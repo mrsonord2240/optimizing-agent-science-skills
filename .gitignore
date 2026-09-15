@@ -1,0 +1,29 @@
+# Heavy or reproducible artefacts live outside git (see README, "What is deliberately not here").
+
+# Raw run outputs and generated test data
+audits/*/*/runs/
+audits/*/*/rerun/
+audits/*/*/data/*
+!audits/*/*/data/*.py
+!audits/*/*/data/*.R
+!audits/*/*/data/README.md
+
+# Downloaded public datasets, runtimes and installed binaries
+public-data/
+environments/**/venv/
+environments/**/R-lib/
+environments/**/tools/
+*.raw
+*.mzML
+*.mzXML
+*.fasta
+*.tar.bz2
+*.msi
+*.zip
+
+# Editor and OS noise
+node_modules/
+__pycache__/
+.Rhistory
+.DS_Store
+Thumbs.db
