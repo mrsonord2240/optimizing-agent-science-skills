@@ -1,0 +1,7 @@
+.libPaths(c(Sys.getenv("R_LIBS_USER"), .libPaths()))
+options(repos = c(CRAN = "https://cloud.r-project.org"))
+if (!requireNamespace("ggtreeExtra", quietly = TRUE)) BiocManager::install("ggtreeExtra", lib = Sys.getenv("R_LIBS_USER"), update = FALSE, ask = FALSE)
+if (!requireNamespace("svglite", quietly = TRUE)) install.packages("svglite", lib = Sys.getenv("R_LIBS_USER"))
+cat("ggtreeExtra", as.character(packageVersion("ggtreeExtra")), "\n")
+cat("ggtree", as.character(packageVersion("ggtree")), "treeio", as.character(packageVersion("treeio")), "ggplot2", as.character(packageVersion("ggplot2")), "\n")
+cat(R.version.string, "\n")

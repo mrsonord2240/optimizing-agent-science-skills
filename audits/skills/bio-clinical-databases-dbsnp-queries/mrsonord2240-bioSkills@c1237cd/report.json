@@ -1,0 +1,424 @@
+{
+  "meta": {
+    "skill_name": "bio-clinical-databases-dbsnp-queries",
+    "description": "Resolves rsIDs, navigates RsMergeArch/SNPHistory merge chains, and converts between rsID, SPDI, HGVS, and VCF representations using the dbSNP Build 156 JSON architecture. Use when normalizing variant identifiers, joining variant databases by cluster ID, or tracking deprecated rsIDs through historical merges.",
+    "evaluated_on": "2026-09-15",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Moderate",
+    "n_inputs": 7,
+    "source": "mrsonord2240/bioSkills@c1237cdbc9bb199947696f3909de26a55d259116:clinical-databases/dbsnp-queries",
+    "executed": 7,
+    "execution_note": "Re-audit of the fixed Skill (fork commit c1237cdb). Mode A. Live NCBI Variation Services v0 and E-utilities efetch (no API key, 0.4 s spacing) and myvariant.info over HTTPS (certificate valid, HTTP 200) on 2026-09-15; Windows Python 3.12 venv. SKILL.md code re-extracted verbatim into runs/p_skill_code.py; example from the fork commit (runs/dbsnp_lookup.fork_copy.py); driver runs/p_run_all.py (outputs in runs/p_in1..p_in5, runs/in6, runs/in7). Real public data only; bulk JSON not downloaded; no withdrawn rsID was available to exercise is_withdrawn. n_inputs 7 = 5 regression + 2 new. Inputs executed: 7/7.",
+    "re_audit": {
+      "pre_fix_score": 66,
+      "pre_fix_grade": "Beta Only",
+      "pre_fix_report": "F:/OpenScience/audits/_pre-fix-20260915/bio-clinical-databases-dbsnp-queries/",
+      "fix_log": "F:/OpenScience/specialist-src/round2/fixes/bio-clinical-databases-dbsnp-queries.md",
+      "regression_inputs": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "new_inputs": [
+        6,
+        7
+      ]
+    }
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "All identifiers and frequencies came from live services; references (Phan 2025, Sayers 2024, Holmes 2020) are real."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Identifier normalization only; no individual-level content."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Cluster-vs-variant principle, SPDI 0-based convention and canonicalization verified on live data."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All SKILL.md functions and the example ran without errors on the tested inputs."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 83,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 11,
+        "max": 12,
+        "note": "All pre-fix code defects fixed and verified live: merge chains follow merged_snapshot_data.merged_into (rs630496 -> rs429358), vcf_to_canonical_spdi builds the SPDI from the response fields with a full GRCh38 RefSeq map and raises on REF mismatch, ALFA comes from /refsnp/{id}/frequency (rs6025 Total 472,250 alleles), dbsnp1_merges reported, example parser and batch table correct. Gap: the batch table does not carry annotations to the canonical rsID after a merge."
+      },
+      "reliability": {
+        "score": 9,
+        "max": 12,
+        "note": "Not-found results use an 'error' key in SKILL.md but 'status' in the example; the batch helper duplicates values when an input rsID is repeated."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "370 lines, mostly load-bearing."
+      },
+      "agent_usability": {
+        "score": 14,
+        "max": 16,
+        "note": "Code now matches the live responses; failure-mode prose accurate."
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Natural prompts."
+      },
+      "security": {
+        "score": 9,
+        "max": 12,
+        "note": "Public API; no API-key or participant-data guidance."
+      },
+      "maintainability": {
+        "score": 9,
+        "max": 12,
+        "note": "Example runs and prints meaningful demo output; no tests."
+      },
+      "agent_specific": {
+        "score": 17,
+        "max": 20,
+        "note": "Clear routing to myvariant/clinvar/gnomad Skills."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 87.6,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 26,
+      "total": 28
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Resolve rs429358 (regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "summarize_refsnp: APOE, NC_000019.10:44908683 T>C, not multi-allelic, merged_from [630496, 61228756]. Example __main__: rs630496 resolved to rs429358 (chain 2), GRCh38 allele T>C, BRCA1 SPDI NC_000017.11:43106486:A:C -> rs28897672, rs6025 ALFA Total 472,250 (pre-fix: alleles [] and SPDI None).",
+        "executed": true,
+        "execution_note": "runs/p_run_all.py in1 -> runs/p_in1/out.txt (live API; example __main__ as subprocess).",
+        "basic": 36,
+        "specialized": 53,
+        "total": 89,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Coordinates and alleles correct",
+            "result": "PASS",
+            "note": "T>C at 44908683 (0-based)"
+          },
+          {
+            "text": "Gene annotation correct",
+            "result": "PASS",
+            "note": "APOE"
+          },
+          {
+            "text": "Merge history reported by the Skill code",
+            "result": "PASS",
+            "note": "merged_from from dbsnp1_merges"
+          },
+          {
+            "text": "Example demo produces meaningful output",
+            "result": "PASS",
+            "note": "alleles, SPDI, rsID, ALFA populated"
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Trace a merged rsID (regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "SKILL.md and example resolve_merge_chain('rs630496') -> resolved 429358, chain ['630496','429358'] (pre-fix: KeyError 0 in both).",
+        "executed": true,
+        "execution_note": "runs/p_run_all.py in2 -> runs/p_in2/out.txt.",
+        "basic": 37,
+        "specialized": 54,
+        "total": 91,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Skill code resolves rs630496 to rs429358",
+            "result": "PASS",
+            "note": "resolved"
+          },
+          {
+            "text": "Code matches the live merge schema",
+            "result": "PASS",
+            "note": "merged_into object read"
+          },
+          {
+            "text": "Chain order preserved",
+            "result": "PASS",
+            "note": "ordered list"
+          },
+          {
+            "text": "No uncaught exception",
+            "result": "PASS",
+            "note": "exit 0"
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Multi-allelic and nonexistent rsIDs (regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "rs334: SKILL.md and example both report multi-allelic (T>A, T>C, T>G); rs1 and rs999999999999 -> {'error': 'not found'} (the example's batch uses status 'not_found').",
+        "executed": true,
+        "execution_note": "runs/p_run_all.py in3 -> runs/p_in3/out.txt.",
+        "basic": 36,
+        "specialized": 53,
+        "total": 89,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "SKILL.md multi-allelic detection correct",
+            "result": "PASS",
+            "note": "rs334 True"
+          },
+          {
+            "text": "Example multi-allelic detection correct",
+            "result": "PASS",
+            "note": "3 ALT alleles, True"
+          },
+          {
+            "text": "Nonexistent ids return a structured not-found",
+            "result": "PASS",
+            "note": "404 handled"
+          },
+          {
+            "text": "Warns that an rsID is a cluster needing allele matching",
+            "result": "PASS",
+            "note": "stated"
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "VCF to canonical SPDI and rsID (regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "19:44908684 T>C -> NC_000019.10:44908683:T:C -> rs429358; chr17:43106487 A>C -> rs28897672 (chr prefix accepted); X:154536002 C>T -> rs1050828; 17:43094464 G>A -> ValueError 'reference ... (T) is not equal to variant's asserted reference (G)' (pre-fix: None for every input).",
+        "executed": true,
+        "execution_note": "runs/p_run_all.py in4 -> runs/p_in4/out.txt.",
+        "basic": 37,
+        "specialized": 54,
+        "total": 91,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Canonical SPDI returned by the Skill code",
+            "result": "PASS",
+            "note": "3 of 3 valid inputs"
+          },
+          {
+            "text": "SKILL.md RefSeq map covers the input chromosomes",
+            "result": "PASS",
+            "note": "chr19, chr17, chrX"
+          },
+          {
+            "text": "spdi_to_rsid works",
+            "result": "PASS",
+            "note": "429358, 28897672, 1050828"
+          },
+          {
+            "text": "REF mismatch surfaced",
+            "result": "PASS",
+            "note": "ValueError with the reference base"
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Five-rsID normalization table with ALFA (regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "alfa_frequency Total: rs6025 T 0.0237 (472,250 alleles), rs1799963 A 0.0119, rs429358 C 0.0354, rs7412 T 0.0804, rs121913529 T 6.4e-6; European rs6025 364,284 alleles. Batch table: one row per rsID, rs6025 and rs121913529 multi-allelic, gnomAD v2 AFs aligned per allele, ClinVar significance populated (pre-fix: ALFA None, flags False, ClinVar None, duplicated rows).",
+        "executed": true,
+        "execution_note": "runs/p_run_all.py in5 -> runs/p_in5/out.txt (Variation Services + myvariant.info HTTPS).",
+        "basic": 36,
+        "specialized": 52,
+        "total": 88,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "ALFA frequency returned",
+            "result": "PASS",
+            "note": "5/5 rsIDs"
+          },
+          {
+            "text": "Table flags multi-allelic sites",
+            "result": "PASS",
+            "note": "rs6025, rs121913529 True"
+          },
+          {
+            "text": "gnomAD AF populated and labelled v2",
+            "result": "PASS",
+            "note": "gnomad_v2_* columns"
+          },
+          {
+            "text": "ClinVar significance populated",
+            "result": "PASS",
+            "note": "from clinvar.rcv"
+          }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Edge",
+        "label": "NEW: homopolymer deletion written left- and right-aligned",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "TTTTT at 13:32340285-32340289: left-aligned VCF 32340284 AT>A and right-shifted 32340288 TT>T both give canonical SPDI NC_000013.11:32340284:TTTTT:TTTT and rs80359548.",
+        "executed": true,
+        "execution_note": "runs/p_run_all.py in6 -> runs/in6/out.txt; reference bases fetched live (efetch NC_000013.11:32340280-32340320). A first run that picked a 1-base run (auditor error) was replaced.",
+        "basic": 37,
+        "specialized": 53,
+        "total": 90,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Both representations canonicalize to the same SPDI",
+            "result": "PASS",
+            "note": "identical"
+          },
+          {
+            "text": "rsID resolved from the canonical SPDI",
+            "result": "PASS",
+            "note": "rs80359548"
+          },
+          {
+            "text": "1-based VCF to 0-based SPDI handled",
+            "result": "PASS",
+            "note": "pos-1 applied"
+          },
+          {
+            "text": "Valid alleles pass the REF check",
+            "result": "PASS",
+            "note": "no warnings"
+          }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Variant A",
+        "label": "NEW: messy manifest with merged, duplicate and missing rsIDs",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "rs630496 -> canonical 429358 (chain 2) but all annotation columns NaN, because myvariant is queried with the old rsID and the table does not re-query the canonical one. The duplicated rs429358 is one row, but its values are doubled ('chr19:g.45411941T>C;chr19:g.45411941T>C', '0.138498;0.138498'). rs999999999999 -> not_found row. rs334 multi-allelic, allele-aligned values.",
+        "executed": true,
+        "execution_note": "runs/p_run_all.py in7 -> runs/in7/out.txt (example batch_normalize_rsids).",
+        "basic": 31,
+        "specialized": 44,
+        "total": 75,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Merged rsID resolved to the canonical rsID",
+            "result": "PASS",
+            "note": "429358"
+          },
+          {
+            "text": "Nonexistent rsID reported as not found",
+            "result": "PASS",
+            "note": "not_found row"
+          },
+          {
+            "text": "Merged rsID carries the canonical record's annotations",
+            "result": "FAIL",
+            "note": "NaN: looked up by the old id"
+          },
+          {
+            "text": "Duplicate input does not duplicate per-allele values",
+            "result": "FAIL",
+            "note": "values joined twice"
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 33.2,
+    "dynamic_weighted": 52.6,
+    "score": 86,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "All five pre-fix defects fixed and verified live: merge chains, canonical SPDI, ALFA endpoint, allele parser and batch table",
+    "The rsID-is-a-cluster principle and SPDI canonicalization hold on real multi-allelic and homopolymer cases",
+    "REF mismatches are raised with the reference base instead of returning None"
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "Batch table drops annotations for merged rsIDs",
+      "observed_in": [
+        7
+      ],
+      "problem": "batch_normalize_rsids resolves rs630496 to rs429358 but reads myvariant hits for the old id, so every annotation column is empty.",
+      "root_cause": "Annotation lookup keyed on the input rsID, not on the resolved one.",
+      "fix": "Query myvariant with the canonical rsID (or the resolved SPDI) after resolve_merge_chain."
+    },
+    {
+      "priority": "P2",
+      "title": "Duplicate input rsIDs double the per-allele values",
+      "observed_in": [
+        7
+      ],
+      "problem": "A repeated rsID yields one row whose ids and AFs are joined twice ('0.138498;0.138498').",
+      "root_cause": "Hits from the repeated query are appended under the same key.",
+      "fix": "De-duplicate the input before getvariants, or de-duplicate hits by _id per rsID."
+    },
+    {
+      "priority": "P2",
+      "title": "Inconsistent not-found contract between SKILL.md and example",
+      "observed_in": [
+        3,
+        7
+      ],
+      "problem": "SKILL.md resolve_merge_chain returns {'error': 'not found'}; the example returns {'status': 'not_found'}.",
+      "root_cause": "The two copies evolved separately.",
+      "fix": "Use one key and value in both."
+    }
+  ]
+}

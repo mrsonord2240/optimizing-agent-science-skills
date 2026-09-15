@@ -1,0 +1,12 @@
+suppressMessages({library(rwty)})
+setwd("F:/OpenScience/audits/bio-phylo-bayesian-inference/runs_v2/in2")
+run1 <- load.trees("user.run1.t", type = "nexus", format = "mb")
+run2 <- load.trees("user.run2.t", type = "nexus", format = "mb")
+cat("trees per run:", length(run1$trees), length(run2$trees), " burnin(trees):", round(0.25 * length(run1$trees)), "\n")
+set.seed(1)
+res <- tryCatch(analyze.rwty(list(run1 = run1, run2 = run2), burnin = round(0.25 * length(run1$trees))),  # Skill verbatim
+                error = function(e) {cat("analyze.rwty ERROR:", conditionMessage(e), "\n"); NULL})
+cat("analyze.rwty returned:", !is.null(res), "\n")
+ts <- makeplot.treespace(list(run1 = run1, run2 = run2), burnin = round(0.25 * length(run1$trees)), n.points = 100)
+png("treespace.png", width = 900, height = 450); print(ts$treespace.heatmap); dev.off()
+cat("approx topological ESS:\n"); print(topological.approx.ess(run1, burnin = round(0.25 * length(run1$trees))))

@@ -1,0 +1,460 @@
+{
+  "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:phylogenetics/divergence-dating",
+  "meta": {
+    "skill_name": "bio-phylo-divergence-dating",
+    "description": "Estimate divergence times under molecular-clock models with BEAST2, MCMCTree/PAML, TreePL and LSD2: calibration priors, effective-prior (sample-from-prior) checks, fossil minima and soft bounds, tip-dating with temporal-signal tests, and clock-model choice.",
+    "evaluated_on": "2026-09-15",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:phylogenetics/divergence-dating",
+    "executed": "6/7 inputs executed (PAML 4.10.10 mcmctree/baseml, IQ-TREE 2.4.0 + LSD2, BEAST 2.7.7 + TreeAnnotator, Biopython 1.88, DendroPy 5.0.13); Input 6 is a routing answer",
+    "execution_note": "All data SYNTHETIC (data/make_data.py): an 8-taxon time tree with known ages and lognormal branch rates simulated with AliSim (two loci), a 30-tip heterochronous virus set with a strict clock of 2e-3, and a 0.4-yr no-signal set. The shipped example and the Skill's MCMCTree/BEAST/LSD2 commands and Python snippet were run as written first; TreePL and TempEst were not executed (no Windows build / GUI only)."
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "Every number in the outputs comes from runs on synthetic data; citations in the Skill are real and correctly attributed; nothing fabricated."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Evolutionary and outbreak-population dating only; nothing diagnoses, prescribes or triages an individual."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Fossil-as-minimum, effective-prior reporting, temporal-signal gating and refusal of bare PL dates were applied correctly; the Skill's misleading Bio.Phylo comparison snippet was replaced in the output, so no output carried the error."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All delivered code ran. Skill-supplied MCMCTree control lines ('BDparas = 1 1 0.1', bare 'usedata = 2') fail on PAML 4.10.10 with explicit messages and run after the documented one-line fixes, as the Skill's adapt rule instructs; scored as P1 correctness defects, not unrunnable code."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 80,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 9,
+        "max": 12,
+        "note": "Completeness 3: covers clock choice, calibration design, four engines, prior-only and temporal-signal checks; no BEAST2 tip-dating/FBD XML pattern and no root-to-tip or date-randomization code. Correctness 2: on PAML 4.10.10 the example ctl ('BDparas = 1 1 0.1') is rejected, bare 'usedata = 2' fails ('file name empty'), the claim that '>'/'<' calibrations are silently ignored is false (bug existed only in 4.9b-4.9d), and the Bio.Phylo prior-vs-posterior snippet does not compare node ages. Appropriateness 4."
+      },
+      "reliability": {
+        "score": 8,
+        "max": 12,
+        "note": "Common Errors table and introspect-and-adapt rule help (fault tolerance 2, error reporting 3, recoverability 3), but one row is factually wrong ('>'/'<') and the two errors actually hit on PAML 4.10.10 (BDparas flag, in.BV filename) are absent."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "215-line SKILL.md plus 108-line usage guide, dense tables, no redundant steps; all content is loaded at once but it is compact."
+      },
+      "agent_usability": {
+        "score": 13,
+        "max": 16,
+        "note": "Learnable (3) with excellent error prevention (4): fossil-as-minimum, effective prior, temporal signal, bare PL dates. Consistency 3: the shipped example writes RootAge = <1.0 while SKILL.md tells the agent to avoid '<' notation. Feedback design 3: 'specified vs effective vs posterior' and 'median + 95% HPD' are prescribed, but the code meant to produce them prints clade.confidence."
+      },
+      "human_usability": {
+        "score": 6,
+        "max": 8,
+        "note": "Usage guide has natural prompts for every task type; the description is long and jargon-dense; off-spec requests are handled by routing to sibling Skills."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "No credentials, no network, local tools only; shipped example writes into an OS temp dir without cleanup; no input sanity checks."
+      },
+      "maintainability": {
+        "score": 8,
+        "max": 12,
+        "note": "Clear sections and one helper module (modularity 3, modifiability 3); testability 2: the example ships no data, never writes the calibrated tree file, its three ctl files share one output directory so mcmc.txt/FigTree.tre of the prior run are overwritten by the posterior run, and it was never run against PAML 4.10."
+      },
+      "agent_specific": {
+        "score": 18,
+        "max": 20,
+        "note": "Precise trigger and routing to modern-tree-inference, bayesian-inference, tree-manipulation, tree-io and phylodynamics (all present); strong escape hatches (refuse to date without temporal signal, never a bare PL date). Progressive disclosure 3 (no references/), idempotency 3 (example uses seed = -1)."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 84.9,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 26,
+      "total": 32
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "MCMCTree fossil-calibrated dating, prior-only then approximate likelihood",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Prior (usedata=0), in.BV (usedata=3) ran; the Skill's bare 'usedata = 2' exits 1 on PAML 4.10.10, 'usedata = 2 in.BV' runs; all 7 true node ages inside the 95% HPD; effective prior on the L(0.15) node has mean 0.289, not the typed minimum",
+        "basic": 36,
+        "specialized": 48,
+        "total": 84,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "A prior-only (usedata = 0) run precedes the posterior run",
+            "result": "PASS",
+            "note": "prior/ run, effective prior table produced"
+          },
+          {
+            "text": "The Skill's MCMCTree posterior step (usedata = 2) runs as written on PAML 4.10.10",
+            "result": "FAIL",
+            "note": "exit 1 'error: file name empty.'; pamlDOC p.48 documents 'usedata = 2 inBVfilename'"
+          },
+          {
+            "text": "Every true (simulated) node age lies inside the posterior 95% HPD",
+            "result": "PASS",
+            "note": "7/7, e.g. AB 0.20 in [0.149, 0.300]"
+          },
+          {
+            "text": "Output reports specified vs effective prior vs posterior for each calibrated node",
+            "result": "PASS",
+            "note": "AB: L(0.15) / 0.289 [0.134,0.572] / 0.222 [0.149,0.300]"
+          },
+          {
+            "text": "Fossil calibrations are encoded as soft minima or soft bounds, never points",
+            "result": "PASS",
+            "note": "L(0.15,0.1,1,0.025), B() with 2.5% tails"
+          }
+        ],
+        "executed": true,
+        "execution_note": "mcmctree/baseml PAML 4.10.10 on SYNTHETIC 8-taxon 4 kb locus (runs/in1). Adapted: BDparas M flag and 'usedata = 2 in.BV' after the as-written forms failed."
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Temporal signal + LSD2 tip-dating on heterochronous virus data",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Root-to-tip slope 2.22e-3 (true 2e-3), R^2 0.987; LSD2 rate 1.94e-3 [1.54e-3, 2.28e-3], tMRCA 1996.79 [1994.74, 1998.40] (true 1996.98); date-randomization 20 reps max 7.3e-5, real CI outside -> signal passes",
+        "basic": 37,
+        "specialized": 53,
+        "total": 90,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Both Skill IQ-TREE commands (ML tree; --date --date-ci 100) run as written",
+            "result": "PASS",
+            "note": "exit 0 on IQ-TREE 2.4.0"
+          },
+          {
+            "text": "Root-to-tip regression reports slope, x-intercept, R^2 and residual outliers",
+            "result": "PASS",
+            "note": "slope 2.22e-3, x-int 1997.98, R^2 0.987, 0 tips beyond 3 SD"
+          },
+          {
+            "text": "Date-randomization test is run and the real rate CI is compared with the randomized distribution",
+            "result": "PASS",
+            "note": "20 shuffles; no overlap"
+          },
+          {
+            "text": "LSD2 rate and tMRCA confidence intervals contain the simulated truth",
+            "result": "PASS",
+            "note": "rate 2e-3 and tMRCA 1996.98 bracketed"
+          },
+          {
+            "text": "Output states R^2 is exploratory (non-independent tips), not a formal test",
+            "result": "PASS",
+            "note": "stated, per the Skill"
+          }
+        ],
+        "executed": true,
+        "execution_note": "IQ-TREE 2.4.0 + LSD2 on SYNTHETIC 30-tip serial-coalescent alignment (runs/in2). Root-to-tip and date randomization were implemented in Python (TempEst is GUI-only; the Skill gives no code for either)."
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Virus samples spanning 0.4 yr: no temporal signal",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "LSD2 still returns rate 4.2e-4 and tMRCA 1810 (CI to -1e9; truth 1976); root-to-tip R^2 0.094 with a spurious positive slope; real rate CI overlaps randomized 95% range [~0, 1.08e-3] -> output refuses to date",
+        "basic": 36,
+        "specialized": 50,
+        "total": 86,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Output refuses to report a divergence date for this dataset",
+            "result": "PASS",
+            "note": "no-signal verdict; recommends wider sampling span"
+          },
+          {
+            "text": "Date-randomization overlap is detected and used as the deciding test",
+            "result": "PASS",
+            "note": "real CI [1e-10, 3.96e-3] overlaps"
+          },
+          {
+            "text": "R^2 < ~0.2 red flag and implausible x-intercept (2018.78) are reported",
+            "result": "PASS",
+            "note": "both flagged"
+          },
+          {
+            "text": "The Skill's 'positive slope is mandatory' rule by itself rejects this dataset",
+            "result": "FAIL",
+            "note": "slope is positive (0.144, meaningless over 0.4 yr); only R^2 and the randomization test catch it"
+          }
+        ],
+        "executed": true,
+        "execution_note": "Same pipeline on SYNTHETIC no-signal set (runs/in3); verdict.py re-parses the LSD2 CI (negative bound broke the first regex - auditor script bug, not the Skill's)."
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "BEAST2 prior-only vs with-data runs and the Skill's MCC comparison snippet",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "sampleFromPrior=\"true\" and 'beast -seed 1 -prefix' work on BEAST 2.7.7 (prior-only likelihood logged as NaN); the Skill's Bio.Phylo snippet exits 0 but prints 'None None' for all 7 nodes and zip() pairs different clades at 4 of 7 positions; corrected log/annotation comparison: AB prior 17.4 [15.1,25.3] -> posterior 19.9 [16.7,25.4] (true 20), all 7 true ages inside posterior HPD; node-age ESS only 22-48 (posterior 353) after 2M steps, so per the Skill's ESS > 200 rule the output flags the run as too short to report",
+        "basic": 33,
+        "specialized": 44,
+        "total": 77,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "sampleFromPrior=\"true\" yields a data-free run of the same model",
+            "result": "PASS",
+            "note": "likelihood column NaN in prioronlydating.log; clockRate prior HPD [0.0002, 0.0138] vs posterior [0.0020, 0.0029]"
+          },
+          {
+            "text": "'beast -seed 1 -prefix <name> <xml>' runs as documented",
+            "result": "PASS",
+            "note": "exit 0; note the prefix is concatenated without a separator (prioronlydating.log)"
+          },
+          {
+            "text": "The Skill's Bio.Phylo snippet compares node ages / HPDs between the two MCC trees",
+            "result": "FAIL",
+            "note": "prints 'None None' x7: TreeAnnotator stores height_median/height_95%_HPD in [&...] comments, which Bio.Phylo keeps only as clade.comment"
+          },
+          {
+            "text": "The Skill's snippet pairs the same clade from the prior-only and posterior MCC trees",
+            "result": "FAIL",
+            "note": "zip() over get_nonterminals() pairs ABCDEF-ABCD, CDEF-CD, CE-EFGH, DF-EF; the prior-only MCC topology differs"
+          },
+          {
+            "text": "Posterior 95% HPD contains the simulated age of every node",
+            "result": "PASS",
+            "note": "7/7, e.g. GH 39.9 [35.0, 50.1] vs true 45; root 88.2 [80.0, 109.2] vs 100"
+          }
+        ],
+        "executed": true,
+        "execution_note": "BEAST 2.7.7 Windows build (bundled JRE), hand-written XML (BEAUti is GUI-only) for SYNTHETIC loc1: HKY+G4, strict clock, Yule, 3 calibrations, 2M steps each (6 s prior-only, 353 s with data); TreeAnnotator -burnin 10 -height median; Skill snippet run verbatim; compare.py is the corrected comparison."
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Two loci, clock 2 vs 3, two chains; notation, RootAge and shipped example checks",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "All 4 runs bracket 7/7 true ages, chains agree (max mean diff 0.0025); '>0.15'/'>0.35<0.55' read identically to L()/B(); RootAge = <1.0 works; shipped example ctl fails as written (BDparas), then needs a tree header and 'usedata = 2 in.BV'",
+        "basic": 34,
+        "specialized": 47,
+        "total": 81,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Two independent chains per clock model agree",
+            "result": "PASS",
+            "note": "max |mean age difference| 0.0025 (clock 2), 0.0016 (clock 3)"
+          },
+          {
+            "text": "True node ages inside the 95% HPD under both clock models",
+            "result": "PASS",
+            "note": "7/7 in all four runs"
+          },
+          {
+            "text": "The Skill's claim that '>'/'<' calibrations are silently ignored holds on PAML 4.10.10",
+            "result": "FAIL",
+            "note": "calibration block and effective priors identical to B()/L(); pamlHistory: bug only in 4.9b-4.9d"
+          },
+          {
+            "text": "Shipped examples/mcmctree_setup.py control files run as written",
+            "result": "FAIL",
+            "note": "all three exit 1 'BDparas: expect flag ... C ... M'"
+          },
+          {
+            "text": "Output reports effective prior vs posterior for every calibrated node",
+            "result": "PASS",
+            "note": "table for 7 nodes"
+          }
+        ],
+        "executed": true,
+        "execution_note": "PAML 4.10.10, SYNTHETIC two-locus data (runs/in5). Strict-vs-relaxed was not settled by marginal likelihood (stepping-stone not run: time budget); reported as a limitation."
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Skyline Ne and Re requested from the tip-dated tree",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Routes Ne/Re to epidemiological-genomics/phylodynamics, hands over temporal-signal evidence, warns not to condition a skyline on the LSD2 point tree",
+        "basic": 37,
+        "specialized": 48,
+        "total": 85,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Scope: no Ne or Re estimate is produced",
+            "result": "PASS",
+            "note": "declined and routed"
+          },
+          {
+            "text": "Routes to the correct sibling Skill (epidemiological-genomics/phylodynamics, present in the repo)",
+            "result": "PASS",
+            "note": "named"
+          },
+          {
+            "text": "States that LSD2 point dates are a cross-check and dating uncertainty must be integrated",
+            "result": "PASS",
+            "note": "stated"
+          },
+          {
+            "text": "States the analysis concerns an outbreak population, not an individual",
+            "result": "PASS",
+            "note": "research-only caveat given"
+          }
+        ],
+        "executed": false,
+        "execution_note": "Routing answer; nothing to execute (runs/in6/response.txt)."
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "PI demands a point fossil age and a bare TreePL date",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Point calibration B(0.399,0.401) pins (G,H) at 0.400 [0.399,0.401], excluding the true 0.45 and dragging EFGH to 0.694 and root to 0.922; soft minimum L(0.40) gives 0.491 [0.369,0.638]; TreePL prime/cv/bootstrap workflow written, not executed",
+        "basic": 37,
+        "specialized": 54,
+        "total": 91,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Safety: output refuses to encode the fossil as a point age",
+            "result": "PASS",
+            "note": "explains fossil = minimum"
+          },
+          {
+            "text": "Output demonstrates the too-young, falsely precise bias on data with known truth",
+            "result": "PASS",
+            "note": "point HPD width 0.002 excludes truth; soft-min HPD contains it"
+          },
+          {
+            "text": "Output refuses a bare TreePL date and prescribes cross-validated smoothing plus bootstrap intervals",
+            "result": "PASS",
+            "note": "prime -> cv/randomcv -> bootstrap trees"
+          },
+          {
+            "text": "TreePL configuration keys used exist in the treePL documentation",
+            "result": "PASS",
+            "note": "prime, cv, randomcv, cvoutfile, mrca/min/max checked on the wiki"
+          }
+        ],
+        "executed": true,
+        "execution_note": "MCMCTree runs executed (runs/in7); TreePL NOT executed (no Windows build), keys checked against the treePL wiki."
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 32.0,
+    "dynamic_weighted": 50.9,
+    "score": 83,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Correct, current dating doctrine: fossils as minima with soft tails, specified vs effective prior vs posterior, and a tight HPD is not evidence the data informed a node",
+    "Temporal-signal gate (root-to-tip plus date-randomization) correctly separated a signal dataset from a no-signal dataset on which LSD2 silently returned a date",
+    "MCMCTree approximate-likelihood workflow, once its control lines are fixed, recovered all simulated node ages under independent and autocorrelated clocks with agreeing chains",
+    "Clear routing to tree inference, Bayesian convergence, rooting, tree I/O and phylodynamics Skills, all present"
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "Replace the Bio.Phylo MCC prior-vs-posterior snippet",
+      "observed_in": [
+        4
+      ],
+      "problem": "The snippet prints clade.confidence (None for every node of a TreeAnnotator MCC tree) and zips get_nonterminals() of two trees whose topologies can differ, so it neither reads ages/HPDs nor matches nodes.",
+      "root_cause": "Node heights live in [&height_median=..., height_95%_HPD={...}] comments that Bio.Phylo does not parse, and node order is not a clade identity.",
+      "fix": "Compare the MRCA heights logged by each calibration in the two .log files (median + 95% HPD), or parse clade.comment with a regex and match clades by tip set; route MCC parsing to tree-io (treeio::read.beast)."
+    },
+    {
+      "priority": "P1",
+      "title": "Fix MCMCTree control lines for PAML 4.10",
+      "observed_in": [
+        1,
+        5
+      ],
+      "problem": "The example writes 'BDparas = 1 1 0.1' (rejected: 'expect flag ... C for conditional, M for multiplicative') and SKILL.md/example use bare 'usedata = 2', which exits with 'file name empty.'",
+      "root_cause": "Control-file syntax was written for PAML 4.9 and not re-tested on the 4.10 version the Skill claims.",
+      "fix": "Write 'BDparas = 1 1 0.1 m' and 'usedata = 2 in.BV', and state that out.BV from usedata = 3 must be renamed/copied to in.BV."
+    },
+    {
+      "priority": "P1",
+      "title": "Remove the false '>'/'<' calibration claim",
+      "observed_in": [
+        5
+      ],
+      "problem": "Common Errors says '>'/'<' calibrations are silently ignored; PAML 4.10.10 reads them identically to L()/B() and the shipped example itself uses RootAge = <1.0.",
+      "root_cause": "A 4.9b-4.9d parsing bug (pamlHistory) was generalised to all versions.",
+      "fix": "Replace the row with: '>'/'<' bounds were mis-read only in PAML 4.9b-4.9d; prefer B()/L()/U() because they expose tail probabilities."
+    },
+    {
+      "priority": "P2",
+      "title": "Make examples/mcmctree_setup.py runnable end to end",
+      "observed_in": [
+        5
+      ],
+      "problem": "It never writes the calibrated tree file (needed with an 'ntaxa ntree' header), puts all three runs in one directory so mcmc.txt/FigTree.tre are overwritten, and uses seed = -1.",
+      "root_cause": "The helper only prints configs and was never executed against data.",
+      "fix": "Write the tree file with header, use one subdirectory and mcmcfile per run, copy out.BV to in.BV, set a fixed seed, and ship a tiny test alignment."
+    },
+    {
+      "priority": "P2",
+      "title": "Ship root-to-tip and date-randomization code",
+      "observed_in": [
+        2,
+        3
+      ],
+      "problem": "Both temporal-signal tests are described but have no code (TempEst is GUI-only), and a positive slope alone passed a no-signal dataset.",
+      "root_cause": "The Skill defers to a GUI tool for its mandatory gate.",
+      "fix": "Add a short Python/R root-to-tip regression with best-fitting root and an LSD2 date-shuffle loop; say a positive slope is necessary but not sufficient."
+    },
+    {
+      "priority": "P2",
+      "title": "Add a marginal-likelihood recipe for clock choice",
+      "observed_in": [
+        5
+      ],
+      "problem": "The Skill says to decide strict vs relaxed by path sampling/stepping-stone but gives no command for MCMCTree or BEAST2.",
+      "root_cause": "Model comparison is delegated to bayesian-inference without an engine-specific pointer.",
+      "fix": "Point to BEAST2 PathSampler/NS package and MCMCTree's mcmc3r stepping-stone workflow, or route explicitly."
+    }
+  ]
+}

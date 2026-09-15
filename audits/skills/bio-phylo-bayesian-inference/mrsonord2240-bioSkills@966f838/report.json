@@ -1,0 +1,129 @@
+{
+  "source": "mrsonord2240/bioSkills@966f838b0ba32918310bd223a34f71d78f190560:phylogenetics/bayesian-inference",
+  "meta": {
+    "skill_name": "bio-phylo-bayesian-inference",
+    "description": "Frames Bayesian phylogenetics as approximating a posterior distribution over trees conditioned on data AND priors via an MCMC that must be proven to have converged, using MrBayes, BEAST2, RevBayes, and PhyloBayes-MPI.",
+    "evaluated_on": "2026-09-15",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 9,
+    "source": "mrsonord2240/bioSkills@966f838b0ba32918310bd223a34f71d78f190560:phylogenetics/bayesian-inference",
+    "executed": "8/9 inputs executed (MrBayes 3.2.7a Windows, R rwty 1.0.3, Python example); Input 6 is a routing answer. PhyloBayes-MPI, BEAST2, RevBayes not executed.",
+    "execution_note": "Re-audit of the fixed Skill: 7 pre-fix inputs as regression tests plus 2 new inputs (N = 9). The Skill's MrBayes block used with its seeds and stoprule=no; ngen scaled from 10,000,000 to 100k-300k. Input 5's data-run tree lengths come from the pre-fix gammadir/exp10 runs (commands unchanged); its new prior-only runs were executed. SYNTHETIC data (data/make_data.py)."
+  },
+  "veto_gates": {
+    "skill_veto": {"gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS"},
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {"result": "PASS", "detail": "All ESS, PSRF, posterior and marginal-likelihood values come from MrBayes runs on synthetic data."},
+      "practice_boundaries": {"result": "PASS", "detail": "Research phylogenetics only."},
+      "methodological_ground": {"result": "PASS", "detail": "No unconverged posterior reported, HME refused for model choice, stepping-stone used, near-zero internode reported as a soft node."},
+      "code_usability": {"result": "PASS", "detail": "The fixed MrBayes block, 'mcmc append=yes ngen=<new total>', 'mcmc data=no', the ss line, the RWTY burnin expression and the example script all run."}
+    }
+  },
+  "static_score": {
+    "subtotal": 86,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {"score": 11, "max": 12, "note": "stoprule, append, prior-only, ss samples-per-step, RWTY burnin, seeds and polytomy-prior statements verified. Completeness 3/4: BEAST2 and RevBayes remain names only."},
+      "reliability": {"score": 10, "max": 12, "note": "New Common Errors rows (early halt, HME banner) are accurate; the example silently runs its synthetic self-test when given one .p file (Input 9)."},
+      "performance_context": {"score": 7, "max": 8, "note": "245-line SKILL.md, compact."},
+      "agent_usability": {"score": 14, "max": 16, "note": "Convergence checklist and new append instruction are clear; nst=mixed output (model probabilities) is not explained."},
+      "human_usability": {"score": 6, "max": 8, "note": "Natural prompts; dense description."},
+      "security": {"score": 11, "max": 12, "note": "Nothing sensitive; example lacks header validation."},
+      "maintainability": {"score": 9, "max": 12, "note": "Self-testing example now documents its intended FAIL; no test NEXUS shipped."},
+      "agent_specific": {"score": 18, "max": 20, "note": "Precise trigger and routing; seeds now in the block."}
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 87.2,
+    "max": 100,
+    "assertion_pass_rate": {"passed": 40, "total": 42},
+    "inputs": [
+      {"index": 1, "type": "Canonical", "label": "12-taxon MrBayes run with proof of convergence", "status": "COMPLETED", "status_flag": "✅", "note": "Fixed block at 100k: min ESS 51.6 -> Skill's append extended the same runs to 300k (3001 samples/run), PSRF <= 1.003, ASDSF 0.0003, alpha ESS 140.6 still < 200 -> reported as needing a further append, not as converged; consensus RF 0", "basic": 36, "specialized": 52, "total": 88, "assertions_passed": 5, "assertions_total": 5,
+       "assertions": [
+         {"text": "The Skill's block runs the full ngen (no premature halt)", "result": "PASS", "note": "stoprule=no (pre-fix: halted at gen 5000)"},
+         {"text": "mcmc append=yes ngen=<new total> continues the same runs", "result": "PASS", "note": "1001 -> 3001 samples per run"},
+         {"text": "PPs withheld until every ESS > 200", "result": "PASS", "note": "alpha 140.6 flagged"},
+         {"text": "Consensus equals the simulated tree", "result": "PASS", "note": "RF 0"},
+         {"text": "RWTY burnin expression in trees works", "result": "PASS", "note": "burnin 750 of 3001; analyze.rwty returned (pre-fix FAIL)"}
+       ], "executed": true, "execution_note": "runs_v2/in1: in1a.nex (100k), in1b.nex (append to 300k), mbdiag.py, rf_truth.py, rwty.R."},
+      {"index": 2, "type": "Variant A", "label": "Under-run 60-isolate user run: write up PPs?", "status": "COMPLETED", "status_flag": "✅", "note": "min ESS 21.9, ASDSF 0.0129, max split SD 0.10; example flags low ESS; not reportable", "basic": 37, "specialized": 52, "total": 89, "assertions_passed": 5, "assertions_total": 5,
+       "assertions": [
+         {"text": "Declines to write up PPs", "result": "PASS", "note": "not reportable"},
+         {"text": "Scalar ESS gate applied", "result": "PASS", "note": "21.9"},
+         {"text": "Topology gate applied", "result": "PASS", "note": "ASDSF 0.0129"},
+         {"text": "Recommends extending runs, not thinning", "result": "PASS", "note": "append"},
+         {"text": "Example script agrees with sump", "result": "PASS", "note": "low ESS flagged"}
+       ], "executed": true, "execution_note": "runs_v2/in2: agent_diag.nex, bayesian_convergence.py, rwty.R on the pre-fix synthetic user run files."},
+      {"index": 3, "type": "Edge", "label": "Near-polytomy split posterior", "status": "COMPLETED", "status_flag": "✅", "note": "Fixed block 300k converged (min ESS 220, PSRF 1.003); split of interest PP 0.714, alternative 0.207; reported as an effective polytomy as the fixed text says", "basic": 36, "specialized": 52, "total": 88, "assertions_passed": 5, "assertions_total": 5,
+       "assertions": [
+         {"text": "The Skill's block yields ESS > 200", "result": "PASS", "note": "220.4 (pre-fix FAIL)"},
+         {"text": "Split reported as soft", "result": "PASS", "note": "PP 0.71"},
+         {"text": "Cross-checked against bootstrap", "result": "PASS", "note": "pre-fix UFBoot 63 for the same split"},
+         {"text": "Strongly supported true splits recovered", "result": "PASS", "note": "RF 0"},
+         {"text": "Polytomy-prior guidance is actionable on MrBayes", "result": "PASS", "note": "report as effective polytomy (pre-fix FAIL)"}
+       ], "executed": true, "execution_note": "runs_v2/in3: in3.nex, split_pp.py."},
+      {"index": 4, "type": "Variant B", "label": "Stepping-stone GTR+G vs JC", "status": "COMPLETED", "status_flag": "✅", "note": "49 samples per step = 250000/51/100 as the Skill's formula says; lnML -9857.08 vs -10602.26; 2 lnBF = 1490", "basic": 37, "specialized": 54, "total": 91, "assertions_passed": 5, "assertions_total": 5,
+       "assertions": [
+         {"text": "ss line with samplefreq runs", "result": "PASS", "note": "exit 0"},
+         {"text": "The Skill states samples per step, alpha and burninss", "result": "PASS", "note": "formula matches printed 49 (pre-fix FAIL)"},
+         {"text": "2 lnBF computed and read on the Kass-Raftery scale", "result": "PASS", "note": "1490, decisive"},
+         {"text": "Proper priors noted", "result": "PASS", "note": "MrBayes defaults proper"},
+         {"text": "Result matches the simulating model", "result": "PASS", "note": "GTR+G"}
+       ], "executed": true, "execution_note": "runs_v2/in4: ss_gtrg.nex, ss_jc.nex."},
+      {"index": 5, "type": "Stress", "label": "exp(10) vs gammadir prior on 60 taxa, with prior-only check", "status": "COMPLETED", "status_flag": "✅", "note": "Skill's 'mcmc data=no' runs: prior TL mean 9.56 (gammadir) and 11.69 (exp10, about 117 branches x 0.1) vs data posteriors 0.90 and 1.18; data dominate, residual pull toward the exp10 prior visible", "basic": 36, "specialized": 52, "total": 88, "assertions_passed": 5, "assertions_total": 5,
+       "assertions": [
+         {"text": "The Skill gives a runnable prior-only command", "result": "PASS", "note": "'Running without data' (pre-fix FAIL)"},
+         {"text": "Prior and posterior TL compared", "result": "PASS", "note": "9.56/11.69 vs 0.90/1.18"},
+         {"text": "exp(10) inflation direction reported", "result": "PASS", "note": "posterior TL 31% higher"},
+         {"text": "Topology effect reported honestly", "result": "PASS", "note": "pre-fix RF 0 between priors"},
+         {"text": "ML reference not treated as truth", "result": "PASS", "note": "true TL 1.01 between"}
+       ], "executed": true, "execution_note": "runs_v2/in5: prior_gdir.nex, prior_exp10.nex; data-run TL from runs/in5 (pre-fix)."},
+      {"index": 6, "type": "Scope Boundary", "label": "Divergence times from the unconstrained consensus", "status": "COMPLETED", "status_flag": "✅", "note": "Routed to divergence-dating with calibration as minimum and prior-only run", "basic": 37, "specialized": 47, "total": 84, "assertions_passed": 4, "assertions_total": 4,
+       "assertions": [
+         {"text": "No ages derived from substitution-scaled tree", "result": "PASS", "note": "declined"},
+         {"text": "Routes to divergence-dating", "result": "PASS", "note": "named"},
+         {"text": "Fossil treated as minimum", "result": "PASS", "note": "stated"},
+         {"text": "Convergence gates carried over", "result": "PASS", "note": "stated"}
+       ], "executed": false, "execution_note": "Routing answer; nothing to run."},
+      {"index": 7, "type": "Adversarial", "label": "Use sump harmonic means for Bayes factors", "status": "COMPLETED", "status_flag": "✅", "note": "Banner reproduced; HME GTR+G -9788.80/-9787.16 and JC -10551.31/-10551.95 vs SS -9857.08/-10602.26; declined per the new Common Errors row", "basic": 37, "specialized": 54, "total": 91, "assertions_passed": 5, "assertions_total": 5,
+       "assertions": [
+         {"text": "Safety: HME not used for model choice", "result": "PASS", "note": "declined"},
+         {"text": "SS value supplied instead", "result": "PASS", "note": "2 lnBF 1490"},
+         {"text": "HME instability shown on replicates", "result": "PASS", "note": "1.6 log-unit spread, ~70 above SS"},
+         {"text": "The Skill pre-empts MrBayes's 'use the harmonic mean' banner", "result": "PASS", "note": "Common Errors row (pre-fix FAIL)"},
+         {"text": "Code runs", "result": "PASS", "note": "4 runs exit 0"}
+       ], "executed": true, "execution_note": "runs_v2/in7: mc_{gtrg,jc}_{a,b}.nex."},
+      {"index": 8, "type": "Variant B", "label": "NEW: substitution-model averaging with nst=mixed", "status": "COMPLETED", "status_flag": "✅", "note": "Converged (ESS 218, ASDSF 0.0001); model posteriors spread: 123323 0.199, 123121 0.144, 121121 0.129 ...; consensus RF 0", "basic": 35, "specialized": 51, "total": 86, "assertions_passed": 3, "assertions_total": 4,
+       "assertions": [
+         {"text": "lset nst=mixed runs as the Skill names it", "result": "PASS", "note": "exit 0"},
+         {"text": "Convergence gates applied before reading model probabilities", "result": "PASS", "note": "ESS/PSRF/ASDSF"},
+         {"text": "The Skill explains how to read the model-probability table", "result": "FAIL", "note": "no mention of mstat or gtrsubmodel strings"},
+         {"text": "Output reports model uncertainty, not one winner", "result": "PASS", "note": "top model 0.20"}
+       ], "executed": true, "execution_note": "runs_v2/in8/mixed.nex."},
+      {"index": 9, "type": "Edge", "label": "NEW: one MrBayes run, user asks to prove convergence", "status": "COMPLETED", "status_flag": "⚠️", "note": "nruns=1: sump gives ESS but no PSRF or ASDSF; agent declines per the Skill and asks for nruns >= 2; the shipped example given one .p file silently runs its synthetic self-test with exit 0", "basic": 32, "specialized": 48, "total": 80, "assertions_passed": 3, "assertions_total": 4,
+       "assertions": [
+         {"text": "Output refuses to claim convergence from a single run", "result": "PASS", "note": "multiple-run rule"},
+         {"text": "Output reruns with nruns >= 2", "result": "PASS", "note": "recommended"},
+         {"text": "The example script rejects a single .p file", "result": "FAIL", "note": "prints self-test results instead, exit 0"},
+         {"text": "Code runs", "result": "PASS", "note": "exit 0"}
+       ], "executed": true, "execution_note": "runs_v2/in9/single.nex; bayesian_convergence.py single.p. (mbdiag.py auditor helper crashed on the missing PSRF column; diagnosis taken from single.pstat.)"}
+    ]
+  },
+  "final": {"static_weighted": 34.4, "dynamic_weighted": 52.3, "score": 87, "max": 100, "grade": "Production Ready", "grade_symbol": "⭐", "deployable": true, "veto_override": false},
+  "key_strengths": [
+    "MrBayes block now runs the full chain and the append instruction extends runs exactly as described",
+    "Prior-only and stepping-stone commands are runnable and their numbers check out",
+    "Clear separation of scalar and topology convergence with correct thresholds",
+    "Explicit refusal of harmonic-mean model choice, matched to MrBayes's own misleading banner"
+  ],
+  "recommendations": [
+    {"priority": "P2", "title": "Make the example refuse a single .p file", "observed_in": [9], "problem": "bayesian_convergence.py with one argument silently runs its synthetic self-test and exits 0.", "root_cause": "Argument handling treats anything but two files as self-test mode.", "fix": "Run the self-test only with --selftest; exit with a message when one file is given."},
+    {"priority": "P2", "title": "Explain nst=mixed output", "observed_in": [8], "problem": "The Skill recommends nst=mixed but not how to read the model-probability table.", "root_cause": "Model averaging is mentioned in one line.", "fix": "Say sump prints gtrsubmodel posterior probabilities (mixed.mstat) and to report the spread, not one model."},
+    {"priority": "P2", "title": "Add minimal BEAST2/RevBayes commands", "observed_in": [], "problem": "Both are recommended with names only.", "root_cause": "Scope written around MrBayes.", "fix": "Add a minimal command or route explicitly."}
+  ]
+}

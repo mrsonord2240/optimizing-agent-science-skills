@@ -1,0 +1,342 @@
+{
+  "meta": {
+    "skill_name": "bio-variant-normalization",
+    "description": "Left-align and trim indels to parsimonious canonical form, decompose MNPs (atomize), and split multiallelic variants with bcftools norm. Use when comparing variants across callers or cohorts, preparing a VCF for database annotation or ClinVar/dbSNP matching, merging VCFs, reconciling vt-vs-bcftools discordance, or resolving the VCF-left-align vs HGVS-3'-rule clash.",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Moderate",
+    "n_inputs": 5,
+    "executed": true,
+    "execution_note": "Mode A: the auditor wrote bcftools/cyvcf2 code from the Skill's patterns and ran it. bcftools 1.24 (MSYS2 mingw64 native Windows build) for most runs; bcftools 1.21, vt and cyvcf2 0.34 from bioconda in a micromamba env inside the WSL 'agents' distro (/tmp tmpfs) for the Linux cross-check, vt and cyvcf2. All input data are SYNTHETIC (data/make_data.py, seed 20260911; rs9000000xx IDs are not real). Inputs executed: 5/5. Layer-1 avg 35.4/40, Layer-2 avg 50.4/60, assertion pass rate 17/20 (85%). scoring_rubric.md s.5 floor(s) not met for the numeric tier (assertion rate 0.85 < 0.9): grade downgraded one tier.",
+    "evaluator_version": "skill-auditor@1.0",
+    "evaluated_on": "2026-09-11",
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:variant-calling/variant-normalization"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated identifiers or statistics; the one citation (Tan 2015, doi:10.1093/bioinformatics/btv112) is correct; all counts reported come from executed runs."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Pure representation work; no output classifies, diagnoses or triages an individual."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Left-align + parsimony against the exact reference, split-before-matching and haplotype-aware consequence advice are all sound; the atomize-order defect is an implementation error (P1), not a principled fallacy."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "Every bcftools command in SKILL.md parsed and ran on bcftools 1.21 and 1.24; the cyvcf2 check ran unmodified. The Skill's recommended atomize->split order runs but emits spurious '*' records (P1); the shipped example exits with a cryptic error on REF-mismatched input (P2)."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 85,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 10,
+        "max": 12,
+        "note": "Covers every promised use (left-align, parsimony, split, atomize, REF check, vt discordance, HGVS clash). Correctness 2/4: the recommended order (atomize -> split -> left-align) turns a plain 1/2 multiallelic SNV into two extra 'A>*' records on bcftools 1.21 and 1.24 (atomize defaults to --atom-overlaps '*'); splitting first or a single-pass -m-any --atomize is clean."
+      },
+      "reliability": {
+        "score": 9,
+        "max": 12,
+        "note": "REF-mismatch default (-c e) and the -c w/x/s choices are documented and verified; the Common Errors table is accurate. The shipped example silences stderr with 2>/dev/null, so a REF mismatch surfaces only as 'Failed to read from standard input: unknown file type'."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "293-line SKILL.md plus a 243-line usage guide that largely repeats it; no conditional loading needed for a single-tool skill."
+      },
+      "agent_usability": {
+        "score": 14,
+        "max": 16,
+        "note": "Clear governing principle and decision tables; strong error prevention (reference identity, Number=. trap, spanning deletions). Inconsistency: SKILL.md table says '-m-both = split SNPs and indels separately' while the usage guide correctly says -m-both and -m-any are identical when splitting."
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Trigger phrases match real requests (caller comparison, ClinVar miss, HGVS mismatch)."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "No credentials, no network, no eval; inputs are file paths passed to bcftools."
+      },
+      "maintainability": {
+        "score": 9,
+        "max": 12,
+        "note": "One example script; no test data; version notes present but the atomize flag history is stated without the --atom-overlaps default that causes the defect."
+      },
+      "agent_specific": {
+        "score": 18,
+        "max": 20,
+        "note": "Precise trigger, clean handoffs to annotation/manipulation, normalization idempotence stated and verified; escape hatch for single-caller no-lookup cases."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 85.8,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 17,
+      "total": 20
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "GATK-like vs FreeBayes-like caller comparison",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Pipeline ran; REF mismatch at chr1:4000 caught by -c w and the default -c e as the Skill says; after normalization caller B has 0 private records (raw isec: 6/4/5 private/private/shared). But the Skill's atomize-first order added two spurious 'chr1:2000 A>*' records to each file, reported as 'shared'.",
+        "basic": 33,
+        "specialized": 48,
+        "total": 81,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "REF/build mismatch is detected before normalization rather than silently fixed",
+            "result": "PASS",
+            "note": "REF_MISMATCH chr1:4000 T vs C; default -c e aborts; -c x chosen after inspection"
+          },
+          {
+            "text": "Representation-only discordances (homopolymer and CA-repeat deletions, MNP) resolve after normalization",
+            "result": "PASS",
+            "note": "506 AA>A -> 500 GA>G, 806 ACA>A -> 800 TCA>T, CTA>TTC -> 1041 C>T + 1043 A>C; B private 0"
+          },
+          {
+            "text": "The normalized files contain only real variant records",
+            "result": "FAIL",
+            "note": "atomize-before-split emitted two A>* records per file at the 1/2 site"
+          },
+          {
+            "text": "Normalization is idempotent on the output",
+            "result": "PASS",
+            "note": "re-running norm -f -m- changed 0 records"
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/in1/run.sh on bcftools 1.24 (Windows); order defect cross-checked on Linux bcftools 1.21 (runs/in1/linux_check.out)."
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "ClinVar 'absent' homopolymer deletion",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Raw annotation missed the 2-star Pathogenic GA>G and the Benign TCA>T entries and pinned the A>G 'Conflicting' assertion on the whole A>C,G record; after normalization against the same reference every entry matched and the conflict attached only to A>G.",
+        "basic": 37,
+        "specialized": 54,
+        "total": 91,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The silent miss is demonstrated on the raw file",
+            "result": "PASS",
+            "note": "chr1:506 AA>A and 806 ACA>A: no ClinVar/dbSNP hit"
+          },
+          {
+            "text": "Normalized records match the canonical database entries",
+            "result": "PASS",
+            "note": "500 GA>G Pathogenic, 800 TCA>T Benign, rsIDs recovered for the atomized MNP"
+          },
+          {
+            "text": "Multiallelic split is applied before ClinVar matching as the Skill's table requires",
+            "result": "PASS",
+            "note": "raw record mis-attributed the A>G conflict to A>C,G"
+          },
+          {
+            "text": "Normalization uses the exact reference that the database coordinates use",
+            "result": "PASS",
+            "note": "same ref.fa; mismatched site excluded, not force-fixed"
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/in2/run.sh, bcftools 1.24; annotate run on indexed files (bcftools refuses an unindexed stdin target when -a is a VCF, on Windows and Linux alike)."
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Multiallelic split with Number=A/R/G/. fields and rejoin",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Confirmed every Skill claim: Number=. INFO carried whole onto both split records, AD/PL subset correctly by R/G, -m+ rejoin loses the 1/2 PL value ('.'), --keep-sum AD preserves total depth.",
+        "basic": 38,
+        "specialized": 55,
+        "total": 93,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The Number=. trap is reproduced and explained",
+            "result": "PASS",
+            "note": "XAF=0.1,0.2 on both split records; correct with Number=A header"
+          },
+          {
+            "text": "AD (Number=R) and PL (Number=G) are subset per allele",
+            "result": "PASS",
+            "note": "A>G PL 400,210,390 = indices 0,3,5"
+          },
+          {
+            "text": "Rejoin limitations are stated before recommending -m+",
+            "result": "PASS",
+            "note": "rejoined PL has '.' at the 1/2 index"
+          },
+          {
+            "text": "Guidance says split once, early, and fix the header rather than post-hoc",
+            "result": "PASS",
+            "note": "matches SKILL.md rule"
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/in3/run.sh on SYNTHETIC data/edge_multiallelic*.vcf, bcftools 1.24."
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "vt- vs bcftools-normalized cohorts disagree",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Reproduced the predicted discordance (vt 10 records vs bcftools 9; the MNP is private in both directions) and fixed it by standardizing on one tool+flags (0/0 private, 10 shared). The shipped example reported 'Extra records from atomization: 2' for callerA, which has no MNPs, and exited 127 with 'unknown file type' on callerB's REF mismatch.",
+        "basic": 35,
+        "specialized": 48,
+        "total": 83,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The vt-vs-bcftools MNP discordance appears exactly as the Skill predicts",
+            "result": "PASS",
+            "note": "vt private 1041 C>T, 1043 A>C; bcftools private 1041 CTA>TTC"
+          },
+          {
+            "text": "Standardizing one tool and flag set removes the spurious private variants",
+            "result": "PASS",
+            "note": "0 private after split/atomize/left-align on both"
+          },
+          {
+            "text": "The exact command and flags are recorded for reuse across cohorts",
+            "result": "PASS",
+            "note": "Skill's decision text followed"
+          },
+          {
+            "text": "The shipped example diagnoses atomization correctly on real inputs",
+            "result": "FAIL",
+            "note": "counts 2 phantom '*' records as MNP atoms; cryptic failure on REF mismatch"
+          }
+        ],
+        "executed": true,
+        "execution_note": "vt and bcftools 1.21 in the WSL micromamba env (runs/in4/run.sh); shipped examples/normalize_vcf.sh run as written on Windows bcftools 1.24 (example_A.txt, example_B.txt)."
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Normalization check + matching vs annotation copies + HGVS",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "cyvcf2 check ran unmodified (2 of 9 flagged; correctly caveated as a lower bound: the 2 unaligned indels need the reference). bcftools csq exits non-zero on unphased hets unless -p is given; with -p a the un-atomized MNP gives 11L>11F missense. HGVS 3'-rule vs left-align explained without hand-deriving c. positions.",
+        "basic": 34,
+        "specialized": 47,
+        "total": 81,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The Skill's cyvcf2 check runs and its lower-bound caveat holds",
+            "result": "PASS",
+            "note": "reports 2; bcftools realigned 2 more"
+          },
+          {
+            "text": "The consequence step the Skill prescribes (bcftools csq on the un-atomized copy) runs as described",
+            "result": "FAIL",
+            "note": "'Unphased heterozygous genotype ... See the --phase option'; -p a needed"
+          },
+          {
+            "text": "The codon-level MNP effect is shown (missense haplotype vs synonymous atoms)",
+            "result": "PASS",
+            "note": "CTA>TTC = L11F; each atom alone is synonymous"
+          },
+          {
+            "text": "HGVS discrepancy explained without hand-deriving c. from POS",
+            "result": "PASS",
+            "note": "defers to the annotation engine's 3' shift"
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/in5/run_csq.sh (bcftools 1.24) and norm_check.py (cyvcf2 0.34, WSL)."
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 34.0,
+    "dynamic_weighted": 51.5,
+    "score": 86,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Correct, executable account of why normalization is mandatory: the ClinVar miss and the multiallelic mis-attribution reproduced exactly as described",
+    "Number=A/R/G/. reapportionment, spanning-deletion and rejoin caveats all verified on bcftools",
+    "vt-vs-bcftools MNP discordance and its fix reproduced as predicted",
+    "REF-mismatch handling (-c e/w/x/s) accurate, with the right warning against silently fixing REF"
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "Recommended atomize->split order emits spurious * records",
+      "observed_in": [
+        1,
+        4
+      ],
+      "problem": "On bcftools 1.21 and 1.24, 'norm --atomize | norm -m- | norm -f' turns a 1/2 multiallelic SNV into A>C, A>G plus two bogus A>* records; the shipped example then counts them as MNP atoms.",
+      "root_cause": "--atomize defaults to --atom-overlaps '*' and is applied to multiallelic records before they are split.",
+      "fix": "Recommend split first (norm -m- | norm --atomize | norm -f) or a single pass 'norm -f ref.fa -m-any --atomize'; update the pipeline, Quick Reference and examples/normalize_vcf.sh, and mention --atom-overlaps."
+    },
+    {
+      "priority": "P1",
+      "title": "bcftools csq advice omits the required --phase option",
+      "observed_in": [
+        5
+      ],
+      "problem": "The Skill tells the agent to run bcftools csq on the un-atomized VCF; on ordinary unphased calls csq exits with 'Unphased heterozygous genotype'.",
+      "root_cause": "csq defaults to -p r (require phased genotypes) and the Skill does not say so.",
+      "fix": "Show 'bcftools csq -p a|m|s ...' and explain that -p a assumes cis for all hets (which also merges atomized SNVs into one codon change)."
+    },
+    {
+      "priority": "P2",
+      "title": "Example hides bcftools errors behind 2>/dev/null",
+      "observed_in": [
+        4
+      ],
+      "problem": "examples/normalize_vcf.sh exits 127 with 'unknown file type' when the input has a REF mismatch.",
+      "root_cause": "stderr of the failing norm step is discarded under set -euo pipefail.",
+      "fix": "Keep stderr, run a 'norm -c w' pre-check and print the mismatch count before the pipeline."
+    },
+    {
+      "priority": "P2",
+      "title": "-m-both described inconsistently",
+      "observed_in": [],
+      "problem": "SKILL.md says -m-both splits SNPs and indels separately; the usage guide says -m-both and -m-any are identical when splitting.",
+      "root_cause": "Split and join semantics of the type string are conflated in one table.",
+      "fix": "State in SKILL.md that the type string only matters for -m+ (join)."
+    }
+  ]
+}

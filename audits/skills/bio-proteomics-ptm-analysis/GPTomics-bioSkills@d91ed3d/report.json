@@ -1,0 +1,259 @@
+{
+  "meta": {
+    "skill_name": "bio-proteomics-ptm-analysis",
+    "description": "Frames PTM/phosphoproteomics analysis as three stacked inference layers on a biased enrichment - chemistry selection, site localization (FLR), and protein-level-adjusted quantification with MSstatsPTM - plus kinase-activity and functional triage. Covers MaxQuant Phospho (STY)Sites multiplicity expansion, localization-probability filtering, FLR, motif analysis with experiment-matched backgrounds, diGly/K-GG specificity, acetyl/glyco traps, and KSEA/PTM-SEA.",
+    "evaluated_on": "2026-09-11",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Moderate",
+    "n_inputs": 5,
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:proteomics/ptm-analysis"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "No fabricated identifiers or data. 23 references checked; MSstatsPTM (MCP 22(1):100477), DeepFLR (Nat Commun 14:2269), Mueller-Dott 2025 (Nat Commun 16:4771) and Ramsbottom 2022 (JPR 21(7):1603) confirmed against Crossref; NEDD8 ~6% of K-GG at basal matches Kim 2011. Masses recomputed from element masses: GG = 2x carbamidomethyl = 114.0429, acetyl 42.0106 vs trimethyl 42.0470 (delta 0.0364), N->D 0.9840 / 2.9883 with 18O. Ramsbottom 2022 is cited in a table but missing from References." },
+      "practice_boundaries": { "result": "PASS", "detail": "Research-only proteomics analysis; no output diagnoses, prescribes or triages an individual." },
+      "methodological_ground": { "result": "PASS", "detail": "The core method is sound and was confirmed by running it: ADJUSTED.Model removed 6/6 protein-driven phosphosite calls and 5/5 stabilisation-driven K-GG calls, and recovered 2/3 masked sites. The adj.p<0.05 & |log2FC|>1 double filter gave 9-13% false calls for a '>2-fold' claim at nominal 5% in simulation. The differential-abundance Skill forbids that filter. It is scored under methodology but does not invert conclusions." },
+      "code_usability": { "result": "PASS", "detail": "Positive evidence: the expansion block and the shipped example ran (exit 0). The MSstatsPTM block fails as written on 2.8.1: dataSummarizationPTM(use_log_file=FALSE) trips an append assertion, and data.type='LF' matches neither branch ('object ptm_model not found'). The motif block raises NameError on 'confident'. None is a syntax error, loop or missing dependency. The Skill's Version Compatibility and '?MaxQtoMSstatsPTMFormat' hints lead to one-token fixes, after which all 5 inputs ran. Scored under Code Executability." }
+    }
+  },
+  "static_score": {
+    "subtotal": 74,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 7, "max": 12, "note": "Completeness 2: FLR and KSEA/PTM-SEA promised in the description but no code or command; motif block stops at a frequency counter. Correctness 2: chemistry and references accurate, but three MSstatsPTM API defects (data.type 'LF', append default, no evidence_prot), a bogus 'Intensity' run in the melt and an undefined 'confident'. Appropriateness 3: right tools; double filter and missing localization filter in the R path." },
+      "reliability": { "score": 7, "max": 12, "note": "Fault tolerance 2: guards for Contaminant and blank Gene names; the 'accept either form' filename comment is not implemented; the phospho-only path crashes on a NULL ADJUSTED.Model. Error reporting 2: Common Errors lists 7 symptoms, none of the 4 failures hit in runs. Recoverability 3: Version Compatibility tells the agent to introspect; stateless code." },
+      "performance_context": { "score": 6, "max": 8, "note": "Token cost 3: 294 lines / 28 KB in one file, long taxonomy tables loaded on every request. Execution efficiency 3: linear blocks, but two parallel quant routes (Sites-table pandas vs evidence MSstatsPTM) with no bridge between them." },
+      "agent_usability": { "score": 11, "max": 16, "note": "Learnability 3: the three-inference framing is very clear. Consistency 2: phospho vs confident; the comment says 'supply the global proteome' but the code never passes it; class I applied only in pandas; the double filter contradicts the sibling Skill. Feedback 3: Goal/Approach per block and 'report three numbers'. Error prevention 3: six failure modes, but misses contrast direction, unmodified peptides in $PTM and the R-path localization filter." },
+      "human_usability": { "score": 6, "max": 8, "note": "Discoverability 3: natural terms (phosphosites, ubiquitination, regulated) in a dense, jargon-heavy description. Forgiveness 3 (Cat-3 override): input requirements such as the paired global proteome and evidence.txt vs Sites table are stated explicitly." },
+      "security": { "score": 11, "max": 12, "note": "No credentials or network use (4); only column-existence guards, no schema validation of user tables (3); local files only, no retention (4)." },
+      "maintainability": { "score": 8, "max": 12, "note": "Modularity 3: clean sections, but code blocks share variable names across sections. Modifiability 3: named constants (CLASS_I_PROB, WINDOW_HALF); filename and mod hard-coded. Testability 2: the one example uses only aggregated Intensity___n columns, so it never exercises the per-run path where the bug is; nothing covers the R block." },
+      "agent_specific": { "score": 18, "max": 20, "note": "Trigger 4: explicit routing to peptide-identification, quantification, differential-abundance and dia-analysis. Disclosure 3: under 500 lines but no references/. Composability 4. Idempotency 4. Escape hatches 3: 'no global proteome -> report UNADJUSTED' and an OUT OF SCOPE list, but no stop for an FLR request without spectra." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 65.2,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 13, "total": 24 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Regulated phosphosites adjusted for protein abundance (MSstatsPTM)",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "Verbatim block: names(input)=PTM only (no evidence_prot), then the append assertion in dataSummarizationPTM. After that fix, data.type='LF' fails with 'object ptm_model not found'. With 3 fixes: PTM.Model called 6/7 protein-driven sites, ADJUSTED 0/7; site-regulated 7/8; masked 2/3. 5 class II/III sites tested (1 called); 39 bare-protein rows from unmodified peptides tested as 'sites'.",
+        "basic": 26,
+        "specialized": 38,
+        "total": 64,
+        "assertions_passed": 2,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "The Skill's MSstatsPTM block runs as written on MSstatsPTM 2.8.1", "result": "FAIL", "note": "Assertion on '!(append & !use_log_file)' failed; then data.type='LF' -> object 'ptm_model' not found (help: 'LabelFree' or 'TMT')" },
+          { "text": "The block as written builds the PROTEIN dataset from the paired global proteome", "result": "FAIL", "note": "No evidence_prot argument; MaxQtoMSstatsPTMFormat only builds $PROTEIN when evidence_prot is non-NULL; names(input) = 'PTM'" },
+          { "text": "After the minimal fixes, ADJUSTED.Model removes site changes that are entirely protein-driven", "result": "PASS", "note": "Protein-driven: PTM.Model called 6 of 7 tested, ADJUSTED.Model 0 of 7; true site regulation kept 7/8" },
+          { "text": "The class-I (>=0.75) localization rule is applied in the MSstatsPTM path", "result": "FAIL", "note": "Converter uses best-localized Modified sequence regardless of probability; 5 class II/III sites tested, P60038_S172 (p=0.42) called regulated" },
+          { "text": "Safety: Output refuses to call a site regulated without protein-level adjustment", "result": "PASS", "note": "Only ADJUSTED.Model hits reported as regulated, as the Skill directs" }
+        ],
+        "executed": true,
+        "execution_note": "Ran runs/in1_msstatsptm_verbatim.R (SKILL.md 140-172 verbatim, file names mapped; stopped at the dataSummarizationPTM assertion). runs/in1_msstatsptm_LF_error.out: data.type='LF' failure. runs/in1_msstatsptm_adapted.R ran with evidence_prot + append=FALSE + data.type='LabelFree' (exit 0), and runs/in1c_unmod_in_ptm.R compared against evidence pre-filtered to Phospho rows. SYNTHETIC data from data/make_ptm_synthetic.py."
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Multiplicity expansion of a Phospho (STY)Sites table",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Block ran verbatim (exit 0): REV/CON removed, 35 class-I sites, blank Gene names fell back to Protein. The aggregated Intensity___1/2/3 columns leak in as a 9th run 'Intensity' (38 of 295 rows, median 2.74 log2 above real runs). Expanded ___1/___2 exposed a phospho-form switch that the collapsed column hid (+0.16 vs -1.40/+1.56).",
+        "basic": 30,
+        "specialized": 43,
+        "total": 73,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "The expansion code runs without error on a MaxQuant-format Sites table", "result": "PASS", "note": "exit 0 on pandas 3.0.5" },
+          { "text": "The expanded long table contains only real experiment runs", "result": "FAIL", "note": "Run labels C1-C4, T1-T4 plus 'Intensity' (sum over runs) because mult_cols matches the aggregated Intensity___n columns" },
+          { "text": "REV/CON rows removed, only class-I sites kept, blank Gene names fall back to Protein", "result": "PASS", "note": "42 rows -> 35; site_id P60005_T360 for the blank-gene row" },
+          { "text": "Multiplicity-resolved values reveal a phospho-form change hidden in the collapsed column", "result": "PASS", "note": "4 switch sites: collapsed log2FC +0.01 to +0.44, ___1 -1.40 to -1.76, ___2 +1.11 to +1.56" },
+          { "text": "Scope: Output stays on site-table processing and routes protein-level quant to quantification", "result": "PASS", "note": "No protein-level claims made from the site table" }
+        ],
+        "executed": true,
+        "execution_note": "Ran runs/in2_expand_sites.py: Block 1 = SKILL.md 108-131 verbatim, Block 2 = pivot + residue counts, Block 3 = the SKILL.md motif block in order (NameError reproduced). Shipped examples/phospho_analysis.py also ran (exit 0, runs/smoke_phospho_analysis.out)."
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Phospho-only run, no global proteome",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "The Decision Tree correctly says to report UNADJUSTED and flag the confound: PTM.Model called 6 of 7 protein-driven sites. The Skill code still fails ('LF', append), then its filter line crashes on NULL ADJUSTED.Model ('non-numeric argument to mathematical function'). The Skill never mentions MSstatsPTM's use_unmod_peptides=TRUE proxy (here 0/7 protein-driven called, 7/8 true sites kept).",
+        "basic": 29,
+        "specialized": 37,
+        "total": 66,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Output flags that phospho-only site changes are confounded with protein abundance and reports them as UNADJUSTED", "result": "PASS", "note": "Decision Tree row followed; 6/7 protein-driven sites would otherwise be called regulated" },
+          { "text": "The Skill's code produces the unadjusted site table without error", "result": "FAIL", "note": "data.type='LF' error; after fixes, the regulated line fails on result$ADJUSTED.Model = NULL" },
+          { "text": "Output mentions the unmodified-peptide protein proxy (use_unmod_peptides) with its caveats", "result": "FAIL", "note": "The Skill hard-codes use_unmod_peptides = FALSE without explanation" },
+          { "text": "Safety: Output does not claim regulation for any site in a phospho-only run", "result": "PASS", "note": "Sites reported as unadjusted changes only" }
+        ],
+        "executed": true,
+        "execution_note": "Ran runs/in3_phospho_only.R (no evidence_prot; use_unmod_peptides FALSE and TRUE; exit 0 with the append/LabelFree fixes) and runs/in3b_null_filter.R (the Skill's filter line applied to NULL)."
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Motif enrichment + kinase activity from adjusted sites",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "The motif block raises NameError ('confident') when run in order, and it only defines a counter (no background builder, no test). Agent-written Fisher test vs an S/T background from the identified proteins recovered the planted +1 Pro (q=3e-4). No KSEA code in the Skill and KSEAapp is not installed; KSEA z on a SYNTHETIC prior flips sign unless the 'Control vs Treatment' Label is reversed, which the Skill never mentions.",
+        "basic": 27,
+        "specialized": 35,
+        "total": 62,
+        "assertions_passed": 2,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "The Skill's motif block runs in SKILL.md order", "result": "FAIL", "note": "NameError: name 'confident' is not defined (the expansion block names the table 'phospho')" },
+          { "text": "The motif background is experiment-matched, not whole-proteome", "result": "PASS", "note": "S/T windows from identified proteins; +1 P fg 4/4 vs bg 91/1885, BH q=0.0003" },
+          { "text": "Kinase-activity inference has runnable code or a concrete package call", "result": "FAIL", "note": "Only a table row names KSEAapp/ssGSEA2.0; no call, no prior-loading step; KSEAapp absent here" },
+          { "text": "Output warns that kinase calls are prior-limited and silence is not absence", "result": "PASS", "note": "Skill's Mueller-Dott 2025 benchmark caveat carried into the answer" },
+          { "text": "Output checks the direction of MSstatsPTM log2FC before kinase scoring", "result": "FAIL", "note": "Default pairwise Label is 'Control vs Treatment' (Control minus Treatment); SYN_PRO z = +3.59 flipped vs -3.59 unflipped" }
+        ],
+        "executed": true,
+        "execution_note": "Ran runs/in4_motif_ksea.py (exit 0) on runs/in1_adjusted_model.csv and the SYNTHETIC Sites table; kinase_substrate_SYNTHETIC.tsv is a motif-derived toy prior, not PhosphoSitePlus. KSEAapp/ssGSEA2.0 were not run (not installed; R installs not permitted)."
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "diGly (K-GG) + iodoacetamide + FLR request",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "K-GG = ub+NEDD8+ISG15 and the IAA +114.0429 artifact were flagged correctly, but the Skill gives only a prospective fix (use CAA). No empirical FLR is possible from MaxQuant tables (LuciPHOr2/DeepFLR need spectra; no code); only a model-based mean(1-p) = 0.0017. The expansion needed a filename swap and showed the same bogus run. MSstatsPTM (GlyGly mod_id, 3 fixes) removed 5/5 stabilisation-driven calls. 4 C-terminal K-GG rows survived every Skill filter.",
+        "basic": 26,
+        "specialized": 35,
+        "total": 61,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Output treats K-GG sites as ubiquitin + NEDD8 + ISG15 rather than ubiquitination alone", "result": "PASS", "note": "Skill trap table followed; NEDD8 ~6% basal verified (Kim 2011)" },
+          { "text": "Output flags the iodoacetamide +114.0429 artifact for this IAA-alkylated dataset", "result": "PASS", "note": "Flagged; mass identity with GG verified (C4H6N2O2)" },
+          { "text": "Output reports an empirical global FLR as the Skill's 'three numbers' rule requires", "result": "FAIL", "note": "Needs spectra (LuciPHOr2/DeepFLR); Skill gives no route from a txt/ folder; only a model-based estimate was possible" },
+          { "text": "Output screens K-GG peptides carrying GG on the peptide C-terminal lysine", "result": "FAIL", "note": "Not prompted by the Skill; 4 planted C-terminal K-GG sites passed REV/CON + class-I filters" },
+          { "text": "Safety: Output does not call K-GG changes ubiquitination without the chemistry caveats", "result": "PASS", "note": "Reported as K-GG sites with NEDD8/ISG15/IAA caveats" }
+        ],
+        "executed": true,
+        "execution_note": "Ran runs/in5_glygly_sites.py (exit 0) and runs/in5_glygly_msstatsptm.R (exit 0, with the Input-1 fixes and mod_id '\\\\(GlyGly \\\\(K\\\\)\\\\)'). LuciPHOr2 and DeepFLR were not executed: no Windows build here and no spectra in the synthetic txt/ folder."
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 29.6,
+    "dynamic_weighted": 39.1,
+    "score": 69,
+    "max": 100,
+    "grade": "Beta Only",
+    "grade_symbol": "⚠️",
+    "deployable": false,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "The central claim holds when run: MSstatsPTM ADJUSTED.Model removed 6/6 called protein-driven phosphosite changes and 5/5 stabilisation-driven K-GG changes, and recovered masked occupancy changes that PTM.Model missed",
+    "Chemistry facts are exact (GG = 2x carbamidomethyl = 114.0429; acetyl/trimethyl delta 0.0364 Da; 18O deglycosylation +2.988), and the references checked against Crossref are genuine",
+    "The phospho-only escape hatch is correct: report UNADJUSTED and do not claim regulation",
+    "The multiplicity rationale works in practice: expanded ___1/___2 columns exposed a phospho-form switch invisible in the collapsed column",
+    "Guidance on experiment-matched motif backgrounds and on prior-limited kinase inference is sound and carried straight into the analysis"
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "MSstatsPTM block fails as written on 2.8.1",
+      "observed_in": [1, 3, 5],
+      "problem": "dataSummarizationPTM(input, use_log_file = FALSE) fails with \"Assertion on '!(append & !use_log_file)' failed\". groupComparisonPTM(data.type = 'LF') matches neither branch and stops with \"object 'ptm_model' not found\".",
+      "root_cause": "The block mixes up the converter's labeling_type = 'LF' with groupComparisonPTM's data.type, and ignores the append = TRUE default.",
+      "fix": "Use dataSummarizationPTM(input, use_log_file = FALSE, append = FALSE) and groupComparisonPTM(summarized, data.type = 'LabelFree'). Add both errors to Common Errors."
+    },
+    {
+      "priority": "P1",
+      "title": "Protein dataset never built: evidence_prot missing",
+      "observed_in": [1, 3, 5],
+      "problem": "The comment says to supply the global proteome, but the call passes only proteinGroups and annotation_protein. MaxQtoMSstatsPTMFormat then returns list(PTM) with no PROTEIN, so no adjustment is possible.",
+      "root_cause": "The code does not match the documented converter contract, which builds $PROTEIN only when evidence_prot is non-NULL.",
+      "fix": "Add evidence_prot = read.table('evidence_global.txt', ...) and which_proteinid_protein = 'Proteins'. Add stopifnot('PROTEIN' %in% names(input)) before summarization."
+    },
+    {
+      "priority": "P1",
+      "title": "Multiplicity melt adds a bogus run named 'Intensity'",
+      "observed_in": [2, 5],
+      "problem": "On a real-format Sites table, mult_cols also matches the aggregated Intensity___1/2/3 columns. The long table gains a 9th 'run' holding the sum over runs: 38 of 295 rows, median 2.74 log2 above the real runs.",
+      "root_cause": "The filter uses c.startswith('Intensity') instead of per-experiment 'Intensity <exp>___n'; the shipped example has only aggregated columns, so it never exposes this.",
+      "fix": "Select with c.startswith('Intensity ') and a ___[123]$ suffix (or exclude ^Intensity___), and add per-run columns to the example."
+    },
+    {
+      "priority": "P1",
+      "title": "R path skips localization filter and keeps unmodified rows",
+      "observed_in": [1],
+      "problem": "In the MSstatsPTM route, class II/III sites are tested (1 with localization prob 0.42 called regulated). Unmodified peptides from the enriched runs enter $PTM as bare-protein 'sites' (39 of 80 rows).",
+      "root_cause": "The class-I rule and the modified-peptide filter exist only in the pandas Sites-table workflow; the converter uses the best-localized sequence as is.",
+      "fix": "Before conversion, keep evidence rows whose Modified sequence matches mod_id and whose max localization probability (parsed from 'Phospho (STY) Probabilities') is >= 0.75. After testing, drop result rows without a site suffix."
+    },
+    {
+      "priority": "P1",
+      "title": "Motif block NameError; no kinase-activity code",
+      "observed_in": [4],
+      "problem": "Run in order, the motif block raises NameError on 'confident'. It defines only a counter, with no background construction or enrichment test. KSEA/PTM-SEA, both promised in the description, have no code.",
+      "root_cause": "The block was lifted from the example, which names the filtered table 'confident', and was never run after the expansion block.",
+      "fix": "Rename to 'phospho'. Add a matched-background builder plus a per-position Fisher/BH test, and a KSEAapp::KSEA.Scores call with a documented PhosphoSitePlus/NetworKIN input and fold-change direction."
+    },
+    {
+      "priority": "P2",
+      "title": "FC+p double filter conflicts with differential-abundance",
+      "observed_in": [1, 5],
+      "problem": "The regulated rule adj.pvalue < 0.05 & abs(log2FC) > 1 is the post-hoc double filter the differential-abundance Skill forbids. In simulation (4v4) it gave 9.1-12.9% false calls for a '>2-fold' claim at nominal 5%.",
+      "root_cause": "The site-level selection rule was not aligned with the sibling Skill's treat-style guidance.",
+      "fix": "Test |log2FC| > c inside the statistic, e.g. p = pt((abs(log2FC) - c)/SE, DF, lower.tail = FALSE) on ADJUSTED.Model, with BH; or call the double filter a ranking heuristic whose FDR refers to FC != 0."
+    },
+    {
+      "priority": "P2",
+      "title": "Default contrast direction is not stated",
+      "observed_in": [4],
+      "problem": "The default pairwise Label is 'Control vs Treatment' (log2FC = Control - Treatment). Downstream KSEA z-scores and up/down calls invert unless the sign is flipped.",
+      "root_cause": "The Skill says 'contrast.matrix defaults to full pairwise' without describing the Label orientation.",
+      "fix": "Tell the agent to read adjusted$Label or pass an explicit contrast.matrix (Treatment = 1, Control = -1) before labelling sites up or down."
+    },
+    {
+      "priority": "P2",
+      "title": "FLR and K-GG QC lack a runnable route",
+      "observed_in": [5],
+      "problem": "Reporting an empirical FLR is mandatory, but no route exists from MaxQuant tables. For already-acquired IAA data the only advice is prospective (use chloroacetamide), and C-terminal K-GG IDs pass every filter.",
+      "root_cause": "FLR and diGly guidance are narrative only and assume spectra are available.",
+      "fix": "State that LuciPHOr2/DeepFLR need spectra; otherwise report mean(1 - p) as model-based only. Add a K-GG QC that flags GG on the peptide C-terminal K and asks for the alkylation reagent."
+    },
+    {
+      "priority": "P2",
+      "title": "Phospho-only path: document use_unmod_peptides",
+      "observed_in": [3],
+      "problem": "For phospho-only data the Skill hard-codes use_unmod_peptides = FALSE and never mentions that MSstatsPTM can use co-enriched unmodified peptides as a weak protein proxy.",
+      "root_cause": "Only the paired-proteome route is documented.",
+      "fix": "Add a caveated option: use_unmod_peptides = TRUE when no global run exists, and label the results proxy-adjusted."
+    },
+    {
+      "priority": "P2",
+      "title": "Small doc inconsistencies",
+      "observed_in": [2],
+      "problem": "The filename comment 'accept either form' is not implemented. The example labels Localization prob 0.75 as class II while the filter keeps it as class I. The 'fake dephosphorylation' wording misdescribes the collapse, which masks form switches. Ramsbottom 2022 is cited but not in References.",
+      "root_cause": "Text and code were edited separately.",
+      "fix": "Try both filenames, use right=False bins in the example, reword the multiplicity failure mode, and add Ramsbottom KA et al. J Proteome Res 2022;21(7):1603-1615."
+    }
+  ]
+}

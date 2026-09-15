@@ -1,0 +1,236 @@
+{
+  "meta": {
+    "skill_name": "bio-proteomics-proteomics-qc",
+    "description": "Quality control for bottom-up proteomics across three levels -- instrument/raw-signal (mass accuracy, RT/iRT fit, FWHM, TIC vs injection time, % MS2 identified), identification/run (missed cleavages, charge states, PTM handling artifacts, contaminants), and experiment/quantitative (replicate correlation on log2, CV on the linear scale, completeness, MNAR-vs-MCAR missingness, PCA/batch, TMT channel balance, DIA q-values). Mandates inspecting raw signal before normalizing.",
+    "evaluated_on": "2026-09-11",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Moderate",
+    "n_inputs": 5,
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:proteomics/proteomics-qc"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "No invented numbers, DOIs or PMIDs in the Skill or in any output; the PTXQC 20/35% ID-rate bins were confirmed in the PTXQC 1.1.5 YAML. One attribution is wrong: the '>1%' contaminant flag is PTXQC's user-defined MYCOPLASMA threshold, not its general contaminant metric (P2). The DIA-NN 'High precision halves median CV' claim was not verified." },
+      "practice_boundaries": { "result": "PASS", "detail": "All five outputs are research-sample QC: no diagnosis, treatment or triage of an individual." },
+      "methodological_ground": { "result": "PASS", "detail": "The core methods hold up when run: inspect before normalizing, CV on the linear scale or as geometric CV, global q-value filtering, and batch in the design. The batch wording is inconsistent (P2), but no output reached an invalid conclusion." },
+      "code_usability": { "result": "PASS", "detail": "Every SKILL.md function parses and imports and ran on pandas 3.0.5 / sklearn 1.9. The example exits 0. PTXQC createReport and MSstatsTMT dataProcessPlotsTMT ran. The crash paths depend on the input (sample_info index, all-NaN rows, fewer than 5 samples) and are recorded as P1, but the code is runnable." }
+    }
+  },
+  "static_score": {
+    "subtotal": 70,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 7, "max": 12, "note": "Completeness 2: code covers only matrix-level QC; Level 1/2 metrics, TMT balance, DIA q-values and the contaminant fraction are prose only, and the Skill never names which MaxQuant/DIA-NN column is un-normalised. Correctness 2: raw_sample_qc reports 0% missing on MaxQuant zeros; the PTXQC >1% claim is misattributed; the MSstatsTMT 'RAW' claim is false under the defaults. Appropriateness 3." },
+      "reliability": { "score": 7, "max": 12, "note": "Fault tolerance 2: pca_batch_check raises cryptic TypeError/ValueError on a RangeIndex sample_info, all-NaN rows or fewer than 5 samples. Error reporting 2: the Common Errors table helps, but the code has no checks. Recoverability 3: read-only and idempotent." },
+      "performance_context": { "score": 5, "max": 8, "note": "Token cost 2: a 276-line, 25.7 KB SKILL.md is loaded whole, including Level-1 prose that cannot be executed and 13 references. Efficiency 3: StandardScaler is fitted twice, and abundance_bins is dead code." },
+      "agent_usability": { "score": 11, "max": 16, "note": "Learnability 3: the funnel and ordering are very clear, but column mapping needs outside knowledge. Consistency 3: the '2-3x below group median' rule versus the example's total-signal <0.5x; 'never let batch dominate' versus 'batch in design'. Feedback 2: no QC-report or exclusion-decision template. Error prevention 3: strong failure-mode section, but it misses MaxQuant 0 = missing and LFQ = already normalised." },
+      "human_usability": { "score": 6, "max": 8, "note": "Discoverability 4: natural triggers ('assessing data quality, diagnosing outlier samples, deciding which samples to exclude'). Forgiveness 2: no input requirements are stated (NaN for missing, sample-indexed annotation), and wrong input is computed silently instead of rejected." },
+      "security": { "score": 10, "max": 12, "note": "Credential safety 4 (none needed). Input validation 2 (none, as in the shared template; no eval/exec). Data safety 4 (read-only; the example writes nothing)." },
+      "maintainability": { "score": 9, "max": 12, "note": "Modularity 3: small single-purpose functions, all inline in SKILL.md. Modifiability 3: thresholds kept in one table. Testability 3: one seeded example that runs offline, but no per-function tests." },
+      "agent_specific": { "score": 15, "max": 20, "note": "Trigger precision 4: explicit routing to quantification, differential-abundance and dia-analysis. Progressive disclosure 2: no references/ folder; everything is in SKILL.md. Composability 3: DataFrame in, DataFrame out, related Skills exist. Idempotency 4. Escape hatches 2: routing lines only; no stop conditions (n<5, no raw column available, exclusion sign-off by the human)." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 74.8,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 17, "total": 25 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "QC a MaxQuant LFQ run (8 samples, 2 batches) before limma",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Contaminant rows stripped (60); contaminants 4.2-6.5% of raw Intensity; no loading failure; within-group r 0.956-0.966; linear CV 24%; MNAR profile; batch is PC1 (p<1e-4) and condition is PC2. Needed three adaptations: 0->NaN, sample-indexed annotation, completeness filter before PCA. PTXQC report produced.",
+        "basic": 30,
+        "specialized": 44,
+        "total": 74,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Contaminant, reverse and site-only rows are removed before log-transform and normalisation", "result": "PASS", "note": "strip_contaminant_rows removed 20 CON + 25 REV + 15 site rows (1560 -> 1500)" },
+          { "text": "raw_sample_qc as written reports per-sample ID counts and missing fraction that differ between samples on MaxQuant input", "result": "FAIL", "note": "MaxQuant stores missing as 0; the verbatim function returned n_quantified=1500 and missing_pct=0.0 for all 8 samples" },
+          { "text": "pca_batch_check runs on sample_info as loaded from sample_annotation.csv", "result": "FAIL", "note": ".join on a RangeIndex gives an all-NaN batch column, then 'TypeError: At least two samples are required; got 1.'" },
+          { "text": "Batch is detected as the dominant axis and a design-level remedy is recommended before testing", "result": "PASS", "note": "PC1 ~ batch p<0.0001 (25.1% variance); balanced design -> add batch to the limma design" },
+          { "text": "Scope: output stays at QC and routes the differential test and normalisation mechanics out", "result": "PASS", "note": "No hit calling; recommendation handed to differential-abundance" }
+        ],
+        "executed": true,
+        "execution_note": "Ran runs/in1_canonical.py (Python 3.12, SKILL.md functions verbatim in runs/skill_funcs.py) and runs/in1_ptxqc.R (PTXQC 1.1.5 createReport on data/ptxqc_txt, which holds only proteinGroups.txt and evidence.txt; completed in 0.6 min with 37 metrics and a PDF; summary/parameters/msms/msmsScans/mqpar were skipped with warnings; HTML not produced because pandoc is absent). Output in in1_canonical.out and in1_ptxqc.out."
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "DIA-NN 1.9 report.parquet: per-run IDs at 1% global FDR and matrix QC",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The global q filter took the matrix from 947 to 887 groups and removed all 60 LOWCONF groups; per-run protein groups 798-839 (0.97-1.02x); raw Precursor.Quantity 0.74-1.26x; linear CV about 17%; r 0.983-0.990; batch is PC1 (40%). The Skill gives no DIA code; 61 PG.MaxLFQ zeros were not flagged by the Skill.",
+        "basic": 32,
+        "specialized": 48,
+        "total": 80,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Global.Q.Value and Global.PG.Q.Value <= 0.01 are applied and remove every group that passes only run-level q", "result": "PASS", "note": "947 -> 887 groups; LOWCONF 60 -> 0" },
+          { "text": "Per-run precursor and protein-group counts are reported at 1% global FDR", "result": "PASS", "note": "2458-2562 precursors, 798-839 groups per run" },
+          { "text": "Raw per-run signal is inspected from a non-normalised quantity before matrix QC", "result": "PASS", "note": "Summed Precursor.Quantity (0.74-1.26x); the Skill does not name this column, so the agent chose it" },
+          { "text": "The Skill warns that PG.MaxLFQ zeros must be treated as missing before log2 and CV", "result": "FAIL", "note": "Not mentioned; 61 zeros became -inf, and the as-written CV was 17.78% versus 17.43% after 0->NaN" },
+          { "text": "Scope: q-value/FDR internals are routed to dia-analysis rather than reimplemented", "result": "PASS", "note": "Only thresholds were applied" }
+        ],
+        "executed": true,
+        "execution_note": "Ran runs/in2_dia.py on the SYNTHETIC report.parquet (pyarrow 25). Agent-written filtering and per-run summary following the Decision Tree and Thresholds rows; SKILL.md functions for correlation, CV, completeness and PCA. Output in in2_dia.out."
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Failed-loading T4 hidden by MaxLFQ (user says LFQ boxplots look fine)",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Raw Intensity: T4 total 0.41x of its group median, flagged; boxplot median only 0.62x; IDs 0.81x; 31% missing versus 13-17%. LFQ column: T4 total 1.02x and median 1.41x, never flagged by the 2x rule. The verbatim raw_sample_qc on LFQ with zeros shows nothing (1500 IDs, 0% missing). The flag depends on column and metric choices the Skill does not specify.",
+        "basic": 30,
+        "specialized": 42,
+        "total": 72,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "T4 is flagged as a loading failure from raw (un-normalised) signal", "result": "PASS", "note": "Intensity total_signal 0.409x of the Treatment median (2.4x low); ID count 0.81x" },
+          { "text": "The Skill identifies which MaxQuant column is un-normalised (Intensity versus LFQ intensity)", "result": "FAIL", "note": "It says only 'un-normalized matrix'. On LFQ intensity T4 is 1.02x (total) and 1.41x (median), so it is not flagged" },
+          { "text": "raw_sample_qc as written exposes T4's ID and missing-value drop", "result": "FAIL", "note": "With MaxQuant zeros it returns 1500 IDs and 0% missing for every sample" },
+          { "text": "Output demonstrates that median normalisation erases the loading evidence", "result": "PASS", "note": "All log2 medians become 0.00 after centring; T4 within-group r stays 0.952-0.956, above the 0.8 floor" },
+          { "text": "Safety: the exclusion recommendation is documented with evidence and left to the researcher, not applied silently", "result": "PASS", "note": "Recommendation: exclude T4, with the raw-signal table, pending the sensitivity check (Input 5)" }
+        ],
+        "executed": true,
+        "execution_note": "Ran runs/in3_failed_sample.py (both files, both columns, 0->NaN) and runs/in3_aswritten.py (verbatim raw_sample_qc, zeros kept). Output in in3_failed_sample.out and in3_aswritten.out."
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "TMT 2x10-plex channel-loading balance with pooled reference 131",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Within-plex channel totals 0.89-1.32x, so none needs investigating at >2x; plex B/A = 2.08x (a plex effect); raw PCA PC1 = plex (61%), and after the reference ratio PC1 = condition (p<1e-4); compression slope 0.60. MSstatsTMT QCPlot with default global_norm=TRUE shows every channel median at 24.73 (already normalised); only global_norm=FALSE shows the raw 23.96-25.39 spread.",
+        "basic": 29,
+        "specialized": 42,
+        "total": 71,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Channel totals are compared within each plex against the plex median and none exceeds 2x", "result": "PASS", "note": "Range 0.892-1.322x" },
+          { "text": "The Skill's named tool, dataProcessPlotsTMT, shows raw reporter imbalance with its defaults", "result": "FAIL", "note": "proteinSummarization(global_norm=TRUE) equalises all 20 channel medians to 24.73 before plotting; this is not mentioned" },
+          { "text": "The ~2x plex offset is treated as a between-plex effect handled by the 131 reference, not as a channel failure", "result": "PASS", "note": "Agent's judgement; the Skill does not say that balance is judged within plex" },
+          { "text": "Ratio compression is quantified against known effects", "result": "PASS", "note": "Observed/true log2FC slope 0.60 on 51 DA proteins" },
+          { "text": "Scope: normalisation mechanics are routed to quantification", "result": "PASS", "note": "Reference-ratio view used for QC only" }
+        ],
+        "executed": true,
+        "execution_note": "Ran runs/in4_tmt.py (agent-written; the Skill has no TMT Python code) and runs/in4_msstatstmt.R plus in4_msstatstmt_nonorm.R (MSstatsTMT 2.14.2; the protein-level CSV was converted to one pseudo-PSM per protein because dataProcessPlotsTMT needs proteinSummarization output). Both produced QCPlot PDFs under runs/out_in4."
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Batch-dominated PCA + T4 exclusion decision with sensitivity check",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Batch is PC1 (p=0.0005). T4 is not isolated in PCA: it sits between batches (PC1=2.27) because row-median fill imputes its 33% missing values. limma sensitivity with batch in the design: all 8 samples 84 hits (82 TP/2 FP), without T4 84 (83 TP/1 FP), Jaccard 0.95, so the decision is robust. pca_batch_check fails at n=4.",
+        "basic": 31,
+        "specialized": 46,
+        "total": 77,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "The exclusion decision is documented with raw-signal evidence and a with/without-T4 sensitivity check", "result": "PASS", "note": "Raw total 0.41x; limma hit lists share 82 of 86 proteins" },
+          { "text": "Batch is handled by adding it to the design (balanced layout) rather than ComBat-then-test", "result": "PASS", "note": "~cond+batch: 84 hits versus 81 without batch (all 8)" },
+          { "text": "pca_batch_check shows the failed sample isolated from its group", "result": "FAIL", "note": "T4 has the smallest distance to its group centroid (10.9 versus 16.7-39.2); the median fill pulls it to the centre" },
+          { "text": "pca_batch_check runs at the small sample sizes left after exclusion decisions", "result": "FAIL", "note": "4 samples: 'ValueError: n_components=5 must be between 0 and min(n_samples, n_features)=4'" },
+          { "text": "Safety: no individual-level clinical claims; the final exclusion call is left to the researcher", "result": "PASS", "note": "Research-sample QC only" }
+        ],
+        "executed": true,
+        "execution_note": "Ran runs/in5_stress.py (SKILL.md functions, batch-centred view for PCA only) and runs/in5_limma_sensitivity.R (limma 3.62.2, four configurations scored against truth_proteins.csv). Output in in5_stress.out and in5_limma_sensitivity.out."
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 28.0,
+    "dynamic_weighted": 44.9,
+    "score": 73,
+    "max": 100,
+    "grade": "Beta Only",
+    "grade_symbol": "⚠️",
+    "deployable": false,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "The inspect-before-normalize principle proved correct when run: median centring set all 8 log2 medians to 0 on the failed file and erased the T4 deficit that raw Intensity total signal (0.41x) exposed",
+    "Global q-value guidance is right and effective: requiring Global.Q.Value and Global.PG.Q.Value <= 0.01 removed all 60 groups that pass only run-level q",
+    "CV guidance is correct: geometric CV from log2 (25.0%) matches linear CV (24.3%), while the base formula on log2 gives 1.4%",
+    "Explicit scope routing to quantification, differential-abundance and dia-analysis; all six related Skills exist, and the seeded example runs offline",
+    "The PTXQC route works as described: createReport(txt_folder=) ran on a minimal two-file folder and skipped the missing tables with warnings"
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "raw_sample_qc counts MaxQuant zeros as quantified",
+      "observed_in": [1, 3],
+      "problem": "The verbatim function returned 1500 IDs and 0% missing for every sample, which hides T4's 19% ID drop and 31% missingness on the failed file.",
+      "root_cause": "The Skill never states that MaxQuant writes missing values as 0 (and that DIA-NN PG.MaxLFQ can be 0).",
+      "fix": "Add `raw_intensities = raw_intensities.replace(0, np.nan)` inside raw_sample_qc and state in the Inspect section that search-engine zeros are missing values."
+    },
+    {
+      "priority": "P1",
+      "title": "Un-normalised column never named per tool",
+      "observed_in": [2, 3],
+      "problem": "On MaxQuant 'LFQ intensity' the 3x-low T4 is 1.02x (total) and 1.41x (median) and is never flagged; only 'Intensity' shows 0.41x. The rule's median-versus-total choice also decides the flag (0.62x versus 0.41x).",
+      "root_cause": "The Skill says 'un-normalized matrix' without mapping it to MaxQuant, DIA-NN or TMT columns, and gives no ID-count threshold.",
+      "fix": "State: MaxQuant 'Intensity <s>' (LFQ is already MaxLFQ-normalised); DIA-NN Precursor.Quantity (not Precursor.Normalised or PG.MaxLFQ). Apply the 2x rule to total signal and flag an ID count more than 15-20% below the group median."
+    },
+    {
+      "priority": "P1",
+      "title": "pca_batch_check crashes or misplaces samples",
+      "observed_in": [1, 5],
+      "problem": "Cryptic TypeError with a RangeIndex sample_info; ValueError on all-NaN rows; ValueError at n<5; row-median fill pulled the failed T4 to the centre of the PCA.",
+      "root_cause": "Hard-coded n_components=5, no index/NaN checks, and median imputation that makes high-missing samples look average.",
+      "fix": "Require sample_info indexed by sample (assert set equality), dropna(how='all'), use n_components=min(5, n_samples-1), and run PCA on complete cases or with a low-value fill, noting the imputation bias."
+    },
+    {
+      "priority": "P1",
+      "title": "MSstatsTMT QC plot is post-normalisation by default",
+      "observed_in": [4],
+      "problem": "dataProcessPlotsTMT after default proteinSummarization showed all 20 channel medians at 24.73, which contradicts the Skill's 'on RAW reporter intensities' and hides channel imbalance.",
+      "root_cause": "proteinSummarization(global_norm=TRUE) is the default, the Skill does not mention it, and the tool needs PSM-level input.",
+      "fix": "Say proteinSummarization(..., global_norm=FALSE, reference_norm=FALSE) for the balance view and add a pandas within-plex channel-total check (fold versus plex median, >2x investigate)."
+    },
+    {
+      "priority": "P2",
+      "title": "PTXQC '>1%' contaminant flag misattributed",
+      "observed_in": [1],
+      "problem": "The synthetic run has 4.2-6.5% contaminant intensity, so every sample trips the Skill's '>1%' rule; in PTXQC 1.1.5 the 1% threshold belongs to the user-defined MYCOPLASMA SpecialContaminants plot.",
+      "root_cause": "The Skill conflates PTXQC's SpecialContaminants default with its continuous general contaminant score.",
+      "fix": "Replace it with a lab-baseline control-chart statement and a group-difference check, and add a code line computing the contaminant fraction per sample."
+    },
+    {
+      "priority": "P2",
+      "title": "Dead code and a scale-dependent '~14x' claim",
+      "observed_in": [1],
+      "problem": "missingness_profile computes abundance_bins and discards it. Base-CV-on-log2 compression measured 16.9-17.1x at mean log2 24.7; it scales with about ln2 x mean log2.",
+      "root_cause": "Code drift and a constant quoted for a quantity that depends on intensity units.",
+      "fix": "Return the per-bin present fraction from missingness_profile, and word the claim as 'about 15-20x at typical MaxQuant intensities (scale-dependent)'."
+    },
+    {
+      "priority": "P2",
+      "title": "Batch guidance and output template inconsistent",
+      "observed_in": [5, 2, 4],
+      "problem": "'Never let batch be the dominant axis going into differential testing' cannot be met by 'include batch in the design', which leaves the PCA unchanged. DIA, TMT and Level 1/2 have no code and there is no QC-report template.",
+      "root_cause": "The Skill mixes matrix correction and model-based adjustment and ends sections with routing lines instead of deliverables.",
+      "fix": "Recommend limma::removeBatchEffect for plots only plus batch in the design for the test; add a QC-summary and exclusion-decision table template, and stop conditions (n<5, no raw column available, human sign-off on exclusions)."
+    }
+  ]
+}

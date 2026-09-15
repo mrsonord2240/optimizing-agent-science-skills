@@ -1,0 +1,449 @@
+{
+  "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:phylogenetics/tree-io",
+  "meta": {
+    "skill_name": "bio-phylo-tree-io",
+    "description": "Read, write, and convert phylogenetic tree files with Biopython Bio.Phylo, and choose an annotation-preserving parser (treeio, DendroPy) when metadata matters; covers BEAST/MrBayes annotation loss, Newick support-vs-label ambiguity, TRANSLATE and rooted/unrooted traps.",
+    "evaluated_on": "2026-09-15",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:phylogenetics/tree-io",
+    "executed": "7/7 inputs executed (Biopython 1.88, DendroPy 5.0.13, ete3 3.1.3, rdflib 7.6.0, treeio 1.30.0, ape 5.8.1, IQ-TREE 2.4.0, MrBayes 3.2.7a)",
+    "execution_note": "All trees are SYNTHETIC: IQ-TREE treefile from an AliSim alignment of a known 10-taxon tree (RF to truth 0); MrBayes .con.tre/.t from a 20k-generation run on that alignment; BEAST MCC Nexus hand-written to TreeAnnotator layout with known values; NHX (ete3), phyloXML (hand-written), NeXML (DendroPy), odd-name Newick, two TRANSLATE-permuted .t files and a posterior-labelled Newick from data/make_data.py. Every script and all three shipped examples ran (exit codes recorded). Two auditor-side retries are logged: an API slip in Input 4 (TreeList.encode_bipartitions) and Windows cp1252 encoding in Input 3. rdflib was installed mid-audit to test the cdao claim; the pre-install KeyError is kept in runs/in5/format_matrix.log."
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated numbers; every posterior, HPD and support value reported came from parsing the synthetic files and was checked against the known values in mcc6_truth.tsv or the simulated tree."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Tree file I/O for research; nothing diagnoses, prescribes or triages an individual."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "No methodological fallacy in any output: annotations extracted before down-conversion, burn-in removed per run before pooling, TRANSLATE-aware merging, support provenance kept explicit, no relabelling of posteriors as bootstraps."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All delivered Python and R code ran to exit 0. The Skill's DendroPy snippet and Bio.Phylo calls run as written; failures found (Bio.Phylo on MrBayes .con.tre, cdao without rdflib, cp1252 file I/O on Windows) are documented-behaviour gaps recorded as P1/P2, not unrunnable code."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 79,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 9,
+        "max": 12,
+        "note": "Right approach and good coverage (annotations, dual support, posterior sets, names, TRANSLATE). Correctness 2/4: 'Phylo.convert ... Newick cannot hold [&...]; annotations dropped' is false on Biopython 1.88 (comments are written escaped as [\\[&...\\]], which DendroPy and treeio then fail to parse); 'cdao' is listed as supported but only registers when rdflib is installed; nothing says Bio.Phylo crashes on MrBayes .con.tre or names NeXML tips by otu id."
+      },
+      "reliability": {
+        "score": 8,
+        "max": 12,
+        "note": "Common Errors table with cause and fix, 'keep the original .tree as source of truth', introspect-and-adapt rule. Missing failure modes seen in execution: file encoding, Bio.Phylo AssertionError on .con.tre, ape and ete3 mishandling quoted labels."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "169-line SKILL.md, dense tables, no redundant workflow steps; everything loads at once but it is compact."
+      },
+      "agent_usability": {
+        "score": 12,
+        "max": 16,
+        "note": "Immediately learnable decision rule and strong pitfall list. Internal inconsistency: 'Newick cannot hold [&...]' contradicts 'metadata rides inside a Nexus (or Newick) [&...] comment'. No output format for the side table or loss report; values come back from DendroPy as strings without a warning to cast."
+      },
+      "human_usability": {
+        "score": 6,
+        "max": 8,
+        "note": "Usage guide has natural prompts; the description is long and jargon-dense; the sanitize-and-round-trip advice copes with off-spec names."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "Local files only, no credentials, no exec of user strings; name sanitisation advised, but no guidance on file encoding."
+      },
+      "maintainability": {
+        "score": 8,
+        "max": 12,
+        "note": "Clear sections and routing. Shipped examples are toy strings: convert_formats.py claims to demonstrate lossy conversion but converts an annotation-free tree phyloXML->Nexus and only prints the claim; no example covers BEAST/MrBayes/IQ-TREE files."
+      },
+      "agent_specific": {
+        "score": 18,
+        "max": 20,
+        "note": "Precise trigger, explicit routing to tree-manipulation, tree-visualization, bayesian-inference, divergence-dating and read-sequences (all exist). I/O is idempotent. Escape hatches cover scope but not 'ask what program wrote the file' when support provenance is unknown."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 86.6,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 26,
+      "total": 34
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "BEAST MCC -> side table of posteriors/HPDs, then plain Newick",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Side table matches all 5 known nodes; treeio height_0.95_HPD and write.beast round trip confirmed; Skill's 'plain Newick' still starts with [&R]; Skill's Phylo.convert claim is false",
+        "basic": 37,
+        "specialized": 52,
+        "total": 89,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Extracted posterior, height and 95% HPD bounds match the values written into the MCC file",
+            "result": "PASS",
+            "note": "5/5 internal nodes match mcc6_truth.tsv"
+          },
+          {
+            "text": "Skill's DendroPy snippet (extract_comment_metadata, get_value('height_95%_HPD')) runs as written",
+            "result": "PASS",
+            "note": "exit 0; HPD returned as list ['38.1','48.9'] of strings"
+          },
+          {
+            "text": "Stripped topology written with the Skill's call is plain Newick with no bracket comments",
+            "result": "FAIL",
+            "note": "suppress_annotations=True still writes a leading '[&R] '; suppress_rooting=True needed"
+          },
+          {
+            "text": "Output's account of Phylo.convert nexus->newick (annotations dropped) matches actual behaviour",
+            "result": "FAIL",
+            "note": "Biopython 1.88 writes 11 escaped [\\[&...\\]] comments; DendroPy re-read gives posterior None, treeio read.beast.newick yields columns '\\[&posterior'"
+          },
+          {
+            "text": "R route: read.beast exposes height_0.95_HPD and write.beast round-trips posteriors and HPDs",
+            "result": "PASS",
+            "note": "treeio 1.30.0: column present (list), posteriors and HPDs identical after round trip; ape::read.nexus drops them"
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/in1/extract_mcc.py, extract_mcc.R, reread_convert.py, reread_convert.R all exit 0."
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Split IQ-TREE 2.4.0 SH-aLRT/UFBoot labels",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Bio.Phylo puts '98.1/98' in .name (confidence None), split into typed columns and phyloXML; treeio read.iqtree gives SH_aLRT/UFboot; ML tree RF 0 to the simulated tree",
+        "basic": 37,
+        "specialized": 54,
+        "total": 91,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Both SH-aLRT and UFBoot are preserved for every internal branch with their provenance",
+            "result": "PASS",
+            "note": "7 branches, two typed <confidence> elements each in phyloXML, round trip read back"
+          },
+          {
+            "text": "Output checks .confidence vs .name before using the label, as the Skill instructs",
+            "result": "PASS",
+            "note": "all dual labels found in .name, none in .confidence"
+          },
+          {
+            "text": "treeio read.iqtree splits dual support as the Skill claims",
+            "result": "PASS",
+            "note": "columns SH_aLRT, UFboot"
+          },
+          {
+            "text": "Values are range-checked against the Skill's scale table ([0,100] for both)",
+            "result": "PASS",
+            "note": "assert 0<=x<=100 on all"
+          },
+          {
+            "text": "The Skill supplies a Python pattern for splitting the dual label",
+            "result": "FAIL",
+            "note": "only the R route is named; the Python split was written from scratch"
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/in2/split_support.py and read_iqtree.R exit 0 on data/iq10.treefile (iqtree2 -B 1000 -alrt 1000 --seed 7)."
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Tip names with spaces, quotes, commas, non-ASCII; join to metadata",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Sanitize-and-map joins 7/7 after two retries: Windows cp1252 garbled read and write; ape reads 'O''Brien isolate 7' as NA; ete3 fails on quoted names",
+        "basic": 33,
+        "specialized": 46,
+        "total": 79,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "All tips join to the metadata table after sanitisation",
+            "result": "PASS",
+            "note": "7/7 (naive exact joins: Bio.Phylo 4/7, DendroPy 6/7, ape 0/7)"
+          },
+          {
+            "text": "An original->sanitized label map is written and checked for collisions",
+            "result": "PASS",
+            "note": "label_map.tsv, no collisions"
+          },
+          {
+            "text": "Labels are round-trip tested after writing, as the Skill instructs",
+            "result": "PASS",
+            "note": "sanitized.nwk re-read matches mapping"
+          },
+          {
+            "text": "Skill guidance prevents the file-encoding failure on the non-ASCII name",
+            "result": "FAIL",
+            "note": "path-based Phylo.read/DendroPy decoded as cp1252 ('CercopithÃ¨que'); Phylo.write to a path produced a non-UTF-8 file"
+          },
+          {
+            "text": "Skill warns which of its named tools mishandle quoted labels",
+            "result": "FAIL",
+            "note": "ape read.tree turns 'O''Brien isolate 7' into NA and keeps quotes; ete3 raises KeyError with quoted_node_names=True"
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/in3/odd_names.py attempt 1 (garbled join, kept as odd_names_attempt1_path_open.log), attempt 2 UnicodeDecodeError, attempt 3 exit 0; odd_names.R exit 0 with NA tip."
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "MrBayes posterior .t sets and .con.tre",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Phylo.read raises exactly as documented; 201+201 trees, 302 after 25% burn-in per run; Bio.Phylo crashes on .con.tre (AssertionError); DendroPy and read.mrbayes read prob",
+        "basic": 35,
+        "specialized": 49,
+        "total": 84,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Phylo.read raises on multi-tree and empty files as the Skill states",
+            "result": "PASS",
+            "note": "'There are multiple trees in this file; use parse() instead.' / 'There are no trees in this file.'"
+          },
+          {
+            "text": "Tree counts are reported per run and burn-in removed per run before pooling",
+            "result": "PASS",
+            "note": "201 each, 50 dropped each, 302 pooled"
+          },
+          {
+            "text": "Clade posteriors from .con.tre are extracted with an annotation-aware reader",
+            "result": "PASS",
+            "note": "DendroPy prob (strings) and treeio read.mrbayes prob/prob_stddev"
+          },
+          {
+            "text": "The Skill's primary tool (Bio.Phylo) reads the MrBayes consensus tree or the Skill warns it cannot",
+            "result": "FAIL",
+            "note": "Phylo.read(con.tre,'nexus') -> AssertionError 'Two string taxonomies?'; not mentioned"
+          },
+          {
+            "text": "Code runs",
+            "result": "PASS",
+            "note": "exit 0 after fixing an auditor API slip (TreeList has no encode_bipartitions)"
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/in4/posterior_set.py (first run exit 1 on auditor bug, rerun exit 0) and read_mrbayes.R exit 0."
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "NHX/phyloXML/NeXML -> Nexus/Newick/phyloXML/NeXML/cdao loss table",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Loss table with round trips: only phyloXML keeps 10/10 confidences, 7/7 taxonomy, colour; cdao KeyError without rdflib; Bio.Phylo names DendroPy NeXML tips 'd10'; rooted flag lost to Nexus/Newick",
+        "basic": 34,
+        "specialized": 47,
+        "total": 81,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Output gives a per-conversion table of what is lost",
+            "result": "PASS",
+            "note": "confidences, taxonomy, colour and rooted flag per target"
+          },
+          {
+            "text": "Read-write-read round trips diff annotations, not only topology",
+            "result": "PASS",
+            "note": "counts re-read from each written file; ete3 NHX round trip identical"
+          },
+          {
+            "text": "Every format string the Skill lists as supported works",
+            "result": "FAIL",
+            "note": "'cdao' -> KeyError until rdflib installed; after install it writes but drops all confidences"
+          },
+          {
+            "text": "Tip names survive a Bio.Phylo NeXML read",
+            "result": "FAIL",
+            "note": "tips named by otu id (d10, d8, d9); NeXMLIO.py line 141 uses node.attrib['otu']"
+          },
+          {
+            "text": "Colours persist only in phyloXML, as the Skill states",
+            "result": "PASS",
+            "note": "1/1 in phyloXML, 0 in Nexus/Newick/NeXML"
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/in5/format_matrix.py exit 0; cdao retest after pip install rdflib 7.6.0 in cdao_after_rdflib.log exit 0."
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Merge two .t runs with different TRANSLATE tables; consensus/root/figure requested",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Naive cat merge gives 2 topologies (mislabelled); TRANSLATE-aware merge gives 1; consensus, rooting on Mus and figure routed to sibling Skills",
+        "basic": 37,
+        "specialized": 55,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Output detects the TRANSLATE mismatch before merging",
+            "result": "PASS",
+            "note": "tables printed and compared"
+          },
+          {
+            "text": "Tip-label sets are verified equal across merged files",
+            "result": "PASS",
+            "note": "True; merged_AB.nex re-read by Bio.Phylo, 20 trees"
+          },
+          {
+            "text": "Scope: consensus, rooting and plotting are routed, not improvised",
+            "result": "PASS",
+            "note": "bayesian-inference/tree-manipulation/tree-visualization named"
+          },
+          {
+            "text": "Output states the trees are [&U] unrooted and rooting must be set explicitly",
+            "result": "PASS",
+            "note": "is_rooted False for all 20"
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/in6/merge_runs.py exit 0."
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "User insists 0-1 node labels are bootstraps; collapse < 70",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Values 0.54-1.0 flagged as posterior-scale; 'collapse < 70' would remove 5/5 clades; wrote phyloXML with provenance marked unconfirmed, no collapsing",
+        "basic": 37,
+        "specialized": 53,
+        "total": 90,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Safety: output does not store the values as bootstrap without confirmed provenance",
+            "result": "PASS",
+            "note": "confidence type marked unconfirmed; asks which program wrote the file"
+          },
+          {
+            "text": "Output shows the < 70 rule would collapse every clade on this scale",
+            "result": "PASS",
+            "note": "5 of 5"
+          },
+          {
+            "text": "Output applies the Skill's scale table (posterior [0,1] vs bootstrap [0,100])",
+            "result": "PASS",
+            "note": "scale inferred from max 1.0"
+          },
+          {
+            "text": "Scope: collapsing is routed to tree-manipulation rather than done here",
+            "result": "PASS",
+            "note": "no clades collapsed"
+          },
+          {
+            "text": "Support read into .confidence, not .name, is verified",
+            "result": "PASS",
+            "note": "all five in .confidence"
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/in7/collab_labels.py exit 0."
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 31.6,
+    "dynamic_weighted": 52.0,
+    "score": 84,
+    "max": 100,
+    "grade": "Beta Only",
+    "grade_symbol": "⚠️",
+    "deployable": false,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "The central routing rule is right and verified: DendroPy extract_comment_metadata and treeio read.beast recover posteriors and 95% HPDs exactly, ape::read.nexus drops them",
+    "Exact API details hold on current versions: height_0.95_HPD column name, read.iqtree SH_aLRT/UFboot split, write.beast round trip, Phylo.read raising on 0 or >1 trees",
+    "TRANSLATE and rooted/unrooted guidance caught a real mislabelling merge on synthetic runs",
+    "Support-scale table led directly to refusing to relabel posteriors as bootstraps",
+    "Clean scope with routing to five sibling Skills, all present"
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "Fix the Phylo.convert-to-Newick annotation claim",
+      "observed_in": [1],
+      "problem": "SKILL.md says Phylo.convert nexus->newick drops [&...] annotations; Biopython 1.88 writes them as escaped [\\[&...\\]] comments that DendroPy (posterior None) and treeio read.beast.newick (column '\\[&posterior') cannot parse.",
+      "root_cause": "The claim was not checked against NewickIO._format_comment, which escapes brackets inside the comment.",
+      "fix": "State that Bio.Phylo carries comments into Newick in an escaped, non-standard form that other readers mis-parse, so the annotations are effectively corrupted; keep the rule 'extract first, then write with DendroPy suppress_annotations=True, suppress_rooting=True'."
+    },
+    {
+      "priority": "P1",
+      "title": "Warn where Bio.Phylo fails on Nexus/NeXML inputs",
+      "observed_in": [4, 5],
+      "problem": "Phylo.read on a MrBayes .con.tre raises AssertionError 'Two string taxonomies?', and Phylo.read on DendroPy NeXML names tips by otu id (d10, d8...). Neither is mentioned.",
+      "root_cause": "The tool taxonomy lists Bio.Phylo for general Nexus/NeXML work without testing annotated MrBayes or foreign NeXML files.",
+      "fix": "Add Common Errors rows: MrBayes .con.tre -> use DendroPy or treeio read.mrbayes; NeXML from other tools -> check tip names, prefer DendroPy."
+    },
+    {
+      "priority": "P1",
+      "title": "Add encoding and quoted-label guidance",
+      "observed_in": [3],
+      "problem": "Path-based Bio.Phylo/DendroPy I/O on Windows decoded and wrote cp1252, garbling a non-ASCII tip; ape read 'O''Brien isolate 7' as NA; ete3 raised on quoted names. The assertion pass rate (26/34) missed the Limited Release floor partly on these.",
+      "root_cause": "The name-trap section covers sanitisation but not file encoding or per-tool quoted-label support.",
+      "fix": "Tell the agent to pass explicit UTF-8 handles (open(p, encoding='utf-8')) for read and write, and to sanitise before ape or ete3 ever see quoted labels."
+    },
+    {
+      "priority": "P2",
+      "title": "Document rdflib for cdao and string-typed DendroPy values",
+      "observed_in": [1, 5],
+      "problem": "'cdao' raises KeyError unless rdflib is installed and then drops confidences; DendroPy returns posterior and HPD as strings.",
+      "root_cause": "Format list and snippet omit optional dependencies and value types.",
+      "fix": "Note 'cdao requires pip install rdflib'; cast with float() in the DendroPy snippet."
+    },
+    {
+      "priority": "P2",
+      "title": "Make the shipped examples demonstrate the Skill's claims",
+      "observed_in": [],
+      "problem": "convert_formats.py converts an annotation-free tree phyloXML->Nexus and prints a claim about loss without showing any; no example covers BEAST, MrBayes or IQ-TREE files or splitting dual support in Python.",
+      "root_cause": "Examples predate the annotation-focused rewrite of SKILL.md.",
+      "fix": "Ship a small annotated MCC string plus a DendroPy extraction and an IQ-TREE dual-label split, each printing before/after annotation counts."
+    }
+  ]
+}

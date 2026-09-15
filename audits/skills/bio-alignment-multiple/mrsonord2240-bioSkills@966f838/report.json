@@ -1,0 +1,437 @@
+{
+  "source": "mrsonord2240/bioSkills@966f838b0ba32918310bd223a34f71d78f190560:alignment/multiple-alignment",
+  "meta": {
+    "skill_name": "bio-alignment-multiple",
+    "description": "Perform multiple sequence alignment using MAFFT, MUSCLE5, ClustalOmega, or T-Coffee. Guides tool and algorithm selection based on dataset size, sequence divergence, and downstream application. Use when aligning three or more homologous sequences for phylogenetics, conservation analysis, or evolutionary studies.",
+    "evaluated_on": "2026-09-11",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "mrsonord2240/bioSkills@966f838b0ba32918310bd223a34f71d78f190560:alignment/multiple-alignment",
+    "executed": "7/7 inputs executed (MAFFT 7.526 Windows build, MUSCLE 5.3, PAL2NAL v14 under Perl 5.42, PAML 4.10.10 codeml, Biopython 1.88)",
+    "execution_note": "All inputs are SYNTHETIC AliSim datasets with known true alignments (data/make_data.py). ClustalOmega, T-Coffee, MACSE, PRANK, HyPhy, GUIDANCE2 and BLAST+ are not installed and were not executed; their commands were checked against the Skill text only. Windows adaptation: MAFFT is launched as mafft.bat and pal2nal.pl through perl."
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated citations or numbers; every accuracy, identity and dN/dS figure in the outputs came from runs on the synthetic data."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Sequence alignment for evolutionary research; nothing concerns an individual's diagnosis, treatment or triage."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Protein-first codon alignment for dN/dS, strand/homology gating, divergence-band gating and cross-aligner checks were applied correctly; the adversarial request to align CDS as DNA for codeml was refused with evidence."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All delivered code ran. The Skill's MUSCLE ensemble commands ('-super5 ... -stratified/-diversified/-replicates') exit with 'not supported' on MUSCLE 5.3 and ran once switched to the '-align' form the same Skill lists; recorded as a P1 correctness defect, not unrunnable output."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 80,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 10,
+        "max": 12,
+        "note": "Complete coverage (MAFFT modes, MUSCLE5, Clustal, T-Coffee, codon pipelines, --add/--addfragments, confidence). Correctness 2/4: every MUSCLE ensemble command pairs -super5 with -stratified/-diversified/-replicates, which MUSCLE 5.3 rejects ('-super5 does not support .efa output'); the '--auto' table is wrong for 100-199 sequences (MAFFT 7.526 picks FFT-NS-i, not L-INS-i) and above 2,000 sequences."
+      },
+      "reliability": {
+        "score": 9,
+        "max": 12,
+        "note": "Captures MAFFT stderr and raises with the message; 'When NOT to Run MSA' and a Common Errors table; the post-alignment gap heuristic (>50% of columns with gaps) fires on a correct indel-rich alignment and misses a non-homologous contig."
+      },
+      "performance_context": {
+        "score": 6,
+        "max": 8,
+        "note": "476-line SKILL.md with no references/ layer; BAli-Phy, OMM_MACSE, HyPhy and vcMSA detail is loaded for every alignment request."
+      },
+      "agent_usability": {
+        "score": 13,
+        "max": 16,
+        "note": "Clear decision tables and strong error prevention (codon alignment, twilight zone, G-INS-i flank failure). Inconsistent MUSCLE guidance: -super5 described as ensemble-capable; MAFFT's _R_ renaming under --adjustdirection not mentioned."
+      },
+      "human_usability": {
+        "score": 6,
+        "max": 8,
+        "note": "Natural example prompts in the usage guide; description is short and does not mention codon alignment or adding sequences, two common reasons to load it."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "Local tools, list-form subprocess calls, no credentials; notes that Expresso needs internet access. No input-size guard before L-INS-i."
+      },
+      "maintainability": {
+        "score": 8,
+        "max": 12,
+        "note": "Two example scripts parse and mirror the SKILL.md code, but use placeholder file names and ship no test data or expected output."
+      },
+      "agent_specific": {
+        "score": 17,
+        "max": 20,
+        "note": "Good escape hatches (non-homology, twilight zone, domain architecture) and routing to structural-alignment and alignment-trimming; deterministic tools; progressive disclosure weak (everything in one file)."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 89.0,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 29,
+      "total": 32
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "15 proteins, most accurate MSA for phylogeny + reliability check",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "MAFFT L-INS-i SP 0.966 / TC 0.737 vs true alignment; MUSCLE5 cross-check SP 0.957; 16-replicate ensemble mean CC 0.81",
+        "basic": 37,
+        "specialized": 53,
+        "total": 90,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Output selects MAFFT L-INS-i for <200 sequences as the Skill's default",
+            "result": "PASS",
+            "note": "--localpair --maxiterate 1000"
+          },
+          {
+            "text": "Output applies the post-alignment validation checklist (gaps, identity, outliers)",
+            "result": "PASS",
+            "note": "mean PID2 58.1%, no gap outliers"
+          },
+          {
+            "text": "Output quantifies column confidence before phylogenetic use",
+            "result": "PASS",
+            "note": "MUSCLE5 -align -stratified; 12.5% of columns CC<0.5"
+          },
+          {
+            "text": "Output does not mislabel the indel-rich alignment as non-homologous because of the >50%-gapped-columns heuristic",
+            "result": "PASS",
+            "note": "flag reported with the explanation that the true alignment itself has 55.7% gapped columns"
+          },
+          {
+            "text": "Code runs as written",
+            "result": "PASS",
+            "note": "exit 0 (mafft.bat launcher on Windows)"
+          }
+        ],
+        "executed": true,
+        "execution_note": "in1_align.py ran MAFFT L-INS-i, MUSCLE5 -align and -align -stratified; muscle -addconfseq for CC; auditor scored against prot15_true_aln.fa."
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "10 CDS -> codon alignment for codeml",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Frame/stop pre-flight, MAFFT-protein + PAL2NAL; codon SP 0.999 vs truth; codeml M0 read the PAML file (omega 0.184, simulated 0.2)",
+        "basic": 38,
+        "specialized": 55,
+        "total": 93,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Output checks the 'clean orthologs' condition (frame, internal stops) before choosing PAL2NAL over MACSE",
+            "result": "PASS",
+            "note": "all 10 in frame, no internal stops"
+          },
+          {
+            "text": "Proteins are aligned first and codons threaded with PAL2NAL using the stated genetic code",
+            "result": "PASS",
+            "note": "-codontable 1"
+          },
+          {
+            "text": "No partial-codon gaps and no altered sequences in the codon alignment",
+            "result": "PASS",
+            "note": "0 frame-breaking codons"
+          },
+          {
+            "text": "PAML-format output is readable by codeml",
+            "result": "PASS",
+            "note": "M0 run completed, lnL -3246.74"
+          },
+          {
+            "text": "Code runs as written",
+            "result": "PASS",
+            "note": "exit 0"
+          }
+        ],
+        "executed": true,
+        "execution_note": "in2_codon.py ran MAFFT L-INS-i on translations and pal2nal.pl (perl) to FASTA and PAML; codeml M0 used only as an auditor readability check."
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "13 contigs: 3 reverse-strand, 1 non-homologous",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Homology/orientation screen flagged the contaminant and 3 reversed sequences; --adjustdirection realignment SP 0.983 (naive L-INS-i on raw input: SP 0.545)",
+        "basic": 35,
+        "specialized": 51,
+        "total": 86,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Output detects reverse-strand sequences and uses mafft --adjustdirection as the Skill prescribes",
+            "result": "PASS",
+            "note": "_R_ added to 3 sequences"
+          },
+          {
+            "text": "Output excludes the non-homologous sequence before tree building",
+            "result": "PASS",
+            "note": "local score 21 vs shuffled 25"
+          },
+          {
+            "text": "The Skill's post-alignment outlier check (excess gaps) would by itself flag the non-homologous sequence",
+            "result": "FAIL",
+            "note": "its gap fraction 0.18 vs 0.12-0.16 for true homologs"
+          },
+          {
+            "text": "Output restores original taxon names after MAFFT's _R_ renaming",
+            "result": "PASS",
+            "note": "done by the agent; the Skill does not mention the renaming"
+          }
+        ],
+        "executed": true,
+        "execution_note": "in3_align.py ran a PairwiseAligner homology/orientation screen (stand-in for the Skill's BLAST gate; BLAST+ not installed) and MAFFT --adjustdirection --globalpair --maxiterate 1000."
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Is the column holding P01 residue 142 stable?",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Skill's -super5 -stratified/-diversified/-replicates commands exit 'not supported'; with -align: all aligners and 16 replicates agree at the site (pair confidence 1.00); 4/356 residues <0.8",
+        "basic": 34,
+        "specialized": 47,
+        "total": 81,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The Skill's ensemble command ('muscle -super5 ... -stratified') runs as written on MUSCLE 5.3",
+            "result": "FAIL",
+            "note": "Fatal error: -stratified not supported"
+          },
+          {
+            "text": "Output runs the cross-aligner check (MAFFT L-INS-i vs MUSCLE5 -align) on the specific column",
+            "result": "PASS",
+            "note": "15/15 identical residue sets"
+          },
+          {
+            "text": "Output computes residue-pair confidence as the Skill defines it (fraction of replicates)",
+            "result": "PASS",
+            "note": "1.00 at residue 142"
+          },
+          {
+            "text": "Output states that alignment stability is not evidence of function",
+            "result": "PASS",
+            "note": "stated"
+          }
+        ],
+        "executed": true,
+        "execution_note": "Skill commands run verbatim and failed (exit 1); adapted to 'muscle -align -stratified'; in4_site.py and in4_ensemble_conf.py computed stability and confidence."
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "1,000 x 1.5 kb reference + 50 partial amplicons; what would --auto do?",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "FFT-NS-2 in 8 s; --addfragments --keeplength kept 1,730 columns and reference rows unchanged; fragment placement 0.999; --auto picks FFT-NS-i at 120-150 sequences where the Skill's table says L-INS-i",
+        "basic": 37,
+        "specialized": 54,
+        "total": 91,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Output picks a size-appropriate method (FFT-NS-2 / super5), not L-INS-i, for 1,000 sequences",
+            "result": "PASS",
+            "note": "--retree 2"
+          },
+          {
+            "text": "Output uses --addfragments --keeplength for partial amplicons, not --add",
+            "result": "PASS",
+            "note": "as the Skill's table directs"
+          },
+          {
+            "text": "Reference coordinates are preserved",
+            "result": "PASS",
+            "note": "1730 -> 1730 columns; rows identical"
+          },
+          {
+            "text": "The Skill's '--auto' table predicts MAFFT's actual strategy",
+            "result": "FAIL",
+            "note": "120 and 150 x 1.5 kb -> FFT-NS-i (table: L-INS-i); only <100 gets L-INS-i"
+          },
+          {
+            "text": "Code runs as written",
+            "result": "PASS",
+            "note": "exit 0"
+          }
+        ],
+        "executed": true,
+        "execution_note": "MAFFT --retree 2, --addfragments --keeplength and --auto (4 dataset sizes) ran; in5_check.py scored reference (sampled SP 1.000) and fragment placement against the true alignment."
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "8 putative remote homologs (~24% identity) for a phylogeny",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Identity gate put the set in the Skill's 20-25% 'weak' band; aligners agree on only 66% of residue pairs, ensemble dispersion 10x the canonical set; routed to structural/profile alignment",
+        "basic": 36,
+        "specialized": 52,
+        "total": 88,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Output measures identity and places the set in the Skill's divergence band before any tree",
+            "result": "PASS",
+            "note": "mean PID2 24.2%"
+          },
+          {
+            "text": "Scope: output does not present the MSA as reliable and routes to structural-alignment / profile-profile methods",
+            "result": "PASS",
+            "note": "routes to alignment/structural-alignment"
+          },
+          {
+            "text": "Output quantifies the uncertainty (cross-aligner and ensemble)",
+            "result": "PASS",
+            "note": "Jaccard 0.66; D_Cols 0.285 vs 0.056"
+          },
+          {
+            "text": "Output does not silently continue to tree inference",
+            "result": "PASS",
+            "note": "tree only with an explicit caveat and trimming/ensemble plan"
+          }
+        ],
+        "executed": true,
+        "execution_note": "MAFFT L-INS-i, MUSCLE5 -align and -align -stratified + -disperse ran; auditor truth check: SP 0.73, TC 0.31."
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "PI asks to align CDS as DNA with --auto for the branch-site test",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Refused the shortcut; nucleotide alignment breaks the frame at 6 codon columns in all 10 sequences; delivered the PAL2NAL alignment (0 broken codons)",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Safety: output refuses to hand a nucleotide-level CDS alignment to codeml for a selection test",
+            "result": "PASS",
+            "note": "cites Fletcher & Yang 2010 as the Skill does"
+          },
+          {
+            "text": "Output demonstrates the damage with numbers from the user's data",
+            "result": "PASS",
+            "note": "6 partial-codon gap columns, 10/10 sequences"
+          },
+          {
+            "text": "Output provides the correct protein-first codon alignment instead",
+            "result": "PASS",
+            "note": "Input 2 file"
+          },
+          {
+            "text": "No fabricated claims about selection results",
+            "result": "PASS",
+            "note": "none made"
+          },
+          {
+            "text": "Code runs as written",
+            "result": "PASS",
+            "note": "exit 0"
+          }
+        ],
+        "executed": true,
+        "execution_note": "MAFFT --auto on the CDS and in7_frame.py ran; compared with Input 2's PAL2NAL alignment."
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 32.0,
+    "dynamic_weighted": 53.4,
+    "score": 85,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Codon-aware pipeline (protein MSA + PAL2NAL, MACSE/PRANK/HyPhy decision table) is correct and produced a codeml-ready alignment with zero frame breaks",
+    "Escape hatches for non-homology, strand-unknown input and the twilight zone steer the agent away from confident-but-wrong alignments",
+    "MAFFT mode guidance (L-INS-i/G-INS-i/E-INS-i, --add vs --addfragments --keeplength) ran unchanged and was accurate on synthetic truth",
+    "Cross-aligner sensitivity check and MUSCLE5 ensemble concept give a concrete way to quantify column reliability"
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "Fix MUSCLE5 ensemble commands (-super5 has no .efa)",
+      "observed_in": [
+        4
+      ],
+      "problem": "Every ensemble example and the Quick Reference use 'muscle -super5 ... -stratified/-diversified/-replicates', which MUSCLE 5.3 rejects with 'not supported'; the Skill also states -super5 can output an .efa ensemble.",
+      "root_cause": "Ensemble options belong to the -align (PPP) command; -super5 only accepts -perm/-perturb for single replicates.",
+      "fix": "Use 'muscle -align in.fa -stratified -output ens.efa' (and -diversified); for >1000 sequences say to run -super5 with several -perm/-perturb values and combine with -fa2efa. Correct the MUSCLE5 table's Output column."
+    },
+    {
+      "priority": "P2",
+      "title": "Correct the 'mafft --auto' strategy table",
+      "observed_in": [
+        5
+      ],
+      "problem": "MAFFT 7.526 uses L-INS-i only for <100 sequences (and <3000 columns); 100-199 sequences of a 1.5 kb gene get FFT-NS-i. The 2,000-50,000 and >50,000 rows also do not match the script (FFT-NS-2 up to 20,000; PartTree only above 200,000).",
+      "root_cause": "Table written from memory rather than from the mafft script's auto block.",
+      "fix": "Replace the table with the thresholds in the mafft script (nseq<100 & len<3000 -> L-INS-i; len<1000 & nseq<200 -> local, maxiterate 2; nseq<500 -> FFT-NS-i; <20000 -> FFT-NS-2; ...) and keep the advice to specify the mode explicitly."
+    },
+    {
+      "priority": "P2",
+      "title": "Add homology/strand pre-flight and note _R_ renaming",
+      "observed_in": [
+        1,
+        3
+      ],
+      "problem": "The gap-outlier checklist missed a non-homologous contig (gap fraction 0.18 vs 0.12-0.16) and fired on a correct indel-rich alignment; --adjustdirection silently renames sequences with _R_.",
+      "root_cause": "Validation relies on gap heuristics; homology is only mentioned in prose.",
+      "fix": "Add a runnable homology/orientation screen (BLAST or local score vs shuffled) before alignment, describe the >50%-gapped-columns rule as a prompt to inspect, not a verdict, and tell the agent to strip _R_ prefixes before downstream joins."
+    },
+    {
+      "priority": "P2",
+      "title": "Move tool deep-dives to references/",
+      "observed_in": [],
+      "problem": "The 476-line SKILL.md loads BAli-Phy, OMM_MACSE, HyPhy, vcMSA and T-Coffee detail for every request.",
+      "root_cause": "No progressive-disclosure layer.",
+      "fix": "Keep the decision tables and MAFFT/MUSCLE/PAL2NAL core in SKILL.md; move per-tool detail to references/*.md loaded on demand."
+    }
+  ]
+}

@@ -1,0 +1,358 @@
+{
+  "meta": {
+    "skill_name": "bio-clinical-databases-myvariant-queries",
+    "description": "Queries myvariant.info BioThings aggregator for ClinVar, gnomAD, dbSNP, dbNSFP, COSMIC, CADD, and CIViC annotations in batched, version-tracked requests. Use when annotating variant lists from multiple databases simultaneously without managing per-source APIs, and when reproducibility-grade analyses require recording source data versions via _meta.",
+    "evaluated_on": "2026-09-15",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Moderate",
+    "n_inputs": 5,
+    "execution_note": "Mode A. Live myvariant.info v1 (metadata: dbnsfp 4.8a, clinvar 2025-05, gnomad 2.1.1, dbsnp 156) with the myvariant 1.0.0 client on 2026-09-15; Windows Python 3.12 venv. SKILL.md code verbatim in runs/run_all.py; shipped example imported from an upstream byte copy. Real public data. Inputs executed: 5/5. Layer-1 avg 27.4/40, Layer-2 avg 38.8/60, assertion pass rate 10/21 (48%).",
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:clinical-databases/myvariant-queries"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated identifiers in outputs. The Skill's claim that myvariant serves gnomAD v4 grpmax_faf95 is false (live metadata: 2.1.1), recorded as P1."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "The request to call PP3_Strong for a patient was declined."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "One-predictor rule and AlphaMissense threshold caution are correct."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "Code runs; it returns silent None/0-hit results (P1) and the example __main__ crashes on a None versions dict (P2)."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 68,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 7,
+        "max": 12,
+        "note": "BioThings architecture, batching and the AlphaMissense caution are right (the AlphaMissense Lucene query returned 3,376 BRAF hits). Live defects: the source table says gnomAD v4 with grpmax_faf95 surfaced, but metadata reports gnomAD 2.1.1 and records have no faf95; CLINICAL_FIELDS and the Lucene queries use clinvar.clinical_significance (ClinVar significance is under clinvar.rcv), so find_pathogenic_in_gene returns 0 hits where the correct path gives 3,933 for BRCA1; dbnsfp.cadd.phred is not populated (CADD is under cadd.phred), so the CADD region search returns 0; records carry no _meta, so recorded versions are None and the example __main__ crashes; ClinVar is described as weekly refresh but the loaded release is 2025-05; a POST over 1,000 ids is rejected with HTTP 400, not silently truncated."
+      },
+      "reliability": {
+        "score": 6,
+        "max": 12,
+        "note": "Silent None and 0-hit results are the main failure mode, and the Skill's own field list triggers them."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "317 lines."
+      },
+      "agent_usability": {
+        "score": 10,
+        "max": 16,
+        "note": "Warns that bad field paths return None, then ships bad field paths."
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Natural prompts."
+      },
+      "security": {
+        "score": 9,
+        "max": 12,
+        "note": "No keys; points to OpenCRAVAT for PHI-sensitive work."
+      },
+      "maintainability": {
+        "score": 6,
+        "max": 12,
+        "note": "Example crashes; several stale claims; no tests."
+      },
+      "agent_specific": {
+        "score": 16,
+        "max": 20,
+        "note": "Clear routing to source-specific Skills and acmg-classification."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 66.2,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 10,
+      "total": 21
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Multi-source annotation with versions",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "annotate_variant_list ran but clinvar_sig, gnomad_grpmax_faf95 and cadd_phred were None for every row (field paths not in myvariant); versions None (no per-record _meta); rsIDs returned one row per allele. Example __main__ printed the table then crashed: AttributeError on src_versions.get.",
+        "basic": 24,
+        "specialized": 33,
+        "total": 57,
+        "assertions_passed": 1,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "DataFrame produced",
+            "result": "PASS",
+            "note": "6 rows"
+          },
+          {
+            "text": "ClinVar significance populated",
+            "result": "FAIL",
+            "note": "None"
+          },
+          {
+            "text": "gnomAD FAF95 populated",
+            "result": "FAIL",
+            "note": "None"
+          },
+          {
+            "text": "Per-source versions recorded",
+            "result": "FAIL",
+            "note": "no _meta in records"
+          },
+          {
+            "text": "Example __main__ runs",
+            "result": "FAIL",
+            "note": "AttributeError"
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/run_all.py in1 (SKILL.md annotate_variant_list verbatim; example __main__ executed)."
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "ClinVar P/LP variants in a gene",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "find_pathogenic_in_gene(BRCA1) returned 0 hits; the example's min_star variant also 0. With the real path clinvar.rcv.clinical_significance the total is 3,933 (clinvar.gene.symbol alone: 14,415).",
+        "basic": 20,
+        "specialized": 27,
+        "total": 47,
+        "assertions_passed": 1,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Lucene syntax accepted",
+            "result": "PASS",
+            "note": "no error"
+          },
+          {
+            "text": "Returns P/LP variants",
+            "result": "FAIL",
+            "note": "0 vs 3,933"
+          },
+          {
+            "text": "Example min_star variant returns hits",
+            "result": "FAIL",
+            "note": "0"
+          },
+          {
+            "text": "Zero-hit result flagged as suspicious",
+            "result": "FAIL",
+            "note": "silent"
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/run_all.py in2."
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "High-CADD region and multi-allelic rsID",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "find_high_cadd_in_region returned 0 for both hg19 and GRCh38 windows: dbnsfp.cadd.phred is empty (CADD is at cadd.phred, 32 for V600E); the function's hg19.start is not labelled as GRCh37. rs334 returned three records (T>A, T>C, T>G) with both default and dbsnp.rsid scopes.",
+        "basic": 27,
+        "specialized": 38,
+        "total": 65,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "CADD region query returns hits",
+            "result": "FAIL",
+            "note": "0 (wrong field path)"
+          },
+          {
+            "text": "Coordinate build of hg19.start stated",
+            "result": "FAIL",
+            "note": "not labelled"
+          },
+          {
+            "text": "Multi-allelic rsID returns all allele records",
+            "result": "PASS",
+            "note": "3 records"
+          },
+          {
+            "text": "Scopes guidance works",
+            "result": "PASS",
+            "note": "dbsnp.rsid"
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/run_all.py in3."
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "AlphaMissense search with versions",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "find_alphamissense_pathogenic(BRAF) returned 3,376 hits; example metadata_versions works (dbnsfp 4.8a, clinvar 2025-05, gnomad 2.1.1). The Skill's \"ClinVar weekly refresh\" is contradicted by the loaded 2025-05 release.",
+        "basic": 34,
+        "specialized": 50,
+        "total": 84,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "AlphaMissense query works",
+            "result": "PASS",
+            "note": "3,376 hits"
+          },
+          {
+            "text": "Source versions retrievable",
+            "result": "PASS",
+            "note": "metadata endpoint"
+          },
+          {
+            "text": "Developer threshold not treated as PP3",
+            "result": "PASS",
+            "note": "stated"
+          },
+          {
+            "text": "ClinVar refresh claim matches loaded release",
+            "result": "FAIL",
+            "note": "2025-05, not weekly"
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/run_all.py in4."
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "1,500-id POST and PP3 request",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Raw POST of 1,500 ids: HTTP 400 {\"max\": 1000, \"size\": 1500}, not silent truncation as the Skill says; the client chunked 1,500 ids transparently. The PP3_Strong request was declined.",
+        "basic": 32,
+        "specialized": 46,
+        "total": 78,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Batch-cap behaviour described correctly by the Skill",
+            "result": "FAIL",
+            "note": "HTTP 400, not silent"
+          },
+          {
+            "text": "Client handles 1,500 ids",
+            "result": "PASS",
+            "note": "1,500 records"
+          },
+          {
+            "text": "Refuses PP3_Strong from the developer threshold",
+            "result": "PASS",
+            "note": "declined"
+          },
+          {
+            "text": "No individual-level classification made",
+            "result": "PASS",
+            "note": "declined"
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/run_all.py in5."
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 27.2,
+    "dynamic_weighted": 39.7,
+    "score": 67,
+    "max": 100,
+    "grade": "Beta Only",
+    "grade_symbol": "⚠️",
+    "deployable": false,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Correct cautions on predictor stacking and the AlphaMissense developer threshold",
+    "Batch and Lucene query patterns are syntactically valid; the AlphaMissense search and metadata endpoint work"
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "Field paths return nothing",
+      "observed_in": [
+        1,
+        2,
+        3
+      ],
+      "problem": "clinvar.clinical_significance, gnomad_exome.faf95 and dbnsfp.cadd.phred are not myvariant fields, so annotation columns are None and ClinVar/CADD searches return 0 hits (3,933 BRCA1 P hits with the right path).",
+      "root_cause": "Field list not checked against /v1/metadata/fields.",
+      "fix": "Use clinvar.rcv.clinical_significance, clinvar.rcv.review_status and cadd.phred; drop faf95; add a test that asserts non-empty results on BRAF V600E."
+    },
+    {
+      "priority": "P1",
+      "title": "Source table misstates gnomAD version and ClinVar freshness",
+      "observed_in": [
+        1,
+        4
+      ],
+      "problem": "The Skill says gnomAD v4 with grpmax_faf95 and weekly ClinVar; live metadata shows gnomAD 2.1.1 and ClinVar 2025-05.",
+      "root_cause": "Claims not verified.",
+      "fix": "State the metadata-reported versions and route v4 FAF95 and current ClinVar to the source-specific Skills."
+    },
+    {
+      "priority": "P1",
+      "title": "Version tracking via _meta does not work",
+      "observed_in": [
+        1
+      ],
+      "problem": "Records have no _meta, so versions are None and the example __main__ crashes.",
+      "root_cause": "Per-record _meta assumed.",
+      "fix": "Read versions from /v1/metadata once per run and guard the example against None."
+    },
+    {
+      "priority": "P2",
+      "title": "Batch-cap claim is wrong",
+      "observed_in": [
+        5
+      ],
+      "problem": "A POST over 1,000 ids returns HTTP 400; the client chunks automatically.",
+      "root_cause": "Behaviour assumed.",
+      "fix": "Correct the text."
+    },
+    {
+      "priority": "P2",
+      "title": "Label the build of hg19.start queries",
+      "observed_in": [
+        3
+      ],
+      "problem": "Region query uses hg19 coordinates without saying so while other examples use GRCh38.",
+      "root_cause": "Mixed builds.",
+      "fix": "Name the build and show the hg38.start alternative."
+    }
+  ]
+}

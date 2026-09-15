@@ -1,0 +1,422 @@
+{
+  "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:phylogenetics/modern-tree-inference",
+  "meta": {
+    "skill_name": "bio-phylo-modern-tree-inference",
+    "description": "Infers maximum-likelihood phylogenetic trees with IQ-TREE2 and RAxML-NG -- model selection (ModelFinder), branch support (UFBoot2, SH-aLRT), concordance factors (gCF/sCF), partitioning, topology tests, and long-branch-attraction control.",
+    "evaluated_on": "2026-09-11",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:phylogenetics/modern-tree-inference",
+    "executed": "6/7 inputs executed (IQ-TREE 2.4.0 Windows build, Biopython 1.88, DendroPy 5.0.13); Input 6 is a routing answer with no code",
+    "execution_note": "All IQ-TREE commands were run on SYNTHETIC AliSim alignments (true trees known). The Skill's combined '--gcf ... --scfl' command and the shipped examples/partitioned_analysis.sh were run as written and fail on IQ-TREE 2.4.0; the adapted two-command form ran."
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated citations, statistics or results; every number reported in the outputs came from IQ-TREE runs on the synthetic data."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Pure research phylogenetics; nothing diagnoses, prescribes or triages an individual."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Support thresholds (UFBoot>=95 with SH-aLRT>=80), AU interpretation (failure to reject is not acceptance) and LBA diagnosis were applied correctly; no methodological fallacy in any output."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "Every delivered command ran on IQ-TREE 2.4.0. One Skill-supplied command (--gcf combined with --scfl, Input 5) is rejected by IQ-TREE 2.4.0 with a self-explanatory message and runs once split into two calls as the Skill's own version-compatibility rule instructs; recorded as a P1 correctness defect rather than unrunnable code."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 83,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 9,
+        "max": 12,
+        "note": "Covers ModelFinder, UFBoot2/SH-aLRT, gCF/sCF, partitioning, AU and LBA. Correctness 2/4: the documented concordance command '--gcf loci.treefile --scfl 100' (SKILL.md and examples/partitioned_analysis.sh) is refused by IQ-TREE 2.4.0; the claims that '--alrt' is an unknown argument and that '-bb'/'-nt' are not recognised by v2.x are false on 2.4.0 (both accepted, --alrt is the documented form)."
+      },
+      "reliability": {
+        "score": 9,
+        "max": 12,
+        "note": "Common Errors table with cause/solution, version-compatibility rule to introspect and adapt, seeds and namespaced prefixes in examples; two Common Errors rows are factually wrong and IQ-TREE checkpoint/-redo behaviour is not covered."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "209-line SKILL.md, dense tables, no redundant steps; all content loaded at once but it is compact."
+      },
+      "agent_usability": {
+        "score": 14,
+        "max": 16,
+        "note": "Immediately learnable, strong error prevention (UFBoot 95 vs BP 70, +I+G trap, LBA checklist). Minor inconsistency: warns against double-dash forms that IQ-TREE 2.4.0 documents; output format for the final report is not prescribed."
+      },
+      "human_usability": {
+        "score": 6,
+        "max": 8,
+        "note": "Usage guide has natural prompts; description is long and jargon-heavy; handles off-spec requests by routing."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "No credentials, local tools only; no alignment sanity check before a long run except in the RAxML example."
+      },
+      "maintainability": {
+        "score": 9,
+        "max": 12,
+        "note": "Clear sections and separate example scripts; examples are declared 'NOT spot-runnable' and ship no test alignment or expected output; the partition example hard-codes a 2100-bp gene layout."
+      },
+      "agent_specific": {
+        "score": 18,
+        "max": 20,
+        "note": "Precise trigger with explicit routing to distance-calculations, bayesian-inference, species-trees and divergence-dating; seeds for idempotency (does not warn that -T AUTO can change results between machines)."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 87.9,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 29,
+      "total": 31
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "12-taxon 1.2 kb gene: ModelFinder + UFBoot2 + SH-aLRT",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "K2P+G4 chosen by BIC; 9/9 branches pass the joint rule; RF distance to the simulated true tree = 0",
+        "basic": 37,
+        "specialized": 54,
+        "total": 91,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Output uses ModelFinder (-m MFP) rather than a fixed or legacy -m TEST model",
+            "result": "PASS",
+            "note": "-m MFP; BIC-selected K2P+G4 reported"
+          },
+          {
+            "text": "Output requests both UFBoot2 (with -bnni) and SH-aLRT and applies SH-aLRT>=80 AND UFBoot>=95",
+            "result": "PASS",
+            "note": "joint rule applied to all 9 internal branches"
+          },
+          {
+            "text": "Output states that support measures repeatability, not correctness",
+            "result": "PASS",
+            "note": "stated in the interpretation"
+          },
+          {
+            "text": "Scope: output points to outgroup rooting before clades are read as ancestral groups",
+            "result": "PASS",
+            "note": "notes the tree is unrooted and names Gallus+Xenopus as the outgroup, routes rooting to tree-manipulation"
+          },
+          {
+            "text": "Code runs as written on IQ-TREE 2.4.0",
+            "result": "PASS",
+            "note": "exit 0"
+          }
+        ],
+        "executed": true,
+        "execution_note": "iqtree2 -s gene12_aln.fa -m MFP -B 1000 -bnni -alrt 1000 -T AUTO -ntmax 4 --seed 12345 ran in 45 s; interpret.py (Biopython) parsed SH-aLRT/UFBoot labels."
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "10-locus supermatrix: MFP+MERGE partitioning, -p linkage",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "10 loci merged to 2 subsets (HKY+F+G4 each); ML topology matches the simulated species tree",
+        "basic": 37,
+        "specialized": 53,
+        "total": 90,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Output recommends -p (edge-linked proportional) and explains -q/-Q",
+            "result": "PASS",
+            "note": "linkage table reproduced with reasons"
+          },
+          {
+            "text": "Output uses -m MFP+MERGE with -rcluster rather than a hand-picked maximal scheme",
+            "result": "PASS",
+            "note": "merged 10 -> 2 subsets"
+          },
+          {
+            "text": "Partition file is valid NEXUS and read by IQ-TREE",
+            "result": "PASS",
+            "note": "no parse warnings"
+          },
+          {
+            "text": "Output reports the chosen scheme and per-subset models",
+            "result": "PASS",
+            "note": "from part.iqtree"
+          }
+        ],
+        "executed": true,
+        "execution_note": "iqtree2 -s concat10.fasta -p partitions.nex -m MFP+MERGE -rcluster 10 -B 1000 -bnni -alrt 1000 --seed 12345 ran in 43 s."
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "6 short (250 bp) isolates, two identical",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Runs; 33 parsimony-informative sites; IQ-TREE keeps the duplicate; the identical-pair split gets 86.7/100",
+        "basic": 34,
+        "specialized": 46,
+        "total": 80,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Output reports the low information content (parsimony-informative sites) before interpreting support",
+            "result": "PASS",
+            "note": "33 PIS / 250 sites reported"
+          },
+          {
+            "text": "Output does not present the identical-sequence split (zero-length branches) as a supported clade",
+            "result": "PASS",
+            "note": "flagged as trivially supported; recommends collapsing zero-length branches"
+          },
+          {
+            "text": "Guidance for tiny or duplicate-containing alignments comes from the Skill",
+            "result": "FAIL",
+            "note": "the Skill has no guidance for identical sequences, minimum alignment size or zero-length branches; the caveats came from the IQ-TREE log and general knowledge"
+          },
+          {
+            "text": "Code runs as written",
+            "result": "PASS",
+            "note": "exit 0"
+          }
+        ],
+        "executed": true,
+        "execution_note": "iqtree2 -s isolates6.fa -m MFP -B 1000 -bnni -alrt 1000 -T 1 --seed 12345 ran; log NOTE on identical sequence captured."
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "AU test: Primates+Rodents constraint vs ML tree",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Constrained tree deltaL 7.88, p-AU = 0.0303 -> rejected at 0.05; KH/SH shown only for completeness",
+        "basic": 38,
+        "specialized": 55,
+        "total": 93,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Output builds the alternative with -g and evaluates with -z -n 0 -zb 10000 -au",
+            "result": "PASS",
+            "note": "exact Skill flags accepted by 2.4.0"
+          },
+          {
+            "text": "Output reads p-AU < 0.05 as rejection and uses AU, not KH, as the decision test",
+            "result": "PASS",
+            "note": "p-AU 0.0303 -> constrained tree rejected"
+          },
+          {
+            "text": "Output warns that failure to reject would not be acceptance and not to pad the candidate set",
+            "result": "PASS",
+            "note": "stated"
+          },
+          {
+            "text": "Code runs as written",
+            "result": "PASS",
+            "note": "exit 0 on both steps"
+          }
+        ],
+        "executed": true,
+        "execution_note": "iqtree2 -g constraint search, then iqtree2 -z trees.nex -n 0 -zb 10000 -au (flags exactly as in the Skill) ran."
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "40-locus ILS phylogenomics: gene trees + gCF/sCFL",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Concatenated tree wrong at one short internode (61.6/72, gCF 20, gDFP 35); CD and GH nodes UFBoot 100 but gCF 50-58, sCF 40-45",
+        "basic": 34,
+        "specialized": 48,
+        "total": 82,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The Skill's concordance-factor command runs as written",
+            "result": "FAIL",
+            "note": "IQ-TREE 2.4.0 rejects --gcf together with --scfl (exit 2)"
+          },
+          {
+            "text": "Output flags UFBoot-100 nodes with gCF near or below 50 as contested and the gCF-20 node as unresolved",
+            "result": "PASS",
+            "note": "node 10 (gCF 20, gDF1/gDF2 22.5) called an effective polytomy; routes to species-trees"
+          },
+          {
+            "text": "Output reports both gCF and sCF alongside UFBoot/SH-aLRT",
+            "result": "PASS",
+            "note": "table of all five branches"
+          },
+          {
+            "text": "Output routes to a coalescent species tree when loci disagree",
+            "result": "PASS",
+            "note": "species-trees named"
+          },
+          {
+            "text": "Numbers reported match cf.stat files",
+            "result": "PASS",
+            "note": "checked against concord_g/concord_s .cf.stat"
+          }
+        ],
+        "executed": true,
+        "execution_note": "Concat, -S per-locus trees ran. The Skill's 'iqtree2 -te concat.treefile -s concat.fasta --gcf loci.treefile --scfl 100' exited 2 ('Do not specify --scf or --gcf with --scfl'); split into '-t ... --gcf' and '-te ... --scfl 100', both ran."
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Posterior probabilities + fossil-calibrated root age requested",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Routes posteriors to bayesian-inference and dating to divergence-dating; flags that the ML tree is unrooted and that the calibration is a minimum",
+        "basic": 38,
+        "specialized": 49,
+        "total": 87,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Scope: output does not produce posterior probabilities or dates from the ML run",
+            "result": "PASS",
+            "note": "declines and routes"
+          },
+          {
+            "text": "Output names the correct sibling Skills (bayesian-inference, divergence-dating)",
+            "result": "PASS",
+            "note": "both named with what they need"
+          },
+          {
+            "text": "Output states that UFBoot is not a posterior probability",
+            "result": "PASS",
+            "note": "stated"
+          },
+          {
+            "text": "Output explains what to hand over (rooted tree, alignment, calibration as a minimum)",
+            "result": "PASS",
+            "note": "listed"
+          }
+        ],
+        "executed": false,
+        "execution_note": "No code: the correct response is a routing answer; nothing to execute."
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "PI insists two long branches (UFBoot 100) are sisters",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "JC tree groups Fast_A+Fast_C at 100; BIC model K2P+G4 recovers (A,B)(C,D) at weak internode support; AU does not reject A+C (p=0.108); dropping Fast_C leaves Fast_A with Slow_B",
+        "basic": 36,
+        "specialized": 56,
+        "total": 92,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Safety: output refuses to report the A+C grouping as strongly supported",
+            "result": "PASS",
+            "note": "explains it is an under-fit-model artefact"
+          },
+          {
+            "text": "Output applies the Skill's LBA checklist (better model, taxon removal, topology test)",
+            "result": "PASS",
+            "note": "all three run"
+          },
+          {
+            "text": "Output reads p-AU 0.108 as failure to reject, not acceptance of either topology",
+            "result": "PASS",
+            "note": "stated"
+          },
+          {
+            "text": "Output does not recommend adding bootstrap replicates to raise support",
+            "result": "PASS",
+            "note": "explicitly rejected"
+          },
+          {
+            "text": "Code runs as written",
+            "result": "PASS",
+            "note": "exit 0 for all runs"
+          }
+        ],
+        "executed": true,
+        "execution_note": "IQ-TREE runs under MFP and JC, constrained A+C tree, AU test and a taxon-removal run all executed."
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 33.2,
+    "dynamic_weighted": 52.7,
+    "score": 86,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Correct, current support doctrine: UFBoot>=95 with SH-aLRT>=80, -bnni, and support as repeatability not accuracy",
+    "Concordance factors and the UFBoot-100/gCF-35 reading are explained well enough to catch a wrong concatenated node on real runs",
+    "LBA failure-mode checklist led directly to the right diagnosis on a synthetic long-branch dataset",
+    "Topology-test (AU) and partitioning (-p, MFP+MERGE) commands run unchanged on IQ-TREE 2.4.0",
+    "Tight scope with explicit routing to distance, Bayesian, species-tree and dating Skills"
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "Split the --gcf/--scfl command into two calls",
+      "observed_in": [
+        5
+      ],
+      "problem": "The Skill's concordance command and examples/partitioned_analysis.sh combine --gcf and --scfl; IQ-TREE 2.4.0 exits 2 with 'Do not specify --scf or --gcf with --scfl'.",
+      "root_cause": "The command was written against a documentation form that is not accepted by current IQ-TREE 2 builds.",
+      "fix": "Replace with 'iqtree2 -t concat.treefile --gcf loci.treefile --prefix concord_g' and 'iqtree2 -te concat.treefile -s concat.fasta --scfl 100 --prefix concord_s' in SKILL.md and partitioned_analysis.sh."
+    },
+    {
+      "priority": "P2",
+      "title": "Correct the IQ-TREE flag-form warnings",
+      "observed_in": [],
+      "problem": "The Skill says '--alrt' is an unknown argument and that '-bb'/'-nt' are not recognised by v2.x; IQ-TREE 2.4.0 documents --alrt/--bnni and still accepts -bb/-nt.",
+      "root_cause": "Flag guidance was not checked against the current binary's help.",
+      "fix": "State that single- and double-dash forms are both accepted in 2.x and that -B/-T are the preferred v2 names; drop the 'Unknown argument --alrt' row."
+    },
+    {
+      "priority": "P2",
+      "title": "Add small-data and duplicate-sequence guidance",
+      "observed_in": [
+        3
+      ],
+      "problem": "Nothing tells the agent how to treat identical sequences, zero-length branches or alignments with very few informative sites before reading support.",
+      "root_cause": "The Skill concentrates on phylogenomic-scale failure modes.",
+      "fix": "Add a short pre-flight: report parsimony-informative sites, note IQ-TREE's identical-sequence handling, collapse branches < 1e-6 before interpreting support."
+    }
+  ]
+}

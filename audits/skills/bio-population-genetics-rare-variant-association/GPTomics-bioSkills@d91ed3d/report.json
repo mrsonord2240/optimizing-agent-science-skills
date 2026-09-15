@@ -1,0 +1,352 @@
+{
+  "meta": {
+    "skill_name": "bio-population-genetics-rare-variant-association",
+    "description": "Gene and region-based rare-variant aggregation - burden/collapsing, SKAT, SKAT-O, ACAT-V/ACAT-O, annotation-weighted STAAR - with regenie (--vc-tests), SAIGE-GENE+, and the SKAT R package. Single-variant tests are powerless at low minor allele count, so rare variants are aggregated across a gene or region under an explicit mask (functional class plus a MAF cutoff). A burden test collapses variants into one score assuming a single effect direction (powerful when true, near-zero power when risk and protective variants cancel); SKAT is a variance-component test robust to mixed directions; SKAT-O blends the two; ACAT/STAAR are dependence-robust and annotation-weighted. The mask is the hypothesis, imbalance needs SPA or Firth, and testing burden is per-gene-per-mask. Use when aggregating rare coding or regulatory variants into gene or region tests, choosing burden vs SKAT vs SKAT-O, or building masks. For single-variant GWAS see association-testing; for mask annotations see variant-calling/variant-annotation.",
+    "evaluated_on": "2026-09-15",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Moderate",
+    "n_inputs": 5,
+    "execution_note": "Mode A. WSL agents distro via tar hand-over: plink2 v2.0.0-a.6.9, regenie 4.1.3 and r-saige 1.3.1 (bioconda; tbb<2021 pinned so SAIGE.so loads); Windows R 4.4.3 with SKAT 2.2.5 in the candidate R library. Data SYNTHETIC (data/make_rv_data.py, seed 20260915): 2,000 unrelated samples, 180 cases, covariates age/sex/PC1/PC2, 1,200 common array SNPs on 3 chromosomes, 30 genes with 462 rare variants (LoF/missense/synonymous); planted G01 burden (LoF+missense risk), G11 mixed-direction missense, G21 LoF-only; 27 null genes. STAAR was not run (text only). Inputs executed: 5/5. Layer-1 avg 34.6/40, Layer-2 avg 50.4/60, assertion pass rate 15/20 (75%). Grade note: Production Ready floor not met (assertions): downgraded one tier.",
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:population-genetics/rare-variant-association"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated values; references (Li & Leal 2008, Madsen & Browning 2009, Wu 2011, Lee 2012, Liu 2019, Li 2020, Mbatchou 2021, Zhou 2022) are real with correct DOIs."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Cohort statistics only."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Burden/SKAT/SKAT-O behaviour matched planted truth (G11 burden p=0.054 vs SKAT p=0.0025; G21 LoF-only mask p=3e-14 vs LoF+missense 2.5e-3); calibration on nulls acceptable (regenie lambda 1.04)."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "SKAT, regenie step 2 and SAIGE step 2 ran; the step-1 block, the example script and the bgen form of the SAIGE command fail with explicit errors (P1), not silent wrong results."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 84,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 10,
+        "max": 12,
+        "note": "Test-selection logic (burden vs SKAT vs SKAT-O, mask as hypothesis, SPA/Firth, per-gene-per-mask burden) is correct, and the SKAT R block ran verbatim. Defects found by running it: the SKILL.md regenie step-1 block has no --bt and stops on a binary trait (\"very few unique values\"); regenie adds an \"all\" mask, not the \"implicit singleton mask\" the version block describes; the SAIGE-GENE+ --annotation_in_groupTest string has its separators reversed (SAIGE: comma separates tests, semicolon joins annotations), so \"lof;lof,missense;lof,missense,synonymous\" runs lof, missense+lof, missense-only and synonymous-only instead of the three nested masks; the printed step-2 command uses --bgenFile without the --bgenFileIndex/--sampleFile it needs."
+      },
+      "reliability": {
+        "score": 9,
+        "max": 12,
+        "note": "Common Errors covers skat-o spelling (confirmed: \"unrecognized VC test: 'skat-o'\"), missing burden files and Firth/SPA; it misses the step-1 --bt omission and the reversed SAIGE separators."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "197-line SKILL.md; decision tables compact."
+      },
+      "agent_usability": {
+        "score": 13,
+        "max": 16,
+        "note": "Clear mechanism-first framing; the in-code comment describing SAIGE group syntax contradicts the tool and would mislead an agent."
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Usage-guide prompts map to the decision tree."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "Local files; no credentials."
+      },
+      "maintainability": {
+        "score": 8,
+        "max": 12,
+        "note": "Shipped example reuses one genotype prefix for step 1 and step 2 and fails on a rare-variant-only set; no test data."
+      },
+      "agent_specific": {
+        "score": 19,
+        "max": 20,
+        "note": "Precise scope with explicit routing to association-testing, variant-annotation and clinical-databases/variant-prioritization."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 85.0,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 15,
+      "total": 20
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "regenie masks with SKAT-O and ACAT-O",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "--check-burden-files: 0 unknown annotations. SKILL.md step-1 block (no --bt) stopped: \"phenotype Y has very few unique values (=2)\"; with --bt step 1 and the SKILL.md step 2 ran. Top: G21 Mask_LoF SKAT-O LOG10P 7.93, G01 Mask_LoF_mis ACAT-O 4.01, G11 Mask_LoF_mis SKAT 2.30; null genes 3/334 tests above LOG10P 2. Masks built: 0.001, 0.01 and \"all\" (no singleton mask). The shipped example stopped at step 1 (\"SNP 1:5000247:G:T has low variance\").",
+        "basic": 32,
+        "specialized": 47,
+        "total": 79,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Mask inputs validated before testing",
+            "result": "PASS",
+            "note": "--check-burden-files, 0 unknown annotations"
+          },
+          {
+            "text": "SKILL.md step-1 block runs for the binary trait",
+            "result": "FAIL",
+            "note": "needs --bt"
+          },
+          {
+            "text": "Planted genes recovered with calibrated nulls",
+            "result": "PASS",
+            "note": "G21/G01 top; null 3/334 above LOG10P 2"
+          },
+          {
+            "text": "Shipped example script runs",
+            "result": "FAIL",
+            "note": "step 1 on rare variants: low variance error"
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/in1/run.sh in WSL (plink2, regenie 4.1.3); shipped example run from an upstream byte copy."
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "SKAT, burden and SKAT-O in R",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Null model fitted once; per gene: G21 SKAT-O 1.7e-6 (SKAT 4.6e-7), G01 SKAT-O 9.5e-6 (burden 1.5e-4), G11 SKAT 3.4e-3 vs burden 0.044; next best null gene 0.011; 2 of 27 null genes with any p<0.05; Bonferroni 0.05/90 = 5.6e-4 passed by G21 and G01 only.",
+        "basic": 38,
+        "specialized": 55,
+        "total": 93,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "SKILL.md SKAT block runs as written",
+            "result": "PASS",
+            "note": "SKAT 2.2.5"
+          },
+          {
+            "text": "SKAT-O selected via method=\"SKATO\"; burden via r.corr=1",
+            "result": "PASS",
+            "note": "three distinct p-values per gene"
+          },
+          {
+            "text": "Planted genes rank first",
+            "result": "PASS",
+            "note": "G21, G01, G11"
+          },
+          {
+            "text": "Multiple-testing threshold stated for genes x tests",
+            "result": "PASS",
+            "note": "5.6e-4"
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/in2/run.sh (Windows R 4.4.3, SKAT 2.2.5); SKILL.md block verbatim inside a per-gene loop."
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Mixed directions and LoF-only architecture",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "G11 LoF+missense: burden 0.054, SKAT 0.0025, SKAT-O 0.0049 (per-variant case fractions 0.00-0.42 around the 0.09 baseline). G21 LoF mask: burden 3.2e-14 vs LoF+missense burden 2.5e-3, the extra neutral missense variants diluting the signal. G01 LoF+missense burden 5.6e-6 vs LoF-only 0.11.",
+        "basic": 38,
+        "specialized": 55,
+        "total": 93,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Burden cancels under mixed directions, as the Skill states",
+            "result": "PASS",
+            "note": "G11 burden 0.054 vs SKAT 0.0025"
+          },
+          {
+            "text": "Mask choice changes the answer, as the Skill states",
+            "result": "PASS",
+            "note": "G21 LoF 3e-14 vs LoF+mis 2.5e-3"
+          },
+          {
+            "text": "Recommends SKAT/SKAT-O for mixed directions and burden for a single-direction mask",
+            "result": "PASS",
+            "note": "decision tree applied"
+          },
+          {
+            "text": "Masks counted in the multiple-testing burden",
+            "result": "PASS",
+            "note": "stated"
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/in3/run.sh (Windows R, SKAT 2.2.5) over LoF, LoF+missense and LoF+missense+synonymous masks."
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "SAIGE-GENE+ for an imbalanced trait",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "The SKILL.md step 2 as printed failed (bgen input requires --bgenFileIndex and --sampleFile). With PLINK input it ran: Cauchy p G21 5.1e-8, G01 7.2e-5, G11 0.019; 1 of 27 null genes <0.05. But the groups tested were \"lof;lof\", \"missense;lof\", \"missense\" and \"synonymous\": SAIGE's help says comma separates tests and \";\" joins annotations, the reverse of the Skill's comment, so the intended nested masks were not run.",
+        "basic": 30,
+        "specialized": 44,
+        "total": 74,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "SKILL.md step-2 command runs as printed",
+            "result": "FAIL",
+            "note": "bgen needs --bgenFileIndex/--sampleFile"
+          },
+          {
+            "text": "Annotation groups match the intended nested masks",
+            "result": "FAIL",
+            "note": "separators reversed vs SAIGE help"
+          },
+          {
+            "text": "Multiple MAF cutoffs parsed in one run",
+            "result": "PASS",
+            "note": "0.0001/0.001/0.01 rows"
+          },
+          {
+            "text": "Planted genes recovered with calibrated nulls",
+            "result": "PASS",
+            "note": "G21 5e-8, G01 7e-5; null 1/27"
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/in4/run.sh in WSL (r-saige 1.3.1): step 1 with SAIGE-documented flags (the Skill gives none for GENE+), the SKILL.md step-2 command as printed, then the same flags with PLINK input."
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Full scan, thresholds and flag checks",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "\"--vc-tests skat-o\" rejected exactly as the Skill says (\"accepted=skat/skato/skato-acat/acatv/acato\"). Scan with AAF bins 0.0001/0.001/0.01 plus ACAT-V/ACAT-O: 372 rows; masks 0.001, 0.01 and \"all\" (no singleton mask, contrary to the version block; 0.0001 bins were empty and not emitted). Bonferroni over 139 burden tests alpha 3.6e-4, over all 372 tests 1.3e-4; genes passing the 30-gene ACAT-O threshold: G21 (both masks) and G01; null-gene burden lambda 1.04.",
+        "basic": 35,
+        "specialized": 51,
+        "total": 86,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "regenie token spelling claim is correct",
+            "result": "PASS",
+            "note": "skat-o rejected, skato accepted"
+          },
+          {
+            "text": "Mask construction described correctly (implicit singleton)",
+            "result": "FAIL",
+            "note": "regenie builds \"all\", not singleton"
+          },
+          {
+            "text": "Per-gene-per-mask threshold computed and explained",
+            "result": "PASS",
+            "note": "1.3e-4 / 3.6e-4 / 1.7e-3"
+          },
+          {
+            "text": "ACAT-O omnibus combines masks as described",
+            "result": "PASS",
+            "note": "ADD-ACATO rows per mask set"
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/in5/run.sh in WSL (regenie 4.1.3)."
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 33.6,
+    "dynamic_weighted": 51.0,
+    "score": 85,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Mechanism-first test selection is correct and was borne out: burden cancelled for the mixed-direction gene and a LoF-only mask beat LoF+missense by 11 orders of magnitude",
+    "SKAT R block runs verbatim and the regenie step-2 recipe recovers the planted genes with calibrated nulls",
+    "Version traps that change results (skato token, SPA/Firth under imbalance, LOCO null) are called out"
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "SAIGE-GENE+ group syntax is reversed",
+      "observed_in": [
+        4
+      ],
+      "problem": "\"lof;lof,missense;lof,missense,synonymous\" makes SAIGE test lof, missense+lof, missense-only and synonymous-only, not the three nested masks; the comment describing the syntax is backwards.",
+      "root_cause": "Separator semantics not checked against step2_SPAtests.R --help (comma = tests, semicolon = annotations within a test).",
+      "fix": "Use `--annotation_in_groupTest=lof,missense;lof,missense;lof;synonymous` and fix the comment."
+    },
+    {
+      "priority": "P1",
+      "title": "regenie step-1 block omits --bt",
+      "observed_in": [
+        1
+      ],
+      "problem": "The SKILL.md step-1 command fails on a binary phenotype (\"very few unique values\"), while step 2 uses --bt.",
+      "root_cause": "Trait-type flag missing from step 1.",
+      "fix": "Add --bt to step 1 whenever step 2 uses --bt, as the shipped example already does."
+    },
+    {
+      "priority": "P1",
+      "title": "Shipped example runs step 1 on the rare-variant genotypes",
+      "observed_in": [
+        1
+      ],
+      "problem": "rare_variant_test.sh passes one genotype prefix to both steps; step 1 on a rare-variant set stops with a low-variance SNP error.",
+      "root_cause": "Step-1 and step-2 inputs conflated.",
+      "fix": "Take separate array and exome prefixes (or filter step 1 to MAC/MAF-QC'd common variants)."
+    },
+    {
+      "priority": "P2",
+      "title": "regenie adds an \"all\" mask, not a singleton mask",
+      "observed_in": [
+        1,
+        5
+      ],
+      "problem": "The version block says --aaf-bins always adds an implicit singleton mask; regenie 4.1.3 emitted \".all\" masks and no singleton mask.",
+      "root_cause": "Behaviour described from memory.",
+      "fix": "Say that an all-variant mask is added and that singleton masks need --singleton-carrier."
+    },
+    {
+      "priority": "P2",
+      "title": "SAIGE step-2 bgen command incomplete",
+      "observed_in": [
+        4
+      ],
+      "problem": "--bgenFile is shown without --bgenFileIndex and --sampleFile, which the tool requires.",
+      "root_cause": "Abbreviated command.",
+      "fix": "Add both flags, or show the --bedFile/--bimFile/--famFile form."
+    }
+  ]
+}

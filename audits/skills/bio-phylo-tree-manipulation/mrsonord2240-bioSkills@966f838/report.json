@@ -1,0 +1,125 @@
+{
+  "source": "mrsonord2240/bioSkills@966f838b0ba32918310bd223a34f71d78f190560:phylogenetics/tree-manipulation",
+  "meta": {
+    "skill_name": "bio-phylo-tree-manipulation",
+    "description": "Edit phylogenetic tree structure with Biopython Bio.Phylo, and treat rooting as a separate statistical inference rather than a display choice.",
+    "evaluated_on": "2026-09-15",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 9,
+    "source": "mrsonord2240/bioSkills@966f838b0ba32918310bd223a34f71d78f190560:phylogenetics/tree-manipulation",
+    "executed": "8/9 inputs executed (Biopython 1.88, ete3 3.1.3, ape/phangorn, MAD 2.2, FastRoot 1.5, IQ-TREE 2.4.0); Input 6 is a routing answer. RootDigger and Newick Utilities not executable.",
+    "execution_note": "Re-audit of the fixed Skill: 7 pre-fix inputs as regression tests plus 2 new inputs (N = 9). Skill snippets used verbatim (file names only). SYNTHETIC data (data/make_data.py)."
+  },
+  "veto_gates": {
+    "skill_veto": {"gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS"},
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {"result": "PASS", "detail": "All results from runs on synthetic trees with known roots."},
+      "practice_boundaries": {"result": "PASS", "detail": "Research tree editing only."},
+      "methodological_ground": {"result": "PASS", "detail": "Root uncertainty reported with rootstrap and AU sets; basal claims refused; soft polytomies labelled."},
+      "code_usability": {"result": "PASS", "detail": "Outgroup, collapse, prune snippets, the MAD strip regex, the IQ-TREE root-test command and all four examples run."}
+    }
+  },
+  "static_score": {
+    "subtotal": 86,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {"score": 11, "max": 12, "note": "Outgroup guard, dual-label collapse, 1e-6 tolerance, root-test command and MAD strip verified. The outgroup snippet tests only outgroup monophyly although its Approach says to check ingroup monophyly (Input 8)."},
+      "reliability": {"score": 10, "max": 12, "note": "Assert before collapsing; accurate Common Errors rows; no ingroup check in code."},
+      "performance_context": {"score": 7, "max": 8, "note": "236 lines, dense tables."},
+      "agent_usability": {"score": 14, "max": 16, "note": "Traps that bite on IQ-TREE trees are now covered."},
+      "human_usability": {"score": 6, "max": 8, "note": "Natural prompts; jargon-heavy description."},
+      "security": {"score": 11, "max": 12, "note": "Local edits; no taxon-name validation."},
+      "maintainability": {"score": 10, "max": 12, "note": "Examples use IQ-TREE-style layouts and dual labels; still toy trees."},
+      "agent_specific": {"score": 17, "max": 20, "note": "Precise trigger and routing; RootDigger still named without flags."}
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 86.3,
+    "max": 100,
+    "assertion_pass_rate": {"passed": 38, "total": 39},
+    "inputs": [
+      {"index": 1, "type": "Canonical", "label": "Root IQ-TREE tree on two close outgroups", "status": "COMPLETED", "status_flag": "✅", "note": "Snippet verbatim: bifurcating root on OutA+OutB, ingroup monophyletic, rooted clades identical to truth, patristic distances unchanged", "basic": 37, "specialized": 51, "total": 88, "assertions_passed": 4, "assertions_total": 4,
+       "assertions": [
+         {"text": "The Skill's snippet roots as written on an IQ-TREE tree", "result": "PASS", "note": "root children 2 (pre-fix FAIL)"},
+         {"text": "Root matches the simulated root", "result": "PASS", "note": "True"},
+         {"text": "Ingroup monophyly checked", "result": "PASS", "note": "True"},
+         {"text": "Support separated from root confidence", "result": "PASS", "note": "stated"}
+       ], "executed": true, "execution_note": "runs_v2/in1/in1.py."},
+      {"index": 2, "type": "Variant A", "label": "Induced subtree with distances unchanged, plus ete3", "status": "COMPLETED", "status_flag": "✅", "note": "Bio.Phylo max diff 1.1e-16; ete3 preserve_branch_length=True 0, False 0.103", "basic": 37, "specialized": 54, "total": 91, "assertions_passed": 5, "assertions_total": 5,
+       "assertions": [
+         {"text": "Induced subtree instead of MRCA clade", "result": "PASS", "note": "MRCA holds 14 taxa"},
+         {"text": "Distances unchanged", "result": "PASS", "note": "1.1e-16"},
+         {"text": "No degree-2 nodes", "result": "PASS", "note": "0"},
+         {"text": "ete3 flag mandatory as stated", "result": "PASS", "note": "0.103 without"},
+         {"text": "Subset support caveat", "result": "PASS", "note": "stated"}
+       ], "executed": true, "execution_note": "runs_v2/in2 (pre-fix script)."},
+      {"index": 3, "type": "Edge", "label": "Collapse UFBoot < 95 and zero-length branches", "status": "COMPLETED", "status_flag": "✅", "note": "Snippet verbatim: 14 -> 13 internal nodes, (I5,I5_dup,I6) soft polytomy, assert fires on a label-free tree", "basic": 36, "specialized": 52, "total": 88, "assertions_passed": 5, "assertions_total": 5,
+       "assertions": [
+         {"text": "Collapse works on dual labels as written", "result": "PASS", "note": "14 -> 13 (pre-fix no-op)"},
+         {"text": "Zero-length tolerance matches IQ-TREE", "result": "PASS", "note": "<= 1e-6 (pre-fix FAIL)"},
+         {"text": "95 cutoff for UFBoot", "result": "PASS", "note": "comment"},
+         {"text": "Soft polytomy labelled", "result": "PASS", "note": "stated"},
+         {"text": "Guard stops a silent no-op", "result": "PASS", "note": "assertion message on label-free tree"}
+       ], "executed": true, "execution_note": "runs_v2/in3/in3.py."},
+      {"index": 4, "type": "Variant B", "label": "Outgroup-free MAD and MinVar on a rate-shifted tree", "status": "COMPLETED", "status_flag": "✅", "note": "MAD AI 0.880; MAD and MinVar agree on a wrong root, midpoint on Y10; fixed rule 'agreement is not root confidence' leads to an uncertain-root report", "basic": 36, "specialized": 50, "total": 86, "assertions_passed": 4, "assertions_total": 4,
+       "assertions": [
+         {"text": "Commands run as written", "result": "PASS", "note": "exit 0"},
+         {"text": "Midpoint rate artefact flagged", "result": "PASS", "note": "Y10"},
+         {"text": "The Skill's rule prevents reporting the agreed root as confident", "result": "PASS", "note": "agreement is not confidence (pre-fix FAIL)"},
+         {"text": "MAD AI reported", "result": "PASS", "note": "0.880"}
+       ], "executed": true, "execution_note": "runs_v2/in4: mad.py, FastRoot.py, in4_score.py."},
+      {"index": 5, "type": "Stress", "label": "Root with confidence, R subset, collapse, binary resolutions", "status": "COMPLETED", "status_flag": "✅", "note": "Skill's iqtree root-test command runs (28 s): true X|Y root p-AU 0.919, 6 of 35 roots not rejected, rootstrap 67.8; drop.tip exact; collapse changes distances by 0.093 as the Skill now warns", "basic": 36, "specialized": 51, "total": 87, "assertions_passed": 5, "assertions_total": 5,
+       "assertions": [
+         {"text": "The Skill gives a runnable non-reversible root command", "result": "PASS", "note": "writes .rootstrap.nex and .roottest.csv (pre-fix absent)"},
+         {"text": "Root confidence reported as rootstrap + AU set", "result": "PASS", "note": "67.8; 6 roots"},
+         {"text": "drop.tip preserves distances", "result": "PASS", "note": "2.2e-16"},
+         {"text": "The Skill warns collapsing changes distances", "result": "PASS", "note": "paragraph added (pre-fix FAIL)"},
+         {"text": "Many random resolutions", "result": "PASS", "note": "100 draws"}
+       ], "executed": true, "execution_note": "runs_v2/in5: iqtree2 --model-joint 12.12 -B 1000 --root-test -zb 1000 -au; roottest_map.py; in5_pipeline.R."},
+      {"index": 6, "type": "Scope Boundary", "label": "Root by root-to-tip regression and give tMRCA", "status": "COMPLETED", "status_flag": "✅", "note": "Routed to divergence-dating", "basic": 36, "specialized": 46, "total": 82, "assertions_passed": 4, "assertions_total": 4,
+       "assertions": [
+         {"text": "No tMRCA or rate from a structural edit", "result": "PASS", "note": "declined"},
+         {"text": "Routed to divergence-dating", "result": "PASS", "note": "named"},
+         {"text": "Midpoint not substituted", "result": "PASS", "note": "stated"},
+         {"text": "Hand-over inputs listed", "result": "PASS", "note": "tree, alignment, dates"}
+       ], "executed": false, "execution_note": "Routing answer."},
+      {"index": 7, "type": "Adversarial", "label": "Distant lonely outgroup; call Fast8 basal", "status": "COMPLETED", "status_flag": "✅", "note": "FarOut roots next to I13 and breaks clade B; midpoint/MinVar put Fast8 basal; MAD correct only after the Skill's documented root-length strip; claim refused", "basic": 36, "specialized": 53, "total": 89, "assertions_passed": 4, "assertions_total": 4,
+       "assertions": [
+         {"text": "Safety: refuses the basal claim", "result": "PASS", "note": "declined"},
+         {"text": "Distant outgroup flagged with monophyly check", "result": "PASS", "note": "clade B broken"},
+         {"text": "Method disagreement read as uncertainty", "result": "PASS", "note": "stated"},
+         {"text": "Pipeline runs with the Skill's MAD guidance", "result": "PASS", "note": "strip documented (pre-fix FAIL)"}
+       ], "executed": true, "execution_note": "runs_v2/in7 (pre-fix script)."},
+      {"index": 8, "type": "Edge", "label": "NEW: user names FarOut + I13 as the outgroups", "status": "COMPLETED", "status_flag": "✅", "note": "On the ML tree FarOut and I13 are sisters (LBA), so the snippet's outgroup-monophyly guard passes and roots on them; only the ingroup check the Approach describes (clade B not monophyletic, Input 7 evidence) exposes the problem, and the snippet does not run it", "basic": 33, "specialized": 45, "total": 78, "assertions_passed": 3, "assertions_total": 4,
+       "assertions": [
+         {"text": "Snippet runs", "result": "PASS", "note": "exit 0"},
+         {"text": "The snippet's code catches a mis-assigned outgroup", "result": "FAIL", "note": "tests outgroup monophyly only; rooted on FarOut+I13"},
+         {"text": "Following the Skill's Approach text (ingroup monophyly) flags it", "result": "PASS", "note": "clade B not monophyletic"},
+         {"text": "Output treats a lonely distant outgroup as a red flag", "result": "PASS", "note": "failure-mode section"}
+       ], "executed": true, "execution_note": "runs_v2/in89.py in8."},
+      {"index": 9, "type": "Variant A", "label": "NEW: MAD on a tree written by Bio.Phylo", "status": "COMPLETED", "status_flag": "✅", "note": "Raw Bio.Phylo output: MAD 'Corrupt NEWICK format'; after the Skill's regex: MAD 0.243, AI 0.869", "basic": 37, "specialized": 51, "total": 88, "assertions_passed": 4, "assertions_total": 4,
+       "assertions": [
+         {"text": "The failure the Skill describes reproduces", "result": "PASS", "note": "Corrupt NEWICK"},
+         {"text": "The Skill's regex strips only the root length", "result": "PASS", "note": "'):0;' -> ');'"},
+         {"text": "MAD runs after the strip", "result": "PASS", "note": "AI 0.869"},
+         {"text": "AI reported as the Skill asks", "result": "PASS", "note": "0.869"}
+       ], "executed": true, "execution_note": "runs_v2/in89.py in9."}
+    ]
+  },
+  "final": {"static_weighted": 34.4, "dynamic_weighted": 51.8, "score": 86, "max": 100, "grade": "Production Ready", "grade_symbol": "⭐", "deployable": true, "veto_override": false},
+  "key_strengths": [
+    "Outgroup rooting and support collapsing now work on real IQ-TREE output",
+    "Rooting treated as inference with a runnable rootstrap/AU command",
+    "Distance-preserving pruning verified across Bio.Phylo, ete3 and ape",
+    "Documented MAD root-length workaround"
+  ],
+  "recommendations": [
+    {"priority": "P2", "title": "Check ingroup monophyly in the outgroup snippet", "observed_in": [8], "problem": "The code tests only outgroup monophyly, so an LBA sister pair used as outgroups passes and is rooted on.", "root_cause": "The Approach's ingroup check was not coded.", "fix": "After rooting, assert tree.is_monophyletic(ingroup) and print the warning otherwise."},
+    {"priority": "P2", "title": "Give RootDigger flags or drop it", "observed_in": [], "problem": "RootDigger is recommended without a command.", "root_cause": "Named only.", "fix": "Add 'rootdigger --msa aln --tree tree --exhaustive' or route to the IQ-TREE command."}
+  ]
+}

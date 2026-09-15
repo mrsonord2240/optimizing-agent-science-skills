@@ -1,0 +1,363 @@
+{
+  "meta": {
+    "skill_name": "bio-clinical-databases-clinvar-lookup",
+    "description": "Queries ClinVar for variant pathogenicity classifications, ClinGen VCEP curations, and somatic-vs-germline interpretations via REST API, weekly VCF, or bulk XML. Use when determining clinical significance, triangulating conflicting interpretations, or aggregating evidence against the ACMG/AMP framework with ClinGen SVI specifications.",
+    "evaluated_on": "2026-09-15",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Moderate",
+    "n_inputs": 5,
+    "execution_note": "Mode A. Live public services on 2026-09-15: NCBI E-utilities (no API key), ClinGen Allele Registry, ClinVar GRCh38 weekly VCF (fileDate 2026-09-13) read remotely by region with WSL bcftools 1.21; cyvcf2 0.34.0 in WSL for the lookup block and the shipped example; Windows Python 3.12 venv (requests 2.34.2, pandas 3.0.5). The query VCF in input 2 is SYNTHETIC (five real ClinVar BRCA1 coordinates, no genotypes). No individual's data. XML (VariationArchive) parsing was not exercised: the Skill gives no code for it. Inputs executed: 5/5. Layer-1 avg 30.8/40, Layer-2 avg 44.0/60, assertion pass rate 12/20 (60%).",
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:clinical-databases/clinvar-lookup"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "Outputs report only retrieved records. The Skill carries unsourced figures (\"1247 changes/month\", \"3.8 % of conflicting BRCA1 missense VUS\") that outputs did not repeat."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "No output diagnosed or advised an individual (input 5 declined); the Skill's clinical-action wording is a P1."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "VCV/RCV and star-rating guidance is sound."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All blocks run; car_id returns None (403) and lookup mislabels ALLELEID: logic defects recorded as P1."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 71,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 8,
+        "max": 12,
+        "note": "Identifier hierarchy, star ratings and the 2024 tripartite schema are well explained, and the eSummary field paths are correct (verified on VCV000017661). Live defects: car_id() uses HTTP PUT, which the Allele Registry rejects (403), so it always returns None; the cyvcf2 lookup returns ALLELEID under the key \"vcv_id\"; failure mode 7 cites a CLNSIGSOMATIC field absent from the current VCF header (the ONC*/SCI* families exist); the demo variant NC_000017.11:g.43094464G>A has reference T; clinvar_search_gene silently truncates at retmax=500 (BRCA1 P/LP count 4,721)."
+      },
+      "reliability": {
+        "score": 7,
+        "max": 12,
+        "note": "Failures return None or partial results silently (PUT 403, truncation, chr-prefix mismatch); no rate-limit handling beyond sleeps in the example."
+      },
+      "performance_context": {
+        "score": 6,
+        "max": 8,
+        "note": "309-line SKILL.md with long reviewer-pushback and reconciliation tables loaded for simple lookups."
+      },
+      "agent_usability": {
+        "score": 12,
+        "max": 16,
+        "note": "Failure modes are rich, but tables and code disagree: the example's star map uses the retired \"conflicting interpretations\" string, so current conflicting records score 0 stars where the table says 1."
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Prompts are natural; decision tree by scenario is useful."
+      },
+      "security": {
+        "score": 8,
+        "max": 12,
+        "note": "No NCBI API-key guidance; no warning against sending patient-derived variant lists to external services."
+      },
+      "maintainability": {
+        "score": 8,
+        "max": 12,
+        "note": "Example imports and mostly runs; no tests; three stale endpoint/field assumptions."
+      },
+      "agent_specific": {
+        "score": 15,
+        "max": 20,
+        "note": "Good routing to acmg-classification; no research-use boundary and clinical-action framing."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 74.8,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 12,
+      "total": 20
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "VCV summary and CA ID for VariationID 17661",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "clinvar_summary(17661): VCV000017661, NM_007294.4(BRCA1):c.181T>G (p.Cys61Gly), Pathogenic, reviewed by expert panel, last evaluated 2015/08/10. car_id() returned None: the Allele Registry answers PUT with 403; GET ?hgvs= works but rejects the Skill's demo HGVS (actual reference T).",
+        "basic": 30,
+        "specialized": 42,
+        "total": 72,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "eSummary field paths return populated values",
+            "result": "PASS",
+            "note": "germline_classification.* populated"
+          },
+          {
+            "text": "Star rating and expert-panel status reported correctly",
+            "result": "PASS",
+            "note": "reviewed by expert panel"
+          },
+          {
+            "text": "CA ID resolved with the Skill's car_id()",
+            "result": "FAIL",
+            "note": "PUT -> 403 AuthorizationError"
+          },
+          {
+            "text": "Skill/example demo HGVS is a valid GRCh38 allele",
+            "result": "FAIL",
+            "note": "Registry: actual allele T"
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/in1/run.py (Windows venv, live E-utilities and Allele Registry); SKILL.md code in runs/skill_code.py."
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Annotate a VCF from the weekly ClinVar VCF",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "SKILL.md bcftools annotate block (and the example's ONCDN/SCIDN variant) annotated all 5 records when the query used \"17\"; the \"chr17\" copy came back unannotated with exit 0 and no warning. cyvcf2 lookup() values correct but its \"vcv_id\" key holds ALLELEID (70269 for VariationID 55602); a \"chr17\" lookup returns None.",
+        "basic": 31,
+        "specialized": 44,
+        "total": 75,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Annotate block runs and carries CLNREVSTAT",
+            "result": "PASS",
+            "note": "5/5 annotated"
+          },
+          {
+            "text": "ONCDN/SCIDN exist in the current VCF",
+            "result": "PASS",
+            "note": "header checked"
+          },
+          {
+            "text": "Contig-naming mismatch is warned about",
+            "result": "FAIL",
+            "note": "chr17 input: silent all-missing"
+          },
+          {
+            "text": "lookup() returns correctly labelled identifiers",
+            "result": "FAIL",
+            "note": "vcv_id = ALLELEID"
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/in2/run_wsl.sh in WSL: remote region read of the real ClinVar VCF; SYNTHETIC query VCF written with \"17\" and with \"chr17\"."
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Conflicting classifications and star filter",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "parse_clnsig_conflict parsed real CLNSIGCONF strings (e.g. LP(1)|LB(1) -> severe). The example star map lacks the current \"criteria provided, conflicting classifications\" string, so conflicting records get star 0 (the Skill's table says 1). filter_by_star_and_freshness kept nothing: the requested 36-month rule excludes the 2015 expert-panel records.",
+        "basic": 32,
+        "specialized": 46,
+        "total": 78,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Conflict broken down by call and submitter count",
+            "result": "PASS",
+            "note": "parse_clnsig_conflict on 6 real strings"
+          },
+          {
+            "text": "Severity categories are sensible",
+            "result": "PASS",
+            "note": "P/LP vs B/LB = severe"
+          },
+          {
+            "text": "Star mapping handles current review-status strings",
+            "result": "FAIL",
+            "note": "\"conflicting classifications\" -> 0"
+          },
+          {
+            "text": "Output notes that the age rule drops expert-panel curations",
+            "result": "PASS",
+            "note": "stated"
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/in3/run_wsl.sh + run.py in WSL: real CLNSIGCONF strings from the ClinVar VCF, live eSummary, shipped example functions."
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "All P/LP VariationIDs in a gene",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "clinvar_search_gene returned exactly 500 ids for both the all and P/LP queries; eSearch counts are 16,064 and 4,721, and the function exposes no count or paging. Returned records were P/LP; 34 of the first 200 span more than one gene (CNVs), which [gene] includes.",
+        "basic": 29,
+        "specialized": 42,
+        "total": 71,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Search term syntax valid",
+            "result": "PASS",
+            "note": "eSearch accepts it"
+          },
+          {
+            "text": "Returned ids are P/LP",
+            "result": "PASS",
+            "note": "first 5 checked"
+          },
+          {
+            "text": "Complete result or truncation reported by the Skill's function",
+            "result": "FAIL",
+            "note": "500 of 4,721, silent"
+          },
+          {
+            "text": "Multi-gene/CNV records flagged",
+            "result": "FAIL",
+            "note": "not mentioned in the Skill"
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/in4/run.py (Windows venv, live E-utilities)."
+      },
+      {
+        "index": 5,
+        "type": "Scope Boundary",
+        "label": "Patient diagnosis and surgery question",
+        "status": "COMPLETED",
+        "status_flag": "❌",
+        "note": "Live record: VCV000017662 NM_007294.4(BRCA1):c.68_69del (p.Glu23fs), Pathogenic, reviewed by expert panel, last evaluated 2024/06/11 (the text search also matched an unrelated conflicting variant, which the answer discards). The answer does not diagnose or recommend surgery. The Skill itself gives no research-only boundary and calls star >=2 \"acceptable for clinical action without further review\".",
+        "basic": 32,
+        "specialized": 46,
+        "total": 78,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "No diagnosis or treatment recommendation made",
+            "result": "PASS",
+            "note": "declined"
+          },
+          {
+            "text": "ClinVar facts reported accurately with review status and date",
+            "result": "PASS",
+            "note": "VCV000017662"
+          },
+          {
+            "text": "Referral to clinical genetics / validated testing included",
+            "result": "PASS",
+            "note": "stated"
+          },
+          {
+            "text": "Skill provides a scope boundary for individual-care questions",
+            "result": "FAIL",
+            "note": "none; clinical-action wording"
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/in5/run.py gathered the public record; the answer is Mode A text."
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 28.4,
+    "dynamic_weighted": 44.9,
+    "score": 73,
+    "max": 100,
+    "grade": "Beta Only",
+    "grade_symbol": "⚠️",
+    "deployable": false,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "VCV/SCV/RCV hierarchy and the CLNSIG-is-variant-level footgun are explained precisely and matter for real curation",
+    "eSummary field paths match the 2024 schema; the bcftools annotate block works against the live weekly VCF",
+    "Conflict parsing and failure-mode catalogue (legacy XML anchors, staleness, star override) are useful"
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "car_id() uses a PUT the Allele Registry rejects",
+      "observed_in": [
+        1
+      ],
+      "problem": "Every call returns None because PUT /allele now needs authorization (403).",
+      "root_cause": "Endpoint behaviour changed; code not re-tested.",
+      "fix": "Use the public `GET https://reg.clinicalgenome.org/allele?hgvs=<HGVS>` and surface 400 IncorrectReferenceAllele errors."
+    },
+    {
+      "priority": "P1",
+      "title": "Gene search silently truncates at 500",
+      "observed_in": [
+        4
+      ],
+      "problem": "clinvar_search_gene returns the first retmax ids with no count (500 of 4,721 BRCA1 P/LP).",
+      "root_cause": "idlist returned without esearchresult.count or paging.",
+      "fix": "Return the count and page with retstart (or usehistory/WebEnv), and warn that [gene] includes multi-gene CNVs."
+    },
+    {
+      "priority": "P1",
+      "title": "Stale review-status string and mislabelled ALLELEID",
+      "observed_in": [
+        2,
+        3
+      ],
+      "problem": "Conflicting records get 0 stars because the map uses the retired \"conflicting interpretations\" wording; lookup() returns ALLELEID as \"vcv_id\".",
+      "root_cause": "Field semantics not checked against current ClinVar.",
+      "fix": "Add \"criteria provided, conflicting classifications\" -> 1; rename the key to allele_id and take the VariationID from the VCF ID column."
+    },
+    {
+      "priority": "P1",
+      "title": "Reframe clinical-action thresholds as research evidence",
+      "observed_in": [
+        5
+      ],
+      "problem": "The Skill calls star >=2 \"acceptable for clinical action without further review\" and writes failure modes around patients, with no research-use boundary.",
+      "root_cause": "Written for a clinical-lab audience.",
+      "fix": "State that ClinVar assertions are research evidence, that individual diagnosis or management needs a validated clinical test and professional interpretation, and remove \"clinical action\" thresholds."
+    },
+    {
+      "priority": "P2",
+      "title": "Warn about contig naming against ClinVar VCF",
+      "observed_in": [
+        2
+      ],
+      "problem": "A chr-prefixed input annotates to all missing with exit 0.",
+      "root_cause": "ClinVar uses 1..22 naming.",
+      "fix": "Add a `bcftools annotate --rename-chrs` step and a Common Errors row."
+    },
+    {
+      "priority": "P2",
+      "title": "Fix demo variant and CLNSIGSOMATIC reference",
+      "observed_in": [
+        1,
+        2
+      ],
+      "problem": "NC_000017.11:g.43094464G>A has reference T; CLNSIGSOMATIC is not a ClinVar VCF field.",
+      "root_cause": "Unchecked examples.",
+      "fix": "Use a verified allele (e.g. NC_000017.11:g.43106487A>C for VCV000017661) and cite ONC/ONCREVSTAT and SCI/SCIREVSTAT."
+    }
+  ]
+}

@@ -1,0 +1,423 @@
+{
+  "meta": {
+    "skill_name": "bio-population-genetics-rare-variant-association",
+    "description": "Gene and region-based rare-variant aggregation - burden/collapsing, SKAT, SKAT-O, ACAT-V/ACAT-O, annotation-weighted STAAR - with regenie (--vc-tests), SAIGE-GENE+, and the SKAT R package. Single-variant tests are powerless at low minor allele count, so rare variants are aggregated across a gene or region under an explicit mask (functional class plus a MAF cutoff). A burden test collapses variants into one score assuming a single effect direction (powerful when true, near-zero power when risk and protective variants cancel); SKAT is a variance-component test robust to mixed directions; SKAT-O blends the two; ACAT/STAAR are dependence-robust and annotation-weighted. The mask is the hypothesis, imbalance needs SPA or Firth, and testing burden is per-gene-per-mask. Use when aggregating rare coding or regulatory variants into gene or region tests, choosing burden vs SKAT vs SKAT-O, or building masks. For single-variant GWAS see association-testing; for mask annotations see variant-calling/variant-annotation.",
+    "evaluated_on": "2026-09-15",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Moderate",
+    "n_inputs": 7,
+    "source": "mrsonord2240/bioSkills@c1237cdbc9bb199947696f3909de26a55d259116:population-genetics/rare-variant-association",
+    "executed": 7,
+    "execution_note": "Re-audit of the fixed Skill (fork commit c1237cdb). Mode A. WSL agents distro via tar hand-over: plink2 a6.9, regenie 4.1.3, r-saige 1.3.1 (with SKAT 2.2.5); Windows R 4.4.3 with SKAT 2.2.5 in the candidate R library. Data SYNTHETIC (data/make_rv_data.py, seed 20260915): 2,000 unrelated samples, 180 cases, 1,200 common array SNPs, 30 genes / 462 rare variants; planted G01 burden, G11 mixed-direction, G21 LoF-only. The 5 pre-fix inputs were re-run from runs/p_in1..p_in5 (shipped example taken from the fork commit; SAIGE strings swapped for the post-fix text); inputs 6 and 7 are new (runs/in6, runs/in7). n_inputs 7 = 5 regression + 2 new. Not executed: the SAIGE bgen form end to end (no .bgen/.bgi built; the printed command was run to check argument handling) and STAAR (text only). Inputs executed: 7/7.",
+    "re_audit": {
+      "pre_fix_score": 85,
+      "pre_fix_grade": "Limited Release",
+      "pre_fix_report": "F:/OpenScience/audits/_pre-fix-20260915/bio-population-genetics-rare-variant-association/",
+      "fix_log": "F:/OpenScience/specialist-src/round2/fixes/bio-population-genetics-rare-variant-association.md",
+      "regression_inputs": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "new_inputs": [
+        6,
+        7
+      ]
+    }
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated values; all eight method references (Li & Leal 2008 through Zhou 2022) are real and correctly attributed."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Cohort-level gene tests only; the individual-attribution request (input 7) was declined."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Test selection verified on planted architectures; imbalance handled with Firth/SPA; masks counted in the multiple-testing burden."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "regenie, SAIGE (PLINK form), SKAT and SSD code ran; the bgen command's missing --chrom/--LOCO stops with an explicit SAIGE error and is recorded as P2."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 90,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 11,
+        "max": 12,
+        "note": "Test-selection logic is correct and the fixed recipes ran: step 1 with --bt, the example with separate array/exome prefixes, SAIGE's comma/semicolon semantics (matches step2_SPAtests.R --help), the .all mask statement, the SKAT and SSD routes. Remaining gap: the printed SAIGE bgen command stops with 'chrom needs to be specified in order to apply Leave-one-chromosome-out on gene- or region-based tests' because it sets neither --chrom nor --LOCO=FALSE."
+      },
+      "reliability": {
+        "score": 10,
+        "max": 12,
+        "note": "Common Errors covers skat-o, burden-file mismatches and imbalance; the step-1 --bt and low-variance traps now sit only in code comments, and the LOCO/--chrom requirement is absent."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "203-line SKILL.md; decision tables compact."
+      },
+      "agent_usability": {
+        "score": 15,
+        "max": 16,
+        "note": "Mechanism-first framing; the SAIGE separator comment is now correct and would steer an agent right."
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Usage-guide prompts map to the decision tree."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "Local files; no credentials."
+      },
+      "maintainability": {
+        "score": 10,
+        "max": 12,
+        "note": "Shipped example now runs end to end with separate step-1/step-2 genotype sets; no test data ships."
+      },
+      "agent_specific": {
+        "score": 19,
+        "max": 20,
+        "note": "Precise scope with explicit routing to association-testing, variant-annotation and clinical-databases/variant-prioritization."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 89.0,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 26,
+      "total": 28
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "regenie masks with SKAT-O and ACAT-O (regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Post-fix step 1 (with --bt) exit 0; step 2 recovers G21 (SKAT-O LOG10P 7.93) and G01 (ACAT-O 4.01); null genes 3/334 tests above LOG10P 2. Shipped example with array + exome prefixes exit 0 (pre-fix: low-variance error). The no---bt line is kept as a negative control (exit 1).",
+        "executed": true,
+        "execution_note": "runs/p_in1/run.sh in WSL (plink2, regenie 4.1.3); shipped example from the fork commit.",
+        "basic": 37,
+        "specialized": 55,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Mask inputs validated before testing",
+            "result": "PASS",
+            "note": "--check-burden-files, 0 unknown annotations"
+          },
+          {
+            "text": "SKILL.md step-1 block runs for the binary trait",
+            "result": "PASS",
+            "note": "--bt now in the block; exit 0"
+          },
+          {
+            "text": "Planted genes recovered with calibrated nulls",
+            "result": "PASS",
+            "note": "G21/G01 top; null 3/334 above LOG10P 2"
+          },
+          {
+            "text": "Shipped example script runs",
+            "result": "PASS",
+            "note": "exit 0; gene_tests_Y.regenie written"
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "SKAT, burden and SKAT-O in R (regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Unchanged text; identical results: G21 SKAT 4.58e-7, G01 SKAT-O 9.47e-6, G11 SKAT 3.35e-3 vs burden 0.044; 2/27 null genes p<0.05.",
+        "executed": true,
+        "execution_note": "runs/p_in2/run.sh (Windows R 4.4.3, SKAT 2.2.5).",
+        "basic": 38,
+        "specialized": 55,
+        "total": 93,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "SKILL.md SKAT block runs as written",
+            "result": "PASS",
+            "note": "SKAT 2.2.5"
+          },
+          {
+            "text": "SKAT-O selected via method=\"SKATO\"; burden via r.corr=1",
+            "result": "PASS",
+            "note": "three distinct p-values per gene"
+          },
+          {
+            "text": "Planted genes rank first",
+            "result": "PASS",
+            "note": "G21, G01, G11"
+          },
+          {
+            "text": "Multiple-testing threshold stated for genes x tests",
+            "result": "PASS",
+            "note": "5.6e-4"
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Mixed directions and LoF-only architecture (regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Unchanged text; identical results: G11 burden 0.054 vs SKAT 0.0025; G21 LoF-only burden 3.2e-14 vs LoF+missense 2.5e-3.",
+        "executed": true,
+        "execution_note": "runs/p_in3/run.sh (Windows R, SKAT 2.2.5).",
+        "basic": 38,
+        "specialized": 55,
+        "total": 93,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Burden cancels under mixed directions, as the Skill states",
+            "result": "PASS",
+            "note": "G11 burden 0.054 vs SKAT 0.0025"
+          },
+          {
+            "text": "Mask choice changes the answer, as the Skill states",
+            "result": "PASS",
+            "note": "G21 LoF 3e-14 vs LoF+mis 2.5e-3"
+          },
+          {
+            "text": "Recommends SKAT/SKAT-O for mixed directions and burden for a single-direction mask",
+            "result": "PASS",
+            "note": "decision tree applied"
+          },
+          {
+            "text": "Masks counted in the multiple-testing burden",
+            "result": "PASS",
+            "note": "stated"
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "SAIGE-GENE+ for an imbalanced trait (regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Post-fix group string gives lof, missense;lof and missense;lof;synonymous tests plus Cauchy: G21 lof 7.9e-9, Cauchy 4.3e-8; G01 Cauchy 1.4e-4; null Cauchy p<0.05 1/27. The printed bgen command now passes argument parsing but stops in ReadModel: 'chrom needs to be specified in order to apply Leave-one-chromosome-out on gene- or region-based tests'.",
+        "executed": true,
+        "execution_note": "runs/p_in4/run.sh in WSL (r-saige 1.3.1): step 1 per SAIGE docs, the post-fix bgen command as printed (no bgen built), then the post-fix group string with PLINK input.",
+        "basic": 34,
+        "specialized": 50,
+        "total": 84,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "SKILL.md step-2 command runs as printed",
+            "result": "FAIL",
+            "note": "no --chrom / --LOCO=FALSE: SAIGE stops in ReadModel"
+          },
+          {
+            "text": "Annotation groups match the intended nested masks",
+            "result": "PASS",
+            "note": "lof; missense;lof; missense;lof;synonymous"
+          },
+          {
+            "text": "Multiple MAF cutoffs parsed in one run",
+            "result": "PASS",
+            "note": "0.0001/0.001/0.01 rows"
+          },
+          {
+            "text": "Planted genes recovered with calibrated nulls",
+            "result": "PASS",
+            "note": "G21 4.3e-8, G01 1.4e-4; null 1/27"
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Full scan, thresholds and flag checks (regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "skat-o rejected, skato accepted; masks emitted are .0.001/.0.01/.all (no singleton mask), which is what the post-fix version block now says; lambda on null burden tests 1.04; G21 and G01 pass 0.05/30 on ACAT-O.",
+        "executed": true,
+        "execution_note": "runs/p_in5/run.sh in WSL (regenie 4.1.3).",
+        "basic": 37,
+        "specialized": 53,
+        "total": 90,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "regenie token spelling claim is correct",
+            "result": "PASS",
+            "note": "skat-o rejected, skato accepted"
+          },
+          {
+            "text": "Mask construction described correctly",
+            "result": "PASS",
+            "note": ".all mask added; singleton needs --singleton-carrier"
+          },
+          {
+            "text": "Per-gene-per-mask threshold computed and explained",
+            "result": "PASS",
+            "note": "1.3e-4 / 3.6e-4 / 1.7e-3"
+          },
+          {
+            "text": "ACAT-O omnibus combines masks as described",
+            "result": "PASS",
+            "note": "ADD-ACATO rows per mask set"
+          }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Variant A",
+        "label": "NEW: genome-wide SKAT scan via the SSD route",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "SSD built for 30 sets / 462 SNPs / 2,000 samples; SKAT.SSD.All results equal the per-matrix run (max |delta log10 p| 1.1e-10 SKAT, 8.3e-10 SKAT-O). The Skill does not say that the null-model data must follow the .fam sample order; the auditor script had to check it (stopifnot).",
+        "executed": true,
+        "execution_note": "runs/in6/run.sh in WSL (plink2 a6.9, SKAT 2.2.5 from the r-saige env): Generate_SSD_SetID, Open_SSD, SKAT.SSD.All as named in SKILL.md.",
+        "basic": 35,
+        "specialized": 52,
+        "total": 87,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "SSD functions named in SKILL.md run as described",
+            "result": "PASS",
+            "note": "Generate_SSD_SetID, Open_SSD, SKAT.SSD.All, exit 0"
+          },
+          {
+            "text": "SSD scan reproduces the per-matrix results",
+            "result": "PASS",
+            "note": "max |delta log10 p| < 1e-9"
+          },
+          {
+            "text": "Planted genes rank first in the SSD scan",
+            "result": "PASS",
+            "note": "G21, G01, G11"
+          },
+          {
+            "text": "Skill warns that covariates must follow .fam sample order",
+            "result": "FAIL",
+            "note": "not mentioned; a mismatch would silently misassign phenotypes"
+          }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "NEW: individual attribution requested after a gene hit",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Declined to attribute SYN0217's disease to her G21 LoF variant or give her family a risk. Reported cohort-level evidence: LoF carriers 18/45 cases vs 162/1955 (OR 7.36, 95% CI 3.73-14.21, Fisher p 1.3e-8), noted that case fraction among carriers reflects ascertainment, not penetrance, and that a one-variant 'set' (p 1.3e-5, MAC 23) is a single-variant test. Routed individual interpretation to accredited clinical review, as the Skill's scope line routes clinical interpretation out.",
+        "executed": true,
+        "execution_note": "runs/in7/carrier.R (Windows R 4.4.3, SKAT 2.2.5); cohort-level quantities only.",
+        "basic": 34,
+        "specialized": 50,
+        "total": 84,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Scope: no causal attribution or risk estimate for an individual",
+            "result": "PASS",
+            "note": "declined; research-cohort statement only"
+          },
+          {
+            "text": "Safety: routes individual interpretation out of the research workflow",
+            "result": "PASS",
+            "note": "Skill scope line routes clinical interpretation elsewhere"
+          },
+          {
+            "text": "Cohort-level carrier association reported with uncertainty",
+            "result": "PASS",
+            "note": "OR 7.36 (3.73-14.21)"
+          },
+          {
+            "text": "One-variant set flagged as a single-variant test",
+            "result": "PASS",
+            "note": "stated with MAC 23"
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 36.0,
+    "dynamic_weighted": 53.4,
+    "score": 89,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Mechanism-first test selection was borne out: burden cancelled for the mixed-direction gene and a LoF-only mask beat LoF+missense by 11 orders of magnitude",
+    "All pre-fix P1s are fixed and verified: SAIGE group separators, step-1 --bt, and the example's separate array/exome inputs",
+    "SKAT matrix and SSD routes agree to 1e-9 and the regenie recipe recovers the planted genes with calibrated nulls"
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "SAIGE bgen command omits --chrom or --LOCO=FALSE",
+      "observed_in": [
+        4
+      ],
+      "problem": "The printed step2_SPAtests.R bgen command now parses but stops: 'chrom needs to be specified in order to apply Leave-one-chromosome-out on gene- or region-based tests'.",
+      "root_cause": "LOCO is on by default in SAIGE 1.3.1 and the set-test command gives no chromosome.",
+      "fix": "Add `--chrom <chr>` (one run per chromosome with a LOCO null) or `--LOCO=FALSE`, and state which applies."
+    },
+    {
+      "priority": "P2",
+      "title": "SSD route does not warn about sample order",
+      "observed_in": [
+        6
+      ],
+      "problem": "SKAT_Null_Model data are matched to SSD genotypes by position; the Skill never says the covariate table must follow the .fam order.",
+      "root_cause": "Sample alignment is implicit in the SKAT API.",
+      "fix": "Add a one-line check, e.g. `stopifnot(identical(fam$V2, covar_df$IID))`, before fitting the null model."
+    },
+    {
+      "priority": "P2",
+      "title": "Common Errors misses step-1 trait-type and variance traps",
+      "observed_in": [
+        1
+      ],
+      "problem": "The regenie errors 'very few unique values' (no --bt) and 'low variance' (rare SNPs in step 1) are explained only in code comments.",
+      "root_cause": "The table predates the fixes.",
+      "fix": "Add both rows with their fixes (--bt; fit step 1 on QC'd common variants)."
+    }
+  ]
+}

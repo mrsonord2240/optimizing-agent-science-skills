@@ -1,0 +1,5 @@
+.libPaths(c('F:/OpenScience/audit-envs/mass-spec-proteomics-analyst/R-lib', .libPaths()))
+suppressMessages(library(MSstatsPTM))
+print(body(MaxQtoMSstatsPTMFormat))
+ns <- asNamespace('MSstatsPTM')
+for (f in ls(ns, all.names=TRUE)) if (grepl('maxq|MaxQ|Maxq', f, ignore.case=TRUE)) cat('fn:', f, '\n')

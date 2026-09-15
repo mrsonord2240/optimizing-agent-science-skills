@@ -1,0 +1,8 @@
+library(ape); library(phangorn)
+cat('R', R.version.string, '\n')
+cat('ape', as.character(packageVersion('ape')), ' phangorn', as.character(packageVersion('phangorn')), '\n')
+print(args(dist.dna)); print(args(fastme.bal)); print(args(boot.phylo)); print(args(dist.ml))
+x <- as.DNAbin(matrix(strsplit('ACGTACGTAC','')[[1]], nrow = 1))
+cat('dist.dna model list (from source):\n')
+src <- deparse(dist.dna)
+print(grep('MODELS', src, value = TRUE))

@@ -1,0 +1,128 @@
+{
+  "source": "mrsonord2240/bioSkills@966f838b0ba32918310bd223a34f71d78f190560:phylogenetics/tree-io",
+  "meta": {
+    "skill_name": "bio-phylo-tree-io",
+    "description": "Read, write, and convert phylogenetic tree files with Biopython Bio.Phylo, and choose an annotation-preserving parser (treeio, DendroPy) when metadata matters.",
+    "evaluated_on": "2026-09-15",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 9,
+    "source": "mrsonord2240/bioSkills@966f838b0ba32918310bd223a34f71d78f190560:phylogenetics/tree-io",
+    "executed": "9/9 inputs executed (Biopython 1.88, DendroPy 5.0.13, ete3 3.1.3, rdflib 7.6.0, R treeio 1.30.0 / ape 5.8.1)",
+    "execution_note": "Re-audit of the fixed Skill: 7 pre-fix inputs as regression tests plus 2 new inputs (N = 9). Skill snippets verbatim (paths only). Windows locale cp1252. SYNTHETIC data (data/make_data.py)."
+  },
+  "veto_gates": {
+    "skill_veto": {"gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS"},
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {"result": "PASS", "detail": "Values checked against a truth table for the synthetic MCC tree."},
+      "practice_boundaries": {"result": "PASS", "detail": "File I/O only."},
+      "methodological_ground": {"result": "PASS", "detail": "Provenance of support values not guessed; annotations extracted before conversion."},
+      "code_usability": {"result": "PASS", "detail": "DendroPy extraction snippet, Bio.Phylo read/split loop and all three examples run."}
+    }
+  },
+  "static_score": {
+    "subtotal": 86,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {"score": 11, "max": 12, "note": "Convert-corruption claim, MrBayes .con.tre crash, NeXML otu names, encoding and quoted names, rdflib and string casts all verified. Key insight 3 still says a single-value parser 'truncates or chokes on' dual labels, which the corrected failure-mode section contradicts."},
+      "reliability": {"score": 10, "max": 12, "note": "Common Errors table now covers the failures actually met; no explicit loss table per conversion."},
+      "performance_context": {"score": 7, "max": 8, "note": "177 lines."},
+      "agent_usability": {"score": 14, "max": 16, "note": "Decision rule clear; one residual contradiction."},
+      "human_usability": {"score": 6, "max": 8, "note": "Natural prompts; dense description."},
+      "security": {"score": 11, "max": 12, "note": "Local files only."},
+      "maintainability": {"score": 9, "max": 12, "note": "convert_formats.py now demonstrates the loss; other examples are toys."},
+      "agent_specific": {"score": 18, "max": 20, "note": "Precise trigger and routing to five siblings."}
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 88.6,
+    "max": 100,
+    "assertion_pass_rate": {"passed": 41, "total": 42},
+    "inputs": [
+      {"index": 1, "type": "Canonical", "label": "BEAST MCC to plain Newick without losing HPDs", "status": "COMPLETED", "status_flag": "✅", "note": "Snippet verbatim yields typed floats for 5/5 nodes matching truth; topology.nwk has no [&R]; Phylo.convert writes 11 escaped comments and DendroPy then reads 0 posteriors; treeio write.beast round-trips", "basic": 37, "specialized": 54, "total": 91, "assertions_passed": 5, "assertions_total": 5,
+       "assertions": [
+         {"text": "Values match truth", "result": "PASS", "note": "0 mismatches"},
+         {"text": "Snippet runs and casts to float", "result": "PASS", "note": "(1.0, [38.1, 48.9])"},
+         {"text": "Plain Newick has no [&R]", "result": "PASS", "note": "suppress_rooting (pre-fix FAIL)"},
+         {"text": "The Skill's Phylo.convert statement matches behaviour", "result": "PASS", "note": "escaped, unreadable (pre-fix FAIL)"},
+         {"text": "treeio route round-trips", "result": "PASS", "note": "TRUE/TRUE"}
+       ], "executed": true, "execution_note": "runs_v2/in1/in1.py; in1r/extract_mcc.R."},
+      {"index": 2, "type": "Variant A", "label": "Split IQ-TREE SH-aLRT/UFBoot labels", "status": "COMPLETED", "status_flag": "✅", "note": "Skill loop verbatim splits 7 labels; 6 pass the joint rule, Bos+Sus 94/93 fails", "basic": 37, "specialized": 55, "total": 92, "assertions_passed": 5, "assertions_total": 5,
+       "assertions": [
+         {"text": "Skill gives a Python split pattern", "result": "PASS", "note": "loop in snippet (pre-fix FAIL)"},
+         {"text": "Labels split correctly", "result": "PASS", "note": "7"},
+         {"text": "Joint rule applied", "result": "PASS", "note": "6/7"},
+         {"text": ".confidence vs .name checked", "result": "PASS", "note": "printed"},
+         {"text": "Code runs", "result": "PASS", "note": "exit 0"}
+       ], "executed": true, "execution_note": "runs_v2/in2/in2.py."},
+      {"index": 3, "type": "Edge", "label": "Odd tip names joined to metadata", "status": "COMPLETED", "status_flag": "✅", "note": "UTF-8 handles + sanitized map join 7/7; ete3 raises on quoted names and ape gives NA, both now warned about", "basic": 36, "specialized": 50, "total": 86, "assertions_passed": 5, "assertions_total": 5,
+       "assertions": [
+         {"text": "Skill prevents the encoding failure", "result": "PASS", "note": "encoding note (pre-fix FAIL)"},
+         {"text": "Skill warns about ape/ete3 quoted labels", "result": "PASS", "note": "failure-mode fix (pre-fix FAIL)"},
+         {"text": "Sanitized join complete", "result": "PASS", "note": "7/7"},
+         {"text": "Label map round-trips", "result": "PASS", "note": "True"},
+         {"text": "Code runs", "result": "PASS", "note": "exit 0"}
+       ], "executed": true, "execution_note": "runs_v2/in3 (pre-fix scripts)."},
+      {"index": 4, "type": "Variant B", "label": "MrBayes posterior set and consensus", "status": "COMPLETED", "status_flag": "✅", "note": "302 post-burn-in trees; Bio.Phylo con.tre AssertionError now in Common Errors; DendroPy reads all clade probabilities", "basic": 36, "specialized": 52, "total": 88, "assertions_passed": 5, "assertions_total": 5,
+       "assertions": [
+         {"text": "Phylo.read/parse claims hold", "result": "PASS", "note": "exact errors"},
+         {"text": "Burn-in per run", "result": "PASS", "note": "50 each"},
+         {"text": "Skill warns Bio.Phylo cannot read .con.tre", "result": "PASS", "note": "row (pre-fix FAIL)"},
+         {"text": "Clade probabilities read", "result": "PASS", "note": "DendroPy"},
+         {"text": "Convergence routed out", "result": "PASS", "note": "bayesian-inference"}
+       ], "executed": true, "execution_note": "runs_v2/in4 (pre-fix script)."},
+      {"index": 5, "type": "Stress", "label": "Convert NHX/phyloXML/NeXML and tabulate losses", "status": "COMPLETED", "status_flag": "✅", "note": "Only phyloXML keeps 10 confidences, 7 taxonomies and colour; nexus/newick lose rooted flag; cdao works with rdflib; Bio.Phylo NeXML tips named by otu id", "basic": 34, "specialized": 50, "total": 84, "assertions_passed": 4, "assertions_total": 5,
+       "assertions": [
+         {"text": "cdao behaviour matches the Skill", "result": "PASS", "note": "needs rdflib (pre-fix FAIL)"},
+         {"text": "NeXML tip-name issue warned", "result": "PASS", "note": "row (pre-fix FAIL)"},
+         {"text": "Colour only in phyloXML", "result": "PASS", "note": "1/1"},
+         {"text": "Round-trip checks run", "result": "PASS", "note": "all formats"},
+         {"text": "The Skill states that Bio.Phylo's NeXML writer drops confidences and taxonomy", "result": "FAIL", "note": "format table implies NeXML can hold them; writer loss not mentioned"}
+       ], "executed": true, "execution_note": "runs_v2/in5/format_matrix.py (runner grep failed; script re-run directly)."},
+      {"index": 6, "type": "Scope Boundary", "label": "cat two MrBayes runs and build a figure", "status": "COMPLETED", "status_flag": "✅", "note": "Naive merge 2 topologies; TRANSLATE-aware merge 1; consensus/rooting/figure routed", "basic": 37, "specialized": 55, "total": 92, "assertions_passed": 4, "assertions_total": 4,
+       "assertions": [
+         {"text": "Refuses naive cat", "result": "PASS", "note": "tables differ"},
+         {"text": "Translate-aware merge delivered", "result": "PASS", "note": "1 topology"},
+         {"text": "Rootedness explicit", "result": "PASS", "note": "[&U]"},
+         {"text": "Routes consensus and figure", "result": "PASS", "note": "siblings named"}
+       ], "executed": true, "execution_note": "runs_v2/in6."},
+      {"index": 7, "type": "Adversarial", "label": "Treat posterior-scale labels as bootstraps and collapse <70", "status": "COMPLETED", "status_flag": "✅", "note": "Values in [0,1]; collapse would remove 5/5; provenance left unconfirmed", "basic": 37, "specialized": 53, "total": 90, "assertions_passed": 5, "assertions_total": 5,
+       "assertions": [
+         {"text": "Safety: refuses to label as bootstrap", "result": "PASS", "note": "declined"},
+         {"text": "Scale inferred", "result": "PASS", "note": "[0,1]"},
+         {"text": "Consequence of <70 shown", "result": "PASS", "note": "5/5"},
+         {"text": "No collapse performed", "result": "PASS", "note": "routed"},
+         {"text": "Typed phyloXML with unconfirmed provenance", "result": "PASS", "note": "re-read"}
+       ], "executed": true, "execution_note": "runs_v2/in7."},
+      {"index": 8, "type": "Variant B", "label": "NEW: will R accept the stripped topology?", "status": "COMPLETED", "status_flag": "✅", "note": "ape reads topology.nwk (6 tips); on the Bio.Phylo-converted file ape also reads 6 tips but silently has no node labels; a leading [&R] is tolerated by ape", "basic": 35, "specialized": 51, "total": 86, "assertions_passed": 4, "assertions_total": 4,
+       "assertions": [
+         {"text": "Skill's stripped topology loads in ape", "result": "PASS", "note": "6 tips"},
+         {"text": "Annotation loss after Phylo.convert confirmed downstream", "result": "PASS", "note": "no labels"},
+         {"text": "Skill's advice to extract first is the only lossless path", "result": "PASS", "note": "side table from In1"},
+         {"text": "Code runs", "result": "PASS", "note": "exit 0"}
+       ], "executed": true, "execution_note": "runs_v2/in8/in8.R."},
+      {"index": 9, "type": "Edge", "label": "NEW: accented tip names on Windows", "status": "COMPLETED", "status_flag": "✅", "note": "Locale cp1252: Bio.Phylo and DendroPy path reads garble names (CercopithÃ¨que); path-written file is not UTF-8; the Skill's handle fix round-trips correctly", "basic": 36, "specialized": 52, "total": 88, "assertions_passed": 4, "assertions_total": 4,
+       "assertions": [
+         {"text": "Path reads garble non-ASCII as the Skill says", "result": "PASS", "note": "both parsers"},
+         {"text": "Path writes use the locale codec", "result": "PASS", "note": "UnicodeDecodeError on UTF-8 re-read"},
+         {"text": "Handle fix round-trips", "result": "PASS", "note": "True"},
+         {"text": "Code runs", "result": "PASS", "note": "exit 0"}
+       ], "executed": true, "execution_note": "runs_v2/in9/in9.py."}
+    ]
+  },
+  "final": {"static_weighted": 34.4, "dynamic_weighted": 53.2, "score": 88, "max": 100, "grade": "Production Ready", "grade_symbol": "⭐", "deployable": true, "veto_override": false},
+  "key_strengths": [
+    "Annotation-preserving extraction snippet is exact and typed",
+    "Accurate warnings about Bio.Phylo's escaped comments, MrBayes consensus crash and NeXML tip names",
+    "Encoding guidance matches observed Windows behaviour",
+    "Python split of IQ-TREE dual support included"
+  ],
+  "recommendations": [
+    {"priority": "P2", "title": "Remove the 'truncates or chokes' sentence", "observed_in": [2], "problem": "Key insight 3 contradicts the corrected failure-mode section.", "root_cause": "Not updated with the fix.", "fix": "Say single-value parsers keep the label in .name and leave confidence empty."},
+    {"priority": "P2", "title": "Note Bio.Phylo NeXML writer losses", "observed_in": [5], "problem": "Bio.Phylo writes NeXML without confidences or taxonomy.", "root_cause": "Format table covers capability, not writer behaviour.", "fix": "Add a row: use DendroPy to write annotated NeXML."}
+  ]
+}

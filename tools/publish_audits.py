@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Publish finished skill-auditor records into the openscience-specialists repository.
+"""Publish finished skill-auditor records into this repository.
 
 Each audited Skill version lands in audits/skills/<skill-id>/<owner>-<repo>@<sha7>/ with:
   record.json  provenance: Skill source and author, audit method, who performed it, what it supersedes
@@ -9,10 +9,15 @@ Each audited Skill version lands in audits/skills/<skill-id>/<owner>-<repo>@<sha
   scripts/     the scripts the auditor wrote and ran (synthetic data and run outputs stay local)
 
 Usage:
-  publish_audits.py --repo F:/openscience-specialists --skill ID [--skill ID ...]
+  publish_audits.py --repo F:/optimizing-agent-science-skills --skill ID [--skill ID ...]
                     [--specialist ID=viable | --specialist ID=not-viable:<failing gate>]
 
+Afterwards regenerate the index: npm run audits:index
+
 Re-running is safe: each version folder is replaced.
+
+AUDITS and SPECIALIST_SRC are the live working area on F: where auditors run — raw outputs and
+generated data stay there and are never published. FIXES is this repository's own fix logs.
 """
 import argparse
 import json
@@ -20,10 +25,11 @@ import os
 import re
 import shutil
 
-AUDITS = "F:/OpenScience/audits"
+REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+AUDITS = os.environ.get("OASS_AUDITS", "F:/OpenScience/audits")
 PRE_FIX = os.path.join(AUDITS, "_pre-fix-20260915")
-FIXES = "F:/OpenScience/specialist-src/round2/fixes"
-SPECIALIST_SRC = "F:/OpenScience/specialist-src"
+FIXES = os.path.join(REPO_ROOT, "fixes")
+SPECIALIST_SRC = os.environ.get("OASS_SPECIALIST_SRC", "F:/OpenScience/specialist-src")
 
 SOURCE_RE = re.compile(r"^(?P<repository>[\w.-]+/[\w.-]+)@(?P<commit>[0-9a-f]{40}):(?P<path>.+)$")
 UPSTREAM_BIOSKILLS = {"repository": "GPTomics/bioSkills", "commit": "d91ed3d563019e649dc854c56ccd62551359488a"}

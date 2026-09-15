@@ -1,0 +1,423 @@
+{
+  "meta": {
+    "skill_name": "bio-vcf-statistics",
+    "description": "Compute and interpret VCF quality-control metrics (Ti/Tv, het/hom, novel/known, missingness, HWE, contamination, relatedness) with bcftools stats, vcftools, plot-vcfstats, and identity tools (somalier, peddy, KING). Use when judging whether a callset is trustworthy, diagnosing a low Ti/Tv or outlier het/hom sample, deciding whether an HWE deviation is error or biology, screening a cohort for sample swaps/contamination/wrong-sex before analysis, or comparing call sets before and after filtering. Not for applying filters (see variant-calling/filtering-best-practices) or normalizing representation (see variant-calling/variant-normalization).",
+    "evaluated_on": "2026-09-15",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Moderate",
+    "n_inputs": 7,
+    "source": "mrsonord2240/bioSkills@c1237cdbc9bb199947696f3909de26a55d259116:variant-calling/vcf-statistics",
+    "executed": 7,
+    "execution_note": "Re-audit of the fixed Skill (fork commit c1237cdb). Mode A. Windows bcftools 1.24 (plugins via BCFTOOLS_PLUGINS); WSL agents distro: bcftools 1.21, vcftools 0.1.17, cyvcf2 0.34.0, matplotlib (plot-vcfstats), somalier 0.3.5, peddy 0.4.8. Data SYNTHETIC (data/make_data.py, seed 20260911): 8 samples, SYN_S6 low coverage, SYN_S7 ~15% contaminated, SYN_S8 duplicate of SYN_S3, 6 excess-het paralog sites. The 5 pre-fix inputs were re-run from runs/p_in1..p_in5 (example taken from the fork commit; the het allele-balance one-liner swapped for the post-fix text); inputs 6 and 7 are new (runs/in6 builds a SYNTHETIC phased copy of the cohort; runs/in7 a soft-filtered copy). peddy still cannot run on the 35-kb synthetic genome; VerifyBamID2/CHARR need BAM/gVCF input. n_inputs 7 = 5 regression + 2 new. Inputs executed: 7/7.",
+    "re_audit": {
+      "pre_fix_score": 87,
+      "pre_fix_grade": "Production Ready",
+      "pre_fix_report": "F:/OpenScience/audits/_pre-fix-20260915/bio-vcf-statistics/",
+      "fix_log": "F:/OpenScience/specialist-src/round2/fixes/bio-vcf-statistics.md",
+      "regression_inputs": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "new_inputs": [
+        6,
+        7
+      ]
+    }
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated values; references (Danecek 2011/2021, Wigginton 2005, Manichaikul 2010, Pedersen 2017/2020, Zhang 2020) are real."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Cohort QC; identity checks are sample-level QC, not individual interpretation."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Excess-het-only HWE, genotype filtering before cohort metrics and ancestry stratification verified on planted truth."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "bcftools, vcftools, somalier and cyvcf2 code ran; peddy's failure is the synthetic genome, not the command."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 88,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 11,
+        "max": 12,
+        "note": "Metric table verified on data (TSTV field 5, PSC column 14 = nMissing, ExcessHet>54.69 = the 6 planted paralog sites, gtcheck/KING/somalier find the S3/S8 duplicate). The fixed het allele-balance one-liner is now per sample and matches an independent parse on unphased calls, but it tests only 0/1 and 0|1, so on a phased VCF it silently drops every 1|0 het (n halved)."
+      },
+      "reliability": {
+        "score": 10,
+        "max": 12,
+        "note": "Common Errors now covers the plot-vcfstats LaTeX requirement. The quick 'PASS' count returns 0 on a callset whose FILTER is '.', while the shipped vcf_stats.py counts the same records as PASS (361); nothing in the Skill explains the difference."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "228-line SKILL.md; usage guide holds the Python extensions."
+      },
+      "agent_usability": {
+        "score": 15,
+        "max": 16,
+        "note": "Order-of-operations and ancestry-stratification rules are explicit; the HWE excess-only rule was demonstrated."
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Prompts map to sections; decision table readable."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "Local files; no credentials."
+      },
+      "maintainability": {
+        "score": 9,
+        "max": 12,
+        "note": "Runnable example; no test data; peddy/somalier site-panel requirements still unstated (left unfixed by the fixer)."
+      },
+      "agent_specific": {
+        "score": 18,
+        "max": 20,
+        "note": "Clear trigger and hand-offs to filtering/normalization; identity QC flagged as mandatory before association."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 87.7,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 26,
+      "total": 28
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Callset QC summary (regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Same metrics as pre-fix (361 records, Ti/Tv 1.43, S6 missing 76). plot-vcfstats still exits 2 without a LaTeX engine and writes the PNGs, which the post-fix Common Errors row and usage-guide tip now state.",
+        "executed": true,
+        "execution_note": "runs/p_in1/run.sh (Windows) and run_wsl.sh (fork copy of vcf_stats.py, plot-vcfstats) in WSL.",
+        "basic": 37,
+        "specialized": 53,
+        "total": 90,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Counts and Ti/Tv extracted correctly",
+            "result": "PASS",
+            "note": "SN and TSTV field 5 = 1.43"
+          },
+          {
+            "text": "Per-sample missingness from PSC column 14 is correct",
+            "result": "PASS",
+            "note": "S6 = 76, matches vcftools"
+          },
+          {
+            "text": "Shipped example runs",
+            "result": "PASS",
+            "note": "vcf_stats.py same counts"
+          },
+          {
+            "text": "plot-vcfstats instructions suffice to produce the report",
+            "result": "PASS",
+            "note": "LaTeX need now documented; PNGs written, PDF step exit 2 as described"
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Swap / duplicate / relatedness screen (regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Unchanged text; identical results: gtcheck S8/S3 discordance 1.98; KING phi 0.5; somalier 1.0; peddy fails on the synthetic genome.",
+        "executed": true,
+        "execution_note": "runs/p_in2/run.sh (bcftools gtcheck, Windows) and run_wsl.sh (vcftools --relatedness2, somalier, peddy) in WSL.",
+        "basic": 37,
+        "specialized": 54,
+        "total": 91,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Duplicate pair identified by gtcheck",
+            "result": "PASS",
+            "note": "S8/S3 discordance 1.98"
+          },
+          {
+            "text": "KING kinship bands interpreted correctly",
+            "result": "PASS",
+            "note": "phi 0.5 = duplicate/MZ"
+          },
+          {
+            "text": "Version note on gtcheck -G is accurate",
+            "result": "PASS",
+            "note": "'-G has been deprecated'"
+          },
+          {
+            "text": "somalier commands run as written",
+            "result": "PASS",
+            "note": "extract/relate exit 0"
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Should every HWE failure be dropped? (regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Unchanged text; identical results: ExcessHet>54.69 flags exactly the 6 planted sites; two-sided HWE p<0.05 hits 19 sites including 13 real variants.",
+        "executed": true,
+        "execution_note": "runs/p_in3/run.sh (Windows, +fill-tags) and run_wsl.sh (vcftools --hardy).",
+        "basic": 37,
+        "specialized": 54,
+        "total": 91,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Recommends excess-het-only filtering",
+            "result": "PASS",
+            "note": "per SKILL.md"
+          },
+          {
+            "text": "ExcessHet cutoff isolates the artifact sites",
+            "result": "PASS",
+            "note": "6/6, no others"
+          },
+          {
+            "text": "Warns that two-sided HWE removes real variants",
+            "result": "PASS",
+            "note": "13 real sites in the two-sided set"
+          },
+          {
+            "text": "Mentions ancestry and controls-only requirements",
+            "result": "PASS",
+            "note": "stated"
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Contamination check from the VCF (regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Post-fix one-liner prints one line per sample: S7 0.419 (n=92) lowest, S8 0.489, S1 0.449 (n=162), identical to the auditor's independent per-sample computation (pre-fix: a single meaningless 0.729). S6 is a coverage problem (F_MISS 0.21).",
+        "executed": true,
+        "execution_note": "runs/p_in4/run.sh (Windows) with the post-fix one-liner verbatim, and run_wsl.sh (vcftools --missing-indv).",
+        "basic": 37,
+        "specialized": 54,
+        "total": 91,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The Skill's quick het-AB check gives a valid number",
+            "result": "PASS",
+            "note": "per-sample means equal the independent computation"
+          },
+          {
+            "text": "Contaminated sample identified",
+            "result": "PASS",
+            "note": "SYN_S7 lowest mean AB"
+          },
+          {
+            "text": "Recommends VerifyBamID2/CHARR confirmation",
+            "result": "PASS",
+            "note": "signals, not measurement"
+          },
+          {
+            "text": "Missingness counts only ./.",
+            "result": "PASS",
+            "note": "vcftools F_MISS S6 0.21"
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Raw vs filtered comparison with novel/known strata (regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Unchanged text; identical results: removed records Ti/Tv 0.60; novel 32% -> 18%; 6 novel common sites all excess-het artifacts; difficult BED Ti/Tv 1.15 vs 1.53.",
+        "executed": true,
+        "execution_note": "runs/p_in5/run.sh (Windows bcftools 1.24).",
+        "basic": 37,
+        "specialized": 53,
+        "total": 90,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Two-file stats output read correctly (ids 0/1/2)",
+            "result": "PASS",
+            "note": "private/shared sets"
+          },
+          {
+            "text": "Novel/known via the annotate idiom works",
+            "result": "PASS",
+            "note": "0.324 -> 0.184"
+          },
+          {
+            "text": "Novel common sites flagged as artifacts",
+            "result": "PASS",
+            "note": "6/6 excess_het"
+          },
+          {
+            "text": "Region-stratified stats run",
+            "result": "PASS",
+            "note": "-R easy/difficult"
+          }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Edge",
+        "label": "NEW: het allele balance on a phased VCF",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Post-fix one-liner on the phased copy counts only 0|1: S1 n=80 vs 162, S2 0.457 vs 0.473, S7 0.425 vs 0.419; the independent parse (0/1, 0|1, 1|0) reproduces the unphased values exactly. S7 is still the lowest sample, so the contamination call survives here, but half the hets are silently ignored.",
+        "executed": true,
+        "execution_note": "runs/in6/run.sh (Windows bcftools 1.24, Python 3.12) on a SYNTHETIC phased copy of the cohort (0/1 written alternately as 0|1 and 1|0, AD unchanged).",
+        "basic": 33,
+        "specialized": 48,
+        "total": 81,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "One-liner runs as written",
+            "result": "PASS",
+            "note": "exit 0"
+          },
+          {
+            "text": "Output is per sample",
+            "result": "PASS",
+            "note": "8 lines"
+          },
+          {
+            "text": "All het genotypes are counted on phased input",
+            "result": "FAIL",
+            "note": "1|0 not matched; n halved per sample"
+          },
+          {
+            "text": "Contaminated sample still identifiable",
+            "result": "PASS",
+            "note": "SYN_S7 lowest (0.425)"
+          }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Variant A",
+        "label": "NEW: PASS counts on raw vs soft-filtered callsets",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Raw callset (FILTER '.' on all 361): SKILL.md 'bcftools view -f PASS' count = 0, 'view -f .,PASS' = 361, vcf_stats.py 'PASS variants' = 361. Soft-filtered copy: all three agree (350 PASS, 11 LowQual). The Skill gives both idioms without saying they treat '.' differently.",
+        "executed": true,
+        "execution_note": "runs/in7/run.sh (Windows bcftools 1.24) and run_wsl.sh (fork copy of vcf_stats.py, cyvcf2 0.34.0).",
+        "basic": 33,
+        "specialized": 47,
+        "total": 80,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "PASS count correct on a soft-filtered callset",
+            "result": "PASS",
+            "note": "350 from bcftools and the example"
+          },
+          {
+            "text": "Shipped example runs on both files",
+            "result": "PASS",
+            "note": "exit 0"
+          },
+          {
+            "text": "bcftools quick count and the example agree on an unfiltered callset",
+            "result": "FAIL",
+            "note": "0 vs 361; FILTER '.' unexplained"
+          },
+          {
+            "text": "FILTER label counts idiom works",
+            "result": "PASS",
+            "note": "11 LowQual / 350 PASS"
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 35.2,
+    "dynamic_weighted": 52.6,
+    "score": 88,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Every metric is tied to a mechanism and an action; the excess-het-only HWE rule and 'novel common = artifact' were borne out on planted truth",
+    "The fixed het allele-balance check now reports valid per-sample means that identify the contaminated sample",
+    "Identity QC is accurate and runnable: gtcheck, vcftools --relatedness2 and somalier all found the planted duplicate"
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "Het allele-balance one-liner ignores 1|0 genotypes",
+      "observed_in": [
+        6
+      ],
+      "problem": "The awk test matches 0/1 and 0|1 only, so on a phased VCF every 1|0 het is dropped (per-sample n halved, means shifted).",
+      "root_cause": "Phased genotype orientations were not enumerated.",
+      "fix": "Match `$2 ~ /^(0[\\/|]1|1\\|0)$/` (or normalise with `gsub(/\\|/,\"/\")` and accept 0/1 and 1/0)."
+    },
+    {
+      "priority": "P2",
+      "title": "Quick PASS count treats FILTER '.' as not passing",
+      "observed_in": [
+        7
+      ],
+      "problem": "`bcftools view -f PASS` counts 0 on an unfiltered callset (FILTER '.'), while examples/vcf_stats.py counts those records as PASS (361).",
+      "root_cause": "The two idioms differ on missing FILTER and the Skill does not say so.",
+      "fix": "Use `bcftools view -f .,PASS` for 'not failed', or state that '.' means unfiltered and is excluded by `-f PASS`."
+    },
+    {
+      "priority": "P2",
+      "title": "State the site-panel needs of peddy and somalier",
+      "observed_in": [
+        2
+      ],
+      "problem": "peddy fails on non-human or small targets; somalier needs a build-matched sites file.",
+      "root_cause": "Tool requirements not stated (left unfixed in this round).",
+      "fix": "Note the bundled human site panels, the chrX requirement and `somalier find-sites` for custom targets."
+    }
+  ]
+}

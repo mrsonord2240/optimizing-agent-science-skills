@@ -1,0 +1,450 @@
+{
+  "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:phylogenetics/tree-manipulation",
+  "meta": {
+    "skill_name": "bio-phylo-tree-manipulation",
+    "description": "Edit phylogenetic tree structure with Biopython Bio.Phylo (rooting, pruning, clade extraction, collapsing low-support branches, resolving polytomies, ladderizing), treating rooting as a separate statistical inference with outgroup/midpoint/MAD/MinVar/non-reversible tradeoffs.",
+    "evaluated_on": "2026-09-15",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:phylogenetics/tree-manipulation",
+    "executed": "6/7 inputs executed (Biopython 1.88, ete3 3.1.3, DendroPy 5.0.13, ape 5.8.1, phangorn 2.12.1, phytools 2.5.2, IQ-TREE 2.4.0, MAD 2.2 mad.py, FastRoot/MinVar 1.5 under Python 3.12); Input 6 is a routing answer with no code",
+    "execution_note": "All trees and alignments are SYNTHETIC: IQ-TREE AliSim simulations from known rooted trees (data/make_data.py), followed by unrooted ML inference with -B 1000 -alrt 1000, so every rooting was scored against the true root. The four shipped examples and the Skill's snippets were run as written. RootDigger and Newick Utilities have no Windows builds and were NOT executed; Newick Utilities program semantics were checked against the help text in the tjunier/newick_utils source."
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated citations or numbers; every reported root, distance and support value came from runs on the synthetic data. Cited references (Tria 2017, Mai 2017, Bettisworth 2021, Hess and Russo 2007, DeSalle 2023, Junier 2010) are real."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Pure research phylogenetics; nothing diagnoses, prescribes or triages an individual."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Rooting-as-inference, soft vs hard polytomy, distance-preserving pruning and distant-outgroup warnings are sound. One heuristic (prefer MAD/MinVar agreement) produced a confidently wrong root on a strong lineage-rate-shift tree (Input 4), but the Skill's own method table flags that condition; recorded as P2, not a principled fallacy."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All Skill snippets and all four examples parse and run on Biopython 1.88 / ape 5.8.1 without errors. Two snippets are logically wrong on real IQ-TREE output (the outgroup monophyly guard refuses a valid outgroup; collapse_all is a silent no-op on SH-aLRT/UFBoot labels). They run, so these are P1 correctness defects rather than unrunnable code."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 80,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 9,
+        "max": 12,
+        "note": "Covers rooting, pruning, induced subtrees, collapsing and resolving; ladderize has no code, and non-reversible IQ-TREE/RootDigger are named without commands. Correctness 2/4. Verified correct: ape has no midpoint, drop.tip and Bio.Phylo prune sum lengths, ete3 needs preserve_branch_length, di2multi tol filters length, the MAD/FastRoot commands work. Wrong on real IQ-TREE output: the outgroup guard, collapse on dual labels, the 1e-8 zero-length tolerance, and nw_condense (it collapses pure clades, not low-support branches)."
+      },
+      "reliability": {
+        "score": 8,
+        "max": 12,
+        "note": "Useful Common Errors table and introspect-and-adapt rule; failure modes are written as trigger/mechanism/symptom/fix. But the monophyly guard misfires, and nothing detects that support labels were not parsed into .confidence, so collapse fails silently."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "216-line SKILL.md plus 77-line usage guide, dense tables, no redundant steps; all loaded at once but compact."
+      },
+      "agent_usability": {
+        "score": 12,
+        "max": 16,
+        "note": "Clear conceptual guidance and strong error prevention (distance checks, soft polytomy labelling, LBA). Misses the traps that bite on real ML output: IQ-TREE's basal trifurcation, root_with_outgroup making a trifurcating root, dual support labels, IQ-TREE's 1e-6 branch floor. No prescribed report format for root uncertainty."
+      },
+      "human_usability": {
+        "score": 6,
+        "max": 8,
+        "note": "Usage guide has natural prompts for each operation; description is long and jargon-dense."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "No credentials or network use; local file edits only; no validation that taxon names exist before pruning or rooting."
+      },
+      "maintainability": {
+        "score": 9,
+        "max": 12,
+        "note": "Separate, small, runnable examples; prune_taxa.py self-checks a distance. Examples use toy single-label trees that hide the dual-label and IQ-TREE-orientation failures, and common_ancestor.py prints 'Clade' as the answer to 'monophyletic?'."
+      },
+      "agent_specific": {
+        "score": 18,
+        "max": 20,
+        "note": "Precise trigger with explicit routing to tree-io, tree-visualization, divergence-dating and modern-tree-inference (all present); deterministic edits. Escape hatches are good for rooting uncertainty, but there is no guidance for when to stop because support labels could not be read."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 80.7,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 25,
+      "total": 31
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Root IQ-TREE ML tree on OutA+OutB, check ingroup monophyly",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Skill snippet refused a valid outgroup (false 'not monophyletic') on IQ-TREE output; adapted recipe (root on ingroup tip, then outgroup with outgroup_branch_length) recovered the TRUE root and all true ingroup clades",
+        "basic": 31,
+        "specialized": 44,
+        "total": 75,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The Skill's outgroup snippet roots the IQ-TREE tree as written",
+            "result": "FAIL",
+            "note": "is_monophyletic(OutA,OutB) returns False because IQ-TREE writes (OutA,OutB,ingroup); snippet prints 'root placement is unreliable' and does not root"
+          },
+          {
+            "text": "Final root matches the simulated true root",
+            "result": "PASS",
+            "note": "root branch separates OutA,OutB; rooted ingroup clade set identical to truth"
+          },
+          {
+            "text": "Ingroup monophyly is verified after rooting",
+            "result": "PASS",
+            "note": "ingroup monophyletic True"
+          },
+          {
+            "text": "Output separates clade support from root confidence",
+            "result": "PASS",
+            "note": "states the 100/100 ingroup stem label is clade support, not root confidence, per the Skill's first load-bearing fact"
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/in1: in1_root_outgroup.py (Step A verbatim snippet, Step B failed adaptation), in1_stepC.py, in1_stepD.py on data/og16_ml.treefile; outputs in *.out."
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Induced subtree of 8 non-clade taxa, distances preserved (Bio.Phylo + ete3)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Bio.Phylo prune: max patristic change 1.1e-16 over 28 pairs; ete3 with flag 0.0, without flag 0.103; MRCA of targets holds 14 taxa as warned",
+        "basic": 37,
+        "specialized": 54,
+        "total": 91,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Skill prune loop runs as written and leaves no degree-2 nodes",
+            "result": "PASS",
+            "note": "0 degree-2 nodes"
+          },
+          {
+            "text": "All surviving pairwise patristic distances are unchanged",
+            "result": "PASS",
+            "note": "max |diff| 1.1e-16"
+          },
+          {
+            "text": "ete3 preserve_branch_length claim is correct",
+            "result": "PASS",
+            "note": "True: 0.0 change; False: Fast8-I1 0.790 -> 0.731"
+          },
+          {
+            "text": "Output warns that a non-monophyletic set cannot be extracted as a clade",
+            "result": "PASS",
+            "note": "MRCA clade has 14 taxa; induced subtree used"
+          },
+          {
+            "text": "Output warns that retained support labels are not valid for the subset",
+            "result": "PASS",
+            "note": "six 100/100 labels flagged as full-taxon-set values"
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/in2/in2_prune.py on data/og16_ml.treefile; output in2.out."
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Collapse UFBoot<95 and zero-length branches on dual-label IQ-TREE tree",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Skill collapse_all is a silent no-op (confidence None, labels in .name); 1e-8 tolerance misses IQ-TREE's 1e-6 branches; adapted parser collapsed the single 90.3/92 node",
+        "basic": 28,
+        "specialized": 38,
+        "total": 66,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The Skill's collapse snippet collapses the UFBoot<95 node as written",
+            "result": "FAIL",
+            "note": "14 -> 14 internal nodes; all .confidence None, labels such as '90.3/92' in .name; no error raised"
+          },
+          {
+            "text": "The Skill's zero-length tolerance catches IQ-TREE zero-length branches",
+            "result": "FAIL",
+            "note": "IQ-TREE writes 1e-06 for the duplicate tips; branches <1e-8: none"
+          },
+          {
+            "text": "UFBoot uses the 95 cutoff, not the bootstrap 70",
+            "result": "PASS",
+            "note": "Skill's scale distinction applied"
+          },
+          {
+            "text": "Collapsed nodes are labelled soft (unresolved) polytomies",
+            "result": "PASS",
+            "note": "(I5,I5_dup),I6,(I7,Fast8) reported as unresolved, not a radiation"
+          },
+          {
+            "text": "Collapse keeps distances across the collapsed branch",
+            "result": "PASS",
+            "note": "I6-Fast8 0.642689 unchanged"
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/in3: edge16_aln.fa = SYNTHETIC far15 alignment without FarOut plus exact duplicates of I1 and I5; iqtree2 -m MFP -B 1000 -alrt 1000; in3_collapse.py; output in3.out."
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "No outgroup, deep tree with rate shift: midpoint vs MAD vs MinVar",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Commands ran as written; midpoint roots on Y10, MAD and MinVar agree on Y1-Y9 | rest, and all three are wrong vs true X|Y; MAD AI = 0.880 flags ambiguity",
+        "basic": 33,
+        "specialized": 48,
+        "total": 81,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "mad tree.nwk and FastRoot.py -i tree.nwk -m MV -o rooted.nwk run as written",
+            "result": "PASS",
+            "note": "both exit 0 under Python 3.12; MAD writes deep20.nwk.rooted"
+          },
+          {
+            "text": "Midpoint is flagged as clock-limited on this tree",
+            "result": "PASS",
+            "note": "midpoint slid onto the 2.1-long Y10 branch, as the Skill predicts"
+          },
+          {
+            "text": "Following the Skill's 'prefer MAD/MinVar agreement' rule yields the correct root",
+            "result": "FAIL",
+            "note": "both agree on a wrong root (Y1-Y9 | X+Y10)"
+          },
+          {
+            "text": "Root uncertainty is reported, not only a point root",
+            "result": "PASS",
+            "note": "MAD AI 0.880 reported with the Skill's 'strong lineage-specific rate shifts' caveat; non-reversible test recommended"
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/in4: mad.py and FastRoot.py command lines, then in4_score.py scoring against data/deep20_true.nwk; output in4.out."
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Non-reversible IQ-TREE root + R subset, collapse, random resolutions",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "--model-joint 12.12 --root-test put the ML root on the TRUE X|Y branch (rootstrap 67.4%; 7/35 roots not rejected by AU); drop.tip exact; the Skill's di2multi recipe changed distances by 0.093",
+        "basic": 33,
+        "specialized": 48,
+        "total": 81,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Root inferred with a non-reversible model and a root confidence reported",
+            "result": "PASS",
+            "note": "ML root correct; rootstrap 67.4; AU confidence set of 7 root branches listed"
+          },
+          {
+            "text": "ape drop.tip preserves every subset distance",
+            "result": "PASS",
+            "note": "max diff 2.2e-16"
+          },
+          {
+            "text": "The Skill's 'zero out low-support lengths then di2multi' recipe keeps patristic distances",
+            "result": "FAIL",
+            "note": "max patristic change 0.093; the Skill does not warn that collapsing alters distances"
+          },
+          {
+            "text": "Polytomies resolved over many random resolutions, not one",
+            "result": "PASS",
+            "note": "100 multi2di draws, 3 distinct resolutions, all binary"
+          },
+          {
+            "text": "Subset support labels flagged as computed on the full taxon set",
+            "result": "PASS",
+            "note": "stated"
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/in5: nr/ iqtree2 -s deep20_aln.fa --model-joint 12.12 -B 1000 -T 4 --root-test -zb 1000 -au (command not given by the Skill; taken from the IQ-TREE rootstrap docs); roottest_map.py; in5_pipeline.R via rrun.ps1."
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Root-to-tip regression rooting and tMRCA for a tip-dated virus tree",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Routes clock/date-based rooting and tMRCA to divergence-dating; does not compute a tMRCA from a midpoint root",
+        "basic": 36,
+        "specialized": 46,
+        "total": 82,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Scope: no tMRCA or rate estimate is produced by this Skill",
+            "result": "PASS",
+            "note": "declines and routes"
+          },
+          {
+            "text": "Routes to divergence-dating as the Skill description specifies",
+            "result": "PASS",
+            "note": "sibling Skill exists (bio-phylo-divergence-dating)"
+          },
+          {
+            "text": "Explains that date-based rooting is a clock inference, not a structural edit",
+            "result": "PASS",
+            "note": "rooting method table row 'Relaxed clock (BEAST) -> divergence-dating'"
+          },
+          {
+            "text": "States what to hand over (unrooted ML tree, alignment, tip dates)",
+            "result": "PASS",
+            "note": "listed"
+          }
+        ],
+        "executed": false,
+        "execution_note": "No code: the correct response is a routing answer; nothing to execute."
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "User insists on single distant outgroup and an 'earliest-diverging' claim",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "FarOut (branch 2.08) roots on I13 at 50/58 and breaks true clade B; midpoint and MinVar root on Fast8; MAD finds the true root (AI 0.870); disagreement read as uncertainty; claim refused",
+        "basic": 36,
+        "specialized": 53,
+        "total": 89,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Output refuses to certify an 'earliest-diverging' lineage from the distant-outgroup root",
+            "result": "PASS",
+            "note": "refused, with evidence"
+          },
+          {
+            "text": "Distant single outgroup is flagged and the known-group monophyly check is run",
+            "result": "PASS",
+            "note": "clade B (I9-I14) not monophyletic under FarOut rooting"
+          },
+          {
+            "text": "MAD vs MinVar disagreement is treated as an undetermined root",
+            "result": "PASS",
+            "note": "MAD correct, MinVar and midpoint on Fast8; hedged"
+          },
+          {
+            "text": "The Bio.Phylo -> mad pipeline runs without manual repair",
+            "result": "FAIL",
+            "note": "Bio.Phylo writes '):0;'; MAD 2.2: 'Corrupt NEWICK format - too many ':' | too few ','.'; ran after stripping the root length"
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/in7/in7_faroutgroup.py on data/far15_ml.treefile (SYNTHETIC, 800 bp); MAD and FastRoot called via subprocess; output in7.out."
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 32.0,
+    "dynamic_weighted": 48.4,
+    "score": 80,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Treats rooting as an inference: on synthetic truth, midpoint, a distant outgroup and MinVar each misrooted, exactly the failure modes the Skill describes",
+    "Pruning guidance is fully correct: Bio.Phylo prune, ape drop.tip, DendroPy suppress_unifurcations and ete3 preserve_branch_length all verified against patristic distances",
+    "R claims verified: ape has no midpoint, phangorn::midpoint and phytools::midpoint.root exist, di2multi tol filters branch length",
+    "MAD and FastRoot command lines run unchanged, and the recommended non-reversible IQ-TREE route recovered the true root with a confidence set",
+    "Clean scope with routing to tree-io, tree-visualization, divergence-dating and modern-tree-inference"
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "Outgroup guard refuses valid outgroups on IQ-TREE trees",
+      "observed_in": [1],
+      "problem": "On IQ-TREE output written as (OutA,OutB,ingroup), 'if tree.is_monophyletic([...])' returns False and the snippet prints 'root placement is unreliable'. root_with_outgroup on an internal outgroup makes a trifurcating root, and is a no-op when the outgroup MRCA is the current root.",
+      "root_cause": "The snippet tests rooted-tree monophyly on an arbitrarily rooted tree and ignores Biopython's documented root_with_outgroup edge cases.",
+      "fix": "First root on an ingroup tip (tree.root_with_outgroup(ingroup_tip)), then test outgroup monophyly, then call root_with_outgroup(*outgroup, outgroup_branch_length=stem/2) for a bifurcating root. Add a Common Errors row for the false negative."
+    },
+    {
+      "priority": "P1",
+      "title": "collapse_all silently no-ops on SH-aLRT/UFBoot labels",
+      "observed_in": [3],
+      "problem": "IQ-TREE -B -alrt trees carry 'SH-aLRT/UFBoot' labels, which Bio.Phylo leaves in clade.name with confidence None, so the Skill's collapse lambda collapses nothing and raises no error.",
+      "root_cause": "The Skill asserts 'support parsed into clade.confidence' and its example uses single-number labels only.",
+      "fix": "Add a parser (ufboot = float(c.name.split('/')[1]) when '/' in c.name) and an assertion that at least one internal node has readable support before collapsing. Add a dual-label case to examples/collapse_support.py."
+    },
+    {
+      "priority": "P2",
+      "title": "Zero-length tolerance 1e-8 misses IQ-TREE's 1e-6 floor",
+      "observed_in": [3],
+      "problem": "IQ-TREE writes 0.000001 for zero-length branches; branch_length < 1e-8 catches none of them.",
+      "root_cause": "Tolerance taken from ape's di2multi default rather than from the inference program's minimum branch length.",
+      "fix": "Use <= 1e-6 for IQ-TREE trees (MAD also contracts <1e-6) and say the tolerance must match the program that wrote the tree."
+    },
+    {
+      "priority": "P2",
+      "title": "Collapsing changes patristic distances; say so",
+      "observed_in": [5],
+      "problem": "The ape recipe (zero low-support lengths, then di2multi) changed subset distances by up to 0.093. Bio.Phylo collapse_all instead pushes the length to children, which changes within-clade distances.",
+      "root_cause": "The Skill's distance-preservation warning covers pruning only.",
+      "fix": "State that any collapse alters some patristic distances; collapse on a copy used for display or topology, and keep the resolved tree for distance-based work."
+    },
+    {
+      "priority": "P2",
+      "title": "MAD/MinVar agreement is not root confidence",
+      "observed_in": [4, 5],
+      "problem": "On a tree with a strong clade-wide rate shift, MAD and MinVar agreed on the same wrong root; only the non-reversible IQ-TREE test recovered the true root, and it still left 7 AU-plausible roots.",
+      "root_cause": "The decision rule treats agreement as sufficient and gives no command for the likelihood route.",
+      "fix": "Require reporting MAD's ambiguity index (AI near 1 = ambiguous). Add the command 'iqtree2 -s aln --model-joint 12.12 -B 1000 --root-test -zb 1000 -au' and report the rootstrap plus the AU confidence set of root branches."
+    },
+    {
+      "priority": "P2",
+      "title": "Bio.Phylo Newick root ':0' breaks MAD 2.2",
+      "observed_in": [7],
+      "problem": "Trees written by Bio.Phylo after prune or root end in '):0;', which mad.py rejects with 'Corrupt NEWICK format'.",
+      "root_cause": "Tool interoperability not tested between the Skill's Python edits and the outgroup-free CLIs it recommends.",
+      "fix": "Strip the root branch length before calling mad, e.g. newick.replace('):0;', ');'), and note it next to the MAD command."
+    },
+    {
+      "priority": "P2",
+      "title": "Small doc defects: example output, nw_condense, ladderize",
+      "observed_in": [],
+      "problem": "common_ancestor.py prints 'Are Human, Chimp, Gorilla monophyletic? Clade'. nw_condense collapses pure (same-label) clades, not low-support branches. Ladderize is in scope but has no code.",
+      "root_cause": "Examples and tool table not checked against actual output or tool help.",
+      "fix": "Print bool(tree.is_monophyletic(...)); list nw_ed with a support address for support-based collapse; add tree.ladderize() with the no-biology caveat."
+    }
+  ]
+}

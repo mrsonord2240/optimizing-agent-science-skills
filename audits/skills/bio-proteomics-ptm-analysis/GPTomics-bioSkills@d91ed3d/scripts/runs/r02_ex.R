@@ -1,0 +1,8 @@
+.libPaths(c('F:/OpenScience/audit-envs/mass-spec-proteomics-analyst/R-lib', .libPaths()))
+suppressMessages(library(MSstatsPTM))
+ns <- asNamespace('MSstatsPTM')
+print(get('.checkAnnotation', ns))
+print(head(maxq_lf_annotation)); print(dim(maxq_lf_evidence)); print(colnames(maxq_lf_evidence))
+print(head(maxq_lf_evidence[, c('Sequence','Modified.sequence','Proteins','Raw.file','Intensity','Modifications')], 5))
+print(MSstatsPTMSiteLocator)
+print(tidyFasta)

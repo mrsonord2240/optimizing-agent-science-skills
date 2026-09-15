@@ -1,0 +1,332 @@
+{
+  "meta": {
+    "skill_name": "bio-vcf-basics",
+    "description": "View, query, and interpret VCF/BCF variant files with bcftools and cyvcf2. Use when inspecting variants, extracting fields with query format strings, converting VCF/BCF, or correctly reading a field -- QUAL vs GQ vs PL/GL, AD vs DP and allele balance, GT phasing/ploidy/PS and missing-vs-hom-ref, INFO/FORMAT Number A/R/G semantics, symbolic alleles and END, or telling a raw gVCF apart from a filtered callset.",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Moderate",
+    "n_inputs": 5,
+    "execution_note": "Mode A. bcftools 1.24 (MSYS2 native Windows build) for CLI steps; cyvcf2 0.34.0 (bioconda, micromamba env in the WSL 'agents' distro, /tmp) for all Python, including the shipped examples/view_vcf.py. All data SYNTHETIC (data/make_data.py, seed 20260911): 1-sample callerA.vcf, 8-sample raw cohort.vcf (SYN_S6 low-coverage, SYN_S7 contaminated, SYN_S8 duplicate of S3), sample.g.vcf. Inputs executed: 5/5. Layer-1 avg 37.4/40, Layer-2 avg 53.4/60, assertion pass rate 18/20 (90%).",
+    "evaluator_version": "skill-auditor@1.0",
+    "evaluated_on": "2026-09-11",
+    "source": "mrsonord2240/bioSkills@c1237cdbc9bb199947696f3909de26a55d259116:variant-calling/vcf-basics"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated values; the three references (VCFtools 2011, BCFtools 2021, hts-specs) are real and correctly described."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "File inspection only; no individual-level interpretation."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Field semantics verified: GQ equals min(99, second-smallest PL) on 2812/2812 genotypes; cyvcf2 gt_types codes and missing-vs-hom-ref handling correct."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All bcftools and cyvcf2 blocks ran unmodified (paths only); shipped examples/view_vcf.py ran."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 89,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 11,
+        "max": 12,
+        "note": "Complete coverage of view/query/convert and field semantics; claims checked against data (PL/GQ, Number codes, gt_types). One wrong tip in usage-guide.md: 'Use -H with bcftools query to skip the header line' (for query, -H prints a header; SKILL.md itself is right)."
+      },
+      "reliability": {
+        "score": 10,
+        "max": 12,
+        "note": "Common Errors table maps real failures to fixes; the bgzip row quotes 'no BGZF EOF marker' while bcftools 1.24 prints 'not compressed with bgzip' / 'not BGZF compressed, cannot index'."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "263-line SKILL.md; dense but every section is used."
+      },
+      "agent_usability": {
+        "score": 15,
+        "max": 16,
+        "note": "Governing principle (level + Number before meaning) is exactly what an agent needs; strong traps list (./. vs 0/0, *, <NON_REF>, PS). Minor usage-guide/SKILL.md inconsistency on query -H."
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Plain-language prompts in the usage guide map to the sections."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "Local file reads only."
+      },
+      "maintainability": {
+        "score": 10,
+        "max": 12,
+        "note": "Small runnable example; no test data shipped."
+      },
+      "agent_specific": {
+        "score": 18,
+        "max": 20,
+        "note": "Clear trigger and routing to normalization/joint-calling; idempotent read-only operations."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 90.8,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 18,
+      "total": 20
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Inspect header, samples, table and type counts",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Header lines, sample list, GT/GQ/AD table and SNP/indel counts (8/3) produced; shipped view_vcf.py ran. SKILL.md shows query -H as a column header (correct); usage-guide tip says the opposite.",
+        "basic": 38,
+        "specialized": 54,
+        "total": 92,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Header, samples and a per-sample field table are produced with the Skill's commands",
+            "result": "PASS",
+            "note": "query -f with [...] sample loop"
+          },
+          {
+            "text": "SNP/indel counts are correct",
+            "result": "PASS",
+            "note": "8 SNP records (incl. one multiallelic), 3 indels"
+          },
+          {
+            "text": "The shipped example runs as written",
+            "result": "PASS",
+            "note": "prints QUAL/FILTER/TYPE for 5 records"
+          },
+          {
+            "text": "Guidance on bcftools query -H is consistent across the Skill",
+            "result": "FAIL",
+            "note": "usage-guide says -H skips the header; it prints '#[1]CHROM ...'"
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/in1/run.sh (bcftools 1.24) and view_vcf.upstream_copy.py (upstream LF bytes via git show, cyvcf2 0.34 in WSL)."
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Allele balance from AD and QUAL vs GQ",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Per-sample het AB computed from AD; SYN_S7 stands out (mean 0.419, 16% of hets outside 0.2-0.8 vs <=10% for others); all 8 high-QUAL sites with a low-GQ carrier are S7 genotypes, illustrating site vs genotype confidence.",
+        "basic": 37,
+        "specialized": 53,
+        "total": 90,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Allele balance is derived from AD rather than read from a nonexistent AB tag",
+            "result": "PASS",
+            "note": "alt/(ref+alt) on HET genotypes only"
+          },
+          {
+            "text": "QUAL (site) and GQ (genotype) are treated as different quantities",
+            "result": "PASS",
+            "note": "8 high-QUAL sites with GQ<20 carriers"
+          },
+          {
+            "text": "Deviant AB is read as artifact/contamination signal, not biology, per the Skill",
+            "result": "PASS",
+            "note": "S7 flagged for follow-up"
+          },
+          {
+            "text": "Missing genotypes are excluded from the AB computation",
+            "result": "PASS",
+            "note": "gt_types==2 skipped"
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/in2/ab.py, cyvcf2 0.34 (WSL)."
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Missing vs hom-ref and PL/GQ relationship",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "SYN_S6 is ./. at 76/361 sites; counting ./. as 0/0 biases AF by up to 0.125 at a site; GQ equals min(99, PL gap) for all 2812 called genotypes.",
+        "basic": 38,
+        "specialized": 55,
+        "total": 93,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "No-calls are counted as missing, never as hom-ref",
+            "result": "PASS",
+            "note": "cyvcf2 code 2 = UNKNOWN, as stated"
+          },
+          {
+            "text": "The AF bias of the ./.=0/0 mistake is quantified",
+            "result": "PASS",
+            "note": "mean 0.006, max 0.125"
+          },
+          {
+            "text": "The Skill's GQ-from-PL statement holds on the data",
+            "result": "PASS",
+            "note": "2812/2812"
+          },
+          {
+            "text": "Two independent methods agree on missingness",
+            "result": "PASS",
+            "note": "cyvcf2 and bcftools both 76"
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/in3/miss.py (cyvcf2, WSL) + bcftools GT[5]=\"mis\" cross-check (76, identical)."
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Is this gVCF analysis-ready?",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Recognized a gVCF: 4 records, 3 END-delimited <NON_REF> reference blocks covering 1229 bp and one candidate site (1026 G>C,<NON_REF>); the 1201-1230 block has DP 3 / GQ 0, i.e. no confident hom-ref. Advised joint genotyping before filtering or counting.",
+        "basic": 37,
+        "specialized": 52,
+        "total": 89,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The file is identified as a gVCF intermediate, not a callset",
+            "result": "PASS",
+            "note": "<NON_REF> on every record"
+          },
+          {
+            "text": "END is used for record spans",
+            "result": "PASS",
+            "note": "block lengths from INFO/END"
+          },
+          {
+            "text": "Low-GQ reference blocks are not treated as confident hom-ref",
+            "result": "PASS",
+            "note": "1201-1230 GQ 0"
+          },
+          {
+            "text": "Joint genotyping, not bcftools merge, is recommended",
+            "result": "PASS",
+            "note": "routes to joint-calling"
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/in4/run.sh, bcftools 1.24."
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Convert/index/region query, gzip failure, Python filtered write",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "BCF and tabix outputs, region query (32 records), cyvcf2 region fetch (32) and QUAL>30 Writer (350/361) all ran; the plain-gzip failure was diagnosed with the bgzip fix, although the error text differs from the Skill's table.",
+        "basic": 37,
+        "specialized": 53,
+        "total": 90,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Conversion, indexing and region query work as written",
+            "result": "PASS",
+            "note": "bcftools and cyvcf2 agree (32)"
+          },
+          {
+            "text": "gzip-vs-bgzip failure is diagnosed with the right fix",
+            "result": "PASS",
+            "note": "recompress with bgzip"
+          },
+          {
+            "text": "Filtered write inherits the header and filters on site-level QUAL",
+            "result": "PASS",
+            "note": "350 records written"
+          },
+          {
+            "text": "The Common Errors table predicts the observed message",
+            "result": "FAIL",
+            "note": "table says 'no BGZF EOF marker'; bcftools 1.24 says 'not compressed with bgzip'"
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/in5/run.sh (bcftools 1.24) and write_q30.py (cyvcf2, WSL)."
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 35.6,
+    "dynamic_weighted": 54.5,
+    "score": 90,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Governing principle (read the level and the Number before the value) prevents the silent-wrong-number failures it lists",
+    "Field semantics verified on data: GQ from PL, Number=A/R/G, cyvcf2 gt_types codes, missing vs hom-ref",
+    "gVCF <NON_REF>/END model explained well enough to stop an agent counting reference blocks as variants",
+    "Every code block ran unmodified on bcftools 1.24 and cyvcf2 0.34"
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "Wrong bcftools query -H tip in usage guide",
+      "observed_in": [
+        1
+      ],
+      "problem": "usage-guide.md says '-H with bcftools query skips the header line'; for query -H prints a header.",
+      "root_cause": "view -H (skip header) and query -H (print header) were conflated.",
+      "fix": "Change the tip to 'bcftools view -H skips the header; bcftools query -H adds a column header'."
+    },
+    {
+      "priority": "P2",
+      "title": "Update the bgzip error string",
+      "observed_in": [
+        5
+      ],
+      "problem": "Common Errors quotes 'no BGZF EOF marker'; current bcftools reports 'not compressed with bgzip' or 'not BGZF compressed, cannot index'.",
+      "root_cause": "Error text from an older htslib.",
+      "fix": "List the current messages alongside the old one."
+    },
+    {
+      "priority": "P2",
+      "title": "Add a gVCF variant-site extraction recipe",
+      "observed_in": [
+        4
+      ],
+      "problem": "The gVCF section explains the model but gives no command to list candidate sites; ALT=\"<NON_REF>\" expressions also match multi-ALT records.",
+      "root_cause": "Section is conceptual only.",
+      "fix": "Add 'bcftools view -i \"N_ALT>1\" sample.g.vcf' and note that string tests on ALT match any allele."
+    }
+  ]
+}

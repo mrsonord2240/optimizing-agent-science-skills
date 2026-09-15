@@ -1,0 +1,242 @@
+{
+  "meta": {
+    "skill_name": "bio-proteomics-dia-analysis",
+    "description": "Analyzes data-independent acquisition (DIA) proteomics by scoring reconstructed fragment-chromatogram peak groups against a decoy null with DIA-NN (library-free directDIA, library-based, or deep-learning predicted-library routes), Spectronaut, OpenSWATH, and EncyclopeDIA. Frames the deliverable around q-value LEVEL (precursor/peptide/protein-group) and CONTEXT (run vs experiment-wide/global) rather than a bare \"1% FDR\", and around the duty-cycle-vs-selectivity acquisition tradeoff (window design, staggered demultiplexing, diaPASEF, narrow-window Astral). Use when identifying and quantifying proteins from DIA mass spectrometry runs and filtering DIA-NN report.parquet/matrix output. Building the spectral library itself is spectral-libraries; normalization and protein roll-up is quantification; statistical testing of the matrix is differential-abundance.",
+    "evaluated_on": "2026-09-11",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Moderate",
+    "n_inputs": 5,
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:proteomics/dia-analysis"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All nine references verified (journal, volume, pages); no invented numbers; every dataset used in the audit is labelled SYNTHETIC." },
+      "practice_boundaries": { "result": "PASS", "detail": "No output diagnoses, prescribes or triages; the 600-run plasma cohort (Input 5) is treated as research data only." },
+      "methodological_ground": { "result": "PASS", "detail": "FDR level/context guidance is correct (Rosenberger 2017) and was confirmed by execution; the demultiplexing overstatement and large-cohort route are best-practice deviations, not principled fallacies." },
+      "code_usability": { "result": "PASS", "detail": "The Python filter ran as written on Inputs 1, 2 and 5 (exit 0); 22 DIA-NN flags are documented in the 1.9.2/2.0/master READMEs and --unimod4 is accepted by DIA-NN 2.0 per its log; the msconvert filter string is valid; the failing easypqp library call is a usage error in one snippet (P1), not a syntax or dependency failure." }
+    }
+  },
+  "static_score": {
+    "subtotal": 77,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 8, "max": 12, "note": "Completeness 3 (OpenSWATH/Spectronaut/EncyclopeDIA only as table rows), Correctness 2 (easypqp library command exits 1; --mass-acc 0 'per file' wrong; demux 'MUST' overstated; stale --out-lib .tsv and --qvalue default claims), Appropriateness 3." },
+      "reliability": { "score": 9, "max": 12, "note": "Good per-method failure modes and Common Errors table; example has no diann/FASTA/mzML existence checks (empty dir passes literal '*.mzML')." },
+      "performance_context": { "score": 6, "max": 8, "note": "2,939-word single file loaded whole; linear route; --mass-acc 0 restates the default." },
+      "agent_usability": { "score": 12, "max": 16, "note": "Strong error prevention on parquet, zeros, matrix counts and cohort FDR; 'predicted-library (directDIA)' naming contradicts Insight 3; no warning on run-order-dependent auto mass accuracy or peak picking before demux." },
+      "human_usability": { "score": 6, "max": 8, "note": "Jargon-dense description but names DIA-NN/report.parquet; usage guide has natural prompts; input requirements implicit." },
+      "security": { "score": 11, "max": 12, "note": "No credentials or data exposure; no report column/version validation and the example's unquoted --f $f splits filenames with spaces." },
+      "maintainability": { "score": 8, "max": 12, "note": "Clean sections; command duplicated in SKILL.md and example; no test data and the example contains only comments where it promises filtering." },
+      "agent_specific": { "score": 17, "max": 20, "note": "Precise routing and existing Related Skills; 236 lines but no references layer; auto mass accuracy makes DIA-NN results run-order dependent without warning; routing lines, not stop conditions." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 77.2,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 16, "total": 23 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "DIA-NN library-free on 8 Exploris runs -> 1% FDR protein matrix",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Skill filter gave an 887x8 log2 matrix, 0/60 LOWCONF, 0 -Inf; DIA-NN command flags verified against docs; mass-accuracy wording wrong.",
+        "basic": 35,
+        "specialized": 49,
+        "total": 84,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Filter names both LEVEL and CONTEXT (Q.Value, PG.Q.Value, Global.PG.Q.Value)", "result": "PASS", "note": "Exactly as written in the Skill's filter block" },
+          { "text": "Skill code runs as written and yields a log2 matrix without -Inf", "result": "PASS", "note": "887x8 matrix, 0 -Inf, 589 NaN (8.3%)" },
+          { "text": "Every DIA-NN flag in the command is documented or demonstrably accepted", "result": "PASS", "note": "22 flags in README reference lists; --unimod4 accepted per DIA-NN 2.0 log (issue #1490)" },
+          { "text": "Mass-accuracy guidance matches DIA-NN documentation", "result": "FAIL", "note": "Skill says auto 'per file'; docs: optimised on first run and reused, fixed values preferred" },
+          { "text": "Scope: stays within search and filtering and routes normalisation/statistics to other skills", "result": "PASS", "note": "Hands off the log2 matrix to quantification/differential-abundance" }
+        ],
+        "executed": true,
+        "execution_note": "Ran runs/in1_skill_filter.py (Skill filter block verbatim, path changed) on SYNTHETIC data/report.parquet, exit 0; ran examples/diann_analysis.sh with a stub diann echoing argv (exit 0, 38 args). DIA-NN itself not executed (no build); command checked against DIA-NN READMEs 1.9.2/2.0/master."
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Filter existing report.parquet for a cohort matrix; explain matrix count",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "60 groups removed by Global.PG.Q.Value, all LOWCONF, each seen in 1-3 runs; 61 zero cells -> NaN; matrix-count explanation matches docs.",
+        "basic": 37,
+        "specialized": 54,
+        "total": 91,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Groups failing Global.PG.Q.Value are removed from the cohort matrix", "result": "PASS", "note": "0/60 LOWCONF survive vs 60/60 with a run-level-only filter" },
+          { "text": "DIA-NN zeros are converted to NaN before log2", "result": "PASS", "note": "61 zero cells became NaN; 0 -Inf" },
+          { "text": "Matrix-vs-report count explanation matches DIA-NN documentation", "result": "PASS", "note": "Extra 5% run-specific PG filter via --matrix-spec-q confirmed in README" },
+          { "text": "Filter includes every report filter DIA-NN recommends", "result": "FAIL", "note": "Global.Q.Value <= 0.01 omitted (no effect on this synthetic report)" },
+          { "text": "Scope: matrix handed to quantification/differential-abundance without normalising or testing", "result": "PASS", "note": "Only valid-value counts reported for hand-off" }
+        ],
+        "executed": true,
+        "execution_note": "Ran runs/in1_skill_filter.py and runs/in2_dropped_groups.py on SYNTHETIC data/report.parquet, both exit 0."
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Staggered 2x8 Th overlapping-window data: conversion and search",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Demux filter string valid, but Skill omits peak picking first and overstates demux as mandatory; DIA-NN supports overlapping windows natively.",
+        "basic": 31,
+        "specialized": 39,
+        "total": 70,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "msconvert demultiplex filter string is valid ProteoWizard syntax", "result": "PASS", "note": "optimization=<(none)|overlap_only> in pwiz usage_demux" },
+          { "text": "Conversion puts vendor peak picking as the first filter", "result": "FAIL", "note": "Missing from the Skill; DIA-NN docs require it and Skyline says centroid before demux" },
+          { "text": "Output reflects that DIA-NN handles overlapping windows natively and demux is an optional gain", "result": "FAIL", "note": "Skill says staggered data MUST be demultiplexed or every tool sees the wide window" },
+          { "text": "Scope: no redesign of the acquisition method; window scheme treated as inherited", "result": "PASS", "note": "Consistent with the Skill's 'analyst inherits the design' framing" }
+        ],
+        "executed": true,
+        "execution_note": "Partly: agent-written pyOpenMS window detector (runs/in3_staggered_check.py) ran on two SYNTHETIC mzML files, exit 0. The Skill's msconvert command was NOT executed (no ProteoWizard build); checked against pwiz source and Skyline/DIA-NN docs."
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "FragPipe DDA library via EasyPQP -> DIA-NN library-based search",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "Skill's easypqp library command exits 1 ('No PSMs files present'); DIA-NN library flags valid but no --fasta or third-party-library caution.",
+        "basic": 29,
+        "specialized": 35,
+        "total": 64,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "EasyPQP library command runs as written", "result": "FAIL", "note": "exit 1: No PSMs files present; with pkl files added: psm.tsv but no peptide.tsv" },
+          { "text": "Library-based DIA-NN flags exist in the documented version", "result": "PASS", "note": "--lib, --reanalyse, --matrices, --smart-profiling in 1.9.2/2.0/master" },
+          { "text": "Output supplies FASTA / warns about third-party library compatibility", "result": "FAIL", "note": "Neither in the Skill; DIA-NN docs advise verifying compatibility and offer --reannotate" },
+          { "text": "Scope: library-building details deferred to spectral-libraries", "result": "PASS", "note": "Routed there, though the Skill also ships the failing snippet" }
+        ],
+        "executed": true,
+        "execution_note": "Ran the Skill's easypqp library command verbatim with easypqp 0.1.59 from an extracted wheel (click/colorama/tqdm wheels on PYTHONPATH, import stubs for seaborn/numba; venv untouched because pip install easypqp would downgrade numpy/scipy): exit 1. DIA-NN library search NOT executed (no build)."
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "600-run diaPASEF plasma cohort, MBR, QC and methods q-value statement",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Skill filter on 3.05M rows in 1.9 s, 0 false groups vs 892 under run-level-only; large-cohort DIA-NN route diverges from DIA-NN docs.",
+        "basic": 32,
+        "specialized": 45,
+        "total": 77,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Skill filter scales to a 3M-row report in seconds without -Inf", "result": "PASS", "note": "1.9 s wall time, 2000x600 matrix, 0 -Inf" },
+          { "text": "Global filter prevents false-group accumulation across runs", "result": "PASS", "note": "0 false groups vs 892 (30.8% of union) with run-level-only at 600 runs" },
+          { "text": "Large-cohort route matches DIA-NN docs (empirical library from a subset, fixed mass accuracy)", "result": "FAIL", "note": "Skill: --reanalyse on all runs with --mass-acc 0" },
+          { "text": "Methods statement names q-value column, level, context and DIA-NN version", "result": "PASS", "note": "Directly supported by the Skill's level/context principle" },
+          { "text": "Safety: no individual-level diagnostic or clinical claims from the plasma cohort", "result": "PASS", "note": "Output is a research protein matrix and QC only" }
+        ],
+        "executed": true,
+        "execution_note": "Ran runs/in5_make_cohort.py (SYNTHETIC seeded 600-run report) and runs/in5_cohort_filter.py (Skill filter block verbatim plus agent-written QC/union comparison), both exit 0. DIA-NN command NOT executed; checked against DIA-NN docs."
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 30.8,
+    "dynamic_weighted": 46.3,
+    "score": 77,
+    "max": 100,
+    "grade": "Beta Only",
+    "grade_symbol": "⚠️",
+    "deployable": false,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "The report filter is correct and ran as written: it removes all 60 globally unconfident groups that a run-level filter keeps, and its 0->NaN step prevents -Inf",
+    "Frames '1% FDR' by level and context; a 600-run simulation showed run-level-only filtering letting false groups reach 30.8% of the union while the Skill's filter kept 0",
+    "Accurate on DIA-NN output: parquet main report since 1.9, the extra 5% run-specific matrix filter via --matrix-spec-q, and matrix filename caveats",
+    "22 of 23 DIA-NN flags are in the documented command-line reference and --unimod4 is accepted by DIA-NN 2.0; the msconvert demultiplex filter string is valid",
+    "Clean routing to spectral-libraries, quantification and differential-abundance, and all Related Skills exist"
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "easypqp library snippet fails as written",
+      "observed_in": [4],
+      "problem": "The Skill's easypqp library command exits 1 ('No PSMs files present'); with pkl inputs it still fails because --psmtsv requires --peptidetsv, and with both tsvs the FDR flags are ignored.",
+      "root_cause": "The snippet omits the prior easypqp convert step and the positional *.psmpkl/*.peakpkl inputs, and is mislabelled as predicted-library generation.",
+      "fix": "Show easypqp convert per run, then 'easypqp library --psmtsv psm.tsv --peptidetsv peptide.tsv --out library.tsv *.psmpkl *.peakpkl', note the ignored FDR flags, and retitle the section as empirical library building."
+    },
+    {
+      "priority": "P1",
+      "title": "Staggered-window guidance overstated and incomplete",
+      "observed_in": [3],
+      "problem": "The Skill says staggered data MUST be demultiplexed or every tool loses selectivity, and gives an msconvert command without peak picking.",
+      "root_cause": "It ignores DIA-NN's native support for overlapping windows and its requirement that vendor peak picking be the first msconvert filter.",
+      "fix": "State that DIA-NN handles overlapping windows natively (demux is an optional few-% gain) and give --filter \"peakPicking vendor msLevel=1-\" --filter \"demultiplex optimization=overlap_only massError=10ppm\"."
+    },
+    {
+      "priority": "P1",
+      "title": "Mass-accuracy advice contradicts DIA-NN docs",
+      "observed_in": [1, 5],
+      "problem": "SKILL.md l.82 and example l.15 say --mass-acc 0 auto-optimises per file and recommend it as the default; DIA-NN optimises on the first run, reuses it, and prefers fixed values.",
+      "root_cause": "Auto mass accuracy was assumed to be per-run and best practice.",
+      "fix": "Explain first-run optimisation and --individual-mass-acc, and recommend fixed MS1/MS2 accuracies per instrument (timsTOF 15/15, Astral MS1 4 / MS2 10, TripleTOF 20/20) for production runs."
+    },
+    {
+      "priority": "P1",
+      "title": "Large-cohort route diverges from DIA-NN guidance",
+      "observed_in": [5],
+      "problem": "The decision tree sends hundreds to thousands of runs through --reanalyse; DIA-NN docs recommend an empirical library from 20-100 runs, then searching all runs with it.",
+      "root_cause": "MBR is treated as the FDR mechanism instead of a convenience feature, and version-specific Lib.* vs Global.* guidance is missing.",
+      "fix": "Add the two-step empirical-library route with fixed mass accuracy for large cohorts, and state which q-value columns apply under MBR by version (1.9.x Lib.*, 2.x Global.*)."
+    },
+    {
+      "priority": "P2",
+      "title": "Report filter omits Global.Q.Value",
+      "observed_in": [2],
+      "problem": "DIA-NN recommends Global.Q.Value <= 0.01 alongside Global.PG.Q.Value; the Skill's filter omits it, and its comment says per-run while the code applies all three filters.",
+      "root_cause": "The filter targets protein context only.",
+      "fix": "Add Global.Q.Value <= 0.01 to the filter and correct the comment."
+    },
+    {
+      "priority": "P2",
+      "title": "Library-based route lacks FASTA and library caveat",
+      "observed_in": [4],
+      "problem": "The library-based command omits --fasta, so protein annotation relies on a third-party library, and it does not warn that such libraries need compatibility checks.",
+      "root_cause": "The route assumes a DIA-NN-generated library.",
+      "fix": "Add --fasta (plus --reannotate for third-party libraries) and DIA-NN's advice to prefer DIA-NN-generated .parquet/.speclib libraries."
+    },
+    {
+      "priority": "P2",
+      "title": "Version drift in output and default claims",
+      "observed_in": [1],
+      "problem": "--out-lib uses .tsv although empirical libraries are .parquet since 1.9.1; '--qvalue 0.01 = DIA-NN default' is false for current docs (5%); directDIA and predicted-library are presented as different routes.",
+      "root_cause": "The text mixes 1.8-era conventions with 1.9+ claims.",
+      "fix": "Use .parquet library names, date the default claims by version, and describe library-free search as DIA-NN's predicted-library route."
+    },
+    {
+      "priority": "P2",
+      "title": "Example script fragile and missing promised filter",
+      "observed_in": [],
+      "problem": "Unquoted --f $f splits filenames with spaces; an empty directory passes a literal '*.mzML'; the header promises filtering but the script only has comments.",
+      "root_cause": "The example was written as illustration, not as a runnable pipeline.",
+      "fix": "Build args with an array (args+=(--f \"$f\")), check that diann, the FASTA and mzML files exist, and add the Python filter step."
+    }
+  ]
+}

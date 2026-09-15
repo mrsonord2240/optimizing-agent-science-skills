@@ -1,0 +1,449 @@
+{
+  "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:phylogenetics/bayesian-inference",
+  "meta": {
+    "skill_name": "bio-phylo-bayesian-inference",
+    "description": "Frames Bayesian phylogenetics as a posterior over trees conditioned on data and priors, approximated by an MCMC that must be proven converged (ESS, PSRF, ASDSF), with MrBayes, BEAST2, RevBayes and PhyloBayes-MPI; covers branch-length priors, stepping-stone model comparison and CAT-GTR.",
+    "evaluated_on": "2026-09-15",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:phylogenetics/bayesian-inference",
+    "executed": "6/7 inputs executed (MrBayes 3.2.7a Windows serial build, IQ-TREE 2.4.0 + AliSim, rwty 1.0.3 / R, Python 3.12 with numpy/pandas/DendroPy 5.0.13); Input 6 is a routing answer with no code",
+    "execution_note": "All alignments are SYNTHETIC (IQ-TREE AliSim from known trees, data/make_data.py): 12 taxa x 1500 bp GTR+G, an 8-taxon near-polytomy (central edge 0.0005), and 60 taxa x 800 bp with very short branches. MCMC lengths were cut to 20k-300k generations; seeds were added by the auditor because the Skill's MrBayes block sets none. The Skill's MrBayes block was also run VERBATIM (ngen=10000000) and halted itself at generation 5000. PhyloBayes-MPI has no Windows build: its flags were checked against the PhyloBayes-MPI 1.9 manual and NOT executed. BEAST2 and RevBayes were not installed; the Skill gives no runnable code for them."
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated numbers or citations. Every ESS, PSRF, ASDSF, posterior probability, marginal likelihood and tree length reported came from MrBayes/IQ-TREE/rwty runs on the synthetic data. The key historical claim (gammadir default since 3.2.3) was verified in the 3.2.7a help and the v3.2.3 release notes."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Pure research phylogenetics; nothing diagnoses, prescribes or triages an individual."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "The agent never shipped an unconverged posterior: the early-halted stoprule runs (Inputs 1, 3) and the under-run chain (Input 2) were rejected on ESS, ASDSF and max split SD. Harmonic-mean model choice was refused (Input 7) and dating was not faked from substitution branch lengths (Input 6)."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "Every MrBayes command in the Skill (lset, prset gammadir, mcmc with stoprule/stopval/diagnfreq, sump/sumt burninfrac relburnin, ss nsteps) is accepted by 3.2.7a and exits 0. examples/bayesian_convergence.py passes py_compile and runs on real MrBayes .p files. The stoprule block is runnable but halts too early to be usable (P1), which is a correctness defect rather than unrunnable code. PhyloBayes flags match the manual (not executed)."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 81,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 10,
+        "max": 12,
+        "note": "Completeness 3: MrBayes, stepping-stone and PhyloBayes are covered with commands; BEAST2 and RevBayes are named only, and the recommended prior-only check has no command (mcmc data=no). Correctness 3: the gammadir default history, flags and thresholds are verified. But the headline block's 'stoprule=yes stopval=0.01' with diagnfreq=5000 halts at generation 5000 on easy data, and the RWTY call 'burnin=25' is 25 trees in rwty 1.0.3, not 25%. Appropriateness 4."
+      },
+      "reliability": {
+        "score": 8,
+        "max": 12,
+        "note": "The post-run convergence checklist and Common Errors table catch non-convergence, so fault tolerance is good. Error reporting is table-based. Recoverability 2: no guidance on checkpoints or 'mcmc append=yes' for extending a run, and the stoprule behaviour is undocumented."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "235-line SKILL.md with dense tables and one 143-line example; loaded at once but compact."
+      },
+      "agent_usability": {
+        "score": 13,
+        "max": 16,
+        "note": "Learnability 4. Consistency 3 (burninfrac=0.25 next to rwty burnin=25). Feedback design 3: an explicit convergence checklist but no reporting template. Error prevention 3: it does not warn that stoprule can halt before scalars are sampled, or that MrBayes sump itself prints 'Use the harmonic mean for Bayes factor comparisons of models'."
+      },
+      "human_usability": {
+        "score": 6,
+        "max": 8,
+        "note": "The usage guide has natural example prompts. The description is long and jargon-dense (ASDSF, PSRF, CAT-GTR)."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "No credentials, network calls or eval. The example parses user files without validating the header (it raises NameError if no 'Gen' line)."
+      },
+      "maintainability": {
+        "score": 9,
+        "max": 12,
+        "note": "Clear sections and one self-testing example script. The self-test deliberately shows a PSRF FAIL, but no expected output is documented, and there is no test NEXUS for the MrBayes block."
+      },
+      "agent_specific": {
+        "score": 17,
+        "max": 20,
+        "note": "Precise trigger with explicit routing to modern-tree-inference, divergence-dating, species-trees and tree-io; strong escape hatches. Idempotency 2: the MrBayes block sets no seed/swapseed, so reruns differ."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 86.0,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 27,
+      "total": 34
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "12-taxon GTR+I+G MrBayes run with convergence proof vs known tree",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The Skill block auto-halted at gen 5000 (ASDSF 0.000; 39 samples/run; minESS 2.7, PSRF up to 1.61). The agent rejected it on sump ESS and reran with stoprule=no for 300k gens: minESS 204.8, PSRF <= 1.004, ASDSF 0.0001, topological ESS 697/2251, consensus RF = 0 to the true tree",
+        "basic": 34,
+        "specialized": 46,
+        "total": 80,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The Skill's MrBayes block is accepted by MrBayes 3.2.7a",
+            "result": "PASS",
+            "note": "exit 0; verbatim ngen=10000000 version also exit 0"
+          },
+          {
+            "text": "The block as written yields a posterior sample that passes the Skill's own ESS > 200 gate",
+            "result": "FAIL",
+            "note": "stoprule fired at the first diagnfreq check (gen 5000): minESS 2.7-10 (reduced) / 3.3-5 (verbatim)"
+          },
+          {
+            "text": "Output withholds clade PPs until ESS, PSRF and ASDSF all pass",
+            "result": "PASS",
+            "note": "reported only from the 300k-gen rerun"
+          },
+          {
+            "text": "Reported consensus matches the simulated true tree",
+            "result": "PASS",
+            "note": "RF = 0; all 9 true splits PP >= 0.989"
+          },
+          {
+            "text": "The Skill's RWTY call works as a 25% burn-in",
+            "result": "FAIL",
+            "note": "rwty 1.0.3 documents burnin as a number of trees; 'burnin=25' discards 25 of 3001 trees"
+          }
+        ],
+        "executed": true,
+        "execution_note": "mb.exe in1.nex (Skill block, ngen 300000, samplefreq 100), verbatim/verbatim.nex (ngen 10000000, timeout 600 s) and adapted/adapted.nex (stoprule=no) ran; mbdiag.py parsed .pstat/.tstat/.mcmc; rwty_in1.R (analyze.rwty, topological.approx.ess, makeplot.treespace) exited 0; rf_truth.py (DendroPy) gave RF 0. remedy/remedy.nex (diagnfreq=100000) still stopped at 100k with pinvar minESS 42."
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "User's finished 20k-generation 60-taxon run: write up clade PPs",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Refused to write up: sump minESS 21.9 (pi(G)), live ASDSF 0.0129 > 0.01, max split SD 0.103, rwty topological ESS 43/89. Shipped example flags all 9 parameters. Recommended longer ngen, not more thinning",
+        "basic": 37,
+        "specialized": 52,
+        "total": 89,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Safety: output refuses to report clade PPs from the under-run chain",
+            "result": "PASS",
+            "note": "explicit refusal with the failing diagnostics"
+          },
+          {
+            "text": "ESS is checked for every parameter, not only LnL",
+            "result": "PASS",
+            "note": "all 7 .pstat parameters plus LnL/LnPr in the example script"
+          },
+          {
+            "text": "A topology diagnostic is run in addition to scalar ones",
+            "result": "PASS",
+            "note": "ASDSF, max split SD and rwty topological ESS"
+          },
+          {
+            "text": "The shipped examples/bayesian_convergence.py runs on real MrBayes .p files",
+            "result": "PASS",
+            "note": "exit 0; its verdicts agree with MrBayes sump"
+          },
+          {
+            "text": "The fix recommends more generations rather than thinning",
+            "result": "PASS",
+            "note": "stated, per the Skill's Common Errors row"
+          }
+        ],
+        "executed": true,
+        "execution_note": "user_run.nex produced the SYNTHETIC under-run chain; agent_diag.nex (sump/sumt), mbdiag.py, examples/bayesian_convergence.py user.run1.p user.run2.p 0.25 and rwty_in2.R ran. The auditor's first rwty script used fill.color='LnL' (not a column in MrBayes files) and was fixed. Consensus: RF 5 to truth, all differences unresolved splits, no wrong splits."
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Near-zero internode (0.0005): is PP support trustworthy?",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The Skill block stopped at gen 20000 (minESS 34). The 300k rerun converged: ABCD|EFGH PP 0.717 vs SH-aLRT/UFBoot 70.3/63, and a 0.0034 ML branch. Reported as soft/unresolved; RF 0 to truth. The Skill's polytomy-prior advice has no command in any named tool",
+        "basic": 35,
+        "specialized": 48,
+        "total": 83,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The Skill's block as written gives a sample that passes ESS > 200",
+            "result": "FAIL",
+            "note": "stoprule halt at gen 20000: minESS 34.2-103.5"
+          },
+          {
+            "text": "The short-internode split is reported as soft, not as a supported clade",
+            "result": "PASS",
+            "note": "PP 0.72 plus a near-zero branch, treated as an effective polytomy"
+          },
+          {
+            "text": "PP is cross-checked against ML support",
+            "result": "PASS",
+            "note": "IQ-TREE SH-aLRT 70.3 / UFBoot 63 on the same split"
+          },
+          {
+            "text": "The four well-supported true splits are recovered",
+            "result": "PASS",
+            "note": "AB, CD, EF, GH PP 1.0; RF 0"
+          },
+          {
+            "text": "The Skill's polytomy-prior remedy is actionable with its named tools",
+            "result": "FAIL",
+            "note": "no MrBayes/BEAST2/RevBayes command given; MrBayes 3.2.7a prset has no polytomy prior"
+          }
+        ],
+        "executed": true,
+        "execution_note": "in3.nex (Skill block) and adapted/adapted.nex ran; split_pp.py mapped .parts/.tstat; IQ-TREE ml_star8 supplied SH-aLRT/UFBoot; examples/bayesian_convergence.py on the adapted .p files agreed with sump (all OK)."
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Stepping-stone GTR+G vs JC with 2lnBF",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "ss accepted; lnML GTR+G -9855.36 (runs -9857.10/-9854.76), JC -10602.53 (-10603.46/-10602.05); 2lnBF = 1494.3, decisive (>10) for GTR+G, consistent with the GTR+G simulation",
+        "basic": 37,
+        "specialized": 53,
+        "total": 90,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The Skill's 'ss ngen nsteps diagnfreq' command runs on 3.2.7a",
+            "result": "PASS",
+            "note": "exit 0 for both models"
+          },
+          {
+            "text": "Model choice uses the stepping-stone estimate, not the harmonic mean",
+            "result": "PASS",
+            "note": "SS means from the .ss/stdout"
+          },
+          {
+            "text": "2lnBF is computed correctly and read on the Kass-Raftery scale",
+            "result": "PASS",
+            "note": "2*(-9855.36 - -10602.53) = 1494.3 -> very strong"
+          },
+          {
+            "text": "Output reports between-run SS spread and proper priors",
+            "result": "PASS",
+            "note": "run spread 2.3 and 1.4 log units; MrBayes defaults are proper"
+          },
+          {
+            "text": "The Skill states how many samples per step or which alpha/burninss to use",
+            "result": "FAIL",
+            "note": "silent; with a changed samplefreq a step can hold < 10 samples"
+          }
+        ],
+        "executed": true,
+        "execution_note": "ss_gtrg.nex and ss_jc.nex ran (ngen 250000, samplefreq 100 -> 49 samples/step, nsteps 50) in 680 s and 440 s."
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "60 short-branch taxa: exp(10) vs gammadir tree-length inflation",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Both converged (minESS >= 240, ASDSF 0.005/0.004). Posterior TL exp(10) 1.181 vs gammadir 0.904 vs IQ-TREE ML 0.900 (true 1.012). Identical consensus topology (RF 0 between priors). Inflation is real vs ML, but the ML reference underestimates here (5 branches at 1e-6)",
+        "basic": 35,
+        "specialized": 50,
+        "total": 85,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Both brlenspr settings in the Skill are accepted",
+            "result": "PASS",
+            "note": "unconstrained:exp(10) and unconstrained:gammadir(1,0.1,1,1)"
+          },
+          {
+            "text": "Convergence is verified before tree lengths are compared",
+            "result": "PASS",
+            "note": "sump ESS/PSRF and ASDSF checked for both"
+          },
+          {
+            "text": "Posterior TL is compared with an ML reference and topology sensitivity is checked",
+            "result": "PASS",
+            "note": "+31% vs ML under exp(10); RF 0 between priors"
+          },
+          {
+            "text": "Output does not overstate inflation as a topology effect",
+            "result": "PASS",
+            "note": "reports no topology change; ML TL is not truth"
+          },
+          {
+            "text": "The Skill gives a runnable prior-only / prior-sensitivity command",
+            "result": "FAIL",
+            "note": "'sample the prior alone' is advised but no 'mcmc data=no' or equivalent is given"
+          }
+        ],
+        "executed": true,
+        "execution_note": "exp10.nex and gdir.nex ran (200k gens, 2 runs x 4 chains) in 981 s and 999 s; mbdiag.py, rf_truth.py and topo_compare.py (DendroPy) ran."
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Divergence times from the unconstrained MrBayes run",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Declined to derive ages from substitutions/site branch lengths. Routed to divergence-dating with clock model, tree prior, fossil as a minimum, prior-only run and the same convergence gates",
+        "basic": 37,
+        "specialized": 47,
+        "total": 84,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Scope: output produces no node ages from the unconstrained run",
+            "result": "PASS",
+            "note": "explicitly refuses"
+          },
+          {
+            "text": "Output names divergence-dating as the correct sibling Skill",
+            "result": "PASS",
+            "note": "matches the Skill's routing line"
+          },
+          {
+            "text": "Output explains the fossil is a minimum-age calibration and suggests a prior-only run",
+            "result": "PASS",
+            "note": "stated"
+          },
+          {
+            "text": "Convergence requirements are carried over to the dated analysis",
+            "result": "PASS",
+            "note": ">= 2 runs, ESS > 200 including clock rate"
+          }
+        ],
+        "executed": false,
+        "execution_note": "No code: the correct response is a routing answer (runs/in6/response.md)."
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Reviewer deadline: pick the model from sump harmonic means",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Refused HME model choice and used SS (Input 4). HME GTR+G -9792.35 / -9788.50 in two replicates (SS -9855.36, overstated by ~65), JC -10551.00 / -10551.28 (SS -10602.53). The early-halted GTR+I+G run gave HME -9958.40 vs -9789.67 after 300k gens. MrBayes sump prints 'Use the harmonic mean for Bayes factor comparisons'; the Skill does not flag that message",
+        "basic": 37,
+        "specialized": 54,
+        "total": 91,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Safety: output refuses to select the model by the harmonic-mean estimator",
+            "result": "PASS",
+            "note": "refusal cites the Skill's HME section"
+          },
+          {
+            "text": "Output supplies a stepping-stone Bayes factor instead",
+            "result": "PASS",
+            "note": "2lnBF 1494 from Input 4"
+          },
+          {
+            "text": "Output demonstrates HME bias/instability with real numbers",
+            "result": "PASS",
+            "note": "~65 log-unit overstatement; 168-unit swing between a 5k- and a 300k-generation run"
+          },
+          {
+            "text": "Output does not overclaim: notes HME and SS agree on direction for this easy pair",
+            "result": "PASS",
+            "note": "stated"
+          },
+          {
+            "text": "The Skill pre-empts MrBayes's own 'use the harmonic mean' message",
+            "result": "FAIL",
+            "note": "the MrBayes 3.2.7a sump banner contradicts the Skill and the Skill does not mention it"
+          }
+        ],
+        "executed": true,
+        "execution_note": "mc_gtrg_a/b and mc_jc_a/b (100k gens, different seeds) ran with sump; HME values read from stdout/.lstat; SS values reused from Input 4."
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 32.4,
+    "dynamic_weighted": 51.6,
+    "score": 84,
+    "max": 100,
+    "grade": "Beta Only",
+    "grade_symbol": "⚠️",
+    "deployable": false,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Convergence doctrine is correct and operational: scalar vs topology diagnostics, ESS for every parameter, and >= 2 runs. It led the agent to reject every unconverged sample on the real MrBayes output",
+    "Factual claims verified on the binary: gammadir has been the default since 3.2.3 (3.2.7a help, v3.2.3 release notes), and all MrBayes flags are accepted",
+    "The harmonic-mean prohibition and stepping-stone recipe produced a correct Kass-Raftery Bayes factor, and the HME bias was reproduced (~65 log units)",
+    "The shipped convergence script runs on real MrBayes .p files and its verdicts agree with MrBayes sump",
+    "Clean routing to divergence-dating, modern-tree-inference, species-trees and tree-io; PhyloBayes bpcomp/tracecomp syntax and thresholds match the manual"
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "stoprule block halts before the chain is sampled",
+      "observed_in": [1, 3],
+      "problem": "With 'stoprule=yes stopval=0.01 diagnfreq=5000' MrBayes stopped at gen 5000 (d12) and 20000 (star8) with minESS 2.7-34. Raising diagnfreq to 100000 still stopped with pinvar ESS 42.",
+      "root_cause": "The Skill presents ASDSF auto-halt as the convergence gate. ASDSF can hit 0 on easy topologies long before scalars mix, and stoprule checks only topology.",
+      "fix": "Default to stoprule=no with an ngen sized for ESS > 200. If stoprule is kept, state that it is a topology-only minimum: add 'minpartfreq', a large diagnfreq, and a mandatory rerun/append ('mcmc append=yes ngen=...') until sump ESS > 200."
+    },
+    {
+      "priority": "P1",
+      "title": "Assertion pass rate below the Limited Release floor",
+      "observed_in": [1, 3, 4, 5, 7],
+      "problem": "7 of 34 assertions failed (79.4%). They come from gaps in the Skill: stoprule, RWTY burnin, polytomy prior, SS per-step samples, prior-only command, and the MrBayes HME banner.",
+      "root_cause": "Several recommendations are stated as doctrine without a runnable command or a version-checked parameter.",
+      "fix": "Add runnable one-liners for each piece of advice (prior-only 'mcmc data=no', 'mcmc append=yes', ss samplefreq/alpha, rwty burnin in trees) and fix the items below."
+    },
+    {
+      "priority": "P2",
+      "title": "RWTY burnin=25 is trees, not percent",
+      "observed_in": [1],
+      "problem": "analyze.rwty(..., burnin=25) next to burninfrac=0.25 implies 25%, but rwty 1.0.3 documents burnin as a number of trees.",
+      "root_cause": "The parameter unit was not checked against ?analyze.rwty.",
+      "fix": "Write burnin = round(0.25 * length(run1$trees)) and note the unit."
+    },
+    {
+      "priority": "P2",
+      "title": "Warn that MrBayes sump recommends the harmonic mean",
+      "observed_in": [7],
+      "problem": "MrBayes 3.2.7a sump prints '(Use the harmonic mean for Bayes factor comparisons of models)', which contradicts the Skill.",
+      "root_cause": "The Skill does not anticipate program output that invites the error it forbids.",
+      "fix": "Add a Common Errors row: ignore the sump HME banner and use ss / .ss marginal likelihoods."
+    },
+    {
+      "priority": "P2",
+      "title": "Seeds, SS per-step sampling and polytomy-prior tooling",
+      "observed_in": [3, 4, 5],
+      "problem": "The MrBayes block sets no seed/swapseed. The ss snippet gives no guidance on samples per step, alpha or burninss. The polytomy prior (Lewis 2005) has no command in any named tool, and prior-only sampling has no command.",
+      "root_cause": "The recipes stop at the headline command.",
+      "fix": "Add 'set seed= swapseed=', state '>= 30-50 samples per step (ngen/samplefreq/(nsteps+1))', name 'mcmc data=no' for prior-only runs, and state that the reversible-jump polytomy prior is not in MrBayes 3.2.7."
+    }
+  ]
+}

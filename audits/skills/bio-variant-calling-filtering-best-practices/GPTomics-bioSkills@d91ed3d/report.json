@@ -1,0 +1,428 @@
+{
+  "meta": {
+    "skill_name": "bio-variant-calling-filtering-best-practices",
+    "description": "Filters germline and somatic variant callsets at the site and genotype level with GATK VQSR (VQSLOD, truth-sensitivity tranches), VETS/ScoreVariantAnnotations, NVScoreVariants, hard filters with per-annotation thresholds, and bcftools/cyvcf2 expressions, plus Ti/Tv-based QC. Use when deciding between VQSR, hard filtering, and ML recalibration by cohort size and platform, setting SNP vs indel thresholds, replicating the missing-annotation-passes rule so hom-alt sites survive, applying genotype-level GQ/DP filters, or validating filter impact. Not for VCF normalization (see variant-calling/variant-normalization) or summary statistics (see variant-calling/vcf-statistics).",
+    "evaluated_on": "2026-09-15",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "execution_note": "Mode A. Windows: bcftools 1.24 (MSYS2 build, plugins via BCFTOOLS_PLUGINS) and GATK 4.6.1.0 (OpenJDK 17); WSL agents distro (files passed by tar, no drive mount): bcftools 1.21, cyvcf2 0.34.0. Data SYNTHETIC (data/make_data.py, seed 20260911): 8-sample raw joint callset, 361 sites with planted truth in data/cohort_truth_classes.tsv (240 true SNPs, 25 hom-alt-only true sites, 20 true indels, 6 excess-het paralog sites, 60 artifact SNPs, 10 artifact indels), plus SYNTHETIC DeepVariant-shaped (runs/in6) and Mutect2-shaped (runs/in7) VCFs. Not executed: FilterMutectCalls itself (needs Mutect2 stats/contamination tables; flags checked with --help), VETS and NVScoreVariants (no model/GPU). Inputs executed: 7/7. Layer-1 avg 34.6/40, Layer-2 avg 50.6/60, assertion pass rate 23/28 (82%). Grade note: Production Ready floor not met (assertions): downgraded one tier.",
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:variant-calling/filtering-best-practices"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated identifiers or values in outputs; references (DePristo 2011, Van der Auwera 2013, Poplin 2018, Danecek 2021) are real and correctly attributed."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Callset QC only; no individual-level interpretation."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Method guidance verified on planted truth (hard filters kept 285/285 true sites; the VQSR-on-small-panel failure the Skill warns about was reproduced)."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "GATK, bcftools and cyvcf2 blocks ran. Three snippets (example concat, FMT/AF[0], usage-guide AD[1]) fail loudly with explicit bcftools errors; recorded as P1/P2, not silent wrong results."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 84,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 10,
+        "max": 12,
+        "note": "VQSR/hard-filter/genotype guidance verified: GATK VariantFiltration with the SKILL.md thresholds kept 240/240 true SNPs, 25/25 hom-alt, 20/20 true indels and 8/70 artifacts; the guarded bcftools expression reproduced the GATK SNP PASS set exactly. Three shipped snippets fail: examples/filter_variants.sh aborts at bcftools concat on any multi-chromosome input, and the somatic FMT/AF[0] and usage-guide AD[1]/(AD[0]+AD[1]) expressions are rejected by bcftools 1.21 and 1.24 (Number=A/R tags need [sample:subfield])."
+      },
+      "reliability": {
+        "score": 9,
+        "max": 12,
+        "note": "Common Errors table maps hom-alt loss, VQSR non-convergence and empty output to fixes; it misses the concat-contiguity and subfield-index errors the Skill's own code triggers."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "261-line SKILL.md; dense tables, all load-bearing."
+      },
+      "agent_usability": {
+        "score": 14,
+        "max": 16,
+        "note": "Governing principle (site vs genotype, SNP vs indel, missing=>PASS) is exactly what an agent needs; the cyvcf2 block is presented as the Python counterpart but omits QD/SOR/RankSum terms (kept 26/60 artifacts vs 4/60)."
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Natural prompts in usage guide; method-selection table readable."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "Local files only; no credentials; no destructive commands."
+      },
+      "maintainability": {
+        "score": 8,
+        "max": 12,
+        "note": "Modular sections; the shipped example is broken for multi-contig input and no test data ships to catch it."
+      },
+      "agent_specific": {
+        "score": 18,
+        "max": 20,
+        "note": "Precise trigger with hand-offs to normalization and vcf-statistics; DL-caller and somatic escape hatches explicit."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 85.1,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 23,
+      "total": 28
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "GATK hard filters on an 8-sample joint callset",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "GATK SelectVariants + VariantFiltration (SKILL.md thresholds): PASS 275 SNPs / 24 indels; truth 240/240 true SNPs, 25/25 hom-alt, 20/20 true indels kept, 8/70 artifacts kept. Shipped examples/filter_variants.sh failed at concat (\"chromosome block chr1 is not contiguous\"); with concat -a plus indexing it gives the same PASS set (Ti/Tv 1.72).",
+        "basic": 34,
+        "specialized": 50,
+        "total": 84,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "SNPs and indels are split and filtered with type-specific thresholds",
+            "result": "PASS",
+            "note": "SelectVariants by type; FS60 vs FS200, ReadPosRankSum -8 vs -20"
+          },
+          {
+            "text": "Hom-alt sites with missing RankSum annotations survive",
+            "result": "PASS",
+            "note": "25/25 PASS"
+          },
+          {
+            "text": "Filtering removes most artifacts without losing true variants",
+            "result": "PASS",
+            "note": "8/70 artifacts kept; 0 of 285 true sites lost"
+          },
+          {
+            "text": "The shipped example script runs end to end",
+            "result": "FAIL",
+            "note": "concat without -a aborts on two-chromosome input; no output written"
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/in1/run.sh on Windows (bcftools 1.24, GATK 4.6.1.0); shipped example run from an upstream byte copy (git show)."
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "bcftools replica of the GATK filter plus cyvcf2 version",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Guarded expression (verbatim) kept true SNPs 240/240, hom-alt 25/25, artifacts 4/60, identical to GATK; the naive unguarded translation kept only 2/25 hom-alt sites. The SKILL.md cyvcf2 block ran but filters only QUAL/DP/FS/MQ: 26/60 artifacts kept, 12 of them with QD<2.",
+        "basic": 35,
+        "specialized": 51,
+        "total": 86,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Guarded bcftools expression reproduces the GATK PASS set",
+            "result": "PASS",
+            "note": "same 240/25/6/4 counts as VariantFiltration"
+          },
+          {
+            "text": "Naive translation loses hom-alt sites, as the Skill warns",
+            "result": "PASS",
+            "note": "2/25 kept"
+          },
+          {
+            "text": "cyvcf2 block runs as written",
+            "result": "PASS",
+            "note": "exit 0 in WSL"
+          },
+          {
+            "text": "cyvcf2 block implements the same filter as the bcftools/GATK expression",
+            "result": "FAIL",
+            "note": "no QD/SOR/RankSum terms; 26/60 artifacts vs 4/60"
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/in2/run.sh (Windows bcftools 1.24) and run_py.sh in WSL (cyvcf2 0.34.0) via tar hand-over."
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "VQSR requested for an 8-sample panel",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Output declines VQSR as the Skill instructs and gives hard filters. Testing the warning: the SKILL.md VariantRecalibrator command first stopped on a zero-variance annotation (MQ), then \"converged\" with GATK's \"Training with very few variant sites\" warning; the 99.7 tranche kept 57/60 artifact SNPs vs 4/60 for hard filters.",
+        "basic": 37,
+        "specialized": 54,
+        "total": 91,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Steers away from VQSR on a small panel",
+            "result": "PASS",
+            "note": "Skill table and pitfalls applied"
+          },
+          {
+            "text": "Recommends hard filters, VETS or NVScoreVariants instead",
+            "result": "PASS",
+            "note": "hard filters kept 4/60 artifacts"
+          },
+          {
+            "text": "SKILL.md VariantRecalibrator/ApplyVQSR syntax is valid in GATK 4.6.1.0",
+            "result": "PASS",
+            "note": "resource tags parsed; tranches and recal files written"
+          },
+          {
+            "text": "Tranche is explained as truth sensitivity, not FDR",
+            "result": "PASS",
+            "note": "tranche file truthSensitivity column matches"
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/in3/run.sh (GATK 4.6.1.0) with a SYNTHETIC circular truth resource (the simulation's true sites: best case for VQSR)."
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Genotype-level no-calls before cohort metrics",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Site filter then `bcftools filter -S . -e 'FMT/GQ<20 | FMT/DP<8'` (verbatim): all 299 sites kept, exactly the 23 failing genotypes set to ./. (0 left), SYN_S7 no-calls 0 -> 13; sites with F_MISSING>=0.05 rose 59 -> 77, which is why the Skill puts genotype filtering before cohort metrics.",
+        "basic": 36,
+        "specialized": 53,
+        "total": 89,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Genotype filter keeps sites and nulls only failing genotypes",
+            "result": "PASS",
+            "note": "299 sites kept; 23 nulled; 0 failing left"
+          },
+          {
+            "text": "Site -> genotype -> cohort-QC order stated and followed",
+            "result": "PASS",
+            "note": "per SKILL.md"
+          },
+          {
+            "text": "Missingness recomputed after nulling",
+            "result": "PASS",
+            "note": "59 -> 77 sites above 5 %"
+          },
+          {
+            "text": "./. is not treated as 0/0",
+            "result": "PASS",
+            "note": "per-sample ./. counts reported"
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/in4/run.sh (Windows bcftools 1.24, +fill-tags plugin)."
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "End-to-end filter and validation",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Pipeline ran: records 361 -> 299 -> 289, Ti/Tv 1.43 -> 1.72 -> 1.68, known% 67.6 -> 82.4; truth 232/240 true SNPs and 3/60 artifact SNPs kept. The usage-guide allele-balance expression AD[1]/(AD[0]+AD[1]) is rejected (\"FORMAT tag AD can have multiple subfields\"); the FMT/AD[:1] form works (262 records).",
+        "basic": 34,
+        "specialized": 50,
+        "total": 84,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Steps run in the Skill order",
+            "result": "PASS",
+            "note": "site -> genotype -> region -> validation"
+          },
+          {
+            "text": "Before/after Ti/Tv and known% computed with the Skill idioms",
+            "result": "PASS",
+            "note": "bcftools stats TSTV field 5; ID column"
+          },
+          {
+            "text": "Exclusion BED removes the region",
+            "result": "PASS",
+            "note": "10 records in chr2:1-1000 removed"
+          },
+          {
+            "text": "Usage-guide allele-balance filter runs",
+            "result": "FAIL",
+            "note": "bcftools: run as AD[sample:subfield]"
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/in5/run.sh (Windows bcftools 1.24)."
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "GATK filters requested for DeepVariant output",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Output declines, per the Skill. On the DeepVariant-shaped VCF GATK VariantFiltration exits 0 and flags nothing (JEXL \"undefined variable\" warnings); the guarded bcftools expression aborts (\"tag QD is not defined in the VCF header\"). FILTER=PASS + QUAL/GQ kept 285/285 true sites.",
+        "basic": 36,
+        "specialized": 52,
+        "total": 88,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Declines GATK hard filters on DeepVariant output",
+            "result": "PASS",
+            "note": "Site-level method table row"
+          },
+          {
+            "text": "Routes to the caller's FILTER and QUAL/GQ",
+            "result": "PASS",
+            "note": "kept 285/285 true sites"
+          },
+          {
+            "text": "Explains why the annotations are absent or a no-op",
+            "result": "PASS",
+            "note": "matches the JEXL warnings observed"
+          },
+          {
+            "text": "Stays within filtering scope",
+            "result": "PASS",
+            "note": "annotation handed off"
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/in6/run.sh on a SYNTHETIC DeepVariant-shaped VCF (annotations stripped, FILTER=RefCall on low QUAL)."
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Germline filter requested for Mutect2 calls",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Output refuses the germline filter and keeps FilterMutectCalls (--contamination-table and --tumor-segmentation exist in 4.6.1.0). The SKILL.md post-filter `FMT/AF[0]>0.05 && FMT/DP[0]>20` is rejected (AF is Number=A). The minimal fix AF[0:0] tests the first column, the normal, and keeps only the germline het (5500); the tumor-explicit AF[1:0] keeps 5100/5200/5300 (+5500). The Skill never says which column is the tumor.",
+        "basic": 30,
+        "specialized": 44,
+        "total": 74,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Refuses germline hard filters for somatic calls",
+            "result": "PASS",
+            "note": "Somatic track in SKILL.md"
+          },
+          {
+            "text": "FilterMutectCalls flags are valid",
+            "result": "PASS",
+            "note": "--contamination-table, --tumor-segmentation in --help"
+          },
+          {
+            "text": "SKILL.md post-filter expression runs",
+            "result": "FAIL",
+            "note": "Number=A AF needs [sample:subfield]"
+          },
+          {
+            "text": "Post-filter guidance selects the tumor sample",
+            "result": "FAIL",
+            "note": "index 0 is the normal when it is listed first"
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/in7/run.sh: GATK FilterMutectCalls --help (tool not run: needs Mutect2 stats/contamination tables) and bcftools 1.24 on a SYNTHETIC Mutect2-shaped VCF (normal column first)."
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 33.6,
+    "dynamic_weighted": 51.1,
+    "score": 85,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Hard-filter thresholds and the missing-RankSum => PASS rule are right: the guarded bcftools expression reproduced GATK VariantFiltration's PASS set site for site",
+    "Method selection is honest about regimes: the VQSR-on-small-panel warning was borne out (57/60 artifacts kept vs 4/60 with hard filters)",
+    "Site- vs genotype-level ordering, SNP/indel separation and the DeepVariant/somatic escape hatches are explicit and correct",
+    "GATK commands are valid for 4.6.1.0 as written"
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "Shipped filter_variants.sh fails on multi-contig input",
+      "observed_in": [
+        1
+      ],
+      "problem": "bcftools concat without -a aborts (\"chromosome block chr1 is not contiguous\") whenever the SNP and indel files span more than one chromosome, so the script never writes its merged output.",
+      "root_cause": "concat is applied to two position-interleaved, unindexed files.",
+      "fix": "Index both filtered files and use `bcftools concat -a`; verified that the script then produces the same PASS set as GATK."
+    },
+    {
+      "priority": "P1",
+      "title": "Somatic post-filter uses invalid, wrong-sample indexing",
+      "observed_in": [
+        7
+      ],
+      "problem": "`FMT/AF[0]>0.05` is rejected for Number=A AF, and the obvious fix AF[0:0] filters the first sample column, which is the normal in tumor-normal VCFs listing the normal first.",
+      "root_cause": "Sample and subfield indexing were not tested on a two-sample Mutect2 VCF.",
+      "fix": "Use `FMT/AF[T:0]` with T taken from `bcftools query -l` or the ##tumor_sample header (or `bcftools view -s TUMOR` first) and state which column is tested."
+    },
+    {
+      "priority": "P2",
+      "title": "Usage-guide allele-balance expression does not parse",
+      "observed_in": [
+        5
+      ],
+      "problem": "`AD[1]/(AD[0]+AD[1])` is rejected by bcftools 1.21 and 1.24.",
+      "root_cause": "Number=R FORMAT tag indexed without sample:subfield.",
+      "fix": "Write `GT=\"het\" & FMT/AD[:1]/(FMT/AD[:0]+FMT/AD[:1])>0.2 & FMT/AD[:1]/(FMT/AD[:0]+FMT/AD[:1])<0.8`."
+    },
+    {
+      "priority": "P2",
+      "title": "cyvcf2 block is not equivalent to the hard filter",
+      "observed_in": [
+        2
+      ],
+      "problem": "The Python block checks only QUAL/DP/FS/MQ and kept 26/60 artifacts where the bcftools/GATK filter kept 4.",
+      "root_cause": "Presented as the Python counterpart but omits QD, SOR and RankSum terms.",
+      "fix": "Add QD, SOR and None-guarded RankSum checks, or label the block a minimal example."
+    },
+    {
+      "priority": "P2",
+      "title": "Common Errors table misses the Skill's own failure modes",
+      "observed_in": [
+        1,
+        5,
+        7
+      ],
+      "problem": "The concat-contiguity and \"multiple subfields\" errors hit by the Skill's code are not in the table.",
+      "root_cause": "Table written from generic experience rather than running the recipes.",
+      "fix": "Add rows for both errors with the fixes above."
+    }
+  ]
+}

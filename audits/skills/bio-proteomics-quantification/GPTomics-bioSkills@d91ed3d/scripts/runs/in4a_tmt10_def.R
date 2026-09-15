@@ -1,0 +1,13 @@
+.libPaths(c('F:/OpenScience/audit-envs/mass-spec-proteomics-analyst/R-lib', .libPaths()))
+suppressPackageStartupMessages(library(MSnbase))
+cat('MSnbase', as.character(packageVersion('MSnbase')), '| interactive() =', interactive(), '\n')
+print(TMT10)
+write.csv(data.frame(name = reporterNames(TMT10), mz = mz(TMT10)), 'F:/OpenScience/audits/bio-proteomics-quantification/data/tmt10_reporters.csv', row.names = FALSE)
+cat('\n--- makeImpuritiesMatrix(x = 10) exactly as the Skill writes it (default edit = TRUE) ---\n')
+t0 <- Sys.time()
+imp <- tryCatch(makeImpuritiesMatrix(x = 10), error = function(e) { cat('ERROR:', conditionMessage(e), '\n'); NULL })
+cat('returned after', round(as.numeric(Sys.time() - t0, units = 'secs'), 2), 's; class =', class(imp)[1], '\n')
+if (!is.null(imp)) { print(round(imp, 3)); cat('is identity matrix:', isTRUE(all.equal(unname(imp), diag(10))), '\n') }
+cat('\n--- makeImpuritiesMatrix(x = 6, edit = FALSE) for comparison (TMT6 template exists) ---\n')
+print(round(makeImpuritiesMatrix(x = 6, edit = FALSE), 3))
+cat('\nshipped PurityCorrection csv templates:\n'); print(basename(dir(system.file('extdata', package = 'MSnbase'), pattern = 'PurityCorrection', full.names = TRUE)))

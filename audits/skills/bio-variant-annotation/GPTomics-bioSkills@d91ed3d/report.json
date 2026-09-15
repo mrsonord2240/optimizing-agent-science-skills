@@ -1,0 +1,427 @@
+{
+  "meta": {
+    "skill_name": "bio-variant-annotation",
+    "description": "Annotates VCF variants with functional consequences, population frequencies, and pathogenicity scores using bcftools annotate/csq, Ensembl VEP, SnpEff, and ANNOVAR. Use when deciding which annotation engine and version to pin, which transcript set to report on (MANE Select), reconciling HGVS 3'-shifting with VCF left-alignment, NMD status for PVS1, one calibrated predictor for PP3/BP4, or gnomAD grpmax filtering AF instead of a global AF cutoff.",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "execution_note": "Mode A. bcftools 1.24 (MSYS2 native Windows) for annotate/csq/+split-vep; cyvcf2 0.34 and Ensembl VEP 114.2 (bioconda) in micromamba envs inside the WSL 'agents' distro (/tmp); bcftools 1.21 there for Linux cross-checks. VEP ran against the synthetic GFF3/FASTA because no VEP cache is available offline; SnpEff and ANNOVAR were not executed (no database/licence), their commands were checked against the Skill text only. Pejaver 2022 thresholds were checked against the paper (PMC9748256, Table 2) and the VEP pick_order default against VEP 110/114 Config.pm. All variant data SYNTHETIC (data/make_data.py seed 20260911; data/worst_vs_mane.vcf hand-written). Inputs executed: 7/7. Layer-1 avg 35.6/40, Layer-2 avg 50.3/60, assertion pass rate 22/28 (79%). scoring_rubric.md s.5 floor(s) not met for the numeric tier (assertion rate 0.786 < 0.9): grade downgraded one tier.",
+    "evaluator_version": "skill-auditor@1.0",
+    "evaluated_on": "2026-09-11",
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:variant-calling/variant-annotation"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "References are real and correctly cited; REVEL thresholds match Pejaver 2022 Table 2. The statements that SIFT/PolyPhen-2 and raw CADD 'did not reach Supporting' are true only at developer thresholds (calibrated PolyPhen-2 and CADD reach PP3_Moderate) - an overstatement (P2), not fabricated data."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Input 6 (patient pathogenicity question): annotation facts only, ClinVar treated as a lead, classification routed to clinical-interpretation / an accredited laboratory; no diagnosis or advice."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "MANE-first reporting, one calibrated predictor, NMD 50-nt rule and grpmax FAF are sound; the usage-guide rare-variant recipe that clobbers INFO/AF is an implementation defect (P1), not a principled fallacy."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All SKILL.md bcftools/cyvcf2/VEP blocks parse and run (VEP with GFF in place of cache). Two runtime failures in Skill-provided code are recorded as P1: bcftools csq without --phase on unphased calls, and annotate recipes that stream an unindexed target into 'bcftools annotate -a <vcf>' (fails on bcftools 1.21 and 1.24)."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 85,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 10,
+        "max": 12,
+        "note": "Covers engines, transcript sets, MANE, NMD, predictors and grpmax FAF. Correctness 2/4: csq command fails on unphased data; the usage-guide Basic/Clinical/Rare pipelines and the example's gnomAD branch pipe an unindexed stream into annotate -a <VCF>, which bcftools rejects; the Rare recipe overwrites the cohort's INFO/AF; '--pick defaults are canonical, biotype, rank, length, accession' is outdated for the pinned VEP 110+ (default pick_order starts mane_select, mane_plus_clinical)."
+      },
+      "reliability": {
+        "score": 9,
+        "max": 12,
+        "note": "Good symptom/cause/fix table (build mismatch, chr naming, MANE migration); runtime failures above are not anticipated."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "188-line SKILL.md; usage guide (329 lines) carries the bcftools recipes."
+      },
+      "agent_usability": {
+        "score": 14,
+        "max": 16,
+        "note": "Governing principle (annotation is a tuple, pin every axis) is excellent; recommends MANE Plus Clinical but its --pick_order example omits mane_plus_clinical."
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Natural prompts ('why do VEP and SnpEff disagree') in the usage guide."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "Public database downloads only; no credentials."
+      },
+      "maintainability": {
+        "score": 9,
+        "max": 12,
+        "note": "Example script's optional branch broken; no test data."
+      },
+      "agent_specific": {
+        "score": 18,
+        "max": 20,
+        "note": "Precise trigger; explicit 'Not for ACMG combining rules or final classification' handoff."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 85.9,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 22,
+      "total": 28
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "rsID + grpmax FAF + ClinVar + bcftools csq triage",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Annotation with indexed intermediates worked (ClinVar significance carried with CLNREVSTAT). 'bcftools csq -f -g in.vcf.gz' as written exits on the first unphased het; with -p a it ran but treated all hets as cis, folding the last-exon stop (1466) into the 1420 frameshift. Shipped examples/annotate_vcf.sh: dbSNP-only branch OK, gnomAD branch fails ('not compressed with bgzip') on Windows 1.24 and Linux 1.21.",
+        "basic": 32,
+        "specialized": 46,
+        "total": 78,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "rsID, grpmax FAF and ClinVar (with review status) are attached to normalized records",
+            "result": "PASS",
+            "note": "12/12 records annotated as expected"
+          },
+          {
+            "text": "The consequence command runs as the Skill writes it",
+            "result": "FAIL",
+            "note": "csq needs --phase for unphased genotypes"
+          },
+          {
+            "text": "The shipped example runs in both of its modes",
+            "result": "FAIL",
+            "note": "GNOMAD_VCF branch exits 255/127"
+          },
+          {
+            "text": "Triage list contains the coding/splice variants",
+            "result": "PASS",
+            "note": "1026, 1041, 1101, 1231, 1420 (1466 merged into 1420 by -p a)"
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/in1/run.sh (bcftools 1.24); example rerun on Linux with the upstream LF bytes (linux_example.out)."
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Parse VEP CSQ on the MANE block",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "SKILL.md cyvcf2 parser ran unmodified and returned the MANE-block consequence (stop_gained, missense) where the legacy first-block script reported intron/splice_region; +split-vep CLI agreed.",
+        "basic": 38,
+        "specialized": 54,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The Skill's CSQ parser runs unmodified",
+            "result": "PASS",
+            "note": "header Format parsed; 2 + 13 records printed"
+          },
+          {
+            "text": "The MANE block is reported instead of the first or worst block",
+            "result": "PASS",
+            "note": "chr1:1231 stop_gained, not intron_variant"
+          },
+          {
+            "text": "The CLI alternative works",
+            "result": "PASS",
+            "note": "+split-vep -s worst / -i MANE_SELECT!=\"\""
+          },
+          {
+            "text": "IMPACT is used as triage, not evidence",
+            "result": "PASS",
+            "note": "stated per SKILL.md"
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/in2/parse_csq.py (cyvcf2 0.34, WSL); +split-vep on bcftools 1.24."
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Usage-guide rare-variant recipe on a VCF with its own INFO/AF",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "'annotate -c INFO/AF' left the cohort AF (0.5) on the 5 gnomAD-absent records, so 'INFO/AF<0.01 || INFO/AF=\".\"' dropped them - including ClinVar P/LP leads 1231 and 1101 and the frameshift; csq then failed on phase. SKILL.md's own FAF rule with a renamed tag (-c INFO/gnomAD_FAF:=INFO/fafmax_faf95_max) kept all 6 rare/absent records.",
+        "basic": 33,
+        "specialized": 47,
+        "total": 80,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The recipe runs end to end as written",
+            "result": "FAIL",
+            "note": "csq exits on unphased hets"
+          },
+          {
+            "text": "Variants absent from gnomAD are kept as the recipe intends",
+            "result": "FAIL",
+            "note": "cohort AF survives the annotate step; 5 records lost"
+          },
+          {
+            "text": "SKILL.md's grpmax-FAF rule, applied with a non-clobbering tag, recovers them",
+            "result": "PASS",
+            "note": "500, 1073, 1101, 1231, 1420, 1466 kept"
+          },
+          {
+            "text": "Output states that 'absent' is not 'never seen in humans'",
+            "result": "PASS",
+            "note": "callability caveat from SKILL.md"
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/in3/run.sh (bcftools 1.24)."
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "One calibrated predictor instead of four",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Following the Skill: REVEL 0.70 -> PP3_Supporting only; SIFT/PolyPhen not counted (inside REVEL), CADD not used for missense PP3. REVEL cutoffs match Pejaver 2022 Table 2. The Skill's claims that SIFT/PolyPhen-2 and raw CADD never reach Supporting are wrong at calibrated thresholds (PolyPhen-2 PP3 >=0.978/>=0.999, CADD PP3 [25.3,28.1)/>=28.1).",
+        "basic": 36,
+        "specialized": 50,
+        "total": 86,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Exactly one calibrated missense predictor is applied",
+            "result": "PASS",
+            "note": "REVEL"
+          },
+          {
+            "text": "REVEL thresholds match the calibration paper",
+            "result": "PASS",
+            "note": "0.290 / 0.644 / 0.773 / 0.932 / 0.016"
+          },
+          {
+            "text": "Correlated-predictor stacking is explained",
+            "result": "PASS",
+            "note": "SIFT/PolyPhen are REVEL components"
+          },
+          {
+            "text": "Statements about SIFT, PolyPhen-2 and CADD calibration are accurate",
+            "result": "FAIL",
+            "note": "true only at developer thresholds"
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/in4/pp3.py (Windows venv Python 3.12); thresholds cross-checked against PMC9748256 Table 2."
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Complete VEP pipeline (MANE, pick_order, review filter)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Pipeline flags accepted by VEP 114.2 (cache flags swapped for --gff/--fasta). VEP annotated the phased 1041/1043 atoms as two synonymous changes (p.Leu11=) while the haplotype is missense, so the HIGH/MODERATE review file drops the true missense - the MNV trap the Skill warns about. HGVS came from the engine (c.211del). VEP's own default pick_order already starts mane_select, mane_plus_clinical.",
+        "basic": 35,
+        "specialized": 50,
+        "total": 85,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The Skill's VEP flags (--everything --mane_select --pick --pick_order ...) are accepted",
+            "result": "PASS",
+            "note": "exit 0 on VEP 114.2"
+          },
+          {
+            "text": "HGVS is taken from the engine, not derived from POS",
+            "result": "PASS",
+            "note": "SYNT1:c.211del p.Thr71ArgfsTer41"
+          },
+          {
+            "text": "The MNV misannotation risk is surfaced",
+            "result": "PASS",
+            "note": "VEP synonymous x2 vs csq L11F"
+          },
+          {
+            "text": "The Skill's description of --pick defaults matches the pinned VEP",
+            "result": "FAIL",
+            "note": "VEP 110/114 default pick_order = mane_select, mane_plus_clinical, canonical, ..."
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/in5/run.sh, VEP 114.2 + bcftools 1.21 in WSL; --cache/--offline/--dir_cache/--assembly replaced by --gff genes.gff3.gz --fasta ref.fa."
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "'Is my patient's stop_gained pathogenic?'",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Answered within scope: MANE consequence p.Gln41Ter in exon 2/3, PTC 69 nt upstream of the last junction (NMD predicted), synthetic ClinVar 3-star lead, PVS1 depends on LOF mechanism; classification and any patient communication routed to clinical-interpretation and an accredited clinical laboratory.",
+        "basic": 37,
+        "specialized": 52,
+        "total": 89,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "No pathogenicity classification or patient advice is given",
+            "result": "PASS",
+            "note": "defers per 'Not for ACMG combining rules or final classification'"
+          },
+          {
+            "text": "The NMD 50-nt / last-exon rule is applied correctly",
+            "result": "PASS",
+            "note": "1231 NMD, 1466 escapes"
+          },
+          {
+            "text": "ClinVar is treated as a lead with its review status",
+            "result": "PASS",
+            "note": "reviewed_by_expert_panel shown"
+          },
+          {
+            "text": "A human/clinical handoff is named",
+            "result": "PASS",
+            "note": "accredited lab / clinical-interpretation"
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/in6/nmd.py (NMD 50-55 nt rule on the synthetic gene model)."
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "'Use worst consequence and call every HIGH PVS1'",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Declined: worst-consequence turned a MANE-intronic variant into a HIGH splice_donor via a minor isoform (chr1:3000), and the HIGH stop_gained at 3500 sits in the last exon (9/9, NMD escape). Also declined stacking SIFT+PolyPhen+CADD+REVEL as four PP3 lines.",
+        "basic": 38,
+        "specialized": 53,
+        "total": 91,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Refuses to equate HIGH impact with PVS1",
+            "result": "PASS",
+            "note": "cites NMD and LOF mechanism"
+          },
+          {
+            "text": "Demonstrates worst-consequence inflation against MANE",
+            "result": "PASS",
+            "note": "3000: splice_donor (minor) vs intron (MANE)"
+          },
+          {
+            "text": "Flags last-exon PTCs as NMD-escaping",
+            "result": "PASS",
+            "note": "3500 exon 9/9"
+          },
+          {
+            "text": "Refuses predictor stacking",
+            "result": "PASS",
+            "note": "one calibrated tool per evidence type"
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/in7 (+split-vep on hand-written SYNTHETIC data/worst_vs_mane.vcf, bcftools 1.24)."
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 34.0,
+    "dynamic_weighted": 51.5,
+    "score": 86,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Governing principle - a consequence belongs to (variant, transcript, engine, version, parameters) - makes an agent pin and record every axis",
+    "MANE-first reporting, NMD 50-nt rule and worst-consequence dangers all reproduced on data",
+    "One-calibrated-predictor rule with REVEL thresholds that match Pejaver 2022 Table 2",
+    "Clean research boundary: 'Not for ACMG combining rules or final classification', held under a patient-level question"
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "Piped annotate recipes fail in bcftools",
+      "observed_in": [
+        1
+      ],
+      "problem": "usage-guide Basic/Clinical/Rare pipelines and the example's gnomAD branch stream an unindexed target into 'bcftools annotate -a <vcf>', which bcftools 1.21 and 1.24 reject.",
+      "root_cause": "annotate with a VCF annotation file needs an indexed target; the recipes were not run.",
+      "fix": "Write each annotate step to an indexed -Oz file (or use a tab-delimited annotation source) and fix examples/annotate_vcf.sh accordingly."
+    },
+    {
+      "priority": "P1",
+      "title": "bcftools csq commands lack --phase",
+      "observed_in": [
+        1,
+        3
+      ],
+      "problem": "Every csq command exits on unphased heterozygous genotypes.",
+      "root_cause": "csq defaults to -p r (require phased).",
+      "fix": "Use -p a|m|s explicitly and explain that -p a assumes cis for all hets (it merged a frameshift and a last-exon stop in Input 1)."
+    },
+    {
+      "priority": "P1",
+      "title": "Rare-variant recipe clobbers the cohort INFO/AF",
+      "observed_in": [
+        3
+      ],
+      "problem": "'annotate -c INFO/AF' keeps the cohort AF where gnomAD has no record, so the 'absent' guard never fires and absent variants (incl. ClinVar P/LP leads) are dropped.",
+      "root_cause": "Source and target share the tag name; unmatched records keep their own value.",
+      "fix": "Annotate into a new tag (-c INFO/gnomAD_FAF:=INFO/fafmax_faf95_max) and filter on it, as SKILL.md's grpmax-FAF section implies."
+    },
+    {
+      "priority": "P2",
+      "title": "--pick default description outdated; pick_order drops MANE Plus Clinical",
+      "observed_in": [
+        5
+      ],
+      "problem": "VEP 110+ default pick_order already starts mane_select, mane_plus_clinical; the Skill's recommended --pick_order omits mane_plus_clinical.",
+      "root_cause": "Text reflects pre-MANE VEP releases.",
+      "fix": "Describe the current default and use --pick_order mane_select,mane_plus_clinical,canonical,..."
+    },
+    {
+      "priority": "P2",
+      "title": "Overstated SIFT/PolyPhen/CADD calibration claims",
+      "observed_in": [
+        4
+      ],
+      "problem": "Skill says these never reach PP3_Supporting; Pejaver 2022 Table 2 gives PolyPhen-2 and CADD PP3_Supporting/Moderate at calibrated thresholds.",
+      "root_cause": "Developer-threshold results were generalised.",
+      "fix": "Say 'at developer-recommended thresholds' and point to the calibrated intervals."
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+.libPaths(c('F:/OpenScience/audit-envs/mass-spec-proteomics-analyst/R-lib', .libPaths()))
+suppressPackageStartupMessages(library(MSnbase))
+print(body(makeImpuritiesMatrix))
+m <- makeImpuritiesMatrix(x = 10, edit = FALSE)
+cat('edit=FALSE returns immediately; identity?', isTRUE(all.equal(unname(m), diag(10))), '\n'); print(dimnames(m))

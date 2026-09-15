@@ -28,10 +28,12 @@ Fixes worth sending back go upstream as pull requests from a fork of the origina
 | Path | What |
 | --- | --- |
 | `skills/<upstream>/` | Fixed Skill trees, one directory per upstream source, with `UPSTREAM.json` and the upstream `LICENSE` |
-| `audits/<skill-id>/<owner>-<repo>@<sha7>/` | `report.json`, `viewer.md`, `record.json`, `fixes.md`, and the scripts the auditor ran |
+| `audits/skills/<skill-id>/<owner>-<repo>@<sha7>/` | `report.json`, `viewer.md`, `record.json`, `fixes.md`, and the scripts the auditor ran |
+| `audits/specialists/<id>/` | The candidate's `AUDIT.md` and its viability verdict |
 | `fixes/<skill-id>.md` | What changed, why, and how it was verified, per fix pass |
 | `process/` | The briefs agents follow, and the viability gates |
-| `tools/` | Publishing and indexing scripts |
+| `tools/` | `publish_audits.py`, which writes audit records into `audits/` |
+| `scripts/` | `audit-index.mjs`, which generates `audits/INDEX.md` and `BACKLOG.md` (`npm run audits:index`) |
 | `environments/` | How each candidate's runtime was built: interpreters, packages, command-line tools and versions |
 
 ## What is deliberately not here

@@ -1,0 +1,414 @@
+{
+  "meta": {
+    "skill_name": "bio-variant-normalization",
+    "description": "Left-align and trim indels to parsimonious canonical form, decompose MNPs (atomize), and split multiallelic variants with bcftools norm. Use when comparing variants across callers or cohorts, preparing a VCF for database annotation or ClinVar/dbSNP matching, merging VCFs, reconciling vt-vs-bcftools representation discordance, or resolving the VCF-left-align vs HGVS-3'-rule clash.",
+    "evaluated_on": "2026-09-15",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Moderate",
+    "n_inputs": 7,
+    "source": "mrsonord2240/bioSkills@c1237cdbc9bb199947696f3909de26a55d259116:variant-calling/variant-normalization",
+    "executed": 7,
+    "execution_note": "Re-audit of the fixed Skill (fork commit c1237cdb). Mode A. Windows bcftools 1.24 (MSYS2); WSL agents distro: bcftools 1.21, vt, cyvcf2 0.34.0. Data SYNTHETIC (data/make_data.py, seed 20260911; edge_multiallelic*.vcf hand-written; runs/in7/mixed.vcf written for input 7). Only in4/in5 pre-fix scripts were kept, so inputs 1-4 were rebuilt from the pre-fix viewer with the post-fix commands (runs/p_in1..p_in5); inputs 6 and 7 are new (runs/in6, runs/in7). Phase-mode semantics checked against 'bcftools csq' help on 1.24 and 1.21. n_inputs 7 = 5 regression + 2 new. Inputs executed: 7/7.",
+    "re_audit": {
+      "pre_fix_score": 86,
+      "pre_fix_grade": "Limited Release",
+      "pre_fix_report": "F:/OpenScience/audits/_pre-fix-20260915/bio-variant-normalization/",
+      "fix_log": "F:/OpenScience/specialist-src/round2/fixes/bio-variant-normalization.md",
+      "regression_inputs": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "new_inputs": [
+        6,
+        7
+      ]
+    }
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated values; Tan 2015 is the correct reference for the normal form."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Representation and matching only; ClinVar assertions reported as leads with review status."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Order of operations, reference matching and the decompose-vs-annotate tension verified on data."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All bcftools, vt and cyvcf2 code and the shipped example ran; failures on the REF-mismatch file are the documented -c e behaviour."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 88,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 11,
+        "max": 12,
+        "note": "Split -> atomize -> left-align now emits no spurious ALT=* records (callerA, callerB, edge file); the single-pass -m-any --atomize claim, the -m-both/-m+both table and --old-rec-tag were verified. One error introduced by the fix: the csq caveat says -p m merges only where phase is known and -p s treats unphased hets as separate haplotypes; bcftools 1.21/1.24 help and runs show m merges all GTs and s skips unphased hets."
+      },
+      "reliability": {
+        "score": 10,
+        "max": 12,
+        "note": "Example REF pre-check stops with a clear count and inspection command; Common Errors gained the atomize-order and unphased-het rows. The 'Before Database Annotation' block still writes a non-BGZF empty file on a REF mismatch and the index error that follows is misleading."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "298-line SKILL.md; usage guide partly duplicates it."
+      },
+      "agent_usability": {
+        "score": 14,
+        "max": 16,
+        "note": "Clear ordering rule with its reason; the wrong -p m/-p s wording is the one misleading sentence."
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Natural trigger phrases."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "Nothing sensitive."
+      },
+      "maintainability": {
+        "score": 10,
+        "max": 12,
+        "note": "Example no longer hides stderr and runs; no test data ships."
+      },
+      "agent_specific": {
+        "score": 18,
+        "max": 20,
+        "note": "Precise trigger and hand-offs to annotation and clinical-interpretation."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 89.9,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 26,
+      "total": 28
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Normalize GATK and FreeBayes calls and compare (regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "REF check finds chr1:4000; callerB aborts under default -c e as the Skill says, then -c x. ALT=* records 0 in both normalized files (pre-fix: two A>* rows). isec normalized: private A 2 (1420, 1466), private B 0, shared 10; raw isec 6/4/5. Re-normalizing changes 0 records.",
+        "executed": true,
+        "execution_note": "runs/p_in1/run.sh (Windows bcftools 1.24), post-fix 'Full Normalization for Caller Comparison' verbatim.",
+        "basic": 37,
+        "specialized": 54,
+        "total": 91,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Normalized files contain only real records",
+            "result": "PASS",
+            "note": "0 ALT=* records"
+          },
+          {
+            "text": "Representation-only discordance disappears",
+            "result": "PASS",
+            "note": "private B 6/4/5 raw -> 2/0/10"
+          },
+          {
+            "text": "REF mismatch surfaced, not silently fixed",
+            "result": "PASS",
+            "note": "-c w lists chr1:4000; -c e aborts"
+          },
+          {
+            "text": "Normalization is idempotent",
+            "result": "PASS",
+            "note": "0 changed records"
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Homopolymer deletion 'not in ClinVar' (regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Raw chr1:506 AA>A unmatched; after the post-fix block (with -c x after inspecting the mismatch) it is 500 GA>G rs900000001 Pathogenic (2-star). Verbatim block on the mismatch file: last step exit 127, 0 records written.",
+        "executed": true,
+        "execution_note": "runs/p_in2/run.sh (Windows bcftools 1.24), post-fix 'Before Database Annotation' block.",
+        "basic": 37,
+        "specialized": 54,
+        "total": 91,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Raw annotation misses the canonical ClinVar record",
+            "result": "PASS",
+            "note": "506 AA>A unmatched"
+          },
+          {
+            "text": "Normalized annotation finds it",
+            "result": "PASS",
+            "note": "500 GA>G Pathogenic"
+          },
+          {
+            "text": "Multiallelic conflict assigned to the right ALT",
+            "result": "PASS",
+            "note": "Conflicting on A>G only"
+          },
+          {
+            "text": "Review status carried with the assertion",
+            "result": "PASS",
+            "note": "CLNREVSTAT reported"
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Split with per-ALT INFO and rejoin (regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Unchanged text; identical results: Number=. XAF carried whole, Number=A subset; -m+any rejoin loses the 1/2 PL; --keep-sum AD works.",
+        "executed": true,
+        "execution_note": "runs/p_in3/run.sh (Windows bcftools 1.24).",
+        "basic": 38,
+        "specialized": 55,
+        "total": 93,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Number=. trap demonstrated",
+            "result": "PASS",
+            "note": "XAF=0.1,0.2 on both records"
+          },
+          {
+            "text": "Number=A field subset correctly",
+            "result": "PASS",
+            "note": "0.1 / 0.2"
+          },
+          {
+            "text": "Rejoin limits stated",
+            "result": "PASS",
+            "note": "PL for 1/2 not recoverable"
+          },
+          {
+            "text": "--keep-sum AD behaves as documented",
+            "result": "PASS",
+            "note": "summed ref depth"
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Reconcile vt and bcftools cohorts; shipped example (regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "vt 10 vs bcftools 9 records; private 1041 C>T, 1043 A>C vs 1041 CTA>TTC; after the post-fix pipeline on both: 0/0/10. Example: callerA 12/12, 'Extra records from atomization: 0' (pre-fix: 2 phantom * rows); callerB exits 1 with 'Error: 1 REF allele(s) do not match'; edge file 2 records, no *.",
+        "executed": true,
+        "execution_note": "runs/p_in4/run.sh in WSL (vt, bcftools 1.21) and run_win.sh (Windows bcftools 1.24, example from the fork commit).",
+        "basic": 37,
+        "specialized": 55,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "vt vs bcftools MNP discordance reproduced",
+            "result": "PASS",
+            "note": "1041 MNP vs atoms"
+          },
+          {
+            "text": "Post-fix pipeline reconciles both cohorts",
+            "result": "PASS",
+            "note": "0/0/10"
+          },
+          {
+            "text": "Shipped example diagnoses atomization correctly",
+            "result": "PASS",
+            "note": "0 extra on an MNP-free file; no * rows"
+          },
+          {
+            "text": "Example reports REF mismatch clearly",
+            "result": "PASS",
+            "note": "count plus inspection command, exit 1"
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Count, matching vs annotation copies, codon, HGVS (regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "cyvcf2 block: 9 total, 2 needing normalization (lower bound; bcftools realigns 2 more). csq -p a on the un-atomized copy: 1041 CTA>TTC missense 11L>11F; on the atomized copy the atoms are merged back (@1041). -p s on the atomized copy returned no consequence for every unphased het, contradicting the Skill's 'separate haplotypes' wording.",
+        "executed": true,
+        "execution_note": "runs/p_in5/run_csq.sh (Windows bcftools 1.24) and run_wsl.sh (cyvcf2 0.34.0).",
+        "basic": 35,
+        "specialized": 50,
+        "total": 85,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "cyvcf2 count presented as a lower bound",
+            "result": "PASS",
+            "note": "2 vs bcftools realigned 2 more"
+          },
+          {
+            "text": "Matching and annotation copies produced as advised",
+            "result": "PASS",
+            "note": "atomized vs un-atomized"
+          },
+          {
+            "text": "Prescribed csq step runs as described",
+            "result": "PASS",
+            "note": "-p a exit 0; 11L>11F"
+          },
+          {
+            "text": "Phase-mode description matches bcftools behaviour",
+            "result": "FAIL",
+            "note": "-p s skipped unphased hets (help: 'skip unphased hets')"
+          }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Variant A",
+        "label": "NEW: single-pass norm vs three-step pipeline; REF error",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Single-pass 'norm -f ref -m-any --atomize -c x' equals the three-step pipeline on callerA (12), callerB (10) and the edge file (2): 0 differing lines, 0 ALT=*. The verbatim 'Before Database Annotation' block on callerB reports 'Reference allele mismatch at chr1:4000', then leaves a 0-record non-BGZF for_annotation.vcf.gz; 'bcftools index' fails with 'not BGZF compressed'.",
+        "executed": true,
+        "execution_note": "runs/in6/run.sh (Windows bcftools 1.24).",
+        "basic": 35,
+        "specialized": 51,
+        "total": 86,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Single-pass command equals the three-step pipeline",
+            "result": "PASS",
+            "note": "0 differing lines on 3 files"
+          },
+          {
+            "text": "Neither form emits spurious ALT=* records",
+            "result": "PASS",
+            "note": "0"
+          },
+          {
+            "text": "REF mismatch reported with its position",
+            "result": "PASS",
+            "note": "chr1:4000 REF_SEQ C vs VCF T"
+          },
+          {
+            "text": "Workflow block avoids leaving an unusable output file",
+            "result": "FAIL",
+            "note": "0-record non-BGZF file; misleading index error"
+          }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Edge",
+        "label": "NEW: -m-both/-m+both for a SNP and indel at one position",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Split: -m-any, -m-both, -m-snps and -m-indels give identical records for a mixed A>C,AT,G site. Join: -m+any makes G>T,GA,C; -m+both makes G>T,C and a separate G>GA, as the post-fix table says. --old-rec-tag ORIGINAL traces 1041/1043 back to CTA>TTC.",
+        "executed": true,
+        "execution_note": "runs/in7/run.sh (Windows bcftools 1.24) on a hand-written SYNTHETIC VCF.",
+        "basic": 37,
+        "specialized": 54,
+        "total": 91,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "-m-both identical to -m-any when splitting",
+            "result": "PASS",
+            "note": "same records"
+          },
+          {
+            "text": "-m+both keeps SNPs and indels in separate records",
+            "result": "PASS",
+            "note": "G>T,C and G>GA"
+          },
+          {
+            "text": "Type string matters only when joining",
+            "result": "PASS",
+            "note": "all split variants identical"
+          },
+          {
+            "text": "--old-rec-tag keeps a trace of the MNP",
+            "result": "PASS",
+            "note": "ORIGINAL=chr1|1041|CTA|TTC"
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 35.2,
+    "dynamic_weighted": 53.9,
+    "score": 89,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Normal-form definition and the silent-miss mechanism are exact and were demonstrated (homopolymer deletion found in ClinVar only after normalization)",
+    "The pre-fix P1 is fixed and verified: splitting before atomizing removes the spurious ALT=* records, and the single-pass form was confirmed equivalent",
+    "The example now stops with a clear REF-mismatch message and reports zero atomization artifacts on MNP-free input"
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "csq --phase m and s described wrongly",
+      "observed_in": [
+        5
+      ],
+      "problem": "The caveat says -p m merges only where phase is known and -p s treats unphased hets as separate haplotypes; bcftools 1.21/1.24 help: m merges all GTs into a single haplotype, s skips unphased hets (no consequence emitted in the run).",
+      "root_cause": "Mode semantics were paraphrased, not copied from 'bcftools csq' help.",
+      "fix": "Replace with the help text (a = GTs as is, 0/1 -> 0|1; m = merge all GTs; r = require phase; s = skip unphased hets) and recommend -p a for phased input."
+    },
+    {
+      "priority": "P2",
+      "title": "Database-annotation block leaves an empty file on REF error",
+      "observed_in": [
+        2,
+        6
+      ],
+      "problem": "On a REF mismatch the last pipe step aborts after creating a 0-record non-BGZF file; the next 'bcftools index' fails with 'not BGZF compressed', hiding the real cause.",
+      "root_cause": "The workflow blocks omit the REF pre-check the example now has.",
+      "fix": "Add `set -o pipefail` and a `bcftools norm -f ref.fa -c w` pre-check (or the example's MISMATCH count) before the pipeline."
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "name": "optimizing-agent-science-skills",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "audits:check": "node scripts/audit-index.mjs --check",
+    "audits:index": "node scripts/audit-index.mjs",
+    "test": "node --test \"test/**/*.test.mjs\""
+  }
+}

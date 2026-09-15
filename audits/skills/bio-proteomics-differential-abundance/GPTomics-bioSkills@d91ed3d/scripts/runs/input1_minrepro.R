@@ -1,0 +1,21 @@
+.libPaths(c('F:/OpenScience/audit-envs/mass-spec-proteomics-analyst/R-lib', .libPaths()))
+# Independent minimal reproduction of the input1 eBayes(trend=TRUE) failure on an LFQ matrix with NAs.
+suppressPackageStartupMessages(library(limma))
+grp <- factor(rep(c('Control', 'Treatment'), each = 4))
+d <- model.matrix(~0 + grp); colnames(d) <- levels(grp)
+try_patterns <- function(label, edit) {
+  set.seed(3)
+  m <- matrix(rnorm(500 * 8, 24, 0.4), ncol = 8)
+  m <- edit(m)
+  f <- suppressWarnings(contrasts.fit(lmFit(m, d), makeContrasts(Treatment - Control, levels = d)))
+  r <- tryCatch({ eBayes(f, trend = TRUE, robust = TRUE); 'OK' }, error = function(e) paste('ERROR:', conditionMessage(e)))
+  r2 <- tryCatch({ eBayes(f, trend = FALSE, robust = TRUE); 'OK' }, error = function(e) paste('ERROR:', conditionMessage(e)))
+  cat(sprintf('%-62s trend=TRUE: %-40s trend=FALSE: %s\n', label, r, r2))
+}
+try_patterns('1 on/off row (4 C obs, 0 T obs; df=3)', function(m) { m[1, 5:8] <- NA; m })
+try_patterns('1 row with 1 C obs + 1 T obs (df=0, contrast estimable)', function(m) { m[1, c(2:4, 6:8)] <- NA; m })
+try_patterns('1 row with 1 C obs only (df=0, contrast NA)', function(m) { m[1, c(2:8)] <- NA; m })
+try_patterns('1 row with 2 C obs only (df=1, contrast NA)', function(m) { m[1, c(3:8)] <- NA; m })
+try_patterns('1 row all NA', function(m) { m[1, ] <- NA; m })
+try_patterns('mixed: unequal df (some rows 2 NA) + 1 on/off', function(m) { m[2:50, c(1, 5)] <- NA; m[1, 5:8] <- NA; m })
+try_patterns('mixed: unequal df + 1 row with 1 C obs only', function(m) { m[2:50, c(1, 5)] <- NA; m[1, 2:8] <- NA; m })

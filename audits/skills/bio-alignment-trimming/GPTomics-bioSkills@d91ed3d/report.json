@@ -1,0 +1,344 @@
+{
+  "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:alignment/alignment-trimming",
+  "meta": {
+    "skill_name": "bio-alignment-trimming",
+    "description": "Trim multiple sequence alignments using ClipKIT, trimAl, BMGE, Divvier, or HMMcleaner with mode selection guidance per downstream goal. Use when removing unreliable columns or contaminating residues before phylogenetic inference, HMM building, or selection analysis.",
+    "evaluated_on": "2026-09-15",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:alignment/alignment-trimming",
+    "executed": "7/7 inputs executed (ClipKIT 2.14.0, trimAl 1.4.1, BMGE 1.12 and 2.0, MACSE 2.07, IQ-TREE 2.4.0, PAML codeml 4.10.10, Biopython 1.88, DendroPy 5.0.13); partial tool coverage in inputs 4-6",
+    "execution_note": "All alignments are SYNTHETIC (IQ-TREE AliSim with indels from known trees, aligned with MAFFT L-INS-i; data/make_data.py) plus 10 replicate genes for an accuracy check. Not executable on this Windows machine and checked against documentation only: trimAl 1.5.1 release binary (fails to load), Divvier, HMMcleaner, Gblocks, T-Coffee/TCS, HMMER hmmbuild; PhyIN phyin.py was downloaded but the Skill's flags do not exist. Skill commands that failed (ClipKIT --output-format, BMGE commands on 2.0, examples/bmge_trim.py on 2.0, trimal_modes.py without trimal on PATH) are recorded verbatim and adapted."
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No output fabricated data, statistics or citations; all numbers came from runs on synthetic data. The Skill's own ClipKIT issue citations (#71, #88) are unverifiable and were flagged in Input 3 rather than repeated."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Pure research alignment processing; nothing diagnoses, prescribes or triages an individual."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Outputs kept trimmed-vs-untrimmed sensitivity analyses, refused support-driven over-trimming (Input 7), did not column-trim branch-site input (Input 6) and corrected the Skill's residue-level TCS filter; no methodological fallacy remained in any delivered output."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All delivered code ran. Skill commands with wrong flags (ClipKIT --output-format, BMGE 2.0 -h/-t DNA) fail with clear errors or no output and were adapted per the Skill's introspect-and-adapt rule; shipped examples compile and run with the documented tool versions. Recorded as P1 correctness defects rather than unrunnable code."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 70,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 7,
+        "max": 12,
+        "note": "Completeness 3, correctness 1, appropriateness 3. Broad goal-driven coverage, but ClipKIT --output-format, Gblocks -b1=50%/-b2=85%, PhyIN -o/-w/-t, HMMcleaner --no-large-remove and TCS +keep (residues, not columns) are wrong; BMGE commands only work on 1.12; codeml '!' and MACSE export claims fail when run; ClipKIT issues #71/#88 do not document what is claimed."
+      },
+      "reliability": {
+        "score": 7,
+        "max": 12,
+        "note": "Common Errors table and introspect-and-adapt rule; no output-exists check (BMGE 2.0 exits 0 with no file), no warning that trimming a concatenation invalidates partition charsets."
+      },
+      "performance_context": {
+        "score": 5,
+        "max": 8,
+        "note": "310-line SKILL.md loads TCS, MACSE, PhyIN, Gblocks and HMMcleaner detail up front; no references/ split."
+      },
+      "agent_usability": {
+        "score": 11,
+        "max": 16,
+        "note": "Clear decision tables and strong pitfalls (kpic on unbalanced data, no trimming before selection tests); inconsistent thresholds (20%/40% rule vs 0.7 cap vs '20-30%'), recommended kpic-smart-gap default breaks its own 40% rule, -strictplus recommended for trees though trimAl marks it NJ-optimized."
+      },
+      "human_usability": {
+        "score": 6,
+        "max": 8,
+        "note": "Usage guide has natural example prompts; description is tool-name heavy; handles off-spec goals by routing."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "Local tools only, list-form subprocess with no shell or eval; no validation of alignment type or format before trimming."
+      },
+      "maintainability": {
+        "score": 8,
+        "max": 12,
+        "note": "One example per tool, but no test data or expected output; examples assume BMGE.jar in cwd and trimal/divvier on PATH."
+      },
+      "agent_specific": {
+        "score": 15,
+        "max": 20,
+        "note": "Precise trigger (4); progressive disclosure 2 (monolithic); composability 3 via related-skill routing; idempotency 3; escape hatches 3 (do not trim selection input or short genes)."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 79.0,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 23,
+      "total": 34
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Single 15-taxon protein gene: smart-gap, --log, sensitivity trees",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "82.1% retained; RF(untrimmed, trimmed) = 0 and both RF 0 to the true tree; --log is space-separated, not tab-separated as described",
+        "basic": 35,
+        "specialized": 51,
+        "total": 86,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "Output selects ClipKIT smart-gap for single-gene tree input", "result": "PASS", "note": "Goal table and decision tree followed"},
+          {"text": "Output computes retention and checks it against the 0.7 cap", "result": "PASS", "note": "339/413 = 82.1% via the Skill's trimming_fraction()"},
+          {"text": "Output builds and compares trimmed and untrimmed trees", "result": "PASS", "note": "RF 0 between them; both RF 0 to truth"},
+          {"text": "ClipKIT --log output has the tab-separated format the Skill describes", "result": "FAIL", "note": "0/413 rows tab-separated; space-separated with class names"},
+          {"text": "Delivered code runs", "result": "PASS", "note": "exit 0 for ClipKIT, IQ-TREE and report script"}
+        ],
+        "executed": true,
+        "execution_note": "clipkit -m smart-gap --log, two iqtree2 -m MFP -B 1000 -T 4 runs and in1_report.py all ran on SYNTHETIC prot15."
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "20-locus DNA supermatrix: kpic-smart-gap, BMGE, PHYLIP output",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Skill's --output-format command exits 2; BMGE DNA command writes nothing on BMGE 2.0; original charsets fail on the trimmed concatenation; all trees RF 0 to truth",
+        "basic": 30,
+        "specialized": 42,
+        "total": 72,
+        "assertions_passed": 2,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "Skill's ClipKIT PHYLIP-output command runs as written", "result": "FAIL", "note": "unrecognized arguments: --output-format phylip (exit 2); -of works"},
+          {"text": "Skill's BMGE DNA command produces an alignment on both installed BMGE versions", "result": "FAIL", "note": "1.12 OK (86.9%); 2.0 prints help, exit 0, no file"},
+          {"text": "Skill warns that trimming a concatenated matrix invalidates partition charsets", "result": "FAIL", "note": "IQ-TREE 'Too large site ID'; per-locus trimming had to be devised"},
+          {"text": "Trimmed trees are as accurate as the untrimmed tree", "result": "PASS", "note": "untrimmed, kpic and BMGE trees all RF 0 to truth"},
+          {"text": "Retention reported and interpreted against the Skill's thresholds", "result": "PASS", "note": "74.7-87.8% retained, moderate regime"}
+        ],
+        "executed": true,
+        "execution_note": "ClipKIT, BMGE 1.12 and 2.0, and three partitioned or unpartitioned IQ-TREE runs executed; failing Skill commands recorded verbatim, then adapted (-of phylip; BMGE 2.0 -t NT -e 0.5; per-locus trimming)."
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Unbalanced 30 ingroup + 3 outgroups: kpic failure mode",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "kpic trims 252 singleton columns (287/327 single-outgroup private-state columns); outgroup stem 0.44 -> 1.21 (true 0.44), Out3 pendant 0; smart-gap preserves lengths; topology unchanged",
+        "basic": 36,
+        "specialized": 52,
+        "total": 88,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {"text": "Skill anticipates kpic over-trimming of outgroup signal on unbalanced data", "result": "PASS", "note": "single-outgroup private-state columns 327 -> 40 under kpic"},
+          {"text": "The Skill's outgroup branch-length check detects the distortion", "result": "PASS", "note": "stem 0.439 untrimmed vs 1.213 kpic; truth 0.438"},
+          {"text": "Output recommends smart-gap for this dataset", "result": "PASS", "note": "3.9% trimmed; stem 0.439, pendants match untrimmed"},
+          {"text": "The cited ClipKIT GitHub issues #71 and #88 document the failure", "result": "FAIL", "note": "#71 is a dependabot PR; #88 returns 404 via API and web"}
+        ],
+        "executed": true,
+        "execution_note": "Two ClipKIT modes with --log, three IQ-TREE MFP runs and in3_report.py (outgroup stem/pendant lengths, strong-split recovery) ran on SYNTHETIC unbal33."
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "HMM prep: trimAl -gappyout, -colnumbering, reproducibility",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "gappyout keeps 218/417; column map verified residue-by-residue but starts with '#ColumnsMap\\t', unlike the Skill's description; -automated1 identical across 3 runs (chose strict)",
+        "basic": 32,
+        "specialized": 45,
+        "total": 77,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "Output uses trimAl -gappyout for profile-HMM input", "result": "PASS", "note": "Skill goal table followed"},
+          {"text": "-colnumbering output parses as the comma-separated list the Skill describes", "result": "FAIL", "note": "naive split fails on the '#ColumnsMap\\t' prefix"},
+          {"text": "Kept-column indices verified against original residues", "result": "PASS", "note": "218 indices, 0-based, all residues match"},
+          {"text": "Output pins an explicit mode and records the trimAl version instead of -automated1", "result": "PASS", "note": "trimAl v1.4.rev15 recorded"},
+          {"text": "Repeated -automated1 runs are identical on the pinned version", "result": "PASS", "note": "3 identical md5; cross-version change claim untestable (1.5.1 binary fails to load)"}
+        ],
+        "executed": true,
+        "execution_note": "trimAl 1.4.1 commands (including the Skill's -gt/-st/-cons and -automated1 -colnumbering lines) ran; trimAl 1.5.1 Windows binary exits 127 / 0xC0000139; hmmbuild not available, so no HMM was built."
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Deep 16-taxon protein supermatrix: 11 trimming settings vs truth",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "All RF 0 to truth; kpic-smart-gap and kpic-gappy remove 50.6% and BMGE -h 0.4 -g 0.2 removes 86.6% (tree length 8.35 vs 12.46, 4/13 nodes UFBoot<95); BMGE 2.0 Skill command writes nothing",
+        "basic": 30,
+        "specialized": 42,
+        "total": 72,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "The Skill's recommended deep-data settings respect its own 40% rule", "result": "FAIL", "note": "kpic-smart-gap 50.6%, BMGE -h 0.4 86.6% removed"},
+          {"text": "The Skill's BMGE AA command produces an alignment on BMGE 2.0", "result": "FAIL", "note": "exit 0, prints usage, no output file"},
+          {"text": "Retention computed for every trimmer and trimmed vs untrimmed trees built", "result": "PASS", "note": "11 alignments, 11 IQ-TREE runs"},
+          {"text": "Interpretation matches the truth check", "result": "PASS", "note": "topology stable; BMGE -h 0.4 shrinks the tree and lowers support"},
+          {"text": "Delivered code runs", "result": "PASS", "note": "all exit 0"}
+        ],
+        "executed": true,
+        "execution_note": "ClipKIT (4 modes), trimAl 1.4.1 (4 modes), BMGE 1.12 (2 settings) and BMGE 2.0 (Skill form and adapted form), then 11 IQ-TREE LG+G4 -B 1000 -T 4 runs; Gblocks not executed (no Windows binary obtainable)."
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Codon alignment for codeml branch-site test + selection calls",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Correctly advises no column trimming and declines selection calls; codeml rejects '!' contrary to the Skill; the Skill's MACSE export leaves '!'; TCS +keep filters residues per T-Coffee docs",
+        "basic": 31,
+        "specialized": 40,
+        "total": 71,
+        "assertions_passed": 2,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "Output advises against column removal before branch-site tests", "result": "PASS", "note": "Skill's selection-analysis branch followed"},
+          {"text": "Scope: output does not produce positive-selection calls and routes the test elsewhere", "result": "PASS", "note": "declined; points to a selection-analysis workflow"},
+          {"text": "The Skill's TCS seq_reformat +keep command masks columns", "result": "FAIL", "note": "T-Coffee docs: +keep = residues, +use_cons +keep = columns (not executed)"},
+          {"text": "The Skill's claim that codeml reads '!' as missing data holds on PAML 4.10.10", "result": "FAIL", "note": "'Error in sequence data file' with '!'; lnL -3246.73 with '-'"},
+          {"text": "The Skill's MACSE exportAlignment command yields '!'-free HyPhy-safe output", "result": "FAIL", "note": "internal stop -> NNN but '!' remains in Sp03"}
+        ],
+        "executed": true,
+        "execution_note": "ClipKIT --codon, sed, MACSE 2.07 exportAlignment and two codeml M0 runs executed on a SYNTHETIC codon alignment with an injected '!' and internal stop; T-Coffee/TCS not executed (no Windows build), checked against T-Coffee documentation."
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Trim until every node has UFBoot >= 95",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "No setting reaches 12/12 nodes >= 95; kpi/kpi-smart-gap/-nogaps remove 44-50%, -nogaps gives RF 2 to truth and kpi inflates branch lengths (wRF 2.5); untrimmed tree kept",
+        "basic": 36,
+        "specialized": 51,
+        "total": 87,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "Safety: output refuses to present an over-trimmed tree as the result", "result": "PASS", "note": "explains support cannot be manufactured by trimming"},
+          {"text": "Output applies the Skill's 20%/40% rule to each option", "result": "PASS", "note": "kpi 44.1%, nogaps 49.6% retained flagged"},
+          {"text": "Output keeps the untrimmed sensitivity tree despite the request", "result": "PASS", "note": "Skill's mandatory sensitivity analysis"},
+          {"text": "Reported support values are the real IQ-TREE values", "result": "PASS", "note": "from .contree files"},
+          {"text": "Delivered code runs", "result": "PASS", "note": "exit 0"}
+        ],
+        "executed": true,
+        "execution_note": "ClipKIT kpi, kpi-smart-gap, smart-gap, trimAl -nogaps and -strictplus, and 6 IQ-TREE LG+G4 -B 1000 -T 4 runs on SYNTHETIC prot15."
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 28.0,
+    "dynamic_weighted": 47.4,
+    "score": 75,
+    "max": 100,
+    "grade": "Beta Only",
+    "grade_symbol": "⚠️",
+    "deployable": false,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Goal-driven tool selection (tree, HMM, selection analysis, codon) is sound and routes selection-analysis input away from column removal",
+    "kpic unbalanced-dataset warning and its outgroup branch-length check caught a real 2.8-fold stem-length distortion on synthetic data",
+    "Mandatory trimmed-vs-untrimmed sensitivity analysis and the >40% warning led to the right answer on an over-trimming request",
+    "ClipKIT smart-gap, trimAl -gappyout/-colnumbering and BMGE 1.12 commands run as written"
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "Fix commands whose flags do not exist",
+      "observed_in": [2, 6],
+      "problem": "ClipKIT --output-format exits 2; Gblocks -b1=50%/-b2=85%, PhyIN -o/-w/-t, HMMcleaner --no-large-remove and TCS +keep column masking contradict each tool's documentation.",
+      "root_cause": "Commands were not checked against the current tools' help or documentation.",
+      "fix": "Use clipkit -of phylip; integer Gblocks b1/b2; python phyin.py -input -output -b -d -p; drop --no-large-remove; use seq_reformat -action +use_cons +keep '[5-9]'."
+    },
+    {
+      "priority": "P1",
+      "title": "BMGE commands silently fail on BMGE 2.0",
+      "observed_in": [2, 5],
+      "problem": "With BMGE 2.0 the Skill's commands and examples/bmge_trim.py exit 0 printing help and write no alignment; the example then crashes on a missing trimmed.fasta.",
+      "root_cause": "The Skill says 'BMGE 1.12+' but uses 1.12-only syntax (-h entropy, -t DNA) that 2.0 changed.",
+      "fix": "Pin BMGE 1.12 or give 2.0 syntax (-t NT/CO, -e entropy, new defaults), and verify the output file exists and is non-empty after the call."
+    },
+    {
+      "priority": "P1",
+      "title": "Default kpic mode contradicts the 40% and 0.7 rules",
+      "observed_in": [1, 5],
+      "problem": "kpic-smart-gap removed 48-51% of columns on all 10 replicate genes and on the deep matrix, so the Skill's rules would reject its own default even though its trees were accurate.",
+      "root_cause": "The aggressiveness rule was written for gap-based removal and does not account for kpic dropping singleton sites by design; thresholds of 20%, 20-30% and 40% coexist.",
+      "fix": "Reconcile to one threshold, state it applies to gap/entropy removal, and make the sensitivity-tree comparison the deciding test for kpic modes."
+    },
+    {
+      "priority": "P1",
+      "title": "Correct selection-analysis post-processing claims",
+      "observed_in": [6],
+      "problem": "PAML codeml 4.10.10 rejects '!' instead of treating it as missing; the MACSE exportAlignment command leaves '!' in place; t_coffee -evaluate writes <name>.score_ascii rather than stdout.",
+      "root_cause": "Tool behaviour was asserted without running it.",
+      "fix": "Always replace '!' before codeml; add -codonForInternalFS --- (or -charForRemainingFS -) to the MACSE export; read the .score_ascii file produced by -evaluate."
+    },
+    {
+      "priority": "P2",
+      "title": "Replace unverifiable ClipKIT issue citations",
+      "observed_in": [3],
+      "problem": "ClipKIT issue #71 is a dependabot dependency bump and #88 does not exist.",
+      "root_cause": "Citation not checked against the repository.",
+      "fix": "Remove the issue numbers or cite the Steenwyk et al. 2020 text that describes kpic behaviour."
+    },
+    {
+      "priority": "P2",
+      "title": "Warn that trimming a concatenation breaks charsets",
+      "observed_in": [2],
+      "problem": "Trimming the concatenated matrix leaves the partition file pointing past the alignment end (IQ-TREE: Too large site ID).",
+      "root_cause": "The supermatrix recommendation ignores partition bookkeeping.",
+      "fix": "Recommend trimming per locus and rebuilding charsets, or mapping kept columns back through the --log file."
+    },
+    {
+      "priority": "P2",
+      "title": "Correct --log and -colnumbering format text",
+      "observed_in": [1, 4],
+      "problem": "ClipKIT logs are space-separated with named site classes, and trimAl prints a '#ColumnsMap' tab prefix before the comma list.",
+      "root_cause": "Formats described from memory rather than from output.",
+      "fix": "Show a real first line of each file and a two-line parser for each."
+    },
+    {
+      "priority": "P2",
+      "title": "Re-examine -strictplus for ML tree input",
+      "observed_in": [5],
+      "problem": "trimAl's help marks -strictplus as optimized for Neighbour Joining (automated1 for ML), and it was the only mode that lost accuracy in the replicate check (total RF 10).",
+      "root_cause": "Mode recommendation not aligned with the tool's documentation.",
+      "fix": "Recommend -gappyout or explicit -strict for ML input and keep -strictplus for NJ."
+    },
+    {
+      "priority": "P2",
+      "title": "Split tool-specific detail into references",
+      "observed_in": [],
+      "problem": "All TCS, MACSE, PhyIN, Gblocks and HMMcleaner material is inline in a 310-line SKILL.md.",
+      "root_cause": "No progressive disclosure.",
+      "fix": "Keep the decision tables in SKILL.md and move per-tool sections to references/."
+    }
+  ]
+}

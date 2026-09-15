@@ -1,0 +1,7 @@
+.libPaths(c('F:/OpenScience/audit-envs/mass-spec-proteomics-analyst/R-lib', .libPaths()))
+suppressMessages(library(MSstatsPTM))
+cat('MSstatsPTM', as.character(packageVersion('MSstatsPTM')), ' MSstats', as.character(packageVersion('MSstats')), '\n')
+print(args(MaxQtoMSstatsPTMFormat))
+print(args(dataSummarizationPTM))
+print(args(groupComparisonPTM))
+print(ls('package:MSstatsPTM'))

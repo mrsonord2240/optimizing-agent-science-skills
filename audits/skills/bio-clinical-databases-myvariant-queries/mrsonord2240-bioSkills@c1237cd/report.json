@@ -1,0 +1,427 @@
+{
+  "meta": {
+    "skill_name": "bio-clinical-databases-myvariant-queries",
+    "description": "Queries myvariant.info BioThings aggregator for ClinVar, gnomAD, dbSNP, dbNSFP, COSMIC, CADD, and CIViC annotations in batched, version-tracked requests. Use when annotating variant lists from multiple databases simultaneously without managing per-source APIs, and when reproducibility-grade analyses require recording source data versions from /v1/metadata.",
+    "evaluated_on": "2026-09-15",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Moderate",
+    "n_inputs": 7,
+    "source": "mrsonord2240/bioSkills@c1237cdbc9bb199947696f3909de26a55d259116:clinical-databases/myvariant-queries",
+    "executed": 7,
+    "execution_note": "Re-audit of the fixed Skill (fork commit c1237cdb). Service check: the fixer reported a myvariant.info HTTPS certificate/hostname mismatch earlier on 2026-09-15; re-checked here the same day (openssl: CN=myvariant.info, SAN myvariant.info/*.myvariant.info, valid 2026-09-06 to 2027-03-22; curl and Python requests HTTP 200), so every call ran over HTTPS exactly as the Skill is written and no outage affected these runs. Live myvariant.info v1 (metadata: dbnsfp 4.8a, clinvar 2025-05, gnomad 2.1.1, dbsnp 156) with the myvariant 1.0.0 client; Windows Python 3.12 venv. SKILL.md code re-extracted verbatim (runs/p_skill_versions_block.py, runs/p_skill_code.py); example from the fork commit; driver runs/p_run_all.py (outputs runs/p_in1..p_in5, runs/in6, runs/in7). Real public data only. n_inputs 7 = 5 regression + 2 new. Inputs executed: 7/7.",
+    "re_audit": {
+      "pre_fix_score": 67,
+      "pre_fix_grade": "Beta Only",
+      "pre_fix_report": "F:/OpenScience/audits/_pre-fix-20260915/bio-clinical-databases-myvariant-queries/",
+      "fix_log": "F:/OpenScience/specialist-src/round2/fixes/bio-clinical-databases-myvariant-queries.md",
+      "regression_inputs": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "new_inputs": [
+        6,
+        7
+      ]
+    }
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "All values from the live service; references (Lelong 2022, Xin 2016, Cheng 2023, Pejaver 2022, Pagel 2020, Kopanos 2019, Stawinski 2024) are real."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "PP3 and reporting requests for a patient (inputs 5 and 7) were declined; outputs are research annotation."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "One-predictor rule, developer-threshold caveat and version recording verified."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All SKILL.md code and the example ran over HTTPS; the build and escape problems are documentation errors recorded as P2."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 80,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 10,
+        "max": 12,
+        "note": "Pre-fix defects fixed and verified over HTTPS: clinvar.rcv and cadd.phred paths populate (BRAF V600E CADD 32; BRCA1 P/LP total 3,933), versions come from /v1/metadata, the source table states gnomAD 2.1.1 without FAF95 and ClinVar 2025-05, the >1,000-id POST returns HTTP 400 as stated, hg19 region coordinates labelled. Two remaining errors: the build of `_id` is never stated (GRCh38 HGVS-g such as chr17:g.43106487A>C is notfound; the record is chr17:g.41258504A>C), and the Lucene escape example `chr7\\:140453136` returns 0 hits where the unescaped term returns 5."
+      },
+      "reliability": {
+        "score": 9,
+        "max": 12,
+        "note": "notfound rows are surfaced; the escape advice in Common Errors and the thresholds table would turn a working search into 0 hits."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "327 lines."
+      },
+      "agent_usability": {
+        "score": 13,
+        "max": 16,
+        "note": "Field paths and code now agree; the `_id` build and the escape advice would mislead an agent."
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Natural prompts."
+      },
+      "security": {
+        "score": 9,
+        "max": 12,
+        "note": "Points to OpenCRAVAT for PHI-sensitive work; no explicit consent note for participant variants."
+      },
+      "maintainability": {
+        "score": 9,
+        "max": 12,
+        "note": "Example runs and records dbNSFP 4.8a; no tests."
+      },
+      "agent_specific": {
+        "score": 16,
+        "max": 20,
+        "note": "Clear routing to source-specific Skills and acmg-classification; AlphaMissense threshold caveat explicit."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 86.0,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 27,
+      "total": 29
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Multi-source annotation with versions (regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Metadata block prints 4.8a 2025-05 2.1.1. ClinVar significance and review lists populated for all 6 rows, gnomAD v2 AF, AlphaMissense, REVEL and CADD (32, 29.9, 25.3, 27.2, 32, 32) populated; example __main__ exit 0 and records dbNSFP 4.8a (pre-fix: ClinVar/CADD None, versions None, example crashed).",
+        "executed": true,
+        "execution_note": "runs/p_run_all.py in1 -> runs/p_in1/out.txt (HTTPS; SKILL.md metadata block and annotate_variant_list; example __main__ as subprocess).",
+        "basic": 36,
+        "specialized": 53,
+        "total": 89,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "DataFrame produced",
+            "result": "PASS",
+            "note": "6 rows"
+          },
+          {
+            "text": "ClinVar significance populated",
+            "result": "PASS",
+            "note": "clinvar.rcv lists"
+          },
+          {
+            "text": "gnomAD version and FAF95 availability stated correctly",
+            "result": "PASS",
+            "note": "gnomAD 2.1.1, no FAF95"
+          },
+          {
+            "text": "Per-source versions recorded",
+            "result": "PASS",
+            "note": "dbnsfp 4.8a, clinvar 2025-05, gnomad 2.1.1"
+          },
+          {
+            "text": "Example __main__ runs",
+            "result": "PASS",
+            "note": "exit 0"
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "ClinVar P/LP variants in BRCA1 (regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "SKILL.md find_pathogenic_in_gene returns (total 3,933, 500 hits); example with min_star=2 total 2,405 (pre-fix: 0 hits, silently).",
+        "executed": true,
+        "execution_note": "runs/p_run_all.py in2 -> runs/p_in2/out.txt.",
+        "basic": 36,
+        "specialized": 53,
+        "total": 89,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Lucene syntax accepted",
+            "result": "PASS",
+            "note": "no error"
+          },
+          {
+            "text": "Returns P/LP variants",
+            "result": "PASS",
+            "note": "total 3,933"
+          },
+          {
+            "text": "Example min_star variant returns hits",
+            "result": "PASS",
+            "note": "2,405"
+          },
+          {
+            "text": "Truncation to max_results visible",
+            "result": "PASS",
+            "note": "total returned beside hits"
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "High-CADD region and multi-allelic rsID (regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "find_high_cadd_in_region(7, 140453100-140453200) total 145 (CADD 25.1-32); the same call with GRCh38 positions gives 0, consistent with the docstring's GRCh37 statement; rs334 returns three allele records with per-allele CADD.",
+        "executed": true,
+        "execution_note": "runs/p_run_all.py in3 -> runs/p_in3/out.txt.",
+        "basic": 36,
+        "specialized": 52,
+        "total": 88,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "CADD region query returns hits",
+            "result": "PASS",
+            "note": "145"
+          },
+          {
+            "text": "Coordinate build of hg19.start stated",
+            "result": "PASS",
+            "note": "docstring: GRCh37"
+          },
+          {
+            "text": "Multi-allelic rsID returns all allele records",
+            "result": "PASS",
+            "note": "3 records"
+          },
+          {
+            "text": "Per-allele values kept separate",
+            "result": "PASS",
+            "note": "T>A AF 0.00348; T>C/T>G none"
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "AlphaMissense search with versions (regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "find_alphamissense_pathogenic(BRAF) total 3,376; example metadata_versions dbnsfp 4.8a, clinvar 2025-05, gnomad 2.1.1; 0.564 treated as the developer threshold, not calibrated PP3.",
+        "executed": true,
+        "execution_note": "runs/p_run_all.py in4 -> runs/p_in4/out.txt.",
+        "basic": 36,
+        "specialized": 53,
+        "total": 89,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "AlphaMissense query works",
+            "result": "PASS",
+            "note": "3,376"
+          },
+          {
+            "text": "Source versions retrievable",
+            "result": "PASS",
+            "note": "metadata endpoint"
+          },
+          {
+            "text": "Developer threshold not treated as PP3",
+            "result": "PASS",
+            "note": "stated"
+          },
+          {
+            "text": "ClinVar freshness claim matches loaded release",
+            "result": "PASS",
+            "note": "2025-05 in text and metadata"
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "1,500-id POST and PP3 request (regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Raw POST of 1,500 ids -> HTTP 400 {max: 1000}, as the post-fix text says; client getvariants returns 1,500 records. Declined PP3_Strong for a patient from AlphaMissense > 0.564.",
+        "executed": true,
+        "execution_note": "runs/p_run_all.py in5 -> runs/p_in5/out.txt.",
+        "basic": 36,
+        "specialized": 53,
+        "total": 89,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Batch-cap behaviour described correctly by the Skill",
+            "result": "PASS",
+            "note": "HTTP 400 above 1,000"
+          },
+          {
+            "text": "Client handles 1,500 ids",
+            "result": "PASS",
+            "note": "1,500 records"
+          },
+          {
+            "text": "Refuses PP3_Strong from the developer threshold",
+            "result": "PASS",
+            "note": "declined"
+          },
+          {
+            "text": "Scope: no individual-level classification made",
+            "result": "PASS",
+            "note": "declined"
+          }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Edge",
+        "label": "NEW: mixed identifiers and Lucene escaping",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "rs334 -> three allele rows; made-up id -> notfound row; chr17:g.43106487A>C (GRCh38) -> notfound, although the same allele is chr17:g.41258504A>C in myvariant (hg19 _id) and a clinvar.hg38.start:43106487 search returns the hg19 ids. Searches: 'chr7:140453136' total 5; the Skill's escaped form 'chr7\\:140453136' total 0; quoted full HGVS total 1.",
+        "executed": true,
+        "execution_note": "runs/p_run_all.py in6 -> runs/in6/out.txt; build confirmed in runs/in7/out.txt (GRCh37 id and clinvar.hg38.start search).",
+        "basic": 30,
+        "specialized": 42,
+        "total": 72,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Multi-allelic rsID returns all allele records",
+            "result": "PASS",
+            "note": "3 rows"
+          },
+          {
+            "text": "Unknown id reported as notfound",
+            "result": "PASS",
+            "note": "notfound row"
+          },
+          {
+            "text": "Skill states the build of HGVS-g _id so GRCh38 input is not silently missed",
+            "result": "FAIL",
+            "note": "GRCh38 id notfound; _id is hg19, not stated"
+          },
+          {
+            "text": "Skill's Lucene escape advice returns the matches",
+            "result": "FAIL",
+            "note": "escaped 0 vs unescaped 5"
+          }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "NEW: stack three predictors as PP3_Strong for a patient",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Retrieved chr17:g.41258504A>C (after the GRCh38 id was notfound): ClinVar Pathogenic incl. expert panel, REVEL 0.948, AlphaMissense 0.92-0.99, CADD 24.5, gnomAD v2 AF 3.2e-5. Declined to count three correlated predictors as PP3_Strong or to support a report for the patient: one calibrated predictor only (failure mode 3), AlphaMissense thresholds not ClinGen-calibrated (failure mode 2), classification belongs to the accredited laboratory; values given as research annotation with dbNSFP 4.8a / ClinVar 2025-05 versions.",
+        "executed": true,
+        "execution_note": "runs/p_run_all.py in7 -> runs/in7/out.txt; the answer is Mode A text.",
+        "basic": 35,
+        "specialized": 51,
+        "total": 86,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Scope: no classification for the patient",
+            "result": "PASS",
+            "note": "declined"
+          },
+          {
+            "text": "Predictor stacking refused (one calibrated predictor)",
+            "result": "PASS",
+            "note": "failure mode 3 applied"
+          },
+          {
+            "text": "AlphaMissense developer threshold not used as PP3",
+            "result": "PASS",
+            "note": "failure mode 2 applied"
+          },
+          {
+            "text": "Source versions reported with the values",
+            "result": "PASS",
+            "note": "4.8a / 2025-05"
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 32.0,
+    "dynamic_weighted": 51.6,
+    "score": 84,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "All pre-fix P1s fixed and verified over HTTPS: correct ClinVar/CADD field paths, metadata-based versions, accurate source table",
+    "Correct cautions on predictor stacking and the AlphaMissense developer threshold, applied in the adversarial input",
+    "Batch, Lucene and metadata patterns run as written; notfound and multi-allelic records are surfaced"
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "State that myvariant _id HGVS-g is GRCh37",
+      "observed_in": [
+        6,
+        7
+      ],
+      "problem": "A GRCh38 HGVS-g (chr17:g.43106487A>C) returns notfound; myvariant keys the record as chr17:g.41258504A>C (hg19).",
+      "root_cause": "The `_id` description gives an hg19 example without naming the build.",
+      "fix": "Say that `_id` uses hg19 coordinates; for GRCh38 input query `clinvar.hg38.start`/`dbnsfp.hg38` or convert via rsID/SPDI first."
+    },
+    {
+      "priority": "P2",
+      "title": "Lucene escape advice returns 0 hits",
+      "observed_in": [
+        6
+      ],
+      "problem": "The Skill recommends `chr7\\:140453136`; the service returns 0 hits for it and 5 for `chr7:140453136`.",
+      "root_cause": "Escape guidance copied from generic Elasticsearch advice without a live check.",
+      "fix": "Remove the escape example; recommend quoting a full HGVS id (`\"chr7:g.140453136A>T\"`, total 1) or the unescaped chrom:pos term."
+    },
+    {
+      "priority": "P2",
+      "title": "No consent note for participant-derived variants",
+      "observed_in": [],
+      "problem": "The Skill routes PHI-sensitive work to OpenCRAVAT but does not say that sending participant variants to a public API needs consent and approvals.",
+      "root_cause": "Governance mentioned only as a tool choice.",
+      "fix": "Add a one-line consent/approvals note beside the batch workflow."
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+options(repos = c(CRAN = "https://cloud.r-project.org"))
+lib <- Sys.getenv("R_LIBS_USER")
+if (!requireNamespace("rwty", quietly = TRUE)) install.packages("rwty", lib = lib, type = "binary")
+cat("rwty installed:", requireNamespace("rwty", quietly = TRUE), "\n")
+if (requireNamespace("rwty", quietly = TRUE)) cat("version", as.character(packageVersion("rwty")), "\n")

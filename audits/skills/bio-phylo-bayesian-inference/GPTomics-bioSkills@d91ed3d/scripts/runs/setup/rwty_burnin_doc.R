@@ -1,0 +1,8 @@
+suppressMessages(library(rwty))
+cat("rwty", as.character(packageVersion("rwty")), "\n")
+cat("analyze.rwty args:", paste(names(formals(analyze.rwty)), collapse=", "), "\n")
+db <- tools::Rd_db("rwty")
+txt <- capture.output(tools::Rd2txt(db[["analyze.rwty.Rd"]], options=list(underline_titles=FALSE)))
+i <- grep("burnin", txt)
+cat(txt[unique(unlist(lapply(i, function(k) k:(k+2))))], sep="\n")
+b <- deparse(body(analyze.rwty)); cat(grep("burnin", b, value=TRUE)[1:8], sep="\n")

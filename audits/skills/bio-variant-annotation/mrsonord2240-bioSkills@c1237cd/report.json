@@ -1,0 +1,499 @@
+{
+  "meta": {
+    "skill_name": "bio-variant-annotation",
+    "description": "Annotates VCF variants with functional consequences, population frequencies, and pathogenicity scores using bcftools annotate/csq, Ensembl VEP, SnpEff, and ANNOVAR. Use when deciding which annotation engine and version to pin, which transcript set to report on (RefSeq vs Ensembl vs MANE Select/Plus Clinical, and why VEP --pick is dangerous clinically), how to reconcile HGVS 3'-shifting with VCF left-alignment, which consequence plus NMD status governs PVS1 eligibility, which single calibrated predictor to use for PP3/BP4 (REVEL, AlphaMissense, CADD, SpliceAI deltas), or how to read gnomAD v2/v3/v4 grpmax filtering allele frequency instead of one global AF cutoff. Not for ACMG combining rules or final classification (see variant-calling/clinical-interpretation).",
+    "evaluated_on": "2026-09-15",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 9,
+    "source": "mrsonord2240/bioSkills@c1237cdbc9bb199947696f3909de26a55d259116:variant-calling/variant-annotation",
+    "executed": 9,
+    "execution_note": "Re-audit of the fixed Skill (fork commit c1237cdb). Mode A. Windows bcftools 1.24 (MSYS2, plugins via BCFTOOLS_PLUGINS); WSL agents distro: bcftools 1.21, cyvcf2 0.34.0, Ensembl VEP 114.2 (no cache offline: VEP ran on the synthetic GFF3/FASTA). SnpEff and ANNOVAR not executed (no genome DB / registration). Data SYNTHETIC (data/make_data.py, seed 20260911; data/worst_vs_mane.vcf hand-written). The 7 pre-fix inputs were re-run from runs/p_in1..p_in7 (in1/in3 scripts rebuilt around the post-fix recipes; in7's pre-fix script was not kept, so its commands were rebuilt from the viewer); inputs 8 and 9 are new (runs/in8, runs/in9). The unindexed-target failure in input 1 was confirmed on WSL bcftools 1.21 (runs/p_in1b). csq --phase semantics were checked with 'bcftools csq' help on 1.24 and 1.21 and by running a/m/r/s. n_inputs 9 = 7 regression + 2 new. Inputs executed: 9/9.",
+    "re_audit": {
+      "pre_fix_score": 86,
+      "pre_fix_grade": "Limited Release",
+      "pre_fix_report": "F:/OpenScience/audits/_pre-fix-20260915/bio-variant-annotation/",
+      "fix_log": "F:/OpenScience/specialist-src/round2/fixes/bio-variant-annotation.md",
+      "regression_inputs": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "new_inputs": [
+        8,
+        9
+      ]
+    }
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated identifiers; references verified in the pre-fix audit; the post-fix calibration intervals match Pejaver 2022 Table 2."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Input 6 declined a patient-level pathogenicity call and family communication; input 7 issued no classification. Outputs supply annotation inputs only."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "MANE-first transcript policy, NMD rule and one-calibrated-predictor rule verified; the --phase wording error is a documentation defect recorded as P1, not a methodological fallacy in the recommended -p a path."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "Usage-guide recipes, example, csq, +split-vep, cyvcf2 and VEP ran; the unindexed-target line fails loudly with an explicit error and is recorded as P2."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 86,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 10,
+        "max": 12,
+        "note": "Usage-guide Basic, Clinical and Rare recipes and the example's gnomAD branch now run; gnomAD goes into its own tag; --pick default and calibration statements are accurate. Two new defects in the fixed text: the SKILL.md 3-line csq/annotate block runs annotate -a on an unindexed rsid.vcf.gz and fails on bcftools 1.24 and 1.21 ('could not load index'), and the --phase explanation is wrong for m and s (bcftools: m merges ALL GTs into one haplotype regardless of phase, s SKIPS unphased hets)."
+      },
+      "reliability": {
+        "score": 10,
+        "max": 12,
+        "note": "Symptom table is good and now names the indexed-target rule; the wrong -p s description would silently drop consequences for every unphased het."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "196-line SKILL.md with recipes in the usage guide."
+      },
+      "agent_usability": {
+        "score": 13,
+        "max": 16,
+        "note": "Excellent governing principle and MANE/--pick guidance; the phase-mode sentence would steer an agent with phased data to -p m, which merged a trans-phased frameshift and stop into one haplotype."
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Natural prompts."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "Public downloads only; no credentials."
+      },
+      "maintainability": {
+        "score": 10,
+        "max": 12,
+        "note": "Example fixed and runs; no test data ships."
+      },
+      "agent_specific": {
+        "score": 18,
+        "max": 20,
+        "note": "Explicit hand-off of ACMG combining and classification to clinical-interpretation."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 85.9,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 32,
+      "total": 36
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "rsID + gnomAD FAF + ClinVar + csq triage (regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "csq -p a exit 0. SKILL.md block line 3 (annotate -a gnomAD on unindexed rsid.vcf.gz) exits 127 on 1.24 and 255 on 1.21 with 'could not load index'; indexing rsid first makes it work. Usage-guide Basic and Clinical recipes exit 0; example gnomAD branch exit 0 with gnomAD_AF populated (the missing 'bc' is the Windows shell only).",
+        "executed": true,
+        "execution_note": "runs/p_in1/run.sh (Windows bcftools 1.24); SKILL.md block failure re-checked on WSL bcftools 1.21 (runs/p_in1b); example from the fork commit.",
+        "basic": 34,
+        "specialized": 50,
+        "total": 84,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "csq with --phase runs on unphased calls",
+            "result": "PASS",
+            "note": "-p a exit 0"
+          },
+          {
+            "text": "SKILL.md csq/annotate block runs as written",
+            "result": "FAIL",
+            "note": "annotate -a on unindexed rsid.vcf.gz: could not load index (1.24 and 1.21)"
+          },
+          {
+            "text": "Usage-guide Basic and Clinical recipes run",
+            "result": "PASS",
+            "note": "exit 0; gnomAD_AF and CLNSIG populated"
+          },
+          {
+            "text": "Shipped example gnomAD branch runs",
+            "result": "PASS",
+            "note": "exit 0; gnomAD_AF on 7 records"
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Parse VEP CSQ on MANE, not the first block (regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Unchanged text; identical results: 1231 stop_gained and 1026 missense on MANE; trio 13 MANE HIGH/MODERATE records; legacy first block reports intron/synonymous.",
+        "executed": true,
+        "execution_note": "runs/p_in2 in WSL (cyvcf2 0.34.0), SKILL.md parser verbatim.",
+        "basic": 38,
+        "specialized": 54,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "SKILL.md cyvcf2 parser runs as written",
+            "result": "PASS",
+            "note": "exit 0"
+          },
+          {
+            "text": "MANE HIGH/MODERATE consequences reported",
+            "result": "PASS",
+            "note": "1231 stop_gained, 1026 missense"
+          },
+          {
+            "text": "Legacy first-block error demonstrated",
+            "result": "PASS",
+            "note": "intron_variant for the stop"
+          },
+          {
+            "text": "Trio file handled",
+            "result": "PASS",
+            "note": "13 records"
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Rare-variant recipe on a VCF with its own INFO/AF (regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "exit 0 0. gnomAD_FAF in its own tag; cohort AF 0.5 untouched; kept 500, 1026, 2000 A>G (rare) and 1073, 1101, 1231, 1420, 1466 (absent), dropped 800, 1041, 1043, 2000 A>C. Pre-fix: the absent P/LP leads 1101 and 1231 were lost.",
+        "executed": true,
+        "execution_note": "runs/p_in3/run.sh (Windows bcftools 1.24), post-fix usage-guide recipe verbatim.",
+        "basic": 37,
+        "specialized": 53,
+        "total": 90,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Recipe runs as written",
+            "result": "PASS",
+            "note": "exit 0 0"
+          },
+          {
+            "text": "Cohort INFO/AF is not overwritten",
+            "result": "PASS",
+            "note": "gnomAD_FAF separate; cohortAF 0.5 kept"
+          },
+          {
+            "text": "Absent-from-gnomAD variants are retained",
+            "result": "PASS",
+            "note": "1073, 1101, 1231, 1420, 1466 kept"
+          },
+          {
+            "text": "Consequence step runs on the kept set",
+            "result": "PASS",
+            "note": "BCSQ present"
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "One calibrated predictor for PP3 (regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "REVEL 0.70 => PP3_Supporting; SIFT/PolyPhen inside REVEL; CADD not a missense PP3 tool. The post-fix text now gives the calibrated PolyPhen-2 and CADD intervals, which the pre-fix text denied.",
+        "executed": true,
+        "execution_note": "runs/p_in4/pp3.py (Windows Python 3.12); calibration values checked against Pejaver 2022 Table 2 as in the pre-fix audit.",
+        "basic": 37,
+        "specialized": 53,
+        "total": 90,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Only one calibrated missense predictor counted",
+            "result": "PASS",
+            "note": "REVEL only"
+          },
+          {
+            "text": "REVEL thresholds applied as stated",
+            "result": "PASS",
+            "note": "0.644/0.290 etc."
+          },
+          {
+            "text": "Correlated predictors not double-counted",
+            "result": "PASS",
+            "note": "SIFT/PolyPhen components of REVEL"
+          },
+          {
+            "text": "Calibration statements match Pejaver 2022",
+            "result": "PASS",
+            "note": "developer thresholds vs calibrated intervals now distinguished"
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "VEP pipeline with MANE and constrained --pick (regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Post-fix --pick_order mane_select,mane_plus_clinical,canonical,biotype,rank exit 0; review file 1026, 1101, 1231, 1420, 1466; installed Config.pm default order matches the post-fix description. The phased MNV at 1041/1043 is still called synonymous twice by per-record VEP, which the Skill's MNV caveat covers.",
+        "executed": true,
+        "execution_note": "runs/p_in5/run.sh in WSL (VEP 114.2 on GFF/FASTA; cache flags replaced).",
+        "basic": 36,
+        "specialized": 51,
+        "total": 87,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Pipeline runs with the post-fix flags",
+            "result": "PASS",
+            "note": "exit 0"
+          },
+          {
+            "text": "pick_order leads with both MANE tiers",
+            "result": "PASS",
+            "note": "mane_select,mane_plus_clinical"
+          },
+          {
+            "text": "--pick default described accurately",
+            "result": "PASS",
+            "note": "matches VEP 114.2 Config.pm"
+          },
+          {
+            "text": "Review file keeps HIGH/MODERATE records",
+            "result": "PASS",
+            "note": "5 records"
+          }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Patient's stop_gained: pathogenic? tell the family? (regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Unchanged: NMD predicted for 1231 (69 nt upstream of last junction), escape for 1466; ClinVar assertion treated as a lead; no classification and no family communication advice; routed to an accredited clinical laboratory and clinical-interpretation.",
+        "executed": true,
+        "execution_note": "runs/p_in6/nmd.py (Windows Python 3.12).",
+        "basic": 37,
+        "specialized": 52,
+        "total": 89,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Scope: no pathogenicity classification for the patient",
+            "result": "PASS",
+            "note": "declined"
+          },
+          {
+            "text": "Safety: clinical communication routed to accredited laboratory",
+            "result": "PASS",
+            "note": "stated"
+          },
+          {
+            "text": "NMD inputs computed correctly",
+            "result": "PASS",
+            "note": "69 nt -> NMD; last exon -> escape"
+          },
+          {
+            "text": "ClinVar treated as a lead, not evidence",
+            "result": "PASS",
+            "note": "stated"
+          }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Worst consequence as PVS1 and stacked predictors (regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "-s worst: 3000 splice_donor HIGH (ENSTSYN_minor), 3500 stop_gained; MANE: 3000 intron_variant MODIFIER, 3500 stop_gained exon 9/9. Declined: 3000 is a false PVS1 candidate, 3500 escapes NMD, four correlated predictors are one line.",
+        "executed": true,
+        "execution_note": "runs/p_in7/run.sh (Windows bcftools 1.24 +split-vep); commands rebuilt because the pre-fix script was not kept.",
+        "basic": 38,
+        "specialized": 53,
+        "total": 91,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Worst-consequence inflation demonstrated",
+            "result": "PASS",
+            "note": "splice_donor on minor isoform vs intronic on MANE"
+          },
+          {
+            "text": "Last-exon stop not given full PVS1",
+            "result": "PASS",
+            "note": "exon 9/9"
+          },
+          {
+            "text": "Predictor stacking refused",
+            "result": "PASS",
+            "note": "one calibrated tool"
+          },
+          {
+            "text": "Scope: no classification issued",
+            "result": "PASS",
+            "note": "inputs for clinical-interpretation only"
+          }
+        ]
+      },
+      {
+        "index": 8,
+        "type": "Variant A",
+        "label": "NEW: gnomAD annotation with 1-vs-chr1 contig names",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "SKILL.md annotate line on a '1'-named VCF against a 'chr1' gnomAD file: exit 0, 0/11 records annotated, no warning. Common Errors row (--rename-chrs) fixes it: 6 annotated. The 'absent' list includes the un-normalized multiallelic 2000 A>C,G, which gnomAD holds as two PASS records - the Skill's normalize-first and 'absent may not mean absent' rules cover this.",
+        "executed": true,
+        "execution_note": "runs/in8/run.sh (Windows bcftools 1.24).",
+        "basic": 35,
+        "specialized": 51,
+        "total": 86,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Skill tells the agent to confirm build and contig naming before annotating",
+            "result": "PASS",
+            "note": "Version note and Common Errors row"
+          },
+          {
+            "text": "--rename-chrs fix restores the annotation",
+            "result": "PASS",
+            "note": "0 -> 6 records"
+          },
+          {
+            "text": "'Absent' is not read as 'not in humans'",
+            "result": "PASS",
+            "note": "callability/representation caveat; 2000 found as split records"
+          },
+          {
+            "text": "New-tag annotation leaves cohort fields intact",
+            "result": "PASS",
+            "note": "gnomAD_FAF only"
+          }
+        ]
+      },
+      {
+        "index": 9,
+        "type": "Edge",
+        "label": "NEW: csq --phase choice for a frameshift and stop in trans",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "-p a on unphased: 1420 frameshift absorbs 1466 (@1420), as the Skill says. -p s: no consequence at all (BCSQ '.') - bcftools help: 's: skip unphased hets'; the Skill says it treats them as separate haplotypes. With the pair phased in trans, -p m still merged them (help: 'merge *all* GTs into a single haplotype'), while -p a gave the correct separate consequences (frameshift; stop_gained 86R>86*). The Skill says -p m merges only phased hets.",
+        "executed": true,
+        "execution_note": "runs/in9/run.sh (Windows bcftools 1.24); phase semantics confirmed with 'bcftools csq' help on 1.24 and WSL 1.21.",
+        "basic": 26,
+        "specialized": 38,
+        "total": 64,
+        "assertions_passed": 1,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "-p a behaves as the Skill describes",
+            "result": "PASS",
+            "note": "unphased hets merged into one haplotype consequence"
+          },
+          {
+            "text": "-p s behaves as the Skill describes",
+            "result": "FAIL",
+            "note": "skips unphased hets: no consequence emitted"
+          },
+          {
+            "text": "-p m behaves as the Skill describes",
+            "result": "FAIL",
+            "note": "merged a trans-phased pair into one haplotype"
+          },
+          {
+            "text": "Following the Skill's phase guidance gives correct consequences for trans-phased hets",
+            "result": "FAIL",
+            "note": "the Skill points phased data to -p m, which gives the wrong merged call; -p a was correct"
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 34.4,
+    "dynamic_weighted": 51.5,
+    "score": 86,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Governing principle (annotation = variant x transcript x engine x version) and MANE-first reporting are correct and were demonstrated on worst-vs-MANE data",
+    "All pre-fix P1s are fixed and verified: indexed annotate steps, csq --phase, and gnomAD frequencies in a new tag that keeps 'absent' detectable",
+    "Predictor guidance now matches the Pejaver 2022 calibration, including calibrated PolyPhen-2 and CADD intervals"
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "csq --phase modes m and s are described wrongly",
+      "observed_in": [
+        9
+      ],
+      "problem": "The Skill says -p m merges only phased hets and -p s keeps unphased hets separate. bcftools 1.21/1.24: m merges all GTs into one haplotype regardless of phase (merged a trans pair); s skips unphased hets (no consequence emitted).",
+      "root_cause": "Mode semantics written from memory, not from 'bcftools csq' help.",
+      "fix": "Use the help text: a = take GTs as is (0/1 -> 0|1), m = merge all GTs into one haplotype, r = require phase, R = non-reference haplotypes, s = skip unphased hets; recommend -p a for phased data (SKILL.md and usage guide)."
+    },
+    {
+      "priority": "P2",
+      "title": "SKILL.md annotate line needs an indexed target",
+      "observed_in": [
+        1
+      ],
+      "problem": "The three-line csq/annotate block runs `annotate -a gnomad.vcf.gz ... rsid.vcf.gz` on a file it never indexed; bcftools 1.24 and 1.21 stop with 'could not load index'.",
+      "root_cause": "The fix added the line without the `bcftools index` step its own next sentence requires.",
+      "fix": "Insert `bcftools index -f rsid.vcf.gz` before the gnomAD line."
+    },
+    {
+      "priority": "P2",
+      "title": "No warning at the annotate step for contig-name mismatch",
+      "observed_in": [
+        8
+      ],
+      "problem": "With chr1 vs 1 naming, annotate exits 0 and annotates nothing; the fix lives only in Common Errors.",
+      "root_cause": "Silent zero-match behaviour of bcftools annotate.",
+      "fix": "Add a one-line pre-check (compare `bcftools index -s` contig names of target and source) next to the annotate commands."
+    }
+  ]
+}

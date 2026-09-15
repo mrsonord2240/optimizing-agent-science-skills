@@ -1,0 +1,128 @@
+{
+  "source": "mrsonord2240/bioSkills@966f838b0ba32918310bd223a34f71d78f190560:phylogenetics/species-trees",
+  "meta": {
+    "skill_name": "bio-phylo-species-trees",
+    "description": "Estimates species trees under the multispecies coalescent from per-locus gene trees with the modern ASTER astral binary (ASTRAL-III/wASTRAL/ASTRAL-Pro), plus SVDQuartets, BPP, and StarBEAST2.",
+    "evaluated_on": "2026-09-15",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 9,
+    "source": "mrsonord2240/bioSkills@966f838b0ba32918310bd223a34f71d78f190560:phylogenetics/species-trees",
+    "executed": "9/9 inputs executed (ASTER Windows build astral/wastral/astral-pro, Java ASTRAL 5.7.8, IQ-TREE 2.4.0, DendroPy, SciPy); PAUP*/SVDQuartets, BPP, StarBEAST2 not executed (no Skill command)",
+    "execution_note": "Re-audit of the fixed Skill: 7 pre-fix inputs re-run as regression tests plus 2 new inputs (N = 9). Per-locus IQ-TREE gene trees were reused from the pre-fix audit (runs/inN/loci.treefile; command unchanged except the binary name); every ASTER, concordance-factor and asymmetry step and the shipped example (which re-infers its own gene trees) were re-run. SYNTHETIC data (data/make_data.py)."
+  },
+  "veto_gates": {
+    "skill_veto": {"gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS"},
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {"result": "PASS", "detail": "All numbers come from runs on synthetic multispecies-coalescent data with known species trees."},
+      "practice_boundaries": {"result": "PASS", "detail": "Research phylogenetics only."},
+      "methodological_ground": {"result": "PASS", "detail": "localPP never read as bootstrap; introgression claimed only with a significant minority-quartet asymmetry; units reported as CULength or SULength explicitly."},
+      "code_usability": {"result": "PASS", "detail": "Every ASTER and IQ-TREE command in SKILL.md ran (exit 0), including the split concordance calls and astral-pro -a; examples/astral_pipeline.sh now completes (exit 0 after 306 s) and writes cf_g/cf_s outputs."}
+    }
+  },
+  "static_score": {
+    "subtotal": 85,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {"score": 10, "max": 12, "note": "Concordance calls, ASTER units, astral-pro -a, contraction scope and the asymmetry test are fixed and verified. Completeness 3: SVDQuartets, BPP and StarBEAST2 still have no command, control file or XML. Correctness 3: the frontmatter description still says ASTRAL branch lengths are coalescent units, contradicting the fixed body."},
+      "reliability": {"score": 9, "max": 12, "note": "Accurate Common Errors table; no check that leaf names are consistent across gene trees, so a renamed sample silently becomes an extra species (Input 9)."},
+      "performance_context": {"score": 7, "max": 8, "note": "218-line SKILL.md, compact."},
+      "agent_usability": {"score": 14, "max": 16, "note": "Flag mapping and units now accurate in the body; description and the 'Approach' line (contract <10% before ASTRAL) lag behind the fixed guidance."},
+      "human_usability": {"score": 6, "max": 8, "note": "Natural prompts in usage guide; description is a 900-character jargon block."},
+      "security": {"score": 11, "max": 12, "note": "Local tools only; no taxon-label validation."},
+      "maintainability": {"score": 10, "max": 12, "note": "Shipped example now runs end to end with a binary resolver; no test data or expected output shipped."},
+      "agent_specific": {"score": 18, "max": 20, "note": "Precise trigger and routing; StarBEAST2 routing no longer circular; seeds in example."}
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 87.0,
+    "max": 100,
+    "assertion_pass_rate": {"passed": 38, "total": 41},
+    "inputs": [
+      {"index": 1, "type": "Canonical", "label": "150-locus radiation: wASTRAL/ASTRAL + gCF/sCF", "status": "COMPLETED", "status_flag": "✅", "note": "All four ASTER trees and concatenation RF 0; split CF calls exit 0; gCF 12-50 with localPP 0.97-1; CULength reported", "basic": 37, "specialized": 53, "total": 90, "assertions_passed": 5, "assertions_total": 5,
+       "assertions": [
+         {"text": "wASTRAL/ASTRAL species tree equals the simulated species tree", "result": "PASS", "note": "RF 0/14 x4"},
+         {"text": "The Skill's concordance-factor commands run as written", "result": "PASS", "note": "-t --gcf and -te --scfl exit 0 (pre-fix exit 2)"},
+         {"text": "localPP read on its own scale next to gCF/sCF", "result": "PASS", "note": "table reported"},
+         {"text": "The Skill's contraction guidance matches UFBoot gene trees", "result": "PASS", "note": "0 collapsed; Skill now says near no-op with UFBoot, use wASTRAL (pre-fix FAIL)"},
+         {"text": "Branch lengths reported in stated units", "result": "PASS", "note": "--length CULength run"}
+       ], "executed": true, "execution_note": "runs_v2/in1: treetools contract, wastral, astral -t 4/-u 2/--root/--length CULength, iqtree2 CF calls."},
+      {"index": 2, "type": "Variant A", "label": "Anomaly-zone radiation, 400 loci", "status": "COMPLETED", "status_flag": "✅", "note": "RF 0 all; short branches gCF 25/20.5, localPP 0.786/0.761, Java polytomy p 0.37/0.16 -> near-polytomy reported; estimated gene-tree plurality 0.087 anomalous vs 0.060 species", "basic": 37, "specialized": 53, "total": 90, "assertions_passed": 5, "assertions_total": 5,
+       "assertions": [
+         {"text": "Output reports the most frequent gene tree differs from the species tree", "result": "PASS", "note": "0.087 vs 0.060"},
+         {"text": "Short branches reported unresolved despite concatenation support", "result": "PASS", "note": "polytomy p 0.37/0.16"},
+         {"text": "The Skill's CF commands run as written", "result": "PASS", "note": "exit 0"},
+         {"text": "The Skill no longer overclaims coalescent recovery deep in the zone", "result": "PASS", "note": "near-polytomy deliverable stated (pre-fix P2)"},
+         {"text": "Polytomy test command (Java -t 10) runs", "result": "PASS", "note": "exit 0"}
+       ], "executed": true, "execution_note": "runs_v2/in2: ASTER pipeline, CF calls, java -jar astral.5.7.8.jar -t 10."},
+      {"index": 3, "type": "Edge", "label": "150 short (120 bp) loci with missing taxa", "status": "COMPLETED", "status_flag": "✅", "note": "RF 0 all; 2 of ~1000 branches contracted; gCF 11-43 below sCF 28-56 (gene-tree-error symptom); SVDQuartets still has no command", "basic": 34, "specialized": 48, "total": 82, "assertions_passed": 3, "assertions_total": 4,
+       "assertions": [
+         {"text": "Species tree from short incomplete loci equals the simulated tree", "result": "PASS", "note": "RF 0"},
+         {"text": "Output applies the Skill's gene-tree-error diagnostic", "result": "PASS", "note": "gCF far below sCF"},
+         {"text": "The Skill's guidance on contraction with UFBoot input is accurate", "result": "PASS", "note": "near no-op stated"},
+         {"text": "The Skill provides a runnable SVDQuartets path", "result": "FAIL", "note": "method named only"}
+       ], "executed": true, "execution_note": "runs_v2/in3: same pipeline on reused short-locus gene trees."},
+      {"index": 4, "type": "Variant B", "label": "ILS vs introgression across 5 branches", "status": "COMPLETED", "status_flag": "✅", "note": "Skill's binomial test on gDF1_N/gDF2_N: branch 13 (A,B,C) 9 vs 58, p 6.8e-10 ASYMMETRIC, others p 0.26-1.0; freqQuad.csv names the inflated minority as C with (D,E), matching the simulation", "basic": 37, "specialized": 55, "total": 92, "assertions_passed": 5, "assertions_total": 5,
+       "assertions": [
+         {"text": "Only the simulated introgression branch is flagged", "result": "PASS", "note": "1 of 5"},
+         {"text": "The inflated minority is identified as C with (D,E)", "result": "PASS", "note": "freqQuad N2 t3 72.67"},
+         {"text": "The Skill supplies a concrete asymmetry test and names -u 3 / freqQuad.csv", "result": "PASS", "note": "binomial f2 vs f2+f3 (pre-fix FAIL)"},
+         {"text": "The Skill's CF commands run as written", "result": "PASS", "note": "exit 0"},
+         {"text": "Output routes to reticulation models rather than forcing a tree", "result": "PASS", "note": "HyDe/QuIBL/BPP-MSci named"}
+       ], "executed": true, "execution_note": "runs_v2/in4: astral -u 3 (freqQuad.csv), symtest.py (auditor implementation of the Skill's test sentence; first run crashed on the NA root row, fixed and re-run)."},
+      {"index": 5, "type": "Stress", "label": "150 multi-copy gene families", "status": "COMPLETED", "status_flag": "✅", "note": "Skill's astral-pro -a gene2species.txt returns the 8-species tree, RF 0, localPP >= 0.999998", "basic": 37, "specialized": 53, "total": 90, "assertions_passed": 5, "assertions_total": 5,
+       "assertions": [
+         {"text": "Families kept; ASTRAL-Pro used without pre-orthology", "result": "PASS", "note": "150/150"},
+         {"text": "The Skill's ASTRAL-Pro command yields a species tree as written", "result": "PASS", "note": "8 tips (pre-fix: 16-tip gene-copy tree)"},
+         {"text": "Recovers the simulated species tree", "result": "PASS", "note": "RF 0/10"},
+         {"text": "Map file format as the Skill describes", "result": "PASS", "note": "tab-separated gene species"},
+         {"text": "Paralogy claims not overstated", "result": "PASS", "note": "stated"}
+       ], "executed": true, "execution_note": "runs_v2/in5: astral-pro -a and -u 2 on reused family trees."},
+      {"index": 6, "type": "Scope Boundary", "label": "Dates from ASTRAL lengths + BPP delimitation", "status": "COMPLETED", "status_flag": "✅", "note": "Declines dating; units checked: default S01,S02 0.0064 SULength, --length CULength 0.152, wASTRAL 0.164 (true 0.20 CU); BPP routed to GitHub releases but no control file", "basic": 35, "specialized": 48, "total": 83, "assertions_passed": 3, "assertions_total": 4,
+       "assertions": [
+         {"text": "Scope: no divergence times from ASTRAL lengths", "result": "PASS", "note": "routed to divergence-dating"},
+         {"text": "Names BPP and what it needs", "result": "PASS", "note": "stated"},
+         {"text": "The Skill's units statement matches the installed ASTER output", "result": "PASS", "note": "SULength default, CULength flag (pre-fix FAIL)"},
+         {"text": "The Skill gives an actionable BPP path", "result": "FAIL", "note": "install location fixed, still no control file"}
+       ], "executed": true, "execution_note": "runs_v2/in1 unit comparisons (default, --length CULength, wastral); nothing dated by design."},
+      {"index": 7, "type": "Adversarial", "label": "Report localPP as bootstrap; call discordance introgression", "status": "COMPLETED", "status_flag": "✅", "note": "Refuses; ASTER -t 4 tree carries localPP but no q values, -u 2 carries q1-q3, as the fixed text says; S01-S03 minorities symmetric", "basic": 37, "specialized": 53, "total": 90, "assertions_passed": 5, "assertions_total": 5,
+       "assertions": [
+         {"text": "Safety: refuses to report localPP as bootstrap percentages", "result": "PASS", "note": "declined"},
+         {"text": "Maps the Java -t 8 intent to ASTER -u 2", "result": "PASS", "note": "explained"},
+         {"text": "No introgression claim without asymmetry", "result": "PASS", "note": "symmetric"},
+         {"text": "The Skill's description of the -t mix-up matches the binary", "result": "PASS", "note": "localPP only, no q (pre-fix FAIL)"},
+         {"text": "Commands run", "result": "PASS", "note": "exit 0"}
+       ], "executed": true, "execution_note": "runs_v2/in1 species.tre (-t 4) and species_annot.tre (-u 2) inspected."},
+      {"index": 8, "type": "Variant B", "label": "NEW: measure ILS first (internodes in coalescent units)", "status": "COMPLETED", "status_flag": "✅", "note": "astral --root Sp_O --length CULength -u 2: successive internodes 0.054 and 0.046 CU (true 0.03, 0.03) -> anomaly-zone risk per the Skill's <0.1-0.2 threshold", "basic": 36, "specialized": 51, "total": 87, "assertions_passed": 4, "assertions_total": 4,
+       "assertions": [
+         {"text": "Combined --root/--length/-u command runs", "result": "PASS", "note": "exit 0"},
+         {"text": "Internode lengths reported in coalescent units", "result": "PASS", "note": "CULength field"},
+         {"text": "The Skill's internode thresholds are applied", "result": "PASS", "note": "both < 0.1"},
+         {"text": "Estimates are not overclaimed", "result": "PASS", "note": "noted as estimates from estimated gene trees"}
+       ], "executed": true, "execution_note": "runs_v2/in8 on the az gene trees."},
+      {"index": 9, "type": "Edge", "label": "NEW: one taxon renamed (S03_b) in 30 of 150 gene trees", "status": "COMPLETED", "status_flag": "✅", "note": "astral and wastral exit 0 with no warning and return 11 'species' (S03_b placed with S06-S08, localPP 0.55); astral -a name map fixes it, RF 0", "basic": 33, "specialized": 46, "total": 79, "assertions_passed": 3, "assertions_total": 4,
+       "assertions": [
+         {"text": "The Skill tells the agent to check leaf-name consistency across gene trees", "result": "FAIL", "note": "no such check; ASTER silently counts #Species: 11"},
+         {"text": "The agent detects the extra species from the ASTER log", "result": "PASS", "note": "#Species: 11 for 10 species"},
+         {"text": "The Skill's gene-to-species map format fixes the run", "result": "PASS", "note": "astral -a name2species.txt RF 0/14 (Skill documents -a for astral-pro)"},
+         {"text": "Code runs", "result": "PASS", "note": "exit 0"}
+       ], "executed": true, "execution_note": "runs_v2/in9: relabel.py (synthetic), astral, astral -a, wastral."}
+    ]
+  },
+  "final": {"static_weighted": 34.0, "dynamic_weighted": 52.2, "score": 86, "max": 100, "grade": "Production Ready", "grade_symbol": "⭐", "deployable": true, "veto_override": false},
+  "key_strengths": [
+    "Concordance-factor, ASTRAL-Pro mapping and units guidance now run and match ASTER output",
+    "The binomial minority-quartet test isolates the single simulated introgression branch",
+    "Correct coalescent doctrine: anomaly zone, localPP is not bootstrap, polytomy test as the deliverable deep in the zone",
+    "Shipped astral_pipeline.sh runs end to end and recovers the simulated species tree"
+  ],
+  "recommendations": [
+    {"priority": "P2", "title": "Add a leaf-name consistency check before ASTRAL", "observed_in": [9], "problem": "A sample renamed in 30 gene trees became an extra species with exit 0 and no warning.", "root_cause": "The Skill has no input validation step for gene-tree label sets.", "fix": "Tell the agent to compare leaf sets across gene trees, check '#Species' in the ASTER log, and use astral -a with a map file (as for astral-pro) when names differ."},
+    {"priority": "P2", "title": "Bring the description and Approach line in line with the body", "observed_in": [], "problem": "Frontmatter still says ASTRAL branch lengths are coalescent units, and the Approach still says to contract <10% branches before ASTRAL.", "root_cause": "The fix edited the body but not the description.", "fix": "State units depend on binary and flag; say contraction applies to standard bootstrap and wASTRAL is the default guard."},
+    {"priority": "P2", "title": "Give minimal SVDQuartets and BPP commands", "observed_in": [3, 6], "problem": "Both are recommended with no PAUP* block or BPP control file.", "root_cause": "Method table without worked commands.", "fix": "Add a minimal PAUP* svdq block and a BPP A00/A10 control-file skeleton, or route explicitly."}
+  ]
+}

@@ -1,0 +1,127 @@
+{
+  "source": "mrsonord2240/bioSkills@966f838b0ba32918310bd223a34f71d78f190560:phylogenetics/divergence-dating",
+  "meta": {
+    "skill_name": "bio-phylo-divergence-dating",
+    "description": "Estimate divergence times under molecular-clock models with BEAST2, MCMCTree/PAML, TreePL, and LSD2, framing a date as a product of the calibration prior and the clock model far more than of the sequence data.",
+    "evaluated_on": "2026-09-15",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 9,
+    "source": "mrsonord2240/bioSkills@966f838b0ba32918310bd223a34f71d78f190560:phylogenetics/divergence-dating",
+    "executed": "8/9 inputs executed (PAML 4.10.10 mcmctree/baseml, IQ-TREE 2.4.0 LSD2, Biopython 1.88); Input 6 is a routing answer. BEAST 2.7.7 was not re-run: Input 4 reuses the pre-fix TreeAnnotator MCC trees. TreePL not executable.",
+    "execution_note": "Re-audit of the fixed Skill: 7 pre-fix inputs as regression tests plus 2 new inputs (N = 9). Input 5 re-ran the shipped helper end to end and the '>'/'<' claim; its clock=2 vs clock=3 two-chain comparison is the pre-fix run (control lines identical to the fixed Skill's). SYNTHETIC data (data/make_data.py)."
+  },
+  "veto_gates": {
+    "skill_veto": {"gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS"},
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {"result": "PASS", "detail": "All ages, rates and intervals come from runs on synthetic data with known node ages and rates."},
+      "practice_boundaries": {"result": "PASS", "detail": "Research dating only; phylodynamic population-level questions are routed out."},
+      "methodological_ground": {"result": "PASS", "detail": "Fossils encoded as soft minima, prior-only runs before posteriors, temporal signal gated by date randomization, point calibrations refused."},
+      "code_usability": {"result": "PASS", "detail": "The Skill's PAML control lines, tree-file header, Bio.Phylo MCC snippet and the shipped mcmctree_setup.py (demo and full prior->bv->post pipeline, 1 and 2 loci) all run on PAML 4.10.10 / Biopython 1.88."}
+    }
+  },
+  "static_score": {
+    "subtotal": 87,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {"score": 11, "max": 12, "note": "BDparas flag, 'usedata = 2 in.BV', ntaxa header, corrected '>'/'<' row and the tip-set MCC snippet are all verified. Completeness 3/4: root-to-tip regression and the date-randomization test are described but not coded; TreePL has keys only."},
+      "reliability": {"score": 10, "max": 12, "note": "Common Errors now lists the three PAML 4.10 errors actually met; helper checks out.BV size; no checkpoint or ESS guidance for MCMCTree runs."},
+      "performance_context": {"score": 7, "max": 8, "note": "241-line SKILL.md, compact tables."},
+      "agent_usability": {"score": 14, "max": 16, "note": "Strong error prevention (effective prior, fossil-as-minimum, temporal-signal gate); snippet and prose now agree."},
+      "human_usability": {"score": 6, "max": 8, "note": "Natural prompts in usage guide; long description."},
+      "security": {"score": 11, "max": 12, "note": "No sensitive data; helper writes to OS temp directories without cleanup."},
+      "maintainability": {"score": 10, "max": 12, "note": "Helper now runnable end to end with per-run directories, seed and CLI; no test alignment shipped (demo writes an empty placeholder)."},
+      "agent_specific": {"score": 18, "max": 20, "note": "Precise trigger and routing to bayesian-inference, modern-tree-inference, tree-manipulation, tree-io, phylodynamics."}
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 87.2,
+    "max": 100,
+    "assertion_pass_rate": {"passed": 38, "total": 40},
+    "inputs": [
+      {"index": 1, "type": "Canonical", "label": "MCMCTree with a fossil minimum and soft bounds, 8 taxa", "status": "COMPLETED", "status_flag": "✅", "note": "Skill control lines run as written; bare 'usedata = 2' reproduces the documented error; 7/7 true ages inside posterior HPD; GH and root posteriors equal their effective priors", "basic": 37, "specialized": 52, "total": 89, "assertions_passed": 5, "assertions_total": 5,
+       "assertions": [
+         {"text": "Prior-only run first", "result": "PASS", "note": "usedata = 0"},
+         {"text": "The Skill's approximate-likelihood control line runs as written", "result": "PASS", "note": "'usedata = 2 in.BV' exit 0 (pre-fix FAIL)"},
+         {"text": "True ages inside posterior HPD", "result": "PASS", "note": "7/7"},
+         {"text": "Specified vs effective prior vs posterior table", "result": "PASS", "note": "reported"},
+         {"text": "Fossils encoded as soft minima/bounds", "result": "PASS", "note": "L() and B()"}
+       ], "executed": true, "execution_note": "runs_v2/in1/run_in1.py with common/mct.py (BDparas = 1 1 0.1 m, header '8 1')."},
+      {"index": 2, "type": "Variant A", "label": "Virus temporal signal + LSD2", "status": "COMPLETED", "status_flag": "✅", "note": "slope 2.22e-3, R^2 0.987; LSD2 rate 1.94e-3 [1.54e-3, 2.28e-3], tMRCA 1996.79 (truth 1996.975); randomized rates <= 7.3e-5 -> signal passes", "basic": 37, "specialized": 53, "total": 90, "assertions_passed": 5, "assertions_total": 5,
+       "assertions": [
+         {"text": "Root-to-tip regression with positive slope before dating", "result": "PASS", "note": "slope 2.22e-3"},
+         {"text": "Date-randomization test run and read correctly", "result": "PASS", "note": "real CI outside cloud"},
+         {"text": "The Skill's LSD2 command runs", "result": "PASS", "note": "exit 0"},
+         {"text": "LSD2 treated as a cross-check", "result": "PASS", "note": "stated"},
+         {"text": "Rate and TMRCA near truth", "result": "PASS", "note": "within CI"}
+       ], "executed": true, "execution_note": "runs_v2/common/tipdate.py virus in2 20 (auditor implementation of the described tests; Skill gives no code)."},
+      {"index": 3, "type": "Edge", "label": "Samples collected over five months", "status": "COMPLETED", "status_flag": "✅", "note": "LSD2 still prints tMRCA 1810 with CI to -1e9; R^2 0.094; randomization overlaps -> no temporal signal, no date reported", "basic": 37, "specialized": 51, "total": 88, "assertions_passed": 4, "assertions_total": 4,
+       "assertions": [
+         {"text": "Output refuses to report a TMRCA", "result": "PASS", "note": "declined"},
+         {"text": "Randomization overlap read as no signal", "result": "PASS", "note": "True"},
+         {"text": "The Skill warns that a positive slope alone is not sufficient", "result": "PASS", "note": "new sentence matches this dataset (pre-fix FAIL)"},
+         {"text": "Code runs", "result": "PASS", "note": "exit 0"}
+       ], "executed": true, "execution_note": "runs_v2/common/tipdate.py nosig in3 20; verdict.py."},
+      {"index": 4, "type": "Variant B", "label": "BEAST2 prior-only vs posterior MCC, node by node", "status": "COMPLETED", "status_flag": "✅", "note": "Skill's fixed snippet prints median + HPD by tip set: AB prior 17.37 [15.12, 25.30] vs posterior 19.88 [16.72, 25.41]; GH 42.68 vs 39.86; root 97.69 vs 88.24 (identical to the pre-fix compare.py); clades absent from the prior MCC are labelled", "basic": 36, "specialized": 50, "total": 86, "assertions_passed": 5, "assertions_total": 5,
+       "assertions": [
+         {"text": "Prior-only run via sampleFromPrior", "result": "PASS", "note": "pre-fix BEAST run"},
+         {"text": "beast -seed -prefix usage correct", "result": "PASS", "note": "pre-fix run, unchanged text"},
+         {"text": "The Skill's snippet compares ages and HPDs", "result": "PASS", "note": "medians and HPDs printed (pre-fix: None None)"},
+         {"text": "The Skill's snippet matches clades by tip set", "result": "PASS", "note": "frozenset keys (pre-fix FAIL)"},
+         {"text": "True ages inside posterior HPD", "result": "PASS", "note": "AB, GH, root"}
+       ], "executed": true, "execution_note": "runs_v2/in4: in4_snippet.py (verbatim) on the pre-fix TreeAnnotator MCC trees; BEAST not re-run. Node-age ESS 22-48 from the pre-fix run still needs a longer chain."},
+      {"index": 5, "type": "Stress", "label": "Shipped helper, calibration notation claim, two clocks", "status": "COMPLETED", "status_flag": "✅", "note": "mcmctree_setup.py pipeline mode runs prior -> bv -> post unmodified (in.BV 2343 bytes, 7/7 in HPD); '>0.35<0.55' and B(0.35,0.55) give identical calibration blocks and priors on 4.10.10, matching the fixed row", "basic": 36, "specialized": 51, "total": 87, "assertions_passed": 5, "assertions_total": 5,
+       "assertions": [
+         {"text": "The shipped helper runs as written", "result": "PASS", "note": "run_pipeline OK (pre-fix: 3 edits needed)"},
+         {"text": "The Skill's '>'/'<' statement matches PAML 4.10.10", "result": "PASS", "note": "identical blocks (pre-fix FAIL)"},
+         {"text": "Effective prior vs posterior table produced", "result": "PASS", "note": "7 clades"},
+         {"text": "Independent chains agree", "result": "PASS", "note": "pre-fix clock 2/3 two-chain run, max mean-age difference 0.0025"},
+         {"text": "True ages inside HPD under both clocks", "result": "PASS", "note": "pre-fix run, 7/7 each"}
+       ], "executed": true, "execution_note": "runs_v2/example_runs.py in5 (imports the shipped helper read-only) and claims_and_isp.py claims; clock comparison reused from runs/in5."},
+      {"index": 6, "type": "Scope Boundary", "label": "Skyline Ne and Re from the dated tree", "status": "COMPLETED", "status_flag": "✅", "note": "Routed to epidemiological-genomics/phylodynamics with the temporal-signal evidence; population-level only", "basic": 37, "specialized": 48, "total": 85, "assertions_passed": 4, "assertions_total": 4,
+       "assertions": [
+         {"text": "No skyline or Re produced", "result": "PASS", "note": "routed"},
+         {"text": "Correct sibling named", "result": "PASS", "note": "phylodynamics"},
+         {"text": "Advises a joint tip-dated model rather than conditioning on the LSD2 tree", "result": "PASS", "note": "stated"},
+         {"text": "Population-level framing, no individual inference", "result": "PASS", "note": "stated"}
+       ], "executed": false, "execution_note": "Routing answer; nothing to run."},
+      {"index": 7, "type": "Adversarial", "label": "Fossil as an exact point; bare TreePL date", "status": "COMPLETED", "status_flag": "✅", "note": "Point calibration pins GH at 0.400 [0.399, 0.401] and misses truth 0.45; soft minimum 0.491 [0.369, 0.638] contains it; TreePL bootstrap workflow given, not executed", "basic": 37, "specialized": 54, "total": 91, "assertions_passed": 4, "assertions_total": 4,
+       "assertions": [
+         {"text": "Safety: refuses to present a point fossil calibration", "result": "PASS", "note": "shown to miss truth"},
+         {"text": "Refuses a bare PL date without interval", "result": "PASS", "note": "bootstrap + cv workflow"},
+         {"text": "Soft minimum contains the true age", "result": "PASS", "note": "0.45 in [0.369, 0.638]"},
+         {"text": "Code runs", "result": "PASS", "note": "MCMCTree exit 0"}
+       ], "executed": true, "execution_note": "runs_v2/in7/run_in7.py (reuses runs_v2/in1/bv/out.BV)."},
+      {"index": 8, "type": "Variant B", "label": "NEW: helper on a 2-locus alignment", "status": "COMPLETED", "status_flag": "✅", "note": "ndata = 2 passed through **ctl_options; pipeline completes, in.BV 4686 bytes (two loci), 7/7 true ages in HPD and narrower intervals (EF 0.150 [0.101, 0.204])", "basic": 35, "specialized": 50, "total": 85, "assertions_passed": 3, "assertions_total": 4,
+       "assertions": [
+         {"text": "Helper accepts ndata for a multi-locus file", "result": "PASS", "note": "ctl shows ndata = 2"},
+         {"text": "Pipeline completes prior -> bv -> post", "result": "PASS", "note": "run_pipeline OK"},
+         {"text": "Posterior HPDs contain the true ages", "result": "PASS", "note": "7/7"},
+         {"text": "The helper or Skill says how to set ndata/partitions for multi-locus data", "result": "FAIL", "note": "ndata is only a keyword default; not mentioned in usage or SKILL.md"}
+       ], "executed": true, "execution_note": "runs_v2/example_runs.py in8 on species2loci.phy."},
+      {"index": 9, "type": "Edge", "label": "NEW: will more sequence data narrow my dates? (infinite-sites plot)", "status": "COMPLETED", "status_flag": "✅", "note": "CI width vs mean age through origin: 1 locus slope 0.483, R^2 0.57; 2 loci slope 0.445, R^2 0.88 -> points approaching the line, calibration uncertainty starting to dominate", "basic": 35, "specialized": 49, "total": 84, "assertions_passed": 3, "assertions_total": 4,
+       "assertions": [
+         {"text": "Plot quantities computed from posterior tables", "result": "PASS", "note": "7 nodes each"},
+         {"text": "Interpretation follows the Skill's infinite-sites reading", "result": "PASS", "note": "better fossils over more sites once linear"},
+         {"text": "The Skill supplies code for the infinite-sites plot", "result": "FAIL", "note": "described only"},
+         {"text": "Small node count caveat stated", "result": "PASS", "note": "7 nodes"}
+       ], "executed": true, "execution_note": "runs_v2/claims_and_isp.py isp on in5 and in8 results.json."}
+    ]
+  },
+  "final": {"static_weighted": 34.8, "dynamic_weighted": 52.3, "score": 87, "max": 100, "grade": "Production Ready", "grade_symbol": "⭐", "deployable": true, "veto_override": false},
+  "key_strengths": [
+    "PAML 4.10.10 control lines, tree header and in.BV hand-off now run exactly as written",
+    "The MCC comparison snippet reads medians and HPDs by tip set and reproduces the independent log-based numbers",
+    "Shipped mcmctree_setup.py runs the full prior -> bv -> post pipeline for one and two loci",
+    "Correct calibration doctrine: fossil as minimum, effective prior reported, temporal-signal gate"
+  ],
+  "recommendations": [
+    {"priority": "P2", "title": "Ship root-to-tip and date-randomization code", "observed_in": [2, 3], "problem": "Both tests are mandatory in the Skill but had to be written by the agent.", "root_cause": "TempEst is GUI-only and no scripted replacement is given.", "fix": "Add a short DendroPy/NumPy root-to-tip regression and an LSD2 date-shuffle loop."},
+    {"priority": "P2", "title": "Document multi-locus ndata in the helper", "observed_in": [8], "problem": "Multi-locus alignments need ndata set; the helper exposes it only as a keyword default.", "root_cause": "Usage text covers one alignment.", "fix": "Mention ndata and partitioned PHYLIP blocks in the docstring and SKILL.md."},
+    {"priority": "P2", "title": "Give infinite-sites plot code", "observed_in": [9], "problem": "The diagnostic is described but not coded.", "root_cause": "Conceptual section only.", "fix": "Add the regression of HPD width on posterior mean from out.txt."}
+  ]
+}

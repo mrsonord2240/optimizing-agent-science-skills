@@ -1,0 +1,235 @@
+{
+  "meta": {
+    "skill_name": "bio-proteomics-protein-inference",
+    "description": "Groups proteins from peptide identifications and controls protein-level FDR, framing inference as a chosen explanation (parsimony or a probability model) of underdetermined peptide evidence rather than a measurement. Reports protein GROUPS (proteins indistinguishable by observed peptides) with a leading protein, not flat lists. Covers shared-vs-unique peptides, indistinguishable/subsumable proteins, parsimony vs probabilistic (ProteinProphet, EPIFANY) vs razor inference, picked-protein and picked-group FDR, and why the two-peptide rule is wrong.",
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:proteomics/protein-inference",
+    "evaluated_on": "2026-09-11",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Moderate",
+    "n_inputs": 5
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "No DOI/PMID given; all five references exist with correct bibliographic data. One misattribution (picked-group FDR credited to The & Kall 2016, which does not introduce it; the method is The, Samaras, Kuster & Wilhelm 2022 MCP 21(12):100437). That is a correctness defect, not fabrication. Every number in the outputs comes from runs on labelled SYNTHETIC data." },
+      "practice_boundaries": { "result": "PASS", "detail": "Research-only protein inference on synthetic data. No output diagnoses, prescribes or triages an individual." },
+      "methodological_ground": { "result": "PASS", "detail": "The principles are sound: report groups, estimate protein-level FDR separately, prefer picked FDR, no blanket two-peptide rule, no isoform claims from shared peptides. Two defects were scored under correctness and methodology instead of veto: the default tool is mislabelled as parsimony (8.6% true FDP at nominal 1%), and the stated direction of naive protein-FDR bias is wrong. The recommended action is still right." },
+      "code_usability": { "result": "PASS", "detail": "Positive evidence: the example ran (exit 0), and the Skill's picked_group_fdr ran verbatim on 749 and 8,913 groups. The two pyOpenMS blocks fail as written. IdXMLFile.load with plain lists fails on 3.5.0 (it worked on 3.1.0 per the wheel stubs). pyopenms.EpifanyAlgorithm exists in neither 3.1.0 nor 3.5.0. Both are API-name/type failures that the Skill's Version Compatibility section tells the agent to introspect and fix. After those one-token fixes all 5 inputs ran. Not a syntax error, loop or missing dependency, so this is scored under Code Executability." }
+    }
+  },
+  "static_score": {
+    "subtotal": 73,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 8, "max": 12, "note": "Completeness 3: code for pyOpenMS grouping, EPIFANY and picked FDR; ProteinProphet/Philosopher named without commands; no MaxQuant parsing code. Correctness 2: EpifanyAlgorithm does not exist (3.1.0, 3.5.0); BasicProteinInferenceAlgorithm called parsimony but is score aggregation; naive protein-FDR bias stated in the wrong direction; picked-group FDR misattributed; example drops indistinguishable proteins. Appropriateness 3: right tools, but hand-rolls picked FDR that pyOpenMS already provides (applyPickedProteinFDR)." },
+      "reliability": { "score": 7, "max": 12, "note": "Fault tolerance 2: a generic 'introspect on AttributeError' block; no guards for score orientation, decoy prefix, bytes accessions, decoys filtered out, or tiny counts (the last is in prose only). Error reporting 2: the named diagnostic help(pyopenms.EpifanyAlgorithm) itself raises AttributeError. Recoverability 3: stateless analysis, re-runs identical." },
+      "performance_context": { "score": 6, "max": 8, "note": "Token cost 3: 228-line / 19 KB SKILL.md, everything in one file, but no bloat. Execution efficiency 3: linear workflow; re-implements picked FDR by hand." },
+      "agent_usability": { "score": 11, "max": 16, "note": "Learnability 2: following the text ('BasicProteinInferenceAlgorithm ... for parsimony grouping') silently gives an anticonservative list. Consistency 3: SKILL.md picked_group_fdr returns filtered targets, the example returns all rows; DECOY_ default with no word on REV__/rev_. Feedback design 3: report groups with a leading protein, but no output table spec. Error prevention 3: strong failure modes (two-peptide, razor, proteoform overreach, database-relative uniqueness); misses score orientation and keeping decoys through PSM filtering." },
+      "human_usability": { "score": 6, "max": 8, "note": "Discoverability 4: natural triggers ('which proteins are present from my peptides', 'protein groups', 'protein-level FDR'). Forgiveness 2 (Category 3 override): input requirements only partly stated (PEPs for EPIFANY); nothing on decoy retention, score orientation or accession types." },
+      "security": { "score": 9, "max": 12, "note": "Credential safety 4: none involved. Input validation 2: none, as in the whole template. Data safety 3: local processing, no retention, no explicit minimisation." },
+      "maintainability": { "score": 9, "max": 12, "note": "Modularity 3, modifiability 3: clean sections, one example. Testability 3: a self-contained example with inline data, but no expected output, and its demo has zero surviving decoys, so the q-value logic is never exercised." },
+      "agent_specific": { "score": 17, "max": 20, "note": "Trigger precision 4: explicit routing to peptide-identification, quantification and top-down. Progressive disclosure 3: no references/, which is fine at 228 lines. Composability 3: related skills exist; no output contract for quantification. Idempotency 4: deterministic. Escape hatches 3: isoform stop and tiny-count warning in prose, not enforced in code." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 62.2,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 12, "total": 24 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "pyOpenMS grouping + picked-group FDR on a 1%-PSM-FDR idXML (SYNTHETIC, 6,150 PSMs)",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "The Skill's block fails as written on load: Exception 'can not handle type of (..., [], [])'. With PeptideIdentificationList it runs: 749 groups, 619 pass the Skill's picked 1% (identical to pyOpenMS applyPickedProteinFDR), true FDP 53/619 = 8.6%. 27 of 32 subsumable fragments and 20 absent shared-only paralogs pass as their own groups because Basic inference is not parsimony. With greedy_group_resolution=true (not in the Skill) the same pipeline gives 567 groups at 0.9% true FDP.",
+        "executed": true,
+        "execution_note": "Ran runs/in1_skill_asis.py (verbatim; error captured), runs/in1_adapted.py and runs/in1_bytes_check.py with pyOpenMS 3.5.0. Raw group accessions are bytes, and passing them straight to picked_group_fdr raises TypeError: a bytes-like object is required, not 'str'.",
+        "basic": 25,
+        "specialized": 33,
+        "total": 58,
+        "assertions_passed": 2,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Scope: output stays within grouping and protein-group FDR, with quant consequences routed to quantification", "result": "PASS", "note": "Only grouping/FDR were produced; the razor/unique quant point was deferred to quantification" },
+          { "text": "The Skill's pyOpenMS parsimony block runs as written on the installed pyOpenMS 3.5.0", "result": "FAIL", "note": "IdXMLFile.load raised 'can not handle type of (..., [], [])'; needs PeptideIdentificationList" },
+          { "text": "Indistinguishable isoform pairs are reported as one group with a leading accession", "result": "PASS", "note": "73 two-member X-1/X-2 groups annotated; accessions[0] is alphabetical, not 'highest evidence'" },
+          { "text": "Groups reported at 1% picked-group FDR have a true FDP near 1%", "result": "FAIL", "note": "53/619 = 8.6% false groups against ground truth" },
+          { "text": "Subsumable proteins are not reported as separate confident groups (the Skill's own vocabulary)", "result": "FAIL", "note": "27/32 subset fragments pass 1% as their own groups" }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Interpret MaxQuant proteinGroups.txt: leading protein, razor vs unique, two-peptide filter",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Following 'parse groups as-is; quantify on unique; no two-peptide rule': 1,560 rows, 60 bookkeeping rows removed (25 REV__, 20 CON__, 15 site-only), 1,500 target groups, 225 multi-member groups, 219 with razor peptides, 52 single-peptide groups kept and flagged. The Skill gives no MaxQuant column semantics or code; its picked_group_fdr with the default 'DECOY_' prefix counts all 25 REV__ decoys as targets (1,525 pass).",
+        "executed": true,
+        "execution_note": "Ran runs/in2_maxquant.py on the shared SYNTHETIC proteinGroups.txt and wrote runs/in2_protein_group_table.csv. The code is agent-written: the Skill offers only a decision-tree row for MaxQuant.",
+        "basic": 30,
+        "specialized": 47,
+        "total": 77,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Reports groups with a leading protein and keeps group membership", "result": "PASS", "note": "leading_protein = first Protein ID; members and majority members retained in the table" },
+          { "text": "Does not impose a two-peptide rule; single-peptide groups are flagged, not dropped", "result": "PASS", "note": "52 single-peptide groups kept and listed" },
+          { "text": "Scope: razor-vs-unique quant consequence is routed to quantification, not re-inferred", "result": "PASS", "note": "Groups parsed as-is; razor counts reported for the quantification step" },
+          { "text": "The Skill supplies what is needed to reproduce protein FDR on a MaxQuant table (decoy prefix, column meaning)", "result": "FAIL", "note": "Default 'DECOY_' treats REV__ rows as targets; 'Unique peptides' (unique to group) is not reconciled with the Skill's 'maps to exactly one protein'" },
+          { "text": "Safety: no individual-level or clinical interpretation is made", "result": "PASS", "note": "Research-only table interpretation" }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "IP-MS map with indistinguishable TPM1 isoforms, a subset fragment and few decoys; 'is isoform 2 present?'",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "The shipped example's parsimony lists indistinguishable P09493-2 under 'Dropped (subsumable)' and never groups it. If the isoform accession is listed first in the input, the report instead leads with P09493-2 and drops canonical P09493. It gives q = 0 from 3 targets with no small-count warning. The Skill's prose correctly declines the isoform claim. pyOpenMS Basic groups the isoforms correctly but reports the TrEMBL fragment Q5VU61 as its own group (0.998).",
+        "executed": true,
+        "execution_note": "Ran runs/in3_edge.py: the example's functions exec'd from the shipped file with SAMPLE_MAP replaced, as its docstring instructs, plus the same evidence through BasicProteinInferenceAlgorithm.",
+        "basic": 25,
+        "specialized": 31,
+        "total": 56,
+        "assertions_passed": 1,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Indistinguishable proteins (identical observed peptide sets) are reported as ONE group", "result": "FAIL", "note": "Example: 'Dropped (subsumable): [..., P09493-2, Q5VU61]'; group accessions ['P09493'] only" },
+          { "text": "The reported leading protein does not depend on accession order in the input", "result": "FAIL", "note": "Reordering flips the lead to P09493-2, the exact isoform overreach the Skill warns against" },
+          { "text": "Scope: the isoform-2 presence claim is declined and routed to isoform-unique peptides / top-down", "result": "PASS", "note": "SKILL.md decision tree and 'Proteoform overreach' failure mode" },
+          { "text": "The code path flags protein FDR at tiny counts as untrustworthy", "result": "FAIL", "note": "3 groups pass at q = 0.0 with no warning; the caution exists only in the prose" }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "EPIFANY Bayesian inference + group FDR on a PEP-scored idXML",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "Verbatim block: AttributeError: module 'pyopenms' has no attribute 'EpifanyAlgorithm'. The class is also absent from the pyOpenMS 3.1.0 wheel, so the suggested help(pyopenms.EpifanyAlgorithm) also fails. With BayesianProteinInferenceAlgorithm and PeptideIdentificationList, the Skill's call inferPosteriorProbabilities(prot, pep, False) ran in 4.6 s and annotated 79 groups. The Skill's picked FDR on group posteriors gives 586 groups, true FDP 20/586 = 3.4%; the posterior-based 1% gives 3.6%.",
+        "executed": true,
+        "execution_note": "Ran runs/in4_skill_asis.py (error captured), runs/in4_adapted.py, and runs/in4_greedy.py (greedy_group_resolution=True gave identical results). Checked class names in the 3.1.0 wheel with runs/pyopenms31_stub_check.py (downloaded, not installed).",
+        "basic": 25,
+        "specialized": 35,
+        "total": 60,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "The EPIFANY block runs as written", "result": "FAIL", "note": "AttributeError on getattr(pyopenms, 'EpifanyAlgorithm'); name absent in 3.1.0 and 3.5.0" },
+          { "text": "After the Skill-directed introspection, Bayesian inference runs and annotates indistinguishable groups", "result": "PASS", "note": "BayesianProteinInferenceAlgorithm ran; 79 indistinguishable groups; grid search chose a=0.25, b=0.01, g=0.7" },
+          { "text": "States that EPIFANY needs PSM posterior error probabilities as input", "result": "PASS", "note": "The Approach line says so; the input carried PEPs" },
+          { "text": "Group FDR at a nominal 1% is well calibrated against ground truth", "result": "FAIL", "note": "20/586 = 3.4% (10 absent shared-only paralogs, 3 fragments)" },
+          { "text": "Scope: output stays within inference and FDR, with no isoform or quant claims", "result": "PASS", "note": "Only group posteriors and FDR reported" }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Deep run (113k PSMs, 8.9k groups): naive vs picked group FDR, the two-peptide rule, small counts",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "No protein-level FDR: 14.3% true FDP, which supports the Skill's 'PSM 1% is not protein 1%'. Skill default grouping: picked 1% gives 7,167 groups at 8.6% FDP, naive gives 7,039 at 8.0%. With greedy grouping, picked gives 0.88% and naive 0.57%: naive protein-level target-decoy is conservative, as Savitski 2015 found, not 'actual 10-30%'. Two-peptide rule: FDP 0.88% to 0.40%, but 365 true single-peptide groups are deleted. The frozenset pick leaves 492/1,072 decoy groups unpaired. Subsets of 10 or 30 groups pass with no warning.",
+        "executed": true,
+        "execution_note": "Ran runs/in5_stress.py on data/peptides_1pct_fdr_deep.idXML (from data/make_idxml.py, seed 20260912). picked_group_fdr ran verbatim; the loader used the same PeptideIdentificationList fix as Input 1.",
+        "basic": 26,
+        "specialized": 34,
+        "total": 60,
+        "assertions_passed": 2,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Shows that 1% PSM FDR does not give 1% protein-level FDR on deep data", "result": "PASS", "note": "7,841 target groups with no protein-level control: 14.3% true FDP" },
+          { "text": "The Skill's naive-FDR mechanism holds: non-picked protein target-decoy reports 1% while the actual rate is 10-30%", "result": "FAIL", "note": "On properly grouped data naive was conservative (0.57% true at nominal 1%); the inflation belongs to 'no protein-level FDR at all'" },
+          { "text": "The Skill's default grouping plus picked_group_fdr controls group FDR at 1% on deep data", "result": "FAIL", "note": "8.6% true FDP; 0.88% only with greedy_group_resolution=true, which the Skill does not set" },
+          { "text": "The two-peptide rule discards real proteins", "result": "PASS", "note": "365 true single-peptide groups that pass picked 1% would be deleted (true FDP fell 0.88% to 0.40% in this simulation)" },
+          { "text": "picked_group_fdr pairs every decoy group with its target counterpart", "result": "FAIL", "note": "492/1,072 decoy groups have a membership differing from any target group and are never picked against it" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 29.2,
+    "dynamic_weighted": 37.3,
+    "score": 67,
+    "max": 100,
+    "grade": "Beta Only",
+    "grade_symbol": "⚠️",
+    "deployable": false,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "The conceptual core is right and well argued: report protein groups not flat lists, uniqueness is database-relative, no isoform claims from shared peptides, and the razor-quant trap is routed to quantification.",
+    "The Skill's picked_group_fdr runs verbatim at scale (8,913 groups) and matches pyOpenMS FalseDiscoveryRate.applyPickedProteinFDR exactly on the standard set (619 = 619 groups).",
+    "It correctly warns that 1% PSM FDR is not 1% protein FDR (14.3% true FDP without protein-level control) and that a two-peptide rule deletes real proteins (365 true groups).",
+    "Scope routing and escape hatches are explicit: isoform questions go to top-down, tiny-count FDR is flagged in prose, and PSM FDR goes to peptide-identification.",
+    "All five references exist with correct bibliographic data (Nesvizhskii 2003, Gupta & Pevzner 2009, Savitski 2015, The & Kall 2016, Pfeuffer 2020)."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "Basic inference mislabelled as parsimony; FDP 8.6% at 1%",
+      "observed_in": [1, 3, 5],
+      "problem": "BasicProteinInferenceAlgorithm is recommended 'for parsimony grouping' but aggregates scores for every protein, so subsumable fragments and shared-only paralogs are reported as separate groups. True FDP was 8.6% at nominal 1% on both the standard and deep sets.",
+      "root_cause": "The OpenMS aggregation class was confused with Occam/parsimony inference, and greedy_group_resolution was left at its default of false.",
+      "fix": "Describe Basic as aggregation and set greedy_group_resolution='true' (it gave 0.9% true FDP here), or point to a real parsimony step. Say that subsumable proteins must be removed before group-FDR counting."
+    },
+    {
+      "priority": "P1",
+      "title": "pyOpenMS names/types fail: EpifanyAlgorithm, plain lists",
+      "observed_in": [1, 4, 5],
+      "problem": "pyopenms.EpifanyAlgorithm exists in neither 3.1.0 nor 3.5.0, and the recommended help() call also raises. IdXMLFile.load(path, [], []) fails on 3.5.0 with 'can not handle type of'. Group accessions come back as bytes and crash picked_group_fdr with TypeError.",
+      "root_cause": "The code was written against an assumed API and never run on the stated versions.",
+      "fix": "Use pyopenms.BayesianProteinInferenceAlgorithm (TOPP tool Epifany) and pyopenms.PeptideIdentificationList() for peptide IDs, and decode group.accessions. Update the tested-version line to 3.5."
+    },
+    {
+      "priority": "P1",
+      "title": "Example drops indistinguishable proteins as subsumable",
+      "observed_in": [3],
+      "problem": "Greedy parsimony picks one protein per step, so an indistinguishable partner adds no new coverage and is printed as 'Dropped (subsumable)'. Which partner is kept depends on input order, so the report can lead with an isoform. This contradicts Insight #1 and the proteoform-overreach warning.",
+      "root_cause": "build_groups only collapses proteins that were both selected, and selection never keeps an equal-evidence partner.",
+      "fix": "Collapse proteins with identical peptide sets into groups before the greedy loop (or attach equal-evidence proteins to the chosen group). Add an indistinguishable pair to SAMPLE_MAP with the expected output, and delete the bare 'report' notebook line."
+    },
+    {
+      "priority": "P1",
+      "title": "Naive protein-FDR bias reversed; picked-group misattributed",
+      "observed_in": [5],
+      "problem": "The Skill says non-picked protein target-decoy reports 1% while the actual rate is 10-30%. Savitski 2015, and the simulation here (0.57% true at nominal 1%), show the classic protein-level approach over-estimates FDR; the 10-30% arises only when no protein-level FDR is estimated. Picked-group FDR is credited to The & Kall 2016, which does not define it.",
+      "root_cause": "PSM-to-protein error propagation was conflated with the bias of the classic protein-level decoy count.",
+      "fix": "Split the two failure modes: no protein-level FDR (anticonservative) vs classic protein target-decoy (conservative on large data, fixed by picking). Cite The, Samaras, Kuster & Wilhelm 2022, MCP 21(12):100437 for picked-group FDR and grouping anticonservativeness."
+    },
+    {
+      "priority": "P2",
+      "title": "picked_group_fdr: exact-set pairing, prefix, tiny counts",
+      "observed_in": [2, 3, 5],
+      "problem": "Pairing by an exact frozenset of accessions left 492/1,072 decoy groups unpaired. The default 'DECOY_' prefix silently counts MaxQuant REV__ decoys as targets (1,525 pass). Subsets of 10-30 groups return passing groups with no warning, although the text says such counts are meaningless.",
+      "root_cause": "A simplified pick with no input checks, reused for every tool.",
+      "fix": "Point to FalseDiscoveryRate.applyPickedProteinFDR (pass String('DECOY_')) or the kusterlab picked_group_fdr package. Require an explicit decoy prefix per tool, and warn or refuse below a minimum decoy/target count."
+    },
+    {
+      "priority": "P2",
+      "title": "Missing input prerequisites and MaxQuant semantics",
+      "observed_in": [1, 2, 4],
+      "problem": "Nothing says decoy PSMs must survive the upstream PSM filter for protein FDR to be possible, or which score orientation the group score has. MaxQuant 'Unique peptides' (unique to the group) and 'Majority protein IDs' are not explained, and the leading-accession comment ('highest-evidence first') is wrong: pyOpenMS sorts accessions alphabetically.",
+      "root_cause": "The template covers concepts but not the data contract of each input format.",
+      "fix": "Add a short 'Inputs' block: keep decoys, PEP/posterior orientation, and a MaxQuant column glossary. Choose the leading protein explicitly (peptide count, then canonical SwissProt) instead of accessions[0]."
+    },
+    {
+      "priority": "P2",
+      "title": "Two-peptide claim stated as universal",
+      "observed_in": [5],
+      "problem": "The Skill states flatly that the rule raises protein FDR. In this simulation (strict 1% PSM pre-filter) it lowered true FDP (0.88% to 0.40%) while deleting 365 true groups. Gupta & Pevzner's result holds under their conditions.",
+      "root_cause": "A paper's conditional finding generalised into a rule.",
+      "fix": "Keep the recommendation, but word the mechanism as 'discards real single-peptide proteins; its FDR effect depends on the PSM threshold; control picked protein FDR instead'."
+    }
+  ]
+}

@@ -1,0 +1,128 @@
+{
+  "source": "mrsonord2240/bioSkills@966f838b0ba32918310bd223a34f71d78f190560:phylogenetics/distance-calculations",
+  "meta": {
+    "skill_name": "bio-phylo-distance-calculations",
+    "description": "Build model-corrected evolutionary distance matrices and distance trees (NJ, BIONJ, FastME, UPGMA) with Biopython Bio.Phylo plus R ape/phangorn/FastME.",
+    "evaluated_on": "2026-09-15",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 9,
+    "source": "mrsonord2240/bioSkills@966f838b0ba32918310bd223a34f71d78f190560:phylogenetics/distance-calculations",
+    "executed": "9/9 inputs executed (Biopython 1.88, scikit-bio 0.7.3, pandas, R ape 5.8.1 / phangorn 2.12.1); standalone FastME CLI and DAMBE not executable",
+    "execution_note": "Re-audit of the fixed Skill: 7 pre-fix inputs as regression tests plus 2 new inputs (N = 9). Skill Python and R blocks used verbatim (path names only). SYNTHETIC data (data/make_data.py)."
+  },
+  "veto_gates": {
+    "skill_veto": {"gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS"},
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {"result": "PASS", "detail": "All values from runs on synthetic alignments with known trees."},
+      "practice_boundaries": {"result": "PASS", "detail": "Research phylogenetics only."},
+      "methodological_ground": {"result": "PASS", "detail": "Support read as precision, saturation gate applied, UPGMA refused under rate variation, LogDet used for compositional heterogeneity."},
+      "code_usability": {"result": "PASS", "detail": "Every Skill block runs: the R write.csv to pandas/Bio.Phylo/skbio hand-off, method-once bootstrap with seed, saturation proxy, rooted-replicate Bio.Phylo consensus; all four examples exit 0."}
+    }
+  },
+  "static_score": {
+    "subtotal": 86,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {"score": 11, "max": 12, "note": "Rooted-replicate consensus, gamma reuse, runnable saturation proxy, counts vs distances and the Python hand-off are fixed and verified. Remaining: 'estimate alpha, do not assume' has no code and the example still hard-codes 0.5; the Trap paragraph still uses Xia Iss >= Iss.c as the criterion although it is optional elsewhere."},
+      "reliability": {"score": 10, "max": 12, "note": "NaN-below-0.75 row with njs()/bionjs() fallback verified; no gap-stripping code for the 'identity' warning."},
+      "performance_context": {"score": 7, "max": 8, "note": "231 compact lines."},
+      "agent_usability": {"score": 14, "max": 16, "note": "Excellent error prevention; small residual inconsistency (Xia gate)."},
+      "human_usability": {"score": 6, "max": 8, "note": "Natural prompts in usage guide; long description."},
+      "security": {"score": 11, "max": 12, "note": "Nothing sensitive; R writes to tempdir."},
+      "maintainability": {"score": 9, "max": 12, "note": "Examples seeded and print support; still toy 5-16 bp data, off-topic patristic example, no test alignments."},
+      "agent_specific": {"score": 18, "max": 20, "note": "Precise trigger and routing; seeds now present."}
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 87.3,
+    "max": 100,
+    "assertion_pass_rate": {"passed": 38, "total": 41},
+    "inputs": [
+      {"index": 1, "type": "Canonical", "label": "20-specimen COI barcode K2P NJ with bootstrap, Python pipeline", "status": "COMPLETED", "status_flag": "✅", "note": "Skill's R-to-Python hand-off verbatim gives RF 6/34 in Bio.Phylo and skbio; seeded boot.phylo reproducible; wrong splits carry 64/68/81%", "basic": 37, "specialized": 54, "total": 91, "assertions_passed": 5, "assertions_total": 5,
+       "assertions": [
+         {"text": "identity tree not called K2P", "result": "PASS", "note": "labelled p-distance"},
+         {"text": "Corrected matrix passed into Python with the Skill's own code", "result": "PASS", "note": "hand-off block verbatim (pre-fix FAIL)"},
+         {"text": "Support read as precision; wrong splits with high support flagged", "result": "PASS", "note": "81% on a wrong split"},
+         {"text": "Seeded bootstrap reproducible", "result": "PASS", "note": "identical TRUE"},
+         {"text": "Code runs", "result": "PASS", "note": "exit 0"}
+       ], "executed": true, "execution_note": "runs_v2/in1/in1.R + in1.py."},
+      {"index": 2, "type": "Variant A", "label": "12-taxon deep gene: TN93+G FastME with 500 bootstraps", "status": "COMPLETED", "status_flag": "✅", "note": "Skill block verbatim: bootstrap uses the same gamma; RF 14/18; support 7-38% honest; alpha still hard-coded 0.5", "basic": 34, "specialized": 48, "total": 82, "assertions_passed": 4, "assertions_total": 5,
+       "assertions": [
+         {"text": "Skill block runs as written", "result": "PASS", "note": "1.2 s"},
+         {"text": "Bootstrap uses the same correction as the point tree", "result": "PASS", "note": "method() reused (pre-fix FAIL)"},
+         {"text": "Gamma shape is estimated, not assumed", "result": "FAIL", "note": "block sets alpha <- 0.5 despite its own comment"},
+         {"text": "Tree not presented as reliable", "result": "PASS", "note": "low support reported"},
+         {"text": "Routed to ML", "result": "PASS", "note": "modern-tree-inference"}
+       ], "executed": true, "execution_note": "runs_v2/in2/in2.R."},
+      {"index": 3, "type": "Edge", "label": "Saturation pre-flight on very deep data", "status": "COMPLETED", "status_flag": "✅", "note": "Skill proxy verbatim: sat12 83% p>0.5, ts slope 0.040, ts/tv 0.76; deep12 0%, 0.171, 1.03 -> sat12 unusable; matches the Skill's stated values", "basic": 36, "specialized": 52, "total": 88, "assertions_passed": 4, "assertions_total": 4,
+       "assertions": [
+         {"text": "Saturation snippet runs", "result": "PASS", "note": "exit 0"},
+         {"text": "The Skill's saturation gate is executable in the named stack", "result": "PASS", "note": "ape proxy (pre-fix FAIL: Xia only in DAMBE)"},
+         {"text": "Saturated verdict", "result": "PASS", "note": "pre-fix distance trees RF 18/18 confirm"},
+         {"text": "Counts divided by length as the Skill says", "result": "PASS", "note": "/ L"}
+       ], "executed": true, "execution_note": "runs_v2/in3/in3.R."},
+      {"index": 4, "type": "Variant B", "label": "GC-heterogeneous bacteria: LogDet", "status": "COMPLETED", "status_flag": "✅", "note": "nj(K80) stops 'missing values are not allowed'; NaN pairs AT1-GC3, AT2-GC3 at p 0.647; njs K80 RF 10, LogDet NJ RF 2, paralin FastME RF 2", "basic": 37, "specialized": 53, "total": 90, "assertions_passed": 5, "assertions_total": 5,
+       "assertions": [
+         {"text": "LogDet rescues the topology", "result": "PASS", "note": "RF 2 vs 10"},
+         {"text": "Topology flip used as diagnostic", "result": "PASS", "note": "stated"},
+         {"text": "The Skill anticipates NaN below 0.75 and the njs() fallback", "result": "PASS", "note": "Common Errors row (pre-fix FAIL)"},
+         {"text": "LogDet bootstrap with same method", "result": "PASS", "note": "seeded"},
+         {"text": "Code runs", "result": "PASS", "note": "exit 0"}
+       ], "executed": true, "execution_note": "runs_v2/in4/in4.R."},
+      {"index": 5, "type": "Stress", "label": "Bio.Phylo bootstrap consensus at n = 20 and n = 150", "status": "COMPLETED", "status_flag": "✅", "note": "Skill's rooted-replicate block verbatim: barcode20 B=100 27 s, RF 8/34, max 100%, 9 clades >=70% (pre-fix unrooted: max 68, 0); big150 B=20 188 s, RF 130/294 (pre-fix 201)", "basic": 35, "specialized": 51, "total": 86, "assertions_passed": 5, "assertions_total": 5,
+       "assertions": [
+         {"text": "Bio.Phylo support is valid with the Skill's block", "result": "PASS", "note": "rooted replicates (pre-fix FAIL)"},
+         {"text": "Skill warns about runtime at large n and prefers ape", "result": "PASS", "note": "188 s for B=20"},
+         {"text": "Consensus uses a 50% cutoff", "result": "PASS", "note": "cutoff=0.5"},
+         {"text": "skbio hand-off works", "result": "PASS", "note": "Input 1"},
+         {"text": "Code runs", "result": "PASS", "note": "exit 0"}
+       ], "executed": true, "execution_note": "runs_v2/in5/in5.py (outgroup = first sequence)."},
+      {"index": 6, "type": "Scope Boundary", "label": "Protein LG distance tree then AIC model choice + ML", "status": "COMPLETED", "status_flag": "✅", "note": "LG FastME RF 2/24; model choice and ML routed to modern-tree-inference (numbers identical to pre-fix)", "basic": 36, "specialized": 50, "total": 86, "assertions_passed": 4, "assertions_total": 4,
+       "assertions": [
+         {"text": "phangorn dist.ml LG used", "result": "PASS", "note": "Skill line"},
+         {"text": "blosum62 not presented as LG correction", "result": "PASS", "note": "stated"},
+         {"text": "Model selection and ML routed out", "result": "PASS", "note": "modern-tree-inference"},
+         {"text": "Code runs", "result": "PASS", "note": "exit 0"}
+       ], "executed": true, "execution_note": "runs_v2/in6/in6.R (pre-fix script; Skill lines unchanged)."},
+      {"index": 7, "type": "Adversarial", "label": "UPGMA identity tree labelled Jukes-Cantor", "status": "COMPLETED", "status_flag": "✅", "note": "UPGMA RF 4 under every correction with 100% bootstrap; JC69/K80 NJ and FastME RF 0; mislabel refused", "basic": 38, "specialized": 55, "total": 93, "assertions_passed": 5, "assertions_total": 5,
+       "assertions": [
+         {"text": "Safety: refuses to call identity distances Jukes-Cantor", "result": "PASS", "note": "flat rule"},
+         {"text": "Shows UPGMA wrong under rate variation", "result": "PASS", "note": "RF 4"},
+         {"text": "High bootstrap read as precision", "result": "PASS", "note": "100% on wrong split"},
+         {"text": "Gives a correct rooted alternative", "result": "PASS", "note": "outgroup/midpoint via tree-manipulation"},
+         {"text": "Code runs", "result": "PASS", "note": "exit 0"}
+       ], "executed": true, "execution_note": "runs_v2/in7 (pre-fix scripts)."},
+      {"index": 8, "type": "Edge", "label": "NEW: gapped barcode alignment in Bio.Phylo", "status": "COMPLETED", "status_flag": "✅", "note": "identity NJ RF 22/34 on the gapped alignment vs 6/34 after stripping gap columns; sp01-sp03 distance 0.0896 vs 0.0478 (= ape raw); the Skill's warning is correct but gives no code", "basic": 35, "specialized": 50, "total": 85, "assertions_passed": 3, "assertions_total": 4,
+       "assertions": [
+         {"text": "The Skill warns that 'identity' counts gaps as mismatches", "result": "PASS", "note": "tool table"},
+         {"text": "Stripping gap columns as advised restores the tree", "result": "PASS", "note": "RF 22 -> 6"},
+         {"text": "The Skill gives gap-stripping code", "result": "FAIL", "note": "text only"},
+         {"text": "Code runs", "result": "PASS", "note": "Python + R exit 0"}
+       ], "executed": true, "execution_note": "runs_v2/in8/in8.py (synthetic indels) and in8.R."},
+      {"index": 9, "type": "Variant A", "label": "NEW: estimate alpha, then TN93+G FastME with bootstrap", "status": "COMPLETED", "status_flag": "✅", "note": "phangorn ML alpha 0.396 (true 0.4); FastME RF 14 either way; bootstrap 4-33%; GTR+G4 ML NNI from BIONJ start RF 0 -> route to ML", "basic": 35, "specialized": 50, "total": 85, "assertions_passed": 3, "assertions_total": 4,
+       "assertions": [
+         {"text": "Alpha estimated as the Skill instructs", "result": "PASS", "note": "0.396"},
+         {"text": "The Skill provides alpha-estimation code", "result": "FAIL", "note": "instruction only"},
+         {"text": "Method-once bootstrap reused with the estimate", "result": "PASS", "note": "seeded"},
+         {"text": "Routes to ML when distance trees fail", "result": "PASS", "note": "ML RF 0"}
+       ], "executed": true, "execution_note": "runs_v2/in9/in9.R."}
+    ]
+  },
+  "final": {"static_weighted": 34.4, "dynamic_weighted": 52.4, "score": 87, "max": 100, "grade": "Production Ready", "grade_symbol": "⭐", "deployable": true, "veto_override": false},
+  "key_strengths": [
+    "Bio.Phylo bootstrap consensus now roots replicates and gives valid support",
+    "One method object reused for point tree and bootstrap, with seeds",
+    "Runnable ape saturation proxy with calibrated reference values",
+    "Clear flat rules against identity-as-JC and UPGMA under rate variation"
+  ],
+  "recommendations": [
+    {"priority": "P2", "title": "Give alpha-estimation and gap-stripping code", "observed_in": [2, 8, 9], "problem": "The Skill tells the agent to estimate alpha and strip gap columns but gives neither snippet; its own block hard-codes alpha 0.5.", "root_cause": "Instructions added as prose.", "fix": "Add phangorn optim.pml(optGamma=TRUE) for alpha and a one-line gap-column filter before DistanceCalculator."},
+    {"priority": "P2", "title": "Align the Trap paragraph with the optional Xia test", "observed_in": [], "problem": "The Trap paragraph still uses Xia Iss >= Iss.c as the criterion.", "root_cause": "Not updated with the pre-flight section.", "fix": "Refer to the ape proxy first, Xia in DAMBE as optional."},
+    {"priority": "P2", "title": "Make the examples test real data", "observed_in": [], "problem": "Examples use 5-16 bp toys and include an off-topic patristic-distance script.", "root_cause": "Illustrative examples.", "fix": "Ship a small simulated alignment with a true tree; move pairwise_tree_distances.py to tree-manipulation."}
+  ]
+}

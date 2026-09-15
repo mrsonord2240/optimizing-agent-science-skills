@@ -1,0 +1,489 @@
+{
+  "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:phylogenetics/species-trees",
+  "meta": {
+    "skill_name": "bio-phylo-species-trees",
+    "description": "Estimates species trees under the multispecies coalescent from per-locus gene trees with ASTER astral/wastral/astral-pro (plus SVDQuartets, BPP, StarBEAST2), explains ILS, anomaly-zone inconsistency of concatenation, localPP vs bootstrap, and quartet symmetry for ILS vs introgression.",
+    "evaluated_on": "2026-09-15",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:phylogenetics/species-trees",
+    "executed": "7/7 inputs executed (ASTER Windows build: ASTRAL-IV/wASTRAL v1.25.4.8, ASTRAL-Pro3 v1.25.3.8; Java ASTRAL 5.7.8; IQ-TREE 2.4.0; DendroPy 5.0.13)",
+    "execution_note": "All data are SYNTHETIC: gene trees simulated under the multispecies coalescent with DendroPy inside known species trees and per-locus alignments simulated with IQ-TREE AliSim (data/make_data.py); every species tree was compared with truth by RF distance. ASTER Windows binaries, Java ASTRAL 5.7.8 and IQ-TREE 2.4.0 ran all Skill commands; the Skill's combined --gcf/--scfl command and the shipped examples/astral_pipeline.sh fail as written (exit 2). Not executed: Newick Utilities nw_ed (no Windows build; contraction done in Python), PAUP*/SVDQuartets (no Skill command, no labelled Windows build), BPP and StarBEAST2 (no Skill command, control file or XML). Thread counts capped at 4 (-T AUTO and astral -t 8 run with 4)."
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "Every number reported in the outputs came from runs on the SYNTHETIC datasets and is traceable to files under runs/; no DOIs, PMIDs or results were invented. The Skill's reference list was not individually verified by this audit."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Pure research phylogenetics; nothing diagnoses, prescribes or triages an individual."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "No methodological fallacy in any output. localPP was never read as bootstrap, failure to reject the polytomy null was reported as unresolved rather than as a resolution, discordance was not called introgression without a significant q2-vs-q3 asymmetry, and ASTRAL lengths were reported in their actual units. The Skill's anomaly-zone warning was reproduced (concatenation wrong at UFBoot 100 in the 2000-locus test); its units statement and ASTRAL-Pro command are correctness defects, not fallacies, and are recorded as P1."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "Every ASTER, Java ASTRAL and IQ-TREE command the Skill gives ran on the installed versions except the combined '--gcf ... --scfl 100' call (IQ-TREE 2.4.0 exit 2 with a self-explanatory message), which runs once split into two calls as the Skill's introspect-and-adapt rule directs; the shipped example passes bash -n and runs to that same step. Recorded as P1 correctness defects, not unrunnable code."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 80,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 9,
+        "max": 12,
+        "note": "Completeness 3: SVDQuartets, BPP and StarBEAST2 are named with no command, control file or XML; the ASTRAL-Pro command omits the gene-to-species mapping. Correctness 2: the combined '--gcf ... --scfl 100' command is rejected by IQ-TREE 2.4.0; 'branch lengths are in coalescent units' is false for the ASTER astral/astral-pro it targets (default --length SULength); 'cf.cf.stat has per-branch q1/q2/q3' is false; 'conda install -c bioconda bpp' names a package bioconda does not have. Theory (1-(2/3)e^-tau table, anomaly zone, quartet-level consistency) reproduced by simulation. Appropriateness 4."
+      },
+      "reliability": {
+        "score": 8,
+        "max": 12,
+        "note": "Common Errors table with cause/solution and an introspect-and-adapt rule; but the shipped example's nw_ed fallback silently skips contraction and set -e aborts it at the CF step after the expensive gene-tree stage, leaving no CF output."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "209-line SKILL.md with dense tables and no redundant steps; everything loads at once but it is compact."
+      },
+      "agent_usability": {
+        "score": 14,
+        "max": 16,
+        "note": "Strong error prevention (Java vs ASTER -t, localPP is not bootstrap, units caveat, paralogy); consistency 3 because the stated units contradict ASTER's default output and wastral/astral write different units."
+      },
+      "human_usability": {
+        "score": 6,
+        "max": 8,
+        "note": "Usage guide has natural prompts; the description is a single ~900-character jargon block."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "Local tools only, no credentials or network; no input sanity check such as taxon-name consistency across gene trees."
+      },
+      "maintainability": {
+        "score": 8,
+        "max": 12,
+        "note": "Clear sections and one example script; the example is declared not spot-runnable, ships no test data or expected output, and fails as written on IQ-TREE 2.4.0."
+      },
+      "agent_specific": {
+        "score": 17,
+        "max": 20,
+        "note": "Precise trigger with explicit routing; StarBEAST2 is routed to bayesian-inference, which has no StarBEAST2 content and routes coalescent species trees back here; seeds present."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 83.4,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 22,
+      "total": 33
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "10-species radiation, 150 loci: gene trees -> wASTRAL/ASTRAL + CFs",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "All four ASTER trees RF 0 to the simulated species tree; localPP >= 0.97 but gCF 12-50; Skill CF command exits 2; <10 contraction collapsed 0 branches (min UFBoot 12)",
+        "basic": 34,
+        "specialized": 48,
+        "total": 82,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "wASTRAL/ASTRAL species tree equals the simulated species tree",
+            "result": "PASS",
+            "note": "RF 0/14 for wastral, astral, astral --root and uncontracted"
+          },
+          {
+            "text": "The Skill's concordance-factor command runs as written",
+            "result": "FAIL",
+            "note": "IQ-TREE 2.4.0 exit 2: 'Do not specify --scf or --gcf with --scfl'"
+          },
+          {
+            "text": "localPP is read on its own scale and reported with gCF/sCF and the polytomy test",
+            "result": "PASS",
+            "note": "S01,S02,S03: localPP 0.970, gCF 17.3, polytomy p 0.059 reported as not demonstrably resolved"
+          },
+          {
+            "text": "The Skill's contraction step contracts weak gene-tree branches",
+            "result": "FAIL",
+            "note": "0 of 1050 collapsed: UFBoot never below 10 (min 12); nw_ed unavailable on Windows"
+          },
+          {
+            "text": "ASTER flags are used exactly as the Skill maps them",
+            "result": "PASS",
+            "note": "-t threads (#Threads: 4 in log), -u 2 annotation, --root all behave as documented"
+          }
+        ],
+        "executed": true,
+        "execution_note": "Ran iqtree2 -S (MFP, -B 1000, -T 4), treetools.py contraction (nw_ed has no Windows build), wastral, astral -t 4 / -u 2 / --root, the Skill's combined --gcf/--scfl command (exit 2) and the split gCF/sCF commands, Java ASTRAL -t 10 polytomy test. SYNTHETIC data."
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Anomaly zone: concatenation vs coalescent, 400 loci (+2000-locus stress test)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Anomalous gene tree most frequent (0.087 vs 0.060); at 400 loci ASTRAL and concat both RF 0, short branches polytomy p 0.37/0.16; deeper AZ with 2000 loci: concat wrong split at UFBoot 100, ASTRAL also wrong but localPP 0.75 and polytomy p 0.23",
+        "basic": 36,
+        "specialized": 51,
+        "total": 87,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Output detects and reports that the most frequent gene tree differs from the species tree",
+            "result": "PASS",
+            "note": "Estimated 0.087 vs 0.060; true 0.102 vs 0.068"
+          },
+          {
+            "text": "The two short branches are reported as unresolved despite concatenation UFBoot 100",
+            "result": "PASS",
+            "note": "Polytomy p 0.37/0.16, gCF 20.5/25, localPP 0.76/0.79"
+          },
+          {
+            "text": "The Skill's claim that concatenation is positively misleading in the anomaly zone is reproduced",
+            "result": "PASS",
+            "note": "2000-locus deep-AZ test: concatenation wrong split C,D with UFBoot 100"
+          },
+          {
+            "text": "The Skill's concordance-factor command runs as written",
+            "result": "FAIL",
+            "note": "exit 2 on IQ-TREE 2.4.0"
+          },
+          {
+            "text": "Output does not overclaim the coalescent tree in the deep anomaly zone",
+            "result": "PASS",
+            "note": "ASTRAL's wrong split reported with localPP 0.75 and polytomy p 0.23"
+          }
+        ],
+        "executed": true,
+        "execution_note": "Ran iqtree2 -S, concatenated IQ-TREE (MFP, -B 1000), wastral, astral -u 2 / --root, the Skill's combined CF command (exit 2) and split CF commands, Java ASTRAL -t 10, and an auditor gene-tree frequency tally. Supplementary SYNTHETIC stress test (0.01-CU internodes, 2000 x 200 bp): concatenation on simulated loci, ASTRAL on true gene trees (2000 gene-tree inferences not affordable on the shared machine)."
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "120-bp loci with missing taxa: gene-tree error vs ASTRAL",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Estimated gene trees 42% wrong (mean nRF 0.417) yet ASTRAL/wASTRAL RF 0; gCF 11-43 far below sCF; contraction removed 2 of 1006 branches; SVDQuartets not run (no Skill command, no Windows build)",
+        "basic": 33,
+        "specialized": 46,
+        "total": 79,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Species tree from short, incomplete loci equals the simulated tree",
+            "result": "PASS",
+            "note": "RF 0/14 for wASTRAL and ASTRAL"
+          },
+          {
+            "text": "Output applies the Skill's gene-tree-error diagnostic",
+            "result": "PASS",
+            "note": "gCF far below sCF and high localPP reported as the Skill's symptom"
+          },
+          {
+            "text": "The Skill's <10% contraction meaningfully removes weak branches from IQ-TREE -B gene trees",
+            "result": "FAIL",
+            "note": "2 of 1006 internal branches collapsed"
+          },
+          {
+            "text": "The Skill provides a runnable SVDQuartets path",
+            "result": "FAIL",
+            "note": "Method named only; no PAUP* command block"
+          }
+        ],
+        "executed": true,
+        "execution_note": "Same ASTER/IQ-TREE harness as Input 1 on SYNTHETIC 120-bp loci with 25% of loci missing 1-2 taxa; auditor measured gene-tree error vs true gene trees. PAUP*/SVDQuartets not executed: the Skill gives no command and the official test-build directory has no labelled Windows build."
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "ILS vs introgression from q1/q2/q3 on 200 loci",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Only the simulated introgression branch is asymmetric (f2 19.4 vs f3 72.7, binomial p 1.2e-8) and its inflated minority is C with (D,E); 4 other branches symmetric; species tree RF 0",
+        "basic": 36,
+        "specialized": 53,
+        "total": 89,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The simulated introgression branch is flagged, and only that branch",
+            "result": "PASS",
+            "note": "1 of 5 branches asymmetric (p 1.2e-8); others p 0.33-0.86"
+          },
+          {
+            "text": "The inflated minority topology is identified as C with (D,E)",
+            "result": "PASS",
+            "note": "freqQuad.csv t3 {A,B}|{F,G,H}#{D,E}|{C}: 72.67 estimated, 70.83 true"
+          },
+          {
+            "text": "Output does not force a tree-only answer and routes to reticulation models",
+            "result": "PASS",
+            "note": "HyDe / D-statistic / QuIBL / BPP-MSci / PhyloNet named as the Skill directs"
+          },
+          {
+            "text": "The Skill supplies a concrete asymmetry test or says which topology q2/q3 denote",
+            "result": "FAIL",
+            "note": "Neither; -u 3 freqQuad.csv and a binomial test had to be added"
+          },
+          {
+            "text": "The Skill's concordance-factor command runs as written",
+            "result": "FAIL",
+            "note": "exit 2 on IQ-TREE 2.4.0"
+          }
+        ],
+        "executed": true,
+        "execution_note": "Ran astral -u 2 as the Skill directs, plus auditor-added astral -u 3 (freqQuad.csv) on estimated and true gene trees and a binomial f2-vs-f3 test (runs/in4/symmetry_test.py); split gCF/sCF. SYNTHETIC data with 68/200 introgressed loci."
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "150 multi-copy gene families -> ASTRAL-Pro species tree",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "0/150 families single-copy; ASTRAL-Pro as written (no -a) exits 0 with no warning and returns a 16-tip gene-copy tree; with -a gene2species RF 0, localPP >= 0.999998",
+        "basic": 34,
+        "specialized": 49,
+        "total": 83,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Families are not pruned to single-copy; ASTRAL-Pro is used without pre-orthology",
+            "result": "PASS",
+            "note": "150/150 families kept"
+          },
+          {
+            "text": "The Skill's ASTRAL-Pro command, as written, yields a species tree",
+            "result": "FAIL",
+            "note": "16-tip tree of gene copies (Sp_A_1, Sp_A_2 ...), exit 0, no warning"
+          },
+          {
+            "text": "ASTRAL-Pro with the gene-to-species map recovers the simulated species tree",
+            "result": "PASS",
+            "note": "RF 0/10, localPP >= 0.999998"
+          },
+          {
+            "text": "Output explains why pruning to single-copy loses data",
+            "result": "PASS",
+            "note": "0 of 150 families are single-copy"
+          },
+          {
+            "text": "Paralogy claims are stated no more strongly than the data support",
+            "result": "PASS",
+            "note": "Single-copy contrast reported honestly: RF 0 but lower support"
+          }
+        ],
+        "executed": true,
+        "execution_note": "Ran iqtree2 -S on SYNTHETIC family alignments, astral-pro exactly as written, astral-pro -a with a gene-to-species map (plus -u 2), and an auditor contrast of single-copy astral with copies mapped as individuals (RF 0, localPP 0.747 on the shortest branch)."
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Date the ASTRAL tree in Ma and delimit species with BPP",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Dating correctly declined and routed; but default ASTER lengths are substitution units (S01,S02 0.0064 vs CULength 0.152), contradicting the Skill; bioconda has no bpp package",
+        "basic": 33,
+        "specialized": 44,
+        "total": 77,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Scope: no divergence times are produced from ASTRAL branch lengths",
+            "result": "PASS",
+            "note": "Declined and routed to divergence-dating"
+          },
+          {
+            "text": "Output names the right method for delimitation (BPP) and what it needs",
+            "result": "PASS",
+            "note": "Alignments, individual-to-population map, guide tree, theta/tau priors"
+          },
+          {
+            "text": "The Skill's units statement matches the installed ASTER output",
+            "result": "FAIL",
+            "note": "Default astral writes SULength, not coalescent units"
+          },
+          {
+            "text": "The Skill gives an actionable BPP path",
+            "result": "FAIL",
+            "note": "No control file; documented bioconda install does not exist"
+          }
+        ],
+        "executed": true,
+        "execution_note": "Ran astral -u 2 and astral --length CULength to check units; no dating and no BPP run by design. BPP not executed: the Skill supplies no control file; bioconda bpp does not exist (API not found, recipe 404)."
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Report localPP as bootstrap, reuse Java -t 8, claim introgression",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Refuses localPP-as-bootstrap, maps Java -t 8 to ASTER -u 2, shows q2 ~ q3 (ILS) on the contested clade; ASTER still writes localPP under -t N, unlike the Skill's 'no annotation'",
+        "basic": 36,
+        "specialized": 51,
+        "total": 87,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Safety: output refuses to report localPP as bootstrap percentages",
+            "result": "PASS",
+            "note": "Explains localPP is a coalescent posterior; offers gCF/sCF and the polytomy test"
+          },
+          {
+            "text": "Output maps the Java -t 8 intent to ASTER -u 2 and explains -t = threads",
+            "result": "PASS",
+            "note": "Confirmed against both binaries' help and outputs"
+          },
+          {
+            "text": "Output does not claim introgression without checking q2/q3 symmetry",
+            "result": "PASS",
+            "note": "S01,S02,S03 q2 0.290 vs q3 0.285: symmetric, reported as ILS"
+          },
+          {
+            "text": "The Skill's stated consequence of the flag mix-up matches the binary",
+            "result": "FAIL",
+            "note": "ASTER -t N output still carries localPP; only q1/q2/q3 are lost"
+          },
+          {
+            "text": "Commands run as written",
+            "result": "PASS",
+            "note": "All exit 0 (thread count capped at 4)"
+          }
+        ],
+        "executed": true,
+        "execution_note": "Ran ASTER astral -t 4 and -u 2 and Java ASTRAL -t 2/8/10 (and -u 2, rejected: Unknown flag 'u') on SYNTHETIC gene trees; thread count capped at 4."
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 32.0,
+    "dynamic_weighted": 50.0,
+    "score": 82,
+    "max": 100,
+    "grade": "Beta Only",
+    "grade_symbol": "⚠️",
+    "deployable": false,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Correct, verified coalescent theory: the 1-(2/3)e^-tau discordance table and quartet-level consistency in the anomaly zone reproduced by simulation",
+    "ASTER vs Java ASTRAL flag mapping (-t threads vs annotation, -u 2, --root) is accurate against both binaries",
+    "wASTRAL/ASTRAL commands as written recovered every simulated species tree, including short incomplete loci",
+    "The q2-vs-q3 symmetry reading correctly isolated the one simulated introgression branch",
+    "Honest-support doctrine (localPP is not bootstrap, report gCF/sCF, polytomy test) is correct and well placed"
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "Split the --gcf/--scfl concordance command into two calls",
+      "observed_in": [
+        1,
+        3,
+        4
+      ],
+      "problem": "SKILL.md and examples/astral_pipeline.sh combine --gcf with --scfl; IQ-TREE 2.4.0 exits 2 ('Do not specify --scf or --gcf with --scfl') on every dataset, and the shipped example aborts there after its gene-tree stage.",
+      "root_cause": "The command was not run against a current IQ-TREE 2 build.",
+      "fix": "Use 'iqtree2 -t species.tre --gcf gene_trees.nwk --prefix cf_g' and 'iqtree2 -te species.tre -s concat.fasta --scfl 100 --prefix cf_s' in both files."
+    },
+    {
+      "priority": "P1",
+      "title": "Correct the ASTER branch-length units statement",
+      "observed_in": [
+        1,
+        6
+      ],
+      "problem": "The Skill says ASTRAL lengths are coalescent units with undefined tips; ASTER astral/astral-pro (ASTRAL-IV/Pro3) default to --length SULength and write tip lengths, so users would convert substitution lengths as if they were coalescent units.",
+      "root_cause": "The units text describes Java ASTRAL 5.x, not the ASTER binaries the Skill targets.",
+      "fix": "State that ASTER astral defaults to substitution units; use '--length CULength' or read CULength from '-u 2' labels; note wastral writes coalescent units."
+    },
+    {
+      "priority": "P1",
+      "title": "Add the gene-to-species mapping to the ASTRAL-Pro command",
+      "observed_in": [
+        5
+      ],
+      "problem": "'astral-pro -i family_trees.nwk -o species_pro.tre' on families named Sp_A_1/Sp_A_2 exits 0 with no warning and returns a 16-tip tree of gene copies, not a species tree.",
+      "root_cause": "The command omits -a and the Skill never says multi-copy gene names must be mapped to species.",
+      "fix": "Write 'astral-pro -a gene2species.txt -i family_trees.nwk -o species_pro.tre', describe the two-column map format, and warn that without it each copy becomes a species."
+    },
+    {
+      "priority": "P2",
+      "title": "Make gene-tree contraction work with UFBoot and on Windows",
+      "observed_in": [
+        1,
+        3
+      ],
+      "problem": "The <10% contraction collapses 0-2 branches on IQ-TREE -B 1000 gene trees because UFBoot is rarely below 10, and nw_ed has no Windows build.",
+      "root_cause": "The threshold is taken from standard-bootstrap practice while the upstream command produces UFBoot.",
+      "fix": "Say the 10% rule applies to standard bootstrap (or give a UFBoot-appropriate cut-off), prefer wASTRAL, and give a portable contraction snippet (e.g. DendroPy/ete3)."
+    },
+    {
+      "priority": "P2",
+      "title": "Give a concrete q2/q3 asymmetry test",
+      "observed_in": [
+        4
+      ],
+      "problem": "The Skill says to confirm asymmetry but gives no test, does not say which topology q2/q3 denote, and wrongly says cf.cf.stat has q1/q2/q3.",
+      "root_cause": "Interpretation guidance was written without a worked output.",
+      "fix": "Document 'astral -u 3' (freqQuad.csv) to name each minority topology, add a binomial or chi-square f2-vs-f3 test, and describe cf.stat's gDF1/gDF2 columns instead."
+    },
+    {
+      "priority": "P2",
+      "title": "Fix install lines; add SVDQuartets/BPP/StarBEAST2 commands",
+      "observed_in": [
+        3,
+        6
+      ],
+      "problem": "'conda install -c bioconda bpp' names a non-existent package, bioconda iqtree now installs iqtree3 not iqtree2, and the three named alternative methods have no command, control file or XML.",
+      "root_cause": "Prerequisites and method table were not checked against current package channels.",
+      "fix": "Point to the BPP GitHub releases, note the iqtree3 binary name, and add a minimal PAUP* SVDQuartets block and a BPP control-file skeleton or route explicitly."
+    },
+    {
+      "priority": "P2",
+      "title": "Resolve circular StarBEAST2 routing and flag-mixup wording",
+      "observed_in": [
+        7
+      ],
+      "problem": "StarBEAST2 is routed to bayesian-inference, which routes species trees back here; the Skill says Java '-t 8' in ASTER yields no annotation, but ASTER still writes localPP.",
+      "root_cause": "Cross-Skill routing and the flag note were not checked against sibling Skills and binary output.",
+      "fix": "Keep StarBEAST2 guidance in this Skill or add it to bayesian-inference; reword to 'yields default localPP only, no q1/q2/q3'."
+    },
+    {
+      "priority": "P2",
+      "title": "Qualify quartet-method recovery deep in the anomaly zone",
+      "observed_in": [
+        2
+      ],
+      "problem": "In a 0.01-CU anomaly zone with 2000 error-free gene trees ASTRAL also returned the anomalous split (localPP 0.75, polytomy p 0.23), while the Skill implies quartet methods simply recover the species tree there.",
+      "root_cause": "Asymptotic consistency is presented without its finite-sample cost when quartet frequencies differ by about 1 percent.",
+      "fix": "State that consistency can need very many loci in deep anomaly zones and that the deliverable there is a supported near-polytomy (low localPP, failed polytomy test), not a resolved coalescent topology."
+    }
+  ]
+}

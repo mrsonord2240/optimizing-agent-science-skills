@@ -1,0 +1,8 @@
+suppressPackageStartupMessages(library(ape))
+a <- read.tree("../../data/names_odd.nwk")
+cat("ape tips:", paste0("[", a$tip.label, "]", collapse = " "), "\n")
+cat("ape node.label:", paste(a$node.label, collapse = ","), "\n")
+m <- read.delim("../../data/names_meta.tsv", encoding = "UTF-8")
+cat("ape exact join:", sum(a$tip.label %in% m$taxon), "/", length(a$tip.label), "\n")
+write.tree(a, "ape_rt.nwk")
+cat("ape written:", readLines("ape_rt.nwk", encoding = "UTF-8"), "\n")

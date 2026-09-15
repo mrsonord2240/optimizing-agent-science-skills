@@ -1,0 +1,27 @@
+{
+  "upstream": {
+    "repository": "https://github.com/GPTomics/bioSkills",
+    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "author": "GPTomics",
+    "author_url": "https://github.com/GPTomics",
+    "license": "MIT"
+  },
+  "exported_from": {
+    "repository": "https://github.com/mrsonord2240/bioSkills",
+    "branch": "fix/proteomics-2",
+    "commit": "d1b8fdce4e647baf676759ba64da8d8412320244",
+    "note": "Fork of the upstream commit above, carrying only audit-evidenced fixes. The fork exists to send fixes back upstream; this directory is what Specialist releases ship."
+  },
+  "modified": true,
+  "modified_by": "Samuel Nord, via Claude (Anthropic) fixer agents",
+  "changes": {
+    "logs": "fixes/<skill-id>.md",
+    "records": "audits/skills/<skill-id>/<owner>-<repo>@<sha7>/fixes.md",
+    "rule": "Files change only where an audit demonstrated a defect. Frontmatter `name` never changes. Skills that passed with no findings are byte-identical to the upstream commit."
+  },
+  "fixed_so_far": {
+    "phylogenetics": "10 Skills, re-audited, viable",
+    "variant-calling, clinical-databases, population-genetics": "11 Skills, re-audited, viable",
+    "proteomics": "8 Skills, pass 1 re-audited; pass 2 (peptide-identification, ptm-analysis) awaiting re-audit"
+  }
+}

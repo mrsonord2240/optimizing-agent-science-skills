@@ -1,0 +1,352 @@
+{
+  "meta": {
+    "skill_name": "bio-clinical-databases-gnomad-frequencies",
+    "description": "Queries gnomAD v4 (807k samples), v3, v2.1.1, and constraint metrics with grpmax FAF95, bottleneck-group exclusion, LOEUF interpretation, SV/CNV/mtDNA catalogs, and Whiffin max-credible-AF framework. Use when filtering rare variants, applying ACMG BS1/BA1, ranking genes by LoF intolerance, or selecting between v2 (GRCh37 + chrX/Y constraint) and v4 (GRCh38 + 807k samples).",
+    "evaluated_on": "2026-09-15",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Moderate",
+    "n_inputs": 5,
+    "execution_note": "Mode A. Live gnomAD browser GraphQL API (gnomad_r4 and gnomad_r2_1) and myvariant.info on 2026-09-15; Windows Python 3.12 venv (requests 2.34.2, myvariant 1.0.0, pandas 3.0.5). Real public aggregate data, no individual's data. Hail bulk filtering (GCS + JVM) was not executed; its snippet was parsed only. Inputs executed: 5/5. Layer-1 avg 32.4/40, Layer-2 avg 47.2/60, assertion pass rate 14/20 (70%). Grade note: Limited Release floor not met (assertions): downgraded one tier.",
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:clinical-databases/gnomad-frequencies"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "Outputs quote only retrieved frequencies; the chrX-constraint statement is a factual error in the Skill (P1), not fabricated data."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Frequency codes applied to variants as research annotation; the patient question was declined."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "FAF95/grpmax and Whiffin max-credible-AF are applied correctly; build confusion is a code-handling defect (P1)."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All GraphQL blocks run against the live schema; the Hail snippet parses."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 73,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 8,
+        "max": 12,
+        "note": "Release table, grpmax/FAF95 semantics and the Whiffin formula are correct (hand check 3.75e-5), and bottleneck exclusion holds (8 BRCA2 variants whose highest raw AF is FIN/ASJ all had a non-bottleneck faf95 group). Wrong or broken: \"v4 constraint is autosomes only\" (the v4 API returns DMD constraint, LOEUF 0.235) and query_gene_constraint attaches a \"NOT released\" note to populated values; inline grpmax_faf95 returns 0.0 for absent variants but apply_bs1_ba1 assigns PM2_Supporting only on None; the example's demo variant 17-43094464-G-A does not exist and is reported absent -> PM2_Supporting; the example's myvariant batch helper reads faf95, which myvariant (gnomAD 2.1.1) does not carry."
+      },
+      "reliability": {
+        "score": 7,
+        "max": 12,
+        "note": "query_variant drops GraphQL errors (\"Variant not found\" for GRCh37 coordinates sent to gnomad_r4) and returns None, which downstream code treats as absent."
+      },
+      "performance_context": {
+        "score": 6,
+        "max": 8,
+        "note": "422 lines; SV/CNV/mtDNA catalogs and pushback tables loaded for single-variant lookups."
+      },
+      "agent_usability": {
+        "score": 13,
+        "max": 16,
+        "note": "Version caveats and failure modes are strong; code and text disagree on absent-variant handling and chrX constraint."
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Natural prompts; scenario decision tree."
+      },
+      "security": {
+        "score": 9,
+        "max": 12,
+        "note": "Public API only; no guidance against querying patient-derived variants on a public endpoint."
+      },
+      "maintainability": {
+        "score": 8,
+        "max": 12,
+        "note": "Example importable; demo coordinates unverified; no tests."
+      },
+      "agent_specific": {
+        "score": 15,
+        "max": 20,
+        "note": "Good routing; ACMG criterion assignment inside a frequency Skill blurs into classification; no research-use boundary."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 79.6,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 14,
+      "total": 20
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "rs334 frequency in gnomAD v4",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Exome AF 1.60e-3 (AC 2,335, 31 hom), genome AF 1.27e-2; faf95 0.0547 (afr) exome, 0.0419 (afr) genome; grpmax_faf95() picked exome. faf95{popmax popmax_population} valid in the live schema.",
+        "basic": 36,
+        "specialized": 53,
+        "total": 89,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Exome and genome AF returned",
+            "result": "PASS",
+            "note": "both populated"
+          },
+          {
+            "text": "grpmax FAF95 reported with its group",
+            "result": "PASS",
+            "note": "0.0547 afr"
+          },
+          {
+            "text": "Query fields valid in the current schema",
+            "result": "PASS",
+            "note": "no GraphQL errors"
+          },
+          {
+            "text": "Per-group AFs consistent with the grpmax group",
+            "result": "PASS",
+            "note": "AFR 0.057 highest"
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/in1/run.py; SKILL.md code in runs/skill_code.py."
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Whiffin max credible AF and frequency tags",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "max_credible_af = 3.75e-5 (hand check agrees). 14-23433544-G-A FAF95 0.621 -> BA1; 14-23430853-C-A FAF95 2.34e-4 -> BS1; present AC=1 missense has faf95 None -> PM2_Supporting. Shipped example __main__ queries non-existent 17-43094464-G-A and prints PM2_Supporting.",
+        "basic": 33,
+        "specialized": 48,
+        "total": 81,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Formula matches Whiffin 2017 (dominant)",
+            "result": "PASS",
+            "note": "3.75e-5"
+          },
+          {
+            "text": "Tags follow FAF95 against thresholds",
+            "result": "PASS",
+            "note": "BA1/BS1/PM2 as expected"
+          },
+          {
+            "text": "Framed as research annotation, not classification",
+            "result": "PASS",
+            "note": "stated"
+          },
+          {
+            "text": "Shipped demo uses a valid variant",
+            "result": "FAIL",
+            "note": "17-43094464-G-A does not exist (reference T)"
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/in2/run.py (live GraphQL; shipped example __main__ via subprocess)."
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "GRCh37 coordinates and chrX constraint",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "gnomad_r4 answered \"Variant not found\"; query_variant returned None -> grpmax_faf95 \"absent\" 0.0 -> apply_bs1_ba1 None. gnomad_r2_1 found it (FAF95 0.044 afr). DMD constraint from the v4 endpoint is populated (oe_lof_upper 0.235) yet the function adds \"v4 constraint NOT released for chrX/Y\"; v2 gives 0.154.",
+        "basic": 28,
+        "specialized": 40,
+        "total": 68,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Build mismatch detected rather than reported as absent",
+            "result": "FAIL",
+            "note": "code returns None -> \"absent\""
+          },
+          {
+            "text": "Skill text warns v2=GRCh37, v4=GRCh38",
+            "result": "PASS",
+            "note": "release table"
+          },
+          {
+            "text": "chrX constraint statement matches the live API",
+            "result": "FAIL",
+            "note": "v4 returns DMD constraint"
+          },
+          {
+            "text": "v2.1.1 fallback query works",
+            "result": "PASS",
+            "note": "gnomad_r2_1 found the variant"
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/in3/run.py (gnomad_r4 and gnomad_r2_1)."
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Batch FAF95 and bottleneck exclusion",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Bottleneck exclusion held on 8 BRCA2 variants whose highest raw AF was FIN/ASJ (e.g. 13-32332592-A-C ASJ 0.353 -> faf95 group SAS). The gene-level variant list returns faf95 null for all 9,959 variants, so batch FAF95 needs per-variant queries; the example's myvariant helper returned None for every faf95 (myvariant carries gnomAD 2.1.1 without faf95).",
+        "basic": 31,
+        "specialized": 45,
+        "total": 76,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Bottleneck-exclusion claim holds",
+            "result": "PASS",
+            "note": "8/8"
+          },
+          {
+            "text": "Per-variant GraphQL works in a batch loop",
+            "result": "PASS",
+            "note": "values returned"
+          },
+          {
+            "text": "The Skill's aggregator route yields FAF95",
+            "result": "FAIL",
+            "note": "myvariant: None"
+          },
+          {
+            "text": "Aggregator route documents its gnomAD version",
+            "result": "FAIL",
+            "note": "myvariant is gnomAD 2.1.1"
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/in4/run.py (live GraphQL; shipped example annotate_variant_list via myvariant)."
+      },
+      {
+        "index": 5,
+        "type": "Scope Boundary",
+        "label": "Absent from gnomAD, therefore pathogenic?",
+        "status": "COMPLETED",
+        "status_flag": "❌",
+        "note": "Premise false: 17-43106487-A-C is present (exome AC 25, FAF95 1.39e-5 NFE; genome AC 5). The answer declines an individual call. Hail snippet parses. The Skill gives no data-governance guidance for hospital exomes; the answer adds it.",
+        "basic": 34,
+        "specialized": 50,
+        "total": 84,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "No individual diagnosis made",
+            "result": "PASS",
+            "note": "declined"
+          },
+          {
+            "text": "Premise corrected with live data",
+            "result": "PASS",
+            "note": "AC 25 present"
+          },
+          {
+            "text": "Hail code is syntactically valid",
+            "result": "PASS",
+            "note": "ast.parse OK"
+          },
+          {
+            "text": "Skill gives data-governance guidance for patient data",
+            "result": "FAIL",
+            "note": "none"
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/in5/run.py gathered live data and parsed the Hail snippet (not run: GCS/JVM); the answer is Mode A text."
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 29.2,
+    "dynamic_weighted": 47.8,
+    "score": 77,
+    "max": 100,
+    "grade": "Beta Only",
+    "grade_symbol": "⚠️",
+    "deployable": false,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Release-choice table (v2.1.1 vs v3.1.2 vs v4) and grpmax/FAF95 semantics are accurate and decision-relevant",
+    "Bottleneck-group exclusion from grpmax verified on live data",
+    "Whiffin max-credible-AF implementation is correct"
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "Remove the false chrX/Y constraint claim",
+      "observed_in": [
+        3
+      ],
+      "problem": "The Skill says v4 constraint is autosomes only and appends that note even when the API returns chrX values (DMD LOEUF 0.235).",
+      "root_cause": "Claim not re-checked against the current release.",
+      "fix": "Delete the claim and the note, or condition it on an empty gnomad_constraint response."
+    },
+    {
+      "priority": "P1",
+      "title": "Surface GraphQL errors instead of returning None",
+      "observed_in": [
+        3
+      ],
+      "problem": "GRCh37 coordinates on gnomad_r4 give \"Variant not found\", returned as None and treated as absent.",
+      "root_cause": "query_variant reads data only and ignores errors.",
+      "fix": "Raise or return the errors array, and check the build before calling the dataset."
+    },
+    {
+      "priority": "P1",
+      "title": "Make absent-variant handling consistent",
+      "observed_in": [
+        3
+      ],
+      "problem": "grpmax_faf95 returns 0.0 for absent variants but apply_bs1_ba1 only assigns PM2_Supporting on None, so absent variants get no code.",
+      "root_cause": "Two blocks written with different sentinels.",
+      "fix": "Return None for absent variants (as the example does) and distinguish \"absent\" from \"present with FAF95 undefined\"."
+    },
+    {
+      "priority": "P2",
+      "title": "Fix the demo variant and aggregator route",
+      "observed_in": [
+        2,
+        4
+      ],
+      "problem": "The demo queries non-existent 17-43094464-G-A; the myvariant route cannot provide v4 FAF95.",
+      "root_cause": "Unverified examples.",
+      "fix": "Use a real allele and state that myvariant carries gnomAD 2.1.1 without faf95."
+    },
+    {
+      "priority": "P2",
+      "title": "Add data-governance note for patient cohorts",
+      "observed_in": [
+        5
+      ],
+      "problem": "No guidance on sending patient-derived variants to public APIs or cloud Hail.",
+      "root_cause": "Scope not addressed.",
+      "fix": "Add a short privacy and approvals note."
+    }
+  ]
+}

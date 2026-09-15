@@ -1,0 +1,332 @@
+{
+  "meta": {
+    "skill_name": "bio-vcf-manipulation",
+    "description": "Combine, split, sort, intersect, and subset VCF/BCF files with bcftools merge, concat, isec, sort, view, and reheader. Covers the normalize-before-combine rule, the single-sample-merge 0/0-fabrication trap (merge is not joint genotyping), merge vs concat vs isec selection, and the --naive concat and -R-vs-T region caveats.",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Moderate",
+    "n_inputs": 5,
+    "execution_note": "Mode A. bcftools 1.24 (MSYS2 native Windows) for inputs 1, 2, 4, 5; bcftools 1.21 (bioconda, WSL micromamba env) for input 3 (shipped example needs bc) and the -R cross-check. All data SYNTHETIC (data/make_data.py, seed 20260911): 8-sample joint cohort (SYN_S6 has 76 no-calls), callerA/callerB. Inputs executed: 5/5. Layer-1 avg 36.2/40, Layer-2 avg 51.8/60, assertion pass rate 17/20 (85%). scoring_rubric.md s.5 floor(s) not met for the numeric tier (assertion rate 0.85 < 0.9): grade downgraded one tier.",
+    "evaluator_version": "skill-auditor@1.0",
+    "evaluated_on": "2026-09-11",
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:variant-calling/vcf-manipulation"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated values; the two references are real."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "File operations only."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Merge-is-not-joint-genotyping and normalize-before-combine rules verified quantitatively; the reheader-for-contig-naming advice is an implementation error (P1)."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All commands parsed and ran on bcftools 1.21/1.24; examples/compare_vcfs.sh ran as written."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 88,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 10,
+        "max": 12,
+        "note": "Complete merge/concat/isec/subset/sort/reheader coverage. Correctness 2/4: advises 'fix chr1-vs-1 contig naming with bcftools reheader' - reheader -f rewrites ##contig lines only, and the subsequent merge silently doubles every site; the '-R with overlapping BED emits records twice' warning does not reproduce on 1.21/1.24; the Common Errors fix for sample-order mismatch ('drop --naive') does not work because plain concat refuses too."
+      },
+      "reliability": {
+        "score": 10,
+        "max": 12,
+        "note": "Common Errors table matches the real messages for duplicate samples, concat/merge inversion and unsorted input."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "Compact 128-line SKILL.md; 337-line usage guide repeats it."
+      },
+      "agent_usability": {
+        "score": 15,
+        "max": 16,
+        "note": "Choose-by-what-differs table is excellent; the merge trap is stated with the right alternative (joint-calling)."
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Plain prompts for merge/concat/compare."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "Local files only."
+      },
+      "maintainability": {
+        "score": 10,
+        "max": 12,
+        "note": "Working example; no test data."
+      },
+      "agent_specific": {
+        "score": 18,
+        "max": 20,
+        "note": "Clear routing to normalization, joint-calling and SV merging."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 88.0,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 17,
+      "total": 20
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Cohort from single-sample VCFs: merge default vs -0",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Against the joint call of the same 4 samples: default merge turned 632 true hom-ref genotypes into ./. (AF inflated at 274 of 305 sites); -0 turned them back but fabricated 0/0 for 62 genotypes that were no-calls in the joint call (low-coverage SYN_S6). Exactly the Skill's 'both are guesses'; recommended gVCF joint genotyping.",
+        "basic": 38,
+        "specialized": 55,
+        "total": 93,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Default merge leaves unseen sites ./., as the Skill states",
+            "result": "PASS",
+            "note": "632 ./. placeholders"
+          },
+          {
+            "text": "-0 is shown to fabricate hom-ref where the sample had no data",
+            "result": "PASS",
+            "note": "62 fabricated 0/0"
+          },
+          {
+            "text": "Joint genotyping of gVCFs is recommended instead",
+            "result": "PASS",
+            "note": "routes to joint-calling"
+          },
+          {
+            "text": "The AF consequence is quantified",
+            "result": "PASS",
+            "note": "274 sites inflated under ./."
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/in1/run.sh, bcftools 1.24."
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Stitch per-chromosome files; --naive; overlapping windows",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "concat reproduced the original byte-for-byte (records); --naive worked on identical headers and refused a reordered sample list; overlapping windows without -a silently gave 194 records (22 duplicates) and -a -d exact gave the correct 172; concat of different samples printed the 'Perhaps bcftools merge' error. The Skill's fix for a sample-order mismatch ('drop --naive') fails: plain concat refuses the reordered file as well.",
+        "basic": 37,
+        "specialized": 53,
+        "total": 90,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "concat of per-chromosome files reproduces the callset",
+            "result": "PASS",
+            "note": "md5 of records identical"
+          },
+          {
+            "text": "Overlapping inputs need -a with -d",
+            "result": "PASS",
+            "note": "194 -> 172"
+          },
+          {
+            "text": "--naive header check behaves as described",
+            "result": "PASS",
+            "note": "refuses differing samples"
+          },
+          {
+            "text": "The Skill's fix for a sample-order mismatch works",
+            "result": "FAIL",
+            "note": "plain concat: 'Different sample names'; needs bcftools view -s to reorder"
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/in2/run.sh, bcftools 1.24."
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Three-caller set operations",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Normalizing first raised the >=2-caller set from 9 to 11 records; -n=3, -C and the -n~100 mask agreed; examples/compare_vcfs.sh ran as written (A only 4, B only 1, shared 8). The remaining MNP discordance is the atomization case the Skill routes to variant-normalization.",
+        "basic": 37,
+        "specialized": 53,
+        "total": 90,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Inputs are normalized before isec",
+            "result": "PASS",
+            "note": "norm -m-any -f"
+          },
+          {
+            "text": "-n/-w/-C/mask semantics are applied correctly",
+            "result": "PASS",
+            "note": "-C and -n~100 both give 1420 GA>G"
+          },
+          {
+            "text": "The shipped example runs",
+            "result": "PASS",
+            "note": "exit 0, overlap percentages printed"
+          },
+          {
+            "text": "Residual discordance is traced to MNP representation, not called a caller difference",
+            "result": "PASS",
+            "note": "CTA>TTC vs two SNVs"
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/in3/run.sh + compare_vcfs.upstream_copy.sh (upstream LF bytes), bcftools 1.21 in WSL."
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Subset cases; stale INFO; -R vs -T",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "bcftools view -s updated AC/AN but left AF stale at 277/361 sites; -I left everything stale; +fill-tags fixed all. The warning that -R with overlapping BED intervals emits records twice did not reproduce on bcftools 1.21 or 1.24 (80 = 80 distinct).",
+        "basic": 36,
+        "specialized": 52,
+        "total": 88,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Sample subsetting with -s works",
+            "result": "PASS",
+            "note": "4 of 8 samples"
+          },
+          {
+            "text": "The Skill's statement that -s updates AC/AN but other tags need fill-tags holds",
+            "result": "PASS",
+            "note": "AF stale 277/361 until +fill-tags"
+          },
+          {
+            "text": "Stale tags are recomputed before use",
+            "result": "PASS",
+            "note": "0 wrong after fill-tags"
+          },
+          {
+            "text": "The -R overlapping-regions duplication warning reproduces",
+            "result": "FAIL",
+            "note": "no duplicates on 1.21 or 1.24"
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/in4/run.sh (1.24) and linux_R.sh (1.21)."
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Merge batches with a sample-name collision and chr1-vs-1 contigs; sort",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Duplicate sample name caught with the documented message and fixed by reheader -s. Following the Skill's contig advice (reheader -f ref.fa.fai) changed only ##contig lines; merge then exited 0 with 722 rows - every site twice, under 'chr1' and '1'. bcftools annotate --rename-chrs (not mentioned in this Skill) gave the correct 361 x 8 cohort identical to the joint call. Unsorted input failed to index and bcftools sort -T -m fixed it.",
+        "basic": 33,
+        "specialized": 46,
+        "total": 79,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Sample-name collisions are detected and resolved",
+            "result": "PASS",
+            "note": "'Duplicate sample names (SYN_S1)'; reheader -s"
+          },
+          {
+            "text": "The Skill's contig-harmonization advice yields a correct merge",
+            "result": "FAIL",
+            "note": "reheader -f leaves body CHROM '1'; merge doubles sites silently"
+          },
+          {
+            "text": "Unsorted input is sorted before indexing",
+            "result": "PASS",
+            "note": "sort -T ./tmp -m 100M"
+          },
+          {
+            "text": "The final cohort matches the joint callset",
+            "result": "PASS",
+            "note": "after annotate --rename-chrs"
+          }
+        ],
+        "executed": true,
+        "execution_note": "runs/in5/run.sh, bcftools 1.24."
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 35.2,
+    "dynamic_weighted": 52.8,
+    "score": 88,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Merge-is-not-joint-genotyping trap stated precisely and reproduced quantitatively (./. inflation vs -0 fabrication)",
+    "merge/concat/isec decision table by 'what differs' prevents the commonest operation inversions",
+    "Normalize-before-combine rule with correct isec -c none explanation",
+    "Accurate stale-INFO guidance after subsetting (AC/AN updated, AF not)"
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "reheader cannot fix chr1-vs-1 record naming",
+      "observed_in": [
+        5
+      ],
+      "problem": "Skill says to fix mismatched contig naming with bcftools reheader before merge; reheader -f only rewrites ##contig lines and the merge silently doubles every site.",
+      "root_cause": "Header contig lines and record CHROM values are conflated.",
+      "fix": "Use 'bcftools annotate --rename-chrs map.txt' to rename records; keep reheader -f for contig lengths only."
+    },
+    {
+      "priority": "P2",
+      "title": "Sample-order fix for concat is wrong",
+      "observed_in": [
+        2
+      ],
+      "problem": "Common Errors suggests dropping --naive when sample order differs; plain concat refuses too.",
+      "root_cause": "Assumed plain concat reorders samples.",
+      "fix": "Reorder with 'bcftools view -s <order>' before concat."
+    },
+    {
+      "priority": "P2",
+      "title": "-R overlapping-region duplication claim not reproducible",
+      "observed_in": [
+        4
+      ],
+      "problem": "bcftools 1.21 and 1.24 do not emit duplicates for overlapping -R intervals.",
+      "root_cause": "Behaviour of an older bcftools release.",
+      "fix": "Qualify the warning with the version range or remove it."
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+# Input 1 (Canonical) - R part. Data: SYNTHETIC barcode20.fa (AliSim, known tree).
+library(ape); library(phangorn)
+set.seed(20260915)
+aln  <- read.dna('../../data/barcode20.fa', format = 'fasta')
+rownames(aln) <- trimws(rownames(aln))   # AliSim pads FASTA names; read.dna keeps the padding
+true <- read.tree('../../data/barcode20_true.nwk')
+rf <- function(a) RF.dist(unroot(a), unroot(true), normalize = FALSE)
+d <- dist.dna(aln, model = 'K80')
+cat('K80 range', format(range(d), digits = 3), ' zero-distance pairs:', sum(d == 0), '\n')
+tree <- nj(d)
+boot <- boot.phylo(tree, aln, function(x) nj(dist.dna(x, model = 'K80')), B = 500, quiet = TRUE)
+tree$node.label <- round(100 * boot / 500)
+cat('RF K2P-NJ vs true:', rf(tree), ' (max', 2 * (Ntip(true) - 3), ')\n')
+cat('RF raw-NJ vs true:', rf(nj(dist.dna(aln, model = 'raw'))), '\n')
+cat('RF K2P-BIONJ vs true:', rf(bionj(d)), '  RF K2P-FastME vs true:', rf(fastme.bal(d)), '\n')
+cat('bootstrap %:', tree$node.label, '\n')
+# which NJ splits are not in the true tree, and their support
+pp <- prop.part(unroot(true))
+ok <- prop.clades(unroot(tree), unroot(true), rooted = FALSE)
+cat('internal nodes found in true tree (1=yes):', ok, '\n')
+cat('support on wrong splits:', tree$node.label[ok == 0 | is.na(ok)], '\n')
+write.tree(tree, 'k2p_nj_boot.nwk')
