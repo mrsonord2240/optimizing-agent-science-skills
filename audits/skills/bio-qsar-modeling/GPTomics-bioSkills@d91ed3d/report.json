@@ -1,0 +1,269 @@
+{
+  "meta": {
+    "skill_name": "bio-qsar-modeling",
+    "description": "Builds QSAR / QSPR models using chemprop D-MPNN, MolFormer, Uni-Mol, ChemBERTa, random forest baselines, and Gaussian processes with explicit handling of OECD 5 principles, applicability domain (kNN, leverage, conformal prediction, Mahalanobis), scaffold-balanced splits, ensemble uncertainty, calibration (Platt, isotonic), feature importance (SHAP, atomic attribution), and prospective validation. Use when building target-specific predictive models from in-house bioassay data, ADMET endpoints, or selectivity profiles.",
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:chemoinformatics/qsar-modeling",
+    "evaluated_on": "2026-09-16",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "executed_inputs": "7/7"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "No fabricated claims, and several places where the Skill actively declines to make one: following the OECD principles 'does not by itself confer regulatory acceptance', ensemble disagreement is 'not a formally defined applicability domain or calibrated coverage guarantee', split differences are 'split-specific sensitivity rather than a universal true generalization gap', and a project-percentile AD threshold must be labelled a project-defined heuristic. Each of these is the correct position and each was borne out by the runs." },
+      "practice_boundaries": { "result": "PASS", "detail": "Model building on assay data only. hERG appears purely as a regression endpoint; nothing in any output concerns an individual." },
+      "methodological_ground": { "result": "PASS", "detail": "Strong. The random-versus-scaffold split leakage mechanism reproduced (152 shared scaffolds across a random split, 0 across a scaffold split); the class-imbalance symptom reproduced (accuracy 0.697 against a 0.681 majority baseline with minority recall 0.165); the calibrator-overfitting warning reproduced (fitting isotonic on the test set gives a better and meaningless Brier score). The one gap is an interaction the Skill does not flag -- the scaffold split it recommends breaks the exchangeability its conformal section depends on, and the observed coverage undershot at every alpha." },
+      "code_usability": { "result": "PASS", "detail": "The conformal snippet runs verbatim inside the Skill's own stated version bound (MAPIE 0.8.6) and fails outside it, so the bound is correct and load-bearing. The chemprop training block trains a real model with every documented flag. The one hard failure -- the prediction block crashing against a model trained by the training block -- is a missing flag, not unrunnable code, and is raised as a P1." }
+    }
+  },
+  "static_score": {
+    "subtotal": 90,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 10, "max": 12, "note": "Everything the description promises is present and nearly all of it executable: model taxonomy, OECD principles, four AD families, the chemprop 2.x CLI, conformal prediction, SHAP on the fingerprint baseline, Bayesian optimisation and calibration. Correctness docked for three verified problems -- the prediction CLI block omits the featurizer flag its own training block sets and therefore crashes, `--seed 42` does not exist in chemprop 2.x, and leverage is tabulated as an AD method with no warning that it is numerically meaningless on the fingerprint representation the Skill recommends." },
+      "reliability": { "score": 10, "max": 12, "note": "The failure-mode section is accurate and its symptoms reproduce. Docked because the two failures found in this audit both surface as silent or cryptic: leverage returns hat-matrix values up to 782 without raising, and the chemprop prediction step fails with a raw tensor-shape error that names nothing a user could act on." },
+      "performance_context": { "score": 7, "max": 8, "note": "351 lines, well layered, and the chemprop flag set is economical. Execution efficiency docked: the conformal snippet as written (RandomForestRegressor(500) with cv=5 and no n_jobs) took over 50 minutes on a 2,579 x 2,048 matrix with no warning that cross-conformal multiplies the base-model cost sixfold." },
+      "agent_usability": { "score": 14, "max": 16, "note": "Learnability is high -- all seven inputs were built from the text without guesswork -- and the error-prevention content is among the best in this candidate. Consistency docked: the training block and the prediction block are not usable as a pair, and the Common Errors table references a flag from chemprop 1.x." },
+      "human_usability": { "score": 8, "max": 8, "note": "The decision tree by dataset context is phrased the way a project lead actually asks the question, and the first row ('quantify instability and avoid unsupported deployment') answers the hardest case honestly rather than recommending a model." },
+      "security": { "score": 11, "max": 12, "note": "No credentials, no network, no eval/exec; the CLI examples are fixed strings. Input validation docked: nothing validates the training CSV's columns or label distribution before a multi-hour training run." },
+      "maintainability": { "score": 11, "max": 12, "note": "Each component is independently swappable and the AD methods are tabulated rather than hard-wired into one pipeline. Testability docked: no worked numbers accompany any snippet, which is why the prediction-block mismatch shipped." },
+      "agent_specific": { "score": 19, "max": 20, "note": "Precise trigger, correct layering, and explicit composability notes that save real time (chemprop is not sklearn-compatible, so MAPIE and SHAP need a wrapper). Idempotency docked: the documented reproducibility flag does not exist, so a chemprop run cannot be made repeatable by following the Skill." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 87.1,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 24, "total": 31 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "RF + ECFP4 hERG regression on a scaffold split with an applicability-domain gate on the report",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Ran run/inputs_1_4_6_7.py on 3,224 unique ChEMBL hERG compounds. Scaffold-balanced split 2,579/322/323 with 0 scaffolds shared between train and test. Test R2 0.507, MAE 0.560. AD diagnostics: mean max-Tanimoto 0.605, mean kNN5 0.536, mean ensemble sd 0.653. Splitting the test set at the median of each diagnostic: max-Tanimoto gives R2 0.637 inside against 0.243 outside; kNN5 gives 0.612 against 0.295; ensemble sd gives MAE 0.444 against 0.677 but R2 0.410 against 0.502.",
+        "note": "The AD gate is not decoration -- similarity-based diagnostics more than double explained variance inside the domain. The ensemble-variance row behaving differently on MAE and R2 is exactly why the Skill refuses to call it an applicability domain.",
+        "basic": 37,
+        "specialized": 54,
+        "total": 91,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "A fingerprint baseline trains and predicts on a scaffold-balanced split as the decision tree prescribes", "result": "PASS", "note": "RandomForestRegressor(500) on 2,579 training compounds, R2 0.507 / MAE 0.560 on 323 held-out" },
+          { "text": "The scaffold split leaks no chemotype between train and test", "result": "PASS", "note": "0 Bemis-Murcko scaffolds shared; 1,005 train scaffolds against 323 test scaffolds" },
+          { "text": "At least one tabulated AD diagnostic separates reliable from unreliable predictions", "result": "PASS", "note": "Max-Tanimoto: R2 0.637 inside the median against 0.243 outside" },
+          { "text": "The Skill's caution that ensemble variance is not a calibrated AD is borne out", "result": "PASS", "note": "Ensemble sd orders MAE correctly (0.444 / 0.677) but inverts on R2 (0.410 / 0.502), so it is a diagnostic and not a domain" },
+          { "text": "The Skill is honest about where its AD threshold comes from", "result": "PASS", "note": "It requires any percentile threshold to be labelled a project-defined heuristic and validated prospectively rather than quoted as a standard" }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "chemprop 2.x training and prediction, following the CLI blocks as a pair",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "The training block trained 4 models (2 replicates x 2 ensemble members) on 3,224 compounds with --molecule-featurizers rdkit_2d, --split scaffold_balanced, --split-sizes 0.8 0.1 0.1 and --metric roc. Scaffold-split test ROC: 0.743, 0.735, 0.776, 0.780. The prediction block then failed: RuntimeError: mat1 and mat2 shapes cannot be multiplied (64x300 and 517x300) -- the model expects 517 inputs (300 hidden + 217 rdkit_2d descriptors) and predict supplied 300, because --molecule-featurizers is not repeated at prediction time. Adding that flag made it work, producing pred_0 and pred_0_unc. Separately, `chemprop train --seed 42` from the Common Errors table is rejected with 'unrecognized arguments'.",
+        "note": "Every flag in the training block is current and correct; the two blocks simply cannot be used together as written.",
+        "basic": 33,
+        "specialized": 46,
+        "total": 79,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Every flag in the training block exists in the installed release and a model trains end to end", "result": "PASS", "note": "chemprop 2.3.1; 4 models trained, scaffold-split test ROC 0.735-0.780" },
+          { "text": "The documented prediction block runs against a model trained by the documented training block", "result": "FAIL", "note": "RuntimeError on a 517-vs-300 tensor shape; --molecule-featurizers rdkit_2d must be repeated at predict time and the Skill's block omits it" },
+          { "text": "--uncertainty-method ensemble produces an uncertainty column as claimed", "result": "PASS", "note": "pred_0_unc written for all 200 test compounds once the featurizer flag was supplied" },
+          { "text": "The reproducibility flag the Common Errors table prescribes exists", "result": "FAIL", "note": "chemprop: error: unrecognized arguments: --seed 42; the real flags are --data-seed and --pytorch-seed" },
+          { "text": "The Skill's 'ensemble variance always small' warning is observable in a real ensemble", "result": "PASS", "note": "The two members of replicate_0 correlate 0.987 and their checkpoints share a val_loss of 0.45; mean across-model sd 0.038" }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Conformal prediction for calibrated intervals, and whether the version bound is real",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "The SKILL.md MapieRegressor snippet was run verbatim in two environments. In tools\\mapie08-venv (mapie 0.8.6, scikit-learn 1.5.2 -- inside the Skill's stated bound of >=0.8,<1.0) it ran and produced intervals of shape (323, 2, 1). In the shared venv (mapie 1.5.0) it fails: ImportError: cannot import name 'MapieRegressor' from 'mapie.regression'. Empirical coverage on the scaffold-split test set: 0.851 at a 0.90 target, 0.916 at 0.95, 0.706 at 0.80; mean interval width 1.943 log units against a 4.00-9.85 label range. Interval width tracks reliability: the narrow half has MAE 0.496 and coverage 0.907, the wide half MAE 0.625 and coverage 0.795.",
+        "note": "The Skill's version bounding is correct and load-bearing -- rare, and worth saying. The undercoverage is explained by its own stated assumption, which it does not connect to the split design it recommends elsewhere in the same document.",
+        "basic": 36,
+        "specialized": 52,
+        "total": 88,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "The conformal snippet runs verbatim inside the version window the Skill states", "result": "PASS", "note": "mapie 0.8.6 with scikit-learn 1.5.2; intervals (323, 2, 1) as the API documents" },
+          { "text": "The snippet fails outside that window, so the bound is load-bearing rather than decorative", "result": "PASS", "note": "ImportError on mapie 1.5.0, which replaced MapieRegressor with SplitConformalRegressor" },
+          { "text": "Empirical coverage matches the nominal level", "result": "FAIL", "note": "0.851 against 0.90, 0.916 against 0.95, 0.706 against 0.80 -- undercovering at every alpha tested" },
+          { "text": "The Skill states the assumption that explains the shortfall", "result": "PASS", "note": "'Finite-sample marginal coverage under exchangeability' -- exactly the assumption a scaffold split violates" },
+          { "text": "The Skill warns that the scaffold split it recommends breaks that assumption", "result": "FAIL", "note": "The two sections sit two pages apart with no cross-reference; a reader following both gets silent undercoverage" }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Leverage and Mahalanobis, the two remaining tabulated AD methods, on the recommended representation",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Leverage computed as x(X'X)^-1 x' over the 2,020 non-constant ECFP4 bits with n=2,579. The direct inverse returned without raising and gave hat values with mean 120.2 and maximum 782.2; 319 of 323 exceed 1, which is impossible for a hat-matrix diagonal. The condition number of X'X is 1.14e8. Mahalanobis on 50 PCA components ran cleanly (mean 6.12) but separated almost nothing: MAE 0.557 inside the median against 0.564 outside. The kNN-Tanimoto route from input 1 is the only tabulated method that worked on this representation.",
+        "note": "The Skill's own 'Con' column predicted both outcomes -- 'linear assumptions' for leverage and 'high-dim instability' for Mahalanobis -- but it does not say that these two rows are unusable on the fingerprint input it recommends everywhere else.",
+        "basic": 34,
+        "specialized": 49,
+        "total": 83,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Leverage is computable on the representation the Skill recommends", "result": "FAIL", "note": "Hat values up to 782.2 with 319/323 above 1, returned silently from a near-singular X'X (condition number 1.14e8)" },
+          { "text": "Mahalanobis on PCA components runs without error", "result": "PASS", "note": "Mean distance 6.12 over 50 components; no numerical failure" },
+          { "text": "The 'Con' the Skill records for each method matches what actually went wrong", "result": "PASS", "note": "'Linear assumptions' and 'high-dim instability' name both failures precisely" },
+          { "text": "The Skill offers at least one AD method that works on the representation it recommends", "result": "PASS", "note": "kNN / Tanimoto coverage separates R2 0.637 from 0.243 in input 1" }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Class imbalance and probability calibration on a binarised hERG endpoint",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Ran run/input5_calibration_imbalance.py with the calibration split carved from train only. Default loss: accuracy 0.697 against a 0.681 majority baseline, AUC 0.688, minority-class precision 0.586 and recall 0.165. class_weight='balanced': recall on the minority class rises to 0.466 and AUC to 0.705. Isotonic calibration on the held-out calibration split: Brier 0.1981 -> 0.1968, 5-bin calibration gap 0.0554 -> 0.0405, AUC 0.688 -> 0.696. Platt made calibration slightly worse (gap 0.0598). Fitting the calibrator on the test set gives Brier 0.1863 -- better and meaningless.",
+        "note": "Three documented behaviours reproduced in one run, including the one that only shows up if you deliberately do the wrong thing.",
+        "basic": 38,
+        "specialized": 55,
+        "total": 93,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The class-imbalance symptom reproduces as documented", "result": "PASS", "note": "'High accuracy but precision/recall on minority class poor': 0.697 accuracy against a 0.681 baseline, minority recall 0.165" },
+          { "text": "The prescribed class-weighting fix improves the minority class", "result": "PASS", "note": "Minority recall 0.165 -> 0.466 with AUC also improving to 0.705" },
+          { "text": "The isotonic snippet runs and improves calibration without being a ranking change", "result": "PASS", "note": "Brier and the 5-bin gap both fall while AUC barely moves -- exactly the Skill's point that --metric roc does not calibrate" },
+          { "text": "The calibrator-overfitting warning is demonstrable", "result": "PASS", "note": "Fitting isotonic on the test set gives Brier 0.1863 against an honest 0.1968; the Skill's insistence on a proper calibration split is what prevents it" }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Predicting a genuinely novel chemotype series with the AD check skipped",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "The 50 test compounds most dissimilar to training (mean max-Tanimoto 0.288) against the 50 closest analogues (0.821). MAE 0.667 against 0.659 -- a ratio of 1.01. R2 0.015 against 0.621. Ensemble sd 0.706 against 0.594. Label standard deviation 0.853 in the novel subset against 1.313 in the familiar one.",
+        "note": "The AD signal is real and visible before prediction, but the Skill's stated symptom for this failure mode is the wrong one on this dataset.",
+        "basic": 35,
+        "specialized": 50,
+        "total": 85,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The model produces predictions for novel chemotypes with no refusal or flag of its own", "result": "PASS", "note": "50/50 predicted; nothing in the model output distinguishes them" },
+          { "text": "The AD diagnostic flags them before the fact", "result": "PASS", "note": "Mean max-Tanimoto 0.288 against 0.821, and higher ensemble sd (0.706 against 0.594)" },
+          { "text": "The documented symptom -- 'confident predictions but actual values different' -- reproduces", "result": "FAIL", "note": "MAE is essentially identical (ratio 1.01). The degradation is in explained variance (R2 0.015 against 0.621), driven by the novel subset's lower label spread; a reader watching MAE would see nothing" },
+          { "text": "The Skill requires the AD gate to be predefined rather than read off afterwards", "result": "PASS", "note": "'Predefine and validate one or more domain/uncertainty diagnostics... and report what each diagnostic does and does not guarantee'" }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "'Our random-split R2 is 0.55, can we ship it?'",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Same model, same test-set size, two splits. Random: R2 0.554, MAE 0.478, RMSE 0.644, with 152 Bemis-Murcko scaffolds shared between train and test. Scaffold-balanced: R2 0.507, MAE 0.560, RMSE 0.730, with 0 shared scaffolds.",
+        "note": "The leakage mechanism is demonstrable and the direction is right; the size of the effect is smaller than the failure mode's wording suggests.",
+        "basic": 37,
+        "specialized": 54,
+        "total": 91,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The random-versus-scaffold gap reproduces in the documented direction", "result": "PASS", "note": "R2 0.554 -> 0.507 and MAE 0.478 -> 0.560 when the same model is evaluated across scaffolds" },
+          { "text": "The leakage mechanism the Skill names is directly demonstrable", "result": "PASS", "note": "152 scaffolds appear on both sides of the random split against 0 on the scaffold split" },
+          { "text": "The Skill refuses to treat the gap as a universal measure of memorisation", "result": "PASS", "note": "'Interpret their differences as split-specific sensitivity rather than a universal true generalization gap'" },
+          { "text": "The gap is 'substantial', as the failure mode's symptom states", "result": "FAIL", "note": "17% MAE inflation and 0.047 in R2 -- real and worth acting on, but a reader told to expect a substantial drop might dismiss it as noise" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 36.0,
+    "dynamic_weighted": 52.3,
+    "score": 88,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Its version bounding is correct and load-bearing, which is rare: the conformal snippet runs verbatim under MAPIE 0.8.6 inside the stated >=0.8,<1.0 window and fails with an ImportError under 1.5, exactly as the bound implies.",
+    "The applicability-domain gate it insists on is not decoration -- a max-Tanimoto gate more than doubled explained variance inside the domain (R2 0.637 against 0.243) on a real scaffold-split hERG model.",
+    "It repeatedly declines to overclaim where overclaiming is standard: OECD compliance is not regulatory acceptance, ensemble disagreement is not a calibrated AD, and split differences are split-specific sensitivity rather than a universal generalization gap.",
+    "Its chemprop 2.x training flag set is completely current -- every flag validated against 2.3.1 and a real model trained to a scaffold-split ROC of 0.735-0.780.",
+    "Three separate documented behaviours reproduced in one calibration run, including the calibrator-overfitting trap that only appears if you deliberately fit on the test set."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "The chemprop prediction block crashes against a model trained by the training block",
+      "observed_in": [2],
+      "problem": "The training block sets --molecule-featurizers rdkit_2d, which adds 217 descriptors to the model input. The prediction block does not repeat it, so chemprop predict fails with 'RuntimeError: mat1 and mat2 shapes cannot be multiplied (64x300 and 517x300)'. The error names a tensor shape and nothing a user could act on.",
+      "root_cause": "The two CLI blocks were written independently and never run as a pair.",
+      "fix": "Add --molecule-featurizers rdkit_2d to the chemprop predict block and state in the key-flags list that molecule featurizers must match between training and prediction, with the 517-versus-300 shape error given as the symptom to recognise."
+    },
+    {
+      "priority": "P1",
+      "title": "Leverage is tabulated as an AD method but is numerically meaningless on fingerprints",
+      "observed_in": [4],
+      "problem": "Computing the documented hat-matrix leverage over 2,020 ECFP4 bits with 2,579 training compounds returned hat values averaging 120.2 and reaching 782.2, with 319 of 323 above the theoretical maximum of 1, silently, because X'X has a condition number of 1.14e8. Nothing raises, so a pipeline would carry these values forward as an applicability domain.",
+      "root_cause": "The AD table lists leverage alongside kNN and conformal prediction without noting that it presumes a low-dimensional, well-conditioned descriptor matrix -- not the sparse binary fingerprints the Skill recommends everywhere else.",
+      "fix": "Add an applicability column to the AD table saying which representation each method needs, mark leverage and Mahalanobis as descriptor-space methods requiring dimensionality reduction first, and add a sanity assertion (0 <= h <= 1) to any leverage snippet."
+    },
+    {
+      "priority": "P1",
+      "title": "The scaffold split the Skill recommends breaks the exchangeability its conformal section requires",
+      "observed_in": [3],
+      "problem": "Conformal intervals fitted on a scaffold-split model undercovered at every level tested: 0.851 against a 0.90 target, 0.916 against 0.95, 0.706 against 0.80. The Skill states the exchangeability assumption in the AD table and recommends the scaffold split two pages earlier, but never connects them, so a reader following both instructions gets silent undercoverage.",
+      "root_cause": "The two sections were written independently; the interaction between split design and conformal validity is never addressed.",
+      "fix": "Add a sentence to the conformal section: under a scaffold or time split the calibration and test sets are not exchangeable, so marginal coverage is not guaranteed -- report empirical coverage on the held-out set alongside the nominal level, and consider a Mondrian or group-conditional conformal variant."
+    },
+    {
+      "priority": "P2",
+      "title": "chemprop reproducibility advice names a flag that does not exist",
+      "observed_in": [2],
+      "problem": "The Common Errors table fixes 'AUC mismatched across folds' with `--seed 42`. chemprop 2.3.1 rejects it outright. The correct flags are --data-seed and --pytorch-seed.",
+      "root_cause": "Carried over from the chemprop 1.x CLI, whose breaking change the Skill itself documents elsewhere.",
+      "fix": "Replace with `--data-seed 42 --pytorch-seed 42` and note that they control different sources of randomness. The identical error appears in chemoinformatics/admet-prediction."
+    },
+    {
+      "priority": "P2",
+      "title": "Conformal snippet's cost is not signposted",
+      "observed_in": [3],
+      "problem": "MapieRegressor(RandomForestRegressor(n_estimators=500), method='plus', cv=5) as written took over 50 minutes on a 2,579 x 2,048 training matrix on one CPU, because cross-conformal fits the base model six times and no n_jobs is set.",
+      "root_cause": "The snippet demonstrates the API on an unstated toy scale.",
+      "fix": "Set n_jobs=-1 on the base estimator in the snippet and add one line noting that cv=5 multiplies base-model training cost sixfold, with split-conformal as the cheaper alternative when the base model is expensive."
+    },
+    {
+      "priority": "P2",
+      "title": "The missing-AD failure mode names a symptom that does not appear in absolute error",
+      "observed_in": [6],
+      "problem": "The symptom is given as 'Confident predictions but actual values different'. On the 50 most novel chemotypes, MAE was 0.667 against 0.659 for the 50 closest analogues -- a ratio of 1.01 -- while R2 fell from 0.621 to 0.015.",
+      "root_cause": "The symptom is described in terms of absolute error, but out-of-domain subsets often also have compressed label ranges, so the damage appears in explained variance instead.",
+      "fix": "Restate the symptom as loss of explained variance and rank ordering on the out-of-domain subset, and tell the reader to report R2 or Spearman stratified by the AD diagnostic rather than MAE alone."
+    }
+  ]
+}

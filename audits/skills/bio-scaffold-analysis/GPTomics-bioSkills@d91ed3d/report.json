@@ -1,0 +1,427 @@
+{
+  "meta": {
+    "skill_name": "bio-scaffold-analysis",
+    "description": "Analyzes chemical libraries by scaffold using Bemis-Murcko scaffolds, generic frameworks, cyclic skeletons, matched molecular pair (MMP) analysis via mmpdb, R-group decomposition, Free-Wilson analysis, scaffold hopping, and chemotype-aware ML train/test splits. Use when identifying chemotype clusters in a library, deriving SAR transformation rules, decomposing series into R-groups, performing scaffold-balanced QSAR splits, or planning analog campaigns.",
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:chemoinformatics/scaffold-analysis",
+    "evaluated_on": "2026-09-16",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "executed_inputs": "7/7"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated claims. The Skill deliberately refuses to give universal numbers where none exist -- it declines to convert mmpdb pair counts into reliability labels, and says series counts depend on library provenance and standardization. Its worked scaffold example is chemically correct (verified by canonicalising the quoted strings), though written non-canonically."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Library-level chemotype and SAR analysis only; nothing touches an individual."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "The methodological content is sound and unusually careful: it states that chemprop's scaffold_balanced balances group sizes rather than labels, that a scaffold split is one design among several rather than a universal measure of memorisation, and that matched-pair effects are context-dependent (Raut and Dixit 2025). The shipped splitter's singleton-test-set behaviour is a defect in the implementation, not in the method it describes -- the Skill documents that failure mode explicitly."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "Every Python function ran verbatim on 3,224 real compounds, including the input guards, and the full mmpdb cycle executed on 1,500 compounds producing 6,731 rules over 52,032 pairs. The MMPA defect is a missing step in a documented command sequence, not unrunnable code."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 91,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 9,
+        "max": 12,
+        "note": "All documented scaffold views, clustering, splitting, R-group decomposition and MMPA are present and runnable. Docked on two counts: the three-line mmpdb recipe omits `loadprops`, so it cannot produce the property output it promises, and the prescribed fix for its own scaffold-split failure mode ('use a stratified scaffold split') has no implementation while the shipped splitter produces that failure mode in its most extreme form."
+      },
+      "reliability": {
+        "score": 11,
+        "max": 12,
+        "note": "scaffold_split's two input guards both fired correctly under test -- a named ValueError listing invalid row positions, and a named ValueError when fewer than two scaffolds exist -- which under the Category 3 fault-tolerance override is exactly right. Error reporting docked because the mmpdb path surfaces the tool's own message rather than anything the Skill anticipates."
+      },
+      "performance_context": {
+        "score": 8,
+        "max": 8,
+        "note": "314 lines with depth in tables. Scaffold clustering of 3,224 compounds and a full fragment/index/loadprops/transform cycle over 1,500 compounds both completed in ordinary time on one CPU."
+      },
+      "agent_usability": {
+        "score": 14,
+        "max": 16,
+        "note": "Terminology is consistent and the reconciliation table on competing scaffold definitions is genuinely useful. Learnability and feedback design docked: an agent following the MMPA block literally gets an error, and the stated output contract ('ranked transformations with delta(pIC50), N pairs, confidence') does not match the unranked 20-column TSV with no confidence field that mmpdb actually emits."
+      },
+      "human_usability": {
+        "score": 8,
+        "max": 8,
+        "note": "The scaffold-definition table maps onto the argument medicinal chemists actually have about what counts as one series, and it commits to an answer per use case."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "No credentials, network or destructive operations; the shell commands are fixed and do not interpolate user strings. Input validation docked because decompose_series validates compounds but the scaffold pattern is only checked for parseability."
+      },
+      "maintainability": {
+        "score": 11,
+        "max": 12,
+        "note": "Each function is small and independently replaceable, and the scaffold representation choice is isolated in one place. Testability docked: no expected outputs are supplied, which is why the non-canonical worked example and the missing loadprops step both went unnoticed."
+      },
+      "agent_specific": {
+        "score": 19,
+        "max": 20,
+        "note": "Precise trigger, correct layering, clean composability with qsar-modeling and similarity-searching, and a seeded, reproducible splitter. Escape hatches docked: it says a Bemis-Murcko split is only one design but never gives a condition under which the agent should stop and ask for a time split instead."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 86.9,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 24,
+      "total": 30
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Bemis-Murcko chemotype census of 3,224 hERG compounds",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Ran run/inputs_main.py. 1,729 distinct Bemis-Murcko scaffolds for 3,224 compounds (1.86 per scaffold); 1,221 singleton scaffolds covering 37.9% of compounds; largest cluster 53 (diphenyl ether); 257 series of 3 or more members covering 1,501 compounds; zero acyclic compounds.",
+        "note": "Clean run of the shipped clustering function; the library's structure -- a long singleton tail plus a few large series -- is exactly what the Skill's series-detection guidance anticipates.",
+        "basic": 38,
+        "specialized": 54,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "scaffold_clusters runs over the full library without loss",
+            "result": "PASS",
+            "note": "3,224/3,224 compounds assigned to 1,729 scaffolds"
+          },
+          {
+            "text": "The empty-scaffold case is handled rather than crashing the census",
+            "result": "PASS",
+            "note": "Acyclic compounds would group under '' as documented; this library has none"
+          },
+          {
+            "text": "detect_series at min_size=3 produces a usable set of series",
+            "result": "PASS",
+            "note": "257 series covering 1,501 of 3,224 compounds"
+          },
+          {
+            "text": "The Skill sets the right expectation about the singleton tail",
+            "result": "PASS",
+            "note": "It says series counts depend on provenance, standardization and scaffold definition, and to report the observed distribution -- which is 70.6% singleton scaffolds here"
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "The shipped scaffold_split at three train fractions, checked for leakage and representativeness",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "scaffold_split run verbatim. Achieved train fractions 0.800, 0.700 and 0.900 exactly against the requested values, with zero scaffolds shared between train and test at every fraction. But at every fraction the test set consists entirely of singleton scaffolds: 645/645 at 0.8, and the same pattern at 0.7 and 0.9, against 22.3% singletons in train. Activity balance is fine (train mean pChEMBL 5.548 sd 0.897; test 5.501 sd 0.898). Different seeds give different splits.",
+        "note": "The split is leak-free and hits its target size precisely, and it produces the pathological case the Skill itself documents -- every time, by construction.",
+        "basic": 33,
+        "specialized": 47,
+        "total": 80,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The shipped splitter achieves the requested train fraction",
+            "result": "PASS",
+            "note": "0.800, 0.700 and 0.900 achieved exactly"
+          },
+          {
+            "text": "No Bemis-Murcko scaffold appears in both train and test",
+            "result": "PASS",
+            "note": "Overlap of 0 at all three fractions -- the leakage the split exists to prevent is prevented"
+          },
+          {
+            "text": "The resulting test set is representative of the library's chemotype structure",
+            "result": "FAIL",
+            "note": "100% of test compounds sit on singleton scaffolds at every fraction, so the held-out set measures only one-off-chemotype transfer"
+          },
+          {
+            "text": "The Skill documents this outcome as a known failure mode",
+            "result": "PASS",
+            "note": "'Test set is mostly singleton scaffolds; metrics misleading' -- named exactly, with the correct mechanism (size-descending greedy assignment)"
+          },
+          {
+            "text": "The Skill ships the fix it prescribes for that failure mode",
+            "result": "FAIL",
+            "note": "'Use stratified scaffold split' and 'scaffold-balanced cross-validation' are named but neither is implemented anywhere in the Skill"
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Variant B",
+        "label": "R-group decomposition, on the worked example and on a real 53-member series",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "The SKILL.md worked example ran verbatim and returned Core/R1/R2 with both compounds matched and no unmatched indices. Against the library's largest scaffold (diphenyl ether, 53 members), 20 compounds decomposed with 20 matched and 0 unmatched, producing a five-position R-group table (R1-R5).",
+        "note": "Both the toy example and a real series work without adaptation, and the unmatched-index contract the function documents behaves as stated.",
+        "basic": 38,
+        "specialized": 54,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The worked R-group example runs and returns labelled attachment points",
+            "result": "PASS",
+            "note": "R1 = CC[*:1] / CCC[*:1], R2 = F[*:2] / Cl[*:2] against a shared core"
+          },
+          {
+            "text": "Decomposition against a real library scaffold matches the compounds in that series",
+            "result": "PASS",
+            "note": "20/20 matched on the 53-member diphenyl-ether scaffold, yielding R1-R5"
+          },
+          {
+            "text": "Unmatched compound indices are returned as the function documents",
+            "result": "PASS",
+            "note": "Empty list in both runs, and the matched_positions/unmatched contract held"
+          },
+          {
+            "text": "The ambiguous-match failure mode is preventable from what the Skill provides",
+            "result": "PASS",
+            "note": "It names labelled attachment points and RGroupDecompositionParameters as the controls, both of which exist in the installed RDKit"
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Edge",
+        "label": "The documented scaffold failure modes, one by one",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Linear molecules give an empty scaffold (palmitic acid and ethylamine both ''). Generic frameworks collapse benzene, pyridine and pyrimidine onto C1CCCCC1 and thiophene and furan onto C1CCCC1. Spiro and bridged systems return the whole ring system as described. The worked example's Bemis-Murcko and generic outputs are chemically identical to the Skill's quoted strings but written differently: the code emits O=C(NCC1CCCC1)c1ccccc1 where the Skill writes c1ccc(C(=O)NCC2CCCC2)cc1.",
+        "note": "Three of the four documented behaviours reproduce exactly; the fourth is a presentation problem rather than a chemistry error.",
+        "basic": 37,
+        "specialized": 52,
+        "total": 89,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The linear-molecule empty-scaffold failure mode reproduces",
+            "result": "PASS",
+            "note": "Palmitic acid and ethylamine both return ''"
+          },
+          {
+            "text": "Generic frameworks lose heteroatom identity as documented",
+            "result": "PASS",
+            "note": "Benzene, pyridine and pyrimidine all collapse to C1CCCCC1"
+          },
+          {
+            "text": "Spiro and bridged ring systems behave as the failure mode describes",
+            "result": "PASS",
+            "note": "The entire ring system is retained with R-groups stripped, in all three probes"
+          },
+          {
+            "text": "The worked example's stated output matches what the code produces",
+            "result": "FAIL",
+            "note": "Chemically identical -- verified by canonicalising the quoted strings -- but not the canonical SMILES the code emits, so a literal comparison fails"
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Full MMPA cycle on 1,500 compounds with measured pIC50",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "executed": true,
+        "execution_note": "The Skill's three-line recipe (fragment, index, transform --property pIC50) fails at the last step: '--property pIC50 is not present in the database'. Adding the undocumented `mmpdb loadprops` step made it work: 1,064 compounds with properties, 6,731 rules, 52,032 pairs, 45,317 rule statistics. The transform output is a 20-column TSV in SMILES order, not ranked, with no confidence column; 89 of 135 transformations (65.9%) rest on a single pair, and only 4 have 10 or more.",
+        "note": "The MMPA method content is strong -- especially the context-dependence caveat -- but the documented command sequence cannot produce the documented output.",
+        "basic": 31,
+        "specialized": 43,
+        "total": 74,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The documented mmpdb command sequence produces the promised property output",
+            "result": "FAIL",
+            "note": "mmpdb rejects the transform with \"--property 'pIC50' is not present in the database\"; `mmpdb loadprops` is absent from the recipe"
+          },
+          {
+            "text": "The full cycle works once the missing step is supplied",
+            "result": "PASS",
+            "note": "1,064 compounds, 6,731 rules, 52,032 pairs, 45,317 rule statistics"
+          },
+          {
+            "text": "The output contract matches the Skill's description",
+            "result": "FAIL",
+            "note": "Described as 'ranked transformations with delta(pIC50), N pairs, confidence'; the actual output is unranked, in SMILES order, and has no confidence column"
+          },
+          {
+            "text": "The low-pair-count failure mode reproduces on real data",
+            "result": "PASS",
+            "note": "65.9% of transformations rest on a single pair; only 4 of 135 reach 10 pairs"
+          },
+          {
+            "text": "The Skill's interpretation guidance is actionable on the real output",
+            "result": "PASS",
+            "note": "Pair count, standard deviation and a paired-t p-value are all present, so 'report uncertainty and context diversity' can be followed directly"
+          }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Pressed to define analog series by generic framework instead of Bemis-Murcko",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "1,500 compounds give 857 Bemis-Murcko scaffolds against 583 generic frameworks, a 1.47x collapse, with zero MakeScaffoldGeneric errors. The largest generic framework holds 59 compounds spanning 4 distinct Bemis-Murcko scaffolds -- chemotypes a medicinal chemist would not call one series.",
+        "note": "The Skill refuses the substitution and its reason checks out, but it never characterises how much collapsing actually happens.",
+        "basic": 37,
+        "specialized": 53,
+        "total": 90,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Generic frameworks merge chemotypes that Bemis-Murcko keeps separate",
+            "result": "PASS",
+            "note": "Largest framework spans 4 distinct Bemis-Murcko scaffolds across 59 compounds"
+          },
+          {
+            "text": "The Skill directs series detection to Bemis-Murcko rather than the generic view",
+            "result": "PASS",
+            "note": "Stated in both the failure mode and the reconciliation table: 'Use Bemis-Murcko (preserves heteroatoms); generic framework for topology only'"
+          },
+          {
+            "text": "MakeScaffoldGeneric runs without the version error the Common Errors table anticipates",
+            "result": "PASS",
+            "note": "0 errors over 1,500 compounds on RDKit 2026.03.6 at the documented import path"
+          },
+          {
+            "text": "The Skill characterises how much the generic view collapses a real library",
+            "result": "FAIL",
+            "note": "No expectation is given; measured 1.47x fewer groups, which a reader cannot anticipate from the text"
+          }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "'Our library is all singletons' -- tautomer-induced scaffold variation and bad inputs",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Four tautomer pairs (2-pyridone, 4-pyrimidinone, 2-thiouracil, barbiturate) all produced different raw Bemis-Murcko scaffolds and all four unified after TautomerEnumerator.Canonicalize. scaffold_split raised the documented ValueError for a single-scaffold frame and for an invalid SMILES, naming row position 1.",
+        "note": "The diagnosis the Common Errors table offers for singleton inflation is correct and its fix is testable and works.",
+        "basic": 38,
+        "specialized": 53,
+        "total": 91,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Tautomer-induced scaffold variation reproduces",
+            "result": "PASS",
+            "note": "All four pairs give different Bemis-Murcko scaffolds before canonicalization"
+          },
+          {
+            "text": "The prescribed fix ('canonicalize first') resolves it",
+            "result": "PASS",
+            "note": "4/4 pairs unified after TautomerEnumerator.Canonicalize"
+          },
+          {
+            "text": "scaffold_split raises named errors for both documented bad-input cases",
+            "result": "PASS",
+            "note": "'A scaffold split requires at least two scaffolds' and 'Invalid SMILES at row positions: [1]'"
+          },
+          {
+            "text": "The Skill connects singleton inflation to an upstream standardization problem",
+            "result": "PASS",
+            "note": "Common Errors: 'Singleton scaffolds dominate library -> Aggressive standardization -> check for tautomer-induced scaffold variation; canonicalize first'"
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 36.4,
+    "dynamic_weighted": 52.1,
+    "score": 88,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "The shipped scaffold_split hits its requested train fraction exactly (0.800, 0.700, 0.900) with zero scaffold overlap, and both of its input guards fire with named, actionable errors.",
+    "Its reconciliation table settles the competing definitions of 'scaffold' and 'series' with a recommendation per use case, which is the argument this analysis actually turns on.",
+    "It is precise where precision is hard: chemprop's scaffold_balanced balances group sizes rather than labels, a scaffold split is one design among several rather than a universal memorisation test, and matched-pair effects are context-dependent with the 2025 citation to support it.",
+    "Every documented scaffold failure mode reproduced -- empty scaffolds for linear molecules, heteroatom loss in generic frameworks, whole-ring-system spiro behaviour, and tautomer-induced singleton inflation whose prescribed fix unified 4 of 4 test pairs.",
+    "R-group decomposition worked unmodified on both the worked example and a real 53-member series, returning a five-position SAR table."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "The MMPA command sequence omits loadprops and cannot produce its documented output",
+      "observed_in": [
+        5
+      ],
+      "problem": "The three-line recipe is fragment, index, then `mmpdb transform --property pIC50`. Run as written it fails with \"--property 'pIC50' is not present in the database\", because activity data is never loaded. The section's stated output -- 'ranked transformations with delta(pIC50), N pairs, confidence' -- is also wrong: the real output is an unranked 20-column TSV in SMILES order with no confidence field.",
+      "root_cause": "The recipe was written from the mmpdb command list without running the property-dependent step end to end.",
+      "fix": "Insert `mmpdb loadprops -p props.csv data.mmpdb` between index and transform, show the two-column tab-separated property file format, and correct the output description to name the columns that actually appear (count, avg, std, paired_t, p_value) and to say the caller must sort."
+    },
+    {
+      "priority": "P1",
+      "title": "The shipped scaffold split always yields an all-singleton test set",
+      "observed_in": [
+        2
+      ],
+      "problem": "Because scaffold groups are sorted largest-first and assigned to train until the target size is reached, every multi-member scaffold lands in train. At 0.8, 0.7 and 0.9 train fractions the test set was 100% singleton-scaffold compounds. The Skill names this exact failure mode and prescribes a stratified scaffold split, but ships no implementation of one.",
+      "root_cause": "Size-descending greedy assignment optimises only for hitting the target train size, with nothing spreading large scaffolds across splits.",
+      "fix": "Either interleave assignment (walk the size-sorted groups and send every k-th large group to test) or ship the StratifiedGroupKFold variant the Skill already recommends, and add an assertion in the function that reports the fraction of test compounds sitting on singleton scaffolds so the user sees the problem."
+    },
+    {
+      "priority": "P2",
+      "title": "Worked example quotes non-canonical SMILES for code output",
+      "observed_in": [
+        4
+      ],
+      "problem": "The scaffold example states the Bemis-Murcko output as c1ccc(C(=O)NCC2CCCC2)cc1 and the generic as C1CCC(C(C)CCC2CCCC2)CC1. Both are chemically correct but neither is what MolToSmiles emits (O=C(NCC1CCCC1)c1ccccc1 and CC(CCC1CCCC1)C1CCCCC1), so an agent comparing strings sees a mismatch.",
+      "root_cause": "The example was written by hand rather than pasted from a run.",
+      "fix": "Replace both strings with the canonical output of the current RDKit and note that the example was produced with a stated version."
+    },
+    {
+      "priority": "P2",
+      "title": "No expectation given for how much the generic framework collapses a library",
+      "observed_in": [
+        6
+      ],
+      "problem": "The Skill correctly says generic frameworks are for topology comparison only, but gives no sense of scale. Measured on 1,500 real compounds: 857 Bemis-Murcko scaffolds become 583 generic frameworks, and the largest framework merges 4 distinct chemotypes into 59 compounds.",
+      "root_cause": "The representation table describes what each view loses without quantifying the consequence.",
+      "fix": "Add a one-line worked figure to the taxonomy table showing the scaffold-count ratio on a representative library, so a reader can judge whether the abstraction is acceptable for their purpose."
+    }
+  ]
+}

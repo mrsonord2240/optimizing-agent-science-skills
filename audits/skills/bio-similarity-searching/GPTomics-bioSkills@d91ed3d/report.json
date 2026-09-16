@@ -1,0 +1,251 @@
+{
+  "meta": {
+    "skill_name": "bio-similarity-searching",
+    "description": "Performs molecular similarity searching using Tanimoto, Tversky, Dice, and cosine coefficients on bit/count fingerprints with explicit choice rules for symmetric vs asymmetric measures, scaffold-hopping vs lead-optimization regimes, activity-cliff diagnosis, and large-library nearest-neighbor methods (BulkTanimoto, MHFP6 LSH forest, USRCAT). Use when ranking compounds by structural resemblance to a query, clustering libraries, finding analogs, or diagnosing activity cliffs.",
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:chemoinformatics/similarity-searching",
+    "evaluated_on": "2026-09-16",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "executed_inputs": "7/7"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "No fabricated claims. The Skill's most exacting statement -- that a Butina cutoff of 0.4 guarantees each member is within 0.6 of its centroid but does NOT guarantee that every non-centroid pair reaches 0.6 -- was checked directly and is exactly right: 0 member-to-centroid violations and 1,292 of 3,080 non-centroid pairs below 0.6, the worst at 0.342. Its threshold bands are explicitly labelled repository heuristics rather than calibration." },
+      "practice_boundaries": { "result": "PASS", "detail": "Compound-ranking and clustering only; nothing approaches an individual. The activity-cliff section correctly frames cliffs as a medicinal-chemistry investigation rather than a data error." },
+      "methodological_ground": { "result": "PASS", "detail": "No fallacy. The Skill leads with the correct caveat -- 'Tanimoto above 0.7 is not a guarantee of activity preservation' with the Maggiora and Stumpfe/Bajorath citations -- and the run found 5 cliffs including two enantiomer pairs differing by 3 log units. The two defects found are wrong causal explanations for observed artifacts, not invalid method choices." },
+      "code_usability": { "result": "PASS", "detail": "Every snippet in the Skill ran as written on 3,224 real compounds: BulkTanimotoSimilarity, TverskySimilarity, Butina.ClusterData, LazyBitVectorPick with a seed, rdFMCS with the documented MCSParameters spellings, the activity_cliffs function, and the MHFP6 LSHForestHelper route (recall 10/10 against exact search). No syntax error, no missing API, no wrong parameter name." }
+    }
+  },
+  "static_score": {
+    "subtotal": 92,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 10, "max": 12, "note": "Every documented capability exists and runs, and the coefficient and threshold tables are unusually careful about what they do and do not promise. Correctness docked to 2/4 for one wrong mechanism and one non-working fix: the 'Tanimoto = 1.0 != same molecule' failure mode attributes the effect to hash collisions and prescribes an unhashed sparse fingerprint, but all 141 observed cases are stereochemistry-blind fingerprints whose sparse forms are identical too." },
+      "reliability": { "score": 11, "max": 12, "note": "activity_cliffs raises a named ValueError on invalid SMILES rather than skipping it, the O(N^2) cost of Butina is stated up front and measured correctly, and the MaxMin seeding advice prevents a real failure. Error reporting docked: the search helper raises on a bad query but the clustering and MCS paths report nothing about inputs they silently ignore." },
+      "performance_context": { "score": 8, "max": 8, "note": "329 lines, and the performance claims check out: BulkTanimotoSimilarity over 3,224 compounds in 0.002 s, an all-pairs cliff scan in 1.5 s, and a 1,200-compound Butina distance matrix of exactly 719,400 floats as the O(N^2) note predicts." },
+      "agent_usability": { "score": 14, "max": 16, "note": "Consistent terminology and a decision-tree table that maps onto real tasks; every snippet was implementable without inference. Error prevention docked because two of the seven failure modes give a cause that does not match what actually happens on a real library, and one of them prescribes a fix that does not work." },
+      "human_usability": { "score": 8, "max": 8, "note": "The threshold band table is exactly how a chemist thinks about this, and it is explicitly labelled as a starting heuristic rather than calibration -- which the measured 6.4x spread in selectivity across fingerprints shows to be the right framing." },
+      "security": { "score": 11, "max": 12, "note": "No credentials, network, eval/exec or destructive operations. Input validation docked: only the search helper validates its query; cluster() and mcs_smarts() accept whatever they are given." },
+      "maintainability": { "score": 11, "max": 12, "note": "Each capability is a small independent function with an explicit parameter surface, so a project can swap coefficients or cutoffs without touching anything else. Testability docked: no worked example with an expected output, which is why the sparse-fingerprint fix was never checked." },
+      "agent_specific": { "score": 19, "max": 20, "note": "Precise trigger description, correct layering, clean composability with descriptors and scaffold-analysis, and reproducible results under an explicit seed. Escape hatches docked: it says when a coefficient is inappropriate but never says when to stop and hand the series to a chemist." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 89.3,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 23, "total": 29 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Analog search around astemizole across 3,224 hERG compounds",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Ran run/inputs_main.py. BulkTanimotoSimilarity over 3,224 fingerprints in 0.002 s. Band populations: >=0.85 n=1 (mean pChEMBL 8.30), 0.70-0.85 n=1 (9.00), 0.55-0.70 n=1 (7.55), 0.35-0.55 n=13 (6.05), <0.35 n=3,208 (5.53). The query itself was recovered at 1.000.",
+        "note": "Works exactly as documented, and the mean activity falls monotonically across the Skill's own bands -- which is the similarity principle showing up in the data.",
+        "basic": 38,
+        "specialized": 54,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The search returns ranked hits and recovers the query itself at similarity 1.0", "result": "PASS", "note": "Query found in library at 1.000; the next hit at 0.787 is the des-methyl analogue" },
+          { "text": "Mean activity falls monotonically across the Skill's threshold bands", "result": "PASS", "note": "8.30 / 9.00 / 7.55 in the top three bands against 5.53 in the noise band" },
+          { "text": "BulkTanimotoSimilarity is fast enough for library-scale use as the Skill claims", "result": "PASS", "note": "0.002 s for 3,224 comparisons" },
+          { "text": "The Skill states that its threshold bands are working defaults rather than transferable calibration", "result": "PASS", "note": "Said in those words, and it matters here: only 2 of 3,224 compounds reach 0.70 of a marketed hERG blocker" }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Butina clustering and what a 0.4 cutoff actually guarantees",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "1,200 compounds -> 454 clusters in 0.2 s, largest 31, 275 singletons, distance matrix exactly 719,400 floats (5.8 MB). Member-to-centroid similarity below 0.6: 0. Non-centroid pairs below 0.6: 1,292 of 3,080, minimum 0.342. Re-clustering the same 1,200 in reverse order produced a different centroid set.",
+        "note": "The single most precisely correct statement found in this candidate. Most sources describe a Butina cutoff as a within-cluster similarity guarantee; this Skill says it is not, and the data agree exactly.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The documented Butina snippet runs and produces clusters with the centroid convention the Skill describes", "result": "PASS", "note": "454 clusters; the first element of each is the centroid as stated" },
+          { "text": "Every assigned member is within the cutoff of its centroid, as the Skill claims", "result": "PASS", "note": "0 violations across all clusters of size >= 3" },
+          { "text": "The Skill's negative claim -- that non-centroid pairs are NOT guaranteed to meet the cutoff -- is correct", "result": "PASS", "note": "1,292 of 3,080 non-centroid pairs fall below 0.6, the worst pair at 0.342" },
+          { "text": "The O(N^2) memory statement is quantitatively accurate", "result": "PASS", "note": "719,400 upper-triangle floats for 1,200 compounds, matching n(n-1)/2 exactly" }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Variant B",
+        "label": "Tversky alpha=1, beta=0 as a substructure-like ranking",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "2-aminobenzimidazole as the query fragment. Tversky(query->library) mean 0.273, max 0.762; Tversky(library->query) mean 0.106, max 0.356 -- mean absolute difference 0.167, so the coefficient is genuinely asymmetric. Tanimoto for the same pairs: mean 0.083, max 0.320, zero hits at 0.7. Only 2 compounds in the library actually contain the fragment; of the 8 compounds at Tversky >= 0.7, one does.",
+        "note": "The asymmetry is real and Tversky recovers ranking signal where Tanimoto returns nothing, but a user reading 'substructure-like' could reasonably expect better than 12% precision.",
+        "basic": 36,
+        "specialized": 51,
+        "total": 87,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Tversky with alpha=1, beta=0 is asymmetric as the coefficient table states", "result": "PASS", "note": "Mean absolute difference of 0.167 between the two directions across 3,224 compounds" },
+          { "text": "It surfaces fragment-containing compounds where symmetric Tanimoto does not", "result": "PASS", "note": "Tanimoto >= 0.7 returns 0 compounds; Tversky >= 0.7 returns 8, including a true container" },
+          { "text": "The Skill states that the parameter choice is subjective rather than principled", "result": "PASS", "note": "'Parameter choice subjective; alpha=1,beta=0 = substructure-like' in the coefficient table" },
+          { "text": "The Skill gives the reader any expectation of substructure precision", "result": "FAIL", "note": "12% of Tversky >= 0.7 hits actually contain the query fragment; 'substructure-like' is the only qualifier offered and no precision figure or verification step is suggested" }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Edge",
+        "label": "Activity-cliff diagnosis at Tanimoto >= 0.85 and >= 2 log units",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "All-pairs scan of 3,224 compounds in 1.5 s. 667 pairs at Tanimoto >= 0.85, of which 5 are cliffs (0.75%). The five: two enantiomer pairs at similarity 1.000 with 3.01 and 3.00 log-unit gaps, one diastereomer pair at 0.891, one ring-size/stereo pair at 0.915, and one pair that is the same SMILES with and without a `.Cl` counter-ion at 0.982 with a 2.10 log gap.",
+        "note": "The function works and the science is framed correctly, but four of the five hits are stereochemistry artifacts of a chirality-blind fingerprint and the fifth is an unstripped salt -- and the Skill blames cliff false positives on bit collisions.",
+        "basic": 36,
+        "specialized": 52,
+        "total": 88,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The activity_cliffs function runs at library scale and raises on invalid SMILES as written", "result": "PASS", "note": "3,224 compounds in 1.5 s; the documented ValueError guard is present and correct" },
+          { "text": "Cliffs are found, supporting the Skill's leading caveat about similarity and activity", "result": "PASS", "note": "Two pairs at Tanimoto 1.000 differ by 3 log units in measured pChEMBL" },
+          { "text": "The Skill frames cliffs as an investigation rather than an error", "result": "PASS", "note": "It lists measurement noise, cryptic SAR, conformational selection and real SAR as alternatives" },
+          { "text": "The documented cause of cliff false positives matches what was observed", "result": "FAIL", "note": "The Common Errors row says 'Bit-collisions inflate similarity'; all five observed cliffs are chirality-blind fingerprints or an unstripped `.Cl` salt form" }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "MaxMin diversity selection and MCS on a deliberately divergent set",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "LazyBitVectorPick selected 100 of 3,224 instantly, identical on repeat with seed=42 and 37/100 overlap with seed=7. Mean pairwise Tanimoto 0.094 for the MaxMin set against 0.132 for a random 100. MCS: 10 close analogues gave an 8-atom MCS in 0.0 s; 40 diverse compounds gave a 2-atom MCS in 0.0 s with canceled=False at both a 5 s and a 60 s timeout.",
+        "note": "MaxMin behaves exactly as documented. The MCS failure mode half-reproduces: the 'small partial MCS' symptom appeared, but through immediate convergence on a trivial common fragment, not through the documented timeout mechanism.",
+        "basic": 37,
+        "specialized": 53,
+        "total": 90,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "MaxMin picking is reproducible under the seed the Skill tells you to set", "result": "PASS", "note": "Identical selection on repeat at seed 42; a different seed changes 63 of 100 picks" },
+          { "text": "MaxMin produces a measurably more diverse subset than random selection", "result": "PASS", "note": "Mean pairwise Tanimoto 0.094 versus 0.132, and no MaxMin pair above 0.172" },
+          { "text": "The documented 'picker returns the first N inputs' failure does not occur when seeded", "result": "PASS", "note": "The selection is not range(100); the Skill's preventive advice is what avoids it" },
+          { "text": "The MCS exponential-timeout failure mode reproduces by its documented mechanism", "result": "FAIL", "note": "40 divergent molecules returned a 2-atom MCS in under 0.1 s with canceled=False at both 5 s and 60 s; raising the timeout, the Skill's prescribed fix, changes nothing" }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Pressed to reuse one similarity threshold across four fingerprint families",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "All pairwise similarities over 800 compounds for each fingerprint. ECFP4: mean 0.133, p99 0.344, 0.094% of pairs above its quoted 0.70. FCFP4: mean 0.185, 0.493% above 0.60. AtomPair: mean 0.296, 0.603% above 0.55. MACCS: mean 0.497, 0.396% above 0.85.",
+        "note": "The Skill refuses to treat its per-fingerprint numbers as equivalents, and the measurement shows why -- a 6.4x spread in how much of the library each one retains.",
+        "basic": 37,
+        "specialized": 54,
+        "total": 91,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "All four fingerprints in the threshold-transfer table are constructible and comparable", "result": "PASS", "note": "ECFP4, FCFP4, AtomPair and MACCS all built and compared over the same 800 compounds" },
+          { "text": "Their similarity distributions differ enough to make a shared threshold wrong", "result": "PASS", "note": "Mean pairwise similarity ranges from 0.133 (ECFP4) to 0.497 (MACCS)" },
+          { "text": "The Skill labels its per-fingerprint numbers as starting heuristics rather than equivalents", "result": "PASS", "note": "'repository starting heuristics, not universal equivalents' -- stated explicitly" },
+          { "text": "The quoted per-fingerprint values are at least roughly iso-selective", "result": "FAIL", "note": "Fraction of pairs retained spans 0.094% to 0.603%, a 6.4x range, so the four numbers are not a matched set even approximately" }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "'These two compounds score 1.0 but are different molecules' -- plus the LSH route",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "141 pairs in the library reach folded-ECFP4 Tanimoto 1.0 with different canonical SMILES. For all four inspected examples the unhashed sparse count fingerprints are identical as well, while InChIKeys differ -- the pairs are enantiomers and diastereomers, and the default Morgan generator ignores chirality. Separately, the MHFP6 LSHForestHelper route ran as written in tools\\mhfp-venv: index over 1,000 compounds in 12.1 s, query returned 10 neighbours, recall 10/10 against an exact MHFP distance search.",
+        "note": "The Skill is right that Tanimoto 1.0 does not mean identity, wrong about why, and its first prescribed fix does not work.",
+        "basic": 34,
+        "specialized": 49,
+        "total": 83,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "The Skill's warning that Tanimoto 1.0 does not imply identity reproduces on a real library", "result": "PASS", "note": "141 such pairs among 3,224 compounds" },
+          { "text": "The documented mechanism matches the observed cause", "result": "FAIL", "note": "The Skill says a folded hashed fingerprint maps distinct environments to the same bits; the observed cause is that the default Morgan generator has includeChirality=False" },
+          { "text": "The prescribed fix -- use an unhashed sparse fingerprint to disambiguate -- works", "result": "FAIL", "note": "The sparse count fingerprints are identical for every inspected pair, so the fix cannot separate them" },
+          { "text": "The Skill's other prescribed fix, comparing InChIKey, does separate them", "result": "PASS", "note": "InChIKeys differ for all four inspected pairs" },
+          { "text": "The MHFP6 LSH-forest route runs as written and its recall can be measured as instructed", "result": "PASS", "note": "build_index and query_index both worked verbatim; recall@10 was 10/10 against exact MHFP search" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 36.8,
+    "dynamic_weighted": 53.6,
+    "score": 90,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Its hardest technical claim is exactly right where most sources are wrong: a Butina cutoff of 0.4 guarantees member-to-centroid similarity but not pairwise similarity, verified as 0 centroid violations against 1,292 of 3,080 non-centroid pairs below 0.6.",
+    "Every snippet ran verbatim at library scale with no adaptation -- Bulk Tanimoto, Tversky, Butina, MaxMin with a seed, rdFMCS with the correct MCSParameters spellings, the activity-cliff scan, and the MHFP6 LSH forest at 10/10 recall.",
+    "It leads with the activity-cliff caveat rather than burying it, and the data bear it out: two pairs at Tanimoto 1.000 differ by 3 log units in measured hERG potency.",
+    "Its threshold bands are labelled as working defaults rather than calibration, which the measured 6.4x spread in selectivity across four fingerprint families shows to be the honest framing.",
+    "The performance claims are quantitatively accurate, down to the exact size of the Butina distance matrix."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "The 'Tanimoto = 1.0' failure mode has the wrong cause and a fix that does not work",
+      "observed_in": [4, 7],
+      "problem": "141 pairs in a 3,224-compound library reach folded-ECFP4 Tanimoto 1.0 with different structures. The Skill attributes this to hash collisions and prescribes an unhashed sparse fingerprint to disambiguate. Every inspected pair is an enantiomer or diastereomer whose unhashed sparse fingerprints are also identical, because the default Morgan generator sets includeChirality=False. The same misattribution appears in the Common Errors row for activity-cliff false positives, where four of five observed cliffs are stereochemistry artifacts and the fifth is an unstripped salt.",
+      "root_cause": "Fingerprint collisions and stereochemistry-blindness produce the same symptom, and the Skill diagnosed the rarer cause.",
+      "fix": "Rewrite the failure mode around chirality: state that RDKit's Morgan generators default to includeChirality=False, give GetMorganGenerator(..., includeChirality=True) as the first fix and InChIKey as the identity check, and keep hash collisions as a secondary cause. Add the same note to the activity-cliff false-positive row, together with a reminder to strip salts upstream."
+    },
+    {
+      "priority": "P2",
+      "title": "MCS failure mode describes a timeout that does not occur",
+      "observed_in": [5],
+      "problem": "The Skill's MCS failure mode says the algorithm 'tries every atom-mapping permutation within timeout' and prescribes raising the timeout. On 40 deliberately divergent molecules rdFMCS returned a 2-atom MCS in under 0.1 s with canceled=False at both a 5 s and a 60 s timeout, so raising the timeout changes nothing.",
+      "root_cause": "The symptom 'returns small partial MCS' has two causes -- cancellation and genuine convergence on a trivial common fragment -- and the Skill only covers the first.",
+      "fix": "Split the symptom: instruct the reader to check result.canceled first, and state that a small MCS with canceled=False means the input set genuinely has little in common, for which the fix is pre-clustering rather than a longer timeout."
+    },
+    {
+      "priority": "P2",
+      "title": "No precision expectation for Tversky substructure-like search",
+      "observed_in": [3],
+      "problem": "With alpha=1, beta=0 against a 2-aminobenzimidazole query, 8 compounds scored above 0.7 and only one actually contains the fragment. The Skill offers 'substructure-like' and 'parameter choice subjective' but no indication that the hit list needs a SMARTS confirmation step.",
+      "root_cause": "The section explains the coefficient's asymmetry without characterising its precision as a substructure proxy.",
+      "fix": "Add one line telling the reader to confirm Tversky hits with an actual substructure match from chemoinformatics/substructure-search, and note that the coefficient ranks feature overlap rather than containment."
+    },
+    {
+      "priority": "P2",
+      "title": "Per-fingerprint thresholds are not iso-selective and the Skill does not say how to set them",
+      "observed_in": [6],
+      "problem": "The quoted starting points (ECFP4 0.7, FCFP4 0.6, AtomPair 0.55, MACCS 0.85) retain between 0.094% and 0.603% of all pairs on the same library -- a 6.4x spread. The Skill correctly says they are not universal equivalents, but gives no procedure for choosing one.",
+      "root_cause": "The table lists heuristics without the calibration step that would make them comparable.",
+      "fix": "Add a two-line recipe: compute the all-pairs similarity distribution on the actual library and pick the threshold at a chosen percentile (for example p99.5), so thresholds across fingerprints select comparable fractions rather than comparable numbers."
+    }
+  ]
+}

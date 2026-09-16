@@ -1,0 +1,220 @@
+{
+  "meta": {
+    "skill_name": "bio-molecular-standardization",
+    "description": "Standardizes molecular structures using the ChEMBL structure pipeline for normalization and parent selection plus RDKit rdMolStandardize for explicit custom steps such as tautomer canonicalization, salt/solvent stripping, charge handling, stereochemistry handling, mixture selection, and isotope normalization. Explicitly compares ChEMBL, canSARchem, RDKit, and PubChem standardization choices. Use when preparing libraries for QSAR training, joining datasets across sources, deduplicating compound collections, or building canonical compound registries.",
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:chemoinformatics/molecular-standardization",
+    "evaluated_on": "2026-09-16",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Moderate",
+    "n_inputs": 5,
+    "executed_inputs": "5/5"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "No fabricated identifiers or values in any of the 5 outputs. Every number reported (3,966 rows, 3,208 unique InChIKeys, 97.3% join recovery, 88 mol/s) was produced by a script whose stdout is stored in run/*.out. The Skill's own claims about ChEMBL vs RDKit tautomer behaviour were checked against the installed libraries rather than accepted." },
+      "practice_boundaries": { "result": "PASS", "detail": "Compound-registry and QSAR-data-preparation scope only. No output diagnoses, prescribes for, or triages any individual; hERG is handled purely as an in vitro assay endpoint for model training data." },
+      "methodological_ground": { "result": "PASS", "detail": "No principled fallacy. The Skill correctly separates representation standardization from tautomer canonicalization, and explicitly refuses to claim that the canonical tautomer is the dominant in vivo form (verified in Input 3 where the enumerator selected a non-aromatic ring form). Gap noted in recommendations: it gives no policy for replicate measurements that disagree (12.4% of replicated compounds spanned >1 log unit), but it does surface the replicate count." },
+      "code_usability": { "result": "PASS", "detail": "All code written from the Skill's patterns ran under rdkit 2026.03.6 / chembl_structure_pipeline 1.2.4 / pandas 3.0.5 with zero exceptions across 3,966 real compounds. Every API the Skill names exists at the path it gives, including the rdkit.Chem.MolStandardize.rdMolStandardize import path and the SetMaxTransforms/SetMaxTautomers caps." }
+    }
+  },
+  "static_score": {
+    "subtotal": 91,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 11, "max": 12, "note": "Covers every promised use case: ChEMBL pipeline, explicit 8-stage rdMolStandardize pipeline, canSARchem/PubChem comparison, tautomer policy, dedup for ML. Correctness docked one point: the ChEMBL route can return an unstripped two-fragment salt when every fragment is on ChEMBL's salt list, and the Skill does not say so." },
+      "reliability": { "score": 10, "max": 12, "note": "Strong fault tolerance (explicit parse_failure / excluded_by_chembl / standardize_error statuses, a per-tool failure-mode section). Error reporting is the weak point: the SKILL.md prepare_qsar_data and the shipped example both drop failures with a bare `continue` and tally nothing, contradicting the usage guide's step 7 and the Skill's own 'do not silently accept' instruction." },
+      "performance_context": { "score": 6, "max": 8, "note": "SKILL.md is 306 lines with the depth split into usage-guide.md and one example; some code is duplicated between SKILL.md and the example. Measured 88 mol/s for the ChEMBL pipeline and ~1 min projected for the full library with tautomer canonicalization, matching the Skill's own 'per-molecule Python overhead' warning." },
+      "agent_usability": { "score": 15, "max": 16, "note": "All five test inputs were implemented straight from SKILL.md without guesswork; terminology (parent, exclude flag, standardize_mol) is consistent throughout; the error-prevention content is exceptional. Feedback design docked: the reporting contract in usage-guide step 7 has no counterpart in the code." },
+      "human_usability": { "score": 8, "max": 8, "note": "usage-guide.md lists five natural trigger phrasings that match how a chemist would actually ask. Under Category 3 Override 2, strict rejection of unparseable input is scored as a data-integrity guarantee, not a defect; the Skill states its input requirements explicitly." },
+      "security": { "score": 11, "max": 12, "note": "No credentials, no network calls, no eval/exec, no shell-outs in any snippet. Input validation docked one point: user-supplied column names (smiles_col, activity_col) are used without a presence check, so a missing column surfaces as a raw KeyError." },
+      "maintainability": { "score": 11, "max": 12, "note": "Clean separation across SKILL.md / usage-guide.md / examples, and the 8 pipeline stages are independent primitives that can be reordered (which is exactly what the canSARchem comparison asks for). Testability docked: examples/standardize_library.py has a __main__ demo with 4 SMILES but no expected output or assertion to check against." },
+      "agent_specific": { "score": 19, "max": 20, "note": "Precise trigger description, correct progressive disclosure, clean composability with molecular-io / descriptors / qsar-modeling, and verified idempotency (two scripts re-run byte-identical). Escape hatches docked: 'manual review' is advised for natural products and peptides but no stop-and-ask condition is given for the co-crystal case the Skill itself calls the hardest." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 89.4,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 21, "total": 24 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Prepare 3,966 ChEMBL hERG IC50 rows as a deduplicated QSAR training set",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Ran run/input1_herg_qsar_prep.py on the real 3,966-row CHEMBL240 export. 3,966/3,966 standardized with zero parse failures, exclusions or errors; 129 structures changed; 3,208 unique InChIKeys; 16 records merged only because of standardization; 379 compounds replicated, 47 of them spanning >1 log unit (max 3.69).",
+        "note": "Delivered the training set and the per-stage loss report, but the counters that produced that report had to be added by the auditor -- the Skill's own snippet discards failures silently.",
+        "basic": 37,
+        "specialized": 53,
+        "total": 90,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Every input row is accounted for by exactly one status counter", "result": "PASS", "note": "3,966 rows in, 3,966 counted as ok; no row vanished between load and output" },
+          { "text": "Deduplication keys on the InChIKey of the standardized parent, not on raw SMILES", "result": "PASS", "note": "3,224 distinct raw canonical SMILES collapsed to 3,208 keys; 16 merges exist only because standardization ran first" },
+          { "text": "Replicate count is emitted per compound so measurement reliability is visible downstream", "result": "PASS", "note": "n_replicates column written; 379 compounds carry more than one measurement" },
+          { "text": "The Skill's own prepare_qsar_data would have produced the per-stage loss report the prompt asked for", "result": "FAIL", "note": "Both the SKILL.md version and examples/standardize_library.py use `except Exception: continue` with no tally, so the counts came from auditor-added code" },
+          { "text": "No patient-level or clinical claim appears anywhere in the output", "result": "PASS", "note": "Output is compound identity plus an in vitro pChEMBL aggregate; hERG is treated as an assay endpoint" }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "ChEMBL get_parent_mol vs LargestFragmentChooser on 12 registry salt/solvate/co-crystal forms",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Ran run/input2_salt_charge_forms.py plus the follow-up probe run/input2b_chembl_saltlist_probe.py. All 12 forms processed by both routes with exclude=False throughout. Five route disagreements found; the sodium/potassium-salt disagreement was characterised on 7 further probes.",
+        "note": "The Skill's edge-case table reproduces exactly under the RDKit route (7/7) and quaternary charge is preserved by both routes, but the ChEMBL default route silently returns a two-fragment salt for organic counter-ions and the Skill never says so.",
+        "basic": 35,
+        "specialized": 51,
+        "total": 86,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Every row of the SKILL.md Salt Stripping Edge Cases table reproduces under LargestFragmentChooser(preferOrganic=True)", "result": "PASS", "note": "7/7 rows matched, including hydrate, solvate, mixed salt -> CCO and the co-crystal largest-fragment rule" },
+          { "text": "Quaternary ammonium charge survives both routes, including Uncharger(force=True)", "result": "PASS", "note": "C[N+](C)(C)C and bethanechol chloride both kept net charge +1 under ChEMBL, force=False and force=True" },
+          { "text": "The Skill warns that its default ChEMBL route can return an unstripped salt when every fragment is on ChEMBL's salt list", "result": "FAIL", "note": "Sodium acetate, benzoate, formate, citrate, potassium acetate and choline chloride all came back as two fragments; the documented mitigation (pre-filter to >=1 carbon) passes all six" },
+          { "text": "Both routes complete on all 12 forms without a crash or a silent null", "result": "PASS", "note": "12/12 returned a molecule; sodium aspirinate stripped correctly, proving the behaviour is a salt-list rule and not a library failure" },
+          { "text": "The Skill surfaces rather than hides the mixed-salt / co-crystal ambiguity", "result": "PASS", "note": "The table hedges 'or CC(=O)O depending on rule'; observed ChEMBL -> CC(=O)O and RDKit -> CCO, exactly the hedged split" }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Eight tautomer pairs: does the ChEMBL route register them twice, and does InChIKey rescue it?",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Ran run/input3_tautomer_dedup.py on all 8 pairs from the SKILL.md tautomer table plus guanine and nitro/aci-nitro. ChEMBL-only SMILES agree for 2/8; InChIKey agrees for 4/8; adding TautomerEnumerator.Canonicalize unified 4/4 of the misses. Re-run byte-identical.",
+        "note": "Every claim the Skill makes about this step was confirmed against the installed libraries, including the warning that the canonical tautomer is a scoring-rule choice.",
+        "basic": 37,
+        "specialized": 54,
+        "total": 91,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "ChEMBL standardization alone leaves keto/enol and phenol/keto pairs as distinct records, as the Skill states", "result": "PASS", "note": "acetone/enol, acetylacetone, 2-naphthol and nitro/aci-nitro all produced different InChIKeys after the ChEMBL route" },
+          { "text": "Standard InChIKey collapses some but not all tautomer representations, as the Skill states", "result": "PASS", "note": "4/8 collapsed (lactam/lactim, pyrazole, guanine N7H/N9H, amidine/iminol); 4/8 did not" },
+          { "text": "Adding TautomerEnumerator.Canonicalize unifies every pair InChIKey missed", "result": "PASS", "note": "4/4 of the split pairs became identical after canonicalization" },
+          { "text": "The canonical tautomer is presented as a reproducible scoring choice, not a physical prediction", "result": "PASS", "note": "SKILL.md states this explicitly; the run bore it out -- the polyhydroxy case canonicalized to a non-aromatic ring form" }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Join a 300-compound ChEMBL slice against a synthetic in-house registry with known ground truth",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Ran run/input4_crossdb_join.py against data/inhouse_registry_synthetic.csv (synthetic, built by data/make_inhouse_set.py, documented in data/README.md). Recovered joins: 131/300 raw (43.7%), 263/300 after the ChEMBL pipeline (87.7%), 292/300 after the Skill's full pipeline (97.3%).",
+        "note": "The Skill's prescription is quantitatively correct: standardizing both sides more than doubles recovered overlap, and the residual misses map onto effects the Skill warns about.",
+        "basic": 37,
+        "specialized": 54,
+        "total": 91,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Standardizing both sides before the join raises recovered overlap above the raw-key baseline", "result": "PASS", "note": "43.7% -> 87.7% with the ChEMBL pipeline alone" },
+          { "text": "The ChEMBL pipeline alone leaves tautomer and stereo mismatches unjoined", "result": "PASS", "note": "alt_tautomer 47% and stereo_dropped 66% recovery, unchanged from raw -- matching the Skill's statement that ChEMBL does neither" },
+          { "text": "The Skill's full documented pipeline recovers at least 95% of ground-truth pairs", "result": "PASS", "note": "292/300 = 97.3% after isotope strip + tautomer canonicalization + stereo removal" },
+          { "text": "The residual misses are attributable to an effect the Skill explicitly warns about", "result": "PASS", "note": "The 6% hcl_salt shortfall is the salt-list behaviour from Input 2; the as_is/stereo shortfall is key collision after stereo removal, which the Skill cautions against" },
+          { "text": "No join is asserted without a verifiable ground-truth identifier", "result": "PASS", "note": "Every recovered join was checked against source_chembl_id, not merely counted as a key intersection" }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Mixed tracer library: per-record isotope policy, tautomer explosion, full-library throughput",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Ran run/input5_stress.py. Isotope flag behaves as documented; the polyhydroxy case enumerated 104 tautomers unbounded and 35 with status MaxTransformsReached under the documented caps; ChEMBL pipeline ran 3,966 molecules in 45.2 s (88 mol/s); removing stereochemistry merged 113 distinct compounds onto shared keys.",
+        "note": "Everything the Skill documents held, but keep_isotopes is a single library-wide boolean, so the mixed tracer/non-tracer requirement had to be met by calling the function twice.",
+        "basic": 36,
+        "specialized": 53,
+        "total": 89,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "keep_isotopes controls whether a labelled compound merges with its unlabelled parent", "result": "PASS", "note": "13C-aspirin shares aspirin's key only with keep_isotopes=False (BSYNRYMUTXBXSQ-UHFFFAOYSA-N vs -OUBTZVSYSA-N)" },
+          { "text": "SetMaxTransforms / SetMaxTautomers cap the enumeration exactly as the failure-mode section says", "result": "PASS", "note": "104 tautomers unbounded -> 35 with status MaxTransformsReached at (50, 100)" },
+          { "text": "Canonicalize() avoids the full-enumeration cost the Skill warns about", "result": "PASS", "note": "0.15 s for the canonical form on the case that produced 104 tautomers" },
+          { "text": "The Skill offers a per-record isotope policy for a library that mixes tracers and ordinary compounds", "result": "FAIL", "note": "keep_isotopes is one boolean applied to every molecule; the split had to be improvised by the auditor" },
+          { "text": "Throughput is adequate for a 4,000-compound library without special handling", "result": "PASS", "note": "45.2 s for 3,966 molecules; ~1 min projected with tautomer canonicalization added" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 36.4,
+    "dynamic_weighted": 53.6,
+    "score": 90,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Its factual claims survive empirical checking: the salt-stripping table reproduces 7/7 under the RDKit route, the tautomer claims reproduce 8/8, and the InChIKey 'collapses some but not all' caveat is exactly right (4/8 collapsed).",
+    "It separates representation standardization from tautomer canonicalization and refuses to call the canonical tautomer a physical prediction -- the single most common error in this area.",
+    "The full documented pipeline is quantitatively load-bearing: it lifted cross-registry join recovery from 43.7% to 97.3% on a 300-compound ground-truth test.",
+    "Every API path it names exists in current RDKit, including rdkit.Chem.MolStandardize.rdMolStandardize and the SetMaxTransforms/SetMaxTautomers caps for the enumeration-explosion failure mode.",
+    "Zero failures on 3,966 real ChEMBL compounds at 88 mol/s, with byte-identical output on re-run."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "ChEMBL route can return an unstripped organic salt, undocumented",
+      "observed_in": [2, 4],
+      "problem": "get_parent_mol returned both fragments for sodium acetate, sodium benzoate, sodium formate, sodium citrate, potassium acetate and choline chloride, because every fragment is itself on ChEMBL's salt list. The Skill presents the ChEMBL route as the default and documents only the fully-inorganic case.",
+      "root_cause": "The 'ChEMBL pipeline -- inorganic salt fails' failure mode assumes the survivor has no carbon, so its prescribed mitigation (pre-filter to >=1 carbon atom) passes every organic salt shown above.",
+      "fix": "Add a failure mode for the all-fragments-are-salts case and change the mitigation to a fragment-count check on the parent (`len(Chem.GetMolFrags(parent)) > 1` -> flag for review or fall back to LargestFragmentChooser(preferOrganic=True)), not a carbon-count check."
+    },
+    {
+      "priority": "P1",
+      "title": "Shipped code discards failures silently, contradicting the usage guide",
+      "observed_in": [1],
+      "problem": "usage-guide.md step 7 promises a report of parse failures, exclusion flags and fragments stripped, but prepare_qsar_data in both SKILL.md and examples/standardize_library.py drops every failure with a bare `continue` and keeps no counts, so a library can lose rows with no trace.",
+      "root_cause": "The reporting contract lives only in the usage guide; the reference implementation was written as a filter rather than as an audited transform.",
+      "fix": "Give prepare_qsar_data a status tally (parse_failure / excluded_by_chembl / standardize_error / inorganic / ok), return it alongside the DataFrame, and print it in the __main__ demo so the documented report is what the code actually produces."
+    },
+    {
+      "priority": "P2",
+      "title": "No policy for replicate measurements that disagree",
+      "observed_in": [1],
+      "problem": "Mean-aggregating pChEMBL across replicates is prescribed without any tolerance check. On the real hERG set, 47 of 379 replicated compounds (12.4%) spanned more than 1 log unit, up to 3.69.",
+      "root_cause": "The ML-preparation section treats replicate count as a confidence signal but never converts it into a decision rule.",
+      "fix": "Add a spread column (std or max-min) and a documented threshold in the ML-preparation section, with guidance to drop or flag compounds above it, and note that ChEMBL exports mix binding and functional assay formats."
+    },
+    {
+      "priority": "P2",
+      "title": "Isotope handling is a single library-wide boolean",
+      "observed_in": [5],
+      "problem": "keep_isotopes applies to every molecule, so a library mixing labelled tracers with ordinary compounds cannot be standardized in one pass under the documented policy.",
+      "root_cause": "Stage 7 of the pipeline table treats isotope normalization as a global setting, although its own note says to preserve labels when scientifically meaningful.",
+      "fix": "Show the per-record form in the pipeline: accept a predicate or a per-row flag column, and add a line to the Tips section on recording which compounds retained labels."
+    },
+    {
+      "priority": "P2",
+      "title": "User column names are used without a presence check",
+      "observed_in": [],
+      "problem": "prepare_qsar_data indexes row[smiles_col] and row[activity_col] directly, so a mistyped or absent column surfaces as a raw pandas KeyError rather than an actionable message.",
+      "root_cause": "The function was written for a fixed in-house schema and then parameterised without validating the parameters.",
+      "fix": "Validate that both columns exist in df.columns at function entry and raise a named error listing the available columns."
+    }
+  ]
+}

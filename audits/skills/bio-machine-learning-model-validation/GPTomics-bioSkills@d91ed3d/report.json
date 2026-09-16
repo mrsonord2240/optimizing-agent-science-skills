@@ -1,0 +1,253 @@
+{
+  "meta": {
+    "skill_name": "bio-machine-learning-model-validation",
+    "description": "Validates predictive models on omics and biomedical data with nested cross-validation, group/batch/temporal-aware splits, the full data-leakage taxonomy, probability calibration, decision-curve net benefit, optimism correction, sample-size planning, and TRIPOD+AI reporting. Use when estimating model performance honestly, choosing a CV scheme, detecting leakage, or judging whether reported discrimination means the model is actually useful.",
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:machine-learning/model-validation",
+    "evaluated_on": "2026-09-16",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "executed_inputs": "7/7"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "The most factually current Skill in this candidate, and every checkable claim checked out. All three scikit-learn drift predictions were exact on 1.9.1: CalibratedClassifierCV(cv='prefit') now raises InvalidParameterError, FrozenEstimator is the working replacement, and method='temperature' exists. Its citations are real and correctly attached (Ambroise 2002 for selection bias, Kapoor 2023 for leakage, Van Calster 2019 for calibration, Collins 2024 for TRIPOD+AI)." },
+      "practice_boundaries": { "result": "PASS", "detail": "It is explicit about the boundary rather than silent on it: the decision tree routes confirmatory-trial inference out to a different Skill because 'the estimand is a treatment effect, not a prediction', and it frames clinical usefulness through decision-curve net benefit rather than asserting any clinical conclusion." },
+      "methodological_ground": { "result": "PASS", "detail": "Its central thesis was demonstrated rather than asserted: selecting features outside the CV fold on 200 x 5,000 pure noise with random labels produced a CV AUC of 0.904, against 0.547 for the same selection inside a Pipeline. The orthogonality of discrimination and calibration, the AUPRC-baseline-is-prevalence point, and the LOO-with-AUC degeneracy all reproduced." },
+      "code_usability": { "result": "PASS", "detail": "Every snippet ran verbatim on real hERG ECFP4 data, and the shipped example byte-compiles and runs end to end, reproducing both of its headline claims (leaky AUC 0.959 against nested 0.569; oversampled mean predicted risk 0.24 against a true prevalence of 0.10)." }
+    }
+  },
+  "static_score": {
+    "subtotal": 95,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 12, "max": 12, "note": "Everything the description promises is present, correct and executable: nested CV, the eight-row leakage taxonomy, group/temporal splits, calibration with the current API, decision-curve net benefit, optimism correction, Riley sample-size framing and TRIPOD+AI. No factual error was found in seven inputs of testing; the one claim that did not reproduce (SMOTE harming calibration) is regime-dependent and does reproduce in the Skill's own worked example." },
+      "reliability": { "score": 10, "max": 12, "note": "The per-method failure modes are accurate and their symptoms reproduce. Docked because this is guidance plus one demonstration script: neither validates its inputs, and nothing warns when a requested CV scheme is degenerate for the data handed to it (the LOO/AUC case surfaces as a scikit-learn scoring warning and a nan rather than as an error the Skill raises)." },
+      "performance_context": { "score": 8, "max": 8, "note": "218 lines carrying a great deal of content, with the density in tables rather than prose. Nested CV with a 9-point grid over 1,200 x 1,978 completed in ordinary time." },
+      "agent_usability": { "score": 15, "max": 16, "note": "The decision-tree-by-scenario table is the best routing device in this candidate -- it names the generalisation question, the scheme and the reason, and routes three cases out to other Skills. Feedback design docked: it demands TRIPOD+AI reporting without specifying what the produced report should contain." },
+      "human_usability": { "score": 8, "max": 8, "note": "It opens with the question a user actually asks ('Validate my omics classifier honestly') and answers it in three lines before any theory." },
+      "security": { "score": 11, "max": 12, "note": "No credentials, network, eval/exec or destructive operations anywhere. Input validation docked: the shipped example and every snippet assume well-formed X, y and groups." },
+      "maintainability": { "score": 12, "max": 12, "note": "Full marks for testability, which is rare here: examples/nested_cv_biomarker.py is a runnable demonstration of the two claims the Skill most depends on, and it reproduces both. The content is otherwise tabulated and independently editable." },
+      "agent_specific": { "score": 19, "max": 20, "note": "Precise trigger, excellent escape hatches (three explicit routings to other Skills including the prediction-versus-inference boundary), clean composability and deterministic seeded examples. Progressive disclosure docked: for this breadth of scope everything lives in a single SKILL.md with no references directory." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 91.3,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 25, "total": 31 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Nested CV against flat CV on a real hERG ECFP4 classifier",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "The SKILL.md nested-CV snippet was run verbatim on 1,200 hERG compounds x 1,978 ECFP4 bits with the documented 9-point grid. Nested AUC 0.753 +/- 0.030; the flat GridSearchCV best score on the same data was 0.762, an optimism of +0.009 AUC. The selected configuration was C=0.01, k=200.",
+        "note": "The procedure works exactly as written and the bias is in the documented direction, but it is small on this dataset and grid.",
+        "basic": 37,
+        "specialized": 53,
+        "total": 90,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The nested-CV snippet runs verbatim on real data", "result": "PASS", "note": "GridSearchCV inside cross_val_score with the Pipeline inside, exactly as printed" },
+          { "text": "The nested estimate is lower than the flat estimate, in the documented direction", "result": "PASS", "note": "0.753 against 0.762" },
+          { "text": "Putting selection inside the Pipeline prevents the selection leak", "result": "PASS", "note": "Demonstrated decisively in input 2: 0.547 against 0.904 on pure noise" },
+          { "text": "The optimism is large enough to justify calling flat CV a reviewer red flag", "result": "FAIL", "note": "+0.009 AUC on this dataset -- the Skill gives no sense of when the gap is large (a small grid over a weak signal) and when it is negligible" }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Feature-selection and preprocessing leakage on data with zero true signal",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Synthetic 200 x 5,000 standard-normal features with random binary labels -- no signal by construction. SelectKBest(k=20) fitted on all data before CV gave a 5-fold CV AUC of 0.904. The identical selection inside a Pipeline gave 0.547. A StandardScaler fitted on all data before CV gave 0.484 against 0.488 inside the Pipeline, a difference of -0.004.",
+        "note": "The strongest single result in this audit: the Skill's claim of 'near-perfect CV from pure noise' is not rhetoric, it is 0.904 out of nothing.",
+        "basic": 39,
+        "specialized": 57,
+        "total": 96,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Selection outside the fold manufactures performance from pure noise", "result": "PASS", "note": "CV AUC 0.904 with zero true signal" },
+          { "text": "Moving selection into the Pipeline eliminates it", "result": "PASS", "note": "0.547, i.e. chance, on the same data" },
+          { "text": "Preprocessing leakage is as damaging as its position at the head of the taxonomy implies", "result": "FAIL", "note": "Scaler-before-split cost -0.004 AUC here -- nothing. The Skill labels it 'most common, most missed', which is about frequency, but the table ordering reads as severity" },
+          { "text": "The selection case is attributed to the right source", "result": "PASS", "note": "Ambroise 2002 is exactly the paper that established this for gene-expression data" },
+          { "text": "The demonstration needs nothing the Skill does not supply", "result": "PASS", "note": "SelectKBest, Pipeline, cross_val_score -- all named in the snippet" }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Variant B",
+        "label": "Group-aware CV with chemical scaffold as the unit of independence",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "787 scaffold groups over 1,200 compounds. Plain StratifiedKFold: AUC 0.588 +/- 0.035 with 419 scaffolds spanning train and test summed over folds. StratifiedGroupKFold with groups passed: AUC 0.573 +/- 0.025 with 0 scaffolds spanning. RepeatedStratifiedKFold 5x10 gave 0.602 +/- 0.044 with 90% of draws in [0.533, 0.661].",
+        "note": "The group machinery does exactly what the Skill says, and the repeated-CV interval makes the 'a single CV is one high-variance draw' point concrete.",
+        "basic": 38,
+        "specialized": 54,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "StratifiedGroupKFold eliminates group spanning across folds", "result": "PASS", "note": "419 spanning groups under plain KFold, 0 under StratifiedGroupKFold" },
+          { "text": "Ignoring the group inflates the estimate in the documented direction", "result": "PASS", "note": "0.588 against 0.573" },
+          { "text": "Repeated stratified k-fold yields the interval the Skill asks to be reported", "result": "PASS", "note": "0.602 +/- 0.044, 90% of draws in [0.533, 0.661]" },
+          { "text": "The groups= argument threads correctly, as the Common Errors row requires", "result": "PASS", "note": "cross_val_score(..., cv=gcv, groups=gs) produced group-disjoint folds, confirming the row's fix" }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Edge",
+        "label": "The scikit-learn calibration API drift the Skill predicts",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "On scikit-learn 1.9.1: CalibratedClassifierCV(base, cv='prefit') raises InvalidParameterError, as the Skill predicts for 1.8+. The prescribed FrozenEstimator route works. All three calibration methods the Skill mentions are available, including method='temperature' which it says was added in 1.8. Isotonic calibration on a 260-sample disjoint fold left AUC unchanged (0.783 -> 0.784) and moved Brier from 0.1480 to 0.1505.",
+        "note": "Three independent version predictions, all exact. This is the most current Skill in the candidate.",
+        "basic": 39,
+        "specialized": 56,
+        "total": 95,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "cv='prefit' raises on the installed scikit-learn, exactly as predicted", "result": "PASS", "note": "InvalidParameterError on 1.9.1; the Skill says 'removed in 1.8 (it now raises)'" },
+          { "text": "The prescribed FrozenEstimator replacement works", "result": "PASS", "note": "from sklearn.frozen import FrozenEstimator, then CalibratedClassifierCV(FrozenEstimator(model), method='isotonic')" },
+          { "text": "method='temperature' exists, as the Skill says it does from 1.8", "result": "PASS", "note": "Constructed and fitted without error" },
+          { "text": "Calibrating on a disjoint fold improved the proper score", "result": "FAIL", "note": "Brier 0.1480 -> 0.1505; isotonic on 260 calibration points made it marginally worse" },
+          { "text": "The Skill anticipates that outcome", "result": "PASS", "note": "'Use Platt (method=sigmoid) for small calibration sets, isotonic for hundreds-plus points' -- 260 points is exactly the boundary case" }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Reliability curve, proper scores and a decision curve on the same model",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "calibration_curve with strategy='uniform' gave a mean absolute gap of 0.1036 across 10 bins; strategy='quantile' gave 0.0596. AUPRC 0.554 against a prevalence baseline of 0.247. The SKILL.md net-benefit formula produced a coherent decision curve: at threshold probabilities 0.20/0.40/0.50/0.60 the model scores 0.1187/0.0528/0.0444/0.0250 against treat-all values of 0.0590/-0.2546/-0.5056/-0.8819 and treat-none of 0; at 0.80 the model falls to -0.0000 and is no longer useful.",
+        "note": "Every calibration and utility tool the Skill names works as documented, and its advice to use equal-mass bins under imbalance is measurably right.",
+        "basic": 38,
+        "specialized": 55,
+        "total": 93,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The reliability curve, Brier and AUPRC calls all run as documented", "result": "PASS", "note": "calibration_curve, brier_score_loss and average_precision_score at the paths given" },
+          { "text": "Quantile binning gives a smaller and more trustworthy calibration gap under imbalance, as advised", "result": "PASS", "note": "0.0596 against 0.1036 for equal-width bins, supporting the Roelofs 2022 caution about equal-width ECE" },
+          { "text": "The AUPRC baseline is the prevalence, as the metric table states", "result": "PASS", "note": "0.554 against a 0.247 baseline -- a number that would be meaningless read against 0.5" },
+          { "text": "The net-benefit formula as written produces a valid decision curve", "result": "PASS", "note": "Model above both references at pt 0.2-0.6 and indistinguishable from treat-none at 0.8, which is the interpretation the Skill describes" }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Pressed to SMOTE the class imbalance away before building a risk model",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "On the real hERG set (24.7% positives) SMOTE inside an imblearn Pipeline gave AUC 0.810 against 0.783 without it, Brier 0.1421 against 0.1480, and mean predicted probability 0.275 against a true prevalence of 0.247. The Skill's own shipped example, on synthetic data at 10% prevalence, reproduces the documented behaviour cleanly: mean predicted risk 0.24 against a true prevalence of 0.10 with AUC unchanged.",
+        "note": "The mechanism is real and the direction of probability inflation reproduced, but at moderate imbalance the two documented symptoms did not -- and the Skill states no prevalence regime.",
+        "basic": 34,
+        "specialized": 48,
+        "total": 82,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The prescribed imblearn.pipeline route runs and keeps resampling to the training fold", "result": "PASS", "note": "ImbPipeline([('sm', SMOTE()), ('clf', ...)]) exactly as the fix directs" },
+          { "text": "Resampling inflates predicted probabilities relative to the true prevalence", "result": "PASS", "note": "0.275 against 0.247 here, and 0.24 against 0.10 in the Skill's own example" },
+          { "text": "The documented 'no AUC gain' holds on a real, moderately imbalanced dataset", "result": "FAIL", "note": "AUC rose from 0.783 to 0.810" },
+          { "text": "The Skill states the imbalance regime in which its warning applies", "result": "FAIL", "note": "The effect is dramatic at 10% prevalence in its own example and absent at 24.7%; no prevalence range is given anywhere" }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "'We only have 120 samples, just use leave-one-out'",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "120 samples with 28 positives. cross_val_score with LeaveOneOut and scoring='roc_auc' failed per fold with a scoring warning and produced nan, exactly as the failure mode describes. Pooled LOO out-of-fold predictions scored once gave 0.662. The prescribed averaged 5-fold gave 0.698 +/- 0.088, and pooled 5-fold OOF scored once gave 0.696, a difference of only 0.002. Repeated 5x10 gave 0.667 +/- 0.125 with individual draws ranging from 0.400 to 0.889.",
+        "note": "The degeneracy is real and the prescribed fix works. The repeated-CV range from 0.400 to 0.889 on the same data is the most persuasive argument in the Skill for reporting a spread.",
+        "basic": 38,
+        "specialized": 53,
+        "total": 91,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "LOO with a ranking metric fails as the failure mode describes", "result": "PASS", "note": "Per-fold scoring failed and returned nan; AUC is undefined on a size-1 test fold" },
+          { "text": "The prescribed repeated stratified k-fold works on the same data", "result": "PASS", "note": "0.667 +/- 0.125 over 50 fits" },
+          { "text": "The high-variance warning is justified at this sample size", "result": "PASS", "note": "Individual draws span 0.400 to 0.889 -- a single CV number here would be meaningless" },
+          { "text": "Pooled out-of-fold scoring differs materially from the fold average, as the Skill warns", "result": "FAIL", "note": "0.696 against 0.698 for 5-fold, a difference of 0.002; the caution is correct in principle but negligible in this case" },
+          { "text": "Reserving cross_val_predict for visuals rather than headline metrics remains defensible", "result": "PASS", "note": "Under LOO the pooled number (0.662) is the only obtainable one, which is exactly the ambiguity the Skill flags" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 38.0,
+    "dynamic_weighted": 54.8,
+    "score": 93,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "It proves its central claim rather than asserting it: selecting features outside the CV fold on 200 x 5,000 pure noise with random labels produced a CV AUC of 0.904, against 0.547 with the identical selection inside a Pipeline.",
+    "It is the most version-current Skill in this candidate, and all three of its scikit-learn drift predictions were exact on 1.9.1 -- cv='prefit' now raises, FrozenEstimator is the replacement, and method='temperature' exists.",
+    "It ships a runnable demonstration (examples/nested_cv_biomarker.py) that reproduces both of its headline claims end to end, which is why the SMOTE regime question could be answered at all.",
+    "Its decision-tree-by-scenario table routes on the generalisation question rather than on the algorithm, and it routes three cases out to other Skills including the prediction-versus-inference boundary.",
+    "Although written for omics, every snippet applied to chemical fingerprints without a single change, with scaffold substituted directly for patient as the grouping unit."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "The leakage taxonomy's ordering implies a severity ranking it does not have",
+      "observed_in": [2],
+      "problem": "Preprocessing leakage heads the table as 'most common, most missed', and feature-selection leakage follows as a 'severe special case'. Measured on identical zero-signal data, selection leakage manufactured 0.357 AUC while scaler leakage cost -0.004 -- that is, nothing at all.",
+      "root_cause": "The table is ordered by frequency while readers will take the first row as the biggest risk.",
+      "fix": "Add a severity column with indicative magnitudes (selection leakage can produce near-perfect CV from pure noise; scaler leakage is usually small for a single global transform but large for quantile normalisation, ComBat and kNN imputation), so the reader triages by impact rather than by position."
+    },
+    {
+      "priority": "P2",
+      "title": "The SMOTE warning gives no prevalence regime",
+      "observed_in": [6],
+      "problem": "The failure mode says oversampling inflates minority-class probabilities with no AUC gain and produces badly miscalibrated risks. At 10% prevalence in the Skill's own example that is exactly what happens; at 24.7% prevalence on real data, AUC rose from 0.783 to 0.810 and Brier improved from 0.1480 to 0.1421.",
+      "root_cause": "The claim is stated unconditionally although its magnitude depends strongly on how severe the imbalance is.",
+      "fix": "Qualify the entry with the regime it was established in (van den Goorbergh studied severe imbalance) and state that the probability shift scales with the resampling ratio, so mild imbalance may show little effect -- while keeping the recommendation, since even here mean predicted risk drifted above prevalence."
+    },
+    {
+      "priority": "P2",
+      "title": "No guidance on when nested-versus-flat optimism is large",
+      "observed_in": [1],
+      "problem": "Flat CV with tuning is called a known reviewer red flag, but the measured optimism was +0.009 AUC on a 9-point grid over a real dataset. A reader cannot tell from the Skill whether to expect 0.01 or 0.2.",
+      "root_cause": "The bias is described qualitatively although it depends on grid size, signal strength and sample size -- all of which the Skill discusses elsewhere.",
+      "fix": "Add one line tying the size of the optimism to the number of configurations tried and the sample size, and recommend reporting both numbers when they are close so a reviewer can see the gap rather than infer it."
+    },
+    {
+      "priority": "P2",
+      "title": "TRIPOD+AI reporting is required but never specified",
+      "observed_in": [],
+      "problem": "The Skill names TRIPOD+AI as the 2024+ target and lists what it demands (data-splitting and leakage controls, calibration, fairness/subgroup performance, uncertainty) but gives no template, checklist or output structure for the report it asks the agent to produce.",
+      "root_cause": "Reporting is treated as a citation rather than as a deliverable.",
+      "fix": "Add a short output skeleton -- the fields a validation report must carry (split design and unit of independence, leakage controls applied, discrimination with an interval, calibration slope and intercept, net benefit at pre-specified thresholds, subgroup performance) -- so the agent produces something checkable."
+    }
+  ]
+}

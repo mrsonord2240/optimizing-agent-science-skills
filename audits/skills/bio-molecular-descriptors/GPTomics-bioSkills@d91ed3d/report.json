@@ -1,0 +1,269 @@
+{
+  "meta": {
+    "skill_name": "bio-molecular-descriptors",
+    "description": "Calculates molecular fingerprints (ECFP/Morgan, FCFP, MACCS, RDKit, AtomPair, TopologicalTorsion, Avalon, MAP4, MHFP6) and physicochemical descriptors (Lipinski, QED, TPSA, Crippen LogP, 3D shape) with explicit choice tables, bit vs count semantics, and partial-charge model selection. Use when featurizing molecules for similarity, QSAR, virtual screening, or ML, or selecting the correct fingerprint for a chemotype-aware task.",
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:chemoinformatics/molecular-descriptors",
+    "evaluated_on": "2026-09-16",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "executed_inputs": "7/7"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "This Skill is unusually careful with claims: it explicitly refuses a universal AtomPair scaffold-hopping advantage, a universal 4096-bit folding setting, a 1-5% collision rate, the '30% of oral drugs violate a rule' figure, and the 'hydrophobe is a Morgan feature invariant' error -- each attributed to the literature that does or does not support it. Nothing fabricated was found; the measured collision loss (5.4% at 512 bits down to 0.44% at 8192) confirms that refusing a fixed number was correct." },
+      "practice_boundaries": { "result": "PASS", "detail": "Compound featurisation only. Drug-likeness rule sets are presented as risk indicators, not as decisions about any individual, and no output approaches patient care." },
+      "methodological_ground": { "result": "PASS", "detail": "No principled fallacy. The ECFP radius/diameter convention, the bit-vs-count Tanimoto caveat, the MHFP6 MinHash-distance caveat and the conformer-dependence warning are all correct and all reproduced. The QED caveat is directionally incomplete (see recommendations) but is not a fallacy." },
+      "code_usability": { "result": "PASS", "detail": "Every API named exists and every snippet executes: 10 fingerprint generators, the 9-call physchem panel, ComputeGasteigerCharges, Descriptors3D and MHFPEncoder.encode_mol. The 3D ensemble snippet's defect is a logic error in its convergence guard, not unrunnable code: it runs and then raises on its own valid output. MAP4 is the one dependency that cannot be obtained at all." }
+    }
+  },
+  "static_score": {
+    "subtotal": 85,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 10, "max": 12, "note": "Coverage is excellent -- 9 of the 10 tabulated fingerprints construct and behave exactly as the table says, and all nine physchem calls resolve. Correctness docked hard for two verified problems: the 3D ensemble snippet rejects its own valid output on ordinary flexible drugs, and Version Compatibility claims testing against 'map4 1.1+' when that package has no distribution on PyPI at all." },
+      "reliability": { "score": 7, "max": 12, "note": "The weakest category. The Category 3 fault-tolerance override protects hard stops that catch real failures; this one fires on the normal case -- MMFF status 1 means 'more iterations needed', not 'failed', so 19/20 conformers for atenolol and 20/20 for verapamil trigger a RuntimeError that discards a perfectly usable ensemble. Error messages themselves are clear and named. Recoverability is poor: no maxIters guidance, and the example's 3D helper is unseeded." },
+      "performance_context": { "score": 8, "max": 8, "note": "258 lines with depth pushed into tables rather than prose. Measured 8,106 mol/s for ECFP4 2048 over the full 3,224-compound library and 7.4 s for the nine-descriptor panel; the advice to measure collision occupancy rather than assume a number is exactly the right performance guidance." },
+      "agent_usability": { "score": 14, "max": 16, "note": "Error prevention is the standout: the Skill actively corrects five widespread myths with citations. Consistency docked -- SKILL.md seeds ETKDGv3 with randomSeed=42 and the shipped example's calculate_3d_descriptors does not, so the two documented 3D paths differ in reproducibility; the physchem dict and the example's calculate_druglikeness also use different key names for the same quantities." },
+      "human_usability": { "score": 7, "max": 8, "note": "Trigger phrasing in the usage guide matches how a chemist asks, and the QED tip was written carefully ('calibrate it for the library, do not treat it as a universal boundary'). Docked because the documented 3D route is rigid enough that an ordinary flexible molecule produces an exception rather than a result." },
+      "security": { "score": 11, "max": 12, "note": "No credentials, network, eval/exec or destructive operations. Input validation docked: batch_calculate_descriptors resolves descriptor names via getattr(Descriptors, name) on a caller-supplied string, which raises AttributeError rather than a named error for a typo." },
+      "maintainability": { "score": 10, "max": 12, "note": "Clean file split and dictionary-driven descriptor lists that are easy to extend. Testability docked to 2/4: the example's __main__ demo exercises only ethanol and never calls calculate_3d_descriptors at all, which is precisely why the convergence-guard defect shipped." },
+      "agent_specific": { "score": 18, "max": 20, "note": "Precise trigger description, correct layering, clean composability into similarity-searching and qsar-modeling. Idempotency docked: the example's 3D path returned asphericity 0.7876 / 0.7216 / 0.7210 on three identical calls. Escape hatches docked: no guidance on when a single conformer is not good enough to proceed at all." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 87.3,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 25, "total": 31 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Physicochemical panel and six drug-likeness rule sets over 1,000 real compounds",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Ran run/inputs_all.py on 1,000 distinct ChEMBL hERG compounds. All nine SKILL.md descriptor calls resolved; 2.4 s; zero nan. Ro5: 629 clean / 213 one violation / 158 two or more. Veber 954, Egan 884, lead-like 29, Ro3 9, QED>=0.5 555, TPSA<=90 773.",
+        "note": "Clean. The rule-set thresholds are transcribed correctly and the Skill's 'risk indicators, not hard cutoffs' framing is what makes the 158 two-violation compounds interpretable rather than deletable.",
+        "basic": 38,
+        "specialized": 54,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "All nine descriptor calls in the physchem snippet resolve against the installed RDKit", "result": "PASS", "note": "Including Lipinski.NumAromaticRings and Descriptors.FractionCSP3, which live in less obvious namespaces" },
+          { "text": "The drug-likeness rule-set thresholds are transcribed correctly and are directly applicable", "result": "PASS", "note": "Ro5, Veber, Egan, lead-like and Ro3 all implemented straight from the table with no interpretation needed" },
+          { "text": "No nan or inf appears in the panel over 1,000 real compounds", "result": "PASS", "note": "0 nan, 0 inf; the QED-returns-nan failure mode did not fire on this library" },
+          { "text": "The Skill frames the rule sets as risk indicators rather than hard cutoffs", "result": "PASS", "note": "Stated explicitly, and it matters here: 371 of 1,000 real hERG actives violate at least one Ro5 criterion" }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Construct every fingerprint in the taxonomy table and check the tabulated properties",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "ECFP4 37 on-bits, ECFP6 47, FCFP4 32, RDKitFP 309, AtomPair 155 bits / 109 nonzero counts, TopTorsion 23 / 15, MACCS 167 bits with bit 0 unset, Avalon 1024. MAP4: ModuleNotFoundError, and TOOLS.md records that PyPI serves no version of it at all. MHFPEncoder has encode_mol; a separate probe showed it works under numpy 1.26 and raises OverflowError under numpy 2.5.3.",
+        "note": "Nine of ten taxonomy rows are constructible and behave as tabulated. The tenth is pinned in Version Compatibility to a package that cannot be installed.",
+        "basic": 37,
+        "specialized": 52,
+        "total": 89,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Every fingerprint in the taxonomy table can be constructed with the documented API", "result": "FAIL", "note": "map4 is not installable -- no distribution exists on the PyPI URL the Skill cites, yet Version Compatibility claims the examples were tested with map4 1.1+" },
+          { "text": "MACCS returns 167 bits with bit 0 unused, as the Common Errors table states", "result": "PASS", "note": "GetNumBits()=167, GetBit(0)=False, slice [1:] gives the literature 166" },
+          { "text": "Bit and count vectors differ exactly where the table says they carry different information", "result": "PASS", "note": "AtomPair 155 on-bits vs 109 nonzero counts and TopTorsion 23 vs 15 show the multiplicity the count form preserves" },
+          { "text": "FCFP feature invariants produce a genuinely different fingerprint from ECFP", "result": "PASS", "note": "GetMorganFeatureAtomInvGen constructs and yields 32 on-bits vs ECFP4's 37 on the same molecule" },
+          { "text": "The MHFP6 snippet's API matches the installed library", "result": "PASS", "note": "MHFPEncoder(2048).encode_mol(mol, radius=3) is correct and returns a 2048-length vector; MHFPEncoder.distance gave 0.2783 on an analogue pair" }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "ECFP radius/diameter convention and the bit-collision claim, measured",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Distinct environments on atenolol: ECFP0 11, ECFP2 26, ECFP4 38, ECFP6 48 -- monotone in radius exactly as the table predicts. Folding loss over 500 compounds: 5.38% at 512 bits, 2.95% at 1024, 1.89% at 2048, 0.85% at 4096, 0.44% at 8192.",
+        "note": "The Skill's decision to refuse a universal collision-rate number and instead tell the reader to measure is vindicated by the measurement.",
+        "basic": 38,
+        "specialized": 55,
+        "total": 93,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The ECFP-X / RDKit-radius conversion table is correct", "result": "PASS", "note": "Distinct environments increase monotonically 11 -> 26 -> 38 -> 48 across radius 0-3" },
+          { "text": "Folding loss decreases monotonically as nBits increases", "result": "PASS", "note": "5.38% -> 0.44% across 512-8192 bits" },
+          { "text": "The Skill refuses a universal collision-rate claim and tells the reader to measure", "result": "PASS", "note": "It explicitly declines to endorse a 1-5% figure or a universal 4096-bit setting, citing O'Boyle and Sayle correctly" },
+          { "text": "The recommended 2048-bit baseline is defensible on the measured data", "result": "PASS", "note": "1.89% of distinct environments lost at 2048, against a 4x memory cost to halve it" }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "3D shape descriptors over a conformer ensemble for flexible drug-like molecules",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "executed": true,
+        "execution_note": "The SKILL.md ensemble snippet was run verbatim on four inputs. Butanol (the Skill's own example) succeeded, 0/20 non-converged. Atenolol: 19/20 conformers returned MMFF status 1, so the snippet's guard raises RuntimeError and discards all 20. Verapamil: 20/20, same outcome. A metal input correctly hit the MMFFHasAllMoleculeParams guard. Three identical runs of the example's single-conformer helper gave asphericity 0.7876, 0.7216, 0.7210.",
+        "note": "The documented 3D route works on the four-carbon example in the Skill and fails on both real drug-like molecules tested. MMFF status 1 means 'more iterations required', not failure.",
+        "basic": 30,
+        "specialized": 38,
+        "total": 68,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "The documented ensemble path returns descriptors for a flexible drug-like molecule", "result": "FAIL", "note": "RuntimeError for atenolol (8 rotatable bonds) and verapamil (13); only the 4-carbon example in the Skill succeeds" },
+          { "text": "The MMFF-parameter guard fires correctly on an unparameterisable input", "result": "PASS", "note": "MMFFHasAllMoleculeParams returned False for a metal centre and the documented ValueError path was reached" },
+          { "text": "Descriptor variation across an ensemble is large enough to justify the Skill's own conformer-dependence warning", "result": "PASS", "note": "Atenolol asphericity sd 0.068 over the range 0.614-0.824, so a single conformer really can be unrepresentative" },
+          { "text": "The 3D path is reproducible across runs", "result": "FAIL", "note": "The example's calculate_3d_descriptors omits randomSeed, giving 0.7876 / 0.7216 / 0.7210 on three identical calls; SKILL.md's ensemble version does seed" },
+          { "text": "The aggregation rule the Skill asks the reader to document is implementable from what it provides", "result": "PASS", "note": "Per-conformer descriptors are exposed by confId, so mean or Boltzmann-weighted aggregation is straightforward once the guard is relaxed" }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Featurize the whole 3,224-compound library into an ML-ready matrix",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "ECFP4 2048 for 3,224 molecules in 0.4 s (8,106 mol/s), 6.6 MB matrix, mean 55.4 on-bits per molecule, only 8 of 2,048 bits never set across the entire library. Nine-descriptor panel for the same set in 7.4 s with zero nan and zero inf.",
+        "note": "No surprises; the recommended representation is well sized for this library.",
+        "basic": 38,
+        "specialized": 55,
+        "total": 93,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Full-library featurization completes without an error or a silent truncation", "result": "PASS", "note": "3,224/3,224 molecules featurized; matrix shape (3224, 2048)" },
+          { "text": "The recommended fingerprint size is not mostly dead weight on this library", "result": "PASS", "note": "Only 8 of 2,048 bits are never set" },
+          { "text": "The descriptor panel is free of nan and inf on real data", "result": "PASS", "note": "0 and 0 over 3,224 x 9 values" },
+          { "text": "Throughput is adequate for library-scale ML without special handling", "result": "PASS", "note": "8,106 mol/s for fingerprints; the descriptor panel is the slower path at 436 mol/s" }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Pressed to use QED >= 0.5 as the sole triage gate across fragments and natural products",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "QED computed for ten probes without raising. Drugs: aspirin 0.550, atenolol 0.638, imatinib 0.389. Fragments: indole 0.544, phenol 0.515, benzamidine 0.421. Natural product: paclitaxel 0.130. Peptide 0.301. Charged species: Na+ 0.247, EDTA tetraanion 0.356.",
+        "note": "The Skill's refusal to treat QED as a universal boundary is the right call and the numbers show why, but its stated failure direction does not match what was observed.",
+        "basic": 37,
+        "specialized": 53,
+        "total": 90,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "QED is computed for every probe without raising", "result": "PASS", "note": "10/10, including charged species; the documented 'QED returns nan' failure mode did not fire" },
+          { "text": "The Skill's warning that QED under-ranks natural-product-like molecules reproduces", "result": "PASS", "note": "Paclitaxel 0.130, peptide 0.301 -- both far below a 0.5 gate" },
+          { "text": "The Skill's caveat covers the failure direction actually observed for fragments", "result": "FAIL", "note": "It warns QED can under-rank fragment-like molecules; observed the opposite -- indole 0.544 and phenol 0.515 clear a 0.5 gate while imatinib, a marketed drug, scores 0.389" },
+          { "text": "The usage guide presents QED >= 0.5 as a project heuristic needing calibration, not a universal boundary", "result": "PASS", "note": "Stated in both SKILL.md and the usage-guide tip, and the observed numbers make that instruction load-bearing" }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Partial charges and 'which LogP is this?' -- the model-mismatch traps",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Gasteiger on neutral aspirin gave 13 heavy-atom charges summing to -0.6555. Gasteiger on [Fe+2].[Fe+2] returned 2.0 for each iron with no warning. Crippen MolLogP(aspirin) = 1.31 against an experimental 1.19. MolWt 180.159 vs ExactMolWt 180.0423. MACCS slice [1:] gives 166.",
+        "note": "Two of the three documented traps reproduce exactly as written; the Gasteiger snippet has its own unstated trap.",
+        "basic": 36,
+        "specialized": 50,
+        "total": 86,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Partial charges are computed through the documented ComputeGasteigerCharges call", "result": "PASS", "note": "Runs and populates _GasteigerCharge on every atom as the snippet expects" },
+          { "text": "The charges the snippet prints sum to the molecule's formal charge", "result": "FAIL", "note": "-0.6555 for neutral aspirin: the loop iterates heavy atoms only and implicit-hydrogen charge is held separately, which the snippet never mentions" },
+          { "text": "The charge-method-must-match-downstream warning is present and correct", "result": "PASS", "note": "The Gasteiger-in-AMBER example is a real and commonly made error, and the charge table's cost/accuracy columns are accurate" },
+          { "text": "MolWt versus ExactMolWt behaves as the Common Errors table describes", "result": "PASS", "note": "180.159 average vs 180.0423 monoisotopic, a 0.117 difference, matching the documented PubChem discrepancy" },
+          { "text": "An unparameterisable metal produces an error or a flagged value rather than a plain number", "result": "FAIL", "note": "[Fe+2] silently returns a Gasteiger charge of exactly 2.0, i.e. the formal charge echoed back, with no warning anywhere in the Skill" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 34.0,
+    "dynamic_weighted": 52.4,
+    "score": 86,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "It actively corrects five widespread myths with the citations that do and do not support them -- the universal AtomPair scaffold-hopping advantage, a universal 4096-bit setting, a fixed collision rate, the '30% of oral drugs violate a rule' figure, and hydrophobe as a Morgan feature invariant. The collision measurement (5.4% to 0.44% across 512-8192 bits) confirms that refusing a fixed number was right.",
+    "Nine of the ten tabulated fingerprints construct and behave exactly as tabulated, including the MACCS 167-bit/bit-0 detail and the bit-versus-count divergence for AtomPair and TopologicalTorsion.",
+    "The 2D path is fast and clean at library scale: 8,106 mol/s for ECFP4 2048 over 3,224 compounds with only 8 dead bits, and a nine-descriptor panel with zero nan or inf.",
+    "The drug-likeness rule sets are transcribed accurately and framed as risk indicators, which is what makes the 371-in-1,000 Ro5 violators in a real hERG set interpretable rather than deletable.",
+    "The conformer-dependence warning is quantitatively justified by its own data: atenolol asphericity ranges 0.614-0.824 across a 20-conformer ensemble."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "3D convergence guard rejects valid ensembles for ordinary flexible drugs",
+      "observed_in": [4],
+      "problem": "Both documented 3D paths raise RuntimeError when any conformer returns MMFF status 1. Status 1 means 'more iterations required', not failure. 19 of 20 conformers for atenolol and 20 of 20 for verapamil hit it, so the snippet discards a usable ensemble for any flexible drug-like molecule. Only the four-carbon example in the Skill succeeds.",
+      "root_cause": "The guard treats MMFFOptimizeMoleculeConfs' two-valued status as pass/fail rather than converged/needs-more-iterations.",
+      "fix": "Pass maxIters=2000 (or higher) and treat status 1 as a warning: count non-converged conformers, re-optimize or drop only those, and raise only when every conformer fails. Update both SKILL.md and examples/calculate_descriptors.py, and add atenolol to the example's __main__ so the path is exercised."
+    },
+    {
+      "priority": "P1",
+      "title": "Version Compatibility pins map4, which has no obtainable distribution",
+      "observed_in": [2],
+      "problem": "The header states the examples were tested with 'map4 1.1+' and the references cite https://pypi.org/project/map4/, but pip reports no version of map4 exists on PyPI and the import fails. MAP4 also appears as a first-class row in the fingerprint taxonomy table.",
+      "root_cause": "The pin was written from the paper and the project README rather than from an actual install.",
+      "fix": "Remove map4 from Version Compatibility, mark the MAP4 taxonomy row as 'GitHub source install, conda-only tmap dependency, no Windows build', and point the stereochemistry-aware route at mapchiral, which does install and works."
+    },
+    {
+      "priority": "P1",
+      "title": "The example's 3D helper is unseeded and non-reproducible",
+      "observed_in": [4],
+      "problem": "calculate_3d_descriptors calls EmbedMolecule(mol, AllChem.ETKDGv3()) with no randomSeed, so three identical calls returned asphericity 0.7876, 0.7216 and 0.7210 -- a 9% swing in a value that may become a QSAR feature. SKILL.md's ensemble snippet does set randomSeed=42.",
+      "root_cause": "Seed management was applied to the SKILL.md pattern and not propagated to the shipped helper.",
+      "fix": "Set params.randomSeed explicitly in calculate_3d_descriptors, accept it as an argument, and state in the usage guide that a recorded seed is required for any descriptor that feeds a model."
+    },
+    {
+      "priority": "P2",
+      "title": "Gasteiger snippet prints charges that do not sum to the formal charge",
+      "observed_in": [7],
+      "problem": "The documented loop iterates the molecule's atoms and prints _GasteigerCharge. For neutral aspirin those sum to -0.6555, because implicit-hydrogen charge is carried separately and the molecule has not had hydrogens added.",
+      "root_cause": "The snippet demonstrates the API call without stating the hydrogen convention it depends on.",
+      "fix": "Call Chem.AddHs before ComputeGasteigerCharges in the snippet, or read _GasteigerHCharge alongside it, and add a line stating that heavy-atom charges alone will not balance."
+    },
+    {
+      "priority": "P2",
+      "title": "No warning that Gasteiger silently echoes formal charge for unparameterised elements",
+      "observed_in": [7],
+      "problem": "ComputeGasteigerCharges on [Fe+2] returned exactly 2.0 with no exception and no nan, so a metal-containing compound passes through a charge-aware pipeline carrying a meaningless number.",
+      "root_cause": "The partial-charge table covers cost and accuracy but not element coverage.",
+      "fix": "Add an element-coverage column or note to the charge table, and show a guard that flags atoms outside the Gasteiger parameter set before the charges are used downstream."
+    },
+    {
+      "priority": "P2",
+      "title": "QED caveat states the wrong failure direction for fragments",
+      "observed_in": [6],
+      "problem": "The Skill warns QED can under-rank fragment-like molecules. Measured the opposite: indole 0.544 and phenol 0.515 clear a 0.5 gate while imatinib, a marketed drug, scores 0.389.",
+      "root_cause": "The caveat generalises the natural-product case, where under-ranking is real (paclitaxel 0.130), to fragments, where the desirability functions are permissive instead.",
+      "fix": "Split the caveat: QED under-ranks large natural-product and peptide chemistry and over-ranks small fragments, with these numbers as worked examples, and repeat that it must not be the sole gate in either regime."
+    }
+  ]
+}

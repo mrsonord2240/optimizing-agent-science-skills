@@ -1,0 +1,202 @@
+{
+  "meta": {
+    "skill_name": "bio-machine-learning-prediction-explanation",
+    "description": "Explains ML predictions on omics data with SHAP, LIME, and permutation importance, handling the correlated-feature trap, the conditional-vs-interventional Shapley choice, and the attribution-is-not-causation boundary. Use when interpreting an omics classifier, debugging shortcut/batch learning, or deciding whether an attribution ranking can be trusted as biology. For validated feature selection see machine-learning/biomarker-discovery; explanations are not a selection method.",
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:machine-learning/prediction-explanation",
+    "evaluated_on": "2026-09-16",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Moderate",
+    "n_inputs": 5,
+    "executed_inputs": "5/5"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "Its citations are real, correctly attached and unusually apt (Janzing 2020 for the conditioning choice, Hooker 2021 for unrestricted permutation, Slack 2020 for fooling LIME, DeGrave 2021 for shortcut learning). Its version note is exact: shap 0.52.0's TreeExplainer default feature_perturbation is 'auto', as the Skill says it became in 0.47. One methodological claim overstates what its own shipped example demonstrates -- raised as a P1 -- but nothing is fabricated." },
+      "practice_boundaries": { "result": "PASS", "detail": "The strongest boundary framing of the three ML Skills: it states a three-layer 'not' (not biology, not causation, not a validated biomarker), routes panel selection out to another Skill, and cites Rudin 2019 for preferring an inherently interpretable model in high-stakes settings." },
+      "methodological_ground": { "result": "PASS", "detail": "The methodological position -- attributions describe the model on this training distribution, within-module ordering is not a finding, and the legitimate use is catching shortcut learning -- is correct, and two of its three testable claims reproduced. The third (conditional SHAP leaking credit to an entirely unused feature) did not, which is a precision failure in a claim rather than a fallacy: the conditioning mode does change the credit split, just not from zero." },
+      "code_usability": { "result": "PASS", "detail": "Every snippet ran on a real 838-feature hERG random forest, and both shipped examples execute end to end and print their own conclusions. The shap Explanation API, the explicit feature_perturbation argument, LimeTabularExplainer with a pinned seed and sklearn's permutation_importance all behaved as documented." }
+    }
+  },
+  "static_score": {
+    "subtotal": 92,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 10, "max": 12, "note": "All three method families are covered with an unusually good taxonomy and every API call is correct. Correctness docked to 2/4 because the Skill's central distinction -- that tree_path_dependent 'can give nonzero credit to a feature the model never uses' while interventional gives 'exactly zero' -- did not reproduce on the cleanest available test: a depth-1 tree splitting only on A gave its 0.9995-correlated twin B exactly 0.0000 under both modes. The claim appears three times, and the Skill's own shipped example only supports the weaker version of it." },
+      "reliability": { "score": 10, "max": 12, "note": "The failure modes are well chosen and two of three reproduced. Docked because the guidance is advisory: nothing raises or warns when the reader is in the situation the Skill cares about (no check that a module map was supplied before ranking, no guard against using LIME output globally)." },
+      "performance_context": { "score": 8, "max": 8, "note": "173 lines, the shortest Skill audited here and among the densest. The interventional SHAP run over 300 test compounds x 838 features with a 200-row background completed in about a minute on CPU." },
+      "agent_usability": { "score": 15, "max": 16, "note": "The decision-tree-by-scenario table distinguishes the descriptive question from the model-reliance question, which is the distinction most sources miss, and the version-drift note is precise enough to be actionable. Feedback design docked: the aggregation snippet takes a gene-to-module map as given with no guidance on how to build one, and the threshold used changes which module ranks first." },
+      "human_usability": { "score": 8, "max": 8, "note": "It opens with the question users actually ask ('Which genes drive my classifier?') and answers it in one sentence that contains the whole argument." },
+      "security": { "score": 11, "max": 12, "note": "No credentials, network, eval/exec or destructive operations. Input validation docked: the snippets assume well-formed matrices and a valid background." },
+      "maintainability": { "score": 11, "max": 12, "note": "Two focused example scripts, each demonstrating one claim, both runnable. Testability docked because the SHAP example demonstrates a weaker claim than the SKILL.md prose asserts, and nothing reconciles them." },
+      "agent_specific": { "score": 19, "max": 20, "note": "Precise trigger, excellent escape hatches (three explicit 'this is not selection' statements plus a route to an interpretable model), clean composability with omics-classifiers and biomarker-discovery. Progressive disclosure docked: no references directory, everything in one file." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 86.8,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 17, "total": 22 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "TreeSHAP on a hERG ECFP4 random forest, with module aggregation before ranking",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "RF (300 trees, test AUC 0.822) over 838 ECFP4 bits. TreeExplainer with an explicit 200-row background and feature_perturbation='interventional' returned an Explanation of shape (300, 838, 2). Top bits by mean |SHAP|: bit_1911 (0.01023), bit_650 (0.00954), bit_807 (0.00794). Only 2 of 838 bits received exactly zero. Hierarchical clustering at |r| >= 0.3 gave bit modules; the top module (28 members, summed 0.04236) contains none of the top five individually ranked bits.",
+        "note": "The Skill's prescription visibly changes the answer: the raw top-five bits and the top aggregated module are disjoint, which is exactly why it insists on aggregating first.",
+        "basic": 38,
+        "specialized": 53,
+        "total": 91,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "TreeExplainer with an explicit estimand returns the modern Explanation object the API note describes", "result": "PASS", "note": "explainer(X) -> Explanation, values shape (300, 838, 2)" },
+          { "text": "Module aggregation changes the ranking enough to matter", "result": "PASS", "note": "The top module's members are disjoint from the top five individually ranked bits" },
+          { "text": "The aggregation snippet runs as written once a module map is supplied", "result": "PASS", "note": "The loop over zip(columns, mean_abs) summing into module_importance worked unchanged" },
+          { "text": "The Skill says how to build the module map its own snippet requires", "result": "FAIL", "note": "`clusters` is described only as 'a precomputed gene->module map'; the correlation threshold had to be chosen by the auditor, and it determines which module ranks first" }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "The central claim: does conditional SHAP credit a feature the model never uses?",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "executed": true,
+        "execution_note": "Purpose-built probe: A drives the target, B = A + small noise (r = 0.9995), C is irrelevant. A depth-1 DecisionTreeRegressor splits only on A, so B is definitively unused and definitively correlated. Result: tree_path_dependent gives A 1.5832, B 0.0000, C 0.0000; interventional gives A 1.5814, B 0.0000, C 0.0000. At depth 2, where the tree splits on both A and B, the modes differ as expected (B: 0.3925 path-dependent against 0.3511 interventional). The Skill's own shipped example reaches only the weaker conclusion: 'The A-vs-B split differs by mode; the module total is the stable quantity.'",
+        "note": "The conditioning choice does change credit allocation, which is the Skill's broader point. The specific contrast it draws three times -- nonzero for an unused feature under path-dependent, exactly zero under interventional -- did not reproduce.",
+        "basic": 30,
+        "specialized": 42,
+        "total": 72,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Both conditioning modes are selectable at the documented API", "result": "PASS", "note": "feature_perturbation='tree_path_dependent' and 'interventional' with data=, exactly as written" },
+          { "text": "The two modes give different attributions for a correlated pair the model does use", "result": "PASS", "note": "B: 0.3925 against 0.3511 at depth 2 -- the conditioning is not cosmetic" },
+          { "text": "tree_path_dependent gives nonzero credit to a feature the model never splits on", "result": "FAIL", "note": "B, correlated at r=0.9995 with the only split feature, received exactly 0.0000. Path-dependent TreeSHAP walks the tree's own paths, so an absent feature has no contribution by construction" },
+          { "text": "interventional gives exactly zero to unused features", "result": "PASS", "note": "0.0000 for both B and C -- this half of the claim holds" },
+          { "text": "The failure mode's symptom -- 'a gene the model never splits on ranks high' -- reproduces", "result": "FAIL", "note": "It ranked at exactly zero, not high; the Skill's own example script asserts only the milder split-differs claim" }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Variant B",
+        "label": "Permutation importance under correlated predictors",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Held-out permutation importance with 20 repeats. With both A and its 0.9995-correlated twin B present: A +0.2254, B +0.0565, C +0.0005. With B removed from the model entirely: A +0.4931, C -0.0003. A's measured importance more than doubles purely because the correlated copy was dropped. sklearn's permutation_importance has no `conditional=` parameter, as the Skill states.",
+        "note": "The dilution mechanism is confirmed quantitatively and the Skill's warning not to 'fix' SHAP by switching to permutation importance is well founded.",
+        "basic": 38,
+        "specialized": 55,
+        "total": 93,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Correlated predictors dilute each other's permutation importance", "result": "PASS", "note": "A +0.2254 with B present against +0.4931 with B removed" },
+          { "text": "sklearn has no conditional-permutation option, as the Skill says", "result": "PASS", "note": "No `conditional` parameter in permutation_importance; the Skill correctly points at R's party::cforest instead" },
+          { "text": "The prescribed fix is applicable on this data", "result": "PASS", "note": "Clustering and keeping one feature per cluster is exactly what removing B demonstrated" },
+          { "text": "Permutation importance was evaluated on held-out data as instructed", "result": "PASS", "note": "Computed on the test split, per the Skill's closing sentence on that section" }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Edge",
+        "label": "Background choice and the silent feature_perturbation='auto' flip",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Introspected shap 0.52.0: TreeExplainer's default feature_perturbation is 'auto', exactly as the Skill says it became in 0.47. Three interventional runs with mixed, inactive-only and active-only backgrounds gave top-10 overlaps of 9/10 (mixed vs inactive), 8/10 (mixed vs active) and 8/10 (inactive vs active). check_additivity=True passed on a correctly configured explainer.",
+        "note": "The version claim is exact. The background effect is real but smaller than the Skill's framing suggests for this model.",
+        "basic": 37,
+        "specialized": 51,
+        "total": 88,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The installed shap has the 'auto' default the Skill warns about", "result": "PASS", "note": "shap 0.52.0 TreeExplainer default feature_perturbation = 'auto'" },
+          { "text": "Changing the background changes the attribution ranking", "result": "PASS", "note": "Top-10 overlap falls to 8/10 between an active-only and an inactive-only background" },
+          { "text": "check_additivity passes on a correctly configured explainer", "result": "PASS", "note": "No local-accuracy violation, so the guard the Skill tells you not to disable was not spuriously firing" },
+          { "text": "The magnitude matches 'yields different important genes'", "result": "FAIL", "note": "8 to 9 of the top 10 persist across three quite different backgrounds; the ranking is more robust here than the framing implies" }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Is LIME reproducible enough to rank features?",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Five LimeTabularExplainer instances with random_state 0-4, same instance, same model, 5,000 perturbation samples each. Only 6 of 10 features appear in all five top-10 lists; mean pairwise top-10 overlap 8.5/10. Two successive calls on a single explainer with a pinned seed gave different top-10 lists (9/10 overlap). The shipped lime_explanation.py reproduces the same effect on its own data: 3 distinct top-5 sets across 5 seeds.",
+        "note": "The instability is real, including under a pinned seed, which is the subtler half of the Skill's warning and the half it states precisely.",
+        "basic": 37,
+        "specialized": 53,
+        "total": 90,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "LIME's top-10 changes across seeds on an identical instance and model", "result": "PASS", "note": "Only 6/10 features survive in all five runs" },
+          { "text": "Pinning the seed does not make LIME reproducible", "result": "PASS", "note": "Two calls on the same pinned explainer differ (9/10 overlap) -- exactly the 'only conditional stability' the Skill states" },
+          { "text": "The instruction to keep LIME local and never global follows from the measurement", "result": "PASS", "note": "A global ranking built from these would move between runs" },
+          { "text": "The instability is severe enough to 'flip the top features', as stated", "result": "FAIL", "note": "Mean pairwise overlap 8.5/10; the top two features were identical in all five runs, so the head of the ranking is stable and the tail is not" },
+          { "text": "The shipped example independently demonstrates the effect", "result": "PASS", "note": "lime_explanation.py prints '3 distinct top-5 sets across 5 seeds' on its own synthetic data" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 36.8,
+    "dynamic_weighted": 52.1,
+    "score": 89,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "It draws the distinction most sources miss -- between 'which features are informative here' (conditional) and 'which features the model actually keys on' (interventional) -- and makes the reader state which one they are asking.",
+    "Its boundary discipline is the best of the three ML Skills: a three-layer 'not biology, not causation, not a validated biomarker', a routing of panel selection to another Skill, and Rudin 2019 for preferring an interpretable model outright.",
+    "Two of its three testable claims reproduced cleanly on real data: permutation importance halved a feature's measured importance purely because a correlated copy was present, and LIME's ranking moved across seeds and even across two calls on one pinned explainer.",
+    "The version note is exact -- shap 0.52.0's TreeExplainer default is 'auto', as the Skill says it became in 0.47 -- and the instruction to set feature_perturbation explicitly is therefore load-bearing.",
+    "Both shipped examples run end to end and each demonstrates one claim, printing its own conclusion."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "The conditional-SHAP 'credit to an unused feature' claim does not reproduce",
+      "observed_in": [2],
+      "problem": "The Skill states three times -- in the method taxonomy, in the core section and in a failure mode -- that tree_path_dependent SHAP can give nonzero attribution to a feature the model never uses, with the symptom 'a gene the model never splits on ranks high'. On a depth-1 tree that splits only on A, its twin B (r = 0.9995) received exactly 0.0000 under tree_path_dependent as well as under interventional. Path-dependent TreeSHAP walks the fitted tree's own paths, so a feature absent from every split contributes nothing by construction. The Skill's own example script asserts only the weaker, correct claim: the A-versus-B credit split differs by mode.",
+      "root_cause": "A property of conditional Shapley in general has been attributed to the tree_path_dependent implementation specifically, where the tree structure prevents it.",
+      "fix": "Restate the taxonomy row and the failure mode: under tree_path_dependent the credit split among correlated features that the model DOES use shifts toward the conditionally implied ones, which is why within-module ordering is not a finding. Reserve the 'nonzero credit to an entirely unused feature' statement for conditional estimators that sample from p(x_dropped | x_S) without reference to the fitted structure, and align the prose with what examples/shap_omics_classifier.py already prints."
+    },
+    {
+      "priority": "P2",
+      "title": "The aggregation snippet requires a module map the Skill never tells you how to build",
+      "observed_in": [1],
+      "problem": "The prescribed workflow ends with aggregating |SHAP| over co-expression modules, but the snippet takes `clusters` as 'a precomputed gene->module map'. The choice of correlation metric and cut threshold determines which module ranks first -- at |r| >= 0.3 the top module here contained none of the top five individually ranked features.",
+      "root_cause": "Module construction is treated as an input to the method rather than as part of it, although it changes the result.",
+      "fix": "Add three lines showing one defensible construction (absolute-correlation distance, average linkage, a stated cut) and say plainly that the threshold is a reported analysis choice, since the module ranking moves with it."
+    },
+    {
+      "priority": "P2",
+      "title": "Two instability claims are stated more strongly than they behave",
+      "observed_in": [4, 5],
+      "problem": "The background section says a different background 'yields different important genes'; three quite different backgrounds shared 8 to 9 of the top 10 here. The LIME section says different seeds 'flip the top features'; the mean pairwise top-10 overlap was 8.5/10 and the top two features were identical across all five seeds.",
+      "root_cause": "Both effects are real but their magnitude depends on the model and the feature correlation structure, and the Skill quantifies neither.",
+      "fix": "Soften both to what is reliably true and testable -- the tail of the ranking is unstable while the head often is not -- and tell the reader to measure it: rerun with two backgrounds or two seeds and report the rank overlap alongside the ranking."
+    }
+  ]
+}

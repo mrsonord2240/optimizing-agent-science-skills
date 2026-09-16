@@ -22,7 +22,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: mu=10 is far below a realistic mean count for 20,000 genes at usable depth, maxN=30 truncates the search below the answer, res$ssize is a 1x3 matrix rather than the scalar the comment claims, and the example was demonstrably never executed against the versions the Skill says it was tested with.
 - Fix: Set the worked example's mu from the pilot's normalized means (order 100 to 500), raise maxN to 200, print res$ssize[, "ssize"], and add a guard: if (is.na(n)) stop("no n <= maxN reaches the target; raise maxN or revise fc/dispersion").
 
-## P1 (23)
+## P1 (39)
 
 ### `bio-experimental-design-sample-size` — PROPER and powsimR routes ship with no executable pattern
 
@@ -120,6 +120,46 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The block and its new error message were written for the label-free case only, while the taxonomy advertises TMT.
 - Fix: Add a decision-tree row 'MaxQuant TMT / isobaric labelling -> read Reporter intensity corrected <n> columns; corrected channels apply MaxQuant's isotope-impurity correction, uncorrected do not; reporter-ion quant computation itself is quantification', and change the ValueError to name the columns the table actually has, e.g. 'No LFQ intensity columns. Found Reporter intensity corrected columns -> this is an isobaric (TMT/iTRAQ) run; see the TMT row. Otherwise use Intensity and normalize explicitly.'
 
+### `bio-admet-prediction` — No executable ADMET prediction route ships with the Skill
+
+- Skill: 86, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/admet-prediction) · [viewer](skills/bio-admet-prediction/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 1, 2
+- Problem: The description names ADMETlab 3.0, ADMET-AI, DeepChem MolNet and chemprop. ADMETlab is the declared primary_tool and has no request code at all; ADMET-AI and DeepChem appear only as taxonomy rows with no code; chemprop is a commented CLI block. Everything the Skill can actually run is rule-based physchem and RDKit alert catalogs, so the canonical triage produces no ADMET prediction.
+- Root cause: The deliberate and defensible decision not to hard-code a web API route was not paired with an offline fallback, leaving the Skill with no working model path.
+- Fix: Add a short executable ADMET-AI section: admet_ai ships its model weights and DrugBank reference set in the package and runs fully offline (verified here: 105 endpoints including hERG, the five CYPs, DILI, AMES, Caco-2 and BBB). Ten lines would give the Skill a working prediction route without touching a network service.
+
+### `bio-admet-prediction` — The prescribed out-of-distribution mitigation is unavailable in the runnable route
+
+- Skill: 86, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/admet-prediction) · [viewer](skills/bio-admet-prediction/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 4, 7
+- Problem: The OOD and hERG failure modes both prescribe 'check the uncertainty band' and 'if kNN distance to training set > P95, treat as low-confidence'. The only route that can be executed emits neither: zero of 105 output columns carry uncertainty or applicability-domain information, and sodium chloride came back with BBB_Martins 0.967 and AMES 0.905.
+- Root cause: The applicability-domain guidance is written against the hosted service's evidential uncertainty and was never re-grounded in what an offline user can compute.
+- Fix: Add a toolkit-independent AD gate the reader can always run: max Tanimoto similarity to a reference set plus a heavy-atom/element sanity filter that rejects inorganics and metals before prediction, with the worked numbers from this audit as the motivating example.
+
+### `bio-molecular-descriptors` — 3D convergence guard rejects valid ensembles for ordinary flexible drugs
+
+- Skill: 86, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/molecular-descriptors) · [viewer](skills/bio-molecular-descriptors/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 4
+- Problem: Both documented 3D paths raise RuntimeError when any conformer returns MMFF status 1. Status 1 means 'more iterations required', not failure. 19 of 20 conformers for atenolol and 20 of 20 for verapamil hit it, so the snippet discards a usable ensemble for any flexible drug-like molecule. Only the four-carbon example in the Skill succeeds.
+- Root cause: The guard treats MMFFOptimizeMoleculeConfs' two-valued status as pass/fail rather than converged/needs-more-iterations.
+- Fix: Pass maxIters=2000 (or higher) and treat status 1 as a warning: count non-converged conformers, re-optimize or drop only those, and raise only when every conformer fails. Update both SKILL.md and examples/calculate_descriptors.py, and add atenolol to the example's __main__ so the path is exercised.
+
+### `bio-molecular-descriptors` — Version Compatibility pins map4, which has no obtainable distribution
+
+- Skill: 86, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/molecular-descriptors) · [viewer](skills/bio-molecular-descriptors/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 2
+- Problem: The header states the examples were tested with 'map4 1.1+' and the references cite https://pypi.org/project/map4/, but pip reports no version of map4 exists on PyPI and the import fails. MAP4 also appears as a first-class row in the fingerprint taxonomy table.
+- Root cause: The pin was written from the paper and the project README rather than from an actual install.
+- Fix: Remove map4 from Version Compatibility, mark the MAP4 taxonomy row as 'GitHub source install, conda-only tmap dependency, no Windows build', and point the stereochemistry-aware route at mapchiral, which does install and works.
+
+### `bio-molecular-descriptors` — The example's 3D helper is unseeded and non-reproducible
+
+- Skill: 86, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/molecular-descriptors) · [viewer](skills/bio-molecular-descriptors/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 4
+- Problem: calculate_3d_descriptors calls EmbedMolecule(mol, AllChem.ETKDGv3()) with no randomSeed, so three identical calls returned asphericity 0.7876, 0.7216 and 0.7210 -- a 9% swing in a value that may become a QSAR feature. SKILL.md's ensemble snippet does set randomSeed=42.
+- Root cause: Seed management was applied to the SKILL.md pattern and not propagated to the shipped helper.
+- Fix: Set params.randomSeed explicitly in calculate_3d_descriptors, accept it as an argument, and state in the usage guide that a recorded seed is required for any descriptor that feeds a model.
+
 ### `bio-variant-annotation` — csq --phase modes m and s are described wrongly
 
 - Skill: 86, Limited Release · [mrsonord2240/bioSkills@c1237cd](https://github.com/mrsonord2240/bioSkills/tree/c1237cdbc9bb199947696f3909de26a55d259116/variant-calling/variant-annotation) · [viewer](skills/bio-variant-annotation/mrsonord2240-bioSkills@c1237cd/viewer.md)
@@ -160,6 +200,62 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The contrast machinery was generalised to N levels while the effect-size threshold stayed a single global constant written for the two-condition case.
 - Fix: Add one line beside the treat() call: "lfc = log2(1.5) is a per-contrast minimum effect. On a dose series or time course the intermediate levels carry a SMALLER true effect than the extreme one, so the same floor can return zero calls there while the top level is significant -- lower lfc, or screen with the eBayes/topTable F-test documented below and report the pairwise contrasts only for direction."
 
+### `bio-qsar-modeling` — The chemprop prediction block crashes against a model trained by the training block
+
+- Skill: 88, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/qsar-modeling) · [viewer](skills/bio-qsar-modeling/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 2
+- Problem: The training block sets --molecule-featurizers rdkit_2d, which adds 217 descriptors to the model input. The prediction block does not repeat it, so chemprop predict fails with 'RuntimeError: mat1 and mat2 shapes cannot be multiplied (64x300 and 517x300)'. The error names a tensor shape and nothing a user could act on.
+- Root cause: The two CLI blocks were written independently and never run as a pair.
+- Fix: Add --molecule-featurizers rdkit_2d to the chemprop predict block and state in the key-flags list that molecule featurizers must match between training and prediction, with the 517-versus-300 shape error given as the symptom to recognise.
+
+### `bio-qsar-modeling` — Leverage is tabulated as an AD method but is numerically meaningless on fingerprints
+
+- Skill: 88, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/qsar-modeling) · [viewer](skills/bio-qsar-modeling/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 4
+- Problem: Computing the documented hat-matrix leverage over 2,020 ECFP4 bits with 2,579 training compounds returned hat values averaging 120.2 and reaching 782.2, with 319 of 323 above the theoretical maximum of 1, silently, because X'X has a condition number of 1.14e8. Nothing raises, so a pipeline would carry these values forward as an applicability domain.
+- Root cause: The AD table lists leverage alongside kNN and conformal prediction without noting that it presumes a low-dimensional, well-conditioned descriptor matrix -- not the sparse binary fingerprints the Skill recommends everywhere else.
+- Fix: Add an applicability column to the AD table saying which representation each method needs, mark leverage and Mahalanobis as descriptor-space methods requiring dimensionality reduction first, and add a sanity assertion (0 <= h <= 1) to any leverage snippet.
+
+### `bio-qsar-modeling` — The scaffold split the Skill recommends breaks the exchangeability its conformal section requires
+
+- Skill: 88, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/qsar-modeling) · [viewer](skills/bio-qsar-modeling/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 3
+- Problem: Conformal intervals fitted on a scaffold-split model undercovered at every level tested: 0.851 against a 0.90 target, 0.916 against 0.95, 0.706 against 0.80. The Skill states the exchangeability assumption in the AD table and recommends the scaffold split two pages earlier, but never connects them, so a reader following both instructions gets silent undercoverage.
+- Root cause: The two sections were written independently; the interaction between split design and conformal validity is never addressed.
+- Fix: Add a sentence to the conformal section: under a scaffold or time split the calibration and test sets are not exchangeable, so marginal coverage is not guaranteed -- report empirical coverage on the held-out set alongside the nominal level, and consider a Mondrian or group-conditional conformal variant.
+
+### `bio-scaffold-analysis` — The MMPA command sequence omits loadprops and cannot produce its documented output
+
+- Skill: 88, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/scaffold-analysis) · [viewer](skills/bio-scaffold-analysis/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 5
+- Problem: The three-line recipe is fragment, index, then `mmpdb transform --property pIC50`. Run as written it fails with "--property 'pIC50' is not present in the database", because activity data is never loaded. The section's stated output -- 'ranked transformations with delta(pIC50), N pairs, confidence' -- is also wrong: the real output is an unranked 20-column TSV in SMILES order with no confidence field.
+- Root cause: The recipe was written from the mmpdb command list without running the property-dependent step end to end.
+- Fix: Insert `mmpdb loadprops -p props.csv data.mmpdb` between index and transform, show the two-column tab-separated property file format, and correct the output description to name the columns that actually appear (count, avg, std, paired_t, p_value) and to say the caller must sort.
+
+### `bio-scaffold-analysis` — The shipped scaffold split always yields an all-singleton test set
+
+- Skill: 88, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/scaffold-analysis) · [viewer](skills/bio-scaffold-analysis/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 2
+- Problem: Because scaffold groups are sorted largest-first and assigned to train until the target size is reached, every multi-member scaffold lands in train. At 0.8, 0.7 and 0.9 train fractions the test set was 100% singleton-scaffold compounds. The Skill names this exact failure mode and prescribes a stratified scaffold split, but ships no implementation of one.
+- Root cause: Size-descending greedy assignment optimises only for hitting the target train size, with nothing spreading large scaffolds across splits.
+- Fix: Either interleave assignment (walk the size-sorted groups and send every k-th large group to test) or ship the StratifiedGroupKFold variant the Skill already recommends, and add an assertion in the function that reports the fraction of test compounds sitting on singleton scaffolds so the user sees the problem.
+
+### `bio-substructure-search` — Ester SMARTS silently misses every -O-CH< ester
+
+- Skill: 88, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/substructure-search) · [viewer](skills/bio-substructure-search/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: —
+- Problem: The Common SMARTS Patterns table gives ester as [CX3](=O)[OX2][!H]. In SMARTS, [!H] means 'not exactly one attached hydrogen', not 'not a hydrogen atom', so the pattern returns False for isopropyl acetate and any other ester whose O-substituted carbon carries one H. The shipped example uses [CX3](=O)[OX2][C] instead, which catches isopropyl but misses aryl esters such as aspirin.
+- Root cause: [!H] was written as if H were an element primitive; the two files were never cross-checked because the example asserts nothing.
+- Fix: Change the table entry to [CX3](=[OX1])[OX2][#6] (and make the example match), then add a regression case for CC(=O)OC(C)C and CC(=O)Oc1ccccc1 to the example's __main__.
+
+### `bio-substructure-search` — Invalid or empty SMARTS is not guarded in any SKILL.md snippet
+
+- Skill: 88, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/substructure-search) · [viewer](skills/bio-substructure-search/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 7
+- Problem: filter_library, pains_filter and the basic-match snippet pass the result of MolFromSmarts straight into HasSubstructMatch. An invalid pattern produces a four-line Boost C++ signature dump; an empty string produces a valid 0-atom query that matches nothing, so an include filter returns an empty library with no error at all.
+- Root cause: The None guard exists only in the shipped example's has_substructure and was never propagated into the SKILL.md patterns the agent actually copies.
+- Fix: Add a compile_smarts(s) helper to SKILL.md that raises ValueError on None and on a zero-atom query, and route every snippet through it.
+
 ### `bio-proteomics-proteomics-qc` — The new degenerate-design caveats are print() only and never reach the returned objects
 
 - Skill: 88.1, Production Ready · [mrsonord2240/bioSkills@45a0c5a](https://github.com/mrsonord2240/bioSkills/tree/45a0c5a65b7346d47a7b72b6d0a6eb60ea590317/proteomics/proteomics-qc) · [viewer](skills/bio-proteomics-proteomics-qc/mrsonord2240-bioSkills@45a0c5a/viewer.md)
@@ -176,6 +272,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The block was written from the run's stdout and column header rather than from the content of the rows, so the elimination-vs-listing distinction was never checked.
 - Fix: Add one line under the Percolator OUTPUT CHECK: "each row is a single representative -- the indistinguishable partners are ELIMINATED, not listed; pass --protein-report-duplicates (and --protein-report-fragments) if you need the full group membership, and never report prot.target.tsv as a group list without them."
 
+### `bio-machine-learning-prediction-explanation` — The conditional-SHAP 'credit to an unused feature' claim does not reproduce
+
+- Skill: 89, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/prediction-explanation) · [viewer](skills/bio-machine-learning-prediction-explanation/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 2
+- Problem: The Skill states three times -- in the method taxonomy, in the core section and in a failure mode -- that tree_path_dependent SHAP can give nonzero attribution to a feature the model never uses, with the symptom 'a gene the model never splits on ranks high'. On a depth-1 tree that splits only on A, its twin B (r = 0.9995) received exactly 0.0000 under tree_path_dependent as well as under interventional. Path-dependent TreeSHAP walks the fitted tree's own paths, so a feature absent from every split contributes nothing by construction. The Skill's own example script asserts only the weaker, correct claim: the A-versus-B credit split differs by mode.
+- Root cause: A property of conditional Shapley in general has been attributed to the tree_path_dependent implementation specifically, where the tree structure prevents it.
+- Fix: Restate the taxonomy row and the failure mode: under tree_path_dependent the credit split among correlated features that the model DOES use shifts toward the conditionally implied ones, which is why within-module ordering is not a finding. Reserve the 'nonzero credit to an entirely unused feature' statement for conditional estimators that sample from p(x_dropped \| x_S) without reference to the fitted structure, and align the prose with what examples/shap_omics_classifier.py already prints.
+
 ### `bio-proteomics-differential-abundance` — The centring section's stated mechanism is refuted
 
 - Skill: 89, Production Ready · [mrsonord2240/bioSkills@1110c24](https://github.com/mrsonord2240/bioSkills/tree/1110c241c27760ad0127bd803e8832d54651e31c/proteomics/differential-abundance) · [viewer](skills/bio-proteomics-differential-abundance/mrsonord2240-bioSkills@1110c24/viewer.md)
@@ -183,6 +287,22 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The Skill says a global between-condition offset of 0.1-0.2 log2 'becomes significant for hundreds of proteins at once' because feature-level standard errors are small. Injecting a uniform -0.20 log2 offset into every treatment run gives 0 false positives, with the null-protein median SE unchanged at 0.2057. Real per-run median normalization at the same -0.199 median offset gives 31 false positives, because it ALSO halves that SE to 0.1159 by removing genuine within-condition run-to-run loading variation. Neither ingredient alone is enough - offset-only gives 0 FP, SE-shrinkage-only (centring each run on its own condition's median) gives 1 of 81. 'Hundreds' is also an overstatement of 31.
 - Root cause: The root-cause analysis varied one family of normalizations, in which the offset and the variance shrinkage move together, and attributed the whole effect to the variable that was easiest to measure.
 - Fix: Rewrite the Approach paragraph: per-run median normalization of a peptide table does two things at once - it transfers a detection-composition difference into a between-condition offset, AND it removes real run-to-run loading variance, shrinking the residual the test divides by. The offset is the detectable symptom of both. Keep the guard exactly as it is (it fired correctly on every configuration tested) and add a second cheap check beside it: compare the residual SD before and after normalization, and treat a large drop as the same warning. Drop 'hundreds of proteins at once' for the measured figure.
+
+### `bio-molecular-standardization` — ChEMBL route can return an unstripped organic salt, undocumented
+
+- Skill: 90, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/molecular-standardization) · [viewer](skills/bio-molecular-standardization/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 2, 4
+- Problem: get_parent_mol returned both fragments for sodium acetate, sodium benzoate, sodium formate, sodium citrate, potassium acetate and choline chloride, because every fragment is itself on ChEMBL's salt list. The Skill presents the ChEMBL route as the default and documents only the fully-inorganic case.
+- Root cause: The 'ChEMBL pipeline -- inorganic salt fails' failure mode assumes the survivor has no carbon, so its prescribed mitigation (pre-filter to >=1 carbon atom) passes every organic salt shown above.
+- Fix: Add a failure mode for the all-fragments-are-salts case and change the mitigation to a fragment-count check on the parent (`len(Chem.GetMolFrags(parent)) > 1` -> flag for review or fall back to LargestFragmentChooser(preferOrganic=True)), not a carbon-count check.
+
+### `bio-molecular-standardization` — Shipped code discards failures silently, contradicting the usage guide
+
+- Skill: 90, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/molecular-standardization) · [viewer](skills/bio-molecular-standardization/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 1
+- Problem: usage-guide.md step 7 promises a report of parse failures, exclusion flags and fragments stripped, but prepare_qsar_data in both SKILL.md and examples/standardize_library.py drops every failure with a bare `continue` and keeps no counts, so a library can lose rows with no trace.
+- Root cause: The reporting contract lives only in the usage guide; the reference implementation was written as a filter rather than as an audited transform.
+- Fix: Give prepare_qsar_data a status tally (parse_failure / excluded_by_chembl / standardize_error / inorganic / ok), return it alongside the DataFrame, and print it in the __main__ demo so the documented report is what the code actually produces.
 
 ### `bio-pathway-gsea` — nPerm is accepted and silently downgrades the engine
 
@@ -208,7 +328,15 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The recommendation describes CAMERA's 2012 published behaviour; limma later changed the default from estimating the correlation to a fixed preset, and the Skill was never updated to name the argument that restores it.
 - Fix: Change every CAMERA reference to limma::camera(y, index, design, contrast, inter.gene.cor = NA) and add one sentence: 'limma's default preset inter.gene.cor = 0.01 does NOT estimate the correlation and will not protect a strongly co-regulated set; pass NA to estimate it per set, and report the estimated Correlation column alongside the FDR.'
 
-## P2 (108)
+### `bio-similarity-searching` — The 'Tanimoto = 1.0' failure mode has the wrong cause and a fix that does not work
+
+- Skill: 90, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/similarity-searching) · [viewer](skills/bio-similarity-searching/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 4, 7
+- Problem: 141 pairs in a 3,224-compound library reach folded-ECFP4 Tanimoto 1.0 with different structures. The Skill attributes this to hash collisions and prescribes an unhashed sparse fingerprint to disambiguate. Every inspected pair is an enantiomer or diastereomer whose unhashed sparse fingerprints are also identical, because the default Morgan generator sets includeChirality=False. The same misattribution appears in the Common Errors row for activity-cliff false positives, where four of five observed cliffs are stereochemistry artifacts and the fifth is an unstripped salt.
+- Root cause: Fingerprint collisions and stereochemistry-blindness produce the same symptom, and the Skill diagnosed the rarer cause.
+- Fix: Rewrite the failure mode around chirality: state that RDKit's Morgan generators default to includeChirality=False, give GetMorganGenerator(..., includeChirality=True) as the first fix and InChIKey as the identity check, and keep hash collisions as a secondary cause. Add the same note to the activity-cliff false-positive row, together with a reminder to strip salts upstream.
+
+## P2 (139)
 
 ### `bio-experimental-design-sample-size` — SKILL.md code blocks omit set.seed
 
@@ -418,6 +546,30 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The blocks are written as minimal transformations.
 - Fix: Add one print per block summarising rows read, rows removed by each criterion, and final matrix shape, and say in the Approach text that this line belongs in the methods record.
 
+### `bio-admet-prediction` — chemprop reproducibility advice names a flag that does not exist
+
+- Skill: 86, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/admet-prediction) · [viewer](skills/bio-admet-prediction/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 3
+- Problem: The Common Errors table fixes 'Predictions inconsistent across runs' with `--seed 42`. chemprop 2.3.1 rejects it: 'unrecognized arguments: --seed 42'. The real flags are --data-seed and --pytorch-seed.
+- Root cause: The flag is carried over from chemprop 1.x, which the Skill elsewhere correctly flags as a breaking API change.
+- Fix: Replace with `--data-seed 42 --pytorch-seed 42` and note that the two control different sources of randomness. The identical error appears in chemoinformatics/qsar-modeling and should be fixed in both.
+
+### `bio-admet-prediction` — load_admetlab_results enforces no column contract
+
+- Skill: 86, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/admet-prediction) · [viewer](skills/bio-admet-prediction/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 2
+- Problem: The loader checks only that the file is non-empty. A two-column CSV with a single unrelated field passed unchallenged, and a missing file produces an unhandled FileNotFoundError. The Skill's instruction to 'preserve the uncertainty columns and task identifier' therefore has nothing enforcing it.
+- Root cause: The function was written as a thin wrapper around read_csv for a route whose output shape the Skill declines to specify.
+- Fix: Have the loader take a required-columns argument (defaulting to a smiles column plus at least one uncertainty column), raise a named error listing what was missing, and catch FileNotFoundError with a message pointing at the API step that should have produced the file.
+
+### `bio-admet-prediction` — ADMET-AI version pin is two major versions behind the Skill's own warning
+
+- Skill: 86, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/admet-prediction) · [viewer](skills/bio-admet-prediction/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: —
+- Problem: Version Compatibility pins 'admet-ai 1.3+', while the taxonomy table itself warns that 'v2 package predictions differ from the v1 paper/server'. The installed release is 2.0.1, so the pin admits precisely the version the Skill says will disagree.
+- Root cause: The pin was written as a lower bound before the v1/v2 divergence note was added, and the two were never reconciled.
+- Fix: State the tested major version explicitly and repeat the divergence warning in Version Compatibility, not only in the taxonomy table.
+
 ### `bio-clinical-databases-dbsnp-queries` — Batch table drops annotations for merged rsIDs
 
 - Skill: 86, Production Ready · [mrsonord2240/bioSkills@c1237cd](https://github.com/mrsonord2240/bioSkills/tree/c1237cdbc9bb199947696f3909de26a55d259116/clinical-databases/dbsnp-queries) · [viewer](skills/bio-clinical-databases-dbsnp-queries/mrsonord2240-bioSkills@c1237cd/viewer.md)
@@ -465,6 +617,30 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: 430 lines load SV/CNV/mtDNA catalogs and pushback tables for one-variant queries.
 - Root cause: All material kept in SKILL.md.
 - Fix: Move catalogs and pushback tables to the usage guide.
+
+### `bio-molecular-descriptors` — Gasteiger snippet prints charges that do not sum to the formal charge
+
+- Skill: 86, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/molecular-descriptors) · [viewer](skills/bio-molecular-descriptors/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 7
+- Problem: The documented loop iterates the molecule's atoms and prints _GasteigerCharge. For neutral aspirin those sum to -0.6555, because implicit-hydrogen charge is carried separately and the molecule has not had hydrogens added.
+- Root cause: The snippet demonstrates the API call without stating the hydrogen convention it depends on.
+- Fix: Call Chem.AddHs before ComputeGasteigerCharges in the snippet, or read _GasteigerHCharge alongside it, and add a line stating that heavy-atom charges alone will not balance.
+
+### `bio-molecular-descriptors` — No warning that Gasteiger silently echoes formal charge for unparameterised elements
+
+- Skill: 86, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/molecular-descriptors) · [viewer](skills/bio-molecular-descriptors/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 7
+- Problem: ComputeGasteigerCharges on [Fe+2] returned exactly 2.0 with no exception and no nan, so a metal-containing compound passes through a charge-aware pipeline carrying a meaningless number.
+- Root cause: The partial-charge table covers cost and accuracy but not element coverage.
+- Fix: Add an element-coverage column or note to the charge table, and show a guard that flags atoms outside the Gasteiger parameter set before the charges are used downstream.
+
+### `bio-molecular-descriptors` — QED caveat states the wrong failure direction for fragments
+
+- Skill: 86, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/molecular-descriptors) · [viewer](skills/bio-molecular-descriptors/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 6
+- Problem: The Skill warns QED can under-rank fragment-like molecules. Measured the opposite: indole 0.544 and phenol 0.515 clear a 0.5 gate while imatinib, a marketed drug, scores 0.389.
+- Root cause: The caveat generalises the natural-product case, where under-ranking is real (paclitaxel 0.130), to fragments, where the desirability functions are permissive instead.
+- Fix: Split the caveat: QED under-ranks large natural-product and peptide chemistry and over-ranks small fragments, with these numbers as worked examples, and repeat that it must not be the sole gate in either regime.
 
 ### `bio-phylo-species-trees` — Add a leaf-name consistency check before ASTRAL
 
@@ -722,6 +898,78 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: Format table covers capability, not writer behaviour.
 - Fix: Add a row: use DendroPy to write annotated NeXML.
 
+### `bio-qsar-modeling` — chemprop reproducibility advice names a flag that does not exist
+
+- Skill: 88, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/qsar-modeling) · [viewer](skills/bio-qsar-modeling/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 2
+- Problem: The Common Errors table fixes 'AUC mismatched across folds' with `--seed 42`. chemprop 2.3.1 rejects it outright. The correct flags are --data-seed and --pytorch-seed.
+- Root cause: Carried over from the chemprop 1.x CLI, whose breaking change the Skill itself documents elsewhere.
+- Fix: Replace with `--data-seed 42 --pytorch-seed 42` and note that they control different sources of randomness. The identical error appears in chemoinformatics/admet-prediction.
+
+### `bio-qsar-modeling` — Conformal snippet's cost is not signposted
+
+- Skill: 88, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/qsar-modeling) · [viewer](skills/bio-qsar-modeling/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 3
+- Problem: MapieRegressor(RandomForestRegressor(n_estimators=500), method='plus', cv=5) as written took over 50 minutes on a 2,579 x 2,048 training matrix on one CPU, because cross-conformal fits the base model six times and no n_jobs is set.
+- Root cause: The snippet demonstrates the API on an unstated toy scale.
+- Fix: Set n_jobs=-1 on the base estimator in the snippet and add one line noting that cv=5 multiplies base-model training cost sixfold, with split-conformal as the cheaper alternative when the base model is expensive.
+
+### `bio-qsar-modeling` — The missing-AD failure mode names a symptom that does not appear in absolute error
+
+- Skill: 88, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/qsar-modeling) · [viewer](skills/bio-qsar-modeling/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 6
+- Problem: The symptom is given as 'Confident predictions but actual values different'. On the 50 most novel chemotypes, MAE was 0.667 against 0.659 for the 50 closest analogues -- a ratio of 1.01 -- while R2 fell from 0.621 to 0.015.
+- Root cause: The symptom is described in terms of absolute error, but out-of-domain subsets often also have compressed label ranges, so the damage appears in explained variance instead.
+- Fix: Restate the symptom as loss of explained variance and rank ordering on the out-of-domain subset, and tell the reader to report R2 or Spearman stratified by the AD diagnostic rather than MAE alone.
+
+### `bio-scaffold-analysis` — Worked example quotes non-canonical SMILES for code output
+
+- Skill: 88, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/scaffold-analysis) · [viewer](skills/bio-scaffold-analysis/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 4
+- Problem: The scaffold example states the Bemis-Murcko output as c1ccc(C(=O)NCC2CCCC2)cc1 and the generic as C1CCC(C(C)CCC2CCCC2)CC1. Both are chemically correct but neither is what MolToSmiles emits (O=C(NCC1CCCC1)c1ccccc1 and CC(CCC1CCCC1)C1CCCCC1), so an agent comparing strings sees a mismatch.
+- Root cause: The example was written by hand rather than pasted from a run.
+- Fix: Replace both strings with the canonical output of the current RDKit and note that the example was produced with a stated version.
+
+### `bio-scaffold-analysis` — No expectation given for how much the generic framework collapses a library
+
+- Skill: 88, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/scaffold-analysis) · [viewer](skills/bio-scaffold-analysis/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 6
+- Problem: The Skill correctly says generic frameworks are for topology comparison only, but gives no sense of scale. Measured on 1,500 real compounds: 857 Bemis-Murcko scaffolds become 583 generic frameworks, and the largest framework merges 4 distinct chemotypes into 59 compounds.
+- Root cause: The representation table describes what each view loses without quantifying the consequence.
+- Fix: Add a one-line worked figure to the taxonomy table showing the scaffold-count ratio on a representative library, so a reader can judge whether the abstraction is acceptable for their purpose.
+
+### `bio-substructure-search` — Curcumin is named as a PAINS_A target but RDKit's catalog has no curcumin pattern
+
+- Skill: 88, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/substructure-search) · [viewer](skills/bio-substructure-search/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 6
+- Problem: The PAINS false-positive failure mode says PAINS_A patterns target 'rhodanines, curcumins, polyhydroxylated polyphenols'. Curcumin is clean against all 480 PAINS entries in RDKit 2026.03.6; only BRENK flags it. A scan of all catalog descriptions found no entry containing 'cur'.
+- Root cause: The sentence describes the Baell & Holloway paper's scope rather than the RDKit FilterCatalog implementation the Skill tells the reader to use.
+- Fix: Replace 'curcumins' with a scaffold the RDKit catalog does cover (rhodanines fire as ene_rhod_A(235); catechols as catechol_A(92)) and add a line noting that RDKit's PAINS implementation does not reproduce every alert class in the original paper.
+
+### `bio-substructure-search` — Recursive-SMARTS slowdown is overstated by an order of magnitude
+
+- Skill: 88, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/substructure-search) · [viewer](skills/bio-substructure-search/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 3
+- Problem: The performance failure mode states a 10x-100x slowdown. Measured over 2,000 molecules: 1.6x for a one-level recursive amine pattern and 3.7x for a deeply nested one.
+- Root cause: The figure appears to be carried from an older toolkit or an unusually pathological pattern and was never re-measured.
+- Fix: State a measured range with the pattern and library size it was measured on, or drop the numeric claim and keep the prefilter-then-retest fix, which does work (identical matches at half the cost).
+
+### `bio-substructure-search` — BRENK attrition on lead-like libraries is not anticipated
+
+- Skill: 88, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/substructure-search) · [viewer](skills/bio-substructure-search/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 2
+- Problem: The prescribed HTS library-prep combination removed 39.4% of a lead-like ChEMBL set, of which BRENK alone accounted for 288 of 315 compounds. The catalog table frames BRENK as 'useful for fragment / virtual library' and offers no expectation of how much it removes from a drug-like collection.
+- Root cause: The when-to-apply table recommends catalog combinations without characterising their cost on different library types.
+- Fix: Add an expected-attrition column or a short note giving typical flag rates per catalog on fragment, lead-like and drug-like collections, and advise reviewing BRENK hits by category rather than deleting them wholesale.
+
+### `bio-substructure-search` — Reactive-filter section lacks the false-positive caveat the PAINS section has
+
+- Skill: 88, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/substructure-search) · [viewer](skills/bio-substructure-search/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 4
+- Problem: REACTIVE_SMARTS flagged curcumin and would flag any enone under Michael_acceptor, and flags penicillin G under beta_lactam. The PAINS section carries an explicit false-positive warning; this section carries none, so a user is more likely to treat these flags as deletions.
+- Root cause: The custom-filter section was written as a utility rather than as a judgement call, unlike the catalog sections around it.
+- Fix: Add two or three lines mirroring the PAINS caveat: name the classes each pattern over-calls (enones, beta-lactam antibiotics, aliphatic aldehydes) and repeat the flag-not-delete rule. Also hoist the MolFromSmarts calls out of reactive_filter's per-molecule loop.
+
 ### `bio-variant-calling-filtering-best-practices` — Tumor-column block has no guard for a missing header
 
 - Skill: 88, Production Ready · [mrsonord2240/bioSkills@c1237cd](https://github.com/mrsonord2240/bioSkills/tree/c1237cdbc9bb199947696f3909de26a55d259116/variant-calling/filtering-best-practices) · [viewer](skills/bio-variant-calling-filtering-best-practices/mrsonord2240-bioSkills@c1237cd/viewer.md)
@@ -825,6 +1073,22 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The CLI routes now specify their output columns and a row-count assertion, but the recommended Python path leaves the caller to infer the report shape from a print loop. An agent chaining this into quantification has no named contract to bind to.
 - Root cause: The fix addressed the CLI gap and left the asymmetry.
 - Fix: State the group record once -- leading_protein, accessions, n_peptides, n_unique_peptides, is_decoy, qvalue -- which is exactly what examples/protein_groups.py already returns, and point the default block at it.
+
+### `bio-machine-learning-prediction-explanation` — The aggregation snippet requires a module map the Skill never tells you how to build
+
+- Skill: 89, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/prediction-explanation) · [viewer](skills/bio-machine-learning-prediction-explanation/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 1
+- Problem: The prescribed workflow ends with aggregating \|SHAP\| over co-expression modules, but the snippet takes `clusters` as 'a precomputed gene->module map'. The choice of correlation metric and cut threshold determines which module ranks first -- at \|r\| >= 0.3 the top module here contained none of the top five individually ranked features.
+- Root cause: Module construction is treated as an input to the method rather than as part of it, although it changes the result.
+- Fix: Add three lines showing one defensible construction (absolute-correlation distance, average linkage, a stated cut) and say plainly that the threshold is a reported analysis choice, since the module ranking moves with it.
+
+### `bio-machine-learning-prediction-explanation` — Two instability claims are stated more strongly than they behave
+
+- Skill: 89, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/prediction-explanation) · [viewer](skills/bio-machine-learning-prediction-explanation/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 4, 5
+- Problem: The background section says a different background 'yields different important genes'; three quite different backgrounds shared 8 to 9 of the top 10 here. The LIME section says different seeds 'flip the top features'; the mean pairwise top-10 overlap was 8.5/10 and the top two features were identical across all five seeds.
+- Root cause: Both effects are real but their magnitude depends on the model and the feature correlation structure, and the Skill quantifies neither.
+- Fix: Soften both to what is reliably true and testable -- the tail of the ranking is unstable while the head often is not -- and tell the reader to measure it: rerun with two backgrounds or two seeds and report the rank overlap alongside the ranking.
 
 ### `bio-population-genetics-rare-variant-association` — SAIGE bgen command omits --chrom or --LOCO=FALSE
 
@@ -938,6 +1202,30 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The workflow blocks omit the REF pre-check the example now has.
 - Fix: Add `set -o pipefail` and a `bcftools norm -f ref.fa -c w` pre-check (or the example's MISMATCH count) before the pipeline.
 
+### `bio-molecular-standardization` — No policy for replicate measurements that disagree
+
+- Skill: 90, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/molecular-standardization) · [viewer](skills/bio-molecular-standardization/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 1
+- Problem: Mean-aggregating pChEMBL across replicates is prescribed without any tolerance check. On the real hERG set, 47 of 379 replicated compounds (12.4%) spanned more than 1 log unit, up to 3.69.
+- Root cause: The ML-preparation section treats replicate count as a confidence signal but never converts it into a decision rule.
+- Fix: Add a spread column (std or max-min) and a documented threshold in the ML-preparation section, with guidance to drop or flag compounds above it, and note that ChEMBL exports mix binding and functional assay formats.
+
+### `bio-molecular-standardization` — Isotope handling is a single library-wide boolean
+
+- Skill: 90, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/molecular-standardization) · [viewer](skills/bio-molecular-standardization/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 5
+- Problem: keep_isotopes applies to every molecule, so a library mixing labelled tracers with ordinary compounds cannot be standardized in one pass under the documented policy.
+- Root cause: Stage 7 of the pipeline table treats isotope normalization as a global setting, although its own note says to preserve labels when scientifically meaningful.
+- Fix: Show the per-record form in the pipeline: accept a predicate or a per-row flag column, and add a line to the Tips section on recording which compounds retained labels.
+
+### `bio-molecular-standardization` — User column names are used without a presence check
+
+- Skill: 90, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/molecular-standardization) · [viewer](skills/bio-molecular-standardization/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: —
+- Problem: prepare_qsar_data indexes row[smiles_col] and row[activity_col] directly, so a mistyped or absent column surfaces as a raw pandas KeyError rather than an actionable message.
+- Root cause: The function was written for a fixed in-house schema and then parameterised without validating the parameters.
+- Fix: Validate that both columns exist in df.columns at function entry and raise a named error listing the available columns.
+
 ### `bio-pathway-go-enrichment` — enrichResult column list is stale
 
 - Skill: 90, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/pathway-analysis/go-enrichment) · [viewer](skills/bio-pathway-go-enrichment/GPTomics-bioSkills@d91ed3d/viewer.md)
@@ -1042,6 +1330,30 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: Pass 4 added roughly 120 lines of new sections without splitting the file.
 - Fix: Move the three command-line sections and the reference list into `references/cli_route.md` and `references/citations.md`, leaving the insights, estimators and Common Errors in SKILL.md.
 
+### `bio-similarity-searching` — MCS failure mode describes a timeout that does not occur
+
+- Skill: 90, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/similarity-searching) · [viewer](skills/bio-similarity-searching/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 5
+- Problem: The Skill's MCS failure mode says the algorithm 'tries every atom-mapping permutation within timeout' and prescribes raising the timeout. On 40 deliberately divergent molecules rdFMCS returned a 2-atom MCS in under 0.1 s with canceled=False at both a 5 s and a 60 s timeout, so raising the timeout changes nothing.
+- Root cause: The symptom 'returns small partial MCS' has two causes -- cancellation and genuine convergence on a trivial common fragment -- and the Skill only covers the first.
+- Fix: Split the symptom: instruct the reader to check result.canceled first, and state that a small MCS with canceled=False means the input set genuinely has little in common, for which the fix is pre-clustering rather than a longer timeout.
+
+### `bio-similarity-searching` — No precision expectation for Tversky substructure-like search
+
+- Skill: 90, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/similarity-searching) · [viewer](skills/bio-similarity-searching/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 3
+- Problem: With alpha=1, beta=0 against a 2-aminobenzimidazole query, 8 compounds scored above 0.7 and only one actually contains the fragment. The Skill offers 'substructure-like' and 'parameter choice subjective' but no indication that the hit list needs a SMARTS confirmation step.
+- Root cause: The section explains the coefficient's asymmetry without characterising its precision as a substructure proxy.
+- Fix: Add one line telling the reader to confirm Tversky hits with an actual substructure match from chemoinformatics/substructure-search, and note that the coefficient ranks feature overlap rather than containment.
+
+### `bio-similarity-searching` — Per-fingerprint thresholds are not iso-selective and the Skill does not say how to set them
+
+- Skill: 90, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/similarity-searching) · [viewer](skills/bio-similarity-searching/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 6
+- Problem: The quoted starting points (ECFP4 0.7, FCFP4 0.6, AtomPair 0.55, MACCS 0.85) retain between 0.094% and 0.603% of all pairs on the same library -- a 6.4x spread. The Skill correctly says they are not universal equivalents, but gives no procedure for choosing one.
+- Root cause: The table lists heuristics without the calibration step that would make them comparable.
+- Fix: Add a two-line recipe: compute the all-pairs similarity distribution on the actual library and pick the threshold at a chosen percentile (for example p99.5), so thresholds across fingerprints select comparable fractions rather than comparable numbers.
+
 ### `bio-vcf-basics` — Wrong bcftools query -H tip in usage guide
 
 - Skill: 90, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/variant-calling/vcf-basics) · [viewer](skills/bio-vcf-basics/GPTomics-bioSkills@d91ed3d/viewer.md)
@@ -1073,3 +1385,67 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: `bcftools view -s <order>` adds INFO/AC and INFO/AN header lines, so `concat --naive` then refuses with 'incompatible headers' (also with -I). Plain concat after the reorder works.
 - Root cause: The fix was checked against plain concat, not --naive.
 - Fix: Say: reorder with view -s, then use plain `bcftools concat` (or re-create every file with the same view -s so headers match) before --naive.
+
+### `bio-molecular-io` — Open Babel snippet writes InChI, which the pinned build does not support
+
+- Skill: 91, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/molecular-io) · [viewer](skills/bio-molecular-io/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 3
+- Problem: The pybel snippet ends with `inchi = mol.write('inchi')`. Under openbabel-wheel 3.1.1.23 -- inside the Skill's own 'Open Babel 3.1.1+' pin -- this raises ValueError: 'inchi is not a recognised Open Babel format', and `obabel -L formats` confirms neither inchi nor inchikey is compiled into the build. The Skill discusses InChI at length elsewhere, so a reader is likely to take this line at face value.
+- Root cause: InChI support in Open Babel is a compile-time option and the snippet assumes it is always present; the Skill's own instruction to check `obabel -L formats` was never applied to its own example.
+- Fix: Drop the InChI line from the pybel snippet and point InChI generation at RDKit (rdkit.Chem.inchi.MolToInchi, verified working here), with a one-line note that Open Babel InChI support is build-dependent and should be checked with `obabel -L formats`.
+
+### `bio-molecular-io` — The SDF V2000 999-atom failure mode no longer fires
+
+- Skill: 91, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/molecular-io) · [viewer](skills/bio-molecular-io/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 2
+- Problem: The failure mode predicts a truncated atom block and a cryptic parse failure for molecules above 999 atoms. RDKit 2026.03.6's SDWriter emitted V3000 automatically for a 1,200-atom molecule and it read back intact, so SetForceV3000(True) was a no-op in the case it exists to fix.
+- Root cause: The symptom was written against an older RDKit that did not auto-upgrade the format.
+- Fix: Restate the entry: current RDKit auto-selects V3000 above the V2000 limit, so the real risk is downstream software that cannot read V3000, and SetForceV3000 remains useful for forcing the format deliberately rather than for avoiding truncation.
+
+### `bio-molecular-io` — The sanitize=False diagnostic does not apply to two of the three causes it is offered for
+
+- Skill: 91, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/molecular-io) · [viewer](skills/bio-molecular-io/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 7
+- Problem: The Common Errors row pairs 'Invalid SMILES, bad parentheses, ring not closed' with the fix 'try sanitize=False, inspect'. Grammar-level errors return None under sanitize=False as well, so the fix only helps the chemistry cases (valence, kekulization).
+- Root cause: Two different classes of parse failure -- grammar and chemistry -- are grouped under one row with one fix.
+- Fix: Split the row: grammar errors return None regardless and need the input corrected; chemistry errors are recoverable with sanitize=False followed by SanitizeMol(catchErrors=True), which names the failing step.
+
+### `bio-molecular-io` — An empty SMILES silently yields a valid molecule
+
+- Skill: 91, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/molecular-io) · [viewer](skills/bio-molecular-io/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 7
+- Problem: Chem.MolFromSmiles('') returns a zero-atom Mol rather than None, so an empty cell in an input file passes every None check in the Skill and flows downstream as a real record.
+- Root cause: The Skill's parse guards test for None only, which is the documented failure signal but not the only one.
+- Fix: Add a line to parse_smiles_safe and the Common Errors table: treat a molecule with GetNumAtoms() == 0 as a parse failure, because an empty or whitespace input does not return None.
+
+### `bio-machine-learning-model-validation` — The leakage taxonomy's ordering implies a severity ranking it does not have
+
+- Skill: 93, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/model-validation) · [viewer](skills/bio-machine-learning-model-validation/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 2
+- Problem: Preprocessing leakage heads the table as 'most common, most missed', and feature-selection leakage follows as a 'severe special case'. Measured on identical zero-signal data, selection leakage manufactured 0.357 AUC while scaler leakage cost -0.004 -- that is, nothing at all.
+- Root cause: The table is ordered by frequency while readers will take the first row as the biggest risk.
+- Fix: Add a severity column with indicative magnitudes (selection leakage can produce near-perfect CV from pure noise; scaler leakage is usually small for a single global transform but large for quantile normalisation, ComBat and kNN imputation), so the reader triages by impact rather than by position.
+
+### `bio-machine-learning-model-validation` — The SMOTE warning gives no prevalence regime
+
+- Skill: 93, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/model-validation) · [viewer](skills/bio-machine-learning-model-validation/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 6
+- Problem: The failure mode says oversampling inflates minority-class probabilities with no AUC gain and produces badly miscalibrated risks. At 10% prevalence in the Skill's own example that is exactly what happens; at 24.7% prevalence on real data, AUC rose from 0.783 to 0.810 and Brier improved from 0.1480 to 0.1421.
+- Root cause: The claim is stated unconditionally although its magnitude depends strongly on how severe the imbalance is.
+- Fix: Qualify the entry with the regime it was established in (van den Goorbergh studied severe imbalance) and state that the probability shift scales with the resampling ratio, so mild imbalance may show little effect -- while keeping the recommendation, since even here mean predicted risk drifted above prevalence.
+
+### `bio-machine-learning-model-validation` — No guidance on when nested-versus-flat optimism is large
+
+- Skill: 93, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/model-validation) · [viewer](skills/bio-machine-learning-model-validation/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 1
+- Problem: Flat CV with tuning is called a known reviewer red flag, but the measured optimism was +0.009 AUC on a 9-point grid over a real dataset. A reader cannot tell from the Skill whether to expect 0.01 or 0.2.
+- Root cause: The bias is described qualitatively although it depends on grid size, signal strength and sample size -- all of which the Skill discusses elsewhere.
+- Fix: Add one line tying the size of the optimism to the number of configurations tried and the sample size, and recommend reporting both numbers when they are close so a reviewer can see the gap rather than infer it.
+
+### `bio-machine-learning-model-validation` — TRIPOD+AI reporting is required but never specified
+
+- Skill: 93, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/model-validation) · [viewer](skills/bio-machine-learning-model-validation/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: —
+- Problem: The Skill names TRIPOD+AI as the 2024+ target and lists what it demands (data-splitting and leakage controls, calibration, fairness/subgroup performance, uncertainty) but gives no template, checklist or output structure for the report it asks the agent to produce.
+- Root cause: Reporting is treated as a citation rather than as a deliverable.
+- Fix: Add a short output skeleton -- the fields a validation report must carry (split design and unit of independence, leakage controls applied, discrimination with an interval, calibration slope and intercept, net benefit at pre-specified thresholds, subgroup performance) -- so the agent produces something checkable.

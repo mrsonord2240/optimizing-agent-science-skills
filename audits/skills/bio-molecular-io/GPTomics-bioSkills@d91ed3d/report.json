@@ -1,0 +1,252 @@
+{
+  "meta": {
+    "skill_name": "bio-molecular-io",
+    "description": "Reads, writes, and converts molecular file formats (SMILES, InChI, SDF V2000/V3000, MOL2, PDB, and BinaryCIF) using RDKit and Open Babel with rigorous handling of aromaticity perception, stereochemistry, implicit/explicit hydrogens, kekulization, and salt/fragment separation. Use when loading chemical libraries, debugging parse failures, or preparing molecules for downstream standardization, descriptor calculation, or docking.",
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:chemoinformatics/molecular-io",
+    "evaluated_on": "2026-09-16",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "executed_inputs": "7/7"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "The factual density here is high and it holds up. Its description of the MDL aromaticity model -- five-membered rings not aromatic unless part of a fused aromatic system -- reproduced exactly (furan, thiophene and pyrrole give 0 aromatic atoms under AROMATICITY_MDL against 5 under AROMATICITY_RDKIT, while indole gives 6 against 9). Its /FixedH tautomer caveat, its InChIKey collision framing and its BinaryCIF/MMTF retirement note are all correct and correctly cited." },
+      "practice_boundaries": { "result": "PASS", "detail": "File-format handling only; no clinical or individual-level content anywhere." },
+      "methodological_ground": { "result": "PASS", "detail": "No fallacy. The Skill's central thesis -- that most downstream errors are silent I/O errors, and that identity should travel on InChIKey rather than canonical SMILES -- is correct and was demonstrated: PDB ligands come back with every bond single and zero aromatic atoms until a template is applied." },
+      "code_usability": { "result": "PASS", "detail": "Every RDKit snippet ran on 3,224 real compounds with a perfect SDF round trip. The one failing line is the Open Babel InChI write, which is a format-support gap in the installed openbabel-wheel build rather than a syntax or API error, and RDKit's own InChI path (which the Skill also documents) works." }
+    }
+  },
+  "static_score": {
+    "subtotal": 94,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 11, "max": 12, "note": "Format coverage, aromaticity models, stereo layers, charge models and per-format failure modes are all present and nearly all verified correct. Correctness docked for two: the Open Babel snippet writes InChI, which the Skill's own pinned build does not support, and the SDF V2000 999-atom failure mode no longer fires on current RDKit, whose SDWriter emits V3000 automatically." },
+      "reliability": { "score": 11, "max": 12, "note": "parse_smiles_safe returns explicit statuses and its round-trip check actually caught one unstable compound in 3,224. The sanitize=False diagnostic path is genuinely useful, returning named error flags (SANITIZE_PROPERTIES, SANITIZE_KEKULIZE). Error reporting docked: the pybel snippet has no guard, so an unsupported format surfaces as a bare ValueError." },
+      "performance_context": { "score": 8, "max": 8, "note": "269 lines with the depth in tables. Parsing and round-tripping 3,224 compounds through a 9.1 MB SDF took a few seconds end to end." },
+      "agent_usability": { "score": 15, "max": 16, "note": "The per-format failure modes are written as trigger/mechanism/symptom/fix and are immediately actionable; terminology is consistent throughout. Feedback design docked: the Skill says to verify formats with `obabel -L formats` in Version Compatibility but its own snippet does not, which is exactly how the InChI line slipped through." },
+      "human_usability": { "score": 8, "max": 8, "note": "The format taxonomy answers the question a user actually arrives with -- which format should I be in, and what will it cost me -- with a Fails-when column for every row." },
+      "security": { "score": 11, "max": 12, "note": "No credentials or network. One subprocess call to obabel with fixed arguments and check=True. Input validation docked: MolFromSmiles('') returns a valid zero-atom molecule with no error, and nothing in the Skill warns about it." },
+      "maintainability": { "score": 11, "max": 12, "note": "Format handling is tabulated rather than hard-coded, so adding a format is a table row plus a failure mode. Testability docked: no expected outputs, which is why the InChI line and the stale V2000 symptom both survived." },
+      "agent_specific": { "score": 19, "max": 20, "note": "Precise trigger, correct layering, and clean handoffs to standardization, descriptors and conformer generation. Escape hatches docked: it says the RDKit MOL2 parser is brittle and to convert via Open Babel, but gives no condition under which the agent should stop and ask for a different source file." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 89.6,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 26, "total": 30 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "3,224 SMILES to a property-carrying SDF and back",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "parse_smiles_safe over 3,224 SMILES in 2.3 s: 3,223 ok, 1 round_trip_unstable, 0 parse failures. Wrote a 9.1 MB SDF, read it back with SDMolSupplier: 3,224 parsed, 0 failed, 3,224 carrying the pChEMBL property, 3,224 with SMILES identical to the original, and tetrahedral stereo preserved on all 1,291 compounds that had it.",
+        "note": "A clean full-library round trip with no silent loss of structure, stereo or metadata -- which is the thing this Skill exists to guarantee.",
+        "basic": 39,
+        "specialized": 55,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Every record survives the SMILES -> SDF -> SDMolSupplier round trip", "result": "PASS", "note": "3,224 in, 3,224 out, 0 parse failures" },
+          { "text": "Per-molecule properties survive the round trip", "result": "PASS", "note": "3,224/3,224 carry the pChEMBL tag, retrieved via GetPropsAsDict as documented" },
+          { "text": "Stereochemistry survives the round trip", "result": "PASS", "note": "1,291 stereocentre-bearing compounds before and after" },
+          { "text": "The documented round-trip stability check actually detects something", "result": "PASS", "note": "1 compound flagged round_trip_unstable, so the check is not vacuous" }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "The SDF V2000 999-atom limit and the SetForceV3000 fix",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "A 1,200-atom molecule was written with the default SDWriter. It did not truncate or fail: the counts line reads '0 0 0 0 0 0 0 0 0 0999 V3000' and the file read back with all 1,200 atoms. SetForceV3000(True) produced an identical counts line and also read back at 1,200 atoms.",
+        "note": "The API and the fix are correct; the failure they exist to prevent no longer occurs in RDKit 2026.03.6, which upgrades to V3000 on its own.",
+        "basic": 35,
+        "specialized": 50,
+        "total": 85,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The documented 999-atom symptom reproduces", "result": "FAIL", "note": "'Truncated atom block; parse failure with cryptic error' did not occur -- the default writer emitted V3000 automatically and the file read back intact" },
+          { "text": "SetForceV3000 produces a V3000 file that reads back correctly", "result": "PASS", "note": "1,200 atoms recovered" },
+          { "text": "The API the fix names exists at the documented path", "result": "PASS", "note": "Chem.SDWriter.SetForceV3000 present in RDKit 2026.03.6" },
+          { "text": "RDKit auto-detects V3000 on read, as the Skill states", "result": "PASS", "note": "SDMolSupplier read both files with no format argument" }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Variant B",
+        "label": "The Open Babel route for MOL2, PDBQT and InChI",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "'from openbabel import pybel' works, confirming the documented OB 3.x import fix. pybel.readstring parsed and write() succeeded for smi (30 chars), sdf (1,822), mol2 (2,000) and pdbqt (2,445). write('inchi') and write('inchikey') both raised ValueError: 'inchi is not a recognised Open Babel format', and `obabel -L formats` confirms neither format is in this build.",
+        "note": "Three of the four documented Open Babel uses work; the InChI line in the snippet fails in the very build the Skill pins.",
+        "basic": 32,
+        "specialized": 47,
+        "total": 79,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "The documented OB 3.x import path is correct", "result": "PASS", "note": "'from openbabel import pybel' works; the 2.x 'import pybel' failure mode is accurately described" },
+          { "text": "pybel reads and writes the formats the Skill routes to it", "result": "PASS", "note": "smi, sdf, mol2 and pdbqt all wrote successfully" },
+          { "text": "The snippet's InChI write succeeds in the build the Skill pins", "result": "FAIL", "note": "ValueError: inchi is not a recognised Open Babel format; `obabel -L formats` lists neither inchi nor inchikey in openbabel-wheel 3.1.1.23" },
+          { "text": "The Skill tells the reader how to detect this class of problem", "result": "PASS", "note": "Version Compatibility instructs `obabel -L formats` -- the exact check that exposes it" },
+          { "text": "The documented PDBQT conversion route is usable", "result": "PASS", "note": "pdbqt write produced 2,445 characters, and obabel is present for the subprocess form" }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Edge",
+        "label": "Aromaticity models -- the Skill's 'most common silent error'",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Chem.AromaticityModel, AROMATICITY_RDKIT and AROMATICITY_MDL all exist at the documented path. Kekulized then re-perceived: furan, thiophene and pyrrole each give 5 aromatic atoms under the RDKit model and 0 under MDL; indole gives 9 against 6; benzene gives 6 under both; cyclopentadienone 0 under both.",
+        "note": "The most precise claim in the Skill, verified atom for atom -- including the fused-system exception, which is why indole keeps its six benzo atoms under MDL.",
+        "basic": 39,
+        "specialized": 56,
+        "total": 95,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Both named aromaticity models exist at the documented API path", "result": "PASS", "note": "Chem.SetAromaticity(mol, Chem.AromaticityModel.AROMATICITY_RDKIT) is exactly right" },
+          { "text": "The MDL five-membered-ring rule reproduces", "result": "PASS", "note": "Furan, thiophene and pyrrole: 5 aromatic atoms under RDKit, 0 under MDL" },
+          { "text": "The fused-system exception the Skill states reproduces", "result": "PASS", "note": "Indole: 9 aromatic atoms under RDKit, 6 under MDL -- the benzo ring only, exactly as described" },
+          { "text": "The models agree where the Skill implies they should", "result": "PASS", "note": "Benzene gives 6 under both, so the difference is confined to the cases the Skill names" }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Pulling a co-crystal ligand out of a PDB entry",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Benzamidine extracted from PDB 3PTB: 9 atoms, all 9 bonds SINGLE, 0 aromatic atoms. After AllChem.AssignBondOrdersFromTemplate with a charged benzamidinium template: 6 AROMATIC, 2 SINGLE, 1 DOUBLE, 6 aromatic atoms, SMILES NC(=[NH2+])c1ccccc1. A neutral template also succeeded, giving N=C(N)c1ccccc1.",
+        "note": "The failure mode is exact -- 'All bonds single; aromatic rings non-aromatic' -- and the prescribed fix restores the chemistry on a real PDB entry.",
+        "basic": 38,
+        "specialized": 55,
+        "total": 93,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "A ligand parsed from PDB has no bond orders and no aromaticity", "result": "PASS", "note": "9/9 bonds SINGLE, 0 aromatic atoms -- the documented symptom verbatim" },
+          { "text": "AssignBondOrdersFromTemplate restores them", "result": "PASS", "note": "6 aromatic bonds and 1 double bond recovered; SMILES NC(=[NH2+])c1ccccc1" },
+          { "text": "The API named in the fix exists and takes the documented argument order", "result": "PASS", "note": "AllChem.AssignBondOrdersFromTemplate(template, ligand)" },
+          { "text": "The Skill offers a fallback when a template is not available", "result": "PASS", "note": "It names the PDB Ligand Expo SDF as the alternative source" }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Pressed to use InChIKey as a tautomer-distinguishing identity key",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "RDKit INCHI_AVAILABLE is True. Standard InChI is identical for 2-pyridone/2-hydroxypyridine and for guanine N7H/N9H, and differs for acetone keto/enol. The /FixedH option distinguishes all three pairs. MolToInchiKey and InchiToInchiKey(MolToInchi(...)) agree.",
+        "note": "The caveat the Skill attaches to InChI identity is exactly right and its prescribed option works on every pair tested.",
+        "basic": 38,
+        "specialized": 55,
+        "total": 93,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "RDKit's InChI path is available, as the Skill assumes throughout", "result": "PASS", "note": "Chem.inchi.INCHI_AVAILABLE is True; MolToInchi and MolToInchiKey both work" },
+          { "text": "Standard InChI collapses mobile-hydrogen tautomers, as documented", "result": "PASS", "note": "Identical std InChI for 2-pyridone/2-hydroxypyridine and for guanine N7H/N9H" },
+          { "text": "The /FixedH option distinguishes them, as the caveat prescribes", "result": "PASS", "note": "3/3 pairs separated, via Chem.MolToInchiAndAuxInfo(mol, options='/FixedH')" },
+          { "text": "The two documented routes to an InChIKey agree", "result": "PASS", "note": "MolToInchiKey equals InchiToInchiKey(MolToInchi(mol))" }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Malformed input and the sanitize=False diagnostic path",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Seven malformed or borderline inputs. Grammar errors (unclosed ring, bad parentheses, nonsense) return None from both MolFromSmiles and MolFromSmiles(sanitize=False). Chemistry errors are recoverable: a pentavalent nitrogen parses with sanitize=False and SanitizeMol(catchErrors=True) reports SANITIZE_PROPERTIES; an aromatic non-ring reports SANITIZE_KEKULIZE. SF6 parses normally (legitimately hexavalent). An empty string returns a valid zero-atom molecule with no error.",
+        "note": "The diagnostic path is real and names the failing sanitization step, but it does not cover the grammar cases the Common Errors row lists alongside them, and the empty-string case is a silent trap.",
+        "basic": 37,
+        "specialized": 51,
+        "total": 88,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Grammar-level errors are rejected rather than silently accepted", "result": "PASS", "note": "Unclosed ring, bad parentheses and nonsense all return None" },
+          { "text": "sanitize=False recovers a diagnosable object for chemistry errors", "result": "PASS", "note": "Pentavalent nitrogen parses and can then be inspected" },
+          { "text": "catchErrors names the specific sanitization step that failed", "result": "PASS", "note": "SANITIZE_PROPERTIES for the valence case, SANITIZE_KEKULIZE for the aromatic non-ring" },
+          { "text": "The Common Errors fix applies to every cause it lists", "result": "FAIL", "note": "The row lists 'bad parentheses, ring not closed' and prescribes sanitize=False, but those return None under sanitize=False too, so the fix does not apply to two of its own three causes" },
+          { "text": "An empty SMILES is rejected rather than silently yielding a molecule", "result": "FAIL", "note": "MolFromSmiles('') returns a valid zero-atom Mol with no error and no warning anywhere in the Skill" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 37.6,
+    "dynamic_weighted": 53.8,
+    "score": 91,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Its aromaticity content is exact to the atom: the MDL model's five-membered-ring rule and its fused-system exception both reproduced (furan/thiophene/pyrrole 5 against 0; indole 9 against 6), which is the single hardest thing in this Skill to get right.",
+    "A full 3,224-compound SMILES to SDF to SDMolSupplier round trip lost nothing -- not one record, not one property tag, not one of 1,291 stereocentres.",
+    "The PDB failure mode is exact and its fix works on a real entry: benzamidine from 3PTB comes back with 9 single bonds and 0 aromatic atoms, and AssignBondOrdersFromTemplate restores 6 aromatic bonds.",
+    "The InChI caveats are correct and testable: standard InChI collapses the mobile-hydrogen pairs, /FixedH separates all three, and the two documented routes to an InChIKey agree.",
+    "The sanitize=False diagnostic path returns named failing steps (SANITIZE_PROPERTIES, SANITIZE_KEKULIZE) rather than an opaque failure."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "Open Babel snippet writes InChI, which the pinned build does not support",
+      "observed_in": [3],
+      "problem": "The pybel snippet ends with `inchi = mol.write('inchi')`. Under openbabel-wheel 3.1.1.23 -- inside the Skill's own 'Open Babel 3.1.1+' pin -- this raises ValueError: 'inchi is not a recognised Open Babel format', and `obabel -L formats` confirms neither inchi nor inchikey is compiled into the build. The Skill discusses InChI at length elsewhere, so a reader is likely to take this line at face value.",
+      "root_cause": "InChI support in Open Babel is a compile-time option and the snippet assumes it is always present; the Skill's own instruction to check `obabel -L formats` was never applied to its own example.",
+      "fix": "Drop the InChI line from the pybel snippet and point InChI generation at RDKit (rdkit.Chem.inchi.MolToInchi, verified working here), with a one-line note that Open Babel InChI support is build-dependent and should be checked with `obabel -L formats`."
+    },
+    {
+      "priority": "P2",
+      "title": "The SDF V2000 999-atom failure mode no longer fires",
+      "observed_in": [2],
+      "problem": "The failure mode predicts a truncated atom block and a cryptic parse failure for molecules above 999 atoms. RDKit 2026.03.6's SDWriter emitted V3000 automatically for a 1,200-atom molecule and it read back intact, so SetForceV3000(True) was a no-op in the case it exists to fix.",
+      "root_cause": "The symptom was written against an older RDKit that did not auto-upgrade the format.",
+      "fix": "Restate the entry: current RDKit auto-selects V3000 above the V2000 limit, so the real risk is downstream software that cannot read V3000, and SetForceV3000 remains useful for forcing the format deliberately rather than for avoiding truncation."
+    },
+    {
+      "priority": "P2",
+      "title": "The sanitize=False diagnostic does not apply to two of the three causes it is offered for",
+      "observed_in": [7],
+      "problem": "The Common Errors row pairs 'Invalid SMILES, bad parentheses, ring not closed' with the fix 'try sanitize=False, inspect'. Grammar-level errors return None under sanitize=False as well, so the fix only helps the chemistry cases (valence, kekulization).",
+      "root_cause": "Two different classes of parse failure -- grammar and chemistry -- are grouped under one row with one fix.",
+      "fix": "Split the row: grammar errors return None regardless and need the input corrected; chemistry errors are recoverable with sanitize=False followed by SanitizeMol(catchErrors=True), which names the failing step."
+    },
+    {
+      "priority": "P2",
+      "title": "An empty SMILES silently yields a valid molecule",
+      "observed_in": [7],
+      "problem": "Chem.MolFromSmiles('') returns a zero-atom Mol rather than None, so an empty cell in an input file passes every None check in the Skill and flows downstream as a real record.",
+      "root_cause": "The Skill's parse guards test for None only, which is the documented failure signal but not the only one.",
+      "fix": "Add a line to parse_smiles_safe and the Common Errors table: treat a molecule with GetNumAtoms() == 0 as a parse failure, because an empty or whitespace input does not return None."
+    }
+  ]
+}

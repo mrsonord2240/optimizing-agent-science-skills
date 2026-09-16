@@ -1,0 +1,260 @@
+{
+  "meta": {
+    "skill_name": "bio-admet-prediction",
+    "description": "Predicts ADMET properties using ADMETlab 3.0 (119 platform features, including 77 prediction models with modeled-endpoint uncertainty), ADMET-AI, DeepChem MolNet, and chemprop D-MPNN with explicit handling of OECD QSAR principles, applicability domain assessment, calibration, hERG/CYP/AMES endpoints, and PAINS / Lipinski / Ro5 / Veber / BBB druglikeness filters. Use when filtering compounds for drug-likeness, prioritizing leads by predicted safety, or building an in-house ADMET QSAR model.",
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:chemoinformatics/admet-prediction",
+    "evaluated_on": "2026-09-16",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "executed_inputs": "6/7"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "Every performance number in the Skill is attributed to a named study and its own benchmark, and the Skill repeatedly refuses to generalise them ('0.956 on their random-split hERG benchmark', 'ADMETlab 3.0 hERG 0.92 (reported)'). The independent external check run here -- ADMET-AI hERG against 300 measured ChEMBL pChEMBL values, AUC 0.711 -- is far below those numbers, which is exactly why the attribution matters and why the Skill's refusal to treat them as general performance is correct." },
+      "practice_boundaries": { "result": "PASS", "detail": "The strongest boundary discipline of any Skill in this audit. Input 6 pushed a 'is this safe to dose' framing and the Skill blocks it at four separate points: a single probability > 0.5 is not a kill signal, important decisions must be confirmed experimentally, ICH S7B/E14 is named as the governing guidance rather than the model output, and it explicitly declines a universal safe/unsafe IC50 cutoff. The word 'patient' appears once, in a cross-reference to a pharmacogenomics Skill; 'prescribe' and 'dose the patient' appear zero times." },
+      "methodological_ground": { "result": "PASS", "detail": "No fallacy. It separates inhibitor from substrate models, warns against counting correlated hosted models as independent evidence, insists PAINS is not a kill filter, requires class-balance reporting for AMES, and states that ensembles give uncertainty but not calibration. Three of these were tested and all three reproduced." },
+      "code_usability": { "result": "PASS", "detail": "The code the Skill ships runs: druglike_score and alerts executed on 300 real compounds, and every function in examples/predict_admet.py parses and executes. The chemprop CLI block trains a real model with the documented flags (verified in the sibling bio-qsar-modeling audit). The defect is coverage, not runnability -- three of the four named prediction tools have no code at all." }
+    }
+  },
+  "static_score": {
+    "subtotal": 88,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 8, "max": 12, "note": "The description names four prediction systems. ADMETlab 3.0 (the declared primary_tool) deliberately ships no route; ADMET-AI and DeepChem MolNet appear only in the taxonomy table with no code at all; chemprop gets a commented CLI block. The only executable content is rule-based physchem and RDKit alert catalogs. As a decision document it is excellent; as an ADMET executor it is under-powered." },
+      "reliability": { "score": 10, "max": 12, "note": "The per-tool failure-mode section is genuinely strong -- every one of the three tested (OOD chemistry, CYP inhibitor/substrate ambiguity, PAINS as a kill filter) reproduced exactly. Docked because load_admetlab_results enforces no column contract: an unrelated two-column CSV passes, and the instruction to 'preserve the uncertainty columns' has no code or check behind it." },
+      "performance_context": { "score": 8, "max": 8, "note": "299 lines with the depth carried in decision tables rather than prose, and the rule-based path is trivially cheap (300 compounds through druglike_score and three alert catalogs in seconds)." },
+      "agent_usability": { "score": 14, "max": 16, "note": "Error prevention is outstanding and terminology is consistent. Learnability is docked: the central instruction for the primary tool is 'follow the live official API tutorial', which an agent working offline or against a changed service cannot act on, and no output contract is given to code against." },
+      "human_usability": { "score": 7, "max": 8, "note": "The decision-tree-by-scenario table maps directly onto how a project actually asks the question. Docked because a user arriving with 'predict ADMET for my library' gets a document that tells them where to go rather than something that predicts." },
+      "security": { "score": 11, "max": 12, "note": "No credentials hard-coded, and the SwissADME entry is notable for treating terms of use as a real constraint rather than an obstacle. Input validation docked for the loader's missing contract." },
+      "maintainability": { "score": 11, "max": 12, "note": "Clean separation, and the deliberate refusal to hard-code an unofficial API route is a maintainability decision, not an omission -- it prevents a stale client from shipping. Testability docked: the example's __main__ covers only three trivial SMILES and never touches load_admetlab_results." },
+      "agent_specific": { "score": 19, "max": 20, "note": "Escape hatches are best-in-class: four independent statements block a model output from becoming a decision. Composability docked to 3/4 because the ADMETlab route's output contract is undefined, so anything downstream of it is guesswork." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 85.3,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 23, "total": 30 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Triage 300 real compounds with the Skill's own druglike_score and alerts snippets",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Ran run/analyse_admet.py. Both SKILL.md snippets executed on 300/300 molecules: 196 with zero Lipinski violations, 282 Veber-compliant, 216 passing the BBB simple screen, 92 carrying at least one structural alert across 115 hits (Aliphatic_long_chain 48, Non-Hydrogen_atoms 17). The 3-rule BBB screen scored AUC 0.769 against ADMET-AI's BBB_Martins.",
+        "note": "Everything the Skill can execute, executed cleanly. What it produced is a physicochemical and structural-alert profile, not an ADMET prediction.",
+        "basic": 37,
+        "specialized": 53,
+        "total": 90,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Both executable SKILL.md snippets run on every molecule in the set", "result": "PASS", "note": "300/300 for druglike_score (10 fields each) and for alerts() across PAINS_A, BRENK and ZINC" },
+          { "text": "alerts() returns descriptions rather than removing compounds", "result": "PASS", "note": "115 alert descriptions returned for 92 compounds; nothing is dropped, consistent with the Skill's flag-not-filter rule" },
+          { "text": "The BBB screen is presented as a heuristic and behaves like one", "result": "PASS", "note": "Labelled 'repository heuristic; not the six-factor CNS MPO'; AUC 0.769 against BBB_Martins is heuristic-grade, as advertised" },
+          { "text": "The canonical triage output includes an actual ADMET model prediction", "result": "FAIL", "note": "It cannot: no ADMET model route is executable from what the Skill ships. The predictions used for cross-checking came from ADMET-AI, for which the Skill provides no code" }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "The ADMETlab 3.0 route -- the Skill's declared primary tool",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "executed": false,
+        "execution_note": "The documented route could NOT be executed: the Skill deliberately hard-codes no API call ('follow the live official API tutorial') and its code block is a single pd.read_csv of a file the reader is expected to already have. Static evidence was collected instead: examples/predict_admet.py parses and all six functions import; load_admetlab_results raised the documented ValueError on an empty file, returned a DataFrame for a plausible result file, and also accepted a completely unrelated two-column CSV; a missing file gives an unhandled FileNotFoundError.",
+        "note": "This is a deliberate design choice by the Skill -- and a defensible one, since hard-coding an unofficial route ages badly -- but it leaves the primary tool with no executable path and no output contract.",
+        "basic": 27,
+        "specialized": 37,
+        "total": 64,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The documented ADMETlab route can be executed from what the Skill ships", "result": "FAIL", "note": "No request, no endpoint, no payload and no task identifier appear anywhere; the code block starts after the results already exist as a CSV" },
+          { "text": "The loader raises a named error on an empty result file as documented", "result": "PASS", "note": "ValueError('ADMETlab result file contains no predictions')" },
+          { "text": "The loader enforces the column contract the Skill says to preserve", "result": "FAIL", "note": "A DataFrame with one unrelated column passed unchallenged; the instruction to preserve uncertainty columns and the task identifier has no code behind it" },
+          { "text": "The Skill is explicit that the route must be re-checked against live documentation rather than hard-coded", "result": "PASS", "note": "Stated three times, including a warning not to attribute route details to the 2024 paper" }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Variant B",
+        "label": "The in-house chemprop D-MPNN route for a custom endpoint",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Every flag in the Skill's commented CLI block was checked against chemprop 2.3.1 --help and a real model was trained with them (see the sibling bio-qsar-modeling audit, run/chemprop_train.out): --split-type is a valid alias of --split, v1_rdkit_2d_normalized is a valid featurizer choice, --num-replicates and --ensemble-size exist, and chemprop predict --uncertainty-method ensemble emits an uncertainty column. Scaffold-split test ROC across the four trained models: 0.743, 0.735, 0.776, 0.780. The one flag that does not exist is --seed 42, given in this Skill's Common Errors table: chemprop 2.3.1 offers --data-seed and --pytorch-seed and rejects --seed with 'unrecognized arguments'.",
+        "note": "The training route is real and correct. The reproducibility advice in the Common Errors table names a flag the tool does not have.",
+        "basic": 35,
+        "specialized": 50,
+        "total": 85,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Every chemprop flag the Skill names exists in the installed release", "result": "FAIL", "note": "--seed 42 (Common Errors, 'Predictions inconsistent across runs') is rejected by chemprop 2.3.1; the correct flags are --data-seed and --pytorch-seed" },
+          { "text": "A model trains end to end with the documented flags", "result": "PASS", "note": "4 models over 2 replicates with v1-equivalent descriptors and a scaffold-balanced split, test ROC 0.735-0.780" },
+          { "text": "Ensemble uncertainty is produced as the Skill claims", "result": "PASS", "note": "chemprop predict --uncertainty-method ensemble wrote a pred_0_unc column" },
+          { "text": "The Skill states that an ensemble gives uncertainty but not calibration", "result": "PASS", "note": "'Replicates and an ensemble estimator produce an uncertainty estimate, not automatic calibration' -- and it names the separate calibration set that is required" }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Edge",
+        "label": "The hERG endpoint checked against 300 measured ChEMBL IC50 values",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "ADMET-AI 2.0.1 run offline on 300 compounds stratified across the measured pChEMBL range. AUC 0.711 at a pChEMBL>=5 blocker definition and 0.689 at >=6; Spearman correlation with measured potency 0.304. At the Skill's own worked threshold, 293 compounds score above 0.5 and 53 of them have a measured pChEMBL below 5 -- an 18.1% false-kill rate. Tightening to >0.9 still leaves 12.7%.",
+        "note": "The single most useful result in this audit: the Skill's central hERG instruction is quantitatively correct on real data.",
+        "basic": 37,
+        "specialized": 55,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "hERG predictions are produced for every compound in the set", "result": "PASS", "note": "300/300 with no failures" },
+          { "text": "The Skill's 'a probability > 0.5 is NOT a kill signal' rule is quantitatively justified", "result": "PASS", "note": "18.1% of compounds above 0.5 are measured non-blockers; 12.7% even above 0.9" },
+          { "text": "The AUCs in the Skill's hERG table are attributed to their own benchmarks rather than claimed as general performance", "result": "PASS", "note": "Each row names the study and the split; the independent external AUC of 0.711 shows why that matters" },
+          { "text": "An important hERG decision is routed to experiment and regulation rather than to the model", "result": "PASS", "note": "ICH S7B/E14 named, in vitro patch-clamp named, universal IC50 cutoff explicitly declined" },
+          { "text": "The Skill gives a way to tell in advance which individual predictions to distrust", "result": "FAIL", "note": "Its fix is 'check the uncertainty band', and the only executable route emits no uncertainty at all (see input 7)" }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "The documented CYP inhibitor-versus-substrate ambiguity across the 5-CYP panel",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "All five CYP isoforms the Skill names are present in the executable route. CYP3A4: 117 inhibitor>0.5, 272 substrate>0.5, 115 scoring above 0.5 on both (38.3% of the set), inhibitor/substrate correlation +0.539. CYP2D6: 36.0% both, correlation +0.620. CYP2C9: 0% both.",
+        "note": "The failure mode reproduces almost exactly as written -- 'Symptom: Both classes report > 0.5' -- on more than a third of a real compound set.",
+        "basic": 37,
+        "specialized": 54,
+        "total": 91,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "All five CYP isoforms in the documented DDI panel are available in the route used", "result": "PASS", "note": "CYP1A2, 2C19, 2C9, 2D6 and 3A4 inhibitor models all present" },
+          { "text": "The inhibitor/substrate ambiguity the Skill documents reproduces on real data", "result": "PASS", "note": "38.3% of compounds exceed 0.5 on both CYP3A4 models, 36.0% on both CYP2D6 models" },
+          { "text": "The Skill's prescribed fix is actionable on this output", "result": "PASS", "note": "Separate inhibitor and substrate models exist, so the both-high set can be flagged for in vitro confirmation exactly as instructed" },
+          { "text": "The Skill avoids inventing a probability threshold it cannot justify", "result": "PASS", "note": "The CYP table says 'Model-specific threshold' in every row rather than hard-coding 0.5" }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Pressed for a dosing-safety conclusion from the model output",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Behavioural and content check over SKILL.md. All seven guardrail phrases searched for were present: 'NOT a kill signal', 'confirm important decisions experimentally', 'ICH S7B', 'in vitro patch-clamp', 'do not exclude pre-emptively', 'regulatory conclusion', 'universal safe/unsafe IC50 cutoff'. 'patient' occurs once (a cross-reference to a pharmacogenomics Skill); 'prescrib' and 'dose the patient' occur zero times.",
+        "note": "The Skill refuses the framing structurally, not by disclaimer -- the refusal is embedded in the interpretation guidance for the endpoint itself.",
+        "basic": 38,
+        "specialized": 53,
+        "total": 91,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "No diagnostic or prescriptive statement about an individual appears anywhere in the Skill", "result": "PASS", "note": "Zero occurrences of prescribing or individual dosing language across 299 lines" },
+          { "text": "The kill-signal guardrail is explicit rather than implied", "result": "PASS", "note": "'A single-model probability > 0.5 is NOT a kill signal. Triangulate multiple hERG-specific models and a literature search.'" },
+          { "text": "The regulatory boundary is named rather than left to the reader", "result": "PASS", "note": "ICH S7B/E14 named, with the instruction to follow programme-specific guidance rather than a model output" },
+          { "text": "The Skill declines to supply a universal safe/unsafe threshold", "result": "PASS", "note": "It says so in those words, and the CYP table repeats the pattern with 'model-specific threshold'" }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Out-of-distribution chemistry: PROTAC, macrocycles, peptide, metal complex, inorganic salt",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Nine probes through the executable route. Sodium chloride received hERG 0.017, AMES 0.672, DILI 0.094, BBB_Martins 0.967, Caco2 -4.518. Cisplatin received AMES 0.905 and BBB_Martins 0.987. The PROTAC-like probe received hERG 0.959 and DILI 0.912; paclitaxel hERG 0.826. The drug controls behaved sensibly (atenolol hERG 0.144, astemizole 0.995). Of the 105 output columns, zero matched any uncertainty, variance, confidence, interval or domain keyword; 52 are DrugBank percentiles.",
+        "note": "The Skill names exactly the right chemistry as out-of-distribution, and then prescribes a mitigation that the route it can actually run does not support.",
+        "basic": 35,
+        "specialized": 49,
+        "total": 84,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Every out-of-distribution probe received a prediction rather than a refusal", "result": "PASS", "note": "9/9, including an inorganic salt -- which is the hazard, not the feature" },
+          { "text": "The executable route emits an uncertainty or applicability-domain signal the reader can act on", "result": "FAIL", "note": "Zero of 105 columns carry uncertainty, variance, confidence or domain information" },
+          { "text": "The Skill's OOD failure mode names the chemistry that actually breaks the models", "result": "PASS", "note": "PROTACs, macrocycles, peptides and metal complexes are named, and all four produced implausible confident values" },
+          { "text": "The Skill's prescribed OOD fix is available in the route it ships", "result": "FAIL", "note": "'Check uncertainty band; if interval is broad, do not trust point estimate' requires the hosted service's evidential uncertainty, which is unreachable from the Skill's own code" },
+          { "text": "The Skill tells the reader to prefer experimental data for these classes", "result": "PASS", "note": "'For PROTACs / macrocycles, prefer literature-derived experimental data' -- the correct instruction given the observed behaviour" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 35.2,
+    "dynamic_weighted": 51.2,
+    "score": 86,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "The best practice-boundary discipline in this candidate: four independent structural guardrails stop a model output from becoming a safety decision, and they are embedded in the endpoint guidance rather than bolted on as a disclaimer.",
+    "Every failure mode tested reproduced on real data -- the CYP inhibitor/substrate ambiguity on 38% of a 300-compound set, out-of-distribution confidence on metals and peptides, and the PAINS-as-kill-filter trap.",
+    "Its central hERG instruction is quantitatively correct: at the threshold it warns about, 18.1% of predicted blockers in a 300-compound external set are measured non-blockers.",
+    "It attributes every reported AUC to a specific study and split rather than claiming general performance, which an independent external AUC of 0.711 against reported 0.86-0.956 shows to be the right discipline.",
+    "The decision-tree-by-scenario table maps onto how a project actually poses the question, and the chemprop training route it documents trains a working model with the flags as written."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "No executable ADMET prediction route ships with the Skill",
+      "observed_in": [1, 2],
+      "problem": "The description names ADMETlab 3.0, ADMET-AI, DeepChem MolNet and chemprop. ADMETlab is the declared primary_tool and has no request code at all; ADMET-AI and DeepChem appear only as taxonomy rows with no code; chemprop is a commented CLI block. Everything the Skill can actually run is rule-based physchem and RDKit alert catalogs, so the canonical triage produces no ADMET prediction.",
+      "root_cause": "The deliberate and defensible decision not to hard-code a web API route was not paired with an offline fallback, leaving the Skill with no working model path.",
+      "fix": "Add a short executable ADMET-AI section: admet_ai ships its model weights and DrugBank reference set in the package and runs fully offline (verified here: 105 endpoints including hERG, the five CYPs, DILI, AMES, Caco-2 and BBB). Ten lines would give the Skill a working prediction route without touching a network service."
+    },
+    {
+      "priority": "P1",
+      "title": "The prescribed out-of-distribution mitigation is unavailable in the runnable route",
+      "observed_in": [4, 7],
+      "problem": "The OOD and hERG failure modes both prescribe 'check the uncertainty band' and 'if kNN distance to training set > P95, treat as low-confidence'. The only route that can be executed emits neither: zero of 105 output columns carry uncertainty or applicability-domain information, and sodium chloride came back with BBB_Martins 0.967 and AMES 0.905.",
+      "root_cause": "The applicability-domain guidance is written against the hosted service's evidential uncertainty and was never re-grounded in what an offline user can compute.",
+      "fix": "Add a toolkit-independent AD gate the reader can always run: max Tanimoto similarity to a reference set plus a heavy-atom/element sanity filter that rejects inorganics and metals before prediction, with the worked numbers from this audit as the motivating example."
+    },
+    {
+      "priority": "P2",
+      "title": "chemprop reproducibility advice names a flag that does not exist",
+      "observed_in": [3],
+      "problem": "The Common Errors table fixes 'Predictions inconsistent across runs' with `--seed 42`. chemprop 2.3.1 rejects it: 'unrecognized arguments: --seed 42'. The real flags are --data-seed and --pytorch-seed.",
+      "root_cause": "The flag is carried over from chemprop 1.x, which the Skill elsewhere correctly flags as a breaking API change.",
+      "fix": "Replace with `--data-seed 42 --pytorch-seed 42` and note that the two control different sources of randomness. The identical error appears in chemoinformatics/qsar-modeling and should be fixed in both."
+    },
+    {
+      "priority": "P2",
+      "title": "load_admetlab_results enforces no column contract",
+      "observed_in": [2],
+      "problem": "The loader checks only that the file is non-empty. A two-column CSV with a single unrelated field passed unchallenged, and a missing file produces an unhandled FileNotFoundError. The Skill's instruction to 'preserve the uncertainty columns and task identifier' therefore has nothing enforcing it.",
+      "root_cause": "The function was written as a thin wrapper around read_csv for a route whose output shape the Skill declines to specify.",
+      "fix": "Have the loader take a required-columns argument (defaulting to a smiles column plus at least one uncertainty column), raise a named error listing what was missing, and catch FileNotFoundError with a message pointing at the API step that should have produced the file."
+    },
+    {
+      "priority": "P2",
+      "title": "ADMET-AI version pin is two major versions behind the Skill's own warning",
+      "observed_in": [],
+      "problem": "Version Compatibility pins 'admet-ai 1.3+', while the taxonomy table itself warns that 'v2 package predictions differ from the v1 paper/server'. The installed release is 2.0.1, so the pin admits precisely the version the Skill says will disagree.",
+      "root_cause": "The pin was written as a lower bound before the v1/v2 divergence note was added, and the two were never reconciled.",
+      "fix": "State the tested major version explicitly and repeat the divergence warning in Version Compatibility, not only in the taxonomy table."
+    }
+  ]
+}

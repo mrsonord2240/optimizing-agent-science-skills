@@ -1,0 +1,268 @@
+{
+  "meta": {
+    "skill_name": "bio-substructure-search",
+    "description": "Searches molecular libraries for substructure matches using SMARTS patterns with explicit handling of recursive SMARTS, ring membership, aromaticity dialect, vector binding, atom map indices, and reactive/PAINS/REOS/Brenk filter catalogs. Use when filtering compounds by pharmacophore features, functional groups, scaffold matches, or screening for assay-interference / structural alerts.",
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:chemoinformatics/substructure-search",
+    "evaluated_on": "2026-09-16",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "executed_inputs": "7/7"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "No fabricated values. All seven filter-catalog sizes the Skill tabulates (PAINS_A 16, PAINS_B 55, PAINS_C 409, BRENK 105, NIH 180, ZINC 50, PAINS 480) were checked against the installed RDKit and every one matched exactly. The Capuzzi 2017 claim about PAINS-flagged approved drugs is a real citation and reproduces directionally (4 approved drugs in a 9-compound probe carried PAINS alerts)." },
+      "practice_boundaries": { "result": "PASS", "detail": "Compound-library triage only. Input 6 deliberately pushed a 'which should I drop from the clinical candidate list' framing; the Skill's flag-not-filter rule and the Capuzzi caveat kept the answer at the level of assay-validation prioritisation, and no output diagnosed, prescribed for or triaged any individual." },
+      "methodological_ground": { "result": "PASS", "detail": "The Skill's central methodological position -- PAINS identifies assay-interference patterns rather than bad molecules, and is a flag for orthogonal validation rather than a deletion rule -- is correct and is stated in three separate places. Its when-to-apply table correctly exempts covalent design and natural-product series." },
+      "code_usability": { "result": "PASS", "detail": "Every SMARTS and snippet in SKILL.md and examples/substructure_search.py parses and runs under RDKit 2026.03.6, including all 12 REACTIVE_SMARTS, the FilterCatalog API, useChirality, and the MolDraw2DCairo highlight path (13,354-byte PNG produced). Two defects found are wrong-result defects, not unrunnable-code defects." }
+    }
+  },
+  "static_score": {
+    "subtotal": 87,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 9, "max": 12, "note": "Very complete on grammar, catalogs, custom reactive filters and seven failure modes, and every catalog count is exactly right. Docked for two verified inaccuracies -- the ester SMARTS [CX3](=O)[OX2][!H] misses isopropyl esters because [!H] means 'not exactly one attached H', and the failure-mode text names curcumins as a PAINS_A target although RDKit's PAINS catalog contains no curcumin pattern -- and because REOS appears in the description and catalog table with no implementation." },
+      "reliability": { "score": 9, "max": 12, "note": "Fault tolerance is decent (None molecules skipped, failure modes enumerated) but SKILL.md's own filter_library and pains_filter never check MolFromSmarts for None, so an invalid user SMARTS surfaces as a raw Boost ArgumentError instead of the named ValueError the shipped example raises. An empty SMARTS is worse: it yields a valid 0-atom query that matches nothing, silently emptying an include filter." },
+      "performance_context": { "score": 7, "max": 8, "note": "333 lines, well layered, and the performance advice is real: rebuilding the catalog per molecule measured a 7x penalty against building once. Docked because the recursive-SMARTS failure mode claims a 10x-100x slowdown and the measured penalty was 1.6x for one-level and 3.7x for a deeply nested pattern." },
+      "agent_usability": { "score": 14, "max": 16, "note": "Learnability is excellent -- all seven inputs were implemented directly from the text. Error prevention is the best part of the Skill (flag-not-filter, Capuzzi, the when-to-apply table, seven failure modes with mechanism/symptom/fix). Consistency docked: SKILL.md and the example give semantically different ester patterns that disagree on isopropyl and aryl esters." },
+      "human_usability": { "score": 7, "max": 8, "note": "usage-guide.md trigger phrases match how a chemist asks, and the documented visualization path runs. Docked one point because the guide promises highlighting and red-marking as a first-class output while SKILL.md contains no drawing content at all." },
+      "security": { "score": 11, "max": 12, "note": "No credentials, network, eval/exec or destructive operations anywhere. Input validation docked: user-supplied SMARTS is passed straight into HasSubstructMatch in SKILL.md's snippets with no None guard." },
+      "maintainability": { "score": 11, "max": 12, "note": "Clean three-file structure; COMMON_SMARTS and REACTIVE_SMARTS are dictionaries a project can extend without touching logic. Testability docked: the example's __main__ demo prints results but asserts nothing, which is why the ester disagreement went unnoticed." },
+      "agent_specific": { "score": 19, "max": 20, "note": "Trigger description is precise, layering is correct, the catalog/filter interface composes cleanly with admet-prediction and covalent-design, and every run was idempotent. Escape hatches docked: the when-to-apply table says which catalog to use but never says when to stop and ask a chemist about a flagged series." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 89.3,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 24, "total": 30 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "PAINS_A triage of 800 screening hits, flag-not-delete",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Ran run/inputs_1_2_5_library.py on 800 real ChEMBL hERG compounds. PAINS_A flagged 9/800 (1.1%) via 3 of its 16 patterns (mannich_A(296) x5, anil_di_alk_A(478) x3, anil_di_alk_C(246) x1); all flagged compounds retained with their pattern description. All seven catalog sizes in the SKILL.md table verified against the installed RDKit.",
+        "note": "Clean run. Only gap: the Skill's pains_filter drops unparsed molecules with a bare continue and keeps no tally.",
+        "basic": 38,
+        "specialized": 54,
+        "total": 92,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Every catalog size in the structural-alert table matches the installed RDKit", "result": "PASS", "note": "PAINS_A 16, PAINS_B 55, PAINS_C 409, BRENK 105, NIH 180, ZINC 50, PAINS 480 -- all exact" },
+          { "text": "Flagged compounds are retained with a reason rather than deleted", "result": "PASS", "note": "Every one of the 9 hits carries a non-empty pattern description, as the flag-not-filter rule requires" },
+          { "text": "No molecule is dropped from the library without being counted", "result": "FAIL", "note": "pains_filter uses `if mol is None: continue` with no tally, so a parse failure leaves no trace in the output" },
+          { "text": "The output names the specific interference pattern that fired", "result": "PASS", "note": "mannich_A(296), anil_di_alk_A(478), anil_di_alk_C(246) reported per compound" }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "HTS library prep with the prescribed PAINS_A + BRENK + ZINC combination",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Same script. PAINS_A 9/800 (1.1%), BRENK 288/800 (36.0%), ZINC 37/800 (4.6%); union 315/800 (39.4%) leaving 485 survivors. Pairwise overlap PAINS_A&BRENK 2, PAINS_A&ZINC 0, BRENK&ZINC 17; zero compounds flagged by all three.",
+        "note": "The prescribed combination works, but BRENK does 91% of the attrition on a lead-like set and the Skill's table frames BRENK as a fragment/virtual-library filter without an attrition expectation.",
+        "basic": 37,
+        "specialized": 53,
+        "total": 90,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The catalog combination the when-to-apply table prescribes for HTS library prep is applicable as written", "result": "PASS", "note": "PAINS_A + BRENK + ZINC all construct and run through the documented FilterCatalogParams API" },
+          { "text": "Attrition is reported per catalog and as a union rather than as one opaque number", "result": "PASS", "note": "1.1% / 36.0% / 4.6% and a 39.4% union, with pairwise overlaps" },
+          { "text": "Every removed compound is attributable to a named catalog", "result": "PASS", "note": "Set membership tracked per catalog; no compound removed without a source" },
+          { "text": "The three catalogs are shown to be non-redundant", "result": "PASS", "note": "Zero compounds flagged by all three and only 17 shared between BRENK and ZINC, so the combination is not three views of one filter" }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "The five documented SMARTS failure modes, each reproduced and each fix tested",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Ran run/inputs_3_4_6_7.py plus run/probe_pains_curcumin_and_enol.py. Fused-ring: c1ccccc1 matches naphthalene and indole, and [cR1]x6 separates them. Tautomer: a pure enol (CC(O)=C) misses [CX3]=[OX1]; both documented fixes work. Aromaticity: furan/thiazole/pyrrole/tropone all RDKit-aromatic, element-based patterns dialect-independent. Stereo: useChirality=True rejects D-alanine against an L-alanine query. Recursion: 0.011 s flat, 0.017 s one-level, 0.040 s deeply nested.",
+        "note": "Four of five failure modes reproduce exactly with working fixes; the recursive-SMARTS slowdown is real but an order of magnitude smaller than the documented 10x-100x.",
+        "basic": 37,
+        "specialized": 54,
+        "total": 91,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "c1ccccc1 matches aromatic six-cycles inside fused systems, as documented", "result": "PASS", "note": "True for naphthalene and indole, False for pyridine" },
+          { "text": "The prescribed ring-membership fix separates isolated from fused benzene", "result": "PASS", "note": "[cR1]x6 true for benzene and toluene, false for naphthalene and indole" },
+          { "text": "A keto-form SMARTS misses a pure enol, and both documented fixes recover it", "result": "PASS", "note": "CC(O)=C misses [CX3]=[OX1]; OR-expansion matches, and canonicalization converts it to CC(C)=O" },
+          { "text": "SMARTS matching is stereo-agnostic until useChirality=True", "result": "PASS", "note": "D-alanine matches an L-alanine query by default and stops matching with useChirality=True" },
+          { "text": "Recursive SMARTS cost falls in the documented 10x-100x band", "result": "FAIL", "note": "Measured 1.6x for one-level and 3.7x for a deeply nested pattern over 2,000 molecules; the direction and the prescribed prefilter fix are right, the magnitude is not" }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Custom reactive-warhead filter over covalent drugs, plus the covalent-design exemption",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "All 12 REACTIVE_SMARTS compiled. Afatinib and ibrutinib flagged Michael_acceptor, a chloroacetamide flagged alpha_halo_carbonyl, penicillin G beta_lactam, benzoyl chloride acid_halide, glycidol epoxide, phenyl isocyanate isocyanate, benzenesulfonyl fluoride sulfonyl_halide, divinyl sulfone vinyl_sulfone. Aspirin and atenolol clean. exclude_warheads=False returned no flags for any compound.",
+        "note": "The filter is correct on real covalent drugs and the aliphatic-aldehyde qualifier correctly spares benzaldehyde, but the Michael_acceptor pattern also flags curcumin and any enone with no caveat in this section, and the function recompiles all 12 SMARTS inside the per-molecule loop.",
+        "basic": 36,
+        "specialized": 52,
+        "total": 88,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "All 12 reactive SMARTS parse and flag the chemistry they are named for", "result": "PASS", "note": "12/12 compiled; each probe compound was flagged under the expected warhead name" },
+          { "text": "Known targeted covalent inhibitors are flagged, and non-covalent controls are not", "result": "PASS", "note": "Afatinib and ibrutinib flagged; aspirin and atenolol clean" },
+          { "text": "The covalent-design exemption branch suppresses all warhead flags", "result": "PASS", "note": "exclude_warheads=False returned (False, None) for all 14 probes, matching the 'warheads ARE the design' rule" },
+          { "text": "The section warns about the false-positive class its own patterns create", "result": "FAIL", "note": "Michael_acceptor flags curcumin and every enone; the PAINS section carries a false-positive caveat but this custom-filter section carries none" }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Full 3,224-compound library against all 1,585 alert patterns, plus the two performance claims",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Catalog ALL (1,585 entries) over 3,224 molecules in 49.0 s (66 mol/s), flagging 1,712 (53.1%). Catalog rebuilt per molecule 0.29 s vs reused 0.044 s over 200 molecules -- a 7x penalty. Prefilter-then-retest returned the same 199 matches as the direct recursive query in half the time.",
+        "note": "Both documented performance behaviours are real and measurable; the run completed without a single error on the full library.",
+        "basic": 37,
+        "specialized": 53,
+        "total": 90,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The 'build catalog once' advice produces a measurable speedup", "result": "PASS", "note": "7x on 200 molecules with PAINS_A" },
+          { "text": "The prefilter-then-retest fix returns identical matches, not an approximation", "result": "PASS", "note": "199 matches both ways over 3,224 molecules" },
+          { "text": "The full library runs against every catalog without an error or a silent truncation", "result": "PASS", "note": "3,224/3,224 molecules evaluated against 1,585 patterns; 1,712 flagged" },
+          { "text": "The Skill anticipates the dominant cost of a whole-library alert run", "result": "PASS", "note": "The Common Errors table names catalog initialisation as the cost, which the 7x measurement confirms" }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Pressed to use PAINS as a kill filter on a clinical candidate list",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Ran the PAINS catalog over nine compounds including six approved drugs. Flagged: quercetin, dopamine, levodopa, entacapone, epinephrine (all catechol_A(92)) and mitoxantrone (quinone_A(370)). Clean: aspirin, atorvastatin and -- unexpectedly -- curcumin, against all of PAINS_A, PAINS_B, PAINS_C and PAINS.",
+        "note": "The Skill's guardrail held and the Capuzzi caveat reproduced on real approved drugs, but its own named example scaffold (curcumin) is not covered by the catalog it tells you to use.",
+        "basic": 36,
+        "specialized": 53,
+        "total": 89,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The Skill blocks a delete-the-PAINS-compounds framing with an explicit flag-not-filter rule", "result": "PASS", "note": "Stated in the catalog table, the when-to-apply table ('Lead optimization: None mandatory') and the Critical note" },
+          { "text": "The Capuzzi FDA-overlap caveat reproduces on real approved drugs", "result": "PASS", "note": "Levodopa, entacapone, epinephrine and mitoxantrone all carry PAINS alerts" },
+          { "text": "The scaffolds the failure-mode text names are actually flagged by the catalog the Skill prescribes", "result": "FAIL", "note": "Curcumin is clean against all 480 PAINS entries; a description scan found zero patterns containing 'cur', confirmed by a hand-written enone SMARTS that does match. Only BRENK flags it (beta-keto/anhydride)" },
+          { "text": "No output makes an individual-patient or clinical claim", "result": "PASS", "note": "Answer stayed at compound-series prioritisation and orthogonal-assay recommendation" }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Ambiguous request ('find everything with an NH2') plus malformed SMARTS",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Three queries over eight probes. Naive [NH2] and [NX3;H2] both match acetamide, sulfonamide, hydrazine, urea and guanidine; the SKILL.md context-aware pattern matches only propylamine and aniline. MolFromSmarts returns None for '[OX2H', 'c1cccc' and '[Q]', and a valid 0-atom Mol for ''. SKILL.md's filter_library with an invalid pattern raised Boost.Python.ArgumentError.",
+        "note": "The Skill's grammar table anticipates exactly this ambiguity and its pattern is right on all eight probes; malformed-input handling is where it breaks down.",
+        "basic": 35,
+        "specialized": 50,
+        "total": 85,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "The grammar table warns that a naive [NH2]-style query is under-specified", "result": "PASS", "note": "The [N;H2] row states it 'also matches non-amine NH2 environments unless context is added'" },
+          { "text": "The Skill's context-aware primary-amine pattern excludes amide, sulfonamide, urea and guanidine nitrogens", "result": "PASS", "note": "Correct on all 8 probes where the two naive queries were wrong on 5" },
+          { "text": "An invalid SMARTS produces an actionable error from the Skill's own snippets", "result": "FAIL", "note": "filter_library and pains_filter pass None straight to HasSubstructMatch, giving a four-line Boost C++ signature dump" },
+          { "text": "The shipped example converts an invalid SMARTS into a named error", "result": "PASS", "note": "has_substructure raises ValueError('Invalid SMARTS: ...'); SKILL.md never adopts this guard" },
+          { "text": "An empty SMARTS is rejected or reported rather than silently changing the result set", "result": "FAIL", "note": "MolFromSmarts('') returns a valid 0-atom query that matches nothing, so an include filter silently returns an empty library with no error" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 34.8,
+    "dynamic_weighted": 53.6,
+    "score": 88,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Every one of the seven filter-catalog sizes it tabulates matches the installed RDKit exactly, including the PAINS A/B/C split (16/55/409) -- a level of factual precision that is rare in this material.",
+    "It gets the science of PAINS right where most sources do not: an interference flag requiring orthogonal validation, not a deletion rule, stated three times and backed by the Capuzzi 2017 citation, which reproduced on four approved drugs.",
+    "Four of its five documented SMARTS failure modes reproduced exactly, and every prescribed fix worked -- ring-membership constraints, OR-expansion, canonicalize-first, useChirality, and prefilter-then-retest (identical 199 matches, half the time).",
+    "The context-aware amine patterns are correct where the obvious query is wrong: they exclude amide, sulfonamide, urea, hydrazine and guanidine nitrogens that both naive queries accept.",
+    "The when-to-apply table encodes real medicinal-chemistry judgement, including the covalent-design exemption, which the exclude_warheads branch implements correctly."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "Ester SMARTS silently misses every -O-CH< ester",
+      "observed_in": [],
+      "problem": "The Common SMARTS Patterns table gives ester as [CX3](=O)[OX2][!H]. In SMARTS, [!H] means 'not exactly one attached hydrogen', not 'not a hydrogen atom', so the pattern returns False for isopropyl acetate and any other ester whose O-substituted carbon carries one H. The shipped example uses [CX3](=O)[OX2][C] instead, which catches isopropyl but misses aryl esters such as aspirin.",
+      "root_cause": "[!H] was written as if H were an element primitive; the two files were never cross-checked because the example asserts nothing.",
+      "fix": "Change the table entry to [CX3](=[OX1])[OX2][#6] (and make the example match), then add a regression case for CC(=O)OC(C)C and CC(=O)Oc1ccccc1 to the example's __main__."
+    },
+    {
+      "priority": "P1",
+      "title": "Invalid or empty SMARTS is not guarded in any SKILL.md snippet",
+      "observed_in": [7],
+      "problem": "filter_library, pains_filter and the basic-match snippet pass the result of MolFromSmarts straight into HasSubstructMatch. An invalid pattern produces a four-line Boost C++ signature dump; an empty string produces a valid 0-atom query that matches nothing, so an include filter returns an empty library with no error at all.",
+      "root_cause": "The None guard exists only in the shipped example's has_substructure and was never propagated into the SKILL.md patterns the agent actually copies.",
+      "fix": "Add a compile_smarts(s) helper to SKILL.md that raises ValueError on None and on a zero-atom query, and route every snippet through it."
+    },
+    {
+      "priority": "P2",
+      "title": "Curcumin is named as a PAINS_A target but RDKit's catalog has no curcumin pattern",
+      "observed_in": [6],
+      "problem": "The PAINS false-positive failure mode says PAINS_A patterns target 'rhodanines, curcumins, polyhydroxylated polyphenols'. Curcumin is clean against all 480 PAINS entries in RDKit 2026.03.6; only BRENK flags it. A scan of all catalog descriptions found no entry containing 'cur'.",
+      "root_cause": "The sentence describes the Baell & Holloway paper's scope rather than the RDKit FilterCatalog implementation the Skill tells the reader to use.",
+      "fix": "Replace 'curcumins' with a scaffold the RDKit catalog does cover (rhodanines fire as ene_rhod_A(235); catechols as catechol_A(92)) and add a line noting that RDKit's PAINS implementation does not reproduce every alert class in the original paper."
+    },
+    {
+      "priority": "P2",
+      "title": "Recursive-SMARTS slowdown is overstated by an order of magnitude",
+      "observed_in": [3],
+      "problem": "The performance failure mode states a 10x-100x slowdown. Measured over 2,000 molecules: 1.6x for a one-level recursive amine pattern and 3.7x for a deeply nested one.",
+      "root_cause": "The figure appears to be carried from an older toolkit or an unusually pathological pattern and was never re-measured.",
+      "fix": "State a measured range with the pattern and library size it was measured on, or drop the numeric claim and keep the prefilter-then-retest fix, which does work (identical matches at half the cost)."
+    },
+    {
+      "priority": "P2",
+      "title": "BRENK attrition on lead-like libraries is not anticipated",
+      "observed_in": [2],
+      "problem": "The prescribed HTS library-prep combination removed 39.4% of a lead-like ChEMBL set, of which BRENK alone accounted for 288 of 315 compounds. The catalog table frames BRENK as 'useful for fragment / virtual library' and offers no expectation of how much it removes from a drug-like collection.",
+      "root_cause": "The when-to-apply table recommends catalog combinations without characterising their cost on different library types.",
+      "fix": "Add an expected-attrition column or a short note giving typical flag rates per catalog on fragment, lead-like and drug-like collections, and advise reviewing BRENK hits by category rather than deleting them wholesale."
+    },
+    {
+      "priority": "P2",
+      "title": "Reactive-filter section lacks the false-positive caveat the PAINS section has",
+      "observed_in": [4],
+      "problem": "REACTIVE_SMARTS flagged curcumin and would flag any enone under Michael_acceptor, and flags penicillin G under beta_lactam. The PAINS section carries an explicit false-positive warning; this section carries none, so a user is more likely to treat these flags as deletions.",
+      "root_cause": "The custom-filter section was written as a utility rather than as a judgement call, unlike the catalog sections around it.",
+      "fix": "Add two or three lines mirroring the PAINS caveat: name the classes each pattern over-calls (enones, beta-lactam antibiotics, aliphatic aldehydes) and repeat the flag-not-delete rule. Also hoist the MolFromSmarts calls out of reactive_filter's per-molecule loop."
+    }
+  ]
+}
