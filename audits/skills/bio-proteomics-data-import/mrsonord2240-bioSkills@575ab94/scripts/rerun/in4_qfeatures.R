@@ -1,0 +1,15 @@
+# Data-import Input 4 (R part): the Skill names QFeatures::readQFeatures but gives no R code; agent-written import. SYNTHETIC data.
+.libPaths(c('F:/OpenScience/audit-envs/mass-spec-proteomics-analyst/R-lib', .libPaths()))
+suppressPackageStartupMessages(library(QFeatures))
+pg <- read.delim('F:/OpenScience/audits/bio-proteomics-data-import/data/proteinGroups_failed.txt', quote = '', check.names = FALSE)
+cat('readQFeatures formals:', paste(names(formals(readQFeatures)), collapse = ','), '\n')
+qcols <- grep('^LFQ intensity ', names(pg))
+qf <- readQFeatures(pg, quantCols = qcols, name = 'proteinGroups')
+cat('features read:', nrow(qf[[1]]), '\n')
+r1 <- tryCatch({ filterFeatures(qf, ~ Reverse != '+' & `Potential contaminant` != '+'); 'OK' }, error = function(e) paste('ERROR:', conditionMessage(e)))
+cat('filterFeatures with MaxQuant column names as-is:', substr(r1, 1, 160), '\n')
+rd <- rowData(qf[[1]]); colnames(rd) <- make.names(colnames(rd)); rowData(qf[[1]]) <- rd
+qf <- filterFeatures(qf, ~ !(Reverse %in% '+') & !(Potential.contaminant %in% '+') & !(Only.identified.by.site %in% '+'))
+qf <- zeroIsNA(qf, 1); qf <- logTransform(qf, i = 1, name = 'log2LFQ')
+m <- assay(qf[['log2LFQ']])
+cat('after filter + zeroIsNA + log2:', dim(m), '| -Inf:', any(is.infinite(m)), '| NA %:', round(100 * mean(is.na(m)), 1), '\n')

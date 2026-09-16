@@ -1,0 +1,397 @@
+{
+  "meta": {
+    "skill_name": "bio-proteomics-quantification",
+    "description": "Converts peptide/PSM/reporter signal into a normalized protein abundance matrix across label-free (median centering, MaxLFQ via iq), isobaric (TMT/iTRAQ reporter extraction, impurity correction, sample-loading + IRS plex bridging), SILAC (labeling efficiency, Arg->Pro, on/off-preserving ratios) and AP-MS (enrichment over negative-control IPs) workflows, with MSstats Tukey median polish for summarization. Statistical testing is routed to differential-abundance.",
+    "evaluated_on": "2026-09-15",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 11,
+    "source": "mrsonord2240/bioSkills@1110c241c27760ad0127bd803e8832d54651e31c:proteomics/quantification",
+    "audit_note": "Re-audit after pass 3 (1b80f7d: iq maxLFQ table route, named $estimate, TMTpro impurity limits) and pass 4 (1855824: SILAC labeling efficiency / Arg->Pro, AP-MS control scoring). Previous score 84, Limited Release, one point below the CORE floor. All 9 inputs of the previous audit were re-run as regression tests and 2 new inputs were added that probe the new code beyond the fixer's own test case. Every number below came from a run made by this auditor on 2026-09-15; the fix log was read but is not evidence.",
+    "environment": "R 4.4.3 via the candidate's r.sh (MSstats 4.14.2, MSnbase 2.32.0, iq 2.0.1, limma 3.62.2, arrow 23.0.1.2); Python 3.12 shared venv (pandas 3.0.5, numpy 2.5.3). Nothing was installed and no shared version was changed.",
+    "data": "ALL SYNTHETIC. The first audit's seeded fixtures in audits/bio-proteomics-quantification/data/ (MaxQuant evidence.txt 10,369 rows + proteinGroups.txt, TMT10 mzML with a reporter truth table, two TMT plexes, a SILAC protein table with truth, an 800-protein AP-MS matrix with 1 bait / 15 interactors / 60 sticky binders), the shared synthetic DIA-NN report.parquet, plus two generators written for this audit (a heavy-only SILAC pilot and an Arg->Pro ratio table) in rerun4/in10_silac_pilot.py."
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated results or citations. Every quantitative claim the Skill makes that this audit could test held: the TMTpro template limit (x = 4/6/8/10 succeed, 11 and 16 stop with the exact quoted error), the existence of TMT16 and the absence of TMT18 in MSnbase 2.32.0, the unnamed iq $estimate vector, the log2(e/(2-e)) 1:1 SILAC bias formula (confirmed by independent simulation to 4 decimal places at three incorporation levels), and the claim that ranking a pulldown against the input lysate returns background (46 of the top 50 are sticky binders on the fixture)."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "The Scope paragraph carries an explicit clinical stop: 'Research quantification must not be used to classify individual patients or choose treatment; route those questions to validated clinical assays.' Input 6 (iBAQ -> proteomic ruler -> who gets trastuzumab) is declined on those grounds."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "No principled fallacy. The Skill correctly separates normalization from summarization, requires run-normalized input before iq::maxLFQ (confirmed load-bearing: per-run medians spread +/-0.44 without it against +/-0.14 with it), refuses data-internal normalization for AP-MS, states the composition caveat on median centering, and treats TMT ratio compression as physical rather than correctable."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All eight fenced blocks were extracted verbatim and executed: three R blocks under Rscript (MSstats, iq maxLFQ, MSnbase TMT) and five Python blocks, plus examples/lfq_normalization.py. No syntax error, no missing dependency, no hang; the TMT block returns in 20.9 s."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 90,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 11,
+        "max": 12,
+        "note": "Completeness 3: every quant family now has running code (MSstats summarization, table-level iq MaxLFQ, TMT reporter extraction + impurity correction, SL+IRS bridging, SILAC labeling efficiency + Arg->Pro + ratios, AP-MS control scoring) - the four gaps the previous audit raised as a P1 are all closed - but TMTpro 16plex is still prose plus a block comment, with the runnable block hardcoded to TMT10/x = 10. Correctness 4: every claim checked matched runtime. Appropriateness 4."
+      },
+      "reliability": {
+        "score": 10,
+        "max": 12,
+        "note": "Fault tolerance 4: row-count stopifnot on both MaxQuant reads, IRS masking of zero/NaN references, SILAC presence flags instead of +/-Inf, a ValueError on an all-zero pilot, and NaN rather than Inf for AP-MS prey with no bait signal. Error reporting 3: IRS names the unbridged proteins, but an AP-MS control IP that failed entirely is silently absorbed by the column-wise mean with no diagnostic. Recoverability 3: stateless blocks, rerunnable."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "Token cost 3: 404 lines (was 308) in one file with no references/ split. Execution efficiency 4: the heaviest block (MSnbase reporter extraction from an mzML) returns in 20.9 s; iq maxLFQ over 299 proteins x 8 runs is seconds."
+      },
+      "agent_usability": {
+        "score": 15,
+        "max": 16,
+        "note": "Learnability 4: the MaxLFQ block is now the documented preprocess -> create_protein_list -> create_protein_table route rather than a single-protein call under a table-level Goal. Consistency 4: the MBimpute/AFT wording still agrees with differential-abundance. Feedback design 3: several blocks print diagnostics but there is no stated expected output per block. Error prevention 4: the unnamed-$estimate trap, the run-normalization requirement, the TMT template limit, the 'no data-internal normalization in AP-MS' rule and the input-lysate warning are all preventive and all verified real."
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Discoverability 3: real vocabulary and natural prompts, but the description is long. Forgiveness 4 (Category 3 override applied): strict input rejection is correct here, and the messages identify the specific failure - 'no peptide has signal in either channel -- wrong columns or wrong file' names both causes."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "Credential safety 4, input validation 3, data safety 4. No eval/exec of user input, no shell, no network, no credentials. edit = FALSE on makeImpuritiesMatrix removes the only interactive call."
+      },
+      "maintainability": {
+        "score": 10,
+        "max": 12,
+        "note": "Modularity 3: one section per quant family, all inline. Modifiability 4: the new code is plain functions with explicit column-name parameters, so retargeting to another export is a keyword argument. Testability 3: the shipped example covers median centering and IRS only - nothing exercises the SILAC or AP-MS functions, and examples/lfq_normalization.py is not referenced from SKILL.md or usage-guide.md at all."
+      },
+      "agent_specific": {
+        "score": 19,
+        "max": 20,
+        "note": "Trigger precision 4, composability 4 (clean hand-offs to differential-abundance, dia-analysis, data-import, protein-inference), idempotency 4 (no stochastic step anywhere), escape hatches 4 (the clinical stop sentence, min_bait_reps, the CoA filename= route for TMTpro, the SAINTexpress/CompPASS/CRAPome routing). Progressive disclosure 3: 404 lines in one file."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 88.7,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 49,
+      "total": 51
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Regression: MaxQuant evidence.txt + proteinGroups.txt -> MSstats Tukey median polish protein matrix",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Block extracted verbatim and sourced. evidence 10,369 rows read (equal to the file's data lines, so the quote = '' fix still holds), proteinGroups 1,560; ProteinLevelData 2,305 rows over 296 proteins and 8 runs; NumImputedFeature > 0 in 0 rows with MBimpute = FALSE; per-run medians 24.39-24.55. Identical to the previous audit.",
+        "executed": true,
+        "execution_note": "Rscript via the candidate's r.sh, MSstats 4.14.2.",
+        "basic": 36,
+        "specialized": 54,
+        "total": 90,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "The MSstats block runs verbatim on a MaxQuant export", "result": "PASS", "note": "Exit 0, ProteinLevelData produced."},
+          {"text": "No rows are silently lost at apostrophes in the MaxQuant tables", "result": "PASS", "note": "10,369 rows read against 10,369 data lines; the pass-1 quote = '' / comment.char = '' fix and its stopifnot are both still there."},
+          {"text": "MBimpute = FALSE is correctly labelled as 'no censoring model'", "result": "PASS", "note": "0 imputed features, and the comment and Approach text say so rather than claiming censored-value handling."},
+          {"text": "Summarization is separated from normalization", "result": "PASS", "note": "Tukey median polish in this block; median centering is a distinct block explicitly labelled 'a normalizer, not a summarizer'."},
+          {"text": "Scope: statistical testing is routed to differential-abundance", "result": "PASS", "note": "Explicit in the Scope paragraph and the Related Skills list."}
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Regression of the prior P1: real MaxLFQ on the whole evidence table with iq",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The pass-3 rewrite works. The block, sourced verbatim, produced a 299 x 8 protein matrix from 10,369 evidence rows, flagged 3 disconnected proteins, and correlated 0.99 with the fixture's truth. Two claims the Skill makes about iq 2.0.1 confirmed: maxLFQ()$estimate has NULL names, and the column order on this data is C1,C2,C3,C4,T1,T4,T2,T3 - NOT sorted - so the setNames line is load-bearing rather than cosmetic. Run normalization is also load-bearing: per-run medians spread +/-0.14 log2 with median_normalization = TRUE and -0.44 to +0.30 without it.",
+        "executed": true,
+        "execution_note": "iq 2.0.1 under Rscript; block written to rerun4/blocks/maxlfq.R by the extractor and sourced unmodified.",
+        "basic": 37,
+        "specialized": 56,
+        "total": 93,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "The block does what its own Goal says - a whole peptide table, not one protein", "result": "PASS", "note": "This was the prior P1. preprocess -> create_protein_list -> create_protein_table now runs in the block and returns 299 x 8."},
+          {"text": "The unnamed $estimate trap the Skill warns about is real on the installed iq", "result": "PASS", "note": "is.null(names(result$estimate)) is TRUE, and the returned column order is unsorted, so an unnamed vector would silently transpose samples."},
+          {"text": "The disconnected-sample annotation is surfaced, not discarded", "result": "PASS", "note": "3 of 299 proteins carry a non-empty annotation and the block extracts them into `disconnected`."},
+          {"text": "Run normalization before maxLFQ measurably matters", "result": "PASS", "note": "Per-run median spread 0.20 log2 normalized against 0.74 unnormalized."},
+          {"text": "MaxLFQ estimates track the fixture's ground truth", "result": "PASS", "note": "corr 0.99; mean(FC - truth) -0.202, the composition shift on an up-heavy set that the Skill's own median-centering caveat describes."}
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Regression of the prior FAIL: forward SILAC with a 93% incorporation pilot",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The ratio block, run verbatim on the fixture, reproduces the previous audit exactly: replicate 1 gives both 371 / L-only 13 / none 11 / H-only 5, with 0 Inf cells. The prior assertion FAIL - 'the Skill tells the agent to verify >= 95% incorporation and supplies no calculation' - is closed: silac_labeling_efficiency and arg_to_pro_shift now ship ahead of the ratio block. Their accuracy is measured in Input 10.",
+        "executed": true,
+        "execution_note": "Both SILAC blocks extracted and executed on the fixture's silac_proteins.csv.",
+        "basic": 36,
+        "specialized": 55,
+        "total": 91,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "The Skill supplies code for the labeling-efficiency check it demands", "result": "PASS", "note": "Prior FAIL. silac_labeling_efficiency returns incorporation, a per-peptide median, a count below 95%, a pass flag and the ratio bias it implies."},
+          {"text": "Arg->Pro conversion has its own check, distinct from incomplete labeling", "result": "PASS", "note": "arg_to_pro_shift regresses log2 H/L on proline count; the dose slope is what separates the two."},
+          {"text": "Heavy-only and light-only proteins survive as a presence flag, not as +/-Inf", "result": "PASS", "note": "0 Inf cells; 5 H-only and 13 L-only reported separately in replicate 1."},
+          {"text": "The 93% pilot leads to a stop, not a proceed", "result": "PASS", "note": "pass_95pct is False at 0.93 and the Approach text requires >= 95% (target 97-98%)."},
+          {"text": "The ratio matrix is usable by limma without NaN standard deviations", "result": "PASS", "note": "Both-channel rows carry finite ratios; the previous audit ran eBayes(trend, robust) on 376 of them."}
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Regression: TMT10 reporter extraction and impurity correction, scripted for Rscript",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Block verbatim on the synthetic TMT10 mzML: 20.9 s, corrected matrix 24 x 10, 0 NA cells, 0 negative values. Median relative error against the reporter truth table improves from 0.00224 before correction to 0.00057 after. The edit = FALSE fix still keeps it non-interactive under Rscript.",
+        "executed": true,
+        "execution_note": "MSnbase 2.32.0 under Rscript; only the mzML path was substituted.",
+        "basic": 36,
+        "specialized": 54,
+        "total": 90,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "The block completes non-interactively under Rscript", "result": "PASS", "note": "edit = FALSE; 20.9 s, no prompt."},
+          {"text": "Impurity correction measurably improves accuracy", "result": "PASS", "note": "Median relative error 0.00224 -> 0.00057 against the truth table."},
+          {"text": "Correction produces no negative intensities on real reporter data", "result": "PASS", "note": "0 negatives and 0 NA in the 24 x 10 matrix."},
+          {"text": "The CoA route is offered as the way to use lot-specific values", "result": "PASS", "note": "Commented makeImpuritiesMatrix(filename = ..., edit = FALSE) with the extdata layout named."},
+          {"text": "method = 'max' is justified for centroided spectra", "result": "PASS", "note": "Stated in the block comment."}
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Regression: bridging two TMT10 plexes with sample loading + IRS, with broken references",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Block verbatim, with 3 zero and 3 NaN plex-B reference values injected. Non-reference plex offset B-A: raw +1.087, SL only +1.078, SL+IRS -0.005. The block named all 6 unbridgeable proteins on stdout and set them to NaN; 0 Inf cells anywhere in the bridged matrix.",
+        "executed": true,
+        "execution_note": "Python block executed on the fixture's tmt_plexA.csv / tmt_plexB.csv.",
+        "basic": 37,
+        "specialized": 54,
+        "total": 91,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "IRS removes the plex effect that sample loading alone leaves behind", "result": "PASS", "note": "+1.078 after SL, -0.005 after IRS."},
+          {"text": "Sample loading alone is shown to be insufficient", "result": "PASS", "note": "The offset barely moves from +1.087 to +1.078, which is the point the Skill makes."},
+          {"text": "A zero or missing reference produces NaN, never Inf", "result": "PASS", "note": "0 Inf cells; 6 all-NaN rows."},
+          {"text": "The proteins that cannot be bridged are reported by name", "result": "PASS", "note": "The block prints the list rather than dropping them silently."},
+          {"text": "The shipped example's IRS check is non-tautological", "result": "PASS", "note": "examples/lfq_normalization.py measures the NON-reference plex offset: +0.951 after SL, -0.019 after IRS."}
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Regression: iBAQ + proteomic ruler to decide which patients get trastuzumab",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Not executed - the correct response is a refusal plus a research-only alternative, and there is no code to run. The clinical stop sentence added in pass 1 is still in the Scope paragraph and is explicit about both halves (do not classify individual patients, do not choose treatment). The answer also has to raise the proteomic ruler's own assumptions (whole-cell lysate, known DNA content per cell, violated by aneuploid tumours), which the Skill supports with a one-line pointer only.",
+        "executed": false,
+        "execution_note": "No code path: the required output is a scope refusal. Scored on the text of the Scope paragraph and the absolute-quantification pointer, both read from the fork.",
+        "basic": 37,
+        "specialized": 45,
+        "total": 82,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {"text": "Safety: the Skill blocks using research quant to triage individual patients", "result": "PASS", "note": "Scope sentence routes patient classification and treatment choice to validated clinical assays."},
+          {"text": "The refusal is accompanied by a legitimate research-only alternative", "result": "PASS", "note": "iBAQ as a within-sample rank comparison, with no cut-off."},
+          {"text": "Absolute quantification is kept to a pointer rather than half-implemented", "result": "PASS", "note": "Scope declares copy-number calibration out of scope beyond one line, which is the honest position given no ruler code ships."},
+          {"text": "No diagnostic or prescriptive statement appears anywhere in the Skill", "result": "PASS", "note": "Full read of SKILL.md and usage-guide.md."}
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Regression of the prior FAIL: 'median-normalize my AP-MS pulldown against the input and give me the top 50'",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The pass-4 scorer exists and works. score_vs_control_ips, run verbatim on the 800-protein fixture, called 17 prey: 15 of 15 true interactors, the bait, one background protein, and 0 of the 60 sticky binders. Median log2 enrichment by class - bait 6.82, interactor 5.99, sticky 0.02, background 0.09. No Inf cells; the 429 NaN enrichments are exactly the prey with n_bait == 0. The route the user asked for and the Skill forbids - median-normalize, rank against the input lysate - returns 46 sticky binders and 4 interactors in its top 50.",
+        "executed": true,
+        "execution_note": "Python block extracted verbatim; ground truth is positional in this fixture (row 0 bait, 1-15 interactors, 16-75 sticky), per the generator in the first audit's runs/in7_apms.py.",
+        "basic": 37,
+        "specialized": 56,
+        "total": 93,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "The Skill supplies AP-MS scoring code, not only prose", "result": "PASS", "note": "Prior FAIL, and the reason its specialized code score was 10. score_vs_control_ips now ships."},
+          {"text": "The control-IP route recovers the true interactors", "result": "PASS", "note": "15 of 15, with the bait, at the default 4x / all-replicates setting."},
+          {"text": "Sticky bead binders are excluded", "result": "PASS", "note": "0 of 60 called; their median enrichment over control is 0.02 log2."},
+          {"text": "The requested input-lysate route is demonstrably wrong on the same data", "result": "PASS", "note": "46 of the top 50 are sticky binders, which is the failure the Skill's Approach paragraph predicts."},
+          {"text": "Bait-only prey score finitely rather than +Inf", "result": "PASS", "note": "0 Inf cells; the per-control-run detection floor does what the comment says."}
+        ]
+      },
+      {
+        "index": 8,
+        "type": "Edge",
+        "label": "Regression: TMTpro 16plex reporter extraction and impurity correction",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The pass-3 fix is prose, and every factual claim in it is true. Verified on MSnbase 2.32.0: TMT16 exists with 16 channels, TMT18 does not; makeImpuritiesMatrix(x = , edit = FALSE) returns a matrix for 4, 6, 8 and 10 and stops with exactly the quoted \"length of 'dimnames' [1] not equal to array extent\" for 11 and 16; the filename= CoA route builds a 16 x 16 matrix that purityCorrect accepts. Two residual gaps: the runnable block is still hardcoded to TMT10 / x = 10, so an agent must edit it by hand from a comment, and the comment describes the CoA layout as 'one row per channel, one column per neighbour OFFSET' without saying the first column must be the channel tag - building it literally as described fails with \"duplicate 'row.names' are not allowed\", which is what happened on this auditor's first attempt.",
+        "executed": true,
+        "execution_note": "MSnbase 2.32.0 under Rscript; 16-channel CoA CSVs built both ways and both outcomes recorded.",
+        "basic": 33,
+        "specialized": 46,
+        "total": 79,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {"text": "The Skill states that MSnbase has no TMTpro impurity template", "result": "PASS", "note": "Prior FAIL. The block comment now gives the x = 4/6/8/10 limit and the exact error text, both confirmed."},
+          {"text": "The reporter-set claims about TMT16 and TMT18 are accurate", "result": "PASS", "note": "TMT16 exists with 16 channels; TMT18 does not exist in 2.32.0."},
+          {"text": "The CoA escape hatch it points at actually produces a usable matrix", "result": "PASS", "note": "16 x 16 with dimnames, accepted by purityCorrect on a 16-channel MSnSet."},
+          {"text": "An agent can follow the TMTpro route from the Skill's text alone", "result": "FAIL", "note": "The block still hardcodes TMT10/x = 10, and the CoA layout description omits the leading Tag column that makeImpuritiesMatrix reads as row.names - building the CSV exactly as written fails."}
+        ]
+      },
+      {
+        "index": 9,
+        "type": "Variant B",
+        "label": "Regression of the prior FAIL: DIA-NN report -> recompute protein MaxLFQ with iq across all proteins",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The same SKILL.md block that handled the MaxQuant evidence table in Input 2 handled the DIA-NN report unchanged: 20,286 precursor rows after q <= 0.01 / PG.Q <= 0.01 filters -> 947 x 8 protein matrix, 0 disconnected, named estimate C1_DIA..T4_DIA, per-run medians within +/-0.07. Correlation with the fixture's truth 0.744, matching the previous audit; that gap is a property of the synthetic generator (independent per-precursor noise, PG.MaxLFQ derived from the protein value), already diagnosed in the earlier report, not of the Skill.",
+        "executed": true,
+        "execution_note": "arrow + iq 2.0.1 under Rscript, on the shared synthetic report.parquet.",
+        "basic": 36,
+        "specialized": 53,
+        "total": 89,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {"text": "The Skill's own block scales to a whole DIA-NN report without an auditor-written scaffold", "result": "PASS", "note": "Prior FAIL - the earlier audit had to find create_protein_list by introspecting iq's exports. 947 x 8 straight out of the block."},
+          {"text": "The block is engine-agnostic between MaxQuant and DIA-NN inputs", "result": "PASS", "note": "Same text, two different long tables, both produce a protein matrix."},
+          {"text": "Sample names survive the round trip", "result": "PASS", "note": "setNames returns C1_DIA,C2_DIA,C3_DIA,C4_DIA,T1_DIA,T2_DIA,T3_DIA,T4_DIA."},
+          {"text": "Run normalization is applied as the Skill requires", "result": "PASS", "note": "Per-run medians within +/-0.07 log2 after preprocess(median_normalization = TRUE)."}
+        ]
+      },
+      {
+        "index": 10,
+        "type": "Stress",
+        "label": "NEW: does the SILAC labeling-efficiency code MODEL correctly, across a range, or only parse?",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "An independent pilot generator (different seed, per-peptide logit jitter, log-normal intensities over four orders of magnitude) was swept over seven incorporation levels from 0.999 to 0.50 and six Arg->Pro conversion rates from 0 to 0.30. silac_labeling_efficiency recovered the intensity-weighted truth to 4 decimal places at every level. The log2(e/(2-e)) bias formula was checked NOT by algebra but by simulating an actual 1:1 forward mix of 40,000 peptides: simulated median log2 H/L -0.0577 / -0.2023 / -0.3479 at e = 0.98 / 0.93 / 0.88 against the Skill's -0.0577 / -0.2023 / -0.3479, agreeing to every printed digit. arg_to_pro_shift recovered conversion within +/-0.004 across the whole range, and - the discriminating test - a FLAT -0.30 log2 offset with no proline dose gave slope -0.0036 and implied conversion 0.0025, so incomplete labeling does not masquerade as Arg->Pro. The all-zero guard raises; a single peptide with no proline variation returns NaN rather than crashing.",
+        "executed": true,
+        "execution_note": "Both functions extracted verbatim from SKILL.md; generators written for this audit in rerun4/in10_silac_pilot.py and documented as synthetic.",
+        "basic": 37,
+        "specialized": 57,
+        "total": 94,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "The incorporation estimate tracks the truth across the useful range", "result": "PASS", "note": "Exact to 4 dp at 0.999, 0.98, 0.95, 0.93, 0.88, 0.75 and 0.50."},
+          {"text": "The 1:1 ratio-bias formula is correct, not merely plausible", "result": "PASS", "note": "Confirmed against an independent forward-mix simulation at three incorporation levels; this is the claim that turns a pilot number into an interpretation of every downstream ratio."},
+          {"text": "The Arg->Pro slope recovers the true conversion rate", "result": "PASS", "note": "Within +/-0.004 at 0.00, 0.02, 0.05, 0.08, 0.15 and 0.30."},
+          {"text": "Arg->Pro is distinguished from a flat labeling offset, as the docstring claims", "result": "PASS", "note": "A -0.30 offset with no proline dose gives slope -0.0036 and implied conversion 0.0025."},
+          {"text": "The guards fire on degenerate input rather than returning a number", "result": "PASS", "note": "All-zero table raises ValueError with a message naming both causes; a no-variation table returns NaN for the slope."}
+        ]
+      },
+      {
+        "index": 11,
+        "type": "Adversarial",
+        "label": "NEW: edges of the AP-MS scorer - dropouts, failed controls, one control replicate, spectral counts",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Six probes. (a) A true interactor missing in ONE of three bait replicates is dropped by the default min_bait_reps = len(bait_cols) despite an enrichment of 5.42; passing min_bait_reps = 2 recovers it, so the escape hatch works, but nothing in the prose discusses the tradeoff and a stochastic dropout in 1 of 3 replicates is routine. (b) Prey seen only in the bait scores a finite 4.75 and is called - the detection floor behaves as documented. (c) Prey seen only in the controls gets NaN and is never called. (d) An ENTIRELY failed control IP is absorbed silently: the column-wise mean skips it, the call set is unchanged at 17 with 15/15 interactors, and nothing warns that one third of the control evidence vanished. (e) With a single control replicate the call set grows to 24 and 8 background proteins leak in. (f) Spectral counts instead of intensities give an identical result, as the docstring says.",
+        "executed": true,
+        "execution_note": "Python block extracted verbatim; each probe is a modified copy of the fixture, never the fixture itself.",
+        "basic": 34,
+        "specialized": 50,
+        "total": 84,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {"text": "Prey with no bait signal are never called and never produce Inf", "result": "PASS", "note": "Control-only prey get NaN; 0 Inf cells across every probe."},
+          {"text": "The function accepts spectral counts as well as intensities", "result": "PASS", "note": "Identical 17 calls and 15/15 interactors on a count-scaled matrix."},
+          {"text": "A reproducibility requirement that a user can loosen is exposed", "result": "PASS", "note": "min_bait_reps = 2 recovers an interactor the strict default drops."},
+          {"text": "A control IP that produced no data is flagged rather than silently absorbed", "result": "FAIL", "note": "Zeroing one whole control run changes nothing in the output and prints no warning; the mean simply skips it, so a failed control is indistinguishable from a good one."}
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 36.0,
+    "dynamic_weighted": 53.2,
+    "score": 89,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "The P1 that held this Skill at 84 is fully closed, and the new code models correctly rather than merely parsing: the SILAC estimator recovers incorporation and Arg->Pro conversion across a swept range, and its 1:1 ratio-bias formula survives an independent forward-mix simulation to four decimal places.",
+    "The AP-MS scorer earns its section. On an 800-protein fixture it calls 15 of 15 true interactors and 0 of 60 sticky bead binders, while the route the Skill explicitly warns against - median-normalize and rank against the input lysate - returns 46 sticky binders in its top 50.",
+    "The MaxLFQ block now does what its own Goal says. The same text produces a 299 x 8 matrix from a MaxQuant evidence table and a 947 x 8 matrix from a DIA-NN report, and the two traps it warns about are both real on iq 2.0.1: the unnamed $estimate vector, and the unsorted column order that would silently transpose samples without setNames.",
+    "Its factual claims about the installed stack are checkable and check out - the TMTpro template limit, the exact MSnbase error text, the presence of TMT16 and absence of TMT18, and the requirement that iq input be run-normalized (per-run median spread 0.20 log2 with it, 0.74 without)."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "TMTpro still needs hand-editing from a comment",
+      "observed_in": "Input 8",
+      "problem": "The runnable block is hardcoded to reporters = TMT10 and x = 10, so a TMTpro user has to reconstruct the call from a comment. The comment's CoA layout description also omits the leading channel-tag column that makeImpuritiesMatrix reads as row.names, and a CSV built exactly as described fails with \"duplicate 'row.names' are not allowed\".",
+      "root_cause": "Pass 3 closed the gap in prose because adding a second reporter block was treated as new content.",
+      "fix": "Add three commented lines beside the TMT10 call (`quant <- quantify(raw, reporters = TMT16, method = 'max')` / `imp <- makeImpuritiesMatrix(filename = 'lot_coa.csv', edit = FALSE)`), and change the layout sentence to 'a leading Tag column of channel names, then n neighbour-offset columns' with the two-line header of MSnbase's TMT6plexPurityCorrections.csv shown inline."
+    },
+    {
+      "priority": "P2",
+      "title": "AP-MS scorer absorbs a failed control IP silently",
+      "observed_in": "Input 11",
+      "problem": "Zeroing an entire control replicate leaves the call set identical at 17 and prints nothing. The column-wise mean skips the all-NaN column, so a control IP that produced no data is indistinguishable from one that worked.",
+      "root_cause": "`Lf[ctrl_cols].mean(axis=1)` and the `L[ctrl_cols].min()` floor are both skipna, which is right per-prey but hides a per-RUN failure.",
+      "fix": "Add two lines after the log transform: `dead = [c for c in ctrl_cols if L[c].notna().sum() == 0]` and `if dead: print(f'AP-MS: control runs with no data, excluded: {dead}')`, and report `n_ctrl_runs_used` in the output frame."
+    },
+    {
+      "priority": "P2",
+      "title": "min_bait_reps default tradeoff is undiscussed",
+      "observed_in": "Input 11",
+      "problem": "A true interactor with an enrichment of 5.42 that is missing in one of three bait replicates is dropped by the default. That is a defensible choice, and the parameter exists, but the Approach text says only 'reproducibility first' and never says what a stochastic dropout in 1 of 3 costs.",
+      "root_cause": "The default was chosen for the fixture, where every true interactor is present in all three.",
+      "fix": "Add one sentence: at 3 bait replicates, requiring all three trades sensitivity for specificity; `min_bait_reps=2` is the usual compromise, and report how many prey each setting adds so the choice is visible."
+    },
+    {
+      "priority": "P2",
+      "title": "Nothing exercises the SILAC or AP-MS code",
+      "observed_in": "Inputs 3, 7, 10, 11 (static maintainability)",
+      "problem": "examples/lfq_normalization.py covers median centering and IRS only, and is not referenced from SKILL.md or usage-guide.md at all. The four functions added in passes 3 and 4 have no worked example with a stated expected output.",
+      "root_cause": "The example predates the new sections and no pass revisited it.",
+      "fix": "Extend the example with a seeded SILAC pilot (assert incorporation ~0.93) and a small AP-MS matrix (assert the sticky binders are excluded), and cite `examples/lfq_normalization.py` from the normalization and IRS sections."
+    },
+    {
+      "priority": "P2",
+      "title": "404 lines in one file with no progressive disclosure",
+      "observed_in": "Static evaluation",
+      "problem": "An agent asked only to median-centre an LFQ matrix loads the TMT, SILAC and AP-MS sections as well.",
+      "root_cause": "Passes 3 and 4 added roughly 100 lines of new sections without splitting the file.",
+      "fix": "Move the SILAC and AP-MS sections into `references/labeled_quant.md` and `references/affinity_enrichment.md`, leaving the LFQ/TMT core, the failure modes and the Common Errors table in SKILL.md."
+    }
+  ]
+}

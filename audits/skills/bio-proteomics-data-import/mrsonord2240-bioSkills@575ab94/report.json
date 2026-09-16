@@ -1,0 +1,343 @@
+{
+  "meta": {
+    "skill_name": "bio-proteomics-data-import",
+    "description": "Loads mass-spectrometry data into Python/R and strips the search engine's bookkeeping before any number is trusted -- removes decoys (REV__/Reverse), contaminants (CON__/Potential contaminant), Only-identified-by-site groups, and resolves semicolon razor/leading protein-ID ambiguity in MaxQuant proteinGroups.txt, DIA-NN report.parquet, and mzML/mzXML. Distinguishes Intensity (raw) vs LFQ intensity (MaxLFQ) vs iBAQ, treats a MaxQuant zero as missing (NaN, not log2(-inf)), and diagnoses the missingness contract (intensity-dependent in both DDA and DIA; DIA has fewer missing values). Use when starting an analysis from raw spectra or a search engine output. Downstream normalization and stats are differential-abundance; reporter-ion/MaxLFQ quant is quantification; protein grouping is protein-inference.",
+    "evaluated_on": "2026-09-15",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Moderate",
+    "n_inputs": 8,
+    "audit_type": "re-audit after fix pass 1",
+    "pre_fix_report": "F:/OpenScience/audits/_pre-fix-20260915/bio-proteomics-data-import/ (2026-09-11, static 79, execution 76.8, final 78, Beta Only)",
+    "source": "mrsonord2240/bioSkills@575ab946989a7029d235eb0ab711e47b08edbcb0:proteomics/data-import",
+    "environment": "pyOpenMS 3.5.0; pandas 3.0.5; numpy 2.5.3; R 4.4.3 with QFeatures 1.16.0; DIA-NN 2.6.1 Academia and msconvert 3.0.26253 (to produce the real inputs) (F:/OpenScience/audit-envs/mass-spec-proteomics-analyst)",
+    "data": "SYNTHETIC: proteinGroups.txt (1560 rows, 8 LFQ runs), proteinGroups_failed.txt (Intensity/iBAQ/LFQ families, one weak run T4), report.parquet (8 runs, 60 LOWCONF groups), synthetic_mixed.mzML (DDA + DIA + offsets-missing + all-ion scans, with a truth table), MaxQuant TMT10 proteinGroups.txt and FragPipe combined_protein.tsv (rerun/make_new_tables.py). PUBLIC: PXD070049 (CC0, Van Puyvelde 2026) Orbitrap Astral 5-min 250 pg -- one DIA mzML (20,409 spectra) and a real DIA-NN 2.6.1 report.parquet."
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS",
+      "detail": "Every Skill code block ran to completion on the inputs it is scoped for (MaxQuant proteinGroups.txt, DIA-NN report.parquet, mzML) including a real 20,409-spectrum Astral file and a real DIA-NN 2.6.1 report. No loops, no nondeterminism (same shapes and counts on repeat runs). The two failures observed are on tables outside the Skill's declared formats (FragPipe) or outside its documented quant column family (MaxQuant TMT), and both are recorded as recommendations, not stability failures. Code is read-only on user data."
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "Six references, all real and now correctly attributed (the pyOpenMS misattribution to Chambers 2012 is fixed; Rost 2014 Proteomics 14(1):74-77 is cited). No invented numbers. Every synthetic dataset is labelled SYNTHETIC in the scripts that make and use it."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "No diagnostic, prescriptive or triage content anywhere; the Skill only imports and characterises data."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "The missingness teaching is now correct and was confirmed on real data: on a real Astral DIA matrix the abundance-missingness correlation is -0.444 and missingness runs 29.8% in the lowest abundance quartile against 1.7% in the highest -- exactly the intensity-dependent structure the fixed text describes. The Intensity / LFQ intensity / iBAQ distinction was confirmed against a table with a deliberate loading failure."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All four code blocks ran verbatim under pandas 3.0.5 / numpy 2.5.3 / pyOpenMS 3.5.0 on the formats the Skill declares, on both synthetic and real files, with no syntax errors, no missing imports and no -inf."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 84,
+    "max": 100,
+    "delta_vs_pre_fix": "+5 (79 -> 84)",
+    "categories": {
+      "functional_suitability": {
+        "score": 10,
+        "max": 12,
+        "note": "Completeness 3, Correctness 3, Appropriateness 4. All five pass-1 correctness defects are fixed and each was re-verified by execution: Global.PG.Q.Value in the DIA filter, 0 -> NaN in the DIA block, the DIA-MCAR claim replaced with a diagnostic-driven one, the mzML precursor guard, and the pyOpenMS citation. Still incomplete: no TMT route at all although the taxonomy claims TMT coverage, and the R/QFeatures route is named with no code (left unfixed as new content)."
+      },
+      "reliability": {
+        "score": 10,
+        "max": 12,
+        "note": "Fault tolerance 3, Error reporting 3, Recoverability 4. The block now raises on a table with no LFQ columns, drops all-NaN rows, skips precursor-less MS2 scans and prints a named warning when isolation offsets are absent -- all four confirmed. Two gaps left: the no-LFQ error message points a TMT user at Intensity columns that do not exist in a TMT proteinGroups.txt, and the three-way .get() flag mask collapses to a scalar when all three flag columns are absent, producing `KeyError: True`."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "Token cost 3, Execution efficiency 4. ~19 KB single file, all inline. The code is linear and fast: 20,409 real spectra parsed in 16 s, a 46k-row DIA-NN report reduced to a matrix in well under a second."
+      },
+      "agent_usability": {
+        "score": 14,
+        "max": 16,
+        "note": "Learnability 3, Consistency 4, Feedback design 3, Error prevention 4. The DIA q-value filter now agrees with the sibling dia-analysis Skill (both name Global.PG.Q.Value and the 1.9.x Lib.* alternative), zero handling is stated for MaxQuant and DIA-NN alike, and the >=2-peptide threshold row now says explicitly that the import code does not apply it. The block still does not report how many rows it removed, and an agent arriving with TMT data is left without a route."
+      },
+      "human_usability": {
+        "score": 6,
+        "max": 8,
+        "note": "Discoverability 3, Forgiveness 3. Usage guide has natural prompts and the description names the concrete artefacts; the description is long and jargon-dense. Tolerant of absent or empty single flag columns; brittle when all three are absent."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "Credential safety 4, Input validation 3, Data safety 4. Local, read-only code throughout; no writes to user data anywhere in the audit. Input validation is still template-level: the LFQ-column check is the only presence check, and no block validates that the columns it indexes exist."
+      },
+      "maintainability": {
+        "score": 9,
+        "max": 12,
+        "note": "Modularity 3, Modifiability 3, Testability 3. examples/load_maxquant.py was updated in step with SKILL.md and runs clean (11 groups, 22.7% missing, abundance-missingness -0.84). There is still only one runnable example and it covers MaxQuant only -- nothing ships for the DIA-NN or mzML blocks, which are the two that changed most."
+      },
+      "agent_specific": {
+        "score": 17,
+        "max": 20,
+        "note": "Trigger precision 3, Progressive disclosure 3, Composability 4, Idempotency 4, Escape hatches 3. Scope statement is explicit about what is OUT and all eight Related Skills exist. Still one flat file with no references/ layer, and the routing lines are phrased as pointers rather than stop conditions."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 86.0,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 35,
+      "total": 40
+    },
+    "layer1_avg": 35.6,
+    "layer2_avg": 50.4,
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "MaxQuant proteinGroups.txt -> clean log2 LFQ matrix",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Block ran verbatim on pandas 3.0.5: 60/60 bookkeeping rows removed, 0 -inf, and the 55 all-NaN rows the pre-fix version passed through are now gone.",
+        "basic": 38,
+        "specialized": 55,
+        "total": 93,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "Bookkeeping rows fully removed under pandas 3.0 string dtype", "result": "PASS", "note": "1560 read, 1500 kept, 0 surviving REV__/CON__ IDs"},
+          {"text": "No -inf after log2", "result": "PASS", "note": "0 -inf; 0 -> NaN applied before the transform"},
+          {"text": "Proteins with zero valid LFQ values are removed or flagged", "result": "PASS", "note": "Fixed: final matrix 1445 x 10 with 0 all-NaN rows (pre-fix kept 55)"},
+          {"text": "Documented-but-not-applied thresholds are declared as such", "result": "PASS", "note": "16 groups with Razor + unique peptides < 2 remain in the matrix, and the thresholds table now states the import code does not apply that filter"},
+          {"text": "Scope and safety: import and cleaning only, read-only on the user file", "result": "PASS", "note": "No normalisation, imputation or testing; no writes"}
+        ],
+        "executed": true,
+        "execution_note": "rerun/in1_maxquant.py executed SKILL.md block b02 verbatim on a copy of the SYNTHETIC proteinGroups.txt, exit 0, no warnings. A second pass on the same table with the LFQ columns dropped raised the new ValueError as designed."
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "DIA-NN report.parquet -> protein x run matrix at 1% FDR",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Both pre-fix FAILs are fixed: all 60 LOWCONF groups are now excluded and the 202 zero PG.MaxLFQ cells become NaN instead of -inf.",
+        "basic": 37,
+        "specialized": 54,
+        "total": 91,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "Block runs on the DIA-NN parquet schema", "result": "PASS", "note": "23,020 rows -> 20,170 after filter -> 887 x 8 matrix, exit 0, no warnings"},
+          {"text": "Matrix controls experiment-wide protein-group FDR", "result": "PASS", "note": "Fixed: 0/60 LOWCONF groups survive (pre-fix 60/60)"},
+          {"text": "PG.MaxLFQ zeros converted to NaN before log2", "result": "PASS", "note": "Fixed: 0 -inf; 202 zero cells among the filtered rows"},
+          {"text": "The filter matches the sibling dia-analysis Skill", "result": "PASS", "note": "Both now name run-level Q.Value/PG.Q.Value plus Global.PG.Q.Value, and both name Lib.PG.Q.Value for 1.9.x MBR (column confirmed present in the report)"},
+          {"text": "Scope and safety: import only, read-only", "result": "PASS", "note": "Stops at the pivot; pivot_table aggfunc='first' is safe here (max 1 distinct PG.MaxLFQ per group x run)"}
+        ],
+        "executed": true,
+        "execution_note": "rerun/in2_diann.py executed SKILL.md block b03 verbatim on the SYNTHETIC report.parquet, exit 0."
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Mixed DDA/DIA/AIF mzML, then a real 20k-spectrum Astral DIA mzML",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The loop no longer crashes on a precursor-less MS2 scan and names the scan whose isolation offsets are missing; on a real file it parses 20,409 spectra with no spurious warnings.",
+        "basic": 37,
+        "specialized": 54,
+        "total": 91,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "pyOpenMS API claims hold on 3.5.0 and extracted values match the truth table", "result": "PASS", "note": "load returns None and fills in place, get_peaks returns a tuple of ndarrays, getPrecursors returns a list; m/z, charge, offsets and peak counts match synthetic_mixed_truth.csv row for row"},
+          {"text": "Loop completes on an MS2 spectrum without a precursor", "result": "PASS", "note": "Fixed: all 20 spectra processed; scan 18 (all-ion, no precursor) skipped by the new guard instead of raising IndexError"},
+          {"text": "Missing isolation-window offsets are flagged, not reported as a 0-Th window", "result": "PASS", "note": "Fixed: 'controllerType=0 controllerNumber=1 scan=18: isolation offsets not written (width unknown, not 0 Th)'"},
+          {"text": "The block holds up on a real acquisition without false warnings", "result": "PASS", "note": "New: real PXD070049 Astral DIA mzML -- 20,409 spectra in 16 s, 1361 MS1 / 19,048 MS2, 0 MS2 without a precursor, all windows 20.01 Th, 0 warning lines printed"},
+          {"text": "Scope and safety: no RAW conversion attempted; read-only", "result": "PASS", "note": "Conversion routed to peptide-identification; no writes"}
+        ],
+        "executed": true,
+        "execution_note": "rerun/in3_mzml.py (SYNTHETIC mixed file) and rerun/in3b_public_mzml.py (real msconvert-produced mzML, path substituted because a Windows hard link is not portable), both exit 0."
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Intensity vs LFQ vs iBAQ on a run with a loading failure, plus the R/QFeatures route",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "The quant-column teaching is right and demonstrable. The R route is still a name with no code, which the fix log records as deliberately out of scope.",
+        "basic": 36,
+        "specialized": 50,
+        "total": 86,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "Recommends LFQ intensity for between-condition comparison and the data bear it out", "result": "PASS", "note": "The deliberately under-loaded run T4 sits 1.33 log2 below the others in Intensity and iBAQ but 0.00 in LFQ intensity; true-null median fold change -0.424 (Intensity/iBAQ) vs -0.066 (LFQ)"},
+          {"text": "iBAQ described as within-sample only and shown to carry raw Intensity's between-sample ratios", "result": "PASS", "note": "Maximum within-protein SD of log2(iBAQ/Intensity) across samples = 0.0"},
+          {"text": "The Skill gives enough to build the QFeatures import without trial and error", "result": "FAIL", "note": "Unfixed P2. readQFeatures 1.16.0 works, but filterFeatures with the MaxQuant column names as written errors ('Potential contaminant' is/are absent from all rowData); make.names() renaming is needed and the Skill says nothing about it. After adapting: 1500 x 8, no -Inf, 19.8% NA"},
+          {"text": "Scope: normalisation and testing routed out", "result": "PASS", "note": "No DE test run"},
+          {"text": "Safety: read-only", "result": "PASS", "note": "No writes to user data"}
+        ],
+        "executed": true,
+        "execution_note": "rerun/in4_columns.py (Python, exit 0) and rerun/in4_qfeatures.R via the candidate R 4.4.3 / QFeatures 1.16.0 (exit 0, output in in4_qfeatures.out)."
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "DDA + DIA tables together: missingness diagnosis and imputation advice",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The pre-fix contradiction is gone: the Skill no longer calls DIA missingness MCAR and its decision tree routes by the diagnostic.",
+        "basic": 37,
+        "specialized": 54,
+        "total": 91,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "Both tables loaded; missingness quantified overall and per sample; overlap reported", "result": "PASS", "note": "DDA 1445, DIA 887, both 864"},
+          {"text": "Imputation advice for DIA is consistent with the Skill's own diagnostic", "result": "PASS", "note": "Fixed: diagnostic DIA -0.495 vs DDA -0.619, and the Skill text now says DIA has fewer missing values that are still mostly intensity-dependent, with the imputer chosen from the diagnostic"},
+          {"text": "Following the DIA block, the diagnostic is computed on log scale with zeros as NaN", "result": "PASS", "note": "Fixed: the block's own 0 -> NaN plus log2 is what makes the signature visible (pre-fix verbatim reading was -0.16)"},
+          {"text": "The claimed structure is present in the data", "result": "PASS", "note": "DIA missing % by true-abundance quartile 21.9 / 4.3 / 3.6 / 3.4"},
+          {"text": "Scope and safety: diagnosis only, imputation deferred", "result": "PASS", "note": "No imputed matrix produced"}
+        ],
+        "executed": true,
+        "execution_note": "rerun/in5_stress.py, exit 0."
+      },
+      {
+        "index": 6,
+        "type": "New (edge)",
+        "label": "MaxQuant TMT10 proteinGroups.txt (no LFQ columns)",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "The new ValueError fires correctly, but the fallback it names does not exist in a TMT table, and the Skill has no TMT route at all.",
+        "basic": 31,
+        "specialized": 40,
+        "total": 71,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "The block fails loudly instead of silently returning an ID-only matrix", "result": "PASS", "note": "ValueError raised (the pre-fix block returned a matrix with no quant columns)"},
+          {"text": "The error message routes the agent to a column family that exists in this file", "result": "FAIL", "note": "It says 'use Intensity and normalize explicitly'. A MaxQuant TMT proteinGroups.txt has no per-sample 'Intensity <sample>' columns at all -- only a single summed 'Intensity' column. The channels live in 'Reporter intensity corrected 1..10'"},
+          {"text": "The Skill's decision tree or taxonomy gives a TMT route", "result": "FAIL", "note": "The taxonomy row claims MaxQuant txt covers 'DDA label-free / TMT search results', but no decision-tree row, code block or threshold mentions reporter-ion columns or the corrected-vs-uncorrected choice"},
+          {"text": "An agent can still reach a correct matrix by adapting the Skill's own cleaning pattern", "result": "PASS", "note": "Reusing the flag mask and 0 -> NaN / log2 on 'Reporter intensity corrected' gave a 390 x 10 matrix whose fold changes correlate 0.897 with the seeded truth"},
+          {"text": "Scope: reporter-ion quant computation itself routed to quantification", "result": "PASS", "note": "Consistent with the Skill's stated scope"}
+        ],
+        "executed": true,
+        "execution_note": "rerun/in6_mq_tmt.py on a SYNTHETIC MaxQuant TMT10 table built by rerun/make_new_tables.py, exit 0."
+      },
+      {
+        "index": 7,
+        "type": "New (variant, out-of-declared-format)",
+        "label": "FragPipe combined_protein.tsv handed to the MaxQuant block",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "The block dies with `KeyError: True`. The cause is a real defect in the guard the Skill documents as the fix for missing flag columns.",
+        "basic": 31,
+        "specialized": 41,
+        "total": 72,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "The block fails with a message that names the actual problem", "result": "FAIL", "note": "`KeyError: True` -- nothing in it points at the missing flag columns or the wrong input format"},
+          {"text": "The documented .get() guard covers a missing flag column", "result": "FAIL", "note": "Reproduced minimally (rerun/in8_real_dia_missingness.py): with one or two flag columns absent the mask is still a Series and the guard works, but with all three absent every .get() returns the scalar '' and the mask collapses to the Python bool True, so pg[mask] raises KeyError: True. The Common Errors row that recommends .get() does not hold in that case"},
+          {"text": "The Skill's stated scope makes clear which formats it supports", "result": "PASS", "note": "Description and taxonomy name MaxQuant proteinGroups.txt, DIA-NN report.parquet and mzML/mzXML only; FragPipe is genuinely out of scope, so refusing is right -- refusing legibly is the gap"},
+          {"text": "An agent can still reach a clean matrix by following the Skill's patterns", "result": "PASS", "note": "contam_ prefix removal (the Skill's bookkeeping principle), MaxLFQ columns, 0 -> NaN, log2: 292 x 6, 0 -inf, 15.1% missing"},
+          {"text": "Safety: read-only", "result": "PASS", "note": "No writes to user data"}
+        ],
+        "executed": true,
+        "execution_note": "rerun/in7_fragpipe.py on a SYNTHETIC FragPipe-style combined_protein.tsv (rerun/make_new_tables.py), exit 0; the degenerate mask reproduced independently on a four-column DataFrame in rerun/in8_real_dia_missingness.py."
+      },
+      {
+        "index": 8,
+        "type": "New (public data)",
+        "label": "Real DIA-NN 2.6.1 report from Orbitrap Astral runs: import block plus missingness diagnostic",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The fixed missingness claim, previously verified only on synthetic tables, holds on real data.",
+        "basic": 38,
+        "specialized": 55,
+        "total": 93,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "The DIA import block runs verbatim on a real DIA-NN 2.6.1 report", "result": "PASS", "note": "46,485 rows -> 4376 x 3 matrix"},
+          {"text": "No -inf on real PG.MaxLFQ zeros", "result": "PASS", "note": "0 -inf; 1717 NaN (13.1%)"},
+          {"text": "assess_missingness runs verbatim and returns the documented keys", "result": "PASS", "note": "per_protein, per_sample, total_pct, abundance_missing_corr all returned; total 13.1%, per-run missing 565 / 428 / 724"},
+          {"text": "The Skill's DIA missingness claim holds on real data", "result": "PASS", "note": "abundance-missingness correlation -0.444, and missingness runs 29.8% in the lowest abundance quartile against 1.7% in the highest -- fewer missing values than the DDA table, still strongly intensity-dependent, exactly as the fixed text says"},
+          {"text": "Scope and safety: diagnosis only", "result": "PASS", "note": "No imputation performed"}
+        ],
+        "executed": true,
+        "execution_note": "rerun/in8_real_dia_missingness.py, exit 0, output in rerun/in8_real_dia_missingness.out. Input produced by a real DIA-NN 2.6.1 run on three PXD070049 Astral DIA runs (public-work/diann_predlib_mzml). One replicate per condition, so no within-condition CV is claimed."
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 33.6,
+    "dynamic_weighted": 51.6,
+    "score": 85.2,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": true,
+    "veto_override": false,
+    "grade_note": "Raw score 85.2 maps to Production Ready, but the assertion pass rate is 35/40 = 87.5%, below the 90% floor, so the grade is downgraded exactly one tier to Limited Release. All other floors are met: static 84 >= 80, execution 86.0 >= 85, Layer 1 35.6/40 >= 32, Layer 2 50.4/60 >= 48.",
+    "delta_vs_pre_fix": "78 Beta Only (not deployable) -> 85.2 Limited Release (deployable). All four pre-fix P1 findings and two of three P2 findings are confirmed fixed by execution; the QFeatures P2 was deliberately left, and three new defects were found by inputs the fixer was not told about (TMT, a flagless table, and the degenerate mask behind it)."
+  },
+  "key_strengths": [
+    "Every pass-1 P1 fix was re-verified by running the Skill's own code, not by reading the diff: 0/60 LOWCONF groups now survive the DIA filter, 0 -inf anywhere, the mzML loop completes over an all-ion scan and names the scan whose offsets are missing, and the all-NaN rows are gone.",
+    "The rewritten missingness teaching is correct on real data, which is the strongest single result in this audit: on a real Orbitrap Astral DIA matrix the correlation is -0.444 and missingness runs 29.8% in the lowest abundance quartile against 1.7% in the highest.",
+    "The quant-column teaching is demonstrably right: on a table with a deliberate loading failure, the weak run sits 1.33 log2 low in Intensity and iBAQ and exactly 0.00 in LFQ intensity, and iBAQ carries raw Intensity's between-sample ratios identically (SD 0.0).",
+    "The DIA filter is now consistent with the sibling dia-analysis Skill, so an agent running both does not get two different definitions of 1% FDR.",
+    "The blocks scale: 20,409 real spectra parsed in 16 s with zero spurious warnings, and a 46k-row real DIA-NN report reduced to a matrix in under a second."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "No TMT route, and the no-LFQ error sends a TMT user to columns that do not exist",
+      "observed_in": [6],
+      "problem": "On a MaxQuant TMT10 proteinGroups.txt the block raises 'No LFQ intensity columns: LFQ was not enabled in MaxQuant; use Intensity and normalize explicitly'. A TMT proteinGroups.txt has no per-sample 'Intensity <sample>' columns -- only one summed 'Intensity' column -- so the suggested fallback is a dead end. The channels are in 'Reporter intensity corrected 1..N'. The Tool Taxonomy claims MaxQuant txt output covers 'DDA label-free / TMT search results' but no decision-tree row, code block or threshold mentions reporter ions.",
+      "root_cause": "The block and its new error message were written for the label-free case only, while the taxonomy advertises TMT.",
+      "fix": "Add a decision-tree row 'MaxQuant TMT / isobaric labelling -> read Reporter intensity corrected <n> columns; corrected channels apply MaxQuant's isotope-impurity correction, uncorrected do not; reporter-ion quant computation itself is quantification', and change the ValueError to name the columns the table actually has, e.g. 'No LFQ intensity columns. Found Reporter intensity corrected columns -> this is an isobaric (TMT/iTRAQ) run; see the TMT row. Otherwise use Intensity and normalize explicitly.'"
+    },
+    {
+      "priority": "P2",
+      "title": "The flag-column guard collapses to a scalar when all three flag columns are absent",
+      "observed_in": [7],
+      "problem": "`mask = (pg.get('Reverse','') != '+') & (pg.get('Potential contaminant','') != '+') & (pg.get('Only identified by site','') != '+')` returns a Series while at least one flag column is present, but the Python bool True when all three are absent; `pg[True]` then raises `KeyError: True`. The Common Errors table recommends exactly this .get() pattern as the guard for a missing flag column, so the Skill documents a guard that does not hold in the case it is meant for.",
+      "root_cause": "pandas `.get(col, '')` returns the scalar default, and `'' != '+'` is a bool, not a Series; the failure only surfaces when no flag column survives to keep the expression a Series.",
+      "fix": "Build the mask from a Series of the right length, e.g. `mask = pd.Series(True, index=pg.index)` then `for c in ('Reverse','Potential contaminant','Only identified by site'): mask &= pg.get(c, pd.Series('', index=pg.index)) != '+'`, and raise a named error when none of the three columns is present ('no MaxQuant flag columns found -- is this a proteinGroups.txt?'). Correct the Common Errors row to match."
+    },
+    {
+      "priority": "P2",
+      "title": "R/QFeatures route is named with no code, and the obvious call fails on MaxQuant column names",
+      "observed_in": [4],
+      "problem": "The decision tree routes R pipelines to `readQFeatures` + `aggregateFeatures` and the taxonomy prefers QFeatures over MSnbase, but the Skill ships no R code. readQFeatures 1.16.0 works, but `filterFeatures` with the MaxQuant names as written errors ('Potential contaminant' is/are absent from all rowData) because readQFeatures applies make.names(), turning the spaces into dots. An agent hits this on the first try. (The fix log records this as deliberately deferred: adding a QFeatures block is new content.)",
+      "root_cause": "The R route was documented from package names rather than from a run.",
+      "fix": "Add a short R block: `readQFeatures(assayData=..., quantCols=..., runCol=...)`, then `filterFeatures(~ Reverse != '+')`, `filterFeatures(~ Potential.contaminant != '+')`, `filterFeatures(~ Only.identified.by.site != '+')` with a one-line note that readQFeatures renames columns via make.names(), then `zeroIsNA()` and `logTransform()`. Verified working shape on the audit table: 1500 x 8, no -Inf, 19.8% NA."
+    },
+    {
+      "priority": "P2",
+      "title": "Only one runnable example, and it covers the block that changed least",
+      "observed_in": [1, 2, 3],
+      "problem": "examples/ ships load_maxquant.py only. The DIA-NN and mzML blocks are the two that changed most in pass 1 and neither has an example or any test input, so a regression in either is invisible until a user hits it.",
+      "root_cause": "Single-example Skill.",
+      "fix": "Add examples/load_diann.py and examples/load_mzml.py with a few-hundred-row synthetic report.parquet and a ~20-spectrum mzML that includes one all-ion scan and one scan with missing isolation offsets, so both guards are exercised by running the example."
+    },
+    {
+      "priority": "P2",
+      "title": "The cleaning blocks do not report what they removed",
+      "observed_in": [1, 2],
+      "problem": "The MaxQuant and DIA blocks silently drop rows. An agent following the Skill hands the user a matrix with no record of how many bookkeeping rows, sub-threshold rows or all-NaN rows were removed, which is exactly the provenance a methods section needs.",
+      "root_cause": "The blocks are written as minimal transformations.",
+      "fix": "Add one print per block summarising rows read, rows removed by each criterion, and final matrix shape, and say in the Approach text that this line belongs in the methods record."
+    }
+  ]
+}

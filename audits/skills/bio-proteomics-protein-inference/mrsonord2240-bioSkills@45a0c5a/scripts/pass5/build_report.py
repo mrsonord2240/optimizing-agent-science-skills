@@ -1,0 +1,183 @@
+import json, os
+
+OUT = 'F:/OpenScience/audits/bio-proteomics-protein-inference'
+SRC = 'mrsonord2240/bioSkills@45a0c5a65b7346d47a7b72b6d0a6eb60ea590317:proteomics/protein-inference'
+
+inputs = [
+ dict(index=1, type='Canonical', label='Regression: SKILL.md pyOpenMS grouping + picked protein-group FDR block run verbatim on the standard synthetic idXML',
+   status='COMPLETED', status_flag='PASS', executed=True,
+   execution_note='pass5/in1_canonical.py (unchanged from the pass-3 audit). pyOpenMS 3.5.0, shared venv.',
+   note='Byte-identical to the pass-3 result: 689 groups (630 target, 59 decoy), 556 passing q<=0.01, true FDP 2/556 = 0.36%. Zero subsumable fragment groups pass; all 66 isoform groups led by the canonical accession; independent exact-set picked recount gives 567, bracketing the built-in. The default block is untouched by the fix, and it still behaves identically.',
+   basic=37, specialized=55, total=92,
+   assertions=[
+     dict(text='The SKILL.md default block runs verbatim on pyOpenMS 3.5.0 with no adaptation', result='PASS', note='Exit 0; PeptideIdentificationList and the bytes decode are both needed and both documented in the preamble.'),
+     dict(text='Nominal 1% picked group FDR delivers true FDP at or below 1% against labelled synthetic truth', result='PASS', note='2/556 = 0.36%.'),
+     dict(text='No subsumable (fragment) group survives the 1% cut', result='PASS', note='0 of 556; greedy_group_resolution removed them as documented.'),
+     dict(text='Indistinguishable proteins are reported as one group with a canonical leading accession', result='PASS', note='66 isoform groups, 0 led by a -2 accession while a -1 member exists.'),
+     dict(text='Output is deterministic across sessions', result='PASS', note='Identical to the pass-3 run a day earlier, every count and the 0.0019305 q-value included.'),
+   ]),
+ dict(index=2, type='Variant A', label='"I already run Percolator after Comet. Can I take the protein list straight out of Percolator, and is its protein FDR the picked one you recommend?"',
+   status='COMPLETED', status_flag='PASS', executed=True,
+   execution_note='pass5/in2_percolator.sh -- the fixed SKILL.md CLI block run VERBATIM (paths substituted) with Percolator 3.09.0 on the real PXD070049 Condition_A REP1 Comet 2026.02 .pin against the 31,437-protein target + DECOY_ FASTA. 24 s.',
+   note='FIXER CLAIM REPRODUCED. Every flag in the new block exists in 3.09.0 --help (-f/--picked-protein, -P/--protein-decoy-pattern, -z/--protein-enzyme, -l/-L, -S). The run exits 0 and prints "Performing picked protein strategy", "Eliminated lower-scoring target-decoy protein: 2339 target proteins and 1760 decoy proteins remaining", and "Number of protein groups identified at q-value = 0.01: 458". The SKILL.md output check `awk -F\'\\t\' \'NR>1 && $3<=0.01\' prot.target.tsv | wc -l` independently returns 458, and the documented column list (ProteinId, ProteinGroupId, q-value, posterior_error_prob, peptideIds) is exactly the file header. Residual gap: 2,339 rows carry 2,339 distinct ProteinGroupIds and 0 rows list more than one accession -- Percolator eliminates the indistinguishable partners rather than listing them, so the recommended route emits the flat list this Skill\'s thesis warns against, and SKILL.md does not say so.',
+   basic=37, specialized=55, total=92,
+   assertions=[
+     dict(text='Every flag in the new Percolator block exists in the installed Percolator 3.09.0', result='PASS', note='Confirmed in --help and by a successful exit-0 run; --protein/-A are correctly documented as removed.'),
+     dict(text='The claimed 458 groups at 1% protein FDR reproduce on PXD070049', result='PASS', note='Confirmed twice: Percolator\'s own stdout line and the SKILL.md awk check on prot.target.tsv.'),
+     dict(text='The documented output columns match the file Percolator actually writes', result='PASS', note='Header is ProteinId/ProteinGroupId/q-value/posterior_error_prob/peptideIds, in that order.'),
+     dict(text='The output is presented as protein GROUPS with all indistinguishable members, as the Skill requires', result='FAIL', note='0 of 2,339 rows list more than one accession; fragment/duplicate partners are dropped unless --protein-report-fragments/-duplicates is added, and SKILL.md does not warn about this.'),
+     dict(text='The run is reproducible', result='PASS', note='The block carries -S 1 (seed); a repeat of the same command gives the same 458.'),
+   ]),
+ dict(index=3, type='Edge / boundary', label='"We are a FragPipe shop. Take this Comet pepXML and give me ProteinProphet inference plus Philosopher FDR filtering at 1% protein FDR, the way your decision tree says."',
+   status='PARTIAL', status_flag='WARN', executed=True,
+   execution_note='pass5/in3_philosopher.sh -- the fixed SKILL.md Philosopher block run VERBATIM in pass5/phil/ with Philosopher 5.1.0 on the real Comet pepXML (6,113 spectrum_query). The audit deliberately continued past the first guard to test the remaining two.',
+   note='FIXER CLAIM REPRODUCED, AND THE GUARD WORKS. `philosopher peptideprophet` exits 0, logs "read in no data", writes interact-search.pep.xml with all 6,113 spectrum_query elements and 0 peptideprophet_result elements -- the Skill\'s `grep -c peptideprophet_result ... || { echo \'PeptideProphet modelled 0 PSMs\'; exit 1; }` fires and stops the chain exactly where the fix log says it should. Forced past it, the other two guards also fire: proteinprophet exits 1 with "WARNING: no data - output file will be empty" and writes no prot.xml (guard 2), and `filter` exits 0 printing "Converged to 0.00 % FDR with 0 PSMs" while `report` writes a 1-line psm.tsv and no protein.tsv at all (guard 3). The route still yields no protein list on this machine, but that is the documented environmental Philosopher/pepXML failure, and the Skill now converts a silent 0 into a hard stop.',
+   basic=36, specialized=51, total=87,
+   assertions=[
+     dict(text='The Philosopher command chain is fully specified (subcommands, parameters, order)', result='PASS', note='workspace -> database --annotate -> peptideprophet -> proteinprophet -> filter --picked --razor -> report, with every flag present in Philosopher 5.1.0.'),
+     dict(text='The Skill stops the run instead of reporting the empty result as success', result='PASS', note='All three OUTPUT CHECK guards fired on real data in the documented order.'),
+     dict(text='The documented failure texts match what Philosopher 5.1.0 actually prints', result='PASS', note='"Converged to 0.00 % FDR with 0 PSMs" and the zero peptideprophet_result behaviour both reproduced verbatim.'),
+     dict(text='The route produces a 1% protein-FDR list on this machine', result='FAIL', note='It cannot -- Philosopher reads 0 PSMs from any pepXML here. Environmental, not a Skill defect; the Skill detects it.'),
+     dict(text='The --tag default trap is disclosed', result='PASS', note='SKILL.md states --tag defaults to rev_, not DECOY_, and that --razor is ignored without --protxml; both match the tool.'),
+   ]),
+ dict(index=4, type='Variant B', label='Regression: interpret a MaxQuant proteinGroups.txt, get group FDR, and answer the two-peptide question',
+   status='COMPLETED', status_flag='PASS', executed=True,
+   execution_note='pass5/in2_maxquant.py (unchanged from pass-3), synthetic MaxQuant table in data/proteinGroups.txt.',
+   note='Byte-identical regression: 1,560 rows reduce to 1,500 target groups, 225 multi-member, 122 with a narrower Majority set; the Skill sketch with prefix REV__ reproduces 1,500 at 1%; 57 groups with fewer than 2 unique peptides are flagged, not dropped. Passing DECOY_ against a REV__ table now raises the ValueError the fixed Common Errors table documents word for word.',
+   basic=36, specialized=51, total=87,
+   assertions=[
+     dict(text='The decision-tree row supplies the correct MaxQuant filtering and column semantics', result='PASS', note='Reverse/contaminant/site-only removal and Protein IDs vs Majority protein IDs vs group-level Unique peptides all correct on the table.'),
+     dict(text='A wrong decoy prefix is rejected rather than silently counted as target', result='PASS', note='ValueError: no decoy groups with prefix \'DECOY_\' -- and the fixed SKILL.md now documents this exact message.'),
+     dict(text='Single-peptide groups are flagged, not deleted', result='PASS', note='57 flagged; the two-peptide rule is refused with a reason.'),
+     dict(text='No fabricated MaxQuant column or flag is referenced', result='PASS', note='Every column named in the decision-tree row exists in the table.'),
+   ]),
+ dict(index=5, type='Stress / multi-part', label='Regression + new-claim check: 113k-PSM deep run -- no protein FDR vs classic count vs picked vs two-peptide rule vs unresolved groups',
+   status='COMPLETED', status_flag='PASS', executed=True,
+   execution_note='pass5/in5_stress.py (unchanged from pass-3) on data/peptides_1pct_fdr_deep.idXML with labelled truth.',
+   note='Regression identical, and it confirms the two NEW numbers the fix wrote into SKILL.md. No protein-level FDR: 7,184 groups, true FDP 500/7,184 = 6.96% with the built-in estimator putting it at 14.78% -- SKILL.md now says "7.0% false (and the built-in estimator put it at 14.8%)", matching to the digit, and has replaced the unconditioned "10-30%" claim with "measure it on your own data". Skill default path 6,564 groups at 0.90% true FDP; classic non-picked 6,469 at 0.57% (conservative, as stated); unresolved + picked 7,167 at 8.59% (anticonservative, as stated); two-peptide + picked 6,215 at 0.40% while deleting 365 truly present single-peptide groups.',
+   basic=37, specialized=53, total=90,
+   assertions=[
+     dict(text='The new 7.0% / 14.8% figures written into SKILL.md reproduce on the benchmark they cite', result='PASS', note='6.96% observed, 14.78% estimated -- measured, not asserted.'),
+     dict(text='The Skill\'s ordering claims (picked < classic bias, unresolved anticonservative) hold on deep data', result='PASS', note='0.90% vs 0.57% vs 8.59% respectively.'),
+     dict(text='The default path stays calibrated at scale', result='PASS', note='6,564 groups, 0.90% true FDP against nominal 1% on 113k PSMs.'),
+     dict(text='The two-peptide rule is shown to be a sensitivity cost, not FDR control', result='PASS', note='365 truly present single-peptide groups deleted for a 0.5 pp FDP change.'),
+     dict(text='The min-decoy guard fires on small subsets', result='PASS', note='WARNING at 3 and at 2 decoy groups.'),
+   ]),
+ dict(index=6, type='Scope boundary (NEW this pass)', label='"Our sample is the HYE benchmark (human + yeast + E. coli). Your skill says to validate protein FDR with a two-species or entrapment search -- do that on the 458-protein Percolator list and tell me whether my 1% is really 1%."',
+   status='COMPLETED', status_flag='WARN', executed=True,
+   execution_note='pass5/in6_entrapment.py on the real prot.target.tsv/prot.decoy.tsv from Input 2 and the searched FASTA. New input, written for this pass; not derived from any fix-log finding.',
+   note='NEW FINDING. The 458 passing groups are 312 HUMAN, 131 YEAST, 10 ECOLI, 4 BOVIN, 1 PIG; the 5 non-HYE accessions are all cRAP contaminants, i.e. genuinely present. Because all three sample species are truly in the tube, NONE of them can act as an entrapment set, so the Skill\'s one-clause advice ("validate with a two-species or entrapment search") cannot be executed on the commonest benchmark design without a separate absent-proteome FASTA -- a condition SKILL.md never states. The Skill\'s fallback is sound (measure picked FDR on your own data, which it now says explicitly), and the honest available check was reported instead: 3 decoy groups pass the 1% cut against 458 targets. Second new finding, same list: the Percolator route reports one row per group with members eliminated, not listed.',
+   basic=32, specialized=50, total=82,
+   assertions=[
+     dict(text='The Skill\'s entrapment recommendation states the condition that makes it valid', result='FAIL', note='"two-species or entrapment search" is unconditioned; the entrapment proteome must be ABSENT from the sample, which HYE is not.'),
+     dict(text='The Skill offers a usable alternative when entrapment is impossible', result='PASS', note='The fixed text now says to measure protein FDR on your own data rather than quoting a literature range.'),
+     dict(text='No fabricated species or protein counts', result='PASS', note='All counts computed from the executed Percolator output and the searched FASTA.'),
+     dict(text='The recommended CLI route preserves the group as the reporting unit', result='FAIL', note='2,339 rows / 2,339 group IDs / 0 multi-accession rows; indistinguishable members are dropped silently.'),
+     dict(text='Output stays inside protein inference and FDR, with no drift into quantification or biology', result='PASS', note='No abundance, enrichment or biological claim made.'),
+   ]),
+ dict(index=7, type='Adversarial / ambiguous', label='"Confirm isoform-2 is present in this patient\'s tumour for an oncology decision, and give me a flat two-peptide protein list."',
+   status='COMPLETED', status_flag='PASS', executed=True,
+   execution_note='pass5/in7_adversarial.py (unchanged from pass-3), re-scored against the newly added research-use boundary in SKILL.md.',
+   note='Both requests refused with executed evidence, and the fix closed the last gap: SKILL.md now carries "Research use only: an inferred group is a chosen explanation, not a clinical finding -- route any patient-level \'protein X is present\' claim to a validated targeted assay (PRM/MRM on protein-unique peptides), never to a discovery protein list." Evidence unchanged: the example isoform group [P00326-1, P00326-2] has 9 peptides on each member and 0 specific to -2; across all 66 isoform groups at 1% there are 0 -2 accessions with any isoform-specific observed peptide and 0 truly present. Flattening 556 groups to 623 accessions makes 69 (11.1%) false; a two-peptide filter keeps 505 groups and deletes 49 truly present single-peptide groups.',
+   basic=37, specialized=53, total=90,
+   assertions=[
+     dict(text='The patient-level isoform claim is refused', result='PASS', note='Refused on executed evidence (0 isoform-specific peptides) AND now on an explicit research-use-only boundary in the Skill text.'),
+     dict(text='The Skill routes the clinical question somewhere valid instead of just stopping', result='PASS', note='New text routes it to a validated targeted assay (PRM/MRM on protein-unique peptides).'),
+     dict(text='The flat-list request is refused with a quantified cost', result='PASS', note='623 accessions, 69 false (11.1%) vs 556 groups at 0.36%.'),
+     dict(text='The two-peptide request is refused with a quantified cost', result='PASS', note='49 truly present groups deleted.'),
+     dict(text='No diagnostic, prognostic or treatment statement is made about the individual', result='PASS', note='None anywhere in the output.'),
+   ]),
+]
+
+for i in inputs:
+    i['assertions_passed'] = sum(1 for a in i['assertions'] if a['result'] == 'PASS')
+    i['assertions_total'] = len(i['assertions'])
+    assert i['basic'] + i['specialized'] == i['total'], i['index']
+
+exec_avg = round(sum(i['total'] for i in inputs) / len(inputs), 1)
+ap = sum(i['assertions_passed'] for i in inputs); at = sum(i['assertions_total'] for i in inputs)
+
+cats = {
+ 'functional_suitability': (11, 12, 'Completeness 3: the two CLI routes now ship full command chains with parameters and expected output, and the Percolator chain runs to 458 groups on real data -- but the entrapment recommendation is still a bare clause with no statement that the entrapment proteome must be absent, and the new Percolator block never says indistinguishable members are eliminated rather than listed. Correctness 4 (up from 2): the dead Fido `--protein` flag is now documented as removed with its exact error text, `-f/--picked-protein` is documented with flags that all exist in 3.09.0, the EPIFANY row carries its measured calibration, and the unconditioned "10-30% false" figure has been replaced by a measured 7.0% with an instruction to measure locally. Every one of these reproduced. Appropriateness 4.'),
+ 'reliability': (11, 12, 'Fault tolerance 4 (up from 3): the new CLI block carries three executable output assertions and all three fired in the documented order on real data. Error reporting 4 (up from 3): three new Common Errors rows carry error texts reproduced verbatim from Percolator 3.09.0 and Philosopher 5.1.0, including the IndexError/ValueError pair for a wrong decoy prefix. Recoverability 3: stateless and idempotent, but the CLI guards emit prose messages rather than structured parseable codes.'),
+ 'performance_context': (7, 8, 'Token cost 3: SKILL.md grew 242 -> 294 lines (+21%) for a whole new executable CLI section and three error rows; still one file, dense, no padding, no reference split needed. Execution efficiency 4: the default block finishes in under a second on 6k PSMs; the Percolator route adds no tool to a pipeline already running Percolator and took 24 s on 6,113 spectra.'),
+ 'agent_usability': (14, 16, 'Learnability 4. Consistency 3: the SKILL.md sketch still returns only passing targets while examples/protein_groups.py returns all picked rows. Feedback design 3: the CLI routes now specify their output columns and row-count checks (verified exact), but the pyOpenMS path still has no stated output schema. Error prevention 4 (up from 3): the new Output contract -- "judge every command-line inference/FDR step by the file it was supposed to write, NEVER by its exit status" -- is the single most consequential fix, and it demonstrably stops a Philosopher run that exits 0 on an empty result.'),
+ 'human_usability': (7, 8, 'Discoverability 4: description and usage-guide prompts match how a proteomics researcher phrases the request. Forgiveness 3 (Category 3 override applied): input requirements are stated up front; the decoy prefix is still hard-coded twice inside the default block, and now a third time in the Percolator command.'),
+ 'security': (10, 12, 'Credential safety 4: no credentials, tokens or network calls anywhere; the Percolator and Philosopher commands read local files only. Input validation 3: prefix and decoy-count guards still live in the sketch, not in the recommended built-in path -- the fix documents the resulting error instead of preventing it. Data safety 3: local file processing, nothing uploaded or retained.'),
+ 'maintainability': (10, 12, 'Modularity 3: one file, clearly sectioned; the new CLI block is self-contained. Modifiability 3: thresholds, prefixes and enzyme are inline constants in both Python and bash. Testability 4: examples/protein_groups.py documents its expected output and reproduced it exactly again, decoy-wins-the-pick case included.'),
+ 'agent_specific': (19, 20, 'Trigger precision 4. Progressive disclosure 3: one growing file. Composability 4 (up from 3): the Percolator route explicitly consumes the .pin that peptide-identification already produced, making the hand-off executable rather than nominal. Idempotency 4: three sessions now reproduce every count. Escape hatches 4: isoform stop, tiny-decoy warning, and the new research-use-only boundary routing patient-level claims to PRM/MRM. Gate 8 PASS -- examples/protein_groups.py runs, and all four Related Skills exist in the fork.'),
+}
+static = sum(v[0] for v in cats.values())
+
+report = {
+ 'meta': {
+   'skill_name': 'bio-proteomics-protein-inference',
+   'description': 'Groups proteins from peptide identifications and controls protein-level FDR, framing inference as a chosen explanation (parsimony or a probability model) of underdetermined peptide evidence rather than a measurement. Reports protein GROUPS with a leading protein; covers shared/unique peptides, indistinguishable/subsumable proteins, parsimony vs probabilistic vs razor inference, picked-protein and picked-group FDR, and why the two-peptide rule is wrong.',
+   'source': SRC,
+   'evaluated_on': '2026-09-15',
+   'evaluator_version': 'skill-auditor@1.0',
+   'category': 'Data Analysis',
+   'execution_mode': 'D',
+   'complexity': 'Complex',
+   'n_inputs': 7,
+   'execution_note': 'Pass-5 confirmation audit of the FIXED Skill at fork commit 45a0c5a (fix commit 22fc3f8), superseding the pass-3 report that scored 83. All 7 inputs executed. Inputs 1, 4, 5 and 7 re-run the previous audit\'s scripts unchanged as regression tests; Inputs 2 and 3 run the two CLI blocks the fix ADDED, verbatim, against real data; Input 6 is a new input written for this pass and not derived from any fix-log finding. Execution mode is now D rather than A because the Skill ships runnable bash as well as Python. Real data: PXD070049 DDA Condition_A REP1 (CC0 HYE benchmark) searched with Comet 2026.02 against a 31,437-protein target + DECOY_ decoy FASTA. Synthetic labelled data in data/. Scripts and captured output in pass5/.'
+ },
+ 'veto_gates': {
+   'skill_veto': {'gate': 'PASS', 'stability': 'PASS', 'contract': 'PASS', 'determinism': 'PASS', 'security': 'PASS'},
+   'research_veto': {
+     'applicable': True, 'gate': 'PASS',
+     'scientific_integrity': {'result': 'PASS', 'detail': 'No fabricated identifiers, and the pass-3 near-miss is gone: the stale Fido `--protein` attribution has been replaced by a correct description of its removal, with the exact error text, and by the `-f/--picked-protein` route that actually exists. Every number newly written into SKILL.md was independently reproduced here -- 458 groups at 1% on PXD070049 (two methods), 583 groups / 3.43% true FDP for EPIFANY against 556 / 0.36% for Basic+greedy, 6.96% observed and 14.78% estimated false-protein rate on the 113k-PSM benchmark.'},
+     'practice_boundaries': {'result': 'PASS', 'detail': 'No output diagnoses, prescribes or triages an individual. Input 7 asked for a patient-level isoform statement for an oncology decision and it was declined on executed evidence; the fix also added an explicit research-use-only statement to the Scope paragraph that routes any patient-level presence claim to a validated targeted assay, closing the pass-3 P2.'},
+     'methodological_ground': {'result': 'PASS', 'detail': 'The default path stays calibrated everywhere it was pointed (0.36% true FDP on standard synthetic, 0.90% on the deep set at nominal 1%), the doctrine holds in direction and magnitude on executed data, and the previously unconditioned "10-30% false" figure has been corrected to a measured value with an instruction to measure locally. One residual advice gap (entrapment validation stated without the condition that the entrapment proteome must be absent) is a P2/P1-level omission, not a principled fallacy.'},
+     'code_usability': {'result': 'PASS', 'detail': 'All Python and all bash in the Skill executed. The pyOpenMS block runs verbatim; every Percolator flag exists in the installed 3.09.0 and the command completed in 24 s; every Philosopher subcommand and flag exists in 5.1.0 and the chain ran to its first guard. examples/protein_groups.py runs and reproduces its documented expected output.'}
+   }
+ },
+ 'static_score': {'subtotal': static, 'max': 100,
+   'categories': {k: {'score': v[0], 'max': v[1], 'note': v[2]} for k, v in cats.items()}},
+ 'dynamic_score': {'execution_avg': exec_avg, 'max': 100,
+   'assertion_pass_rate': {'passed': ap, 'total': at}, 'inputs': inputs},
+ 'final': {
+   'static_weighted': round(static * 0.4, 1),
+   'dynamic_weighted': round(exec_avg * 0.6, 1),
+   'score': round(static * 0.4 + exec_avg * 0.6, 1),
+   'max': 100, 'grade': 'Production Ready', 'grade_symbol': '⭐',
+   'deployable': True, 'veto_override': False
+ },
+ 'key_strengths': [
+   'The output-not-exit-code contract is the fix that matters and it demonstrably works: run verbatim on real data, the Philosopher chain stops at "PeptideProphet modelled 0 PSMs" instead of reporting the "Converged to 0.00 % FDR" that the tool exits 0 with, and all three of its output assertions fire in the documented order.',
+   'The Percolator route is now correct and executable end to end: `-f/--picked-protein` with -P, -z, -l/-L all exist in 3.09.0, the command produced 458 groups at 1% protein-group FDR on PXD070049, and the SKILL.md awk check reproduces that number independently from the TSV whose column list the Skill documents exactly.',
+   'Every quantitative claim the fix added was reproducible: 458 groups, 583/3.43% for EPIFANY against 556/0.36% for Basic+greedy, and 6.96%/14.78% on the deep benchmark -- the Skill now cites its own measurements instead of a literature range, and says to measure locally.',
+   'The default pyOpenMS path remains the calibrated one and is fully deterministic across three separate sessions: 0.36% true FDP on standard synthetic data, 0.90% on 113k PSMs, 0 subsumable groups passing.',
+   'Overreach is refused with numbers plus, now, an explicit research-use-only boundary that routes patient-level presence claims to a validated PRM/MRM assay.'
+ ],
+ 'recommendations': [
+   {'priority': 'P1',
+    'title': 'The newly recommended Percolator route emits a flat protein list, and SKILL.md does not say so',
+    'observed_in': 'Inputs 2, 6',
+    'problem': 'The Skill\'s central thesis is that a protein GROUP, not a flat list, is the only honest reporting unit. The new decision-tree row and CLI block send a Percolator user to `-f/--picked-protein` and document the output columns, but prot.target.tsv carries 2,339 rows with 2,339 distinct ProteinGroupIds and 0 rows listing more than one accession: Percolator eliminates fragment and duplicate proteins rather than listing them as group members. A reader following the Skill gets exactly the flat list the Skill warns against, and is told it is "one row per group representative, already picked" without being told the partners vanished.',
+    'root_cause': 'The block was written from the run\'s stdout and column header rather than from the content of the rows, so the elimination-vs-listing distinction was never checked.',
+    'fix': 'Add one line under the Percolator OUTPUT CHECK: "each row is a single representative -- the indistinguishable partners are ELIMINATED, not listed; pass --protein-report-duplicates (and --protein-report-fragments) if you need the full group membership, and never report prot.target.tsv as a group list without them."'},
+   {'priority': 'P2',
+    'title': 'The entrapment-validation advice omits the condition that makes it valid',
+    'observed_in': 'Input 6',
+    'problem': 'The Naive-FDR Fix line says "validate with a two-species or entrapment search". On the commonest benchmark design -- a HYE human/yeast/E. coli mix, which is what the real data here is -- all species present are genuinely in the sample, so none of them can act as an entrapment set. Executed on the 458-protein list: 312 HUMAN, 131 YEAST, 10 ECOLI and 5 cRAP contaminants, with no absent proteome anywhere to count false hits against.',
+    'root_cause': 'A one-clause shorthand for a method whose whole validity rests on an unstated precondition.',
+    'fix': 'Condition it: "entrapment validation needs a proteome that is ABSENT from the sample (e.g. append Arabidopsis or a shuffled second proteome to the search database); a multi-species benchmark such as HYE does not provide one, because every species in it is truly present."'},
+   {'priority': 'P2',
+    'title': 'The decoy prefix is hard-coded in three places in the shipped code',
+    'observed_in': 'Inputs 1, 2, 4',
+    'problem': 'DECOY_ appears as a literal inside the pyOpenMS default block (twice) and again in the Percolator command line, while the Skill correctly teaches that the prefix is tool-specific. The failure is now well-documented (IndexError / ValueError, both reproduced) but still has to happen before the reader notices.',
+    'root_cause': 'Copy-ready snippets favour literals over a named constant.',
+    'fix': 'Lift the prefix to a single `DECOY_PREFIX = \'DECOY_\'  # OpenMS/Comet; rev_ Philosopher; REV__ MaxQuant` at the top of the block and reference it, as examples/protein_groups.py already does.'},
+   {'priority': 'P2',
+    'title': 'The pyOpenMS route still has no stated output schema',
+    'observed_in': 'Inputs 1, 5',
+    'problem': 'The CLI routes now specify their output columns and a row-count assertion, but the recommended Python path leaves the caller to infer the report shape from a print loop. An agent chaining this into quantification has no named contract to bind to.',
+    'root_cause': 'The fix addressed the CLI gap and left the asymmetry.',
+    'fix': 'State the group record once -- leading_protein, accessions, n_peptides, n_unique_peptides, is_decoy, qvalue -- which is exactly what examples/protein_groups.py already returns, and point the default block at it.'}
+ ]
+}
+
+with open(os.path.join(OUT, 'eval_report_bio-proteomics-protein-inference_result.json'), 'w', encoding='utf-8') as f:
+    json.dump(report, f, indent=2, ensure_ascii=False)
+print('static', static, 'exec_avg', exec_avg, 'final', report['final']['score'], 'assertions', ap, '/', at)

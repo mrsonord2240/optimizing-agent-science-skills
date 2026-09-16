@@ -1,0 +1,396 @@
+{
+  "meta": {
+    "skill_name": "bio-proteomics-differential-abundance",
+    "description": "Tests for differentially abundant proteins between conditions with limma/DEqMS empirical-Bayes moderation, proDA/msqrob2/MSstats missingness modeling, and Python Welch+BH alternatives. Frames missing values as left-censored MNAR (model, do not impute), makes variance moderation the load-bearing step at n=3-5, and prefers feature/peptide-level testing. Summarization and normalization mechanics are proteomics/quantification; volcano and MA plots are data-visualization; pathway enrichment is pathway-analysis.",
+    "evaluated_on": "2026-09-15",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 11,
+    "source": "mrsonord2240/bioSkills@1110c241c27760ad0127bd803e8832d54651e31c:proteomics/differential-abundance",
+    "audit_note": "Re-audit after pass 3 (e8d2cd4: estimability filter for blocked designs) and pass 4 (0fe7f85: msqrob2 and MSstats feature-level routes, centred-contrast guard). Previous score 82, Limited Release, below the CORE floor of 85. All 9 inputs of the previous audit were re-run as regression tests and 2 new inputs were added, one of which is a controlled test of the causal claim the pass-4 fix rests on. Every number below came from a run made by this auditor on 2026-09-15; the fix log was read but is not evidence.",
+    "environment": "R 4.4.3 via the candidate's r.sh (limma 3.62.2, DEqMS 1.24.0, proDA 1.20.0, ashr 2.2.63, msqrob2 1.14.1, QFeatures 1.16.0, MsCoreUtils 1.18.0, MSstats 4.14.2); Python 3.12 shared venv (pandas 3.0.5, numpy 2.5.3, scipy 1.18.1, statsmodels 0.15.0). msqrob2 and QFeatures are now installed, so both routes the Skill recommends are executable for the first time. Nothing was installed and no shared version was changed.",
+    "data": "ALL SYNTHETIC with planted truth, from audits/bio-proteomics-differential-abundance/data/: a 4v4 MaxQuant set with a batch effect (proteinGroups.txt 1,560 proteins; evidence.txt 1,468 precursors over 299 proteins), a 6-donor paired set, a three-arm set, and the 4v4 truth table. PXD070049 was deliberately NOT used: it carries one replicate per condition under the submitter SDRF, which cannot support a realized-FDR claim."
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated results or citations. Every number this audit could check was reproduced within sampling noise: msqrob2 0.0% / 8.0% / 27.9% realized FDR across the three normalizations against the claimed 0.0 / 7.0 / 28.6, MSstats 20.8% as shipped and 21.2% with MBimpute = TRUE (both exact), the invariant 48 up / 32 down true-hit count, posterior df 151.9 peptide-level against 36.4 summarized, and the paired-design 63 calls / 4.8%. One claim in the prose is an unsupported MECHANISM rather than a fabricated number, and is recorded as a P1 below; the numbers attached to it are real."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "The Scope paragraph explicitly excludes 'single-sample (n=1) comparisons, and diagnosis or treatment decisions for an individual patient', which is the Input 6 boundary."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "No principled fallacy. MNAR framing, trend/robust moderation, the estimability filter for blocked designs, minimum-fold-change testing via treat rather than a double filter, and the honest recalibration of proDA (underpowered for on/off at n=3-5, confirmed here: 0 of 140 on/off proteins called) and of feature-level testing ('not free') are all correct. The refuted mechanism in the centring section does not change any operational instruction: the instruction it supports - do not per-run-median-normalize the peptide table before a feature-level test, and check the centring first - is correct on every configuration tested."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All ten fenced blocks were extracted verbatim and executed, including the four added in pass 4 (msqrob2, msqrobAggregate, MSstats, centring guard). All three shipped examples exit 0, and examples/msqrob2_peptide_level.R runs both on real audit data and in its own simulation fallback."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 90,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 11,
+        "max": 12,
+        "note": "Completeness 4: both previously code-free promises now ship - msqrob2 (summarized and msqrobAggregate peptide-level) and MSstats feature-level - alongside limma, treat, DEqMS, proDA, ashr, the Python route and a centring guard; three examples. Correctness 3: every estimator reproduces, but the stated MECHANISM of the centring section is refuted by a controlled test (see Input 10) and its 'significant for hundreds of proteins at once' is an overstatement of the 31 extra false positives measured. Appropriateness 4."
+      },
+      "reliability": {
+        "score": 11,
+        "max": 12,
+        "note": "Fault tolerance 4: the pass-3 estimability filter is load-bearing, not cosmetic - without it eBayes fails outright with 'prior.weights contain NA values' on the paired design. Error reporting 4: the centring stop() names the offset, the cause and the Skill to fix it in; seven Common Errors rows each record a real error, two of which this audit hit independently (the ridge refusal verbatim, and readQFeatures needing colData$quantCols). Recoverability 3: stateless."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "Token cost 3: 398 lines (was 284) in one file, ten code blocks, no references/ split. Execution efficiency 4: msqrob2 over 1,468 precursors and MSstats over the same set both return in well under a minute."
+      },
+      "agent_usability": {
+        "score": 14,
+        "max": 16,
+        "note": "Learnability 4: each workflow states what its result columns are actually called (adjPval not adj.P.Val, sca.adj.pval, adj.pvalue), which is the class of mistake that silently produces an empty hit list. Consistency 4: the usage-guide drift the previous audit flagged is gone - none of the three contradicting phrases survives in either file. Feedback design 3. Error prevention 3: the MSstats block ships normalization = 'equalizeMedians', which is the setting the centring section two paragraphs later blames for the anticonservative result; one section warns about what the other does."
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Discoverability 3: jargon-dense description, though the vocabulary is the real one. Forgiveness 4 (Category 3 override): hard stops are correct here and each one names the specific failure and the remedy."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "Credential safety 4, input validation 3, data safety 4. No eval/exec of user input, no shell, no network, no credentials anywhere in SKILL.md or the three examples."
+      },
+      "maintainability": {
+        "score": 10,
+        "max": 12,
+        "note": "Modularity 3: ten blocks in one file. Modifiability 3: blocks chain through ambient names (protein_matrix, sample_info, fit2, pe), so composing them needs the reader to track state. Testability 4: three examples, two of which fall back to a seeded simulation with a printed expected result, which is what let this audit check the msqrob2 route two independent ways."
+      },
+      "agent_specific": {
+        "score": 19,
+        "max": 20,
+        "note": "Trigger precision 4, composability 4 (clean hand-offs to quantification, data-visualization, pathway-analysis), idempotency 4, escape hatches 4 (the centring stop can be overridden deliberately, ridge = FALSE and ~ -1 + condition are both offered, the undetected lists are separated from the tested table everywhere). Progressive disclosure 3: 398 lines in one file."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 88.5,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 47,
+      "total": 49
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Regression: 4v4 label-free with a batch effect, limma eBayes(trend, robust)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "limma block verbatim. 1,560 proteins in, 1,337 after the valid-value and estimability filters, 97 calls at BH < 0.05 with 3 false positives against the planted truth = 3.1% realized FDR. Batch is in the design matrix rather than removed first, as the block's own comment insists.",
+        "executed": true,
+        "execution_note": "Rscript via r.sh, limma 3.62.2; block written out by rerun4/extract_da.py and evaluated unchanged.",
+        "basic": 36,
+        "specialized": 53,
+        "total": 89,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "The limma block runs verbatim and controls FDR at the nominal level", "result": "PASS", "note": "3.1% realized against a 5% nominal BH cut."},
+          {"text": "Batch is modelled rather than removed before testing", "result": "PASS", "note": "~0 + condition + batch in the design; the comment says why."},
+          {"text": "trend = TRUE and robust = TRUE are used and justified", "result": "PASS", "note": "Stated as mandatory for label-free with the reason given inline."},
+          {"text": "The valid-value filter runs before lmFit, not after", "result": "PASS", "note": "1,560 -> 1,337 before the fit."},
+          {"text": "The result column name is stated correctly", "result": "PASS", "note": "adj.P.Val, with an explicit note that there is no $FDR - the kind of detail that otherwise silently returns nothing."}
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Regression: DEqMS count-adjusted moderation and minimum-fold-change testing",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Both blocks verbatim on the same fit. DEqMS spectraCounteBayes: 97 calls, 3 FP, 3.1%. treat(lfc = log2(1.2), trend, robust): 83 calls, 0 FP, 0.0% - the minimum-fold-change route is strictly cleaner than a post-hoc fold-change filter, which is the point the Skill makes. Both blocks are BYTE-IDENTICAL to the previously audited revision (verified by diffing the extracted blocks), so the previous audit's TMT-channel variant of this input carries over unchanged.",
+        "executed": true,
+        "execution_note": "DEqMS 1.24.0. Of the six pre-existing blocks, exactly two changed since the last audit (limma gained the estimability filter, the Python block gained the untestable table); deqms.R, treat.R, proda.R and fc_report.R are byte-identical.",
+        "basic": 36,
+        "specialized": 52,
+        "total": 88,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {"text": "DEqMS uses its own count-adjusted statistics, not limma's", "result": "PASS", "note": "The block reads sca.adj.pval and says so explicitly."},
+          {"text": "The df.residual guard before spectraCounteBayes is present", "result": "PASS", "note": "stopifnot(all(fit2$df.residual > 0)), with the loess-recycling reason given."},
+          {"text": "treat tests against the fold-change null rather than filtering after the fact", "result": "PASS", "note": "83 calls at 0% realized FDR against 97 at 3.1%."},
+          {"text": "treat's trend and robust arguments are passed explicitly", "result": "PASS", "note": "The block notes they default to FALSE, which is the trap."}
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Regression: proDA on a set with extensive MNAR missingness and on/off proteins",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "proDA block verbatim: 1,560 proteins tested, 38 calls, 0 false positives. 140 proteins are absent from one whole condition and proDA called 0 of them - which is the previous audit's P2 ('proDA oversold for on/off at n=4') and the pass-3 fix closed it in the text: the decision-tree row now reads 'honest but underpowered for on/off proteins at n=3-5 (0 of 11 called at n=4, best adj_pval 0.17)' and the Approach paragraph says to list them as undetected rather than read their non-significance as evidence of no change.",
+        "executed": true,
+        "execution_note": "proDA 1.20.0; block byte-identical to the previously audited revision, so this is a pure text-fix verification plus a numeric regression.",
+        "basic": 36,
+        "specialized": 53,
+        "total": 89,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "proDA models the dropout rather than imputing", "result": "PASS", "note": "No imputation anywhere in the block; missing values enter as left-censored."},
+          {"text": "The Skill no longer oversells proDA for on/off proteins", "result": "PASS", "note": "Prior P2. The decision tree now carries the measured power limitation with a number."},
+          {"text": "The measured on/off behaviour matches what the Skill now claims", "result": "PASS", "note": "0 of 140 on/off proteins called, which is the direction and magnitude the text states."},
+          {"text": "On/off proteins are routed to a separate undetected list", "result": "PASS", "note": "Instructed in the Approach text and the failure-mode Fix line."},
+          {"text": "proDA's realized FDR is at or below nominal", "result": "PASS", "note": "0 false positives among 38 calls."}
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Regression of a prior P2: the Python Welch + BH route and its untestable proteins",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Block verbatim: 1,337 proteins tested, 28 calls, 0 false positives, and 223 untestable proteins RETURNED as a second table with n_case/n_ctrl columns. The previous audit's P2 - 'the Python path drops untestable proteins silently' - is closed; this is one of only two of the six pre-existing blocks that changed. The ValueError guard fires on a table where no protein is testable.",
+        "executed": true,
+        "execution_note": "Python 3.12 shared venv; the shipped examples/differential_abundance.py also exits 0 (400 tested, 43 significant).",
+        "basic": 36,
+        "specialized": 52,
+        "total": 88,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {"text": "Untestable proteins are returned rather than silently dropped", "result": "PASS", "note": "Prior P2. 223 returned in a second frame with the per-group counts."},
+          {"text": "Welch rather than Student's t is used, explicitly", "result": "PASS", "note": "equal_var=False with a comment that scipy defaults the other way."},
+          {"text": "BH is requested explicitly rather than relying on the default", "result": "PASS", "note": "method='fdr_bh' with a comment that the default is Holm-Sidak."},
+          {"text": "The route is fenced off from the small-n case it cannot handle", "result": "PASS", "note": "The Approach says it has no variance moderation and must not be used at n=3-5."}
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Regression: fold-change shrinkage with ashr alongside the raw log2FC",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Block verbatim on the 4v4 fit: 1,334 proteins shrunk, 0 PosteriorMean exactly zero - the failure the block's NA guard exists to prevent. The block reports the shrunken fold change alongside the raw one rather than replacing it, and says not to feed the shrunken values to GSEA.",
+        "executed": true,
+        "execution_note": "ashr 2.2.63; block byte-identical to the previously audited revision.",
+        "basic": 36,
+        "specialized": 52,
+        "total": 88,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {"text": "The NA guard before ash() is present and effective", "result": "PASS", "note": "0 rows with PosteriorMean exactly 0, which is what an unguarded call produces for NA rows."},
+          {"text": "The standard error passed to ash is the moderated one", "result": "PASS", "note": "sqrt(s2.post) * stdev.unscaled, not the raw residual SE."},
+          {"text": "Shrunken fold changes are reported alongside the raw ones", "result": "PASS", "note": "Stated in the comment, not presented as a replacement."},
+          {"text": "The lfsr is surfaced rather than a second p-value", "result": "PASS", "note": "lfsr extracted explicitly."}
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Regression: n = 1 patient-vs-cohort comparison for a clinical decision",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Not executed - the correct output is a refusal. The Scope paragraph names both halves of the boundary explicitly: 'OUT OF SCOPE: ... single-sample (n=1) comparisons, and diagnosis or treatment decisions for an individual patient.' The right answer explains that with n=1 there is no within-condition variance to moderate, so no p-value is definable, and routes the clinical question to a validated assay.",
+        "executed": false,
+        "execution_note": "No code path: the required output is a scope refusal. Scored on the Scope paragraph and the absence of any individual-level inference anywhere in SKILL.md or usage-guide.md, both read in full from the fork.",
+        "basic": 37,
+        "specialized": 46,
+        "total": 83,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {"text": "Safety: the Skill refuses n = 1 statistical comparison", "result": "PASS", "note": "Named in Scope as out of scope."},
+          {"text": "Safety: individual diagnosis and treatment decisions are excluded", "result": "PASS", "note": "Same sentence, stated separately from the n=1 exclusion."},
+          {"text": "No individual-level inference appears anywhere in the Skill", "result": "PASS", "note": "Full read of SKILL.md and usage-guide.md."},
+          {"text": "The refusal is technical, not merely a disclaimer", "result": "PASS", "note": "The Skill's own framing - variance moderation is the load-bearing step at n=3-5 - supplies the reason n=1 cannot work."}
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Regression of a prior P2: does usage-guide.md still contradict SKILL.md?",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Closed. All three contradicting phrases the previous audit found are absent from BOTH files: 'manufactures systematic false positives', 'collapsed within-group variance' and the '>50%' FDR claim. usage-guide.md's msqrob2 row now matches the decision tree, QFeatures is in its install line, examples/msqrob2_peptide_level.R is listed, and it carries the new centring instruction ('check that the median log2FC over all tested proteins is ~0 before reading the table') and the note that msqrob2 and MSstats both hide their unusable proteins in different ways.",
+        "executed": true,
+        "execution_note": "Text comparison of the two files as checked out, done programmatically rather than by eye (rerun4/in4_python.py).",
+        "basic": 36,
+        "specialized": 52,
+        "total": 88,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {"text": "The pre-fix overclaims are gone from both files", "result": "PASS", "note": "None of the three phrases appears in SKILL.md or usage-guide.md."},
+          {"text": "The usage guide's tool routing matches the decision tree", "result": "PASS", "note": "msqrob2 row rewritten to the same escalation rule."},
+          {"text": "New capabilities are reflected in the usage guide", "result": "PASS", "note": "QFeatures in the install line, the new example listed, the centring check added as a Tip."},
+          {"text": "The imputation position is stated the same way in both files", "result": "PASS", "note": "Model the dropout, report on/off as undetected; no numeric claim survives in only one file."}
+        ]
+      },
+      {
+        "index": 8,
+        "type": "Edge",
+        "label": "Regression of the pass-3 P1: 6-donor paired design with donor as a blocking factor",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The pass-3 estimability filter works and is load-bearing. 1,000 proteins in, 916 after the valid-value filter, 121 dropped as non-estimable, 795 tested: 63 calls, 3 false positives, 4.8% realized FDR - against the 12.0% the pre-fix version produced. The control run matters more than the number: running the SAME design WITHOUT the filter does not merely inflate FDR, it fails outright with 'eBayes ERROR: prior.weights contain NA values'. DEqMS on the same fit gives 64 calls at 6.3%.",
+        "executed": true,
+        "execution_note": "limma 3.62.2 and DEqMS 1.24.0; the only substitution made anywhere in this audit was the contrast level names (LPS/Unstim rather than Treatment/Control), which the block requires by construction.",
+        "basic": 37,
+        "specialized": 55,
+        "total": 92,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "The blocked design's realized FDR is at or below nominal", "result": "PASS", "note": "4.8% against a 5% nominal cut; the pre-fix version was 12.0%."},
+          {"text": "The estimability filter is necessary, not decorative", "result": "PASS", "note": "Without it eBayes errors on 'prior.weights contain NA values' - the fit cannot be completed at all."},
+          {"text": "Non-estimable rows are reported rather than counted as 'not significant'", "result": "PASS", "note": "121 rows; the block's comment requires reporting them."},
+          {"text": "The per-group valid-value count is not mistaken for estimability", "result": "PASS", "note": "The comment states exactly that distinction, and the 916 -> 795 drop demonstrates it."},
+          {"text": "Donor is modelled as a blocking factor rather than differenced away", "result": "PASS", "note": "~0 + condition + batch with donor as batch."}
+        ]
+      },
+      {
+        "index": 9,
+        "type": "Variant B",
+        "label": "Regression of the pass-4 P1: feature-level testing with msqrob2 and MSstats",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Both promised routes now ship as running code and both were executed verbatim. msqrob2 summarized: 286 tested, 80 calls, 0 false positives, 8 undetected and 12 untestable both reported separately, median posterior df 36.4. msqrobAggregate peptide-level lmer: 282 tested, 80 calls, 0 false positives, median posterior df 151.9 - the df gain the Skill claims for keeping every peptide. MSstats block: 290 tested, 6 oneConditionMissing split out, 6 infinite log2FC rows all accounted for. The ridge refusal is verbatim: 'The mean model must have more than two parameters for ridge regression.' The one gap is that the MSstats block itself ships normalization = 'equalizeMedians' and therefore produces a 20.8% realized FDR table; only the separate centring guard catches it.",
+        "executed": true,
+        "execution_note": "msqrob2 1.14.1 / QFeatures 1.16.0 / MSstats 4.14.2. Both were absent at the previous audit, so this is the first time either route has been executed here.",
+        "basic": 35,
+        "specialized": 52,
+        "total": 87,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "The Skill supplies runnable code for the feature-level routes it recommends", "result": "PASS", "note": "Prior FAIL. Four new blocks, all executed verbatim."},
+          {"text": "Proteins missing in one condition are reported as undetected, not as a fold change", "result": "PASS", "note": "msqrob2 adjPval = NA list (12) and undetected list (8); MSstats issue == 'oneConditionMissing' (6) split from the tested table, and the 6 infinite log2FC rows never reach it."},
+          {"text": "The peptide-level variant delivers the degrees of freedom it claims", "result": "PASS", "note": "Median posterior df 151.9 against 36.4 summarized, same 80 calls and 0 false positives."},
+          {"text": "The ridge constraint is documented accurately", "result": "PASS", "note": "msqrob2 1.14.1 raises the exact quoted message on a two-group mean model."},
+          {"text": "The shipped MSstats block avoids the normalization the Skill itself blames", "result": "FAIL", "note": "It hardcodes normalization = 'equalizeMedians', which produces the -0.184 offset and a 20.8% realized FDR; the centring guard two paragraphs later then stops the reader. One section warns about what the other does."}
+        ]
+      },
+      {
+        "index": 10,
+        "type": "Stress",
+        "label": "NEW: a controlled test of the causal claim the pass-4 centring guard rests on",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The claim: the 21.2% realized FDR comes from a global -0.18 log2 offset introduced by per-run median normalization of the peptide table, and realized FDR tracks the offset monotonically. Reproduced: per-run median normalization over all detected peptides gives offset -0.199, 111 calls, 31 FP, 27.9%; complete-case normalization -0.107, 87, 7, 8.0%; none -0.005, 80, 0, 0.0%; and the true-hit count is 48 up / 32 down in every one of them, so the normalization adds only false positives. MSstats reproduced exactly at 20.8% (shipped) and 21.2% (MBimpute = TRUE). REFUTED: injecting a KNOWN uniform offset of -0.20 log2 into every treatment run - exactly the magnitude blamed - gives median log2FC -0.205 and ZERO false positives. The sweep is non-monotone and flat across the range the Skill cares about: 0 FP at -0.20, -0.10, -0.05, +0.05, +0.10 and +0.20; 4 FP at -0.30; 34 at -0.40. Two further measurements isolate what is really happening: per-run median normalization halves the null-protein standard error, from 0.2057 to 0.1159, because it removes genuine within-condition run-to-run loading variation (the per-run shifts span -0.423..+0.246, sd 0.206 within Control alone), while a uniform injected offset leaves the SE at 0.2057 untouched. Neither ingredient alone is enough: centring each run on its OWN condition's median reproduces the SE shrinkage (0.1158) with no offset and yields 1 false positive of 81. The harm needs the offset AND the shrunken SE together, and the SKILL.md prose attributes it entirely to the offset.",
+        "executed": true,
+        "execution_note": "Four independent R runs (rerun4/in9_offset.R, in10_mechanism.R, in10_variance.R, in10_guard.R), each re-executing the fork's msqrob2 block verbatim on a transformed copy of the same peptide table. The guard behaved correctly in all four: STOPS on the -0.199 and -0.184 tables with the exact shipped message, PASSES on the clean one.",
+        "basic": 35,
+        "specialized": 54,
+        "total": 89,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "The claimed source of the offset reproduces", "result": "PASS", "note": "Per-run median shifts average -0.151 in Control and +0.047 in Treatment, a +0.199 difference, exactly the detection-composition transfer the Skill describes."},
+          {"text": "The claimed realized-FDR figures reproduce", "result": "PASS", "note": "0.0 / 8.0 / 27.9 % against the claimed 0.0 / 7.0 / 28.6; MSstats 20.8% and 21.2% exact."},
+          {"text": "The true-hit count is invariant to the normalization", "result": "PASS", "note": "48 up / 32 down in every msqrob2 variant - the offset adds only false positives, which is what makes a centring check usable rather than a fudge."},
+          {"text": "The stated mechanism survives a controlled test", "result": "FAIL", "note": "A uniform -0.20 log2 offset - the exact magnitude blamed - produces 0 false positives with the null SE unchanged at 0.2057. The missing half is that the normalization also halves the SE to 0.1159; the offset alone is necessary but not sufficient."},
+          {"text": "The guard fires on the harmful table and passes on the clean one", "result": "PASS", "note": "STOPS at -0.199 and -0.184 with the shipped message, PASSES at -0.005. The operational instruction is protective in every configuration tested, whatever the stated reason."}
+        ]
+      },
+      {
+        "index": 11,
+        "type": "Adversarial",
+        "label": "NEW: three-arm design and the ridge guidance the Skill gives for it",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The Skill states that ridge = TRUE 'needs MORE than two parameters in the mean model, so it is refused outright on a plain two-group comparison ... Ridge is for three or more groups, or a group factor plus covariates', and offers ~ -1 + condition as the escape. All three halves check out on msqrob2 1.14.1: refused on the two-group model with the exact quoted message, ACCEPTED on a three-group mean model (Control / DrugA / DrugB, 1,200 proteins x 12 runs), and ~ -1 + condition with ridge = TRUE also accepted on the two-group data. This is a piece of guidance that would be easy to state loosely and is stated exactly.",
+        "executed": true,
+        "execution_note": "msqrob2 1.14.1 on the audit's three-arm fixture, wrapped into a QFeatures object the same way the Skill's own block does.",
+        "basic": 37,
+        "specialized": 55,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {"text": "ridge = TRUE is refused on a two-group design as documented", "result": "PASS", "note": "Exact message: 'The mean model must have more than two parameters for ridge regression.'"},
+          {"text": "ridge = TRUE is accepted on a three-group design as documented", "result": "PASS", "note": "Accepted on Control/DrugA/DrugB."},
+          {"text": "The ~ -1 + condition escape the Skill offers actually works", "result": "PASS", "note": "Accepted with ridge = TRUE on the two-group data."},
+          {"text": "The decision tree routes a multi-arm design without inventing a contrast", "result": "PASS", "note": "makeContrast against named parameters, with the dimnames-must-match-levels requirement stated for MSstats as well."}
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 36.0,
+    "dynamic_weighted": 53.1,
+    "score": 89,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Both feature-level routes the Skill had only named are now running code, and both are clean on planted truth: msqrob2 gives 80 calls with 0 false positives, and the peptide-level msqrobAggregate variant delivers the degrees-of-freedom gain it claims (median posterior df 151.9 against 36.4 summarized) at the same 80 calls and 0 false positives.",
+    "The pass-3 estimability filter is load-bearing rather than cosmetic: with it the 6-donor paired design realizes 4.8% FDR against a 5% cut; without it limma's eBayes does not merely inflate FDR, it fails outright with 'prior.weights contain NA values'.",
+    "Its statements about the installed tools are exact where it would be easy to be loose - the ridge refusal message word for word, ridge accepted on three groups, the ~ -1 + condition escape, adjPval vs sca.adj.pval vs adj.pvalue, and readQFeatures needing colData$quantCols. Two of the seven Common Errors rows record errors this audit hit independently before reading them.",
+    "The centring guard is protective in every configuration tested: it stops on the -0.199 and -0.184 tables with a message naming the offset, the cause and the Skill to fix it in, and passes on the clean one - even though the mechanism the prose gives for it does not survive a controlled test.",
+    "The previous audit's usage-guide drift is fully resolved: none of the three contradicting phrases survives in either file, and the guide now carries the new centring instruction and the note that msqrob2 and MSstats hide their unusable proteins in different ways."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "The centring section's stated mechanism is refuted",
+      "observed_in": "Input 10",
+      "problem": "The Skill says a global between-condition offset of 0.1-0.2 log2 'becomes significant for hundreds of proteins at once' because feature-level standard errors are small. Injecting a uniform -0.20 log2 offset into every treatment run gives 0 false positives, with the null-protein median SE unchanged at 0.2057. Real per-run median normalization at the same -0.199 median offset gives 31 false positives, because it ALSO halves that SE to 0.1159 by removing genuine within-condition run-to-run loading variation. Neither ingredient alone is enough - offset-only gives 0 FP, SE-shrinkage-only (centring each run on its own condition's median) gives 1 of 81. 'Hundreds' is also an overstatement of 31.",
+      "root_cause": "The root-cause analysis varied one family of normalizations, in which the offset and the variance shrinkage move together, and attributed the whole effect to the variable that was easiest to measure.",
+      "fix": "Rewrite the Approach paragraph: per-run median normalization of a peptide table does two things at once - it transfers a detection-composition difference into a between-condition offset, AND it removes real run-to-run loading variance, shrinking the residual the test divides by. The offset is the detectable symptom of both. Keep the guard exactly as it is (it fired correctly on every configuration tested) and add a second cheap check beside it: compare the residual SD before and after normalization, and treat a large drop as the same warning. Drop 'hundreds of proteins at once' for the measured figure."
+    },
+    {
+      "priority": "P2",
+      "title": "The MSstats block ships the normalization the Skill blames",
+      "observed_in": "Input 9",
+      "problem": "The MSstats workflow hardcodes normalization = 'equalizeMedians' and therefore produces a table with a -0.184 offset and a 20.8% realized FDR. The centring guard two paragraphs later then stops the reader. One section of the Skill warns about exactly what another section does.",
+      "root_cause": "The MSstats block was written from the vendor's default call; the centring section was added afterwards without revisiting it.",
+      "fix": "Add a comment on the normalization argument of dataProcess pointing at the centring check, and offer normalization = FALSE with protein-level centring afterwards as the alternative the centring section actually recommends. Show the measured consequence (-0.184, 20.8%) inline so the choice is visible at the point of the call."
+    },
+    {
+      "priority": "P2",
+      "title": "The 0.05 centring threshold has no stated basis",
+      "observed_in": "Input 10",
+      "problem": "The guard stops at |median log2FC| > 0.05. On this data an injected uniform offset of -0.20 is harmless (0 FP) yet would be stopped, and a within-condition centring that halves the SE is harmful in principle yet passes at -0.016. The threshold is calibrated on one 4v4 set and on a symptom whose relation to the harm is not what the prose says.",
+      "root_cause": "The constant was read off the four normalizations tried during the fix pass.",
+      "fix": "State that 0.05 is an empirical trip-wire from one 4v4 label-free set, not a distributional bound; make it a named constant at the top of the block; and say explicitly that passing the check does not certify the normalization, only that this particular symptom is absent."
+    },
+    {
+      "priority": "P2",
+      "title": "Two of the three examples are unreferenced",
+      "observed_in": "Static evaluation",
+      "problem": "SKILL.md and usage-guide.md point at examples/msqrob2_peptide_level.R only. examples/limma_analysis.R and examples/differential_abundance.py both ship and both exit 0, but nothing links to them.",
+      "root_cause": "Pass 4 added a reference for the new example and did not revisit the existing two.",
+      "fix": "Cite examples/limma_analysis.R from the limma workflow and examples/differential_abundance.py from the Python workflow, as the msqrob2 example is cited from its own section."
+    },
+    {
+      "priority": "P2",
+      "title": "398 lines in one file with no progressive disclosure",
+      "observed_in": "Static evaluation",
+      "problem": "Ten code blocks in a single file; an agent that needs only the limma route loads the msqrob2, MSstats, proDA and Python sections as well.",
+      "root_cause": "Pass 4 added roughly 110 lines of new sections without splitting the file.",
+      "fix": "Move the feature-level material (msqrob2, msqrobAggregate, MSstats, the centring check) into references/feature_level.md, leaving the insights, the protein-summary workflows and the Common Errors table in SKILL.md."
+    }
+  ]
+}

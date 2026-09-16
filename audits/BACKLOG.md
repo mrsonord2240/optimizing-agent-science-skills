@@ -8,255 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (34)
-
-### `bio-proteomics-protein-inference` — Basic inference mislabelled as parsimony; FDP 8.6% at 1%
-
-- Skill: 67, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/protein-inference) · [viewer](skills/bio-proteomics-protein-inference/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 1, 3, 5
-- Problem: BasicProteinInferenceAlgorithm is recommended 'for parsimony grouping' but aggregates scores for every protein, so subsumable fragments and shared-only paralogs are reported as separate groups. True FDP was 8.6% at nominal 1% on both the standard and deep sets.
-- Root cause: The OpenMS aggregation class was confused with Occam/parsimony inference, and greedy_group_resolution was left at its default of false.
-- Fix: Describe Basic as aggregation and set greedy_group_resolution='true' (it gave 0.9% true FDP here), or point to a real parsimony step. Say that subsumable proteins must be removed before group-FDR counting.
-
-### `bio-proteomics-protein-inference` — pyOpenMS names/types fail: EpifanyAlgorithm, plain lists
-
-- Skill: 67, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/protein-inference) · [viewer](skills/bio-proteomics-protein-inference/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 1, 4, 5
-- Problem: pyopenms.EpifanyAlgorithm exists in neither 3.1.0 nor 3.5.0, and the recommended help() call also raises. IdXMLFile.load(path, [], []) fails on 3.5.0 with 'can not handle type of'. Group accessions come back as bytes and crash picked_group_fdr with TypeError.
-- Root cause: The code was written against an assumed API and never run on the stated versions.
-- Fix: Use pyopenms.BayesianProteinInferenceAlgorithm (TOPP tool Epifany) and pyopenms.PeptideIdentificationList() for peptide IDs, and decode group.accessions. Update the tested-version line to 3.5.
-
-### `bio-proteomics-protein-inference` — Example drops indistinguishable proteins as subsumable
-
-- Skill: 67, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/protein-inference) · [viewer](skills/bio-proteomics-protein-inference/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 3
-- Problem: Greedy parsimony picks one protein per step, so an indistinguishable partner adds no new coverage and is printed as 'Dropped (subsumable)'. Which partner is kept depends on input order, so the report can lead with an isoform. This contradicts Insight #1 and the proteoform-overreach warning.
-- Root cause: build_groups only collapses proteins that were both selected, and selection never keeps an equal-evidence partner.
-- Fix: Collapse proteins with identical peptide sets into groups before the greedy loop (or attach equal-evidence proteins to the chosen group). Add an indistinguishable pair to SAMPLE_MAP with the expected output, and delete the bare 'report' notebook line.
-
-### `bio-proteomics-protein-inference` — Naive protein-FDR bias reversed; picked-group misattributed
-
-- Skill: 67, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/protein-inference) · [viewer](skills/bio-proteomics-protein-inference/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 5
-- Problem: The Skill says non-picked protein target-decoy reports 1% while the actual rate is 10-30%. Savitski 2015, and the simulation here (0.57% true at nominal 1%), show the classic protein-level approach over-estimates FDR; the 10-30% arises only when no protein-level FDR is estimated. Picked-group FDR is credited to The & Kall 2016, which does not define it.
-- Root cause: PSM-to-protein error propagation was conflated with the bias of the classic protein-level decoy count.
-- Fix: Split the two failure modes: no protein-level FDR (anticonservative) vs classic protein target-decoy (conservative on large data, fixed by picking). Cite The, Samaras, Kuster & Wilhelm 2022, MCP 21(12):100437 for picked-group FDR and grouping anticonservativeness.
-
-### `bio-proteomics-ptm-analysis` — MSstatsPTM block fails as written on 2.8.1
-
-- Skill: 69, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/ptm-analysis) · [viewer](skills/bio-proteomics-ptm-analysis/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 1, 3, 5
-- Problem: dataSummarizationPTM(input, use_log_file = FALSE) fails with "Assertion on '!(append & !use_log_file)' failed". groupComparisonPTM(data.type = 'LF') matches neither branch and stops with "object 'ptm_model' not found".
-- Root cause: The block mixes up the converter's labeling_type = 'LF' with groupComparisonPTM's data.type, and ignores the append = TRUE default.
-- Fix: Use dataSummarizationPTM(input, use_log_file = FALSE, append = FALSE) and groupComparisonPTM(summarized, data.type = 'LabelFree'). Add both errors to Common Errors.
-
-### `bio-proteomics-ptm-analysis` — Protein dataset never built: evidence_prot missing
-
-- Skill: 69, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/ptm-analysis) · [viewer](skills/bio-proteomics-ptm-analysis/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 1, 3, 5
-- Problem: The comment says to supply the global proteome, but the call passes only proteinGroups and annotation_protein. MaxQtoMSstatsPTMFormat then returns list(PTM) with no PROTEIN, so no adjustment is possible.
-- Root cause: The code does not match the documented converter contract, which builds $PROTEIN only when evidence_prot is non-NULL.
-- Fix: Add evidence_prot = read.table('evidence_global.txt', ...) and which_proteinid_protein = 'Proteins'. Add stopifnot('PROTEIN' %in% names(input)) before summarization.
-
-### `bio-proteomics-ptm-analysis` — Multiplicity melt adds a bogus run named 'Intensity'
-
-- Skill: 69, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/ptm-analysis) · [viewer](skills/bio-proteomics-ptm-analysis/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 2, 5
-- Problem: On a real-format Sites table, mult_cols also matches the aggregated Intensity___1/2/3 columns. The long table gains a 9th 'run' holding the sum over runs: 38 of 295 rows, median 2.74 log2 above the real runs.
-- Root cause: The filter uses c.startswith('Intensity') instead of per-experiment 'Intensity <exp>___n'; the shipped example has only aggregated columns, so it never exposes this.
-- Fix: Select with c.startswith('Intensity ') and a ___[123]$ suffix (or exclude ^Intensity___), and add per-run columns to the example.
-
-### `bio-proteomics-ptm-analysis` — R path skips localization filter and keeps unmodified rows
-
-- Skill: 69, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/ptm-analysis) · [viewer](skills/bio-proteomics-ptm-analysis/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 1
-- Problem: In the MSstatsPTM route, class II/III sites are tested (1 with localization prob 0.42 called regulated). Unmodified peptides from the enriched runs enter $PTM as bare-protein 'sites' (39 of 80 rows).
-- Root cause: The class-I rule and the modified-peptide filter exist only in the pandas Sites-table workflow; the converter uses the best-localized sequence as is.
-- Fix: Before conversion, keep evidence rows whose Modified sequence matches mod_id and whose max localization probability (parsed from 'Phospho (STY) Probabilities') is >= 0.75. After testing, drop result rows without a site suffix.
-
-### `bio-proteomics-ptm-analysis` — Motif block NameError; no kinase-activity code
-
-- Skill: 69, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/ptm-analysis) · [viewer](skills/bio-proteomics-ptm-analysis/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 4
-- Problem: Run in order, the motif block raises NameError on 'confident'. It defines only a counter, with no background construction or enrichment test. KSEA/PTM-SEA, both promised in the description, have no code.
-- Root cause: The block was lifted from the example, which names the filtered table 'confident', and was never run after the expansion block.
-- Fix: Rename to 'phospho'. Add a matched-background builder plus a per-position Fisher/BH test, and a KSEAapp::KSEA.Scores call with a documented PhosphoSitePlus/NetworKIN input and fold-change direction.
-
-### `bio-proteomics-quantification` — MaxQuant read.table silently drops rows at apostrophes
-
-- Skill: 71, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/quantification) · [viewer](skills/bio-proteomics-quantification/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 1
-- Problem: read.table(sep='\t', header=TRUE) keeps the default quote="\"'", so apostrophes in 'Protein names' (e.g. 5'-nucleotidase) open quoted fields. It read 2,954 of 10,369 evidence rows and the pipeline ran on 57 of 296 proteins, with only a scan() warning.
-- Root cause: The canonical MSstats block uses default read.table quoting on MaxQuant tables, which contain apostrophes, and never checks the row count.
-- Fix: Use read.table(..., quote = '', comment.char = '') or data.table::fread for evidence.txt and proteinGroups.txt, and add a row-count check against wc -l, or a Common Errors row for this.
-
-### `bio-proteomics-quantification` — makeImpuritiesMatrix(x=10) blocks non-interactive runs
-
-- Skill: 71, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/quantification) · [viewer](skills/bio-proteomics-quantification/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 4
-- Problem: The default edit=TRUE calls edit(M); under Rscript the TMT block stalled until the timeout killed it (exit 124, twice). The Skill also says to use lot CoA values but shows no way to load them.
-- Root cause: The example uses the interactive default and leaves out the filename= route.
-- Fix: Write makeImpuritiesMatrix(x = 10, edit = FALSE) and show the CoA route (makeImpuritiesMatrix(filename = 'lot_coa.csv', edit = FALSE), or a directly built matrix), with a note that TMT10 N/C interleaving means +1 Da is two positions away in the channel order.
-
-### `bio-proteomics-quantification` — MBimpute=FALSE contradicts censored handling and MSstats-AFT
-
-- Skill: 71, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/quantification) · [viewer](skills/bio-proteomics-quantification/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 1
-- Problem: The text promises 'censored-value handling', but MBimpute=FALSE gives 0 imputed features and censoredInt has no effect. Common Errors defers missingness to differential-abundance, which recommends MSstats-AFT, and that AFT exists only in dataProcess(MBimpute=TRUE): groupComparison has no censoring argument.
-- Root cause: The MSstats censoring model is split across two Skills that each assume the other handles it.
-- Fix: State that MBimpute=FALSE means no censoring model in MSstats and that on/off proteins come out as oneConditionMissing / -Inf. Either keep MBimpute=TRUE as the MSstats-AFT route or point to proDA/msqrob2, and align the differential-abundance wording.
-
-### `bio-proteomics-proteomics-qc` — raw_sample_qc counts MaxQuant zeros as quantified
-
-- Skill: 73, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/proteomics-qc) · [viewer](skills/bio-proteomics-proteomics-qc/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 1, 3
-- Problem: The verbatim function returned 1500 IDs and 0% missing for every sample, which hides T4's 19% ID drop and 31% missingness on the failed file.
-- Root cause: The Skill never states that MaxQuant writes missing values as 0 (and that DIA-NN PG.MaxLFQ can be 0).
-- Fix: Add `raw_intensities = raw_intensities.replace(0, np.nan)` inside raw_sample_qc and state in the Inspect section that search-engine zeros are missing values.
-
-### `bio-proteomics-proteomics-qc` — Un-normalised column never named per tool
-
-- Skill: 73, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/proteomics-qc) · [viewer](skills/bio-proteomics-proteomics-qc/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 2, 3
-- Problem: On MaxQuant 'LFQ intensity' the 3x-low T4 is 1.02x (total) and 1.41x (median) and is never flagged; only 'Intensity' shows 0.41x. The rule's median-versus-total choice also decides the flag (0.62x versus 0.41x).
-- Root cause: The Skill says 'un-normalized matrix' without mapping it to MaxQuant, DIA-NN or TMT columns, and gives no ID-count threshold.
-- Fix: State: MaxQuant 'Intensity <s>' (LFQ is already MaxLFQ-normalised); DIA-NN Precursor.Quantity (not Precursor.Normalised or PG.MaxLFQ). Apply the 2x rule to total signal and flag an ID count more than 15-20% below the group median.
-
-### `bio-proteomics-proteomics-qc` — pca_batch_check crashes or misplaces samples
-
-- Skill: 73, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/proteomics-qc) · [viewer](skills/bio-proteomics-proteomics-qc/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 1, 5
-- Problem: Cryptic TypeError with a RangeIndex sample_info; ValueError on all-NaN rows; ValueError at n<5; row-median fill pulled the failed T4 to the centre of the PCA.
-- Root cause: Hard-coded n_components=5, no index/NaN checks, and median imputation that makes high-missing samples look average.
-- Fix: Require sample_info indexed by sample (assert set equality), dropna(how='all'), use n_components=min(5, n_samples-1), and run PCA on complete cases or with a low-value fill, noting the imputation bias.
-
-### `bio-proteomics-proteomics-qc` — MSstatsTMT QC plot is post-normalisation by default
-
-- Skill: 73, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/proteomics-qc) · [viewer](skills/bio-proteomics-proteomics-qc/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 4
-- Problem: dataProcessPlotsTMT after default proteinSummarization showed all 20 channel medians at 24.73, which contradicts the Skill's 'on RAW reporter intensities' and hides channel imbalance.
-- Root cause: proteinSummarization(global_norm=TRUE) is the default, the Skill does not mention it, and the tool needs PSM-level input.
-- Fix: Say proteinSummarization(..., global_norm=FALSE, reference_norm=FALSE) for the balance view and add a pandas within-plex channel-total check (fold versus plex median, >2x investigate).
-
-### `bio-proteomics-differential-abundance` — proDA block calls a coefficient that does not exist
-
-- Skill: 75, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/differential-abundance) · [viewer](skills/bio-proteomics-differential-abundance/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 3
-- Problem: test_diff(fit, conditionTreatment - conditionControl) fails with object 'conditionControl' not found; with reference_level='Control' the coefficients are Intercept and conditionTreatment.
-- Root cause: The contrast was written for a no-intercept design while the call uses an intercept design with a reference level.
-- Fix: Use test_diff(fit, 'conditionTreatment') and show batch in the formula (design = ~condition + batch).
-
-### `bio-proteomics-differential-abundance` — limma and DEqMS blocks break on real MaxQuant matrices
-
-- Skill: 75, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/differential-abundance) · [viewer](skills/bio-proteomics-differential-abundance/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 1, 5
-- Problem: Rows with no LFQ value make eBayes(trend=TRUE) stop with 'prior.weights contain NA values'; rows with zero residual df make DEqMS recycle loess predictions onto the wrong proteins with only a warning.
-- Root cause: The Skill has no valid-value filtering step and its Common Errors table omits both failures.
-- Fix: Add a filter before lmFit (e.g. at least 2-3 valid values per group; drop df.residual == 0 before spectraCounteBayes) and add both errors to Common Errors.
-
-### `bio-proteomics-differential-abundance` — treat() silently drops trend and robust moderation
-
-- Skill: 75, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/differential-abundance) · [viewer](skills/bio-proteomics-differential-abundance/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 5
-- Problem: treat(fit2, lfc=...) re-estimates the prior with trend=FALSE and robust=FALSE (s2.prior became constant, df.prior 18.6), contradicting the Skill's own 'trend mandatory' rule; the example does the same.
-- Root cause: treat() has its own trend/robust arguments defaulting to FALSE, which the snippet does not pass.
-- Fix: Write treat(fit2, lfc = LFC_THRESHOLD, trend = TRUE, robust = TRUE) in SKILL.md and examples/limma_analysis.R, and keep the eBayes fit in a separate object for the ashr block.
-
-### `bio-proteomics-differential-abundance` — Downshift and double-filter FDR claims are overstated
-
-- Skill: 75, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/differential-abundance) · [viewer](skills/bio-proteomics-differential-abundance/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 3, 7
-- Problem: On truth data downshift gave 0-1 false positives (it lost power: 62-68 vs 104 calls) and the \|FC\|>2 & p<0.05 filter gave 1.3-3.8% realized FDR, not the systematic false positives and >50% FDR the Skill states as general.
-- Root cause: The Skill treats Perseus sigma (the across-protein SD of a run) as the within-group SD and generalizes a regime-specific literature figure.
-- Fix: Say downshift makes on/off fold changes arbitrary (the wing, r = -0.96) with no FDR guarantee, and call the >50% figure regime-specific (top-k lists with many small effects).
-
-### `bio-proteomics-differential-abundance` — Example 'median centering' scales log values
-
-- Skill: 75, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/differential-abundance) · [viewer](skills/bio-proteomics-differential-abundance/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: —
-- Problem: examples/limma_analysis.R normalizes log2 data with normalizeBetweenArrays(method='scale'), which divides by a factor (x1.0595 for a run shifted by -1.5), inflating its spread and leaving 0.28 log2 bias at +4 log2 from the median.
-- Root cause: method='scale' is multiplicative median scaling meant for unlogged values, mislabelled as median centering.
-- Fix: Use sweep(x, 2, apply(x, 2, median, na.rm = TRUE)) as the Python path does, or method = 'none' on matrices already normalized upstream.
-
-### `bio-proteomics-dia-analysis` — easypqp library snippet fails as written
-
-- Skill: 77, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/dia-analysis) · [viewer](skills/bio-proteomics-dia-analysis/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 4
-- Problem: The Skill's easypqp library command exits 1 ('No PSMs files present'); with pkl inputs it still fails because --psmtsv requires --peptidetsv, and with both tsvs the FDR flags are ignored.
-- Root cause: The snippet omits the prior easypqp convert step and the positional *.psmpkl/*.peakpkl inputs, and is mislabelled as predicted-library generation.
-- Fix: Show easypqp convert per run, then 'easypqp library --psmtsv psm.tsv --peptidetsv peptide.tsv --out library.tsv *.psmpkl *.peakpkl', note the ignored FDR flags, and retitle the section as empirical library building.
-
-### `bio-proteomics-dia-analysis` — Staggered-window guidance overstated and incomplete
-
-- Skill: 77, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/dia-analysis) · [viewer](skills/bio-proteomics-dia-analysis/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 3
-- Problem: The Skill says staggered data MUST be demultiplexed or every tool loses selectivity, and gives an msconvert command without peak picking.
-- Root cause: It ignores DIA-NN's native support for overlapping windows and its requirement that vendor peak picking be the first msconvert filter.
-- Fix: State that DIA-NN handles overlapping windows natively (demux is an optional few-% gain) and give --filter "peakPicking vendor msLevel=1-" --filter "demultiplex optimization=overlap_only massError=10ppm".
-
-### `bio-proteomics-dia-analysis` — Mass-accuracy advice contradicts DIA-NN docs
-
-- Skill: 77, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/dia-analysis) · [viewer](skills/bio-proteomics-dia-analysis/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 1, 5
-- Problem: SKILL.md l.82 and example l.15 say --mass-acc 0 auto-optimises per file and recommend it as the default; DIA-NN optimises on the first run, reuses it, and prefers fixed values.
-- Root cause: Auto mass accuracy was assumed to be per-run and best practice.
-- Fix: Explain first-run optimisation and --individual-mass-acc, and recommend fixed MS1/MS2 accuracies per instrument (timsTOF 15/15, Astral MS1 4 / MS2 10, TripleTOF 20/20) for production runs.
-
-### `bio-proteomics-dia-analysis` — Large-cohort route diverges from DIA-NN guidance
-
-- Skill: 77, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/dia-analysis) · [viewer](skills/bio-proteomics-dia-analysis/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 5
-- Problem: The decision tree sends hundreds to thousands of runs through --reanalyse; DIA-NN docs recommend an empirical library from 20-100 runs, then searching all runs with it.
-- Root cause: MBR is treated as the FDR mechanism instead of a convenience feature, and version-specific Lib.* vs Global.* guidance is missing.
-- Fix: Add the two-step empirical-library route with fixed mass accuracy for large cohorts, and state which q-value columns apply under MBR by version (1.9.x Lib.*, 2.x Global.*).
-
-### `bio-proteomics-data-import` — DIA-NN import omits Global.PG.Q.Value filter
-
-- Skill: 78, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/data-import) · [viewer](skills/bio-proteomics-data-import/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 2, 5
-- Problem: Following the DIA block and its threshold table, all 60 LOWCONF groups (Global.PG.Q.Value 0.04) enter the cross-run matrix (6.3% of rows, 116 cells).
-- Root cause: The import filter is run-level only (Q.Value and PG.Q.Value), unlike the sibling dia-analysis Skill and DIA-NN guidance for cross-run matrices.
-- Fix: Add (report['Global.PG.Q.Value'] <= 0.01) (or Lib.PG.Q.Value for library-based MBR) to the DIA code, the Quantitative Thresholds row and the Stale DIA-NN parsing fix.
-
-### `bio-proteomics-data-import` — DIA missingness labelled MCAR against own diagnostic
-
-- Skill: 78, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/data-import) · [viewer](skills/bio-proteomics-data-import/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 5
-- Problem: assess_missingness gives DIA the same MNAR signature as DDA (-0.66 vs -0.62; missing cells in the lowest abundance quartile), yet the Decision Tree routes DIA to 'MCAR / standard imputers'.
-- Root cause: Imputation class is keyed to acquisition mode instead of the diagnostic, and the MCAR claim has no supporting citation.
-- Fix: State that DIA has less but still mostly intensity-dependent missingness; choose the imputer from the diagnostic; cite a missing-value source (e.g. msImpute 2023).
-
-### `bio-proteomics-data-import` — DIA block keeps PG.MaxLFQ zeros (-inf after log2)
-
-- Skill: 78, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/data-import) · [viewer](skills/bio-proteomics-data-import/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 2, 5
-- Problem: 61 PG.MaxLFQ zeros pass into the pivot and become -inf at log2; run verbatim on the linear matrix the diagnostic reads -0.16 instead of -0.66.
-- Root cause: The zero->NaN rule and log2 step are written for MaxQuant only.
-- Fix: After the pivot add matrix = np.log2(matrix.replace(0, np.nan)) and state that assess_missingness expects a log2 matrix with NaN for missing.
-
-### `bio-proteomics-data-import` — mzML loop crashes on MS2 scans without precursor
-
-- Skill: 78, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/data-import) · [viewer](skills/bio-proteomics-data-import/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 3
-- Problem: spectrum.getPrecursors()[0] raises IndexError on an AIF/bbCID-style MS2 scan; missing isolation offsets are reported as width 0.
-- Root cause: The loop assumes every MS2 spectrum carries a precursor with written isolation offsets.
-- Fix: Guard with precs = spectrum.getPrecursors(); if not precs: record as no-precursor and continue; warn when lower+upper offset == 0.
-
-### `bio-proteomics-peptide-identification` — Correct the separate-search FDR estimator and citation
-
-- Skill: 79, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/peptide-identification) · [viewer](skills/bio-proteomics-peptide-identification/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 5
-- Problem: SKILL.md insight 2, the FDR vocabulary, the 'Concatenated vs separate' failure mode and the usage-guide tip give Elias-Gygi 2*decoy/(target+decoy) as the separate-search estimator. On synthetic separate searches it reported 2.06% where the truth was 0.62% and kept 2138 PSMs vs 2888 for pi0*decoy/target.
-- Root cause: Elias & Gygi 2007 proposed 2*decoy/(target+decoy) for a concatenated composite search; Kall et al. 2008 (J Proteome Res 7:29) give pi0*decoy/target for separate searches, refined by mix-max (Keich 2015).
-- Fix: State: concatenated TDC -> (decoy+1)/target (Elias-Gygi's 2d/(t+d) is the older, conservative whole-list form); separate searches -> pi0*decoy/target (Kall 2008) or mix-max (Keich 2015). Replace the failure-mode 'Mechanism' line, which describes the factor 2 wrongly.
-
-### `bio-proteomics-peptide-identification` — Update pyOpenMS code to PeptideIdentificationList
-
-- Skill: 79, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/peptide-identification) · [viewer](skills/bio-proteomics-peptide-identification/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 1
-- Problem: peptide_ids = [] makes SimpleSearchEngineAlgorithm.search raise TypeError on pyopenms 3.5.0; IdXMLFile().load with a list fails too, although the header says 'tested with pyOpenMS 3.1+'.
-- Root cause: OpenMS 3.5 replaced vector<PeptideIdentification> with PeptideIdentificationList in the Python bindings.
-- Fix: Use 'from pyopenms import PeptideIdentificationList; peptide_ids = PeptideIdentificationList()' in both blocks and the Common Errors row; change the version header to the tested version.
+## P1 (11)
 
 ### `bio-phylo-tree-visualization` — Root before colouring clades by MRCA
 
@@ -268,11 +20,19 @@ None open.
 
 ### `bio-alignment-multiple` — Fix MUSCLE5 ensemble commands (-super5 has no .efa)
 
-- Skill: 85, Production Ready · [mrsonord2240/bioSkills@966f838](https://github.com/mrsonord2240/bioSkills/tree/966f838b0ba32918310bd223a34f71d78f190560/alignment/multiple-alignment) · [viewer](skills/bio-alignment-multiple/mrsonord2240-bioSkills@966f838/viewer.md)
+- Skill: 85, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/alignment/multiple-alignment) · [viewer](skills/bio-alignment-multiple/GPTomics-bioSkills@d91ed3d/viewer.md)
 - Observed in inputs: 4
 - Problem: Every ensemble example and the Quick Reference use 'muscle -super5 ... -stratified/-diversified/-replicates', which MUSCLE 5.3 rejects with 'not supported'; the Skill also states -super5 can output an .efa ensemble.
 - Root cause: Ensemble options belong to the -align (PPP) command; -super5 only accepts -perm/-perturb for single replicates.
 - Fix: Use 'muscle -align in.fa -stratified -output ens.efa' (and -diversified); for >1000 sequences say to run -super5 with several -perm/-perturb values and combine with -fa2efa. Correct the MUSCLE5 table's Output column.
+
+### `bio-proteomics-data-import` — No TMT route, and the no-LFQ error sends a TMT user to columns that do not exist
+
+- Skill: 85.2, Limited Release · [mrsonord2240/bioSkills@575ab94](https://github.com/mrsonord2240/bioSkills/tree/575ab946989a7029d235eb0ab711e47b08edbcb0/proteomics/data-import) · [viewer](skills/bio-proteomics-data-import/mrsonord2240-bioSkills@575ab94/viewer.md)
+- Observed in inputs: 6
+- Problem: On a MaxQuant TMT10 proteinGroups.txt the block raises 'No LFQ intensity columns: LFQ was not enabled in MaxQuant; use Intensity and normalize explicitly'. A TMT proteinGroups.txt has no per-sample 'Intensity <sample>' columns -- only one summed 'Intensity' column -- so the suggested fallback is a dead end. The channels are in 'Reporter intensity corrected 1..N'. The Tool Taxonomy claims MaxQuant txt output covers 'DDA label-free / TMT search results' but no decision-tree row, code block or threshold mentions reporter ions.
+- Root cause: The block and its new error message were written for the label-free case only, while the taxonomy advertises TMT.
+- Fix: Add a decision-tree row 'MaxQuant TMT / isobaric labelling -> read Reporter intensity corrected <n> columns; corrected channels apply MaxQuant's isotope-impurity correction, uncorrected do not; reporter-ion quant computation itself is quantification', and change the ValueError to name the columns the table actually has, e.g. 'No LFQ intensity columns. Found Reporter intensity corrected columns -> this is an isobaric (TMT/iTRAQ) run; see the TMT row. Otherwise use Intensity and normalize explicitly.'
 
 ### `bio-variant-annotation` — csq --phase modes m and s are described wrongly
 
@@ -282,239 +42,63 @@ None open.
 - Root cause: Mode semantics written from memory, not from 'bcftools csq' help.
 - Fix: Use the help text: a = take GTs as is (0/1 -> 0\|1), m = merge all GTs into one haplotype, r = require phase, R = non-reference haplotypes, s = skip unphased hets; recommend -p a for phased data (SKILL.md and usage guide).
 
-## P2 (85)
+### `bio-proteomics-dia-analysis` — The headline predicted-library command is rejected as 'incorrect settings' by DIA-NN 2.x
 
-### `bio-proteomics-protein-inference` — picked_group_fdr: exact-set pairing, prefix, tiny counts
+- Skill: 86.2, Limited Release · [mrsonord2240/bioSkills@575ab94](https://github.com/mrsonord2240/bioSkills/tree/575ab946989a7029d235eb0ab711e47b08edbcb0/proteomics/dia-analysis) · [viewer](skills/bio-proteomics-dia-analysis/mrsonord2240-bioSkills@575ab94/viewer.md)
+- Observed in inputs: 1
+- Problem: Run with the installed DIA-NN 2.6.1, the Skill's default command answers: 'WARNING: incorrect settings, the in silico-predicted library must be generated in a separate pipeline step and then used to process the raw data, now without activating FASTA digest'. The Skill presents combining --fasta-search --gen-spec-lib --predictor with data processing as the modern default and never mentions a two-step form.
+- Root cause: The command is written for DIA-NN 1.9.x behaviour. In 2.x, library prediction and data processing are separate pipeline steps.
+- Fix: Split the 'DIA-NN -- Predicted-Library (directDIA) Route' section into two commands for DIA-NN 2.x: step 1 `diann --fasta <db> --fasta-search --gen-spec-lib --predictor --out-lib predicted.speclib` (no --f), step 2 `diann --f ... --lib predicted.speclib --fasta <db> --out ... --reanalyse`. Note that DIA-NN writes the predicted library as *.predicted.speclib regardless of the --out-lib name, and add a Common Errors row for the warning text so an agent that sees it knows what to do.
 
-- Skill: 67, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/protein-inference) · [viewer](skills/bio-proteomics-protein-inference/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 2, 3, 5
-- Problem: Pairing by an exact frozenset of accessions left 492/1,072 decoy groups unpaired. The default 'DECOY_' prefix silently counts MaxQuant REV__ decoys as targets (1,525 pass). Subsets of 10-30 groups return passing groups with no warning, although the text says such counts are meaningless.
-- Root cause: A simplified pick with no input checks, reused for every tool.
-- Fix: Point to FalseDiscoveryRate.applyPickedProteinFDR (pass String('DECOY_')) or the kusterlab picked_group_fdr package. Require an explicit decoy prefix per tool, and warn or refuse below a minimum decoy/target count.
+### `bio-proteomics-dia-analysis` — The matrix-vs-report count guidance is inverted for DIA-NN 2.6.1
 
-### `bio-proteomics-protein-inference` — Missing input prerequisites and MaxQuant semantics
-
-- Skill: 67, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/protein-inference) · [viewer](skills/bio-proteomics-protein-inference/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 1, 2, 4
-- Problem: Nothing says decoy PSMs must survive the upstream PSM filter for protein FDR to be possible, or which score orientation the group score has. MaxQuant 'Unique peptides' (unique to the group) and 'Majority protein IDs' are not explained, and the leading-accession comment ('highest-evidence first') is wrong: pyOpenMS sorts accessions alphabetically.
-- Root cause: The template covers concepts but not the data contract of each input format.
-- Fix: Add a short 'Inputs' block: keep decoys, PEP/posterior orientation, and a MaxQuant column glossary. Choose the leading protein explicitly (peptide count, then canonical SwissProt) instead of accessions[0].
-
-### `bio-proteomics-protein-inference` — Two-peptide claim stated as universal
-
-- Skill: 67, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/protein-inference) · [viewer](skills/bio-proteomics-protein-inference/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 5
-- Problem: The Skill states flatly that the rule raises protein FDR. In this simulation (strict 1% PSM pre-filter) it lowered true FDP (0.88% to 0.40%) while deleting 365 true groups. Gupta & Pevzner's result holds under their conditions.
-- Root cause: A paper's conditional finding generalised into a rule.
-- Fix: Keep the recommendation, but word the mechanism as 'discards real single-peptide proteins; its FDR effect depends on the PSM threshold; control picked protein FDR instead'.
-
-### `bio-proteomics-ptm-analysis` — FC+p double filter conflicts with differential-abundance
-
-- Skill: 69, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/ptm-analysis) · [viewer](skills/bio-proteomics-ptm-analysis/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 1, 5
-- Problem: The regulated rule adj.pvalue < 0.05 & abs(log2FC) > 1 is the post-hoc double filter the differential-abundance Skill forbids. In simulation (4v4) it gave 9.1-12.9% false calls for a '>2-fold' claim at nominal 5%.
-- Root cause: The site-level selection rule was not aligned with the sibling Skill's treat-style guidance.
-- Fix: Test \|log2FC\| > c inside the statistic, e.g. p = pt((abs(log2FC) - c)/SE, DF, lower.tail = FALSE) on ADJUSTED.Model, with BH; or call the double filter a ranking heuristic whose FDR refers to FC != 0.
-
-### `bio-proteomics-ptm-analysis` — Default contrast direction is not stated
-
-- Skill: 69, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/ptm-analysis) · [viewer](skills/bio-proteomics-ptm-analysis/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 4
-- Problem: The default pairwise Label is 'Control vs Treatment' (log2FC = Control - Treatment). Downstream KSEA z-scores and up/down calls invert unless the sign is flipped.
-- Root cause: The Skill says 'contrast.matrix defaults to full pairwise' without describing the Label orientation.
-- Fix: Tell the agent to read adjusted$Label or pass an explicit contrast.matrix (Treatment = 1, Control = -1) before labelling sites up or down.
-
-### `bio-proteomics-ptm-analysis` — FLR and K-GG QC lack a runnable route
-
-- Skill: 69, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/ptm-analysis) · [viewer](skills/bio-proteomics-ptm-analysis/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 5
-- Problem: Reporting an empirical FLR is mandatory, but no route exists from MaxQuant tables. For already-acquired IAA data the only advice is prospective (use chloroacetamide), and C-terminal K-GG IDs pass every filter.
-- Root cause: FLR and diGly guidance are narrative only and assume spectra are available.
-- Fix: State that LuciPHOr2/DeepFLR need spectra; otherwise report mean(1 - p) as model-based only. Add a K-GG QC that flags GG on the peptide C-terminal K and asks for the alkylation reagent.
-
-### `bio-proteomics-ptm-analysis` — Phospho-only path: document use_unmod_peptides
-
-- Skill: 69, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/ptm-analysis) · [viewer](skills/bio-proteomics-ptm-analysis/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 3
-- Problem: For phospho-only data the Skill hard-codes use_unmod_peptides = FALSE and never mentions that MSstatsPTM can use co-enriched unmodified peptides as a weak protein proxy.
-- Root cause: Only the paired-proteome route is documented.
-- Fix: Add a caveated option: use_unmod_peptides = TRUE when no global run exists, and label the results proxy-adjusted.
-
-### `bio-proteomics-ptm-analysis` — Small doc inconsistencies
-
-- Skill: 69, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/ptm-analysis) · [viewer](skills/bio-proteomics-ptm-analysis/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Skill: 86.2, Limited Release · [mrsonord2240/bioSkills@575ab94](https://github.com/mrsonord2240/bioSkills/tree/575ab946989a7029d235eb0ab711e47b08edbcb0/proteomics/dia-analysis) · [viewer](skills/bio-proteomics-dia-analysis/mrsonord2240-bioSkills@575ab94/viewer.md)
 - Observed in inputs: 2
-- Problem: The filename comment 'accept either form' is not implemented. The example labels Localization prob 0.75 as class II while the filter keeps it as class I. The 'fake dephosphorylation' wording misdescribes the collapse, which masks form switches. Ramsbottom 2022 is cited but not in References.
-- Root cause: Text and code were edited separately.
-- Fix: Try both filenames, use right=False bins in the example, reword the multiplicity failure mode, and add Ramsbottom KA et al. J Proteome Res 2022;21(7):1603-1615.
+- Problem: The Skill states the *_matrix.tsv files apply an extra 5% run-specific protein FDR (--matrix-spec-q) so the matrix protein count can be LOWER than the report count, and instructs the agent not to panic. On real 2.6.1 output the matrix holds 4440 protein groups against 4376 in the run-level-filtered report and 4375 after the Skill's own global filter -- the matrix is larger. The 2.6.1 log describes the matrices as '1% precursor and protein group FDR'. An agent following the Skill would explain a real discrepancy backwards.
+- Root cause: Version drift: the --matrix-spec-q behaviour is described from older DIA-NN documentation and was never checked against a 2.x run.
+- Fix: Replace the directional claim with a version-aware one: say the matrix and the filtered report apply different q-value contexts so the counts will differ in either direction, that the direction depends on the DIA-NN version and on which q-value columns the agent filtered on, and that the authoritative statement is the 'levels matrix' line in report.log.txt for the version actually used. Update the Common Errors row and the 'Matrix run-specific PG filter 0.05' threshold row the same way.
 
-### `bio-proteomics-quantification` — iq::maxLFQ does not do delayed normalization
+### `bio-proteomics-ptm-analysis` — The new TMT section states the wrong Channel index, and the Skill's own annotation is rejected
 
-- Skill: 71, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/quantification) · [viewer](skills/bio-proteomics-quantification/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 2
-- Problem: The Skill says iq::maxLFQ implements delayed normalization; it does ratio extraction only, so run-level loading offsets carried into the estimates (centred run medians -0.43..+0.30). Median normalization, the Skill's 'safe default', also biased null FCs by -0.19 on an up-heavy protein set.
-- Root cause: The MaxQuant algorithm is conflated with the iq function, and the median-centering assumption is not stated.
-- Fix: Say that maxLFQ(X) needs pre-normalized input (iq::preprocess or per-run median), add a peptide-matrix scaffold, and note that median centering assumes most proteins are unchanged and changes are symmetric.
+- Skill: 86.4, Production Ready · [mrsonord2240/bioSkills@45a0c5a](https://github.com/mrsonord2240/bioSkills/tree/45a0c5a65b7346d47a7b72b6d0a6eb60ea590317/proteomics/ptm-analysis) · [viewer](skills/bio-proteomics-ptm-analysis/mrsonord2240-bioSkills@45a0c5a/viewer.md)
+- Observed in inputs: Input 5
+- Problem: SKILL.md says "Channel is 'channel.1' ... 'channel.N' and maps to the evidence's 'Reporter intensity corrected <n>' columns". MaxQuant writes those columns 0-indexed for a 10-plex ("Reporter intensity corrected 0" through "9"), so the channel names MSstatsTMT derives are channel.0 .. channel.9. An annotation built to the Skill's spec is rejected with "** Please check the annotation file. The channel name must be matched with that in input data." -- a message that says nothing about an off-by-one. Reproduced by running both indexings on the same evidence: channel.1..10 fails, channel.0..9 completes.
+- Root cause: The channel naming was written from the MSstatsTMT convention rather than from a MaxQuant evidence file's actual column suffixes.
+- Fix: Change the comment to: "Channel names follow the reporter-column suffixes MaxQuant wrote -- for a 10-plex those are `Reporter intensity corrected 0` .. `9`, so the annotation needs `channel.0` .. `channel.9`. Read the suffixes off your own evidence header before writing the annotation; a mismatch gives `the channel name must be matched with that in input data`, which does not mention the index."
 
-### `bio-proteomics-quantification` — SILAC +/-Inf breaks the limma step downstream
+### `bio-workflows-proteomics-pipeline` — The fixed treat() fold-change floor silently zeroes the intermediate level of a dose series
 
-- Skill: 71, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/quantification) · [viewer](skills/bio-proteomics-quantification/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 3
-- Problem: The scalar function fails on Series. Its +/-Inf output made pandas SDs NaN, crashed eBayes(trend=TRUE, robust=TRUE), and 11 of 12 on/off proteins silently left the test. -Inf also codes detection-limit dropout as biology.
-- Root cause: On/off proteins are encoded inside the numeric matrix instead of as a separate flag, and there is no vectorized form.
-- Fix: Vectorize with np.where, return NaN plus a presence flag column (H-only / L-only / both), and add the labeling-efficiency and Arg->Pro check code that SILAC_SHIFTS implies.
+- Skill: 87.7, Production Ready · [mrsonord2240/bioSkills@45a0c5a](https://github.com/mrsonord2240/bioSkills/tree/45a0c5a65b7346d47a7b72b6d0a6eb60ea590317/workflows/proteomics-pipeline) · [viewer](skills/bio-workflows-proteomics-pipeline/mrsonord2240-bioSkills@45a0c5a/viewer.md)
+- Observed in inputs: Input 3
+- Problem: The newly supported multi-condition path inherits treat(lfc = log2(1.5)) = 0.585 log2 from the two-condition workflow. On a dose design whose LowDose effect is a real 0.7 log2, Low_vs_Ctl returns 0 calls while High_vs_Ctl returns 20 -- a reader following the block would report "no effect at low dose" for 120 proteins that genuinely respond. The floor is correct practice for a single pairwise comparison; on a monotonic dose series it is a design decision that must be stated.
+- Root cause: The contrast machinery was generalised to N levels while the effect-size threshold stayed a single global constant written for the two-condition case.
+- Fix: Add one line beside the treat() call: "lfc = log2(1.5) is a per-contrast minimum effect. On a dose series or time course the intermediate levels carry a SMALLER true effect than the extreme one, so the same floor can return zero calls there while the top level is significant -- lower lfc, or screen with the eBayes/topTable F-test documented below and report the pairwise contrasts only for direction."
 
-### `bio-proteomics-quantification` — IRS silently yields Inf/NaN when the reference is missing
+### `bio-proteomics-proteomics-qc` — The new degenerate-design caveats are print() only and never reach the returned objects
 
-- Skill: 71, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/quantification) · [viewer](skills/bio-proteomics-quantification/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 5
-- Problem: A 0 reference made whole plex-B rows +Inf and a NaN reference made them NaN, with no message. The example's IRS check (reference ratio SD 3.378 -> 0.000) is true by construction and proves nothing.
-- Root cause: irs_scale divides by the raw reference without masking, and the example tests the quantity IRS forces to be equal.
-- Fix: Mask references <= 0 or NaN, report the affected proteins, and check the bridge on non-reference channels (plex share of PC1 variance).
+- Skill: 88.1, Production Ready · [mrsonord2240/bioSkills@45a0c5a](https://github.com/mrsonord2240/bioSkills/tree/45a0c5a65b7346d47a7b72b6d0a6eb60ea590317/proteomics/proteomics-qc) · [viewer](skills/bio-proteomics-proteomics-qc/mrsonord2240-bioSkills@45a0c5a/viewer.md)
+- Observed in inputs: Inputs 2, 8
+- Problem: When some but not all groups are singletons, median_cv_linear returns a frame with a bare NaN in median_cv_pct for those groups and replicate_correlation simply omits them, while the explanation goes to stdout. An agent (the intended caller of this Skill) that consumes the return value sees NaN and absence with no machine-readable signal that the group was unmeasurable -- which is the exact misreading the fix set out to prevent, moved one layer down.
+- Root cause: The all-singleton case was fixed with a raise (which the caller cannot miss) and the partial case with a print (which it can).
+- Fix: Return the status in the data: add a `status` column to median_cv_linear ('measured' / 'not_measurable_n1') and an `unchecked_groups` entry (or a second returned frame) to replicate_correlation, and have pca_batch_check return the per-PC test status alongside coords rather than only printing it.
 
-### `bio-proteomics-quantification` — No clinical-use stop condition
+### `bio-proteomics-protein-inference` — The newly recommended Percolator route emits a flat protein list, and SKILL.md does not say so
 
-- Skill: 71, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/quantification) · [viewer](skills/bio-proteomics-quantification/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 6
-- Problem: Asked for patient-level HER2 copies for a therapy decision, the Skill offered only the technical note that absolute quant is out of scope; the decline came from general agent judgement.
-- Root cause: The template has routing lines but no explicit stop conditions.
-- Fix: Add a line: research quantification must not be used to classify individual patients or decide treatment; route to validated clinical assays.
+- Skill: 88.8, Production Ready · [mrsonord2240/bioSkills@45a0c5a](https://github.com/mrsonord2240/bioSkills/tree/45a0c5a65b7346d47a7b72b6d0a6eb60ea590317/proteomics/protein-inference) · [viewer](skills/bio-proteomics-protein-inference/mrsonord2240-bioSkills@45a0c5a/viewer.md)
+- Observed in inputs: Inputs 2, 6
+- Problem: The Skill's central thesis is that a protein GROUP, not a flat list, is the only honest reporting unit. The new decision-tree row and CLI block send a Percolator user to `-f/--picked-protein` and document the output columns, but prot.target.tsv carries 2,339 rows with 2,339 distinct ProteinGroupIds and 0 rows listing more than one accession: Percolator eliminates fragment and duplicate proteins rather than listing them as group members. A reader following the Skill gets exactly the flat list the Skill warns against, and is told it is "one row per group representative, already picked" without being told the partners vanished.
+- Root cause: The block was written from the run's stdout and column header rather than from the content of the rows, so the elimination-vs-listing distinction was never checked.
+- Fix: Add one line under the Percolator OUTPUT CHECK: "each row is a single representative -- the indistinguishable partners are ELIMINATED, not listed; pass --protein-report-duplicates (and --protein-report-fragments) if you need the full group membership, and never report prot.target.tsv as a group list without them."
 
-### `bio-proteomics-proteomics-qc` — PTXQC '>1%' contaminant flag misattributed
+### `bio-proteomics-differential-abundance` — The centring section's stated mechanism is refuted
 
-- Skill: 73, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/proteomics-qc) · [viewer](skills/bio-proteomics-proteomics-qc/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 1
-- Problem: The synthetic run has 4.2-6.5% contaminant intensity, so every sample trips the Skill's '>1%' rule; in PTXQC 1.1.5 the 1% threshold belongs to the user-defined MYCOPLASMA SpecialContaminants plot.
-- Root cause: The Skill conflates PTXQC's SpecialContaminants default with its continuous general contaminant score.
-- Fix: Replace it with a lab-baseline control-chart statement and a group-difference check, and add a code line computing the contaminant fraction per sample.
+- Skill: 89, Production Ready · [mrsonord2240/bioSkills@1110c24](https://github.com/mrsonord2240/bioSkills/tree/1110c241c27760ad0127bd803e8832d54651e31c/proteomics/differential-abundance) · [viewer](skills/bio-proteomics-differential-abundance/mrsonord2240-bioSkills@1110c24/viewer.md)
+- Observed in inputs: Input 10
+- Problem: The Skill says a global between-condition offset of 0.1-0.2 log2 'becomes significant for hundreds of proteins at once' because feature-level standard errors are small. Injecting a uniform -0.20 log2 offset into every treatment run gives 0 false positives, with the null-protein median SE unchanged at 0.2057. Real per-run median normalization at the same -0.199 median offset gives 31 false positives, because it ALSO halves that SE to 0.1159 by removing genuine within-condition run-to-run loading variation. Neither ingredient alone is enough - offset-only gives 0 FP, SE-shrinkage-only (centring each run on its own condition's median) gives 1 of 81. 'Hundreds' is also an overstatement of 31.
+- Root cause: The root-cause analysis varied one family of normalizations, in which the offset and the variance shrinkage move together, and attributed the whole effect to the variable that was easiest to measure.
+- Fix: Rewrite the Approach paragraph: per-run median normalization of a peptide table does two things at once - it transfers a detection-composition difference into a between-condition offset, AND it removes real run-to-run loading variance, shrinking the residual the test divides by. The offset is the detectable symptom of both. Keep the guard exactly as it is (it fired correctly on every configuration tested) and add a second cheap check beside it: compare the residual SD before and after normalization, and treat a large drop as the same warning. Drop 'hundreds of proteins at once' for the measured figure.
 
-### `bio-proteomics-proteomics-qc` — Dead code and a scale-dependent '~14x' claim
-
-- Skill: 73, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/proteomics-qc) · [viewer](skills/bio-proteomics-proteomics-qc/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 1
-- Problem: missingness_profile computes abundance_bins and discards it. Base-CV-on-log2 compression measured 16.9-17.1x at mean log2 24.7; it scales with about ln2 x mean log2.
-- Root cause: Code drift and a constant quoted for a quantity that depends on intensity units.
-- Fix: Return the per-bin present fraction from missingness_profile, and word the claim as 'about 15-20x at typical MaxQuant intensities (scale-dependent)'.
-
-### `bio-proteomics-proteomics-qc` — Batch guidance and output template inconsistent
-
-- Skill: 73, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/proteomics-qc) · [viewer](skills/bio-proteomics-proteomics-qc/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 5, 2, 4
-- Problem: 'Never let batch be the dominant axis going into differential testing' cannot be met by 'include batch in the design', which leaves the PCA unchanged. DIA, TMT and Level 1/2 have no code and there is no QC-report template.
-- Root cause: The Skill mixes matrix correction and model-based adjustment and ends sections with routing lines instead of deliverables.
-- Fix: Recommend limma::removeBatchEffect for plots only plus batch in the design for the test; add a QC-summary and exclusion-decision table template, and stop conditions (n<5, no raw column available, human sign-off on exclusions).
-
-### `bio-proteomics-differential-abundance` — msqrob2 and MSstats promised but not provided
-
-- Skill: 75, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/differential-abundance) · [viewer](skills/bio-proteomics-differential-abundance/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: —
-- Problem: The description and decision tree route to msqrob2 and MSstats, but the Skill gives no code for either (msqrob2 is also not installed in the candidate environment).
-- Root cause: Coverage was written into the taxonomy but not into workflow sections.
-- Fix: Add minimal msqrob2 (QFeatures + msqrob) and MSstats (dataProcess + groupComparison) blocks or remove them from the description.
-
-### `bio-proteomics-differential-abundance` — Design rename hard-codes two groups
-
-- Skill: 75, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/differential-abundance) · [viewer](skills/bio-proteomics-differential-abundance/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 5
-- Problem: colnames(design)[1:2] <- levels(...) warns and leaves conditionDrugB, so makeContrasts fails for three groups.
-- Root cause: The block was written for the two-group case only.
-- Fix: Use colnames(design)[seq_len(nlevels(cond))] <- levels(cond).
-
-### `bio-proteomics-differential-abundance` — No stop condition for n=1 or clinical questions
-
-- Skill: 75, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/differential-abundance) · [viewer](skills/bio-proteomics-differential-abundance/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 6
-- Problem: Asked about one patient and a treatment decision, the Skill offers no guidance and its Python function dies with KeyError 'pvalue' when no protein has two samples per group.
-- Root cause: Escape hatches cover routing to other Skills only; the code does not check for an empty result.
-- Fix: Add a line that single-sample comparisons and clinical decisions are out of scope, and raise a clear error when no protein meets the minimum observations.
-
-### `bio-proteomics-differential-abundance` — Silent defaults in ashr and proDA outputs
-
-- Skill: 75, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/differential-abundance) · [viewer](skills/bio-proteomics-differential-abundance/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 3, 5
-- Problem: ash() returns PosteriorMean 0 and lfsr equal to the prior for NA rows; proDA diff is positive for low-abundance proteins absent from the Treatment group.
-- Root cause: The snippets pass unfiltered fits and describe proDA diff as the log2FC without caveat.
-- Fix: Drop NA rows before ash(), and state that proDA diff should not be reported for proteins absent from a group.
-
-### `bio-proteomics-dia-analysis` — Report filter omits Global.Q.Value
-
-- Skill: 77, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/dia-analysis) · [viewer](skills/bio-proteomics-dia-analysis/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 2
-- Problem: DIA-NN recommends Global.Q.Value <= 0.01 alongside Global.PG.Q.Value; the Skill's filter omits it, and its comment says per-run while the code applies all three filters.
-- Root cause: The filter targets protein context only.
-- Fix: Add Global.Q.Value <= 0.01 to the filter and correct the comment.
-
-### `bio-proteomics-dia-analysis` — Library-based route lacks FASTA and library caveat
-
-- Skill: 77, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/dia-analysis) · [viewer](skills/bio-proteomics-dia-analysis/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 4
-- Problem: The library-based command omits --fasta, so protein annotation relies on a third-party library, and it does not warn that such libraries need compatibility checks.
-- Root cause: The route assumes a DIA-NN-generated library.
-- Fix: Add --fasta (plus --reannotate for third-party libraries) and DIA-NN's advice to prefer DIA-NN-generated .parquet/.speclib libraries.
-
-### `bio-proteomics-dia-analysis` — Version drift in output and default claims
-
-- Skill: 77, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/dia-analysis) · [viewer](skills/bio-proteomics-dia-analysis/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 1
-- Problem: --out-lib uses .tsv although empirical libraries are .parquet since 1.9.1; '--qvalue 0.01 = DIA-NN default' is false for current docs (5%); directDIA and predicted-library are presented as different routes.
-- Root cause: The text mixes 1.8-era conventions with 1.9+ claims.
-- Fix: Use .parquet library names, date the default claims by version, and describe library-free search as DIA-NN's predicted-library route.
-
-### `bio-proteomics-dia-analysis` — Example script fragile and missing promised filter
-
-- Skill: 77, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/dia-analysis) · [viewer](skills/bio-proteomics-dia-analysis/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: —
-- Problem: Unquoted --f $f splits filenames with spaces; an empty directory passes a literal '*.mzML'; the header promises filtering but the script only has comments.
-- Root cause: The example was written as illustration, not as a runnable pipeline.
-- Fix: Build args with an array (args+=(--f "$f")), check that diann, the FASTA and mzML files exist, and add the Python filter step.
-
-### `bio-proteomics-data-import` — R route named but no QFeatures code given
-
-- Skill: 78, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/data-import) · [viewer](skills/bio-proteomics-data-import/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 4
-- Problem: readQFeatures exists in QFeatures 1.16.0 but the Skill gives no code; filterFeatures on MaxQuant flag names with spaces errors.
-- Root cause: R path is one line in the Tool Taxonomy and Decision Tree.
-- Fix: Add a short QFeatures block: readQFeatures(quantCols=...), make.names on rowData before filterFeatures, zeroIsNA, logTransform; note aggregateFeatures is for peptide-to-protein only.
-
-### `bio-proteomics-data-import` — Silent failure modes in the MaxQuant block
-
-- Skill: 78, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/data-import) · [viewer](skills/bio-proteomics-data-import/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 1
-- Problem: With no LFQ columns the block returns an ID-only matrix without error; 55 all-NaN rows are kept; the listed >=2-peptide threshold is not applied.
-- Root cause: No input validation or post-load checks in the code block.
-- Fix: Stop if lfq_cols is empty, drop rows with no valid values, and either apply or drop the >=2-peptide threshold.
-
-### `bio-proteomics-data-import` — pyOpenMS misattributed to Chambers 2012
-
-- Skill: 78, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/data-import) · [viewer](skills/bio-proteomics-data-import/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: —
-- Problem: The Tool Taxonomy cites the ProteoWizard paper for pyOpenMS.
-- Root cause: Citation copied from the msconvert row.
-- Fix: Cite Rost et al. 2014 (Proteomics) for pyOpenMS.
-
-### `bio-proteomics-peptide-identification` — Make the table snippet rank-1 and +1 corrected
-
-- Skill: 79, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/peptide-identification) · [viewer](skills/bio-proteomics-peptide-identification/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 2, 3
-- Problem: The snippet never keeps one hit per spectrum (Comet .txt has 5 rows per scan by default; 4 scans entered the list twice) and uses decoys/targets, so a 33-PSM list with no decoys gets q = 0 for every row while 11 are false.
-- Root cause: 'One best hit per spectrum' is stated in prose but not enforced in code; no (D+1) correction.
-- Fix: Add psms = psms.sort_values('score', ascending=False).drop_duplicates('scan') and fdr = (decoys + 1) / targets.clip(lower=1), matching OpenMS FalseDiscoveryRate's conservative default.
-
-### `bio-proteomics-peptide-identification` — Show SimpleSearchEngineAlgorithm parameter setting
-
-- Skill: 79, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/peptide-identification) · [viewer](skills/bio-proteomics-peptide-identification/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 1
-- Problem: The thresholds table recommends 0.02 Da fragment tolerance and 2 missed cleavages, but the search block runs defaults (10 ppm fragment, 1 missed cleavage) with no parameter code.
-- Root cause: Parameter handling is shown only for PeptideIndexing.
-- Fix: Add getParameters()/setValue for 'precursor:mass_tolerance', 'fragment:mass_tolerance(_unit)', 'peptide:missed_cleavages', 'modifications:fixed/variable', and note that 'decoys' can generate decoys and that the search already annotates target/decoy.
-
-### `bio-proteomics-peptide-identification` — Fix two Common Errors rows and the example demo
-
-- Skill: 79, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/peptide-identification) · [viewer](skills/bio-proteomics-peptide-identification/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 4
-- Problem: MSnbase::readMzIdData exists (it read 387 rows here); an unannotated idXML makes FalseDiscoveryRate raise RuntimeError, not return all-zero q-values; examples/fdr_filtering.py simulates independent rows (1000 null targets vs 2000 decoys) and labels it a concatenated search.
-- Root cause: Rows written from memory rather than checked against installed packages; demo lacks per-spectrum competition.
-- Fix: Drop or correct the readMzIdData row, give the real FalseDiscoveryRate error text, and have build_demo_table draw one target and one decoy score per null spectrum and keep the higher.
+## P2 (93)
 
 ### `bio-alignment-trimming` — Caution on trimAl sequence-overlap thresholds
 
@@ -606,7 +190,7 @@ None open.
 
 ### `bio-alignment-multiple` — Correct the 'mafft --auto' strategy table
 
-- Skill: 85, Production Ready · [mrsonord2240/bioSkills@966f838](https://github.com/mrsonord2240/bioSkills/tree/966f838b0ba32918310bd223a34f71d78f190560/alignment/multiple-alignment) · [viewer](skills/bio-alignment-multiple/mrsonord2240-bioSkills@966f838/viewer.md)
+- Skill: 85, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/alignment/multiple-alignment) · [viewer](skills/bio-alignment-multiple/GPTomics-bioSkills@d91ed3d/viewer.md)
 - Observed in inputs: 5
 - Problem: MAFFT 7.526 uses L-INS-i only for <100 sequences (and <3000 columns); 100-199 sequences of a 1.5 kb gene get FFT-NS-i. The 2,000-50,000 and >50,000 rows also do not match the script (FFT-NS-2 up to 20,000; PartTree only above 200,000).
 - Root cause: Table written from memory rather than from the mafft script's auto block.
@@ -614,7 +198,7 @@ None open.
 
 ### `bio-alignment-multiple` — Add homology/strand pre-flight and note _R_ renaming
 
-- Skill: 85, Production Ready · [mrsonord2240/bioSkills@966f838](https://github.com/mrsonord2240/bioSkills/tree/966f838b0ba32918310bd223a34f71d78f190560/alignment/multiple-alignment) · [viewer](skills/bio-alignment-multiple/mrsonord2240-bioSkills@966f838/viewer.md)
+- Skill: 85, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/alignment/multiple-alignment) · [viewer](skills/bio-alignment-multiple/GPTomics-bioSkills@d91ed3d/viewer.md)
 - Observed in inputs: 1, 3
 - Problem: The gap-outlier checklist missed a non-homologous contig (gap fraction 0.18 vs 0.12-0.16) and fired on a correct indel-rich alignment; --adjustdirection silently renames sequences with _R_.
 - Root cause: Validation relies on gap heuristics; homology is only mentioned in prose.
@@ -622,11 +206,43 @@ None open.
 
 ### `bio-alignment-multiple` — Move tool deep-dives to references/
 
-- Skill: 85, Production Ready · [mrsonord2240/bioSkills@966f838](https://github.com/mrsonord2240/bioSkills/tree/966f838b0ba32918310bd223a34f71d78f190560/alignment/multiple-alignment) · [viewer](skills/bio-alignment-multiple/mrsonord2240-bioSkills@966f838/viewer.md)
+- Skill: 85, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/alignment/multiple-alignment) · [viewer](skills/bio-alignment-multiple/GPTomics-bioSkills@d91ed3d/viewer.md)
 - Observed in inputs: —
 - Problem: The 476-line SKILL.md loads BAli-Phy, OMM_MACSE, HyPhy, vcMSA and T-Coffee detail for every request.
 - Root cause: No progressive-disclosure layer.
 - Fix: Keep the decision tables and MAFFT/MUSCLE/PAL2NAL core in SKILL.md; move per-tool detail to references/*.md loaded on demand.
+
+### `bio-proteomics-data-import` — The flag-column guard collapses to a scalar when all three flag columns are absent
+
+- Skill: 85.2, Limited Release · [mrsonord2240/bioSkills@575ab94](https://github.com/mrsonord2240/bioSkills/tree/575ab946989a7029d235eb0ab711e47b08edbcb0/proteomics/data-import) · [viewer](skills/bio-proteomics-data-import/mrsonord2240-bioSkills@575ab94/viewer.md)
+- Observed in inputs: 7
+- Problem: `mask = (pg.get('Reverse','') != '+') & (pg.get('Potential contaminant','') != '+') & (pg.get('Only identified by site','') != '+')` returns a Series while at least one flag column is present, but the Python bool True when all three are absent; `pg[True]` then raises `KeyError: True`. The Common Errors table recommends exactly this .get() pattern as the guard for a missing flag column, so the Skill documents a guard that does not hold in the case it is meant for.
+- Root cause: pandas `.get(col, '')` returns the scalar default, and `'' != '+'` is a bool, not a Series; the failure only surfaces when no flag column survives to keep the expression a Series.
+- Fix: Build the mask from a Series of the right length, e.g. `mask = pd.Series(True, index=pg.index)` then `for c in ('Reverse','Potential contaminant','Only identified by site'): mask &= pg.get(c, pd.Series('', index=pg.index)) != '+'`, and raise a named error when none of the three columns is present ('no MaxQuant flag columns found -- is this a proteinGroups.txt?'). Correct the Common Errors row to match.
+
+### `bio-proteomics-data-import` — R/QFeatures route is named with no code, and the obvious call fails on MaxQuant column names
+
+- Skill: 85.2, Limited Release · [mrsonord2240/bioSkills@575ab94](https://github.com/mrsonord2240/bioSkills/tree/575ab946989a7029d235eb0ab711e47b08edbcb0/proteomics/data-import) · [viewer](skills/bio-proteomics-data-import/mrsonord2240-bioSkills@575ab94/viewer.md)
+- Observed in inputs: 4
+- Problem: The decision tree routes R pipelines to `readQFeatures` + `aggregateFeatures` and the taxonomy prefers QFeatures over MSnbase, but the Skill ships no R code. readQFeatures 1.16.0 works, but `filterFeatures` with the MaxQuant names as written errors ('Potential contaminant' is/are absent from all rowData) because readQFeatures applies make.names(), turning the spaces into dots. An agent hits this on the first try. (The fix log records this as deliberately deferred: adding a QFeatures block is new content.)
+- Root cause: The R route was documented from package names rather than from a run.
+- Fix: Add a short R block: `readQFeatures(assayData=..., quantCols=..., runCol=...)`, then `filterFeatures(~ Reverse != '+')`, `filterFeatures(~ Potential.contaminant != '+')`, `filterFeatures(~ Only.identified.by.site != '+')` with a one-line note that readQFeatures renames columns via make.names(), then `zeroIsNA()` and `logTransform()`. Verified working shape on the audit table: 1500 x 8, no -Inf, 19.8% NA.
+
+### `bio-proteomics-data-import` — Only one runnable example, and it covers the block that changed least
+
+- Skill: 85.2, Limited Release · [mrsonord2240/bioSkills@575ab94](https://github.com/mrsonord2240/bioSkills/tree/575ab946989a7029d235eb0ab711e47b08edbcb0/proteomics/data-import) · [viewer](skills/bio-proteomics-data-import/mrsonord2240-bioSkills@575ab94/viewer.md)
+- Observed in inputs: 1, 2, 3
+- Problem: examples/ ships load_maxquant.py only. The DIA-NN and mzML blocks are the two that changed most in pass 1 and neither has an example or any test input, so a regression in either is invisible until a user hits it.
+- Root cause: Single-example Skill.
+- Fix: Add examples/load_diann.py and examples/load_mzml.py with a few-hundred-row synthetic report.parquet and a ~20-spectrum mzML that includes one all-ion scan and one scan with missing isolation offsets, so both guards are exercised by running the example.
+
+### `bio-proteomics-data-import` — The cleaning blocks do not report what they removed
+
+- Skill: 85.2, Limited Release · [mrsonord2240/bioSkills@575ab94](https://github.com/mrsonord2240/bioSkills/tree/575ab946989a7029d235eb0ab711e47b08edbcb0/proteomics/data-import) · [viewer](skills/bio-proteomics-data-import/mrsonord2240-bioSkills@575ab94/viewer.md)
+- Observed in inputs: 1, 2
+- Problem: The MaxQuant and DIA blocks silently drop rows. An agent following the Skill hands the user a matrix with no record of how many bookkeeping rows, sub-threshold rows or all-NaN rows were removed, which is exactly the provenance a methods section needs.
+- Root cause: The blocks are written as minimal transformations.
+- Fix: Add one print per block summarising rows read, rows removed by each criterion, and final matrix shape, and say in the Approach text that this line belongs in the methods record.
 
 ### `bio-clinical-databases-dbsnp-queries` — Batch table drops annotations for merged rsIDs
 
@@ -732,6 +348,62 @@ None open.
 - Root cause: Silent zero-match behaviour of bcftools annotate.
 - Fix: Add a one-line pre-check (compare `bcftools index -s` contig names of target and source) next to the annotate commands.
 
+### `bio-proteomics-dia-analysis` — The EasyPQP library is not loadable by DIA-NN without fragment-annotation columns
+
+- Skill: 86.2, Limited Release · [mrsonord2240/bioSkills@575ab94](https://github.com/mrsonord2240/bioSkills/tree/575ab946989a7029d235eb0ab711e47b08edbcb0/proteomics/dia-analysis) · [viewer](skills/bio-proteomics-dia-analysis/mrsonord2240-bioSkills@575ab94/viewer.md)
+- Observed in inputs: 4, 7
+- Problem: The library.tsv that the Skill's own easypqp route produces was rejected by DIA-NN 2.6.1 until FragmentCharge, FragmentType and FragmentSeriesNumber columns were added by hand. The Skill offers only 'compatibility should be verified for each software version, settings and data type', which does not tell the agent what will break or how to fix it.
+- Root cause: The two tools were documented from their own manuals rather than from a run that passes one's output to the other.
+- Fix: Add a Common Errors row naming the three columns DIA-NN expects from a TSV library and the fact that EasyPQP does not write them, and state the preferred alternative explicitly (let FragPipe emit a DIA-NN-format library, or convert the EasyPQP TSV before use).
+
+### `bio-proteomics-dia-analysis` — The output-file listing omits files DIA-NN 2.6.1 writes
+
+- Skill: 86.2, Limited Release · [mrsonord2240/bioSkills@575ab94](https://github.com/mrsonord2240/bioSkills/tree/575ab946989a7029d235eb0ab711e47b08edbcb0/proteomics/dia-analysis) · [viewer](skills/bio-proteomics-dia-analysis/mrsonord2240-bioSkills@575ab94/viewer.md)
+- Observed in inputs: 6
+- Problem: The listing covers report.parquet, stats, pg/pr/gg matrices and report-lib. DIA-NN 2.6.1 also writes report.unique_genes_matrix.tsv, report.protein_description.tsv, report.manifest.txt, report.log.txt and a .skyline.speclib. report.log.txt in particular is the file that settles the matrix-FDR question in P1 above.
+- Root cause: The listing was written against an older output set.
+- Fix: Extend the listing with the five additional files and point at report.log.txt as the authoritative record of what filters the run actually applied.
+
+### `bio-proteomics-dia-analysis` — Command duplicated between SKILL.md and examples/, and the Skill ships no test data
+
+- Skill: 86.2, Limited Release · [mrsonord2240/bioSkills@575ab94](https://github.com/mrsonord2240/bioSkills/tree/575ab946989a7029d235eb0ab711e47b08edbcb0/proteomics/dia-analysis) · [viewer](skills/bio-proteomics-dia-analysis/mrsonord2240-bioSkills@575ab94/viewer.md)
+- Observed in inputs: 1
+- Problem: The DIA-NN command exists twice and can drift; there is no small input an agent can use to check its filter code before running it on a real report.
+- Root cause: Single-file Skill with an example script that restates rather than sources the command.
+- Fix: Keep one copy of the command in examples/ and have SKILL.md point at it, and ship a tiny synthetic report.parquet (a few hundred rows, including groups that fail only the global q-value) so the filter block is self-testing.
+
+### `bio-proteomics-ptm-analysis` — One of the two new TMT Common Errors messages could not be reproduced
+
+- Skill: 86.4, Production Ready · [mrsonord2240/bioSkills@45a0c5a](https://github.com/mrsonord2240/bioSkills/tree/45a0c5a65b7346d47a7b72b6d0a6eb60ea590317/proteomics/ptm-analysis) · [viewer](skills/bio-proteomics-ptm-analysis/mrsonord2240-bioSkills@45a0c5a/viewer.md)
+- Observed in inputs: Input 6
+- Problem: The row for "TMT evidence left on the default labeling_type = LF" quotes "A non-empty vector of column names for 'by' is required". Three mismatched configurations on this data produced three other loud errors instead ("Extra columns ... Run, Raw.file, Condition, BioReplicate, IsotopeLabelType" and "** Please check annotation. Each MS run (Raw.file) can't have multiple conditions or BioReplicates."). The doctrine around it -- fails loudly in both directions, no message mentions labeling -- is confirmed.
+- Root cause: The quoted text was captured from one particular evidence/annotation shape and written up as the message for that direction generally.
+- Fix: Generalise the row: "several different loud errors are possible depending on which half is mismatched (observed: `A non-empty vector of column names for 'by' is required`, `Extra columns included in the annotation file ...`, `Each MS run (Raw.file) can't have multiple conditions or BioReplicates`); none of them names the labeling type, so check labeling_type first whenever the converter rejects a TMT input."
+
+### `bio-proteomics-ptm-analysis` — Modification names are hard-coded to phospho, now in three code paths
+
+- Skill: 86.4, Production Ready · [mrsonord2240/bioSkills@45a0c5a](https://github.com/mrsonord2240/bioSkills/tree/45a0c5a65b7346d47a7b72b6d0a6eb60ea590317/proteomics/ptm-analysis) · [viewer](skills/bio-proteomics-ptm-analysis/mrsonord2240-bioSkills@45a0c5a/viewer.md)
+- Observed in inputs: Inputs 1, 2, 5
+- Problem: The label-free block, the Python Sites-table path and now the TMT block each hard-code `Phospho (STY)` in the regex, the mod_id and the probability column. Any other PTM needs the same substitutions in one more place than before.
+- Root cause: Copy-ready snippets favour the dominant PTM over a parameterised constant.
+- Fix: Lift MOD_NAME / MOD_ID / PROB_COL to three constants at the top of the MSstatsPTM section and reference them from all three blocks; the diGly example in the failure-modes table then becomes a three-line change rather than a six-substitution rewrite.
+
+### `bio-proteomics-ptm-analysis` — PTM-SEA and empirical FLR are prescribed but still have no runnable route
+
+- Skill: 86.4, Production Ready · [mrsonord2240/bioSkills@45a0c5a](https://github.com/mrsonord2240/bioSkills/tree/45a0c5a65b7346d47a7b72b6d0a6eb60ea590317/proteomics/ptm-analysis) · [viewer](skills/bio-proteomics-ptm-analysis/mrsonord2240-bioSkills@45a0c5a/viewer.md)
+- Observed in inputs: Inputs 1, 3
+- Problem: The Skill requires reporting an empirical global FLR and names PTM-SEA as the site-level enrichment method, but ships neither. Input 3 could only produce a model-based expected FLR (0.0382), which the Skill itself says is not the number to report.
+- Root cause: Both were left for a later pass while the TMT route was added.
+- Fix: Add a short ssGSEA2.0/PTM-SEA invocation and a LuciPHOr2 (or decoy-site) empirical-FLR recipe; both tools are installed in this environment, so this is now writable rather than blocked.
+
+### `bio-proteomics-ptm-analysis` — The file is heavy for an always-loaded Skill and got heavier
+
+- Skill: 86.4, Production Ready · [mrsonord2240/bioSkills@45a0c5a](https://github.com/mrsonord2240/bioSkills/tree/45a0c5a65b7346d47a7b72b6d0a6eb60ea590317/proteomics/ptm-analysis) · [viewer](skills/bio-proteomics-ptm-analysis/mrsonord2240-bioSkills@45a0c5a/viewer.md)
+- Observed in inputs: Static evaluation
+- Problem: 391 -> 478 lines, three large taxonomy tables and a 23-entry reference list, all loaded on every invocation, with no references/ split.
+- Root cause: The TMT route necessarily grew the file and splitting is a restructure.
+- Fix: Move the Tool Taxonomy, the Per-Method Failure Modes and the reference list into references/ and leave the decision tree, the input contract and the code blocks in SKILL.md.
+
 ### `bio-phylo-bayesian-inference` — Make the example refuse a single .p file
 
 - Skill: 87, Production Ready · [mrsonord2240/bioSkills@966f838](https://github.com/mrsonord2240/bioSkills/tree/966f838b0ba32918310bd223a34f71d78f190560/phylogenetics/bayesian-inference) · [viewer](skills/bio-phylo-bayesian-inference/mrsonord2240-bioSkills@966f838/viewer.md)
@@ -803,6 +475,38 @@ None open.
 - Problem: The diagnostic is described but not coded.
 - Root cause: Conceptual section only.
 - Fix: Add the regression of HPD width on posterior mean from out.txt.
+
+### `bio-workflows-proteomics-pipeline` — The PCA guard and the contrast logic now live in two places that deliberately disagree
+
+- Skill: 87.7, Production Ready · [mrsonord2240/bioSkills@45a0c5a](https://github.com/mrsonord2240/bioSkills/tree/45a0c5a65b7346d47a7b72b6d0a6eb60ea590317/workflows/proteomics-pipeline) · [viewer](skills/bio-workflows-proteomics-pipeline/mrsonord2240-bioSkills@45a0c5a/viewer.md)
+- Observed in inputs: Inputs 1, 3
+- Problem: examples/proteomics_workflow.R gained the same prcomp guard as SKILL.md but deliberately keeps the hard-coded two-condition contrast, with a comment telling the reader not to edit sample_groups. Two copies of near-identical logic that differ on purpose will drift, and the example is the file a newcomer runs first.
+- Root cause: The example is a self-contained demo and the block is the general recipe; the fix updated both rather than unifying them.
+- Fix: Give the example the same level-driven contrast construction as SKILL.md -- it is four lines and collapses to the identical result for two conditions -- so the two files cannot diverge.
+
+### `bio-workflows-proteomics-pipeline` — Two named routes remain uncoded
+
+- Skill: 87.7, Production Ready · [mrsonord2240/bioSkills@45a0c5a](https://github.com/mrsonord2240/bioSkills/tree/45a0c5a65b7346d47a7b72b6d0a6eb60ea590317/workflows/proteomics-pipeline) · [viewer](skills/bio-workflows-proteomics-pipeline/mrsonord2240-bioSkills@45a0c5a/viewer.md)
+- Observed in inputs: Static evaluation
+- Problem: FragPipe is named as a supported input but has no code, and the MSstatsTMT multi-plex (reference-channel/IRS) route is still a comment block inside the TMT section, so a two-plex TMT experiment -- the common case -- has no executable path here.
+- Root cause: Both were deferred while the multi-condition and guard work was done.
+- Fix: Either write the MSstatsTMT multi-plex call (MSstatsTMT 2.14.2 is installed) or state plainly in the decision tree that multi-plex TMT routes out to proteomics/ptm-analysis and proteomics/quantification, which now carry a TMT route.
+
+### `bio-workflows-proteomics-pipeline` — The file has outgrown a single page
+
+- Skill: 87.7, Production Ready · [mrsonord2240/bioSkills@45a0c5a](https://github.com/mrsonord2240/bioSkills/tree/45a0c5a65b7346d47a7b72b6d0a6eb60ea590317/workflows/proteomics-pipeline) · [viewer](skills/bio-workflows-proteomics-pipeline/mrsonord2240-bioSkills@45a0c5a/viewer.md)
+- Observed in inputs: Static evaluation
+- Problem: 396 -> 479 lines in one always-loaded file with no references/ directory, and the token-cost mark dropped accordingly.
+- Root cause: Every fix so far has added prose and guards to the same file.
+- Fix: Move the Tool/Method taxonomy and the Common Errors table into references/ and leave the decision tree, the input contract and the five code blocks in SKILL.md.
+
+### `bio-workflows-proteomics-pipeline` — The result table has no stated schema
+
+- Skill: 87.7, Production Ready · [mrsonord2240/bioSkills@45a0c5a](https://github.com/mrsonord2240/bioSkills/tree/45a0c5a65b7346d47a7b72b6d0a6eb60ea590317/workflows/proteomics-pipeline) · [viewer](skills/bio-workflows-proteomics-pipeline/mrsonord2240-bioSkills@45a0c5a/viewer.md)
+- Observed in inputs: Inputs 1, 3
+- Problem: results now carries a contrast column and a global-BH significant column, but the schema is discoverable only by reading the code. An agent chaining this into a pathway Skill has no named contract, and the per-contrast breakdown is printed rather than returned.
+- Root cause: Output shape has always been implicit in the write.csv line.
+- Fix: State the columns once above step 7 -- protein, contrast, logFC, AveExpr, t, P.Value, adj.P.Val, significant -- and note that significance comes from the global decideTests, not from adj.P.Val alone.
 
 ### `bio-phylo-modern-tree-inference` — Remove the false IQ-TREE flag-form warnings
 
@@ -892,6 +596,62 @@ None open.
 - Root cause: Tool requirements not stated (left unfixed in this round).
 - Fix: Note the bundled human site panels, the chrX requirement and `somalier find-sites` for custom targets.
 
+### `bio-proteomics-proteomics-qc` — Levels 1-2 and DIA matrix construction are still prose only
+
+- Skill: 88.1, Production Ready · [mrsonord2240/bioSkills@45a0c5a](https://github.com/mrsonord2240/bioSkills/tree/45a0c5a65b7346d47a7b72b6d0a6eb60ea590317/proteomics/proteomics-qc) · [viewer](skills/bio-proteomics-proteomics-qc/mrsonord2240-bioSkills@45a0c5a/viewer.md)
+- Observed in inputs: Input 2
+- Problem: The description advertises instrument-level QC, and the Levels table names RT/iRT fit and FWHM, but no function and no threshold is offered for either. On the real DIA-NN report those metrics were sitting in columns the Skill already tells the reader to load (RT, Predicted.RT, FWHM, Quantity.Quality) and the auditor had to compute r = 0.9996 and median FWHM 0.050 min by hand.
+- Root cause: The python blocks cover Levels 2-3 only; Level 1 was left as taxonomy.
+- Fix: Add one short block: correlate RT against Predicted.RT per run, report median FWHM and median Quantity.Quality per run, and give the thresholds you would act on (e.g. RT/iRT r < 0.99, FWHM drift > 1.5x across runs).
+
+### `bio-proteomics-proteomics-qc` — Sample-swap detection is named in the decision tree but has no code
+
+- Skill: 88.1, Production Ready · [mrsonord2240/bioSkills@45a0c5a](https://github.com/mrsonord2240/bioSkills/tree/45a0c5a65b7346d47a7b72b6d0a6eb60ea590317/proteomics/proteomics-qc) · [viewer](skills/bio-proteomics-proteomics-qc/mrsonord2240-bioSkills@45a0c5a/viewer.md)
+- Observed in inputs: Input 6
+- Problem: The row "Replicate correlation low for one sample -> Check if it correlates better with a DIFFERENT group" is the correct diagnostic and it is what identified the planted C2/T3 swap, but replicate_correlation computes within-group pairs only. The auditor had to write the mean-centred own-vs-other comparison; the within-group table alone shows nothing (all pairs 0.93-0.96).
+- Root cause: The insight was captured in the decision tree and never turned into a function.
+- Fix: Extend replicate_correlation (or add cross_group_correlation) to report, per sample, mean centred r against its own group and against every other group, and flag any sample whose best match is not its own label.
+
+### `bio-proteomics-proteomics-qc` — No QC report or exclusion-decision template
+
+- Skill: 88.1, Production Ready · [mrsonord2240/bioSkills@45a0c5a](https://github.com/mrsonord2240/bioSkills/tree/45a0c5a65b7346d47a7b72b6d0a6eb60ea590317/proteomics/proteomics-qc) · [viewer](skills/bio-proteomics-proteomics-qc/mrsonord2240-bioSkills@45a0c5a/viewer.md)
+- Observed in inputs: Inputs 1, 4, 6
+- Problem: The Skill instructs the reader to document and justify every exclusion and to run a sensitivity check, but ships no structure for either, so each run produces a different ad-hoc write-up and the TMT investigate band exists only inside the code.
+- Root cause: Reporting was left to the caller.
+- Fix: Add a short template: per sample, the metric that failed, its value and threshold, the decision, and the with/without sensitivity result -- then point the TMT and loading rules at it.
+
+### `bio-proteomics-proteomics-qc` — examples/qc_analysis.py still states no expected output
+
+- Skill: 88.1, Production Ready · [mrsonord2240/bioSkills@45a0c5a](https://github.com/mrsonord2240/bioSkills/tree/45a0c5a65b7346d47a7b72b6d0a6eb60ea590317/proteomics/proteomics-qc) · [viewer](skills/bio-proteomics-proteomics-qc/mrsonord2240-bioSkills@45a0c5a/viewer.md)
+- Observed in inputs: Input 1
+- Problem: The example is now seeded and therefore reproducible, but nothing in the file says what it should print, so it cannot serve as its own regression test the way protein-inference's example does.
+- Root cause: The fix seeded the PCA without adding the expected-output docstring.
+- Fix: Add the "Expected output:" block at the top of the file, now that the seeding makes the numbers stable.
+
+### `bio-proteomics-protein-inference` — The entrapment-validation advice omits the condition that makes it valid
+
+- Skill: 88.8, Production Ready · [mrsonord2240/bioSkills@45a0c5a](https://github.com/mrsonord2240/bioSkills/tree/45a0c5a65b7346d47a7b72b6d0a6eb60ea590317/proteomics/protein-inference) · [viewer](skills/bio-proteomics-protein-inference/mrsonord2240-bioSkills@45a0c5a/viewer.md)
+- Observed in inputs: Input 6
+- Problem: The Naive-FDR Fix line says "validate with a two-species or entrapment search". On the commonest benchmark design -- a HYE human/yeast/E. coli mix, which is what the real data here is -- all species present are genuinely in the sample, so none of them can act as an entrapment set. Executed on the 458-protein list: 312 HUMAN, 131 YEAST, 10 ECOLI and 5 cRAP contaminants, with no absent proteome anywhere to count false hits against.
+- Root cause: A one-clause shorthand for a method whose whole validity rests on an unstated precondition.
+- Fix: Condition it: "entrapment validation needs a proteome that is ABSENT from the sample (e.g. append Arabidopsis or a shuffled second proteome to the search database); a multi-species benchmark such as HYE does not provide one, because every species in it is truly present."
+
+### `bio-proteomics-protein-inference` — The decoy prefix is hard-coded in three places in the shipped code
+
+- Skill: 88.8, Production Ready · [mrsonord2240/bioSkills@45a0c5a](https://github.com/mrsonord2240/bioSkills/tree/45a0c5a65b7346d47a7b72b6d0a6eb60ea590317/proteomics/protein-inference) · [viewer](skills/bio-proteomics-protein-inference/mrsonord2240-bioSkills@45a0c5a/viewer.md)
+- Observed in inputs: Inputs 1, 2, 4
+- Problem: DECOY_ appears as a literal inside the pyOpenMS default block (twice) and again in the Percolator command line, while the Skill correctly teaches that the prefix is tool-specific. The failure is now well-documented (IndexError / ValueError, both reproduced) but still has to happen before the reader notices.
+- Root cause: Copy-ready snippets favour literals over a named constant.
+- Fix: Lift the prefix to a single `DECOY_PREFIX = 'DECOY_' # OpenMS/Comet; rev_ Philosopher; REV__ MaxQuant` at the top of the block and reference it, as examples/protein_groups.py already does.
+
+### `bio-proteomics-protein-inference` — The pyOpenMS route still has no stated output schema
+
+- Skill: 88.8, Production Ready · [mrsonord2240/bioSkills@45a0c5a](https://github.com/mrsonord2240/bioSkills/tree/45a0c5a65b7346d47a7b72b6d0a6eb60ea590317/proteomics/protein-inference) · [viewer](skills/bio-proteomics-protein-inference/mrsonord2240-bioSkills@45a0c5a/viewer.md)
+- Observed in inputs: Inputs 1, 5
+- Problem: The CLI routes now specify their output columns and a row-count assertion, but the recommended Python path leaves the caller to infer the report shape from a print loop. An agent chaining this into quantification has no named contract to bind to.
+- Root cause: The fix addressed the CLI gap and left the asymmetry.
+- Fix: State the group record once -- leading_protein, accessions, n_peptides, n_unique_peptides, is_decoy, qvalue -- which is exactly what examples/protein_groups.py already returns, and point the default block at it.
+
 ### `bio-population-genetics-rare-variant-association` — SAIGE bgen command omits --chrom or --LOCO=FALSE
 
 - Skill: 89, Production Ready · [mrsonord2240/bioSkills@c1237cd](https://github.com/mrsonord2240/bioSkills/tree/c1237cdbc9bb199947696f3909de26a55d259116/population-genetics/rare-variant-association) · [viewer](skills/bio-population-genetics-rare-variant-association/mrsonord2240-bioSkills@c1237cd/viewer.md)
@@ -916,6 +676,78 @@ None open.
 - Root cause: The table predates the fixes.
 - Fix: Add both rows with their fixes (--bt; fit step 1 on QC'd common variants).
 
+### `bio-proteomics-differential-abundance` — The MSstats block ships the normalization the Skill blames
+
+- Skill: 89, Production Ready · [mrsonord2240/bioSkills@1110c24](https://github.com/mrsonord2240/bioSkills/tree/1110c241c27760ad0127bd803e8832d54651e31c/proteomics/differential-abundance) · [viewer](skills/bio-proteomics-differential-abundance/mrsonord2240-bioSkills@1110c24/viewer.md)
+- Observed in inputs: Input 9
+- Problem: The MSstats workflow hardcodes normalization = 'equalizeMedians' and therefore produces a table with a -0.184 offset and a 20.8% realized FDR. The centring guard two paragraphs later then stops the reader. One section of the Skill warns about exactly what another section does.
+- Root cause: The MSstats block was written from the vendor's default call; the centring section was added afterwards without revisiting it.
+- Fix: Add a comment on the normalization argument of dataProcess pointing at the centring check, and offer normalization = FALSE with protein-level centring afterwards as the alternative the centring section actually recommends. Show the measured consequence (-0.184, 20.8%) inline so the choice is visible at the point of the call.
+
+### `bio-proteomics-differential-abundance` — The 0.05 centring threshold has no stated basis
+
+- Skill: 89, Production Ready · [mrsonord2240/bioSkills@1110c24](https://github.com/mrsonord2240/bioSkills/tree/1110c241c27760ad0127bd803e8832d54651e31c/proteomics/differential-abundance) · [viewer](skills/bio-proteomics-differential-abundance/mrsonord2240-bioSkills@1110c24/viewer.md)
+- Observed in inputs: Input 10
+- Problem: The guard stops at \|median log2FC\| > 0.05. On this data an injected uniform offset of -0.20 is harmless (0 FP) yet would be stopped, and a within-condition centring that halves the SE is harmful in principle yet passes at -0.016. The threshold is calibrated on one 4v4 set and on a symptom whose relation to the harm is not what the prose says.
+- Root cause: The constant was read off the four normalizations tried during the fix pass.
+- Fix: State that 0.05 is an empirical trip-wire from one 4v4 label-free set, not a distributional bound; make it a named constant at the top of the block; and say explicitly that passing the check does not certify the normalization, only that this particular symptom is absent.
+
+### `bio-proteomics-differential-abundance` — Two of the three examples are unreferenced
+
+- Skill: 89, Production Ready · [mrsonord2240/bioSkills@1110c24](https://github.com/mrsonord2240/bioSkills/tree/1110c241c27760ad0127bd803e8832d54651e31c/proteomics/differential-abundance) · [viewer](skills/bio-proteomics-differential-abundance/mrsonord2240-bioSkills@1110c24/viewer.md)
+- Observed in inputs: Static evaluation
+- Problem: SKILL.md and usage-guide.md point at examples/msqrob2_peptide_level.R only. examples/limma_analysis.R and examples/differential_abundance.py both ship and both exit 0, but nothing links to them.
+- Root cause: Pass 4 added a reference for the new example and did not revisit the existing two.
+- Fix: Cite examples/limma_analysis.R from the limma workflow and examples/differential_abundance.py from the Python workflow, as the msqrob2 example is cited from its own section.
+
+### `bio-proteomics-differential-abundance` — 398 lines in one file with no progressive disclosure
+
+- Skill: 89, Production Ready · [mrsonord2240/bioSkills@1110c24](https://github.com/mrsonord2240/bioSkills/tree/1110c241c27760ad0127bd803e8832d54651e31c/proteomics/differential-abundance) · [viewer](skills/bio-proteomics-differential-abundance/mrsonord2240-bioSkills@1110c24/viewer.md)
+- Observed in inputs: Static evaluation
+- Problem: Ten code blocks in a single file; an agent that needs only the limma route loads the msqrob2, MSstats, proDA and Python sections as well.
+- Root cause: Pass 4 added roughly 110 lines of new sections without splitting the file.
+- Fix: Move the feature-level material (msqrob2, msqrobAggregate, MSstats, the centring check) into references/feature_level.md, leaving the insights, the protein-summary workflows and the Common Errors table in SKILL.md.
+
+### `bio-proteomics-quantification` — TMTpro still needs hand-editing from a comment
+
+- Skill: 89, Production Ready · [mrsonord2240/bioSkills@1110c24](https://github.com/mrsonord2240/bioSkills/tree/1110c241c27760ad0127bd803e8832d54651e31c/proteomics/quantification) · [viewer](skills/bio-proteomics-quantification/mrsonord2240-bioSkills@1110c24/viewer.md)
+- Observed in inputs: Input 8
+- Problem: The runnable block is hardcoded to reporters = TMT10 and x = 10, so a TMTpro user has to reconstruct the call from a comment. The comment's CoA layout description also omits the leading channel-tag column that makeImpuritiesMatrix reads as row.names, and a CSV built exactly as described fails with "duplicate 'row.names' are not allowed".
+- Root cause: Pass 3 closed the gap in prose because adding a second reporter block was treated as new content.
+- Fix: Add three commented lines beside the TMT10 call (`quant <- quantify(raw, reporters = TMT16, method = 'max')` / `imp <- makeImpuritiesMatrix(filename = 'lot_coa.csv', edit = FALSE)`), and change the layout sentence to 'a leading Tag column of channel names, then n neighbour-offset columns' with the two-line header of MSnbase's TMT6plexPurityCorrections.csv shown inline.
+
+### `bio-proteomics-quantification` — AP-MS scorer absorbs a failed control IP silently
+
+- Skill: 89, Production Ready · [mrsonord2240/bioSkills@1110c24](https://github.com/mrsonord2240/bioSkills/tree/1110c241c27760ad0127bd803e8832d54651e31c/proteomics/quantification) · [viewer](skills/bio-proteomics-quantification/mrsonord2240-bioSkills@1110c24/viewer.md)
+- Observed in inputs: Input 11
+- Problem: Zeroing an entire control replicate leaves the call set identical at 17 and prints nothing. The column-wise mean skips the all-NaN column, so a control IP that produced no data is indistinguishable from one that worked.
+- Root cause: `Lf[ctrl_cols].mean(axis=1)` and the `L[ctrl_cols].min()` floor are both skipna, which is right per-prey but hides a per-RUN failure.
+- Fix: Add two lines after the log transform: `dead = [c for c in ctrl_cols if L[c].notna().sum() == 0]` and `if dead: print(f'AP-MS: control runs with no data, excluded: {dead}')`, and report `n_ctrl_runs_used` in the output frame.
+
+### `bio-proteomics-quantification` — min_bait_reps default tradeoff is undiscussed
+
+- Skill: 89, Production Ready · [mrsonord2240/bioSkills@1110c24](https://github.com/mrsonord2240/bioSkills/tree/1110c241c27760ad0127bd803e8832d54651e31c/proteomics/quantification) · [viewer](skills/bio-proteomics-quantification/mrsonord2240-bioSkills@1110c24/viewer.md)
+- Observed in inputs: Input 11
+- Problem: A true interactor with an enrichment of 5.42 that is missing in one of three bait replicates is dropped by the default. That is a defensible choice, and the parameter exists, but the Approach text says only 'reproducibility first' and never says what a stochastic dropout in 1 of 3 costs.
+- Root cause: The default was chosen for the fixture, where every true interactor is present in all three.
+- Fix: Add one sentence: at 3 bait replicates, requiring all three trades sensitivity for specificity; `min_bait_reps=2` is the usual compromise, and report how many prey each setting adds so the choice is visible.
+
+### `bio-proteomics-quantification` — Nothing exercises the SILAC or AP-MS code
+
+- Skill: 89, Production Ready · [mrsonord2240/bioSkills@1110c24](https://github.com/mrsonord2240/bioSkills/tree/1110c241c27760ad0127bd803e8832d54651e31c/proteomics/quantification) · [viewer](skills/bio-proteomics-quantification/mrsonord2240-bioSkills@1110c24/viewer.md)
+- Observed in inputs: Inputs 3, 7, 10, 11 (static maintainability)
+- Problem: examples/lfq_normalization.py covers median centering and IRS only, and is not referenced from SKILL.md or usage-guide.md at all. The four functions added in passes 3 and 4 have no worked example with a stated expected output.
+- Root cause: The example predates the new sections and no pass revisited it.
+- Fix: Extend the example with a seeded SILAC pilot (assert incorporation ~0.93) and a small AP-MS matrix (assert the sticky binders are excluded), and cite `examples/lfq_normalization.py` from the normalization and IRS sections.
+
+### `bio-proteomics-quantification` — 404 lines in one file with no progressive disclosure
+
+- Skill: 89, Production Ready · [mrsonord2240/bioSkills@1110c24](https://github.com/mrsonord2240/bioSkills/tree/1110c241c27760ad0127bd803e8832d54651e31c/proteomics/quantification) · [viewer](skills/bio-proteomics-quantification/mrsonord2240-bioSkills@1110c24/viewer.md)
+- Observed in inputs: Static evaluation
+- Problem: An agent asked only to median-centre an LFQ matrix loads the TMT, SILAC and AP-MS sections as well.
+- Root cause: Passes 3 and 4 added roughly 100 lines of new sections without splitting the file.
+- Fix: Move the SILAC and AP-MS sections into `references/labeled_quant.md` and `references/affinity_enrichment.md`, leaving the LFQ/TMT core, the failure modes and the Common Errors table in SKILL.md.
+
 ### `bio-variant-normalization` — csq --phase m and s described wrongly
 
 - Skill: 89, Production Ready · [mrsonord2240/bioSkills@c1237cd](https://github.com/mrsonord2240/bioSkills/tree/c1237cdbc9bb199947696f3909de26a55d259116/variant-calling/variant-normalization) · [viewer](skills/bio-variant-normalization/mrsonord2240-bioSkills@c1237cd/viewer.md)
@@ -932,9 +764,57 @@ None open.
 - Root cause: The workflow blocks omit the REF pre-check the example now has.
 - Fix: Add `set -o pipefail` and a `bcftools norm -f ref.fa -c w` pre-check (or the example's MISMATCH count) before the pipeline.
 
+### `bio-proteomics-peptide-identification` — dda_search.sh hides Percolator's error from the operator
+
+- Skill: 90, Production Ready · [mrsonord2240/bioSkills@1110c24](https://github.com/mrsonord2240/bioSkills/tree/1110c241c27760ad0127bd803e8832d54651e31c/proteomics/peptide-identification) · [viewer](skills/bio-proteomics-peptide-identification/mrsonord2240-bioSkills@1110c24/viewer.md)
+- Observed in inputs: Input 10
+- Problem: With a decoy-tag mismatch, Percolator correctly exits 1 with 'Error: no decoy PSMs were provided', but the script redirects its stderr to $OUT/percolator.log and dies under set -e, so the console shows the search completing and then nothing - no counts, no message.
+- Root cause: The 2> redirect was added to keep Percolator's long banner off the console, and no trap or tee was added with it.
+- Fix: Replace the redirect with `2> >(tee "$OUT/percolator.log" >&2)` or add a `trap 'tail -3 "$OUT/percolator.log" >&2' ERR`, and add a pre-flight check that the pin's Label column contains both 1 and -1 before calling Percolator.
+
+### `bio-proteomics-peptide-identification` — No shipped route for the multi-run pooling the Skill advises
+
+- Skill: 90, Production Ready · [mrsonord2240/bioSkills@1110c24](https://github.com/mrsonord2240/bioSkills/tree/1110c241c27760ad0127bd803e8832d54651e31c/proteomics/peptide-identification) · [viewer](skills/bio-proteomics-peptide-identification/mrsonord2240-bioSkills@1110c24/viewer.md)
+- Observed in inputs: Input 9
+- Problem: The Skill states, correctly and with numbers this audit reproduced, that Percolator needs pooled runs to beat an engine's own score, but dda_search.sh accepts one MZML and the sample Sage JSON shows one mzml path.
+- Root cause: The script was written around the single-run comparison used to generate the engine-comparison paragraph.
+- Fix: Let MZML hold several space-separated paths, pass them all to `sage` and loop the Comet call, and note that Comet's pins must be concatenated (header once) before Percolator.
+
+### `bio-proteomics-peptide-identification` — Zero-decoy stop loses the q-floor hint on tiny lists
+
+- Skill: 90, Production Ready · [mrsonord2240/bioSkills@1110c24](https://github.com/mrsonord2240/bioSkills/tree/1110c241c27760ad0127bd803e8832d54651e31c/proteomics/peptide-identification) · [viewer](skills/bio-proteomics-peptide-identification/mrsonord2240-bioSkills@1110c24/viewer.md)
+- Observed in inputs: Input 3
+- Problem: A genuinely decoy-free 33-PSM pulldown export now raises ValueError. The pre-fix behaviour returned a q floor of 0.0303, which told the operator directly that 1% is unreachable at this list size - the exact point the Skill's own Decision Tree makes.
+- Root cause: The guard added in pass 2 treats 'no decoys' as unconditionally an error rather than distinguishing a prefix mismatch from an already-filtered table.
+- Fix: Keep the raise, but put the attainable floor in the message: `raise ValueError(f'no decoy PSMs recognised in {len(psms)} rows: check the decoy prefix, or the table was already decoy-filtered (with no decoys the smallest reachable q is 1/{len(psms)} = {1/len(psms):.3f})')`.
+
+### `bio-proteomics-peptide-identification` — mokapot and MS2Rescore promised but not routed
+
+- Skill: 90, Production Ready · [mrsonord2240/bioSkills@1110c24](https://github.com/mrsonord2240/bioSkills/tree/1110c241c27760ad0127bd803e8832d54651e31c/proteomics/peptide-identification) · [viewer](skills/bio-proteomics-peptide-identification/mrsonord2240-bioSkills@1110c24/viewer.md)
+- Observed in inputs: Static evaluation
+- Problem: The frontmatter description and the tool taxonomy both advertise rescoring via mokapot and MS2Rescore, but only Percolator has a command line. mokapot 0.10.0 is installed and takes the same Sage pin.
+- Root cause: Pass 4 deliberately scoped rescoring to one tool to avoid adding surface.
+- Fix: Add a two-line mokapot invocation next to the Percolator block (`mokapot --dest_dir ... results.sage.pin`) and state that it consumes the identical pin, or drop MS2Rescore from the description so the description matches what ships.
+
+### `bio-proteomics-peptide-identification` — examples/fdr_filtering.py ships but is unreferenced
+
+- Skill: 90, Production Ready · [mrsonord2240/bioSkills@1110c24](https://github.com/mrsonord2240/bioSkills/tree/1110c241c27760ad0127bd803e8832d54651e31c/proteomics/peptide-identification) · [viewer](skills/bio-proteomics-peptide-identification/mrsonord2240-bioSkills@1110c24/viewer.md)
+- Observed in inputs: Static evaluation (gate 8 direction check)
+- Problem: SKILL.md and usage-guide.md now point at examples/dda_search.sh and examples/separate_search_fdr.py only. fdr_filtering.py still ships, still runs, and is the Skill's only worked PEP-vs-q demonstration, but nothing links to it.
+- Root cause: Pass 4 added two example references and did not re-check the existing one.
+- Fix: Cite `examples/fdr_filtering.py` from the PEP vs q-value insight, the same way the other two examples are cited from their sections.
+
+### `bio-proteomics-peptide-identification` — 366-line SKILL.md with no progressive disclosure
+
+- Skill: 90, Production Ready · [mrsonord2240/bioSkills@1110c24](https://github.com/mrsonord2240/bioSkills/tree/1110c241c27760ad0127bd803e8832d54651e31c/proteomics/peptide-identification) · [viewer](skills/bio-proteomics-peptide-identification/mrsonord2240-bioSkills@1110c24/viewer.md)
+- Observed in inputs: Static evaluation
+- Problem: An agent that only needs the table snippet loads the full CLI route, the decoy-database section and a 19-entry reference list.
+- Root cause: Pass 4 added roughly 120 lines of new sections without splitting the file.
+- Fix: Move the three command-line sections and the reference list into `references/cli_route.md` and `references/citations.md`, leaving the insights, estimators and Common Errors in SKILL.md.
+
 ### `bio-vcf-basics` — Wrong bcftools query -H tip in usage guide
 
-- Skill: 90, Production Ready · [mrsonord2240/bioSkills@c1237cd](https://github.com/mrsonord2240/bioSkills/tree/c1237cdbc9bb199947696f3909de26a55d259116/variant-calling/vcf-basics) · [viewer](skills/bio-vcf-basics/mrsonord2240-bioSkills@c1237cd/viewer.md)
+- Skill: 90, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/variant-calling/vcf-basics) · [viewer](skills/bio-vcf-basics/GPTomics-bioSkills@d91ed3d/viewer.md)
 - Observed in inputs: 1
 - Problem: usage-guide.md says '-H with bcftools query skips the header line'; for query -H prints a header.
 - Root cause: view -H (skip header) and query -H (print header) were conflated.
@@ -942,7 +822,7 @@ None open.
 
 ### `bio-vcf-basics` — Update the bgzip error string
 
-- Skill: 90, Production Ready · [mrsonord2240/bioSkills@c1237cd](https://github.com/mrsonord2240/bioSkills/tree/c1237cdbc9bb199947696f3909de26a55d259116/variant-calling/vcf-basics) · [viewer](skills/bio-vcf-basics/mrsonord2240-bioSkills@c1237cd/viewer.md)
+- Skill: 90, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/variant-calling/vcf-basics) · [viewer](skills/bio-vcf-basics/GPTomics-bioSkills@d91ed3d/viewer.md)
 - Observed in inputs: 5
 - Problem: Common Errors quotes 'no BGZF EOF marker'; current bcftools reports 'not compressed with bgzip' or 'not BGZF compressed, cannot index'.
 - Root cause: Error text from an older htslib.
@@ -950,7 +830,7 @@ None open.
 
 ### `bio-vcf-basics` — Add a gVCF variant-site extraction recipe
 
-- Skill: 90, Production Ready · [mrsonord2240/bioSkills@c1237cd](https://github.com/mrsonord2240/bioSkills/tree/c1237cdbc9bb199947696f3909de26a55d259116/variant-calling/vcf-basics) · [viewer](skills/bio-vcf-basics/mrsonord2240-bioSkills@c1237cd/viewer.md)
+- Skill: 90, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/variant-calling/vcf-basics) · [viewer](skills/bio-vcf-basics/GPTomics-bioSkills@d91ed3d/viewer.md)
 - Observed in inputs: 4
 - Problem: The gVCF section explains the model but gives no command to list candidate sites; ALT="<NON_REF>" expressions also match multi-ALT records.
 - Root cause: Section is conceptual only.

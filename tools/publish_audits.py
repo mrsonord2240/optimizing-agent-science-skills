@@ -24,6 +24,7 @@ import json
 import os
 import re
 import shutil
+import subprocess
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 AUDITS = os.environ.get("OASS_AUDITS", "F:/OpenScience/audits")
@@ -54,6 +55,8 @@ AUDIT_METHOD = {
 AUDIT_METHOD["url"] = f"https://github.com/{AUDIT_METHOD['repository']}/tree/{AUDIT_METHOD['commit']}/{AUDIT_METHOD['path']}"
 PERFORMED_BY = "Claude (Anthropic) auditor agents"
 COMMISSIONED_BY = "Samuel Nord"
+RUN_DIR_RE = re.compile(r"^(runs|rerun|pass)\w*$")
+FORK_CLONE = os.environ.get("OASS_FORK_CLONE", "F:/OpenScience/external/mrsonord2240__bioSkills")
 SCRIPT_EXTENSIONS = {".py", ".R", ".r", ".sh", ".ctl"}
 MAX_SCRIPT_BYTES = 100_000
 
@@ -86,6 +89,53 @@ def version_name(source):
     return f"{source['repository'].replace('/', '-')}@{source['commit'][:7]}"
 
 
+def fork_modifies(source):
+    """Does the audited fork commit actually change this Skill's files from its upstream base?
+
+    A fix log on disk does not answer this: it may describe fixes committed *after* the commit that
+    was audited, in which case the audited content is still upstream's. Returns None when the fork
+    clone is unavailable, leaving the caller to fall back on the fix log.
+    """
+    base = source.get("fork_of")
+    if not base or not os.path.isdir(os.path.join(FORK_CLONE, ".git")):
+        return None
+    result = subprocess.run(
+        ["git", "diff", "--quiet", base["commit"], source["commit"], "--", source["path"]],
+        cwd=FORK_CLONE, capture_output=True)
+    if result.returncode == 0:
+        return False
+    if result.returncode == 1:
+        return True
+    return None
+
+
+def resolve_identity(source, fixes_present):
+    """The version a record is filed under.
+
+    A Skill whose audited fork commit does not change its files is byte-identical to upstream at the
+    fork's base commit, so the audited *content* is upstream's. Filing it under the fork commit
+    would claim a modification that does not exist, so it is filed under upstream and the fork
+    checkout it was read from is recorded separately.
+    """
+    modified = fork_modifies(source)
+    if not source.get("fork_of") or (fixes_present if modified is None else modified):
+        return source, version_name(source)
+    base = source["fork_of"]
+    upstream = dict(source)
+    upstream.pop("fork_of", None)
+    upstream.pop("modified_by", None)
+    upstream["repository"] = base["repository"]
+    upstream["commit"] = base["commit"]
+    upstream["url"] = f"https://github.com/{base['repository']}/tree/{base['commit']}/{source['path']}"
+    upstream["audited_from"] = {
+        "repository": source["repository"],
+        "commit": source["commit"],
+        "url": source["url"],
+        "unchanged_from_upstream": True,
+    }
+    return upstream, version_name(upstream)
+
+
 def collect_scripts(folder, subdirectories, modified_before=None, modified_after=None):
     found = []
     for sub in subdirectories:
@@ -105,7 +155,7 @@ def collect_scripts(folder, subdirectories, modified_before=None, modified_after
     return found
 
 
-def header(skill_id, source, report, fixes_present):
+def header(skill_id, source, report):
     lines = [
         f"> **Audit record for `{skill_id}`**",
         f"> - Skill authored by [{source['author']}]({source['author_url']}); audited version "
@@ -116,7 +166,13 @@ def header(skill_id, source, report, fixes_present):
         lines.append(
             f"> - Modified by {source['modified_by']} from "
             f"[{base['repository']}@{base['commit'][:7]}](https://github.com/{base['repository']}/tree/{base['commit']}); "
-            + ("every change is listed in [fixes.md](fixes.md)." if fixes_present else "no changes to this Skill's files.")
+            "every change is listed in [fixes.md](fixes.md)."
+        )
+    elif source.get("audited_from"):
+        fork = source["audited_from"]
+        lines.append(
+            f"> - Read from [{fork['repository']}@{fork['commit'][:7]}]({fork['url']}), a fork in which this "
+            "Skill's files are unchanged from upstream; the audited content is upstream's."
         )
     lines += [
         f"> - Audit method: [{AUDIT_METHOD['name']}]({AUDIT_METHOD['url']}) by {AUDIT_METHOD['author']} "
@@ -135,7 +191,17 @@ def publish_version(repo, skill_id, folder, report_name, script_dirs, supersedes
     report_path = os.path.join(folder, report_name)
     report = read_json(report_path)
     source = parse_source(report, report_path)
-    name = version_name(source)
+    fixes_present = bool(fixes_path and os.path.isfile(fixes_path))
+    source, name = resolve_identity(source, fixes_present)
+    # Filed under upstream: the audited commit changes nothing here, so any fix log on disk
+    # describes work that landed after this audit and does not belong to this record.
+    fixes_present = fixes_present and bool(source.get("fork_of"))
+    if name == supersedes:
+        raise SystemExit(
+            f"{skill_id}: {name} would overwrite the superseded record — the fork version is unchanged "
+            "from upstream, so both resolve to the same version. Expected a fix log at "
+            f"{fixes_path}."
+        )
     target = os.path.join(repo, "audits", "skills", skill_id, name)
     if os.path.isdir(target):
         shutil.rmtree(target)
@@ -144,8 +210,7 @@ def publish_version(repo, skill_id, folder, report_name, script_dirs, supersedes
     viewer_path = os.path.join(folder, f"eval_viewer_{skill_id}.md")
     with open(viewer_path, encoding="utf-8") as f:
         viewer = f.read().replace("\r\n", "\n")
-    fixes_present = bool(fixes_path and os.path.isfile(fixes_path))
-    write_text(os.path.join(target, "viewer.md"), header(skill_id, source, report, fixes_present) + "\n" + viewer)
+    write_text(os.path.join(target, "viewer.md"), header(skill_id, source, report) + "\n" + viewer)
     shutil.copyfile(report_path, os.path.join(target, "report.json"))
     if fixes_present:
         with open(fixes_path, encoding="utf-8") as f:
@@ -181,7 +246,12 @@ def publish_skill(repo, skill_id):
     current = os.path.join(AUDITS, skill_id)
     report_name = f"eval_report_{skill_id}_result.json"
     archived = os.path.join(PRE_FIX, skill_id)
-    runs = sorted(d for d in os.listdir(current) if d.startswith("runs") and os.path.isdir(os.path.join(current, d)))
+    work_dirs = sorted(d for d in os.listdir(current)
+                       if RUN_DIR_RE.match(d) and os.path.isdir(os.path.join(current, d)))
+    # A re-audit writes to its own folder — runs_v2, rerun, rerun2, pass5 — leaving runs/ as the
+    # first audit's. Only when it reuses runs/ do we have to fall back to splitting by mtime.
+    reaudit = [d for d in work_dirs if d != "runs"]
+    runs = [d for d in work_dirs if d not in reaudit]
     data = ["data"] if os.path.isdir(os.path.join(current, "data")) else []
     fix_log = os.path.join(FIXES, f"{skill_id}.md")
 
@@ -191,20 +261,20 @@ def publish_skill(repo, skill_id):
                 parse_source(read_json(os.path.join(current, report_name)), current)["commit"]:
             raise SystemExit(f"{skill_id}: archived and current reports audit the same commit")
         # The archive holds only the reports; the pre-fix run scripts are still in the live folder.
-        if "runs_v2" in runs:
-            # The re-audit wrote to runs_v2; every other run folder belongs to the first audit.
-            pre_dirs, post_dirs = [d for d in runs if d != "runs_v2"] + data, ["runs_v2"]
+        if reaudit:
+            pre_dirs, post_dirs = runs + data, reaudit
             pre_window = post_window = (None, None)
         else:
-            # The re-audit reused the same folders: split by modification time against the archived
-            # report, which was copied after the first audit finished and before the re-audit began.
+            # The re-audit reused runs/: split by modification time against the archived report,
+            # which was copied after the first audit finished and before the re-audit began.
             cutoff = os.path.getmtime(os.path.join(archived, report_name))
             pre_dirs = post_dirs = runs + data
             pre_window, post_window = (cutoff, None), (None, cutoff)
         supersedes, _ = publish_version(repo, skill_id, archived, report_name, pre_dirs, None, None,
                                         scripts_folder=current, script_window=pre_window)
     else:
-        post_dirs = runs + data
+        # Nothing superseded, so this record is the only one: it carries every run folder.
+        post_dirs = work_dirs + data
         post_window = (None, None)
     source = parse_source(read_json(os.path.join(current, report_name)), current)
     name, count = publish_version(repo, skill_id, current, report_name, post_dirs, supersedes,

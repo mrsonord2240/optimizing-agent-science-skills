@@ -1,0 +1,7 @@
+E="F:/OpenScience/audit-envs/mass-spec-proteomics-analyst"
+export PY="$E/Scripts/python.exe"
+export RSH="$E/r.sh"
+export QK="F:/OpenScience/external/mrsonord2240__bioSkills/proteomics/quantification"
+export QD="F:/OpenScience/audits/bio-proteomics-quantification/data"
+export QW="F:/OpenScience/audits/bio-proteomics-quantification/rerun4"
+export XT="F:/OpenScience/audits/bio-proteomics-peptide-identification/rerun4/extract.py"

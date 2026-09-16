@@ -1,0 +1,14 @@
+diann \
+    --f sample1.mzML --f sample2.mzML \
+    --lib "" --fasta uniprot_human.fasta --fasta-search \
+    --gen-spec-lib --predictor \
+    --out diann_out/report.parquet \
+    --out-lib diann_out/report-lib.parquet \
+    --qvalue 0.01 \
+    --matrices \
+    --mass-acc 15 --mass-acc-ms1 15 \
+    --reanalyse --smart-profiling \
+    --cut K*,R* --missed-cleavages 1 \
+    --min-pep-len 7 --max-pep-len 30 \
+    --unimod4 --var-mods 1 --var-mod UniMod:35,15.994915,M \
+    --threads 8

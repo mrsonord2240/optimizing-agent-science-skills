@@ -1,0 +1,320 @@
+{
+  "meta": {
+    "skill_name": "bio-proteomics-dia-analysis",
+    "description": "Analyzes data-independent acquisition (DIA) proteomics by scoring reconstructed fragment-chromatogram peak groups against a decoy null with DIA-NN (library-free search against a deep-learning predicted library, or library-based search), Spectronaut, OpenSWATH, and EncyclopeDIA. Frames the deliverable around q-value LEVEL (precursor/peptide/protein-group) and CONTEXT (run vs experiment-wide/global) rather than a bare \"1% FDR\", and around the duty-cycle-vs-selectivity acquisition tradeoff (window design, staggered demultiplexing, diaPASEF, narrow-window Astral). Use when identifying and quantifying proteins from DIA mass spectrometry runs and filtering DIA-NN report.parquet/matrix output. Building the spectral library itself is spectral-libraries; normalization and protein roll-up is quantification; statistical testing of the matrix is differential-abundance.",
+    "evaluated_on": "2026-09-15",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Moderate",
+    "n_inputs": 7,
+    "audit_type": "re-audit after fix pass 1",
+    "pre_fix_report": "F:/OpenScience/audits/_pre-fix-20260915/bio-proteomics-dia-analysis/ (2026-09-11, static 77, execution 77.2, final 77, Beta Only)",
+    "source": "mrsonord2240/bioSkills@575ab946989a7029d235eb0ab711e47b08edbcb0:proteomics/dia-analysis",
+    "environment": "DIA-NN 2.6.1 Academia; ProteoWizard msconvert 3.0.26253; EasyPQP 0.1.59; Sage 0.14.6; pyOpenMS 3.5.0; pandas 3.0.5; numpy 2.5.3 (F:/OpenScience/audit-envs/mass-spec-proteomics-analyst)",
+    "data": "SYNTHETIC: rerun/work/report.parquet (8 runs, 60 LOWCONF groups), rerun/cohort (seeded 600-run report, 3.05M rows), rerun/stagger/staggered_cycles.mzML (12 staggered cycles). PUBLIC: PXD070049 (CC0, Van Puyvelde 2026), Orbitrap Astral 5-min 250 pg HYE benchmark, 3 DIA + 3 DDA runs, submitter SDRF."
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS",
+      "detail": "The Skill's Python filter block ran to completion on every dataset thrown at it (synthetic 23k-row report, synthetic 3.05M-row cohort, two real DIA-NN 2.6.1 reports). No crashes, no loops. Deterministic: same matrix shape and counts on repeat runs. The example shell script now quotes its --f arguments (a filename with a space is passed as one argument, verified with a stub diann) and exits 1 on an empty input directory."
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "Nine references, all real and correctly cited. The quantitative claims that could be checked were checked: the Skill's route recovered the known HYE mixing ratios on public CC0 data (yeast +1.04 vs +1.00 expected, E. coli -1.77 vs -2.00 on A/B). Every synthetic dataset used here is labelled SYNTHETIC."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "No output diagnoses, prescribes or triages an individual; the 600-run plasma cohort is handled as research data only."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "The q-value LEVEL/CONTEXT framing is correct (Rosenberger 2017) and was confirmed by execution at 8 and 600 runs. The two residual defects (one-step vs two-step predicted-library command on DIA-NN 2.x; the matrix-vs-report count direction) are version-drift errors, not principled fallacies."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "The Python filter block ran verbatim in all seven inputs. The msconvert filter chain ran to exit 0 and did what the Skill says it does (8 Th -> 4 Th, 240 -> 480 MS2 scans). Every flag in both DIA-NN commands was accepted by the installed DIA-NN 2.6.1: its log records unrecognised options explicitly (it did so for a deliberate `--help`) and recorded none for either Skill command. The easypqp `convert` and `library` subcommands and their options exist in 0.1.59 and a library was built from real DDA data with them."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 85,
+    "max": 100,
+    "delta_vs_pre_fix": "+8 (77 -> 85)",
+    "categories": {
+      "functional_suitability": {
+        "score": 9,
+        "max": 12,
+        "note": "Completeness 3 (OpenSWATH/Spectronaut/EncyclopeDIA still table rows only). Correctness 3: the easypqp route, mass-accuracy guidance, staggered-window guidance, library-based --fasta/--reannotate caveat and the Global.Q.Value filter are all now right and all were verified by execution. Two correctness defects remain against the installed DIA-NN 2.6.1: the headline predicted-library command is flagged 'incorrect settings' (2.x wants library prediction as a separate step) and the matrix-vs-report count claim points the wrong way. Appropriateness 3."
+      },
+      "reliability": {
+        "score": 11,
+        "max": 12,
+        "note": "Per-method failure modes and Common Errors are strong and now match observed behaviour. The example script checks for diann, the FASTA and at least one mzML, uses an argument array, and exits 1 on an empty directory (all verified). Nothing warns the agent that the canonical one-command route draws a DIA-NN 2.x settings warning."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "Still a single ~3,200-word file loaded whole with a linear route, but the mass-accuracy section now carries real per-instrument values and a run-order caveat instead of restating the default, and the large-cohort row gives an actual scaling strategy."
+      },
+      "agent_usability": {
+        "score": 13,
+        "max": 16,
+        "note": "Error prevention on parquet-not-tsv, zeros-before-log2 and cohort FDR is excellent and all three were exercised. The 'library-free IS the predicted-library route' naming contradiction is resolved in the header, Insight 3 and the decision tree. Peak-picking-before-demux and run-order-dependent auto mass accuracy are now stated. Lost: an agent following the headline command verbatim gets a DIA-NN warning it has not been prepared for, and would mis-explain a matrix count that is larger, not smaller, than the report."
+      },
+      "human_usability": {
+        "score": 6,
+        "max": 8,
+        "note": "Description is jargon-dense but names the concrete artefacts (DIA-NN, report.parquet). The usage guide has natural prompts. Input requirements (what files the analyst must already have) are still implicit."
+      },
+      "security": {
+        "score": 12,
+        "max": 12,
+        "note": "No credentials, no data exposure, no shell injection surface. The unquoted --f $f word-splitting defect is fixed: 'run A.mzML' arrives as a single argument."
+      },
+      "maintainability": {
+        "score": 9,
+        "max": 12,
+        "note": "Clean sections and a dated, specific Version Compatibility header naming what was executed versus doc-checked. The DIA-NN command is still duplicated between SKILL.md and examples/, and the Skill still ships no test data."
+      },
+      "agent_specific": {
+        "score": 18,
+        "max": 20,
+        "note": "Routing to spectral-libraries / quantification / differential-abundance is precise and every Related Skill exists. Scope statement names what is OUT. Still one flat file with no references/ layer, and the routing lines are not phrased as stop conditions."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 87.0,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 30,
+      "total": 34
+    },
+    "layer1_avg": 36.0,
+    "layer2_avg": 51.0,
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "DIA-NN predicted-library route on multi-run DIA data -> 1% FDR protein matrix",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Filter block gave an 887x8 log2 matrix, 0/60 LOWCONF, 0 -Inf. Every flag of the Skill's command was accepted by DIA-NN 2.6.1, but 2.6.1 answers the command itself with 'WARNING: incorrect settings, the in silico-predicted library must be generated in a separate pipeline step'.",
+        "basic": 36,
+        "specialized": 51,
+        "total": 87,
+        "assertions_passed": 5,
+        "assertions_total": 6,
+        "assertions": [
+          {"text": "Filter names both LEVEL and CONTEXT (Q.Value, PG.Q.Value, Global.Q.Value, Global.PG.Q.Value)", "result": "PASS", "note": "All four are in the Skill's filter block as written"},
+          {"text": "Skill code runs as written and yields a log2 matrix without -Inf", "result": "PASS", "note": "887x8, 0 -Inf, 589 NaN (8.3%); rerun/in12_filter.out"},
+          {"text": "Every DIA-NN flag in the command is accepted by the installed version", "result": "PASS", "note": "DIA-NN 2.6.1 log lists unrecognised options by name (it did so for a deliberate --help) and lists none for the Skill's 23 flags; it echoed back the digest, mods, length, mass-accuracy and thread settings"},
+          {"text": "The predicted-library command runs as a single step on the installed DIA-NN", "result": "FAIL", "note": "DIA-NN 2.6.1: 'WARNING: incorrect settings, the in silico-predicted library must be generated in a separate pipeline step and then used to process the raw data, now without activating FASTA digest'. The run continued and wrote the predicted library, but the Skill presents the one-command form as the default and never mentions the two-step requirement"},
+          {"text": "Mass-accuracy guidance matches DIA-NN documentation and works in practice", "result": "PASS", "note": "Fixed per-instrument values; the Skill's Orbitrap Astral pair (--mass-acc 10 --mass-acc-ms1 4) was used in both real runs and echoed back by DIA-NN as 1e-05 / 4e-06"},
+          {"text": "Scope: stays within search and filtering, routes normalisation and statistics elsewhere", "result": "PASS", "note": "Hands off the log2 matrix"}
+        ],
+        "executed": true,
+        "execution_note": "Skill filter block executed verbatim on SYNTHETIC rerun/work/report.parquet (rerun/in12_filter.py, exit 0). The Skill's example script executed against a stub diann in three cases (rerun/smoke: valid input exit 0 and 40 argv entries; filename with a space passed as one argument; empty directory exit 1). The Skill's b01 command itself was executed with the real DIA-NN 2.6.1 binary on the three PXD070049 DIA .raw files (public-work/diann_libfree): it predicted a 1.9 GB library in 50 min, emitted the incorrect-settings warning, and then failed reading .raw for an environment reason unrelated to the Skill (DIA-NN's RawWrapper needs .NET 8; only .NET 10 is installed)."
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Filter an existing report.parquet for a cohort matrix and explain the matrix-vs-report count",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "All 60 globally unconfident groups removed, zeros converted before log2, Global.Q.Value now in the filter. The Skill's explanation of the matrix-vs-report count is wrong for DIA-NN 2.6.1: the matrix is larger, not smaller.",
+        "basic": 36,
+        "specialized": 50,
+        "total": 86,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "Groups failing the experiment-wide q-value are removed from the cohort matrix", "result": "PASS", "note": "0/60 LOWCONF survive vs 60/60 under a run-level-only filter"},
+          {"text": "DIA-NN zeros are converted to NaN before log2", "result": "PASS", "note": "0 -Inf in every matrix produced in this audit, synthetic and real"},
+          {"text": "Filter includes every report filter DIA-NN recommends", "result": "PASS", "note": "Global.Q.Value <= 0.01 was added by the fix; present in the block and in the thresholds table"},
+          {"text": "The matrix-vs-report count explanation matches the installed DIA-NN", "result": "FAIL", "note": "Real 2.6.1 output: report.pg_matrix.tsv holds 4440 protein groups against 4376 in the run-level-filtered report and 4375 after the Skill's own global filter -- the matrix is LARGER. The 2.6.1 log calls the matrices '1% precursor and protein group FDR' and never mentions --matrix-spec-q. The Skill tells the agent the matrix count will be lower and to 'not panic', which inverts what this version does"},
+          {"text": "Scope: matrix handed on without normalising or testing", "result": "PASS", "note": "Only valid-value counts reported"}
+        ],
+        "executed": true,
+        "execution_note": "rerun/in12_filter.py on SYNTHETIC data (exit 0) and rerun/in6_public_predlib.py on the real DIA-NN 2.6.1 output in public-work/diann_predlib_mzml (exit 0). Matrix row count confirmed twice: pandas nunique on Protein.Group (4440) and wc -l on the TSV (4441 lines incl. header)."
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Staggered 2x8 Th overlapping-window data: conversion and search route",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The Skill's msconvert command, run verbatim on a properly staggered file, demultiplexed 240 MS2 at 8 Th into 480 MS2 at 4 Th. Reversing the filter order reproduces the exact warning the Skill's ordering advice is based on.",
+        "basic": 37,
+        "specialized": 53,
+        "total": 90,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {"text": "The msconvert demultiplex filter string is valid and completes", "result": "PASS", "note": "exit 0; 12-cycle SYNTHETIC staggered mzML in, demultiplexed mzML out"},
+          {"text": "Vendor peak picking is placed as the FIRST filter and that ordering matters", "result": "PASS", "note": "Skill orders peakPicking first. Running the two filters in the reverse order produced 'Warning: vendor peakPicking requested, but peakPicking is not the first filter. Since the vendor DLLs can only operate directly on raw data, this filter will likely not have any effect.' -- the fix is correct and now demonstrated, not asserted"},
+          {"text": "Demultiplexing halves the effective isolation width, as the Skill claims (Amodei 2019)", "result": "PASS", "note": "Input: 240 MS2, all 8.0 Th, 40 distinct centres. Output: 480 MS2, all 4.0 Th, 41 centres"},
+          {"text": "Output reflects that DIA-NN handles overlapping windows natively and demultiplexing is an optional gain", "result": "PASS", "note": "Skill text now says exactly this and cites the DIA-NN docs and issue #438; not executable here because the public Astral data is not staggered (20.01 Th windows stepping 20.005 Th, i.e. abutting, not interleaved)"}
+        ],
+        "executed": true,
+        "execution_note": "rerun/in3_make_staggered.py built a 252-spectrum SYNTHETIC staggered mzML (12 cycles x 20 windows; the pre-fix synthetic file had 5 spectra, so msconvert aborted with 'Too few spectra to determine the number of precursor windows' before the command could be judged). msconvert 3.0.26253 then ran the Skill's two filters verbatim (rerun/stagger/demux_skillcmd.out, exit 0) and again in reverse order (demux_reversed.out). Window widths before and after verified with pyOpenMS (check_demux.out)."
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Build an empirical library from DDA search results with EasyPQP, then search DIA against it",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "The rewritten two-step easypqp route is real and works: a library was built from three real Astral DDA runs. But the Skill never says that an EasyPQP TSV library is not directly loadable by DIA-NN without fragment-annotation columns, which is what actually blocks this route.",
+        "basic": 33,
+        "specialized": 44,
+        "total": 77,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {"text": "The easypqp subcommands and options in the snippet exist in the installed version", "result": "PASS", "note": "easypqp 0.1.59: `convert` takes --pepxml, --spectra, --psms, --peaks; `library` takes --out, --rt_reference and positional INFILES documented as 'PSM and Peak pickle files generated from an easypqp convert command'"},
+          {"text": "The library step assembles a library from the converted pickles", "result": "PASS", "note": "Ran on real data: 7063 PSMs -> 2327 modified peptides and 977 proteins at q < 0.01, RT alignment across three runs, library.tsv written (public-work/sage/easypqp/library3.log)"},
+          {"text": "The Skill warns what DIA-NN needs from a third-party library", "result": "FAIL", "note": "The EasyPQP library.tsv was not usable by DIA-NN 2.6.1 until FragmentCharge, FragmentType and FragmentSeriesNumber columns were added by hand. The Skill offers only a generic 'compatibility should be verified for each software version' and points at FragPipe's DIA-NN-format export; the concrete failure an agent will hit is undocumented"},
+          {"text": "Library-building detail is deferred to spectral-libraries", "result": "PASS", "note": "Routed there in scope, decision tree and Related Skills"}
+        ],
+        "executed": true,
+        "execution_note": "Partly verbatim. `easypqp convert` as written takes pepXML; no pepXML exists here (the DDA search used Sage 0.14.6), so the sibling `convertsage` was run on the real Sage results and `easypqp library` was then run on the resulting pickles (public-work/sage/easypqp). The Skill's step-2 command as printed also names --psmtsv/--peptidetsv/--rt_reference, which are FragPipe artefacts absent here; without them the same binary built the library successfully. `easypqp convert --help` and `easypqp library --help` captured in rerun/easypqp_help.out."
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "600-run diaPASEF plasma cohort: filtering, QC and the methods q-value statement",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "3.05M-row report filtered in 1.5 s to a 2000x600 matrix, 0 -Inf, 0 false groups, 17.2% missing. The large-cohort route now matches DIA-NN's own guidance.",
+        "basic": 37,
+        "specialized": 53,
+        "total": 90,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "The filter scales to a 3M-row report without -Inf", "result": "PASS", "note": "1.5 s, 2000x600 matrix, 0 -Inf"},
+          {"text": "The experiment-wide filter prevents false-group accumulation across runs", "result": "PASS", "note": "0 FALSE* groups survive at 600 runs"},
+          {"text": "The large-cohort route matches DIA-NN guidance", "result": "PASS", "note": "Fixed by pass 1: empirical library from 20-100 high-quality runs, search all runs with it, MBR off, fixed mass accuracies, filter on Global.*"},
+          {"text": "A methods statement can name column, level, context and version from the Skill alone", "result": "PASS", "note": "Directly supported by the level/context principle and the thresholds table"},
+          {"text": "Safety: no individual-level diagnostic or clinical claim from a plasma cohort", "result": "PASS", "note": "Output is a research matrix plus per-run QC (median 1667 groups/run, MAD 43, 0 runs flagged)"}
+        ],
+        "executed": true,
+        "execution_note": "rerun/in5_cohort.py regenerated the SYNTHETIC seeded 600-run report (3,046,139 rows, 142 MB) and ran the Skill's filter block verbatim plus per-run QC, exit 0; the parquet was deleted afterwards."
+      },
+      {
+        "index": 6,
+        "type": "New (public data, canonical route)",
+        "label": "Predicted-library route end to end on real Orbitrap Astral HYE benchmark runs (PXD070049, CC0)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Filter block ran verbatim on real DIA-NN 2.6.1 output (4375x3) and the resulting quantities recover the known three-species mixing design.",
+        "basic": 37,
+        "specialized": 54,
+        "total": 91,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "The Skill's filter block runs unmodified on real DIA-NN 2.6.1 output", "result": "PASS", "note": "46,485 rows -> 4375x3 log2 matrix in 0.1 s, 0 -Inf"},
+          {"text": "Every column the filter needs exists in the installed version's report", "result": "PASS", "note": "Q.Value, PG.Q.Value, Global.Q.Value, Global.PG.Q.Value, Lib.Q.Value, Lib.PG.Q.Value, PG.MaxLFQ, Protein.Group, Run all present"},
+          {"text": "The filtered matrix recovers the known HYE mixing ratios", "result": "PASS", "note": "A/B human +0.02 (0), yeast +1.04 (+1.00), E. coli -1.77 (-2.00); C/A human -0.02 (0), yeast -3.22 (-3.32), E. coli +2.43 (+2.68). Ratio compression at the low end is expected at 250 pg load, not a Skill defect"},
+          {"text": "The Skill's documented output-file listing matches what the installed version writes", "result": "PASS", "note": "All five listed files present; the Skill's note that predicted libraries land as *.predicted.speclib rather than the requested --out-lib name was confirmed exactly"},
+          {"text": "Scope: no normalisation or testing performed on the matrix", "result": "PASS", "note": "Matrix handed off"}
+        ],
+        "executed": true,
+        "execution_note": "Real DIA-NN 2.6.1 Academia run (public-work/diann_predlib_mzml, 3 x Orbitrap Astral 5-min 250 pg DIA, msconvert-converted mzML, the Skill's own Astral mass accuracies). Analysis script rerun/in6_public_predlib.py, exit 0, output in rerun/in6_public_predlib.out. This is one replicate per condition, so within-condition CV is not computable from this dataset."
+      },
+      {
+        "index": 7,
+        "type": "New (public data, library-based route)",
+        "label": "Library-based route on the same real Astral runs using the EasyPQP empirical library",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The Skill's b02 command ran on DIA-NN 2.6.1 against a library built from the project's own DDA runs; 771x3 matrix, ratios again recover the design.",
+        "basic": 36,
+        "specialized": 52,
+        "total": 88,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "The library-based command's flags are accepted by the installed DIA-NN", "result": "PASS", "note": "No unrecognised-option warnings in public-work/diann_libbased_mzml/diann.log"},
+          {"text": "Passing --fasta alongside --lib annotates proteins, as the fix claims", "result": "PASS", "note": "All 786 protein-group accessions in the report are present in the shipped HYE FASTA (0 unmatched) and gene names are filled for 4845 of 4851 rows (rerun/check_annot.out)"},
+          {"text": "The filter block runs verbatim on this report too", "result": "PASS", "note": "771x3, 0 -Inf, 12 NaN"},
+          {"text": "Quantities recover the known mixing design on the smaller library-based result", "result": "PASS", "note": "A/B yeast +0.98 (+1.00), E. coli -1.92 (-2.00), human -0.04 (0)"},
+          {"text": "The third-party-library caveat is specific enough to act on", "result": "FAIL", "note": "Same gap as Input 4: the EasyPQP library needed fragment-annotation columns added before DIA-NN would load it, and the Skill's caveat does not name that"}
+        ],
+        "executed": true,
+        "execution_note": "Real DIA-NN 2.6.1 run at public-work/diann_libbased_mzml (surviving work from the first re-audit pass); filter and species-ratio analysis in rerun/public_hye_check.py / public_libbased.out."
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 34.0,
+    "dynamic_weighted": 52.2,
+    "score": 86.2,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": true,
+    "veto_override": false,
+    "grade_note": "Raw score 86.2 maps to Production Ready, but the assertion pass rate is 30/34 = 88.2%, below the 90% floor, so the grade is downgraded exactly one tier to Limited Release. All other floors are met: static 85 >= 80, execution 87.0 >= 85, Layer 1 36.0/40 >= 32, Layer 2 51.0/60 >= 48.",
+    "delta_vs_pre_fix": "77 Beta Only (not deployable) -> 86.2 Limited Release (deployable). Six of the eight pre-fix recommendations are confirmed fixed by execution; two new version-drift defects were found against DIA-NN 2.6.1."
+  },
+  "key_strengths": [
+    "The filter block is the Skill's core artefact and it is now correct and proven at four scales: 23k-row synthetic, 3.05M-row synthetic cohort, and two real DIA-NN 2.6.1 reports. Zero -Inf everywhere, all 60 globally unconfident synthetic groups removed, 1.5 s on 3M rows.",
+    "The route produces quantitatively right answers on public CC0 benchmark data: on PXD070049 the predicted-library route recovered human 0.0, yeast +1.0 and E. coli -2.0 log2 ratios to within 0.25.",
+    "Every pass-1 fix that could be executed was executed and held: the msconvert filter chain demultiplexes 8 Th to 4 Th and the reversed order reproduces ProteoWizard's own 'peakPicking is not the first filter' warning; the example script survives filenames with spaces and exits on an empty directory; the easypqp two-step route built a real library from real DDA data.",
+    "Every flag in both DIA-NN commands is accepted by DIA-NN 2.6.1, verified against a binary that names unrecognised options explicitly in its log.",
+    "q-value LEVEL and CONTEXT framing is the right teaching for this domain and is what makes the 600-run result correct; routing to spectral-libraries, quantification and differential-abundance is precise and every Related Skill exists."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "The headline predicted-library command is rejected as 'incorrect settings' by DIA-NN 2.x",
+      "observed_in": [1],
+      "problem": "Run with the installed DIA-NN 2.6.1, the Skill's default command answers: 'WARNING: incorrect settings, the in silico-predicted library must be generated in a separate pipeline step and then used to process the raw data, now without activating FASTA digest'. The Skill presents combining --fasta-search --gen-spec-lib --predictor with data processing as the modern default and never mentions a two-step form.",
+      "root_cause": "The command is written for DIA-NN 1.9.x behaviour. In 2.x, library prediction and data processing are separate pipeline steps.",
+      "fix": "Split the 'DIA-NN -- Predicted-Library (directDIA) Route' section into two commands for DIA-NN 2.x: step 1 `diann --fasta <db> --fasta-search --gen-spec-lib --predictor --out-lib predicted.speclib` (no --f), step 2 `diann --f ... --lib predicted.speclib --fasta <db> --out ... --reanalyse`. Note that DIA-NN writes the predicted library as *.predicted.speclib regardless of the --out-lib name, and add a Common Errors row for the warning text so an agent that sees it knows what to do."
+    },
+    {
+      "priority": "P1",
+      "title": "The matrix-vs-report count guidance is inverted for DIA-NN 2.6.1",
+      "observed_in": [2],
+      "problem": "The Skill states the *_matrix.tsv files apply an extra 5% run-specific protein FDR (--matrix-spec-q) so the matrix protein count can be LOWER than the report count, and instructs the agent not to panic. On real 2.6.1 output the matrix holds 4440 protein groups against 4376 in the run-level-filtered report and 4375 after the Skill's own global filter -- the matrix is larger. The 2.6.1 log describes the matrices as '1% precursor and protein group FDR'. An agent following the Skill would explain a real discrepancy backwards.",
+      "root_cause": "Version drift: the --matrix-spec-q behaviour is described from older DIA-NN documentation and was never checked against a 2.x run.",
+      "fix": "Replace the directional claim with a version-aware one: say the matrix and the filtered report apply different q-value contexts so the counts will differ in either direction, that the direction depends on the DIA-NN version and on which q-value columns the agent filtered on, and that the authoritative statement is the 'levels matrix' line in report.log.txt for the version actually used. Update the Common Errors row and the 'Matrix run-specific PG filter 0.05' threshold row the same way."
+    },
+    {
+      "priority": "P2",
+      "title": "The EasyPQP library is not loadable by DIA-NN without fragment-annotation columns",
+      "observed_in": [4, 7],
+      "problem": "The library.tsv that the Skill's own easypqp route produces was rejected by DIA-NN 2.6.1 until FragmentCharge, FragmentType and FragmentSeriesNumber columns were added by hand. The Skill offers only 'compatibility should be verified for each software version, settings and data type', which does not tell the agent what will break or how to fix it.",
+      "root_cause": "The two tools were documented from their own manuals rather than from a run that passes one's output to the other.",
+      "fix": "Add a Common Errors row naming the three columns DIA-NN expects from a TSV library and the fact that EasyPQP does not write them, and state the preferred alternative explicitly (let FragPipe emit a DIA-NN-format library, or convert the EasyPQP TSV before use)."
+    },
+    {
+      "priority": "P2",
+      "title": "The output-file listing omits files DIA-NN 2.6.1 writes",
+      "observed_in": [6],
+      "problem": "The listing covers report.parquet, stats, pg/pr/gg matrices and report-lib. DIA-NN 2.6.1 also writes report.unique_genes_matrix.tsv, report.protein_description.tsv, report.manifest.txt, report.log.txt and a .skyline.speclib. report.log.txt in particular is the file that settles the matrix-FDR question in P1 above.",
+      "root_cause": "The listing was written against an older output set.",
+      "fix": "Extend the listing with the five additional files and point at report.log.txt as the authoritative record of what filters the run actually applied."
+    },
+    {
+      "priority": "P2",
+      "title": "Command duplicated between SKILL.md and examples/, and the Skill ships no test data",
+      "observed_in": [1],
+      "problem": "The DIA-NN command exists twice and can drift; there is no small input an agent can use to check its filter code before running it on a real report.",
+      "root_cause": "Single-file Skill with an example script that restates rather than sources the command.",
+      "fix": "Keep one copy of the command in examples/ and have SKILL.md point at it, and ship a tiny synthetic report.parquet (a few hundred rows, including groups that fail only the global q-value) so the filter block is self-testing."
+    }
+  ]
+}

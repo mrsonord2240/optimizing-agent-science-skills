@@ -1,0 +1,6 @@
+E="F:/OpenScience/audit-envs/mass-spec-proteomics-analyst"
+export PY="$E/Scripts/python.exe"
+export RSH="$E/r.sh"
+export DK="F:/OpenScience/external/mrsonord2240__bioSkills/proteomics/differential-abundance"
+export DD="F:/OpenScience/audits/bio-proteomics-differential-abundance/data"
+export DW="F:/OpenScience/audits/bio-proteomics-differential-abundance/rerun4"

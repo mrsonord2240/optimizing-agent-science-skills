@@ -1,0 +1,381 @@
+{
+  "meta": {
+    "skill_name": "bio-proteomics-peptide-identification",
+    "description": "Peptide-spectrum matching from MS/MS with target-decoy FDR control, framing identification confidence as a property of a ranked list (q-value/PEP) rather than a raw engine score (XCorr, hyperscore, Andromeda, SpecEValue). Covers sequence-database search engines (Comet, MS-GF+, MSFragger, Sage, MaxQuant, MetaMorpheus), concatenated vs separate target-decoy competition, PEP vs q-value, the multi-level FDR cascade, open/mass-tolerant search, rescoring (Percolator, mokapot, MS2Rescore), and pyOpenMS SimpleSearchEngineAlgorithm + FalseDiscoveryRate.",
+    "evaluated_on": "2026-09-15",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 10,
+    "source": "mrsonord2240/bioSkills@1110c241c27760ad0127bd803e8832d54651e31c:proteomics/peptide-identification",
+    "audit_note": "Third audit of this Skill (pre-fix and post-pass-2 reports both scored 79, Beta Only). Re-audited after pass 2 (b76ffa0, lowercase rev_ decoys) and pass 4 (6476b0e, an entire runnable DDA command-line route). All 8 inputs of the previous audit were re-run as regression tests and 2 new inputs were added. Every number below was produced by a run made on 2026-09-15 by this auditor; the fix log was read but is not treated as evidence.",
+    "environment": "pyOpenMS 3.5.0, pandas 3.0.5, numpy 2.5.3, Python 3.12 (shared candidate venv); Sage 0.14.6, Comet 2026.02 rev.2, MS-GF+ v2024.03.26 + MzIDToTsv (Java 17.0.19), Percolator 3.09.0, OpenMS 3.5.0 DecoyDatabase. Nothing was installed and no shared version was changed.",
+    "data": "SYNTHETIC with ground truth: audits/bio-proteomics-peptide-identification/data/ (make_synthetic_ms2.py, make_psm_tables.py; 600-spectrum mzML + 8 replicate seeds, 12,000-spectrum Comet-style table, separate target/decoy pair, 33-PSM pulldown). PUBLIC CC0: PXD070049 (Van Puyvelde et al., LFQ Benchmark Generation Beta), Orbitrap Astral 5-min DDA, 250 pg HYE, Conditions A/B/C REP1, submitter SDRF; FASTA uniprotkb_proteome_HYE_UniversalContaminants.fasta (31,437 entries)."
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated identifiers or values. Every quantitative claim in the SKILL.md prose that this audit could test was reproduced exactly on the same public data: DecoyDatabase 31,437 -> 62,874 entries with 31,437 DECOY_; Sage 1,406 at its own spectrum_q <= 0.01 and 1,398 PSMs / 1,367 peptides after Percolator; Comet 916 raw and 1,144 / 1,138 after Percolator; MS-GF+ 656 from -log10(SpecEValue); pooled three runs 5,006 vs Sage's own 4,961; separate-search pi0-hat 0.611 -> 2,888 at 1.04% true FDP. Citations checked: picked-group FDR is now credited to Savitski 2015 / The 2022, matching the protein-inference Skill."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Research proteomics only. No diagnostic, prognostic or prescriptive content about any individual anywhere in SKILL.md or usage-guide.md."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Target-decoy competition, (D+1)/T, pi0*D/T, mix-max routing and the PEP-vs-q guidance are all correct and were confirmed calibrated against ground truth in runs. The Skill correctly refuses a decoy FDR claim below a few hundred PSMs and states the 'do not generalise these counts' caveat on its own engine comparison."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "Both pyOpenMS blocks, the concatenated table block, the separate-search block, examples/fdr_filtering.py, examples/separate_search_fdr.py and examples/dda_search.sh (both ENGINE values) all executed with exit 0. The three documented command lines (Sage, Comet, MS-GF+) and the Percolator command were executed against real Orbitrap Astral data with the flags as written."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 91,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 11,
+        "max": 12,
+        "note": "Completeness 3: the route is now end to end (concatenated database build, three engine command lines, Percolator rescoring, both FDR estimators, two shipped scripts), but mokapot and MS2Rescore are named in the Skill's own description and taxonomy with no command line, and examples/fdr_filtering.py is shipped but no longer referenced from SKILL.md or usage-guide.md. Correctness 4: every estimator and every quantitative claim this audit tested reproduced exactly. Appropriateness 4."
+      },
+      "reliability": {
+        "score": 10,
+        "max": 12,
+        "note": "Fault tolerance 4: the zero-decoy ValueError guard is real and fires on both a decoy-free table and a prefix mismatch; separate_search_fdr.py additionally rejects duplicated scans and an empty decoy table. Error reporting 4: four Common Errors rows reproduced verbatim in runs (pyOpenMS TypeError, FalseDiscoveryRate RuntimeError, the empty 1% list from an untransformed E-value, the Percolator q-value column shift). Recoverability 2 tiers down to 3 short of full: examples/dda_search.sh sends Percolator's stderr to a log and runs under set -e, so a decoy-tag mismatch kills the script with nothing on the console."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "Token cost 3: SKILL.md grew from 243 to 366 lines with a 19-entry reference list and everything in one file; dense but nothing is filler. Execution efficiency 4: the full shipped route (database + search + Percolator + 1% list) finishes in 33 s for Sage and 27 s for Comet on a 6,135-MS2 run."
+      },
+      "agent_usability": {
+        "score": 15,
+        "max": 16,
+        "note": "Learnability 4: a Version Compatibility header naming the five CLI versions, plus a script with a stated expected output. Consistency 4: the The-2016/The-2022 citation conflict with protein-inference is resolved. Feedback design 4: the script echoes database size and decoy count before searching. Error prevention 3: the per-tool decoy-tag table, the score-orientation comment and the doubled-decoy row are genuinely preventive, but the zero-decoy guard now hard-stops on a legitimately decoy-free small table where the pre-fix version usefully showed the q floor instead."
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Discoverability 3: the frontmatter description is long and jargon-dense, unchanged from the pre-fix version. Forgiveness 4: the failure modes a human is most likely to hit each have an explicit Common Errors row with the real message text."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "Credential safety 4, input validation 3, data safety 4. No eval/exec, no network calls, no credentials. examples/dda_search.sh uses set -euo pipefail and parameter-expansion guards on its required variables; its only file-modifying step is a sed over comet.params.new into its own output directory."
+      },
+      "maintainability": {
+        "score": 11,
+        "max": 12,
+        "note": "Modularity 3: one 366-line SKILL.md plus three examples, no references/ split. Modifiability 4: every tool path in dda_search.sh is an overridable environment variable, which is how this audit ran it unchanged. Testability 4: both new scripts print numbers a re-auditor can check, and separate_search_fdr.py prints a ground-truth FDP when the table carries is_correct."
+      },
+      "agent_specific": {
+        "score": 19,
+        "max": 20,
+        "note": "Trigger precision 4, composability 4 (clean hand-offs to protein-inference, ptm-analysis, dia-analysis, quantification, data-import), idempotency 4 (Percolator on the same pin is byte-identical across runs), escape hatches 4. Progressive disclosure 3: the whole Skill is one file, so an agent loads all 366 lines whether it needs the CLI route or only the table snippet."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 89.9,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 41,
+      "total": 43
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Regression: both pyOpenMS blocks verbatim on synthetic mzML + concatenated FASTA",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Blocks extracted programmatically from the current SKILL.md (rerun4/extract.py) so nothing was retyped. 381 PSMs after search, 311 accepted at q <= 0.01, max q 0.0096, 298 correct / 13 false (single-run FDP 4.18%), pooled over 8 replicate seeds 2,326 accepted / 22 false = 0.95%. Identical to the previous audit's numbers.",
+        "executed": true,
+        "execution_note": "Ran on pyOpenMS 3.5.0 in the shared candidate venv; 9 datasets (main + rep11..rep88).",
+        "basic": 36,
+        "specialized": 55,
+        "total": 91,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "Both pyOpenMS blocks run verbatim from the current SKILL.md on pyOpenMS 3.5.0", "result": "PASS", "note": "Exit 0, 381 PSMs, idXML written."},
+          {"text": "The user's search parameters are applied by the Skill's own code", "result": "PASS", "note": "getParameters() reads back 10.0 ppm precursor, 0.02 Da fragment, 2 missed cleavages, CAM fixed, Met-ox variable."},
+          {"text": "The delivered 1% list is calibrated across replicates", "result": "PASS", "note": "Pooled FDP 0.95% over 8 independent seeds; single-run 4.18% at ~300 PSMs is the expected small-list noise the Skill itself warns about."},
+          {"text": "The Common Errors TypeError and RuntimeError rows reproduce verbatim", "result": "PASS", "note": "Plain [] raises the exact TypeError quoted in the table."},
+          {"text": "Scope: protein-level FDR is routed to protein-inference, not attempted here", "result": "PASS", "note": "Explicit hand-off in the Approach text and the Related Skills list."}
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Regression: q-values from a Comet .txt with 5 ranks per scan",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "SKILL.md table block verbatim. 60,000 rows -> 12,000 after rank-1 dedup -> 2,632 kept at q <= 0.01, all unique scans, true FDP 0.72%. XCorr at the cut 3.497, presented as run-specific only.",
+        "executed": true,
+        "execution_note": "rerun4/tables4.py; synthetic Comet-style table with ground truth.",
+        "basic": 36,
+        "specialized": 54,
+        "total": 90,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {"text": "Only the rank-1 hit per scan enters the 1% list", "result": "PASS", "note": "2,632 kept over 2,632 unique scans; drop_duplicates('scan') after sorting is in the block."},
+          {"text": "The 1% list is calibrated against ground truth", "result": "PASS", "note": "True FDP 0.72% at a nominal 1%."},
+          {"text": "The (decoys + 1) correction is applied", "result": "PASS", "note": "Present in the block and load-bearing on the small-list case in Input 3."},
+          {"text": "No raw-XCorr threshold is presented as reusable across runs", "result": "PASS", "note": "The Skill's first Insight and a dedicated failure-mode section both forbid it."}
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Regression: 33-PSM single-bait pulldown, and the same export with a decoy at rank 1",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "pulldown_topdecoy.tsv: 33 rows, 1 decoy, q floor 0.0625, 0 PSMs kept at 1%, no inf. pulldown_nodecoy.tsv now raises ValueError('no decoy PSMs recognised...') where the pre-fix version returned a 0.0303 floor. Both outcomes make a '0% FDR' or '1% FDR' claim impossible, but the error path no longer shows the operator what the attainable floor is.",
+        "executed": true,
+        "execution_note": "rerun4/tables4.py; both synthetic pulldown exports.",
+        "basic": 37,
+        "specialized": 53,
+        "total": 90,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {"text": "Safety: no '0% FDR' claim is reachable from 33 PSMs", "result": "PASS", "note": "Smallest attainable q is 0.0625 with one decoy; 0 rows pass 1%."},
+          {"text": "No inf q-value is produced when a decoy sits at rank 1", "result": "PASS", "note": "targets.clip(lower=1) in the block; np.isinf over all q-values is False."},
+          {"text": "A decoy-free table stops instead of passing every row at 1% FDR", "result": "PASS", "note": "ValueError raised rather than a silent q = 1/t on all 33 rows."},
+          {"text": "The error message names the two real causes an agent must distinguish", "result": "PASS", "note": "'check the decoy prefix, or the table was already decoy-filtered'."}
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Regression: PEP <= 0.01 vs q <= 0.01, through the shipped examples/fdr_filtering.py",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Shipped example run unchanged: Targets 2,445 / Decoys 1,555; 481 target PSMs at q <= 0.01; worst PEP inside that list 0.047; 289 at PEP <= 0.01. Identical to the previous audit.",
+        "executed": true,
+        "execution_note": "Subprocess call to the fork's examples/fdr_filtering.py with bytecode writing disabled; the fork checkout stayed clean.",
+        "basic": 36,
+        "specialized": 53,
+        "total": 89,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {"text": "The answer uses q-value for the list cut and PEP for the single-peptide decision", "result": "PASS", "note": "Insight 3 and the Decision Tree both state it; the example prints both numbers side by side."},
+          {"text": "The shipped example runs unchanged on the installed stack", "result": "PASS", "note": "Exit 0, four lines of output."},
+          {"text": "The worst PEP inside the 1%-FDR list is reported, not assumed", "result": "PASS", "note": "0.047, consistent with the Skill's stated 10-50% range for real data."},
+          {"text": "The example's demo resolves a real per-spectrum target/decoy competition", "result": "PASS", "note": "build_demo_table draws one target and one decoy per spectrum and keeps the higher."}
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Regression of the prior FAIL: FDR from separate target and decoy searches",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The previous audit failed this input because the Skill had no separate-search code. It now has a SKILL.md block and examples/separate_search_fdr.py. Run verbatim on the synthetic pair (12,000 spectra each): pi0-hat 0.611 -> 2,888 kept at 1.04% true FDP; pi0 = 1 -> 2,588 at 0.62%; the concatenated snippet misapplied to the merged pair -> 2,632 at 0.72%. Exactly reproduces the numbers the SKILL.md prose states.",
+        "executed": true,
+        "execution_note": "SKILL.md block extracted and executed, then the shipped script run separately; both give the same figures. Percolator's -y/-Y semantics were checked against the installed 3.09.0 binary's own --help, not against documentation.",
+        "basic": 36,
+        "specialized": 56,
+        "total": 92,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "The Skill supplies runnable code for the separate-search pi0 estimator", "result": "PASS", "note": "This was the FAIL that capped the previous audit; estimate_pi0 + separate_search_qvalues now ship in both SKILL.md and examples/."},
+          {"text": "The pi0-hat run reproduces the numbers the SKILL.md prose claims", "result": "PASS", "note": "0.611 / 2,888 / 1.04%, matching the text to every digit."},
+          {"text": "pi0 = 1 is genuinely conservative relative to the estimated pi0", "result": "PASS", "note": "2,588 kept at 0.62% true FDP against 2,888 at 1.04%."},
+          {"text": "The Percolator -y/-Y statements match the installed binary", "result": "PASS", "note": "percolator 3.09.0 --help: -y mix-max 'only has an effect if the input PSMs are from separate target and decoy searches. This is the default setting'; -Y replaces it with target-decoy competition. Exactly what the Skill says."},
+          {"text": "The shipped script validates its inputs before estimating anything", "result": "PASS", "note": "Raises on duplicated scans per table and on an empty decoy table."}
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Edge",
+        "label": "Regression of the prior P1: FragPipe/Philosopher lowercase rev_ decoy prefix",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "FIXED. The same synthetic table with DECOY_ rewritten to rev_ now yields 3,813 decoys detected, 2,632 kept, true FDP 0.72% - bit-for-bit the DECOY_ result. Previously it kept all 12,000 spectra at 63.6% true FDP with no warning. MaxQuant REV__ also matches, and a decoy-free table raises.",
+        "executed": true,
+        "execution_note": "rerun4/tables4.py, SKILL.md block verbatim; three prefix variants plus the decoy-free case.",
+        "basic": 36,
+        "specialized": 56,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {"text": "The table snippet detects lowercase rev_ decoys", "result": "PASS", "note": "3,813 of 3,813; DECOY_PREFIXES is compared against protein.str.lower()."},
+          {"text": "The rev_ list is calibrated and identical to the DECOY_ result", "result": "PASS", "note": "2,632 kept, 0.72% true FDP in both cases."},
+          {"text": "MaxQuant's REV__ tag is also matched", "result": "PASS", "note": "2,632 kept at 0.72%, covered by the 'rev_' entry after lower-casing."},
+          {"text": "A table with no recognised decoys raises instead of passing every PSM", "result": "PASS", "note": "ValueError, which is the behaviour the previous audit asked for."}
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Regression of the prior FAIL: lower-is-better SpecEValue mapped straight to `score`",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The block now carries an explicit orientation comment and there is a matching Common Errors row. Raw E-value as score keeps 0 PSMs (visible failure); -log10(E-value) keeps 2,574 at 0.66% true FDP. The same behaviour was confirmed on real MS-GF+ output in Input 9: raw SpecEValue keeps 0, -log10 keeps 656.",
+        "executed": true,
+        "execution_note": "rerun4/tables4.py on synthetic data and rerun4/in10b_msgf.py on the real MS-GF+ search.",
+        "basic": 35,
+        "specialized": 53,
+        "total": 88,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {"text": "The Skill states the score orientation its snippet requires", "result": "PASS", "note": "Was the prior FAIL; now an inline comment in the block plus a Common Errors row naming -log10(E-value) as the fix."},
+          {"text": "A wrong orientation fails visibly rather than producing a wrong list", "result": "PASS", "note": "0 PSMs kept, on both synthetic and real MS-GF+ data."},
+          {"text": "The transformed score produces a calibrated list", "result": "PASS", "note": "2,574 at 0.66% true FDP on synthetic data."},
+          {"text": "The answer declines the user's 'do not transform it' instruction", "result": "PASS", "note": "The Skill's failure-mode section forbids thresholding on a raw engine score and the code comment forces the transform."}
+        ]
+      },
+      {
+        "index": 8,
+        "type": "Variant B",
+        "label": "Regression of the prior P1 on public data: real Sage search of PXD070049 Condition A REP1",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "FIXED on the engine the Skill recommends by default. 1,939 Sage rows (1,717 target / 222 decoy). The SKILL.md snippet now detects all 222 rev_ decoys and keeps 1,406 PSMs, a scan-set-identical match to Sage's own spectrum_q <= 0.01 list. Previously it reported all 1,939 rows, 222 decoys included, as a '1% FDR' list. Species mix of the kept list HUMAN 927 / YEAST 416 / ECOLI 23 / other 40, consistent with the 65:30:5 HYE design.",
+        "executed": true,
+        "execution_note": "Fresh Sage 0.14.6 search run by this auditor via the shipped examples/dda_search.sh; mzML from msconvert 3.0.26253. PUBLIC CC0 data.",
+        "basic": 37,
+        "specialized": 57,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {"text": "The snippet detects the decoys of the Skill's own default engine", "result": "PASS", "note": "222 of 222, equal to Sage's own label == -1 count."},
+          {"text": "The reported 1% list excludes decoy PSMs", "result": "PASS", "note": "1,406 target PSMs, zero decoys."},
+          {"text": "The snippet's (D+1)/T q-values reproduce Sage's own spectrum_q list", "result": "PASS", "note": "Identical scan sets, 1,406 = 1,406."},
+          {"text": "Species proportions of the kept list follow the HYE benchmark design", "result": "PASS", "note": "E. coli is the 5% component and lands at 23 of 1,406."}
+        ]
+      },
+      {
+        "index": 9,
+        "type": "Stress",
+        "label": "NEW: the whole shipped CLI route, plus the Skill's own 'pool runs to give Percolator training data' claim",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "examples/dda_search.sh executed end to end from the read-only fork, twice. ENGINE=sage: DecoyDatabase 31,437 -> 62,874 entries with 31,437 DECOY_, then 1,398 PSMs / 1,367 peptides at q <= 0.01. ENGINE=comet: 1,144 / 1,138. The documented MS-GF+ block was run separately with its stated flags: 6,806 rank-1 rows over 5,949 scans, 656 PSMs at 1% from -log10(SpecEValue). Pooling the three DDA runs (6,864 PSMs) gave Percolator 5,006 PSMs against Sage's own 4,961, while the single run went 1,406 -> 1,398. The Skill's engine-comparison and pooling statements are therefore both correct on this data.",
+        "executed": true,
+        "execution_note": "All four tool invocations run by this auditor on public CC0 PXD070049. The pooled Sage config had to be hand-written because dda_search.sh accepts a single MZML.",
+        "basic": 36,
+        "specialized": 54,
+        "total": 90,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "The shipped dda_search.sh runs end to end and reports its own 1% counts", "result": "PASS", "note": "33 s for Sage and 27 s for Comet including the database build; both counts match the Skill's stated figures exactly."},
+          {"text": "The Skill's pooling claim reproduces independently", "result": "PASS", "note": "5,006 vs Sage's own 4,961 on 6,864 pooled PSMs; -0.6% on a single 1,939-PSM run. The 'Percolator needs enough PSMs to train' tip is supported."},
+          {"text": "The DecoyDatabase step produces a 1:1 concatenated database", "result": "PASS", "note": "31,437 target entries in, 62,874 out, 31,437 of them ^>DECOY_; the two grep checks in the Skill are the right checks."},
+          {"text": "The MS-GF+ command block runs with the documented flags and yields the stated count", "result": "PASS", "note": "-tda 0 with the concatenated DB and -decoy DECOY_ as written; 656 at 1% FDR, matching the prose."},
+          {"text": "The shipped example supports the multi-run pooling the Skill recommends", "result": "FAIL", "note": "dda_search.sh takes one MZML and the sample Sage JSON shows one mzml path, so the operator has to hand-write a config to follow the Skill's own advice."}
+        ]
+      },
+      {
+        "index": 10,
+        "type": "Adversarial",
+        "label": "NEW: decoy-tag mismatch driven through the whole CLI route (Comet decoy_prefix = rev_ against a DECOY_ database)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "This is the failure the Skill names as its own silent trap, pushed through the command-line route rather than the table snippet. Comet exits 0 and writes a pin whose Label column is 6,113 targets and 0 decoys (the correct run gives 3,952 / 2,161). Percolator then refuses: exit 1, 'Train/test set contains 6113 positives and 0 negatives' and 'Exception caught: Error: no decoy PSMs were provided.' - a loud failure, no wrong list. The Skill's table snippet is immune to this particular mismatch because Comet's .txt still names proteins DECOY_: 2,168 decoy rows found and 916 PSMs at 1% either way. The gap is in the shipped script, which sends Percolator's stderr to $OUT/percolator.log under set -euo pipefail, so the operator sees the search finish and then nothing at all.",
+        "executed": true,
+        "execution_note": "Comet 2026.02 rev.2 and Percolator 3.09.0 run on public CC0 PXD070049 Condition A REP1; pin Label counts checked with awk, Percolator's refusal read from its log and its exit code.",
+        "basic": 33,
+        "specialized": 50,
+        "total": 83,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {"text": "A decoy-tag mismatch never yields a silently wrong 1% list anywhere on the documented route", "result": "PASS", "note": "Percolator exits 1 with an explicit 'no decoy PSMs were provided'; the table snippet raises or, here, is unaffected."},
+          {"text": "The table snippet survives a config-level mismatch because it reads protein names", "result": "PASS", "note": "916 PSMs at 1% from both the correct and the mismatched Comet run."},
+          {"text": "The shipped script surfaces Percolator's refusal to the operator", "result": "FAIL", "note": "stderr goes to percolator.log and set -e aborts the script, so the console shows the search completing and no error and no counts. Nothing in the script checks the pin's Label column first."},
+          {"text": "The Skill documents the decoy-tag hazard this input exercises", "result": "PASS", "note": "Per-tool decoy-tag table in the database section, a bolded warning sentence, and a Common Errors row."}
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 36.4,
+    "dynamic_weighted": 53.9,
+    "score": 90,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "The P1 that capped the previous two audits is definitively fixed: the table snippet now finds lowercase rev_ decoys on synthetic FragPipe-style data (3,813 of 3,813) and on a real Sage search of public data (222 of 222), and reproduces Sage's own q-value list scan for scan.",
+    "The Skill now carries a complete, executable DDA route. Every command block was run as written on real Orbitrap Astral data: OpenMS DecoyDatabase, Sage, Comet, MS-GF+ and Percolator, plus a 117-line shipped script that runs the whole chain in 33 seconds.",
+    "Every quantitative claim in the prose that could be tested reproduced exactly - 1,398/1,367, 1,144/1,138, 916, 656, 5,006 vs 4,961, 31,437 -> 62,874, pi0-hat 0.611 -> 2,888 at 1.04% FDP. That is unusually strong provenance for a Skill's stated numbers.",
+    "The failure modes are now guarded in code rather than only in prose: a zero-decoy table raises, a wrong score orientation returns an empty list rather than a wrong one, and the Percolator q-value column is located by header name (an index read would have given 885 instead of 1,144).",
+    "Estimator-to-search-mode matching is correct and now backed by running code on both sides: (D+1)/T for concatenated competition, pi0*D/T for separate searches, with Percolator's -y/-Y semantics verified against the installed 3.09.0 binary's own help text."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "dda_search.sh hides Percolator's error from the operator",
+      "observed_in": "Input 10",
+      "problem": "With a decoy-tag mismatch, Percolator correctly exits 1 with 'Error: no decoy PSMs were provided', but the script redirects its stderr to $OUT/percolator.log and dies under set -e, so the console shows the search completing and then nothing - no counts, no message.",
+      "root_cause": "The 2> redirect was added to keep Percolator's long banner off the console, and no trap or tee was added with it.",
+      "fix": "Replace the redirect with `2> >(tee \"$OUT/percolator.log\" >&2)` or add a `trap 'tail -3 \"$OUT/percolator.log\" >&2' ERR`, and add a pre-flight check that the pin's Label column contains both 1 and -1 before calling Percolator."
+    },
+    {
+      "priority": "P2",
+      "title": "No shipped route for the multi-run pooling the Skill advises",
+      "observed_in": "Input 9",
+      "problem": "The Skill states, correctly and with numbers this audit reproduced, that Percolator needs pooled runs to beat an engine's own score, but dda_search.sh accepts one MZML and the sample Sage JSON shows one mzml path.",
+      "root_cause": "The script was written around the single-run comparison used to generate the engine-comparison paragraph.",
+      "fix": "Let MZML hold several space-separated paths, pass them all to `sage` and loop the Comet call, and note that Comet's pins must be concatenated (header once) before Percolator."
+    },
+    {
+      "priority": "P2",
+      "title": "Zero-decoy stop loses the q-floor hint on tiny lists",
+      "observed_in": "Input 3",
+      "problem": "A genuinely decoy-free 33-PSM pulldown export now raises ValueError. The pre-fix behaviour returned a q floor of 0.0303, which told the operator directly that 1% is unreachable at this list size - the exact point the Skill's own Decision Tree makes.",
+      "root_cause": "The guard added in pass 2 treats 'no decoys' as unconditionally an error rather than distinguishing a prefix mismatch from an already-filtered table.",
+      "fix": "Keep the raise, but put the attainable floor in the message: `raise ValueError(f'no decoy PSMs recognised in {len(psms)} rows: check the decoy prefix, or the table was already decoy-filtered (with no decoys the smallest reachable q is 1/{len(psms)} = {1/len(psms):.3f})')`."
+    },
+    {
+      "priority": "P2",
+      "title": "mokapot and MS2Rescore promised but not routed",
+      "observed_in": "Static evaluation",
+      "problem": "The frontmatter description and the tool taxonomy both advertise rescoring via mokapot and MS2Rescore, but only Percolator has a command line. mokapot 0.10.0 is installed and takes the same Sage pin.",
+      "root_cause": "Pass 4 deliberately scoped rescoring to one tool to avoid adding surface.",
+      "fix": "Add a two-line mokapot invocation next to the Percolator block (`mokapot --dest_dir ... results.sage.pin`) and state that it consumes the identical pin, or drop MS2Rescore from the description so the description matches what ships."
+    },
+    {
+      "priority": "P2",
+      "title": "examples/fdr_filtering.py ships but is unreferenced",
+      "observed_in": "Static evaluation (gate 8 direction check)",
+      "problem": "SKILL.md and usage-guide.md now point at examples/dda_search.sh and examples/separate_search_fdr.py only. fdr_filtering.py still ships, still runs, and is the Skill's only worked PEP-vs-q demonstration, but nothing links to it.",
+      "root_cause": "Pass 4 added two example references and did not re-check the existing one.",
+      "fix": "Cite `examples/fdr_filtering.py` from the PEP vs q-value insight, the same way the other two examples are cited from their sections."
+    },
+    {
+      "priority": "P2",
+      "title": "366-line SKILL.md with no progressive disclosure",
+      "observed_in": "Static evaluation",
+      "problem": "An agent that only needs the table snippet loads the full CLI route, the decoy-database section and a 19-entry reference list.",
+      "root_cause": "Pass 4 added roughly 120 lines of new sections without splitting the file.",
+      "fix": "Move the three command-line sections and the reference list into `references/cli_route.md` and `references/citations.md`, leaving the insights, estimators and Common Errors in SKILL.md."
+    }
+  ]
+}

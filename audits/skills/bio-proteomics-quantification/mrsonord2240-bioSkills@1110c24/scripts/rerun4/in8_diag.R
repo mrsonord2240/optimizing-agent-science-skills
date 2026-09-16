@@ -1,0 +1,26 @@
+suppressPackageStartupMessages(library(MSnbase))
+QW <- 'F:/OpenScience/audits/bio-proteomics-quantification/rerun4'
+imp16 <- makeImpuritiesMatrix(filename=file.path(QW,'tmtpro16_coa.csv'), edit=FALSE)
+cat('row sums:', paste(round(rowSums(imp16),4), collapse=' '), '\n')
+cat('rcond:', format(rcond(imp16)), '| det:', format(det(imp16)), '\n')
+set.seed(1)
+e <- matrix(runif(300*16, 1e4, 1e6), nrow=300, dimnames=list(paste0('P',1:300), rownames(imp16)))
+pc <- purityCorrect(new('MSnSet', exprs=e), imp16)
+x <- exprs(pc)
+cat('NA cells:', sum(is.na(x)), 'of', length(x), '| negatives among finite:', sum(x<0, na.rm=TRUE), '\n')
+cat('NA columns:', paste(which(colSums(is.na(x))>0), collapse=','), '\n')
+# compare against the well-formed TMT6 template
+imp6 <- makeImpuritiesMatrix(x=6, edit=FALSE)
+cat('TMT6 template row sums:', paste(round(rowSums(imp6),4), collapse=' '), '\n')
+e6 <- matrix(runif(300*6, 1e4, 1e6), nrow=300, dimnames=list(paste0('P',1:300), rownames(imp6)))
+x6 <- exprs(purityCorrect(new('MSnSet', exprs=e6), imp6))
+cat('TMT6: NA cells', sum(is.na(x6)), '| negatives', sum(x6<0, na.rm=TRUE), '\n')
+# a CoA whose off-diagonals stay inside the matrix at every row
+n <- 16; tags <- reporterNames(TMT16); offs <- c(seq(-n/2,-1), seq(1,n/2))
+coa <- data.frame(Tag=tags); for (o in offs) coa[[as.character(o)]] <- 0
+coa[['-1']] <- c(0, rep(1.0, n-1)); coa[['1']] <- c(rep(5.0, n-1), 0)
+f <- file.path(QW,'tmtpro16_coa_b.csv'); write.csv(coa, f, row.names=FALSE, quote=FALSE)
+i2 <- makeImpuritiesMatrix(filename=f, edit=FALSE)
+cat('variant B row sums all 1:', all(abs(rowSums(i2)-1)<1e-9), '| rcond', format(rcond(i2)), '\n')
+x2 <- exprs(purityCorrect(new('MSnSet', exprs=e), i2))
+cat('variant B: NA cells', sum(is.na(x2)), '| negatives', sum(x2<0, na.rm=TRUE), '\n')

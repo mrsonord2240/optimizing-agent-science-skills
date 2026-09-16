@@ -95,6 +95,10 @@ const cell = (text) =>
     .replace(/\|/g, "\\|")
     .trim();
 
+// Auditors write observed_in as either a list of inputs or a single prose string.
+const observedIn = ({ observed_in: observed }) =>
+  cell(Array.isArray(observed) ? observed.join(", ") : observed) || "—";
+
 const sourceLink = ({ source }) =>
   `[${source.repository}@${source.commit.slice(0, 7)}](${source.url})`;
 
@@ -196,7 +200,7 @@ export function renderBacklog({ skills }) {
         `### \`${entry.skillId}\` — ${cell(recommendation.title)}`,
         "",
         `- Skill: ${final.score}, ${cell(final.grade)} · ${sourceLink(entry.record)} · ${recordLink(entry)}`,
-        `- Observed in inputs: ${(recommendation.observed_in ?? []).join(", ") || "—"}`,
+        `- Observed in inputs: ${observedIn(recommendation)}`,
         `- Problem: ${cell(recommendation.problem)}`,
         `- Root cause: ${cell(recommendation.root_cause)}`,
         `- Fix: ${cell(recommendation.fix)}`,
