@@ -1,0 +1,7 @@
+.libPaths(c('F:/OpenScience/audit-envs/mass-spec-proteomics-analyst/R-lib', .libPaths()))
+suppressMessages(library(IHW))
+d <- read.csv('F:/OpenScience/audits/bio-experimental-design-multiple-testing/data/synthetic_de_pvalues.csv')
+nb <- as.integer(commandArgs(TRUE)[1])
+cat('m = 18000, nbins =', nb, ' ... '); flush.console()
+r <- ihw(d$pvalue, d$mean_expression, alpha = 0.05, nbins = nb)
+cat('OK rejections =', rejections(r), '\n')

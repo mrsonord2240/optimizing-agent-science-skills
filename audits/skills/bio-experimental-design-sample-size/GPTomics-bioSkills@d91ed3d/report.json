@@ -1,0 +1,515 @@
+{
+  "meta": {
+    "skill_name": "bio-experimental-design-sample-size",
+    "description": "Estimates the minimum biological replicates (or cells/events) for a target power at a target FDR in genomics experiments using ssizeRNA, PROPER, powsimR for scRNA-seq, and pilot-data dispersion estimation from DESeq2/edgeR. Covers the biological-versus-technical replication distinction, replicate-number-versus-sequencing-depth budgeting, scRNA-seq sample-versus-cell allocation under a pseudobulk model, and the critique that n=3 is a publication convention rather than a power calculation.",
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:experimental-design/sample-size",
+    "audit_type": "first audit (no fix applied)",
+    "evaluated_on": "2026-09-16",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Protocol Design",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "executed_inputs": 7
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "FAIL",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "All eight references verified against their stated journal, volume and first page, and each attributed claim matches the cited work (Schurch 2016 RNA 22:839 and the 48-vs-48 yeast benchmark; Blainey 2014 Nat Methods 11:879; Liu 2014 Bioinformatics 30:301; Squair 2021 Nat Commun 12:5692; Murphy and Skene 2022 Nat Commun 13:7851; Bi and Liu 2016 BMC Bioinformatics 17:146; Wu 2015 PROPER; Vieth 2017 powsimR). No fabricated DOI, PMID, sample size, p-value or efficacy figure in the Skill or in any of the seven outputs."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Nothing in the Skill or in any of the seven outputs diagnoses, prescribes or triages an individual. The regulated clinical regime is explicitly handed off to clinical-biostatistics/power-and-sample-size in both the frontmatter description and the decision tree. Gate 7 (research scope) is clear."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "The central methodology is sound and three of its claims were independently confirmed by simulation in this audit: technical-replicate inflation (770 false positives in a null study under the n=9 framing versus zero after collapsing), donors-over-cells for scRNA-seq (pseudobulk power 0.000 at 3 donors x 800 cells versus 0.172 at 10 donors x 200 cells, with cell-level realized FDR 0.87-0.94), and replicates-over-depth at fixed spend (power 0.000 to 0.559 as n went 2 to 12). The proteomics route's missing multiplicity step and the unreconciled 'at least 6' versus 'n=74' figures are recorded as P1 recommendations rather than a redline, because the Skill's stated frame is FDR-aware throughout and it explicitly labels its assay numbers as floors rather than targets."
+      },
+      "code_usability": {
+        "result": "FAIL",
+        "detail": "The SKILL.md invocation of the declared primary_tool raised an error on 21 of 21 calls on ssizeRNA 1.3.3, the current CRAN release and squarely inside the Skill's own 'tested with ssizeRNA 1.3+' claim: ssizeRNA_vary is passed scalar mu and disp where it requires per-gene vectors, and fails with 'integrate(): non-finite function value'. Adapting to ssizeRNA_single as the Skill's own escape hatch instructs still returns ssize = NA at the Skill's parameters. The shipped examples/sample_size_estimation.R, run verbatim, exits 0 but prints 'Minimum n per group (1.5-fold, disp=0.2, FDR 0.05, 80% power): 0.95 NA NA' and 'At n=6/group: BH average power = 0.00, true FDR = NaN'. A researcher following the Skill's headline route obtains no sample size."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 69,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 6,
+        "max": 12,
+        "note": "Conceptual coverage of the promised scope is complete and the decision tree is well matched to the task, but two of the six tools in the taxonomy (PROPER and powsimR) ship with no code at all, and the flagship ssizeRNA block is factually wrong in three ways: it calls _vary with scalars (always errors), it documents res$ssize as the minimum n per group (it is a 1x3 matrix of pi0, ssize and power), and its mu=10 / maxN=30 parameters have no solution."
+      },
+      "reliability": {
+        "score": 4,
+        "max": 12,
+        "note": "No handling for the estimators' own failure modes: a silent NA when no n reaches the target within maxN, and a NaN true FDR from check.power when there are zero discoveries. The single recovery instruction ('introspect the installed package and adapt to the actual API') misdirects here, because the failure is numerical rather than an API mismatch. Analysis is stateless and safely re-runnable, which is the one point of credit."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "SKILL.md is 179 lines with depth deferred to usage-guide.md and examples/, so context cost is well controlled and the workflow is linear. One deduction: check.power at the documented nGenes and sims is minutes-long on a laptop and the Skill gives no runtime or sims guidance."
+      },
+      "agent_usability": {
+        "score": 10,
+        "max": 16,
+        "note": "Learnability and error prevention are strong - the decision tree routes instantly, and the per-method failure modes are empirically correct. Consistency and feedback design are weak: the SKILL.md block contradicts the Skill's own Version Compatibility note about _vary versus _single, the assay floor table contradicts the n the prescribed proteomics tool returns, and the only documented output field is mis-described."
+      },
+      "human_usability": {
+        "score": 6,
+        "max": 8,
+        "note": "Discoverability is excellent - the description and the usage guide's Quick Start match how researchers actually phrase the request, with explicit hand-offs to sibling Skills. Applying the Category 2 forgiveness override (strict inputs are a scientific-integrity requirement, judged on whether required parameters are stated), the Skill names its required parameters but never states the units or plausible range of mu, and that ambiguity is precisely what makes its own worked example return NA."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "No credentials, no network calls, no eval/exec, no file writes and no PHI anywhere; all inputs are numeric design parameters, so the injection surface is effectively nil. One point withheld because no parameter-range validation is specified at all."
+      },
+      "maintainability": {
+        "score": 9,
+        "max": 12,
+        "note": "Clean three-file layout with one concern per section, and the table-driven structure keeps most edits local. Testability is the weak point: an example script exists but carries no assertions and its headline outputs are NA and NaN, which is direct evidence it was never executed against the versions the Skill claims it was tested with. The assay floor table is also duplicated between SKILL.md and the example script, so it needs two edits to change."
+      },
+      "agent_specific": {
+        "score": 16,
+        "max": 20,
+        "note": "Trigger precision and progressive disclosure are both very good, with explicit out-of-scope hand-offs in the description itself. Idempotency is the main deduction: both ssizeRNA entry points simulate and no SKILL.md block sets a seed, though measured drift proved small (ssizeRNA_single returned n=18 on 8 of 8 unseeded calls). Escape hatches exist for version drift and for the clinical regime but not for the case where no n is feasible."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 66.0,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 21,
+      "total": 35
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Bulk RNA-seq sizing from a literature dispersion (20k genes, 5% DE, FC 1.5, disp 0.2)",
+        "status": "ERROR",
+        "status_flag": "❌",
+        "executed": true,
+        "execution_note": "Ran on R 4.4.3 with ssizeRNA 1.3.3. The SKILL.md code block was executed verbatim and errored on every attempt (8 unseeded repeats, a mu sweep over 10/25/50/100/500 and an nGenes sweep over 5000/10000/20000). Adapting to ssizeRNA_single ran and returned NA. Cross-checked with a planted-truth SYNTHETIC simulation scored by both edgeR QL and limma-voom.",
+        "note": "ssizeRNA_vary with scalar mu/disp raises integrate(): non-finite function value on 21/21 calls; ssizeRNA_single returns ssize = NA at maxN=30; the real answer is n=74 per group, visible only at maxN=200 and confirmed by simulation (power 0.971 at n=74, 0.000 at n=6).",
+        "basic": 21,
+        "specialized": 36,
+        "total": 57,
+        "assertions_passed": 2,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The SKILL.md ssizeRNA code block runs without error on the declared-supported ssizeRNA 1.3+",
+            "result": "FAIL",
+            "note": "21 of 21 calls raised integrate(): non-finite function value on ssizeRNA 1.3.3; isolated by a fixed-seed A/B to _vary requiring per-gene vectors"
+          },
+          {
+            "text": "The prescribed procedure returns a usable minimum n per group",
+            "result": "FAIL",
+            "note": "ssize is NA within the Skill's maxN=30; n=74 appears only when maxN is raised to 200"
+          },
+          {
+            "text": "res$ssize is the minimum n per group, as SKILL.md documents it",
+            "result": "FAIL",
+            "note": "res$ssize is a 1x3 matrix of (pi0, ssize, power), not a scalar n"
+          },
+          {
+            "text": "Output stays within the Skill's stated scope with no clinical or individual-level content",
+            "result": "PASS",
+            "note": "Output confined to cohort-level design; clinical regime handed off as the Skill directs"
+          },
+          {
+            "text": "The estimator's verdict is corroborated by an independent planted-truth simulation",
+            "result": "PASS",
+            "note": "edgeR QL and limma-voom both give power 0.000 at n<=6 and 0.971 at n=74, matching ssizeRNA's answer"
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Size the full study from a 4-sample (2v2) pilot using DESeq2 dispersions",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "executed": true,
+        "execution_note": "SYNTHETIC pilots with a planted dispersion of 0.35 were generated by data/make_synthetic_data.R. The SKILL.md DESeq2 block ran verbatim on both the 2v2 and the 6v6 pilot; the sizing step ran with the pilot's per-gene mu/disp vectors. PROPER 1.38.0 was installed and available but the Skill supplies no PROPER code to run.",
+        "note": "DESeq2 half works well - a 2v2 pilot recovered the planted 0.35 dispersion to within 7% on the median (0.374), with edgeR common 0.338 agreeing. The sizing half returns ssize = NA from both pilots, and the two tools the Skill routes this route to have no code anywhere.",
+        "basic": 26,
+        "specialized": 38,
+        "total": 64,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The SKILL.md DESeq2 pilot-dispersion block runs as written on DESeq2 1.46.0",
+            "result": "PASS",
+            "note": "Ran clean on both synthetic pilots and produced a full per-gene dispersion vector"
+          },
+          {
+            "text": "Dispersion estimated from a 2-vs-2 pilot recovers the planted value within 2x",
+            "result": "PASS",
+            "note": "Median 0.374 against a planted 0.35 (1.07x); the Skill's instruction to use the median rather than the mean is what makes this work, since the mean was 0.41 with a max of 10.0"
+          },
+          {
+            "text": "The Skill supplies an executable pattern for the PROPER/powsimR route it calls most defensible",
+            "result": "FAIL",
+            "note": "Both are named in the taxonomy and decision tree only; no code exists in SKILL.md, usage-guide.md or examples/"
+          },
+          {
+            "text": "Sizing from the pilot returns a usable n per group",
+            "result": "FAIL",
+            "note": "ssizeRNA_vary returned ssize = NA from both the 2v2 and the 6v6 pilot at maxN=30"
+          },
+          {
+            "text": "No individual-level clinical inference is drawn from the pilot data",
+            "result": "PASS",
+            "note": "Output remained at cohort design level throughout"
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Budget fixed at n=6 - what power and true FDR? And an unreachable 1.2-fold target",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "executed": true,
+        "execution_note": "check.power ran as written at the SKILL.md parameters with sims=50, and was cross-checked against an independent 20-simulation edgeR QL + BH run. The unreachable-target branch (disp 0.8, fc 1.2) was run through both ssizeRNA entry points.",
+        "note": "check.power is correct - it reports 2e-05 average power where the independent simulation gives 0.000 - but it returns a NaN true FDR on zero discoveries and the Skill never says what that means. On the unreachable target both entry points return NA or error, with no guidance to follow.",
+        "basic": 24,
+        "specialized": 36,
+        "total": 60,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "check.power runs as written on ssizeRNA 1.3.3",
+            "result": "PASS",
+            "note": "Returned a complete result object with all four reported fields"
+          },
+          {
+            "text": "check.power's reported power matches an independent simulation",
+            "result": "PASS",
+            "note": "2e-05 from check.power against 0.000 from 20 independent edgeR QL simulations at n=6"
+          },
+          {
+            "text": "The Skill explains how to interpret a NaN true FDR or a zero-discovery result",
+            "result": "FAIL",
+            "note": "No mention anywhere; the shipped example prints 'true FDR = NaN' as its answer"
+          },
+          {
+            "text": "The Skill gives a stop condition when no n in the search range reaches the target",
+            "result": "FAIL",
+            "note": "NA is returned silently and no instruction follows to test for it, raise maxN, or report a minimum detectable effect instead"
+          },
+          {
+            "text": "Output does not overstate the adequacy of the budget-fixed n",
+            "result": "PASS",
+            "note": "The near-zero power at n=6 is reported honestly rather than rounded up or hedged away"
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "scRNA-seq donors versus cells at a fixed 30k-cell budget",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "executed": true,
+        "execution_note": "powsimR, the only tool the Skill names for this route, is unavailable: its Bioconductor dependency bayNorm requires compilation and the Rtools install was in progress during this audit. Re-checked at finalize time and still MISSING, so the powsimR route is recorded as executed: false. The Skill also contains no powsimR commands, so there was nothing to check against powsimR's documented arguments. The route's claims were instead tested by an independent SYNTHETIC donors-by-cells simulation scored by pseudobulk voom and by a cell-level test.",
+        "note": "The Skill's central single-cell claim is confirmed sharply: 3 donors x 800 cells gives pseudobulk power 0.000 while 10 donors x 200 cells gives 0.172, and cell-level testing reaches power 0.62-0.99 at a realized FDR of 0.87-0.94. What is missing is any executable donor-sizing procedure.",
+        "basic": 31,
+        "specialized": 46,
+        "total": 77,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The Skill's claim that donors, not cells, drive population DE power holds under simulation",
+            "result": "PASS",
+            "note": "Pseudobulk power 0.000 at 3 donors x 800 cells against 0.172 at 10 donors x 200 cells - a fiftieth of the cells per donor, far more power"
+          },
+          {
+            "text": "The Skill's warning that cell-level DE inflates false discoveries is confirmed",
+            "result": "PASS",
+            "note": "Realized FDR 0.87-0.94 across the entire donors-by-cells grid when cells were treated as replicates"
+          },
+          {
+            "text": "The named scRNA-seq tool (powsimR) is obtainable and runnable in a standard Bioconductor environment",
+            "result": "FAIL",
+            "note": "GitHub-only with a compile-required dependency (bayNorm); MISSING at both the first check and the finalize re-check"
+          },
+          {
+            "text": "The Skill gives a concrete donor-sizing procedure rather than only a principle",
+            "result": "FAIL",
+            "note": "No code, no worked example and no pseudobulk sizing pattern for the donor count"
+          },
+          {
+            "text": "Output stays at cohort level and makes no individual patient inference",
+            "result": "PASS",
+            "note": "Disease-versus-control framing handled purely as cohort allocation; gate 7 clear"
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Fixed sequencing budget split between replicates and depth, plus failure margin and grant text",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "executed": true,
+        "execution_note": "Executed as a SYNTHETIC equal-total-spend ladder (n x mean counts per gene held constant at 240) plus a depth-only ladder at fixed n=3 and a replicate-only ladder at fixed depth, all scored by edgeR QL with BH at 0.05 over 5 replicates per configuration.",
+        "note": "The Skill's replicates-beat-depth rule is its best-supported claim and is fully confirmed. The multi-part request is only partly served: no allocation procedure or cost model, and the grant-ready justification with a power curve that the usage guide promises does not exist anywhere in the Skill.",
+        "basic": 30,
+        "specialized": 41,
+        "total": 71,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The Skill's rule that replicates beat depth at equal spend is confirmed by simulation",
+            "result": "PASS",
+            "note": "At identical total spend, power rose from 0.000 at n=2 with 120 counts per gene to 0.559 at n=12 with 20 counts per gene"
+          },
+          {
+            "text": "The Skill's claim that sequencing depth saturates is confirmed",
+            "result": "PASS",
+            "note": "A 16x depth increase at fixed n=3 moved power only from 0.001 to 0.003"
+          },
+          {
+            "text": "The Skill supplies a procedure, not only a heuristic, for allocating a fixed budget",
+            "result": "FAIL",
+            "note": "No cost model and no code; the rule is stated in prose and never operationalised"
+          },
+          {
+            "text": "The Skill supplies the grant-ready justification with a power curve that its usage guide promises",
+            "result": "FAIL",
+            "note": "usage-guide.md step 5 promises it; no template, example paragraph or plotting pattern exists in any file"
+          },
+          {
+            "text": "The 10-20 percent failure margin is stated with its basis",
+            "result": "PASS",
+            "note": "Labelled 'common practice' in the thresholds table rather than presented as a derived figure"
+          }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "DIA proteomics, about 5000 proteins with 20 percent missing values",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "executed": true,
+        "execution_note": "The decision tree's proteomics route (pwr::pwr.t.test per protein) was run as written on pwr 1.3.0, then tested against a SYNTHETIC simulation of 5000 proteins with 10 percent truly changed at d=1.2 and 20 percent MNAR dropout, scored by BH at 0.05 over 5 replicates per n.",
+        "note": "The prescribed route drops the multiple-testing frame the rest of the Skill is built on: pwr.t.test returns n=12 at d=1.2, which delivers BH marginal power of roughly 0.03 to 0.33, and the Skill's own assay floor row (3, or 6-10 for small effects) delivers 0.000-0.001. The Skill's two halves contradict each other by an order of magnitude.",
+        "basic": 25,
+        "specialized": 31,
+        "total": 56,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The pwr::pwr.t.test route runs as written on pwr 1.3.0",
+            "result": "PASS",
+            "note": "Returned n for every effect size tested (26 at d=0.8, 17 at d=1.0, 12 at d=1.2)"
+          },
+          {
+            "text": "The prescribed proteomics n delivers the stated 80 percent power under proteome-wide FDR control",
+            "result": "FAIL",
+            "note": "BH marginal power 0.030 at n=10 and 0.330 at n=17 against an 0.80 target; Bonferroni-equivalent sizing needs n=44"
+          },
+          {
+            "text": "The Skill's proteomics assay floor is consistent with the n its own prescribed tool returns",
+            "result": "FAIL",
+            "note": "Assay table says 3, or 6-10 for small effects; pwr.t.test on the same route says 12 to 26"
+          },
+          {
+            "text": "The Skill flags missingness as a proteomics-specific caveat",
+            "result": "PASS",
+            "note": "MNAR named in both the decision tree and the assay table, and the simulation confirms it bites - 24 percent of proteins untestable at n=3"
+          },
+          {
+            "text": "Output does not stray into clinical interpretation of proteomic markers",
+            "result": "PASS",
+            "note": "Output stayed on experimental design throughout"
+          }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Three mice times three technical replicates claimed as n=9, powered for 1.2-fold at 90 percent",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Executed as a SYNTHETIC null study (no gene truly DE) with a mouse-level biological variance and near-pure technical noise within mouse, analysed once with technical replicates treated as replicates and once after the Skill's prescribed collapse, plus a power ladder for the requested 1.2-fold target.",
+        "note": "The Skill's guard fires and is quantitatively right: the n=9 framing manufactured 770 BH-significant genes where nothing is differentially expressed, and the prescribed collapse restored nominal error control exactly. The gap is the second half of the ask - a 1.2-fold target at 90 percent power is unreachable at any fundable n and the Skill has no way to say so.",
+        "basic": 32,
+        "specialized": 45,
+        "total": 77,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The Skill detects and refuses the technical-replicates-as-n framing",
+            "result": "PASS",
+            "note": "Named as a Per-Method Failure Mode with trigger, mechanism, symptom and fix, and repeated in the Common Errors table"
+          },
+          {
+            "text": "Simulation confirms the inflation the Skill warns about",
+            "result": "PASS",
+            "note": "770 genes called at BH<0.05 in a null study under the n=9 framing, with a raw p<0.05 rate of 0.257 against a nominal 0.05"
+          },
+          {
+            "text": "The Skill's collapse-to-biological-unit fix restores nominal error control",
+            "result": "PASS",
+            "note": "After collapsing to n=3, zero BH calls and a raw p<0.05 rate of 0.056"
+          },
+          {
+            "text": "The Skill warns that the requested 1.2-fold at 90 percent power is unreachable at a fundable n",
+            "result": "FAIL",
+            "note": "No infeasibility guidance; simulated power was 0.000 at n=3 and still about 0.001 at n=24, while the Skill's 'at least 6 for realistic effects' line would understate the requirement by orders of magnitude"
+          },
+          {
+            "text": "No fabricated power number is asserted for the n=9 claim",
+            "result": "PASS",
+            "note": "The Skill refuses the premise rather than quoting a power figure for the inflated n"
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 27.6,
+    "dynamic_weighted": 39.6,
+    "score": 67,
+    "max": 100,
+    "grade": "Reject",
+    "grade_symbol": "❌",
+    "deployable": false,
+    "veto_override": true
+  },
+  "key_strengths": [
+    "The conceptual core is right and it held up under test: counting 3 mice by 3 technical replicates as n=9 produced 770 BH-significant genes in a synthetic null study, where the Skill's prescribed collapse to biological units produced zero and restored a nominal 0.056 false-positive rate.",
+    "The single-cell guidance is vindicated sharply by simulation: pseudobulk power tracked donor count (0.000 at 3 donors by 800 cells versus 0.172 at 10 donors by 200 cells) while cell-level testing ran at a realized FDR of 0.87 to 0.94.",
+    "The replicates-beat-depth rule is the Skill's best-supported claim: at identical total sequencing spend power rose from 0.000 to 0.559 as replicates went from 2 to 12, and a 16-fold depth increase at n=3 moved power only from 0.001 to 0.003.",
+    "The DESeq2 pilot-dispersion block is the one code path that runs cleanly and does its job - a 2-versus-2 synthetic pilot recovered a planted dispersion of 0.35 to within 7 percent using the median, exactly as the Skill instructs.",
+    "Routing and reviewer-defence structure are unusually crisp for an agent skill: a decision tree, per-method failure modes with trigger/mechanism/symptom/fix, an anticipated-pushback table, honest hedging that assay numbers are floors rather than targets, and eight citations that all check out."
+  ],
+  "recommendations": [
+    {
+      "priority": "P0",
+      "title": "ssizeRNA_vary called with scalars errors on every call",
+      "observed_in": [
+        1,
+        2,
+        3
+      ],
+      "problem": "The SKILL.md code block for the declared primary_tool raises 'integrate(): non-finite function value' on ssizeRNA 1.3.3. Twenty-one of twenty-one calls failed across unseeded repeats, a mean-count sweep and an nGenes sweep; it never returns a number.",
+      "root_cause": "ssizeRNA_vary requires heterogeneous per-gene mu and disp vectors, and the Skill's own Version Compatibility note states that ssizeRNA_single is the one-mean-and-dispersion entry point, so the flagship code block contradicts the Skill's own text.",
+      "fix": "Use ssizeRNA_single(nGenes=, pi0=, m=200, mu=, disp=, ...) for a single mean and dispersion, and reserve ssizeRNA_vary for the pilot case shown with mu = mu_vec and disp = disp_vec from DESeq2. Add one line stating that passing scalars to _vary raises 'integrate(): non-finite function value'."
+    },
+    {
+      "priority": "P0",
+      "title": "Worked example returns NA and NaN as its headline answers",
+      "observed_in": [
+        1,
+        3
+      ],
+      "problem": "examples/sample_size_estimation.R run verbatim exits 0 but prints 'Minimum n per group (1.5-fold, disp=0.2, FDR 0.05, 80% power): 0.95 NA NA' and 'At n=6/group: BH average power = 0.00, true FDR = NaN'. At the SKILL.md parameters no n within maxN=30 exists; raising maxN to 200 shows the answer is n=74 per group, which an independent planted-truth simulation confirms at power 0.971.",
+      "root_cause": "mu=10 is far below a realistic mean count for 20,000 genes at usable depth, maxN=30 truncates the search below the answer, res$ssize is a 1x3 matrix rather than the scalar the comment claims, and the example was demonstrably never executed against the versions the Skill says it was tested with.",
+      "fix": "Set the worked example's mu from the pilot's normalized means (order 100 to 500), raise maxN to 200, print res$ssize[, \"ssize\"], and add a guard: if (is.na(n)) stop(\"no n <= maxN reaches the target; raise maxN or revise fc/dispersion\")."
+    },
+    {
+      "priority": "P1",
+      "title": "PROPER and powsimR routes ship with no executable pattern",
+      "observed_in": [
+        2,
+        4
+      ],
+      "problem": "The taxonomy and decision tree send the route the Skill itself calls most defensible, and the entire scRNA-seq route, to PROPER and powsimR, but neither appears as code in SKILL.md, usage-guide.md or examples/. PROPER 1.38.0 was installed and idle during this audit; powsimR is GitHub-only and did not install.",
+      "root_cause": "Progressive disclosure stops short of the two routes the Skill ranks highest, leaving them as tool names rather than procedures.",
+      "fix": "Add a PROPER block (estParam, RNAseq.SimOptions.2grp, runSims, comparePower) fed by the pilot dispersions, and either pin a powsimR commit with a documented fallback or replace the scRNA-seq route with a pseudobulk-on-donors pattern built from DESeq2/edgeR, which needs no extra dependency."
+    },
+    {
+      "priority": "P1",
+      "title": "Threshold table and own calculation differ 10-fold",
+      "observed_in": [
+        1,
+        5,
+        7
+      ],
+      "problem": "The Quantitative Thresholds table asserts at least 6 biological replicates for bulk RNA-seq DE, while the Skill's own worked example answers n=74 per group. Planted-truth simulation at a uniform 1.5-fold target gives power 0.000 at n=6, 0.181 at n=20 and 0.877 at n=50; with a realistic fold-change spectrum it gives 0.211 at n=6 and 0.755 at n=74.",
+      "root_cause": "The Schurch benchmark measures recovery over a real fold-change spectrum while the calculation measures 80 percent marginal power at a fixed minimum fold change, and the Skill presents the two as the same quantity.",
+      "fix": "State beside the thresholds table that 'at least 6' is an empirical recovery benchmark rather than the n for 80 percent marginal power at a fixed minimum fold change, and have the worked example print both numbers side by side."
+    },
+    {
+      "priority": "P1",
+      "title": "Proteomics route drops proteome-wide FDR control",
+      "observed_in": [
+        6
+      ],
+      "problem": "The decision tree sends proteomics to pwr.t.test at alpha 0.05 per protein. Across 5000 proteins with 10 percent changed at d=1.2 and 20 percent MNAR dropout, the prescribed n gives BH marginal power of 0.030 at n=10 and 0.330 at n=17, and the Skill's own assay floor row gives 0.000 to 0.001.",
+      "root_cause": "The Gaussian per-protein route was added without carrying over the multiple-testing frame used everywhere else in the Skill.",
+      "fix": "Give the proteomics row an explicit alpha adjustment (sig.level = 0.05 divided by the effective number of proteins, or a simulation-based BH step) and reconcile the assay floor table with the n its own prescribed tool returns."
+    },
+    {
+      "priority": "P1",
+      "title": "No stop condition when the target is infeasible",
+      "observed_in": [
+        1,
+        2,
+        3,
+        7
+      ],
+      "problem": "When no n within maxN reaches the target the estimators return NA silently, and check.power returns a NaN true FDR when there are zero discoveries; the Skill explains neither. The adversarial 1.2-fold at 90 percent power request has simulated power of about 0.001 even at n=24 and the Skill has no mechanism for saying it is unreachable.",
+      "root_cause": "The Skill documents only the success path of its estimators.",
+      "fix": "Add a 'when the answer is no feasible n' subsection: test is.na(ssize), raise maxN and re-run, report the achieved power at maxN, and fall back to reporting the minimum detectable fold change at the affordable n. State that a NaN true FDR means zero discoveries rather than unknown FDR."
+    },
+    {
+      "priority": "P2",
+      "title": "SKILL.md code blocks omit set.seed",
+      "observed_in": [
+        "Static evaluation",
+        1,
+        3
+      ],
+      "problem": "Both ssizeRNA entry points simulate and no SKILL.md block sets a seed, although the examples file does. Measured drift was small - ssizeRNA_single returned n=18 on 8 of 8 unseeded calls - but check.power's average power moved between 0.1015 and 0.1098 across unseeded calls.",
+      "root_cause": "Seed management lives only in the examples file and was never carried into the instruction file.",
+      "fix": "Add set.seed() to every SKILL.md code block and state that a reported sample size must cite its seed and its sims count."
+    },
+    {
+      "priority": "P2",
+      "title": "SKILL.md never points at examples/sample_size_estimation.R",
+      "observed_in": [
+        "Static evaluation"
+      ],
+      "problem": "The Skill's only runnable artifact is not referenced from SKILL.md, so an agent that loads SKILL.md alone never learns it exists.",
+      "root_cause": "No cross-reference exists between the instruction file and the example directory.",
+      "fix": "Add a 'Worked script: examples/sample_size_estimation.R' line to SKILL.md, once the example produces a number rather than NA."
+    },
+    {
+      "priority": "P2",
+      "title": "No ethics or protocol note for human-donor cohort sizing",
+      "observed_in": [
+        "Static evaluation",
+        4
+      ],
+      "problem": "The Skill sizes human donor cohorts (tumour versus normal, disease versus control donors) without noting that the sample-size justification normally sits inside an approved protocol, or that recruiting the extra 10 to 20 percent failure margin has consent implications.",
+      "root_cause": "Ethical compliance is handled only through the hand-off to the clinical-trial Skill, which does not cover observational human-tissue genomics.",
+      "fix": "Add one line to the failure-margin row noting that donor counts, including the failure margin, must match the approved protocol."
+    }
+  ]
+}

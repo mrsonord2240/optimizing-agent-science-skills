@@ -1,0 +1,7 @@
+.libPaths(c('F:/OpenScience/audit-envs/mass-spec-proteomics-analyst/R-lib', .libPaths()))
+suppressPackageStartupMessages(library(ssizeRNA))
+cat("--- ssizeRNA exports ---\n"); print(ls("package:ssizeRNA"))
+cat("\n--- args(ssizeRNA_single) ---\n"); print(args(ssizeRNA_single))
+cat("\n--- args(ssizeRNA_vary) ---\n");  print(args(ssizeRNA_vary))
+cat("\n--- args(check.power) ---\n");    print(args(check.power))
+cat("\n--- body head of ssizeRNA_vary ---\n"); print(head(deparse(body(ssizeRNA_vary)), 40))

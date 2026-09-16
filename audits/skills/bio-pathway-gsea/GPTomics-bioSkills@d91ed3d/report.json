@@ -1,0 +1,476 @@
+{
+  "meta": {
+    "skill_name": "bio-pathway-gsea",
+    "description": "Tests a ranked gene vector for coordinated expression shifts in GO, KEGG, Reactome or MSigDB gene sets with clusterProfiler's gseGO/gseKEGG/gsePathway/GSEA on the fgseaMultilevel engine, and scores per-sample pathway activity with ssGSEA and GSVA. Frames a GSEA result as a deterministic function of the ranking statistic, the weight exponent and the permuted labels.",
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:pathway-analysis/gsea",
+    "audit_type": "first audit (no fix applied)",
+    "evaluated_on": "2026-09-16",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "executed_inputs": 7,
+    "environment": "R 4.4.3 / Bioconductor 3.20; clusterProfiler 4.14.6, fgsea 1.32.4, DOSE 4.0.1, org.Hs.eg.db 3.20.0, GO.db 3.20.0, msigdbr 26.1.0, ReactomePA 1.50.0, reactome.db 1.89.0, GSVA 2.0.7, limma 3.62.2. The SKILL.md frontmatter claims testing against clusterProfiler 4.18.4+, org.Hs.eg.db 3.22+, msigdbr 26+, fgsea 1.36+, so every code block was run one Bioconductor cycle BEHIND what the Skill claims. Nothing failed for that reason: the Skill's Version Compatibility instruction (check packageVersion, introspect, adapt) was never needed, because every documented call signature was already valid on the installed stack."
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "All nine references are real, correctly cited papers (Subramanian 2005 PNAS 102:15545, Mootha 2003 Nat Genet 34:267, Wu & Smyth 2012 NAR 40:e133, Wu 2010 Bioinformatics 26:2176, Barbie 2009 Nature 462:108, Hanzelmann 2013 BMC Bioinformatics 14:7, Reimand 2019 Nat Protoc 14:482, Wijesooriya 2022 PLoS Comput Biol 18:e1009935); the Korotkevich fgsea entry is honestly labelled a preprint rather than dressed as a journal article. No DOI, PMID, p-value or effect size in the Skill is invented. Every number in this report came from an executed run recorded under runs/."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Functional-genomics methodology only. Nothing in SKILL.md, usage-guide.md or either example diagnoses, prescribes for or triages an individual, and no clinical interpretation is offered. Gate 7 (research scope) is clean."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "The Skill's central claims were confirmed empirically rather than merely accepted: the unsigned -log10(p) ranking lost the planted down-regulated set (Input 5), BH p.adjust < 0.25 produced two 'significant' Hallmarks on a label-permuted true-null ranking (Input 7), and preranked gene-permutation gave HALLMARK_OXIDATIVE_PHOSPHORYLATION FDR 3.6e-16 where CAMERA with an estimated inter-gene correlation of 0.312 gave FDR 0.80 (Input 5). No principled fallacy was found. The two gaps recorded below (the p-clamp weight and CAMERA's inter.gene.cor default) are an omission and an incomplete fix, not an inverted conclusion."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "Every R block in SKILL.md was executed verbatim and completed: the ranked-vector recipe, gseGO, gseKEGG (live API), GSEA(TERM2GENE) with msigdbr, gsePathway, and the gsva/ssgseaParam block. Both shipped examples ran from the read-only clone and exited clean (gsea_go.R 98.3 s, gsea_msigdb.R 9.5 s). No syntax error, no missing dependency, no loop."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 91,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 10,
+        "max": 12,
+        "note": "Completeness 4: every advertised capability exists and was exercised - preranked GSEA on GO/KEGG/Reactome/MSigDB, ranked-vector construction for DESeq2/limma/edgeR/log2FC, leading edge, NES/FDR semantics, ssGSEA and GSVA, and routing to CAMERA/ROAST. Correctness 2: the bulk of the document is unusually accurate (the gseaResult column list matches clusterProfiler 4.14.6 exactly; the msigdbr 26.x collection=/ncbi_gene claim and the 'old gsva method= signature is defunct' claim are both verbatim true), but three checkable statements are wrong on the installed stack - 'unsorted input silently mis-ranks' and 'duplicates give silently wrong ES' are in fact hard errors, the 'nPerm argument error' symptom does not occur (nPerm is accepted and silently downgrades the engine to fgseaSimple), and the bare limma::camera call it prescribes does not estimate the inter-gene correlation it credits CAMERA with. Appropriateness 4: correctly scoped, routes out rather than over-reaching."
+      },
+      "reliability": {
+        "score": 10,
+        "max": 12,
+        "note": "Fault Tolerance 3 and Error Reporting 3: eight Per-Method Failure Modes plus a seven-row Common Errors table is well above average coverage, and the '--> No gene can be mapped' string is exactly what clusterProfiler prints - but two of the eight symptoms are wrong, the opaque follow-on error a user really hits after an ID mismatch ('organism is not a slot in class NULL') is unlisted, and the fgsea ties / scoreType warnings that fired on four of my runs are never mentioned. Recoverability 4: stateless Mode A skill, reruns verified identical under set.seed(123). Scored under the Category 3 Scene Override, so hard stops are not penalised."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "Token Cost 4: SKILL.md is 214 lines with depth pushed to usage-guide.md (101 lines), two 40-line examples and the category README - correct layering. Execution Efficiency 3: the workflow is linear with no redundant step, but gseGO over a 14,000-gene vector took 154.8 s here and the Skill gives no runtime expectation or iteration shortcut."
+      },
+      "agent_usability": {
+        "score": 15,
+        "max": 16,
+        "note": "Learnability 4, Consistency 4, Feedback Design 4: I executed nearly every block verbatim with no interpretation required, the seed/eps/minGSSize/maxGSSize parameter set is repeated identically at all four call sites, and 'the honesty is bounded by reporting' is a genuine output specification (log the metric, exponent, permutation type, collection version, size filters, MTC method). Error Prevention 3: failure-mode coverage is excellent in breadth, but two symptoms are wrong and the clamp-weight trap that changed my Input 3 result is absent."
+      },
+      "human_usability": {
+        "score": 8,
+        "max": 8,
+        "note": "Discoverability 4: the headline question - 'Which pathways shift coordinately across my full ranked gene list, with no cutoff?' - is how a researcher actually phrases it, and the usage-guide Quick Start lists four natural triggers. Forgiveness 4: under Category 3 Override 2, strict input rejection is a data-integrity guarantee; the Skill states the input contract explicitly (named, NA-free, deduplicated, strictly decreasing, ID type matched) and supplies bitr as the documented route for off-spec IDs, which mapped 100% of my symbols."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "Credential Safety 4 and Data Safety 4: no credentials, tokens or env vars anywhere; no eval/exec/system/unlink in any file; all annotation is local except the KEGG REST call, which the Skill flags as a live external dependency and tells the agent to date-pin. No PHI is handled. Input Validation 3: no code-level validation, which is appropriate for a Mode A pattern skill, but it means the input contract is enforced only by the underlying tools."
+      },
+      "maintainability": {
+        "score": 10,
+        "max": 12,
+        "note": "Modularity 4 and Modifiability 4: clean SKILL.md / usage-guide / examples separation, and the Version Compatibility block declares itself the single source of truth for versions while the Quantitative Thresholds table centralises every tunable parameter with its citation. Testability 2: both shipped examples run and exit clean, but both build their ranking with rnorm() under a fixed seed, so both deterministically return zero enriched terms - the 'if (nrow(results) > 0)' reporting branch is dead code as shipped, no expected output is documented, and a user cannot tell a working install from a broken one."
+      },
+      "agent_specific": {
+        "score": 20,
+        "max": 20,
+        "note": "Trigger Precision 4: a long but precisely bounded description that names its own hand-offs. Progressive Disclosure 4. Composability 4: explicit upstream (differential-expression/de-results) and downstream (enrichment-visualization) contracts, and all seven named Related Skills plus the category README exist in the clone. Idempotency 4: verified - identical p.adjust across reruns with set.seed(123), with KEGG's date-dependence disclosed rather than hidden. Escape Hatches 4: four distinct ones, all correct - unranked list goes to go-enrichment, the DE statistic itself goes to de-results, a design matrix should go to CAMERA, and ssGSEA/GSVA are explicitly NOT a contrast test."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 90.0,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 28,
+      "total": 33
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Full DESeq2 table, Wald-stat ranking, GO BP preranked GSEA",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "runs/in1_canonical.R - the SKILL.md 'Build the Ranked Vector' and 'Run Preranked GSEA on GO' blocks verbatim over data/SYNTHETIC_deseq2_results.csv (14,000 real Entrez IDs, synthetic statistics). gseGO wall time 154.8 s. stdout at runs/in1_canonical.out, terms at runs/in1_go_terms.csv.",
+        "note": "64 significant GO BP terms, 28 positive and 36 negative NES. Both planted directions recovered with the right sign: DNA replication GO:0006260 NES -3.158 p.adjust 2.2e-28 at rank 1, aerobic respiration GO:0009060 NES +2.297 p.adjust 6.0e-08. The 11 documented gseaResult columns matched the returned frame exactly; setReadable turned core_enrichment into symbols (110-gene leading edge on the top term). A rerun under the same seed returned an identical row count and identical p.adjust.",
+        "basic": 37,
+        "specialized": 57,
+        "total": 94,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The SKILL.md ranked-vector and gseGO blocks run verbatim on the installed stack",
+            "result": "PASS",
+            "note": "Both blocks copied unchanged except the input path; completed in 154.8 s on clusterProfiler 4.14.6, one cycle older than the frontmatter claims."
+          },
+          {
+            "text": "The documented gseaResult column list matches what the installed clusterProfiler returns",
+            "result": "PASS",
+            "note": "ID, Description, setSize, enrichmentScore, NES, pvalue, p.adjust, qvalue, rank, leading_edge, core_enrichment - all 11 present, none extra."
+          },
+          {
+            "text": "Both planted directions are recovered with the correct NES sign",
+            "result": "PASS",
+            "note": "Planted-up OXPHOS terms all NES > 0 (6 of 6); planted-down DNA-replication terms all NES < 0 (10 of 10)."
+          },
+          {
+            "text": "set.seed(123) plus seed=TRUE makes the result reproducible",
+            "result": "PASS",
+            "note": "Second identical call returned the same 64 rows with all.equal on p.adjust TRUE."
+          },
+          {
+            "text": "The answer reports p.adjust/qvalue and never an invented $FDR column",
+            "result": "PASS",
+            "note": "qvalue present, no FDR column exists in the frame, and the Skill explicitly forbids inventing one."
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "MSigDB Hallmark GSEA plus gseKEGG against the live API",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "runs/in2_msigdb_kegg.R - the SKILL.md 'Run GSEA on KEGG, Reactome, or MSigDB' block verbatim, driven by the usage-guide's own example prompt. KEGG was reachable on 2026-09-16 and the run date is recorded in the output. stdout at runs/in2_msigdb_kegg.out.",
+        "note": "The msigdbr 26.x version claims are exactly right on 26.1.0: collection= is accepted and gs_collection / ncbi_gene are the column names, so t2g built with no change. 5 significant Hallmarks; the two planted sets came back first and second with the correct signs - OXPHOS NES +3.159 p.adjust 1.0e-28, E2F_TARGETS NES -3.062 p.adjust 8.9e-24. gseKEGG with keyType='ncbi-geneid' fetched three KEGG REST endpoints and returned 15 pathways led by hsa00190 Oxidative phosphorylation (NES +2.174) and hsa03030 DNA replication (NES -2.284).",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The msigdbr 26.x API claims in the Skill hold on the installed msigdbr",
+            "result": "PASS",
+            "note": "collection='H' accepted without warning; ncbi_gene and gs_collection both present on 26.1.0, exactly as the inline comment states."
+          },
+          {
+            "text": "GSEA(TERM2GENE) recovers both planted Hallmark sets with the correct sign",
+            "result": "PASS",
+            "note": "Ranks 1 and 2 of 5, NES +3.159 and -3.062."
+          },
+          {
+            "text": "gseKEGG with keyType='ncbi-geneid' executes against the live KEGG API",
+            "result": "PASS",
+            "note": "Three rest.kegg.jp endpoints fetched; 15 pathways returned. The Skill's warning that 'kegg' keyType is the prokaryote locus-tag path was not needed because the documented choice was correct."
+          },
+          {
+            "text": "The KEGG result is flagged as date-dependent and the run date is captured",
+            "result": "PASS",
+            "note": "The Skill instructs pinning the run date in three separate places; the run recorded 2026-09-16."
+          },
+          {
+            "text": "setReadable applies to a generic GSEA() result as the Common Errors table implies",
+            "result": "PASS",
+            "note": "core_enrichment converted from Entrez to symbols (MTRF1/ACAT1/COX5A/...)."
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "edgeR QL table: no Wald stat, symbol IDs, 300 duplicate rows, exact-zero p-values, unsorted",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "runs/in3_edger_edge.R plus the follow-up diagnostics runs/in3b_diagnostics.R and runs/in3c_dupcheck.R, over data/SYNTHETIC_edger_qlf.csv. All three completed; stdout in the matching .out files.",
+        "note": "The signed-p recipe sign(logFC)*-log10(pmax(p,1e-300)) behaved as advertised on the messy input - no Inf, duplicates removed, bitr mapped 100% of symbols - but it cost the analysis half its answer. Because pmax clamps the 4 exact-zero p-values to 1e-300, those genes enter the exponent=1 running sum with weight 300 against a next-largest genuinely measured weight of 4.23 (71x), holding 16.05% of the entire sum(|stat|) with 4 of 14,000 genes. Result: 8 terms, all positive NES, planted down-set gone. Re-running the identical pipeline with the clamp at 1e-30 gave 30 terms, 18 up and 12 down, with DNA replication recovered. Separately, both halves of the 'Unsorted or duplicated geneList' failure mode are loud errors here, not the silent mis-ranking the Skill describes: a shuffled or increasing vector gives 'geneList should be a decreasing sorted vector...' and duplicate names give 'Duplicate values in names(stats) not allowed'.",
+        "basic": 33,
+        "specialized": 49,
+        "total": 82,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The signed-p recipe clamps p == 0 without producing Inf and survives the messy table",
+            "result": "PASS",
+            "note": "Range exactly [-300, +300], no Inf, 300 duplicate gene rows dropped, vector strictly decreasing."
+          },
+          {
+            "text": "The documented bitr route maps the off-spec SYMBOL IDs and the conversion rate is reportable",
+            "result": "PASS",
+            "note": "14,003 of 14,000 rows mapped (100%), 3 one-to-many symbol rows deduplicated as the Skill instructs."
+          },
+          {
+            "text": "The Skill's stated symptom for an unsorted or duplicated geneList ('silently wrong ES') is what actually happens",
+            "result": "FAIL",
+            "note": "Both are hard errors on fgsea 1.32.4 / clusterProfiler 4.14.6. The advice to sort and deduplicate is right; the symptom an agent is told to watch for cannot occur."
+          },
+          {
+            "text": "The prescribed pmax(p, 1e-300) clamp does not distort the exponent=1 weighting",
+            "result": "FAIL",
+            "note": "4 clamped genes carry 16.05% of total |stat| and 71x the weight of the strongest measured gene; the planted down-regulated biology is lost at 1e-300 and recovered at 1e-30."
+          },
+          {
+            "text": "The Common Errors entry for a wrong keyType matches the message clusterProfiler actually prints",
+            "result": "PASS",
+            "note": "'--> No gene can be mapped....' appeared verbatim, as documented - though the run then died on an unlisted 'organism is not a slot in class NULL'."
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Per-sample pathway activity matrix with GSVA and ssGSEA",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "runs/in4_gsva.R - the SKILL.md 'Per-Sample Scores' block verbatim over data/SYNTHETIC_logcpm_matrix.csv (4,341 genes x 20 samples, two groups of 10). Ran on GSVA 2.0.7. stdout at runs/in4_gsva.out; scores at runs/in4_gsva_scores.csv and runs/in4_ssgsea_scores.csv.",
+        "note": "The parameter-object block ran unchanged and produced two 46-set x 20-sample matrices. The Skill's claim that the old signature is defunct is verbatim correct - gsva(expr, sets, method='ssgsea') returned 'Calling gsva(expr=., gset.idx.list=., method=., ...) is defunct; use a method-specific parameter object'. The planted contrast survives into the per-sample scores in both directions (GSVA OXPHOS delta +0.206, E2F delta -0.477) and the return value is a bare numeric matrix with no p-value slot, exactly as the Skill insists. What the Skill never mentions is that gsva() makes a kernel choice on the caller's behalf - it logged kcdf='auto' on my log-scale input - and that choice differs between logCPM and raw counts.",
+        "basic": 38,
+        "specialized": 55,
+        "total": 93,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The gsvaParam / ssgseaParam block runs verbatim on the installed GSVA",
+            "result": "PASS",
+            "note": "GSVA 2.0.7; both calls completed and returned 46 x 20 matrices."
+          },
+          {
+            "text": "The claim that the pre-1.50 method= signature is defunct is exactly true",
+            "result": "PASS",
+            "note": "Error text matched the Skill's description word for word."
+          },
+          {
+            "text": "gsva() returns a score matrix with no per-set p-value, as the Skill states",
+            "result": "PASS",
+            "note": "Plain numeric matrix; the 'not a contrast test' framing is accurate and repeated in both SKILL.md and usage-guide.md."
+          },
+          {
+            "text": "The Skill names the analysis decisions GSVA actually exposes to the caller",
+            "result": "FAIL",
+            "note": "kcdf is the one parameter that changes GSVA results between logCPM and count input and it is never mentioned; GSVA silently logged kcdf='auto'."
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Multi-part: Reactome offline, three ranking metrics compared, and is the preranked FDR honest on a correlated set?",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "runs/in5_stress.R plus runs/in5b_camera_default.R. All three sub-tasks completed. stdout at runs/in5_stress.out and runs/in5b_camera_default.out; comparison table at runs/in5_camera_vs_preranked.csv.",
+        "note": "This is where the Skill's headline claim was tested and where its proposed fix fell short. (a) gsePathway ran offline from reactome.db and returned 35 pathways led by R-HSA-1428517 Aerobic respiration (NES +2.293) and Cell Cycle (NES -1.673). (b) The three-metric comparison reproduced the Skill's ordering: Wald stat gave 5 sets with both planted sets at 1e-28 and 1e-24; unsigned -log10(p) gave 1 set, lost the planted down-set entirely, and triggered fgsea's own 'all values greater than zero, maybe switch to scoreType=pos' warning; bare log2FC put all 25 low-count trap genes at ranks 1-25 where the Wald stat had them at 5,708+. (c) The anti-conservatism claim held emphatically - the planted OXPHOS set has a measured inter-gene correlation of 0.312 and got preranked FDR 3.6e-16 versus CAMERA FDR 0.80, and 2 of the 4 gene-permutation hits were exactly the 2 sets with the highest inter-gene correlation. But limma::camera(mat, idx, design, contrast=2) as the Skill writes it uses limma's PRESET inter.gene.cor = 0.01 and returns no Correlation column: that call gives OXPHOS FDR 7.2e-08, i.e. it does not deliver the correction. Only inter.gene.cor=NA, which the Skill never mentions, produces the 0.80.",
+        "basic": 35,
+        "specialized": 53,
+        "total": 88,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "gsePathway runs offline from the local reactome.db and recovers the planted biology",
+            "result": "PASS",
+            "note": "35 pathways, no network; respiratory electron transport up, cell cycle and HDR down."
+          },
+          {
+            "text": "The unsigned -log10(p) ranking loses the planted down-regulated set, as the Skill predicts",
+            "result": "PASS",
+            "note": "5 sets under Wald stat versus 1 under unsigned -log10(p); HALLMARK_E2F_TARGETS not significant, and fgsea itself flagged the all-positive stats vector."
+          },
+          {
+            "text": "Preranked gene-permutation FDR is anti-conservative on a genuinely correlated set",
+            "result": "PASS",
+            "note": "OXPHOS inter-gene correlation 0.312: preranked FDR 3.6e-16 versus CAMERA 0.80. The 2 sets gene-permutation called that CAMERA did not are the 2 most correlated sets."
+          },
+          {
+            "text": "limma::camera as written in the Skill delivers the inter-gene-correlation correction it is credited with",
+            "result": "FAIL",
+            "note": "Default preset inter.gene.cor=0.01 gives OXPHOS FDR 7.2e-08 and no Correlation column; only the unmentioned inter.gene.cor=NA gives 0.80."
+          },
+          {
+            "text": "Bare log2FC ranking pushes low-count outliers to the top of the ranking, as the Skill's mechanism claims",
+            "result": "PASS",
+            "note": "All 25 planted low-count high-LFC genes occupy ranks 1-25 under log2FC and ranks 5,708+ under the Wald stat. They did not enter the top set's leading edge here only because none of them happened to be Hallmark members."
+          }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "A 180-gene CRISPR hit list with no statistic - 'run GSEA on these'",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "runs/in6_scope_boundary.R over data/SYNTHETIC_screen_hits.txt. Both the out-of-scope path and the prescribed in-scope path were executed. stdout at runs/in6_scope_boundary.out.",
+        "note": "The Skill puts the routing rule in four places an agent will hit before writing code - the Scope paragraph, the Decision Tree, the GSEA-vs-ORA table in the usage-guide, and the conceptual prerequisites - and it is unambiguous: a pre-selected unranked gene LIST goes to go-enrichment. Forcing GSEA anyway is diagnosable rather than quietly plausible: a constant pseudo-rank triggers 'ties in the preranked stats (99.44% of the list)' and a made-up descending rank triggers the all-positive scoreType warning. The prescribed ORA route returned 9 terms and recovered the planted biology (generation of precursor metabolites and energy 17/180, p.adjust 0.010).",
+        "basic": 37,
+        "specialized": 56,
+        "total": 93,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The unranked-list-to-ORA routing rule is stated where an agent reads it before writing code",
+            "result": "PASS",
+            "note": "Present in the Scope line, the Decision Tree, the usage-guide prerequisites and the GSEA-vs-ORA table."
+          },
+          {
+            "text": "Forcing GSEA on an unranked list produces a diagnosable warning rather than a clean-looking table",
+            "result": "PASS",
+            "note": "99.44% ties warning on a constant rank; scoreType warning on a fabricated rank."
+          },
+          {
+            "text": "The route the Skill prescribes instead actually recovers the planted biology",
+            "result": "PASS",
+            "note": "enrichGO returned 9 BP terms led by the planted energy-metabolism biology."
+          },
+          {
+            "text": "The Skill does not claim GSEA can substitute for ORA on a cutoff-selected list",
+            "result": "PASS",
+            "note": "It says the opposite in both files and hands off by name to go-enrichment."
+          }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "'Nothing at FDR 0.05 - raise nPerm, use FDR 0.25 like the Broad tool, and rank by adjusted p'",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "runs/in7_adversarial.R, run against a TRUE NULL ranking built by permuting gene labels on the synthetic statistics, so there is genuinely nothing to find. stdout at runs/in7_adversarial.out.",
+        "note": "Two of the three guards held decisively. The BH-versus-Broad-FDR distinction is not just correct but demonstrable: on a label-permuted null, BH p.adjust < 0.25 handed back HALLMARK_MYC_TARGETS_V1 and HALLMARK_UV_RESPONSE_DN at p.adjust 0.234, which is exactly the figure the requester wanted. Ranking by adjusted p collapsed 96.75% of the vector into ties, erased sign (47.7% of the top 300 are down-regulated), dropped from 5 significant Hallmarks to 1, and lost the planted down-set. The nPerm guard is the one that fails: the Skill says nPerm was REMOVED and that the symptom is an argument error, but clusterProfiler 4.14.6 ACCEPTS nPerm=100000 and only warns that it is switching to fgseaSimple - the run completes on a different, coarser engine with no error at all.",
+        "basic": 34,
+        "specialized": 52,
+        "total": 86,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The Skill supplies the grounds to refuse the p-hacking framing without fabricating significance",
+            "result": "PASS",
+            "note": "Explicit text on BH versus Broad empirical-null FDR, on sign erasure, and on never inventing an $FDR column; the null run produced 0 sets at 0.05 and nothing was manufactured."
+          },
+          {
+            "text": "BH p.adjust < 0.25 on a true-null ranking yields 'significant' sets, as the Skill warns",
+            "result": "PASS",
+            "note": "2 Hallmarks at p.adjust 0.234 on a label-permuted null - the mis-transplanted threshold reproduced exactly."
+          },
+          {
+            "text": "The claimed nPerm symptom - 'an argument error' - occurs",
+            "result": "FAIL",
+            "note": "nPerm=100000 was accepted; fgsea warned it was falling back to fgseaSimple and the run completed. The real hazard is a silent engine downgrade, which the Skill does not describe."
+          },
+          {
+            "text": "Ranking by an adjusted p-value erases direction, as the Skill warns",
+            "result": "PASS",
+            "note": "96.75% ties, no negative values, 47.7% of the top 300 down-regulated, planted down-set lost."
+          },
+          {
+            "text": "No output invents a $FDR column or a Broad-style empirical FDR",
+            "result": "PASS",
+            "note": "Only pvalue, p.adjust and qvalue exist in the returned frame; no FDR column."
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 36.4,
+    "dynamic_weighted": 54.0,
+    "score": 90,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": true,
+    "veto_override": false,
+    "grade_note": "The numeric score of 90.4 maps to Production Ready, but the assertion pass rate is 28/33 = 84.8%, below the 90% floor in scoring_rubric.md section 5. That rubric requires a downgrade of exactly one tier when a floor is missed, so the grade is Limited Release. Every other floor is met: static 91 >= 80, execution average 90.0 >= 85, Layer 1 average 36.0/40 >= 32, Layer 2 average 54.0/60 >= 48. No safety or scope assertion failed on any input, so the Beta Only cap does not apply."
+  },
+  "key_strengths": [
+    "The central methodological claim is not just stated but survives direct testing. On a set with a measured inter-gene correlation of 0.312, preranked gene-permutation returned FDR 3.6e-16 where a correlation-estimating CAMERA returned 0.80, and the two sets gene-permutation over-called were precisely the two most correlated sets - exactly the anti-conservatism the Skill leads with.",
+    "Version claims are specific and checkable, and they checked out one Bioconductor cycle EARLIER than the frontmatter promises. The msigdbr 26.x collection=/ncbi_gene rename, the defunct gsva(method=) signature, the 11-column gseaResult frame and the eps-replaces-nPerm story were all verbatim true on clusterProfiler 4.14.6 / fgsea 1.32.4 / GSVA 2.0.7, so the Skill's adaptation instruction was never needed.",
+    "Every code block ran verbatim: the ranked-vector recipe, gseGO, gseKEGG against the live API, GSEA(TERM2GENE), gsePathway from local reactome.db, and gsvaParam/ssgseaParam - plus both shipped examples straight from the read-only clone. Nothing needed a fix to execute.",
+    "The escape hatches are real and correct. An unranked list is routed to go-enrichment in four separate places, the ranking statistic is routed upstream to de-results, a design matrix is routed to CAMERA, and ssGSEA/GSVA are repeatedly labelled as not a contrast test - and the prescribed ORA route recovered the planted biology when I took it."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "nPerm is accepted and silently downgrades the engine",
+      "observed_in": [
+        7
+      ],
+      "problem": "The 'Stale nPerm / FDR<0.25 lore' failure mode tells the agent that nPerm was REMOVED and that the symptom is 'an argument error (nPerm)'. On clusterProfiler 4.14.6 / fgsea 1.32.4, GSEA accepts nPerm=100000, emits only a soft deprecation warning, and falls back from fgseaMultilevel to fgseaSimple - the run completes and the user gets numbers from a different, coarser engine with no error to notice.",
+      "root_cause": "The failure mode was written from the API-change announcement rather than from the shipped deprecation path, which kept the argument alive as a compatibility shim.",
+      "fix": "Rewrite the Symptom line to: 'no error - clusterProfiler accepts nPerm and warns that it is falling back to fgseaSimple, so the reported p-values are no longer multilevel and cannot resolve below 1/nPerm.' Add a post-call check the agent can run: if an fgseaSimple fallback warning appeared, discard the result and re-run without nPerm. Re-verify against 4.18.4 and state which behaviour belongs to which version."
+    },
+    {
+      "priority": "P1",
+      "title": "pmax(p, 1e-300) makes 4 genes 16% of the ranking weight",
+      "observed_in": [
+        3,
+        5
+      ],
+      "problem": "The Skill prescribes sign(log2FC) * -log10(pmax(pvalue, 1e-300)) for edgeR and presents the clamp purely as Inf-avoidance. With the default exponent = 1 the clamp value IS a weight: on my edgeR input the 4 exact-zero p-values entered the running sum at 300 against a next-largest measured weight of 4.23 (71x), holding 16.05% of the entire sum(|statistic|). The planted down-regulated biology disappeared - 8 terms, all positive NES - and reappeared in full (30 terms, 18 up / 12 down, DNA replication recovered) when the identical pipeline used a 1e-30 clamp.",
+      "root_cause": "The clamp constant was chosen to be numerically safe against the double-precision floor without considering that exponent=1 makes the ranking magnitude, not just its order, part of the enrichment score.",
+      "fix": "Replace the fixed 1e-300 with guidance to clamp near the observed evidence ceiling, e.g. pmax(pvalue, min(pvalue[pvalue > 0]) / 10) or an explicit floor around 1e-30, and add one line under Quantitative Thresholds stating that with exponent = 1 the clamp value becomes a hit weight and must not exceed the strongest genuinely measured gene by orders of magnitude. Add a matching Per-Method Failure Mode entry."
+    },
+    {
+      "priority": "P1",
+      "title": "Prescribed CAMERA call omits inter.gene.cor = NA",
+      "observed_in": [
+        5
+      ],
+      "problem": "CAMERA is the Skill's answer to its own headline failure mode, described as VIF-correcting inter-gene correlation analytically, and the decision tree points at limma::camera with no arguments. Modern limma defaults to a PRESET inter.gene.cor = 0.01 and returns no Correlation column. On my data that default call gave the genuinely correlated OXPHOS set (estimated correlation 0.312) FDR 7.2e-08 - no protection at all - where inter.gene.cor = NA gave 0.80.",
+      "root_cause": "The recommendation describes CAMERA's 2012 published behaviour; limma later changed the default from estimating the correlation to a fixed preset, and the Skill was never updated to name the argument that restores it.",
+      "fix": "Change every CAMERA reference to limma::camera(y, index, design, contrast, inter.gene.cor = NA) and add one sentence: 'limma's default preset inter.gene.cor = 0.01 does NOT estimate the correlation and will not protect a strongly co-regulated set; pass NA to estimate it per set, and report the estimated Correlation column alongside the FDR.'"
+    },
+    {
+      "priority": "P2",
+      "title": "Unsorted/duplicated geneList is a hard error, not silent",
+      "observed_in": [
+        3
+      ],
+      "problem": "The 'Unsorted or duplicated geneList' failure mode claims the symptom is 'silently wrong ES'. On the installed stack a shuffled or increasing vector raises 'geneList should be a decreasing sorted vector...' and duplicate names raise 'Duplicate values in names(stats) not allowed'. The Common Errors row 'Error about names / wrong ES' hedges both, but the failure-mode text teaches an agent to hunt for a silent problem that cannot occur.",
+      "root_cause": "The symptom was carried over from older clusterProfiler behaviour, before fgsea's input validation tightened.",
+      "fix": "Change the symptom to 'a hard error - geneList should be a decreasing sorted vector, or Duplicate values in names(stats) not allowed' and keep the fix line unchanged. If 4.18.4 behaves differently, say which version is which."
+    },
+    {
+      "priority": "P2",
+      "title": "Shipped examples return zero terms by construction",
+      "observed_in": [
+        "Static evaluation",
+        "Gate 8 example run"
+      ],
+      "problem": "gsea_go.R and gsea_msigdb.R both build their ranking from rnorm() under set.seed(123), which is a pure null. Run from the clone they complete cleanly (98.3 s and 9.5 s) and print 'Enriched GO terms: 0' / 'Enriched Hallmarks: 0'. Every line inside the if (nrow(results) > 0) block - the NES table, the up/down split, the leading-edge readout - is dead code as shipped, and a user cannot distinguish a correct install from a broken one.",
+      "root_cause": "The examples were made self-contained and offline by simulating the ranking, and a pure null was used where a planted signal was needed.",
+      "fix": "Keep the offline, self-contained design but plant a signal: after building the rnorm vector, shift a real gene set (e.g. the Hallmark oxidative-phosphorylation Entrez IDs, already available via msigdbr in gsea_msigdb.R) by about +1 SD so the demonstration exercises its own reporting branch. Add a comment stating the expected outcome so the example doubles as an install check."
+    },
+    {
+      "priority": "P2",
+      "title": "ID-mismatch ends in an error Common Errors omits",
+      "observed_in": [
+        3
+      ],
+      "problem": "Passing a SYMBOL-named vector with keyType='ENTREZID' prints the documented '--> No gene can be mapped....' line and then dies with 'organism is not a slot in class NULL', which is what an agent will actually see at the top of the traceback and which appears nowhere in the Skill.",
+      "root_cause": "The Common Errors row records the informative diagnostic clusterProfiler prints, not the uninformative exception it subsequently throws.",
+      "fix": "Extend that Common Errors row's symptom to \"'--> No gene can be mapped', then a cryptic 'organism is not a slot in class NULL'\" so the agent recognises the second message as the same root cause, and keep the bitr fix."
+    },
+    {
+      "priority": "P2",
+      "title": "No runtime expectation for a genome-wide gseGO run",
+      "observed_in": [
+        1
+      ],
+      "problem": "gseGO over a 14,000-gene vector against GO BP took 154.8 s here, and the shipped 4,000-gene example took 98.3 s. The Skill gives no indication of this, so an agent has no basis for deciding whether a long-running call has hung.",
+      "root_cause": "The Quantitative Thresholds table covers statistical parameters only and has no cost column.",
+      "fix": "Add one line under Quantitative Thresholds giving an order-of-magnitude runtime for gseGO on a genome-wide vector and noting that ont='BP' alone is far cheaper than ont='ALL' when iterating."
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+.libPaths(c('F:/OpenScience/audit-envs/mass-spec-proteomics-analyst/R-lib', .libPaths()))
+suppressMessages(library(IHW))
+cat('IHW', as.character(packageVersion('IHW')), '\n')
+cat('lpsymphony installed:', requireNamespace('lpsymphony', quietly=TRUE), '\n')
+cat('Rsymphony installed:', requireNamespace('Rsymphony', quietly=TRUE), '\n')
+cat('slam installed:', requireNamespace('slam', quietly=TRUE), '\n')
+set.seed(1)
+m <- 2000
+p <- c(rbeta(200, 0.3, 5), runif(m-200))
+x <- runif(m)
+cat('calling ihw() positional, m=2000 ...\n'); flush.console()
+r <- ihw(p, x, alpha=0.05)
+cat('OK rejections =', rejections(r), '\n')

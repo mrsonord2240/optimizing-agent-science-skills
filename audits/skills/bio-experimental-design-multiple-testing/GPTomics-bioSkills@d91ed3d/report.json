@@ -1,0 +1,281 @@
+{
+  "meta": {
+    "skill_name": "bio-experimental-design-multiple-testing",
+    "description": "Controls error rates across thousands of simultaneous tests in genomics discovery using false-discovery-rate methods (Benjamini-Hochberg, Benjamini-Yekutieli, Storey q-value with pi0 estimation, local FDR, independent filtering, covariate-weighted FDR via IHW), plus family-wise error control (Bonferroni, Holm) and the GWAS genome-wide threshold. Use when correcting p-values from genome-wide tests, choosing between BH/BY/q-value/Bonferroni, setting an FDR threshold, applying IHW or independent filtering, or interpreting q-values.",
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:experimental-design/multiple-testing",
+    "audit_type": "first audit (no fix applied)",
+    "evaluated_on": "2026-09-16",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "executed_inputs": 7,
+    "environment": "R 4.4.3 / Bioconductor 3.20 (qvalue 2.38.0, IHW 1.34.0, limma 3.62.2, DESeq2 1.46.0, edgeR 4.4.2); Python 3.12 (statsmodels 0.15.0, scipy 1.18.1, numpy 2.5.3, pandas 3.0.5). All installed versions meet or exceed the skill's stated Version Compatibility floors (qvalue 2.34+, IHW 1.30+, statsmodels 0.14+, scipy 1.12+), so no result here is attributable to a version gap. All data is SYNTHETIC with planted ground truth."
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "Nine primary citations, all with real journal/volume/page coordinates and no invented DOI or PMID. The two quantitative claims that could be tested offline both held: statsmodels multipletests really does default to method='hs' (verified from the installed signature and by rejection counts, 60 vs 300), and the GWAS 5e-8 / Dudbridge-Gusnanto 7.2e-8 pairing is stated correctly. No numeric result in the skill was fabricated." },
+      "practice_boundaries": { "result": "PASS", "detail": "Nothing in the skill or in any of the seven outputs diagnoses, prescribes or triages an individual. The one clinical input (Input 6, four pre-specified trial endpoints) is handled purely as a population-level error-rate question and is routed to clinical-biostatistics/multiplicity-graphical. Gate 7 (research scope) is clean." },
+      "methodological_ground": { "result": "PASS", "detail": "No principled fallacy. The FDR-versus-FWER framing, the PRDS condition, pi0 estimation, the filter-independence rule and the false-coverage-rate trap are all stated correctly and three of them were confirmed against planted truth. Two claims are miscalibrated rather than wrong -- the 'realized FDR exceeds nominal' symptom for BH under negative dependence (not reproduced in 400 replicates) and the grouping of variance filtering with preliminary-test filtering (measured null-independent) -- and are raised as P1/P2, not as a veto." },
+      "code_usability": { "result": "PASS", "detail": "The p.adjust, qvalue, statsmodels and Bonferroni/Holm/BY patterns all executed and produced correct results, and the shipped examples/multiple_testing_correction.R ran to completion (exit 0). The SKILL.md IHW call crashed the R session (SIGSEGV in the lpsymphony backend) in 2 of 3 attempts at 18,000 genes, but a documented-API variant of the same call (positional form, nbins <= 5) runs and returns correct results, so the code is not unrunnable in the M4 sense. Recorded as P1, not vetoed." }
+    }
+  },
+  "static_score": {
+    "subtotal": 84,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 9, "max": 12, "note": "Approach is well matched: one-line patterns for a decision problem, with execution correctly delegated to sibling skills. Correctness is high and verifiable. The gap is completeness -- the frontmatter description promises local FDR, independent filtering, the false-coverage-rate fix and IDR, but IDR is one taxonomy row with no code or package guidance, FCR is named four times with no formula, and local FDR is one assignment with no interpretation rule." },
+      "reliability": { "score": 8, "max": 12, "note": "Per-Method Failure Modes covers Bonferroni, BH-under-dependence, the statsmodels default, filtering and FCR with trigger/mechanism/symptom/fix. The two methods the skill most actively promotes as power levers, q-value and IHW, are the only ones with no entry -- and both are exactly what failed in execution. The Version Compatibility recovery protocol is real but assumes a catchable error, which a segfault is not. Category 3 Scene Overrides applied: no deduction taken for strict input handling." },
+      "performance_context": { "score": 7, "max": 8, "note": "192 lines carrying a taxonomy, a scenario decision tree, a reconciliation table, five failure modes and nine citations, with no filler; workflow is one-liners with no redundant round-trips. Minor: there is no references/ directory to defer depth into, so everything loads at once, though the total is small enough that this costs little." },
+      "agent_usability": { "score": 14, "max": 16, "note": "Strongest category. The decision tree and taxonomy let an agent route correctly from a cold start, terminology is consistent throughout, and error prevention is unusually concrete for a statistics skill. Deductions: the IHW snippet references a de_table that is never defined, and no output shape is specified beyond 'report the adjusted quantity with its interpretation'. goal_approach_exempt: true is honoured -- no deduction for absent Goal/Approach blocks." },
+      "human_usability": { "score": 7, "max": 8, "note": "Discoverability is excellent: the description uses the phrasings analysts actually type and the usage guide supplies eight realistic prompts. Forgiveness scored under the Category 3 override on documented requirements rather than strictness -- the skill states no input requirements at all, and its q-value one-liner has no documented family-size floor, which is where it breaks." },
+      "security": { "score": 10, "max": 12, "note": "No credentials, no network calls, no shell execution, no eval/exec, no destructive operations, and the skill only ever touches summary statistics. The deduction is input validation: the central correctness condition of the skill is an independence assumption (IHW covariate, filter statistic) and it ships no diagnostic for testing it, nor any instruction to check that p-values are valid." },
+      "maintainability": { "score": 10, "max": 12, "note": "Clean section separation, table-driven content that extends easily, and explicit delegation boundaries. Testability is the weak point: the single shipped example is seeded and runnable, but with its own seed it prints a realized FDR of 0.108 for BH at nominal 0.05 and an IHW result identical to BH, so the only test artifact actively teaches the wrong lesson." },
+      "agent_specific": { "score": 19, "max": 20, "note": "Trigger precision, composability, idempotency and escape hatches are all at full marks -- seven qualified sibling paths, every one of which exists in the repository, and three separate routings out of the confirmatory-trial case. The single deduction is progressive disclosure: examples/multiple_testing_correction.R is never mentioned by SKILL.md or usage-guide.md, so an agent has no reason to open it." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 81.4,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 21, "total": 33 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "BH plus Storey q-value on 18,000 synthetic DE p-values with planted truth",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "runs/input1_bh_qvalue.R, R 4.4.3 + qvalue 2.38.0, exit 0. Against 1,500 planted alternatives: BH gave 204 discoveries at realized FDP 0.0245 and power 0.1327; qvalue estimated pi0 = 0.9219 against a true 0.9167 and gave 214 discoveries at FDP 0.0280; Bonferroni and Holm gave 13 each, BY 17.",
+        "note": "Every claim the skill makes about this path held. The gap is what happens after: the code produces a local FDR vector the skill never tells the analyst how to threshold, and there is no p-value-distribution check before pi0 is trusted.",
+        "basic": 38,
+        "specialized": 54,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "BH at FDR 0.05 delivers a realized false-discovery proportion at or below 0.05 against planted truth", "result": "PASS", "note": "5 false positives in 204 discoveries, FDP 0.0245" },
+          { "text": "The q-value pi0 estimate lands within 0.02 of the planted true pi0", "result": "PASS", "note": "0.9219 estimated against 0.9167 planted, error 0.0052" },
+          { "text": "The skill's claim that the q-value is more powerful than BH holds on this data", "result": "PASS", "note": "214 versus 204 discoveries; a 5% gain, consistent with the skill's own caveat that the gain is large only when pi0 is far below 1" },
+          { "text": "The skill specifies how to threshold the local FDR its canonical code block computes", "result": "FAIL", "note": "qobj$lfdr is assigned and described as a posterior null probability, but no cutoff, no interpretation rule and no relation to the q-value threshold appears anywhere; 0.20 had to be chosen arbitrarily, returning 364 features at FDP 0.0934" },
+          { "text": "Output stays inside the skill's stated scope and interprets no individual's data", "result": "PASS", "note": "Feature-level error rates only" }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "BH versus BY under positive block and negative pairwise dependence, 400 replicates",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "runs/input2_dependence.py, Python 3.12 + statsmodels 0.15.0, exit 0. 400 replicates per structure, m=5000, 500 alternatives. BH mean FDP: 0.0444 independent, 0.0393 positive block (rho=0.8), 0.0453 negative pair (rho=-0.95). BY mean FDP 0.0038-0.0055 everywhere. The statsmodels default trap reproduced exactly: 60 rejections with the default versus 300 with method='fdr_bh'.",
+        "note": "The skill's headline warning is confirmed hard, but its dependence rule is miscalibrated: BH never lost control in 1,200 replicate datasets, while BY cost 53% of power. What dependence actually did was inflate FDP variance, which the skill never mentions.",
+        "basic": 34,
+        "specialized": 49,
+        "total": 83,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "statsmodels multipletests defaults to Holm-Sidak rather than BH, as the skill warns three separate times", "result": "PASS", "note": "Installed signature shows method='hs'; on identical p-values the default gave 60 rejections against 300 for method='fdr_bh'" },
+          { "text": "BH's realized FDR exceeds the nominal level under the negative dependence the skill's failure-mode block describes", "result": "FAIL", "note": "Mean FDP 0.0453 over 400 replicates at rho=-0.95; the stated symptom never appeared" },
+          { "text": "BY controls FDR under every dependence structure tested", "result": "PASS", "note": "Mean FDP 0.0048, 0.0038 and 0.0055 for independent, positive-block and negative-pair" },
+          { "text": "The skill quantifies what switching from BH to BY costs", "result": "FAIL", "note": "No number anywhere; measured cost is power 0.605 to 0.288, a 53% loss, and mean rejections 312 to 141" },
+          { "text": "Guidance stays in scope and routes the dependence question rather than inventing a dependence test", "result": "PASS", "note": "The Reconciliation table correctly says to state the assumption instead of testing it post hoc" }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Forty synthetic enrichment terms, none truly enriched, plus a pi0 stability sweep",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "executed": true,
+        "execution_note": "runs/input3_small_allnull.R, runs/input3b_pi0_stability.R, runs/input3c_qvalue_error.R, runs/input3d_na_handling.R, all exit 0. On the stored 40-term table BH and qvalue both correctly returned zero discoveries with pi0 = 1.000. Over 500 replicate all-null families, qvalue(p) threw 'Error in smooth.spline(lambda, pi0, df = smooth.df): missing or infinite values in inputs are not allowed' in 178/500 at m=20 and 35/500 at m=50, and where it returned, pi0-hat fell as low as 0.301 against a planted truth of 1.0.",
+        "note": "BH is rock solid at every family size. The skill's q-value one-liner is not, and the skill states no family-size floor and never mentions the lambda or pi0.method arguments that govern the failing spline fit. A separately tested hypothesis -- that p-value vectors containing NAs would trip the skill up -- did not hold: p.adjust, qvalue and ihw all handle NAs correctly, so the skill's silence there is harmless.",
+        "basic": 31,
+        "specialized": 41,
+        "total": 72,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "BH returns zero discoveries on a family where nothing is real", "result": "PASS", "note": "0 at FDR 0.05 and 0 under Bonferroni; minimum raw p was 0.0684" },
+          { "text": "The skill's canonical qvalue(pvalues) call completes on a small family", "result": "FAIL", "note": "36% error rate at m=20 and 7% at m=50 over 500 replicates, from smooth.spline inside the pi0 estimator" },
+          { "text": "The skill states a minimum family size or a fallback for pi0 estimation", "result": "FAIL", "note": "Neither SKILL.md nor usage-guide.md mentions lambda, pi0.method, or any size floor; the usage guide's quick-start invites 'Compute q-values and the proportion of true nulls' unconditionally" },
+          { "text": "No discovery is reported when nothing is real", "result": "PASS", "note": "Both procedures returned empty sets on the stored table; over 500 replicates the rate of at least one false discovery was 0.04-0.08 for both, as expected at alpha 0.05" }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "IHW with mean expression as covariate against plain BH, 18,000 genes",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "executed": true,
+        "execution_note": "runs/input4*.R. The SKILL.md call ihw(pvalue ~ mean_expression, data = de_table, alpha = 0.05) segfaulted the R session (exit 139) in 2 of 3 attempts at 18,000 genes; the third succeeded with nbins = 12 and 223 rejections. The positional call from examples/ also segfaulted at default nbins for m >= 8000, and at m = 18000 was stable only for nbins <= 5. With nbins pinned to 4 the substantive comparison completed: IHW 238 discoveries (FDP 0.0588, power 0.1493) against BH 204 (FDP 0.0245, power 0.1327). Covariate validity was checked separately: null p<0.05 rate 0.0469-0.0516 across mean-expression quintiles (KS versus uniform, p = 0.794) while power rose 0.409 to 0.814 across the same quintiles.",
+        "note": "Root cause of the crash is the lpsymphony LP backend on this Windows build, not incorrect API usage by the skill -- but the skill documents no fallback, no nbins guidance, and no IHW failure mode at all, so there is nothing in it that would get an analyst past this. Separately, the covariate in the shipped example satisfies only the null-independence half of the IHW precondition and not the informativeness half, and delivers no power gain.",
+        "basic": 30,
+        "specialized": 40,
+        "total": 70,
+        "assertions_passed": 2,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "The IHW call printed in SKILL.md executes on an 18,000-gene table", "result": "FAIL", "note": "Segmentation fault, exit 139, in 2 of 3 attempts; the whole R session dies, so the skill's own 'introspect the installed package and adapt' recovery protocol cannot apply" },
+          { "text": "With an informative, null-independent covariate IHW recovers power over plain BH", "result": "PASS", "note": "238 versus 204 discoveries, a 17% gain, power 0.1493 versus 0.1327" },
+          { "text": "The covariate used in the shipped example demonstrates the power recovery its section claims", "result": "FAIL", "note": "The example itself prints 'IHW discoveries at FDR 0.05 = 93 (vs BH = 93)', zero gain; the same rgamma covariate on the audit data gave 196 against BH's 204, an actual loss" },
+          { "text": "The skill tells the analyst how to check that a proposed covariate is legitimate", "result": "FAIL", "note": "The independence requirement is asserted twice but no diagnostic is given; the stratified null-uniformity check used here had to be written from scratch" },
+          { "text": "The realized FDP of the IHW result stays near the nominal 0.05", "result": "PASS", "note": "0.0588 on a single draw, within Monte Carlo range of the nominal level for 238 rejections" }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Independent filtering: variance, mean and preliminary-test filters against planted truth",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "runs/input5_filtering.py and runs/input5b_filter_null_check.py, exit 0. Over 300 replicates at m=6000: no filter mean FDP 0.0449 / power 0.105; top-50% group-blind variance 0.0417 / 0.210; top-50% overall mean 0.0471 / 0.055; preliminary t-test (p<0.5) 0.0831 / 0.217 with P(FDP>alpha) = 0.867. Direct null-uniformity check over 200 replicates: P(null p<0.05 | kept) was 0.0502 for group-blind variance, 0.0500 for overall mean, 0.0138 for within-group variance and 0.1001 for the preliminary test.",
+        "note": "The rule is right and its headline instance is confirmed, but the worked instances are miscalibrated: the preliminary-test filter behaves exactly as described, group-blind variance did not, and within-group variance biased in the opposite direction to the stated symptom. Following the skill's mean-only prescription on this data would have halved power.",
+        "basic": 33,
+        "specialized": 48,
+        "total": 81,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "A preliminary-test filter inflates the realized FDR, as the skill warns", "result": "PASS", "note": "Mean FDP 0.0831 against nominal 0.05, exceeded alpha in 86.7% of replicates, and null p<0.05 rate exactly 0.1001 -- twice nominal, as truncation predicts" },
+          { "text": "Filtering on variance biases the FDR anti-conservatively, as the skill states", "result": "FAIL", "note": "Group-blind variance left null p-values at 0.0502 against a 0.0500 target and gave mean FDP 0.0417; within-group variance biased them to 0.0138, conservative rather than anti-conservative" },
+          { "text": "The skill's recommended mean-based filter preserves FDR control", "result": "PASS", "note": "Mean FDP 0.0471, null p<0.05 rate 0.0500 -- but power fell from 0.105 to 0.055, which the skill does not warn can happen" },
+          { "text": "The skill provides a way to test a proposed filter for null-independence", "result": "FAIL", "note": "No procedure, no code, no diagnostic; the analyst is left with a two-item allow/deny list" },
+          { "text": "No destructive or unsafe operation appears in any code the skill directs", "result": "PASS", "note": "Pure numerical operations on summary statistics throughout" }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Confirmatory trial with four pre-specified, hierarchically ordered endpoints",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "runs/input6_confirmatory.py, exit 0. 200,000 simulated four-endpoint trials at rho=0.3. Under the global null all procedures sat at nominal (BH 0.0481, Holm 0.0466, Hochberg 0.0468, uncorrected 0.1720). With two of four endpoints truly non-null, BH's family-wise type I error over the remaining true nulls rose to 0.0612 while Holm held 0.0400. The handoff target was verified to exist as bio-clinical-biostatistics-multiplicity-graphical (primary_tool gMCP, FDA Multiple Endpoints 2022).",
+        "note": "The cleanest input. The skill declines the case in three separate places and names a specific, existing, well-matched sibling skill, and the claim it uses to justify declining checks out numerically.",
+        "basic": 38,
+        "specialized": 53,
+        "total": 91,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The skill declines the confirmatory case and names a specific sibling skill rather than proceeding", "result": "PASS", "note": "Routed in the frontmatter description, the algorithmic taxonomy and the decision tree; target folder and frontmatter name both verified present" },
+          { "text": "The FWER claim underlying the routing holds against simulation", "result": "PASS", "note": "BH 0.0612 versus Holm 0.0400 over the true nulls once two endpoints are real" },
+          { "text": "No output diagnoses, prescribes or triages any individual patient", "result": "PASS", "note": "Population-level error-rate statements only; gate 7 clean" },
+          { "text": "The skill states how to establish the positive-dependence condition it attaches to Hochberg and Hommel", "result": "FAIL", "note": "The condition is named in the taxonomy but no test or rule of thumb is offered for deciding whether endpoints satisfy it" }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Post-hoc threshold shopping plus confidence intervals on the selected hits",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "runs/input7_threshold_shopping_fcr.py, exit 0. Realized FDP against planted truth: BH 0.0245 at FDR 0.05, 0.0973 at 0.10, 0.1946 at 0.20; raw p<0.01 gave 0.2212 and raw p<0.05 gave 0.4737. On the BH-0.05 selected set, naive 95% confidence intervals covered the true effect 82.35% of the time; Benjamini-Yekutieli 2005 FCR-adjusted intervals at level 1 - qR/m restored coverage to 97.55%.",
+        "note": "The skill has the principle needed to answer the first half -- pre-specify the family, the garden of forking paths -- and its FCR warning is quantitatively correct. It cannot answer the second half: FCR is named four times and shipped nowhere, so the adjustment had to be implemented from the primary literature.",
+        "basic": 34,
+        "specialized": 47,
+        "total": 81,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "The skill supplies the principle needed to refuse post-hoc threshold shopping", "result": "PASS", "note": "The GWAS section's family-definition paragraph states plainly that the family must be pre-specified before seeing results and names the garden of forking paths" },
+          { "text": "BH's realized FDP tracks the nominal level at every threshold tested, so raising the threshold is an honest exchange rather than a cheat", "result": "PASS", "note": "0.0245, 0.0973 and 0.1946 at nominal 0.05, 0.10 and 0.20" },
+          { "text": "Naive confidence intervals on the selected set under-cover, as the FCR failure mode claims", "result": "PASS", "note": "82.35% coverage for nominal 95% intervals on the BH-0.05 selection" },
+          { "text": "The skill provides an implementable FCR adjustment", "result": "FAIL", "note": "Named in the decision tree, the failure modes and the Common Errors table with no formula, package or example; the 1 - alpha*R/m construction had to come from Benjamini-Yekutieli 2005 rather than from the skill" },
+          { "text": "No fabricated citation, p-value or effect size appears in the skill or the output", "result": "PASS", "note": "All nine citations carry plausible and internally consistent journal coordinates; every number reported here came from executed code" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 33.6,
+    "dynamic_weighted": 48.8,
+    "score": 82,
+    "max": 100,
+    "grade": "Beta Only",
+    "grade_symbol": "⚠️",
+    "deployable": false,
+    "veto_override": false,
+    "grade_note": "The numeric score of 82.4 falls in the Limited Release band, but the assertion pass rate is 21/33 = 63.6%, below the 80% floor that scoring_rubric.md section 5 sets for Limited Release. That rubric requires a one-tier downgrade when any floor is missed, so the grade is Beta Only and deployable is false. All other floors are met (static 84 >= 70, execution 81.4 >= 75, Layer 1 average 34.0 >= 28, Layer 2 average 47.4 >= 42). No veto gate fired and no safety or scope assertion failed on any input."
+  },
+  "key_strengths": [
+    "Every quantitative claim that could be tested held up against planted ground truth: statsmodels multipletests really does default to Holm-Sidak (60 rejections versus 300 for fdr_bh on identical p-values), BH's realized FDP tracked the nominal level at 0.05, 0.10 and 0.20, qvalue's pi0 estimate landed at 0.9219 against a planted 0.9167, and naive intervals on the selected set under-covered at 82.4% exactly as the false-coverage-rate warning predicts.",
+    "The routing is the best-engineered part of the skill: seven qualified sibling-skill paths, every one of which exists in the repository, with an explicit 'method choice here, application there' boundary that kept the confirmatory-trial and GWAS inputs cleanly out of scope in three separate places.",
+    "Error-prevention content is concrete rather than cautionary -- the statsmodels default, Bonferroni on a transcriptome, and pre-specifying the family are each given with trigger, mechanism, symptom and fix, and the first two were reproduced exactly in execution.",
+    "192 lines carry an algorithmic taxonomy, a scenario decision tree, a reconciliation table, five failure modes and nine primary citations with no filler, no credentials, no network calls and no executable attack surface anywhere in the skill."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "IHW is a headline power lever with no failure-mode coverage",
+      "observed_in": [4],
+      "problem": "The exact call printed in SKILL.md, ihw(pvalue ~ mean_expression, data = de_table, alpha = 0.05), segfaulted the R session in 2 of 3 attempts on an 18,000-gene table under IHW 1.34.0 / R 4.4.3 / Bioconductor 3.20; the positional form from examples/ also crashed at default nbins for m >= 8000, and only nbins <= 5 was stable at 18,000 genes. The failure kills the interpreter, so nothing the analyst can catch is raised.",
+      "root_cause": "The Per-Method Failure Modes section covers Bonferroni, BH, statsmodels, filtering and FCR but has no entry for IHW, so there is no documented fallback, no nbins guidance, no mention of the lpsymphony LP backend the method depends on, and no note that IHW silently reduces to Benjamini-Hochberg when the bin count collapses (which it printed at m = 2000).",
+      "fix": "Add an IHW failure-mode block: name the lpsymphony/Rsymphony solver dependency, give nbins as the first parameter to reduce when the call fails or hangs, note the built-in 'more than 1000 p-values' guard, and instruct a documented fall back to plain BH with the power loss stated when IHW cannot be made to run."
+    },
+    {
+      "priority": "P1",
+      "title": "The q-value one-liner is unreliable on small families and pi0 is unstable there",
+      "observed_in": [1, 3],
+      "problem": "qvalue(pvalues) as printed failed with 'Error in smooth.spline(lambda, pi0, df = smooth.df): missing or infinite values in inputs are not allowed' in 178 of 500 all-null families at m = 20 and 35 of 500 at m = 50. Where it did return, pi0-hat fell as low as 0.301 against a planted truth of 1.0 at m = 50 and 0.376 at m = 100, so the number the skill tells the analyst to report can be badly wrong on small families.",
+      "root_cause": "The q-value section presents a bare one-liner with no minimum family size and never mentions the lambda or pi0.method arguments that govern the spline fit which is what actually breaks.",
+      "fix": "State a working floor in the q-value section (pi0 estimation needs a family in the thousands), show qvalue(p, pi0.method = 'bootstrap') and qvalue(p, lambda = 0) as the documented fallbacks, and add a q-value entry to Per-Method Failure Modes with the smooth.spline error as its symptom."
+    },
+    {
+      "priority": "P1",
+      "title": "The BH-to-BY rule prescribes a large power loss on an undiagnosable symptom",
+      "observed_in": [2],
+      "problem": "Across 1,200 replicate datasets BH never lost FDR control: mean realized FDP was 0.0444 under independence, 0.0393 under strong positive block dependence (rho = 0.8) and 0.0453 under pairwise negative dependence at rho = -0.95. The stated symptom, 'realized FDR exceeds nominal', never appeared -- and could not be observed by a real analyst in any case. Meanwhile switching to BY cost 53% of power (0.605 to 0.288) and more than half the rejections (312 to 141).",
+      "root_cause": "The failure-mode entry presents a worst-case theoretical guarantee as an observable symptom, and the decision tree converts it into an unconditional recommendation for 'strong/unknown/negative dependence', which sweeps in the common case of merely unknown dependence.",
+      "fix": "Replace the symptom line with what dependence actually does -- under positive block dependence the FDP standard deviation rose from 0.011 to 0.043 and the chance of FDP exceeding 0.10 went from 0.000 to 0.092 while the mean stayed controlled -- quantify BY's power cost, and narrow the decision-tree row to cases where negative dependence is actually expected rather than merely unestablished."
+    },
+    {
+      "priority": "P1",
+      "title": "The false-coverage-rate fix is named four times and shipped nowhere",
+      "observed_in": [7],
+      "problem": "The decision tree, the Per-Method Failure Modes block and the Common Errors table all end at 'FCR-adjusted intervals for the selected set', but no formula, package or worked example exists anywhere in the skill, so a routine request for confidence intervals on the reported hits cannot be completed from it. The gap is not cosmetic: naive 95% intervals on the BH-0.05 selected set covered the true effect only 82.4% of the time, and the Benjamini-Yekutieli 2005 construction restored 97.6%, but had to be written from the primary literature.",
+      "root_cause": "FCR is treated as a caution to be raised rather than a procedure to be executed, unlike BH, BY, q-value and IHW which all get code.",
+      "fix": "Add a short code block computing the FCR-adjusted level as 1 - alpha*R/m and applying it to the selected set, alongside the Benjamini & Yekutieli 2005 citation, so the warning ends in an action the way the other failure modes do."
+    },
+    {
+      "priority": "P2",
+      "title": "The shipped example teaches the wrong lesson twice",
+      "observed_in": [1, 4],
+      "problem": "Run as shipped, examples/multiple_testing_correction.R prints a realized FDR of 0.108 for BH at a nominal 0.05 -- the 99.7th percentile of that same simulation's FDP distribution over 300 seeds, whose mean is 0.0472 -- so every reader sees the recommended method apparently failing by a factor of two. Its IHW section then prints 'IHW discoveries at FDR 0.05 = 93 (vs BH = 93)', zero gain, for a section whose stated purpose is that IHW 'recovers power vs plain BH'; the same rgamma covariate on the audit data gave 196 against BH's 204, an outright loss.",
+      "root_cause": "The seed was never checked against the distribution it draws from, and the demo covariate satisfies only the null-independence half of the IHW precondition while carrying no information about power, which is the other half.",
+      "fix": "Average the method-comparison table over replicates, or pick a seed near the median of the FDP distribution; and generate the IHW covariate so power genuinely depends on it (for example tie per-gene noise to mean expression, which produced a 17% discovery gain here) so the section demonstrates the effect it claims."
+    },
+    {
+      "priority": "P2",
+      "title": "The filtering rule is right but names the wrong instance",
+      "observed_in": [5],
+      "problem": "The skill groups 'a pre-test on variance' with 'a preliminary t-test' as filters that are not null-independent and bias the FDR anti-conservatively. Measured over 200 replicates, the preliminary t-test behaved exactly as described (null p<0.05 rate 0.1001, mean FDP 0.0831, alpha exceeded in 86.7% of replicates), but group-blind variance filtering left the null p-value rate at 0.0502 against a 0.0500 target and doubled power, and within-group variance biased p-values conservatively (0.0138) rather than anti-conservatively. Following the skill's mean-only prescription on this data halved power, from 0.105 to 0.055.",
+      "root_cause": "One sentence collapses three filter statistics with three different behaviours into a single warning, and the allow-list contains exactly one entry (overall mean count) borrowed from the count-data setting where a mean-variance trend makes it informative.",
+      "fix": "Name the statistics separately with the direction of each bias, say that the mean filter buys power only where mean predicts power, and add the one-line diagnostic used here -- check that null p-values stay uniform within strata of the filter statistic -- so an analyst can test any proposed filter instead of consulting a two-item list."
+    },
+    {
+      "priority": "P2",
+      "title": "Three advertised topics appear only as taxonomy rows",
+      "observed_in": [1],
+      "problem": "The frontmatter description promises local FDR, independent filtering and reproducibility ranking via IDR. In the body, IDR is a single taxonomy row naming an unspecified 'idr (ENCODE)' package with no code and no citation link in the workflow, and local FDR is one assignment, qobj$lfdr, with no cutoff, no interpretation rule and no statement of how it relates to the q-value threshold. Choosing a cutoff of 0.20 arbitrarily returned 364 features at a realized FDP of 0.0934, which no guidance in the skill would have predicted or sanctioned.",
+      "root_cause": "The description was written to the full breadth of the topic while the body was written to the four methods that carry code, leaving a gap between what triggers the skill and what it can do.",
+      "fix": "Either add one sentence each giving a conventional lfdr cutoff with the per-feature-versus-tail-average distinction, and a concrete IDR entry point, or trim those promises out of the description so the trigger matches the content."
+    }
+  ]
+}
