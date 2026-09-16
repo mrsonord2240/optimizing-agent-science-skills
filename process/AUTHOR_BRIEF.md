@@ -91,6 +91,20 @@ honestly how the result could be better.
    build. Write `not-viable.md` in the same folder stating which gate fails and exactly what is
    needed to make it viable.
 
+## Where a finished Specialist goes (2026-09-15)
+
+**Our own marketplace: `mrsonord2240/openscience-specialists`.** Not yours to do — Sam or the
+session lead lands it — but know the destination so you do not aim at the wrong one.
+
+The package is committed to `main` there (`specialists/<id>/`, same layout as the existing ones),
+then released by dispatching the **Publish Specialist** workflow with `specialist_id=<id>`. Signing
+happens in CI; there is no local key and you should never look for one.
+
+**Do not open a pull request against `aipoch/openscience-specialist-marketplace`.** The first ten
+Specialists were contributed there deliberately, and the same ten seeded our own marketplace. From
+round two on we publish only to ours. `F:\osa` is a clone of the fork of that upstream repo; it is
+the protocol reference and the release builder, **not** a publishing target.
+
 ## Rules
 
 - Never edit anything under `F:\OpenScience\external`, `F:\OpenScience\skills`,
