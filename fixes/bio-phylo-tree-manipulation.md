@@ -14,3 +14,12 @@ Branch `fix/phylogenetics`, worktree `F:\OpenScience\external\bioSkills-wt-phylo
 
 ## Left unfixed
 - None. RootDigger is still named without flags (not in the findings).
+
+## Backlog pass — 2026-09-15
+
+Worktree `F:\OpenScience\external\bioSkills-wt-p2`, branch `fix/backlog-p2`. Runtime: candidate venv `F:\OpenScience\audit-envs\molecular-phylogenetics-analyst\` (Biopython).
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| Check ingroup monophyly in the outgroup snippet | P2 | "Root with an Outgroup" snippet now declares a separate, a-priori `ingroup` taxon list and checks its monophyly after rooting, printing a warning if it fails; Approach prose explains why a complement-of-outgroup check is a no-op | ran | commit 383ad1c; on `far15_ml.treefile` (15 tips, FarOut + 14 ingroup incl. I13): confirmed complement-of-outgroup "ingroup" monophyly is always True by construction (no-op) for both `outgroup=[FarOut]` and the LBA mistake `outgroup=[FarOut, I13]`; the new separately-declared-ingroup check correctly returns True (no warning) for `outgroup=[FarOut]` and False (warns) for `outgroup=[FarOut, I13]`, where I13 is really an ingroup taxon LBA-attracted to FarOut; exact SKILL.md snippet (placeholders swapped for real names in the verification script only) `py_compile`'d and ran both ways |
+| Give RootDigger flags or drop it | P2 | Fixed "rootdigger" binary-name typos to `rd` (Tool Taxonomy row, inline CLI list); tied the RootDigger software name to its `rd` binary at every other mention (Rule paragraph, Common Errors row, usage-guide.md); added a real, doc-checked `rd --msa aln.fa --tree tree.nwk --exhaustive` (+ `--early-stop` note) to the Root-at-the-Midpoint code block, explicitly marked not-run-here | docs | commit fa5496e; RootDigger/rd confirmed absent (recursive find under audit-envs tools/ and Scripts/, second independent check); command cross-checked against 3 sources: computations/root_digger GitHub README (fetched directly, confirms binary `rd` and exact `--msa/--tree/--exhaustive` usage), web search over the same repo/docs, and the Bettisworth & Stamatakis 2021 paper's Methods section (fetched via PMC, gives `rd --msa <MSAFILE> --tree <TREEFILE>`) -- all three agree on `rd`, not the finding's suggested "rootdigger"; left the prior pass's `iqtree3 --root-test` line in place as the runnable confidence-bearing alternative |

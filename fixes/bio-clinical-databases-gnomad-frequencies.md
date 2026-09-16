@@ -12,3 +12,13 @@ Branch `fix/variant`. Verified live on 2026-09-15 against the gnomAD browser Gra
 | Common Errors "FAF95 = 0" row wrong | cheap | Null-FAF95 and "Variant not found" rows | live responses above | |
 
 Left unfixed: none.
+
+## Backlog pass — 2026-09-15
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| No rate-limit handling for the gnomAD API | P2 | Added `_post_graphql()` with bounded exponential backoff on HTTP 429 in SKILL.md (`query_variant`, `query_gene_constraint`) and examples/gnomad_query.py (`query_variant_v4`, `query_gene_constraint_v4`); docstrings note batch pacing and point to the existing Hail Table path | ran: mocked requests.post (429, 429, 200) confirms 3 retries then success; live query_variant/query_variant_v4 on BRCA1 17-43106487-A-C unaffected (FAF95 1.387e-05 nfe) | commit 58bcb8d |
+| GRCh37 ids declared as GRCh38 still read as absent (item 8) | P2 | Added a "Residual case" bullet to SKILL.md Failure Mode 3: the `build` check only catches a self-contradicting caller (build vs dataset), not GRCh37 coordinates paired with a correctly-stated `build='GRCh38'`; points to spot-checking a known common variant or confirming the reference allele via NCBI Variation Services before trusting a batch of "absent" results | ran: rs334 GRCh38 coords (11-5227002-T-A) on gnomad_r4 -> present, genome AF 0.01272; rs334 GRCh37 coords (11-5248232-T-A) on gnomad_r4 with build='GRCh38' -> "Variant not found" (identical to absent); NCBI Variation Services `/v0/spdi/.../canonical_representative` (0-based SPDI pos 5227001) -> clean match; deliberately wrong position -> "Disambiguation exception" warning; `/v0/refsnp/334` -> live rsID data | docs-only, no code changed; commit 15882e9 |
+| SKILL.md long for single lookups (item 9) | P2 | Moved "SV Catalog and CNV", "mtDNA (Laricchia 2022)", and "Anticipated Reviewer Pushback" sections verbatim to usage-guide.md, appended before "## Related Skills"; one-line pointer left in SKILL.md per section. Mirrors clinvar-lookup commit f26acc9. | docs: git diff confirms moved blocks are line-for-line identical (cut-and-paste); both files read end-to-end for markdown integrity | docs-only, no code changed; SKILL.md 446 -> 427 lines, usage-guide.md 100 -> 125 lines; Reconciliation table and all code/decision-tree/threshold content kept in SKILL.md per finding's stated scope; commit 28bdd11 |
+
+Left unfixed: none.

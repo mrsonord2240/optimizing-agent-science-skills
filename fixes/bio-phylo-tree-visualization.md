@@ -15,3 +15,13 @@ Branch `fix/phylogenetics`, worktree `F:\OpenScience\external\bioSkills-wt-phylo
 
 ## Left unfixed
 - P2 "Add ggtree code patterns for the rich-figure path": a full read.iqtree -> geom_fruit -> geom_cladelab example is a new section, out of the brief's scope.
+
+## Backlog pass — 2026-09-15
+
+Worktree `F:\OpenScience\external\bioSkills-wt-p2`, branch `fix/backlog-p2`. Runtime: candidate venv `F:\OpenScience\audit-envs\molecular-phylogenetics-analyst\` (Biopython, matplotlib), R at `F:\OpenScience\runtime\envs\.r\Scripts\Rscript.exe` with `R_LIBS_USER` pointed at the candidate's `R-lib` (ggtree 3.14.0, ggplot2 4.0.3, treeio, ggtreeExtra, ape).
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| Root before colouring clades by MRCA | P1 | "Color branches by group" recipe roots on an outgroup before any `common_ancestor` call, prints the MRCA tip set, clears raw IQ-TREE support strings from `clade.name`; new Common Errors row | ran | commit fa75880 |
+| Correct the gheatmap line in the version block | P2 | Version Compatibility block no longer lists `gheatmap()` as flatly failing; says it is call-dependent (plain call succeeds, composite pipeline + `new_scale_fill()` call fails), cites the reproduced error, keeps `ggtreeExtra::geom_fruit` as the fallback | ran | commit 00141d5; plain `gheatmap(ggtree(tr), df)` on `primates16_true.nwk` -> OK; composite pipeline mirroring fig2.R (prior geoms + `new_scale_fill()`) on rooted `primates16.treefile` -> `new_geom_point_g_gtree() requires the following missing aesthetics: x` (ggtree 3.14.0, ggplot2 4.0.3, treeio 1.30.0, ggnewscale 0.5.2) |
+| Add ggtree patterns for rich figures | P2 | New "## ggtree + treeio Recipe (R)" section (after Bio.Phylo recipes, before Per-Method Failure Modes): `read.iqtree()` -> `root_keep()` (`treeio::root(..., edgelabel = TRUE)` + tip-label-by-index restore) -> `geom_nodelab()` dual SH-aLRT/UFBoot -> `geom_fruit()` metadata ring; one sentence on groupOTU's verified stem-coloring behavior | ran | commit 0f50878; equivalent pipeline (real outgroup Microcebus_murinus+Otolemur_garnettii) on `primates16.treefile`: 13/14 internal nodes non-NA UFboot after rooting, `ggplot_build()` on the nodelab+geom_fruit composite succeeds (7 layers), `ggsave()` writes a non-empty PDF; `groupOTU(list(Apes=...))` + `aes(color=grp)` checked via `ggplot_build()` segment colours -- stem edge into Apes MRCA (#00BFC4) matches an Apes tip edge (#00BFC4) and differs from the edge above the ungrouped parent (#F8766D), confirming no stem-miscoloring bug on this ggtree version; exact SKILL.md R block also `parse()`-checked. Reverses the prior pass's "out of scope" call per FIX_BRIEF's "Missing referenced executables" section (2026-09-15) |

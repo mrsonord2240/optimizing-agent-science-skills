@@ -11,3 +11,13 @@ Branch `fix/variant`. Runtime: bcftools 1.24 (MSYS2, candidate venv, plugins via
 | SIFT/PolyPhen/CADD calibration overstated | P2 | Qualified to developer thresholds; calibrated PP3 intervals cited | docs: Pejaver 2022 Table 2 values as quoted in audit Input 4 | |
 
 Left unfixed: none.
+
+## Backlog pass — 2026-09-15
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| csq --phase modes m and s described wrongly | P1 | Replaced paraphrase with verbatim `bcftools csq` help semantics (a/m/r/R/s) in SKILL.md and usage-guide.md; recommend -p a for unphased short-read data | ran: `bcftools csq --help` 1.24; reproduced audit in9 case (chr1:1420/1466 phased in trans) on synthetic data, -p a/-p m/-p s on bcftools 1.24 matched corrected text | |
+| SKILL.md annotate line needs an indexed target | P2 | Inserted `bcftools index -f rsid.vcf.gz` before the gnomAD annotate line | ran on synthetic data: reproduced `could not load index` (exit 127) without the fix, exit 0 with it, bcftools 1.24 | |
+| No warning at the annotate step for contig-name mismatch | P2 | Added inline pre-check comment (`bcftools index -s` comparison) next to the annotate commands | ran `bcftools index -s` on both target and source synthetic files to confirm output format; Common Errors row kept as-is | |
+
+Left unfixed: none (3/3 fixed).

@@ -10,3 +10,12 @@ Branch `fix/variant`. Runtime: bcftools 1.24 (MSYS2, candidate venv); audit data
 | `-m-both` described inconsistently | P2 | SKILL.md table: type string only matters for `-m+` | docs: bcftools norm manual; consistent with the usage guide | |
 
 Left unfixed: none.
+
+## Backlog pass — 2026-09-15
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| csq --phase m and s described wrongly | P2 | Replaced paraphrase with verbatim `bcftools csq` help semantics (a/m/s); recommend -p a for unphased input | ran: `bcftools csq --help` 1.24, matches corrected text | |
+| Database-annotation block leaves an empty file on REF error | P2 | Added `set -o pipefail` + `bcftools norm -c w` MISMATCH pre-check to "Full Normalization for Caller Comparison" and "Before Database Annotation" blocks | ran on synthetic REF-mismatch VCF (bcftools 1.24): reproduced the 0-byte-file / "not BGZF compressed" masking without the fix; pre-check catches it with a clear message and exit 1 with the fix; also ran happy-path (matching VCF) to confirm no regression | |
+
+Left unfixed: none (2/2 fixed).

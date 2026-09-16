@@ -13,3 +13,14 @@ Branch `fix/phylogenetics`, worktree `F:\OpenScience\external\bioSkills-wt-phylo
 
 ## Left unfixed
 - P2 examples: extra example files for an MCC side-table extraction and a Python dual-label split were not added. That would be new content; the split now sits in the SKILL.md snippet.
+
+## Backlog pass — 2026-09-15
+
+Worktree `F:\OpenScience\external\bioSkills-wt-p2`, branch `fix/backlog-p2`. Runtime: Python venv
+`F:\OpenScience\audit-envs\molecular-phylogenetics-analyst\Scripts\python.exe` (Biopython), audit
+data `F:\OpenScience\audits\bio-phylo-tree-io\data\iq10.treefile`.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| Key Insight 3 ("Single Most Important Modern Insight") said IQ-TREE's `SH-aLRT/UFBoot` dual label "truncates or chokes" a single-value parser, contradicting the already-corrected "Support Value Read as a Node Name" failure-mode section further down the same file | P2 | Replaced the contradicting clause with: a single-value parser like Bio.Phylo neither truncates nor errors on the dual label -- it keeps the whole string in `.name` and leaves `.confidence` empty -- with a cross-reference to the failure-mode section | ran: `Bio.Phylo.read()` on `iq10.treefile` (dual-support Newick) -- every internal `clade.name` held the full string (`99.4/100`, `99.3/100`, `98.1/98`, `100/100`, `94/93`), `clade.confidence` was `None` in every case, no exception | commit 3ba91aa |
+| "Bio.Phylo writes NeXML without confidences or taxonomy" | P2 | Added a Common Errors row: Bio.Phylo's NeXML writer keeps a plain single `.confidence` (via `cdao:has_Support_Value`) but drops phyloXML-typed `.confidences` and always drops taxonomy; recommends DendroPy for annotation-preserving NeXML | ran: `iq10.contree` (single bootstrap) round-tripped through `Phylo.write`/`Phylo.read` nexml with confidences intact (100, 98, 93...); `phylo8.xml` (phyloXML, dual bootstrap+probability + NCBI taxonomy) round-tripped with confidence and taxonomy both lost -- `.confidence` is `None` even though `.confidences=[80.0, 0.97]`; DendroPy check: `mcc6.tree` (BEAST posterior/HPD/rate via `extract_comment_metadata=True`) written straight to nexml produced 68 typed `<meta>` elements with posterior values matching source exactly | commit 0ecf9dc; finding's blanket claim was only half true -- simple single-value confidence is NOT dropped, only phyloXML-typed multi-confidence and taxonomy are |

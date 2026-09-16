@@ -14,3 +14,15 @@ Branch `fix/phylogenetics`, worktree `F:\OpenScience\external\bioSkills-wt-phylo
 
 ## Left unfixed
 - P2 examples: no simulated alignment with a true tree shipped, and `pairwise_tree_distances.py` (patristic, off-topic) not moved to tree-manipulation. Both add or relocate content rather than correct it.
+
+## Backlog pass — 2026-09-15
+
+Worktree `F:\OpenScience\external\bioSkills-wt-p1`, branch `fix/backlog-p1`. Runtime: ape 5.8.1 / phangorn (R-lib), IQ-TREE 2.4.0 (AliSim), scikit-bio 0.7.3, Biopython.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| Alpha-estimation and gap-stripping instructed but not coded | P2 | SKILL.md Python block: numpy gap-column filter before `DistanceCalculator('identity')`. R block: `phangorn::optim.pml(optGamma=TRUE)` replaces hard-coded `alpha <- 0.5` | ran: gap filter on a 3-taxon/12-col toy (2 gapped cols) → 10 cols kept correctly; R block on `examples/data/sim8.fasta` → alpha ≈ 100 (correct: JC69 sim, no ASRV), FastME tree built | commit 4ba536f |
+| Trap paragraph still names Xia Iss>=Iss.c as the criterion | P2 | Points at the Pre-flight ape proxy as primary; Xia/DAMBE kept as optional confirmation, matching the rest of the file | docs-only consistency edit, cross-checked against Pre-flight/Common Errors/Thresholds sections | commit 28c2e87 |
+| Examples use 5-16bp toys; off-topic script | P2 | Shipped `examples/data/sim8.fasta` + `sim8_true.nwk` (8 taxa, 300bp, IQ-TREE 2.4.0 AliSim, JC69, seed 42). `build_nj_tree.py` and `model_corrected_tree.R` now run on it and report Robinson-Foulds distance to the true tree (skbio `compare_rfd` / ape `dist.topo`). `pairwise_tree_distances.py` moved to `tree-manipulation/examples/` via `git mv` | ran: `build_nj_tree.py` end-to-end, RF proportion 0.200; `model_corrected_tree.R` end-to-end (parse() OK), alpha≈100, RF=4; moved script re-verified (py_compile + run) from new path | commit 9ae33f2. Also propagated the alpha-estimation fix into `model_corrected_tree.R` (same hard-coded 0.5 as the SKILL.md finding), noted in that commit body |
+
+Unfixed: none in this slice.

@@ -13,3 +13,13 @@ Branch `fix/variant`. Verified live on 2026-09-15: NCBI E-utilities, ClinGen All
 | `parse_clnsig_conflict(None)` return type differs | cheap | Returns `{'calls': [], 'severity': None}` | ran | |
 
 Left unfixed: none. Usage-guide myvariant prompt updated to `clinvar.rcv.review_status`.
+
+## Backlog pass — 2026-09-15
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| Batch CA-ID helper aborts on non-400 Registry errors | P2 | `batch_resolve_to_car_then_clinvar` catches `requests.HTTPError` and records the Registry's JSON `message` in the row's `error` column instead of raising | ran: NC_000017.11:g.43106487A>C resolves normally; NC_000013.14:g.32398489A>G returns live HTTP 500 `Unknown reference: NC_000013.14`, batch continues and records it | commit fc575c5 |
+| No privacy or API-key guidance for bulk queries | P2 | Data-governance note under Scope (consent/IRB approvals for participant-derived variants); `api_key` comment above the E-utilities code | docs: NCBI E-utilities `NBK25497` API Keys section (param name `api_key`, 3 req/s -> 10 req/s) | commit 905893a |
+| SKILL.md long for single lookups | P2 | Moved Reconciliation, 2024 Tripartite schema, and Anticipated Reviewer Pushback sections verbatim to usage-guide.md; one-line pointers left in SKILL.md | text diff: content unchanged, only relocated; SKILL.md 344 -> 322 lines | commit f26acc9 |
+
+Left unfixed: none.

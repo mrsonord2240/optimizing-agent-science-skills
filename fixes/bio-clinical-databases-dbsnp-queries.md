@@ -11,3 +11,13 @@ Branch `fix/variant`. Verified live on 2026-09-15 against NCBI Variation Service
 | Merge history ignores `dbsnp1_merges` | P2 | `merged_from` from `dbsnp1_merges` (SKILL summarize, example resolve) | ran: rs429358 merged_from [630496, 61228756] | |
 
 Left unfixed: none.
+
+## Backlog pass — 2026-09-15
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| Batch table drops annotations for merged rsIDs | P2 | `batch_normalize_rsids` resolves merges first, then queries myvariant by the canonical (re-`rs`-prefixed) rsID instead of the input rsID | ran: `batch_normalize_rsids(['rs630496'])` live; before fix all annotation columns None, after fix gnomad_v2_exome_af 0.138498, gnomad_v2_genome_af 0.164436, clinvar_sig populated | commit 17cc648 |
+| Duplicate input rsIDs double per-allele values | P2 | `getvariants` called with `list(dict.fromkeys(rsids))` instead of the raw (possibly duplicated) list | ran: `['rs630496','rs6025','rs6025']` live; before fix rs6025 row had 4 joined values for 2 alleles, after fix 2 | commit 3add557 |
+| Inconsistent not-found contract between SKILL.md and example | P2 | SKILL.md `resolve_merge_chain` not-found branch changed to `{'status': 'not_found', ...}` to match the example | ran: extracted + py_compiled all 4 python blocks in SKILL.md; grep confirms one spelling left | commit 357f83c |
+
+Left unfixed: none.
