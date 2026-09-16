@@ -1,0 +1,235 @@
+{
+  "meta": {
+    "skill_name": "bio-workflows-metabolomics-pipeline",
+    "description": "Orchestrates the untargeted LC-MS metabolomics pipeline end-to-end (xcms 4.x feature extraction, QC/drift/normalization, confidence-stratified annotation, permutation-validated statistics, background-aware pathway mapping), naming what each stage decides and where it silently fails.",
+    "evaluated_on": "2026-09-16",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:workflows/metabolomics-pipeline"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "No fabricated DOI/PMID/p-values/effect sizes anywhere; all reported numbers came from real xcms/pmp/ropls output on real faahKO/MTBLS79 data or the bundled synthetic example, both labeled correctly." },
+      "practice_boundaries": { "result": "PASS", "detail": "Research-only mouse/serum metabolomics pipeline; no individual diagnostic or prescriptive claims, no medical-disclaimer-requiring content." },
+      "methodological_ground": { "result": "PASS", "detail": "No principled statistical fallacy found (BH FDR, permutation-validated OPLS-DA, background-aware ORA are all correctly specified in principle); the mode-lock and MSI-gate enforcement gaps (Inputs 4, 6) are completeness/documentation gaps, not incorrect methodology." },
+      "code_usability": { "result": "PASS", "detail": "The one bundled, self-contained runnable file (examples/metabolomics_workflow.R) executed cleanly end-to-end and recovered 20/20 planted hits. A real crash was found (Input 2) when chaining the Stage2->Stage4 SKILL.md code snippets on real multi-batch data, but this is scored hard in code executability and flagged as P1 recommendations rather than vetoed, consistent with sibling component-Skill audits' treatment of similar reproducible snippet bugs." }
+    }
+  },
+  "static_score": {
+    "subtotal": 78,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 8, "max": 12, "note": "Thorough 5-stage decision table and pipeline-flow diagram, but two real correctness defects were found in the documented Stage1->Stage2 and Stage2->Stage4 code snippets (see Inputs 1-2)." },
+      "reliability": { "score": 7, "max": 12, "note": "Common Errors table is useful but omits both hand-off bugs found by execution; QC Checkpoints table gives good refresh-routing for component-level failures." },
+      "performance_context": { "score": 7, "max": 8, "note": "Concise (230 lines), defers detail to component Skills well, good token economy." },
+      "agent_usability": { "score": 14, "max": 16, "note": "Clear trigger phrasing, explicit stage ownership table; consistency suffers slightly where prose commitments have no matching code (Inputs 4, 6)." },
+      "human_usability": { "score": 7, "max": 8, "note": "Natural example prompts, good discoverability; forgiveness path (Refresh -> where) is well structured." },
+      "security": { "score": 12, "max": 12, "note": "No credential exposure, injection vectors, or destructive operations anywhere in the orchestration code." },
+      "maintainability": { "score": 8, "max": 12, "note": "Modular hand-off to 8 component Skills, but the one bundled example never exercises the real multi-package seams (Stage 1/3/5 fully commented out) -- exactly where both real bugs found here live." },
+      "agent_specific": { "score": 15, "max": 20, "note": "Strong trigger precision and composability (workflow:true, depends_on frontmatter); no escape-hatch/idempotency handling shown for a broken hand-off (Input 2's crash has no recovery guidance)." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 70.7,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 18, "total": 28 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Stage1->Stage2 xcms-to-pmp orientation hand-off, real faahKO feature table",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "SKILL.md's `fm <- t(feat)` inverts the orientation its own comment claims; pmp's check_peak_matrix silently auto-corrects via classes-length matching, so real execution succeeds but only by luck of a downstream defensive check, not by the documented code being correct.",
+        "basic": 33,
+        "specialized": 43,
+        "total": 76,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Workflow's Stage1->Stage2 code produces the pmp orientation its own comment claims", "result": "FAIL", "note": "t(feat) on real 574x12 xcms output produces 12x574 (samples-in-rows), the opposite of the comment's claim." },
+          { "text": "Real xcms output can be fed through the documented transform without crashing", "result": "PASS", "note": "filter_peaks_by_fraction ran without error on both the transposed and untransposed matrix, returning the same 573x12 result via pmp's own auto-detection." },
+          { "text": "SKILL.md flags the orientation-sensitivity risk it silently depends on", "result": "FAIL", "note": "No mention anywhere that correctness relies on pmp's classes-length auto-detection rather than the documented transpose being correct." },
+          { "text": "No security/injection issues in the hand-off code", "result": "PASS", "note": "Plain matrix transpose and CSV read; no unsafe operations." }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Real Stage2->Stage4 chain on MTBLS79 (cow/sheep serum, 8 batches, 38 QCs)",
+        "status": "ERROR",
+        "status_flag": "❌",
+        "note": "Running the workflow's documented pmp Stage-2 chain then `t(normalized)[study_samples,]` into opls() on real biological data crashed with 'missing value where TRUE/FALSE needed'. Root cause: 5 of 8 real batches have only 4 QC injections (< the workflow's own minQC=5 default), triggering QCRSC's known silent all-NA-per-batch bug (already flagged in the normalization-qc audit); the result is 55.95% NA cells fed straight into opls() because the workflow's Stage 4 code snippet never calls the imputation step it only names in a comment.",
+        "basic": 23,
+        "specialized": 25,
+        "total": 48,
+        "assertions_passed": 2,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Documented Stage2->Stage4 code chain runs end-to-end on real multi-batch biological data", "result": "FAIL", "note": "opls() threw 'missing value where TRUE/FALSE needed'." },
+          { "text": "Stage 2 output's missingness is imputed before entering Stage 4 as the pipeline's own text states", "result": "FAIL", "note": "No imputation call exists between pqn_normalisation and opls() in the SKILL.md code; imputation is named only in a trailing comment." },
+          { "text": "Feature/sample orientation is correct at the Stage2->Stage4 boundary", "result": "PASS", "note": "t(normalized)[study_samples,] correctly produced 134 samples x 2433 features for opls()." },
+          { "text": "A failure at this hand-off surfaces an actionable, pipeline-aware message", "result": "FAIL", "note": "Raw R error only; no guidance tying it back to the missing imputation step or the QCRSC minQC caveat." },
+          { "text": "No unsafe operations in the executed code", "result": "PASS", "note": "Read-only analysis of public MetaboLights data." }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Stress",
+        "label": "Bundled reference example, examples/metabolomics_workflow.R, run as shipped",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Ran clean end-to-end: 292/300 features survived RSD/D-ratio filter, 20/20 planted true hits recovered at FDR<0.05 & |log2FC|>1, temp outputs written then cleaned up.",
+        "basic": 38,
+        "specialized": 55,
+        "total": 93,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The Skill's bundled example file exists and runs without error (gate 8)", "result": "PASS", "note": "Executed via rs.sh with zero errors/warnings." },
+          { "text": "Output demonstrates the QC/RSD/D-ratio filter step", "result": "PASS", "note": "Printed 'Features kept after RSD/D-ratio filter: 292 of 300'." },
+          { "text": "Output correctly recovers the planted ground-truth signal", "result": "PASS", "note": "'True planted hits recovered: 20 of 20'." },
+          { "text": "Temporary outputs are cleaned up, no stray files left", "result": "PASS", "note": "unlink() call confirmed via 'Cleaned up temporary outputs' message." }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Edge",
+        "label": "Stage3->Stage5 MSI-confidence gate (\"only Level 1-2 enter identified-ORA\")",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "Inspection-based: no code anywhere in the orchestrator builds `identified_compounds` by filtering on MSI level, despite this being one of the three stated governing commitments. The component Skill (metabolite-annotation) does emit a usable per-feature level in its own real output, so the data needed exists -- the orchestrator just never shows the filter step.",
+        "basic": 27,
+        "specialized": 33,
+        "total": 60,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "SKILL.md shows code that gates identified_compounds by MSI level before Stage 5", "result": "FAIL", "note": "Stage 5 code block uses `identified_compounds` with no derivation shown anywhere in the file." },
+          { "text": "The stated commitment ('only Level 1-2 enter identified-ORA') is checked anywhere, not just narrated", "result": "FAIL", "note": "Appears only as prose and as a QC-checkpoint table row, never as executable logic." },
+          { "text": "Component skill (metabolite-annotation) produces a usable per-feature confidence level to filter on", "result": "PASS", "note": "Confirmed in that Skill's own audit: every resolved query printed an explicit MSI/Schymanski level." },
+          { "text": "QC checkpoint table names this exact hand-off", "result": "PASS", "note": "after_annotation row: 'MSI/Schymanski level assigned per compound; only Level 1-2 enter identified-ORA'." }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Variant B",
+        "label": "MS-DIAL alternate front end, \"enter the pipeline at Stage 2\" claim",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Inspection-based cross-check of both Skills' SKILL.md: msdial-preprocessing's own import code produces rownames=Alignment ID (features in rows) and sample Area columns (samples in columns) -- the same convention pmp needs, so the claimed entry point is format-compatible even though the orchestrator itself shows no glue code for it.",
+        "basic": 33,
+        "specialized": 45,
+        "total": 78,
+        "assertions_passed": 2,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "MS-DIAL alternate entry claim (features-in-rows/samples-in-columns) matches xcms/pmp convention", "result": "PASS", "note": "Verified against msdial-preprocessing's real 'Import the Alignment Result into R' code block." },
+          { "text": "Orchestrator shows explicit glue code for this entry point", "result": "FAIL", "note": "Only a one-sentence pointer ('import the alignment-result table and enter the pipeline at Stage 2') with no code." },
+          { "text": "No contradictory instructions between the two front-end Skills", "result": "PASS", "note": "Both agree on peak-width/annotation caveats specific to MS-DIAL; no conflicting guidance found." }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Ionization-mode lock (\"mode-lock\" governing commitment #1) across stages",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "Inspection-based: no per-feature mode column appears in any code example or the pipeline-flow diagram; the mode-lock principle is real and correctly stated but entirely unenforced in code, the same gap pattern as Input 4.",
+        "basic": 24,
+        "specialized": 28,
+        "total": 52,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "A per-feature ionization-mode column is carried through the documented pipeline", "result": "FAIL", "note": "No such column in the feature-table schema shown anywhere (feature_id, mz, rt, log2fc, pval, padj, significant only)." },
+          { "text": "Mixed-mode data handling is demonstrated, not just asserted", "result": "FAIL", "note": "No code path checks or merges by mode." },
+          { "text": "The principle is at least clearly stated so a careful agent could implement it manually", "result": "PASS", "note": "Governing principle #1 explicitly names the adduct-table mismatch risk." },
+          { "text": "No incorrect mode-chemistry claims made", "result": "PASS", "note": "[M+H]+/[M+Na]+ vs [M-H]-/[M+Cl]- adduct pairing is chemically correct." }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "\"Skip the MSI confidence stuff, just give me significant pathways\" shortcut request",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Simulated Mode A response following SKILL.md's stated governing principle #2 verbatim: declined to silently drop confidence tagging, explained the ORA-laundering risk in the Skill's own terms, and offered a fast path that still tags achievable confidence levels rather than refusing outright.",
+        "basic": 37,
+        "specialized": 51,
+        "total": 88,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Agent declines to silently skip confidence-level tagging when asked to shortcut", "result": "PASS", "note": "Response explicitly kept minimal per-feature confidence tagging in the plan." },
+          { "text": "Response cites the Skill's own stated governing principle rather than a generic disclaimer", "result": "PASS", "note": "Referenced governing principle #2 ('a database name is an MSI Level 4-5 guess...') directly." },
+          { "text": "Response still offers a fast path forward rather than refusing outright", "result": "PASS", "note": "Offered to proceed with minimal added annotation work rather than blocking the request." },
+          { "text": "Response avoids fabricating a compound-level confidence result it didn't compute", "result": "PASS", "note": "No specific compound or level was invented in the simulated response." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 31.2,
+    "dynamic_weighted": 42.4,
+    "score": 74,
+    "max": 100,
+    "grade": "Beta Only",
+    "grade_symbol": "⚠️",
+    "deployable": false,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "The bundled reference example (examples/metabolomics_workflow.R) is real, runs cleanly end-to-end, and correctly recovers all 20 planted true-effect features from synthetic Stage 2+4 data.",
+    "The five-stage QC-checkpoint table and 'Refresh (fail) -> where' routing give a genuinely useful failure-triage map back to the right component Skill.",
+    "The MS-DIAL alternate front-end claim (enter at Stage 2) is real: both Skills independently converge on the same features-in-rows/samples-in-columns table shape.",
+    "No credential, injection, or destructive-operation exposure anywhere in the orchestration code.",
+    "When pushed to shortcut confidence-level tagging, the Skill's own stated principles are strong enough to make an agent hold the line without just refusing outright."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "Stage2->Stage4 hand-off crashes on real multi-batch data: imputation is a comment, not code",
+      "observed_in": [2],
+      "problem": "The documented `t(normalized)[study_samples,]` -> opls() call throws 'missing value where TRUE/FALSE needed' on real MTBLS79 data (55.95% NA cells), because QCRSC's known silent all-NA behavior on thin-QC batches (already flagged in the normalization-qc audit) reaches opls() unimputed.",
+      "root_cause": "SKILL.md's Stage 2 code block names imputation only in a trailing comment ('Impute only the sparse residual holes... see normalization-qc') instead of calling it, so the orchestrator's own worked Stage 4 example receives an unimputed matrix.",
+      "fix": "Insert an explicit imputation call (impute.QRILC/missForest per mechanism) between pqn_normalisation and opls() in the Stage 4 code block, and add 'no missing values remain before OPLS-DA' to a QC checkpoint."
+    },
+    {
+      "priority": "P1",
+      "title": "Stage1->Stage2 orientation comment contradicts its own code",
+      "observed_in": [1],
+      "problem": "`fm <- t(feat)` is captioned 'features in ROWS, samples in COLUMNS (pmp convention)' but featureValues() output is already features-in-rows, so the transpose inverts it; correctness only survives because pmp's check_peak_matrix silently auto-detects and re-transposes via the classes-length match.",
+      "root_cause": "The snippet appears to assume a samples-in-rows input without re-checking against the featureValues() convention documented earlier in the same file.",
+      "fix": "Remove the erroneous transpose (feed `feat` directly to pmp) or correct the comment to state the true post-transpose orientation, and add a `stopifnot` dimension check so a future regression is caught rather than silently masked."
+    },
+    {
+      "priority": "P1",
+      "title": "Two of the three governing commitments have no enforcing code anywhere",
+      "observed_in": [4, 6],
+      "problem": "The ionization-mode lock and the MSI-confidence gate before ORA are stated as prose/QC-checkpoint rows but never appear as code in SKILL.md or the bundled example; only the block-randomization commitment is actually demonstrated in runnable code.",
+      "root_cause": "The orchestrator is written as a narrative sequencer over component Skills rather than as a checkable hand-off contract at each Skill boundary.",
+      "fix": "Add a minimal snippet at Stage 3->5 that filters annotated compounds to MSI Level 1-2 before building `identified_compounds`, and thread a `mode` column through the feature table with a check before Stage 3/5 that all rows share one ionization mode."
+    },
+    {
+      "priority": "P2",
+      "title": "The bundled example never exercises the seams it claims to unify",
+      "observed_in": [3],
+      "problem": "examples/metabolomics_workflow.R runs cleanly but only synthesizes Stage 2 and Stage 4 in base R; Stage 1, 3, and 5 -- where both real bugs above live -- are fully commented out, so the one runnable artifact never tests the actual multi-package hand-offs.",
+      "root_cause": "Stage 1/3/5 need real instrument files, SIRIUS-class tools, or MetaboAnalystR's network dependency, which are hard to bundle in a self-contained example.",
+      "fix": "Ship a second, smaller example chaining real (or cached) Stage 1 output through Stage 2's real pmp calls into a real Stage 4 opls() call on a tiny toy dataset, so regressions like the two found here are caught automatically."
+    }
+  ]
+}

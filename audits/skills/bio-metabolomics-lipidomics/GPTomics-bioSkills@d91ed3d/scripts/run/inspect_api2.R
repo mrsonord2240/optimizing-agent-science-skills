@@ -1,0 +1,6 @@
+suppressMessages(library(lipidr))
+cat("=== as_lipidomics_experiment source ===\n")
+print(lipidr:::as_lipidomics_experiment)
+cat("\n=== example data.csv used by vignette (bundled) ===\n")
+f <- system.file("extdata", package = "lipidr")
+print(list.files(f, recursive = TRUE))

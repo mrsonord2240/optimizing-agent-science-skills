@@ -1,0 +1,198 @@
+{
+  "meta": {
+    "skill_name": "bio-metabolomics-msdial-preprocessing",
+    "description": "Runs the MS-DIAL preprocessing workflow (peak picking, MS2Dec spectral deconvolution, alignment, gap-filling) and imports the alignment-result table into R or Python with honest filtering. Use when preprocessing LC-MS DDA/DIA (SWATH) raw data with MS-DIAL, deciding MS-DIAL vs XCMS, configuring the MsdialConsoleApp console run, or parsing an MS-DIAL export into a clean feature matrix.",
+    "evaluated_on": "2026-09-16",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Moderate",
+    "n_inputs": 5,
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:metabolomics/msdial-preprocessing"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All cited literature (Tsugawa 2015/2020/2024, Li 2018, Mahieu 2017, Broadhurst 2018, Stein 1999) are real, correctly attributed papers; no fabricated DOIs, PMIDs, sample sizes or effect sizes in any of the 5 outputs." },
+      "practice_boundaries": { "result": "N/A", "detail": "Preprocessing pipeline for aggregate metabolomics data; no individual-subject diagnostic or prescriptive content in any output." },
+      "methodological_ground": { "result": "PASS", "detail": "No methodological fallacies observed; correctly warns that a marker list surviving only one preprocessing pipeline is a candidate not a result, and correctly defers QC-CV/D-ratio/imputation to normalization-qc rather than reimplementing them inline." },
+      "code_usability": { "result": "PASS", "detail": "The R and Python parsing/filtering code the Skill actually supplies ran correctly on independently-generated synthetic exports (verified against ground truth in Inputs 1 and 4). The CLI-naming and GC-MS-exclusion defects found are documentation/version-currency errors, not unrunnable code, so M4 is not triggered; they are recorded as P1 recommendations instead." }
+    }
+  },
+  "static_score": {
+    "subtotal": 76,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 7, "max": 12, "note": "Broad, real coverage (decision framework, console run, R/Python import, honest filtering, failure modes), but the core 'Run MS-DIAL Headless' commands (MsdialConsoleApp lcmsdda/lcmsdia) do not match the installed MS-DIAL 5.5.260820 console, and the central 'MS-DIAL 5 excludes GC-MS' claim is contradicted by that same installed release." },
+      "reliability": { "score": 8, "max": 12, "note": "Common Errors table is genuinely useful (header offset, ABF-only DIA input, version drift) and the Version Compatibility section builds in a verify-before-trust habit; it does not, however, warn about the pandas TRUE/FALSE auto-bool-cast trap found in Input 4." },
+      "performance_context": { "score": 7, "max": 8, "note": "SKILL.md (~210 lines) and usage-guide.md are both concise for the scope covered; one small, on-topic example script." },
+      "agent_usability": { "score": 13, "max": 16, "note": "Clear trigger description, well-enumerated workflow, and a strong decision-tree table; docked for internal inconsistency between the commands it tells the agent to run and the verification step it also tells the agent to run." },
+      "human_usability": { "score": 6, "max": 8, "note": "Well-organized with worked examples and a references section; no explicit 'When NOT to use' section (routing to XCMS/normalization-qc/metabolite-annotation substitutes for it, imperfectly)." },
+      "security": { "score": 12, "max": 12, "note": "No credential handling, no eval/exec of raw strings, no destructive operations; all local file parsing." },
+      "maintainability": { "score": 8, "max": 12, "note": "Well-modularized sections and real, checkable citations; the shipped example script runs correctly (verified), but the CLI command examples show the Skill was not re-validated against a current MS-DIAL release." },
+      "agent_specific": { "score": 15, "max": 20, "note": "Good trigger precision and composability (explicit Related Skills cross-references to xcms-preprocessing, lipidomics, metabolite-annotation, normalization-qc); the Version Compatibility section is a genuine escape hatch even though the specific names it tells the agent to check are themselves wrong." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 73.2,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 15, "total": 22 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Build DDA console command, import AlignResult into R, filter honestly",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "R import+filter code (run verbatim from SKILL.md) is fully correct on a real synthetic export; the documented MsdialConsoleApp lcmsdda command does not match the installed console.",
+        "basic": 32,
+        "specialized": 49,
+        "total": 81,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "The documented 'MsdialConsoleApp lcmsdda -i ... -o ... -m ...' command runs against the installed MS-DIAL console as written", "result": "FAIL", "note": "Executed: the real binary is MSDIALCUI.exe and its help banner lists no 'lcmsdda' command; only 'lcms' exists for LC-MS (verified via `MSDIALCUI.exe` with no args and `MSDIALCUI.exe lcms --help`)." },
+          { "text": "The Skill instructs verifying the installed console's real subcommands before trusting the documented command", "result": "PASS", "note": "Version Compatibility section explicitly says to run the console with no arguments first." },
+          { "text": "R import code correctly splits metadata columns from per-sample intensity columns on a real 4-header-row MS-DIAL-style export", "result": "PASS", "note": "Executed: 45/45 rows and 10/10 sample columns recovered exactly, matching the synthetic ground truth." },
+          { "text": "Fill% >= 70 filter keeps only features whose real Fill% truly meets the threshold", "result": "PASS", "note": "Executed: programmatic ground-truth check confirmed TRUE for all 15 retained features." },
+          { "text": "Output excludes gap-filled/low-confidence features before they could be treated as measurements", "result": "PASS", "note": "Filtered table contains only the 15/45 features with Fill% >= 70, as the Skill intends." }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "DIA/SWATH console command and ABF input requirement",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Same lcmsdia-does-not-exist defect as Input 1; the Skill also never explains that DDA vs DIA is actually selected via the -m method file, not a console token.",
+        "basic": 30,
+        "specialized": 43,
+        "total": 73,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Documented 'lcmsdia' console token exists in the installed MS-DIAL console", "result": "FAIL", "note": "Executed: help banner and MSDIALCUI.exe lcms --help confirm only 'lcms' exists; no separate DIA token." },
+          { "text": "Skill correctly explains that DIA requires ABF-format input, not mzML", "result": "PASS", "note": "Documented and consistent with MS-DIAL's known ABF-only DIA constraint; not contradicted by anything found in the console help (which has no input-format flag to check against)." },
+          { "text": "Skill correctly explains why DIA/SWATH needs MS2Dec deconvolution (chimeric spectra)", "result": "PASS", "note": "Prose explanation is accurate and consistent with the MS-DIAL literature (Tsugawa 2015)." },
+          { "text": "SKILL.md documents how DDA vs DIA is actually distinguished in the real console (method-file parameter, not a separate subcommand)", "result": "FAIL", "note": "Not documented anywhere in SKILL.md; the real console exposes one 'lcms' command for both, so an agent following the Skill has no path to the correct invocation." }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "GC-EI data on MS-DIAL 5 -- is GC-MS supported?",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "The Skill's central claim that MS-DIAL 5 excludes GC-MS is contradicted by the installed 5.5.260820 console, which ships a working 'gcms' subcommand and its own MsdialGcMsApi.dll.",
+        "basic": 25,
+        "specialized": 37,
+        "total": 62,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "SKILL.md's claim 'MS-DIAL 5-alpha excludes GC-MS' / 'No GC-MS option in MS-DIAL 5' holds for the installed, current MS-DIAL 5 console", "result": "FAIL", "note": "Executed: MSDIALCUI.exe (v5.5.260820) lists 'gcms' as a real subcommand and `gcms --help` prints a full, working -i/-o/-m option list; MsdialGcMsApi.dll ships in the same release." },
+          { "text": "Skill correctly explains why GC-EI deconvolution is fundamentally different from LC peak-picking", "result": "PASS", "note": "Accurate, well-sourced (Stein 1999 AMDIS) explanation of component deconvolution as detection." },
+          { "text": "The Common Errors fix for 'No GC-MS option in MS-DIAL 5' (use a MS-DIAL 4 build) is the researcher's best available path", "result": "FAIL", "note": "Misleading: the researcher's already-installed 5.x console has a working gcms mode; the Skill sends them to source and maintain a separate older build unnecessarily." },
+          { "text": "Skill correctly recommends retention-index (not raw RT) alignment for GC-EI cross-run comparability", "result": "PASS", "note": "Accurate and well-justified (column-aging RT drift rationale)." }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Parse an existing AlignResult.txt into pandas and map annotation tags to MSI levels",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Python import section runs correctly; the natural Python port of the R-only MS/MS-support check silently fails because pandas auto-casts the export's TRUE/FALSE text to bool.",
+        "basic": 29,
+        "specialized": 41,
+        "total": 70,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Python import code (verbatim from SKILL.md) correctly separates metadata from sample intensity columns on a real 4-header-row export", "result": "PASS", "note": "Executed: 30/30 rows and 6/6 sample columns recovered exactly, matching synthetic ground truth." },
+          { "text": "The Skill's documented MS/MS-support check correctly flags Metabolite/Lipid+MS/MS features as MSI Level 2 when applied via the Python import path the Skill also documents", "result": "FAIL", "note": "Executed: pandas.read_csv silently casts the 'TRUE'/'FALSE' text column to native bool dtype, so the `== 'TRUE'` string-comparison idiom (the only idiom SKILL.md gives, in R) evaluates to all-False with zero error or warning when ported to Python -- confirmed with an independent 3-line repro. No feature is ever assigned MSI Level 2." },
+          { "text": "Fill% >= 70 filter in Python keeps only truly-qualifying features", "result": "PASS", "note": "Executed: ground-truth check confirmed TRUE for all 12 retained features (numeric column unaffected by the bool-cast issue)." },
+          { "text": "Output does not fabricate identification beyond what the data supports", "result": "PASS", "note": "No fabrication observed; the numeric Fill% filtering remains honest even though the MSI-level tagging silently degrades." }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Full pipeline: MS-DIAL vs XCMS decision, console command, R import, filter, handoff to normalization-qc",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Strong decision framework and correct scope discipline (defers QC-CV/D-ratio/imputation to normalization-qc); repeats the same console-command defect from Input 1.",
+        "basic": 31,
+        "specialized": 49,
+        "total": 80,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Skill gives a clear, defensible decision framework for MS-DIAL vs XCMS", "result": "PASS", "note": "Comparison table plus 'Decision Tree by Scenario' table are specific and actionable, not generic." },
+          { "text": "Full-pipeline console command runs against the installed console as documented", "result": "FAIL", "note": "Same MsdialConsoleApp/lcmsdda defect as Input 1, reused here." },
+          { "text": "Skill defers QC-CV/D-ratio/blank-filtering and MNAR-aware imputation to normalization-qc rather than reimplementing them inline", "result": "PASS", "note": "Explicit one-line handoff plus a sourced (Broadhurst 2018) reference table, no fabricated inline implementation." },
+          { "text": "R import + Fill% honest-filter portion of the full pipeline runs correctly end-to-end", "result": "PASS", "note": "Reuses the same logic verified correct in Input 1." },
+          { "text": "Skill warns that a marker list surviving only one preprocessing pipeline is a candidate, not a validated result", "result": "PASS", "note": "Explicit, sourced (Li 2018) caveat present in the 'Single Most Important Insight' section." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 30.4,
+    "dynamic_weighted": 43.9,
+    "score": 74,
+    "max": 100,
+    "grade": "Beta Only",
+    "grade_symbol": "⚠️",
+    "deployable": false,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "R and Python import/parsing logic (header-skip, metadata/sample-column split) verified correct against independently-generated synthetic MS-DIAL-style exports, with exact row/column-count ground-truth checks.",
+    "Fill%-based honest-filtering logic -- the Skill's stated core value proposition -- verified correct in R against ground truth.",
+    "Quantitative thresholds (Fill%, QC CV, D-ratio, blank filter) are traceable to real, correctly-cited published guidance (Broadhurst 2018, Mahieu 2017), not invented numbers.",
+    "Correct scope discipline: explicitly defers QC-CV/D-ratio filtering and MNAR-aware imputation to normalization-qc rather than reimplementing them, and warns that single-pipeline findings are candidates, not results."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "Documented MsdialConsoleApp lcmsdda/lcmsdia commands do not exist",
+      "observed_in": [1, 2, 5],
+      "problem": "Every 'Run MS-DIAL Headless' example invokes 'MsdialConsoleApp <lcmsdda|lcmsdia|gcms>', but the installed MS-DIAL 5.5.260820 console binary is MSDIALCUI.exe and its only LC-MS subcommand is 'lcms' -- DDA and DIA are not separate console tokens.",
+      "root_cause": "The command examples were written against an older or different MS-DIAL console CLI naming convention and were never re-verified against a current MS-DIAL 5.x release.",
+      "fix": "Rename every 'MsdialConsoleApp' reference to the real executable, replace 'lcmsdda'/'lcmsdia' with 'lcms', and document that DDA vs DIA is selected inside the -m method/param file rather than via the console token; also fix the binary name in the Version Compatibility self-check instruction itself."
+    },
+    {
+      "priority": "P1",
+      "title": "'MS-DIAL 5 excludes GC-MS' claim is contradicted by the installed release",
+      "observed_in": [3],
+      "problem": "SKILL.md states twice (a dedicated subsection and a Common Errors row) that MS-DIAL 5-alpha excludes GC-MS and that GC-EI work requires a MS-DIAL 4 build; the installed MS-DIAL 5.5.260820 console ships a fully working 'gcms' subcommand backed by its own MsdialGcMsApi.dll.",
+      "root_cause": "The claim was accurate for the 5-alpha milestone the Skill was written against but was never re-checked against later MS-DIAL 5.x releases that re-added GC-MS support.",
+      "fix": "Re-verify GC-MS support against the currently-recommended MS-DIAL 5.x release and update or scope the exclusion claim (e.g. '5-alpha only, restored in later 5.x builds') so researchers are not sent to source an unnecessary separate MS-DIAL 4 install."
+    },
+    {
+      "priority": "P1",
+      "title": "Silent MSI-level bug when the R filter idiom is ported to Python",
+      "observed_in": [4],
+      "problem": "The 'Filter the Table Honestly' section gives the MS/MS-support check only in R ('== \"TRUE\"' against a character column). The natural Python port silently evaluates to all-False because pandas.read_csv auto-casts the export's TRUE/FALSE text to native bool -- with no error or warning -- so every feature loses its MSI Level 2 assignment.",
+      "root_cause": "No Python-specific filter snippet exists, leaving readers to port an R string-comparison idiom into a language where the equivalent column is silently a different dtype.",
+      "fix": "Add an explicit Python filter snippet that compares against boolean True (or forces the column to stay textual, e.g. dtype=str on read_csv), and add the TRUE/FALSE auto-bool-cast trap to the Common Errors table."
+    },
+    {
+      "priority": "P2",
+      "title": "No explicit 'When NOT to use' section",
+      "observed_in": [],
+      "problem": "Human Usability is reduced because scope boundaries (vs. xcms-preprocessing, vs. normalization-qc, vs. metabolite-annotation) must be inferred from the Related Skills list and prose rather than a dedicated section.",
+      "root_cause": "SKILL.md organizes routing information by topic rather than as an explicit inclusion/exclusion boundary list.",
+      "fix": "Add a short 'When NOT to use' section pointing to xcms-preprocessing, lipidomics, metabolite-annotation and normalization-qc with one line each on why."
+    }
+  ]
+}

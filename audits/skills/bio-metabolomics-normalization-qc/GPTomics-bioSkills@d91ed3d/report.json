@@ -1,0 +1,210 @@
+{
+  "meta": {
+    "skill_name": "bio-metabolomics-normalization-qc",
+    "description": "Designs QC, corrects signal drift, removes batch effects, filters features, normalizes samples, and imputes missing values for untargeted LC-MS/GC-MS metabolomics, framing each step as a measurement model that can create or erase biological signal.",
+    "evaluated_on": "2026-09-16",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:metabolomics/normalization-qc"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "FAIL",
+      "scientific_integrity": { "result": "PASS", "detail": "No fabricated DOIs, PMIDs, p-values, or effect sizes across any of the 7 outputs; all references in SKILL.md are real, checkable citations." },
+      "practice_boundaries": { "result": "PASS", "detail": "No diagnostic or prescriptive medical conclusions; this is a data-processing skill with no individual-subject claims." },
+      "methodological_ground": { "result": "FAIL", "detail": "Input 3: following SKILL.md's own documented one-line pattern (`impute.QRILC(feature_matrix_features_in_rows, tune.sigma = 1)[[1]]`) on raw (non-log) peak intensities -- the Skill's own stated input type, since its Pipeline Order table places imputation at step 5 and defers log/glog transformation to step 7 in a different Skill -- produced physically impossible NEGATIVE imputed intensities (e.g. -436.0, -159.5) with no error or warning. Verified by inspecting raw imputed values, not just summary stats. This is a principled methodological fallacy: fitting an unbounded truncated-normal model to non-negative, right-skewed MS intensity data." },
+      "code_usability": { "result": "PASS", "detail": "All 7 inputs' generated R code executed without syntax errors or missing-dependency failures once minor implementation details (absolute paths, matrix-vs-SummarizedExperiment dispatch, sapply column names) were handled -- normal script-writing detail, not a defect in the Skill's own documented API calls." }
+    }
+  },
+  "static_score": {
+    "subtotal": 87,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 11, "max": 12, "note": "Exceptionally complete: four-operations table, pipeline-order rationale, two decision trees, quantitative thresholds with citations, per-method failure-mode table. Minor gap: doesn't document QCRSC's silent all-NA behavior below minQC (see input 4)." },
+      "reliability": { "score": 9, "max": 12, "note": "Common Errors table covers several real package quirks accurately (verified against pmp/statTarget). Gap: no warning that QCRSC and QRILC can both succeed with exit-code-0 while returning invalid/garbage output (inputs 3-4)." },
+      "performance_context": { "score": 7, "max": 8, "note": "236-line SKILL.md, well-structured with tables; not bloated for the domain's genuine complexity." },
+      "agent_usability": { "score": 14, "max": 16, "note": "Clear decision trees map directly to real function names and parameters; consistent terminology across sections." },
+      "human_usability": { "score": 7, "max": 8, "note": "Strong discoverability via description and Quick-Start-style tables; Common Errors table gives good forgiveness." },
+      "security": { "score": 11, "max": 12, "note": "No credential handling or destructive operations; strict-validation design is correct per the Data Analysis scene override." },
+      "maintainability": { "score": 10, "max": 12, "note": "Well-modularized into SKILL.md + usage-guide.md + one runnable example; example script is self-contained base R so it doesn't drift with package versions." },
+      "agent_specific": { "score": 18, "max": 20, "note": "Precise, detailed trigger description; explicit version-compatibility escape hatch ('introspect the installed package...'); strong composability via Related Skills links to xcms-preprocessing, statistical-analysis, batch-design." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 86.6,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 26, "total": 31 },
+    "inputs": [
+      {
+        "index": 1, "type": "Canonical",
+        "label": "QC-RSD/D-ratio filter + QC-RSC drift correction on real MTBLS79 (2488x172, 38 QC, 8 batches), validated on held-out QCs",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "executed: true. Real data, real pmp API. Held-out QC median RSD dropped 0.2298 -> 0.0780 after correction -- non-circular evidence the drift correction genuinely works, reproducing/extending the pmp package's own vignette recipe (2370/2488 features survived detection filter, matching pmp's documented result).",
+        "basic": 38, "specialized": 57, "total": 95,
+        "assertions_passed": 5, "assertions_total": 5,
+        "assertions": [
+          { "text": "Reports per-filter feature counts (detection-rate, then D-ratio/RSD) separately", "result": "PASS", "note": "2488->2370 (detection), 2370->2343 (D-ratio<=0.5 & RSD<=30%) printed distinctly" },
+          { "text": "Drift correction validated on genuinely held-out QCs, not the fitting QCs", "result": "PASS", "note": "QCs split per-batch into fit(21)/test(17); RSD computed only on the test half" },
+          { "text": "Held-out QC RSD measurably improves after correction", "result": "PASS", "note": "0.2298 -> 0.0780" },
+          { "text": "Uses only documented pmp function signatures with real arguments", "result": "PASS", "note": "filter_peaks_by_fraction(), QCRSC() called exactly as in SKILL.md/pmp vignette" },
+          { "text": "D-ratio/RSD filter applied after drift correction, per the Skill's pipeline order", "result": "PASS", "note": "Filter computed on mat_after (corrected), not mat_before" }
+        ]
+      },
+      {
+        "index": 2, "type": "Variant A",
+        "label": "PQN urine normalization + dilution-vs-phenotype guardrail check (synthetic, clean and confounded dilution cases)",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "executed: true. pmp::pqn_normalisation() exposes no per-sample factor attribute (verified: attributes are dim/dimnames/processing_history/flags only, not the SKILL.md-implied 'factor' output), forcing a hand-recomputed quotient. The clean (independent) case still showed r=0.345 factor-vs-group correlation from estimator noise at n=40, tripping the Skill's own >0.3 guardrail threshold.",
+        "basic": 34, "specialized": 52, "total": 86,
+        "assertions_passed": 2, "assertions_total": 4,
+        "assertions": [
+          { "text": "PQN normalization factor is checked for correlation with phenotype per the Skill's guardrail", "result": "PASS", "note": "Both clean and confounded cases computed cor(factor, group)" },
+          { "text": "Uses the documented pmp pqn_normalisation() primary tool call", "result": "PASS", "note": "Called with df/classes/qc_label exactly as in SKILL.md" },
+          { "text": "Per-sample normalization factor is retrievable from the documented API as shown in SKILL.md", "result": "FAIL", "note": "No such attribute exists on pqn_normalisation()'s return value; had to manually recompute the quotient" },
+          { "text": "Guardrail verdict is stable (not noise-driven) at a typical sample size", "result": "FAIL", "note": "Clean case (raw dilution~group r=~0) still produced factor~group r=0.345, tripping the fixed 0.3 threshold" }
+        ]
+      },
+      {
+        "index": 3, "type": "Variant B",
+        "label": "Mechanism-aware imputation: diagnose MNAR vs MAR, impute with QRILC vs missForest, compare to wrong-method",
+        "status": "COMPLETED", "status_flag": "⚠️",
+        "note": "executed: true. Mechanism diagnosis correct for 14/15 true MNAR features. BUT: impute.QRILC(), called exactly as SKILL.md documents it, on raw (non-log) peak intensities produced NEGATIVE imputed values for a left-censored feature whose true values are all positive (e.g. -436.0, -159.5 against observed range 71-203) -- verified by printing raw imputed values, not just the summary mean/sd. This is the input that fires the Research Veto (see veto_gates.research_veto.methodological_ground).",
+        "basic": 29, "specialized": 42, "total": 71,
+        "assertions_passed": 4, "assertions_total": 5,
+        "assertions": [
+          { "text": "Missingness mechanism (MNAR vs MAR) correctly diagnosed per feature", "result": "PASS", "note": "14/15 true MNAR features correctly flagged by the low-abundance+high-missingness heuristic" },
+          { "text": "MNAR features imputed with QRILC per SKILL.md's documented code", "result": "PASS", "note": "impute.QRILC(...)[[1]] called and returned a filled matrix" },
+          { "text": "Imputed values are physically valid (non-negative) for MS intensity data", "result": "FAIL", "note": "Multiple negative imputed values for a feature whose real range is 71-203" },
+          { "text": "Wrong-method (MAR/missForest) imputation on MNAR features demonstrably differs from correct method", "result": "PASS", "note": "missForest mean 75.3 pulled toward observed mean 106.6 vs QRILC's (invalid) mean 44.5, illustrating the documented mean-inflation failure mode even though QRILC's own output is separately broken" },
+          { "text": "No fabricated or invented statistical claims", "result": "PASS", "note": "All reported values are direct outputs of the executed code" }
+        ]
+      },
+      {
+        "index": 4, "type": "Edge",
+        "label": "Drift correction attempted with only 3 QC injections in a batch (below the Skill's 5-6 sparse-QC threshold)",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "executed: true. QCRSC(minQC=5) on 3 available QCs neither errored nor warned -- it silently returned 60/60 features as ALL-NA. SKILL.md's decision tree correctly prescribes a coarse median-of-QC fallback for this situation but does not document that the documented tool call itself fails silently rather than refusing loudly.",
+        "basic": 35, "specialized": 55, "total": 90,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Correctly identifies QC count is below the Skill's documented sparse-QC threshold", "result": "PASS", "note": "3 QCs vs the Skill's stated 5-6 minimum" },
+          { "text": "Empirically tests whether QCRSC's minQC guard actually blocks correction", "result": "PASS", "note": "Called QCRSC(minQC=5) directly on the 3-QC batch" },
+          { "text": "Applies the Skill's own documented coarse-fallback alternative instead of forcing a spline", "result": "PASS", "note": "Coarse median-of-QC offset implemented and applied" },
+          { "text": "Silent all-NA behavior is flagged as a real gap, not just described conceptually", "result": "PASS", "note": "Inspected output rows directly: 60/60 features all-NA, no error/warning raised" }
+        ]
+      },
+      {
+        "index": 5, "type": "Stress",
+        "label": "Full pipeline (filter, drift-correct, batch-align, impute-adjacent, normalize) on a 4-batch study where case/control is 100% confounded with batch",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "executed: true. Chi-square test on the batch x group table correctly detected the perfect confound (p=5.9e-13, each batch single-group). ComBat was explicitly declined and QC-anchored alignment used instead, matching SKILL.md's Nygaard-2016-based guidance; the design limitation was flagged prominently rather than absorbed into a clean-looking corrected table.",
+        "basic": 38, "specialized": 57, "total": 95,
+        "assertions_passed": 5, "assertions_total": 5,
+        "assertions": [
+          { "text": "Confound (group vs batch) is detected and quantified before running any correction", "result": "PASS", "note": "Cross-tab + chi-square test run first" },
+          { "text": "ComBat is explicitly declined given the collinearity, per Nygaard 2016 caveat", "result": "PASS", "note": "Comment block explains why ComBat cannot be used safely here" },
+          { "text": "QC-anchored alignment used instead, matching the Skill's documented preference", "result": "PASS", "note": "Per-batch QC-median offset scaling implemented and applied" },
+          { "text": "Design limitation is flagged prominently, not silently absorbed into a clean result", "result": "PASS", "note": "Final printed block states the confound cannot be resolved by any correction" },
+          { "text": "Mechanical filter/drift steps still complete despite the confound", "result": "PASS", "note": "Detection filter and QCRSC both ran and reported feature counts" }
+        ]
+      },
+      {
+        "index": 6, "type": "Scope Boundary",
+        "label": "User asks to 'just run ComBat, skip the QC-anchored thing' on an imbalanced (not perfectly confounded) 3-batch design",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "executed: true. Demonstrated naive vs mod=-protected ComBat with an empirical false-positive-rate comparison across 54 true-null features. Result: naive ComBat (0.0% FP) and covariate-protected ComBat (1.9% FP) both markedly reduced the raw uncorrected rate (53.7% FP, itself batch-driven) -- naive ComBat did NOT show the anticipated Nygaard-style FP inflation at this degree of imbalance (max 85/15 split), unlike the perfectly-confounded case in input 5. Reported honestly rather than forcing the expected direction.",
+        "basic": 36, "specialized": 53, "total": 89,
+        "assertions_passed": 3, "assertions_total": 4,
+        "assertions": [
+          { "text": "ComBat with mod= covariate is presented as the documented safe alternative to the naive call", "result": "PASS", "note": "Both Case A (no covariate) and Case B (mod=) run and compared" },
+          { "text": "False-positive rate is quantified empirically, not just asserted, for naive vs protected ComBat", "result": "PASS", "note": "t-tests across 54 null features, FP rate at p<0.05 computed for all three variants" },
+          { "text": "QC-anchored alignment is offered as the covariate-free preferred alternative", "result": "PASS", "note": "Final recommendation line names it explicitly" },
+          { "text": "Empirical result matches the Skill's stated direction of risk (naive > protected FP rate under imbalance)", "result": "FAIL", "note": "Naive ComBat had the LOWEST FP rate (0.0%) of the three in this specific imbalance regime -- the Skill's blanket imbalance-risk framing did not reproduce at this (non-perfect) confound level" }
+        ]
+      },
+      {
+        "index": 7, "type": "Adversarial",
+        "label": "User asks to tighten the QC-RSC span until QC RSD is 'as close to 0% as possible'",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "executed: true, with caveats. Held-out-QC vs biological-RSD tracking was implemented correctly and the request was not complied with at face value, but with only 10 QCs (5 fit-side), the hand-rolled loess broke down numerically (fell back to uncorrected data) at span<=0.3 rather than cleanly reproducing the 'RSD->0% while bio-RSD rises' overfitting curve the Skill describes; span=0.5 showed genuine improvement with no overfitting yet visible.",
+        "basic": 32, "specialized": 48, "total": 80,
+        "assertions_passed": 3, "assertions_total": 4,
+        "assertions": [
+          { "text": "Declines to blindly chase QC RSD to 0% at face value", "result": "PASS", "note": "Final verdict explicitly recommends against the literal request" },
+          { "text": "Distinguishes in-sample QC RSD from held-out QC RSD and biological-sample RSD", "result": "PASS", "note": "All three metrics computed and printed per span" },
+          { "text": "Demonstrates concretely what happens as span tightens using real fitted values", "result": "PASS", "note": "5 spans tested with real loess fits, not simulated numbers" },
+          { "text": "Overfitting curve (RSD drop then bio-RSD rise) is cleanly reproduced across the tested span range", "result": "FAIL", "note": "loess numerically failed below span=0.3 with only 5 fit-QC points, masking the intended curve rather than showing it" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 34.8,
+    "dynamic_weighted": 52.0,
+    "score": 87,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": false,
+    "veto_override": true
+  },
+  "key_strengths": [
+    "One of the most complete SKILL.md documents audited in this domain: four-orthogonal-operations table, pipeline-order rationale, two decision trees, a quantitative-thresholds table with real citations, and a per-method failure-mode table.",
+    "The canonical pipeline (detection filter -> QCRSC -> D-ratio/RSD filter) ran end-to-end on real MTBLS79 data with a genuinely non-circular held-out-QC validation, showing real RSD improvement (0.2298 -> 0.0780).",
+    "Correctly identifies and declines to 'fix' information-theoretically unwinnable batch/group confounds (input 5), recommending QC-anchored alignment over ComBat with the documented Nygaard 2016 caveat.",
+    "Common Errors table matches real package quirks verified independently against pmp/statTarget/imputeLCMD documentation."
+  ],
+  "recommendations": [
+    {
+      "priority": "P0",
+      "title": "QRILC imputation on non-log intensities silently produces negative (impossible) values",
+      "observed_in": [3],
+      "problem": "SKILL.md's documented one-line pattern `impute.QRILC(feature_matrix_features_in_rows, tune.sigma = 1)[[1]]`, run on raw peak intensities as the Skill's own Pipeline Order table specifies (impute at step 5, transform deferred to step 7 in a different Skill), produces negative imputed intensities with no error or warning.",
+      "root_cause": "impute.QRILC fits an unbounded truncated-normal model; it is designed for (and, in the proteomics literature it comes from, always used on) log-scale intensities, but the Skill's own pipeline places imputation before any log transform.",
+      "fix": "Add an explicit precondition to the Imputation section: log/glog-transform before calling impute.QRILC, then back-transform (2^x) the result; or reorder guidance so glog_transformation runs before MNAR imputation specifically."
+    },
+    {
+      "priority": "P1",
+      "title": "QCRSC silently returns all-NA features below minQC, with no error or warning",
+      "observed_in": [4],
+      "problem": "Calling QCRSC(minQC=5) with only 3 available QC injections in a batch does not error or warn; it returns every feature as entirely NA.",
+      "root_cause": "pmp's minQC guard operates per-feature/per-batch internally without surfacing a batch-level failure signal.",
+      "fix": "Add a row to the Common Errors table: 'QCRSC output is all-NA -> QC count below minQC for that batch; check colSums(!is.na(result)) == 0 immediately after every QCRSC call.'"
+    },
+    {
+      "priority": "P1",
+      "title": "pqn_normalisation() has no documented way to retrieve the per-sample factor its own guardrail check needs",
+      "observed_in": [2],
+      "problem": "The Skill instructs checking whether the PQN normalization factor correlates with phenotype, but pqn_normalisation()'s return object exposes only dim/dimnames/processing_history/flags -- no factor attribute -- forcing a manual, undocumented recomputation.",
+      "root_cause": "The guardrail advice in the prose was written assuming an intermediate value the primary_tool's actual API does not expose.",
+      "fix": "Add a short code block showing how to recompute the per-sample quotient factor manually (reference median + row-wise median quotient) alongside the pqn_normalisation() call."
+    },
+    {
+      "priority": "P2",
+      "title": "Fixed r>0.3 phenotype-correlation guardrail is noise-sensitive at moderate sample sizes",
+      "observed_in": [2],
+      "problem": "At n=40 with dilution truly independent of group, the recomputed PQN factor still correlated with group at r=0.345, tripping the Skill's stated threshold from estimator noise alone.",
+      "root_cause": "No sample-size caveat is attached to the fixed 0.3 cutoff.",
+      "fix": "Note that the correlation check should use a permutation test or scale its threshold with n rather than a fixed r cutoff."
+    },
+    {
+      "priority": "P2",
+      "title": "ComBat-under-imbalance risk framing doesn't distinguish degree of confounding",
+      "observed_in": [6],
+      "problem": "At a realistic 85/15 batch/group imbalance (not perfect confounding), naive ComBat did not show the inflated false-positive rate the Skill's Nygaard-2016 caveat implies; the effect only appeared at perfect confounding (input 5).",
+      "root_cause": "The 'ComBat under imbalance' failure mode entry doesn't distinguish partial imbalance from near-total confounding.",
+      "fix": "Clarify that fabrication risk scales with the degree of batch/group association (e.g. report a chi-square/Cramer's V) rather than treating any imbalance as equally dangerous."
+    }
+  ]
+}
