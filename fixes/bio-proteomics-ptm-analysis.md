@@ -30,3 +30,42 @@ Unfixed:
 - **[P2] Modification names hard-coded to phospho.** A six-substitution refactor of two working blocks; nothing computes the wrong answer, so out of scope per the brief ("rewriting what works").
 - **[P2] PTM-SEA and empirical FLR lack runnable routes.** New content (new tool commands), out of scope.
 - **[P2] SKILL.md too heavy for context.** Restructuring into `references/`, not a correction.
+
+
+## Pass 5 (2026-09-15)
+
+Re-audit after pass 2 scored **85 (raw 84.7)**, deployable, with the pass-2 KSEA correctness fix verified against
+known truth (sign agreement 3/3, Spearman rho 1.0, a hand-computed Casado z matching the package to 0). That fix
+was **not touched**. Worktree `F:\OpenScience\external\bioSkills-wt-prot5b`, branch `fix/proteomics-5b`, cut from
+`openscience-fixes` at `1110c24`. Commit `b5355db`. Runtime: R 4.4.3 via the candidate `r.sh` -- MSstatsPTM 2.8.1,
+MSstatsTMT 2.14.2, KSEAapp 2.0 (installed in the shared R-lib now, nothing installed or changed by this pass).
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| No route for TMT / isobaric phosphoproteomics; the scope statement did not admit the gap | P1 | **Route written** (Sam's decision, 2026-09-15: write it, do not scope it out). New "TMT / isobaric plexes -- same adjustment, three different calls" subsection under the MSstatsPTM section: `labeling_type = 'TMT'` on `MaxQtoMSstatsPTMFormat`, `dataSummarizationPTM_TMT` (a different function, not a flag), `groupComparisonPTM(data.type = 'TMT')`, the MSstatsTMT annotation columns, and the `Condition = 'Norm'` reference channel `reference_norm`/`remove_norm_channel` need. Plus the two TMT-specific traps for the *adjustment* -- ratio compression biases `dFC_PTM - dFC_protein` rather than merely attenuating it, and enriched + global should share a plex. Decision Tree gained two rows; scope sentence now reads "label-free AND TMT"; usage-guide gained a TMT prompt and route line; `TMT_keyword` documented as belonging to the `sites_data =` route only | **ran, not parsed.** Built a synthetic TMT10 MaxQuant evidence pair (phospho + global, 8 sample channels + 2 pooled `Norm`) by reshaping the audit's own label-free synthetic set, so `truth_sites.csv` still applies. The block extracted verbatim from SKILL.md completes: `names(input)` = PTM PROTEIN, all four models, **39 ADJUSTED site rows**, Label `Treatment vs Control`. Against planted truth it behaves like the label-free route: protein_driven calls **6/8 -> 1/8** after adjustment, site_regulated **8/8** retained, masked **1/4 -> 3/4** recovered, sign agreement **8/8**, Spearman rho 0.691 vs true occupancy log2FC | The re-auditor could not execute the silent path for want of TMT evidence; this pass could. See the correction below |
+| KSEA breaks on an empty filtered PX and on a single-match prior | P2 | Three guards around (never inside) the pass-2 correctness filter: `nrow(ks) == 0` stops with a message about one-condition sites; `Peptide = rep('NULL', nrow(ks))` instead of the length-1 literal; `nrow(PX) == 0` after the gene-symbol drop; and an explicit prior-coverage count, `paste(Gene, Residue.Both)` against `paste(SUB_GENE, SUB_MOD_RSD)` over the PhosphoSitePlus subset, stopping with the coverage number when it is below 2. Two Common Errors rows | ran: the re-audit's six-shape Input-D probe set plus a no-gene-symbol probe, with the block body spliced in verbatim. D4 (single-match prior) and D6 (empty PX) now stop with the coverage / one-condition messages instead of `no rows to aggregate` and `differing number of rows: 0, 1`. **D1, D2, D3 and D5 are unchanged to the last digit** -- BASO -2.5514841 FDR 0.008044892, PRO 3.3688957 FDR 0.001132050, RANDOM -0.6524595 FDR 0.257052400 | The coverage threshold is deliberately conservative; the real Input-1 table covers 14 of 31 sites and passes |
+| Version Compatibility did not name the TMT dependency | P2 (found while working) | `MSstatsTMT 2.14.2 (the TMT route)` and `KSEAapp 2.0` added, with the check date | ran: versions printed from the session that executed the TMT route | |
+
+**A claim I wrote and then had to correct.** The first draft of the TMT section said the reverse misconfiguration
+is silent -- that TMT evidence left on the default `labeling_type = 'LF'` would make the converter read the MS1
+`Intensity` column and collapse the channels. Executed on real TMT evidence, it is **not** silent: it stops with
+`A non-empty vector of column names for 'by' is required`. Both directions are now documented with their exact
+messages, with the point that neither message mentions labeling. (The forward direction reproduces the
+re-audit's finding: a label-free annotation with `labeling_type = 'TMT'` gives `Extra columns included in the
+annotation file that are not required ... Run, Raw.file, Fraction, TechRepMixture, Channel, Condition, Mixture,
+BioReplicate` -- which doubles as the spec for the TMT annotation.)
+
+**Label-free regression.** The MSstatsPTM block run verbatim from the edited SKILL.md on the audit's Input-1 data
+still gives 36 ADJUSTED site rows, 10 regulated by TREAT (masked 2, null 3, site_regulated 5) and 1 non-finite
+log2FC row -- the re-audit's numbers cell for cell. All three R fences `parse()`; all three Python fences and the
+shipped `examples/phospho_analysis.py` `py_compile`.
+
+## Left unfixed (pass 5)
+
+- **[P2] Modification names hard-coded to phospho in both code paths.** Unchanged from pass 2: a six-substitution
+  refactor of two working blocks, nothing computes a wrong answer.
+- **[P2] PTM-SEA and empirical FLR have no runnable route.** ssGSEA2.0 and LuciPHOr2 are both installed, so this
+  is now writable under the "missing referenced executables" rule -- but it is a second, independent route and
+  this pass was already adding the TMT one. Flagged for a later pass rather than bundled in.
+- **[P2] 391 -> 477 lines with no `references/`.** The TMT route necessarily grew the file. Splitting is a
+  restructure, out of scope, and the static token-cost mark will get worse before it gets better.
