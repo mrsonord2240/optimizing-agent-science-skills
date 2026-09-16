@@ -37,9 +37,31 @@ correction, not new content:
 Method-level changes are allowed only when the audit demonstrated the problem with a run (e.g. a
 recommended default that distorted branch lengths). Say what the evidence was.
 
-**Not in scope:** new sections, new tools, broader coverage, restyling prose, rewriting what works.
-Keep diffs minimal. Never change the frontmatter `name`. Change `description` only if it is wrong.
-Do not tune text toward the audit's assertions; fix the defect the assertion exposed.
+## Missing referenced executables (2026-09-15)
+
+A Skill that names a tool, method or routine and ships no runnable code for it has a defect, not a
+gap in coverage — the audits keep capping such Skills below their floor, and three separate fixers
+declined the work as "new content" before Sam settled it: **write the executable.**
+
+So when the Skill's own `SKILL.md`, `usage-guide.md` or decision tree references something a user
+could reasonably expect to run, you have two options and must take one:
+
+- **write it** — a runnable block in the Skill's existing voice and structure, using a tool that is
+  actually installed on this machine (check the candidate's `TOOLS.md` first); or
+- **delete the claim** — remove it from the description, decision tree and prose, so the Skill stops
+  advertising what it cannot do.
+
+Leaving it as an unbacked mention is not an option. Prefer writing it when the tool is installed and
+the audit's assertions show a user was expected to run it; prefer deleting when the tool is
+registration-gated, absent, or outside the Skill's scope. Say which you chose and why.
+
+This is bounded by what the Skill already claims. It is not licence for broader coverage: extend the
+existing sections, do not restructure them, and do not add a tool the Skill never mentioned.
+
+**Still not in scope:** broader coverage, new tools the Skill does not reference, restyling prose,
+rewriting what works. Keep diffs minimal. Never change the frontmatter `name`. Change `description`
+only if it is wrong, or to drop a claim you deleted under the rule above. Do not tune text toward the
+audit's assertions; fix the defect the assertion exposed.
 
 ## Verify every change
 
@@ -49,13 +71,21 @@ Do not tune text toward the audit's assertions; fix the defect the assertion exp
   say which.
 - Every changed `.py` must `py_compile`; every changed `.R` must parse (`Rscript -e "parse('f.R')"`);
   every changed `.sh` must pass `bash -n`.
-- Never claim a fix ran when it did not.
+- **Code you write under "Missing referenced executables" must actually execute** — "it parses" is not
+  evidence. Run it, and where you can, show it recovers something checkable (a known spike-in ratio, a
+  realized FDR against planted truth) rather than merely exiting zero. Record the exact version of
+  every tool you invoke.
+- Never install into the shared venv or R library, and never change a version there — other agents
+  are using it. If you need a package that is absent, say so in your final message instead.
+- Never claim a fix ran when it did not, and never diagnose from a single exit code — confirm with a
+  second independent method.
 
 ## Record
 
 - One commit per Skill on your branch, `git commit -F <msgfile>`:
-  `fix(<folder>/<skill>): <one-line summary>`, body = one line per finding → change → how verified,
-  ending with `Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>`.
+  `fix(<folder>/<skill>): <one-line summary>` — or `feat(...)` when the commit is mostly executables
+  written under "Missing referenced executables" — body = one line per finding → change → how
+  verified, ending with `Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>`.
 - `F:\optimizing-agent-science-skills\fixes\<skill-id>.md` (outside the fork, so it never ships):
   dated heading, then a table `finding | priority | change | verified (ran / help / docs) | notes`, and
   a list of findings left unfixed with the reason.
