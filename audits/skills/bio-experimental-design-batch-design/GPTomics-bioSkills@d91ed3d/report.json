@@ -1,0 +1,165 @@
+{
+  "meta": {
+    "skill_name": "bio-experimental-design-batch-design",
+    "description": "Designs genomics experiments so technical nuisance variation (batch, lane, plate, flow cell, operator, reagent lot, processing day) is balanced against the biological variable of interest and therefore estimable rather than confounded, using constrained sample-to-batch assignment (designit, OSAT), the confounder/mediator/collider distinction, and the principle that no post-hoc correction recovers a fully confounded design. Covers detecting hidden batches with surrogate variable analysis, a decision table for downstream correction (ComBat-seq, RUVSeq, SVA) whose execution is deferred to differential-expression/batch-correction, and reproducibility metadata. Use when assigning samples to sequencing batches/lanes/plates, avoiding batch-condition confounding, deciding whether a design is salvageable by correction, choosing a correction method, or estimating the number of hidden batches. For the experimental unit, randomization, and blocking concepts see experimental-design/randomization-blocking.",
+    "evaluated_on": "2026-09-15",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Protocol Design",
+    "execution_mode": "A",
+    "complexity": "Moderate",
+    "n_inputs": 5,
+    "source": "mrsonord2240/bioSkills@575ab946989a7029d235eb0ab711e47b08edbcb0:experimental-design/batch-design",
+    "audit_type": "first audit (no fix applied; files identical to GPTomics/bioSkills@d91ed3d)",
+    "executed_inputs": "5/5"
+  },
+  "veto_gates": {
+    "skill_veto": { "gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS" },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All numbers come from runs on labelled synthetic designs and matrices; the eight references (Leek 2010, Nygaard 2016, Johnson 2007, Zhang 2020, Leek & Storey 2007, Gagnon-Bartsch 2012, Kang 2018, Yan 2012) are real." },
+      "practice_boundaries": { "result": "PASS", "detail": "Design guidance only; no individual-level diagnostic or treatment content." },
+      "methodological_ground": { "result": "PASS", "detail": "Core claims reproduced: ComBat cannot rescue a confounded design (0 calls or 279 false calls), and ComBat-then-test on an unbalanced design gave 33.1% realized FDR vs 4.6% with batch in the model." },
+      "code_usability": { "result": "PASS", "detail": "The designit block ran verbatim on designit 0.5.1 and the SVA block on sva 3.54.0 (complete matrix); the example exits 0. The SVA block stopping on a matrix with missing values is an undocumented input requirement (P1), not unrunnable code." }
+    }
+  },
+  "static_score": {
+    "subtotal": 81,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 10, "max": 12, "note": "Completeness 3: assignment, confounding, SVA and a correction decision table; no OSAT code and no code for the reference/bridge channel it recommends. Correctness 4: every claim tested reproduced. Appropriateness 3: framed for sequencing counts; LC-MS and TMT appear only in the taxonomy." },
+      "reliability": { "score": 7, "max": 12, "note": "No check that the optimized layout is balanced, no guard for missing values before sva(); API-drift warnings are good." },
+      "performance_context": { "score": 7, "max": 8, "note": "189 lines; designit optimization took 154 s on a 64-position layout with default settings." },
+      "agent_usability": { "score": 13, "max": 16, "note": "Clear causal framing and failure modes; no instruction to print and verify the condition x batch table after optimization (Input 2 stopped at a sub-optimal 9/6 split)." },
+      "human_usability": { "score": 7, "max": 8, "note": "Natural trigger language ('design my experiment so batch effects don't ruin it')." },
+      "security": { "score": 11, "max": 12, "note": "No credentials or data exposure; input checks limited to what designit and sva do themselves." },
+      "maintainability": { "score": 9, "max": 12, "note": "Self-contained example that runs; SKILL.md designit block has no seed." },
+      "agent_specific": { "score": 17, "max": 20, "note": "Clear stop condition (redesign a confounded study), routes execution to batch-correction and concepts to randomization-blocking; genomics-only trigger wording under-triggers for proteomics." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 83.2,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 17, "total": 21 },
+    "inputs": [
+      {
+        "index": 1, "type": "Canonical", "label": "24 plasma samples into 3 LC-MS batches, condition and sex balanced",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "designit block ran verbatim (designit 0.5.1): condition 4/4/4 and sex 4/4/4 in every batch, no empty positions.",
+        "executed": true,
+        "execution_note": "runs/in1_designit.R sourcing block b02 (its example sample frame matches this design); SYNTHETIC design; output runs/in1_designit.out.",
+        "basic": 36, "specialized": 50, "total": 86,
+        "assertions_passed": 5, "assertions_total": 5,
+        "assertions": [
+          { "text": "The designit assignment block runs as written on the installed version", "result": "PASS", "note": "designit 0.5.1" },
+          { "text": "Condition is balanced across batches", "result": "PASS", "note": "4/4/4" },
+          { "text": "The secondary covariate is balanced across batches", "result": "PASS", "note": "Sex 4/4/4" },
+          { "text": "All samples are placed", "result": "PASS", "note": "0 empty positions" },
+          { "text": "Scope: correction execution is routed to differential-expression/batch-correction", "result": "PASS", "note": "Decision table" }
+        ]
+      },
+      {
+        "index": 2, "type": "Variant A", "label": "60 plasma samples into 4 TMTpro 16plex plexes with a pooled bridge channel",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Agent adapted designit (exclude channel 16 per plex); the bridge channel stayed free, sites 4-6 per plex, but the optimizer stopped at score 6 with cases 7/7/7/9 where 7-8 per plex was achievable; the Skill gives no bridge-channel code and no instruction to verify balance.",
+        "executed": true,
+        "execution_note": "runs/in2_tmt_plex.R (agent adaptation of block b02); SYNTHETIC design; 154 s; output runs/in2_tmt_plex.out.",
+        "basic": 33, "specialized": 44, "total": 77,
+        "assertions_passed": 2, "assertions_total": 4,
+        "assertions": [
+          { "text": "A pooled reference channel is reserved in every plex", "result": "PASS", "note": "Channel 16 unused by samples" },
+          { "text": "The Skill provides code or parameters for a bridge/reference-channel layout", "result": "FAIL", "note": "Taxonomy row only" },
+          { "text": "Condition balance across plexes is as good as achievable", "result": "FAIL", "note": "Cases 7/7/7/9; 7-8 per plex achievable" },
+          { "text": "Site is balanced within one sample per plex", "result": "PASS", "note": "4-6 per plex" }
+        ]
+      },
+      {
+        "index": 3, "type": "Edge", "label": "All cases on day 1, all controls on day 2: can ComBat rescue it?",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Simulation confirmed the Skill: ComBat refuses the condition covariate ('confounded with batch'), ComBat without it removes every real change (0 calls), no correction gives 346 calls of which 279 are pure day effect, and ~cond + day is not estimable. Answer: redesign.",
+        "executed": true,
+        "execution_note": "runs/in3_confounded_rescue.R on a SYNTHETIC 1000-protein log2 matrix with known changes and day effect; output runs/in3_confounded_rescue.out.",
+        "basic": 37, "specialized": 55, "total": 92,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "The Skill's claim that correction cannot separate a confounded batch holds", "result": "PASS", "note": "ComBat error with covariate; 0 calls without" },
+          { "text": "Testing without correction attributes the day effect to condition", "result": "PASS", "note": "279 of 346 calls are nulls" },
+          { "text": "The recommended action is redesign, not correction", "result": "PASS", "note": "Decision-tree row followed" },
+          { "text": "Scope: no claim that the existing data can answer the question", "result": "PASS", "note": "Stated explicitly" }
+        ]
+      },
+      {
+        "index": 4, "type": "Variant B", "label": "Hidden batches in a MaxQuant log2 LFQ matrix with missing values",
+        "status": "COMPLETED", "status_flag": "⚠️",
+        "note": "SVA block verbatim on the imported matrix (2120 NA) stopped: 'infinite or missing values in x'. The Skill never mentions missing values; on complete cases (738 of 1500 proteins) it found 1 surrogate variable correlated 1.00 with the unannotated acquisition day.",
+        "executed": true,
+        "execution_note": "runs/in4_sva_proteomics.R sourcing block b03 on the SYNTHETIC shared proteinGroups.txt; output runs/in4_sva_proteomics.out.",
+        "basic": 30, "specialized": 39, "total": 69,
+        "assertions_passed": 2, "assertions_total": 4,
+        "assertions": [
+          { "text": "The SVA block runs on a proteomics matrix as imported", "result": "FAIL", "note": "Missing values stop sva()" },
+          { "text": "The Skill states the complete-matrix requirement or a missing-value strategy", "result": "FAIL", "note": "Absent" },
+          { "text": "On a complete matrix the surrogate variable recovers the hidden day effect", "result": "PASS", "note": "cor 1.00" },
+          { "text": "Surrogate variables are added to the model rather than subtracted", "result": "PASS", "note": "Block comment and failure mode" }
+        ]
+      },
+      {
+        "index": 5, "type": "Stress", "label": "Unbalanced 3-batch design: ComBat-cleaned matrix vs batch in the model",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Over 20 seeds, ComBat-then-limma called 89 proteins per run with 33.1% realized FDR (14% of nulls at p<0.05); batch in the model called 59 with 4.6% (4.8% of nulls at p<0.05), reproducing the Skill's Nygaard warning.",
+        "executed": true,
+        "execution_note": "runs/in5_unbalanced_combat.R, 20 seeded SYNTHETIC replicates; output runs/in5_unbalanced_combat.out.",
+        "basic": 37, "specialized": 55, "total": 92,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "ComBat on an unbalanced design inflates false positives", "result": "PASS", "note": "33.1% realized FDR" },
+          { "text": "Batch as a model covariate stays calibrated", "result": "PASS", "note": "4.6%; null p<0.05 rate 4.8%" },
+          { "text": "The Skill's recommended route is the one that holds", "result": "PASS", "note": "Keep batch in the model" },
+          { "text": "Scope: the ComBat matrix is reserved for visualization", "result": "PASS", "note": "As the Skill states" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 32.4,
+    "dynamic_weighted": 49.9,
+    "score": 82,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Its central claims reproduced exactly: a confounded design is unrescuable and unbalanced ComBat inflated realized FDR to 33% vs 4.6% with batch in the model",
+    "The designit assignment block runs as written and balanced two factors perfectly",
+    "Clear causal framing (confounder, mediator, collider) and an explicit redesign stop condition",
+    "Self-contained example that runs and demonstrates confounded vs balanced layouts"
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "SVA block fails on matrices with missing values",
+      "observed_in": [4],
+      "problem": "sva() stops with 'infinite or missing values in x' on a proteomics log-intensity matrix; the Skill does not mention the requirement.",
+      "root_cause": "The block assumes a complete sequencing-style matrix.",
+      "fix": "State that sva needs a complete matrix and show filtering to complete (or high-completeness) features before num.sv/sva, noting the bias toward abundant features."
+    },
+    {
+      "priority": "P2",
+      "title": "No verification step after optimization",
+      "observed_in": [2],
+      "problem": "designit stopped at a sub-optimal split (9/6 cases in one plex) and nothing in the Skill tells the agent to print and check the balance table or raise iterations.",
+      "root_cause": "The assignment block ends at get_samples().",
+      "fix": "Add a table(condition, batch) check with an acceptance rule and the optimize_design iteration argument."
+    },
+    {
+      "priority": "P2",
+      "title": "Bridge/reference channel layout not shown",
+      "observed_in": [2],
+      "problem": "The taxonomy recommends a reference sample per batch for TMT, but the code gives no way to reserve those positions.",
+      "root_cause": "Genomics-first examples.",
+      "fix": "Show BatchContainer$new(..., exclude = ) reserving one channel per plex, and mention run-order randomization for LC-MS."
+    }
+  ]
+}

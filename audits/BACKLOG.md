@@ -8,7 +8,15 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (11)
+## P1 (12)
+
+### `bio-experimental-design-batch-design` — SVA block fails on matrices with missing values
+
+- Skill: 82, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/experimental-design/batch-design) · [viewer](skills/bio-experimental-design-batch-design/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 4
+- Problem: sva() stops with 'infinite or missing values in x' on a proteomics log-intensity matrix; the Skill does not mention the requirement.
+- Root cause: The block assumes a complete sequencing-style matrix.
+- Fix: State that sva needs a complete matrix and show filtering to complete (or high-completeness) features before num.sv/sva, noting the bias toward abundant features.
 
 ### `bio-phylo-tree-visualization` — Root before colouring clades by MRCA
 
@@ -98,7 +106,23 @@ None open.
 - Root cause: The root-cause analysis varied one family of normalizations, in which the offset and the variance shrinkage move together, and attributed the whole effect to the variable that was easiest to measure.
 - Fix: Rewrite the Approach paragraph: per-run median normalization of a peptide table does two things at once - it transfers a detection-composition difference into a between-condition offset, AND it removes real run-to-run loading variance, shrinking the residual the test divides by. The offset is the detectable symptom of both. Keep the guard exactly as it is (it fired correctly on every configuration tested) and add a second cheap check beside it: compare the residual SD before and after normalization, and treat a large drop as the same warning. Drop 'hundreds of proteins at once' for the measured figure.
 
-## P2 (93)
+## P2 (98)
+
+### `bio-experimental-design-batch-design` — No verification step after optimization
+
+- Skill: 82, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/experimental-design/batch-design) · [viewer](skills/bio-experimental-design-batch-design/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 2
+- Problem: designit stopped at a sub-optimal split (9/6 cases in one plex) and nothing in the Skill tells the agent to print and check the balance table or raise iterations.
+- Root cause: The assignment block ends at get_samples().
+- Fix: Add a table(condition, batch) check with an acceptance rule and the optimize_design iteration argument.
+
+### `bio-experimental-design-batch-design` — Bridge/reference channel layout not shown
+
+- Skill: 82, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/experimental-design/batch-design) · [viewer](skills/bio-experimental-design-batch-design/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 2
+- Problem: The taxonomy recommends a reference sample per batch for TMT, but the code gives no way to reserve those positions.
+- Root cause: Genomics-first examples.
+- Fix: Show BatchContainer$new(..., exclude = ) reserving one channel per plex, and mention run-order randomization for LC-MS.
 
 ### `bio-alignment-trimming` — Caution on trimAl sequence-overlap thresholds
 
@@ -763,6 +787,30 @@ None open.
 - Problem: On a REF mismatch the last pipe step aborts after creating a 0-record non-BGZF file; the next 'bcftools index' fails with 'not BGZF compressed', hiding the real cause.
 - Root cause: The workflow blocks omit the REF pre-check the example now has.
 - Fix: Add `set -o pipefail` and a `bcftools norm -f ref.fa -c w` pre-check (or the example's MISMATCH count) before the pipeline.
+
+### `bio-pathway-go-enrichment` — enrichResult column list is stale
+
+- Skill: 90, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/pathway-analysis/go-enrichment) · [viewer](skills/bio-pathway-go-enrichment/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 1
+- Problem: The Skill lists ID, Description, GeneRatio, BgRatio, pvalue, p.adjust, qvalue, geneID, Count; clusterProfiler 4.14.6 also returns RichFactor, FoldEnrichment and zScore, so the fold enrichment it tells the agent to compute is already provided.
+- Root cause: Column list written against an older clusterProfiler.
+- Fix: Add RichFactor, FoldEnrichment and zScore to the column list and say to use FoldEnrichment when present.
+
+### `bio-pathway-go-enrichment` — simplify() on ont='ALL' silently drops two ontologies
+
+- Skill: 90, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/pathway-analysis/go-enrichment) · [viewer](skills/bio-pathway-go-enrichment/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 4
+- Problem: The Skill predicts 'redundancy not removed, or an error'; in practice it returned only the BP terms (15 of 36), silently discarding CC and MF.
+- Root cause: The failure mode was written from the intent, not from the observed behaviour.
+- Fix: State that simplify() on an ont='ALL' object returns only the first ontology's terms, so BP/MF/CC must be run and simplified separately.
+
+### `bio-pathway-go-enrichment` — Second example is not self-contained
+
+- Skill: 90, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/pathway-analysis/go-enrichment) · [viewer](skills/bio-pathway-go-enrichment/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: —
+- Problem: examples/go_all_ontologies.R stops immediately: it reads a de_results.csv that is not shipped, while the basic example runs offline.
+- Root cause: Example written against a user file.
+- Fix: Have the example simulate a small DE table (as the basic example does) or read one from tempdir().
 
 ### `bio-proteomics-peptide-identification` — dda_search.sh hides Percolator's error from the operator
 

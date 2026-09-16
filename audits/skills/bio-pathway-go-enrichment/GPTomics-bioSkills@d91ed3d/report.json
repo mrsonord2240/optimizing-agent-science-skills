@@ -1,0 +1,166 @@
+{
+  "meta": {
+    "skill_name": "bio-pathway-go-enrichment",
+    "description": "Runs Gene Ontology over-representation analysis (ORA) on a gene LIST with clusterProfiler enrichGO, the one-sided hypergeometric/Fisher 2x2 test phyper(k-1, M, N-M, n, lower.tail=FALSE). Covers why the BACKGROUND universe (not the gene list) is the null and decides significance, why omitting universe= is a bug, why enrichGO defaults to ont='MF' not 'BP', why pvalueCutoff filters p.adjust not raw p, why ORA discards effect magnitude and inherits GO-DAG true-path redundancy (simplify, topGO), why RNA-seq gene-length bias inflates long-gene terms (GOseq Wallenius), plus GeneRatio/BgRatio, bitr ID mapping, minGSSize/maxGSSize, groupGO.",
+    "evaluated_on": "2026-09-15",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Moderate",
+    "n_inputs": 5,
+    "source": "mrsonord2240/bioSkills@575ab946989a7029d235eb0ab711e47b08edbcb0:pathway-analysis/go-enrichment",
+    "audit_type": "first audit (no fix applied; files identical to GPTomics/bioSkills@d91ed3d)",
+    "executed_inputs": "5/5"
+  },
+  "veto_gates": {
+    "skill_veto": { "gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS" },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All numbers come from executed runs; gene identities and GO annotations are real (org.Hs.eg.db 3.20.0, GO.db 3.20.0) while hit/universe membership is synthetic; the nine references are real papers." },
+      "practice_boundaries": { "result": "PASS", "detail": "Functional annotation only; no individual-level or clinical content." },
+      "methodological_ground": { "result": "PASS", "detail": "The hypergeometric framing, universe-as-null, effect-size-alongside-p and DAG-redundancy guidance all held in execution; the circularity warning (terms cannot validate the DE list) is stated." },
+      "code_usability": { "result": "PASS", "detail": "All five R blocks used ran verbatim on clusterProfiler 4.14.6 / org.Hs.eg.db 3.20.0; the basic example exits 0. The GOseq block could not be executed because geneLenDataBase would not install on this machine (recorded, not scored as a defect)." }
+    }
+  },
+  "static_score": {
+    "subtotal": 89,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 11, "max": 12, "note": "Completeness 4: ORA, universe construction, simplify, GOseq, ont='ALL'/groupGO, enricher, other organisms. Correctness 3: every tested claim held, but the documented enrichResult column list is stale - clusterProfiler 4.14.6 also returns RichFactor, FoldEnrichment and zScore, so the fold enrichment the Skill tells the agent to compute is already in the table. Appropriateness 4." },
+      "reliability": { "score": 10, "max": 12, "note": "Explicit recovery guidance (inspect with cutoffs at 1, report conversion rate, flag >15% ID loss); no code-level guards, which is acceptable for a Mode A analysis skill." },
+      "performance_context": { "score": 7, "max": 8, "note": "230 dense lines in one file; enrichGO on a 3500-gene universe took 146 s, simplify 30 s, ont='ALL' 53 s." },
+      "agent_usability": { "score": 16, "max": 16, "note": "Unambiguous: set ont explicitly, pass universe, deduplicate after bitr, read fold enrichment with p.adjust, simplify per ontology; each instruction was directly executable." },
+      "human_usability": { "score": 7, "max": 8, "note": "Natural trigger ('which biological processes are enriched in my gene list?'); strict ENTREZ requirement handled by bitr guidance." },
+      "security": { "score": 11, "max": 12, "note": "Local OrgDb only, no credentials or network; no input validation code." },
+      "maintainability": { "score": 9, "max": 12, "note": "Two examples; the basic one is self-contained and runs, the ont='ALL' one needs an external de_results.csv that is not shipped." },
+      "agent_specific": { "score": 18, "max": 20, "note": "Precise trigger with routing to gsea/kegg/reactome/wikipathways/enrichment-visualization; reproducible given pinned annotation packages; small-list caveat is the main escape hatch." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 90.0,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 20, "total": 22 },
+    "inputs": [
+      {
+        "index": 1, "type": "Canonical", "label": "GO BP ORA on a proteomics hit list with the quantified proteome as universe",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "enrichGO block ran verbatim: 15 terms, the planted GO:0002181 cytoplasmic translation first (fold enrichment 11.66, p.adjust 3.4e-32, 40/146 genes), background N = 3363 annotated genes of the 3500-protein universe, Descriptions readable.",
+        "executed": true,
+        "execution_note": "runs/in1_canonical.R sourcing block b01 verbatim; SYNTHETIC hit/universe membership over REAL org.Hs.eg.db annotations (data/make_go_inputs.R); output runs/in1_canonical.out, terms in runs/in1_terms.csv.",
+        "basic": 38, "specialized": 55, "total": 93,
+        "assertions_passed": 5, "assertions_total": 5,
+        "assertions": [
+          { "text": "The enrichGO block runs as written on the installed clusterProfiler", "result": "PASS", "note": "4.14.6, 146 s" },
+          { "text": "The matched universe is used and N is reported", "result": "PASS", "note": "BgRatio denominator 3363" },
+          { "text": "The planted biology is recovered as the top term", "result": "PASS", "note": "GO:0002181 rank 1, fold enrichment 11.66" },
+          { "text": "ont is set explicitly rather than relying on the MF default", "result": "PASS", "note": "ont='BP' in the block" },
+          { "text": "Fold enrichment is reported alongside p.adjust", "result": "PASS", "note": "(k/n)/(M/N) computed; matches the FoldEnrichment column" }
+        ]
+      },
+      {
+        "index": 2, "type": "Variant A", "label": "Effect of omitting universe= on a null hit list",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "With the matched universe a 150-protein null list gave 0 significant terms; with universe omitted it gave 1 (cellular response to heat, p.adjust 0.033) and the background grew from 3363 to 18986. On the signal list, omission changed the table from 15 to 25 terms (13 shared) and moved the planted term from 3.4e-32 to 3.0e-46.",
+        "executed": true,
+        "execution_note": "runs/in2_universe.R: block b01 verbatim, then the same call with the universe line removed; output runs/in2_universe.out.",
+        "basic": 36, "specialized": 53, "total": 89,
+        "assertions_passed": 3, "assertions_total": 4,
+        "assertions": [
+          { "text": "Omitting universe= changes the null (background N)", "result": "PASS", "note": "3363 -> 18986" },
+          { "text": "Omitting universe= produces significant terms from a list with no biology", "result": "PASS", "note": "1 term vs 0 with the matched universe" },
+          { "text": "The Skill's stated symptom (a confident table dominated by tissue-restricted terms) is reproduced", "result": "FAIL", "note": "Only one extra term on the null list; the effect was real but far smaller than described" },
+          { "text": "Scope: no claim that the enriched terms validate the hit list", "result": "PASS", "note": "Circularity caveat carried into the answer" }
+        ]
+      },
+      {
+        "index": 3, "type": "Edge", "label": "UniProt accessions and a 15-protein hit list",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "bitr mapped all 15 foreground accessions (0% loss) and 3348 universe rows to 3331 unique ENTREZ (115 one-to-many rows deduplicated); the small list still returned 2 significant terms with the planted term first, and inspecting with cutoffs at 1 gave 466 terms with min raw p 4.9e-07 vs min p.adjust 2.3e-04 - confirming pvalueCutoff filters the adjusted p.",
+        "executed": true,
+        "execution_note": "runs/in3_uniprot_small.R (bitr UNIPROT->ENTREZID, then block b01 verbatim); output runs/in3_uniprot_small.out.",
+        "basic": 36, "specialized": 53, "total": 89,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "The documented bitr route maps proteomics accessions and the conversion rate is reported", "result": "PASS", "note": "15/15 foreground, 0% loss" },
+          { "text": "One-to-many maps are deduplicated before counting", "result": "PASS", "note": "115 duplicate rows removed" },
+          { "text": "A 15-gene list still yields the planted term", "result": "PASS", "note": "GO:0002181 p.adjust 2.3e-04" },
+          { "text": "pvalueCutoff filters the adjusted p, as the Skill states", "result": "PASS", "note": "2 terms at defaults vs 466 with cutoffs at 1" }
+        ]
+      },
+      {
+        "index": 4, "type": "Variant B", "label": "GO-DAG redundancy: simplify per ontology, ont='ALL', groupGO",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "simplify collapsed BP from 15 to 7 terms and the translation lineage from 7 to 2; ont='ALL' returned 36 terms with an ONTOLOGY column (BP 15 / CC 13 / MF 8); groupGO returned 476 classification rows with no p-values. simplify() on the ont='ALL' object did not error - it silently returned only the 15 BP terms, dropping CC and MF.",
+        "executed": true,
+        "execution_note": "runs/in4_simplify_all.R sourcing blocks b03 and b05 verbatim, then simplify() on the ALL object; output runs/in4_simplify_all.out.",
+        "basic": 35, "specialized": 52, "total": 87,
+        "assertions_passed": 3, "assertions_total": 4,
+        "assertions": [
+          { "text": "simplify collapses the redundant ancestor lineage", "result": "PASS", "note": "15 -> 7 terms; translation lineage 7 -> 2" },
+          { "text": "ont='ALL' returns the three ontologies with an ONTOLOGY column", "result": "PASS", "note": "BP 15, CC 13, MF 8" },
+          { "text": "groupGO is a classification, not a test", "result": "PASS", "note": "476 rows, no p-value column" },
+          { "text": "The Skill describes what simplify() actually does to an ont='ALL' object", "result": "FAIL", "note": "Skill says 'redundancy not removed, or an error'; it silently returned BP only (15 of 36)" }
+        ]
+      },
+      {
+        "index": 5, "type": "Stress", "label": "Direction-split ORA, fold enrichment, redundancy collapse and a custom gene set",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Up (81) and down (69) proteins tested separately gave 11 and 2 terms with the planted term leading both (fold enrichment 12.39 and 10.80), simplify reduced them to 6 and 1, the mixed list gave 15 terms, and the enricher block ran on a 120-row TERM2GENE with the same universe.",
+        "executed": true,
+        "execution_note": "runs/in5_stress.R using blocks b01, b03 and b06 verbatim; output runs/in5_stress.out.",
+        "basic": 37, "specialized": 55, "total": 92,
+        "assertions_passed": 5, "assertions_total": 5,
+        "assertions": [
+          { "text": "ORA is run separately per direction as the Skill directs", "result": "PASS", "note": "up 11 terms, down 2 terms" },
+          { "text": "Fold enrichment accompanies every reported term", "result": "PASS", "note": "12.39 / 10.80 for the planted term" },
+          { "text": "Redundancy is collapsed before reporting", "result": "PASS", "note": "simplify 11 -> 6 and 2 -> 1" },
+          { "text": "enricher runs on a custom TERM2GENE with the same universe", "result": "PASS", "note": "1 term, p.adjust 1.0e-06" },
+          { "text": "Scope: ranked-list analysis is routed to gsea rather than faked with ORA", "result": "PASS", "note": "ORA/GSEA fork followed" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 35.6,
+    "dynamic_weighted": 54.0,
+    "score": 90,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Every instruction is directly executable and was borne out: explicit ont, matched universe, deduplicated bitr mapping, fold enrichment with p.adjust, simplify per ontology",
+    "The planted biology was recovered as the top term in every variant, including a 15-protein UniProt list",
+    "Its documented traps reproduced exactly: pvalueCutoff filters the adjusted p (2 vs 466 terms), groupGO carries no p-values, omitting universe changes the null",
+    "Reproducibility is addressed concretely (record org.Hs.eg.db and GO.db versions; annotation lives locally)"
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "enrichResult column list is stale",
+      "observed_in": [1],
+      "problem": "The Skill lists ID, Description, GeneRatio, BgRatio, pvalue, p.adjust, qvalue, geneID, Count; clusterProfiler 4.14.6 also returns RichFactor, FoldEnrichment and zScore, so the fold enrichment it tells the agent to compute is already provided.",
+      "root_cause": "Column list written against an older clusterProfiler.",
+      "fix": "Add RichFactor, FoldEnrichment and zScore to the column list and say to use FoldEnrichment when present."
+    },
+    {
+      "priority": "P2",
+      "title": "simplify() on ont='ALL' silently drops two ontologies",
+      "observed_in": [4],
+      "problem": "The Skill predicts 'redundancy not removed, or an error'; in practice it returned only the BP terms (15 of 36), silently discarding CC and MF.",
+      "root_cause": "The failure mode was written from the intent, not from the observed behaviour.",
+      "fix": "State that simplify() on an ont='ALL' object returns only the first ontology's terms, so BP/MF/CC must be run and simplified separately."
+    },
+    {
+      "priority": "P2",
+      "title": "Second example is not self-contained",
+      "observed_in": [],
+      "problem": "examples/go_all_ontologies.R stops immediately: it reads a de_results.csv that is not shipped, while the basic example runs offline.",
+      "root_cause": "Example written against a user file.",
+      "fix": "Have the example simulate a small DE table (as the basic example does) or read one from tempdir()."
+    }
+  ]
+}
