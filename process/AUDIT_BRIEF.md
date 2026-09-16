@@ -21,10 +21,18 @@ write the Specialist, and you have no stake in any Skill passing.
 
 ## Working limits (2026-09-15, revised 2026-09-16)
 
-- **Do not spawn sub-agents.** Audit your Skills one after another yourself; at most two auditors run on
-  the machine at once, and a fan-out of eight made every run crawl.
+- **Do not spawn sub-agents.** At most two auditors run on the machine at once, and a fan-out of
+  eight made every run crawl.
+- **The audit is split across fresh agents (2026-09-16)** so no one context carries ten Skills of run
+  output. Your dispatch names your stage; do only that stage, then stop:
+  - **select** — Step 1 only. Write `F:\OpenScience\specialist-src\<candidate-id>\SELECTION.md`: the
+    chosen Skills in audit order (core first) with role and source folder, the Skills already audited
+    that you reuse, and one line for each Skill read but not chosen.
+  - **audit `<skill-id>`** — Step 2 for that one Skill. Read `SELECTION.md` for its role. Skip the Step 1 claim `mkdir` if the folder exists and holds no report — the orchestrator may have made it.
+  - **verdict** — Step 3 only, from the reports on disk and `SELECTION.md`.
 - **Audit the core Skills first** — the ones the Specialist's central step cannot exist without. If
-  no core Skill reaches 85, stop, write the not-viable verdict in `AUDIT.md`, and skip the rest.
+  no core Skill reaches 85, the orchestrator skips the rest and dispatches the verdict stage, which
+  writes the not-viable verdict in `AUDIT.md`.
 - **Open P1 findings do not block viability.** Open P0s and fired vetoes do. Say so in `AUDIT.md`
   rather than hedging the verdict.
 
@@ -172,8 +180,10 @@ Then write `F:\OpenScience\specialist-src\<candidate-id>\AUDIT.md` (dated headin
 - No network calls to paid or authenticated services. Public downloads for pip/CRAN/Bioconductor
   are fine.
 
-## Final message (≤ 200 words)
+## Final message
 
-Candidate verdict (viable / not viable and the failing gate); Skills audited with final scores;
+- **select** (≤ 100 words): the audit order with core marked, and which reports are reused.
+- **audit** (≤ 80 words): final score, grade, deployable, executed k/N, veto, top P0/P1.
+- **verdict** (≤ 200 words): candidate verdict (viable / not viable and the failing gate); Skills audited with final scores;
 how many inputs actually executed; the three most important findings about Skill quality; anything
 pending or blocked.
