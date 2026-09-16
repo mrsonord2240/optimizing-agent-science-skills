@@ -10,7 +10,7 @@
   "exported_from": {
     "repository": "https://github.com/mrsonord2240/bioSkills",
     "branch": "openscience-fixes",
-    "commit": "9314b053fd80e04d5e37420fa28f91e85d1bb8a4",
+    "commit": "a62c7097f37cde2f1d44763ac22c3f5c6d5350bb",
     "note": "Fork of the upstream commit above, carrying only audit-evidenced fixes. Upstream is archived, so this fork is the maintained line rather than a staging area for pull requests; this directory is the export of it that Specialist releases ship."
   },
   "modified": true,

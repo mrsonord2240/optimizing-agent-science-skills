@@ -24,9 +24,14 @@ unarchives, or names a successor, they are yours to take.
 
 ---
 
-# This repo is archived. The structuring is still valid, but we encourage branching and self customization to encode your own expertise into the skills.  We'll no longer be making updates or code fixes.
+## Below: the upstream README, as it stood at `d91ed3d`
 
-# bioSkills
+Kept for attribution and because the project description, requirements and layout still apply. Its
+archive notice read: *"This repo is archived. The structuring is still valid, but we encourage
+branching and self customization to encode your own expertise into the skills. We'll no longer be
+making updates or code fixes."* That notice is about upstream, not about this fork.
+
+### bioSkills
 
 A collection of skills that guide AI coding agents (Claude Code, OpenAI Codex, Google Gemini, OpenCode, OpenClaw) through common bioinformatics tasks.
 
