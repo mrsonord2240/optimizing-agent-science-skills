@@ -23,7 +23,13 @@ folders under `F:\OpenScience\external\mrsonord2240__bioSkills\`.
 
 Install in priority order: (1) the Skills the Specialist's central step cannot exist without;
 (2) supporting Skills in scope; (3) list-only — anything out of the candidate's scope, GPU-first, or
-needing an account. Give any single install ~20 minutes; if it will not go, record it as blocked with
+needing an account. **Linux-only is not blocked (2026-09-16).** Docker Desktop and a WSL2 distro (`agents`) run on this
+machine; a tool with an official Docker image or a bioconda Linux build runs through those. Likewise a
+tool pinned to an older Python gets its own `uv` venv (`uv python list` shows what is installed). Try
+those before recording a tool as not installable — the CRISPR pass blocked CRISPResso2 and PRIDICT2 on
+reasons neither survived a check. Docker's VM has 4 GB of memory; say so if a tool needs more.
+
+Give any single install ~20 minutes; if it will not go, record it as blocked with
 the actual error and move on.
 
 **`F:\OpenScience\external\` is read-only.** Never write there, including `__pycache__` from an
