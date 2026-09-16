@@ -19,12 +19,36 @@ write the Specialist, and you have no stake in any Skill passing.
   rejected as evidence. Yours must be the opposite: inputs written for this Skill's real use,
   outputs you actually produced, scores you can defend line by line.
 
-## Working limits (2026-09-15)
+## Working limits (2026-09-15, revised 2026-09-16)
 
 - **Do not spawn sub-agents.** Audit your Skills one after another yourself; at most two auditors run on
   the machine at once, and a fan-out of eight made every run crawl.
 - **Audit the core Skills first** — the ones the Specialist's central step cannot exist without. If
   no core Skill reaches 85, stop, write the not-viable verdict in `AUDIT.md`, and skip the rest.
+- **Open P1 findings do not block viability.** Open P0s and fired vetoes do. Say so in `AUDIT.md`
+  rather than hedging the verdict.
+
+## Your environment is built before you start (2026-09-16)
+
+A **tooling agent** runs first, one per candidate, and leaves
+`F:\OpenScience\audit-envs\<candidate-id>\TOOLS.md`: every package and CLI the candidate's Skills
+reference, the venv or library each one lives in, its smoke test, what is blocked and why, cached
+model weights and reference data, and a "Notes for auditors" section. **Read it before writing any
+code.** The two candidates audited this way on 2026-09-16 executed 66/67 and 51/53 inputs; the
+candidate audited before the practice existed spent five passes discovering its tools mid-audit.
+
+If something you need is genuinely missing, take the candidate's install lock
+(`mkdir ...\install.lock`), install without changing any existing package's version, verify with an
+import or `packageVersion()` that prints, and `rmdir` the lock — then add it to `TOOLS.md`.
+
+## Judge a run by its output, never by its exit code (2026-09-16)
+
+Five tools on this machine have now exited 0 while producing nothing or producing garbage:
+Philosopher `peptideprophet` and `filter`, both powsimR installs, openbabel `--gen3D` (all-zero
+coordinates from an empty data dir), and a Skill's own Scrublet loop that scored a view and silently
+discarded the result. **A snippet that "ran" without printing a checked result has not been shown to
+work.** Assert on the content of the output — a count, a value against ground truth, a file that
+exists and parses — and record that assertion in the report.
 
 ## Re-auditing a fixed Skill (2026-09-15)
 
@@ -94,7 +118,11 @@ Write per Skill, into `F:\OpenScience\audits\<skill-id>\`:
   what it printed (trim long output, keep what the scores depend on).
 
 **Never write anything inside `F:\OpenScience\external\`** — the clones must stay byte-identical to
-their upstream commits; the builder checks this.
+their upstream commits; the builder checks this. This includes what your interpreter writes for you:
+importing a Skill's `examples/` module leaves a `__pycache__` beside it, and `.pyc` files are
+gitignored, so **`git status` in the clone reads clean while byte-identity is broken**. Check the
+filesystem (`find <clone> -name __pycache__`), not git status, and run every script from your own
+`F:\OpenScience\audits\<skill-id>\run\` with the Skill's folder copied, not imported in place.
 
 ## Step 3 — skeleton spec
 

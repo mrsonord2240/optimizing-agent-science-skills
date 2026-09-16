@@ -5,6 +5,7 @@ if a brief is wrong, the audits it produced are wrong, so change them deliberate
 
 | File | Who reads it | What it governs |
 | --- | --- | --- |
+| `TOOLING_BRIEF.md` | tooling agent | building a candidate's audit environment and writing the `TOOLS.md` the auditor reads, before the first audit |
 | `AUDIT_BRIEF.md` | auditor | choosing Skills, writing inputs, running the code, scoring, what a report must contain, and how a re-audit of a fixed Skill differs |
 | `FIX_BRIEF.md` | fixer | what counts as an audit-evidenced defect, what is out of scope, how every change is verified, one commit per Skill, the fix log format |
 | `AUTHOR_BRIEF.md` | author | turning passed audits into a Specialist |
@@ -19,3 +20,14 @@ score measures the Skill rather than the findings the fixer was handed.
 
 Evidence is what ran. A command checked against documentation is recorded as not executed, and says
 which documentation.
+
+**And a run is evidence only if its output was checked.** Five tools on this machine have exited 0
+while producing nothing or producing garbage, so an exit code proves nothing on its own: assert on a
+count, a value against ground truth, or a file that exists and parses.
+
+## The order agents run in
+
+`TOOLING_BRIEF` (once per candidate) → `AUDIT_BRIEF` (the candidate's auditor) → `FIX_BRIEF` (a
+different agent, per failing Skill) → `AUDIT_BRIEF` again (a third agent, re-audit) → `AUTHOR_BRIEF`.
+Two candidates can run side by side as long as they share no source folder; more than two auditors on
+this machine makes every run crawl.

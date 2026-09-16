@@ -44,10 +44,13 @@ gap in coverage — the audits keep capping such Skills below their floor, and t
 declined the work as "new content" before Sam settled it: **write the executable.**
 
 So when the Skill's own `SKILL.md`, `usage-guide.md` or decision tree references something a user
-could reasonably expect to run, you have two options and must take one:
+could reasonably expect to run, you have three options and must take one:
 
 - **write it** — a runnable block in the Skill's existing voice and structure, using a tool that is
   actually installed on this machine (check the candidate's `TOOLS.md` first); or
+- **install it** — when the tool is a public, unauthenticated install that the candidate's tooling
+  pass simply missed, install it into the candidate's own env under that env's no-version-change
+  rule, add it to `TOOLS.md` with a smoke test, and then write the runnable block; or
 - **delete the claim** — remove it from the description, decision tree and prose, so the Skill stops
   advertising what it cannot do.
 
