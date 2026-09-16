@@ -95,7 +95,7 @@ print(f'\nMissingness: present-fraction low-abundance={present_frac[mean_abundan
 # PCA / batch on complete cases (a median fill would pull high-missing samples to the centre)
 complete = normalized.dropna(how='any')
 scaled = StandardScaler().fit_transform(complete.T)
-pca = PCA(n_components=3).fit(scaled)
+pca = PCA(n_components=3, svd_solver='full', random_state=0).fit(scaled)  # unseeded PCA is not reproducible
 coords = pd.DataFrame(pca.transform(scaled), columns=['PC1', 'PC2', 'PC3'], index=survivors)
 coords['condition'] = groups_kept.values
 print('\nPCA variance explained:', [f'{100 * v:.1f}%' for v in pca.explained_variance_ratio_])

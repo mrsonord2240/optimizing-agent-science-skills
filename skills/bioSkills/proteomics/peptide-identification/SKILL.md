@@ -7,7 +7,7 @@ primary_tool: pyOpenMS
 
 ## Version Compatibility
 
-Reference examples tested with: pyOpenMS 3.5.0, pandas 2.2+, numpy 1.26+ (pyOpenMS 3.5 takes a `PeptideIdentificationList`, not a plain Python list, for peptide IDs)
+Reference examples tested with: pyOpenMS 3.5.0, pandas 2.2+, numpy 1.26+ (pyOpenMS 3.5 takes a `PeptideIdentificationList`, not a plain Python list, for peptide IDs). Command-line route checked on Sage 0.14.6, Comet 2026.02 rev.2, MS-GF+ v2024.03.26, Percolator 3.09.0, OpenMS 3.5.0 `DecoyDatabase`, Java 17.
 
 Before using code patterns, verify installed versions match. If versions differ:
 - Python: `pip show <package>` then `help(module.function)` to check signatures
@@ -73,6 +73,90 @@ Scope: this skill owns spectrum-to-peptide matching and PSM/peptide-level FDR. P
 | Need per-site / per-ID confidence | act on PEP, not q-value | q-value is list-level; PEP is local |
 
 Default when uncertain: concatenated target-decoy search with Comet or Sage, rescore with Percolator/mokapot, filter at q <= 0.01, and hand protein-level FDR to protein-inference.
+
+### Build the Concatenated Target-Decoy Database
+
+**Goal:** Turn a target-only FASTA into the concatenated target+decoy database that every FDR number below depends on.
+
+**Approach:** Reverse at the PROTEIN level with the peptide N/C termini held fixed, so decoy peptides obey the same enzyme rules and match the targets in length and amino-acid composition, at 1:1. Sage generates decoys internally and takes the TARGET-ONLY FASTA (so do MSFragger and MetaMorpheus, per their documentation); Comet, MS-GF+ and X!Tandem need this file. Include contaminants in the input before reversing, so contaminant decoys exist too. **The decoy tag is where this Skill silently fails:** every tool defaults to a different string, and a mismatch means zero decoys are found and every PSM is reported "at 1% FDR" with no error.
+
+```bash
+# OpenMS 3.5.0; -method shuffle is the alternative when reversal makes
+# decoy peptides that are palindromes of real ones
+DecoyDatabase -in human_plus_contaminants.fasta -out human_target_decoy.fasta \
+  -decoy_string DECOY_ -decoy_string_position prefix \
+  -method reverse -enzyme Trypsin -threads 8
+
+grep -c '^>' human_target_decoy.fasta        # must be 2x the target count
+grep -c '^>DECOY_' human_target_decoy.fasta  # must equal the target count
+```
+
+| Tool | Default decoy tag | Set it with |
+|---|---|---|
+| OpenMS `DecoyDatabase` / `PeptideIndexing` | `DECOY_` | `-decoy_string`, `decoy_string` |
+| Sage | `rev_` (lower case) | `decoy_tag` in the JSON, with `generate_decoys: true` |
+| Comet | `DECOY_` | `decoy_prefix`; `decoy_search = 0` when the DB already holds them |
+| MS-GF+ | `XXX_` | `-decoy`; `-tda 0` when the DB already holds them |
+| MSFragger / FragPipe / Philosopher | `rev_` (lower case) | `decoy_prefix`, `--decoy` |
+| MaxQuant | `REV__` | fixed |
+| Percolator | reads the pin `Label` column | `-P` only for `--picked-protein` |
+
+Checked on OpenMS 3.5.0: 31,437 UniProt entries (human + yeast + E. coli + contaminants) became 62,874 with 31,437 `DECOY_` entries in 5 s.
+
+### Run a DDA Search from the Command Line
+
+**Goal:** Search a centroided mzML against the database and emit PSMs plus Percolator features.
+
+**Approach:** All three engines below run one concatenated search and write a Percolator `.pin`, so the rescoring step is the same for each. Convert vendor raw first (`msconvert --mzML --zlib --filter "peakPicking vendor msLevel=1-"` -> data-import). Set tolerances to the instrument, not to the default: 10 ppm precursor and high-res fragment settings for an Orbitrap, 0.6 Da / ion-trap binning for CID. `examples/dda_search.sh` runs the whole route (database -> search -> Percolator -> 1% list) for `ENGINE=sage` or `ENGINE=comet`.
+
+```bash
+# Sage 0.14.6 -- generates its own 'rev_' decoys, so it takes the TARGET-ONLY FASTA.
+# search.json: {"database": {"enzyme": {"missed_cleavages": 2, "min_len": 7, "max_len": 30,
+#   "cleave_at": "KR", "restrict": "P"}, "static_mods": {"C": 57.0215},
+#   "variable_mods": {"M": [15.9949]}, "max_variable_mods": 2,
+#   "decoy_tag": "rev_", "generate_decoys": true, "fasta": "human.fasta"},
+#  "precursor_tol": {"ppm": [-10, 10]}, "fragment_tol": {"ppm": [-20, 20]},
+#  "isotope_errors": [0, 1], "deisotope": true, "predict_rt": true, "report_psms": 1}
+sage search.json sample.mzML --write-pin     # -> results.sage.tsv + results.sage.pin
+
+# Comet 2026.02 -- searches the concatenated DB built above.
+comet -p                                     # writes comet.params.new to edit
+#   database_name = human_target_decoy.fasta   decoy_search = 0   decoy_prefix = DECOY_
+#   peptide_mass_tolerance_upper = 10.0   peptide_mass_tolerance_lower = -10.0
+#   peptide_mass_units = 2                 # 2 = ppm
+#   fragment_bin_tol = 0.02  fragment_bin_offset = 0.0   # high-res HCD; 1.0005/0.4 for ion trap
+#   search_enzyme_number = 1  allowed_missed_cleavage = 2  peptide_length_range = 7 30
+#   variable_mod01 = 15.9949 M 0 2 -1 0 0 0.0   max_variable_mods_in_peptide = 2
+#   output_percolatorfile = 1  output_txtfile = 1  num_output_lines = 1
+comet -Pcomet.params -Nsample sample.mzML    # -> sample.pin, sample.txt, sample.pep.xml
+
+# MS-GF+ v2024.03.26 -- calibrated SpecEValue; -tda 0 because the DB already has decoys.
+java -Xmx8g -jar MSGFPlus.jar -s sample.mzML -d human_target_decoy.fasta \
+  -decoy DECOY_ -o sample.mzid -t 10ppm -ti 0,1 -tda 0 \
+  -m 3 -inst 3 -e 1 -ntt 2 -mod mods.txt \
+  -minLength 7 -maxLength 30 -maxMissedCleavages 2 -n 1 -addFeatures 1 -thread 8
+# mods.txt: "NumMods=2" / "C2H3N1O1,C,fix,any,Carbamidomethyl" / "O1,M,opt,any,Oxidation"
+java -cp MSGFPlus.jar edu.ucsd.msjava.ui.MzIDToTsv -i sample.mzid -o sample.tsv -showDecoy 1
+```
+
+### Rescore to FDR-Controlled PSMs with Percolator
+
+**Goal:** Turn engine features into a single learned score and a q-value, and read off the 1% list.
+
+**Approach:** Percolator trains a semi-supervised SVM on the decoy PSMs with three-fold cross-validation, so it must be told which post-processing matches the search. `-Y`/`--post-processing-tdc` is target-decoy competition, correct for a concatenated search with one hit per spectrum; `-y`/`--post-processing-mix-max` is the mix-max method and **only has an effect on separate target and decoy searches**, where it is the default (flag text from `percolator --help`, 3.09.0). `--results-psms` holds targets only, so no decoy filtering afterwards -- but read the `q-value` column BY NAME, because Percolator emits a `filename` column only when the pin carries one (Sage does, Comet does not), which shifts every later column by one.
+
+```bash
+percolator --post-processing-tdc \
+  --results-psms psms.target.tsv       --decoy-results-psms psms.decoy.tsv \
+  --results-peptides peptides.target.tsv --decoy-results-peptides peptides.decoy.tsv \
+  results.sage.pin
+
+# 1% list, with the q-value column located by name rather than by index
+awk -F'\t' 'NR == 1 { for (i = 1; i <= NF; i++) if ($i == "q-value") q = i; next }
+            q && $q <= 0.01' psms.target.tsv > psms_1pct.tsv
+```
+
+Rescoring pays where the engine's own score is weakest. On one Orbitrap Astral 5-min DDA run (250 pg HYE load, 6,135 MS2 spectra, 31,437-protein database, PXD070049), Comet's raw `-log10(e-value)` gave **916** PSMs at 1% FDR and Percolator lifted the same search to **1,144** (+25%); Sage's `sage_discriminant_score` is already a learned score, so Percolator moved it from **1,406** to **1,398** (-0.6%) -- no gain to be had. Sage 0.14.6 wins this input outright; Comet 2026.02 with Percolator lands 19% behind it, and MS-GF+ v2024.03.26 read straight off `-log10(SpecEValue)` with no rescoring gives **656**, because a calibrated E-value buys cross-instrument comparability, not raw yield. **Do not generalise these counts**: one run, one low-load short-gradient method, each engine at its own idiomatic high-res settings. Rescoring also needs training data -- pooling the three DDA runs (6,864 PSMs) gave Percolator 5,006 PSMs against Sage's own 4,961, while on a single run of 1,939 PSMs it had too few positives to improve anything.
 
 ### Database Search with pyOpenMS
 
@@ -154,13 +238,40 @@ psms['qvalue'] = psms['fdr'][::-1].cummin()[::-1]   # running min from the botto
 kept = psms[(psms['qvalue'] <= 0.01) & (~psms['is_decoy'])]   # 1% list-level FDR
 ```
 
+### FDR from SEPARATE Target and Decoy Searches (pi0 * D / T)
+
+**Goal:** Get a valid 1% list out of two result tables produced by searching the same spectra against a target DB and a decoy DB independently.
+
+**Approach:** No competition resolved which hit wins, so the decoy count estimates the number of incorrect TARGETS directly, scaled by pi0, the proportion of target PSMs that are incorrect (Kall et al. 2008). pi0 = 1 is always valid and conservative; the median-decoy estimate (twice the fraction of target scores below the median decoy score) recovers the identifications that pi0 = 1 throws away, at the cost of estimating a nuisance parameter. Do NOT run the concatenated snippet above on the two tables merged. `examples/separate_search_fdr.py` ships this as a script.
+
+```python
+import numpy as np
+
+def estimate_pi0(target_scores, decoy_scores):        # Kall et al. 2008
+    median_decoy = np.median(decoy_scores)
+    return min(1.0, 2.0 * np.mean(np.asarray(target_scores) < median_decoy))
+
+def separate_search_qvalues(targets, decoys, pi0=None):
+    # targets, decoys: DataFrames with 'scan' and 'score', ONE row per spectrum each
+    if pi0 is None:
+        pi0 = estimate_pi0(targets['score'].to_numpy(), decoys['score'].to_numpy())
+    t = targets.sort_values('score', ascending=False).reset_index(drop=True)
+    decoy_sorted = np.sort(decoys['score'].to_numpy())
+    n_decoy_above = len(decoy_sorted) - np.searchsorted(decoy_sorted, t['score'].to_numpy(), side='left')
+    t['fdr'] = np.minimum(1.0, pi0 * n_decoy_above / np.arange(1, len(t) + 1))
+    t['qvalue'] = t['fdr'][::-1].cummin()[::-1]
+    return t, pi0
+```
+
+On the synthetic separate-search pair with ground truth (12,000 spectra each): pi0-hat = 0.611 keeps 2,888 PSMs at a true FDP of 1.04%, pi0 = 1 keeps 2,588 at 0.62%, and Elias-Gygi's 2d/(t+d) misapplied here keeps only 2,139 at 0.33%. The alternative is to hand both tables to Percolator and let mix-max do it: that is Percolator's default for separate-search input, and it is a calibrated-score procedure, not the same arithmetic.
+
 ## Per-Method Failure Modes
 
 ### Concatenated vs separate FDR formula mismatch
 **Trigger:** running the concatenated snippet on a merged table from separate searches without per-spectrum competition, or applying Elias-Gygi's 2*decoy/(target+decoy) to separate searches.
 **Mechanism:** Elias-Gygi's factor 2 counts decoys in the combined target+decoy list of a concatenated search; in separate searches every spectrum gets both a target and a decoy hit, so the decoy count estimates false targets directly, scaled by pi0 (the fraction of target PSMs that are incorrect).
 **Symptom:** mis-estimated FDR; 2d/(t+d) on separate searches over-estimates it (synthetic test: 2.06% vs 0.62% true, about a quarter of IDs lost).
-**Fix:** confirm the search mode; concatenated -> (#decoy + 1)/#target; separate -> pi0 * #decoy/#target (Kall et al. 2008) or the mix-max estimator (Keich, Kertesz-Farkas & Noble 2015). In Percolator, mix-max is the default for separate-search input and `-Y`/`--post-processing-tdc` selects target-decoy competition instead; concatenated input forces TDC automatically.
+**Fix:** confirm the search mode; concatenated -> (#decoy + 1)/#target; separate -> pi0 * #decoy/#target (Kall et al. 2008; code in "FDR from SEPARATE Target and Decoy Searches" above and in `examples/separate_search_fdr.py`) or the mix-max estimator (Keich, Kertesz-Farkas & Noble 2015). In Percolator, mix-max is the default for separate-search input and `-Y`/`--post-processing-tdc` selects target-decoy competition instead; concatenated input forces TDC automatically.
 
 ### Thresholding on raw engine score
 **Trigger:** filtering on XCorr/hyperscore/Andromeda score, or comparing scores from two engines.
@@ -216,6 +327,9 @@ kept = psms[(psms['qvalue'] <= 0.01) & (~psms['is_decoy'])]   # 1% list-level FD
 | Empty 1% list from a table snippet | lower-is-better score (E-value, SpecEValue) used as `score` | use `-log10(E-value)` |
 | All q-values 0 from a hand-rolled table | no +1 correction on a list with zero decoys | use (decoys + 1)/targets; a tiny list cannot reach 1% |
 | Percolator q-method mismatched to search mode | mix-max is the default for separate-search input | for separate searches, mix-max (default) or `-Y`/`--post-processing-tdc` for target-decoy competition; concatenated input forces TDC automatically; use `--picked-protein` for protein FDR |
+| Percolator's 1% list is far too big or too small when cut by column index | Percolator writes a `filename` column only when the pin has one (Sage yes, Comet no), shifting `q-value` between columns 3 and 4 | locate `q-value` by header name, never by a fixed index |
+| Decoy count is twice the target count after a search | `-tda 1` (MS-GF+) or `generate_decoys: true` (Sage) run against a database that already contains decoys | use `-tda 0` / `generate_decoys: false` with a concatenated DB, or feed the target-only FASTA and let the engine make them |
+| `philosopher peptideprophet` exits 0 but the output has no `peptideprophet_result` and the log says `read in 0 1+, 0 2+ ... spectra` / `read in no data` | its embedded PeptideProphet does not model this pepXML (seen with Comet 2026.02 rev.2 pepXML under Philosopher v5.1.0 on Windows, with and without `--nonparam --decoy`) | rescore with Percolator on the engine's `.pin` instead; check the interact file for `peptideprophet_result` before trusting a PeptideProphet run |
 | 1% PSM FDR assumed to give 1% protein FDR | each level needs its own estimation | estimate protein-level (picked) FDR -> protein-inference |
 | "PEP <= 0.01" returns far fewer IDs than expected | PEP is per-PSM and far stricter than q-value | filter list cutoffs on q-value; reserve PEP for per-ID decisions |
 

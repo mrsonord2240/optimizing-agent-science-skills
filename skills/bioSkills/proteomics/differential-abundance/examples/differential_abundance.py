@@ -16,18 +16,20 @@ def preprocess(intensities):
 
 
 def differential_abundance(normalized, case_cols, ctrl_cols):
-    rows = []
+    rows, untestable = [], []
     for protein in normalized.index:
         case, ctrl = normalized.loc[protein, case_cols].dropna(), normalized.loc[protein, ctrl_cols].dropna()
         if len(case) >= MIN_OBS_PER_GROUP and len(ctrl) >= MIN_OBS_PER_GROUP:
             _, pval = stats.ttest_ind(case, ctrl, equal_var=False)  # Welch; scipy defaults to Student's True
             rows.append({'protein': protein, 'log2fc': case.mean() - ctrl.mean(), 'pvalue': pval})
+        else:  # never drop these silently: proteins undetected in one group are often the largest real changes
+            untestable.append({'protein': protein, 'n_case': len(case), 'n_ctrl': len(ctrl)})
     if not rows:
         raise ValueError(f'No protein has >= {MIN_OBS_PER_GROUP} non-missing values in both groups; a two-sample test is not possible')
     df = pd.DataFrame(rows)
     df['padj'] = multipletests(df['pvalue'], method='fdr_bh')[1]  # default is Holm-Sidak; pass fdr_bh explicitly
     df['significant'] = df['padj'] < 0.05
-    return df
+    return df, pd.DataFrame(untestable, columns=['protein', 'n_case', 'n_ctrl'])
 
 
 def simulate_matrix(n_proteins=400, n_true=40, n_per_group=12, seed=0):
@@ -45,8 +47,8 @@ if __name__ == '__main__':
     case_cols = [c for c in intensities.columns if c.startswith('case')]
 
     normalized = preprocess(intensities)
-    results = differential_abundance(normalized, case_cols, ctrl_cols)
+    results, untestable = differential_abundance(normalized, case_cols, ctrl_cols)
 
     n_sig = int(results['significant'].sum())
-    print(f'Tested: {len(results)}, Significant (padj<0.05): {n_sig}')
+    print(f'Tested: {len(results)}, Significant (padj<0.05): {n_sig}, Untestable (reported separately): {len(untestable)}')
     print(results.sort_values('padj').head().to_string(index=False))

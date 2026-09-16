@@ -6,7 +6,10 @@ Protein inference decides which proteins are present from identified peptides. I
 ## Prerequisites
 ```bash
 pip install pyopenms pandas
-# CLI alternatives: ProteinProphet (TPP), Epifany (OpenMS; pyOpenMS class BayesianProteinInferenceAlgorithm), Philosopher (FragPipe)
+# CLI alternatives: percolator -f/--picked-protein (3.09.0; Fido's --protein is gone),
+#                   Epifany (OpenMS; pyOpenMS class BayesianProteinInferenceAlgorithm),
+#                   philosopher proteinprophet + philosopher filter (FragPipe/TPP; Philosopher 5.1.0
+#                   ships the TPP-derived subcommands, so a separate TPP install is not needed)
 ```
 
 ## Quick Start
@@ -60,6 +63,7 @@ Tell your AI agent what you want to do:
 - "Unique" is database-relative; a peptide unique against SwissProt may be shared once isoforms and TrEMBL are added. Fix and document the database.
 - For sensitive differential abundance, quantify on unique peptides only; razor assignment can flip between conditions and fake DE.
 - A protein group is not a proteoform -- do not claim a specific isoform from shared-peptide evidence.
+- Judge every CLI inference/FDR step by the file it wrote, never by its exit status: `philosopher filter` exits 0 and prints "Converged to 0.00 % FDR" when it read nothing, so count the rows in `protein.tsv` before believing any protein number.
 
 ## Related Skills
 - peptide-identification - Produces the FDR-filtered peptide list that feeds inference and shares the target-decoy machinery

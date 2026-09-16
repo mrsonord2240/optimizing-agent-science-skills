@@ -40,7 +40,7 @@ Tell your AI agent what you want to do:
 ### 1. Data Import
 - Load proteinGroups.txt (MaxQuant) or report.parquet (DIA-NN 1.9+)
 - Filter contaminants, reverse, and only-identified-by-site BEFORE normalizing
-- Extract intensity columns (LFQ intensity, not raw Intensity, for between-sample work)
+- Extract intensity columns (LFQ intensity, not raw Intensity, for between-sample work) -- but inspect the raw `Intensity` columns for failed loads: MaxLFQ has already renormalized the LFQ columns, so a low injection is largely invisible there
 
 ### 2. Transformation
 - Replace 0 with NA
@@ -82,12 +82,17 @@ annotation.csv     # Sample metadata
 ```
 
 ### Sample Annotation
+`batch` is required whenever samples were acquired in more than one run/day/plex -- the pipeline's
+design branch keys on that column and puts batch in the model as a covariate; without it the batch
+effect stays in the residual. `condition` may have more than two levels (dose series, time course);
+every non-reference level is contrasted against the first level.
+
 ```csv
-sample,condition,replicate
-Sample1,Control,1
-Sample2,Control,2
-Sample3,Treatment,1
-Sample4,Treatment,2
+sample,condition,replicate,batch
+Sample1,Control,1,B1
+Sample2,Control,2,B2
+Sample3,Treatment,1,B1
+Sample4,Treatment,2,B2
 ```
 
 ## Expected Outputs
@@ -109,7 +114,8 @@ Sample4,Treatment,2
 ## Tips
 
 - **Missing values**: model the MNAR dropout (proDA/msqrob2/MSstats-AFT) rather than impute; downshift imputation manufactures systematic false positives
-- **Normalization**: median centering is the default for balanced designs; never normalize an AP-MS/enrichment pulldown this way
+- **Normalization**: median centering assumes most proteins are unchanged AND that the changes are roughly symmetric up/down; on a one-sided design it shifts the whole unchanged proteome the other way and manufactures one-directional hits. Never normalize an AP-MS/enrichment pulldown this way; normalize on a spike-in or unchanged-protein set instead
+- **More than two conditions**: supported -- contrasts are built from the condition levels against the reference (first) level, and adjusted across all contrasts with `decideTests(method = 'global')`
 - **Completeness**: filter on per-group completeness before any missing-value handling, not a blanket >50% rule
 - **Replicates**: minimum 3 biological replicates per condition
 - **Contaminants**: filter MaxQuant contaminants, reverse, and only-identified-by-site BEFORE log + normalize

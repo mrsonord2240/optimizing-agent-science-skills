@@ -15,6 +15,7 @@ pip install pandas numpy scipy
 Tell your AI agent what you want to do:
 - "Load my MaxQuant Phospho (STY)Sites.txt, expand multiplicity, and keep class I sites"
 - "Adjust phosphosite changes for protein abundance using MSstatsPTM and a paired global proteome"
+- "Protein-adjust my TMT phosphoproteomics -- enriched and global runs are labelled plexes with a pooled reference channel"
 - "Build a kinase-motif logo using an experiment-matched background, not the whole proteome"
 - "Infer which kinases are active with KSEA from my site fold-changes"
 - "Check whether my diGly sites are confounded by NEDD8/ISG15 or an iodoacetamide artifact"
@@ -51,7 +52,7 @@ Tell your AI agent what you want to do:
 1. Frame the question as enrichment -> localization -> quantification and identify which layer the user is asking about
 2. Load the search-engine site output, drop Reverse/contaminant, and filter localization probability to class I
 3. Expand MaxQuant multiplicity to a long, multiplicity-resolved site matrix before any statistics
-4. Run MSstatsPTM with a paired global proteome and report PTM, PROTEIN, and ADJUSTED models, calling only ADJUSTED hits regulated
+4. Run MSstatsPTM with a paired global proteome and report PTM, PROTEIN, and ADJUSTED models, calling only ADJUSTED hits regulated -- label-free by default, or the TMT/isobaric route (`labeling_type = 'TMT'`, `dataSummarizationPTM_TMT`, `data.type = 'TMT'`) when the runs are labelled plexes
 5. Perform motif analysis against an experiment-matched background and kinase-activity inference with a curated prior
 6. Report three numbers (peptide FDR, localization probability, global FLR) and triage hits by functional evidence
 

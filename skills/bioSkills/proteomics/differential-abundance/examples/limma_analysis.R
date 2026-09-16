@@ -26,6 +26,11 @@ design <- model.matrix(~0 + condition, data = sample_info)
 colnames(design) <- levels(sample_info$condition)
 
 fit <- lmFit(log2_norm, design)
+# Estimability filter: rows the design cannot estimate (paired/blocked designs with gaps) otherwise reach
+# eBayes with zero residual df or a partly NA coefficient vector. No-op on this complete simulated matrix.
+estimable <- fit$df.residual > 0 & rowSums(is.na(fit$coefficients)) == 0
+fit <- fit[estimable, ]
+
 contrast_matrix <- makeContrasts(Treatment - Control, levels = design)
 fit2 <- contrasts.fit(fit, contrast_matrix)
 fit2 <- eBayes(fit2, trend = TRUE, robust = TRUE)  # trend mandatory for intensity data; robust Winsorizes outliers

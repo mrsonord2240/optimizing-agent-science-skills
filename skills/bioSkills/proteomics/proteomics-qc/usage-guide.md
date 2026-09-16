@@ -68,6 +68,9 @@ Tell your AI agent what you want to do:
 - Compute CV on linear intensity (or geometric CV on logs); always state normalization, transform, and software or the CV is uninterpretable.
 - Diagnose MNAR vs MCAR before choosing an imputer; the wrong one either kills or fabricates differences.
 - Document and justify every sample exclusion, and run a sensitivity check with and without borderline samples.
+- Seed the PCA (`random_state`, `svd_solver='full'`) and re-run it once: sklearn's default is unseeded and randomized on wide matrices, so the p-values you quote change between identical runs.
+- With one run per condition, replicate correlation, CV and the within-group loading rule cannot run at all. Report which checks were skipped; an empty table is not a pass.
+- PTXQC `createReport()` writes the PDF, mzQC, heatmap and YAML without Pandoc; only the HTML report needs it (`PATH` or `RSTUDIO_PANDOC`, check `rmarkdown::pandoc_available()`).
 
 ## Related Skills
 - data-import - Load search-engine output and intensity matrices before QC

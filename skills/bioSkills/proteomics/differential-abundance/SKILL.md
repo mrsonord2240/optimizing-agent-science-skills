@@ -7,7 +7,7 @@ primary_tool: limma
 
 ## Version Compatibility
 
-Reference examples tested with: limma 3.62.2, DEqMS 1.24.0, proDA 1.20.0, ashr 2.2.63, pandas 3.0.5, scipy 1.18.1, statsmodels 0.15.0 (checked 2026-09-15)
+Reference examples tested with: limma 3.62.2, DEqMS 1.24.0, proDA 1.20.0, msqrob2 1.14.1, QFeatures 1.16.0, MsCoreUtils 1.18.0, MSstats 4.14.2, ashr 2.2.63 (R 4.4.3 / Bioconductor 3.20), pandas 3.0.5, scipy 1.18.1, statsmodels 0.15.0 (checked 2026-09-15)
 
 Before using code patterns, verify installed versions match. If versions differ:
 - Python: `pip show <package>` then `help(module.function)` to check signatures
@@ -18,10 +18,11 @@ package and adapt the example to match the actual API rather than retrying.
 
 # Differential Protein Abundance -- Moderated Testing on a Log-Intensity Matrix with Honest Missingness
 
-**"Find differentially abundant proteins between my conditions"** -> Moderated statistical testing on a normalized log-intensity matrix, carrying missingness in the likelihood instead of filling it in -- because the missing values are low BECAUSE the protein is low, and imputing them manufactures false positives.
+**"Find differentially abundant proteins between my conditions"** -> Moderated statistical testing on a normalized log-intensity matrix, carrying missingness in the likelihood instead of filling it in -- because the missing values are low BECAUSE the protein is low, and imputing them replaces a detection limit with numbers whose fold change is set by the imputation constant and whose p-value carries no FDR guarantee.
 - R: `limma::eBayes(fit, trend=TRUE, robust=TRUE)` for empirical-Bayes moderated t-tests (the protein-level workhorse)
 - R: `DEqMS::spectraCounteBayes()` when PSM/peptide counts are available (preferred over limma-trend when quant depth varies)
-- R: `proDA::test_diff()` / `msqrob2` / `MSstats` when missing values are extensive (model the dropout, no imputation)
+- R: `proDA::test_diff()` when missing values are extensive (model the dropout, no imputation)
+- R: `msqrob2::msqrob()` on a `QFeatures` object, or `MSstats::groupComparison()`, to test from the peptide/precursor table instead of a protein matrix
 - Python: `scipy.stats.ttest_ind(equal_var=False)` + `statsmodels` BH (large n only; no moderation)
 
 Scope: this skill owns the statistical TEST -- design/contrast construction, variance moderation, missingness handling, multiple-testing correction, minimum-fold-change testing, and fold-change shrinkage. Peptide-to-protein summarization and normalization mechanics -> proteomics/quantification. Volcano/MA plots -> data-visualization/volcano-and-ma-plots. Enrichment of the hit list -> pathway-analysis/go-enrichment. OUT OF SCOPE: how MaxLFQ/TMP/IRS produce the matrix (quantification); how to draw a volcano (data-visualization); single-sample (n=1) comparisons, and diagnosis or treatment decisions for an individual patient.
@@ -30,7 +31,7 @@ Scope: this skill owns the statistical TEST -- design/contrast construction, var
 
 1. **Missing values in label-free MS are left-censored MNAR -- missing BECAUSE the intensity is low -- and imputing them (especially Perseus/MaxQuant downshift) turns a detection limit into numbers the test treats as measurements. Downshift draws each missing value from a Gaussian with mean = mu - 1.8*sigma and SD = 0.3*sigma, where mu and sigma describe ALL proteins in that run (sigma is not the replicate SD). For an on/off protein (seen in all of group A, missing in all of B) the fold change is therefore set by the imputation constant and the protein's own intensity, not by biology -- the volcano-plot "anchor/wing" artifact (on/off proteins on a streak whose logFC tracks average intensity). The p-value carries no FDR guarantee: whether 0.3*sigma is narrower or wider than the real replicate SD decides whether imputation inflates false positives or only costs power. The honest statement is "undetected in group B", not "20x lower, p=1e-6". The correct approach is to MODEL the dropout in the likelihood -- proDA (probabilistic dropout), msqrob2, MSstats-AFT -- NOT fill it (Lazar 2016; Ahlmann-Eltze & Anders 2019).
 2. **At the n=3-5 replicates proteomics actually uses, per-protein variance has only 2-4 residual df and is unusable raw -- variance moderation is the load-bearing element, not optional.** limma borrows a prior d0 across all proteins so a 4-replicate design tests on ~10 df instead of 6; `trend=TRUE` makes the prior a function of mean intensity (effectively mandatory for label-free, where a single global prior mis-calibrates FDR across the abundance range); `robust=TRUE` Winsorizes outlier variances (Phipson 2016). DEqMS makes the prior a function of PSM/peptide count and generally outperforms limma-trend when quantification depth varies across proteins (Zhu 2020).
-3. **Feature/peptide-level modeling beats summarize-then-test.** Summarizing first (one number per protein per run) discards the within-protein between-peptide variance and the correct degrees of freedom: 12 consistent peptides deserve a smaller SE than 12 disagreeing ones, but after summarization both look equally certain, and a protein with 30 observations looks as informative as one with 3. msqrob2/MSstats keep every peptide as a degree of freedom; this is why the same data gives different answers (Goeminne 2016; Sticker 2020; Choi 2014).
+3. **Feature/peptide-level modeling keeps information that summarize-then-test throws away -- but it is not free.** Summarizing first (one number per protein per run) discards the within-protein between-peptide variance and the correct degrees of freedom: 12 consistent peptides deserve a smaller SE than 12 disagreeing ones, but after summarization both look equally certain, and a protein with 30 observations looks as informative as one with 3. msqrob2/MSstats keep every peptide as a degree of freedom (Goeminne 2016; Sticker 2020; Choi 2014). Two calibrations from running all three on the same 4 v 4 peptide table: on clean, balanced data the feature-level fit and limma on the robustly summarized matrix returned the SAME 80 calls -- the gain is real when peptides within a protein disagree or coverage is unbalanced, not automatic. And the smaller SEs cut both ways: an uncorrected global offset that a protein-level test ignores becomes proteome-wide significance at the feature level, so a feature-level result is only readable after the centred-contrast check below.
 
 ## Tool Taxonomy
 
@@ -39,7 +40,7 @@ Scope: this skill owns the statistical TEST -- design/contrast construction, var
 | limma | Ritchie 2015; Phipson 2016 | EB moderated t; posterior variance blends a prior d0 with the per-protein estimate; `trend` ties the prior to mean intensity, `robust` Winsorizes outliers | protein-level summaries, small n, the default workhorse |
 | DEqMS | Zhu 2020 | prior variance = loess of log-variance vs log2(count); precision follows quantification DEPTH not just intensity | TMT (count=PSM) and label-free DDA (count=peptide); quant depth varies; preferred over limma-trend |
 | proDA | Ahlmann-Eltze & Anders 2019 (preprint) | probabilistic dropout: missing = left-censored, integrated under a per-sample sigmoid dropout curve; EB on location and variance; no imputation | label-free DDA with many MNAR missing values, small n, proteins absent in one group |
-| msqrob2 | Sticker 2020; Goeminne 2016 | peptide-level robust ridge: Huber M-estimation downweights outlier peptides, ridge shrinks effects from few observations, EB variance moderation | label-free DDA, outlier-peptide / unbalanced-coverage risk; best FDR in hard spike-in regimes |
+| msqrob2 | Sticker 2020; Goeminne 2016 | peptide-level robust ridge on a `QFeatures` object: Huber M-estimation downweights outlier peptides, ridge shrinks effects from few observations (>2 mean-model parameters only), EB variance moderation | label-free DDA, outlier-peptide / unbalanced-coverage risk; best FDR in hard spike-in regimes |
 | MSstats | Choi 2014 | feature-level linear mixed model (group fixed + feature + run/subject random); AFT censored imputation only inside `dataProcess(MBimpute = TRUE)` (`groupComparison` has no censoring argument) | SRM/PRM/DIA, technical replicates, nested/repeated-measures, labeled designs |
 | Welch t-test + BH | -- | per-protein two-sample t with `equal_var=False` + Benjamini-Hochberg | large n (>10/group), Python-only; no moderation, unusable at n=3-5 |
 | ashr | Stephens 2017 | mixture prior with a point mass at zero; posterior means shrink uncertain effects toward zero | recovering "which proteins truly changed and by how much" (not for GSEA ranking) |
@@ -52,9 +53,12 @@ Scope: this skill owns the statistical TEST -- design/contrast construction, var
 |----------|-------------|-----|
 | Small n (3-5/group), protein-level summary matrix | limma `eBayes(trend=TRUE, robust=TRUE)` | EB borrows variance across proteins; the trend calibrates FDR across abundance |
 | PSM/peptide counts available (TMT or label-free DDA) | DEqMS `spectraCounteBayes` | prior keyed on quant depth removes single-PSM false positives limma admits |
-| Label-free with many MNAR missing values, on/off proteins | proDA `test_diff` | models the censored dropout; never imputes; correct verdict for "undetected in one group" |
-| Outlier-peptide risk, unbalanced peptide coverage | msqrob2 (peptide-level robust ridge) | keeps feature df; Huber downweights bad peptides; best FDR in spike-in benchmarks |
+| Label-free with many MNAR missing values, on/off proteins | proDA `test_diff` | models the censored dropout; never imputes. It is honest but underpowered for on/off proteins at n=3-5 (0 of 11 called at n=4, best adj_pval 0.17): report those as a separate undetected list, not as non-significant |
+| A peptide/precursor table is available, not just a protein matrix | msqrob2 (`QFeatures` + `msqrob`) or MSstats | the feature table is the only place the between-peptide spread still exists; both keep it |
+| Outlier-peptide risk, unbalanced peptide coverage | msqrob2 `robustSummary` + `msqrob(robust = TRUE)` | Huber M-estimation downweights the bad peptide instead of letting it move the protein mean. On a clean, balanced 4 v 4 it buys nothing: msqrob2 and limma on the same summarized matrix returned the identical 80 calls. Escalate for the disagreement, not by default |
+| Three or more groups, or group plus covariates, at the peptide level | msqrob2 `msqrobAggregate(..., ridge = TRUE)` | ridge shrinks effects estimated from few observations -- but it is REFUSED on a two-group design (needs >2 mean-model parameters); use `ridge = FALSE` there |
 | Technical replicates, nested/repeated-measures, labeled (SRM/PRM/DIA) | MSstats (feature-level mixed model) | random effects capture run/subject structure summarize-then-test discards |
+| Any feature-level route | check `median(log2FC) ~ 0` before reading the table | small feature-level SEs turn a normalization offset into proteome-wide significance; measured 21.2% realized FDR from a -0.18 offset |
 | Batch present | batch as a covariate in the design (`~ batch + condition`) | `removeBatchEffect` is visualization-only; never feed its output to `lmFit` |
 | Minimum biologically meaningful fold change | `treat()` + `topTreat()` (or SAM s0) | tests |log2FC|>c against the moderated null; a post-hoc FC+significance double filter inflates FDR |
 | Large n (>10/group), Python-only | Welch t-test + BH | variance estimates reliable; no moderation needed at large n |
@@ -65,7 +69,7 @@ Default when uncertain: protein-level summary matrix at n=3-5 -> limma `eBayes(t
 
 **Goal:** Identify differentially abundant proteins using moderated statistics that borrow information across all proteins.
 
-**Approach:** Filter to proteins with enough valid values per group (rows with no or too few values give `NA` averages that stop `eBayes(trend = TRUE)`), build the design (batch as a covariate when present), fit the linear model and contrast, apply EB moderation with the intensity trend and robust fitting, then extract BH-corrected results. Report proteins removed by the filter (e.g. undetected in one group) separately. Never feed `removeBatchEffect` output to `lmFit`.
+**Approach:** Filter to proteins with enough valid values per group (rows with no or too few values give `NA` averages that stop `eBayes(trend = TRUE)`), build the design (batch as a covariate when present), fit the linear model, drop rows the design cannot estimate, then contrast, apply EB moderation with the intensity trend and robust fitting, and extract BH-corrected results. The per-condition count is NOT sufficient in a paired or blocked design (donor, subject or batch in the model): rows whose observed values fall in different blocks in the two conditions leave zero residual df or a partly `NA` coefficient vector, and limma tests them anyway on a contrast that is partly a block difference. Report proteins removed by either filter (e.g. undetected in one group) separately. Never feed `removeBatchEffect` output to `lmFit`.
 
 ```r
 library(limma)
@@ -79,6 +83,11 @@ design <- model.matrix(~0 + condition + batch, data = sample_info)  # batch in t
 colnames(design)[seq_len(nlevels(cond))] <- levels(cond)
 
 fit <- lmFit(protein_matrix, design)
+# Estimability filter: the per-group count above does not make the contrast estimable under a blocked
+# design ('Partial NA coefficients for N probe(s)'). Keep only fully estimated rows with residual df.
+estimable <- fit$df.residual > 0 & rowSums(is.na(fit$coefficients)) == 0
+fit <- fit[estimable, ]    # report the dropped rows; they are the non-estimable ones, not "not significant"
+
 contrast_matrix <- makeContrasts(Treatment - Control, levels = design)
 fit2 <- contrasts.fit(fit, contrast_matrix)
 fit2 <- eBayes(fit2, trend = TRUE, robust = TRUE)  # trend mandatory for label-free; robust Winsorizes outliers
@@ -121,7 +130,7 @@ results <- outputResult(fit3, coef_col = 1)
 
 **Goal:** Test proteins with extensive MNAR missingness, including on/off proteins, without imputing a single value.
 
-**Approach:** Fit the probabilistic-dropout model directly on the log-intensity matrix; missing values contribute as left-censored observations under a per-sample dropout curve. Then test the contrast against zero.
+**Approach:** Fit the probabilistic-dropout model directly on the log-intensity matrix; missing values contribute as left-censored observations under a per-sample dropout curve. Then test the contrast against zero. proDA keeps on/off proteins in the model honestly but rarely reaches significance for them at n=3-5 -- a censored observation carries less information than a measured one -- so list them as "undetected in group X" rather than reading their non-significance as evidence of no change.
 
 ```r
 library(proDA)
@@ -134,11 +143,97 @@ results <- test_diff(fit, 'conditionTreatment')
 # do not report diff for proteins with no observed value in a group: the location prior sets it (sign can be wrong)
 ```
 
+## msqrob2 Workflow (R) -- Peptide Table In, Protein Calls Out
+
+**Goal:** Test from the peptide/precursor table itself (MaxQuant `evidence.txt`, a DIA-NN report, a PSM table) so the between-peptide spread and the number of observations set the standard error, instead of collapsing to one number per protein per run first.
+
+**Approach:** Build a `QFeatures` object from a wide peptide matrix, log-transform, keep peptides seen in at least 2 runs, aggregate to protein with `robustSummary` (Huber M-estimation, which is what downweights an outlier peptide), then fit `msqrob` -- ridge/robust regression with empirical-Bayes variance moderation -- and test the contrast. `hypothesisTest` writes its result into `rowData(pe[['protein']])`, one data frame per contrast. Two things the object does silently and you must undo: proteins with no observation in a condition come back with `adjPval = NA` rather than in a list, and any per-run normalization you apply here is applied to a *different peptide set in each run*, which is the offset trap below. Report the untestable and undetected proteins separately, as the limma section requires.
+
+```r
+library(QFeatures)
+library(msqrob2)
+
+# peptide_wide: one row per precursor; columns 'feature', 'protein', then one intensity column per run
+runs <- sample_info$run
+col_data <- data.frame(quantCols = runs, condition = factor(sample_info$condition),
+                       sample = factor(runs), row.names = runs)  # quantCols column is required by readQFeatures
+pe <- readQFeatures(assayData = peptide_wide, quantCols = runs, colData = col_data, name = 'peptideRaw')
+pe <- zeroIsNA(pe, 'peptideRaw')
+pe <- logTransform(pe, base = 2, i = 'peptideRaw', name = 'peptideLog')
+rowData(pe[['peptideLog']])$nNonZero <- rowSums(!is.na(assay(pe[['peptideLog']])))
+pe <- filterFeatures(pe, ~ nNonZero >= 2, keep = TRUE)  # keep=TRUE: the variable exists only on peptideLog
+
+# undetected list, taken BEFORE aggregation: msqrob2 reports these as adjPval = NA, not as a list
+cond <- colData(pe)$condition  # colData lives on the QFeatures object; pe[['peptideLog']]$condition is NULL
+obs <- sapply(levels(cond), function(g)
+  tapply(rowSums(!is.na(assay(pe[['peptideLog']])[, cond == g, drop = FALSE])),
+         rowData(pe[['peptideLog']])$protein, sum))
+undetected <- rownames(obs)[apply(obs, 1, min) == 0]  # report as "undetected in group X", never as a fold change
+
+pe <- aggregateFeatures(pe, i = 'peptideLog', fcol = 'protein', name = 'protein',
+                        fun = MsCoreUtils::robustSummary, na.rm = TRUE)
+pe <- msqrob(pe, i = 'protein', formula = ~condition, robust = TRUE)
+L <- makeContrast('conditionTreatment = 0', parameterNames = 'conditionTreatment')
+pe <- hypothesisTest(pe, i = 'protein', contrast = L)
+
+res <- rowData(pe[['protein']])$conditionTreatment  # columns: logFC, se, df, t, pval, adjPval (no adj.P.Val)
+res$protein <- rownames(pe[['protein']])
+untestable <- res$protein[is.na(res$adjPval)]       # report these; they are not "not significant"
+res <- res[!is.na(res$adjPval), ]
+```
+
+To keep every peptide as its own degree of freedom instead of summarizing first, fit the mixed model over the peptide assay. `sample` must be a column of `colData` and `feature` a column of `rowData`:
+
+```r
+pe <- msqrobAggregate(pe, i = 'peptideLog', fcol = 'protein', name = 'proteinLmer',
+                      formula = ~condition + (1 | sample) + (1 | feature), ridge = FALSE)
+pe <- hypothesisTest(pe, i = 'proteinLmer', contrast = L)
+```
+
+`ridge = TRUE` needs MORE than two parameters in the mean model, so it is refused outright on a plain two-group comparison ("The mean model must have more than two parameters for ridge regression"); use `ridge = FALSE`, or drop the intercept with `~ -1 + condition` as the error message itself suggests. Ridge is for three or more groups, or a group factor plus covariates.
+
+## MSstats Workflow (R) -- Feature-Level Mixed Model
+
+**Goal:** Test a feature-level design with run/subject structure -- technical replicates, nested or repeated measures, SRM/PRM/DIA -- from the search engine's own output tables.
+
+**Approach:** Convert with the vendor-specific importer, summarize with `dataProcess`, then test the contrast with `groupComparison`. The contrast matrix is columns-by-condition and its `dimnames` must match `levels(proc$ProteinLevelData$GROUP)` exactly. Keep `MBimpute = FALSE` unless you want the AFT censored imputation: it is the only place MSstats imputes, and the Skill's position is to model dropout rather than fill it. On a 4 v 4 label-free set the two settings differed by 0.4 percentage points of realized FDR, so the AFT imputation is not buying accuracy either. Proteins present in only one condition come back with an infinite `log2FC` and `issue == 'oneConditionMissing'`; split them out and report them as undetected.
+
+```r
+library(MSstats)
+
+input <- MaxQtoMSstatsFormat(evidence = evidence, proteinGroups = protein_groups,
+                             annotation = annotation, use_log_file = FALSE)  # annotation: Raw.file, Condition, BioReplicate, IsotopeLabelType
+proc <- dataProcess(input, normalization = 'equalizeMedians', summaryMethod = 'TMP',
+                    censoredInt = 'NA', MBimpute = FALSE, use_log_file = FALSE)
+
+contrast <- matrix(c(-1, 1), nrow = 1,
+                   dimnames = list('Treatment-Control', c('Control', 'Treatment')))  # order = levels(GROUP)
+res <- groupComparison(contrast.matrix = contrast, data = proc, use_log_file = FALSE)$ComparisonResult
+res$Protein <- as.character(res$Protein)
+
+undetected <- res[res$issue %in% 'oneConditionMissing', ]   # infinite log2FC; report as undetected, not as a ratio
+tested <- res[is.finite(res$log2FC) & !is.na(res$adj.pvalue), ]
+# columns: Protein, Label, log2FC, SE, Tvalue, DF, pvalue, adj.pvalue, issue (adj.pvalue is the BH p)
+```
+
+### Check the contrast is centred before reading any feature-level result
+
+**Goal:** Catch the one failure that turns a feature-level test anticonservative across the whole table.
+
+**Approach:** A feature-level route has far smaller standard errors than a protein-summary test -- that is the point of it -- so a global between-condition offset of 0.1-0.2 log2 that limma would never call becomes significant for hundreds of proteins at once. The offset comes from per-run median normalization applied to the peptide table, because each run's median is taken over a *different* set of detected peptides. Measure it: the median log2FC over all tested proteins must be ~0 unless you genuinely expect most of the proteome to move. If it is not, the normalization is the suspect, not biology -- fix it upstream in proteomics/quantification (normalize on features present in every run, or at the protein level after summarization) rather than by re-centring the p-values here.
+
+```r
+offset <- median(tested$log2FC, na.rm = TRUE)          # msqrob2: median(res$logFC)
+if (abs(offset) > 0.05) stop(sprintf(
+  'median log2FC = %+.3f: the contrast is not centred. Re-normalize (proteomics/quantification) before reading this table.',
+  offset))
+```
+
 ## Python Workflow
 
 **Goal:** Run the full pipeline in Python when no R is available and n is large enough that moderation is unnecessary.
 
-**Approach:** Log2-transform, median-normalize, run per-protein Welch t-tests, apply Benjamini-Hochberg. This has NO variance moderation and should not be used at n=3-5 -- escalate to limma/DEqMS for small n.
+**Approach:** Log2-transform, median-normalize, run per-protein Welch t-tests, apply Benjamini-Hochberg. Return the untestable proteins (fewer than 2 values in a group) alongside the results, as the limma section requires -- they are not "not significant". This has NO variance moderation and should not be used at n=3-5 -- escalate to limma/DEqMS for small n.
 
 ```python
 import numpy as np
@@ -152,17 +247,19 @@ def preprocess(intensities):
     return log2_data - sample_medians + sample_medians.median()
 
 def differential_abundance(normalized, case_cols, ctrl_cols):
-    rows = []
+    rows, untestable = [], []
     for protein in normalized.index:
         case, ctrl = normalized.loc[protein, case_cols].dropna(), normalized.loc[protein, ctrl_cols].dropna()
         if len(case) >= 2 and len(ctrl) >= 2:
             _, pval = stats.ttest_ind(case, ctrl, equal_var=False)  # Welch; scipy defaults to Student's True
             rows.append({'protein': protein, 'log2fc': case.mean() - ctrl.mean(), 'pvalue': pval})
+        else:  # never drop these silently: proteins undetected in one group are often the largest real changes
+            untestable.append({'protein': protein, 'n_case': len(case), 'n_ctrl': len(ctrl)})
     if not rows:
         raise ValueError('No protein has >= 2 non-missing values in both groups; a two-sample test is not possible')
     df = pd.DataFrame(rows)
     df['padj'] = multipletests(df['pvalue'], method='fdr_bh')[1]  # default is Holm-Sidak; pass fdr_bh explicitly
-    return df
+    return df, pd.DataFrame(untestable, columns=['protein', 'n_case', 'n_ctrl'])  # report the second table too
 ```
 
 ## Fold-Change Reporting
@@ -219,6 +316,12 @@ lfsr <- shrunk$result$lfsr
 **Symptom:** Biased estimates; the model fits a dropout curve that does not exist.
 **Fix:** proDA needs intensity-dependent missingness; for MCAR use limma/DEqMS on the observed values.
 
+### Per-run median normalization under a feature-level test
+**Trigger:** `dataProcess(normalization = 'equalizeMedians')`, `normalize(method = 'center.median')` or any per-run median centring applied to the PEPTIDE table, then msqrob2/MSstats.
+**Mechanism:** Each run's median is computed over the peptides detected in THAT run, and the detected set differs run to run. Equalizing those medians therefore transfers a detection-composition difference into a uniform between-condition offset in every protein. A protein-summary test would mostly shrug it off; a feature-level test has standard errors small enough to call it significant, so the offset becomes a proteome-wide false-positive band.
+**Symptom:** `median(log2FC)` over all tested proteins is far from 0 while the raw peptide table's is ~0; the extra calls are low-|logFC|, low-SE proteins; the true hits are recovered either way.
+**Fix:** Check `median(log2FC)` before reading the table. Normalize on features present in every run, or after summarization at the protein level (proteomics/quantification owns the mechanics). Do not "fix" it by re-centring p-values.
+
 ### FC + significance double filter
 **Trigger:** `abs(logFC) > 1 & adj.P.Val < 0.05` applied after the test.
 **Mechanism:** |logFC| is large for a true effect OR a large SE; filtering on both the FC and the p (both depend on SE) selects high-variance nulls (collider effect).
@@ -237,6 +340,8 @@ lfsr <- shrunk$result$lfsr
 | BH adjusted p < 0.05 | Benjamini-Hochberg | controls FDR over the WHOLE rejection set, not subsets carved out afterward |
 | DEqMS multi-batch TMT: minimum count across batches | Zhu 2020 | the bottleneck batch sets the realized precision |
 | realized FDR > 50% from FC+significance double filter | Ebrahimpoor & Goeman 2021 | top-100 at n=12 exceeded 50% FDR at nominal 5%; regime-specific (many small effects), not a general rate |
+| feature-level route: `abs(median(log2FC))` <= 0.05 | measured | on one 4 v 4 peptide set the realized FDR tracked the offset monotonically: -0.005 -> 0.0%, -0.107 -> 7.0%, -0.184 -> 21.2%, -0.202 -> 28.6%, all at nominal 5%; the true-hit count did not change |
+| msqrob2 ridge needs > 2 mean-model parameters | msqrob2 1.14.1 | a two-group `~condition` mean model has 2, so `ridge = TRUE` errors; `ridge = FALSE` or `~ -1 + condition` |
 
 ## Common Errors
 
@@ -248,6 +353,7 @@ lfsr <- shrunk$result$lfsr
 | min-FC test inflates FDR | `topTable(lfc=...)` or post-hoc volcano double filter | `treat(fit, lfc=log2(1.2), trend=TRUE, robust=TRUE)` then `topTreat()` |
 | treat() list moderated without the intensity trend | `treat()` re-estimates the prior with `trend=FALSE, robust=FALSE` by default | pass `trend = TRUE, robust = TRUE` to `treat()` |
 | `eBayes`: `prior.weights contain NA values` | rows with no valid value (MaxQuant all-zero LFQ rows) or too few per group | valid-value filter before `lmFit` |
+| `lmFit`: `Partial NA coefficients for N probe(s)`; `stopifnot(all(fit2$df.residual > 0))` fires | a paired/blocked design (donor, subject, batch) where a row's values sit in different blocks per condition; the per-condition valid-value filter does not catch this | `fit <- fit[fit$df.residual > 0 & rowSums(is.na(fit$coefficients)) == 0, ]` after `lmFit` |
 | DEqMS warning `longer object length is not a multiple of shorter object length` | rows with NA sigma / zero residual df reach `spectraCounteBayes` | filter before `lmFit`; require `fit2$df.residual > 0` |
 | proDA: `object 'conditionControl' not found` | intercept design with `reference_level`: coefficients are `Intercept`, `conditionTreatment` | `test_diff(fit, 'conditionTreatment')` |
 | `makeContrasts`: `object 'DrugB' not found` | design rename hard-coded to two groups | `colnames(design)[seq_len(nlevels(cond))] <- levels(cond)` |
@@ -257,6 +363,14 @@ lfsr <- shrunk$result$lfsr
 | Student's t instead of Welch | `scipy.stats.ttest_ind` defaults `equal_var=True` | pass `equal_var=False` |
 | p-values look like Holm-Sidak | `statsmodels` `multipletests` defaults to `'hs'` | pass `method='fdr_bh'` |
 | volcano "anchor/wing" streaks | downshift/imputation feeding the test | model dropout (proDA/msqrob2/MSstats-AFT); report on/off proteins as undetected |
+| hundreds of low-|logFC| calls from msqrob2/MSstats and `median(log2FC)` far from 0 | per-run median normalization on the peptide table offsets the whole contrast | re-normalize on complete-case features or after summarization; see the centred-contrast check |
+| `readQFeatures`: `'colData' must contain a column called 'quantCols'` | QFeatures 1.16 requires the run names in `colData$quantCols` | `data.frame(quantCols = runs, condition = ..., row.names = runs)` |
+| msqrob2: `The mean model must have more than two parameters for ridge regression` | `ridge = TRUE` on a two-group design | `ridge = FALSE`, or drop the intercept (`~ -1 + condition`) |
+| msqrob2: `Variable sample is not found in coldata or rowdata` | `msqrobAggregate` formula names a term that is in neither | add `sample` to `colData`; `feature` must be a `rowData` column of the peptide assay |
+| `pe[['peptideLog']]$condition` is `NULL` | in QFeatures 1.16 `colData` is held on the QFeatures object, not on each assay | `colData(pe)$condition` (or `getWithColData(pe, i)` for a standalone assay) |
+| msqrob2 results have no `adj.P.Val`; some rows are all `NA` | `hypothesisTest` writes `logFC, se, df, t, pval, adjPval` into `rowData`, and returns `NA` for proteins it cannot fit | read `adjPval`; report the `is.na(adjPval)` rows separately, not as non-significant |
+| MSstats rows with infinite `log2FC` | `issue == 'oneConditionMissing'` | split them out and report as undetected; never as a ratio |
+| MaxQuant `evidence.txt`: the `Reverse`/`Potential contaminant` filter drops every row | empty flag columns are read as logical `NA`, and `NA != '+'` is `NA` | filter with `!(ev$Reverse %in% '+')`, which is `FALSE` for `NA` |
 
 ## References
 
