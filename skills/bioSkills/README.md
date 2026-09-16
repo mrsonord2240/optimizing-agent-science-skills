@@ -1,3 +1,29 @@
+# bioSkills — maintained fork
+
+Upstream [GPTomics/bioSkills](https://github.com/GPTomics/bioSkills) was archived on 2026-08-15 at
+commit `d91ed3d`, and its README asks people to branch and customize rather than wait for updates.
+This fork does that.
+
+Skills here are audited against the `skill-auditor` rubric and fixed where the audit demonstrated a
+defect — broken commands, renamed flags, version drift, snippets that ran but computed the wrong
+thing, and routines a Skill promised but shipped no code for. Nothing is restyled, no frontmatter
+`name` changes, and a Skill that passed with no findings stays byte-identical to `d91ed3d`.
+
+Every change is traceable. The audit reports, the per-Skill fix logs and the process that produced
+them are public in
+[mrsonord2240/optimizing-agent-science-skills](https://github.com/mrsonord2240/optimizing-agent-science-skills):
+`audits/` for the reports, `fixes/<skill-id>.md` for what changed and how it was verified, and
+`process/` for the briefs and the viability gates.
+
+Branch `openscience-fixes` is the working line. As of 2026-09-15 it carries fixes to 30 Skills across
+phylogenetics, variant interpretation and proteomics, each one re-audited after the fix by an agent
+that did not make it.
+
+Fixes cannot go back upstream — an archived repository accepts no pull requests. If GPTomics
+unarchives, or names a successor, they are yours to take.
+
+---
+
 # This repo is archived. The structuring is still valid, but we encourage branching and self customization to encode your own expertise into the skills.  We'll no longer be making updates or code fixes.
 
 # bioSkills

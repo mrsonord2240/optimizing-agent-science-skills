@@ -4,13 +4,14 @@
     "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
     "author": "GPTomics",
     "author_url": "https://github.com/GPTomics",
-    "license": "MIT"
+    "license": "MIT",
+    "archived": "2026-08-15; the repository accepts no pull requests or issues, and its own README asks people to branch and customize"
   },
   "exported_from": {
     "repository": "https://github.com/mrsonord2240/bioSkills",
     "branch": "openscience-fixes",
-    "commit": "45a0c5a65b7346d47a7b72b6d0a6eb60ea590317",
-    "note": "Fork of the upstream commit above, carrying only audit-evidenced fixes. The fork exists to send fixes back upstream; this directory is what Specialist releases ship."
+    "commit": "9314b053fd80e04d5e37420fa28f91e85d1bb8a4",
+    "note": "Fork of the upstream commit above, carrying only audit-evidenced fixes. Upstream is archived, so this fork is the maintained line rather than a staging area for pull requests; this directory is the export of it that Specialist releases ship."
   },
   "modified": true,
   "modified_by": "Samuel Nord, via Claude (Anthropic) fixer agents",

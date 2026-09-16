@@ -21,7 +21,9 @@ we made and how that change was verified.
    [mrsonord2240/openscience-specialists](https://github.com/mrsonord2240/openscience-specialists),
    which sources Skill content from this repository and cites the audit that justified it.
 
-Fixes worth sending back go upstream as pull requests from a fork of the original repository.
+Fixes are made in a fork of the original repository. Where that upstream is still maintained they
+go back as pull requests; `GPTomics/bioSkills` was archived on 2026-08-15, so for those Skills the
+fork is the maintained line rather than a staging area.
 
 ## Layout
 

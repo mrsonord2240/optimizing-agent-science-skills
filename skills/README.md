@@ -31,4 +31,7 @@ Rules for this directory:
 - A Skill's frontmatter `name` never changes. It is the Skill ID everything else keys on.
 - Files change only where an audit demonstrated a defect. No restyling, no new sections.
 - A Skill that passed with no findings stays byte-identical to its upstream commit.
-- The fork is the route for sending fixes back upstream, not the source of releases.
+- Fixes are made in a fork, never here; this directory is an export of that fork.
+- Where the original upstream is still maintained, the fork is also the route for sending fixes
+  back. `GPTomics/bioSkills` was archived on 2026-08-15 and takes no pull requests, so for those
+  Skills the fork is the maintained line instead.
