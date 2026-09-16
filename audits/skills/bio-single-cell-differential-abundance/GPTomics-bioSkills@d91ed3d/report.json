@@ -1,0 +1,352 @@
+{
+  "meta": {
+    "skill_name": "bio-single-cell-differential-abundance",
+    "description": "Test whether cell-type proportions or composition changed between conditions in single-cell data using Milo (miloR), scCODA, sccomp, and propeller. Use when comparing cell-type proportions / composition between conditions, asking which populations expanded or contracted with treatment or disease, running neighborhood-level (cluster-free) abundance testing, or guarding against compositional shifts that masquerade as differential expression.",
+    "evaluated_on": "2026-09-16",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Moderate",
+    "n_inputs": 5,
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:single-cell/differential-abundance",
+    "executed_inputs": "5/5"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "Every number reported came from a logged run, and where a claim could not be demonstrated on this dataset (input 5) the output says so rather than asserting it. The five cited references are real and correctly attributed."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "No output diagnoses, prescribes or triages an individual. Composition is tested across donor groups."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "No principled fallacy. The Skill's central statistical argument - proportions live on a simplex, so per-cluster t-tests are invalid - is stated correctly, and the correlation of the NK proportion with the mean of all others came out at exactly -1.000, which is the constraint made visible."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "5/5 inputs executed. The propeller, Milo and scCODA blocks all run as printed (scCODA needs the isolated sccoda-venv for an arviz reason unrelated to the Skill). sccomp is not installed on this machine and its block was checked statically only, which is recorded as an environment limit, not a defect."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 87,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 11,
+        "max": 12,
+        "note": "Completeness 4: Milo, scCODA, sccomp and propeller all have code, plus the covariate/confounding section, the reference-cell-type section, and an explicit 'never recommended' row for the naive t-test. Correctness 3: two things are off. The method table and Approach line describe propeller as 'arcsin-sqrt + limma' - speckle 1.6.0 prints 'Performing logit transformation of proportions' for the default call, so logit is the default. And Milo's 'Fails when: very few cells/sample' caveat is badly calibrated: on 674-837 cells per sample with n=4 per group and a 2.25x expansion of a 6% population, Milo as prescribed returned zero significant neighbourhoods at any k from 30 to 120, while propeller found it at FDR 9e-5. Appropriateness 4."
+      },
+      "reliability": {
+        "score": 10,
+        "max": 12,
+        "note": "Fault tolerance 3, error reporting 4, recoverability 3. The Common Errors table earns its keep: 'No significant abundance change despite an obvious shift -> too few biological replicates; add donors, report effect sizes' is exactly the right response to the Milo result in input 2, and the row about noisy neighbourhoods names the k/prop lever this audit swept. What is missing is a row for propeller's n=1 error, which is cryptic ('No finite residual standard deviations') and is the most likely first failure a user hits."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "Token cost 3: 185 lines covering four methods plus covariate handling with no duplicated code; no references/ layer. Execution efficiency 4: count table -> model -> FDR, one path per method, no redundancy."
+      },
+      "agent_usability": {
+        "score": 15,
+        "max": 16,
+        "note": "Learnability 4, consistency 4, error prevention 4. The three Governing Principle paragraphs are each a specific, checkable claim rather than advice, and the reference-cell-type section is the single most useful page in this Skill - input 3 confirmed the verdict flips exactly as described. Feedback design 3: no output format, so what to report (effect sizes, credible intervals, which population drives the shift) is left to the agent even though the Skill's own error table asks for it."
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Discoverability 4: 'did cell-type proportions change', 'which populations expanded' is how the question actually arrives. Forgiveness 3: no guidance for the common case where cell-type labels are unstable between samples, which changes what is being counted."
+      },
+      "security": {
+        "score": 10,
+        "max": 12,
+        "note": "Credential safety 4: no credentials, eval/exec or network calls. Input validation 3: the Skill insists on sample-level counts and biological replicates but no snippet checks the design before fitting. Data safety 3: no donor-data note."
+      },
+      "maintainability": {
+        "score": 10,
+        "max": 12,
+        "note": "Modularity 4: one section per method plus separate covariate, reference and error sections, and six Related Skills hand-offs. Modifiability 3. Testability 3: examples/milo_differential_abundance.R and examples/sccoda_composition.py both exist and parse, but there is no fixture and no expected output."
+      },
+      "agent_specific": {
+        "score": 17,
+        "max": 20,
+        "note": "Trigger precision 4, composability 4, escape hatches 4 - the replicate requirement ('>=2, ideally 3-4', 'the effect is unidentifiable, not merely underpowered') and the never-recommended row are firm refusals, and input 4 confirmed the n=2/3/4 progression it predicts. Progressive disclosure 3. Idempotency 2: makeNhoods samples neighbourhoods at random and scCODA runs HMC, and the Skill sets no seed anywhere and never mentions one; the same script can return a different neighbourhood set and a different posterior each run."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 88.8,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 18,
+      "total": 20
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "propeller on 8 donors: did any population change?",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Exactly right: NK cells the only call at FDR 9.3e-5, and nothing else below 0.05. The simplex constraint is visible in the data (NK proportion correlates -1.000 with the mean of all others).",
+        "executed": true,
+        "execution_note": "run/input1.R, run/input1.log. speckle 1.6.0 + limma 3.62.2 on the SYNTHETIC 8-sample PBMC set (6,049 clean cells, 4 donors per condition). Ground truth: NK 6% -> ~13%, everything else rescaled.",
+        "basic": 37,
+        "specialized": 56,
+        "total": 93,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "A simplex-aware method is used rather than a per-cluster proportion t-test",
+            "result": "PASS",
+            "note": "propeller (transform + limma moderated test) used as the primary test; the naive t-test run only as the comparison the Skill's 'never recommended' row invites."
+          },
+          {
+            "text": "The single true abundance change is recovered and nothing else is called",
+            "result": "PASS",
+            "note": "NK cells FDR 9.25e-05; next best CD8 T at FDR 0.067, correctly left uncalled. Identical result with transform='logit'."
+          },
+          {
+            "text": "The compositional coupling is reported rather than only p-values",
+            "result": "PASS",
+            "note": "Mean pairwise correlation between type proportions -0.099, and NK vs the mean of all others exactly -1.000 - the constraint the Governing Principle describes."
+          },
+          {
+            "text": "The Skill's description of propeller's transform matches the installed version",
+            "result": "FAIL",
+            "note": "SKILL.md calls propeller 'arcsin-sqrt + limma'. speckle 1.6.0 printed 'Performing logit transformation of proportions' on the default call, i.e. logit is the default. Both transforms gave the same answer here, so the consequence is cosmetic, but the description is wrong."
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Milo, the Skill's primary_tool, on the same 8-donor design",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The most serious finding in this audit. Milo, run exactly as SKILL.md:83-95 prescribes, found ZERO significant neighbourhoods on a 2.25x expansion that propeller detects at FDR 9e-5 on the same cells. Raw p-values were also all above 0.05, so it is power, not the SpatialFDR correction.",
+        "executed": true,
+        "execution_note": "run/input2.R, run/input2b_milo_k.R and logs. miloR 2.2.0, 284 neighbourhoods at k=30 prop=0.1 (median 105 cells each). Follow-up sweep at k = 30/50/80/120, prop 0.2: still 0 significant, best NK raw p = 0.067, logFC +1.3 to +2.3 (right direction, no power). Adding batch (~ batch + condition) produced 16 significant neighbourhoods of which 15 are CD14+ monocytes, a population that did not change.",
+        "basic": 30,
+        "specialized": 46,
+        "total": 76,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The Milo code the Skill prints runs end to end on a standard SCE",
+            "result": "PASS",
+            "note": "Milo -> buildGraph -> makeNhoods -> countCells -> calcNhoodDistance -> testNhoods -> annotateNhoods all ran unchanged in 37 s and returned the documented columns including SpatialFDR and cell_type_fraction."
+          },
+          {
+            "text": "SpatialFDR is reported rather than the raw p-value, as the Skill insists",
+            "result": "PASS",
+            "note": "All three reported together: raw PValue < 0.05 in 0 nhoods, FDR < 0.1 in 0, SpatialFDR < 0.1 in 0."
+          },
+          {
+            "text": "Milo with the Skill's prescribed parameters detects the real abundance change",
+            "result": "FAIL",
+            "note": "0 of 284 neighbourhoods at k=30/prop=0.1; 0 at every k from 30 to 120 with prop=0.2. NK counts per sample were 41/56/42/32 (control) against 83/95/100/108 (treated) - a clean doubling that propeller finds trivially."
+          },
+          {
+            "text": "No abundance claim is made from the batch-adjusted run without cross-checking",
+            "result": "PASS",
+            "note": "~ batch + condition produced 16 significant neighbourhoods, 15 of them CD14+ monocytes; the response flags these as inconsistent with both the unadjusted Milo run and propeller rather than reporting a monocyte change."
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Variant B",
+        "label": "scCODA, and does the reference cell type really change the verdict?",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The Skill devotes a whole section to the reference-cell-type choice and it is exactly right. With any of seven non-NK references, or 'automatic', the credible effect is NK alone. With NK as the reference the verdict inverts completely: seven types become credible changes and NK does not.",
+        "executed": true,
+        "execution_note": "run/input3.py, run/input3.log, run via tools/sccoda-venv/Scripts/python.exe (the shared venv's arviz 1.x breaks scCODA 0.1.9). Ten HMC fits, sample_hmc(num_results=20000, num_burnin=5000), est_fdr=0.1. 'automatic' selected CD4 T cells. Batch-adjusted formula 'batch + condition' also gave NK alone.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "A per-sample cell-type count table with covariates is built as the model requires",
+            "result": "PASS",
+            "note": "pd.crosstab(sample, cell_type) merged with the sample metadata, exactly the shape SKILL.md:111-113 prints; dat.from_pandas accepted it unchanged."
+          },
+          {
+            "text": "The reference cell type is chosen deliberately rather than left implicit",
+            "result": "PASS",
+            "note": "'automatic' used for the headline run (it selected CD4 T cells) and all eight explicit references tested."
+          },
+          {
+            "text": "The Skill's warning that the verdict can flip with the reference is verified, not repeated",
+            "result": "PASS",
+            "note": "reference=NK cells inverted the result: B cells, CD14+ Mono, CD4 T, CD8 T, DC, FCGR3A+ Mono and Megakaryocytes all became credible effects at inclusion probabilities 0.907-1.000, and NK did not."
+          },
+          {
+            "text": "Only the population the data supports is reported as changed",
+            "result": "PASS",
+            "note": "NK cells, log2 fold change +1.12, inclusion probability 1.000 - matching the injected truth; the NK-reference run is reported as the demonstration of the pitfall, not as a result."
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Edge",
+        "label": "One donor per condition - can anything be concluded?",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "propeller refuses, which under the Category 3 fault-tolerance override is the correct design. The Skill's '>=2, ideally 3-4' guidance is confirmed quantitatively: NK FDR 0.012 at n=2, 0.0006 at n=3, 9.3e-5 at n=4, with no other type ever called.",
+        "executed": true,
+        "execution_note": "run/input4.R, run/input4.log. n=1 per group: 'Error in .ebayes(...): No finite residual standard deviations' - a hard stop with no p-values emitted. sccomp could not be tested (not installed on this machine); scCODA's behaviour at n=1 was not re-run because input 3's ten HMC fits already took ~12 minutes.",
+        "basic": 37,
+        "specialized": 55,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The n=1 design is identified as unidentifiable before any test is trusted",
+            "result": "PASS",
+            "note": "The response states the donor is perfectly confounded with condition, per SKILL.md:28, and treats the proportion table as descriptive only."
+          },
+          {
+            "text": "No abundance claim is made from one donor per condition",
+            "result": "PASS",
+            "note": "The 6.1% -> 12.2% NK difference between S1 and S5 is shown and explicitly not tested."
+          },
+          {
+            "text": "The Skill's replicate guidance is checked against the data rather than repeated",
+            "result": "PASS",
+            "note": "n=2/3/4 run: 1 type called at every n, NK, with FDR improving 0.012 -> 0.0006 -> 9.3e-5, which is what 'more donors help' predicts."
+          },
+          {
+            "text": "The failure at n=1 is surfaced rather than silently producing numbers",
+            "result": "PASS",
+            "note": "propeller raised and the response reports the error text. The message itself is cryptic and the Skill has no Common Errors row for it - recorded as a P2, not an assertion failure, because the output did surface it."
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "'I have DE genes in my T-cell cluster' - expression or composition?",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The DE half worked perfectly (15 injected interferon genes recovered in CD14+ monocytes at precision 1.000, zero calls in clusters where nothing was injected). The masquerade claim itself could not be demonstrated on this dataset and the response says so instead of asserting it.",
+        "executed": true,
+        "execution_note": "run/input5.R, run/input5.log. edgeR 4.4.2 pseudobulk per sample. Merged CD4+CD8 'T cells' cluster: 0 DE genes. Forced CD4:CD8 ratio shift from 0.27 to 0.10 with expression untouched: still 0 DE genes; mean |log2FC| across eight CD8-lineage markers only 0.729. The synthetic CD4 and CD8 profiles derive from very similar pbmc3k means, so mixing them barely moves the aggregate.",
+        "basic": 35,
+        "specialized": 54,
+        "total": 89,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The DE and DA analyses are run and interpreted jointly, as SKILL.md:29 requires",
+            "result": "PASS",
+            "note": "Pseudobulk edgeR on three cell sets plus propeller on both fine and coarse labels, reported together."
+          },
+          {
+            "text": "Pseudobulk DE recovers the injected genes without false positives",
+            "result": "PASS",
+            "note": "CD14+ monocytes: 15 calls, all 15 among the 55 injected genes (precision 1.000) - IFIT1, IFITM3, ISG15, LY6E, IFI44L, MX1, STAT1, RSAD2 ... Pure CD4 and merged T clusters: 0 calls, correctly."
+          },
+          {
+            "text": "The masquerade claim is tested rather than repeated from the Skill",
+            "result": "PASS",
+            "note": "Tested twice - at the natural CD8-share difference (0.273 vs 0.235) and at a forced 0.27 vs 0.10 - and reported as not demonstrable here."
+          },
+          {
+            "text": "The response states plainly that this dataset cannot decide the Skill's masquerade claim",
+            "result": "PASS",
+            "note": "The log says the claim is 'neither confirmed nor refuted here' and gives the reason (mean |log2FC| across eight CD8-lineage markers only 0.729 after a 2.7x ratio shift, because the simulated CD4 and CD8 profiles are too similar). Separately noted: propeller on the coarse labels called only NK, so the sub-cluster shift is invisible to a cluster-level test - the case the Skill says Milo exists for, and Milo had no power here. That is folded into the P1, not scored twice."
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 34.8,
+    "dynamic_weighted": 53.3,
+    "score": 88,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "The reference-cell-type section is the best-validated page in this candidate's whole Skill set: with any non-NK reference scCODA returned NK alone, and with NK as the reference the verdict inverted to seven credible effects and NK excluded - exactly the flip the Skill warns about, demonstrated in one run.",
+    "The simplex argument is not rhetoric. The NK proportion correlated with the mean of all other proportions at exactly -1.000, which is the constraint made visible, and the Skill's 'never recommended' row for per-cluster t-tests follows from it.",
+    "The replicate guidance is quantitatively right: propeller hard-errors at n=1 per group and the NK call strengthens monotonically from FDR 0.012 at n=2 to 9.3e-5 at n=4, with no spurious calls at any n.",
+    "The Common Errors table anticipated the Milo failure this audit found ('No significant abundance change despite an obvious shift -> underpowered; add donors, report effect sizes'), which is the right response even though the Skill's own primary tool produced it."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "The primary tool returns a false negative on the canonical use case",
+      "observed_in": [
+        2,
+        5
+      ],
+      "problem": "Milo is declared primary_tool. Run exactly as SKILL.md:83-95 prescribes on 8 donors with 674-837 cells each, it found 0 of 284 neighbourhoods significant for a 2.25x expansion of a 6% population (NK counts 41/56/42/32 control against 83/95/100/108 treated). A k sweep to 120 with prop 0.2 still found nothing; the best NK raw p was 0.067. propeller found the same effect at FDR 9.3e-5, and scCODA at inclusion probability 1.000.",
+      "root_cause": "Milo's NB-GLM on ~100-cell neighbourhoods has little power at this cell count, and the Skill's only caveat - 'Fails when: very few cells/sample' - reads as a warning about hundreds of cells, not about a 6,000-cell 8-donor experiment that most readers would call comfortably sized.",
+      "fix": "Quantify the caveat: say Milo needs roughly thousands of cells per sample and that below that a cluster-based method is the primary test, not the cross-check. Invert the 'run a cluster-based method and Milo when feasible' sentence so the cluster-based method leads, and add a Common Errors row: 'Milo returns zero significant neighbourhoods while a cluster test is highly significant -> under-powered at this cell count; report the cluster-level result and Milo's effect sizes'."
+    },
+    {
+      "priority": "P2",
+      "title": "No seed anywhere, in a Skill whose two headline methods are stochastic",
+      "observed_in": [
+        2,
+        3
+      ],
+      "problem": "makeNhoods samples neighbourhoods at random and scCODA's sample_hmc runs an MCMC chain. Neither the SKILL.md blocks nor either shipped example sets a seed, and the Skill never mentions one, so the same script can return a different neighbourhood set and a different posterior on each run.",
+      "root_cause": "Reproducibility is not covered in the Skill at all - there is no Common Errors row for it and no set.seed in any snippet.",
+      "fix": "Add set.seed() above buildGraph/makeNhoods and a seed argument to the scCODA call, and state that a differential-abundance result must be reported with the seed and the k/prop or HMC settings that produced it."
+    },
+    {
+      "priority": "P2",
+      "title": "propeller's transform default is named wrongly",
+      "observed_in": [
+        1
+      ],
+      "problem": "The method table says 'arcsin-sqrt or logit transform + limma' and the Approach line says 'apply an arcsin-sqrt (or logit) variance-stabilizing transform'. speckle 1.6.0 prints 'Performing logit transformation of proportions' for propeller() with no transform argument.",
+      "root_cause": "The description predates speckle's change of default.",
+      "fix": "Say logit is the current default and arcsin-sqrt is the alternative (transform = 'asin'), so a methods section written from this Skill is accurate."
+    },
+    {
+      "priority": "P2",
+      "title": "No Common Errors row for the most likely first failure",
+      "observed_in": [
+        4
+      ],
+      "problem": "With one sample per group propeller aborts with 'Error in .ebayes(...): No finite residual standard deviations'. That message says nothing about replicates, and it is exactly the error a user with a pilot experiment will hit first.",
+      "root_cause": "The n=1 discussion is in the Governing Principle, not in the error table where an agent looks after a crash.",
+      "fix": "Add a row: symptom 'No finite residual standard deviations' / cause 'one sample per group - no residual degrees of freedom' / fix 'the effect is unidentifiable; add biological replicates, do not switch tools'."
+    },
+    {
+      "priority": "P2",
+      "title": "sccomp is prescribed but could not be verified here",
+      "observed_in": [],
+      "problem": "sccomp has a full code block and a method-table row, but the package is not installed in this audit environment (it pulls a Stan toolchain), so its three-function pipeline was checked only against the documented API, not run.",
+      "root_cause": "Environment limitation, not a Skill defect - recorded so the gap in this audit's coverage is explicit.",
+      "fix": "No change required of the Skill. A future fix pass should install sccomp and re-run the same design, since it is the Skill's recommended route when outliers or over-dispersion are present and it is the one route this audit could not test."
+    }
+  ]
+}

@@ -1,0 +1,257 @@
+{
+  "meta": {
+    "skill_name": "bio-differential-expression-deseq2-basics",
+    "description": "Performs differential expression on bulk RNA-seq count data with DESeq2's negative-binomial GLM, Wald and LRT testing, apeglm/ashr/normal LFC shrinkage, independent filtering, Cook's outlier handling, VST/rlog transforms, and design formulas including paired, batch, and interaction terms. Use when running bulk DE, choosing DESeq2 over edgeR or limma-voom, building a paired or interaction design, applying LFC shrinkage for ranking or GSEA, choosing Wald vs LRT, troubleshooting padj=NA, picking VST vs rlog, importing salmon/kallisto via tximport, or analyzing prokaryotic RNA-seq.",
+    "evaluated_on": "2026-09-16",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:differential-expression/deseq2-basics",
+    "executed_inputs": "7/7"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "Every number reported came from a logged run. The eleven cited references are real and correctly attributed, including the three (Zhu 2019, Crowell 2020, Ignatiadis 2016) whose claims this audit tested directly - all three held." },
+      "practice_boundaries": { "result": "PASS", "detail": "No output diagnoses, prescribes or triages an individual. The Skill operates on count matrices; the rare-disease example in its Cook's failure mode is about a count outlier, not a clinical call." },
+      "methodological_ground": { "result": "PASS", "detail": "The adversarial input asked for a post-hoc shrunken-LFC filter reported as FDR-controlled, for bare results(dds) on a two-factor design, and for summary() at the wrong alpha. All three were refused with measurements, and the FDR-valid alternative (lfcThreshold / TREAT) was produced." },
+      "code_usability": { "result": "PASS", "detail": "7/7 inputs executed. Every code block in this Skill ran as printed under DESeq2 1.46.0, apeglm 1.28.0, ashr 2.2.63 and IHW 1.34.0, including the interaction, LRT, tximport-shaped and shrinkage paths. The only adaptation needed anywhere was pinning IHW's nbins, which is a documented local environment issue, not a Skill defect." }
+    }
+  },
+  "static_score": {
+    "subtotal": 88,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 11, "max": 12, "note": "Completeness 4: designs, Wald/LRT, three shrinkage flavours, independent filtering, Cook's, VST/rlog, tximport, size-factor alternatives, PyDESeq2 and a prokaryotic section - everything the description promises, with a decision tree that covers the single-cell pseudobulk case this candidate needs. Correctness 3: almost every checkable claim was verified exactly (the apeglm error string matched verbatim, LRT LFC really is the last coefficient, name= and contrast= really are identical now, minReplicatesForReplace really is 7), but two statements are imprecise. 'padj = NA has three distinct causes ... all-zero in a group' - a gene that is all-zero in one group tested fine here (padj = 0); DESeq2's NA rule is all-zero across ALL samples. And 'lfcShrink preserves the Wald p-value' is true of pvalue but not of padj, which differed for all 1,669 non-NA genes (max |diff| 0.154). Appropriateness 4." },
+      "reliability": { "score": 11, "max": 12, "note": "Fault tolerance 3, error reporting 4, recoverability 4. The Per-Method Failure Modes section is the best reliability writing in this candidate's Skill set: five modes, each with trigger, mechanism, symptom and fix, and the symptom string it predicts for apeglm ('type=\\'apeglm\\' shrinkage only for use with \\'coef\\'') came back verbatim from R. All three padj=NA remedies worked on constructed cases: independentFiltering=FALSE rescued a baseMean-16 regulator below the 19.69 filter threshold, cooksCutoff=FALSE rescued a one-sample-driven gene, and IHW rescued the low-count gene that default filtering dropped - which is exactly the 'often less aggressive on low-count genes' claim." },
+      "performance_context": { "score": 7, "max": 8, "note": "Token cost 3: 337 lines, no duplicated code, but the prokaryotic RNA-seq section and parts of the betaPrior history are dead weight for most calls and there is no references/ layer to defer them to. Execution efficiency 4: construct, relevel, filter, fit, extract by explicit contrast, shrink - linear with no redundant step." },
+      "agent_usability": { "score": 15, "max": 16, "note": "Learnability 4, consistency 4, error prevention 4. Leading with 'The Single Most Important Modern Insight' and the resultsNames trap puts the two things agents most often get wrong in the first screen. Feedback design 3: no output format specified; nothing says to report the contrast name, the alpha actually used, or the filtering threshold, all of which this audit had to print to make sense of the results." },
+      "human_usability": { "score": 7, "max": 8, "note": "Discoverability 4: 'find differentially expressed genes between conditions' is the literal trigger line and matches how the request arrives. Forgiveness 3: strict input handling is correct under Category 3 Override 2, and the Skill does explain the integer-count and reference-level requirements, but it gives no guidance for a count matrix whose sample order does not match the colData." },
+      "security": { "score": 10, "max": 12, "note": "Credential safety 4: no credentials, eval/exec or network calls. Input validation 3: the Skill flags fractional counts and the full-rank design check (alias(model.matrix(...))) but no snippet validates colData/count alignment before fitting. Data safety 3: no note on human-donor count matrices despite the rare-disease cohort example." },
+      "maintainability": { "score": 10, "max": 12, "note": "Modularity 4: one section per decision, a separate failure-mode section, and thirteen Related Skills hand-offs. Modifiability 3. Testability 3: three shipped example scripts (basic_workflow.R, batch_correction.R, multi_condition.R), all present and all parsing, but no fixture and no expected output." },
+      "agent_specific": { "score": 17, "max": 20, "note": "Composability 4 and idempotency 4 (DESeq2 is deterministic; two runs of every input here agreed exactly). Trigger precision 3: the description is bulk-worded throughout ('bulk RNA-seq count data'), and single-cell pseudobulk - the reason this candidate needs the Skill at all - appears only as one decision-tree row and one size-factor note, so 'run pseudobulk DE on my scRNA-seq' may not trigger it. Progressive disclosure 3. Escape hatches 3: the n=2 'report as exploratory' row is good, but there is no stop condition for a design that cannot support the requested contrast." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 94.0,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 27, "total": 28 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Pseudobulk DE on CD14+ monocytes from 8 donors",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Ran first time and got it right: 19 calls, all 19 among the 55 injected genes (precision 1.000), direction correct 19/19, and estimated LFCs within 0.2 of the injected values at every effect size.",
+        "executed": true,
+        "execution_note": "run/input1.R, run/input1.log. DESeq2 1.46.0 + apeglm 1.28.0 on a pseudobulk matrix built from the SYNTHETIC 8-sample PBMC set (12,521 genes x 8 samples; 8,983 after the Skill's rowSums >= 10 pre-filter). Matrix saved to data/pseudobulk_cd14_mono.rds and reused by inputs 2-7.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The reference level is set explicitly before DESeq(), as the Skill insists", "result": "PASS", "note": "relevel(ref='control') before the fit; resultsNames came back as condition_treated_vs_control with the sign in the expected direction." },
+          { "text": "The contrast is named explicitly rather than relying on bare results()", "result": "PASS", "note": "results(name='condition_treated_vs_control'); the bare-call trap was then demonstrated separately - with design ~ condition + batch, bare results() returns the batch effect." },
+          { "text": "Shrunken LFC and Wald p-value are not conflated in the report", "result": "PASS", "note": "Verified that lfcShrink preserves pvalue exactly (all.equal TRUE) while changing the LFC (median |LFC| 0.287 unshrunk vs 0.000 shrunk across all genes), and reported accordingly." },
+          { "text": "The result is scored against the known structure rather than asserted", "result": "PASS", "note": "Recall broken down by injected effect size: 14/15 at true log2FC +2, 4/20 at +1, 1/20 at -1, with median estimated LFCs +1.81 / +0.90 / -0.97 against truth +2 / +1 / -1." }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Design formulas: batch and sex as nuisance, plus a paired design",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The Skill's design guidance is worth real power here: adding batch took recall from 0.345 to 0.436, and batch + sex kept precision at 1.000 while holding that recall. The paired design produced textbook-correct CD16-monocyte markers.",
+        "executed": true,
+        "execution_note": "run/input2.R, run/input2.log. Four nuisance formulas plus a genuine within-donor paired design (each donor contributes CD14+ and FCGR3A+ monocyte pseudobulk, ~ donor + subtype, 16 samples).",
+        "basic": 37,
+        "specialized": 56,
+        "total": 93,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The variable of interest is placed last and the contrast is still named explicitly", "result": "PASS", "note": "All four formulas end in condition and every extraction uses name=; ~ condition + batch with an explicit name gave an identical result, confirming the Skill's 'last for readability' framing." },
+          { "text": "Adding nuisance covariates is justified by its measured effect rather than by habit", "result": "PASS", "note": "~ condition 19 calls / recall 0.345; ~ batch + condition 25 calls / recall 0.436 with 1 FP; ~ batch + sex + condition 24 calls / recall 0.436 with 0 FP; ~ sex + condition 17 calls / recall 0.309." },
+          { "text": "The pairing variable is placed first in the paired design, per SKILL.md", "result": "PASS", "note": "~ donor + subtype used; the unpaired ~ subtype run is reported alongside (1,988 vs 1,997 calls - essentially neutral here because the simulated donor effects are small)." },
+          { "text": "The paired result is sanity-checked against known biology", "result": "PASS", "note": "FCGR3A +4.18, CDKN1C +2.94, MS4A7 +1.91, CD14 -3.66, LYZ -2.56 (CD16 vs CD14 monocytes) - all five in the textbook direction at padj 0." }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Three genes with padj = NA for three different reasons",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Two of the Skill's three named causes reproduced exactly and both prescribed fixes worked. The third named cause does not behave as described.",
+        "executed": true,
+        "execution_note": "run/input3.R, run/input3.log. Three genes appended to the real pseudobulk matrix: a baseMean-16 consistent regulator, a one-sample-driven gene, and a gene all-zero in the control group. Independent filtering threshold came out at baseMean 19.69; minReplicatesForReplace default confirmed as 7 against n=4 per group.",
+        "basic": 36,
+        "specialized": 54,
+        "total": 90,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The distinct padj=NA causes are diagnosed separately rather than treated as one problem", "result": "PASS", "note": "MASTER_TF had a p-value but no padj (independent filtering); ONE_SAMPLE_GENE had neither (Cook's); the two were given different fixes." },
+          { "text": "Each prescribed fix is applied and its effect measured", "result": "PASS", "note": "independentFiltering=FALSE gave MASTER_TF padj 0.008; cooksCutoff=FALSE gave ONE_SAMPLE_GENE p 0.00138 / padj 0.148; filterFun=ihw gave MASTER_TF padj 0.00225 - confirming the Skill's 'IHW is often less aggressive on low-count genes'." },
+          { "text": "The Skill's listed causes match what DESeq2 actually does", "result": "FAIL", "note": "The Skill lists 'all-zero in a group' as one of the three padj=NA causes. The constructed ZERO_IN_CONTROL gene (0,0,0,0,300,300,300,300) tested normally: LFC 10.88, padj 0. DESeq2's NA rule is all-zero across ALL samples, which is a different and much rarer case." },
+          { "text": "No filtering override is applied globally without stating what it costs", "result": "PASS", "note": "Reported that turning off independent filtering takes padj NAs from 7,144 to 1 across 8,986 genes, i.e. it trades FDR power for coverage - so the override is used per-gene, not as a default." }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Interaction design, the resultsNames trap and the apeglm footgun",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Every claim in the Skill's interaction section verified, including the exact error text. The interaction term correctly found 0 genes against a ground truth of no interaction, and both prescribed workarounds agreed at cor = 1.000.",
+        "executed": true,
+        "execution_note": "run/input4.R, run/input4.log. ~ sex + condition + sex:condition on the pseudobulk matrix (2 F and 2 M per condition). resultsNames: Intercept | sex_M_vs_F | condition_treated_vs_control | sexM.conditiontreated.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The main-effect coefficient is interpreted as the effect in the reference level only", "result": "PASS", "note": "condition_treated_vs_control gave 11 genes (the effect in females); the summed contrast for males gave 6; both reported as level-specific, never as a marginal average." },
+          { "text": "The apeglm contrast limitation is hit and handled with a workaround the Skill prescribes", "result": "PASS", "note": "R returned \"type='apeglm' shrinkage only for use with 'coef'\" - character-for-character the symptom string at SKILL.md's apeglm failure mode. ashr with contrast= then ran." },
+          { "text": "The two prescribed workarounds agree with each other", "result": "PASS", "note": "The summed list-contrast and the ~ 0 + group rebuild both gave 6 genes at padj<0.05, all 6 true positives, with LFC correlation 1.0000; apeglm shrank the ~0+group coefficient without error." },
+          { "text": "The interaction result is checked against what the data can support", "result": "PASS", "note": "The treatment effect was injected identically in both sexes, so the true interaction is zero for every gene; the interaction term returned 0 genes at padj<0.05." }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Four-level factor: LRT omnibus, and what its LFC column actually is",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The Skill's sharpest small claim - after an LRT, results() reports the LFC of the LAST coefficient, not an omnibus effect - is exactly true here, and the prescribed remedy (per-level Wald extraction) works.",
+        "executed": true,
+        "execution_note": "run/input5.R, run/input5.log. grp = condition x batch as a 4-level factor, 2 samples per level. LRT reduced=~1 gave 269 genes at precision 0.108 (it tests batch and condition jointly); LRT with reduced=~batch gave 25 genes at precision 1.000.",
+        "basic": 37,
+        "specialized": 56,
+        "total": 93,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "LRT is used for the omnibus question and Wald for a specific coefficient", "result": "PASS", "note": "LRT reduced=~1 for 'any difference among the four groups'; Wald contrasts for each level comparison." },
+          { "text": "The LRT log2FoldChange column is not reported as the omnibus effect", "result": "PASS", "note": "Reported as the treated_B-vs-control_A coefficient, with the per-level Wald table given instead as the effect sizes." },
+          { "text": "The Skill's claim about which coefficient the LRT LFC shows is verified, not repeated", "result": "PASS", "note": "all.equal(LRT LFC, Wald LFC of the last coefficient) = TRUE; against the first non-intercept coefficient = FALSE; correlation with the treated_A-vs-control_A contrast only 0.405." },
+          { "text": "The reduced model retains the nuisance term rather than dropping everything", "result": "PASS", "note": "reduced=~1 was shown to conflate batch with condition (precision 0.108); reduced=~batch gave 25 genes at precision 1.000, which is the form SKILL.md prints." }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "'Can I just run DESeq2 on my 1,184 cells directly?'",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The strongest single measurement in this audit. On a deliberately null contrast, cell-level testing produced 78 false positives (smallest BH p 2e-13) and cell-level DESeq2 produced 30; the pseudobulk route the Skill prescribes produced ZERO, smallest padj 1.000.",
+        "executed": true,
+        "execution_note": "run/input6.R, run/input6.log. Null split {S1,S3,S5,S7} vs {S2,S4,S6,S8}, balanced 2+2 on condition, batch and sex, so every call is a false positive by construction. presto::wilcoxauc for the cell-level test, DESeq2 for both DESeq2 routes.",
+        "basic": 39,
+        "specialized": 57,
+        "total": 96,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The cells-as-replicates request is refused rather than accommodated", "result": "PASS", "note": "Refused, with the Skill's decision-tree row and Crowell 2020 as the reason, and the pseudobulk matrix produced instead." },
+          { "text": "The refusal is backed by a null-data measurement rather than a citation alone", "result": "PASS", "note": "Cell-level Wilcoxon 78 false positives at BH<0.05 (14 surviving |logFC|>0.25); cell-level DESeq2 on 400 cells 30 false positives; pseudobulk DESeq2 0, smallest padj 1.00." },
+          { "text": "The pseudobulk alternative is produced and scored on the real contrast too", "result": "PASS", "note": "On the real contrast, cell-level Wilcoxon gave 44 calls at precision 0.523 against pseudobulk's 19 calls at precision 1.000." },
+          { "text": "The unit of aggregation is the biological sample, not the cell or the cluster", "result": "PASS", "note": "One pseudobulk column per donor per cell type throughout, as the Skill's decision-tree row specifies." }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "'results(dds), filter |shrunken LFC| > 1, call it FDR 5%'",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "All three requests refused with numbers. The bare-results() demonstration is the most damaging: on ~ condition + batch it returns the batch effect - 539 genes at precision 0.017 against the 19 at precision 1.000 the user wanted.",
+        "executed": true,
+        "execution_note": "run/input7.R, run/input7.log. Also quantified a nuance the Skill does not state: lfcShrink preserves pvalue exactly but padj differs for all 1,669 non-NA genes (max |diff| 0.154).",
+        "basic": 39,
+        "specialized": 57,
+        "total": 96,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The post-hoc shrunken-LFC filter is refused as an FDR-controlled claim", "result": "PASS", "note": "Refused per the Skill's headline insight, and shown to be lossy: it drops 4 genuinely injected genes (HDLBP, CLTA, MS4A6A, SEPT9, all true |log2FC| = 1) whose shrunken estimates fall just below 1." },
+          { "text": "An FDR-valid alternative for the same question is produced", "result": "PASS", "note": "results(lfcThreshold=0.5) gave 13 genes and lfcThreshold=1.0 gave 1, both at precision 1.000 - properly conservative, and the only versions carrying an FDR guarantee for a magnitude claim." },
+          { "text": "The bare results(dds) request is refused with evidence", "result": "PASS", "note": "On ~ condition + batch, bare results() reports 'log2 fold change (MLE): batch B vs A' - 539 calls at precision 0.017 versus the named contrast's 19 at 1.000." },
+          { "text": "The Skill's claim that lfcShrink preserves the Wald p-value is verified rather than assumed", "result": "PASS", "note": "all.equal on the pvalue column returned TRUE. The padj column is NOT preserved (all 1,669 non-NA genes differ, max |diff| 0.154), which the Skill does not mention - recorded as a P2." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 35.2,
+    "dynamic_weighted": 56.4,
+    "score": 92,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "The highest verified-claim rate of any Skill in this candidate's set. The apeglm failure-mode symptom string came back from R character-for-character; the LRT LFC really is the last coefficient (all.equal TRUE); name= and contrast= really are identical now; minReplicatesForReplace really is 7; IHW really is less aggressive on low-count genes than default independent filtering.",
+    "The single-cell pseudobulk row of the decision tree is worth the whole Skill to this candidate: on a null contrast the prescribed route gave 0 false positives where cell-level testing gave 78, and on the real contrast it gave precision 1.000 against cell-level 0.523.",
+    "Leading with 'shrunken LFC and the Wald p-value come from different models' and the resultsNames trap puts the two most consequential DESeq2 errors in the first screen, and the bare-results() trap is catastrophic when it fires - 539 calls at precision 0.017 versus 19 at 1.000.",
+    "All three padj=NA remedies worked on constructed cases, which is unusual: most troubleshooting tables in this Skill set name a fix that does not address the failure it is listed under."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "'All-zero in a group' is not a padj=NA cause",
+      "observed_in": [3],
+      "problem": "The Skill lists three causes of padj=NA: independent filtering, Cook's outlier, and 'all-zero in a group'. A constructed gene with counts 0,0,0,0,300,300,300,300 tested normally (LFC 10.88, padj 0). DESeq2 sets NA when a row is all-zero across ALL samples, not within one group.",
+      "root_cause": "The condition was compressed from DESeq2's documented rule and lost the quantifier.",
+      "fix": "Change the third cause to 'all-zero across every sample (baseMean = 0)' and note that group-specific zeros are testable and usually produce very large LFCs."
+    },
+    {
+      "priority": "P2",
+      "title": "lfcShrink preserves pvalue but not padj",
+      "observed_in": [1, 7],
+      "problem": "The headline insight says the p-value column lfcShrink carries forward is the unshrunken Wald p-value. That is exactly true of pvalue, but padj differed between results() and lfcShrink() for all 1,669 non-NA genes (max |diff| 0.154), so a padj filter applied to the shrunken object is not the same filter.",
+      "root_cause": "Independent filtering is re-run on the shrunken object, so the adjusted values are recomputed even though the raw p-values are carried through.",
+      "fix": "Add one clause: pvalue is carried through unchanged, padj is recomputed - take padj from results() and the LFC from lfcShrink() if the two are combined in one table."
+    },
+    {
+      "priority": "P2",
+      "title": "The description is bulk-worded and may not trigger on pseudobulk requests",
+      "observed_in": [],
+      "problem": "The frontmatter description says 'bulk RNA-seq count data' and lists bulk-specific triggers. Single-cell pseudobulk - the reason a single-cell workflow needs this Skill - appears only as one decision-tree row and one size-factor note.",
+      "root_cause": "The Skill was written for a bulk RNA-seq bundle and pseudobulk was added as a case rather than as a stated use.",
+      "fix": "Add 'single-cell pseudobulk DE aggregated per sample x cell type' to the description's Use-when list, so a request phrased as pseudobulk triggers it."
+    },
+    {
+      "priority": "P2",
+      "title": "No guidance on what to report",
+      "observed_in": [1, 5, 7],
+      "problem": "The Skill never says what a DE result should carry. The contrast name, the alpha actually passed to results(), and the independent-filtering baseMean threshold were all needed here to interpret the output, and all three had to be printed on the auditor's initiative.",
+      "root_cause": "Feedback design is not covered anywhere in SKILL.md or the usage guide.",
+      "fix": "Add a short 'what to report' block: the exact contrast, n per group, alpha, the filtering threshold from metadata(res)$filterThreshold, counts of padj NA by cause, and whether the LFC quoted is shrunken."
+    },
+    {
+      "priority": "P2",
+      "title": "Prokaryotic and betaPrior sections are dead weight for most calls",
+      "observed_in": [],
+      "problem": "Roughly 60 of 337 lines cover prokaryotic RNA-seq and the betaPrior deprecation history. Both load into context on every invocation and neither was relevant to any of the seven realistic inputs.",
+      "root_cause": "No references/ layer exists, so everything sits in SKILL.md.",
+      "fix": "Move the prokaryotic section and the betaPrior timeline into references/ and leave a one-line pointer each, which would bring SKILL.md under 280 lines without losing anything."
+    }
+  ]
+}

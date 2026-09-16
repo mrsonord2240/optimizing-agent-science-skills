@@ -1,0 +1,265 @@
+{
+  "meta": {
+    "skill_name": "bio-workflows-scrnaseq-pipeline",
+    "description": "Orchestrates the end-to-end single-cell RNA-seq pipeline from 10x Cell Ranger output to annotated cell types, chaining ambient-RNA removal, doublet detection, MAD-adaptive QC, normalization, integration, clustering, marker annotation, and (separately) pseudobulk DE + differential abundance. Hands mechanism to the single-cell component skills; not a re-teach of any single step.",
+    "evaluated_on": "2026-09-16",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:workflows/scrnaseq-pipeline",
+    "executed_inputs": "6/7"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "Every number reported came from a logged run, and where a predicted failure did not materialise (input 7, fake intermediate clusters) the output says so instead of repeating the claim. The three cited references are real and correctly used." },
+      "practice_boundaries": { "result": "PASS", "detail": "No output diagnoses, prescribes or triages an individual. The workflow runs on donor-pooled count matrices end to end." },
+      "methodological_ground": { "result": "PASS", "detail": "The adversarial input asked to skip ambient and doublet removal and to run DE on integrated values; both were refused with measurements. The pseudobulk and differential-abundance pairing the Skill mandates was executed and recovered exactly the two injected effects with no false calls in seven other cell types." },
+      "code_usability": { "result": "PASS", "detail": "6/7 inputs executed. Both shipped paths - the Complete R Workflow and the Scanpy alternative - ran verbatim end to end and wrote their outputs. The end-to-end multi-sample run reached 0.998 accuracy against ground truth, though half of it had to be written from the Skill's prose because no code exists for integration, pseudobulk DE or differential abundance." }
+    }
+  },
+  "static_score": {
+    "subtotal": 78,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 10, "max": 12, "note": "Completeness 3: the ordering prose covers all seven cross-cutting decisions the description promises, but the CODE covers load -> QC -> doublets -> normalize -> PCA -> cluster -> markers -> annotate, single-sample, starting from the filtered matrix. Three of the seven rules the Skill exists to enforce - integration, pseudobulk condition DE and differential abundance - have no code anywhere in the Skill or its examples, and the multi-sample structure is one prose paragraph. Correctness 3: every checkable factual claim held (gex_only really does default to True in both scanpy readers; adata.raw before scale really does prevent NaN log fold changes - 12,587 of 16,000 without it; the pinned Leiden backend really does raise the predicted FutureWarning; SoupX really cannot run from a filtered matrix), but the Step 2 / Complete Workflow QC uses flat cutoffs directly under text calling MAD-adaptive the modern default. The Skill labels the cutoffs 'illustrative', which mitigates but does not remove the contradiction. Appropriateness 4." },
+      "reliability": { "score": 9, "max": 12, "note": "Fault tolerance 3, error reporting 3, recoverability 3. The 7-row Common Errors table is good and directionally right on every row tested, but the Troubleshooting table is four generic rows ('All cells filtered -> relax thresholds'), and the four qc_checkpoints declared in the frontmatter are never printed by any code path, so the workflow has named checkpoints and no checkpoint output." },
+      "performance_context": { "score": 5, "max": 8, "note": "Token cost 2: 415 lines, the longest Skill in this candidate's set, and the Seurat path is given twice - once as Steps 1-8 and again in full as the Complete R Workflow - plus a complete Scanpy path, with no references/ layer to defer any of it. Execution efficiency 3: the pipeline itself is linear, but an agent that reads both Seurat copies does the same reasoning twice." },
+      "agent_usability": { "score": 13, "max": 16, "note": "Learnability 4 and error prevention 4: the seven ordering rules are the best-written part of this Skill and each states its consequence, not just its instruction. Consistency 2: three internal contradictions. The workflow diagram opens with [0. Ambient removal] and no code path performs it; the MAD-adaptive text sits directly above flat-cutoff code; and the Complete R Workflow omits the annotation step that Step 8 defines. Feedback design 3: checkpoints are declared but never emitted." },
+      "human_usability": { "score": 7, "max": 8, "note": "Discoverability 4: 'Analyze my single-cell RNA-seq data from counts to cell types' is exactly the request this Skill should catch, and it is the trigger line. Forgiveness 3: the Skill handles the Seurat/Scanpy preference well but gives no route for the extremely common case of a collaborator supplying only the filtered matrix beyond saying the loss is irreversible." },
+      "security": { "score": 9, "max": 12, "note": "Credential safety 4: no credentials, eval/exec or network calls. Input validation 2: nothing anywhere checks the input - not that the matrix is genes-by-cells, not that feature names are symbols rather than Ensembl IDs, not whether the directory handed in is the raw or the filtered matrix, which is the single most consequential distinction the Skill itself names. Data safety 3: no note on donor-level data despite a workflow that ends in a saved annotated object." },
+      "maintainability": { "score": 9, "max": 12, "note": "Modularity 4: clean stage sections, a depends_on frontmatter block and 19 Related Skills hand-offs. Modifiability 3. Testability 2: two example scripts that exist and parse, but they duplicate the in-SKILL code rather than adding anything, there is no fixture, no expected output, and the declared qc_checkpoints are not testable because nothing emits them." },
+      "agent_specific": { "score": 16, "max": 20, "note": "Trigger precision 4 and composability 4 - the depends_on list plus 19 hand-offs make this the best-composed Skill in the set, and the per-step cross-references are specific rather than decorative. Progressive disclosure 2: 415 lines with a duplicated path and no references/ layer. Idempotency 3: the Scanpy path pins the Leiden backend, but no R code path sets a seed and scDblFinder's per-sample call is not reproducible under set.seed (see bio-single-cell-doublet-detection). Escape hatches 3: strong on what not to do, no stop condition for a design the pipeline cannot serve." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 89.9,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 27, "total": 28 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "8 Cell Ranger samples to annotated cell types, end to end",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The best end-to-end result in this audit: 0.998 accuracy and ARI 0.996 against ground truth, 8 clusters for 8 true types, zero low-quality cells surviving. Integration is decisive - clustering on raw PCA gave ARI 0.648, on the Harmony embedding 0.996.",
+        "executed": true,
+        "execution_note": "run/input1.R, run/input1.log. Per sample: SoupX on the RAW matrix (rho 0.085-0.153) -> MAD-adaptive QC -> scDblFinder with a fixed BPPARAM seed; then merge, Harmony on batch, Leiden, FindAllMarkers, panel-based labelling. 6,524 -> 6,014 cells. Half the steps had no code in the Skill and were written from its prose.",
+        "basic": 36,
+        "specialized": 55,
+        "total": 91,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Ambient removal runs on the RAW matrix and precedes QC and doublet detection", "result": "PASS", "note": "SoupX built from raw+filtered per sample with clusters supplied, before any filtering; rho reported per sample (0.085-0.153)." },
+          { "text": "QC and doublet detection are per sample and complete before any merge", "result": "PASS", "note": "Eight independent loops; the merge happens only after singlet selection. Audit table shows loaded / after_qc / after_doublet per sample." },
+          { "text": "Integration precedes clustering, and the benefit is measured rather than assumed", "result": "PASS", "note": "Same object clustered both ways: raw PCA 13 clusters at ARI 0.648 and ARI 0.182 against batch; Harmony 8 clusters at ARI 0.996 and ARI -0.000 against batch." },
+          { "text": "The final annotation is scored against the design rather than asserted", "result": "PASS", "note": "Full 8x8 crosstab against the truth labels; accuracy 0.998, with 49 of 195 injected doublets and 0 of 290 low-quality cells surviving." }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "The Complete R Workflow block, run verbatim",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Ran end to end with only the paths changed, wrote all three declared outputs, and reached ARI 0.986 on one sample losing just 9 good cells. But it performs none of ambient removal, integration, annotation, pseudobulk DE or differential abundance - five things the same document says are essential.",
+        "executed": true,
+        "execution_note": "run/input2.R, run/input2.log, run/input2_results/. Sample S2: 865 loaded -> 814 after the flat QC -> 799 singlets; 7 clusters, 2,891 marker rows; markers.csv, seurat_object.rds and umap.pdf all written. 73% of injected doublets and 85% of low-quality cells removed.",
+        "basic": 35,
+        "specialized": 51,
+        "total": 86,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The Complete R Workflow block runs end to end as printed", "result": "PASS", "note": "No edit beyond data_dir and output_dir; completed and printed its own 'Pipeline complete' line." },
+          { "text": "Its declared outputs are produced and non-empty", "result": "PASS", "note": "markers.csv (2,891 rows), seurat_object.rds and umap.pdf all present in the output directory." },
+          { "text": "The block honours the ordering rules the same Skill mandates", "result": "FAIL", "note": "data_dir points at filtered_feature_bc_matrix, so no ambient removal; no merge or integration; no annotation (Step 8 exists only in the step-by-step section); no pseudobulk DE; no differential abundance. Five of the Skill's seven ordering rules are absent from the block an agent is most likely to copy." },
+          { "text": "No cell-type claim is made from a block that performs no annotation", "result": "PASS", "note": "Output reported as 7 unlabelled clusters plus a marker table; the truth comparison is an ARI, not a label assignment." }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Variant B",
+        "label": "The Scanpy alternative path, run verbatim",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Ran verbatim to a written h5ad at ARI 0.960. Both of the block's inline self-corrections are real and one is severe: without the adata.raw-before-scale line, 12,587 of 16,000 log fold changes come back NaN.",
+        "executed": true,
+        "execution_note": "run/input3.py, run/input3.log. S2: 865 -> 827 after flat QC -> 817 after scrublet (expected_rate 0.0066 from the recovered-cell rule), 7 clusters. Doublet removal only 38% here against 73% for the R path. Pinned vs unpinned Leiden ARI 0.9877 with the predicted FutureWarning raised.",
+        "basic": 36,
+        "specialized": 53,
+        "total": 89,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The Scanpy block runs end to end as printed and writes its object", "result": "PASS", "note": "Completed through rank_genes_groups and wrote the h5ad; no edit beyond the input path." },
+          { "text": "adata.raw is set before scaling, as the block's own inline comment requires", "result": "PASS", "note": "With it: 0 NaN log fold changes of 80,710. Without it, on an otherwise identical run: 12,587 NaN of 16,000. The comment is not decorative." },
+          { "text": "The Leiden backend is pinned for reproducibility", "result": "PASS", "note": "flavor='igraph', n_iterations=2, directed=False as printed; the unpinned call raises the FutureWarning the comment predicts and gives ARI 0.9877 against the pinned labels." },
+          { "text": "The flat QC cutoffs are treated as illustrative rather than adopted as thresholds", "result": "PASS", "note": "The block's own inline comment says so and the response reports the cutoffs as the block's, alongside the per-sample MAD route used in input 1." }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Edge",
+        "label": "'My collaborator only sent the filtered matrix'",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Every claim in the made-once commitments table verified. SoupX cannot run from a filtered matrix (it errors rather than guessing), the raw-only barcodes carry 7.5% of synthetic and 9.4% of real total UMIs, and gex_only really is True by default in both scanpy readers.",
+        "executed": true,
+        "execution_note": "run/input4.R, run/input4.log, plus a scanpy signature check. autoEstCont on a filtered-as-raw channel: 'missing values and NaN's not allowed'. emptyDrops on the raw matrix called 816 barcodes at FDR<0.01 against Cell Ranger's 882. Real 10x PBMC 1k: 6,794,880 raw barcodes vs 1,222 filtered, rho 0.01.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The claim that the filtered matrix cannot support ambient removal is verified, not repeated", "result": "PASS", "note": "SoupX errors when handed the filtered matrix as both table-of-droplets and table-of-counts; with the raw matrix the same call returns rho 0.153 for the same sample." },
+          { "text": "The 'irreversible loss' is quantified rather than asserted", "result": "PASS", "note": "Raw-only barcodes carry 191,733 UMIs, 7.5% of the sample total (9.4% on the real PBMC 1k run)." },
+          { "text": "The gex_only claim is checked against the actual reader APIs", "result": "PASS", "note": "sc.read_10x_h5 and sc.read_10x_mtx both have gex_only: bool = True, exactly as the table says. Seurat's Read10X_h5 has no such argument, so the commitment applies to the scanpy path - the Skill does not say which API it means." },
+          { "text": "No ambient correction is reported from a filtered-only input", "result": "PASS", "note": "The failure is reported as a stop condition; the response recommends going back for the raw matrix rather than proceeding." }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Pseudobulk condition DE plus differential abundance, per the ordering rules",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Exactly right against ground truth: 20 DE genes in CD14+ monocytes at precision 1.000 and ZERO calls in the other seven cell types, plus NK cells as the only abundance change. Both steps had to be written from prose - the Skill supplies no code for either.",
+        "executed": true,
+        "execution_note": "run/input5.R, run/input5.log, on the annotated object from input 1. Pseudobulk raw counts per sample x cell type -> DESeq2 per cell type; propeller for abundance (NK FDR 1.4e-4, next best CD8 T at 0.066).",
+        "basic": 39,
+        "specialized": 55,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Pseudobulk aggregates RAW counts per sample x cell type", "result": "PASS", "note": "Matrix::rowSums over the counts layer, one column per sample within each cell type, rounded to integers." },
+          { "text": "DE is run per cell type rather than on a pooled object", "result": "PASS", "note": "Eight separate DESeq2 fits; the one-cell-type effect was not diluted, which is the Skill's stated reason for the per-cell-type loop." },
+          { "text": "A differential-abundance test is run alongside the DE, as the Skill's rule 7 requires", "result": "PASS", "note": "propeller on the same annotated object; NK cells the only call at FDR 1.4e-4, matching the injected 6% -> 13% shift." },
+          { "text": "No condition-level claim is made from cell-level testing", "result": "PASS", "note": "All condition inference goes through the sample-level pseudobulk matrix; marker p-values from input 1 are used only for labelling." }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "A hashed CITE-seq pool of 6 donors in one lane",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Text response. The Skill has the right answer and states it as an ordering rule - demultiplex first, before any per-sample step - and the gex_only consequence for HTO/ADT features is verified. The mechanism lives in a Skill this candidate's bundle does not contain.",
+        "executed": false,
+        "execution_note": "Text response; no code run. The two factual claims it rests on were verified in input 4: gex_only defaults to True in sc.read_10x_h5 and sc.read_10x_mtx, and Seurat's Read10X_h5 exposes no equivalent.",
+        "basic": 36,
+        "specialized": 49,
+        "total": 85,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The response states that a hashed pool is demultiplexed before any per-sample step", "result": "PASS", "note": "SKILL.md's second ordering rule says exactly this, including that cross-sample doublets are removed at that point, and the response follows it." },
+          { "text": "The gex_only consequence for HTO/ADT features is named before loading", "result": "PASS", "note": "gex_only=False plus splitting on feature_types, per the made-once commitments table; the default was confirmed to be True." },
+          { "text": "The response does not attempt the demultiplexing itself and names where the mechanism lives", "result": "PASS", "note": "Deferred to single-cell/hashing-demultiplexing, which the Skill names in both the ordering rule and the Related Skills list." },
+          { "text": "No per-sample QC or doublet call is attempted on an undemultiplexed pool", "result": "PASS", "note": "The response stops at the demultiplexing hand-off rather than running the per-capture steps on a pooled object." }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "'Skip ambient and doublets, and run the DE on the integrated values'",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Both refused with measurements. The ordering rules are worth ARI 0.996 against 0.921 and DE recall 0.364 against 0.309 - but honestly, the catastrophic failures the Skill describes did not materialise at this scale, and the response says so.",
+        "executed": true,
+        "execution_note": "run/input7.R, run/input7.log. Shortcut object: 6,518 cells, 11 clusters, all 195 injected doublets and 285 of 290 low-quality cells retained, 2 of 11 clusters below 0.9 purity. Most doublet-enriched cluster only 5.5% against a 3.0% baseline, so no fake intermediate cluster formed. Harmony writes a 50-component embedding and no corrected expression.",
+        "basic": 37,
+        "specialized": 53,
+        "total": 90,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The request to skip ambient removal and doublet detection is refused", "result": "PASS", "note": "Refused; the full pipeline was run alongside so the comparison is on identical data." },
+          { "text": "The refusal is backed by measurement rather than by the Skill's authority", "result": "PASS", "note": "ARI 0.996 vs 0.921; 0 vs 285 low-quality cells surviving; DE recall 0.364 vs 0.309 on the matching monocyte cluster." },
+          { "text": "The request to run DE on integrated values is refused", "result": "PASS", "note": "Harmony produces a 6,518 x 50 embedding and no corrected expression matrix, so the request is ill-posed on this object; the pseudobulk route was run instead." },
+          { "text": "The cost is reported honestly, including where the predicted failure did not occur", "result": "PASS", "note": "The Skill predicts doublets seeding fake intermediate clusters; the most doublet-enriched shortcut cluster was 5.5% against a 3.0% baseline, and the response reports that the predicted failure did not materialise at this doublet rate rather than repeating the claim." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 31.2,
+    "dynamic_weighted": 53.9,
+    "score": 85,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Followed end to end, this workflow works: 8 Cell Ranger samples to annotated cell types at 0.998 accuracy and ARI 0.996 against ground truth, with pseudobulk DE finding 20 genes at precision 1.000 in the one cell type that changed and zero calls in the other seven, and differential abundance finding only the one population that shifted.",
+    "The seven cross-cutting ordering rules are the substance of the Skill and each one that could be tested held: integration before clustering moved ARI from 0.648 to 0.996 on the same object; ambient removal really does need the raw matrix (SoupX errors without it, and the raw-only barcodes carry 7.5-9.4% of all UMIs); per-sample cleanup removed every low-quality cell where the shortcut kept 285.",
+    "Both shipped code paths run verbatim on real Cell Ranger layout and reach ARI 0.986 (Seurat) and 0.960 (Scanpy) on a single sample with almost no collateral loss.",
+    "The two inline self-corrections in the Scanpy block are load-bearing and correct: setting adata.raw before scaling prevents 12,587 of 16,000 log fold changes from coming back NaN, and pinning the Leiden backend suppresses the FutureWarning it predicts."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "Three of the seven ordering rules have no code anywhere",
+      "observed_in": [1, 2, 5],
+      "problem": "Integration, pseudobulk condition DE and differential abundance are each stated as a make-or-break ordering decision, and none has a code block in SKILL.md, in the Complete R Workflow, or in either example script. The multi-sample structure the Skill exists to orchestrate is one prose paragraph. Producing the canonical result (input 1) and the DE/abundance pairing (input 5) required writing roughly half the pipeline from the prose.",
+      "root_cause": "The code sections were written single-sample for clarity and the multi-sample path was left as a hand-off, but the Skill's own value proposition is the chaining, which is exactly what is missing.",
+      "fix": "Add a short multi-sample block after Step 4 - merge, RunHarmony(group.by.vars=), FindNeighbors(reduction='harmony') - and a Step 9 that aggregates raw counts per sample x cell type, hands them to DESeq2, and runs propeller. Twenty lines would make the workflow executable as written."
+    },
+    {
+      "priority": "P1",
+      "title": "The block agents will copy omits five of the Skill's own rules",
+      "observed_in": [2],
+      "problem": "The Complete R Workflow reads from filtered_feature_bc_matrix and performs no ambient removal, no merge or integration, no annotation, no pseudobulk DE and no differential abundance. It is the longest, most copy-ready artefact in the Skill and it contradicts the ordering section above it.",
+      "root_cause": "The Complete R Workflow duplicates Steps 1-7 and was not updated when the ordering rules were written.",
+      "fix": "Either delete the Complete R Workflow (it duplicates the step-by-step section and adds nothing) or extend it to the full ordering, and in either case start it from the raw matrix with the SoupX call the diagram's Step 0 requires."
+    },
+    {
+      "priority": "P2",
+      "title": "Declared QC checkpoints are never emitted",
+      "observed_in": [1, 2, 3],
+      "problem": "The frontmatter declares four qc_checkpoints (after_loading, after_qc, after_normalization, after_clustering) and no code path prints any of them. Neither shipped example emits a checkpoint either.",
+      "root_cause": "The checkpoints are metadata, not instructions, and nothing ties them to the code.",
+      "fix": "Add one cat()/print() per checkpoint to the code paths - cell count after loading, after QC and after doublet removal, cluster count and per-cluster size after clustering. Input 1 had to invent this audit table to answer 'what did QC remove'."
+    },
+    {
+      "priority": "P2",
+      "title": "Flat QC cutoffs sit under MAD-adaptive text",
+      "observed_in": [2, 3],
+      "problem": "Step 2, the Complete R Workflow and the Scanpy block all filter on nFeature 200-5000 and percent.mt < 20 while the surrounding prose and the parameter table say to use MAD-adaptive, tissue-aware thresholds. The Skill labels them illustrative, but they are the only executable QC it ships.",
+      "root_cause": "The illustrative cutoffs predate the MAD guidance and were annotated rather than replaced.",
+      "fix": "Replace the flat cutoffs in at least the Complete R Workflow with the five-line MAD helper (median absolute deviation on log counts, log genes and mito, plus a tissue-dependent cap) so the copy-ready path matches the prose."
+    },
+    {
+      "priority": "P2",
+      "title": "No input validation at any stage",
+      "observed_in": [4],
+      "problem": "Nothing checks whether the directory handed in is the raw or the filtered matrix - the distinction the Skill itself calls irreversible - nor whether feature names are symbols or Ensembl IDs, which silently disables the '^MT-' mito pattern.",
+      "root_cause": "The made-once commitments are stated as consequences to know, not as checks to run.",
+      "fix": "Add two assertions to Step 1: warn if the loaded matrix has roughly as many barcodes as cells (i.e. it is the filtered matrix) when an ambient step is intended, and warn if rownames match ^ENSG rather than gene symbols."
+    },
+    {
+      "priority": "P2",
+      "title": "415 lines with the Seurat path given twice",
+      "observed_in": [],
+      "problem": "SKILL.md is the longest in this candidate's set and the Seurat pipeline appears in full twice - once as Steps 1-8 and again as the Complete R Workflow - plus a full Scanpy path, all loaded on every invocation with no references/ layer.",
+      "root_cause": "No progressive-disclosure layer exists.",
+      "fix": "Keep the ordering rules and the step-by-step section in SKILL.md; move the Complete R Workflow and the Scanpy path to references/ (or rely on the two example scripts, which already duplicate them)."
+    }
+  ]
+}

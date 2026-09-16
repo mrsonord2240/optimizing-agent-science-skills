@@ -22,7 +22,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: mu=10 is far below a realistic mean count for 20,000 genes at usable depth, maxN=30 truncates the search below the answer, res$ssize is a 1x3 matrix rather than the scalar the comment claims, and the example was demonstrably never executed against the versions the Skill says it was tested with.
 - Fix: Set the worked example's mu from the pilot's normalized means (order 100 to 500), raise maxN to 200, print res$ssize[, "ssize"], and add a guard: if (is.na(n)) stop("no n <= maxN reaches the target; raise maxN or revise fc/dispersion").
 
-## P1 (39)
+## P1 (51)
 
 ### `bio-experimental-design-sample-size` — PROPER and powsimR routes ship with no executable pattern
 
@@ -112,6 +112,62 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: Ensemble options belong to the -align (PPP) command; -super5 only accepts -perm/-perturb for single replicates.
 - Fix: Use 'muscle -align in.fa -stratified -output ens.efa' (and -diversified); for >1000 sequences say to run -super5 with several -perm/-perturb values and combine with -fa2efa. Correct the MUSCLE5 table's Output column.
 
+### `bio-single-cell-doublet-detection` — The Python per-sample loop silently discards its own results
+
+- Skill: 85, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/doublet-detection) · [viewer](skills/bio-single-cell-doublet-detection/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 2
+- Problem: SKILL.md:105 tells the agent to loop sc.pp.scrublet(adata[adata.obs.sample == s], ...). That indexes a view; scanpy raises only an ImplicitModificationWarning and the parent object ends with neither doublet_score nor predicted_doublet. The pipeline then continues as though doublets had been scored.
+- Root cause: The loop was written as prose shorthand and never run; scanpy's view semantics make it a no-op rather than an error.
+- Fix: Replace the loop with one that collects results explicitly (sub = adata[mask].copy(); sc.pp.scrublet(sub, ...); adata.obs.loc[mask, 'doublet_score'] = sub.obs['doublet_score']) or lead with the batch_key form, which this audit verified agrees with an explicit loop on every cell. Add a Common Errors row: 'doublet columns missing after the per-sample loop -> scored a view'.
+
+### `bio-single-cell-doublet-detection` — The prescribed scDblFinder call is not reproducible and the Skill says nothing about seeds
+
+- Skill: 85, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/doublet-detection) · [viewer](skills/bio-single-cell-doublet-detection/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 1
+- Problem: scDblFinder(sce, samples = 'sample_id') under set.seed(20260916) gave 215 calls on one run and 207 on the next, disagreeing on 54 cells - 22.7% of the union of the two call sets. Which cells get deleted therefore changes between runs of the same script.
+- Root cause: samples= dispatches through BiocParallel, which does not inherit the base R seed; the Skill has no seed guidance anywhere in SKILL.md, the usage guide or either example.
+- Fix: Add BPPARAM = BiocParallel::SerialParam(RNGseed = <seed>) to the prescribed call - it gave 0 disagreements across repeat runs here - and add one line to the Skill saying that set.seed() alone does not control it.
+
+### `bio-single-cell-doublet-detection` — Shipped DoubletFinder example aborts on its own call
+
+- Skill: 85, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/doublet-detection) · [viewer](skills/bio-single-cell-doublet-detection/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 4
+- Problem: examples/doubletfinder.R:36 calls doubletFinder(..., reuse.pANN = FALSE). Because FALSE is not NULL, DoubletFinder 2.0.6 takes its reuse branch, builds pANN.old from a zero-column data.frame and dies with 'Error in xtfrm.data.frame(x): cannot xtfrm data frames'.
+- Root cause: reuse.pANN is a character column name or NULL, never a logical; the example was written as though FALSE meant 'do not reuse'.
+- Fix: Delete reuse.pANN = FALSE from examples/doubletfinder.R (the SKILL.md:123 snippet already omits it and runs), and add the error string to the Common Errors DoubletFinder row, whose current fix - 'use current function names' - does not address it.
+
+### `bio-single-cell-preprocessing` — SoupX snippet errors on the input the Skill names
+
+- Skill: 85, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/preprocessing) · [viewer](skills/bio-single-cell-preprocessing/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 2
+- Problem: SKILL.md:123-128 gives load10X -> autoEstCont -> adjustCounts as the SoupX pattern. On standard Cell Ranger raw+filtered output it aborts with 'Clustering information must be supplied, run setClusters first', because load10X imports clusters only when an analysis/clustering directory is present.
+- Root cause: The snippet was written against a Cell Ranger run that included the secondary-analysis directory, and the precondition was never stated.
+- Fix: Add setClusters between load10X and autoEstCont in the snippet, with a one-line note that a Cell Ranger delivery without analysis/clustering needs clusters supplied from a quick Seurat or scran pass, and add the error string to Common Errors.
+
+### `bio-single-cell-preprocessing` — The prescribed mito rule deletes the population the Skill says it protects
+
+- Skill: 85, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/preprocessing) · [viewer](skills/bio-single-cell-preprocessing/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 7
+- Problem: The QC code hardcodes pct_counts_mt > 8 as an unconditional hard cap. On a tissue with a constitutively high-mito population it removed 374/374 of that population and 819 cells overall, versus 663 for the flat 5% cutoff the Skill criticises for exactly this failure.
+- Root cause: The tissue-dependence of the cap is stated in prose (SKILL.md:102) and in an example comment, but the code block that agents copy has no branch on tissue and no way to disable the cap.
+- Fix: Replace the literal 8 with a named variable set from a short tissue table (nuclei ~1, PBMC 8, cardiac/hepatic/muscle 25-40, 'unknown' = MAD only), and state that the hard cap must be raised or removed whenever the tissue has a known high-mito parenchyma.
+
+### `bio-workflows-scrnaseq-pipeline` — Three of the seven ordering rules have no code anywhere
+
+- Skill: 85, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/workflows/scrnaseq-pipeline) · [viewer](skills/bio-workflows-scrnaseq-pipeline/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 1, 2, 5
+- Problem: Integration, pseudobulk condition DE and differential abundance are each stated as a make-or-break ordering decision, and none has a code block in SKILL.md, in the Complete R Workflow, or in either example script. The multi-sample structure the Skill exists to orchestrate is one prose paragraph. Producing the canonical result (input 1) and the DE/abundance pairing (input 5) required writing roughly half the pipeline from the prose.
+- Root cause: The code sections were written single-sample for clarity and the multi-sample path was left as a hand-off, but the Skill's own value proposition is the chaining, which is exactly what is missing.
+- Fix: Add a short multi-sample block after Step 4 - merge, RunHarmony(group.by.vars=), FindNeighbors(reduction='harmony') - and a Step 9 that aggregates raw counts per sample x cell type, hands them to DESeq2, and runs propeller. Twenty lines would make the workflow executable as written.
+
+### `bio-workflows-scrnaseq-pipeline` — The block agents will copy omits five of the Skill's own rules
+
+- Skill: 85, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/workflows/scrnaseq-pipeline) · [viewer](skills/bio-workflows-scrnaseq-pipeline/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 2
+- Problem: The Complete R Workflow reads from filtered_feature_bc_matrix and performs no ambient removal, no merge or integration, no annotation, no pseudobulk DE and no differential abundance. It is the longest, most copy-ready artefact in the Skill and it contradicts the ordering section above it.
+- Root cause: The Complete R Workflow duplicates Steps 1-7 and was not updated when the ordering rules were written.
+- Fix: Either delete the Complete R Workflow (it duplicates the step-by-step section and adds nothing) or extend it to the full ordering, and in either case start it from the raw matrix with the SoupX call the diagram's Step 0 requires.
+
 ### `bio-proteomics-data-import` — No TMT route, and the no-LFQ error sends a TMT user to columns that do not exist
 
 - Skill: 85.2, Limited Release · [mrsonord2240/bioSkills@575ab94](https://github.com/mrsonord2240/bioSkills/tree/575ab946989a7029d235eb0ab711e47b08edbcb0/proteomics/data-import) · [viewer](skills/bio-proteomics-data-import/mrsonord2240-bioSkills@575ab94/viewer.md)
@@ -192,6 +248,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The channel naming was written from the MSstatsTMT convention rather than from a MaxQuant evidence file's actual column suffixes.
 - Fix: Change the comment to: "Channel names follow the reporter-column suffixes MaxQuant wrote -- for a 10-plex those are `Reporter intensity corrected 0` .. `9`, so the annotation needs `channel.0` .. `channel.9`. Read the suffixes off your own evidence header before writing the annotation; a mismatch gives `the channel name must be matched with that in input data`, which does not mention the index."
 
+### `bio-single-cell-cell-annotation` — The triage screens on the one signal artifacts do not trip
+
+- Skill: 87, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/cell-annotation) · [viewer](skills/bio-single-cell-cell-annotation/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 5
+- Problem: SKILL.md:138-139 screens for suspect clusters with median conf_score < 0.5. On a dataset containing labelled doublet and low-quality clusters, that screen selected six ordinary clusters and none of the four artifact clusters, which scored 0.59 to 0.97.
+- Root cause: Self-contradiction: the Skill's own Governing Principle says a state outside the reference is forced to the nearest label 'often with high apparent confidence', which is precisely why artifact clusters are confident. Low confidence instead tracks fine-granularity ambiguity between similar reference labels.
+- Fix: Invert the entry point. Screen every cluster on the QC covariates the same code block already computes - pct_counts_mt, n_genes_by_counts, doublet rate, batch purity - and use low annotation confidence only as a secondary signal for 'not in reference'. In this run the QC columns separated the artifacts perfectly (21-22% mito against a 2.5% baseline; doublet rates 0.44 and 0.22 against 0.02).
+
 ### `bio-workflows-proteomics-pipeline` — The fixed treat() fold-change floor silently zeroes the intermediate level of a dose series
 
 - Skill: 87.7, Production Ready · [mrsonord2240/bioSkills@45a0c5a](https://github.com/mrsonord2240/bioSkills/tree/45a0c5a65b7346d47a7b72b6d0a6eb60ea590317/workflows/proteomics-pipeline) · [viewer](skills/bio-workflows-proteomics-pipeline/mrsonord2240-bioSkills@45a0c5a/viewer.md)
@@ -239,6 +303,22 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: Because scaffold groups are sorted largest-first and assigned to train until the target size is reached, every multi-member scaffold lands in train. At 0.8, 0.7 and 0.9 train fractions the test set was 100% singleton-scaffold compounds. The Skill names this exact failure mode and prescribes a stratified scaffold split, but ships no implementation of one.
 - Root cause: Size-descending greedy assignment optimises only for hitting the target train size, with nothing spreading large scaffolds across splits.
 - Fix: Either interleave assignment (walk the size-sorted groups and send every k-th large group to test) or ship the StratifiedGroupKFold variant the Skill already recommends, and add an assertion in the function that reports the fraction of test compounds sitting on singleton scaffolds so the user sees the problem.
+
+### `bio-single-cell-differential-abundance` — The primary tool returns a false negative on the canonical use case
+
+- Skill: 88, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/differential-abundance) · [viewer](skills/bio-single-cell-differential-abundance/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 2, 5
+- Problem: Milo is declared primary_tool. Run exactly as SKILL.md:83-95 prescribes on 8 donors with 674-837 cells each, it found 0 of 284 neighbourhoods significant for a 2.25x expansion of a 6% population (NK counts 41/56/42/32 control against 83/95/100/108 treated). A k sweep to 120 with prop 0.2 still found nothing; the best NK raw p was 0.067. propeller found the same effect at FDR 9.3e-5, and scCODA at inclusion probability 1.000.
+- Root cause: Milo's NB-GLM on ~100-cell neighbourhoods has little power at this cell count, and the Skill's only caveat - 'Fails when: very few cells/sample' - reads as a warning about hundreds of cells, not about a 6,000-cell 8-donor experiment that most readers would call comfortably sized.
+- Fix: Quantify the caveat: say Milo needs roughly thousands of cells per sample and that below that a cluster-based method is the primary test, not the cross-check. Invert the 'run a cluster-based method and Milo when feasible' sentence so the cluster-based method leads, and add a Common Errors row: 'Milo returns zero significant neighbourhoods while a cluster test is highly significant -> under-powered at this cell count; report the cluster-level result and Milo's effect sizes'.
+
+### `bio-single-cell-markers-annotation` — The Python pseudobulk snippet sums normalized values, against the Skill's own rule
+
+- Skill: 88, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/markers-annotation) · [viewer](skills/bio-single-cell-markers-annotation/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 4
+- Problem: SKILL.md:154 is sc.get.aggregate(cell_type, by='sample', func='sum'). With no layer= argument it sums .X, which on the object the Skill's own earlier steps produce is log-normalized. The result is a non-integer matrix (max 988.94 against 17,064 for the correct one, correlation 0.729) that R DESeq2 would refuse outright and that cost recall 0.291 against 0.345 in pyDESeq2.
+- Root cause: The snippet was written against an object whose .X still held counts; the Skill's own 'Defaults that bite' row ('Aggregate RAW counts (summed), never normalized') is the correct rule and the R snippet on the next line follows it.
+- Fix: Change the call to sc.get.aggregate(cell_type, by='sample', func='sum', layer='counts') and add a one-line assertion that the aggregated values are integral, so the contradiction cannot survive a copy-paste.
 
 ### `bio-substructure-search` — Ester SMARTS silently misses every -O-CH< ester
 
@@ -288,6 +368,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The root-cause analysis varied one family of normalizations, in which the offset and the variance shrinkage move together, and attributed the whole effect to the variable that was easiest to measure.
 - Fix: Rewrite the Approach paragraph: per-run median normalization of a peptide table does two things at once - it transfers a detection-composition difference into a between-condition offset, AND it removes real run-to-run loading variance, shrinking the residual the test divides by. The offset is the detectable symptom of both. Keep the guard exactly as it is (it fired correctly on every configuration tested) and add a second cheap check beside it: compare the residual SD before and after normalization, and treat a large drop as the same warning. Drop 'hundreds of proteins at once' for the measured figure.
 
+### `bio-single-cell-clustering` — The Skill's only operational stop rule never stops
+
+- Skill: 89, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/clustering) · [viewer](skills/bio-single-cell-clustering/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 3, 4
+- Problem: The rule an agent can actually execute - merge clusters whose top markers are indistinguishable - passed every artifactual split constructed in this audit. A single true cell type split in two gave 0.00 marker overlap and adjusted p = 9.1e-153; a 100%-pure subcluster split gave 0.00 overlap and p = 7.7e-46.
+- Root cause: Marker distinctness is itself a double-dipped quantity, so it cannot adjudicate a split chosen to maximise separation - the Skill says exactly this two paragraphs earlier and then still offers it as the stop rule.
+- Fix: Replace the marker-overlap stop rule with checks that are not circular and are runnable today: does the split align with batch/sample/QC covariates (ARI against each), does it survive on held-out cells, and does it reproduce in a second half of the data. Keep scSHC/CHOIR as the formal answer but give one of them a code block, since the Skill's thesis depends on it.
+
 ### `bio-molecular-standardization` — ChEMBL route can return an unstripped organic salt, undocumented
 
 - Skill: 90, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/molecular-standardization) · [viewer](skills/bio-molecular-standardization/GPTomics-bioSkills@d91ed3d/viewer.md)
@@ -336,7 +424,15 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: Fingerprint collisions and stereochemistry-blindness produce the same symptom, and the Skill diagnosed the rarer cause.
 - Fix: Rewrite the failure mode around chirality: state that RDKit's Morgan generators default to includeChirality=False, give GetMorganGenerator(..., includeChirality=True) as the first fix and InChIKey as the identity check, and keep hash collisions as a secondary cause. Add the same note to the activity-cliff false-positive row, together with a reminder to strip salts upstream.
 
-## P2 (139)
+### `bio-single-cell-batch-integration` — The Seurat v5 snippet aborts on its own default method
+
+- Skill: 90, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/batch-integration) · [viewer](skills/bio-single-cell-batch-integration/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 4
+- Problem: SKILL.md:135 prints IntegrateLayers(..., method = RPCAIntegration). On a 6,048-cell, two-batch object it aborts: 'The total size of the 10 globals exported for future expression (FUN()) is 781.60 MiB. This exceeds the maximum allowed size 500.00 MiB per plan() argument maxSizeOfObjects'. CCAIntegration and HarmonyIntegration through the same code ran fine.
+- Root cause: Seurat's anchor-based integration ships its work to future workers, and the 500 MiB default globals limit is exceeded at very ordinary dataset sizes; the Skill's snippet omits the options() line every Seurat v5 integration tutorial carries.
+- Fix: Add options(future.globals.maxSize = 4 * 1024^3) immediately above the IntegrateLayers call - verified here to make RPCAIntegration run in 20 s at ARI 1.000 - and add the error string to Common Errors.
+
+## P2 (175)
 
 ### `bio-experimental-design-sample-size` — SKILL.md code blocks omit set.seed
 
@@ -513,6 +609,86 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The 476-line SKILL.md loads BAli-Phy, OMM_MACSE, HyPhy, vcMSA and T-Coffee detail for every request.
 - Root cause: No progressive-disclosure layer.
 - Fix: Keep the decision tables and MAFFT/MUSCLE/PAL2NAL core in SKILL.md; move per-tool detail to references/*.md loaded on demand.
+
+### `bio-single-cell-doublet-detection` — The lineage co-expression heuristic needs an ambient caveat where it is stated
+
+- Skill: 85, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/doublet-detection) · [viewer](skills/bio-single-cell-doublet-detection/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 5
+- Problem: The Governing Principle says to treat any small cluster co-expressing two lineage programs (CD3+LYZ) as doublet-suspect. On an ambient-contaminated dataset the genuinely doublet-enriched cluster was BELOW the dataset-wide CD3D+LYZ+ rate (26.3% vs 36.0%), so the heuristic points away from the right cluster.
+- Root cause: The ambient caveat exists but is 100 lines away in Deeper Cautions, not attached to the heuristic it invalidates.
+- Fix: Add one clause where the heuristic is stated: compare co-expression against the dataset-wide rate, and run ambient removal first, or use the doublet score rather than raw co-expression.
+
+### `bio-single-cell-doublet-detection` — No guidance on what to report
+
+- Skill: 85, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/doublet-detection) · [viewer](skills/bio-single-cell-doublet-detection/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 1, 2, 3
+- Problem: The Skill specifies no output format. Each input required the agent to invent what to print, and the numbers that matter (per-sample call counts, threshold, detectable fraction) are exactly the ones a reviewer will ask for.
+- Root cause: Feedback design is not covered anywhere in SKILL.md or the usage guide.
+- Fix: Add a four-line 'what to report' block: per-sample cell count, expected rate and where it came from, threshold used and whether it was automatic, and calls as a count and a percentage, with the homotypic caveat attached.
+
+### `bio-single-cell-preprocessing` — batch_key HVG advice has an undocumented precondition
+
+- Skill: 85, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/preprocessing) · [viewer](skills/bio-single-cell-preprocessing/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 5
+- Problem: SKILL.md:176 says to set batch_key to compute HVGs per batch. With flavor='seurat_v3' on a design where one batch is shallow, this raised ValueError: reciprocal condition number 2.07e-15 from the loess fit and produced nothing.
+- Root cause: seurat_v3's per-batch loess is singular when a batch carries too many near-zero genes; the Skill treats batch_key as a free option.
+- Fix: Note that batch_key with seurat_v3 requires gene filtering inside each batch first (filter_genes min_cells applied per batch fixed it here) and add the error string to Common Errors.
+
+### `bio-single-cell-preprocessing` — Re-normalization error row states the wrong symptom
+
+- Skill: 85, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/preprocessing) · [viewer](skills/bio-single-cell-preprocessing/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 7
+- Problem: Common Errors says re-running normalization gives 'Values inflated ~2x'. Measured on scanpy 1.12.4 the total fell to 0.662x of the single-pass value, and scanpy emitted its own 'adata.X seems to be already log-transformed' warning.
+- Root cause: The row describes a pre-log1p size-factor double-application, not the normalize_total + log1p pair the Skill actually prescribes.
+- Fix: Change the symptom to 'values shrink and distributions compress; scanpy warns that X looks already log-transformed' and keep the fix (restore from layers['counts']).
+
+### `bio-single-cell-preprocessing` — QC over-removes low-complexity cell types with no warning
+
+- Skill: 85, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/preprocessing) · [viewer](skills/bio-single-cell-preprocessing/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 1, 5
+- Problem: The 5-MAD rule on pct_counts_in_top_20_genes deleted 28.8% of megakaryocytes, a genuinely low-complexity type, while catching 100% of the true low-quality cells. The Skill warns about cell-type deletion only in the mito context.
+- Root cause: pct_counts_in_top_20_genes is presented as a pure quality metric ('high value flags low-complexity / dying cells') without the same 'this is a biology metric' caveat the Skill gives pct_counts_mt.
+- Fix: Add a caveat to the QC threshold table that platelets/megakaryocytes, erythrocytes and other transcriptionally simple types are constitutively high on this metric, and tell the agent to report per-cluster removal rates before subsetting.
+
+### `bio-single-cell-preprocessing` — MAD-collapse fallback is unquantified
+
+- Skill: 85, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/preprocessing) · [viewer](skills/bio-single-cell-preprocessing/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 3
+- Problem: The Common Errors row tells the agent to assert 'n_obs > 0 and a sane survival fraction'. n_obs > 0 never fires, and no number is given for the survival fraction, so the 30% loss in input 3 passed the guard.
+- Root cause: The guard names the right check but leaves the threshold to the caller.
+- Fix: Give the guard a number - e.g. stop and fall back to fixed cutoffs when MAD of any log1p QC metric is 0, or when survival is below 80% of the input barcodes - and say to report the MAD value itself.
+
+### `bio-workflows-scrnaseq-pipeline` — Declared QC checkpoints are never emitted
+
+- Skill: 85, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/workflows/scrnaseq-pipeline) · [viewer](skills/bio-workflows-scrnaseq-pipeline/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 1, 2, 3
+- Problem: The frontmatter declares four qc_checkpoints (after_loading, after_qc, after_normalization, after_clustering) and no code path prints any of them. Neither shipped example emits a checkpoint either.
+- Root cause: The checkpoints are metadata, not instructions, and nothing ties them to the code.
+- Fix: Add one cat()/print() per checkpoint to the code paths - cell count after loading, after QC and after doublet removal, cluster count and per-cluster size after clustering. Input 1 had to invent this audit table to answer 'what did QC remove'.
+
+### `bio-workflows-scrnaseq-pipeline` — Flat QC cutoffs sit under MAD-adaptive text
+
+- Skill: 85, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/workflows/scrnaseq-pipeline) · [viewer](skills/bio-workflows-scrnaseq-pipeline/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 2, 3
+- Problem: Step 2, the Complete R Workflow and the Scanpy block all filter on nFeature 200-5000 and percent.mt < 20 while the surrounding prose and the parameter table say to use MAD-adaptive, tissue-aware thresholds. The Skill labels them illustrative, but they are the only executable QC it ships.
+- Root cause: The illustrative cutoffs predate the MAD guidance and were annotated rather than replaced.
+- Fix: Replace the flat cutoffs in at least the Complete R Workflow with the five-line MAD helper (median absolute deviation on log counts, log genes and mito, plus a tissue-dependent cap) so the copy-ready path matches the prose.
+
+### `bio-workflows-scrnaseq-pipeline` — No input validation at any stage
+
+- Skill: 85, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/workflows/scrnaseq-pipeline) · [viewer](skills/bio-workflows-scrnaseq-pipeline/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 4
+- Problem: Nothing checks whether the directory handed in is the raw or the filtered matrix - the distinction the Skill itself calls irreversible - nor whether feature names are symbols or Ensembl IDs, which silently disables the '^MT-' mito pattern.
+- Root cause: The made-once commitments are stated as consequences to know, not as checks to run.
+- Fix: Add two assertions to Step 1: warn if the loaded matrix has roughly as many barcodes as cells (i.e. it is the filtered matrix) when an ambient step is intended, and warn if rownames match ^ENSG rather than gene symbols.
+
+### `bio-workflows-scrnaseq-pipeline` — 415 lines with the Seurat path given twice
+
+- Skill: 85, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/workflows/scrnaseq-pipeline) · [viewer](skills/bio-workflows-scrnaseq-pipeline/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: —
+- Problem: SKILL.md is the longest in this candidate's set and the Seurat pipeline appears in full twice - once as Steps 1-8 and again as the Complete R Workflow - plus a full Scanpy path, all loaded on every invocation with no references/ layer.
+- Root cause: No progressive-disclosure layer exists.
+- Fix: Keep the ordering rules and the step-by-step section in SKILL.md; move the Complete R Workflow and the Scanpy path to references/ (or rely on the two example scripts, which already duplicate them).
 
 ### `bio-proteomics-data-import` — The flag-column guard collapses to a scalar when all three flag columns are absent
 
@@ -826,6 +1002,38 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: Conceptual section only.
 - Fix: Add the regression of HPD width on posterior mean from out.txt.
 
+### `bio-single-cell-cell-annotation` — Two 'wrong input' symptoms are stale for current tool versions
+
+- Skill: 87, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/cell-annotation) · [viewer](skills/bio-single-cell-cell-annotation/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 1, 3
+- Problem: The normalization table says wrong CellTypist input produces 'confident but degraded/wrong labels, no error'; Common Errors row 3 says an Ensembl-ID query produces 'confident but nonsensical labels'. Under celltypist 1.7.1 both raise hard ValueErrors instead.
+- Root cause: The symptoms were written against an older CellTypist that did not validate its input; the requirements themselves are still right.
+- Fix: Update both symptom cells to name the actual error strings ('Invalid expression matrix in .X, expect log1p normalized expression to 10000 counts per cell' and 'No features overlap with the model. Please provide gene symbols'), and keep a line for the case that IS still silent - log1p without CP10K, or scanpy's median-normalized default, where accuracy degrades and mean max-probability roughly halves.
+
+### `bio-single-cell-cell-annotation` — SingleR's rejection set is presented as a safety net it is not
+
+- Skill: 87, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/cell-annotation) · [viewer](skills/bio-single-cell-cell-annotation/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 2
+- Problem: The Skill treats pruned.labels and pruneScores(nmads=3) as the rejection mechanism. On a query where 169 of 3,023 cells were confidently misassigned across lineage boundaries, pruning flagged 15 cells and pruneScores flagged 0, and accuracy among retained cells was no better than overall.
+- Root cause: Delta-based pruning detects cells whose best and second-best scores are close, not cells whose reference simply lacks their type - a different failure from the one the Skill is guarding against.
+- Fix: Say what pruning does and does not catch, and pair it with the marker-triangulation step the Skill already describes: a DotPlot of canonical markers by SingleR label would have shown the monocyte-to-B_cell assignments immediately.
+
+### `bio-single-cell-cell-annotation` — The marker-validation snippet assumes a normalized object it is not given
+
+- Skill: 87, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/cell-annotation) · [viewer](skills/bio-single-cell-cell-annotation/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 4
+- Problem: SKILL.md:155-158 runs DotPlot straight after the annotation block. On the object RunAzimuth returns, the RNA data layer is empty, and Seurat falls back with 'data layer is not found and counts layer is used' - so the validation plot is built from raw counts.
+- Root cause: The validation section was written as if the object had already been through NormalizeData, which the Azimuth path does not guarantee.
+- Fix: Add NormalizeData(seurat_obj) (or a note that DotPlot needs the data layer) immediately above the DotPlot call.
+
+### `bio-single-cell-cell-annotation` — majority_voting's over-clustering is neither created nor seeded
+
+- Skill: 87, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/cell-annotation) · [viewer](skills/bio-single-cell-cell-annotation/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 1, 5
+- Problem: The CellTypist snippet passes majority_voting=True but never says where the over-clustering comes from. Left to itself CellTypist runs its own Leiden; given an unseeded upstream clustering, the smoothed labels differ between runs of the same script.
+- Root cause: The dependency on a clustering is implicit in the argument name.
+- Fix: Pass over_clustering='leiden' explicitly in the snippet and note that the upstream clustering must be seeded for the annotation to be reproducible.
+
 ### `bio-workflows-proteomics-pipeline` — The PCA guard and the contrast logic now live in two places that deliberately disagree
 
 - Skill: 87.7, Production Ready · [mrsonord2240/bioSkills@45a0c5a](https://github.com/mrsonord2240/bioSkills/tree/45a0c5a65b7346d47a7b72b6d0a6eb60ea590317/workflows/proteomics-pipeline) · [viewer](skills/bio-workflows-proteomics-pipeline/mrsonord2240-bioSkills@45a0c5a/viewer.md)
@@ -937,6 +1145,70 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The Skill correctly says generic frameworks are for topology comparison only, but gives no sense of scale. Measured on 1,500 real compounds: 857 Bemis-Murcko scaffolds become 583 generic frameworks, and the largest framework merges 4 distinct chemotypes into 59 compounds.
 - Root cause: The representation table describes what each view loses without quantifying the consequence.
 - Fix: Add a one-line worked figure to the taxonomy table showing the scaffold-count ratio on a representative library, so a reader can judge whether the abstraction is acceptable for their purpose.
+
+### `bio-single-cell-differential-abundance` — No seed anywhere, in a Skill whose two headline methods are stochastic
+
+- Skill: 88, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/differential-abundance) · [viewer](skills/bio-single-cell-differential-abundance/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 2, 3
+- Problem: makeNhoods samples neighbourhoods at random and scCODA's sample_hmc runs an MCMC chain. Neither the SKILL.md blocks nor either shipped example sets a seed, and the Skill never mentions one, so the same script can return a different neighbourhood set and a different posterior on each run.
+- Root cause: Reproducibility is not covered in the Skill at all - there is no Common Errors row for it and no set.seed in any snippet.
+- Fix: Add set.seed() above buildGraph/makeNhoods and a seed argument to the scCODA call, and state that a differential-abundance result must be reported with the seed and the k/prop or HMC settings that produced it.
+
+### `bio-single-cell-differential-abundance` — propeller's transform default is named wrongly
+
+- Skill: 88, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/differential-abundance) · [viewer](skills/bio-single-cell-differential-abundance/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 1
+- Problem: The method table says 'arcsin-sqrt or logit transform + limma' and the Approach line says 'apply an arcsin-sqrt (or logit) variance-stabilizing transform'. speckle 1.6.0 prints 'Performing logit transformation of proportions' for propeller() with no transform argument.
+- Root cause: The description predates speckle's change of default.
+- Fix: Say logit is the current default and arcsin-sqrt is the alternative (transform = 'asin'), so a methods section written from this Skill is accurate.
+
+### `bio-single-cell-differential-abundance` — No Common Errors row for the most likely first failure
+
+- Skill: 88, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/differential-abundance) · [viewer](skills/bio-single-cell-differential-abundance/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 4
+- Problem: With one sample per group propeller aborts with 'Error in .ebayes(...): No finite residual standard deviations'. That message says nothing about replicates, and it is exactly the error a user with a pilot experiment will hit first.
+- Root cause: The n=1 discussion is in the Governing Principle, not in the error table where an agent looks after a crash.
+- Fix: Add a row: symptom 'No finite residual standard deviations' / cause 'one sample per group - no residual degrees of freedom' / fix 'the effect is unidentifiable; add biological replicates, do not switch tools'.
+
+### `bio-single-cell-differential-abundance` — sccomp is prescribed but could not be verified here
+
+- Skill: 88, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/differential-abundance) · [viewer](skills/bio-single-cell-differential-abundance/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: —
+- Problem: sccomp has a full code block and a method-table row, but the package is not installed in this audit environment (it pulls a Stan toolchain), so its three-function pipeline was checked only against the documented API, not run.
+- Root cause: Environment limitation, not a Skill defect - recorded so the gap in this audit's coverage is explicit.
+- Fix: No change required of the Skill. A future fix pass should install sccomp and re-run the same design, since it is the Skill's recommended route when outliers or over-dispersion are present and it is the one route this audit could not test.
+
+### `bio-single-cell-markers-annotation` — No Common Errors row for a non-integer pseudobulk matrix
+
+- Skill: 88, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/markers-annotation) · [viewer](skills/bio-single-cell-markers-annotation/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 4
+- Problem: The failure introduced by the snippet above has a distinctive symptom - a pseudobulk matrix of non-integer values, which DESeq2 rejects in R and which silently loses power in Python - and the error table has no row for it.
+- Root cause: The table predates the pseudobulk section.
+- Fix: Add: symptom 'pseudobulk matrix has non-integer values / DESeq2 says counts matrix should be integers' / cause 'aggregated .X instead of the counts layer' / fix 'pass layer="counts" (Python) or layer="counts" to AggregateExpression (R)'.
+
+### `bio-single-cell-markers-annotation` — Canonical NK and CD8 panels overlap and the table does not say so
+
+- Skill: 88, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/markers-annotation) · [viewer](skills/bio-single-cell-markers-annotation/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 1
+- Problem: Labelling by the Skill's canonical panel scored 0.879 accuracy, and essentially the whole error is 724 of 731 CD8 T cells labelled NK, because NKG7 and GNLY are shared with cytotoxic CD8 T cells while the CD8 panel's CD8A/CD8B are sparsely detected.
+- Root cause: The panel table lists markers per type without noting which pairs of types the panels cannot separate.
+- Fix: Flag the CD8 T / NK pair in the table and say that separating them needs CD3D/CD3E as a gate rather than the cytotoxic genes alone. The Skill already states the general principle ('a marker is a conditional statement'); this is the case where it bites in PBMC.
+
+### `bio-single-cell-markers-annotation` — The 24-versus-25 control-bin claim could not be verified
+
+- Skill: 88, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/markers-annotation) · [viewer](skills/bio-single-cell-markers-annotation/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 1, 2
+- Problem: SKILL.md:109 says scanpy uses 25 control bins and Seurat 24, and calls this a cross-ecosystem reproducibility source. scanpy's n_bins default is 25 as stated, but Seurat 5.5.0's AddModuleScore generic exposes nbin as NULL, so the 24 could not be confirmed from the installed package.
+- Root cause: Not a defect - an unverifiable claim from this environment, recorded so the audit's coverage is honest.
+- Fix: No change required unless a fix pass can confirm the Seurat default; if it can, cite where it is set so a reader can check it.
+
+### `bio-single-cell-markers-annotation` — No guidance on what to report
+
+- Skill: 88, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/markers-annotation) · [viewer](skills/bio-single-cell-markers-annotation/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 1, 2
+- Problem: The Skill prescribes a filter but never says what a marker table should carry into a figure or methods section - the filter thresholds used, the fraction-expressing gap, and the explicit statement that the p-values are descriptive all had to be supplied by the agent.
+- Root cause: Feedback design is not covered.
+- Fix: Add a three-line 'what to report' block: the test and thresholds used, per-cluster top markers with pct.1/pct.2, and a standing note that cluster-marker p-values are descriptive.
 
 ### `bio-substructure-search` — Curcumin is named as a PAINS_A target but RDKit's catalog has no curcumin pattern
 
@@ -1186,6 +1458,38 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: Passes 3 and 4 added roughly 100 lines of new sections without splitting the file.
 - Fix: Move the SILAC and AP-MS sections into `references/labeled_quant.md` and `references/affinity_enrichment.md`, leaving the LFQ/TMT core, the failure modes and the Common Errors table in SKILL.md.
 
+### `bio-single-cell-clustering` — Seurat Leiden dependency is named wrongly
+
+- Skill: 89, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/clustering) · [viewer](skills/bio-single-cell-clustering/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 2
+- Problem: SKILL.md:39 says algorithm=4 'requires the leidenalg Python module via reticulate'. Seurat 5.5.0 fails with "Package 'leidenbase' is required for leiden_method = 'leidenbase'".
+- Root cause: The statement describes Seurat 4-era behaviour; Seurat 5 moved to the R leidenbase backend.
+- Fix: Change the sentence to name leidenbase and note that install.packages('leidenbase') is the fix under Seurat 5, keeping the reticulate/leidenalg note for Seurat 4.
+
+### `bio-single-cell-clustering` — Elbow advice and the recommended n_pcs range point in opposite directions
+
+- Skill: 89, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/clustering) · [viewer](skills/bio-single-cell-clustering/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 1
+- Problem: The parameter table says n_pcs 30-50 'check elbow'. On this dataset the variance-ratio elbow sits at roughly PC 5-7, while ARI was best at n_pcs = 50. Following the elbow would have cost 0.24 ARI.
+- Root cause: The elbow heuristic and the empirical 30-50 range are both offered without saying which wins when they conflict.
+- Fix: State that the elbow is a floor rather than a target - take the larger of the elbow and about 30 - and add the cluster-stability-across-nearby-n_pcs check the same table already names as the validation.
+
+### `bio-single-cell-clustering` — Validation section is prose where the rest of the Skill is code
+
+- Skill: 89, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/clustering) · [viewer](skills/bio-single-cell-clustering/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 3, 4
+- Problem: Bootstrap stability, scSHC, CHOIR and ClusterDE are the Skill's answer to its own central question and none of them has a code block. The bootstrap had to be written from scratch for input 3.
+- Root cause: The Validating section was written as argument rather than as procedure.
+- Fix: Add a short bootstrap-stability block (resample, re-cluster, per-cluster Jaccard) - it is ten lines and the Skill already specifies the 0.6-0.7 threshold - and at least one significance-test call, with a note on what to do when the package is unavailable.
+
+### `bio-single-cell-clustering` — No guidance on what to report from a sweep
+
+- Skill: 89, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/clustering) · [viewer](skills/bio-single-cell-clustering/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 1, 2
+- Problem: The Skill prescribes a resolution sweep but never says what to output from it, so the numbers that decide the answer (cluster counts per resolution, marker overlap, covariate alignment) are the ones an agent has to think to produce.
+- Root cause: Feedback design is not covered.
+- Fix: Add a four-line 'what to report' block: clusters per resolution, the chosen level and why, per-cluster size and covariate composition, and an explicit statement that marker p-values are for ranking only.
+
 ### `bio-variant-normalization` — csq --phase m and s described wrongly
 
 - Skill: 89, Production Ready · [mrsonord2240/bioSkills@c1237cd](https://github.com/mrsonord2240/bioSkills/tree/c1237cdbc9bb199947696f3909de26a55d259116/variant-calling/variant-normalization) · [viewer](skills/bio-variant-normalization/mrsonord2240-bioSkills@c1237cd/viewer.md)
@@ -1354,6 +1658,46 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The table lists heuristics without the calibration step that would make them comparable.
 - Fix: Add a two-line recipe: compute the all-pairs similarity distribution on the actual library and pick the threshold at a chosen percentile (for example p99.5), so thresholds across fingerprints select comparable fractions rather than comparable numbers.
 
+### `bio-single-cell-batch-integration` — Two of the five listed Seurat methods need an unnamed package
+
+- Skill: 90, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/batch-integration) · [viewer](skills/bio-single-cell-batch-integration/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 4
+- Problem: SKILL.md:143 lists CCAIntegration, RPCAIntegration, HarmonyIntegration, FastMNNIntegration and scVIIntegration as bare symbols to pass. Only the first three resolve in Seurat 5.5.0; FastMNNIntegration and scVIIntegration live in SeuratWrappers, which is not mentioned anywhere in the Skill.
+- Root cause: The list was written from Seurat's documentation, which groups them together without flagging the package boundary.
+- Fix: Mark the last two as requiring SeuratWrappers (and scVIIntegration additionally requiring a working reticulate scvi-tools), so an agent that reaches for fastMNN in R knows what to install.
+
+### `bio-single-cell-batch-integration` — The theta warning has no magnitude
+
+- Skill: 90, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/batch-integration) · [viewer](skills/bio-single-cell-batch-integration/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 1
+- Problem: The strength-parameter table says larger theta over-corrects. Sweeping theta 0.5 / 2.0 / 8.0 changed batch ASW and cell-type ASW by less than 1e-4; only theta = 50 produced a visibly different correction, and theta = 0 still corrected substantially.
+- Root cause: The table gives a direction with no scale, so an agent cannot tell whether raising theta from 2 to 8 is a meaningful intervention.
+- Fix: State the useful range (roughly 0.5-5, default around 2) and say that the batch effect size dominates theta below that - and that theta = 0 does not disable correction.
+
+### `bio-single-cell-batch-integration` — Scanorama's sorted-batch precondition is unstated
+
+- Skill: 90, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/batch-integration) · [viewer](skills/bio-single-cell-batch-integration/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 3
+- Problem: sce.pp.scanorama_integrate raises 'Detected non-contiguous batches' on a normally ordered object. The Skill recommends Scanorama for partial cell-type overlap but gives no code and no precondition.
+- Root cause: Scanorama is table-only in the Skill, so its input contract was never written down.
+- Fix: Add one line to the method table or Common Errors: Scanorama requires the object sorted by batch key before integrate/correct.
+
+### `bio-single-cell-batch-integration` — The confounded-design diagnostic is necessary but not sufficient
+
+- Skill: 90, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/batch-integration) · [viewer](skills/bio-single-cell-batch-integration/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 6
+- Problem: The prescribed check is 'cluster the uncorrected data and cross-tabulate clusters x batch x condition'. On a design that is confounded by construction, that check returned 0 of 8 pure clusters and ARI 0.003 against capture day, i.e. it read as safe.
+- Root cause: The diagnostic detects a large batch effect, not a confounded design; a confound with a modest batch effect is invisible to it.
+- Fix: Lead the section with the metadata test - cross-tabulate condition against batch and stop if any condition sits entirely in one batch - and keep the cluster crosstab as the follow-up that sizes the effect. (Caveat: the simulated day effect used here is a uniform per-gene rescale that normalization removes, so this run shows the diagnostic is insufficient, not that it is generally blind.)
+
+### `bio-single-cell-batch-integration` — Seeds are prescribed in the error table and set in no code block
+
+- Skill: 90, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/batch-integration) · [viewer](skills/bio-single-cell-batch-integration/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 1, 2
+- Problem: Common Errors says 'Set seeds; for scVI fix max_epochs and report it', but not one of the five code blocks sets a seed, and the handle that actually works for scvi-tools (scvi.settings.seed) is never named.
+- Root cause: The advice lives only in the error table, not in the patterns agents copy.
+- Fix: Add random_state / scvi.settings.seed to the code blocks and name max_epochs explicitly in the scVI snippet rather than relying on the internal heuristic.
+
 ### `bio-vcf-basics` — Wrong bcftools query -H tip in usage guide
 
 - Skill: 90, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/variant-calling/vcf-basics) · [viewer](skills/bio-vcf-basics/GPTomics-bioSkills@d91ed3d/viewer.md)
@@ -1417,6 +1761,46 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: Chem.MolFromSmiles('') returns a zero-atom Mol rather than None, so an empty cell in an input file passes every None check in the Skill and flows downstream as a real record.
 - Root cause: The Skill's parse guards test for None only, which is the documented failure signal but not the only one.
 - Fix: Add a line to parse_smiles_safe and the Common Errors table: treat a molecule with GetNumAtoms() == 0 as a parse failure, because an empty or whitespace input does not return None.
+
+### `bio-differential-expression-deseq2-basics` — 'All-zero in a group' is not a padj=NA cause
+
+- Skill: 92, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/differential-expression/deseq2-basics) · [viewer](skills/bio-differential-expression-deseq2-basics/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 3
+- Problem: The Skill lists three causes of padj=NA: independent filtering, Cook's outlier, and 'all-zero in a group'. A constructed gene with counts 0,0,0,0,300,300,300,300 tested normally (LFC 10.88, padj 0). DESeq2 sets NA when a row is all-zero across ALL samples, not within one group.
+- Root cause: The condition was compressed from DESeq2's documented rule and lost the quantifier.
+- Fix: Change the third cause to 'all-zero across every sample (baseMean = 0)' and note that group-specific zeros are testable and usually produce very large LFCs.
+
+### `bio-differential-expression-deseq2-basics` — lfcShrink preserves pvalue but not padj
+
+- Skill: 92, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/differential-expression/deseq2-basics) · [viewer](skills/bio-differential-expression-deseq2-basics/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 1, 7
+- Problem: The headline insight says the p-value column lfcShrink carries forward is the unshrunken Wald p-value. That is exactly true of pvalue, but padj differed between results() and lfcShrink() for all 1,669 non-NA genes (max \|diff\| 0.154), so a padj filter applied to the shrunken object is not the same filter.
+- Root cause: Independent filtering is re-run on the shrunken object, so the adjusted values are recomputed even though the raw p-values are carried through.
+- Fix: Add one clause: pvalue is carried through unchanged, padj is recomputed - take padj from results() and the LFC from lfcShrink() if the two are combined in one table.
+
+### `bio-differential-expression-deseq2-basics` — The description is bulk-worded and may not trigger on pseudobulk requests
+
+- Skill: 92, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/differential-expression/deseq2-basics) · [viewer](skills/bio-differential-expression-deseq2-basics/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: —
+- Problem: The frontmatter description says 'bulk RNA-seq count data' and lists bulk-specific triggers. Single-cell pseudobulk - the reason a single-cell workflow needs this Skill - appears only as one decision-tree row and one size-factor note.
+- Root cause: The Skill was written for a bulk RNA-seq bundle and pseudobulk was added as a case rather than as a stated use.
+- Fix: Add 'single-cell pseudobulk DE aggregated per sample x cell type' to the description's Use-when list, so a request phrased as pseudobulk triggers it.
+
+### `bio-differential-expression-deseq2-basics` — No guidance on what to report
+
+- Skill: 92, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/differential-expression/deseq2-basics) · [viewer](skills/bio-differential-expression-deseq2-basics/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 1, 5, 7
+- Problem: The Skill never says what a DE result should carry. The contrast name, the alpha actually passed to results(), and the independent-filtering baseMean threshold were all needed here to interpret the output, and all three had to be printed on the auditor's initiative.
+- Root cause: Feedback design is not covered anywhere in SKILL.md or the usage guide.
+- Fix: Add a short 'what to report' block: the exact contrast, n per group, alpha, the filtering threshold from metadata(res)$filterThreshold, counts of padj NA by cause, and whether the LFC quoted is shrunken.
+
+### `bio-differential-expression-deseq2-basics` — Prokaryotic and betaPrior sections are dead weight for most calls
+
+- Skill: 92, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/differential-expression/deseq2-basics) · [viewer](skills/bio-differential-expression-deseq2-basics/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: —
+- Problem: Roughly 60 of 337 lines cover prokaryotic RNA-seq and the betaPrior deprecation history. Both load into context on every invocation and neither was relevant to any of the seven realistic inputs.
+- Root cause: No references/ layer exists, so everything sits in SKILL.md.
+- Fix: Move the prokaryotic section and the betaPrior timeline into references/ and leave a one-line pointer each, which would bring SKILL.md under 280 lines without losing anything.
 
 ### `bio-machine-learning-model-validation` — The leakage taxonomy's ordering implies a severity ranking it does not have
 

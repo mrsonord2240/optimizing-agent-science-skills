@@ -1,0 +1,215 @@
+{
+  "meta": {
+    "skill_name": "bio-single-cell-clustering",
+    "description": "Dimensionality reduction and graph-based clustering for single-cell RNA-seq with Scanpy (Python) and Seurat (R). Resolves which algorithm to use (Leiden vs Louvain), how many PCs and neighbors to set, how to sweep and validate resolution, when a split is over-clustering, and why post-clustering marker p-values are not valid inference. Use when clustering cells, choosing a clustering resolution, deciding whether two clusters are one population, building a UMAP/tSNE, or judging whether clusters are real.",
+    "evaluated_on": "2026-09-16",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Moderate",
+    "n_inputs": 5,
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:single-cell/clustering",
+    "executed_inputs": "5/5"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "Every number reported came from a logged run. The six cited references are real and correctly used; the Chari and Pachter claim about UMAP distances was tested rather than repeated (Spearman rho 0.247 cell-level, 0.025 between cluster centroids)." },
+      "practice_boundaries": { "result": "PASS", "detail": "No output diagnoses, prescribes or triages an individual." },
+      "methodological_ground": { "result": "PASS", "detail": "This Skill's whole subject is a methodological fallacy (double-dipping) and it refuses it correctly. The stress input's request to quote post-clustering marker p-values as proof was answered with a permuted-null demonstration rather than an assertion." },
+      "code_usability": { "result": "PASS", "detail": "All 5 inputs executed. Both SKILL.md code blocks and both shipped example scripts run under scanpy 1.12.4 and Seurat 5.5.0. The single failure (FindClusters algorithm=4) is an optional dependency the Skill itself flags as usually unavailable, not broken code." }
+    }
+  },
+  "static_score": {
+    "subtotal": 86,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 10, "max": 12, "note": "Completeness 3: Leiden/Louvain/SLM, the parameter table, the sweep, subclustering, the UMAP caveat and the double-dipping argument are all there, but the Skill's central thesis is that clusters must be validated and the two tools that would do it (scSHC/CHOIR for significance, ClusterDE for DE) are named in prose and shipped as no code at all, while bootstrap stability is described but never written. Correctness 3: one claim is out of date - SKILL.md:39 says Seurat's algorithm=4 needs 'the leidenalg Python module via reticulate'; Seurat 5.5.0 actually fails with \"Package 'leidenbase' is required for leiden_method = 'leidenbase'\", an R package. Everything else checked out, including the n_pcs-dominates-n_neighbors claim (ARI span 0.244 vs 0.022) and the FutureWarning text. Appropriateness 4." },
+      "reliability": { "score": 9, "max": 12, "note": "Fault tolerance 3, error reporting 3, recoverability 3. The 8-row Common Errors table is accurate and its 'A cluster maps to one sample/lane only -> batch effect, not biology' row predicted input 3's result exactly (ARI(cluster, batch) = 1.000). What it does not do is fail loudly: the over-clustering failure modes are silent by nature and the Skill offers no automatic check that would surface one." },
+      "performance_context": { "score": 7, "max": 8, "note": "Token cost 3: 178 lines, no duplicated code path, Python and R kept parallel rather than repeated; no references/ layer. Execution efficiency 4: PCA -> neighbors -> partition -> embed with no redundant step, and the sweep is one loop." },
+      "agent_usability": { "score": 15, "max": 16, "note": "Learnability 4, consistency 4, error prevention 4. The Governing Principle states the trap in one paragraph and every later instruction traces back to it. Feedback design 3: no output format is specified - the agent has to invent what to report from a sweep, and the numbers that decide the answer (cluster count, marker overlap, batch alignment) are exactly the ones not asked for." },
+      "human_usability": { "score": 7, "max": 8, "note": "Discoverability 4: 'Cluster my cells', 'how many clusters should I have', 'are these two clusters one population' are all covered by the description. Forgiveness 3: no guidance for the common off-spec case of an object that arrives already clustered by someone else." },
+      "security": { "score": 10, "max": 12, "note": "Credential safety 4: no credentials, eval/exec or network calls. Input validation 3: the Skill checks nothing about the input object (that PCA exists, that X is log-normalised) before clustering it. Data safety 3: no donor-data note." },
+      "maintainability": { "score": 10, "max": 12, "note": "Modularity 4: one section per decision, eight explicit Related Skills hand-offs. Modifiability 3. Testability 3: both shipped example scripts exist and run (verified, including that ElbowPlot inside pdf() does render under Rscript - Rscript auto-prints top-level visible results), but there are no expected outputs and no fixture." },
+      "agent_specific": { "score": 18, "max": 20, "note": "Trigger precision 4, composability 4, idempotency 4 - the explicit backend pinning (flavor='igraph', n_iterations=2, directed=False) plus random_state gave bit-identical labels across repeat runs, the best reproducibility discipline of any Skill in this candidate set. Progressive disclosure 3. Escape hatches 3: the Skill is emphatic about what NOT to claim, but it never gives a stop rule that actually terminates - the only operational one it offers (merge clusters whose top markers are indistinguishable) said CONTINUE on every artifactual split this audit constructed." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 91.6,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 17, "total": 20 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Cluster 6,049 QC'd PBMCs; choose n_pcs and resolution defensibly",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Ran clean. Three of the Skill's claims confirmed with numbers: n_pcs dominates n_neighbors (ARI span 0.244 vs 0.022), the pinned Leiden call is bit-reproducible, and over-clustering is the default (13-19 clusters for 8 true types at every setting tried).",
+        "executed": true,
+        "execution_note": "run/input1.py, run/input1.log. scanpy 1.12.4 on the SYNTHETIC 8-sample PBMC set with doublets and low-quality cells removed using the ground-truth labels, so the clustering is judged on clustering alone.",
+        "basic": 37,
+        "specialized": 58,
+        "total": 95,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The Leiden backend, n_iterations and random_state are pinned as the Skill requires", "result": "PASS", "note": "flavor='igraph', n_iterations=2, directed=False, random_state=0 throughout; two runs gave ARI 1.0000 and bit-identical labels." },
+          { "text": "Resolution is swept rather than fixed, and the coarsest defensible level is preferred", "result": "PASS", "note": "18-cell sweep over n_pcs x resolution; best ARI (0.665) at the coarsest resolution tested, which is the Skill's own recommendation." },
+          { "text": "The claim that n_pcs dominates n_neighbors is tested rather than repeated", "result": "PASS", "note": "n_pcs moved ARI from 0.421 to 0.665 (span 0.244); n_neighbors from 0.571 to 0.593 (span 0.022) at fixed n_pcs and resolution." },
+          { "text": "No cluster count is presented as the correct number of cell populations", "result": "PASS", "note": "13-19 clusters reported against 8 true types with the over-clustering framing the Skill prescribes; no partition declared correct." }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Seurat route with a resolution vector and clustree",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The whole Seurat path ran and clustree rendered from the swept object with no extra wiring. algorithm=4 (Leiden) failed as the Skill predicts, but for a different reason than the Skill states.",
+        "executed": true,
+        "execution_note": "run/input2.R, run/input2.log, run/input2_clustree.png. Seurat 5.5.0, clustree 0.5.1. FindClusters(resolution=c(0.2,...,1.0)) created RNA_snn_res.0.2 ... RNA_snn_res.1 exactly as SKILL.md:114 says (note the 1.0 column is named .1, not .1.0). algorithm=1 and 3 both gave 15 clusters at ARI 0.615.",
+        "basic": 36,
+        "specialized": 54,
+        "total": 90,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The Seurat sweep produces the RNA_snn_res.<r> columns clustree needs", "result": "PASS", "note": "Five columns created and listed; clustree consumed them with prefix='RNA_snn_res.' unchanged." },
+          { "text": "clustree renders from the swept object without extra wiring", "result": "PASS", "note": "Rendered to run/input2_clustree.png on the first attempt." },
+          { "text": "The Skill's stated cause for the algorithm=4 failure matches the actual failure", "result": "FAIL", "note": "SKILL.md:39 says it 'requires the leidenalg Python module via reticulate'. Seurat 5.5.0 raises \"Package 'leidenbase' is required for leiden_method = 'leidenbase'\" - an R package, not a Python one. The practical conclusion (algorithm=4 needs an extra install; most pipelines run Louvain) is still correct." },
+          { "text": "No claim is made about which algorithm is biologically right", "result": "PASS", "note": "Louvain and SLM gave identical ARI (0.615); reported as such rather than as evidence for either." }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Sorted CD4 capture - one population or several?",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The cleanest result in this audit. A capture containing exactly one true cell type split into two clusters that are perfectly stable (Jaccard 1.0), have ZERO marker overlap and reach adjusted p = 9.1e-153 - and are exactly the two sequencing batches (ARI 1.000).",
+        "executed": true,
+        "execution_note": "run/input3.py, run/input3.log; derived data at data/sorted_cd4_clean.h5ad (SYNTHETIC, see data/README.md). Resolution sweep 0.2-2.0 gave 2 to 16 clusters on 1,400 cells of a single true type.",
+        "basic": 37,
+        "specialized": 55,
+        "total": 92,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The single-population possibility is entertained rather than a parameter bug assumed", "result": "PASS", "note": "The Skill's Common Errors row 1 explicitly allows for it and the response followed that branch." },
+          { "text": "Bootstrap stability is reported as necessary but not sufficient", "result": "PASS", "note": "Both clusters scored Jaccard 1.0 over ten 80% resamples and the response used that to make the Skill's point ('stable does not mean real'), not to validate the split." },
+          { "text": "The Skill's marker-overlap stop rule correctly identifies the over-split", "result": "FAIL", "note": "SKILL.md:89-91 says to merge clusters whose top markers are indistinguishable. Here the top-10 marker overlap was 0.00 and the smallest adjusted p was 9.1e-153, so the rule says keep the split - on a population that is one cell type in two batches." },
+          { "text": "The response checks what the split actually tracks before naming anything", "result": "PASS", "note": "ARI(cluster, batch) = 1.000, ARI(cluster, sample) = 0.250, ARI(cluster, condition) = 0.000; the cluster x batch crosstab is a perfect 0/721, 679/0 split." }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Subcluster a 1,107-cell CD4 T cluster - two routes compared",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Both routes split a 100%-pure single cell type into two, and they disagree with each other (ARI 0.120). The Skill's warning about reusing the global PCA is directionally supported - the route changes the answer - but its prescribed route did not prevent the artifact.",
+        "executed": true,
+        "execution_note": "run/input4.py, run/input4.log. Route A = recompute HVG + scale + PCA + graph on the subset (SKILL.md:121-129); route B = reuse the inherited global PCA. Neither split tracks batch, sample or condition strongly (ARI <= 0.27), i.e. both are essentially noise partitions.",
+        "basic": 35,
+        "specialized": 52,
+        "total": 87,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "HVGs, scaling and PCA are recomputed on the subset rather than inherited", "result": "PASS", "note": "Route A follows SKILL.md:121-129 exactly; route B was run only as the named counter-example." },
+          { "text": "The Skill's stop rule terminates subclustering before an artifactual split is reported", "result": "FAIL", "note": "SKILL.md:131 says to stop 'when splits lose distinct markers'. Both routes produced splits with 0.00 top-10 marker overlap and adjusted p down to 7.7e-46 on a cluster that is 100% one true cell type, so the rule says continue. The Skill names scSHC/CHOIR as the rule that would work and ships no code for either." },
+          { "text": "No sub-population is named from the split", "result": "PASS", "note": "The response reports two candidate splits and refuses to label them, following the Skill's 'label finer splits as hypotheses'." },
+          { "text": "The disagreement between the two routes is reported rather than one being presented as the answer", "result": "PASS", "note": "ARI(route A, route B) = 0.120 reported, with what each partition tracks." }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "'Resolution 2.0 gave me a rare subset with p=1e-30 markers and it's far away in UMAP'",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Both arguments refused with measurements rather than authority. The permuted-null run is the decisive one: on data where the true null holds exactly for every gene, Leiden still found 18 clusters and the marker test still returned adjusted p down to 6.8e-12.",
+        "executed": true,
+        "execution_note": "run/input5.py, run/input5.log; derived data at data/permuted_null.h5ad (SYNTHETIC). Honest note: on this dataset the actual smallest cluster at resolution 2.0 turned out to be 100% dendritic cells, i.e. genuinely real, so the adversarial premise did not hold here - which is itself the point, since the p-values look identical either way.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The marker p-value argument is refused with a demonstration rather than an assertion", "result": "PASS", "note": "Gene-wise permuted null: 18 clusters at resolution 1.0, 9 genes below FDR 0.05, smallest adjusted p 6.83e-12, on data with no cell structure at all." },
+          { "text": "The UMAP-distance argument is refused with a measurement", "result": "PASS", "note": "Spearman(UMAP distance, PCA(30) distance) = 0.247 over 1,500 cells and 0.025 between cluster centroids." },
+          { "text": "No novel cell subset is named on the strength of a high-resolution split", "result": "PASS", "note": "The response declines the claim and points at the significance-test route the Skill names." },
+          { "text": "The candidate cluster is checked for batch and sample confounding before any verdict", "result": "PASS", "note": "ARI(cluster, batch) = 0.004 and the largest single-sample share was 0.304, so confounding was ruled out before the cluster was discussed - and it turned out to be a real dendritic-cell population." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 34.4,
+    "dynamic_weighted": 55.0,
+    "score": 89,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "The strongest methodological content in this candidate's Skill set. The double-dipping argument is stated correctly (p-values are invalid, not inflated; BH does nothing because the p-values are broken before correction) and a permuted-null run reproduced it exactly.",
+    "Reproducibility discipline is the best of any Skill audited here: the Leiden backend, n_iterations and directedness are pinned in every code block, the predicted FutureWarning really is raised, and two runs gave bit-identical labels.",
+    "The parameter table's headline claim is quantitatively true on real data - n_pcs moved ARI by 0.244 against n_neighbors' 0.022.",
+    "'UMAP distances are not metric data' is not a slogan here: measured Spearman correlation between UMAP and PCA distances was 0.247 cell-to-cell and 0.025 between cluster centroids."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "The Skill's only operational stop rule never stops",
+      "observed_in": [3, 4],
+      "problem": "The rule an agent can actually execute - merge clusters whose top markers are indistinguishable - passed every artifactual split constructed in this audit. A single true cell type split in two gave 0.00 marker overlap and adjusted p = 9.1e-153; a 100%-pure subcluster split gave 0.00 overlap and p = 7.7e-46.",
+      "root_cause": "Marker distinctness is itself a double-dipped quantity, so it cannot adjudicate a split chosen to maximise separation - the Skill says exactly this two paragraphs earlier and then still offers it as the stop rule.",
+      "fix": "Replace the marker-overlap stop rule with checks that are not circular and are runnable today: does the split align with batch/sample/QC covariates (ARI against each), does it survive on held-out cells, and does it reproduce in a second half of the data. Keep scSHC/CHOIR as the formal answer but give one of them a code block, since the Skill's thesis depends on it."
+    },
+    {
+      "priority": "P2",
+      "title": "Seurat Leiden dependency is named wrongly",
+      "observed_in": [2],
+      "problem": "SKILL.md:39 says algorithm=4 'requires the leidenalg Python module via reticulate'. Seurat 5.5.0 fails with \"Package 'leidenbase' is required for leiden_method = 'leidenbase'\".",
+      "root_cause": "The statement describes Seurat 4-era behaviour; Seurat 5 moved to the R leidenbase backend.",
+      "fix": "Change the sentence to name leidenbase and note that install.packages('leidenbase') is the fix under Seurat 5, keeping the reticulate/leidenalg note for Seurat 4."
+    },
+    {
+      "priority": "P2",
+      "title": "Elbow advice and the recommended n_pcs range point in opposite directions",
+      "observed_in": [1],
+      "problem": "The parameter table says n_pcs 30-50 'check elbow'. On this dataset the variance-ratio elbow sits at roughly PC 5-7, while ARI was best at n_pcs = 50. Following the elbow would have cost 0.24 ARI.",
+      "root_cause": "The elbow heuristic and the empirical 30-50 range are both offered without saying which wins when they conflict.",
+      "fix": "State that the elbow is a floor rather than a target - take the larger of the elbow and about 30 - and add the cluster-stability-across-nearby-n_pcs check the same table already names as the validation."
+    },
+    {
+      "priority": "P2",
+      "title": "Validation section is prose where the rest of the Skill is code",
+      "observed_in": [3, 4],
+      "problem": "Bootstrap stability, scSHC, CHOIR and ClusterDE are the Skill's answer to its own central question and none of them has a code block. The bootstrap had to be written from scratch for input 3.",
+      "root_cause": "The Validating section was written as argument rather than as procedure.",
+      "fix": "Add a short bootstrap-stability block (resample, re-cluster, per-cluster Jaccard) - it is ten lines and the Skill already specifies the 0.6-0.7 threshold - and at least one significance-test call, with a note on what to do when the package is unavailable."
+    },
+    {
+      "priority": "P2",
+      "title": "No guidance on what to report from a sweep",
+      "observed_in": [1, 2],
+      "problem": "The Skill prescribes a resolution sweep but never says what to output from it, so the numbers that decide the answer (cluster counts per resolution, marker overlap, covariate alignment) are the ones an agent has to think to produce.",
+      "root_cause": "Feedback design is not covered.",
+      "fix": "Add a four-line 'what to report' block: clusters per resolution, the chosen level and why, per-cluster size and covariate composition, and an explicit statement that marker p-values are for ranking only."
+    }
+  ]
+}

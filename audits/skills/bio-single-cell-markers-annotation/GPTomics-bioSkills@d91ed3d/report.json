@@ -1,0 +1,354 @@
+{
+  "meta": {
+    "skill_name": "bio-single-cell-markers-annotation",
+    "description": "Detect cluster marker genes and assign manual cell type labels in single-cell RNA-seq using Scanpy (Python) and Seurat (R). Use when finding genes that distinguish clusters, ranking markers for annotation, scoring gene signatures, hand-labeling clusters, or deciding between Wilcoxon marker ranking and pseudobulk condition DE.",
+    "evaluated_on": "2026-09-16",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Moderate",
+    "n_inputs": 5,
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:single-cell/markers-annotation",
+    "executed_inputs": "5/5"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "Every number reported came from a logged run. The five cited references are real and correctly used, and the two whose claims were tested directly (Squair 2021 on pseudoreplication, Tirosh 2016 on control-set module scoring) both held."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "No output diagnoses, prescribes or triages an individual. Labels are attached to clusters of barcodes."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "The stress input asked for a cell-level condition contrast - the exact pseudoreplication the Skill exists to prevent - and it was refused with a null-contrast measurement (13 false positives, smallest padj 2e-13, against 0 for pseudobulk)."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "5/5 inputs executed. Every block runs under scanpy 1.12.4 and Seurat 5.5.0. One block produces the wrong kind of matrix (the Python pseudobulk aggregation sums log-normalized values rather than counts) - that is a correctness P1, not an M4 failure: the code runs, and the downstream pyDESeq2 fit still completed."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 84,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 10,
+        "max": 12,
+        "note": "Completeness 4: marker ranking in both ecosystems, the method-choice table, module scoring, cell-cycle scoring, manual labelling, the pseudobulk hand-off and a canonical PBMC panel. Correctness 2: the Python pseudobulk snippet at SKILL.md:150-156 calls sc.get.aggregate(..., func='sum') with no layer=, so on the object the Skill's own upstream steps produce it sums LOG-NORMALIZED values. The resulting matrix is non-integer (max 988.94), correlates 0.729 with the correct one, and cost recall 0.291 against 0.345 in a pyDESeq2 fit. This directly contradicts the Skill's own 'Defaults that bite' row four sections earlier ('Aggregate RAW counts (summed), never normalized'), and the R snippet on the next line does pass layer='counts'. Appropriateness 4."
+      },
+      "reliability": {
+        "score": 9,
+        "max": 12,
+        "note": "Fault tolerance 3, error reporting 3, recoverability 3. Every Common Errors row that could be tested was accurate, and the single-cluster row is exact: rank_genes_groups on one group returned all 12,521 logfoldchanges as NaN with RuntimeWarnings and no exception, which is precisely the symptom described. What is missing is any row for the pseudobulk-layer defect the Skill itself introduces - the symptom (non-integer pseudobulk matrix, DESeq2 refusing it in R) is exactly the kind of thing this table exists for."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "Token cost 3: 204 lines covering markers, scoring, cell cycle, labelling and pseudobulk with no duplicated code; no references/ layer. Execution efficiency 4: rank, filter, label - three steps with the hand-off to deseq2-basics for the modelling."
+      },
+      "agent_usability": {
+        "score": 13,
+        "max": 16,
+        "note": "Learnability 4 and error prevention 4 are strong - the two-questions framing at the top is the clearest statement of the marker-vs-condition-DE distinction in this Skill set, and the 'Defaults that bite' table was verified correct on all four testable rows. Consistency 2: the Skill states its pseudobulk input rule in a table and then violates it in its own code block, in the same document. Feedback design 3: no output format specified."
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Discoverability 4: 'find marker genes for my clusters' is the literal trigger and matches the request. Forgiveness 3: no guidance for an object whose clusters arrived from someone else with no raw counts retained, which is when the pseudobulk step actually breaks."
+      },
+      "security": {
+        "score": 10,
+        "max": 12,
+        "note": "Credential safety 4: no credentials, eval/exec or network calls. Input validation 3: the Skill tells the agent to aggregate raw counts but nothing checks that a counts layer exists or that the values are integral. Data safety 3: no donor-data note."
+      },
+      "maintainability": {
+        "score": 10,
+        "max": 12,
+        "note": "Modularity 4: one section per task, an explicit scope split with cell-annotation and differential-abundance, and seven Related Skills hand-offs. Modifiability 3. Testability 3: examples/find_markers_scanpy.py and examples/find_markers_seurat.R both exist, compile and parse; no fixture or expected output."
+      },
+      "agent_specific": {
+        "score": 18,
+        "max": 20,
+        "note": "Trigger precision 4, composability 4 (the boundary with cell-annotation and differential-abundance is stated in prose, not just in a link list), idempotency 4 (all methods deterministic given the clustering). Progressive disclosure 3. Escape hatches 3: the 'report it as a single homogeneous type' branch is a genuine stop condition and was the correct answer in input 3, but there is no stop condition for the case where no raw counts survive to pseudobulk."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 90.0,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 19,
+      "total": 20
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Scanpy markers on 12 clusters, then manual PBMC labelling",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Ran clean. The 'Defaults that bite' claim about method=None is exactly right, the specificity filter cut 150,252 marker rows to 712, and the canonical panel gave 0.879 labelling accuracy - with the one systematic error being exactly the context-dependence the Skill warns about.",
+        "executed": true,
+        "execution_note": "run/input1.py, run/input1.log. scanpy 1.12.4 on the SYNTHETIC 8-sample PBMC set (6,049 clean cells, 12 Leiden clusters at resolution 0.3, 8 true types). uns['params'] after a default rank_genes_groups call records \"'method': 't-test'\".",
+        "basic": 37,
+        "specialized": 55,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Wilcoxon is requested explicitly rather than relying on the scanpy default",
+            "result": "PASS",
+            "note": "method='wilcoxon' passed; the default call was run separately and its recorded params confirm method resolves to 't-test', with only 0.86 top-20 marker overlap between the two."
+          },
+          {
+            "text": "Markers are filtered by effect size and fraction-expressing rather than by p-value",
+            "result": "PASS",
+            "note": "The Skill's filter (logfoldchanges > 1, pct_nz_group > 0.5, pct_nz_reference < 0.25) applied; ranking by p-value instead would have picked a largely different shortlist (top-5 overlap 0.25)."
+          },
+          {
+            "text": "Cluster labels come from marker evidence, with unmapped clusters flagged rather than dropped",
+            "result": "PASS",
+            "note": "Module scores computed for all eight canonical panels per cluster; labels assigned by argmax with .fillna('Unassigned'), and the full score table reported."
+          },
+          {
+            "text": "Marker p-values are not offered as evidence that the clusters are real cell types",
+            "result": "PASS",
+            "note": "16,189 of 150,252 gene-by-cluster tests reach padj<0.05 with a smallest value of exactly 0; reported as descriptive ranking per the Governing Principle."
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Seurat FindAllMarkers and the v5 default changes",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "All three Seurat rows of the 'Defaults that bite' table are correct against Seurat 5.5.0, and the 'permissive, returns more hits' claim is measurable: 28,584 rows at the defaults against 15,241 with the Skill's explicit thresholds.",
+        "executed": true,
+        "execution_note": "run/input2.R, run/input2.log. Seurat 5.5.0 + presto 1.1.0, 6,048 cells, 14 clusters. formals() confirms logfc.threshold = 0.1 and min.pct = 0.01; test.use defaults to 'wilcox'. FindAllMarkers took 7-8.5 s with presto present.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The three Seurat v5 defaults the Skill names match the installed package",
+            "result": "PASS",
+            "note": "logfc.threshold 0.1 (folklore 0.25), min.pct 0.01 (folklore 0.1), test.use 'wilcox' - all three exactly as the table states."
+          },
+          {
+            "text": "presto is confirmed present before relying on a fast Wilcoxon",
+            "result": "PASS",
+            "note": "requireNamespace('presto') TRUE; FindAllMarkers completed in 7 s on 6,048 cells, consistent with the fast path rather than the base-R fallback."
+          },
+          {
+            "text": "The Skill's specificity filter restores a marker-grade shortlist from a permissive run",
+            "result": "PASS",
+            "note": "15,241 rows -> 140 after p_val_adj < 0.05, avg_log2FC > 1 and (pct.1 - pct.2) > 0.2, with all 14 clusters retaining markers."
+          },
+          {
+            "text": "No cell type is named from the marker table alone",
+            "result": "PASS",
+            "note": "Markers reported as a ranked shortlist; labelling was done in input 1 from module scores over the canonical panel, with the crosstab against truth shown."
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "A sorted CD4 population - marker ranking with only one group",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The Common Errors row is exact: all 12,521 logfoldchanges came back NaN with RuntimeWarnings and no exception. The better result is that the Skill's specificity filter then correctly rejected the batch-aligned subcluster split that p-values endorsed at padj 7e-231.",
+        "executed": true,
+        "execution_note": "run/input3.py, run/input3.log. 2,127 CD4 T cells from the SYNTHETIC set. Subclustering produced exactly 2 groups that are exactly the two sequencing batches (1020/0, 0/1107); rank_genes_groups gave padj down to 7.33e-231 but the Skill's specificity filter returned 0 markers.",
+        "basic": 37,
+        "specialized": 55,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The degenerate single-group output is detected rather than used",
+            "result": "PASS",
+            "note": "All logfoldchanges NaN and all padj 1.0; reported as degenerate rather than interpreted."
+          },
+          {
+            "text": "The Skill's stated symptom for this case matches what actually happens",
+            "result": "PASS",
+            "note": "'NaN / degenerate logFC and p-values from marker ranking' - exactly the observed behaviour, including that no exception is raised."
+          },
+          {
+            "text": "Both prescribed alternatives are considered and the right branch is chosen",
+            "result": "PASS",
+            "note": "Subclustering was tried and the split shown to be the batch; the response takes the Skill's other branch, 'report it as a single homogeneous type', which is correct against the truth labels."
+          },
+          {
+            "text": "No sub-population is named from the batch-aligned split",
+            "result": "PASS",
+            "note": "The specificity filter returned 0 markers for the split and nothing was labelled."
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Aggregate to pseudobulk before handing off to DESeq2",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The Skill's Python pseudobulk snippet violates the Skill's own rule. sc.get.aggregate(..., func='sum') with no layer= sums the log-normalized values sitting in .X, producing a non-integer matrix that correlates only 0.729 with the correct one and costs recall.",
+        "executed": true,
+        "execution_note": "run/input4.py, run/input4.log. On the object the Skill's own upstream steps produce, the verbatim snippet gave max 988.94 and 'all values integral? False'; with layer='counts' it gave max 17064 and integral values. pyDESeq2 on the two matrices: 16 genes (recall 0.291) vs 19 genes (recall 0.345), both at precision 1.000.",
+        "basic": 30,
+        "specialized": 46,
+        "total": 76,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The pseudobulk matrix contains summed RAW counts, as the Skill's own rule requires",
+            "result": "FAIL",
+            "note": "It does not. SKILL.md:154 omits layer='counts', so the sum runs over .X, which by that point in the Skill's own workflow is log-normalized. The R snippet on line 159 passes layer='counts' correctly, so the two ecosystems disagree inside one document."
+          },
+          {
+            "text": "Aggregation is per sample x cell type rather than pooled",
+            "result": "PASS",
+            "note": "Subset to CD14 Mono first, then by='sample' - 8 columns from 1,184 cells, as SKILL.md:153 prescribes."
+          },
+          {
+            "text": "The consequence of the wrong input is measured rather than assumed",
+            "result": "PASS",
+            "note": "Both matrices taken through pyDESeq2: 16 vs 19 calls, recall 0.291 vs 0.345, precision 1.000 in both cases - so the damage here is lost power, not false positives."
+          },
+          {
+            "text": "The R aggregation path is checked against the Python one",
+            "result": "PASS",
+            "note": "AggregateExpression(..., layer = 'counts') at SKILL.md:159 is correct; the defect is Python-only."
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "'Just run the marker test treated-vs-control across my cells'",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Refused with a null-contrast measurement. On donors split so condition, batch and sex are each balanced, cell-level Wilcoxon returned 13 'significant' genes at a smallest padj of 2e-13; pseudobulk returned zero, smallest padj exactly 1.",
+        "executed": true,
+        "execution_note": "run/input5.py, run/input5.log. Same 1,184 CD14 Mono cells. On the real contrast: cell-level 37 called at precision 0.649, pseudobulk 19 called at precision 1.000.",
+        "basic": 39,
+        "specialized": 57,
+        "total": 96,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The cells-as-replicates request is refused rather than accommodated",
+            "result": "PASS",
+            "note": "Refused on the Skill's two-questions framing; the pseudobulk route was produced instead."
+          },
+          {
+            "text": "The refusal is backed by a null-contrast measurement rather than a citation alone",
+            "result": "PASS",
+            "note": "13 false positives from cell-level Wilcoxon on a balanced null split, smallest padj 2.02e-13, against 0 from pseudobulk with a smallest padj of 1."
+          },
+          {
+            "text": "The pseudobulk alternative is produced and scored on the real contrast too",
+            "result": "PASS",
+            "note": "Cell-level precision 0.649 against pseudobulk 1.000; recall 0.436 against 0.345, i.e. the extra cell-level calls are false positives, not extra sensitivity."
+          },
+          {
+            "text": "The tool's willingness to run the contrast is reported as a hazard, not a feature",
+            "result": "PASS",
+            "note": "The response states that rank_genes_groups returns a tidy table with p-values down to 7e-147 for the condition contrast and that this is the Skill's stated reason the error is so common."
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 33.6,
+    "dynamic_weighted": 54.0,
+    "score": 88,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "The 'Defaults that bite' table is the most directly useful page in this Skill and every testable row came back correct: scanpy's method=None really does resolve to t-test (confirmed from uns['params']), Seurat v5's FindMarkers really does default to logfc.threshold 0.1 and min.pct 0.01, and the v5 defaults really are permissive (28,584 rows against 15,241).",
+    "The two-questions framing at the top - marker ranking versus condition DE, with the unit of replication stated for each - is the clearest statement of that distinction in this candidate's Skill set, and it was confirmed by measurement: cell-level testing gave 13 false positives on a null contrast where pseudobulk gave zero.",
+    "The specificity filter (effect size plus in/out fraction, not p-value) does real work. On a batch-aligned subcluster split with adjusted p-values down to 7e-231, it returned zero markers - the filter caught what the p-values endorsed.",
+    "The single-cluster Common Errors row is exact, down to the fact that scanpy raises no exception: all 12,521 log fold changes came back NaN with only RuntimeWarnings."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "The Python pseudobulk snippet sums normalized values, against the Skill's own rule",
+      "observed_in": [
+        4
+      ],
+      "problem": "SKILL.md:154 is sc.get.aggregate(cell_type, by='sample', func='sum'). With no layer= argument it sums .X, which on the object the Skill's own earlier steps produce is log-normalized. The result is a non-integer matrix (max 988.94 against 17,064 for the correct one, correlation 0.729) that R DESeq2 would refuse outright and that cost recall 0.291 against 0.345 in pyDESeq2.",
+      "root_cause": "The snippet was written against an object whose .X still held counts; the Skill's own 'Defaults that bite' row ('Aggregate RAW counts (summed), never normalized') is the correct rule and the R snippet on the next line follows it.",
+      "fix": "Change the call to sc.get.aggregate(cell_type, by='sample', func='sum', layer='counts') and add a one-line assertion that the aggregated values are integral, so the contradiction cannot survive a copy-paste."
+    },
+    {
+      "priority": "P2",
+      "title": "No Common Errors row for a non-integer pseudobulk matrix",
+      "observed_in": [
+        4
+      ],
+      "problem": "The failure introduced by the snippet above has a distinctive symptom - a pseudobulk matrix of non-integer values, which DESeq2 rejects in R and which silently loses power in Python - and the error table has no row for it.",
+      "root_cause": "The table predates the pseudobulk section.",
+      "fix": "Add: symptom 'pseudobulk matrix has non-integer values / DESeq2 says counts matrix should be integers' / cause 'aggregated .X instead of the counts layer' / fix 'pass layer=\"counts\" (Python) or layer=\"counts\" to AggregateExpression (R)'."
+    },
+    {
+      "priority": "P2",
+      "title": "Canonical NK and CD8 panels overlap and the table does not say so",
+      "observed_in": [
+        1
+      ],
+      "problem": "Labelling by the Skill's canonical panel scored 0.879 accuracy, and essentially the whole error is 724 of 731 CD8 T cells labelled NK, because NKG7 and GNLY are shared with cytotoxic CD8 T cells while the CD8 panel's CD8A/CD8B are sparsely detected.",
+      "root_cause": "The panel table lists markers per type without noting which pairs of types the panels cannot separate.",
+      "fix": "Flag the CD8 T / NK pair in the table and say that separating them needs CD3D/CD3E as a gate rather than the cytotoxic genes alone. The Skill already states the general principle ('a marker is a conditional statement'); this is the case where it bites in PBMC."
+    },
+    {
+      "priority": "P2",
+      "title": "The 24-versus-25 control-bin claim could not be verified",
+      "observed_in": [
+        1,
+        2
+      ],
+      "problem": "SKILL.md:109 says scanpy uses 25 control bins and Seurat 24, and calls this a cross-ecosystem reproducibility source. scanpy's n_bins default is 25 as stated, but Seurat 5.5.0's AddModuleScore generic exposes nbin as NULL, so the 24 could not be confirmed from the installed package.",
+      "root_cause": "Not a defect - an unverifiable claim from this environment, recorded so the audit's coverage is honest.",
+      "fix": "No change required unless a fix pass can confirm the Seurat default; if it can, cite where it is set so a reader can check it."
+    },
+    {
+      "priority": "P2",
+      "title": "No guidance on what to report",
+      "observed_in": [
+        1,
+        2
+      ],
+      "problem": "The Skill prescribes a filter but never says what a marker table should carry into a figure or methods section - the filter thresholds used, the fraction-expressing gap, and the explicit statement that the p-values are descriptive all had to be supplied by the agent.",
+      "root_cause": "Feedback design is not covered.",
+      "fix": "Add a three-line 'what to report' block: the test and thresholds used, per-cluster top markers with pct.1/pct.2, and a standing note that cluster-marker p-values are descriptive."
+    }
+  ]
+}

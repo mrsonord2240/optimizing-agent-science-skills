@@ -1,0 +1,7 @@
+.libPaths(c('F:/OpenScience/audit-envs/single-cell-transcriptomics-analyst/R-lib', .libPaths()))
+suppressPackageStartupMessages({library(Seurat); library(DoubletFinder)})
+b <- body(DoubletFinder::doubletFinder)
+txt <- deparse(b)
+cat(paste(grep('order|Idents|orig.ident|xtfrm|sort', txt, value=TRUE), collapse='\n'), '\n')
+cat('---- first 40 lines ----\n')
+cat(paste(head(txt, 40), collapse='\n'), '\n')

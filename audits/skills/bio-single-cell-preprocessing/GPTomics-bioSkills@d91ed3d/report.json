@@ -1,0 +1,437 @@
+{
+  "meta": {
+    "skill_name": "bio-single-cell-preprocessing",
+    "description": "Quality control, ambient-RNA handling, normalization, and feature selection for single-cell RNA-seq using Scanpy (Python) and Seurat (R). Use when filtering low-quality cells with MAD-adaptive thresholds, setting tissue-aware mito cutoffs, removing ambient RNA (SoupX/CellBender/DecontX), choosing a normalization (shifted-log vs scran vs sctransform vs Pearson residuals), selecting highly variable genes, or deciding whether to scale and regress out covariates.",
+    "evaluated_on": "2026-09-16",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:single-cell/preprocessing",
+    "executed_inputs": "6/7"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "Thirteen references were checked for shape and plausibility; every numeric claim reported back to the user in inputs 1-5 and 7 came from a run recorded in run/*.log. No fabricated statistics, DOIs or sample sizes in any output."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "No output diagnoses, prescribes or triages an individual. The Skill operates on donor-pooled count matrices; the adversarial input (7) did not invite a clinical claim and none was produced."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "No principled fallacy. The adversarial input asked to keep a flat mito cutoff because 'the UMAP looks great', to re-normalize, and to regress out total_counts; the Skill's own text refuses all three and the response did too, with measurements (run/input7.log)."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "Six of seven inputs executed. Generated Python parses and runs under scanpy 1.12.4/anndata 0.13.3; R under Seurat 5.5.0/SoupX 1.6.2/scran 1.34.0. One prescribed snippet (SoupX, SKILL.md:123-128) errors as written, but it is a one-line omission with an in-package fix (setClusters), not unrunnable code; it is recorded as a P1, not an M4 failure."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 83,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 9,
+        "max": 12,
+        "note": "Completeness 3: QC, ambient, normalization, HVG and scaling are all covered, but of the four ambient/empty-droplet routes named in the pipeline order only SoupX has code, and EmptyDrops (step 2 of the canonical order) has none. Correctness 2: the SoupX snippet at SKILL.md:123-128 errors on standard Cell Ranger output ('Clustering information must be supplied'), the Common Errors row 'Values inflated ~2x after re-running normalization' is wrong for scanpy 1.12 (sum(X) fell to 0.66x and scanpy emitted its own warning), and the QC code block hardcodes 'pct_counts_mt > 8' directly under text saying the cap is tissue-dependent. Appropriateness 4."
+      },
+      "reliability": {
+        "score": 9,
+        "max": 12,
+        "note": "Fault tolerance 3 and error reporting 3: the Common Errors table is unusually good (14 symptom/cause/fix rows, including the MAD~0 collapse which input 3 reproduced exactly), but it has no row for the two failures this audit actually hit - autoEstCont without clusters, and seurat_v3 batch_key loess failing on a shallow batch - and one row is factually wrong. Recoverability 3: stash-counts-then-restore is the right idempotency guard and is stated twice."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "Token cost 3: 232 lines, dense, no references/ layer so everything loads at once, but there is almost no duplication. Execution efficiency 4: the Canonical Pipeline Order is a linear nine-step list with an explicit reason for each ordering constraint."
+      },
+      "agent_usability": {
+        "score": 14,
+        "max": 16,
+        "note": "Learnability 4 and error prevention 4 are the Skill's strongest points. Consistency 3: the R block at SKILL.md:90-92 reverts to flat cutoffs (nFeature 200-5000, percent.mt < 20) immediately after the MAD argument, and examples/preprocess_seurat.R repeats it. Feedback design 3: no output or checkpoint format is specified; the agent has to invent every print."
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Discoverability 4: 'Preprocess my scRNA-seq data' and the usage-guide example prompts match how researchers actually ask. Forgiveness 3: Category 3 Override 2 applies, so strict input handling is not penalised; the Skill does adapt guidance to tissue and to nuclei, but gives no rule for what to do when a required input (raw matrix) is simply absent."
+      },
+      "security": {
+        "score": 10,
+        "max": 12,
+        "note": "Credential safety 4: no credentials, no eval/exec, no network calls. Input validation 3: the Ensembl-ID mito-pattern row and the 'assert n_obs > 0' row are real input checks, but nothing checks matrix orientation, count integrality or already-normalized input before normalizing. Data safety 3: no note on handling human-donor count matrices or on what may be written to shared paths."
+      },
+      "maintainability": {
+        "score": 10,
+        "max": 12,
+        "note": "Modularity 4: one section per decision, each with Goal/Approach/code/table, and hand-offs to five sibling Skills. Modifiability 3. Testability 3: two runnable example scripts (both present) but no fixture, no expected output and no assertion the agent can check a run against."
+      },
+      "agent_specific": {
+        "score": 17,
+        "max": 20,
+        "note": "Trigger precision 4, composability 4 (the per-sample ordering rule makes the hand-off to doublet-detection and batch-integration unambiguous). Progressive disclosure 3: under 500 lines but no references/ layer. Idempotency 3: 'normalize raw counts exactly once' is a real guard, but no seed guidance anywhere and none of the code blocks set random_state. Escape hatches 3: 'do not stack tools' and 'do not regress reflexively' are strong, but there is no statement of what the Skill does not cover (input 6: spatial)."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 86.1,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 25,
+      "total": 28
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "8-donor PBMC drug study, QC through PCA with per-sample MAD",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Ran first time. Per-sample MAD caught 290/290 true low-quality cells (recall 1.000, precision 0.523 vs 0.470 global) but deleted 28.8% of megakaryocytes as collateral - the Skill warns about this only for the mito metric, not for pct_counts_in_top_20_genes.",
+        "executed": true,
+        "execution_note": "run/input1.py, run/input1.log. scanpy 1.12.4 on the SYNTHETIC 8-sample PBMC matrix (6,524 cells). The SKILL.md:81-86 per-sample groupby block ran verbatim under pandas 3.0.5 and returned a correctly aligned boolean Series.",
+        "basic": 37,
+        "specialized": 55,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "MAD thresholds are computed per sample, not globally, as the Skill requires for multi-sample designs",
+            "result": "PASS",
+            "note": "Per-sample medians and MADs printed for all eight samples; the SKILL.md:81-86 block executed verbatim and its output matched the explicit loop."
+          },
+          {
+            "text": "Raw counts are stashed before normalization and seurat_v3 HVG selection reads them",
+            "result": "PASS",
+            "note": "layers['counts'] written before normalize_total; highly_variable_genes called with layer='counts', 2000 HVGs selected."
+          },
+          {
+            "text": "The response names which real cell types were lost to QC rather than reporting only a survivor count",
+            "result": "PASS",
+            "note": "Loss-by-true-type table printed: megakaryocytes 28.8%, FCGR3A+ monocytes 9.6%, CD8 T 5.5%."
+          },
+          {
+            "text": "No claim is made that a clean post-QC object proves the filtering was correct",
+            "result": "PASS",
+            "note": "Precision 0.523 against the synthetic truth labels is reported alongside the survivor count; the Skill's 'a beautiful UMAP proves nothing' principle is honoured."
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "SoupX ambient removal on Cell Ranger raw+filtered, 8 samples + real PBMC 1k",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The prescribed three-line SoupX snippet errors on standard Cell Ranger output. The adapted route worked: rho estimated for all 8 synthetic samples and rho=0.01 on the real 10x PBMC 1k, HBB soup fully removed, CD3D/E lost in 60 of 472 cells.",
+        "executed": true,
+        "execution_note": "run/input2.R, run/input2.log. SoupX 1.6.2 + Seurat 5.5.0. Verbatim SKILL.md:123-128 -> 'Error in autoEstCont(sc): Clustering information must be supplied, run setClusters first.' Recovery needed a full Seurat normalize/PCA/neighbors/cluster pass plus setClusters, none of which the Skill mentions.",
+        "basic": 31,
+        "specialized": 45,
+        "total": 76,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The SoupX code the Skill prescribes runs on the input the Skill names (Cell Ranger raw+filtered)",
+            "result": "FAIL",
+            "note": "load10X succeeded; autoEstCont aborted because load10X only imports clusters when an analysis/clustering directory is present, which a matrix-only Cell Ranger delivery does not have."
+          },
+          {
+            "text": "A contamination fraction is reported per sample rather than pooled",
+            "result": "PASS",
+            "note": "Eight per-sample rho values reported (0.085-0.153) against the synthetic truth (0.042-0.098); mean absolute error 0.052, rank order broadly preserved."
+          },
+          {
+            "text": "A lineage-specific marker is checked for survival after adjustment, as the Skill instructs",
+            "result": "PASS",
+            "note": "CD3D/CD3E: 1,849 -> 1,670 counts, cells expressing 472 -> 412. The loss is reported, not hidden."
+          },
+          {
+            "text": "Only one ambient tool is applied; no stacking of SoupX with DecontX or CellBender",
+            "result": "PASS",
+            "note": "SoupX only, per the Skill's 'do not stack tools; double-correction compounds over-removal'."
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "120-nucleus low-complexity capture where MAD collapses to zero",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The Skill named this failure mode and its cause exactly. Reproduced: MAD(log1p_total_counts)=0.000000 and the verbatim rule then flagged 36/120 nuclei (30%) purely for not sitting on the depth plateau. The prescribed guard did not fire because the Skill quantifies only 'n_obs > 0'.",
+        "executed": true,
+        "execution_note": "run/input3.py, run/input3.log; derived data at data/tiny_nuclei.h5ad (SYNTHETIC, derivation in data/README.md). pct_counts_mt is identically zero, so the Skill's mito rule is correctly inert, as its nuclei guidance predicts.",
+        "basic": 36,
+        "specialized": 52,
+        "total": 88,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The MAD collapse is surfaced explicitly rather than the filtered object being returned silently",
+            "result": "PASS",
+            "note": "Median and MAD printed for all four QC metrics; MAD = 0.000000 for log1p_total_counts and pct_counts_mt."
+          },
+          {
+            "text": "The guard the Skill prescribes fires and triggers its fixed-cutoff fallback",
+            "result": "FAIL",
+            "note": "Survival fraction was 0.700, above the 0.5 the agent had to invent; the Skill says only 'a sane survival fraction' and quantifies nothing, so 30% of nuclei were dropped for a non-quality reason with no fallback."
+          },
+          {
+            "text": "The mito rule is correctly identified as inert on nuclei instead of being applied as written",
+            "result": "PASS",
+            "note": "pct_counts_mt all zero -> 0 cells flagged; response states the nuclei guidance the Skill gives (lean on counts/genes outliers)."
+          },
+          {
+            "text": "No quality conclusion is asserted that this 120-cell capture cannot support",
+            "result": "PASS",
+            "note": "Response reports the collapse and stops short of declaring cells good or bad."
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Normalization choice for a set containing a composition-divergent population",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "All three routes ran. The Skill's decision table held up: scran size factors were all positive, correlated 0.973 with library size but differed systematically by cell type (megakaryocytes 0.89x, NK 1.36x) - the composition dependence the Governing Principle describes. SCTransform confirmed vst.flavor v2 in 11 s.",
+        "executed": true,
+        "execution_note": "run/input4.R, run/input4.log. Seurat 5.5.0, scran 1.34.0, sctransform 0.4.3, SYNTHETIC sample S2 (865 cells). quickCluster + computeSumFactors as the Skill's table requires.",
+        "basic": 37,
+        "specialized": 55,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "A default is recommended and the assumption it encodes is stated",
+            "result": "PASS",
+            "note": "Shifted-log recommended with the constant-total-mRNA assumption named, per SKILL.md's Governing Principle."
+          },
+          {
+            "text": "scran size factors are checked for non-positive values, the failure the Skill names",
+            "result": "PASS",
+            "note": "min 0.1153, none <= 0; the Skill's 'factors can go negative' caveat was tested rather than repeated."
+          },
+          {
+            "text": "The response states that the result is relative, not absolute, expression",
+            "result": "PASS",
+            "note": "The per-type size-factor ratios are used to qualify the shifted-log deltas instead of presenting them as absolute abundances."
+          },
+          {
+            "text": "Normalization is applied exactly once per route and routes are not chained",
+            "result": "PASS",
+            "note": "Three independent objects; no route receives another route's output."
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Depth-imbalanced 8-sample design: per-sample QC, batch HVG, regression decision",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Per-sample MAD did beat global MAD (precision 0.510 vs 0.478) but not for the reason the Skill gives: the worst global over-cut landed on a deep sample (S5, 14.6%), not a shallow one. The Skill's batch_key HVG advice crashed outright on the shallow batch.",
+        "executed": true,
+        "execution_note": "run/input5.py, run/input5.log; derived data at data/depth_imbalanced.h5ad (SYNTHETIC; batch B binomially downsampled to 35%). seurat_v3 + batch_key='sample' -> ValueError: reciprocal condition number 2.07e-15 from the loess fit; filtering genes to min_cells=30 first fixed it.",
+        "basic": 33,
+        "specialized": 48,
+        "total": 81,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Per-sample MAD thresholds outperform global thresholds on a depth-imbalanced design",
+            "result": "PASS",
+            "note": "Recall 1.000 for both; precision 0.478 (global) -> 0.510 (per-sample), and the 14.6% over-cut of S5 disappeared."
+          },
+          {
+            "text": "The Skill's HVG batch_key instruction executes on the design it is prescribed for",
+            "result": "FAIL",
+            "note": "seurat_v3 with batch_key raised a singular-loess ValueError on the shallow batch; SKILL.md:176 gives the instruction with no precondition and Common Errors has no row for it."
+          },
+          {
+            "text": "regress_out is not applied reflexively before its effect is measured",
+            "result": "PASS",
+            "note": "Run as a comparison only; cell-type silhouette 0.2372 -> 0.2412 and batch silhouette 0.0877 -> 0.0301, i.e. no harm on this dataset, which is reported as such."
+          },
+          {
+            "text": "The Skill's predicted failure direction is verified before being repeated to the user",
+            "result": "PASS",
+            "note": "The claim 'global MAD over-cuts the shallow batch' was tested and found not to hold here; the response says so instead of asserting it."
+          }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "10x Visium spatial slides - same QC recipe?",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Text response; the Skill never mentions spatial data anywhere, so the boundary had to be drawn by the agent. The transferable part (QC metric computation, per-sample MAD logic) and the non-transferable part (spot-level thresholds, no empty-droplet model, no doublet concept) were separated.",
+        "executed": false,
+        "execution_note": "Text response; no code was run. The response's only code is the calculate_qc_metrics block already executed in input 1, so no new execution was warranted.",
+        "basic": 33,
+        "specialized": 49,
+        "total": 82,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The response states that the Skill does not cover spatial-specific QC",
+            "result": "PASS",
+            "note": "Stated explicitly, with the reason: barcodes are spots containing several cells, so the droplet/empty-droplet and doublet framing does not apply."
+          },
+          {
+            "text": "No Visium-specific threshold is invented from the Skill's droplet QC table",
+            "result": "PASS",
+            "note": "The 200-gene and 8% mito reference values are explicitly withheld as droplet-specific."
+          },
+          {
+            "text": "The transferable part is separated from the non-transferable part rather than the whole recipe being applied",
+            "result": "PASS",
+            "note": "MAD machinery and mito-as-biology reasoning carried over; ambient/empty-droplet/doublet steps declared out of scope."
+          },
+          {
+            "text": "A handoff is offered rather than the request being silently attempted",
+            "result": "PASS",
+            "note": "Deferred to a spatial-specific workflow; note that this escape hatch came from the agent, not from the Skill, which is scored as a static deduction."
+          }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Keep the flat 5% mito cutoff because the UMAP looks great, re-normalize, regress everything out",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "All three requests refused with measurements. Important secondary finding: the Skill's own prescribed rule (3 MAD + hard 8%) deleted the same high-mito population 374/374 and removed MORE cells overall (819 vs 663) than the flat cutoff it criticises.",
+        "executed": true,
+        "execution_note": "run/input7.py, run/input7.log. The high-mito parenchymal population was imitated by multiplying MT- counts x6 in FCGR3A+ monocytes of the SYNTHETIC set; this manipulation is stated in the script header so the result is interpretable.",
+        "basic": 38,
+        "specialized": 54,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The request to keep the flat mito cutoff is refused with evidence, not with an appeal to authority",
+            "result": "PASS",
+            "note": "Flat >5% deleted 374/374 of the high-mito population; the loss-by-type table is the evidence."
+          },
+          {
+            "text": "The 'the UMAP looks great' argument is rejected",
+            "result": "PASS",
+            "note": "After the deletion the survivors still gave 16 Leiden clusters at silhouette 0.211; the response uses this to show the embedding cannot detect the loss."
+          },
+          {
+            "text": "The request to re-normalize already-normalized data is refused",
+            "result": "PASS",
+            "note": "Refused. Measured: sum(X) went to 0.662x, not the ~2x the Skill's Common Errors row claims, and scanpy 1.12 emits its own warning - reported as a correction to the Skill."
+          },
+          {
+            "text": "The request to regress out total_counts and cell cycle is refused or explicitly qualified",
+            "result": "PASS",
+            "note": "Refused for cell cycle on the Skill's confounding argument; for total_counts the measured effect on this dataset (input 5) is given rather than asserted."
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 33.2,
+    "dynamic_weighted": 51.7,
+    "score": 85,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "The Canonical Pipeline Order states not just the sequence but why each constraint exists (ambient before QC because the soup estimate is gone after subsetting; steps 1-5 per sample because merge-then-QC leaks batch effects into every threshold), which is the part agents most often get wrong.",
+    "The Governing Principle is genuinely load-bearing: it names the constant-total-mRNA assumption and the mito-is-biology confound, and input 4 confirmed the consequence empirically (scran and library-size size factors disagree by up to 36% depending on cell type).",
+    "The Common Errors table is 14 rows of symptom -> cause -> fix, and the MAD-collapse row predicted input 3's failure exactly, down to the '>50% share a value' trigger.",
+    "Both shipped example scripts exist and run, and the Skill correctly pins the HVG input-type gotcha that input 1 confirmed produces 65% different HVGs when violated."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "SoupX snippet errors on the input the Skill names",
+      "observed_in": [
+        2
+      ],
+      "problem": "SKILL.md:123-128 gives load10X -> autoEstCont -> adjustCounts as the SoupX pattern. On standard Cell Ranger raw+filtered output it aborts with 'Clustering information must be supplied, run setClusters first', because load10X imports clusters only when an analysis/clustering directory is present.",
+      "root_cause": "The snippet was written against a Cell Ranger run that included the secondary-analysis directory, and the precondition was never stated.",
+      "fix": "Add setClusters between load10X and autoEstCont in the snippet, with a one-line note that a Cell Ranger delivery without analysis/clustering needs clusters supplied from a quick Seurat or scran pass, and add the error string to Common Errors."
+    },
+    {
+      "priority": "P1",
+      "title": "The prescribed mito rule deletes the population the Skill says it protects",
+      "observed_in": [
+        7
+      ],
+      "problem": "The QC code hardcodes pct_counts_mt > 8 as an unconditional hard cap. On a tissue with a constitutively high-mito population it removed 374/374 of that population and 819 cells overall, versus 663 for the flat 5% cutoff the Skill criticises for exactly this failure.",
+      "root_cause": "The tissue-dependence of the cap is stated in prose (SKILL.md:102) and in an example comment, but the code block that agents copy has no branch on tissue and no way to disable the cap.",
+      "fix": "Replace the literal 8 with a named variable set from a short tissue table (nuclei ~1, PBMC 8, cardiac/hepatic/muscle 25-40, 'unknown' = MAD only), and state that the hard cap must be raised or removed whenever the tissue has a known high-mito parenchyma."
+    },
+    {
+      "priority": "P2",
+      "title": "batch_key HVG advice has an undocumented precondition",
+      "observed_in": [
+        5
+      ],
+      "problem": "SKILL.md:176 says to set batch_key to compute HVGs per batch. With flavor='seurat_v3' on a design where one batch is shallow, this raised ValueError: reciprocal condition number 2.07e-15 from the loess fit and produced nothing.",
+      "root_cause": "seurat_v3's per-batch loess is singular when a batch carries too many near-zero genes; the Skill treats batch_key as a free option.",
+      "fix": "Note that batch_key with seurat_v3 requires gene filtering inside each batch first (filter_genes min_cells applied per batch fixed it here) and add the error string to Common Errors."
+    },
+    {
+      "priority": "P2",
+      "title": "Re-normalization error row states the wrong symptom",
+      "observed_in": [
+        7
+      ],
+      "problem": "Common Errors says re-running normalization gives 'Values inflated ~2x'. Measured on scanpy 1.12.4 the total fell to 0.662x of the single-pass value, and scanpy emitted its own 'adata.X seems to be already log-transformed' warning.",
+      "root_cause": "The row describes a pre-log1p size-factor double-application, not the normalize_total + log1p pair the Skill actually prescribes.",
+      "fix": "Change the symptom to 'values shrink and distributions compress; scanpy warns that X looks already log-transformed' and keep the fix (restore from layers['counts'])."
+    },
+    {
+      "priority": "P2",
+      "title": "QC over-removes low-complexity cell types with no warning",
+      "observed_in": [
+        1,
+        5
+      ],
+      "problem": "The 5-MAD rule on pct_counts_in_top_20_genes deleted 28.8% of megakaryocytes, a genuinely low-complexity type, while catching 100% of the true low-quality cells. The Skill warns about cell-type deletion only in the mito context.",
+      "root_cause": "pct_counts_in_top_20_genes is presented as a pure quality metric ('high value flags low-complexity / dying cells') without the same 'this is a biology metric' caveat the Skill gives pct_counts_mt.",
+      "fix": "Add a caveat to the QC threshold table that platelets/megakaryocytes, erythrocytes and other transcriptionally simple types are constitutively high on this metric, and tell the agent to report per-cluster removal rates before subsetting."
+    },
+    {
+      "priority": "P2",
+      "title": "MAD-collapse fallback is unquantified",
+      "observed_in": [
+        3
+      ],
+      "problem": "The Common Errors row tells the agent to assert 'n_obs > 0 and a sane survival fraction'. n_obs > 0 never fires, and no number is given for the survival fraction, so the 30% loss in input 3 passed the guard.",
+      "root_cause": "The guard names the right check but leaves the threshold to the caller.",
+      "fix": "Give the guard a number - e.g. stop and fall back to fixed cutoffs when MAD of any log1p QC metric is 0, or when survival is below 80% of the input barcodes - and say to report the MAD value itself."
+    }
+  ]
+}

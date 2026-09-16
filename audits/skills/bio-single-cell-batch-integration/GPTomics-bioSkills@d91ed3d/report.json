@@ -1,0 +1,437 @@
+{
+  "meta": {
+    "skill_name": "bio-single-cell-batch-integration",
+    "description": "Integrate multiple scRNA-seq samples or batches with Harmony, scVI/scANVI, Seurat (CCA/RPCA), fastMNN, Scanorama, or BBKNN. Resolves which method to use for the dataset size and design, how strongly to correct, when integration is the wrong move (confounded batch/biology), how to score integration with scIB metrics without gaming them, and why corrected expression must not be used for differential expression. Use when integrating batches or datasets, choosing an integration method, diagnosing over-correction, or judging integration quality.",
+    "evaluated_on": "2026-09-16",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:single-cell/batch-integration",
+    "executed_inputs": "7/7"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "Every number reported came from a logged run. The eight cited references are real and correctly used, and the scIB composite the Skill quotes (0.6 bio + 0.4 batch) reproduced the scib-metrics Benchmarker's own Total column to four decimals on all four embeddings tested."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "No output diagnoses, prescribes or triages an individual."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "The two methodological traps this Skill exists to prevent were both put to it adversarially and both refused with measurements: DE on batch-corrected expression (precision collapsed from 0.649 to 0.022 against ground truth) and selecting a method on a batch metric alone (a pure-noise embedding tied for the best batch ASW)."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "7/7 inputs executed. The Harmony, scVI/scANVI, BBKNN and evaluation blocks all run as printed. One block does not: the Seurat v5 IntegrateLayers snippet with RPCAIntegration aborts on future.globals.maxSize and needs one options() line, which is a P1 rather than an M4 failure - the same snippet with CCAIntegration and HarmonyIntegration ran, and RPCA ran once the limit was raised."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 88,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 11,
+        "max": 12,
+        "note": "Completeness 4: Harmony, scVI, scANVI, Seurat v5 and BBKNN all have runnable code, plus the evaluation recipe, the strength-parameter table, the When-NOT-to-integrate section and the reference-mapping contrast; fastMNN and Scanorama are table-only but explicitly secondary. Correctness 3: the RPCAIntegration example that SKILL.md:135 actually prints fails out of the box on a 6,000-cell two-batch object, and two of the five bare symbols it lists (FastMNNIntegration, scVIIntegration) do not exist without SeuratWrappers, which is never named. Everything else verified true, including the scANVI positional-argument note at SKILL.md:119 and the claim that Harmony and BBKNN produce no corrected counts. Appropriateness 4."
+      },
+      "reliability": {
+        "score": 10,
+        "max": 12,
+        "note": "Fault tolerance 3 and error reporting 3: the 8-row Common Errors table is accurate on every row that could be checked, but it has no entry for either runtime failure this audit hit (future.globals.maxSize under IntegrateLayers, Scanorama's non-contiguous-batch precondition). Recoverability 4: 'always keep the uncorrected embedding for before/after comparison' is stated in the Governing Principle and used in the evaluation recipe, and it is exactly what makes an over-correction recoverable."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "Token cost 3: 203 lines carrying six methods without repeating a code path; no references/ layer so it all loads at once. Execution efficiency 4: each method section is preprocess -> integrate -> downstream with no redundant step, and the evaluation section is four lines."
+      },
+      "agent_usability": {
+        "score": 15,
+        "max": 16,
+        "note": "Learnability 4, consistency 4, error prevention 4. The method table's Use-when/Fails-when columns are specific enough to act on, and the scIB weighting is given as a formula rather than a slogan. Feedback design 3: no output format specified - what to report from an integration (before/after metrics, rare-population check) has to be invented."
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Discoverability 4: 'Integrate my batches', 'which integration method', 'did integration ruin my data' are all covered. Forgiveness 3: no guidance for the very common case of an object whose batch key is ambiguous (sample vs donor vs chemistry)."
+      },
+      "security": {
+        "score": 10,
+        "max": 12,
+        "note": "Credential safety 4: no credentials, eval/exec or network calls. Input validation 3: nothing checks that the batch key exists or that X holds what each method expects (scVI silently wants raw counts). Data safety 3: no donor-data note, despite reference mapping to public atlases being discussed."
+      },
+      "maintainability": {
+        "score": 10,
+        "max": 12,
+        "note": "Modularity 4: one section per method plus separate evaluation and reference-mapping sections, and eight Related Skills hand-offs. Modifiability 3. Testability 3: both shipped examples exist and parse (py_compile and R parse clean) but are function-shaped scripts over hypothetical input files, with no fixture and no expected output."
+      },
+      "agent_specific": {
+        "score": 18,
+        "max": 20,
+        "note": "Trigger precision 4, composability 4, escape hatches 4 - 'When NOT to Integrate' is the strongest escape hatch in this candidate's whole Skill set, naming three refusal conditions and an experimental rather than computational fix. Progressive disclosure 3. Idempotency 3: the Common Errors table does tell the agent to set seeds and fix max_epochs, but no code block sets one and the scvi.settings.seed handle is never named."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 91.0,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 25,
+      "total": 28
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Harmony on two 10x lanes, with the Skill's own before/after evaluation",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Ran clean and worked well: batch ASW +0.0211 -> -0.0001 while cell-type ASW rose slightly, and Leiden ARI against the true cell types went from 0.784 uncorrected to 0.998 corrected (8 clusters for 8 true types).",
+        "executed": true,
+        "execution_note": "run/input1.py, run/input1.log; theta verification in run/theta_check.py. scanpy 1.12.4 + harmonypy 0.0.10 on the SYNTHETIC 8-sample PBMC set with doublets and low-quality cells removed.",
+        "basic": 37,
+        "specialized": 56,
+        "total": 93,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The uncorrected embedding is kept and scored for the before/after comparison the Skill requires",
+            "result": "PASS",
+            "note": "X_pca retained and scored alongside X_pca_harmony; uncorrected Leiden also run as the baseline."
+          },
+          {
+            "text": "Batch-mixing and bio-conservation are reported jointly, never batch alone",
+            "result": "PASS",
+            "note": "Every line prints batch ASW and cell-type ASW together, as SKILL.md:150-160 prescribes."
+          },
+          {
+            "text": "The design is cross-tabulated before any correction is applied",
+            "result": "PASS",
+            "note": "condition x batch printed first: 1468/1555 control and 1451/1575 treated, i.e. balanced, so integration is safe here."
+          },
+          {
+            "text": "The Skill's theta claim is tested rather than repeated",
+            "result": "PASS",
+            "note": "theta 0.5/2.0/8.0 gave identical ASW to four decimals; a direct harmonypy sweep showed theta does reach the backend but changes the correction only by ~0.03% until theta=50. The Skill's direction is right, its magnitude is unstated."
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "scVI then scANVI with 60% of labels hidden",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The Skill's most specific API claim is correct: unlabeled_category really is the second positional argument of SCANVI.from_scvi_model in scvi-tools 1.5.1. scANVI beat scVI on both axes and predicted 3,653 hidden labels at 1.000 accuracy.",
+        "executed": true,
+        "execution_note": "run/input2.py, run/input2.log. scvi-tools 1.5.1 on CPU, 40 epochs SCVI + 20 epochs SCANVI, scvi.settings.seed = 20260916. Signature confirmed: from_scvi_model(scvi_model, unlabeled_category, labels_key=None, ...).",
+        "basic": 36,
+        "specialized": 56,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The scANVI call form the Skill prints is accepted by the installed scvi-tools",
+            "result": "PASS",
+            "note": "SCANVI.from_scvi_model(model, 'Unknown', labels_key=...) accepted; the signature shows unlabeled_category as the second positional parameter exactly as SKILL.md:119 states."
+          },
+          {
+            "text": "Raw counts are registered in a layer, as scVI requires",
+            "result": "PASS",
+            "note": "layers['counts'] written before HVG selection and passed to setup_anndata(layer='counts'), per SKILL.md:104-109."
+          },
+          {
+            "text": "scVI latent dimensions are not read as biological axes",
+            "result": "PASS",
+            "note": "X_scVI used only for neighbours, clustering and silhouette scoring, per SKILL.md:119."
+          },
+          {
+            "text": "The under-training risk the Skill names for small data is checked rather than ignored",
+            "result": "PASS",
+            "note": "Leiden on X_scVI gave ARI 0.625 against 0.998 for Harmony on the same 6,049 cells - exactly the 'small data (under-trained)' failure the method table predicts, and it is reported as such."
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "BBKNN when only clustering and UMAP are needed",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "All three of the Skill's BBKNN claims confirmed: it writes no embedding (obsm unchanged), it rewrites the graph in place, and it leans toward batch removal (same-batch neighbour fraction 0.832 -> 0.411, i.e. past the 0.50 mixing point).",
+        "executed": true,
+        "execution_note": "run/input3.py, run/input3.log. bbknn 1.6.0 ran in 28 s; Leiden on the BBKNN graph gave ARI 0.999 against the true cell types. Scanorama also run; it raised 'Detected non-contiguous batches' until the object was sorted by batch.",
+        "basic": 37,
+        "specialized": 54,
+        "total": 91,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The response does not attempt to score BBKNN with an embedding-based metric",
+            "result": "PASS",
+            "note": "silhouette on X_bbknn raised KeyError, and the response treats that as the expected consequence of SKILL.md:143 rather than an error to work around."
+          },
+          {
+            "text": "A graph-level batch-mixing measure is substituted when no embedding exists",
+            "result": "PASS",
+            "note": "Mean same-batch neighbour fraction computed from obsp: 0.411 after BBKNN against 0.832 uncorrected."
+          },
+          {
+            "text": "No corrected counts are claimed to exist after BBKNN",
+            "result": "PASS",
+            "note": "Stated explicitly; the downstream hand-off is Leiden/UMAP only."
+          },
+          {
+            "text": "Scanorama runs from the Skill's description without an undocumented precondition",
+            "result": "FAIL",
+            "note": "ValueError: Detected non-contiguous batches. The object must be sorted by batch first. The Skill gives Scanorama a table row and no code, so no snippet is broken, but the precondition is not named anywhere."
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Seurat v5 IntegrateLayers - the R snippet the Skill actually prints",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The exact method the Skill's R code block uses, RPCAIntegration, aborts on a routine 6,048-cell two-batch object. CCAIntegration and HarmonyIntegration through the same code ran and reached ARI 0.999 and 1.000.",
+        "executed": true,
+        "execution_note": "run/input4.R, run/input4.log, run/input4b_rpca.R, run/input4b.log. Error: 'The total size of the 10 globals exported for future expression (FUN()) is 781.60 MiB. This exceeds the maximum allowed size 500.00 MiB'. With options(future.globals.maxSize = 4 * 1024^3) it ran in 20 s at ARI 1.000. FastMNNIntegration and scVIIntegration do not resolve as bare symbols without SeuratWrappers.",
+        "basic": 33,
+        "specialized": 48,
+        "total": 81,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The IntegrateLayers snippet the Skill prints runs on a standard two-batch object",
+            "result": "FAIL",
+            "note": "RPCAIntegration - the method the code block names - aborted on the future.globals.maxSize limit. One options() line, absent from the Skill, fixes it."
+          },
+          {
+            "text": "The bare-symbol method names the Skill lists resolve in the installed Seurat",
+            "result": "FAIL",
+            "note": "CCAIntegration, RPCAIntegration and HarmonyIntegration exist; FastMNNIntegration and scVIIntegration do not. They live in SeuratWrappers, which SKILL.md:143 never mentions."
+          },
+          {
+            "text": "The integrated reduction is used for neighbours and clustering, not the raw PCA",
+            "result": "PASS",
+            "note": "FindNeighbors(reduction = 'int.<method>') throughout, per SKILL.md:138."
+          },
+          {
+            "text": "An uncorrected baseline is reported alongside the integrated result",
+            "result": "PASS",
+            "note": "Uncorrected: 13 clusters at ARI 0.650; CCA 8 clusters at 0.999; Harmony 8 at 1.000."
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Score four candidate embeddings with scib-metrics and pick one",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The best result in this audit. scib-metrics Benchmarker ran on all four embeddings, and the composite the Skill states from memory (0.6 bio + 0.4 batch) reproduced the tool's own Total column to four decimals on every row.",
+        "executed": true,
+        "execution_note": "run/input5.py, run/input5.log. scib-metrics 0.6.1, 11 metrics x 4 embeddings. Totals: X_pca 0.6572, X_pca_harmony 0.8647, X_scVI 0.8588, X_scANVI 0.9097 - the same ranking the Skill quotes from Luecken 2022 (scANVI tops bio-conservation).",
+        "basic": 39,
+        "specialized": 57,
+        "total": 96,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "At least two candidate methods are scored on a common axis set, as the Skill prescribes",
+            "result": "PASS",
+            "note": "Four embeddings through Benchmarker: 5 bio-conservation and 5 batch-correction metrics each."
+          },
+          {
+            "text": "The 0.6/0.4 composite the Skill states matches the tool's own aggregate",
+            "result": "PASS",
+            "note": "Hand-computed 0.6*bio + 0.4*batch equals the Benchmarker Total to four decimals for all four embeddings."
+          },
+          {
+            "text": "No method is selected on a batch metric alone",
+            "result": "PASS",
+            "note": "X_pca_harmony has the best iLISI-driven batch score but scANVI wins the composite on bio-conservation; the composite is what the response uses."
+          },
+          {
+            "text": "The over-correction gaming failure is demonstrated rather than asserted",
+            "result": "PASS",
+            "note": "A pure-noise embedding scored batch ASW +0.0001, tied for the best of all four, with cell-type ASW -0.0053."
+          }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "All controls on day 1, all treated on day 2 - integrate anyway?",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Refused, correctly and for the right reason (the design, not a metric). But the data-driven diagnostic the Skill prescribes did not fire at either simulated effect size, which is partly a limit of the simulation and partly a real gap in the diagnostic.",
+        "executed": true,
+        "execution_note": "run/input6.py, run/input6.log; derived data data/confounded_sd035.h5ad and data/confounded_sd090.h5ad (SYNTHETIC, see data/README.md). The metadata crosstab is decisive (3023/0, 0/3026). The cluster x day crosstab gave 0/8 pure clusters and ARI 0.003 at both sd 0.35 and sd 0.90, because a uniform per-gene multiplicative day effect is largely removed by CP10k normalization. The log states this limitation explicitly.",
+        "basic": 35,
+        "specialized": 53,
+        "total": 88,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Integration is refused for the confounded design rather than attempted",
+            "result": "PASS",
+            "note": "The refusal is the headline of the response; Harmony was run only to quantify what would happen, and labelled as such."
+          },
+          {
+            "text": "The refusal rests on the design, not on a data-driven metric that happened to fire",
+            "result": "PASS",
+            "note": "condition x capture_day is a perfect 3023/0, 0/3026 - unidentifiable by construction, and the response says so before clustering anything."
+          },
+          {
+            "text": "An experimental fix is named rather than a computational one",
+            "result": "PASS",
+            "note": "Multiplex conditions across captures (hashing, genetic demux, split each condition across days), per SKILL.md:33."
+          },
+          {
+            "text": "The response states the limits of what this dataset could actually test",
+            "result": "PASS",
+            "note": "The log says plainly that the simulated day effect is a uniform per-gene rescale that normalization removes, so the failure of the cluster diagnostic here is not proof the diagnostic is bad."
+          }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "'iLISI is 0.91, we're done - now DE the corrected matrix'",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The most decisive measurement in this audit. DE on Scanorama-corrected expression returned 319 hits at precision 0.022 against the injected ground truth; DE on uncorrected log-normalized counts returned 37 hits at precision 0.649. A 30x precision collapse.",
+        "executed": true,
+        "execution_note": "run/input7.py, run/input7.log. Ground truth: truth_de_genes.csv, 35 up and 20 down genes in CD14+ monocytes only, 1,184 monocytes. Harmony was confirmed to write no corrected expression at all (obsm only), so the request literally cannot be honoured on a Harmony object.",
+        "basic": 39,
+        "specialized": 57,
+        "total": 96,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Differential expression on batch-corrected expression is refused",
+            "result": "PASS",
+            "note": "Refused, and the Skill's alternative (uncorrected log-normalized counts; pseudobulk per sample x cell type for cross-condition) is named."
+          },
+          {
+            "text": "The refusal is backed by a measurement against ground truth rather than an appeal to the Skill",
+            "result": "PASS",
+            "note": "Precision 0.649 (uncorrected) vs 0.022 (Scanorama-corrected); 312 of 319 corrected-matrix hits are false positives."
+          },
+          {
+            "text": "The 'iLISI is high so we are done' argument is refused",
+            "result": "PASS",
+            "note": "Answered with input 5's noise embedding, which ties for the best batch mixing while destroying all biology."
+          },
+          {
+            "text": "The response states that Harmony produces no corrected counts, so the request is ill-posed on this object",
+            "result": "PASS",
+            "note": "obsm holds X_pca and X_pca_harmony; there is no corrected expression matrix, exactly as SKILL.md:164 says."
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 35.2,
+    "dynamic_weighted": 54.6,
+    "score": 90,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "The scIB composite the Skill states from memory (overall = 0.6 x bio-conservation + 0.4 x batch-removal) reproduced the scib-metrics Benchmarker's own Total column to four decimals on all four embeddings tested, and the method ranking it quotes from Luecken 2022 came out in the right order.",
+    "'Never run DE on batch-corrected expression' is the single highest-value rule in this candidate's Skill set, and it is measurably true: precision against injected ground truth fell from 0.649 to 0.022 when the corrected matrix was used.",
+    "'When NOT to Integrate' is the strongest escape hatch in the whole Skill set - three named refusal conditions, a concrete diagnostic, and an experimental rather than computational fix.",
+    "The method table's Fails-when column is specific enough to act on and was right where it could be tested: scVI was visibly under-trained on 6,000 cells (ARI 0.625 against Harmony's 0.998), and BBKNN did lean past the batch-removal midpoint (neighbour mixing 0.411 against a 0.50 balance point)."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "The Seurat v5 snippet aborts on its own default method",
+      "observed_in": [
+        4
+      ],
+      "problem": "SKILL.md:135 prints IntegrateLayers(..., method = RPCAIntegration). On a 6,048-cell, two-batch object it aborts: 'The total size of the 10 globals exported for future expression (FUN()) is 781.60 MiB. This exceeds the maximum allowed size 500.00 MiB per plan() argument maxSizeOfObjects'. CCAIntegration and HarmonyIntegration through the same code ran fine.",
+      "root_cause": "Seurat's anchor-based integration ships its work to future workers, and the 500 MiB default globals limit is exceeded at very ordinary dataset sizes; the Skill's snippet omits the options() line every Seurat v5 integration tutorial carries.",
+      "fix": "Add options(future.globals.maxSize = 4 * 1024^3) immediately above the IntegrateLayers call - verified here to make RPCAIntegration run in 20 s at ARI 1.000 - and add the error string to Common Errors."
+    },
+    {
+      "priority": "P2",
+      "title": "Two of the five listed Seurat methods need an unnamed package",
+      "observed_in": [
+        4
+      ],
+      "problem": "SKILL.md:143 lists CCAIntegration, RPCAIntegration, HarmonyIntegration, FastMNNIntegration and scVIIntegration as bare symbols to pass. Only the first three resolve in Seurat 5.5.0; FastMNNIntegration and scVIIntegration live in SeuratWrappers, which is not mentioned anywhere in the Skill.",
+      "root_cause": "The list was written from Seurat's documentation, which groups them together without flagging the package boundary.",
+      "fix": "Mark the last two as requiring SeuratWrappers (and scVIIntegration additionally requiring a working reticulate scvi-tools), so an agent that reaches for fastMNN in R knows what to install."
+    },
+    {
+      "priority": "P2",
+      "title": "The theta warning has no magnitude",
+      "observed_in": [
+        1
+      ],
+      "problem": "The strength-parameter table says larger theta over-corrects. Sweeping theta 0.5 / 2.0 / 8.0 changed batch ASW and cell-type ASW by less than 1e-4; only theta = 50 produced a visibly different correction, and theta = 0 still corrected substantially.",
+      "root_cause": "The table gives a direction with no scale, so an agent cannot tell whether raising theta from 2 to 8 is a meaningful intervention.",
+      "fix": "State the useful range (roughly 0.5-5, default around 2) and say that the batch effect size dominates theta below that - and that theta = 0 does not disable correction."
+    },
+    {
+      "priority": "P2",
+      "title": "Scanorama's sorted-batch precondition is unstated",
+      "observed_in": [
+        3
+      ],
+      "problem": "sce.pp.scanorama_integrate raises 'Detected non-contiguous batches' on a normally ordered object. The Skill recommends Scanorama for partial cell-type overlap but gives no code and no precondition.",
+      "root_cause": "Scanorama is table-only in the Skill, so its input contract was never written down.",
+      "fix": "Add one line to the method table or Common Errors: Scanorama requires the object sorted by batch key before integrate/correct."
+    },
+    {
+      "priority": "P2",
+      "title": "The confounded-design diagnostic is necessary but not sufficient",
+      "observed_in": [
+        6
+      ],
+      "problem": "The prescribed check is 'cluster the uncorrected data and cross-tabulate clusters x batch x condition'. On a design that is confounded by construction, that check returned 0 of 8 pure clusters and ARI 0.003 against capture day, i.e. it read as safe.",
+      "root_cause": "The diagnostic detects a large batch effect, not a confounded design; a confound with a modest batch effect is invisible to it.",
+      "fix": "Lead the section with the metadata test - cross-tabulate condition against batch and stop if any condition sits entirely in one batch - and keep the cluster crosstab as the follow-up that sizes the effect. (Caveat: the simulated day effect used here is a uniform per-gene rescale that normalization removes, so this run shows the diagnostic is insufficient, not that it is generally blind.)"
+    },
+    {
+      "priority": "P2",
+      "title": "Seeds are prescribed in the error table and set in no code block",
+      "observed_in": [
+        1,
+        2
+      ],
+      "problem": "Common Errors says 'Set seeds; for scVI fix max_epochs and report it', but not one of the five code blocks sets a seed, and the handle that actually works for scvi-tools (scvi.settings.seed) is never named.",
+      "root_cause": "The advice lives only in the error table, not in the patterns agents copy.",
+      "fix": "Add random_state / scvi.settings.seed to the code blocks and name max_epochs explicitly in the scVI snippet rather than relying on the internal heuristic."
+    }
+  ]
+}
