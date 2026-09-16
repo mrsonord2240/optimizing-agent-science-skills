@@ -20,3 +20,41 @@ Unfixed: QC-report / exclusion-decision template and DIA/Level-1/2 code (new con
 No change; left byte-identical. The re-audit (86, Production Ready) reports no P1 and no demonstrated defect in what runs -- every open item is a P2 asking for new content (commands, code for a prose-only step, a report template) or a wording softening, which the brief puts out of scope.
 
 Also **not tested: the DIA-NN "High precision mode halves median CV" claim**, so the sentence is unchanged. It is not cheap here: the earlier library-free run under `audit-envs/.../public-work/diann_libfree` died during spectral prediction and left `diann_out` empty, so there is no library and no `.quant` file to reuse -- testing it means two full library-free DIA-NN runs over a 7.75M-precursor predicted library for three Astral runs. And PXD070049 has one replicate per condition (its own README says there is no CV or replicate-precision check), so a within-condition median CV cannot be computed from this data at all. Needs either a replicated dataset or a budgeted DIA-NN run.
+
+## Pass 5 — 2026-09-15 (re-audit at 85, Limited Release; assertion floor 90% missed at 87.2%)
+
+Branch `fix/proteomics-5` (worktree `F:\OpenScience\external\bioSkills-wt-prot5`), branched from
+`openscience-fixes` @ `1110c24`. Commit `95a8460`. Evidence: the batch-C re-audit at
+`F:\OpenScience\audits\bio-proteomics-proteomics-qc\` (19:10), which ran each script more than once
+and on real single-replicate DIA data. Runtime: Python 3.12 shared venv (pandas 3.0.5, numpy 2.5.3,
+scikit-learn 1.9.1), R 4.4.3 via `r.sh` (PTXQC 1.1.5, rmarkdown 2.31), Pandoc 3.11, DIA-NN 2.6.1
+output. All six SKILL.md python blocks were extracted programmatically and `exec`'d — nothing retyped.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| `pca_batch_check` is not reproducible: `PCA(n_components=n_pc)` has no `random_state`, and sklearn's `'auto'` solver is randomized on a wide matrix | P1 | `PCA(n_components=n_pc, svd_solver='full', random_state=0)` in SKILL.md and in `examples/qc_analysis.py`; a Version Compatibility sentence ("seed anything stochastic and re-run it once"); a Common Errors row | ran, twice over: on the audit's 20 x 600 TMT matrix the OLD line gave **6 distinct** PC3~plex p-values over 6 identical fits (0.987768, 0.988524, 0.989106, 0.989532, 0.989552, 0.991638); the fixed line gives **1** (0.988923). Six calls of the fixed `pca_batch_check` produce one identical printed block and one identical `explained_variance_ratio_`. The example prints byte-identical output on two runs | `'full'` is exact, not just seeded; at QC sizes (tens of samples) it is free |
+| Three checks degrade silently at n = 1 per group: `replicate_correlation` -> 0 rows, `median_cv_linear` -> NaN, loading rule inert (`fold_total_vs_group` identically 1.0) | P1 | `replicate_correlation` and `median_cv_linear` raise `ValueError` with the group sizes when no group has >=2 samples (and warn per-group otherwise); `raw_sample_qc` detects single-sample groups, warns, adds a `baseline` column and falls back to the all-sample median; a decision-tree row and a prose paragraph state the design requirement | ran on real PXD070049 DIA-NN 2.6.1 output (3 Astral runs, one per condition, 1619 precursor rows after global-q filtering): both functions raise with `{'A': 1, 'B': 1, 'C': 1}`; `raw_sample_qc` prints the warning and reports the ALL baseline with folds 0.901 / 1.127 / 1.000 and IDs 1.000 / 1.004 / 0.994 — the same numbers the auditor got by hand-building that baseline | |
+| `pca_batch_check` raised `TypeError: At least two samples are required; got 1` from a correctly-indexed `sample_info` when a batch level has one sample | P1 (part of the above) | Guard before `f_oneway`: prints `NOT TESTABLE` with the level sizes and "this is not evidence of no batch effect" | ran on the same 3-run DIA matrix: `PC1 ~ batch: NOT TESTABLE, level sizes [1, 1, 1]`, PC2 likewise, function returns coords + `[0.6903 0.3097]` instead of raising | |
+| Pandoc claim (dispatch item): the earlier premise that Pandoc blocked `createReport()` was wrong | P1/P2 | Decision-tree row and taxonomy row now say `createReport()` writes PDF + mzQC + heatmap + YAML with no extra dependency and HTML **only** when Pandoc is reachable; a Common Errors row explains the message is not fatal and how to point at Pandoc | ran twice on the same MaxQuant `txt/` folder: clean session -> `rmarkdown::pandoc_available()` FALSE, `Sys.which("pandoc")` empty, PTXQC prints "The 'Pandoc' converter is not installed on your system", call **completes**, writes `report_v1.1.5_*.pdf` 60.6 kB + `.mzQC` + `.yaml` + `_heatmap.txt`, **no HTML**. With `RSTUDIO_PANDOC=.../tools/pandoc/pandoc-3.11` -> `pandoc_available()` TRUE, same PDF plus a **1400 kB HTML** | Pandoc 3.11 is installed but NOT on PATH, so a clean session still prints the message. The Skill documents that rather than the old claim or the old workaround |
+| Common Errors misattributes `At least two samples are required; got 1` to a RangeIndex alone | P2 | Row now names both causes and points at the `NOT TESTABLE` output | ran: RangeIndex still raises the Skill's own explicit `ValueError`; the correctly-indexed single-sample case now prints `NOT TESTABLE` | |
+| No warning that a batch fully confounded with condition cannot be corrected at all | P2 | One sentence in the PCA prose: non-identifiable, do not correct and do not test | audit run (Input 8): mean \|log2FC\| on 104 true DA proteins 1.546 -> 0.000 after batch removal on a fully confounded design | not re-simulated; figure from the audit |
+
+Regression on the audit's synthetic data with the edited blocks: T4 flagged on `Intensity` and not on
+`LFQ intensity` in `proteinGroups_failed.txt`, nothing flagged in the clean file; replicate r
+0.956–0.966 over 12 pairs; median CV 24.3% / 23.6%; `PC1 ~ batch: p=0.0000`. All match the re-audit.
+`examples/qc_analysis.py` `py_compile` clean, exit 0, `ctrl_3` still flagged. Files pure ASCII, CRLF
+preserved.
+
+## Left unfixed (pass 5)
+
+- **P2 — Levels 1–2 and DIA matrix construction remain prose only.** Still new content: the Skill names
+  the metrics and their thresholds but never claims to supply code for them, and adding RT/iRT-fit and
+  FWHM extraction would be a new section rather than a correction.
+- **P2 — sample-swap detection has no code.** Same reading. The decision-tree row tells the agent what
+  to do ("check if it correlates better with a DIFFERENT group") and the audit found the swap by doing
+  exactly that; the centred cross-group correlation would be a new function.
+- **PTXQC's fixed-score behaviour** (a healthy 1,300-peptide dataset scoring ~0.08 on
+  `Peptide Count (>15000)`, a 0.375x-loaded run scoring 1.0 on `Peptide Intensity (>23.0)`) is a real
+  observation from Input 2, but that input scored 91/100 with 5/5 assertions PASS and the audit called
+  it a demonstration **supporting** the Skill's control-chart thesis. Not a defect; deliberately not
+  written in.
