@@ -1,0 +1,412 @@
+{
+  "meta": {
+    "skill_name": "bio-workflows-crispr-screen-pipeline",
+    "description": "End-to-end pooled and single-cell CRISPR screen analysis from FASTQ to hit genes: library QC, guide counting, six-stage screen QC, method-matched hit calling across MAGeCK/BAGEL2/drugZ/JACKS/Chronos, copy-number and batch correction, and tier-based cross-method consensus, with branches to editing/single-cell/in-vivo variants.",
+    "evaluated_on": "2026-09-16",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:workflows/crispr-screen-pipeline"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "FAIL",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "FAIL",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "FAIL",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated DOIs, statistics, or trial data; all citations in the References section are real and correctly attributed."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Scope is experimental/technical screen diagnostics throughout; no diagnostic or prescriptive claims about human subjects."
+      },
+      "methodological_ground": {
+        "result": "FAIL",
+        "detail": "Step 3's shipped 'Replicate Pearson' QC code averages the full pairwise correlation matrix, conflating true replicate pairs with baseline-vs-endpoint pairs. On real HAP1 TKOv3 data this understates true replicate concordance (0.677 naive vs 0.789 true T18-replicate-only), straddling the workflow's own 0.8/0.85 QC gate -- a principled statistical conflation, not a stylistic issue."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "Every code block runs when given internally-consistent inputs (MAGeCK RRA, BAGEL2 fc/bf, drugZ, Step 7 tier-consensus merge, JACKS CLI flags, Chronos API calls all verified against real installs); the Step 2/Step 6a sample-label mismatch is a cross-example inconsistency, not unrunnable code within a single block."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 76,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 9,
+        "max": 12,
+        "note": "End-to-end coverage across 15 chained Skills is thorough and complete, but two real correctness defects were found in shipped code: the QC 'Replicate Pearson' formula conflates replicate and non-replicate sample pairs, and Step 2/Step 6a's own worked examples use incompatible sample-label schemes that error when composed in sequence."
+      },
+      "reliability": {
+        "score": 8,
+        "max": 12,
+        "note": "The Common Errors table covers real, plausible failure symptoms, but does not cover the Step 2/6a sample-label mismatch or the BAGEL2 run-to-run non-determinism this audit reproduced; no recovery guidance exists for either."
+      },
+      "performance_context": {
+        "score": 6,
+        "max": 8,
+        "note": "Token-efficient prose for the scope covered (15 chained sub-skills, 6 specialized branches); code blocks are concise, adapted patterns rather than verbose boilerplate."
+      },
+      "agent_usability": {
+        "score": 11,
+        "max": 16,
+        "note": "Strong decision aids (Pipeline Branches diagram, Decision Cheat Sheet, Made-Once Commitments table) support learnability, but consistency is undermined by the CN-threshold drift between SKILL.md and usage-guide.md, and error prevention is weakened by the absence of a pre-flight gate for missing baseline/library/CN commitments."
+      },
+      "human_usability": {
+        "score": 6,
+        "max": 8,
+        "note": "Quick Start and worked Example Prompts (including the exact Diagnostics scenario tested here) aid discoverability; forgiveness is limited since neither the sample-label mismatch nor the BAGEL2 determinism issue has documented recovery guidance."
+      },
+      "security": {
+        "score": 12,
+        "max": 12,
+        "note": "No credential exposure, destructive operations, or prompt-injection vectors in any script or instruction."
+      },
+      "maintainability": {
+        "score": 9,
+        "max": 12,
+        "note": "Well cross-referenced (15-entry Related Skills list, real DOIs in References), but the CN-bias residual-correlation gate is stated as <0.10 in SKILL.md's frontmatter and flatly <0.05 in usage-guide.md's cheat-sheet table -- a documentation-sync defect on a numeric pass/fail threshold."
+      },
+      "agent_specific": {
+        "score": 15,
+        "max": 20,
+        "note": "Composability across chained sub-skills mostly works -- Step 7's tier-consensus code ran unmodified against real 3-method output -- but two adjacent worked examples (Step 2, Step 6a) don't compose without manual correction, and no escape hatch exists for missing made-once commitments before hit-calling proceeds."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 75.3,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 15,
+      "total": 26
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Two-condition essentiality: QC + MAGeCK RRA + BAGEL2 + drugZ + Step 7 tier consensus on real HAP1 TKOv3 data",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Pipeline ran end-to-end and produced biologically correct hit calls, but two shipped-code defects surfaced: the QC Pearson formula and BAGEL2's tier-flipping non-determinism.",
+        "basic": 27,
+        "specialized": 38,
+        "total": 65,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Step 3's QC code executes without error on real 71,090-guide count data",
+            "result": "PASS",
+            "note": "Ran cleanly; printed per-sample Gini/pct_zero/reads_per_sgrna and a 'Replicate Pearson' value"
+          },
+          {
+            "text": "The 'Replicate Pearson' value reflects true technical-replicate correlation",
+            "result": "FAIL",
+            "note": "Naive formula gave 0.677 vs. true T18-replicate-only correlation of 0.789; baseline-vs-endpoint pairs (mean 0.565) were incorrectly averaged in"
+          },
+          {
+            "text": "MAGeCK RRA (Step 6a) and drugZ (Step 6c) commands, run as documented, produce biologically correct top hits",
+            "result": "PASS",
+            "note": "Top depleted genes POLR2L/EIF3A/GTPBP10/PES1/MRPL53 (MAGeCK) and POLR2L/POLR3H/GTPBP10 (drugZ), matching the published HAP1 TKOv3 benchmark"
+          },
+          {
+            "text": "Step 7's tier-consensus code runs unmodified against real MAGeCK+BAGEL2+drugZ output with matching column names",
+            "result": "PASS",
+            "note": "id/neg|fdr, GENE/BF, GENE/fdr_synth all resolved correctly; produced 481 Tier-1 and 402 Tier-2 genes from 18,056 merged genes"
+          },
+          {
+            "text": "Tier assignments are reproducible across identical re-runs",
+            "result": "FAIL",
+            "note": "Re-running BAGEL2's bf step on the identical fold-change file flipped the BF>6 hit call for 39 of 18,053 genes, directly changing their Tier"
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Step 2's count-file example handed off literally into Step 6a's hit-calling example",
+        "status": "ERROR",
+        "status_flag": "❌",
+        "note": "Following the SKILL.md's own two adjacent worked examples in sequence produces a hard MAGeCK error.",
+        "basic": 26,
+        "specialized": 37,
+        "total": 63,
+        "assertions_passed": 1,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Step 6a's mageck test command runs successfully against the count file produced by Step 2's own worked example",
+            "result": "FAIL",
+            "note": "MAGeCK errored: 'Sample label Day14_r1 does not match records in your count table' -- Step 2's example produces Plasmid/Day0/Veh_r1/Veh_r2/Drug_r1/Drug_r2, not Day14_r*"
+          },
+          {
+            "text": "SKILL.md flags the sample-label mismatch clearly enough to prevent the error",
+            "result": "FAIL",
+            "note": "One caveat sentence notes the mismatch exists but gives no corrected command for the Step 2 drug-screen scenario"
+          },
+          {
+            "text": "Step 6a's own BAGEL2 fc/bf pair (Day0/Day14_r* naming) is internally self-consistent",
+            "result": "PASS",
+            "note": "fc -c Day0 produces Day14_r1/2/3 fold-change columns that bf -c Day14_r1,Day14_r2,Day14_r3 can consume, provided the Day0/Day14 count file (not Step 2's file) is used"
+          },
+          {
+            "text": "Section 6a's terminology matches its own heading",
+            "result": "FAIL",
+            "note": "Heading says 'Two-condition essentiality' but the example is captioned 'time-course dropout design', colliding with Step 6b's distinct time-course (MLE) method name"
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "CN-bias QC threshold cross-check between SKILL.md and usage-guide.md at rho=0.07",
+        "status": "COMPLETED",
+        "status_flag": "❌",
+        "note": "The two shipped documents give contradictory pass/fail thresholds for the same numeric gate.",
+        "basic": 28,
+        "specialized": 45,
+        "total": 73,
+        "assertions_passed": 1,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "SKILL.md and usage-guide.md state the same numeric threshold for the CN-bias gate",
+            "result": "FAIL",
+            "note": "SKILL.md frontmatter says abs(rho)<0.10 with <0.05 as an optional stricter target; usage-guide.md's QC Checkpoints table states flatly abs(rho)<0.05"
+          },
+          {
+            "text": "A screen with rho=0.07 gets a single, unambiguous pass/fail verdict from the Skill",
+            "result": "FAIL",
+            "note": "Passes per SKILL.md's primary threshold, fails per usage-guide.md's cheat-sheet table"
+          },
+          {
+            "text": "The underlying CN-bias check itself (Spearman rho, LFC vs CN) is methodologically sound",
+            "result": "PASS",
+            "note": "The check concept -- residual correlation between corrected LFC and copy number -- is standard and correctly described"
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "JACKS Step 6d CLI flags + Chronos Step 6e API surface checked against installed tools",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Every documented flag and API element matched the real installed packages exactly.",
+        "basic": 35,
+        "specialized": 55,
+        "total": 90,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "run_JACKS.py's documented --rep_hdr/--sample_hdr/--ctrl_sample_hdr/--sgrna_hdr/--gene_hdr/--outprefix/--apply_w_hp flags exist in the installed tool",
+            "result": "PASS",
+            "note": "All seven flags found verbatim in jacks_io.py's argparse definitions"
+          },
+          {
+            "text": "chronos.Chronos()'s documented sequence_map=/guide_gene_map=/readcounts= keyword arguments match the installed package",
+            "result": "PASS",
+            "note": "Confirmed via inspect.signature on the installed chronos package"
+          },
+          {
+            "text": "chronos.Chronos.train(nepochs=301) and .gene_effect as a property (not a method) match the installed API",
+            "result": "PASS",
+            "note": "Both confirmed by direct introspection of the installed chronos-venv package"
+          },
+          {
+            "text": "chronos.alternate_CN exists as documented for post-hoc CN correction",
+            "result": "PASS",
+            "note": "Function present in the installed chronos module's top-level namespace"
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Baseline-choice claim (vehicle vs Day-0) empirically tested with drugZ on a synthetic drug screen with known true targets",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The Skill's stated methodological principle held up under a controlled empirical test.",
+        "basic": 34,
+        "specialized": 54,
+        "total": 88,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "drugZ runs successfully with both -c Veh and -c Day0 control specifications, per Step 6c's documented flags",
+            "result": "PASS",
+            "note": "Both invocations completed and produced valid drugz_output.txt files"
+          },
+          {
+            "text": "Using vehicle as control avoids at least one proliferation-confounded false positive that Day-0-as-control introduces",
+            "result": "PASS",
+            "note": "Day0-baseline run flagged 7 significant genes vs. 6 for vehicle-baseline; the 1 extra gene was not among the 20 true synthetic drug targets"
+          },
+          {
+            "text": "The Skill's baseline-choice claim is presented with appropriate methodological hedging, not overstated as an absolute",
+            "result": "PASS",
+            "note": "Text says drug-vs-Day-0 'conflates' effects, a defensible causal claim grounded in the cited literature, not a fabricated statistic"
+          }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Diagnostic reasoning: CEGv2 PR-AUC=0.45, diagnose selection failure vs timepoint vs library positioning vs CN bias",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Good diagnostic coverage and correct integrity framing; remediation guidance thins out below the documented PR-AUC band.",
+        "basic": 33,
+        "specialized": 50,
+        "total": 83,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The Skill enumerates plausible causes matching its own worked Diagnostics prompt",
+            "result": "PASS",
+            "note": "Common Errors table + Tips section cover Cas9 selection failure, early timepoint, and CN bias explicitly; library positioning is covered indirectly via skew/coverage QC gates"
+          },
+          {
+            "text": "The Skill states the correct integrity consequence when PR-AUC is low",
+            "result": "PASS",
+            "note": "'The screen failed selection; no hit is trustworthy regardless of p-value' is stated directly, avoiding the fallacy of trusting hits from a failed screen"
+          },
+          {
+            "text": "Guidance stays within experimental/technical diagnosis, not human-subject medical practice",
+            "result": "PASS",
+            "note": "All recommendations concern assay/screen technical quality, not patient diagnosis or treatment"
+          },
+          {
+            "text": "The Skill gives an actionable remediation path for a PR-AUC as low as 0.45",
+            "result": "FAIL",
+            "note": "The documented remediation band is 0.5-0.7 (tighten FDR to 0.01); at 0.45 the Skill only says the screen failed, with no next-step remediation spelled out for this worse band"
+          }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Minimal-context request ('analyze my CRISPR screen, tell me the top hit genes') with baseline/library-control/CN status unspecified",
+        "status": "COMPLETED",
+        "status_flag": "❌",
+        "note": "The Skill's own stated risk of silent, wrong commitments is not backed by any procedural gate.",
+        "basic": 25,
+        "specialized": 40,
+        "total": 65,
+        "assertions_passed": 0,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "SKILL.md instructs the agent to confirm baseline/library-control/CN commitments before computing hits when unspecified",
+            "result": "FAIL",
+            "note": "No numbered step requires this; the 'governing principle' and 'Made-Once Commitments' table are narrative documentation, not a procedural gate"
+          },
+          {
+            "text": "Following the numbered pipeline steps literally would surface a missing-commitment error before hits are reported",
+            "result": "FAIL",
+            "note": "Steps 2 through 7 run mechanically on whatever count file and labels are given, with no explicit precondition check"
+          },
+          {
+            "text": "The Skill's own stated risk ('a wrong-but-silent commitment invalidates the endpoint with no error thrown') is mitigated by its own instructions",
+            "result": "FAIL",
+            "note": "The risk is named accurately in prose but never operationalized into a guard or required clarifying question"
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 30.4,
+    "dynamic_weighted": 45.2,
+    "score": 76,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": false,
+    "veto_override": true
+  },
+  "key_strengths": [
+    "Step 7's tier-consensus code ran unmodified end-to-end against real MAGeCK+BAGEL2+drugZ output from real HAP1 TKOv3 data, with all cross-tool column names (id/neg|fdr, GENE/BF, GENE/fdr_synth) resolving correctly.",
+    "Step 6e's Chronos usage (sequence_map=/guide_gene_map=/readcounts= kwargs, train(nepochs=301), gene_effect as a property, alternate_CN) verified 100% accurate against the installed package via direct introspection.",
+    "Step 6d's JACKS CLI flags verified 100% accurate against the real argparse source in run_JACKS.py's jacks_io.py.",
+    "The vehicle-vs-Day-0 baseline-choice principle is empirically well-founded, not just asserted -- confirmed directionally correct via a controlled synthetic drugZ simulation.",
+    "Exceptionally thorough end-to-end scope: made-once-commitments table, six specialized branches, a real-literature-referenced Common Errors table, and worked example prompts matching real screen-design scenarios."
+  ],
+  "recommendations": [
+    {
+      "priority": "P0",
+      "title": "BAGEL2 non-determinism silently destabilizes the workflow's own Tier consensus",
+      "observed_in": [
+        1
+      ],
+      "problem": "Running the SKILL.md's own documented BAGEL2 bf command twice on identical input produced materially different Bayes Factors (mean abs diff 1.31, max 89.3 across 18,053 genes); 39 genes flipped their bagel_hit (BF>6) classification between runs, changing their Tier in Step 7's consensus output.",
+      "root_cause": "SKILL.md invokes BAGEL.py bf as a required consensus method (Steps 6a, 7) with no seed-management, run-averaging, or determinism caveat anywhere in the document.",
+      "fix": "Document BAGEL2's run-to-run BF variance explicitly; recommend averaging BF over multiple runs (or using BAGEL2's own bootstrap flag with a fixed, documented iteration count) before thresholding for Tier assignment."
+    },
+    {
+      "priority": "P0",
+      "title": "Shipped 'Replicate Pearson' QC formula conflates replicate and non-replicate sample pairs",
+      "observed_in": [
+        1
+      ],
+      "problem": "Step 3's code averages ALL off-diagonal pairwise correlations, including baseline-vs-endpoint pairs. On real HAP1 TKOv3 data this gives 0.677, while the true endpoint-replicate correlation (T18A/B/C only) is 0.789 -- an 0.11 gap straddling the workflow's own stated 0.8/0.85 QC gate.",
+      "root_cause": "The code has no concept of which sample-pairs are true replicates vs different conditions/timepoints; it treats the full correlation matrix as homogeneous.",
+      "fix": "Compute replicate Pearson only over an explicitly declared replicate-group mapping (same-condition columns), not the full pairwise matrix that includes baseline-vs-endpoint comparisons."
+    },
+    {
+      "priority": "P1",
+      "title": "Step 2's and Step 6a's own worked examples don't compose",
+      "observed_in": [
+        2
+      ],
+      "problem": "Following Step 2's drug-screen count command (sample-label Plasmid,Day0,Veh_r1,Veh_r2,Drug_r1,Drug_r2) directly into Step 6a's literal mageck test command (--treatment-id Day14_r1,Day14_r2,Day14_r3) produces a hard MAGeCK error because those columns don't exist in Step 2's output.",
+      "root_cause": "Step 6a's example uses a different (time-course-style) sample-label scheme than Step 2's example; a single caveat sentence flags the mismatch but never resolves it with matching commands for the scenario Step 2 actually walks through.",
+      "fix": "Give Step 6a a hit-calling example that uses Step 2's own sample labels (Veh_r*/Drug_r*), or clearly separate the two worked scenarios end-to-end with self-consistent counting and hit-calling commands for each."
+    },
+    {
+      "priority": "P1",
+      "title": "CN-bias QC threshold conflicts between SKILL.md and usage-guide.md",
+      "observed_in": [
+        3
+      ],
+      "problem": "SKILL.md's frontmatter states the CN-bias gate as abs(rho)<0.10 ('<0.05 is a stricter target'), while usage-guide.md's QC Checkpoints table states flatly abs(rho)<0.05 as the pass criterion, so a screen with rho=0.07 passes by one document and fails by the other.",
+      "root_cause": "The same numeric gate was authored independently in two files without cross-checking.",
+      "fix": "State one canonical threshold in SKILL.md and have usage-guide.md's table reference or repeat it verbatim, including the same optional-stricter-target language."
+    },
+    {
+      "priority": "P1",
+      "title": "No operational gate enforces the Skill's own 'made-once commitments' principle",
+      "observed_in": [
+        7
+      ],
+      "problem": "SKILL.md's governing principle states that a wrong-but-silent baseline/library/CN commitment 'invalidates the endpoint with no error thrown,' but no numbered step instructs the agent to confirm these commitments (or ask the user) before computing LFCs or hits when they are unspecified.",
+      "root_cause": "The principle is documented narratively (prose warnings, a consequences table) but never translated into a procedural checklist or gate in the numbered pipeline steps.",
+      "fix": "Add an explicit pre-flight step before Step 2: if baseline, library control classes (NTC/CEGv2/NEGv1), or CN profile (for cancer lines) are unspecified, ask the user before proceeding."
+    },
+    {
+      "priority": "P2",
+      "title": "Step 6a's example is mislabeled 'time-course dropout design' under a 'Two-condition essentiality' heading",
+      "observed_in": [
+        2
+      ],
+      "problem": "The terminology collision with Step 6b's distinct 'time-course' (MLE) method risks an agent picking the wrong hit-calling method for a genuine multi-timepoint design.",
+      "root_cause": "Loose, reused wording across two different method sections of the same document.",
+      "fix": "Rename the caption to 'two-timepoint dropout design' or similar, reserving 'time-course' terminology for Step 6b only."
+    }
+  ]
+}

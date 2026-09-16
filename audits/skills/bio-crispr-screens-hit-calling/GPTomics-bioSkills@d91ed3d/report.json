@@ -1,0 +1,254 @@
+{
+  "meta": {
+    "skill_name": "bio-crispr-screens-hit-calling",
+    "description": "Cross-method decision tree for calling hits in pooled CRISPR screens. Catalogs statistical models (MAGeCK RRA, MAGeCK MLE, BAGEL2, drugZ, JACKS, Chronos, CERES), experimental designs each is built for, failure modes outside design domain, reconciliation when methods disagree, multiple-testing and effect-size thresholds, the order of operations, the second-best-sgRNA conservative rule, and consensus-hit strategy.",
+    "evaluated_on": "2026-09-16",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:crispr-screens/hit-calling"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All citations (Li 2014/2015, Hart 2017 G3, Colic 2019, Allen 2019, Dempster 2021, Meyers 2017) are real papers matching known CRISPR-screen literature; no fabricated DOI/PMID/statistics in any of the 7 outputs. All numeric results traced to real MAGeCK/BAGEL2/drugZ files or scripts executed for this audit." },
+      "practice_boundaries": { "result": "PASS", "detail": "Purely gene-level/screen-level research analysis; no diagnostic or prescriptive claim about any individual across all 7 outputs; no disclaimer required for this research-only scope." },
+      "methodological_ground": { "result": "PASS", "detail": "Real methodological gaps were found (Spearman sign/scale inversion in usage-guide.md's own prompt, Input 4; incomplete empty-consensus failure-mode list, Inputs 5/7), but none of the 7 delivered outputs itself asserted an inverted or fallacious conclusion -- each output caught and corrected the pitfall rather than being misled by it. The gaps are recorded as P1 recommendations rather than a veto." },
+      "code_usability": { "result": "PASS", "detail": "All 3 Python code blocks embedded in SKILL.md parse (ast.parse). examples/consensus_hits.py ran unmodified against real HAP1 TKOv3 MAGeCK/BAGEL2 output with no errors. consensus_hits() and second_best_lfc(), adapted per SKILL.md's own text, ran cleanly on real data in Inputs 1, 3, 5." }
+    }
+  },
+  "static_score": {
+    "subtotal": 73,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 9, "max": 12, "note": "Broad, accurate coverage of 7 methods, reconciliation, consensus, and thresholds; one promised capability ('interpreting unstable hit lists across reruns', frontmatter) is entirely absent from the body (verified by grep), and three internal threshold defaults for the same MAGeCK-FDR/BAGEL-BF pair disagree with each other." },
+      "reliability": { "score": 7, "max": 12, "note": "Between-method disagreement is well covered (explicit Trigger/Mechanism/Symptom/Fix tables); same-method rerun instability and cross-design file merges have no documented handling at all (verified via Inputs 5 and 6)." },
+      "performance_context": { "score": 7, "max": 8, "note": "Single 279-line SKILL.md plus a separate usage-guide.md and one example file; workflow is linear with no redundant round-trips." },
+      "agent_usability": { "score": 10, "max": 16, "note": "Canonical decision-tree prompts resolve unambiguously to one correct, well-cited answer (Input 2); the internal threshold inconsistency and two unaddressed pitfalls (rerun instability, mismatched-design merge) are consistency and error-prevention gaps." },
+      "human_usability": { "score": 7, "max": 8, "note": "Natural trigger phrasing throughout Quick Start and Example Prompts; advisory (non-CLI) nature is inherently forgiving of input variation." },
+      "security": { "score": 11, "max": 12, "note": "No credentials, no injection vectors; example code snippets do no column/schema validation before use, so a malformed input file would raise a raw KeyError rather than a clear message." },
+      "maintainability": { "score": 7, "max": 12, "note": "The same consensus logic is duplicated (with drifted default thresholds) between SKILL.md's inline function and examples/consensus_hits.py -- a concrete, demonstrated maintainability failure, not a hypothetical one." },
+      "agent_specific": { "score": 15, "max": 20, "note": "Strong trigger precision and composability with the 4 upstream method Skills; idempotency and escape-hatch guidance both have real, demonstrated gaps (Inputs 5, 6, 7)." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 81.4,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 28, "total": 32 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "2-method MAGeCK+BAGEL2 consensus on real HAP1 TKOv3 data, validated against CEGv2/NEGv1",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Ran cleanly; Tier-1 consensus (844 genes) has 100% precision and 54.7% recall against CEGv2/NEGv1 ground truth.",
+        "basic": 37,
+        "specialized": 56,
+        "total": 93,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Consensus uses the thresholds SKILL.md's own Quantitative Thresholds table recommends (FDR<0.05, BF>6)", "result": "PASS", "note": "Used explicitly instead of consensus_hits()'s own drifted default of BF>5." },
+          { "text": "Consensus hit list is validated against an independent ground truth (CEGv2/NEGv1)", "result": "PASS", "note": "Tier-1: 844 genes, 0 NEGv1 hits, 374 CEGv2 hits, precision=1.000." },
+          { "text": "No fabricated statistics; all values trace to real MAGeCK/BAGEL2 output files", "result": "PASS", "note": "Both input files are unmodified copies of real HAP1 TKOv3 audit outputs." },
+          { "text": "Output stays within cross-method reconciliation scope, no individual-level claims", "result": "PASS", "note": "Purely gene/screen-level statistics." }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Method selection for a 5-cell-line cancer panel (Chronos vs MAGeCK MLE vs JACKS)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Verbatim usage-guide.md example prompt; Decision Tree table gives one unambiguous, correctly-justified answer (Chronos primary, MAGeCK MLE per-line secondary, JACKS correctly ruled out).",
+        "basic": 36,
+        "specialized": 48,
+        "total": 84,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Recommended primary method traces to an exact SKILL.md table cell, not invented", "result": "PASS", "note": "Decision Tree row 'Multi-cell-line panel (cancer dependency)' -> Chronos." },
+          { "text": "JACKS is correctly ruled out for this design with cited reasoning", "result": "PASS", "note": "JACKS row is 'Multi-screen joint, same library', a different problem; also 'Fails when: Single screen'." },
+          { "text": "Response flags the copy-number-correction requirement per the Order of Operations table", "result": "PASS", "note": "Cited step 7 preceding step 9." },
+          { "text": "Response does not overstate confidence beyond what SKILL.md's tables support", "result": "PASS", "note": "All claims quote or paraphrase an exact table cell." }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Variant B",
+        "label": "Second-best-sgRNA rule applied to real MAGeCK sgrna_summary.txt for Tier-1 genes",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "second_best_lfc() ran unmodified on 844 real Tier-1 genes; all pass (TKOv3's 4-guides/gene design leaves no single-guide risk in this dataset).",
+        "basic": 36,
+        "specialized": 53,
+        "total": 89,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "second_best_lfc() executes without error on real MAGeCK sgrna_summary.txt", "result": "PASS", "note": "Ran on 844 genes x ~4 sgRNAs each." },
+          { "text": "Zero single-guide-driven false positives is verified against the actual per-gene sgRNA count, not assumed", "result": "PASS", "note": "n_sgrnas column checked explicitly; 0 genes with <2 guides." },
+          { "text": "The function's silent single-guide fallback behavior is identified as a design risk even though not triggered here", "result": "PASS", "note": "Documented in the script's own docstring and the audit note." },
+          { "text": "Output stays in scope as a guide-level QC flag, not a diagnostic claim", "result": "PASS", "note": "No claims beyond guide-level statistics." }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Edge",
+        "label": "Spearman rho audit between MAGeCK neg|score and BAGEL2 BF (usage-guide.md's own prompt)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Naive rho=-0.806 would trigger usage-guide.md's own 'audit why methods disagree' instruction; sign-corrected rho=+0.806 shows strong true agreement. The prompt itself never warns of the sign/scale inversion.",
+        "basic": 35,
+        "specialized": 43,
+        "total": 78,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Spearman rho is computed correctly with real values reported", "result": "PASS", "note": "rho=-0.8057 naive, +0.8057 sign-corrected, both p~0." },
+          { "text": "Output distinguishes a sign/scale mismatch from genuine method disagreement", "result": "PASS", "note": "Explicitly explained why the naive rho is misleading." },
+          { "text": "SKILL.md/usage-guide.md text was actually checked for existing sign-mismatch guidance before concluding it is missing", "result": "PASS", "note": "Grepped both files; no mention of sign or scale direction found." },
+          { "text": "usage-guide.md's own worked prompt ('compute rho; if <0.6 audit why') is sufficient on its own, without outside statistical knowledge, to reach the correct conclusion", "result": "FAIL", "note": "The prompt gives no hint that neg|score and BF run in opposite directions; a literal reading produces the wrong conclusion." },
+          { "text": "Output avoids overstating 'the methods disagree' without verification", "result": "PASS", "note": "Final conclusion correctly states the methods agree." }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "3-method 'same data' consensus built from mismatched essentiality + drug-response files",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "consensus_hits() extended to 3 methods ran without error; produced an empty (0-gene) Tier-1 list because drugZ's 6 real hits (a different, drug-response comparison) never overlap the 844-gene MAGeCK+BAGEL2 essentiality agreement set.",
+        "basic": 32,
+        "specialized": 44,
+        "total": 76,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "3-method merge code executes without error", "result": "PASS", "note": "Ran on 18,056 merged genes." },
+          { "text": "Output checks whether 'consensus' genes are genuine planted drug-response hits vs. coincidental overlap", "result": "PASS", "note": "Cross-checked against drugz_ground_truth.txt; 0/0 overlap confirmed." },
+          { "text": "Output identifies the root cause (mismatched experimental designs) rather than accepting the empty result at face value", "result": "PASS", "note": "Explicitly diagnosed as a same-screen violation, not a biology finding." },
+          { "text": "consensus_hits()'s own code (SKILL.md or examples/) would itself warn against merging non-comparable designs", "result": "FAIL", "note": "No such check exists in either the inline function or examples/consensus_hits.py." },
+          { "text": "Output does not claim these are real chemogenomic hits ready for validation", "result": "PASS", "note": "Explicitly flagged as a methodological artifact, not a finding." }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "BAGEL2 non-determinism across two identical reruns on real HAP1 TKOv3 data",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Confirmed 33 genes flip across BF>6 between two real, identical BAGEL.py bf runs (max diff 26.72); SKILL.md/usage-guide.md have zero mention of seed/determinism/reruns despite the frontmatter explicitly promising to help 'interpret unstable hit lists across reruns'.",
+        "basic": 33,
+        "specialized": 43,
+        "total": 76,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Determinism check uses two independent real BAGEL2 runs, not simulated data", "result": "PASS", "note": "bayes_factor.txt and bayes_factor_rep2.txt, both real outputs from the bagel-essentiality audit." },
+          { "text": "Quantified magnitude matches the independently-verified bagel-essentiality audit finding", "result": "PASS", "note": "Max diff 26.72 and 33 flips reproduce that audit's own numbers exactly." },
+          { "text": "SKILL.md and usage-guide.md were actually grepped, not assumed, before concluding no guidance exists", "result": "PASS", "note": "grep -in 'seed|determin|rerun|reproducib' returned only the frontmatter description line." },
+          { "text": "Output ties the gap explicitly to the Skill's own frontmatter promise", "result": "PASS", "note": "Quoted '...or interpreting unstable hit lists across reruns' directly." },
+          { "text": "A fix/recommendation for this scenario is derivable from hit-calling's own SKILL.md/usage-guide.md text alone, without consulting bagel-essentiality's audit", "result": "FAIL", "note": "The -s/--seed fix and the 26.7/33-gene figures exist only in the sibling bagel-essentiality audit, not in this Skill's own content." }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Empty 3-method consensus (grounded in Input 5's real result) -- is this a QC problem?",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "SKILL.md's only documented cause for an empty 3-method consensus is low screen quality; applied to the real Input-5 case this would misdirect a researcher into re-auditing a screen that Input 1 already showed has 100% CEGv2/NEGv1 precision.",
+        "basic": 34,
+        "specialized": 40,
+        "total": 74,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Scenario is grounded in a real executed result (Input 5), not invented", "result": "PASS", "note": "Uses Input 5's actual 0/848/1774 counts." },
+          { "text": "Output correctly identifies that SKILL.md's literal guidance would misdirect toward a nonexistent QC problem", "result": "PASS", "note": "Cross-referenced Input 1's precision/recall numbers to show the screen is healthy." },
+          { "text": "Output verifies screen quality using Input 1's own numbers before ruling out 'low quality' as the cause", "result": "PASS", "note": "Explicitly cites the 100% CEGv2/NEGv1 precision figure." },
+          { "text": "The key diagnostic insight (mismatched experimental designs) is derivable from hit-calling's own SKILL.md/usage-guide.md text alone", "result": "FAIL", "note": "Failure Modes table's only listed cause is screen quality; mismatched-design merge is not mentioned anywhere in the Skill." },
+          { "text": "Output stops short of any diagnostic/prescriptive claim about the screen or the researcher", "result": "PASS", "note": "Framed entirely as a methodological/QC discussion." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 29.2,
+    "dynamic_weighted": 48.8,
+    "score": 78,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Decision Tree and Statistical Models Compared tables give one clear, internally-consistent, correctly-justified answer for canonical method-selection prompts, verified against the Skill's own worked usage-guide.md example.",
+    "consensus_hits() and second_best_lfc() run out-of-the-box, unmodified, on real HAP1 TKOv3 MAGeCK/BAGEL2 output and validate cleanly: Tier-1 consensus reaches 100% precision against CEGv2/NEGv1.",
+    "Between-method reconciliation tables (MAGeCK vs BAGEL2, Chronos vs MAGeCK, drugZ vs MAGeCK, JACKS vs MAGeCK) are specific, accurate, and trace to real literature with no fabricated citations found across any of the 7 outputs.",
+    "Correctly stays within research scope throughout: no diagnostic, prescriptive, or individual-level claims in any output."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "BAGEL2 run-to-run non-determinism is unaddressed despite being named in scope",
+      "observed_in": [6],
+      "problem": "Two identical BAGEL.py bf runs on the same HAP1 TKOv3 data differ by up to 26.7 BF and flip 33 genes across the BF>6 threshold; this Skill's own frontmatter promises help 'interpreting unstable hit lists across reruns' but neither SKILL.md nor usage-guide.md mentions BAGEL2 seed management, reruns, or rerun variance anywhere.",
+      "root_cause": "The Reconciliation and Failure Modes tables cover disagreement BETWEEN methods only, never disagreement between two runs of the SAME method.",
+      "fix": "Add a row to the Reconciliation table for same-method rerun instability naming BAGEL2's -s/--seed requirement explicitly, and cross-link to bagel-essentiality's determinism guidance."
+    },
+    {
+      "priority": "P1",
+      "title": "Empty/degenerate consensus guidance omits the mismatched-design failure mode",
+      "observed_in": [5, 7],
+      "problem": "Merging real MAGeCK+BAGEL2 essentiality results with a real drugZ table from an unrelated drug-response comparison produces an empty Tier-1 consensus even though the underlying screen has excellent QC (100% CEGv2/NEGv1 precision). SKILL.md's only documented cause for an empty 3-method consensus is poor screen quality, which would send a researcher to needlessly re-audit a healthy screen.",
+      "root_cause": "consensus_hits() and its usage-guide.md prompts never check or warn that merged files must come from the same experimental comparison.",
+      "fix": "Document 'mismatched comparison / wrong file' as an alternate cause of empty consensus alongside 'low screen quality', and add a same-design sanity check (e.g. comparing condition/replicate naming) before merging."
+    },
+    {
+      "priority": "P1",
+      "title": "Spearman rho audit prompt doesn't account for MAGeCK/BAGEL2 sign-scale inversion",
+      "observed_in": [4],
+      "problem": "usage-guide.md instructs computing Spearman rho between MAGeCK neg|score and BAGEL2 BF and auditing disagreement if rho<0.6. On real HAP1 TKOv3 data this rho is -0.806 (methods actually agree strongly once sign-corrected to +0.806), so literal application triggers a false 'disagreement' investigation.",
+      "root_cause": "MAGeCK neg|score is a p-value-like statistic (smaller=more essential) while BAGEL2 BF is a log-likelihood ratio (larger=more essential); the prompt never flags this inversion.",
+      "fix": "State explicitly in usage-guide.md that neg|score must be sign-flipped (or rank-reversed) before computing rho against BF, with a worked numeric example showing the real HAP1 values."
+    },
+    {
+      "priority": "P1",
+      "title": "Three different MAGeCK-FDR/BAGEL-BF threshold pairs across the Skill's own files",
+      "observed_in": [1],
+      "problem": "SKILL.md's inline consensus_hits() defaults to FDR<0.05/BF>5; examples/consensus_hits.py defaults to FDR<0.1/BF>5; the Quantitative Thresholds table recommends FDR<0.05/BF>6. On real data this swings the 'consensus' gene count from 844 to 1131 (+34%) depending on which default is trusted.",
+      "root_cause": "The same two threshold numbers are hardcoded independently in three places that have drifted out of sync.",
+      "fix": "Make examples/consensus_hits.py and the inline SKILL.md function both default to the Quantitative Thresholds table's stated values (FDR<0.05, BF>6) and remove the duplicate hardcoding."
+    },
+    {
+      "priority": "P2",
+      "title": "second_best_lfc() silently exempts single-guide genes from its own rule",
+      "observed_in": [3],
+      "problem": "For any gene with only one sgRNA, second_best_lfc() falls back to that guide's own LFC, which then reads as 'passing' the second-best-sgRNA rule with no second guide involved at all. Not triggered on TKOv3 (always 4 guides/gene) but will silently misfire on sparser libraries.",
+      "root_cause": "No n_sgrnas>=2 guard or flag exists in the function.",
+      "fix": "Have second_best_lfc() return NaN or a 'single_guide' flag instead of a silently-passing fallback value when a gene has fewer than 2 sgRNAs."
+    },
+    {
+      "priority": "P2",
+      "title": "No references/ split for the dense 7-method comparison tables",
+      "observed_in": [],
+      "problem": "All 7 methods' comparison tables, the reconciliation table, thresholds, and code live in one 279-line SKILL.md with no references/ subfolder, which is workable but denser than necessary for a single 'which method / how do I reconcile' query.",
+      "root_cause": "No references/ subfolder exists for this Skill, unlike some sibling Skills in the same folder.",
+      "fix": "Optionally split the Statistical Models Compared / Algorithmic Taxonomy tables into references/method-catalog.md, keeping SKILL.md focused on the decision tree and reconciliation workflow."
+    }
+  ]
+}

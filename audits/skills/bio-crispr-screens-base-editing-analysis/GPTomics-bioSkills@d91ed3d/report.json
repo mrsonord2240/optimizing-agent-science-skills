@@ -1,0 +1,258 @@
+{
+  "meta": {
+    "skill_name": "bio-crispr-screens-base-editing-analysis",
+    "description": "Analyzes base-editing screens for variant function: library design (Hanna 2021 ClinVar-scale CBE screen, Cuella-Martin 2021 DDR saturation), CBE vs ABE chemistry choice, editing-window math (positions 4-8 from PAM-distal end), bystander-edit quantification, sgRNA-efficiency filtering before hit calling, indel byproduct interpretation, ClinVar/COSMIC annotation, and the Broad be-validation-pipeline.",
+    "evaluated_on": "2026-09-16",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:crispr-screens/base-editing-analysis"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "FAIL",
+      "scientific_integrity": { "result": "PASS", "detail": "No fabricated statistics, DOIs, or trial results. Editing-window values, thresholds, and the Hanna/Cuella-Martin methodology descriptions match the cited primary literature." },
+      "practice_boundaries": { "result": "PASS", "detail": "Research-scope screen/variant-function analysis only; no diagnostic or prescriptive claims about a person or patient." },
+      "methodological_ground": { "result": "PASS", "detail": "Editing-window math, chemistry selection logic, and the substitution-vs-indel diagnostic are methodologically sound; the diagnostic was independently confirmed correct on a real, ground-truth-known Cas9 sample (ratio 0.12, correctly called Cas9-like against the Skill's own <3 threshold)." },
+      "code_usability": { "result": "FAIL", "detail": "All three of the Skill's data-integration Python functions crash immediately when run against real tool output: filter_by_editing_efficiency() raises KeyError 'Position' against a real CRISPResso2 Quantification_window_nucleotide_percentage_table.txt (the function assumes rows=Position/columns=base; the real file is the transpose, rows=base/columns=position). deconvolute_bystander() raises KeyError 'Reference_pct' against a real Alleles_frequency_table.zip (the real column is '%Reads'). aggregate_variant_scores() raises KeyError 'sgRNA' merging against a real MAGeCK sgrna_summary.txt (the real column is lowercase 'sgrna'). The fourth function, find_be_spacers(), does not crash but silently misattributes target-vs-bystander classification for any reverse-strand candidate: it computes genomic_pos in reverse-complement coordinate space but compares it against forward-strand codon boundaries, producing a confirmed false on-target call for a spacer whose actual edited base lies 65nt away from the intended codon." }
+    }
+  },
+  "static_score": {
+    "subtotal": 65,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 8, "max": 12, "note": "Completeness is strong (library design through hit-calling integration, case studies, decision rules). Correctness docked hard: 3 of 4 bundled functions crash on real tool output and the 4th silently misattributes coordinates on the reverse strand, all confirmed by execution." },
+      "reliability": { "score": 3, "max": 12, "note": "No schema validation or column-existence checks in any bundled function. The Version-Compatibility note only tells the agent to recover from ImportError/AttributeError/TypeError -- none of the four real failures found were those types (three are KeyError from wrong assumed schema, one is a silent coordinate error), so the stated recovery path does not cover the actual failure modes." },
+      "performance_context": { "score": 7, "max": 8, "note": "SKILL.md ~360 lines with usage-guide.md and examples/ split out; some chemistry/threshold table duplication between the two docs, same pattern as the sibling crispresso-editing Skill." },
+      "agent_usability": { "score": 9, "max": 16, "note": "Strong learnability and mostly-consistent decision trees. Feedback Design and Error Prevention both docked hard: no function checks its input schema before indexing into it, and the one function that doesn't crash (find_be_spacers) gives no signal at all that its reverse-strand output can be wrong." },
+      "human_usability": { "score": 5, "max": 8, "note": "Natural, well-targeted trigger prompts throughout usage-guide.md. Forgiveness is weak: a researcher who runs the bundled code has no documented way to notice the silent coordinate bug, and the three crashes have no recovery guidance beyond the generic version-compatibility note." },
+      "security": { "score": 11, "max": 12, "note": "No secrets or injection vectors; inputs are sequence strings, file paths, and column names. Minor: no input-range validation (e.g., target_aa, target_base) and no mention of clinical-sample sensitivity." },
+      "maintainability": { "score": 7, "max": 12, "note": "Clean SKILL.md/usage-guide.md/examples split. Testability docked to 0/4: none of the four bundled functions show evidence of having been run against real CRISPResso2 or MAGeCK output before shipping -- all four have defects that a single real test run would have caught." },
+      "agent_specific": { "score": 15, "max": 20, "note": "Precise, detailed triggering and excellent Related-Skills composability across the whole CRISPR-screen family. Escape Hatches docked: no guidance for what an agent should do when a bundled function crashes on real data, or how to independently verify a function's output before trusting it (as this audit had to do for find_be_spacers)." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 47.0,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 17, "total": 28 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "CBE saturation library design tiling a target region (find_be_spacers, BE4max)",
+        "status": "COMPLETED",
+        "status_flag": "❌",
+        "note": "Ran verbatim on a synthetic 300nt CDS (100 codons, seeded, no stop codons). Completed without error, found 21 candidate spacers, 1 flagged on-target for aa 40 -- but that hit is a reverse-strand spacer, and independent coordinate verification shows the code compares a reverse-complement-space index (117) directly against forward-strand codon bounds [117,120) without ever converting back; the base actually being edited sits at true forward-CDS index 182, 65nt from the intended codon. A researcher trusting this output would misassign an off-target edit as on-target with no warning.",
+        "basic": 16,
+        "specialized": 20,
+        "total": 36,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "find_be_spacers scans both strands for candidate NGG-adjacent spacers", "result": "PASS", "note": "Confirmed: loops over forward CDS and its reverse complement." },
+          { "text": "On-target hits reported by the function are genuinely within the intended codon", "result": "FAIL", "note": "The one on-target hit found is a reverse-strand candidate whose true edited base is 65nt outside the target codon; confirmed by independent coordinate math." },
+          { "text": "No silent, unflagged coordinate error for reverse-strand candidates", "result": "FAIL", "note": "genomic_pos is computed in reverse-complement index space but compared against forward-strand codon boundaries with no conversion." },
+          { "text": "Function completes without raising an exception on a realistic synthetic CDS", "result": "PASS", "note": "Ran to completion, returned a well-formed, sorted DataFrame." }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Editing-efficiency filtering on real CRISPResso2 pilot output (filter_by_editing_efficiency)",
+        "status": "ERROR",
+        "status_flag": "❌",
+        "note": "Ran verbatim against real CRISPResso2 2.3.4 output from this audit's synthetic CBE FASTQ (ground truth: 50% target editing, 30% bystander editing, planted). Crashed immediately: KeyError 'Position'. The function assumes the quantification-window table has a 'Position' column with base-percentage columns; the real file is the transpose (rows are A/C/G/T/N/-, columns are per-window-position reference bases, duplicated column names). This is the same class of defect (assumed-vs-real file schema mismatch) already found as a P0 in the sibling crispresso-editing Skill's audit.",
+        "basic": 10,
+        "specialized": 15,
+        "total": 25,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "filter_by_editing_efficiency runs without error against real CRISPResso2 quantification-window output", "result": "FAIL", "note": "KeyError: 'Position', reproduced directly against the real file." },
+          { "text": "The function's assumed table orientation (rows=Position, columns=base) matches the real file", "result": "FAIL", "note": "Real file: rows=A/C/G/T/N/-, columns=per-position reference base (duplicated names); the file is the transpose of what the code assumes." },
+          { "text": "The editing-efficiency threshold convention (>=30% primary, >=50% validation) is methodologically sound", "result": "PASS", "note": "Matches the field convention documented and is internally consistent with the Skill's own Quantitative Thresholds table." },
+          { "text": "Failure is a loud exception rather than a silently wrong number", "result": "PASS", "note": "KeyError halts execution rather than returning a plausible-looking but incorrect editing percentage." }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "ABE7.10 zero-bystander spacer search for a single-variant install (find_be_spacers, target_base='A')",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Ran on the same synthetic CDS with editor='ABE7.10', target_base='A'. Completed, found 20 candidates, 0 with target_positions non-empty AND n_bystanders==0 -- consistent with the Skill's own documented fallback ('if no zero-bystander spacer exists, list candidates sorted by bystander_count and recommend prime editor'). The ABE7.10 window dict value (4,7) matches SKILL.md's own table exactly. The same reverse-strand coordinate bug from Input 1 remains latent in this code path (no on-target hit happened to surface here, but nothing in the function would have caught it if one had).",
+        "basic": 24,
+        "specialized": 32,
+        "total": 56,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Function completes without error for editor='ABE7.10', target_base='A'", "result": "PASS", "note": "Ran to completion, returned 20 well-formed candidate rows." },
+          { "text": "When no zero-bystander candidate exists, the output supports the Skill's documented recommend-PE fallback", "result": "PASS", "note": "n_bystanders column present and sortable exactly as the decision rule requires." },
+          { "text": "Target/bystander classification is coordinate-correct for reverse-strand candidates in this editor path too", "result": "FAIL", "note": "Same unconverted reverse-complement-index bug as Input 1 remains present in this code path." },
+          { "text": "ABE7.10's window (4,7) in the code matches the Skill's own stated table", "result": "PASS", "note": "window_by_editor['ABE7.10'] = (4, 7), exact match to the SKILL.md Base Editor Chemistry Selection table." }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Bystander deconvolution from a real CRISPResso2 allele-frequency table (deconvolute_bystander)",
+        "status": "ERROR",
+        "status_flag": "❌",
+        "note": "Ran verbatim against the real Alleles_frequency_table.zip from the same synthetic CBE run. Crashed: KeyError 'Reference_pct' -- the real column is '%Reads'. Patching only that one column name and re-running recovers the exact planted ground truth: 40.0% unmodified, 30.0% target-only, 20.0% target+bystander, 10.0% bystander-only, matching the four planted read populations exactly. The underlying position-indexing logic is correct; only the column name is wrong.",
+        "basic": 18,
+        "specialized": 30,
+        "total": 48,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "deconvolute_bystander runs without error against a real Alleles_frequency_table.zip", "result": "FAIL", "note": "KeyError: 'Reference_pct', reproduced directly." },
+          { "text": "The column name used for read fraction matches the real CRISPResso2 output", "result": "FAIL", "note": "Code uses 'Reference_pct'; real column is '%Reads'." },
+          { "text": "Once the column name is corrected, the partition matches the planted ground truth exactly", "result": "PASS", "note": "40.0/30.0/20.0/10.0 recovered exactly against the four planted read populations." },
+          { "text": "The str-indexing logic for detecting an edit at a given position is sound", "result": "PASS", "note": "Confirmed correct once the column bug is patched -- position math itself has no defect." }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Aggregate per-sgRNA MAGeCK scores to per-variant fitness (aggregate_variant_scores)",
+        "status": "ERROR",
+        "status_flag": "❌",
+        "note": "Ran verbatim, merging a real MAGeCK sgrna_summary.txt (from the sibling mageck-analysis audit's own verified real-data run) with a synthetic variant-annotation table. Crashed: KeyError 'sgRNA' -- real MAGeCK output uses lowercase 'sgrna'. The merge, groupby, and aggregation logic (mean/std/count of LFC per target_variant) is sound in isolation; only the join-key case is wrong.",
+        "basic": 12,
+        "specialized": 18,
+        "total": 30,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "aggregate_variant_scores merges cleanly against a real MAGeCK sgrna_summary.txt", "result": "FAIL", "note": "KeyError: 'sgRNA', reproduced against real MAGeCK 0.5.9.5 output." },
+          { "text": "The sgRNA-identifier column name matches real MAGeCK output", "result": "FAIL", "note": "Code merges on 'sgRNA'; real MAGeCK column is lowercase 'sgrna'." },
+          { "text": "The aggregation logic (per-variant mean/std/count of LFC, target-only vs mixed split) is sound", "result": "PASS", "note": "Verified in isolation with the column name corrected: groupby/agg produces the expected per-variant summary shape." },
+          { "text": "No fabricated per-variant fitness values are produced", "result": "PASS", "note": "Function crashes rather than returning any number." }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "BE-Hive editing-efficiency prediction for a designed guide, following only the Skill's guidance",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "The Skill gives one sentence on BE-Hive ('clone maxwshen/be_predict_bystander and import via sys.path') with zero code and no mention of its required 50nt-substrate convention or its own internal 1-indexed position numbering. Built the substrate by hand per BE-Hive's own README; a first attempt used the README's literal '-19 to 30' arithmetic and was off by one nucleotide relative to BE-Hive's actual internal indexing (confirmed via its own 'Assumed protospacer sequence' diagnostic field). Once reconciled, init_model(BE4, mES) + predict() ran to completion (Total predicted probability 0.98) and correctly identified both planted editable C's (this audit's target and bystander positions) as the dominant variable columns in the output.",
+        "basic": 24,
+        "specialized": 34,
+        "total": 58,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "An agent can construct a valid BE-Hive input from the Skill's own guidance alone", "result": "FAIL", "note": "No code sample, no substrate convention, no position-numbering caveat given anywhere in SKILL.md or usage-guide.md; had to consult BE-Hive's own README and its runtime diagnostic output to get a correct result." },
+          { "text": "BE-Hive prediction runs to completion using the maintainers' own documented API", "result": "PASS", "note": "init_model()/predict() ran without error, Total predicted probability 0.98." },
+          { "text": "Predicted output correctly reflects the true editable C positions in the designed guide", "result": "PASS", "note": "BE-Hive's own C4/C6 columns correspond exactly to this audit's planted target (spacer pos 5) and bystander (spacer pos 7) once its internal 1-off numbering is reconciled." },
+          { "text": "Skill warns that BE-Hive's internal position numbering can differ from its own PAM-distal 1-8 convention", "result": "FAIL", "note": "No such warning exists anywhere in the Skill." }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Substitution-vs-indel diagnostic on a sample with elevated indels ('is this Cas9 contamination?')",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Applied the Skill's substitution-vs-indel ratio diagnostic to real CRISPResso2 output on FANC.Cas9.fastq (250 reads, a sample independently known to be Cas9-nuclease-edited, cached from the sibling crispresso-editing audit's own verified run): 7 substitutions / 57 indels = ratio 0.12, well under the Skill's own <3 Cas9-like threshold. Correctly classifies a real, ground-truth-known contamination case; the documented fix path (verify vector, confirm cell line, pilot first) is actionable.",
+        "basic": 32,
+        "specialized": 44,
+        "total": 76,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The substitution-vs-indel ratio threshold correctly classifies a real, independently-known Cas9-edited sample as Cas9-like", "result": "PASS", "note": "Ratio 0.12, well under the Skill's <3 threshold; sample is genuinely Cas9-nuclease-edited, not BE." },
+          { "text": "Diagnostic reasoning does not fabricate a root cause", "result": "PASS", "note": "Classification follows directly from the real substitution/indel counts, not an invented explanation." },
+          { "text": "Skill gives an actionable fix for the Cas9-contamination case", "result": "PASS", "note": "Failure Modes table: verify vector (nCas9-BE3 not Cas9-BE3), confirm cell line lacks Cas9 background, pilot first." },
+          { "text": "No claim that this ratio is computed by any of the Skill's bundled Python functions", "result": "PASS", "note": "The ratio is documented only in prose/tables; none of the four bundled functions compute it, so no code-usability claim is at stake here." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 26.0,
+    "dynamic_weighted": 28.2,
+    "score": 54,
+    "max": 100,
+    "grade": "Reject",
+    "grade_symbol": "❌",
+    "deployable": false,
+    "veto_override": true
+  },
+  "key_strengths": [
+    "Biological content is accurate: editing-window positions per editor, chemistry selection rules, and the Hanna 2021 / Cuella-Martin 2021 methodology summaries match the cited primary literature.",
+    "The substitution-vs-indel contamination diagnostic correctly classified a real, independently-known Cas9-edited sample (ratio 0.12 against a <3 threshold).",
+    "Once each function's single schema/column-name bug is corrected, the underlying algorithmic logic in deconvolute_bystander(), aggregate_variant_scores(), and the ABE7.10 window table is sound -- these are narrow, fixable defects, not conceptual errors.",
+    "Comprehensive, accurate Related-Skills composability across the full CRISPR base-editing/screening family (crispresso-editing, library-design, prime-editing-screens, hit-calling, mageck-analysis, drugz-chemogenomic, clinvar-lookup)."
+  ],
+  "recommendations": [
+    {
+      "priority": "P0",
+      "title": "filter_by_editing_efficiency() crashes on real CRISPResso2 output",
+      "observed_in": [2],
+      "problem": "The function raises KeyError: 'Position' on the first real Quantification_window_nucleotide_percentage_table.txt it is run against -- the exact 'non-negotiable' filtering step the usage-guide calls critical.",
+      "root_cause": "The code assumes rows=Position/columns=base-percentage; the real CRISPResso2 file is the transpose (rows=A/C/G/T/N/-, columns=per-window-position reference base, with duplicated column names).",
+      "fix": "Rewrite to read the file with index_col=0, transpose it (or iterate columns instead of a 'Position' column), and pull the position via the table's column order rather than a nonexistent 'Position' field. Verify against a real CRISPResso2 output directory before shipping."
+    },
+    {
+      "priority": "P0",
+      "title": "deconvolute_bystander() crashes on real CRISPResso2 allele tables",
+      "observed_in": [4],
+      "problem": "The function raises KeyError: 'Reference_pct' on a real Alleles_frequency_table.zip.",
+      "root_cause": "The real column is '%Reads', not 'Reference_pct'.",
+      "fix": "Change the groupby aggregation column to '%Reads'. The rest of the function is correct as written -- confirmed it recovers planted ground truth exactly (40/30/20/10) once this one name is fixed."
+    },
+    {
+      "priority": "P0",
+      "title": "aggregate_variant_scores() crashes merging against real MAGeCK output",
+      "observed_in": [5],
+      "problem": "The function raises KeyError: 'sgRNA' merging mageck_sgrna_summary with variant_annotation_df.",
+      "root_cause": "Real MAGeCK sgrna_summary.txt uses the lowercase column name 'sgrna', not 'sgRNA'.",
+      "fix": "Merge on 'sgrna' (or normalize both frames' column names to a common case before merging) and document the real MAGeCK column name in the Hit Calling section."
+    },
+    {
+      "priority": "P0",
+      "title": "find_be_spacers() silently misattributes target/bystander for reverse-strand spacers",
+      "observed_in": [1, 3],
+      "problem": "For minus-strand candidates, the function computes genomic_pos in reverse-complement coordinate space but compares it directly against forward-strand codon boundaries with no conversion. A confirmed on-target call in this audit's test run was actually 65nt from the intended codon. This produces no error and no warning -- a researcher would trust a wrong on-target call.",
+      "root_cause": "Missing coordinate conversion (true_forward_index = len(cds_sequence) - 1 - genomic_pos) for the strand == '-' branch before comparing against target_codon_start/target_codon_end.",
+      "fix": "Convert genomic_pos back to forward-CDS coordinates for minus-strand candidates before the codon-overlap check, and add a unit test with a known reverse-strand hit to catch regressions."
+    },
+    {
+      "priority": "P1",
+      "title": "BE-Hive integration has no code sample and omits its position-numbering convention",
+      "observed_in": [6],
+      "problem": "The Skill names BE-Hive as its efficiency-prediction tool in one sentence with no worked example, no mention of the required 50nt-substrate layout, and no warning that BE-Hive's internal 1-indexed position numbering can be offset from a naive construction of that substrate.",
+      "root_cause": "The Skill treats BE-Hive as a citation rather than an integration point, unlike its detailed treatment of CRISPResso2 CLI flags.",
+      "fix": "Add a short worked BE-Hive code example (init_model + predict on a concrete sequence) and a note to cross-check BE-Hive's own 'Assumed protospacer sequence' diagnostic field against the intended spacer before trusting its position-labeled output columns."
+    },
+    {
+      "priority": "P1",
+      "title": "No bundled function validates its input schema before indexing into it",
+      "observed_in": [1, 2, 4, 5],
+      "problem": "All four bundled functions index directly into an assumed column/schema with no existence check, so every one of the three real-data integration points fails with an unhelpful KeyError instead of a clear, actionable error.",
+      "root_cause": "None of the four functions appear to have been run against real CRISPResso2 or MAGeCK output before being included in the Skill.",
+      "fix": "Add a schema assertion (e.g., assert 'Position' in df.columns, f'unexpected columns: {list(df.columns)}') at the top of each function so a future schema drift fails loudly and specifically rather than with a bare KeyError."
+    },
+    {
+      "priority": "P2",
+      "title": "Chemistry and threshold tables duplicated between SKILL.md and usage-guide.md",
+      "observed_in": [],
+      "problem": "The Base Editor Chemistry Selection table and the editing-efficiency threshold convention both appear near-verbatim in both files with no cross-reference.",
+      "root_cause": "The two files were not consolidated to a single source of truth when split.",
+      "fix": "Keep the full table in one file and reference it from the other, as already done cleanly for the Related Skills section."
+    }
+  ]
+}

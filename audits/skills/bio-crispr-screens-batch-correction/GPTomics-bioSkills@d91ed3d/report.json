@@ -1,0 +1,259 @@
+{
+  "meta": {
+    "skill_name": "bio-crispr-screens-batch-correction",
+    "description": "Batch effect correction for CRISPR screens covering ComBat empirical-Bayes, RUV, SVA, control-sgRNA normalization, and the model-based alternative of including batch as a covariate in MAGeCK MLE or Chronos, plus diagnosis, decision-tree guidance, and when correction harms biology.",
+    "evaluated_on": "2026-09-16",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:crispr-screens/batch-correction"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All cited references (Johnson 2007 Biostatistics, Leek 2012 Bioinformatics, Risso 2014 Nat Biotechnol, Pacini 2021 Nat Commun, Vinceti 2024 Genome Biol) are real, correctly attributed landmark papers. No fabricated statistics, DOIs, or results in any of the 7 outputs; all quantitative results (AUCs, betas, correlations) trace to real HAP1 TKOv3 data or clearly-labeled synthetic data with disclosed ground truth." },
+      "practice_boundaries": { "result": "PASS", "detail": "Pure computational-biology screen analysis; no diagnostic, prescriptive, or clinical claims about individuals anywhere in scope." },
+      "methodological_ground": { "result": "PASS", "detail": "Confounding, covariate modeling, and empirical-Bayes assumptions are handled correctly throughout (Input 3 correctly distinguishes 'destroys biology' from 'tool refuses' rather than conflating them)." },
+      "code_usability": { "result": "PASS", "detail": "Every input's FINAL delivered code ran to completion with no syntax errors, infinite loops, or missing dependencies. Caveat carried in P1 recommendations, not this gate: SKILL.md's own combat_correct() and RUV cIdx snippets crash exactly as literally written (Inputs 1 and 2) until a 1-line type fix is applied, and ComBat silently returns all-NaN output (not an exception) when forced on batch-free data (Input 7). None of these are syntax errors, infinite loops, or missing dependencies -- the strict M4 bar -- so this gate does not fire, but the underlying defects are real and scored down in static and dynamic scoring." }
+    }
+  },
+  "static_score": {
+    "subtotal": 78,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 9, "max": 12, "note": "Completeness and appropriateness are strong (full coverage of ComBat/RUV/SVA/NTC/covariate methods, well-matched to the domain), but Correctness is docked hard: 2 of the 5 documented code patterns (ComBat's 'Critical' mod usage, RUV's cIdx) crash as literally written." },
+      "reliability": { "score": 5, "max": 12, "note": "Version-Compatibility section anticipates API drift and tells the agent to adapt, which is good design intent, but there is zero guidance for the far more dangerous silent-NaN failure mode found in Input 7, and error reporting for the two code bugs is raw library tracebacks with no Skill-level pointer to the fix." },
+      "performance_context": { "score": 7, "max": 8, "note": "SKILL.md is dense but relevant (282 lines, no padding); usage-guide.md carries the deeper examples. Workflow is linear with no redundant round-trips." },
+      "agent_usability": { "score": 14, "max": 16, "note": "Consistent terminology, an explicit Validation Checklist, and 'Critical' callouts before common mistakes are strong; docked slightly because the ComBat covariate call requires debugging despite being flagged as the single most important pattern to get right." },
+      "human_usability": { "score": 6, "max": 8, "note": "Description is trigger-rich and natural; Forgiveness is limited because failures surface as raw stack traces (Python TypeError / R S4 dispatch error) rather than Skill-level guidance, and per Category-3 scene override this is scored on error clarity, not on strictness." },
+      "security": { "score": 10, "max": 12, "note": "No credential or data-safety issues. Docked on Input Validation: none of the documented functions validate the type/shape of batch_vector, condition_vector, or mod before use, which is the direct root cause of two of the three bugs found." },
+      "maintainability": { "score": 9, "max": 12, "note": "Functions are small and single-purpose with clear parameters (good Modularity/Modifiability); Testability is docked because the inline SKILL.md snippets show no sign of having been run against the real installed pyComBat/RUVSeq APIs before shipping (examples/batch_correct.py, which does run, sidesteps ComBat and RUV entirely)." },
+      "agent_specific": { "score": 18, "max": 20, "note": "Excellent Composability (7 accurately-described Related Skills links) and Progressive Disclosure; strong Escape Hatches (When NOT to Correct table) docked one point because that table doesn't warn the escape hatch can be bypassed into a silent 100%-NaN outcome if a user overrides it." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 78.6,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 25, "total": 31 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Real HAP1 TKOv3, planted 2-batch shift, ComBat with condition covariate",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "SKILL.md's own combat_correct() crashed verbatim (ValueError: mod passed as ndarray, data as raw array); fixed with a 1-line change (mod=list(condition_vector), data wrapped as DataFrame) and re-run to completion on all 71,090 real guides.",
+        "executed": true,
+        "execution_note": "Ran to completion in F:\\OpenScience\\audits\\bio-crispr-screens-batch-correction\\run\\input1_canonical.py against real HAP1_TKOv3_reads.txt (hart-lab/bagel). Bug reproduced first, then fixed version executed for the real result.",
+        "basic": 32,
+        "specialized": 45,
+        "total": 77,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "SKILL.md's own combat_correct() code runs without modification", "result": "FAIL", "note": "TypeError/ValueError: mod passed as a one-hot ndarray where pycombat requires a plain list; data passed as ndarray where a DataFrame is required." },
+          { "text": "Batch effect is measurably reduced after correction (PCA/centroid distance)", "result": "PASS", "note": "Batch centroid distance in PC1/PC2 fell from 233.83 to 0.98 (99.6% reduction)." },
+          { "text": "Essential-gene dropout signal (CEGv2 vs NEGv1) is preserved or improved post-correction", "result": "PASS", "note": "AUC 0.9947 (pre) -> 0.9966 (post), n=1443 labeled genes." },
+          { "text": "Biological covariate (condition) is supplied so condition variance is not removed as batch", "result": "PASS", "note": "mod=list(condition_vector) passed once the type bug was fixed." },
+          { "text": "Output stays within the Skill's stated CRISPR-screen batch-correction scope", "result": "PASS", "note": "No claims beyond batch correction / essentiality validation." }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Unknown/unannotated batch -> RUVg on synthetic NTC-anchored counts",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "SKILL.md's RUV snippet (cIdx <- which(...)) crashed with an S4 dispatch error against a SeqExpressionSet; fixed by using character rownames instead of integer positions, then re-run to completion.",
+        "executed": true,
+        "execution_note": "Ran to completion in run\\input2_ruv.R (RUVSeq 1.40.0) against a synthetic 2500-guide, 8-sample dataset with a HIDDEN (analyst-invisible) true batch, matching the real 'unknown batch source' use case.",
+        "basic": 32,
+        "specialized": 45,
+        "total": 77,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "SKILL.md's own RUV code (cIdx <- which(...)) runs without modification against a SeqExpressionSet", "result": "FAIL", "note": "'unable to find an inherited method for function RUVg for signature x=\"SeqExpressionSet\", cIdx=\"integer\"' -- RUVg's SeqExpressionSet method requires cIdx as character rownames." },
+          { "text": "RUV correction removes the (agent-invisible) true batch shift in NTC medians", "result": "PASS", "note": "NTC median ratio (shallow/deep) moved from 0.649 (raw) to 1.000 (corrected)." },
+          { "text": "Essential-gene dropout signal survives RUV correction", "result": "PASS", "note": "Mean essential-guide LFC: -1.986 raw vs -1.980 corrected." },
+          { "text": "Correction uses only NTC identity, not disclosed batch labels, matching the 'unknown batch source' use case", "result": "PASS", "note": "True batch labels were never passed to RUVg, only used afterward to verify the correction." }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Batch fully confounded with condition -> ComBat vs MLE-covariate",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Empirically reproduced SKILL.md's stated failure mode and confirmed pycombat's own confound detector fires when a covariate is added anyway.",
+        "executed": true,
+        "execution_note": "Ran to completion in run\\input3_confounded.py using the fixed combat_correct() wrapper on a fully-confounded real-data subset (all day0 in batch1, all endpt in batch2).",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Skill's stated failure mode ('ComBat without mod destroys biology under confounding') is empirically reproduced", "result": "PASS", "note": "Essentiality AUC 0.945 -> 0.831; mean |LFC| for CEGv2 genes collapsed from 2.070 to 0.017." },
+          { "text": "Tool detects and refuses a fully confounded covariate rather than silently returning a wrong answer", "result": "PASS", "note": "pycombat raised ConfoundingVariablesError when mod=condition was supplied on the fully collinear design." },
+          { "text": "Recommendation correctly favors covariate-modeling/redesign over pre-correction for confounded designs", "result": "PASS", "note": "Output text explicitly points to Input 4's MLE-covariate approach as the correct next step." },
+          { "text": "No fabricated statistics used to support the conclusion", "result": "PASS", "note": "All AUC/LFC values computed directly from real HAP1 data in the run." }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Batch as explicit covariate in MAGeCK MLE design matrix (real HAP1 subset)",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "mageck mle ran exactly per SKILL.md's documented flags with no modification needed; batch2 beta absorbed the planted shift and treatment beta correctly recovered known essential genes.",
+        "executed": true,
+        "execution_note": "Real mageck mle (0.5.9.5) run, ~80s, on a 1646-gene / 6460-guide real HAP1 TKOv3 subset (646 CEGv2 genes + 1000 random genes), 2 batches x 2 conditions x 2 replicates.",
+        "basic": 37,
+        "specialized": 53,
+        "total": 90,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "mageck mle command matches SKILL.md's documented --count-table/--design-matrix/--output-prefix flags", "result": "PASS", "note": "Ran unmodified with those exact flags." },
+          { "text": "Batch-aware MLE recovers real essential genes despite a planted batch shift", "result": "PASS", "note": "Most negative treatment|beta genes: POLR2L, POLR3H, RPL31, PCNA, MRPL53, RRM1 -- concordant with TOOLS.md's independent mageck/BAGEL2/drugZ smoke tests on the same real dataset. Essentiality AUC = 0.9685." },
+          { "text": "Design matrix avoids collinearity between batch and treatment columns", "result": "PASS", "note": "baseline/batch2/treatment columns are not collinear; mle completed without NaN betas." },
+          { "text": "Skill discloses that full-genome-scale MLE runtime is multi-hour", "result": "FAIL", "note": "Not mentioned in SKILL.md or usage-guide.md; only recorded separately in the environment's own TOOLS.md." },
+          { "text": "No unapproved treatment/diagnostic claims made", "result": "PASS", "note": "Output confined to gene essentiality beta scores." }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "SVA latent-confounder discovery on synthetic 12-sample screen",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "SKILL.md's SVA code ran perfectly unmodified and recovered a hidden, condition-orthogonal confound almost exactly.",
+        "executed": true,
+        "execution_note": "Ran to completion in run\\input5_sva.R (sva 3.54.0) on a synthetic 4000-guide x 12-sample matrix with a planted hidden multiplicative confound uncorrelated with condition (r=0.070).",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "sva() code runs unmodified exactly as documented", "result": "PASS", "note": "mod/mod0/sva() call ran with no changes." },
+          { "text": "Discovered surrogate variable recovers the true hidden confounder", "result": "PASS", "note": "SV1 vs true hidden confound: r = 0.998." },
+          { "text": "Surrogate variable is discovered independent of the condition model (mod vs mod0 contrast)", "result": "PASS", "note": "mod0 (intercept-only) vs mod (~condition) contrast used exactly as SKILL.md specifies." },
+          { "text": "Output correctly frames the SV as a candidate MAGeCK MLE covariate, not a standalone correction", "result": "PASS", "note": "design_mat <- cbind(mod, sv_obj$sv) constructed per SKILL.md's stated next step." }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Non-CRISPR bulk RNA-seq batch-correction request",
+        "status": "COMPLETED",
+        "status_flag": "\u26a0\ufe0f",
+        "note": "Reasoning-only input (no code needed): checked whether the Skill gives an agent any explicit boundary against non-CRISPR use. It does not; the boundary must be inferred from the frontmatter alone.",
+        "executed": false,
+        "execution_note": "No code executed; this input tests scope-boundary language, not a computational claim. Assessed by reading SKILL.md/usage-guide.md directly.",
+        "basic": 25,
+        "specialized": 37,
+        "total": 62,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Response identifies that ComBat/RUV/SVA are general statistical methods, not CRISPR-specific", "result": "PASS", "note": "SKILL.md's own References section cites Johnson 2007, Leek 2012, and Risso 2014 -- all originally microarray/RNA-seq papers, not CRISPR papers, supporting this framing." },
+          { "text": "Response correctly flags CRISPR-specific thresholds/QC (NTC counts, CEGv2 PR-AUC, MAGeCK MLE) as non-transferable to RNA-seq", "result": "PASS", "note": "These are screen-specific by construction (sgRNA-level NTCs, gene-essentiality gold standards)." },
+          { "text": "SKILL.md contains an explicit out-of-domain escape hatch for non-CRISPR requests", "result": "FAIL", "note": "No 'out of scope' section exists anywhere in SKILL.md or usage-guide.md." },
+          { "text": "Response does not claim the Skill's screen-specific validation checklist applies unchanged to RNA-seq", "result": "PASS", "note": "Checklist items (PR-AUC, NTC distribution) are screen-only by nature." }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Forcing ComBat on an already-clean, batch-free screen",
+        "status": "COMPLETED",
+        "status_flag": "\u274c",
+        "note": "Correctly diagnosed no correction was needed (Skill's own >0.95 threshold), but forcing ComBat anyway silently returned a 100% NaN matrix with exit code 0 and no exception -- a safety-relevant gap nothing in the Skill would catch.",
+        "executed": true,
+        "execution_note": "Ran to completion in run\\input7_unnecessary_correction.py; confirmed 568,720/568,720 output values were NaN via a follow-up inline check.",
+        "basic": 22,
+        "specialized": 32,
+        "total": 54,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Diagnostic correctly identifies no correction is needed per the Skill's own >0.95 replicate-correlation threshold", "result": "PASS", "note": "Measured within- and cross-batch replicate r all >= 0.997." },
+          { "text": "If correction is forced anyway, output is checked for NaN/Inf before being trusted", "result": "FAIL", "note": "Neither combat_correct() nor usage-guide.md's Validation Checklist includes a basic NaN/Inf sanity check; 100% of corrected values were NaN and this would go undetected by design." },
+          { "text": "Skill warns that forcing correction on a batch-free design can silently corrupt all values, not just waste effort", "result": "FAIL", "note": "'When NOT to Correct' frames this as adding noise / wasted correction, not as a silent total-data-loss risk." },
+          { "text": "Recommendation still correctly declines correction by default", "result": "PASS", "note": "Output explicitly states the correct default is to decline unless the user overrides after being told why." },
+          { "text": "No fabricated results reported", "result": "PASS", "note": "NaN outcome reported plainly, not papered over." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 31.2,
+    "dynamic_weighted": 47.2,
+    "score": 78,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "\u2705",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "SVA and MAGeCK-MLE-covariate patterns ran perfectly out-of-the-box against real HAP1 TKOv3 data, recovering known essential genes (POLR2L, POLR3H, PCNA, MRPL53, RRM1) even under a planted batch shift, concordant with this environment's independent MAGeCK/BAGEL2/drugZ smoke tests on the same dataset.",
+    "The confounded-batch failure mode the Skill warns about is real and precisely reproducible: forcing ComBat without a covariate on batch-confounded data collapsed essential-gene signal (AUC 0.945 -> 0.831), and pycombat's own confound detector correctly refuses when a covariate is added instead.",
+    "Decision-tree framing (When NOT to Correct, Common Errors, Quantitative Thresholds) gives an agent clear, checkable stop conditions rather than blanket 'always correct' guidance.",
+    "Composability is strong: accurate, specific 'Related Skills' links to mageck-analysis, screen-qc, copy-number-correction, library-design, jacks-analysis, hit-calling, and in-vivo-screens."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "ComBat combat_correct() crashes on its own 'Critical' covariate usage",
+      "observed_in": [1],
+      "problem": "SKILL.md's combat_correct() passes mod as a one-hot numpy array and data as a raw array; pycombat requires mod as a plain list and data as a DataFrame, so the documented function raises an error on the exact call pattern the Skill labels 'Critical'.",
+      "root_cause": "The example was written against pyComBat's docstring assumption rather than executed against the installed API; pycombat's mod contract (a list, one-hot-encoded internally) is easy to misread as 'pass a pre-encoded matrix'.",
+      "fix": "Change combat_correct() to pass data=pd.DataFrame(log_data, index=..., columns=...) and mod=list(condition_vector); add a smoke test asserting the returned DataFrame has zero NaNs."
+    },
+    {
+      "priority": "P1",
+      "title": "RUV example's cIdx type is incompatible with SeqExpressionSet dispatch",
+      "observed_in": [2],
+      "problem": "ntc_indices <- which(rownames(counts_df) %in% ntc_sgrna_names) returns integer positions, but RUVg's S4 method for x='SeqExpressionSet' only accepts cIdx='character' (control rownames); the documented snippet fails with an S4 dispatch error on first use.",
+      "root_cause": "The which()-based indexing pattern matches RUVg's x='matrix' method (cIdx='ANY') but not the stricter x='SeqExpressionSet' method shown two lines earlier in the same snippet.",
+      "fix": "Use ntc_indices <- rownames(counts_df)[rownames(counts_df) %in% ntc_sgrna_names] (character rownames) before calling RUVg on a SeqExpressionSet."
+    },
+    {
+      "priority": "P1",
+      "title": "Forcing ComBat on a batch-free design silently returns 100% NaN",
+      "observed_in": [7],
+      "problem": "When replicate correlation is already >0.95 within and across batches and a user overrides the Skill's 'no correction needed' guidance, pycombat's empirical-Bayes variance step divides by a near-zero pooled variance and returns an all-NaN DataFrame with exit code 0 and no exception.",
+      "root_cause": "Neither combat_correct() nor the Validation Checklist includes a basic NaN/Inf sanity check on ComBat's output; only downstream biological checks (PCA overlap, PR-AUC) are specified, which a user would only run after already trusting a corrupted matrix.",
+      "fix": "Add an explicit post-hoc check to combat_correct() (assert not corrected.isna().any().any()) and a Common Errors row: 'ComBat output is all-NaN -> batch effect too small to estimate a pooled variance; do not force correction, see When NOT to Correct.'"
+    },
+    {
+      "priority": "P2",
+      "title": "No explicit out-of-CRISPR-screen scope boundary",
+      "observed_in": [6],
+      "problem": "SKILL.md never states whether its ComBat/RUV/SVA guidance is intended to generalize to non-CRISPR batch correction (e.g. bulk RNA-seq); an agent must infer this solely from the frontmatter description.",
+      "root_cause": "The Skill documents only positive guidance for screens, with no negative/boundary section for adjacent domains.",
+      "fix": "Add a short 'Related but out of scope' note: the underlying statistical methods generalize, but the quantitative thresholds (NTC count, CEGv2 PR-AUC) and MAGeCK/Chronos integration are CRISPR-screen-specific."
+    },
+    {
+      "priority": "P2",
+      "title": "MAGeCK MLE permutation p-values are not flagged as run-to-run stochastic",
+      "observed_in": [4],
+      "problem": "mageck mle's default permutation-based significance testing is not seeded by the documented command, so p-values/FDR can vary slightly between reruns on identical input; the batch-covariate example doesn't mention this.",
+      "root_cause": "The example focuses on design-matrix mechanics and omits mageck mle's own reproducibility caveats.",
+      "fix": "Note that beta estimates are stable but permutation p-values are stochastic unless a seed/round count is fixed, and reference mageck mle's own --permutation-round option."
+    }
+  ]
+}

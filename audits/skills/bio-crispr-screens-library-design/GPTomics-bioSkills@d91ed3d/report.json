@@ -1,0 +1,216 @@
+{
+  "meta": {
+    "skill_name": "bio-crispr-screens-library-design",
+    "description": "Designs pooled sgRNA libraries for CRISPR knockout, interference (CRISPRi), activation (CRISPRa), Cas12a multiplex, base-editor, and prime-editor screens. Covers on-target scoring (Rule Set 2, Azimuth, DeepSpCas9, CRISPRon), off-target scoring (CFD, MIT), TSS-relative positioning for CRISPRi/a (Horlbeck, Dolcetto, Calabrese), PAM-variant chemistries, control-guide composition, oligo cloning architecture, and library QC.",
+    "evaluated_on": "2026-09-16",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Protocol Design",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:crispr-screens/library-design"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "No fabricated DOI/PMID/statistics observed across 7 outputs; the heuristic on-target scorer that substitutes for the unrunnable Azimuth predictor is explicitly labeled as a substitute in every output, never presented as a real Rule Set 2 score." },
+      "practice_boundaries": { "result": "PASS", "detail": "Pure research library-design workflow; no individual-patient diagnostic, prescriptive, or clinical content in any of the 7 outputs." },
+      "methodological_ground": { "result": "PASS", "detail": "No active methodological fallacy (no correlation-for-causation, no inverted statistic). The Azimuth-usability contradiction between SKILL.md and usage-guide.md (Input 6) and the missing guide-spacing filter (Input 4) are completeness/consistency gaps, not fallacious claims, and are captured as P1 recommendations instead." },
+      "code_usability": { "result": "PASS", "detail": "All Skill-authored code (find_sgrna_candidates, annotate_exon_position, crispri_window, crispra_window, build_oligo, examples/design_library.py) ran without syntax errors across all 5 code-executing inputs. The one broken import (azimuth.model_comparison, third-party, not authored by this Skill) is correctly reported as unusable rather than presented as working." }
+    }
+  },
+  "static_score": {
+    "subtotal": 83,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 11, "max": 12, "note": "TKOv3 guide/gene counts (18,056 genes, 71,090 guides, ~4 guides/gene for 17,445 genes) independently verified against the real public-data annotation and match the SKILL.md table exactly. Correctness dinged: SKILL.md's Version Compatibility section presents Azimuth 2.0 as directly callable via azimuth.model_comparison.predict(...), but that import raises a confirmed SyntaxError (Python-2 print statement) -- an inaccurate instruction usage-guide.md itself does not repeat." },
+      "reliability": { "score": 10, "max": 12, "note": "Failure Modes and Common Errors tables give unusually strong trigger/mechanism/symptom/fix guidance. find_sgrna_candidates degrades safely (empty DataFrame, no crash) on a genuinely PAM-less sequence. Gap: no guide-to-guide spacing/independence filter, so a short target can return near-duplicate overlapping guides that silently count toward the 4-guides-per-gene quota." },
+      "performance_context": { "score": 5, "max": 8, "note": "SKILL.md carries all content in one ~305-line file with large inline tables and no references/ split; usage-guide.md largely duplicates SKILL.md's own tables/examples rather than adding orthogonal depth, so progressive disclosure is weak." },
+      "agent_usability": { "score": 14, "max": 16, "note": "Step-by-step 'What the Agent Will Do' list and extensive pitfall callouts are clear and consistent within SKILL.md itself. Docked for the direct SKILL.md vs usage-guide.md contradiction on whether Azimuth 2.0 is usable." },
+      "human_usability": { "score": 7, "max": 8, "note": "Description text mirrors real researcher phrasing (library names, chemistries, diagnosis language). Required-inputs list is explicit, which the Category-2 Forgiveness override treats as correct strictness rather than a usability defect." },
+      "security": { "score": 11, "max": 12, "note": "No credentials, no eval/exec of raw strings, no injection surface -- all local sequence processing. Sequence inputs are composition-filtered (GC/poly-T) but not format-validated (e.g. non-ACGT characters untested)." },
+      "maintainability": { "score": 9, "max": 12, "note": "Helper functions (find_sgrna_candidates, crispri_window, crispra_window, build_oligo) are small and independently testable. Docked because the shipped examples/design_library.py implements a different, simpler algorithm (random sequences + pure GC heuristic) than the CDS-position/TSS-window method documented in the SKILL.md body, so the one executable artifact doesn't exercise the documented method." },
+      "agent_specific": { "score": 16, "max": 20, "note": "Precise triggering and a clean Related-Skills composability chain (screen-qc, mageck-analysis, combinatorial-screens, base/prime-editing). Docked: no explicit stop-and-ask escape hatch when gene list/chemistry/genome are missing (only a passive 'Required inputs' list), and progressive disclosure is weak per performance_context." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 79.7,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 24, "total": 30 },
+    "inputs": [
+      {
+        "index": 1, "type": "Canonical",
+        "label": "Cas9 KO library, 8 synthetic DDR genes (synthetic CDS)",
+        "status": "COMPLETED", "status_flag": "\u2705",
+        "note": "Ran find_sgrna_candidates/annotate_exon_position/build_oligo (verbatim from SKILL.md) against 8 synthetic gene CDS sequences; produced 32 targeting guides (4/gene) plus NTC/safe-harbor/essential/non-essential controls, 91 rows total, all spacers 20nt, 0 poly-T leaks.",
+        "executed": true, "execution_note": "Executed in F:\\OpenScience\\audit-envs\\crispr-screen-analyst venv; output at data\\input1_ko_library.csv.",
+        "basic": 36, "specialized": 50, "total": 86,
+        "assertions_passed": 5, "assertions_total": 5,
+        "assertions": [
+          { "text": "Output includes a library table with gene, guide sequence, and control-guide types", "result": "PASS", "note": "library_df has gene/spacer/type columns; verified in CSV output" },
+          { "text": "On-target scoring approach is disclosed as a heuristic substitute, not fabricated as real Azimuth/Rule-Set-2 output", "result": "PASS", "note": "Script comment explicitly cites TOOLS.md's Azimuth import failure as the reason for the GC-heuristic substitute" },
+          { "text": "Guides restricted to 5-65% of CDS per Brunello convention", "result": "PASS", "note": "annotate_exon_position enforced before scoring; verified via lo/hi bounds" },
+          { "text": "All requested control types present (NTC, safe-harbor, essential, non-essential)", "result": "PASS", "note": "value_counts shows all 5 types present (50 NTC, 4 essential, 4 non-essential, 1 safe-harbor, 32 targeting)" },
+          { "text": "No fabricated real-world efficacy/off-target numbers presented as measured data", "result": "PASS", "note": "Only the internal GC-heuristic score column is populated; no invented Azimuth/CFD values" }
+        ]
+      },
+      {
+        "index": 2, "type": "Variant A",
+        "label": "CRISPRi Dolcetto-window library, 5 synthetic lncRNAs",
+        "status": "COMPLETED", "status_flag": "\u2705",
+        "note": "Ran crispri_window() (verbatim from SKILL.md) against synthetic TSS-flanking sequence; all 5 genes reached the 6-guide quota, 0 guides fell outside the declared -50/+300 window, 23/30 guides landed in the Sanson +25/+75 optimum band.",
+        "executed": true, "execution_note": "Executed in the audit venv; output at data\\input2_crispri_library.csv.",
+        "basic": 36, "specialized": 52, "total": 88,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Output reports per-gene guide counts against the 6-guide quota", "result": "PASS", "note": "groupby(gene).size() printed, all 5 genes = 6" },
+          { "text": "Guides positioned within the documented Dolcetto window (-50/+300)", "result": "PASS", "note": "outside-window count verified = 0" },
+          { "text": "Positional bias toward Sanson +25/+75 optimum reported", "result": "PASS", "note": "23/30 guides in the optimum band, printed explicitly" },
+          { "text": "All 5 genes addressed with either guides or an explicit shortfall flag", "result": "PASS", "note": "flags list printed as empty; all genes filled" }
+        ]
+      },
+      {
+        "index": 3, "type": "Variant B",
+        "label": "CRISPRa Calabrese-window library, 4 synthetic TFs",
+        "status": "COMPLETED", "status_flag": "\u2705",
+        "note": "Ran crispra_window() (verbatim from SKILL.md); the narrow -150/-75 window under-supplied guides for 2/4 genes (3 and 4 of 6 guides respectively) and the script correctly surfaced this as an explicit flag rather than padding the quota.",
+        "executed": true, "execution_note": "Executed in the audit venv; output at data\\input3_crispra_library.csv.",
+        "basic": 36, "specialized": 51, "total": 87,
+        "assertions_passed": 4, "assertions_total": 5,
+        "assertions": [
+          { "text": "Reports guides/gene per TF, flags shortfalls explicitly rather than silently under-filling", "result": "PASS", "note": "2 explicit shortfall flags printed (TF-A: 3/6, TF-B: 4/6)" },
+          { "text": "Guides positioned within Calabrese window (-150/-75)", "result": "PASS", "note": "outside-window count verified = 0" },
+          { "text": "No guide count silently padded past what real PAM sites support", "result": "PASS", "note": "TF-A/TF-B legitimately returned fewer than 6 candidates and were reported as such" },
+          { "text": "All 4 genes addressed", "result": "PASS", "note": "all 4 genes have >=3 guides and appear in output" },
+          { "text": "SKILL.md/usage-guide warns that the narrow Calabrese window can undersupply guides", "result": "FAIL", "note": "Neither document mentions that the tight 75bp Calabrese window can leave genes below quota; this pass discovered the shortfall empirically" }
+        ]
+      },
+      {
+        "index": 4, "type": "Edge",
+        "label": "Edge: short/PAM-less synthetic CDS, guide-independence gap",
+        "status": "COMPLETED", "status_flag": "\u26a0\ufe0f",
+        "note": "A genuinely PAM-less 44nt CDS correctly returned 0 candidates (no crash). A 42nt CDS returned 5 candidates but 2 of them (positions 15 and 16) overlap by 19 of 20nt -- find_sgrna_candidates has no minimum-spacing/independence filter, so short targets can yield near-duplicate 'independent' guides.",
+        "executed": true, "execution_note": "Executed in the audit venv (two sub-cases); no output file, printed to stdout only.",
+        "basic": 31, "specialized": 38, "total": 69,
+        "assertions_passed": 3, "assertions_total": 4,
+        "assertions": [
+          { "text": "Genuinely PAM-less sequence returns zero candidates without crashing", "result": "PASS", "note": "confirmed: 0 candidates, no exception" },
+          { "text": "Selected candidate guides for a short CDS are checked for mutual independence/minimum spacing before being counted as 4 separate guides", "result": "FAIL", "note": "candidates at pos_in_cds 15 and 16 overlap by 19/20 nt and both pass the documented filter unmodified" },
+          { "text": "Candidate count vs quota (4/gene) is explicitly reported so a human can catch undersized designs", "result": "PASS", "note": "script prints raw and filtered candidate counts at each stage" },
+          { "text": "No guides are fabricated beyond what the documented filters actually produce", "result": "PASS", "note": "all 5 candidates are real regex matches on the synthetic sequence" }
+        ]
+      },
+      {
+        "index": 5, "type": "Stress",
+        "label": "Shipped design_library.py example, 20 oncogenes (real run)",
+        "status": "COMPLETED", "status_flag": "\u2705",
+        "note": "Ran the Skill's own examples/design_library.py unmodified: exit 0, 142-row library (80 targeting + 50 NTC + 10 essential + 2 safe-harbor), no NaN, valid oligos, real Gini-adjacent QC stats printed. But the script demonstrates a different algorithm (random sequences + GC heuristic only) than the CDS/TSS method documented in SKILL.md's body, and its control fraction (43.7%) is far from the ~1% NTC target SKILL.md itself recommends at genome scale.",
+        "executed": true, "execution_note": "Executed unmodified from run\\library-design-src\\examples\\design_library.py against the copied (not in-place-imported) Skill folder; np.random.seed(42) makes it deterministic.",
+        "basic": 34, "specialized": 42, "total": 76,
+        "assertions_passed": 2, "assertions_total": 4,
+        "assertions": [
+          { "text": "Shipped example script runs end-to-end without error and produces non-empty, non-NaN output", "result": "PASS", "note": "exit 0; 142 rows, 0 NaN in sequence column, verified by direct pandas inspection" },
+          { "text": "QC statistics (Gini-equivalent, GC distribution, poly-T count, control fraction) are printed and are real computed values, not stubs", "result": "PASS", "note": "printed stats (GC mean 50.6%, range 35-70%, 0 poly-T) match a fresh independent recomputation from the CSV" },
+          { "text": "Example's algorithm matches the CDS-position/TSS-window method documented in the SKILL.md body", "result": "FAIL", "note": "design_library.py never calls find_sgrna_candidates/annotate_exon_position/TSS windows; it generates fully random 20nt sequences and scores them by GC content alone" },
+          { "text": "Example's control-guide proportions are representative of the genome-scale proportions SKILL.md recommends (~1% NTC)", "result": "FAIL", "note": "control fraction is 43.7% of a 142-row demo vs the ~1% NTC target SKILL.md states for real libraries, uncaveated in the script" }
+        ]
+      },
+      {
+        "index": 6, "type": "Scope Boundary",
+        "label": "CRISPOR/Azimuth real-tool request (not executed, verified why)",
+        "status": "COMPLETED", "status_flag": "\u2705",
+        "note": "Requested real CRISPOR off-target and Azimuth on-target scoring. Correctly not executed: CRISPOR needs multi-GB genome-scale indices absent from this environment (TOOLS.md); Azimuth's real entry point (azimuth.model_comparison) independently reproduced as a SyntaxError on import (Python-2 print statement), confirming TOOLS.md's finding by a second method rather than trusting it at face value.",
+        "executed": false, "execution_note": "CRISPOR: not executed, no genome index installed (confirmed: no crisporWebsite clone present under tools\\dl). Azimuth: import attempted and failed live -- 'import azimuth' succeeds but 'import azimuth.model_comparison' raises SyntaxError at line 269 ('print \"...\"'), independently reproducing TOOLS.md's claim.",
+        "basic": 37, "specialized": 46, "total": 83,
+        "assertions_passed": 3, "assertions_total": 4,
+        "assertions": [
+          { "text": "CRISPOR non-execution is explained with the correct, TOOLS.md-consistent reason (genome-scale indices, not license/deprecation)", "result": "PASS", "note": "verified no crisporWebsite clone or genome index present in audit-env tools\\dl" },
+          { "text": "Azimuth non-execution claim is independently verifiable (real import failure), not just asserted", "result": "PASS", "note": "reproduced the exact SyntaxError live rather than citing TOOLS.md alone" },
+          { "text": "SKILL.md and usage-guide.md agree on whether Azimuth is usable", "result": "FAIL", "note": "SKILL.md's Version Compatibility section presents Azimuth 2.0+ as directly callable; usage-guide.md's Prerequisites section says the same package is Python-2-only and archived and recommends CRISPick/crisprScore instead" },
+          { "text": "No fabricated on-target/off-target scores presented as if a real predictor had run", "result": "PASS", "note": "output states plainly that no CRISPOR/Azimuth scores were computed" }
+        ]
+      },
+      {
+        "index": 7, "type": "Adversarial",
+        "label": "Ambiguous 'design me a CRISPR library' request (no gene list/chemistry)",
+        "status": "COMPLETED", "status_flag": "\u26a0\ufe0f",
+        "note": "A careful agent correctly halts and asks for gene list, chemistry, and genome/TSS source before proceeding (per the Category-2 Forgiveness override, this is correct strictness, not a usability defect). But this behavior is not actually mandated anywhere in SKILL.md or usage-guide.md -- only a passive 'Required inputs' list exists, with no imperative stop-and-ask instruction.",
+        "executed": false, "execution_note": "No code to execute; this input tests the SKILL.md/usage-guide.md text's instruction-following behavior, not a script.",
+        "basic": 31, "specialized": 38, "total": 69,
+        "assertions_passed": 3, "assertions_total": 4,
+        "assertions": [
+          { "text": "Skill halts and requests gene list + chemistry + genome before generating a design, rather than guessing", "result": "PASS", "note": "the correct simulated response asks for the three required parameters instead of assuming a chemistry" },
+          { "text": "SKILL.md/usage-guide.md contains an explicit imperative instruction to stop and ask when required inputs are missing", "result": "FAIL", "note": "usage-guide.md's 'Required inputs' is a passive list; no section instructs the agent to halt and confirm before designing" },
+          { "text": "Clarifying question enumerates exactly the required parameters from usage-guide.md's own Required Inputs list", "result": "PASS", "note": "gene list, genome assembly, chemistry, and TSS/exon source all named" },
+          { "text": "No chemistry/gene list is silently assumed or fabricated", "result": "PASS", "note": "no default chemistry (e.g. Cas9 KO) is guessed in the correct response" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 33.2,
+    "dynamic_weighted": 47.8,
+    "score": 81,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "\u2705",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Design guidance is independently verified accurate against real data: the SKILL.md's TKOv3 table (~18k genes x 4 guides, ~71k total) matches the real HAP1_TKOv3_reads.txt annotation exactly (18,056 genes, 71,090 guides, 17,445 of them at exactly 4 guides/gene).",
+    "Unusually strong fault-tolerance documentation: explicit Failure Modes and Common Errors tables (trigger/mechanism/symptom/fix) that held up under testing -- e.g. find_sgrna_candidates degrades to an empty result rather than crashing on a PAM-less sequence.",
+    "The Skill's own inline design functions (find_sgrna_candidates, crispri_window, crispra_window, build_oligo) are correct and produced sound, in-window, quota-respecting designs across independent Cas9 KO, CRISPRi, and CRISPRa test runs.",
+    "Honest tool-status framing: correctly declines to run CRISPOR/Azimuth when they are genuinely unavailable rather than fabricating scores, and clearly labels its GC-heuristic fallback as a substitute rather than a real Rule Set 2 result."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "No minimum-spacing/independence filter on candidate guides",
+      "observed_in": [4],
+      "problem": "find_sgrna_candidates filters only on GC content and poly-T; for short CDS regions it can return near-duplicate guides overlapping by 19/20 nt that both count toward the 4-guides-per-gene quota.",
+      "root_cause": "The documented filter checks sequence composition only, never guide-to-guide positional independence.",
+      "fix": "After ranking, greedily select guides at least ~5 bp apart (or drop candidates sharing >80% sequence overlap with an already-selected guide) before taking the top N per gene."
+    },
+    {
+      "priority": "P1",
+      "title": "SKILL.md and usage-guide.md contradict each other on Azimuth 2.0 usability",
+      "observed_in": [6],
+      "problem": "SKILL.md's Version Compatibility section instructs calling azimuth.model_comparison.predict(...) as if Azimuth 2.0 is directly usable; that exact import raises a confirmed SyntaxError (Python-2 print statement). usage-guide.md separately and correctly states Azimuth is Python-2-only, archived, and recommends CRISPick/crisprScore::getAzimuthScores() instead.",
+      "root_cause": "The two docs were not updated together when the Azimuth deprecation note was added to usage-guide.md.",
+      "fix": "Remove or correct the azimuth.model_comparison.predict(...) instruction in SKILL.md's Version Compatibility section so it points to the same CRISPick/crisprScore alternative usage-guide.md already recommends."
+    },
+    {
+      "priority": "P2",
+      "title": "Shipped example algorithm diverges from the documented design method",
+      "observed_in": [5],
+      "problem": "examples/design_library.py generates fully random 20nt sequences and scores them by GC content alone; it never calls find_sgrna_candidates, annotate_exon_position, or the TSS-window functions that SKILL.md documents as the actual design method.",
+      "root_cause": "The example script appears to predate, or was written independently of, the CDS-position/TSS-window functions later added inline to SKILL.md.",
+      "fix": "Update design_library.py to call the documented functions against a real or synthetic CDS, or add a comment clarifying it is a simplified standalone demo rather than an implementation of the documented method."
+    },
+    {
+      "priority": "P2",
+      "title": "Demo control-guide proportions don't match the genome-scale guidance",
+      "observed_in": [5],
+      "problem": "The shipped example's control fraction (43.7% of a 142-row demo) is far from the ~1% NTC target SKILL.md recommends for real genome-scale libraries, with no caveat in the script.",
+      "root_cause": "Control counts were fixed as small absolute numbers for a 20-gene toy demo rather than scaled as a percentage.",
+      "fix": "Add a one-line comment in design_library.py noting the control counts are demo-only and should be recalculated as ~1% NTC (plus 50-100 each of safe-harbor/essential/non-essential) for a real design."
+    },
+    {
+      "priority": "P2",
+      "title": "No explicit stop-and-ask escape hatch for missing required inputs",
+      "observed_in": [7],
+      "problem": "usage-guide.md lists 'Required inputs' (gene list, genome, chemistry, TSS/exon source) but no section instructs the agent to halt and confirm these before generating a design.",
+      "root_cause": "The Required-inputs list is informational, not an imperative workflow step.",
+      "fix": "Add a 'Before Designing' checklist as the first step of the workflow requiring the agent to confirm gene list, chemistry, and genome/TSS source before any guide enumeration begins."
+    }
+  ]
+}

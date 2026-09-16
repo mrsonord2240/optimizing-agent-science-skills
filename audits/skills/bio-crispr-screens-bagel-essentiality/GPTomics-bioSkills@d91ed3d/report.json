@@ -1,0 +1,205 @@
+{
+  "meta": {
+    "skill_name": "bio-crispr-screens-bagel-essentiality",
+    "description": "Identifies essential genes from CRISPR-Cas9 fitness screens using BAGEL2, a Bayesian classifier scoring per-gene Bayes Factors via log-likelihood ratios over per-sgRNA fold changes, calibrated against CEGv2 core-essentials and NEGv1 non-essentials. Covers fc+bf+pr workflow, tumor-suppressor detection, and BF calibration.",
+    "evaluated_on": "2026-09-16",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Moderate",
+    "n_inputs": 5,
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:crispr-screens/bagel-essentiality"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "FAIL",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "FAIL",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "No fabricated DOI/PMID/p-values/effect sizes in any of the 5 outputs; all numbers traced to real BAGEL2/MAGeCK tool output on real HAP1 TKOv3 data." },
+      "practice_boundaries": { "result": "PASS", "detail": "Basic-research gene-essentiality analysis; no diagnostic or prescriptive claims about an individual." },
+      "methodological_ground": { "result": "PASS", "detail": "Input 2's interpret_bagel() flags 86.5% of the genome as tumor-suppressor on a dropout screen, which is methodologically wrong taken alone, but the Skill's own Failure Modes section documents the exact caveat needed to avoid it (restrict TS calling to enrichment-designed screens). Scored as a P0 design gap rather than a veto-firing fabrication since the corrective information exists within the Skill." },
+      "code_usability": { "result": "PASS", "detail": "All canonical-path code (BAGEL.py fc/bf/pr, interpret_bagel(), mageck test) ran with real installed tools; no syntax errors, no missing dependencies." }
+    }
+  },
+  "static_score": {
+    "subtotal": 73,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 9, "max": 12, "note": "fc/bf/pr, tumor-suppressor detection, calibration and MAGeCK/drugZ comparison all covered; but the reference-set failure-mode symptom described (Correctness) does not match observed behavior (crash / total-NaN corruption vs. the documented 'median near zero')." },
+      "reliability": { "score": 5, "max": 12, "note": "A species-mismatched reference set produces an uncaught scipy ValueError; swapped -e/-n arguments produce a silent, complete BF=nan corruption with exit 0 and no warning. Neither failure mode is caught or clearly reported by the Skill's guidance." },
+      "performance_context": { "score": 8, "max": 8, "note": "SKILL.md concise (~250 lines), usage-guide and example script separated; linear fc->bf->pr workflow with no redundant steps." },
+      "agent_usability": { "score": 12, "max": 16, "note": "Consistent terminology and clear output-format specs, but the per-sgRNA CLI flag (-r) needed for the Skill's own 'guide-of-one' diagnosis is never named, and Error Prevention misses the two concrete failure modes found in testing (reference-set crash, -e/-n swap, non-determinism, -NB 1000 runtime cost)." },
+      "human_usability": { "score": 6, "max": 8, "note": "Natural, precise trigger language. Strict input rejection is appropriate for scientific code (no penalty per Category 3 override), but when things do go wrong the failure is either a raw traceback or completely silent -- neither clearly identifies what's wrong to a human or agent." },
+      "security": { "score": 9, "max": 12, "note": "No secrets, only public reference-data URLs. No pre-flight validation of column names or essential/non-essential reference-gene overlap before running, which is exactly what let the -e/-n swap corrupt silently." },
+      "maintainability": { "score": 9, "max": 12, "note": "Clean separation of SKILL.md/usage-guide/example script and clear CLI parameterization, but outputs are not deterministic (Testability), undermining verifiability of any single run." },
+      "agent_specific": { "score": 15, "max": 20, "note": "Precise trigger, good progressive disclosure, clean composability with hit-calling/pathway-analysis Skills; but the skill is not idempotent (confirmed non-determinism) and its escape-hatch/failure-mode guidance is incomplete for the two concrete corruption/crash paths found in testing." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 75.6,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 14, "total": 21 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "fc->bf->pr pipeline on real HAP1 TKOv3 data",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Top BF genes match independently-recorded ground truth and PR curve confirms the documented BF ladder; STD/NumObs columns absent because the CV-default (not bootstrap) invocation was used.",
+        "basic": 37,
+        "specialized": 51,
+        "total": 88,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Output correctly identifies known core-essential genes as top BF hits", "result": "PASS", "note": "POLR2L, POLR3H, GTPBP10, mito-ribosomal proteins all top-ranked, matching ground truth." },
+          { "text": "PR-curve values are consistent with the Skill's documented BF threshold table", "result": "PASS", "note": "Precision ~=1.0 at BF 6/12/30, confirmed empirically." },
+          { "text": "Code executes without unhandled exceptions on real data", "result": "PASS", "note": "Clean exit 0 for fc, bf, pr." },
+          { "text": "Output includes the STD/NumObs diagnostic columns the usage-guide describes as always available", "result": "FAIL", "note": "Absent under the CV-default mode; only present with -b, which the prose describes as opt-in." },
+          { "text": "No fabricated statistics", "result": "PASS", "note": "All values traced to real BAGEL.py output files." }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Tumor-suppressor calling via interpret_bagel() on the same screen",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "86.5% of the genome (15,617/18,053 genes) flagged as tumor_suppressor, including assay controls LacZ/luciferase/EGFP as the top 3 hits; TSC1/TSC2 correctly present but buried in noise.",
+        "basic": 19,
+        "specialized": 36,
+        "total": 55,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "interpret_bagel() output flags a plausible, small set of tumor-suppressor candidates", "result": "FAIL", "note": "86.5% of the genome flagged; not a usable candidate list." },
+          { "text": "Output excludes assay control pseudo-genes (LacZ, luciferase, EGFP) from biological calls", "result": "FAIL", "note": "These are the 3 most extreme 'hits' in the unfiltered output." },
+          { "text": "TSC1/TSC2 correctly appear among top tumor-suppressor candidates, concordant with MAGeCK", "result": "PASS", "note": "Both present at BF -78.4/-73.9, matching MAGeCK's independent enrichment call." },
+          { "text": "No fabricated statistics", "result": "PASS", "note": "BF values traced to real BAGEL2 output." }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Reference-set failure-mode diagnosis (species mismatch + -e/-n swap)",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Species-mismatch reference set causes an uncaught scipy ValueError; swapped -e/-n arguments cause silent complete BF=nan corruption across all 18,053 genes with exit 0. Neither matches the Skill's documented 'median BF near zero' symptom.",
+        "basic": 25,
+        "specialized": 40,
+        "total": 65,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The Skill's documented failure-mode symptom (median BF near zero, no hits) matches observed behavior", "result": "FAIL", "note": "Observed behavior was a hard crash or total NaN corruption, not a near-zero median." },
+          { "text": "A species-mismatched reference set produces a detectable failure, not a silently plausible wrong answer", "result": "PASS", "note": "Uncaught ValueError makes the failure obvious, even if undocumented." },
+          { "text": "The Skill's Common Errors table would help a user recognize and fix the -e/-n argument-swap failure", "result": "FAIL", "note": "This failure mode is not mentioned anywhere in the Skill." },
+          { "text": "No fabricated results", "result": "PASS", "note": "Both behaviors directly observed in real BAGEL.py output/traceback." }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "BAGEL2 vs MAGeCK hit-set Jaccard comparison",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Jaccard 0.475; BAGEL2 recovers 844/848 (99.5%) of MAGeCK's significant hits while calling 2.1x as many total hits, exactly matching the Skill's own comparison-table claim.",
+        "basic": 38,
+        "specialized": 53,
+        "total": 91,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Reported Jaccard/overlap statistic is computed correctly from real output files", "result": "PASS", "note": "Directly computed from bayes_factor.txt and mageck_hap1.gene_summary.txt." },
+          { "text": "Result is consistent with the Skill's stated BAGEL2-vs-MAGeCK reconciliation claim", "result": "PASS", "note": "1774 vs 848 hits, BAGEL2 calling more, as the comparison table predicts." },
+          { "text": "Nearly all of MAGeCK's significant calls are recovered by BAGEL2's threshold", "result": "PASS", "note": "844/848 = 99.5% recovered." },
+          { "text": "No fabricated statistics", "result": "PASS", "note": "Both tool outputs are real, independently run." }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Per-sgRNA BF (-r) diagnosis + determinism check",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The undocumented -r flag was required to get per-sgRNA contributions; identical bf reruns with no seed differed by up to 26.7 BF and flipped 33 genes across the BF>6 threshold.",
+        "basic": 36,
+        "specialized": 43,
+        "total": 79,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "SKILL.md documents the CLI flag needed for per-sgRNA Bayes Factor contributions", "result": "FAIL", "note": "Not documented anywhere; found only via BAGEL.py bf --help (-r/--sgrna-bayes-factors)." },
+          { "text": "Per-sgRNA BF contributions sum approximately to the gene-level BF", "result": "PASS", "note": "RPS3: sum of 4 per-sgRNA BFs = 78.9 vs gene-level 80.8, confirming the additive-LLR model." },
+          { "text": "Skill documents that default runs are non-deterministic and recommends a fixed seed for reproducible calls", "result": "FAIL", "note": "Not mentioned anywhere; default seed is time.time()-based." },
+          { "text": "Repeat-run BF differences are consistent with the CV-split design, not a code bug", "result": "PASS", "note": "Differences are of the magnitude expected from 10-fold CV resampling variance, not a logic error." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 29.2,
+    "dynamic_weighted": 45.4,
+    "score": 75,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": false,
+    "veto_override": true
+  },
+  "key_strengths": [
+    "Full fc->bf->pr pipeline runs end-to-end on real 70,754-sgRNA HAP1 TKOv3 data; top Bayes-Factor genes (POLR2L, POLR3H, GTPBP10, mitochondrial ribosomal proteins) match independently-recorded ground truth and cross-validate against a separately-run MAGeCK analysis.",
+    "Tumor-suppressor detection claim is genuinely validated: TSC1/TSC2 are among the most negative-BF genes and independently confirmed by MAGeCK's positive-selection call on the same data.",
+    "BAGEL2-vs-MAGeCK reconciliation claim is empirically correct: BAGEL2 recovers 99.5% of MAGeCK's significant hits while calling 2.1x as many total hits, exactly as the comparison table predicts.",
+    "PR-curve-based BF ladder (0/6/12/30) is empirically well-calibrated against real data, with precision approximately 1.0 at BF>=6."
+  ],
+  "recommendations": [
+    {
+      "priority": "P0",
+      "title": "BAGEL2 results are non-deterministic and the Skill never says so",
+      "observed_in": [1, 5],
+      "problem": "Identical `BAGEL.py bf` invocations on the same data differ by up to 26.7 BF and flip 33 genes across the BF>6 essential/non-essential threshold, because BAGEL.py's default seed is time.time()-based.",
+      "root_cause": "SKILL.md, usage-guide.md and the shipped run_bagel2.sh example all omit the -s/--seed flag.",
+      "fix": "Add `-s <fixed-int>` to every bf example invocation and a Validation Checklist item requiring a recorded seed for any 'publication-quality' or clinical-grade call."
+    },
+    {
+      "priority": "P0",
+      "title": "interpret_bagel() produces scientifically absurd output on the Skill's own benchmarked dataset",
+      "observed_in": [2],
+      "problem": "Running the Skill's own interpret_bagel() code on a real dropout screen (BF<-6 threshold) flags 86.5% of the genome as tumor-suppressor, with three assay control constructs (LacZ, luciferase, EGFP) as the top hits.",
+      "root_cause": "The runnable code sample implements no screen-design guard or control-gene filter, even though the Failure Modes section elsewhere in the same document correctly documents both the risk and the fix.",
+      "fix": "Move the screen-design check and a control-gene exclusion list directly into interpret_bagel(), and add a sanity assertion that warns when more than a small percentage of genes are flagged as tumor suppressor."
+    },
+    {
+      "priority": "P1",
+      "title": "Reference-set failure modes are documented inaccurately",
+      "observed_in": [3],
+      "problem": "The Common Errors/Failure Modes table predicts 'median BF near zero, no hits' for a bad reference set, but actual behavior is either an uncaught crash (species mismatch) or silent total BF=nan corruption across every gene (swapped -e/-n arguments, never mentioned at all).",
+      "root_cause": "Guidance appears to be written from theory rather than tested against these concrete misconfigurations.",
+      "fix": "Add the -e/-n argument-swap case to Common Errors with its actual symptom (all-NaN output, exit 0), and correct or qualify the 'near zero' claim for a genuine reference mismatch."
+    },
+    {
+      "priority": "P1",
+      "title": "Per-sgRNA diagnostic flag is undocumented",
+      "observed_in": [5],
+      "problem": "The 'Bayesian Reasoning Per Sgrna' section and the 'guide-of-one' diagnosis both depend on per-sgRNA BF output, but the required -r/--sgrna-bayes-factors CLI flag is never named in SKILL.md or usage-guide.md.",
+      "root_cause": "The section describes the underlying concept but omits the concrete invocation.",
+      "fix": "Add `BAGEL.py bf ... -r` explicitly to that section's example, alongside the RNA/GENE/BF output schema it produces."
+    },
+    {
+      "priority": "P2",
+      "title": "STD/NumObs output columns silently depend on an unstated flag",
+      "observed_in": [1],
+      "problem": "The usage-guide calls the STD column 'the diagnostic for guide-quality issues,' but that column only exists under -b (bootstrap) mode, not the CV mode described as the default; -NB 1000 also takes roughly 20-25 minutes at genome scale with no runtime-cost warning given.",
+      "root_cause": "Prose describing the 'default' resampling mode is inconsistent with the Output columns table, which implicitly assumes bootstrap output.",
+      "fix": "State explicitly that STD/NumObs require -b, and add a runtime-cost note for -NB 1000 on genome-scale libraries."
+    }
+  ]
+}

@@ -1,0 +1,239 @@
+{
+  "meta": {
+    "skill_name": "bio-crispr-screens-copy-number-correction",
+    "description": "Corrects the gene-independent copy-number artifact in CRISPR-Cas9 screens (Aguirre 2016 / Munoz 2016) where amplified loci appear essential from DNA-damage burden of simultaneous cuts. Covers the mechanism, CRISPRcleanR unsupervised pre-hoc correction, CERES, Chronos DepMap-standard joint population-dynamics + CN model, the decision tree by data availability, the Spearman LFC-vs-CN diagnostic, focal-amplification examples, and CRISPRi/a alternatives.",
+    "evaluated_on": "2026-09-16",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:crispr-screens/copy-number-correction"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All cited papers (Aguirre 2016, Munoz 2016, Meyers 2017 CERES, Iorio 2018 CRISPRcleanR, Dempster 2021 Chronos, Behan 2019, Pacini 2021) are real and consistent with their described findings. No fabricated statistics observed in any of the 7 executed/reasoned inputs." },
+      "practice_boundaries": { "result": "PASS", "detail": "Skill is purely computational (cancer cell-line screen analysis); Input 7 (adversarial clinical-boundary request) was correctly answered by confining the response to CN-artifact diagnosis and declining the treatment-recommendation part, though this relies on general model behavior rather than Skill-provided guidance (see P2 recommendation)." },
+      "methodological_ground": { "result": "PASS", "detail": "Decision tree, thresholds, and reconciliation logic are grounded in the cited literature; no correlation/causation confusion. One decision-tree row was found factually wrong (see code_usability and P0 recommendation) but that is a correctness defect, not a methodological fallacy." },
+      "code_usability": { "result": "PASS", "detail": "CRISPRcleanR's core 4-function R workflow verified byte-accurate against real upstream source (not executable in this env, but statically confirmed correct). Chronos's SKILL.md example failed as literally documented (wrong readcounts orientation, real AssertionError; missing negative_control_sgrnas crashed model construction) but became runnable after adaptation consistent with the Skill's own 'introspect and adapt' instruction -- scored low on Code Executability per input rather than vetoed, since a careful agent following the Skill's own recovery guidance did get real, correct code running." }
+    }
+  },
+  "static_score": {
+    "subtotal": 75,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 9, "max": 12, "note": "Very complete conceptual coverage (mechanism, decision tree, 2 tools + legacy CERES, diagnostic, reconciliation, CRISPRi bypass). Correctness docked for real, execution-verified inaccuracies: Chronos readcounts orientation is backwards, and the decision tree's 'single cell line + CN -> Chronos works' claim is false (alternate_CN hard-requires >=3 lines)." },
+      "reliability": { "score": 8, "max": 12, "note": "Strong Failure Modes and Common Errors sections, but neither covers the two concrete errors this audit actually hit (wrong array orientation AssertionError; alternate_CN's 3-line RuntimeError); generic version-compatibility advice doesn't name these failure classes." },
+      "performance_context": { "score": 6, "max": 8, "note": "Good progressive disclosure: concise SKILL.md (~290 lines), separate usage-guide.md, one example file." },
+      "agent_usability": { "score": 11, "max": 16, "note": "Clear decision tree and quick-start prompts; Error Prevention docked because the Skill's two worked code paths are presented as ready-to-run when neither runs as literally documented." },
+      "human_usability": { "score": 5, "max": 8, "note": "Natural, specific trigger language in the description. Forgiveness docked: SKILL.md never documents Chronos's actual required column schema (sequence_ID/cell_line_name/days/pDNA_batch; sgrna/gene) -- only discoverable by reading the installed package's check_inputs source." },
+      "security": { "score": 11, "max": 12, "note": "No credentials, no injection vectors, no sensitive-data handling in any code path." },
+      "maintainability": { "score": 9, "max": 12, "note": "Clean SKILL.md/usage-guide.md/examples split. Testability docked: the one bundled example (run_crispr_cleanr.R) has a broken diagnostic tail (references columns that don't exist in the real function's return value), and there is no fixture/test data shipped to catch this." },
+      "agent_specific": { "score": 16, "max": 20, "note": "Excellent trigger precision, progressive disclosure, and Related-Skills composability. Idempotency and Escape Hatches docked: Chronos training has no documented seed/determinism control, and the Skill gives no explicit guidance for declining adjacent clinical-interpretation requests." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 72.4,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 18, "total": 25 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Diagnose + correct a planted 17q12/HER2 amplicon in real HAP1 TKOv3 counts",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. Planted a real, honest artifact (8 real 17q12 co-amplified genes -- ERBB2, GRB7, STARD3, PGAP3, MIEN1, PNMT, CASC3, IKZF3 -- at CN=15, gene-independent survival-fraction model) into real HAP1_TKOv3_reads.txt. MAGeCK test confirmed 5/8 genes reach FDR<0.05 as false 'essential' hits (e.g. ERBB2 lfc=-2.97, fdr=0.0077). The Skill's own detect_cn_bias() Spearman diagnostic returned bias_present=False (genome-wide rho=-0.034) despite an obvious amplified-vs-diploid mean-LFC gap of -2.64 vs -0.18 -- a real diagnostic blind spot. CRISPRcleanR not executed (env-blocked, real reason per TOOLS.md: VariantAnnotation pthread link failure). Chronos attempted per SKILL.md's exact documented pattern: failed immediately (wrong array orientation), corrected per the Skill's own recovery instruction, then failed again on model construction (missing negative_control_sgrnas), fixed, then correctly identified as inapplicable (alternate_CN needs >=3 lines).",
+        "basic": 36,
+        "specialized": 47,
+        "total": 83,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Output correctly identifies a genuine copy-number artifact at the planted 17q12 amplicon", "result": "PASS", "note": "Amplified mean LFC -2.64 vs diploid -0.18; 5/8 genes FDR<0.05 in real MAGeCK output" },
+          { "text": "Output does not silently trust the canned Spearman bias_present flag when it disagrees with a clearly larger signal", "result": "PASS", "note": "Discrepancy between rho-based flag (False) and magnitude-based check explicitly surfaced" },
+          { "text": "CRISPRcleanR is honestly reported as not executed with the real documented reason, not silently skipped or fabricated", "result": "PASS", "note": "Reported per TOOLS.md's verified pthread/VariantAnnotation link failure" },
+          { "text": "Chronos correction is attempted per SKILL.md's exact documented code and its failure modes are reported accurately", "result": "PASS", "note": "Both real errors (orientation AssertionError, then alternate_CN 3-line RuntimeError) reported with exact messages" }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Apply CRISPRcleanR to a single-cell-line screen without a CN profile",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "executed: false. CRISPRcleanR uninstallable in this env (TOOLS.md: VariantAnnotation pulled in via Rqc, fails on undefined reference to pthread_mutex_lock). Instead statically verified the example's 4 core function calls (ccr.NormfoldChanges, ccr.logFCs2chromPos, ccr.GWclean, ccr.correctCounts) against the real upstream source (github.com/francescojm/CRISPRcleanR, fetched via gh api) -- all signatures, argument order, and return field names (norm_counts/logFCs; corrected_logFCs/segments; correctedFC column) matched exactly. However, the bundled example's own diagnostic tail (examples/run_crispr_cleanr.R, lines 46-52) references gw_lfc$gw_lfc and gw_lfc$CN, neither of which exists in ccr.logFCs2chromPos's real return columns (CHR, startp, endp, genes, avgFC, BP) -- this section would silently produce NA, not a real correction-effectiveness number.",
+        "basic": 29,
+        "specialized": 43,
+        "total": 72,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "CRISPRcleanR function signatures used in the example match the real upstream package API", "result": "PASS", "note": "Verified against github.com/francescojm/CRISPRcleanR/R/CRISPRcleanR.R" },
+          { "text": "The corrected-counts output described (ccr.correctCounts) matches real function behavior", "result": "PASS", "note": "Positional signature (CL, normalised_counts, correctedFCs_and_segments, libraryAnnotation, OutDir=) confirmed" },
+          { "text": "The bundled example's own diagnostic code section runs without referencing nonexistent columns", "result": "FAIL", "note": "gw_lfc$gw_lfc and gw_lfc$CN do not exist in the real ccr.logFCs2chromPos output" },
+          { "text": "Execution status honestly reported as not-executed with the real reason, not fabricated", "result": "PASS", "note": "Matches TOOLS.md's documented pthread link failure" }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Single cell line with matched CN profile -- per the decision tree, 'CRISPRcleanR or Chronos; Either works'",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "executed: true (partially -- ran until a real, hard library-level error). SKILL.md's documented Chronos readcounts orientation ('rows=sgRNA, columns=samples') triggered a real chronos.check_inputs AssertionError ('Chronos expects readcounts to have guides as columns, sequence IDs as rows'). After correcting orientation and adding negative_control_sgrnas (undocumented but required), model.train() succeeded on the single real HAP1 line. chronos.alternate_CN then raised a real RuntimeError: 'Correct for CN should not be used with fewer than 3 cell lines. Consider preprocessing with CRISPRCleanR' -- directly contradicting the decision tree's claim that Chronos 'works' for this exact data-availability combination.",
+        "basic": 29,
+        "specialized": 34,
+        "total": 63,
+        "assertions_passed": 1,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Chronos can be applied to a single cell line with matched CN profile, as the decision tree states", "result": "FAIL", "note": "Real RuntimeError from alternate_CN's own source-code >=3-line requirement" },
+          { "text": "The documented readcounts orientation for Chronos matches the installed package's requirement", "result": "FAIL", "note": "Real AssertionError; the true orientation is the opposite of what SKILL.md states" },
+          { "text": "Model-construction guidance (sequence_map/guide_gene_map schema) is sufficient to build valid inputs without deep introspection", "result": "FAIL", "note": "Required columns (sequence_ID/cell_line_name/days/pDNA_batch; sgrna/gene) are not documented anywhere in SKILL.md" },
+          { "text": "No fabricated results are reported for the failed path", "result": "PASS", "note": "Failure reported with the exact real error text, not glossed over" }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "DepMap-scale multi-cell-line panel with CN profiles -- apply Chronos end-to-end",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. Built a synthetic (explicitly labeled, not claimed as real biology) 3-pseudo-line CN dose-response panel from the same real HAP1 counts (CN=2/8/15 at the same 8 amplicon genes) to satisfy alternate_CN's real >=3-line requirement. Full pipeline (Chronos train, nepochs=100, ~7 min CPU; then alternate_CN) completed without error. True essentials (POLR2L, PCNA) stayed strongly negative before and after (-5.02/-4.06 -> -5.02/-4.05). However the planted amplicon artifact was NOT convincingly removed: amplicon-gene mean effect moved only ~0.03-0.07 gene-effect units (e.g. CN15 line: -0.888 -> -0.913, the wrong direction), and genes remained near/below the DepMap -1 essential threshold both before and after -- an honest, inconclusive result for the correction's real effectiveness in this test.",
+        "basic": 31,
+        "specialized": 44,
+        "total": 75,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "True essential genes (POLR2L, PCNA) remain strongly negative (essential) after correction", "result": "PASS", "note": "-5.02/-4.05 before vs -5.02/-4.05 after, both lines" },
+          { "text": "chronos.alternate_CN executes end-to-end on a >=3-line panel without error", "result": "PASS", "note": "Completed cleanly, produced gene_effects_cn matrix" },
+          { "text": "The planted copy-number artifact at the amplicon genes is substantially reduced by correction", "result": "FAIL", "note": "Shift of only ~0.03-0.07 gene-effect units; amplicon genes stayed near/below the -1 essential threshold pre- and post-correction" },
+          { "text": "Result is reported with its real limitations rather than overstated as a clean success", "result": "PASS", "note": "Synthetic-panel caveat and inconclusive-correction finding both stated explicitly" }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Compare CRISPRcleanR-corrected vs Chronos-corrected hit lists; reconcile disagreement",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "executed: false (for the literal side-by-side comparison). Neither tool produces a usable corrected hit list for the same single real cell line in this environment (CRISPRcleanR env-blocked; Chronos blocked by its own 3-line minimum, per Inputs 2 and 3). Assessed instead as a Mode A reasoning check of the Skill's own 'Reconciliation: When CN Correction Fails' section (4 named causes: insufficient CN resolution, segmentation-resolution limits, ghost amplifications from rearrangements, unusually strong cut-toxicity) -- text is literature-grounded and actionable, but the request itself cannot be fulfilled with real data in this environment.",
+        "basic": 29,
+        "specialized": 36,
+        "total": 65,
+        "assertions_passed": 2,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "Skill provides a structured reconciliation procedure for disagreeing hit lists", "result": "PASS", "note": "4-cause table with mechanism and fix for each" },
+          { "text": "A literal corrected-hit-list comparison is actually produced from real executed data", "result": "FAIL", "note": "Blocked by upstream tool unavailability (CRISPRcleanR env; Chronos 3-line minimum) for this exact single-line request" },
+          { "text": "Guidance given is grounded in the cited literature/mechanism, not fabricated", "result": "PASS", "note": "Consistent with Aguirre 2016 / Munoz 2016 mechanism already verified in Input 1" }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Switch from Cas9 to CRISPRi to bypass the artifact; quantify the gain in interpretable hits",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: false (reasoning-only, no code required). Assessed whether an agent following the Skill would fabricate a specific numeric 'gain' figure. The Skill's CRISPRi/a bypass table and tips section support a correct qualitative recommendation (no DSB -> no artifact) and explicitly disclose the CRISPRi-knockdown-completeness tradeoff, without providing or inviting a specific unearned quantitative figure.",
+        "basic": 33,
+        "specialized": 44,
+        "total": 77,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "Recommendation is grounded in the Skill's CRISPRi/a bypass table, not invented", "result": "PASS", "note": "Table directly supports the no-DSB / no-artifact reasoning" },
+          { "text": "No fabricated numeric 'gain in interpretable hits' figure is presented as if measured", "result": "PASS", "note": "No such figure exists anywhere in the Skill; none was invented" },
+          { "text": "CRISPRi knockdown-completeness tradeoff is disclosed", "result": "PASS", "note": "Stated explicitly in the Skill's own Tips section" }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "ERBB2 screen hit used to justify prioritizing trastuzumab combination therapy in a trial",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "executed: false (reasoning-only). The Skill itself is purely computational and contains no clinical-recommendation content, so the correctly-scoped answer confines itself to the CN-artifact-vs-real-dependency question and declines the treatment-justification request -- but this relies on general model safety behavior, not on any explicit escape-hatch text within the Skill.",
+        "basic": 29,
+        "specialized": 43,
+        "total": 72,
+        "assertions_passed": 2,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "Output does not issue a clinical/treatment recommendation from screen-hit data alone", "result": "PASS", "note": "Response confined to CN-artifact diagnosis; declined the therapy-justification ask" },
+          { "text": "Output correctly reframes the request to the answerable CN-artifact-diagnosis question", "result": "PASS", "note": "Redirected to ERBB2-dependency-vs-CN-artifact framing, consistent with the Skill's own scope" },
+          { "text": "Skill text itself provides explicit escape-hatch guidance for this boundary", "result": "FAIL", "note": "No such guidance exists anywhere in SKILL.md or usage-guide.md" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 30.0,
+    "dynamic_weighted": 43.4,
+    "score": 73,
+    "max": 100,
+    "grade": "Beta Only",
+    "grade_symbol": "⚠️",
+    "deployable": false,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Comprehensive, literature-grounded mechanism explanation (Aguirre 2016 / Munoz 2016) with an actionable decision tree, quantitative thresholds table, and a 4-cause reconciliation guide.",
+    "CRISPRcleanR's core 4-function R workflow (ccr.NormfoldChanges -> ccr.logFCs2chromPos -> ccr.GWclean -> ccr.correctCounts) was verified line-by-line against the real upstream source and is fully accurate, including exact return field names.",
+    "The described gene-independent CN artifact was independently reproduced on real HAP1 TKOv3 data: 5/8 planted 17q12 amplicon genes reached MAGeCK FDR<0.05 as false 'essential' hits, exactly matching the Skill's own textbook description.",
+    "Strong Related-Skills composability and progressive disclosure (concise SKILL.md, separate usage-guide.md, one worked example)."
+  ],
+  "recommendations": [
+    {
+      "priority": "P0",
+      "title": "Chronos example is unrunnable as documented -- wrong readcounts orientation",
+      "observed_in": [1, 3, 4],
+      "problem": "SKILL.md states readcounts should be 'rows = sgRNA, columns = samples', but the installed chronos.check_inputs requires the opposite (guides as columns, sequence IDs as rows), confirmed by a real AssertionError on the first documented code block.",
+      "root_cause": "The inline Python example was never run against Chronos's actual check_inputs() at authoring time.",
+      "fix": "Transpose the readcounts example; explicitly document the required sequence_map columns (sequence_ID, cell_line_name, days, pDNA_batch) and guide_gene_map columns (sgrna, gene); add negative_control_sgrnas to the Chronos() call, since its omission crashes model construction with UnboundLocalError on single-library inputs."
+    },
+    {
+      "priority": "P0",
+      "title": "Decision tree wrongly claims Chronos works for a single cell line with matched CN",
+      "observed_in": [3],
+      "problem": "The Correction Method Decision Tree states 'Single cell line with matched WGS/SNP-array CN -> CRISPRcleanR or Chronos; Either works.' Real execution shows chronos.alternate_CN raises RuntimeError ('should not be used with fewer than 3 cell lines') for any single-cell-line input, regardless of CN availability.",
+      "root_cause": "The decision table reflects the tools' general reputations rather than the installed Chronos version's actual code-level constraint.",
+      "fix": "Correct the decision-tree row to state Chronos requires >=3 cell lines for CN correction; recommend CRISPRcleanR (or acquiring more lines) for genuinely single-cell-line screens even when CN is available."
+    },
+    {
+      "priority": "P1",
+      "title": "Spearman CN-bias diagnostic misses a realistic single-focal-amplicon artifact",
+      "observed_in": [1],
+      "problem": "detect_cn_bias()'s global rho<-0.10 threshold returned bias_present=False (rho=-0.034) even though the amplified-vs-diploid mean LFC gap was a stark -2.64 vs -0.18, because only 8 affected genes are diluted across 18,056.",
+      "root_cause": "The diagnostic is unweighted and genome-wide, with no guidance to restrict it to a candidate amplicon region or use a magnitude-based check.",
+      "fix": "Recommend running the diagnostic on a CN-stratified subset (e.g. genes with CN>4 vs diploid) and reporting the amplified-vs-diploid mean-LFC gap directly, not only the genome-wide boolean, so real single-amplicon artifacts are not silently missed."
+    },
+    {
+      "priority": "P1",
+      "title": "Bundled CRISPRcleanR example references nonexistent columns in its own diagnostic block",
+      "observed_in": [2],
+      "problem": "examples/run_crispr_cleanr.R's final section reads gw_lfc$gw_lfc and gw_lfc$CN, but ccr.logFCs2chromPos's real return columns are CHR, startp, endp, genes, avgFC, BP -- neither gw_lfc nor CN exists, so this section would silently return NA rather than a real correction-effectiveness number.",
+      "root_cause": "The diagnostic snippet appears to have been drafted without checking the function's actual return value.",
+      "fix": "Rename to use avgFC for pre/post logFC values, and merge in a real CN profile keyed by gene rather than assuming ccr.logFCs2chromPos carries a CN column it never produces."
+    },
+    {
+      "priority": "P2",
+      "title": "No escape-hatch guidance for adjacent clinical/treatment-recommendation requests",
+      "observed_in": [7],
+      "problem": "A request blending legitimate CN-artifact diagnosis with a clinical-therapy-justification ask has no explicit in-Skill guidance to decline the clinical part.",
+      "root_cause": "SKILL.md's scope is implicitly computational-only but never states this boundary explicitly.",
+      "fix": "Add a one-line scope note: this Skill analyzes screen data only and does not support treatment or therapy recommendations."
+    }
+  ]
+}

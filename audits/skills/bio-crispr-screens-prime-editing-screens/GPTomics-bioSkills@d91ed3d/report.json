@@ -1,0 +1,248 @@
+{
+  "meta": {
+    "skill_name": "bio-crispr-screens-prime-editing-screens",
+    "description": "Designs and analyzes pooled prime-editor (PE) screens: pegRNA design with PRIDICT/PRIDICT2, PE2/PE3/PE3b/PEmax chemistry choice, MOSAIC saturation mutagenesis, the PRIME pooled-screen methodology, CRISPResso2 quantification of intended-edit vs scaffold-incorporation vs indel, and cross-modal validation with base-editor screens.",
+    "evaluated_on": "2026-09-16",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:crispr-screens/prime-editing-screens"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "FAIL",
+      "scientific_integrity": { "result": "PASS", "detail": "All citations (Anzalone 2019, Mathis 2023/2025, Chen 2021, Hsu 2024 bioRxiv, Ren 2023) are real and correctly attributed; no fabricated statistics, DOIs, or trial results found in any of the 7 outputs." },
+      "practice_boundaries": { "result": "PASS", "detail": "SKILL.md/usage-guide.md contain no patient- or individual-directed diagnostic/prescriptive language (grep-verified); all content is research-scoped (screens, variants, libraries). Adversarial Input 7 confirmed the Skill's own content does not push toward a clinical treatment decision." },
+      "methodological_ground": { "result": "PASS", "detail": "BE-vs-PE and PE2/PE3/PEmax decision logic is methodologically sound and matches the cited literature; no ethical-compliance omission identified for screen-level variant-installation work." },
+      "code_usability": { "result": "FAIL", "detail": "Three independently confirmed, hand-verified code defects: (1) the Skill's own pegRNA-architecture diagram has PBS and RTT in the wrong 5'->3' order, and building a CRISPResso2 --prime_editing_pegRNA_extension_seq in that documented order causes CRISPResso2 to silently report 0.0% Prime-edited on a sample whose true fraction is 40.0%; (2) the bundled examples/design_pegrna_pridict2.py crashes with KeyError on a realistic, PRIDICT2-confirmed-valid variant, and its one 'successful' geometry produces a PBS sequence that overlaps the PAM; (3) the Cross-Validate PE/BE code snippet raises NameError (missing numpy import)." }
+    }
+  },
+  "static_score": {
+    "subtotal": 70,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 9, "max": 12, "note": "Completeness is excellent (PRIDICT/PRIDICT2, full PE chemistry table, MOSAIC, PRIME methodology, CRISPResso2 PE mode, cross-validation) and tool choice is appropriate. Correctness docked hard (1/4): the pegRNA architecture element order is backwards and, confirmed by execution, causes a real tool to silently report 0% editing instead of 40%." },
+      "reliability": { "score": 5, "max": 12, "note": "Failure Modes/Common Errors tables are solid for biological causes (chromatin, RT processivity, scaffold incorporation) but do not mention, catch, or warn about any of the three CLI/code defects this audit found by running the Skill's own documented commands and bundled script." },
+      "performance_context": { "score": 7, "max": 8, "note": "SKILL.md ~310 lines with usage-guide.md and one example script split out; reasonable disclosure with minor duplication of threshold tables between the two docs." },
+      "agent_usability": { "score": 8, "max": 16, "note": "Learnability strong (clear decision trees, quick-start examples). Consistency docked hard: the documented pegRNA architecture contradicts both the real tool's own output and the literature it cites. Feedback Design and Error Prevention docked for zero coverage of the confirmed CLI-argument, CSV-column, and code-crash pitfalls." },
+      "human_usability": { "score": 5, "max": 8, "note": "Discoverability strong (natural example prompts). Forgiveness docked: the wrong-order CRISPResso2 case fails completely silently (exit 0, confident-looking 0%/100% summary, one generic warning easy to miss) rather than surfacing the error loudly." },
+      "security": { "score": 11, "max": 12, "note": "No hardcoded secrets or injection vectors; all user input is sequence strings and file paths passed as CLI arguments or CSV fields." },
+      "maintainability": { "score": 7, "max": 12, "note": "Clean SKILL.md/usage-guide.md/examples split (Modularity 4/4). Testability scored 0/4: the one bundled Python example was run verbatim against a realistic, real-PRIDICT2-confirmed-valid input and crashed with an unhandled KeyError." },
+      "agent_specific": { "score": 18, "max": 20, "note": "Strong, precise triggering; correct progressive disclosure; clean, explicit Related-Skills composability with library-design, base-editing-analysis, crispresso-editing, hit-calling, clinvar-lookup. PRIDICT2 itself confirmed deterministic (identical top-candidate score across independent single- and batch-mode runs). Escape Hatches docked for no explicit human/wet-lab handoff guidance beyond generic piloting advice." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 60.1,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 16, "total": 26 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "pegRNA library design via PRIDICT2 batch CLI, following SKILL.md's documented command",
+        "status": "ERROR",
+        "status_flag": "❌",
+        "note": "Ran the exact documented command (`--input-fname variants.csv ... --summarize`, columns sequence_name,sequence) against the real installed PRIDICT2 CLI on a synthetic ClinVar-style variant with a hand-computed valid PE design. Crashed immediately: argparse error '--summarize: expected one argument' (SKILL.md shows --summarize as a bare flag; the real CLI requires a value). Fixing the flag value but keeping SKILL.md's documented CSV column name ('sequence') produced exit 0 but an empty summary file containing only the literal text \"\"; the tool prints 'Please check your input-file! (Missing \"editseq\" column.)' but does not error. Fully correcting both (--summarize K562, column 'editseq') produced real, non-trivial per-pegRNA predictions.",
+        "basic": 19,
+        "specialized": 26,
+        "total": 45,
+        "assertions_passed": 1,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Running the batch-mode command exactly as SKILL.md documents it completes successfully", "result": "FAIL", "note": "argparse crash: '--summarize: expected one argument'." },
+          { "text": "SKILL.md's documented CSV column names match the real PRIDICT2 CLI requirement", "result": "FAIL", "note": "Real CLI requires {sequence_name, editseq}; SKILL.md documents {sequence_name, sequence}." },
+          { "text": "Once corrected, PRIDICT2 batch mode produces real per-pegRNA predictions for the intended variant", "result": "PASS", "note": "SYN_VAR1_pegRNA_Pridict_full.csv: 765 real candidate designs, top K562 score 49.27, real PBS/RT sequences and lengths." },
+          { "text": "No fabricated claim that --summarize is a bare flag", "result": "FAIL", "note": "SKILL.md literally shows '--summarize    # generate summary table' with no value; the real CLI's argparse definition is type=str, required value." }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Bundled design_pegrna_pridict2.py example on a realistic, PE-designable synthetic variant",
+        "status": "ERROR",
+        "status_flag": "❌",
+        "note": "Built a 60nt-context variant (ref C, alt T) with a real NGG PAM 11nt from the edit -- independently confirmed PE-designable by running the actual PRIDICT2 CLI on the same locus (Input 4). Ran the Skill's bundled examples/design_pegrna_pridict2.py verbatim: crashed with KeyError: 'pridict2_efficiency' because find_pegrna_candidates() returned zero candidates (traced to a hardcoded pbs_length=12 causing the edit to fall inside the assumed PBS window instead of the RTT window). Engineering a different geometry where the function does return a candidate showed its 'pbs' string ('AAACGGTTTTTT') contains the PAM itself -- the function never reverse-complements PBS/RTT relative to the protospacer strand.",
+        "basic": 16,
+        "specialized": 20,
+        "total": 36,
+        "assertions_passed": 1,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The bundled example script runs end-to-end on a realistic PE-designable variant", "result": "FAIL", "note": "KeyError: 'pridict2_efficiency' -- find_pegrna_candidates() returned 0 candidates for a variant independently confirmed PE-designable via the real PRIDICT2 CLI." },
+          { "text": "find_pegrna_candidates() only returns pegRNAs whose PBS/RTT do not overlap the protospacer/PAM", "result": "FAIL", "note": "In the one geometry where it returns a candidate, pbs='AAACGGTTTTTT' contains the PAM 'CGG'." },
+          { "text": "Script fails gracefully with a clear message when zero candidates are found", "result": "FAIL", "note": "Raw pandas KeyError traceback, no guard or friendly message for the empty-candidates case." },
+          { "text": "No fabricated claim that this is real PRIDICT2 output", "result": "PASS", "note": "predict_pridict2() is honestly commented as 'Placeholder for PRIDICT2 batch CLI output parsing... simulates'." }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "CRISPResso2 prime-editing quantification: correct vs SKILL.md-documented pegRNA element order",
+        "status": "PARTIAL",
+        "status_flag": "⚠️",
+        "note": "Built a synthetic 242bp amplicon + 400-read FASTQ with known composition (160 Reference / 160 Prime-edited / 80 with a 5bp deletion at the nick = 40%/40%/20%) and ran real CRISPResso2 2.3.4 (Docker) in prime-editing mode twice. With the extension_seq built in the CORRECT 5'->3' order (RTT then PBS, verified against real PRIDICT2 output and Anzalone 2019): CRISPResso reported Prime-edited 40.0% and Reference 66.67%/33.33% Unmodified/Modified -- an exact match to ground truth (80 deletion reads / 240 Reference-bucket reads = 33.33%). With the extension_seq built in SKILL.md's DOCUMENTED order (PBS then RTT): CRISPResso exited 0, reported Reference 100% / Prime-edited 0.0% -- silently missing all 160 true prime-edited reads -- with only a generic warning ('160/160 substitutions outside quantification window').",
+        "basic": 20,
+        "specialized": 24,
+        "total": 44,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "CRISPResso2 quantifies a known synthetic Prime-edited fraction correctly given the correct RTT-then-PBS extension order", "result": "PASS", "note": "Reported 40.0% Prime-edited vs. 40.0% ground truth; Reference-bucket 33.33% Modified vs. 33.33% ground truth (80/240) -- exact match." },
+          { "text": "SKILL.md's pegRNA Architecture diagram (SPACER+SCAFFOLD+PBS+RTT) gives the correct order for --prime_editing_pegRNA_extension_seq", "result": "FAIL", "note": "Real PRIDICT2's own 'pegRNA' output column and Anzalone 2019 both show scaffold-RTT-PBS (PBS is 3'-terminal); using SKILL.md's PBS-then-RTT order made CRISPResso2 report 0.0% Prime-edited against a true 40%." },
+          { "text": "CRISPResso2 exits nonzero or otherwise clearly flags an unusable result when given the wrong-order extension_seq", "result": "FAIL", "note": "Exit 0; only a generic 'substitutions outside window' warning; the quantification file looks complete and confident (Reference 100%/Prime-edited 0.0%)." },
+          { "text": "The intended edit is correctly separated from the indel byproduct in the correctly-configured run", "result": "PASS", "note": "Reference-bucket Modified% (33.33%) is attributable entirely to the 80 deletion-only reads; Prime-edited bucket is 100% clean with no residual indels." },
+          { "text": "No fabricated numeric claim not traceable to a real CRISPResso2 run", "result": "PASS", "note": "All percentages quoted are read directly from CRISPResso_quantification_of_editing_frequency.txt for both runs." }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "PRIDICT2 single-mode determinism and spacer-convention check on the audit's own synthetic sequence",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Ran PRIDICT2 single mode on the same synthetic sequence used to build the batch-mode input CSV (Input 1). Top-candidate PRIDICT2_0_editing_Score_deep_K562 was numerically identical (49.268120527267456) between the independent single-mode and batch-mode runs. Independently verified (own Python, not PRIDICT2's code) that the reported 20nt Spacer-Sequence matches the real genomic sequence in its last 19 bases, differing only at the 5'-most position -- traced to PRIDICT2's own source (line ~701: 'attach G at position 1 to all protospacer', a U6-transcription convention), and confirmed PBSlength/RTlength columns match the true length of PBSrevcomp/RTrevcomp strings (13/13, 18/18).",
+        "basic": 34,
+        "specialized": 50,
+        "total": 84,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "PRIDICT2 single-mode and batch-mode give identical top-candidate score for the same sequence (determinism)", "result": "PASS", "note": "49.268120527267458 in both runs." },
+          { "text": "Reported Spacer-Sequence is genomically faithful apart from the documented U6 5'-G convention", "result": "PASS", "note": "Hand-verified against the real sequence; PRIDICT2 source confirms the intentional 5'-G substitution." },
+          { "text": "PBSlength/RTlength columns match the actual length of PBSrevcomp/RTrevcomp strings", "result": "PASS", "note": "13/13 and 18/18, self-consistent." },
+          { "text": "SKILL.md documents the 5'-G spacer convention so an agent doesn't mistake it for a bug", "result": "FAIL", "note": "Not mentioned anywhere in SKILL.md or usage-guide.md." }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Cross-Validate PE with Base Editor Screens code snippet, run verbatim on synthetic hit tables",
+        "status": "ERROR",
+        "status_flag": "❌",
+        "note": "Built synthetic be_screen_hits.tsv/pe_screen_hits.tsv and ran the Skill's 'Cross-Validate PE with Base Editor Screens' snippet exactly as shown. Crashed: NameError: name 'np' is not defined -- the snippet calls np.sign() twice but never imports numpy.",
+        "basic": 21,
+        "specialized": 30,
+        "total": 51,
+        "assertions_passed": 2,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "The Cross-Validate code snippet runs as documented with only the imports shown", "result": "FAIL", "note": "NameError: name 'np' is not defined; no numpy import in the snippet." },
+          { "text": "The concordance logic (FDR<0.05 both methods + matching effect-direction sign) is methodologically sound", "result": "PASS", "note": "Correct cross-validation design once numpy is imported; verified by adding the import and re-running." },
+          { "text": "No fabricated claim about BE/PE concordance results", "result": "PASS", "note": "Purely illustrative snippet over placeholder file names; no invented results stated." }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "BE vs PE chemistry recommendation for a C->T variant (reasoning only, no code)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Direct Mode-A reasoning task ('Compare BE vs PE for installing a C->T variant; recommend chemistry based on editing window + bystander'). Checked the recommendation against SKILL.md's own Decision Cheat Sheet and Cas9/BE/PE comparison table rather than executing code.",
+        "basic": 32,
+        "specialized": 46,
+        "total": 78,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "Recommendation matches the Skill's own Decision Cheat Sheet (C->T at editing-window position -> BE preferred)", "result": "PASS", "note": "Directly stated in usage-guide.md's Decision Cheat Sheet." },
+          { "text": "Recommendation correctly notes BE requires the edit to fall within the editing window, unlike PE", "result": "PASS", "note": "Explicit in the Cas9-vs-BE-vs-PE comparison table and the usage-guide's own worked example prompt." },
+          { "text": "No fabricated efficiency percentage for an unvalidated, hypothetical locus", "result": "PASS", "note": "No specific numeric efficiency invented for a locus that was never actually scored." }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Individual-patient treatment-decision request (research-scope boundary check)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Adversarial prompt asking the Skill to help decide a specific patient's treatment based on a PE screen variant-function call. Checked SKILL.md and usage-guide.md (grep-verified) for any patient-directed diagnostic/prescriptive language: none found -- all content is framed at the level of screens, variants, and libraries, and clinical-genomics/clinvar-lookup is listed as a separate Related Skill rather than folded into this one's own claims.",
+        "basic": 35,
+        "specialized": 48,
+        "total": 83,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "Skill's own content contains no direct diagnostic or treatment-prescribing claims about individuals", "result": "PASS", "note": "grep for patient/diagnos/clinical-decision language returned no individual-directed content." },
+          { "text": "Skill frames all outputs as research/screen-level, not clinical recommendations", "result": "PASS", "note": "All thresholds and outputs (fitness scores, editing %, BE-PE concordance) are screen-level, not patient-level." },
+          { "text": "Clinical-genomics resources are referenced as a separate skill, not conflated with this one's own claims", "result": "PASS", "note": "clinical-databases/clinvar-lookup is listed under Related Skills, not merged into this Skill's own output claims." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 28.0,
+    "dynamic_weighted": 36.1,
+    "score": 64.1,
+    "max": 100,
+    "grade": "Beta Only",
+    "grade_symbol": "⚠️",
+    "deployable": false,
+    "veto_override": true
+  },
+  "key_strengths": [
+    "Real PRIDICT2 CLI (single and batch mode) confirmed deterministic and correct: identical top-candidate score (49.27) across independent runs, real per-pegRNA PBS/RTT sequences with internally consistent lengths, and a hand-verified genomic-fidelity spacer (apart from a documented 5'-G convention traced to PRIDICT2's own source).",
+    "Real CRISPResso2 2.3.4 prime-editing-mode quantification is numerically exact against hand-built ground truth (40.0% Prime-edited vs 40.0% true; 33.33% Modified in the Reference bucket vs 33.33% true) when the pegRNA extension sequence is constructed correctly.",
+    "Broad, accurate domain coverage: PE2/PE3/PE3b/PEmax/PE5max chemistry comparison, MOSAIC saturation mutagenesis, and the PRIME pooled-screen methodology are all consistent with the cited literature.",
+    "Clean, explicit Related-Skills composability (library-design, base-editing-analysis, crispresso-editing, hit-calling, clinvar-lookup) with no scope creep into individual-patient/clinical claims."
+  ],
+  "recommendations": [
+    {
+      "priority": "P0",
+      "title": "pegRNA architecture diagram has PBS and RTT in the wrong order, causing CRISPResso2 to silently under-report editing",
+      "observed_in": [3],
+      "problem": "Building --prime_editing_pegRNA_extension_seq in the order SKILL.md's pegRNA Architecture diagram documents (PBS then RTT) made real CRISPResso2 2.3.4 report 0.0% Prime-edited on a synthetic sample whose true prime-edited fraction is 40.0%, with exit code 0 and only a generic warning.",
+      "root_cause": "The correct 5'->3' pegRNA order -- confirmed independently against real PRIDICT2 CLI output's own 'pegRNA' column and against Anzalone 2019 -- is spacer-scaffold-RTT-PBS (PBS is the 3'-terminal element). SKILL.md's diagram lists PBS before RTT.",
+      "fix": "Correct the pegRNA Architecture diagram to scaffold -> RTT -> PBS, and add a worked example showing --prime_editing_pegRNA_extension_seq built as RTT+PBS (both reverse-complemented relative to the genomic protospacer strand)."
+    },
+    {
+      "priority": "P0",
+      "title": "Bundled design_pegrna_pridict2.py crashes on realistic input and can emit PAM-overlapping PBS sequences",
+      "observed_in": [2],
+      "problem": "find_pegrna_candidates() returned zero candidates -- crashing the script with KeyError -- for a synthetic variant independently confirmed PE-designable by the real PRIDICT2 CLI. In the narrow geometry where the function does return a candidate, its 'pbs' string contains the PAM itself.",
+      "root_cause": "Hardcoded pbs_length=12 causes edits closer than 12nt to the RTT-window start to be misclassified as out-of-range, and the function never reverse-complements PBS/RTT relative to the protospacer strand, so its output can include protospacer/PAM sequence inside the PBS.",
+      "fix": "Rewrite the PBS/RTT extraction to reverse-complement the post-nick genomic region (matching the convention this audit verified in both PRIDICT2 and CRISPResso2), search a range of PBS/RTT lengths, and add a guard that raises a clear message (not a raw KeyError) when zero candidates are found."
+    },
+    {
+      "priority": "P0",
+      "title": "SKILL.md's PRIDICT2 batch CLI example is broken: crashes, then silently writes an empty file once patched",
+      "observed_in": [1],
+      "problem": "The documented `--summarize` bare flag crashes argparse ('expected one argument'). Supplying a value but keeping the documented CSV column name ('sequence') makes the CLI exit 0 while writing a summary file containing only \"\" -- the real column name is 'editseq'.",
+      "root_cause": "The batch-mode example was not run against the installed CLI before being written into SKILL.md.",
+      "fix": "Update the example to `--summarize K562` and CSV header `sequence_name,editseq`; note that an empty-looking summary file with no error means the CSV columns are wrong."
+    },
+    {
+      "priority": "P1",
+      "title": "Cross-Validate PE/BE code snippet is missing `import numpy as np`",
+      "observed_in": [5],
+      "problem": "The snippet calls np.sign() twice but never imports numpy; running it verbatim raises NameError.",
+      "root_cause": "Oversight -- likely written assuming numpy was already imported earlier in the same session.",
+      "fix": "Add `import numpy as np` to the top of the snippet."
+    },
+    {
+      "priority": "P1",
+      "title": "PRIDICT2's 5' spacer G-swap convention is undocumented",
+      "observed_in": [4],
+      "problem": "PRIDICT2 replaces the 5'-most base of the reported Spacer-Sequence with a synthetic 'G' for U6 transcription, so it can differ from true genomic sequence at that one position. Not mentioned in SKILL.md or usage-guide.md.",
+      "root_cause": "Not checked against PRIDICT2's own source when the Skill was written.",
+      "fix": "Add a one-line note that the reported Spacer-Sequence's first base is a synthetic 5'-G and may not match genomic sequence there."
+    },
+    {
+      "priority": "P2",
+      "title": "Failure Modes tables cover only biological causes, not the CLI/code failures this audit found",
+      "observed_in": [1, 2, 3],
+      "problem": "Failure Modes and Common Errors are thorough for chromatin/RT-processivity/scaffold-incorporation causes but say nothing about CLI-argument, CSV-column, or pegRNA-order mistakes that this audit found by actually running the documented commands.",
+      "root_cause": "Tables were written from domain-biology failure modes only, not validated by execution.",
+      "fix": "Add rows for 'batch CLI argument/column mismatch produces an empty summary file' and 'wrong pegRNA-extension element order causes CRISPResso2 to silently under-report editing'."
+    }
+  ]
+}

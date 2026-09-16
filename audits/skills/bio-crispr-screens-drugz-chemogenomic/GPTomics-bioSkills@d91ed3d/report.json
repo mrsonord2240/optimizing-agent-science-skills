@@ -1,0 +1,196 @@
+{
+  "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:crispr-screens/drugz-chemogenomic",
+  "meta": {
+    "skill_name": "bio-crispr-screens-drugz-chemogenomic",
+    "description": "Analyzes CRISPR drug-modifier (chemogenomic) screens with drugZ (Colic et al. 2019 Genome Med), a bidirectional Z-score method identifying synthetic-lethal sensitizing genes and resistance-conferring suppressor genes from vehicle vs drug comparisons.",
+    "evaluated_on": "2026-09-16",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "B",
+    "complexity": "Moderate",
+    "n_inputs": 5
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "Citations (Colic et al. 2019 Genome Med, Olivieri et al. 2020 Cell, Behan et al. 2019 Nature) are real papers matching drugZ's actual provenance; no fabricated DOI/PMID/statistics detected across any of the 5 outputs." },
+      "practice_boundaries": { "result": "PASS", "detail": "Purely a screen-analysis research tool; no diagnostic, prescriptive, or individual-patient claims in any output." },
+      "methodological_ground": { "result": "PASS", "detail": "Core method description (bidirectional Z-score, vehicle-anchored not Day-0) was empirically verified correct on real+synthetic data across all 5 inputs; no principled statistical fallacy found." },
+      "code_usability": { "result": "PASS", "detail": "All CLI invocations documented in SKILL.md/usage-guide ran without syntax errors or missing dependencies (patched drugZ, 5/5 executions). Input 2's bundled essentials-exclusion example has a serious silent logic bug (0/684 genes actually excluded) but does not meet M4's strict 'unrunnable' bar -- it exits 0 with no exception. Scored heavily under the Data Analysis specialized rubric instead and flagged as a P0 recommendation." }
+    }
+  },
+  "static_score": {
+    "subtotal": 75,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 10, "max": 12, "note": "Completeness and appropriateness strong (standard run, dose designs, essentials exclusion, MAGeCK MLE comparison, failure-mode table all covered and correctly scoped to drugZ's real use case). Correctness docked: the only executable example for essentials-exclusion (examples/run_drugz.py Step 2) is silently broken -- verified to remove 0/684 genes." },
+      "reliability": { "score": 4, "max": 12, "note": "No guidance covers the half_window_size/total-guide-count crash (Input 5, confirmed IndexError even at half_window_size=2 on a 9-guide table), and the essentials-exclusion no-op (Input 2) produces zero signal that anything failed -- exits 0, writes a complete-looking file." },
+      "performance_context": { "score": 6, "max": 8, "note": "SKILL.md ~254 lines with a separate usage-guide and one example script; reasonable progressive disclosure, workflow is linear with no redundant steps." },
+      "agent_usability": { "score": 13, "max": 16, "note": "Terminology and output-column documentation are exact matches to real drugZ output (verified). Error Prevention docked: the Failure Modes table covers Day-0-vs-vehicle and essentials-inflating-null well (both empirically confirmed real) but omits the half_window_size crash entirely, and does not flag that its own bundled -r example is broken." },
+      "human_usability": { "score": 6, "max": 8, "note": "Natural-language trigger phrasing in usage-guide's Quick Start / Example Prompts is strong. Forgiveness scored under the Category-3 override (strict validation is a data-integrity guarantee, not a defect); scored down because there is no validation step at all before the small-library crash, not because strictness itself is penalized." },
+      "security": { "score": 9, "max": 12, "note": "No credentials or PHI involved. Input Validation docked: examples/run_drugz.py never validates that -r's gene list actually parsed into real gene symbols, which is exactly how the silent no-op in Input 2 goes undetected." },
+      "maintainability": { "score": 9, "max": 12, "note": "Clean SKILL.md/usage-guide/examples split. Testability docked: the essentials-exclusion example has no self-check (e.g. comparing output row/gene counts) that would have caught its own bug." },
+      "agent_specific": { "score": 18, "max": 20, "note": "Precise, well-differentiated trigger description vs MAGeCK/BAGEL2; explicit Related Skills cross-references; deterministic/idempotent CLI. Escape Hatches docked: no guidance on what to do when a run crashes or when replicate Pearson is below the stated 0.85 threshold beyond listing it as a checklist item." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 70.6,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 10, "total": 20 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Standard PARPi-style vehicle vs drug run on synthetic HAP1 TKOv3-derived counts",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. Ran the SKILL.md-documented CLI verbatim (python drugz.py -i ... -c Veh_r1,Veh_r2,Veh_r3 -x Drug_r1,Drug_r2,Drug_r3 -p 5) against a synthetic drug-vs-vehicle count table built from real HAP1_TKOv3_reads.txt with 6 planted sensitizers + 6 planted suppressors + 1 planted drug-target-paradox gene as ground truth. All 13 planted genes recovered at ranks 1-6/1-7 in their correct direction; 0 NaN in 18,054 genes (confirms the tooling agent's pandas-CoW patch holds).",
+        "basic": 38,
+        "specialized": 55,
+        "total": 93,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Output contains the documented columns (GENE, sumZ, normZ, fdr_synth, fdr_supp, etc.)", "result": "PASS", "note": "All 10 documented columns present, exact names." },
+          { "text": "Planted ground-truth sensitizer/suppressor genes are recovered as the top hits", "result": "PASS", "note": "6/6 sensitizers at rank_synth 1-6; 6/6 suppressors at rank_supp 1-6; drug-target paradox gene at rank_supp 7, all fdr<1e-150." },
+          { "text": "No NaN/garbage values in normZ or FDR columns (pandas Copy-on-Write regression check)", "result": "PASS", "note": "0/18054 genes NaN in normZ." },
+          { "text": "Command matches SKILL.md's documented CLI syntax exactly, unmodified", "result": "PASS", "note": "Ran the exact -i/-o/-c/-x/-p flag pattern from the SKILL.md Quick Reference." }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Excluding CEGv2 essentials from the null distribution via -r (SKILL.md's own worked example)",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "executed: true. Ran examples/run_drugz.py's Step 1+2 logic verbatim (curl-equivalent CEGv2 file already cached; join lines with commas; pass to -r) then re-ran with a correctly-parsed gene list for comparison.",
+        "basic": 18,
+        "specialized": 24,
+        "total": 42,
+        "assertions_passed": 0,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The -r essentials-exclusion example actually excludes the named genes from the analysis", "result": "FAIL", "note": "0/684 genes matched -- the joined string contains raw tab-separated tokens like 'AARS\\tHGNC:20\\t16' which never match a bare gene symbol via isin()." },
+          { "text": "drugZ output changes meaningfully between the standard run and the essentials-excluded run", "result": "FAIL", "note": "Byte-for-byte identical normZ values (max |diff| = 0.0) between Input 1's output and the as-documented -r run." },
+          { "text": "The example correctly parses the real CEGv2.txt format it just downloaded", "result": "FAIL", "note": "CEGv2.txt is tab-separated with a header (GENE, HGNC_ID, ENTREZ_ID, 685 lines incl. header); the example treats each raw line as a single gene name." },
+          { "text": "No exception or error is silently swallowed without any signal to the user", "result": "FAIL", "note": "drugz.py exits 0 and writes a complete-looking drugz_ceg_excluded.txt; nothing indicates 0 genes were removed." }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Variant B",
+        "label": "Multi-dose consistency check (mid-dose vs high-dose, both vs vehicle)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. SKILL.md's dose-loop code is commented-out pseudocode, so a full working per-dose implementation was written to test the pattern: a synthetic mid-dose arm (geometric blend between vehicle and the Input-1 drug arm) was run through drugZ and compared against the high-dose (Input 1) result.",
+        "basic": 37,
+        "specialized": 46,
+        "total": 83,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "SKILL.md/usage-guide provide executable (not just pseudocode) code for multi-dose drugZ analysis", "result": "FAIL", "note": "The only dose-loop code in the Skill (usage-guide 'Drug-Dose and Time-Course Designs') is a commented-out sketch, not runnable as-is." },
+          { "text": "Per-dose drugZ runs against the same vehicle control show internally consistent direction of effect for true hits", "result": "PASS", "note": "All 6 sensitizers and 6 suppressors kept the same sign at mid-dose, at ~85-88% of the high-dose |normZ| magnitude." },
+          { "text": "Guidance correctly states drugZ does not natively model dose and recommends per-dose + consistency aggregation", "result": "PASS", "note": "Matches usage-guide's stated limitation and recommended workaround exactly." },
+          { "text": "A stated numeric rule distinguishes genuinely dose-responsive hits from noise", "result": "FAIL", "note": "SKILL.md only says 'consistent direction'; no minimum correlation, rank-overlap, or magnitude-ratio threshold is given." }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Edge",
+        "label": "Diagnosing a 'no sensitizers found' report caused by comparing Day-0 instead of vehicle",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. Ran drugZ with T0 as control (-c T0 -x Drug_r1,Drug_r2,Drug_r3 -unpaired) on the same planted drug arm used in Input 1, to test the exact failure mode described in SKILL.md's Failure Modes section.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Skill correctly identifies vehicle (not Day-0) as the required control", "result": "PASS", "note": "SKILL.md and usage-guide both state this as the single most common silent failure." },
+          { "text": "Day-0 vs Drug measurably masks true drug-specific hits relative to Vehicle vs Drug", "result": "PASS", "note": "All 6 planted sensitizers dropped from fdr_synth<1e-200/rank 1-6 (Input 1) to fdr_synth 0.10-0.26/rank ~700-1060 (Day-0 comparison)." },
+          { "text": "Stated mechanism (proliferation effects conflated with drug effects) matches the empirically observed failure", "result": "PASS", "note": "509 genes crossed fdr_synth<0.05 under Day-0-vs-Drug (proliferation drift noise) vs only 6 true hits under Vehicle-vs-Drug." },
+          { "text": "Fix guidance (re-run with vehicle) is actionable and resolves the issue", "result": "PASS", "note": "Confirmed via Input 1, which is exactly that re-run and recovers all 6 planted hits cleanly." }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Running drugZ on a small/pilot-scale count table (bundled-style 9-guide demo)",
+        "status": "ERROR",
+        "status_flag": "❌",
+        "note": "executed: true. Ran drugz.py on the cached hart-lab drugz_demo_olaparib_counts.txt (9 sgRNAs) with correct sample-column names, then retried at --half_window_size 2, then confirmed the same half_window_size works fine on a 200-guide synthetic subset.",
+        "basic": 17,
+        "specialized": 23,
+        "total": 40,
+        "assertions_passed": 0,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "SKILL.md documents the relationship between total guide count and --half_window_size needed to avoid a crash", "result": "FAIL", "note": "SKILL.md only documents a 4-6 sgRNA/gene minimum for stable per-gene Z, not a total-library-size requirement for the sliding window." },
+          { "text": "Running drugZ on a small demo-style count table fails with a documented, actionable error", "result": "FAIL", "note": "Raw uncaught 'IndexError: single positional indexer is out-of-bounds' with no SKILL.md guidance to interpret or avoid it." },
+          { "text": "Reducing --half_window_size allows small libraries to run", "result": "FAIL", "note": "Still IndexErrors on the 9-guide table even at --half_window_size 2; confirmed working at --half_window_size 50 only once the guide count was raised to 200." },
+          { "text": "Skill warns that small/pilot-style count files are unsuitable for a real drugZ run", "result": "FAIL", "note": "No such warning anywhere in SKILL.md or usage-guide; TOOLS.md (tooling agent's own notes, not the Skill) is the only place this is flagged." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 30.0,
+    "dynamic_weighted": 42.4,
+    "score": 72,
+    "max": 100,
+    "grade": "Beta Only",
+    "grade_symbol": "⚠️",
+    "deployable": false,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Canonical vehicle-vs-drug CLI invocation ran unmodified from SKILL.md and recovered 12/12 planted synthetic sensitizer+suppressor genes at ranks 1-6 each, with zero NaN/garbage values across 18,054 genes -- confirms both the patched drugZ CoW fix and the Skill's documented workflow work correctly end to end.",
+    "The Skill's central warning (compare drug to vehicle, never Day-0) is not just plausible advice: substituting Day-0 for vehicle empirically masked all 6 true hits (dropping them from rank 1-6 to rank ~700-1060) and produced 509 spurious 'significant' genes from proliferation drift alone.",
+    "Dose-response guidance (per-dose drugZ + consistency check) is methodologically correct and reproduces the expected weaker-but-same-direction signal at a simulated mid-dose.",
+    "Honest, literature-grounded positioning against MAGeCK MLE/RRA (real citations: Colic 2019, Olivieri 2020, Behan 2019) with a concrete decision table rather than marketing claims."
+  ],
+  "recommendations": [
+    {
+      "priority": "P0",
+      "title": "Bundled essentials-exclusion example silently excludes zero genes",
+      "observed_in": [2],
+      "problem": "examples/run_drugz.py's own Step 2 downloads the real CEGv2.txt (tab-separated, 3 columns, header row) and joins its raw lines with commas, then passes that string to drugz.py -r. -r splits on comma and does an exact isin() match, so tokens like 'AARS\\tHGNC:20\\t16' never match any real gene symbol. Verified empirically: 0/684 genes removed, and the 'CEG-excluded' output is byte-identical (max |normZ diff| = 0.0) to the unfiltered run, while the tool exits 0 and writes a complete-looking file.",
+      "root_cause": "The example assumes remove_essential.txt is one bare gene symbol per line (as SKILL.md's own inline cat> snippet shows) but the real curl-downloaded CEGv2.txt used earlier in the same script has a different, multi-column format, and nothing parses or validates it.",
+      "fix": "Parse CEGv2.txt properly (skip header line, split on tab, take column 0) before joining into the -r argument, and add a post-hoc sanity check that compares gene counts between the filtered and unfiltered outputs to catch a zero-exclusion no-op."
+    },
+    {
+      "priority": "P1",
+      "title": "No documented relationship between total guide count and --half_window_size",
+      "observed_in": [5],
+      "problem": "Running drugZ on a small (9-guide) count table crashes with an uncaught IndexError regardless of --half_window_size, down to a value of 2. SKILL.md only documents a 4-6 sgRNA/gene minimum for stable per-gene Z, never that the empirical-Bayes sliding window needs total guide count well above half_window_size.",
+      "root_cause": "SKILL.md's stability guidance conflates per-gene guide count with total-library guide count, which govern different parts of the algorithm.",
+      "fix": "Add a Common Errors row for 'IndexError: single positional indexer is out-of-bounds' with the fix: total sgRNA count must be well above --half_window_size (default 500; confirmed working at roughly total_guides >= 4x half_window_size on a 200-guide test); for small pilot/arrayed sub-libraries, lower --half_window_size proportionally or use MAGeCK MLE instead."
+    },
+    {
+      "priority": "P1",
+      "title": "Dose-response section's only code is unexecutable pseudocode",
+      "observed_in": [3],
+      "problem": "The multi-dose loop shown in the SKILL.md/usage-guide is a commented-out sketch (# def per_dose_drugz(doses_dict): ... # subprocess.run(...)) rather than runnable code; an agent must write the real implementation from scratch to follow this workflow.",
+      "root_cause": "The dose-response pattern was documented conceptually but never turned into a working example, unlike the standard-run and essentials-exclusion sections.",
+      "fix": "Complete per_dose_drugz into runnable code with a concrete consistency rule (e.g. same-sign normZ at 2+ doses with fdr<0.05 at the top dose)."
+    },
+    {
+      "priority": "P2",
+      "title": "No numeric threshold given for cross-dose 'consistency'",
+      "observed_in": [3],
+      "problem": "'Consistent direction across doses' is never quantified -- no minimum correlation, rank overlap, or magnitude-ratio bound.",
+      "root_cause": "Guidance stops at a qualitative rule while every other threshold in the Skill (FDR, Pearson, sgRNA count) is quantitative.",
+      "fix": "Add a concrete rule, e.g. 'same sign at all tested doses and fdr<0.05 at the highest dose', consistent with the Skill's other quantitative-threshold tables."
+    }
+  ]
+}

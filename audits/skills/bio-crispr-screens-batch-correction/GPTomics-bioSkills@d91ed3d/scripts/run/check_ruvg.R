@@ -1,0 +1,5 @@
+suppressMessages(library(RUVSeq))
+cat("RUVSeq version:", as.character(packageVersion("RUVSeq")), "\n")
+showMethods("RUVg")
+cat("\n--- args ---\n")
+print(args(getGeneric("RUVg")))

@@ -122,6 +122,10 @@ Write per Skill, into `F:\OpenScience\audits\<skill-id>\`:
   `recommendations[]` with `priority`). Add `"source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:<folder>/<skill>"`
   and per input `"executed": true|false` plus `"execution_note"` inside `meta`/each input.
   `meta.evaluated_on` = the date you run the audit.
+- `run\` — every script you ran, saved as a file (`.py`, `.R`, `.sh`), including the ones that are
+  one CLI or `docker run` invocation. The publisher copies this folder into the record; commands that
+  only ever existed in a tool call publish as nothing, and two audits on 2026-09-16 published zero
+  scripts that way.
 - `eval_viewer_<skill-id>.md` — the Step 7 viewer, including the generated code, what ran, and
   what it printed (trim long output, keep what the scores depend on).
 
