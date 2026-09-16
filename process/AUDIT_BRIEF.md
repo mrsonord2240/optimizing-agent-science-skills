@@ -6,10 +6,10 @@ write the Specialist, and you have no stake in any Skill passing.
 
 ## Read first
 
-- `F:\OpenScience\specialist-src\round2\CANDIDATES.md` — your candidate's scope, source folders and
-  boundaries, and why every candidate uses `GPTomics/bioSkills` only.
-- `F:\OpenScience\specialist-src\THRESHOLD.md` — the viability gates. You own the evidence for gates
-  2, 3, 4, 7 and 8.
+- `F:\optimizing-agent-science-skills\process\CANDIDATES.md` — your candidate's scope, source
+  folders and boundaries, and why every candidate uses `GPTomics/bioSkills` only.
+- `F:\optimizing-agent-science-skills\process\THRESHOLD.md` — the viability gates. You own the
+  evidence for gates 2, 3, 4, 7 and 8.
 - `F:\OpenScience\skills\skill-auditor\SKILL.md` and every file in its `references/` — the audit
   method. Follow it exactly: Skill Veto → 25-criteria static score → classification and execution
   mode → N inputs by the complexity rule → execution → Layer 1/2/3 scoring → Research Veto → final
@@ -28,15 +28,17 @@ write the Specialist, and you have no stake in any Skill passing.
 
 ## Re-auditing a fixed Skill (2026-09-15)
 
-Failing Skills are being fixed in Sam's fork (`round2\FIX_BRIEF.md`). When your dispatch names a
-fixed Skill:
+Failing Skills are being fixed in Sam's fork
+(`F:\optimizing-agent-science-skills\process\FIX_BRIEF.md`). When your dispatch names a fixed
+Skill:
 
 - Read the Skill from the fork path and commit in your dispatch, not from `GPTomics__bioSkills`.
   `"source"` becomes `"mrsonord2240/bioSkills@<commit>:<folder>/<skill>"`.
 - The pre-fix report is archived at `F:\OpenScience\audits\_pre-fix-20260915\<skill-id>\`. Re-run its
   inputs as regression tests, and add at least two new inputs of your own so the score does not
   only measure the defects the fixer was told about. The fix log
-  (`round2\fixes\<skill-id>.md`) says what changed; it is not evidence — only your runs are.
+  (`F:\optimizing-agent-science-skills\fixes\<skill-id>.md`) says what changed; it is not evidence
+  — only your runs are.
 - Write the new report into `F:\OpenScience\audits\<skill-id>\` as for a first audit.
 
 ## Step 1 — choose the Skills (8–14)

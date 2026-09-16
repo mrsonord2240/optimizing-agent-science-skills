@@ -10,6 +10,10 @@ agent re-audits your work afterwards; you never score anything.
 - Fork (MIT, same history as upstream): `F:\OpenScience\external\mrsonord2240__bioSkills`, base
   branch `openscience-fixes` at upstream `d91ed3d563019e649dc854c56ccd62551359488a`.
 - **Your worktree and branch** are named in your dispatch message. Work only there.
+- Records repository (briefs, gates, fix logs, audit records):
+  `F:\optimizing-agent-science-skills` — gates in `process\THRESHOLD.md`, your fix logs in
+  `fixes\`. The fixed Skill trees are exported there from the fork under `skills\bioSkills\`;
+  that export is a separate step, not yours.
 - Evidence per Skill: `F:\OpenScience\audits\<skill-id>\eval_report_<skill-id>_result.json`
   (`recommendations[]`, per-input notes) and `eval_viewer_<skill-id>.md` (the commands that ran, what
   failed, and often the corrected command the auditor verified). Candidate verdict:
@@ -52,14 +56,16 @@ Do not tune text toward the audit's assertions; fix the defect the assertion exp
 - One commit per Skill on your branch, `git commit -F <msgfile>`:
   `fix(<folder>/<skill>): <one-line summary>`, body = one line per finding → change → how verified,
   ending with `Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>`.
-- `F:\OpenScience\specialist-src\round2\fixes\<skill-id>.md` (outside the fork, so it never ships):
+- `F:\optimizing-agent-science-skills\fixes\<skill-id>.md` (outside the fork, so it never ships):
   dated heading, then a table `finding | priority | change | verified (ran / help / docs) | notes`, and
   a list of findings left unfixed with the reason.
 
 ## Rules
 
 - Never write in `F:\OpenScience\external\GPTomics__bioSkills`, `F:\OpenScience\audits`, other
-  worktrees, `F:\OpenScience\skills`, or the builder. Do not push, merge or rebase.
+  worktrees, `F:\OpenScience\skills`, or the builder. Do not push, merge or rebase. In the records
+  repository write only your `fixes\<skill-id>.md`; `skills\bioSkills\` there is an export of the
+  fork, never edited by hand.
 - Skills that already pass as core and have no P1 stay byte-identical.
 - Public unauthenticated services (NCBI E-utilities, myvariant.info, gnomAD GraphQL, Ensembl) are fine
   for verifying database Skills; nothing paid or authenticated.

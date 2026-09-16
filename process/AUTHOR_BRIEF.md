@@ -7,19 +7,24 @@ honestly how the result could be better.
 
 ## Where things are
 
-- Threshold every Specialist must meet: `F:\OpenScience\specialist-src\THRESHOLD.md` (read first).
-  Round 2 differs in two ways, both already handled by the builder: Skills come from
-  `GPTomics/bioSkills` at the commit pinned in `spec.json`'s `upstream` block (gate 6 checks bytes
-  against that commit), and audit reports live in `F:\OpenScience\audits\<skill-id>\`.
-- Why every candidate uses bioSkills only: `F:\OpenScience\specialist-src\round2\CANDIDATES.md`.
-  Your candidate's scope and boundaries are its row there.
+- Threshold every Specialist must meet: `F:\optimizing-agent-science-skills\process\THRESHOLD.md`
+  (read first). Round 2 differs in two ways, both already handled by the builder: Skills come from
+  the repository, commit and `prefix` pinned in `spec.json`'s `upstream` block — for fixed Skills
+  that is `optimizing-agent-science-skills` at the export commit, under `skills/bioSkills/` — and
+  gate 6 checks bytes against that commit; and audit reports live in
+  `F:\OpenScience\audits\<skill-id>\`.
+- Why every candidate uses bioSkills only:
+  `F:\optimizing-agent-science-skills\process\CANDIDATES.md`. Your candidate's scope and
+  boundaries are its row there.
 - Your spec: `F:\OpenScience\specialist-src\<id>\spec.json` and the auditor's
   `F:\OpenScience\specialist-src\<id>\AUDIT.md`. Do not change the `upstream` block, Skill `id`s
   or `source`s.
 - Audit evidence per Skill: `F:\OpenScience\audits\<skill-id>\eval_report_*_result.json` and
   `eval_viewer_<skill-id>.md` (what the auditor ran, what executed, the P1/P2 findings).
-- Bundled Skills: `F:\OpenScience\external\GPTomics__bioSkills\<source>\` (`SKILL.md`,
-  `usage-guide.md`, `examples/`). Read-only.
+- Bundled Skills: under the `upstream` `path` (plus `prefix`) your `spec.json` pins — fixed Skills
+  at `F:\optimizing-agent-science-skills\skills\bioSkills\<source>\`, unmodified ones at
+  `F:\OpenScience\external\GPTomics__bioSkills\<source>\` (`SKILL.md`, `usage-guide.md`,
+  `examples/`). Read-only.
 - Builder: `python F:\OpenScience\specialist-src\build_specialist.py <id>` → writes
   `F:\OpenScience\specialists\<id>\...`. It enforces the threshold and fails loudly.
 - Clean marketplace worktree with dependencies installed: `F:\osa` (read-only for you).

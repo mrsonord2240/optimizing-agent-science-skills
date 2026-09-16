@@ -13,6 +13,14 @@ uses one. So a Specialist cannot mix AIPOCH and bioSkills Skills. Each candidate
 - license MIT
 - local clone `F:\OpenScience\external\GPTomics__bioSkills`
 
+**What round 2 actually ships (2026-09-15).** Skills the audits found defective were fixed in
+`mrsonord2240/bioSkills` and exported into this repository under `skills/bioSkills/`, with the
+route recorded in `skills/bioSkills/UPSTREAM.json`. A release's `source` is therefore
+`optimizing-agent-science-skills` at the export commit, not the upstream commit above; the
+upstream commit stays the provenance base, and the clone above stays the read-only reference for
+Skills that were never modified. Gate 6 in `THRESHOLD.md` says which bytes are checked against
+which commit.
+
 Skill ID = the SKILL.md frontmatter `name` (e.g. `bio-single-cell-preprocessing`), not the folder
 name.
 

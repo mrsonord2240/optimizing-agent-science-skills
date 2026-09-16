@@ -1,4 +1,4 @@
-# Specialist viability threshold (2026-09-10)
+# Specialist viability threshold (2026-09-10; gate 6 rewritten for round 2 on 2026-09-15)
 
 A candidate Specialist is built only when every gate below passes. `build_specialist.py` enforces
 gates 2, 3, 6, 8 and 9 mechanically; gate 1 is the marketplace tooling; gates 4, 5 and 7 are
@@ -32,13 +32,29 @@ the `skill-auditor` grading rubric shipped with the skills
 5. **Distinct scope.** The Specialist routes a workflow that no published Specialist already
    routes. Sharing individual Skills with `auto-research-specialist` is allowed; duplicating its
    purpose is not.
-6. **Provenance and references.** Skill files are byte-identical to the public upstream commit
-   `aipoch/medical-research-skills@f5ef65b9` (audit reports excluded), or to the published
-   Marketplace bytes under gate 9. Nothing is edited: a Skill's ID is its SKILL.md frontmatter
-   `name`. The only permitted change is omitting a test fixture that breaks a marketplace ZIP
-   limit (10 MiB per file), recorded with a reason (`exclude` in `spec.json`). Every Connector ID
-   is one already used by a published release. Every bundled Python and R script parses under the
-   Open Science runtime's own interpreters.
+6. **Provenance and references.** Skill files are byte-identical to the commit the release names
+   as its source (audit reports excluded), or to the published Marketplace bytes under gate 9.
+   Which commit that is depends on the round:
+
+   - **Round 1 — AIPOCH, unmodified upstream.** Byte-identical to the public upstream commit
+     `aipoch/medical-research-skills@f5ef65b9`. Nothing is edited.
+   - **Round 2 — bioSkills, modified (2026-09-15).** Byte-identical to
+     `optimizing-agent-science-skills@<commit>:skills/bioSkills/<folder>/<skill>/`, where
+     `<commit>` is the exact commit recorded in the candidate's `spec.json` `upstream` block.
+     These Skills *are* edited, so the audit trail replaces "nothing is edited": the modification
+     route — upstream base commit → fork branch and commit → this repository's export — must be
+     recorded in `skills/bioSkills/UPSTREAM.json` (today: base
+     `GPTomics/bioSkills@d91ed3d5`, fixes exported from `mrsonord2240/bioSkills@d1b8fdce`, MIT),
+     and a release may cite no other route. Every changed file needs a fix log in
+     `fixes/<skill-id>.md` and a post-fix audit report that meets gates 2 and 3, written by an
+     agent that did not make the fix. A Skill no audit found a defect in stays byte-identical to
+     the upstream base commit.
+
+   In both rounds a Skill's ID is its SKILL.md frontmatter `name`, and the only permitted
+   packaging change is omitting a test fixture that breaks a marketplace ZIP limit (10 MiB per
+   file), recorded with a reason (`exclude` in `spec.json`). Every Connector ID is one already
+   used by a published release. Every bundled Python and R script parses under the Open Science
+   runtime's own interpreters.
 7. **Research scope.** The workflow is research, not patient care. Anything that would diagnose,
    prescribe or triage an individual fails the skill-auditor Practice Boundaries redline by design.
 8. **Shipped means present.** Every `references/`, `scripts/`, `assets/` or `templates/` file a
