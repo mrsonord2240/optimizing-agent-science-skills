@@ -1,0 +1,41 @@
+{
+  "skill_id": "bio-causal-genomics-genomic-sem",
+  "version": "mrsonord2240-bioSkills@c602f2a",
+  "source": {
+    "repository": "mrsonord2240/bioSkills",
+    "commit": "c602f2a0fe25fff9502210b062d195aa0a69b214",
+    "path": "causal-genomics/genomic-sem",
+    "author": "GPTomics",
+    "author_url": "https://github.com/GPTomics",
+    "license": "MIT",
+    "modified_by": "Samuel Nord",
+    "fork_of": {
+      "repository": "GPTomics/bioSkills",
+      "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    "url": "https://github.com/mrsonord2240/bioSkills/tree/c602f2a0fe25fff9502210b062d195aa0a69b214/causal-genomics/genomic-sem"
+  },
+  "audit": {
+    "method": {
+      "name": "skill-auditor",
+      "author": "AIPOCH",
+      "repository": "aipoch/medical-research-skills",
+      "commit": "f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26",
+      "path": "skill-auditor",
+      "license": "MIT",
+      "url": "https://github.com/aipoch/medical-research-skills/tree/f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26/skill-auditor"
+    },
+    "evaluator_version": "skill-auditor@1.0",
+    "audited_on": "2026-09-17",
+    "performed_by": "Claude (Anthropic) auditor agents",
+    "commissioned_by": "Samuel Nord",
+    "test_data": "synthetic"
+  },
+  "supersedes": "GPTomics-bioSkills@d91ed3d",
+  "files": {
+    "report": "report.json",
+    "viewer": "viewer.md",
+    "fixes": "fixes.md",
+    "scripts": 11
+  }
+}

@@ -68,7 +68,3 @@ fix above).
 
 - Merged to fork main at `10ac5b0`, including `c3dff65`, which replaced the fixer's bundled copy of CBIIT's GPL-3 fixtures with staging from the user's clone. Re-run: identical numbers.
 - `285e2b0` (merged `c602f2a`): genetic-correlation, genomic-sem, `causal-genomics/README.md` and `workflows/causal-genomics-pipeline/usage-guide.md` still recommended abdenlab/ldsc-python3; all now give the CBIIT route. Verified from a fresh GitHub clone with the documented install in a throwaway WSL env: h2 0.3783 (0.0419), rg 0.1117 (0.0776), h2-cts CellTypeB P=3.5e-4 / CellTypeA P=0.99.
-
-## 2026-09-17, re-audit
-
-75 Reject -> **88.2 Production Ready**, Research Veto PASS, at fork `c602f2a` (a different agent; 7 pre-fix inputs re-run as regression plus 2 new, from its own clean CBIIT/ldsc clone). It reverted and re-applied the documented `--h2-cts` patch itself, fetched `bulik/ldsc`'s live README to confirm the CBIIT redirect, and ran the real LDAK 6.3 binary the pre-fix audit could only inspect. New P1: the fork ships no `.gitattributes`, so a default Windows checkout converts `examples/*.sh` to CRLF and every one of them fails under WSL bash, including this Skill's own smoke test -- corpus-wide, not specific to this Skill.

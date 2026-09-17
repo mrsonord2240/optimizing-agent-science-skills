@@ -92,7 +92,3 @@ present in SKILL.md by direct reading (not just section-title match) before remo
 Nothing needs Sam.
 
 Merged to fork main at `f031005` (2026-09-17), with a follow-up commit `4951af0` that cut the Version Compatibility paragraph down to the pin and its reason, since it restated both new Common Errors rows.
-
-## 2026-09-17, re-audit
-
-69 Reject -> **88 Production Ready**, Research Veto PASS, at fork `c602f2a` (a different agent; 6 pre-fix inputs re-run as regression plus 2 new). Two open P1s: `commonfactorGWAS(DWLS)`'s Q_pval still fails to discriminate planted heterogeneous SNPs on two independent synthetic panels while ML discriminates correctly both times -- this disconfirms the fixer's flat-SE-artifact hypothesis and needs a real `ldsc()`-derived V to settle; and `commonfactor()` and `usermodel()` name the same standardized-loading quantity differently.
