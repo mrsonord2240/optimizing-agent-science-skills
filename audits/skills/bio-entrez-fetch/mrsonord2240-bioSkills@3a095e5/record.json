@@ -1,10 +1,10 @@
 {
-  "skill_id": "bio-local-blast",
-  "version": "mrsonord2240-bioSkills@581dcd8",
+  "skill_id": "bio-entrez-fetch",
+  "version": "mrsonord2240-bioSkills@3a095e5",
   "source": {
     "repository": "mrsonord2240/bioSkills",
-    "commit": "581dcd89a7450785c2451a0543ee822049fbf934",
-    "path": "database-access/local-blast",
+    "commit": "3a095e59ce2df1dc0a820f3f11c7e6b472afce45",
+    "path": "database-access/entrez-fetch",
     "author": "GPTomics",
     "author_url": "https://github.com/GPTomics",
     "license": "MIT",
@@ -13,7 +13,7 @@
       "repository": "GPTomics/bioSkills",
       "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
     },
-    "url": "https://github.com/mrsonord2240/bioSkills/tree/581dcd89a7450785c2451a0543ee822049fbf934/database-access/local-blast"
+    "url": "https://github.com/mrsonord2240/bioSkills/tree/3a095e59ce2df1dc0a820f3f11c7e6b472afce45/database-access/entrez-fetch"
   },
   "audit": {
     "method": {
@@ -31,11 +31,11 @@
     "commissioned_by": "Samuel Nord",
     "test_data": "synthetic"
   },
-  "supersedes": null,
+  "supersedes": "mrsonord2240-bioSkills@581dcd8",
   "files": {
     "report": "report.json",
     "viewer": "viewer.md",
     "fixes": "fixes.md",
-    "scripts": 13
+    "scripts": 24
   }
 }

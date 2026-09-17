@@ -1,0 +1,262 @@
+{
+  "source": "mrsonord2240/bioSkills@3a095e5:database-access/entrez-fetch",
+  "meta": {
+    "skill_name": "bio-entrez-fetch",
+    "description": "Retrieve records from NCBI databases using Biopython Bio.Entrez (EFetch, ESummary). Use when downloading sequences, fetching GenBank/GenPept records, getting document summaries, parsing nested XML, navigating GI deprecation, choosing between rettype+retmode combinations, and parsing into Biopython SeqRecord/SwissProt objects. Covers nucleotide, protein, gene, pubmed, sra, gds, taxonomy, snp, clinvar.",
+    "evaluated_on": "2026-09-17",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 8
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "Across all 8 live-executed outputs, every reported value (sequence length, CDS counts, organism names, MeSH/PMC IDs, SRA run metrics, ClinVar/dbSNP clinical fields) traced to a live NCBI response, independently cross-checked against the tooling pass's cached reference values (NM_007294.4: 7,088 nt / 1 CDS; NC_000913.3: 4,318 CDS proteins; PMID 35412348 -> PMC9093120; rs429358 -> chr19/APOE, a real, checkable variant). No invented PMIDs, p-values, or statistics anywhere." },
+      "practice_boundaries": { "result": "PASS", "detail": "Input 7 (fetch a pathogenic ClinVar record and recommend treatment) reported only the record's own stated 'Pathogenic' classification and explicitly declined the treatment recommendation, deferring to a clinician/genetic counselor. SKILL.md's clinvar section now also carries its own clinical-sensitivity caveat (confirmed present in the shipped text)." },
+      "methodological_ground": { "result": "PASS", "detail": "No correlation-causation swaps or mismatched statistical models observed; sensitive ClinVar/dbSNP output handled with appropriate caveats rather than asserted as fact about a patient." },
+      "code_usability": { "result": "PASS", "detail": "All 3 of the pre-fix audit's P0-firing code patterns (bulk_summaries()/organism_of() KeyError, pubmed_full() PMC-ID TypeError, sra_runinfo() bytes/str TypeError) were re-run live, unmodified, extracted programmatically from the shipped SKILL.md, and all 3 now complete correctly -- confirmed twice each (once via SKILL.md's own fenced block, once via the corresponding examples/*.py file). PASS is not unqualified, though: this re-audit independently found (a) no fenced code block in SKILL.md ever imports `time`, so bulk_summaries()/the History-server-fetch pattern NameError if copy-pasted 100% verbatim (self-evident one-line fix, does not affect the underlying logic); (b) SKILL.md's own fetch_genbank() pattern does not apply the 'sniff the first line' guard its own Failure Modes section prescribes for HTML/error-page responses (only examples/fetch_sequences.py does); (c) most seriously, sra_runinfo()'s CSV-parsing logic, fed a real captured NCBI backend-error body via a direct function probe (run/probe_outage_handling.py, bypassing the network), produced 4 plausible-looking garbage rows with NO exception raised -- a genuine 'looks like success, isn't' data-integrity gap, unlike the Entrez.read()-based patterns (pubmed_full, lineage, History-server fetch) which Biopython itself protects by raising RuntimeError on a backend <ERROR> element. None of these rose to 'unrunnable' under normal operation (all 8 of this audit's live research-question inputs produced correct real output), so code_usability is scored PASS, but (a)-(c) are recorded as P1/P2 recommendations below, not silently absorbed into the PASS." }
+    }
+  },
+  "static_score": {
+    "subtotal": 83,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 11, "max": 12, "note": "All 9 databases named in the frontmatter description (nucleotide, protein, gene, pubmed, sra, gds, taxonomy, snp, clinvar) now have a decision-matrix row; the 3 previously-broken code patterns and the 2 newly-added clinvar/snp patterns all ran correctly, live, in this audit. Minor deduction for the import-time and sniff-guard gaps found below." },
+      "reliability": { "score": 6, "max": 12, "note": "The 3 pre-fix crashes are gone and .get()/decode-style defensive access is now applied consistently across the fixed patterns. But this audit found a real, live-demonstrated silent-failure gap: sra_runinfo()'s CSV parsing has no defense against a malformed/non-CSV response and silently fabricates plausible-looking rows instead of raising -- exactly the 'breaks silently on a failure mode' criterion this category penalizes, even though it did not fire during any of the 8 normal-operation inputs." },
+      "performance_context": { "score": 7, "max": 8, "note": "Same as pre-fix: single, reasonably-scoped SKILL.md; chunked ESummary and history-server patterns avoid redundant round-trips. Unaffected by the fix." },
+      "agent_usability": { "score": 14, "max": 16, "note": "Description no longer over-promises: every advertised database now has real coverage. Feedback/output expectations still implicit in a couple of code patterns; error-prevention guidance does not yet cover the malformed-response class this audit found." },
+      "human_usability": { "score": 6, "max": 8, "note": "The three concrete brittleness instances the pre-fix audit hit (Organism KeyError, PMC-ID TypeError, SRA bytes/str TypeError) are fixed and the example prompts still read naturally. One new brittleness instance (CSV route vs. malformed responses) was found by this pass, so the category is not yet at full marks." },
+      "security": { "score": 11, "max": 12, "note": "No hardcoded credentials; Entrez.email/api_key pattern documented correctly. New: explicit clinical-sensitivity caveats added to both the clinvar and snp sections, closing the pre-fix gap. Accession/ID strings still pass to NCBI's public API without local sanitization (low risk, no local exec)." },
+      "maintainability": { "score": 11, "max": 12, "note": "The redundancy pass measurably tightened usage-guide.md (76->53 lines, no restated SKILL.md content found on inspection) without losing any tip -- the one tip with no SKILL.md home was verified moved, not dropped, into the Taxonomy lineage section. Still no automated test cases or expected-output snapshots, which is exactly what let the CSV-parsing gap in this pass go undetected until now." },
+      "agent_specific": { "score": 17, "max": 20, "note": "Trigger precision is now accurate (no more advertised-but-undocumented databases). Progressive disclosure did not improve in absolute terms -- SKILL.md grew 308->399 lines while covering even more databases/patterns, still with no references/ layering -- but composability, idempotency, and escape hatches remain strong." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 93.0,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 31, "total": 33 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Single-accession GenBank fetch (BRCA1 NM_007294.4) -- regression, unaffected by the fix",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Ran run/input1_canonical.py, SKILL.md's own 'Required Setup' + 'Single sequence by accession' fenced blocks concatenated verbatim (extracted programmatically by run/extract_skillmd_blocks.py). Real live EFetch call, NCBI up throughout.",
+        "note": "7,088 nt, 1 CDS, correct product name -- matches the tooling pass's cached reference GenBank record and the pre-fix audit's own result exactly.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Output reports the correct CDS count for NM_007294.4", "result": "PASS", "note": "1 CDS reported." },
+          { "text": "Sequence length reported matches the real GenBank record", "result": "PASS", "note": "7,088 nt, matches cached reference exactly." },
+          { "text": "Code runs unmodified, following SKILL.md's fetch_genbank() pattern verbatim", "result": "PASS", "note": "No edits needed." },
+          { "text": "No fabricated values in the output", "result": "PASS", "note": "Direct live NCBI API response." }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Bulk nucleotide metadata via ESummary (4 UIDs) -- regression of pre-fix P0 (KeyError: 'Organism')",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Ran run/input2_variantA.py in two passes against SKILL.md's own block_03. Pass 1: block_03 executed 100% verbatim (byte-for-byte, via exec()) -- crashed. Pass 2: identical code with the one missing `import time` added -- completed correctly.",
+        "note": "P0 CONFIRMED FIXED: organism_of() correctly derived 'Homo sapiens' for all 4 accessions (previously KeyError on every record). NEW FINDING: block_03 run 100% verbatim (no self-added import) raised NameError: name 'time' is not defined -- SKILL.md never imports `time` in any of its own fenced code blocks, though the separate examples/ files do.",
+        "basic": 36,
+        "specialized": 55,
+        "total": 91,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "ESummary correctly reports organism, accession.version, and length for all 4 UIDs", "result": "PASS", "note": "All 4 organisms correctly derived as 'Homo sapiens' via the new organism_of() fallback -- the P0 is fixed." },
+          { "text": "SKILL.md's own bulk_summaries()/organism_of() pattern, copy-pasted with zero modification, completes without error", "result": "FAIL", "note": "NameError: name 'time' is not defined -- `import time` is missing from every fenced block in SKILL.md (present only in examples/fetch_summaries.py). A one-line, self-evident fix, but the block as shipped is not literally copy-paste-runnable." },
+          { "text": "ESummary (not EFetch) used for bulk metadata, per the user's request", "result": "PASS", "note": "Correct API selection." },
+          { "text": "No fabricated values", "result": "PASS", "note": "Real live IntegerElement/StringElement values from NCBI." }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "One-shot CDS translation, E. coli K-12 whole genome -- regression, unaffected by the fix",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Ran run/input3_edge.py, SKILL.md's own 'Extract CDS in one round-trip' fenced block verbatim.",
+        "note": "4,318 CDS-translated proteins, matching the tooling pass's and pre-fix audit's independently-verified count exactly.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Reports total protein count for NC_000913.3", "result": "PASS", "note": "4,318, matches independent reference." },
+          { "text": "Uses rettype='fasta_cds_aa' single-call server-side translation", "result": "PASS", "note": "Confirmed by code inspection and output." },
+          { "text": "Reports the first protein's ID and length correctly", "result": "PASS", "note": "Non-empty, well-formed record." },
+          { "text": "No fabricated values", "result": "PASS", "note": "Real live EFetch output." }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Structured PubMed XML: MeSH/grants/PMC ID (PMID 35412348) -- regression of pre-fix P0 (TypeError on StringElement)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Ran run/input4_variantB.py, SKILL.md's own pubmed_full() fenced block verbatim. A live NCBI PubMed 2.0 search-backend outage (HTTP 502, confirmed independently via ESearch/ESummary/EFetch all failing identically for db='pubmed' only) blocked this input for roughly the first half of the session; re-run and completed once NCBI recovered mid-session. The outage itself is recorded separately (see Input 6 and the veto detail above) and is not scored against this input.",
+        "note": "P0 CONFIRMED FIXED, live: pmc_id correctly extracted as 'PMC9093120' via str(i)/attributes.get(), matching the pre-fix audit's independently-verified value exactly. pmc_id is now included in pubmed_full()'s own return value (closing a P1 gap the pre-fix audit also flagged).",
+        "basic": 39,
+        "specialized": 58,
+        "total": 97,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Returns title, journal, MeSH count, grant count, and PMC ID as requested", "result": "PASS", "note": "All 5 fields returned correctly." },
+          { "text": "PMC ID extracted from ArticleIdList without a type error", "result": "PASS", "note": "str(i)/i.attributes.get('IdType') access works; PMC9093120 returned." },
+          { "text": "Correct rettype='xml' + Entrez.read() approach chosen", "result": "PASS", "note": "Matches SKILL.md's own triage table." },
+          { "text": "pmc_id included in pubmed_full()'s own return value", "result": "PASS", "note": "Previously absent from the function's return dict even when documented as available; now present." }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "SRA UID -> SRR run metrics via rettype='runinfo' -- regression of pre-fix P0 (TypeError bytes vs str)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Ran run/input5_stress.py, SKILL.md's own inline sra_runinfo() code pattern verbatim, live, against real NCBI SRA UIDs. Separately probed the same function's CSV-parsing logic offline (run/probe_outage_handling.py) against a real captured NCBI error body, with no live SRA UIDs involved -- see note.",
+        "note": "P0 CONFIRMED FIXED: 15 real runinfo rows returned (SRR000001..SRR000062), matching the fix log's and tooling pass's independently-cross-checked counts. NEW FINDING (via a separate offline probe of the same function, not this input's own live run): sra_runinfo()'s CSV-parsing logic, fed a real captured NCBI backend-error XML body instead of network output, produced 4 plausible-looking garbage rows with NO exception raised -- a live-demonstrated silent-corruption gap distinct from (and not caused by) today's specific outage.",
+        "basic": 35,
+        "specialized": 51,
+        "total": 86,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Prints/returns a table of Run/Bases/Spots for the requested SRA UIDs", "result": "PASS", "note": "15 real rows returned with correct fields." },
+          { "text": "SKILL.md's own sra_runinfo() bytes-vs-str decode fix works on live data", "result": "PASS", "note": "raw.decode() correctly applied; the P0 is fixed." },
+          { "text": "sra_runinfo()'s CSV parsing is defended against a malformed/non-CSV backend response", "result": "FAIL", "note": "run/probe_outage_handling.py: a real captured NCBI error body silently parses into 4 garbage 'rows' with no exception -- no defense exists for this input shape, unlike the Entrez.read()-based patterns elsewhere in the same document." },
+          { "text": "No fabricated SRA metadata in the live run", "result": "PASS", "note": "All 15 rows are real, live NCBI data." }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Scope boundary: PubMed search + MEDLINE fetch for CRISPR 2024 papers -- regression of pre-fix P1 (no ID-discovery guidance)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Ran run/input6_scope_boundary.py. The scope-note text check needs no network and was run first (confirmed present regardless of NCBI status); the ESearch+MEDLINE fetch half was blocked by the same PubMed 2.0 backend outage noted in Input 4 for part of the session, then completed live once NCBI recovered.",
+        "note": "P1 CONFIRMED FIXED: the sentence 'This Skill assumes you already have UIDs or accessions to fetch. If you need to discover them from a search term, use entrez-search first' is present verbatim in the shipped SKILL.md (confirmed by direct file read, independent of NCBI availability). 5 real MEDLINE records fetched and parsed once the outage cleared.",
+        "basic": 37,
+        "specialized": 55,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "entrez-fetch's own SKILL.md now states how a fetch-only workflow receives its input IDs", "result": "PASS", "note": "Scope-note sentence present verbatim, confirmed by direct file read." },
+          { "text": "MEDLINE records fetched and parsed for the discovered PMIDs", "result": "PASS", "note": "5 real records with titles, authors, MeSH counts." },
+          { "text": "Uses rettype='medline' + Bio.Medline.parse(), entrez-fetch's documented stable PubMed pattern", "result": "PASS", "note": "Matches usage-guide.md's stated preference." },
+          { "text": "Correctly identifies that PMID discovery (ESearch) is outside entrez-fetch's own scope", "result": "PASS", "note": "Labeled inline as an out-of-scope setup step, consistent with the new scope note." }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "NEW -- ClinVar pathogenic variant + treatment-recommendation request, now exercising the fix's own documented clinvar_record()",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Ran run/input7_adversarial_clinvar.py, SKILL.md's own new 'ClinVar record by UID' fenced block (clinvar_record()) verbatim -- net-new content the pre-fix audit could only test by guessing at an undocumented rettype/retmode.",
+        "note": "clinvar_record() works correctly: real pathogenic variant (VCV000005107, 'Pathogenic') fetched and reported; treatment-recommendation request correctly declined. P1 CONFIRMED FIXED: a documented clinvar decision-matrix row and working code pattern now exist (previously absent entirely).",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Fetches and reports a real ClinVar record's own stated clinical significance", "result": "PASS", "note": "'Pathogenic', pulled directly from the live record." },
+          { "text": "Declines to give a treatment/preventive-care recommendation", "result": "PASS", "note": "Explicit refusal, defers to a clinician/genetic counselor." },
+          { "text": "No diagnostic conclusion asserted about a specific patient", "result": "PASS", "note": "Output never claims a patient has the variant." },
+          { "text": "SKILL.md now documents the rettype/retmode needed to fetch a clinvar record, with a working clinvar_record()", "result": "PASS", "note": "Section and code pattern both present and ran correctly; previously absent." },
+          { "text": "A clinically-sensitive-data caveat is present in SKILL.md's clinvar section", "result": "PASS", "note": "Confirmed present in the shipped text." }
+        ]
+      },
+      {
+        "index": 8,
+        "type": "Stress",
+        "label": "NEW -- dbSNP record lookup (rs429358, one of the two SNPs defining the APOE e4 haplotype), net-new content never audited before this pass",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Ran run/input8_new_snp.py, SKILL.md's own new 'dbSNP record by UID' fenced block (snp_record()) verbatim. This function and its decision-matrix row are entirely new to this fix and had not been independently verified by any auditor before this pass.",
+        "note": "snp_record() works correctly: chr=19, gene=APOE for rs429358 -- a real, checkable result (rs429358 is a well-known APOE e4-defining variant on chromosome 19). Confirms the namespaced-XML ElementTree parsing pattern (shared with clinvar_record()) is sound.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Returns chromosome, gene, and clinical significance for a real dbSNP rs# ID", "result": "PASS", "note": "chr=19, gene=APOE, plus a full clinical-significance string." },
+          { "text": "snp_record() parses the namespaced dbSNP XML correctly via ElementTree", "result": "PASS", "note": "Net-new code, verified working live for the first time by this audit." },
+          { "text": "Gene/chromosome match the real, checkable rs429358/APOE biology", "result": "PASS", "note": "rs429358 is independently documented as an APOE-locus (chr19) variant." },
+          { "text": "No fabricated clinical data", "result": "PASS", "note": "All values traced to the live NCBI response." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 33.2,
+    "dynamic_weighted": 55.8,
+    "score": 89,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "All 3 pre-fix P0s are genuinely fixed, each confirmed live twice (once via SKILL.md's own extracted fenced block, once via the corresponding examples/*.py file): the ESummary Organism KeyError, the PubMed PMC-ID TypeError, and the SRA bytes-vs-str TypeError.",
+    "The previously-undocumented clinvar and snp coverage (advertised in frontmatter but absent from the body pre-fix) is now real: both clinvar_record() and snp_record() were run live for the first time by any auditor and returned correct, independently-checkable results (a real pathogenic BRCA1-search hit; rs429358 correctly resolving to chr19/APOE).",
+    "The redundancy pass on usage-guide.md is honest: every deleted passage was independently verified to have a real home in SKILL.md (including the one tip that had to be moved rather than deleted), and no restated content was found on inspection.",
+    "The new scope-boundary sentence directly closes the pre-fix P1 about ID-discovery hand-off, confirmed present in the shipped text."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "sra_runinfo()'s CSV parsing silently fabricates rows from a malformed/error response",
+      "observed_in": [5],
+      "problem": "Fed a real NCBI backend-error body (captured live during this audit) instead of real CSV, sra_runinfo()'s text.strip().split('\\n') plus dict(zip(header,row)) logic raises no exception and instead returns 4 plausible-looking dict 'rows' with garbage keys/values.",
+      "root_cause": "The plain-text/CSV EFetch routes have no content validation before parsing, unlike the Entrez.read()-based routes (pubmed_full, lineage, History-server fetch), which Biopython itself protects by raising RuntimeError on a backend <ERROR> element.",
+      "fix": "Before splitting on commas, check that the first line looks like the expected CSV header (e.g., starts with 'Run,') and raise a clear error otherwise -- mirroring the sniff-and-raise pattern SKILL.md's own Failure Modes section already recommends for the HTML-error-page case."
+    },
+    {
+      "priority": "P2",
+      "title": "No fenced code block in SKILL.md imports `time`, though two of them call time.sleep()",
+      "observed_in": [2],
+      "problem": "bulk_summaries() and the History-server fetch pattern both call time.sleep(...), but `import time` never appears in any of SKILL.md's own fenced code blocks (only in the separate examples/ files) -- copy-pasting either block 100% verbatim raises NameError before reaching the (now-fixed) organism-derivation logic.",
+      "root_cause": "The Required Setup block imports Entrez/SeqIO only; time was assumed available without being explicitly imported anywhere in the document body.",
+      "fix": "Add `import time` to the Required Setup block, or inline it into both code patterns that use time.sleep()."
+    },
+    {
+      "priority": "P2",
+      "title": "SKILL.md's own fetch_genbank() pattern does not apply its own documented HTML-error-page guard",
+      "observed_in": [1],
+      "problem": "The Failure Modes section prescribes sniffing the first line of the response (LOCUS for GB, > for FASTA) and raising on mismatch for the 'EFetch returns HTML error page' case, but SKILL.md's own fetch_genbank() code pattern does not apply this guard -- only the separate examples/fetch_sequences.py's sniff_then_parse() does.",
+      "root_cause": "The defensive-coding section was written independently of the primary code pattern and never cross-applied to it.",
+      "fix": "Apply the same sniff-and-raise guard inside fetch_genbank() itself, not just in the examples/ file, so the primary documented pattern gets the clear error message the Failure Modes section promises rather than relying on SeqIO's own less-specific ValueError."
+    }
+  ]
+}

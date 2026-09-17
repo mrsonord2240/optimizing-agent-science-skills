@@ -1,9 +1,9 @@
 {
   "skill_id": "bio-local-blast",
-  "version": "mrsonord2240-bioSkills@581dcd8",
+  "version": "mrsonord2240-bioSkills@e3ae050",
   "source": {
     "repository": "mrsonord2240/bioSkills",
-    "commit": "581dcd89a7450785c2451a0543ee822049fbf934",
+    "commit": "e3ae050e9b0c4bef22129953132c11e80ded18e8",
     "path": "database-access/local-blast",
     "author": "GPTomics",
     "author_url": "https://github.com/GPTomics",
@@ -13,7 +13,7 @@
       "repository": "GPTomics/bioSkills",
       "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
     },
-    "url": "https://github.com/mrsonord2240/bioSkills/tree/581dcd89a7450785c2451a0543ee822049fbf934/database-access/local-blast"
+    "url": "https://github.com/mrsonord2240/bioSkills/tree/e3ae050e9b0c4bef22129953132c11e80ded18e8/database-access/local-blast"
   },
   "audit": {
     "method": {
@@ -31,11 +31,11 @@
     "commissioned_by": "Samuel Nord",
     "test_data": "synthetic"
   },
-  "supersedes": null,
+  "supersedes": "mrsonord2240-bioSkills@581dcd8",
   "files": {
     "report": "report.json",
     "viewer": "viewer.md",
     "fixes": "fixes.md",
-    "scripts": 13
+    "scripts": 15
   }
 }
