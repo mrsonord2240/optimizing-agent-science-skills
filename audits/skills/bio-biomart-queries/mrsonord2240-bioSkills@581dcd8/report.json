@@ -1,0 +1,214 @@
+{
+  "source": "mrsonord2240/bioSkills@581dcd89a7450785c2451a0543ee822049fbf934:database-access/biomart-queries",
+  "meta": {
+    "skill_name": "bio-biomart-queries",
+    "description": "Bulk-query Ensembl BioMart (and other BioMart instances) for cross-database ID mapping, gene/transcript/exon coordinates, and ortholog tables. Use when batch-converting Ensembl IDs to other namespaces (HGNC, RefSeq, UniProt, Entrez), pulling gene coordinate tables for thousands of genes, building ortholog wide-tables across species, or replacing slow Ensembl REST loops with one-shot bulk export.",
+    "evaluated_on": "2026-09-17",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Moderate",
+    "n_inputs": 5
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "FAIL",
+      "scientific_integrity": { "result": "PASS", "detail": "No fabricated DOIs/PMIDs/trial results/p-values across any of the 5 outputs; this is a database-query Skill, not a results-interpretation Skill." },
+      "practice_boundaries": { "result": "PASS", "detail": "No diagnostic/prescriptive medical conclusions; operates on population-level reference genome data (BioMart), not individual patient data. No disclaimer required." },
+      "methodological_ground": { "result": "PASS", "detail": "Query design in all 5 outputs is methodologically sound (correct filter/attribute semantics, correct ortholog one2one logic, correct long-format GO join); SKILL.md proactively documents real pitfalls (row multiplication, version drift, HGNC renames) without committing a fallacy." },
+      "code_usability": { "result": "FAIL", "detail": "Inputs 1, 2 and 5 (3 of 5) fail deterministically and reproducibly, client-side, before any network call completes: SKILL.md's own inline 'Bulk ID mapping' and 'GO term annotation' Python patterns, and the shipped examples/bulk_id_mapping.py verbatim, call pybiomart's Dataset.query(filters={'ensembl_gene_id': ...}) / filters={'external_gene_name': ...}, which pybiomart 0.2.0 (the only version ever published to PyPI; SKILL.md's claimed '0.9+' does not exist) rejects with BiomartException because its Dataset.filters property never recurses into nested id_list filter definitions. This is the Skill's own flagship, most-advertised use case failing on its own unmodified canonical example. Input 2's coordinate-table pattern separately uses a non-existent attribute name ('biotype' instead of 'gene_biotype'). Not attributable to live Ensembl flakiness -- confirmed via 3 independent code paths (bulk_id_mapping.py, the coordinate-table pattern, the GO-annotation pattern) plus a direct ds.filters/ds.attributes membership check (Input 3)." }
+    }
+  },
+  "static_score": {
+    "subtotal": 73,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 7, "max": 12, "note": "Narrative coverage of use cases is complete, but Correctness is severely undermined: the primary documented Python code patterns do not produce correct results as written (confirmed defects, not hypothetical)." },
+      "reliability": { "score": 6, "max": 12, "note": "SKILL.md's prose 'Failure modes' section is strong, but the actual example scripts have zero defensive validation -- one crashes with an opaque StopIteration when the live service returns a malformed 200 response instead of raising a clear error." },
+      "performance_context": { "score": 6, "max": 8, "note": "SKILL.md is ~283 lines, no reference bloat, examples/ appropriately separated." },
+      "agent_usability": { "score": 12, "max": 16, "note": "Consistent terminology and clear feedback statements, but an agent following the documented patterns verbatim would hit the same unexplained runtime errors this audit did, with no guidance in the Skill to self-diagnose them." },
+      "human_usability": { "score": 6, "max": 8, "note": "Description uses natural trigger language; but even the Skill's own recommended defensive habit (discover attributes/filters before use) does not protect a user from the ensembl_gene_id/external_gene_name filter bug, since the broken filters never appear in discovery output either." },
+      "security": { "score": 11, "max": 12, "note": "No credentials, no destructive operations, public reference data only; minor: no explicit input-sanitization guidance for user-supplied ID lists (low risk given library-mediated serialization)." },
+      "maintainability": { "score": 8, "max": 12, "note": "Clean SKILL.md/usage-guide.md/examples/ separation, but attribute/filter names are hardcoded redundantly across multiple files with no single source of truth, and the shipped examples were evidently never run before publishing (two of three fail immediately)." },
+      "agent_specific": { "score": 17, "max": 20, "note": "Precise triggering, correct progressive disclosure, strong 'Related Skills' composability section; escape-hatch guidance is limited to a BioMart-vs-REST routing table, not stop conditions for when the tool itself is misbehaving." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 51.8,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 11, "total": 20 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Bulk ID mapping: 5 Ensembl Gene IDs -> HGNC/RefSeq/UniProt",
+        "status": "ERROR",
+        "status_flag": "❌",
+        "note": "examples/bulk_id_mapping.py run unmodified; BiomartException on the ensembl_gene_id filter, zero rows produced.",
+        "basic": 14,
+        "specialized": 25,
+        "total": 39,
+        "executed": true,
+        "execution_note": "Ran verbatim in run/bulk_id_mapping.py; failed deterministically before any query left the client -- not a live-service issue.",
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Code executes without unhandled exceptions", "result": "FAIL", "note": "BiomartException raised on the exact filter the flagship example uses" },
+          { "text": "Output contains one row per (gene, cross-ref) pair as documented", "result": "FAIL", "note": "Zero rows produced" },
+          { "text": "No fabricated biological data in output", "result": "PASS", "note": "Clean error, no silently-wrong data" },
+          { "text": "Error message clearly identifies the cause", "result": "PASS", "note": "Names the exact unknown filter" }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Coordinate table: protein-coding genes on chr21",
+        "status": "ERROR",
+        "status_flag": "❌",
+        "note": "SKILL.md inline pattern (chr17->chr21) run verbatim; BiomartException on attribute 'biotype'. Corrected to 'gene_biotype' returns 221 real rows.",
+        "basic": 17,
+        "specialized": 29,
+        "total": 46,
+        "executed": true,
+        "execution_note": "Ran verbatim in run/input2_coordinate_table.py (fails), then corrected in run/input2b_coordinate_table_corrected.py (succeeds, 221 real chr21 protein-coding genes, archived at data/input2_chr21_protein_coding_LIVE.tsv).",
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Code executes without unhandled exceptions", "result": "FAIL", "note": "As literally documented, it does not" },
+          { "text": "Attribute list matches real, queryable BioMart attribute names", "result": "FAIL", "note": "'biotype' is a filter name, not an attribute name; real attribute is 'gene_biotype'" },
+          { "text": "Corrected version returns real, plausible chr21 gene coordinates", "result": "PASS", "note": "221 rows; genes match known chr21 loci (TPTE, LIPI, CXADR, BTG3)" },
+          { "text": "No fabricated biological data", "result": "PASS", "note": "Live real data, cross-checked" }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Discover real attributes/filters before trusting field names",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "SKILL.md discovery pattern run verbatim plus targeted membership checks; completed cleanly and root-caused Inputs 1, 2 and 5.",
+        "basic": 36,
+        "specialized": 54,
+        "total": 90,
+        "executed": true,
+        "execution_note": "Ran in run/input3_discover.py; confirmed live against Ensembl (45 filters enumerated, ensembl_gene_id absent, gene_biotype present/biotype absent as an attribute).",
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "ds.attributes / ds.filters execute without error", "result": "PASS", "note": "Clean execution" },
+          { "text": "Output correctly enumerates real attribute/filter counts", "result": "PASS", "note": "Cross-checked against the cached live attribute/filter dump" },
+          { "text": "Confirms whether SKILL.md's own filter names are actually discoverable this way", "result": "PASS", "note": "Correctly shows ensembl_gene_id is NOT in ds.filters -- the root cause" },
+          { "text": "No fabricated data", "result": "PASS", "note": "Live real metadata" }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Ortholog wide-table: human/mouse/zebrafish chr17, 1:1 only",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "examples/ortholog_table.py run 3x (2 backoff retries); Ensembl returned an HTML outage page as HTTP 200 each time, which pybiomart silently accepted as data, crashing downstream column logic with an unhelpful StopIteration.",
+        "basic": 16,
+        "specialized": 30,
+        "total": 46,
+        "executed": true,
+        "execution_note": "Ran verbatim in run/ortholog_table.py at 3 attempts (0s, +20s, +35s); all hit the same live 'Service unavailable' 200-OK page (documented independently in this env's TOOLS.md). Ortholog attribute names separately confirmed valid (run/input3b_ortholog_attr_check.txt).",
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Code executes without unhandled exceptions", "result": "FAIL", "note": "StopIteration on all 3 attempts" },
+          { "text": "Ortholog attribute names used are valid BioMart attributes", "result": "PASS", "note": "All 4 independently confirmed present in ds.attributes" },
+          { "text": "Script validates server response before using it", "result": "FAIL", "note": "No check exists; malformed HTML silently treated as data" },
+          { "text": "No fabricated ortholog calls produced", "result": "PASS", "note": "Crashed rather than reporting wrong orthology -- a safe failure" }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "GO annotations for 4 genes + HGNC-rename check (MARCH1)",
+        "status": "ERROR",
+        "status_flag": "❌",
+        "note": "SKILL.md GO-annotation pattern run verbatim with MARCH1 added; same filter bug as Input 1. Raw-XML control confirmed external_gene_name is valid server-side (TP53); MARCH1-rename check itself blocked twice by the same live outage seen in Input 4.",
+        "basic": 13,
+        "specialized": 25,
+        "total": 38,
+        "executed": true,
+        "execution_note": "Ran verbatim in run/input5_go_and_rename.py (fails, same root cause as Input 1). Raw-XML control in run/input5b_raw_xml_march1.py and a retry in run/input5c_march1_retry.txt; TP53 succeeded live, MARCH1 hit the live outage page both times.",
+        "assertions_passed": 1,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Code executes without unhandled exceptions", "result": "FAIL", "note": "Same BiomartException as Input 1, on external_gene_name" },
+          { "text": "Output distinguishes found vs. not-found gene symbols", "result": "FAIL", "note": "Never reached that stage" },
+          { "text": "Raw-XML control confirms external_gene_name is a valid server-side filter", "result": "PASS", "note": "TP53 raw XML query returned the correct real answer, isolating the bug to the pybiomart client" },
+          { "text": "MARCH1-rename failure mode empirically confirmed this session", "result": "FAIL", "note": "Blocked twice by a live Ensembl outage; inconclusive, recorded honestly rather than assumed" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 29.2,
+    "dynamic_weighted": 31.1,
+    "score": 60,
+    "max": 100,
+    "grade": "Reject",
+    "grade_symbol": "❌",
+    "deployable": false,
+    "veto_override": true
+  },
+  "key_strengths": [
+    "SKILL.md's 'Failure modes' and 'Common errors' sections are unusually specific and accurate (row-multiplication, version drift, HGNC renames, chunking-by-chromosome) -- better than most Skills of this type, even though they miss the one failure mode that actually broke this audit's runs.",
+    "The 'discover attributes/filters before you guess' pattern (Input 3) worked cleanly and was the single most useful output of this audit, correctly root-causing every other failure.",
+    "BioMart-vs-Ensembl-REST decision matrix is accurate and well-reasoned, and the ortholog attribute names used throughout (mmusculus_homolog_*, drerio_homolog_*) are all independently confirmed valid.",
+    "Clean file separation (SKILL.md / usage-guide.md / examples/) and a genuinely useful 'Related Skills' cross-reference section."
+  ],
+  "recommendations": [
+    {
+      "priority": "P0",
+      "title": "Flagship bulk-ID-mapping pattern is non-functional with the real pybiomart client",
+      "observed_in": [1, 4, 5],
+      "problem": "SKILL.md's primary Python pattern and examples/bulk_id_mapping.py call ds.query(filters={'ensembl_gene_id': [...]}); pybiomart 0.2.0 rejects this with BiomartException because Dataset.filters never recurses into nested id_list filter definitions. The same defect hits external_gene_name (Input 5).",
+      "root_cause": "SKILL.md was apparently written/tested against a pybiomart version or mental model that does not match any version ever published to PyPI ('0.9+' does not exist; only 0.1 and 0.2.0 do), and the nested-filter gap in 0.2.0 was never caught before shipping.",
+      "fix": "Document the confirmed-working raw-XML/dataset.get() workaround as the primary Python pattern for ID-list filters (ensembl_gene_id, external_gene_name, entrezgene_id), or add an explicit warning plus try/except with the exact remediation before the high-level ds.query() call."
+    },
+    {
+      "priority": "P0",
+      "title": "Documented pybiomart version does not exist on PyPI",
+      "observed_in": [],
+      "problem": "SKILL.md frontmatter and 'Version Compatibility' section pin 'pybiomart 0.9+'; PyPI has only ever published 0.1 and 0.2.0.",
+      "root_cause": "Likely confusion with the unrelated PyPI package 'biomart' or with GitHub tag names rather than PyPI releases.",
+      "fix": "Correct the pin to 'pybiomart 0.2.0 (latest/only modern PyPI release)' and note the filter-discovery limitation as a known defect of that version."
+    },
+    {
+      "priority": "P1",
+      "title": "Coordinate-table pattern uses a non-existent attribute name ('biotype')",
+      "observed_in": [2],
+      "problem": "The inline 'Pull gene coordinate table for a chromosome' pattern lists 'biotype' as an attribute; the real attribute is 'gene_biotype' ('biotype' is only a valid filter name).",
+      "root_cause": "Attribute and filter namespaces were conflated when writing the example; never executed before publishing.",
+      "fix": "Change 'biotype' to 'gene_biotype' in the attributes list; keep the existing filters={'biotype': ...} usage, which is correct."
+    },
+    {
+      "priority": "P1",
+      "title": "No validation of BioMart's response before use",
+      "observed_in": [4],
+      "problem": "Ensembl intermittently returns an HTML 'Service unavailable' page with HTTP 200; pybiomart accepts this as data, and examples/ortholog_table.py then crashes with an opaque StopIteration with no indication of the real cause.",
+      "root_cause": "Neither pybiomart nor the Skill's example code checks the response shape before using it; SKILL.md's 'Failure modes' section does not mention this pattern despite covering 6 others.",
+      "fix": "Add a one-line sanity check (e.g. assert not response.startswith('<html')) after every query in the examples, and add this as a 7th documented failure mode in SKILL.md."
+    },
+    {
+      "priority": "P2",
+      "title": "examples/bulk_id_mapping.py and SKILL.md's own inline pattern disagree on attribute count",
+      "observed_in": [1],
+      "problem": "The shipped example adds entrezgene_id to SKILL.md's inline 5-attribute pattern; per this environment's tooling pass, that 6th attribute triggers a separate live server-side 'Too many attributes selected for External References' error once the filter bug is fixed.",
+      "root_cause": "The example and the inline documentation drifted independently.",
+      "fix": "Drop entrezgene_id from the example (matching the inline pattern) or split it into a second query joined client-side on ensembl_gene_id."
+    }
+  ]
+}
