@@ -36,6 +36,7 @@ fork is the maintained line rather than a staging area.
 | `process/` | The briefs agents follow, and the viability gates |
 | `tools/` | `publish_audits.py`, which writes audit records into `audits/` |
 | `scripts/` | `audit-index.mjs`, which generates `audits/INDEX.md` and `BACKLOG.md` (`npm run audits:index`) |
+| `crossref/` | Cross-references between Skill corpora: what duplicates what, and which of two overlapping Skills a Specialist should bundle |
 | `environments/` | How each candidate's runtime was built: interpreters, packages, command-line tools and versions |
 
 ## What is deliberately not here
