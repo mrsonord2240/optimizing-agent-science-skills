@@ -1,0 +1,228 @@
+{
+  "meta": {
+    "skill_name": "bio-pathway-wikipathways",
+    "description": "Tests a gene list (ORA, enrichWP) or a ranked gene vector (GSEA, gseWP) against the WikiPathways community-curated pathway collection with clusterProfiler and rWikiPathways. Covers why a WikiPathways result is a snapshot of a live, monthly-updated database (enrichWP/gseWP/gson_WP silently pull data.wikipathways.org/current/), why reproducibility requires pinning a dated GMT via downloadPathwayArchive(date=, format='gmt'), why the WP GMT is Entrez-keyed so symbols and Ensembl silently overlap nothing, why universe=NULL gives a biased all-WP-genes background, how to split the name%version%wpid%org term, and why WikiPathways (CC0, no peer review) complements KEGG/Reactome.",
+    "evaluated_on": "2026-09-17",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 9,
+    "source": "mrsonord2240/bioSkills@41650aa:pathway-analysis/wikipathways",
+    "executed_inputs": "3/9 re-executed this pass (inputs 4, 8, 9); 6/9 (inputs 1,2,3,5,6,7) carried forward as regression evidence from the pre-fix audit without re-execution, justified by a byte-for-byte git diff (d9971f6..41650aa) confirming their underlying R code (ORA, GSEA, universe comparison, compareCluster, zebrafish enrichWP call, raw-symbol enrichWP call, and the untouched examples/wikipathways_ora.R) is unchanged by the fix -- only the Reproducible-Analysis code block, one Common Errors table row, and prose were touched. Input 6's assertion 4 is updated on inspection (Common Errors table now documents the wrong-organism-string symptom) without re-running the unchanged R call."
+  },
+  "veto_gates": {
+    "skill_veto": { "gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS" },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "This pass's own executed numbers (WP554 p.adjust 6.44e-11 and WP430 p.adjust 8.90e-22 from the computed-date archive; WP554 p.adjust 2.73e-51 from the shipped examples/wikipathways_explore.R) match the fix log's independently reported values exactly. No fabricated statistics found in the fixed Skill or in this report." },
+      "practice_boundaries": { "result": "PASS", "detail": "Unchanged from pre-fix: gene-set/pathway enrichment on de-identified expression data only; no individual-level, diagnostic, or prescriptive content." },
+      "methodological_ground": { "result": "PASS", "detail": "The fix's core methodological change -- replacing a hardcoded archive date with a computed one -- is the correct direction (a permanent 404 traded for an occasional, self-correcting month-to-month drift) and is now explicitly documented as such, including the retention window and the Zenodo long-term fallback (verified live: zenodo.org/communities/wikipathways redirects 308->200 to a real, populated community page). No fallacy found." },
+      "code_usability": { "result": "PASS", "detail": "Both defects this fix targeted (the hardcoded-date 404, and the entrez_ids/all_entrez bug that fixing the date exposed in examples/wikipathways_explore.R) are confirmed fixed by direct re-execution: the SKILL.md 'Reproducible Analysis with a Dated GMT' code block runs end-to-end today with its own computed date, and the shipped wikipathways_explore.R runs byte-for-byte unmodified to completion with no R error, where the pre-fix version halted at 'Execution halted' on both." }
+    }
+  },
+  "static_score": {
+    "subtotal": 95,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 12, "max": 12, "note": "Completeness 4/4, Appropriateness 4/4 (unchanged). Correctness now 4/4 (was 3/4 pre-fix): the one worked reproducibility example that 404s no longer hardcodes a stale date -- it computes one, verified live to succeed today, and the ~12-month retention window is now stated in-line where the date is computed." },
+      "reliability": { "score": 11, "max": 12, "note": "Error Reporting 4/4 (unchanged, 8-row Common Errors table plus Per-Method Failure Modes, now 9 rows -- the wrong-organism-string P2 row added, confirmed present). Fault Tolerance now 4/4 (archive-retention 404 is now explained and defended against by computing a recent date). Recoverability stays at 3/4: the fix documents what to do when a date is DELIBERATELY older than the retention window (use Zenodo), but not what an agent should do if the COMPUTED date itself unexpectedly fails to download (confirmed live this pass: a date just outside the window still 404s with a bare R error and no recovery guidance in the code or SKILL.md -- new P2, see recommendations)." },
+      "performance_context": { "score": 8, "max": 8, "note": "Unchanged: SKILL.md grew 207->250 lines from the redundancy pass (absorbed genuinely new content from usage-guide.md, not padding), workflow stays linear with no redundant round-trips." },
+      "agent_usability": { "score": 16, "max": 16, "note": "Learnability 4, Consistency 4, Feedback Design 4 (unchanged). Error Prevention now 4/4 (was 3/4): the archive-retention-window trap that this audit's pre-fix pass hit is now proactively warned about and defended against by the computed-date pattern itself." },
+      "human_usability": { "score": 6, "max": 8, "note": "Unchanged from pre-fix: Discoverability 3/4 (dense, technical trigger language), Forgiveness 3/4 under the Category-3 override (clean NULL/empty degradation is the correct data-integrity posture)." },
+      "security": { "score": 12, "max": 12, "note": "Unchanged: no credentials, no eval/exec of raw strings, no destructive operations, only unauthenticated public WikiPathways network calls." },
+      "maintainability": { "score": 11, "max": 12, "note": "Modularity 4/4 (unchanged). Modifiability 3/4 (unchanged: extension points still implicit via Related Skills). Testability now 4/4 (was 3/4): both shipped example scripts now run verbatim end-to-end without error -- confirmed this pass by re-running examples/wikipathways_explore.R byte-for-byte, which previously halted with an unhandled R error at the exact stale-date call." },
+      "agent_specific": { "score": 19, "max": 20, "note": "Trigger Precision 4, Progressive Disclosure 4, Composability 4 (unchanged). Idempotency stays 3/4 (current/ drift is still an intentional, by-design re-run hazard, now joined by the smaller computed-date drift, which is the same trade-off, not a new defect). Escape Hatches now 4/4 (was 3/4): the unsupported-organism silent-NULL case and the stale-date case both now have an explicit, documented stop condition / fix." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 94.1,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 38, "total": 40 },
+    "inputs": [
+      {
+        "index": 1, "type": "Canonical",
+        "label": "ORA on ~63 significant human genes (SYMBOL) against a ~3080-gene tested universe, top 15 by p.adjust with readable symbols",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Regression, not re-executed this pass. run/in1_canonical.R's code path (bitr -> enrichWP(universe=) -> setReadable) is byte-identical between the pre-fix commit (d9971f6) and the fixed commit (41650aa) -- confirmed by git diff, which shows zero changes to the ORA section or examples/wikipathways_ora.R. Pre-fix result carried forward: enrichWP recovered both planted pathways (WP430 rank1 p.adjust 9.5e-22, WP554 rank3 p.adjust 6.9e-11).",
+        "executed": false,
+        "execution_note": "Not re-run this pass; carried forward from F:\\OpenScience\\audits\\_pre-fix-20260917\\bio-pathway-wikipathways\\run\\in1_canonical.R and .out, justified by the diff showing this code path is untouched by the fix.",
+        "basic": 38, "specialized": 57, "total": 95,
+        "assertions_passed": 5, "assertions_total": 5,
+        "assertions": [
+          { "text": "bitr converts SYMBOL sig and universe lists to ENTREZID with a reported conversion rate", "result": "PASS", "note": "carried forward: 63/63 sig, 3080/3048 universe" },
+          { "text": "enrichWP is called with universe= set to the tested-gene Entrez vector, not left NULL", "result": "PASS", "note": "carried forward: universe = all_entrez per the Skill's own pattern" },
+          { "text": "The planted WikiPathways signal is recovered among the top hits by p.adjust", "result": "PASS", "note": "carried forward: WP554 rank 3/15, WP430 rank 1/15" },
+          { "text": "setReadable() converts the geneID column from Entrez back to gene symbols", "result": "PASS", "note": "carried forward, ran without error" },
+          { "text": "Output reports p.adjust (BH-adjusted), not raw p, as the column to act on", "result": "PASS", "note": "carried forward, Understanding Results table agrees" }
+        ]
+      },
+      {
+        "index": 2, "type": "Variant A",
+        "label": "GSEA (gseWP) on the full ranked gene list, no cutoff",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Regression, not re-executed this pass. The GSEA section's code block is byte-identical between d9971f6 and 41650aa (confirmed by diff). Pre-fix result carried forward: both planted terms recovered with correct-sign NES, determinism confirmed by same-seed re-run.",
+        "executed": false,
+        "execution_note": "Not re-run this pass; carried forward from run/in2_gsea.R and .out in the pre-fix report, justified by the diff.",
+        "basic": 37, "specialized": 59, "total": 96,
+        "assertions_passed": 5, "assertions_total": 5,
+        "assertions": [
+          { "text": "The ranked vector is a NAMED Entrez vector sorted DECREASING", "result": "PASS", "note": "carried forward" },
+          { "text": "set.seed(123) fixes permutation reproducibility as the SKILL states", "result": "PASS", "note": "carried forward, identical term set/NES on re-run" },
+          { "text": "Both planted terms recovered with the biologically correct NES sign", "result": "PASS", "note": "carried forward: WP554 +2.77, WP430 -3.05" },
+          { "text": "No universe= argument is used for gseWP", "result": "PASS", "note": "carried forward" },
+          { "text": "NES and core_enrichment are the columns to read, as documented", "result": "PASS", "note": "carried forward" }
+        ]
+      },
+      {
+        "index": 3, "type": "Edge",
+        "label": "universe=NULL vs a matched tested-gene universe",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Regression, not re-executed this pass. This section of SKILL.md and the underlying enrichWP calls are byte-identical between d9971f6 and 41650aa. Pre-fix result carried forward: background N jumped 186->9031, p.adjust for the same true-positive hit went from 6.86e-11 to 9.34e-39 under the default universe.",
+        "executed": false,
+        "execution_note": "Not re-run this pass; carried forward from run/in3_universe.R and .out, justified by the diff.",
+        "basic": 38, "specialized": 57, "total": 95,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "universe=NULL uses a biased all-WP-genes background, as documented", "result": "PASS", "note": "carried forward" },
+          { "text": "Passing the tested-gene universe produces a smaller, defensible background N", "result": "PASS", "note": "carried forward: 186 vs 9031" },
+          { "text": "p.adjust for the same true-positive term is dramatically more significant under the default universe", "result": "PASS", "note": "carried forward: 6.86e-11 vs 9.34e-39" },
+          { "text": "A gene list with no planted biology does not fabricate false pathway hits under either universe setting", "result": "PASS", "note": "carried forward" }
+        ]
+      },
+      {
+        "index": 4, "type": "Variant B",
+        "label": "Reproducible analysis: pin a dated GMT (now via the Skill's own computed-date pattern), split the term field, run enricher, report the date",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "RE-EXECUTED this pass, the direct regression test for the P1 fix. The Skill's own current worked code block (archive_date <- format(Sys.Date()-60,'%Y%m10')) was run verbatim against the same synthetic DE data as the pre-fix Input 4. Result: computed date 20260710 downloaded successfully (333 KB, <1s), and enricher on the pinned/split GMT recovered WP554 (p.adjust 6.435e-11) and WP430 (p.adjust 8.901e-22) -- matching the fix log's independently reported values exactly. Also probed a new edge case: a date 400 days back (simulating an unlucky computed-date miss, distinct from the deliberately-older-than-12-months case the Zenodo fallback already covers) still 404s with a bare R error and no documented recovery step -- new P2 finding.",
+        "executed": true,
+        "execution_note": "run/in4_dated_gmt_computed.R against data/de_results_synthetic.csv (same synthetic data as the pre-fix report, reused and reconfirmed synthetic); output run/in4_dated_gmt_computed.out.",
+        "basic": 38, "specialized": 53, "total": 91,
+        "assertions_passed": 4, "assertions_total": 5,
+        "assertions": [
+          { "text": "The Skill's own current worked example (computed archive_date) downloads successfully today", "result": "PASS", "note": "date 20260710 downloaded, 333 KB, <1s; pre-fix's literal '20240310' would still 404 the same way" },
+          { "text": "SKILL.md documents the archive's retention window and a long-term citable fallback (Zenodo)", "result": "PASS", "note": "'The live archive keeps only the last ~12 months' and the Zenodo GMT/GPML archive URL are both present; the Zenodo URL was verified live this pass (308->200, real populated community page)" },
+          { "text": "With the computed date, the term field splits correctly and enricher recovers the planted terms", "result": "PASS", "note": "WP554 p.adjust 6.435e-11, WP430 p.adjust 8.901e-22, matching the fix log exactly" },
+          { "text": "format='gmt' is required and documented (default is 'gpml')", "result": "PASS", "note": "unchanged, confirmed present" },
+          { "text": "The Skill documents what to do if the COMPUTED archive_date itself unexpectedly fails to download (not just the deliberately-older-than-window case)", "result": "FAIL", "note": "no retry/fallback/diagnostic guidance exists for this specific case; confirmed live this pass that a near-window date still 404s with a bare, unhandled-style error and no pointer back to Zenodo or a wider search window" }
+        ]
+      },
+      {
+        "index": 5, "type": "Stress",
+        "label": "compareCluster(fun='enrichWP') across up- and down-regulated gene clusters",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Regression, not re-executed this pass. This section's Decision Tree row and underlying pattern are unchanged between d9971f6 and 41650aa. Pre-fix result carried forward: 16 cluster-tagged rows, WP554 exclusively in up, WP430 exclusively in down, 0 cross-cluster leakage.",
+        "executed": false,
+        "execution_note": "Not re-run this pass; carried forward from run/in5_comparecluster.R and .out, justified by the diff.",
+        "basic": 38, "specialized": 57, "total": 95,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "compareCluster(fun='enrichWP') runs against two named gene clusters in one call", "result": "PASS", "note": "carried forward" },
+          { "text": "Planted UP signal (WP554) assigned exclusively to the up cluster", "result": "PASS", "note": "carried forward" },
+          { "text": "Planted DOWN signal (WP430) assigned exclusively to the down cluster", "result": "PASS", "note": "carried forward" },
+          { "text": "Result is a standard clustered enrichResult usable downstream by enrichment-visualization", "result": "PASS", "note": "carried forward" }
+        ]
+      },
+      {
+        "index": 6, "type": "Scope Boundary",
+        "label": "Non-model organism: zebrafish enrichWP, confirming the exact organism string",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Not re-executed this pass -- the enrichWP/get_wp_organisms() calls are byte-identical between d9971f6 and 41650aa. What DID change (confirmed by inspection, not re-run) is the fix for the pre-fix report's own P2 finding: the Common Errors table now has a row for exactly this symptom ('enrichWP/gseWP returns NULL with no terms | wrong/non-canonical organism string | verify with listOrganisms()/get_wp_organisms() first'). The underlying live result (silent NULL on 'zebrafish', correct hit on 'Danio rerio') is unchanged and was not re-queried.",
+        "executed": false,
+        "execution_note": "Not re-run this pass; carried forward from run/in6_zebrafish.R and .out. Assertion 4 updated on inspection of the fixed SKILL.md Common Errors table, since the change there is documentation-only and does not alter the R call's behavior.",
+        "basic": 38, "specialized": 58, "total": 96,
+        "assertions_passed": 5, "assertions_total": 5,
+        "assertions": [
+          { "text": "get_wp_organisms()/listOrganisms() both confirm 'Danio rerio' as the exact organism string", "result": "PASS", "note": "carried forward" },
+          { "text": "enrichWP with organism='Danio rerio' recovers the real, planted zebrafish pathway exactly", "result": "PASS", "note": "carried forward: WP468, p.adjust 1.15e-9, 7/7 genes" },
+          { "text": "An incorrect organism string is handled without a crash", "result": "PASS", "note": "carried forward: returned NULL, no R error" },
+          { "text": "SKILL.md documents what actually happens on an incorrect organism string", "result": "PASS", "note": "was FAIL pre-fix; now PASS -- the P2 fix added the exact Common Errors row, confirmed present by inspection this pass" },
+          { "text": "The Skill's '~30+ species' coverage claim is consistent with the live listOrganisms() count", "result": "PASS", "note": "carried forward: 39 organisms" }
+        ]
+      },
+      {
+        "index": 7, "type": "Adversarial",
+        "label": "\"Just run enrichWP directly on my gene symbols, don't bother converting IDs\"",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Regression, not re-executed this pass. The raw-SYMBOL enrichWP call and the Common Errors row it exercises are unchanged. Pre-fix result carried forward: NULL result, 'No gene can be mapped', no crash, no fabricated hits.",
+        "executed": false,
+        "execution_note": "Not re-run this pass; carried forward from run/in7_adversarial_symbols.R and .out, justified by the diff.",
+        "basic": 38, "specialized": 57, "total": 95,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "enrichWP on raw SYMBOL input does not throw an R error/crash", "result": "PASS", "note": "carried forward" },
+          { "text": "Result is NULL/empty rather than a misleading non-empty table", "result": "PASS", "note": "carried forward" },
+          { "text": "The Skill's own Common Errors table entry predicts this exact outcome", "result": "PASS", "note": "carried forward" },
+          { "text": "No fabricated pathway hits are returned despite the malformed input", "result": "PASS", "note": "carried forward" }
+        ]
+      },
+      {
+        "index": 8, "type": "Stress",
+        "label": "NEW (this re-audit): run the shipped examples/wikipathways_explore.R byte-for-byte, unmodified, end-to-end -- the regression test for both the P1 fix and the entrez_ids bug it exposed",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "The pre-fix audit found this exact file halted with an unhandled R error ('Execution halted') at the stale-date downloadPathwayArchive call. Run unmodified this pass: it completes end-to-end (exit 0), computes archive_date=20260710, downloads the archive, and its final self-contained enricher block recovers WP554 as the clear top hit (p.adjust 2.73e-51, 17/17 genes) -- exactly matching the fix log's independently reported 2.7e-51. No undefined-variable error (entrez_ids/all_entrez), confirming the second, previously-undiscovered defect the fixer found while verifying the P1 fix is also resolved.",
+        "executed": true,
+        "execution_note": "run/in8_explore_verbatim.sh runs skill_copy/examples/wikipathways_explore.R via the crispr-screen-analyst r.sh wrapper, copied from the fixed Skill folder unmodified; output run/in8_explore_verbatim.out.",
+        "basic": 39, "specialized": 55, "total": 94,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "The shipped examples/wikipathways_explore.R runs end-to-end unmodified without an R error", "result": "PASS", "note": "exit 0, full output through the final enricher data frame; pre-fix ran the identical unmodified file and got 'Execution halted'" },
+          { "text": "The archive_date the script computes downloads successfully against the live server", "result": "PASS", "note": "20260710, 333 KB, <1s" },
+          { "text": "The script is self-contained: entrez_ids/all_entrez are defined within the file, not assumed from a sibling script", "result": "PASS", "note": "reuses the WP554 genes fetched via getXrefList() earlier in the same file; no undefined-object error" },
+          { "text": "enricher on the pinned archive recovers a real, correctly-annotated pathway (WP554) as a top hit", "result": "PASS", "note": "rank 1 of 10, p.adjust 2.7316e-51, 17/17 genes -- matches the fix log's reported value exactly" }
+        ]
+      },
+      {
+        "index": 9, "type": "Edge",
+        "label": "NEW (this re-audit): does the redundancy pass (SKILL.md 209->250 lines, usage-guide.md 100->37 lines) leave an agent following ONLY the surviving files with everything the deleted usage-guide.md passages provided?",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "An automated content-presence check (18 assertions derived from the fix log's own deletion table) plus a manual read of both files found the redundancy pass sound: every install command, conceptual prerequisite, workflow step, results table, and failure-mode tip the fix log claims moved is actually present at its claimed destination. One genuine, if minor, loss: the deleted Tips bullet 'WikiPathways has fewer total pathways than KEGG' (an unsourced, non-operational comparative claim) has no surviving equivalent anywhere in SKILL.md or usage-guide.md -- the closest remaining content (the WikiPathways-vs-KEGG/Reactome table) compares organism-species counts, not total pathway counts, so this specific claim is dropped rather than relocated.",
+        "executed": true,
+        "execution_note": "run/in9_redundancy_check.py, a content-presence script checking 19 assertions (18 auto-checked + 1 derived from reading the deleted Quick-Start section against surviving Example Prompts / Decision Tree); output run/in9_redundancy_check.out. Also manually read both skill_copy/SKILL.md and skill_copy/usage-guide.md in full against the fix log's deletion table.",
+        "basic": 38, "specialized": 52, "total": 90,
+        "assertions_passed": 3, "assertions_total": 4,
+        "assertions": [
+          { "text": "Every deleted usage-guide.md passage claimed to have a new home in SKILL.md is actually present there", "result": "PASS", "note": "17/18 automated substring checks pass on operationally-relevant content; the one miss is the non-operational pathway-count claim below" },
+          { "text": "Nothing an agent needs to follow the Skill's core workflow (install, ID conversion, universe, dated-GMT, organism verification) was lost in the pass", "result": "PASS", "note": "install block, all five conceptual prerequisites, the numbered agent workflow, the results-column table, and every failure-mode tip checked are present in SKILL.md" },
+          { "text": "The three deleted Quick Start one-liners are functionally covered by surviving Example Prompts / Decision Tree entries", "result": "PASS", "note": "basic enrichment and reproducible-analysis prompts survive verbatim-in-spirit in usage-guide.md's Example Prompts; the disease/drug-vs-KEGG/Reactome scenario is covered by SKILL.md's Decision Tree row rather than a 1:1 prompt match -- coverage survives, exact wording does not" },
+          { "text": "No content present before the pass has zero surviving coverage after it", "result": "FAIL", "note": "the deleted Tips claim 'WikiPathways has fewer total pathways than KEGG' has no surviving equivalent; low materiality (unsourced, non-operational, not something an agent acts on), but it is a genuine drop, not a relocation" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 38.0,
+    "dynamic_weighted": 56.5,
+    "score": 94,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Both defects the fixer set out to resolve are confirmed fixed by direct re-execution, not just inspection: the SKILL.md worked example's computed date downloads live today and reproduces the fix log's exact p.adjust values (6.435e-11 / 8.901e-22), and the shipped examples/wikipathways_explore.R -- which pre-fix halted with an unhandled R error -- now runs byte-for-byte unmodified to completion (p.adjust 2.73e-51 for WP554, matching the fix log exactly).",
+    "The computed-date approach (format(Sys.Date()-60,'%Y%m10')) is the right trade for an agent-run Skill: it converts a guaranteed future 404 into a rare, self-correcting one, and the Skill now states the retention window and the Zenodo long-term fallback -- verified live this pass to be a real, working, populated archive (zenodo.org/communities/wikipathways).",
+    "The redundancy pass (SKILL.md 209->250, usage-guide.md 100->37 lines) survives a targeted content-loss audit: every install command, workflow step, results table, and failure-mode tip an agent needs is present at its claimed new location; only one low-materiality, unsourced comparative claim was genuinely dropped.",
+    "Six of the seven pre-fix inputs (ORA, GSEA, universe comparison, compareCluster, zebrafish, adversarial symbols) remain valid without re-execution because a git diff confirms their underlying code is byte-identical to the pre-fix commit -- the fix and redundancy pass touched only the reproducibility section, one Common Errors row, and prose."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "No documented recovery path when the computed archive_date itself misses",
+      "observed_in": [4],
+      "problem": "The fix's Zenodo fallback guidance covers a date DELIBERATELY older than the ~12-month retention window, but nothing documents what an agent should do if downloadPathwayArchive(date=archive_date) itself unexpectedly 404s on the freshly-computed, supposedly-in-window date (confirmed live this pass: a date just past the window still fails with a bare, unhandled-style R error).",
+      "root_cause": "The fix treats 'compute a recent date' as sufficient and only documents the already-known always-fails case (too old); it does not document the should-usually-work-but-might-not case.",
+      "fix": "Add one sentence or a tryCatch pattern: if downloadPathwayArchive() 404s on the computed date, step back one more month (Sys.Date() - 90, -120, ...) before falling back to Zenodo, and say so in the Reproducible Analysis section or the Common Errors table."
+    },
+    {
+      "priority": "P2",
+      "title": "Redundancy pass silently dropped one Tips claim with no surviving equivalent",
+      "observed_in": [9],
+      "problem": "The deleted usage-guide.md Tips bullet 'WikiPathways has fewer total pathways than KEGG; best used as a complement' has no surviving statement anywhere in SKILL.md or usage-guide.md -- the closest remaining content (the WikiPathways-vs-KEGG/Reactome table's Species row) compares organism counts, not pathway counts.",
+      "root_cause": "The fix log's deletion table classified this bullet as 'no unique content' alongside several bullets that genuinely were duplicates, but this specific quantitative comparison was not actually restated elsewhere.",
+      "fix": "Either restore a one-line version of the claim (with a source, since the original was unsourced) in the WikiPathways vs KEGG/Reactome section, or drop it deliberately and note the removal in the fix log rather than folding it into the true-duplicate bucket."
+    }
+  ]
+}

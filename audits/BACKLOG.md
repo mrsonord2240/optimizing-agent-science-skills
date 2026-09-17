@@ -30,7 +30,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: Both files build a toy exponential-decay LD matrix independently of the simulated per-SNP betas/SEs, so the LD is not internally consistent with any genotype process that could have produced those z-scores; estimate_s_rss correctly detects this (lambda 0.21-0.39, far above the Skill's own 0.05 threshold).
 - Fix: Regenerate both example datasets from a single simulated genotype matrix, deriving both the GWAS/eQTL summary statistics AND the LD matrix from that same genotype matrix (verified working in this audit's run/input2b_susie_selfconsistent.R, which recovers the planted 2-credible-set truth exactly with lambda=0).
 
-## P1 (80)
+## P1 (79)
 
 ### `bio-experimental-design-sample-size` — PROPER and powsimR routes ship with no executable pattern
 
@@ -656,14 +656,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The Version Compatibility disclosure block added in the last fix pass covered only the two functions the fixer was explicitly told about (CalculateOraScore/CalculateQeaScore); it was not extended to the library-loading functions that also reach out to a remote server.
 - Fix: Add one sentence to Version Compatibility or Prerequisites noting that SetKEGG.PathLib/CrossReferencing/Setup.KEGGReferenceMetabolome download generic (non-user) reference libraries from metaboanalyst.ca on first use or after a 30-day cache expiry, mirroring the existing FELLA/KEGGREST live-dependency disclosure.
 
-### `bio-pathway-wikipathways` — Reproducibility worked example uses a date the live archive no longer serves
-
-- Skill: 92, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/pathway-analysis/wikipathways) · [viewer](skills/bio-pathway-wikipathways/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 4
-- Problem: SKILL.md's and usage-guide.md's own 'correct, reproducible pattern' example, downloadPathwayArchive(date='20240310', organism='Homo sapiens', format='gmt'), returns an HTTP 404 today because data.wikipathways.org retains only the last 12 months of monthly archives; nothing in the Skill states this retention window or names the Zenodo GMT/GPML archive that WikiPathways' own site recommends for anything older. This is not just a documentation staleness issue: the shipped examples/wikipathways_explore.R file itself, run byte-for-byte unmodified, halts on this exact call ('Execution halted').
-- Root cause: The reproducibility guidance treats the dated-archive endpoint as a permanent pin when it is only durable for about a year on WikiPathways' own infrastructure.
-- Fix: Replace the hardcoded date in both worked examples with guidance to use a date within the last 12 months, and add one sentence noting the retention window plus the Zenodo GMT/GPML community archive (https://zenodo.org/communities/wikipathways) as the citable long-term fallback for anything published beyond that window.
-
 ### `bio-pathway-kegg-pathways` — graphite route disagrees with direct spia() on perturbation direction for 30% of pathways, undocumented
 
 - Skill: 94, Production Ready · [mrsonord2240/bioSkills@424a053](https://github.com/mrsonord2240/bioSkills/tree/424a0533ba4b67063c884886c727b1f3ecab6342/pathway-analysis/kegg-pathways) · [viewer](skills/bio-pathway-kegg-pathways/mrsonord2240-bioSkills@424a053/viewer.md)
@@ -672,7 +664,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: This divergence was undiscoverable before this fix round because the graphite route never completed a single successful run pre-fix (Research Veto M4 FAIL); the fixer's own verification (fixes/bio-pathway-kegg-pathways.md) checked that runSPIA returned real rows but did not cross-check its direction calls against the direct spia() route.
 - Fix: Add a caveat to the SPIA section (and the Common Errors / Per-Method Failure Modes tables) stating that graphite's harmonized topology can disagree with SPIA's native KEGG-bundled topology on perturbation direction for a meaningful fraction of pathways, and recommend treating the two routes as complementary evidence rather than interchangeable, or explicitly stating which one to prefer as the default and why.
 
-## P2 (253)
+## P2 (254)
 
 ### `bio-experimental-design-sample-size` — SKILL.md code blocks omit set.seed
 
@@ -2538,14 +2530,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The new Correspondence-section sentence was written with a same-group-replicate example in mind and doesn't flag that a mixed-group case/control pair behaves differently.
 - Fix: Add one clause distinguishing '2 replicates of one condition' (minFraction meaningfully varies 0.5 vs 1.0) from '1 sample per condition, no true replicates' (minFraction in (0,1] is equivalent; there is no within-group fraction to tune).
 
-### `bio-pathway-wikipathways` — Wrong-organism-string failure mode is undocumented
-
-- Skill: 92, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/pathway-analysis/wikipathways) · [viewer](skills/bio-pathway-wikipathways/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 6
-- Problem: enrichWP(organism='zebrafish') (a plausible common-name mistake instead of the required scientific binomial) returns NULL silently, but this specific symptom is absent from the otherwise-thorough Common Errors and Per-Method Failure Modes tables, which only say to verify the string first without saying what a wrong one does.
-- Root cause: The failure-mode tables were written around the ID-type, universe, and date/format pitfalls but not the free-text organism parameter, which fails the same silent-NULL way.
-- Fix: Add one row to the Common Errors table: 'enrichWP/gseWP returns NULL with no terms \| wrong/non-canonical organism string \| verify with listOrganisms()/get_wp_organisms() first; the string must match exactly.'
-
 ### `bio-workflows-metabolomics-pipeline` — MS-DIAL alternate entry point still has zero glue code
 
 - Skill: 92, Production Ready · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/workflows/metabolomics-pipeline) · [viewer](skills/bio-workflows-metabolomics-pipeline/mrsonord2240-bioSkills@6847328/viewer.md)
@@ -2641,6 +2625,22 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: examples/kegg_spia_topology.R's default n_boot=2000 makes a full run of the direct spia() + graphite sections take substantially longer than the other examples in this Skill; an agent following the shipped example verbatim on a first exploratory pass has no documented lighter-weight option.
 - Root cause: n_boot is hardcoded to SPIA's own package default without a documented fast-iteration alternative.
 - Fix: Add a one-line comment noting that nB can be lowered (e.g. to 200-500) for interactive exploration and should be raised back to 2000+ only for the final reported result, mirroring the practice this and the fixer's own verification already use.
+
+### `bio-pathway-wikipathways` — No documented recovery path when the computed archive_date itself misses
+
+- Skill: 94, Production Ready · [mrsonord2240/bioSkills@41650aa](https://github.com/mrsonord2240/bioSkills/tree/41650aaada13fe9b267c617e40353f480740940b/pathway-analysis/wikipathways) · [viewer](skills/bio-pathway-wikipathways/mrsonord2240-bioSkills@41650aa/viewer.md)
+- Observed in inputs: 4
+- Problem: The fix's Zenodo fallback guidance covers a date DELIBERATELY older than the ~12-month retention window, but nothing documents what an agent should do if downloadPathwayArchive(date=archive_date) itself unexpectedly 404s on the freshly-computed, supposedly-in-window date (confirmed live this pass: a date just past the window still fails with a bare, unhandled-style R error).
+- Root cause: The fix treats 'compute a recent date' as sufficient and only documents the already-known always-fails case (too old); it does not document the should-usually-work-but-might-not case.
+- Fix: Add one sentence or a tryCatch pattern: if downloadPathwayArchive() 404s on the computed date, step back one more month (Sys.Date() - 90, -120, ...) before falling back to Zenodo, and say so in the Reproducible Analysis section or the Common Errors table.
+
+### `bio-pathway-wikipathways` — Redundancy pass silently dropped one Tips claim with no surviving equivalent
+
+- Skill: 94, Production Ready · [mrsonord2240/bioSkills@41650aa](https://github.com/mrsonord2240/bioSkills/tree/41650aaada13fe9b267c617e40353f480740940b/pathway-analysis/wikipathways) · [viewer](skills/bio-pathway-wikipathways/mrsonord2240-bioSkills@41650aa/viewer.md)
+- Observed in inputs: 9
+- Problem: The deleted usage-guide.md Tips bullet 'WikiPathways has fewer total pathways than KEGG; best used as a complement' has no surviving statement anywhere in SKILL.md or usage-guide.md -- the closest remaining content (the WikiPathways-vs-KEGG/Reactome table's Species row) compares organism counts, not pathway counts.
+- Root cause: The fix log's deletion table classified this bullet as 'no unique content' alongside several bullets that genuinely were duplicates, but this specific quantitative comparison was not actually restated elsewhere.
+- Fix: Either restore a one-line version of the claim (with a source, since the original was unsourced) in the WikiPathways vs KEGG/Reactome section, or drop it deliberately and note the removal in the fix log rather than folding it into the true-duplicate bucket.
 
 ### `bio-metabolomics-metabolite-annotation` — Inline code comment misplaces where the precursor_mz AssertionError actually fires
 
