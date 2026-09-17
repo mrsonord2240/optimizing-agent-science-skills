@@ -1,0 +1,8 @@
+library(GenomicSEM)
+b3 <- deparse(body(commonfactorGWAS))
+m <- grep("covstruc\\[|SNPs\\[|colnames\\(SNPs\\)", b3, value=TRUE)
+cat(paste(head(m, 80), collapse="\n"), "\n")
+cat("\n--- ldsc return structure (tail of body) ---\n")
+b4 <- deparse(body(ldsc))
+tail_lines <- tail(b4, 30)
+cat(paste(tail_lines, collapse="\n"), "\n")

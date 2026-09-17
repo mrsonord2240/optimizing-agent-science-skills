@@ -1,0 +1,8 @@
+cat("mr.raps version:", as.character(packageVersion("mr.raps")), "\n")
+cat("mrclust version:", as.character(packageVersion("mrclust")), "\n")
+library(mr.raps)
+cat("mr.raps exports mr.raps fn:", exists("mr.raps", where=asNamespace("mr.raps")), "\n")
+library(mrclust)
+cat("mrclust exports mr_clust_em fn:", exists("mr_clust_em", where=asNamespace("mrclust")), "\n")
+cat("TwoSampleMR mr_raps wraps mr.raps:\n")
+print(TwoSampleMR::mr_raps)

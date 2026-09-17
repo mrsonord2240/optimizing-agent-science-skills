@@ -1,0 +1,5 @@
+library(MRPRESSO)
+fn <- getAnywhere("mr_presso")
+src <- deparse(fn$objs[[1]])
+idx <- grep("Pvalue|GlobalTest|Global", src, ignore.case = TRUE)
+cat(paste(src[idx], collapse = "\n"), "\n")

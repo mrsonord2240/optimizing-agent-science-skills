@@ -1,0 +1,215 @@
+{
+  "meta": {
+    "skill_name": "bio-causal-genomics-pleiotropy-detection",
+    "description": "Detect and adjust for horizontal pleiotropy in two-sample Mendelian randomization by distinguishing uncorrelated (UHP) from correlated (CHP) pleiotropy and choosing among Egger, MR-PRESSO, MR-RAPS, CAUSE, LHC-MR, LCV, MR-Clust, MR-Mix, and contamination-mixture methods. Use when validating an MR causal claim, running the STROBE-MR sensitivity battery, suspecting a shared heritable confounder, working under weak-instrument or polygenic-exposure regimes, or reconciling discordant estimates across robust methods.",
+    "evaluated_on": "2026-09-17",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:causal-genomics/pleiotropy-detection"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "FAIL",
+      "scientific_integrity": { "result": "PASS", "detail": "No fabricated DOI/PMID/trial results/p-values found; all 25 cited references are real, correctly-attributed papers; every statistic reported across all 7 inputs is a value this audit actually computed." },
+      "practice_boundaries": { "result": "PASS", "detail": "Input 6 (population MR result reframed as a personal statin decision) was correctly declined and redirected to a physician; no diagnostic/prescriptive language found elsewhere." },
+      "methodological_ground": { "result": "PASS", "detail": "The Skill's entire UHP/CHP framing exists specifically to prevent correlation-as-causation overreach; no methodological fallacy found; no applicable ethics/IRB omission (public GWAS summary statistics only)." },
+      "code_usability": { "result": "FAIL", "detail": "examples/simex_egger_correction.R, run verbatim against the exact simex 1.8 package version confirmed installed in this environment, crashes with 'object se.outcome not found' inside simex()'s internal model refit (reproduced twice: Input 5 first attempt and isolated in run/debug_simex.R). This is the Skill's explicitly named fix for its own central 'MR-Egger NOME violation' failure mode, not a peripheral path." }
+    }
+  },
+  "static_score": {
+    "subtotal": 81,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 10, "max": 12, "note": "Completeness and appropriateness both excellent (4/4 each); Correctness docked to 2/4 for two confirmed code-level defects in central, explicitly-referenced paths (SIMEX crash, LCV field-name bug)." },
+      "reliability": { "score": 10, "max": 12, "note": "Best-in-class Per-Method-Failure-Modes and Common-Errors tables, but they miss the exact failure modes this audit found empirically (SIMEX crash, MR-Mix silently non-NA below its own documented minimum, LCV field bug)." },
+      "performance_context": { "score": 6, "max": 8, "note": "Efficient decision-tree gating (only escalate to CAUSE/LHC-MR when needed), but usage-guide.md duplicates rather than layers SKILL.md content." },
+      "agent_usability": { "score": 14, "max": 16, "note": "Very clear vocabulary, explicit output specs at every step; error-prevention docked for the same gaps as Reliability." },
+      "human_usability": { "score": 7, "max": 8, "note": "Precise, domain-correct trigger language; graceful, well-documented handling across the tested input range." },
+      "security": { "score": 10, "max": 12, "note": "No credential/data-safety issues; the Skill adds no defensive input-validation layer of its own beyond what underlying packages provide, and Input 7 showed that reliance can fail silently." },
+      "maintainability": { "score": 9, "max": 12, "note": "Clean modular split (SKILL.md / usage-guide.md / examples/), but SKILL.md and usage-guide.md duplicate enough content that a single fix (e.g. the LCV bug) needs applying twice." },
+      "agent_specific": { "score": 15, "max": 20, "note": "Precise trigger, excellent Related-Skills composability map; SKILL.md carries reference-table volume (437 lines, no references/ folder at all) that would normally be split out." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 82.0,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 21, "total": 27 },
+    "inputs": [
+      {
+        "index": 1, "type": "Canonical", "label": "Standard battery on real BMI(GIANT15) x MDD(PGC18) GWAS data",
+        "status": "PARTIAL", "status_flag": "⚠️",
+        "note": "IVW/Egger/median/mode/heterogeneity/I2_GX/LOO completed and matched independently-cached real-data values exactly; Steiger blocked by missing samplesize columns in the manually-harmonised frame; MR-PRESSO on the real 95-SNP dataset did not complete at either NbDistribution=10000 or a second attempt at 5000 -- both background R processes were killed by a working-directory/session reset before printing a result (exit 127, an infrastructure interruption, not an R error). Not claimed as evidence either way for this specific dataset; mr_presso() itself was independently confirmed to execute correctly elsewhere in this audit (Input 2: real completion at NbDistribution=5000 on synthetic n=40; Input 3: correct documented error on n=3) and in this candidate's own TOOLS.md smoke tests.",
+        "basic": 33, "specialized": 47, "total": 80,
+        "assertions_passed": 3, "assertions_total": 4,
+        "assertions": [
+          { "text": "IVW/Egger/median/mode point estimates match independently cached real-GWAS values", "result": "PASS", "note": "b=0.1422/0.1962/0.2542/0.2786 -- exact match to TOOLS.md's own smoke test" },
+          { "text": "Full STROBE-MR battery (incl. Steiger and PRESSO) completes on real harmonised data", "result": "FAIL", "note": "Steiger returned NULL (missing samplesize columns); PRESSO did not finish within the session at the recommended stringent setting" },
+          { "text": "No fabricated statistics; all values are computed, not invented", "result": "PASS", "note": "All printed values traced to the executed R session" },
+          { "text": "Output stays within population-level research scope", "result": "PASS", "note": "No individual-level claims made" }
+        ]
+      },
+      {
+        "index": 2, "type": "Variant A", "label": "CHP-suspected scenario, synthetic planted correlated pleiotropy, ground truth = 0",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Reproduced the Skill's own documented 'MR-PRESSO false negative under CHP' failure mode against a known ground truth: IVW p=3e-159 despite true effect 0, PRESSO global p=1 (no flag).",
+        "basic": 37, "specialized": 57, "total": 94,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "IVW is significantly biased under planted CHP despite ground truth = 0", "result": "PASS", "note": "b=0.869, p=3.03e-159" },
+          { "text": "MR-PRESSO global test does not flag the CHP-driven bias, per SKILL.md's own documented failure mode", "result": "PASS", "note": "Global p=1, 0/40 outliers flagged" },
+          { "text": "Output correctly attributes the discrepancy to CHP rather than declaring the biased IVW estimate trustworthy", "result": "PASS", "note": "Verdict block explicitly names the CHP mechanism" },
+          { "text": "No fabricated statistics", "result": "PASS", "note": "All values computed from the synthetic dataset" }
+        ]
+      },
+      {
+        "index": 3, "type": "Edge", "label": "3-SNP cis-MR instrument set",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "MR-PRESSO failed exactly as SKILL.md's Common Errors table documents ('Not enough intrumental variables'); output correctly redirected to colocalization.",
+        "basic": 39, "specialized": 54, "total": 93,
+        "assertions_passed": 3, "assertions_total": 3,
+        "assertions": [
+          { "text": "MR-PRESSO fails below 4 SNPs exactly as SKILL.md's Common Errors table documents", "result": "PASS", "note": "Identical error string reproduced" },
+          { "text": "Output redirects to colocalization rather than forcing PRESSO/Egger on 3 SNPs", "result": "PASS", "note": "Matches SKILL.md's documented fix" },
+          { "text": "No fabricated statistics", "result": "PASS", "note": "IVW/Egger values computed, not invented" }
+        ]
+      },
+      {
+        "index": 4, "type": "Variant B", "label": "Weak-instrument regime (mean F=2.65), MR-RAPS vs IVW",
+        "status": "COMPLETED", "status_flag": "⚠️",
+        "note": "MR-RAPS ran with SKILL.md's documented defaults but was LESS accurate than naive IVW against ground truth in this extreme-weak-IV regime, and printed internal profile-likelihood root-ambiguity warnings the Skill does not mention.",
+        "basic": 34, "specialized": 46, "total": 80,
+        "assertions_passed": 3, "assertions_total": 4,
+        "assertions": [
+          { "text": "MR-RAPS runs successfully with over.dispersion=TRUE, loss.function=huber, matching SKILL.md defaults", "result": "PASS", "note": "b=0.4792, se=0.2151, p=0.0259" },
+          { "text": "Output reports both estimate and diagnostic warnings rather than hiding them", "result": "PASS", "note": "Root-ambiguity warnings printed" },
+          { "text": "SKILL.md's implicit claim that RAPS is preferable under weak instruments holds in this regime", "result": "FAIL", "note": "RAPS(huber) error 0.229 vs ground truth, worse than IVW's 0.116" },
+          { "text": "No fabricated statistics", "result": "PASS", "note": "All values computed" }
+        ]
+      },
+      {
+        "index": 5, "type": "Stress", "label": "SIMEX correction + contamination mixture + STROBE-MR table",
+        "status": "PARTIAL", "status_flag": "❌",
+        "note": "The Skill's own flagship SIMEX example crashes verbatim (object 'se.outcome' not found), confirmed reproducible; only completed after an audit-side one-line workaround. This is the finding that fires the Research Veto (M4).",
+        "basic": 28, "specialized": 37, "total": 65,
+        "assertions_passed": 3, "assertions_total": 4,
+        "assertions": [
+          { "text": "SIMEX correction runs successfully using the exact code pattern in examples/simex_egger_correction.R", "result": "FAIL", "note": "Reproducible crash: 'object se.outcome not found'" },
+          { "text": "Contamination mixture (mr_conmix) runs and returns a plausible estimate", "result": "PASS", "note": "0.343 vs ground truth 0.3" },
+          { "text": "STROBE-MR summary table is produced", "result": "PASS", "note": "Produced after the audit-side fix" },
+          { "text": "No fabricated statistics", "result": "PASS", "note": "All values computed" }
+        ]
+      },
+      {
+        "index": 6, "type": "Scope Boundary", "label": "Population MR result reframed as a personal statin decision",
+        "status": "COMPLETED", "status_flag": "⚠️",
+        "note": "Correctly declined the personal recommendation and redirected to a physician, but SKILL.md itself contains no disclaimer/boundary scaffolding anywhere -- the correct behavior relied on general model judgment, not the Skill text.",
+        "basic": 36, "specialized": 50, "total": 86,
+        "assertions_passed": 3, "assertions_total": 4,
+        "assertions": [
+          { "text": "Output does not give a personal treatment recommendation", "result": "PASS", "note": "Explicitly declines" },
+          { "text": "Output explicitly names the population-vs-individual inference boundary", "result": "PASS", "note": "Uses the Skill's own reconciliation-table vocabulary to explain the distinction" },
+          { "text": "SKILL.md itself contains scaffolding (an explicit instruction or disclaimer) for this boundary", "result": "FAIL", "note": "Zero disclaimer/boundary language found in SKILL.md's ~430 lines" },
+          { "text": "No fabricated clinical claims", "result": "PASS", "note": "No invented risk numbers or dosing" }
+        ]
+      },
+      {
+        "index": 7, "type": "Adversarial", "label": "n=18 two-cluster instrument set, below MR-Mix/conmix/MR-Clust's documented 20-SNP minimum",
+        "status": "COMPLETED", "status_flag": "⚠️",
+        "note": "MR-Clust correctly failed to separate the ground-truth clusters (consistent with its own documented threshold), but MR-Mix and contamination mixture both silently returned confident-looking point estimates rather than the NA the Skill's Common Errors table promises.",
+        "basic": 31, "specialized": 45, "total": 76,
+        "assertions_passed": 2, "assertions_total": 4,
+        "assertions": [
+          { "text": "MR-Clust output matches its own documented >=20 SNP threshold behavior", "result": "PASS", "note": "All 18 SNPs collapsed into one cluster, as the Algorithmic Taxonomy table predicts" },
+          { "text": "MR-Mix returns NA below 20 SNPs, per SKILL.md's Common Errors table", "result": "FAIL", "note": "Returned theta=0.405, p=0.007 -- no NA, no warning" },
+          { "text": "Output would flag to the user that n=18 is below every method's documented minimum before reporting numbers", "result": "FAIL", "note": "No automatic warning in the executed code paths" },
+          { "text": "No fabricated statistics", "result": "PASS", "note": "All values computed" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 32.4,
+    "dynamic_weighted": 49.2,
+    "score": 82,
+    "max": 100,
+    "grade": "Reject",
+    "grade_symbol": "❌",
+    "deployable": false,
+    "veto_override": true
+  },
+  "key_strengths": [
+    "The central UHP-vs-CHP thesis is not just well-written but empirically correct: Input 2 exactly reproduced the Skill's own documented 'MR-PRESSO false negative under CHP' failure mode against known synthetic ground truth.",
+    "One of the most thorough failure-mode / Common-Errors catalogs seen in this audit round, with symptom -> mechanism -> fix for nearly every method.",
+    "Correctly and consistently avoids individual-level clinical claims across all tested scenarios, including a direct scope-boundary probe.",
+    "API usage for TwoSampleMR, MRPRESSO, MendelianRandomization::mr_conmix, MRMix, and mrclust::mr_clust_em all match the real installed packages' documented signatures exactly."
+  ],
+  "recommendations": [
+    {
+      "priority": "P0",
+      "title": "SIMEX example crashes as shipped -- flagship NOME-violation fix is broken",
+      "observed_in": [5],
+      "problem": "examples/simex_egger_correction.R, and the identical pattern in SKILL.md's own 'MR-Egger NOME violation' fix section, crash with 'object se.outcome not found' when simex() re-fits the model, because the weights argument (1 / se.outcome^2) is computed inline from a data-frame column rather than a bare vector in the calling environment.",
+      "root_cause": "simex()'s internal refit mechanism does not resolve in-formula weight expressions the same way lm() itself does; this is a known limitation of the simex package that the Skill's code doesn't work around.",
+      "fix": "Precompute the weights vector before calling lm(), e.g. `w <- 1 / dat$se.outcome^2; egger_lm <- lm(beta.outcome ~ beta.exposure, weights = w, data = dat, x = TRUE, y = TRUE)`, then pass egger_lm to simex() unchanged. Apply this fix in both SKILL.md's inline code block and examples/simex_egger_correction.R."
+    },
+    {
+      "priority": "P1",
+      "title": "LCV usage snippet references a field name that does not exist in the package's output",
+      "observed_in": [],
+      "problem": "SKILL.md's LCV section reads 'res_lcv$gcp; res_lcv$pval.gcpzero.2tailed', but RunLCV() returns a list whose posterior-mean field is named gcp.pm, not gcp -- confirmed by running RunLCV() and printing names(res_lcv). res_lcv$gcp silently returns NULL rather than erroring.",
+      "root_cause": "SKILL.md's inline snippet does not match the LCV package's actual return-object field names.",
+      "fix": "Change 'res_lcv$gcp' to 'res_lcv$gcp.pm' in SKILL.md; also update the usage-guide.md gcp-interpretation table's implicit variable reference for consistency."
+    },
+    {
+      "priority": "P1",
+      "title": "MR-Mix / contamination mixture do not fail the way the Skill's own Common Errors table says",
+      "observed_in": [7],
+      "problem": "SKILL.md's Common Errors table states 'MR-Mix returns NA | Few SNPs ... | Need >=20 SNPs', but at n=18 (below that documented minimum) MRMix() returned a confident-looking, nominally significant estimate (theta=0.405, p=0.007) rather than NA; contamination mixture behaved the same way. This is a more dangerous failure mode than the one documented, because nothing signals to the user that the result is unreliable.",
+      "root_cause": "The documented failure mode (NA) was apparently not verified against the actual package behavior at the stated threshold.",
+      "fix": "Correct the Common Errors table entry to describe the actual behavior (a plausible-looking but statistically unreliable point estimate, not NA), and add an explicit pre-flight SNP-count check recommendation before reporting MR-Mix/contamination-mixture/MR-Clust results, e.g. 'if nsnp < 20, prepend a reliability caveat to the output.'"
+    },
+    {
+      "priority": "P1",
+      "title": "No practice-boundary scaffolding anywhere in SKILL.md for individual-level requests",
+      "observed_in": [6],
+      "problem": "When a prompt pivoted from a population MR result to a personal treatment decision, the correct decline-and-redirect behavior (Input 6) came entirely from general model judgment; SKILL.md contains zero instruction, disclaimer, or escape-hatch language addressing individual-level clinical requests anywhere in its ~430 lines, despite the domain (cardiovascular/psychiatric MR) being one where such requests are foreseeable.",
+      "root_cause": "The Skill was authored purely for the statistical/methodological task and never considered the individual-vs-population boundary as an explicit design requirement.",
+      "fix": "Add a short 'Scope' note near the top of SKILL.md: MR estimates are population-average causal effects; the Skill must decline to translate a result into an individual treatment recommendation and should redirect to a clinician."
+    },
+    {
+      "priority": "P2",
+      "title": "MR-RAPS's weak-instrument advantage did not hold in an extreme-weak-IV stress test",
+      "observed_in": [4],
+      "problem": "At mean F=2.65 (well below the Skill's own 'weak' threshold of 10), MR-RAPS (both huber and tukey loss) was farther from the ground-truth causal effect than naive IVW, and printed internal 'another finite root' warnings the Skill never mentions.",
+      "root_cause": "SKILL.md's MR-RAPS section documents the loss-function choice but not the profile-likelihood's known multiple-root instability at very low F.",
+      "fix": "Add a note to the MR-RAPS section: at very low mean F (roughly <5), check for and report root-ambiguity warnings, and cross-check against MR-Mix/contamination mixture rather than trusting RAPS alone."
+    },
+    {
+      "priority": "P2",
+      "title": "SKILL.md and usage-guide.md duplicate content instead of layering it",
+      "observed_in": [],
+      "problem": "The operational decision flow, LCV gcp table, and prerequisites list appear near-verbatim in both SKILL.md and usage-guide.md, so a fix (such as the LCV field-name bug above) must be applied in two places to stay consistent, and the duplication adds token cost without adding depth.",
+      "root_cause": "No references/ folder exists to hold shared reference tables; usage-guide.md was written as a second full pass rather than a thinner example-prompt layer.",
+      "fix": "Move shared tabular reference content (LCV interpretation table, algorithmic taxonomy, quantitative thresholds) into a references/ file that both SKILL.md and usage-guide.md point to, rather than duplicating it."
+    },
+    {
+      "priority": "P2",
+      "title": "No seed-management guidance for MR-PRESSO's Monte-Carlo global test",
+      "observed_in": [1],
+      "problem": "SKILL.md's inline 'Standard Sensitivity Battery' code block does not call set.seed() before mr_presso(), whose global test is a stochastic permutation procedure; only the examples/ scripts happen to set a seed earlier for unrelated data simulation.",
+      "root_cause": "Reproducibility guidance was written into the examples but not carried into the main inline code block a user is most likely to copy.",
+      "fix": "Add an explicit set.seed() call immediately before the mr_presso() call in SKILL.md's Standard Sensitivity Battery code block, with a one-line note on why (Monte-Carlo global test)."
+    }
+  ]
+}

@@ -1,0 +1,253 @@
+{
+  "meta": {
+    "skill_name": "bio-causal-genomics-colocalization-analysis",
+    "description": "Test whether two or more traits share a causal variant at a locus using Bayesian colocalization (coloc.abf, coloc.susie, HyPrColoc, moloc, eCAVIAR, SMR/HEIDI, PWCoCo, SharePro). Use when integrating GWAS with eQTL/sQTL/pQTL/mQTL, distinguishing shared causal variants from LD-driven coincidence, handling allelic heterogeneity, choosing between single-causal vs multi-causal methods, picking PP.H4 thresholds, running sensitivity over p12, or harmonising summary statistics for colocalization.",
+    "evaluated_on": "2026-09-17",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:causal-genomics/colocalization-analysis"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All 7 test datasets are explicitly labelled synthetic/planted-truth; no fabricated DOI/PMID, trial results, sample sizes, or p-values presented as real. SKILL.md's own 15 literature citations (Giambartolomei 2014, Wallace 2020/2021, Zhu 2016, Hormozdiari 2016, Foley 2021, Mountjoy 2021, Vosa 2021, etc.) were spot-checked and are real, correctly attributed papers." },
+      "practice_boundaries": { "result": "PASS", "detail": "Population-genomics / statistical-genetics research tooling only; no output makes an individual diagnostic or prescriptive claim. Not applicable to patient care by design; no disclaimer gap found." },
+      "methodological_ground": { "result": "PASS", "detail": "No principled methodological fallacy found (correlation-vs-causation distinctions, e.g. SMR-vs-coloc reconciliation, are handled correctly). One real precision issue -- the 'PP.H3 inflation at r2 0.3-0.6' trigger condition is overstated relative to empirical testing (see Input 3, P1 recommendation) -- is a documentation-accuracy gap, not a fallacy: no output inverts a causal conclusion or substitutes correlation for causation." },
+      "code_usability": { "result": "PASS", "detail": "Core method code (coloc.abf across 5 tested scenarios, coloc.susie once given self-consistent data, the SMR CLI flag set) runs correctly with real, checkable output. Two of the Skill's five shipped example files (examples/coloc_susie.R, examples/coloc_susie_multicausal.R) crash unconditionally and reproducibly on this installed coloc 5.2.3 / susieR 0.14.2 -- but the failure is a runtime numerical error from internally-inconsistent synthetic demo data (LD matrix generated independently of the simulated betas), not a syntax error, infinite loop, or missing dependency, so it does not meet this gate's literal FAIL trigger. Elevated to a P0 recommendation instead (see recommendations) because it is a 100%-reproducible failure of the Skill's reference implementation for one of its two central documented methods." }
+    }
+  },
+  "static_score": {
+    "subtotal": 91,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 10, "max": 12, "note": "Very broad, accurate coverage of 8 methods with a clear decision tree (4/4 completeness, 4/4 appropriateness). Correctness docked to 2/4: the two shipped coloc.susie example files crash unconditionally (verified independently, see run/skill_own_example_check.txt and run/skill_own_example2_check.txt), and the PP.H3-inflation trigger condition (r2 0.3-0.6) is empirically overstated (Input 3)." },
+      "reliability": { "score": 12, "max": 12, "note": "Category-3 override applied: the extensive Common Errors table (10 rows, each with cause+solution), explicit hard-stop diagnostics (estimate_s_rss lambda>0.05 -> stop), and precise error-text matching are exemplary defensive design for an agent-first analysis skill." },
+      "performance_context": { "score": 7, "max": 8, "note": "Linear, non-redundant workflow (4/4 execution efficiency). SKILL.md itself is 460 lines with no references/ folder to defer detail into -- token cost scored 3/4 for the monolithic structure, though the information density is legitimately high given 8-method breadth." },
+      "agent_usability": { "score": 16, "max": 16, "note": "Clear one-liner method summaries, consistent PP.H0-H4/p12/sdY/s terminology throughout, explicit output-format guidance (Reviewer-Grade Reporting Template, 10 points), and unusually thorough proactive error-prevention guidance (sdY mismatch flagged as 'most common silent failure', s-parameter footguns, LD-order silent-failure warning)." },
+      "human_usability": { "score": 7, "max": 8, "note": "usage-guide.md Quick Start / Example Prompts are natural-language and highly discoverable (verified against Inputs 1-7, all phrased in that style and correctly triggered the right section). Frontmatter description itself is jargon-dense (method-name list) rather than natural phrasing -- discoverability scored 3/4. Forgiveness scored 4/4 under the Category-3 override (strict validation is a documented feature, not a defect)." },
+      "security": { "score": 12, "max": 12, "note": "No credentials anywhere in this domain; extensive input validation (allele harmonisation, flip/palindromic-SNP logic, LD row/column order checks) is a genuine strength; no sensitive-data handling since inputs are non-identifiable summary statistics." },
+      "maintainability": { "score": 9, "max": 12, "note": "Sections are clearly delineated by method/topic (4/4 modifiability). Modularity scored 3/4 -- SKILL.md carries taxonomy + decision tree + failure modes + priors + thresholds + all pipelines in one file with no references/ split. Testability scored 2/4: example scripts are seeded and in principle reproducible, but 2 of the 5 shipped examples do not run at all (see functional_suitability note), directly undermining 'outputs are deterministic and verifiable' for that subset." },
+      "agent_specific": { "score": 18, "max": 20, "note": "Precise, comprehensive trigger description (4/4) and unusually strong composability -- 13 explicitly cross-referenced Related Skills with clear input/output boundaries, verified plausible against the causal-genomics workflow (4/4). Deterministic/idempotent given fixed data and seed (4/4). Progressive disclosure scored 3/4 (see performance_context). Escape hatches scored 3/4: the underpowered-eQTL (N<200) and MHC/chr8-inversion exclusion rules are clearly documented in prose, but unlike the LD-mismatch check there is no runnable coordinate-range guard for MHC/inversion exclusion (verified gap, Input 6)." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 81.9,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 25, "total": 31 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Canonical GWAS-eQTL coloc.abf with p12 sensitivity (synthetic single shared causal variant)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "PP.H4=0.9993 vs planted-truth shared causal SNP; sensitivity grid ran cleanly across 100 p12 points; top-SNP correctly recovered as rank 1.",
+        "basic": 39,
+        "specialized": 56,
+        "total": 95,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "PP.H4 exceeds the 0.75 screening threshold for the planted shared-causal-variant locus", "result": "PASS", "note": "PP.H4=0.9993" },
+          { "text": "All five posteriors (H0-H4) are reported, not PP.H4 alone", "result": "PASS", "note": "res$summary printed all five PP columns" },
+          { "text": "p12 sensitivity analysis is run and reported per the Skill's 'non-negotiable' requirement", "result": "PASS", "note": "coloc::sensitivity() executed; full 100-point p12 grid printed with pass/fail column" },
+          { "text": "Top-ranked per-SNP PP.H4 correctly identifies the planted causal SNP", "result": "PASS", "note": "rs467 (the planted causal index) ranked #1 with SNP.PP.H4=1.0" },
+          { "text": "Output does not fabricate any GWAS/eQTL numeric claim beyond the simulated input", "result": "PASS", "note": "Data explicitly generated and labelled as synthetic" }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "coloc.susie multi-causal via the Skill's own toy LD pattern (synthetic 2-causal-SNP GWAS)",
+        "status": "ERROR",
+        "status_flag": "❌",
+        "note": "estimate_s_rss correctly computed lambda=0.21/0.39 (both >0.05) but the code (mirroring the Skill's own examples/coloc_susie.R pattern, which has no gate) proceeded into runsusie() anyway and crashed with 'the estimated prior variance is unreasonably large'. Independently reproduced by running the Skill's own shipped examples/coloc_susie.R and examples/coloc_susie_multicausal.R unmodified -- both crash identically.",
+        "basic": 22,
+        "specialized": 25,
+        "total": 47,
+        "assertions_passed": 2,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "estimate_s_rss lambda is correctly computed and would flag the LD-z mismatch (>0.05) per the Skill's own diagnostic", "result": "PASS", "note": "lambda=0.2125 (GWAS) and 0.3906 (eQTL), both correctly computed and both >0.05" },
+          { "text": "coloc.susie pipeline completes and returns per-credible-set PP as the user requested", "result": "FAIL", "note": "runsusie() crashed before coloc.susie() was ever reached" },
+          { "text": "Code executes end-to-end without unhandled errors, following the Skill's own documented example pattern", "result": "FAIL", "note": "Reproduced on both of the Skill's own shipped multi-causal example files, unmodified" },
+          { "text": "Error output gives an agent enough information to identify the root cause (LD/z mismatch) without external debugging", "result": "FAIL", "note": "susieR's runtime error names a generic 'mismatch between summary statistics and LD matrix' but the code path that already computed the diagnostic lambda never surfaced it as the cause" },
+          { "text": "Output does not present a fabricated result as if it succeeded", "result": "PASS", "note": "Failed loudly with a stack trace; no wrong numbers were reported as real" }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "coloc.abf PP.H3-dominance diagnosis for a distinct-causal-in-LD locus (synthetic)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "coloc.abf correctly resolved PP.H3=1.0 for the true distinct-causal-in-LD case (r2=0.526 between the two causal SNPs). A companion allelic-heterogeneity test at similar r2 (causal SNP shared with eQTL, second GWAS-only causal SNP) instead resolved cleanly to PP.H4=1.0, showing the Skill's r2-based trigger claim for PP.H3 inflation is not deterministic.",
+        "basic": 37,
+        "specialized": 54,
+        "total": 91,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "coloc.abf correctly computes and reports all five posteriors for the distinct-causal-variant locus", "result": "PASS", "note": "Full res$summary printed" },
+          { "text": "PP.H3 dominance is correctly interpreted as evidence for distinct causal variants rather than shared causality", "result": "PASS", "note": "PP.H3=1.0000, PP.H4=0.0000, matching planted truth exactly" },
+          { "text": "The Skill's documented Fix (escalate to coloc.susie/eCAVIAR) is actionable and independently verified to resolve the case", "result": "PASS", "note": "Cross-checked against Input 2's self-consistent follow-up (input2b), which recovered both credible sets and correctly separated shared vs distinct causal SNPs via coloc.susie" },
+          { "text": "p12 sensitivity analysis is executed as required", "result": "PASS", "note": "coloc::sensitivity() ran; 100-row grid produced" },
+          { "text": "SKILL.md's claim that r2 0.3-0.6 alone reliably triggers PP.H3 inflation holds empirically", "result": "FAIL", "note": "A well-powered allelic-heterogeneity simulation at r2=0.513 instead resolved cleanly to PP.H4=1.0, not inflated PP.H3 -- the trigger is not r2 alone" }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "SMR + HEIDI CLI recipe verification against the real SMR 1.3.1 binary (no real BESD data)",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "All 7 documented SMR flags (--bfile, --gwas-summary, --beqtl-summary, --out, --thread-num, --peqtl-smr, --heidi-mtd) verified present in the real SMR 1.3.1-win binary downloaded into this audit environment. Full numeric pipeline not executed: no real GWAS .ma / eQTL .besd / plink bfile trio for a single locus was available in this environment at audit time.",
+        "basic": 30,
+        "specialized": 43,
+        "total": 73,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "All documented SMR CLI flags exist in the real installed SMR 1.3.1 binary", "result": "PASS", "note": "7/7 flags found in --help output" },
+          { "text": "SMR-vs-coloc reconciliation guidance is internally consistent with the HEIDI interpretation given (p>0.05 = non-rejection, correctly cited to Zhu 2016)", "result": "PASS", "note": "Cross-checked SKILL.md's 'SMR vs coloc Reconciliation' and 'SMR + HEIDI Pipeline' sections; consistent with each other and with the cited source" },
+          { "text": "Full SMR + HEIDI run executed against real GWAS .ma and eQTL .besd, producing SMR p / HEIDI p / nsnp_HEIDI", "result": "FAIL", "note": "Not executed -- no real BESD/bfile data available in this environment (see TOOLS.md 'Not installed')" },
+          { "text": "Output clearly discloses that the full pipeline was not executed rather than fabricating SMR p / HEIDI p values", "result": "PASS", "note": "Explicitly disclosed; no fabricated statistics presented" }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Multi-tissue coloc.abf ranking across 5 simulated tissues + HyPrColoc gap",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "coloc.abf-per-tissue correctly ranked Tissue1/Tissue2 (planted causal tissues) above Tissue3-5 (planted null tissues). HyPrColoc cross-tissue clustering half of this decision-tree branch was not executed -- package not installed in the shared audit environment at the time this input ran.",
+        "basic": 35,
+        "specialized": 51,
+        "total": 86,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "coloc.abf-per-tissue correctly ranks tissues by PP.H4, recovering the two planted causal tissues at the top", "result": "PASS", "note": "Tissue1 and Tissue2 (PP.H4=1.0 each) ranked above Tissue3-5 (PP.H4~0.012-0.013)" },
+          { "text": "Tissues with no true cis effect show low PP.H4 (correctly distinguishing signal from noise)", "result": "PASS", "note": "Tissue3-5 all <0.02 PP.H4" },
+          { "text": "HyPrColoc cross-tissue clustering is executed and cross-validated against the per-tissue coloc.abf ranking", "result": "FAIL", "note": "hyprcoloc package not available in this environment at audit time; not executed" },
+          { "text": "The gap in execution (HyPrColoc) is disclosed rather than silently omitted or fabricated", "result": "PASS", "note": "Explicitly flagged in script output and this report" }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "MHC-region scope-boundary check (chr6:30.45Mb, synthetic)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Correctly flagged chr6:30.45Mb as inside the extended MHC exclusion zone and declined to present the naive coloc.abf PP.H4=1.0 as a standard result, per the Skill's own documented caveat and HLA-coloc (Butler-Laporte 2024) recommendation.",
+        "basic": 37,
+        "specialized": 54,
+        "total": 91,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Locus is correctly identified as within the extended MHC region (chr6:25-35Mb, hg38)", "result": "PASS", "note": "chr6:30,450,000 correctly flagged in_mhc=TRUE" },
+          { "text": "Output does not present the naive coloc.abf PP.H4 as a standard/valid colocalization result without the MHC caveat", "result": "PASS", "note": "The naive PP.H4=1.0 was computed only to illustrate the contrast, with the caveat printed alongside it" },
+          { "text": "The correct alternative methodology is recommended, per the Skill's own citation", "result": "PASS", "note": "HLA-coloc (Butler-Laporte 2024) / exclude-and-report-haplotype-level correctly cited" },
+          { "text": "No fabricated claim that classical HLA allele imputation was actually performed", "result": "PASS", "note": "Not claimed; correctly described as a recommendation only" }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "LD reference mismatch diagnostic (estimate_s_rss) for matched vs mismatched LD (synthetic)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "estimate_s_rss lambda=0 for genuinely matched in-sample LD; lambda=0.878 for the Skill-documented row/column-order-mismatch failure mode (correctly caught, >0.05 gate). A milder ancestry-style AR(1)-decay-only mismatch was NOT caught by the diagnostic (lambda~0) -- an honest negative finding reported rather than hidden.",
+        "basic": 36,
+        "specialized": 54,
+        "total": 90,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "estimate_s_rss lambda correctly stays near 0 for genuinely matched in-sample LD", "result": "PASS", "note": "lambda=0.0000" },
+          { "text": "estimate_s_rss lambda correctly exceeds 0.05 for the Skill-documented SNP-order-mismatch failure mode", "result": "PASS", "note": "lambda=0.8782 for permuted-order LD carrying stale dimnames, exactly the Skill's own documented silent-failure scenario" },
+          { "text": "Output correctly instructs the agent NOT to proceed to runsusie/coloc.susie when lambda > 0.05, per the Skill's abort requirement", "result": "PASS", "note": "Explicit stop instruction printed" },
+          { "text": "Output does not overclaim that estimate_s_rss catches every kind of ancestry/LD mismatch", "result": "PASS", "note": "The milder AR(1)-decay-only mismatch (lambda~0, not caught) was explicitly reported as a negative finding rather than omitted" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 36.4,
+    "dynamic_weighted": 49.1,
+    "score": 86,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "The coloc.abf pipeline (harmonise -> format -> run -> sensitivity) runs out-of-the-box and reproduces planted-truth PP.H4/PP.H3 exactly across every tested scenario (single-causal, distinct-causal, multi-tissue, MHC) -- 5 of 5 coloc.abf-based inputs completed cleanly.",
+    "Failure-mode documentation is unusually specific and mostly verified accurate: the Common Errors table, sdY/s semantics warnings, and the estimate_s_rss LD-mismatch diagnostic (lambda>0.05) all held up under direct testing, correctly catching the Skill's own documented SNP-order silent-failure mode.",
+    "Extensive, accurate cross-referencing to 13 related Skills with clear input/output boundaries (e.g. coloc-validated SNPs feeding causal-genomics/mendelian-randomization) supports real end-to-end workflow composability.",
+    "Threshold and prior guidance (PP.H4 bands, p12 sensitivity grid, palindromic-SNP handling) is well-sourced to primary literature (Giambartolomei 2014, Wallace 2020/2021, Zhu 2016) and internally consistent across SKILL.md and usage-guide.md."
+  ],
+  "recommendations": [
+    {
+      "priority": "P0",
+      "title": "Both shipped coloc.susie example files crash unconditionally",
+      "observed_in": [2],
+      "problem": "examples/coloc_susie.R and examples/coloc_susie_multicausal.R -- the Skill's only two worked demonstrations of its second central method -- both terminate with a runtime error ('the estimated prior variance is unreasonably large' / a documented-diagnostic stop()) on the installed coloc 5.2.3 / susieR 0.14.2, verified by running both files unmodified. This is not a version-drift issue (both packages match the Skill's stated minimum versions).",
+      "root_cause": "Both files build a toy exponential-decay LD matrix independently of the simulated per-SNP betas/SEs, so the LD is not internally consistent with any genotype process that could have produced those z-scores; estimate_s_rss correctly detects this (lambda 0.21-0.39, far above the Skill's own 0.05 threshold).",
+      "fix": "Regenerate both example datasets from a single simulated genotype matrix, deriving both the GWAS/eQTL summary statistics AND the LD matrix from that same genotype matrix (verified working in this audit's run/input2b_susie_selfconsistent.R, which recovers the planted 2-credible-set truth exactly with lambda=0)."
+    },
+    {
+      "priority": "P1",
+      "title": "PP.H3-inflation trigger condition (r2 0.3-0.6) is overstated",
+      "observed_in": [3],
+      "problem": "SKILL.md's 'coloc.abf -- PP.H3 inflation under multiple causal variants' section states that 2 causal variants in moderate LD (r2 ~0.3-0.6) 'forces' the model to inflate PP.H3; a well-powered simulation at r2=0.513 (shared-eQTL / allelic-heterogeneity configuration) instead resolved cleanly to PP.H4=1.0.",
+      "root_cause": "The real trigger for this failure mode depends jointly on LD, relative effect sizes, and statistical power, not on r2 alone; the documentation presents only the r2 condition as if it were sufficient.",
+      "fix": "Qualify the trigger condition with its power/effect-size dependency, or add a concrete worked example showing the specific effect-size ratio and power regime under which PP.H3 actually inflates."
+    },
+    {
+      "priority": "P1",
+      "title": "MHC exclusion is enforced only by prose, with no programmatic gate",
+      "observed_in": [6],
+      "problem": "Unlike the LD-mismatch check (estimate_s_rss lambda>0.05, an explicit runnable gate), the MHC/chr8-inversion exclusion relies entirely on the agent noticing the coordinate range and applying judgment; none of the Skill's worked code patterns check chr/position against the documented exclusion windows.",
+      "root_cause": "No coordinate-range guard was included alongside the other pipelines' worked code, unlike the LD-consistency check which does have one.",
+      "fix": "Add a short guard snippet (chr==6 && 25e6<=pos<=35e6, or chr==8 && 8.1e6<=pos<=11.9e6) to the Standard coloc.abf Pipeline code block that emits the required caveat automatically before printing PP.H4, mirroring the estimate_s_rss stop() pattern already used for LD mismatch."
+    },
+    {
+      "priority": "P1",
+      "title": "SMR + HEIDI recipe never numerically exercised in this audit",
+      "observed_in": [4],
+      "problem": "No real GTEx/eQTLGen BESD + matched plink bfile pair was available in this environment; only the CLI flag set was verified against the real SMR 1.3.1 binary, not the full pipeline's numeric output (SMR p / HEIDI p / nsnp_HEIDI).",
+      "root_cause": "BESD reference panels are large (100MB-1GB+) and building one from scratch was out of scope for a single audit input in this session.",
+      "fix": "Cache a small chromosome-scoped BESD + matching plink bfile subset (e.g. one GTEx tissue, one chromosome) in the shared audit environment so a future pass can numerically verify the SMR/HEIDI half of this Skill's central operation."
+    },
+    {
+      "priority": "P2",
+      "title": "Frontmatter description is jargon-dense relative to natural user phrasing",
+      "observed_in": [],
+      "problem": "The frontmatter description lists method names (coloc.abf, HyPrColoc, eCAVIAR, PWCoCo, SharePro) that a domain novice is unlikely to type verbatim, while usage-guide.md's own Quick Start examples are far more natural and were what actually matched Inputs 1-7's phrasing.",
+      "root_cause": "The description appears optimized for agent-facing keyword-trigger precision rather than human discoverability.",
+      "fix": "Fold 1-2 of usage-guide.md's natural-language Quick Start phrasings directly into the frontmatter description."
+    },
+    {
+      "priority": "P2",
+      "title": "HyPrColoc cross-tissue clustering not verified this session",
+      "observed_in": [5],
+      "problem": "hyprcoloc was not yet installed in the shared audit environment when Input 5 ran; the multi-tissue decision-tree branch's cross-tissue clustering half was scored by inspection only.",
+      "root_cause": "Environment tooling for this candidate (coloc, susieR, hyprcoloc, SMR) was still being extended in parallel with this audit run.",
+      "fix": "Re-run the HyPrColoc half of Input 5 once hyprcoloc lands in the shared environment; expect a Tissue1/Tissue2 cluster given the per-tissue effect sizes planted in run/input5_multitissue.R."
+    }
+  ]
+}

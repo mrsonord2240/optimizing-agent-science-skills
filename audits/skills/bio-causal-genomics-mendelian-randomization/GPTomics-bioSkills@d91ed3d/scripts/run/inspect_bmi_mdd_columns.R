@@ -1,0 +1,6 @@
+bmi <- readRDS('public-data/MRMix_BMI15.rds')
+mdd <- readRDS('public-data/MRMix_MDD18.rds')
+cat("BMI cols:\n"); print(colnames(bmi)); print(head(bmi,3))
+cat("\nMDD cols:\n"); print(colnames(mdd)); print(head(mdd,3))
+common <- intersect(bmi$SNP, mdd$SNP)
+cat("\noverlap:", length(common), "\n")

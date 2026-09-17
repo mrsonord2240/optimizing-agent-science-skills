@@ -1,0 +1,203 @@
+{
+  "meta": {
+    "skill_name": "bio-causal-genomics-proteome-mr-drug-target",
+    "description": "Runs cis-pQTL Mendelian randomization for drug-target validation using UKB-PPP (Olink), deCODE (SomaScan), Fenland, INTERVAL, ARIC, and FinnGen-PPP proteomes plus colocalization triangulation, phenome-wide on-target adverse-effect scans, cross-platform Olink/SomaScan replication, and PAV (protein-altering variant) sensitivity.",
+    "evaluated_on": "2026-09-17",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:causal-genomics/proteome-mr-drug-target"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All 7 inputs use explicitly-labeled synthetic, planted-ground-truth data; no fabricated DOI/PMID/trial results or invented real-world statistics appear in any output." },
+      "practice_boundaries": { "result": "PASS", "detail": "Workflow is population-level drug-target genomics research (gate 7 in scope); no individual diagnostic or prescriptive claim appears in any of the 7 outputs." },
+      "methodological_ground": { "result": "PASS", "detail": "No correlation-causation conflation; the skill's own triangulation ladder was empirically validated (Input 6: trans-pQTL inclusion demonstrably distorts the estimate 3.6x; Input 7: a bare nominal p-value is correctly refused as insufficient for a drug-target claim)." },
+      "code_usability": { "result": "PASS", "detail": "6 of 7 inputs executed real R code to completion with checkable numeric results against planted ground truth. One real defect was found and reproduced (Input 5: TwoSampleMR/MendelianRandomization mr_ivw namespace collision) but it fails loudly with a one-line fix, not silently or unrunnably -- does not meet the M4 FAIL bar; recorded as a P1 recommendation instead." }
+    }
+  },
+  "static_score": {
+    "subtotal": 85,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 11, "max": 12, "note": "Covers single-target cis-MR, phewas, cross-platform replication, correlated/robust IVW, allelic heterogeneity (coloc.susie), PAV sensitivity, and sample-overlap correction -- essentially the full stated scope. Docked 1 point for the undocumented mr_ivw namespace collision found in execution testing (Input 5)." },
+      "reliability": { "score": 10, "max": 12, "note": "Common-Errors table (11 rows) and an explicit Version-Compatibility section instructing the agent to introspect installed APIs rather than blindly retry are strong fault-tolerance features (Category-3 hard-stop-is-correct override applied). Neither covers the mr_ivw masking failure or the phewas example's own debug-shortcut anti-pattern." },
+      "performance_context": { "score": 6, "max": 8, "note": "usage-guide.md separates quick-start from the main SKILL.md, but SKILL.md itself (450 lines, no references/ subfolder) carries the entire methodological corpus -- decision trees, thresholds, failure modes -- inline rather than deferring the denser tables." },
+      "agent_usability": { "score": 15, "max": 16, "note": "Exceptionally explicit worked examples with exact hg38 coordinates and function calls; consistent column-naming (SNP/BETA/SE/A1/A2/EAF/P) throughout; Common-Errors + Anticipated-Reviewer-Pushback tables give strong preventive guidance. Docked 1 point: no warning anywhere about the TwoSampleMR/MendelianRandomization mr_ivw name collision central to its own correlated-IV workflow." },
+      "human_usability": { "score": 6, "max": 8, "note": "Description and Quick-Start prompts use natural researcher phrasing ('nominate or de-risk a drug target', 'mimic pharmacological inhibition'), though dense and expert-jargon-heavy by nature of the domain. Strict-input-validation Category-3 override applied to forgiveness." },
+      "security": { "score": 12, "max": 12, "note": "No hardcoded credentials, no injection vectors; file-path-based local TSV reads are appropriate for a research-analysis skill; no PHI/PII in scope (aggregate GWAS summary statistics)." },
+      "maintainability": { "score": 8, "max": 12, "note": "Two example scripts are well-scoped and separable, but neither ships with self-contained/synthetic data -- both hardcode local paths (ukbppp_pcsk9.tsv, 1kg_EUR/EUR) that require the user's own real data or an auditor-built substitute (as this audit did) to actually run, limiting out-of-the-box testability." },
+      "agent_specific": { "score": 17, "max": 20, "note": "Precise, non-overlapping trigger description relative to sibling skills (mendelian-randomization, pleiotropy-detection, colocalization-analysis); 10-entry Related-Skills cross-reference; explicit, empirically-validated escape hatches (trans-pQTL refusal, cross-platform-disagreement non-claim, sample-overlap correction). Docked for SKILL.md length/layering (8.2) relative to the ≤500-line-with-references ideal." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 89.1,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 30, "total": 31 },
+    "inputs": [
+      {
+        "index": 1, "type": "Canonical", "label": "PCSK9 cis-MR vs CAD, coloc.abf + PAV-excluded sensitivity + correlated cis-IVW",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Recovered IVW b=0.4296 vs planted 0.45; PP.H4=0.9999999; PAV exclusion concordant (23/24 instruments retained)",
+        "basic": 35, "specialized": 55, "total": 90,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "cis-MR IVW estimate recovers the planted causal effect within a reasonable margin", "result": "PASS", "note": "Recovered 0.4296 vs planted 0.45 (~4.5% off)" },
+          { "text": "PAV-excluded sensitivity panel is reported alongside the primary estimate", "result": "PASS", "note": "Both panels printed; direction preserved, magnitude within 2x, still nominally significant" },
+          { "text": "Coloc PP.H4 is reported and compared against the skill's own 3-tier threshold ladder", "result": "PASS", "note": "PP.H4≈1.0, above the 0.95 industry tier" },
+          { "text": "Correlated-instrument cis-IVW (correl=TRUE) executes without error using the documented API", "result": "PASS", "note": "Worked because TwoSampleMR was loaded before MendelianRandomization in this script's library order" }
+        ]
+      },
+      {
+        "index": 2, "type": "Variant A", "label": "IL6R cis-MR vs rheumatoid arthritis, Olink vs SomaScan cross-platform replication",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Direction agreement holds but pre-PAV magnitude ratio 2.19 exceeds the mandatory <2x bar; resolves to 1.05x after PAV exclusion",
+        "basic": 35, "specialized": 54, "total": 89,
+        "assertions_passed": 5, "assertions_total": 5,
+        "assertions": [
+          { "text": "Cross-platform direction agreement is checked", "result": "PASS", "note": "Both platforms negative direction" },
+          { "text": "Magnitude-within-2x criterion is evaluated, not just direction", "result": "PASS", "note": "Ratio 2.19 correctly flagged as exceeding the mandatory bar pre-PAV-exclusion" },
+          { "text": "PAV annotation correctly identifies the platform-specific artifact SNP", "result": "PASS", "note": "Planted SomaScan-only missense artifact correctly dropped" },
+          { "text": "A PP.H3-dominant coloc result is recognized as ambiguous, not naive PP.H4 rejection", "result": "PASS", "note": "SomaScan PP.H3=1.0 vs PP.H4≈0 flagged, matches skill's own Common-Errors row" },
+          { "text": "Skill's non-claim rule applies while platforms disagree beyond 2x", "result": "PASS", "note": "Resolved only after PAV exclusion brings ratio to ~1.05x" }
+        ]
+      },
+      {
+        "index": 3, "type": "Edge", "label": "Minimal cis-pQTL window (ANGPTL4 vs triglycerides), small-N coloc",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "5 instruments survived filtering (LD pulled in neighbours); PP.H4=0.60, below the 0.7 suggestive tier",
+        "basic": 34, "specialized": 52, "total": 86,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Wald-ratio-only pathway triggers when analysis is restricted to a single instrument", "result": "PASS", "note": "Sentinel-only Wald ratio computed and compared to full-IVW" },
+          { "text": "Coloc is still run and interpreted even with a small (15-SNP) window", "result": "PASS", "note": "PP.H4=0.6026 reported with the small-window caveat" },
+          { "text": "PP.H4 below the 0.7 suggestive tier is correctly treated as insufficient", "result": "PASS", "note": "Explicitly not claimed as publishable" },
+          { "text": "Sentinel Wald ratio vs full cis-IVW comparison matches the skill's own common-error row", "result": "PASS", "note": "Ratio 0.928 -- small, expected divergence for a clean window" }
+        ]
+      },
+      {
+        "index": 4, "type": "Variant B", "label": "PCSK9 phenome-wide cis-MR, Bonferroni-corrected on-target adverse-effect scan",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "OpenGWAS confirmed gated (401); local 50-outcome synthetic substitute correctly recovered the sole planted true effect as Bonferroni-significant",
+        "basic": 36, "specialized": 56, "total": 92,
+        "assertions_passed": 5, "assertions_total": 5,
+        "assertions": [
+          { "text": "OpenGWAS gating is correctly handled", "result": "PASS", "note": "No live call attempted; gate confirmed in TOOLS.md, offline substitute used" },
+          { "text": "Bonferroni correction applied over the full outcome set, not a truncated subset", "result": "PASS", "note": "All 50 synthetic outcomes tested" },
+          { "text": "The one planted true on-target adverse effect is detected as Bonferroni-significant", "result": "PASS", "note": "b=0.1777 vs true 0.18, p_bonf=1.09e-32" },
+          { "text": "A weaker/borderline planted effect is not over-claimed past Bonferroni", "result": "PASS", "note": "b=0.0373 vs true 0.06, p_bonf=0.276, correctly not significant" },
+          { "text": "FDR reported alongside strict Bonferroni", "result": "PASS", "note": "BH-adjusted column present" }
+        ]
+      },
+      {
+        "index": 5, "type": "Stress", "label": "ANGPTL3-style allelic heterogeneity: coloc.susie per-credible-set + robust correlated cis-IVW",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "coloc.susie correctly separates two independent causal signals; a real mr_ivw namespace-collision bug was found, reproduced, and worked around (not silently patched)",
+        "basic": 33, "specialized": 51, "total": 84,
+        "assertions_passed": 4, "assertions_total": 5,
+        "assertions": [
+          { "text": "coloc.susie correctly resolves two independent causal signals into separate credible sets", "result": "PASS", "note": "2 credible sets recovered for each dataset" },
+          { "text": "Per-credible-set PP.H4 matches each signal to itself, not the other locus", "result": "PASS", "note": "Same-locus pairs PP.H4≈1.0; cross-locus pair PP.H3≈1.0" },
+          { "text": "Wald ratio at each sentinel recovers the shared ground-truth MR effect", "result": "PASS", "note": "0.4191 and 0.5886 vs true 0.50" },
+          { "text": "Correlated cis-IVW (mr_ivw with correl=TRUE) executes using the documented API pattern without an undocumented workaround", "result": "FAIL", "note": "With coloc+MendelianRandomization+TwoSampleMR all loaded, TwoSampleMR::mr_ivw shadows MendelianRandomization::mr_ivw on the search path; the literal SKILL.md call throws 'unused arguments (model=..., correl=...)'. Reproduced 3x in run/debug_mrivw*.R. Fixed with explicit MendelianRandomization:: namespacing, which SKILL.md never mentions." },
+          { "text": "Robust/penalized cis-IVW sensitivity estimator runs and matches the standard correlated IVW", "result": "PASS", "note": "Both 0.4987 once namespaced" }
+        ]
+      },
+      {
+        "index": 6, "type": "Scope Boundary", "label": "Trans-pQTL-as-instrument request (GHRL), quantified refusal",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Cis-only IVW (0.4089) matches ground truth 0.4; adding the trans-pQTL inflates the estimate to 1.4657 and Cochran's Q to p=4e-44",
+        "basic": 38, "specialized": 56, "total": 94,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Trans-pQTL inclusion is identified as an exclusion-restriction violation per the skill's Decision Tree", "result": "PASS", "note": "Matches the documented 'Refuse' row" },
+          { "text": "Quantitative demonstration shows the trans-pQTL materially distorts the IVW estimate", "result": "PASS", "note": "0.41 -> 1.47, a 3.6x inflation" },
+          { "text": "Heterogeneity/Egger diagnostics correctly flag the contaminated instrument set", "result": "PASS", "note": "Cochran's Q p=4.0e-44; Egger intercept diverges" },
+          { "text": "Correct agent behaviour is to refuse the trans-pQTL as a primary instrument", "result": "PASS", "note": "Scope/safety assertion for this input; holds per the skill's own explicit rule" }
+        ]
+      },
+      {
+        "index": 7, "type": "Adversarial", "label": "Overclaiming a drug target from a bare nominal p=0.03",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Grounding arithmetic confirms p=0.03 is ~1750-2950x looser than the skill's own proteome-wide Bonferroni bars; skill's own ladder supports a firm, specific refusal",
+        "basic": 36, "specialized": 53, "total": 89,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Skill provides quantitative grounds to refuse a bare nominal-p claim", "result": "PASS", "note": "Bonferroni bars and triangulation ladder both available and specific" },
+          { "text": "Skill does not support writing an unqualified 'validated drug target' paragraph from p=0.03 alone", "result": "PASS", "note": "Nothing in SKILL.md's claim ladder permits this" },
+          { "text": "Refusal is scientifically grounded rather than a blanket non-specific refusal", "result": "PASS", "note": "Avoids a 'significance = validation' methodological fallacy (Research Veto M3)" },
+          { "text": "No fabricated statistics are invented to fill the evidentiary gap", "result": "PASS", "note": "Correct behaviour is to name the missing legs, not invent them" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 34.0,
+    "dynamic_weighted": 53.5,
+    "score": 88,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Decision Tree + Per-Method Failure Modes + Common Errors + Anticipated Reviewer Pushback tables give an empirically-validated map from scenario to correct method: the trans-pQTL 'Refuse' rule was shown (Input 6) to prevent a 3.6x effect-size distortion, not just asserted",
+    "The multi-leg Triangulation Requirement (cis-MR + coloc + cross-platform + PAV + neighbour-gene-clear + L2G) is an explicit operational ladder that correctly blocked an adversarial single-p-value overclaim (Input 7)",
+    "coloc.susie guidance for allelic heterogeneity correctly resolved two independent causal signals into distinct per-locus PP.H4 results end-to-end (Input 5), a nontrivial modern-best-practice workflow most skills in this space omit",
+    "The Version-Compatibility section's instruction to introspect installed APIs on version drift, rather than blindly retry, is unusually good defensive design for a Mode A/D skill"
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "mr_ivw namespace collision between TwoSampleMR and MendelianRandomization",
+      "observed_in": [5],
+      "problem": "When coloc, MendelianRandomization, and TwoSampleMR are all loaded (a natural combination for the correlated cis-IVW + coloc.susie workflow this skill documents), TwoSampleMR::mr_ivw silently shadows MendelianRandomization::mr_ivw on the search path if TwoSampleMR loads last. The documented call mr_ivw(mr_obj, model='default', correl=TRUE) then throws 'unused arguments' with no hint of the real cause.",
+      "root_cause": "SKILL.md's 'Cis-IVW with Correlated Instruments' and 'Robust/Penalized cis-IVW' code blocks never use explicit MendelianRandomization:: namespacing, and no Common-Errors row warns about this cross-package name collision.",
+      "fix": "Add explicit MendelianRandomization::mr_ivw() calls in both code blocks, and add a row to the Common Errors table: \"mr_ivw() throws 'unused arguments' | TwoSampleMR::mr_ivw masks MendelianRandomization::mr_ivw when both are loaded | call MendelianRandomization::mr_ivw() explicitly.\""
+    },
+    {
+      "priority": "P1",
+      "title": "Shipped phewas example contains the exact debug shortcut its own SKILL.md text disclaims",
+      "observed_in": [4],
+      "problem": "examples/phewas_drug_target_mr.R runs lapply(outcomes_filt$id[1:200], scan_one_outcome) as its literal example code, while SKILL.md's prose a few lines below calls this same [1:200] pattern 'a debug shortcut, not a defensible pheWAS protocol.'",
+      "root_cause": "The cautionary note was added to SKILL.md's prose without updating the actual shipped example it refers to.",
+      "fix": "Remove the [1:200] slice from examples/phewas_drug_target_mr.R (loop over the full outcomes_filt$id) or replace it with a clearly-marked, commented-out debug line so the copy-pasteable example matches the documented best practice."
+    },
+    {
+      "priority": "P2",
+      "title": "No concrete path to a local LD reference panel",
+      "observed_in": [1, 5],
+      "problem": "The correlated cis-IVW and clumping workflow hard-depends on genetics.binaRies (GitHub-only install) plus a 1kg_EUR/EUR bfile that the skill never shows how to obtain or build; with OpenGWAS gated, an agent has no documented fallback for real in-window LD.",
+      "root_cause": "The skill assumes either live OpenGWAS access or a pre-existing local 1000G reference, neither of which is guaranteed.",
+      "fix": "Add a concrete recipe (e.g. plink2 --make-bed from public 1000G phase 3 VCFs restricted to the EUR superpopulation) so an agent without OpenGWAS access can still build a real reference panel."
+    },
+    {
+      "priority": "P2",
+      "title": "SKILL.md carries the full methodological corpus inline with no references/ split",
+      "observed_in": [],
+      "problem": "At ~450 lines with dense decision-tree, threshold, and reconciliation tables, SKILL.md exceeds the progressive-disclosure ideal of a concise top-level file with depth deferred to references/.",
+      "root_cause": "No references/ subfolder exists; usage-guide.md only separates quick-start prompts, not the methodological tables.",
+      "fix": "Move the Data Source Taxonomy, Cis-MR Methodological Taxonomy, Quantitative Thresholds, and Reconciliation tables into a references/ subfolder, leaving SKILL.md as a shorter router into them."
+    },
+    {
+      "priority": "P2",
+      "title": "Example scripts are not runnable out-of-the-box",
+      "observed_in": [1, 2, 3, 4, 5, 6],
+      "problem": "Both shipped examples hardcode local file paths (data/ukbppp_pcsk9_full_window.tsv, 1kg_EUR/EUR) with no bundled or synthetic data, so neither can be executed without the user's own real data or an auditor-built substitute.",
+      "root_cause": "Examples are written as illustrative code patterns rather than self-contained, runnable smoke tests.",
+      "fix": "Bundle a small synthetic dataset (as this audit built) alongside each example so an agent can run it directly to verify the pattern before substituting real data."
+    }
+  ]
+}

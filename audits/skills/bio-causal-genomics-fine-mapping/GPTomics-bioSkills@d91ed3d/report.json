@@ -1,0 +1,230 @@
+{
+  "meta": {
+    "skill_name": "bio-causal-genomics-fine-mapping",
+    "description": "Resolves GWAS associations to candidate causal variants and credible sets via SuSiE, susie_rss, FINEMAP, CAVIAR, DAP-G, PAINTOR, PolyFun, SuSiEx, MultiSuSiE, and FOCUS. Use when narrowing a GWAS lead SNP to a 95 percent credible set, choosing between in-sample and reference LD, calibrating non-sparse loci, integrating functional priors via PolyFun, fine-mapping across ancestries, diagnosing LD mismatch, handling HLA, or feeding credible sets into coloc.susie.",
+    "evaluated_on": "2026-09-17",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:causal-genomics/fine-mapping"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All 12 cited papers (Wang 2020 JRSSB 82:1273, Zou 2022 PLoS Genet, Cui 2024 Nat Genet 56:162, Benner 2016 Bioinformatics 32:1493, Weissbrod 2020 Nat Genet 52:1355, Yuan 2024 Nat Genet 56:1841, etc.) are real and correctly attributed; no fabricated statistics, p-values, or sample sizes anywhere in the Skill." },
+      "practice_boundaries": { "result": "PASS", "detail": "Population-genetics / statistical-genomics research workflow only; no individual diagnostic, prescriptive, or treatment claims in scope anywhere in SKILL.md or usage-guide.md." },
+      "methodological_ground": { "result": "PASS", "detail": "The Skill actively guards against the methodological fallacy this audit's adversarial input (Input 7) tried to induce: a dedicated 'Credible-set misinterpretation' section rejects reporting a single top-PIP SNP as causal, and the case-control Neff correction (verified empirically against 4/(1/Ncase+1/Ncontrol)=19800.0) is stated correctly." },
+      "code_usability": { "result": "PASS", "detail": "6 of 7 executed/inspected code patterns (susie_rss summary-stat, susie individual-level, LD-mismatch diagnostic, L-scaling for non-sparse loci, Neff correction, FINEMAP CLI syntax) ran or checked out cleanly against real planted-truth data or public documentation. One pattern (coloc.susie, Input 4) crashes with a cryptic data.table error when followed exactly as documented in SKILL.md, due to an undocumented precondition (z/R must carry SNP names) -- a real, fixable, one-line gap in a single code block among ~15 documented patterns, not a systemic failure. Recorded as a P1 recommendation rather than a veto." }
+    }
+  },
+  "static_score": {
+    "subtotal": 86,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 11, "max": 12, "note": "Covers essentially every fine-mapping method in current use (SuSiE family, FINEMAP, CAVIAR, DAP-G, PAINTOR, PolyFun, SuSiEx, MultiSuSiE, FOCUS) with a correct decision tree by scenario; one verified correctness gap in the coloc.susie example (Input 4)." },
+      "reliability": { "score": 8, "max": 12, "note": "Excellent explicit handling for LD mismatch, non-convergence, and PSD violations (Category-3 override applied: hard stops are correct design). The coloc.susie SNP-naming precondition is neither validated, warned about, nor listed in the 'Common Errors' table, and the resulting failure is maximally cryptic (unrelated data.table internals)." },
+      "performance_context": { "score": 6, "max": 8, "note": "SKILL.md is 436 lines with all technical depth (algorithmic taxonomy, thresholds, failure modes, reviewer pushback) inline rather than in a references/ folder that would load conditionally; no references/ directory exists at all. Workflow itself (diagnose -> choose -> fit -> extract -> report) is linear with no redundant steps." },
+      "agent_usability": { "score": 14, "max": 16, "note": "Consistent terminology (PIP, credible set, purity, lambda, Neff) throughout; explicit output/reporting expectations (Required Reporting Schema table); one of the strongest 'Per-Tool Failure Modes' + 'Common Errors' catalogs seen in this audit series, though it omits the coloc.susie naming precondition found by execution." },
+      "human_usability": { "score": 7, "max": 8, "note": "Natural-language Quick Start prompts in usage-guide.md map precisely onto how a researcher actually asks for this work. Category-3 forgiveness override applied (strict input validation is correct here); documented errors are clear, the one undocumented one (coloc naming) is not." },
+      "security": { "score": 11, "max": 12, "note": "No credentials or sensitive data anywhere; only public reference panels (1000G, UKB baseline-LF) cited. Explicit PSD/eigenvalue and convergence checks exist for the summary-statistic path; no equivalent pre-flight check exists for the coloc.susie naming precondition." },
+      "maintainability": { "score": 11, "max": 12, "note": "Clean separation across SKILL.md (method/taxonomy), usage-guide.md (workflow/prompts), and examples/ (4 runnable scripts). Every documented code path was independently testable and, in 6/7 cases, verified correct against planted-truth synthetic data." },
+      "agent_specific": { "score": 18, "max": 20, "note": "Precise, well-targeted trigger description; excellent composability (12 related Skills cross-referenced with concrete interface descriptions); explicit, strong escape hatches (dedicated 'HLA and Long-Range LD: When to Stop' section). Progressive disclosure is the one weak sub-criterion: no references/ folder exists, so all reference-style tables load with the Skill every time." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 91.1,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 22, "total": 23 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "susie_rss on a matched-LD summary-statistics locus, 2 planted causals",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Both planted causal variants recovered at PIP=1.0000 in separate purity-1.0 credible sets; estimate_s_rss lambda=0.0164, well within the Skill's <0.05 acceptable band.",
+        "basic": 38,
+        "specialized": 59,
+        "total": 97,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "estimate_s_rss lambda < 0.05 for a genuinely matched LD reference", "result": "PASS", "note": "lambda = 0.0164" },
+          { "text": "Both planted causal variants recovered in a returned credible set", "result": "PASS", "note": "idx 90 and idx 310 both found, PIP=1.0000 each" },
+          { "text": "At least one credible set has purity >= 0.5", "result": "PASS", "note": "both sets at purity 1.000" }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "susie(X, y, L=10) on individual-level genotypes",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Planted causal SNP recovered at PIP=1.0000 in a single purity-1.0 credible set; correctly used in-sample LD with no estimate_s_rss diagnostic (not needed for individual-level input, per the Skill's own decision tree).",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "Planted causal recovered in a credible set", "result": "PASS", "note": "SNP60 in CS1" },
+          { "text": "PIP at planted causal > 0.5", "result": "PASS", "note": "PIP = 1.0000" },
+          { "text": "In-sample LD used correctly for individual-level input", "result": "PASS", "note": "susie(X,y) called directly, no summary-stat diagnostic invoked, matching the Skill's decision tree" }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "LD reference mismatch diagnostic (estimate_s_rss / kriging_rss)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Deliberately mismatched reference LD (independently simulated cohort) produced lambda=0.7517 vs 0.0000 matched, and 9 spurious singleton credible sets vs the true 1 signal -- exactly the symptom SKILL.md documents for this failure mode.",
+        "basic": 38,
+        "specialized": 59,
+        "total": 97,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "lambda(mismatched) > lambda(matched)", "result": "PASS", "note": "0.7517 vs 0.0000" },
+          { "text": "lambda(mismatched) exceeds the Skill's 0.05 acceptable threshold", "result": "PASS", "note": "0.7517 > 0.05" },
+          { "text": "lambda(matched) is within the Skill's acceptable range", "result": "PASS", "note": "0.0000 < 0.05" },
+          { "text": "kriging_rss flags more outliers under mismatch", "result": "PASS", "note": "12/300 vs 1/300" }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "coloc.susie two-trait colocalization, shared planted causal",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "SKILL.md's documented Coloc.susie Integration code (bare, unnamed z vectors) crashes with a cryptic data.table error; adding SNP names (an undocumented precondition) fixes it and correctly recovers PP.H4=1.0 on the planted shared causal. Root cause traced to coloc:::coloc.bf_bf source in this environment.",
+        "basic": 29,
+        "specialized": 47,
+        "total": 76,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "coloc.susie fails when SKILL.md's documented pattern is followed literally (unnamed z)", "result": "PASS", "note": "Reproduced deterministically: 'Check that is.data.table(DT) == TRUE...' error" },
+          { "text": "coloc.susie succeeds once SNP names are added to z and R", "result": "PASS", "note": "Confirms the underlying method and installed package version are sound" },
+          { "text": "Max PP.H4 > 0.8 (the Skill's own shared-causal threshold)", "result": "PASS", "note": "PP.H4 = 1.0000" },
+          { "text": "Top colocalized hit is the planted shared causal SNP", "result": "PASS", "note": "rs0000130 in both traits' hit1/hit2, matching the planted index 130" }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "HLA-like non-sparse locus, 12 planted causals vs L=10 default cap",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "L=10 saturated all 10 slots and missed 2/12 planted signals; L=30 auto-pruned to exactly 12 credible sets and recovered all 12 planted causals -- a textbook confirmation of the Skill's 'L is cheap to increase' guidance.",
+        "basic": 38,
+        "specialized": 59,
+        "total": 97,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "L=10 saturates all requested slots (signal L is undersized)", "result": "PASS", "note": "10/10 credible sets returned" },
+          { "text": "L=30 returns fewer than the 30 cap (auto-pruning)", "result": "PASS", "note": "12/30 returned" },
+          { "text": "Raising L recovers at least as many planted causals as L=10", "result": "PASS", "note": "12/12 at L=30 vs 10/12 at L=10" }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "FINEMAP CLI shotgun stochastic search, no Windows binary",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "Not executed -- no FINEMAP/SuSiEx/PAINTOR/DAP-G binary exists on this platform (confirmed by filesystem search; Windows builds of plink2/magma/smr do exist in the same env). CLI flags and master-file format verified correct against real public FINEMAP 1.4.x documentation via WebSearch. SKILL.md never states that these four CLI tools require a POSIX build.",
+        "basic": 32,
+        "specialized": 50,
+        "total": 82,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "CLI flags match documented, current FINEMAP 1.4.x usage", "result": "PASS", "note": "--sss, --n-causal-snps, --prob-tol, --n-iterations, --n-convergence all verified via WebSearch against hongchengyao.github.io/fine-mapping_document/FINEMAP/" },
+          { "text": "Master file column format matches FINEMAP's documented spec", "result": "PASS", "note": "z;ld;snp;config;cred;log;n_samples order confirmed" },
+          { "text": "Skill explicitly warns that FINEMAP/SuSiEx/PAINTOR/DAP-G have no Windows build", "result": "FAIL", "note": "No platform caveat anywhere in SKILL.md or usage-guide.md; an agent on Windows discovers this only by trying and failing" },
+          { "text": "Skill provides a documented fallback when the CLI tool is unavailable", "result": "PASS", "note": "susie_rss is the primary path throughout, and the 'Reconciliation: When Methods Disagree' table gives an explicit procedure" }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Case-control Neff vs Ntotal + \"just tell me THE causal SNP\" framing",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Neff formula (4/(1/Ncase+1/Ncontrol)) verified exact at 19,800.0 vs Ntotal 500,000 (25.3x). Residual-variance calibration differed materially (0.9957 vs 0.9007, ~10.5%) between the two N choices, confirming the Skill's warning empirically. This locus's signal was strong enough that top-line PIP did not flip -- a property of the chosen synthetic locus, not a Skill defect; the mandated non-single-SNP framing from 'Credible-set misinterpretation' still applies regardless of PIP sharpness.",
+        "basic": 37,
+        "specialized": 57,
+        "total": 94,
+        "assertions_passed": 2,
+        "assertions_total": 2,
+        "assertions": [
+          { "text": "Neff formula matches 4/(1/Ncase+1/Ncontrol)", "result": "PASS", "note": "19800.0 exact" },
+          { "text": "Residual-variance/calibration estimate differs materially between Ntotal and Neff fits", "result": "PASS", "note": "0.995655 vs 0.900730, 10.5% difference" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 34.4,
+    "dynamic_weighted": 54.7,
+    "score": 89,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "The mandatory estimate_s_rss / kriging_rss LD-mismatch diagnostic works exactly as documented: on a genuinely mismatched reference panel, lambda jumped from 0.0000 (matched) to 0.7517 (mismatched) and correctly produced the predicted symptom (9 spurious singleton credible sets vs. the true 1).",
+    "L-scaling guidance for high-signal / HLA-like loci verified empirically end-to-end: with 12 planted causal variants, L=10 saturated and missed 2 signals, L=30 recovered all 12 and auto-pruned to exactly 12.",
+    "Extensive, well-sourced failure-mode catalog (LD mismatch, non-sparse architecture, L too small, prior_weights vs prior_variance, Neff vs Ntotal, allele harmonization, credible-set misinterpretation) citing real primary literature with correct volume/page numbers.",
+    "Case-control Neff correction is correctly specified and shown to materially change the model's residual-variance calibration when tested against a planted-truth locus.",
+    "Strong composability: 12 related Skills cross-referenced with concrete, correct interface descriptions (credible sets feed coloc.susie; fine-mapped variants feed MR as cis-instruments)."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "coloc.susie example crashes on SKILL.md's own documented code (missing SNP-name precondition)",
+      "observed_in": [4],
+      "problem": "Running the 'Coloc.susie Integration' section's code exactly as written (bare, unnamed z1/z2 vectors) crashes with a cryptic, unrelated data.table error ('Check that is.data.table(DT) == TRUE...') instead of succeeding or failing with a clear message.",
+      "root_cause": "coloc.bf_bf matches SNPs between the two susie fits' lbf_variable matrices via intersect(colnames(bf1), colnames(bf2)); SKILL.md's example never sets names(z1)/names(z2) or LD dimnames, so the intersect is empty, coloc.bf_bf silently returns a summary-less data.table, and coloc.susie's ret$summary[, :=(...)] then fails on NULL.",
+      "fix": "Add one line before the susie_rss calls in the Coloc.susie Integration code block: `names(z1) <- names(z2) <- colnames(ld_matrix) <- rownames(ld_matrix) <- snp_ids`, and state explicitly that coloc.susie requires named SNP IDs on z and R or it fails with an unrelated data.table error."
+    },
+    {
+      "priority": "P1",
+      "title": "No platform caveat for FINEMAP / SuSiEx / PAINTOR / DAP-G (all POSIX-only CLI tools)",
+      "observed_in": [6],
+      "problem": "SKILL.md documents FINEMAP, SuSiEx, PAINTOR, and DAP-G CLI invocations with no mention that these are Linux/macOS-only binaries with no Windows build; an agent running on Windows discovers this only after attempting execution.",
+      "root_cause": "The prerequisites section (usage-guide.md) lists `git clone` / `make` build instructions for each CLI tool without a platform-compatibility note.",
+      "fix": "Add a one-line platform caveat at first mention of each CLI tool: 'Linux/macOS binary only; on Windows use WSL, or fall back to susie_rss for the equivalent inference.'"
+    },
+    {
+      "priority": "P2",
+      "title": "SKILL.md carries all technical depth inline rather than in a references/ folder",
+      "observed_in": [],
+      "problem": "At 436 lines, SKILL.md loads its full Algorithmic Taxonomy, Quantitative Thresholds, and Anticipated Reviewer Pushback tables every time the Skill triggers, rather than deferring this depth to a conditionally-loaded reference file.",
+      "root_cause": "No references/ directory exists for this Skill; all reference-style content lives directly in SKILL.md.",
+      "fix": "Move the Algorithmic Taxonomy, Quantitative Thresholds, and Anticipated Reviewer Pushback tables into references/fine_mapping_reference.md, leaving SKILL.md as a leaner entry point with a pointer to it."
+    },
+    {
+      "priority": "P2",
+      "title": "Individual-level and CLI code paths lack an explicit genotype-QC checklist",
+      "observed_in": [2, 6],
+      "problem": "The summary-statistics path has explicit PSD/eigenvalue and convergence checks; the individual-level susie(X,y) path and the CLI examples have no equivalent guidance on genotype-level quality control (call rate, HWE, MAF floor) before fitting.",
+      "root_cause": "The Skill's data-quality guidance is concentrated on the LD-diagnostic block for the summary-statistics path and was not mirrored for the individual-level or CLI paths.",
+      "fix": "Add a brief genotype-QC checklist alongside the susie(X, y) pattern and the FINEMAP/SuSiEx prerequisites."
+    }
+  ]
+}

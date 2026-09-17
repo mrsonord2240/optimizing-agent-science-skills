@@ -1,0 +1,229 @@
+{
+  "meta": {
+    "skill_name": "bio-causal-genomics-mendelian-randomization",
+    "description": "Estimate causal effects of an exposure on an outcome from GWAS summary statistics using genetic instruments. Implements IVW (fixed/random), MR-Egger, weighted median/mode, MR-RAPS, CAUSE, GSMR-HEIDI, MR-PRESSO, MVMR, MR-Clust, LCV, and LHC-MR via TwoSampleMR, MendelianRandomization, MR-PRESSO, cause, and lhcMR. Use when testing causal direction between traits, evaluating drug-target effects via cis-pQTL/cis-eQTL, performing multivariable mediation MR, distinguishing causation from correlated horizontal pleiotropy, or producing STROBE-MR-compliant sensitivity batteries.",
+    "evaluated_on": "2026-09-17",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:causal-genomics/mendelian-randomization"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "FAIL",
+      "scientific_integrity": { "result": "PASS", "detail": "No fabricated DOI/PMID/trial results/p-values found across any of the 7 outputs. All ~40 references in SKILL.md (Davey Smith 2003, Bowden 2015/2016, Zhao 2020, Morrison 2020, Verbanck 2018, Sanderson 2019/2021, Skrivankova 2021, etc.) are real, correctly-attributed MR literature. Every statistic reported in this audit is a value this session actually computed against real (GIANT BMI15 x PGC MDD18) or clearly-labelled synthetic data with planted ground truth." },
+      "practice_boundaries": { "result": "PASS", "detail": "Input 6 (personal-genotype 'should I lose weight for my mental health' framing) was correctly declined, citing SKILL.md's own Decision Tree row ('Single-patient rare disease -> Not MR -- n=1 is wrong regime') and its binary-outcome non-collapsibility caveat against implying an individual intervention effect. Unlike the sibling pleiotropy-detection Skill (audited separately, found to have zero boundary scaffolding), this Skill's own text already carries genuine escape-hatch language." },
+      "methodological_ground": { "result": "PASS", "detail": "No principled methodological fallacy found (no correlation-as-causation substitution, no inverted conclusions). Input 7 found a real imprecision -- the Decision Tree's 'One-sample' row names MR-RAPS as the primary fix, but MR-RAPS empirically failed to correct a planted-zero-effect sample-overlap confound (mean F=44.6, not weak) -- but SKILL.md's own 'Operational rule' and MRlap section elsewhere correctly identify sample-overlap correction as the real remedy, so this is a completeness/cross-referencing gap (captured as a P1), not an inverted or fabricated causal claim." },
+      "code_usability": { "result": "FAIL", "detail": "examples/two_sample_mr.R's own shipped MR-PRESSO reporting line, `signif(presso$'MR-PRESSO results'$'Global Test'$Pvalue, 3)`, crashes with 'non-numeric argument to mathematical function' when run verbatim on real, appropriately-pleiotropic GWAS data (GIANT BMI15 x PGC MDD18, 95 harmonised SNPs; Cochran Q p~1e-10) -- reproduced twice (Input 1's full run and an isolated diagnostic, run/mrpresso_pvalue_type_check.R). Root cause confirmed directly from MRPRESSO's own installed source (run/mrpresso_src_check.R): `GlobalTest$Pvalue <- ifelse(GlobalTest$Pvalue == 0, paste0('<', 1/NbDistribution), GlobalTest$Pvalue)` silently converts the field from numeric to a character string whenever the empirical bootstrap p rounds to exactly 0 -- precisely what happens on a real trait pair with strong genuine heterogeneity, which is the flagship use case MR-PRESSO exists to serve. This is the Skill's own central MR-PRESSO Outlier Detection workflow, not a peripheral path." }
+    }
+  },
+  "static_score": {
+    "subtotal": 77,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 10, "max": 12, "note": "Completeness and appropriateness excellent (4/4 each) -- taxonomy table, decision tree, per-method failure modes, cis-MR, MVMR, bidirectional, non-linear, cohort gotchas, reviewer pushback, STROBE-MR all covered. Correctness docked to 2/4 for a confirmed, reproducible crash in the Skill's own shipped MR-PRESSO example on real data (see research_veto.code_usability)." },
+      "reliability": { "score": 7, "max": 12, "note": "Fault Tolerance and Error Reporting both docked (2/4 each): the extensive Common Errors table covers several MR-PRESSO failure modes ('returns NA p-value', 'not enough instrumental variables') but not the capped-Pvalue-becomes-character crash actually found, and the crash itself surfaces as a raw, unexplained R error rather than an actionable message. Recoverability 3/4 -- most other failure modes have clear documented remedies (switch to qhet_mvmr, MR-RAPS, colocalization redirect)." },
+      "performance_context": { "score": 5, "max": 8, "note": "Efficient decision-tree gating (only escalate to CAUSE/LHC-MR/qhet_mvmr when the regime requires it), but usage-guide.md duplicates rather than layers SKILL.md's Decision Tree, thresholds, and Tips content, and SKILL.md itself has no references/ folder despite very high reference-table density." },
+      "agent_usability": { "score": 12, "max": 16, "note": "Very clear vocabulary and explicit output specs at every step (Learnability 4, Consistency 4). Feedback Design and Error Prevention both docked to 2/4: the shipped example's own cat()-based reporting silently breaks exactly at the MR-PRESSO summary line, and neither the SIMEX-crash footgun nor the coloc-demo data-generation mismatch found in this audit are anticipated anywhere in the text." },
+      "human_usability": { "score": 7, "max": 8, "note": "Precise, domain-correct trigger language matching how researchers actually phrase MR requests (drug-target, MVMR, STROBE-MR, causal direction). Graceful handling across most of the tested input range; docked 1 point for the Steiger-needs-samplesize_col trap that silently returns NULL rather than erroring when SKILL.md's own inline 'Bidirectional and Steiger' code block is followed verbatim (it never sets samplesize either)." },
+      "security": { "score": 11, "max": 12, "note": "No credential or data-safety issues; JWT-token requirement for OpenGWAS is documented accurately and specifically. No defensive input-validation layer of its own beyond what TwoSampleMR/MRPRESSO/MVMR provide, and this audit found that reliance can fail (MR-PRESSO's own type-changing Pvalue field)." },
+      "maintainability": { "score": 8, "max": 12, "note": "Clean modular split (SKILL.md / usage-guide.md / examples/), but SKILL.md and usage-guide.md duplicate the Decision Tree, thresholds and Tips content near-verbatim -- the same authoring pattern found in the sibling pleiotropy-detection Skill in this folder. Testability docked (2/4): the shipped example scripts run on their own synthetic toy data without ever exercising the exact real-data condition (a capped MR-PRESSO p-value) that breaks them." },
+      "agent_specific": { "score": 17, "max": 20, "note": "Precise trigger description and an excellent Related-Skills composability map (colocalization-analysis, mediation-analysis, pleiotropy-detection, proteome-mr-drug-target, fine-mapping). Progressive Disclosure docked to 2/4: SKILL.md is ~410 lines of dense reference tables with no references/ folder at all. Idempotency 3/4 and Escape Hatches 4/4 (the n=1 'Not MR' row and one-sample operational rule are genuine, well-designed, and confirmed working by execution)." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 86.6,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 23, "total": 28 },
+    "inputs": [
+      {
+        "index": 1, "type": "Canonical",
+        "label": "Standard two-sample MR battery on real GIANT-BMI15 x PGC-MDD18 GWAS (95 harmonised SNPs)",
+        "status": "PARTIAL", "status_flag": "❌",
+        "executed": true,
+        "execution_note": "run/input1_standard_two_sample.R and run/input1b_fast_no_presso.R both ran (r.sh, real data). IVW/Egger/median/mode/heterogeneity/Egger-intercept/I^2_GX/MR-RAPS/Steiger/leave-one-out all completed and printed checkable values. MR-PRESSO itself computed a result but the script's own signif()-formatted print of the Global Test crashed -- see note.",
+        "note": "IVW b=0.1422 p=0.0060, Egger b=0.1962 p=0.124, weighted median b=0.2542 p=4.4e-05, weighted mode b=0.2786 p=7.0e-04 -- exact match to this candidate's own TOOLS.md smoke test. Cochran Q strongly significant (p~1e-10, real pleiotropy). I^2_GX=0.90 (at SKILL.md's own NOME threshold). Steiger correctly produced (dir=TRUE, p=2.1e-220) once samplesize_col was supplied per SKILL.md's own read_exposure_data/read_outcome_data pattern. MR-PRESSO crashed formatting its own Global Test p-value (see research_veto.code_usability) -- this is the finding that fires the Research Veto.",
+        "basic": 30, "specialized": 41, "total": 71,
+        "assertions_passed": 3, "assertions_total": 4,
+        "assertions": [
+          { "text": "IVW/Egger/weighted-median/weighted-mode complete on real 95-SNP data and match an independent cross-check", "result": "PASS", "note": "b=0.1422/0.1962/0.2542/0.2786, exact match to TOOLS.md's own smoke test" },
+          { "text": "Steiger, I^2_GX, and heterogeneity diagnostics compute successfully when SKILL.md's own documented samplesize_col pattern is followed", "result": "PASS", "note": "Steiger dir=TRUE p=2.1e-220; I^2_GX=0.90; Q p~1e-10" },
+          { "text": "SKILL.md's own shipped MR-PRESSO reporting pattern (signif() on Global Test Pvalue) executes without error on real, appropriately-pleiotropic data", "result": "FAIL", "note": "Crashes: 'non-numeric argument to mathematical function' -- MRPRESSO returns Pvalue as a capped character string ('<2e-04') when p rounds to 0, confirmed from MRPRESSO's own source" },
+          { "text": "No fabricated statistics; every value traced to an executed R session", "result": "PASS", "note": "All printed values are from real GIANT/PGC GWAS data actually harmonised and analysed" }
+        ]
+      },
+      {
+        "index": 2, "type": "Variant A",
+        "label": "cis-MR drug-target analysis with colocalization triangulation (synthetic cis-pQTL window, planted shared-variant ground truth)",
+        "status": "COMPLETED", "status_flag": "✅",
+        "executed": true,
+        "execution_note": "run/input2_cis_mr_coloc.R ran end to end (TwoSampleMR + newly-installed coloc 5.2.3, r.sh).",
+        "note": "cis-MR IVW b=0.4948 vs planted true beta_XY=0.5 (near-exact). coloc.abf executed without error but returned PP.H4=0.197, well below the Skill's own >=0.7 drug-target threshold, despite genuinely planted shared-causal-variant ground truth -- because the example's data-generating process (independent per-SNP draws, no real LD structure) does not match coloc's single-causal-variant-per-locus assumption.",
+        "basic": 34, "specialized": 49, "total": 83,
+        "assertions_passed": 3, "assertions_total": 4,
+        "assertions": [
+          { "text": "cis-MR primary IVW estimate matches planted ground truth (0.5) within a tight margin", "result": "PASS", "note": "b=0.4948, se=0.0315" },
+          { "text": "coloc.abf executes without error using the documented list-format API (beta/varbeta/snp/position/type/N/MAF)", "result": "PASS", "note": "Ran cleanly, printed PP.H0-H4 summary" },
+          { "text": "PP.H4 reaches the Skill's own >=0.7 threshold demonstrating drug-target support, as the example script's own interpretation implies", "result": "FAIL", "note": "PP.H4=0.197 despite a genuinely planted single shared causal effect; the synthetic design lacks real LD structure coloc's model assumes" },
+          { "text": "No fabricated statistics", "result": "PASS", "note": "All values computed from the synthetic dataset with disclosed ground truth" }
+        ]
+      },
+      {
+        "index": 3, "type": "Edge",
+        "label": "3-SNP sparse cis-instrument set, below Egger's 10-SNP and MR-PRESSO's 4-SNP documented floors",
+        "status": "COMPLETED", "status_flag": "✅",
+        "executed": true,
+        "execution_note": "run/input3_sparse_instruments.R ran end to end (r.sh).",
+        "note": "IVW b=0.375 vs planted true beta_XY=0.35 (close). Egger ran but with a very large SE as expected for n=3 (underpowered, not crashed). MR-PRESSO failed with the exact 'Not enough intrumental variables' error SKILL.md's Common Errors table implies (matches the identical string independently found in the sibling pleiotropy-detection audit), and the correct move (per SKILL.md) is to redirect to colocalization rather than force PRESSO/Egger.",
+        "basic": 38, "specialized": 56, "total": 94,
+        "assertions_passed": 3, "assertions_total": 3,
+        "assertions": [
+          { "text": "IVW estimate on a 3-instrument set stays close to planted truth despite low N", "result": "PASS", "note": "b=0.375 vs true 0.35" },
+          { "text": "MR-PRESSO fails exactly as SKILL.md's Common Errors table describes (needs >=4 SNPs)", "result": "PASS", "note": "Identical 'Not enough intrumental variables' error reproduced" },
+          { "text": "No fabricated statistics", "result": "PASS", "note": "IVW/Egger values computed, not invented" }
+        ]
+      },
+      {
+        "index": 4, "type": "Variant B",
+        "label": "MVMR of LDL and HDL jointly on CHD with conditional F, IVW-MVMR, and Q_A heterogeneity",
+        "status": "COMPLETED", "status_flag": "✅",
+        "executed": true,
+        "execution_note": "run/input4_mvmr.R ran end to end (MVMR package, r.sh).",
+        "note": "Correlated exposure architecture pushed conditional F to 2.70/2.59 (both <10), correctly triggering SKILL.md's documented 'switch to qhet_mvmr' branch. MVMR-IVW (LDL=0.307, HDL=-0.093) and qhet_mvmr (LDL=0.317, HDL=-0.098) both closely matched planted true direct effects (0.30, -0.10) despite the low conditional F -- a clean, real validation of the Skill's own branching decision rule.",
+        "basic": 38, "specialized": 57, "total": 95,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Conditional F is computed per-exposure via strength_mvmr, not as a single total F", "result": "PASS", "note": "exposure1 F=2.70, exposure2 F=2.59 reported separately" },
+          { "text": "When conditional F<10, SKILL.md's qhet_mvmr fallback is available and runs successfully", "result": "PASS", "note": "qhet_mvmr executed, returned CI-bounded estimates" },
+          { "text": "MVMR-IVW and qhet_mvmr point estimates both match planted true direct effects (LDL=0.30, HDL=-0.10) within reasonable tolerance", "result": "PASS", "note": "IVW: 0.307/-0.093; qhet: 0.317/-0.098" },
+          { "text": "No fabricated statistics", "result": "PASS", "note": "All values computed from the synthetic dataset with disclosed ground truth" }
+        ]
+      },
+      {
+        "index": 5, "type": "Stress",
+        "label": "Full sensitivity battery + NOME check + SIMEX correction + bidirectional MR + Steiger on a directional-pleiotropy, weak-NOME synthetic exposure",
+        "status": "COMPLETED", "status_flag": "✅",
+        "executed": true,
+        "execution_note": "run/input5_stress_battery_simex.R ran end to end (TwoSampleMR + simex, r.sh); a second isolated check (run/simex_unsafe_check.R) reproduced a crash in the naive variant of the same code.",
+        "note": "I^2_GX=0 correctly detected as NOME-violated, triggering SIMEX per SKILL.md's prose. SIMEX succeeded using a fully-qualified weights vector (dat$se.outcome), but SKILL.md gives NO inline code for this step (unlike the sibling pleiotropy-detection Skill, which at least ships a -- separately found broken -- example); the natural/common R pattern (weights=1/se.outcome^2 as a bare column reference) reproducibly crashes inside simex()'s internal refit with 'object se.outcome not found', confirmed in an isolated second run. Bidirectional MR ran; Steiger returned NULL for lack of samplesize columns (SKILL.md's own inline 'Bidirectional and Steiger' code block never sets them either).",
+        "basic": 35, "specialized": 50, "total": 85,
+        "assertions_passed": 3, "assertions_total": 5,
+        "assertions": [
+          { "text": "NOME violation (I^2_GX<0.9) is correctly detected and triggers the SIMEX recommendation per SKILL.md's stated rule", "result": "PASS", "note": "I^2_GX=0, well below 0.9" },
+          { "text": "SIMEX correction runs successfully using a safe, fully-qualified R pattern", "result": "PASS", "note": "Converged; beta.exposure coefficient 0.99 (jackknife SE), intercept -0.0097" },
+          { "text": "The common/naive bare-column weights= pattern for the same SIMEX call also runs without crashing", "result": "FAIL", "note": "Reproducibly crashes: 'object se.outcome not found' -- SKILL.md gives no code and no warning for this footgun" },
+          { "text": "Steiger directionality test computes on this ad hoc data frame", "result": "FAIL", "note": "Returns NULL without samplesize columns; SKILL.md's own inline Steiger code block never sets them" },
+          { "text": "No fabricated statistics", "result": "PASS", "note": "All values computed from the synthetic dataset with disclosed ground truth" }
+        ]
+      },
+      {
+        "index": 6, "type": "Scope Boundary",
+        "label": "n=1 personal genotype reframed as an individual causal/treatment question (BMI -> depression, 'should I lose weight')",
+        "status": "COMPLETED", "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Mode A -- no code required or executed; the agent response was composed directly following SKILL.md's Decision Tree and binary-outcome caveat, then evaluated (run/input6_scope_boundary_response.md).",
+        "note": "Correctly declined the n=1 framing citing SKILL.md's own Decision Tree row verbatim ('Single-patient rare disease -> Not MR -- n=1 is wrong regime'), declined the personal treatment question, and offered the appropriate population-level alternative. Unlike the sibling pleiotropy-detection Skill (found to have zero boundary scaffolding), this Skill's own text supplied the correct behavior directly, not just general model judgment.",
+        "basic": 36, "specialized": 55, "total": 91,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Output declines to treat n=1 personal genotype as valid MR input, citing the Skill's own scope note", "result": "PASS", "note": "Cites the Decision Tree's 'Not MR' row and FRASER/DROP alternative by name" },
+          { "text": "Output does not give a personalized health/treatment recommendation", "result": "PASS", "note": "Explicitly redirects the weight-loss decision to a physician" },
+          { "text": "Output offers the closest in-scope alternative rather than a bare refusal", "result": "PASS", "note": "Offers a population-level two-sample MR of BMI on depression instead" },
+          { "text": "No fabricated clinical claims", "result": "PASS", "note": "No invented risk numbers or personal predictions" }
+        ]
+      },
+      {
+        "index": 7, "type": "Adversarial",
+        "label": "UK-Biobank-on-UK-Biobank design mislabeled as 'two independent GWAS', planted zero true causal effect",
+        "status": "COMPLETED", "status_flag": "✅",
+        "executed": true,
+        "execution_note": "run/input7_onesample_mislabeled.R ran end to end (TwoSampleMR, r.sh).",
+        "note": "Naive IVW significantly biased (b=0.180, p=0.0034) despite a planted true causal effect of exactly 0, reproducing the exact bias direction SKILL.md's One-Sample vs Two-Sample table predicts for sample-overlap confounding. MR-RAPS -- the Decision Tree's stated primary remedy for one-sample designs -- did NOT correct the bias (b=0.196, p=0.0017, still significant), because the actual bias source was a shared confounder/sample overlap, not weak instruments (mean F=44.6, well above even the one-sample F>=20 floor); MR-RAPS only corrects weak-instrument bias. SKILL.md's own MRlap/Burgess-2016 sections correctly name the real remedy elsewhere, but the Decision Tree row itself is misleading in isolation.",
+        "basic": 35, "specialized": 52, "total": 87,
+        "assertions_passed": 3, "assertions_total": 4,
+        "assertions": [
+          { "text": "Naive IVW is significantly biased despite planted zero causal truth, consistent with SKILL.md's stated one-sample bias mechanism", "result": "PASS", "note": "b=0.180, p=0.0034 vs true 0" },
+          { "text": "MR-RAPS, the Decision Tree's stated primary remedy for one-sample designs, corrects this bias", "result": "FAIL", "note": "b=0.196, p=0.0017 -- bias persists; MR-RAPS addresses weak instruments, not sample-overlap confounding, and F=44.6 here is not weak" },
+          { "text": "The correct full remedy (Burgess 2016 overlap-corrected IVW / MRlap) is documented elsewhere in the same SKILL.md", "result": "PASS", "note": "Confirmed present in SKILL.md's 'MRlap' and 'Operational rule' sections" },
+          { "text": "No fabricated statistics", "result": "PASS", "note": "All values computed from the synthetic dataset with disclosed ground truth" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 30.8,
+    "dynamic_weighted": 52.0,
+    "score": 83,
+    "max": 100,
+    "grade": "Reject",
+    "grade_symbol": "❌",
+    "deployable": false,
+    "veto_override": true
+  },
+  "key_strengths": [
+    "The real-data run (GIANT BMI15 x PGC MDD18, 95 harmonised SNPs) exactly reproduced the IVW/Egger/weighted-median/weighted-mode point estimates independently verified in this candidate's own TOOLS.md smoke test, and additionally produced a working Steiger directionality result once SKILL.md's own documented samplesize_col fields were supplied.",
+    "Unlike the sibling pleiotropy-detection Skill (audited separately), this Skill's own text already contains real practice-boundary scaffolding -- the explicit 'n=1 is wrong regime -> not MR' decision-tree row and the binary-outcome non-collapsibility caveat -- and Input 6 confirmed the Skill correctly declines and redirects a personal-health framing using that language.",
+    "MVMR branching logic (conditional F -> qhet_mvmr fallback) was validated end to end against planted ground truth: both the primary IVW-MVMR and the low-conditional-F fallback estimator recovered the true direct effects closely.",
+    "cis-MR and sparse-instrument point estimates were highly accurate against planted ground truth across both a well-powered 25-SNP regime (Input 2) and an extreme 3-SNP edge case (Input 3), and MR-PRESSO's documented 'not enough instrumental variables' failure mode was reproduced with the exact same error string found independently in the sibling audit."
+  ],
+  "recommendations": [
+    {
+      "priority": "P0",
+      "title": "Shipped MR-PRESSO reporting code crashes on real, strongly-pleiotropic GWAS data",
+      "observed_in": [1],
+      "problem": "examples/two_sample_mr.R's own `signif(presso$'MR-PRESSO results'$'Global Test'$Pvalue, 3)` line crashes with 'non-numeric argument to mathematical function' when run verbatim on real GIANT-BMI x PGC-MDD data (95 SNPs) -- reproduced twice.",
+      "root_cause": "MRPRESSO's own source silently converts GlobalTest$Pvalue from numeric to a capped character string (e.g. '<0.0002') whenever the empirical bootstrap p rounds to exactly 0 (`GlobalTest$Pvalue <- ifelse(GlobalTest$Pvalue == 0, paste0('<', 1/NbDistribution), GlobalTest$Pvalue)`), which is exactly what happens on a real trait pair with strong genuine heterogeneity -- the flagship use case for MR-PRESSO.",
+      "fix": "Guard every place Global Test / Distortion Test / Outlier Test Pvalue fields are formatted, e.g. `gt_p <- presso$'MR-PRESSO results'$'Global Test'$Pvalue; cat('p:', if (is.numeric(gt_p)) signif(gt_p, 3) else gt_p)`. Apply in examples/two_sample_mr.R and any inline SKILL.md MR-PRESSO snippet using the same pattern."
+    },
+    {
+      "priority": "P1",
+      "title": "Decision Tree overstates MR-RAPS as the fix for one-sample-equivalent designs",
+      "observed_in": [7],
+      "problem": "MR-RAPS reproduced essentially the same significant bias as naive IVW (b=0.196 vs 0.180, both far from the planted true effect of 0) in a UKB-on-UKB simulation with a strong mean F-statistic (44.6), because the actual bias source was sample-overlap/confounding, not weak instruments.",
+      "root_cause": "The Decision Tree table's 'One-sample' row lists only 'IVW with weak-IV-aware (MR-RAPS)' as the primary method, without cross-referencing the file's own correct Burgess 2016 / MRlap sample-overlap correction that appears later in the same document.",
+      "fix": "Edit the Decision Tree row to read 'IVW with sample-overlap correction (Burgess 2016 / MRlap); MR-RAPS only if instruments are ALSO weak (F<20)' so the table itself does not imply MR-RAPS alone is sufficient."
+    },
+    {
+      "priority": "P1",
+      "title": "SIMEX correction is prose-only with no code, and the natural way to write it crashes",
+      "observed_in": [5],
+      "problem": "SKILL.md instructs 'SIMEX-correct via the simex package applied to the Egger fit, treating se.exposure as measurement error' but gives no code block; the natural R pattern (weights = 1/se.outcome^2 as a bare in-formula column reference) reproducibly crashes inside simex()'s internal refit with 'object se.outcome not found'.",
+      "root_cause": "simex() cannot resolve bare column names via non-standard evaluation outside the original calling data frame at refit time, and nothing in SKILL.md warns of this.",
+      "fix": "Add a working inline code pattern: precompute `w <- 1 / dat$se.outcome^2` before `lm(beta.outcome ~ beta.exposure, weights = w, data = dat, x = TRUE, y = TRUE)`, then pass the fitted model to simex() unchanged."
+    },
+    {
+      "priority": "P1",
+      "title": "cis-MR/coloc example's synthetic data cannot demonstrate its own claimed PP.H4 >= 0.7 threshold",
+      "observed_in": [2],
+      "problem": "Running examples/cis_mr_drug_target.R's exact data-generating pattern (independent per-SNP simulated effects, no real LD structure) on a genuinely single-shared-causal-variant ground truth still returned PP.H4=0.197, well below the 'DRUG-TARGET SUPPORTED' threshold the example's own comment implies.",
+      "root_cause": "coloc.abf's Bayesian model assumes LD-linked, single-causal-variant-per-locus association patterns; generating each SNP's effect independently (as both the shipped example and this audit's ground-truth replication do) does not produce that pattern regardless of the true underlying biology.",
+      "fix": "Either simulate the cis-window with real LD-decayed effects (draw one causal SNP effect and propagate to neighbors via an LD matrix) or add a caveat in the example/SKILL.md that the demo's PP.H4 is illustrative-only and not expected to reliably clear 0.7."
+    },
+    {
+      "priority": "P2",
+      "title": "No seed set before Monte-Carlo MR-PRESSO calls in SKILL.md's own inline code block",
+      "observed_in": [1],
+      "problem": "SKILL.md's 'MR-PRESSO Outlier Detection' inline code block never calls set.seed() before mr_presso(), whose global test is a randomized permutation procedure.",
+      "root_cause": "Reproducibility guidance was written into the examples' data-simulation seed but not carried into the MR-PRESSO call itself.",
+      "fix": "Add an explicit set.seed() call immediately before the mr_presso() call in SKILL.md's inline code block, with a one-line note on why (Monte-Carlo global test)."
+    },
+    {
+      "priority": "P2",
+      "title": "SKILL.md and usage-guide.md duplicate content instead of layering it",
+      "observed_in": [],
+      "problem": "The Decision Tree, Quantitative Thresholds, and Tips content appear near-verbatim in both SKILL.md and usage-guide.md -- the same authoring pattern independently found in the sibling pleiotropy-detection Skill in this folder -- so a fix (such as the P0 above) needs applying consistently across both, and the duplication adds token cost without adding depth.",
+      "root_cause": "No references/ folder exists to hold shared reference tables; usage-guide.md was written as a second full pass rather than a thinner example-prompt layer.",
+      "fix": "Move shared tabular reference content (Decision Tree, Quantitative Thresholds, Cohort Gotchas) into a references/ file that both SKILL.md and usage-guide.md point to, rather than duplicating it."
+    }
+  ]
+}
