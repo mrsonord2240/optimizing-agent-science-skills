@@ -45,3 +45,29 @@ Untouched: "Overview", "Quick Start", "Example Prompts", "Related Skills" -- all
 allowed usage-guide.md categories, no restatement of SKILL.md agent-facing material found in them.
 
 Left unfixed: none. Nothing needs Sam.
+
+---
+
+# Round 2 (2026-09-17) — re-audit P2s
+
+Worktree `F:\OpenScience\wt\mr-mr-p2`, branch `fix/mr-mr-p2`, based on staging `main` @ `978ae4a`
+(already contains round 1 above). Commit `dfecae6`. Fixer: Claude Sonnet 5. Runtime: R 4.4.3 via
+`F:\OpenScience\audit-envs\mendelian-randomization-analyst\r.sh`; MVMR 0.4.8, TwoSampleMR 0.7.9
+already installed, no version changes, nothing new installed. Evidence: re-audit at
+`F:\OpenScience\audits\bio-causal-genomics-mendelian-randomization\` (score 87, Production Ready).
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| Below conditional F < 1, `qhet_mvmr` flips the sign of an exposure's estimate; SKILL.md called it "robust to weak conditional instruments" with no floor | P2 | Added `if (any(condF < 1)) stop(...)` to the "MVMR with Conditional F" code block, plus a caveat paragraph with the reproduced numbers; softened the "robust to weak conditional instruments" claim | ran | Reproduced the re-audit's own Input 4 (`run/input4_mvmr.R`) verbatim: condF = 0.87/0.78, MVMR-IVW = 0.298/-0.099 (true 0.30/-0.10, close), `qhet_mvmr` = 0.236/**+0.049** (true -0.10 — sign flip). Confirmed the new guard fires at condF = 0.87/0.78 and does *not* fire on an independent-instrument synthetic case at condF = 1.22/1.21 |
+| Under SKILL.md's own inline code ("TwoSampleMR Standard Workflow" and "Bidirectional and Steiger"), `directionality_test()` returns `NULL` with no error | P2 | Added `samplesize_col = 'N'` to both `read_exposure_data()`/`read_outcome_data()` calls in the Standard Workflow block (matching the already-correct `examples/two_sample_mr.R` pattern); added an `is.null()` guard with `stop()` at both call sites | ran | Root cause: `TwoSampleMR::directionality_test()` needs `pval.exposure`/`pval.outcome`/`samplesize.exposure`/`samplesize.outcome` (or precomputed `r.exposure`/`r.outcome`); without them it prints a message and returns `NULL` — no error. Reproduced the NULL on synthetic planted-direction data using SKILL.md's code exactly as written pre-fix; confirmed the fix returns `correct_causal_direction = TRUE`, `steiger_pval = 7.85e-180` (planted direction is exposure -> outcome); confirmed the new guard fires with a clear message when `samplesize_col` is omitted |
+
+2/2 dispatched P2s fixed. All 7 R code blocks in the updated SKILL.md re-verified to parse
+(`Rscript -e "parse(...)"`).
+
+**Out of scope, not fixed:** CAUSE crashing against `loo` 2.10.1 (`in_sample_elpd_loo` -> `loo_compare()`
+shape mismatch). This is a package-version defect in the environment (`cause` 1.2.0.335 x `loo`
+2.10.1), not in any file this Skill ships — SKILL.md's own CAUSE section is prose plus a pointer to
+the sibling `pleiotropy-detection` Skill, not runnable code here. Per the re-audit's own note, it
+does not affect the veto or the grade.
+
+Left unfixed: none of the two dispatched findings. Nothing needs Sam.

@@ -79,14 +79,17 @@ went untracked on 2026-09-17.
   before the re-audit writes a new one.
 - A fix lands when its re-audit passes: core ≥ 85, deployable, no open P0, no veto. Merge `--no-ff`
   into staging `main`, push, delete the branch and worktree.
-- **Move every Skill that passes audit to `optimized-scientific-skills`** (Sam, 2026-09-17). This
-  applies to a first audit or a re-audit: core ≥ 85, deployable, no open P0, no veto. Promotion is
-  part of landing, not a separate decision, so do not wait to be asked. A Skill that fails stays in
-  `REMAINING.md` until its fix passes re-audit.
-  Run `python tools/promote_skills.py --add <id>,<id>` as a dry run, then with `--apply`. First
-  advance `FORK_COMMIT` to the staging commit you are promoting from. Afterwards update the count table
-  in the published `README.md`. The dry run's "qualifies, not promoted" line lists any passing Skill
-  that was missed. Check it every time and promote those too.
+- **Move every audited Skill that did not fail to `optimized-scientific-skills`, whatever its score**
+  (Sam, 2026-09-17). "Did not fail" means deployable with no open P0. Below the core floor still goes
+  in. Promotion is part of landing, not a separate decision, so do not wait to be asked. Failed Skills
+  stay in `REMAINING.md` under `excluded` until a fix passes re-audit.
+- **Every promoted Skill's status must be visible.** `promote_skills.py` sets two flags, both in
+  `PROVENANCE.json` and listed at the top of `REMAINING.md`:
+  - `fix_pass: needed` — it has only had a first audit, however high it scored.
+  - `reaudit: needed` — its staging bytes changed after its latest audit.
+- To promote: advance `FORK_COMMIT` in `tools/promote_skills.py` to the staging commit, then run
+  `python tools/promote_skills.py` as a dry run, then with `--apply`. Afterwards update the Status
+  table in the published `README.md` from the new `PROVENANCE.json`.
 
 ## Sharing the machine with other sessions
 

@@ -1,7 +1,8 @@
 """Assemble the optimized-scientific-skills repository.
 
 Contents, per Sam 2026-09-17:
-  - the Skills we have finished (audited clean, deployable, no open P0)
+  - every Skill whose latest audit is deployable with no open P0, whatever its score, with
+    `fix_pass: needed` marking those not yet through a fix pass
   - a list of what remains, limited for now to the rest of GPTomics/bioSkills
 
 Layout is flat, `skills/<skill-id>/`, so the directory name equals the frontmatter `name` and equals
@@ -84,27 +85,30 @@ def classify(path):
     return "modified", files
 
 
-def published_ids():
-    p = os.path.join(OUT, "PROVENANCE.json")
-    if not os.path.exists(p):
-        return set()
-    return {s["id"] for s in json.load(open(p, encoding="utf-8"))["skills"]}
+def audited_bytes_differ(source, path):
+    """True when the bytes at FORK_COMMIT are not the bytes the audit ran on.
+
+    A Skill fixed after its audit but not yet re-audited must not be promoted on the old score. The
+    `license: MIT` line added corpus-wide at 558aea5 is the one tolerated difference.
+    """
+    m = re.match(r"^[\w.-]+/[\w.-]+@([0-9a-f]{7,40}):", source or "")
+    if not m:
+        return True
+    out = git(["diff", "-U0", m.group(1), FORK_COMMIT, "--", path]).stdout or ""
+    changed = [l for l in out.splitlines() if l[:1] in "+-" and not l.startswith(("+++", "---"))]
+    return any(l != "+license: MIT" for l in changed)
 
 
 def main():
+    # Every Skill whose latest audit is deployable with no open P0 is promoted, whatever its score
+    # (Sam, 2026-09-17). Skills that have not yet been through a fix pass are promoted too, and are
+    # flagged `fix_pass: needed` in PROVENANCE.json and listed in REMAINING.md.
     apply = "--apply" in sys.argv
-    # Promotion is an explicit decision per Skill, not a side effect of an audit landing: the published
-    # set is what is already there plus `--add id,id`. Qualifying audits not named stay in remaining.
-    add = set()
-    for i, a in enumerate(sys.argv):
-        if a == "--add" and i + 1 < len(sys.argv):
-            add |= {s.strip() for s in sys.argv[i + 1].split(",") if s.strip()}
-    promote = published_ids() | add
     idx = skill_index()
     rep = audits()
     fixlogs = {f[:-3] for f in os.listdir(os.path.join(REC, "fixes")) if f.endswith(".md")}
 
-    finished, excluded, held = [], [], []
+    finished, excluded = [], []
     for sid, r in rep.items():
         if sid not in idx:
             continue
@@ -119,17 +123,13 @@ def main():
             "open_p0": len(p0),
             "audited_on": r.get("meta", {}).get("evaluated_on"),
             "fix_log": f"fixes/{sid}.md" if sid in fixlogs else None,
+            "fix_pass": "done" if sid in fixlogs else "needed",
         }
-        if not (fin["deployable"] and not p0):
-            excluded.append(row)
-        elif sid in promote:
-            finished.append(row)
-        else:
-            held.append(row)
-
-    missing = add - {r["id"] for r in finished}
-    if missing:
-        raise SystemExit(f"--add names Skills with no deployable, P0-free audit: {sorted(missing)}")
+        # Changed since its audit (e.g. the 2026-09-16 P2 backlog round, fixed without a re-audit):
+        # still promoted, but flagged so the score is never read as describing these bytes.
+        row["reaudit"] = ("needed" if audited_bytes_differ(
+            r.get("source") or r.get("meta", {}).get("source"), idx[sid]) else "not needed")
+        (finished if fin["deployable"] and not p0 else excluded).append(row)
 
     for row in finished:
         kind, files = classify(row["upstream_path"])
@@ -140,13 +140,16 @@ def main():
     excluded.sort(key=lambda r: r["id"])
     remaining = sorted(set(idx) - {r["id"] for r in finished} - {r["id"] for r in excluded}
                        - set(OUT_OF_SCOPE))
+    needs_fix = [r for r in finished if r["fix_pass"] == "needed"]
 
     print(f"finished  : {len(finished)}")
     for k in ("modified", "licence-declaration-only", "unmodified"):
         print(f"   {k:26s} {sum(1 for r in finished if r['relative_to_upstream'] == k)}")
-    print(f"   with a fix log             {sum(1 for r in finished if r['fix_log'])}")
+    print(f"   fix pass done              {len(finished) - len(needs_fix)}")
+    print(f"   fix pass needed            {len(needs_fix)}")
     print(f"excluded  : {len(excluded)}  {[r['id'] for r in excluded]}")
-    print(f"qualifies, not promoted: {len(held)}  {[(r['id'], r['score']) for r in held]}")
+    stale = [r for r in finished if r["reaudit"] == "needed"]
+    print(f"   re-audit needed            {len(stale)}")
     print(f"remaining : {len(remaining)}")
 
     if not apply:
@@ -235,6 +238,19 @@ def main():
          "| folder | remaining | refined |", "| --- | ---: | ---: |"]
     for f in sorted(by, key=lambda f: (-len(by[f]), f)):
         L.append(f"| {f} | {len(by[f])} | {done.get(f, 0)} |")
+    L += ["", "## Promoted, fix pass still needed", "",
+          "These Skills are in `skills/` because their audit found them deployable with no open P0.",
+          "They have not yet been through a fix pass, however high they scored. Their open findings",
+          "are in the audit record. `fix_pass` in PROVENANCE.json carries the same flag.", "",
+          "| skill | score | grade |", "| --- | ---: | --- |"]
+    for r in needs_fix:
+        L.append(f"| `{r['id']}` | {r['score']} | {r['grade']} |")
+    L += ["", "## Promoted, re-audit still needed", "",
+          "Changed in staging after their latest audit, so the score below describes earlier bytes.",
+          "`reaudit` in PROVENANCE.json carries the same flag.", "",
+          "| skill | score at last audit | audited on |", "| --- | ---: | --- |"]
+    for r in stale:
+        L.append(f"| `{r['id']}` | {r['score']} | {r['audited_on']} |")
     L += ["", "## Audited and excluded", "",
           "Audited and did not pass. Not pending — rejected until the defects behind the score are",
           "fixed.", "", "| skill | score | grade | open P0 |", "| --- | ---: | --- | ---: |"]
