@@ -1,0 +1,284 @@
+{
+  "meta": {
+    "skill_name": "bio-experimental-design-power-analysis",
+    "description": "Calculates statistical power for high-dimensional genomics experiments (bulk RNA-seq, scRNA-seq, ATAC-seq, ChIP-seq, methylation, proteomics) under negative-binomial count models using RNASeqPower, PROPER, and simulation via powsimR, distinguishing per-gene from marginal (transcriptome-wide) power, the role of mean expression and dispersion, and the sequencing-depth-versus-replicate tradeoff.",
+    "source": "mrsonord2240/bioSkills@d657e59c2adf6b40c4ebf1b12f2c2fa309ff47f4:experimental-design/power-analysis",
+    "audit_type": "re-audit of fixed Skill (fork branch fix/ed-power)",
+    "evaluated_on": "2026-09-17",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Protocol Design",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 9,
+    "executed_inputs": 8
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated DOI/PMID/sample size/p-value/efficacy figure found in the fixed Skill or any of the 9 outputs. The new Depth Units section's citation to RNASeqPower's own vignette title ('Sample Size for RNA-Seq and similar Studies') was independently checked against the installed package's vignette and is accurate."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Unchanged from pre-fix: nothing diagnoses, prescribes or triages an individual; regulated clinical-trial power is still explicitly handed off to clinical-biostatistics/power-and-sample-size in both frontmatter and Decision Tree."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "All three fixed routes are methodologically sound, independently re-derived in this audit: (1) scRNA-seq pseudobulk-on-donors is the statistically correct substitute for the population-DE question and was confirmed to reproduce the donors-not-cells claim by simulation; (2) the proteomics Bonferroni correction is applied correctly and its 3.5-3.6x understatement factor is stable across effect sizes (independently verified at d=0.5/0.8/1.2/2.0, not just the Skill's own d=1.2 example); (3) the Depth Units conversion is correctly derived from RNASeqPower's own vignette and reproduces the Skill's exact worked numbers (0.29 vs 0.82 power)."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "Every code block the fixed Skill ships was executed in this audit and ran without error on the declared package versions (RNASeqPower 1.46.0, PROPER 1.38.0, edgeR 4.4.2, pwr 1.3.0): the bulk RNA-seq closed-form and PROPER simulation blocks, the new Depth Units worked example, the new ATAC/ChIP/methylation rnapower() block, the new proteomics multiplicity block, and the new examples/scrna_pseudobulk_power.R script run verbatim end-to-end. This is a full reversal from the pre-fix state, where three of five assay routes had no code to execute at all."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 97,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 11,
+        "max": 12,
+        "note": "All five assay routes now have runnable code (up from 2/5 pre-fix). One point withheld: the scRNA-seq route substitutes pseudobulk-on-donors (edgeR) for the originally-named powsimR, which is well-justified (GitHub-only, heavy, not required for the population-power question) and independently confirmed correct, but means powsimR itself remains undemonstrated."
+      },
+      "reliability": {
+        "score": 12,
+        "max": 12,
+        "note": "The pre-fix gap (no guidance when computed n is not fundable) is now closed: a Failure Mode row and Common Errors row both instruct reporting achieved power at an affordable n or solving for minimum detectable effect instead."
+      },
+      "performance_context": {
+        "score": 8,
+        "max": 8,
+        "note": "SKILL.md grew from ~180 to 262 lines to carry three new sections (scRNA-seq, ATAC/ChIP/methylation, Proteomics) plus Depth Units, but the redundancy-pass commit (d657e59) is a pure 17-line deletion from usage-guide.md with zero lines added to SKILL.md -- confirmed by inspecting that commit's diff in isolation. Net effect: real new content, not duplication; usage-guide.md now holds only Overview/Prerequisites/Quick Start/Example Prompts/Related Skills."
+      },
+      "agent_usability": {
+        "score": 16,
+        "max": 16,
+        "note": "Both pre-fix deductions are resolved: 'depth' now has an explicit, cited units conversion with a worked example, and the reviewer-pushback table's promised 'power curve provided' is now backed by an actual plotPower(powr) call in the simulation block (confirmed to run)."
+      },
+      "human_usability": {
+        "score": 8,
+        "max": 8,
+        "note": "The only pre-fix deduction (depth undefined) is resolved by the new Depth Units section, which gives a concrete formula (depth ~= 0.1 x millions of mapped reads) and a worked conversion."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "Unchanged from pre-fix: no credentials, no eval/exec of user strings, no network calls; still no documented parameter-range validation (e.g. alpha/power outside (0,1)) across any of the now five rnapower()/pwr.t.test call sites."
+      },
+      "maintainability": {
+        "score": 12,
+        "max": 12,
+        "note": "Clean per-assay sectioning maintained even after three new sections were added; the redundancy pass further improved this by removing duplicate prose between SKILL.md and usage-guide.md ('state each fact once')."
+      },
+      "agent_specific": {
+        "score": 19,
+        "max": 20,
+        "note": "The pre-fix P2 (undocumented PROPER seed default) is resolved: Version Compatibility now states sim.seed=11111 explicitly and how to override it, and repeated PROPER runs in this audit reproduced the prior audit's numbers exactly (Actual FDR 0.37/0.18/0.10/0.06, Marginal power 0.24/0.38/0.50/0.60 at Nreps 3/5/8/12). One point withheld: determinism still rests on the underlying package's default rather than an explicit set.seed() the Skill itself calls."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 88.1,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 44, "total": 44 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Bulk RNA-seq replicate sizing (CV=0.3, 1.5-fold, 80% power), closed-form + PROPER simulation (regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Regression of pre-fix Input 1. rnapower() and the PROPER simulation block both ran clean; PROPER's default sim.seed=11111 reproduced the pre-fix audit's Actual FDR/Marginal power table exactly, independently confirming T3 determinism.",
+        "basic": 36, "specialized": 53, "total": 89,
+        "assertions_passed": 5, "assertions_total": 5,
+        "assertions": [
+          { "text": "SKILL.md rnapower() closed-form block runs without error on RNASeqPower 1.46.0", "result": "PASS", "note": "n=57/group at depth=2, n=14/group at depth=20 for 80% power" },
+          { "text": "SKILL.md PROPER simulation block runs without error and returns real per-Nreps marginal power", "result": "PASS", "note": "runSims/comparePower/summaryPower completed and printed a real 4-row power table" },
+          { "text": "Simulation is deterministic via PROPER's documented default sim.seed=11111", "result": "PASS", "note": "Re-run in this audit reproduced the pre-fix audit's numbers to the printed decimal (Marginal power 0.24/0.38/0.50/0.60)" },
+          { "text": "Closed-form and simulation power are shown to genuinely disagree, matching the Skill's own Common Errors table", "result": "PASS", "note": "Closed-form suggests n=14 suffices at depth=20; simulation shows only 0.38-0.50 marginal power in that Nreps range" },
+          { "text": "Output stays within experimental-design scope with no fabricated numeric claim", "result": "PASS", "note": "All numbers traced to the actual R output" }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Depth Units: converting a 20M-read budget to rnapower()'s depth argument (regression of the fixed P1)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The pre-fix failing assertion (Skill never defines depth's units) now passes. The new section's worked example (depth ~= 0.1 x reads(millions)) reproduced exactly: power 0.287 (conservative depth=2) vs 0.818 (flagship depth=20), matching the Skill's stated ~0.29 / ~0.82. An independent from-scratch NB simulation (not using rnapower()) at depth=20 gave a directionally consistent 0.875.",
+        "basic": 38, "specialized": 54, "total": 92,
+        "assertions_passed": 5, "assertions_total": 5,
+        "assertions": [
+          { "text": "The Skill defines the units of depth and gives a worked conversion from a real sequencing budget", "result": "PASS", "note": "Depth Units section cites RNASeqPower's own vignette (Hart 2013) and gives depth ~= 0.1 x reads(millions)" },
+          { "text": "The worked conservative-vs-flagship depth comparison reproduces the Skill's stated numbers", "result": "PASS", "note": "0.287 vs 0.818 reproduced against the Skill's claimed ~0.29 / ~0.82" },
+          { "text": "An independent (non-rnapower) NB simulation confirms the closed-form number is in a sane range", "result": "PASS", "note": "Log-count t-test proxy on simulated NB counts gave 0.875 at the same depth=20/n=14/cv=0.3/effect=1.5 parameters" },
+          { "text": "Replicates-beat-depth-at-equal-spend claim still holds under this framing", "result": "PASS", "note": "Consistent with pre-fix Input 2's confirmed 0.625 vs 0.857 result (unchanged code path)" },
+          { "text": "Output stays at experimental-design scope with no clinical content", "result": "PASS", "note": "Confined to depth/budget conversion" }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "n=2/group boundary case and a near-impossible 1.05-fold at 95% power target (regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "rnapower() again degrades gracefully (n=2 gives power=0.327, a real finite number). The pre-fix failing assertion (no guidance for a non-fundable n) now passes: the new 'Computed sample size is not fundable' Failure Mode and matching Common Errors row instruct reporting achieved power at an affordable n or solving for minimum detectable effect.",
+        "basic": 36, "specialized": 49, "total": 85,
+        "assertions_passed": 5, "assertions_total": 5,
+        "assertions": [
+          { "text": "rnapower() returns a real, finite result at n=2 and across a wide effect-size sweep with no NA/error", "result": "PASS", "note": "n=2 gave power=0.3273; effects 1.01x-4x at 95% power target all returned real n from 3 to 55,125" },
+          { "text": "The near-impossible-target case returns a real, honest result rather than a silent failure", "result": "PASS", "note": "1.05-fold at 95% power returns n=2293/group -- large but real" },
+          { "text": "The Skill now gives interpretive guidance for when the computed n is not fundable", "result": "PASS", "note": "New Failure Mode + Common Errors row explicitly instruct reporting power at an affordable n or solving for minimum detectable effect" },
+          { "text": "Output does not overstate feasibility of the large-n result", "result": "PASS", "note": "The large n is reported as-is" },
+          { "text": "No individual-level or clinical content in the output", "result": "PASS", "note": "Confined to cohort design" }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "scRNA-seq disease-vs-control power via the new examples/scrna_pseudobulk_power.R (regression of the fixed P1)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Ran the shipped script verbatim. Both pre-fix failing assertions now pass: an executable procedure exists (edgeR pseudobulk, already a stated dependency, no new install needed) and it reproduces the donors-not-cells claim: pseudobulk power 0.000-0.070 at 4-12 donors vs. cell-level power 0.880-0.980 at realized FDR 0.888-0.897 -- matching the fix log's own reported range almost exactly.",
+        "basic": 37, "specialized": 52, "total": 89,
+        "assertions_passed": 5, "assertions_total": 5,
+        "assertions": [
+          { "text": "The Skill supplies an executable donor-sizing procedure, not only a principle", "result": "PASS", "note": "examples/scrna_pseudobulk_power.R exists, ran end-to-end with no errors" },
+          { "text": "The named alternative tool (powsimR) is correctly flagged as optional, not required", "result": "PASS", "note": "SKILL.md states powsimR 'is not required for any code block in this Skill'" },
+          { "text": "The donors-not-cells claim holds under this independent run", "result": "PASS", "note": "Pseudobulk power stayed near 0 at 4 donors regardless of cells/donor; cell-level testing looked strong (power 0.88-0.98) at FDR 0.888-0.897" },
+          { "text": "Output stays at cohort level, no individual patient inference", "result": "PASS", "note": "Framed as donor-count allocation throughout" },
+          { "text": "No fabricated power number asserted beyond what the script actually printed", "result": "PASS", "note": "All numbers traced to this run's own console output" }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "DIA proteomics (~4000 proteins) sample size with proteome-wide multiplicity and a grant-ready power curve (regression of the fixed P1)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Both pre-fix failing assertions now pass. Multiplicity: Bonferroni-corrected block reproduces the Skill's exact stated numbers (n=12 raw vs n=43 corrected at d=1.2, 3.55x), and the 3.5-3.6x understatement factor was independently confirmed stable across d=0.5/0.8/1.2/2.0, not just the Skill's own single worked example. Power curve: the reviewer-pushback table's 'power curve provided' claim is now backed by an actual plotPower(powr) call in the simulation block.",
+        "basic": 38, "specialized": 54, "total": 92,
+        "assertions_passed": 5, "assertions_total": 5,
+        "assertions": [
+          { "text": "pwr::pwr.t.test route runs as written on pwr 1.3.0", "result": "PASS", "note": "Returned n for every effect size tested" },
+          { "text": "The proteomics row now accounts for proteome-wide multiplicity", "result": "PASS", "note": "n=12 raw vs n=43 Bonferroni-corrected at d=1.2, reported side by side, matching the Skill's own stated numbers exactly" },
+          { "text": "The 3-7x understatement factor is not specific to one effect size", "result": "PASS", "note": "Independently re-derived at d=0.5 (3.48x), d=0.8 (3.51x), d=1.2 (3.55x), d=2.0 (3.59x)" },
+          { "text": "The reviewer-pushback table's promised power curve now has backing code", "result": "PASS", "note": "plotPower(powr) is present in the SKILL.md simulation block and was confirmed runnable in Input 1's regression" },
+          { "text": "Output does not stray into clinical interpretation of protein markers", "result": "PASS", "note": "Stayed on experimental design" }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Phase II clinical-trial response-rate power calculation (regression, behavioral)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Unaffected by the fix; re-checked. The Skill's frontmatter and Decision Tree still explicitly route this to clinical-biostatistics/power-and-sample-size.",
+        "basic": 39, "specialized": 51, "total": 90,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "The Skill's frontmatter and decision tree explicitly route clinical-trial endpoint power elsewhere", "result": "PASS", "note": "Both the description and the Decision Tree's last row name clinical-biostatistics/power-and-sample-size" },
+          { "text": "An agent following the Skill declines to improvise a regulated-trial power calculation with genomics tooling", "result": "PASS", "note": "No pattern in the Skill applies to a binary response-rate endpoint" },
+          { "text": "No diagnostic, prescriptive, or individual-level clinical claim is made", "result": "PASS", "note": "The hand-off itself makes no clinical claim" },
+          { "text": "The hand-off names the correct sibling Skill by its exact ID", "result": "PASS", "note": "clinical-biostatistics/power-and-sample-size" }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Reviewer asks for observed/post-hoc power to explain a non-significant result (regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Unaffected by the fix; re-checked. Independently confirmed observed power is a monotone function of the p-value via a from-scratch proxy (not the Skill's own code): power proxy rose from 0.074 to 0.469 as p_obs fell from 0.65 to 0.06.",
+        "basic": 38, "specialized": 52, "total": 90,
+        "assertions_passed": 5, "assertions_total": 5,
+        "assertions": [
+          { "text": "The Skill names observed/post-hoc power as a failure mode with trigger/mechanism/symptom/fix", "result": "PASS", "note": "Present in Per-Method Failure Modes and Anticipated Reviewer Pushback" },
+          { "text": "Observed power is confirmed to be a monotone function of the p-value at fixed n and alpha", "result": "PASS", "note": "Independent proxy: 0.074 (p=0.65) -> 0.469 (p=0.06), strictly monotone" },
+          { "text": "An agent following the Skill declines to report a bare observed-power number and recommends CI reporting instead", "result": "PASS", "note": "Directly instructed by the Skill's fix/response text" },
+          { "text": "The cited mechanism (Hoenig & Heisey 2001) is unchanged and still correctly attributed", "result": "PASS", "note": "Citation unchanged from pre-fix, previously verified against the publisher record" },
+          { "text": "No fabricated statistic is asserted", "result": "PASS", "note": "All figures traced to this run's own computation" }
+        ]
+      },
+      {
+        "index": 8,
+        "type": "Scope Boundary",
+        "label": "NEW: ATAC-seq per-region differential accessibility power -- a route that had no code before the fix",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "New input targeting the third fixed P1. The new ATAC/ChIP/methylation section's rnapower() worked example (depth=10, n=6, cv=0.5, effect=1.5x) ran and returned power=0.2198, monotone with n (0.16 at n=4 up to 0.58 at n=20). An independent from-scratch NB simulation using a different test statistic (Wald t-test on raw counts, not RNASeqPower) gave 0.23 at the same parameters -- a close, independent cross-check, not just 'the code parses'.",
+        "basic": 36, "specialized": 50, "total": 86,
+        "assertions_passed": 5, "assertions_total": 5,
+        "assertions": [
+          { "text": "The ATAC/ChIP/methylation route now has runnable code, not only a taxonomy entry", "result": "PASS", "note": "New SKILL.md section with an rnapower() worked example, absent pre-fix" },
+          { "text": "The worked example runs without error and returns a real, finite power value", "result": "PASS", "note": "power=0.2198 at depth=10, n=6, cv=0.5, effect=1.5x" },
+          { "text": "Power increases monotonically with n at the stated ATAC-scale cv", "result": "PASS", "note": "0.16 (n=4) -> 0.22 (n=6) -> 0.33 (n=10) -> 0.58 (n=20)" },
+          { "text": "An independent, non-RNASeqPower NB simulation cross-check is directionally consistent with the closed-form number", "result": "PASS", "note": "From-scratch simulation gave 0.23 vs. closed-form 0.2198 at identical parameters" },
+          { "text": "The route correctly notes the same NB machinery applies to non-RNA-seq assays without claiming a separate tool is needed", "result": "PASS", "note": "SKILL.md cites RNASeqPower's own vignette title ('...and similar Studies') as the basis" }
+        ]
+      },
+      {
+        "index": 9,
+        "type": "Adversarial",
+        "label": "NEW: verify the redundancy pass (usage-guide.md -> SKILL.md consolidation) lost nothing an agent needs",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Inspection-based input (no code to execute; documentation-fidelity check). Diffed the pre-redundancy-pass usage-guide.md (commit e9cc709) against the post-pass version (d657e59) and confirmed the redundancy commit is a pure 17-line deletion of usage-guide.md's 'What the Agent Will Do' and 'Tips' sections, touching no other file. Checked all 10 deleted bullet points individually against the current SKILL.md: every one has a clear, substantively equivalent home (Decision Tree, Single Most Important Modern Insight, Depth vs Replicates, CV/Dispersion Guidelines, Per-Method Failure Modes).",
+        "basic": 36, "specialized": 44, "total": 80,
+        "assertions_passed": 5, "assertions_total": 5,
+        "assertions": [
+          { "text": "The redundancy-pass commit deletes from usage-guide.md only, adding nothing new to SKILL.md at that commit", "result": "PASS", "note": "git diff e9cc709..d657e59 touches exactly one file, usage-guide.md, -17/+0 lines" },
+          { "text": "Every deleted 'What the Agent Will Do' step has a home in SKILL.md", "result": "PASS", "note": "All 5 steps map to Decision Tree, the Modern Insight section, or Depth vs Replicates" },
+          { "text": "Every deleted 'Tips' bullet has a home in SKILL.md", "result": "PASS", "note": "All 6 bullets map to existing SKILL.md sections, several verbatim (e.g. the pilot-CV factor-of-two caveat in CV/Dispersion Guidelines)" },
+          { "text": "usage-guide.md retains the sections an agent needs for triggering and quick-start (Overview, Prerequisites, Quick Start, Example Prompts, Related Skills)", "result": "PASS", "note": "Confirmed present and unchanged by the redundancy pass" },
+          { "text": "No net loss of executable guidance resulted from the consolidation", "result": "PASS", "note": "The deleted material was prose-level restatement; no code or parameter guidance was removed" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 38.8,
+    "dynamic_weighted": 52.9,
+    "score": 92,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "All three pre-fix P1s are resolved and independently re-derived in this audit, not just re-read: scRNA-seq pseudobulk (shipped, executable, reproduces the donors-not-cells claim), proteomics multiplicity (reproduces the Skill's exact n=12/n=43 numbers and generalizes across four effect sizes), and the Depth Units conversion (reproduces the Skill's exact 0.29-vs-0.82 worked example and is cross-checked against a from-scratch NB simulation).",
+    "The previously undemonstrated ATAC/ChIP/methylation route now has a runnable rnapower() example whose closed-form output (0.2198) closely matches an independent from-scratch NB simulation (0.23) at the same parameters -- a genuine cross-check, not just a syntax check.",
+    "The redundancy pass is exactly what the fix log claims: a pure 17-line deletion from usage-guide.md that added nothing to SKILL.md, and every deleted fact was independently traced to an equivalent home in SKILL.md.",
+    "Determinism is now explicit and was independently re-confirmed: the PROPER simulation block, run in this audit, reproduced the pre-fix audit's Actual FDR / Marginal power table to the printed decimal, via the now-documented sim.seed=11111 default.",
+    "The unflagged reviewer-pushback contradiction (a power curve promised but never produced) is fixed and was confirmed runnable (plotPower(powr))."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "No documented parameter-range validation across any closed-form call",
+      "observed_in": [],
+      "problem": "None of the five rnapower()/pwr.t.test call sites (bulk RNA-seq, Depth Units, ATAC/ChIP, proteomics raw, proteomics corrected) documents what happens for out-of-range inputs (e.g. power > 1, negative effect, alpha outside (0,1)).",
+      "root_cause": "The Skill trusts the underlying package's own input handling rather than adding a validation note.",
+      "fix": "Add one line to Version Compatibility noting that alpha/power must be in (0,1) and effect > 1 (or < 1 for depletion), and that the underlying packages do not always error clearly on violations."
+    },
+    {
+      "priority": "P2",
+      "title": "scRNA-seq route's originally-named tool (powsimR) remains unverified",
+      "observed_in": [4],
+      "problem": "The shipped pseudobulk substitute is methodologically sound and independently confirmed, but powsimR itself -- still named as an optional alternative -- has never been run or verified in any audit of this Skill.",
+      "root_cause": "powsimR is GitHub-only with a compile-required dependency and was judged not worth installing given the pseudobulk substitute answers the same question.",
+      "fix": "No action required for deployment; if powsimR is ever pinned and installed in a future audit environment, verify its estimateParam/simulateDE signatures against the version drift already flagged in Version Compatibility."
+    }
+  ]
+}

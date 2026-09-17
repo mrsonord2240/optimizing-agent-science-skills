@@ -70,7 +70,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: Both files build a toy exponential-decay LD matrix independently of the simulated per-SNP betas/SEs, so the LD is not internally consistent with any genotype process that could have produced those z-scores; estimate_s_rss correctly detects this (lambda 0.21-0.39, far above the Skill's own 0.05 threshold).
 - Fix: Regenerate both example datasets from a single simulated genotype matrix, deriving both the GWAS/eQTL summary statistics AND the LD matrix from that same genotype matrix (verified working in this audit's run/input2b_susie_selfconsistent.R, which recovers the planted 2-credible-set truth exactly with lambda=0).
 
-## P1 (91)
+## P1 (88)
 
 ### `bio-experimental-design-sample-size` — PROPER and powsimR routes ship with no executable pattern
 
@@ -207,30 +207,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: Running examples/cis_mr_drug_target.R's exact data-generating pattern (independent per-SNP simulated effects, no real LD structure) on a genuinely single-shared-causal-variant ground truth still returned PP.H4=0.197, well below the 'DRUG-TARGET SUPPORTED' threshold the example's own comment implies.
 - Root cause: coloc.abf's Bayesian model assumes LD-linked, single-causal-variant-per-locus association patterns; generating each SNP's effect independently (as both the shipped example and this audit's ground-truth replication do) does not produce that pattern regardless of the true underlying biology.
 - Fix: Either simulate the cis-window with real LD-decayed effects (draw one causal SNP effect and propagate to neighbors via an LD matrix) or add a caveat in the example/SKILL.md that the demo's PP.H4 is illustrative-only and not expected to reliably clear 0.7.
-
-### `bio-experimental-design-power-analysis` — scRNA-seq, ATAC/ChIP/methylation and proteomics routes ship with no executable code
-
-- Skill: 83, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/experimental-design/power-analysis) · [viewer](skills/bio-experimental-design-power-analysis/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 4, 5
-- Problem: Three of the five assay types in the Algorithmic Taxonomy and Decision Tree exist only as prose. powsimR (the named scRNA-seq tool) is GitHub-only and not installed; no pseudobulk-sizing pattern, ATAC/ChIP NB-simulation pattern, or proteomics pwr.t.test block appears anywhere in SKILL.md, usage-guide.md or examples/.
-- Root cause: Progressive disclosure stops at the bulk RNA-seq case; the other four assay types were documented conceptually but never given a worked code pattern.
-- Fix: Add a minimal pwr::pwr.t.test block for proteomics (trivial, since pwr is already a stated dependency), a pseudobulk-on-donors DESeq2/edgeR pattern for scRNA-seq that needs no extra dependency, and either pin a powsimR commit with a documented install fallback or drop it from the primary recommendation.
-
-### `bio-experimental-design-power-analysis` — Proteomics route drops proteome-wide multiplicity control
-
-- Skill: 83, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/experimental-design/power-analysis) · [viewer](skills/bio-experimental-design-power-analysis/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 5
-- Problem: The decision tree sends proteomics to pwr.t.test at alpha=0.05 per protein with no multiplicity step. Across a realistic 4000-protein panel, the prescribed n (12 at d=1.2) is 3-7x smaller than what proteome-wide FDR control requires (n=43 Bonferroni-equivalent), and the row gives no caveat.
-- Root cause: The Gaussian per-protein route was added without carrying over the FDR-aware framing used everywhere else in the Skill (per-gene power, marginal power at target FDR).
-- Fix: Add an explicit alpha adjustment to the proteomics row (sig.level = 0.05/n_proteins, or a simulation-based BH step) and state the resulting n alongside the raw uncorrected figure so the two are never confused.
-
-### `bio-experimental-design-power-analysis` — rnapower()'s 'depth' parameter has no documented units or real-budget conversion
-
-- Skill: 83, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/experimental-design/power-analysis) · [viewer](skills/bio-experimental-design-power-analysis/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 2
-- Problem: Every budget-tradeoff example (including the shipped script's own 'Depth vs Replicates' section) manipulates 'depth' without ever stating what unit it is in or how to derive it from a stated sequencing budget (e.g. 20 million reads per sample).
-- Root cause: The Skill inherits RNASeqPower's own terse documentation ('average depth of coverage ... common values 5-20') without adding the conversion step a researcher actually needs.
-- Fix: Add one worked example converting a stated total-reads budget to RNASeqPower's depth units (e.g. via mapped reads / number of expressed genes / a normalization constant), and state the assumption explicitly.
 
 ### `bio-causal-genomics-effector-gene-prioritization` — No explicit research-only / clinical-boundary language anywhere in the Skill
 
@@ -953,22 +929,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The Decision Tree, Quantitative Thresholds, and Tips content appear near-verbatim in both SKILL.md and usage-guide.md -- the same authoring pattern independently found in the sibling pleiotropy-detection Skill in this folder -- so a fix (such as the P0 above) needs applying consistently across both, and the duplication adds token cost without adding depth.
 - Root cause: No references/ folder exists to hold shared reference tables; usage-guide.md was written as a second full pass rather than a thinner example-prompt layer.
 - Fix: Move shared tabular reference content (Decision Tree, Quantitative Thresholds, Cohort Gotchas) into a references/ file that both SKILL.md and usage-guide.md point to, rather than duplicating it.
-
-### `bio-experimental-design-power-analysis` — No guidance when the computed sample size is not fundable
-
-- Skill: 83, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/experimental-design/power-analysis) · [viewer](skills/bio-experimental-design-power-analysis/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 3
-- Problem: rnapower() correctly returns a real but very large n for near-impossible targets (e.g. n=3276 for a 1.05-fold change at 95% power), but the Skill gives no instruction for what to do next -- report the achieved power at an affordable n, suggest a coarser effect size, or flag infeasibility explicitly.
-- Root cause: The Skill documents only the case where a reasonable n exists within a practical range.
-- Fix: Add a short 'when the target is not fundable' note: report power at the affordable n, or solve for the minimum detectable effect at that n instead of an unreachable sample size.
-
-### `bio-experimental-design-power-analysis` — Simulation determinism rests entirely on an undocumented PROPER package default
-
-- Skill: 83, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/experimental-design/power-analysis) · [viewer](skills/bio-experimental-design-power-analysis/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: Static evaluation
-- Problem: No SKILL.md or examples/ block calls set.seed(); repeated runs of the identical PROPER block were measured to be byte-identical only because PROPER's own RNAseq.SimOptions.2grp hard-codes sim.seed=11111 as its default. The Skill neither documents nor relies on this explicitly.
-- Root cause: Seed management was left entirely to the underlying package's own default rather than made an explicit part of the Skill's instructions.
-- Fix: State explicitly that RNAseq.SimOptions.2grp's default sim.seed=11111 is what makes the quickstart reproducible, and show how to pass a different explicit seed (sim.seed=) for a documented, intentional re-run rather than an accidental one.
 
 ### `bio-causal-genomics-effector-gene-prioritization` — SKILL.md is dense and un-layered relative to its size
 
@@ -2617,6 +2577,22 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: Roughly 60 of 337 lines cover prokaryotic RNA-seq and the betaPrior deprecation history. Both load into context on every invocation and neither was relevant to any of the seven realistic inputs.
 - Root cause: No references/ layer exists, so everything sits in SKILL.md.
 - Fix: Move the prokaryotic section and the betaPrior timeline into references/ and leave a one-line pointer each, which would bring SKILL.md under 280 lines without losing anything.
+
+### `bio-experimental-design-power-analysis` — No documented parameter-range validation across any closed-form call
+
+- Skill: 92, Production Ready · [mrsonord2240/bioSkills@d657e59](https://github.com/mrsonord2240/bioSkills/tree/d657e59c2adf6b40c4ebf1b12f2c2fa309ff47f4/experimental-design/power-analysis) · [viewer](skills/bio-experimental-design-power-analysis/mrsonord2240-bioSkills@d657e59/viewer.md)
+- Observed in inputs: —
+- Problem: None of the five rnapower()/pwr.t.test call sites (bulk RNA-seq, Depth Units, ATAC/ChIP, proteomics raw, proteomics corrected) documents what happens for out-of-range inputs (e.g. power > 1, negative effect, alpha outside (0,1)).
+- Root cause: The Skill trusts the underlying package's own input handling rather than adding a validation note.
+- Fix: Add one line to Version Compatibility noting that alpha/power must be in (0,1) and effect > 1 (or < 1 for depletion), and that the underlying packages do not always error clearly on violations.
+
+### `bio-experimental-design-power-analysis` — scRNA-seq route's originally-named tool (powsimR) remains unverified
+
+- Skill: 92, Production Ready · [mrsonord2240/bioSkills@d657e59](https://github.com/mrsonord2240/bioSkills/tree/d657e59c2adf6b40c4ebf1b12f2c2fa309ff47f4/experimental-design/power-analysis) · [viewer](skills/bio-experimental-design-power-analysis/mrsonord2240-bioSkills@d657e59/viewer.md)
+- Observed in inputs: 4
+- Problem: The shipped pseudobulk substitute is methodologically sound and independently confirmed, but powsimR itself -- still named as an optional alternative -- has never been run or verified in any audit of this Skill.
+- Root cause: powsimR is GitHub-only with a compile-required dependency and was judged not worth installing given the pseudobulk substitute answers the same question.
+- Fix: No action required for deployment; if powsimR is ever pinned and installed in a future audit environment, verify its estimateParam/simulateDE signatures against the version drift already flagged in Version Compatibility.
 
 ### `bio-metabolomics-lipidomics` — istd-coverage guard is table()-based and silently misses Class=NA rows entirely
 
