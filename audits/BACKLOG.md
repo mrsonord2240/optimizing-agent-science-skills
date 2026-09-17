@@ -30,7 +30,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: Both files build a toy exponential-decay LD matrix independently of the simulated per-SNP betas/SEs, so the LD is not internally consistent with any genotype process that could have produced those z-scores; estimate_s_rss correctly detects this (lambda 0.21-0.39, far above the Skill's own 0.05 threshold).
 - Fix: Regenerate both example datasets from a single simulated genotype matrix, deriving both the GWAS/eQTL summary statistics AND the LD matrix from that same genotype matrix (verified working in this audit's run/input2b_susie_selfconsistent.R, which recovers the planted 2-credible-set truth exactly with lambda=0).
 
-## P1 (79)
+## P1 (78)
 
 ### `bio-experimental-design-sample-size` — PROPER and powsimR routes ship with no executable pattern
 
@@ -624,14 +624,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: Seurat's anchor-based integration ships its work to future workers, and the 500 MiB default globals limit is exceeded at very ordinary dataset sizes; the Skill's snippet omits the options() line every Seurat v5 integration tutorial carries.
 - Fix: Add options(future.globals.maxSize = 4 * 1024^3) immediately above the IntegrateLayers call - verified here to make RPCAIntegration run in 20 s at ARI 1.000 - and add the error string to Common Errors.
 
-### `bio-experimental-design-randomization-blocking` — Split-plot section's headline claim has no matching worked example
-
-- Skill: 91, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/experimental-design/randomization-blocking) · [viewer](skills/bio-experimental-design-randomization-blocking/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 4
-- Problem: SKILL.md states a flat analysis is anti-conservative for the whole-plot factor, but its only code example has just one fixed effect (sub-plot), never a fixed effect that varies between whole plots.
-- Root cause: The prose describes the whole-plot risk but the single code block only demonstrates the sub-plot case.
-- Fix: Add a second short example with a genuine whole-plot fixed effect (e.g. incubator temperature per run) crossed with a sub-plot fixed effect, showing the flat model's anti-conservative SE for the whole-plot term next to the correct two-stratum model's larger, honest SE.
-
 ### `bio-metabolomics-msdial-preprocessing` — Malformed param-file syntax (Key=Value) fails silently, not loudly
 
 - Skill: 91, Limited Release · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/metabolomics/msdial-preprocessing) · [viewer](skills/bio-metabolomics-msdial-preprocessing/mrsonord2240-bioSkills@6847328/viewer.md)
@@ -664,7 +656,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: This divergence was undiscoverable before this fix round because the graphite route never completed a single successful run pre-fix (Research Veto M4 FAIL); the fixer's own verification (fixes/bio-pathway-kegg-pathways.md) checked that runSPIA returned real rows but did not cross-check its direction calls against the direct spia() route.
 - Fix: Add a caveat to the SPIA section (and the Common Errors / Per-Method Failure Modes tables) stating that graphite's harmonized topology can disagree with SPIA's native KEGG-bundled topology on perturbation direction for a meaningful fraction of pathways, and recommend treating the two routes as complementary evidence rather than interchangeable, or explicitly stating which one to prefer as the default and why.
 
-## P2 (254)
+## P2 (253)
 
 ### `bio-experimental-design-sample-size` — SKILL.md code blocks omit set.seed
 
@@ -2282,22 +2274,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: Pre-existing structural issue from the pre-fix audit; out of scope for this fix round, which targeted the two ticketed P1s.
 - Fix: Split the Genome-Wide Library Selection table, Failure Modes section, and References into a references/ subdirectory, leaving SKILL.md focused on the core design workflow.
 
-### `bio-experimental-design-randomization-blocking` — No caution about block-count reliability at very small block counts
-
-- Skill: 91, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/experimental-design/randomization-blocking) · [viewer](skills/bio-experimental-design-randomization-blocking/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 3
-- Problem: This audit's run showed that with only 2 blocks, the estimate of block variance is itself unreliable (1 df) — a real design trap the skill doesn't name.
-- Root cause: The Quantitative Thresholds table covers small EU counts (df corrections) but not small block counts specifically.
-- Fix: Add a row noting RCBD needs a minimum block count (e.g. >=3-4) before the block-variance estimate itself can be trusted, cross-referenced from the existing 'blocking on noise' failure mode.
-
-### `bio-experimental-design-randomization-blocking` — Related Skills list duplicated near-verbatim across two files
-
-- Skill: 91, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/experimental-design/randomization-blocking) · [viewer](skills/bio-experimental-design-randomization-blocking/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: —
-- Problem: SKILL.md and usage-guide.md each carry their own, overlapping Related Skills list.
-- Root cause: No single source of truth for the cross-reference list.
-- Fix: Keep the list in SKILL.md only; have usage-guide.md point to it.
-
 ### `bio-metabolomics-msdial-preprocessing` — Targeted MRM/PRM/SRM quantification is never routed to metabolomics/targeted-analysis
 
 - Skill: 91, Limited Release · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/metabolomics/msdial-preprocessing) · [viewer](skills/bio-metabolomics-msdial-preprocessing/mrsonord2240-bioSkills@6847328/viewer.md)
@@ -2553,6 +2529,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: Both bundled examples start from a synthetic or cached featureValues()-shaped table; neither exercises real mzML -> xcms -> Stage 2 as part of one script.
 - Root cause: Deliberately deferred by the fixer (fix log 'Left unfixed') to xcms-preprocessing's own bundled-example scope, since it needs real instrument files.
 - Fix: A future third example chaining real (or cached) xcms output through all 5 stages would give full-pipeline regression coverage, but is reasonably out of scope for this fix round.
+
+### `bio-experimental-design-randomization-blocking` — usage-guide.md lost its standalone human-skimmable process/tips summary
+
+- Skill: 93, Production Ready · [mrsonord2240/bioSkills@1695fb8](https://github.com/mrsonord2240/bioSkills/tree/1695fb874bdabab56600955b935593464cd04b7f/experimental-design/randomization-blocking) · [viewer](skills/bio-experimental-design-randomization-blocking/mrsonord2240-bioSkills@1695fb8/viewer.md)
+- Observed in inputs: 10
+- Problem: The redundancy pass correctly removed duplicated content, but usage-guide.md's deleted 'What the Agent Will Do' and 'Tips' sections were also the only place a human skimming usage-guide.md alone got a compact bulleted process summary; that substance now requires reading SKILL.md's full prose sections.
+- Root cause: The redundancy pass treated 'restated in SKILL.md' as sufficient grounds for deletion without preserving a short pointer-style summary for the human-facing file.
+- Fix: Optional: add a 3-4 line 'At a glance' bullet list to usage-guide.md that summarizes without restating SKILL.md's prose, the way a table of contents differs from the chapter it points to.
 
 ### `bio-machine-learning-model-validation` — The leakage taxonomy's ordering implies a severity ranking it does not have
 

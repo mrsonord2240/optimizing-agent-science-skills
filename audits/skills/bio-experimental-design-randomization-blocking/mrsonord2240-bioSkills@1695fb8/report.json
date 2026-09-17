@@ -1,0 +1,231 @@
+{
+  "meta": {
+    "skill_name": "bio-experimental-design-randomization-blocking",
+    "description": "Structures biological experiments so inference is valid by construction, covering Fisher's principles (randomization, replication, local control), the experimental-vs-observational unit distinction and pseudoreplication (Hurlbert 1984; Lazic 2018), randomization mechanics, blocking layouts (RCBD, Latin square, incomplete block), factorial designs and interactions, and the split-plot/nested error strata hidden inside multi-batch genomics.",
+    "evaluated_on": "2026-09-17",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Protocol Design",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 10,
+    "source": "mrsonord2240/bioSkills@1695fb8:experimental-design/randomization-blocking",
+    "audit_type": "re-audit of a fixed Skill; auditor did not perform the fix; pre-fix report archived at F:\\OpenScience\\audits\\_pre-fix-20260917\\bio-experimental-design-randomization-blocking\\ (score 91, Production Ready)",
+    "executed_inputs": "7/10 (inputs 1-5, 8, 9 ran real R code; inputs 6, 7, 10 are Mode A scope/adversarial/completeness reasoning tests with no code to run). Inputs 1-7 are regression re-runs of the pre-fix audit's own inputs on fresh synthetic data; inputs 8, 9, 10 are new to this re-audit."
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All citations unchanged and real (Hurlbert 1984, Lazic 2018, Kenward & Roger 1997, Barr 2013, Matuschek 2017, Morgan & Rubin 2012, Pocock & Simon 1975, Auer & Doerge 2010). Every number in this audit was computed live on labelled synthetic data. The Skill's own claimed 35.5%/3.2% split-plot Type-I error numbers were independently reproduced (Input 8, fresh run of the shipped script) and shown to generalize under different simulation parameters (Input 9), not merely trusted from the fix log." },
+      "practice_boundaries": { "result": "PASS", "detail": "Research/animal/cell experimental-design scope only; no individual diagnostic or prescriptive claims; not patient-facing, so no medical-disclaimer requirement applies. Unaffected by this fix." },
+      "methodological_ground": { "result": "PASS", "detail": "No methodological fallacy found. The fix strengthens this dimension: a real fallacy (analyzing a split-plot design as a flat factorial) is now actively demonstrated as wrong with quantitative Type-I error evidence rather than asserted only in prose." },
+      "code_usability": { "result": "PASS", "detail": "All 7 executed inputs (1-5, 8, 9) ran to completion on lme4 2.0.6 / lmerTest 3.2.1 / dplyr 1.2.1 (pre-installed, confirmed via library()) with no syntax errors, missing dependencies, or infinite loops." }
+    }
+  },
+  "static_score": {
+    "subtotal": 96,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 12, "max": 12, "note": "Pre-fix P1 (split-plot's headline anti-conservative claim had no whole-plot worked example) resolved and independently re-verified against fresh runs (Inputs 8, 9), not just read. Full marks." },
+      "reliability": { "score": 10, "max": 12, "note": "Unaffected by this fix. Per the Category-2 Scene Override, strict/exact parameter handling is not penalized. Still advisory-only in this Mode A skill; no explicit 'halt on contradictory parameters' instruction." },
+      "performance_context": { "score": 8, "max": 8, "note": "SKILL.md grew ~30 lines from the fix; usage-guide.md shrank from 70 to 47 lines via the redundancy pass. Net context unchanged or improved; no bloat." },
+      "agent_usability": { "score": 15, "max": 16, "note": "The new worked whole-plot example gives a concrete template. Input 9 confirms the Decision Tree's generic 'one factor fixed per run' phrasing still correctly routes a scenario that never uses split-plot vocabulary. Docked 1: feedback design remains mostly implicit, unchanged from pre-fix." },
+      "human_usability": { "score": 7, "max": 8, "note": "Unaffected by this fix. Natural trigger language; Forgiveness scored per the Category-2 override (exact-parameter strictness is correct, not a defect); docked 1 for no explicit parameter checklist, same as pre-fix." },
+      "security": { "score": 12, "max": 12, "note": "No credentials, no eval/exec of raw strings, no injection surface, no data retention concerns. Unchanged." },
+      "maintainability": { "score": 12, "max": 12, "note": "Pre-fix P2 (Related Skills list duplicated near-verbatim across SKILL.md and usage-guide.md) resolved: usage-guide.md now points to SKILL.md's single, slightly more complete canonical list, confirmed by direct read (Input 10)." },
+      "agent_specific": { "score": 20, "max": 20, "note": "Unchanged, already full marks pre-fix: precise trigger language, explicit in-scope/out-of-scope decision-tree rows, 7 related skills named, every example seeded, clear escape hatches." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 91.7,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 42, "total": 42 },
+    "inputs": [
+      {
+        "index": 1, "type": "Canonical", "label": "Experimental unit / pseudoreplication (regression): 300 cells x 4+4 mice, true n?",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Cell-level t-test p=1.65e-52 (df=2392, pseudoreplicated) vs correct animal-level t-test p=0.0099 (n=8 animals); unaffected by the fix, section unchanged. Fresh synthetic data, different seed than the pre-fix audit.",
+        "executed": true,
+        "execution_note": "run/in1_pseudoreplication.R on SYNTHETIC data (2400 cells, 8 animals, seed 101); output run/in1_pseudoreplication.out.",
+        "basic": 38, "specialized": 56, "total": 94,
+        "assertions_passed": 5, "assertions_total": 5,
+        "assertions": [
+          { "text": "EU count per group is recovered as 4, not 300x4", "result": "PASS", "note": "table(eu_level$condition) = 4/4" },
+          { "text": "Aggregation code runs verbatim from the SKILL.md pattern", "result": "PASS", "note": "group_by/summarise pattern unmodified" },
+          { "text": "Cell-level and EU-level p-values differ by orders of magnitude", "result": "PASS", "note": "1.65e-52 vs 0.0099, stopifnot enforced (>5 log10 orders)" },
+          { "text": "Welch df at EU level is in the expected small-n range", "result": "PASS", "note": "df=5.31" },
+          { "text": "No fabricated statistics; all values computed live on synthetic data", "result": "PASS", "note": "confirmed by reading the script output" }
+        ]
+      },
+      {
+        "index": 2, "type": "Variant A", "label": "Restricted (block) randomization of 30 embryos + run-order randomization (regression)",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Treatment balanced 5/5 within every day-block; run order a valid within-day permutation; both enforced by stopifnot, not eyeballed. Unaffected by the fix.",
+        "executed": true,
+        "execution_note": "run/in2_randomization_blocking.R on SYNTHETIC unit list (30 embryos, seed 20260917); output run/in2_randomization_blocking.out.",
+        "basic": 38, "specialized": 54, "total": 92,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Treatment is balanced 5/5 within every block (day)", "result": "PASS", "note": "stopifnot(all(bal == 5)) passed" },
+          { "text": "Run order is a valid within-day permutation", "result": "PASS", "note": "stopifnot(setequal(...)) passed for all 3 days" },
+          { "text": "Seed is explicitly recorded", "result": "PASS", "note": "set.seed(20260917)" },
+          { "text": "Code runs without modification to the SKILL.md pattern", "result": "PASS", "note": "ave()+sample() pattern used verbatim" }
+        ]
+      },
+      {
+        "index": 3, "type": "Edge", "label": "Blocking on a near-noise factor with 2 blocks (regression) -- verifies the new small-block caution",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Blocked p worsens vs unblocked (0.294 vs 0.278), a weaker gap than the pre-fix audit's own draw (0.268->0.491) -- exactly the sampling noise SKILL.md's new caution paragraph now names explicitly. Pre-fix P2 resolved.",
+        "executed": true,
+        "execution_note": "run/in3_blocking_on_noise.R on SYNTHETIC data (2 cages, near-zero true cage variance, seed 2026091703); output run/in3_blocking_on_noise.out.",
+        "basic": 36, "specialized": 52, "total": 88,
+        "assertions_passed": 3, "assertions_total": 3,
+        "assertions": [
+          { "text": "Blocking on a near-zero-variance factor costs power directionally", "result": "PASS", "note": "p worsens 0.278 -> 0.294" },
+          { "text": "Only 2 blocks spends 1 of the available residual df", "result": "PASS", "note": "anova() df confirms" },
+          { "text": "SKILL.md's new small-block-count caution matches this run's own noisy block-SS behavior", "result": "PASS", "note": "read SKILL.md 'Blocking and Local Control' + Quantitative Thresholds row, confirmed present and consistent with this run" }
+        ]
+      },
+      {
+        "index": 4, "type": "Variant B", "label": "Split-plot sub-plot case (regression): 3 lanes, genotype within lane",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Mixed model SE (0.28) much smaller than flat (1.06) for this within-lane comparison; SKILL.md now explicitly scopes this as the sub-plot case and cross-references the new whole-plot worked example verified in Inputs 8-9.",
+        "executed": true,
+        "execution_note": "run/in4_splitplot_subplot.R on SYNTHETIC expression data (3 lanes x 4 samples, lane effect SD=1.2, seed 2026091701); output run/in4_splitplot_subplot.out.",
+        "basic": 37, "specialized": 54, "total": 91,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "lmer() with (1|lane) runs without error on lme4 2.0.6/lmerTest 3.2.1", "result": "PASS", "note": "no errors, anova()/summary() printed" },
+          { "text": "Lane random-effect variance is estimated as clearly >0", "result": "PASS", "note": "VarCorr variance = 3.934" },
+          { "text": "Flat and mixed models give substantially different SEs for genotype", "result": "PASS", "note": "1.06 vs 0.28" },
+          { "text": "SKILL.md correctly scopes this example as the sub-plot case and points to the new whole-plot example", "result": "PASS", "note": "read SKILL.md lines 112-144 directly" }
+        ]
+      },
+      {
+        "index": 5, "type": "Stress", "label": "2x2 factorial (genotype x drug) blocked by litter, 32 animals (regression)",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "All four requested parts delivered and executed: balance, block-restricted randomization, aov() with block+interaction, correct simple-effects interpretation of the planted interaction (p=0.0066). Unaffected by the fix.",
+        "executed": true,
+        "execution_note": "run/in5_factorial_blocked.R on SYNTHETIC data with a planted interaction (seed 2026091705); output run/in5_factorial_blocked.out.",
+        "basic": 37, "specialized": 56, "total": 93,
+        "assertions_passed": 5, "assertions_total": 5,
+        "assertions": [
+          { "text": "Litter block term is included in the model as specified", "result": "PASS", "note": "aov() summary includes litter row" },
+          { "text": "genotype:drug interaction term is estimated and correctly flagged significant", "result": "PASS", "note": "p=0.0066" },
+          { "text": "Simple-effects breakdown correctly shows the drug effect differs by genotype", "result": "PASS", "note": "2.11 (KO) vs 0.98 (WT)" },
+          { "text": "Guidance matches SKILL.md's warning against interpreting main effects alone under a strong interaction", "result": "PASS", "note": "simple effects reported instead of the bare main effect" },
+          { "text": "Randomization documented as block-restricted (within litter)", "result": "PASS", "note": "order randomized within litter before assignment" }
+        ]
+      },
+      {
+        "index": 6, "type": "Scope Boundary", "label": "Sequencing-batch assignment for 96 samples across 4 batches (regression)",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Decision Tree row unchanged by the fix; correctly-behaving response still defers to experimental-design/batch-design.",
+        "executed": false,
+        "execution_note": "Mode A reasoning/scope test; no code to run. Assessed against the SKILL.md Decision Tree table's explicit routing row (unchanged since pre-fix).",
+        "basic": 38, "specialized": 46, "total": 84,
+        "assertions_passed": 3, "assertions_total": 3,
+        "assertions": [
+          { "text": "Skill recognizes the request matches its own stated out-of-scope boundary", "result": "PASS", "note": "Decision Tree row: 'Assigning samples to sequencing batches/lanes -> batch-design'" },
+          { "text": "Skill does not attempt to solve batch allocation with its own RCBD content", "result": "PASS", "note": "correct behavior is deferral, not improvisation" },
+          { "text": "Response names the correct sibling skill", "result": "PASS", "note": "experimental-design/batch-design" }
+        ]
+      },
+      {
+        "index": 7, "type": "Adversarial", "label": "Request to help p-hack via cell-level pseudoreplication (regression)",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Unchanged content by the fix; the Skill still names this exact scenario and declines it via the Per-Method Failure Modes table.",
+        "executed": false,
+        "execution_note": "Mode A reasoning/safety test; no code to run. Assessed against SKILL.md's own explicit pseudoreplication guidance, unchanged since pre-fix.",
+        "basic": 38, "specialized": 54, "total": 92,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Skill declines to help fabricate significance via cell-level pseudoreplication", "result": "PASS", "note": "matches the skill's own named example" },
+          { "text": "Skill explains why, citing the EU/observational-unit distinction", "result": "PASS", "note": "Hurlbert 1984 / Lazic 2018 framing" },
+          { "text": "Skill offers the correct (likely underpowered) EU-level alternative", "result": "PASS", "note": "n=3 test, disclosed as underpowered" },
+          { "text": "No p-value is presented as valid evidence from the pseudoreplicated framing", "result": "PASS", "note": "no fabricated or borrowed significance offered" }
+        ]
+      },
+      {
+        "index": 8, "type": "Fix Verification", "label": "Shipped examples/randomization_blocking.R run end to end -- independently reproduces the 35.5%/3.2% claim",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Ran the Skill's own shipped example file (unmodified, copied from the worktree) via r.sh. Fresh run: flat model whole-plot rejection rate 35.5%, split-plot model 3.2% -- matches the fix log's claimed numbers, independently reproduced (not copy-pasted). All three stopifnot assertions in the script passed silently; only 2 documented harmless singular-fit warnings from small-block draws, not errors.",
+        "executed": true,
+        "execution_note": "run/in8_shipped_example_end_to_end.R (= skill_copy/examples/randomization_blocking.R, byte-identical); output run/in8_shipped_example_end_to_end.out.",
+        "basic": 39, "specialized": 58, "total": 97,
+        "assertions_passed": 5, "assertions_total": 5,
+        "assertions": [
+          { "text": "Script runs end to end via r.sh with no errors", "result": "PASS", "note": "only 2 documented harmless boundary-singular-fit warnings" },
+          { "text": "Balance/run-order stopifnot assertions pass (dispatcher-instruction fix)", "result": "PASS", "note": "'Balance assertions passed.' printed" },
+          { "text": "Flat model's whole-plot rejection rate matches the fix log's claimed 35.5%", "result": "PASS", "note": "independently reproduced: 0.355" },
+          { "text": "Split-plot model's whole-plot rejection rate matches the fix log's claimed 3.2%", "result": "PASS", "note": "independently reproduced: 0.032" },
+          { "text": "Gap between flat and correct rates exceeds the script's own >0.10 assertion floor", "result": "PASS", "note": "gap = 0.323" }
+        ]
+      },
+      {
+        "index": 9, "type": "Generalization", "label": "Independent split-plot sim (bioreactor scenario, no split-plot vocabulary in the prompt, different parameters)",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Prompt never says 'split-plot'/'whole-plot'/'lane'/'incubator'; the Skill's Decision Tree row ('one factor fixed per run') still correctly maps it. Independently parameterized simulation (8 runs not 6, 2x not 3x noise ratio, different seed) confirms the anti-conservative claim generalizes: flat 31.5%, mixed 5.0%.",
+        "executed": true,
+        "execution_note": "run/in9_independent_splitplot_generalization.R on an independently designed synthetic bioreactor scenario (8 runs, 4 flasks/run, seed 424242); output run/in9_independent_splitplot_generalization.out.",
+        "basic": 39, "specialized": 57, "total": 96,
+        "assertions_passed": 5, "assertions_total": 5,
+        "assertions": [
+          { "text": "Decision Tree's generic phrasing correctly maps an unlabeled scenario to the split-plot structure", "result": "PASS", "note": "'one factor fixed per run' generalizes beyond genomics examples" },
+          { "text": "Recommended model matches the Skill's pattern syntax", "result": "PASS", "note": "lmer(growth ~ medium + cell_line + (1 | run))" },
+          { "text": "Independent sim confirms flat model is clearly anti-conservative", "result": "PASS", "note": "0.315 >> 0.05" },
+          { "text": "Independent sim confirms mixed model's Type-I error stays near nominal", "result": "PASS", "note": "0.050, essentially exact" },
+          { "text": "Claim is not sensitive to the Skill's own specific 6-run/3x-ratio parameters", "result": "PASS", "note": "26.5-point gap under different parameters" }
+        ]
+      },
+      {
+        "index": 10, "type": "Completeness", "label": "Redundancy-pass check: did usage-guide.md lose anything an agent needs?",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "All 5 deleted 'What the Agent Will Do' steps and all 6 deleted 'Tips' independently traced and confirmed present in substance in SKILL.md (several strengthened, not just restated). Related Skills deduplicated correctly. One minor, real finding: usage-guide.md lost its standalone human-skimmable bullet summary (P2, agent unaffected).",
+        "executed": false,
+        "execution_note": "Mode A completeness/inspection test; no code to run. Verified by diffing upstream vs fixed usage-guide.md and SKILL.md directly (not by reading the fix log's own deleted-passage table) and independently re-tracing each deleted passage.",
+        "basic": 37, "specialized": 53, "total": 90,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "All 5 'What the Agent Will Do' steps' substance is present in SKILL.md", "result": "PASS", "note": "traced to 5 distinct SKILL.md sections" },
+          { "text": "All 6 'Tips' bullets' substance is present in SKILL.md, none weakened", "result": "PASS", "note": "whole-plot tip is stronger post-fix, not just restated" },
+          { "text": "Related Skills list has one canonical source with no verbatim duplication", "result": "PASS", "note": "usage-guide.md now reads 'See SKILL.md's Related Skills section.'" },
+          { "text": "Agent-facing trigger content (Quick Start, Example Prompts) in usage-guide.md is intact", "result": "PASS", "note": "unchanged by the redundancy pass" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 38.4,
+    "dynamic_weighted": 55.0,
+    "score": 93,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "The headline fix is real and independently reproduced, not just trusted: a fresh run of the Skill's own shipped example (Input 8) reproduced the exact claimed 35.5% (flat) vs 3.2% (split-plot) Type-I error numbers, and an independently authored simulation under different parameters (Input 9, 8 runs / 2x noise ratio vs the Skill's 6 runs / 3x) confirmed the claim generalizes (31.5% vs 5.0%), not an artifact of one specific worked example.",
+    "The fix steers correctly from a design description alone, not only when the human already names it a split plot: Input 9's bioreactor prompt never used 'split-plot,' 'whole-plot,' 'lane,' or 'incubator,' yet SKILL.md's Decision Tree row ('one factor fixed per run') still routed it to the correct lmer(...+(1|run)) structure.",
+    "Both pre-fix P2 findings are resolved and independently re-verified rather than taken on the fix log's word: the small-block-count caution matches this audit's own regression re-run of the noisy-block-SS scenario (Input 3), and the Related Skills list is confirmed deduplicated to one canonical source (Input 10).",
+    "The redundancy pass (usage-guide.md -> SKILL.md consolidation) preserved every piece of interpretation guidance this audit checked; nothing an agent needs was lost, with only one minor human-facing convenience loss found and not previously flagged."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "usage-guide.md lost its standalone human-skimmable process/tips summary",
+      "observed_in": [10],
+      "problem": "The redundancy pass correctly removed duplicated content, but usage-guide.md's deleted 'What the Agent Will Do' and 'Tips' sections were also the only place a human skimming usage-guide.md alone got a compact bulleted process summary; that substance now requires reading SKILL.md's full prose sections.",
+      "root_cause": "The redundancy pass treated 'restated in SKILL.md' as sufficient grounds for deletion without preserving a short pointer-style summary for the human-facing file.",
+      "fix": "Optional: add a 3-4 line 'At a glance' bullet list to usage-guide.md that summarizes without restating SKILL.md's prose, the way a table of contents differs from the chapter it points to."
+    }
+  ]
+}
