@@ -20,7 +20,7 @@ import sys
 REC = "F:/optimizing-agent-science-skills"
 FORK = "F:/OpenScience/external/mrsonord2240__bioSkills"
 UPSTREAM_COMMIT = "d91ed3d563019e649dc854c56ccd62551359488a"
-FORK_COMMIT = "558aea51d3476d61727c943cc5d28882bae7d390"
+FORK_COMMIT = "978ae4ab4f9cc5317433ce6956b37aa1957d8295"
 AUDITS = "F:/OpenScience/audits"
 OUT = "F:/optimized-scientific-skills"
 
@@ -84,13 +84,27 @@ def classify(path):
     return "modified", files
 
 
+def published_ids():
+    p = os.path.join(OUT, "PROVENANCE.json")
+    if not os.path.exists(p):
+        return set()
+    return {s["id"] for s in json.load(open(p, encoding="utf-8"))["skills"]}
+
+
 def main():
     apply = "--apply" in sys.argv
+    # Promotion is an explicit decision per Skill, not a side effect of an audit landing: the published
+    # set is what is already there plus `--add id,id`. Qualifying audits not named stay in remaining.
+    add = set()
+    for i, a in enumerate(sys.argv):
+        if a == "--add" and i + 1 < len(sys.argv):
+            add |= {s.strip() for s in sys.argv[i + 1].split(",") if s.strip()}
+    promote = published_ids() | add
     idx = skill_index()
     rep = audits()
     fixlogs = {f[:-3] for f in os.listdir(os.path.join(REC, "fixes")) if f.endswith(".md")}
 
-    finished, excluded = [], []
+    finished, excluded, held = [], [], []
     for sid, r in rep.items():
         if sid not in idx:
             continue
@@ -106,7 +120,16 @@ def main():
             "audited_on": r.get("meta", {}).get("evaluated_on"),
             "fix_log": f"fixes/{sid}.md" if sid in fixlogs else None,
         }
-        (finished if fin["deployable"] and not p0 else excluded).append(row)
+        if not (fin["deployable"] and not p0):
+            excluded.append(row)
+        elif sid in promote:
+            finished.append(row)
+        else:
+            held.append(row)
+
+    missing = add - {r["id"] for r in finished}
+    if missing:
+        raise SystemExit(f"--add names Skills with no deployable, P0-free audit: {sorted(missing)}")
 
     for row in finished:
         kind, files = classify(row["upstream_path"])
@@ -123,6 +146,7 @@ def main():
         print(f"   {k:26s} {sum(1 for r in finished if r['relative_to_upstream'] == k)}")
     print(f"   with a fix log             {sum(1 for r in finished if r['fix_log'])}")
     print(f"excluded  : {len(excluded)}  {[r['id'] for r in excluded]}")
+    print(f"qualifies, not promoted: {len(held)}  {[(r['id'], r['score']) for r in held]}")
     print(f"remaining : {len(remaining)}")
 
     if not apply:
