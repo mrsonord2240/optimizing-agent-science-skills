@@ -64,6 +64,28 @@ registration-gated, absent, or outside the Skill's scope. Say which you chose an
 This is bounded by what the Skill already claims. It is not licence for broader coverage: extend the
 existing sections, do not restructure them, and do not add a tool the Skill never mentioned.
 
+## Remove redundancy, every pass (2026-09-17)
+
+Sam's rule: **every Skill a fixer touches leaves with each fact stated once**, whether or not the audit
+flagged duplication. Two copies drift — a fix lands in one and the other keeps the bug — and every
+repeated line costs the agent context.
+
+- `SKILL.md` is what the agent loads, so it is the single home for anything the agent acts on:
+  commands, thresholds, decision flows, failure modes, interpretation tables, install notes, caveats.
+- `usage-guide.md` keeps only what is for the human choosing the Skill: a short overview, example
+  prompts, and related Skills. Everything else in it that restates `SKILL.md` is deleted. Where the
+  guide needs the point, it names the `SKILL.md` section instead of repeating it.
+- Content that exists **only** in `usage-guide.md` but that the agent needs (a table `SKILL.md` points
+  at, a tip found nowhere else) moves into the matching `SKILL.md` section — it is not deleted.
+- Repetition inside `SKILL.md` (a Tips list re-saying the failure-mode sections, a threshold given in
+  three places) collapses to the one section where it belongs.
+- When two copies disagree, keep the one the audit's runs support, and log the disagreement.
+- Shipped `examples/` scripts are out of this rule: a runnable file beside an inline block is not a
+  duplicate.
+
+Verify by listing, in the fix log, every deleted passage and where its content now lives. Nothing
+the agent needs may leave the Skill. This is the one restructuring a fixer does.
+
 **Still not in scope:** broader coverage, new tools the Skill does not reference, restyling prose,
 rewriting what works. Keep diffs minimal. Never change the frontmatter `name`. Change `description`
 only if it is wrong, or to drop a claim you deleted under the rule above. Do not tune text toward the
