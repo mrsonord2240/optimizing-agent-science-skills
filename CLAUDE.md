@@ -16,7 +16,7 @@ The method lives in `process/`. This file only says how the work is run.
    one folder at a time.
 2. **Fix pass after.** Fixers work from the audit reports once the audits have landed, and a re-audit
    by a third agent follows every fix.
-3. **Promote** each Skill that passes re-audit (see below).
+3. **Promote** every Skill that passes audit or re-audit to `optimized-scientific-skills` (see below).
 
 Every stage names who does it: `TOOLING_BRIEF` → `AUDIT_BRIEF` → `FIX_BRIEF` → `AUDIT_BRIEF` (re-audit).
 **The auditor, the fixer and the re-auditor are always different agents.**
@@ -79,11 +79,14 @@ went untracked on 2026-09-17.
   before the re-audit writes a new one.
 - A fix lands when its re-audit passes: core ≥ 85, deployable, no open P0, no veto. Merge `--no-ff`
   into staging `main`, push, delete the branch and worktree.
-- **Promotion is explicit per Skill:**
-  `python tools/promote_skills.py --add <id>,<id>` for a dry run, then `--apply`. First advance
-  `FORK_COMMIT` to the staging commit you are promoting from, and update the count table in the
-  published `README.md`. The dry run lists Skills that qualify but were not named. They stay in
-  `REMAINING.md` until someone decides to promote them.
+- **Move every Skill that passes audit to `optimized-scientific-skills`** (Sam, 2026-09-17). This
+  applies to a first audit or a re-audit: core ≥ 85, deployable, no open P0, no veto. Promotion is
+  part of landing, not a separate decision, so do not wait to be asked. A Skill that fails stays in
+  `REMAINING.md` until its fix passes re-audit.
+  Run `python tools/promote_skills.py --add <id>,<id>` as a dry run, then with `--apply`. First
+  advance `FORK_COMMIT` to the staging commit you are promoting from. Afterwards update the count table
+  in the published `README.md`. The dry run's "qualifies, not promoted" line lists any passing Skill
+  that was missed. Check it every time and promote those too.
 
 ## Sharing the machine with other sessions
 
