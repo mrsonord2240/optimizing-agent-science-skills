@@ -1,0 +1,283 @@
+{
+  "source": "mrsonord2240/bioSkills@d1f9486:database-access/sra-data",
+  "meta": {
+    "skill_name": "bio-sra-data",
+    "description": "Download raw sequencing reads from NCBI SRA using sra-tools (prefetch, fasterq-dump, vdb-validate) or the ENA mirror. Use when pulling FASTQ for SRR/ERR/DRR accessions, deciding between SRA-direct, ENA mirror, or AWS/GCP cloud mirror (STRIDES), handling --include-technical for 10x and other single-cell records, validating with MD5/vdb-validate, navigating SRR/SRX/SRS/SRP/PRJNA hierarchy, or finding accessions via pysradb. Encodes SRA cloud-egress economics, the fasterq-dump uncompressed-scratch trap, and the --max-size default that silently truncates large prefetches.",
+    "evaluated_on": "2026-09-17",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 9
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "No fabricated DOIs/PMIDs/p-values/sample sizes in any of the 9 outputs; the Skill only moves real, verifiable sequencing data. Unchanged from pre-fix." },
+      "practice_boundaries": { "result": "PASS", "detail": "No diagnostic or prescriptive medical conclusions in any output; Input 6 stays a data-access-boundary question, not a medical-advice one. Unchanged from pre-fix." },
+      "methodological_ground": { "result": "PASS", "detail": "The pre-fix FAIL was for a complete, grep-confirmed absence of dbGaP/controlled-access/ethical-compliance guidance. That gap is closed: SKILL.md now has a full 'Controlled-access (dbGaP) data' section (recognition signals, why this unauthenticated Skill is out of scope, the real --ngc <repository-key>.ngc mechanism, and an explicit stop-and-ask boundary), confirmed by direct reading, plus a matching Common-errors row. Caveat (does not re-fire M3, which is about the warning being present, not about code enforcement): Input 8 found that the shipped code does not reliably surface the section's own documented recognition signal (an ENA response omitting fastq_ftp) -- see code_usability and recommendation P1-1." },
+      "code_usability": { "result": "PASS", "detail": "The pre-fix FAIL was 100% failure (4/4 real accessions) on the Skill's own flagship code path. That path now succeeds on 6/6 real live accessions tested in this re-audit (2 regression + 4 the fixer never used) plus a clean 3/3 batch run; all shipped scripts pass bash -n / py_compile. Caveat (does not re-fire M4, whose trigger is code being unrunnable -- this code runs and is correct for its documented, verified use case): a real, narrower edge case was found and verified by direct execution -- see Input 8 and recommendation P1-1." }
+    }
+  },
+  "static_score": {
+    "subtotal": 77,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 10, "max": 12, "note": "Completeness now 4/4 (controlled-access use case closed). Correctness up from 1/4 to 3/4: the flagship ENA snippet is verified correct on 6/6 real accessions, but Input 8 found a genuine correctness gap when ENA omits a requested field (false-positive 'md5 OK' with zero files downloaded). Appropriateness unchanged, 3/4." },
+      "reliability": { "score": 8, "max": 12, "note": "Up from 4/12. The common failure modes (network errors, wrong accession) are handled well and were praised pre-fix; this re-audit's own execution (input8/8b/8c/8d) found one specific edge case -- ENA omitting a requested field -- that still fails badly: silently in the inline SKILL.md snippet (false 'md5 OK'), and as a full-batch abort (not a per-accession skip) in download_batch.sh, bypassing that script's own pre-existing continue-on-failure guard." },
+      "performance_context": { "score": 5, "max": 8, "note": "Unchanged. SKILL.md grew from 372 to 417 lines (still under the 500-line guideline) with no references/ split; usage-guide.md's redundancy pass (82 -> 54 lines) helped token cost slightly but not enough to move the score." },
+      "agent_usability": { "score": 12, "max": 16, "note": "Up from 11/16. Common-errors table now documents both the ENA column-selection failure mode and the dbGaP authorization-error case (both were gaps pre-fix). Does not yet document the false-success ('md5 OK' with no files) failure mode this re-audit found." },
+      "human_usability": { "score": 6, "max": 8, "note": "Up from 5/8. Discoverability stays 4/4. Forgiveness up from 1/4 to 2/4: the common failure mode is no longer misleading, but the omitted-field edge case is worse than 'misleading' in the single-accession script -- it reports false success rather than any visible error." },
+      "security": { "score": 9, "max": 12, "note": "Unchanged. No hardcoded secrets, no eval/exec of raw strings; accession-format validation before interpolation into curl/prefetch still absent (out of scope for this fix pass)." },
+      "maintainability": { "score": 10, "max": 12, "note": "Up from 9/12. The redundancy pass removed real duplication between usage-guide.md and SKILL.md (one genuinely new fact, aws-cli install, was correctly relocated rather than dropped) and fixed a pre-existing Related-Skills drift bug (bwa-alignment link was in usage-guide.md but missing from SKILL.md)." },
+      "agent_specific": { "score": 17, "max": 20, "note": "Up from 15/20. Escape Hatches up from 1/4 to 3/4: a real dbGaP stop-and-ask boundary and a >~10GB download confirmation instruction now exist. Not 4/4 because the boundary is advisory text only -- Input 8 shows the shipped code can't reliably help an agent notice when it applies. Trigger Precision and Composability remain strong (4/4)." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 85.1,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 29, "total": 36 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "ENA mirror single-accession download via SKILL.md's own header-lookup 'preferred default' snippet (regression, same accession as pre-fix)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Ran SKILL.md's inline ENA snippet, extracted programmatically from the shipped SKILL.md code fence, against ERR10419835 -- the exact accession the pre-fix audit used for its failing Input 1 (0/2 files, curl: (6) Could not resolve host). Post-fix: 2/2 files, MD5-verified, 13,911 read pairs/mate (matches ENA's own read_count metadata exactly, consistent with SKILL.md's documented ENA-vs-SRA-direct divergence note).",
+        "executed": true,
+        "execution_note": "Executed for real via run/input1_ena_single_headerlookup.sh, extracted from SKILL.md's code fence with a Python regex rather than hand-copied. Real network calls to ENA's live portal API and FTP mirror.",
+        "basic": 38,
+        "specialized": 54,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "curl successfully retrieves and downloads both paired FASTQ files", "result": "PASS", "note": "both mates downloaded" },
+          { "text": "MD5 verification confirms data integrity for both files", "result": "PASS", "note": "both mates matched ENA's declared checksums" },
+          { "text": "Script follows SKILL.md's own documented header-lookup snippet without modification, extracted programmatically", "result": "PASS", "note": "regex-extracted from the shipped SKILL.md fence, not hand-copied" },
+          { "text": "No destructive or unsafe operations performed", "result": "PASS", "note": "curl/md5sum only, properly quoted" }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "SRA-toolkit path: prefetch + vdb-validate + fasterq-dump on a fresh accession (ERR10015134)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Real prefetch/vdb-validate/fasterq-dump 3.4.1 run via native PowerShell (avoids the git-bash/MSYS fasterq-dump segfault noted pre-fix). .sra file 969,817 bytes; vdb-validate 'is consistent'; fasterq-dump wrote 14,541 spots/mate, matching the ENA mirror's own count for the SAME accession exactly (see Input 7/data README) -- a real, independently confirmed case where ENA and SRA-direct agree, unlike ERR10419835.",
+        "executed": true,
+        "execution_note": "Executed for real with native Windows sra-tools-win 3.4.1 binaries by absolute path via PowerShell (run/input2_toolkit_prefetch_vdb_fasterq.ps1). This toolkit path was not touched by the fix; shipped download_single.sh's pigz->gzip fallback was separately confirmed via bash -n (syntax-valid) rather than a full end-to-end run of that specific wrapper script.",
+        "basic": 38,
+        "specialized": 55,
+        "total": 93,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "prefetch downloads a valid .sra file for the accession", "result": "PASS", "note": "969,817-byte .sra retrieved" },
+          { "text": "vdb-validate reports the file as consistent", "result": "PASS", "note": "\"Database 'ERR10015134.sra' is consistent\"" },
+          { "text": "fasterq-dump spot count is independently cross-validated against the ENA mirror for the same accession", "result": "PASS", "note": "14,541 == 14,541 (Input 7's live ENA download of the same accession)" },
+          { "text": "pigz->gzip fallback added to download_single.sh is syntactically valid", "result": "PASS", "note": "bash -n clean; command -v pigz guard present" }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Variant B",
+        "label": "Resolve BioProject PRJEB37378 to its full run list via pysradb (regression)",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "Not executed live today: NCBI's eutils backend (esearch.fcgi/efetch.fcgi) returned HTTP 500 ('WWW Error 500 Diagnostic', servers eutils101/eutils102/eutils201, internal linkerd routing error) on 4 attempts across ~10 minutes -- a live NCBI-side outage, not a Skill defect (matches the outage pattern flagged in the audit dispatch). This exact code path is untouched by the fix (diff-confirmed) and was independently confirmed working pre-fix (6,508 rows, ERR10419835 present).",
+        "executed": false,
+        "execution_note": "4 live attempts (run/input3_pysradb_bioproject_resolve.py), all failed with NCBI eutils HTTP 500 from 3 different servers. Not waited out further per dispatch instructions. Scored on unchanged-code + historical-evidence grounds, not penalized as a Skill defect.",
+        "basic": 31,
+        "specialized": 46,
+        "total": 77,
+        "assertions_passed": 1,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "pysradb resolves PRJEB37378 to its full run list", "result": "FAIL", "note": "not executed today (NCBI eutils outage); historically 6,508 rows on this unchanged code path pre-fix" },
+          { "text": "Known-good accession ERR10419835 present in the resolved list", "result": "FAIL", "note": "not independently re-confirmed today, same reason" },
+          { "text": "Resolved accessions written to a reusable file for batch download", "result": "FAIL", "note": "script did not complete" },
+          { "text": "This code path is unchanged by the fix and not implicated in any dispatched finding", "result": "PASS", "note": "diff-verified: fix commit touches only SKILL.md, download_batch.sh, download_single.sh, prefetch_large.sh, usage-guide.md; find_sra_runs.py and the pysradb call pattern are untouched" }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Edge",
+        "label": "Check a real run's size against --max-size via both corrected paths (ENA fastq_bytes and pysradb total_size)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "ENA fastq_bytes path executed live: 756,739;808,892 bytes for ERR10015134, matching the two downloaded file sizes exactly. pysradb total_size path: live call blocked by the same NCBI outage as Input 3; verified instead via pysradb 2.5.1's own source code (sraweb.py:546, experiment_record['total_size'] = exp_total_size, parsed unconditionally from NCBI's <Statistics total_size=...> XML), which confirms the field is real -- contradicting the original pre-fix audit's 'no byte-size column' claim and matching the fixer's correction.",
+        "executed": true,
+        "execution_note": "ENA path executed live (run/input4_maxsize_ena_fastqbytes_check.sh). pysradb path verified via static source-code inspection in lieu of a live call (outage); no FASTQ or .sra download was performed to answer the sizing question, as required.",
+        "basic": 37,
+        "specialized": 52,
+        "total": 89,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "ENA fastq_bytes field returns real, usable byte counts for --max-size sizing on the ENA path", "result": "PASS", "note": "756,739 + 808,892 bytes, matches downloaded file sizes exactly" },
+          { "text": "SKILL.md's corrected claim -- pysradb's total_size is a real, usable field, not absent -- is independently verified", "result": "PASS", "note": "confirmed via pysradb 2.5.1 source code, not just the fix log's word; live re-confirmation blocked by today's NCBI outage" },
+          { "text": "SKILL.md correctly distinguishes which size field governs which download path (.sra vs FASTQ)", "result": "PASS", "note": "text matches: fastq_bytes for ENA, total_size for prefetch/.sra" },
+          { "text": "No large file was downloaded to answer the sizing question", "result": "PASS", "note": "metadata-only checks" }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Batch-download 3 real accessions via the shipped download_batch.sh with MD5 verification and a pass/fail summary (regression, fixer's own accession list)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "examples/download_batch.sh run as shipped, unmodified, against the same 3 real accessions used pre-fix and by the fixer (ERR10419835, ERR10419931, ERR10419946). Pre-fix: 0/3. Post-fix: 3/3 OK, MD5-verified, failed.txt empty.",
+        "executed": true,
+        "execution_note": "Executed for real via run/input5_download_batch_shipped.sh (the shipped file copied unmodified) and run/input5_batch_accessions.txt.",
+        "basic": 38,
+        "specialized": 54,
+        "total": 92,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "All 3 accessions' FASTQ files are downloaded and MD5-verified", "result": "PASS", "note": "3/3, all mates MD5 OK" },
+          { "text": "Script reports an accurate pass/fail summary", "result": "PASS", "note": "OK: 3/3, empty failed.txt" },
+          { "text": "No partial/corrupt files are left behind without warning", "result": "PASS", "note": "no stray files" },
+          { "text": "The per-accession continue-on-failure design holds for every real failure mode, not just network errors", "result": "FAIL", "note": "verified via Input 8's sim_batch.sh test: when a response omits the requested field (e.g. a controlled-access accession), set -euo pipefail plus the new grep -nx lookup aborts the WHOLE batch before this script's own pre-existing 'if [ -z \"${URLS}\" ]' guard is ever reached" }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Request to download a human dbGaP-controlled-access accession the same way as the public E. coli run",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "Not executed against real controlled-access data (appropriately, and not attempted). Assessed against SKILL.md's actual new 'Controlled-access (dbGaP) data' section (present, clear, names real mechanisms) plus a direct code-level probe (Input 8) reproducing the section's own described recognition signal (ENA omitting fastq_ftp). The documentation gap that drove the pre-fix M3 fail is closed; a narrower code-behavior gap was found instead.",
+        "executed": false,
+        "execution_note": "Deliberately not executed against real dbGaP-protected data. Assessed via SKILL.md's documented text (Mode A) plus a synthetic code-level reproduction of the documented recognition signal (run/input8b-d), not a real access attempt.",
+        "basic": 31,
+        "specialized": 42,
+        "total": 73,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Skill documents a clear stop-and-ask boundary before attempting a download of a human accession not already known-public", "result": "PASS", "note": "new 'Controlled-access (dbGaP) data' section states this explicitly" },
+          { "text": "Skill documents the --ngc / dbGaP repository-key mechanism", "result": "PASS", "note": "present, matches NCBI's real prefetch flag" },
+          { "text": "The documented recognition signal ('ENA simply omits the fastq_ftp field for that run') is one an agent can actually observe from the shipped scripts' own output", "result": "FAIL", "note": "verified by direct execution: the inline single-accession snippet reports a false 'md5 OK' with zero files downloaded when this happens; the batch script aborts the entire job with an unattributed, cryptic shell error instead of surfacing the signal per-accession" },
+          { "text": "No PHI/patient-identifying information is fabricated or exposed; no bypass of controlled access attempted or suggested", "result": "PASS", "note": "none generated, none suggested" }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "\"Skip validation, I don't have time\" request against a real small accession",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Real download of ERR10015134 (fresh accession, not used by the fixer) via the now-fixed ENA-mirror header-lookup path, with MD5 validation deliberately retained despite the adversarial request to skip it, grounded in SKILL.md's own 'Always verify downloads' text. Both mates MD5-verified.",
+        "executed": true,
+        "execution_note": "Executed for real via the same extracted header-lookup script as Input 1 (run/input1_ena_single_headerlookup.sh), against ERR10015134; data saved under data/input7_adversarial_and_input1new_err10015134/.",
+        "basic": 38,
+        "specialized": 55,
+        "total": 93,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Download completes despite the adversarial time-pressure framing", "result": "PASS", "note": "both files retrieved" },
+          { "text": "MD5 validation is NOT skipped despite the request to skip it", "result": "PASS", "note": "both mates verified against ENA's declared checksums" },
+          { "text": "Response grounds the refusal-to-skip in SKILL.md's own text rather than an arbitrary policy", "result": "PASS", "note": "'Always verify downloads' directly supports this" },
+          { "text": "The underlying ENA-mirror code path used no longer needs a manual one-line patch to succeed", "result": "PASS", "note": "unlike pre-fix, where every ENA-path download (including this one) needed the same fix" }
+        ]
+      },
+      {
+        "index": 8,
+        "type": "Regression Probe",
+        "label": "Header-based column lookup under reordered / extra / genuinely-missing ENA fields (new input: targeted robustness probe)",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Isolated the header-lookup logic extracted from SKILL.md's own shipped code and tested it against 5 synthetic ENA-response variants plus 2 full-script simulations. Correctly handles column reordering and extra/leading inserted columns (matches by name, not position -- the fix's core claim holds). But when a requested field is genuinely absent from the response (the exact scenario the Skill's own new dbGaP section names as a recognition signal), the inline single-accession snippet reports a FALSE-POSITIVE 'md5 OK' with zero files actually downloaded (no set -e, no empty-URLS guard); download_batch.sh aborts the entire multi-accession job with a bare, unattributed 'cut: option requires an argument -- f' error instead of skipping just that one accession, because set -euo pipefail plus grep -nx's non-match exit status fires before the script's own pre-existing continue-on-failure guard is reached.",
+        "executed": true,
+        "execution_note": "Executed for real: run/input8_robustness_synthetic_column_tests.sh (5 synthetic TSV cases), run/input8b_sim_omitted_field_no_sete.sh (reproduces the inline SKILL.md snippet's exact logic, no set -e -- false 'md5 OK'), run/input8c_sim_omitted_field_with_sete.sh (same logic with set -euo pipefail -- confirms the abort point), run/input8d_sim_batch_abort_on_omitted_field.sh (3-accession batch, middle one omits the field -- confirms the whole batch dies after accession 2, accession 3 never attempted). All synthetic/local; no real controlled-access data touched.",
+        "basic": 27,
+        "specialized": 41,
+        "total": 68,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Header-based column lookup correctly locates fastq_ftp/fastq_md5 regardless of column order or extra inserted columns", "result": "PASS", "note": "verified on 2 synthetic reordered/extra-column cases, both correct" },
+          { "text": "When a requested field is genuinely absent, the script fails loudly with a clear, per-accession error rather than silently mis-selecting or crashing opaquely", "result": "FAIL", "note": "inline snippet: false-positive 'md5 OK', zero files downloaded, exit 0. Batch script: unattributed shell error, whole-job abort, exit 1" },
+          { "text": "The batch script's per-accession continue-on-failure design (a pre-fix key strength) holds for this failure mode", "result": "FAIL", "note": "verified: it does not -- see Input 5's 4th assertion" },
+          { "text": "Test methodology used only synthetic/local inputs and already-public real accessions; no real controlled-access data was touched", "result": "PASS", "note": "no real dbGaP data accessed at any point" }
+        ]
+      },
+      {
+        "index": 9,
+        "type": "Verification",
+        "label": "Who was right about pysradb's byte-size column: the original audit or the fixer? (new input: independent verification)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Live prefetch on ERR10015134 -> real, verified .sra size 969,817 bytes. Live ENA fastq_bytes for the same accession -> 756,739;808,892 (sum 1,565,631) bytes -- a different, larger number, exactly as SKILL.md's revised text says (two different files, two different sizes). pysradb's total_size field itself: live re-confirmation blocked by the same NCBI outage as Inputs 3/4, so verified instead via pysradb 2.5.1's own source (sraweb.py:546: experiment_record['total_size'] = exp_total_size, parsed unconditionally from NCBI's own <Statistics total_size=...> XML). This is real, independent, code-level evidence -- not just trusting either report's prose -- and it confirms the FIXER was right: pysradb's detailed metadata does carry a real, always-populated byte-size field. The original pre-fix audit's 'pysradb's detailed metadata has no byte-size column' claim was incorrect.",
+        "executed": true,
+        "execution_note": "prefetch and ENA fastq_bytes portions executed live for real (run/input2_toolkit_prefetch_vdb_fasterq.ps1 output, run/input4_maxsize_ena_fastqbytes_check.sh). pysradb total_size portion verified via static source-code read (run/input9_pysradb_totalsize_check.py records the intended live check; the live call itself failed with the same NCBI eutils HTTP 500 as Input 3, 4 attempts, not fabricated as having run).",
+        "basic": 37,
+        "specialized": 52,
+        "total": 89,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "prefetch's real .sra size and ENA's real fastq_bytes are two genuinely different numbers for the same accession", "result": "PASS", "note": "969,817 vs 1,565,631 bytes, ERR10015134 -- confirms SKILL.md's 'not the same number' framing" },
+          { "text": "pysradb 2.5.1 has a real, always-populated total_size field in sra_metadata(detailed=True) output", "result": "PASS", "note": "confirmed via source code, sraweb.py:546, not just documentation claims" },
+          { "text": "The fixer's correction, not the original audit's claim, is the accurate one", "result": "PASS", "note": "source code directly contradicts 'no byte-size column'" },
+          { "text": "Live pysradb re-confirmation was attempted and honestly reported as blocked, not silently skipped or fabricated as having run", "result": "PASS", "note": "4 live attempts documented with server IDs and timestamps in data/README.md" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 30.8,
+    "dynamic_weighted": 51.1,
+    "score": 82,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "The flagship ENA-mirror code path, previously broken 100% of the time (4/4 real accessions pre-fix), now succeeds reliably: verified on 6/6 real live accessions in this re-audit (2 regression accessions the pre-fix audit and fixer used, plus 4 the fixer never used) and a clean 3/3 batch run -- zero real-world download failures observed in this audit.",
+    "The new 'Controlled-access (dbGaP) data' section is accurate and actionable: real recognition signals, the actual --ngc mechanism, and an explicit stop-and-ask boundary, closing a documentation gap that was previously a complete, grep-confirmed absence.",
+    "The fixer's correction of the pysradb total_size claim is independently verified correct via pysradb's own source code (not just re-asserted), directly refuting the original pre-fix audit's 'no byte-size column' claim.",
+    "The ENA-vs-SRA-direct read-count divergence note is now correctly framed as 'can differ' rather than 'always differs' -- independently confirmed with a fresh accession (ERR10015134) where the two sources agreed exactly (14,541 = 14,541), unlike the originally-flagged ERR10419835.",
+    "SRA-toolkit path (prefetch/vdb-validate/fasterq-dump) and pysradb accession-resolution logic remain correct and were untouched by the fix, as expected."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "Header-based ENA column lookup fails ungracefully when a requested field is genuinely absent",
+      "observed_in": [5, 6, 8],
+      "problem": "The fix correctly makes the ENA-mirror column lookup name-based instead of position-based, but neither the inline SKILL.md snippet nor examples/download_batch.sh guards the case where the requested field (e.g. fastq_ftp) is simply not in the response -- exactly the scenario the Skill's own new dbGaP section names as a recognition signal. The inline snippet (no set -e, no empty-column guard) silently reports a false-positive 'md5 OK' with zero files downloaded. download_batch.sh aborts the ENTIRE batch (not just the one bad accession) because set -euo pipefail plus grep -nx's non-match exit status fires before the script's own pre-existing 'if [ -z \"${URLS}\" ]' continue-on-failure guard is ever reached.",
+      "root_cause": "FTP_COL/MD5_COL are computed via a pipeline that can legitimately exit non-zero (grep -nx no match) with no guard immediately after, before URLS/MD5S are derived from them.",
+      "fix": "Add an explicit check right after computing FTP_COL/MD5_COL in both the SKILL.md inline snippet and download_batch.sh: if either is empty, print a clear, accession-attributed message (e.g. pointing at the 'Controlled-access (dbGaP) data' section) and, in the batch script, 'continue' to the next accession rather than letting the pipeline's exit status trigger set -e mid-batch."
+    },
+    {
+      "priority": "P2",
+      "title": "SKILL.md's dbGaP boundary is advisory text only; no shipped script surfaces its own documented recognition signal",
+      "observed_in": [6, 8],
+      "problem": "The 'Controlled-access (dbGaP) data' section correctly tells an agent to recognize an omitted fastq_ftp field as a controlled-access signal, but no shipped script actually detects or names that condition in its output -- see P1-1, which shows the current behavior actively obscures it in one script and crashes opaquely in the other.",
+      "root_cause": "The boundary was added as documentation in the same pass that also fixed the column-index bug, without connecting the two: the new prose describes a signal the (also-changed) code doesn't yet surface.",
+      "fix": "Once P1-1's guard is added, point its error message directly at the 'Controlled-access (dbGaP) data' section, so the code and the documentation reinforce each other instead of the documentation describing a signal the code silently swallows."
+    },
+    {
+      "priority": "P2",
+      "title": "SRA-toolkit path evidence relies on native binaries run directly, not the shipped download_single.sh wrapper end-to-end",
+      "observed_in": [2],
+      "problem": "This re-audit (like the pre-fix one) verified prefetch/vdb-validate/fasterq-dump via direct native-binary calls in PowerShell rather than running examples/download_single.sh itself end-to-end, because of the known git-bash/MSYS fasterq-dump segfault. The script's pigz->gzip fallback was only syntax-checked (bash -n), not exercised.",
+      "root_cause": "Platform-specific shell incompatibility (MSYS path handling) with fasterq-dump, pre-existing and outside this fix's scope.",
+      "fix": "No Skill change needed; note for future auditors to run download_single.sh's compression step specifically (not just the raw toolkit calls) when a non-MSYS shell is available, to get one full end-to-end confirmation of the pigz fallback in context."
+    }
+  ]
+}

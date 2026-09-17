@@ -1,9 +1,9 @@
 {
   "skill_id": "bio-sra-data",
-  "version": "mrsonord2240-bioSkills@581dcd8",
+  "version": "mrsonord2240-bioSkills@d1f9486",
   "source": {
     "repository": "mrsonord2240/bioSkills",
-    "commit": "581dcd89a7450785c2451a0543ee822049fbf934",
+    "commit": "d1f94867649eda9539d55954daeeae828b2f62fb",
     "path": "database-access/sra-data",
     "author": "GPTomics",
     "author_url": "https://github.com/GPTomics",
@@ -13,7 +13,7 @@
       "repository": "GPTomics/bioSkills",
       "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
     },
-    "url": "https://github.com/mrsonord2240/bioSkills/tree/581dcd89a7450785c2451a0543ee822049fbf934/database-access/sra-data"
+    "url": "https://github.com/mrsonord2240/bioSkills/tree/d1f94867649eda9539d55954daeeae828b2f62fb/database-access/sra-data"
   },
   "audit": {
     "method": {
@@ -31,7 +31,7 @@
     "commissioned_by": "Samuel Nord",
     "test_data": "synthetic"
   },
-  "supersedes": null,
+  "supersedes": "mrsonord2240-bioSkills@581dcd8",
   "files": {
     "report": "report.json",
     "viewer": "viewer.md",
