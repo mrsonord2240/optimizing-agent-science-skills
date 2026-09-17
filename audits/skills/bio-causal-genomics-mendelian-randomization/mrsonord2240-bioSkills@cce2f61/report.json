@@ -1,0 +1,243 @@
+{
+  "meta": {
+    "skill_name": "bio-causal-genomics-mendelian-randomization",
+    "description": "Estimate causal effects of an exposure on an outcome from GWAS summary statistics using genetic instruments. Implements IVW (fixed/random), MR-Egger, weighted median/mode, MR-RAPS, CAUSE, GSMR-HEIDI, MR-PRESSO, MVMR, MR-Clust, LCV, and LHC-MR via TwoSampleMR, MendelianRandomization, MR-PRESSO, cause, and lhcMR. Use when testing causal direction between traits, evaluating drug-target effects via cis-pQTL/cis-eQTL, performing multivariable mediation MR, distinguishing causation from correlated horizontal pleiotropy, or producing STROBE-MR-compliant sensitivity batteries.",
+    "evaluated_on": "2026-09-17",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 9,
+    "source": "mrsonord2240/bioSkills@cce2f617dab31a3b1146db86cf5ba773b4d8c1cf:causal-genomics/mendelian-randomization",
+    "audit_type": "re-audit-post-fix",
+    "pre_fix_report": "F:/OpenScience/audits/_pre-fix-20260917/bio-causal-genomics-mendelian-randomization/eval_report_bio-causal-genomics-mendelian-randomization_result.json",
+    "pre_fix_score": 83,
+    "pre_fix_grade": "Reject",
+    "fix_log": "F:/optimizing-agent-science-skills/fixes/bio-causal-genomics-mendelian-randomization.md",
+    "note": "9 inputs = the pre-fix 7 re-run as regression tests (1-7, same scenarios) plus 2 new inputs (8-9) exercising CAUSE and LCV, both newly installed in this environment and absent from the pre-fix audit."
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "No fabricated DOI/PMID/trial results/p-values in any of the 9 outputs. Every statistic is a value this session actually computed against real (GIANT BMI15 x PGC MDD18) or clearly-labelled synthetic data with planted ground truth; the CAUSE crash and the LCV inconclusive-gcp result are both reported as what they are, not dressed up as successes." },
+      "practice_boundaries": { "result": "PASS", "detail": "Input 6 (personal-genotype 'should I lose weight' framing) was correctly declined, citing SKILL.md's own Decision Tree row ('n=1 is wrong regime -> Not MR') and the binary-outcome non-collapsibility caveat, unchanged from the pre-fix behavior." },
+      "methodological_ground": { "result": "PASS", "detail": "No principled methodological fallacy found. The pre-fix P1 finding (Decision Tree overstating MR-RAPS as sufficient for one-sample-equivalent designs) is now FIXED: Input 7's regression re-run confirms MR-RAPS still does not correct sample-overlap bias (b=0.23 vs naive 0.245, true=0), and SKILL.md's Decision Tree/Operational rule text now correctly states this instead of implying MR-RAPS alone suffices." },
+      "code_usability": { "result": "PASS", "detail": "The pre-fix P0 -- examples/two_sample_mr.R's signif() crash on MR-PRESSO's character-valued Global Test Pvalue -- is FIXED and verified on the same real GIANT-BMI15 x PGC-MDD18 data (95 harmonised SNPs) that triggered it originally: MRPRESSO still returns Pvalue as the character string '<0.001' under real strong heterogeneity, and the new is.numeric()-guarded reporting line now formats it without crashing (Input 1). The P1 coloc fix is also verified: the rewritten LD-tag-decay data generator in examples/cis_mr_drug_target.R now reliably clears its own PP.H4>=0.7 threshold (PP.H4=1.00, Input 2), and the P1 SIMEX fix runs cleanly using the new precomputed-weights code block (Input 5). One new, environment-level finding: CAUSE 1.2.0.335's cause() crashes inside its own in_sample_elpd_loo() step against the installed loo 2.10.1 (Input 8) -- but this is not code this Skill ships (SKILL.md gives CAUSE only as prose + a pointer to pleiotropy-detection's full example, no inline CAUSE code block here), so it does not fail this Skill's own M4 check." }
+    }
+  },
+  "static_score": {
+    "subtotal": 87,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 12, "max": 12, "note": "Completeness/appropriateness already excellent pre-fix (4/4 each); Correctness raised from 2/4 to 4/4 -- the confirmed, reproducible MR-PRESSO crash on the Skill's own shipped example is fixed and re-verified on the same real data that broke it." },
+      "reliability": { "score": 9, "max": 12, "note": "Fault Tolerance and Error Reporting raised from 2/4 to 3/4 each: the MR-PRESSO/coloc/SIMEX failure modes this audit found pre-fix are now guarded or documented with working code. Recoverability holds at 3/4 -- the Steiger-returns-NULL-without-samplesize-columns gap (Input 5) was not part of this fix round and remains a raw, unexplained NULL." },
+      "performance_context": { "score": 7, "max": 8, "note": "Efficient decision-tree gating unchanged. The redundancy pass materially reduced SKILL.md/usage-guide.md duplication (usage-guide.md 125->78 lines, Decision Tree/Tips content de-duplicated into SKILL.md) though SKILL.md itself still has no references/ folder despite growing slightly (410->435 lines) to absorb the new SIMEX code and installation fixes." },
+      "agent_usability": { "score": 14, "max": 16, "note": "Learnability/Consistency remain 4/4. Feedback Design and Error Prevention raised from 2/4 to 3/4: the SIMEX footgun now ships working code with an explicit code-comment warning about the in-formula crash it replaces, and the MR-PRESSO Pvalue coercion is now explained inline where it is guarded. Still not anticipated: the qhet_mvmr-unreliable-at-very-low-conditional-F behavior this audit found (Input 4) and the pre-existing Steiger-NULL gap." },
+      "human_usability": { "score": 7, "max": 8, "note": "Unchanged from pre-fix -- precise, domain-correct trigger language; the Steiger-needs-samplesize_col silent-NULL trap (SKILL.md's own inline 'Bidirectional and Steiger' block never sets it) was not addressed by this fix round." },
+      "security": { "score": 11, "max": 12, "note": "Unchanged -- no credential or data-safety issues; JWT-token requirement for OpenGWAS documented accurately. No new defensive-validation layer added beyond the specific guards this fix round shipped." },
+      "maintainability": { "score": 10, "max": 12, "note": "Modularity raised: the redundancy pass verified every one of usage-guide.md's 17 duplicated Tips bullets against SKILL.md's own sections before deleting, closing one real gap in passing (usage-guide.md's CRAN-stable install list had 'simex' that SKILL.md's copy lacked, even though SKILL.md now ships runnable SIMEX code needing it -- fixed by folding it into SKILL.md's install line). Testability held at 2/4->3/4: the fixed examples are now safe by construction (guarded/corrected) rather than because a regression test was added that specifically exercises the crash-triggering condition." },
+      "agent_specific": { "score": 17, "max": 20, "note": "Unchanged from pre-fix -- excellent trigger description and Related-Skills composability map; Progressive Disclosure still docked (2/4, no references/ folder for ~435 lines of dense tables); Idempotency 3/4 and Escape Hatches 4/4 hold, confirmed again by Input 6's unchanged strong scope-boundary behavior." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 86.3,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 32, "total": 36 },
+    "inputs": [
+      {
+        "index": 1, "type": "Canonical",
+        "label": "Standard two-sample MR battery on real GIANT-BMI15 x PGC-MDD18 GWAS (95 harmonised SNPs) -- P0 REGRESSION TEST",
+        "status": "COMPLETED", "status_flag": "\u2705",
+        "executed": true,
+        "execution_note": "run/input1_standard_two_sample_regression.R ran end to end via r.sh on the same cached real GIANT-BMI15 x PGC-MDD18 data as the pre-fix audit (95/97 SNPs after dropping 1 palindromic SNP). MR-PRESSO run with NbDistribution=1000 (not 10000) to fit the session's turn budget, per the audit brief's own timing trap note -- flagged here, not hidden. All values cross-checked against this candidate's own TOOLS.md smoke test (exact IVW b=0.1422 match).",
+        "note": "IVW b=0.1422 p=0.0060 (exact match to pre-fix and TOOLS.md), Egger b=0.1962, weighted median b=0.2542, weighted mode b=0.2786. I^2_GX=0.90, Steiger dir=TRUE p=1.4e-68. MR-PRESSO's Global Test Pvalue field is STILL a character string ('<0.001') under this real strongly-pleiotropic data (RSSobs=213) -- the exact pre-fix crash precondition is reproduced -- but the FIXED is.numeric()-guarded line now formats and prints it cleanly instead of crashing with 'non-numeric argument to mathematical function'. This is the direct, real-data verification of the P0 fix.",
+        "basic": 37, "specialized": 56, "total": 93,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "IVW/Egger/weighted-median/weighted-mode complete on real 95-SNP data and match TOOLS.md's independent smoke test", "result": "PASS", "note": "IVW b=0.1422, exact match" },
+          { "text": "MR-PRESSO's Global Test Pvalue field is a character string on this real, strongly-pleiotropic data (the exact P0 regression precondition)", "result": "PASS", "note": "Confirmed: class 'character', value '<0.001'" },
+          { "text": "The FIXED is.numeric()-guarded reporting line executes without crashing on that exact character value", "result": "PASS", "note": "Printed 'p: <0.001' cleanly; no error" },
+          { "text": "No fabricated statistics; every value traced to an executed R session", "result": "PASS", "note": "All values from a real, executed R session on real GWAS data" }
+        ]
+      },
+      {
+        "index": 2, "type": "Variant A",
+        "label": "cis-MR drug-target with colocalization, using the FIXED LD-tag-decay example -- P1 REGRESSION TEST",
+        "status": "COMPLETED", "status_flag": "\u2705",
+        "executed": true,
+        "execution_note": "run/input2_cis_mr_coloc.R -- ran the FIXED examples/cis_mr_drug_target.R verbatim (same set.seed(7)), unmodified, via r.sh.",
+        "note": "11 of 40 SNPs passed genome-wide significance + F>=10. cis-MR IVW b=0.613 (planted true beta_XY=0.5, correct sign and order of magnitude for an 11-SNP window). Coloc PP.H4=1.00, now clearing the Skill's own >=0.7 drug-target threshold -- exact reproduction of the fix log's own claimed numbers. This confirms the LD-tag-decay rewrite (single causal SNP + exp(-|distance|/250000) decay in both traits) fixes the pre-fix PP.H4=0.197 failure.",
+        "basic": 38, "specialized": 57, "total": 95,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "cis-MR IVW estimate is directionally correct and same order of magnitude as planted truth (0.5)", "result": "PASS", "note": "b=0.613, se=0.061, correct sign" },
+          { "text": "coloc.abf executes without error using the documented list-format API", "result": "PASS", "note": "Ran cleanly, printed PP.H0-H4 summary" },
+          { "text": "PP.H4 reaches the Skill's own >=0.7 threshold, as the example's own interpretation implies", "result": "PASS", "note": "PP.H4=1.00 -- FIXED, was 0.197/FAIL pre-fix" },
+          { "text": "No fabricated statistics", "result": "PASS", "note": "All values computed from the fixed example's own synthetic data" }
+        ]
+      },
+      {
+        "index": 3, "type": "Edge",
+        "label": "3-SNP sparse cis-instrument set, below Egger's 10-SNP and MR-PRESSO's 4-SNP documented floors",
+        "status": "COMPLETED", "status_flag": "\u2705",
+        "executed": true,
+        "execution_note": "run/input3_sparse_instruments.R ran end to end via r.sh. Unaffected by this fix round (no code path here was changed); re-run to confirm no regression.",
+        "note": "IVW b=0.322 vs planted true beta_XY=0.35 (close, n=3). Egger ran with a large SE as expected for n=3 (underpowered, not crashed). MR-PRESSO failed with the same 'Not enough intrumental variables' error SKILL.md's Common Errors table predicts, unchanged from pre-fix.",
+        "basic": 38, "specialized": 56, "total": 94,
+        "assertions_passed": 3, "assertions_total": 3,
+        "assertions": [
+          { "text": "IVW estimate on a 3-instrument set stays close to planted truth despite low N", "result": "PASS", "note": "b=0.322 vs true 0.35" },
+          { "text": "MR-PRESSO fails exactly as SKILL.md's Common Errors table describes (needs >=4 SNPs)", "result": "PASS", "note": "Identical 'Not enough intrumental variables' error reproduced" },
+          { "text": "No fabricated statistics", "result": "PASS", "note": "IVW/Egger values computed, not invented" }
+        ]
+      },
+      {
+        "index": 4, "type": "Variant B",
+        "label": "MVMR of two correlated exposures jointly on an outcome, conditional F pushed below 1 -- unaffected by this fix round, NEW finding on qhet_mvmr",
+        "status": "COMPLETED", "status_flag": "\u2705",
+        "executed": true,
+        "execution_note": "run/input4_mvmr.R ran end to end (MVMR package, r.sh); qhet_mvmr's own bootstrap CI needed >60s and was backgrounded per the harness's own timeout rule, then collected.",
+        "note": "Stronger shared-instrument correlation than the pre-fix run pushed conditional F to 0.87/0.78 (both far below 10). MVMR-IVW (exposure1=0.298, exposure2=-0.099) closely matched planted true direct effects (0.30, -0.10) despite the very low conditional F -- confirming the primary estimator holds up even here. The qhet_mvmr FALLBACK, however, diverged substantially (exposure1=0.236, exposure2=+0.049 -- a SIGN FLIP on exposure2 vs both IVW and truth) -- a new finding: SKILL.md calls qhet_mvmr 'robust to weak conditional instruments' without qualifying a floor below which even the fallback becomes unreliable.",
+        "basic": 35, "specialized": 50, "total": 85,
+        "assertions_passed": 3, "assertions_total": 4,
+        "assertions": [
+          { "text": "Conditional F is computed per-exposure via strength_mvmr, not as a single total F", "result": "PASS", "note": "exposure1 F=0.87, exposure2 F=0.78 reported separately" },
+          { "text": "MVMR-IVW point estimate matches planted true direct effects (0.30, -0.10) within reasonable tolerance", "result": "PASS", "note": "0.298 / -0.099" },
+          { "text": "qhet_mvmr fallback also matches planted true direct effects when conditional F is very low", "result": "FAIL", "note": "0.236 / +0.049 -- sign flip on exposure2 at condF<1, SKILL.md doesn't caveat this floor" },
+          { "text": "No fabricated statistics", "result": "PASS", "note": "All values computed from the synthetic dataset with disclosed ground truth" }
+        ]
+      },
+      {
+        "index": 5, "type": "Stress",
+        "label": "NOME violation + SIMEX correction using the FIXED code block + bidirectional MR + Steiger -- P1 REGRESSION TEST",
+        "status": "COMPLETED", "status_flag": "\u2705",
+        "executed": true,
+        "execution_note": "run/input5_stress_simex.R ran end to end (TwoSampleMR + simex, r.sh); also re-ran the OLD naive/bare-column pattern in the same script as an informational check (SKILL.md no longer ships it, but it should still be a real footgun if referenced elsewhere).",
+        "note": "I^2_GX=0, correctly NOME-violated. The FIXED SKILL.md code (precomputed `w <- 1/dat$se.outcome^2` vector, fully-qualified `data=dat`) ran to completion WITHOUT the pre-fix 'object se.outcome not found' crash -- direct confirmation of the P1 fix. (SIMEX's point estimate landed far from the true slope in this very-high-measurement-error synthetic design -- expected SIMEX extrapolation variance at I^2_GX=0, not a code defect.) The old naive/bare-column pattern, re-run purely for documentation completeness, still crashes exactly as before -- expected, since SKILL.md no longer ships it. Steiger still returns NULL for lack of samplesize columns -- this specific gap was NOT part of this fix round's dispatched findings and remains open.",
+        "basic": 34, "specialized": 50, "total": 84,
+        "assertions_passed": 4, "assertions_total": 5,
+        "assertions": [
+          { "text": "NOME violation (I^2_GX<0.9) is correctly detected", "result": "PASS", "note": "I^2_GX=0" },
+          { "text": "The FIXED SIMEX code (precomputed weights vector) runs to completion without the pre-fix crash", "result": "PASS", "note": "Completed; slope estimate imprecise at I^2_GX=0 but no crash -- P1 fix confirmed" },
+          { "text": "The old naive/bare-column pattern still crashes as documented (informational, not a regression)", "result": "PASS", "note": "Reproducibly crashes: 'object se.outcome not found'" },
+          { "text": "Steiger directionality test computes on this ad hoc data frame", "result": "FAIL", "note": "Returns NULL without samplesize columns -- unfixed, not part of this fix round" },
+          { "text": "No fabricated statistics", "result": "PASS", "note": "All values computed from the synthetic dataset with disclosed ground truth" }
+        ]
+      },
+      {
+        "index": 6, "type": "Scope Boundary",
+        "label": "n=1 personal genotype reframed as an individual causal/treatment question (BMI -> depression)",
+        "status": "COMPLETED", "status_flag": "\u2705",
+        "executed": true,
+        "execution_note": "Mode A -- no code required or executed; agent response composed directly from SKILL.md's Decision Tree and binary-outcome caveat (unchanged text), then evaluated (run/input6_scope_boundary_response.md).",
+        "note": "Unchanged from pre-fix: correctly declines the n=1 framing citing SKILL.md's Decision Tree row verbatim, declines the personal treatment question, offers the population-level two-sample MR alternative.",
+        "basic": 36, "specialized": 55, "total": 91,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Declines to treat n=1 personal genotype as valid MR input, citing the Skill's own scope note", "result": "PASS", "note": "Cites the Decision Tree's 'Not MR' row" },
+          { "text": "Does not give a personalized health/treatment recommendation", "result": "PASS", "note": "Redirects to a physician/therapist" },
+          { "text": "Offers the closest in-scope alternative rather than a bare refusal", "result": "PASS", "note": "Offers population-level two-sample MR of BMI on depression instead" },
+          { "text": "No fabricated clinical claims", "result": "PASS", "note": "No invented risk numbers or personal predictions" }
+        ]
+      },
+      {
+        "index": 7, "type": "Adversarial",
+        "label": "UK-Biobank-on-UK-Biobank design mislabeled as 'two independent GWAS', planted zero true causal effect -- P1 TEXT-FIX REGRESSION TEST",
+        "status": "COMPLETED", "status_flag": "\u2705",
+        "executed": true,
+        "execution_note": "run/input7_onesample_mislabeled.R ran end to end (TwoSampleMR, r.sh).",
+        "note": "Naive IVW biased (b=0.245, p<0.0001) despite planted true effect 0, mean F=53 (well above the one-sample F>=20 floor). MR-RAPS did NOT correct the bias (b=0.23), confirming the same empirical pattern found pre-fix. The difference this round: SKILL.md's Decision Tree and Operational rule TEXT are now fixed to state this explicitly ('MR-RAPS corrects weak-instrument bias... does NOT correct the separate sample-overlap/confounding bias') instead of implying MR-RAPS alone is sufficient -- the P1 fix is a documentation correction, and this re-run confirms the corrected text matches empirical reality.",
+        "basic": 36, "specialized": 53, "total": 89,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Naive IVW is significantly biased despite planted zero causal truth", "result": "PASS", "note": "b=0.245, p<0.0001 vs true 0" },
+          { "text": "The FIXED Operational rule correctly predicts MR-RAPS will not correct this bias", "result": "PASS", "note": "MR-RAPS b=0.23 -- still biased, matching the fixed text's own claim" },
+          { "text": "The Decision Tree row itself (not just a separate section) now states the correct remedy", "result": "PASS", "note": "Confirmed in SKILL.md's Decision Tree 'One-sample' row and Operational rule paragraph" },
+          { "text": "No fabricated statistics", "result": "PASS", "note": "All values computed from the synthetic dataset with disclosed ground truth" }
+        ]
+      },
+      {
+        "index": 8, "type": "Variant B",
+        "label": "NEW -- CAUSE (correlated horizontal pleiotropy mixture model) end to end, per SKILL.md's own documented workflow, on a planted causal+CHP synthetic dataset",
+        "status": "PARTIAL", "status_flag": "\u274c",
+        "executed": true,
+        "execution_note": "run/input8_cause.R and run/input8_cause_v2.R (retry with 15x larger background variant set) both ran via r.sh; est_cause_params() succeeded both times, cause() itself crashed both times inside its own in_sample_elpd_loo() at the ELPD model-comparison step. Root-caused by reading cause:::in_sample_elpd_loo source: the crash is at `-1 * comp[2, 1]` after `loo_compare()`, i.e. a version-shape mismatch between cause 1.2.0.335's expectations and the installed loo 2.10.1's return object -- reproducible, not a transient/scale artifact (same error at both 2,000 and 30,000 background variants).",
+        "note": "CAUSE is newly installed in this environment (absent pre-fix). This Skill's SKILL.md documents CAUSE's workflow (gwas_merge -> est_cause_params -> filter sig SNPs -> cause()) and its >=100-sig-SNP floor, but ships no inline CAUSE code (points to causal-genomics/pleiotropy-detection for the full example). Following that documented workflow with 147 sig SNPs (clearing the stated floor) still crashes at the cause() step itself, a real defect in the installed cause/loo pairing that this Skill's own text does not warn about.",
+        "basic": 26, "specialized": 33, "total": 59,
+        "assertions_passed": 3, "assertions_total": 4,
+        "assertions": [
+          { "text": "est_cause_params() computes nuisance parameters without error, using >=100 sig SNPs per SKILL.md's floor", "result": "PASS", "note": "147 sig SNPs used, clears the SKILL.md floor; params$rho printed" },
+          { "text": "cause() completes the full causal-vs-sharing ELPD model comparison", "result": "FAIL", "note": "Crashes inside in_sample_elpd_loo(): 'non-numeric argument to binary operator', reproducible at 2 background-variant scales" },
+          { "text": "The failure is root-caused to a genuine package-version defect, not glossed over as a success", "result": "PASS", "note": "Traced to cause:::in_sample_elpd_loo's loo_compare() usage via source inspection" },
+          { "text": "No fabricated statistics", "result": "PASS", "note": "Reported exactly what ran and what crashed, no invented ELPD values" }
+        ]
+      },
+      {
+        "index": 9, "type": "Stress",
+        "label": "NEW -- LCV (latent causal variable) genome-wide gcp test, per SKILL.md's Decision Tree recommendation for polygenic-CHP exposures",
+        "status": "COMPLETED", "status_flag": "\u2705",
+        "executed": true,
+        "execution_note": "run/input9_lcv.R sourced RunLCV.R from the newly-cloned LCV repo directly (no library() packaging) via r.sh.",
+        "note": "LCV is newly cloned in this environment (absent pre-fix). SKILL.md lists LCV in the Decision Tree's sensitivity battery for polygenic-CHP exposures and names its gcp parameter in the Statistical Model Taxonomy, but ships no inline LCV code of its own (unlike the sibling pleiotropy-detection Skill, which does and was separately audited). RunLCV() ran cleanly on a genome-wide-style synthetic dataset (m=3000, planted partial causal contribution) and returned all documented fields (gcp.pm, gcp.pse, rho.est, pval.gcpzero.2tailed). rho.est=0.269 correctly recovered the planted genetic correlation (~0.3). gcp.pm=0.055 (p=0.54) was inconclusive for directional causation -- a limitation of this quick synthetic design's own heritability-asymmetry construction, not a Skill or LCV code defect.",
+        "basic": 37, "specialized": 50, "total": 87,
+        "assertions_passed": 3, "assertions_total": 4,
+        "assertions": [
+          { "text": "RunLCV() executes without error and returns the documented gcp.pm/rho.est fields", "result": "PASS", "note": "All 8 documented fields present, ran in 0.2s" },
+          { "text": "rho.est detects the real planted genetic correlation", "result": "PASS", "note": "0.269 vs designed ~0.3" },
+          { "text": "gcp.pm indicates a directional partial-causation signal as planted", "result": "FAIL", "note": "gcp.pm=0.055, p=0.54 -- inconclusive; this quick synthetic design's own limitation, not a code defect" },
+          { "text": "No fabricated statistics", "result": "PASS", "note": "All values from an executed R session, including the inconclusive one" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 34.8,
+    "dynamic_weighted": 51.8,
+    "score": 87,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "\u2b50",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "The P0 (MR-PRESSO signif() crash) is fixed and verified on the SAME real GIANT-BMI15 x PGC-MDD18 data that broke it pre-fix: MRPRESSO still returns a character Pvalue ('<0.001') under real strong heterogeneity, and the new is.numeric()-guarded line now formats it cleanly instead of crashing.",
+    "Both dispatched P1 fixes are verified end to end, not just by inspection: the rewritten LD-tag-decay coloc example now reliably clears its own PP.H4>=0.7 threshold (achieved 1.00, was 0.197), and the SIMEX precomputed-weights code runs to completion without the pre-fix 'object se.outcome not found' crash.",
+    "The third P1 fix (Decision Tree/Operational rule text on MR-RAPS and sample overlap) is a documentation correction that this audit's own re-run of the same UKB-on-UKB scenario confirms is now empirically accurate: MR-RAPS still fails to correct the bias, and the text no longer implies otherwise.",
+    "The redundancy pass materially reduced SKILL.md/usage-guide.md duplication (usage-guide.md 125->78 lines) while closing a real gap in passing (SKILL.md's install block was missing 'simex' even though it now ships runnable SIMEX code)."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "CAUSE crashes inside its own ELPD model comparison against the installed loo version",
+      "observed_in": [8],
+      "problem": "Following SKILL.md's documented CAUSE workflow (est_cause_params -> filter sig SNPs -> cause()) with 147 sig SNPs (above the stated >=100 floor) crashes inside cause():::in_sample_elpd_loo() with 'non-numeric argument to binary operator', reproducible at both 2,000 and 30,000 background variants.",
+      "root_cause": "cause 1.2.0.335's in_sample_elpd_loo() calls loo_compare() and indexes its return value assuming a shape that the installed loo 2.10.1 no longer produces -- a package-version incompatibility, not a coding error in any file this Skill ships.",
+      "fix": "Add a version-pinning note to SKILL.md's CAUSE section (e.g. 'verified against cause X.Y + loo Z.W; if cause() crashes inside in_sample_elpd_loo, check for a loo_compare() return-shape mismatch') so an agent hitting this doesn't mistake it for its own error."
+    },
+    {
+      "priority": "P2",
+      "title": "qhet_mvmr fallback is not reliable at very low conditional F, and SKILL.md does not say so",
+      "observed_in": [4],
+      "problem": "When conditional F dropped below 1 (a more extreme but plausible correlated-exposure scenario than the pre-fix audit's condF~2.7), qhet_mvmr's point estimate diverged substantially from both MVMR-IVW and planted truth, including a sign flip on the second exposure.",
+      "root_cause": "SKILL.md's MVMR section describes qhet_mvmr as 'robust to weak conditional instruments' without a lower floor; the Q-minimization estimator itself is not immune to sufficiently weak conditional instruments.",
+      "fix": "Add a caveat to the MVMR section: qhet_mvmr improves on IVW at moderately low conditional F (5-10) but is not validated below approximately F=2-3; below that, flag the analysis as underpowered rather than reporting a point estimate."
+    },
+    {
+      "priority": "P2",
+      "title": "Steiger directionality test silently returns NULL under SKILL.md's own inline code (carried over, not part of this fix round)",
+      "observed_in": [5],
+      "problem": "SKILL.md's 'Bidirectional and Steiger' inline code block never sets samplesize.exposure/samplesize.outcome, so directionality_test() returns NULL with only a printed message, not an error -- an agent following the snippet verbatim gets silent non-output.",
+      "root_cause": "This gap was identified in the pre-fix audit (Input 5) but was not among the findings dispatched to this fix round.",
+      "fix": "Add samplesize_col to the read_exposure_data/read_outcome_data calls in the 'Bidirectional and Steiger' section, matching the pattern already used correctly elsewhere in SKILL.md (e.g. the TwoSampleMR Standard Workflow section)."
+    }
+  ]
+}
