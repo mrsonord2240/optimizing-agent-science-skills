@@ -3,6 +3,7 @@ name: bio-epidemiological-genomics-transmission-inference
 description: Infers person-to-person transmission from pathogen genomes using outbreaker2, TransPhylo, phybreak, BadTrIP, SCOTTI, BEASTLIER, and SNP-distance / cluster-picker approaches (HIV-TRACE for HIV; transcluster). Defines outbreak clusters using pathogen-specific SNP thresholds (NOT a universal cutoff -- TB <=12 SNPs; MRSA <=15; C. difficile <=2; Klebsiella <=21), models within-host diversity and transmission bottlenecks, integrates contact-tracing data, distinguishes generation from serial interval, and attributes source via Bayesian source attribution (islandR). Use when investigating outbreaks for who-infected-whom, defining SNP-cluster outbreak definitions, accounting for unsampled intermediates, choosing between outbreaker2 (rich epi data) and TransPhylo (genomic-only after a dated phylogeny), running source attribution between host populations, calling HIV-TRACE thresholds appropriate to the local subtype, or distinguishing recent transmission from reactivation in TB or chronic HIV.
 tool_type: mixed
 primary_tool: TransPhylo
+license: MIT
 ---
 
 ## Version Compatibility

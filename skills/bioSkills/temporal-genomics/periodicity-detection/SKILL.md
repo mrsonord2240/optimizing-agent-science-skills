@@ -3,6 +3,7 @@ name: bio-temporal-genomics-periodicity-detection
 description: Discovers a periodic signal of UNKNOWN period in time-series omics data and puts a defensible significance on it, especially when sampling is IRREGULAR (dropped timepoints, pooled harvests) so FFT/Welch/JTK are invalid. Estimates the dominant period with Lomb-Scargle / generalized Lomb-Scargle (scipy, astropy), corroborates with autocorrelation, resolves transient/time-varying periodicity with the wavelet CWT (pywt), and screens genome-wide with false-alarm probabilities under BH FDR. Use when finding an oscillation whose period is not known a priori, analyzing cell-cycle or ultradian rhythms, or handling unevenly sampled time courses. Not for testing a KNOWN 24-hour rhythm (see temporal-genomics/circadian-rhythms).
 tool_type: python
 primary_tool: scipy
+license: MIT
 ---
 
 ## Version Compatibility

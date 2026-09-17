@@ -3,6 +3,7 @@ name: bio-longitudinal-monitoring
 description: Tracks ctDNA across serial liquid-biopsy timepoints for molecular residual disease (MRD) and treatment-response monitoring, treating MRD as a binary integrated detection call across the patient's full variant set (with a defined LoD95 and per-sample specificity) rather than a per-timepoint VAF threshold, and handling undetectable samples as left-censored at the per-sample limit of detection rather than true zeros. Covers tumor-informed bespoke vs tumor-naive design, landmark vs surveillance sampling, molecular-response definitions and their non-standardization, censoring-aware clearance kinetics, and the multiple-testing structure of repeated surveillance. Use when monitoring ctDNA during therapy, calling molecular relapse before imaging, or estimating clearance half-life from serial samples.
 tool_type: python
 primary_tool: pandas
+license: MIT
 ---
 
 ## Version Compatibility

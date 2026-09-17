@@ -3,6 +3,7 @@ name: bio-batch-processing
 description: Process many sequence files in batch (count, merge, split, convert, summarize) with memory-safe streaming and on-disk indexing using Biopython, pysam, or pyfastx. Use when iterating over a directory of FASTA/FASTQ files, merging or splitting datasets, building random access across many or huge files, or automating per-file operations without exhausting RAM.
 tool_type: python
 primary_tool: Bio.SeqIO
+license: MIT
 ---
 
 ## Version Compatibility

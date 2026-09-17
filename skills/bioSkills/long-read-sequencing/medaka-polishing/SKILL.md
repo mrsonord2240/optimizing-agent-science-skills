@@ -3,6 +3,7 @@ name: bio-long-read-sequencing-medaka-polishing
 description: Polishes Oxford Nanopore draft assemblies to higher consensus accuracy with medaka, a basecaller-model-specific neural consensus net, produces haploid variant calls (VCF) for microbial, mitochondrial, or viral samples, and generates amplicon/viral consensus sequences. Covers the model-matching footgun that silently degrades output, why Racon-first is obsolete and medaka runs directly on Flye output as a single pass, why HiFi must never be fed to medaka, the v1->v2 subcommand renames, and the precise medaka_variant deprecation. Use when polishing an ONT-only assembly, generating an amplicon/viral consensus, calling a haploid ONT consensus, or deciding whether medaka, dorado polish, or Clair3 is the right tool.
 tool_type: cli
 primary_tool: medaka
+license: MIT
 ---
 
 ## Version Compatibility

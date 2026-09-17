@@ -16,6 +16,7 @@ qc_checkpoints:
   - after_qc: "Replicate Spearman >=0.85 IP-IP (10kb bins); plotFingerprint IP-vs-input JS >=0.5"
   - after_peaks: "DRACH enrichment P-value <1e-50 on the peak SET (sanity check, never a per-peak filter)"
   - after_metagene: "Guitar metagene shows the stop-codon/3'UTR-proximal peak; else STOP (IP failure)"
+license: MIT
 ---
 
 ## Version Compatibility

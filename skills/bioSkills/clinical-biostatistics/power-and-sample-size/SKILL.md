@@ -4,6 +4,7 @@ description: Computes sample size and power for clinical trials including contin
 tool_type: mixed
 primary_tool: statsmodels
 goal_approach_exempt: true
+license: MIT
 ---
 
 ## Version Compatibility

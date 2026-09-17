@@ -3,6 +3,7 @@ name: bio-structural-biology-binding-site-detection
 description: Detects putative ligand-binding pockets and druggable cavities de novo on an apo protein structure with fpocket, P2Rank, CASTp, and DoGSiteScorer, ranking them by druggability/ligandability score. Use when detecting cavities on an apo structure with no bound ligand; choosing geometric pocket enumeration (fpocket alpha-spheres, CASTp) vs ML ligandability scoring (P2Rank, DoGSiteScorer); recognizing that a geometric cavity is a hypothesis, not automatically a functional or druggable site (may be a crystal-additive or non-functional cleft); knowing druggability scores were trained on holo sets and under-detect apo, shallow, and cryptic pockets; detecting cryptic or transient pockets over an MD or conformational ensemble (mdpocket); and detecting on a predicted model whose pocket-lining rotamers are the least reliable atoms. Keywords binding site, pocket, cavity, druggability, ligandability, fpocket, P2Rank, CASTp, DoGSiteScorer, apo, cryptic pocket, alpha sphere, mdpocket.
 tool_type: mixed
 primary_tool: fpocket
+license: MIT
 ---
 
 ## Version Compatibility

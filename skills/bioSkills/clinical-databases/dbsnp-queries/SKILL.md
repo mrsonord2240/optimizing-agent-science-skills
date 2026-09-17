@@ -3,6 +3,7 @@ name: bio-clinical-databases-dbsnp-queries
 description: Resolves rsIDs, navigates RsMergeArch/SNPHistory merge chains, and converts between rsID, SPDI, HGVS, and VCF representations using the dbSNP Build 156 JSON architecture. Use when normalizing variant identifiers, joining variant databases by cluster ID, or tracking deprecated rsIDs through historical merges.
 tool_type: python
 primary_tool: myvariant
+license: MIT
 ---
 
 ## Version Compatibility

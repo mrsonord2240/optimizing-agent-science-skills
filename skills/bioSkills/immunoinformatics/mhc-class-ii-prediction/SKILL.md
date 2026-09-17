@@ -3,6 +3,7 @@ name: bio-immunoinformatics-mhc-class-ii-prediction
 description: Predict peptide-MHC class II (HLA-DR/DQ/DP) binding and presentation for CD4 T-cell epitopes with NetMHCIIpan-4.3 and MixMHC2pred-2.0. Covers why class II is far less reliable than class I (open binding groove, 9-mer register ambiguity, sparse noisy training data, DR>DP>DQ accuracy asymmetry), the DQ/DP heterodimer alpha/beta pairing trap, and the looser 1%/5% %Rank thresholds. Use when predicting CD4 epitopes for vaccine help, mapping class II neoantigens, or scoring long peptides against DR/DQ/DP. For CD8/class I see mhc-binding-prediction.
 tool_type: cli
 primary_tool: NetMHCIIpan
+license: MIT
 ---
 
 ## Version Compatibility

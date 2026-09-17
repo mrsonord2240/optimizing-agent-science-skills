@@ -3,6 +3,7 @@ name: bio-atac-seq-footprinting
 description: Detect transcription factor binding footprints in ATAC-seq using TOBIAS, HINT-ATAC, Wellington, or scprinter. Use when identifying bound TF sites within accessible regions, correcting Tn5 insertion bias before footprinting, choosing between cleavage-based and aggregate-based footprinters, or comparing differential TF activity between conditions.
 tool_type: cli
 primary_tool: tobias
+license: MIT
 ---
 
 ## Version Compatibility

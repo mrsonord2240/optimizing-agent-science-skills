@@ -3,6 +3,7 @@ name: bio-data-visualization-heatmaps-clustering
 description: Build clustered heatmaps for expression matrices and other features-by-samples data with rigorous distance/linkage/scaling choices, robust color mapping, optimal leaf ordering, and ComplexHeatmap/pheatmap/seaborn rendering. Covers the ward.D vs ward.D2 trap, the row-vs-column scaling decision, multi-track annotations, oncoPrint, and raster rendering for large matrices. Use when visualizing expression patterns across samples or identifying co-regulated clusters.
 tool_type: mixed
 primary_tool: ComplexHeatmap
+license: MIT
 ---
 
 ## Version Compatibility

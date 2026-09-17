@@ -3,6 +3,7 @@ name: bio-uniprot-access
 description: Query UniProt's REST API (post-2022 endpoint at rest.uniprot.org) for protein sequences, annotations, GO terms, cross-references, ID mappings, and proteomes. Use when fetching UniProtKB entries, navigating the JSON schema, choosing between UniProtKB/UniRef/UniParc/Proteomes resources, deciding stream vs search endpoint for batch retrieval, running ID-mapping jobs with the async pattern, handling isoform suffixes, or filtering reviewed Swiss-Prot vs auto-annotated TrEMBL. Encodes the legacy URL migration (2022), the new JSON schema layout, and bulk-pull patterns.
 tool_type: python
 primary_tool: requests
+license: MIT
 ---
 
 ## Version Compatibility

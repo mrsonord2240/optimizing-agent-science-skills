@@ -3,6 +3,7 @@ name: bio-metagenomics-kraken
 description: Classifies shotgun metagenomic reads to taxa with Kraken2's minimizer/LCA matching against a chosen reference database, then hands off to Bracken for abundance re-estimation. Covers why the database (not the algorithm) decides what can be detected, the --confidence and --minimum-hit-groups precision levers, unique-minimizer false-positive control, host-read removal, and why raw Kraken2 read counts are not abundances. Use when profiling who-is-there from shotgun reads, choosing a Kraken2 database, setting a confidence threshold, controlling false positives, or feeding reports to Bracken. For marker-gene profiling see metaphlan-profiling; for abundance mechanics see abundance-estimation; for assembly/MAG recovery see genome-assembly/metagenome-assembly.
 tool_type: cli
 primary_tool: Kraken2
+license: MIT
 ---
 
 ## Version Compatibility

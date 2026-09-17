@@ -14,6 +14,7 @@ qc_checkpoints:
   - after_cv: "Selection inside the CV pipeline; AUC reported with fold spread; AUPRC/MCC if imbalanced"
   - after_interpretation: "SHAP used as a shortcut/batch audit, aggregated over modules, not as the validated panel"
   - after_validation: "Hold-out AUC with bootstrap CI plus calibration (Brier); external cohort for the real bar"
+license: MIT
 ---
 
 ## Version Compatibility

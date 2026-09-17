@@ -3,6 +3,7 @@ name: bio-long-read-sequencing-clair3-variants
 description: Calls germline small variants (SNPs and indels) from Oxford Nanopore and PacBio HiFi long reads with Clair3, a two-stage (pileup + full-alignment) deep-learning caller, selecting the chemistry- and basecaller-version-matched model, enabling read-based phasing, and benchmarking against GIAB with stratification. Covers why the model string is the experiment (no auto-detection, silent degradation on mismatch), why ONT homopolymer/STR indels are the residual error whole-genome F1 hides, and the somatic/trio/RNA boundary to the ClairS/Clair3-Trio family. Use when calling germline SNVs/indels from ONT or HiFi BAMs, choosing a Clair3 model, phasing variants, or benchmarking long-read calls.
 tool_type: cli
 primary_tool: Clair3
+license: MIT
 ---
 
 ## Version Compatibility

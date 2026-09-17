@@ -3,6 +3,7 @@ name: bio-methylation-differential-cpg
 description: Tests individual CpG sites for differential methylation (DMC/DMP) from bisulfite sequencing counts or array/continuous beta-value matrices. Covers the count-vs-continuous fork that dictates the model, beta-value vs M-value logit (Du 2010), beta-binomial overdispersion count models (DSS, methylKit, MOABS, RADMeth) for sequencing, limma moderated-t on M-values (eBayes trend/robust) for arrays, the bare-beta Welch t-test caveat, coverage-as-precision coupling, delta-beta effect size, BH-FDR with the neighboring-CpG dependence problem, EWAS genome-wide thresholds, and differential variability (DiffVar/iEVORA). Use when comparing per-CpG methylation between groups from WGBS/RRBS/targeted bisulfite or 450K/EPIC arrays, choosing a per-site test, or scanning for variance (not just mean) differences. For region-level aggregation see dmr-detection; for covariate/cell-fraction strategy and genomic inflation see ewas-design.
 tool_type: mixed
 primary_tool: limma
+license: MIT
 ---
 
 ## Version Compatibility

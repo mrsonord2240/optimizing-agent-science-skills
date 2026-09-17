@@ -4,6 +4,7 @@ description: Modifies protein structures in place with Biopython Bio.PDB - trans
 tool_type: python
 primary_tool: Bio.PDB
 goal_approach_exempt: true
+license: MIT
 ---
 
 ## Version Compatibility

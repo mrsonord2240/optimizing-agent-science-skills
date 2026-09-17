@@ -3,6 +3,7 @@ name: bio-epitranscriptomics-modification-visualization
 description: Visualises RNA-modification data with transcript-feature metagene plots (Guitar GuitarPlot; MetaPlotR; deepTools computeMatrix scale-regions), peak-centred heatmaps (ComplexHeatmap; deepTools plotHeatmap), IP-vs-input paired browser tracks (log2 IP/input bigWig via deepTools bamCompare; pyGenomeTracks; Gviz; IGV/UCSC track hubs), DRACH sequence-logo plots (ggseqlogo; MEME), feature-distribution stacked bars, and volcano/MA plots for differential modification. Establishes stop-codon enrichment in the metagene plot as the biological QC anchor for any MeRIP dataset (Dominissini 2012; Meyer 2012). Use when producing the canonical metagene plot with stop-codon enrichment as a QC anchor, building paired IP/input genome-browser tracks at single-locus resolution, plotting peak-centred heatmaps clustered by condition, summarising peak distribution across transcript features, generating DRACH motif logos as sanity checks, rendering volcano plots of differential m6A, or reproducing the stop-codon enrichment plot.
 tool_type: mixed
 primary_tool: Guitar
+license: MIT
 ---
 
 ## Version Compatibility

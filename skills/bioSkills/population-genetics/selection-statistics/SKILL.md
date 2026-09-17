@@ -3,6 +3,7 @@ name: bio-population-genetics-selection-statistics
 description: Scans genomes for natural selection with SFS tests (Tajima's D, Fay & Wu H, Zeng E, SweepFinder2 CLR), haplotype tests (iHS, nSL, XP-EHH, Rsb, H12), and differentiation (FST, PBS) using scikit-allel, selscan, and SweepFinder2. No single statistic separates selection from demography at one locus, so the deliverable is empirical genome-wide outliers plus multiple orthogonal signals, not an absolute cutoff. iHS detects incomplete sweeps and collapses to zero at fixation while XP-EHH catches fixed sweeps; iHS/nSL standardize within derived-allele-frequency bins but XP-EHH gets a genome-wide z-score; derived-allele tests need substitution-model polarization; background selection mimics FST and CLR. Use when computing selection statistics like FST, Tajima's D, iHS, or XP-EHH, or scanning for selective sweeps. For phasing inputs see phasing-imputation/haplotype-phasing; for dN/dS see comparative-genomics/positive-selection.
 tool_type: mixed
 primary_tool: scikit-allel
+license: MIT
 ---
 
 ## Version Compatibility

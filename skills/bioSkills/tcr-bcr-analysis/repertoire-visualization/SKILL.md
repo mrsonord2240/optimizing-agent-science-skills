@@ -4,6 +4,7 @@ description: Draws TCR/BCR repertoire figures - V-J chord/circos, CDR3 spectraty
 tool_type: mixed
 primary_tool: VDJtools
 goal_approach_exempt: true
+license: MIT
 ---
 
 ## Version Compatibility

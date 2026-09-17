@@ -3,6 +3,7 @@ name: bio-methylation-based-detection
 description: Detects cancer and infers tissue-of-origin from cfDNA methylation by choosing conversion chemistry (bisulfite vs EM-seq vs TAPS vs cfMeDIP), calling read-level methylation haplotypes rather than averaged beta values, and deconvolving a hematopoietic-dominated cfDNA mixture against a methylation atlas via NNLS/quadratic programming. Encodes the GRAIL/CCGA thesis that thousands of tissue-specific markers make methylation outperform sparse mutations for multi-cancer early detection (MCED) and localization, and that single concordantly-methylated fragments give ppm-level sensitivity. Uses MethylDackel for extraction (mbias-then-extract), MEDIPS/QSEA for enrichment data, scipy.optimize.nnls for deconvolution. Use when building an MCED or methylation-MRD assay, picking a conversion chemistry for low-input plasma, or deconvolving tissue-of-origin from cfDNA.
 tool_type: mixed
 primary_tool: MethylDackel
+license: MIT
 ---
 
 ## Version Compatibility

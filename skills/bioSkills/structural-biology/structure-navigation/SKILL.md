@@ -4,6 +4,7 @@ description: Navigate the Bio.PDB SMCRA hierarchy (Structure-Model-Chain-Residue
 tool_type: python
 primary_tool: Bio.PDB
 goal_approach_exempt: true
+license: MIT
 ---
 
 ## Version Compatibility

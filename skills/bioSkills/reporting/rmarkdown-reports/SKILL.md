@@ -4,6 +4,7 @@ description: Creates reproducible R Markdown analysis reports (HTML, PDF, Word) 
 tool_type: r
 primary_tool: rmarkdown
 goal_approach_exempt: true
+license: MIT
 ---
 
 ## Version Compatibility

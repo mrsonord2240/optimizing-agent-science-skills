@@ -3,6 +3,7 @@ name: bio-structural-biology-alphafold-predictions
 description: Retrieves and interprets AlphaFold Protein Structure Database (AFDB) models by UniProt accession, reading pLDDT and PAE confidence correctly. Use when treating pLDDT as PER-RESIDUE confidence (not global accuracy) and recognizing a long low-pLDDT stretch as an intrinsically disordered region rather than a modeling error; reading PAE to segment confident domains and judge inter-domain/relative-position confidence that high mean pLDDT cannot certify; recognizing a static AFDB model carries NO ligands, ions, cofactors, PTMs, quaternary assembly, or alternative conformations (pLDDT sits in the B-factor column with opposite polarity to thermal motion); and deciding an AFDB entry vs re-running prediction. Keywords AlphaFold DB, pLDDT, PAE, B-factor column, intrinsic disorder, UniProt, Foldseek.
 tool_type: python
 primary_tool: requests
+license: MIT
 ---
 
 ## Version Compatibility

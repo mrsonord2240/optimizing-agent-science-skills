@@ -3,6 +3,7 @@ name: bio-sequence-statistics
 description: Calculate assembly and sequence statistics (N50/L50, auN, NG50/NGA50, length distribution, GC content with ambiguity handling, summary reports) using Biopython. Use when analyzing sequence datasets, generating QC reports, or comparing genome assemblies.
 tool_type: python
 primary_tool: Bio.SeqIO
+license: MIT
 ---
 
 ## Version Compatibility

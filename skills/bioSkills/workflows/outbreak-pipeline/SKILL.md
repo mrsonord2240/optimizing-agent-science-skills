@@ -15,6 +15,7 @@ qc_checkpoints:
   - after_amr: "AMR genes identified; AMRFinderPlus applies its curated per-gene thresholds (it does not use a flat 90% identity cutoff)"
   - after_phylodynamics: "Root-to-tip R2 >=0.3, clock rate plausible"
   - after_transmission: "Transmission pairs consistent with epi data"
+license: MIT
 ---
 
 ## Version Compatibility

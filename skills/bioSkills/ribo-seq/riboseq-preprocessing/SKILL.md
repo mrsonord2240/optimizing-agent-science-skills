@@ -3,6 +3,7 @@ name: bio-ribo-seq-riboseq-preprocessing
 description: Preprocess ribosome profiling reads with UMI handling, adapter trimming, contaminant/rRNA depletion, and footprint-aware alignment. Use when preparing Ribo-seq FASTQ for periodicity QC, ORF detection, translation efficiency, or stalling analysis, or when deciding how to deduplicate, which aligner to use, or how to size-select ribosome-protected fragments.
 tool_type: cli
 primary_tool: STAR
+license: MIT
 ---
 
 ## Version Compatibility

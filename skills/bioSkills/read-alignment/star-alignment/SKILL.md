@@ -3,6 +3,7 @@ name: bio-read-alignment-star-alignment
 description: Aligns RNA-seq reads to a genome with STAR, the fast splice-aware aligner whose splice-junction database (built from a GTF at sjdbOverhang = readlength-1) and two-pass mode set junction sensitivity, whose 255-for-unique MAPQ breaks GATK, and whose GeneCounts output reveals library strandedness. Use when RNA reads must be placed on the genome for novel-isoform discovery, fusion detection, RNA variant calling, coverage tracks, splicing QC, or single-cell (STARsolo). Memory-constrained RNA alignment is hisat2-alignment; DE on known transcripts only should skip alignment for rna-quantification/alignment-free-quant; the QC gate and contig-naming reconciliation are alignment-files; counting is rna-quantification; DNA is bwa-alignment/bowtie2-alignment.
 tool_type: cli
 primary_tool: STAR
+license: MIT
 ---
 
 ## Version Compatibility

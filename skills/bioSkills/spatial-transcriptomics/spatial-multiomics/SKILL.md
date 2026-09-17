@@ -3,6 +3,7 @@ name: bio-spatial-transcriptomics-spatial-multiomics
 description: Integrates spatial RNA with a second modality (protein, ATAC, or histone marks) on spatial CITE-seq, DBiT-seq, spatial-ATAC, or Visium CytAssist data. Use when deciding vertical (same-pixel co-profiling -> WNN/MOFA joint factors) versus diagonal (serial adjacent sections -> registration via PASTE/STalign) integration; recognizing that modalities from serial sections are DIFFERENT cells so joint same-cell methods do not apply; handling a bounded antibody/feature panel where absence is uninformative; or treating a pixel/spot as a multi-cell mixture rather than a single cell.
 tool_type: python
 primary_tool: muon
+license: MIT
 ---
 
 ## Version Compatibility

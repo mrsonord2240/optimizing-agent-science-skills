@@ -19,6 +19,7 @@ qc_checkpoints:
   - after_imputation: "INFO/R2 or DR2 filtered (MAF-stratified), cases+controls imputed together, dosages carried forward"
   - after_structure: "No population stratification bias"
   - after_association: "Lambda ~1.0, expected QQ plot"
+license: MIT
 ---
 
 ## Version Compatibility

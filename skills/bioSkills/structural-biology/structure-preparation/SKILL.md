@@ -3,6 +3,7 @@ name: bio-structural-biology-structure-preparation
 description: Prepares a deposited or predicted structure for docking, molecular dynamics, or electrostatics by adding hydrogens, assigning protonation and tautomer states, and filling missing atoms and short loops with PDBFixer, reduce, PROPKA, and PDB2PQR. Use when adding hydrogens an X-ray model never resolved; assigning His HID/HIE/HIP tautomers, Asn/Gln/His 180-degree flips, and Cys/Lys/Asp/Glu pKa-shifted protonation at a stated pH and microenvironment rather than trusting standard pKa 7; filling missing side-chain atoms and modeling short missing loops as disorder hypotheses; making a receptor docking- or MD-ready and recording what was built; preparing a predicted model after trimming low-pLDDT regions; and writing a PQR for Poisson-Boltzmann electrostatics. Keywords PDBFixer, reduce, PROPKA, PDB2PQR, protonation, tautomer, missing atoms, hydrogens, pKa, docking prep, MD prep.
 tool_type: python
 primary_tool: PDBFixer
+license: MIT
 ---
 
 ## Version Compatibility

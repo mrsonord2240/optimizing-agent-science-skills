@@ -3,6 +3,7 @@ name: bio-transcription-translation
 description: Transcribe DNA to RNA and translate to protein using Biopython, with NCBI codon-table selection, CDS validation, and six-frame ORF finding. Use when converting a CDS or ORF to its amino-acid sequence, selecting a non-standard (mitochondrial, bacterial, ciliate) genetic code, validating a coding sequence, or scanning all reading frames.
 tool_type: python
 primary_tool: Bio.Seq
+license: MIT
 ---
 
 ## Version Compatibility

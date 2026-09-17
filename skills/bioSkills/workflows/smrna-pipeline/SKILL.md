@@ -16,6 +16,7 @@ qc_checkpoints:
   - after_quant: "RNA-class composition checked (miRNA vs tRF/rRF/piRNA); abundant non-miRNA = different story"
   - before_de: "RAW counts confirmed (not RPM); size factors inspected for compositional distortion"
   - after_de: "baseMean reported with every call (significant FC on a ~5-count miRNA is noise)"
+license: MIT
 ---
 
 ## Version Compatibility

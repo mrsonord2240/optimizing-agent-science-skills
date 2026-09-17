@@ -3,6 +3,7 @@ name: bio-small-rna-seq-trf-pirna-profiling
 description: Profiles non-miRNA small RNAs - tRNA-derived fragments (tRFs/tsRNAs), piRNAs, and rRNA/snoRNA-derived species - with MINTmap, unitas, SPORTS, and proTRAC. Use when annotating all small-RNA classes in a library; quantifying tRFs at locus resolution where tRNA loci are redundant (exclusive vs ambiguous); testing the piRNA ping-pong signature; deciding whether a species is a processed functional RNA or a degradation fragment; or judging whether the prep could even capture 5'-OH/cyclic-phosphate classes.
 tool_type: mixed
 primary_tool: MINTmap
+license: MIT
 ---
 
 ## Version Compatibility

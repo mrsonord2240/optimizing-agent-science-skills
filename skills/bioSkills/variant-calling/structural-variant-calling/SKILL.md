@@ -3,6 +3,7 @@ name: bio-variant-calling-structural-variant-calling
 description: Call structural variants (>=50 bp deletions, insertions, inversions, duplications, translocations) from short- or long-read data by reconstructing four orthogonal signals (discordant pairs, split reads via the SA tag, read depth, local assembly). Covers Manta, DELLY, LUMPY/smoove, GRIDSS2, SvABA for short reads and Sniffles2, cuteSV, pbsv, dipcall/PAV for long reads, each mapped to the signals it fuses and the blind spots that follow. Use when choosing an SV caller from its signal set and failure modes, decoding the SVLEN-sign / symbolic-vs-BND / CIPOS VCF representation minefield, force-genotyping a cohort matrix instead of unioning discovery VCFs, merging populations with sequence-aware Truvari vs position-only SURVIVOR, parameterizing a Truvari benchmark, or deciding when short-read insertion recall forces a switch to long reads. Not for pure copy-number dosage (see copy-number/cnvkit-analysis).
 tool_type: cli
 primary_tool: manta
+license: MIT
 ---
 
 ## Version Compatibility

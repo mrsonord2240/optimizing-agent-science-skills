@@ -3,6 +3,7 @@ name: bio-population-genetics-linkage-disequilibrium
 description: Computes linkage disequilibrium (r2, D', composite Rogers-Huff r2), prunes correlated variants, clumps GWAS summary statistics to lead SNPs, and defines haplotype blocks with PLINK 1.9/2.0 and scikit-allel. r2 and D' answer different questions - r2 (= chi2/N) is the tagging and GWAS-power currency, D' marks observed recombination and is upward-biased for rare variants. PLINK 2.0 has no bare --r2 (split into --r2-phased and --r2-unphased); pruning (--indep-pairwise, genotype-blind) and clumping (--clump, p-value-aware) are distinct operations that are constantly confused. The clumping or fine-mapping LD reference must be ancestry-matched or it fails silently into false credible sets. Use when calculating LD, pruning variants for PCA or structure, clumping GWAS hits, or selecting tag SNPs. For QC see plink-basics; for PCA see population-structure; fine-mapping is causal-genomics/fine-mapping.
 tool_type: mixed
 primary_tool: plink2
+license: MIT
 ---
 
 ## Version Compatibility

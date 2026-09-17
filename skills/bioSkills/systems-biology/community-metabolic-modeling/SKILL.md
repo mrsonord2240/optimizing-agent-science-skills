@@ -3,6 +3,7 @@ name: bio-systems-biology-community-metabolic-modeling
 description: Builds and simulates multi-species metabolic community models from member genome-scale models, using MICOM for abundance-weighted steady-state community FBA and cooperative tradeoff, SMETANA for cross-feeding and competition scoring, and SteadyCom/COMETS for common-growth-rate and dynamic simulation. Use when modeling a microbiome or co-culture, predicting cross-feeding and competition, abundance-weighting members from metagenomics, choosing steady-state vs dynamic community modeling, avoiding the compartment-pooling artifact, or judging how member-model quality and namespace propagate into community predictions.
 tool_type: python
 primary_tool: micom
+license: MIT
 ---
 
 ## Version Compatibility

@@ -3,6 +3,7 @@ name: bio-epidemiological-genomics-variant-surveillance
 description: Assigns pathogen lineages (SARS-CoV-2 Pangolin UShER mode; Nextclade clade + QC; pango-designation alias resolution) and tracks variant frequencies over time using Nextstrain (Augur + Auspice), wastewater deconvolution (Freyja, COJAC, alcov, lineagespot), lineage-fitness modelling (multinomial logistic), and recombinant detection (3SEQ, RDP4, Bolotie). Covers Pangolin pangolin-data and Nextclade dataset version pinning (mandatory; lineage-defining mutations change with dataset), Freyja barcode forward-only date constraint, ARTIC primer scheme churn (V3/V4/V4.1/V5.3.2/Midnight) with dropout regions, and recombinant X-prefix designation lag. Use when assigning Pango lineages and Nextclade clades to viral consensus sequences, building Nextstrain Augur surveillance pipelines, deconvolving wastewater into lineage frequencies with Freyja, tracking lineage frequencies over time, handling ARTIC primer dropouts, or running surveillance for SARS-CoV-2/influenza/Mpox/RSV/H5N1/measles.
 tool_type: mixed
 primary_tool: Pangolin
+license: MIT
 ---
 
 ## Version Compatibility

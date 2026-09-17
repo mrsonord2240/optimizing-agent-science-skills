@@ -4,6 +4,7 @@ description: Reads, writes, downloads, and converts macromolecular structures wi
 tool_type: python
 primary_tool: Bio.PDB
 goal_approach_exempt: true
+license: MIT
 ---
 
 ## Version Compatibility

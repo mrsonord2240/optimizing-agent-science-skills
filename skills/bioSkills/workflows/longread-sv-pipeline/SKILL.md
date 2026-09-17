@@ -14,6 +14,7 @@ qc_checkpoints:
   - after_alignment: "Mapping rate >90%, coverage >=15x for confident SV calling"
   - after_calling: "SV count in the expected range, INS/DEL ratio sane, genotypes concordant"
   - after_benchmark: "Truvari F1 reported WITH its refdist/pctsize/pctseq, on Tier 1 AND CMRG"
+license: MIT
 ---
 
 ## Version Compatibility

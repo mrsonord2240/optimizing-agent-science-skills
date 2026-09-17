@@ -3,6 +3,7 @@ name: bio-filter-sequences
 description: Filter and select sequences by criteria (length, ID, GC content, N content, motifs, patterns, description) using Biopython, streaming so large files never load into RAM. Use when subsetting a FASTA/FASTQ file, removing unwanted or low-quality records, or selecting records by specific criteria. Use the paired-end-fastq skill instead whenever the input is paired R1/R2 reads.
 tool_type: python
 primary_tool: Bio.SeqIO
+license: MIT
 ---
 
 ## Version Compatibility

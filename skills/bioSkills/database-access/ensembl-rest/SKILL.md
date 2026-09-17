@@ -3,6 +3,7 @@ name: bio-ensembl-rest
 description: Query the Ensembl REST API for gene/transcript/protein lookup, sequence retrieval, comparative genomics (Compara), variant effect prediction (VEP), regulatory features, and cross-species ortholog/paralog calls. Use when pulling Ensembl-native data (Ensembl Gene IDs, version-pinned releases, archive endpoints for reproducibility), gene/transcript/exon structure with stable IDs, or VEP for variant annotation. Encodes the 15 req/sec rate limit, archive (e110.rest.ensembl.org) for reproducibility, Ensembl divisions (vertebrates / plants / fungi / metazoa / bacteria), and the symbol-vs-ID stability problem.
 tool_type: python
 primary_tool: requests
+license: MIT
 ---
 
 ## Version Compatibility

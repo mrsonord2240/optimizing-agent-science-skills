@@ -3,6 +3,7 @@ name: bio-ribo-seq-initiation-site-mapping
 description: Map translation initiation sites, including non-AUG and alternative starts, from initiation-drug ribosome profiling (TI-seq). Use when locating start codons, detecting near-cognate or upstream initiation, or analyzing harringtonine, lactimidomycin (GTI-seq/QTI-seq), or retapamulin (Ribo-RET) data.
 tool_type: mixed
 primary_tool: Ribo-TISH
+license: MIT
 ---
 
 ## Version Compatibility

@@ -3,6 +3,7 @@ name: bio-compressed-files
 description: Read, write, and index compressed sequence files (gzip, bzip2, xz, BGZF) with Biopython and bgzip/samtools. Use when working with .gz, .bz2, or .bgz sequence files, when random access into a compressed FASTA/FASTQ is needed, or when SeqIO.index/faidx/tabix rejects a plain .gz. Covers the BGZF-vs-gzip seekability asymmetry, the 'rt'-not-'rb' handle trap, virtual offsets, and gzip-to-BGZF conversion.
 tool_type: mixed
 primary_tool: Bio.bgzf
+license: MIT
 ---
 
 ## Version Compatibility

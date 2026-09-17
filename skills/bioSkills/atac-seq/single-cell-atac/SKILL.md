@@ -3,6 +3,7 @@ name: bio-atac-seq-single-cell-atac
 description: Process and analyze single-cell ATAC-seq data with Signac, ArchR, SnapATAC2, or Cell Ranger ATAC. Use when handling 10X scATAC or 10X Multiome (paired RNA+ATAC) data, performing per-cell QC, choosing between ArchR/Signac/SnapATAC2 ecosystems, building per-cluster consensus peaksets, integrating with paired scRNA-seq, doublet detection (AMULET vs ArchR vs scDblFinder), or running pseudobulk differential accessibility per cluster.
 tool_type: mixed
 primary_tool: Signac
+license: MIT
 ---
 
 ## Version Compatibility

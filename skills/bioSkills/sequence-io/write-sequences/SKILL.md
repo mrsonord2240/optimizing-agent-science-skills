@@ -3,6 +3,7 @@ name: bio-write-sequences
 description: Write biological sequences to files (FASTA, FASTQ, GenBank, EMBL) using Biopython Bio.SeqIO. Use when saving sequences, creating new sequence files, or outputting modified records.
 tool_type: python
 primary_tool: Bio.SeqIO
+license: MIT
 ---
 
 ## Version Compatibility

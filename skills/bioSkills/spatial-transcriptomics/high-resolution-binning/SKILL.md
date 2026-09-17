@@ -3,6 +3,7 @@ name: bio-spatial-transcriptomics-high-resolution-binning
 description: Reconstructs single cells from sub-cellular spatial capture units (Visium HD 2um bins, Stereo-seq DNB spots, Slide-seqV2 beads) by aggregating bins UP into cells rather than deconvolving a mixture DOWN. Use when choosing a bin size and recognizing the sparsity-vs-mixture dilemma (2um bins are too sparse to cluster, but binning to 8/16um re-creates the multi-cell mixture deconvolution was meant to escape); deciding between morphology-driven cell reconstruction (Bin2cell -- StarDist/Cellpose nuclei on a registered H&E/DAPI image, then assign 2um bins to nuclei) and fixed-bin aggregation by whether a co-registered cell image exists; recognizing this as the INVERSE of deconvolution (bin UP, not mix DOWN -- this is the AMBIGUOUS regime of the resolution fork); and handling each platform (Visium HD has an image so reconstruct, Slide-seqV2 has no per-bead image so aggregate or deconvolve, Stereo-seq depends on a registered stain).
 tool_type: python
 primary_tool: bin2cell
+license: MIT
 ---
 
 ## Version Compatibility

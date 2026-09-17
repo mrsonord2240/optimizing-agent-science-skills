@@ -21,6 +21,7 @@ qc_checkpoints:
   - after_stats: "Univariate FDR (BH) AND permutation-validated multivariate (permI>=1000; Q2 high with small pQ2); getSummaryDF() has >0 rows, not a silent empty model"
   - after_annotation: "MSI/Schymanski level assigned per compound; only Level 1-2 enter identified-ORA"
   - after_pathway: "Background = assay coverage (identified ORA) OR full feature table (mummichog); PREDICTED vs MEASURED stated"
+license: MIT
 ---
 
 ## Version Compatibility

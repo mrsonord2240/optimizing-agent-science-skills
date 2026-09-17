@@ -19,6 +19,7 @@ qc_checkpoints:
   - after_align: "Uniquely-mapped >80%; junction-saturation curves plateau (else sequence deeper)"
   - after_diff: "|deltaPSI| >0.1 (lenient) / >0.2 (stringent), FDR <0.05, >=10 junction reads supporting the event"
   - after_dtu: "stageR gene-level screen passed BEFORE trusting any transcript-level q-value"
+license: MIT
 ---
 
 ## Version Compatibility

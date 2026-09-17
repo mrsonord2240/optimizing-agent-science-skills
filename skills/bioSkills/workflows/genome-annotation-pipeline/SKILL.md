@@ -17,6 +17,7 @@ qc_checkpoints:
   - after_repeat_masking: "Repeat content within expected range for taxon"
   - after_gene_prediction: "Gene count plausible, BUSCO completeness >90%"
   - after_functional_annotation: ">60% of genes with functional assignment"
+license: MIT
 ---
 
 ## Version Compatibility

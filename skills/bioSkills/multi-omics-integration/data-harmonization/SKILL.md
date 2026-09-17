@@ -3,6 +3,7 @@ name: bio-multi-omics-data-harmonization
 description: Harmonizes already-normalized per-omic matrices onto a common footing before joint integration - assembling a MultiAssayExperiment, choosing the per-omic variance-stabilizing transform, deciding per-view versus per-feature scaling, picking a cross-omic batch strategy, and triaging missing data (feature, value, or whole sample; MAR versus MNAR). Covers why a shared-latent integrator is blind to what an omic is so scaling silently decides which block dominates, why batch confounded with biology is irrecoverable and should be modeled as a covariate not scrubbed, and why stacking blocks and running one ComBat erases cross-omic signal. Use when preparing two or more omics for MOFA2, mixOmics, or SNF, deciding a transform or scaling, correcting batch across modalities, or handling missing omics per sample. For deep per-omic normalization see differential-expression, methylation-analysis, proteomics, metabolomics; for the method decision see integration-design; for fusion see mofa-integration, mixomics-analysis.
 tool_type: r
 primary_tool: MultiAssayExperiment
+license: MIT
 ---
 
 ## Version Compatibility

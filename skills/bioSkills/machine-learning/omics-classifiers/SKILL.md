@@ -3,6 +3,7 @@ name: bio-machine-learning-omics-classifiers
 description: Builds diagnostic and prognostic classifiers on omics feature matrices with regularized logistic regression, random forest, and gradient-boosted trees, handling the p>>n regime, batch shortcut learning, class imbalance, and probability calibration. Use when building a classifier from expression, methylation, or variant data, choosing an algorithm for high-dimensional small-n data, or diagnosing a suspiciously perfect AUC. For unbiased evaluation see machine-learning/model-validation; for feature selection see machine-learning/biomarker-discovery; for time-to-event outcomes see machine-learning/survival-analysis.
 tool_type: python
 primary_tool: sklearn
+license: MIT
 ---
 
 ## Version Compatibility

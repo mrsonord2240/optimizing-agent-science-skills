@@ -3,6 +3,7 @@ name: bio-epidemiological-genomics-phylodynamics
 description: Estimates time-scaled phylogenies, molecular-clock rates, effective reproduction number R_e, and population dynamics from dated pathogen genomes using TreeTime (maximum-likelihood) and BEAST2 (Bayesian; strict/relaxed clocks; coalescent, Bayesian-Skyline, Skygrid, Birth-Death-Skyline, and sampled-ancestor priors; structured coalescent via MASCOT). Covers root-to-tip clock QC via TempEst, date-randomisation tests, recombination masking via Gubbins/ClonalFrameML before clock inference for recombining bacteria, BDSKY origin-vs-rootHeight pitfalls, sampling-bias correction, multi-chain convergence diagnostics, and reconciling phylodynamic R_e with case-based R_t. Use when dating outbreak origins, estimating substitution rates, inferring R_e through time, building time-calibrated Nextstrain Augur trees, choosing between strict and relaxed clocks, fitting Birth-Death-Skyline models, diagnosing temporal-signal failure, running MASCOT for structured-population analyses, or using UShER for pandemic-scale placement.
 tool_type: mixed
 primary_tool: BEAST2
+license: MIT
 ---
 
 ## Version Compatibility

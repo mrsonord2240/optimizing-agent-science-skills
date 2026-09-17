@@ -3,6 +3,7 @@ name: bio-long-read-sequencing-long-read-alignment
 description: Aligns Oxford Nanopore and PacBio long reads (and assemblies) to a reference with minimap2 using the error-rate-matched preset (map-ont, lr:hq, map-hifi, map-pb, splice/splice:hq, asm5/10/20, ava), producing a sorted/indexed BAM for variant, SV, methylation, or isoform analysis. Covers why the preset rewrites the scoring/chaining model, why SV calling rides on supplementary not secondary alignments, carrying MM/ML methylation tags through with -y, the multi-part-index MAPQ trap, and when to swap in Winnowmap/VACmap/lra/pbmm2. Use when mapping ONT or PacBio reads, choosing a minimap2 preset by platform/chemistry, preparing input for Clair3/medaka/Sniffles/modkit, aligning into repeats/centromeres, or spliced-aligning cDNA/Iso-Seq.
 tool_type: cli
 primary_tool: minimap2
+license: MIT
 ---
 
 ## Version Compatibility

@@ -4,6 +4,7 @@ description: Authors reproducible bioinformatics pipelines with Snakemake - rule
 tool_type: python
 primary_tool: Snakemake
 goal_approach_exempt: true
+license: MIT
 ---
 
 ## Version Compatibility

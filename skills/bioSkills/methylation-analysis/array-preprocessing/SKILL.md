@@ -3,6 +3,7 @@ name: bio-methylation-array-preprocessing
 description: Turns raw Illumina Infinium methylation BeadChip IDATs (450K, EPIC, EPICv2) into a defensible beta/M matrix with sesame (openSesame/SigDF) or minfi (RGChannelSet -> MethylSet -> GenomicRatioSet). Covers Type I vs Type II probe chemistry and why raw Type II beta is compressed, the signal-to-beta math (beta = M/(M+U+100)) and M-value logit, detection-p / pOOBAH masking including the out-of-band deletion-artifact catch, dye-bias correction, and the normalization decision (noob, funnorm, quantile, SWAN, BMIQ, dasen, sesame QCDPB). Use when reading IDATs, choosing a normalization for a 450K/EPIC/EPICv2 cohort, deciding beta vs M, masking failed probes, or producing the corrected matrix before testing. For probe/sample filtering, EPICv2 replicate collapse, and sample-identity QC see array-qc-filtering; for native long-read 5mC see long-read-sequencing/nanopore-methylation (a different platform).
 tool_type: r
 primary_tool: sesame
+license: MIT
 ---
 
 ## Version Compatibility

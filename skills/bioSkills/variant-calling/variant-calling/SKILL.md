@@ -3,6 +3,7 @@ name: bio-variant-calling
 description: Call germline SNPs and indels from a BAM/CRAM with bcftools mpileup and call, and select the right calling engine for the job. Use when generating a VCF from aligned reads, choosing between bcftools, GATK HaplotypeCaller, DeepVariant, and DRAGEN, setting ploidy for haploid/organelle/polyploid/sex-chromosome calling, or deciding whether pileup-based calling is good enough versus a local-reassembly caller for indels and difficult regions. Not for cohort joint genotyping (see variant-calling/joint-calling), GATK-specific workflows (see variant-calling/gatk-variant-calling), deep-learning calling (see variant-calling/deepvariant), or somatic/low-VAF detection.
 tool_type: cli
 primary_tool: bcftools
+license: MIT
 ---
 
 ## Version Compatibility

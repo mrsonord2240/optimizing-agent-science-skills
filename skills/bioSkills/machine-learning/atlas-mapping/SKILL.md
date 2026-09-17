@@ -3,6 +3,7 @@ name: bio-machine-learning-atlas-mapping
 description: Maps query single-cell data onto reference atlases and transfers cell-type labels using scArches surgery (scVI/scANVI), Symphony, Azimuth, CellTypist, scPoli, popV, and foundation models, with explicit out-of-distribution and label-transfer uncertainty. Use when annotating new single-cell datasets against a pre-trained reference, deciding which mapping method fits, or judging whether transferred labels are trustworthy. For de novo clustering and manual annotation see single-cell/cell-annotation; for batch integration without a reference see single-cell/batch-integration.
 tool_type: python
 primary_tool: scvi-tools
+license: MIT
 ---
 
 ## Version Compatibility

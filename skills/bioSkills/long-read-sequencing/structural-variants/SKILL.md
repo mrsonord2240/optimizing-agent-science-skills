@@ -3,6 +3,7 @@ name: bio-long-read-sequencing-structural-variants
 description: Detects structural variants (deletions, insertions, inversions, duplications, translocations) from Oxford Nanopore and PacBio long-read alignments with Sniffles2, cuteSV, SVIM, and assembly-based callers, joint-genotypes cohorts via the Sniffles2 .snf workflow, and benchmarks with Truvari against GIAB. Covers why an SV call is a representation artifact (the tandem-repeat BED, aligner, and Truvari params set precision/recall as much as the caller), the cuteSV per-platform parameter trap, soft-clipped supplementary alignments as the SV substrate, and the somatic/mosaic boundary to Severus/nanomonsv. Use when calling germline or somatic SVs from ONT/HiFi reads, joint-genotyping a cohort, choosing or tuning an SV caller, or benchmarking SV calls.
 tool_type: cli
 primary_tool: sniffles
+license: MIT
 ---
 
 ## Version Compatibility

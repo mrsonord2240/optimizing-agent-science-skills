@@ -3,6 +3,7 @@ name: bio-rna-structure-secondary-structure-prediction
 description: Predicts RNA secondary structure with ViennaRNA, treating the Boltzmann ensemble (partition function, base-pair probabilities, centroid, MEA, stochastic samples) as the object rather than a single MFE fold. Covers consensus folding from alignments (RNAalifold), SHAPE-constrained folding, RNA-RNA interaction (RNAcofold/RNAduplex/RNAup), local and linear-time methods for long RNA, and pseudoknot-aware tools. Use when folding an RNA and choosing between MFE, centroid, MEA, or ensemble sampling; judging whether a single structure is well-defined; folding long RNAs where a global MFE is meaningless; handling suspected pseudoknots; or weighing thermodynamic versus comparative versus deep-learning prediction.
 tool_type: cli
 primary_tool: ViennaRNA
+license: MIT
 ---
 
 ## Version Compatibility

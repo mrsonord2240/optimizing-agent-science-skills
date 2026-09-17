@@ -3,6 +3,7 @@ name: bio-seq-objects
 description: Create and manipulate Seq, MutableSeq, and SeqRecord objects using Biopython. Use when creating sequences from strings, modifying sequence data in-place, building annotated records for file output, or debugging post-1.78 Bio.Alphabet and immutability errors.
 tool_type: python
 primary_tool: Bio.Seq
+license: MIT
 ---
 
 ## Version Compatibility

@@ -3,6 +3,7 @@ name: bio-variant-calling-clinical-interpretation
 description: Classify variant clinical significance with the ACMG/AMP germline framework and its 2018-2025 ClinGen refinements (graded PVS1 decision tree, PM2 downgraded to Supporting, PP5/BP6 retired, calibrated PP3/BP4, Bayesian points), the AMP/ASCO/CAP somatic tiers and ClinGen oncogenicity system, ClinVar star-rating and gnomAD grpmax filtering-AF interpretation. Use when deciding germline-vs-somatic framework, applying current (not flat-2015) ACMG points, checking for a gene-specific VCEP specification, judging whether a ClinVar assertion or gnomAD frequency is usable evidence, calibrating a pathogenicity predictor, evaluating PVS1 on the MANE Select transcript, or building a VUS reanalysis loop. Not for functional annotation itself (see variant-calling/variant-annotation).
 tool_type: mixed
 primary_tool: bcftools
+license: MIT
 ---
 
 ## Version Compatibility

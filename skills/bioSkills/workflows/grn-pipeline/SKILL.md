@@ -13,6 +13,7 @@ qc_checkpoints:
   - after_grn_inference: "50-500 regulons detected, known TFs present"
   - after_activity_scoring: "AUCell scores separate known cell types"
   - after_perturbation: "Predicted shifts match known biology"
+license: MIT
 ---
 
 ## Version Compatibility

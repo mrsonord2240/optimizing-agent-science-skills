@@ -3,6 +3,7 @@ name: bio-clinical-databases-msi-detection
 description: Calls microsatellite instability from WES/WGS/targeted-panel with MSIsensor, MSIsensor-pro, MSIsensor-ct (panel-aware), mSINGS, and MANTIS for FDA pembrolizumab MSI-H pan-tumor / Lynch syndrome / dMMR ICI biomarker. Use when stratifying ICI eligibility (Le 2015), pairing MSI with TMB-H (Sha 2020 / Salem 2018), screening Lynch syndrome (universal IHC + MSI), or distinguishing MSI-H tumors from POLE-exo hypermutator with overlapping signatures.
 tool_type: cli
 primary_tool: MSIsensor-pro
+license: MIT
 ---
 
 ## Version Compatibility

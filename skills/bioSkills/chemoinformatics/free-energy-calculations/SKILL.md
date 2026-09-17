@@ -3,6 +3,7 @@ name: bio-free-energy-calculations
 description: Performs alchemical free-energy calculations including relative binding free energy (RBFE / FEP+) and absolute binding free energy (ABFE) via OpenFE, FEP+, GROMACS, AMBER pmemd, and OpenMM with explicit lambda scheduling, soft-core potentials, MBAR/BAR analysis, cycle-closure validation, and protocol-appropriate enhanced sampling. Compares ML alternatives (Boltz-2 affinity, DeepDock). Use when ranking analogs by binding affinity beyond docking accuracy, performing prospective lead optimization, or validating SAR predictions.
 tool_type: mixed
 primary_tool: OpenFE
+license: MIT
 ---
 
 ## Version Compatibility

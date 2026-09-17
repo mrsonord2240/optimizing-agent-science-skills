@@ -3,6 +3,7 @@ name: bio-read-qc-adapter-trimming
 description: Removes sequencing adapters from FASTQ reads with Cutadapt and Trimmomatic, including paired-end read-through, small-RNA 3' adapters, amplicon primers, and anchored/linked adapters. Use when FastQC shows adapter content climbing toward the 3' end, when inserts are shorter than the read length (small-RNA, cfDNA, FFPE), or before assembly/k-mer analysis. For all-in-one trimming use fastp-workflow; for quality/length filtering use quality-filtering.
 tool_type: cli
 primary_tool: cutadapt
+license: MIT
 ---
 
 ## Version Compatibility

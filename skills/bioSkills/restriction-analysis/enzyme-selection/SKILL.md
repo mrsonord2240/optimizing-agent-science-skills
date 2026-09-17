@@ -3,6 +3,7 @@ name: bio-restriction-enzyme-selection
 description: Select restriction enzymes for cloning or diagnostics using Biopython Bio.Restriction. Finds enzymes by cut frequency, overhang type, recognition-site length, commercial availability, compatible ends, and methylation sensitivity, and identifies isoschizomers and compatible pairs. Use when choosing which enzymes to use to linearize a vector, drop in an insert, set up a diagnostic digest, or pick a methylation-insensitive enzyme.
 tool_type: python
 primary_tool: Bio.Restriction
+license: MIT
 ---
 
 ## Version Compatibility

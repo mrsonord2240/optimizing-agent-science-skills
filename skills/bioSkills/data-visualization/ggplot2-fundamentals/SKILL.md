@@ -4,6 +4,7 @@ description: Build publication-quality figures in R with ggplot2 using the gramm
 tool_type: r
 primary_tool: ggplot2
 goal_approach_exempt: true
+license: MIT
 ---
 
 ## Version Compatibility

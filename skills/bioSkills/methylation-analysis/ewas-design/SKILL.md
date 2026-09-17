@@ -3,6 +3,7 @@ name: bio-methylation-ewas-design
 description: Designs and defends an epigenome-wide association study (EWAS) on 450K/EPIC array or bisulfite methylation - the layer deciding whether a hit is credible. Covers the confounding hierarchy (cell composition covariates as the dominant confounder, batch/Sentrix chip/array position, age/sex, smoking AHRR cg05575921, ancestry/mQTL, reverse causation), chip randomization (no-rescue theorem), surrogate variable analysis sva/SmartSVA, ComBat, RUVm, over-correction, genomic inflation lambda vs GWAS genomic control, BACON bias/inflation, genome-wide significance threshold 450K/EPIC, FWER vs FDR, pwrEWAS power, meta-analysis, EWAS Catalog/Atlas, methylation risk scores. Use when designing an EWAS, choosing a covariate set, randomizing a plate layout, interpreting lambda, applying BACON, setting a threshold, powering a study, or using an MRS. For the per-site test see differential-cpg-testing; for cell fractions see cell-type-deconvolution; for causal mQTL orientation see causal-genomics/mendelian-randomization.
 tool_type: mixed
 primary_tool: meffil
+license: MIT
 ---
 
 ## Version Compatibility

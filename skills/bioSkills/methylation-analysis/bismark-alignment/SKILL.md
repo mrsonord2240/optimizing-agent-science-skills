@@ -3,6 +3,7 @@ name: bio-methylation-bismark-alignment
 description: Aligns bisulfite-converted (WGBS, RRBS, PBAT) and enzymatic (EM-seq) short reads to an in-silico C->T/G->A-converted reference with Bismark (Bowtie2 or HISAT2), preparing the genome index, choosing the directional vs non-directional vs PBAT strand flag, deduplicating WGBS/EM-seq (never RRBS), and bounding bisulfite conversion efficiency with unmethylated lambda and methylated pUC19 spike-ins. Covers why the library protocol (not the aligner) decides whether calls are meaningful, why incomplete conversion masquerades as methylation, the 3-letter reduced-complexity mapping bias (50-70% efficiency is normal), and M-bias end-clipping. Use when aligning bisulfite or EM-seq reads, preparing a bisulfite genome, choosing the strand flag, or diagnosing low mapping efficiency. For methylation extraction see methylation-calling; for long-read MM/ML modification calling see long-read-sequencing/nanopore-methylation.
 tool_type: cli
 primary_tool: Bismark
+license: MIT
 ---
 
 ## Version Compatibility

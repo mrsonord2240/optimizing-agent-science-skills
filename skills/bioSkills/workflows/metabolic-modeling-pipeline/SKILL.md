@@ -16,6 +16,7 @@ qc_checkpoints:
   - after_curation: "Memote score >50%, <5% orphan reactions"
   - after_fba: "Realistic growth rate, major pathways active"
   - after_essentiality: "Core essential genes match literature >70%"
+license: MIT
 ---
 
 ## Version Compatibility

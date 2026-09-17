@@ -3,6 +3,7 @@ name: bio-workflow-management-nf-core-pipelines
 description: Runs and configures curated nf-core community Nextflow pipelines (rnaseq, sarek, atacseq, methylseq, ampliseq, taxprofiler, fetchngs) reproducibly, pinning the pipeline revision with -r and selecting a container engine and institutional config via -profile. Use when deciding to adopt a community pipeline versus author one from scratch; picking a pipeline and pinning its -r revision; selecting -profile test/docker/singularity/conda plus an institutional config from nf-core/configs; building and validating a samplesheet CSV against the pipeline schema (nf-schema); choosing --genome/iGenomes versus custom references; configuring resources and max_memory for SLURM/AWS Batch; using -resume and -stub; and reading MultiQC outputs.
 tool_type: cli
 primary_tool: nf-core
+license: MIT
 ---
 
 ## Version Compatibility

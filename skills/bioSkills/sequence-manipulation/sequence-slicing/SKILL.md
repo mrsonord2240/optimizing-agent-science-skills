@@ -3,6 +3,7 @@ name: bio-sequence-slicing
 description: Slice, extract, and concatenate biological sequences and annotated records using Biopython. Use when extracting subsequences by position, splicing exons into a transcript, joining sequences, or carrying a sub-region of an annotated record (with quality scores and features) into a new record.
 tool_type: python
 primary_tool: Bio.Seq
+license: MIT
 ---
 
 ## Version Compatibility

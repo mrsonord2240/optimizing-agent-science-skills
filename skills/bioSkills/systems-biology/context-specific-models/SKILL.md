@@ -3,6 +3,7 @@ name: bio-systems-biology-context-specific-models
 description: Builds tissue-, cell-type-, and condition-specific metabolic models by integrating transcriptomic or proteomic data into a generic genome-scale model, using extraction algorithms (GIMME, iMAT, INIT/tINIT, MADE, E-Flux, CORDA, FASTCORE) via troppo and corda in Python or the COBRA Toolbox/RAVEN in MATLAB. Use when pruning a generic model to a context, choosing an extraction method and expression threshold, mapping expression through GPR rules to reactions, deciding whether an objective is required (GIMME vs iMAT), avoiding the growth-objective trap for non-proliferating tissue, or judging how much of a context-specific model is real signal versus an artifact of the threshold and method.
 tool_type: python
 primary_tool: cobrapy
+license: MIT
 ---
 
 ## Version Compatibility

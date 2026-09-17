@@ -3,6 +3,7 @@ name: bio-workflow-management-cwl-workflows
 description: Authors portable, strongly-typed bioinformatics pipelines in the Common Workflow Language (CWL v1.2) as CommandLineTool/Workflow/ExpressionTool documents, validated with cwltool and run at scale on Toil/Arvados/Calrissian. Use when deciding CWL (portability/provenance/regulated) vs Nextflow/WDL/Snakemake; declaring secondaryFiles for indexed companions (.bai/.fai/.dict/.tbi and the caret rule); putting resources/containers under requirements (must-hold) vs hints (advisory) to avoid silent OOM; choosing scatterMethod (dotproduct vs flat_/nested_crossproduct); preferring $(...) parameter refs over ${...} JavaScript for portability; pinning DockerRequirement images; or emitting a CWLProv provenance object for audited/clinical settings.
 tool_type: cli
 primary_tool: cwltool
+license: MIT
 ---
 
 ## Version Compatibility

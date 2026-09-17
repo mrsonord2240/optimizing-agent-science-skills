@@ -3,6 +3,7 @@ name: bio-structural-biology-interface-analysis
 description: Maps protein-protein and protein-ligand interfaces with Bio.PDB, computing contact residues and buried surface area (BSA). Use when choosing a contact cutoff and stating its rationale (heavy-atom 4-5A vs CA-CA 8A vs a SASA-based definition); deciding a contact list is not an interface and computing buried surface area (dSASA/BSA) instead; distinguishing a genuine biological interface from a crystal-packing artifact; identifying ligand-contact or epitope residues; and computing on the biological assembly rather than the asymmetric unit. Keywords interface, buried surface area, BSA, contacts, NeighborSearch, PISA, crystal packing, epitope, binding site, ShrakeRupley.
 tool_type: python
 primary_tool: Bio.PDB
+license: MIT
 ---
 
 ## Version Compatibility

@@ -3,6 +3,7 @@ name: bio-structural-biology-structure-validation
 description: Judges whether a macromolecular model (or a region of it) is reliable enough to build on, using resolution, R-free, B-factors, MolProbity geometry, and predicted-model confidence with Bio.PDB. Use when deciding if a structure or a specific region is trustworthy before docking/mechanism/measurement; reading resolution, R-work vs R-free and the R-free-minus-R-work overfitting gap; sanity-checking per-residue and mean B-factors; flagging clashscore, Ramachandran and rotamer outliers and cis non-proline peptides; validating a PREDICTED (AlphaFold/ESMFold) model via pLDDT bands and PAE before docking or molecular replacement; and interpreting cryo-EM global-vs-local resolution (FSC 0.143 half-map vs 0.5 map-model) or an NMR ensemble spread. Keywords validation, resolution, R-free, B-factor, MolProbity, clashscore, Ramachandran, rotamer, pLDDT, PAE, wwPDB, cryo-EM local resolution.
 tool_type: python
 primary_tool: Bio.PDB
+license: MIT
 ---
 
 ## Version Compatibility

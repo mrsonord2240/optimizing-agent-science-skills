@@ -3,6 +3,7 @@ name: bio-gatk-variant-calling
 description: Call germline SNPs and indels with GATK HaplotypeCaller and the GVCF joint-genotyping workflow. Covers the local-reassembly + PairHMM mechanism (why HC beats pileup callers on indels), the -ERC GVCF reference-confidence model and <NON_REF> allele, BQSR-vs-DRAGSTR and --dragen-mode error modeling, allele-specific (AS_) annotations, and edge cases (ploidy, Mutect2 mitochondria mode, sex chromosomes/PAR, contamination gating). Use when deciding whether to use HaplotypeCaller vs a pileup or DRAGEN caller, whether BQSR still earns its place, whether to call per-sample GVCFs for a cohort, or how to handle non-diploid, mitochondrial, sex-chromosome, or contaminated samples. Not for post-calling filtering depth (see variant-calling/filtering-best-practices) or cohort joint-genotyping scaling (see variant-calling/joint-calling).
 tool_type: cli
 primary_tool: gatk
+license: MIT
 ---
 
 ## Version Compatibility

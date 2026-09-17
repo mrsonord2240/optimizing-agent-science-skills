@@ -1,6 +1,6 @@
 ---
 name: bio-workflows-cnv-pipeline
-description: Orchestrates the copy-number pipeline from BAM to segmented, integer-called, annotated CNVs, forking on germline-vs-somatic - CNVkit (somatic exome/panel: coverage -> assay-matched reference/PoN -> fix -> segment -> purity/ploidy-aware call), GATK gCNV (germline rare-CNV cohort), and allele-specific callers (ASCAT/FACETS/PURPLE) for purity/ploidy. Use when committing the build + target/access BED + PoN once (assay-matched), building the reference from normals BEFORE segmenting, fitting purity/ploidy BEFORE integer calls in tumors, centering on the true (non-diploid) mode before GISTIC2 recurrence, or routing cfDNA to ichorCNA. Hands mechanism to the copy-number component skills; not a re-teach of any single step.
+description: "Orchestrates the copy-number pipeline from BAM to segmented, integer-called, annotated CNVs, forking on germline-vs-somatic - CNVkit (somatic exome/panel: coverage -> assay-matched reference/PoN -> fix -> segment -> purity/ploidy-aware call), GATK gCNV (germline rare-CNV cohort), and allele-specific callers (ASCAT/FACETS/PURPLE) for purity/ploidy. Use when committing the build + target/access BED + PoN once (assay-matched), building the reference from normals BEFORE segmenting, fitting purity/ploidy BEFORE integer calls in tumors, centering on the true (non-diploid) mode before GISTIC2 recurrence, or routing cfDNA to ichorCNA. Hands mechanism to the copy-number component skills; not a re-teach of any single step."
 tool_type: mixed
 primary_tool: CNVkit
 goal_approach_exempt: true
@@ -18,6 +18,7 @@ qc_checkpoints:
   - after_fix: "log2-ratio noise (.cnr spread/MAD) within tolerance; high bin noise -> over-segmentation"
   - after_call: "Integer CN off a fitted purity/ploidy (not defaults); tumor purity above the ~40% death zone"
   - after_recurrent: "GISTIC2 input is diploid-CENTERED (uncentered WGD inverts recurrence)"
+license: MIT
 ---
 
 ## Version Compatibility

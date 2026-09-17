@@ -3,6 +3,7 @@ name: bio-interaction-databases
 description: Query protein-protein and gene interaction databases (STRING, BioGRID, IntAct, SIGNOR, Reactome, HuRI, HuMAP, OmniPath, ConsensusPathDB, DIP). Use when building PPI networks, choosing between physical vs functional vs genetic interactions, signed/directed vs undirected, high-throughput vs curated, picking confidence thresholds, aggregating across resources, or navigating license constraints. Encodes the database decision matrix, STRING v12 channel semantics, OmniPath as meta-database, SIGNOR for signed signaling, and per-resource rate limits.
 tool_type: python
 primary_tool: requests
+license: MIT
 ---
 
 ## Version Compatibility

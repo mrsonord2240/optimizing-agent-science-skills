@@ -3,6 +3,7 @@ name: bio-ribo-seq-ribosome-stalling
 description: Detect ribosome pausing and stalling at codon resolution from Ribo-seq, using local-relative occupancy metrics and A-site assignment. Use when studying elongation dynamics, codon dwell times, pause motifs, or ribosome collisions, and when judging whether a pause is real biology or a cycloheximide artifact.
 tool_type: python
 primary_tool: Plastid
+license: MIT
 ---
 
 ## Version Compatibility

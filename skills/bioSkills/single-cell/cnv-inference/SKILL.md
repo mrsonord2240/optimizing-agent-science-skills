@@ -3,6 +3,7 @@ name: bio-single-cell-cnv-inference
 description: Infer large-scale copy-number alterations from tumor single-cell or single-nucleus RNA-seq to separate malignant from normal cells and call subclones, using inferCNV, copyKAT, Numbat, and SCEVAN. Use when separating malignant from normal cells in a tumor scRNA-seq dataset, inferring chromosome-arm CNVs or aneuploidy from expression, calling tumor subclones from single cells, choosing a CNV-inference method (reference-based vs reference-free, expression-only vs allele-aware), or deciding which cells are tumor before downstream analysis.
 tool_type: r
 primary_tool: inferCNV
+license: MIT
 ---
 
 ## Version Compatibility

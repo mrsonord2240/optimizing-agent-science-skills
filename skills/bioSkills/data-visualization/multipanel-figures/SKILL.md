@@ -3,6 +3,7 @@ name: bio-data-visualization-multipanel-figures
 description: Compose multi-panel publication figures with patchwork, cowplot, gridExtra (R), or matplotlib GridSpec/subfigures (Python) including shared axes/legends/guides collection, panel labels in Nature/Cell convention, and journal-spec sizing. Covers patchwork ≥1.2.0 axes='collect' feature, Type-42 font embedding, and the cairo_pdf save path. Use when composing 2+ subpanels into a single figure for journal submission.
 tool_type: mixed
 primary_tool: patchwork
+license: MIT
 ---
 
 ## Version Compatibility

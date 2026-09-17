@@ -3,6 +3,7 @@ name: bio-spatial-transcriptomics-spatial-preprocessing
 description: Quality control, filtering, and normalization for spatial transcriptomics (Visium, Visium HD, Xenium, MERFISH/MERSCOPE, CosMx, Slide-seq) with Squidpy and Scanpy. Use when setting QC floors that do NOT delete real low-count imaging cells (an scRNA min_counts=500 floor deletes nearly every Xenium cell, whose vector is tens-to-low-hundreds of transcripts); deciding whether to normalize at all when library size carries spatial biology rather than pure technical depth; choosing cell-volume/area normalization over Pearson residuals for skewed targeted panels; reading negative-control-probe / blank-barcode false-discovery rates; and inspecting QC spatially on the tissue rather than only in violins.
 tool_type: python
 primary_tool: squidpy
+license: MIT
 ---
 
 ## Version Compatibility

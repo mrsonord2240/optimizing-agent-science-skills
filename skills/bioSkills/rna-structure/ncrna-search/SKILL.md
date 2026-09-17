@@ -3,6 +3,7 @@ name: bio-rna-structure-ncrna-search
 description: Searches for non-coding RNA homologs and classifies RNA families with Infernal covariance models against Rfam, scoring sequence AND secondary-structure conservation jointly. Use when deciding whether a covariance model is the right tool versus BLAST/nhmmer (structured ncRNA versus lncRNA or mature miRNA); choosing the Rfam gathering threshold over a flat E-value; resolving clan overlaps; building and calibrating a custom CM from a structure-annotated alignment; or preferring a family-specialized tool (tRNAscan-SE, barrnap) over a generic Rfam scan.
 tool_type: cli
 primary_tool: Infernal
+license: MIT
 ---
 
 ## Version Compatibility

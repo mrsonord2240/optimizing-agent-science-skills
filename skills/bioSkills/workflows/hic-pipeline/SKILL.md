@@ -18,6 +18,7 @@ qc_checkpoints:
   - after_pairs: "Long-range cis (>=20kb) fraction, not just %valid; trans is genome-size-dependent"
   - after_balance: "balance=True returns finite weights; masked bins are NaN by design"
   - after_analysis: "Eigenvector sign phased by GC; feature scale matches the resolution"
+license: MIT
 ---
 
 ## Version Compatibility

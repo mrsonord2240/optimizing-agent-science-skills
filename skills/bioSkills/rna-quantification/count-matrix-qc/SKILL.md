@@ -3,6 +3,7 @@ name: bio-rna-quantification-count-matrix-qc
 description: Quality control and exploration of RNA-seq count matrices before differential expression. Use when checking library sizes and composition, choosing VST vs rlog for visualization, running PCA and sample correlation, detecting outliers with Cook's distance, deciding how to handle known vs unknown batch effects, screening for sample swaps, or judging whether a sample or design is too compromised to test.
 tool_type: mixed
 primary_tool: DESeq2
+license: MIT
 ---
 
 ## Version Compatibility

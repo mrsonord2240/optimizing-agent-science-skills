@@ -3,6 +3,7 @@ name: bio-paired-end-fastq
 description: Handle paired-end FASTQ files (R1/R2) using Biopython while keeping mates synchronized. Use when working with Illumina paired reads, synchronizing pairs, filtering both mates together with orphan routing, interleaving/deinterleaving, or matching mates by read name.
 tool_type: python
 primary_tool: Bio.SeqIO
+license: MIT
 ---
 
 ## Version Compatibility

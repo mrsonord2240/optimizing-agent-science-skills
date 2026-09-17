@@ -6,6 +6,7 @@ qc_checkpoints: [preprocessing_retention, alignment_rate, library_complexity, fr
 description: End-to-end CLIP-seq pipeline from FASTQ to ENCODE-compliant binding sites, single-nucleotide crosslink maps, annotation, motifs, and (optionally) differential binding. Use when running the full Yeo lab eCLIP / iCLIP / iCLIP2 / iCLIP3 / irCLIP / PAR-CLIP analysis with SMInput control, protocol-specific UMI extraction, ENCODE STAR parameters, CLIPper or Skipper peak calling with stringent log2 FC and -log10 p thresholds, IDR rescue and self-consistency QC, and downstream motif registration with mCross or PEKA.
 tool_type: mixed
 primary_tool: CLIPper
+license: MIT
 ---
 
 ## Version Compatibility

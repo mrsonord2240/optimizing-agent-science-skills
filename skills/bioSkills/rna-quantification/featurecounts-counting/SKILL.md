@@ -3,6 +3,7 @@ name: bio-rna-quantification-featurecounts-counting
 description: Count reads per gene from aligned BAM files using Subread featureCounts. Use when turning STAR/HISAT2 BAMs into a gene-level count matrix for DESeq2/edgeR, deciding library strandedness, handling paired-end fragment counting, choosing how to treat multi-mapping and multi-overlapping reads, or diagnosing a low assignment rate from the summary file.
 tool_type: cli
 primary_tool: featureCounts
+license: MIT
 ---
 
 ## Version Compatibility

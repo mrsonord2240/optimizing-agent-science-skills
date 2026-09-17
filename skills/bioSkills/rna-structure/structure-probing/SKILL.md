@@ -3,6 +3,7 @@ name: bio-rna-structure-structure-probing
 description: Processes experimental RNA structure probing data (SHAPE-MaP, DMS-MaPseq) into per-nucleotide reactivity profiles with ShapeMapper2, then uses them as soft restraints on thermodynamic folding. Covers reagent and readout choice (SHAPE vs DMS, mutational-profiling vs RT-stop), the three control samples, per-transcript normalization, the Deigan vs Zarringhalam pseudo-energy models, in-cell versus in-vitro interpretation, and multi-conformation deconvolution. Use when converting probing reads to reactivities; deciding SHAPE versus DMS parameters; judging whether low reactivity means base-paired or protein-bound; or detecting whether an RNA populates more than one structure.
 tool_type: cli
 primary_tool: ShapeMapper2
+license: MIT
 ---
 
 ## Version Compatibility

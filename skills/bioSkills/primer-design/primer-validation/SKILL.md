@@ -3,6 +3,7 @@ name: bio-primer-design-primer-validation
 description: Validates chosen PCR/qPCR oligos for intramolecular thermodynamic liabilities with primer3-py - hairpins, self-dimers, cross-dimers (calc_hairpin/homodimer/heterodimer), and 3'-end stability (calc_end_stability) - returning ThermoResult dG/Tm and ASCII structures. Covers why a "dimer-free" verdict is a PREDICTION at the supplied salt/Mg/dNTP/oligo conditions and temp_c (so the same primer is fine or dimer-prone depending on conditions), why a 3'-END dimer or hairpin is the lethal class (polymerase-extendable into primer-dimer) so structures are ranked by dG at the annealing temperature and 3'-end involvement rather than global Tm, that ThermoResult dG is in cal/mol not kcal/mol, and that .structure_found must gate the numbers. Use when checking primer pairs before ordering, troubleshooting primer-dimers or smears, or screening oligos for secondary structure. Genome off-target/mispriming is primer-specificity; design is primer-basics; probe assays are qpcr-primers.
 tool_type: python
 primary_tool: primer3-py
+license: MIT
 ---
 
 ## Version Compatibility

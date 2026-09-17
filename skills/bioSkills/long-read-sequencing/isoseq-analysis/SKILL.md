@@ -4,6 +4,7 @@ description: Discovers, classifies, filters, and quantifies full-length transcri
 tool_type: mixed
 primary_tool: SQANTI3
 goal_approach_exempt: true
+license: MIT
 ---
 
 ## Version Compatibility

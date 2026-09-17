@@ -3,6 +3,7 @@ name: bio-spatial-transcriptomics-spatial-data-io
 description: Loads spatial transcriptomics data from Visium, Visium HD, Xenium, MERFISH/MERSCOPE, CosMx, Slide-seq/Curio, and Stereo-seq into AnnData or SpatialData using spatialdata-io and Squidpy. Use when deciding which platform class is in hand (imaging/in-situ vs sequencing/capture), which reader matches the platform (spatialdata_io.xenium/merscope/cosmx vs squidpy.read.visium/vizgen/nanostring), whether to work from the per-transcript molecule table (the re-segmentable source of truth) or the segmentation-derived per-cell matrix (quality-filtered, inherits all segmentation error), whether a molecule table even exists (spot platforms have none), and how to keep coordinate frames and units (pixel vs micron) registered to histology.
 tool_type: python
 primary_tool: spatialdata
+license: MIT
 ---
 
 ## Version Compatibility

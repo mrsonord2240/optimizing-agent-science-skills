@@ -3,6 +3,7 @@ name: bio-spatial-transcriptomics-spatial-visualization
 description: Plots spatial transcriptomics expression, clusters, and annotations on tissue using Squidpy and Scanpy. Use when choosing the plotter and spot size by platform fork (sc.pl.spatial / sq.pl.spatial_scatter with real scalefactors and capture diameter for spot/capture data like Visium and Slide-seq, versus molecule/segmentation overlays for imaging/FOV data like Xenium, MERFISH, and CosMx); getting the histology coordinate-frame transform right (micron<->pixel, scalefactors) so points land on the image; and avoiding the honest-visualization traps where interpolation/KDE manufactures spatial pattern not in the data, oversized markers fake tissue coverage, jet and other non-uniform colormaps distort structure, and non-metric UMAP/tSNE distances are misread as spatial conclusions.
 tool_type: python
 primary_tool: squidpy
+license: MIT
 ---
 
 ## Version Compatibility

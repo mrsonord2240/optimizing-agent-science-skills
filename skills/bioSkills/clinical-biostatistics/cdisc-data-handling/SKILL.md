@@ -4,6 +4,7 @@ description: Reads, validates, and prepares CDISC SDTM and ADaM clinical trial d
 tool_type: python
 primary_tool: pyreadstat
 goal_approach_exempt: true
+license: MIT
 ---
 
 ## Version Compatibility

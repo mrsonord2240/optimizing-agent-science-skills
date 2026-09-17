@@ -3,6 +3,7 @@ name: bio-restriction-golden-gate-assembly
 description: Design and validate Type IIS scarless DNA assembly (Golden Gate, MoClo) using Biopython Bio.Restriction. Screens parts for internal BsaI/BsmBI/BbsI/SapI sites (domestication), previews the fusion overhangs a digest exposes, and validates a fusion-overhang set for distinctness and fidelity. Use when designing a Golden Gate or MoClo assembly, domesticating a part by removing internal Type IIS sites, or choosing and checking fusion overhangs for one-pot assembly.
 tool_type: python
 primary_tool: Bio.Restriction
+license: MIT
 ---
 
 ## Version Compatibility

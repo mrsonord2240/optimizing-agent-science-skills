@@ -3,6 +3,7 @@ name: bio-motif-search
 description: Find sequence motifs, degenerate IUPAC patterns, and transcription-factor binding sites in DNA/RNA using Biopython and regex, including position weight matrix (PWM/PSSM) scoring. Use when locating regulatory elements, counting overlapping motif occurrences, scanning for binding-site matches above a significance threshold, or reading motif matrices from JASPAR/MEME/TRANSFAC files. For restriction enzyme sites, use restriction-analysis/restriction-sites.
 tool_type: python
 primary_tool: Bio.motifs
+license: MIT
 ---
 
 ## Version Compatibility

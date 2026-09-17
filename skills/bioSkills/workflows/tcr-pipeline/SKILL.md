@@ -15,6 +15,7 @@ qc_checkpoints:
   - after_align: "Amplicon alignment >80-90%; RNA-seq legitimately low, judge by clonotype yield; chain usage on-target"
   - after_assemble: "Clonotype count plausible; report UMI/molecule counts, not reads, on UMI libraries"
   - before_diversity: "All samples downsampled to a common depth, else diversity/overlap are confounded by library size"
+license: MIT
 ---
 
 ## Version Compatibility

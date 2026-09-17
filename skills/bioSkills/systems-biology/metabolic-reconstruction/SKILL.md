@@ -3,6 +3,7 @@ name: bio-systems-biology-metabolic-reconstruction
 description: Builds draft genome-scale metabolic models from an annotated genome using CarveMe (top-down carving of a BiGG universal model) or gapseq (bottom-up pathway-evidence reconstruction), then loads and sanity-checks the draft in COBRApy. Use when creating a model for an organism without one, choosing between CarveMe and gapseq, gap-filling to a target medium, understanding why a draft that grows is still only a hypothesis, handling BiGG-vs-ModelSEED namespace mismatch, or preparing a draft for curation and community modeling.
 tool_type: cli
 primary_tool: CarveMe
+license: MIT
 ---
 
 ## Version Compatibility

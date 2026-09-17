@@ -3,6 +3,7 @@ name: bio-data-visualization-distribution-plots
 description: Plot per-group distributions of continuous data using boxplots, violins, beeswarms, quasirandom jitter, and raincloud plots with sample-size honesty (Weissgerber 2015), KDE-bandwidth awareness, and N-aware encoding choices. Use when comparing distributions across a small number of groups — expression per cluster, biomarker per arm, scores per condition — and the bar-of-mean default is misleading.
 tool_type: mixed
 primary_tool: ggplot2
+license: MIT
 ---
 
 ## Version Compatibility

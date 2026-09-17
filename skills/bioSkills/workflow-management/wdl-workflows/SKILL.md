@@ -3,6 +3,7 @@ name: bio-workflow-management-wdl-workflows
 description: Authors bioinformatics pipelines in WDL (Workflow Description Language) run by Cromwell or miniwdl, targeting the GATK/Broad and Terra/AnVIL/BioData Catalyst cloud ecosystem, with tasks, workflows, scatter-gather parallelism, structs, and a runtime block that sizes the cloud VM. Use when deciding to target Terra/AnVIL/GATK/WARP (chosen for the ecosystem, not the language); sizing runtime disks dynamically for a fresh-per-task cloud VM (ceil(size(f)*factor)+buffer); choosing preemptible vs on-demand VMs by task length and idempotency; picking Cromwell (production, cloud, call-caching) vs miniwdl (local dev, miniwdl check linting, readable errors); enabling and debugging call-caching silent-miss modes; pinning Docker by digest for reproducibility and cache stability; or scattering an array for parallel fan-out.
 tool_type: cli
 primary_tool: cromwell
+license: MIT
 ---
 
 ## Version Compatibility

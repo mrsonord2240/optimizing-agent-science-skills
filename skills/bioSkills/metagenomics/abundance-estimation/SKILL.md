@@ -3,6 +3,7 @@ name: bio-metagenomics-abundance
 description: Turns shotgun classifier output into a defensible abundance table with Bracken Bayesian re-estimation, then compositional treatment (CLR, zero handling), library-size normalization, reference-frame differential abundance, and optional absolute quantification. Covers why a relative-abundance change is not a change, why Bracken read fractions and MetaPhlAn percentages are different physical quantities, the silent -r read-length bias, the genome-size confound no library-size method fixes, and the rarefaction debate. Use when estimating species abundance from a Kraken2 report, normalizing a community count table, choosing a compositional transform, or converting relative to absolute load. For classification see kraken-classification; for diversity/ordination/DA mechanics see metagenome-visualization.
 tool_type: mixed
 primary_tool: Bracken
+license: MIT
 ---
 
 ## Version Compatibility

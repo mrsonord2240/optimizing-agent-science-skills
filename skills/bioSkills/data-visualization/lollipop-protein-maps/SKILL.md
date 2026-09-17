@@ -3,6 +3,7 @@ name: bio-data-visualization-lollipop-protein-maps
 description: Plot per-gene mutation distributions on a protein-domain map (lollipop / needle plots) showing mutation position, recurrence count, and variant classification with maftools, g3-lollipop, trackViewer, and ProteinPaint. Use when visualizing recurrent mutation hotspots on a single gene's protein, marking domain boundaries from UniProt/Pfam, comparing missense vs truncating distributions, or contrasting two cohorts on the same lollipop.
 tool_type: mixed
 primary_tool: maftools
+license: MIT
 ---
 
 ## Version Compatibility

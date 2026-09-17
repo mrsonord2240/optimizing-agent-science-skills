@@ -3,6 +3,7 @@ name: bio-small-rna-seq-mirge3-analysis
 description: Quantifies known miRNAs, isomiRs, tRFs, and A-to-I editing fast with miRge3.0 by aligning collapsed reads to curated miRBase or MirGeneDB libraries. Use when choosing miRBase versus MirGeneDB as the reference; deciding whether to collapse isomiRs to the parent miRNA or keep 5'-isomiRs separate (they shift the seed and retarget); confirming the organism is among the six supported species; or remembering that RPM output is for display only and raw counts go to DESeq2/edgeR.
 tool_type: python
 primary_tool: miRge3
+license: MIT
 ---
 
 ## Version Compatibility

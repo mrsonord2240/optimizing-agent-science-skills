@@ -3,6 +3,7 @@ name: bio-systems-biology-flux-balance-analysis
 description: Performs flux balance analysis (FBA), flux variability analysis (FVA), parsimonious FBA (pFBA), loopless FBA, flux sampling, and production envelopes on genome-scale metabolic models with COBRApy, solving the biomass-maximization linear program under a defined medium. Use when predicting growth rate on a carbon source, computing flux ranges and alternative optima (FVA), setting exchange bounds and minimal media, distinguishing a real growth phenotype from an under-constrained model, sampling the flux solution space, or choosing between FBA, pFBA, loopless FBA, and sampling for a flux distribution.
 tool_type: python
 primary_tool: cobrapy
+license: MIT
 ---
 
 ## Version Compatibility

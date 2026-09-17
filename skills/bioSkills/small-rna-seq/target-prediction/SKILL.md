@@ -3,6 +3,7 @@ name: bio-small-rna-seq-target-prediction
 description: Predicts and prioritizes miRNA target genes with seed-based tools (miRanda, TargetScan, miRDB) and experimentally validated databases (miRTarBase, multiMiR). Use when deciding that a predicted target is a hypothesis not a finding; ranking by the right score (weighted context++, mirSVR, miRDB); raising confidence by intersecting predictions with inversely-correlated mRNA DE; weighing validated (CLIP/reporter) over predicted evidence; or avoiding the circular enrichment of unfiltered target lists.
 tool_type: mixed
 primary_tool: miRanda
+license: MIT
 ---
 
 ## Version Compatibility

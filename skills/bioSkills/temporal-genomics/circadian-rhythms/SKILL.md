@@ -3,6 +3,7 @@ name: bio-temporal-genomics-circadian-rhythms
 description: Tests and estimates rhythmicity at a PRE-SPECIFIED period (canonically 24h) in time-series omics using cosinor regression (CosinorPy), JTK_CYCLE/ARSER/Lomb-Scargle meta-analysis (MetaCycle meta2d), and non-parametric tests for asymmetric waveforms (RAIN, DiscoRhythm); estimates phase (acrophase), amplitude, and MESOR, and controls FDR with an effect-size (rAMP) filter against over-detection. Use when testing for 24-hour or other known-period oscillations in a single condition (circadian, feeding-fasting, or light-dark experiments) and estimating their phase/amplitude. Not for unknown-period discovery (see temporal-genomics/periodicity-detection) or comparing rhythms between conditions (see temporal-genomics/differential-rhythmicity).
 tool_type: mixed
 primary_tool: CosinorPy
+license: MIT
 ---
 
 ## Version Compatibility

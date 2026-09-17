@@ -3,6 +3,7 @@ name: bio-spatial-transcriptomics-spatial-deconvolution
 description: Estimates per-spot cell type composition of spatial transcriptomics mixtures (Visium, Slide-seq, Stereo-seq) from an scRNA-seq reference with cell2location, RCTD, SPOTlight, stereoscope, SpatialDWLS, or reference-free STdeconvolve. Use when deciding whether a platform even needs deconvolution (the resolution fork -- a 55um Visium spot is a 1-10-cell MIXTURE -> deconvolve, but a Xenium/MERFISH/CosMx cell is already single -> segment instead, and running deconvolution there invents fractions that do not exist); choosing cell2location (absolute abundance) vs RCTD/SPOTlight/stereoscope/SpatialDWLS (proportions only) by output and runtime; matching the scRNA reference to tissue and condition (the reference IS the result -- a missing cell type is silently misassigned to its nearest neighbor with no error flag); and handling compositional outputs that sum to 1 with CLR/ILR rather than naive per-type t-tests.
 tool_type: python
 primary_tool: cell2location
+license: MIT
 ---
 
 ## Version Compatibility

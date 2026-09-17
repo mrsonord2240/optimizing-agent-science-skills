@@ -3,6 +3,7 @@ name: bio-metagenomics-amr-detection
 description: Profiles the antimicrobial-resistance gene content (resistome) of shotgun metagenomes - read-based quantification with RGI bwt, AMR++/MEGARes, ARGs-OAP/SARG, deepARG, or GROOT, and presence calling with AMRFinderPlus/ABRicate on assembled contigs or MAGs. Covers why an ARG hit is a sequence match not a phenotype, why a metagenomic ARG has no host and no genomic context until assembly (and assembly breaks at ARGs), per-gene curated thresholds vs a flat 80/80, gene-fraction false-positive control, and cross-study normalization pitfalls. Use when quantifying a community resistome, normalizing ARG abundance, or calling ARGs from metagenome contigs. For pure-culture isolate AMR, point mutations, and phenotype/MIC prediction see epidemiological-genomics/amr-surveillance.
 tool_type: cli
 primary_tool: AMRFinderPlus
+license: MIT
 ---
 
 ## Version Compatibility

@@ -16,6 +16,7 @@ qc_checkpoints:
   - periodicity_gate: "Strong 3-nt frame-0 periodicity REQUIRED before any ORF/stalling analysis; else gene-level counts only"
   - after_psite: "Per-read-length P-site offsets calibrated (not a single hardcoded 28 / read 5' end)"
   - after_te: "TE via count-based GLM (riborex/Xtail/anota2seq), never a ratio of ratios"
+license: MIT
 ---
 
 ## Version Compatibility

@@ -1,8 +1,9 @@
 ---
 name: bio-temporal-genomics-trajectory-modeling
-description: Models continuous temporal trajectories from BULK or time-resolved omics where the x-axis is measured experimental time: penalized GAMs (mgcv) for smooth trends and changepoint detection (segmented, ruptures) for abrupt regime shifts. Use when deciding between a smooth GAM and a changepoint model; choosing the GAM distribution (nb() plus a library-size offset for raw counts vs Gaussian on vst/log-CPM); setting the basis-dimension ceiling k below the number of timepoints and letting REML pick wiggliness; handling residual autocorrelation across timepoints with corAR1/bam(rho=); testing whether two conditions' trajectories diverge with an ordered-factor difference smooth; and choosing a changepoint search/cost/penalty (Pelt/Binseg, l2/rbf). Not for single-cell pseudotime (see single-cell/trajectory-inference).
+description: "Models continuous temporal trajectories from BULK or time-resolved omics where the x-axis is measured experimental time: penalized GAMs (mgcv) for smooth trends and changepoint detection (segmented, ruptures) for abrupt regime shifts. Use when deciding between a smooth GAM and a changepoint model; choosing the GAM distribution (nb() plus a library-size offset for raw counts vs Gaussian on vst/log-CPM); setting the basis-dimension ceiling k below the number of timepoints and letting REML pick wiggliness; handling residual autocorrelation across timepoints with corAR1/bam(rho=); testing whether two conditions' trajectories diverge with an ordered-factor difference smooth; and choosing a changepoint search/cost/penalty (Pelt/Binseg, l2/rbf). Not for single-cell pseudotime (see single-cell/trajectory-inference)."
 tool_type: mixed
 primary_tool: mgcv
+license: MIT
 ---
 
 ## Version Compatibility

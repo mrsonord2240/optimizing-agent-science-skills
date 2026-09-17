@@ -3,6 +3,7 @@ name: bio-spatial-transcriptomics-spatial-domains
 description: Identify spatially coherent tissue domains (regions like cortical layers, tumor vs stroma) in Visium, Visium HD, Xenium, MERFISH, Slide-seq, and Stereo-seq data with Squidpy, BANKSY, BayesSpace, STAGATE, and GraphST. Use when distinguishing a domain (a region with many cell types) from a cell type (one cell's identity) and a niche (local cell-type composition); choosing a domain method by tissue geometry (laminar/continuous vs high-resolution imaging vs non-contiguous); tuning the spatial-weight knob (BANKSY lambda, BayesSpace smoothing, SpaGCN histology weight, GNN graph radius) to avoid over-smoothing into blobs or under-smoothing into salt-and-pepper; choosing the number of domains k as a biological decision with k+-1 sensitivity; and reading the Yuan 2024 benchmark with the DLPFC continuous-laminar caveat.
 tool_type: python
 primary_tool: squidpy
+license: MIT
 ---
 
 ## Version Compatibility

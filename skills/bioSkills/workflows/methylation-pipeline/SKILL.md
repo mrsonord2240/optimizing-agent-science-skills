@@ -15,6 +15,7 @@ qc_checkpoints:
   - after_qc: "Q30 >80%, adapter content removed"
   - after_alignment: "Mapping efficiency >50%, bisulfite conversion >99%"
   - after_calling: "Coverage distribution reasonable, no biased positions"
+license: MIT
 ---
 
 ## Version Compatibility

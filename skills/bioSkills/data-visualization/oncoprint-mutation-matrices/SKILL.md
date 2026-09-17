@@ -3,6 +3,7 @@ name: bio-data-visualization-oncoprint-mutation-matrices
 description: Build OncoPrint and co-mutation matrix plots from somatic-variant cohorts using ComplexHeatmap, maftools, and comut.py with alteration-type stacking, sample ordering by mutational burden, mutual-exclusivity overlays, and clinical annotation tracks. Use when visualizing per-sample mutation patterns across recurrent driver genes, comparing alteration classes, or identifying mutually-exclusive / co-occurring driver pairs.
 tool_type: mixed
 primary_tool: ComplexHeatmap
+license: MIT
 ---
 
 ## Version Compatibility

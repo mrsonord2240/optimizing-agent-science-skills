@@ -3,6 +3,7 @@ name: bio-phasing-imputation-imputation-qc
 description: Assesses and filters phasing/imputation output - the quality metrics (Beagle DR2, Minimac R2 and EmpRsq, IMPUTE/GLIMPSE INFO), MAF-stratified filtering, true accuracy by masking, the differential-imputation confound, dosage-based downstream usage, and phasing switch-error QC. Covers why every routine quality score is an ESTIMATE of r2 from the posterior spread (not validation against truth), why it is confounded with MAF so a flat INFO>=0.3 cutoff is a hidden rare-variant filter, why concordance lies for rare variants while masked dosage-r2 by MAF is the gold standard, why separate case/control imputation manufactures false GWAS hits, and that the field name tells the tool (DR2=Beagle, R2=Minimac, INFO=GLIMPSE/IMPUTE). Use when filtering imputed variants before GWAS, validating accuracy, benchmarking phasing against trios, or diagnosing inflated association. Imputation is genotype-imputation; phasing is haplotype-phasing; panel ancestry is reference-panels; the test is population-genetics/association-testing.
 tool_type: mixed
 primary_tool: bcftools
+license: MIT
 ---
 
 ## Version Compatibility

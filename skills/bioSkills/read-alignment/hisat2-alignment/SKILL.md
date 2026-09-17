@@ -3,6 +3,7 @@ name: bio-read-alignment-hisat2-alignment
 description: Aligns RNA-seq reads to a genome with HISAT2, the splice-aware aligner whose hierarchical graph FM-index runs at roughly a quarter of STAR's memory (~7 GB for human), whose SNP/haplotype graph index reduces reference bias in the index itself, and whose MAPQ is GATK-friendly (60 for unique, no 255 problem). Use when RNA alignment must fit a memory-constrained machine, when feeding StringTie/Cufflinks transcript assembly via --dta, or when a SNP-aware graph index is wanted for allele-robust mapping. Feature-rich/high-RAM RNA alignment and fusion detection are star-alignment; DE on known transcripts only should skip alignment for rna-quantification/alignment-free-quant; the QC gate and contig-naming reconciliation are alignment-files; counting is rna-quantification.
 tool_type: cli
 primary_tool: HISAT2
+license: MIT
 ---
 
 ## Version Compatibility

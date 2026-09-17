@@ -3,6 +3,7 @@ name: bio-temporal-genomics-temporal-clustering
 description: Clusters temporally variable genes by expression-profile SHAPE (not significance) using Mfuzz fuzzy c-means, TCseq, DEGreport degPatterns, and tslearn DTW/soft-DTW. Use when grouping pre-selected time-course genes into shared trajectory programs (co-expression modules), choosing between soft vs hard clustering, picking k, selecting a distance metric (Euclidean/correlation/DTW), or interpreting clusters with per-cluster enrichment. Requires temporally variable genes selected FIRST (differential-expression/timeseries-de or a variance filter); clustering is descriptive and downstream of selection, never a test of which genes are dynamic.
 tool_type: mixed
 primary_tool: Mfuzz
+license: MIT
 ---
 
 ## Version Compatibility

@@ -3,6 +3,7 @@ name: bio-entrez-search
 description: Search NCBI databases using Biopython Bio.Entrez (ESearch, EInfo, EGQuery, ESpell). Use when finding records by keyword, building reproducible field-qualified queries, navigating the Entrez Query Translator, exploiting the history server for large result sets, handling retmax caps, or interpreting weekly index lag. Covers PubMed, Nucleotide, Protein, Gene, SRA, GEO, Assembly, Taxonomy, ClinVar, dbSNP.
 tool_type: python
 primary_tool: Bio.Entrez
+license: MIT
 ---
 
 ## Version Compatibility

@@ -3,6 +3,7 @@ name: bio-ncbi-datasets-cli
 description: Download genome assemblies, gene records, and ortholog data from NCBI using the modern Datasets v2 CLI (replaces assembly_summary.txt scraping and many EFetch workflows). Use when bulk-pulling genome assemblies, gene metadata across species, ortholog sets, or BLAST databases; when E-utilities are too slow for genome-scale work; or when automatic checksum verification, parallel download, and clean accession-driven retrieval are required. Encodes the JSON-lines output format, dataformat conversion, --dehydrated for cloud workflows, and when Datasets is/isn't the right tool.
 tool_type: cli
 primary_tool: NCBI Datasets CLI
+license: MIT
 ---
 
 ## Version Compatibility

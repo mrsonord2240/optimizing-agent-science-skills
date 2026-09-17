@@ -3,6 +3,7 @@ name: bio-methylation-calling
 description: Extracts per-cytosine methylation calls from aligned bisulfite/EM-seq reads with bismark_methylation_extractor (Bismark BAM) or the aligner-agnostic MethylDackel/BISCUIT (bwa-meth BAM), producing the beta value M/(M+U) as a coverage file, bedGraph, or genome-wide cytosine report across CpG/CHG/CHH context. Covers conversion-rate QC as the first gate, the 5mC vs 5hmC summed caveat, variant-aware calling so a C/T SNP does not masquerade as unmethylation, paired-end --no_overlap double-counting, symmetric CpG dyad collapse, and the 0-based vs 1-based coordinate trap. Use when extracting methylation levels from a bisulfite/EM-seq alignment, choosing an extractor for a non-Bismark BAM, QC-ing conversion efficiency, or producing coverage/cytosine-report input for testing. For long-read MM/ML modification calling see long-read-sequencing/nanopore-methylation; for the upstream BAM see bismark-alignment; for per-CpG statistics see differential-cpg-testing.
 tool_type: cli
 primary_tool: Bismark
+license: MIT
 ---
 
 ## Version Compatibility

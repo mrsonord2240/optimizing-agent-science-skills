@@ -3,6 +3,7 @@ name: bio-spatial-transcriptomics-spatial-communication
 description: Maps cell-cell communication and ligand-receptor co-expression in spatial transcriptomics (Visium, Xenium, MERFISH, CosMx, Slide-seq) with Squidpy ligrec, COMMOT, stLearn, CellChat-spatial, and NicheNet. Use when choosing a method by whether spatial distance is actually modeled (squidpy ligrec is space-blind cluster-permutation vs COMMOT optimal-transport is distance-aware vs stLearn neighborhood vs CellChat-spatial filter) and by secreted-vs-contact-dependent range; choosing the ligand-receptor database knowingly because it drives the result as much as the algorithm; guarding against segmentation-spillover circularity that fabricates short-range hits; treating every ligand-receptor score as a co-expression hypothesis on a confidence ladder, not validated signaling; correcting for thousands of pair-by-cell-type-pair permutation tests; and recognizing that a targeted imaging panel rarely contains the relevant ligands and receptors so a "no communication" call is uninformative.
 tool_type: python
 primary_tool: squidpy
+license: MIT
 ---
 
 ## Version Compatibility

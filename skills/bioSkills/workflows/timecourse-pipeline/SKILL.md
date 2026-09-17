@@ -16,6 +16,7 @@ qc_checkpoints:
   - after_clustering: "Membership >0.5 for soft clustering; no empty clusters; k validated by silhouette/gap or bootstrap stability (typical 4-20)"
   - before_rhythm_detection: "GATE: design covers >=2 full cycles AND >=6-8 samples/cycle at ~even spacing AND collection order was randomized; else SKIP rhythm detection"
   - after_enrichment: "At least 3 clusters with significant GO terms at FDR <0.05; background = temporal genes, not the genome"
+license: MIT
 ---
 
 ## Version Compatibility

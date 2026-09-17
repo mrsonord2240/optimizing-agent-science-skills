@@ -3,6 +3,7 @@ name: bio-data-visualization-forest-funnel-plots
 description: Build forest plots (HR, OR, RR, beta-coefficient summaries with CIs) and funnel plots (meta-analysis publication-bias diagnostics) using forestplot, metafor, ggforest, and MendelianRandomization with proper axis-scaling, summary-diamond placement, subgroup nesting, and Egger / trim-and-fill asymmetry tests. Use when summarizing effects across subgroups, trials, or instruments — meta-analysis, Mendelian randomization, subgroup HRs.
 tool_type: r
 primary_tool: metafor
+license: MIT
 ---
 
 ## Version Compatibility

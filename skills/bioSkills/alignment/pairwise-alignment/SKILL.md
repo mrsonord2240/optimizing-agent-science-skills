@@ -3,6 +3,7 @@ name: bio-alignment-pairwise
 description: Perform pairwise sequence alignment using Biopython Bio.Align.PairwiseAligner. Use when comparing two sequences, finding optimal alignments, scoring similarity, and identifying local or global matches between DNA, RNA, or protein sequences.
 tool_type: python
 primary_tool: Bio.Align
+license: MIT
 ---
 
 ## Version Compatibility

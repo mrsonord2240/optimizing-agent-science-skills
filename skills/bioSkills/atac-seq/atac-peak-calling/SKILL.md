@@ -3,6 +3,7 @@ name: bio-atac-seq-atac-peak-calling
 description: Call accessible chromatin regions from ATAC-seq BAM files using MACS3, MACS2, Genrich, or HMMRATAC. Use when identifying open chromatin from aligned ATAC-seq, choosing between point-source vs HMM peak callers, applying ENCODE-style pseudoreplicate IDR, removing blacklist regions, or fixing 501bp consensus peaks for downstream differential analysis.
 tool_type: cli
 primary_tool: macs3
+license: MIT
 ---
 
 ## Version Compatibility

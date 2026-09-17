@@ -19,6 +19,7 @@ qc_checkpoints:
   - after_fragment: "Modal insert ~167bp (150-180); mononucleosome fraction >0.3"
   - after_tf: "TF above the ~3% ichorCNA LoD to trust the value (below = below detection, not low burden)"
   - after_mutation: "VarDict -f 0.005 is a reporting floor, NOT a detection threshold: confirm each call against a per-locus background-error model (PoN or smCounter2) before reporting; CHIP-subtracted against matched WBC"
+license: MIT
 ---
 
 ## Version Compatibility

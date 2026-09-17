@@ -3,6 +3,7 @@ name: bio-metagenomics-functional-profiling
 description: Profiles the functional potential of shotgun metagenomes with HUMAnN 3's tiered search (MetaPhlAn prescreen, Bowtie2 pangenome, translated DIAMOND vs UniRef), giving gene-family (RPK) and MetaCyc pathway abundances stratified by species. Covers why a metagenome measures potential not activity, why dropping UNMAPPED/UNINTEGRATED biases everything, why stratification is an estimate, coverage-vs-abundance and MinPath/gap-fill, UniRef90-vs-50 and biome database bias, and the assembly/eggNOG/dbCAN/antiSMASH alternatives. Use when obtaining pathway or gene-family abundances, regrouping to KO/EC/GO, normalizing functional tables, or choosing read-based vs assembly-based functional profiling. For AMR genes see amr-detection; for host-gene enrichment see pathway-analysis.
 tool_type: cli
 primary_tool: HUMAnN
+license: MIT
 ---
 
 ## Version Compatibility

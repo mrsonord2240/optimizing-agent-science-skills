@@ -3,6 +3,7 @@ name: bio-epitranscriptomics-m6anet-analysis
 description: Detects m6A modifications from Oxford Nanopore direct-RNA-seq (DRS) signal using m6Anet (multiple-instance-learning over DRACH 5-mer signal). Covers the upstream pipeline (Dorado/Guppy basecalling -> minimap2 map-ont -> nanopolish eventalign -> m6anet dataprep -> m6anet inference), per-site vs per-read probability including the mod_ratio stoichiometry column, the DRACH-only constraint, minimum-coverage thresholds (20-50 reads/site), multi-condition comparison via xPore/Nanocompore/ELIGOS, Dorado native modification calling (RNA004, 2024+), and the cDNA-vs-DRS distinction (cDNA Nanopore CANNOT detect modifications). Use when calling m6A from ONT DRS without immunoprecipitation, choosing m6Anet vs xPore vs Nanocompore vs ELIGOS vs Dorado native, interpreting probability_modified vs mod_ratio vs per-read probabilities, deciding between m6Anet (known DRACH sites) and Dorado/Remora (genome-wide screening), pinning RNA002 vs RNA004 chemistry and basecaller versions, or troubleshooting eventalign/dataprep failures.
 tool_type: python
 primary_tool: m6Anet
+license: MIT
 ---
 
 ## Version Compatibility

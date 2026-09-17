@@ -3,6 +3,7 @@ name: bio-flow-cytometry-compensation-transformation
 description: Corrects fluorophore spillover (conventional compensation) or spectral overlap (spectral unmixing) and applies variance-stabilizing transforms (logicle/biexponential, arcsinh, log) for flow and mass cytometry. Covers spillover-matrix estimation from single-stain controls, AutoSpill, the spillover spreading matrix and why panel design (not compensation) bounds resolution, compensate-then-transform ordering, and arcsinh cofactor choice (5 for CyTOF, ~150 for fluorescence, per-channel via flowVS). Use when correcting spectral overlap, preparing data for gating/clustering, choosing logicle vs arcsinh, deciding a cofactor, or distinguishing compensation from spectral unmixing.
 tool_type: r
 primary_tool: flowCore
+license: MIT
 ---
 
 ## Version Compatibility

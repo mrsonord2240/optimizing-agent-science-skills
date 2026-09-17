@@ -3,6 +3,7 @@ name: bio-immunoinformatics-immunogenicity-scoring
 description: Rank and prioritize neoantigen/epitope candidates by likely T-cell response using NeoFox feature annotation, PRIME2.0, BigMHC-IM, the Łuksza/Balachandran fitness model (agretopicity + foreignness), and pVACtools tiering. Encodes the field's hard truths that immunogenicity is the least-solved layer (dedicated scores ~AUROC 0.6-0.7, modest PPV), that scores are valid only for RANKING within one patient (never absolute go/no-go or cross-patient), that DAI has anchor-inflation and WT-denominator traps, and that stacking weak correlated scores into one number is a red flag. Use when ordering a candidate list for a vaccine. Binding lives in mhc-binding-prediction; calling in neoantigen-prediction.
 tool_type: python
 primary_tool: NeoFox
+license: MIT
 ---
 
 ## Version Compatibility

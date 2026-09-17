@@ -3,6 +3,7 @@ name: bio-epitranscriptomics-m6a-peak-calling
 description: Calls m6A peaks from MeRIP-seq / m6A-seq paired IP-vs-input data using exomePeak2 (transcript-aware, GC-bias-corrected Poisson GLM), MeTPeak (HMM over sliding windows), MACS3/MACS2 with --nomodel --broad --keep-dup all (genome-wide broad alternative), and DRACH motif enrichment via HOMER or ggseqlogo as a sanity check (NOT a filter). Covers BED12 vs narrowPeak output, exonic vs intronic peak handling, multi-tool reconciliation (intersection vs union), the m6A-vs-m6Am ambiguity at 5'UTR peaks that antibody methods cannot resolve, and orthogonal validation (miCLIP/GLORI/m6A-SAC-seq/m6Anet). Use when calling peaks from paired IP/input genome BAMs, choosing exomePeak2 (transcript-aware default) vs MACS3 (broad genomic) vs MeTPeak (HMM-smoothed low-coverage), confirming DRACH enrichment as a sanity check on the peak set, reconciling differing peak sets across tools, validating MeRIP peaks against single-base methods, interpreting 5' peaks where m6Am contamination is possible, or recommending a consensus strategy.
 tool_type: mixed
 primary_tool: exomePeak2
+license: MIT
 ---
 
 ## Version Compatibility

@@ -3,6 +3,7 @@ name: bio-data-visualization-manhattan-qq-locuszoom
 description: Build Manhattan, Miami, QQ, and locuszoom-style regional plots from GWAS, TWAS, PWAS, and QTL summary statistics with correct genomic-inflation diagnostics, multi-trait overlays, lead-SNP labeling, and LD-aware regional rendering. Use when visualizing association results across the genome, comparing two traits, computing genomic inflation lambda, or zooming into a locus with LD coloring.
 tool_type: mixed
 primary_tool: qqman
+license: MIT
 ---
 
 ## Version Compatibility

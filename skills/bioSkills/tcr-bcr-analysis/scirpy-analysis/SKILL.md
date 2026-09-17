@@ -3,6 +3,7 @@ name: bio-tcr-bcr-analysis-scirpy-analysis
 description: Integrates single-cell paired TCR/BCR (10x VDJ, AIRR, dandelion, BD Rhapsody) with gene expression in an AnnData/MuData object using scirpy - chain-pairing QC, clonotype definition, clonal expansion, diversity, repertoire overlap, V(D)J usage, and VDJdb specificity. Operates on the awkward-array AIRR model (adata.obsm['airr'], accessed via get.airr after pp.index_chains), not legacy per-chain obs columns. Use when deciding clonotype definition for TCR (exact CDR3-nt identity via define_clonotypes) versus BCR (nucleotide distance clustering via define_clonotype_clusters with normalized_hamming plus same_v_gene/same_j_gene, because somatic hypermutation shatters identity clonotypes); tuning receptor_arms (all vs any), dual_ir, and within_group; filtering chain_qc categories (multichain doublets, orphan dropout, extra-VJ dual-TCR) without biasing clonal-expansion and diversity estimates; and overlaying clonality onto the transcriptomic UMAP.
 tool_type: python
 primary_tool: scirpy
+license: MIT
 ---
 
 ## Version Compatibility

@@ -3,6 +3,7 @@ name: bio-fragment-analysis
 description: Extracts cfDNA fragmentomics features (DELFI genome-wide short/long ratios, WPS nucleosome positioning, Griffin GC-corrected accessibility profiles, end-motifs/MDS, OCF) for cancer detection and tissue-of-origin from plasma WGS. Centers on the nuclease-footprint reframe (every feature re-reads one nucleosome object), the mandatory GC correction, and the cross-protocol non-comparability that breaks naive classifiers. Runs FinaleToolkit (real CLI/Python, MIT) and the Griffin Snakemake pipeline; DELFI is a method, not a package. Use when deriving fragment-based signal from cfDNA, choosing a feature family for detection vs subtyping, or diagnosing why a fragmentomic model failed validation.
 tool_type: python
 primary_tool: FinaleToolkit
+license: MIT
 ---
 
 ## Version Compatibility

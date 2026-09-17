@@ -3,6 +3,7 @@ name: bio-epitranscriptomics-m6a-differential
 description: Identifies differential m6A methylation between conditions from MeRIP-seq paired IP/input data using exomePeak2 (GC-bias-aware differential via its bam_ip/bam_input control + bam_treated_ip/bam_treated_input treatment arms), QNB beta-binomial, MeTDiff HMM, and RADAR, plus the paired-symmetric edgeR/DESeq2-on-peak-counts route when batch/lot covariates need fixed-effect handling that exomePeak2's API does not accept. Covers paired vs unpaired vs interaction designs, batch confounding and per-lot meta-analysis, the stoichiometry-vs-expression-vs-IP-efficiency confound, and effect-size filtering against under-powered N=2 designs. Use when comparing m6A across two or more conditions, choosing between exomePeak2/QNB/RADAR/MeTDiff for a design, handling batch confounding when exomePeak2's API is too rigid, distinguishing real hyper/hypo-methylation from expression shifts, applying effect-size thresholds, or planning orthogonal stoichiometry validation (GLORI/SAC-seq/m6Anet mod_ratio).
 tool_type: r
 primary_tool: exomePeak2
+license: MIT
 ---
 
 ## Version Compatibility

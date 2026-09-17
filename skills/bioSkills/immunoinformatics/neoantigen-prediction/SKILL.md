@@ -3,6 +3,7 @@ name: bio-immunoinformatics-neoantigen-prediction
 description: Identify tumor neoantigens from somatic variants with pVACtools (pVACseq/pVACfuse/pVACbind/pVACvector/pVACview) for personalized cancer vaccines and checkpoint biomarkers. Encodes the field's hard truth that binding prediction is the easy, near-solved part and single-digit-percent PPV lives downstream — so it centers clonality/CCF, HLA LOH (the silent invalidator), expression, proximal-variant phasing, agretopicity/foreignness quality, and the predicted->presented->immunogenic validation tiers. Use when nominating vaccine targets, ranking neoantigens, or building a tumor-to-candidate pipeline. Binding details in mhc-binding-prediction; ranking in immunogenicity-scoring.
 tool_type: mixed
 primary_tool: pVACtools
+license: MIT
 ---
 
 ## Version Compatibility

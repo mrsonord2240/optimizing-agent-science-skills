@@ -4,6 +4,7 @@ description: Controls error rates across thousands of simultaneous tests in geno
 tool_type: mixed
 primary_tool: qvalue
 goal_approach_exempt: true
+license: MIT
 ---
 
 ## Version Compatibility

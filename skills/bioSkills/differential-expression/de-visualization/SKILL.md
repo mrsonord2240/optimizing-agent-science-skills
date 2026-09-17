@@ -3,6 +3,7 @@ name: bio-differential-expression-de-visualization
 description: Creates DE-specific diagnostic and result visualizations using DESeq2/edgeR built-in functions and lightweight ggplot2 wrappers. Covers MA plot (with the shrunken-LFC compression effect), volcano (with the apeglm caveat that p-values are unchanged), PCA on VST/rlog (never raw counts), sample distance heatmaps, top-DE-gene heatmaps with the row-scaling trap, dispersion / BCV plot interpretation, p-value histogram diagnostics, plotCounts for individual genes, blind=TRUE vs FALSE rationale, and the n=3 visualization stake. Use when generating DE diagnostic plots, choosing VST vs rlog for visualization, troubleshooting suspicious plot patterns (shifted MA cloud, batch-dominated PCA, anti-conservative p-value histogram), or building a standard QC figure panel.
 tool_type: r
 primary_tool: DESeq2
+license: MIT
 ---
 
 ## Version Compatibility

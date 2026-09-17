@@ -4,6 +4,7 @@ description: Builds reproducible Quarto reports, presentations, and websites acr
 tool_type: mixed
 primary_tool: Quarto
 goal_approach_exempt: true
+license: MIT
 ---
 
 ## Version Compatibility

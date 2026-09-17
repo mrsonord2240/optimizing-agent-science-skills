@@ -1,8 +1,9 @@
 ---
 name: bio-methylation-array-qc-filtering
-description: Performs probe filtering and sample-level QC on Illumina Infinium methylation arrays (450K / EPIC / EPICv2) to decide which probes and samples to trust. Drops detection-p-failed and low-bead-count probes, removes cross-reactive/non-specific probes (Chen 2013 / Pidsley 2016 lists via maxprobes), excludes SNP-overlapping probes with dropLociWithSnps, and handles sex-chromosome probes. Collapses EPICv2 replicate probes with betasCollapseToPfx and harmonizes across array versions (EPICv2 hg38 vs 450K/EPIC hg19, intersect plus mLiftOver). Runs sample-identity QC: getSex sex prediction vs sample sheet for swap detection, rs-SNP fingerprint clustering for duplicates/swaps, and Sentrix chip/array-position batch diagnosis. Use when filtering methylation array probes, detecting sample swaps or mislabels, collapsing EPICv2 replicates, or merging 450K/EPIC/EPICv2 cohorts. For IDAT-to-corrected-beta normalization see array-preprocessing; for batch correction and study design see ewas-design.
+description: "Performs probe filtering and sample-level QC on Illumina Infinium methylation arrays (450K / EPIC / EPICv2) to decide which probes and samples to trust. Drops detection-p-failed and low-bead-count probes, removes cross-reactive/non-specific probes (Chen 2013 / Pidsley 2016 lists via maxprobes), excludes SNP-overlapping probes with dropLociWithSnps, and handles sex-chromosome probes. Collapses EPICv2 replicate probes with betasCollapseToPfx and harmonizes across array versions (EPICv2 hg38 vs 450K/EPIC hg19, intersect plus mLiftOver). Runs sample-identity QC: getSex sex prediction vs sample sheet for swap detection, rs-SNP fingerprint clustering for duplicates/swaps, and Sentrix chip/array-position batch diagnosis. Use when filtering methylation array probes, detecting sample swaps or mislabels, collapsing EPICv2 replicates, or merging 450K/EPIC/EPICv2 cohorts. For IDAT-to-corrected-beta normalization see array-preprocessing; for batch correction and study design see ewas-design."
 tool_type: r
 primary_tool: minfi
+license: MIT
 ---
 
 ## Version Compatibility

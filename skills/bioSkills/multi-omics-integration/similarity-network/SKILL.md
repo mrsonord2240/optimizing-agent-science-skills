@@ -3,6 +3,7 @@ name: bio-multi-omics-similarity-network
 description: Stratifies patients into multi-omics subtypes by building one patient-by-patient similarity network per omic, fusing them with SNF's cross-network diffusion, and spectral-clustering the fused graph - then defending the clusters with stability, survival separation, and replication. Covers why spectral clustering always returns the requested cluster count so a subtype is a claim not a discovery, why the eigengap is a graph property not a biological truth, why fusion is not automatically better than the best single omic, why SNF needs complete data while NEMO handles mosaic cohorts, and the SNFtool API gotchas (dist2 returns squared distance, affinityMatrix width is sigma, spectralClustering K is the cluster count). Use when discovering patient subtypes from multiple omics, choosing a cluster number, validating subtypes, or handling partial multi-omic data. For feature-space factors see mofa-integration; for supervised signatures see mixomics-analysis; for survival see clinical-biostatistics/survival-analysis.
 tool_type: r
 primary_tool: SNFtool
+license: MIT
 ---
 
 ## Version Compatibility

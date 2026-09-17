@@ -3,6 +3,7 @@ name: bio-ribo-seq-ribosome-periodicity
 description: Validate Ribo-seq library quality by measuring 3-nucleotide periodicity and calibrating read-length-specific P-site offsets. Use when checking whether footprints capture genuine translation, determining P-site offsets for downstream ORF/TE/stalling analysis, or deciding which read lengths to keep.
 tool_type: mixed
 primary_tool: riboWaltz
+license: MIT
 ---
 
 ## Version Compatibility

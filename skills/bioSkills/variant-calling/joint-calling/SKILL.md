@@ -3,6 +3,7 @@ name: bio-variant-calling-joint-calling
 description: Joint genotype a cohort of per-sample gVCFs with GATK (HaplotypeCaller -ERC GVCF -> GenomicsDBImport or CombineGVCFs -> GenotypeGVCFs) or GLnexus for DeepVariant gVCFs, producing a squared-off sample-by-site genotype matrix. Use when deciding between joint genotyping and merging single-sample callsets (never bcftools merge as absent==hom-ref), choosing GenomicsDBImport vs CombineGVCFs by cohort size and memory, solving the N+1 problem so a new sample does not force re-calling everyone, understanding cohort rescue of low-coverage het sites, handling the spanning-deletion star allele and GQ/PL recomputation at the joint step, scaling to biobank cohorts by interval sharding, or picking DeepVariant+GLnexus over the GATK path on throughput. Not for single-sample calling (see variant-calling/gatk-variant-calling) or VQSR/hard-filter mechanism (see variant-calling/filtering-best-practices).
 tool_type: cli
 primary_tool: GATK
+license: MIT
 ---
 
 ## Version Compatibility

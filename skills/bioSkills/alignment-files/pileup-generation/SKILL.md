@@ -3,6 +3,7 @@ name: bio-pileup-generation
 description: Generate pileup data for variant calling using samtools mpileup and pysam. Use when preparing data for variant calling, analyzing per-position read data, or calculating allele frequencies.
 tool_type: cli
 primary_tool: samtools
+license: MIT
 ---
 
 ## Version Compatibility

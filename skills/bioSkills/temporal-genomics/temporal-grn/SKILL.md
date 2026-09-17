@@ -3,6 +3,7 @@ name: bio-temporal-genomics-temporal-grn
 description: Infers directed, time-delayed gene regulatory edges from BULK time-series expression using Granger causality (statsmodels VAR F-test), dynGENIE3 (tree ensembles regressing ODE-derived derivatives; Random Forests by default, Extra-Trees optional), and dynamic Bayesian networks (bnlearn). Use when the output is a RANKED HYPOTHESIS list for perturbation validation, not validated causal edges; deciding Granger vs dynGENIE3 vs DBN by timepoint count and linearity; sizing maxlag against the n>3*maxlag+1 degrees-of-freedom floor; handling stationarity/differencing before Granger; restricting regulators to known TFs; and comparing network rewiring across conditions at matched edge density. Not for single-cell pseudotime GRNs (see gene-regulatory-networks/scenic-regulons) or static co-expression (see gene-regulatory-networks/coexpression-networks).
 tool_type: mixed
 primary_tool: statsmodels
+license: MIT
 ---
 
 ## Version Compatibility

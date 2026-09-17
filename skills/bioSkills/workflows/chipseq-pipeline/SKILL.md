@@ -20,6 +20,7 @@ qc_checkpoints:
   - before_dedup: "NRF >0.8, PBC1 >0.8 (computed on the PRE-dedup BAM; after dedup the metric is meaningless)"
   - after_peaks: "FRiP >1% (TF) or >5% (sharp histone; broad marks run lower); NSC >1.05; RSC >0.8; fingerprint separates IP from input"
   - after_idr: "IDR rescue ratio max(Np,Nt)/min and self-consistency ratio max(N1,N2)/min both <=2 (ENCODE); IDR run on PER-REPLICATE peaks"
+license: MIT
 ---
 
 ## Version Compatibility

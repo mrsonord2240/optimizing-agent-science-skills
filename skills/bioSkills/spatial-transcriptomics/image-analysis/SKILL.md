@@ -3,6 +3,7 @@ name: bio-spatial-transcriptomics-image-analysis
 description: Segments cells/nuclei and extracts image features from imaging spatial transcriptomics (Xenium, MERFISH/MERSCOPE, CosMx) and H&E/IF tissue images using Cellpose, StarDist, Baysor, and Squidpy. Use when choosing a segmentation strategy (DAPI nucleus + expansion vs membrane-stain whole-cell vs transcript-aware Baysor/proseg vs segmentation-free SSAM) given the available stain; judging whether transcript spillover is fabricating false co-expression and short-range cell-cell signal; and deciding whether the derived cell-by-gene matrix is trustworthy before downstream typing, DE, or ligand-receptor analysis.
 tool_type: python
 primary_tool: squidpy
+license: MIT
 ---
 
 ## Version Compatibility

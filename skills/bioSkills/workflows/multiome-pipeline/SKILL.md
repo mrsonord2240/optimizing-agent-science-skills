@@ -19,6 +19,7 @@ qc_checkpoints:
   - after_rna_qc: "RNA quality filters passed"
   - after_atac_qc: "TSS enrichment >2, nucleosome signal <4"
   - after_wnn: "Joint embedding separates cell types"
+license: MIT
 ---
 
 ## Version Compatibility

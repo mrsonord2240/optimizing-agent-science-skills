@@ -3,6 +3,7 @@ name: bio-multi-omics-integration-design
 description: Chooses a bulk multi-omics integration strategy before any tool runs by mapping the biological question (subtype discovery, shared axis of variation, predictive signature, pairwise correlation) to a method class, naming the sample correspondence (paired-vertical, horizontal, mosaic, diagonal), enforcing the n<<p discipline that makes a held-out cohort the endpoint instead of in-cohort cross-validation, and running the per-view variance-imbalance diagnostic. Covers the early/mixed/intermediate/late taxonomy, why vertical and horizontal integration are different problems, and why a shared factor dominated by one omic is not integration. Use when deciding which integration method fits a question, whether data is paired or mosaic, supervised or unsupervised, or how to validate an integrated result. For unsupervised factors see mofa-integration; for supervised signatures see mixomics-analysis; for stratification see similarity-network; for single-cell see single-cell/multimodal-integration.
 tool_type: r
 primary_tool: MultiAssayExperiment
+license: MIT
 ---
 
 ## Version Compatibility

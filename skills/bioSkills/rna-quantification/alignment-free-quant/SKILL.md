@@ -4,6 +4,7 @@ description: Quantify transcript expression from FASTQ with Salmon (selective al
 tool_type: cli
 primary_tool: salmon
 goal_approach_exempt: true
+license: MIT
 ---
 
 ## Version Compatibility

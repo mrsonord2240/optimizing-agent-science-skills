@@ -3,6 +3,7 @@ name: bio-long-read-sequencing-long-read-qc
 description: Assesses Oxford Nanopore and PacBio long-read quality with NanoPlot, cramino, NanoComp, pycoQC/toulligQC, and seqkit, and filters reads with chopper/Filtlong for the downstream goal. Covers why read-only Qscore is an uncalibrated posterior (real accuracy needs a reference BAM), why the sequencing_summary.txt is required for run-health metrics, intent-conditioned filtering (preserve long reads and small replicons for assembly, filter almost nothing for variant calling), the chimera/internal-adapter trap that fabricates SVs, and PacBio rq-based HiFi QC. Use when judging a long-read run, computing read N50 or percent identity, filtering reads before assembly or variant calling, comparing barcodes/runs, or reading run-health red flags.
 tool_type: cli
 primary_tool: nanoplot
+license: MIT
 ---
 
 ## Version Compatibility

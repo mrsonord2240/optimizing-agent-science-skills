@@ -3,6 +3,7 @@ name: bio-data-visualization-network-visualization
 description: Visualize biological networks (PPI, gene-regulatory, co-expression, pathway) with layout algorithm choice (ForceAtlas2, Fruchterman-Reingold, Kamada-Kawai, hive plots), edge bundling, community-based coloring, and reproducible seeds using NetworkX, PyVis, igraph, and Cytoscape automation. Use when rendering biological networks for static publication, interactive HTML exploration, or Cytoscape-format export.
 tool_type: python
 primary_tool: NetworkX
+license: MIT
 ---
 
 ## Version Compatibility

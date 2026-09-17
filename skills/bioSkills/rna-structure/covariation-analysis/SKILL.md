@@ -3,6 +3,7 @@ name: bio-rna-structure-covariation-analysis
 description: Tests whether a proposed or predicted RNA secondary structure is supported by evolutionary covariation using R-scape, which scores compensatory substitutions against a phylogeny-aware null and estimates the statistical power of the alignment. Use when validating a conserved-structure claim before trusting it (the test that found no support for HOTAIR/Xist/SRA lncRNA structures); separating real covariation from phylogenetic correlation; deciding whether an alignment even has the power to test structure; or building a covariation-supported consensus (CaCoFold) to seed a covariance model or folding.
 tool_type: cli
 primary_tool: R-scape
+license: MIT
 ---
 
 ## Version Compatibility

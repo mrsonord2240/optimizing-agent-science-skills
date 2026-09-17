@@ -19,6 +19,7 @@ qc_checkpoints:
   - after_loading: "Spots/cells detected, image aligned"
   - after_qc: "Low-quality spots filtered, genes detected"
   - after_clustering: "Spatial domains correspond to tissue regions"
+license: MIT
 ---
 
 ## Version Compatibility

@@ -3,6 +3,7 @@ name: bio-primer-design-primer-specificity
 description: Checks whether a PCR primer PAIR amplifies only the intended target genome-wide, using pair-aware in-silico PCR (MFEprimer-3.0, UCSC isPcr, NCBI Primer-BLAST) plus a primer3-py 3'-end-stability prefilter, against the correct database. Covers why plain BLAST is the wrong tool (it scores per-primer similarity, blind to 3'-terminal anchoring and to whether the two primers form a convergent amplicon in range), why a single 3'-terminal mismatch suppresses amplification while internal mismatches are tolerated, why intron-spanning RT-qPCR is defeated by processed pseudogenes that force a GENOME search not transcriptome-only, how to read a Primer-BLAST report (empty unintended-products means none passed its filter, not none exist), and that in-silico checking reduces but never replaces empirical validation. Use when confirming specificity, screening off-target amplicons, avoiding paralog/pseudogene hits, or checking SNPs under the 3' end. Design is primer-basics; dimers primer-validation; alignment read-alignment.
 tool_type: mixed
 primary_tool: mfeprimer
+license: MIT
 ---
 
 ## Version Compatibility

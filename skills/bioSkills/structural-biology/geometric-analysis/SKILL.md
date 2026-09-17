@@ -4,6 +4,7 @@ description: Measures geometric properties of protein structures with Biopython 
 tool_type: python
 primary_tool: Bio.PDB
 goal_approach_exempt: true
+license: MIT
 ---
 
 ## Version Compatibility

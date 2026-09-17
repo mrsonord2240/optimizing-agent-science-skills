@@ -3,6 +3,7 @@ name: bio-clinical-databases-pharmacogenomics
 description: Queries PharmGKB / CPIC / DPWG for drug-gene interactions; calls CYP2D6/CYP2C9/CYP2C19/DPYD/TPMT/NUDT15/UGT1A1/SLCO1B1 star alleles and phenotype with PharmCAT, Cyrius (CYP2D6 structural variants), Aldy, Stargazer; applies Caudle 2020 activity-score translation. Use when implementing pharmacogenomic-guided prescribing, applying CPIC vs DPWG guidance, screening HLA risk alleles for ICI / antiepileptics / abacavir, or interpreting compound TPMT+NUDT15 thiopurine risk.
 tool_type: mixed
 primary_tool: PharmCAT
+license: MIT
 ---
 
 ## Version Compatibility

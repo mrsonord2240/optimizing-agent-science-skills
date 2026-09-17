@@ -3,6 +3,7 @@ name: bio-data-visualization-flow-and-transition-plots
 description: Build Sankey, alluvial, river, and CONSORT-style flow diagrams to visualize cohort transitions, cell-state changes, or pipeline filtering using ggalluvial, networkD3, plotly, and consort. Use when showing how entities move between categories across timepoints (cell states, drug response classes, patient flow through a trial) or filtering pipelines (variants filtered through QC stages).
 tool_type: mixed
 primary_tool: ggalluvial
+license: MIT
 ---
 
 ## Version Compatibility

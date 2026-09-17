@@ -3,6 +3,7 @@ name: bio-spatial-transcriptomics-spatial-proteomics
 description: Analyzes multiplexed antibody-imaging data (CODEX/PhenoCycler, MIBI-TOF, IMC, CyCIF, Opal/Vectra mIF) as continuous protein intensity rather than transcript counts, using scimap and squidpy. Use when choosing an intensity transform/normalization (arcsinh cofactor vs z-score vs percentile -- NOT log1p-of-counts) and correcting channel spillover and antibody-batch effects; deciding whether to phenotype by gating or by clustering on intensities; recognizing that a bounded antibody panel makes marker absence uninformative; treating whole-cell segmentation (Mesmer) as the dominant error source; and knowing which platform applies and when to defer to the imaging-mass-cytometry skills for the IMC pipeline.
 tool_type: python
 primary_tool: scimap
+license: MIT
 ---
 
 ## Version Compatibility

@@ -3,6 +3,7 @@ name: bio-rna-quantification-tximport-workflow
 description: Import transcript-level quantifications from Salmon/kallisto/RSEM into R for gene-level analysis with DESeq2/edgeR using tximport or tximeta. Use when summarizing transcript abundances to gene counts with the correct length offset, choosing a countsFromAbundance mode (full-length vs 3'-tag vs DTU), resolving transcript-ID version mismatches, or handing off to DESeq2/edgeR without double-applying the offset.
 tool_type: r
 primary_tool: tximport
+license: MIT
 ---
 
 ## Version Compatibility

@@ -4,6 +4,7 @@ description: Draw and export phylogenetic trees with Bio.Phylo plus matplotlib, 
 tool_type: python
 primary_tool: Bio.Phylo
 goal_approach_exempt: true
+license: MIT
 ---
 
 ## Version Compatibility

@@ -3,6 +3,7 @@ name: bio-workflow-management-nextflow-pipelines
 description: Authors reproducible Nextflow DSL2 pipelines built on reactive dataflow, where processes communicate only through channels and execution order is not guaranteed. Use when deciding channel/dataflow (Nextflow) vs rule-based (Snakemake) authoring; wiring queue vs value channels and fixing shared-reference exhaustion with .first(); composing DSL2 modules and subworkflows with take/main/emit; selecting container/conda profiles and pinning images by digest for portability across local/SLURM/LSF/AWS Batch/Google Batch/Kubernetes executors; diagnosing why -resume misses the cache (nondeterministic input order, mtime on network filesystems, mutable :latest tags) with cache 'lenient' and -dump-hashes; managing work/ vs publishDir and dynamic retry escalation; and choosing whether to adopt an nf-core community pipeline or author from scratch.
 tool_type: cli
 primary_tool: Nextflow
+license: MIT
 ---
 
 ## Version Compatibility

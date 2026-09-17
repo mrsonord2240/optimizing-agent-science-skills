@@ -3,6 +3,7 @@ name: bio-primer-design-qpcr-primers
 description: Co-designs qPCR/RT-qPCR primers and hydrolysis (TaqMan) or molecular-beacon probes with primer3-py (PRIMER_PICK_INTERNAL_OLIGO, PRIMER_INTERNAL_* tags), for assays whose deliverable is a quantitative measurement device. Covers why amplification efficiency (90-110%, slope -3.6 to -3.1) and single-product specificity make the 2^-ddCq / Pfaffl math valid, why the short amplicon (70-150 bp), tight Tm, and zero-dimer requirement exist, the coupled probe rules (probe Tm 8-10 C above primers so it is bound when Taq's exonuclease cleaves it; no 5' G as it quenches the reporter; C-rich strand; primer3 has NO no-5'-G tag so enforce PRIMER_INTERNAL_MUST_MATCH_FIVE_PRIME=HNNNN), gDNA exclusion by exon-junction spanning AND why pseudogenes defeat it, SYBR melt-curve QC, and reference-gene validation (geNorm/NormFinder). Use when designing TaqMan/SYBR assays, exon-spanning primers, probes, or matched-efficiency multiplex panels. Genome specificity is primer-specificity; dimers primer-validation; standard PCR primer-basics.
 tool_type: python
 primary_tool: primer3-py
+license: MIT
 ---
 
 ## Version Compatibility

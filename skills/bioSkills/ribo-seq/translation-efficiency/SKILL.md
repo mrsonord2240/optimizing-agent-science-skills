@@ -3,6 +3,7 @@ name: bio-ribo-seq-translation-efficiency
 description: Quantify translation efficiency (TE) as ribosome occupancy relative to mRNA abundance and test for differential TE between conditions. Use when separating translational from transcriptional regulation, distinguishing genuine translational control from buffering, or choosing between riborex, Xtail, anota2seq, and DESeq2 interaction models.
 tool_type: mixed
 primary_tool: riborex
+license: MIT
 ---
 
 ## Version Compatibility

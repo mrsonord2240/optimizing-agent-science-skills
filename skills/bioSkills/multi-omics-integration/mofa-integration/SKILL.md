@@ -3,6 +3,7 @@ name: bio-multi-omics-mofa-integration
 description: Discovers shared and view-specific latent factors across bulk multi-omics blocks (RNA-seq, proteomics, methylation) on a common sample axis with MOFA2's unsupervised Bayesian group factor model, then attributes per-view variance explained and interprets signed factor weights. Covers why a factor is an unsupervised axis of variance and not a pathway, why a factor that correlates with batch is a batch factor, why the per-view variance-explained table is the primary read-out rather than p-values, why raw counts in a Gaussian view make factor 1 the library-size factor, and why MOFA2 handles missing omics-per-sample natively. Use when integrating two or more bulk omics to find joint axes of variation, choosing factor count, labeling factors against metadata, or running enrichment on factor weights. For supervised discriminant integration see mixomics-analysis; for the method decision see integration-design; for single-cell see single-cell/multimodal-integration; for enrichment see pathway-analysis/gsea.
 tool_type: r
 primary_tool: MOFA2
+license: MIT
 ---
 
 ## Version Compatibility

@@ -3,6 +3,7 @@ name: bio-restriction-mapping
 description: Build restriction maps showing enzyme cut positions and inter-site distances along DNA using Biopython Bio.Restriction. Produces text or graphical maps for linear and circular molecules, orders sites from single and double digests, and overlays GenBank features. Use when creating a restriction map of a sequence, ordering cut sites along a plasmid, or relating sites to annotated features.
 tool_type: python
 primary_tool: Bio.Restriction
+license: MIT
 ---
 
 ## Version Compatibility

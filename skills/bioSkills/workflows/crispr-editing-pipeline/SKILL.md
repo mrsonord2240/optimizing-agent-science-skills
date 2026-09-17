@@ -14,6 +14,7 @@ qc_checkpoints:
   - after_grna_design: "Context-valid on-target shortlist (CRISPOR: Rule Set 2 for U6/lentiviral, CRISPRscan for T7/embryo); reject TTTT and GC extremes; rank by predicted frameshift/out-of-frame fraction, not raw activity; carry 3-6 guides in an early constitutive NMD-competent exon"
   - after_offtarget: "Escalate predicted -> detected -> validated; reject guides with a low-mismatch high-CFD off-target in a gene; variant-aware (gnomAD) for therapeutic guides; high-fidelity nuclease in the delivery format used"
   - after_template: "Blocking (PAM/seed) mutation present AND codon-checked; edit within ~10 bp of the cut; donor format matches cell type (ssODN/lssDNA/dsDNA/AAV; HITI for post-mitotic); report edit:indel purity for base editing"
+license: MIT
 ---
 
 ## Version Compatibility

@@ -3,6 +3,7 @@ name: bio-read-qc-fastp-workflow
 description: Runs all-in-one FASTQ preprocessing with fastp in a single pass - adapter trimming via paired-end overlap analysis, quality/length filtering, 2-color poly-G removal, base correction, optional dedup/UMI/merge, and HTML/JSON reports. Use when preprocessing bulk Illumina data and wanting one fast tool instead of separate Cutadapt, Trimmomatic, and FastQC steps. For precise small-RNA/amplicon adapters use adapter-trimming; for molecule-accurate UMI dedup use umi-processing.
 tool_type: cli
 primary_tool: fastp
+license: MIT
 ---
 
 ## Version Compatibility

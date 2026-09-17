@@ -3,6 +3,7 @@ name: bio-machine-learning-survival-analysis
 description: Builds and validates predictive time-to-event models on clinical and omics data with penalized Cox, random survival forests, gradient-boosted and deep survival models, and prediction-grade evaluation (Uno's C, time-dependent AUC, integrated Brier, calibration, competing risks). Use when building an individualized risk predictor or prognostic omics signature, choosing a survival model, or evaluating one beyond the C-index. For Kaplan-Meier, log-rank, and classical Cox hazard-ratio inference in a trial see clinical-biostatistics/survival-analysis.
 tool_type: python
 primary_tool: scikit-survival
+license: MIT
 ---
 
 ## Version Compatibility

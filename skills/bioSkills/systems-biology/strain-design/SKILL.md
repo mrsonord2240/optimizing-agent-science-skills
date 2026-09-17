@@ -3,6 +3,7 @@ name: bio-systems-biology-strain-design
 description: Computes metabolic-engineering strain designs on genome-scale models with StrainDesign (OptKnock, RobustKnock, minimal cut sets, OptCouple) and cameo (heuristic knockout and FSEOF over/under-expression targets), finding gene/reaction interventions that couple product formation to growth. Use when designing knockouts to overproduce a target chemical, choosing between OptKnock and RobustKnock, growth-coupling a product so evolution maintains it, computing minimal cut sets, finding amplification targets with FSEOF, or understanding why MILP strain design needs a strong solver and why a design is only a hypothesis.
 tool_type: python
 primary_tool: straindesign
+license: MIT
 ---
 
 ## Version Compatibility

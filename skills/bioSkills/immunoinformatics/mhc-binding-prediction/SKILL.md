@@ -3,6 +3,7 @@ name: bio-immunoinformatics-mhc-binding-prediction
 description: Predict peptide-MHC class I binding and natural presentation with MHCflurry, NetMHCpan-4.1, and MixMHCpred to nominate candidate CD8 T-cell epitopes. Covers the binding-affinity (BA) vs eluted-ligand (EL/presentation) distinction, why %Rank beats raw nM for cross-allele work, the MS abundance bias that misranks low-expression neoantigens, allele-coverage inequity, and length bias. Use when scanning a protein or peptide set for class I epitopes, scoring neoantigen candidates, or choosing a binding predictor. For CD4/HLA class II see mhc-class-ii-prediction.
 tool_type: python
 primary_tool: mhcflurry
+license: MIT
 ---
 
 ## Version Compatibility

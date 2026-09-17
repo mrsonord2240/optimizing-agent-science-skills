@@ -11,9 +11,9 @@
     "repository": "https://github.com/mrsonord2240/bioSkills-Improved",
     "renamed_from": "https://github.com/mrsonord2240/bioSkills; renamed 2026-09-16. Audit records written before the rename cite the old name and GitHub's redirect keeps them resolving.",
     "branch": "openscience-fixes",
-    "commit": "9d31109159d4d490ec375d4ae88c9b77570f3840",
-    "note": "Fork of the upstream commit above, carrying only audit-evidenced fixes. Upstream is archived, so this fork is the maintained line rather than a staging area for pull requests; this directory is the export of it that Specialist releases ship.",
-    "verified": "2026-09-16: every one of the 2054 files in this directory is byte-identical to the fork tree at this commit, compared by git blob hash rather than by re-reading the files."
+    "commit": "558aea51d3476d61727c943cc5d28882bae7d390",
+    "note": "Fork of the upstream commit above, carrying only audit-evidenced fixes plus the 2026-09-17 frontmatter repair. Upstream is archived, so this fork is the maintained line rather than a staging area for pull requests; this directory is the export of it that Specialist releases ship.",
+    "verified": "2026-09-17: every one of the 2054 files in this directory is byte-identical to the fork tree at this commit, compared by git blob hash rather than by re-reading the files."
   },
   "modified": true,
   "modified_by": "Samuel Nord, via Claude (Anthropic) fixer agents",
@@ -26,6 +26,7 @@
     "phylogenetics": "10 Skills, re-audited, viable; published as molecular-phylogenetics-analyst 1.0.0",
     "variant-calling, clinical-databases, population-genetics": "11 Skills, re-audited, viable",
     "proteomics": "11 Skills across five fix passes, all re-audited; every core Skill >= 85 and every Skill deployable as of 2026-09-15",
-    "crispr-screens, metabolomics, pathway-analysis, experimental-design": "24 Skills fixed in one pass and all re-audited by separate agents on 2026-09-16; both candidates viable. Every core Skill >= 85 and every bundled Skill deployable, with copy-number-correction re-marked supporting (82). Four blocking vetoes cleared: BAGEL2 determinism, the CRISPResso output parser, the CRISPR pipeline's replicate grouping, and base-editing code usability (54 -> 92)."
+    "crispr-screens, metabolomics, pathway-analysis, experimental-design": "24 Skills fixed in one pass and all re-audited by separate agents on 2026-09-16; both candidates viable. Every core Skill >= 85 and every bundled Skill deployable, with copy-number-correction re-marked supporting (82). Four blocking vetoes cleared: BAGEL2 determinism, the CRISPResso output parser, the CRISPR pipeline's replicate grouping, and base-editing code usability (54 -> 92).",
+    "corpus-wide frontmatter (2026-09-17)": "Thirteen Skills had an unquoted description containing ': ', so their YAML frontmatter did not parse and both name and description were invisible to the Skill loader and to any catalog tooling. Quoted the scalar in each, with the parsed result asserted equal to the original text. Separately declared license: MIT in all 561 SKILL.md files, since the corpus is MIT and a missing declaration otherwise requires a reviewed exception at intake. Checked against the Open-Science Skill Marketplace's own yaml parser and frontmatter rules: 561 of 561 now pass every hard gate, against 548 before."
   }
 }

@@ -3,6 +3,7 @@ name: bio-systems-biology-model-curation
 description: Validates, gap-fills, and standardizes genome-scale metabolic models using memote for consistency and annotation scoring and COBRApy for manual curation, including mass/charge balance, energy-generating-cycle detection, dead-end resolution, GPR fixes, and SBML/SBO/MIRIAM annotation. Use when improving a draft model, gap-filling to a target medium, detecting erroneous ATP-from-nothing cycles, interpreting a memote score correctly (consistency vs biological validity), validating predictions against measured growth/essentiality, or preparing a model for publication.
 tool_type: python
 primary_tool: memote
+license: MIT
 ---
 
 ## Version Compatibility

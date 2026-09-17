@@ -3,6 +3,7 @@ name: bio-data-visualization-statistical-annotation
 description: Add p-value brackets, significance asterisks, and effect-size annotations to distribution plots using ggpubr, ggsignif, and statannotations with correct test selection (parametric vs non-parametric vs paired), multiple-testing adjustment, and rendering of negative results. Use when a boxplot/violin/raincloud needs in-figure statistical comparisons between groups.
 tool_type: mixed
 primary_tool: ggpubr
+license: MIT
 ---
 
 ## Version Compatibility

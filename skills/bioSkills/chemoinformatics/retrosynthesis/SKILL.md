@@ -3,6 +3,7 @@ name: bio-retrosynthesis
 description: Performs retrosynthetic planning using AiZynthFinder (template-based MCTS), maintained or version-pinned template-free models, ASKCOS, and emerging RetroSynFormer with explicit handling of route scoring, configurable MCTS rewards, building-block availability, and forward-prediction checks. Use when assessing synthetic feasibility of generated or selected molecules, planning multi-step syntheses, building synthesis-aware design pipelines, or screening libraries for retro-route feasibility.
 tool_type: python
 primary_tool: AiZynthFinder
+license: MIT
 ---
 
 ## Version Compatibility

@@ -3,6 +3,7 @@ name: bio-read-qc-umi-processing
 description: Extracts UMIs and collapses reads to original molecules with umi_tools (directional dedup) or builds error-corrected single-strand/duplex consensus reads with fgbio. Use when the library has UMIs and accurate molecule counting or below-sequencer-floor error correction is needed - single-cell, low-input RNA-seq, targeted panels, and ctDNA/liquid-biopsy rare-variant detection. For UMI extraction during QC use fastp-workflow; do not dedup non-UMI bulk RNA-seq.
 tool_type: cli
 primary_tool: umi_tools
+license: MIT
 ---
 
 ## Version Compatibility

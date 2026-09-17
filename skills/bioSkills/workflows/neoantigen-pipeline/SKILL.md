@@ -17,6 +17,7 @@ qc_checkpoints:
   - after_binding: "Predictions for ALL alleles (LOH-lost alleles dropped); ranked within patient, not hard-thresholded across patients"
   - after_neoantigen: "Expressed (RNA-confirmed); clonality via CCF from purity+CN, not raw VAF"
   - after_scoring: "Top candidates are a tier-1 hypothesis list for MS + T-cell validation"
+license: MIT
 ---
 
 ## Version Compatibility

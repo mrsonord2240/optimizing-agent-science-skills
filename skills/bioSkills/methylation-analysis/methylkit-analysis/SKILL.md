@@ -1,8 +1,9 @@
 ---
 name: bio-methylation-methylkit
-description: Imports Bismark coverage or cytosine-report files into the methylKit object model, then runs the import-to-results spine - filterByCoverage, normalizeCoverage, unite/destrand, calculateDiffMeth, getMethylDiff - for both per-CpG (DMC) and fixed-tile (DMR) differential methylation, plus tileMethylCounts, PCA/correlation/clustering QC, and assocComp/removeComp batch handling. Covers the silent default traps that shape the false-positive rate: overdispersion='none' does no correction while 'MN' forces the F-test (ignoring test='Chisq'), adjust defaults to SLIM not BH, getMethylDiff defaults difference=25/qvalue=0.01, cov.bases=0 admits single-CpG tiles, and pool destroys biological replication. Use when importing bisulfite count tables, filtering/normalizing/uniting methylation samples, running methylKit differential testing, or QC-ing methylomes. For per-site test-choice (count vs continuous) see differential-cpg-testing; for selection-aware region FDR (dmrseq/DSS) see dmr-detection.
+description: "Imports Bismark coverage or cytosine-report files into the methylKit object model, then runs the import-to-results spine - filterByCoverage, normalizeCoverage, unite/destrand, calculateDiffMeth, getMethylDiff - for both per-CpG (DMC) and fixed-tile (DMR) differential methylation, plus tileMethylCounts, PCA/correlation/clustering QC, and assocComp/removeComp batch handling. Covers the silent default traps that shape the false-positive rate: overdispersion='none' does no correction while 'MN' forces the F-test (ignoring test='Chisq'), adjust defaults to SLIM not BH, getMethylDiff defaults difference=25/qvalue=0.01, cov.bases=0 admits single-CpG tiles, and pool destroys biological replication. Use when importing bisulfite count tables, filtering/normalizing/uniting methylation samples, running methylKit differential testing, or QC-ing methylomes. For per-site test-choice (count vs continuous) see differential-cpg-testing; for selection-aware region FDR (dmrseq/DSS) see dmr-detection."
 tool_type: r
 primary_tool: methylKit
+license: MIT
 ---
 
 ## Version Compatibility

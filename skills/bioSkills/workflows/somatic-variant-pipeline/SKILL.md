@@ -17,6 +17,7 @@ qc_checkpoints:
   - after_contamination: "CalculateContamination estimate low (<~0.02); high contamination inflates false positives"
   - after_filtering: "FilterMutectCalls PASS fraction sane; FFPE/oxoG orientation-bias artifacts removed via --ob-priors"
   - after_interpretation: "Variants tiered by AMP/ASCO/CAP + oncogenicity (never germline ACMG); drivers vs passengers separated"
+license: MIT
 ---
 
 ## Version Compatibility

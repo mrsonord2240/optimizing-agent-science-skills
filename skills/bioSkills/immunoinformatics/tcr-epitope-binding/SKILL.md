@@ -3,6 +3,7 @@ name: bio-immunoinformatics-tcr-epitope-binding
 description: Infer or annotate TCR antigen specificity by unsupervised clustering (TCRdist/tcrdist3, GLIPH2, clusTCR, GIANA) and database lookup (VDJdb, IEDB, McPAS-TCR), and rank candidates with supervised predictors (ERGO-II, NetTCR-2.x, pMTnet) under explicit caveats. Encodes the central truth that general TCR-epitope prediction for UNSEEN epitopes essentially does not work (collapses to near-random; IMMREP22, Grazioli 2022) because labeled data is dominated by a few immunodominant epitopes and there is no true negative set — so clustering for discovery is the honest task and de-novo binding needs wet-lab validation. Use when annotating TCR specificity or grouping a repertoire. Epitope/MHC context lives in mhc-binding-prediction.
 tool_type: python
 primary_tool: tcrdist3
+license: MIT
 ---
 
 ## Version Compatibility

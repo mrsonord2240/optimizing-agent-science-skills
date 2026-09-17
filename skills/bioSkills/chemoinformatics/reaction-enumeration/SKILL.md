@@ -3,6 +3,7 @@ name: bio-reaction-enumeration
 description: Enumerates virtual chemical libraries via reaction SMARTS transformations using RDKit and reaction templates, with explicit handling of atom mapping, RDChiral template extraction, product validation, RECAP/BRICS fragmentation, R-group decomposition, matched molecular pair analysis (MMPA), and Free-Wilson analysis. Use when generating combinatorial libraries from building blocks, enumerating analog series, deriving structure-activity rules, or extracting transformations from reaction data.
 tool_type: python
 primary_tool: RDKit
+license: MIT
 ---
 
 ## Version Compatibility

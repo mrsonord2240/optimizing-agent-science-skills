@@ -3,6 +3,7 @@ name: bio-read-alignment-bwa-alignment
 description: Aligns DNA short reads (paired- or single-end) to a reference genome with bwa-mem2, the maintained successor to BWA-MEM, for WGS/WES and germline/somatic variant-calling pipelines; covers index build, read-group injection, the collate/fixmate/sort/markdup ordering, soft-clipping for SV split reads, ALT/decoy-aware mapping on GRCh38, -K determinism, and streaming straight to a sorted BAM. Use when mapping DNA short reads to a reference for variant calling, coverage, ChIP/ATAC (alongside bowtie2-alignment), or SV detection. RNA-seq spliced alignment is star-alignment/hisat2-alignment; BAM sort/dedup/stats, the QC gate, and the cross-tool MAPQ scale are alignment-files; read trimming is read-qc; counting reads over features is rna-quantification.
 tool_type: cli
 primary_tool: bwa-mem2
+license: MIT
 ---
 
 ## Version Compatibility

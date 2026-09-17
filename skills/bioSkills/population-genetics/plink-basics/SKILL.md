@@ -1,8 +1,9 @@
 ---
 name: bio-population-genetics-plink-basics
-description: Manages PLINK genotype filesets - format conversion (VCF, BED/BIM/FAM, PED/MAP, pgen/pvar/psam) and sample/variant QC (missingness, MAF, HWE, sex check, heterozygosity, KING relatedness) with PLINK 1.9 and 2.0. PLINK rewrites allele bookkeeping: PLINK 1.x A1 defaults to the minor allele and is recomputed every load, silently flipping effect-allele meaning unless --keep-allele-order, while PLINK 2.0 tracks explicit REF/ALT. QC order matters (variant before sample missingness), HWE is controls-only in 1.9 but not 2.0, add midp, and differential case/control missingness injects false hits. Use when converting between PLINK formats or running genotype QC before association, structure, or LD analysis. For LD pruning/clumping see linkage-disequilibrium; for GWAS see association-testing; VCF input from variant-calling/vcf-basics.
+description: "Manages PLINK genotype filesets - format conversion (VCF, BED/BIM/FAM, PED/MAP, pgen/pvar/psam) and sample/variant QC (missingness, MAF, HWE, sex check, heterozygosity, KING relatedness) with PLINK 1.9 and 2.0. PLINK rewrites allele bookkeeping: PLINK 1.x A1 defaults to the minor allele and is recomputed every load, silently flipping effect-allele meaning unless --keep-allele-order, while PLINK 2.0 tracks explicit REF/ALT. QC order matters (variant before sample missingness), HWE is controls-only in 1.9 but not 2.0, add midp, and differential case/control missingness injects false hits. Use when converting between PLINK formats or running genotype QC before association, structure, or LD analysis. For LD pruning/clumping see linkage-disequilibrium; for GWAS see association-testing; VCF input from variant-calling/vcf-basics."
 tool_type: cli
 primary_tool: plink
+license: MIT
 ---
 
 ## Version Compatibility

@@ -3,6 +3,7 @@ name: bio-methylation-dmr-detection
 description: Detects differentially methylated regions (DMRs) from short-read bisulfite (WGBS/RRBS), array, and long-read methylation count tables using dmrseq (permutation region-FDR over the region selection), DSS callDMR (beta-binomial), methylKit tiles, bsseq BSmooth, DMRcate Gaussian-kernel smoothing, metilene, and comb-p. Covers why a DMR is DEFINED by arbitrary thresholds (min-CpGs, max-gap, delta-beta, q) and a smoothing bandwidth, why selecting extreme runs of CpGs then testing them on the same data is post-selection inference, why region q-values are not comparable across tools, and a single-sample domain-segmentation section (PMD, UMR/LMR, MethylSeekR, solo-WCGW) that must run before focal calling on cancer/aging genomes. Use when calling region-level methylation differences, choosing a DMR caller, controlling region-level FDR, or segmenting megabase methylation domains. For per-site testing see differential-cpg-testing; for the methylKit object model see methylkit-analysis.
 tool_type: r
 primary_tool: dmrseq
+license: MIT
 ---
 
 ## Version Compatibility

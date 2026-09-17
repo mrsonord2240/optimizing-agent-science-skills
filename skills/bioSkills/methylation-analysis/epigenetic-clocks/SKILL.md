@@ -1,8 +1,9 @@
 ---
 name: bio-methylation-epigenetic-clocks
-description: Computes DNA methylation age (DNAm age) and pace of aging by applying frozen elastic-net epigenetic clocks to a clean beta matrix with methylclock, dnaMethyAge, or methylCIPHER. Covers the clock menu by question (chronological Horvath/Hannum/skin&blood; health-mortality PhenoAge/GrimAge; DunedinPACE pace; pediatric/gestational; mitotic epiTOC), age acceleration (EAA/IEAA/EEAA) as the real endpoint, the principal-component (PC) clock fix for the per-CpG reliability crisis, and EPICv2 clock-CpG dropout with missing-CpG imputation bias. Use when estimating epigenetic age, computing age acceleration, choosing a clock for an outcome, assessing clock reliability, or porting a clock to EPICv2. A clock is a frozen predictor: do not GO-enrich its CpGs and do not train it here. For cell-count adjustment (IEAA) see cell-type-deconvolution; for predictor training/validation/leakage see machine-learning/model-validation; for survival modeling of age acceleration see clinical-biostatistics/survival-analysis.
+description: "Computes DNA methylation age (DNAm age) and pace of aging by applying frozen elastic-net epigenetic clocks to a clean beta matrix with methylclock, dnaMethyAge, or methylCIPHER. Covers the clock menu by question (chronological Horvath/Hannum/skin&blood; health-mortality PhenoAge/GrimAge; DunedinPACE pace; pediatric/gestational; mitotic epiTOC), age acceleration (EAA/IEAA/EEAA) as the real endpoint, the principal-component (PC) clock fix for the per-CpG reliability crisis, and EPICv2 clock-CpG dropout with missing-CpG imputation bias. Use when estimating epigenetic age, computing age acceleration, choosing a clock for an outcome, assessing clock reliability, or porting a clock to EPICv2. A clock is a frozen predictor: do not GO-enrich its CpGs and do not train it here. For cell-count adjustment (IEAA) see cell-type-deconvolution; for predictor training/validation/leakage see machine-learning/model-validation; for survival modeling of age acceleration see clinical-biostatistics/survival-analysis."
 tool_type: r
 primary_tool: methylclock
+license: MIT
 ---
 
 ## Version Compatibility

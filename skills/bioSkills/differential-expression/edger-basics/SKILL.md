@@ -3,6 +3,7 @@ name: bio-differential-expression-edger-basics
 description: Performs differential expression on bulk RNA-seq count data with edgeR's negative-binomial GLM and quasi-likelihood F-test framework. Covers DGEList construction, filterByExpr, TMM/TMMwsp normalization, robust dispersion estimation, glmQLFit/glmQLFTest, TREAT for magnitude-bounded hypotheses, contrasts via no-intercept designs, voom and voomWithQualityWeights for heterogeneous samples, and the edgeR v4 bias-corrected APL changes. Use when running bulk DE with edgeR, choosing edgeR over DESeq2 (small n, transcript DE via catchSalmon, large samples), needing TREAT for a fold-change-threshold hypothesis, troubleshooting v3-to-v4 reproducibility, building paired or interaction designs, or handling library-quality heterogeneity.
 tool_type: r
 primary_tool: edgeR
+license: MIT
 ---
 
 ## Version Compatibility

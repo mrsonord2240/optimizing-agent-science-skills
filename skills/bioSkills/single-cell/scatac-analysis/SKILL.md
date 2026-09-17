@@ -3,6 +3,7 @@ name: bio-single-cell-scatac-analysis
 description: Analyze single-cell ATAC-seq with Signac/ArchR (R) and SnapATAC2 (Python alternative). Use when processing scATAC fragments, choosing a framework, calling consensus peaks, running TF-IDF/LSI while diagnosing the depth component, scoring chromVAR motif deviations against GC-matched backgrounds, detecting homotypic vs heterotypic doublets, or deciding whether to binarize the count matrix.
 tool_type: r
 primary_tool: Signac
+license: MIT
 ---
 
 ## Version Compatibility

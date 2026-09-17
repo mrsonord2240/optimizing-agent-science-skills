@@ -3,6 +3,7 @@ name: bio-immunoinformatics-epitope-prediction
 description: Predict B-cell and T-cell epitopes for vaccine antigen design and epitope mapping with BepiPred-3.0, DiscoTope-3.0, the IEDB tools, and EL-mode MHC presentation. Encodes the load-bearing asymmetry that T-cell epitope prediction is mature (it reduces to MHC presentation, AUC>0.9) while B-cell prediction is unreliable (linear predictors ~AUC 0.6 because ~90% of real epitopes are conformational) — so structure-based DiscoTope-3.0 on AlphaFold models is the only defensible B-cell path, propensity scales are obsolete, and NetChop is largely redundant on EL-trained models. Use when mapping epitopes or selecting vaccine antigens. MHC binding lives in mhc-binding-prediction.
 tool_type: python
 primary_tool: BepiPred
+license: MIT
 ---
 
 ## Version Compatibility

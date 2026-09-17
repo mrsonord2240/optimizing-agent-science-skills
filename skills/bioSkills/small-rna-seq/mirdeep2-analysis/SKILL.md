@@ -3,6 +3,7 @@ name: bio-small-rna-seq-mirdeep2-analysis
 description: Discovers novel miRNAs and quantifies known miRNAs with miRDeep2 by scoring genome-mapped read stacks against the Dicer/Drosha biogenesis signature. Use when deciding whether a study needs de novo discovery at all versus known-miRNA quantification; choosing the species and related-species miRBase references; reading the miRDeep2 score as a signal-to-noise hypothesis rather than a fixed cutoff; or filtering novel candidates against tRNA/rRNA loci to reject the classic false positives.
 tool_type: cli
 primary_tool: miRDeep2
+license: MIT
 ---
 
 ## Version Compatibility

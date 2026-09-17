@@ -3,6 +3,7 @@ name: bio-codon-usage
 description: Analyze codon usage and calculate CAI (Codon Adaptation Index), RSCU, and Nc with Biopython, and produce naive max-CAI codon-optimized sequences. Use when scoring a gene's codon bias against a host, optimizing a CDS for heterologous expression, or studying synonymous codon selection.
 tool_type: python
 primary_tool: Bio.SeqUtils.CodonAdaptationIndex
+license: MIT
 ---
 
 ## Version Compatibility

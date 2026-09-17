@@ -3,6 +3,7 @@ name: bio-single-cell-lineage-tracing
 description: Reconstructs single-cell lineage trees and clonal relationships from CRISPR/Cas9 scars, static expressed barcodes (LARRY/CellTag), or somatic mtDNA mutations using Cassiopeia, Startle, and CoSpar. Use when building a phylogeny from barcode scars, choosing a tree-reconstruction solver, handling homoplasy and dropout, grouping clones from mtDNA, integrating clone with transcriptomic state, or judging whether a state-based fate call is trustworthy.
 tool_type: python
 primary_tool: Cassiopeia
+license: MIT
 ---
 
 ## Version Compatibility

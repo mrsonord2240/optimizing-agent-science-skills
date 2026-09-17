@@ -3,6 +3,7 @@ name: bio-consensus-sequences
 description: Generate consensus FASTA sequences by applying VCF variants onto a reference with bcftools consensus, or build viral/amplicon consensus with iVar. Use when reconstructing a sample-specific reference or haplotype, deciding -H haplotype vs IUPAC vs all-ALT projection, masking no-coverage sites so a consensus does not manufacture false reference calls, or setting iVar min-depth/min-frequency policy for surveillance genomes.
 tool_type: cli
 primary_tool: bcftools
+license: MIT
 ---
 
 ## Version Compatibility

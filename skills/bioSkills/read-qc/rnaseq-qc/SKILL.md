@@ -3,6 +3,7 @@ name: bio-read-qc-rnaseq-qc
 description: Runs RNA-seq-specific post-alignment QC - strandedness inference, gene-body 5'-3' coverage, read distribution (exonic/intronic/intergenic), rRNA/globin/mitochondrial rate, transcript integrity (TIN), and saturation - with RSeQC, Qualimap, RNA-SeQC, and Picard. Use when validating RNA-seq libraries before quantification or differential expression, diagnosing degradation or gDNA contamination, or determining library strandedness. For raw-FASTQ QC use quality-reports; for UMI dedup use umi-processing.
 tool_type: mixed
 primary_tool: RSeQC
+license: MIT
 ---
 
 ## Version Compatibility

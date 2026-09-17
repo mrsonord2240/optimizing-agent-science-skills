@@ -3,6 +3,7 @@ name: bio-multi-omics-mixomics-analysis
 description: Builds supervised and unsupervised multivariate integration across bulk omics blocks with mixOmics - sPLS for sparse pairwise correlation, DIABLO (block.splsda) for a multi-block discriminant signature, rCCA for regularized canonical correlation, and MINT for multi-study integration. Covers why these projection methods maximize covariance or correlation and not truth, why DIABLO's design matrix is the central correlation-versus-discrimination decision, why cross-validation must wrap keepX selection or the reported error is leaked, why balanced error rate is required under class imbalance, and why DIABLO needs matched samples while MINT handles multiple cohorts. Use when finding a cross-omic discriminant signature for a known outcome, selecting correlated features between two omics, tuning keepX, or integrating one omic across studies. For unsupervised factors see mofa-integration; for the method decision see integration-design; for cross-validation theory see machine-learning/model-validation.
 tool_type: r
 primary_tool: mixOmics
+license: MIT
 ---
 
 ## Version Compatibility

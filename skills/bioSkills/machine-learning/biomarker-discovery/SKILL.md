@@ -3,6 +3,7 @@ name: bio-machine-learning-biomarker-discovery
 description: Selects biomarker features from high-dimensional omics data using Boruta all-relevant selection, mRMR, LASSO/elastic-net, and stability selection, while controlling the leakage, irreproducibility, and correlated-feature traps that make most published signatures fail to replicate. Use when identifying candidate biomarkers, deciding between an all-relevant and a minimal-optimal selector, or judging whether a selected gene set is reproducible. For unbiased performance estimation of the resulting model see machine-learning/model-validation; for interpreting a trained model see machine-learning/prediction-explanation.
 tool_type: python
 primary_tool: boruta
+license: MIT
 ---
 
 ## Version Compatibility

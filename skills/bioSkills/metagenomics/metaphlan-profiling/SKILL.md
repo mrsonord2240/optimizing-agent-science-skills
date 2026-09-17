@@ -3,6 +3,7 @@ name: bio-metagenomics-metaphlan
 description: Profiles shotgun metagenomes to species/SGB relative abundance with MetaPhlAn 4's clade-specific marker genes (bowtie2 short reads, minimap2 long reads). Covers why a MetaPhlAn percentage is a cell fraction (genome-size-normalized taxonomic abundance) and must never be merged with Kraken/Bracken read fractions, kSGB vs uSGB units for quantifying database-absent taxa, the unknown-fraction rescaling and its version-default flip, --index pinning as a batch variable, and when mOTUs3 or sourmash gather beat marker profiling. Use when profiling who-is-there with high precision, needing HMP-comparable species abundances, quantifying novel taxa, or deciding marker-gene vs k-mer profiling. For k-mer classification see kraken-classification; for strains see strain-tracking; for 16S amplicon see the microbiome category.
 tool_type: cli
 primary_tool: MetaPhlAn
+license: MIT
 ---
 
 ## Version Compatibility

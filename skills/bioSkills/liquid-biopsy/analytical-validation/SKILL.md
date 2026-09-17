@@ -3,6 +3,7 @@ name: bio-analytical-validation
 description: Treats a ctDNA assay as a molecule-counting experiment at the Poisson edge and builds its analytical-validation case the measurement-science way. Covers the genome-equivalent currency (~330 haploid copies/ng), the lambda = input_GE x VAF sampling ceiling (lambda>=3 for ~95% detection), the error-suppression ladder (raw NGS ~1e-3 -> single-strand UMI ~1e-4/1e-5 -> duplex <1e-7), the CLSI EP17 LoB/LoD/LoD95/LoQ framework, the per-locus-vs-panel-integrated LoD distinction that lets bespoke MRD reach ppm, contrived/SEQC2 reference standards, and honest LoD reporting conditioned on input mass + consensus depth + replicate detection rate. Use when stating or trusting a sensitivity claim, designing a dilution-series validation, deciding how many genome equivalents are needed at a target VAF, choosing a single-locus vs panel-integrated LoD, or auditing a "detects 0.1% VAF" claim.
 tool_type: python
 primary_tool: scipy
+license: MIT
 ---
 
 ## Version Compatibility

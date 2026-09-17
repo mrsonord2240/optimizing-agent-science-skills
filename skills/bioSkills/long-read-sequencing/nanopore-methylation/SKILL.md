@@ -3,6 +3,7 @@ name: bio-long-read-sequencing-nanopore-methylation
 description: Calls DNA base modifications (5mC, 5hmC, 6mA, 4mC) directly from Oxford Nanopore and PacBio HiFi long reads encoded as MM/ML SAM tags, piles them into per-site bedMethyl with modkit (or pb-CpG-tools for PacBio), and produces phased allele-specific methylation. Covers why methylation is a basecalling decision that cannot be recovered later, the MM/ML tag-drop failure that silently zeroes methylation through alignment, the MM ? vs . no-call semantics, 5mC/5hmC resolution vs bisulfite, modkit's 10th-percentile auto-threshold, and the haplotagged ASM workflow. Use when calling 5mC/5hmC/6mA from a modBAM, generating bedMethyl, preserving methylation tags through alignment, doing allele-specific or differential methylation, or QC-ing a modification BAM.
 tool_type: cli
 primary_tool: modkit
+license: MIT
 ---
 
 ## Version Compatibility

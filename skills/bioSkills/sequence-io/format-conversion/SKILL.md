@@ -3,6 +3,7 @@ name: bio-format-conversion
 description: Convert between sequence file formats (FASTA, FASTQ, GenBank, EMBL, Stockholm) and re-encode FASTQ quality offsets using Biopython Bio.SeqIO. Use when changing a file format for a downstream tool, fixing FASTQ quality encoding (Phred+33 vs Phred+64 vs Solexa), or when a conversion risks silently dropping annotations or quality scores.
 tool_type: python
 primary_tool: Bio.SeqIO
+license: MIT
 ---
 
 ## Version Compatibility

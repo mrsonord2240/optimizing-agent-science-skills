@@ -3,6 +3,7 @@ name: bio-sequence-properties
 description: Calculate nucleotide and protein sequence properties (GC content, GC skew, molecular weight, melting temperature, isoelectric point, instability, hydropathy) with Biopython. Use when analyzing sequence composition, computing primer Tm, estimating DNA or protein mass, or profiling protein biophysical properties.
 tool_type: python
 primary_tool: Bio.SeqUtils
+license: MIT
 ---
 
 ## Version Compatibility

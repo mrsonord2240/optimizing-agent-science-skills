@@ -3,6 +3,7 @@ name: bio-read-sequences
 description: Read biological sequence files (FASTA, FASTQ, GenBank, EMBL, ABI, SFF) with Biopython Bio.SeqIO, choosing between streaming, in-memory, and on-disk-indexed access. Use when parsing sequence files, iterating multi-record files, randomly accessing records by ID in large files, or maximizing parse throughput.
 tool_type: python
 primary_tool: Bio.SeqIO
+license: MIT
 ---
 
 ## Version Compatibility

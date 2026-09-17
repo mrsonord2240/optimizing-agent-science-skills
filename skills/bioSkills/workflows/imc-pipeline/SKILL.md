@@ -13,6 +13,7 @@ depends_on:
   - imaging-mass-cytometry/differential-analysis
   - imaging-mass-cytometry/interactive-annotation
   - imaging-mass-cytometry/quality-metrics
+license: MIT
 ---
 
 ## Version Compatibility

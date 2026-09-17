@@ -4,6 +4,7 @@ description: Designs adaptive clinical trials including group-sequential (O'Brie
 tool_type: r
 primary_tool: rpact
 goal_approach_exempt: true
+license: MIT
 ---
 
 ## Version Compatibility

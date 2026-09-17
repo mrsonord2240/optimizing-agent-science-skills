@@ -3,6 +3,7 @@ name: bio-alignment-filtering
 description: Filter alignments by flags, mapping quality, and regions using samtools view and pysam. Use when extracting specific reads, removing low-quality alignments, or subsetting to target regions.
 tool_type: cli
 primary_tool: samtools
+license: MIT
 ---
 
 ## Version Compatibility

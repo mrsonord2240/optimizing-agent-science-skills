@@ -3,6 +3,7 @@ name: bio-metagenomics-strain-tracking
 description: Resolves and compares bacterial strains below the species level from shotgun metagenomes with inStrain (popANI/conANI microdiversity), StrainPhlAn (marker-SNV consensus phylogeny and nGD), MIDAS2, metaSNV, and StrainGE, plus genome-vs-genome ANI (skani/fastANI/MASH) for isolate/MAG comparison. Covers why a strain is a threshold not a thing, why ANI answers same-genome while popANI/nGD answer same-population-in-situ, the 99.999% popANI and per-species nGD definitions, the coverage detection limit (absence is not absence), why sharing is not transmission direction, and mapping to the dataset's own dRep MAGs. Use when detecting shared strains, tracking transmission, resolving within-host strain dynamics, or deconvoluting co-occurring strains. For pure-culture isolate outbreak SNP trees see epidemiological-genomics; for MAG assembly see genome-assembly/metagenome-assembly.
 tool_type: mixed
 primary_tool: inStrain
+license: MIT
 ---
 
 ## Version Compatibility

@@ -3,6 +3,7 @@ name: bio-metagenomics-contamination-controls
 description: Cleans a shotgun metagenome of everything that is not the target community before profiling - host-read depletion (Hostile, bowtie2/T2T-CHM13), reagent/kitome contamination control with blanks and decontam, mock-community validation, and depth-adequacy checks (Nonpareil). Covers why a metagenomic result is a position in a choice-chain rather than a direct observation, why extraction is the experiment, why a low-biomass community can be entirely kitome, why absence means not-detectable-by-this-chain, and why a confident classifier call can still be wrong when the reference is contaminated. Use when designing controls, removing host reads, identifying reagent contaminants, validating with mocks, or judging whether a low-biomass result is real. For adapter/quality trimming see read-qc; for MAG-level decontamination see genome-assembly/metagenome-assembly.
 tool_type: mixed
 primary_tool: decontam
+license: MIT
 ---
 
 ## Version Compatibility

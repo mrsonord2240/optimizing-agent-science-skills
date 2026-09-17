@@ -3,6 +3,7 @@ name: bio-read-qc-quality-filtering
 description: Filters reads by quality, length, N content, and complexity with Trimmomatic, fastp, and Cutadapt, including sliding-window trimming, per-read unqualified-base filtering, and 2-color poly-G removal. Use when reads have poor-quality tails, when an assembly or k-mer workflow needs clean input, or when a junk read subpopulation must be dropped. For adapter removal use adapter-trimming; for all-in-one preprocessing use fastp-workflow.
 tool_type: cli
 primary_tool: trimmomatic
+license: MIT
 ---
 
 ## Version Compatibility

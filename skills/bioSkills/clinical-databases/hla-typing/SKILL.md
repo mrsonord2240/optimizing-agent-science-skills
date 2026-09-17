@@ -3,6 +3,7 @@ name: bio-clinical-databases-hla-typing
 description: Calls HLA class I and class II alleles at 2/4/6/8-field resolution from WGS/WES/RNA-seq/long-read data using OptiType, HLA-LA, T1K, Polysolver, HLA-HD, arcasHLA, StarPhase, or HIBAG imputation. Use when typing for HSCT, solid-organ transplant, neoantigen prediction, PGx screening (B*57:01, B*15:02, etc.), or disease-association studies, with reconciliation across tools and IPD-IMGT/HLA version mismatch handling.
 tool_type: cli
 primary_tool: T1K
+license: MIT
 ---
 
 ## Version Compatibility

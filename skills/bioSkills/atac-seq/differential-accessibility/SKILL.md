@@ -3,6 +3,7 @@ name: bio-atac-seq-differential-accessibility
 description: Identify differentially accessible chromatin regions across conditions using DiffBind, csaw, DESeq2, or edgeR. Use when comparing ATAC-seq accessibility between treatment groups, choosing between consensus-peak vs sliding-window approaches, picking the correct normalization (full library vs reads-in-peaks), correcting batch with SVA/RUVseq, or interpreting log2FC and FDR thresholds in a chromatin context.
 tool_type: r
 primary_tool: DiffBind
+license: MIT
 ---
 
 ## Version Compatibility

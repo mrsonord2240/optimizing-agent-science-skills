@@ -4,6 +4,7 @@ description: Visualizes ChIP-seq data using deepTools (computeMatrix, plotHeatma
 tool_type: mixed
 primary_tool: deepTools
 goal_approach_exempt: true
+license: MIT
 ---
 
 ## Version Compatibility

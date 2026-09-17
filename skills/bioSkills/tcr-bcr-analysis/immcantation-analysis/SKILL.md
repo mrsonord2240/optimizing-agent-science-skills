@@ -3,6 +3,7 @@ name: bio-tcr-bcr-analysis-immcantation-analysis
 description: Reconstructs B-cell clonal families, quantifies somatic hypermutation and selection, and builds antibody lineage trees with the Immcantation R suite (alakazam, shazam, scoper, dowser, tigger) on AIRR-format BCR data. Use when deriving the clonal-clustering threshold from the distToNearest bimodal valley (never a hardcoded 0.15); choosing hierarchicalClones vs spectralClones (vj vs novj) for SHM-diverged repertoires; personalizing the germline with TIGGER before mutation counting; reconstructing D-masked germlines with createGermlines; measuring R/S mutation frequency by CDR and FWR region; testing antigen-driven selection with BASELINe; comparing Hill-number diversity at equal sampling depth; and inferring IgPhyML lineage trees for affinity maturation, class-switch, and ancestral-antibody analysis.
 tool_type: r
 primary_tool: alakazam
+license: MIT
 ---
 
 ## Version Compatibility

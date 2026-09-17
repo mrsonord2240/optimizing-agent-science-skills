@@ -3,6 +3,7 @@ name: bio-read-qc-quality-reports
 description: Generates and interprets per-file and cross-sample QC reports from FASTQ data with FastQC, falco, and MultiQC, covering Phred quality, per-base composition, GC, duplication, overrepresented sequences, and adapter content. Use when performing initial QC on raw sequencing reads, validating preprocessing, or judging a multi-sample cohort for outliers and batch effects. For long reads use NanoPlot; for adapter/quality remediation route to adapter-trimming, quality-filtering, or fastp-workflow.
 tool_type: cli
 primary_tool: fastqc
+license: MIT
 ---
 
 ## Version Compatibility

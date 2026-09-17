@@ -3,6 +3,7 @@ name: bio-small-rna-seq-differential-mirna
 description: Tests miRNAs for differential expression with DESeq2 or edgeR using small-RNA-aware normalization and filtering. Use when deciding which normalization survives a library dominated by a few hyper-abundant miRNAs (compositional fragility); choosing DESeq2 vs edgeR vs a compositional method; setting a lower prefilter than mRNA; handling biofluid data with no endogenous normalizer; or remembering that RPM is for display and TDMD can make a miRNA drop without transcriptional repression.
 tool_type: r
 primary_tool: DESeq2
+license: MIT
 ---
 
 ## Version Compatibility

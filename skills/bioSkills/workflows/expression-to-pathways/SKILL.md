@@ -15,6 +15,7 @@ qc_checkpoints:
   - input_validation: "Gene IDs match the method (OrgDb keyType / kegg-id / ENTREZ); >85% convert; background = testable genes"
   - generation_choice: "ORA-vs-GSEA fork decided BEFORE running; a ranking for all genes -> GSEA, a pre-selected list -> ORA"
   - reproducibility: "Tool + database version/date, ranking metric, p-adjust method, and universe recorded; set.seed for GSEA"
+license: MIT
 ---
 
 ## Version Compatibility

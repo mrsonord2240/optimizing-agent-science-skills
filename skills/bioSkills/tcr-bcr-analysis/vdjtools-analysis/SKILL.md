@@ -3,6 +3,7 @@ name: bio-tcr-bcr-analysis-vdjtools-analysis
 description: Computes immune-repertoire diversity, clonal structure, overlap, and segment usage from TCR/BCR clonotype tables with VDJtools (immunarch as the modern R alternative). Use when deciding which diversity estimator answers a question (q=0 observed richness/chao1/chaoE, q=1 shannonWienerIndex, q=2 inverseSimpson as a Hill profile); normalizing sequencing depth before any cross-sample claim (DownSample or the resampled CalcDiversityStats table); choosing an overlap metric (depth-robust MorisitaHorn/F2 vs depth-biased Jaccard/public counts) and a clonotype match key (-i nt/aa, +/-V/J); summarizing clonality as 1 - normalizedShannonWienerIndex; reading spectratype and V-J usage under primer bias; interpreting public clonotypes; and choosing VDJtools (stable Java CLI) vs immunarch (active tidy R).
 tool_type: cli
 primary_tool: VDJtools
+license: MIT
 ---
 
 ## Version Compatibility

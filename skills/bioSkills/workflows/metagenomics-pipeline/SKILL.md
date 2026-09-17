@@ -16,6 +16,7 @@ qc_checkpoints:
   - after_qc: "Q30 >80%, host reads removed"
   - after_classification: "Classification rate >60%, known taxa dominant"
   - after_functional: "Pathway coverage reasonable, unmapped <50%"
+license: MIT
 ---
 
 ## Version Compatibility

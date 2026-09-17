@@ -3,6 +3,7 @@ name: bio-primer-design-primer-basics
 description: Designs and ranks PCR primer pairs for a target template with primer3-py (design_primers), returning pairs with nearest-neighbor Tm, GC, product size, and complementarity scores. Covers why primer3 is a LOCAL weighted-penalty minimizer over the single template supplied (so PRIMER_PAIR_0 is the lowest-penalty pair under the given bounds, never a genome-specificity guarantee), why Tm is a salt/concentration-dependent SantaLucia prediction not a fixed property, why the two primers must be Tm-matched, the seq_args/global_args tag semantics (SEQUENCE_TARGET/INCLUDED/EXCLUDED/OVERLAP_JUNCTION/FORCE_*, 0-based [start,length]), 3'-end and GC-clamp mechanism, 5'-tail handling, masking SNPs under 3' ends, and diagnosing zero-pair runs. Use when designing standard PCR, cloning, genotyping, or sequencing primers, flanking a target, or screening pairs by Tm/size/GC. Genome off-target checking is primer-specificity; dimers/hairpins primer-validation; qPCR and probes qpcr-primers.
 tool_type: python
 primary_tool: primer3-py
+license: MIT
 ---
 
 ## Version Compatibility

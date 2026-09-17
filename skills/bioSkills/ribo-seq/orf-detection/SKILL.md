@@ -3,6 +3,7 @@ name: bio-ribo-seq-orf-detection
 description: Detect and quantify translated ORFs from Ribo-seq using 3-nucleotide periodicity, including uORFs, internal ORFs, dORFs, and novel ORFs. Use when finding actively translated regions beyond annotated CDS, classifying ORFs by the 2022 community standard, quantifying ORF-level translation, or choosing between periodicity-based callers.
 tool_type: mixed
 primary_tool: RiboCode
+license: MIT
 ---
 
 ## Version Compatibility

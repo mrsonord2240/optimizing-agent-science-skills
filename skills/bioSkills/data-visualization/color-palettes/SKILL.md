@@ -4,6 +4,7 @@ description: Select colormaps and qualitative palettes for scientific figures us
 tool_type: mixed
 primary_tool: viridis
 goal_approach_exempt: true
+license: MIT
 ---
 
 ## Version Compatibility

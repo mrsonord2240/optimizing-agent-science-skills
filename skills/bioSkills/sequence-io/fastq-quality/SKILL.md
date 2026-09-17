@@ -3,6 +3,7 @@ name: bio-fastq-quality
 description: Work with FASTQ quality scores using Biopython - access Phred scores, filter and trim by quality, compute per-position profiles, and convert between Sanger/Phred+33, Solexa, and Illumina/Phred+64 encodings. Use when analyzing read quality, filtering or trimming low-quality bases, generating quality reports, or deciding which FASTQ quality encoding a file uses before parsing.
 tool_type: python
 primary_tool: Bio.SeqIO
+license: MIT
 ---
 
 ## Version Compatibility

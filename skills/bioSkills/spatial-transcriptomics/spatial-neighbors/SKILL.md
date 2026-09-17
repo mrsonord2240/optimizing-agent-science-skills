@@ -3,6 +3,7 @@ name: bio-spatial-transcriptomics-spatial-neighbors
 description: Build the spatial neighbor graph that every downstream spatial statistic (Moran's I, neighborhood enrichment, co-occurrence, spatial domains) inherits, using Squidpy. Use when choosing the graph type (kNN vs Delaunay vs fixed-radius vs Visium hex grid) and understanding why it silently changes every downstream result; handling variable cell density (kNN fixes neighbor COUNT, fixed-radius fixes physical DISTANCE -- each distorts the other); getting coordinate units right (pixels vs microns; Visium array coords are not distance); pruning Delaunay long edges across tissue gaps; running the graph sensitivity analysis almost nobody runs; and knowing when planar section neighbors misrepresent a 3D tissue.
 tool_type: python
 primary_tool: squidpy
+license: MIT
 ---
 
 ## Version Compatibility

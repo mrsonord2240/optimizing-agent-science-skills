@@ -3,6 +3,7 @@ name: bio-reference-operations
 description: Generate consensus sequences and manage reference files using samtools. Use when creating consensus from alignments, indexing references, or creating sequence dictionaries.
 tool_type: cli
 primary_tool: samtools
+license: MIT
 ---
 
 ## Version Compatibility

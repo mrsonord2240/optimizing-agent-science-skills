@@ -4,6 +4,7 @@ description: Designs Bayesian clinical trials including Phase I dose-finding (BO
 tool_type: r
 primary_tool: RBesT
 goal_approach_exempt: true
+license: MIT
 ---
 
 ## Version Compatibility

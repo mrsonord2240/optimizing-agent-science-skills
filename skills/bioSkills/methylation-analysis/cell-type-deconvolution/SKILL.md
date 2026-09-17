@@ -3,6 +3,7 @@ name: bio-methylation-cell-type-deconvolution
 description: Estimates cell-type composition from bulk DNA methylation and uses it to defuse the single biggest EWAS confounder. Covers reference-based deconvolution (Houseman constrained-projection, minfi estimateCellCounts2 with FlowSorted.Blood.EPIC + IDOL-optimized libraries, EpiDISH RPC/CBS/CP, 12-cell extended, cord-blood nRBC references, EpiSCORE/hepidish for solid tissue), reference-free correction (ReFACTor, RefFreeEWAS, SVA), using fractions as covariates vs the compositionality/collinearity trap, and cell-type-resolved EWAS (CellDMC, TCA, TOAST, omicwas, HIRE). Use when estimating blood/tissue cell fractions, adjusting an EWAS for composition, choosing a deconvolution reference, or attributing a methylation signal to a cell type. For the EWAS confounder-vs-mediator decision see ewas-design; for the IEAA cell-count adjustment of DNAm age see epigenetic-clocks; for clean beta input see array-preprocessing.
 tool_type: r
 primary_tool: EpiDISH
+license: MIT
 ---
 
 ## Version Compatibility

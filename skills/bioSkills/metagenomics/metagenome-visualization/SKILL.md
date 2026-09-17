@@ -3,6 +3,7 @@ name: bio-metagenomics-visualization
 description: Turns a shotgun profiler table (MetaPhlAn relative abundance, Bracken counts, HUMAnN function tables) into honest figures and defensible community statistics with phyloseq, vegan, microViz, and Python. Covers why an ordination/bar/diversity number is a modeling choice that can manufacture a result, the MetaPhlAn-percent-vs-Bracken-counts fork that decides everything, CLR/Aitchison vs Bray-Curtis, Hill numbers and why shotgun richness is a database readout, pairing PERMANOVA with betadisper, and the multi-tool differential-abundance consensus. Use when plotting taxonomic/functional profiles, computing alpha/beta diversity, running ordination/PERMANOVA, or testing differential abundance. For amplicon/QIIME2 stats see the microbiome category; for compositional theory see abundance-estimation.
 tool_type: mixed
 primary_tool: phyloseq
+license: MIT
 ---
 
 ## Version Compatibility

@@ -3,6 +3,7 @@ name: bio-phasing-imputation-reference-panels
 description: Selects and prepares the reference panel that phasing/imputation copies haplotypes from (1000 Genomes, HRC, TOPMed, HGDP+1kGP/gnomAD, CAAPA), matching panel ancestry to the target, reconciling genome build and chromosome naming, and running the strand/allele harmonization gate. Covers why ancestry-match beats panel size (imputation can only copy haplotypes the panel contains), why palindromic A/T and C/G SNPs flip strand without erroring, why liftover is a strand-flip generator in between-build inverted regions, that HRC is SNP-only and TOPMed is never downloadable (governance can override accuracy), and panel formats (msav, bref3, imp5). Use when choosing a panel for a target ancestry, preparing or converting a panel, aligning study data, or deciding between downloadable and server-only panels. Phasing is haplotype-phasing; imputation is genotype-imputation; PCA for ancestry is population-genetics/population-structure; HLA panels are clinical-databases/hla-typing.
 tool_type: cli
 primary_tool: bcftools
+license: MIT
 ---
 
 ## Version Compatibility

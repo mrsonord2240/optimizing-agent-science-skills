@@ -4,6 +4,7 @@ description: Assesses ChIP-seq quality across antibody specificity, fragmentatio
 tool_type: mixed
 primary_tool: deepTools
 goal_approach_exempt: true
+license: MIT
 ---
 
 ## Version Compatibility

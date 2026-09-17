@@ -3,6 +3,7 @@ name: bio-differential-expression-de-results
 description: Extracts, filters, annotates, and exports differential expression results from DESeq2 or edgeR with proper handling of padj=NA (independent filtering, Cook's outliers, all-zero), multiple-testing correction choice (BH vs Storey q-value vs IHW vs lfsr), TREAT vs post-hoc fold-change filtering, p-value histogram diagnostics, gene annotation via org.db/biomaRt/mygene, GSEA preranked input, ORA background construction, replication reality (Schurch 2016 small-n result), and SABV/sex-stratified reporting. Use when extracting and interpreting DE results, troubleshooting padj=NA, choosing FDR method, preparing ranked lists for pathway analysis, annotating gene IDs, or comparing DESeq2 vs edgeR outputs.
 tool_type: r
 primary_tool: DESeq2
+license: MIT
 ---
 
 ## Version Compatibility

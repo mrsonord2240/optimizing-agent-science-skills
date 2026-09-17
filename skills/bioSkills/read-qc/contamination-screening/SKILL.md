@@ -3,6 +3,7 @@ name: bio-read-qc-contamination-screening
 description: Detects contamination in sequencing reads - cross-species (FastQ Screen, Kraken2), vector/PhiX/adapter, rRNA, and same-species cross-sample/index-hopping and sample swaps (SNP fingerprints via verifyBamID2/NGSCheckMate/somalier). Use when suspecting cross-contamination, PDX host reads, microbial carry-over, or sample swaps, and to decide whether to report, filter, or align to a combined reference. For deep taxonomic profiling use metagenomics/kraken-classification.
 tool_type: cli
 primary_tool: fastq_screen
+license: MIT
 ---
 
 ## Version Compatibility

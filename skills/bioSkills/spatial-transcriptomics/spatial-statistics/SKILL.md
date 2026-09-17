@@ -3,6 +3,7 @@ name: bio-spatial-transcriptomics-spatial-statistics
 description: Detects spatially variable genes, spatial autocorrelation, and cell-type colocalization for spatial transcriptomics using Squidpy with PySAL/esda for local statistics. Use when choosing an SVG method by its null and scaling (SpatialDE/SPARK GP variance-component vs SPARK-X/nnSVG linear vs Moran/Geary graph autocorrelation); separating genes that are spatially variable because of cell-type composition from genes regulated within a cell type; choosing the right autocorrelation statistic (global Moran/Geary vs Getis-Ord hot/cold spots vs local LISA and its FDR trap); and choosing a colocalization null strong enough to defeat the abundance/compartment confound (conditional or toroidal vs the weak Squidpy default permutation).
 tool_type: python
 primary_tool: squidpy
+license: MIT
 ---
 
 ## Version Compatibility

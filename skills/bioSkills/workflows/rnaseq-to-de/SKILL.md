@@ -20,6 +20,7 @@ qc_checkpoints:
   - after_quant: "Mapping rate >70%, >10M reads mapped, flat gene-body coverage, low rRNA/intronic"
   - after_import: "tx2gene release matches the Salmon index; ID conversion loses few transcripts"
   - after_de: "Dispersion trend sane, PCA separates condition not batch, no Cook's outliers"
+license: MIT
 ---
 
 ## Version Compatibility

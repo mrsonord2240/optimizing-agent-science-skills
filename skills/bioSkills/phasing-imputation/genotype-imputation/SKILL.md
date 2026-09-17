@@ -3,6 +3,7 @@ name: bio-phasing-imputation-genotype-imputation
 description: Imputes untyped genotypes against a phased reference panel with Beagle, Minimac4, or IMPUTE5 (array data) or from genotype likelihoods with GLIMPSE2, QUILT2, or STITCH (low-coverage WGS), producing per-variant dosages (DS) with a self-estimated quality (Beagle DR2, Minimac R2, IMPUTE INFO). Covers why the honest output is a dosage posterior not a hard call, why GWAS regresses on DS, why the quality metric is an ESTIMATE of r2 from posterior spread (not validation against truth), the DS/GP/HDS fields, the phasing prerequisite, chunking, chrX ploidy, the Michigan/TOPMed servers (the only access to HRC/TOPMed), and low-coverage WGS as the modern array replacement. Use when increasing variant density for GWAS, harmonizing arrays, inferring untyped variants, or imputing low-coverage sequence. Phase first with haplotype-phasing; prepare the panel with reference-panels; filter with imputation-qc; the GWAS test is population-genetics/association-testing; end-to-end orchestration is workflows/gwas-pipeline.
 tool_type: cli
 primary_tool: Beagle
+license: MIT
 ---
 
 ## Version Compatibility

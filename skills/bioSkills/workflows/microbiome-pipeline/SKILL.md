@@ -15,6 +15,7 @@ qc_checkpoints:
   - after_denoising: "Per-sample reads tracked through filter/denoise/merge/nonchim; no merge cliff"
   - after_diversity: "Sampling depth declared; dropped-sample list reported"
   - after_da: "Consensus of >=2 CoDA tools on unrarefied counts; tools named"
+license: MIT
 ---
 
 ## Version Compatibility

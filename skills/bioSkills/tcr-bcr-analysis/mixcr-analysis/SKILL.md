@@ -1,8 +1,9 @@
 ---
 name: bio-tcr-bcr-analysis-mixcr-analysis
-description: Align V(D)J reads and assemble TCR/BCR clonotypes with MiXCR, driven by a chemistry-matched preset. Use when choosing/auditing the preset for a library (5'RACE/template-switch vs multiplex-primer amplicon -> rigid vs floating boundaries; RNA vs gDNA -> --rna/--dna; bulk vs 10x single-cell; UMI vs no-UMI -> tag pattern and barcode collapse; kit presets Takara/NEBNext/QIAseq/BD/MiLaboratory); assembling clonotypes by CDR3 vs VDJRegion; setting the reads-vs-UMI-vs-cell quantitation denominator; exporting native MiXCR fields vs AIRR rearrangement TSV for downstream Immcantation/scirpy/VDJtools; and running alignment/chain-usage QC. Keywords: MiXCR, analyze, align, refineTagsAndSort, assemblePartial, assemble, assembleCells, exportClones, exportAirr, exportQc, CDR3, V(D)J, clonotype, UMI, cell barcode, 10x VDJ, license.
+description: "Align V(D)J reads and assemble TCR/BCR clonotypes with MiXCR, driven by a chemistry-matched preset. Use when choosing/auditing the preset for a library (5'RACE/template-switch vs multiplex-primer amplicon -> rigid vs floating boundaries; RNA vs gDNA -> --rna/--dna; bulk vs 10x single-cell; UMI vs no-UMI -> tag pattern and barcode collapse; kit presets Takara/NEBNext/QIAseq/BD/MiLaboratory); assembling clonotypes by CDR3 vs VDJRegion; setting the reads-vs-UMI-vs-cell quantitation denominator; exporting native MiXCR fields vs AIRR rearrangement TSV for downstream Immcantation/scirpy/VDJtools; and running alignment/chain-usage QC. Keywords: MiXCR, analyze, align, refineTagsAndSort, assemblePartial, assemble, assembleCells, exportClones, exportAirr, exportQc, CDR3, V(D)J, clonotype, UMI, cell barcode, 10x VDJ, license."
 tool_type: cli
 primary_tool: MiXCR
+license: MIT
 ---
 
 ## Version Compatibility

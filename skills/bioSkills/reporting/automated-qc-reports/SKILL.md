@@ -3,6 +3,7 @@ name: bio-reporting-automated-qc-reports
 description: Aggregates per-tool QC metrics (FastQC, fastp, alignment, quantification, variant calling, single-cell) into one interactive MultiQC report, and guides module scoping, sample-name resolution, large-cohort behavior, and turning the report into an actual QC gate. Use when summarizing QC across many samples, building a shareable quality report, or wiring automated QC into a pipeline.
 tool_type: cli
 primary_tool: multiqc
+license: MIT
 ---
 
 ## Version Compatibility

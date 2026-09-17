@@ -3,6 +3,7 @@ name: bio-phasing-imputation-haplotype-phasing
 description: Estimates haplotype phase from population linkage disequilibrium with SHAPEIT5, SHAPEIT4, Eagle2, or Beagle - turning unphased genotypes (0/1) into phased haplotypes (0|1) for imputation input, compound-heterozygote calls, HLA typing, or population genetics. Covers why statistical phase is an INFERENCE (not a measurement) whose error concentrates at rare variants, why a genome-wide switch-error rate hides catastrophic rare-variant error and must be reported MAC-stratified, the SHAPEIT5 common-scaffold-then-rare design (phase_common, ligate, phase_rare, switch), reference-based vs within-cohort phasing, the build-matched genetic map, chrX male-haploid handling, and the switch-vs-flip-vs-Hamming distinction. Use when phasing genotypes before imputation, for compound-het/ASE/HLA, or benchmarking against trios. Read-backed / molecular phasing (long reads, Hi-C) is long-read-sequencing/haplotype-phasing; panel choice is reference-panels; imputation is genotype-imputation.
 tool_type: cli
 primary_tool: SHAPEIT5
+license: MIT
 ---
 
 ## Version Compatibility

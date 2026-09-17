@@ -3,6 +3,7 @@ name: bio-differential-expression-batch-correction
 description: Handles batch effects in bulk RNA-seq via design-matrix inclusion (the correct path for DE), ComBat/ComBat-seq for visualization, SVA for unknown latent factors, RUVSeq for negative-control-gene-anchored unwanted variation, and limma::removeBatchEffect for plotting only. Encodes the Nygaard 2016 cardinal sin against testing on a batch-corrected matrix, the choice between SVA/RUVg/RUVs/RUVr, the confounding non-identifiability problem, the single-cell boundary (Harmony/MNN are NOT for bulk), and the Goh 2017 harmonization critique. Use when designing a DE analysis with batch structure, troubleshooting batch-dominated PCA, choosing ComBat vs ComBat-seq, handling unknown batch via SVA, integrating across studies, or deciding when (rarely) to subtract batch.
 tool_type: r
 primary_tool: sva
+license: MIT
 ---
 
 ## Version Compatibility

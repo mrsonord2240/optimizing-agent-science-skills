@@ -4,6 +4,7 @@ description: Runs parameterized Jupyter notebooks as reproducible batch report g
 tool_type: python
 primary_tool: papermill
 goal_approach_exempt: true
+license: MIT
 ---
 
 ## Version Compatibility

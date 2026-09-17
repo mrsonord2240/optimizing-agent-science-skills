@@ -3,6 +3,7 @@ name: bio-ctdna-mutation-detection
 description: Detects somatic mutations in circulating tumor DNA, treating low-VAF detection as a signal-versus-noise problem set by error suppression and molecules sampled, not by the choice of caller. Distinguishes de novo CALLING (scanning a panel for unknown variants, bounded by per-locus error and multiple testing) from tumor-informed DETECTION (tracking a pre-specified variant set, where panel integration reaches single-ppm). Covers VarDict and Mutect2 for de novo calling, UMI-aware callers, and a pysam-based known-variant VAF tracker, with matched-WBC subtraction as the mandatory defense against clonal hematopoiesis (the dominant false positive). Use when calling or tracking tumor mutations from plasma cfDNA, setting a VAF threshold, or deciding whether a low-VAF call is tumor versus CHIP.
 tool_type: mixed
 primary_tool: VarDict
+license: MIT
 ---
 
 ## Version Compatibility

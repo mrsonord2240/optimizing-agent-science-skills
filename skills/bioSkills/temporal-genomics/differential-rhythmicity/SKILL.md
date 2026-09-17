@@ -3,6 +3,7 @@ name: bio-temporal-genomics-differential-rhythmicity
 description: Compares how a rhythm CHANGES between conditions, genotypes, treatments, tissues, or ages (differential rhythmicity), classifying each feature as gain-of-rhythm, loss-of-rhythm, phase change, amplitude change, unchanged-rhythmic, or arrhythmic-in-both, and distinguishing differential EXPRESSION (condition main effect) from differential RHYTHMICITY (condition x time interaction). Uses model-based approaches that borrow strength across conditions - LimoRhyde (sin/cos interaction terms in a limma/edgeR/DESeq2 design), dryR (BIC model selection across >=2 conditions), compareRhythms (direct gain/loss/change/same classification), DODR, CircaCompare - instead of the detect-then-Venn anti-pattern that overestimates reprogramming. Use when testing whether rhythms differ between conditions/genotypes/tissues/ages, classifying gain/loss/phase/amplitude change, or separating differential expression from differential rhythmicity. Not for detecting rhythms in one condition (see temporal-genomics/circadian-rhythms).
 tool_type: r
 primary_tool: limorhyde
+license: MIT
 ---
 
 ## Version Compatibility

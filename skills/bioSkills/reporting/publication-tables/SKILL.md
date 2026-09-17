@@ -4,6 +4,7 @@ description: Builds publication-ready tables - descriptive Table 1, regression a
 tool_type: mixed
 primary_tool: gtsummary
 goal_approach_exempt: true
+license: MIT
 ---
 
 ## Version Compatibility

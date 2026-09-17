@@ -3,6 +3,7 @@ name: bio-structural-biology-modern-structure-prediction
 description: Predicts protein and complex structures with deep-learning models (ESMFold, AlphaFold2/ColabFold, AlphaFold3, Chai-1, Boltz-1/2) and reconciles them with confidence metrics. Use when choosing a predictor by input and question rather than novelty (ESMFold single-chain, no-MSA, fast, metagenomic-scale vs AlphaFold3/Chai-1/Boltz for complexes, ligands, nucleic acids, ions, PTMs); recognizing that MSA depth is the dominant accuracy determinant so ESMFold trades accuracy for speed and degrades on orphan proteins; gating a complex on ipTM plus inter-chain PAE, not per-chain pLDDT; reading pLDDT as local confidence, PAE as inter-domain/inter-chain positioning, pTM as global fold; knowing a single prediction is one dominant conformer not an ensemble (no apo/holo, allosteric, or fold-switch states), that these are not variant-effect/ddG/affinity engines, and that a confident prediction is a hypothesis, not an experiment. Keywords ESMFold, AlphaFold3, Chai-1, Boltz-1, ColabFold, ipTM, PAE, pLDDT, MSA depth.
 tool_type: python
 primary_tool: ESMFold
+license: MIT
 ---
 
 ## Version Compatibility

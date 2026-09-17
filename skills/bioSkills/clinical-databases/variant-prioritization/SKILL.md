@@ -3,6 +3,7 @@ name: bio-clinical-databases-variant-prioritization
 description: Prioritizes rare-disease variants from trio/quad WES/WGS with de novo (DeNovoGear, Triodenovo), compound-heterozygous phasing (WhatsHap), mosaic VAF tiering, phenotype-driven ranking (Exomiser, Phen2Gene, AMELIE), ClinGen gene-disease validity gating, and ACMG SF v3.2 secondary findings reporting. Use when running diagnostic exome / genome pipelines, identifying candidate Mendelian disease genes, screening for incidental findings, or auditing VUS reclassification cycles. The ACMG/AMP classification framework (PVS1 decision tree, Pejaver PP3/BP4 calibration, Tavtigian point system) is in clinical-databases/acmg-classification.
 tool_type: python
 primary_tool: pandas
+license: MIT
 ---
 
 ## Version Compatibility

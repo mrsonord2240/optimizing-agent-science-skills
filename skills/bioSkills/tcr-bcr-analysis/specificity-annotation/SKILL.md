@@ -3,6 +3,7 @@ name: bio-tcr-bcr-analysis-specificity-annotation
 description: Maps TCR/BCR receptor sequences toward candidate antigen specificity and clusters repertoires by shared-specificity signal, while enforcing that a database match or a cluster label is a HYPOTHESIS, not a specificity call. Use when deciding among database annotation (VDJdb/McPAS/IEDB+TCRMatch, requiring V-gene and HLA concordance plus a confidence score) versus sequence clustering (tcrdist3 meta-clonotypes, GLIPH2, GIANA, clusTCR, which find enrichment not per-receptor labels) versus generation-probability nulls (OLGA Pgen, IGoR, SONIA Ppost) for testing public/convergent/shared claims; and when guarding against overclaiming specificity, base-rate false positives from bare CDR3 matches, unpaired beta-only annotation, ML predictor failure on unseen epitopes, and ignored MHC restriction. TCR-focused with a BCR/antibody note (SHM, conformational epitopes, IGHV3-53/3-66 public clonotypes). Keywords CDR3, pMHC, HLA restriction, cross-reactivity, meta-clonotype, Pgen, public clonotype, convergent recombination.
 tool_type: mixed
 primary_tool: tcrdist3
+license: MIT
 ---
 
 ## Version Compatibility

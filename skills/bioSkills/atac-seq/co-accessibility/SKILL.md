@@ -3,6 +3,7 @@ name: bio-atac-seq-co-accessibility
 description: Infer cis-regulatory connections (peak-to-peak co-accessibility) from scATAC-seq using Cicero, ArchR getCoAccessibility, or SCENIC+. Use when linking enhancer accessibility to promoter accessibility, identifying enhancer-gene pairs from chromatin alone (without paired RNA), running gene-regulatory inference combining ATAC + RNA, or comparing predicted regulatory contacts against Hi-C/Micro-C ground truth.
 tool_type: r
 primary_tool: cicero
+license: MIT
 ---
 
 ## Version Compatibility

@@ -4,6 +4,7 @@ description: Exports publication-ready figures with the correct vector/raster sp
 tool_type: mixed
 primary_tool: matplotlib
 goal_approach_exempt: true
+license: MIT
 ---
 
 ## Version Compatibility

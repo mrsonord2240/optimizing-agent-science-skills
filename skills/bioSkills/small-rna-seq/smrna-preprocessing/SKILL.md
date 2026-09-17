@@ -3,6 +3,7 @@ name: bio-small-rna-seq-smrna-preprocessing
 description: Trims kit-specific 3' adapters, strips UMIs or 4N degenerate ends, size-selects, and collapses small RNA-seq reads (miRNA, piRNA, tRF) with cutadapt or fastp. Use when choosing the kit's 3' adapter; setting the size window (18-26 nt miRNA vs 24-32 nt piRNA); deciding whether a library carries a true UMI (QIAseq) versus a 4N debiasing spacer (NEXTflex); reading the read-length histogram to judge library quality; or deciding whether to collapse identical reads before mapping.
 tool_type: cli
 primary_tool: cutadapt
+license: MIT
 ---
 
 ## Version Compatibility

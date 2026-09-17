@@ -3,6 +3,7 @@ name: bio-differential-expression-timeseries-de
 description: Analyzes time-series and longitudinal RNA-seq for differential expression and trajectory structure. Covers DESeq2 LRT with reduced models, time as factor vs continuous vs natural splines, maSigPro (Nueda 2014 for RNA-seq), ImpulseDE2 with explicit impulse-model failure modes, DREAM for repeated measures via linear mixed models, pseudoreplication avoidance, conditional vs marginal modeling, and trajectory clustering with DPGP, Mfuzz (with Schwämmle 2010 fuzzifier estimation), and splines+k-means. Use when modeling time-course or longitudinal expression, choosing factor vs spline, handling repeated measures from the same subject, avoiding pseudoreplication, clustering temporal trajectories, or selecting between dedicated time-course tools and pairwise+LRT.
 tool_type: r
 primary_tool: DESeq2
+license: MIT
 ---
 
 ## Version Compatibility

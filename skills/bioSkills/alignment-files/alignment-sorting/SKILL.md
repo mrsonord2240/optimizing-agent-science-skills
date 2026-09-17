@@ -3,6 +3,7 @@ name: bio-alignment-sorting
 description: Sort alignment files by coordinate or read name using samtools and pysam. Use when preparing BAM files for indexing, variant calling, or paired-end analysis.
 tool_type: cli
 primary_tool: samtools
+license: MIT
 ---
 
 ## Version Compatibility

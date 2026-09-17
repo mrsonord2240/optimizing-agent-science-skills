@@ -3,6 +3,7 @@ name: bio-restriction-fragment-analysis
 description: Predict restriction digest fragment sizes and gel patterns using Biopython Bio.Restriction. Computes fragment lengths and sequences for single and double digests on linear or circular DNA, and interprets them against an agarose gel. Use when predicting the fragments from a digest, planning a diagnostic digest to verify a clone, or matching observed gel bands to an expected pattern.
 tool_type: python
 primary_tool: Bio.Restriction
+license: MIT
 ---
 
 ## Version Compatibility

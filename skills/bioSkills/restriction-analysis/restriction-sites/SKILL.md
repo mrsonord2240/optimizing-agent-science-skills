@@ -3,6 +3,7 @@ name: bio-restriction-sites
 description: Find restriction enzyme cut sites in DNA sequences using Biopython Bio.Restriction. Searches single enzymes, batches, or commercial enzyme sets and returns cut positions for linear or circular DNA. Use when locating where one or more restriction enzymes cut a sequence, screening a sequence for the presence or absence of a site, or counting how often an enzyme cuts.
 tool_type: python
 primary_tool: Bio.Restriction
+license: MIT
 ---
 
 ## Version Compatibility

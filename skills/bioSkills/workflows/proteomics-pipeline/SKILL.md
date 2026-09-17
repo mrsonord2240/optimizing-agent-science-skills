@@ -11,6 +11,7 @@ depends_on:
   - proteomics/protein-inference
   - proteomics/differential-abundance
   - proteomics/dia-analysis
+license: MIT
 ---
 
 ## Version Compatibility
