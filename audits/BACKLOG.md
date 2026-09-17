@@ -70,7 +70,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: Both files build a toy exponential-decay LD matrix independently of the simulated per-SNP betas/SEs, so the LD is not internally consistent with any genotype process that could have produced those z-scores; estimate_s_rss correctly detects this (lambda 0.21-0.39, far above the Skill's own 0.05 threshold).
 - Fix: Regenerate both example datasets from a single simulated genotype matrix, deriving both the GWAS/eQTL summary statistics AND the LD matrix from that same genotype matrix (verified working in this audit's run/input2b_susie_selfconsistent.R, which recovers the planted 2-credible-set truth exactly with lambda=0).
 
-## P1 (88)
+## P1 (85)
 
 ### `bio-experimental-design-sample-size` — PROPER and powsimR routes ship with no executable pattern
 
@@ -639,30 +639,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The pre-fix audit's own P1 recommendation proposed adding a Common Errors row for 'IndexError: single positional indexer is out-of-bounds'. The fixer instead documented the fix as prose (per the fix log: 'New paragraph after the algorithm'), and that prose is accurate and complete. But the shipped SKILL.md's Common Errors table (6 rows: No hits / Hits dominated by essentials / Unstable hits / Drug-target as suppressor / MAGeCK-drugZ disagreement / Inconsistent between doses) still has no row for this crash, so an agent that jumps straight to that quick-reference table after hitting the error will not find the fix there.
 - Root cause: The fix addressed the substance (documenting the guide-count / half_window_size relationship) via Algorithm-section prose rather than the Common Errors table the original recommendation suggested; both are legitimate documentation choices, but only the table is a quick-lookup surface for this specific crash message.
 - Fix: Add a row to the Common Errors table: 'IndexError: single positional indexer is out-of-bounds \| half_window_size too large for total guide count \| set --half_window_size to ~1/4 of total guides; see Algorithm section'.
-
-### `bio-metabolomics-isotope-tracing` — Steady-state check only compares the last time-point pair
-
-- Skill: 90, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/metabolomics/isotope-tracing) · [viewer](skills/bio-metabolomics-isotope-tracing/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 3
-- Problem: The documented steady-state snippet (`abs(fe[-1]-fe[-2]) < 0.02`) can return 'plateau reached' on a time course that is still clearly decelerating but not flat, licensing classical-MFA flux inference prematurely.
-- Root cause: SKILL.md's steady-state guidance checks only the final pair of points against a fixed threshold, with no check of the trend across the full time course.
-- Fix: Add guidance to require the delta to be shrinking (or below threshold) across at least the last 2-3 consecutive intervals, or recommend fitting a saturating-exponential curve to the full time course and checking its asymptote, per the already-cited Cheah & Young 2018 reference.
-
-### `bio-metabolomics-isotope-tracing` — Documented error text for 'half-defined resolution' is more specific than the real message
-
-- Skill: 90, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/metabolomics/isotope-tracing) · [viewer](skills/bio-metabolomics-isotope-tracing/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 3, 5
-- Problem: The Common Errors table implies IsoCor reports a resolution-specific problem when `mz_of_resolution`/`charge` are given without `resolution`; the real raised text is a generic 'unable to select a correction strategy' ValueError that does not name resolution at all.
-- Root cause: The table paraphrases isocor's internal factory-selection failure rather than quoting the real (generic) message an agent will actually see.
-- Fix: Either quote the real isocor error text verbatim in the Common Errors table, or add a pre-check in the Skill's guidance that raises a more specific message before delegating to isocor's factory.
-
-### `bio-metabolomics-isotope-tracing` — AccuCor code pattern omits a real filesystem side effect
-
-- Skill: 90, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/metabolomics/isotope-tracing) · [viewer](skills/bio-metabolomics-isotope-tracing/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 2
-- Problem: `natural_abundance_correction(path=...)` writes an output file next to the input path by default; the SKILL.md R snippet does not mention this side effect or the `output_base` parameter that controls it.
-- Root cause: The snippet was written to show the return value, not the function's default file-write behavior.
-- Fix: Add a one-line note to the AccuCor code block: 'writes <input>_corrected.xlsx next to the input by default -- pass output_base= to redirect it', so an agent following the pattern doesn't write into an unintended directory.
 
 ### `bio-metabolomics-targeted-analysis` — No runnable code for accuracy/precision/matrix-factor/carryover validation metrics
 
@@ -2122,14 +2098,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: No references/ subfolder exists for this Skill; the fix log explicitly left this unaddressed as a P2, judging the reorg risk not worth it for a Skill 7 points from its floor at the time.
 - Fix: Now that the Skill clears the floor, revisit splitting the Statistical Models Compared / Algorithmic Taxonomy tables into references/method-catalog.md, keeping SKILL.md focused on the decision tree, reconciliation, and the newer sign/comparability guidance.
 
-### `bio-metabolomics-isotope-tracing` — No inline recovery guidance in the code snippets themselves
-
-- Skill: 90, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/metabolomics/isotope-tracing) · [viewer](skills/bio-metabolomics-isotope-tracing/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: —
-- Problem: Both the isocor and accucor code blocks in SKILL.md show only the happy path; error handling exists only as prose in a separate Common Errors table, not as a try/except pattern in the snippets.
-- Root cause: SKILL.md separates 'how to call it' from 'what can go wrong' into different sections rather than integrating them.
-- Fix: Add one line to each code snippet (e.g. '# wrap in try/except ValueError -- see Common Errors table below') so the recovery path is visible at the point of use.
-
 ### `bio-metabolomics-targeted-analysis` — No explicit final-output/report-format template
 
 - Skill: 90, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/metabolomics/targeted-analysis) · [viewer](skills/bio-metabolomics-targeted-analysis/GPTomics-bioSkills@d91ed3d/viewer.md)
@@ -2729,6 +2697,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The Skill names TRIPOD+AI as the 2024+ target and lists what it demands (data-splitting and leakage controls, calibration, fairness/subgroup performance, uncertainty) but gives no template, checklist or output structure for the report it asks the agent to produce.
 - Root cause: Reporting is treated as a citation rather than as a deliverable.
 - Fix: Add a short output skeleton -- the fields a validation report must carry (split design and unit of independence, leakage controls applied, discrimination with an interval, calibration slope and intercept, net benefit at pre-specified thresholds, subgroup performance) -- so the agent produces something checkable.
+
+### `bio-metabolomics-isotope-tracing` — Fixed plateau check gives no guidance for <4-timepoint experiments
+
+- Skill: 93, Production Ready · [mrsonord2240/bioSkills@bb99daf](https://github.com/mrsonord2240/bioSkills/tree/bb99dafd612928583fb281f70790b5c801108c47/metabolomics/isotope-tracing) · [viewer](skills/bio-metabolomics-isotope-tracing/mrsonord2240-bioSkills@bb99daf/viewer.md)
+- Observed in inputs: 7
+- Problem: len(deltas) >= 3 (i.e. at least 4 timepoints) is required before the fixed rule can ever return True; SKILL.md never states this minimum in prose, so an agent following the snippet literally reports a 2-3-timepoint series as 'not at steady state' rather than 'insufficient timepoints to assess.'
+- Root cause: The P1 fix corrected the false-positive case (last-pair-only) but did not add a caveat for the now-more-conservative rule's own minimum-data requirement.
+- Fix: Add one sentence near the fixed snippet: 'requires at least 4 timepoints (3 consecutive deltas); with fewer, report insufficient timepoints to assess steady state rather than not yet at steady state.'
 
 ### `bio-crispr-screens-screen-qc` — Documented sgRNA-identifier-column requirement is not enforced by validate_counts()
 

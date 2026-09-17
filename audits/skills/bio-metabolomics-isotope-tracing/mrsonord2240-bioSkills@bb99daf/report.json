@@ -1,0 +1,212 @@
+{
+  "meta": {
+    "skill_name": "bio-metabolomics-isotope-tracing",
+    "description": "Designs and analyzes stable-isotope-resolved metabolomics (SIRM / isotope tracing / fluxomics) experiments that measure metabolic ACTIVITY via 13C/15N/2H tracers, distinct from steady-state pool profiling. Covers tracer choice, isotopologue vs isotopomer, mass-isotopomer distributions (MID), fractional enrichment, the mandatory natural-abundance + tracer-purity correction (IsoCor, AccuCor), and the metabolic/isotopic steady-state vs non-stationary (INST-MFA) distinction.",
+    "evaluated_on": "2026-09-17",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Moderate",
+    "n_inputs": 7,
+    "source": "mrsonord2240/bioSkills@bb99daf:metabolomics/isotope-tracing",
+    "reaudit_of": "F:/OpenScience/audits/_pre-fix-20260917/bio-metabolomics-isotope-tracing (score 90, Production Ready)"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All 7 outputs use synthetic or independently-sourced real (accucor extdata) numeric inputs; no fabricated DOI/PMID, trial results, sample sizes, or p-values in any output." },
+      "practice_boundaries": { "result": "PASS", "detail": "No diagnostic/prescriptive claims in any output; bench-research metabolomics framing throughout, including Input 4's cancer-cell-line tracer question." },
+      "methodological_ground": { "result": "PASS", "detail": "The pre-fix M3-adjacent gap (steady-state check licensing flux inference on a still-decelerating series) is resolved and re-verified by direct execution (Input 3: reached_plateau now False on the same series that returned True pre-fix). Input 7 finds a smaller documentation gap (no guidance for <4-timepoint series) that does not itself cause a wrong conclusion -- filed as P2, does not meet the M3 FAIL bar." },
+      "code_usability": { "result": "PASS", "detail": "All executed code (Inputs 1, 2, 3, 5, 7) ran without syntax errors, missing dependencies, or infinite loops, using the real installed isocor 2.2.4 / accucor 0.3.1.9000 packages; Input 2's corrected output matched accucor's own shipped ground-truth reference to 2.775558e-17, and the fixed output_base pattern was confirmed to leave the package's read-only extdata/ folder byte-identical before and after (md5 unchanged, file count unchanged)." }
+    }
+  },
+  "static_score": {
+    "subtotal": 97,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 12, "max": 12, "note": "All documented use cases (isocor low-res correction, accucor high-res correction, MID/enrichment math, steady-state check, tracer decision tree) covered and run-verified; the pre-fix 1-point dock for the steady-state check's incomplete robustness is restored -- the multi-interval fix is confirmed correct on both the original failing series and two new adversarial series (Input 7)." },
+      "reliability": { "score": 12, "max": 12, "note": "Common Errors table's causes are accurate; the pre-fix 1-point dock for the half-defined-resolution error text is restored -- the table now quotes the real isocor 2.2.4 text verbatim, confirmed by exact string match against the live exception (Input 5)." },
+      "performance_context": { "score": 8, "max": 8, "note": "SKILL.md ~198 lines after the redundancy pass, usage-guide kept separate and now points to SKILL.md for install commands instead of duplicating them; correct progressive disclosure maintained." },
+      "agent_usability": { "score": 15, "max": 16, "note": "Consistent terminology and runnable code patterns throughout; docked 1 point (not the pre-fix 2) because the fixed steady-state snippet still doesn't tell the agent what to report when fewer than 4 timepoints are available (Input 7)." },
+      "human_usability": { "score": 7, "max": 8, "note": "Unchanged from pre-fix: Category-3 scene override applied to Forgiveness (strict input validation is correct design here); docked 1 point because isocor/accucor raise plain, non-Skill-specific ValueErrors rather than structured recovery codes -- not in scope of this fix round." },
+      "security": { "score": 12, "max": 12, "note": "No credentials, no destructive operations, no injection surface anywhere in SKILL.md, usage-guide, or the example script; pure numeric analysis on user-supplied arrays." },
+      "maintainability": { "score": 11, "max": 12, "note": "Clean 3-file separation maintained after the redundancy pass, which removed duplication without breaking modularity; docked 1 point because only one worked example ships and no additional test fixtures were added by the fix." },
+      "agent_specific": { "score": 20, "max": 20, "note": "Description precisely disambiguates from 4 adjacent Skills; verified idempotent/deterministic across all 7 inputs; correctly hands flux-fitting off to INCA/13CFLUX2 rather than reimplementing MFA." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 89.9,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 28, "total": 29 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "IsoCor natural-abundance correction of synthetic U-13C5-glutamine areas (regression)",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "executed: true. Re-ran unmodified against the fixed SKILL.md's MetaboliteCorrectorFactory().correct() pattern; identical result to the pre-fix audit (this code path was not touched by the fix). MID sums to 1, fractional enrichment 0.2794.",
+        "basic": 37,
+        "specialized": 53,
+        "total": 90,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Output reports corrected MID as a vector summing to 1", "result": "PASS", "note": "Script asserts abs(sum(iso_fraction)-1.0)<1e-6, prints True." },
+          { "text": "Output does not fabricate DOI/PMID or invented statistical claims", "result": "PASS", "note": "All values computed by isocor's correct(); no citations invented." },
+          { "text": "Output stays within isotope-correction analysis, does not attempt flux fitting", "result": "PASS", "note": "Script only computes MID/enrichment, matching the documented hand-off to INCA/13CFLUX2." },
+          { "text": "Output reports both the corrected MID and fractional enrichment as requested", "result": "PASS", "note": "Both printed explicitly." },
+          { "text": "No medical diagnostic/prescriptive claims made", "result": "PASS", "note": "Pure lab-analysis context throughout." }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "AccuCor correction of real accucor extdata vs shipped ground truth, with output_base isolation check (regression + strengthened)",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "executed: true. Corrected Normalized MID for glucose-6-phosphate matched accucor's own shipped C_Sample_Input_Simple_corrected.xlsx reference to 2.775558e-17. Followed the FIXED SKILL.md snippet's output_base pattern, writing only into this audit's own run/ folder; verified by md5 and file-count that the package's own extdata/ was untouched before vs after.",
+        "basic": 38,
+        "specialized": 55,
+        "total": 93,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Corrected values match AccuCor's own shipped reference output", "result": "PASS", "note": "Max abs difference 2.775558e-17 across the full Normalized table for glucose-6-phosphate." },
+          { "text": "Output presents normalized MID per isotopologue (C_Label) per sample", "result": "PASS", "note": "Full 7x11 tibble printed." },
+          { "text": "Output does not fabricate values beyond what accucor computed", "result": "PASS", "note": "All values are natural_abundance_correction()'s own return object." },
+          { "text": "Comparison against ground truth explicitly performed and reported", "result": "PASS", "note": "Max-diff check computed and printed in the script." },
+          { "text": "Using the documented output_base pattern leaves the package's own extdata/ untouched", "result": "PASS", "note": "md5 3e7a76e5e12ffbf7c2637bc9407076bb before and after; file count 25/25 before and after; output landed only in run/input2_accucor_output_corrected.xlsx." }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Steady-state boundary check (P1 regression target) + IsoCor length-mismatch error",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "executed: true. Same series as the pre-fix audit (deltas 0.10, 0.10, 0.08, 0.06, 0.01), re-run against the FIXED multi-interval rule (len(deltas)>=3 and all(deltas[-3:]<0.02)). Pre-fix this returned reached_plateau=True; post-fix it correctly returns False because 0.08 (part of the last-3 window) fails the threshold. Part B length-mismatch error text matched exactly, unchanged.",
+        "basic": 38,
+        "specialized": 54,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Steady-state call correctly applies the SKILL.md-documented multi-interval rule", "result": "PASS", "note": "reached_plateau computed exactly per the fixed snippet: False." },
+          { "text": "Output flags the documented ValueError for a length-mismatched isotopologue vector", "result": "PASS", "note": "Exact match to the real isocor 2.2.4 message." },
+          { "text": "Output does not overclaim flux-readiness from an unconverged/boundary time course", "result": "PASS", "note": "FAILED in the pre-fix audit on this exact series; now PASSES -- reached_plateau=False correctly withholds flux-readiness on the decelerating series." },
+          { "text": "Output addresses both parts of the multi-part prompt (steady-state check + error explanation)", "result": "PASS", "note": "Both Part A and Part B present and labeled." }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Tracer-selection guidance for PPP vs glycolysis (decision-tree reasoning, regression)",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "executed: false -- Mode A direct-reasoning input, no code expected. SKILL.md's Decision Tree row (positional 1,2-13C2-glucose tracer; M+1 vs M+2 split) is unchanged by the fix/refactor commits, so the pre-fix assessment stands.",
+        "basic": 37,
+        "specialized": 49,
+        "total": 86,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Recommended tracer and readout match the isotope-tracing literature (oxidative-PPP C1-decarboxylation logic)", "result": "PASS", "note": "Textbook-correct 1,2-13C2-glucose / M+1-vs-M+2 reasoning, matching SKILL.md's unchanged Decision Tree row." },
+          { "text": "Output correctly stays in tracing scope rather than redirecting to abundance profiling", "result": "PASS", "note": "Explicitly frames this as a route/activity question, not a concentration question." },
+          { "text": "Answer names both the tracer AND the specific readout (M+1 vs M+2 split)", "result": "PASS", "note": "Both present in the response." },
+          { "text": "No prescriptive/diagnostic clinical claims about the cancer cell line", "result": "PASS", "note": "Research-only framing throughout." }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "GC-MS derivative-formula correction + half-defined-resolution error text (P1 regression target, multi-part)",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "executed: true. Part A/A2 confirmed the documented derivative-formula failure mode (0.0795 max MID shift when the derivative formula is omitted). Part B: the real isocor exception text was compared by exact string equality to the SKILL.md Common Errors table entry -- exact match confirmed, resolving the pre-fix P1.",
+        "basic": 38,
+        "specialized": 55,
+        "total": 93,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Derivative-formula correction demonstrably changes the MID vs. omitting it", "result": "PASS", "note": "0.0795 max-abs difference shown between with/without derivative_formula runs." },
+          { "text": "Documented half-defined-resolution error text now matches the real isocor message verbatim", "result": "PASS", "note": "Exact string equality confirmed in-script: msg == documented text -> True." },
+          { "text": "Both parts of the multi-part prompt are addressed with labeled output", "result": "PASS", "note": "Part A and Part B both present and clearly labeled." },
+          { "text": "No fabricated claims about instrument-specific behavior beyond what the API returns", "result": "PASS", "note": "Output limited to what correct() and the factory actually returned." }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "NEW -- redundancy-pass content-loss check (pool-vs-flux + quench-speed questions)",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "executed: false -- Mode A reasoning, evaluated by direct source comparison against git show 5f30723~1:.../usage-guide.md (pre-refactor). Both prompt parts previously answerable only from usage-guide.md's now-deleted Tips section; response drafted using only the current SKILL.md, then all six moved facts traced to their real post-fix location (see run/input6_redundancy_pass_check.md).",
+        "basic": 36,
+        "specialized": 49,
+        "total": 85,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Output correctly explains pool-vs-flux divergence using SKILL.md's own language, without needing usage-guide.md", "result": "PASS", "note": "Matches 'The Single Most Important Insight' section verbatim reasoning." },
+          { "text": "Output correctly states the quench temperature range as documented", "result": "PASS", "note": "-40 to -80 C aqueous methanol/acetonitrile, matching the Quench/extraction failure-mode Fix column." },
+          { "text": "Output does not fabricate any threshold or fact not present in SKILL.md", "result": "PASS", "note": "All six checked facts traced to a real SKILL.md location before drafting." },
+          { "text": "Every fact deleted from usage-guide.md's Tips section during the redundancy pass is traceable to a specific SKILL.md location", "result": "PASS", "note": "6/6 items in the comparison table confirmed present by direct read." }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "NEW -- adversarial edge cases of the fixed plateau-check rule itself",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "executed: true. Confirms the P1 fix did not introduce a new false-negative regression (genuinely flat series still returns True) and correctly withholds plateau on a series with one still-large delta inside the 3-interval window even though the very last pair alone looks flat. Also finds the fixed rule always returns False for <4-timepoint series, with no SKILL.md guidance distinguishing that from 'not converged.'",
+        "basic": 36,
+        "specialized": 54,
+        "total": 90,
+        "assertions_passed": 2,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "A genuinely flat last-3-interval series is still correctly flagged reached_plateau=True (no new false negative introduced by the fix)", "result": "PASS", "note": "deltas [0.085, 0.010, 0.004, 0.001] -> reached_plateau=True." },
+          { "text": "A series whose last pair alone looks flat, but has a still-large delta earlier in the 3-interval window, is correctly NOT flagged as plateau", "result": "PASS", "note": "deltas [0.2, 0.095, 0.003, 0.001] -> reached_plateau=False (0.095 fails)." },
+          { "text": "SKILL.md documents what an agent should report when fewer than 4 timepoints are available for the check", "result": "FAIL", "note": "The fixed rule always returns False with <4 timepoints (len(deltas)>=3 required), but SKILL.md never states this minimum in prose, so a 2-timepoint series is indistinguishable in output from a genuinely non-plateaued one." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 38.8,
+    "dynamic_weighted": 53.9,
+    "score": 93,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "\u2b50",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "All three pre-fix P1s independently re-verified as resolved by direct re-execution (not by reading the diff): the steady-state fix, the isocor error-text fix, and the accucor output_base fix all reproduce the documented behavior exactly.",
+    "The accucor output_base fix was verified with a byte-level check (md5 + file count) that the package's read-only extdata/ folder was untouched before and after the run, directly closing the P1 that caused the pre-fix audit's first attempt to write into shared package data.",
+    "The fixed steady-state rule was adversarially tested beyond the original P1's series: it still correctly flags a genuinely flat time course as plateaued (no new false negative) and correctly withholds plateau on a series that only looks flat on the very last pair.",
+    "The redundancy pass (commit bb99daf) was verified lossless: all five usage-guide.md Tips-section facts and the install-command block were traced to specific, accurate locations in the current SKILL.md, and a fresh prompt answerable only from that deleted content was answered correctly using SKILL.md alone."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "Fixed plateau check gives no guidance for <4-timepoint experiments",
+      "observed_in": [7],
+      "problem": "len(deltas) >= 3 (i.e. at least 4 timepoints) is required before the fixed rule can ever return True; SKILL.md never states this minimum in prose, so an agent following the snippet literally reports a 2-3-timepoint series as 'not at steady state' rather than 'insufficient timepoints to assess.'",
+      "root_cause": "The P1 fix corrected the false-positive case (last-pair-only) but did not add a caveat for the now-more-conservative rule's own minimum-data requirement.",
+      "fix": "Add one sentence near the fixed snippet: 'requires at least 4 timepoints (3 consecutive deltas); with fewer, report insufficient timepoints to assess steady state rather than not yet at steady state.'"
+    }
+  ]
+}
