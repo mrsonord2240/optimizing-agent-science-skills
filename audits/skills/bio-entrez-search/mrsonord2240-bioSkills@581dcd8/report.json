@@ -1,0 +1,241 @@
+{
+  "source": "mrsonord2240/bioSkills@581dcd89a7450785c2451a0543ee822049fbf934:database-access/entrez-search",
+  "meta": {
+    "skill_name": "bio-entrez-search",
+    "description": "Search NCBI databases using Biopython Bio.Entrez (ESearch, EInfo, EGQuery, ESpell). Use when finding records by keyword, building reproducible field-qualified queries, navigating the Entrez Query Translator, exploiting the history server for large result sets, handling retmax caps, or interpreting weekly index lag. Covers PubMed, Nucleotide, Protein, Gene, SRA, GEO, Assembly, Taxonomy, ClinVar, dbSNP.",
+    "evaluated_on": "2026-09-17",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Evidence Insight",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 7
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All counts, UIDs, and translations across all 6 executed inputs came from live NCBI E-utilities calls; none were fabricated. No DOI/PMID/p-value/sample-size claims were invented." },
+      "practice_boundaries": { "result": "PASS", "detail": "Pure literature/database search tooling; no output makes diagnostic, prescriptive, or treatment claims about an individual. Not applicable to this Skill's scope." },
+      "methodological_ground": { "result": "PASS", "detail": "No correlation/causation conflation or statistical fallacy in any output; the Skill's own guidance (evidence-hierarchy-adjacent EGQuery/ESearch distinction, index-lag caveats) was applied correctly where relevant." },
+      "code_usability": { "result": "PASS", "detail": "All 6 executed scripts ultimately ran to completion with real, checked output. 2 of 6 (Inputs 2, 6) hit confirmed API-surface defects in the Skill's own documented code patterns (see recommendations), but both are one-line-fix field/attribute mismatches, not syntax errors, infinite loops, or missing dependencies -- the Skill's own 'Version Compatibility' instruction anticipates exactly this class of drift." }
+    }
+  },
+  "static_score": {
+    "subtotal": 82,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 9, "max": 12, "note": "Broad, accurate coverage of ESearch/EInfo/EGQuery/ESpell/history-server/retmax, but two of the Skill's own copy-pasteable code patterns (EGQuery call; EInfo DbInfo indexing) crash as written on the installed Biopython 1.88 -- confirmed by direct execution." },
+      "reliability": { "score": 11, "max": 12, "note": "Failure Modes and Common Errors tables are unusually thorough and every entry spot-checked (retmax cap, WebEnv expiration, rate limits) matched live behavior exactly." },
+      "performance_context": { "score": 6, "max": 8, "note": "Single flat ~300-line SKILL.md with no references/ split; examples/ exist but are never linked from SKILL.md or usage-guide.md." },
+      "agent_usability": { "score": 15, "max": 16, "note": "Decision table plus Goal/Approach/Reference code-pattern structure is clear and consistent; a couple of patterns (e.g. list_fields) omit expected sample output." },
+      "human_usability": { "score": 7, "max": 8, "note": "Natural trigger language in the description; usage-guide worked examples cover ambiguity/typos well, though one (MARCH1) has data-drifted -- see Input 4." },
+      "security": { "score": 8, "max": 12, "note": "No credential-exposure risk in practice, but Required Setup hardcodes Entrez.api_key = 'YOUR_KEY' rather than an env-var pattern, and gives no input-validation guidance for term strings." },
+      "maintainability": { "score": 9, "max": 12, "note": "Small, reusable functions per pattern, but no references/ modularity split despite non-trivial length." },
+      "agent_specific": { "score": 17, "max": 20, "note": "Precise, well-calibrated trigger description and explicit Related Skills composability; missing progressive-disclosure split (references/) is the main gap." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 82.9,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 24, "total": 27 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Reproducible PubMed TMB/NSCLC 2024 query with QueryTranslation",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. Live ESearch, real Count=65, real QueryTranslation, 20 real PMIDs, retmax-cap warning fired correctly.",
+        "basic": 38,
+        "specialized": 46,
+        "total": 84,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Output prints QueryTranslation for the constructed query", "result": "PASS", "note": "Printed verbatim." },
+          { "text": "retmax cap warning issued when Count > retmax", "result": "PASS", "note": "WARNING printed (65 > 20)." },
+          { "text": "Output does not fabricate PMIDs", "result": "PASS", "note": "20 real, live 8-digit PMIDs returned." },
+          { "text": "Output stays within ESearch's stated capability (UIDs only, not full records)", "result": "PASS", "note": "No record content claimed." }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "EInfo field discovery for ClinVar",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "executed: true. Reproduced the documented EInfo DbInfo-indexing TypeError (TOOLS.md note #2) exactly, then completed with the corrected r['DbInfo'][0] access; real field list and live LastUpdate returned.",
+        "basic": 30,
+        "specialized": 43,
+        "total": 73,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "EInfo call for clinvar returns DbName matching 'clinvar'", "result": "PASS", "note": "Matched after correcting the indexing bug." },
+          { "text": "Output does not silently swallow the DbInfo-indexing TypeError", "result": "PASS", "note": "Caught and printed explicitly, not hidden." },
+          { "text": "Field list and LastUpdate are real, non-fabricated values", "result": "PASS", "note": "Count 4,563,915; LastUpdate 2026/09/14 15:01 (live)." },
+          { "text": "Code as literally documented in SKILL.md/examples/database_info.py runs without error", "result": "FAIL", "note": "TypeError: list indices must be integers or slices, not str -- both SKILL.md's list_fields() and the shipped example index DbInfo as a dict; Biopython 1.88 returns a one-element list." }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Variant B",
+        "label": "History-server queue for human RefSeq mRNA set",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. Count 197,890 (>9,999 non-history cap), real WebEnv/QueryKey returned, matches SKILL.md pattern exactly.",
+        "basic": 39,
+        "specialized": 49,
+        "total": 88,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "Count exceeds retmax non-history cap (9,999), justifying history-server use", "result": "PASS", "note": "197,890 > 9,999." },
+          { "text": "WebEnv and QueryKey both returned and non-empty", "result": "PASS", "note": "Confirmed present." },
+          { "text": "No UIDs fetched directly (history-server path defers retrieval to EFetch)", "result": "PASS", "note": "retmax=0, no IdList requested." }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Edge",
+        "label": "MARCH1 ambiguous gene symbol diagnosis (usage-guide's own worked example)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. Ran clean end-to-end; the usage-guide's claimed 'no hits' premise does not reproduce live (Count=702, not 0), but the field-qualification technique still correctly narrows 702 -> 1.",
+        "basic": 35,
+        "specialized": 49,
+        "total": 84,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "QueryTranslation printed for the original query", "result": "PASS", "note": "Printed." },
+          { "text": "Corrected query uses a field-qualified HGNC-permanent symbol", "result": "PASS", "note": "MARCHF1[Gene Name] used." },
+          { "text": "Corrected query returns fewer, more precise hits than the original", "result": "PASS", "note": "1 vs 702." },
+          { "text": "Diagnosis matches the actual live count observed", "result": "FAIL", "note": "usage-guide.md's premise claims 'no hits'; live Count is 702, not 0 -- the script doesn't surface this mismatch to the user." }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Chained history-server intersection + unrelated spell-check in one request",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. Real counts for both legs (16,601 / 226,611), real intersection (117, sanity-checked <= both parents), real spell correction.",
+        "basic": 37,
+        "specialized": 51,
+        "total": 88,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Intersection count does not exceed either parent set", "result": "PASS", "note": "117 <= 16,601 and <= 226,611." },
+          { "text": "WebEnv reused (not re-fetched) across all three ESearch calls", "result": "PASS", "note": "Same WebEnv string passed through all three calls." },
+          { "text": "Spell-check correction resolves 'canser' to 'cancer'", "result": "PASS", "note": "Confirmed." },
+          { "text": "All three counts and the correction are real API values, not fabricated", "result": "PASS", "note": "Live NCBI call." }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "EGQuery cross-database discovery for DDX3X (usage-guide's own worked example)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. Reproduced the documented Entrez.egquery AttributeError (TOOLS.md note #1) exactly, then completed via the Skill's own documented CURATED_DBS ESearch-loop fallback plus a real gene-UID drill-down.",
+        "basic": 31,
+        "specialized": 47,
+        "total": 78,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Entrez.egquery() call is attempted as SKILL.md documents", "result": "PASS", "note": "Attempted first." },
+          { "text": "AttributeError is caught and surfaced, not silently ignored", "result": "PASS", "note": "Printed explicitly with type and message." },
+          { "text": "Fallback CURATED_DBS loop returns nonzero counts for a real gene", "result": "PASS", "note": "10/10 curated databases returned nonzero counts for DDX3X." },
+          { "text": "Gene UID resolved for DDX3X via field-qualified query", "result": "PASS", "note": "UID 1654, matches the real NCBI Gene ID for DDX3X." },
+          { "text": "SKILL.md's own decision-table entry ('Which NCBI databases mention X at all? -> EGQuery') is runnable as documented", "result": "FAIL", "note": "Confirmed broken; module 'Bio.Entrez' has no attribute 'egquery' on Biopython 1.88. Only the fallback path works." }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Out-of-scope request to fetch full-text/GenBank content through this Skill",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: false -- tests instruction-following on an out-of-scope retrieval request, not a Bio.Entrez code path; no runnable code would legitimately satisfy the request from inside this Skill's documented scope. See run/input7_adversarial_note.md.",
+        "basic": 38,
+        "specialized": 47,
+        "total": 85,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "Response does not fabricate abstract text or GenBank sequence content", "result": "PASS", "note": "No content invented; response declines and redirects." },
+          { "text": "Response identifies entrez-fetch (or an EFetch/ESummary call) as the correct next step", "result": "PASS", "note": "entrez-fetch named explicitly, per the Skill's own Related Skills section." },
+          { "text": "Response reuses the UIDs already obtained rather than re-running ESearch", "result": "PASS", "note": "Prior UIDs referenced, not re-derived." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 32.8,
+    "dynamic_weighted": 49.7,
+    "score": 83,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Failure Modes and Common Errors tables are unusually thorough; every entry spot-checked (retmax cap, WebEnv-expiration semantics, rate-limit math) matched real, live NCBI behavior exactly.",
+    "History-server chaining/intersection is documented precisely and the multi-part chained-intersection pattern ran correctly end-to-end with real, sanity-checked counts (Input 5).",
+    "Explicit Related Skills cross-references correctly kept the agent in-scope: on the one out-of-scope request tested (Input 7), the Skill's own framing ('ESearch returns UIDs, not records') led to a correct redirect to entrez-fetch instead of fabricated content.",
+    "Rate-limit guidance (0.34s/0.10s, history-server-over-parallelism) is accurate and was applied consistently across every executed script."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "EGQuery documented as a core utility but nonexistent on Biopython 1.88",
+      "observed_in": [6],
+      "problem": "SKILL.md's decision table and usage-guide.md's 'Cross-database discovery' worked example both route through Entrez.egquery(), which raises AttributeError on the installed Biopython 1.88 -- the entire EGQuery code path, including examples/global_query.py's only top-level call, is unusable as shipped.",
+      "root_cause": "SKILL.md's reference code was written/tested against a Biopython version where Bio.Entrez.egquery existed; the function's removal from the installed 1.88 public API was never re-verified against.",
+      "fix": "Promote the already-correct ESearch-loop-over-CURATED_DBS fallback (examples/global_query.py) to the primary documented path, or add a version-pinned note flagging Bio.Entrez.egquery as broken on Biopython >=1.85 with a direct pointer to the fallback."
+    },
+    {
+      "priority": "P1",
+      "title": "EInfo DbInfo indexed as a dict in SKILL.md and examples/database_info.py, but Biopython 1.88 returns a list-of-one",
+      "observed_in": [2],
+      "problem": "Both SKILL.md's list_fields() (r['DbInfo']['FieldList']) and examples/database_info.py's db_info() (info['DbName']) raise TypeError: list indices must be integers or slices, not str on the installed Biopython version -- every EInfo code pattern in the Skill fails as written.",
+      "root_cause": "Biopython 1.88 wraps DbInfo as a one-element list; the return-shape change was never re-verified against the Skill's reference code.",
+      "fix": "Change both patterns to index r['DbInfo'][0], and add a one-line comment noting the list-of-one wrapping. Confirmed working after this one-line fix in this audit's Input 2."
+    },
+    {
+      "priority": "P2",
+      "title": "No progressive disclosure despite non-trivial SKILL.md length",
+      "observed_in": [],
+      "problem": "SKILL.md is roughly 300 lines with all failure-modes, field tables, and code patterns inline; examples/ exists but is never referenced or linked from SKILL.md or usage-guide.md.",
+      "root_cause": "The Skill was authored as a single flat file without a references/ split or explicit examples/ cross-links.",
+      "fix": "Split the field-qualified-pattern tables and Failure Modes table into a references/ file, and add explicit 'See examples/basic_search.py' pointers next to the matching code patterns in SKILL.md."
+    },
+    {
+      "priority": "P2",
+      "title": "API key documented as a hardcoded placeholder, not an env-var pattern",
+      "observed_in": [],
+      "problem": "'Required Setup' shows Entrez.api_key = 'YOUR_KEY' as a literal assignment with no guidance to source it from an environment variable or secrets store.",
+      "root_cause": "The setup snippet was optimized for copy-paste clarity over credential hygiene.",
+      "fix": "Change the example to Entrez.api_key = os.environ.get('NCBI_API_KEY') and add one line warning never to commit a real key."
+    },
+    {
+      "priority": "P2",
+      "title": "MARCH1 worked example premise ('no hits') no longer reproduces against live data",
+      "observed_in": [4],
+      "problem": "usage-guide.md's 'Diagnosing a wrong count bug' prompt claims the original MARCH1 query returns zero hits; live testing today (gene db) returns 702 hits via the [All Fields] fallback, not zero -- the diagnostic technique still works but the narrative premise is stale.",
+      "root_cause": "NCBI's Entrez Query Translator / indexed content for this term has drifted since the example was authored; the example was never revisited.",
+      "fix": "Regenerate the worked example against a currently-reproducible ambiguous symbol, or soften the prompt to 'returned surprisingly broad/ambiguous hits' rather than a hard 'no hits' claim."
+    }
+  ]
+}

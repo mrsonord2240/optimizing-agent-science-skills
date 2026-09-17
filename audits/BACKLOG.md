@@ -30,7 +30,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: Both files build a toy exponential-decay LD matrix independently of the simulated per-SNP betas/SEs, so the LD is not internally consistent with any genotype process that could have produced those z-scores; estimate_s_rss correctly detects this (lambda 0.21-0.39, far above the Skill's own 0.05 threshold).
 - Fix: Regenerate both example datasets from a single simulated genotype matrix, deriving both the GWAS/eQTL summary statistics AND the LD matrix from that same genotype matrix (verified working in this audit's run/input2b_susie_selfconsistent.R, which recovers the planted 2-credible-set truth exactly with lambda=0).
 
-## P1 (77)
+## P1 (79)
 
 ### `bio-experimental-design-sample-size` — PROPER and powsimR routes ship with no executable pattern
 
@@ -103,6 +103,22 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The decision tree, the Per-Method Failure Modes block and the Common Errors table all end at 'FCR-adjusted intervals for the selected set', but no formula, package or worked example exists anywhere in the skill, so a routine request for confidence intervals on the reported hits cannot be completed from it. The gap is not cosmetic: naive 95% intervals on the BH-0.05 selected set covered the true effect only 82.4% of the time, and the Benjamini-Yekutieli 2005 construction restored 97.6%, but had to be written from the primary literature.
 - Root cause: FCR is treated as a caution to be raised rather than a procedure to be executed, unlike BH, BY, q-value and IHW which all get code.
 - Fix: Add a short code block computing the FCR-adjusted level as 1 - alpha*R/m and applying it to the selected set, alongside the Benjamini & Yekutieli 2005 citation, so the warning ends in an action the way the other failure modes do.
+
+### `bio-entrez-search` — EGQuery documented as a core utility but nonexistent on Biopython 1.88
+
+- Skill: 83, Limited Release · [mrsonord2240/bioSkills@581dcd8](https://github.com/mrsonord2240/bioSkills/tree/581dcd89a7450785c2451a0543ee822049fbf934/database-access/entrez-search) · [viewer](skills/bio-entrez-search/mrsonord2240-bioSkills@581dcd8/viewer.md)
+- Observed in inputs: 6
+- Problem: SKILL.md's decision table and usage-guide.md's 'Cross-database discovery' worked example both route through Entrez.egquery(), which raises AttributeError on the installed Biopython 1.88 -- the entire EGQuery code path, including examples/global_query.py's only top-level call, is unusable as shipped.
+- Root cause: SKILL.md's reference code was written/tested against a Biopython version where Bio.Entrez.egquery existed; the function's removal from the installed 1.88 public API was never re-verified against.
+- Fix: Promote the already-correct ESearch-loop-over-CURATED_DBS fallback (examples/global_query.py) to the primary documented path, or add a version-pinned note flagging Bio.Entrez.egquery as broken on Biopython >=1.85 with a direct pointer to the fallback.
+
+### `bio-entrez-search` — EInfo DbInfo indexed as a dict in SKILL.md and examples/database_info.py, but Biopython 1.88 returns a list-of-one
+
+- Skill: 83, Limited Release · [mrsonord2240/bioSkills@581dcd8](https://github.com/mrsonord2240/bioSkills/tree/581dcd89a7450785c2451a0543ee822049fbf934/database-access/entrez-search) · [viewer](skills/bio-entrez-search/mrsonord2240-bioSkills@581dcd8/viewer.md)
+- Observed in inputs: 2
+- Problem: Both SKILL.md's list_fields() (r['DbInfo']['FieldList']) and examples/database_info.py's db_info() (info['DbName']) raise TypeError: list indices must be integers or slices, not str on the installed Biopython version -- every EInfo code pattern in the Skill fails as written.
+- Root cause: Biopython 1.88 wraps DbInfo as a one-element list; the return-shape change was never re-verified against the Skill's reference code.
+- Fix: Change both patterns to index r['DbInfo'][0], and add a one-line comment noting the list-of-one wrapping. Confirmed working after this one-line fix in this audit's Input 2.
 
 ### `bio-causal-genomics-effector-gene-prioritization` — No explicit research-only / clinical-boundary language anywhere in the Skill
 
@@ -648,7 +664,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: This divergence was undiscoverable before this fix round because the graphite route never completed a single successful run pre-fix (Research Veto M4 FAIL); the fixer's own verification (fixes/bio-pathway-kegg-pathways.md) checked that runSPIA returned real rows but did not cross-check its direction calls against the direct spia() route.
 - Fix: Add a caveat to the SPIA section (and the Common Errors / Per-Method Failure Modes tables) stating that graphite's harmonized topology can disagree with SPIA's native KEGG-bundled topology on perturbation direction for a meaningful fraction of pathways, and recommend treating the two routes as complementary evidence rather than interchangeable, or explicitly stating which one to prefer as the default and why.
 
-## P2 (249)
+## P2 (252)
 
 ### `bio-experimental-design-sample-size` — SKILL.md code blocks omit set.seed
 
@@ -761,6 +777,30 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: 330-line SKILL.md loads TCS, MACSE, PhyIN, Gblocks and HMMcleaner detail for every trimming request.
 - Root cause: Monolithic layout.
 - Fix: Keep the decision rules in SKILL.md and move per-tool command blocks to references/.
+
+### `bio-entrez-search` — No progressive disclosure despite non-trivial SKILL.md length
+
+- Skill: 83, Limited Release · [mrsonord2240/bioSkills@581dcd8](https://github.com/mrsonord2240/bioSkills/tree/581dcd89a7450785c2451a0543ee822049fbf934/database-access/entrez-search) · [viewer](skills/bio-entrez-search/mrsonord2240-bioSkills@581dcd8/viewer.md)
+- Observed in inputs: —
+- Problem: SKILL.md is roughly 300 lines with all failure-modes, field tables, and code patterns inline; examples/ exists but is never referenced or linked from SKILL.md or usage-guide.md.
+- Root cause: The Skill was authored as a single flat file without a references/ split or explicit examples/ cross-links.
+- Fix: Split the field-qualified-pattern tables and Failure Modes table into a references/ file, and add explicit 'See examples/basic_search.py' pointers next to the matching code patterns in SKILL.md.
+
+### `bio-entrez-search` — API key documented as a hardcoded placeholder, not an env-var pattern
+
+- Skill: 83, Limited Release · [mrsonord2240/bioSkills@581dcd8](https://github.com/mrsonord2240/bioSkills/tree/581dcd89a7450785c2451a0543ee822049fbf934/database-access/entrez-search) · [viewer](skills/bio-entrez-search/mrsonord2240-bioSkills@581dcd8/viewer.md)
+- Observed in inputs: —
+- Problem: 'Required Setup' shows Entrez.api_key = 'YOUR_KEY' as a literal assignment with no guidance to source it from an environment variable or secrets store.
+- Root cause: The setup snippet was optimized for copy-paste clarity over credential hygiene.
+- Fix: Change the example to Entrez.api_key = os.environ.get('NCBI_API_KEY') and add one line warning never to commit a real key.
+
+### `bio-entrez-search` — MARCH1 worked example premise ('no hits') no longer reproduces against live data
+
+- Skill: 83, Limited Release · [mrsonord2240/bioSkills@581dcd8](https://github.com/mrsonord2240/bioSkills/tree/581dcd89a7450785c2451a0543ee822049fbf934/database-access/entrez-search) · [viewer](skills/bio-entrez-search/mrsonord2240-bioSkills@581dcd8/viewer.md)
+- Observed in inputs: 4
+- Problem: usage-guide.md's 'Diagnosing a wrong count bug' prompt claims the original MARCH1 query returns zero hits; live testing today (gene db) returns 702 hits via the [All Fields] fallback, not zero -- the diagnostic technique still works but the narrative premise is stale.
+- Root cause: NCBI's Entrez Query Translator / indexed content for this term has drifted since the example was authored; the example was never revisited.
+- Fix: Regenerate the worked example against a currently-reproducible ambiguous symbol, or soften the prompt to 'returned surprisingly broad/ambiguous hits' rather than a hard 'no hits' claim.
 
 ### `bio-causal-genomics-effector-gene-prioritization` — SKILL.md is dense and un-layered relative to its size
 
