@@ -28,7 +28,8 @@ import subprocess
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 AUDITS = os.environ.get("OASS_AUDITS", "F:/OpenScience/audits")
-PRE_FIX_RE = re.compile(r"^_pre-fix-20\d\d-?\d\d-?\d\d$")
+# A second fix round on the same day archives under a letter suffix: _pre-fix-20260917b.
+PRE_FIX_RE = re.compile(r"^_pre-fix-(20\d\d)-?(\d\d)-?(\d\d)([a-z]?)$")
 FIXES = os.path.join(REPO_ROOT, "fixes")
 SPECIALIST_SRC = os.environ.get("OASS_SPECIALIST_SRC", "F:/OpenScience/specialist-src")
 
@@ -289,55 +290,68 @@ def publish_version(repo, skill_id, folder, report_name, script_dirs, supersedes
     return name, len(scripts) + carried
 
 
-def find_archive(skill_id, report_name, current):
-    """The pre-fix report this audit supersedes, or None if this is the Skill's first audit.
+def archive_order(name):
+    year, month, day, suffix = PRE_FIX_RE.match(name).groups()
+    return year + month + day, suffix
 
-    Each fix round archives the reports it is about to replace under its own `_pre-fix-<date>/`, so
-    the folder to read is the newest one holding a report for this Skill that audits a different
-    commit from the current one. Pinning a single date here meant a later round published its
-    re-audits as first audits, with no `supersedes` link and no pre-fix record.
+
+def find_archives(skill_id, report_name, current):
+    """The pre-fix audits the current one supersedes, oldest first; empty for a Skill's first audit.
+
+    Each fix round archives the audit it is about to replace under its own `_pre-fix-<date>/`, and a
+    Skill can go through several rounds, so every archive holding a report for it is a link in one
+    chain. Taking only the newest archive published a three-audit chain as two and silently dropped
+    the middle record.
     """
-    current_commit = parse_source(read_json(os.path.join(current, report_name)), current)["commit"]
-    for archive in sorted((d for d in os.listdir(AUDITS) if PRE_FIX_RE.match(d)), reverse=True):
-        archived = os.path.join(AUDITS, archive, skill_id)
-        path = os.path.join(archived, report_name)
-        if not os.path.isfile(path):
-            continue
-        if parse_source(read_json(path), archived)["commit"] != current_commit:
-            return archived
-        raise SystemExit(f"{skill_id}: {archive} and the current report audit the same commit")
-    return None
+    chain = [os.path.join(AUDITS, archive, skill_id)
+             for archive in sorted((d for d in os.listdir(AUDITS) if PRE_FIX_RE.match(d)), key=archive_order)
+             if os.path.isfile(os.path.join(AUDITS, archive, skill_id, report_name))]
+    folders = chain + [current]
+    commits = [parse_source(read_json(os.path.join(f, report_name)), f)["commit"] for f in folders]
+    for earlier, later, folder in zip(commits, commits[1:], folders[1:]):
+        if earlier == later:
+            raise SystemExit(f"{skill_id}: {folder} audits the same commit as the audit it supersedes")
+    return chain
+
+
+def script_dirs(folder):
+    dirs = sorted(d for d in os.listdir(folder) if RUN_DIR_RE.match(d) and os.path.isdir(os.path.join(folder, d)))
+    return dirs + (["data"] if os.path.isdir(os.path.join(folder, "data")) else [])
 
 
 def publish_skill(repo, skill_id):
     current = os.path.join(AUDITS, skill_id)
     report_name = f"eval_report_{skill_id}_result.json"
-    archived = find_archive(skill_id, report_name, current)
-    work_dirs = sorted(d for d in os.listdir(current)
-                       if RUN_DIR_RE.match(d) and os.path.isdir(os.path.join(current, d)))
-    data = ["data"] if os.path.isdir(os.path.join(current, "data")) else []
+    chain = find_archives(skill_id, report_name, current)
     fix_log = os.path.join(FIXES, f"{skill_id}.md")
+    live_dirs = script_dirs(current)
 
     supersedes = None
-    if archived:
-        # The archive holds only the reports; both audits' run scripts are still in the live folder,
-        # sometimes in one shared folder and sometimes in two. Split by modification time against the
-        # archived report, which was copied after the first audit finished and before the re-audit
-        # began — never by folder name. Auditors have used runs/ and run/ in different rounds, and a
-        # name-based rule silently gave the superseded record no scripts at all.
-        cutoff = os.path.getmtime(os.path.join(archived, report_name))
-        pre_dirs = post_dirs = work_dirs + data
-        pre_window, post_window = (cutoff, None), (None, cutoff)
-        supersedes, _ = publish_version(repo, skill_id, archived, report_name, pre_dirs, None, None,
-                                        scripts_folder=current, script_window=pre_window)
-    else:
-        # Nothing superseded, so this record is the only one: it carries every run folder.
-        post_dirs = work_dirs + data
-        post_window = (None, None)
-    source = parse_source(read_json(os.path.join(current, report_name)), current)
-    name, count = publish_version(repo, skill_id, current, report_name, post_dirs, supersedes,
-                                  fix_log if source.get("fork_of") else None, script_window=post_window)
-    return supersedes, name, count
+    after = None
+    for folder in chain + [current]:
+        if folder == current:
+            # The live folder: split by time only if the audit before it left its scripts here.
+            dirs, scripts_folder, window = live_dirs, current, (None, after)
+        elif script_dirs(folder):
+            # A whole-folder snapshot: that audit's scripts are exactly the ones archived with it. The
+            # re-audit rewrites the live copies, so their times say nothing about the earlier audit.
+            dirs, scripts_folder, window = script_dirs(folder), folder, (None, None)
+            after = None
+        else:
+            # A reports-only archive: its scripts are still in the live folder, sometimes in one shared
+            # folder and sometimes in two. Split by modification time against the archived report,
+            # which was copied after that audit finished and before the next began — never by folder
+            # name. Auditors have used runs/ and run/ in different rounds, and a name-based rule
+            # silently gave the superseded record no scripts at all.
+            cutoff = os.path.getmtime(os.path.join(folder, report_name))
+            dirs, scripts_folder, window = live_dirs, current, (cutoff, after)
+            after = cutoff
+        source = parse_source(read_json(os.path.join(folder, report_name)), folder)
+        name, count = publish_version(repo, skill_id, folder, report_name, dirs, supersedes,
+                                      fix_log if source.get("fork_of") else None,
+                                      scripts_folder=scripts_folder, script_window=window)
+        previous, supersedes = supersedes, name
+    return previous, name, count
 
 
 def publish_specialist(repo, spec):
