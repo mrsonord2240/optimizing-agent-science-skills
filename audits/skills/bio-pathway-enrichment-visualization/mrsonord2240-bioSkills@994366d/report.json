@@ -1,0 +1,211 @@
+{
+  "meta": {
+    "skill_name": "bio-pathway-enrichment-visualization",
+    "description": "Turns an enrichResult or gseaResult from clusterProfiler/enrichplot into a figure that collapses or shows gene-set redundancy, using dotplot, barplot, cnetplot, emapplot, treeplot, ridgeplot, gseaplot2, and upsetplot. Covers why cnetplot/emapplot/treeplot need pairwise_termsim first, why enrichplot ships no barplot for gseaResult, why GeneRatio is not fold enrichment, and why showCategory silently truncates.",
+    "evaluated_on": "2026-09-17",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Moderate",
+    "n_inputs": 7,
+    "source": "mrsonord2240/bioSkills@994366d:pathway-analysis/enrichment-visualization"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity":  { "result": "PASS", "detail": "All 6 citations unchanged and still correctly attributed; no fabricated statistics in any of the 7 re-executed/new inputs -- all numbers (203/77 term counts, NES range, Spearman rho -0.113, S4 dispatch errors) are real computed values from live clusterProfiler/enrichplot/base-R execution." },
+      "practice_boundaries":   { "result": "PASS", "detail": "Still pure bioinformatics visualization of researcher-supplied gene-set objects; no patient data, no diagnostic/prescriptive content." },
+      "methodological_ground": { "result": "PASS", "detail": "GeneRatio!=FoldEnrichment, signed-NES, and DAG-redundancy claims all re-verified against real output identical to the pre-fix run. The new zero-terms guidance and the scope-boundary redirect to REVIGO for non-clusterProfiler flat lists (independently confirmed: pairwise_termsim/emapplot genuinely cannot dispatch on a bare data.frame) are both methodologically sound." },
+      "code_usability":        { "result": "PASS", "detail": "Both shipped examples still run end-to-end (visualization_ora.R re-run independently: exit 0, 4-page PDF, 26,699 bytes, matching the fixer's own 26,694-byte verification within PDF-metadata noise). All 7 constructed inputs executed real R code with no syntax errors; the two known non-crashing failures (treeplot on compareClusterResult, upsetplot without ggupset) are genuine documented package-level limits, not unrunnable code, consistent with the Category 3 Scene Override." }
+    }
+  },
+  "static_score": {
+    "subtotal": 98,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 12, "max": 12, "note": "Both pre-fix imprecisions resolved: Tool Taxonomy now states 'ORA + GSEA, NOT compareClusterResult (crashes - see Version Compatibility)' for treeplot, and the Skill's own worked treeplot example uses cluster.params=list(n=5) instead of the deprecated nCluster=. No remaining correctness gaps found in this re-audit's 7 inputs." },
+      "reliability":            { "score": 12, "max": 12, "note": "Both pre-fix gaps closed: ggupset is now listed in Prerequisites, the Specialized Views code comment, and a new Common Errors row (matching the existing ggridges/ggarchery pattern exactly); the treeplot-on-compareClusterResult crash is now covered in Version Compatibility, Tool Taxonomy, the Decision Tree, and Common Errors, with emapplot named and verified as the working alternative." },
+      "performance_context":    { "score": 7,  "max": 8,  "note": "SKILL.md grew 221->255 lines absorbing real new content (Prerequisites, the four fixes) while usage-guide.md shrank 95->47 lines by removing content that duplicated SKILL.md -- a genuine token-cost improvement, independently confirmed lossless (see dynamic_score input 7). Still one step short of maximal disclosure discipline; not re-scored higher without a more structural change." },
+      "agent_usability":        { "score": 16, "max": 16, "note": "Unchanged from pre-fix: strong cold-start clarity, consistent terminology, explicit output expectations, and proactive failure-mode warnings -- now including the two newly-documented failure classes this re-audit re-verified." },
+      "human_usability":        { "score": 7,  "max": 8,  "note": "Unchanged: frontmatter description still leads with enrichResult/gseaResult/S4-class terminology; usage-guide.md's natural-language Quick Start still compensates. Category-3 Scene Override still credited for the deliberately forgiving 'introspect and adapt' API-churn guidance." },
+      "security":               { "score": 12, "max": 12, "note": "Unchanged: no credentials, no raw-string execution, no sensitive-data handling." },
+      "maintainability":        { "score": 12, "max": 12, "note": "Unchanged and re-confirmed: clean 3-way separation, both shipped example scripts independently re-run end-to-end without modification (visualization_ora.R: exit 0, valid 4-page PDF)." },
+      "agent_specific":         { "score": 20, "max": 20, "note": "The one pre-fix deduction (no Escape Hatch guidance for zero surviving terms/sets) is resolved: a new 'Zero surviving terms or sets' failure mode and Common Errors row now instruct the agent to check nrow()>0 and stop, mirroring the shipped GSEA example's own pre-existing defensive pattern." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 88.9,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 27, "total": 29 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "REGRESSION: Collapse GO-DAG redundancy with simplify() before dotplot, report term counts",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Re-ran the pre-fix audit's exact input/data unchanged. Identical result: 203 raw significant BP terms -> simplify(cutoff=0.7) -> 77 survive; 2-page PDF (12,243 bytes, byte-identical to the pre-fix run), /Count 2 verified. Not touched by the fix or redundancy pass; included as a regression baseline.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Output computes and reports both the raw and simplified GO term counts", "result": "PASS", "note": "203 -> 77, identical to pre-fix run" },
+          { "text": "Output produces a valid, non-empty, multi-page PDF figure", "result": "PASS", "note": "input1_output.pdf, 12,243 bytes, /Count 2 confirmed via direct PDF object inspection" },
+          { "text": "Output does not fabricate p-values or enrichment statistics", "result": "PASS", "note": "Real clusterProfiler output throughout" },
+          { "text": "Output follows the Skill's prescribed collapse-then-dotplot workflow", "result": "PASS", "note": "simplify() called before the second dotplot" }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "REGRESSION: GSEA plots preserving direction (NES dotplot, ridgeplot, gseaplot2)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Re-ran unchanged: 347 significant sets, all positive NES, identical to pre-fix. ridgeplot still fails on the deliberately-not-installed ggridges (Suggests-only, install-nothing rule) -- this dependency was already documented before the fix and is unaffected by it. 2-page PDF (66,003 bytes, byte-identical), /Count 2 verified.",
+        "basic": 35,
+        "specialized": 52,
+        "total": 87,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Output preserves GSEA direction (signed NES) rather than collapsing to unsigned magnitude", "result": "PASS", "note": "347/347 sets shown with sign intact" },
+          { "text": "Output does not force a barplot onto the gseaResult", "result": "PASS", "note": "existsMethod('barplot','gseaResult') confirmed FALSE" },
+          { "text": "A missing optional dependency fails with the message the Skill's own documentation anticipates", "result": "PASS", "note": "ridgeplot error text matches Prerequisites' documented Suggests-only warning" },
+          { "text": "Output produces a valid non-empty PDF with the plots that did succeed", "result": "PASS", "note": "input2_output.pdf, 66,003 bytes, /Count 2" }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "REGRESSION: Small significant-term-count gene-concept network and similarity-map judgment call",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Re-ran unchanged: 28 significant terms (same non-empty edge case as pre-fix), cnetplot and emapplot both rendered. 2-page PDF (17,599 bytes vs pre-fix 17,582 -- the ~17-byte difference is PDF-internal timestamp metadata, not a content change), /Count 2 verified.",
+        "basic": 34,
+        "specialized": 54,
+        "total": 88,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Output attempts the requested cnetplot colored by fold change", "result": "PASS", "note": "cnetplot(ego_small, foldChange=fc_sub) rendered" },
+          { "text": "Output reasons about whether a similarity map is informative at the observed term count", "result": "PASS", "note": "explicit judgment printed" },
+          { "text": "pairwise_termsim/emapplot does not hard-crash at very low term counts", "result": "PASS", "note": "unaffected by the fix; unchanged from pre-fix" },
+          { "text": "Output produces a valid non-empty PDF", "result": "PASS", "note": "input3_output.pdf, 17,599 bytes, /Count 2" }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "REGRESSION: compareCluster faceted dotplot plus enrichment map and treeplot -- the P1 treeplot crash",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "Re-ran unchanged input: dotplot(ck) and emapplot(pairwise_termsim(ck)) both still render correctly (page 1-2 of a 2-page, 85,677-byte PDF, /Count 2). treeplot(ck_ts, nCluster=5) still crashes with the identical ggplot2 check_aesthetics() error. Separately re-confirmed with cluster.params=list(n=5) (the fix's suggested replacement) via check_treeplot_ck.R: SAME crash -- this is a genuine enrichplot/ggtree/ggplot2-4.0 incompatibility, not fixable from SKILL.md, and the fixer's treatment (document as a verified version incompatibility, name emapplot as the confirmed-working alternative, add 'do not retry more argument combinations') is the adequate response for a documentation-only fix. Scored above pre-fix (76->81) because an agent following the fixed Skill now anticipates this failure from the Decision Tree/Tool Taxonomy before attempting it and is told not to waste turns retrying arguments -- a real reliability/efficiency improvement -- even though the literal treeplot deliverable for this class remains impossible under the installed package versions.",
+        "basic": 31,
+        "specialized": 50,
+        "total": 81,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Output produces the requested faceted dotplot comparing Up/Down clusters", "result": "PASS", "note": "dotplot(ck) rendered as page 1" },
+          { "text": "Output produces the requested enrichment map on the compareCluster result", "result": "PASS", "note": "emapplot(pairwise_termsim(ck)) rendered as page 2" },
+          { "text": "Output produces the requested treeplot with 5 named clusters", "result": "FAIL", "note": "Still crashes with both nCluster= and cluster.params= -- confirmed genuine upstream incompatibility, not a Skill defect; correctly anticipated and documented, but the literal deliverable is still not produced" },
+          { "text": "Output surfaces a clear, legible error rather than failing silently, and is now anticipated in advance by the Skill's own guidance", "result": "PASS", "note": "ggplot2's check_aesthetics() error is specific; SKILL.md's Decision Tree/Version Compatibility now warn about this exact case before the agent attempts it" }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "REGRESSION: Full modeling-choice figure set -- the P1 undocumented ggupset dependency",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Re-ran unchanged input: identical 203 raw terms, Spearman rho -0.113 (GeneRatio vs FoldEnrichment), 7 of 8 plots rendered (7-page PDF, 42,820 bytes, /Count 7 verified -- matches the 7 plots printed to stdout). upsetplot() still fails (ggupset deliberately not installed per the install-nothing rule) but the error text now matches SKILL.md's own Prerequisites/Common Errors documentation verbatim, unlike pre-fix where this dependency was undocumented anywhere. Scored above pre-fix (84->88) for the same anticipated-vs-undocumented-failure reasoning as input 4.",
+        "basic": 35,
+        "specialized": 53,
+        "total": 88,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Output reports both raw and simplified term counts / redundancy comparison", "result": "PASS", "note": "203 raw terms printed" },
+          { "text": "Output produces the FoldEnrichment-ordered dotplot and quantifies the difference from GeneRatio ordering", "result": "PASS", "note": "Spearman rho -0.113 computed" },
+          { "text": "Output produces the requested emapplot, treeplot, cnetplot, and heatplot", "result": "PASS", "note": "All 4 rendered on the plain enrichResult (treeplot succeeds here, unlike input 4's compareClusterResult)" },
+          { "text": "Output produces the requested upsetplot", "result": "FAIL", "note": "ggupset still not installed per audit's install-nothing rule, but the failure now exactly matches the Skill's own documented Suggests-only pattern (Prerequisites + Common Errors), not an undocumented gap" },
+          { "text": "Output produces a valid non-empty PDF with the successful plots", "result": "PASS", "note": "input5_output.pdf, 42,820 bytes, /Count 7" }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "NEW: Flat GO-ID + p-value list from a non-clusterProfiler tool -- forcing pairwise_termsim/emapplot vs. the documented REVIGO redirect",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Tests SKILL.md's Decision Tree row for a flat GO-ID+p-value list from a non-clusterProfiler tool (redirect to REVIGO). Verified this is not a stylistic preference but a hard technical requirement: pairwise_termsim(flat_data.frame) and emapplot(flat_data.frame) both throw 'unable to find an inherited method for signature x=\"data.frame\"' -- these S4 generics genuinely cannot dispatch on a bare data.frame, and enrichResult's required slots (result, pvalueCutoff, gene, universe, geneSets, termsim, ...) cannot be reconstructed from a 3-column ID/Description/pvalue table without inventing data the prompt never supplies. The Skill's redirect is the only viable path, not an arbitrary scope restriction.",
+        "basic": 38,
+        "specialized": 55,
+        "total": 93,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "SKILL.md's Decision Tree explicitly covers a flat GO-ID+p-value list from a non-clusterProfiler tool", "result": "PASS", "note": "Row present: 'Flat GO-ID + p-value list from a non-clusterProfiler tool | REVIGO (treemap/MDS) | external semantic collapse'" },
+          { "text": "pairwise_termsim()/emapplot() cannot be forced onto a bare data.frame without fabricating required S4 slots", "result": "PASS", "note": "Both throw 'unable to find an inherited method' on a data.frame; enrichResult needs GeneRatio/BgRatio/geneID/Count/universe the flat list lacks" },
+          { "text": "Skill does not instruct or imply an agent should silently fabricate a fake enrichResult to force the plot through", "result": "PASS", "note": "No such guidance anywhere in SKILL.md or usage-guide.md" },
+          { "text": "Recommended redirect (REVIGO) is correctly scoped as an external tool, not claimed as something this Skill runs inline", "result": "PASS", "note": "REVIGO listed alongside EnrichmentMap as an external route in the Decision Tree and Tool Taxonomy" }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "NEW: Redundancy-pass regression -- Entrez-ID-vs-symbol cnetplot labels, a fact deleted from usage-guide.md's Tips and claimed preserved in SKILL.md's Common Errors",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Directly tests whether the redundancy pass's deletion of usage-guide.md's Tips bullet 9 ('Make the object readable (setReadable) before plotting so gene labels are symbols, not Entrez IDs') actually survives, and whether the claimed destination (SKILL.md's Common Errors row) is not just textually present but functionally correct. Confirmed: an enrichResult built with readable=FALSE stores raw Entrez IDs ('1029','1019','1021'); applying the documented fix setReadable(x, OrgDb, 'ENTREZID') converts them to real gene symbols ('CDKN2A','CDK4','CDK6'); both states rendered to a 2-page PDF (16,284 bytes, /Count 2) showing the visible before/after difference in cnetplot's node labels. Independently cross-checked against the pre-redundancy-pass usage-guide.md (retrieved via git show 10ac5b0) for all 5 deleted sections (Prerequisites bullets, 'What the Agent Will Do', 'Plot-by-Class Quick Reference' table, and all 9 Tips bullets): every fact is present, and in most cases stated with more precision, in the current SKILL.md. No content loss found.",
+        "basic": 37,
+        "specialized": 54,
+        "total": 91,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "SKILL.md documents the setReadable fix for Entrez-ID-labeled output (content that pre-redundancy-pass lived only in usage-guide.md's Tips)", "result": "PASS", "note": "Common Errors row: 'gene labels are Entrez IDs not symbols | object not made readable | setReadable(x, OrgDb, ENTREZID) before plotting' -- confirmed by git-history diff against the pre-pass usage-guide.md" },
+          { "text": "Output before the fix shows raw Entrez IDs", "result": "PASS", "note": "geneID field: '1029, 1019, 1021' -- confirmed all-numeric" },
+          { "text": "Applying the documented fix produces gene symbols, not IDs", "result": "PASS", "note": "geneID field after setReadable: 'CDKN2A, CDK4, CDK6'" },
+          { "text": "Output produces a valid non-empty PDF showing both before/after states", "result": "PASS", "note": "input7_output.pdf, 16,284 bytes, /Count 2" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 39.2,
+    "dynamic_weighted": 53.3,
+    "score": 93,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Both dispatched P1 findings (undocumented ggupset dependency; treeplot-on-compareClusterResult crash) are fixed and independently re-verified in this re-audit: the ggupset error text now matches the Skill's own Prerequisites/Common Errors documentation verbatim, and the treeplot crash was re-reproduced identically with both the old (nCluster=) and new (cluster.params=) arguments, confirming the fixer's 'genuine version incompatibility, use emapplot instead' response is adequate -- this is a documentation-only fix and there is no SKILL.md-level way to patch a compiled-package bug.",
+    "Both P2s (zero-terms guidance; deprecated nCluster in the Skill's own examples) plus a bonus defect the fixer found unprompted (bogus cluster_method= argument, confirmed silently swallowed by R's ... before the fix) are all fixed and verified by execution, including an independent re-run of the shipped visualization_ora.R example (exit 0, 4-page PDF).",
+    "The redundancy pass that moved content from usage-guide.md into SKILL.md was independently verified lossless, not merely trusted from the fix log: every one of the 5 deleted usage-guide.md sections was diffed (via git history) against the current SKILL.md, and one specific relocated fact (the setReadable Entrez-ID-vs-symbol fix) was proven not just textually present but functionally correct via live execution (input 7).",
+    "Two new inputs beyond the regression set both passed cleanly and probe real gaps the pre-fix audit did not: a scope-boundary case confirming the Skill's REVIGO redirect for non-clusterProfiler flat lists is a technical necessity (pairwise_termsim/emapplot genuinely cannot dispatch on a bare data.frame), not an arbitrary restriction."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "treeplot-on-compareClusterResult crash is a live upstream bug worth periodic re-checking",
+      "observed_in": [4],
+      "problem": "The documented incompatibility (enrichplot 1.26.6/ggtree/ggplot2 4.0.3) may be fixed in a future enrichplot or ggtree release, at which point the Skill's 'do not retry' guidance and emapplot-only recommendation for compareClusterResult would become stale.",
+      "root_cause": "The fix correctly documents a point-in-time incompatibility but has no built-in trigger to revisit it as dependency versions move forward.",
+      "fix": "Add a one-line note to Version Compatibility: 're-test treeplot on a compareClusterResult after any enrichplot/ggtree upgrade; this may be fixed upstream'."
+    }
+  ]
+}

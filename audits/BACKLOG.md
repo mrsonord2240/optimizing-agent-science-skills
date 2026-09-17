@@ -70,7 +70,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: Both files build a toy exponential-decay LD matrix independently of the simulated per-SNP betas/SEs, so the LD is not internally consistent with any genotype process that could have produced those z-scores; estimate_s_rss correctly detects this (lambda 0.21-0.39, far above the Skill's own 0.05 threshold).
 - Fix: Regenerate both example datasets from a single simulated genotype matrix, deriving both the GWAS/eQTL summary statistics AND the LD matrix from that same genotype matrix (verified working in this audit's run/input2b_susie_selfconsistent.R, which recovers the planted 2-credible-set truth exactly with lambda=0).
 
-## P1 (85)
+## P1 (83)
 
 ### `bio-experimental-design-sample-size` — PROPER and powsimR routes ship with no executable pattern
 
@@ -664,22 +664,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The reporting contract lives only in the usage guide; the reference implementation was written as a filter rather than as an audited transform.
 - Fix: Give prepare_qsar_data a status tally (parse_failure / excluded_by_chembl / standardize_error / inorganic / ok), return it alongside the DataFrame, and print it in the __main__ demo so the documented report is what the code actually produces.
 
-### `bio-pathway-enrichment-visualization` — upsetplot()'s ggupset dependency is undocumented
-
-- Skill: 90, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/pathway-analysis/enrichment-visualization) · [viewer](skills/bio-pathway-enrichment-visualization/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 5
-- Problem: upsetplot() fails with 'The package "ggupset" is required' on a stock install, but unlike ridgeplot/goplot (whose ggridges/ggarchery Suggests-only dependencies ARE listed), ggupset is never mentioned in SKILL.md or usage-guide.md.
-- Root cause: The Prerequisites section in usage-guide.md was written before or without checking upsetplot()'s own Suggests requirement.
-- Fix: Add ggupset to usage-guide.md's Prerequisites install line and to SKILL.md's Common Errors table, matching the existing ggridges/ggarchery pattern exactly.
-
-### `bio-pathway-enrichment-visualization` — treeplot() on a compareClusterResult crashes under the current enrichplot/ggplot2 combination
-
-- Skill: 90, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/pathway-analysis/enrichment-visualization) · [viewer](skills/bio-pathway-enrichment-visualization/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 4
-- Problem: treeplot(pairwise_termsim(compareClusterResult), nCluster=5) throws a ggplot2 aesthetics-length error, reproducible with both the documented 'nCluster' argument and its suggested replacement 'cluster.params=list(n=5)'. SKILL.md's Version Compatibility note calls out cnetplot/emapplot/goplot argument churn but not this crash.
-- Root cause: The Skill's Tool Taxonomy table lists treeplot as supporting 'ORA + GSEA' without a per-class caveat, and its own worked treeplot example only exercises a plain enrichResult, so the compareClusterResult path was never verified against the installed package combination.
-- Fix: Either verify and fix the compareClusterResult + treeplot path against a current enrichplot release, or add an explicit caveat in the Decision Tree / Common Errors table that treeplot on a compareClusterResult should be verified with a minimal example before use, with emapplot offered as the working alternative for that class (already confirmed working in this audit).
-
 ### `bio-pathway-go-enrichment` — Fix claim #2 (simplify() on ont='ALL') replaced one wrong claim with another wrong claim
 
 - Skill: 90, Production Ready · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/pathway-analysis/go-enrichment) · [viewer](skills/bio-pathway-go-enrichment/mrsonord2240-bioSkills@6847328/viewer.md)
@@ -752,7 +736,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: This divergence was undiscoverable before this fix round because the graphite route never completed a single successful run pre-fix (Research Veto M4 FAIL); the fixer's own verification (fixes/bio-pathway-kegg-pathways.md) checked that runSPIA returned real rows but did not cross-check its direction calls against the direct spia() route.
 - Fix: Add a caveat to the SPIA section (and the Common Errors / Per-Method Failure Modes tables) stating that graphite's harmonized topology can disagree with SPIA's native KEGG-bundled topology on perturbation direction for a meaningful fraction of pathways, and recommend treating the two routes as complementary evidence rather than interchangeable, or explicitly stating which one to prefer as the default and why.
 
-## P2 (254)
+## P2 (253)
 
 ### `bio-experimental-design-sample-size` — SKILL.md code blocks omit set.seed
 
@@ -2138,22 +2122,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The function was written for a fixed in-house schema and then parameterised without validating the parameters.
 - Fix: Validate that both columns exist in df.columns at function entry and raise a named error listing the available columns.
 
-### `bio-pathway-enrichment-visualization` — No explicit guidance for zero-surviving-terms/sets
-
-- Skill: 90, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/pathway-analysis/enrichment-visualization) · [viewer](skills/bio-pathway-enrichment-visualization/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: —
-- Problem: SKILL.md never tells the agent what to do when enrichGO/gseGO returns zero significant rows, even though the Skill's own shipped GSEA example defensively handles exactly this case in its own code.
-- Root cause: The defensive pattern lives only in examples/visualization_gsea.R's if (nrow(...) > 0) branch, not called out as a general rule in SKILL.md's Escape Hatches or Common Errors.
-- Fix: Add one line to the Common Errors table: 'zero significant terms/sets -> report the count and stop, do not attempt to plot an empty object' (mirroring what the shipped example already does).
-
-### `bio-pathway-enrichment-visualization` — Deprecated 'nCluster' argument used in the Skill's own primary treeplot example
-
-- Skill: 90, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/pathway-analysis/enrichment-visualization) · [viewer](skills/bio-pathway-enrichment-visualization/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 1, 5
-- Problem: The installed enrichplot (1.26.6) already warns 'Use cluster.params = list(n = your_value) instead of nCluster. The nCluster parameter will be removed in the next version', but SKILL.md's own code examples use nCluster= throughout.
-- Root cause: SKILL.md was written against an enrichplot version where nCluster was still the primary (non-deprecated) argument name.
-- Fix: Switch the Skill's treeplot() examples to cluster.params=list(n=5) and mention the rename in the Version Compatibility note alongside the cnetplot/emapplot/goplot churn it already documents.
-
 ### `bio-pathway-go-enrichment` — Universe-omission symptom description overstates the observed effect (unchanged from pre-fix, not one of the three fixed claims)
 
 - Skill: 90, Production Ready · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/pathway-analysis/go-enrichment) · [viewer](skills/bio-pathway-go-enrichment/mrsonord2240-bioSkills@6847328/viewer.md)
@@ -2705,6 +2673,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: len(deltas) >= 3 (i.e. at least 4 timepoints) is required before the fixed rule can ever return True; SKILL.md never states this minimum in prose, so an agent following the snippet literally reports a 2-3-timepoint series as 'not at steady state' rather than 'insufficient timepoints to assess.'
 - Root cause: The P1 fix corrected the false-positive case (last-pair-only) but did not add a caveat for the now-more-conservative rule's own minimum-data requirement.
 - Fix: Add one sentence near the fixed snippet: 'requires at least 4 timepoints (3 consecutive deltas); with fewer, report insufficient timepoints to assess steady state rather than not yet at steady state.'
+
+### `bio-pathway-enrichment-visualization` — treeplot-on-compareClusterResult crash is a live upstream bug worth periodic re-checking
+
+- Skill: 93, Production Ready · [mrsonord2240/bioSkills@994366d](https://github.com/mrsonord2240/bioSkills/tree/994366d0185ff09c8717883551dde14c427fbc3c/pathway-analysis/enrichment-visualization) · [viewer](skills/bio-pathway-enrichment-visualization/mrsonord2240-bioSkills@994366d/viewer.md)
+- Observed in inputs: 4
+- Problem: The documented incompatibility (enrichplot 1.26.6/ggtree/ggplot2 4.0.3) may be fixed in a future enrichplot or ggtree release, at which point the Skill's 'do not retry' guidance and emapplot-only recommendation for compareClusterResult would become stale.
+- Root cause: The fix correctly documents a point-in-time incompatibility but has no built-in trigger to revisit it as dependency versions move forward.
+- Fix: Add a one-line note to Version Compatibility: 're-test treeplot on a compareClusterResult after any enrichplot/ggtree upgrade; this may be fixed upstream'.
 
 ### `bio-crispr-screens-screen-qc` — Documented sgRNA-identifier-column requirement is not enforced by validate_counts()
 
