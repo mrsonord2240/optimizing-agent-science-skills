@@ -648,7 +648,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: This divergence was undiscoverable before this fix round because the graphite route never completed a single successful run pre-fix (Research Veto M4 FAIL); the fixer's own verification (fixes/bio-pathway-kegg-pathways.md) checked that runSPIA returned real rows but did not cross-check its direction calls against the direct spia() route.
 - Fix: Add a caveat to the SPIA section (and the Common Errors / Per-Method Failure Modes tables) stating that graphite's harmonized topology can disagree with SPIA's native KEGG-bundled topology on perturbation direction for a meaningful fraction of pathways, and recommend treating the two routes as complementary evidence rather than interchangeable, or explicitly stating which one to prefer as the default and why.
 
-## P2 (253)
+## P2 (249)
 
 ### `bio-experimental-design-sample-size` — SKILL.md code blocks omit set.seed
 
@@ -2314,46 +2314,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The Skill's parse guards test for None only, which is the documented failure signal but not the only one.
 - Fix: Add a line to parse_smiles_safe and the Common Errors table: treat a molecule with GetNumAtoms() == 0 as a parse failure, because an empty or whitespace input does not return None.
 
-### `bio-pathway-reactome` — Shipped GSEA example is null-by-construction (0 terms every run)
-
-- Skill: 91, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/pathway-analysis/reactome-pathways) · [viewer](skills/bio-pathway-reactome/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: —
-- Problem: examples/reactome_gsea.R ranks genes by rnorm() under a fixed seed, so gsePathway finds 0 enriched terms every time it is run as shipped ('no term enriched under specific pvalueCutoff...'), leaving the gseaplot2/ridgeplot reporting branch as dead code that never executes.
-- Root cause: The example uses a random statistic as a self-contained stand-in without planting any real signal, unlike the sibling bio-pathway-gsea Skill's examples, which had the identical defect and were fixed by planting a real shifted gene set.
-- Fix: Plant a real effect on a known Reactome pathway's member genes (as this audit's data/make_data.R does for R-HSA-877300) so the shipped example returns a non-empty, inspectable result and the plotting branch actually runs.
-
-### `bio-pathway-reactome` — Shipped ORA example's 'universe' does not demonstrate the universe/background point
-
-- Skill: 91, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/pathway-analysis/reactome-pathways) · [viewer](skills/bio-pathway-reactome/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: —
-- Problem: examples/reactome_ora.R sets `universe = all_symbols` where all_symbols is every SYMBOL in org.Hs.eg.db (~20,000+ genes) -- functionally almost identical in size to the implicit ~11,200-gene default the SKILL.md warns against, so running the example does not show the universe argument changing the result materially.
-- Root cause: The comment labels this 'a stand-in for the genes actually measured' but a real measured background (e.g. ~12-15k expressed genes) was not used.
-- Fix: Sample a smaller, more realistic 'measured' background (a few thousand genes, as SKILL.md's own decision-tree examples imply) so the example visibly demonstrates why universe= matters, consistent with the emphasis SKILL.md places on it.
-
-### `bio-pathway-reactome` — 'Zero rows' wording does not match the actual NULL return value
-
-- Skill: 91, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/pathway-analysis/reactome-pathways) · [viewer](skills/bio-pathway-reactome/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 3
-- Problem: SKILL.md and usage-guide.md describe the SYMBOL/ENSEMBL-without-bitr failure as producing 'zero rows'/'returns nothing', but the verified runtime behavior is a NULL return (with an informational console message), not a 0-row enrichResult object.
-- Root cause: The description was written from the general shape of the failure rather than the exact object type returned.
-- Fix: Update the wording to 'returns NULL (not a 0-row result)' so an agent writing defensive code (e.g. checking nrow(result)) knows to guard against NULL rather than an empty data frame.
-
-### `bio-pathway-reactome` — No clinical/practice-boundary escape hatch
-
-- Skill: 91, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/pathway-analysis/reactome-pathways) · [viewer](skills/bio-pathway-reactome/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 7
-- Problem: SKILL.md has strong technical escape-hatch guidance (unsupported organism, comparative questions routed to ReactomeGSA) but no line addressing diagnostic/prescriptive misuse of a pathway result; Input 7's correct refusal relied entirely on the base model's alignment, not on any Skill-provided guidance.
-- Root cause: The Skill was written purely as a bioinformatics/statistics reference with no research-scope-boundary section, consistent with most Skills in this collection.
-- Fix: Add a one-line escape hatch (e.g. under Common Errors or a new 'Scope' note) stating that pathway enrichment results are exploratory and must not be used to diagnose or prescribe treatment without a qualified clinician.
-
-### `bio-pathway-reactome` — 7-organism ceiling claim not independently verifiable in this audit environment
-
-- Skill: 91, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/pathway-analysis/reactome-pathways) · [viewer](skills/bio-pathway-reactome/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 6
-- Problem: org.Mm.eg.db and org.At.tair.db are both absent from the shared crispr-screen-analyst audit environment, so organism='mouse' (documented as supported) and organism='arabidopsis' (documented as unsupported) fail identically at the same package-load step, and the claimed distinction between them could not be confirmed by execution.
-- Root cause: This candidate's tooling pass (TOOLS.md) did not install non-human OrgDb packages, and this audit did not install new packages per the 'install nothing' rule.
-- Fix: A future pass with org.Mm.eg.db installed (already noted as a gap for the sibling go-enrichment audit) should re-run this check to confirm the 7-organism ceiling behaves as documented once the annotation package is present.
-
 ### `bio-crispr-screens-base-editing-analysis` — find_be_spacers() has no editor-name validation, unlike the schema-checked functions
 
 - Skill: 92, Production Ready · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/crispr-screens/base-editing-analysis) · [viewer](skills/bio-crispr-screens-base-editing-analysis/mrsonord2240-bioSkills@6847328/viewer.md)
@@ -2633,6 +2593,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: Unlike the matchms section (full runnable synthetic example in examples/annotate_features.py) and SIRIUS's complete bash chain, the new MetFrag section supplies only the params.txt key/value template and the candidates.csv column schema -- an agent must still originate real peak masses and a real candidate structure list from outside knowledge to actually run it, as this audit did.
 - Root cause: The fix prioritized closing the 'zero executable guidance' P1 gap with a runnable template; a fully worked data sample was out of scope for that fix.
 - Fix: Ship a small worked candidates.csv + peaklist.txt (e.g. the citrate/isocitrate/glucose triple this Skill's own prose already describes) alongside examples/annotate_features.py so an agent can run the MetFrag path with zero external chemistry lookup, mirroring the matchms example's self-containedness.
+
+### `bio-pathway-reactome` — 7-organism ceiling claim still not independently verifiable in this shared env
+
+- Skill: 95, Production Ready · [mrsonord2240/bioSkills@02448f6](https://github.com/mrsonord2240/bioSkills/tree/02448f6c40e18dc2dabe39f1bbbc6bbf35ce04ff/pathway-analysis/reactome-pathways) · [viewer](skills/bio-pathway-reactome/mrsonord2240-bioSkills@02448f6/viewer.md)
+- Observed in inputs: 6
+- Problem: org.Mm.eg.db and org.At.tair.db remain absent from the crispr-screen-analyst shared env, so a supported (mouse) and unsupported (arabidopsis) organism both fail at the identical missing-package step; the claimed 'exactly 7 organisms' ceiling can't be separated from 'these 2 packages happen to be missing' by execution.
+- Root cause: The shared audit env has no non-human OrgDb packages installed; this predates and is unrelated to this fix, and was explicitly left out of the dispatched findings.
+- Fix: In a future tooling pass, install org.Mm.eg.db under the shared env's install-lock discipline, then re-run with a real mouse gene list so the 7-organism ceiling is confirmed by a live enrichPathway(organism='mouse') result rather than by argument acceptance alone.
 
 ### `bio-metabolomics-statistical-analysis` — Pareto-vs-UV VIP robustness sub-check not independently reconfirmed post-fix
 
