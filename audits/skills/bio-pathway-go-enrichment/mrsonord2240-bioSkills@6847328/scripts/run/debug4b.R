@@ -1,0 +1,5 @@
+suppressPackageStartupMessages({library(clusterProfiler)})
+print(args(clusterProfiler:::simplify.enrichResult))
+cat('---getMethod---\n')
+m <- getMethod('simplify', 'enrichResult')
+print(m)

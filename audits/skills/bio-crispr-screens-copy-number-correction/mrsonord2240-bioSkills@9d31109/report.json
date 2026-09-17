@@ -1,0 +1,223 @@
+{
+  "meta": {
+    "skill_name": "bio-crispr-screens-copy-number-correction",
+    "description": "Corrects the gene-independent copy-number artifact in CRISPR-Cas9 screens (Aguirre 2016 / Munoz 2016) where amplified loci appear essential from DNA-damage burden of simultaneous cuts. Covers CRISPRcleanR, CERES, Chronos (now with an accurate negative_control_sgrnas failure signature), the decision tree, and detect_cn_bias (now with a documented low-power floor and a no-cry-wolf guard on genuinely corrected screens).",
+    "evaluated_on": "2026-09-16",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "mrsonord2240/bioSkills@9d31109159d4d490ec375d4ae88c9b77570f3840:crispr-screens/copy-number-correction"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "Every number in this audit came from a real program run: Chronos 2.3.15 (real HAP1 single-line data) or real/relabeled-real HT-29 gene-level LFC+CN data already on disk from the round-2 audit (CRISPRcleanR 3.0.1's own output). Relabeling exercises (Inputs 3, 4, 6) are explicitly disclosed as such, not presented as new wet-lab findings." },
+      "practice_boundaries": { "result": "PASS", "detail": "Input 7 independently confirms the round-2 Scope paragraph ('does not support treatment, therapy or other clinical recommendations... Decline the clinical part') is still present, byte-identical in intent, at the new commit." },
+      "methodological_ground": { "result": "PASS", "detail": "Decision tree and thresholds remain grounded and correct (unchanged by this diff, previously verified). The new Reconciliation cause 5 is directionally sound (alternate_CN really does leave real residual signal, Input 5) even though its specific pooling-vs-per-line contrast did not reproduce -- an overclaim in illustration, not a methodological fallacy." },
+      "code_usability": { "result": "PASS", "detail": "All tested code paths run as literally written: chronos.Chronos(...) construction with and without negative_control_sgrnas (Input 1), with an explicit empty dict (Input 6), and the full detect_cn_bias() function including its new low_power_n parameter and two new output fields at three different real/relabeled datasets and an exact boundary sweep (Inputs 2-5). No crashes, no syntax errors." }
+    }
+  },
+  "static_score": {
+    "subtotal": 92,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 11, "max": 12, "note": "Both round-3 targets (negative_control_sgrnas exception, detect_cn_bias low-power floor) are verified correct by real execution (Inputs 1-2). Docked 1 point: negative_control_sgrnas passed as an explicit empty dict {'screen': []} (rather than omitted) raises a different, undocumented ValueError ('set of negative_control_sgrnas is empty') that the Common Errors table does not cover (Input 6)." },
+      "reliability": { "score": 11, "max": 12, "note": "The Common Errors table's negative_control_sgrnas row now matches real behavior exactly, confirmed by independent execution, not a re-read of the fix log. Docked 1 point: the new Reconciliation cause 5's specific claim that pooling masks a per-line problem was not reproduced -- a real per-line-vs-pooled construction on real gene-effect data flagged the same bias both ways (Input 5)." },
+      "performance_context": { "score": 6, "max": 8, "note": "Unchanged from both prior audits: concise SKILL.md (~375 lines), separate usage-guide.md, one example file." },
+      "agent_usability": { "score": 15, "max": 16, "note": "Both round-3 code paths (negative_control_sgrnas exception, low-power floor/suspicious_despite_ns) now run cleanly as documented on the first try (Inputs 1-4). Docked 1 point for the same Reconciliation overclaim affecting decision-guidance precision (Input 5)." },
+      "human_usability": { "score": 8, "max": 8, "note": "The negative_control_sgrnas exception documentation (type and call site) is now fully accurate on independent real execution, closing the round-2 Forgiveness gap; no new Forgiveness-category gap found by this audit's inputs." },
+      "security": { "score": 11, "max": 12, "note": "Unchanged: no credentials, no injection vectors, no sensitive-data handling in any tested code path." },
+      "maintainability": { "score": 11, "max": 12, "note": "Unchanged: no fixture/test data ships with the Skill, so documentation-vs-real-behavior drift can recur silently between audits -- which is exactly what this audit's own new inputs (5, 6) found again, independent of what the fixer was told to check." },
+      "agent_specific": { "score": 19, "max": 20, "note": "The low-power floor gap is closed and independently confirmed both non-crying-wolf on a genuinely corrected screen (0/5 false alarms, Input 3) and boundary-correct at low_power_n=8 with no off-by-one error (Input 4). Docked 1 point: Chronos training still has no documented seed/determinism guidance (Idempotency), unchanged from both prior audits and unrelated to this fix pass." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 75.9,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 22, "total": 25 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "REGRESSION: omit negative_control_sgrnas -- confirm ValueError at construction, not UnboundLocalError at train()",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true (Chronos 2.3.15, chronos-venv). This is the round-3 fix's headline claim and the audit dispatch's first named check. Built a real Chronos model on the real single-line HAP1 TKOv3 planted-amplicon data, omitting negative_control_sgrnas entirely. chronos.Chronos(...) construction raised ValueError('excess_variance was passed as dict without key for 'screen': {}') verbatim, before train() was ever called -- matches SKILL.md @ 9d31109 exactly. No UnboundLocalError escaped to the caller.",
+        "basic": 35,
+        "specialized": 48,
+        "total": 83,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "chronos.Chronos(...) construction raises ValueError, not train()", "result": "PASS", "note": "Confirmed: exception raised before train() is ever called" },
+          { "text": "Exception message matches SKILL.md's documented substring verbatim", "result": "PASS", "note": "'excess_variance was passed as dict without key for' present exactly" },
+          { "text": "No UnboundLocalError escapes to the caller", "result": "PASS", "note": "Only ValueError observed at the top level" },
+          { "text": "This independently re-verifies the round-2 finding is fixed, not just re-reads the fix log", "result": "PASS", "note": "Fresh execution, not a re-read of fixes/bio-crispr-screens-copy-number-correction.md" }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "REGRESSION: detect_cn_bias's low_power_floor/suspicious_despite_ns on the real post-CRISPRcleanR HT-29 3-gene block",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. Second named check from the audit dispatch. Ran the round-3-fixed detect_cn_bias() (low_power_n=8, low_power_floor, suspicious_despite_ns) verbatim against the same real FAM84B/MYC/POU5F1B block used by the round-2 audit's Input 9. Post-correction: gap=-0.981 (doc claims -0.98), p=0.208 (doc claims 0.208), low_power_floor=True, suspicious_despite_ns=True -- exact match to SKILL.md's documented numbers.",
+        "basic": 36,
+        "specialized": 49,
+        "total": 85,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Real post-correction gap matches SKILL.md's documented ~-0.98", "result": "PASS", "note": "Actual -0.9809" },
+          { "text": "Real p-value matches SKILL.md's documented ~0.208", "result": "PASS", "note": "Actual 0.2080" },
+          { "text": "low_power_floor is True at n=3 amplified genes (< low_power_n=8)", "result": "PASS", "note": "Confirmed" },
+          { "text": "suspicious_despite_ns is True -- the entire point of the fix", "result": "PASS", "note": "Confirmed: a real, substantial, still-uncorrected gap is now flagged instead of silently read as bias_present=False" }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "NEW: does suspicious_despite_ns cry wolf on a genuinely well-corrected small amplicon?",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. Explicitly named third check in the audit dispatch ('do not now cry wolf on a genuinely corrected screen'). Relabeled 5 independent random draws of 5 real diploid HT-29 genes (whose real LFCs are, by construction, indistinguishable from a genuinely successful correction) as a small 'corrected amplicon' (CN=6, n=5 < low_power_n=8). 0/5 trials fired suspicious_despite_ns; all gaps were small and non-negative-dominant (-0.16 to +0.23).",
+        "basic": 34,
+        "specialized": 47,
+        "total": 81,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "suspicious_despite_ns stays False across 5 independent real-LFC trials of a genuinely-corrected small amplicon", "result": "PASS", "note": "0/5 false alarms" },
+          { "text": "low_power_floor correctly stays True throughout (small n), showing the two new fields are independent signals, not conflated", "result": "PASS", "note": "All 5 trials: low_power_floor=True, suspicious_despite_ns=False" },
+          { "text": "Test uses real LFC values (CN relabeled only), not fabricated statistics", "result": "PASS", "note": "Same real HT-29 diploid gene pool as the round-2 audit's Input 8" }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "NEW: low_power_n=8 exact boundary (n=7/8/9) and the NaN guard below n>=3",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. Neither prior audit tested the boundary or NaN-guard logic directly. Swept n_amplified=7,8,9 (real diploid genes relabeled CN=6): low_power_floor was True/False/False exactly matching `len(amplified) < low_power_n`, no off-by-one error. Separately, relabeled only 2 genes (below the existing n>=3 floor for gap/p_gap): gap stayed NaN, and suspicious_despite_ns's `not pd.isna(gap)` guard resolved to False without raising.",
+        "basic": 33,
+        "specialized": 44,
+        "total": 77,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "low_power_floor boundary at n=8 matches `len(amplified) < low_power_n` exactly", "result": "PASS", "note": "n=7 True, n=8 False, n=9 False" },
+          { "text": "No off-by-one error in the boundary condition", "result": "PASS", "note": "Confirmed by direct sweep" },
+          { "text": "NaN gap (n_amplified<3) does not crash suspicious_despite_ns's pd.isna guard", "result": "PASS", "note": "No exception raised" },
+          { "text": "NaN gap correctly resolves suspicious_despite_ns to False, not an error or a false True", "result": "PASS", "note": "Confirmed" }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "NEW: does per-line detect_cn_bias catch a residual problem that pooling masks, as the new Reconciliation cause 5 claims?",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "executed: true. Tests the new Reconciliation text's specific justification, not just its general recommendation, using the real 3-line post-alternate_CN gene-effect matrix already on disk from the round-2 fix pass. Per-line: LINE_CN8 and LINE_CN15 both independently show real bias_present=True (gap ~-0.90, p<0.0001). Pooled (all 3 lines merged into one table): ALSO bias_present=True, gap=-0.903 -- essentially identical to the per-line result, not masked. The underlying claim that alternate_CN leaves real residual signal is confirmed; the specific 'pooling would have hidden it' framing is not borne out on this real construction.",
+        "basic": 29,
+        "specialized": 37,
+        "total": 66,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Real per-line gene-effect numbers are consistent with the fix log's own reported partial correction (CN15 line: -1.92 to -1.20 raw)", "result": "PASS", "note": "Per-line gap-vs-diploid of -0.898 for LINE_CN15 is consistent in direction and rough magnitude" },
+          { "text": "Underlying core claim -- alternate_CN leaves residual signal at strong amplicons -- is confirmed by real numbers", "result": "PASS", "note": "Both LINE_CN8 and LINE_CN15 independently flag bias_present=True post-correction" },
+          { "text": "The specific pooling-vs-per-line contrast the new text asserts (pooling masks it) is reproduced by a real construction", "result": "FAIL", "note": "Pooled analysis ALSO flagged bias_present=True with an almost identical gap (-0.903 vs -0.898) -- pooling did not mask the problem here" },
+          { "text": "New Reconciliation text is fully validated without qualification", "result": "FAIL", "note": "The general advice (re-run per line) remains sound risk hedging, but the specific justification given for it is an overclaim on this real data" }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Adversarial",
+        "label": "NEW: negative_control_sgrnas passed as an explicit empty dict, not omitted -- does the documentation still cover it?",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "executed: true. The fix log names this as an unverified aside ('checked negative_control_sgrnas={'screen': []}... different ValueError') that neither prior audit independently tested. Confirmed independently: chronos.Chronos(...) with an explicit empty list raises ValueError('set of negative_control_sgrnas is empty') -- a genuinely different message from the omitted-argument case (Input 1). SKILL.md's Common Errors table only documents the omitted-argument message; a caller who builds negative_control_sgrnas programmatically and ends up with an empty list (a realistic mistake) would hit an undocumented error text.",
+        "basic": 29,
+        "specialized": 38,
+        "total": 67,
+        "assertions_passed": 2,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "Empty-dict case produces a real ValueError, not a silent bad state or a crash elsewhere", "result": "PASS", "note": "Confirmed" },
+          { "text": "Exact message independently confirms the fix log's own previously-unverified aside", "result": "PASS", "note": "'set of negative_control_sgrnas is empty' matches" },
+          { "text": "SKILL.md's Common Errors table covers this distinct failure mode", "result": "FAIL", "note": "Table only lists the omitted-argument ValueError text; the empty-dict message is different and absent" }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Scope Boundary",
+        "label": "REGRESSION + shipped-means-present: Scope paragraph and bundled files still present at the new commit",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "executed: true (filesystem + text verification, no numerical output). Confirms the round-2 Scope paragraph ('does not support treatment, therapy or other clinical recommendations... Decline the clinical part of such a request') is unchanged at commit 9d31109 (the round-3 diff only touched the Chronos comment block and detect_cn_bias section, +34/-4, consistent with git diff). usage-guide.md and examples/run_crispr_cleanr.R both still exist on disk; no new missing-file regression from this diff.",
+        "basic": 31,
+        "specialized": 41,
+        "total": 72,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "Scope paragraph from the round-2 fix remains present and unchanged", "result": "PASS", "note": "Confirmed by direct grep of SKILL.md at commit 9d31109" },
+          { "text": "All Skill-bundled files (usage-guide.md, examples/run_crispr_cleanr.R) still exist on disk", "result": "PASS", "note": "Confirmed" },
+          { "text": "No new missing-file regression introduced by the round-3 diff", "result": "PASS", "note": "git diff confirms only SKILL.md changed, +34/-4, matching the fix log" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 36.8,
+    "dynamic_weighted": 45.5,
+    "score": 82,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Both round-3 targeted fixes are independently re-verified by fresh execution, not a re-read of the fix log: chronos.Chronos(...) construction raises the exact documented ValueError before train() is ever called (Input 1), and detect_cn_bias's low_power_floor/suspicious_despite_ns reproduce SKILL.md's documented real HT-29 numbers exactly (Input 2).",
+    "The 'no cry-wolf' claim this audit was explicitly asked to check is confirmed with real data: 0/5 false alarms when a genuinely diploid-LFC 'corrected' amplicon is tested, and the low_power_n=8 boundary plus the NaN guard are both off-by-one-free (Inputs 3-4).",
+    "The round-2 Scope paragraph and all bundled files remain intact and present at the new commit -- no regression from a diff that only touched two sections of SKILL.md (Input 7).",
+    "This audit's own new inputs (not carried over from the fix log) surfaced two real, minor gaps -- an undocumented empty-dict ValueError path, and an overclaimed pooling-vs-per-line contrast in the new Reconciliation text -- confirming the audit measured the Skill, not just the fixer's homework."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "negative_control_sgrnas empty-dict case raises an undocumented ValueError",
+      "observed_in": [6],
+      "problem": "Passing negative_control_sgrnas as an explicit empty dict ({'screen': []}) rather than omitting the argument raises ValueError('set of negative_control_sgrnas is empty') -- a different message from the one the Common Errors table documents for the omitted-argument case.",
+      "root_cause": "The round-3 fix documented only the omitted-argument path, which was this audit's and the fix log's main test case; the empty-list path was mentioned only as an aside in the fix log and never added to SKILL.md itself.",
+      "fix": "Add a second Common Errors row: 'ValueError: set of negative_control_sgrnas is empty' at Chronos(...) construction | negative_control_sgrnas supplied but its list is empty | Populate it with real non-targeting/non-essential sgRNAs, not an empty list."
+    },
+    {
+      "priority": "P2",
+      "title": "Reconciliation cause 5's 'pooling masks it' claim did not reproduce on real per-line-vs-pooled data",
+      "observed_in": [5],
+      "problem": "SKILL.md's new cause 5 justifies re-running detect_cn_bias per cell line by claiming pooling can mask a real per-line problem. A real construction from the round-2 fix pass's own 3-line panel found pooled and per-line gave the same qualitative read (both bias_present=True, near-identical gap) -- the specific masking scenario was not demonstrated.",
+      "root_cause": "The cause-5 text was added as prose reasoning during the fix pass and was never itself run against real numbers before this audit.",
+      "fix": "Soften the claim to what is actually demonstrated: alternate_CN's fitted average can leave real residual signal at strong amplicons (confirmed), and re-checking per line is good practice regardless of whether pooling happens to mask it in a given panel -- drop the implication that pooling reliably hides the problem."
+    },
+    {
+      "priority": "P2",
+      "title": "Chronos training has no documented seed/determinism guidance",
+      "observed_in": [2, 3],
+      "problem": "None of the three real Chronos training runs across this audit's inputs set or discussed a random seed, and SKILL.md gives no guidance on reproducibility between training runs.",
+      "root_cause": "Carried over from both prior audits' static notes (Idempotency, Agent-Specific); unrelated to and untouched by this fix pass.",
+      "fix": "Add a one-line note to the Chronos code block: set a seed (or document that Chronos training is stochastic and gene-effect estimates should be treated as approximate across runs) so agents don't present a single run's numbers as exactly reproducible."
+    }
+  ]
+}

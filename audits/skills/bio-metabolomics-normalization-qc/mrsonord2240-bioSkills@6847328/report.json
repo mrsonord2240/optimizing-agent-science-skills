@@ -1,0 +1,214 @@
+{
+  "meta": {
+    "skill_name": "bio-metabolomics-normalization-qc",
+    "description": "Designs QC, corrects signal drift, removes batch effects, filters features, normalizes samples, and imputes missing values for untargeted LC-MS/GC-MS metabolomics, framing each step as a measurement model that can create or erase biological signal.",
+    "evaluated_on": "2026-09-16",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 9,
+    "source": "mrsonord2240/bioSkills@684732876d2781df75d90ba35c3e9949ff4f28b2:metabolomics/normalization-qc"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "No fabricated DOIs, PMIDs, p-values, or effect sizes across any of the 9 outputs; all references in SKILL.md are real, checkable citations." },
+      "practice_boundaries": { "result": "PASS", "detail": "No diagnostic or prescriptive medical conclusions; data-processing skill with no individual-subject claims." },
+      "methodological_ground": { "result": "PASS", "detail": "RE-AUDIT: the pre-fix FAIL (impute.QRILC on raw, non-log intensities silently emitting negative intensities) is fixed and verified. Input 3 re-ran the EXACT pre-fix repro (seed 5/9, same 17-feature diagnosed-MNAR subset): the fixed log2()-then-QRILC-then-2^x pattern from SKILL.md's Impute section produced 0 negative values across all 310 imputed cells (min=4.76), versus the old pattern's 123/310 negative (min=-776.37) reproduced independently in Input 8 Part A on the identical data. The new stopifnot(min(...)>=0) guard fired correctly when the old (buggy) pattern was deliberately re-run (Input 8 Part A), and passed cleanly on the fixed pattern (Input 3, Input 8 Part B). No other methodological fallacy found across any of the 9 outputs." },
+      "code_usability": { "result": "PASS", "detail": "All 9 inputs' generated R code executed via pmp/imputeLCMD/missForest/sva against the audit-env R 4.4.3 install; no syntax errors or missing-dependency failures. Input 8 Part B shows impute.QRILC failing LOUDLY (not silently) with 'NA/NaN/Inf in y' when fed NaN-contaminated log-intensities from non-positive raw values -- a safe failure mode, not a code defect." }
+    }
+  },
+  "static_score": {
+    "subtotal": 92,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 12, "max": 12, "note": "The one pre-fix gap (QCRSC's silent all-NA behavior below minQC undocumented) is now closed: SKILL.md's QC-RSC section documents the failure mode inline and ships a copy-pasteable guard line. Pipeline Order table gained a 5a row clarifying the QRILC log2/2^x round-trip is local to the call, not a step reorder -- verified this reading matches the actual runnable code in Input 3/8." },
+      "reliability": { "score": 11, "max": 12, "note": "Both silent-failure gaps identified pre-fix (QCRSC all-NA, QRILC negative values) now ship inline stopifnot guards, both verified to fire correctly on the exact failure conditions (Input 4, Input 8 Part A) and pass cleanly on normal runs (Input 1, 5, 3). Remaining half-point gap: SKILL.md doesn't mention that non-positive raw intensities (possible from imperfect upstream drift correction) make log2()/impute.QRILC fail loudly rather than silently -- a safe but undocumented edge case (Input 8 Part B)." },
+      "performance_context": { "score": 7, "max": 8, "note": "SKILL.md grew modestly (new guard lines, 5a table row, Common Errors row) but stayed well-structured; not bloated for the domain's genuine complexity." },
+      "agent_usability": { "score": 15, "max": 16, "note": "Decision trees and guard lines map directly to real function names/parameters. The new PQN factor code block (documented flags-attribute AND colData path) removes a prior undocumented-API gap; Input 9 confirms the colData(SummarizedExperiment) path -- the more common real path given xcms-preprocessing's own output type -- works as written, not just the plain-matrix path the fix log itself verified." },
+      "human_usability": { "score": 7, "max": 8, "note": "Common Errors table gained a QRILC-negative-values row and clarified the QCRSC all-NA row; strong discoverability and forgiveness unchanged from pre-fix." },
+      "security": { "score": 11, "max": 12, "note": "No credential handling or destructive operations; unchanged from pre-fix." },
+      "maintainability": { "score": 11, "max": 12, "note": "New guard lines are one-line stopifnot assertions co-located with the calls they protect -- easy to keep in sync; example script's permutation-test guardrail is a small, self-contained addition." },
+      "agent_specific": { "score": 18, "max": 20, "note": "Unchanged from pre-fix: precise trigger description, explicit version-compatibility escape hatch, strong composability via Related Skills links." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 92.0,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 38, "total": 39 },
+    "inputs": [
+      {
+        "index": 1, "type": "Canonical",
+        "label": "QC-RSD/D-ratio filter + QC-RSC drift correction on real MTBLS79 (2488x172, 38 QC, 8 batches), validated on held-out QCs, plus the new all-NA guard",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "executed: true. Identical result to the pre-fix run (0.2298 -> 0.0780 held-out QC RSD, 2370/2488 then 2343 features), plus the fixed SKILL.md's documented QCRSC guard line now runs immediately after the call and passes cleanly (not every feature all-NA).",
+        "basic": 39, "specialized": 57, "total": 96,
+        "assertions_passed": 5, "assertions_total": 5,
+        "assertions": [
+          { "text": "Reports per-filter feature counts (detection-rate, then D-ratio/RSD) separately", "result": "PASS", "note": "2488->2370->2343 printed distinctly, matches pre-fix" },
+          { "text": "Drift correction validated on genuinely held-out QCs, not the fitting QCs", "result": "PASS", "note": "fit(21)/test(17) split per batch" },
+          { "text": "Held-out QC RSD measurably improves after correction", "result": "PASS", "note": "0.2298 -> 0.0780" },
+          { "text": "SKILL.md's new QCRSC all-NA guard runs and passes on a normal (non-sparse-QC) dataset", "result": "PASS", "note": "stopifnot(any(rowSums(!is.na(out_mat))>0)) did not fire; no false-positive on real data" },
+          { "text": "D-ratio/RSD filter applied after drift correction, per the Skill's pipeline order", "result": "PASS", "note": "Filter computed on corrected matrix" }
+        ]
+      },
+      {
+        "index": 2, "type": "Variant A",
+        "label": "PQN urine normalization + dilution-vs-phenotype guardrail, using the FIXED documented pqn_coef attribute and permutation-test guardrail",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "executed: true, exact pre-fix synthetic scenario re-run. attr(norm,'flags')[,'pqn_coef'] now exists and reconstructs the input matrix to 2.9e-11 precision (fix log claimed 2.8e-14 on its own data) -- the previously-FAILing 'per-sample factor retrievable from documented API' assertion now PASSes. The permutation-test guardrail (999 shuffles) replaced the fixed r>0.3 cutoff; on this exact clean-case draw it still reports p=0.022 (TRIPPED) -- expected behavior of a properly calibrated test at its nominal false-positive rate, not a residual defect, but worth a P2 usage note (see recommendations).",
+        "basic": 38, "specialized": 56, "total": 94,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "PQN normalization factor is checked for correlation with phenotype per the Skill's guardrail", "result": "PASS", "note": "Both clean and confounded cases computed cor(factor, group)" },
+          { "text": "Uses the documented pmp pqn_normalisation() primary tool call", "result": "PASS", "note": "Called with df/classes/qc_label exactly as in SKILL.md" },
+          { "text": "Per-sample normalization factor is retrievable from the documented API as shown in SKILL.md", "result": "PASS", "note": "FIXED: attr(norm,'flags')[,'pqn_coef'] exists; normalized*factor reconstructs input to 2.9e-11" },
+          { "text": "Guardrail uses a statistically principled, sample-size-aware check rather than an arbitrary fixed threshold", "result": "PASS", "note": "999-permutation empirical p-value replaces the old fixed |r|>0.3 cutoff, per usage-guide.md Tips update" }
+        ]
+      },
+      {
+        "index": 3, "type": "Variant B",
+        "label": "Mechanism-aware imputation with the FIXED log2/QRILC/2^x pattern -- the exact P0 repro scenario re-run",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "executed: true. Identical setup to the pre-fix P0 finding (seed 5/9, same 17-feature diagnosed-MNAR subset). Fixed pattern (log2() before impute.QRILC, 2^x back-transform after, stopifnot guard) produced 0 negative values across all 310 imputed cells (min=4.76), versus 123/310 negative (min=-776.37) for the old pattern reproduced independently in Input 8. This is the finding that RESOLVES the Research Veto.",
+        "basic": 39, "specialized": 58, "total": 97,
+        "assertions_passed": 5, "assertions_total": 5,
+        "assertions": [
+          { "text": "Missingness mechanism (MNAR vs MAR) correctly diagnosed per feature", "result": "PASS", "note": "14/15 true MNAR features correctly flagged, same as pre-fix" },
+          { "text": "MNAR features imputed with the SKILL.md-documented log2/QRILC/2^x pattern", "result": "PASS", "note": "log_mat<-log2(...); 2^(impute.QRILC(log_mat,tune.sigma=1)[[1]]) run exactly as documented" },
+          { "text": "Imputed values are physically valid (non-negative) for MS intensity data", "result": "PASS", "note": "FIXED: min=4.76 across all 310 imputed cells, 0 negative (was 123/310 negative pre-fix)" },
+          { "text": "Wrong-method (MAR/missForest) imputation on MNAR features demonstrably differs from correct method", "result": "PASS", "note": "missForest mean 75.3 vs QRILC-path mean 164.9 (now on original scale, valid); still illustrates the documented mean-inflation direction" },
+          { "text": "No fabricated or invented statistical claims", "result": "PASS", "note": "All reported values are direct outputs of the executed code" }
+        ]
+      },
+      {
+        "index": 4, "type": "Edge",
+        "label": "Drift correction with only 3 QC injections -- verifying the NEW documented QCRSC all-NA guard actually fires",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "executed: true. pmp's QCRSC(minQC=5) on 3 QCs still silently returns 60/60 features all-NA (pmp's own behavior is unchanged, as expected -- the fix adds a guard around the call, not inside pmp). Applying SKILL.md's new documented guard line verbatim: it FIRED as intended (stopifnot error), stopping execution loudly instead of letting the all-NA result flow downstream silently.",
+        "basic": 36, "specialized": 56, "total": 92,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Correctly identifies QC count is below the Skill's documented sparse-QC threshold", "result": "PASS", "note": "3 QCs vs the Skill's stated 5-6 minimum" },
+          { "text": "QCRSC's all-NA failure mode still occurs on this pmp version (regression baseline)", "result": "PASS", "note": "60/60 features all-NA on minQC=5 with 3 QCs, matching pre-fix" },
+          { "text": "SKILL.md's new documented guard line actually fires on this exact failure condition", "result": "PASS", "note": "stopifnot(any(rowSums(!is.na(out_mat))>0)) threw an error as intended -- not decorative" },
+          { "text": "Applies the Skill's own documented coarse-fallback alternative instead of forcing a spline", "result": "PASS", "note": "Coarse median-of-QC offset implemented and applied after the guard stopped the bad path" }
+        ]
+      },
+      {
+        "index": 5, "type": "Stress",
+        "label": "Full pipeline on a 4-batch study with 100%-confounded case/control, plus the new QCRSC guard",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "executed: true. Identical result to pre-fix (p=5.9e-13 perfect confound detected, QC-anchored alignment used, design flag raised prominently); new QCRSC guard runs and passes cleanly on this normal-QC multi-batch data.",
+        "basic": 38, "specialized": 57, "total": 95,
+        "assertions_passed": 5, "assertions_total": 5,
+        "assertions": [
+          { "text": "Confound (group vs batch) is detected and quantified before running any correction", "result": "PASS", "note": "Cross-tab + chi-square test run first" },
+          { "text": "ComBat is explicitly declined given the collinearity, per Nygaard 2016 caveat", "result": "PASS", "note": "Comment block explains why ComBat cannot be used safely here" },
+          { "text": "QC-anchored alignment used instead, matching the Skill's documented preference", "result": "PASS", "note": "Per-batch QC-median offset scaling implemented and applied" },
+          { "text": "New QCRSC all-NA guard passes cleanly (no false trip) on this normal-QC multi-batch data", "result": "PASS", "note": "stopifnot did not fire; 0 all-NA rows after correction" },
+          { "text": "Design limitation is flagged prominently, not silently absorbed into a clean result", "result": "PASS", "note": "Final printed block states the confound cannot be resolved by any correction" }
+        ]
+      },
+      {
+        "index": 6, "type": "Scope Boundary",
+        "label": "User asks to 'just run ComBat, skip the QC-anchored thing' on an imbalanced (not perfectly confounded) 3-batch design",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "executed: true. Identical numeric result to pre-fix (naive ComBat 0.0% FP, covariate-protected 1.9% FP, raw 53.7% FP at 85/15 imbalance). The Skill's Common Errors/failure-mode prose was reworded (P2 fix) to state risk scales with degree of confounding and that absence of the effect at mild imbalance isn't evidence of its absence at severe imbalance -- the previously-FAILing assertion now PASSes because the Skill's own documented claim matches what was actually observed.",
+        "basic": 37, "specialized": 55, "total": 92,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "ComBat with mod= covariate is presented as the documented safe alternative to the naive call", "result": "PASS", "note": "Both Case A (no covariate) and Case B (mod=) run and compared" },
+          { "text": "False-positive rate is quantified empirically, not just asserted, for naive vs protected ComBat", "result": "PASS", "note": "t-tests across 54 null features, FP rate at p<0.05 computed for all three variants" },
+          { "text": "QC-anchored alignment is offered as the covariate-free preferred alternative", "result": "PASS", "note": "Final recommendation line names it explicitly" },
+          { "text": "Empirical result matches the Skill's stated (now degree-scaled) risk framing", "result": "PASS", "note": "FIXED framing: prose now explicitly says mild imbalance may not reproduce the effect, matching the observed 0.0%/1.9% result at 85/15" }
+        ]
+      },
+      {
+        "index": 7, "type": "Adversarial",
+        "label": "User asks to tighten the QC-RSC span until QC RSD is 'as close to 0% as possible'",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "executed: true, with caveats -- identical to pre-fix (unaffected by this fix round). Held-out-QC vs biological-RSD tracking correct; loess numerically breaks down below span<=0.3 with only 5 fit-side QC points (a synthetic-data-density limitation, not a Skill defect).",
+        "basic": 32, "specialized": 48, "total": 80,
+        "assertions_passed": 3, "assertions_total": 4,
+        "assertions": [
+          { "text": "Declines to blindly chase QC RSD to 0% at face value", "result": "PASS", "note": "Final verdict explicitly recommends against the literal request" },
+          { "text": "Distinguishes in-sample QC RSD from held-out QC RSD and biological-sample RSD", "result": "PASS", "note": "All three metrics computed and printed per span" },
+          { "text": "Demonstrates concretely what happens as span tightens using real fitted values", "result": "PASS", "note": "5 spans tested with real loess fits" },
+          { "text": "Overfitting curve (RSD drop then bio-RSD rise) is cleanly reproduced across the tested span range", "result": "FAIL", "note": "loess numerically failed below span=0.3 with only 5 fit-QC points, masking the intended curve -- unchanged from pre-fix" }
+        ]
+      },
+      {
+        "index": 8, "type": "Edge",
+        "label": "NEW (auditor-authored): does the new QRILC guard actually catch the old mistake, and does it stay safe on data it wasn't tuned against (non-positive raw intensities)?",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "executed: true. Part A: deliberately re-ran the OLD (pre-fix) pattern -- impute.QRILC directly on raw intensities -- on the exact P0 repro data; reproduced 123/310 negative values (min=-776.37, matching the fix log's own number), and the NEW stopifnot guard correctly FIRED, stopping execution. Part B: fed 3 non-positive values into the FIXED log2/QRILC/2^x pattern (simulating imperfect upstream drift correction, a case SKILL.md doesn't explicitly rule out); log2() produced NaN, and impute.QRILC itself refused to run ('NA/NaN/Inf in y') -- a loud, safe failure, not the silently-passing-NaN-through-na.rm=TRUE scenario this input set out to probe.",
+        "basic": 36, "specialized": 54, "total": 90,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "The new stopifnot guard fires when the pre-fix mistake (QRILC on raw intensities) is deliberately reproduced", "result": "PASS", "note": "123/310 negative values (min=-776.37) triggered stopifnot as intended" },
+          { "text": "Guard test uses the exact same data/subset that produced the pre-fix P0 finding (not a weaker proxy)", "result": "PASS", "note": "Same seed 5/9, same 17-feature diagnosed-MNAR subset as Input 3 and the original audit" },
+          { "text": "Non-positive raw intensities upstream of the fixed pattern do not silently corrupt output", "result": "PASS", "note": "impute.QRILC errors loudly on NaN-contaminated log-intensities rather than returning garbage" },
+          { "text": "No fabricated or invented values in the reported comparison", "result": "PASS", "note": "All numbers are direct execution output" }
+        ]
+      },
+      {
+        "index": 9, "type": "Edge",
+        "label": "NEW (auditor-authored): does the SKILL.md-documented SummarizedExperiment path for the PQN factor (colData(normalized)$pqn_coef) actually work? (The fix log verified only the plain-matrix path.)",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "executed: true. Built a real SummarizedExperiment (the object type xcms-preprocessing actually hands off, making this the MORE common real-world path, not the corner case). pqn_normalisation() accepted it, colData(normalized)$pqn_coef was present and correct (r=0.752 vs true dilution), and normalized*factor reconstructed the input to 3.6e-12 -- closing a gap the fix log itself had not independently verified.",
+        "basic": 37, "specialized": 55, "total": 92,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "pqn_normalisation() accepts a SummarizedExperiment df argument as SKILL.md implies", "result": "PASS", "note": "Ran without error; returned a SummarizedExperiment with a pqn_coef colData column" },
+          { "text": "The documented colData(normalized)$pqn_coef path (SKILL.md's commented alternative line) actually returns the per-sample factor", "result": "PASS", "note": "length=35, non-NA, correlates with true dilution at r=0.752" },
+          { "text": "Reconstruction identity (normalized * factor == input) holds on the SummarizedExperiment path, not just the plain-matrix path", "result": "PASS", "note": "max abs error = 3.6e-12" },
+          { "text": "Tests the actual production input type (xcms-preprocessing's SummarizedExperiment output), not just a synthetic plain matrix", "result": "PASS", "note": "SE built with assays()/colData() matching the real upstream handoff shape" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 36.8,
+    "dynamic_weighted": 55.2,
+    "score": 92,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "The P0 Research Veto finding is verifiably fixed, not just documented as fixed: re-running the EXACT pre-fix repro data through the fixed log2/QRILC/2^x pattern gives 0 negative values across 310 imputed cells (was 123/310, min=-776.37), and a fresh adversarial test (Input 8) confirms the new guard actually fires when the old mistake is deliberately reproduced -- the guard is a real backstop, not decoration.",
+    "Both P1 fixes hold under conditions the fixer's own verification didn't cover: the QCRSC all-NA guard fires correctly on the documented sparse-QC failure (Input 4) and stays silent on three different normal-QC datasets (Inputs 1, 5); the PQN per-sample-factor fix works on BOTH the plain-matrix path the fix log verified AND the SummarizedExperiment/colData path it did not (Input 9) -- the latter being the more common real-world input type.",
+    "Research Veto now PASSES on all four dimensions -- this Skill is deployable, unlike the pre-fix audit.",
+    "The canonical pipeline still runs end-to-end on real MTBLS79 data with genuine held-out-QC validation (0.2298 -> 0.0780 RSD), and correctly declines to 'fix' an information-theoretically unwinnable batch/group confound (Input 5)."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "Permutation-test guardrail still trips at its nominal false-positive rate on clean data",
+      "observed_in": [2],
+      "problem": "Replacing the fixed |r|>0.3 cutoff with a 999-permutation test (the P2 fix) is a genuine calibration improvement, but on this audit's exact clean-case draw the permutation test still reports p=0.022 (TRIPPED) despite the true dilution-group correlation being 0 -- expected behavior for a properly calibrated test at its ~5% nominal rate, but a user seeing one 'TRIPPED' verdict may not realize that.",
+      "root_cause": "usage-guide.md recommends the permutation test but doesn't caveat that any single well-calibrated test will still false-positive at its nominal rate; no guidance on replication or multiple-draw interpretation.",
+      "fix": "Add one line to the guardrail Tips: a single TRIPPED verdict from the permutation test can still occur by chance at ~5% under a true null -- corroborate with the dilution-factor correlation (should be high) before concluding normalization is eating the effect."
+    },
+    {
+      "priority": "P2",
+      "title": "Non-positive raw intensities upstream of QRILC aren't mentioned in Common Errors",
+      "observed_in": [8],
+      "problem": "If any upstream step (e.g. an imperfect drift-correction division) leaves a non-positive value in a feature fed to log2()/impute.QRILC, the fixed pattern fails loudly ('NA/NaN/Inf in y') rather than silently -- a safe failure mode, but undocumented, so an agent seeing this error has no signpost in SKILL.md pointing at the actual cause.",
+      "root_cause": "SKILL.md assumes raw MS intensities are always positive (physically true for a peak table) and doesn't anticipate corrupted input from an earlier buggy step in an agent-composed pipeline.",
+      "fix": "Add a Common Errors row: 'NA/NaN/Inf in y from impute.QRILC -> a feature has a non-positive value before the log2() call, usually from a division-by-near-zero in an earlier drift-correction step; check min(feature_matrix, na.rm=TRUE) > 0 before imputing.'"
+    }
+  ]
+}

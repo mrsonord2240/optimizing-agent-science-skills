@@ -1,0 +1,264 @@
+{
+  "meta": {
+    "skill_name": "bio-crispr-screens-hit-calling",
+    "description": "Cross-method decision tree for calling hits in pooled CRISPR screens. Catalogs statistical models (MAGeCK RRA, MAGeCK MLE, BAGEL2, drugZ, JACKS, Chronos, CERES), experimental designs each is built for, failure modes outside design domain, reconciliation when methods disagree, multiple-testing and effect-size thresholds, the order of operations, the second-best-sgRNA conservative rule, and consensus-hit strategy.",
+    "evaluated_on": "2026-09-16",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 9,
+    "source": "mrsonord2240/bioSkills@6847328:crispr-screens/hit-calling",
+    "re_audit_note": "Re-audit of a fixed Skill per process/AUDIT_BRIEF.md. Pre-fix report archived at F:\\OpenScience\\audits\\_pre-fix-20260916\\bio-crispr-screens-hit-calling\\ (final 78, Limited Release). Fix log: F:\\optimizing-agent-science-skills\\fixes\\bio-crispr-screens-hit-calling.md (commit e22f956, merged into 6847328). Inputs 1-7 are regression tests of the pre-fix audit's own inputs, re-run against the fixed Skill on the same real HAP1 TKOv3 data; Inputs 8-9 are new, added by this auditor to independently test the fix log's two central claims (cross-implementation consistency, comparability-check sensitivity AND specificity)."
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All citations (Li 2014/2015, Kim & Hart 2021, Colic 2019, Allen 2019, Dempster 2021, Meyers 2017, Hart 2016/2017) match known CRISPR-screen literature; no fabricated DOI/PMID/statistics in any of the 9 outputs. All numeric results in this audit trace to real MAGeCK/BAGEL2/drugZ files or code executed for this re-audit (mageck_hap1.gene_summary.txt, mageck_hap1.sgrna_summary.txt, bayes_factor.txt, bayes_factor_rep2.txt, drugz_drug_output.txt, CEGv2.txt, NEGv1.txt)." },
+      "practice_boundaries": { "result": "PASS", "detail": "Purely gene-level/screen-level research analysis across all 9 outputs; no diagnostic or prescriptive claim about any individual; no disclaimer required for this research-only scope." },
+      "methodological_ground": { "result": "PASS", "detail": "The three methodological gaps that were open pre-fix (Spearman sign/scale inversion, same-method rerun non-determinism, mismatched-design empty-consensus) are now documented in the Skill's own files and independently reproduced by this audit's Inputs 4, 6, 5, 7, 9. No output in this audit asserted an inverted, non-reproducible, or fallacious conclusion -- each correctly used the Skill's now-corrected guidance." },
+      "code_usability": { "result": "PASS", "detail": "All 3 Python code blocks in SKILL.md (consensus_hits + _check_comparable, second_best_lfc, custom_zscore_hit_calling) parse and, where exercised (the first two), run cleanly on real data. examples/consensus_hits.py ran unmodified against real HAP1 TKOv3 output. Both consensus_hits() implementations independently verified to produce byte-identical mageck_hit/bagel_hit calls on the same real input (Input 8)." }
+    }
+  },
+  "static_score": {
+    "subtotal": 87,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 11, "max": 12, "note": "The frontmatter's 'interpreting unstable hit lists across reruns' promise, absent from the body pre-fix, is now covered directly (Reconciliation table row, Common Errors row, usage-guide.md Tips) -- verified by grep in Input 6. The three previously-conflicting MAGeCK-FDR/BAGEL-BF threshold pairs are now unified on FDR<0.05/BF>6 everywhere, verified identical on real data (Inputs 1, 8)." },
+      "reliability": { "score": 10, "max": 12, "note": "Same-method rerun instability (BAGEL2) and cross-design file merges, both undocumented pre-fix, now have explicit Reconciliation/Common Errors rows with concrete fixes (fixed seed; _check_comparable()). Between-method disagreement was already well covered and remains so." },
+      "performance_context": { "score": 7, "max": 8, "note": "SKILL.md grew from 279 to 368 lines and usage-guide.md to 134 lines (new sections for the Spearman caution, comparability check, and threshold unification); still a single file with no references/ split despite the growth -- the open P2 from the pre-fix audit." },
+      "agent_usability": { "score": 14, "max": 16, "note": "Threshold inconsistency (a Consistency defect) is resolved and independently verified byte-identical across both code paths (Input 8). Both previously-unaddressed pitfalls (rerun instability, mismatched-design merge) now have explicit preventive guidance (Error Prevention), verified to fire correctly on real mismatched data and stay silent on real matched data (Inputs 5, 9)." },
+      "human_usability": { "score": 7, "max": 8, "note": "Unchanged from pre-fix: natural trigger phrasing throughout Quick Start and Example Prompts; advisory (non-CLI) nature is inherently forgiving of input variation." },
+      "security": { "score": 11, "max": 12, "note": "Unchanged from pre-fix: no credentials, no injection vectors; example code snippets still do no column/schema validation before use, so a malformed input file would raise a raw KeyError rather than a clear message -- not addressed by this fix pass." },
+      "maintainability": { "score": 10, "max": 12, "note": "The pre-fix audit's concrete maintainability failure -- duplicated consensus logic with drifted defaults between SKILL.md's inline function and examples/consensus_hits.py -- is now demonstrably fixed: Input 8 independently re-derived both implementations' hit calls from source and found them byte-identical (0 mismatches) on 18,056 real genes. Testability improved correspondingly; modularity is unchanged (still no references/ split)." },
+      "agent_specific": { "score": 17, "max": 20, "note": "Escape Hatches materially improved: the new _check_comparable() runtime check is not just documented but independently verified to fire on a genuinely mismatched pair (Input 5, both WARNING lines reproduced) and stay silent on two genuinely matched pairs (Input 9, both BAGEL2-rerun and MAGeCK+BAGEL2 cases) -- a real sensitivity-and-specificity result, not just a docstring claim. Idempotency guidance is now explicit and cites verified real numbers. Trigger Precision and Composability unchanged." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 91.4,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 43, "total": 43 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "2-method MAGeCK+BAGEL2 consensus via examples/consensus_hits.py, real HAP1 TKOv3 data, validated against CEGv2/NEGv1 (regression of pre-fix Input 1)",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Ran examples/consensus_hits.py unmodified (no threshold override needed -- its own hardcoded default is now FDR<0.05/BF>6). 844 consensus genes, 374/684 CEGv2 hits, 0 NEGv1 hits, precision=1.000 -- identical to the pre-fix audit's own figures, confirming no regression from the fix.",
+        "basic": 38,
+        "specialized": 55,
+        "total": 93,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "examples/consensus_hits.py's own hardcoded default now matches the Quantitative Thresholds table (FDR<0.05, BF>6) without any override needed", "result": "PASS", "note": "Script's source (re-read from the fork) hardcodes 0.05/6 directly, citing the table in a comment." },
+          { "text": "Consensus hit list is validated against an independent ground truth (CEGv2/NEGv1)", "result": "PASS", "note": "844 genes: 374 CEGv2 hits, 0 NEGv1 hits, precision=1.000 -- exact match to pre-fix figures." },
+          { "text": "No fabricated statistics; all values trace to real MAGeCK/BAGEL2 output files", "result": "PASS", "note": "Both input files are unmodified real HAP1 TKOv3 audit outputs." },
+          { "text": "Output stays within cross-method reconciliation scope, no individual-level claims", "result": "PASS", "note": "Purely gene/screen-level statistics." }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Method selection for a 5-cell-line cancer panel (Chronos vs MAGeCK MLE vs JACKS) (regression of pre-fix Input 2)",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Verbatim usage-guide.md example prompt, unchanged by the fix. Decision Tree table still gives one unambiguous, correctly-justified answer (Chronos primary, MAGeCK MLE per-line secondary, JACKS correctly ruled out).",
+        "basic": 36,
+        "specialized": 48,
+        "total": 84,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Recommended primary method traces to an exact SKILL.md table cell, not invented", "result": "PASS", "note": "Decision Tree row 'Multi-cell-line panel (cancer dependency)' -> Chronos, unchanged text." },
+          { "text": "JACKS is correctly ruled out for this design with cited reasoning", "result": "PASS", "note": "JACKS row 'Multi-screen joint, same library'; 'Fails when: Single screen'." },
+          { "text": "Response flags the copy-number-correction requirement per the Order of Operations table", "result": "PASS", "note": "Cited step 7 preceding step 9, unchanged." },
+          { "text": "Response does not overstate confidence beyond what SKILL.md's tables support", "result": "PASS", "note": "All claims quote or paraphrase an exact table cell." }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Variant B",
+        "label": "Second-best-sgRNA rule on real MAGeCK sgrna_summary.txt, including 231 real single-guide genes this dataset actually contains (regression of pre-fix Input 3, strengthened)",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "The pre-fix audit's own assumption that TKOv3 is uniformly 4 guides/gene turned out to be wrong on the real file: 231/18,056 genes have exactly 1 guide. This makes the P2 fix (NaN + single_guide=True instead of a silent pass) verifiable against real data, not only synthetic data. All 231 real single-guide genes correctly return NaN; a synthetic case (a constructed 1-guide gene mixed with 3 real multi-guide genes) confirms the same behavior.",
+        "basic": 37,
+        "specialized": 55,
+        "total": 92,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "second_best_lfc() executes without error on real MAGeCK sgrna_summary.txt (18,056 genes)", "result": "PASS", "note": "Ran on all 18,056 genes, 71,090 sgRNA rows." },
+          { "text": "Real single-guide genes in this library return NaN + single_guide=True, not a silent pass", "result": "PASS", "note": "231/18,056 real genes have exactly 1 guide; all 231 correctly return NaN (REGRESSION target of the P2 fix, now verified on real data)." },
+          { "text": "Multi-guide genes are unaffected by the fix (no regression)", "result": "PASS", "note": "17,825 multi-guide genes all get a real, non-NaN second-best LFC." },
+          { "text": "None of Input 1's 844 real Tier-1 consensus genes are single-guide-driven false passes", "result": "PASS", "note": "Cross-checked: 0 of the 844 consensus genes are single-guide in this library." },
+          { "text": "Output stays in scope as a guide-level QC flag, not a diagnostic claim", "result": "PASS", "note": "No claims beyond guide-level statistics." }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Edge",
+        "label": "Spearman rho audit between MAGeCK neg|score and BAGEL2 BF, usage-guide.md's own (now-corrected) prompt (regression of pre-fix Input 4)",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Naive rho=-0.806, sign-corrected rho=+0.806 on real HAP1 TKOv3 data (n=18,053) -- identical to pre-fix. The single pre-fix assertion FAIL (prompt insufficient on its own) is now a PASS: usage-guide.md's Multi-Method Consensus prompt explicitly says to sign-correct first, and SKILL.md has a dedicated 'Correlating MAGeCK and BAGEL2 Scores' section with the exact worked numbers.",
+        "basic": 38,
+        "specialized": 54,
+        "total": 92,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Spearman rho is computed correctly with real values reported", "result": "PASS", "note": "rho=-0.8057 naive, +0.8057 sign-corrected, both p~0, n=18,053." },
+          { "text": "Output distinguishes a sign/scale mismatch from genuine method disagreement", "result": "PASS", "note": "Explicit sign-flip explanation." },
+          { "text": "usage-guide.md's own worked prompt is now sufficient on its own, without outside statistical knowledge, to reach the correct conclusion", "result": "PASS", "note": "REGRESSION check: this FAILED pre-fix. Now usage-guide.md's Multi-Method Consensus prompt explicitly instructs sign-correcting (-neg|score) before thresholding rho." },
+          { "text": "SKILL.md contains a dedicated, worked-example section for this pitfall, not just a passing mention", "result": "PASS", "note": "'Correlating MAGeCK and BAGEL2 Scores' section, verified present by direct read and grep, with the exact -0.806/+0.806 figures." },
+          { "text": "Output avoids overstating 'the methods disagree' without verification", "result": "PASS", "note": "Correctly concludes the methods agree once sign-corrected." }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "3-method consensus from real but mismatched essentiality + drug-response files, now with the _check_comparable() fix active (regression of pre-fix Input 5)",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "consensus_hits() (inline SKILL.md version) ran on real MAGeCK+BAGEL2+drugZ data; the pre-fix empty (0-gene) Tier-1 result is unchanged, but the Skill's own code now WARNS about it: two WARNING lines fire (mageck_hit vs drugz_hit, bagel_hit vs drugz_hit), both p=1.000, exactly the mismatched-comparison signature the fix log describes. The pre-fix assertion FAIL (no such check existed) is now a PASS.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "3-method merge code executes without error", "result": "PASS", "note": "Ran on 18,056 merged genes via the inline consensus_hits()." },
+          { "text": "_check_comparable() fires a warning naming the mismatched drugZ column specifically", "result": "PASS", "note": "REGRESSION check: FAILED pre-fix (no such check existed). Now prints 2 WARNING lines naming 'drugz_hit' explicitly, p=1.000 both." },
+          { "text": "Output checks whether 'consensus' genes are genuine planted drug-response hits vs. coincidental overlap", "result": "PASS", "note": "Cross-checked against drugz_ground_truth.txt's 13 planted genes; 0 overlap with the 844 MAGeCK+BAGEL2 agreement genes." },
+          { "text": "Output identifies the root cause (mismatched experimental designs) rather than accepting the empty result at face value", "result": "PASS", "note": "Both the printed warning and the audit's own interpretation flag this as a same-comparison violation, not a biology finding." },
+          { "text": "Output does not claim these are real chemogenomic hits ready for validation", "result": "PASS", "note": "Explicitly flagged as a methodological artifact." }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "BAGEL2 non-determinism across two identical reruns, now documented in the Skill's own files (regression of pre-fix Input 6)",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Reproduces the pre-fix figures exactly: max BF diff 26.72, 33/18,053 genes flip across BF>6. Post-fix, SKILL.md and usage-guide.md both now state the seed fix and the real 26.7/33 figures directly, not only by cross-link -- the pre-fix FAIL assertion ('derivable from this Skill's own text alone') now passes. The cross-link to bagel-essentiality's 'Reproducibility: Fixing the Random Seed' section was independently checked and is accurate.",
+        "basic": 37,
+        "specialized": 53,
+        "total": 90,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Determinism check uses two independent real BAGEL2 runs, not simulated data", "result": "PASS", "note": "bayes_factor.txt and bayes_factor_rep2.txt, both real outputs." },
+          { "text": "Quantified magnitude matches the independently-verified bagel-essentiality audit finding", "result": "PASS", "note": "Max diff 26.72, 33 flips -- exact match." },
+          { "text": "SKILL.md and usage-guide.md now state seed/determinism guidance directly, not only via cross-link", "result": "PASS", "note": "REGRESSION check: FAILED pre-fix. Both files now grep-confirmed to contain '-s <int>'/'unseeded'/the 26.7 figure directly." },
+          { "text": "Output ties the gap explicitly to the Skill's own frontmatter promise", "result": "PASS", "note": "Frontmatter's 'interpreting unstable hit lists across reruns' phrase is now substantively covered in the body (not verbatim-repeated, but the concept is addressed)." },
+          { "text": "The cross-link to bagel-essentiality's Reproducibility section is accurate, not just present", "result": "PASS", "note": "Independently opened bagel-essentiality/SKILL.md: the named section exists and states matching 26.7/33 figures." }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Empty 3-method consensus (grounded in this audit's own Input 5) -- is this a QC problem, now with the updated Failure Modes table (regression of pre-fix Input 7)",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Post-fix, the Failure Modes 'Consensus across 3 methods is empty' Trigger line and the Common Errors table both now name mismatched-comparison as a cause alongside screen quality. The pre-fix FAIL assertion (self-contained diagnosability) now passes -- assertion pass rate improved from 4/5 to 5/5.",
+        "basic": 38,
+        "specialized": 55,
+        "total": 93,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Scenario is grounded in a real executed result (this audit's Input 5), not invented", "result": "PASS", "note": "Uses Input 5's actual 0/848/1774/6-hit counts." },
+          { "text": "Output correctly identifies that a literal 'screen quality' reading would misdirect toward a nonexistent QC problem", "result": "PASS", "note": "Cross-referenced Input 1's 100% CEGv2/NEGv1 precision." },
+          { "text": "Output verifies screen quality using Input 1's own numbers before ruling out 'low quality' as the cause", "result": "PASS", "note": "Explicit 374/684 CEGv2, 0/419 NEGv1 citation." },
+          { "text": "The key diagnostic insight (mismatched experimental designs) is derivable from hit-calling's own SKILL.md/usage-guide.md text alone", "result": "PASS", "note": "REGRESSION check: FAILED pre-fix. Failure Modes' Trigger line and Common Errors table both now name it directly." },
+          { "text": "Output stops short of any diagnostic/prescriptive claim about the screen or the researcher", "result": "PASS", "note": "Framed entirely as a methodological/QC discussion." }
+        ]
+      },
+      {
+        "index": 8,
+        "type": "Consistency Check (new, auditor-added)",
+        "label": "Do the inline SKILL.md consensus_hits() and examples/consensus_hits.py produce identical hit calls on the same real data?",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Directly targets the fix log's central claim ('both code paths now give 844 Tier-1 hits'). Independently re-derived both implementations' mageck_hit/bagel_hit boolean columns from the fork's actual source (not trusting the fix log) and compared across all 18,056 real genes: 0 mismatches on either column, both give a 2-method consensus of 844.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "mageck_hit (FDR<0.05) is identical between the inline function and the example script", "result": "PASS", "note": "0/18,056 mismatches." },
+          { "text": "bagel_hit (BF>6) is identical between the inline function and the example script", "result": "PASS", "note": "0/18,056 mismatches." },
+          { "text": "The resulting 2-method consensus count is identical between implementations", "result": "PASS", "note": "Both give 844, matching Input 1 exactly." },
+          { "text": "The comparison is done independently -- re-deriving thresholds from each file's actual source, not re-using one implementation's output as ground truth for the other", "result": "PASS", "note": "Implementation A called via lib_consensus_inline.py (transcribed from SKILL.md); Implementation B run as its own subprocess, then its threshold logic independently re-applied from its own source lines." },
+          { "text": "No fabricated or assumed agreement -- the comparison is a real boolean equality check on real data, not a narrative claim", "result": "PASS", "note": "pandas boolean Series equality across the full 18,056-gene index." }
+        ]
+      },
+      {
+        "index": 9,
+        "type": "Specificity Check (new, auditor-added)",
+        "label": "Does _check_comparable() stay silent on genuinely matched pairs, or does it over-fire (false positive)?",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Complements Input 5's sensitivity result (fires correctly on mismatched data) with the specificity half: tested on two real BAGEL2 reruns (bayes_factor.txt vs bayes_factor_rep2.txt, same comparison, same design) and on real MAGeCK vs real BAGEL2 (same HAP1 TKOv3 comparison). Neither genuinely-matched pair triggered a false-positive warning.",
+        "basic": 37,
+        "specialized": 54,
+        "total": 91,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "_check_comparable() does not fire on two real BAGEL2 reruns of the same comparison (BF>6 hit-set overlap)", "result": "PASS", "note": "1774 rep1 hits, 1785 rep2 hits, 1763 overlap -- no warning." },
+          { "text": "_check_comparable() does not fire on the real matched MAGeCK+BAGEL2 pair used end-to-end in Input 1", "result": "PASS", "note": "Called directly on the same merged frame Input 1 used; no warning, consistent with Input 1's clean stdout." },
+          { "text": "The test is a genuine negative control, distinct from Input 5's positive control (different data pairing, not a restatement)", "result": "PASS", "note": "Input 5 tests essentiality-vs-drug-response (mismatched); this tests essentiality-vs-essentiality reruns and essentiality-vs-essentiality cross-method (both matched)." },
+          { "text": "Output reports real overlap counts, not just a pass/fail boolean", "result": "PASS", "note": "1774/1785/1763 printed for the rerun case." },
+          { "text": "Together with Input 5, this establishes both sensitivity and specificity for the check, not just one direction", "result": "PASS", "note": "Input 5 = true positive (fires on mismatched); Input 9 = true negative (silent on matched)." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 34.8,
+    "dynamic_weighted": 54.8,
+    "score": 90,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "\u2b50",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "All four pre-fix P1s are independently re-verified fixed on real data, not just trusted from the fix log: threshold unification (Input 8, byte-identical implementations), BAGEL2 rerun-instability documentation (Input 6), the MAGeCK/BAGEL2 sign-inversion caution (Input 4), and the mismatched-design comparability check (Inputs 5 and 9, both sensitivity and specificity confirmed).",
+    "The new _check_comparable() function is not just documented -- it is a real, runnable statistical check (hypergeometric overlap enrichment) that correctly distinguishes genuine mismatched-comparison merges from genuine method disagreement on real screen data.",
+    "consensus_hits() and second_best_lfc() run out-of-the-box, unmodified, on real HAP1 TKOv3 data; the P2 single-guide-gene fix was validated against 231 real single-guide genes this dataset actually contains, not only a synthetic case.",
+    "Correctly stays within research scope throughout: no diagnostic, prescriptive, or individual-level claims in any of the 9 outputs; no fabricated citations or statistics found."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "usage-guide.md's Prerequisites section has a confusing duplicated drugZ install line",
+      "observed_in": [],
+      "problem": "The comment '# drugZ via PyPI or GitHub' is followed by 'git clone .../drugz', then '# or', then the identical 'git clone .../drugz' line again -- no actual PyPI install command is shown despite the comment claiming one exists, and the two git-clone lines are byte-identical.",
+      "root_cause": "Copy-paste leftover in the Prerequisites code block, not touched by this fix pass (pre-existing, unrelated to the four P1s that were fixed).",
+      "fix": "Either remove the false 'via PyPI' claim (drugZ is not on PyPI, per the block's own other comments) or replace the duplicate second git-clone line with the actual `pip install drugz` command if one now exists upstream."
+    },
+    {
+      "priority": "P2",
+      "title": "No references/ split for the dense 7-method comparison tables (carried over from the pre-fix audit)",
+      "observed_in": [],
+      "problem": "SKILL.md grew from 279 to 368 lines in this fix pass (new Spearman-correction section, comparability check, unified thresholds note) with no references/ subfolder, making an already-dense single file denser.",
+      "root_cause": "No references/ subfolder exists for this Skill; the fix log explicitly left this unaddressed as a P2, judging the reorg risk not worth it for a Skill 7 points from its floor at the time.",
+      "fix": "Now that the Skill clears the floor, revisit splitting the Statistical Models Compared / Algorithmic Taxonomy tables into references/method-catalog.md, keeping SKILL.md focused on the decision tree, reconciliation, and the newer sign/comparability guidance."
+    }
+  ]
+}

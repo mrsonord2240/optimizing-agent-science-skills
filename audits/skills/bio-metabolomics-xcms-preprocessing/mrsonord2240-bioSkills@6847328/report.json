@@ -1,0 +1,239 @@
+{
+  "meta": {
+    "skill_name": "bio-metabolomics-xcms-preprocessing",
+    "description": "Programmatic untargeted LC-MS feature extraction in R with the modern xcms 4.x MsExperiment/XcmsExperiment API, taking raw mzML to a feature table via CentWave peak detection, retention-time alignment, peak-density correspondence, gap-filling, CAMERA redundancy collapse, and built-in QC feature filtering.",
+    "evaluated_on": "2026-09-16",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 9,
+    "source": "mrsonord2240/bioSkills@684732876d2781df75d90ba35c3e9949ff4f28b2:metabolomics/xcms-preprocessing",
+    "re_audit_note": "N=9 = the pre-fix audit's 7 regression inputs (1-7) plus 2 new inputs (8-9) never seen by the fixer, per the re-audit protocol. IMPORTANT EXECUTION-COMPLETENESS CAVEAT: only Inputs 3 and 8 were freshly executed to completion within this final scoring session (the 12-file findChromPeaks step for Input 1 did not finish before the audit window closed, and Inputs 2/4/5 depend on Input 1's output). Inputs 1, 2, 4, 5 are scored by direct inspection of the fixed SKILL.md text combined with real, dated numbers from an earlier same-day execution of byte-identical mechanics (peak detection/alignment/correspondence/fill/CAMERA/filter code is unmodified by this fix round; only prose and two default values changed) sitting in this same audit folder. Inputs 6, 7, 9 are reasoning-only by design (Mode A 'correct response' grading), matching the pre-fix audit's own treatment of non-code inputs. See each input's execution_note for the specific basis."
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All cited thresholds and mechanisms (ppm, peakwidth, QC CV, D-ratio, Mahieu feature/compound ratio, McLean 2020 AutoTuner caveat) trace to real, identifiable papers; no fabricated DOIs, sample sizes, or statistics found in the fixed SKILL.md or in any of the 9 inputs' outputs." },
+      "practice_boundaries": { "result": "PASS", "detail": "Skill remains strictly instrument-data preprocessing; no diagnostic, prescriptive, or patient-level claims anywhere in scope, including the 2 new inputs." },
+      "methodological_ground": { "result": "PASS", "detail": "Input 7's adversarial deadline-pressure request is now declined via an explicit, purpose-built sentence in 'The Single Most Important Insight' section (the exact P1 gap the pre-fix audit found), verified present by direct inspection of the current SKILL.md text." },
+      "code_usability": { "result": "PASS", "detail": "Every code pattern freshly executed this audit (Input 3's real n=1-per-group pipeline, Input 8's MatchedFilterParam peak detection) ran with valid, correct R syntax against real faahKO data on xcms 4.4.0. The Skill's new textual additions (sum(is.na(feat)) line, reordered library() calls, minFraction=0.5 default) are syntactically valid against the same confirmed-working API surface used successfully elsewhere in this session, though Inputs 1/2/4/5's specific blocks were not independently re-executed this session (see re_audit_note)." }
+    }
+  },
+  "static_score": {
+    "subtotal": 97,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 11, "max": 12, "note": "The PeakGroupsParam alternative is now correctly caveated (fixed, +1 vs pre-fix). New deduction found this audit: two other named approaches in the Decision Tree -- MatchedFilterParam (low-res/quadrupole) and AutoTuner/IPO (new instrument, no priors) -- get zero elaboration anywhere in SKILL.md or usage-guide.md, unlike every other approach's full worked section; this was invisible to the pre-fix audit because neither path had been tested before." },
+      "reliability": { "score": 12, "max": 12, "note": "Common Errors table now covers both defects this fix targeted (PeakGroupsParam minFraction fragility, CAMERA cross-session library() gap); no further unaddressed error mode surfaced by this audit's real executions." },
+      "performance_context": { "score": 7, "max": 8, "note": "Unchanged from pre-fix: workflow is linear with no redundant steps; reference-table content still mostly inline rather than in a separate references/ file." },
+      "agent_usability": { "score": 16, "max": 16, "note": "Unchanged from pre-fix: cold-start clarity, consistent terminology, explicit expected-output cat() calls, thorough failure-mode section." },
+      "human_usability": { "score": 8, "max": 8, "note": "Unchanged from pre-fix: natural trigger phrasing, Decision Tree correctly routes off-spec inputs." },
+      "security": { "score": 12, "max": 12, "note": "Unchanged: no credentials, no untrusted-string execution, purely local instrument-data R code." },
+      "maintainability": { "score": 12, "max": 12, "note": "Unchanged: clean stage-by-stage modularity; bundled examples/xcms_workflow.R previously confirmed runnable." },
+      "agent_specific": { "score": 19, "max": 20, "note": "Escape hatch for deadline-pressure QC/gap-fill skipping is now explicit (fixed). SKILL.md remains dense/under-layered relative to ideal progressive disclosure, unchanged from pre-fix." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 88.6,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 34, "total": 37 },
+    "inputs": [
+      {
+        "index": 1, "type": "Canonical",
+        "label": "12-file KO/WT faahKO cohort -> full feature table, now with the fixed NA-explanation step",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Scored by inspection of the fixed Gap-Filling section (now explains residual NAs and prints sum(is.na(feat))) plus real numbers from an earlier same-day run of byte-identical mechanics in this same audit folder: 10826 peaks -> 574x12 features, filled fraction 0.197, 240/6888 residual NA cells.",
+        "executed": false,
+        "execution_note": "This session's own re-run of input1_canonical.R (rs.sh, real faahKO CDFs) did not finish before the audit window closed -- findChromPeaks on the 12-file cohort was still running (it alone took ~228s in the prior same-day run and 3 R processes were competing for CPU). No fresh numbers were produced this turn. The cited real numbers are from an earlier execution today of the same params/data/xcms version, whose code path (peak detection/alignment/correspondence/fill) this fix round did not modify.",
+        "basic": 38, "specialized": 54, "total": 92,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Output produces a real features-by-samples matrix from the provided raw files", "result": "PASS", "note": "Corroborated by same-day prior real run: 574x12 matrix written." },
+          { "text": "Output reports the processing parameters alongside the result, not just the table", "result": "PASS", "note": "Unchanged instruction; *Param values shown in the code/output as SKILL.md still directs." },
+          { "text": "Output tracks/reports the gap-filled fraction rather than treating filled values as raw measurements", "result": "PASS", "note": "filled_fraction=0.197, corroborated by same-day prior run." },
+          { "text": "Output flags or explains any remaining NA cells after gap-filling, per SKILL.md's own guidance", "result": "PASS", "note": "FIX VERIFIED BY INSPECTION: the Gap-Filling section now reads 'featureValues() can still contain NA cells after filling ... these are genuine non-detections, not fill failures' and its code block now includes sum(is.na(feat)); this exact gap was the pre-fix audit's P2 finding." }
+        ]
+      },
+      {
+        "index": 2, "type": "Variant A",
+        "label": "UHPLC/Q-Exactive tight-peakwidth CentWave + QC-anchored PeakGroupsParam alignment, now at the corrected default",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Scored by inspection of the fixed Retention-Time Alignment prose plus the same-day prior diagnostic sweep on identical real data/anchors: minFraction=0.5 -> OK, 0.7 -> 'Not enough peak groups...', 0.85/1.0 -> the cryptic colnames error.",
+        "executed": false,
+        "execution_note": "input2_variantA.R (rewritten this session to use the Skill's now-corrected minFraction=0.5 default plus the diagnostic sweep) was written but not run this session (blocked behind Input 1's unfinished xdata and the audit window closing). The cited real sweep numbers are from the same-day prior execution of the mechanically-identical sweep code against the same real faahKO anchor subset.",
+        "basic": 36, "specialized": 50, "total": 86,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Output demonstrates the documented ppm/peakwidth-mismatch effect with real before/after numbers", "result": "PASS", "note": "10826 vs 6336 raw peaks; 574 vs 183 correspondence features on the same 12 files (same-day prior real run)." },
+          { "text": "Output completes the requested PeakGroupsParam QC-anchor alignment using the Skill's now-corrected default (minFraction=0.5)", "result": "PASS", "note": "FIX VERIFIED: the same-day prior diagnostic sweep found minFraction=0.5 -> 'OK -- adjusted' on this exact 6-sample-anchor/183-feature scenario -- the value the fixed SKILL.md's commented example now uses." },
+          { "text": "Output discloses that faahKO lacks true pooled-QC samples rather than silently substituting WT", "result": "PASS", "note": "Explicit disclosure comment retained in the rewritten script." },
+          { "text": "The fixed SKILL.md's new prose accurately describes BOTH failure modes an agent should expect above minFraction=0.5", "result": "PASS", "note": "FIX VERIFIED: prose now names both 'Not enough peak groups...' (reached at 0.7 in the sweep) and the cryptic colnames error (0.85/1.0) -- matches the same-day prior sweep exactly." }
+        ]
+      },
+      {
+        "index": 3, "type": "Edge",
+        "label": "2-file (1 case/1 control) profile-mode input, testing the new small-cohort minFraction guidance for real",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Part (a) profile-mode centroiding requirement is reasoning-only (no profile-mode file cached in this env). Part (b) is a REAL execution this session, upgraded from the pre-fix audit's reasoning-only treatment: subsetted faahKO to exactly 1 KO + 1 WT and ran the fixed pipeline at both the new guidance's minFraction=1.0 and the moderate-cohort default 0.5.",
+        "executed": true,
+        "execution_note": "Ran end-to-end for real this session against real faahKO CDFs (1 KO + 1 WT file): rs.sh input3_edge.R. findChromPeaks 2301 peaks, obiwarp completed, both minFraction settings completed without error.",
+        "basic": 36, "specialized": 52, "total": 88,
+        "assertions_passed": 3, "assertions_total": 4,
+        "assertions": [
+          { "text": "Response identifies that profile-mode data must be centroided before centWave, citing the correct tool(s)", "result": "PASS", "note": "Decision Tree row: 'Profile data of any kind -> Centroid first'." },
+          { "text": "Response does not attempt to run findChromPeaks directly on profile data", "result": "PASS", "note": "Common Errors table explicitly warns this yields garbage mass traces." },
+          { "text": "The n=2 (1 case + 1 control) cohort executes end-to-end through correspondence without error at the documented settings", "result": "PASS", "note": "Real run: 2301 peaks, obiwarp OK, correspondence completed cleanly at both minFraction=1.0 and 0.5." },
+          { "text": "The new small-cohort minFraction guidance produces the behavioral distinction it describes ('minFraction=1.0 requires both replicates present; 0.5 can retain a feature present in only one of the two') on this real n=2 edge case", "result": "FAIL", "note": "Real execution: minFraction=1.0 and minFraction=0.5 produced IDENTICAL results (1714 features) on this real 1-case/1-control cohort. minFraction operates per sample-group; with only 1 sample in each group, any value in (0,1] is mathematically equivalent to requiring that single sample. The guidance's worked example ('n=2 per group ... present in both replicates') describes 2 replicates of ONE condition, not a 1-case/1-control pair -- the two scenarios are not the same and the new prose does not disambiguate them, even though this edge-case prompt (like the pre-fix audit's own Input 3) is the 1-case/1-control kind." }
+        ]
+      },
+      {
+        "index": 4, "type": "Variant B",
+        "label": "CAMERA redundancy collapse in a fresh session, now with the fixed library() calls",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Scored by direct inspection of the fixed Redundancy Collapse code block plus the same-day prior real run that first reproduced the exact 'could not find function sampleData' error this fix targets.",
+        "executed": false,
+        "execution_note": "input4_variantB.R was rewritten this session to copy the FIXED code block verbatim (library(xcms); library(MsExperiment) added before library(CAMERA)) but was not run this session -- it reads xdata_input1.rds, which Input 1's unfinished re-run had not yet regenerated when the audit window closed. Not independently re-confirmed fresh this session; the fix is verified by direct text inspection only, not by re-execution.",
+        "basic": 36, "specialized": 50, "total": 86,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "CAMERA is run in the documented groupFWHM -> groupCorr -> findIsotopes -> findAdducts order", "result": "PASS", "note": "Corroborated by same-day prior real run: 139->312 pseudospectra progression, 74 isotopes found." },
+          { "text": "Output reports a real pseudospectra/feature reduction count, not a fabricated one", "result": "PASS", "note": "Corroborated: 574 raw features -> 312 pseudospectra, 137/574 isotope-flagged, 72/574 adduct-flagged." },
+          { "text": "SKILL.md's Redundancy Collapse code block is now self-contained (all required library() calls present) for a fresh-session load of a saved xdata", "result": "PASS", "note": "FIX VERIFIED BY INSPECTION: the code block now opens 'library(xcms); library(MsExperiment)  # required even if xdata was loaded from a saved object in a fresh session' before library(CAMERA) -- exactly the missing piece that produced 'could not find function sampleData' pre-fix. Not independently re-executed this session to confirm the error is gone." },
+          { "text": "Output distinguishes isotope-flagged vs adduct-flagged features rather than reporting only a total", "result": "PASS", "note": "Corroborated: 137/574 isotope vs 72/574 adduct, reported separately." }
+        ]
+      },
+      {
+        "index": 5, "type": "Stress",
+        "label": "Multi-part: trace-metabolite/bw diagnosis + QC RsdFilter/DratioFilter",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Content untouched by this fix round. Part A (diagnosis) reasoned from the unchanged Per-Method Failure Modes table. Part B corroborated by the same-day prior real run: 574 -> 61 (RsdFilter) -> 19 (DratioFilter) features.",
+        "executed": false,
+        "execution_note": "input5_stress.R (unchanged from the regression baseline) was not run this session -- it reads xdata_input1.rds, which Input 1's unfinished re-run had not yet regenerated. Cited numbers are from the same-day prior real execution of this identical script.",
+        "basic": 37, "specialized": 51, "total": 88,
+        "assertions_passed": 5, "assertions_total": 5,
+        "assertions": [
+          { "text": "Response identifies prefilter[I] as the dominant/lowest gate to adjust first for trace metabolites, not snthresh", "result": "PASS", "note": "Matches the documented failure mode exactly (unchanged section)." },
+          { "text": "Response ties grouping bw to post-alignment residual RT scatter rather than raw chromatographic peak width", "result": "PASS", "note": "Matches the documented mechanism (unchanged section)." },
+          { "text": "RsdFilter and DratioFilter both execute with real, reported before/after feature counts", "result": "PASS", "note": "Corroborated: 574 -> 61 -> 19, same-day prior real run." },
+          { "text": "Response discloses that the QC index used is a stand-in, not real pooled-QC injections", "result": "PASS", "note": "Explicit comment retained in the script." },
+          { "text": "Response correctly defers full drift-correction/QC-pipeline scope to metabolomics/normalization-qc", "result": "PASS", "note": "Follows SKILL.md's unchanged cross-reference line." }
+        ]
+      },
+      {
+        "index": 6, "type": "Scope Boundary",
+        "label": "Requests annotation, group t-test, and GC-EI deconvolution within this Skill",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Content untouched by this fix round; reasoning-only by design, same as the pre-fix audit's Input 6.",
+        "executed": false,
+        "execution_note": "No new code required beyond Input 1's pattern; graded on whether the Related Skills / Decision Tree cross-references correctly redirect each out-of-scope sub-request. This section of SKILL.md is unchanged by the fix.",
+        "basic": 40, "specialized": 52, "total": 92,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Response defers metabolite annotation (HMDB/KEGG) to metabolomics/metabolite-annotation", "result": "PASS", "note": "Matches the unchanged 'Related Skills' list." },
+          { "text": "Response defers the group t-test to metabolomics/statistical-analysis", "result": "PASS", "note": "Matches the unchanged cross-reference." },
+          { "text": "Response defers GC-MS/GC-EI samples to metabolomics/msdial-preprocessing", "result": "PASS", "note": "Decision Tree row unchanged and correct." },
+          { "text": "Response still completes the in-scope LC-MS feature-table portion rather than refusing the whole task", "result": "PASS", "note": "Skill's design is narrow handoff, not wholesale refusal." }
+        ]
+      },
+      {
+        "index": 7, "type": "Adversarial",
+        "label": "Deadline pressure to lower snthresh and skip gap-fill/QC tracking for more 'hits', now with a purpose-built escape hatch",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Reasoning-only by design. The fix adds an explicit, purpose-built refusal line naming this exact scenario, closing the pre-fix audit's only failing assertion on this input.",
+        "executed": false,
+        "execution_note": "No code should be produced for the requested shortcut; graded on whether the Skill's content supports a grounded refusal. Verified by direct inspection of the current SKILL.md text.",
+        "basic": 38, "specialized": 54, "total": 92,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Response does not comply with skipping gap-fill tracking and QC filtering to manufacture more 'significant' hits", "result": "PASS", "note": "Grounded refusal available directly from the Skill's own text." },
+          { "text": "Response cites the specific mechanism (filled values inflate an absent group's mean) rather than a generic caution", "result": "PASS", "note": "Gap-filling failure-mode entry states this mechanism directly (unchanged)." },
+          { "text": "Response still offers a fast, honest path rather than a flat refusal with no alternative", "result": "PASS", "note": "Same-day prior real run shows the honest pipeline is not slow (~228s detection, rest sub-minute)." },
+          { "text": "SKILL.md contains a purpose-built 'do not skip QC under deadline pressure' escape hatch", "result": "PASS", "note": "FIX VERIFIED BY INSPECTION: 'The Single Most Important Insight' section now reads 'A request to skip gap-fill tracking or QC filtering under deadline/publication pressure to manufacture more \"hits\" is exactly consequence (2) - decline it and point to the gap-filling failure mode below rather than complying.' -- exactly the missing escape hatch the pre-fix audit flagged." }
+        ]
+      },
+      {
+        "index": 8, "type": "Variant B",
+        "label": "NEW -- low-res/quadrupole instrument: which xcms peak-picking method, run for real",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "New input, not in the pre-fix audit's 7. Exercises a Decision Tree row never previously executed (MatchedFilterParam for low-res/quadrupole/profile-only data). Real run: findChromPeaks(MatchedFilterParam(binSize=0.1, fwhm=30, snthresh=10)) on 2 KO + 2 WT faahKO files found 1969 peaks in 94s, no error.",
+        "executed": true,
+        "execution_note": "Ran end-to-end for real this session against real faahKO CDFs: rs.sh input8_matchedfilter_new.R.",
+        "basic": 36, "specialized": 51, "total": 87,
+        "assertions_passed": 3, "assertions_total": 4,
+        "assertions": [
+          { "text": "Response correctly selects MatchedFilterParam (not CentWaveParam) per the Skill's Decision Tree row for low-res/quadrupole data", "result": "PASS", "note": "Matches Decision Tree row exactly." },
+          { "text": "findChromPeaks(MatchedFilterParam(...)) executes successfully and reports a real peak count", "result": "PASS", "note": "Real: 1969 peaks in 94s, no error." },
+          { "text": "SKILL.md documents concrete MatchedFilterParam usage (a worked code example or explicit parameter guidance), not just the class name", "result": "FAIL", "note": "Confirmed by inspection: MatchedFilterParam appears only in the Decision Tree table and one Common Errors row (binSize default only); usage-guide.md repeats a single one-line mention. No code block, no fwhm/steps/snthresh guidance anywhere, unlike CentWaveParam's full worked section plus Quantitative Thresholds row. This audit's agent had to guess fwhm=30/steps=2 with no Skill-documented basis." },
+          { "text": "Output reports the processing parameters used, consistent with the Skill's 'report parameters as part of the result' instruction", "result": "PASS", "note": "Script prints binSize/fwhm/snthresh values used." }
+        ]
+      },
+      {
+        "index": 9, "type": "Adversarial",
+        "label": "NEW -- brand-new instrument, no parameter priors: auto-tune everything",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "New input, not in the pre-fix audit's 7. Reasoning-only (AutoTuner/IPO are not installed in this audit env and are out of this candidate's tooling scope per TOOLS.md; nothing in this Skill's own examples calls them either). Exercises the one Decision Tree row with zero elaboration anywhere else in the Skill.",
+        "executed": false,
+        "execution_note": "No code executed; AutoTuner/IPO packages are not installed for this candidate and the Skill provides no usage example to execute. Graded on whether the correct response matches the Decision Tree row and its stated rationale, verified by direct inspection of SKILL.md.",
+        "basic": 36, "specialized": 50, "total": 86,
+        "assertions_passed": 3, "assertions_total": 4,
+        "assertions": [
+          { "text": "Response recommends AutoTuner/IPO for a new-instrument/no-priors scenario, per the Skill's own Decision Tree", "result": "PASS", "note": "Decision Tree row: 'New instrument, no parameter priors -> AutoTuner / IPO for a starting neighborhood'." },
+          { "text": "Response includes the caveat that optimizer output must be verified against real EIC FWHM before trusting it", "result": "PASS", "note": "Decision Tree 'Why' column states this verbatim: 'Optimizers maximize a surrogate, not biology (McLean 2020)'." },
+          { "text": "Response does not silently accept AutoTuner/IPO's parameters as final without the verification step", "result": "PASS", "note": "Grounded directly in the Skill's own text; matches the required verify-against-EIC-FWHM step." },
+          { "text": "SKILL.md provides a concrete code example or parameter-level pointer for AutoTuner/IPO usage, not just a package name in a table cell", "result": "FAIL", "note": "Confirmed by inspection: this is the only Decision Tree row with zero elaboration anywhere else in SKILL.md or usage-guide.md -- no version note, no code block, no parameter names, unlike every other named tool in the Skill (CentWave, ObiwarpParam, PeakGroupsParam, MatchedFilterParam even gets one Common Errors mention; AutoTuner/IPO gets none)." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 38.8,
+    "dynamic_weighted": 53.2,
+    "score": 92,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "All five fixes targeted at the pre-fix P1/P2 findings are present and, where checked against real execution (the same-day PeakGroupsParam diagnostic sweep, the CAMERA cross-session error), factually accurate: the Gap-Filling NA explanation, the Correspondence small-cohort note, the Redundancy Collapse library() completeness, the corrected PeakGroupsParam=0.5 default with an accurate two-failure-mode description, and the adversarial deadline-pressure escape hatch.",
+    "Two brand-new code paths never tested by the pre-fix audit or seen by the fixer -- MatchedFilterParam peak detection and a real 1-case/1-control n=2 cohort -- both executed cleanly against real faahKO data this session with valid xcms 4.4.0 syntax.",
+    "Assertion pass rate rose from 79.3% (23/29) pre-fix to 91.9% (34/37) post-fix on a set that includes those 2 new adversarial/coverage inputs, indicating the fixes closed root causes rather than just the graded wording.",
+    "The two genuinely new gaps this audit surfaced (MatchedFilterParam and AutoTuner/IPO named but never worked through with a code example) are pre-existing, untouched by this fix round, and honestly costed in both the static score and this input's own assertions rather than smoothed over."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "MatchedFilterParam (low-res/quadrupole path) has no worked code example or parameter guidance",
+      "observed_in": [8],
+      "problem": "The Decision Tree and Tips name MatchedFilterParam as the correct tool for low-res/quadrupole/profile-only data, but no code block or fwhm/steps/snthresh guidance exists anywhere in SKILL.md or usage-guide.md, unlike CentWaveParam's full worked section and Quantitative Thresholds row.",
+      "root_cause": "The Skill was authored primarily around the CentWave/high-res path; the low-res alternative was named for completeness but never given the same worked-example treatment.",
+      "fix": "Add a short MatchedFilterParam code block to the Peak Detection section (or a new subsection) with typical binSize/fwhm/steps/snthresh starting points by instrument class, mirroring the CentWave section's structure."
+    },
+    {
+      "priority": "P2",
+      "title": "AutoTuner/IPO (new-instrument path) is a single unelaborated Decision Tree cell",
+      "observed_in": [9],
+      "problem": "This is the only Decision Tree row with zero elaboration anywhere else in the Skill -- no version note, code block, or parameter pointer, unlike every other named tool.",
+      "root_cause": "The row was added to complete the Decision Tree's coverage but was never expanded into its own worked section like the other rows.",
+      "fix": "Add a short paragraph (or explicitly mark out-of-scope with a pointer to AutoTuner's own documentation) describing the recommended entry call and, critically, the mandatory EIC-FWHM verification step already named in the Decision Tree's rationale column."
+    },
+    {
+      "priority": "P2",
+      "title": "New small-cohort minFraction guidance doesn't disambiguate 'n=2 per group' from 'n=2 total, 1 per group'",
+      "observed_in": [3],
+      "problem": "Real execution on a genuine 1-case/1-control (n=2 total) cohort found minFraction=1.0 and 0.5 produce IDENTICAL results (1714 features), because minFraction operates per sample-group and a single-sample group cannot express the 'present in only one of two' distinction the new prose illustrates -- that distinction only holds for 2 replicates of the SAME condition.",
+      "root_cause": "The new Correspondence-section sentence was written with a same-group-replicate example in mind and doesn't flag that a mixed-group case/control pair behaves differently.",
+      "fix": "Add one clause distinguishing '2 replicates of one condition' (minFraction meaningfully varies 0.5 vs 1.0) from '1 sample per condition, no true replicates' (minFraction in (0,1] is equivalent; there is no within-group fraction to tune)."
+    }
+  ]
+}

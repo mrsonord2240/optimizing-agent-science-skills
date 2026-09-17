@@ -1,0 +1,13 @@
+# Fully isolated, minimal repro matching the fix log's described procedure exactly.
+suppressPackageStartupMessages({library(clusterProfiler); library(org.Hs.eg.db)})
+set.seed(42)
+all_entrez <- keys(org.Hs.eg.db, keytype = 'ENTREZID')
+universe_ids <- sample(all_entrez, 3000)
+gene_list <- sample(universe_ids, 200)
+ego_all <- enrichGO(gene_list, universe = universe_ids, OrgDb = org.Hs.eg.db, keyType = 'ENTREZID', ont = 'ALL', readable = TRUE)
+cat('class:', class(ego_all), '| ontology slot:', ego_all@ontology, '\n')
+d0 <- as.data.frame(ego_all)
+cat('pre-simplify:', nrow(d0), 'terms |', paste(names(table(d0$ONTOLOGY)), table(d0$ONTOLOGY), sep='=', collapse=', '), '\n')
+simp <- simplify(ego_all)
+d1 <- as.data.frame(simp)
+cat('post-simplify (defaults):', nrow(d1), 'terms |', paste(names(table(d1$ONTOLOGY)), table(d1$ONTOLOGY), sep='=', collapse=', '), '\n')

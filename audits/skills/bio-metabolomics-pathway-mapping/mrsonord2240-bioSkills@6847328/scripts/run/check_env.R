@@ -1,0 +1,7 @@
+cat("R version:", R.version.string, "\n")
+suppressMessages(library(MetaboAnalystR))
+cat("MetaboAnalystR:", as.character(packageVersion("MetaboAnalystR")), "\n")
+suppressMessages(library(KEGGREST))
+cat("KEGGREST:", as.character(packageVersion("KEGGREST")), "\n")
+suppressMessages(library(FELLA))
+cat("FELLA:", as.character(packageVersion("FELLA")), "\n")

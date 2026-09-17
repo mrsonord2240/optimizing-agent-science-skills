@@ -1,0 +1,245 @@
+{
+  "meta": {
+    "skill_name": "bio-metabolomics-msdial-preprocessing",
+    "description": "Runs the MS-DIAL preprocessing workflow (peak picking, MS2Dec spectral deconvolution, alignment, gap-filling) and imports the alignment-result table into R or Python with honest filtering. Use when preprocessing LC-MS DDA/DIA (SWATH) or GC-MS raw data with MS-DIAL, deciding MS-DIAL vs XCMS, configuring the MSDIALCUI console run, or parsing an MS-DIAL export into a clean feature matrix.",
+    "evaluated_on": "2026-09-16",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "mrsonord2240/bioSkills@684732876d2781df75d90ba35c3e9949ff4f28b2:metabolomics/msdial-preprocessing",
+    "re_audit_of": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:metabolomics/msdial-preprocessing (pre-fix report: 74, Beta Only -- archived at F:/OpenScience/audits/_pre-fix-20260916/bio-metabolomics-msdial-preprocessing/)",
+    "n_inputs_note": "5 inputs (1-5) are the pre-fix report's own inputs, re-run here as regression tests; inputs 6-7 are new, added per the re-audit brief so the score is not measured only against defects the fixer already knew about. Complexity is unchanged (Moderate scope) but N=7 to satisfy the regression+new-input requirement."
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All cited literature (Tsugawa 2015/2020/2024, Li 2018, Mahieu 2017, Broadhurst 2018, Stein 1999) are real, correctly attributed papers; no fabricated DOIs, PMIDs, sample sizes or effect sizes in any of the 7 outputs." },
+      "practice_boundaries": { "result": "N/A", "detail": "Preprocessing pipeline for aggregate metabolomics data; no individual-subject diagnostic or prescriptive content in any output." },
+      "methodological_ground": { "result": "PASS", "detail": "No methodological fallacies observed; correctly warns a marker list surviving only one pipeline is a candidate not a result; correctly defers QC-CV/D-ratio/imputation to normalization-qc." },
+      "code_usability": { "result": "PASS", "detail": "All R and Python code the Skill supplies (import, metadata/sample-column split, Fill% filter, MS/MS-support filter incl. the documented pandas bool-cast fix) ran correctly against REAL MS-DIAL 5.5.260820 console output produced by this audit (single- and 2-sample runs), not just synthetic fixtures. Cross-validated: the R and Python paths independently computed the identical MS/MS-assigned count (6887/16437) on the same real export." }
+    }
+  },
+  "static_score": {
+    "subtotal": 92,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 11, "max": 12, "note": "All previously-broken core claims (console binary/subcommand names, GC-MS support) are now independently confirmed correct against the real installed MSDIALCUI.exe 5.5.260820. Docked 1 pt: the console's own -t/--target flag and the metabolomics/targeted-analysis sibling Skill are never mentioned, and true DIA/SWATH deconvolution behavior (vs. just CSV-mechanism acceptance) remains unverified for lack of real ABF/DIA test data." },
+      "reliability": { "score": 11, "max": 12, "note": "Common Errors table now correctly covers the pandas True/False auto-bool-cast trap (fixed). Docked 1 pt: this audit independently discovered a param-file failure mode SKILL.md does not warn about -- a malformed Key=Value line is silently dropped (console falls back to built-in defaults with exit code 0, no warning) rather than erroring; verified by a controlled before/after feature-count comparison (11605 vs 13 features)." },
+      "performance_context": { "score": 7, "max": 8, "note": "SKILL.md (~260 lines) and usage-guide.md remain concise for the scope covered; one on-topic example script, correctly updated to match real output conventions." },
+      "agent_usability": { "score": 15, "max": 16, "note": "The internal inconsistency flagged pre-fix (commands vs. verification step) is resolved -- both now correctly point to MSDIALCUI.exe/lcms/gcms. Docked 1 pt for the same targeted-analysis / -t gap noted under Functional Suitability." },
+      "human_usability": { "score": 7, "max": 8, "note": "The missing 'When NOT to Use This Skill' section (pre-fix P2) is now present and correctly routes to xcms-preprocessing, lipidomics, metabolite-annotation, and normalization-qc. Docked 1 pt: it does not route targeted MRM/PRM/SRM panel requests to metabolomics/targeted-analysis." },
+      "security": { "score": 12, "max": 12, "note": "No credential handling, no eval/exec of raw strings, no destructive operations; all local file parsing. Unchanged from pre-fix." },
+      "maintainability": { "score": 11, "max": 12, "note": "CLI examples, parameter-file syntax, and output-file conventions are now independently re-validated against the real 5.5.260820 console by this audit (not just the fixer). Docked 1 pt for the two new gaps (targeted-mode omission, silent-failure warning) not yet folded back into the docs." },
+      "agent_specific": { "score": 18, "max": 20, "note": "Trigger precision, composability (explicit Related Skills), and escape hatches (Version Compatibility section) are now all correct rather than internally contradicted. Docked 2 pts for the targeted-analysis composability gap and the unflagged silent param-parsing failure mode, both found in this audit's new inputs (6-7)." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 90.7,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 25, "total": 29 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Build DDA console command, import real AlignResult into R, filter honestly",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "executed": true,
+        "execution_note": "Ran the real MSDIALCUI.exe 5.5.260820 (lcms subcommand, this audit's own Key: Value param file) end to end on a real LC-MS DDA mzML file, producing a genuine AlignResult-20269161955.mdalign (11605 features, 1 sample column). Then ran SKILL.md's R import + Fill% filter code verbatim against that real file (run/console_commands.sh Test D, run/input1_real_import_filter.R). All values ground-truth-checked programmatically, not just visually inspected.",
+        "note": "Every part of this input -- console command, R import, honest filter -- now runs correctly against real data; the pre-fix MsdialConsoleApp/lcmsdda defect is fully resolved.",
+        "basic": 38,
+        "specialized": 58,
+        "total": 96,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "The documented 'MSDIALCUI.exe lcms -i ... -o ... -m ...' command runs against the installed MS-DIAL console as written", "result": "PASS", "note": "Executed end to end; produced a real, complete alignment export." },
+          { "text": "SKILL.md instructs verifying the installed console's real subcommands before trusting the documented command", "result": "PASS", "note": "Version Compatibility section still says to run the console with no arguments first." },
+          { "text": "R import code correctly splits metadata columns from the per-sample intensity column on the REAL 36-column export", "result": "PASS", "note": "meta_cols found: 8, sample_cols found: 1, exactly matching the real file; storage.mode(intensity) <- numeric succeeded with no text-column leakage from the ~27 interleaved annotation/QC columns." },
+          { "text": "Fill% >= 0.70 filter keeps only features whose real Fill% truly meets the threshold", "result": "PASS", "note": "Real Fill% column confirmed 0-1-scaled (max <= 1.0); all 11605 real single-sample features have Fill%=1.00 and are correctly kept." },
+          { "text": "Real 'MS/MS assigned' values are exactly the documented {True, False} title-case text, not {TRUE, FALSE}", "result": "PASS", "note": "Confirmed on the real export: 6907 False / 4698 True (raw counts before any sample-count normalization)." }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "DIA/SWATH console command, ABF input requirement, and the per-file acquisition_type CSV mechanism",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "executed": true,
+        "execution_note": "Ran MSDIALCUI.exe lcms -i <filelist.csv> ... to completion (not just accept-without-error) using an auditor-authored 2-row CSV with an acquisition_type column, on 2 real LC-MS files (run/console_commands.sh Test E, run/filelist.csv). Both rows used DDA (no real DIA/ABF data was available in this environment, the same limitation the fixer recorded) -- so the CSV mechanism itself is executed and confirmed, but true DIA-specific MS2Dec deconvolution behavior is not.",
+        "note": "The CSV `-i` mechanism is no longer just 'accepted with no parse error' (the fix log's evidence level) -- it is confirmed here to run to a completed, real 2-sample alignment, and the CSV's file_name column is confirmed to control the output sample-column names (CondA/CondB, not the raw .mzML filenames).",
+        "basic": 37,
+        "specialized": 54,
+        "total": 91,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "lcms is the one real subcommand shared by DDA and DIA in the installed console", "result": "PASS", "note": "Confirmed via lcms --help; no separate lcmsdia token exists." },
+          { "text": "SKILL.md documents how DDA vs. DIA is actually distinguished in the real console (CSV acquisition_type column, not a console token)", "result": "PASS", "note": "Documented in 'Run MS-DIAL Headless'; this audit ran the mechanism to completion, going beyond the fixer's parse-only check." },
+          { "text": "The CSV -i file-list mechanism runs to a completed, real multi-sample alignment", "result": "PASS", "note": "16442-line real AlignResult produced; sample columns named CondA/CondB from the CSV's file_name column." },
+          { "text": "True DIA/SWATH acquisition (chimeric-spectra deconvolution) is empirically confirmed on real DIA data", "result": "FAIL", "note": "No real DIA/ABF data was available to this audit or the fixer; the ABF-only-input and MS2Dec-for-DIA claims remain sourced from the official tutorial and prose reasoning, not an executed DIA run." }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "GC-EI data on MS-DIAL 5 -- is GC-MS supported, and how does retention alignment work?",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "executed": true,
+        "execution_note": "Ran MSDIALCUI.exe gcms --help against the real installed console (run/console_commands.sh Test C), independently reconfirming the fixer's finding. No real GC-EI raw data was available in this environment (not listed in TOOLS.md's public data), so the full gcms processing pipeline itself was not executed end to end -- same limitation as the pre-fix and post-fix audits.",
+        "note": "The pre-fix 'MS-DIAL 5 excludes GC-MS' defect is fully resolved and independently reconfirmed; the only remaining gap is lack of real GC-EI test data, an environment limitation rather than a Skill defect.",
+        "basic": 36,
+        "specialized": 51,
+        "total": 87,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "gcms is a real, working subcommand in the installed MS-DIAL 5.5.260820 console", "result": "PASS", "note": "gcms --help prints a real -i/-o/-m/-p option list, matching SKILL.md exactly." },
+          { "text": "SKILL.md correctly explains why GC-EI deconvolution differs fundamentally from LC peak-picking", "result": "PASS", "note": "Accurate, sourced (Stein 1999 AMDIS) explanation, unchanged and correct." },
+          { "text": "SKILL.md correctly recommends retention-index (not raw RT) alignment for GC-EI cross-run comparability", "result": "PASS", "note": "Accurate and well-justified (column-aging RT drift rationale)." },
+          { "text": "The full GC-EI processing pipeline was executed end to end against real GC-MS data", "result": "FAIL", "note": "No real GC-EI raw data available in this audit environment; only the CLI surface (gcms --help) was executed." }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Parse a real MS-DIAL AlignResult export into pandas and map annotation tags to MSI levels",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "executed": true,
+        "execution_note": "Ran SKILL.md's Python import code, the documented buggy naive filter idiom, and the documented fix, verbatim, against the REAL 2-sample export (run/input4_real_python_import.py, ../data/AlignResult-real-multisample.mdalign) -- not a synthetic fixture as in the pre-fix and fix-log evidence.",
+        "note": "Strongest evidence in this audit: the pandas auto-bool-cast bug and its documented fix are both reproduced on real data, and the fixed Python count (6887) exactly matches an independently-computed R-side count on the same file.",
+        "basic": 39,
+        "specialized": 59,
+        "total": 98,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Python import code correctly separates metadata from sample intensity columns on the real 2-sample, 37-column export", "result": "PASS", "note": "sample_cols == ['CondA', 'CondB'] exactly; intensity.astype(float) succeeded with no text-column leakage." },
+          { "text": "The naive R-ported MS/MS-support check ('== \"True\"') silently evaluates to all-False on real data via pandas' auto-bool-cast", "result": "PASS", "note": "pandas dtype of the column is bool; naive check gave 0/16437 True, confirmed on real (not synthetic) data." },
+          { "text": "The documented fix (.astype(str).str.strip().str.lower() == 'true') recovers the correct MS/MS-support count", "result": "PASS", "note": "Fixed count 6887/16437 exactly matches the independently-computed R-side count from input5_real_multisample_filter.R on the same file." },
+          { "text": "Fill% >= 0.70 filter in Python keeps only truly-qualifying real features", "result": "PASS", "note": "9079/16437 kept, matching the R-side result exactly on the same real file." }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Full pipeline: MS-DIAL vs XCMS decision, real 2-sample console run, R import, filter, handoff to normalization-qc",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "executed": true,
+        "execution_note": "Ran the real 2-file CSV-driven console command (same run as Input 2) plus SKILL.md's R import + Fill% filter code verbatim against the resulting real 16437-feature, 2-sample export (run/input5_real_multisample_filter.R).",
+        "note": "Decision framework and scope discipline are unchanged and correct; the console-command defect from the pre-fix Input 1/5 is resolved and re-verified here on genuinely non-degenerate multi-sample data (Fill% in {0.50, 1.00}, not a single-sample-only 1.00).",
+        "basic": 38,
+        "specialized": 58,
+        "total": 96,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "SKILL.md gives a clear, defensible decision framework for MS-DIAL vs. XCMS", "result": "PASS", "note": "Comparison table plus 'Decision Tree by Scenario' table remain specific and actionable." },
+          { "text": "Full-pipeline console command runs against the installed console as documented", "result": "PASS", "note": "Real 2-sample run completed via the CSV mechanism; no MsdialConsoleApp/lcmsdda defect remains." },
+          { "text": "SKILL.md defers QC-CV/D-ratio/blank-filtering and MNAR-aware imputation to normalization-qc rather than reimplementing them inline", "result": "PASS", "note": "Explicit one-line handoff plus a sourced (Broadhurst 2018) reference table, unchanged." },
+          { "text": "R import + Fill% honest-filter portion of the full pipeline runs correctly end-to-end on real multi-sample data", "result": "PASS", "note": "9079/16437 features correctly kept at Fill%>=0.70, with an independent ground-truth check that every kept feature is truly Fill%=1.00 and every dropped feature is truly Fill%=0.50." },
+          { "text": "SKILL.md warns that a marker list surviving only one preprocessing pipeline is a candidate, not a validated result", "result": "PASS", "note": "Explicit, sourced (Li 2018) caveat present in the 'Single Most Important Insight' section, unchanged." }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "I have a targeted MRM/QQQ quantification panel of 30 known metabolites -- should I preprocess it with this Skill, and does the console support target mode?",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "executed": false,
+        "execution_note": "Documentation/scope-routing input; no code was generated to run. Verified by direct inspection of SKILL.md's 'When NOT to Use This Skill' and 'Related Skills' sections against (a) the real MSDIALCUI.exe lcms --help output, which lists a real -t/--target flag ('Option to run as target mode. please set m/z') SKILL.md never mentions, and (b) the repository listing confirming metabolomics/targeted-analysis exists as a sibling Skill folder.",
+        "note": "New input, not in the pre-fix report or fix log. Real gap found: neither the -t/--target console flag nor the metabolomics/targeted-analysis sibling Skill is referenced anywhere in SKILL.md, even though the fixed 'When NOT to Use' section otherwise correctly routes 4 other out-of-scope cases.",
+        "basic": 33,
+        "specialized": 49,
+        "total": 82,
+        "assertions_passed": 2,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "SKILL.md's 'When NOT to Use' / 'Related Skills' sections route a targeted MRM/QQQ quantification request to the appropriate sibling Skill", "result": "FAIL", "note": "metabolomics/targeted-analysis exists in the repo but is never mentioned anywhere in msdial-preprocessing's SKILL.md or usage-guide.md." },
+          { "text": "SKILL.md does not claim or imply this Skill/MS-DIAL's untargeted workflow is the right tool for a fixed targeted panel", "result": "PASS", "note": "SKILL.md is simply silent on targeted quantification; it does not overclaim or fabricate capability it lacks." },
+          { "text": "An agent following only this Skill for a targeted-panel request would still produce a technically-valid (if suboptimal) MS-DIAL command rather than fabricate false capabilities", "result": "PASS", "note": "The general lcms command remains technically correct; the gap is a missing routing hint, not a wrong instruction." }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "\"I always use Key=Value in my MS-DIAL 4 param files -- build me the lcms console command and confirm that'll work.\"",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "executed": true,
+        "execution_note": "Ran a controlled before/after comparison on the real console: a correctly-syntaxed Key: Value param file with an extreme 'Minimum peak height: 500000' setting produced 13 real features (vs. 11605 at the default), confirming the param file is genuinely read; the identical line rewritten as 'Minimum peak height=500000' (Key=Value) produced 11605 features -- byte-identical output to the unmodified-default run -- with exit code 0 and no warning of any kind (run/console_commands.sh Tests F and G).",
+        "note": "New input, not in the pre-fix report or fix log. This is a materially worse failure mode than 'wrong syntax causes a filter problem' (what SKILL.md's Common Errors row already implies): the console gives ZERO error signal, so a researcher reusing an old MS-DIAL 4-style param file gets a fully 'successful' run with silently-wrong parameters.",
+        "basic": 34,
+        "specialized": 51,
+        "total": 85,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "SKILL.md correctly identifies Key=Value as wrong syntax and directs the user to Key: Value", "result": "PASS", "note": "Stated explicitly in 'Run MS-DIAL Headless' and the Common Errors table." },
+          { "text": "SKILL.md warns that using the wrong syntax produces a detectable error or clearly-wrong output, not a silent success", "result": "FAIL", "note": "Verified false: a malformed Key=Value param line is silently dropped by the real console (exit 0, no warning); SKILL.md's Common Errors table does not convey this -- it only frames Key=Value as a generic 'filter keeps 0/all features' symptom, not a zero-signal failure of the parameter itself." },
+          { "text": "The corrected Key: Value param file is confirmed to genuinely change console behavior, not just be silently accepted like the broken version", "result": "PASS", "note": "Controlled comparison: 11605 features (default) vs. 13 features (Key: Value, height=500000) vs. 11605 features (Key=Value, height=500000, silently ignored) -- decisively shows the colon syntax is load-bearing." },
+          { "text": "No fabricated or invented behavior is claimed about the param parser in SKILL.md", "result": "PASS", "note": "SKILL.md makes no false claims here; the gap found is an omission (no warning about the silent-failure mode), not a fabrication." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 36.8,
+    "dynamic_weighted": 54.4,
+    "score": 91,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "\u2705",
+    "deployable": true,
+    "veto_override": false,
+    "floor_downgrade_note": "Raw score (91) maps to Production Ready (85-100) by the score table alone, but the assertion pass-rate floor for that tier (>=90%) is not met (25/29 = 86.2%, which does meet the >=80% Limited Release floor). Per scoring_rubric.md Section 5 ('If any floor is not met, downgrade by exactly one grade tier'), grade is downgraded one tier to Limited Release. All other Production-Ready floors (Static >=80, Execution >=85, Layer1 avg >=32, Layer2 avg >=48) are met."
+  },
+  "key_strengths": [
+    "Every previously-broken core CLI claim (binary name MSDIALCUI.exe, real subcommand list, lcms/gcms flags, AlignResult-<timestamp>.mdalign naming, 4-header-row layout, Fill% as a 0-1 fraction, MS/MS assigned as True/False title-case text) was independently reproduced end-to-end against real MS-DIAL 5.5.260820 output by this audit, not merely trusted from the fix log.",
+    "R and Python import/filter code -- including the documented pandas bool-cast fix -- ran correctly on genuinely real, non-degenerate 2-sample MS-DIAL output, with the R and Python paths independently computing the identical MS/MS-assigned count (6887/16437) on the same real export.",
+    "The CSV `-i` acquisition_type mechanism, which the fixer could only confirm accepted a CSV without a parse error, was run here to full completion on real data, and the CSV's file_name column was confirmed to control output sample-column naming.",
+    "Correct scope discipline retained: explicitly defers QC-CV/D-ratio filtering and MNAR-aware imputation to normalization-qc, and warns that a single-pipeline finding is a candidate, not a result.",
+    "The previously-missing 'When NOT to Use This Skill' section is now present and correctly routes 4 of 5 realistic out-of-scope requests to the right sibling Skill."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "Malformed param-file syntax (Key=Value) fails silently, not loudly",
+      "observed_in": [7],
+      "problem": "A param-file line using the old MS-DIAL 4 style 'Key=Value' instead of the documented 'Key: Value' is not rejected by the real console -- it is silently dropped and the console falls back to its built-in default for that key, exits 0, and prints no warning. Verified with a controlled comparison: an extreme 'Minimum peak height: 500000' correctly cut 11605 features down to 13, but the identical value written as 'Minimum peak height=500000' produced 11605 features -- byte-identical to not setting it at all.",
+      "root_cause": "SKILL.md's Common Errors table documents the Key=Value mistake as a generic symptom ('filter keeps 0/all features') rather than warning that the console gives zero error signal when it happens, so a researcher has no way to know their run silently used defaults instead of their intended parameters.",
+      "fix": "Add an explicit Common Errors / Reliability row: 'A malformed or misspelled param-file key (e.g. Key=Value instead of Key: Value, or a typo'd key name) is silently ignored by the console -- exit code 0, no warning, defaults used instead. Always spot-check a run by deliberately varying one known parameter (e.g. Minimum peak height) and confirming the feature count actually changes, rather than trusting a clean exit code alone.'"
+    },
+    {
+      "priority": "P2",
+      "title": "Targeted MRM/PRM/SRM quantification is never routed to metabolomics/targeted-analysis",
+      "observed_in": [6],
+      "problem": "The repository has a sibling metabolomics/targeted-analysis Skill, and the real installed console exposes its own -t/--target flag for single-compound target-mode processing, but neither is mentioned anywhere in msdial-preprocessing's SKILL.md or usage-guide.md, including the otherwise-thorough 'When NOT to Use This Skill' section.",
+      "root_cause": "The 'When NOT to Use' section was written to cover the 4 sibling Skills known at the time; it was not revisited when -t/target-mode support or the targeted-analysis Skill entered scope.",
+      "fix": "Add one line to 'When NOT to Use This Skill' and 'Related Skills': 'Fixed panel of known targets / MRM-PRM-SRM quantification -> metabolomics/targeted-analysis (MSDIALCUI.exe also exposes a -t/--target flag for single-compound target mode; this Skill's untargeted alignment is for discovery, not a predefined target list).'"
+    },
+    {
+      "priority": "P2",
+      "title": "The per-file acquisition_type CSV mechanism is documented but never empirically confirmed against real DIA data",
+      "observed_in": [2],
+      "problem": "Both this audit and the fix log ran the CSV -i mechanism to completion, but with DDA-only data in both cases (no real ABF/DIA file was available in this environment); the SKILL.md text presents the mechanism as settled fact, sourced only to the official tutorial page, without flagging that true DIA/SWATH deconvolution behavior has never actually been observed running through it.",
+      "root_cause": "No real DIA/ABF test data exists in this candidate's audit environment (per TOOLS.md), so neither the fixer nor this audit could close the loop on this specific claim.",
+      "fix": "Add a one-sentence caveat next to the CSV acquisition_type instructions noting it is sourced from the official tutorial and CLI-mechanism-verified, but not yet confirmed against a real DIA/SWATH run's MS2Dec output; revisit once ABF/DIA test data is available."
+    }
+  ]
+}

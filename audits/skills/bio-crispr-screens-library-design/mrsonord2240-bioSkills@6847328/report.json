@@ -1,0 +1,218 @@
+{
+  "meta": {
+    "skill_name": "bio-crispr-screens-library-design",
+    "description": "Designs pooled sgRNA libraries for CRISPR knockout, interference (CRISPRi), activation (CRISPRa), Cas12a multiplex, base-editor, and prime-editor screens. Covers on-target scoring (Rule Set 2, Azimuth, DeepSpCas9, CRISPRon), off-target scoring (CFD, MIT), TSS-relative positioning for CRISPRi/a (Horlbeck, Dolcetto, Calabrese), PAM-variant chemistries, control-guide composition, oligo cloning architecture, and library QC.",
+    "evaluated_on": "2026-09-16",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Protocol Design",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 8,
+    "source": "mrsonord2240/bioSkills@6847328:crispr-screens/library-design",
+    "reaudit_of": "F:\\OpenScience\\audits\\_pre-fix-20260916\\bio-crispr-screens-library-design (final.score 81, Limited Release)"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "No fabricated DOI/PMID/statistics across 8 outputs. The GC-heuristic on-target substitute is explicitly labeled non-Azimuth in code comments and SKILL.md; the real TP53 CDS (Input 5) and Cas12a candidates (Input 8) are genuine regex matches, not invented sequences." },
+      "practice_boundaries": { "result": "PASS", "detail": "Pure research library-design workflow across all 8 outputs; no individual-patient diagnostic, prescriptive, or clinical content." },
+      "methodological_ground": { "result": "PASS", "detail": "No methodological fallacy. Both P1s from the pre-fix audit (missing independence filter; SKILL.md/usage-guide.md Azimuth contradiction) are now resolved and independently re-verified rather than left as undisclosed gaps." },
+      "code_usability": { "result": "PASS", "detail": "All Skill-authored code (find_sgrna_candidates, annotate_exon_position, select_independent_guides, crispri_window, crispra_window, build_oligo, examples/design_library.py) ran without syntax errors across all 8 code-executing inputs, including against real live-fetched NCBI data. The one broken import (azimuth.model_comparison, third-party, not authored by this Skill) is correctly documented as unusable in both SKILL.md and usage-guide.md, which now agree." }
+    }
+  },
+  "static_score": {
+    "subtotal": 93,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 12, "max": 12, "note": "The pre-fix dock (SKILL.md instructing azimuth.model_comparison.predict(...) as if usable) is resolved: SKILL.md's Version Compatibility section now states plainly Azimuth must not be called and gives the same CRISPick/crisprScore alternative usage-guide.md already recommended. Independently re-verified live (Input 7): import azimuth.model_comparison still raises the documented SyntaxError, and neither doc claims otherwise anymore." },
+      "reliability": { "score": 12, "max": 12, "note": "The pre-fix P1 (no guide-to-guide spacing/independence filter) is resolved: select_independent_guides(min_spacing=5) is documented, shipped in examples/design_library.py, and independently verified here on both a synthetic edge-case CDS (Input 4) and a real, live-fetched TP53 CDS (Input 5) to (a) reject near-duplicate candidates while still filling the quota when possible, and (b) degrade honestly -- report a shortfall, never pad with a near-duplicate -- when the quota cannot be met." },
+      "performance_context": { "score": 5, "max": 8, "note": "Unchanged from the pre-fix audit: SKILL.md is still one ~342-line file (grew slightly from ~305) with no references/ split, and usage-guide.md still substantially duplicates SKILL.md's own tables/examples rather than adding orthogonal depth. Not addressed by this fix round; not part of its scope." },
+      "agent_usability": { "score": 16, "max": 16, "note": "The pre-fix dock (direct SKILL.md vs usage-guide.md contradiction on Azimuth usability) is resolved and independently re-verified (Input 7): both documents now state the same position and recommend the same alternative." },
+      "human_usability": { "score": 7, "max": 8, "note": "Unchanged: researcher-realistic phrasing and an explicit Required-Inputs list remain. usage-guide.md's 'What the Agent Will Do' now opens with an imperative step 0 ('stop and confirm the required inputs are present... ask for it explicitly rather than defaulting') resolving the pre-fix P2 escape-hatch gap, confirmed present in the shipped text; not independently exercised as a dynamic input this round since it is a text-only instruction-following check, already covered pre-fix." },
+      "security": { "score": 11, "max": 12, "note": "Unchanged: no credentials, no eval/exec, no injection surface. New finding this round (not in the pre-fix report or fix log): find_sgrna_candidates is silently case-sensitive -- a lowercase CDS input produces 0 candidates with no warning or auto-uppercase normalization, rather than an explicit error (see Input 4's 5th assertion and run/malformed_input_check.py). Does not crash on any malformed input tested (empty string, embedded 'N', embedded digit/whitespace)." },
+      "maintainability": { "score": 12, "max": 12, "note": "The pre-fix dock (shipped examples/design_library.py implemented a disconnected random-sequence algorithm) is resolved: the rewritten script now calls find_sgrna_candidates/annotate_exon_position/select_independent_guides against a synthetic per-gene CDS -- the same functions SKILL.md documents -- and was re-run unmodified here (Input 6) with an independent pandas re-check of its output." },
+      "agent_specific": { "score": 18, "max": 20, "note": "The pre-fix dock for the missing stop-and-ask escape hatch is resolved (usage-guide.md step 0, confirmed present). Progressive disclosure remains weak (see performance_context) and continues to cost 2 points here as it did pre-fix; this fix round did not restructure the file layout." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 90.0,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 35, "total": 36 },
+    "inputs": [
+      {
+        "index": 1, "type": "Canonical",
+        "label": "Cas9 KO library, 8 synthetic DDR genes (regression, new gene seeds)",
+        "status": "COMPLETED", "status_flag": "\u2705",
+        "note": "Ran find_sgrna_candidates/annotate_exon_position/select_independent_guides/build_oligo verbatim from the fixed SKILL.md against 8 freshly-seeded synthetic 600nt CDS sequences (different from the pre-fix audit's genes/seeds). All 8 genes filled the 4-guide quota; every gene's selected guides verified >=5nt apart (min gap 15-86nt observed). 91 total rows incl. controls, all spacers 20nt, all oligos valid.",
+        "executed": true, "execution_note": "Executed in F:\\OpenScience\\audit-envs\\crispr-screen-analyst venv against the copied Skill folder (run\\library-design-src, not the external clone). Script: run\\input1_cas9_ko.py. Output: data\\input1_ko_library.csv.",
+        "basic": 38, "specialized": 54, "total": 92,
+        "assertions_passed": 5, "assertions_total": 5,
+        "assertions": [
+          { "text": "Output includes a library table with gene, guide sequence, position and control-guide types", "result": "PASS", "note": "91-row CSV with gene/sequence/pos_in_cds/type columns; verified in output file" },
+          { "text": "select_independent_guides enforces the documented >=5nt minimum spacing for every gene, not just some", "result": "PASS", "note": "explicit per-gene min-pairwise-spacing check computed and asserted in code; all 8 genes >=15nt minimum" },
+          { "text": "Guides restricted to 5-65% of CDS per Brunello convention", "result": "PASS", "note": "annotate_exon_position enforced before scoring" },
+          { "text": "All requested control types present (NTC, safe-harbor, essential, non-essential)", "result": "PASS", "note": "value_counts shows all 5 types present" },
+          { "text": "No fabricated real-world efficacy/off-target numbers presented as measured data", "result": "PASS", "note": "only the internal GC-heuristic score column populated" }
+        ]
+      },
+      {
+        "index": 2, "type": "Variant A",
+        "label": "CRISPRi Dolcetto-window library, 5 synthetic lncRNAs (regression, new seeds)",
+        "status": "COMPLETED", "status_flag": "\u2705",
+        "note": "Ran crispri_window() verbatim from SKILL.md against freshly-seeded synthetic TSS-flanking regions. All 5 genes reached the 6-guide quota, 0 guides fell outside the declared -50/+300 window, 10/30 guides landed in the +25/+75 Sanson optimum band (a different but consistent distribution vs. the pre-fix audit's different random seeds).",
+        "executed": true, "execution_note": "Executed in the audit venv. Script: run\\input2_crispri.py. Output: data\\input2_crispri_library.csv. (An initial run had a test-script bug -- absolute vs. TSS-relative coordinates -- caught and fixed before scoring; not a Skill defect.)",
+        "basic": 36, "specialized": 52, "total": 88,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Output reports per-gene guide counts against the 6-guide quota", "result": "PASS", "note": "all 5 genes = 6 guides" },
+          { "text": "Guides positioned within the documented Dolcetto window (-50/+300)", "result": "PASS", "note": "outside-window count = 0" },
+          { "text": "Positional bias toward Sanson +25/+75 optimum reported", "result": "PASS", "note": "10/30 in optimum band, printed explicitly" },
+          { "text": "All 5 genes addressed with either guides or an explicit shortfall flag", "result": "PASS", "note": "flags list empty; all genes filled" }
+        ]
+      },
+      {
+        "index": 3, "type": "Variant B",
+        "label": "CRISPRa Calabrese-window library, 4 synthetic TFs (regression, new seeds)",
+        "status": "COMPLETED", "status_flag": "\u2705",
+        "note": "Ran crispra_window() from the fixed SKILL.md. The 75bp window undersupplied guides for all 4 TFs this run (0, 2, 1, 5 of 6) -- a real, honestly-reported artifact of the window's narrowness, not a regression (behavior is unchanged from pre-fix by design; only the documentation changed). Confirmed the P2 fix: the function's shipped docstring now explicitly warns of this undersupply risk, resolving the pre-fix audit's one failing assertion for this input.",
+        "executed": true, "execution_note": "Executed in the audit venv. Script: run\\input3_crispra.py. Output: data\\input3_crispra_library.csv.",
+        "basic": 36, "specialized": 53, "total": 89,
+        "assertions_passed": 5, "assertions_total": 5,
+        "assertions": [
+          { "text": "Reports guides/gene per TF, flags shortfalls explicitly rather than silently under-filling", "result": "PASS", "note": "4 explicit shortfall flags printed, one per TF" },
+          { "text": "Guides positioned within Calabrese window (-150/-75)", "result": "PASS", "note": "outside-window count = 0" },
+          { "text": "No guide count silently padded past what real PAM sites support", "result": "PASS", "note": "shortfalls reported honestly, not padded" },
+          { "text": "All 4 genes addressed", "result": "PASS", "note": "all 4 TFs appear in output with their actual (possibly partial) guide count" },
+          { "text": "SKILL.md/usage-guide.md now warns that the narrow Calabrese window can undersupply guides", "result": "PASS", "note": "crispra_window()'s shipped docstring contains the undersupply caveat, confirmed by direct file read in the test script; this reverses the pre-fix audit's one FAIL for this input" }
+        ]
+      },
+      {
+        "index": 4, "type": "Edge",
+        "label": "Edge: short/PAM-less synthetic CDS, guide-independence gap (direct P1 regression)",
+        "status": "COMPLETED", "status_flag": "\u2705",
+        "note": "Re-ran the exact pre-fix 42nt CDS that produced a 19/20nt-overlapping near-duplicate pair (pos_in_cds 15 and 16). Reproduced the underlying defect first (composition-only filtering still finds that 1nt-apart pair, min gap 1nt), then confirmed select_independent_guides(min_spacing=5) excludes it: selected guides are pos 15 and pos 7 (8nt apart), correctly reporting a 2/4 shortfall rather than padding with the near-duplicate at pos 16. PAM-less 44nt CDS still returns 0 candidates with no crash. New finding this round: lowercase CDS input silently returns 0 candidates with no warning (case-sensitive regex, no normalization step).",
+        "executed": true, "execution_note": "Executed in the audit venv. Scripts: run\\input4_edge_independence.py and run\\malformed_input_check.py.",
+        "basic": 36, "specialized": 54, "total": 90,
+        "assertions_passed": 4, "assertions_total": 5,
+        "assertions": [
+          { "text": "Genuinely PAM-less sequence returns zero candidates without crashing", "result": "PASS", "note": "confirmed: 0 candidates, no exception" },
+          { "text": "Selected candidate guides for a short CDS are checked for mutual independence/minimum spacing before being counted as separate guides", "result": "PASS", "note": "reverses the pre-fix FAIL: select_independent_guides correctly excludes the pos-15/pos-16 near-duplicate pair, selecting pos 15 and pos 7 (8nt apart) instead" },
+          { "text": "Candidate count vs quota (4/gene) is explicitly reported so a human can catch undersized designs", "result": "PASS", "note": "script prints raw candidate, requested, and independently-selected counts (2/4 shortfall reported honestly)" },
+          { "text": "No guides are fabricated beyond what the documented filters actually produce", "result": "PASS", "note": "all candidates are real regex matches on the synthetic sequence" },
+          { "text": "Lowercase or otherwise malformed sequence input is validated/normalized or produces an explicit warning rather than a silent empty result", "result": "FAIL", "note": "find_sgrna_candidates is case-sensitive; a lowercase CDS silently returns 0 candidates with no error or uppercase() normalization step -- new finding, not in the fix log or pre-fix report" }
+        ]
+      },
+      {
+        "index": 5, "type": "Edge",
+        "label": "Real TP53 CDS (NM_000546.6), live NCBI efetch -- new input, not in pre-fix audit",
+        "status": "COMPLETED", "status_flag": "\u2705",
+        "note": "Independently re-verified the fix log's own primary claim on fresh code (not the fixer's verify_spacing_filter.py) and a fresh live fetch: naive top-12-by-score with no spacing filter reproduces the original defect (min gap 1nt, 2 pairs <5nt apart) on this real gene; select_independent_guides(min_spacing=5) fills the full 12/12 quota with every pairwise gap >=5nt (min observed gap exactly 5nt). Also tested the quota-cannot-be-met case (requesting 161 guides against 104 real candidates): returned 50 guides, no crash, no padding, every pairwise gap still >=5nt.",
+        "executed": true, "execution_note": "Executed in the audit venv with a live, public, unauthenticated call to NCBI E-utilities (efetch, fasta_cds_na, NM_000546.6). Script: run\\input5_tp53_real_gene.py. Output: data\\input5_tp53_selected_guides.csv.",
+        "basic": 38, "specialized": 56, "total": 94,
+        "assertions_passed": 5, "assertions_total": 5,
+        "assertions": [
+          { "text": "Live NCBI fetch succeeds and returns a clean nucleotide CDS", "result": "PASS", "note": "1182nt CDS fetched, validated as ACGTN-only" },
+          { "text": "The pre-fix defect (near-duplicate guides passing composition-only filtering) is real and reproducible on real data, not just synthetic", "result": "PASS", "note": "naive top-12-by-score min pairwise gap = 1nt on real TP53 candidates" },
+          { "text": "select_independent_guides fills the requested quota while enforcing >=5nt spacing, when enough candidates exist", "result": "PASS", "note": "12/12 filled, min gap exactly 5nt, full gap distribution printed" },
+          { "text": "When the quota cannot be met, the function degrades honestly (partial result, no crash) rather than padding or erroring opaquely", "result": "PASS", "note": "161-guide over-request returned 50 guides, all still >=5nt apart, no exception" },
+          { "text": "No fabricated on-target/off-target scores presented as real Azimuth/Rule-Set-2 output", "result": "PASS", "note": "only the internal GC heuristic score is used" }
+        ]
+      },
+      {
+        "index": 6, "type": "Stress",
+        "label": "Shipped examples/design_library.py, 20 oncogenes (direct P1/P2 regression)",
+        "status": "COMPLETED", "status_flag": "\u2705",
+        "note": "Ran the Skill's rewritten examples/design_library.py unmodified: exit 0, 142-row library, 0 NaN, all 20 genes at the exact 4-guide quota. Independently re-verified with a fresh pandas.read_csv + value_counts (not the script's own print statements): confirms it now calls find_sgrna_candidates/annotate_exon_position/select_independent_guides against a synthetic per-gene CDS -- reversing the pre-fix finding that it implemented a disconnected random-sequence algorithm. Control-fraction line now carries an inline caveat pointing at SKILL.md's ~1% NTC guidance, reversing the pre-fix uncaveated-43.7% finding.",
+        "executed": true, "execution_note": "Executed unmodified from run\\library-design-src\\examples\\design_library.py (copied from the fork, not imported in place). np.random.seed(42) makes it deterministic. Command recorded in run\\input6_run_shipped_example.sh. Output copied to data\\input6_design_library_output.csv.",
+        "basic": 37, "specialized": 55, "total": 92,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Shipped example script runs end-to-end without error and produces non-empty, non-NaN output", "result": "PASS", "note": "exit 0; 142 rows, 0 NaN in sequence column" },
+          { "text": "QC statistics are printed and are real computed values, not stubs", "result": "PASS", "note": "independently recomputed from the CSV: mean GC 50.5%, matches printed 50.5%" },
+          { "text": "Example's algorithm now matches the CDS-position/independence method documented in SKILL.md's body", "result": "PASS", "note": "reverses the pre-fix FAIL: script calls find_sgrna_candidates/annotate_exon_position/select_independent_guides per gene against a synthetic CDS" },
+          { "text": "Demo control-guide proportions carry an explicit caveat rather than being presented uncaveated", "result": "PASS", "note": "reverses the pre-fix FAIL: both an inline code comment and the printed 'Control fraction' line now point to SKILL.md's ~1% NTC target" }
+        ]
+      },
+      {
+        "index": 7, "type": "Scope Boundary",
+        "label": "SKILL.md/usage-guide.md Azimuth 2.0 consistency (direct P1 regression)",
+        "status": "COMPLETED", "status_flag": "\u2705",
+        "note": "Confirmed SKILL.md's Version Compatibility section no longer instructs calling azimuth.model_comparison.predict(...); it now states plainly Azimuth must not be called and recommends the same CRISPick/crisprScore::getAzimuthScores() alternative usage-guide.md already named -- reversing the pre-fix contradiction. Independently re-reproduced the underlying import failure live (fresh import attempt, not reusing TOOLS.md's or the fix log's own check): import azimuth succeeds, import azimuth.model_comparison raises the same SyntaxError on line 269.",
+        "executed": true, "execution_note": "Executed in the audit venv (both a text-based doc-consistency check and a live import attempt). Script: run\\input7_azimuth_consistency.py.",
+        "basic": 38, "specialized": 57, "total": 95,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "SKILL.md and usage-guide.md agree on whether Azimuth is usable", "result": "PASS", "note": "reverses the pre-fix FAIL: both docs now state Azimuth must not be called" },
+          { "text": "Both docs recommend the same alternative for real Rule Set 2 scoring", "result": "PASS", "note": "both name CRISPick and crisprScore::getAzimuthScores()" },
+          { "text": "The documented import failure is independently reproducible, not just asserted", "result": "PASS", "note": "fresh live import attempt reproduces the exact SyntaxError, matching both docs and TOOLS.md" },
+          { "text": "No fabricated on-target/off-target scores presented as if a real predictor had run", "result": "PASS", "note": "output states plainly the failure and the substitute in use" }
+        ]
+      },
+      {
+        "index": 8, "type": "Adversarial",
+        "label": "enAsCas12a paralog-multiplex array design -- new chemistry, not tested pre-fix",
+        "status": "COMPLETED", "status_flag": "\u2705",
+        "note": "Exercises a fourth documented chemistry (Cas12a multiplex, 'Library Composition for Specialized Screens') that neither this nor the pre-fix audit had previously run. Built 4-guide arrays (2 guides/paralog) for 3 synthetic paralog pairs using the TTTV-PAM-5'-of-spacer orientation SKILL.md's own Common Errors table calls out (opposite of Cas9's 3' NGG) -- confirming a real, documented pitfall was correctly avoided. Added the singleton (gene-A-alone, gene-B-alone, double-NTC) controls both docs require for GI scoring.",
+        "executed": true, "execution_note": "Executed in the audit venv. Script: run\\input7_cas12a_paralog.py. Output: data\\input7_cas12a_arrays.csv.",
+        "basic": 34, "specialized": 46, "total": 80,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "4-guide arrays are built correctly as a 2+2 split by paralog", "result": "PASS", "note": "all 3 arrays have exactly 2 guides per paralog" },
+          { "text": "Singleton conditions (gene A alone, gene B alone, double-NTC) are present for GI scoring per the documented formula", "result": "PASS", "note": "7 singleton rows for 3 arrays (2 per array + 1 double-NTC), matching double_KO_LFC - sum(single_KO_LFC)" },
+          { "text": "Cas12a's documented PAM-5'-of-spacer orientation is followed, not Cas9's 3' orientation", "result": "PASS", "note": "candidate finder written to SKILL.md's own stated convention and its 'Cas12a oligo doesn't cut' Common Errors pitfall; found real TTTV-adjacent spacers" },
+          { "text": "No off-target/on-target scores fabricated for this untested chemistry", "result": "PASS", "note": "candidates are honest regex matches; no scoring claimed" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 37.2,
+    "dynamic_weighted": 54.0,
+    "score": 91,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "\u2b50",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Both P1 findings from the pre-fix audit (missing guide-independence filter; SKILL.md/usage-guide.md Azimuth contradiction) are fully resolved and independently re-verified here with fresh test code and real data (a live NCBI TP53 fetch), not by re-running the fixer's own scripts.",
+    "select_independent_guides() correctly enforces minimum pairwise spacing while still filling the guide quota when candidates allow, and degrades honestly (reports a shortfall, never pads with a near-duplicate) when they don't -- verified on both a synthetic edge-case CDS and a real gene (TP53).",
+    "The rewritten examples/design_library.py now genuinely exercises the documented CDS-position/independence method, runs end-to-end (exit 0, 142 real rows, all 20 genes at quota), and was independently re-checked with pandas rather than trusted from its own print statements.",
+    "The Skill generalizes correctly to a chemistry never exercised in either audit (enAsCas12a paralog-multiplex arrays), correctly following its own documented PAM-orientation pitfall and GI-scoring singleton-control requirement."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "find_sgrna_candidates silently drops lowercase sequence input",
+      "observed_in": [4],
+      "problem": "A lowercase CDS input returns 0 candidates with no warning, because the PAM/spacer regex is case-sensitive (only matches uppercase ACGT). A researcher pasting a lowercase FASTA CDS gets an empty, unexplained result instead of an error or automatic normalization.",
+      "root_cause": "find_sgrna_candidates never normalizes input case before regex matching.",
+      "fix": "Add cds_sequence = cds_sequence.upper() at the top of find_sgrna_candidates, or raise an explicit error/warning when a sequence contains no uppercase ACGT characters."
+    },
+    {
+      "priority": "P2",
+      "title": "Recommended Azimuth alternative (CRISPick/crisprScore) remains unverified in this environment",
+      "observed_in": [7],
+      "problem": "SKILL.md correctly and honestly flags that neither Broad CRISPick nor R crisprScore::getAzimuthScores() was installed or smoke-tested here, but a user following the Skill's own recommended replacement still cannot confirm it works without testing it themselves.",
+      "root_cause": "Installing/testing crisprScore was explicitly out of scope for this fix pass (per the fix log) and belongs to a tooling pass.",
+      "fix": "In a future tooling pass, install R crisprScore and smoke-test getAzimuthScores() against a real gene, then update SKILL.md's Version Compatibility section from 'verify the call signature' to a confirmed working example."
+    },
+    {
+      "priority": "P2",
+      "title": "SKILL.md remains a single large file with weak progressive disclosure",
+      "observed_in": [],
+      "problem": "SKILL.md is still one ~342-line file (grew slightly from ~305 pre-fix) with no references/ split, and usage-guide.md still substantially duplicates SKILL.md's own tables and examples rather than adding orthogonal depth.",
+      "root_cause": "Pre-existing structural issue from the pre-fix audit; out of scope for this fix round, which targeted the two ticketed P1s.",
+      "fix": "Split the Genome-Wide Library Selection table, Failure Modes section, and References into a references/ subdirectory, leaving SKILL.md focused on the core design workflow."
+    }
+  ]
+}

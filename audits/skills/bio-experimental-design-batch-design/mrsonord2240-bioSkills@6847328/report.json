@@ -1,0 +1,203 @@
+{
+  "meta": {
+    "skill_name": "bio-experimental-design-batch-design",
+    "description": "Designs genomics experiments so technical nuisance variation (batch, lane, plate, flow cell, operator, reagent lot, processing day) is balanced against the biological variable of interest and therefore estimable rather than confounded, using constrained sample-to-batch assignment (designit, OSAT), the confounder/mediator/collider distinction, and the principle that no post-hoc correction recovers a fully confounded design. Covers detecting hidden batches with surrogate variable analysis, a decision table for downstream correction (ComBat-seq, RUVSeq, SVA) whose execution is deferred to differential-expression/batch-correction, and reproducibility metadata. Use when assigning samples to sequencing batches/lanes/plates, avoiding batch-condition confounding, deciding whether a design is salvageable by correction, choosing a correction method, or estimating the number of hidden batches. For the experimental unit, randomization, and blocking concepts see experimental-design/randomization-blocking.",
+    "evaluated_on": "2026-09-16",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Protocol Design",
+    "execution_mode": "A",
+    "complexity": "Moderate",
+    "n_inputs": 7,
+    "source": "mrsonord2240/bioSkills@684732876d2781df75d90ba35c3e9949ff4f28b2:experimental-design/batch-design",
+    "audit_type": "re-audit after fix (fixes/bio-experimental-design-batch-design.md, commit e543a0a); 5 pre-fix inputs re-run as regression + 2 new inputs targeting the fix's own claims",
+    "pre_fix_report": "F:/OpenScience/audits/_pre-fix-20260916/bio-experimental-design-batch-design/ (score 82, Limited Release)",
+    "executed_inputs": "7/7"
+  },
+  "veto_gates": {
+    "skill_veto": { "gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS" },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All numbers this session come from runs on labelled synthetic data (designs, matrices, the shared synthetic MaxQuant proteinGroups.txt); no fabricated DOIs/PMIDs/statistics; the eight references are unchanged from the pre-fix audit and were already confirmed real." },
+      "practice_boundaries": { "result": "PASS", "detail": "Design/QC guidance only; no individual-level diagnostic or treatment content." },
+      "methodological_ground": { "result": "PASS", "detail": "Core claims reproduced: confounded design is unrescuable (ComBat errors or zeroes out the effect), unbalanced ComBat inflates realized FDR to 33.1% vs 4.6% with batch in the model, SVA recovers a hidden batch (cor=1.00), and the new verification step is a real confounding gate, not cosmetic." },
+      "code_usability": { "result": "PASS", "detail": "All 7 inputs ran to completion on designit 0.5.0 / sva 3.54.0 / limma 3.62.2 with no syntax errors, missing dependencies, or infinite loops. (Inputs 6 and 7's first drafts had bugs in this auditor's own test harness -- a stale variable and an unfiltered NaN aggregation -- not in the Skill's code; both were fixed and re-run, see run/ scripts and eval_viewer.)" }
+    }
+  },
+  "static_score": {
+    "subtotal": 87,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 11, "max": 12, "note": "Completeness improved: the new Reference/Bridge Channel Layout section gives real designit code where none existed pre-fix. Still no OSAT code despite OSAT being named as an alternative. Correctness 4/4 equivalent: every tested claim reproduced. Appropriateness improved: TMT/proteomics now has real code, not just a taxonomy row." },
+      "reliability": { "score": 9, "max": 12, "note": "Major gain: the SVA block no longer crashes unexplained on NA (confirmed, Input 4) and the post-optimization verification is a real, confirmed gate (Input 1, Input 6). Docked because the fix is not fully consistent: the bridge-channel block inherited the hard stopifnot(all(tab>0)) confounding check but NOT the primary block's soft imbalance() warning, and Input 2 shows exactly that gap firing silently on a real imbalance of 3." },
+      "performance_context": { "score": 7, "max": 8, "note": "~250 lines now (was 189); designit optimization on the 60-sample/4-plex bridge layout took 144 s with default settings, same cost profile as pre-fix." },
+      "agent_usability": { "score": 15, "max": 16, "note": "The pre-fix gap ('no instruction to verify the condition x batch table after optimization') is fixed and confirmed to work for the primary assignment path; clear causal framing retained." },
+      "human_usability": { "score": 7, "max": 8, "note": "Unaffected by the fix; natural trigger language retained." },
+      "security": { "score": 11, "max": 12, "note": "Unaffected; no credentials or data exposure." },
+      "maintainability": { "score": 10, "max": 12, "note": "New sections are self-contained and independently testable (confirmed runnable this session); SKILL.md's own shown code blocks still don't call set.seed()." },
+      "agent_specific": { "score": 17, "max": 20, "note": "Unaffected by the fix: clear stop condition and routing to batch-correction/randomization-blocking retained; frontmatter description is unchanged and still genomics-first, under-triggering for proteomics/TMT despite the new bridge-channel content inside." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 86.6,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 26, "total": 28 },
+    "inputs": [
+      {
+        "index": 1, "type": "Canonical",
+        "label": "24 plasma samples into 3 LC-MS batches, condition and sex balanced (regression of pre-fix Input 1)",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "designit block ran verbatim (designit 0.5.0): condition 4/4/4 in every batch, 0 empty positions; the NEW post-optimization verification block then ran and correctly did not halt or warn (design is balanced).",
+        "executed": true,
+        "execution_note": "runs/in1_designit.R sourcing runs/blocks/b02_assign.R then runs/blocks/b02_verify.R (both extracted verbatim from the post-fix SKILL.md); SYNTHETIC design; output runs/in1_designit.out.",
+        "basic": 38, "specialized": 53, "total": 91,
+        "assertions_passed": 5, "assertions_total": 5,
+        "assertions": [
+          { "text": "The designit assignment block runs as written on the installed version", "result": "PASS", "note": "designit 0.5.0" },
+          { "text": "Condition is balanced across batches", "result": "PASS", "note": "4/4/4" },
+          { "text": "All samples are placed", "result": "PASS", "note": "0 empty positions" },
+          { "text": "The new post-optimization verification block runs and does not falsely flag a balanced design", "result": "PASS", "note": "No error, no warning" },
+          { "text": "Scope: correction execution is routed to differential-expression/batch-correction", "result": "PASS", "note": "Decision table unchanged" }
+        ]
+      },
+      {
+        "index": 2, "type": "Variant A",
+        "label": "60 plasma samples into 4 TMTpro 16plex plexes with a pooled bridge channel (regression of pre-fix Input 2, now against the NEW bridge-channel code)",
+        "status": "COMPLETED", "status_flag": "❌",
+        "note": "SKILL.md's new Reference/Bridge Channel Layout block (b03_bridge) ran VERBATIM (no agent adaptation needed, unlike pre-fix). Channel 16 correctly stayed empty in every plex (15/15/15/15 biological positions) and the hard stopifnot(all(tab>0)) confounding check passed. BUT the optimizer converged to case 8/8/8/6, ctrl 7/7/7/9 (cell spread 3) with NO warning, because the bridge block only copies the primary block's hard confounding check, not its soft imbalance() warning -- the exact 'suboptimal split accepted silently' failure mode from the original P2 finding recurs in the new code path.",
+        "executed": true,
+        "execution_note": "runs/in2_bridge_channel.R sourcing runs/blocks/b03_bridge.R verbatim; SYNTHETIC design; 144 s; output runs/in2_bridge_channel.out.",
+        "basic": 29, "specialized": 43, "total": 72,
+        "assertions_passed": 2, "assertions_total": 4,
+        "assertions": [
+          { "text": "A pooled reference channel is reserved in every plex", "result": "PASS", "note": "Channel 16 unused; 15/15/15/15 positions used" },
+          { "text": "The Skill's hard confounding check fires correctly in the bridge context", "result": "PASS", "note": "stopifnot(all(tab>0)) passed (no empty cells); independently confirmed to halt on a confounded plex layout in Input 6 Test C" },
+          { "text": "Condition balance across plexes is as good as achievable", "result": "FAIL", "note": "case 8/8/8/6, ctrl 7/7/7/9; same imbalance class as the pre-fix ad hoc adaptation" },
+          { "text": "An avoidable imbalance triggers a warning (parity with the primary block's soft check)", "result": "FAIL", "note": "Bridge block has no imbalance() warning; none fired despite a cell spread of 3" }
+        ]
+      },
+      {
+        "index": 3, "type": "Edge",
+        "label": "All cases on day 1, all controls on day 2: can ComBat rescue it? (regression of pre-fix Input 3, code untouched by the fix)",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Reproduced exactly: ComBat refuses the condition covariate ('confounded with batch'), ComBat without it removes every real change (0 calls), no correction gives 346 calls of which 279 are pure day effect, ~cond + day has non-estimable coefficients.",
+        "executed": true,
+        "execution_note": "runs/in3_confounded_rescue.R on a SYNTHETIC 1000-protein log2 matrix, seed 3; output runs/in3_confounded_rescue.out; numbers match the pre-fix report exactly.",
+        "basic": 37, "specialized": 55, "total": 92,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "The Skill's claim that correction cannot separate a confounded batch holds", "result": "PASS", "note": "ComBat error with covariate; 0 calls without" },
+          { "text": "Testing without correction attributes the day effect to condition", "result": "PASS", "note": "279 of 346 calls are nulls" },
+          { "text": "The recommended action is redesign, not correction", "result": "PASS", "note": "Decision-tree row followed" },
+          { "text": "Scope: no claim that the existing data can answer the question", "result": "PASS", "note": "Stated explicitly" }
+        ]
+      },
+      {
+        "index": 4, "type": "Variant B",
+        "label": "Hidden batches in a MaxQuant log2 LFQ matrix with missing values -- direct regression test for the P1 fix (regression of pre-fix Input 4)",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "The fixed SVA block (b04_sva) ran VERBATIM on the same real synthetic proteinGroups.txt (1500x8, 2120 NA, 18%): it messaged the missing fraction, restricted to 738/1500 complete features (matching an independent complete.cases() recount at 49.2%), and found 1 surrogate variable correlated 1.00 with the unannotated acquisition day -- no crash, no silent row-drop without explanation.",
+        "executed": true,
+        "execution_note": "runs/in4_sva_na.R sourcing runs/blocks/b04_sva.R verbatim on data/proteinGroups.txt + data/sample_annotation.csv; output runs/in4_sva_na.out.",
+        "basic": 36, "specialized": 53, "total": 89,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "The SVA block runs on the matrix as imported (NA present) without an unexplained stop", "result": "PASS", "note": "Messaged 2120/12000 cells (18%) missing, then proceeded" },
+          { "text": "The Skill states the missing-value requirement and its handling strategy before any error could surface", "result": "PASS", "note": "message() fires before filtering, not after a crash" },
+          { "text": "The reported complete-feature count matches an independent recomputation", "result": "PASS", "note": "738/1500 (49.2%) via block vs. independent complete.cases(M) check" },
+          { "text": "On the complete-feature matrix the surrogate variable recovers the hidden day effect", "result": "PASS", "note": "n_sv=1, cor(SV1, day B2)=1.00" }
+        ]
+      },
+      {
+        "index": 5, "type": "Stress",
+        "label": "Unbalanced 3-batch design: ComBat-cleaned matrix vs batch in the model (regression of pre-fix Input 5, code untouched by the fix)",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Reproduced exactly over 20 seeds: ComBat-then-limma called 89.15 proteins/run at 33.1% realized FDR; batch-in-model called 59.05 at 4.6% realized FDR.",
+        "executed": true,
+        "execution_note": "runs/in5_unbalanced_combat.R, 20 seeded SYNTHETIC replicates; output runs/in5_unbalanced_combat.out; numbers match the pre-fix report exactly.",
+        "basic": 37, "specialized": 55, "total": 92,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "ComBat on an unbalanced design inflates false positives", "result": "PASS", "note": "33.1% realized FDR" },
+          { "text": "Batch as a model covariate stays calibrated", "result": "PASS", "note": "4.6%; null p<0.05 rate 4.8%" },
+          { "text": "The Skill's recommended route is the one that holds", "result": "PASS", "note": "Keep batch in the model" },
+          { "text": "Scope: the ComBat matrix is reserved for visualization", "result": "PASS", "note": "As the Skill states" }
+        ]
+      },
+      {
+        "index": 6, "type": "Adversarial",
+        "label": "NEW: 'My core just handed back this plate map -- sanity-check it before we run it' with a genuinely confounded layout -- does the new verification step really halt, or just print a table?",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Three tests of the same verification code (runs/blocks/b02_verify.R and the bridge block's equivalent line): (A) a layout with batch B3 holding zero controls -- HALTED with the documented stopifnot message; (B) a genuinely balanced layout -- ran through with NO error, confirming no false positive; (C) a bridge/plex layout with plex 1 entirely 'case' -- HALTED. The gate is real, not decorative.",
+        "executed": true,
+        "execution_note": "runs/in6_verify_catches_confound.R. First draft had two bugs in this auditor's own harness (Test B re-read a stale `assignment` object instead of the balanced one; Test C's condition vector didn't sum to 60 rows) -- both fixed and re-run; final output in runs/in6_verify_catches_confound.out.",
+        "basic": 38, "specialized": 50, "total": 88,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "stopifnot(all(tab > 0)) halts on a genuinely confounded batch layout", "result": "PASS", "note": "Test A: 'condition is confounded with batch...'" },
+          { "text": "The same check does not fire a false positive on a genuinely balanced layout", "result": "PASS", "note": "Test B: no error" },
+          { "text": "The equivalent bridge-channel confounding check halts on a confounded plex layout", "result": "PASS", "note": "Test C: 'all(tab3 > 0) is not TRUE'" },
+          { "text": "The verification step is real executable code, not documentation-only prose", "result": "PASS", "note": "All three tests ran and behaved exactly as SKILL.md documents" }
+        ]
+      },
+      {
+        "index": 7, "type": "Scope Boundary",
+        "label": "NEW: fact-check the fixer's own stated caveat -- is restricting to complete-observation features really biased toward abundant, well-detected proteins, or just an assumed rationale?",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "On the same real synthetic MaxQuant matrix: the 738 complete-case features are on average 1.78 log2 units more abundant than the 762 dropped features (25.24 vs 23.46, Wilcoxon p=3.7e-69) and detected in a median of 8/8 vs 6/8 samples; 69% of complete features sit above the whole-matrix median abundance. The stated bias is real and correctly characterized, in both magnitude and direction.",
+        "executed": true,
+        "execution_note": "runs/in7_sva_bias_check.R on data/proteinGroups.txt. First draft's aggregate mean() propagated NaN from 55/762 fully-undetected (0/8) dropped features; fixed with na.rm=TRUE and an explicit undetected-feature count, then re-run; final output in runs/in7_sva_bias_check.out.",
+        "basic": 35, "specialized": 47, "total": 82,
+        "assertions_passed": 3, "assertions_total": 3,
+        "assertions": [
+          { "text": "The dropped (incomplete-case) feature subset is measurably lower-abundance than the retained (complete-case) subset", "result": "PASS", "note": "Delta 1.78 log2, p=3.7e-69" },
+          { "text": "Complete-case features are, by construction, better-detected (present in more samples)", "result": "PASS", "note": "Median 8/8 vs 6/8 detected" },
+          { "text": "The Skill's stated bias caveat matches the direction and magnitude found in real data, not just an assumed rationale", "result": "PASS", "note": "Both abundance and detection-completeness biases confirmed in the stated direction" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 34.8,
+    "dynamic_weighted": 52.0,
+    "score": 87,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "The P1 SVA/NA crash is fully fixed and confirmed by execution: the block now messages the missing-value fraction, filters to 738/1500 complete features exactly matching an independent recount, and recovers the hidden day effect (cor(SV1, day)=1.00) instead of crashing unexplained.",
+    "The fixer's own caveat -- that complete-case filtering biases surrogate variables toward abundant, well-detected features -- is empirically true on real data: complete features are 1.78 log2 units more abundant (p=3.7e-69) and detected in a median of 8/8 vs 6/8 samples.",
+    "The new post-optimization verification is a real gate, not decorative: it halted on every genuinely confounded layout tested (primary batch and bridge-plex) and did not false-positive on a balanced one.",
+    "The new bridge/reference-channel section provides real, runnable designit code where the pre-fix Skill had none, and correctly reserves the pooled-reference position in every plex (15/15/15/15, channel 16 always empty).",
+    "All three original findings (P1 SVA crash, P2 no verification, P2 no bridge code) are addressed with working code; only one narrow gap remains (below)."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "Bridge-channel block doesn't inherit the soft imbalance warning",
+      "observed_in": [2],
+      "problem": "The Reference/Bridge Channel Layout section copies the primary block's hard stopifnot(all(tab>0)) confounding check but not its soft imbalance() warning. Input 2's optimizer converged to case 8/8/8/6, ctrl 7/7/7/9 (cell spread 3) with no warning -- the same 'suboptimal split accepted silently' failure mode the original P2 finding described, now recurring in the new bridge code path.",
+      "root_cause": "The bridge section was written by copying only the hard-fail line ('same confounding check as above') and not the adjacent soft-warning block from the primary assignment section.",
+      "fix": "Add the same `imbalance <- max(tab) - min(tab); if (imbalance > 1) warning(...)` block to the Reference/Bridge Channel Layout section, immediately after its `stopifnot(all(tab > 0))` line."
+    },
+    {
+      "priority": "P2",
+      "title": "Balance-verification code shown only for the primary condition, not other covariates",
+      "observed_in": [1],
+      "problem": "SKILL.md's prose says to repeat the table/stopifnot check for every balanced covariate (e.g. sex), but the shown code block only demonstrates it for condition.",
+      "root_cause": "One worked example, not a loop over covariates.",
+      "fix": "Show the loop explicitly, e.g. `for (v in c('condition','sex')) { tab <- table(assignment[[v]], assignment$batch); stopifnot(all(tab > 0)) }`."
+    },
+    {
+      "priority": "P2",
+      "title": "No OSAT code despite OSAT being named as a designit alternative",
+      "observed_in": [],
+      "problem": "OSAT appears in the frontmatter (primary_tool alternative) and taxonomy but no OSAT code exists anywhere in SKILL.md or examples/.",
+      "root_cause": "The Skill was written designit-first; OSAT is a one-line mention.",
+      "fix": "Add a minimal OSAT optimal.shuffle() example, or drop the OSAT promise from the taxonomy line to avoid implying code that isn't shown."
+    }
+  ]
+}

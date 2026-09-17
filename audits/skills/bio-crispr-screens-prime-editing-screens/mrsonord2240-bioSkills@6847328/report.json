@@ -1,0 +1,272 @@
+{
+  "meta": {
+    "skill_name": "bio-crispr-screens-prime-editing-screens",
+    "description": "Designs and analyzes pooled prime-editor (PE) screens: pegRNA design with PRIDICT/PRIDICT2, PE2/PE3/PE3b/PEmax chemistry choice, MOSAIC saturation mutagenesis, the PRIME pooled-screen methodology, CRISPResso2 quantification of intended-edit vs scaffold-incorporation vs indel, and cross-modal validation with base-editor screens.",
+    "evaluated_on": "2026-09-16",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 9,
+    "source": "mrsonord2240/bioSkills@6847328:crispr-screens/prime-editing-screens",
+    "re_audit_of": "F:\\OpenScience\\audits\\_pre-fix-20260916\\bio-crispr-screens-prime-editing-screens\\ (pre-fix score 64.1, Beta Only, M4 veto FAIL)",
+    "note": "7 of 9 inputs are regression tests of the pre-fix audit's own inputs, re-run against the fixed Skill; inputs 8-9 are new this pass (a minus-strand + no-PAM-guard batch test, and a dedicated probe of the PRIDICT2 batch CLI's undocumented input/ directory requirement)."
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "Unchanged from pre-fix: all citations (Anzalone 2019, Mathis 2023/2025, Chen 2021, Hsu 2024 bioRxiv, Ren 2023) real and correctly attributed; no fabricated statistics, DOIs, or trial results in any of the 9 outputs." },
+      "practice_boundaries": { "result": "PASS", "detail": "Unchanged from pre-fix: SKILL.md/usage-guide.md contain no patient- or individual-directed diagnostic/prescriptive language (grep-verified); Input 7 (regression) reconfirmed no clinical-decision content." },
+      "methodological_ground": { "result": "PASS", "detail": "Unchanged from pre-fix: BE-vs-PE and PE2/PE3/PEmax decision logic methodologically sound; matches cited literature." },
+      "code_usability": { "result": "PASS", "detail": "All three pre-fix code defects independently confirmed fixed by fresh execution: (1) the pegRNA-architecture diagram now reads RTT-then-PBS; independently hand-derived from Anzalone 2019's nick/PBS/RTT geometry and found to match the diagram's own worked example exactly, and the fixed examples/design_pegrna_pridict2.py's PBS/RTT output is byte-identical (modulo case-marking of the edited base) to a freshly, independently-run real PRIDICT2 CLI's own output on 5/5 checked candidates across two loci and BOTH strands -- not just the Skill's own worked example. (2) The bundled script no longer crashes: ran cleanly on the exact locus that raised KeyError pre-fix, plus a new minus-strand locus and a new genuinely-undesignable locus (which it now skips with a clear message, not a raw traceback); all 5 candidates independently verified to have zero PAM overlap. (3) The Cross-Validate PE/BE snippet now imports numpy+pandas and ran cleanly on a fresh dataset. One new, lesser-severity defect found this pass: the PRIDICT2 batch CLI example still omits the CLI's required `input/` subdirectory (or --input-dir flag) -- following it literally from a clean directory throws FileNotFoundError. Scored as a P1 (a loud, immediately diagnosable crash, not a silent wrong-science result), not a veto trigger." }
+    }
+  },
+  "static_score": {
+    "subtotal": 90,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 11, "max": 12, "note": "Completeness excellent (unchanged). Correctness now confirmed right: the pegRNA architecture order matches independent hand-derivation and a real PRIDICT2 CLI run on 5/5 candidates. Docked 1pt for the newly found undocumented input/-directory requirement in the batch CLI example." },
+      "reliability": { "score": 10, "max": 12, "note": "Fault tolerance much improved: the bundled script now guards against zero-candidate variants with a clear message instead of crashing. Error Reporting/Recoverability improved: Failure Modes and Common Errors now explicitly cover the two defect classes found pre-fix (wrong element order, CLI/CSV mismatch) with concrete fixes. Docked 2pts because the new input-dir gap is not yet covered anywhere in Failure Modes/Common Errors." },
+      "performance_context": { "score": 7, "max": 8, "note": "Unchanged: SKILL.md ~370 lines with usage-guide.md and one example script split out; reasonable disclosure, minor duplication of threshold tables between the two docs." },
+      "agent_usability": { "score": 14, "max": 16, "note": "Learnability strong (unchanged). Consistency now full marks: diagram matches the real tool's own output and the cited literature. Feedback Design and Error Prevention much improved (new Failure Modes rows for both previously-found defect classes) but docked 1pt each for not yet covering the newly found input-dir gap." },
+      "human_usability": { "score": 7, "max": 8, "note": "Discoverability strong (unchanged). Forgiveness much improved: the former silent-zero CRISPResso2 case is now explicitly documented with a concrete diagnostic path; docked 1pt because the new input-dir crash, while loud, still has no documented remediation." },
+      "security": { "score": 11, "max": 12, "note": "Unchanged: no hardcoded secrets or injection vectors; all user input is sequence strings and file paths passed as CLI arguments or CSV fields." },
+      "maintainability": { "score": 12, "max": 12, "note": "Modularity/Modifiability unchanged (4/4 each). Testability now full marks: the bundled example ran correctly end-to-end this pass on the exact realistic locus that crashed pre-fix, plus new minus-strand and no-PAM-guard cases, all independently verified correct." },
+      "agent_specific": { "score": 18, "max": 20, "note": "Unchanged: strong, precise triggering; correct progressive disclosure; clean Related-Skills composability. Determinism reconfirmed a third time this pass (byte-identical top score across single-mode and two independent batch-mode runs). Escape Hatches still generic (no explicit human/wet-lab handoff beyond piloting advice)." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 75.4,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 29, "total": 32 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical (regression)",
+        "label": "pegRNA library design via PRIDICT2 batch CLI, following SKILL.md's fully-corrected documented command",
+        "status": "PARTIAL",
+        "status_flag": "\u26a0\ufe0f",
+        "executed": true,
+        "execution_note": "Ran the corrected batch command (--summarize K562, editseq column) on two fresh 242nt synthetic loci (VAR_REALISTIC, VAR_MINUS, well over 100nt flanking per side) via the real installed PRIDICT2 CLI in tools/pridict2-venv/. Both the --summarize value and CSV column defects from the pre-fix audit are confirmed fixed: the command runs and produces real, non-trivial predictions (765 rows/variant, K562 scores 42.7-49.3%). However, run from a clean scratch directory as SKILL.md's own heredoc recipe shows, the exact command first throws FileNotFoundError because the CLI's --input-dir defaults to ./input, which SKILL.md never mentions creating -- a new, previously-uncaught defect.",
+        "basic": 22,
+        "specialized": 32,
+        "total": 54,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "SKILL.md's documented --summarize value matches the real PRIDICT2 CLI requirement", "result": "PASS", "note": "Fixed: --summarize K562 accepted, matches argparse type=str requirement." },
+          { "text": "SKILL.md's documented CSV column name matches the real PRIDICT2 CLI requirement", "result": "PASS", "note": "Fixed: header is now sequence_name,editseq, matches the real requirement exactly." },
+          { "text": "Running the batch-mode command exactly as SKILL.md's own heredoc recipe shows (CSV written to the current directory) completes without error", "result": "FAIL", "note": "New finding: FileNotFoundError -- default --input-dir is ./input, undocumented anywhere in SKILL.md or usage-guide.md." },
+          { "text": "Once the CSV is placed in the CLI's expected input/ directory, batch mode produces real per-pegRNA predictions", "result": "PASS", "note": "predictions_round2/: 765 real candidate rows per variant, real PBS/RT sequences, varied K562 scores." }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A (regression)",
+        "label": "Bundled design_pegrna_pridict2.py on the exact locus that crashed pre-fix",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "executed": true,
+        "execution_note": "Reused the identical 60nt-context, edit-11nt-from-nick locus that raised KeyError pre-fix. Ran the fixed script (design_pegrna_pridict2_FIXED.py) verbatim: no crash, 2 candidates found (both strands). The +strand candidate's pbs/rtt (ACGTTCCAGGTCA / GCTTACAGATCGCCATGA) are byte-identical to this audit's own independent hand-derivation from Anzalone 2019's nick/PBS/RTT rule and to SKILL.md's own worked example.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The bundled example script runs end-to-end without crashing on the realistic PE-designable variant that crashed pre-fix", "result": "PASS", "note": "No KeyError; produced 2 real candidates (+ and - strand)." },
+          { "text": "find_pegrna_candidates() only returns pegRNAs whose PBS does not overlap the protospacer/PAM", "result": "PASS", "note": "Verified via run/verify_pbs_pam_overlap.py: exact-coordinate check confirms 0/5 candidates (across all inputs this pass) overlap their PAM window." },
+          { "text": "The script's PBS/RTT for this locus matches an independent hand-derivation from Anzalone 2019's nick geometry", "result": "PASS", "note": "pbs=ACGTTCCAGGTCA, rtt=GCTTACAGATCGCCATGA -- exact match to hand computation and to SKILL.md's own worked example." },
+          { "text": "No fabricated claim that this is real PRIDICT2 output", "result": "PASS", "note": "predict_pridict2() remains honestly labeled as a simulation placeholder." }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge (regression)",
+        "label": "CRISPResso2 prime-editing quantification, correct pegRNA-extension order, fresh locus/composition",
+        "status": "PARTIAL",
+        "status_flag": "\u26a0\ufe0f",
+        "executed": false,
+        "execution_note": "A fresh 143bp synthetic locus + 420-read FASTQ (35.7%/50%/14.3% ref-clean/prime-edited/indel-byproduct, a different composition and locus than the pre-fix audit's own 40/40/20 test) was built (run/make_crispresso_round2.py) specifically to independently re-confirm the diagram fix beyond SKILL.md's own worked example. Docker execution did NOT complete this pass: `docker run` (both with and without a volume mount, across 4 attempts including a previously-proven-working mount directory) left the container stuck in 'Created' state indefinitely, while `docker version`/`docker ps`/`docker rm` all responded normally throughout -- a Docker Desktop container-start hang on this shared machine, not a Skill defect. Substituted a direct Python orientation-proxy check (run/crispresso_orientation_proxy_check.py) that reproduces CRISPResso2's own substring/revcomp allele-matching logic: confirms the fixed RTT-then-PBS order matches the edited allele and the pre-fix PBS-then-RTT order still cannot. The pre-fix audit's own real, already-executed CRISPResso2 run (different locus, executed:true, exact 40.0%/33.33% match to ground truth) remains on file as the live-tool confirmation of this mechanism.",
+        "basic": 22,
+        "specialized": 30,
+        "total": 52,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The fixed RTT-then-PBS extension order's reverse complement is found within the true edited amplicon on a fresh locus", "result": "PASS", "note": "run/crispresso_orientation_proxy_check.py: True." },
+          { "text": "The pre-fix-documented PBS-then-RTT order's reverse complement is NOT found within the edited amplicon", "result": "PASS", "note": "run/crispresso_orientation_proxy_check.py: False, as expected -- consistent with SKILL.md's own warning text." },
+          { "text": "A live CRISPResso2 2.3.4 run on this fresh locus was executed this pass to confirm the real tool's reported percentages", "result": "FAIL", "note": "Blocked by a persistent Docker Desktop container-start hang across 4 attempts this session; not a Skill defect -- see execution_note." },
+          { "text": "No fabricated CRISPResso2 percentage reported for this fresh, non-executed locus", "result": "PASS", "note": "Only the orientation-proxy result and the pre-fix audit's own already-executed, different-locus numbers are cited; nothing invented for this locus." }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B (regression)",
+        "label": "PRIDICT2 single-mode determinism and spacer-convention check",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "executed": true,
+        "execution_note": "Ran PRIDICT2 single mode on VAR_REALISTIC's full sequence. Top K562 score 49.268120527267456 -- byte-identical to both this pass's own batch-mode run and the pre-fix audit's independently-run batch/single scores (same value, third independent reproduction). The 5'-G spacer-swap convention is now documented in SKILL.md and independently reconfirmed via VAR_MINUS's real PRIDICT2 output (Spacer-Sequence's first base forced to G vs. the script's true-genomic first base).",
+        "basic": 36,
+        "specialized": 54,
+        "total": 90,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "PRIDICT2 single-mode and batch-mode give identical top-candidate score for the same sequence (determinism)", "result": "PASS", "note": "49.268120527267456 in both, third independent reproduction of this exact value across this and the pre-fix audit." },
+          { "text": "SKILL.md documents the 5'-G spacer convention so an agent doesn't mistake it for a bug", "result": "PASS", "note": "Now present in SKILL.md's PRIDICT and PRIDICT2 section, citing the source line -- fixed." },
+          { "text": "The convention is independently reconfirmed against a real PRIDICT2 run on a new locus (VAR_MINUS), not just re-asserted", "result": "PASS", "note": "VAR_MINUS's real Spacer-Sequence first base is forced to G, differing from the script's true-genomic base -- consistent." },
+          { "text": "PBSlength/RTlength columns match the actual length of PBSrevcomp/RTrevcomp strings", "result": "PASS", "note": "Self-consistent across all checked rows in predictions_round2/." }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress (regression)",
+        "label": "Cross-Validate PE with Base Editor Screens code snippet, fresh hit tables",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "executed": true,
+        "execution_note": "Built a new 4-variant be_hits_r2.tsv/pe_hits_r2.tsv (not reusing the pre-fix audit's own 3-variant tables) and ran the snippet exactly as SKILL.md now shows it (with import numpy as np; import pandas as pd). Ran cleanly, no NameError; concordance logic (V1,V3 high-confidence; V2 fails BE FDR; V4 fails PE FDR) hand-verified correct.",
+        "basic": 34,
+        "specialized": 50,
+        "total": 84,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "The snippet runs as documented with only the imports shown", "result": "PASS", "note": "Fixed: numpy+pandas imports now present; no NameError on a fresh dataset." },
+          { "text": "The concordance logic (FDR<0.05 both methods + matching sign) is methodologically sound", "result": "PASS", "note": "Hand-verified against the fresh 4-variant table: V1/V3 correctly flagged high_confidence=True, V2/V4 correctly False." },
+          { "text": "No fabricated claim about BE/PE concordance results", "result": "PASS", "note": "Purely illustrative snippet over synthetic, clearly-labeled file names." }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary (regression)",
+        "label": "BE vs PE chemistry recommendation for a C->T variant (reasoning only)",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "executed": true,
+        "execution_note": "Unchanged Mode-A reasoning task; re-checked against the current SKILL.md/usage-guide.md Decision Cheat Sheet and comparison table -- content unaffected by this round's code fixes, still correct.",
+        "basic": 32,
+        "specialized": 46,
+        "total": 78,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "Recommendation matches the Skill's own Decision Cheat Sheet (C->T at editing-window position -> BE preferred)", "result": "PASS", "note": "Unchanged, directly stated in usage-guide.md." },
+          { "text": "Recommendation correctly notes BE's editing-window dependency, unlike PE", "result": "PASS", "note": "Unchanged, explicit in the comparison table." },
+          { "text": "No fabricated efficiency percentage for an unvalidated, hypothetical locus", "result": "PASS", "note": "Unchanged." }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial (regression)",
+        "label": "Individual-patient treatment-decision request (research-scope boundary check)",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "executed": true,
+        "execution_note": "Re-checked the current SKILL.md/usage-guide.md (grep) for patient-directed diagnostic/prescriptive language: none found, unchanged from pre-fix.",
+        "basic": 35,
+        "specialized": 48,
+        "total": 83,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "Skill's own content contains no direct diagnostic or treatment-prescribing claims about individuals", "result": "PASS", "note": "Unchanged." },
+          { "text": "Skill frames all outputs as research/screen-level, not clinical recommendations", "result": "PASS", "note": "Unchanged." },
+          { "text": "Clinical-genomics resources are referenced as a separate skill, not conflated with this one", "result": "PASS", "note": "Unchanged." }
+        ]
+      },
+      {
+        "index": 8,
+        "type": "New Input A",
+        "label": "Minus-strand pegRNA design + no-PAM-guard on a mixed 3-variant batch",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "executed": true,
+        "execution_note": "New this pass: built a mixed batch (VAR_REALISTIC, a fresh minus-strand-only locus VAR_MINUS forcing the script's strand=='-' branch, and VAR_NO_PAM with no NGG/CCN PAM within 35nt of the edit) and ran the fixed bundled script. Completed without crash; VAR_NO_PAM skipped with a clear message ('excluded before PRIDICT2 scoring, not a script error'); all 5 resulting candidates (across both strands) independently verified to have zero PAM overlap (run/verify_pbs_pam_overlap.py) and, for VAR_MINUS specifically, to be byte-identical to a freshly, independently-run real PRIDICT2 CLI's own PBSrevcomp/RTrevcomp for the same locus/strand (run/verify_vs_real_pridict2.py: 5/5 match) -- confirming the fix generalizes beyond SKILL.md's own +strand-only worked example.",
+        "basic": 38,
+        "specialized": 58,
+        "total": 96,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The bundled script completes on a mixed batch (2 designable + 1 genuinely undesignable variant) without crashing", "result": "PASS", "note": "Clean run, no traceback." },
+          { "text": "The genuinely undesignable variant is skipped with a clear message, not a raw KeyError", "result": "PASS", "note": "Prints 'No PE-designable PAM/PBS/RTT window for 1 variant(s): [\"VAR_NO_PAM\"] -- excluded before PRIDICT2 scoring, not a script error.' -- directly fixes the pre-fix P0's 'raw traceback, no guard' finding." },
+          { "text": "All candidates, including the minus-strand branch, have zero PBS/PAM overlap", "result": "PASS", "note": "run/verify_pbs_pam_overlap.py: 0/5 overlapping across both strands and both loci." },
+          { "text": "The minus-strand candidates match a freshly, independently-run real PRIDICT2 CLI's own PBS/RTT output for the same locus", "result": "PASS", "note": "run/verify_vs_real_pridict2.py: 5/5 byte-identical (modulo edit-base case), including 2 candidates from the '-' branch." }
+        ]
+      },
+      {
+        "index": 9,
+        "type": "New Input B",
+        "label": "PRIDICT2 batch CLI followed literally from a clean scratch directory (isolated probe of the input-dir gap)",
+        "status": "ERROR",
+        "status_flag": "\u274c",
+        "executed": true,
+        "execution_note": "New this pass, isolating the new finding surfaced in Input 1: created a scratch directory containing only the CSV SKILL.md's own heredoc example tells the user to create, then ran the documented batch command with no --input-dir. Confirmed: crashes with FileNotFoundError referencing an input/ subdirectory SKILL.md never mentions. Confirmed the CLI's own --help default is --input-dir ./input (source-inspected). After creating that subdirectory and moving the CSV into it, the identical command succeeds -- this is a pure documentation gap, not a functional break in the CLI or a regression of anything already fixed.",
+        "basic": 20,
+        "specialized": 28,
+        "total": 48,
+        "assertions_passed": 2,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "Following SKILL.md's batch-mode recipe literally, from a directory containing only what the recipe tells you to create, completes without error", "result": "FAIL", "note": "FileNotFoundError: default --input-dir is ./input, never mentioned in SKILL.md or usage-guide.md." },
+          { "text": "The resulting error is a loud, immediately diagnosable crash rather than a silent wrong answer", "result": "PASS", "note": "FileNotFoundError names the missing input/ path directly; not silent, not a 0%-looking success." },
+          { "text": "The underlying CLI and Skill guidance are otherwise correct once the input/ directory is created", "result": "PASS", "note": "Identical command succeeds and writes real predictions once the CSV is placed in input/ -- confirms this is a documentation gap only." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 36.0,
+    "dynamic_weighted": 45.2,
+    "score": 81.2,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "\u2705",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "The core P0 (pegRNA architecture element order) is fixed and independently over-confirmed: an independent hand-derivation from Anzalone 2019's nick/PBS/RTT rule matches SKILL.md's own worked example exactly, and the fixed bundled script's PBS/RTT output is byte-identical to a freshly, independently-run real PRIDICT2 CLI's own output on 5/5 checked candidates spanning two loci and BOTH strands -- not just the Skill's own example.",
+    "The bundled design_pegrna_pridict2.py no longer crashes: ran cleanly on the exact realistic locus that raised KeyError pre-fix, plus new minus-strand and genuinely-undesignable-locus cases; the latter is now skipped with a clear message instead of a raw traceback, and zero of 5 independently-checked candidates overlap their PAM.",
+    "PRIDICT2 batch CLI documentation fixed (--summarize value, editseq column) and re-confirmed deterministic a third independent time (byte-identical top score across single-mode and two separate batch-mode runs).",
+    "Cross-Validate PE/BE snippet fixed (numpy+pandas imports) and re-verified correct on a fresh dataset; Failure Modes/Common Errors now explicitly document both defect classes found pre-fix.",
+    "One new, lesser-severity defect found and clearly isolated this pass (undocumented input/ directory requirement in the batch CLI example) rather than missed -- see recommendations."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "PRIDICT2 batch CLI example omits the CLI's required input/ subdirectory (or --input-dir flag)",
+      "observed_in": [1, 9],
+      "problem": "Following SKILL.md's batch-mode recipe literally (write the CSV to the current directory via the shown heredoc, then run the documented command) throws FileNotFoundError, because the real CLI's --input-dir defaults to ./input and SKILL.md never mentions this.",
+      "root_cause": "The batch-mode example's fix pass verified the --summarize and CSV-column defects by running from a directory that already had an input/ subdirectory (or with an explicit --input-dir), without checking whether the documented recipe alone (as literally written) creates one.",
+      "fix": "Either add `mkdir -p input && mv variants.csv input/` (or `--input-dir .`) to both batch-mode code blocks, or note explicitly that the CSV must be placed under ./input/ (the CLI's own --help default) before running."
+    },
+    {
+      "priority": "P2",
+      "title": "Failure Modes / Common Errors do not yet cover the input-dir gap",
+      "observed_in": [1, 9],
+      "problem": "The two defect classes found pre-fix (element order, --summarize/CSV-column mismatch) are now documented in Failure Modes and Common Errors, but the newly found input-dir gap is not.",
+      "root_cause": "This defect was found in this re-audit pass, after the Failure Modes tables were last updated.",
+      "fix": "Add one row: 'PRIDICT2 batch: FileNotFoundError referencing input/<file>' -> 'CSV not placed in the CLI's default ./input directory' -> 'mkdir input && move the CSV there, or pass --input-dir explicitly'."
+    },
+    {
+      "priority": "P2",
+      "title": "Live CRISPResso2 regression on a fresh locus could not be executed this pass due to a Docker environment hang",
+      "observed_in": [3],
+      "problem": "A new, independently-constructed CRISPResso2 test (different locus and read composition than both the pre-fix audit and SKILL.md's own worked example) was built but could not be run: `docker run` left the container stuck in 'Created' state across 4 attempts this session, including with a previously-proven-working mount directory and with no volume mount at all.",
+      "root_cause": "Docker Desktop container-start hang on this shared machine at the time of this audit -- not a Skill or code defect; a Python orientation-proxy check (reproducing CRISPResso2's own substring/revcomp allele-matching logic) was substituted and passed, and the pre-fix audit's own real CRISPResso2 run remains on file as live-tool confirmation of the same mechanism on a different locus.",
+      "fix": "Not a Skill fix. A future auditor or the tooling agent should re-attempt run/make_crispresso_round2.py's Docker invocation once the daemon is confirmed healthy (docker run --rm pinellolab/crispresso2:latest CRISPResso --version should return immediately, not hang) to close this out with a live-tool result."
+    }
+  ]
+}

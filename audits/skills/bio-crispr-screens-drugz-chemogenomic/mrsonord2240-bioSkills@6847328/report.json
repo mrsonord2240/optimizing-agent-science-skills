@@ -1,0 +1,219 @@
+{
+  "source": "mrsonord2240/bioSkills@6847328:crispr-screens/drugz-chemogenomic",
+  "meta": {
+    "skill_name": "bio-crispr-screens-drugz-chemogenomic",
+    "description": "Analyzes CRISPR drug-modifier (chemogenomic) screens with drugZ (Colic et al. 2019 Genome Med), a bidirectional Z-score method identifying synthetic-lethal sensitizing genes and resistance-conferring suppressor genes from vehicle vs drug comparisons.",
+    "evaluated_on": "2026-09-16",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "B",
+    "complexity": "Complex",
+    "n_inputs": 7
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "Citations (Colic 2019 Genome Med, Olivieri 2020 Cell, Behan 2019 Nature) are real and match drugZ's actual provenance; no fabricated DOI/PMID/statistics across any of the 7 outputs." },
+      "practice_boundaries": { "result": "PASS", "detail": "Purely a screen-analysis research tool; no diagnostic, prescriptive, or individual-patient claims anywhere, including the new synergy-screen input (Input 7)." },
+      "methodological_ground": { "result": "PASS", "detail": "Core method (bidirectional Z, vehicle-anchored not Day-0) re-verified correct; the previously-broken essentials-exclusion example and previously-pseudocode dose-consistency logic are now both real, correct, runnable code, verified against planted ground truth." },
+      "code_usability": { "result": "PASS", "detail": "All 7 CLI/code paths documented in SKILL.md/usage-guide/examples ran without syntax errors or missing dependencies. The Input-2 P0 from the pre-fix audit (essentials-exclusion silently excluding 0 genes) is fixed and now self-verifying via an assert in examples/run_drugz.py." }
+    }
+  },
+  "static_score": {
+    "subtotal": 89,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 11, "max": 12, "note": "Completeness/appropriateness strong and unchanged. Correctness no longer docked: examples/run_drugz.py Step 2 now parses CEGv2.txt correctly (verified: excludes 646/684 genes) and asserts non-zero exclusion. Half-point-equivalent still missing: no worked example demonstrates the new half_window_size guidance end-to-end on a small table." },
+      "reliability": { "score": 9, "max": 12, "note": "Both pre-fix P0/P1 reliability gaps are substantively fixed: the essentials-exclusion no-op now fails loudly (assert) instead of exiting 0 silently, and the half_window_size/library-size crash is now documented with the exact error text and a concrete fix (verified: IndexError at default on 200 guides, clean run at --half_window_size 50). Docked because that guidance lives only in the Algorithm-section prose, not in the Common Errors quick-reference table -- see recommendations." },
+      "performance_context": { "score": 7, "max": 8, "note": "SKILL.md grew modestly (~254 to ~299 lines) to add the half_window_size paragraph and the rewritten -r section; still linear, no redundant steps, reasonable progressive disclosure." },
+      "agent_usability": { "score": 15, "max": 16, "note": "Terminology/output-column documentation remains an exact match to real drugZ output. Error Prevention improved: Failure Modes table's 'Unstable hits' entry was correctly corrected to state a rerun on identical input cannot demonstrate instability (verified: two reruns are byte-identical). Still docked one point for the Common Errors table gap noted under Reliability." },
+      "human_usability": { "score": 7, "max": 8, "note": "Quick Start / Example Prompts unchanged and strong. Forgiveness improved: the -r footgun that previously failed silently now fails loudly via an assert in the shipped example, which is a real usability improvement, not just a correctness fix." },
+      "security": { "score": 11, "max": 12, "note": "No credentials or PHI involved. Input Validation improved: examples/run_drugz.py now validates that -r's gene list actually removed genes (assert removed) instead of trusting an unvalidated join, closing the exact hole that produced the pre-fix P0." },
+      "maintainability": { "score": 11, "max": 12, "note": "Clean SKILL.md/usage-guide/examples split, unchanged. Testability improved: the essentials-exclusion example now has a self-check (gene-count diff) that would have caught its own pre-fix bug; the dose-consistency function is now real code that can be unit-tested." },
+      "agent_specific": { "score": 18, "max": 20, "note": "Precise trigger description, explicit Related Skills cross-references, and CLI determinism now independently reconfirmed (byte-identical reruns). Escape Hatches still thin: no guidance on what to do when a run crashes or replicate Pearson falls below 0.85 beyond listing it as a checklist item -- unchanged from the pre-fix audit." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 90.4,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 27, "total": 28 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Standard PARPi-style vehicle vs drug run on synthetic HAP1 TKOv3-derived counts",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. Regression of pre-fix Input 1: ran the SKILL.md CLI verbatim (python drugz.py -i ... -c Veh_r1,Veh_r2,Veh_r3 -x Drug_r1,Drug_r2,Drug_r3 -p 5) against the audit's synthetic drug-vs-vehicle count table (6 planted sensitizers, 6 planted suppressors, 1 drug-target-paradox gene). Unchanged from pre-fix: 12/12 planted genes recovered at rank_synth/rank_supp 1-6 (paradox gene at rank_supp 7), 0/18054 NaN in normZ.",
+        "basic": 38,
+        "specialized": 55,
+        "total": 93,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Output contains the documented columns (GENE, sumZ, normZ, fdr_synth, fdr_supp, etc.)", "result": "PASS", "note": "All 10 documented columns present, exact names." },
+          { "text": "Planted ground-truth sensitizer/suppressor genes are recovered as the top hits", "result": "PASS", "note": "6/6 sensitizers at rank_synth 1-6; 6/6 suppressors at rank_supp 1-6; paradox gene at rank_supp 7." },
+          { "text": "No NaN/garbage values in normZ or FDR columns", "result": "PASS", "note": "0/18054 genes NaN in normZ (confirms the drugZ CoW patch still holds under pandas 3.0.5)." },
+          { "text": "Command matches SKILL.md's documented CLI syntax exactly, unmodified", "result": "PASS", "note": "Ran the exact -i/-o/-c/-x/-p pattern from the Quick Reference." }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "P0 regression: -r essentials exclusion, old broken join vs new corrected parsing, run side by side",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. Built the -r argument two ways from the real cached CEGv2.txt (685 lines incl. header): (a) the pre-fix construction, joining raw tab-separated lines with commas; (b) the current SKILL.md/examples construction, parsing column 1 and skipping the header. Ran both through drugz.py against Input 1's counts file.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The corrected -r construction actually excludes the named genes from the output", "result": "PASS", "note": "646/684 listed CEGv2 genes removed; gene count dropped from 18,054 to 17,408, matching the fix log's own numbers exactly." },
+          { "text": "The old (pre-fix) construction, run on the same data, still excludes zero genes", "result": "PASS", "note": "0/684 removed; output byte-for-byte/normZ-identical to the unfiltered Input-1 run (max |diff| = 0.0) -- confirms the P0 was a real defect, not something already working." },
+          { "text": "None of the genes named in -r remain in the corrected run's output", "result": "PASS", "note": "0 of the 646 removed genes reappear in the filtered output." },
+          { "text": "The shipped example script fails loudly (not silently) if -r matches no gene", "result": "PASS", "note": "examples/run_drugz.py now contains `assert removed, '-r matched no gene: check the reference-file parsing'`, which would have caught the original P0 immediately." }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Variant B",
+        "label": "P1 regression: dose-consistency check using SKILL.md's dose_consistent_hits() verbatim, 3 doses",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. Built a low/mid/high 3-dose count table (low = geometric mean of vehicle and the mid-dose arm, matching the fix log's own method) and ran drugZ once per dose vs the same vehicle. Copied SKILL.md's dose_consistent_hits() function character-for-character and called it on the three output files.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "SKILL.md's dose-consistency code is real, runnable Python, not a commented-out sketch", "result": "PASS", "note": "dose_consistent_hits() ran unmodified, no syntax edits needed." },
+          { "text": "It recovers the planted sensitizers as dose-consistent hits", "result": "PASS", "note": "6/6 planted sensitizers returned (OSTM1, CER1, IL18R1, CCDC89, GALNT11, CFL2), all with normZ growing in magnitude low->mid->high (monotonic=True)." },
+          { "text": "It does not report false positives among non-planted genes", "result": "PASS", "note": "hits set == planted set exactly; 0 extra genes." },
+          { "text": "A concrete numeric consistency rule is stated, not just 'consistent direction'", "result": "PASS", "note": "SKILL.md states: same normZ sign at every dose AND fdr<0.05 at the top dose; |normZ| growth is supporting evidence only, matching what the function implements." }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Edge",
+        "label": "Diagnosing a 'no sensitizers found' report caused by comparing Day-0 instead of vehicle",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. Regression of pre-fix Input 4, unchanged code path: ran drugZ with T0 as control (-c T0 -x Drug_r1,Drug_r2,Drug_r3 -unpaired) on the same planted drug arm as Input 1.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Skill correctly identifies vehicle (not Day-0) as the required control", "result": "PASS", "note": "Both SKILL.md and usage-guide state this as the single most common silent failure." },
+          { "text": "Day-0 vs Drug measurably masks true drug-specific hits relative to Vehicle vs Drug", "result": "PASS", "note": "All 6 planted sensitizers dropped from rank_synth 1-6/fdr<1e-200 to rank ~718-1062/fdr 0.10-0.26." },
+          { "text": "509 genes cross fdr_synth<0.05 under Day-0-vs-Drug (proliferation drift) vs 6 true hits under Vehicle-vs-Drug", "result": "PASS", "note": "Re-confirmed exactly: 509 vs 6, matching the pre-fix audit's own numbers." },
+          { "text": "Fix guidance (re-run with vehicle) is actionable and resolves the issue", "result": "PASS", "note": "Confirmed via Input 1, the exact re-run, which recovers all 6 planted hits cleanly." }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "P1 regression: small/pilot-scale count table vs --half_window_size",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "executed: true. Ran drugz.py on the audit's 200-guide synthetic subset at the default half_window_size (500), then at ~1/4 of the guide count (50), matching the fix log's own test.",
+        "basic": 34,
+        "specialized": 47,
+        "total": 81,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "SKILL.md now documents the total-guide-count vs half_window_size relationship", "result": "PASS", "note": "Algorithm section's 'Library size vs --half_window_size' paragraph states the 4x-guides rule and quotes the exact error text verbatim." },
+          { "text": "Running at the default half_window_size on a 200-guide table reproduces the documented IndexError", "result": "PASS", "note": "'IndexError: single positional indexer is out-of-bounds', exact match to SKILL.md's quoted text." },
+          { "text": "Setting --half_window_size to ~1/4 of the guide count (50 on 200 guides) lets the run complete", "result": "PASS", "note": "returncode 0, 51 gene rows, 0 NaN -- matches the fix log's own numbers exactly." },
+          { "text": "This guidance appears in the Common Errors quick-reference table, not only in algorithm prose", "result": "FAIL", "note": "Checked SKILL.md's Common Errors table directly: it still has no IndexError/half_window_size row. The fix log itself records this as a prose addition ('New paragraph after the algorithm'), not a table row, so this is not a broken claim -- but an agent scanning only the Common Errors table for a quick lookup would still miss it." }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Adversarial",
+        "label": "NEW: T3 determinism check -- rerun drugZ twice on identical input",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. Not in the pre-fix audit. Directly tests the fix log's claim that drugZ has no sampling step or seed and the Skill's rewritten 'Unstable hits' failure mode, which now states a same-input rerun cannot demonstrate instability.",
+        "basic": 37,
+        "specialized": 54,
+        "total": 91,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Two identical drugZ invocations on the same input produce byte-identical output files", "result": "PASS", "note": "filecmp.cmp(shallow=False) True; max |normZ| diff between reruns = 0.0." },
+          { "text": "SKILL.md's failure-mode text matches this empirical behavior (no overclaimed non-determinism)", "result": "PASS", "note": "'drugZ has no sampling step and no seed: identical input gives a byte-identical output file, so a rerun is not a stability check.' -- verified true." },
+          { "text": "The Skill points to a real stability check instead (replicate hold-out / guide bootstrapping)", "result": "PASS", "note": "Fix text: 'check stability by holding out a replicate or bootstrapping the guides yourself; or use MAGeCK MLE.'" },
+          { "text": "T3 Result Determinism veto criterion is satisfied", "result": "PASS", "note": "No output variance on identical input at any temperature-equivalent setting; CLI tool, not an LLM sampling step." }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Scope Boundary",
+        "label": "NEW: two-drug combinatorial synergy screen -- should the Skill force drugZ or redirect?",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: false (Mode A reasoning task, not code). Prompt: 'I have a Drug A + Drug B combination screen (single arm each drug, plus the combo, vs vehicle) and want to find genes whose loss is synergistically lethal with the combination. Can I just run drugZ on combo-vs-vehicle?' Checked the Skill's own guidance for whether it correctly scopes drugZ's applicability here rather than presenting a per-drug drugZ run as sufficient for synergy detection.",
+        "basic": 35,
+        "specialized": 49,
+        "total": 84,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The Skill does not claim drugZ can detect synergy/interaction effects on its own", "result": "PASS", "note": "SKILL.md's comparison table: 'Synergy / antagonism detection: Limited (per-drug calling only)' vs 'MAGeCK MLE: YES (interaction term in MLE)'; no synergy-score column exists in drugZ's documented output." },
+          { "text": "The Skill redirects a synergy-detection question to MAGeCK MLE with an interaction term", "result": "PASS", "note": "usage-guide's Decision Cheat Sheet: 'Synergy / antagonism | MAGeCK MLE with interaction term', matched verbatim in SKILL.md's comparison table." },
+          { "text": "The Skill still offers a constructive drugZ-based first pass rather than a bare refusal", "result": "PASS", "note": "'Reconciliation' section: run both methods; drugZ-only hits at low LFC flagged as needing orthogonal validation -- a per-drug drugZ run remains useful as one input, just not sufficient alone for synergy." },
+          { "text": "No fabricated statistical claim is introduced to answer the out-of-scope part of the question", "result": "PASS", "note": "No invented synergy metric or p-value; the answer stays within what drugZ's real output columns support." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 35.6,
+    "dynamic_weighted": 54.2,
+    "score": 90,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "The pre-fix P0 is genuinely fixed and self-verifying, not papered over: run side by side, the corrected -r parsing excludes 646/684 CEGv2 genes (18,054 -> 17,408 output rows) while the old broken join, on identical input, still excludes 0/684 and is byte-identical to the unfiltered run -- confirming the original defect was real and the fix targets it directly.",
+    "The dose-response section's code is now genuinely runnable: SKILL.md's dose_consistent_hits(), copied character-for-character with no edits, recovered 6/6 planted sensitizers across a 3-dose synthetic screen with zero false positives.",
+    "drugZ's determinism claim is independently verified, not just asserted: two full reruns of the same 71,090-guide input produced byte-identical output files (max |normZ| diff = 0.0), matching the Skill's corrected 'Unstable hits' failure-mode text.",
+    "The Skill correctly scopes its own limits rather than overclaiming: presented with a combinatorial drug-synergy question outside drugZ's documented strengths, its own comparison table and decision cheat sheet redirect to MAGeCK MLE with an interaction term instead of forcing an inappropriate per-drug drugZ analysis.",
+    "Unchanged, already-strong behavior held up under re-test: the canonical run and the Day-0-vs-vehicle failure-mode diagnosis reproduced the pre-fix audit's exact numbers (12/12 planted hits; 509 vs 6 spurious genes under Day-0)."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "Common Errors table still lacks a half_window_size/IndexError row",
+      "observed_in": [5],
+      "problem": "The pre-fix audit's own P1 recommendation proposed adding a Common Errors row for 'IndexError: single positional indexer is out-of-bounds'. The fixer instead documented the fix as prose (per the fix log: 'New paragraph after the algorithm'), and that prose is accurate and complete. But the shipped SKILL.md's Common Errors table (6 rows: No hits / Hits dominated by essentials / Unstable hits / Drug-target as suppressor / MAGeCK-drugZ disagreement / Inconsistent between doses) still has no row for this crash, so an agent that jumps straight to that quick-reference table after hitting the error will not find the fix there.",
+      "root_cause": "The fix addressed the substance (documenting the guide-count / half_window_size relationship) via Algorithm-section prose rather than the Common Errors table the original recommendation suggested; both are legitimate documentation choices, but only the table is a quick-lookup surface for this specific crash message.",
+      "fix": "Add a row to the Common Errors table: 'IndexError: single positional indexer is out-of-bounds | half_window_size too large for total guide count | set --half_window_size to ~1/4 of total guides; see Algorithm section'."
+    },
+    {
+      "priority": "P2",
+      "title": "Escape Hatches for a crashed run or low replicate concordance remain thin",
+      "observed_in": [],
+      "problem": "Beyond the checklist item 'Replicate Pearson >0.85', there is still no guidance on what to do when a run crashes generally or when replicate concordance falls below that threshold -- unchanged from the pre-fix audit.",
+      "root_cause": "The fix round targeted the three findings explicitly reported (essentials exclusion, half_window_size, dose pseudocode) and did not extend to this pre-existing, lower-priority gap.",
+      "fix": "Add a short 'If replicate Pearson <0.85' subsection: hold out the worst replicate and re-run, or flag the screen as QC-failed before trusting drugZ's small-effect sensitivity, which amplifies noise on poor-concordance data."
+    }
+  ]
+}

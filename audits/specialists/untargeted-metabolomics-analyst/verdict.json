@@ -1,6 +1,6 @@
 {
   "specialist_id": "untargeted-metabolomics-analyst",
-  "verdict": "not viable",
-  "failing_gate": "gates 3 and 4",
+  "verdict": "viable",
+  "failing_gate": null,
   "recorded_on": "2026-09-16"
 }

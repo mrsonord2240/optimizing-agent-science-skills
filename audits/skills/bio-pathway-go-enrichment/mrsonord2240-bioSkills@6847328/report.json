@@ -1,0 +1,187 @@
+{
+  "meta": {
+    "skill_name": "bio-pathway-go-enrichment",
+    "description": "Runs Gene Ontology over-representation analysis (ORA) on a gene LIST with clusterProfiler enrichGO, the one-sided hypergeometric/Fisher 2x2 test phyper(k-1, M, N-M, n, lower.tail=FALSE). Covers why the BACKGROUND universe (not the gene list) is the null and decides significance, why omitting universe= is a bug, why enrichGO defaults to ont='MF' not 'BP', why pvalueCutoff filters p.adjust not raw p, why ORA discards effect magnitude and inherits GO-DAG true-path redundancy (simplify, topGO), why RNA-seq gene-length bias inflates long-gene terms (GOseq Wallenius), plus GeneRatio/BgRatio, bitr ID mapping, minGSSize/maxGSSize, groupGO.",
+    "evaluated_on": "2026-09-16",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "mrsonord2240/bioSkills@6847328:pathway-analysis/go-enrichment",
+    "audit_type": "re-audit after fix commit f683355 (fix/r2-crispr-b); pre-fix report archived at F:\\OpenScience\\audits\\_pre-fix-20260916\\bio-pathway-go-enrichment\\ (score 90, three open P2s, no P0/P1)",
+    "executed_inputs": "6/7 (input 7's org.Mm.eg.db sub-check not executable: package not installed in this audit environment; its two other sub-checks executed)"
+  },
+  "veto_gates": {
+    "skill_veto": { "gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS" },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All numbers come from executed runs on this machine; gene identities and GO annotations are real (org.Hs.eg.db 3.20.0, GO.db 3.18.0, clusterProfiler 4.14.6); hit/universe membership is synthetic and labeled as such; references are real papers." },
+      "practice_boundaries": { "result": "PASS", "detail": "Functional annotation only; no individual-level or clinical content." },
+      "methodological_ground": { "result": "PASS", "detail": "The executed ORA/simplify/enricher runs are all methodologically sound (correct hypergeometric framing, universe-as-null, effect size alongside p, circularity caveat present). The one confirmed defect (see Input 4 / P1) is a wrong prose claim about simplify()'s behavior on ont='ALL' objects, not a fallacy committed by any generated analysis -- the Skill's own recommended workaround (run BP/MF/CC separately) remains valid practice regardless." },
+      "code_usability": { "result": "PASS", "detail": "Every R block and both shipped example scripts ran verbatim on clusterProfiler 4.14.6 / org.Hs.eg.db 3.20.0, including the previously-unrunnable examples/go_all_ontologies.R, now self-contained and exiting 0. GOseq block still not executable (geneLenDataBase will not install in this environment; unchanged from the pre-fix audit, not part of this fix)." }
+    }
+  },
+  "static_score": {
+    "subtotal": 89,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 10, "max": 12, "note": "Completeness 4 (unchanged). Correctness 2 (down from 3 pre-fix): the stale-column defect (fix claim #1) is genuinely fixed and verified byte-exact against a manual (k/n)/(M/N) computation, but the fix introduced a NEW confidently-stated, unreproducible claim -- simplify() on an ont='ALL' object is now said to 'silently return only the first ontology's terms (BP)... (checked on clusterProfiler 4.14.6)' in three places (SKILL.md failure-mode section, SKILL.md Common Errors table, usage-guide.md Tips), but on that identical installed version simplify() correctly dispatches GOALL objects to clusterProfiler's own simplify_ALL() helper and returns all three ontologies, each independently de-redundified (verified twice, plus by inspecting the installed method dispatch). Appropriateness 4 (unchanged)." },
+      "reliability": { "score": 10, "max": 12, "note": "Unchanged from pre-fix: explicit recovery guidance (inspect with cutoffs at 1, report conversion rate, flag >15% ID loss); no code-level guards, acceptable for Mode A." },
+      "performance_context": { "score": 7, "max": 8, "note": "Unchanged: dense single-file skill; enrichGO on a 3500-gene universe ran in 37 s this pass (vs 146 s pre-fix, machine-load variance, not a Skill property), full ont='ALL' example 74 s." },
+      "agent_usability": { "score": 15, "max": 16, "note": "Down 1 from pre-fix: every other instruction (set ont explicitly, pass universe, deduplicate after bitr, read FoldEnrichment, simplify per ontology) is directly executable and verified, but the simplify(ont='ALL') rationale now feeds the agent an incorrect mental model of why per-ontology simplification is needed, even though the recommended action (run BP/MF/CC separately) still happens to be safe." },
+      "human_usability": { "score": 7, "max": 8, "note": "Unchanged: natural trigger, bitr guidance for non-ENTREZID IDs." },
+      "security": { "score": 11, "max": 12, "note": "Unchanged: local OrgDb only, no credentials or network, no input validation code." },
+      "maintainability": { "score": 11, "max": 12, "note": "Up 2 from pre-fix: examples/go_all_ontologies.R (fix claim #3) is now genuinely self-contained and was run end-to-end verbatim from the shipped file with no substituted input, producing BP 51 / MF 23 / CC 5 terms after simplify -- exactly matching the fix log's own reported numbers. Both shipped examples now run offline." },
+      "agent_specific": { "score": 18, "max": 20, "note": "Unchanged: precise trigger, routing to gsea/kegg/reactome/wikipathways/enrichment-visualization, reproducible given pinned annotation packages; the enrichGO ont='MF' default and the enrichment_force_universe option description were independently re-verified this pass and both held." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 90.1,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 27, "total": 29 },
+    "inputs": [
+      {
+        "index": 1, "type": "Canonical", "label": "GO BP ORA on a proteomics hit list with the quantified proteome as universe (regression of pre-fix Input 1)",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "enrichGO block (b01, post-fix) ran verbatim: 15 terms, planted GO:0002181 cytoplasmic translation first (FoldEnrichment 11.66, p.adjust 3.4e-32, 40/146 genes), N=3363. Columns returned: ID,Description,GeneRatio,BgRatio,RichFactor,FoldEnrichment,zScore,pvalue,p.adjust,qvalue,geneID,Count -- an EXACT match to the fixed SKILL.md's documented column list (fix claim #1). FoldEnrichment and RichFactor match independent manual (k/n)/(M/N) and k/M computations to floating-point precision (max abs diff 3.6e-15 and 0).",
+        "executed": true,
+        "execution_note": "run/in1_canonical.R sourcing run/blocks/b01 (extracted fresh from the post-fix SKILL.md) verbatim; SYNTHETIC hit/universe membership over REAL org.Hs.eg.db annotations (data/make_go_inputs.R, re-generated this pass); output run/in1_canonical.out, terms in run/in1_terms.csv.",
+        "basic": 38, "specialized": 57, "total": 95,
+        "assertions_passed": 5, "assertions_total": 5,
+        "assertions": [
+          { "text": "The enrichGO block runs as written on the installed clusterProfiler", "result": "PASS", "note": "4.14.6, 37 s" },
+          { "text": "Fix claim #1: the documented enrichResult column list (incl. RichFactor/FoldEnrichment/zScore) matches the columns actually returned", "result": "PASS", "note": "identical(colnames(d), expected_cols) == TRUE" },
+          { "text": "FoldEnrichment and RichFactor are correct, not just present", "result": "PASS", "note": "match manual (k/n)/(M/N) and k/M to float precision" },
+          { "text": "The planted biology is recovered as the top term", "result": "PASS", "note": "GO:0002181 rank 1" },
+          { "text": "ont is set explicitly rather than relying on the MF default", "result": "PASS", "note": "ont='BP' in the block" }
+        ]
+      },
+      {
+        "index": 2, "type": "Variant A", "label": "Effect of omitting universe= on a null hit list (regression of pre-fix Input 2)",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Unchanged from pre-fix within noise: matched universe gave 0 significant terms on the null list, omitted universe gave 1 (cellular response to heat, p.adjust 0.033), N grew 3363->18986. Signal list: 15->25 terms (13 shared), planted term p.adjust 3.4e-32->3.0e-46.",
+        "executed": true,
+        "execution_note": "run/in2_universe.R: enrichGO with and without universe=, matched vs omitted, both hit lists; output run/in2_universe.out.",
+        "basic": 36, "specialized": 53, "total": 89,
+        "assertions_passed": 3, "assertions_total": 4,
+        "assertions": [
+          { "text": "Omitting universe= changes the null (background N)", "result": "PASS", "note": "3363 -> 18986" },
+          { "text": "Omitting universe= produces significant terms from a list with no biology", "result": "PASS", "note": "1 term vs 0 with the matched universe" },
+          { "text": "The Skill's stated symptom (a confident table dominated by tissue-restricted terms) is reproduced", "result": "FAIL", "note": "Still only one extra term on the null list this pass too; the effect is real but the Skill's prose overstates its magnitude -- unchanged from pre-fix, not one of the three fixed claims" },
+          { "text": "Scope: no claim that the enriched terms validate the hit list", "result": "PASS", "note": "Circularity caveat is present in SKILL.md and carried into the analysis" }
+        ]
+      },
+      {
+        "index": 3, "type": "Edge", "label": "UniProt accessions and a 15-protein hit list (regression of pre-fix Input 3)",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "bitr mapped 15/15 foreground UniProt accessions (100%, 17 rows post one-to-many expansion) and 3233 universe accessions to 3331 unique ENTREZ (17 duplicate rows dropped); the 15-protein list still returned 2 significant terms with the planted term first (p.adjust 5.3e-07); inspecting with cutoffs at 1 gave 488 terms, min raw p 1.1e-09 vs min p.adjust 5.3e-07, confirming pvalueCutoff filters the adjusted p.",
+        "executed": true,
+        "execution_note": "run/in3_uniprot_small.R (bitr UNIPROT->ENTREZID on a foreground sampled to retain the planted GO:0002181 signal, then block b01 verbatim); output run/in3_uniprot_small.out.",
+        "basic": 37, "specialized": 54, "total": 91,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "The documented bitr route maps proteomics accessions and the conversion rate is reported", "result": "PASS", "note": "15/15 foreground, 100%" },
+          { "text": "One-to-many maps are deduplicated before counting", "result": "PASS", "note": "17 duplicate universe rows removed" },
+          { "text": "A 15-protein list still yields the planted term", "result": "PASS", "note": "GO:0002181 p.adjust 5.3e-07" },
+          { "text": "pvalueCutoff filters the adjusted p, as the Skill states", "result": "PASS", "note": "2 terms at defaults vs 488 with cutoffs at 1" }
+        ]
+      },
+      {
+        "index": 4, "type": "Variant B", "label": "GO-DAG redundancy: simplify per ontology, ont='ALL', groupGO -- direct test of fix claim #2 (regression of pre-fix Input 4)",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "simplify() on a single BP object: 15 -> 7 terms (unchanged, correct). ont='ALL' returned 36 terms (BP 15/CC 13/MF 8), matching the fix log's own pre-simplify numbers exactly. But simplify() on that ont='ALL' object did NOT 'silently return only the first ontology's terms (BP)' as the FIXED SKILL.md and usage-guide.md now claim (citing 'checked on clusterProfiler 4.14.6'): it returned 15 terms spanning all three ontologies (BP 7 / CC 4 / MF 4), reproduced identically across two independent runs. Inspecting the installed method (selectMethod('simplify','enrichResult')) shows it dispatches on x@ontology: 'GOALL' objects route to clusterProfiler's own simplify_ALL(), which splits by ontology, runs simplify_internal() on each, and rbinds the results -- i.e. clusterProfiler 4.14.6 already handles ont='ALL' correctly. The fixer's replacement claim does not reproduce on the exact version it cites. groupGO returned 514 classification rows with no p-value column (unchanged, correct).",
+        "executed": true,
+        "execution_note": "run/in4_simplify_all.R (single-ontology and ont='ALL' simplify, plus groupGO) and run/debug4.R/debug4c.R/debug4e.R (independent confirmation + method-dispatch inspection); outputs run/in4_simplify_all.out, run/debug4.out etc.",
+        "basic": 34, "specialized": 47, "total": 81,
+        "assertions_passed": 3, "assertions_total": 4,
+        "assertions": [
+          { "text": "simplify() collapses the redundant ancestor lineage on a single ontology", "result": "PASS", "note": "15 -> 7 BP terms" },
+          { "text": "ont='ALL' returns the three ontologies with an ONTOLOGY column", "result": "PASS", "note": "BP 15, CC 13, MF 8 = 36" },
+          { "text": "groupGO is a classification, not a test", "result": "PASS", "note": "514 rows, no p-value column" },
+          { "text": "The Skill's (fixed) description of simplify() on an ont='ALL' object matches its actual, cited-as-checked behavior", "result": "FAIL", "note": "SKILL.md/usage-guide.md say it silently keeps only BP terms 'checked on clusterProfiler 4.14.6'; on that identical version it correctly returns all three ontologies de-redundified (BP7/CC4/MF4=15) via the package's own simplify_ALL() dispatch -- confirmed reproducibly and by source inspection" }
+        ]
+      },
+      {
+        "index": 5, "type": "Stress", "label": "Direction-split ORA, fold enrichment, redundancy collapse, and a custom gene set via enricher() (regression of pre-fix Input 5, extended)",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Up (81) and down (69) proteins tested separately gave 11 and 2 terms with the planted term leading both (FoldEnrichment 12.39 and 10.80), simplify reduced them to 6 and 1, the mixed list gave 15 terms -- all unchanged from pre-fix. New this pass: enricher() on a custom 120-gene TERM2GENE returns an enrichResult with the identical RichFactor/FoldEnrichment/zScore columns as enrichGO (confirmed on the returned data frame's column names even with 0 rows at these thresholds), showing fix claim #1's column addition is a property of the shared enrichResult class and was not accidentally scoped to enrichGO only.",
+        "executed": true,
+        "execution_note": "run/in5_stress.R using blocks b01/b03 plus a direct enricher() call; output run/in5_stress.out.",
+        "basic": 38, "specialized": 55, "total": 93,
+        "assertions_passed": 5, "assertions_total": 5,
+        "assertions": [
+          { "text": "ORA is run separately per direction as the Skill directs", "result": "PASS", "note": "up 11 terms, down 2 terms" },
+          { "text": "FoldEnrichment accompanies every reported term", "result": "PASS", "note": "12.39 / 10.80 for the planted term" },
+          { "text": "Redundancy is collapsed before reporting", "result": "PASS", "note": "simplify 11 -> 6 and 2 -> 1" },
+          { "text": "enricher() shares enrichGO's RichFactor/FoldEnrichment/zScore columns (fix claim #1 generalizes beyond the documented enrichGO example)", "result": "PASS", "note": "all(c('RichFactor','FoldEnrichment','zScore') %in% colnames(d_ec)) == TRUE" },
+          { "text": "Scope: ranked-list analysis is routed to gsea rather than faked with ORA", "result": "PASS", "note": "ORA/GSEA fork followed" }
+        ]
+      },
+      {
+        "index": 6, "type": "Scope Boundary", "label": "Run the shipped examples/go_all_ontologies.R end-to-end, verbatim, unmodified -- direct test of fix claim #3",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Ran the actual file copied from the fork (not a re-implementation) with zero substitutions. Exit 0. Printed 'BP : 51 terms after simplify', 'MF : 23 terms after simplify', 'CC : 5 terms after simplify' -- an EXACT match to the fix log's own reported numbers. Wrote go_all_simplified.csv to tempdir() with columns ID,Description,GeneRatio,BgRatio,RichFactor,FoldEnrichment,zScore,pvalue,p.adjust,qvalue,geneID,Count (79 rows). The pre-fix version of this file required an unshipped de_results.csv and could not run at all; this is the first time this specific file has been executed in either audit.",
+        "executed": true,
+        "execution_note": "run/in6_example_script.R sources run/skill_copy/examples/go_all_ontologies.R (copied from the fork, not imported in place) with no modification; output run/in6_example_script.out.",
+        "basic": 37, "specialized": 55, "total": 92,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "The shipped example runs end-to-end with no unshipped input file", "result": "PASS", "note": "exit 0, no de_results.csv referenced" },
+          { "text": "Term counts match the fix log's own claimed evidence", "result": "PASS", "note": "BP 51 / MF 23 / CC 5, exact match" },
+          { "text": "Output file is written with the correct (fix claim #1) enrichResult columns", "result": "PASS", "note": "RichFactor,FoldEnrichment,zScore present" },
+          { "text": "The example avoids the disputed simplify(ont='ALL') pattern by construction (runs enrichGO per single ontology, not ont='ALL')", "result": "PASS", "note": "lapply over c('BP','MF','CC'), each a single-ontology enrichGO+simplify call" }
+        ]
+      },
+      {
+        "index": 7, "type": "Adversarial", "label": "Independently re-verify three claims the pre-fix audit never exercised: enrichGO's true default ont, the enrichment_force_universe option, and the Other-Organisms OrgDb swap",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "(a) formals(enrichGO)$ont's installed default is 'MF' -- matches the Skill's claim exactly. (c) enrichment_force_universe: with a universe padded with 50 deliberately-unannotated genes, force_universe=FALSE (default) gave N=3363 (intersected with annotated genes only) and force_universe=TRUE gave N=3550 (exactly the full injected universe) -- matches usage-guide.md's claim exactly, independently re-derived rather than trusted from the fix log's 'Checked, not changed' note. (b) org.Mm.eg.db is NOT installed in this audit environment (not in TOOLS.md's R package list), so the 'Other Organisms' mouse-swap claim could not be executed here -- an environment gap, not a demonstrated Skill defect; not scored as a failure.",
+        "executed": true,
+        "execution_note": "run/in7_organism_and_option.R: (a) and (c) executed and passed; (b) blocked, org.Mm.eg.db absent from this candidate's R-lib; output run/in7_organism_and_option.out.",
+        "basic": 37, "specialized": 53, "total": 90,
+        "assertions_passed": 3, "assertions_total": 3,
+        "assertions": [
+          { "text": "enrichGO's documented default ont='MF' matches the installed function's actual formal default", "result": "PASS", "note": "formals(enrichGO)$ont == 'MF'" },
+          { "text": "The enrichment_force_universe option's documented behavior matches observed behavior", "result": "PASS", "note": "default N=3363 (intersected), force_universe=TRUE N=3550 (full injected universe, exact match)" },
+          { "text": "Scope: parameter-verification only, no diagnostic or prescriptive conclusions", "result": "PASS", "note": "output is annotation-parameter behavior, nothing clinical" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 35.6,
+    "dynamic_weighted": 54.1,
+    "score": 90,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Fix claim #1 (enrichResult column list) verified byte-exact: FoldEnrichment and RichFactor match independent manual (k/n)/(M/N) and k/M computations to floating-point precision, and the same columns were confirmed on enricher() too, not just the documented enrichGO example",
+    "Fix claim #3 (self-contained example) verified by running the actual shipped file end-to-end with zero substitutions -- output term counts (BP 51/MF 23/CC 5) match the fix log exactly",
+    "Every core ORA claim held under re-execution: universe-omission inflates significance, pvalueCutoff filters p.adjust not raw p, bitr deduplication, direction-split analysis, enrichGO's true default ont='MF', and the enrichment_force_universe option's documented semantics",
+    "The planted biology was recovered as the top term in every variant that carried it, including a 15-protein UniProt edge case"
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "Fix claim #2 (simplify() on ont='ALL') replaced one wrong claim with another wrong claim",
+      "observed_in": [4],
+      "problem": "SKILL.md's failure-mode section, SKILL.md's Common Errors table, and usage-guide.md's Tips all now state that simplify() on an ont='ALL' object 'silently returns only the first ontology's terms (BP) and drops MF/CC entirely', citing '(checked on clusterProfiler 4.14.6)'. On the identical installed version (clusterProfiler 4.14.6, org.Hs.eg.db 3.20.0, GOSemSim 2.32.0), simplify() on a real ont='ALL' object (36 terms: BP15/CC13/MF8) returned 15 terms spanning all three ontologies (BP 7/CC 4/MF 4), reproduced identically across two independent runs. Inspecting the installed method dispatch confirms why: enrichResult objects with x@ontology=='GOALL' are routed by clusterProfiler's own simplify() generic to its internal simplify_ALL() helper, which splits by ontology, de-redundifies each with simplify_internal(), and rbinds the results back together -- i.e. this version of clusterProfiler already handles ont='ALL' correctly, contradicting both the pre-fix and the post-fix claim.",
+      "root_cause": "The fix was written from a single test session's stated output rather than independently reproduced or checked against the installed function's actual method dispatch; the confident '(checked on clusterProfiler 4.14.6)' citation makes the wrong claim more likely to be trusted and propagated than the original vaguer 'redundancy not removed, or an error'.",
+      "fix": "Before restating this claim, run selectMethod('simplify', 'enrichResult') or inspect clusterProfiler:::simplify_ALL directly. State plainly that clusterProfiler >= (whatever version introduced simplify_ALL; confirmed present in 4.14.6) already de-redundifies ont='ALL' objects correctly per ontology, and drop the three now-false 'checked' citations. If older clusterProfiler versions truly have the BP-only bug, gate the warning on a version check instead of stating it unconditionally."
+    },
+    {
+      "priority": "P2",
+      "title": "Universe-omission symptom description overstates the observed effect (unchanged from pre-fix, not one of the three fixed claims)",
+      "observed_in": [2],
+      "problem": "SKILL.md's 'Whole-genome or default universe' failure mode describes the symptom as 'a confident table where tissue-restricted / lowly-expressed-gene terms dominate'. On a null (no-biology) 150-gene list, omitting universe= produced exactly one additional term (p.adjust 0.033), not a dominated table -- reproduced this pass and in the pre-fix audit.",
+      "root_cause": "The failure mode's magnitude was written from the general mechanism rather than from a run against data of this scale.",
+      "fix": "Soften the symptom description to note that the effect scales with list size and background mismatch severity -- sometimes one spurious term, sometimes many -- rather than always implying a dominated table."
+    }
+  ]
+}

@@ -1,111 +1,127 @@
-# Audit verdict — crispr-screen-analyst (2026-09-16)
+# Audit — crispr-screen-analyst (2026-09-16)
 
-Verdict stage only. Scores, deployability, vetoes and P0/P1s below are taken from each Skill's
-`eval_report_*_result.json`; surprising items were cross-checked against the corresponding
-`eval_viewer_*.md`. Nothing was re-run or re-scored.
+Verdict stage only (Step 3 of `process/AUDIT_BRIEF.md`). Evidence is `SELECTION.md` plus every
+`eval_report_<skill-id>_result.json` under `F:\OpenScience\audits\`. No new auditing was performed;
+no Skill code was run. This replaces the prior not-viable `AUDIT.md` in full (document doctrine:
+delete the old, write the new).
+
+All 16 Skills in `SELECTION.md` were re-audited post-fix on the Sam fork
+`mrsonord2240/bioSkills-Improved` (formerly `mrsonord2240/bioSkills`), branch `openscience-fixes`.
+Every report's `source`/`meta.source` names `mrsonord2240/bioSkills@<commit>:<folder>/<skill>` — none
+still point at `GPTomics/bioSkills`, so no report needed to be scored as unfixed on that basis.
 
 ## Audited Skills
 
-| # | Skill ID | Role | Category | Mode | N | exec k/N | static | dyn. avg | final | grade | veto | top P1/P0 |
-| - | --- | --- | --- | --- | - | --- | --- | --- | --- | --- | --- | --- |
-| 1 | bio-crispr-screens-library-design | core — framing/design | Protocol Design | D | 7 | 5/7 | 33.2 | 47.8 | 81 | Limited Release | none | P1: no minimum-spacing/independence filter on candidate guides |
-| 2 | bio-crispr-screens-screen-qc | core — QC/validation | Data Analysis | D | 7 | 5/7 | 31.2 | 54.6 | 86 | Production Ready | none | P1: CN-bias Spearman threshold misses focal-amplicon artifacts |
-| 3 | bio-crispr-screens-mageck-analysis | core — central operation | Data Analysis | D | 7 | 5/7 | 36.0 | 51.5 | 88 | Limited Release | none | P1: MLE permutation-FDR undocumented-sensitive to `--permutation-round`/covariates |
-| 4 | bio-crispr-screens-bagel-essentiality | core — central operation | Data Analysis | D | 5 | 5/5 | 29.2 | 45.4 | 75 | Limited Release | **Skill Veto (T3 Determinism) FAIL** → deployable false | P0: BAGEL2 non-deterministic, undisclosed; P0: `interpret_bagel()` flags 86.5% of genome as tumor-suppressor on a dropout screen |
-| 5 | bio-crispr-screens-drugz-chemogenomic | core — central operation | Data Analysis | B | 5 | 5/5 | 30.0 | 42.4 | 72 | Beta Only | none fired, not deployable | P0: essentials-exclusion example silently excludes 0/684 genes (CEGv2.txt parsed wrong — no header skip, no tab split) |
-| 6 | bio-crispr-screens-jacks-analysis | core — central operation | Data Analysis | D | 7 | 5/7 | 28.8 | 43.6 | 72 | Beta Only | none fired, not deployable | P0: shipped `analyze_results()` NameError (`output_prefix` undefined); P0: `efficacy_summary()` `KeyError: 'Gene'` — real grna file only has `sgrna, X1, X2` |
-| 7 | bio-crispr-screens-copy-number-correction | core — CN-aware hit calling | Data Analysis | D | 7 | 3/7 | 30.0 | 43.4 | 73 | Beta Only | none fired, not deployable | P0: Chronos example unrunnable — wrong readcounts orientation; P0: decision tree wrongly claims Chronos works for one cell line + matched CN |
-| 8 | bio-crispr-screens-hit-calling | core — cross-method reconciliation | Data Analysis | D | 7 | 5/7 | 29.2 | 48.8 | 78 | Limited Release | none | P1: BAGEL2 non-determinism unaddressed; P1: three different MAGeCK-FDR/BAGEL-BF threshold pairs across the Skill's own files |
-| 9 | bio-workflows-crispr-screen-pipeline | core — end-to-end orchestration | Data Analysis | D | 7 | 4/7 | 30.4 | 45.2 | 76 | Limited Release | **Research Veto (M3 Methodological Ground) FAIL** → deployable false | P0: BAGEL2 non-determinism destabilizes the workflow's own Tier consensus; P0: shipped "Replicate Pearson" QC formula conflates replicate/non-replicate pairs (0.677 naive vs 0.789 true) |
-| 10 | bio-crispr-screens-crispresso-editing | core — editing-outcome quantification | Data Analysis | A | 7 | 7/7 | 32.8 | 43.4 | 76 | Limited Release | **Research Veto (M4 Code Usability) FAIL** → deployable false | P0: `parse_crispresso()` crashes on real output (reads `READS_ALIGNED_PERCENTAGE`, a column that does not exist); P0: CRISPRessoPooled silently all-NA on realistic pilot-scale pools |
-| 11 | bio-crispr-screens-batch-correction | supporting | Data Analysis | D | 7 | 6/7 | 31.2 | 47.2 | 78 | Limited Release | none | P1: `combat_correct()` crashes on its own "Critical"-covariate usage |
-| 12 | bio-experimental-design-batch-design | supporting (reused) | Protocol Design | — | 5 | 5/5 | 32.4 | 49.9 | 82 | Limited Release | none | P1: SVA block fails on matrices with missing values |
-| 13 | bio-pathway-go-enrichment | supporting (reused) | Data Analysis | — | 5 | 5/5 | 35.6 | 54.0 | 90 | Production Ready | none | none open |
-| 14 | bio-pathway-gsea | supporting (reused) | Data Analysis | — | 7 | 7/7 | 36.4 | 54.0 | 90 | Limited Release | none | P1: `nPerm` accepted and silently downgrades the engine |
-| 15 | bio-crispr-screens-base-editing-analysis | supporting — base-editing outcomes | Data Analysis | D | 7 | 6/7 | 26.0 | 28.2 | 54 | Reject | **Research Veto (M4 Code Usability) FAIL** → deployable false | P0×4: `filter_by_editing_efficiency()`, `deconvolute_bystander()`, `aggregate_variant_scores()` all crash (KeyError) on real CRISPResso2/MAGeCK output; `find_be_spacers()` misattributes target/bystander on reverse-strand spacers |
-| 16 | bio-crispr-screens-prime-editing-screens | supporting — prime-editing | Data Analysis | D | 7 | 5/7 | 28.0 | 36.1 | 64.1 | Beta Only | **Research Veto (M4 Code Usability) FAIL** → deployable false | P0×3: pegRNA diagram has PBS/RTT in the wrong order (CRISPResso2 silently under-reports editing); `design_pegrna_pridict2.py` crashes and can emit PAM-overlapping PBS; PRIDICT2 batch CLI example broken, then writes an empty file once patched |
+| # | Skill ID | Role | Category | Mode | N | Executed k/N | Static | Exec. avg | Final | Grade | Veto | Top open P1 |
+|---|----|----|----|----|----|----|----|----|----|----|----|----|
+| 1 | bio-crispr-screens-library-design | core — framing/design | Protocol Design | D | 8 | 8/8 | 93 | 90.0 | **91** | Production Ready | none | (P2 only) |
+| 2 | bio-crispr-screens-screen-qc | core — QC/validation pre-hit-calling | Data Analysis | D | 9 | 6/9* | 93 | 94.8 | **94** | Production Ready | none | (P2 only) |
+| 3 | bio-crispr-screens-mageck-analysis | core — central op. (hit calling) | Data Analysis | D | 9 | 9/9 | 90 | 87.0 | **88** | Limited Release† | none | 4 open P1s (RRA-pairing claim wrong; FluteMLE example broken; MLE rerun non-determinism at default; permutation-round magnitude overclaimed) |
+| 4 | bio-crispr-screens-bagel-essentiality | core — central op. (hit calling) | Data Analysis | D | 7 | 7/7 | 87 | 88.1 | **88** | Production Ready | none | reference-set failure modes documented but no runtime guard |
+| 5 | bio-crispr-screens-drugz-chemogenomic | core — central op. (hit calling) | Data Analysis | B | 7 | 6/7 | 89 | 90.4 | **90** | Production Ready | none | Common Errors table still lacks the half_window_size/IndexError row |
+| 6 | bio-crispr-screens-jacks-analysis | core — central op. (hit calling) | Data Analysis | D | 7 | 7/7 | 96 | 89.1 | **92** | Production Ready | none | (P2 only) |
+| 7 | bio-crispr-screens-copy-number-correction | **supporting** (re-marked, see below) | Data Analysis | D | 7 | 7/7 | 92 | 75.9 | **82** | Limited Release | none | (P2 only) |
+| 8 | bio-crispr-screens-hit-calling | core — cross-method reconciliation | Data Analysis | D | 9 | 9/9 | 87 | 91.4 | **90** | Production Ready | none | (P2 only) |
+| 9 | bio-workflows-crispr-screen-pipeline | core — end-to-end orchestration | Data Analysis | D | 7 | 6/7 | 86 | 84.4 | **85** | Limited Release | none | Step 6b MLE example doesn't carry sibling Skill's permutation-round caveat |
+| 10 | bio-crispr-screens-batch-correction | supporting | Data Analysis | D | 7 | 6/7 | 91 | 91.3 | **91** | Production Ready | none | (P2 only) |
+| 11 | bio-experimental-design-batch-design | supporting (reused; re-audited post-fix) | Protocol Design | A | 7 | 7/7 | 87 | 86.6 | **87** | Production Ready | none | (P2 only) |
+| 12 | bio-pathway-go-enrichment | supporting (reused) | Data Analysis | A | 7 | 6/7 | 89 | 90.1 | **90** | Production Ready | none | simplify(ont='ALL') claim wrong on the cited clusterProfiler version |
+| 13 | bio-pathway-gsea | supporting (reused; assertion count corrected — see below) | Data Analysis | A | 7 | 7/7 | 97 | 96.3 | **97** | Production Ready | none | (P2 only) |
+| 14 | bio-crispr-screens-crispresso-editing | core — editing-outcome quantification | Data Analysis | A | 9 | 9/9 | 93 | 89.2 | **91** | Production Ready | none | (P2 only) |
+| 15 | bio-crispr-screens-base-editing-analysis | supporting | Data Analysis | D | 9 | 9/9 | 87 | 95.0 | **92** | Production Ready | none | find_be_spacers() bare KeyError on zero candidates |
+| 16 | bio-crispr-screens-prime-editing-screens | supporting | Data Analysis | D | 9 | 8/9 | 90 | 75.4 | **81.2** | Limited Release | none | PRIDICT2 batch CLI omits the required `input/` subdirectory |
 
-`exec k/N` counts inputs where generated code was actually run (reasoning-only, scope-boundary and
-adversarial-refusal inputs that require no code are excluded from the denominator's numerator but
-counted in N).
+\* Screen-qc: 3 of 9 inputs are Mode-A reasoning/judgment prompts with no code to run (diagnostic
+reasoning, scope-boundary refusal, adversarial-pressure refusal); all 6 code-executing inputs ran.
+† mageck-analysis: raw weighted score is in the 85–100 band but its assertion pass rate (30/36 =
+83.3%) sits below the 90% Production-Ready floor, forcing one grade-tier downgrade to Limited
+Release per `scoring_rubric.md` §5 — the report's own `final.grade_note` states this and the
+arithmetic checks out (see below).
+
+**Totals: 16/16 Skills pass** (core ≥ 85, supporting ≥ 75, `deployable: true`, no fired veto, no open
+P0). 125 dynamic inputs were written across the 16 reports; at least 117 were actually executed
+(the rest are Mode-A reasoning inputs or one Docker-environment hang, none hiding a defect).
+
+## Arithmetic check (per the dispatch's instruction to re-derive, not trust, the headline)
+
+For every report, per-input `assertions_passed`/`assertions_total` were summed and checked against
+`dynamic_score.assertion_pass_rate`, then checked against what `final.grade`/`grade_note` claims.
+
+- **bio-pathway-gsea**: sums to 32/33 (97.0%). The report's own `final.grade_note` already documents
+  this correction ("Input 4's fourth assertion (kcdf) is a genuine FAIL... miscounted as a PASS in an
+  earlier draft") and the grade (97, Production Ready) is derived from the corrected rate, with the
+  floor check shown inline. **No further correction needed here — this is the report the dispatch
+  flagged as already fixed**, and the fix holds up under an independent resum.
+- **bio-crispr-screens-mageck-analysis**: sums to 30/36 (83.3%), matching the report's stated rate.
+  Its `final.grade_note` explicitly downgrades from the raw weighted 88.2 (which would sit in the
+  Production Ready band) to Limited Release because 83.3% < 90%, and shows the arithmetic. This is
+  correct and internally consistent — flagged here as the report doing its own downgrade honestly,
+  not as a defect.
+- **All other 14 reports**: per-input sums matched `assertion_pass_rate` exactly and matched what
+  `final.grade`/`grade_note` claims (no unexplained mismatch, no unwarranted grade round-up). No
+  report in this candidate's set exhibited the "100% claimed, one FAIL recorded" defect the dispatch
+  warned about generically — that defect was in a different candidate's round.
+
+## copy-number-correction re-mark (2026-09-16, Sam)
+
+`bio-crispr-screens-copy-number-correction` was carried in `SELECTION.md` as **supporting**, not
+core, per Sam's 2026-09-16 re-mark: after three audits (two fix passes) it holds at 82 — deployable,
+no veto, no open P0/P1 — but capped below the 85 core floor by static score and execution average
+rather than by any defect. The candidate's central hit-calling operation is carried by
+mageck-analysis/bagel-essentiality/drugz-chemogenomic/jacks-analysis (all core, all ≥ 88); copy-number
+correction is a supporting adjunct to that operation. Applying the 75 supporting floor, its final
+score of 82 passes. This note exists so a later reader does not mistake the re-mark for a quietly
+waived core-floor failure — the score and defect profile are unchanged from what a core-floor
+Skill would need to clear; only the role classification moved.
 
 ## Skills read but not chosen (from SELECTION.md)
 
-- `bio-crispr-screens-combinatorial-screens` — no installable central tool, niche.
-- `bio-crispr-screens-in-vivo-screens` — animal-model guidance only, nothing executable.
-- `bio-crispr-screens-perturb-seq-analysis` — working tool stack, but belongs to `single-cell-transcriptomics-analyst`'s scope.
-- `experimental-design/power-analysis`, `experimental-design/randomization-blocking` — unaudited, breadth control.
-- `pathway-analysis/kegg-pathways`, `reactome-pathways`, `wikipathways`, `enrichment-visualization` — unaudited, breadth control.
+- `bio-crispr-screens-combinatorial-screens` — no installable central tool (enCas12a is a
+  guide-design concept, not a CLI); niche relative to core pooled-screen scope.
+- `bio-crispr-screens-in-vivo-screens` — animal-model design guidance only, nothing to execute
+  against; niche relative to core pooled-screen scope.
+- `bio-crispr-screens-perturb-seq-analysis` — working tool stack (pertpy/scanpy/anndata) but sits on
+  `single-cell-transcriptomics-analyst`'s side of the line, not this candidate's pooled-screen scope.
+- `experimental-design/power-analysis`, `experimental-design/randomization-blocking` — unaudited,
+  skipped for breadth control (multiple-testing and sample-size, the two other experimental-design
+  Skills already scored from this folder, both had quality problems; batch-design already covers
+  design-framing).
+- `pathway-analysis/kegg-pathways`, `reactome-pathways`, `wikipathways`, `enrichment-visualization` —
+  unaudited, skipped for breadth control (go-enrichment + gsea already give validation/interpretation
+  coverage for gene-level hits).
+- `bio-experimental-design-multiple-testing` (82, not deployable) and
+  `bio-experimental-design-sample-size` (67, Reject, veto) — excluded per the brief.
 
-## Verdict: NOT VIABLE
+## Verdict: VIABLE
 
-Fails **gate 3** and **gate 4**.
+Against the five gates this stage owns:
 
-**Gate 3 (core Skills ≥ 85).** Of 10 Skills marked `core`, only 2 clear the floor: screen-qc (86,
-pre-hit-calling QC) and mageck-analysis (88, single-tool hit calling). The candidate's central
-step — copy-number-aware, cross-method hit calling (MAGeCK, BAGEL2, drugZ, JACKS) plus the added
-editing-outcome operation — has no passing executor outside MAGeCK: bagel-essentiality (75, veto),
-drugz-chemogenomic (72), jacks-analysis (72), copy-number-correction (73), hit-calling (78),
-the end-to-end pipeline (76, veto) and crispresso-editing (76, veto) all fail. library-design (81)
-also falls short.
+- **Gate 2 (every bundled Skill audited and deployable).** All 16 have a post-fix `skill-auditor`
+  report on the Sam fork, `deployable: true`, no fired veto gate, no open P0 recommendation (every
+  open recommendation across all 16 reports is P1 or P2), and a final score ≥ 75 (all 16 clear their
+  respective floor — see table). **PASS.**
+- **Gate 3 (core workflow Skills Production Ready, ≥ 85).** All 9 Skills marked `core` in
+  `SELECTION.md` score ≥ 85: library-design 91, screen-qc 94, mageck-analysis 88, bagel-essentiality
+  88, drugz-chemogenomic 90, jacks-analysis 92, hit-calling 90, crispr-screen-pipeline 85 (exactly at
+  the floor), crispresso-editing 91. The candidate's central step — pooled-screen hit calling — has
+  four independently-audited ≥ 88 executors (MAGeCK, BAGEL2, drugZ, JACKS), not just one. **PASS.**
+- **Gate 4 (end-to-end coverage: ≥ 3 core Skills spanning framing/design, central operation,
+  validation/reporting).** Checked against role, not against which Skills happen to score well:
+  framing/design = library-design; central operation = mageck-analysis + bagel-essentiality +
+  drugz-chemogenomic + jacks-analysis (hit calling) plus crispresso-editing (editing-outcome
+  quantification, the second in-scope central operation per the brief's note that editing is in
+  scope); validation/reporting = screen-qc (pre-hit-calling QC) and hit-calling (post-hit-calling
+  cross-method reconciliation); orchestration = crispr-screen-pipeline. No planning Skill stands in
+  for an execution Skill — the four hit-calling Skills and crispresso-editing are all real executors
+  with tool output, not decision trees. **PASS, with wide margin (9 core Skills, not the minimum 3).**
+- **Gate 7 (research scope).** Every one of the 16 reports' `research_veto.practice_boundaries` is
+  `PASS`; where a report specifically probed an individual-patient/clinical framing (bagel-essentiality
+  Input 7, screen-qc Input 6, crispresso-editing's scope checks, prime-editing-screens Input 7), the
+  Skill declined the clinical leap and stayed at the research/screen level. **PASS.**
+- **Gate 8 (shipped means present).** No report in this set flagged a missing primary script or an
+  entirely missing reference set for any of the 16 Skills. Known gaps are peripheral and already
+  called out as such in the reports themselves (CRISPRessoWGS untested for lack of a cached reference
+  genome; CRISPRcleanR failing to install with Chronos as the verified fallback path) — these are
+  execution-environment limits on a named alternative, not shipped-file absences. **PASS.**
 
-**Gate 4 (end-to-end coverage).** With only 2 of 10 core Skills passing, there is no passing
-framing/design Skill and the "central operation" is reduced to one tool of four, none of which are
-copy-number-aware. That does not meet "at least three core Skills covering framing/design, the
-domain's central operation, and validation/reporting" as designed.
-
-### Two defects span several Skills
-
-- **BAGEL2 unseeded non-determinism** — bagel-essentiality (Skill Veto T3 FAIL, P0), the
-  orchestration pipeline (Research Veto M3 FAIL, P0: destabilizes the workflow's own Tier
-  consensus), and hit-calling (P1: named in scope, still unaddressed). Fix: seed BAGEL2's
-  bootstrap/BF calculation (or document run-to-run BF variance) in one place all three Skills cite.
-- **Bundled parsers keyed to columns/format real tool output does not have** — crispresso-editing
-  (`parse_crispresso()` reads `READS_ALIGNED_PERCENTAGE`, a column absent from the real
-  CRISPResso2 mapping-statistics file, and mis-parses its key/value shape), base-editing-analysis
-  (`filter_by_editing_efficiency()` assumes rows=Position/columns=base; the real
-  `Quantification_window_nucleotide_percentage_table.txt` is the transpose; `deconvolute_bystander()`
-  and `aggregate_variant_scores()` have the same class of KeyError), jacks-analysis
-  (`efficacy_summary()` does `groupby('Gene')` against a real grna-results file whose only columns
-  are `sgrna, X1, X2` — contradicting the Skill's own column table two sections earlier), and
-  drugz-chemogenomic (the essentials-exclusion example parses `CEGv2.txt` with no header skip and
-  no tab split, silently matching 0 of 684 genes). Fix: write one parser per real file format,
-  verified against actual tool output, and stop hand-rolling column names from memory.
-
-### Defects that would flip each failing core Skill
-
-- **library-design (81→85+):** add a minimum-spacing/independence filter on candidate guides;
-  resolve the SKILL.md vs usage-guide.md contradiction on Azimuth 2.0 usability.
-- **bagel-essentiality (veto, 75):** seed/report BAGEL2 determinism (Skill Veto T3); fix or gate
-  `interpret_bagel()`'s tumor-suppressor call so it doesn't fire on dropout-only screens.
-- **drugz-chemogenomic (72):** fix the CEGv2.txt parser (see above, P0); document the
-  `--half_window_size`-vs-guide-count relationship that currently crashes on small libraries.
-- **jacks-analysis (72):** fix `analyze_results()`'s undefined `output_prefix`; fix
-  `efficacy_summary()`'s `KeyError: 'Gene'` (see above, P0).
-- **copy-number-correction (73):** fix the Chronos example's readcounts orientation; correct the
-  decision tree's wrong claim that Chronos suits a single cell line with matched CN (or restore a
-  working CRISPRcleanR path as the actual answer for that case).
-- **hit-calling (78→85+):** address BAGEL2 non-determinism in the reconciliation logic; unify the
-  three conflicting MAGeCK-FDR/BAGEL-BF threshold pairs across the Skill's own files; fix the
-  Spearman rho audit prompt for the MAGeCK/BAGEL2 sign-scale inversion.
-- **workflows-crispr-screen-pipeline (veto, 76):** fix the Replicate Pearson QC formula (P0, see
-  above) and the BAGEL2-non-determinism propagation into Tier consensus (P0).
-- **crispresso-editing (veto, 76):** fix `parse_crispresso()` (P0, see above); fix
-  CRISPRessoPooled's silent all-NA return on realistic pilot-scale pools.
-
-Open P1s (e.g. library-design's guide-spacing gap, batch-correction's `combat_correct()` crash,
-gsea's `nPerm` silent downgrade) do not block viability by the brief's rule, but several sit close
-enough to the 85 floor that fixing them alone (library-design, hit-calling) could flip a Skill.
-
-## Execution
-
-66 of 100 dynamic inputs across the 16 audited Skills ran real generated code (the rest were
-scope-boundary, adversarial-refusal or reasoning-only inputs that require none). Real data used
-where available: HAP1 TKOv3 (hart-lab/bagel), JACKS' own bundled Project Score dataset, and
-CRISPResso2 2.3.4 via Docker against upstream test fixtures.
-
-## Pending / blocked
-
-Nothing pending — all 16 Skills named in SELECTION.md have finished reports. CRISPRcleanR (the
-copy-number-correction Skill's own named primary tool) remains uninstallable on Windows
-(VariantAnnotation pthread link failure); only its Chronos alternative path was exercised.
+**Candidate is viable.** `spec.json` includes all 16 Skills; none needed to be dropped.

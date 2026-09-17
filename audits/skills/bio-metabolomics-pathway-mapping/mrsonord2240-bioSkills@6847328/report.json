@@ -1,0 +1,233 @@
+{
+  "meta": {
+    "skill_name": "bio-metabolomics-pathway-mapping",
+    "description": "Maps metabolomics results to biological pathways via over-representation (ORA), metabolite-set enrichment (MSEA/QEA), mummichog/PSEA on raw m/z peaks, and network-diffusion enrichment (FELLA), with correct background-set construction and honest interpretive ceilings.",
+    "evaluated_on": "2026-09-16",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "mrsonord2240/bioSkills@6847328:metabolomics/pathway-mapping"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "No fabricated DOI/PMID/statistics anywhere; all reference citations in SKILL.md are real and traceable, and every numeric result in this re-audit (ORA p-values, mummichog Gamma scores, FELLA p-scores) is a real computed output, independently re-run, not copied from the fix log." },
+      "practice_boundaries": { "result": "PASS", "detail": "Population/cohort research framing throughout; Input 5's adversarial 'write this up as upregulated' request is still correctly refused with a research-appropriate downgrade on re-derivation from the fixed SKILL.md." },
+      "methodological_ground": { "result": "PASS", "detail": "The Skill actively corrects methodological fallacies (pool-vs-flux causal language, hub-inflated topology, background-driven false positives) and the Category-3 hard-stop override (Input 3) is correctly the right design, not a defect." },
+      "code_usability": { "result": "PASS", "detail": "Both pre-fix P0 code-usability defects are now fixed and independently re-verified: the current.msg/err.vec predeclare converts the uncatchable AddErrMsg crash into a clean, catchable message (re-reproduced then re-tested in Inputs 1 and 3), and the new Local-Only ORA function runs end to end and returns biologically correct results on two independent compound sets (Inputs 1 and 6), not just the fixer's own worked example." }
+    }
+  },
+  "static_score": {
+    "subtotal": 93,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 11, "max": 12, "note": "All four methods (ORA/MSEA/mummichog/FELLA) work; the background-corrected ORA promise is now genuinely fulfilled via the Local-Only ORA function, independently re-verified. Deduct 1: a user who stops at the first ('official') ORA code block still hits a documented dead end before reaching the working alternative later in the same section." },
+      "reliability": { "score": 10, "max": 12, "note": "The current.msg/err.vec predeclare fix is real and verified: the uncatchable 'object current.msg not found' crash (Inputs 1 and 3 pre-fix) now surfaces a clean, catchable diagnostic message on both re-tested paths. Deduct 2: no general guidance beyond this one specific error class (e.g. network-timeout handling), and no retry/backoff logic." },
+      "performance_context": { "score": 8, "max": 8, "note": "SKILL.md/usage-guide.md stay cleanly separated; FELLA's multi-minute cost and the Local-Only ORA's ~3s cost are both disclosed in advance." },
+      "agent_usability": { "score": 16, "max": 16, "note": "Best-in-class per-method failure-mode tables, sourced quantitative thresholds, and a specific 'Common Errors' table; unchanged strength from pre-fix." },
+      "human_usability": { "score": 8, "max": 8, "note": "Per the Category-3 forgiveness override, error messages must be clear for full marks; now they are (fixed, verified in Inputs 1 and 3), up from 6/8 pre-fix." },
+      "security": { "score": 10, "max": 12, "note": "The pre-fix P0 (undisclosed CalculateOraScore/CalculateQeaScore POST to xialab.ca) is now explicitly disclosed and matches the installed source exactly (independently re-verified via getFromNamespace). Deduct 2 for a new, lower-severity finding (Input 7): SetKEGG.PathLib/CrossReferencing/Setup.KEGGReferenceMetabolome silently download generic MetaboAnalyst reference libraries from metaboanalyst.ca via .get.my.lib() whenever the local cache is stale -- not a user-data leak, but an undocumented network dependency." },
+      "maintainability": { "score": 10, "max": 12, "note": "Clean SKILL.md/usage-guide/examples separation, unchanged from pre-fix; examples/pathway_analysis.R confirmed byte-identical and still independently runnable." },
+      "agent_specific": { "score": 20, "max": 20, "note": "set.seed(123) guidance for mummichog is now present and independently verified to make PerformPSEA deterministic across two full runs; FELLA's approx='normality' analytic-determinism note is accurate and correctly avoids a misleading no-op seed. Up from 19/20 pre-fix." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 92.0,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 33, "total": 34 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "ORA on 12 TCA-cycle-adjacent compounds -- regression of the flagship background-correction fix",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Base unfiltered ORA unchanged/real. Official filtered path (SetMetabolomeFilter+Setup.KEGGReferenceMetabolome) re-run with the fixed predeclare: now fails CLEANLY with a real message ('Failed to connect to the API Server!') instead of crashing -- confirms the P1 AddErrMsg fix. The new Local-Only ORA function, independently re-run on this exact dataset, returns a real, correct result: hsa00020 (Citrate cycle) p=9.4e-11 at the 320-ID reference background vs p=6.2e-19 at all-of-KEGG -- less significant with the correct background, as the theory predicts.",
+        "basic": 37,
+        "specialized": 53,
+        "total": 90,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Compound names are correctly cross-referenced to KEGG IDs with reported mapping coverage", "result": "PASS", "note": "12/12 mapped via CrossReferencing()+CreateMappingResultTable(); unchanged from pre-fix, re-confirmed." },
+          { "text": "Base ORA runs and returns real p-values/FDR for KEGG pathways", "result": "PASS", "note": "Unchanged code path, known-good; not re-run this session but stable and unaffected by the fix." },
+          { "text": "The official filtered ORA path fails as a clean, catchable, documented limitation rather than an uncatchable crash", "result": "PASS", "note": "Re-run with current.msg/err.vec predeclared: returns 0 with current.msg = 'Failed to connect to the API Server! | Failed to perform pathway analysis!' -- no crash." },
+          { "text": "A working background-corrected KEGG ORA path exists and is independently verified on this exact input", "result": "PASS", "note": "Local-Only ORA re-run (not just trusted from the fix log) on the same 12-compound/320-ID data: hsa00020 significant at both backgrounds, correct direction of background-inflation effect confirmed via stopifnot()." },
+          { "text": "No fabricated statistics; all values traced to a real computation", "result": "PASS", "note": "All printed p-values are from this session's own executed R code, not copied from the fix log or pre-fix report." }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Mummichog/PSEA on the full 1500-feature synthetic negative-mode table -- regression + determinism check",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Re-run with the fixed predeclare and set.seed(123), TWICE, to test the new P2 seed-guidance fix. Both runs produced byte-identical mummi.resmat output (verified with all.equal + stopifnot), confirming set.seed(123) genuinely fixes the pre-fix nondeterminism. usage-guide.md's Prerequisites now correctly lists fitdistrplus/RJSONIO (read directly, not assumed).",
+        "basic": 38,
+        "specialized": 55,
+        "total": 93,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Uses the FULL feature table as background (R_all)", "result": "PASS", "note": "All 1500 synthetic features supplied, unchanged from pre-fix." },
+          { "text": "Runs to completion and returns real per-pathway p-values", "result": "PASS", "note": "mummi.resmat: 15 rows, real Gamma p-values (e.g. 0.019 top hit), matching pre-fix's independent run." },
+          { "text": "usage-guide.md's Prerequisites lists every package PerformPSEA needs", "result": "PASS", "note": "Fixed: 'install.packages(c(\"fitdistrplus\", \"RJSONIO\"))' now present in usage-guide.md's Prerequisites with the correct root-cause comment; read directly from the fixed file, not assumed from the fix log." },
+          { "text": "Ionization mode and ppm are declared as instructed", "result": "PASS", "note": "UpdateInstrumentParameters(mSet, 5.0, 'negative') called exactly per SKILL.md." },
+          { "text": "Output is run-to-run deterministic now that set.seed(123) is documented", "result": "PASS", "note": "Two full 200-permutation runs with set.seed(123) produced byte-identical results (all.equal()==TRUE, stopifnot passed) -- this specific claim was NOT tested pre-fix and is new evidence, not a re-quote of the fix log." }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Mummichog fed significant-features-only background -- regression of the AddErrMsg crash fix",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "SanityCheckMummichogData still correctly rejects the too-few-features input (right analytical call, Category-3 hard-stop override applies). Pre-fix this crashed with 'object current.msg not found'; re-run this session with the predeclare fix, it now returns 0 cleanly with current.msg = 'There are too few m/z features...' -- the crash-to-clean-message fix independently re-verified on this exact regression input, upgrading the outcome from pre-fix's PARTIAL/58 to a full COMPLETED pass.",
+        "basic": 38,
+        "specialized": 54,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The tool detects the significant-features-only background pitfall the SKILL.md documents", "result": "PASS", "note": "SanityCheckMummichogData correctly rejected the 70-feature significant-only input, unchanged from pre-fix." },
+          { "text": "The rejection surfaces as a clear, catchable message rather than a crash", "result": "PASS", "note": "FIXED: re-run with current.msg/err.vec predeclared, returns 0 with the real diagnostic message, no R error thrown -- pre-fix this was a FAIL (uncatchable crash)." },
+          { "text": "No silently-inflated false-positive result is returned", "result": "PASS", "note": "Execution halted before producing any inflated enrichment result, unchanged correct behavior." },
+          { "text": "SKILL.md now documents this crash pattern and its required predeclare workaround", "result": "PASS", "note": "FIXED: Version Compatibility section now states the predeclare requirement explicitly and Common Errors table has a new row for it -- verified present by direct reading, pre-fix this was absent." }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "FELLA network diffusion on 6 KEGG compound IDs -- unaffected regression",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Fix log confirms the FELLA code block was untouched except a documentation comment; re-run this session (reusing the cached fella_hsa KEGG graph to avoid a redundant ~6-minute live rebuild) to confirm it is genuinely unaffected, not just assumed unaffected. Identical top-3 hits to the pre-fix run: TCA cycle, Ala/Asp/Glu metabolism, Pyruvate metabolism, all p=1e-6.",
+        "basic": 36,
+        "specialized": 57,
+        "total": 93,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Builds/loads the KEGG diffusion data and runs without error", "result": "PASS", "note": "loadKEGGdata + defineCompounds + runDiffusion + generateResultsTable all completed cleanly this session." },
+          { "text": "getExcluded() reports unmapped compounds as instructed", "result": "PASS", "note": "Correctly returned character(0): all 6 input KEGG IDs mapped, unchanged." },
+          { "text": "runDiffusion + generateResultsTable produce a real results table", "result": "PASS", "note": "200-row real results table with KEGG pathway/module IDs and p-scores, re-generated this session." },
+          { "text": "Result is biologically plausible and matches the pre-fix run", "result": "PASS", "note": "Top hits (TCA cycle, Ala/Asp/Glu metabolism, Pyruvate metabolism) identical to the pre-fix audit's independent run." },
+          { "text": "The fix did not silently disturb this working code path", "result": "PASS", "note": "Zero code changes needed; SKILL.md's FELLA block is byte-identical in substance to pre-fix except the documented set.seed comment." }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Adversarial write-up request -- unaffected interpretive regression",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Re-derived Mode A response from the fixed SKILL.md's content alone (no code). The fix did not touch any of the interpretive failure-mode sections this response draws on, and re-derivation reaches the identical conclusion as pre-fix: refuses 'upregulated', flags background inflation, MSI-3 laundering, and hub-inflated impact, each with the correct sourced citation.",
+        "basic": 36,
+        "specialized": 55,
+        "total": 91,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Correctly refuses the 'upregulated' causal framing from concentration data", "result": "PASS", "note": "Downgrades to 'co-varied with phenotype', cites the cGMP/PDE example verbatim from SKILL.md." },
+          { "text": "Flags full-KEGG background inflation with a quantitative citation", "result": "PASS", "note": "Cites Wieder 2021's 'two of five datasets to zero' finding." },
+          { "text": "Downgrades the impact-score claim and names the specific hub risk", "result": "PASS", "note": "Names alanine/glutamate hub risk and the Tsouka & Masoodi 2023 ~95%-centrality precedent." },
+          { "text": "Addresses MSI level-3 annotation uncertainty rather than accepting the p-value at face value", "result": "PASS", "note": "Ties the 60% MSI-3 fraction to the annotation-laundering section, requests an MSI-level-split re-analysis." },
+          { "text": "No fabricated citation or invented statistic is introduced", "result": "PASS", "note": "All four cited findings drawn verbatim from SKILL.md's own reference list." }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "NEW -- Local-Only ORA generalized to purine metabolism, an independently constructed background, different biology than the fix's own worked example",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Copied the SKILL.md's Local-Only ORA function verbatim and applied it to a fresh compound set (hypoxanthine, xanthine, uric acid, inosine, guanine, adenine, adenosine, IMP, AMP, guanosine -- 10/10 mapped) against two backgrounds built from real KEGGREST data (not the fix's own sequential C00001-C00320 list): all-of-KEGG (n=6701) and a freshly random-sampled 250-compound assay-coverage panel. hsa00230 (Purine metabolism) is the correct top or near-top hit under both, p=3.8e-19 (all-of-KEGG) vs p=1.4e-14 (assay-coverage) -- confirming the fix's correctness claim generalizes beyond its own TCA-cycle example, asserted with stopifnot(), not just visual inspection.",
+        "basic": 39,
+        "specialized": 57,
+        "total": 96,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Compound names correctly map to KEGG IDs via the Skill's documented local mapping call", "result": "PASS", "note": "10/10 purine-pathway compounds mapped via CrossReferencing()." },
+          { "text": "Local-Only ORA runs end-to-end on an independently constructed all-of-KEGG background", "result": "PASS", "note": "6701-compound universe built live from keggLink(); no code changes to the SKILL.md function needed." },
+          { "text": "Local-Only ORA runs end-to-end on an independently constructed, differently-sized assay-coverage background", "result": "PASS", "note": "250-compound random-sampled panel, not reused from any prior input's reference file." },
+          { "text": "Known correct biology (Purine metabolism, hsa00230) returned as a strong hit under both backgrounds", "result": "PASS", "note": "p=3.8e-19 and p=1.4e-14 respectively; hsa00230 top-2 in both rankings, verified with stopifnot()." },
+          { "text": "This is a genuinely new test, not a restatement of the fix's own TCA-cycle worked example", "result": "PASS", "note": "Different compounds, different pathway, different background-construction method (live random sample vs sequential ID list) than any prior input or the fix log's own verification." }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "NEW -- disclosure-completeness trace: does every remote-reaching code path get disclosed, not just the two P0s the fixer was told about",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Used getFromNamespace()+deparse() on the installed MetaboAnalystR 4.3.0 binary to read the ACTUAL source (not docs) of every function this Skill's code blocks call, grepped for network tokens, and cross-checked live against stdout during Inputs 1-3's runs. Confirms CalculateOraScore/CalculateQeaScore match the disclosed POST-to-xialab.ca behavior exactly, and that mummichog/FELLA/Local-Only-ORA send no user data. Found ONE new, lower-severity gap: SetKEGG.PathLib/CrossReferencing/Setup.KEGGReferenceMetabolome silently fetch generic reference libraries from metaboanalyst.ca via .get.my.lib() (observed live: 'Loaded files from MetaboAnalyst web-server.' printed 5x during Input 1) -- not a user-data leak (confirmed from .get.my.lib's own source, which never receives the mSet/compound list), but an undocumented network dependency, filed as a new P1.",
+        "basic": 36,
+        "specialized": 53,
+        "total": 89,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Every function the Skill's own code blocks call was traced to installed source, not assumed from documentation", "result": "PASS", "note": "getFromNamespace()+deparse() used throughout; full output saved in source_audit.log/source_audit2.log." },
+          { "text": "The two disclosed remote calls (ORA/QEA) match the installed source exactly, including payload contents", "result": "PASS", "note": "my.ora.kegg/my.qea.kegg -> .do.api.call -> httr::POST(api.base+endpoint, body=serialized mSet) confirmed character-for-character against SKILL.md's disclosure text." },
+          { "text": "No additional code path sends user compound names, IDs, or results off the machine", "result": "PASS", "note": "Traced CrossReferencing, PerformPSEA, SetPeakEnrichMethod, buildGraphFromKEGGREST, keggLink -- none take the mSet/compound list as a network payload." },
+          { "text": "Every network-reaching call in the Skill's code paths is disclosed in SKILL.md/usage-guide.md", "result": "FAIL", "note": ".get.my.lib()'s reference-library downloads (SetKEGG.PathLib, CrossReferencing, Setup.KEGGReferenceMetabolome) are not mentioned anywhere; a researcher reading only the disclosed-calls list would not know this happens." },
+          { "text": "The finding is substantiated with source excerpts and a live-run confirmation, not speculation", "result": "PASS", "note": "Both the source code (.get.my.lib's download.file() call) and the live stdout ('Loaded files from MetaboAnalyst web-server.') are cited." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 37.2,
+    "dynamic_weighted": 55.2,
+    "score": 92,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Both pre-fix P0s are fixed AND independently re-verified with fresh executed code and real assertions (stopifnot), not accepted from the fix log: Local-Only ORA was re-run on the original regression dataset and on a brand-new purine-metabolism dataset (Input 6), correctly returning the right KEGG pathway as a significant hit both times.",
+    "The current.msg/err.vec predeclare fix was validated by reproducing the exact pre-fix crashes fresh, then re-running with the fix applied and confirming a clean, catchable message on both affected inputs (1 and 3).",
+    "set.seed(123) for mummichog/PSEA is not just documented but independently proven to fix nondeterminism: two full 200-permutation runs produced byte-identical output.",
+    "A dedicated source-level disclosure audit (Input 7), reading the installed package's actual source rather than trusting documentation, confirms the two fixed P0 disclosures are accurate and complete, while surfacing one new, lower-severity, non-privacy transparency gap.",
+    "FELLA diffusion and the adversarial interpretive write-up (Inputs 4, 5) were confirmed genuinely unaffected by the fix on fresh re-execution, not just assumed stable."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "Reference-library downloads are an undisclosed network dependency",
+      "observed_in": [7],
+      "problem": "SetKEGG.PathLib(), CrossReferencing(), and Setup.KEGGReferenceMetabolome() all route through MetaboAnalystR's internal .get.my.lib(), which silently downloads generic pathway/compound reference libraries from https://www.metaboanalyst.ca/resources/libs/ whenever the local cache is missing or older than 30 days. This is not disclosed anywhere in SKILL.md/usage-guide.md, unlike the two fixed P0s and unlike FELLA's/KEGGREST's comparable live-network caveats, which ARE disclosed.",
+      "root_cause": "The Version Compatibility disclosure block added in the last fix pass covered only the two functions the fixer was explicitly told about (CalculateOraScore/CalculateQeaScore); it was not extended to the library-loading functions that also reach out to a remote server.",
+      "fix": "Add one sentence to Version Compatibility or Prerequisites noting that SetKEGG.PathLib/CrossReferencing/Setup.KEGGReferenceMetabolome download generic (non-user) reference libraries from metaboanalyst.ca on first use or after a 30-day cache expiry, mirroring the existing FELLA/KEGGREST live-dependency disclosure."
+    },
+    {
+      "priority": "P2",
+      "title": "Primary ORA code block is a signposted dead end before the working fix",
+      "observed_in": [1],
+      "problem": "A user who runs only the first ('official') ORA code block in SKILL.md, including the documented Setup.KEGGReferenceMetabolome() addition, still ends at a clean but unresolved failure; the actually-working Local-Only ORA function appears later in the same section and requires reading past the failure to find it.",
+      "root_cause": "The fix correctly added a working local alternative but kept the known-broken official path as the code block's primary example, with the alternative subordinated below it.",
+      "fix": "Consider swapping the order: lead with Local-Only ORA as the default background-corrected path, and present the official MetaboAnalystR API path as the (currently broken) alternative for users who accept the xialab.ca data-sharing tradeoff."
+    },
+    {
+      "priority": "P2",
+      "title": "Mummichog's automatic duplicate-merging QC step is undocumented in prose",
+      "observed_in": [2],
+      "problem": "Read.PeakListData/SanityCheckMummichogData silently merge duplicate m/z-matched features (observed: 'A total of 11/111/11/11 of duplicates were merged' across four merge passes on the 1500-feature input) with no mention of this behavior in SKILL.md or usage-guide.md.",
+      "root_cause": "The Common Errors table documents input-shape pitfalls but not automatic data-transformation steps performed inside the call.",
+      "fix": "Add one line to the Mummichog/PSEA section noting that duplicate m/z-matched features are automatically merged before enrichment, so reported feature counts may differ from the input row count."
+    }
+  ]
+}

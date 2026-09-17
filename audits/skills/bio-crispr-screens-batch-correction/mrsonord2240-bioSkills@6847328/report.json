@@ -1,0 +1,252 @@
+{
+  "meta": {
+    "skill_name": "bio-crispr-screens-batch-correction",
+    "description": "Batch effect correction for CRISPR screens covering ComBat empirical-Bayes, RUV, SVA, control-sgRNA normalization, and the model-based alternative of including batch as a covariate in MAGeCK MLE or Chronos, plus diagnosis, decision-tree guidance, and when correction harms biology.",
+    "evaluated_on": "2026-09-16",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "mrsonord2240/bioSkills@684732876d2781df75d90ba35c3e9949ff4f28b2:crispr-screens/batch-correction"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All cited references (Johnson 2007 Biostatistics, Leek 2012 Bioinformatics, Risso 2014 Nat Biotechnol, Pacini 2021 Nat Commun, Vinceti 2024 Genome Biol) remain real, correctly attributed papers, unchanged by the fix. No fabricated statistics, DOIs, or results in any of the 7 post-fix outputs; all quantitative results (AUCs, betas, NaN counts, correlations) trace to real HAP1 TKOv3 data or clearly-labeled synthetic data with disclosed ground truth, re-verified this round." },
+      "practice_boundaries": { "result": "PASS", "detail": "Pure computational-biology screen analysis; no diagnostic, prescriptive, or clinical claims about individuals anywhere in scope, before or after the fix." },
+      "methodological_ground": { "result": "PASS", "detail": "Confounding, covariate modeling, and empirical-Bayes assumptions remain handled correctly (Input 3). The auditor's own investigation (Input 5) found the within-batch-constant filter is methodologically broader than strictly necessary -- it excludes some guides that were never at risk of the NaN corruption it targets -- but this is a completeness gap, not a methodological fallacy: it never produces a wrong answer, only a conservatively unconnected one for a small, always-reported subset." },
+      "code_usability": { "result": "PASS", "detail": "All three previously-crashing/silently-corrupting patterns now run cleanly: combat_correct() with a covariate on 71,090 real guides (Input 1), RUVg's SeqExpressionSet dispatch (Input 2), and MAGeCK MLE with the newly-documented --permutation-round flag (Input 4, confirmed present in `mageck mle --help`). The one input designed to trigger a failure (Input 7, forcing ComBat on batch-free data) now fails via a clear, intentional ValueError instead of silently returning a 568,720/568,720-NaN matrix with exit code 0 -- the underlying pycombat call was independently re-confirmed to still do that; the wrapper is what changed." }
+    }
+  },
+  "static_score": {
+    "subtotal": 91,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 11, "max": 12, "note": "Both P1 code patterns (combat_correct() covariate usage, RUV cIdx) now run cleanly verbatim on real data (Inputs 1, 2). Docked 1 pt: the within-batch-constant filter is broader than the actual NaN-causing condition (found by reading pycombat's source and reproducing both the filter's trigger and the true trigger separately in Input 5), unnecessarily leaving some correctable guides -- 294/71,090 on real HAP1 data including 14 essential-gene guides -- permanently batch-confounded rather than corrected." },
+      "reliability": { "score": 10, "max": 12, "note": "combat_correct() now raises an actionable ValueError instead of silently returning all-NaN (Input 7, regression-verified), and the pre-fit filter independently prevents a second, milder failure mode the post-hoc check alone would miss (Input 5 Part 5: a numerically-fragile variant that collapses affected genes to a wrong-but-finite constant instead of NaN). Docked 2 pts: dropped/uncorrected guides are only reported as a printed count, never returned to the caller as an identifiable list, which blocks automated follow-up." },
+      "performance_context": { "score": 7, "max": 8, "note": "SKILL.md remains dense but relevant (grew modestly for the fix's docstring and two new paragraphs/sections, no unrelated bloat); usage-guide.md unchanged in weight." },
+      "agent_usability": { "score": 15, "max": 16, "note": "Both previously-crashing 'Critical' patterns now work exactly as documented, out of the box, on first try (Inputs 1, 2). Docked 1 pt: using combat_correct() safely still requires understanding the drop-and-report nuance, which the Validation Checklist doesn't call out." },
+      "human_usability": { "score": 7, "max": 8, "note": "Failures now surface as a clear, actionable ValueError message instead of a raw pycombat/RUVSeq traceback (Inputs 2, 7). Docked 1 pt: the verbose drop-count print is easy to miss in agent transcripts, and there is no structured way to retrieve which specific guides were affected." },
+      "security": { "score": 11, "max": 12, "note": "The new pre-fit filter and post-hoc NaN/Inf guard are effective validation of the DATA passing through combat_correct(). Docked 1 pt: the function's own arguments (batch_vector, condition_vector, mod) still have no type/shape validation, unchanged from pre-fix." },
+      "maintainability": { "score": 11, "max": 12, "note": "Evidence of real testing is now visible directly in the docstring, which cites a measured result ('6 such guides out of 2,000 produced an all-NaN matrix') -- the auditor independently reproduced this class of failure and confirmed the fix eliminates it (Input 5). Docked 1 pt: no automated smoke test ships with the Skill; the evidence lives only in prose." },
+      "agent_specific": { "score": 19, "max": 20, "note": "The new 'Related but out of scope' section closes the pre-fix scope-boundary gap: Input 6's escape-hatch assertion, which FAILed pre-fix, now PASSes. Docked 1 pt: the Common Errors table and Validation Checklist still don't mention the within-batch-constant drop mechanism or that it can leave a small fraction of guides intentionally uncorrected." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 91.3,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 28, "total": 32 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Real HAP1 TKOv3, planted 2-batch shift, ComBat with condition covariate (P1 regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "SKILL.md's current combat_correct() (transcribed verbatim, not hand-patched) ran cleanly on all 71,090 real guides with zero NaNs. It also flagged and left 294 guides uncorrected (within-batch-constant); a follow-up check confirmed those 294 keep exact raw counts and still show real residual batch separation in PCA, since they were never actually corrected.",
+        "executed": true,
+        "execution_note": "Ran to completion in run\\input1_canonical.py against real HAP1_TKOv3_reads.txt (hart-lab/bagel), plus a follow-up verification script (not saved as a separate run\\ file; logic inlined in the eval viewer) confirming the 294 dropped guides equal raw counts exactly and isolating their contribution to the overall PCA metric.",
+        "basic": 36,
+        "specialized": 51,
+        "total": 87,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "SKILL.md's current combat_correct() code (with covariate) runs without modification on real data", "result": "PASS", "note": "Ran to completion, output shape (71090, 8), 0 NaNs in final output -- regression fix confirmed for the pre-fix P1 crash." },
+          { "text": "Batch effect is measurably reduced after correction (PCA/centroid distance)", "result": "PASS", "note": "Overall centroid distance fell 233.83 -> 124.58 (46.7%); isolating the 294 intentionally-uncorrected guides, the remaining 70,796 corrected guides show a 91.8% reduction (196.94 -> 16.19)." },
+          { "text": "Essential-gene dropout signal (CEGv2 vs NEGv1) is preserved or improved post-correction", "result": "PASS", "note": "AUC 0.9947 (pre) -> 0.9966 (post)." },
+          { "text": "Final corrected output contains zero NaN/Inf values, matching the new Validation Checklist's first item", "result": "PASS", "note": "0/568,720 values NaN, confirmed by direct check." },
+          { "text": "Guides left uncorrected because they are within-batch-constant are identifiable/actionable by the caller, not just counted", "result": "FAIL", "note": "combat_correct() only prints a count ('294 features are constant within a batch'); it returns no list/mask of which rows those are, so a downstream pipeline cannot selectively re-examine or re-normalize them without re-deriving the filter itself." }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Unknown/unannotated batch -> RUVg on synthetic NTC-anchored counts (P1 regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Current SKILL.md's RUV snippet (character rownames for cIdx) ran cleanly against a SeqExpressionSet; the old which()-based pattern was re-tested in the same run and still fails identically, confirming this is a genuine regression test, not just new code that happens to work.",
+        "executed": true,
+        "execution_note": "Ran to completion in run\\input2_ruv.R (RUVSeq 1.40.0) against the same synthetic 2,500-guide, 8-sample hidden-batch dataset used pre-fix.",
+        "basic": 37,
+        "specialized": 56,
+        "total": 93,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "SKILL.md's current RUV code (character-rownames cIdx) runs without modification against a SeqExpressionSet", "result": "PASS", "note": "RUVg ran successfully, k=2 factors estimated, no dispatch error." },
+          { "text": "The old which()-based cIdx pattern still fails the same way (confirms this is a true regression test)", "result": "PASS", "note": "Re-run in the same script: 'unable to find an inherited method ... cIdx = \"integer\"' -- identical to the pre-fix finding." },
+          { "text": "RUV correction removes the (agent-invisible) true batch shift in NTC medians", "result": "PASS", "note": "NTC median ratio (shallow/deep) moved from 0.649 (raw) to 1.000 (corrected)." },
+          { "text": "Essential-gene dropout signal survives RUV correction, and W factors (not just normCounts) are available for downstream design matrices", "result": "PASS", "note": "Mean essential-guide LFC -1.986 raw vs -1.980 corrected; pData(ruv_corrected) exposes W_1, W_2 as documented by the new fix." }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Batch fully confounded with condition -> ComBat refusal vs MLE-covariate (unaffected by fix, re-verified through the new filter)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Re-run through the CURRENT (filtered, NaN-raising) combat_correct(), not the pre-fix hand-transcribed version, to confirm the new filter doesn't interfere with pycombat's own confound detector.",
+        "executed": true,
+        "execution_note": "Ran to completion in run\\input3_confounded.py using the current combat_correct() on a fully-confounded real-data subset.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Skill's stated failure mode ('ComBat without mod destroys biology under confounding') is empirically reproduced through the current combat_correct()", "result": "PASS", "note": "Essentiality AUC 0.9450 -> 0.8243; mean |LFC| for CEGv2 genes collapsed from 2.070 to 0.100." },
+          { "text": "The new within-batch-constant filter runs first and does not mask or alter pycombat's confound detection", "result": "PASS", "note": "1,578 constant-within-batch guides filtered (this design has only 2 batch1 samples, both derived from the same T0 column, so many low-count guides are trivially constant there); pycombat still correctly raised ConfoundingVariablesError when mod=condition was supplied." },
+          { "text": "Recommendation correctly favors covariate-modeling/redesign over pre-correction for confounded designs", "result": "PASS", "note": "Matches Input 4's MLE-covariate approach." },
+          { "text": "No fabricated statistics used to support the conclusion", "result": "PASS", "note": "All AUC/LFC values computed directly from real HAP1 data in this run." }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Batch as explicit covariate in MAGeCK MLE design matrix, with the new --permutation-round flag",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Re-run with the CURRENT documented command (now including --permutation-round 10, a P2 fix). Confirmed the flag is real (present in `mageck mle --help`, not a plausible-looking invention) and that beta estimates are deterministic: the top essential genes and AUC exactly match the pre-fix audit's numbers.",
+        "executed": true,
+        "execution_note": "Real mageck mle (0.5.9.5) run, ~2 min with --permutation-round 10, on the same 1646-gene/6460-guide real HAP1 TKOv3 subset used pre-fix.",
+        "basic": 36,
+        "specialized": 56,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "mageck mle command matches SKILL.md's CURRENT documented flags, including the new --permutation-round", "result": "PASS", "note": "Ran unmodified with --count-table/--design-matrix/--permutation-round 10/--output-prefix; exit code 0." },
+          { "text": "--permutation-round is a real, recognized mageck 0.5.9.5 flag, not a plausible-looking invention", "result": "PASS", "note": "Confirmed present in `mageck mle --help` output." },
+          { "text": "Batch-aware MLE recovers real essential genes despite a planted batch shift, with beta estimates matching the pre-fix audit exactly (supports the new Reproducibility paragraph's determinism claim)", "result": "PASS", "note": "Top genes POLR2L/POLR3H/RPL31/PCNA/MRPL53/RRM1 and AUC=0.9685 are numerically identical to the pre-fix run's results, despite the different --permutation-round setting -- betas are deterministic as documented." },
+          { "text": "Design matrix avoids collinearity between batch and treatment columns", "result": "PASS", "note": "0/1646 NaN betas." },
+          { "text": "Skill discloses that full-genome-scale MLE runtime is multi-hour", "result": "FAIL", "note": "Still not mentioned in SKILL.md or usage-guide.md; unaddressed carryover from the pre-fix audit (only the environment's own TOOLS.md notes this)." }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "NEW -- directly testing the fix log's own claim: within-batch-constant features turn the whole ComBat output NaN",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Not part of the pre-fix audit's 7 inputs. Confirms the mechanism is real (reproduced cleanly in isolation), confirms the fix eliminates it with zero data loss, and finds two genuine, independent nuances: the filter is broader than necessary (over-excludes safe guides), and the underlying NaN-vs-degenerate-value manifestation is floating-point fragile rather than guaranteed.",
+        "executed": true,
+        "execution_note": "run\\input5_zero_variance_mechanism.py (5 parts) and run\\input5b_clean_mechanism_repro.py (a minimal, isolated confirmation). Both ran to completion; all in-script assertions passed.",
+        "basic": 34,
+        "specialized": 51,
+        "total": 85,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "The fix log's claimed mechanism (a handful of zero-pooled-variance guides corrupt the ENTIRE matrix, not just their own rows) is independently reproducible", "result": "PASS", "note": "input5b Test B: 6 guides deterministically constant in BOTH batches -> 16,000/16,000 values (100%) NaN across all 2,000 guides, confirmed by reading pycombat's source (compute_prior pools gamma_hat/delta_hat across ALL genes into a shared scalar hyper-prior)." },
+          { "text": "The current combat_correct() eliminates this failure with zero NaNs and zero silent data loss", "result": "PASS", "note": "On a realistic mixed dataset (6 dangerous + 6 safe-looking planted guides, 2,000 total), the fix dropped exactly 12, returned 0/32,000 NaN, and the 12 dropped guides matched their raw counts exactly (max diff 0.0)." },
+          { "text": "Essential-gene dropout signal is unaffected by the filter (on the un-planted guides)", "result": "PASS", "note": "Mean essential LFC -1.994 pre vs -1.994 post; non-essential post-correction LFC ~0.000 as expected." },
+          { "text": "The all-NaN manifestation is a reliable, deterministic signature of the danger condition across realistic data shapes", "result": "FAIL", "note": "Part 5: the identical 'constant in both batches' construction, run against a dataset with a realistic per-batch baseline shift (800 vs 650) instead of a uniform baseline, produced 0% NaN -- the planted genes instead silently collapsed to a wrong-but-finite constant value (var_pooled came out as ~4.3e-30, a tiny nonzero float from linear-algebra round-off, not exact 0.0)." },
+          { "text": "The per-batch std>0 filter drops only guides that actually threaten the NaN/degenerate-value corruption, not safe ones", "result": "FAIL", "note": "Part 4: of 12 guides dropped, only 6 (the deterministic-in-both-batches group) were ever actually dangerous; the other 6 (constant in batch1 only, ordinary noise in batch2) were confirmed safe under the OLD unfiltered pattern (0% NaN) yet are dropped anyway -- consistent with the 294/71,090 real-data over-exclusion measured in Input 1." }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Non-CRISPR bulk RNA-seq batch-correction request, reassessed against the new 'Related but out of scope' section",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Pre-fix, this input's escape-hatch assertion FAILed (no boundary text existed). SKILL.md now has a dedicated 'Related but out of scope' section; reassessed directly against it.",
+        "executed": false,
+        "execution_note": "Reasoning-only, as pre-fix; no computation needed to answer a scope question. Assessed by reading the current SKILL.md text directly (run\\skill-copy\\SKILL.md).",
+        "basic": 36,
+        "specialized": 52,
+        "total": 88,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Response identifies that ComBat/RUV/SVA are general statistical methods, not CRISPR-specific", "result": "PASS", "note": "The new section states this explicitly: 'ComBat, RUV and SVA are general methods and the code here would run on bulk RNA-seq or proteomics matrices.'" },
+          { "text": "Response correctly flags CRISPR-specific thresholds/QC (NTC counts, CEGv2 PR-AUC, MAGeCK MLE) as non-transferable to RNA-seq", "result": "PASS", "note": "The new section names exactly these: 'the NTC-count rules, the CEGv2 PR-AUC and essential-dropout validation, and the MAGeCK MLE / Chronos integration.'" },
+          { "text": "SKILL.md now contains an explicit out-of-domain escape hatch for non-CRISPR requests (previously FAILed pre-fix)", "result": "PASS", "note": "The new 'Related but out of scope' section (SKILL.md, after 'Diagnose: PCA + Variance Decomposition') directly answers this; the prior audit's P2 recommendation is resolved." },
+          { "text": "Response does not claim the Skill's screen-specific validation checklist applies unchanged to RNA-seq", "result": "PASS", "note": "The new section's closing line -- 'replace those checks with the assay's own' -- makes this explicit rather than leaving it implicit." }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Forcing ComBat on an already-clean, batch-free screen (P1 regression, the pre-fix audit's most important finding)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Pre-fix, this silently returned a 100%-NaN matrix with exit code 0. The current combat_correct() now raises ValueError. The underlying raw pycombat() call was independently re-run without the wrapper to confirm the landmine itself is unchanged -- the fix is entirely in the wrapper's guard, which is exactly where it should be.",
+        "executed": true,
+        "execution_note": "Ran to completion in run\\input7_unnecessary_correction.py; both the wrapped (fixed) call and a bypassed raw pycombat() call were exercised in the same run for direct comparison.",
+        "basic": 39,
+        "specialized": 60,
+        "total": 99,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Diagnostic correctly identifies no correction is needed per the Skill's own >0.95 replicate-correlation threshold", "result": "PASS", "note": "Measured within- and cross-batch replicate r all >= 0.997." },
+          { "text": "If correction is forced anyway, combat_correct() raises an exception rather than returning a matrix that could be silently trusted", "result": "PASS", "note": "Raised ValueError('ComBat returned NaN values: pooled variance is near zero...') -- direct regression fix of the pre-fix audit's headline finding." },
+          { "text": "The underlying pycombat() landmine this wrapper guards against is confirmed still present (i.e. the fix is a real guard, not a coincidence)", "result": "PASS", "note": "A bypassed raw pycombat() call on the identical data returned 568,720/568,720 (100%) NaN with exit code 0 and no exception, matching the pre-fix measurement exactly." },
+          { "text": "Skill's guidance still correctly declines correction by default before the user overrides", "result": "PASS", "note": "'When NOT to Correct' table and the new explicit paragraph both state the >0.95 case should not be corrected." },
+          { "text": "No fabricated results reported", "result": "PASS", "note": "NaN/exception outcome reported plainly." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 36.4,
+    "dynamic_weighted": 54.8,
+    "score": 91,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "All three pre-fix P1 code-crash/silent-corruption bugs are genuinely fixed and independently regression-tested: combat_correct() with a covariate now runs cleanly on 71,090 real guides (Input 1), RUVg's cIdx fix eliminates the S4 dispatch error while the old pattern was re-confirmed to still fail (Input 2), and forcing ComBat on batch-free data now raises an actionable ValueError instead of silently returning a 100%-NaN matrix -- the underlying pycombat call was independently re-verified to still do that; the fix is entirely, correctly, in the wrapper (Input 7).",
+    "The fix log's own most novel, previously-untested claim ('6 zero-within-batch guides out of 2,000 produced an all-NaN matrix') is real: independently reproduced under controlled conditions (Input 5/5b), and the auditor's investigation shows the shipped two-layer design (pre-filter + post-hoc check) is necessary, not redundant -- the post-hoc NaN check alone would miss a milder, numerically-fragile manifestation the auditor also reproduced (Input 5 Part 5).",
+    "MAGeCK MLE's batch-covariate betas are confirmed deterministic under the newly-documented --permutation-round flag: identical top essential genes and AUC (0.9685) to the pre-fix audit despite the different permutation setting, and the flag itself was confirmed to be a real, recognized mageck 0.5.9.5 option, not a plausible-looking invention (Input 4).",
+    "The new 'Related but out of scope' section closes the pre-fix audit's scope-boundary gap cleanly and concisely (Input 6): an agent asked about non-CRISPR batch correction can now cite an explicit answer instead of inferring the boundary from the frontmatter alone."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "Within-batch-constant filter over-excludes guides that were never actually at risk",
+      "observed_in": [1, 5],
+      "problem": "combat_correct()'s per-batch std>0 filter flags a guide if it is constant within ANY single batch, but the actual NaN-causing condition (confirmed by reading pycombat's source and testing both conditions separately) requires zero POOLED variance across ALL batches combined. Guides that are constant in one batch but ordinarily noisy in another are safe to correct, yet are dropped anyway -- 294/71,090 on real HAP1 data (Input 1, including 14 CEGv2 essential-gene guides) and 6/6 in a controlled comparison (Input 5 Part 4).",
+      "root_cause": "The filter checks each batch's variance independently (an easy, cheap per-batch check) rather than the pooled-across-all-batches variance that pycombat's compute_prior() actually divides by.",
+      "fix": "Replace the per-batch std>0 check with a pooled-residual check (e.g. regress out batch+mod via the same design matrix pycombat uses internally, or a simpler proxy: flag a guide only if ALL of its batches are individually constant, not just one), so guides with real information in at least one noisy batch are still corrected."
+    },
+    {
+      "priority": "P2",
+      "title": "Dropped/uncorrected guides are reported only as a count, not returned to the caller",
+      "observed_in": [1, 5],
+      "problem": "combat_correct() prints '<N> features are constant within a batch' but returns a single DataFrame with no column or accompanying mask indicating which specific rows were left uncorrected, so a downstream pipeline cannot selectively re-examine, re-normalize, or exclude them from hit-calling without re-deriving the same per-batch std check itself.",
+      "root_cause": "The `usable` boolean mask computed inside the function is local and discarded after use; only its count is surfaced via print().",
+      "fix": "Return a tuple (or attach a boolean Series as a `.attrs['uncorrected_features']`) so the caller can identify and act on the dropped guides directly, e.g. flag them in the final hit-calling report rather than silently including them alongside genuinely-corrected values."
+    },
+    {
+      "priority": "P2",
+      "title": "The 'all-NaN' failure mode is framed as reliable; it is floating-point fragile",
+      "observed_in": [5],
+      "problem": "combat_correct()'s docstring and the SKILL.md prose describe the danger as producing NaNs 'with no exception and exit code 0.' Testing the identical zero-pooled-variance construction against a dataset with a realistic per-batch baseline shift instead of a uniform one showed it can instead silently collapse the affected genes to a wrong-but-finite constant value -- no NaN at all -- depending on floating-point round-off in the underlying linear-algebra solve.",
+      "root_cause": "The fix log's own measurement ('6/2,000 -> all-NaN') was taken under one specific data shape; the failure's exact numerical manifestation was not characterized as data-shape-dependent.",
+      "fix": "Reframe the docstring/prose to say the pre-fit filter, not the post-hoc NaN check, is what reliably prevents this class of failure (both the NaN and the degenerate-constant manifestations) -- so a future editor doesn't remove the filter under the assumption the NaN check alone is sufficient."
+    },
+    {
+      "priority": "P2",
+      "title": "Full-genome-scale MAGeCK MLE runtime still undisclosed (carryover, unaddressed)",
+      "observed_in": [4],
+      "problem": "mageck mle's default variance modeling at genome scale (18,056 genes) is a multi-hour job by design (confirmed independently in this environment's TOOLS.md), but SKILL.md and usage-guide.md still say nothing about this, even after this round's --permutation-round fix touched the same command.",
+      "root_cause": "The P2 fix this round focused on the permutation-round/reproducibility caveat and did not also address runtime disclosure, which was noted as an assertion FAIL pre-fix but never entered the formal recommendations list.",
+      "fix": "Add one sentence near the mageck mle example: 'At genome scale (~18,000 genes), variance-model permutation is a multi-hour job; use a gene subset or reduce --permutation-round for a fast sanity check before a full run.'"
+    }
+  ]
+}

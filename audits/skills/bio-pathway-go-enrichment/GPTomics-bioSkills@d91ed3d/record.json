@@ -37,6 +37,6 @@
     "report": "report.json",
     "viewer": "viewer.md",
     "fixes": null,
-    "scripts": 14
+    "scripts": 16
   }
 }

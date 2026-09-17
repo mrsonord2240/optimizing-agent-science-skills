@@ -1,0 +1,214 @@
+{
+  "meta": {
+    "skill_name": "bio-metabolomics-metabolite-annotation",
+    "description": "Turns untargeted LC-MS/MS features (m/z, RT, MS/MS) into confidence-stratified metabolite annotations using spectral-library matching (matchms), in-silico tools (SIRIUS/CSI:FingerID, MetFrag) and molecular networking, and assigns a defensible MSI/Schymanski confidence level.",
+    "evaluated_on": "2026-09-16",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Moderate",
+    "n_inputs": 7,
+    "source": "mrsonord2240/bioSkills@6847328:metabolomics/metabolite-annotation"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All 13 cited references unchanged from the pre-fix Skill (Sumner 2007, Schymanski 2014, Li 2021, Duhrkop 2019/2021, Hoffmann 2022, Ruttkies 2016, Wang 2016, Nothias 2020, Kind & Fiehn 2006, Zhou 2020, Theodoridis 2023, Huber 2020) remain real, verifiable, and cited accurately; no fabricated statistics or invented values appeared in any of the 7 executed outputs." },
+      "practice_boundaries": { "result": "PASS", "detail": "Chemical/analytical annotation only; no output makes a diagnostic, prescriptive, or individual-patient claim." },
+      "methodological_ground": { "result": "PASS", "detail": "No output substitutes correlation for causation or overclaims identity; the fixed Skill still actively warns against treating a cosine score as identity and now demonstrably enforces the isomer-wall warning in its own executable code (Inputs 3, 5, 6), not just prose." },
+      "code_usability": { "result": "PASS", "detail": "All executed code (Inputs 1, 3, 4, 5, 6, 7) ran to completion, including the newly added MetFrag section run twice (success and documented-failure case) and the newly TIE_MARGIN-extended library-matching code exercised on a genuine matchms tie. Input 2 (SIRIUS) was not executed due to the same external login gate as the pre-fix audit (TOOLS.md), not an unrunnable-code failure, so it does not trigger this dimension." }
+    }
+  },
+  "static_score": {
+    "subtotal": 98,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 11, "max": 12, "note": "The pre-fix gap (MetFrag named as a route with zero executable guidance) is fixed: the new MetFrag section has a full params.txt template and CLI line, verified runnable verbatim in Input 3. Docks 1 point because, unlike its own worked matchms/SIRIUS blocks, the MetFrag section still gives only the params.txt/CSV schema, not a filled-in sample peaklist.txt/candidates.csv -- an agent must still originate real peak masses and candidate chemistry from outside knowledge to run it, just a narrower gap than before." },
+      "reliability": { "score": 11, "max": 12, "note": "The Common Errors table and Version Compatibility note are now factually correct for matchms 0.33+ (AssertionError, not silent zero score) -- verified by direct execution in Input 1. Docks 1 point: the inline code comment on the `add_precursor_mz(spectrum)` line ('still raises AssertionError here') is placed on the filter call itself, but the assertion actually fires later, inside ModifiedCosine.pair()/calculate_scores at scoring time -- confirmed by isolating the two calls in Input 1's script. The prose Version Compatibility paragraph gets this right ('raises ... afterward'); the code comment's 'here' could mislead an agent into expecting the crash one line earlier than it occurs." },
+      "performance_context": { "score": 8, "max": 8, "note": "Still a single ~250-line SKILL.md, usage-guide.md, and one example script; the new MetFrag section adds ~25 lines without bloating the document." },
+      "agent_usability": { "score": 16, "max": 16, "note": "Decision-tree table and Per-Method Failure Modes section remain a cold-start-usable, consistently-labeled workflow; the new MetFrag section follows the same goal/approach/code/gotcha structure as the matchms and SIRIUS sections, so the format stays consistent." },
+      "human_usability": { "score": 8, "max": 8, "note": "The pre-fix gap (no documented recovery path for MetFrag) is fixed: the CSV-quoting gotcha and 'check row count, not exit code' warning give an agent a real recovery path, verified accurate by reproducing the exact silent-drop failure in Input 3." },
+      "security": { "score": 12, "max": 12, "note": "Unchanged: SIRIUS login uses an env-var pattern, never a hardcoded credential; no injection vectors in any code pattern, including the new MetFrag params.txt block." },
+      "maintainability": { "score": 12, "max": 12, "note": "The pre-fix gap (shipped example had no self-check) is fixed: examples/annotate_features.py now asserts its own two expected levels and was confirmed to exit 0 with both asserts passing in Input 7 -- a real regression guard against a future matchms bump, addressing the prior Testability gap." },
+      "agent_specific": { "score": 20, "max": 20, "note": "Unchanged: precise trigger description, correct progressive disclosure, bidirectional Related-Skills cross-references, fully deterministic logic (re-confirmed across all 6 executed inputs), explicit escape hatches." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 92.4,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 23, "total": 24 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "matchms library match with score+peak floor + precursor_mz regression, on synthetic MS/MS (REGRESSION of pre-fix Input 1)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Re-ran the pre-fix audit's exact synthetic library/queries against the fixed Skill's current library-matching code (TIE_MARGIN loop, verbatim). All 4 queries resolved as documented, including Q4 (no precursor_mz): the fixed Common Errors table/Version Compatibility note now correctly describe an AssertionError, and the code raises it exactly where and how the fix's prose says (at scoring time, not inside add_precursor_mz itself) -- confirmed by isolating the two calls.",
+        "basic": 39,
+        "specialized": 56,
+        "total": 95,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Output states an explicit MSI/Schymanski confidence level, not a bare compound name", "result": "PASS", "note": "Every resolved query printed a level (2a or 5)." },
+          { "text": "Matched-peak floor is enforced alongside the cosine score, not score alone", "result": "PASS", "note": "Q2_promiscuous correctly returned 'no confident candidate -> Level 5' because only 2 of the required 6 peaks matched, despite a high raw score." },
+          { "text": "Missing-precursor_mz failure mode matches the Skill's own (now-fixed) Common Errors table", "result": "PASS", "note": "REGRESSION FIXED: matchms 0.33.1 raises AssertionError: Precursor_mz missing, exactly as the fixed table and Version Compatibility note now state; confirmed by direct execution." },
+          { "text": "Code uses matchms's documented version-safe field lookup (dtype.names) rather than hardcoded field names", "result": "PASS", "note": "Ran correctly against matchms 0.33.1's class-prefixed field names." }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "SIRIUS formula/fingerprint/structure/CANOPUS chain on a library-absent feature (unchanged, still environment-blocked)",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "Not executed: SIRIUS 6 still requires a free-account login with no anonymous CLI path, still blocked in this audit env per TOOLS.md. The fix did not touch the SIRIUS section; inspection-only reasoning is unchanged from the pre-fix audit.",
+        "basic": 32,
+        "specialized": 43,
+        "total": 75,
+        "assertions_passed": 2,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "Documents that SIRIUS requires an account/login before use", "result": "PASS", "note": "Explicit comment and 'sirius login' step precede the pipeline." },
+          { "text": "Distinguishes formula (trustworthy) from top-1 structure (needs COSMIC FDR) rather than treating all SIRIUS outputs as equally confident", "result": "PASS", "note": "Matches Hoffmann 2022 (COSMIC) precisely." },
+          { "text": "Command syntax was verified against a running SIRIUS installation", "result": "FAIL", "note": "Still blocked by login gate; not executed in this audit, per TOOLS.md." }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "MetFrag structure ranking for a feature with no library spectrum, following SKILL.md's new section verbatim (re-tests the fix's central claim)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Copied the fixed SKILL.md's params.txt template verbatim (byte-for-byte) and built peaklist.txt/candidates.csv (real RDKit-verified citrate/isocitrate/glucose chemistry) from outside domain knowledge only for the data content, not the invocation pattern. Ran end to end: reproduced the isomer-wall tie (citrate/isocitrate both Score 1.0, glucose 0.12) AND separately reproduced the documented CSV-quoting gotcha on purpose (unquoted InChI -> 'Stored 0 candidate(s)', exit 0, header-only output file) -- both exactly as the fixed Skill describes.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Output distinguishes tied isomer candidates rather than reporting a single confident structure", "result": "PASS", "note": "Citrate and isocitrate both scored 1.0 (4/6 peaks explained each)." },
+          { "text": "SKILL.md supplies a runnable MetFrag invocation pattern comparable to its SIRIUS bash block", "result": "PASS", "note": "REGRESSION FIXED: the params.txt template (9 key=value lines) was copied verbatim from SKILL.md and ran successfully with no modification; the CLI line was also copied verbatim." },
+          { "text": "MetFrag score is treated as a fragment-support ranking, not an identification", "result": "PASS", "note": "Consistent with the Skill's own Tool Roles table description." },
+          { "text": "Documented failure modes (unquoted-CSV silent drop) reproduce exactly as described, including the exit-0-but-nothing-produced pattern", "result": "PASS", "note": "Deliberately re-ran with an unquoted InChI comma: 'Stored 0 candidate(s)', exit code 0, 1-row (header-only) output file -- matches SKILL.md's warning verbatim." }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "MS1-only accurate mass + isotope pattern, no MS/MS (REGRESSION, code path untouched by the fix)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "SKILL.md's assign_level() snippet ran unmodified and returned Level 4 for a clean unambiguous formula, Level 5 otherwise, matching the decision-tree table exactly -- no change from the pre-fix audit, confirming the fix did not regress this path.",
+        "basic": 39,
+        "specialized": 58,
+        "total": 97,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "Function returns Level 4 only when formula is unambiguous, never higher without structural/library evidence", "result": "PASS", "note": "Confirmed by direct execution." },
+          { "text": "Bare/ambiguous MS1 feature is not over-promoted to a named compound", "result": "PASS", "note": "Ambiguous-adduct and bare-feature cases both correctly returned Level 5." },
+          { "text": "Output ties the returned level to the specific evidence key that triggered it", "result": "PASS", "note": "Code path maps each evidence dict key directly to a level, no black box." }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "6-feature end-to-end pipeline with a genuine matchms isomer tie (re-tests the fix's second central claim)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Rebuilt the isomer reference pair (isocitrate given the same fragment peaks/intensities as citrate -- the same tie the real MetFrag run in Input 3 produced) so the tie is genuinely exercised by matchms itself this time, using SKILL.md's current TIE_MARGIN loop body verbatim. F1_isomer_pair now correctly resolves to Level 3 with 2 tied candidates and is flagged unsafe for pathway enrichment; the pre-fix audit's gap (code path existed but was never actually triggered by matchms) is closed and verified.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Every feature's output includes an explicit confidence level, never a bare name", "result": "PASS", "note": "All 6 rows carry a level." },
+          { "text": "Ambiguous/tied or unmatched features are flagged as unsafe for pathway enrichment, not silently passed through", "result": "PASS", "note": "F1, F2, F4, F5, F6 all flagged NO; only F3 (single confident match) flagged YES." },
+          { "text": "Isomer/tied-candidate handling degrades to Level 3 rather than picking an arbitrary single winner", "result": "PASS", "note": "REGRESSION FIXED: F1_isomer_pair genuinely tied at score 1.000 between citrate and isocitrate under matchms's own ModifiedCosine and was correctly reported as Level 3 with 2 candidates, not collapsed to a single Level 2a winner." },
+          { "text": "MS1-only features are capped at Level 4, never promoted with only isotope/mass evidence", "result": "PASS", "note": "F5 correctly capped at Level 4." }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "False-tie check: does the fixed TIE_MARGIN logic ever demote a genuine single-best match? (new input, directly tests the audit brief's second claim)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Built a library with one clearly-superior match (citrate, score 0.9997) and two only loosely related compounds (succinate 0.7786, malate 0.5763) -- both well outside the 0.02 TIE_MARGIN. SKILL.md's current loop body correctly returned a single Level 2a match for citrate; the loosely related compounds did not spuriously trigger a tie flag.",
+        "basic": 39,
+        "specialized": 56,
+        "total": 95,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "A clearly-superior single match (margin >> 0.02) is not spuriously flagged as tied", "result": "PASS", "note": "citrate (0.9997) vs. next-best succinate (0.7786): margin 0.221, far outside TIE_MARGIN; only citrate passed the floors." },
+          { "text": "TIE_MARGIN only groups candidates genuinely within 0.02 of the top score", "result": "PASS", "note": "Verified by inspecting all 3 raw candidate scores before the floor/margin filter was applied." },
+          { "text": "Output reports Level 2a for the single confident match, not Level 3", "result": "PASS", "note": "Printed 'citrate score=1.000 matches=7 -> Level 2a', not a tie." }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Run the shipped examples/annotate_features.py exactly as distributed (re-tests both P2 fixes to the shipped example)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Copied the fork's examples/annotate_features.py byte-for-byte and ran it unmodified. Printed 'query_strong -> ... score=1.00 matches=7 level=2a' and 'query_promiscuous -> ... score=0.78 matches=2 level=3', matching the fix log's claimed retuned values exactly; both shipped assert statements passed silently (exit code 0).",
+        "basic": 39,
+        "specialized": 57,
+        "total": 96,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "Shipped example runs to completion unmodified, exit code 0", "result": "PASS", "note": "No traceback; process exited 0." },
+          { "text": "query_promiscuous's rejection reason is the matched-peak floor, not the score floor, matching its own docstring", "result": "PASS", "note": "REGRESSION FIXED: score=0.78 clears the 0.7 score floor; matches=2 is below the 6-peak floor, so Level 3 is reached via the matched-peak floor exactly as the retuned docstring now claims." },
+          { "text": "Shipped example includes a self-check that would fail loudly on a future matchms API/behavior change", "result": "PASS", "note": "Two assert statements (query_strong=='2a', query_promiscuous==3) are present and both passed." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 39.2,
+    "dynamic_weighted": 55.4,
+    "score": 95,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "All three P1 findings from the pre-fix audit are fixed and independently re-verified by direct execution, not just inspection: the precursor_mz AssertionError regression (Input 1), the MetFrag section now runs verbatim from SKILL.md end to end including its own documented CSV-quoting failure mode (Input 3), and the matchms tie-detection logic now correctly catches a genuine isomer tie it previously could not (Input 5).",
+    "The fix did not introduce a false-positive tie: a new adversarial test (Input 6) confirms the TIE_MARGIN logic leaves a genuine single-best match alone rather than over-flagging structurally similar-but-distinct library entries.",
+    "Both P2 fixes to the shipped example (corrected docstring, added self-check asserts) hold up under an unmodified run of the actual shipped file (Input 7), not a re-derived copy.",
+    "The MSI/Schymanski confidence-level framing, reference sourcing, and pathway-safety flagging logic remain rigorous and unchanged from the pre-fix audit's strengths."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "Inline code comment misplaces where the precursor_mz AssertionError actually fires",
+      "observed_in": [1],
+      "problem": "The comment on `spectrum = add_precursor_mz(spectrum)` says 'a spectrum with no derivable precursor_mz still raises AssertionError here' -- but add_precursor_mz() itself only logs a warning; the AssertionError actually fires later, inside ModifiedCosine.pair() at calculate_scores() time. Verified by isolating the two calls: add_precursor_mz() completes with a warning, the crash happens on the next call.",
+      "root_cause": "The comment was written to summarize the Version Compatibility paragraph's correct 'raises ... afterward' wording but compressed it onto the filter line itself, losing the 'afterward'.",
+      "fix": "Move the AssertionError comment to the calculate_scores()/ModifiedCosine() line, or reword to 'a spectrum with no derivable precursor_mz will raise AssertionError when scored below, not here'."
+    },
+    {
+      "priority": "P2",
+      "title": "MetFrag section gives the params.txt template and CSV schema but no worked sample data",
+      "observed_in": [3],
+      "problem": "Unlike the matchms section (full runnable synthetic example in examples/annotate_features.py) and SIRIUS's complete bash chain, the new MetFrag section supplies only the params.txt key/value template and the candidates.csv column schema -- an agent must still originate real peak masses and a real candidate structure list from outside knowledge to actually run it, as this audit did.",
+      "root_cause": "The fix prioritized closing the 'zero executable guidance' P1 gap with a runnable template; a fully worked data sample was out of scope for that fix.",
+      "fix": "Ship a small worked candidates.csv + peaklist.txt (e.g. the citrate/isocitrate/glucose triple this Skill's own prose already describes) alongside examples/annotate_features.py so an agent can run the MetFrag path with zero external chemistry lookup, mirroring the matchms example's self-containedness."
+    }
+  ]
+}

@@ -1,0 +1,278 @@
+{
+  "meta": {
+    "skill_name": "bio-crispr-screens-base-editing-analysis",
+    "description": "Analyzes base-editing screens for variant function: library design (Hanna 2021 ClinVar-scale CBE screen, Cuella-Martin 2021 DDR saturation), CBE vs ABE chemistry choice, editing-window math (positions 4-8 from PAM-distal end), bystander-edit quantification, sgRNA-efficiency filtering before hit calling, indel byproduct interpretation, ClinVar/COSMIC annotation, and the Broad be-validation-pipeline.",
+    "evaluated_on": "2026-09-16",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 9,
+    "source": "mrsonord2240/bioSkills@6847328:crispr-screens/base-editing-analysis",
+    "reaudit_of": "F:/OpenScience/audits/_pre-fix-20260916/bio-crispr-screens-base-editing-analysis (score 54, Reject, M4 veto)",
+    "fix_log": "F:/optimizing-agent-science-skills/fixes/bio-crispr-screens-base-editing-analysis.md"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "No fabricated statistics, DOIs, or trial results. Editing-window values, chemistry tables, and Hanna/Cuella-Martin methodology summaries are unchanged from the pre-fix audit's PASS and still match the cited primary literature." },
+      "practice_boundaries": { "result": "PASS", "detail": "Research-scope screen/variant-function analysis only; no diagnostic or prescriptive claims about a person or patient." },
+      "methodological_ground": { "result": "PASS", "detail": "Editing-window math, chemistry selection logic, and the substitution-vs-indel diagnostic are methodologically sound; independently re-confirmed in both directions this pass (real Cas9-nuclease sample correctly Cas9-like, real clean-BE sample correctly non-Cas9-like)." },
+      "code_usability": { "result": "PASS", "detail": "All 4 of the previously-crashing/silently-wrong bundled functions now run correctly against real CRISPResso2 2.3.4 and real MAGeCK 0.5.9.5 output, reproducing planted ground truth exactly: filter_by_editing_efficiency() (50.0%/30.0% target/bystander editing), deconvolute_bystander() (40/30/20/10 allele partition), aggregate_variant_scores() (merges on real lowercase 'sgrna', per-variant LFC mean matches a by-hand recomputation), and find_be_spacers() (reverse-strand coordinate conversion independently verified correct on a hand-constructed case built to trigger the OPPOSITE failure direction from the fixer's own test, plus on a fresh randomly-generated CDS with genuine reverse-strand on-target hits). One NEW, previously-unreported defect was found and is reported below as P1, not a veto trigger: find_be_spacers() raises a bare, unrelated KeyError('n_bystanders') instead of a clear message when it finds zero candidate spacers (e.g. a short CDS, or a lowercase-masked input against the case-sensitive PAM regex) -- a real robustness gap on a boundary condition, not a break in the core, now-verified-correct happy path." }
+    }
+  },
+  "static_score": {
+    "subtotal": 87,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 11, "max": 12, "note": "Completeness unchanged (strong). Correctness now confirmed positive: all 4 bundled functions run correctly on real CRISPResso2/MAGeCK output and reproduce planted ground truth exactly, independently re-verified this pass (not just the fixer's own claims). Docked 1 point for the newly-found zero-candidate crash in find_be_spacers()." },
+      "reliability": { "score": 10, "max": 12, "note": "3 of 4 functions now validate their input schema and raise specific, actionable ValueErrors (verified against 5 adversarial malformed inputs, all 5 fired correctly with clear messages). find_be_spacers() still has no such validation: an invalid editor name raises a bare KeyError, and a zero-candidate result crashes with an unrelated-looking KeyError('n_bystanders') from an empty-DataFrame .sort_values() call -- both confirmed by execution, not inspection." },
+      "performance_context": { "score": 8, "max": 8, "note": "SKILL.md/usage-guide.md duplication (the pre-fix P2) is fixed: both the Base Editor Chemistry Selection table and the editing-efficiency threshold convention are now single-sourced in SKILL.md with usage-guide.md cross-referencing it, confirmed by reading both files." },
+      "agent_usability": { "score": 14, "max": 16, "note": "Strong learnability and decision trees, unchanged. Error Prevention and Feedback Design substantially improved: 3 of 4 functions now fail loudly with specific column/value names instead of bare KeyErrors. Docked 2 points: the inconsistency (find_be_spacers not covered) means an agent following the Skill still hits an unhelped crash on a plausible edge case." },
+      "human_usability": { "score": 7, "max": 8, "note": "Forgiveness meaningfully improved: a researcher hitting the 3 fixed functions' errors now gets an actionable message naming the real problem. BE-Hive section gained a full runnable example plus an explicit warning to cross-check the substrate/spacer offset before trusting output -- verified this actually prevents the exact 1nt-frameshift mistake the pre-fix audit made by hand." },
+      "security": { "score": 11, "max": 12, "note": "Unchanged from pre-fix: no secrets or injection vectors; inputs are sequence strings, file paths, and column names. Still no input-range validation for target_aa/target_base types beyond what the new schema checks cover." },
+      "maintainability": { "score": 9, "max": 12, "note": "Clean SKILL.md/usage-guide.md/examples split, unchanged. Testability improved: 3 of 4 functions are now demonstrably run-tested against real tool output per the fix log and this audit's own independent reruns. find_be_spacers() has no bundled test/assertion of its own despite being the most subtly-defective function pre-fix; this audit's hand-constructed regression (input2) fills that gap externally but nothing in the Skill itself would catch a regression." },
+      "agent_specific": { "score": 17, "max": 20, "note": "Precise triggering and excellent Related-Skills composability, unchanged. Escape Hatches improved: 3 of 4 functions now give an agent a specific, parseable error to act on. Docked 3 points for the newly-found gap: no escape hatch at all when find_be_spacers() finds zero candidates -- an agent gets a confusing internal pandas KeyError with no path to recovery." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 95.0,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 37, "total": 38 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "CBE (BE4max) library design on a fresh synthetic CDS, target aa 25 (find_be_spacers)",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "NEW input (seed 7, different CDS/target_aa from the pre-fix audit's seed-1 CDS). Ran the fixed find_be_spacers() verbatim; found 15 candidates, 2 genuine on-target hits, both reverse-strand. Independently recomputed the true forward-CDS index for every reported on-target hit from its own spacer_start/strand/i fields (not trusting the function's internal math) -- both hits land exactly inside the true target codon [72,75).",
+        "executed": true,
+        "execution_note": "run/input1_find_be_spacers_forward.py, ran to completion, output captured verbatim.",
+        "basic": 38,
+        "specialized": 58,
+        "total": 96,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Function completes without error on a realistic synthetic CDS", "result": "PASS", "note": "15 candidates returned as a well-formed DataFrame." },
+          { "text": "Reported on-target hits are independently confirmed to fall inside the true target codon (recomputed from raw spacer_start/strand/i, not from the function's own target_positions logic)", "result": "PASS", "note": "Both hits (strand='-') verified: true_forward_index=72, inside [72,75)." },
+          { "text": "Reverse-strand hits are handled correctly on a naturally-generated (non-adversarial) CDS, not just a hand-crafted one", "result": "PASS", "note": "Both on-target hits found in this natural random CDS happen to be reverse-strand and are both correct." },
+          { "text": "n_bystanders / bystander_positions columns are internally consistent with edit_bases_in_window minus target_positions", "result": "PASS", "note": "Manually cross-checked row-by-row against printed output." }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Hand-constructed reverse-strand regression for the P0 coordinate-conversion fix (find_be_spacers)",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "The single most important regression in this audit. Built, before running any code, a 100nt CDS engineered so the true on-target edited base sits at forward-CDS index 88 (inside codon [87,90)) but reverse-complement index 11 -- the OPPOSITE failure direction from the fixer's own test case (which found a false on-target; this construction targets a false negative / missed target instead, to check the fix is a general coordinate conversion and not tuned to one direction). Hand-derived prediction: unconverted math would call it a bystander (11 not in [87,90)); converted math correctly calls it target (88 is in [87,90)). Ran the fixed function: it returned exactly one engineered candidate with target_positions=[5], bystander_positions=[] -- matching the hand-derived correct answer, not the pre-fix bug's answer.",
+        "executed": true,
+        "execution_note": "run/input2_find_be_spacers_reverse_hand_check.py, ran to completion, full derivation and printed verdict captured.",
+        "basic": 39,
+        "specialized": 60,
+        "total": 99,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "The engineered reverse-strand candidate (strand='-', spacer_start=7) is found by the PAM scan exactly as constructed", "result": "PASS", "note": "seq[7:27] and seq[27:30] matched the hand-derived spacer/PAM exactly." },
+          { "text": "The fixed code classifies the true on-target C as TARGET, not bystander", "result": "PASS", "note": "target_positions=[5], bystander_positions=[]." },
+          { "text": "This is verifiably the OPPOSITE bug direction from the fix log's own test case (a missed-target rather than a false-on-target)", "result": "PASS", "note": "Unconverted genomic_pos=11 (outside codon) vs converted genomic_pos=88 (inside codon) -- explicitly printed for contrast." },
+          { "text": "No other spurious candidates are produced that would make this result ambiguous", "result": "PASS", "note": "Total candidates=1; the CDS was engineered so only one PAM/window combination exists." },
+          { "text": "The hand derivation was worked out and recorded before running the code, not reverse-engineered from the output", "result": "PASS", "note": "Docstring states the full by-hand derivation and predicted ground truth prior to the run; script asserts against that prediction." }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Editing-efficiency filtering on real CRISPResso2 2.3.4 output (filter_by_editing_efficiency)",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Regression for the P0 fix (KeyError 'Position' -> real file is the transpose, index_col=0, fractions not percentages). Reused this candidate's own real synthetic-CBE CRISPResso2 2.3.4 run (Docker pinellolab/crispresso2:latest) with planted ground truth 50.00%/30.00% target/bystander editing. Identified the two real reference-C window positions (5 and 7) directly from the table's column headers (not by trusting the ground-truth file blindly) and ran the fixed function at both: returned exactly 0.5 and 0.30000000000000004, matching planted ground truth to full float precision.",
+        "executed": true,
+        "execution_note": "run/input3_filter_by_editing_efficiency.py, ran to completion against real Quantification_window_nucleotide_percentage_table.txt.",
+        "basic": 38,
+        "specialized": 59,
+        "total": 97,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "filter_by_editing_efficiency runs without error against real CRISPResso2 2.3.4 output", "result": "PASS", "note": "No exception; returned a well-formed row per call." },
+          { "text": "The reference-C window positions are identified independently from the raw table, not assumed", "result": "PASS", "note": "Columns literally header-labeled 'C' and 'C.1' (pandas dedup of the real duplicated-header file) -> positions 5 and 7." },
+          { "text": "Reported editing_pct matches the planted ground truth exactly at both positions", "result": "PASS", "note": "0.5 == 50.00% (target), 0.300000...4 == 30.00% (bystander) -- float-equal to 1e-6." },
+          { "text": "The new schema check (target_base not in df.index) does not spuriously fire on real, well-formed data", "result": "PASS", "note": "Real data has all 6 nucleotide-identity rows; check passes silently." }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Bystander deconvolution on a real CRISPResso2 allele-frequency table (deconvolute_bystander)",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Regression for the P0 fix (KeyError 'Reference_pct' -> real column is '%Reads'). Same real CRISPResso2 2.3.4 run as Input 3. Ran the fixed function with target_pos=67, bystander_pos=69 (1-indexed from the amplicon ground-truth file's 0-indexed positions 66/68); recovered the exact planted partition 40.0/30.0/20.0/10.0 (unmodified/target-only/target+bystander/bystander-only), summing to 100.0.",
+        "executed": true,
+        "execution_note": "run/input4_deconvolute_bystander.py, ran to completion against real Alleles_frequency_table.zip.",
+        "basic": 38,
+        "specialized": 59,
+        "total": 97,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "deconvolute_bystander runs without error against a real Alleles_frequency_table.zip", "result": "PASS", "note": "No exception; 4-row partition returned." },
+          { "text": "The %Reads column sums to exactly 100.0 across all partitions", "result": "PASS", "note": "Explicitly summed and printed: 100.0." },
+          { "text": "Each of the 4 partitions matches its planted ground-truth percentage exactly", "result": "PASS", "note": "40.0/30.0/20.0/10.0, each asserted to 1e-6." },
+          { "text": "The new required_cols schema check does not spuriously fire on real, well-formed data", "result": "PASS", "note": "Real file has all 3 required columns; check passes silently." }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Aggregate real MAGeCK per-sgRNA LFC to per-variant fitness scores (aggregate_variant_scores)",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Regression for the P0 fix (KeyError 'sgRNA' -> real MAGeCK column is lowercase 'sgrna'). Reused real MAGeCK 0.5.9.5 output from the sibling bio-crispr-screens-mageck-analysis audit's own verified real HAP1 TKOv3 run (71,090 real sgRNAs). Merged against a synthetic variant-annotation table keyed on 6 real sgRNA IDs; the fixed function merged cleanly and its groupby/mean for variant V1 matched a by-hand-computed mean of the 3 real LFC values to full float precision.",
+        "executed": true,
+        "execution_note": "run/input5_aggregate_variant_scores.py, ran to completion against real input1_canonical.sgrna_summary.txt.",
+        "basic": 38,
+        "specialized": 59,
+        "total": 97,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "aggregate_variant_scores merges cleanly against a real MAGeCK sgrna_summary.txt (lowercase 'sgrna')", "result": "PASS", "note": "No exception; merge succeeded on the real lowercase column." },
+          { "text": "target_only_scores contains exactly the sgRNAs with n_bystanders==0, correctly excluding the rest", "result": "PASS", "note": "V1 count=3, matching the 3 zero-bystander sgRNAs in the synthetic annotation." },
+          { "text": "The reported per-variant mean LFC matches an independent by-hand mean of the real MAGeCK LFC values", "result": "PASS", "note": "Hand mean of [6.1648, 4.3083, 4.8304] = 5.101166... matches the function's output exactly." },
+          { "text": "The new schema check catches a missing 'sgrna' column in EITHER input frame, not just one", "result": "PASS", "note": "Verified separately in input7 (adversarial) for both mageck_sgrna_summary and variant_annotation_df." }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "BE-Hive editing-efficiency prediction using the new SKILL.md worked example (P1 fix)",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Regression for the P1 fix (previously one sentence, no code, no substrate convention). Ran the new 'BE-Hive Editing-Efficiency Prediction' code sample from SKILL.md verbatim (BE-Hive git HEAD, this candidate's own isolated venv), using the real guide_seq from this audit's own synthetic CBE fixture. The substrate/spacer offset self-assertion in the SKILL.md example held on the first attempt (unlike the pre-fix audit, which needed a corrective second attempt after a 1nt frameshift). Total predicted probability 0.9795. Independently verified the documented 'C<n> = spacer position n+1' column-naming convention against ALL 5 editable Cs in the spacer (not just the 2 SKILL.md's own text checks) -- held exactly for all 5.",
+        "executed": true,
+        "execution_note": "run/input6_behive_predict.py, ran in tools/behive-venv against BE-Hive git HEAD.",
+        "basic": 37,
+        "specialized": 55,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "An agent can construct a valid BE-Hive input using only the Skill's own guidance, on the first attempt", "result": "PASS", "note": "The new worked example's substrate/spacer offset assertion passed immediately; no trial-and-error needed (contrast with the pre-fix audit's own 1nt-frameshift false start)." },
+          { "text": "BE-Hive prediction runs to completion and returns a real, non-trivial probability", "result": "PASS", "note": "Total predicted probability = 0.9795, real per-genotype pred_df with 10 rows." },
+          { "text": "The documented C<n>-column naming convention holds for every editable C in the spacer, not just the target/bystander pair SKILL.md mentions", "result": "PASS", "note": "All 5 (C4, C6, C11, C15, C17) matched the 'suffix = spacer_position - 1' rule exactly." },
+          { "text": "The planted target (spacer pos 5) and bystander (spacer pos 7) map to the SKILL.md-documented C4/C6 columns", "result": "PASS", "note": "Confirmed directly from the column set and the spacer's own C positions." }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Schema-validation stress test across all 4 bundled functions (P1 fix regression + new finding)",
+        "status": "COMPLETED",
+        "status_flag": "\u26a0\ufe0f",
+        "note": "Regression for the P1 fix 'No bundled function validates its input schema.' Fed 5 deliberately malformed inputs (wrong reference base, out-of-range position, wrong column names, wrong case) to the 3 newly-schema-checked functions: all 5 raised a specific, actionable ValueError naming the real problem, not a bare KeyError. Also tested find_be_spacers() with a zero-candidate input (a short CDS, and separately a lowercase-masked CDS against the case-sensitive PAM regex) and found a genuinely NEW, previously-unreported defect: it crashes with an unrelated-looking KeyError('n_bystanders') from an internal empty-DataFrame .sort_values() call, not a clear message. This is a real robustness gap in the one function the fix pass did not add schema validation to -- reported below as P1, not a veto trigger, since the core (non-empty, real-data) path is confirmed correct across Inputs 1, 2, and 9.",
+        "executed": true,
+        "execution_note": "run/input7_schema_validation_adversarial.py, ran to completion; 5/6 checks passed cleanly, 1 confirmed a new defect.",
+        "basic": 35,
+        "specialized": 52,
+        "total": 87,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "filter_by_editing_efficiency raises a specific ValueError (not KeyError) on a table missing the target_base row", "result": "PASS", "note": "ValueError names the missing base and lists the real rows present." },
+          { "text": "filter_by_editing_efficiency raises a specific ValueError on an out-of-range target_pos", "result": "PASS", "note": "ValueError names the out-of-range value and the table's real column count." },
+          { "text": "deconvolute_bystander raises a specific ValueError on the OLD wrong schema (Reference_pct instead of %Reads)", "result": "PASS", "note": "ValueError names the missing '%Reads' column and lists the real columns present." },
+          { "text": "aggregate_variant_scores raises a specific ValueError when either input frame uses the wrong-case 'sgRNA' column", "result": "PASS", "note": "Verified for both mageck_sgrna_summary and variant_annotation_df independently." },
+          { "text": "find_be_spacers handles a zero-candidate result (empty CDS region, or case-mismatched input) gracefully, with a clear message or a well-formed empty result", "result": "FAIL", "note": "NEW FINDING: raises a bare, unrelated KeyError('n_bystanders') from pd.DataFrame([]).sort_values('n_bystanders') instead. Reproduced with both a too-short uppercase CDS and a lowercase-masked CDS (case-sensitive PAM regex -> same zero-candidate root cause)." }
+        ]
+      },
+      {
+        "index": 8,
+        "type": "Variant C (new)",
+        "label": "Clean-BE substitution-vs-indel classification on a real, non-Cas9 base-edited sample (new, opposite direction from the pre-fix audit's Cas9-contamination check)",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "NEW input. The pre-fix audit tested the Skill's substitution-vs-indel diagnostic in only one direction (a real Cas9-nuclease sample, correctly called Cas9-like). This input tests the other direction on this candidate's own real, independently-known-clean synthetic-CBE CRISPResso2 2.3.4 run: 0 insertions, 0 deletions, 120 real substitutions out of 200 reads -> ratio = infinity, correctly classified as clean BE (>10 threshold) and explicitly NOT Cas9-like (<3 threshold), confirming the diagnostic discriminates in both directions rather than defaulting to one answer.",
+        "executed": true,
+        "execution_note": "run/input8_clean_be_ratio.py, ran to completion against real CRISPResso_quantification_of_editing_frequency.txt / CRISPResso_mapping_statistics.txt.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "A real, independently-known-clean BE sample shows 0 indels in its own CRISPResso2 output", "result": "PASS", "note": "Insertions=0, Deletions=0 (this candidate's own synthetic-CBE run, not the Cas9 sample)." },
+          { "text": "The substitution-vs-indel ratio for this sample is classified as clean BE (>10), not Cas9-like", "result": "PASS", "note": "ratio = 120/0 = infinity, > 10 and not < 3." },
+          { "text": "The diagnostic's threshold table in SKILL.md is applied exactly as documented, not reinterpreted", "result": "PASS", "note": "Used the Quantitative Thresholds table's own >10/<3 values verbatim." },
+          { "text": "No fabricated indel/substitution counts are used -- all figures come from a real CRISPResso2 run", "result": "PASS", "note": "Counts read directly from CRISPResso_mapping_statistics.txt / CRISPResso_quantification_of_editing_frequency.txt." }
+        ]
+      },
+      {
+        "index": 9,
+        "type": "Stress (new)",
+        "label": "ABE8e window correctness + multi-step zero-bystander design on a fresh CDS (new; pre-fix only tested ABE7.10)",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "NEW input. The pre-fix audit only exercised the ABE7.10 window (4,7); this checks ABE8e's window (4,8), which SKILL.md's own Chemistry Selection table documents as matching the CBE window rather than ABE7.10's narrower one -- confirmed by reading the window_by_editor dict directly from the executed source (inspect.getsource), not just the doc table. Ran find_be_spacers() with editor='ABE8e' on a fresh seed-42 CDS; found 2 genuine zero-bystander on-target candidates and independently recomputed both from raw spacer/strand fields, confirming the true forward index lands inside the target codon and that the window (spacer[3:8]) genuinely contains only the one editable A each row reports.",
+        "executed": true,
+        "execution_note": "run/input9_abe8e_multistep.py, ran to completion.",
+        "basic": 37,
+        "specialized": 58,
+        "total": 95,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The window_by_editor dict in the EXECUTED code (not just SKILL.md's prose table) encodes ABE8e as (4,8), distinct from ABE7.10's (4,7)", "result": "PASS", "note": "Read directly from inspect.getsource(find_be_spacers)." },
+          { "text": "Reported zero-bystander on-target candidates are independently confirmed to be genuinely on-target", "result": "PASS", "note": "Both candidates' true_forward_index (123) recomputed from raw fields and confirmed inside codon [123,126)." },
+          { "text": "Reported zero-bystander candidates genuinely contain only one editable A in the window, not more", "result": "PASS", "note": "Directly re-scanned each candidate's spacer[3:8] for 'A' characters; matched target_positions exactly." },
+          { "text": "A multi-step, realistic prompt (design -> filter to zero-bystander -> verify) is fully satisfiable using only the bundled function's own output columns", "result": "PASS", "note": "n_bystanders and target_positions columns were sufficient; no additional undocumented logic was needed." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 34.8,
+    "dynamic_weighted": 57.0,
+    "score": 92,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "\u2b50",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "All 4 of the previously-crashing/silently-wrong bundled functions now run correctly against real CRISPResso2 2.3.4 and real MAGeCK 0.5.9.5 output, reproducing planted ground truth exactly (target/bystander editing %, allele partition, per-variant LFC aggregation) -- independently re-verified this pass with fresh data and fresh math, not by re-running the fixer's own scripts.",
+    "The reverse-strand coordinate-conversion fix in find_be_spacers() is confirmed correct on a hand-constructed case engineered to trigger the OPPOSITE failure direction from the fixer's own test (a missed target rather than a false on-target), the strongest possible independent check of a general fix versus a patch tuned to one example.",
+    "3 of 4 bundled functions now raise specific, actionable ValueErrors instead of bare KeyErrors, verified against 5 adversarial malformed inputs covering every real schema drift the pre-fix audit found.",
+    "The new BE-Hive worked example runs end-to-end on the first attempt (the pre-fix audit needed a corrective second attempt after a 1nt frameshift) and its documented column-naming convention holds for all 5 editable Cs in a real test spacer, not just the 2 SKILL.md's own text checks."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "find_be_spacers() crashes with a bare, unrelated KeyError when it finds zero candidate spacers",
+      "observed_in": [7],
+      "problem": "When no PAM-adjacent window contains the target base on either strand (a short CDS, an unlucky sequence for a narrow-window editor, or a lowercase-masked input against the case-sensitive [ACGT]GG PAM regex), `candidates` stays empty and `pd.DataFrame(candidates).sort_values('n_bystanders')` raises `KeyError: 'n_bystanders'` -- a confusing error unrelated to the actual problem (no candidates found), with no guidance for the agent.",
+      "root_cause": "pd.DataFrame([]) has no columns at all, so .sort_values() on a column name that would only exist if candidates were non-empty fails. This is the same class of defect (missing schema/edge-case guard) that the fix pass addressed in the other 3 functions, but find_be_spacers() was not covered.",
+      "fix": "Guard the return: `if not candidates: return pd.DataFrame(columns=['spacer','strand','spacer_start','target_positions','bystander_positions','n_bystanders'])` before the .sort_values() call, so callers get a well-formed empty result (or raise a clear ValueError like 'no candidate spacers found for target_aa=... with editor=...') instead of an internal pandas KeyError."
+    },
+    {
+      "priority": "P2",
+      "title": "find_be_spacers() has no editor-name validation, unlike the schema-checked functions",
+      "observed_in": [7],
+      "problem": "Calling find_be_spacers() with an invalid `editor` string raises a bare `KeyError: 'NOT_A_REAL_EDITOR'` from the window_by_editor dict lookup, rather than a clear message listing the valid editor names.",
+      "root_cause": "window_by_editor[editor] is indexed directly with no existence check, the same pattern the fix pass replaced with explicit ValueErrors in the other 3 functions.",
+      "fix": "Add `if editor not in window_by_editor: raise ValueError(f\"editor={editor!r} not recognized; valid editors: {sorted(window_by_editor)}\")` at the top of the function, consistent with the validation style already added elsewhere in this Skill."
+    }
+  ]
+}

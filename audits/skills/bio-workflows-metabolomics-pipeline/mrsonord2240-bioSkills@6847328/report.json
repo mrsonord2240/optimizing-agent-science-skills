@@ -1,0 +1,265 @@
+{
+  "meta": {
+    "skill_name": "bio-workflows-metabolomics-pipeline",
+    "description": "Orchestrates the untargeted LC-MS metabolomics pipeline end-to-end (xcms 4.x feature extraction, QC/drift/normalization, confidence-stratified annotation, permutation-validated statistics, background-aware pathway mapping), naming what each stage decides and where it silently fails.",
+    "evaluated_on": "2026-09-16",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 9,
+    "source": "mrsonord2240/bioSkills@6847328:workflows/metabolomics-pipeline"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "No fabricated DOI/PMID/p-values/effect sizes anywhere; every number reported (90/172 samples dropped, pR2Y=pQ2=0.001/0.014, real KEGG pathway p-values) came from real xcms/pmp/ropls/KEGGREST output on real faahKO/MTBLS79 data or clearly-labeled synthetic examples." },
+      "practice_boundaries": { "result": "PASS", "detail": "Research-only mouse/serum/synthetic metabolomics pipeline; no individual diagnostic or prescriptive claims, no medical-disclaimer-requiring content." },
+      "methodological_ground": { "result": "PASS", "detail": "No principled statistical fallacy found; drop-wholly-NA-then-impute-sparse-rest ('report and drop, don't fabricate') is methodologically sound, and the newly-coded MSI-gate/mode-lock enforce exactly the commitments the Skill states." },
+      "code_usability": { "result": "PASS", "detail": "RE-AUDIT: 7 of 9 inputs were real code execution (up from 3 of 7 pre-fix). Both P1 crashes found pre-fix (Stage1->2 orientation, Stage2->4 imputation) are verified fixed on the exact same real data. Both previously-unenforced governing commitments (Input 4 MSI-gate, Input 6 mode-lock) now have real, executing code, including correct behavior on adversarial edge cases (all-tentative refusal, missing-mode hard stop)." }
+    }
+  },
+  "static_score": {
+    "subtotal": 91,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 10, "max": 12, "note": "RE-AUDIT: both pre-fix correctness defects (Stage1->2 orientation inversion, Stage2->4 crash) are fixed and verified on real data. Remaining gap: the MS-DIAL alternate entry point (Input 5) still has zero glue code, unchanged from pre-fix and not part of this fix batch." },
+      "reliability": { "score": 10, "max": 12, "note": "Common Errors table now documents both fixed bugs plus the new QRILC-wipeout and empty-identified_compounds failure modes with concrete fixes -- a real improvement over the pre-fix table, which omitted both hand-off bugs it should have caught." },
+      "performance_context": { "score": 7, "max": 8, "note": "Grew from 230 to ~310 lines adding the fixes, but still defers detail to component Skills well; token cost is proportionate to the added correctness." },
+      "agent_usability": { "score": 16, "max": 16, "note": "The prose/code consistency gap that cost points pre-fix (governing commitments narrated but not coded) is closed: mode-lock and MSI-gate are now both stated AND executable." },
+      "human_usability": { "score": 8, "max": 8, "note": "QC Checkpoint and Common Errors tables are noticeably more actionable post-fix, naming the exact drop-then-impute and MSI-filter steps a human would need to verify." },
+      "security": { "score": 12, "max": 12, "note": "No credential exposure, injection vectors, or destructive operations anywhere in the orchestration code; the new Stage 5 code explicitly prefers the no-remote-call Local-Only ORA path when the primary path is rejected." },
+      "maintainability": { "score": 10, "max": 12, "note": "The bundled example gap flagged pre-fix (P2) is closed: examples/pipeline_handoff_check.R now exercises real pmp+ropls calls across the exact seams that broke. Still no bundled example runs a real Stage 1 xcms extraction end-to-end into Stage 2 -- deliberately deferred to xcms-preprocessing's own scope per the fix log." },
+      "agent_specific": { "score": 18, "max": 20, "note": "The escape-hatch gap flagged pre-fix (Input 2's crash had no recovery guidance) is closed: wholly-NA samples are now reported by batch and dropped rather than crashing or being silently fabricated, and stopifnot guards fire predictably at every new hand-off." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 92.0,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 35, "total": 36 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Stage1->Stage2 orientation hand-off, real faahKO feature table (regression of pre-fix Input 1)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Pre-fix `fm <- t(feat)` inverted the orientation its own comment claimed. Post-fix `fm <- feat` plus a `stopifnot` dimension check re-run against the same real 574x12 faahKO data: no transpose, dimension check passes, `filter_peaks_by_fraction` returns 573/574 features -- identical to the pre-fix 'correct' result, now reached by correct code instead of pmp's silent auto-correction.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Workflow's Stage1->Stage2 code produces the pmp orientation its own comment claims", "result": "PASS", "note": "fm <- feat (no transpose); real faahKO featureValues() output (574x12) reaches pmp unchanged." },
+          { "text": "A dimension check now catches an orientation mismatch instead of relying on pmp's silent auto-correction", "result": "PASS", "note": "stopifnot(nrow(fm)==nrow(defs), ncol(fm)==length(sample_class)) passed on real data; this guard did not exist pre-fix." },
+          { "text": "Real xcms output can be fed through the documented transform without crashing", "result": "PASS", "note": "filter_peaks_by_fraction(fm) returned 573 of 574 features." },
+          { "text": "No security/injection issues in the hand-off code", "result": "PASS", "note": "Plain matrix assignment and CSV read; no unsafe operations." }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Real Stage2->Stage4 chain on MTBLS79 (regression of pre-fix Input 2, the headline P1 fix)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Pre-fix this crashed opls() with 'missing value where TRUE/FALSE needed' (55.95% NA). Post-fix code (drop wholly-NA samples, then log2/2^x QRILC round-trip) re-run on the same real MTBLS79 data (2488 features x 172 samples, 8 batches): 90 of 172 samples dropped (batches 2,3,4,8 -- all below minQC=5), 82 survive at <=18.2% per-sample NA, QRILC imputes with zero NAs remaining, opls() fits successfully: pR2Y=pQ2=0.001, matching the fix log's own verification numbers exactly.",
+        "basic": 37,
+        "specialized": 56,
+        "total": 93,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Documented Stage2->Stage4 code chain runs end-to-end on real multi-batch biological data", "result": "PASS", "note": "opls() completed; pre-fix this threw 'missing value where TRUE/FALSE needed'." },
+          { "text": "Stage 2 output's missingness is imputed before entering Stage 4 as the pipeline's own text states", "result": "PASS", "note": "90 wholly-NA samples dropped, sparse residual holes QRILC-imputed; 0 NAs reach opls()." },
+          { "text": "Wholly-NA (QCRSC-wiped) samples are reported by batch, not silently fabricated", "result": "PASS", "note": "Script printed the per-batch wipe count (2,3,4,8) before dropping." },
+          { "text": "Feature/sample orientation is correct at the Stage2->Stage4 boundary", "result": "PASS", "note": "t(imputed)[study_samples,] produced 60 x 2433 for opls(), correct shape." },
+          { "text": "No unsafe operations in the executed code", "result": "PASS", "note": "Read-only analysis of public MetaboLights data." }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Stress",
+        "label": "Bundled reference example, examples/metabolomics_workflow.R, run as shipped (regression of pre-fix Input 3)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Unchanged file, re-ran clean end-to-end: 292/300 features survived RSD/D-ratio filter, 20/20 planted true hits recovered at FDR<0.05 & |log2FC|>1, identical to the pre-fix result.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The Skill's bundled example file exists and runs without error (gate 8)", "result": "PASS", "note": "Executed via rs.sh with zero errors/warnings." },
+          { "text": "Output demonstrates the QC/RSD/D-ratio filter step", "result": "PASS", "note": "'Features kept after RSD/D-ratio filter: 292 of 300'." },
+          { "text": "Output correctly recovers the planted ground-truth signal", "result": "PASS", "note": "'True planted hits recovered: 20 of 20', identical to pre-fix." },
+          { "text": "Temporary outputs are cleaned up, no stray files left", "result": "PASS", "note": "Confirmed via 'Cleaned up temporary outputs' message." }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Edge",
+        "label": "Stage3->Stage5 MSI-confidence gate, now real executing code (regression + upgrade of pre-fix Input 4)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Pre-fix this was inspection-only (PARTIAL): no code anywhere derived identified_compounds. Post-fix code (`identified_compounds <- unique(annotated$name[grepl('^[12]', as.character(annotated$msi_level))]); stopifnot(length(identified_compounds) > 0)`) run against a synthetic 20-row table shaped like metabolite-annotation's real assign_level() output: correctly kept 8 of 20 names (Level 1/2a/2b only), correctly stopifnot-refused an all-Level-3-5 adversarial case instead of forcing ORA, and correctly handled mixed numeric/string level representations.",
+        "basic": 38,
+        "specialized": 58,
+        "total": 96,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "SKILL.md shows code that gates identified_compounds by MSI level before Stage 5", "result": "PASS", "note": "The filter line now exists and executes; pre-fix this variable had no derivation anywhere." },
+          { "text": "The stated commitment ('only Level 1-2 enter identified-ORA') is checked in code, not just narrated", "result": "PASS", "note": "Real run: 8 of 20 unique names passed, exactly the Level 1/2a/2b subset." },
+          { "text": "The all-tentative edge case (every feature Level 3-5) is handled safely, not forced into ORA", "result": "PASS", "note": "stopifnot(length(identified_compounds) > 0) correctly fired, matching the new Common Errors row." },
+          { "text": "Component skill (metabolite-annotation) produces a usable per-feature confidence level to filter on", "result": "PASS", "note": "Confirmed in that Skill's own audit and reused convention (1, '2a', '2b', 3, 4, 5)." }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Variant B",
+        "label": "MS-DIAL alternate front end, \"enter the pipeline at Stage 2\" claim (regression of pre-fix Input 5, unchanged gap)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Not part of this fix batch. Re-checked SKILL.md unchanged in this respect: the claim is still format-compatible (msdial-preprocessing's Alignment ID/Area export matches pmp's features-in-rows/samples-in-columns convention) but the orchestrator still shows zero glue code for this entry point.",
+        "basic": 33,
+        "specialized": 45,
+        "total": 78,
+        "assertions_passed": 2,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "MS-DIAL alternate entry claim (features-in-rows/samples-in-columns) matches xcms/pmp convention", "result": "PASS", "note": "Verified against msdial-preprocessing's real 'Import the Alignment Result into R' code block." },
+          { "text": "Orchestrator shows explicit glue code for this entry point", "result": "FAIL", "note": "Still only a one-sentence pointer; msdial-preprocessing was not part of this round's fix batch." },
+          { "text": "No contradictory instructions between the two front-end Skills", "result": "PASS", "note": "Both agree on peak-width/annotation caveats specific to MS-DIAL." }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Ionization-mode lock (governing commitment #1), now real executing code (regression + upgrade of pre-fix Input 6)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Pre-fix this was inspection-only (PARTIAL): no per-feature mode column existed anywhere. Post-fix code (`defs$mode <- ionization_mode; stopifnot(!anyNA(defs$mode)); if (length(unique(defs$mode)) > 1) by_mode <- split(defs, defs$mode)`) run against single-mode, mixed-mode (12 positive/8 negative), and missing-mode synthetic tables: single-mode case needs no split, mixed-mode case correctly splits into 2 internally-homogeneous groups, and a missing mode correctly hard-stops rather than being silently inferred.",
+        "basic": 38,
+        "specialized": 58,
+        "total": 96,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "A per-feature ionization-mode column is carried through the documented pipeline", "result": "PASS", "note": "defs$mode <- ionization_mode now exists and executes; pre-fix no such column existed." },
+          { "text": "Mixed-mode data handling is demonstrated, not just asserted", "result": "PASS", "note": "20-feature mixed pos/neg table correctly split into 2 groups (12 positive, 8 negative), each internally single-mode." },
+          { "text": "A missing/unset mode is a hard stop, not a silent default", "result": "PASS", "note": "stopifnot(!anyNA(defs$mode)) correctly fired on an NA-containing mode column." },
+          { "text": "No incorrect mode-chemistry claims made", "result": "PASS", "note": "[M+H]+/[M+Na]+ vs [M-H]-/[M+Cl]- adduct sets confirmed disjoint." }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "\"Skip the MSI confidence stuff, just give me significant pathways\" shortcut request (regression of pre-fix Input 7)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Governing principle #2 text is unchanged post-fix. Re-ran the same simulated Mode A response: declined to silently drop confidence tagging, cited the ORA-laundering risk in the Skill's own terms, offered a fast path retaining minimal confidence tagging.",
+        "basic": 37,
+        "specialized": 51,
+        "total": 88,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Agent declines to silently skip confidence-level tagging when asked to shortcut", "result": "PASS", "note": "Response explicitly kept minimal per-feature confidence tagging in the plan." },
+          { "text": "Response cites the Skill's own stated governing principle rather than a generic disclaimer", "result": "PASS", "note": "Referenced governing principle #2 directly." },
+          { "text": "Response still offers a fast path forward rather than refusing outright", "result": "PASS", "note": "Offered to proceed with minimal added annotation work." },
+          { "text": "Response avoids fabricating a compound-level confidence result it didn't compute", "result": "PASS", "note": "No specific compound or level was invented." }
+        ]
+      },
+      {
+        "index": 8,
+        "type": "Stress",
+        "label": "NEW: the fix's second bundled example, examples/pipeline_handoff_check.R, run as shipped",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Closes the pre-fix P2 finding that the one bundled example never exercised real pmp/ropls seams. Run as shipped on its own synthetic multi-batch table (one batch with 3 QCs, below minQC=5, mirroring MTBLS79's real failure shape): real filter_peaks_by_fraction/QCRSC/filter_peaks_by_rsd/pqn_normalisation and opls() all execute; 13 of 29 samples dropped, imputation clean, OPLS-DA fits with pR2Y=pQ2=0.014, an exact match to the fix log's own claimed verification numbers.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The new bundled second example exists and runs without error", "result": "PASS", "note": "Ran clean end-to-end via rs.sh." },
+          { "text": "It exercises real pmp+ropls calls, not base-R stand-ins", "result": "PASS", "note": "Real filter_peaks_by_fraction/QCRSC/filter_peaks_by_rsd/pqn_normalisation and opls() all called." },
+          { "text": "It reproduces the same failure-then-fix shape as the real MTBLS79 case", "result": "PASS", "note": "One synthetic batch given 3 QCs (< minQC=5); 13 of 29 samples wiped and dropped, mirroring the real 90/172 case." },
+          { "text": "Model-fit statistics reproduce the fixer's own verification run", "result": "PASS", "note": "pR2Y = pQ2 = 0.014, exact match to the fix log's claimed values." }
+        ]
+      },
+      {
+        "index": 9,
+        "type": "Variant A",
+        "label": "NEW: cross-Skill hand-off, Stage 5's MSI-gated identified_compounds into pathway-mapping's real Local-Only ORA (live KEGGREST)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Real end-to-end cross-Skill test: workflow Stage 5's own MSI-filter output (identified_compounds) resolved to KEGG IDs and handed to metabolomics/pathway-mapping's verbatim local_kegg_ora() function (that Skill scored 92/Production Ready this round), against a real live KEGGREST pull and the pathway-mapping audit's own assay-coverage reference file. Ran with zero glue-code adaptation and reproduced pathway-mapping's own background-inflation finding (hsa00250: assay-coverage p=1.45e-8 vs all-of-KEGG p=2.1e-14).",
+        "basic": 38,
+        "specialized": 55,
+        "total": 93,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "identified_compounds from Stage 5's MSI gate resolve to valid KEGG IDs consumable by pathway-mapping's Local-Only ORA", "result": "PASS", "note": "All 7 MSI-passing names mapped to real KEGG compound IDs." },
+          { "text": "No glue-code/format mismatch between the two independently-fixed Skills", "result": "PASS", "note": "Same KEGG-ID convention, same reference-file format; ran with zero adaptation." },
+          { "text": "Background-inflation direction matches pathway-mapping's own audited finding", "result": "PASS", "note": "Smaller, correct assay-coverage background produced a less-inflated p-value than all-of-KEGG, as both audits found." },
+          { "text": "No user compound data sent to any remote server", "result": "PASS", "note": "Local-Only path used (public KEGGREST reference table only), not the xialab.ca CalculateOraScore path." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 36.4,
+    "dynamic_weighted": 55.2,
+    "score": 92,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Both pre-fix P1 crashes (Stage1->2 orientation inversion, Stage2->4 unimputed-NA opls() crash) are verified fixed on the exact same real MTBLS79/faahKO data used pre-fix, reproducing the fix log's own claimed numbers exactly (90/172 dropped, pR2Y=pQ2=0.001).",
+    "The two previously-unenforced governing commitments (MSI-confidence gate, ionization mode-lock) now have real, executing code, including correct behavior on adversarial edge cases (all-tentative refusal, missing-mode hard stop, mixed-mode split).",
+    "A new second bundled example (pipeline_handoff_check.R) exercises the real pmp+ropls seam end-to-end on data shaped like the real failure, closing the pre-fix P2 finding that the one bundled example never touched real multi-package hand-offs.",
+    "Live cross-Skill consistency verified: Stage 5's MSI-gated output hands off with zero adaptation into pathway-mapping's independently-audited Local-Only ORA code (92/Production Ready), reproducing that Skill's own background-inflation finding on a real KEGGREST pull.",
+    "No credential, injection, or destructive-operation exposure anywhere; the Stage 5 code explicitly documents and prefers the no-remote-call path when the primary MetaboAnalystR API path is rejected."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "MS-DIAL alternate entry point still has zero glue code",
+      "observed_in": [5],
+      "problem": "The orchestrator still claims 'import the alignment-result table and enter the pipeline at Stage 2' with no code demonstrating the hand-off, unchanged from the pre-fix audit.",
+      "root_cause": "msdial-preprocessing was not part of this round's fix batch, so this pointer was left as prose.",
+      "fix": "Add a short code snippet showing msdial-preprocessing's Alignment ID/Area export feeding directly into filter_peaks_by_fraction, mirroring the level of detail Stage 1's xcms entry point now has."
+    },
+    {
+      "priority": "P2",
+      "title": "impute.QRILC has no explicit seed, so exact imputed values are not run-to-run reproducible",
+      "observed_in": [2],
+      "problem": "Re-running Stage 2's Input 2 code on the identical real MTBLS79 data produced a different minimum imputed value (17.155 here vs 11.77 in the fixer's own verification run) -- same non-negative, NA-free outcome and identical downstream model-fit statistics (pR2Y=pQ2=0.001), but the imputed values themselves vary.",
+      "root_cause": "imputeLCMD's impute.QRILC draws from a fitted distribution and is not seeded by the Stage 2 code block, unlike PerformPSEA elsewhere in the same pipeline which does call set.seed(123).",
+      "fix": "Add set.seed() immediately before the impute.QRILC call in Stage 2, matching the explicit seeding convention already used for PerformPSEA."
+    },
+    {
+      "priority": "P2",
+      "title": "No bundled example runs a real Stage 1 xcms extraction into the rest of the pipeline",
+      "observed_in": [3, 8],
+      "problem": "Both bundled examples start from a synthetic or cached featureValues()-shaped table; neither exercises real mzML -> xcms -> Stage 2 as part of one script.",
+      "root_cause": "Deliberately deferred by the fixer (fix log 'Left unfixed') to xcms-preprocessing's own bundled-example scope, since it needs real instrument files.",
+      "fix": "A future third example chaining real (or cached) xcms output through all 5 stages would give full-pipeline regression coverage, but is reasonably out of scope for this fix round."
+    }
+  ]
+}

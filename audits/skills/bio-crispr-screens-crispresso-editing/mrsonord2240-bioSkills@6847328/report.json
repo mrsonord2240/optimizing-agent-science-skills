@@ -1,0 +1,258 @@
+{
+  "meta": {
+    "skill_name": "bio-crispr-screens-crispresso-editing",
+    "description": "Quantifies CRISPR editing outcomes with CRISPResso2 across Cas9-nuclease (indels, HDR), CBE/ABE base editors, and prime editor modes; covers single-amplicon, batch, pooled, WGS off-target, and comparison workflows plus quantification-window math and failure-mode diagnosis.",
+    "evaluated_on": "2026-09-16",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 9,
+    "source": "mrsonord2240/bioSkills@6847328:crispr-screens/crispresso-editing",
+    "re_audit_of": "F:/OpenScience/audits/_pre-fix-20260916/bio-crispr-screens-crispresso-editing/",
+    "note": "9 inputs: the pre-fix audit's 7 inputs re-run as regression tests (indices 1-7) plus 2 new auditor-added inputs (8-9) per the re-audit brief."
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "No fabricated statistics, DOIs, or trial results across any of the 9 outputs; all reported percentages trace to real CRISPResso2 2.3.4 Docker runs on real published test FASTQs, independently reproduced this pass." },
+      "practice_boundaries": { "result": "PASS", "detail": "Research-scope amplicon quantification only; no diagnostic or prescriptive claims about a person or patient." },
+      "methodological_ground": { "result": "PASS", "detail": "Quantification-window sizing and the substitution-vs-indel diagnostic are methodologically sound; independently confirmed correct on both the CBE (Input 2) and ABE (Input 9, new) code paths against the same known-Cas9 ground-truth sample." },
+      "code_usability": { "result": "PASS", "detail": "The previously-vetoing parse_crispresso() function was transcribed verbatim from the fixed SKILL.md and run against real CRISPResso2 output (Input 6): it now completes without error and every value (reads_in_input=250, reads_aligned=235, mapping_pct=94.0, Modified%=26.38297872) is correct. The independently-found shipped-script bug (CRISPRessoCompare's old --crispresso_output_folder_1/_2 flags) is also fixed and was run end-to-end (Input 8): exit 0, real comparison output produced." }
+    }
+  },
+  "static_score": {
+    "subtotal": 93,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 11, "max": 12, "note": "Completeness 4/4 (all 5 CRISPResso2 modes + HDR/CBE/ABE/PE). Correctness now 3/4 (was 2/4 pre-fix): parse_crispresso() and CRISPRessoPooled's default threshold are both fixed and independently verified against real output. Docked 1 point: CRISPRessoWGS remains completely unexecuted across both audit passes (no small-genome reference FASTA cached) -- flag names were re-verified via --help only." },
+      "reliability": { "score": 11, "max": 12, "note": "Failure Modes table now covers both the graded '<50% aligned' case and the hard-crash total-failure case (verified: CRITICAL/No alignments found/exit 1/no output folder, reproduced exactly). CRISPRessoPooled's all-NA trap is now documented and the fix (--min_reads_to_use_region 100) reproduces upstream's exact expected percentages. Docked 1 point: no bundled automated test/assertion accompanies the one Python code sample -- correctness still rests on the auditor re-running it by hand each time." },
+      "performance_context": { "score": 7, "max": 8, "note": "SKILL.md ~390 lines with usage-guide.md and examples/ split out; reasonable disclosure with minor duplication between the two docs' mode cheat-sheets (unchanged from pre-fix)." },
+      "agent_usability": { "score": 15, "max": 16, "note": "Mode decision tree and output-file tables are clear and now internally consistent (the mapping-stats-table-vs-Python-snippet contradiction, P2 pre-fix, is resolved -- both now agree the file has no percentage column). Error Prevention improved substantially: both P0s and both P1s from the pre-fix audit are fixed and independently reproduced. Docked 1 point: still no explicit escape-hatch guidance for when to stop and consult a human beyond the failure-mode tables." },
+      "human_usability": { "score": 8, "max": 8, "note": "Natural researcher-phrased trigger examples throughout usage-guide.md; the underlying CLI fails loudly and clearly on badly mismatched input (re-verified), which is correct behavior for this domain." },
+      "security": { "score": 11, "max": 12, "note": "No hardcoded secrets or injection vectors; all user input is sequence strings and file paths passed as CLI arguments. Minor: no mention of handling patient-derived-sample sensitivity if pointed at clinical amplicon data (unchanged from pre-fix)." },
+      "maintainability": { "score": 11, "max": 12, "note": "Clean SKILL.md/usage-guide.md/examples split (Modularity 4/4). Testability substantially improved: the bundled Python sample and the bundled shell script both now run correctly against real CRISPResso2 output, independently re-verified this pass rather than taken on the fix log's word. Docked 1 point: still only one code sample total, and it still has no bundled unit test." },
+      "agent_specific": { "score": 19, "max": 20, "note": "Strong, precise triggering; correct progressive-disclosure layering; explicit, clean Related-Skills composability with base-editing-analysis, prime-editing-screens, and library-design. Escape Hatches docked slightly, same as pre-fix." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 89.2,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 36, "total": 36 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Single Cas9 amplicon indel quantification (FANCF locus) -- regression of pre-fix Input 1",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Re-ran CRISPResso 2.3.4 (Docker) on FANC.Cas9.fastq both with and without --min_average_read_quality 30. Without the flag: 235/250 aligned, 26.38297872% Modified, byte-identical to upstream's expected result. With the flag (as the Skill's own worked example specifies): 221/250 aligned, 24.88687783% Modified -- exactly the shift SKILL.md now discloses in its own text ('235->221', '26.38%->24.89%').",
+        "basic": 36,
+        "specialized": 55,
+        "total": 91,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Output reports % unmodified vs % NHEJ/modified for the amplicon", "result": "PASS", "note": "CRISPResso_quantification_of_editing_frequency.txt has Unmodified%/Modified% columns as documented." },
+          { "text": "SKILL.md discloses that --min_average_read_quality changes the reported editing percentage", "result": "PASS", "note": "Now stated explicitly with the exact numeric shift (fixed from pre-fix P1); independently reproduced 24.89% vs 26.38%, matching the documented numbers." },
+          { "text": "The disclosed shift matches what this audit independently reproduces on the same real amplicon", "result": "PASS", "note": "Reproduced 235/250->221/250 aligned and 26.38297872%->24.88687783% Modified, matching SKILL.md's rounded figures exactly." },
+          { "text": "Mapping-statistics file structure matches what SKILL.md's own output table describes", "result": "PASS", "note": "Verified: 7 space-named columns, one data row, no percentage columns -- exactly as documented, and now consistent with the fixed parse_crispresso() (Input 6)." }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "CBE base-editor quantification-window code path -- regression of pre-fix Input 2",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "CRISPResso --base_editor_output --conversion_nuc_from C --conversion_nuc_to T -w 10 -wc -10 on FANC.Cas9.fastq reproduced the same result as the pre-fix pass: real per-position C/T percentages, indel-dominated modification pattern (54 del + 7 ins vs 10 subs) correctly flags as non-clean-BE via the substitution-vs-indel ratio, matching this sample's true Cas9 origin.",
+        "basic": 36,
+        "specialized": 55,
+        "total": 91,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Per-position C-to-T conversion % table is produced and parses", "result": "PASS", "note": "Quantification_window_nucleotide_percentage_table.txt has real, non-zero A/C/G/T/- rows per position." },
+          { "text": "Substitution-vs-indel ratio diagnostic correctly identifies this as Cas9-like (not clean BE)", "result": "PASS", "note": "10 substitutions vs 61 indels; well under the Skill's <3 Cas9-like threshold." },
+          { "text": "Skill explicitly requires specifying --conversion_nuc_from/--conversion_nuc_to for correct BE chemistry", "result": "PASS", "note": "Documented and confirmed against the CLI's actual default (C->T)." },
+          { "text": "Bystander rate reported separately from target rate as the Skill instructs", "result": "PASS", "note": "Per-position table structure supports separating target vs. bystander positions." }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Total alignment failure / wrong-locus amplicon -- regression of pre-fix Input 3",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Re-ran FANC.Cas9.fastq against the HEK3 amplicon+guide (wrong locus): CRITICAL: Alignment error / ERROR: No alignments were found, exit 1, no output folder -- reproduced exactly. SKILL.md's Failure Modes table now has a dedicated 'Total alignment failure' row for this case (fixed from pre-fix P1, where only the graded '<50%' case was documented).",
+        "basic": 36,
+        "specialized": 54,
+        "total": 90,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Skill's failure-mode table now documents this exact total-failure/no-output case", "result": "PASS", "note": "New 'Total alignment failure (wrong locus / zero output)' row added, matching the exact error text/exit code observed." },
+          { "text": "Symptom text matches the CRITICAL error message reproduced this pass", "result": "PASS", "note": "'CRITICAL: Alignment error...' / 'ERROR: No alignments were found', exit 1, no output folder -- verbatim match." },
+          { "text": "Documented fix path (confirm amplicon matches intended locus via BLAT/BLAST) is actionable", "result": "PASS", "note": "Directly applicable to this reproduced scenario." },
+          { "text": "No misleading claim that misalignment always yields a graded percentage to inspect", "result": "PASS", "note": "The table now distinguishes the graded case from the hard-crash case explicitly." }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "2-amplicon arrayed validation pool (CRISPRessoPooled) -- P0 retest, regression of pre-fix Input 4",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Re-ran CRISPRessoPooled on Both.Cas9.fastq + Cas9.amplicons.txt (242-250 reads/amplicon) at the default threshold: reproduced the pre-fix all-NA result exactly ('Skipping amplicon [FANC] because too few reads (242) align to it'). Re-ran with --min_reads_to_use_region 100, exactly as the fixed SKILL.md's worked example now specifies: FANC 26.38297872% / HEK3 34.42622951%, matching upstream's expected values exactly.",
+        "basic": 37,
+        "specialized": 56,
+        "total": 93,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "CRISPRessoPooled quickstart command, AS NOW DOCUMENTED (with --min_reads_to_use_region 100), produces usable per-amplicon percentages on this pilot pool", "result": "PASS", "note": "FANC/HEK3 real, non-NA percentages reproduced, matching upstream expected results exactly." },
+          { "text": "SKILL.md documents the --min_reads_to_use_region threshold and its default", "result": "PASS", "note": "Now documented in both the Pooled-Amplicon Mode section and usage-guide.md Tips (fixed from pre-fix P0)." },
+          { "text": "SKILL.md/usage-guide.md instruct the agent to check for NA rows before trusting the output", "result": "PASS", "note": "Explicit step added to usage-guide.md's 'What the Agent Will Do' checklist (step 10) and Tips." },
+          { "text": "Once the threshold is corrected, demultiplexing assigns reads to the correct amplicon (no misassignment)", "result": "PASS", "note": "FANC and HEK3 rows separate correctly and match upstream expected percentages exactly." }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Timecourse-style Batch (Untreated vs Cas9) + Compare -- regression of pre-fix Input 5",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "CRISPRessoBatch (Untreated vs Cas9) then CRISPRessoCompare both completed; Cas9 row = 26.38297872%, identical to standalone Input 1 (idempotency confirmed). Additionally re-verified the SKILL.md-documented batch_settings.txt header format (name/fastq_r1/amplicon_seq/guide_seq, not the CRISPResso2 test-suite's internal n/r1 shorthand): ran a batch file using the Skill's exact documented column names and it completed 2/2 runs with results matching exactly -- no defect found.",
+        "basic": 36,
+        "specialized": 54,
+        "total": 90,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Batch mode aggregates per-sample results correctly and matches the single-run canonical number", "result": "PASS", "note": "Cas9 row = 26.38297872%, exactly matching the standalone CRISPResso run." },
+          { "text": "Untreated control shows near-zero modification as expected", "result": "PASS", "note": "0.0% Modified for Untreated." },
+          { "text": "SKILL.md's documented batch_settings.txt header names (name/fastq_r1/amplicon_seq/guide_seq) are accepted by the real CLI", "result": "PASS", "note": "Independently tested with a batch file using exactly those headers; CRISPRessoBatch --help confirms 'fastq_r1' etc. are the real parameter names; 2/2 runs completed with matching results." },
+          { "text": "CRISPRessoCompare runs directly against the batch's per-sample sub-folders without extra reformatting", "result": "PASS", "note": "CRISPRessoBatch_on_.../CRISPResso_on_Untreated and .../CRISPResso_on_Cas9 fed straight in." }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "parse_crispresso() Python parsing + WGS flag check -- P0 retest, regression of pre-fix Input 6",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Transcribed parse_crispresso() verbatim from the fixed SKILL.md into a standalone script (run/input6_parse_output/test_parse_crispresso.py) and ran it against a real CRISPResso2 output directory: reads_in_input=250, reads_aligned=235, mapping_pct=94.0, editing_quant Modified%=26.38297872 -- all correct, all assertions pass, exit 0. This is the direct reversal of the pre-fix ValueError crash. CRISPRessoWGS flags re-verified via --help only (still no reference FASTA available; genuinely time-boxed, unchanged from pre-fix).",
+        "basic": 37,
+        "specialized": 56,
+        "total": 93,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "parse_crispresso() runs without error on a real CRISPResso output directory", "result": "PASS", "note": "Ran clean, exit 0, all internal assertions in the test script passed against known ground-truth values." },
+          { "text": "CRISPRessoWGS flag names (--bam_file/--reference_file/--region_file) match the installed CLI", "result": "PASS", "note": "Verified byte-for-byte against CRISPRessoWGS --help on v2.3.4 (same evidence as pre-fix, re-checked)." },
+          { "text": "Function correctly computes mapping_pct from READS ALIGNED / READS IN INPUTS instead of a nonexistent column", "result": "PASS", "note": "94.0% computed and verified to equal 235/250*100; the fix replaced the old READS_ALIGNED_PERCENTAGE lookup entirely." },
+          { "text": "SKILL.md's mapping-stats output table and the Python example no longer contradict each other", "result": "PASS", "note": "The table still states 'no percentage columns' and the code now computes the percentage itself rather than reading one -- the pre-fix P2 contradiction is resolved." }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Ambiguous base-editor request (ABE vs CBE unspecified) -- regression of pre-fix Input 7",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Re-verified via CRISPResso --help that --conversion_nuc_from defaults to 'C' and --conversion_nuc_to to 'T' with no CLI-level warning if omitted -- exactly the silent-CBE-default failure the Skill's Mode Decision Tree 'Fails when' text calls out. Unchanged from pre-fix (this area was not flagged and needed no fix).",
+        "basic": 33,
+        "specialized": 50,
+        "total": 83,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Skill instructs the agent to determine or clarify ABE vs CBE before running --base_editor_output", "result": "PASS", "note": "Explicit in the Mode Decision Tree's 'Fails when' row and usage-guide's What-the-Agent-Will-Do step 6." },
+          { "text": "Documented default (assumes CBE C->T) matches the installed CLI's actual default", "result": "PASS", "note": "Confirmed via --help: 'default: C' / 'default: T'." },
+          { "text": "Skill warns that silent misclassification of ABE as CBE will happen if flags are omitted", "result": "PASS", "note": "Stated directly in the Mode Decision Tree." },
+          { "text": "No fabricated claim that ABE vs CBE is auto-detected", "result": "PASS", "note": "No such claim made anywhere in SKILL.md or usage-guide.md." }
+        ]
+      },
+      {
+        "index": 8,
+        "type": "Variant C",
+        "label": "NEW (auditor-added): shipped examples/crispresso_analysis.sh end-to-end run",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Ran the Skill's shipped, fixed examples/crispresso_analysis.sh end-to-end via Docker (control=FANC.Untreated.fastq, edited=FANC.Cas9.fastq, real FANCF amplicon/guide): CRISPResso control run, CRISPResso edited run, then CRISPRessoCompare using the now-fixed positional-argument syntax. All three steps completed (exit 0); real comparison output produced (control 1.62% vs edited 27.66% Modified, biologically sensible direction). This directly regression-tests the shipped-script defect the fixer found and fixed independently (old --crispresso_output_folder_1/_2 flags previously crashed with 'unrecognized arguments').",
+        "basic": 35,
+        "specialized": 53,
+        "total": 88,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Shipped script runs to completion without the old 'unrecognized arguments' crash", "result": "PASS", "note": "Exit 0 across all three CRISPResso/CRISPRessoCompare invocations." },
+          { "text": "CRISPRessoCompare invocation matches the tool's actual documented positional-argument syntax", "result": "PASS", "note": "Two positional output-folder paths + --output_folder, matching CRISPRessoCompare --help exactly." },
+          { "text": "Comparison output contains real per-base modification quantification, not an empty/placeholder result", "result": "PASS", "note": "All_modifications_quantification.txt, Insertions/Deletions/Substitutions_quantification.txt and a real Alleles_frequency_table all populated; control (1.62%) vs edited (27.66%) Modified% is directionally correct." },
+          { "text": "Script's inline comment accurately explains why the old flags failed", "result": "PASS", "note": "Comment cites CRISPRessoCompare --help verification; matches this audit's own independent check of --help output." }
+        ]
+      },
+      {
+        "index": 9,
+        "type": "Variant D",
+        "label": "NEW (auditor-added): real ABE quantification-window code path",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Pre-fix and the fixer's own verification pass only ever exercised the CBE branch (--conversion_nuc_from C --conversion_nuc_to T). Ran the ABE branch (--conversion_nuc_from A --conversion_nuc_to G, -w 10 -wc -10) against real FANC.Cas9.fastq for the first time: real per-position A/G percentage table produced (A retained 80-97% at most positions); indel-dominated pattern (54 del + 7 ins vs 10 subs) correctly flags as non-clean-BE via the substitution-vs-indel diagnostic, the same correct conclusion as the CBE test on this known-Cas9 sample.",
+        "basic": 34,
+        "specialized": 50,
+        "total": 84,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Per-position A-to-G conversion % table is produced and parses", "result": "PASS", "note": "Quantification_window_nucleotide_percentage_table.txt has real, non-zero A/C/G/T/- rows at every window position." },
+          { "text": "Substitution-vs-indel ratio diagnostic correctly identifies this Cas9-origin sample as non-clean-BE on the ABE code path too", "result": "PASS", "note": "10 substitutions vs 61 indels; ratio well under the Skill's <3 Cas9-like threshold, same conclusion as the CBE test (Input 2)." },
+          { "text": "ABE conversion direction (A->G) is correctly reflected in the window table's column structure", "result": "PASS", "note": "A-row percentages populate at every A/T position in the amplicon window, consistent with --conversion_nuc_from A." },
+          { "text": "No fabricated claim that this sample is a true ABE edit", "result": "PASS", "note": "The Skill's own diagnostic correctly flags it as Cas9-like rather than clean BE; no overclaiming in how this would be reported." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 37.2,
+    "dynamic_weighted": 53.5,
+    "score": 91,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Both P0 findings from the pre-fix audit are genuinely fixed and independently reproduced against real CRISPResso2 2.3.4 output: parse_crispresso() now runs clean (Input 6) and CRISPRessoPooled's default-threshold NA trap is documented with a working fix (Input 4).",
+    "The shipped examples/crispresso_analysis.sh script -- broken by a bug the fixer found independently, not in the original audit's recommendations -- now runs end-to-end without error (Input 8).",
+    "The substitution-vs-indel diagnostic is correct on both the CBE and the newly-tested ABE code paths (Inputs 2 and 9), consistently identifying the same known-Cas9 sample as non-clean-BE.",
+    "All five CRISPResso2 modes have correct, --help-verified CLI flags; four of five (CRISPResso, CRISPRessoBatch, CRISPRessoPooled, CRISPRessoCompare) have live, reproduced execution evidence this pass."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "CRISPRessoWGS remains unexecuted across two audit passes",
+      "observed_in": [6],
+      "problem": "No live run of CRISPRessoWGS exists in either the pre-fix or this re-audit; only --help flag verification.",
+      "root_cause": "No small-genome reference FASTA is cached alongside the audit's small-genome BAM, and building one is out of scope for a time-boxed audit pass.",
+      "fix": "Cache a minimal reference FASTA (matching the existing Both.Cas9.fastq.smallGenome.bam's chr9/chr11 slices) alongside the other test fixtures so a future audit can execute CRISPRessoWGS for real rather than checking flags only."
+    },
+    {
+      "priority": "P2",
+      "title": "Single bundled Python code sample has no accompanying automated test",
+      "observed_in": [6],
+      "problem": "parse_crispresso() only gets verified when an auditor manually re-runs it by hand; nothing in the Skill package would catch a future regression on its own.",
+      "root_cause": "The Skill ships documentation and CLI examples but no test harness.",
+      "fix": "Consider adding a minimal pytest-style smoke test (or at least a runnable __main__ block, as this audit's own run/input6_parse_output/test_parse_crispresso.py demonstrates) that future contributors can run before shipping a change to the parser."
+    }
+  ]
+}

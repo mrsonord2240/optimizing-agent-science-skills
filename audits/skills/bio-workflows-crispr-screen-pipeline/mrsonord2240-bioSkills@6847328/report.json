@@ -1,0 +1,272 @@
+{
+  "meta": {
+    "skill_name": "bio-workflows-crispr-screen-pipeline",
+    "description": "End-to-end pooled and single-cell CRISPR screen analysis from FASTQ to hit genes: library QC, guide counting, six-stage screen QC, method-matched hit calling across MAGeCK/BAGEL2/drugZ/JACKS/Chronos, copy-number and batch correction, and tier-based cross-method consensus, with branches to editing/single-cell/in-vivo variants.",
+    "evaluated_on": "2026-09-16",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "mrsonord2240/bioSkills@6847328:workflows/crispr-screen-pipeline"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated DOIs, statistics, or trial data; References section citations unchanged and correctly attributed."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Scope remains entirely experimental/technical screen diagnostics; no diagnostic or prescriptive claims about human subjects."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Pre-fix FAIL trigger (Step 3's 'Replicate Pearson' formula conflating replicate and non-replicate pairs) is verified fixed by direct re-execution: the new condition-grouping code gives 0.7886812496284182 on real HAP1 TKOv3 data vs. the old naive formula's 0.6769896801914643 -- both values match the fix log exactly. No new methodological fallacy found; the MLE permutation-round gap (Input 6) is a reliability/documentation-completeness gap, not a fallacy in what is stated."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "Every code block executed successfully on real or realistic data: Step 3 QC (fixed formula), Step 6a MAGeCK RRA (both label schemes), Step 6a BAGEL2 fc/bf with -s 42 (run twice, byte-identical), Step 6c drugZ, Step 6d/6e JACKS/Chronos API surface, Step 6b MAGeCK MLE (default and --permutation-round 10), Step 7 tier-consensus, and examples/crispr_pipeline.sh's flags all verified present in the installed MAGeCK 0.5.9.5."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 86,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 11,
+        "max": 12,
+        "note": "Both correctness defects found pre-fix (Replicate Pearson conflation; Step 2/Step 6a non-composing examples) are fixed and verified by direct re-execution. Remaining gap: Step 6b's MAGeCK MLE example doesn't carry forward sibling mageck-analysis's own fixed permutation-round reliability caveat."
+      },
+      "reliability": {
+        "score": 10,
+        "max": 12,
+        "note": "Common Errors table now covers the BAGEL2 seed and the made-once-commitments risk with pointers to bagel-essentiality; still no row for MLE's default-permutation-round FDR instability, which this audit reproduced on real data (Input 6)."
+      },
+      "performance_context": {
+        "score": 6,
+        "max": 8,
+        "note": "Unchanged from pre-fix: token-efficient prose for the scope covered; code blocks remain concise, adapted patterns."
+      },
+      "agent_usability": {
+        "score": 13,
+        "max": 16,
+        "note": "CN-threshold drift between SKILL.md and usage-guide.md is fixed and verified consistent; Step 0 made-once-commitments gate is now a numbered precondition in both documents. A separate, unfixed Replicate-Pearson threshold drift remains: Step 3's own 'Hard gates' line states >0.85 while the frontmatter, usage-guide.md, and the canonical sibling screen-qc all state a >=0.8 floor with 0.85 as the 'acceptable' (not fail) band."
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Forgiveness improved: the new Step 0 gives explicit recovery guidance (ask the user) for the made-once-commitments risk that pre-fix had only narrative treatment for."
+      },
+      "security": {
+        "score": 12,
+        "max": 12,
+        "note": "Unchanged: no credential exposure, destructive operations, or prompt-injection vectors in any script or instruction."
+      },
+      "maintainability": {
+        "score": 10,
+        "max": 12,
+        "note": "CN-bias threshold is now stated identically in both documents. The Replicate-Pearson threshold wording still drifts internally within SKILL.md itself (frontmatter vs. Step 3 body) -- a residual documentation-sync defect of the same class as the one that was fixed this round."
+      },
+      "agent_specific": {
+        "score": 17,
+        "max": 20,
+        "note": "Composability materially improved: Step 7's tier-consensus code ran unmodified against the new seeded BAGEL2 output, and Step 2's and Step 6a's worked examples now compose without manual correction (verified against the published HAP1 TKOv3 benchmark). A real escape hatch (Step 0) now exists for missing made-once commitments. Step 6b's MLE example is the one remaining composability/escape-hatch gap: no warning that its own literal invocation uses an unreliable default."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 84.4,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 23,
+      "total": 26
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Regression: two-condition essentiality (QC fix + seeded BAGEL2 + MAGeCK RRA + drugZ + Step 7 tier consensus) on real HAP1 TKOv3 data",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Both P0 Research/Skill Veto triggers reproduced-fixed on the same real data that exposed them pre-fix.",
+        "basic": 36,
+        "specialized": 55,
+        "total": 91,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Step 3's condition-grouped QC code executes without error on real 71,090-guide count data", "result": "PASS", "note": "run/step3_qc_fixed.py: printed per-sample Gini/pct_zero/reads_per_sgrna and the grouped Replicate Pearson value" },
+          { "text": "The 'Replicate Pearson' value now reflects true technical-replicate correlation, not baseline-vs-endpoint pairs", "result": "PASS", "note": "Grouped value 0.7886812496284182 vs. naive 0.6769896801914643 -- both reproduce the fix log's cited numbers exactly" },
+          { "text": "MAGeCK RRA (Step 6a) and drugZ (Step 6c) commands, run as documented, produce biologically correct top hits", "result": "PASS", "note": "Reused essentiality_rra.gene_summary.txt / drugz_output.txt from the pre-fix run (Step 6a/6c text unchanged there): top depleted POLR2L/EIF3A/GTPBP10/PES1/MRPL53, matching the published HAP1 TKOv3 benchmark" },
+          { "text": "Step 7's tier-consensus code runs unmodified against real MAGeCK+BAGEL2(seeded)+drugZ output", "result": "PASS", "note": "run/tier_consensus_seeded.py: 481 Tier-1, 399 Tier-2 genes from 18,056 merged genes" },
+          { "text": "Tier assignments are reproducible across identical reruns now that Step 6a documents a fixed -s 42 seed", "result": "PASS", "note": "run/bagel_seeded_determinism_check.py: two BAGEL2 bf runs with -s 42 are byte-identical, 0/18,053 BF>6 flips (vs. 39 flips unseeded, pre-fix)" }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Regression: Step 2's count-file example handed off into Step 6a's new matched hit-calling example",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The fix added a second Step 6a example using Step 2's own sample labels; it now composes without a hard MAGeCK error.",
+        "basic": 35,
+        "specialized": 54,
+        "total": 89,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Step 6a's new matched mageck test example (--treatment-id Veh_r1,Veh_r2 --control-id Day0) runs successfully against Step 2's own count-file scheme", "result": "PASS", "note": "run/step2_step6a_compose.ps1 against experiment_step2scheme.count.txt completed cleanly, produced step2_step6a_compose.gene_summary.txt" },
+          { "text": "Top hits from this composed run match the published HAP1 TKOv3 benchmark", "result": "PASS", "note": "Top depleted genes EIF3A, POLR2L, PCNA, GTPBP10 -- exact match to the fix log's own verification" },
+          { "text": "Step 6a's original Day0/Day14 example remains self-consistent and is now clearly distinguished from the new Veh/Drug example", "result": "PASS", "note": "SKILL.md now captions it 'Day0/Day14 two-timepoint dropout convention -- not the multi-timepoint time-course design in Step 6b'" },
+          { "text": "Section 6a's terminology no longer collides with Step 6b's distinct time-course (MLE) method name", "result": "PASS", "note": "Renamed caption confirmed in the fork's current SKILL.md text" }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Regression: CN-bias QC threshold cross-check between SKILL.md and usage-guide.md at rho=0.07",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The two shipped documents now state the same numeric threshold.",
+        "basic": 34,
+        "specialized": 52,
+        "total": 86,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "SKILL.md and usage-guide.md state the same numeric threshold for the CN-bias gate", "result": "PASS", "note": "Both now read abs(rho)<0.10 post-correction, with <0.05 as an explicit optional stricter target (SKILL.md frontmatter and usage-guide.md's QC Checkpoints table verified verbatim-consistent)" },
+          { "text": "A screen with rho=0.07 gets a single, unambiguous pass/fail verdict from the Skill", "result": "PASS", "note": "Passes under both documents' now-reconciled primary threshold" },
+          { "text": "The underlying CN-bias check itself (Spearman rho, LFC vs CN) remains methodologically sound", "result": "PASS", "note": "Unchanged, correctly described concept" }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Regression: JACKS Step 6d CLI flags + Chronos Step 6e API surface, unchanged by the fix",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Fix log confirms Step 6d/6e text was not touched; spot-checked against the installed packages to confirm it remains accurate.",
+        "basic": 35,
+        "specialized": 55,
+        "total": 90,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "run_JACKS.py's documented flags exist in the installed tool", "result": "PASS", "note": "All seven flags present verbatim in jacks_io.py's argparse definitions (TOOLS.md-installed jacks==0.2)" },
+          { "text": "chronos.Chronos()'s documented sequence_map=/guide_gene_map=/readcounts= keyword arguments match the installed package", "result": "PASS", "note": "Confirmed via inspect.signature on the installed chronos-venv package, same as pre-fix" },
+          { "text": "chronos.Chronos.train(nepochs=301) and .gene_effect as a property match the installed API", "result": "PASS", "note": "Unchanged from pre-fix verification" },
+          { "text": "chronos.alternate_CN exists as documented for post-hoc CN correction", "result": "PASS", "note": "Present in the installed chronos module's top-level namespace" }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Regression: baseline-choice claim (vehicle vs Day-0) for drugZ, unchanged by the fix",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Step 6c text is byte-unchanged per the fix log's file list; carries forward the pre-fix empirical verification and re-confirms drugz_output.txt (reused in Input 1's tier consensus) is real, non-degenerate output.",
+        "basic": 33,
+        "specialized": 53,
+        "total": 86,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "Step 6c's text and flags are unchanged from the version already verified empirically correct pre-fix", "result": "PASS", "note": "Fix log's changed-file list does not include Step 6c" },
+          { "text": "The vehicle-vs-Day-0 baseline-choice principle remains empirically defensible", "result": "PASS", "note": "Carried forward from pre-fix's controlled synthetic drugZ simulation (run/synth_baseline_check.py, run/drugz_vs_vehicle.txt, run/drugz_vs_day0.txt)" },
+          { "text": "drugZ still produces real, non-degenerate output against real HAP1 TKOv3 data in this audit", "result": "PASS", "note": "drugz_output.txt (reused unmodified) fed directly into Input 1's Step 7 tier-consensus run with real fdr_synth values" }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "NEW: Step 6b's MAGeCK MLE example vs. sibling mageck-analysis's own fixed permutation-round reliability caveat",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Auditor-designed cross-Skill consistency check: this pipeline's own literal Step 6b command silently uses MAGeCK's noisy default and reproduces the flip behavior mageck-analysis's audit already found and fixed guidance for, but this Skill does not cross-reference it.",
+        "basic": 27,
+        "specialized": 36,
+        "total": 63,
+        "assertions_passed": 1,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Step 6b's mageck mle example carries a caveat about permutation-round reliability, matching sibling mageck-analysis's own fixed guidance ('use >=10 for any FDR call near 0.05')", "result": "FAIL", "note": "No mention of --permutation-round or FDR reliability anywhere in SKILL.md or usage-guide.md's Step 6b/MLE sections" },
+          { "text": "Running Step 6b's documented command with its implicit default (no --permutation-round given, so MAGeCK's own default of 2) produces FDR calls stable to permutation count", "result": "FAIL", "note": "run/mle_permutation_round_compare.py on a 1,500-gene real-data subsample: 4/1500 genes flip day14 FDR<0.05 status between round 2 (default) and round 10; mageck-analysis's own full-genome-scale run found 19/48 (40%) flip -- same defect class, reproduced here at reduced scale" },
+          { "text": "The pipeline's Related Skills / Version Compatibility sections point an agent to mageck-analysis's specific permutation-round caveat before trusting a near-0.05 MLE call", "result": "FAIL", "note": "Related Skills lists mageck-analysis only generically ('MAGeCK RRA + MLE detail'), with no pointer to this specific reliability finding" },
+          { "text": "mageck mle itself runs without error using the exact flags SKILL.md documents", "result": "PASS", "note": "Both --output-prefix mle_default (round 2) and --permutation-round 10 completed cleanly on the same subsample" }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Regression: minimal-context request ('analyze my CRISPR screen, tell me the top hit genes') with baseline/library-control/CN status unspecified",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The fix added Step 0 / item 0 as a numbered precondition in both SKILL.md and usage-guide.md; the pre-fix gap (narrative-only warning, no operational gate) is closed.",
+        "basic": 34,
+        "specialized": 52,
+        "total": 86,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "SKILL.md instructs the agent to confirm baseline/library-control/CN commitments before computing hits when unspecified", "result": "PASS", "note": "New 'Step 0: Confirm Made-Once Commitments' -- 'if the baseline ... are not stated, ask the user rather than inferring them'" },
+          { "text": "usage-guide.md's own numbered agent workflow includes the same precondition", "result": "PASS", "note": "Item '0.' in 'What the Agent Will Do' states the identical gate before item 1 (guide counting)" },
+          { "text": "Following the numbered pipeline steps literally now surfaces a missing-commitment check before Step 2/counting proceeds", "result": "PASS", "note": "Step 0 explicitly precedes Step 2 both numerically and in prose ('Before running any code')" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 34.4,
+    "dynamic_weighted": 50.6,
+    "score": 85,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Both pre-fix Research/Skill Veto P0 triggers verified genuinely fixed by direct re-execution against the same real HAP1 TKOv3 data that exposed them: the condition-grouped Replicate Pearson formula (0.7887 vs. naive 0.6770) and byte-identical seeded BAGEL2 reruns (0/18,053 BF>6 flips) both reproduce the fix log's own cited numbers exactly.",
+    "Step 2's and Step 6a's worked examples now compose end-to-end without manual correction, reproducing the published HAP1 TKOv3 benchmark (EIF3A/POLR2L/PCNA/GTPBP10).",
+    "The made-once-commitments principle is now an operational Step 0 gate in both SKILL.md and usage-guide.md, not just narrative warning text.",
+    "JACKS and Chronos API usage (Step 6d/6e), untouched by this fix round, remains 100% accurate against the installed packages.",
+    "Thorough end-to-end orchestration scope (15 chained sub-skills, six specialized branches) with real, correctly-attributed literature citations throughout."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "Step 6b's MAGeCK MLE example doesn't carry forward mageck-analysis's own fixed permutation-round caveat",
+      "observed_in": [6],
+      "problem": "Step 6b's mageck mle command sets no --permutation-round, silently using MAGeCK's noisy default of 2. On a 1,500-gene real-data subsample this flips 4/1500 genes' FDR<0.05 status against --permutation-round 10; sibling mageck-analysis's own audit found the same defect flips 40% of hits at full genome scale and now documents '>=10 for any FDR call near 0.05', but this pipeline's Step 6b and Related Skills sections never surface that caveat.",
+      "root_cause": "Step 6b's example was written before mageck-analysis's permutation-round finding existed, and this fix round's Related Skills cross-references were not revisited for it.",
+      "fix": "Add --permutation-round 10 (or an explicit caveat with a pointer to [[mageck-analysis]]'s permutation-round section) to Step 6b's mageck mle example, matching what bagel-essentiality's -s 42 seed and hit-calling's own cross-references already do for the BAGEL2 determinism fix in this same pipeline."
+    },
+    {
+      "priority": "P2",
+      "title": "Replicate Pearson threshold still drifts internally within SKILL.md itself",
+      "observed_in": [1, 6],
+      "problem": "SKILL.md's frontmatter states 'Replicate Pearson on log-counts >=0.8 (MAGeCK-VISPR floor; >0.85 acceptable, >0.95 ideal)', matching usage-guide.md and the canonical sibling screen-qc, but Step 3's own 'Hard gates from [[screen-qc]]' line states flatly 'Replicate Pearson on log-counts >0.85' -- using the 'acceptable' band as if it were the fail floor. This is the same class of documentation-sync defect as the CN-bias threshold that was fixed this round, just not caught by that fix.",
+      "root_cause": "The CN-threshold fix reconciled SKILL.md against usage-guide.md but did not audit SKILL.md's own two internal statements of the Replicate Pearson gate against each other or against screen-qc's canonical wording.",
+      "fix": "Make Step 3's 'Hard gates' line read '>=0.8 (MAGeCK-VISPR floor); >0.85 acceptable' verbatim, matching the frontmatter, usage-guide.md, and screen-qc."
+    },
+    {
+      "priority": "P2",
+      "title": "examples/crispr_pipeline.sh is not referenced from SKILL.md or usage-guide.md",
+      "observed_in": [],
+      "problem": "The bundled examples/crispr_pipeline.sh (a complete, independently-runnable mageck count -> mageck test -> hit extraction script, verified to use only flags present in the installed MAGeCK 0.5.9.5) is never mentioned in either shipped document, so an agent following SKILL.md/usage-guide.md alone would not discover it.",
+      "root_cause": "The examples/ file was added without a cross-reference from the main documents.",
+      "fix": "Add one line in SKILL.md's Output Files or Related Skills section pointing to examples/crispr_pipeline.sh as a ready-to-run reference script."
+    }
+  ]
+}

@@ -1,0 +1,214 @@
+{
+  "meta": {
+    "skill_name": "bio-crispr-screens-jacks-analysis",
+    "description": "Runs JACKS (Joint Analysis of CRISPR/Cas9 Knockout Screens; Allen et al 2019 Genome Research), modeling per-sgRNA log-fold-change as gene-essentiality times guide-efficacy, with hierarchical efficacy priors shared across screens using the same library.",
+    "evaluated_on": "2026-09-16",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "mrsonord2240/bioSkills@6847328:crispr-screens/jacks-analysis"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "Citations (Allen 2019 Genome Research 29:464; Behan 2019 Nature 568:511; Meyers 2017 Nat Genet 49:1779) are real and correctly attributed, unchanged from the pre-fix audit. No fabricated statistics found; every quantitative claim checked in this round (iteration cap 50, n_pseudo Python default 0 vs CLI default 2000, apply_w_hp default False, run_JACKS.py location) was independently confirmed against the installed JACKS 0.2 source, not just re-read from the fix log." },
+      "practice_boundaries": { "result": "PASS", "detail": "Purely computational gene-essentiality tooling; no diagnostic, prescriptive, or patient-facing content." },
+      "methodological_ground": { "result": "PASS", "detail": "No statistical fallacy found. The Model section's stated priors (Normal(1,1) efficacy, Normal(0,1e4) gene effect, tau_prior_strength=0.5) were checked directly against jacks.infer.inferJACKSGene's default keyword arguments and match exactly." },
+      "code_usability": { "result": "PASS", "detail": "Unlike the pre-fix 'borderline' PASS, both previously-crashing code artifacts now run cleanly: examples/run_jacks.py's analyze_results() (P0: NameError on output_prefix) and SKILL.md's own efficacy_summary() (P0: KeyError('Gene')) were re-executed against real JACKS output in this audit and both completed without error, including the documented ValueError guardrail on an unmapped guide." }
+    }
+  },
+  "static_score": {
+    "subtotal": 96,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 11, "max": 12, "note": "Both P0 fixes (efficacy_summary join, analyze_results output_prefix parameter) and all five P1/P2 factual corrections (run_JACKS.py location, apply_w_hp default, wrong-library-prior symptom, naming-mismatch symptom, iteration cap) independently re-verified correct by direct execution. Docked one point: usage-guide.md's 'What the Agent Will Do' step 12 still lists generic output filenames (gene_results.txt, sgrna_efficacy.txt, library_redesign_candidates.txt, comparison_with_mageck.txt) that match none of the real JACKS output files documented and produced elsewhere in the same Skill -- a new finding, not addressed by the round-2 fix pass." },
+      "reliability": { "score": 12, "max": 12, "note": "Both shipped code artifacts that crashed on first real use pre-fix now run correctly and produce correct output; the guidemap-join guard (efficacy_summary) raises an actionable ValueError on unmapped guides, confirmed by direct execution. The hyperparameter-override recipe restores exact prior state after use, verified by object identity plus a byte-identical follow-up run." },
+      "performance_context": { "score": 7, "max": 8, "note": "SKILL.md grew from 269 to 305 lines to accommodate the fixes -- still well under the 500-line budget and information-dense rather than bloated; usage-guide.md and examples/ keep secondary detail out of the core file." },
+      "agent_usability": { "score": 16, "max": 16, "note": "Every internal self-contradiction identified in the pre-fix audit (apply_w_hp default vs recommendation, X1/X2 gene-file-vs-guide-file confusion, 5000+ vs 50 iteration claims) is now consistent across SKILL.md, usage-guide.md and examples/run_jacks.py -- confirmed by reading all three files together, not just SKILL.md in isolation." },
+      "human_usability": { "score": 7, "max": 8, "note": "Clear When-to/When-not-to-use and Tips sections; the Scene Override 2 principle (strict validation over silent auto-correction) is correctly implemented -- efficacy_summary() raises rather than guessing on an unmapped guide." },
+      "security": { "score": 11, "max": 12, "note": "No credential exposure or injection vectors; the one subprocess call remains list-form, not shell=True. run_jacks_analysis()'s file-path arguments are still passed to subprocess without existence/type validation (pre-existing, low risk given list-form invocation)." },
+      "maintainability": { "score": 12, "max": 12, "note": "3-file surface, now internally consistent. The file-location contradiction and the two real runtime bugs that made this hard to maintain pre-fix are fixed and independently confirmed resolved." },
+      "agent_specific": { "score": 20, "max": 20, "note": "Composability (Related Skills cross-links) and escape hatches (When JACKS Is Not the Right Tool) remain strong. Idempotency, previously only disclosed as a limitation, is now positively demonstrated: two identical runs produced byte-identical gene and guide-efficacy files, and the override-then-restore pattern was verified to leave no residual state change." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 89.1,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 30, "total": 32 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Multi-screen joint analysis on JACKS' own bundled Project Score example-small data (5 AML cell lines vs plasmid control, 8081 guides, 1579 genes) -- regression of the apply_w_hp default fix",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Ran SKILL.md's literal post-fix canonical example (apply_w_hp=False, 9.5s) and the 'deliberate use only' variant (apply_w_hp=True, 12.5s). The canonical example is now internally consistent with its own stated recommendation (pre-fix it set True against its own advice). Per-cell-line Spearman rho between settings: 0.894-0.960 -- confirms the two settings produce materially different rankings, though the exact numeric range differs from SKILL.md's quoted 0.75-0.89 because that figure is explicitly scoped to the full 13-cell-line 'example' dataset, not the faster 'example-small' (5-cell-line) dataset used here for speed.",
+        "basic": 36,
+        "specialized": 55,
+        "total": 91,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "SKILL.md's canonical Python example (apply_w_hp=False) is now internally consistent with its own stated recommendation", "result": "PASS", "note": "Ran the example verbatim; the literal code and the 'the default and the tool's recommendation' comment now agree, reversing the pre-fix P1 finding." },
+          { "text": "The documented runJACKS() call runs against real bundled example data using only SKILL.md's documented parameters", "result": "PASS", "note": "common_ctrl_sample='CTRL' and gene_hdr='Gene' are both parameters SKILL.md already documents; no undocumented workaround needed." },
+          { "text": "Output files match the exact names and columns SKILL.md documents", "result": "PASS", "note": "gene/gene_std/grna/pickle files produced with documented columns." },
+          { "text": "apply_w_hp=True vs False produce measurably different gene rankings, as SKILL.md's 'deliberate use only' warning claims", "result": "PASS", "note": "Spearman rho 0.894-0.960 (< 1.0) across all 5 cell lines -- the settings genuinely disagree, confirming the warning is warranted even though the exact quoted range (0.75-0.89) applies to a different, larger dataset not re-run here." },
+          { "text": "No fabricated statistics in the interpretation", "result": "PASS", "note": "All reported rho and gene-effect values computed directly from this run's own output files." }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Single-screen essentiality on real HAP1 TKOv3 data via the corrected JACKS/jacks/ CLI location",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Ran the documented CLI exactly as SKILL.md specifies post-fix (cwd=JACKS/jacks/, run_JACKS.py found there, not at repo root -- regression of the P1 file-location fix). AUC vs CEGv2/NEGv1 = 0.996 (effect) / 0.995 (z). 8 of 9 independently-verified essential genes (POLR2L, POLR3H, GTPBP10, PCNA, MRPL53, RRM1, SDHB, PES1) land in the top 15 by z; EIF3A ranks just outside that window (a property of this test's cutoff choice, not a Skill defect).",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "The CLI runs correctly from JACKS/jacks/ exactly as SKILL.md's corrected file-location claim states", "result": "PASS", "note": "run_JACKS.py confirmed on disk only at JACKS/jacks/run_JACKS.py, matching the corrected SKILL.md/usage-guide.md text; subprocess with cwd=JACKS/jacks/ succeeded." },
+          { "text": "JACKS recovers CEGv2 over NEGv1 with high accuracy on real HAP1 TKOv3 data", "result": "PASS", "note": "AUC 0.996 on a 1443-gene CEGv2/NEGv1 benchmark." },
+          { "text": "JACKS' top hits agree with independently-verified essential genes on this screen", "result": "PASS", "note": "8/9 known essentials in the top 15 by effect/std." },
+          { "text": "--ctrl_sample_hdr correctly documented as naming a Sample-level control id (not a Replicate id)", "result": "PASS", "note": "Confirmed by testing: a Replicate-level control id raises ValueError; the Sample-level id ('T0') SKILL.md's own worked repmap example implies is correct." },
+          { "text": "No fabricated statistics in the interpretation", "result": "PASS", "note": "AUC and top-hit values read directly from this run's output." }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Reference efficacy prior from the wrong library -- regression of the corrected Failure Modes description",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Built a --reffile from Input 1's Project Score run and passed it to the unrelated HAP1 screen. SKILL.md's corrected Failure Modes text ('an immediate exception... naming the exact missing sgRNA') now matches observed behavior exactly, reversing the pre-fix finding that the table described a silent-degradation symptom the tool does not actually produce.",
+        "basic": 34,
+        "specialized": 50,
+        "total": 84,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "SKILL.md's corrected Failure Modes description matches real JACKS 0.2 behavior for a mismatched-library reference prior", "result": "PASS", "note": "Exception 'A1BG_0 has no sgrna reference in ...' raised immediately, matching the corrected text." },
+          { "text": "extract_efficacy_prior() produces a file in the exact schema --reffile requires", "result": "PASS", "note": "sgrna/X1/X2 columns, consumed successfully by the --reffile run before it failed on the expected missing-guide check." },
+          { "text": "The failure is caught and reported clearly rather than silently corrupting results", "result": "PASS", "note": "Hard, named exception -- Scene Override 1 applies (this is correct defensive design, not a bug)." },
+          { "text": "SKILL.md's remaining Fix guidance (match library by sequence, not only ID) is independently actionable", "result": "FAIL", "note": "Not exercised in this input -- the sequence-vs-ID silent-success failure mode SKILL.md also describes was not separately reproduced here (time-boxed); marked FAIL only for not being tested, not because it is wrong." }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Stress",
+        "label": "Run the Skill's own shipped downstream code (both P0 fixes) against real JACKS output from Input 1",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Both P0 bugs from the pre-fix audit are resolved and independently confirmed: examples/run_jacks.py's analyze_results(gene_file, guide_file, output_prefix) now takes output_prefix as a real parameter and runs without NameError; SKILL.md's own efficacy_summary() now joins the guidemap and runs without KeyError, including a correct ValueError guard on an unmapped guide. plot_results() also ran and produced a real, non-empty PNG.",
+        "basic": 37,
+        "specialized": 55,
+        "total": 92,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "examples/run_jacks.py's analyze_results() runs without NameError when imported and called as SKILL.md frames it", "result": "PASS", "note": "P0 regression fixed: output_prefix is now the function's third parameter; returned (genes, guides) correctly." },
+          { "text": "SKILL.md's own efficacy_summary() runs against real grna output without KeyError", "result": "PASS", "note": "P0 regression fixed: merges guidemap on 'sgrna' before use; median_efficacy=1.017 matched the fix log's own independently-quoted figure." },
+          { "text": "efficacy_summary() raises an actionable ValueError on an unmapped guide, as documented", "result": "PASS", "note": "Corrupting one guide ID triggered the documented ValueError with a clear count/message." },
+          { "text": "plot_results() produces a real, non-empty output file from analyze_results()'s return values", "result": "PASS", "note": "93,990-byte PNG written; not a zero-byte or missing file." },
+          { "text": "No fabricated claim that this code 'ran successfully' without having actually executed it", "result": "PASS", "note": "This audit ran every code path live; no execution claims are asserted without a corresponding run." }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Scope Boundary",
+        "label": "CRISPRi chemistry-mismatch hyperparameter-override recipe, run end-to-end with verified restoration",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Pre-fix this Failure Mode's fix was an unactionable P1 (no runnable interface documented). Post-fix, the functools.partial(jacks.infer.inferJACKSGene, ...) recipe runs to completion, measurably widens the efficacy posterior SD (0.557 -> 0.763, confirming the override actually takes effect rather than being silently ignored), and correctly restores the original function afterward -- verified both by object identity and a follow-up run that reproduced the original default-prior output byte-for-byte.",
+        "basic": 36,
+        "specialized": 54,
+        "total": 90,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The documented hyperparameter-override recipe runs end-to-end against real data", "result": "PASS", "note": "Completed without error on example-small data." },
+          { "text": "The override measurably changes inference output (not silently accepted and ignored)", "result": "PASS", "note": "Efficacy posterior SD widened from 0.557 (default var0_x=1.0) to 0.763 (var0_x=4.0), as expected for a weaker (wider) prior." },
+          { "text": "jacks.infer.inferJACKSGene is restored to the exact pre-override default after the recipe, not just claimed to be", "result": "PASS", "note": "Verified by Python object identity (`is _default_gene_fit`) plus a follow-up run reproducing the original default output byte-for-byte." },
+          { "text": "The underlying scientific diagnosis (CRISPRi efficacy != Cas9-KO efficacy) remains accurate", "result": "PASS", "note": "Consistent with Allen 2019's stated scope; unchanged from the pre-fix assessment." }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Adversarial",
+        "label": "sgRNA-to-gene naming mismatch -- regression of the corrected Common Errors symptom",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Built a 1187-guide HAP1 subset (300 genes) and corrupted half the guidemap IDs (underscore->dot), matching SKILL.md's own BRCA1_1/BRCA1.1 example. SKILL.md's corrected Common Errors symptom ('genes missing from output entirely') now matches observed behavior exactly (299 of 300 genes returned, 0 NaN values) -- reversing the pre-fix finding that the table described a NaN symptom the tool does not actually produce.",
+        "basic": 34,
+        "specialized": 49,
+        "total": 83,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "SKILL.md's corrected symptom description ('genes missing from output entirely', no NaN) matches real observed behavior", "result": "PASS", "note": "299/300 genes returned, 0 NaN cells found." },
+          { "text": "The documented sanity check (len(output) == n_genes_expected) detects the mismatch", "result": "PASS", "note": "299 != 300, a real actionable discrepancy." },
+          { "text": "The run completes without crashing on partially mismatched real data", "result": "PASS", "note": "Completed in well under a minute." },
+          { "text": "No fabricated gene-effect values reported", "result": "PASS", "note": "All counts read directly from the real output file." }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Variant B",
+        "label": "Determinism, iteration cap, and Python-API p-value default -- new inputs beyond the pre-fix audit",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "New input, not in the pre-fix audit. Regression-tests the three 'found while fixing' internal contradictions: (1) gene effect and guide efficacy files were byte-for-byte identical across two independent reruns on identical input, confirming the corrected determinism claim; (2) the installed JACKS 0.2's inferJACKS default n_iter=50 matches SKILL.md's Quantitative Thresholds table, and the documented n_iter=500 override recipe ran to completion and was correctly restored; (3) supplying ctrl_genes with the Python API's n_pseudo left at its default (0) produced no p-value file, while n_pseudo=2000 did -- confirming the corrected note that the Python default differs from the CLI default. Also surfaces one new, unfixed finding: usage-guide.md's own listed output filenames do not match the Skill's real output.",
+        "basic": 36,
+        "specialized": 53,
+        "total": 89,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Gene effects and guide efficacies are byte-identical across reruns on identical input, as SKILL.md's corrected Model section claims", "result": "PASS", "note": "Two independent runJACKS() calls on identical input produced byte-for-byte identical gene and grna result files." },
+          { "text": "The documented n_iter=50 default matches the installed JACKS 0.2 API", "result": "PASS", "note": "inspect.signature confirms n_iter=50 as jacks.infer.inferJACKS's default." },
+          { "text": "The n_iter override recipe (convergence-failure Failure Mode) runs to completion and is correctly restored", "result": "PASS", "note": "n_iter=500 override ran; jacks.jacks_io.inferJACKS restored afterward. 0 gene-effect cells changed on this already-converged dataset, consistent with the Skill's own honest caveat that not all data will show a difference." },
+          { "text": "Python API requires ctrl_genes AND n_pseudo>0 to write a p-value file, as SKILL.md's corrected note states", "result": "PASS", "note": "n_pseudo=0 (Python default): no pval file. n_pseudo=2000: pval file written." },
+          { "text": "usage-guide.md's own documented output filenames match what the Skill's real code actually produces", "result": "FAIL", "note": "usage-guide.md step 12 lists gene_results.txt/sgrna_efficacy.txt/library_redesign_candidates.txt/comparison_with_mageck.txt -- none of these match the real JACKS output filenames (<outprefix>_gene_JACKS_results.txt etc.) documented and produced everywhere else in the Skill. New finding, not addressed by the round-2 fix." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 38.4,
+    "dynamic_weighted": 53.5,
+    "score": 92,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Both P0 crashes (efficacy_summary() KeyError, analyze_results() NameError) are fixed and independently confirmed running against real JACKS output, including the documented ValueError guardrail on guide-map mismatches.",
+    "All corrected factual claims (run_JACKS.py location, apply_w_hp default/recommendation match, 50-iteration cap, full determinism of gene effects, Python-API n_pseudo default requiring an explicit override for p-values, naming-mismatch and wrong-library-prior symptoms) were independently re-verified against the installed JACKS 0.2 API and real data in this audit, not accepted from the fix log.",
+    "The CRISPRi hyperparameter-override recipe, previously an unactionable P1 finding, now runs end-to-end, measurably changes inference (efficacy posterior SD widened from 0.557 to 0.763 as expected), and correctly restores the default afterward -- verified by object identity plus a byte-identical follow-up run.",
+    "Every internal self-contradiction found during the fix pass (apply_w_hp, gene-file-vs-guide-file X1/X2 columns, iteration-count claims) is now consistent across SKILL.md, usage-guide.md, and examples/run_jacks.py."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "usage-guide.md's documented output filenames don't match real JACKS output",
+      "observed_in": [7],
+      "problem": "'What the Agent Will Do' step 12 lists gene_results.txt, sgrna_efficacy.txt, library_redesign_candidates.txt, comparison_with_mageck.txt as outputs, but no code anywhere in the Skill produces files with these names -- the real JACKS outputs (confirmed by every execution in this audit) are <outprefix>_gene_JACKS_results.txt, _gene_std_JACKS_results.txt, _grna_JACKS_results.txt, optionally _gene_pval_JACKS_results.txt, and a .pickle file.",
+      "root_cause": "Appears to be a leftover generic/aspirational output summary written before the Skill's real JACKS-derived filename conventions were pinned down elsewhere; not in scope for the round-2 fix pass, which targeted verified code and factual-claim defects rather than this workflow-summary line.",
+      "fix": "Replace step 12's filename list with the Skill's own real output filenames, or explicitly label library_redesign_candidates.txt and comparison_with_mageck.txt as agent-authored downstream summaries rather than direct JACKS outputs."
+    }
+  ]
+}
