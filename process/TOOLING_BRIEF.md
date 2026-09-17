@@ -23,11 +23,41 @@ folders under `F:\OpenScience\external\mrsonord2240__bioSkills\`.
 
 Install in priority order: (1) the Skills the Specialist's central step cannot exist without;
 (2) supporting Skills in scope; (3) list-only — anything out of the candidate's scope, GPU-first, or
-needing an account. **Linux-only is not blocked (2026-09-16).** Docker Desktop and a WSL2 distro (`agents`) run on this
-machine; a tool with an official Docker image or a bioconda Linux build runs through those. Likewise a
-tool pinned to an older Python gets its own `uv` venv (`uv python list` shows what is installed). Try
-those before recording a tool as not installable — the CRISPR pass blocked CRISPResso2 and PRIDICT2 on
-reasons neither survived a check. Docker's VM has 4 GB of memory; say so if a tool needs more.
+needing an account. **Linux-only is not blocked (2026-09-17).** There is a dedicated WSL2 science seat
+with bioconda — see below — plus Docker Desktop. Likewise a tool pinned to an older Python gets its own
+`uv` venv (`uv python list` shows what is installed). Try those before recording a tool as not
+installable — the CRISPR pass blocked CRISPResso2 and PRIDICT2 on reasons neither survived a check.
+Docker's VM has 4 GB of memory; say so if a tool needs more.
+
+## The WSL science seat (built 2026-09-17)
+
+Distro **`science`** (Ubuntu 26.04), replacing the retired `agents` distro. It exists so that
+Linux-only tools — MAGeCK, MAFFT, IQ-TREE, Kraken 2, GATK, QIIME 2, CAUSE, LHC-MR — stop being
+recorded as unexecutable.
+
+```bash
+MSYS2_ARG_CONV_EXCL='*' wsl.exe -d science -- bash -lc 'micromamba activate bio && mageck --version'
+```
+
+- **`MSYS2_ARG_CONV_EXCL='*'` is required** when driving `wsl.exe` from Bash, or Unix paths are
+  rewritten to `C:/Program Files/Git/...`. A round-trip test appeared to pass without it while the
+  `cat` had actually failed.
+- Working user `sci`, passwordless sudo. micromamba at `~/.local/bin`, channels conda-forge + bioconda
+  (strict). Environment **`bio`** already has Python 3.12, R 4.4.1, mageck, mafft, iqtree, kraken2,
+  samtools, bcftools, bedtools, and a full build toolchain — R compiles packages from source there.
+- Install with `micromamba install -n bio -c conda-forge -c bioconda <tool>`. Same no-version-change
+  rule as the Windows envs: snapshot `micromamba list -n bio` first, and put anything that would
+  downgrade an existing package in its own env.
+- **The only Windows path visible inside is `F:\OpenScience`, at `/mnt/openscience`.** That is a
+  deliberate `/etc/fstab` drvfs mount, not automount, and `interop=false` means no `powershell.exe`,
+  no `gh.exe`, no access to the Windows user profile. Verified 2026-08-10 that without `interop=false`
+  a WSL process read `C:\Users\User\.claude\.credentials.json` and hit the Windows keyring **without
+  ever touching `/mnt/c`**. We execute skill-bundled code we did not write, so this is load-bearing.
+  **Do not widen it for convenience.** If a task needs another Windows directory, add that one
+  directory to `/etc/fstab` — never `automount=true`, never `interop=true`.
+- Every launch prints `Failed to start the systemd user session`. **Known and cosmetic** —
+  `user@.service` cannot spawn its executor under WSL here (EBUSY) and is masked, as is
+  `getty@tty1.service`, which has no tty to attach to. Nothing we run needs either. Do not chase it.
 
 Give any single install ~20 minutes; if it will not go, record it as blocked with
 the actual error and move on.
@@ -91,6 +121,8 @@ downloads only — no paid or licence-gated services, and nothing whose terms fo
 3. **Blocked or gated — needs Sam** — with the URL, the real reason, and the free substitute
    installed for the same step.
 4. **Referenced but not installable on Windows** — the reason and what covers the step instead.
+   **Try the `science` WSL seat before writing a row here**, and say so in the row: "not on Windows;
+   runs in WSL `science` env `bio` as `<command>`" is a covered step, not a blocked one.
 5. **Out of candidate scope (not installed)** — identified and deliberately skipped.
 6. **Notes for auditors** — every trap you hit: version skew against what a Skill pins, a package
    that only works in a side venv, a flag that changed, a default that segfaults.
