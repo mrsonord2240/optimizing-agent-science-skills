@@ -21,9 +21,18 @@ environments/**/tools/
 *.msi
 *.zip
 
+# ...except inside the bioSkills export, which is a faithful copy of the fork tree: a Skill's own
+# shipped example data is part of what it ships, and dropping it breaks "shipped means present"
+# for the exported Skill while the fork still passes. Three .fasta examples were being lost here.
+!skills/bioSkills/**/*.fasta
+
 # Editor and OS noise
 node_modules/
 __pycache__/
 .Rhistory
 .DS_Store
 Thumbs.db
+
+
+process/*
+
