@@ -66,7 +66,8 @@ Skill:
 
 - Read the Skill from the fork path and commit in your dispatch, not from `GPTomics__bioSkills`.
   `"source"` becomes `"mrsonord2240/bioSkills@<commit>:<folder>/<skill>"`.
-- The pre-fix report is archived at `F:\OpenScience\audits\_pre-fix-20260915\<skill-id>\`. Re-run its
+- The pre-fix report is archived under `F:\OpenScience\audits\_pre-fix-<date>\<skill-id>\`, and your
+  dispatch names the date (2026-09-15 for the first fix round, 2026-09-16 for the second). Re-run its
   inputs as regression tests, and add at least two new inputs of your own so the score does not
   only measure the defects the fixer was told about. The fix log
   (`F:\optimizing-agent-science-skills\fixes\<skill-id>.md`) says what changed; it is not evidence

@@ -1,0 +1,24 @@
+# bio-crispr-screens-crispresso-editing fixes (2026-09-16)
+
+Worktree `F:\OpenScience\wt\crispr-b`, branch `fix/r2-crispr-b`. Runtime: CRISPResso2 2.3.4
+(`pinellolab/crispresso2:latest` Docker image), invoked per `TOOLS.md` section 6 notes #10-11.
+Real CRISPResso2 output generated this pass (fresh `CRISPResso` run on `FANC.Cas9.fastq`, and a
+`CRISPRessoPooled` re-run with `--min_reads_to_use_region 100`) is saved at
+`F:\OpenScience\wt\_fixdata\crispresso\CRISPResso_on_fixver_FANC.Cas9\` for
+`base-editing-analysis` (fixed after this Skill in the same worktree) to reuse.
+
+## Round-2 audit pass — 2026-09-16
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| `parse_crispresso()` crashes on real output (`ValueError: too many values to unpack`) and reads `READS_ALIGNED_PERCENTAGE`, a column absent from the real file | P0 | Rewrote `parse_crispresso()` in SKILL.md to `pandas.read_csv(sep='\t')` the 7-column/2-row mapping-statistics file and compute `mapping_pct` as `READS ALIGNED / READS IN INPUTS * 100` instead of a nonexistent key | ran | Ran fresh against real Docker output (`CRISPResso` on `FANC.Cas9.fastq`, CRISPResso2 2.3.4): `reads_in_input=250`, `reads_aligned=235`, `mapping_pct=94.0`, `editing_quant['Modified%']['Reference']=26.38297872` (byte-identical to upstream's checked-in expected result). `py_compile` clean. |
+| Same wrong column name (`READS_ALIGNED_PERCENTAGE`) repeated in the Failure Modes "Low alignment rate" row | P0 (same root cause) | Changed the Symptom line to point at `READS ALIGNED`/`READS IN INPUTS` via `parse_crispresso()` instead of the nonexistent key | ran (see above) | Third occurrence of the same defect, not separately listed in `recommendations[]` but same root cause; fixed alongside. |
+| `CRISPRessoPooled` silently returns all-`NA` on a realistic pilot-scale pool (242-250 reads/amplicon); `--min_reads_to_use_region` defaults to 1000, undocumented | P0 | Added `--min_reads_to_use_region 100` to the Pooled-Amplicon Mode worked example plus a note explaining the default and telling the agent to check for `NA` rows; added the same check to usage-guide.md's "What the Agent Will Do" checklist, Tips, and a new Common Errors row | ran + help | Reran `CRISPRessoPooled -r1 Both.Cas9.fastq --amplicons_file Cas9.amplicons.txt --min_reads_to_use_region 100`: FANC 26.38297872% / HEK3 34.42622951% Modified, matching the audit's own corrected numbers and upstream's expected results exactly. `--help` confirms the flag and its default of 1000. |
+| Single-Amplicon worked example's `--min_average_read_quality 30` changes the reported % (26.38%->24.89%) with no disclosure | P1 | Added a note after the worked example: the flag is a real filter, states the measured shift, and instructs reporting the retained-read fraction alongside the editing percentage | ran | Reproduced both the flagged (221/250 aligned, 24.89% Modified) and unflagged (235/250, 26.38%) runs via Docker. |
+| Failure Modes table only documents a graded "<50% aligned" symptom; a badly-wrong amplicon instead hard-crashes with exit 1 and no output folder | P1 | Added a new "Total alignment failure (wrong locus / zero output)" row to Failure Modes and a matching Common Errors row | ran | Reproduced by running FANC reads against the unrelated HEK3 amplicon+guide: `CRITICAL: Alignment error... ERROR: No alignments were found`, exit 1, no output directory written. |
+| Mapping-stats "Key outputs" table ("no percentage columns") contradicted the old Python snippet that read a percentage column | P2 | Resolved as a side effect of the `parse_crispresso()` fix above — the rewritten parser now computes the percentage itself instead of reading a nonexistent column, so the table and the code no longer disagree | ran (see P0 fix) | No separate change needed once the parser was corrected. |
+| (Found independently, not in `recommendations[]`) shipped `examples/crispresso_analysis.sh` calls `CRISPRessoCompare --crispresso_output_folder_1/_2`, flags that do not exist | fix (shipped script that crashes, per brief) | Switched to CRISPRessoCompare's actual positional-argument syntax; added a comment explaining why | ran + help | `CRISPRessoCompare --help` (2.3.4) shows only positional `crispresso_output_folder_1 crispresso_output_folder_2` plus `-n1`/`-n2` sample-name flags. Reproduced the exact crash with the old flags (`unrecognized arguments`), then confirmed the positional form completes (exit 0) on real `CRISPResso_on_*` output directories. |
+| Version Compatibility banner said "CRISPResso2 2.2.14+", untested this pass | housekeeping | Updated to "checked on CRISPResso2 2.3.4 (pinellolab/crispresso2 Docker image)" | ran | Matches the version actually used for every verification above. |
+
+All 5 `recommendations[]` entries (2 P0, 2 P1, 1 P2) fixed, plus one additional shipped-script
+defect found and fixed during verification. Nothing left unfixed.
