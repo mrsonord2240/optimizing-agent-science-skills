@@ -30,7 +30,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: Both files build a toy exponential-decay LD matrix independently of the simulated per-SNP betas/SEs, so the LD is not internally consistent with any genotype process that could have produced those z-scores; estimate_s_rss correctly detects this (lambda 0.21-0.39, far above the Skill's own 0.05 threshold).
 - Fix: Regenerate both example datasets from a single simulated genotype matrix, deriving both the GWAS/eQTL summary statistics AND the LD matrix from that same genotype matrix (verified working in this audit's run/input2b_susie_selfconsistent.R, which recovers the planted 2-credible-set truth exactly with lambda=0).
 
-## P1 (78)
+## P1 (77)
 
 ### `bio-experimental-design-sample-size` — PROPER and powsimR routes ship with no executable pattern
 
@@ -575,14 +575,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The pre-fix audit's own P1 recommendation proposed adding a Common Errors row for 'IndexError: single positional indexer is out-of-bounds'. The fixer instead documented the fix as prose (per the fix log: 'New paragraph after the algorithm'), and that prose is accurate and complete. But the shipped SKILL.md's Common Errors table (6 rows: No hits / Hits dominated by essentials / Unstable hits / Drug-target as suppressor / MAGeCK-drugZ disagreement / Inconsistent between doses) still has no row for this crash, so an agent that jumps straight to that quick-reference table after hitting the error will not find the fix there.
 - Root cause: The fix addressed the substance (documenting the guide-count / half_window_size relationship) via Algorithm-section prose rather than the Common Errors table the original recommendation suggested; both are legitimate documentation choices, but only the table is a quick-lookup surface for this specific crash message.
 - Fix: Add a row to the Common Errors table: 'IndexError: single positional indexer is out-of-bounds \| half_window_size too large for total guide count \| set --half_window_size to ~1/4 of total guides; see Algorithm section'.
-
-### `bio-metabolomics-targeted-analysis` — No runnable code for accuracy/precision/matrix-factor/carryover validation metrics
-
-- Skill: 90, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/metabolomics/targeted-analysis) · [viewer](skills/bio-metabolomics-targeted-analysis/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 5
-- Problem: SKILL.md's 'What the Agent Will Do' step 6 promises computing accuracy, precision, matrix factor, recovery, and carryover, but only calibration/IS-normalization/ion-ratio ship as code; the Quantitative Thresholds table states both intra- and inter-day precision must pass but gives no formula for the correct inter-day computation.
-- Root cause: The skill documents ICH M10 acceptance thresholds as a reference table rather than as runnable code, unlike the calibration and ion-ratio sections which pair the threshold with a code block.
-- Fix: Add a code block for precision/accuracy-by-level-and-day (explicitly using a nested/ANOVA variance-components model for inter-day, not a pooled SD across days), matrix-factor-across-lots, and carryover, matching the style of the existing calibration/IS-normalization/ion-ratio snippets.
 
 ### `bio-molecular-standardization` — ChEMBL route can return an unstripped organic salt, undocumented
 
@@ -2002,21 +1994,21 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: No references/ subfolder exists for this Skill; the fix log explicitly left this unaddressed as a P2, judging the reorg risk not worth it for a Skill 7 points from its floor at the time.
 - Fix: Now that the Skill clears the floor, revisit splitting the Statistical Models Compared / Algorithmic Taxonomy tables into references/method-catalog.md, keeping SKILL.md focused on the decision tree, reconciliation, and the newer sign/comparability guidance.
 
-### `bio-metabolomics-targeted-analysis` — No explicit final-output/report-format template
+### `bio-metabolomics-targeted-analysis` — Matrix factor, recovery, and carryover still lack runnable code
 
-- Skill: 90, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/metabolomics/targeted-analysis) · [viewer](skills/bio-metabolomics-targeted-analysis/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Skill: 90, Production Ready · [mrsonord2240/bioSkills@9cf654d](https://github.com/mrsonord2240/bioSkills/tree/9cf654de316d9ad9ab699c4f9d545cfcd7eabd6b/metabolomics/targeted-analysis) · [viewer](skills/bio-metabolomics-targeted-analysis/mrsonord2240-bioSkills@9cf654d/viewer.md)
+- Observed in inputs: 4, 5
+- Problem: The pre-fix P1 covered accuracy/precision/matrix-factor/carryover collectively; this fix added runnable code only for precision (correctly prioritized -- it was the one with a real silent-failure risk). Matrix factor and carryover are still threshold-table rows with a prose formula, not a code block.
+- Root cause: The fix targeted the one formula an agent could get quantitatively wrong (nested variance components); matrix factor and carryover are simple ratio/percentage arithmetic an agent is unlikely to derive incorrectly, so they were left as documentation.
+- Fix: If time allows in a future pass, add a short code block for IS-normalized matrix factor and carryover-as-%-of-LLOQ, matching the style of the new Precision subsection, for full parity with the calibration/IS-normalization/ion-ratio sections.
+
+### `bio-metabolomics-targeted-analysis` — Description remains jargon-dense for non-expert trigger phrasing
+
+- Skill: 90, Production Ready · [mrsonord2240/bioSkills@9cf654d](https://github.com/mrsonord2240/bioSkills/tree/9cf654de316d9ad9ab699c4f9d545cfcd7eabd6b/metabolomics/targeted-analysis) · [viewer](skills/bio-metabolomics-targeted-analysis/mrsonord2240-bioSkills@9cf654d/viewer.md)
 - Observed in inputs: —
-- Problem: 'What the Agent Will Do' lists 6 workflow steps but never specifies the expected shape of the final deliverable (e.g. a concentrations table with sample/analyte/conc/unit/flag columns).
-- Root cause: SKILL.md focuses on methodological correctness (weighting, IS strategy, thresholds) and leaves output formatting to agent discretion.
-- Fix: Add a short 'Report Format' example showing the expected final table/columns, mirroring the calibration code block's style.
-
-### `bio-metabolomics-targeted-analysis` — Description is jargon-dense for non-expert trigger phrasing
-
-- Skill: 90, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/metabolomics/targeted-analysis) · [viewer](skills/bio-metabolomics-targeted-analysis/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: —
-- Problem: The frontmatter description relies on MRM/SRM/ion-ratio/%RE vocabulary; a user phrasing a request without this vocabulary (e.g. 'how much of X is in my sample') may under-trigger relative to the untargeted-discovery sibling skill.
-- Root cause: Description is written for an expert audience already familiar with targeted-vs-untargeted terminology.
-- Fix: Add one plain-language trigger phrase to the description (e.g. 'give me a concentration in units for a known compound') alongside the technical terms.
+- Problem: The frontmatter description relies on MRM/SRM/ion-ratio/%RE vocabulary; a user phrasing a request without this vocabulary may under-trigger relative to sibling skills.
+- Root cause: Description is written for an expert audience; this is an explicit, logged trade-off (fixes/bio-metabolomics-targeted-analysis.md), not an oversight -- the description already disambiguates against 3 sibling skills.
+- Fix: Optionally add one plain-language trigger phrase (e.g. 'give me a concentration in units for a known compound') alongside the technical terms; not required for deployment.
 
 ### `bio-molecular-standardization` — No policy for replicate measurements that disagree
 

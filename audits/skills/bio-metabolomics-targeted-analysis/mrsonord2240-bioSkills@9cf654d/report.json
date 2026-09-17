@@ -1,0 +1,222 @@
+{
+  "meta": {
+    "skill_name": "bio-metabolomics-targeted-analysis",
+    "description": "Designs and validates quantitative targeted metabolomics assays (MRM/SRM on triple-quadrupole, PRM on high-resolution instruments) to report absolute concentrations. Covers the internal-standard strategy (external cal -> global IS -> standard addition -> stable-isotope-labeled IS), weighted calibration judged by back-calculated %RE not R-squared, ion-ratio quantifier/qualifier confirmation, matrix-effect/recovery characterization, and ICH M10 method validation. Use when quantifying a closed panel of known metabolites with units, building or validating an LC-MS/MS assay, choosing an IS or calibration weighting, or judging whether a reported concentration is trustworthy.",
+    "evaluated_on": "2026-09-17",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Moderate",
+    "n_inputs": 7,
+    "source": "mrsonord2240/bioSkills@9cf654d:metabolomics/targeted-analysis",
+    "audit_type": "re-audit (fixed Skill)",
+    "pre_fix_report": "F:/OpenScience/audits/_pre-fix-20260917/bio-metabolomics-targeted-analysis/",
+    "fix_log": "F:/optimizing-agent-science-skills/fixes/bio-metabolomics-targeted-analysis.md"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All 7 executed/generated outputs derive numbers from computed synthetic data (explicitly labelled synthetic); no fabricated DOI/PMID/statistics. The 7 cited references in SKILL.md are real, verifiable publications (unchanged by the fix)." },
+      "practice_boundaries": { "result": "PASS", "detail": "Scope remains bioanalytical assay validation and method development, not individual patient diagnosis or prescription; no diagnostic/prescriptive language in any of the 7 outputs." },
+      "methodological_ground": { "result": "PASS", "detail": "The pre-fix audit's flagged methodological gap is now closed: SKILL.md's new 'Precision: Intra-Day and Inter-Day (Nested ANOVA, Not Pooled SD)' subsection is placed inline in the default workflow sequence (between LOD/LLOQ and Per-Method Failure Modes) and the Quantitative Thresholds table's precision row now points to it, so an agent following the Skill's normal read-order reaches the correct formula by default, not as an aside. Independently re-derived (Input 6, and a verbatim copy-paste of SKILL.md's own code block) and confirmed: naive pooled SD reads 18.9% (wrongly PASSes the 20% LLOQ tolerance) vs. nested ANOVA 21.1% (correctly FAILs) -- reproducing the fix log's numbers from first principles, not on trust." },
+      "code_usability": { "result": "PASS", "detail": "All R code across 7 inputs ran to completion with base R only (no additional packages), no missing dependencies, no syntax errors, via F:/OpenScience/audit-envs/untargeted-metabolomics-analyst/rs.sh. SKILL.md's own new Precision code block was executed byte-for-byte (not paraphrased) and reproduced its inline comments exactly (21.7%/20.6% intra-day, 18.9% naive, 21.1% nested). The bundled examples/targeted_quantification.R (unchanged by the fix) still runs unmodified." }
+    }
+  },
+  "static_score": {
+    "subtotal": 91,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 11, "max": 12, "note": "Now covers calibration/weighting, IS normalization, ion-ratio, LOD/LLOQ, and -- new in this fix -- intra/inter-day precision with runnable nested-ANOVA code, plus a Report Format section. Matrix factor, recovery, and carryover are still documented only as threshold-table rows with a prose formula, not a runnable code block (down-scoped from a P1 to a P2 in this re-audit, since the highest-risk gap -- inter-day precision silently passing a failing assay -- is fixed and the remaining formulas are simple ratio/percentage arithmetic, not error-prone variance decompositions)." },
+      "reliability": { "score": 9, "max": 12, "note": "Unchanged from pre-fix: hard-stop/NA-below-LLOQ is correct defensive design; boolean pass/id_confirmed flags are structured. Still no documented handling for missing calibrator levels, non-monotonic curves, or negative back-calculated concentrations." },
+      "performance_context": { "score": 7, "max": 8, "note": "SKILL.md grew 211 -> 269 lines (new Precision + Report Format sections); usage-guide.md shrank 74 -> 60 lines via the redundancy pass. Still compact, no redundant round-trips." },
+      "agent_usability": { "score": 16, "max": 16, "note": "The pre-fix Feedback Design gap ('no explicit final-report/output-format template') is now closed by the new Report Format section (verified present and specific: sample x analyte table with a required non-blank reason for unreportable results). Learnability/Consistency/Error Prevention remain strong and were re-verified unchanged across regression Inputs 1-5." },
+      "human_usability": { "score": 7, "max": 8, "note": "Unchanged: usage-guide.md's example prompts still aid discoverability post-redundancy-pass (verified all 5 Example Prompt bullets survive). Frontmatter description remains jargon-dense (MRM/SRM/ion-ratio); left unchanged per the fix log's explicit, logged decision -- not a defect, a documented trade-off." },
+      "security": { "score": 12, "max": 12, "note": "Unchanged: no credentials, no eval/exec of raw strings, all code reads local numeric data only." },
+      "maintainability": { "score": 10, "max": 12, "note": "Improved slightly: the redundancy pass removed a real maintenance liability (two files independently stating the same tips, able to drift out of sync) without losing content -- independently verified in Input 7. Still no scripts/ directory or bundled expected-output fixture beyond the one example." },
+      "agent_specific": { "score": 19, "max": 20, "note": "Unchanged: trigger description still explicitly scopes against 3 sibling Skills; escape-hatch culture intact and re-verified (single-transition compromise language preserved verbatim post-redundancy-pass). Minor Progressive Disclosure deduction unchanged (most code still inline in SKILL.md rather than a scripts/ directory)." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 89.3,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 29, "total": 29 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Weighted calibration + IS-normalized quantification of unknown plasma samples (regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true (re-run of pre-fix input, unaffected by the fix). Output byte-for-byte identical to the pre-fix report: all 6 planted-true unknown concentrations recovered within 1.1% error; LLOQ boundary sample correctly reportable.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "All non-below-LLOQ samples quantified within +-15% of planted true concentration", "result": "PASS", "note": "Max observed error 1.09% across 5 reportable samples (U1-U5); identical to pre-fix." },
+          { "text": "Boundary sample (true=3 ng/mL, LLOQ=2 ng/mL) correctly reported (not suppressed)", "result": "PASS", "note": "conc_est=2.99, reportable=TRUE, -0.22% error." },
+          { "text": "Calibration accepted by per-level back-calculated %RE, not R-squared", "result": "PASS", "note": "SKILL.md's calibration section is unchanged by the fix; code pattern reused verbatim." },
+          { "text": "Output does not fabricate concentrations beyond what the fit computes", "result": "PASS", "note": "All 6 reported values trace directly to the weighted-fit coefficients and input areas." }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "IS-strategy advisory: 40-analyte panel, one global internal standard (regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true (Mode A advisory, no code; re-checked against the fixed SKILL.md -- the cited Decision Tree and 'One IS shared across chemically diverse analytes' failure-mode content is unchanged by the fix, so the pre-fix response remains valid verbatim).",
+        "basic": 35,
+        "specialized": 49,
+        "total": 84,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Response correctly identifies precision/accuracy decoupling for shared-IS panels", "result": "PASS", "note": "Matches SKILL.md's unchanged 'One IS shared across chemically diverse analytes' failure mode." },
+          { "text": "Response ties recommendation to the skill's own Decision Tree tier for the stated (unspecified) study type", "result": "PASS", "note": "Correctly defaults to the 'Exploratory research, ranking' row." },
+          { "text": "Response does not fabricate specific numeric results not derivable from the prompt", "result": "PASS", "note": "No invented p-values, CVs, or concentrations." },
+          { "text": "Response flags need to upgrade IS/validation tier if study becomes regulated", "result": "PASS", "note": "Explicit escalation path stated." }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "LOD/LLOQ from blank scatter + single-transition defensibility (regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true (re-run, unaffected by the fix). Output byte-for-byte identical to pre-fix: LOD=1.329 ng/mL from real blank scatter; single-transition language ('documented compromise, not a default') preserved verbatim post-redundancy-pass.",
+        "basic": 36,
+        "specialized": 54,
+        "total": 90,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "LOD computed from real blank scatter (S/N~3), not hardcoded", "result": "PASS", "note": "LOD=1.329 ng/mL, derived from 5 real synthetic blank replicates." },
+          { "text": "Response states single-transition reporting is a documented compromise, not forbidden outright", "result": "PASS", "note": "Verified this exact sentence still exists verbatim in SKILL.md's Ion-Ratio Confirmation section after the redundancy pass." },
+          { "text": "Response does not claim a single-transition method meets full ICH M10 selectivity standard", "result": "PASS", "note": "Explicitly recommends flagging the limitation." },
+          { "text": "LOD value is consistent with the stated LLOQ (LOD < LLOQ)", "result": "PASS", "note": "LOD 1.33 ng/mL < stated 2 ng/mL LLOQ." }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Ion-ratio confirmation + IS-normalized matrix factor across 6 lots (regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true (re-run, unaffected by the fix). Output byte-for-byte identical to pre-fix: planted isobaric-interference sample correctly flagged id_confirmed=FALSE; 6 clean lots confirmed; matrix factor CV=4.44% PASS.",
+        "basic": 37,
+        "specialized": 57,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Planted-interference sample correctly flagged id_confirmed=FALSE", "result": "PASS", "note": "Ion ratio 0.167 vs calibrator 0.39, 57% relative deviation > 30% tolerance." },
+          { "text": "All 6 clean QC-mid lots correctly confirmed (id_confirmed=TRUE)", "result": "PASS", "note": "Ion ratios 0.390-0.393, all within +-30%." },
+          { "text": "IS-normalized matrix factor CV correctly computed and compared to <=15% threshold", "result": "PASS", "note": "CV=4.44%, correctly below threshold. Note: SKILL.md still gives no runnable code for this metric (see recommendations) -- this script was auditor-written from the prose formula, same as pre-fix." },
+          { "text": "Output does not fabricate lot data beyond what was provided", "result": "PASS", "note": "All 7 rows trace directly to data/input4_ion_ratio_matrix_factor.csv." }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Full ICH M10 validation via naive pooled-SD inter-day precision (regression, pre-fix baseline)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. Re-run of the pre-fix script unmodified; output byte-for-byte identical (naive pooled inter-day LLOQ CV=18.93% PASS, intra-day 21.68%/20.61% FAIL, carryover 427.2% FAIL, overall verdict FALSE). This script represents an agent that follows only the Quantitative Thresholds table's inter-day row without consulting the new Precision subsection; it still reaches the correct overall verdict only because the independent intra-day and carryover checks already fail. Input 6 tests the case that matters more: an agent that DOES follow the new default-path guidance.",
+        "basic": 32,
+        "specialized": 52,
+        "total": 84,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Carryover correctly flagged as failing the <=20%-of-LLOQ threshold", "result": "PASS", "note": "Computed 427.2% of LLOQ, identical to pre-fix." },
+          { "text": "Intra-day LLOQ precision correctly flagged as failing (CV>20%)", "result": "PASS", "note": "Day 1 CV=21.68%, Day 2 CV=20.61%, identical to pre-fix." },
+          { "text": "Overall assay verdict correctly concludes 'not fit for regulated PK decision'", "result": "PASS", "note": "all_acc_prec_pass=FALSE and carryover_pass=FALSE correctly combine to FALSE." },
+          { "text": "LOW/MID/HIGH QC tiers correctly pass accuracy and precision (clean planted data)", "result": "PASS", "note": "Unaffected, identical to pre-fix." }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Stress",
+        "label": "NEW: independent re-derivation of nested-ANOVA vs. naive-pooled inter-day precision, all 4 QC levels",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true (run/input6_new_nested_anova_verification.R, independently re-implemented from SKILL.md's prose formula, not copied from the fix's own code block or fix log). Re-derives the headline claim from first principles and extends it beyond the single cherry-picked LLOQ case: LLOQ naive pooled CV=18.93% (PASS) vs. nested-ANOVA CV=21.15% (FAIL) -- confirms the exact fix-log numbers independently. Also confirms LOW/MID/HIGH levels show no verdict disagreement between the two methods on clean data (the new formula does not introduce false failures). Additionally ran SKILL.md's own Precision code block verbatim, byte-for-byte (run/verbatim_skillmd_precision_snippet.R): reproduced 21.7%/20.6% intra-day, 18.9% naive, 21.1% nested exactly as the inline comments claim -- direct copy-paste usability confirmed, not just conceptual agreement.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "LLOQ naive pooled CV is ~18.9% (matches fix log's claim, independently re-derived)", "result": "PASS", "note": "Computed 18.93%, within stated tolerance." },
+          { "text": "LLOQ nested ANOVA CV is ~21.1% (matches fix log's claim, independently re-derived)", "result": "PASS", "note": "Computed 21.15%, within stated tolerance." },
+          { "text": "The two methods disagree at LLOQ (naive PASS, nested FAIL) -- the exact defect the fix targeted", "result": "PASS", "note": "Naive PASS (18.93<=20) vs. nested FAIL (21.15>20) confirmed." },
+          { "text": "The nested method introduces no new false failures at LOW/MID/HIGH vs. naive on clean data", "result": "PASS", "note": "All three levels: both methods agree PASS (0.82-1.54% CV vs. 15% tolerance)." }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Scope Boundary",
+        "label": "NEW: redundancy-pass content-loss check (deuterium-vs-13C IS, pre-analytical degradation, full workflow, single-transition)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true (Mode A, no code; run/input7_new_redundancy_check.md). Simulates an agent that has loaded only SKILL.md (usage-guide.md's deleted Tips/What-the-Agent-Will-Do sections absent) and checks whether the deleted content's substance is still fully recoverable. Independently re-verified all 4 of the fix log's deleted-passage claims by reading the live SKILL.md text directly (not trusting the fix log's own grep table): full 6/7-step workflow reconstructable from section Goal lines, deuterium-vs-13C/15N guidance + co-elution verification preserved with equal specificity in the Decision Tree paragraph, 'low CV is not evidence of a correct number' preserved in the shared-IS failure mode, pre-analytical-degradation warning (including the 'invisible to safeguards' property, recast as 'no chromatographic error') preserved in Per-Method Failure Modes.",
+        "basic": 36,
+        "specialized": 48,
+        "total": 84,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Full 6/7-step workflow is reconstructable from SKILL.md's section Goal lines alone", "result": "PASS", "note": "Every 'What the Agent Will Do' step maps to a still-present SKILL.md subsection; the post-fix workflow is a superset (adds Precision + Report Format)." },
+          { "text": "Deuterium-vs-13C/15N IS guidance and the co-elution verification method survive with equal specificity", "result": "PASS", "note": "Direct quote match against SKILL.md's Decision Tree paragraph, verified by re-reading the live file, not the fix log's table." },
+          { "text": "'Low CV is not evidence of a correct number' claim survives in Per-Method Failure Modes", "result": "PASS", "note": "Present in the 'One IS shared across chemically diverse analytes' Fix line." },
+          { "text": "Pre-analytical-degradation warning survives with equal specificity, including the no-error-message property", "result": "PASS", "note": "Present in the Per-Method Failure Modes table entry, Symptom column." },
+          { "text": "Single-transition-no-defense claim (the fix log's own headline redundancy example) is preserved verbatim", "result": "PASS", "note": "Independently re-verified by direct grep of the live SKILL.md file, not by trusting the fix log." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 36.4,
+    "dynamic_weighted": 53.6,
+    "score": 90,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "The headline P1 fix is real and independently reproducible three separate ways (hand-derivation, an independently-written re-implementation across all 4 QC levels, and a byte-for-byte copy-paste of SKILL.md's own code block): naive pooled inter-day CV reads 18.9% (wrongly PASSes a 20% LLOQ tolerance) while the correct nested-ANOVA inter-day CV reads 21.1% (correctly FAILs) -- and the new subsection sits inline in the default workflow sequence, not as a footnote, with the Quantitative Thresholds table pointing to it.",
+    "The redundancy pass (usage-guide.md -> SKILL.md dedup) lost nothing an agent needs: all 4 categories of deleted content (workflow-step sequence, IS-isotope-choice guidance, low-CV-is-not-correctness warning, pre-analytical-degradation warning) were independently re-verified present with equal or greater specificity by reading the live file, not by trusting the fix log's own claims.",
+    "Calibration/IS-normalization/ion-ratio/LOD code (unaffected by this fix) continues to reproduce pre-fix results byte-for-byte on re-run, confirming the fix introduced no regression in the Skill's already-correct sections.",
+    "The new Report Format section closes the previously-flagged Feedback Design gap with a concrete, specific rule (never collapse an unreportable sample to a blank/zero; state a reason)."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "Matrix factor, recovery, and carryover still lack runnable code",
+      "observed_in": [4, 5],
+      "problem": "The pre-fix P1 covered accuracy/precision/matrix-factor/carryover collectively; this fix added runnable code only for precision (correctly prioritized -- it was the one with a real silent-failure risk). Matrix factor and carryover are still threshold-table rows with a prose formula, not a code block.",
+      "root_cause": "The fix targeted the one formula an agent could get quantitatively wrong (nested variance components); matrix factor and carryover are simple ratio/percentage arithmetic an agent is unlikely to derive incorrectly, so they were left as documentation.",
+      "fix": "If time allows in a future pass, add a short code block for IS-normalized matrix factor and carryover-as-%-of-LLOQ, matching the style of the new Precision subsection, for full parity with the calibration/IS-normalization/ion-ratio sections."
+    },
+    {
+      "priority": "P2",
+      "title": "Description remains jargon-dense for non-expert trigger phrasing",
+      "observed_in": [],
+      "problem": "The frontmatter description relies on MRM/SRM/ion-ratio/%RE vocabulary; a user phrasing a request without this vocabulary may under-trigger relative to sibling skills.",
+      "root_cause": "Description is written for an expert audience; this is an explicit, logged trade-off (fixes/bio-metabolomics-targeted-analysis.md), not an oversight -- the description already disambiguates against 3 sibling skills.",
+      "fix": "Optionally add one plain-language trigger phrase (e.g. 'give me a concentration in units for a known compound') alongside the technical terms; not required for deployment."
+    }
+  ]
+}
