@@ -101,6 +101,12 @@ finish everything else, note it as pending).
   can.** Python: one venv per candidate at `F:\OpenScience\audit-envs\<candidate-id>\` created
   from `F:\OpenScience\runtime\envs\.p\python.exe` (Python 3.12, the Open Science runtime's own
   interpreter); `pip install` what the code needs. R: `F:\OpenScience\runtime\envs\.r\Scripts\Rscript.exe`
+  **but never invoke it bare — it exits 0 and prints nothing when R's DLLs are not on `PATH`.**
+  Verified 2026-09-17: both `Scripts\Rscript.exe` and `lib\R\bin\Rscript.exe` work with
+  `.r/Library/bin` and `.r/Library/mingw-w64/bin` prepended, and both silently produce no output
+  without them. Write a wrapper once and use it for every R call — see
+  `F:\OpenScience\audit-envs\mendelian-randomization-analyst\r.sh`, which also pins Rtools 4.4 so
+  source packages can compile. This is the exit-code trap below, in the one tool you will use most.
   with a private library at `F:\OpenScience\audit-envs\<candidate-id>\R-lib`. Take the time
   installs need; there is no deadline. Only one or two agents run at a time now, so the machine is
   yours. Command-line tools that have no Windows build (MAFFT, IQ-TREE,

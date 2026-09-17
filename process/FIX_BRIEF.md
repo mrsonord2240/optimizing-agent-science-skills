@@ -19,7 +19,10 @@ agent re-audits your work afterwards; you never score anything.
   failed, and often the corrected command the auditor verified). Candidate verdict:
   `F:\OpenScience\specialist-src\<candidate-id>\AUDIT.md` (may still be being written).
 - Runtimes: the candidate venv `F:\OpenScience\audit-envs\<candidate-id>\` (Python 3.12, R library
-  `R-lib`, tools under `tools\` or `Scripts\`), R at `F:\OpenScience\runtime\envs\.r\Scripts\Rscript.exe`.
+  `R-lib`, tools under `tools\` or `Scripts\`), R at `F:\OpenScience\runtime\envs\.r\Scripts\Rscript.exe`
+  — **never invoked bare: it exits 0 and prints nothing unless `.r/Library/bin` and
+  `.r/Library/mingw-w64/bin` are on `PATH`** (verified 2026-09-17). Use a wrapper such as
+  `F:\OpenScience\audit-envs\mendelian-randomization-analyst\r.sh`.
 
 ## What to fix
 
