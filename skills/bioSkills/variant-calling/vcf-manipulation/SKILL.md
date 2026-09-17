@@ -157,7 +157,7 @@ For SVs (`<DEL>`/`<DUP>`/`<INV>`/BND), "the same event" is fuzzy: breakpoints di
 | Duplicate rows / split AF after merge | inputs represented inconsistently, or un-normalized indels | Normalize + split all inputs identically before merge |
 | Fabricated `0/0` genotypes, inflated ref-allele count | `-0/--missing-to-ref` on single-sample merge (not joint genotyping) | Drop `-0`; joint-genotype gVCFs instead (joint-calling) |
 | `not sorted` / index build fails | unsorted records | `bcftools sort` then re-index |
-| `--naive` refuses or output corrupt | headers or sample order differ across inputs | Reheader to a common header; reorder samples with `bcftools view -s <order>` first (plain concat also refuses a different sample order) |
+| `--naive` refuses or output corrupt | headers or sample order differ across inputs | Reheader to a common header; `bcftools view -s <order>` fixes sample order but adds INFO/AC and INFO/AN header lines, so `--naive` still refuses (`incompatible headers`) -- reorder with plain `concat` instead, or re-run `view -s` on every file so all headers match before `--naive` |
 | Records duplicated / out of order after `-R` (older bcftools) | overlapping regions in the BED | Use non-overlapping regions, then sort/dedup |
 | Merged cohort has every site twice (`chr1` and `1`) | contig naming differs; `reheader -f` fixed only the header | `bcftools annotate --rename-chrs map.txt` on the records, then merge |
 | Sample-name conflict aborts merge | duplicate sample names across files | `--force-samples`, or `reheader -s` first |

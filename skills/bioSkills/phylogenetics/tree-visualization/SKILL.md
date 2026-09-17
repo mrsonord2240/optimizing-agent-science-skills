@@ -10,7 +10,7 @@ goal_approach_exempt: true
 
 Reference examples tested with: BioPython 1.83+, matplotlib 3.8+. Rich-figure alternatives: ggtree 3.12+ / treeio 1.28+ / ggtreeExtra 1.14+ (Bioconductor), ete4 4.x (Python), iTOL v6 (web), FigTree (desktop).
 
-ggtree 3.14.0 with ggplot2 4.0.3 (checked 2026-09): rectangular, circular and fan layouts and `geom_range` work; `slanted`, `equal_angle`, `daylight` and `ape` layouts, `geom_tiplab(align = TRUE)` and `gheatmap()` fail (`could not find function "is.waive"`, `@mapping must be <ggplot2::mapping>`). Fallbacks: `ape::plot.phylo(type = 'unrooted')` for unrooted views, `ggtreeExtra::geom_fruit` instead of `gheatmap`, or pin ggplot2 < 4. ETE4 did not build from pip on Windows / Python 3.12; ete3 renders headlessly only with PyQt5 and `QT_QPA_PLATFORM=offscreen` and then drew no tip text -- prefer ggtree for headless CI figures.
+ggtree 3.14.0 with ggplot2 4.0.3 (checked 2026-09): rectangular, circular and fan layouts and `geom_range` work; `slanted`, `equal_angle`, `daylight` and `ape` layouts and `geom_tiplab(align = TRUE)` fail (`could not find function "is.waive"`). `gheatmap()` is call-dependent: a plain `gheatmap(ggtree(tr), df)` succeeds, but calling it after prior geoms plus `new_scale_fill()` in a composite figure can fail (reproduced here: `` `new_geom_point_g_gtree()` requires the following missing aesthetics: x ``). Fallbacks: `ape::plot.phylo(type = 'unrooted')` for unrooted views, `ggtreeExtra::geom_fruit` instead of `gheatmap` -- the reliable choice for composite/multi-layer figures, or pin ggplot2 < 4. ETE4 did not build from pip on Windows / Python 3.12; ete3 renders headlessly only with PyQt5 and `QT_QPA_PLATFORM=offscreen` and then drew no tip text -- prefer ggtree for headless CI figures.
 
 Before using code patterns, verify installed versions match. If versions differ:
 - Python: `pip show biopython` then `help(Phylo.draw)` to check signatures
@@ -124,10 +124,21 @@ fig.savefig('supported_tree.svg', bbox_inches='tight')
 plt.close(fig)
 ```
 
-Color branches by group (set `.color` on the MRCA clade; descendants inherit it):
+Color branches by group (set `.color` on the MRCA clade; descendants inherit it). ROOT FIRST: `common_ancestor` on an arbitrarily-rooted Newick read (the common case -- IQ-TREE etc. write an unrooted trifurcation) can return a basal node spanning nearly the whole tree instead of the intended clade, so root on an outgroup (tree-manipulation) before calling it, and check the returned tip set:
 
 ```python
-tree.common_ancestor({'name': 'Homo_sapiens'}, {'name': 'Pongo_abelii'}).color = 'red'   # works on a Newick-read tree
+import re
+
+tree.root_with_outgroup({'name': 'OutA'}, {'name': 'OutB'})   # root BEFORE any common_ancestor call -- see tree-manipulation
+
+mrca = tree.common_ancestor({'name': 'Homo_sapiens'}, {'name': 'Pongo_abelii'})
+mrca_tips = sorted(t.name for t in mrca.get_terminals())
+print('MRCA tips:', mrca_tips)                 # check this against the clade you meant BEFORE trusting the color
+mrca.color = 'red'
+
+for clade in tree.get_nonterminals():          # clear raw support strings so they are not drawn as node labels
+    if clade.name and re.fullmatch(r'[\d.]+/[\d.]+', clade.name):
+        clade.name = None
 
 fig, ax = plt.subplots(figsize=(10, 8))
 Phylo.draw(tree, axes=ax, do_show=False)       # as_phyloxml() is needed only to EXPORT colors to phyloXML
@@ -152,6 +163,34 @@ plt.close(fig)
 ```
 
 For circular/fan/unrooted layouts, metadata heatmaps, dual support, or BEAST HPD bars, Bio.Phylo cannot help -- route to ggtree + treeio (R), ETE4, or iTOL.
+
+## ggtree + treeio Recipe (R)
+
+A composite publication figure -- IQ-TREE support kept as columns, rooted, dual support labeled, and a metadata ring -- checked on ggtree 3.14.0 / treeio 1.30.0 / ggtreeExtra 1.16.0 / ggplot2 4.0.3:
+
+```r
+suppressPackageStartupMessages({library(treeio); library(ggtree); library(ggtreeExtra); library(ggplot2)})
+
+iq <- read.iqtree('tree.treefile')          # keeps SH-aLRT/UFBoot as columns instead of text stuck in a label
+
+root_keep <- function(td, outgroup) {       # treeio root() can renumber tip labels to "1","2",... -- restore by index
+  r <- treeio::root(td, outgroup = outgroup, edgelabel = TRUE)
+  if (all(grepl('^[0-9]+$', r@phylo$tip.label))) r@phylo$tip.label <- td@phylo$tip.label[as.integer(r@phylo$tip.label)]
+  r
+}
+iq_r <- root_keep(iq, c('OutA', 'OutB'))    # root BEFORE labeling or coloring -- same root-first rule as the Bio.Phylo recipe above
+
+p <- ggtree(iq_r, size = 0.4) +
+  geom_tiplab(size = 2.6, offset = 0.003) +
+  geom_nodelab(aes(label = ifelse(is.na(UFboot), '', paste0(SH_aLRT, '/', UFboot))), size = 2, hjust = 1.1, vjust = -0.5) +
+  geom_treescale(width = 0.02, fontsize = 2.4)
+
+meta <- data.frame(label = iq_r@phylo$tip.label, trait = seq_along(iq_r@phylo$tip.label))   # replace with real metadata
+p2 <- p + geom_fruit(data = meta, geom = geom_tile, mapping = aes(y = label, fill = trait), pwidth = 0.06, offset = 0.08)
+ggsave('fig.pdf', p2, width = 180, height = 150, units = 'mm')
+```
+
+Use `geom_fruit` (ggtreeExtra) for the metadata ring, not `gheatmap` -- see the Version Compatibility note above on `gheatmap`'s composite-pipeline failure. `groupOTU(tree, list(...), group_name = 'grp')` + `aes(color = grp)` colors branches by predefined clade membership rather than one MRCA at a time; checked here via `ggplot_build()` segment colours that the stem edge into a defined group is colored by that group, not left on the parent's/ungrouped default -- root first here too, for the same reason the Bio.Phylo color recipe roots first.
 
 ## Per-Method Failure Modes
 
@@ -218,6 +257,7 @@ Lock the branch-length scale; do not let the figure engine non-uniformly stretch
 | BEAST HPD bars absent from a Python figure | drew an annotated tree with Bio.Phylo | route through treeio `read.beast` + ggtree `geom_range` |
 | Figure not saving / blank | `do_show=True` opens a window instead of writing | pass `do_show=False`, then `fig.savefig(...)` |
 | Branch colors not appearing | color set on a tip or the wrong clade | set `clade.color` on the MRCA clade (inherits to descendants); `as_phyloxml()` is only needed for phyloXML export |
+| Color covers far more of the tree than the intended clade | `common_ancestor` called before rooting, so the MRCA of two intended-clade tips is the basal node of an arbitrarily-rooted read | root on an outgroup (tree-manipulation) first, then print and check `mrca.get_terminals()` before coloring |
 | Support labels missing on an IQ-TREE tree | `SH-aLRT/UFBoot` label kept in `clade.name`, `confidence` None | parse `clade.name` as in the support recipe; warn when no clade has support |
 | HPD bars shifted off the annotated interval | ggtree `geom_range` default `center = 'auto'` | `geom_range('height_0.95_HPD', center = 'height')` |
 | Labels overlap into a black band | too many tips for rectangular layout | increase panel height, rotate labels, or switch to circular/iTOL |

@@ -60,13 +60,16 @@ Tell your AI agent what you want to do:
 | Description | GO term name |
 | GeneRatio | k/n = foreground genes in term / foreground genes annotated to any term |
 | BgRatio | M/N = universe genes in term / universe genes annotated to any term |
+| RichFactor | k/M = foreground genes in term / universe genes in term |
+| FoldEnrichment | (k/n)/(M/N) - read this column directly instead of recomputing it from GeneRatio/BgRatio |
+| zScore | normal-approximation z-score of the enrichment |
 | pvalue | Raw hypergeometric p-value |
 | p.adjust | BH-adjusted p-value (this is what pvalueCutoff filters) |
 | qvalue | Q-value |
 | geneID | Genes in the term |
 | Count | k = number of foreground genes in the term |
 
-Fold enrichment = GeneRatio / BgRatio. Both denominators are restricted to ANNOTATED genes.
+Fold enrichment = GeneRatio / BgRatio, returned directly as `FoldEnrichment` (checked on clusterProfiler 4.14.6). Both denominators are restricted to ANNOTATED genes.
 
 ## Three Ontologies
 
@@ -78,8 +81,8 @@ Fold enrichment = GeneRatio / BgRatio. Both denominators are restricted to ANNOT
 
 ## Tips
 - Always pass the universe (the tested genes, not the genome); this is the deepest ORA error. The genome is defensible only when every gene truly could have been detected.
-- Read fold enrichment, not just p-values: a 2000-gene term beats a 12-gene term on p at a fraction of the effect size.
-- simplify() works on one ontology at a time (semantic similarity is defined within a single DAG); run BP, MF, CC separately and simplify each. It does not de-redundify an ont='ALL' object.
+- Read the `FoldEnrichment` column, not just p-values: a 2000-gene term beats a 12-gene term on p at a fraction of the effect size.
+- simplify() works on one ontology at a time (semantic similarity is defined within a single DAG); run BP, MF, CC separately and simplify each. On an ont='ALL' object it raises no error - it silently keeps only the first ontology's terms (BP) and drops MF/CC.
 - enrichGO's default ont is 'MF'; set ont explicitly to avoid silently testing the wrong ontology.
 - pvalueCutoff filters the adjusted p; if no terms appear, set pvalueCutoff=1 and qvalueCutoff=1 to inspect everything before loosening real thresholds.
 - After bitr(), deduplicate one-to-many maps and report the conversion rate; flag results when more than ~15% of genes are lost.

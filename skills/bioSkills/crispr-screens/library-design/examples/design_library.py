@@ -1,4 +1,5 @@
-# Reference: biopython 1.83+, mageck 0.5+, numpy 1.26+, pandas 2.2+ | Verify API if version differs
+# Reference: biopython 1.83+, pandas 2.2+, numpy 1.26+ | Verify API if version differs
+import re
 import numpy as np
 import pandas as pd
 from pathlib import Path
@@ -10,6 +11,59 @@ output_dir.mkdir(exist_ok=True)
 
 np.random.seed(42)
 
+# === SKILL.md's documented design functions (verbatim; see SKILL.md's
+# "Score and Rank sgRNAs for a Target Gene" section for the source of truth) ===
+
+def find_sgrna_candidates(cds_sequence, pam='NGG', guide_length=20):
+    '''Return all protospacer candidates with PAM coordinates on + strand.
+    Caller must filter by exon position and Azimuth/CFD score.'''
+    pam_pattern = re.compile(f'(?=([ACGT]{{{guide_length}}}{pam.replace("N", "[ACGT]")}))')
+    candidates = []
+    for strand, seq in [('+', cds_sequence), ('-', str(Seq(cds_sequence).reverse_complement()))]:
+        for m in pam_pattern.finditer(seq):
+            spacer = m.group(1)[:guide_length]
+            if 'TTTT' in spacer or spacer.count('G') + spacer.count('C') not in range(6, 15):
+                continue
+            candidates.append({'spacer': spacer, 'strand': strand,
+                               'pos_in_cds': m.start() if strand == '+' else len(seq) - m.start() - 23,
+                               'gc_frac': (spacer.count('G') + spacer.count('C')) / guide_length})
+    return pd.DataFrame(candidates)
+
+def annotate_exon_position(candidates_df, cds_length):
+    '''Filter to protospacers within first 5-65% of CDS (Brunello convention).'''
+    lo, hi = 0.05 * cds_length, 0.65 * cds_length
+    return candidates_df[(candidates_df['pos_in_cds'] >= lo) & (candidates_df['pos_in_cds'] <= hi)].copy()
+
+def select_independent_guides(candidates_df, n_guides, min_spacing=5, score_col='score'):
+    '''Greedily pick up to n_guides candidates that are >=min_spacing nt apart
+    (see SKILL.md for why composition filters alone let near-duplicates through).'''
+    ranked = candidates_df.sort_values(score_col, ascending=False)
+    selected = []
+    for _, cand in ranked.iterrows():
+        if any(abs(cand['pos_in_cds'] - s['pos_in_cds']) < min_spacing for s in selected):
+            continue
+        selected.append(cand)
+        if len(selected) == n_guides:
+            break
+    return pd.DataFrame(selected)
+
+def generate_synthetic_cds(length=600):
+    '''Demo-only stand-in for a real Ensembl/RefSeq CDS pull. A real design
+    run replaces this with the gene's actual coding sequence.'''
+    bases = ['A', 'C', 'G', 'T']
+    return ''.join(np.random.choice(bases, length))
+
+def generate_sgrna_sequence(length=20):
+    bases = ['A', 'C', 'G', 'T']
+    return ''.join(np.random.choice(bases, length))
+
+def score_sgrna(sequence):
+    gc_content = (sequence.count('G') + sequence.count('C')) / len(sequence)
+    gc_score = 1 - abs(gc_content - 0.5) * 2
+    poly_t_penalty = 0 if 'TTTT' in sequence else 1
+    start_g_bonus = 1 if sequence.startswith('G') else 0.8
+    return gc_score * poly_t_penalty * start_g_bonus, gc_content
+
 # === 1. DEFINE TARGET GENES ===
 print('Defining target gene list...')
 
@@ -18,50 +72,50 @@ target_genes = ['TP53', 'BRCA1', 'BRCA2', 'KRAS', 'NRAS', 'BRAF', 'MYC', 'MYCN',
 
 print(f'Target genes: {len(target_genes)}')
 
-# === 2. GENERATE MOCK sgRNA CANDIDATES ===
-print('\nDesigning sgRNAs for each gene...')
-
-def generate_sgrna_sequence(length=20):
-    bases = ['A', 'C', 'G', 'T']
-    seq = ''.join(np.random.choice(bases, length))
-    return seq
-
-def score_sgrna(sequence):
-    gc_content = (sequence.count('G') + sequence.count('C')) / len(sequence)
-    gc_score = 1 - abs(gc_content - 0.5) * 2
-
-    poly_t_penalty = 0 if 'TTTT' in sequence else 1
-    start_g_bonus = 1 if sequence.startswith('G') else 0.8
-
-    return gc_score * poly_t_penalty * start_g_bonus, gc_content
+# === 2. DESIGN sgRNAs USING THE DOCUMENTED CDS/EXON-POSITION METHOD ===
+# (previously this demo generated fully random 20nt sequences and scored them
+# by GC content alone, which never exercised find_sgrna_candidates /
+# annotate_exon_position / select_independent_guides -- the actual method
+# documented in SKILL.md. It now calls that method against a synthetic CDS
+# per gene, same as SKILL.md's own worked examples.)
+print('\nDesigning sgRNAs for each gene from a synthetic CDS...')
 
 guides_per_gene = 4
 all_guides = []
+shortfall_genes = []
 
 for gene in target_genes:
-    candidates = []
-    for _ in range(50):
-        seq = generate_sgrna_sequence()
-        score, gc = score_sgrna(seq)
-        candidates.append({'sequence': seq, 'score': score, 'gc_content': gc})
+    cds = generate_synthetic_cds(length=600)
+    candidates = find_sgrna_candidates(cds)
+    candidates = annotate_exon_position(candidates, len(cds))
+    if candidates.empty:
+        shortfall_genes.append((gene, 0))
+        continue
+    candidates['score'] = 1 - (candidates['gc_frac'] - 0.5).abs() * 2
+    selected = select_independent_guides(candidates, guides_per_gene, min_spacing=5, score_col='score')
+    if len(selected) < guides_per_gene:
+        shortfall_genes.append((gene, len(selected)))
 
-    candidates_df = pd.DataFrame(candidates)
-    candidates_df = candidates_df.sort_values('score', ascending=False)
-    top_guides = candidates_df.head(guides_per_gene)
-
-    for i, (_, guide) in enumerate(top_guides.iterrows()):
+    for i, (_, guide) in enumerate(selected.iterrows()):
         all_guides.append({
             'gene': gene,
             'guide_number': i + 1,
-            'sequence': guide['sequence'],
+            'sequence': guide['spacer'],
             'score': guide['score'],
-            'gc_content': guide['gc_content'],
+            'gc_content': guide['gc_frac'],
             'type': 'targeting'
         })
 
 print(f'Targeting guides: {len(all_guides)}')
+if shortfall_genes:
+    print(f'Genes below the {guides_per_gene}-guide quota after independence filtering: {shortfall_genes}')
 
 # === 3. ADD CONTROLS ===
+# NOTE: absolute control counts below are sized for this 20-gene demo only.
+# At genome scale, scale non-targeting controls to ~1% of the full library
+# (500-1,000 in a 70k-guide library) and safe-harbor/essential/non-essential
+# controls to 50-100 each -- see SKILL.md's "Control Guides" table. Do not
+# read this demo's ~44% control fraction as a real-library target.
 print('\nAdding control guides...')
 
 n_nontargeting = 50
@@ -148,7 +202,7 @@ poly_t_count = library_df['sequence'].apply(lambda x: 'TTTT' in x).sum()
 print(f"\nPoly-T sequences: {poly_t_count} ({poly_t_count/len(library_df):.1%})")
 
 control_pct = (library_df['type'] != 'targeting').sum() / len(library_df)
-print(f"Control fraction: {control_pct:.1%}")
+print(f"Control fraction: {control_pct:.1%} (demo-scale only -- see NOTE above; real libraries target ~1% NTC)")
 
 # === 6. EXPORT ===
 print('\n=== EXPORTING LIBRARY ===')

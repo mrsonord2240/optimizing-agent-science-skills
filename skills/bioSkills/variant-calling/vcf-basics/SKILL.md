@@ -179,6 +179,7 @@ A gVCF (GATK HaplotypeCaller `-ERC GVCF`) is fundamentally different from a filt
 - Every record carries a symbolic `<NON_REF>` ALT with PL/AD computed against "any unseen allele." This lets joint genotyping evaluate a site in THIS sample even when the variant was only discovered in ANOTHER cohort sample -- the `<NON_REF>` likelihood supplies the evidence.
 - Its purpose is to distinguish, at every site, confident homozygous reference from no-data/no-call -- solving the missing-vs-reference problem when squaring off a cohort matrix.
 - A gVCF is NOT ready for analysis; it is an intermediate. It must be joint-genotyped (`GenomicsDBImport`/`CombineGVCFs` -> `GenotypeGVCFs`) to yield a normal VCF. Do NOT filter, annotate, or count variants on a raw gVCF, and never build a multi-sample callset by `bcftools merge`-ing single-sample project VCFs when gVCF joint-genotyping is available -- merging fabricates hom-ref genotypes. See variant-calling/joint-calling.
+- To list candidate variant sites (not reference bands) before joint genotyping: `bcftools view -i 'N_ALT>1' sample.g.vcf` -- a record has more than one ALT only when a real allele sits alongside `<NON_REF>`. A string test like `ALT="<NON_REF>"` is NOT a substitute: it matches on presence in the ALT list, so it matches every record, reference bands included, not just candidate sites.
 
 ## bcftools view
 
@@ -330,7 +331,7 @@ vcf.close()
 
 | Error | Cause | Solution |
 |-------|-------|----------|
-| `no BGZF EOF marker` | Not bgzipped (plain gzip) | Recompress with `bgzip`, not `gzip` |
+| `not compressed with bgzip` / `not BGZF compressed, cannot index` (older htslib: `no BGZF EOF marker`) | Not bgzipped (plain gzip) | Recompress with `bgzip`, not `gzip` |
 | `index required` / region query fails | Missing index | Run `bcftools index` (`-t` for tabix) |
 | `sample not found` | Wrong sample name | Check with `bcftools query -l` |
 | INFO/FORMAT field missing or mistyped | Header out of sync with body | Fix `##INFO`/`##FORMAT` Number/Type; use `bcftools +fill-tags` |

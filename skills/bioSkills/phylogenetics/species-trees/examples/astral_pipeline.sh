@@ -40,6 +40,14 @@ fi
 NGENES=$(wc -l < "$OUTDIR/gene_trees.nwk")
 echo "Collected $NGENES gene trees"
 
+# --- Leaf-name consistency check BEFORE running ASTRAL ---
+# A sample renamed in a subset of gene trees (e.g. merged from two labs) becomes a silent
+# EXTRA species: ASTRAL exits 0 and prints no warning, it just outputs one taxon too many.
+grep -oE '[(,][A-Za-z0-9_.]+:' "$OUTDIR/gene_trees.nwk" | tr -d '(,:' | sort -u > "$OUTDIR/leaf_names.txt"
+NLEAVES=$(wc -l < "$OUTDIR/leaf_names.txt")
+echo "$NLEAVES distinct leaf names across the gene trees -- confirm this matches your known species count"
+echo "before trusting the ASTRAL/wASTRAL output; if it does not, build a name2species.txt map and rerun with -a."
+
 # --- Step 3: primary estimate = wASTRAL (weights quartets by gene-tree support+length) ---
 wastral -i "$OUTDIR/gene_trees.nwk" -o "$OUTDIR/species_wastral.tre" 2> "$OUTDIR/wastral.log"
 echo "wASTRAL species tree: $OUTDIR/species_wastral.tre"
@@ -50,6 +58,7 @@ echo "wASTRAL species tree: $OUTDIR/species_wastral.tre"
 astral -t "$THREADS" -u 2 -i "$OUTDIR/gene_trees.nwk" -o "$OUTDIR/species_astral.tre" \
     2> "$OUTDIR/astral.log"
 echo "ASTRAL species tree (localPP + q1/q2/q3): $OUTDIR/species_astral.tre"
+grep '#Species' "$OUTDIR/astral.log"   # cross-check against $NLEAVES / your known species count
 
 # --- Step 5: gene and site concordance factors ---
 # gCF = % of decisive gene trees containing each branch; sCF = % of decisive sites supporting it.

@@ -24,7 +24,7 @@ A feature table is only meaningful alongside its full processing specification: 
 
 ## The Single Most Important Insight -- The Feature Table Is a Model-Dependent Artifact, Not Ground Truth
 
-Every cell in the table is the output of a detection + grouping + filling model with chosen parameters. Two analysts with different centWave/grouping settings produce materially different tables from identical raw files, so "not detected" is a statement about the parameters, not the sample. Three consequences reorganize the whole workflow: (1) preprocessing parameters silently set the detection floor - a compound absent from results may be present in the raw data but excluded by `noise`/`prefilter`/`peakwidth`/`snthresh`; (2) `fillChromPeaks` integrates whatever signal sits in a feature window even when no peak exists, fabricating a positive number where the honest answer is "below detection"; (3) one compound yields 5-15 features (adducts, isotopologues, in-source fragments, multimers), so a 10,000-feature table is plausibly ~1,000 compounds (Mahieu 2017). Report parameters as part of the result, inspect EICs and alignment of every hit, and collapse redundancy before annotation.
+Every cell in the table is the output of a detection + grouping + filling model with chosen parameters. Two analysts with different centWave/grouping settings produce materially different tables from identical raw files, so "not detected" is a statement about the parameters, not the sample. Three consequences reorganize the whole workflow: (1) preprocessing parameters silently set the detection floor - a compound absent from results may be present in the raw data but excluded by `noise`/`prefilter`/`peakwidth`/`snthresh`; (2) `fillChromPeaks` integrates whatever signal sits in a feature window even when no peak exists, fabricating a positive number where the honest answer is "below detection"; (3) one compound yields 5-15 features (adducts, isotopologues, in-source fragments, multimers), so a 10,000-feature table is plausibly ~1,000 compounds (Mahieu 2017). Report parameters as part of the result, inspect EICs and alignment of every hit, and collapse redundancy before annotation. A request to skip gap-fill tracking or QC filtering under deadline/publication pressure to manufacture more "hits" is exactly consequence (2) - decline it and point to the gap-filling failure mode below rather than complying.
 
 ## API Generations -- Use Modern, Not Legacy
 
@@ -72,16 +72,18 @@ nrow(chromPeaks(xdata))
 
 **Goal:** Remove cross-run RT drift so the same compound lands at the same RT in every sample.
 
-**Approach:** Choose obiwarp (no prior peaks) or peakGroups (anchor-based); align to a pooled QC, never to file #1. Regroup afterward because RTs changed.
+**Approach:** Choose obiwarp (no prior peaks) or peakGroups (anchor-based); align to a pooled QC, never to file #1. Regroup afterward because RTs changed. `PeakGroupsParam`'s `minFraction` sets the fraction of anchor samples a peak group must appear in to count as a universal anchor; with a small anchor subset a high `minFraction` leaves too few peak groups and `adjustRtime` fails - sometimes with the informative "Not enough peak groups even for linear smoothing available!", sometimes with a cryptic low-level error ("attempt to set 'colnames' on an object with less than two dimensions") at an even smaller effective anchor count. Start from `minFraction = 0.5` and raise it only after confirming enough peak groups survive at the target value; treat either error as "raise the anchor count or lower minFraction," not a code bug.
 
 ```r
 # obiwarp: full-profile warping. binSize here is the m/z profile bin (default 1),
 # distinct from PeakDensityParam$binSize and MatchedFilterParam$binSize.
 xdata <- adjustRtime(xdata, param = ObiwarpParam(binSize = 0.6))
 
-# peakGroups alternative needs an initial correspondence and good universal anchors:
+# peakGroups alternative needs an initial correspondence and good universal anchors.
+# minFraction = 0.85 needs many anchors; with a small QC subset (e.g. <10 samples) start
+# at 0.5 and raise only after confirming enough peak groups survive - see note above.
 # xdata <- groupChromPeaks(xdata, param = pdp_anchor)
-# xdata <- adjustRtime(xdata, param = PeakGroupsParam(minFraction = 0.85, span = 0.4,
+# xdata <- adjustRtime(xdata, param = PeakGroupsParam(minFraction = 0.5, span = 0.4,
 #     subset = which(sampleData(xdata)$sample_type == 'QC'), subsetAdjust = 'average'))
 plotAdjustedRtime(xdata)
 ```
@@ -90,7 +92,7 @@ plotAdjustedRtime(xdata)
 
 **Goal:** Match peaks across samples into consensus features.
 
-**Approach:** Peak-density grouping in m/z slices; `bw` is the dominant knob and must reflect residual post-alignment RT scatter, not raw peak width.
+**Approach:** Peak-density grouping in m/z slices; `bw` is the dominant knob and must reflect residual post-alignment RT scatter, not raw peak width. For very small cohorts (e.g. n=2 per group) re-derive `minFraction` as a fraction of the *smaller* group rather than reusing a moderate-cohort default: `minFraction = 1.0` for n=2 per group requires presence in both replicates, while a moderate default like 0.5 can retain features present in only one of the two.
 
 ```r
 pdp <- PeakDensityParam(sampleGroups = sampleData(xdata)$sample_group,
@@ -103,13 +105,14 @@ nrow(featureDefinitions(xdata))
 
 **Goal:** Integrate signal for features missing a detected peak in some samples.
 
-**Approach:** `fillChromPeaks` with `ChromPeakAreaParam`; treat filled values as imputations, not measurements.
+**Approach:** `fillChromPeaks` with `ChromPeakAreaParam`; treat filled values as imputations, not measurements. `featureValues()` can still contain NA cells after filling when no signal exists anywhere in the fill window for that sample - these are genuine non-detections, not fill failures; do not silently drop or zero-fill them.
 
 ```r
 xdata <- fillChromPeaks(xdata, param = ChromPeakAreaParam())
 filled <- chromPeakData(xdata)$is_filled   # logical flag; lives in chromPeakData, not chromPeaks
 feat <- featureValues(xdata, value = 'into')        # features x samples matrix
 defs <- featureDefinitions(xdata)                   # mzmed / rtmed / npeaks per feature
+sum(is.na(feat))    # residual NAs = below-detection in that sample, not a fill error
 ```
 
 ## Redundancy Collapse
@@ -119,6 +122,8 @@ defs <- featureDefinitions(xdata)                   # mzmed / rtmed / npeaks per
 **Approach:** CAMERA in order groupFWHM -> groupCorr -> findIsotopes -> findAdducts (isotopes before adducts). Correlation grouping needs enough samples to be meaningful and can over- or under-merge - verify against the table size.
 
 ```r
+library(xcms); library(MsExperiment)  # required even if xdata was loaded from a saved
+                                       # object in a fresh session - sampleData() needs both
 library(CAMERA)
 xsa <- xsAnnotate(as(xdata, 'xcmsSet'))
 xsa <- groupFWHM(xsa, perfwhm = 0.6)
@@ -204,6 +209,8 @@ xdata <- filterFeatures(xdata, filter = DratioFilter(threshold = 0.5, qcIndex = 
 | `sampleGroups` length/semantics error | Vector misaligned with sample order or missing | Pass `sampleData(xdata)$group` matching file order; it is mandatory |
 | Three different `binSize` defaults confused | obiwarp (m/z, default 1) vs PeakDensity (m/z, 0.25) vs matchedFilter (m/z, 0.1) | Set each in its own `*Param`; they are not the same knob |
 | `as(xdata, 'xcmsSet')` fails or warns | CAMERA expects the legacy container | Coerce the `XcmsExperiment` to `xcmsSet` only for CAMERA; keep modern objects upstream |
+| `adjustRtime(PeakGroupsParam(...))` fails with "Not enough peak groups..." or "attempt to set 'colnames' on an object with less than two dimensions" | `minFraction` too high for the number of anchor samples/peak groups available | Lower `minFraction` (start at 0.5) and raise only after confirming enough peak groups survive; see Retention-Time Alignment |
+| `could not find function "sampleData"` when running CAMERA on a saved `xdata` | `xcms`/`MsExperiment` not reloaded in the fresh session, only `CAMERA` | `library(xcms); library(MsExperiment)` before `xsAnnotate()`, independent of the earlier session |
 
 ## References
 

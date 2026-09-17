@@ -1,6 +1,6 @@
 ---
 name: bio-phylo-species-trees
-description: Estimates species trees under the multispecies coalescent from per-locus gene trees with the modern ASTER astral binary (ASTRAL-III/wASTRAL/ASTRAL-Pro), plus SVDQuartets, BPP, and StarBEAST2. Covers why a species tree is not a gene tree, why each locus has its own genealogy that disagrees by incomplete lineage sorting (ILS) even with zero error, why concatenation is statistically inconsistent and positively misleading in the anomaly zone where more loci converge on the wrong tree with full support, why gene-tree estimation error biases summary methods, that localPP is not bootstrap and ASTRAL branch lengths are coalescent units, and how minority-quartet symmetry separates ILS from introgression. Use when multi-locus discordance, rapid radiations, anomaly-zone risk, concordance-factor interpretation, or concatenation-vs-coalescent choice arise. Routes per-locus gene-tree inference and gCF/sCF to modern-tree-inference, dating to divergence-dating, orthology to comparative-genomics/ortholog-inference.
+description: Estimates species trees under the multispecies coalescent from per-locus gene trees with the modern ASTER astral binary (ASTRAL-III/wASTRAL/ASTRAL-Pro), plus SVDQuartets, BPP, and StarBEAST2. Covers why a species tree is not a gene tree, why each locus has its own genealogy that disagrees by incomplete lineage sorting (ILS) even with zero error, why concatenation is statistically inconsistent and positively misleading in the anomaly zone where more loci converge on the wrong tree with full support, why gene-tree estimation error biases summary methods, that localPP is not bootstrap and ASTRAL branch-length units depend on the binary and the `--length` flag (not always coalescent units), and how minority-quartet symmetry separates ILS from introgression. Use when multi-locus discordance, rapid radiations, anomaly-zone risk, concordance-factor interpretation, or concatenation-vs-coalescent choice arise. Routes per-locus gene-tree inference and gCF/sCF to modern-tree-inference, dating to divergence-dating, orthology to comparative-genomics/ortholog-inference.
 tool_type: mixed
 primary_tool: ASTRAL-III
 ---
@@ -74,7 +74,7 @@ Do not reflexively coalescent-everything: where ILS is low the two trees agree a
 
 **Goal:** Turn per-locus gene trees into a species tree that is consistent under the MSC, after removing gene-tree noise that would bias the quartet counts.
 
-**Approach:** Infer one gene tree per locus with branch support (modern-tree-inference), contract branches below ~10% support to polytomies (which ASTRAL handles correctly), then run wASTRAL as the primary estimate and `astral` for the classic localPP / polytomy-test workflow.
+**Approach:** Infer one gene tree per locus with branch support (modern-tree-inference), contract branches below ~10% STANDARD bootstrap support to polytomies (a near no-op under UFBoot), then run wASTRAL as the default primary estimate -- its per-branch weighting is the main guard against gene-tree error -- and `astral` for the classic localPP / polytomy-test workflow.
 
 ```bash
 # Per-locus gene trees with support live upstream in modern-tree-inference:
@@ -84,6 +84,12 @@ Do not reflexively coalescent-everything: where ILS is low the two trees agree a
 # Then concatenate into one file, one Newick per line:
 #   cat loci/*.contracted.treefile > gene_trees.nwk
 
+# Leaf-name consistency check BEFORE running ASTRAL. A sample renamed in a subset of gene
+# trees (e.g. merging runs from two labs, S03 vs S03_b) becomes a silent EXTRA species --
+# ASTRAL exits 0 and prints no warning, it just returns one taxon too many at low support.
+grep -oE '[(,][A-Za-z0-9_.]+:' gene_trees.nwk | tr -d '(,:' | sort -u > leaf_names.txt
+wc -l leaf_names.txt   # must equal your KNOWN species count, not just "some number"
+
 # Primary estimate: wASTRAL weights quartets by gene-tree support+length (noisy gene trees)
 wastral -i gene_trees.nwk -o species_wastral.tre 2> species_wastral.log
 
@@ -91,6 +97,7 @@ wastral -i gene_trees.nwk -o species_wastral.tre 2> species_wastral.log
 astral -t 8 -i gene_trees.nwk -o species.tre 2> species.log     # -t 8 = 8 threads here
 astral -u 2 -i gene_trees.nwk -o species_annot.tre              # full localPP + q1/q2/q3 for all 3 resolutions
 astral --root OUTGROUP -i gene_trees.nwk -o species_rooted.tre  # rooting improves branch-length estimation
+grep '#Species' species.log                                     # cross-check against leaf_names.txt / your true count
 
 # Multi-copy gene families (no pre-orthology) -> ASTRAL-Pro, with a gene->species map:
 astral-pro -a gene2species.txt -i family_trees.nwk -o species_pro.tre
@@ -98,7 +105,57 @@ astral-pro -a gene2species.txt -i family_trees.nwk -o species_pro.tre
 
 `gene2species.txt` has one line per gene copy, `<gene name> <species name>` separated by a space or tab (e.g. `Sp_A_1	Sp_A`). Without `-a`, ASTRAL-Pro treats every distinct leaf name as a species: family trees with copies named `Sp_A_1`/`Sp_A_2` return a tree of gene copies, with exit 0 and no warning.
 
+The same `-a`/`--mapping` flag exists on plain `astral` and `wastral` (checked via `astral --help`, same ASTER binary family as `astral-pro`), and the same silent failure happens there: if `leaf_names.txt` has more names than known species, or `#Species` in the log exceeds the true species count, build a `name2species.txt` map the same way (`<gene-tree label> <true species>`, one renamed label per line, e.g. `S03_b	S03`) and rerun with `astral -a name2species.txt -i gene_trees.nwk -o species.tre` -- verified this collapses `#Species` back to the true count and removes the spurious low-support taxon (see Common Errors).
+
 ASTRAL returns an UNROOTED tree; root with an outgroup afterward. Branch-length units depend on the binary: ASTER `astral`/`astral-pro` (ASTRAL-IV / ASTRAL-Pro3) default to `--length SULength` (substitutions per site, tip lengths written); use `--length CULength` for coalescent units, or read `CULength` from the `-u 2` labels. `wastral` and classic Java ASTRAL write coalescent units with undefined tip lengths. Coalescent units are not time either. The classic Java `astral.5.7.8.jar` inverts the flags: there `-t` is the annotation level (`-t 2` full, `-t 8` quartet support, `-t 10` polytomy test) and there is no `-u`.
+
+## Minimal SVDQuartets and BPP Commands
+
+Neither PAUP* (SVDQuartets) nor BPP is installed here -- PAUP* is commercial/registration-gated freeware, not conda/pip-installable, so this is not a version gap to fix but a licensing one. Both blocks below are checked against the PAUP*/SVDQuartets command reference (phylosolutions.com SVDQuartets tutorial) and BPP's own shipped example control files (`bpp/bpp` GitHub, `examples/frogs/A00.bpp.ctl` and `A10.bpp.ctl`, BPP 4.x) -- not executed on this machine.
+
+**SVDQuartets:** map tips to species with a `taxpartition`, then run `svdq` against it.
+
+```
+#NEXUS
+begin sets;
+  taxpartition species = sp1: ind1a ind1b, sp2: ind2a ind2b, sp3: ind3a ind3b, sp4: ind4a ind4b;
+end;
+
+begin paup;
+  log file=svdq.log;
+  svdq taxpartition=species evalq=all bootstrap=standard nreps=100 treeFile=svdq.tre;
+end;
+```
+Run with `paup svdquartets.nex -L svdq.log` (batch) or `exe svdquartets.nex` at the interactive `paup>` prompt. `taxpartition` groups multiple individuals per species tip (RADseq/UCE/SNP matrices); a single-sequence-per-species matrix still works with singleton partitions (`sp1: ind1a`).
+
+**BPP A00** (fixed species tree, parameter estimation only -- `speciesdelimitation = 0`):
+```
+seed = -1
+seqfile = loci.txt
+Imapfile = species.imap
+jobname = out
+
+speciesdelimitation = 0
+speciestree = 0
+species&tree = 4  A  B  C  D
+                  2  2  2  2
+                 ((A, B), (C, D));
+
+phase = 0 0 0 0
+usedata = 1
+nloci = 20
+cleandata = 0
+
+thetaprior = gamma 2 2000
+tauprior = gamma 2 1000
+
+finetune = 1
+print = 1 0 0 0
+burnin = 8000
+sampfreq = 2
+nsample = 100000
+```
+`species&tree` lines are: species count and names, max sequences per species at any locus, then the fixed guide tree. `Imapfile` is two columns, one row per sequence label (`<sequence-name> <species-name>`). **BPP A10** (species delimitation on this same guide tree) changes only `speciesdelimitation = 1 0 2` (rjMCMC algorithm 0, finetune 2) with `speciestree = 0` kept -- everything else above is unchanged (checked against `A10.bpp.ctl`).
 
 ## Compute and Read Concordance Factors
 
@@ -186,6 +243,7 @@ The gCF/sCF cutoffs of 50/33 are practical heuristics relative to the dataset (a
 | `iqtree ... --gcf ... --scfl` exits "Do not specify --scf or --gcf with --scfl" | gCF and likelihood sCF cannot share one call | Run `-t ... --gcf` and `-te ... --scfl` as two calls |
 | High bootstrap, low gCF, called resolved | Concatenation in the anomaly zone | Run coalescent; trust it on low-gCF branches; polytomy test |
 | Most gene families dropped | Forced single-copy orthology | Use ASTRAL-Pro on multi-copy family trees |
+| `#Species` in the log exceeds the known species count; exit 0, no warning | A sample renamed in some gene trees (e.g. merged from two labs) reads as an extra species | Compare leaf sets across gene trees before running; `astral -a name2species.txt` to map renamed labels back |
 | Network claimed from any discordance | ILS also produces discordance | Confirm q2 != q3 (D / HyDe / QuIBL) before invoking gene flow |
 
 ## References

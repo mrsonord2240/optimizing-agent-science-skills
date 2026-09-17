@@ -10,7 +10,7 @@ This skill edits the structure of an existing phylogenetic tree: rooting, prunin
 pip install biopython          # Bio.Phylo (primary)
 pip install dendropy ete3       # annotation-aware / NHX alternatives
 # R: install.packages(c('ape','phangorn','phytools'))
-# CLI (optional): Newick Utilities (nw_reroot, nw_prune); MAD, MinVar-Rooting (FastRoot.py), RootDigger for outgroup-free / likelihood rooting
+# CLI (optional): Newick Utilities (nw_reroot, nw_prune); MAD, MinVar-Rooting (FastRoot.py), RootDigger (binary `rd`) for outgroup-free / likelihood rooting
 ```
 
 Conceptual prerequisites: a tree object (from tree-io), an understanding that branch support is not root confidence, and a priori knowledge of which taxa are outgroups when outgroup rooting is intended.

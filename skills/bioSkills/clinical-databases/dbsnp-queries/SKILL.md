@@ -161,7 +161,7 @@ def resolve_merge_chain(rsid, max_hops=10):
         chain.append(current)
         payload = refsnp(current)
         if payload is None:
-            return {'error': 'not found', 'final_rsid': current, 'chain': chain}
+            return {'status': 'not_found', 'final_rsid': current, 'chain': chain}
         if payload.get('is_withdrawn'):
             return {'status': 'withdrawn', 'final_rsid': current, 'chain': chain}
         primary = payload.get('primary_snapshot_data')

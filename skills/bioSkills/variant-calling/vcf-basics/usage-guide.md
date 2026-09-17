@@ -74,7 +74,7 @@ Tell your AI agent what you want to do:
 - Always use bgzip (not gzip) for VCF compression -- bcftools requires it
 - Index files (.tbi or .csi) enable fast region queries
 - BCF format is faster to process than VCF for large files
-- Use `-H` flag with bcftools query to skip the header line
+- `bcftools view -H` skips the VCF header; `bcftools query -H` does the opposite -- it adds a column header line to query output
 - cyvcf2 is faster than PyVCF for large files
 - Filter status of `None` in cyvcf2 means the variant passed all filters
 - QUAL measures site-level variant existence; GQ measures per-sample genotype confidence -- they answer different questions and are not interchangeable, so filter on both

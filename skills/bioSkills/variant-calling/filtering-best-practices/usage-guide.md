@@ -107,9 +107,11 @@ bcftools filter -i 'INFO/DP>10 && INFO/DP<200' input.vcf -o depth_filtered.vcf
 # Minor allele frequency (population data)
 bcftools filter -i 'INFO/AF>0.01 && INFO/AF<0.99' input.vcf -o maf_filtered.vcf
 
-# Allele balance at hets: a true het is ~0.5 alt fraction; far from 0.5 is suspect
-bcftools filter -i 'GT="het" & FMT/AD[:1]/(FMT/AD[:0]+FMT/AD[:1]) > 0.2 & FMT/AD[:1]/(FMT/AD[:0]+FMT/AD[:1]) < 0.8' \
-    input.vcf -o ab_filtered.vcf
+# Allele balance at hets: a true het is ~0.5 alt fraction; far from 0.5 is suspect.
+# This must be genotype-level (-S ., -e): a site-level -i 'GT="het" & ...' include
+# deletes every site with no het genotype at all -- every hom-alt-only site is lost.
+bcftools filter -S . -e 'GT="het" & (FMT/AD[:1]/(FMT/AD[:0]+FMT/AD[:1])<=0.2 | FMT/AD[:1]/(FMT/AD[:0]+FMT/AD[:1])>=0.8)' \
+    input.vcf -Oz -o ab_filtered.vcf.gz
 ```
 
 ### Per-Sample and Per-Site Missingness

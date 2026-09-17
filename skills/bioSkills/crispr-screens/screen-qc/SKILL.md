@@ -172,15 +172,38 @@ def cn_bias_diagnostic(gene_lfc_df, cn_df):
     merged = gene_lfc_df.merge(cn_df, on='gene')
     bins = pd.qcut(merged['copy_number'], q=5, duplicates='drop')
     bin_lfc = merged.groupby(bins, observed=True)['lfc'].agg(['mean', 'median', 'std', 'count'])
-    from scipy.stats import spearmanr
+    from scipy.stats import spearmanr, mannwhitneyu
     rho, p = spearmanr(merged['copy_number'], merged['lfc'])
+    amplified = merged[merged['copy_number'] > 4]['lfc']
+    diploid = merged[merged['copy_number'].between(1.5, 2.5)]['lfc']
+    gap, p_gap = np.nan, np.nan
+    if len(amplified) >= 3 and len(diploid) >= 3:
+        gap = amplified.mean() - diploid.mean()
+        p_gap = mannwhitneyu(amplified, diploid, alternative='less').pvalue
     return {'cn_vs_lfc_rho': rho, 'cn_vs_lfc_p': p,
-            'amplified_mean_lfc': merged[merged['copy_number'] > 4]['lfc'].mean(),
-            'diploid_mean_lfc': merged[(merged['copy_number'] >= 1.5) & (merged['copy_number'] <= 2.5)]['lfc'].mean(),
+            'n_amplified_genes': len(amplified),
+            'amplified_mean_lfc': amplified.mean(),
+            'diploid_mean_lfc': diploid.mean(),
+            'amplified_vs_diploid_gap': gap,        # negative = amplified genes more depleted
+            'p_amplified_more_depleted': p_gap,
+            'cn_bias_present': bool((rho < -0.1 and p < 0.01) or (gap < -0.5 and p_gap < 0.01)),
             'per_bin': bin_lfc}
 ```
 
-**Interpretation:** A Spearman ρ < -0.1 between copy number and LFC indicates copy-number artifact. The diagnostic threshold is conservative -- Aguirre 2016 showed the effect scales with copy number and with the number of cut sites per sgRNA. Remediation: use CRISPRcleanR, CERES, or Chronos (see [[copy-number-correction]]) before hit calling.
+**Interpretation: two rules, not one.**
+
+1. **Genome-wide.** Spearman ρ < -0.1 (p < 0.01) between copy number and LFC indicates a broad
+   copy-number artifact.
+2. **Focal.** Compare `amplified_mean_lfc` with `diploid_mean_lfc` directly. A single amplicon
+   covers tens of genes out of ~18,000, so it barely moves ρ: on a realistic 40-gene amplicon the
+   genome-wide ρ was only -0.066 while amplified genes averaged LFC -0.877 against -0.019 for
+   diploid ones (p = 7e-19). Treat a gap below -0.5 with a significant one-sided test as bias even
+   when ρ passes.
+
+Either rule firing means correct before hit calling. When a specific amplicon is suspected, run the
+diagnostic again on that region's genes plus a diploid background. Remediation: CRISPRcleanR, CERES
+or Chronos (see [[copy-number-correction]], whose `detect_cn_bias()` applies the same two rules)
+before hit calling.
 
 ## Sequencing Depth Audit
 
@@ -307,6 +330,29 @@ This is a pipeline gate, not a publication metric. DepMap reports `gene effect s
 **Symptom:** RPS/RPL/EIF families dropping out as expected (these have clean canonical TSSs) but downstream genes failing; PR-AUC on broader CEGv2 panel drops.
 **Fix:** Re-design library against FANTOM5 highest-CAGE-peak TSS (Sanson 2018); for tissue-specific lines, use matched CAGE / GRO-seq.
 
+## When NOT to Use This Skill
+
+Screen QC and the CN-bias diagnostics here assess **research cell-line data**. They do not support a
+decision about an individual patient: an amplification that survives correction in a cell line is not
+a confirmed biomarker, and no QC metric here speaks to a person's treatment. If a request mixes screen
+QC with a clinical decision, answer the QC part and direct the clinical part to validated diagnostics
+and a treating physician.
+
+## Input Validation
+
+Before any metric, check the count table and fail with a clear message rather than a traceback:
+
+| Check | Expectation | If it fails |
+|-------|-------------|-------------|
+| Required columns | an sgRNA identifier column (index) and a `Gene` column, then one numeric column per sample | name the missing column; do not guess |
+| Dtypes | every sample column numeric | report which column is non-numeric and the first offending value |
+| All-zero sample | at least one non-zero count per sample | report the sample as failed at sequencing, and skip (not `nan`-propagate) its Gini and correlation |
+| Negative counts | none | reject the file; these are not counts |
+| Duplicate sgRNA IDs | none | report the duplicates; MAGeCK-format tables should be unique |
+
+`gini()` above already returns `np.nan` for an all-zero sample rather than raising; keep that guard in
+any copy of it.
+
 ## Quantitative Thresholds
 
 | Threshold | Value | Source / Rationale |
@@ -322,7 +368,9 @@ This is a pipeline gate, not a publication metric. DepMap reports `gene effect s
 | Library coverage at infection | 500x cells/sgRNA | Joung 2017; DepMap |
 | In-vivo coverage | 50-200x at endpoint | Bottleneck-limited; see [[in-vivo-screens]] |
 | MOI at infection | 0.3 strict | Poisson: P(≥2)=4% at 0.3 vs 9% at 0.5 |
-| CN-bias Spearman ρ (LFC vs copy number) | abs(ρ) <0.10 | Operational convention |
+| CN-bias Spearman ρ (LFC vs copy number), pre-correction fail | abs(ρ) <0.10 | Operational convention |
+| CN-bias Spearman ρ, post-correction target | abs(ρ) <0.05 | Operational convention; the tighter bar after CRISPRcleanR/Chronos |
+| CN-bias amplified-vs-diploid LFC gap | > -0.5 | Catches focal amplicons that ρ misses |
 
 ## Common Errors
 

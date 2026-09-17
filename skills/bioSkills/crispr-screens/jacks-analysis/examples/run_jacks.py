@@ -1,4 +1,5 @@
-# Reference: mageck 0.5+, matplotlib 3.8+, numpy 1.26+, pandas 2.2+, scipy 1.12+ | Verify API if version differs
+# Reference: JACKS 0.2 (felicityallen/JACKS), matplotlib 3.8+, numpy 1.26+, pandas 2.2+ | Verify API if version differs
+import sys
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -27,13 +28,13 @@ def prepare_input_files(counts_file, output_prefix):
 
     return counts
 
-def run_jacks_analysis(counts_file, guidemap_file, replicatemap_file, output_prefix,
-                       ctrl_condition='Day0', treatment_condition='Day14'):
-    '''Run JACKS analysis via command line'''
+def run_jacks_analysis(counts_file, guidemap_file, replicatemap_file, output_prefix, jacks_dir):
+    '''Run JACKS via its CLI. jacks_dir is the cloned JACKS/jacks/ folder holding run_JACKS.py;
+    the replicate map needs a Control column naming each sample's control sample.'''
     import subprocess
 
     cmd = [
-        'python', 'run_JACKS.py',      # run from JACKS/jacks/; there is no jacks.run_JACKS module
+        sys.executable, 'run_JACKS.py',      # lives in JACKS/jacks/; there is no jacks.run_JACKS module
         counts_file,
         replicatemap_file,
         guidemap_file,
@@ -41,13 +42,13 @@ def run_jacks_analysis(counts_file, guidemap_file, replicatemap_file, output_pre
         '--ctrl_sample_hdr', 'Control'
     ]
 
-    result = subprocess.run(cmd, capture_output=True, text=True)
+    result = subprocess.run(cmd, capture_output=True, text=True, cwd=jacks_dir)
     if result.returncode != 0:
         print(f'JACKS error: {result.stderr}')
     return result.returncode == 0
 
-def analyze_results(gene_results_file, guide_results_file):
-    '''Analyze JACKS output'''
+def analyze_results(gene_results_file, guide_results_file, output_prefix):
+    '''Analyze JACKS output; output_prefix locates the matching gene std file.'''
     genes = pd.read_csv(gene_results_file, sep='\t')
     guides = pd.read_csv(guide_results_file, sep='\t')
 
@@ -112,14 +113,14 @@ if __name__ == '__main__':
     output_prefix = 'jacks_analysis'
 
     # Run analysis (assumes input files exist)
-    # run_jacks_analysis('counts.txt', 'guidemap.txt', 'replicatemap.txt', output_prefix)
+    # run_jacks_analysis('counts.txt', 'guidemap.txt', 'replicatemap.txt', output_prefix, jacks_dir='JACKS/jacks')
 
     # Analyze results
     gene_file = f'{output_prefix}_gene_JACKS_results.txt'
     guide_file = f'{output_prefix}_grna_JACKS_results.txt'
 
     try:
-        genes, guides = analyze_results(gene_file, guide_file)
+        genes, guides = analyze_results(gene_file, guide_file, output_prefix)
         plot_results(genes, guides, output_prefix)
     except FileNotFoundError:
         print('Run JACKS first to generate result files')

@@ -1,6 +1,6 @@
 ---
 name: bio-pathway-gsea
-description: Tests a ranked gene vector for coordinated expression shifts in GO, KEGG, Reactome, or MSigDB gene sets with clusterProfiler's gseGO, gseKEGG, gsePathway, and GSEA (fgseaMultilevel engine), and scores per-sample pathway activity with ssGSEA and GSVA. Covers why a GSEA result is a deterministic function of three implicit choices (the ranking STATISTIC, the weight exponent p, and which LABELS are permuted), why the input must be a NAMED vector sorted DECREASING by a signed variance-calibrated metric (DESeq2 stat, limma t) not a raw p-value that erases direction, why preranked gene-permutation is anti-conservative for correlated sets (CAMERA is the fix), why nPerm is gone (eps governs tiny p), and why set.seed is required. Use when every gene carries a DE statistic, when a hard cutoff is arbitrary, or when ORA finds nothing. For gene-list ORA see go-enrichment; the ranking statistic comes from differential-expression/de-results.
+description: Tests a ranked gene vector for coordinated expression shifts in GO, KEGG, Reactome, or MSigDB gene sets with clusterProfiler's gseGO, gseKEGG, gsePathway, and GSEA (fgseaMultilevel engine), and scores per-sample pathway activity with ssGSEA and GSVA. Covers why a GSEA result is a deterministic function of three implicit choices (the ranking STATISTIC, the weight exponent p, and which LABELS are permuted), why the input must be a NAMED vector sorted DECREASING by a signed variance-calibrated metric (DESeq2 stat, limma t) not a raw p-value that erases direction, why preranked gene-permutation is anti-conservative for correlated sets (CAMERA with inter.gene.cor=NA is the fix), why nPerm silently downgrades the engine instead of erroring (eps governs tiny p), and why set.seed is required. Use when every gene carries a DE statistic, when a hard cutoff is arbitrary, or when ORA finds nothing. For gene-list ORA see go-enrichment; the ranking statistic comes from differential-expression/de-results.
 tool_type: r
 primary_tool: clusterProfiler
 ---
@@ -39,7 +39,7 @@ GSEA is not a discovery about biology - it is the running-sum's report on the ra
 | Preranked GSEA (gseGO/gseKEGG/GSEA) | Subramanian 2005 *PNAS* 102:15545; Mootha 2003 *Nat Genet* 34:267 | weighted running-sum ES over a ranked vector; gene-permutation null | the common case: a ranked statistic for all genes, no matrix |
 | fgsea engine | Korotkevich 2021 *bioRxiv* 060012 (preprint) | fgseaMultilevel; resolves tiny p accurately down to `eps` | the engine under `by='fgsea'` (default); what gives sub-1/nperm p-values |
 | Phenotype-permutation GSEA | Subramanian 2005 *PNAS* 102:15545 | shuffles sample labels; preserves gene-gene correlation | matrix + phenotype + ~>=7/group; the gold-standard competitive test |
-| CAMERA | Wu & Smyth 2012 *NAR* 40:e133 | competitive, VIF-corrects inter-gene correlation analytically | matrix + design; want a correlation-honest competitive test |
+| CAMERA | Wu & Smyth 2012 *NAR* 40:e133 | competitive, VIF-corrects inter-gene correlation analytically - only with `inter.gene.cor = NA`; the default preset (0.01) gives no protection | matrix + design; want a correlation-honest competitive test |
 | ROAST / fry | Wu 2010 *Bioinformatics* 26:2176 | self-contained rotation test; valid at any n | matrix + design, tiny n, "is the set DE at all" |
 | ssGSEA | Barbie 2009 *Nature* 462:108 | per-sample rank-based enrichment score | a per-sample pathway-activity matrix (no contrast test) |
 | GSVA | Hanzelmann 2013 *BMC Bioinformatics* 14:7 | unsupervised per-sample, per-set kernel/CDF score | per-sample features for clustering/survival/ML |
@@ -54,7 +54,7 @@ GSEA is not a discovery about biology - it is the running-sum's report on the ra
 | Metabolic / signaling pathways | `gseKEGG` -> kegg-pathways | KEGG maps (live DB) |
 | Reaction-level, reproducible offline | `gsePathway` -> reactome-pathways | local reactome.db |
 | Curated MSigDB hallmark / C2 / C5 | `GSEA(TERM2GENE)` + msigdbr | generic-input GSEA on any collection |
-| Matrix + design, want competitive + correlation-honest | `limma::camera` | VIF-corrects the inter-gene correlation gene-permutation ignores |
+| Matrix + design, want competitive + correlation-honest | `limma::camera(..., inter.gene.cor = NA)` | VIF-corrects the inter-gene correlation gene-permutation ignores - the default preset `inter.gene.cor=0.01` gives no protection; `NA` estimates the real correlation |
 | Matrix + design, tiny n / covariates, "is set DE at all" | `limma::roast`/`fry` | self-contained rotation, valid at any n |
 | Per-sample pathway-activity matrix for clustering/ML | ssGSEA / GSVA | scores each sample, not a contrast test |
 | The DE statistic / ranking itself | -> differential-expression/de-results | upstream, not enrichment |
@@ -84,7 +84,7 @@ gene_list <- gene_list[!duplicated(names(gene_list))]   # one statistic per gene
 gene_list <- sort(gene_list, decreasing = TRUE)         # REQUIRED: unsorted input silently mis-ranks
 ```
 
-Ranking by `sign(log2FC) * -log10(pmax(pvalue, 1e-300))` (for edgeR, or when a Wald stat is unavailable) preserves direction and clamps `p==0` from going to `Inf`. Never rank by raw p-value alone (sign erased) or by `lfcShrink(type='normal')` (deprecated prior distorts the ranking). apeglm/ashr-shrunk results DROP the `stat` column - pull `stat` from the unshrunk `results(dds)` if ranking by it.
+Ranking by `sign(log2FC) * -log10(pmax(pvalue, 1e-30))` (for edgeR, or when a Wald stat is unavailable) preserves direction and clamps `p==0` from going to `Inf` - **the clamp constant is a ranking weight, not just an `Inf` guard**: at `exponent=1`, `pmax(pvalue, 1e-300)` gives an exact-zero-p gene a weight of 300, ~75x the strongest genuinely-measured gene, so 4 such genes out of 14,000 can carry >16% of the total ranking weight and erase a real signal elsewhere in the ranking (audit-verified: `pmax(p, 1e-300)` lost a planted down-regulated set that `pmax(p, 1e-30)` recovered). Never rank by raw p-value alone (sign erased) or by `lfcShrink(type='normal')` (deprecated prior distorts the ranking). apeglm/ashr-shrunk results DROP the `stat` column - pull `stat` from the unshrunk `results(dds)` if ranking by it.
 
 ## Run Preranked GSEA on GO
 
@@ -143,13 +143,13 @@ Use GSEA (preranked or phenotype) for a CONTRAST and a pathway-level p-value; us
 ## Per-Method Failure Modes
 
 ### Ranking by raw p-value
-**Trigger:** `gene_list <- -log10(de$pvalue)` with no `sign()`. **Mechanism:** the magnitude is symmetric, so up- and down-regulated genes both land at the top. **Symptom:** NES signs are meaningless; "enriched" sets mix directions. **Fix:** rank by `sign(log2FC) * -log10(pmax(p, 1e-300))`, or use DESeq2 `stat` / limma `t`.
+**Trigger:** `gene_list <- -log10(de$pvalue)` with no `sign()`. **Mechanism:** the magnitude is symmetric, so up- and down-regulated genes both land at the top. **Symptom:** NES signs are meaningless; "enriched" sets mix directions. **Fix:** rank by `sign(log2FC) * -log10(pmax(p, 1e-30))`, or use DESeq2 `stat` / limma `t`.
 
 ### Preranked p-values treated as correlation-honest
-**Trigger:** reporting FDR 0.001 from gseGO/fgsea on a co-regulated set. **Mechanism:** gene permutation assumes gene independence; correlated sets inflate the set-statistic variance, so p is too small. **Symptom:** "significant" pathways that are co-expression and do not replicate. **Fix:** state the permutation type; for type-I control with a design matrix use CAMERA (Wu & Smyth 2012).
+**Trigger:** reporting FDR 0.001 from gseGO/fgsea on a co-regulated set. **Mechanism:** gene permutation assumes gene independence; correlated sets inflate the set-statistic variance, so p is too small. **Symptom:** "significant" pathways that are co-expression and do not replicate. **Fix:** state the permutation type; for type-I control with a design matrix use CAMERA with the correlation estimated, `limma::camera(..., inter.gene.cor = NA)` (Wu & Smyth 2012) - the default preset `inter.gene.cor = 0.01` assumes low correlation and gives no protection against exactly this failure mode (audit-verified: FDR 7.2e-08 on a set with true inter-gene correlation ~0.31 under the default preset, vs 0.80 once estimated).
 
 ### Unsorted or duplicated geneList
-**Trigger:** an un-sorted vector, or duplicate gene names after ID conversion. **Mechanism:** clusterProfiler assumes pre-sorting and uses names to map into sets; duplicates double-count a gene in the hit increments. **Symptom:** silently wrong ES, or an fgsea ties warning. **Fix:** `sort(gl[!duplicated(names(gl))], decreasing=TRUE)`; prefer a continuous metric (Wald stat / moderated t rarely tie).
+**Trigger:** an un-sorted vector, or duplicate gene names after ID conversion. **Mechanism:** clusterProfiler validates both before running, not after. **Symptom:** a hard error, not a silent miscalculation - unsorted: `geneList should be a decreasing sorted vector...`; duplicated names: `Duplicate values in names(stats) not allowed`. **Fix:** `sort(gl[!duplicated(names(gl))], decreasing=TRUE)`; prefer a continuous metric (Wald stat / moderated t rarely tie).
 
 ### Bare log2FC ranking
 **Trigger:** ranking by `log2FoldChange` from raw counts. **Mechanism:** a gene with 2 vs 8 counts shows a huge unstable LFC. **Symptom:** the leading edge is one or two low-count outliers, not a coordinated shift. **Fix:** rank by `stat`/`t`; if LFC is unavoidable use apeglm/ashr-shrunk LFC (never `type='normal'`).
@@ -161,7 +161,7 @@ Use GSEA (preranked or phenotype) for a CONTRAST and a pathway-level p-value; us
 **Trigger:** trusting a high |NES| without inspecting `core_enrichment`. **Mechanism:** a 1-2 gene leading edge is outlier-driven, not a pathway shift; large sets reach high |NES| by chance. **Symptom:** an unreplicated headline pathway. **Fix:** FDR first, then leading-edge size/concentration, then NES for prioritization.
 
 ### Stale nPerm / FDR<0.25 lore
-**Trigger:** copying `nPerm=10000` and "FDR < 0.25" from a Broad-desktop tutorial. **Mechanism:** `nPerm` was REMOVED at the fgsea/multilevel switch; clusterProfiler `p.adjust` is BH, not the Broad empirical-null FDR that 0.25 was calibrated for. **Symptom:** an argument error (`nPerm`) or a mis-transplanted threshold. **Fix:** drop `nPerm`, govern tiny-p with `eps`, treat `p.adjust` as BH and pick a defensible cutoff (often 0.05).
+**Trigger:** copying `nPerm=10000` and "FDR < 0.25" from a Broad-desktop tutorial. **Mechanism:** `nPerm` is silently ACCEPTED, not rejected - clusterProfiler emits two warnings ("We do not recommend using nPerm...", "You are trying to run fgseaSimple...") and falls back from `fgseaMultilevel` to the coarser `fgseaSimple` engine; clusterProfiler `p.adjust` is BH, not the Broad empirical-null FDR that 0.25 was calibrated for. **Symptom:** no error - a complete-looking `gseaResult` computed on the coarser engine, plus a mis-transplanted threshold (audit-verified on clusterProfiler 4.14.6: `nPerm=10000` runs to completion with only warnings). **Fix:** drop `nPerm` entirely and govern tiny-p with `eps`; if the call isn't fully under your control, guard it: `if ('nPerm' %in% names(gse@params)) stop("nPerm forced a fgseaSimple fallback - remove it")`. Treat `p.adjust` as BH and pick a defensible cutoff (often 0.05).
 
 ### Stale GSVA call
 **Trigger:** `gsva(expr, gene_sets, method='ssgsea')`. **Mechanism:** GSVA >= 1.50 dispatches on a parameter object's class. **Symptom:** the old signature errors. **Fix:** `gsva(gsvaParam(expr, gene_sets))` / `ssgseaParam(...)`.
@@ -178,16 +178,18 @@ Use GSEA (preranked or phenotype) for a CONTRAST and a pathway-level p-value; us
 | `pvalueCutoff = 0.05` | clusterProfiler default | filters on p.adjust by default; defensible BH cutoff |
 | ~>=7 samples/group | Broad GSEA docs | minimum for a non-degenerate phenotype-permutation null |
 | `set.seed(123)` | reproducibility | any fixed seed; the point is to fix the multilevel Monte Carlo |
+| `pmax(p, 1e-30)` clamp, not `1e-300` | audit-verified | at `exponent=1` the clamp is a hit weight: `1e-300` gives an exact-zero-p gene ~75x the weight of the strongest measured gene (>16% of total \|stat\| from 4/14,000 genes) and can erase a real signal; `1e-30` keeps the distortion small (~2%) |
+| genome-wide `gseGO` runtime | audit-measured | ~155s for 14,000 genes against full GO BP on a single core in this environment; budget minutes, not seconds |
 
 ## Common Errors
 
 | Error / symptom | Cause | Solution |
 |-----------------|-------|----------|
 | Error about names / wrong ES | geneList not named or not sorted decreasing | `sort(setNames(v, ids), decreasing=TRUE)` |
-| `--> No gene can be mapped` | wrong keyType/OrgDb, or non-ENTREZ IDs | `bitr` to the expected ID type first |
+| `--> No gene can be mapped` (often followed by `'organism' is not a slot in class "NULL"`) | wrong keyType/OrgDb, or non-ENTREZ IDs | `bitr` to the expected ID type first |
 | gseKEGG returns 0 terms | ENSEMBL/SYMBOL passed, wrong organism code, or KEGG API down | convert to kegg-id/ENTREZ; check the `organism` code; retry (live API) |
 | Different results each run | no `set.seed`, or live KEGG DB changed | fix the seed; pin the KEGG run date |
-| `nPerm` argument error | copied from a pre-4.0 tutorial | remove `nPerm`; use `eps` |
+| `nPerm` silently accepted, no error - engine downgrades to `fgseaSimple` | copied from a pre-4.0 tutorial | remove `nPerm`; use `eps`; guard with `'nPerm' %in% names(gse@params)` |
 | GSVA `method=` error | pre-1.50 signature | `gsva(gsvaParam(expr, sets))` |
 | `core_enrichment` is NA / all-ID | `setReadable` not applied | `setReadable(gse, OrgDb, keyType='ENTREZID')` |
 

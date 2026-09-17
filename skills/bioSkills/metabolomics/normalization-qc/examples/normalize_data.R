@@ -155,14 +155,24 @@ pqn <- pqn_normalize(mat_imp, qc_rows)
 mat_norm <- pqn$data
 
 # Guardrail: the PQN factor should track true dilution, NOT group. A high factor-vs-group
-# correlation means the normalization is eating the biological effect.
+# correlation means the normalization is eating the biological effect. A FIXED |r| > 0.3 cutoff
+# is noise-sensitive at typical study sizes (a real run at n=40 tripped from estimator noise
+# alone with a true correlation of 0); use a permutation test instead, which scales with n.
 factor_dilution_cor <- suppressWarnings(cor(pqn$factors[bio_rows], dilution[bio_rows]))
-factor_group_cor <- suppressWarnings(cor(pqn$factors[bio_rows],
-                                          as.integer(sample_group[bio_rows] == 'case')))
+group_bin <- as.integer(sample_group[bio_rows] == 'case')
+factor_group_cor <- suppressWarnings(cor(pqn$factors[bio_rows], group_bin))
 cat(sprintf('PQN factor vs true dilution: %.3f (want high -- PQN recovered the dilution)\n',
             factor_dilution_cor))
-verdict <- if (abs(factor_group_cor) > 0.3) 'TRIPPED: a strong group effect leaked into the PQN factor; normalize to a measured external quantity instead' else 'ok: factor is independent of group'
-cat(sprintf('PQN factor vs group: %.3f (%s)\n', factor_group_cor, verdict))
+
+set.seed(2)
+n_perm <- 999
+perm_cor <- replicate(n_perm, {
+    suppressWarnings(cor(pqn$factors[bio_rows], sample(group_bin)))
+})
+perm_p <- (sum(abs(perm_cor) >= abs(factor_group_cor)) + 1) / (n_perm + 1)
+verdict <- if (perm_p < 0.05) 'TRIPPED: group effect in the PQN factor unlikely under label-shuffling (p < 0.05); normalize to a measured external quantity instead' else 'ok: factor-vs-group correlation is not distinguishable from label-shuffling noise'
+cat(sprintf('PQN factor vs group: r=%.3f, permutation p=%.3f (%s)\n',
+            factor_group_cor, perm_p, verdict))
 
 out_dir <- tempdir()
 out_file <- file.path(out_dir, 'normalized_feature_table.csv')

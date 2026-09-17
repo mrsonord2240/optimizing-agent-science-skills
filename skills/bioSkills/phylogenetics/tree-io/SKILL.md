@@ -32,7 +32,7 @@ A tree file is a lossy serialization of a richer in-memory object. The biologist
 
 1. **Conversion is a silent data-destroying operation.** Reading a BEAST MCC tree and writing plain Newick produces a topologically identical tree that plots fine, but the HPD intervals, clade posteriors, and per-branch rates are gone and unrecoverable without re-running a multi-day MCMC. The loss is invisible until a reviewer asks where the credible intervals went.
 2. **The tool, not the format string, decides whether `[&...]` metadata survives.** In Python the naive default (Bio.Phylo) does not parse BEAST key-values and corrupts them on Newick write; in R the naive default (`ape::read.nexus`) drops them; the tools built to preserve them are DendroPy (`extract_comment_metadata=True`) and treeio (`read.beast`). Route annotated trees through those.
-3. **In plain Newick a bare number has no fixed meaning.** In `(A,B)95:0.3` the `95` could be a bootstrap, a posterior, an internal clade name, or a second branch length. Only the tool that wrote the file knows; a parser that guesses wrong turns supports into names silently. IQ-TREE overloads the slot further, writing `SH-aLRT/UFBoot` (e.g. `87.5/98`), which a single-value parser truncates or chokes on.
+3. **In plain Newick a bare number has no fixed meaning.** In `(A,B)95:0.3` the `95` could be a bootstrap, a posterior, an internal clade name, or a second branch length. Only the tool that wrote the file knows; a parser that guesses wrong turns supports into names silently. IQ-TREE overloads the slot further, writing `SH-aLRT/UFBoot` (e.g. `87.5/98`); a single-value parser like Bio.Phylo neither truncates nor errors on this -- it keeps the whole string in `.name` and leaves `.confidence` empty (see "Support Value Read as a Node Name" below).
 
 ## Tool Taxonomy
 
@@ -153,6 +153,7 @@ In R the equivalent is treeio `read.beast('mcc.tree')` then `get.data()` / `as_t
 | Parser errors on `[` | strict parser chokes on FigTree comment | strip comments only after extracting needed metadata |
 | `AssertionError: Two string taxonomies?` from `Phylo.read` on a MrBayes `.con.tre` | Bio.Phylo cannot parse MrBayes' annotated consensus layout | read with DendroPy (`extract_comment_metadata=True`) or treeio `read.mrbayes` |
 | NeXML tips named `d7`, `d8`... | Bio.Phylo's NeXML reader names tips by otu id, not label | check tip names; read NeXML from other tools with DendroPy |
+| NeXML written by `Phylo.write(..., 'nexml')` has no taxonomy, and drops confidence for phyloXML-sourced trees | the writer never touches `.taxonomies`, and only checks the singular `.confidence` -- phyloXML clades carry support in `.confidences` (a typed list: bootstrap, probability, ...), which stays `None` and gets skipped; a plain single-value `.confidence` (e.g. from Newick) IS written, as a `cdao:has_Support_Value` edge property | write annotated NeXML with DendroPy instead -- it serializes whatever it read (posterior, HPD, rate, taxonomy, ...) as typed `<meta>` elements, not just one hardcoded slot |
 | Non-ASCII tip garbled (`CercopithÃ¨que`) | path-based read/write used the Windows locale codec | open files with `encoding='utf-8'` for read and write |
 
 ## References

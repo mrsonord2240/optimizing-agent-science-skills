@@ -1,7 +1,7 @@
 '''Gate a MrBayes result on SCALAR convergence: parse two runs' .p files, compute per-parameter
 ESS and PSRF, and report PASS/FAIL. This covers only Question A (scalars); topology convergence
-(ASDSF / RWTY tree-space) is a separate, mandatory check the skill describes. Spot-runnable on
-any two MrBayes .p files; here it self-tests on synthetic traces so no MrBayes install is needed.'''
+(ASDSF / RWTY tree-space) is a separate, mandatory check the skill describes. Run on two real
+MrBayes .p files, or pass --selftest to see it run on synthetic traces (no MrBayes install needed).'''
 # Reference: numpy 1.24+, pandas 2.0+ | Verify API if version differs
 
 import sys
@@ -131,14 +131,29 @@ def write_synthetic_pfiles(outdir):
     return paths
 
 
+def _usage():
+    print('Usage: bayesian_convergence.py <run1.p> <run2.p> [burnin_fraction]')
+    print('       bayesian_convergence.py --selftest')
+    print('\nESS/PSRF are between-run metrics and require two .p files from independent')
+    print('MrBayes runs; a single .p file cannot be assessed. Use --selftest to see the')
+    print('script run on synthetic traces instead.')
+
+
 if __name__ == '__main__':
-    if len(sys.argv) >= 3:
-        pfile1, pfile2 = sys.argv[1], sys.argv[2]
-        burnin = float(sys.argv[3]) if len(sys.argv) > 3 else 0.25
-        assess_convergence(pfile1, pfile2, burnin)
-    else:
-        print('No .p files given; running a self-test on synthetic traces.')
+    if sys.argv[1:] == ['--selftest']:
+        print('Self-test on synthetic traces (no MrBayes install needed).')
         print('(run2 TL is shifted by +0.02 on purpose, so TL is expected to FAIL on PSRF.)\n')
         with tempfile.TemporaryDirectory() as tmp:
             p1, p2 = write_synthetic_pfiles(tmp)
             assess_convergence(p1, p2)
+    elif len(sys.argv) >= 3:
+        pfile1, pfile2 = sys.argv[1], sys.argv[2]
+        burnin = float(sys.argv[3]) if len(sys.argv) > 3 else 0.25
+        assess_convergence(pfile1, pfile2, burnin)
+    elif len(sys.argv) == 2:
+        print(f'Error: one file given ({sys.argv[1]!r}); ESS/PSRF need two .p files from independent runs.')
+        _usage()
+        sys.exit(1)
+    else:
+        _usage()
+        sys.exit(1)

@@ -81,6 +81,39 @@ Tell the agent what to do:
 - Conflict resolution is slow: only ~4% of BRCA1 missense VUS conflicts have reached consensus despite years of effort.
 - For pathogenicity classification logic (PVS1 decision tree, Pejaver 2022 calibrated PP3/BP4 thresholds, Tavtigian point system), defer to `clinical-databases/acmg-classification`; this skill is for querying ClinVar, not classification.
 
+## Reconciliation: When Sources Disagree
+
+| Pattern | Likely cause | Action |
+|---------|-------------|--------|
+| ClinVar P vs gnomAD AF > 1% | Variant is true founder allele in unstratified gnomAD subset, OR ClinVar P is a stale low-star assertion | Check `grpmax_faf95` excluding bottleneck groups; check ClinVar star rating |
+| ClinVar P vs AlphaMissense < 0.1 | Variant in NMD-escape region, alternative isoform, or ClinVar P is mis-curated | Check Pejaver 2022 calibration in `acmg-classification` skill; cross-check VCEP |
+| VCEP 3-star P vs commercial-lab 1-star B | VCEP review takes precedence | Weight the VCEP assertion; flag the submitter record as discordant |
+| ClinVar VCV-level P vs RCV-level VUS for actual condition | VCV averages across conditions | Report at RCV level for condition-specific work |
+| ClinVar P vs LOVD/HGMD discordant | LOVD/HGMD use different classification systems; HGMD "DM" != ACMG P | Triangulate against published evidence; do not auto-translate labels |
+| ClinVar P missing for a known disease variant | Submission lag (~6-12 months typical for new findings) | Check published literature; flag for ClinVar submission |
+
+## ClinVar Somatic vs Germline: 2024 Tripartite
+
+The 2024 schema separates three orthogonal classifications, each with its own `ReviewStatus` and `DateLastEvaluated`:
+
+- **GermlineClassification:** Pathogenic / Likely Pathogenic / VUS / LB / B per ACMG/AMP 2015 + SVI.
+- **SomaticClinicalImpact:** Tier I / II / III / IV per AMP/ASCO/CAP 2017 (Li 2017 *J Mol Diagn*).
+- **OncogenicityClassification:** Oncogenic / Likely Oncogenic / VUS / Likely Benign / Benign per ClinGen/CGC/VICC 2022 oncogenicity framework.
+
+A single VCV can carry all three with distinct evaluations; the legacy "Pathogenic" label is now ambiguous if not qualified by classification type.
+
+## Anticipated Reviewer Pushback
+
+| Pushback | Standard response |
+|----------|-------------------|
+| "Why is this pathogenic variant 1-star?" | We report the star rating per record; stars describe review depth, and ClinVar entries are research evidence, not a clinical classification. |
+| "ClinVar says P but gnomAD AF = 2%" | Reconciled via Whiffin FAF95 max-credible-AF framework; bottleneck-group rule applied. |
+| "This VCV count differs from ClinVar.gov" | We pulled from the monthly archive (first-Thursday-of-month) for reproducibility; the live web is post-most-recent-weekly. |
+| "Why wasn't the somatic variant flagged?" | Pre-2024 XML schema had no separate somatic field; we now read `ONCDN`/`SCIDN`/`SomaticClinicalImpact` per v2 schema. |
+| "VarSome says LP but this says VUS" | Tool-specific aggregation rule differences; VarSome auto-applies PP3+PM2 by default per Tavtigian point system; we apply VCEP-specific PP3 calibration per CSpec. |
+| "rsID match returned wrong variant" | rsID is a cluster identifier; multi-allelic rsIDs require allele-level resolution; we use SPDI or CA ID. |
+| "Why retest a 2022-curated variant?" | Classifications drift as evidence accrues; ClinGen recommends annual re-review for active diagnostic variants. |
+
 ## Related Skills
 
 - clinical-databases/acmg-classification - ACMG/AMP framework, Pejaver PP3/BP4 calibration, PVS1 decision tree

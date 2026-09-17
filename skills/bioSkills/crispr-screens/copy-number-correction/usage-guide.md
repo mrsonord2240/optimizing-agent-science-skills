@@ -64,11 +64,11 @@ Tell the AI agent what to do:
 
 1. Identify if screen is in cancer cell line; if yes, CN correction needed
 2. Check if CN profile is available; if not, default to CRISPRcleanR (unsupervised)
-3. If multi-cell-line + longitudinal + CN available, default to Chronos
-4. Run pre-correction diagnostic: Spearman ρ between gene LFC and CN profile
+3. If >=3 cell lines + CN available (longitudinal preferred), default to Chronos; with 1-2 lines, CN-correct with CRISPRcleanR even when CN is available
+4. Run pre-correction diagnostic: Spearman ρ between gene LFC and CN profile, plus the amplified-vs-diploid LFC gap (a single amplicon does not move the genome-wide ρ)
 5. Apply correction method:
    - CRISPRcleanR: `ccr.GWclean()` -> `ccr.correctCounts()` for MAGeCK input
-   - Chronos: train with dict-keyed `sequence_map`, `guide_gene_map`, `readcounts`; read the `gene_effect` attribute; apply `chronos.alternate_CN` for CN correction
+   - Chronos: `chronos.check_inputs` first; train with dict-keyed `sequence_map` (sequence_ID, cell_line_name, days, pDNA_batch), `guide_gene_map` (sgrna, gene), `readcounts` (rows = sequence_ID, columns = sgRNA) and `negative_control_sgrnas`; read the `gene_effect` attribute; `gene_effects_cn, shifts = chronos.alternate_CN(...)` for CN correction (>=3 lines)
 6. Run post-correction diagnostic; confirm Spearman ρ near zero
 7. Pass corrected counts to downstream hit calling (see [[hit-calling]])
 8. Cross-check hits against known amplifications in the cell-line (e.g., COSMIC, DepMap)
@@ -77,7 +77,7 @@ Tell the AI agent what to do:
 ## Tips
 
 - The CN artifact is universal in cancer cell lines, not conditional. Always check; always correct. ERBB2 in HER2+, MYC in MYC-amplified, FGFR1 in head-and-neck are textbook cases.
-- CRISPRcleanR is unsupervised (no CN profile needed) and works on any screen. Chronos benefits most from longitudinal, multi-cell-line data and applies CN correction after training.
+- CRISPRcleanR is unsupervised (no CN profile needed) and works on any screen. Chronos benefits most from longitudinal, multi-cell-line data and applies CN correction after training, only for panels of 3 or more cell lines.
 - For DepMap-style large panels, Chronos is the standard; no need to use CRISPRcleanR. For Project Score-style or single-cell-line screens without DepMap-grade data, CRISPRcleanR is the workhorse.
 - The artifact applies to Cas9-KO screens only; CRISPRi/a (catalytically dead Cas9), base editor, and prime editor screens are largely free of it.
 - Switching from Cas9 to CRISPRi (Dolcetto library) is the cleanest way to bypass the artifact in cancer-line essentiality screens. The tradeoff: CRISPRi knockdown is less complete than Cas9 KO, so some essentials are missed.
@@ -90,7 +90,8 @@ Tell the AI agent what to do:
 | Have CN profile? | Multi-cell-line + multi-timepoint? | Use |
 |-------------------|-------------------------------------|-----|
 | No | N/A | CRISPRcleanR |
-| Yes | No | CRISPRcleanR or Chronos |
+| Yes | No (1-2 cell lines) | CRISPRcleanR (Chronos' `alternate_CN` needs >=3 lines) |
+| Yes | Yes (>=3 lines) but single timepoint | Chronos |
 | Yes | Yes | Chronos (DepMap standard) |
 
 ## Cancer-Line CN Artifacts to Watch For

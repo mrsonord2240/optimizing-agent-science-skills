@@ -77,11 +77,12 @@ Tell the AI agent what to analyze:
 7. For PE: include pegRNA spacer + extension + scaffold parameters
 8. Run with `--min_average_read_quality 30` for stringent quality filtering
 9. Verify mapping rate >85%; if not, diagnose amplicon sequence / contamination
-10. Parse output: editing quantification, allele-frequency table, per-position nucleotide table
-11. For BE: report target conversion + bystander rate separately; check substitution-vs-indel ratio
-12. For PE: report intended-edit / scaffold-incorporation / indel %
-13. Detect MMEJ patterns in allele table (recurring same-size deletions)
-14. Output editing-efficiency summary, allele-table flagged hits, recommended follow-up validation
+10. For `CRISPRessoPooled`: check `SAMPLES_QUANTIFICATION_SUMMARY.txt` for `NA` rows -- the default `--min_reads_to_use_region` (1000) silently skips any amplicon with fewer aligned reads and still exits 0; lower it for pilot/validation-scale pools
+11. Parse output: editing quantification, allele-frequency table, per-position nucleotide table
+12. For BE: report target conversion + bystander rate separately; check substitution-vs-indel ratio
+13. For PE: report intended-edit / scaffold-incorporation / indel %
+14. Detect MMEJ patterns in allele table (recurring same-size deletions)
+15. Output editing-efficiency summary, allele-table flagged hits, recommended follow-up validation
 
 ## Tips
 
@@ -90,6 +91,7 @@ Tell the AI agent what to analyze:
 - BE samples showing high indel rates (>5%) usually indicate Cas9 / nCas9 expression mismatch; the substitution-vs-indel ratio is the key diagnostic. A ratio <3 = use Cas9-like analysis; >10 = clean BE.
 - For BE variant-function screens, always report target-conversion AND bystander rates per position. Bystander edits are not noise -- they are real edits at adjacent bases that may have biological consequences.
 - Pooled-amplicon mode (`CRISPRessoPooled`) silently misassigns reads when amplicons share primer regions. Always design pooled amplicons with ≥3 bp distinguishing flanks.
+- `CRISPRessoPooled`'s `--min_reads_to_use_region` defaults to 1000; a pilot/validation-scale pool (hundreds of reads/amplicon) exits 0 with every field `NA` unless you lower it. Always check `SAMPLES_QUANTIFICATION_SUMMARY.txt` for `NA` before trusting the run.
 - For prime editor screens, scaffold incorporation indicates RTT design failure. Re-derive pegRNA with PRIDICT2 (see [[prime-editing-screens]]).
 - Allele tables reveal MMEJ patterns: look for recurring deletions of specific sizes (e.g., 7 bp, 14 bp) at the cut site that share microhomology at junctions. These deletions are biologically distinct from random NHEJ and may have different functional consequences.
 - For WGS off-target analysis, supply both the matched-tumor BAM and GUIDE-seq / CIRCLE-seq predicted sites; randomly chosen regions yield no useful comparison.

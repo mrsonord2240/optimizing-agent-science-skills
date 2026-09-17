@@ -87,13 +87,14 @@ Tell the AI agent what to run:
 
 ## What the Agent Will Do
 
+0. If baseline, library control classes (NTC/CEGv2/NEGv1), screen type, or CN profile are unspecified, ask the user before proceeding — a wrong-but-silent commitment invalidates every downstream step with no error thrown
 1. Inspect library file and FASTQ filenames; verify naming consistency
 2. Run mageck count with sample labels and --trim-5 adapter
 3. Inspect countsummary.txt for mapping rate, Gini, % zero per sample
-4. Run six-stage QC (per [[crispr-screens/screen-qc]]): plasmid Gini, Day-0 coverage, replicate Pearson/Spearman, sequencing depth, CEGv2 PR-AUC against Hart 2017
+4. Run six-stage QC (per [[crispr-screens/screen-qc]]): plasmid Gini, Day-0 coverage, replicate Pearson/Spearman (within-condition pairs only, not all sample pairs), sequencing depth, CEGv2 PR-AUC against Hart 2017
 5. If cancer cell line: apply CRISPRcleanR or Chronos for CN bias (per [[crispr-screens/copy-number-correction]])
 6. If multi-batch: add batch covariate to MAGeCK MLE design matrix (per [[crispr-screens/batch-correction]])
-7. Pick hit-calling method by design (RRA for two-condition; MLE for multi-condition; BAGEL2 for essentiality; drugZ for chemogenomic; JACKS for multi-screen joint; Chronos for cancer panels)
+7. Pick hit-calling method by design (RRA for two-condition; MLE for multi-condition; BAGEL2 for essentiality — always seeded with `-s`; drugZ for chemogenomic; JACKS for multi-screen joint; Chronos for cancer panels)
 8. Execute primary method and at least one orthogonal method
 9. Build tier-based consensus: Tier 1 = 3-method agreement, Tier 2 = 2 of 3
 10. Cross-reference cancer-line amplification database to flag CN-suspect hits
@@ -109,6 +110,7 @@ Tell the AI agent what to run:
 - Choose hit calling by experimental design, not by familiarity. MAGeCK RRA is great for two-condition essentiality but fails on time course; Chronos is the DepMap standard for cancer panels but overkill for single-line screens.
 - For high-stakes hits (drug-target nomination), require 2-of-3 or 3-of-3 method consensus. Single-method hits at FDR 0.05 carry ~5% false discovery; tier-1 consensus shrinks this dramatically.
 - BAGEL2 BF >6 corresponds to FDR <3% in the Hart 2017 G3 calibration (BF >3 is the FDR <5% threshold); use this when cross-comparing methods.
+- Always run BAGEL2's `bf` step with a fixed `-s` seed. Unseeded reruns on identical input are not reproducible (mean BF diff 1.31, max 89.3 across 18,053 genes on real HAP1 TKOv3 data) and change which genes cross into Tier 1/2 in Step 7. See [[crispr-screens/bagel-essentiality]]'s Reproducibility section.
 - For low-quality screens (CEGv2 PR-AUC 0.5-0.7), tighten FDR from 0.05 to 0.01 to maintain effective specificity.
 - Switching from Cas9 to CRISPRi (Dolcetto library) is the cleanest way to bypass copy-number artifact in cancer lines. The tradeoff: CRISPRi knockdown is less complete than Cas9 KO.
 - For single-cell screens where each cell must carry exactly one sgRNA, target MOI 0.3 (~26% of cells infected, ~4% multi-infected). Higher-MOI designs are valid only when multi-guide cells are filtered or modelled as combinatorial perturbations.
@@ -136,7 +138,7 @@ Tell the AI agent what to run:
 | Plasmid | Gini | <0.1 | Re-amplify or re-clone |
 | Endpoint | Replicate Pearson on log-counts | >=0.8 (MAGeCK-VISPR floor) | Drop outlier replicate |
 | Biology | CEGv2 PR-AUC | >0.7 | Cas9 selection / timepoint / TSS issue |
-| CN | Spearman LFC vs CN | abs(rho) <0.05 post-correction | Apply CRISPRcleanR / Chronos |
+| CN | Spearman LFC vs CN | abs(rho) <0.10 post-correction (stricter target: <0.05) | Apply CRISPRcleanR / Chronos |
 | Depth | Reads per sgRNA | >300 | Re-sequence |
 | MOI | Poisson P(>=2) | <5% | Re-infect at lower MOI |
 

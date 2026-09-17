@@ -93,19 +93,9 @@ Karczewski 2020 *Nature* 581:434 defined LOEUF as the upper bound of the 90% CI 
 | v4 | `non_neuro` | Deprecated | -- |
 | v4 | `non_cancer` | Unnecessary (no TCGA in v4) | -- |
 
-## SV Catalog and CNV
+SV and CNV catalog details (gnomAD-SV v2/v4 release stats, gnomAD-CNV v4) are in the usage guide.
 
-| Resource | Release | Samples | Coverage |
-|----------|---------|---------|----------|
-| gnomAD-SV v2 | Collins 2020 *Nature* 581:444 | 14,891 unrelated WGS | 433k SVs, GRCh37 |
-| gnomAD-SV v4 | Nov 2023 | 63,046 unrelated WGS | 1,199,117 high-confidence SVs, GRCh38 |
-| gnomAD-CNV v4 | Nov 2023 | 464,297 individuals (exome-derived gCNV) | Rare (AF < 1%) autosomal coding CNVs |
-
-gnomAD-CNV v4 is the resource that democratized exome-derived CNV background frequencies; previously only ExAC-CNV provided this at scale.
-
-## mtDNA (Laricchia 2022 *Genome Res* 32:569)
-
-10,850 unique mtDNA variants across 56,434 individuals (v3.1). Frequencies reported per nuclear-ancestry AND per mitochondrial-haplogroup. Heteroplasmy >=10% threshold; ~1/250 individuals carry pathogenic mtDNA variant at heteroplasmy >=10%. mtDNA inheritance is non-Mendelian; standard ACMG criteria do not apply directly; use MITOMAP and HmtVar in parallel.
+mtDNA catalog details (Laricchia 2022 *Genome Res* 32:569 frequencies and heteroplasmy thresholds) are in the usage guide.
 
 ## VEP Version Pinning
 
@@ -136,10 +126,29 @@ A variant's consequence prediction can flip between v2 and v4 due to MANE Select
 **Approach:** Hit gnomAD's GraphQL API with explicit dataset version; parse the nested response.
 
 ```python
+import time
 import requests
 
 GNOMAD_API = 'https://gnomad.broadinstitute.org/api'
 DATASET_BUILD = {'gnomad_r4': 'GRCh38', 'gnomad_r3': 'GRCh38', 'gnomad_r2_1': 'GRCh37'}
+
+def _post_graphql(query, variables, max_retries=5, base_delay=2.0):
+    '''POST to the gnomAD GraphQL API with bounded exponential backoff on HTTP 429.
+
+    The browser API rate-limits sustained querying: HTTP 429 (a plain HTML page, not JSON) was
+    observed live after one gene-variant-list query plus a handful of single lookups (checked
+    2026-09-15). For more than a few dozen variants, use the Hail Table or sites VCF (see Bulk
+    Query via Hail below) instead of looping GraphQL calls.
+    '''
+    for attempt in range(max_retries):
+        r = requests.post(GNOMAD_API, json={'query': query, 'variables': variables}, timeout=30)
+        if r.status_code == 429:
+            time.sleep(base_delay * (2 ** attempt))
+            continue
+        r.raise_for_status()
+        return r.json()
+    r.raise_for_status()  # exhausted retries; surface the last response's error
+    return r.json()
 
 def query_variant(chrom, pos, ref, alt, build, dataset='gnomad_r4'):
     '''Query gnomAD GraphQL for variant frequency + grpmax FAF95.
@@ -148,7 +157,8 @@ def query_variant(chrom, pos, ref, alt, build, dataset='gnomad_r4'):
     (gnomad_r4 / gnomad_r3 = GRCh38, gnomad_r2_1 = GRCh37). GRCh37 ids sent to gnomad_r4 return
     "Variant not found", the same answer as a truly absent variant.
     Returns the variant payload, or None when the variant is not in this dataset; raises on any
-    other GraphQL error.
+    other GraphQL error. Retries with backoff on HTTP 429 (see _post_graphql); when batch-querying,
+    pace calls with time.sleep(0.2-0.5) between variants to avoid triggering it.
     '''
     if DATASET_BUILD[dataset] != build:
         raise ValueError(f'{dataset} is {DATASET_BUILD[dataset]} but the coordinates are {build}')
@@ -179,11 +189,7 @@ def query_variant(chrom, pos, ref, alt, build, dataset='gnomad_r4'):
     }
     '''
     variant_id = f'{chrom}-{pos}-{ref}-{alt}'
-    r = requests.post(GNOMAD_API,
-                      json={'query': query, 'variables': {'variantId': variant_id, 'dataset': dataset}},
-                      timeout=30)
-    r.raise_for_status()
-    body = r.json()
+    body = _post_graphql(query, {'variantId': variant_id, 'dataset': dataset})
     errors = [e.get('message') for e in body.get('errors') or []]
     if errors and errors != ['Variant not found']:
         raise RuntimeError(f'gnomAD GraphQL error for {variant_id} ({dataset}): {errors}')
@@ -271,11 +277,7 @@ def query_gene_constraint(gene_symbol, dataset='gnomad_r4'):
       }
     }
     '''
-    r = requests.post(GNOMAD_API,
-                      json={'query': query, 'variables': {'symbol': gene_symbol}},
-                      timeout=30)
-    r.raise_for_status()
-    gene = r.json().get('data', {}).get('gene')
+    gene = _post_graphql(query, {'symbol': gene_symbol}).get('data', {}).get('gene')
     if gene is None:
         return None
     if gene.get('gnomad_constraint') is None:
@@ -331,6 +333,7 @@ def filter_rare_variants_hail(input_vcf, max_grpmax_faf95=0.0001, output_path='f
 - Mechanism: The API answers `{"errors": [{"message": "Variant not found"}], "data": {"variant": null}}`; reading only `data` turns a build mismatch into "absent".
 - Symptom: A common variant is reported absent from gnomAD.
 - Fix: Check the build first; surface the GraphQL `errors` array; query `gnomad_r2_1` for GRCh37 or lift over to GRCh38 (rs334 = 11-5227002-T-A).
+- Residual case: `query_variant`'s `build` check only catches a caller who contradicts themselves (`build='GRCh37'` with `dataset='gnomad_r4'`); it cannot catch coordinates that are simply wrong for a `build` the caller states correctly. rs334's GRCh37 coordinates (11-5248232-T-A) queried against `gnomad_r4` with `build='GRCh38'` still return the identical `Variant not found` (confirmed live 2026-09-16) -- the API cannot tell a wrong-build id from a truly absent one. Before trusting a batch of "absent" results, spot-check one known common variant (rs334 -> GRCh38 11-5227002-T-A, genome AF ~1.3%) or confirm the reference allele via NCBI Variation Services `/v0/spdi/{seq_id}:{pos-1}:{ref}:{alt}/canonical_representative` (SPDI positions are 0-based; a `Disambiguation exception` warning there means the asserted reference doesn't match the named assembly -- a build-mismatch signal) or `/v0/refsnp/{rsid}`.
 
 **4. Comparing LOEUF absolute values across v2/v4**
 - Trigger: "v4 LOEUF for GENE-X is 0.45; v2 was 0.30; has it become more tolerant?"
@@ -401,16 +404,7 @@ def filter_rare_variants_hail(input_vcf, max_grpmax_faf95=0.0001, output_path='f
 | SV not found in v4-SV | v2-SV is GRCh37, v4-SV is GRCh38; or variant not called in WGS | Try v2-SV with liftover; or check gnomAD-CNV for exome-derived |
 | mtDNA variant missing | Only v3.1 has mtDNA; not in v4 | Query v3.1 directly |
 
-## Anticipated Reviewer Pushback
-
-| Pushback | Standard response |
-|----------|-------------------|
-| "Why FAF95 instead of AF?" | Raw AF is point estimate; FAF95 is Poisson lower-bound 95% CI; ClinGen SVI recommendation for BS1/BA1. |
-| "Why exclude FIN and ASJ from grpmax?" | Founder-population pathogenic variants reach high AF locally; including them would trigger false BA1. |
-| "This LOEUF differs from the 2020 paper" | We use v4 March 2024 constraint (807k samples); 2020 paper used v2 (141k samples). Decile rank is stable; absolute shifted. |
-| "Why v3 if v4 exists?" | v4 genomes = v3 genomes reprocessed; for genome-only analysis they are equivalent. |
-| "Variant exists in liftover v2 but not v4" | ~0.5-1% of sites differ post-assembly fixes; use v4 native, not liftover, as ground truth. |
-| "Browser AF higher than this value" | Browser includes flagged variants by default; we filter on PASS. |
+Anticipated reviewer pushback and standard responses are in the usage guide.
 
 ## References
 

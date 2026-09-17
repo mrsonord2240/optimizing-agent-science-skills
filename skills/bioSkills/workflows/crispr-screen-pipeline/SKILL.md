@@ -62,6 +62,10 @@ Every LFC, QC gate, and hit call is computed against a reference that is committ
 | Screen type (dropout / enrichment / FACS / drug-modifier) | Which hit-calling method is even valid |
 | Copy-number profile (cancer lines) | Whether amplicon artifacts are removed before hit calling; residual rho(LFC,CN) is the tell |
 
+## Step 0: Confirm Made-Once Commitments
+
+**Before running any code:** if the baseline (plasmid pool / Day-0 / vehicle), library control classes (NTC/CEGv2/NEGv1), screen type (dropout/enrichment/FACS/drug-modifier), or copy-number profile (cancer lines) are not stated, ask the user rather than inferring them from whatever columns happen to be in the file. The governing principle above is not decorative: a wrong-but-silent commitment invalidates every downstream LFC, QC gate, and hit call with no error thrown, and none of Steps 1-7 below can detect it after the fact from the output alone.
+
 ## Pipeline Branches by Screen Design
 
 ```
@@ -136,6 +140,8 @@ For Cas12a libraries (Inzolia, in4mer): see [[combinatorial-screens]]. For 10X s
 **Approach:** Load the count matrix, compute per-sample Gini, zero-fraction, and depth plus replicate correlation against the hard gates below. Essential-gene recovery (CEGv2 PR-AUC) is a separate check computed once endpoint-vs-baseline LFCs exist (it needs CEGv2/NEGv1 labels) -- see screen-qc.
 
 ```python
+import re
+from itertools import combinations
 import pandas as pd
 import numpy as np
 
@@ -159,8 +165,28 @@ per_sample = pd.DataFrame({
 
 log_counts = np.log10(count_matrix + 1)
 pearson = log_counts.corr()
+
+# Replicate Pearson must average only WITHIN-CONDITION replicate pairs. Averaging every
+# off-diagonal pair -- as a naive `pearson.values[pearson.values < 1].mean()` does --
+# mixes in baseline-vs-endpoint pairs and understates true replicate concordance: on
+# real HAP1 TKOv3 data (T0 + T18_A/B/C) the naive formula gives 0.677 while the true
+# T18-vs-T18 replicate correlation is 0.789, an 0.11 gap straddling the 0.8 QC floor.
+# Group samples by condition (label with any trailing replicate marker -- _r1, _rep2,
+# _A, _2, ... -- stripped off), then average only same-condition pairs.
+def condition(sample_name):
+    return re.sub(r'_(?:[Rr]ep|[Rr])?\d+$|_[A-Z]$', '', sample_name)
+
+groups = {}
+for col in count_matrix.columns:
+    groups.setdefault(condition(col), []).append(col)
+
+replicate_pairs = [pearson.loc[a, b] for cols in groups.values() for a, b in combinations(cols, 2)]
+
 print(per_sample)
-print('Replicate Pearson:', pearson.values[pearson.values < 1].mean())
+if replicate_pairs:
+    print('Replicate Pearson (within-condition pairs only):', np.mean(replicate_pairs))
+else:
+    print('Replicate Pearson: no condition has >=2 samples -- cannot assess replicate concordance')
 ```
 
 Hard gates from [[screen-qc]]:
@@ -209,7 +235,20 @@ For multi-batch screens, add batch as a covariate in MAGeCK MLE rather than pre-
 
 Cancer cell lines: pass the CRISPRcleanR-corrected count file (`screen_cleanr_corrected_counts.txt` from Step 4) as `--count-table`/`-i` below, NOT the raw `experiment.count.txt` — the CN-correction commitment is only honored if the corrected counts are what the hit caller reads.
 
-The `Day0`/`Day14_r*` columns below illustrate a time-course dropout design; they must match the count step's `--sample-label` (the drug-screen count above uses `Plasmid,Day0,Veh_r*,Drug_r*`).
+Match `--treatment-id`/`--control-id` (or BAGEL2 `-c`) to whatever sample labels the count step actually used. The two worked conventions below are both valid — don't mix their column names.
+
+If your count table uses Step 2's own drug-screen labels (`Plasmid,Day0,Veh_r1,Veh_r2,Drug_r1,Drug_r2`):
+
+```bash
+mageck test \
+    --count-table experiment.count.txt \
+    --treatment-id Veh_r1,Veh_r2 \
+    --control-id Day0 \
+    --norm-method median \
+    --output-prefix essentiality_rra
+```
+
+If your count table instead uses a Day0/Day14 two-timepoint dropout convention (a single endpoint vs Day0 — not the multi-timepoint time-course design in Step 6b, which needs MLE):
 
 ```bash
 mageck test \
@@ -220,10 +259,12 @@ mageck test \
     --output-prefix essentiality_rra
 ```
 
+BAGEL2's `bf` step is non-deterministic unless seeded (`-s`) — build 115's `-s`/`--seed` default is clock-based, and identical reruns on real HAP1 TKOv3 data produced a mean absolute BF difference of 1.31 (max 89.3) across 18,053 genes, flipping 39 genes' `bagel_hit` (BF>6) call between runs. Always pass a fixed `-s`; see [[bagel-essentiality]]'s "Reproducibility: Fixing the Random Seed" section for the full verification.
+
 ```bash
 BAGEL.py fc -i experiment.count.txt -o experiment -c Day0 --min-reads 30   # -o is an output LABEL; fc writes experiment.foldchange
 BAGEL.py bf -i experiment.foldchange -o bayes_factor.txt -e CEGv2.txt -n NEGv1.txt \
-    -c Day14_r1,Day14_r2,Day14_r3   # add -b -NB 1000 for bootstrapping; -k is not a bf option
+    -c Veh_r1,Veh_r2 -s 42   # or -c Day14_r1,Day14_r2,Day14_r3 for the Day0/Day14 convention; add -b -NB 1000 for bootstrapping; -k is not a bf option; -s fixes the seed for reproducible BF
 ```
 
 ### 6b. Time-course / multi-condition (MAGeCK MLE)
@@ -273,7 +314,7 @@ DepMap quarterly standard; handles CN bias + screen quality + longitudinal joint
 
 **Goal:** Consolidate the per-method calls into confidence tiers.
 
-**Approach:** Merge each method's gene-level result, threshold each to a per-method hit flag, and tier by how many methods agree (Tier 1 = all three, Tier 2 = two of three).
+**Approach:** Merge each method's gene-level result, threshold each to a per-method hit flag, and tier by how many methods agree (Tier 1 = all three, Tier 2 = two of three). BAGEL2's `bagel_bf` input MUST come from a seeded (`-s`) run (Step 6a) — an unseeded rerun changes which genes cross BF>6 and destabilizes this Tier assignment itself, not just BAGEL2's own output.
 
 ```python
 mageck = pd.read_csv('essentiality_rra.gene_summary.txt', sep='\t')[['id', 'neg|fdr']].rename(
@@ -352,6 +393,7 @@ MAGeCKFlute R package provides one-shot FluteRRA / FluteMLE dashboards with KEGG
 | Underpowered / method mismatch | RRA on a time course; single-line Chronos | Pick method by design (fork table); RRA fails multi-condition, Chronos is overkill single-line |
 | Distorted NB mean-variance | Batch pre-corrected with ComBat on counts | Add batch as a MAGeCK MLE covariate instead |
 | Novel hits from a failed screen | CEGv2 essentials did not deplete (PR-AUC < 0.7) | The screen failed selection; no hit is trustworthy regardless of p-value |
+| Tier consensus changes between identical reruns | BAGEL2 `bf` run unseeded (clock-based default `-s`) | Always pass a fixed `-s` (Step 6a); see [[bagel-essentiality]]'s Reproducibility section |
 
 ## References
 

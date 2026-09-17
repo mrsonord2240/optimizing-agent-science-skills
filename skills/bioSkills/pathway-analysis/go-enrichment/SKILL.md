@@ -80,7 +80,7 @@ ego <- enrichGO(gene          = gene_list,        # foreground ENTREZ IDs
                 readable      = TRUE)             # map ENTREZ -> SYMBOL in the output
 ```
 
-The returned `enrichResult` has columns `ID, Description, GeneRatio, BgRatio, pvalue, p.adjust, qvalue, geneID, Count` (plus `ONTOLOGY` when `ont='ALL'`). `pvalueCutoff` filters the ADJUSTED p, so an empty table usually means the cutoff or the universe, not biology - inspect everything with `pvalueCutoff=1, qvalueCutoff=1`.
+The returned `enrichResult` has columns `ID, Description, GeneRatio, BgRatio, RichFactor, FoldEnrichment, zScore, pvalue, p.adjust, qvalue, geneID, Count` (plus `ONTOLOGY` when `ont='ALL'`) - read `FoldEnrichment` directly rather than recomputing GeneRatio/BgRatio by hand (checked on clusterProfiler 4.14.6). `pvalueCutoff` filters the ADJUSTED p, so an empty table usually means the cutoff or the universe, not biology - inspect everything with `pvalueCutoff=1, qvalueCutoff=1`.
 
 ## Build the Foreground and Universe from DE Results
 
@@ -164,7 +164,7 @@ Swap the OrgDb: `org.Mm.eg.db` (mouse), `org.Dr.eg.db` (zebrafish), `org.Sc.sgd.
 **Trigger:** omitting `universe=`, or passing the genome when the assay measured fewer genes. **Mechanism:** N defaults to all annotated genes, inflating the denominator with genes that never could have been selected. **Symptom:** a confident table where tissue-restricted / lowly-expressed-gene terms dominate. **Fix:** set `universe=` to the tested-gene set, map foreground and universe identically, report N.
 
 ### p read without fold enrichment (term-size trap)
-**Trigger:** ranking results by p.adjust alone. **Mechanism:** a 2000-gene term has enormous power at tiny fold enrichment; p scales with term size. **Symptom:** vague broad terms ("cellular process") top the list, specific terms buried. **Fix:** read fold enrichment = (k/n)/(M/N) alongside p.adjust; trim extremes with minGSSize=10, maxGSSize=500.
+**Trigger:** ranking results by p.adjust alone. **Mechanism:** a 2000-gene term has enormous power at tiny fold enrichment; p scales with term size. **Symptom:** vague broad terms ("cellular process") top the list, specific terms buried. **Fix:** read the `FoldEnrichment` column ((k/n)/(M/N)) alongside p.adjust; trim extremes with minGSSize=10, maxGSSize=500.
 
 ### Redundant ancestor lineage counted as findings
 **Trigger:** reporting "cell cycle", "cell cycle process", "mitotic cell cycle" as separate discoveries. **Mechanism:** true-path propagation lights up a whole lineage from one signal; the tests are positively correlated. **Symptom:** the top 20 is one biological theme repeated. **Fix:** `simplify()` per ontology, or topGO weight01; never count lineage members as independent hits.
@@ -179,7 +179,7 @@ Swap the OrgDb: `org.Mm.eg.db` (mouse), `org.Dr.eg.db` (zebrafish), `org.Sc.sgd.
 **Trigger:** concluding "no significant terms" when strong raw p exists. **Mechanism:** `pvalueCutoff` filters p.adjust, not pvalue. **Symptom:** an empty table despite plausible signal. **Fix:** inspect with `pvalueCutoff=1, qvalueCutoff=1`, then judge on p.adjust.
 
 ### simplify on ont='ALL'
-**Trigger:** calling `simplify()` on an `ont='ALL'` object. **Mechanism:** semantic similarity is defined within ONE ontology, not across BP/MF/CC. **Symptom:** redundancy not removed, or an error. **Fix:** run BP/MF/CC separately and simplify each.
+**Trigger:** calling `simplify()` on an `ont='ALL'` object. **Mechanism:** semantic similarity is defined within ONE ontology, not across BP/MF/CC. **Symptom:** no error and no warning - `simplify()` silently returns only the first ontology's terms (BP) and drops MF/CC entirely (checked on clusterProfiler 4.14.6: a 36-term BP+CC+MF object came back as 15 terms, all BP). **Fix:** run BP/MF/CC separately and simplify each.
 
 ## Quantitative Thresholds
 
@@ -202,7 +202,7 @@ Swap the OrgDb: `org.Mm.eg.db` (mouse), `org.Dr.eg.db` (zebrafish), `org.Sc.sgd.
 | Empty result table | `pvalueCutoff` filters p.adjust; or universe too large; or IDs lost | set cutoffs to 1 to inspect; fix the universe; check conversion rate |
 | Vague broad terms dominate | ranking by p alone (term-size trap) | read fold enrichment; trim with minGSSize/maxGSSize |
 | Many redundant ancestor terms | GO-DAG true-path propagation | `simplify()` per ontology, or topGO weight01 |
-| simplify does nothing / errors on ALL | similarity is per-ontology | run BP/MF/CC separately |
+| simplify silently returns BP only on an `ont='ALL'` object | similarity is per-ontology; no error is raised, MF/CC are dropped | run BP/MF/CC separately |
 | Description column shows IDs not names | not readable | `readable=TRUE` or `setReadable(ego, OrgDb, 'ENTREZID')` |
 | Tested MF when expecting BP | enrichGO default `ont='MF'` | set `ont` explicitly every call |
 

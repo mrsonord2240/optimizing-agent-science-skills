@@ -7,7 +7,7 @@ primary_tool: CRISPRcleanR
 
 ## Version Compatibility
 
-Reference examples tested with: CRISPRcleanR 3.0+ (R; github.com/francescojm/CRISPRcleanR), Chronos 2.0+ (https://github.com/broadinstitute/chronos), CERES (legacy, superseded by Chronos), pandas 2.2+, numpy 1.26+, scipy 1.12+.
+Reference examples tested with: CRISPRcleanR 3.0+ (R; github.com/francescojm/CRISPRcleanR), Chronos 2.3.15 (`crispr_chronos`; checked 2026-09-16), CERES (legacy, superseded by Chronos), pandas 2.2+, numpy 1.26+, scipy 1.12+.
 
 Before using code patterns, verify installed versions match. If versions differ:
 - R: `packageVersion('CRISPRcleanR')`; `?ccr.GWclean`
@@ -16,6 +16,11 @@ Before using code patterns, verify installed versions match. If versions differ:
 If code throws ImportError, AttributeError, or TypeError, introspect the installed package and adapt the example to match the actual API rather than retrying.
 
 ## Copy-Number Bias Correction in CRISPR Screens
+
+**Scope:** this Skill analyses screen data. It does not support treatment, therapy or other clinical
+recommendations for an individual; an amplification that survives correction is a research finding,
+not evidence for a therapy choice. Decline the clinical part of such a request and answer the
+computational part.
 
 **"Correct copy-number artifacts in my cancer-cell-line screen"** -> Identify gene-independent depletion at amplified loci, apply CRISPRcleanR (pre-hoc, unsupervised, position-based) or Chronos (joint model, supervised with CN profile) to remove the artifact, then proceed to hit calling on corrected data.
 
@@ -50,9 +55,10 @@ The p53-dependence of Cas9-cut toxicity in general was characterized later, by H
 | Available data | Recommended method | Why |
 |----------------|---------------------|-----|
 | Cell-line panel without matched CN profile | CRISPRcleanR | Unsupervised; uses genomic position only |
-| Single cell line with matched WGS/SNP-array CN | CRISPRcleanR or Chronos | Either works; Chronos more rigorous |
+| Single cell line with matched WGS/SNP-array CN | CRISPRcleanR | Chronos' CN correction (`alternate_CN`) refuses fewer than 3 cell lines, matched CN or not; it says so and points at CRISPRcleanR |
+| >=3 cell lines, CN available | Chronos | `alternate_CN`'s minimum; it fits the CN-effect curve across lines |
 | DepMap-scale (1000+ cell lines, longitudinal) | Chronos | Population-dynamics + screen quality + CN; DepMap quarterly standard |
-| Single cell line, multi-timepoint | Chronos | Leverages longitudinal counts |
+| Single cell line, multi-timepoint | Chronos for gene effects, CRISPRcleanR for CN correction | Chronos trains and scores fine on one line, but cannot CN-correct below 3 lines |
 | Need to integrate with downstream MAGeCK | CRISPRcleanR (pre-hoc) | Outputs corrected counts for any downstream tool |
 | Multiple cell lines + multiple batches | Chronos | Joint modeling of all dimensions |
 
@@ -109,29 +115,53 @@ corrected_counts <- ccr.correctCounts('my_screen',
 import chronos
 from chronos.hit_calling import get_probability_dependent
 
-# Inputs
-# 1. Counts: rows = sgRNA, columns = samples (per-timepoint per-cell-line)
-# 2. Sequence map: sgRNA -> cell line -> sample timepoint
-# 3. Guide-gene map
-# 4. Copy-number profile per cell line (applied AFTER training, not at construction)
+# Every input is a dict keyed by library name, not a bare DataFrame, and Chronos checks the
+# schema below (chronos.check_inputs) before training:
+#
+# 1. readcounts    rows = sequence_ID (one per sequenced sample), columns = sgRNA.
+#                  This is the transpose of a MAGeCK count table; Chronos rejects the other
+#                  orientation with "Chronos expects readcounts to have guides as columns,
+#                  sequence IDs as rows. Is your data transposed?"
+# 2. sequence_map  columns sequence_ID, cell_line_name, days, pDNA_batch. Plasmid samples get
+#                  cell_line_name 'pDNA' and days 0, and every pDNA_batch used by a late
+#                  timepoint needs a pDNA row in the same library.
+# 3. guide_gene_map  columns sgrna, gene; one gene per sgRNA (duplicated sgRNAs are rejected).
+# 4. negative_control_sgrnas  dict library -> sgRNAs of non-targeting or known non-essential
+#                  genes. Optional in the signature only: without it, chronos.Chronos(...)
+#                  construction itself raises ValueError('excess_variance was passed as dict
+#                  without key for <library>: {}') -- before train() is ever called. An
+#                  UnboundLocalError for 'prior_variance' does occur one frame deeper, inside
+#                  _estimate_excess_variance, but Chronos catches it internally and re-raises
+#                  the ValueError above every time; it never reaches the caller under default
+#                  arguments (checked on Chronos 2.3.15).
+# 5. Copy-number profile: cell lines x genes, applied AFTER training (see below).
 
-# All three inputs are dicts of DataFrame keyed by library name, not bare DataFrames.
+chronos.check_inputs(                      # fail fast on schema and orientation
+    readcounts={'screen': readcounts_df},  # rows = sequence_ID, columns = sgRNA
+    guide_gene_map={'screen': guide_gene_map},
+    sequence_map={'screen': sequence_map},
+)
+
 model = chronos.Chronos(
     sequence_map={'screen': sequence_map},
     guide_gene_map={'screen': guide_gene_map},
-    readcounts={'screen': counts_df},
+    readcounts={'screen': readcounts_df},
+    negative_control_sgrnas={'screen': negative_control_sgrnas},
 )
 model.train(nepochs=301)
-gene_effects = model.gene_effect                      # attribute, not a method call
+gene_effects = model.gene_effect                      # attribute, not a method call; lines x genes
 
-# Copy-number correction is a separate post-hoc step, not a constructor argument
-gene_effects_cn = chronos.alternate_CN(gene_effects, copy_number_df)
+# Copy-number correction is a separate post-hoc step, not a constructor argument. It needs at
+# least 3 cell lines (RuntimeError below that), the CN frame must be lines x genes and cover
+# every gene in gene_effects, and it returns two objects: the corrected matrix and the
+# per-gene CN shifts it fitted.
+gene_effects_cn, cn_shifts = chronos.alternate_CN(gene_effects, copy_number_df)
 gene_probabilities = get_probability_dependent(gene_effects_cn, negative_control_genes, positive_control_genes)
 ```
 
 **DepMap convention:** A gene-effect score <-1 corresponds to "essential" in that cell line; <-0.5 is "depleting." Each DepMap release (quarterly) provides Chronos gene effects and probabilities.
 
-**Critical:** Chronos benefits most from longitudinal data (multiple timepoints per cell line) but can run with multiple cell lines at a single timepoint. Copy number is optional: Chronos trains without it and `alternate_CN` applies the correction afterwards. For a single screen (one line, one timepoint) without a matched CN profile, use CRISPRcleanR instead.
+**Critical:** Chronos benefits most from longitudinal data (multiple timepoints per cell line) but can run with multiple cell lines at a single timepoint, and it trains on a single line with replicates too. Copy number is optional to *training*: Chronos trains without it and `alternate_CN` applies the correction afterwards. The correction itself has a hard minimum of 3 cell lines, so for one or two lines, CN-correct with CRISPRcleanR (pre-hoc, on the counts) and use Chronos only for the gene-effect scores, or not at all.
 
 ## CERES (Legacy, Superseded by Chronos)
 
@@ -145,23 +175,64 @@ gene_probabilities = get_probability_dependent(gene_effects_cn, negative_control
 
 ```python
 import pandas as pd
-from scipy.stats import spearmanr
+from scipy.stats import spearmanr, mannwhitneyu
 
-def detect_cn_bias(gene_lfc_df, cn_df):
-    '''Test whether gene-level LFC negatively correlates with copy number.
-    A bias-free screen has Spearman rho near zero between CN and LFC.'''
+def detect_cn_bias(gene_lfc_df, cn_df, amplified_cn=4, diploid_cn=(1.5, 2.5), low_power_n=8):
+    '''Test whether amplified genes are depleted relative to diploid ones.
+
+    The genome-wide Spearman rho alone is not enough: a real focal amplicon covers a handful of
+    genes out of ~18,000, so rho stays near zero while those genes are severely depleted. On a
+    real HAP1 screen with a planted 8-gene 17q12 amplicon at CN 15, rho was -0.034 (not
+    "biased") while amplified genes averaged LFC -2.64 against -0.18 for diploid genes. Report
+    the stratified gap, and treat either signal as bias.
+
+    n_amplified>=3 is only the floor for the Mann-Whitney test to run at all, not a guarantee it
+    has power to detect a real effect. On the real HT-29 FAM84B/MYC/POU5F1B block (CN=8)
+    post-CRISPRcleanR, the residual gap was still -0.98 logFC (MYC itself was left uncorrected;
+    its two flanking genes were), but n=3 gave p=0.208 -- bias_present reads False even though
+    the bias is real and substantial. Bootstrapping that same real 3-gene mixture at larger n
+    shows why: P(p<0.01) is only ~0.04 at n=3, ~0.13 at n=8, ~0.30 at n=15 -- the test needs
+    dozens of amplified genes at this effect size before it reliably clears its own threshold.
+    Below `low_power_n` amplified genes, do not read bias_present=False as "correction
+    succeeded" -- check `suspicious_despite_ns` and the raw `amplified_vs_diploid_gap` instead.
+    '''
     merged = gene_lfc_df.merge(cn_df, on='gene')
     rho, p = spearmanr(merged['copy_number'], merged['lfc'])
+    amplified = merged[merged['copy_number'] > amplified_cn]['lfc']
+    diploid = merged[merged['copy_number'].between(*diploid_cn)]['lfc']
+    gap, p_gap = float('nan'), float('nan')
+    if len(amplified) >= 3 and len(diploid) >= 3:
+        gap = amplified.mean() - diploid.mean()
+        p_gap = mannwhitneyu(amplified, diploid, alternative='less').pvalue
+    low_power = len(amplified) < low_power_n
     return {
         'cn_lfc_rho': rho,
         'p_value': p,
-        'amplified_mean_lfc': merged[merged['copy_number'] > 4]['lfc'].mean(),
-        'diploid_mean_lfc': merged[(merged['copy_number'] >= 1.5) & (merged['copy_number'] <= 2.5)]['lfc'].mean(),
-        'bias_present': rho < -0.1 and p < 0.01,
+        'n_amplified_genes': len(amplified),
+        'amplified_mean_lfc': amplified.mean(),
+        'diploid_mean_lfc': diploid.mean(),
+        'amplified_vs_diploid_gap': gap,          # negative = amplified genes more depleted
+        'p_amplified_more_depleted': p_gap,
+        'bias_present': bool((rho < -0.1 and p < 0.01) or (gap < -0.5 and p_gap < 0.01)),
+        'low_power_floor': bool(low_power),        # test ran, but underpowered below low_power_n
+        'suspicious_despite_ns': bool(low_power and not pd.isna(gap) and gap < -0.5),
     }
 ```
 
-**Threshold (operational convention):** Spearman ρ <-0.10 between LFC and CN indicates significant CN bias. Even modest amplifications generate detectable artifact. Run this diagnostic before AND after correction.
+Run it once genome-wide and once per candidate amplicon (pass only that region's genes plus the
+diploid background), because a single amplicon is invisible in the genome-wide statistic.
+
+**Power caveat:** most candidate amplicons have only 3-10 member genes, and `n>=3` is the floor
+for the focal Mann-Whitney test to run at all -- not a guarantee it can detect a real effect at
+that size (`low_power_floor: true` in the output below `low_power_n=8`). Re-running this exact
+function on real post-CRISPRcleanR HT-29 data at a true 3-gene amplicon block gave
+`bias_present: False` (p=0.208) for a residual gap of -0.98 logFC units that was, in fact, still
+substantial. Below `low_power_n` amplified genes, do not treat `bias_present: False` as proof
+the correction worked; check `suspicious_despite_ns` and the raw `amplified_vs_diploid_gap`
+instead, and treat anything below -0.5 as still suspicious even when `p_amplified_more_depleted`
+is not significant.
+
+**Threshold (operational convention):** Spearman ρ <-0.10 between LFC and CN indicates genome-wide CN bias, and an amplified-vs-diploid LFC gap below -0.5 with a significant one-sided test indicates focal bias the correlation misses. Either one means correct before hit calling. Run this diagnostic before AND after correction.
 
 ## Reconciliation: When CN Correction Fails
 
@@ -171,6 +242,7 @@ If post-CRISPRcleanR or post-Chronos the CN-LFC Spearman is still significantly 
 2. **CRISPRcleanR position-based correction missed it:** The amplification is small relative to the segmentation algorithm's resolution. Use Chronos with matched CN profile.
 3. **Genomic rearrangement creates a "ghost" amplification:** A complex rearrangement appears as normal CN but Cas9 cuts at multiple sites due to translocation breakpoints. Combine WGS structural variants with the analysis.
 4. **Cell line has an unusually strong cut-toxicity response:** The artifact may persist; use CRISPRi screens for that line.
+5. **`alternate_CN` fits one CN-effect curve across the whole panel:** it is a fitted average, not a per-line correction, so a single extreme-CN line can retain residual signal even after correction. On a real 3-line CN dose-response panel (CN=2/8/15), the CN=15 line's amplicon genes moved from -1.92 to only -1.20 -- still essential-looking -- while the essentials stayed untouched. Re-run `detect_cn_bias` per cell line, not only pooled, after `alternate_CN`.
 
 ## Apply CN Correction to Pipeline
 
@@ -207,12 +279,12 @@ CRISPRcleanR was used historically; cross-check with Chronos when CN profile ava
 **Symptom:** A known essential drops out of post-correction hit list.
 **Fix:** Inspect segments manually; if a known essential was within a corrected segment, investigate. Cross-check with non-CN-corrected MAGeCK + BAGEL2 to see if essential was a hit pre-correction.
 
-### Chronos fails on single-timepoint or single-cell-line data
+### Chronos refuses to CN-correct fewer than 3 cell lines
 
-**Trigger:** Chronos requires multiple timepoints (or multiple cell lines) for population-dynamics estimation.
-**Mechanism:** Single observation per condition leaves model under-determined.
-**Symptom:** Chronos errors out or produces flat gene-effect distributions.
-**Fix:** Use CRISPRcleanR (which handles single-timepoint single-line); collect multi-timepoint data for Chronos.
+**Trigger:** One or two cell lines, with or without a matched CN profile.
+**Mechanism:** `alternate_CN` fits the CN-to-gene-effect curve across cell lines, so it needs a panel; its own code raises below 3.
+**Symptom:** `RuntimeError: Correct for CN should not be used with fewer than 3 cell lines. Consider preprocessing with CRISPRCleanR` -- raised after a full training run, so budget for it before you spend the epochs.
+**Fix:** CN-correct the counts with CRISPRcleanR pre-hoc, then hit-call; Chronos training itself works on a single line (with `negative_control_sgrnas`) and its uncorrected gene effects are still useful for QC.
 
 ### Spearman ρ still negative after CRISPRcleanR
 
@@ -224,8 +296,8 @@ CRISPRcleanR was used historically; cross-check with Chronos when CN profile ava
 ### Cell line lacks matched CN profile
 
 **Trigger:** Newly characterized line or rare patient-derived line; WGS not done.
-**Mechanism:** Chronos requires CN as input; CRISPRcleanR doesn't but works better with it.
-**Symptom:** Cannot apply Chronos; CRISPRcleanR less precise without supervised CN.
+**Mechanism:** CRISPRcleanR needs no CN profile; Chronos trains without one too, but its `alternate_CN` correction cannot run without it.
+**Symptom:** Chronos gene effects still carry the artifact; CRISPRcleanR corrects unsupervised.
 **Fix:** Run SNP-array (cheap, fast) or low-coverage WGS to obtain CN profile; in interim, use CRISPRcleanR unsupervised mode.
 
 ### CN amplification at non-coding region drives apparent essentiality
@@ -260,12 +332,17 @@ See [[library-design]] for CRISPRi (Dolcetto) and CRISPRa (Calabrese) library op
 | Chronos gene-probability for "essential" | >0.5 | DepMap convention (dependency-probability cutoff) |
 | Post-correction Spearman ρ | abs(ρ) <0.05 | Acceptable correction quality |
 | Cell-line CN profile resolution | ≥SNP-array level | Below this, CRISPRcleanR unsupervised |
+| Cell lines needed for `chronos.alternate_CN` | ≥3 | Chronos 2.3.15 raises RuntimeError below this |
+| Amplified-vs-diploid LFC gap | < -0.5 -> focal bias present | Catches single amplicons the genome-wide rho misses |
+| `detect_cn_bias` low-power floor | <8 amplified genes -> distrust `bias_present: False` | Real HT-29 3-gene block: p=0.208 for a genuine -0.98 gap |
 
 ## Common Errors
 
 | Error / symptom | Cause | Solution |
 |-----------------|-------|----------|
-| Chronos errors on single-timepoint screen | Insufficient longitudinal data | Use CRISPRcleanR instead |
+| `RuntimeError: Correct for CN should not be used with fewer than 3 cell lines` | `alternate_CN` needs a panel | CN-correct with CRISPRcleanR instead; Chronos can still score the screen |
+| `AssertionError: ... Is your data transposed?` | readcounts passed as guides x samples | Transpose: rows = sequence_ID, columns = sgRNA |
+| `ValueError: excess_variance was passed as dict without key for '<library>': {}` at `chronos.Chronos(...)` construction (not `train()`) | `negative_control_sgrnas` not supplied | Pass a dict of non-targeting/non-essential sgRNAs per library |
 | CRISPRcleanR removes a known essential | Segment-based over-correction | Manually inspect segments; cross-check with non-corrected |
 | Spearman ρ still -0.15 after correction | Method too coarse for the amp | Refine CN profile; use Chronos |
 | ERBB2 listed as essential in SK-BR-3 | Uncorrected HER2 amplification | Always apply correction before hit calling |

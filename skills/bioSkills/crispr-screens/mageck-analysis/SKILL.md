@@ -24,6 +24,8 @@ If code throws ImportError, AttributeError, or TypeError, introspect the install
 - R: `MAGeCKFlute::FluteRRA()` / `FluteMLE()` for downstream visualization and pathway analysis
 - Python: `mageck-vispr` for interactive QC + result dashboard
 
+**Never report specific FDR, LFC, or beta values without having actually run `mageck count`/`test`/`mle` on the user's own data.** If count data isn't ready yet, say so and offer to run the pipeline once it is -- don't fabricate plausible-looking gene_summary numbers to fill a report or deadline.
+
 ## RRA vs MLE Decision Tree
 
 | Experimental design | Recommended | Why |
@@ -53,7 +55,7 @@ If code throws ImportError, AttributeError, or TypeError, introspect the install
 5. Gene-level p-value is computed by permuting sgRNA-to-gene assignment to derive an empirical null over alpha-RRA scores.
 6. Multiple-testing correction is Benjamini-Hochberg.
 
-**Critical assumption:** RRA assumes most sgRNAs are non-changing (used to estimate the NB dispersion). If >40% of sgRNAs change, median normalization fails and the dispersion estimate is biased. Symptom: every gene appears significant. Fix: use control-sgRNA normalization (`--norm-method control`) with non-targeting controls as the reference.
+**Critical assumption:** RRA assumes most sgRNAs are non-changing (used to estimate the NB dispersion). If >40% of sgRNAs change, median normalization fails and the dispersion estimate is biased. Symptom varies by screen: some heavy-selection screens do call every gene significant, but a real 45%-guides-changing test (see Failure Modes below) instead showed asymmetric recall collapse -- one selection direction masked to 0% recall while the other stayed correct. Both manifestations share the same root cause and the same fix: use control-sgRNA normalization (`--norm-method control`) with non-targeting controls as the reference.
 
 ## The MLE Model (under the hood)
 
@@ -168,6 +170,7 @@ mageck mle \
     --design-matrix design.txt \
     --output-prefix timecourse_mle \
     --norm-method median \
+    --permutation-round 10 \                       # default is 2; raise for any FDR call trusted near 0.05 (see below)
     --sgrna-efficiency efficiency.txt \            # OPTIONAL: from JACKS or library design
     --sgrna-eff-name-column 0 \                    # 0-based; 0 is the default
     --sgrna-eff-score-column 1 \                   # 0-based; 1 is the default
@@ -188,6 +191,20 @@ mageck mle \
 | `<condition>|wald-fdr` | Wald-statistic-based FDR (alternative) |
 
 **Interpretation rule:** Beta scores are log2-fold-changes; a beta of -1 in condition day21 means sgRNAs are 2-fold depleted in day-21 relative to baseline. NaN betas indicate convergence failure (typically a gene with too few non-zero counts in that condition); exclude from interpretation.
+
+**Permutation-Round Sensitivity of the primary `fdr` column:** `mageck mle`'s permutation-based `fdr`
+column is coarser than it looks -- `--permutation-round` defaults to 2 (`mageck mle --help`: "Suggested
+value: 10 (may take longer time). Default 2") and the SKILL's own worked examples never set it.
+Measured directly on real data (HAP1 TKOv3 T0-vs-T18 counts, a 1500-gene/5880-sgRNA random subset,
+two-condition `baseline`+`treatment` design, `--norm-method median`): raising `--permutation-round`
+from the default 2 to 5 moved the FDR<0.05 hit count from 48 to 67 genes -- 19 genes (40% of the
+default run's hit count) flipped FDR<0.05 status, purely from the permutation-count change, while
+`wald-fdr` stayed at exactly 108 significant genes across `--permutation-round` 1, 2, and 5 (it does
+not depend on permutation count). **Rule of thumb:** don't trust a permutation `fdr` call near the
+0.05 boundary at the default round count; either raise `--permutation-round` to 10+ (per `--help`'s
+own suggestion) and re-check stability, or cross-check against `wald-fdr`, which is stable but a
+looser approximation (asymptotic, not permutation-calibrated). If the two disagree, treat the gene as
+borderline and validate orthogonally rather than trusting either column alone.
 
 ## Sample MAGeCK Test for Drug Screen with sgRNA Efficiency
 
@@ -237,6 +254,7 @@ def time_course_consistency(mle_results, conditions=['day7', 'day14', 'day21']):
 **Approach:** Load gene_summary.txt, plot `-log10(fdr)` vs LFC, color by significance, annotate top hits.
 
 ```python
+import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -269,20 +287,34 @@ def volcano(gene_summary_path, direction='neg', fdr_threshold=0.05, lfc_threshol
 
 ```r
 library(MAGeCKFlute)
+# FluteRRA/FluteMLE do NOT create their own output directory -- outdir must
+# already exist, and the real subfolder they write into is outdir/MAGeCKFlute_<proj>/,
+# not outdir/ itself. proj defaults to NA, which still needs the matching
+# MAGeCKFlute_NA/ directory pre-created -- always pass proj explicitly instead.
+dir.create("flute_output/MAGeCKFlute_test1", recursive = TRUE, showWarnings = FALSE)
+
 # After mageck test
 FluteRRA(gene_summary = "drug_vs_veh.gene_summary.txt",
          sgrna_summary = "drug_vs_veh.sgrna_summary.txt",
+         proj = "test1",
          organism = "hsa",
          outdir = "flute_output/")
 
 # After mageck mle
+dir.create("flute_mle_output/MAGeCKFlute_test1", recursive = TRUE, showWarnings = FALSE)
 FluteMLE(gene_summary = "timecourse_mle.gene_summary.txt",
          treatname = "day21", ctrlname = "baseline",
+         proj = "test1",
          organism = "hsa",
          outdir = "flute_mle_output/")
 ```
 
 ## MAGeCK-VISPR Interactive Dashboard
+
+**Platform note:** `mageck-vispr` ships only via bioconda for Linux/Mac (Snakemake + Flask); there is
+no PyPI or Windows build. On Windows, use [[screen-qc]]'s pandas/matplotlib QC instead -- it computes
+the same per-sample Gini/mapping-rate/count-summary numbers this dashboard visualizes, without the
+interactive server.
 
 ```bash
 mageck-vispr init my_screen
@@ -300,11 +332,11 @@ vispr server results/*.vispr.yaml   # serve the interactive dashboard
 **Symptom:** `mle.gene_summary.txt` shows NaN in specific gene-condition cells.
 **Fix:** Filter these genes from downstream interpretation; they are not "zero effect" but undetermined. If many genes show NaN, the screen depth is too low or many guides have failed -- audit with screen-qc.
 
-### Every gene appears significant after RRA
+### Heavy-selection screen distorts RRA calls under median normalization
 
 **Trigger:** >40% of sgRNAs change direction (heavy selection screen).
 **Mechanism:** Median normalization assumes most guides are non-changing; under heavy selection, median is biased and dispersion estimation breaks.
-**Symptom:** Thousands of "hits" at FDR <0.05; volcano plot looks like a U with no separation.
+**Symptom:** Two manifestations of the same root cause, either can occur: (a) thousands of "hits" at FDR <0.05 with a volcano plot that looks like a U with no separation, or (b) one selection direction goes to near-zero recall while the other direction stays correct -- measured directly on a real 200-gene/45%-changing synthetic screen: median normalization gave 100% recall of depleted genes but 0% recall of enriched genes (0/43), while `--norm-method control` recovered both (100%/100%). Don't assume "every gene significant" is the only tell; check recall by direction, not just hit count.
 **Fix:** Switch to `--norm-method control` with non-targeting controls; or use BAGEL2 / Chronos for essentiality analysis (`mageck` is not designed for screens with high-fraction true essentiality).
 
 ### MLE beta absorbs batch variance
@@ -349,13 +381,15 @@ vispr server results/*.vispr.yaml   # serve the interactive dashboard
 | Time-course conditions for MLE | ≥3 (otherwise use test) | MLE statistical power |
 | PR-AUC of ranked hits against CEGv2 | >0.7 for "passing" essentiality screen | Community convention (CEGv2 from Hart 2017); see [[screen-qc]] |
 | RRA permutation passes per gene | 100 default; raise via `--additional-rra-parameters "--permutation N"` | Not exposed directly on `mageck test`; trades runtime |
+| MLE `--permutation-round` | Default 2; use >=10 for any FDR call near 0.05 | `mageck mle --help`'s own suggestion; measured 40% of a real screen's FDR<0.05 hits flip between round 2 and round 5 (see MLE section) |
 
 ## Common Errors
 
 | Error / symptom | Cause | Solution |
 |-----------------|-------|----------|
 | `mageck count` outputs mostly zero counts | Library column order swapped, or wrong `--trim-5` length | Library must be sgRNA id, sequence, gene; try `--trim-5 AUTO` |
-| All genes significant | Median normalization break (heavy selection) | `--norm-method control` |
+| All genes significant, or recall collapses in one selection direction | Median normalization break (heavy selection, >40% guides changing) | `--norm-method control` |
+| `FluteRRA`/`FluteMLE` errors on missing output dir, or `undefined columns selected` | `proj=` not passed (subfolder `MAGeCKFlute_<proj>/` not pre-created), or a MAGeCKFlute build ahead of/behind the Version Compatibility note | Pass `proj=` and `dir.create()` the subfolder first; if the column error persists, it is a known MAGeCKFlute-build compatibility gap -- check `packageVersion('MAGeCKFlute')` against this Skill's tested version |
 | NaN beta in MLE | Gene with insufficient non-zero counts | Exclude from interpretation |
 | Two-condition MLE works but ranks differ from RRA | Different test statistic | Both correct; check direction and use the appropriate one |
 | Hits include amplified genes | No CN correction | See [[copy-number-correction]] |

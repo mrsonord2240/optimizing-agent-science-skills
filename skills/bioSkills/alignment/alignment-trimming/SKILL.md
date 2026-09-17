@@ -21,7 +21,7 @@ If code throws ImportError, AttributeError, or TypeError, introspect the install
 - CLI: `clipkit`, `trimal`, `BMGE`, `Divvier`, `HMMcleaner`
 - Python: post-process via Bio.AlignIO with custom column masks
 
-**"Make this alignment publication-grade for phylogenetics"** -> Apply ClipKIT's `smart-gap` mode (its default), or trimAl `-automated1`, then verify via tree-stability comparison before vs after trimming.
+**"Make this alignment publication-grade for phylogenetics"** -> Apply ClipKIT's `smart-gap` mode (its default), or trimAl `-automated1` for typical/exploratory publication use -- not for audit-grade reproducibility work, where the underlying mode must be named explicitly (see Reproducibility note under trimAl Modes) -- then verify via tree-stability comparison before vs after trimming.
 
 Tool choice and aggressiveness matter more than trimming vs not-trimming. Pick a mode by dataset character (table below), and always run a sensitivity check by building trees on trimmed and untrimmed alignments.
 
@@ -47,7 +47,7 @@ Always run a sensitivity analysis: build the tree on trimmed AND untrimmed align
 | Phylogenetic-tree input (single gene) | ClipKIT `smart-gap` | Default mode; dynamic gap-threshold determination |
 | HMM profile building (HMMER, HHsuite) | trimAl `-gappyout` (Capella-Gutierrez et al 2009 Bioinf) | Aggressive gap removal acceptable; profile quality benefits |
 | Selection / dN/dS analysis (PAML, HyPhy) | TCS column masking or GUIDANCE2 (NOT aggressive trimming) | Removing columns causes false-positive selection signals (Fletcher & Yang 2010 MBE) |
-| Deep prokaryotic phylogenomics | BMGE (Criscuolo & Gribaldo 2010 BMC Evol Biol) | Entropy-based with BLOSUM62 context; standard in GToTree pipeline |
+| Deep prokaryotic phylogenomics | BMGE (Criscuolo & Gribaldo 2010 BMC Evol Biol) | Substitution-matrix entropy (BLOSUM62 in 1.12, BLOSUM30 in 2.0); standard in GToTree pipeline |
 | Cross-contaminated sequences | HMMcleaner (Di Franco et al 2019 BMC Evol Biol) | Per-residue cleaning; targets contamination not column quality |
 | Preserve phylogenetic signal in indels | Divvier (Ali, Bogusz & Whelan 2019 MBE) | Splits ambiguous columns rather than removing them |
 | Column-mapping retention for site analysis | trimAl `-colnumbering` | Outputs original-column indices for downstream cross-reference |
@@ -100,7 +100,7 @@ Pick a trimAl mode by downstream tool. `-gappyout` for HMM profile builds, `-gap
 | Manual gap | `-gt 0.5` | Remove columns with > 50% gaps (set fraction explicitly) |
 | Manual similarity | `-st 0.5` | Remove columns with similarity below threshold |
 | Manual conservation | `-cons 60` | Keep at least 60% of original columns regardless of other criteria |
-| Sequence-quality | `-resoverlap 0.8 -seqoverlap 75` | Remove sequences with poor residue/sequence overlap |
+| Sequence-quality | `-resoverlap 0.8 -seqoverlap 75` | Remove sequences with poor residue/sequence overlap; thresholds are dataset-dependent -- see below |
 | HTML report | `-htmlout report.html` | Visual diff of kept/removed columns |
 | Column mapping | `-colnumbering` | Output original column indices preserved |
 
@@ -118,6 +118,21 @@ trimal -in input.fasta -out trimmed.fasta -gt 0.3 -st 0.5 -cons 60 -colnumbering
 `-gappyout` is the recommended choice for HMM profile building (HMMER `hmmbuild` benefits from aggressive gap removal). For ML tree input use `-gappyout` or `-strict`; `-strictplus` is NJ-oriented and was the only trimAl mode that lost topological accuracy in a 10-replicate simulated check. `-automated1` is the fallback when characterising the dataset is impractical (it chose `-strict` and removed 61% of columns on one 15-sequence protein alignment -- check retention).
 
 **Reproducibility note:** `trimAl -automated1` selects between `gappyout`, `strict`, and `strictplus` via internal heuristics that have changed between releases. For audit-grade reproducibility, do NOT use `-automated1`; specify the underlying mode explicitly and record `trimal --version` in pipeline manifests.
+
+### trimAl Sequence-Overlap Filtering: Check What Was Removed
+
+`-resoverlap`/`-seqoverlap` remove whole SEQUENCES, not columns: a sequence is kept only if at least `-seqoverlap` percent of its non-gap residues fall in columns whose overlap with the rest of the alignment reaches `-resoverlap`. This is meant to catch fragmentary or partial sequences, but `-resoverlap 0.8 -seqoverlap 75` (trimAl's own help-text example) is not a validated default -- on a real alignment it can also drop full-length, legitimate sequences if enough columns are gappy or divergent. Thresholds are dataset-dependent; treat them as a starting point, not a fixed recommendation. In a simulated 15-sequence protein alignment with two genuine partial contigs, `-resoverlap 0.8 -seqoverlap 75` removed 4 of 15 sequences, not 2: the two fragments plus two full-length sequences.
+
+trimAl does not print which sequences it removed -- stdout only lists all-gap columns dropped afterward. Always diff the headers before vs after to see what actually left the alignment:
+
+```bash
+trimal -in input.fasta -out filtered.fasta -resoverlap 0.8 -seqoverlap 75
+grep '^>' input.fasta | sort > in.txt
+grep '^>' filtered.fasta | sort > out.txt
+diff in.txt out.txt
+```
+
+If a removed sequence is full-length rather than a fragment you meant to drop, the threshold is too strict for this dataset: relax `-seqoverlap` and re-run the diff. On the same 15-sequence alignment, lowering `-seqoverlap` from 75 to 60 dropped only the two genuine fragments and kept both full-length sequences that 75 had discarded.
 
 ## BMGE: Block Mapping and Gathering with Entropy
 
@@ -167,36 +182,9 @@ Use Divvier when phylogenetic signal in indels matters and pure removal would di
 
 Maintenance note: Divvier's last release was 2019 (`simonwhelan/Divvier`); the tool is no longer actively maintained but results remain reproducible with the v2019 binary.
 
-## HMMcleaner: Per-Residue Cleaning
+## Specialist Trimmers: HMMcleaner, Gblocks, PhyIN
 
-Run HMMcleaner before column trimming when cross-contamination or annotation errors are suspected; it masks suspect residues with `X` rather than removing columns. Apply only to alignments with >= 15 sequences (below that the per-residue pHMM has too little signal and over-flags divergent residues).
-
-```bash
-HmmCleaner.pl input.fasta
-```
-
-Output is `input_hmm.fasta` with low-confidence residues masked. Used in OrthoMaM and Compositional Heterogeneity-aware phylogenomic pipelines where cross-contamination from sequencing or annotation errors is suspected.
-
-**Sample-size sensitivity:** HMMcleaner builds a per-residue HMM from the OTHER sequences at each position, so on small alignments (<15 sequences) the HMM has insufficient signal and over-flags real divergent residues as contamination. Di Franco et al 2019 show two related effects: pHMMs built from few sequences carry less signal, lowering HMMcleaner sensitivity, and its false positives are driven mainly by evolutionary divergence -- specificity falls with gap frequency, evolutionary rate, and the fraction of ambiguously-aligned regions rather than by a fixed sequence count (global specificity ~94% at default settings). OrthoMaM v11 and PhyloHerb pipelines apply HMMcleaner only to alignments with >= 15 sequences. For smaller alignments, manual inspection or BLAST-based contamination screening is more reliable.
-
-## Gblocks: The Legacy Default
-
-Use Gblocks only when matching a legacy pipeline; prefer ClipKIT or trimAl for new work. Default parameters are too aggressive -- relax them. `-b1` and `-b2` are integer sequence COUNTS, not percentages: `-b1` must be greater than half the number of sequences N (default N/2 + 1), and `-b2` at least `-b1` (default 85% of N). Relaxed example for N = 20 sequences:
-
-```bash
-Gblocks input.fasta -t=p -b1=11 -b2=11 -b3=10 -b4=5 -b5=h
-```
-
-## PhyIN: Phylogenetic Incompatibility Trimming
-
-PhyIN (Maddison 2024 PeerJ) is a complementary trimmer that flags neighbouring columns whose split patterns are phylogenetically incompatible (i.e. cannot share a tree). It targets a different failure mode than gap-based or entropy-based trimmers: ClipKIT, trimAl, and BMGE all evaluate columns independently, so a region with consistent gap structure passes their filters even if its character patterns are pairwise tree-incompatible (alignment artefact). PhyIN catches that case.
-
-```bash
-# PhyIN v1.0 is a single Python script; DNA/RNA FASTA alignments only
-python phyin.py -input input.fasta -output trimmed.fasta -b 10 -d 2 -p 0.5
-```
-
-`-b` block length over which conflict is assessed, `-d` neighbour distance surveyed, `-p` proportion of conflicting neighbours that triggers removal; `-e` / `-not.e` treat gaps as an extra state or not. Use PhyIN as a SECOND-PASS trimmer after ClipKIT/trimAl when alignment artefact is the suspected source of incongruence in a phylogenomic dataset; not a replacement for first-pass column filtering. PhyIN's incompatibility test is signal-direction agnostic, so it does not distinguish "the alignment is wrong here" from "true incongruent locus" (e.g. introgression, ILS); only gene-tree comparison after tree-building can disambiguate. Reference: PeerJ 2024 paper.
+Per-residue contamination cleaning (HMMcleaner), matching a legacy pipeline's defaults (Gblocks), and a phylogenetic-incompatibility second-pass after ClipKIT/trimAl/BMGE (PhyIN) come up less often than the tools above. See `references/specialist-trimmers.md` for their commands, flags, and applicability notes (HMMcleaner's >=15-sequence requirement, Gblocks' `-b1`/`-b2` sequence-count semantics, PhyIN's role as a second-pass tool).
 
 ## Decision Tree by Downstream Goal
 
@@ -204,7 +192,7 @@ python phyin.py -input input.fasta -output trimmed.fasta -b 10 -d 2 -p 0.5
 What is the next step?
 +- Phylogenetic ML tree (RAxML, IQ-TREE)
 |  +- Concatenated supermatrix? -> ClipKIT smart-gap per locus, then concatenate
-|  +- Single gene? -> ClipKIT smart-gap or trimAl -automated1
+|  +- Single gene? -> ClipKIT smart-gap or trimAl -automated1 (not for audit-grade reproducibility -- see Reproducibility note)
 |  +- Topology only, balanced taxa? -> kpic-smart-gap allowed, with the branch-length check
 |  +- Deep prokaryotic? -> BMGE at its default entropy threshold; check retention
 |  +- Suspected cross-contamination? -> HMMcleaner first, then ClipKIT
@@ -225,48 +213,9 @@ What is the next step?
    +- Preserve all variable positions
 ```
 
-## TCS Column Masking for Selection Analysis
+## Selection-Analysis Trimming: TCS and MACSE
 
-TCS (Chang et al 2014 MBE) scores each column on a 0-9 scale by consistency across a pairwise-alignment library. The recommended dN/dS workflow:
-
-**Goal:** Mask unreliable columns before selection analysis to prevent alignment errors from inflating false-positive dN/dS calls.
-
-**Approach:** Build a library-rich consistency score via M-Coffee, evaluate the alignment against that library to obtain per-column TCS scores, then keep columns at or above a chosen confidence threshold using `seq_reformat`.
-
-```bash
-# 1. Generate library-rich consistency scores via M-Coffee (combines libraries from MAFFT, MUSCLE, ClustalW, ProbCons)
-t_coffee input.fasta -mode mcoffee -output fasta_aln -outfile aligned.fasta
-
-# 2. Compute per-column TCS scores; T-Coffee writes aligned.score_ascii itself (not to stdout)
-t_coffee -infile aligned.fasta -mode evaluate -output score_ascii
-
-# 3. Filter COLUMNS at a chosen threshold (5-9 = retain columns scoring 5 or higher).
-#    +use_cons +keep acts on column scores; +keep alone keeps individual residues within the range.
-t_coffee -other_pg seq_reformat -in aligned.fasta -struc_in aligned.score_ascii \
-    -struc_in_f number_aln -action +use_cons +keep '[5-9]' -output fasta_aln > aligned_tcs5.fasta
-```
-
-Threshold guidance: TCS >= 5 retains columns confidently aligned by the majority of library methods; TCS >= 7 is a stricter operational convention on the seq_reformat 0-9 display scale. Chang et al 2014 do not prescribe an integer 5/7 cutoff -- on BAliBASE 3 and PREFAB 4 structural benchmarks they keep residues scoring above ~0.6 on the native 0-1 scale and drop columns scoring below 2, with TCS outperforming GUIDANCE and HoT. TCS-from-mcoffee gives substantially better column-confidence ranking than TCS-from-default-tcoffee because the library is more diverse. For the PAML branch-site test, Fletcher & Yang 2010 showed alignment errors inflate false positives dramatically (up to ~0.99 with ClustalW, ~0.13 even with codon-aware PRANK) and that removing gappy columns did not reduce them; confidence-based column masking (TCS, GUIDANCE2) is a common mitigation but was not evaluated in that study, since TCS postdates it (Chang et al 2014).
-
-## MACSE Frameshift Markers Need Post-Processing
-
-MACSE encodes detected frameshifts as `!` (within-codon insertion) and `*` (premature stop) in the nucleotide output. PAML codeml does not accept `!`: codeml 4.10.10 stops with "Error in sequence data file" (and still exits 0), so replace `!` before every codeml run; HyPhy `BUSTED`/`MEME` interpret `!` as `N` but `*` triggers a parse error mid-sequence. Standard cleanup before downstream analysis:
-
-**Goal:** Convert MACSE frameshift and stop markers into formats that PAML and HyPhy will parse correctly.
-
-**Approach:** Replace `!` with gaps for PAML, and use MACSE's own `exportAlignment` sub-program to replace both frameshift codons and internal stops for HyPhy-safe output.
-
-```bash
-# Convert frameshift markers to gaps (PAML)
-sed -e '/^>/!s/!/-/g' aligned_nt.fasta > aligned_paml.fasta
-# Replace frameshift codons and internal stops (HyPhy); checked on MACSE 2.07
-java -jar macse_v2.jar -prog exportAlignment -align aligned_nt.fasta \
-    -codonForFinalStop --- -codonForInternalStop NNN \
-    -codonForInternalFS --- -charForRemainingFS - \
-    -out_NT aligned_hyphy.fasta -out_AA aligned_hyphy_aa.fasta
-```
-
-`-codonForInternalStop NNN` replaces internal stops with `NNN`; `-codonForInternalFS ---` and `-charForRemainingFS -` remove the `!` frameshift markers, which `exportAlignment` otherwise leaves in place. Without this step, the dN/dS run silently produces results that do not correspond to the alignment shown.
+Column masking before dN/dS analysis (TCS, via T-Coffee) and cleaning up MACSE's frameshift/stop markers for PAML or HyPhy input are both needed only when the downstream step is a selection analysis. See `references/selection-analysis-workflow.md` for the TCS masking commands, threshold guidance, and the MACSE `!`/`*` marker conversion recipes.
 
 ## Aggressiveness Cap
 
@@ -284,7 +233,7 @@ If retention drops below 0.6, switch to a less aggressive setting or accept the 
 When trimming for phylogenetic input, retain the column-index mapping so downstream site-specific analyses (selection per site, structure-mapped residues, etc.) can be back-traced:
 
 ```bash
-trimal -in input.fasta -out trimmed.fasta -automated1 -colnumbering > kept_columns.txt
+trimal -in input.fasta -out trimmed.fasta -gappyout -colnumbering > kept_columns.txt
 
 clipkit input.fasta -m smart-gap --log -o trimmed.fasta
 ```
@@ -323,7 +272,7 @@ kept_clipkit = [int(row.split()[0]) - 1 for row in open('trimmed.fasta.log') if 
 - Steenwyk JL, Buida TJ, Li Y, Shen XX, Rokas A. 2020. ClipKIT: a multiple sequence alignment trimming software for accurate phylogenomic inference. PLOS Bio 18:e3001007.
 - Capella-Gutierrez S, Silla-Martinez JM, Gabaldon T. 2009. trimAl: a tool for automated alignment trimming in large-scale phylogenetic analyses. Bioinf 25:1972-1973.
 - Criscuolo A, Gribaldo S. 2010. BMGE: a new software for selection of phylogenetic informative regions from multiple sequence alignments. BMC Evol Biol 10:210.
-- Maddison WP. 2024. PhyIN: trimming alignments by phylogenetic incompatibilities among neighbouring sites. PeerJ 12:e18504.
 - Tan G, Muffato M, Ledergerber C, Herrero J, Goldman N, Gil M, Dessimoz C. 2015. Current methods for automated filtering of multiple sequence alignments frequently worsen single-gene phylogenetic inference. Syst Biol 64:778-791.
 - Fletcher W, Yang Z. 2010. The effect of insertions, deletions, and alignment errors on the branch-site test of positive selection. MBE 27:2257-2267.
-- Chang JM, Di Tommaso P, Notredame C. 2014. TCS: a new multiple sequence alignment reliability measure. MBE 31:1625-1637.
+
+PhyIN and TCS citations (Maddison 2024; Chang et al 2014) moved to `references/specialist-trimmers.md` and `references/selection-analysis-workflow.md` with the sections that cite them.

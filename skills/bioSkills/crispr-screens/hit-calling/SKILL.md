@@ -77,11 +77,40 @@ The primary hit-calling methods cover non-overlapping niches; the decision is no
 
 ```python
 import pandas as pd
+from scipy.stats import hypergeom
+
+def _check_comparable(merged, hit_cols):
+    '''Warn if any pair of method hit-sets shows no statistical enrichment for
+    overlap -- the signature of merging results that answer different questions
+    (e.g. a real essentiality MAGeCK+BAGEL2 pair merged against a drugZ table from
+    an unrelated drug-vs-vehicle screen) rather than genuine method disagreement on
+    the same comparison. Verified on real data: matched MAGeCK/BAGEL2 hit sets give
+    p=0 (highly enriched overlap); a mismatched drugZ table against either gives
+    p=1.0 (no enrichment) -- see the Failure Modes entry below.'''
+    n = len(merged)
+    warnings = []
+    for i, col_a in enumerate(hit_cols):
+        for col_b in hit_cols[i + 1:]:
+            a, b = merged[col_a].fillna(False), merged[col_b].fillna(False)
+            k, K, N = int((a & b).sum()), int(a.sum()), int(b.sum())
+            if K == 0 or N == 0:
+                continue
+            p = hypergeom.sf(k - 1, n, K, N)
+            if p > 0.05:
+                warnings.append(f'{col_a} vs {col_b}: overlap not enriched above chance '
+                                 f'(observed={k}, expected~{K * N / n:.1f}, p={p:.3f}) -- '
+                                 'check these came from the SAME experimental comparison '
+                                 'before trusting consensus.')
+    for w in warnings:
+        print(f'WARNING: {w}')
+    return warnings
 
 def consensus_hits(mageck_path, bagel_path, drugz_path,
-                   mageck_fdr_thresh=0.05, bagel_bf_thresh=5, drugz_fdr_thresh=0.05):
+                   mageck_fdr_thresh=0.05, bagel_bf_thresh=6, drugz_fdr_thresh=0.05):
     '''Build consensus across MAGeCK / BAGEL2 / drugZ on the same screen.
-    Each hit gets a count of supporting methods.'''
+    Each hit gets a count of supporting methods. Defaults match the Quantitative
+    Thresholds table below -- keep this function and examples/consensus_hits.py in
+    sync with that table, not with each other.'''
     mageck = pd.read_csv(mageck_path, sep='\t')[['id', 'neg|fdr']].rename(columns={'id': 'gene', 'neg|fdr': 'mageck_neg_fdr'})
     bagel = pd.read_csv(bagel_path, sep='\t')[['GENE', 'BF']].rename(columns={'GENE': 'gene', 'BF': 'bagel_bf'})
     drugz = pd.read_csv(drugz_path, sep='\t')[['GENE', 'fdr_synth']].rename(columns={'GENE': 'gene', 'fdr_synth': 'drugz_synth_fdr'})
@@ -89,6 +118,7 @@ def consensus_hits(mageck_path, bagel_path, drugz_path,
     merged['mageck_hit'] = merged['mageck_neg_fdr'] < mageck_fdr_thresh
     merged['bagel_hit'] = merged['bagel_bf'] > bagel_bf_thresh
     merged['drugz_hit'] = merged['drugz_synth_fdr'] < drugz_fdr_thresh
+    _check_comparable(merged, ['mageck_hit', 'bagel_hit', 'drugz_hit'])
     merged['consensus_count'] = (merged[['mageck_hit', 'bagel_hit', 'drugz_hit']].astype(int)).sum(axis=1)
     return merged.sort_values('consensus_count', ascending=False)
 ```
@@ -112,6 +142,7 @@ def consensus_hits(mageck_path, bagel_path, drugz_path,
 | drugZ significant, MAGeCK not on drug screen | drugZ bidirectional Z is more sensitive | Trust drugZ for chemogenomic; MAGeCK may miss small effects |
 | MAGeCK MLE significant, MAGeCK RRA not in 2-condition | Beta-score effect size is significant but rank-based not | Trust MLE if guides consistent; RRA may be over-conservative |
 | All methods disagree | Either no real biology or all methods are mis-applied | Stop. Re-audit QC; check chemistry / library / design matrix |
+| BAGEL2 BF changes between reruns on identical input -- not a real method disagreement, but easy to mistake for one | BAGEL2's `bf` step defaults to a clock-derived random seed; two unseeded runs on the same real HAP1 TKOv3 data differed by up to 26.7 BF and flipped 33/18,053 genes across BF>6 | Always pass a fixed `-s <int>` seed to `fc`/`bf`/`pr` and verify two reruns are byte-identical before trusting any single BF table or treating a rerun difference as new biology -- see [[bagel-essentiality]]'s "Reproducibility: Fixing the Random Seed" section |
 
 ## Second-Best sgRNA Conservative Rule
 
@@ -121,20 +152,27 @@ def consensus_hits(mageck_path, bagel_path, drugz_path,
 
 ```python
 def second_best_lfc(sgrna_lfc_df, genes_series, direction='neg'):
-    '''Return per-gene LFC of the second-best sgRNA in the direction of interest.
-    For dropout (direction="neg"), second-most-negative LFC.'''
+    '''Return per-gene LFC of the second-best sgRNA in the direction of interest,
+    and flag genes with fewer than 2 sgRNAs. For dropout (direction="neg"),
+    second-most-negative LFC. A gene with only one sgRNA has no second guide to
+    check at all -- return NaN and single_guide=True for it rather than silently
+    falling back to the lone guide's own LFC, which would read as "passing" the
+    rule with no corroborating guide involved.'''
     results = []
     for gene in genes_series.unique():
         gene_lfc = sgrna_lfc_df[genes_series == gene].sort_values()
-        if direction == 'neg':
-            second = gene_lfc.iloc[1] if len(gene_lfc) >= 2 else gene_lfc.iloc[0]
+        n = len(gene_lfc)
+        if n >= 2:
+            second = gene_lfc.iloc[1] if direction == 'neg' else gene_lfc.iloc[-2]
+            single = False
         else:
-            second = gene_lfc.iloc[-2] if len(gene_lfc) >= 2 else gene_lfc.iloc[-1]
-        results.append({'gene': gene, 'second_best_lfc': second})
+            second = float('nan')
+            single = True
+        results.append({'gene': gene, 'second_best_lfc': second, 'single_guide': single})
     return pd.DataFrame(results)
 ```
 
-**Rule:** A high-confidence hit has second-best LFC also passing the threshold. A guide-of-one hit has only one extreme guide and should be flagged for orthogonal validation. This rule predates JACKS and is implicit in MAGeCK RRA but explicit elsewhere.
+**Rule:** A high-confidence hit has second-best LFC also passing the threshold. A guide-of-one hit has only one extreme guide and should be flagged for orthogonal validation. This rule predates JACKS and is implicit in MAGeCK RRA but explicit elsewhere. Genes with `single_guide=True` (fewer than 2 sgRNAs in the library) have no second guide to check by construction -- always send these to orthogonal validation rather than treating a NaN second-best LFC as a pass.
 
 ## Multiple-Testing Correction Conventions
 
@@ -148,6 +186,27 @@ def second_best_lfc(sgrna_lfc_df, genes_series, direction='neg'):
 | Chronos | DepMap gene-effect probability | `effect_probability` |
 
 **Reconciliation:** BF >6 in BAGEL2 corresponds to ~90% posterior probability (Hart 2017 G3, by overlap with CEGv2) and is commonly used as a stringent cutoff roughly comparable to MAGeCK FDR 0.05. Treat that equivalence as an approximate convention, not an exact calibration. drugZ FDR is per-direction; the `fdr_synth` and `fdr_supp` columns are independent BH corrections.
+
+## Correlating MAGeCK and BAGEL2 Scores (Sign/Scale Caution)
+
+`neg|score` (MAGeCK RRA) is p-value-like: smaller = more essential. `BF` (BAGEL2) is a
+log-likelihood ratio: larger = more essential. The two statistics run in opposite directions on
+the same biology. Computing Spearman rho directly between the raw columns therefore produces a
+strongly *negative* number even when the methods agree strongly -- sign-correct one column first
+(use `-neg|score`) before comparing rho to a disagreement threshold.
+
+**Worked example, real HAP1 TKOv3 T0-vs-T18 data (n=18,053 genes with both scores):**
+
+| Comparison | Spearman rho |
+|---|---|
+| `neg|score` vs `BF`, uncorrected | -0.806 |
+| `-neg|score` vs `BF`, sign-corrected | +0.806 |
+
+Both rows describe the same real agreement between MAGeCK and BAGEL2 on this screen -- only the
+sign flips. Applying a literal "rho <0.6 means disagreement" rule to the uncorrected row would
+falsely flag two methods that in fact concur strongly. Always sign-correct before comparing rho
+to a threshold, and note it in whatever you report ("rho = 0.81 after sign-correcting `neg|score`
+to make both statistics increase with essentiality").
 
 ## Order of Operations
 
@@ -232,10 +291,21 @@ def custom_zscore_hit_calling(counts_df, ctrl_cols, treat_cols, genes_series, nt
 
 ### Consensus across 3 methods is empty (no hits)
 
-**Trigger:** Either no real biology, or each method has different failure mode being triggered.
-**Mechanism:** Screen quality is low; signal-to-noise across all methods is poor.
+**Trigger:** Either no real biology, each method hits a different failure mode, or -- easy to
+overlook -- the merged files are not from the same experimental comparison.
+**Mechanism:** Screen quality is low and signal-to-noise across all methods is poor; OR each
+input file is individually valid but answers a different question (e.g. a real essentiality
+MAGeCK+BAGEL2 pair merged against a drugZ table from an unrelated drug-vs-vehicle screen run on
+the same library). `consensus_hits()` merges without error either way -- verified on real data:
+merging matched MAGeCK/BAGEL2 essentiality output with a real but unrelated drugZ drug-screen
+table produced a 0-gene Tier-1 consensus even though the underlying essentiality screen has
+100% precision against CEGv2/NEGv1 (see Input 1's numbers).
 **Symptom:** Tier 1 consensus list is empty.
-**Fix:** Re-audit QC. Check Cas9 selection, MOI, timepoint, library positioning. Re-run screen if QC fails.
+**Fix:** Check each input file's own QC first (screen-qc PR-AUC, precision/recall against
+CEGv2/NEGv1) -- a high-precision screen with an empty 3-method consensus points to a mismatched
+file, not a bad screen. `consensus_hits()`'s `_check_comparable()` warning (above) also fires
+when a pair's hit-set overlap is no better than chance, the statistical signature of a
+mismatched comparison. Only re-audit QC once a same-comparison mismatch has been ruled out.
 
 ## Quantitative Thresholds
 
@@ -252,6 +322,11 @@ def custom_zscore_hit_calling(counts_df, ctrl_cols, treat_cols, genes_series, nt
 | Tier 3 (1 method only) | Hypothesis; flag for follow-up | Multiple screens or arrayed required |
 | Second-best sgRNA rule | Second-best LFC also passes threshold | Reduces single-guide outliers |
 
+This table is the canonical source for MAGeCK-FDR/BAGEL-BF defaults: `consensus_hits()` in this
+file and `examples/consensus_hits.py` must both use FDR<0.05/BF>6 to match it. On real HAP1
+TKOv3 data, FDR<0.05/BF>6 gives 844 Tier-1 consensus genes; the looser FDR<0.1/BF>5 pairing gives
+1131 (+34%) -- pick one number, not whichever default a given script happens to hardcode.
+
 ## Common Errors
 
 | Error / symptom | Cause | Solution |
@@ -261,8 +336,9 @@ def custom_zscore_hit_calling(counts_df, ctrl_cols, treat_cols, genes_series, nt
 | drugZ output empty | Used Day 0 as control instead of vehicle | Re-run with vehicle as control |
 | Chronos errors out | Missing CN profile for cell line | Use CRISPRcleanR (unsupervised) instead |
 | Methods disagree by orders of magnitude | Quality issue or design mismatch | Re-audit QC; reconcile via tier consensus |
-| Empty tier 1 consensus | No real biology OR QC failure | Re-audit QC |
-| Single-guide-driven hits | Outlier sgRNA | Apply second-best rule; orthogonal validate |
+| Empty tier 1 consensus | No real biology, QC failure, OR merged files are not from the same experimental comparison | Check per-method QC (screen-qc) and `_check_comparable()`'s overlap-enrichment warning first; verify all inputs are the same comparison; only then re-audit QC |
+| Single-guide-driven hits, or genes with only 1 sgRNA in the library | Outlier sgRNA, or library design has no second guide to check | Apply second-best rule; treat `single_guide=True` the same as a failed check; orthogonal validate |
+| BAGEL2 BF differs between two runs on the same input | `bf` step unseeded by default (clock-derived) | Always pass `-s <fixed-int>`; see [[bagel-essentiality]] Reproducibility section |
 
 ## References
 

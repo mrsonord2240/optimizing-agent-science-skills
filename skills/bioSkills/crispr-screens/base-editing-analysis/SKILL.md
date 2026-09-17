@@ -7,7 +7,7 @@ primary_tool: CRISPResso2
 
 ## Version Compatibility
 
-Reference examples tested with: CRISPResso2 2.2.14+, BE-Hive 1.0+ (BE prediction), pandas 2.2+, biopython 1.83+, numpy 1.26+, scipy 1.12+, scikit-learn 1.4+; Broad be-validation-pipeline notebooks (repo HEAD).
+Reference examples checked against CRISPResso2 2.3.4 (2026-09-16, Docker `pinellolab/crispresso2:latest`) and BE-Hive git HEAD (maxwshen/be_predict_bystander, 2026-09-16) real output -- the parsers below assume that output schema, not the file layouts described in older CRISPResso2 docs. Also tested with pandas 2.2+, biopython 1.83+, numpy 1.26+, scipy 1.12+, scikit-learn 1.4+; Broad be-validation-pipeline notebooks (repo HEAD).
 
 Before using code patterns, verify installed versions match. If versions differ:
 - CLI: `CRISPResso --version`
@@ -21,8 +21,45 @@ If code throws ImportError, AttributeError, or TypeError, introspect the install
 
 - CLI: `CRISPResso --base_editor_output` for per-amplicon BE quantification
 - CLI: Broad `be-validation-pipeline` for end-to-end pooled-screen analysis with editing-efficiency filtering
-- Python: `BE-Hive` (Arbab 2020) for editing-efficiency prediction; clone maxwshen/be_predict_bystander and import via sys.path
+- Python: `BE-Hive` (Arbab 2020) for editing-efficiency prediction; clone maxwshen/be_predict_bystander and import via sys.path -- see worked example below
 - Web: `BE-Designer` (Hwang 2018, RGEN Tools) for variant-encoding sgRNA design
+
+## BE-Hive Editing-Efficiency Prediction
+
+BE-Hive (`be_predict_bystander`) takes a fixed **50nt substrate**, not the bare 20nt spacer:
+19nt of upstream context + the 20nt spacer + the 3nt PAM + 8nt of downstream context
+(`-19..30` in the README's own numbering; spacer occupies substrate positions 1-20 of that
+window, PAM at 21-23). Getting the upstream-context length wrong by even 1nt silently
+shifts every predicted position by one base with no error -- checked on this Skill's own
+worked example, verified via BE-Hive's own `pred_df` diagnostic field.
+
+```python
+import sys
+sys.path.append("/path/to/be_predict_bystander/..")  # parent dir of the cloned repo
+from be_predict_bystander import predict as bystander_model
+
+spacer = "TGATCACGTAGCATGCACGT"  # 20nt
+pam = "TGG"
+upstream_19nt = "ATGCATGGATCGTAGCTAG"    # 19nt of real genomic context immediately 5' of the spacer
+downstream_8nt = "CATGCTAG"              # 8nt of real genomic context immediately 3' of the PAM
+substrate = upstream_19nt + spacer + pam + downstream_8nt
+assert len(substrate) == 50
+
+bystander_model.init_model(base_editor="BE4", celltype="mES")  # celltype in {'mES','HEK293','U2OS',...}
+pred_df, stats = bystander_model.predict(substrate)
+
+# Always cross-check BE-Hive's own read-back against the intended spacer before trusting
+# pred_df's position-labeled columns (e.g. 'C4', 'C6') -- a wrong substrate length or
+# offset produces a plausible-looking but silently mis-positioned prediction.
+assert substrate[19:39] == spacer, "substrate/spacer offset is wrong -- check upstream context length"
+print(stats["Total predicted probability"])
+print(pred_df.sort_values("Predicted frequency", ascending=False).head(10))
+```
+
+Checked on BE-Hive git HEAD (maxwshen/be_predict_bystander, 2026-09-16) against a synthetic guide
+with a known target C at spacer position 5 and bystander C at spacer position 7: `pred_df`'s `C4`/`C6`
+columns (BE-Hive's own 0-indexed-from-position-4 editable-C naming) correctly identified both, and
+`Total predicted probability` was 0.97-0.98 (not a stub, not all-zero).
 
 ## Base Editor Chemistry Selection
 
@@ -115,7 +152,15 @@ def find_be_spacers(cds_sequence, cds_protein_start, target_aa, target_base='C',
             target_codon_end = target_codon_start + 3
             target_position_in_spacer = []
             for i in edit_bases_in_window:
-                genomic_pos = spacer_start + i - 1
+                pos_in_seq = spacer_start + i - 1  # 0-indexed position within `seq` (strand-specific)
+                # For strand '-', `seq` is the reverse complement of cds_sequence; convert
+                # back to forward-CDS coordinates before comparing against target_codon_start/
+                # end, which are always forward-strand. Without this, reverse-strand spacers
+                # silently misattribute target vs bystander (verified: a hand-constructed
+                # reverse-strand case with a known on-target C was called "bystander" by the
+                # unconverted math, and the audit's own random-CDS run produced an on-target
+                # call 65nt from the true codon).
+                genomic_pos = (len(cds_sequence) - 1 - pos_in_seq) if strand == '-' else pos_in_seq
                 if target_codon_start <= genomic_pos < target_codon_end:
                     target_position_in_spacer.append(i)
             bystander_positions = [i for i in edit_bases_in_window if i not in target_position_in_spacer]
@@ -141,7 +186,9 @@ def find_be_spacers(cds_sequence, cds_protein_start, target_aa, target_base='C',
 ```python
 def filter_by_editing_efficiency(crispresso_outputs_dir, target_pos, target_base, efficiency_threshold=0.5):
     '''Drop sgRNAs that edit <efficiency_threshold of reads at target position.
-    crispresso_outputs_dir: directory containing CRISPResso per-sample outputs.'''
+    crispresso_outputs_dir: directory containing CRISPResso per-sample outputs.
+    target_pos: 1-indexed position WITHIN THE QUANTIFICATION WINDOW, in column
+    order -- CRISPResso2 does not emit a literal "Position" column.'''
     from pathlib import Path
     results = []
     for sample_dir in Path(crispresso_outputs_dir).glob('CRISPResso_on_*'):
@@ -149,14 +196,23 @@ def filter_by_editing_efficiency(crispresso_outputs_dir, target_pos, target_base
         quant_file = sample_dir / 'Quantification_window_nucleotide_percentage_table.txt'
         if not quant_file.exists():
             continue
-        df = pd.read_csv(quant_file, sep='\t')
-        # Find target position in the quantification window
-        target_row = df[df['Position'] == target_pos]
-        if target_row.empty:
-            continue
-        # Editing = sum of non-original bases at target position
-        original_pct = target_row[target_base].values[0]
-        editing_pct = (100 - original_pct) / 100
+        # Real CRISPResso2 2.3.4 file layout (verified against actual output, not
+        # assumed): rows are nucleotide identity (A/C/G/T/N/-, the index column);
+        # columns are one per window position, header-labeled with the REFERENCE
+        # base at that position (so headers repeat -- pandas suffixes duplicates
+        # .1/.2/... -- select columns positionally, not by label). Values are
+        # FRACTIONS in [0, 1], not 0-100, despite the filename.
+        df = pd.read_csv(quant_file, sep='\t', index_col=0)
+        # Schema check: fail loudly and specifically on drift instead of a bare
+        # KeyError deep in a groupby/indexing call.
+        if target_base not in df.index:
+            raise ValueError(f"target_base={target_base!r} not in table rows {list(df.index)} ({quant_file}); "
+                              "unexpected CRISPResso2 Quantification_window_nucleotide_percentage_table.txt schema")
+        if not (1 <= target_pos <= df.shape[1]):
+            raise ValueError(f"target_pos={target_pos} out of range for a {df.shape[1]}-position "
+                              f"quantification window in {quant_file}")
+        original_frac = df.loc[target_base].iloc[target_pos - 1]
+        editing_pct = 1 - original_frac
         results.append({'sgrna_id': sgrna_id, 'editing_pct': editing_pct,
                          'pass_filter': editing_pct >= efficiency_threshold})
     return pd.DataFrame(results)
@@ -183,11 +239,19 @@ def deconvolute_bystander(allele_table_path, target_pos, bystander_pos_list):
     '''From CRISPResso2 allele table, partition reads by edit pattern at target + bystanders.
     Returns: per-pattern frequency for each combination of target/bystander edits.'''
     alleles = pd.read_csv(allele_table_path, sep='\t', compression='zip')
+    required_cols = {'Aligned_Sequence', 'Reference_Sequence', '%Reads'}
+    missing = required_cols - set(alleles.columns)
+    if missing:
+        raise ValueError(f"Unexpected Alleles_frequency_table schema: missing {missing}; "
+                          f"got columns {list(alleles.columns)}")
     # Mark target_edited and per-bystander_edited
     alleles['target_edited'] = alleles['Aligned_Sequence'].str[target_pos-1] != alleles['Reference_Sequence'].str[target_pos-1]
     for bp in bystander_pos_list:
         alleles[f'bystander_{bp}_edited'] = alleles['Aligned_Sequence'].str[bp-1] != alleles['Reference_Sequence'].str[bp-1]
-    return alleles.groupby(['target_edited'] + [f'bystander_{bp}_edited' for bp in bystander_pos_list])['Reference_pct'].sum().reset_index()
+    # Real Alleles_frequency_table.zip has no 'Reference_pct' column -- the
+    # per-allele read-fraction column is '%Reads' (verified against actual
+    # CRISPResso2 2.3.4 output).
+    return alleles.groupby(['target_edited'] + [f'bystander_{bp}_edited' for bp in bystander_pos_list])['%Reads'].sum().reset_index()
 ```
 
 ## Hit Calling for Variant-Function Screens
@@ -199,8 +263,14 @@ def deconvolute_bystander(allele_table_path, target_pos, bystander_pos_list):
 ```python
 def aggregate_variant_scores(mageck_sgrna_summary, variant_annotation_df):
     '''Aggregate sgRNA-level scores to per-variant scores.
-    variant_annotation_df: per-sgRNA -> predicted variants (target + bystanders).'''
-    df = mageck_sgrna_summary.merge(variant_annotation_df, on='sgRNA')
+    variant_annotation_df: per-sgRNA -> predicted variants (target + bystanders),
+    keyed on the same sgRNA-identifier column name as mageck_sgrna_summary.
+    MAGeCK's real sgrna_summary.txt column is lowercase 'sgrna' (not 'sgRNA') --
+    build variant_annotation_df with that same column name.'''
+    for _name, _frame in (('mageck_sgrna_summary', mageck_sgrna_summary), ('variant_annotation_df', variant_annotation_df)):
+        if 'sgrna' not in _frame.columns:
+            raise ValueError(f"{_name} is missing the 'sgrna' merge column (got {list(_frame.columns)})")
+    df = mageck_sgrna_summary.merge(variant_annotation_df, on='sgrna')
     # Target-only contribution: sgRNAs with no bystanders
     target_only = df[df['n_bystanders'] == 0]
     target_only_scores = target_only.groupby('target_variant')['LFC'].agg(['mean', 'std', 'count'])

@@ -208,7 +208,7 @@ bcftools annotate --rename-chrs rename.txt input.vcf.gz -Oz -o renamed.vcf.gz
 bcftools csq -p a -f reference.fa -g genes.gff3.gz input.vcf.gz -Oz -o consequences.vcf.gz
 ```
 
-`csq` defaults to `-p r` (require phased genotypes) and exits with "Unphased heterozygous genotype" on ordinary calls. `-p a` assumes every het is in cis, so nearby hets in one transcript are merged into one haplotype consequence (a frameshift can absorb a downstream stop, shown as `@POS`); `-p m` merges only phased hets; `-p s` treats unphased hets as separate haplotypes.
+`csq` defaults to `-p r` (require phased genotypes) and exits with "Unphased heterozygous genotype" on ordinary calls. Per `bcftools csq` help (checked on 1.24 and 1.21): `-p a` takes GTs as is, creating haplotypes regardless of phase (0/1 -> 0|1), so nearby hets in one transcript are merged into one haplotype consequence (a frameshift can absorb a downstream stop, shown as `@POS`); `-p m` merges *all* GTs into a single haplotype regardless of phase (0/1 -> 1, 1/2 -> 1) -- in testing this merged a trans-phased frameshift and stop into one consequence; `-p R` creates non-reference haplotypes where possible; `-p s` skips unphased hets entirely, emitting no consequence for them. Recommend `-p a` for typically-unphased short-read data.
 
 ### Output Format
 

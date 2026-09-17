@@ -94,7 +94,7 @@ Tell your AI agent what you want to do:
 - For viruses and ancient DNA, verify temporal signal (positive root-to-tip slope plus a passing date-randomization test) before any dating run; short-time-span data often have none.
 - Check the coefficient of variation / `ucld.stdev`: abutting zero means a strict clock suffices; clearly above zero means the relaxed clock is doing necessary work.
 - Prefer the fossilized birth-death process when several fossils are available; it uses all of them coherently instead of multiplying ad hoc node densities.
-- If credible intervals do not shrink as you add sequence data, you are at the calibration floor: invest in better fossils, not more sites (check the MCMCTree infinite-sites plot).
+- If credible intervals do not shrink as you add sequence data, you are at the calibration floor: invest in better fossils, not more sites (check the MCMCTree infinite-sites plot with `examples/infinite_sites_plot.py`).
 - TreePL and r8s give point estimates only; cross-validate the smoothing parameter and bootstrap for confidence intervals, and never report a bare PL date.
 - Always run at least two independent chains; agreement between chains is the most reliable convergence diagnostic, with ESS > 200 on every reported parameter.
 - For deep divergences, watch for substitution saturation; use slower markers, amino acids, or codon models and check that per-partition branch lengths are reliable before trusting MCMCTree.

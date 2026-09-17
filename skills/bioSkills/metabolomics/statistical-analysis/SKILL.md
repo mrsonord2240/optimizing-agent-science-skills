@@ -67,11 +67,22 @@ van den Berg 2006: on real data autoscale and range recovered biologically meani
 
 ```r
 library(ropls)
+# feature_matrix must be NA-free (opls() does not tolerate missingness) -- impute upstream,
+# see metabolomics/normalization-qc; a real LC-MS peak table is rarely NA-free on its own.
 # scaleC default is "standard" (unit-variance/autoscale), NOT Pareto -- set explicitly
 pca <- opls(t(feature_matrix), scaleC = 'pareto', fig.pdfC = 'none', info.txtC = 'none')
 scores <- getScoreMN(pca)               # samples x components
 getSummaryDF(pca)                       # R2X(cum) per component
 # Tight pooled-QC clustering in the center = trustworthy run; QC scatter = analytical variance dominates
+
+# Hotelling T2 multivariate outlier check (ropls exposes no ready accessor for this --
+# pca@suppLs$outlierDF is NULL for a plain PCA fit; compute it directly from the scores):
+A <- ncol(scores); N <- nrow(scores)
+lambda <- apply(scores, 2, function(col) sum(col^2) / (N - 1))     # per-component variance
+t2 <- rowSums(sweep(scores^2, 2, lambda, '/'))                     # per-sample Hotelling T2
+t2_crit95 <- A * (N - 1) / (N - A) * qf(0.95, A, N - A)            # 95% F-based critical value
+outliers <- rownames(scores)[t2 > t2_crit95]                       # samples beyond the ellipse
+# For a plotted version instead: plot(pca, typeVc = 'outlier') (score + orthogonal distance plot).
 ```
 
 ## Permutation-Validated PLS-DA / OPLS-DA
@@ -83,10 +94,33 @@ getSummaryDF(pca)                       # R2X(cum) per component
 ```r
 library(ropls)
 group <- factor(sample_info$group)
+
+# ropls's own cross-validated significance test on the first predictive component can
+# reject it and silently return a 0-row summaryDF / empty model -- with info.txtC='none'
+# this produces NO warning or error, yet class(model) still reads "opls" and getVipVn()
+# returns a length-0 vector instead of erroring. Measured at ~40% of runs in a p>>n
+# metabolomics-shaped regime (n=40, p=300); ALWAYS check nrow(getSummaryDF()) before
+# trusting a fit. See "OPLS-DA silently returns an empty model" in Common Errors.
+fit_discriminant_guarded <- function(x, y, scaleC, permI = 1000, crossvalI = 7) {
+    m <- opls(x, y, predI = 1, orthoI = NA, scaleC = scaleC, permI = permI,
+              crossvalI = crossvalI, fig.pdfC = 'none', info.txtC = 'none')
+    if (nrow(getSummaryDF(m)) > 0) return(list(model = m, type = 'OPLS-DA'))
+    # Empty OPLS-DA: fall back to PLS-DA (orthoI=0), which has identical predictive power
+    # (see below) and does not carry the same orthogonal-component significance gate --
+    # verified 0/30 failures on both signal-bearing and pure-noise synthetic data at this
+    # n/p (see the Skill's fix log).
+    m2 <- opls(x, y, predI = 1, orthoI = 0, scaleC = scaleC, permI = permI,
+               crossvalI = crossvalI, fig.pdfC = 'none', info.txtC = 'none')
+    if (nrow(getSummaryDF(m2)) > 0) return(list(model = m2, type = 'PLS-DA (OPLS-DA fallback)'))
+    stop('Neither OPLS-DA nor the PLS-DA fallback produced a usable model: the first ',
+         'predictive component was not significant under ropls\' own cross-validated ',
+         'criterion. Report that no multivariate separation was detected -- do not force a model.')
+}
+
 # OPLS-DA: 1 predictive + auto orthogonal; permI default 20 is too few for a reliable pQ2 -> >=1000
-oplsda <- opls(t(feature_matrix), group, predI = 1, orthoI = NA,
-               scaleC = 'pareto', permI = 1000, crossvalI = 7,
-               fig.pdfC = 'none', info.txtC = 'none')
+fit <- fit_discriminant_guarded(t(feature_matrix), group, scaleC = 'pareto', permI = 1000)
+oplsda <- fit$model
+cat('Model type actually fit:', fit$type, '\n')   # report this -- it is not always OPLS-DA
 summ <- getSummaryDF(oplsda)            # R2X(cum), R2Y(cum), Q2(cum), pre, ort, pR2Y, pQ2
 vip_pred <- getVipVn(oplsda)            # predictive VIP (Galindo-Prieto 2014); orthoL=TRUE for orthogonal
 # Claim is licensed only if Q2 high AND pQ2 small. R2Y alone proves nothing.
@@ -186,10 +220,21 @@ plt.xlabel('log2 fold change'); plt.ylabel('-log10(p)')
 | BH FDR < 0.05 | Benjamini-Hochberg | Expected false-positive proportion among rejections; the metabolomics discovery default |
 | \|log2FC\| > 1 | convention | 2-fold; effect-size gate orthogonal to the p-value, mandatory in p>>n |
 
+## When Not to Use
+
+This Skill answers cohort/group-level statistical questions only: does a metabolite differ
+between groups, is a discriminant model real, how many independent signals does a hit list
+represent. It does not interpret a single patient's result or recommend treatment (e.g. "my
+patient's homocysteine is elevated, should they take folate?") -- decline and redirect to the
+patient's treating clinician; offer to run the equivalent cohort-level question instead (e.g.
+"is homocysteine significantly elevated in my case/control cohort after BH FDR, and what's the
+effect size?") if one exists.
+
 ## Common Errors
 
 | Error / symptom | Cause | Solution |
 |-----------------|-------|----------|
+| OPLS-DA silently returns an empty model (`getSummaryDF()` has 0 rows, `getVipVn()` returns length 0, no warning even under `options(warn=1)`) | `orthoI = NA`'s internal CV significance test rejected the first predictive component; `info.txtC = 'none'` suppresses the message that would otherwise say so (observed in ~40% of runs at n=40/p=300) | Use the `fit_discriminant_guarded()` pattern above: check `nrow(getSummaryDF(m)) > 0`, fall back to PLS-DA (`orthoI = 0`) if empty, and `stop()` loudly if that also fails -- never read R2/Q2/VIP off an unchecked fit |
 | Model "significant" yet noise | `permI = 20` (ropls default) | Set `permI >= 1000`; read `pQ2`/`pR2Y` from `getSummaryDF` |
 | Wrong scaling shipped silently | `scaleC` default is `"standard"` (UV), not Pareto | Set `scaleC = 'pareto'` (or the intended scaling) explicitly; report it |
 | PLS-DA vs OPLS-DA "function not found" | type is set by `orthoI`, not a separate function | `orthoI = 0` -> PLS; `orthoI = NA` -> OPLS; `predI = 1` for 2-class |

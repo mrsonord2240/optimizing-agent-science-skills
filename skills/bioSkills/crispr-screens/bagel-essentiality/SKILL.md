@@ -33,6 +33,7 @@ If code throws ImportError, AttributeError, or TypeError, introspect the install
 3. For each sgRNA, compute the log-likelihood ratio: `log( P(LFC | gene is essential) / P(LFC | gene is non-essential) )`. The numerator and denominator are KDEs (kernel density estimates) of LFC distributions from CEGv2 and NEGv1 reference sgRNAs.
 4. Sum per-gene log-likelihood ratios across all sgRNAs targeting the gene -> per-gene Bayes Factor.
 5. Resampling for the confidence interval (default: 10-fold cross-validation; `-b` switches to bootstrapping with `-NB`, default 1000); BF >6 corresponds to ~90% posterior probability (Hart 2017 G3); ~5% FDR by BAGEL convention.
+6. **Resampling is randomized and BAGEL.py seeds it from the clock by default -- always pass `-s <fixed-int>`.** See "Reproducibility: Fixing the Random Seed" below; this is required for any result described as publication- or clinical-grade.
 
 **Critical BAGEL2 improvements over BAGEL1:**
 
@@ -68,11 +69,19 @@ cd bagel
 
 BAGEL.py fc \
     -i counts.txt \
-    -o foldchange \                        # NOTE: -o is a LABEL for fc; writes foldchange.foldchange
-    -c Plasmid \                           # control sample (or Day 0)
-    --min-reads 30                         # default is 0; 30 is a common convention
+    -o foldchange \
+    -c Plasmid \
+    --min-reads 30
+# -o is a LABEL for fc, not a file path; writes foldchange.foldchange
+# -c: control sample (or Day 0); --min-reads: default is 0, 30 is a common convention
 # Output: foldchange.foldchange (per-sgRNA LFCs) and foldchange.normed_readcount
 ```
+
+**Trap, verified directly: a trailing `# comment` after a line-continuation `\` breaks
+the shell.** Comments must go on their own line (as above), not appended after a `\`
+that continues to another `-flag` line -- `bash` stops treating the rest of the
+pipeline as one command as soon as a `#` follows the escaped space, and every
+subsequent `-flag` line then runs as its own (nonexistent) command.
 
 ## Compute Bayes Factors
 
@@ -84,10 +93,14 @@ BAGEL.py fc \
 BAGEL.py bf \
     -i foldchange.foldchange \
     -o bayes_factor.txt \
-    -e CEGv2.txt \                         # essentials reference (CEGv2)
-    -n NEGv1.txt \                          # non-essentials reference
-    -c Sample1,Sample2,Sample3 \            # treatment samples to score
-    -b -NB 1000                            # opt into bootstrapping (default is 10-fold cross-validation)
+    -e CEGv2.txt \
+    -n NEGv1.txt \
+    -c Sample1,Sample2,Sample3 \
+    -s 42 \
+    -b -NB 1000
+# -e/-n: essentials/non-essentials reference; -c: treatment samples to score
+# -s: fixed seed -- required for reproducible calls, see "Reproducibility" below
+# -b -NB 1000: opt into bootstrapping (default is 10-fold cross-validation)
 # Output: bayes_factor.txt - per-gene Bayes Factor + CI
 ```
 
@@ -97,10 +110,47 @@ BAGEL.py bf \
 |--------|---------|
 | `GENE` | Gene symbol |
 | `BF` | Per-gene Bayes Factor (log-likelihood ratio summed across sgRNAs) |
-| `STD` | Standard deviation across the 10 cross-validation folds (or bootstrap iterations with `-b`) |
-| `NumObs` | Number of sgRNAs contributing |
+| `STD` | Standard deviation across the 10 cross-validation folds (or bootstrap iterations with `-b`) -- **only present when `-b` is given** |
+| `NumObs` | Number of sgRNAs contributing -- **only present when `-b` is given** |
 
-**Interpretation rule:** BF >6 corresponds to ~90% posterior probability of essentiality against CEGv2 (Hart 2017; FDR ≤3% in that calibration, with ~5% a looser BAGEL convention); higher BF = stronger evidence the gene is essential. BAGEL2 also reports negative BFs which can indicate tumor suppressors (positive selection).
+Verified directly (build 115): a CV-default run (no `-b`) writes a 2-column `GENE\tBF`
+file; only `-b` adds `STD`/`NumObs`. If you need the STD diagnostic for guide-quality
+triage, you must opt into bootstrap -- `-b -NB 1000` takes roughly 20-25 minutes at
+genome scale (18k+ genes); the CV default runs in well under a minute but has no STD
+column.
+
+**Interpretation rule:** BF >6 corresponds to ~90% posterior probability of essentiality against CEGv2 (Hart 2017; FDR ≤3% in that calibration, with ~5% a looser BAGEL convention); higher BF = stronger evidence the gene is essential. BAGEL2 also reports negative BFs which can indicate tumor suppressors (positive selection) -- see "Interpret BAGEL2 Results" below for when that call is actually defensible.
+
+## Reproducibility: Fixing the Random Seed
+
+**BAGEL.py's resampling (both cross-validation and bootstrap) is seeded from the clock
+by default** (`-s` defaults to `int(time.time()*100000 % 100000)`, undocumented in
+SKILL.md, usage-guide.md or `run_bagel2.sh` before this fix) -- every unseeded run
+produces different Bayes Factors. Verified on real HAP1 TKOv3 data (build 115): two
+identical, unseeded `bf` invocations differed by up to 26.7 BF and **flipped 33 of
+18,053 genes across the BF>6 essential/non-essential threshold**; re-running the
+comparison with `sort`+`diff`, 18,026/18,053 rows differed between the two runs.
+
+**Fix:** always pass `-s <fixed-integer>` and record the value used for any
+publication- or clinical-grade call.
+
+```bash
+BAGEL.py bf -i foldchange.foldchange -o bayes_factor.txt \
+    -e CEGv2.txt -n NEGv1.txt -c Sample1,Sample2,Sample3 \
+    -s 42                                   # fixed seed -- record this value
+```
+
+Verified directly: two `bf` runs against identical inputs with `-s 42` produced a
+byte-identical `bayes_factor.txt` (`diff` clean across all 18,053 genes).
+
+**Trap, verified against build 115: `-s` is declared twice in BAGEL.py's own CLI** --
+once for `-s/--use-small-sample` (a flag) and once for `-s/--seed` (an integer).
+`BAGEL.py bf --help` prints both and warns `The parameter -s is used more than once`;
+passing `-s <int>` binds to `--seed` (the later-declared option wins in Click's
+parser) -- confirmed by running `-s 42` and inspecting the resulting fold-assignment
+log and byte-identical rerun, not just by reading `--help`. This is BAGEL.py's own
+bug, not this Skill's; verify with `--help` before relying on it in an environment
+running a different BAGEL2 build.
 
 ## Precision-Recall Curve
 
@@ -132,31 +182,73 @@ BAGEL.py pr \
 
 **Goal:** Stratify genes into essential, non-essential, and tumor-suppressor categories.
 
-**Approach:** Apply BF threshold to classify; flag negative BF as candidate tumor suppressors.
+**Approach:** Apply BF threshold to classify essentials; only classify negative-BF genes as tumor suppressors when the screen design actually expects enrichment (see Failure Modes below) -- verified on real HAP1 TKOv3 data (a dropout screen) that skipping this guard flags **86.5% of the genome** as tumor-suppressor, with three assay-control pseudo-genes (`LacZ`, `luciferase`, `EGFP`) as the top hits.
 
 ```python
 import pandas as pd
+import warnings
 
-def interpret_bagel(bf_path, bf_essential=6, bf_tumor_suppressor=-6):
-    '''Classify genes from BAGEL2 BF output.'''
+# Assay-control pseudo-genes spiked into CRISPR libraries (never real biology) --
+# verified present and dominating the naive tumor-suppressor call on real HAP1 TKOv3
+# output; extend this set to match your library's own controls.
+ASSAY_CONTROLS = {'LacZ', 'luciferase', 'EGFP'}
+
+def interpret_bagel(bf_path, bf_essential=6, bf_tumor_suppressor=-6,
+                     screen_type='dropout', control_genes=ASSAY_CONTROLS,
+                     tumor_suppressor_frac_warn=0.05):
+    '''Classify genes from BAGEL2 BF output.
+
+    screen_type: 'dropout' (default) only calls `essential`. Tumor-suppressor calls
+    require screen_type='enrichment' or 'both' -- per the Failure Modes section below,
+    a pure dropout screen's negative-BF genes are noise, not tumor suppressors.
+    '''
     df = pd.read_csv(bf_path, sep='\t')
+    df = df[~df['GENE'].isin(control_genes)].copy()   # drop assay-control pseudo-genes
     df['call'] = 'neutral'
     df.loc[df['BF'] > bf_essential, 'call'] = 'essential'
-    df.loc[df['BF'] < bf_tumor_suppressor, 'call'] = 'tumor_suppressor'
+    if screen_type in ('enrichment', 'both'):
+        df.loc[df['BF'] < bf_tumor_suppressor, 'call'] = 'tumor_suppressor'
+        frac = (df['call'] == 'tumor_suppressor').mean()
+        if frac > tumor_suppressor_frac_warn:
+            warnings.warn(
+                f"{frac:.1%} of genes flagged tumor_suppressor -- implausibly high; "
+                "this usually means a dropout-only screen is being scored for "
+                "enrichment. Re-check screen_type and BF<-6 calls against literature "
+                "before reporting."
+            )
     return df.sort_values('BF', ascending=False)
 ```
 
-**Tumor suppressor identification:** Genes with significantly negative BF (e.g., <-6) are enriched in the screen, indicating fitness advantage from their loss. This is biologically distinct from "non-essential" and may indicate tumor-suppressor function. BAGEL1 could not detect this; BAGEL2's linear extrapolation enables it.
+Verified on real HAP1 TKOv3 data (a T0-vs-T18 dropout screen): the default
+(`screen_type='dropout'`) returns 0 tumor-suppressor calls and excludes the 3 control
+pseudo-genes; explicit `screen_type='enrichment'` still surfaces the true tumor
+suppressors TSC1/TSC2 as the two most-negative-BF entries (now that the control genes
+that previously masked them are excluded) but raises the 86.6%-flagged warning so the
+caller doesn't report it uncritically.
+
+**Tumor suppressor identification:** Genes with significantly negative BF (e.g., <-6) in a screen actually designed to detect enrichment (drug-resistance, GoF) indicate fitness advantage from their loss. This is biologically distinct from "non-essential" and may indicate tumor-suppressor function. BAGEL1 could not detect this; BAGEL2's linear extrapolation enables it. **Do not call tumor suppressors from a pure dropout screen** -- see Failure Modes.
 
 ## Bayesian Reasoning Per Sgrna
 
 **Why this matters:** BAGEL2 computes per-sgRNA contributions; a gene with 4 sgRNAs each contributing +5 to BF gets +20 total. A gene with 3 sgRNAs contributing +5 and 1 sgRNA contributing -3 (off-target or low-efficacy) gets +12 net.
 
-```python
-# Per-sgRNA contributions for diagnosis
-# Output table: each sgRNA's LLR contribution to gene-level BF
-# Useful for identifying low-efficacy guides
+**Approach:** Add `-r/--sgrna-bayes-factors` to the `bf` command -- this flag is not
+mentioned elsewhere in this Skill but is required to get per-sgRNA output; found via
+`BAGEL.py bf --help`, not documented upstream either.
+
+```bash
+BAGEL.py bf \
+    -i foldchange.foldchange \
+    -o bayes_factor_sgrna.txt \
+    -e CEGv2.txt -n NEGv1.txt \
+    -c Sample1,Sample2,Sample3 \
+    -s 42 -r                               # -r: per-sgRNA BF contributions
+# Output columns: RNA  GENE  <sample columns>  BF  (one row per sgRNA)
 ```
+
+Verified on real HAP1 TKOv3 data: for RPS3 (the example gene below), the 4 per-sgRNA
+BF values summed to 78.9 against a gene-level BF of 80.8 (within 2.4%), confirming the
+additive-LLR model this section describes.
 
 **Critical:** When per-sgRNA contributions are very heterogeneous (one sgRNA dominates BF), the gene is "guide-of-one"; verify with JACKS efficiency analysis or apply the second-best-sgRNA rule from [[hit-calling]].
 
@@ -176,12 +268,15 @@ def interpret_bagel(bf_path, bf_essential=6, bf_tumor_suppressor=-6):
 
 ## Failure Modes
 
-### BAGEL2 returns no hits despite known essentials
+### BAGEL2 returns no hits, crashes, or silently corrupts output on a bad reference set
 
-**Trigger:** Wrong reference gene set file; CEGv2 or NEGv1 file may have wrong format or be missing genes.
-**Mechanism:** BAGEL2 trains KDEs on the reference; if references are not representative, KDE separation is poor and no gene has BF >6.
-**Symptom:** Median BF near zero; no genes >6 even at low FDR.
-**Fix:** Re-download CEGv2 / NEGv1 from https://github.com/hart-lab/bagel. Verify gene symbols match the screen's annotation.
+**Trigger:** Wrong reference gene set file -- species mismatch, thin/unrepresentative reference, or `-e`/`-n` swapped.
+**Mechanism:** The actual failure mode depends on *how* the reference is wrong, verified directly against three concrete misconfigurations (not one uniform symptom):
+- **Species mismatch** (e.g., a mouse CEG file against a human screen): hard crash, `ValueError: dataset input should have multiple elements` (`scipy.stats.gaussian_kde`) -- not a silent "no hits" run.
+- **`-e`/`-n` arguments swapped** (an easy transcription mistake, not covered anywhere else in this Skill): `BAGEL.py bf` exits 0 and writes a complete-looking `bayes_factor.txt`, but **every gene's `BF` is the literal string `nan`** -- verified across all 18,053 genes on real data, no warning surfaced to the user.
+- **Genuinely thin/unrepresentative reference** (too few genes, weak KDE separation): the "median BF near zero, no genes >6" symptom below does apply here.
+**Symptom:** Depends on failure type -- hard crash (species mismatch), all-`nan` BF column (swapped `-e`/`-n`), or median BF near zero with no genes >6 (thin/unrepresentative reference).
+**Fix:** Re-download CEGv2 / NEGv1 from https://github.com/hart-lab/bagel. Verify gene symbols match the screen's annotation. Before trusting a "no hits" reading, check `bayes_factor.txt` for an all-`nan` `BF` column -- that means `-e`/`-n` were swapped, not that the screen is flat.
 
 ### BAGEL2 calls negative-LFC genes "tumor suppressors"
 
@@ -220,6 +315,7 @@ def interpret_bagel(bf_path, bf_essential=6, bf_tumor_suppressor=-6):
 | Ultra-stringent call | BF >30 | BAGEL convention |
 | BF for tumor-suppressor candidate | <-6 | Empirical; verify with orthogonal screen |
 | Resampling | 10-fold cross-validation (default); `-b -NB 1000` to bootstrap | BAGEL2 default |
+| Seed for reproducible/publication-grade calls | `-s <fixed-int>`, always | Unseeded runs flip up to 33/18,053 gene calls at BF>6 (verified on HAP1 TKOv3, build 115) |
 | Min reads per sgRNA in control | 30 | Convention; the BAGEL2 default is 0 |
 | Min sgRNAs per gene for stable BF | 4-6 | Wider with library convention |
 
@@ -228,9 +324,11 @@ def interpret_bagel(bf_path, bf_essential=6, bf_tumor_suppressor=-6):
 | Error / symptom | Cause | Solution |
 |-----------------|-------|----------|
 | No hits despite essentials present | Wrong reference set | Re-verify CEGv2 / NEGv1 files |
+| Every gene's `BF` is `nan` | `-e`/`-n` arguments swapped | Check argument order against the Output columns example; re-run |
+| Different BF/hit list on a rerun with identical inputs | No `-s` seed given (BAGEL.py defaults to a clock-based seed) | Always pass `-s <fixed-int>`, see Reproducibility section |
 | Wide resampling CI | Too few sgRNAs/gene | Increase library coverage; bootstrap with more iterations |
 | Negative BF for known essentials | Confounding factor (e.g., CN amplification) | Pre-correct with CRISPRcleanR / Chronos |
-| Tumor suppressor calls don't validate | Pure dropout screen; enrichment is noise | Restrict tumor suppressor calls to expected design |
+| Tumor suppressor calls don't validate | Pure dropout screen; enrichment is noise | Only call `interpret_bagel(..., screen_type='enrichment')` on screens actually expecting enrichment |
 | Per-sgRNA LLR dominated by one guide | Outlier or off-target | Apply second-best-sgRNA rule |
 
 ## References

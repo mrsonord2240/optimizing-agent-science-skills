@@ -7,7 +7,7 @@ primary_tool: CRISPResso2
 
 ## Version Compatibility
 
-Reference examples tested with: CRISPResso2 2.2.14+ (pinellolab/CRISPResso2), pandas 2.2+, numpy 1.26+, matplotlib 3.8+.
+Reference examples checked on CRISPResso2 2.3.4 (pinellolab/crispresso2 Docker image), pandas 2.2+, numpy 1.26+, matplotlib 3.8+.
 
 Before using code patterns, verify installed versions match. If versions differ:
 - CLI: `CRISPResso --version`; `CRISPRessoBatch --help`; `CRISPRessoPooled --help`; `CRISPRessoWGS --help`; `CRISPRessoCompare --help`
@@ -92,6 +92,12 @@ CRISPResso \
 #   sample_results/<name>/4b.<ref>.Insertion_deletion_substitution_locations.pdf
 #   (PDF by default; add --save_also_png for PNG)
 ```
+
+**`--min_average_read_quality` changes the reported editing percentage** -- it is a real filter, not a
+neutral default. On one real test amplicon it dropped aligned reads 235->221 and shifted Modified% from
+26.38% to 24.89%. Always report the retained-read fraction (`READS ALIGNED` / `READS IN INPUTS` after
+filtering, from `CRISPResso_mapping_statistics.txt`) alongside the editing percentage so a reader can see
+how much filtering happened.
 
 **Key outputs:**
 
@@ -226,12 +232,20 @@ CRISPRessoPooled \
     --fastq_r2 pooled_R2.fastq.gz \
     --amplicons_file amplicons.txt \
     --output_folder pooled_run \
+    --min_reads_to_use_region 100 \                          # see note below
     --n_processes 8
 
 # Outputs:
 #   pooled_run/SAMPLES_QUANTIFICATION_SUMMARY.txt
 #   pooled_run/CRISPResso_on_<amplicon>/ for each amplicon
 ```
+
+**`--min_reads_to_use_region` defaults to 1000.** Any amplicon with fewer aligned reads than this is silently
+skipped -- CRISPRessoPooled still exits 0 and writes a complete-looking `SAMPLES_QUANTIFICATION_SUMMARY.txt`,
+but every field for that amplicon is `NA` (confirmed: a real 2-amplicon, ~250-reads/amplicon pilot pool --
+exactly the "arrayed validation pool" use case this mode is for -- returns all-NA at the default). Set
+`--min_reads_to_use_region` below the expected per-amplicon read depth for pilot/validation-scale pools.
+Always check `SAMPLES_QUANTIFICATION_SUMMARY.txt` for `NA` rows before trusting the output.
 
 **Failure mode:** Amplicons with shared primer regions get reads assigned to whichever amplicon comes first. Design primers with ≥3-bp distinguishing regions or use unique molecular identifiers.
 
@@ -266,14 +280,12 @@ from pathlib import Path
 def parse_crispresso(output_dir):
     '''Extract key metrics from CRISPResso output directory.'''
     out = {}
-    # Mapping statistics
-    map_stats = {}
-    with open(Path(output_dir) / 'CRISPResso_mapping_statistics.txt') as f:
-        for line in f:
-            k, v = line.strip().split('\t')
-            map_stats[k] = v
-    out['mapping_pct'] = float(map_stats.get('READS_ALIGNED_PERCENTAGE', 'nan'))
-    out['reads_aligned'] = int(map_stats.get('READS_ALIGNED', '0'))
+    # Mapping statistics: 7-column, 2-row TSV (header + one data row); no percentage column,
+    # so compute mapping_pct from READS ALIGNED / READS IN INPUTS.
+    map_stats = pd.read_csv(Path(output_dir) / 'CRISPResso_mapping_statistics.txt', sep='\t').iloc[0]
+    out['reads_in_input'] = int(map_stats['READS IN INPUTS'])
+    out['reads_aligned'] = int(map_stats['READS ALIGNED'])
+    out['mapping_pct'] = out['reads_aligned'] / out['reads_in_input'] * 100
     # Editing quantification
     quant = pd.read_csv(Path(output_dir) / 'CRISPResso_quantification_of_editing_frequency.txt', sep='\t')
     out['editing_quant'] = quant.set_index('Amplicon').to_dict()
@@ -290,8 +302,15 @@ def parse_crispresso(output_dir):
 
 **Trigger:** Wrong amplicon sequence (off by one nt, wrong strand, primer-trimmed vs untrimmed).
 **Mechanism:** CRISPResso fails to align reads beyond the amplicon edges; discards as unmappable.
-**Symptom:** `READS_ALIGNED_PERCENTAGE` <50%; per-position coverage drops at amplicon edges.
+**Symptom:** `READS ALIGNED` / `READS IN INPUTS` (from `CRISPResso_mapping_statistics.txt`, see `parse_crispresso()` above) <50%; per-position coverage drops at amplicon edges.
 **Fix:** Re-derive amplicon from genome at primer-trimmed boundaries; verify strand orientation; check that primers are NOT included in `--amplicon_seq`.
+
+### Total alignment failure (wrong locus / zero output)
+
+**Trigger:** Amplicon sequence is from the wrong locus entirely (e.g. wrong gene), not just off-by-a-few-nt.
+**Mechanism:** No reads align at all; CRISPResso exits with a hard error instead of writing a graded result.
+**Symptom:** `CRITICAL: Alignment error, please check your input. / ERROR: No alignments were found`, exit code 1, no output folder written -- there is no percentage file to inspect in this case.
+**Fix:** Confirm the amplicon sequence actually corresponds to the intended target locus (BLAT/BLAST it against the reference genome) before re-checking primer trimming or strand.
 
 ### High substitution rate but low indel (Cas9 sample)
 
@@ -342,10 +361,12 @@ def parse_crispresso(output_dir):
 | Error / symptom | Cause | Solution |
 |-----------------|-------|----------|
 | Alignment rate <50% | Wrong amplicon sequence | Re-verify; primers should NOT be in amplicon_seq |
+| `CRITICAL: No alignments were found`, exit 1, no output folder | Amplicon from the wrong locus entirely | Confirm amplicon matches the intended target locus before re-checking trimming/strand |
 | All reads "modified" | Misaligned reference | Check amplicon strand; reverse-complement test |
 | BE shows mostly indels | Cas9 contamination or wrong protein | Re-derive cell line origin; check Cas9 vs nCas9-BE3 |
 | Inconsistent batch results | Different amplicon_seq per sample | Use CRISPRessoBatch with consistent amplicon |
 | Pooled-amplicon misassignment | Primer overlap between amplicons | Re-design with ≥3-bp distinguishing regions |
+| Pooled amplicon rows all `NA` | Per-amplicon reads below `--min_reads_to_use_region` (default 1000) | Lower `--min_reads_to_use_region` for pilot/validation-scale pools |
 | Out-of-window edits ignored | Window too narrow | Increase `--quantification_window_size` |
 | Scaffold incorporation high (PE) | RTT too short | Re-design pegRNA |
 | Allele frequency dominated by 1 read | Low input / clonal | Verify input cell count; rerun if singleton |

@@ -246,7 +246,7 @@ chr1  102  .  G  A  30  PASS
 
 **Caveat -- decomposition destroys phase needed for functional annotation.** The original MNP record guarantees that its substitutions occur on the SAME haplotype. Atomization discards that guarantee. The concrete failure: two adjacent SNVs falling in one codon, annotated independently after decomposition, can each look **synonymous** while the true MNV (the haplotype) is **missense or nonsense** (or the reverse). VEP/SnpEff give the wrong amino-acid consequence on decomposed alleles because they no longer see the codon change.
 
-This is the unresolved decompose-vs-atomic tension: decompose for variant **matching** (dbSNP/ClinVar/gnomAD lookup, allele-frequency comparison), but compute **functional consequence** on the haplotype-resolved (undecomposed / phased) representation -- run `bcftools csq` on the un-atomized VCF, which is codon-aware. `csq` defaults to `-p r` (require phased genotypes) and exits with "Unphased heterozygous genotype" on ordinary unphased calls, so set `--phase`: `bcftools csq -p a -f ref.fa -g genes.gff3.gz in.vcf.gz` assumes every het is in cis (it will merge nearby hets into one haplotype consequence, including atomized SNVs), `-p m` merges only where phase is known, `-p s` treats unphased hets as separate haplotypes. Keep the atomized copy for matching and the un-atomized copy for annotation; do not feed atomized alleles to a per-record consequence caller. See variant-calling/variant-annotation.
+This is the unresolved decompose-vs-atomic tension: decompose for variant **matching** (dbSNP/ClinVar/gnomAD lookup, allele-frequency comparison), but compute **functional consequence** on the haplotype-resolved (undecomposed / phased) representation -- run `bcftools csq` on the un-atomized VCF, which is codon-aware. `csq` defaults to `-p r` (require phased genotypes) and exits with "Unphased heterozygous genotype" on ordinary unphased calls, so set `--phase`. Per `bcftools csq` help (checked on 1.24 and 1.21): `bcftools csq -p a -f ref.fa -g genes.gff3.gz in.vcf.gz` takes GTs as is, creating haplotypes regardless of phase (it will merge nearby hets into one haplotype consequence, including atomized SNVs); `-p m` merges *all* GTs into a single haplotype regardless of phase -- this merges a trans-phased pair too, not just where phase is known; `-p s` skips unphased hets entirely (no consequence emitted), it does not treat them as separate haplotypes. Recommend `-p a` for typically-unphased input. Keep the atomized copy for matching and the un-atomized copy for annotation; do not feed atomized alleles to a per-record consequence caller. See variant-calling/variant-annotation.
 
 ### Atomize with Old Record Tag
 
@@ -311,8 +311,14 @@ Duplicate removal options (`-d`):
 **Approach:** Apply the same three-step normalization pipeline to each VCF, then use set operations.
 
 ```bash
+set -o pipefail   # a REF mismatch aborts the last stage after writing a 0-record, non-BGZF
+                   # file; without pipefail the loop continues and `bcftools index` then fails
+                   # with "not BGZF compressed", hiding the real cause
 for vcf in gatk.vcf.gz freebayes.vcf.gz; do
     base=$(basename "$vcf" .vcf.gz)
+    # REF pre-check (see examples/normalize_vcf.sh for the full MISMATCH-count version)
+    bcftools norm -f reference.fa -c w "$vcf" -Ou 2>&1 >/dev/null | grep -q 'REF_MISMATCH\|does not match' && \
+        { echo "Error: $vcf has REF allele mismatches against reference.fa (wrong build or contig naming?)."; exit 1; }
     bcftools norm -m- "$vcf" | \
         bcftools norm --atomize | \
         bcftools norm -f reference.fa -Oz -o "${base}.norm.vcf.gz"
@@ -327,6 +333,12 @@ The `isec` output directories: `0000.vcf` = private to first file, `0001.vcf` = 
 ### Before Database Annotation
 
 ```bash
+set -o pipefail
+# REF pre-check: the pipeline's last stage aborts on a REF mismatch after writing a 0-record,
+# non-BGZF file; without this check the failure surfaces as `bcftools index` reporting
+# "not BGZF compressed", not the real REF mismatch (see examples/normalize_vcf.sh)
+bcftools norm -f reference.fa -c w variants.vcf.gz -Ou 2>&1 >/dev/null | grep -q 'REF_MISMATCH\|does not match' && \
+    { echo "Error: variants.vcf.gz has REF allele mismatches against reference.fa."; exit 1; }
 bcftools norm -m- variants.vcf.gz | \
     bcftools norm --atomize | \
     bcftools norm -f reference.fa -Oz -o for_annotation.vcf.gz

@@ -94,7 +94,8 @@ Tell the AI agent what to audit:
 | Day 0 | Pearson with plasmid | >0.9 | Diagnose infection issue |
 | Endpoint | Replicate Pearson | >=0.8 (MAGeCK-VISPR floor) | Drop outlier replicate |
 | Biology | CEGv2 PR-AUC | >0.7 | Cas9 selection / timepoint / TSS |
-| CN | Spearman LFC vs CN | abs(ρ) <0.05 post-correction | CRISPRcleanR / Chronos |
+| CN | Spearman LFC vs CN | abs(ρ) <0.10 pre-correction fail; abs(ρ) <0.05 post-correction target | CRISPRcleanR / Chronos |
+| CN | Amplified vs diploid mean LFC | gap > -0.5 (focal amplicons barely move ρ) | CRISPRcleanR / Chronos |
 | Depth | Reads/sgRNA | >300 | Re-sequence |
 | MOI | Poisson P(≥2) | <5% | Re-infect |
 

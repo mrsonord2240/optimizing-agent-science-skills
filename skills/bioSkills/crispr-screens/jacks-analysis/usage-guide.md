@@ -8,16 +8,15 @@ Run JACKS (Allen et al 2019 Genome Research) for joint Bayesian decomposition of
 
 ```bash
 git clone https://github.com/felicityallen/JACKS && cd JACKS/jacks && pip install .   # the PyPI 'jacks' is an unrelated package
-# or latest from GitHub (run_JACKS.py is at the repo root)
-git clone https://github.com/felicityallen/JACKS && cd JACKS && pip install .
+# run_JACKS.py and setup.py are both in JACKS/jacks/, not the repo root
 # Optional: pre-computed reference efficacy priors
 # Download DepMap Brunello / Project Score efficacy posteriors for transfer learning
 ```
 
 Required inputs:
-- Count matrix (tab-separated, rows=sgRNA, columns=samples; first columns `sgRNA`, `Gene`)
-- Replicate map (Sample, Experiment, Condition) -- tab-separated, no header
-- Guide-to-gene map (sgRNA, Gene) -- tab-separated, no header
+- Count matrix (tab-separated, rows=sgRNA, columns=samples; sgRNA label in the first column, e.g. `sgRNA`, `Gene`, then samples)
+- Replicate map (`Replicate`, `Sample`, optionally `Control`) -- tab-separated, WITH header; JACKS locates columns by header name
+- Guide-to-gene map (`sgRNA`, `Gene`) -- tab-separated, WITH header (the count matrix itself can serve if it has both columns)
 - Optional: reference efficacy prior file from a matched library
 
 ## Quick Start
@@ -33,7 +32,7 @@ Tell the AI agent what to do:
 
 ### Multi-Screen Joint Analysis
 
-> "I have 4 Brunello screens across HCT116, HEK293T, A375, and MCF7 cell lines, each with 3 replicate Day 0 and Day 14 samples. Run JACKS jointly with `--apply_w_hp` on. Output per-line gene effects, the matching posterior-std file, and shared guide efficacy."
+> "I have 4 Brunello screens across HCT116, HEK293T, A375, and MCF7 cell lines, each with 3 replicate Day 0 and Day 14 samples. Run JACKS jointly with the default settings (`--apply_w_hp` off). Output per-line gene effects, the matching posterior-std file, and shared guide efficacy."
 
 > "My screens were done across 6 weeks in two batches. Set up a per-batch JACKS run and compare to a single joint run; quantify whether batch sharing improves or degrades signal."
 
@@ -53,7 +52,7 @@ Tell the AI agent what to do:
 
 > "Diagnose why JACKS shows median efficacy 0.18 across my whole library. Is this a chemistry mismatch (CRISPRi screen run with Cas9 defaults), an over-shrinkage from `--apply_w_hp`, or a real library quality issue?"
 
-> "My JACKS run varies between repeated runs (different gene rankings in top 100). Investigate convergence: ELBO trajectory, iteration count, seed."
+> "My JACKS p-values change between repeated runs even though the gene effects do not. Explain why and make them reproducible."
 
 ## What the Agent Will Do
 
@@ -61,10 +60,10 @@ Tell the AI agent what to do:
 2. Decide whether joint analysis is appropriate: same library, same chemistry, ≥3 screens
 3. If applicable, build the reference efficacy prior from a matched public dataset
 4. Run JACKS via `python run_JACKS.py` from `JACKS/jacks/`, or programmatically via `jacks.jacks_io.runJACKS`
-5. Leave `--apply_w_hp` off unless deliberately using the hierarchical gene-effect prior (the tool's help advises cautionrior)
-6. Verify ELBO convergence; if iterations <5000, raise; if still noisy, set seed and increase further
+5. Leave `--apply_w_hp` off unless deliberately using the hierarchical gene-effect prior (the tool's help advises caution)
+6. Check convergence: genes ending at the 50-iteration cap in the DEBUG log get a refit with a higher `n_iter`; seed `random` before `runJACKS` when p-values must be reproducible
 7. Generate the gene-effect matrix plus its std file, and the sgRNA efficacy file (`sgrna`, `X1`, `X2`)
-8. Call hits on effect/std (abs >2); supply `--ctrl_genes` if p-values are needed
+8. Call hits on effect/std (abs >2); supply `--ctrl_genes` (and `n_pseudo` > 0 in Python) if p-values are needed
 9. Flag low-efficacy guides (X1 <0.3) and genes where all guides are weak (re-design candidates)
 10. Cross-validate with MAGeCK / BAGEL2: identify high-confidence hits in agreement, single-tool hits flagged for orthogonal validation
 11. Decide if Chronos is preferred (cancer-line multi-cell-line screens with CN bias)
@@ -76,20 +75,20 @@ Tell the AI agent what to do:
 - Always match chemistry: do not share Cas9-KO efficacy with CRISPRi/a guides; efficacy is chemistry-specific. Build separate priors for each.
 - The 2.5x sample-size reduction is real but conditional on the reference being from the same library and similar cell context. Reduction is not free.
 - For multi-cell-line cancer-line panels, prefer Chronos -- it models CN bias and per-screen quality jointly, which JACKS does not.
-- The `X1/X2` ratio (gene-effect divided by its std) is a Bayesian z-equivalent. Use this for ranking rather than X1 alone -- a strong but uncertain effect should rank lower than a moderate but confident one.
+- Gene effect divided by its posterior std (gene file / gene std file, same cell-line column) is a Bayesian z-equivalent. Use this for ranking rather than the effect alone -- a strong but uncertain effect should rank lower than a moderate but confident one.
 - If running on a multi-cell-line panel, fit per-cell-line gene effects but shared efficacy. Pooling effects across cell lines is meta-analysis and should be done downstream after per-cell-line JACKS estimates are obtained.
 - Library re-design: drop the bottom 25% efficacy guides; in the v2 library, every gene should have all guides at efficacy >0.4 (Brunello v2 / Avana v2 convention).
-- Convergence is the silent failure mode. Always check ELBO trajectory and set seed; never trust a single non-converged run.
+- Gene effects are deterministic, so a rerun cannot reveal non-convergence; genes that end at the 50-iteration cap can. Seed Python's `random` only for reproducible pseudo-gene p-values.
 
 ## Key Thresholds
 
 | Threshold | Value | Rationale |
 |-----------|-------|-----------|
 | Hit call | gene effect negative, abs(effect/std) >2 | Bayesian z-equivalent |
-| Effective gene signal | X1 <0 AND abs(X1/X2) >2 | Bayesian z-equivalent ≈ 95% credible |
+| Effective gene signal | effect <0 AND abs(effect/std) >2 | Bayesian z-equivalent ≈ 95% credible |
 | Low-efficacy guide flag | X1 <0.3 | Operational convention; below this, guide likely non-functional |
 | Joint analysis screen count | ≥3 | Below this, equivalent to MAGeCK/BAGEL2 |
-| Iterations for publication | 5000+ | Verify ELBO plateau |
+| Iterations per gene | ≤50, early stop at lower-bound change <0.1 (JACKS 0.2) | Not a CLI option; refit with higher `n_iter` if genes hit the cap |
 | Reference for prior reuse | DepMap or Project Score panel | ~50 cell lines, ~10k screen days |
 
 ## Decision Comparison

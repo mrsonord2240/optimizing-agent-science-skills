@@ -101,6 +101,17 @@ def batch_resolve_to_car_then_clinvar(hgvs_list, sleep=0.34):
             rows.append({'hgvs': hgvs, 'ca_id': None, 'variation_id': None, 'error': str(err)})
             time.sleep(sleep)
             continue
+        except requests.HTTPError as err:
+            # Non-400 Registry errors (e.g. HTTP 500 "Unknown reference: <accession>" for an
+            # unrecognized RefSeq accession) reach here; car_record only special-cases 400.
+            # Record the Registry's own message instead of aborting the whole batch.
+            try:
+                message = err.response.json().get('message', str(err))
+            except ValueError:
+                message = str(err)
+            rows.append({'hgvs': hgvs, 'ca_id': None, 'variation_id': None, 'error': message})
+            time.sleep(sleep)
+            continue
         time.sleep(sleep)
         at_id = record.get('@id', '')
         ca = at_id.rsplit('/', 1)[-1] if at_id else None

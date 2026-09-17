@@ -14,6 +14,8 @@ CONTROL=Plasmid                # control sample column header
 TREATMENT="Sample1,Sample2,Sample3"
 CEG=CEGv2.txt                  # Hart 2017 core essentials
 NEG=NEGv1.txt                  # Hart 2014 non-essentials
+SEED=42                        # fixed seed -- BAGEL.py defaults to a clock-based seed
+                                # (undocumented, non-reproducible); record whatever value you use
 OUTDIR=bagel_results
 
 mkdir -p "$OUTDIR"
@@ -41,7 +43,8 @@ BAGEL.py bf \
     -e "$CEG" \
     -n "$NEG" \
     -c "$TREATMENT" \
-    -b -NB 1000
+    -s "$SEED" \
+    -b -NB 1000                             # -s: fixed seed, required for reproducible calls
 
 # === STEP 3: PRECISION-RECALL CURVE ===
 # Empirically calibrate BF threshold against CEGv2

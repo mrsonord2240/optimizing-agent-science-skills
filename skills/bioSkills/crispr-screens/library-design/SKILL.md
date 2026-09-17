@@ -7,11 +7,15 @@ primary_tool: CRISPOR
 
 ## Version Compatibility
 
-Reference examples tested with: CRISPOR 5.01+, BioPython 1.83+, pandas 2.2+, numpy 1.26+, Azimuth 2.0+ (Doench 2016), CRISPRon 1.0+ (Xiang 2021), DeepSpCas9 1.0+ (Kim 2019).
+Reference examples tested with: CRISPOR 5.01+, BioPython 1.83+, pandas 2.2+, numpy 1.26+, CRISPRon 1.0+ (Xiang 2021), DeepSpCas9 1.0+ (Kim 2019).
+
+**Azimuth 2.0 is not usable and must not be called.** The original `MicrosoftResearch/azimuth` PyPI package installs cleanly (pip exit 0) but is verbatim, un-ported Python 2: its scoring entry point raises `SyntaxError: Missing parentheses in call to 'print'` on import under Python 3 (confirmed live on this machine, checked 2026-09-16 -- `import azimuth.model_comparison` fails at the first `print "..."` statement). There is no maintained Python-3 fork. Recommended on-target scoring path, in order:
+1. **Default:** this Skill's own composition-based heuristic (`score = 1 - |gc_frac - 0.5| * 2`, used by `find_sgrna_candidates`/`annotate_exon_position` below) -- always runs, no install, and every worked example in this Skill labels it explicitly as a substitute rather than a real Rule Set 2 score.
+2. **For real Rule Set 2 predictions:** Broad Institute CRISPick (https://portals.broadinstitute.org/gppx/crispick/public, web submission, no install) or Bioconductor `crisprScore::getAzimuthScores()` (R) -- neither was installed or smoke-tested in this Skill's own audit environment, so verify the call signature against the package's own help before trusting output.
 
 Before using code patterns, verify installed versions match. If versions differ:
 - CLI: `crispor.py --help` from the crisporWebsite clone
-- Python: Azimuth has no console script; call `azimuth.model_comparison.predict(...)`
+- R: `?crisprScore::getAzimuthScores` for the current argument names
 
 If code throws ImportError, AttributeError, or TypeError, introspect the installed package and adapt the example to match the actual API rather than retrying.
 
@@ -20,7 +24,7 @@ If code throws ImportError, AttributeError, or TypeError, introspect the install
 **"Design a CRISPR library for my screen"** -> Pick a chemistry (Cas9 KO, CRISPRi, CRISPRa, Cas12a, base or prime editor), score candidate guides for on-target activity and off-target liability, position them relative to gene/TSS, add appropriate controls, lay out the oligo for synthesis, and validate the cloned pool.
 
 - Python: `crispor.py` (web + CLI) for batch genome-wide guide scoring with CFD+MIT off-target
-- Python: `azimuth` (Microsoft Research) for Rule Set 2 on-target predictions (Brunello-style)
+- Python: this Skill's own GC-content heuristic (default, always available) or Broad CRISPick / R `crisprScore::getAzimuthScores()` for real Rule Set 2 on-target predictions -- **not** the `azimuth` PyPI package, which is unrunnable Python 2 (see Version Compatibility above)
 - Python: `CRISPRon`, `DeepSpCas9` for modern deep-learning predictors
 - R: `crisprDesign` (Bioconductor) for integrated annotation-aware design
 
@@ -66,7 +70,7 @@ CFD remains the default for genome-wide library design. **Critical pitfall:** CF
 
 **Goal:** Generate ranked sgRNA candidates for a single gene, jointly scored on on-target activity (Rule Set 2 / Azimuth) and off-target liability (CFD).
 
-**Approach:** Identify all PAM-adjacent 20-nt protospacers in the target gene's coding sequence, retain only those in the first 5-65% of the protein (constitutive-exon convention from Brunello), filter on GC 30-70% and absence of poly-T (≥4 Ts terminates U6), call Azimuth for on-target and CRISPOR for off-target, and select the top N satisfying both criteria.
+**Approach:** Identify all PAM-adjacent 20-nt protospacers in the target gene's coding sequence, retain only those in the first 5-65% of the protein (constitutive-exon convention from Brunello), filter on GC 30-70% and absence of poly-T (≥4 Ts terminates U6), score on-target (default: this Skill's GC heuristic; see Version Compatibility for the real-Rule-Set-2 alternatives) and off-target with CRISPOR, then **greedily select the top N guides that are also mutually independent** -- composition filters alone do not reject two candidates that overlap almost entirely (see `select_independent_guides` below).
 
 ```python
 import re
@@ -95,6 +99,26 @@ def annotate_exon_position(candidates_df, cds_length):
     C-terminal hits miss functional domains (Doench 2016 Nat Biotech).'''
     lo, hi = 0.05 * cds_length, 0.65 * cds_length
     return candidates_df[(candidates_df['pos_in_cds'] >= lo) & (candidates_df['pos_in_cds'] <= hi)].copy()
+
+def select_independent_guides(candidates_df, n_guides, min_spacing=5, score_col='score'):
+    '''Greedily pick up to n_guides candidates that are mutually independent.
+    Reason: find_sgrna_candidates/annotate_exon_position filter composition
+    only (GC, poly-T); nothing stops two candidates 1-4nt apart -- almost the
+    same 20nt spacer, cutting the same site -- from both counting toward the
+    per-gene quota as if they were independent measurements. Verified against
+    a real gene (TP53, NM_000546.6): requesting 12 candidates with no spacing
+    filter returned a pair 1nt apart (19/20nt shared sequence); this filter
+    guarantees every pair in the output is >=min_spacing nt apart while still
+    filling the quota from the next-best candidates.'''
+    ranked = candidates_df.sort_values(score_col, ascending=False)
+    selected = []
+    for _, cand in ranked.iterrows():
+        if any(abs(cand['pos_in_cds'] - s['pos_in_cds']) < min_spacing for s in selected):
+            continue
+        selected.append(cand)
+        if len(selected) == n_guides:
+            break
+    return pd.DataFrame(selected)
 ```
 
 ## CRISPRi / CRISPRa TSS Targeting
@@ -118,7 +142,11 @@ def crispra_window(tss_coord, strand='+'):
     Reason: dCas9-VP64 (and SAM, SunTag) activate maximally when bound
     just upstream of Pol II loading. Horlbeck v2 CRISPRa uses -550 to -25
     (broader, lower per-guide signal). For SAM, prefer Calabrese tightness;
-    for SunTag, Horlbeck width is acceptable.'''
+    for SunTag, Horlbeck width is acceptable.
+    Caveat: at only 75bp wide, this window routinely fails to contain a full
+    6-guide quota's worth of PAM sites passing the GC/poly-T filter -- budget
+    for shortfalls (report actual count per gene rather than padding with
+    out-of-window guides) or widen to Horlbeck v2 when the quota must be met.'''
     if strand == '+':
         return (tss_coord - 150, tss_coord - 75)
     return (tss_coord + 75, tss_coord + 150)
@@ -267,6 +295,7 @@ def build_oligo(spacer, vector='lentiGuide-Puro', subpool_idx=None):
 | GC content | 30-70% | Doench 2016 Nat Biotech: guides outside this range have low activity |
 | Poly-T avoidance | ≤3 consecutive T | U6 Pol III terminator; ≥4 Ts terminates sgRNA transcription |
 | Guides per gene (Cas9) | 4 (Brunello/TKOv3 standard); up to 6 (Avana, older) | Doench 2016 reports diminishing gene recovery below 4 sgRNAs/gene; returns flatten above 6 |
+| Guide-to-guide minimum spacing | >=5 nt between any two selected guides for the same gene | Composition filters (GC/poly-T) alone don't reject near-duplicate protospacers; `select_independent_guides` enforces this so 4 "guides" are 4 independent cut sites, not fewer |
 | CRISPRi window | -50 to +300 search; +25 to +75 optimum | Sanson 2018 (Dolcetto); Horlbeck v2 uses -25 to +500 |
 | CRISPRa window | -150 to -75 from TSS | Sanson 2018 (Calabrese); narrower than Horlbeck v2 (-550 to -25) |
 | NTCs in library | ~1% (500-1,000 in a 70k library) | DepMap library design notes; rule-of-thumb for stable null |

@@ -15,7 +15,7 @@ Before using code patterns, verify installed versions match. If versions differ:
 
 If code throws an unrecognized-argument or model-parse error, introspect the installed tool and adapt the example to match the actual API rather than retrying.
 
-IQ-TREE2 uses single-dash documented forms (`-alrt`, `-bnni`, `-B`); `-B`/`-T` are v2.x (v1.x used `-bb`/`-nt`). Do NOT write `--alrt`. The likelihood site-concordance flag `--scfl` requires IQ-TREE 2.2.2+ (older builds have only the parsimony `--scf`).
+IQ-TREE2's `--help` documents `--alrt NUM` and `--bnni` (double-dash) and `-B, --ufboot NUM` / `-T NUM|AUTO` (bootstrap replicates / threads, either dash form). In practice IQ-TREE2 2.4.0 accepts both single- and double-dash forms of these flags (`-alrt`/`--alrt`, `-bnni`/`--bnni` all run), and the legacy v1.x short flags `-bb`/`-nt` still work as aliases for `-B`/`-T`. `-B`/`-T` are the current preferred v2 names -- use those in new commands. The likelihood site-concordance flag `--scfl` requires IQ-TREE 2.2.2+ (older builds have only the parsimony `--scf`).
 
 # Modern ML Tree Inference -- ML Support Measures Repeatability, Not Correctness
 
@@ -64,6 +64,18 @@ ModelFinder (Kalyaanamoorthy 2017) scores the substitution matrix and the rate-h
 - **Partition model selection.** `-m MFP+MERGE` fits per-partition models AND greedily merges partitions that fit the same model (BIC-chosen scheme, the successor to PartitionFinder greedy). Pair with `-rcluster 10` (relaxed clustering: only test the top 10% most-similar pairs) for many partitions.
 - **Site-heterogeneous mixtures for deep data.** Empirical matrices (LG, WAG) assume one residue-frequency vector for the whole alignment; real proteins do not, and that across-site compositional heterogeneity is the chief driver of deep LBA. The ML answer is the C10..C60 profile-mixture series (`LG+C60+F+G`), made tractable by PMSF (Wang 2018): a guide-tree pass computes one posterior-mean profile per site, and the real search uses those frozen profiles. PMSF is the standard recommendation for deep / LBA-prone protein phylogenomics.
 
+```bash
+# PMSF (Wang 2018): a fast guide tree, then the C-mixture frozen to that topology
+iqtree3 -s aln.fasta -m LG+F+G --prefix guide                                 # step 1: simple-model guide tree
+iqtree3 -s aln.fasta -m LG+C60+F+G -ft guide.treefile -B 1000 -bnni --prefix pmsf   # step 2: PMSF + UFBoot
+#  -ft guide.treefile   freeze the topology to the guide tree while the C60 profiles are fit and searched
+```
+The `.iqtree` report from step 2 shows `Model of substitution: LG+SSF+F+G4` with "site specific frequencies" --
+that SSF (site-specific frequency) model, cited to Wang 2018, IS the fitted PMSF profile derived from `LG+C60+F+G`;
+IQ-TREE reports the fitted site-specific frequencies rather than echoing the mixture name verbatim. On a
+15-taxon/445-site protein alignment C60+UFBoot1000 took ~4 minutes single-threaded (`-T AUTO` for more cores);
+drop to `C20`/`C10` if `C60` is too slow for the taxon count and add `-T AUTO`.
+
 ## Branch Support -- the Heart
 
 Five measures, three different questions; the cardinal sin is cross-comparing their cutoffs.
@@ -83,6 +95,18 @@ SH-aLRT (Guindon 2010) does not resample data; for each branch it tests whether 
 > A branch is strongly supported iff SH-aLRT >= 80% AND UFBoot >= 95%.
 
 For large rogue-taxon-prone trees, the binary Felsenstein bootstrap lets a single wandering tip crush an otherwise-recovered deep branch; transfer bootstrap (TBE, Lemoine 2018, RAxML-NG `--bs-metric tbe`) replaces the in/out indicator with a gradual transfer distance and rescues those branches, at the cost of being more permissive.
+
+## Pre-flight: Small or Low-Signal Alignments
+
+**Goal:** Decide whether an alignment carries enough signal to trust the tree, and whether apparent structure is really a duplicate sequence, before interpreting support. This is the opposite failure mode from the rest of this Skill -- few taxa, short or conserved alignments, not phylogenomic scale.
+
+**Approach:** IQ-TREE2 already reports every diagnostic below in its own `.iqtree`/`.log` output -- do not compute them separately.
+
+- **Parsimony-informative sites.** The `.iqtree` report's SEQUENCE ALIGNMENT block prints `Number of parsimony informative sites: N`. Few informative sites (short or conserved data, few taxa) means little of the alignment actually drove the topology; check this count before trusting a deep or well-supported-looking node. Example, 6 short primate isolates / 250 sites: `Number of constant sites: 187 (= 74.8% of all sites)` / `Number of parsimony informative sites: 33`.
+- **Identical sequences are KEPT, not dropped.** IQ-TREE2 does not collapse or remove identical sequences by default; it flags the pair in the log and keeps both in the tree: `NOTE: <seq> is identical to <seq> but kept for subsequent analysis`. The duplicate then sits on its own near-zero branch next to its twin (see next point) -- do not mistake the pair for two independently resolved tips.
+- **Collapse or flag branches <=1e-6 before reading support.** IQ-TREE2's branch-length floor is 1e-6 (printed as e.g. `0.0000010000`); a branch at or near that floor means the two sides are effectively identical (a duplicate or near-duplicate), not a resolved split. Support on the node immediately adjacent to a near-zero branch is answering "is this near-duplicate reliably near-duplicate," not "is this clade real" -- collapse such branches first (e.g. `ape::di2multi(tree, tol=1e-6)` in R) before reading support on the adjacent node.
+
+Verified on a 6-taxon alignment with one exact duplicate (`Homo_sapiens` / `Homo_sapiens_isolate2`, `iqtree2 -s isolates6.fa -m MFP -B 1000 -bnni --alrt 1000 -T 1`): `.iqtree` reports `Number of parsimony informative sites: 33` (of 250); `.log` prints `NOTE: Homo_sapiens_isolate2 is identical to Homo_sapiens but kept for subsequent analysis`; the treefile resolves both duplicate tips at `0.0000010000` (IQ-TREE's 1e-6 floor), and the branch grouping that pair with the rest of the tree carries an 86.7/100 SH-aLRT/UFBoot split driven entirely by the duplicate, not by independent phylogenetic signal.
 
 ## Concordance Factors
 
@@ -174,8 +198,6 @@ When splitting an alignment into partitions, the branch-length linkage choice is
 
 | Error / symptom | Cause | Solution |
 |-----------------|-------|----------|
-| `Unknown argument --alrt` | wrote the GNU double-dash form | IQ-TREE2 uses single-dash `-alrt`, `-bnni`, `-B` |
-| `-bb` / `-nt` not recognized | v1.x flags on a v2.x binary | use `-B` (bootstrap) and `-T` (threads) in 2.x |
 | Reading UFBoot 80 as "supported" | applied the bootstrap-70 rule to a different scale | use UFBoot >=95 AND SH-aLRT >=80 |
 | Fully-supported deep node distrusted by reviewer | no concordance factors reported | compute gCF/sCFL; treat high-support/low-CF as unresolved |
 | `--scfl` unrecognized | IQ-TREE older than 2.2.2 | upgrade, or fall back to parsimony `--scf` |

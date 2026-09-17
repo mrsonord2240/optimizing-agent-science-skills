@@ -48,7 +48,7 @@ Tell the AI agent what to call:
 
 > "Run MAGeCK + BAGEL2 + drugZ on my drug screen. Output the tier-1 consensus (3-method agreement) at FDR <0.05 / BF >6 across all. These hits go to arrayed validation."
 
-> "Compute Spearman ρ between MAGeCK neg|score and BAGEL2 BF. If ρ <0.6, audit why the two methods disagree."
+> "Compute Spearman ρ between MAGeCK neg|score and BAGEL2 BF, sign-correcting first (`-neg|score` vs `BF` -- see SKILL.md's Correlating MAGeCK and BAGEL2 Scores section). If the sign-corrected ρ <0.6, audit why the two methods disagree." (Naive, uncorrected ρ on real data is -0.81 and would falsely read as disagreement; sign-corrected ρ is +0.81 -- strong agreement.)
 
 ### Reconciliation
 
@@ -95,6 +95,8 @@ Tell the AI agent what to call:
 - For multi-cell-line studies, run per-line analysis first; pool across lines as meta-analysis downstream. Joint MLE across cell lines without indicator covariates dilutes per-line signal.
 - The second-best-sgRNA rule is your friend for novel libraries with mixed efficacy: a hit driven by one extreme guide is more likely an outlier than a true effect.
 - Heavy-selection drug screens (>40% guides change) break median normalization. Use BAGEL2 (reference-set-anchored, robust) or MAGeCK with `--norm-method control`.
+- BAGEL2's `bf` step is unseeded by default and gives different Bayes Factors on identical reruns of the same data (up to 33 gene calls flipping at BF>6 on real HAP1 TKOv3 data) -- always pass a fixed `-s <int>` seed and verify byte-identical reruns before trusting a single BF table or treating a rerun difference as new biology. See crispr-screens/bagel-essentiality's Reproducibility section.
+- Before merging hit lists into a consensus, confirm every file traces to the *same* experimental comparison. Three individually valid files from different comparisons (e.g. an essentiality screen's MAGeCK+BAGEL2 pair merged against an unrelated drug screen's drugZ table) will merge without error and can produce a misleadingly empty -- or, with unlucky gene overlap, misleadingly nonempty -- "consensus". An empty consensus is not proof of a bad screen; check each file's own QC first.
 
 ## Decision Cheat Sheet
 

@@ -176,6 +176,9 @@ gatk FilterMutectCalls -R reference.fa -V mutect2_raw.vcf \
 # Mutect2 often lists the normal first, so [0] would test the normal.
 TUMOR=$(bcftools view -h mutect2_filtered.vcf | grep '^##tumor_sample=' | cut -d= -f2)
 T=$(( $(bcftools query -l mutect2_filtered.vcf | grep -nxF "$TUMOR" | cut -d: -f1) - 1 ))
+# No ##tumor_sample header (e.g. stripped by a merge step) leaves TUMOR empty and T=-1;
+# without this guard bcftools filter segfaults (exit 139) instead of stopping with a message.
+[ -n "$TUMOR" ] && [ "$T" -ge 0 ] || { echo 'tumor sample not found; pass it explicitly'; exit 1; }
 bcftools filter -i "INFO/TLOD>6.3 && FMT/AF[$T:0]>0.05 && FMT/DP[$T]>20" \
     mutect2_filtered.vcf -o somatic_final.vcf
 ```
@@ -186,7 +189,7 @@ The expression is a site filter: a record passes if the tumor column meets the t
 
 **Goal:** Apply custom multi-metric per-variant logic in Python.
 
-**Approach:** Iterate with cyvcf2, read QUAL/INFO fields, write survivors with Writer. `INFO.get` returns None for missing tags -- treat None as pass to avoid the hom-alt trap. This is a minimal pattern, not the full hard filter: add the QD, SOR and None-guarded RankSum terms from the SNP expression above before using it in place of that filter.
+**Approach:** Iterate with cyvcf2, read QUAL/INFO fields, write survivors with Writer. `INFO.get` returns None for missing tags -- treat None as pass to avoid the hom-alt trap. This mirrors the SNP hard-filter expression above term for term (QUAL, DP, FS, MQ, QD, SOR, MQRankSum, ReadPosRankSum), each RankSum/QD/SOR term None-guarded the same way the bcftools `|| INFO/X = "."` guard is.
 
 ```python
 from cyvcf2 import VCF, Writer
@@ -198,7 +201,15 @@ for variant in vcf:
     dp = variant.INFO.get('DP') or 1e9      # missing depth => do not fail on depth
     fs = variant.INFO.get('FS') or 0.0      # missing strand bias => pass (None -> 0)
     mq = variant.INFO.get('MQ') or 1e9      # missing MQ => pass
-    if qual >= 30 and dp >= 10 and fs <= 60.0 and mq >= 40.0:
+    qd = variant.INFO.get('QD')
+    sor = variant.INFO.get('SOR')
+    mq_rank_sum = variant.INFO.get('MQRankSum')
+    read_pos_rank_sum = variant.INFO.get('ReadPosRankSum')
+    qd_ok = qd is None or qd >= 2.0                          # missing QD (rare) => pass
+    sor_ok = sor is None or sor <= 3.0                       # missing SOR => pass
+    mqrs_ok = mq_rank_sum is None or mq_rank_sum >= -12.5     # undefined at hom-alt sites => pass
+    rprs_ok = read_pos_rank_sum is None or read_pos_rank_sum >= -8.0  # undefined at hom-alt sites => pass
+    if qual >= 30 and dp >= 10 and fs <= 60.0 and mq >= 40.0 and qd_ok and sor_ok and mqrs_ok and rprs_ok:
         writer.write_record(variant)
 writer.close(); vcf.close()
 ```

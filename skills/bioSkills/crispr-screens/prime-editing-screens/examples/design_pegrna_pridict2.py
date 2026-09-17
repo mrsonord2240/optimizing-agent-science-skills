@@ -1,4 +1,5 @@
-# Reference: PRIDICT2 (uzh-dqbm-cmi/PRIDICT2), pandas 2.2+, biopython 1.83+ | Verify API if version differs
+# Reference: PRIDICT2 (uzh-dqbm-cmi/PRIDICT2, git HEAD 2026-09-16), pandas 2.2+ | Verify API if version differs
+# PBS/RTT extraction uses a hand-rolled revcomp (no biopython dependency needed for this script).
 #
 # pegRNA library design with PRIDICT2 efficiency prediction.
 # PRIDICT2 is invoked via CLI (pridict2_pegRNA_design.py batch).
@@ -7,7 +8,6 @@
 import pandas as pd
 import subprocess
 from pathlib import Path
-from Bio.Seq import Seq
 import re
 
 # === INPUTS ===
@@ -20,47 +20,85 @@ variants_df = pd.read_csv('intended_variants.csv')
 # This example uses a placeholder predict_pridict2() that simulates the CLI output.
 
 # === STEP 1: GENERATE pegRNA CANDIDATES ===
-def find_pegrna_candidates(chrom, pos, ref, alt, context_seq):
+# PBS/RTT geometry (verified against real CRISPResso2 2.3.4 output and the real
+# PRIDICT2 CLI's own PBSrevcomp/RTrevcomp columns -- see SKILL.md's pegRNA
+# Architecture section):
+#   - The nick is 3 nt upstream of the PAM (cut_pos = pam_pos - 3).
+#   - PBS is the region UPSTREAM of the nick, i.e. part of the protospacer
+#     itself -- it must never include PAM bases.
+#   - RTT is the region DOWNSTREAM of the nick (through the PAM and beyond) --
+#     this is the window PE actually replaces, and where the edit lives
+#     (1-30 nt from the nick).
+#   - Both PBS and RTT are reverse-complemented relative to the protospacer
+#     strand to get the pegRNA-sense sequence, and the 3' extension is
+#     RTT-then-PBS (not PBS-then-RTT).
+_COMP = {'A': 'T', 'T': 'A', 'G': 'C', 'C': 'G', 'N': 'N'}
+
+
+def _revcomp(s):
+    return ''.join(_COMP[b] for b in reversed(s))
+
+
+# Try the PRIDICT2-typical lengths first (13 nt PBS, 18 nt RTT), then widen.
+PBS_LENGTHS = (13, 12, 11, 14, 15, 10, 9, 8)
+RTT_LENGTHS = (18, 15, 20, 13, 25, 10, 30)
+
+
+def find_pegrna_candidates(chrom, pos, ref, alt, context_seq, edit_position_in_context=30):
     '''Find pegRNAs that can install this variant.
-    Returns list of (spacer, pbs, rtt) candidates.'''
-    # PE requires NGG PAM within ~30 nt of edit
+    `context_seq` must place the edit at `edit_position_in_context` (default 30,
+    matching this script's 60-nt context convention -- see variants_to_design.csv).
+    Returns list of dicts: spacer, pbs, rtt, extension_seq (5'->3', RTT then PBS),
+    pbs_length, rtt_length, pam_strand, edit_dist. Empty list if no NGG PAM gives
+    a workable PBS/RTT window -- callers must check for this (see Step 3).'''
     candidates = []
-    edit_position_in_context = 30  # variant at position 30 of 60-nt context
-    # Scan PAMs in 30-nt upstream + downstream
     for strand in ['+', '-']:
-        seq = context_seq if strand == '+' else str(Seq(context_seq).reverse_complement())
+        if strand == '+':
+            seq, edit_pos, alt_on_strand = context_seq, edit_position_in_context, alt
+        else:
+            # Search the other strand in its own 5'->3' coordinate frame; the
+            # edit position and installed base both have to flip with it.
+            seq = _revcomp(context_seq)
+            edit_pos = len(context_seq) - 1 - edit_position_in_context
+            alt_on_strand = _COMP[alt]
         for pam_match in re.finditer(r'(?=([ACGT]GG))', seq):
             pam_pos = pam_match.start()
-            cut_pos = pam_pos - 3
-            # Distance from cut to edit
-            edit_dist = abs(edit_position_in_context - cut_pos)
-            if edit_dist > 30:
-                continue
-            # Spacer = 20 nt upstream of PAM
             if pam_pos < 20:
+                continue  # no room for a full 20nt spacer upstream of this PAM
+            cut_pos = pam_pos - 3
+            edit_dist = edit_pos - cut_pos  # nt from nick to edit (must be downstream)
+            if not (1 <= edit_dist <= 30):
                 continue
-            spacer = seq[pam_pos-20:pam_pos]
-            # PBS = 11-13 nt downstream of cut (toward edit)
-            pbs_length = 12
-            pbs_start = cut_pos
-            pbs = seq[pbs_start:pbs_start+pbs_length]
-            # RTT = encodes intended edit; 10-20 nt
-            rtt_length = 15
-            # Replace ref with alt in RTT
-            rtt_template = list(seq[pbs_start+pbs_length:pbs_start+pbs_length+rtt_length])
-            # Position of edit in RTT
-            edit_in_rtt = edit_position_in_context - (pbs_start + pbs_length)
-            if 0 <= edit_in_rtt < rtt_length:
-                rtt_template[edit_in_rtt] = alt
-                rtt = ''.join(rtt_template)
-            else:
+            spacer = seq[pam_pos - 20:pam_pos]
+            # Find the first (pbs_length, rtt_length) pair that fits this locus.
+            found = None
+            for pbs_length in PBS_LENGTHS:
+                if cut_pos - pbs_length < 0:
+                    continue
+                for rtt_length in RTT_LENGTHS:
+                    if edit_dist >= rtt_length or cut_pos + rtt_length > len(seq):
+                        continue
+                    found = (pbs_length, rtt_length)
+                    break
+                if found:
+                    break
+            if not found:
                 continue
+            pbs_length, rtt_length = found
+            pbs_geno = seq[cut_pos - pbs_length:cut_pos]
+            rtt_geno = list(seq[cut_pos:cut_pos + rtt_length])
+            rtt_geno[edit_dist] = alt_on_strand
+            pbs = _revcomp(pbs_geno)
+            rtt = _revcomp(''.join(rtt_geno))
             candidates.append({
                 'spacer': spacer,
                 'pbs': pbs,
                 'rtt': rtt,
+                'pbs_length': pbs_length,
+                'rtt_length': rtt_length,
                 'pam_strand': strand,
                 'edit_dist': edit_dist,
+                'extension_seq': rtt + pbs,  # RTT then PBS, not PBS then RTT
             })
     return candidates
 
@@ -79,9 +117,16 @@ def predict_pridict2(spacer, pbs, rtt, context):
 
 # === STEP 3: SCREEN ALL CANDIDATES ===
 all_pegrnas = []
+variants_with_no_pam = []
 for _, var in variants_df.iterrows():
     candidates = find_pegrna_candidates(var['chrom'], var['pos'],
                                           var['ref'], var['alt'], var['context'])
+    if not candidates:
+        # No NGG PAM gave a workable PBS/RTT window for this variant -- not a
+        # bug, a real PE-design dead end (see Failure Modes: "Library missing
+        # intended variant"). Skip it, don't crash the whole batch.
+        variants_with_no_pam.append(var['variant_id'])
+        continue
     for c in candidates:
         pred = predict_pridict2(c['spacer'], c['pbs'], c['rtt'], var['context'])
         all_pegrnas.append({
@@ -89,12 +134,25 @@ for _, var in variants_df.iterrows():
             'spacer': c['spacer'],
             'pbs': c['pbs'],
             'rtt': c['rtt'],
+            'extension_seq': c['extension_seq'],
             'pam_strand': c['pam_strand'],
             'edit_dist': c['edit_dist'],
             'pridict2_efficiency': pred['efficiency'],
             'pridict2_indel': pred['indel_rate'],
             'pridict2_scaffold': pred['scaffold_incorp'],
         })
+
+if variants_with_no_pam:
+    print(f'No PE-designable PAM/PBS/RTT window for {len(variants_with_no_pam)} variant(s): '
+          f'{variants_with_no_pam} -- excluded before PRIDICT2 scoring, not a script error.')
+
+if not all_pegrnas:
+    raise ValueError(
+        'No pegRNA candidates found for any variant in this batch -- check that '
+        'each context places the edit at edit_position_in_context (default 30) '
+        'and has an NGG PAM within 30 nt of it. This is a design dead end, not '
+        'a code bug; see SKILL.md Failure Modes: "Library missing intended variant".'
+    )
 
 pegrnas_df = pd.DataFrame(all_pegrnas)
 

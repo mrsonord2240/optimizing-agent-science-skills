@@ -7,16 +7,21 @@ primary_tool: matchms
 
 ## Version Compatibility
 
-Reference examples tested with: matchms 0.33+, SIRIUS 6.x, MetFrag 2.5+
+Reference examples tested with: matchms 0.33+ (checked on 0.33.1), SIRIUS 6.x, MetFrag 2.5+ (checked on MetFragCommandLine 2.6.1)
 
 Before using code patterns, verify installed versions match. If versions differ:
 - Python: `pip show <package>` then `help(module.function)` to check signatures
 - CLI: `<tool> --version` then `<tool> --help` to confirm flags
 
-Spectral matching needs precursor m/z on every MS/MS spectrum (`add_precursor_mz` filter) or ModifiedCosine silently returns zeros. Level 1 needs an authentic standard run in the same lab under the same method; no software output can substitute for it.
+Spectral matching needs precursor m/z on every MS/MS spectrum. Apply the `add_precursor_mz`
+filter first; in matchms 0.33+ a spectrum that still has no precursor_mz afterward raises a
+hard `AssertionError: Precursor_mz missing` (checked on matchms 0.33.1) rather than silently
+scoring zero -- `add_precursor_mz` cannot invent a value that isn't derivable from existing
+metadata. Level 1 needs an authentic standard run in the same lab under the same method; no
+software output can substitute for it.
 
-If code throws ImportError, AttributeError, or TypeError, introspect the installed
-package and adapt the example to match the actual API rather than retrying.
+If code throws ImportError, AttributeError, TypeError, or AssertionError, introspect the
+installed package and adapt the example to match the actual API rather than retrying.
 
 # Metabolite Annotation
 
@@ -81,7 +86,9 @@ except ImportError:
 
 def prepare(spectrum):
     spectrum = default_filters(spectrum)
-    spectrum = add_precursor_mz(spectrum)  # required for ModifiedCosine or scores are zero
+    spectrum = add_precursor_mz(spectrum)  # required for ModifiedCosine; a spectrum with no
+                                            # derivable precursor_mz still raises AssertionError
+                                            # here, it does not silently score zero
     return normalize_intensities(spectrum)
 
 queries = [prepare(s) for s in queries_raw]
@@ -89,15 +96,29 @@ references = [prepare(s) for s in references_raw]
 
 scores = calculate_scores(references, queries, ModifiedCosine(tolerance=0.005))
 
+TIE_MARGIN = 0.02  # candidates within this margin of the top score are tied, not resolved
+
 # CosineGreedy/ModifiedCosine return a structured array; the field names are
 # class-prefixed and version-dependent (e.g. 'ModifiedCosineGreedy_score' in 0.33),
 # so derive them from the dtype rather than hard-coding.
 for query in queries:
     pairs = scores.scores_by_query(query)
     score_field, match_field = pairs[0][1].dtype.names
-    ref, hit = max(pairs, key=lambda pair: pair[1][score_field])
-    if hit[score_field] >= 0.7 and hit[match_field] >= 6:  # score floor + peak-count floor (GNPS defaults)
+    ranked = sorted(pairs, key=lambda pair: pair[1][score_field], reverse=True)
+    top_score = ranked[0][1][score_field]
+    # Keep every hit within TIE_MARGIN of the top score, not just the argmax -- isomers
+    # routinely score identically (the isomer wall, below), and taking a single winner
+    # would silently launder a tie into a false Level 2a identification.
+    passing = [(ref, hit) for ref, hit in ranked
+               if hit[score_field] >= top_score - TIE_MARGIN
+               and hit[score_field] >= 0.7 and hit[match_field] >= 6]  # score + peak-count floor (GNPS defaults)
+    if len(passing) > 1:
+        print([ref.get('compound_name') for ref, _ in passing], "tied -> Level 3 (isomer wall)")
+    elif len(passing) == 1:
+        ref, hit = passing[0]
         print(ref.get('compound_name'), hit[score_field], hit[match_field])  # Level 2a candidate
+    else:
+        print(query.get('compound_name'), "-> no confident candidate -> Level 5")
 ```
 
 ## Run SIRIUS for Formula, Structure, and Class
@@ -123,6 +144,45 @@ sirius --input features.mgf --project ./sirius_project \
 # --database (on structures) is a scientific choice: 'bio' raises plausibility but cannot
 # return a novel metabolite; 'pubchem' maximizes recall but floods implausible isomers.
 ```
+
+## Run MetFrag for Explainable Structure Ranking
+
+**Goal:** Rank candidate structures for a feature with an unambiguous formula but no library
+spectrum, using bond-disconnection fragment support rather than a black-box score.
+
+**Approach:** Build a minimal parameter file pointing at the peak list and a candidate database
+(a local CSV or PubChem), run the jar, and read the score as fragment support -- not
+identification; isomers sharing fragmentation frequently tie (the isomer wall).
+
+```bash
+# params.txt -- MetFrag reads "key = value" pairs, one per line
+cat > params.txt <<PARAMS
+PeakListPath = peaklist.txt
+MetFragDatabaseType = LocalCSV
+LocalDatabasePath = candidates.csv
+NeutralPrecursorMass = 192.0270
+FragmentPeakMatchAbsoluteMassDeviation = 0.01
+FragmentPeakMatchRelativeMassDeviation = 10
+MetFragCandidateWriter = CSV
+SampleName = citrate_test
+ResultsPath = .
+PARAMS
+# peaklist.txt: one "mz intensity" pair per line, no header.
+# candidates.csv (LocalCSV mode): header row
+#   Identifier,MolecularFormula,MonoisotopicMass,InChI,InChIKey,SMILES,Name
+# CSV-quote any field containing a comma -- an unquoted InChI comma silently drops that
+# candidate row: MetFrag still exits 0 and logs "Stored 0 candidate(s)", so check the
+# output row count, not just the exit code. Swap MetFragDatabaseType to PubChem (and drop
+# LocalDatabasePath) to search PubChem instead of a fixed candidate list.
+
+java -jar MetFragCommandLine-2.6.1.jar params.txt
+# writes <SampleName>.csv, one row per candidate, ranked by fragment-support Score (0-1)
+```
+
+Checked on MetFragCommandLine 2.6.1: a citrate/isocitrate candidate pair (true constitutional
+isomers, same formula and fragment masses) tied at Score 1.0 while an unrelated sugar scored
+0.12 -- the isomer wall, reproduced exactly as this Skill's Per-Method Failure Modes section
+describes below. Treat a tie as Level 3, never as a single winner.
 
 ## Assemble an Evidence-to-Level Call
 
@@ -186,7 +246,7 @@ def assign_level(evidence):
 
 | Error / symptom | Cause | Solution |
 |---|---|---|
-| ModifiedCosine scores all zero | Missing precursor m/z on spectra | Apply `add_precursor_mz` filter to both references and queries first. |
+| `AssertionError: Precursor_mz missing` | Missing precursor m/z, not recoverable by `add_precursor_mz` alone (matchms 0.33+, checked on 0.33.1) | Apply `add_precursor_mz` filter to both references and queries first; if the error persists, the spectrum has no precursor_mz derivable from its metadata at all -- exclude it from ModifiedCosine or score it with CosineGreedy instead (identity-only, not m/z-shift-aware). |
 | `AttributeError: 'Scores' has no attribute 'scores'` | Indexing `scores.scores[...]` (old tutorials) | Use `scores.scores_by_query(query)` or `scores.to_array(name=...)`. |
 | `ValueError: no field of name <X>_score` | Field names are class-prefixed and version-dependent | Read `pair[1].dtype.names` for the score/matches field names rather than hard-coding. |
 | `ImportError: cannot import name 'ModifiedCosine'` | Renamed to `ModifiedCosineGreedy` in matchms 0.33 | Try the new name with an ImportError fallback to the old. |

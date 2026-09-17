@@ -87,13 +87,13 @@ Tell the AI agent what to do:
 
 ## Tips
 
-- Editing efficiency filtering is non-negotiable. Unedited reads carry no biological perturbation; including <30% efficiency sgRNAs adds noise and dilutes signal. A 30% primary / 50% validation split is the common working convention.
+- Editing efficiency filtering is non-negotiable. Unedited reads carry no biological perturbation; including low-efficiency sgRNAs adds noise and dilutes signal. See SKILL.md's "Editing Efficiency Filtering" section for the 30% primary / 50% validation convention.
 - Bystander confounding is the central interpretation challenge in BE screens. Plan the library with multiple sgRNAs per target (10-15 in saturation designs) so bystander patterns vary; consistent signal across diverse bystanders attributes to target.
 - For pristine variant-function calls (clinical-grade), validate with prime editor (zero bystanders). Convergent BE + PE signal is the gold standard for variant pathogenicity in pooled screens.
 - Cell-line BE activity varies; pilot in your target line before designing the full library. Median library editing <30% is a cell-line issue, not a library issue.
 - ABE7.10 has lower indel rate (<2%) than CBE (5-10%); when target is A->G, ABE is the cleaner choice.
 - For C->T variants with target at position 4-5 (PAM-distal end) and bystander at position 6-7, both will edit; this is the most common interpretation trap.
-- Editor chemistries have different windows: BE3/BE4 = 4-8, eA3A = 5-7 (narrower; good for bystander minimization), ABE7.10 = 4-7 (narrowest ABE), SpABE8e = 4-8 (Richter 2020; more processive, so more bystander editing within the window), evoCDA = 1-9 (broadest; high bystander rate).
+- Editor chemistries have different windows and indel/bystander rates -- see SKILL.md's "Base Editor Chemistry Selection" table for the full per-editor comparison.
 - Run substitution-vs-indel ratio per sgRNA as a per-sample QC. <3 means Cas9-like activity (vector mismatch or contamination); >10 means clean BE.
 - The Broad be-validation-pipeline notebooks are the canonical post-processing reference for BE amplicon data; reuse them before writing custom parsers. They do not do hit calling, so score the screen with drugZ or MAGeCK.
 - For drug-modifier BE screens (like Hanna 2021 PARPi), drugZ is more sensitive than MAGeCK for chemogenomic interactions.

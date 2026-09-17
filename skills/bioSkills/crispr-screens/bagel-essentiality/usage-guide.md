@@ -62,11 +62,11 @@ Tell the AI agent what to do:
 1. Verify input file format: sgRNA, GENE, sample columns
 2. Download/verify CEGv2 and NEGv1 reference files from hart-lab
 3. Run `BAGEL.py fc` to compute fold changes from control samples
-4. Run `BAGEL.py bf` to compute Bayes Factors (default: 10-fold cross-validation; `-b -NB 1000` to bootstrap)
+4. Run `BAGEL.py bf` with a fixed `-s <int>` seed to compute Bayes Factors (default: 10-fold cross-validation; `-b -NB 1000` to bootstrap) -- BAGEL.py's own default seed is clock-based and non-reproducible, see [[bagel-essentiality]] "Reproducibility: Fixing the Random Seed"
 5. Run `BAGEL.py pr` to generate precision-recall curve
 6. Apply BF threshold (default BF >6, ~90% posterior per Hart 2017)
-7. Stratify genes: essential (BF >6), neutral (-6 to 6), candidate tumor suppressors (BF <-6)
-8. For tumor suppressors, cross-check against COSMIC / published tumor suppressor lists
+7. Stratify genes: essential (BF >6), neutral (-6 to 6); candidate tumor suppressors (BF <-6) only when the screen is designed to expect enrichment -- see `interpret_bagel(..., screen_type=...)`
+8. For tumor suppressors, exclude assay-control pseudo-genes first, then cross-check against COSMIC / published tumor suppressor lists
 9. Compare to MAGeCK output (if also run); report consensus hits
 10. Cross-check per-sgRNA LLR contributions for low-efficacy guides
 11. Output essential genes ranked by BF, tumor suppressor candidates flagged, library calibration metrics
@@ -77,7 +77,8 @@ Tell the AI agent what to do:
 - BF >6 corresponds to ~90% posterior probability against CEGv2 in Hart 2017 (the ~5% FDR mapping is a rough BAGEL convention). For cell types outside cancer (iPSC, primary T cells), this calibration may not hold; use a cell-type-specific essentialome derived for the relevant lineage.
 - BAGEL2's tumor-suppressor sensitivity comes from linear extrapolation in the BF calculation. This is a real improvement over BAGEL1 and worth using for drug-modifier screens or screens expecting positive selection.
 - For copy-number-confounded cancer-line screens, pre-correct with CRISPRcleanR (see [[copy-number-correction]]) before BAGEL2; otherwise, amplified regions will appear as "essential" with high BF.
-- The resampling CI (STD column) is the diagnostic for guide-quality issues. Wide CI = low confidence; investigate per-sgRNA contributions.
+- The resampling CI (STD column) is the diagnostic for guide-quality issues -- but it only exists when `bf` is run with `-b` (bootstrap); the 10-fold cross-validation default writes only `GENE`/`BF`. Wide CI = low confidence; investigate per-sgRNA contributions.
+- `BAGEL.py bf` seeds its resampling from the system clock unless `-s <int>` is given -- unseeded reruns on the same data can flip dozens of genes across the BF>6 threshold. Always pass a fixed `-s` and record it for any result you'll report.
 - For screens with only 3 sgRNAs/gene (some custom libraries), switch to bootstrapping with `-b -NB` to 5000+ for stable estimates.
 - When BAGEL2 and MAGeCK disagree, BAGEL2 typically calls more hits in screens with high background variance (it's robust due to reference-set anchoring) and fewer in screens with strong NTC null distribution.
 - For non-cancer cell types, cross-check that CEGv2 genes drop out at expected rate. If not, use cell-type-specific reference.
@@ -108,10 +109,11 @@ Precision and recall are screen-specific -- generate them with `BAGEL.py pr` rat
 
 - [ ] CEGv2 and NEGv1 files downloaded and verified
 - [ ] Resampling left at the 10-fold cross-validation default, or `-b -NB 1000` used deliberately
+- [ ] Fixed `-s <int>` seed passed to `bf` and recorded -- unseeded runs are not reproducible (up to 33/18,053 gene calls flip between identical-input reruns)
 - [ ] PR curve generated against CEGv2 for empirical threshold selection
 - [ ] Per-sgRNA LLR distributions checked for outliers
 - [ ] Hits cross-validated with MAGeCK or JACKS (consensus tier)
-- [ ] Tumor-suppressor calls (if any) cross-checked against COSMIC TS list
+- [ ] Tumor-suppressor calls only made when the screen design expects enrichment; assay-control pseudo-genes excluded; cross-checked against COSMIC TS list
 
 ## Related Skills
 

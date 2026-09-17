@@ -136,10 +136,12 @@ table_annovar.pl norm.vcf humandb/ -buildver hg38 -out annotated -remove \
 ```bash
 bcftools csq -p a -f reference.fa -g genes.gff3.gz norm.vcf.gz -Oz -o csq.vcf.gz   # adds BCSQ
 bcftools annotate -a dbsnp.vcf.gz -c ID norm.vcf.gz -Oz -o rsid.vcf.gz             # copy rsIDs
+bcftools index -f rsid.vcf.gz                                                     # annotate -a needs the target indexed
+# contig naming must match: compare `bcftools index -s rsid.vcf.gz` vs `bcftools index -s gnomad.vcf.gz` (chr1 vs 1 annotates nothing, exit 0)
 bcftools annotate -a gnomad.vcf.gz -c INFO/gnomAD_FAF:=INFO/fafmax_faf95_max rsid.vcf.gz -Oz -o af.vcf.gz  # new tag
 ```
 
-`csq` defaults to `-p r` and exits on the first unphased het; `-p a` assumes all hets are in cis and merges nearby hets in a transcript into one consequence (a frameshift can absorb a downstream stop), `-p m` merges only phased hets, `-p s` keeps unphased hets separate. `annotate -a <vcf>` needs an indexed target file (not a pipe). Annotate database frequencies into a new tag: copying into `INFO/AF` keeps the input's own AF wherever the source has no record, so "absent from gnomAD" can no longer be detected.
+`csq` defaults to `-p r` and exits on the first unphased het. Per `bcftools csq` help (checked on 1.24 and 1.21): `-p a` takes GTs as is, creating haplotypes regardless of phase (0/1 -> 0|1) and merges nearby hets in a transcript into one consequence (a frameshift can absorb a downstream stop); `-p m` merges *all* GTs into a single haplotype regardless of phase (0/1 -> 1, 1/2 -> 1) -- this merged a trans-phased frameshift and stop into one haplotype in testing; `-p r` requires phased GTs and errors on an unphased het; `-p R` creates non-reference haplotypes where possible; `-p s` skips unphased hets entirely (no consequence emitted). Recommend `-p a` for typically-unphased short-read data. `annotate -a <vcf>` needs an indexed target file (not a pipe). Annotate database frequencies into a new tag: copying into `INFO/AF` keeps the input's own AF wherever the source has no record, so "absent from gnomAD" can no longer be detected.
 
 See usage-guide.md for BED/TAB annotation, field removal, `--set-id`, chromosome renaming, and database download recipes.
 

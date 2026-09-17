@@ -61,7 +61,7 @@ Tell your AI agent what you want to do:
 - QC RSD approaching 0% after correction is a failure mode (lock-point overfitting), not success.
 - Correct a feature only if it is present in the QCs and actually drifts; reflexively correcting flat features injects noise.
 - Lead filtering with D-ratio (technical SD / biological SD); always state the data stage a CV was computed on.
-- If the normalization factor (PQN coefficient, TIC) correlates with the phenotype, the normalization is eating the effect.
+- If the normalization factor (PQN coefficient, TIC) correlates with the phenotype, the normalization is eating the effect -- test with a permutation (shuffle group labels, compare to the observed correlation) rather than a fixed r cutoff, which trips from noise alone at typical sample sizes (n~40).
 - If many features moved together after TIC/sum, suspect closure from one big mover before believing coordination.
 - Filter before imputing; impute only the residual sparse holes; stress-test the imputation under a second method.
 - Randomize at the bench, or accept that drift and effect are inseparable -- design beats algorithm.

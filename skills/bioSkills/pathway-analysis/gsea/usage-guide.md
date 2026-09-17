@@ -69,7 +69,7 @@ The full ORA-vs-FCS-vs-topology fork and the competitive/self-contained null the
 |-----------|----------------|--------|-------|
 | DESeq2 | Wald statistic | `stat` | best single choice for RNA-seq; signed + variance-calibrated |
 | limma / voom | moderated t-statistic | `t` | empirical-Bayes shrinkage; signed |
-| edgeR | signed p-value | `sign(logFC) * -log10(PValue)` | no Wald-equivalent; clamp p==0 with pmax(p, 1e-300) |
+| edgeR | signed p-value | `sign(logFC) * -log10(PValue)` | no Wald-equivalent; clamp p==0 with pmax(p, 1e-30) - the clamp is a ranking weight at exponent=1, not just an Inf guard; 1e-300 can give a handful of exact-zero genes >16% of the total ranking weight and erase a real signal |
 | any tool, last resort | log2FC alone | `log2FoldChange` | magnitude only; noisy for low-count genes |
 
 apeglm/ashr-shrunk DESeq2 results drop the `stat` column - pull `stat` from the unshrunk `results(dds)` if ranking by it. Never use `lfcShrink(type='normal')` for ranking.
@@ -83,8 +83,8 @@ apeglm/ashr-shrunk DESeq2 results drop the `stat` column - pull `stat` from the 
 
 ## Tips
 - The ranking is the experiment; the gene sets are just the question asked of it. A bad ranking is faithfully reported as a ranking artifact.
-- Preranked GSEA (clusterProfiler/fgsea) uses GENE permutation, which destroys gene-gene correlation and is anti-conservative for co-regulated sets. Report the permutation type; when the design matrix is available, use CAMERA (`limma::camera`) for a correlation-honest competitive test.
-- `nPerm` no longer exists; tiny-p accuracy is governed by `eps` (set `eps=0` for exact). The engine is `fgseaMultilevel` via `by='fgsea'` (the default).
+- Preranked GSEA (clusterProfiler/fgsea) uses GENE permutation, which destroys gene-gene correlation and is anti-conservative for co-regulated sets. Report the permutation type; when the design matrix is available, use CAMERA with the correlation estimated (`limma::camera(..., inter.gene.cor = NA)`) for a correlation-honest competitive test - the default preset `inter.gene.cor = 0.01` gives no protection (audit-verified: FDR 7.2e-08 on a set with true correlation ~0.31 under the default preset, vs 0.80 once estimated).
+- `nPerm` still exists as an argument and is silently ACCEPTED (not rejected) with only a deprecation warning, then downgrades the engine from `fgseaMultilevel` to the coarser `fgseaSimple` - it does not error. Drop it entirely; tiny-p accuracy is governed by `eps` (set `eps=0` for exact). The engine is `fgseaMultilevel` via `by='fgsea'` (the default).
 - ssGSEA and GSVA are NOT a contrast test - they produce a per-sample activity matrix with no per-set p-value. GSVA >= 1.50 needs the parameter-object API: `gsva(gsvaParam(expr, sets))`.
 - msigdbr 26.x renamed `category=` to `collection=` and `gs_cat` to `gs_collection`; the Entrez column is `ncbi_gene` (older releases used `entrez_gene`). Check `?msigdbr` and `names()` for the installed version.
 - If no terms are enriched, check the ranking metric (is it signed?), confirm the vector is named and sorted decreasing, deduplicate gene IDs, and verify the ID type matches the database.

@@ -9,6 +9,11 @@ Usage:
   python mcmctree_setup.py                      # demo: write control files to a temp dir
   python mcmctree_setup.py aln.phy calibrated.tre   # run prior -> bv -> post (mcmctree on PATH)
 calibrated.tre must start with an 'ntaxa 1' header line (see write_tree_file).
+
+Multi-locus data: concatenate each locus's PHYLIP block (its own 'ntaxa nsites' header line,
+same taxon set, blank line between blocks) into one seqfile, then pass ndata=<number of loci>
+(e.g. generate_prior_and_posterior_configs(seqfile, treefile, outdir, ndata=2)) -- see
+write_control_file's docstring for the ndata format.
 '''
 # Reference: PAML/MCMCTree 4.10.10 | Verify control-file syntax if version differs
 
@@ -33,6 +38,12 @@ def write_control_file(outpath, seqfile, treefile, outfile='out.txt', mcmcfile='
     clock: 1 = strict, 2 = independent rates, 3 = autocorrelated rates.
     model: 0 = JC69, 4 = HKY85, 7 = REV (GTR). RootAge is mandatory unless the root is calibrated.
     bdparas: PAML 4.10 requires a trailing flag, m (multiplicative) or c (conditional).
+    ndata: number of loci/partitions in seqfile (PAML's old-style option, examples/ndata/README.txt
+    in the PAML distribution: "the multiple alignments are in one sequence data file, one after
+    another"). Defaults to 1 (single alignment). For multi-locus data, concatenate ndata PHYLIP
+    blocks into one file -- each block starts with its own '<ntaxa> <nsites>' header line and lists
+    the SAME taxon names, separated from the next block by a blank line -- and set ndata to the
+    block count; every locus still shares the one treefile passed to this function.
     '''
     lines = [
         f'seed = {seed}',

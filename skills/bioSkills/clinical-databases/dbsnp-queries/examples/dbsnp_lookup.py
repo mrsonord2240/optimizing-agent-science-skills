@@ -150,14 +150,24 @@ def batch_normalize_rsids(rsids):
     '''
     mv = myvariant.MyVariantInfo()
     fields = ['dbsnp.rsid', 'gnomad_exome.af.af', 'gnomad_genome.af.af', 'clinvar.rcv.clinical_significance']
+    unique_rsids = list(dict.fromkeys(rsids))
+    # Resolve merges first: myvariant.info's dbsnp collection is keyed by the CURRENT rsID, so a
+    # merged input (e.g. rs630496) returns notfound unless queried by its resolved canonical rsID
+    # (e.g. rs429358). Query by canonical rsID, not the input rsID. resolve_merge_chain's
+    # final_rsid is a bare digit string (e.g. '429358'); re-add the 'rs' prefix for the query.
+    merge_results = {rsid: resolve_merge_chain(rsid) for rsid in unique_rsids}
+    def _rs(x):
+        return x if str(x).startswith('rs') else f'rs{x}'
+    canonical = {rsid: _rs(merge_results[rsid].get('final_rsid', rsid)) for rsid in unique_rsids}
     hits_by_rsid = {}
-    for entry in mv.getvariants(rsids, fields=fields):
+    for entry in mv.getvariants(list(dict.fromkeys(canonical.values())), fields=fields):
         hits_by_rsid.setdefault(entry.get('query'), []).append(entry)
     rows = []
-    for rsid in dict.fromkeys(rsids):
-        hits = [h for h in hits_by_rsid.get(rsid, []) if not h.get('notfound')]
-        merge_result = resolve_merge_chain(rsid)
-        alleles = alleles_grch38(refsnp(merge_result.get('final_rsid', rsid)))
+    for rsid in unique_rsids:
+        merge_result = merge_results[rsid]
+        canonical_rsid = canonical[rsid]
+        hits = [h for h in hits_by_rsid.get(canonical_rsid, []) if not h.get('notfound')]
+        alleles = alleles_grch38(refsnp(canonical_rsid))
         # one ';'-separated value per myvariant hit, '.' where the hit has no value (keeps alleles aligned)
         join = lambda vals: ';'.join('.' if v is None else str(v) for v in vals) or None
         rows.append({

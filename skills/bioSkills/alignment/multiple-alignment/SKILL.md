@@ -68,7 +68,9 @@ Some workloads exceed what the four main tools handle gracefully. Use the scale-
 | Strand-unknown (Sanger, Nanopore raw) | `mafft --adjustdirection --globalpair` | Auto-detects and reverse-complements as needed |
 | Adding many sequences to a curated profile | HMMER `hmmalign` (Eddy 2011 PLOS CB) | Profile-driven; better than `mafft --add` for Pfam-style use |
 
-**vcMSA limitation:** Pre-filter input to within ~2x mean length; vcMSA degrades sharply on mixed full-length/fragment input because ProtT5 embeddings encode positional context. For mixed-length sets, segment long sequences via HHsearch domain decomposition before alignment, or use Foldmason on predicted structures.
+**vcMSA limitation:** mixed full-length/fragment input degrades vcMSA sharply because ProtT5 embeddings encode positional context. See `references/specialist-tools.md` for the pre-filtering and segmentation workaround.
+
+**`--adjustdirection` renames reversed sequences.** MAFFT silently prepends `_R_` to the header of every sequence it reverse-complements (verified on MAFFT 7.526: `mafft --adjustdirection --globalpair small.fa` turned `>revcomp_seq` into `>_R_revcomp_seq`, leaving already-forward sequences untouched). Strip the `_R_` prefix from sequence IDs before any downstream join or merge keyed on sequence name (tree tip labels, metadata tables, `pal2nal` pairing) -- an unstripped prefix silently breaks the key match instead of erroring.
 
 ## Critical Concepts
 
@@ -78,14 +80,7 @@ All major MSA tools build a guide tree, then align progressively along it; once 
 
 ### Joint MSA-Phylogeny Co-estimation (Small Datasets Only)
 
-The theoretically correct answer to guide-tree dependency is to estimate the alignment and tree jointly under a statistical evolutionary model rather than treating MSA as a fixed input to phylogenetic inference. BAli-Phy version 3 (Redelings 2021 Bioinf 37:3032) does this via MCMC, producing a posterior distribution over alignments and trees with insertion/deletion rates as model parameters. Version 3 is O(n) instead of O(n^2) per likelihood evaluation, but the practical ceiling remains ~70-200 sequences before runtime becomes prohibitive (weeks for >100 sequences). When the dataset fits the cap, BAli-Phy gives the most defensible alignment+tree pair for publication; when it does not, the practical alternative is MUSCLE5 ensemble + IQ-TREE per-replicate (Edgar 2022) to approximate posterior alignment uncertainty without joint estimation.
-
-| Dataset size | Recommended approach |
-|--------------|----------------------|
-| < 70 sequences | BAli-Phy v3 joint MSA+tree posterior; gold standard |
-| 70 - 200 sequences | BAli-Phy v3 if compute allows (weeks); else MUSCLE5 ensemble + IQ-TREE per replicate |
-| > 200 sequences | MUSCLE5 ensemble (`-stratified`) + IQ-TREE per replicate; BAli-Phy not feasible |
-| > 1000 sequences | Single MAFFT/MUSCLE5 + standard bootstrap; ensemble methods become intractable |
+The theoretically correct answer to guide-tree dependency is to estimate the alignment and tree jointly under a statistical evolutionary model rather than treating MSA as a fixed input to phylogenetic inference, via BAli-Phy's MCMC co-estimation (practical ceiling ~70-200 sequences); the practical alternative above that ceiling is MUSCLE5 ensemble + IQ-TREE per-replicate (Edgar 2022). See `references/specialist-tools.md` for the BAli-Phy workflow and the dataset-size table.
 
 ### Sequence Divergence Thresholds
 
@@ -118,17 +113,24 @@ MAFFT offers multiple algorithms with explicit accuracy/speed tradeoffs. Selecti
 
 ### What `--auto` Picks (and Why to Specify Explicitly)
 
-`mafft --auto` silently downgrades the algorithm based on dataset size. The decision tree is roughly:
+`mafft --auto` silently downgrades the algorithm based on dataset size **and** alignment length (column count) -- verified against the size-check block (`if [ $auto -eq 1 ]`) in the `mafft` wrapper script itself (MAFFT v7.526, `usr/bin/mafft`). Rows are evaluated top-to-bottom; the first match wins.
 
-| Sequences | `--auto` selects | Equivalent flags |
-|-----------|------------------|------------------|
-| < 200 | L-INS-i | `--localpair --maxiterate 1000` |
-| 200 - 500 | FFT-NS-i | `--retree 2 --maxiterate 2` |
-| 500 - 2000 | FFT-NS-2 | `--retree 2 --maxiterate 0` |
-| 2000 - 50000 | FFT-NS-2 (one-pass) | `--retree 1 --maxiterate 0` |
-| > 50000 | PartTree | `--parttree --retree 1 --maxiterate 0` |
+| Sequences | Columns | `--auto` selects | Equivalent flags |
+|-----------|---------|-------------------|-------------------|
+| < 100 | < 3,000 | L-INS-i | `--localpair --maxiterate 1000` |
+| < 200 | < 1,000 | L-INS-i, but capped to 2 iterations | `--localpair --maxiterate 2` |
+| < 500 | < 10,000 | FFT-NS-i | `--retree 2 --maxiterate 2` |
+| < 20,000 | any | FFT-NS-2 | `--retree 2 --maxiterate 0` |
+| < 100,000 | any | FFT-NS-2, memory-saving guide tree | `--retree 2 --maxiterate 0 --memsavetree` |
+| < 200,000 | any | FFT-NS-1, memory-saving guide tree | `--retree 1 --maxiterate 0 --memsavetree` |
+| >= 200,000 | < 3,000 | PartTree, local-alignment distance | `--dpparttree` |
+| >= 200,000 | >= 3,000 | PartTree, k-mer distance | `--parttree` |
 
-The transition at 200 sequences flips the alignment from "iterative-refined accurate" to "single-pass progressive". Note that `--auto` invokes FFT-NS-i with only `--maxiterate 2` in the 200-500 range (a truncated form of the full FFT-NS-i which uses `--maxiterate 1000`); for best accuracy in this range, specify `--retree 2 --maxiterate 1000` explicitly. For publication-quality phylogenetics, specify the algorithm explicitly so reproducibility audits do not rely on internal threshold heuristics.
+Both sequence count AND column count gate the first three rows -- e.g. 150 sequences of a 1.5 kb gene (150 seqs x ~1,500 columns) fail the `< 100`/`< 3,000` row (too many sequences) and the `< 200`/`< 1,000` row (too many columns), so `--auto` falls through to FFT-NS-i, not L-INS-i, despite being under the old "< 200" threshold. Verified empirically on this machine (MAFFT v7.526): 90 seqs x 200bp -> L-INS-i; 150 seqs x 200bp -> L-INS-i, 2 iterations; 150 seqs x 1,500bp and 120 seqs x 1,100bp -> FFT-NS-i, 2 iterations; 600 seqs x 200bp -> FFT-NS-2. The 100,000 / 200,000 / PartTree rows were confirmed by reading the script only -- running them here wasn't practical.
+
+Separately, the wrapper caps `--maxiterate` at 16 by default no matter what value is requested (`iteratelimit=16` under the default `BAATARI2` parallelization strategy, `usr/bin/mafft` ~line 1512) -- confirmed by running `mafft --localpair --maxiterate 1000` explicitly and seeing "Iterative refinement method (<16)" in the reported strategy, identical to `--auto`'s output for the same input. So hand-specifying `--maxiterate 1000` does not actually raise the iteration count above 16 unless a `--bestfirst`/`--baatari0` parallelization strategy is also set (raises the cap to 254).
+
+For publication-quality phylogenetics, specify the algorithm explicitly so reproducibility audits do not rely on internal threshold heuristics.
 
 ### Basic Usage
 
@@ -209,12 +211,12 @@ For HMM-curated families (Pfam, Rfam), `hmmalign --trim --outformat afa profile.
 
 ## Running MUSCLE5
 
-Pick `-align` (PPP) for peak-accuracy runs up to ~1000 sequences, or `-super5` (mBed clustering + chunked alignment) for thousands to millions. `-super5` is not a "lower quality" mode; both share the same HMM-perturbation ensemble machinery.
+Pick `-align` (PPP) for peak-accuracy runs up to ~1000 sequences, or `-super5` (mBed clustering + chunked alignment) for thousands to millions. `-super5` is not a "lower quality" mode; both share the same HMM-perturbation single-replicate machinery (`-perm`/`-perturb`), but only `-align` accepts the `-stratified`/`-diversified` ensemble flags directly -- `-super5` rejects them (checked on MUSCLE 5.3.win64: `-super5 ... -stratified` fails with "-stratified not supported").
 
 | Command | Algorithm | Designed for | Output |
 |---------|-----------|--------------|--------|
-| `-align` (PPP) | Posterior probability progressive (HMM) | <= ~1000 seqs, peak accuracy | Single MSA or .efa ensemble |
-| `-super5` | mBed-clustering + chunked alignment | Thousands to millions of seqs | Single MSA or .efa ensemble |
+| `-align` (PPP) | Posterior probability progressive (HMM) | <= ~1000 seqs, peak accuracy | Single MSA, or `.efa` ensemble via `-stratified`/`-diversified` |
+| `-super5` | mBed-clustering + chunked alignment | Thousands to millions of seqs | Single MSA only per run; no direct `.efa` (combine several `-perm`/`-perturb` runs with `-fa2efa` for an ensemble) |
 
 ### Basic Usage
 
@@ -230,17 +232,30 @@ muscle -super5 input.fasta -output aligned.fasta -threads 8
 
 **Goal:** Quantify alignment uncertainty by generating multiple HMM-perturbed alignments and measuring column consistency.
 
-**Approach:** MUSCLE5 (Edgar 2022 Nat Comm) ships two ensemble modes: `-stratified` (16 replicates by default: the `-replicates` flag defaults to 4 HMM-perturbation seeds x 4 guide-tree permutations) and `-diversified` (100 replicates by default). Both write an Ensemble FASTA (.efa) file containing all replicates; column-level confidence is the fraction of replicates that place a given residue pair in the same column. `-perturb SEED` is a separate flag that sets the HMM-perturbation random seed, not an ensemble selector.
+**Approach:** MUSCLE5 (Edgar 2022 Nat Comm) ships two ensemble modes: `-stratified` (16 replicates by default: the `-replicates` flag defaults to 4 HMM-perturbation seeds x 4 guide-tree permutations) and `-diversified` (100 replicates by default). Both belong to the `-align` (PPP) command, not `-super5` -- `-super5` only accepts `-perm`/`-perturb` for a single replicate and rejects `-stratified`/`-diversified`/`-replicates` outright (checked on MUSCLE 5.3.win64: each fails with "`<flag>` not supported"). Both write an Ensemble FASTA (.efa) file containing all replicates; column-level confidence is the fraction of replicates that place a given residue pair in the same column. `-perturb SEED` is a separate flag that sets the HMM-perturbation random seed, not an ensemble selector.
 
 ```bash
 # Stratified ensemble: 16 replicates (4 HMM-perturbation seeds x 4 guide-tree permutations)
-muscle -super5 input.fasta -stratified -output ensemble.efa
+# Verified on MUSCLE 5.3.win64 / prot15_unaligned.fa (15 seqs): produced 240 aligned records = 16 x 15
+muscle -align input.fasta -stratified -output ensemble.efa
 
 # Diversified ensemble: 100 replicates exploring guide-tree and HMM space
-muscle -super5 input.fasta -diversified -output ensemble.efa
+# Verified: produced 1500 aligned records = 100 x 15
+muscle -align input.fasta -diversified -output ensemble.efa
 
 # Optional: change replicate count and HMM-perturbation seed
-muscle -super5 input.fasta -stratified -replicates 8 -perturb 42 -output ensemble.efa
+muscle -align input.fasta -stratified -replicates 8 -perturb 42 -output ensemble.efa
+```
+
+`-align` scales to peak accuracy only up to ~1000 sequences. Above that you need `-super5`, which cannot write `.efa` directly. Run it once per replicate with a distinct `-perm`/`-perturb` pair, then combine the single alignments into one ensemble with `-fa2efa` (verified: 3 `-super5` single-replicate runs combined into one 45-record `.efa` = 3 x 15 seqs):
+
+```bash
+# >1000 sequences: build replicates individually with -super5, then merge into one ensemble
+muscle -super5 input.fasta -perm none -perturb 1 -output rep1.afa
+muscle -super5 input.fasta -perm abc  -perturb 2 -output rep2.afa
+muscle -super5 input.fasta -perm acb  -perturb 3 -output rep3.afa
+printf 'rep1.afa\nrep2.afa\nrep3.afa\n' > replicates.txt
+muscle -fa2efa replicates.txt -output ensemble.efa
 ```
 
 The .efa output is consumed downstream to derive confidence-weighted bootstrap support: each replicate is fed to a tree builder and the resulting trees combined (Edgar 2022 supplement). Columns consistently aligned across replicates are reliable; high-divergence regions diverge between replicates and should be flagged before phylogenetic inference.
@@ -276,27 +291,11 @@ clustalo -i input.fasta -o aligned.fasta --threads=8
 
 Use T-Coffee for small datasets (<50 sequences) where maximum accuracy matters or where structural templates exist (Expresso, 3D-Coffee). It is slower than progressive aligners but integrates diverse evidence via consistency-based library scoring.
 
-| Mode | Flag | What it does |
-|------|------|-------------|
-| Default | (none) | T-Coffee + Lalign pairwise library |
-| M-Coffee | `-mode mcoffee` | Combines libraries from MAFFT, MUSCLE, ClustalW, ProbCons, T-Coffee, etc. |
-| Expresso | `-mode expresso` | PSI-BLAST searches PDB for structural templates, runs SAP structural alignment (requires internet for PSI-BLAST and PDB lookups; offline alternative: 3D-Coffee with user-supplied templates) |
-| 3D-Coffee | `-mode 3dcoffee -template_file templates.txt` | User-supplied PDB templates; SAP / TM-align pairwise structural library |
-| R-Coffee | `-mode rcoffee` | RNA: combines sequence alignment with consensus secondary structure (RNAplfold) |
-| Pro-Coffee | `-mode procoffee` | Promoter regions: enforces position-specific TF binding-site alignment |
-| Reliability | `-evaluate -output score_ascii` | TCS column reliability score for an existing alignment |
-
 ```bash
 t_coffee input.fasta -output fasta_aln -outfile aligned.fasta
-
-t_coffee input.fasta -mode mcoffee -output fasta_aln -outfile aligned.fasta
-
-t_coffee input.fasta -mode expresso -output fasta_aln -outfile aligned.fasta
-
-t_coffee -infile aligned.fasta -evaluate -output score_ascii > tcs_scores.ascii
 ```
 
-**When to use T-Coffee**: Small datasets (<50 sequences) where maximum accuracy matters, especially when structural information (PDB templates) is available. Expresso (Armougom et al 2006 NAR) and 3D-Coffee modes (Poirot et al 2004; O'Sullivan et al 2004 JMB) substantially improve correct-column rate over sequence-only T-Coffee when structures exist; verify the latest benchmark numbers in the project documentation. Expresso requires internet access for PSI-BLAST + PDB lookups. The TCS reliability score (Chang et al 2014 MBE) flags individual columns as reliable/unreliable for downstream filtering before phylogenetics.
+See `references/tcoffee.md` for the mode table (M-Coffee, Expresso, 3D-Coffee, R-Coffee, Pro-Coffee, TCS reliability scoring), their commands, and when to use each.
 
 ## Codon-Aware Alignment
 
@@ -373,23 +372,11 @@ java -jar macse_v2.jar -prog enrichAlignment -align existing.fasta \
 
 ### OMM_MACSE: Recommended Pipeline Wrapper
 
-OMM_MACSE (Ranwez group, used in OrthoMaM v10+) chains: MACSE `trimNonHomologousFragments` to remove non-homologous fragments (annotation errors, retained introns/UTRs), MAFFT pre-alignment for guide-tree, MACSE v2 frameshift-aware refinement, then soft HMMcleaner cleaning. This is the recommended pipeline for genome-scale ortholog datasets where some genes will contain frameshifts.
-
-```bash
-OMM_MACSE_v12.02.sif --in_seq_file orthogroup.fasta --out_dir omm_out --out_file_prefix orthogroup --genetic_code_number 1
-```
+OMM_MACSE (Ranwez group, used in OrthoMaM v10+) chains MACSE non-homologous-fragment trimming, MAFFT pre-alignment, MACSE v2 frameshift-aware refinement, and HMMcleaner -- the recommended pipeline for genome-scale ortholog datasets where some genes will contain frameshifts. See `references/specialist-tools.md` for the pipeline description and invocation command.
 
 ### HyPhy pre-msa.bf / post-msa.bf
 
-For HyPhy-grade dN/dS analyses (BUSTED, MEME, aBSREL, RELAX), Pond lab's standard workflow is:
-
-```bash
-hyphy pre-msa.bf --input cds.fasta
-mafft --auto cds.fasta_protein.fas > cds.fasta_protein.msa
-hyphy post-msa.bf --protein-msa cds.fasta_protein.msa --nucleotide-sequences cds.fasta_nuc.fas --output cds.codon.msa
-```
-
-`pre-msa.bf` strips internal stop codons and translates; `post-msa.bf` validates that all sequences remain in-frame after threading. Without this validation step, a single mis-aligned codon can cascade into a spurious episodic-selection call.
+For HyPhy-grade dN/dS analyses (BUSTED, MEME, aBSREL, RELAX), Pond lab's standard workflow strips stop codons, aligns at the protein level, then threads back and validates frames. See `references/specialist-tools.md` for the three-command sequence.
 
 ### Confidence Assessment
 
@@ -411,15 +398,41 @@ Mask columns below the reliability threshold before phylogenetic inference. Tree
 Before proceeding to downstream analysis, verify alignment quality:
 
 1. **Visual inspection**: Scan for columns of mostly gaps with scattered residues (hallmark of misalignment)
-2. **Gap distribution**: High gap fraction (>50% of columns with gaps) suggests problematic regions or inclusion of non-homologous sequences
+2. **Gap distribution**: A high gap fraction (>50% of columns with gaps) is a prompt to inspect further, not a verdict on its own -- a correct indel-rich alignment (true divergent-family history) can clear this threshold too (audited case: 55.7% gapped columns on a genuinely correct alignment, SP 0.966 vs truth). Read it alongside the homology/orientation screen below, not instead of it.
 3. **Sequence identity**: If average pairwise identity is <25% for proteins, alignment reliability is questionable
-4. **Outlier sequences**: Sequences with excessive gaps relative to others may be non-homologous or fragments; consider removing and re-aligning
+4. **Outlier sequences**: Sequences with excessive gaps relative to others are a lead to check, not a homology verdict -- a contaminant's gap fraction can sit inside the range of the real homologs (audited case: a non-homologous contig at 0.18 next to homologs at 0.12-0.16, indistinguishable by gap fraction alone) while scoring far below them on a direct homology/orientation screen. Run the screen in "When NOT to Run MSA" below rather than deciding from gap counts alone.
 5. **Conservation pattern**: Functional domains should show clear conservation; absence of expected conserved motifs suggests alignment error or non-homology
 6. **Run GUIDANCE2 or MUSCLE5 ensemble**: Quantify alignment confidence per column before phylogenetic inference
 
 ## When NOT to Run MSA
 
-- **Non-homologous sequences**: MSA tools always produce an alignment, even for unrelated sequences; verify homology first (e.g., BLAST E-value < 1e-5)
+- **Non-homologous sequences**: MSA tools always produce an alignment, even for unrelated sequences; verify homology first (e.g., BLAST E-value < 1e-5). If BLAST+ is not installed, use a local score-vs-shuffled screen instead -- it also flags orientation ahead of `--adjustdirection`:
+
+```python
+# Homology/orientation pre-flight, no BLAST+ required (Biopython PairwiseAligner).
+# A real homolog scores far above the null distribution from shuffled copies of
+# itself; a contaminant or unrelated sequence does not. Run before MSA, not after --
+# gap fraction alone (checklist items 2 and 4 above) can miss a contaminant whose
+# gap fraction lands inside the range of the real homologs.
+import random
+from Bio import SeqIO
+from Bio.Align import PairwiseAligner
+
+recs = list(SeqIO.parse('sequences.fa', 'fasta'))
+al = PairwiseAligner(mode='local', match_score=2, mismatch_score=-3,
+                      open_gap_score=-5, extend_gap_score=-2)
+rng = random.Random(1)
+ref = recs[0]                                    # or a known-good reference
+for r in recs[1:]:
+    fwd, rev = al.score(ref.seq, r.seq), al.score(ref.seq, r.seq.reverse_complement())
+    shuffled_max = max(al.score(ref.seq, ''.join(rng.sample(str(r.seq), len(r.seq))))
+                        for _ in range(5))
+    call = 'NON-HOMOLOGOUS?' if max(fwd, rev) < 2 * shuffled_max else \
+           ('reverse strand' if rev > fwd else 'forward')
+    print(f'{r.id}: fwd={fwd:.0f} rev={rev:.0f} shuffled_max={shuffled_max:.0f} -> {call}')
+```
+
+  Checked on MAFFT 7.526 / BioPython 1.88 against a 13-sequence set with one planted contaminant and three reverse-strand sequences: flagged only the contaminant as `NON-HOMOLOGOUS?` (score 21, vs. shuffled-null ceiling 25) and correctly called the three reverse-strand sequences without flagging them, while their gap fractions (0.12-0.16) were indistinguishable from the contaminant's (0.18). Drop anything flagged `NON-HOMOLOGOUS?` before alignment; re-run `--adjustdirection` only on what remains, then strip `_R_` per the note above.
 - **Sequences below the twilight zone**: Below ~20% protein identity, sequence signal is lost in noise; structural alignment is needed
 - **Different domain architectures**: Globally aligning multi-domain proteins with different domain orders produces meaningless results; align individual domains separately
 - **Very different lengths without shared homology**: Aligning a 50-residue fragment against 1000-residue proteins globally forces biologically meaningless gaps; use local alignment or fragment-aware modes (E-INS-i)
@@ -431,7 +444,7 @@ Before proceeding to downstream analysis, verify alignment quality:
 |------|---------|
 | Best accuracy (<200 seqs) | `mafft --localpair --maxiterate 1000 in.fa > out.fa` |
 | Large dataset | `mafft --retree 2 in.fa > out.fa` or `clustalo -i in.fa -o out.fa` |
-| Uncertainty estimation | `muscle -super5 in.fa -stratified -output out.efa` |
+| Uncertainty estimation | `muscle -align in.fa -stratified -output out.efa` |
 | Codon-aware | Align protein first, then `pal2nal.pl prot.fa cds.fa -output fasta` |
 | Add to existing MSA | `mafft --add new.fa existing.fa > updated.fa` |
 | Profile merge | `clustalo --p1 msa1.fa --p2 msa2.fa -o merged.fa` |
@@ -471,6 +484,6 @@ Before proceeding to downstream analysis, verify alignment quality:
 - Sela I, Ashkenazy H, Katoh K, Pupko T. 2015. GUIDANCE2: accurate detection of unreliable alignment regions accounting for the uncertainty of multiple parameters. NAR 43:W7-W14.
 - Chang JM, Di Tommaso P, Notredame C. 2014. TCS: a new multiple sequence alignment reliability measure to estimate alignment accuracy and improve phylogenetic tree reconstruction. MBE 31:1625-1637.
 - Fletcher W, Yang Z. 2010. The effect of insertions, deletions, and alignment errors on the branch-site test of positive selection. MBE 27:2257-2267.
-- Armougom F, Moretti S, Poirot O, Audic S, Dumas P, Schaeli B, Keduas V, Notredame C. 2006. Expresso: automatic incorporation of structural information in multiple sequence alignments using 3D-Coffee. NAR 34:W604-W608.
 - McWhite CD, Armour-Garb I, Singh M. 2023. Leveraging protein language models for accurate multiple sequence alignments. Genome Res 33:1145-1153.
-- Redelings BD. 2021. BAli-Phy version 3: model-based co-estimation of alignment and phylogeny. Bioinf 37:3032-3034.
+
+Redelings 2021 and Armougom et al 2006 citations moved to `references/specialist-tools.md` and `references/tcoffee.md` respectively, with the sections that cite them.

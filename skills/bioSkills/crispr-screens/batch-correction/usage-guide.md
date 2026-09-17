@@ -101,6 +101,7 @@ Tell the AI agent what to do:
 ## Validation Checklist
 
 After applying correction:
+- [ ] Corrected matrix has no NaN/Inf values (ComBat can return all-NaN with exit code 0)
 - [ ] PCA: batches now overlap (visual)
 - [ ] Within-batch Pearson preserved (should be unchanged)
 - [ ] Across-batch Pearson improved

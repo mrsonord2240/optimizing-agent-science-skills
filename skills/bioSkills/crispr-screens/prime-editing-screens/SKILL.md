@@ -7,7 +7,7 @@ primary_tool: PRIDICT2
 
 ## Version Compatibility
 
-Reference examples tested with: PRIDICT2 v1.0+ (https://github.com/uzh-dqbm-cmi/PRIDICT2), CRISPResso2 2.2.14+, pandas 2.2+, biopython 1.83+, numpy 1.26+.
+Reference examples tested with: PRIDICT2 git HEAD 2026-09-16 (https://github.com/uzh-dqbm-cmi/PRIDICT2), CRISPResso2 2.3.4 (via Docker, `pinellolab/crispresso2:latest`), pandas 2.2+, numpy 1.26+.
 
 Before using code patterns, verify installed versions match. If versions differ:
 - CLI: `python pridict2_pegRNA_design.py single --help`; `python pridict2_pegRNA_design.py batch --help`
@@ -39,18 +39,39 @@ If code throws ImportError, AttributeError, or TypeError, introspect the install
 
 ## pegRNA Architecture
 
-A pegRNA contains four critical elements that determine efficiency:
+A pegRNA contains four critical elements that determine efficiency. **The 3' extension is
+RTT-then-PBS, not PBS-then-RTT** -- PBS is the pegRNA's 3'-terminal element. Getting this order
+backwards is not cosmetic: it makes real CRISPResso2 silently report 0% editing on a true 40%
+sample (see the CRISPResso2 section below), because `--prime_editing_pegRNA_extension_seq` never
+matches the edited allele under the wrong order.
 
 ```
 5'  SPACER (20 nt)  -- standard sgRNA spacer; defines target locus via NGG PAM
     +
     SCAFFOLD (~80 nt) -- canonical or recoded scaffold (Chen 2021 recodes it to cut scaffold-incorporation byproducts)
     +
-    PBS (Primer Binding Site, 8-15 nt) -- complements protospacer downstream of cut site
+    RTT (Reverse Transcription Template, 10-30 nt) -- encodes intended edit; copied by RT.
+        Spans the genomic region DOWNSTREAM of the nick (through the PAM and beyond) --
+        this is the window PE actually replaces.
     +
-    RTT (Reverse Transcription Template, 10-30 nt) -- encodes intended edit; copied by RT
+    PBS (Primer Binding Site, 8-15 nt) -- the pegRNA's 3'-terminal element; primes reverse
+        transcription off the nicked strand. Complementary to the protospacer sequence
+        UPSTREAM of the nick -- it must never include PAM bases.
 3'
 ```
+
+Both RTT and PBS are written on the pegRNA as the **reverse complement** of their genomic
+template regions (verified against the real PRIDICT2 CLI's own `RTrevcomp`/`PBSrevcomp`/`pegRNA`
+columns and against real CRISPResso2 output -- see below).
+
+**Worked example** (hand-derived, independently confirmed by a real CRISPResso2 2.3.4 run
+recovering the planted 40.0% Prime-edited / 33.33% Modified-within-Reference exactly): spacer
+`ACGTTGACCTGGAACGTTCA`, NGG PAM immediately 3' of it, C>T edit 11 nt downstream of the nick.
+RTT genomic window (18 nt, downstream of nick, edit installed) = `TCATGGCGATCTGTAAGC`; its
+reverse complement = `GCTTACAGATCGCCATGA`. PBS genomic window (13 nt, upstream of nick) =
+`TGACCTGGAACGT`; its reverse complement = `ACGTTCCAGGTCA`. Extension = RTT-revcomp + PBS-revcomp
+= `GCTTACAGATCGCCATGAACGTTCCAGGTCA` -- this is the value that belongs in
+`--prime_editing_pegRNA_extension_seq`.
 
 **Key design parameters:**
 - **PBS length:** 11-13 nt typical; longer for high-GC contexts; PBS GC fraction critical (35-65% target)
@@ -73,14 +94,16 @@ python pridict2_pegRNA_design.py single \
 
 # Batch input from CSV:
 python pridict2_pegRNA_design.py batch \
-    --input-fname variants_to_design.csv \                    # CSV: sequence_name, sequence
+    --input-fname variants_to_design.csv \                    # CSV: sequence_name, editseq (NOT "sequence" -- see below)
     --output-dir predictions/ \
     --cores 4 \
-    --summarize                                               # generate summary table
+    --summarize K562                                          # takes a cell-line value ('K562' or 'HEK'); a bare flag crashes argparse
 
-# Output: per-pegRNA predictions in predictions/<sequence_name>/
-# Columns: PBS_sequence, PBS_length, RTT_sequence, RTT_length, predicted_editing_efficiency,
-#          predicted_indel_rate, deep_ensemble_score, etc.
+# Output: per-pegRNA predictions in predictions/<sequence_name>_pegRNA_Pridict_full.csv
+# Real columns (verified against actual output, not the names above earlier drafts guessed):
+#   PRIDICT2_0_editing_Score_deep_K562, PRIDICT2_0_editing_Score_deep_HEK (0-100 scale, not 0-1),
+#   PBSlength, RTlength, PBSrevcomp, RTrevcomp, Spacer-Sequence, pegRNA (full assembled sequence),
+#   Target-Strand, Editing_Position, Correction_Type, Correction_Length, among ~50 total columns.
 ```
 
 **Loading PRIDICT2 results in Python:**
@@ -92,7 +115,10 @@ from pathlib import Path
 def load_pridict2_predictions(prediction_dir):
     '''Load PRIDICT2 batch outputs from prediction_dir/'''
     summary = pd.read_csv(Path(prediction_dir) / '<timestamp>_summary_K562_batch_summary.csv')
-    # summary has columns: sequence_name, PBS, RTT, predicted_efficiency, predicted_indel, etc.
+    # Real columns (verified against real PRIDICT2 2026-09 output): sequence_name,
+    # PRIDICT2_0_editing_Score_deep_K562, PRIDICT2_0_editing_Score_deep_HEK, PBSrevcomp,
+    # RTrevcomp, pegRNA, Target-Strand, Editing_Position, among others -- NOT the
+    # "PBS"/"RTT"/"predicted_efficiency" names some earlier drafts assumed.
     return summary
 ```
 
@@ -109,6 +135,8 @@ def load_pridict2_predictions(prediction_dir):
 | Cell cycle phase | S/G2 = higher efficiency |
 
 **Critical insight from Mathis 2025:** Chromatin context is a major locus-level determinant that sequence-only predictors miss, which is why ePRIDICT is designed to be combined with PRIDICT2.0 rather than replace it -- the pairing helps most in regions of lower chromatin accessibility. For genome-scale screens, validate predictions empirically at representative loci.
+
+**PRIDICT2's reported `Spacer-Sequence` forces a synthetic 5'-G** for U6-promoter transcription (source: `pridict2_pegRNA_design.py`, `protospacerseq = 'G' + original_seq[...]`) -- confirmed against real output, where the reported spacer matched true genomic sequence at 19/20 positions, the sole mismatch being the 5'-most base. If your spacer's true genomic first base isn't G, the ordered oligo will still differ from genomic sequence there; this is expected, not a bug.
 
 ## PRIME Pooled Screen Methodology
 
@@ -142,32 +170,38 @@ def load_pridict2_predictions(prediction_dir):
 **Approach:** Build a CSV with one row per intended edit (sequence + edit notation), run PRIDICT2 in batch mode, parse the per-pegRNA efficiency summary, and filter to candidates above the chosen efficiency threshold.
 
 ```bash
-# Step 1: prepare batch input CSV (sequence_name, sequence with (REF/ALT) edit notation)
+# Step 1: prepare batch input CSV -- real required header is "editseq", NOT "sequence"
+# (documenting it as "sequence" makes the CLI exit 0 while writing an empty summary file,
+# with no error beyond a "Missing editseq column" warning -- verified on real PRIDICT2 CLI)
 cat > variants.csv <<EOF
-sequence_name,sequence
+sequence_name,editseq
 BRCA1_R71X,AGCAGCCT(C/T)CTGAATGCCC...
 MLH1_c677,GAGCTGAGC(A/G)GAGGCTCTTGAAGC...
 EOF
 
-# Step 2: run PRIDICT2 batch
+# Step 2: run PRIDICT2 batch (--summarize takes a cell-line value, not a bare flag)
 python pridict2_pegRNA_design.py batch \
     --input-fname variants.csv \
     --output-dir predictions/ \
     --cores 8 \
-    --summarize
+    --summarize K562
 ```
+
+**If the summary file exists but is empty (just `""`), the run "succeeded" with the wrong CSV
+column name** -- check for `editseq`, not `sequence`, before assuming a real failure.
 
 ```python
 # Step 3: parse and filter
 import pandas as pd
 predictions = pd.read_csv('predictions/<timestamp>_summary_K562_batch_summary.csv')
 
-# Filter to pegRNAs with predicted efficiency > 50% (library-inclusion convention)
-filtered = predictions[predictions['predicted_editing_efficiency'] > 50]
+# Filter to pegRNAs with predicted efficiency > 50% (library-inclusion convention).
+# Real column is PRIDICT2_0_editing_Score_deep_K562 (0-100 scale), not "predicted_editing_efficiency".
+filtered = predictions[predictions['PRIDICT2_0_editing_Score_deep_K562'] > 50]
 print(f'pegRNAs passing PRIDICT2 >50%: {len(filtered)} / {len(predictions)}')
 
 # Pick top 3 per intended edit
-top3 = (filtered.sort_values(['sequence_name', 'predicted_editing_efficiency'],
+top3 = (filtered.sort_values(['sequence_name', 'PRIDICT2_0_editing_Score_deep_K562'],
                               ascending=[True, False])
                  .groupby('sequence_name').head(3))
 top3.to_csv('peg_library_filtered.csv', index=False)
@@ -180,6 +214,9 @@ top3.to_csv('peg_library_filtered.csv', index=False)
 **Approach:** Design parallel BE library for the same variants; run both screens; intersect hits.
 
 ```python
+import numpy as np
+import pandas as pd
+
 # BE screen output (target conversion + bystander)
 be_hits = pd.read_csv('be_screen_hits.tsv', sep='\t')
 # PE screen output (intended edit + scaffold-incorp + indel)
@@ -202,7 +239,7 @@ CRISPResso \
     --amplicon_seq <amplicon_seq> \
     --guide_seq <20nt_spacer> \
     --prime_editing_pegRNA_spacer_seq <spacer> \
-    --prime_editing_pegRNA_extension_seq <RTT+PBS> \
+    --prime_editing_pegRNA_extension_seq <RTT-revcomp + PBS-revcomp, RTT first> \
     --prime_editing_pegRNA_scaffold_seq <scaffold> \
     --quantification_window_size 25 \              # widen to cover edit
     --output_folder pe_results \
@@ -250,6 +287,24 @@ CRISPResso \
 **Symptom:** Specific variants absent from library.
 **Fix:** Use SpRY-PE for relaxed PAM; accept that some variants cannot be PE-installed; consider BE if applicable.
 
+### Wrong pegRNA-extension element order silently zeroes out real editing
+
+**Trigger:** Building `--prime_editing_pegRNA_extension_seq` as PBS-then-RTT instead of RTT-then-PBS.
+**Mechanism:** CRISPResso2 can never match the edited allele against the wrong-order extension sequence.
+**Symptom:** Exit code 0; a true 40% Prime-edited sample reports 0.0% Prime-edited, with only a generic
+"disproportionate percentages" / "substitutions outside quantification window" warning -- easy to miss.
+**Fix:** Build the extension as RTT-revcomp + PBS-revcomp (see pegRNA Architecture above); if Prime-edited%
+comes back near-zero on a library-wide basis, check element order before assuming a biological failure.
+
+### Batch CLI argument or CSV column mismatch produces an empty summary file
+
+**Trigger:** Using `--summarize` as a bare flag, or a CSV header of `sequence` instead of `editseq`.
+**Mechanism:** A bare `--summarize` crashes argparse outright; a wrong CSV header lets the run exit 0
+after printing "Missing editseq column" and writing a summary file containing only `""`.
+**Symptom:** Either a crash, or a "completed successfully" run whose output file is empty.
+**Fix:** Always pass `--summarize <K562|HEK>` and confirm the input CSV header is `sequence_name,editseq`;
+treat an empty-looking summary file as a column-name bug, not evidence PRIDICT2 found nothing.
+
 ## Cas9 vs BE vs PE for Variant Installation
 
 | Approach | Bystander | Indels | Coverage | When to use |
@@ -288,6 +343,9 @@ CRISPResso \
 | Partial multi-base edits | RT processivity limit | Shorter RTT or PE3 |
 | PRIDICT predicts but observes much lower | Chromatin context | Pilot at chromatin-aware sites |
 | Library missing variants | No NGG PAM | SpRY-PE; BE alternative |
+| CRISPResso2 reports ~0% Prime-edited on a library that should edit | pegRNA extension built PBS-then-RTT instead of RTT-then-PBS | Rebuild extension as RTT-revcomp + PBS-revcomp |
+| PRIDICT2 batch: `--summarize: expected one argument` | Bare `--summarize` flag | Pass a value: `--summarize K562` (or `HEK`) |
+| PRIDICT2 batch: summary file is `""` | Input CSV header is `sequence`, not `editseq` | Rename the header column to `editseq` |
 | PE concordant with BE on transitions, disagrees on transversions | PE handles transversions BE doesn't | Expected; trust PE |
 
 ## References

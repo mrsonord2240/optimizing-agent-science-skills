@@ -78,9 +78,11 @@ Tell the AI agent what to analyze:
 
 - Always sequence the plasmid pool and use it as baseline; comparing to Day 0 of the screen pool conflates cloning bottleneck with biology.
 - For chemogenomic / drug screens, use vehicle (matched DMSO or carrier) as control, not Day 0; drug-induced shifts only mean against vehicle.
-- Median normalization fails when >40% of guides change. Symptom: every gene significant. Switch to `--norm-method control` with NTCs.
+- Median normalization fails when >40% of guides change. Symptom varies: sometimes every gene significant, sometimes one selection direction's recall collapses while the other stays correct (real-data measured: 100%/0% -> 100%/100% by direction). Switch to `--norm-method control` with NTCs either way.
 - For multi-cell-line, multi-batch screens, MAGeCK MLE works but Chronos is the DepMap standard with built-in CN bias and screen-quality modeling.
 - NaN beta scores in MLE indicate a fitting failure (typically <2 non-zero sgRNAs per gene per condition). Exclude these from interpretation, do not treat as zero.
+- `mageck mle`'s primary `fdr` column is permutation-based and its granularity depends on `--permutation-round` (default 2, `--help` suggests 10) -- adding or removing a covariate can flip which side of FDR<0.05 a gene lands on for reasons that are pure permutation-count artifact, not biology. Cross-check against the more stable `wald-fdr` column before drawing conclusions from a design change; see SKILL.md's Permutation-Round Sensitivity note for real-data numbers.
+- `mageck-vispr` is Linux/Mac-only (no Windows/PyPI build); on Windows, use [[screen-qc]]'s pandas/matplotlib QC for the same per-sample numbers.
 - For low-effect-size screens (FDR <0.1 hits at LFC 0.3-0.5), MAGeCK results need orthogonal validation; the statistical model is sensitive enough to call hits that don't replicate.
 - `--variance-estimation-samples` lets you fit dispersion from early-timepoint samples (when most guides are still neutral), then test against later samples; useful for low-replicate-number screens.
 - For paired designs (each replicate from a matched donor), add a paired-replicate column to the MLE design matrix.

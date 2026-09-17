@@ -94,7 +94,7 @@ Contamination shows up in VCF stats as a het allele-balance distribution shifted
 
 ```bash
 bcftools query -f '[%SAMPLE\t%GT\t%AD\n]' input.vcf.gz | \
-    awk -F'\t' '($2=="0/1" || $2=="0|1") {split($3,a,","); d=a[1]+a[2]; if (d>0) {s[$1]+=a[2]/d; n[$1]++}}
+    awk -F'\t' '($2 ~ /^(0[\/|]1|1\|0)$/) {split($3,a,","); d=a[1]+a[2]; if (d>0) {s[$1]+=a[2]/d; n[$1]++}}
         END {for (k in s) printf "%s\tmean het AB: %.3f (n=%d)\n", k, s[k]/n[k], n[k]}'   # expect ~0.5 per sample
 ```
 
@@ -119,6 +119,8 @@ peddy samples ~25000 sites plus chrX to check reported sex, relationships, and a
 python -m peddy -p 4 --plot --prefix cohort_qc input.vcf.gz cohort.ped
 ```
 
+peddy's site panel and ancestry PCs are human-only and assume genome-wide coverage including chrX; it is unreliable or crashes outright on non-human organisms and on small or narrowly targeted panels.
+
 ### somalier (scalable)
 
 somalier extracts tiny per-sample sketches at informative sites, then relates them; it scales to tens of thousands of samples in seconds and cross-checks RNA-seq against WGS from the same individual.
@@ -128,6 +130,8 @@ somalier extract -d extracted/ --sites sites.vcf.gz -f ref.fa input.vcf.gz
 somalier relate --ped cohort.ped extracted/*.somalier
 somalier ancestry --labels 1kg-labels.tsv 1kg/*.somalier ++ extracted/*.somalier   # labelled ++ query
 ```
+
+The `--sites` file must be build-matched: the panels published in the [somalier releases](https://github.com/brentp/somalier/releases) are per human build (GRCh37, hg38) and will not work for another organism, a different build, or a custom target panel. For those, build a matching sites file first with `somalier find-sites <population.vcf.gz>`.
 
 ### KING kinship via vcftools
 

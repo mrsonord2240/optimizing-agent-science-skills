@@ -49,6 +49,7 @@ TIC normalization does not handle drift, and -- because of closure -- can spread
 | 3 | QC RSD / D-ratio filter | Drift correction *should* improve RSD; filter after so reproducibility reflects corrected data (report both stages) | `filter_peaks_by_rsd` (pmp), `dratio_filter` (structToolbox) |
 | 4 | Between-batch alignment | QC-anchored offsets removed after within-batch drift is flat | median-of-QC / batchCorr |
 | 5 | Missing-value imputation | Filter aggressively first, then impute only the sparse residual holes by mechanism | `mv_imputation` (pmp), `impute.QRILC`, `missForest` |
+| 5a | -- QRILC's own log2/2^x round-trip | `impute.QRILC` requires log-scale input; this is local to the call, not a promotion of step 7 | see Impute section below |
 | 6 | Sample normalization | Dilution correction on quality features, after junk removed | `pqn_normalisation` (pmp) |
 | 7 | Transformation + scaling | Defers to metabolomics/statistical-analysis | `glog_transformation` (pmp) |
 
@@ -120,6 +121,10 @@ corrected <- QCRSC(df = feature_matrix, order = injection_order, batch = batch_i
                    classes = sample_class, spar = 0, log = TRUE,
                    minQC = 5, qc_label = 'QC')
 # Verify correction worked on HELD-OUT QCs / dilution linearity, not on QC clustering.
+# QCRSC does not error or warn when a batch has fewer QCs than `minQC` -- it silently returns
+# that batch's features as all-NA. Check immediately, per batch, before trusting the output:
+out_mat <- if (methods::is(corrected, 'SummarizedExperiment')) SummarizedExperiment::assay(corrected) else corrected
+stopifnot(any(rowSums(!is.na(out_mat)) > 0))  # fails loudly if every feature came back NA
 ```
 
 statTarget alternative (`MLmethod='QCRFSC'` for RF, `'QCRLSC'` for LOESS; `QCspan=0` auto-GCV span applies to QCRLSC; inputs are two order-aligned CSVs):
@@ -142,6 +147,13 @@ library(pmp)
 # df: features in ROWS, samples in COLUMNS; reference built from QC samples
 normalized <- pqn_normalisation(df = feature_matrix, classes = sample_class,
                                 qc_label = 'QC')
+
+# Per-sample factor for the phenotype-correlation guardrail below: pqn_normalisation() does not
+# return it as a visible top-level result, but it computes and stores it. For a plain-matrix `df`
+# (as above), it lands in the flags attribute; for a SummarizedExperiment `df`, use colData()
+# instead. Verified: `normalized * pqn_factor == feature_matrix` to floating-point precision.
+pqn_factor <- attr(normalized, 'flags')[, 'pqn_coef']         # plain matrix input
+# pqn_factor <- SummarizedExperiment::colData(normalized)$pqn_coef   # SummarizedExperiment input
 ```
 
 ## Impute by Missingness Mechanism
@@ -154,14 +166,21 @@ normalized <- pqn_normalisation(df = feature_matrix, classes = sample_class,
 library(imputeLCMD)
 library(missForest)
 
-# MNAR / left-censored: random draws from a fitted truncated-normal (features in ROWS)
-qrilc_imputed <- impute.QRILC(feature_matrix_features_in_rows, tune.sigma = 1)[[1]]
+# MNAR / left-censored: impute.QRILC fits an unbounded truncated-normal and is only valid on
+# log-scale intensities -- called on raw intensities it silently draws NEGATIVE values (impossible
+# for a peak intensity). Always log2-transform immediately before the call and back-transform (2^x)
+# immediately after, even though the pipeline's own log/glog scaling step (#7) comes later --
+# this round-trip is local to QRILC and leaves the matrix on its original scale for step 6/7.
+log_mat <- log2(feature_matrix_features_in_rows)
+qrilc_imputed <- 2^(impute.QRILC(log_mat, tune.sigma = 1)[[1]])
 
 # MAR / sporadic: iterative random-forest prediction (samples in ROWS, features in COLS)
 rf_imputed <- missForest(sample_by_feature_matrix, maxiter = 10, ntree = 100)$ximp
 ```
 
 Half-min imputation collapses the imputed subset's variance to zero, understating SE and inflating false significance -- prefer QRILC/GSimp, which draw a distribution of plausible low values. Re-run key results under >=2 imputation methods; if headline metabolites flip, the finding lives in the imputation.
+
+**Verify after every QRILC call:** `stopifnot(min(qrilc_imputed, na.rm = TRUE) >= 0)`. If this fails, the log2/2^x round-trip above was skipped or a non-QRILC path fed it raw intensities.
 
 ## Per-Method Failure Modes
 
@@ -182,8 +201,8 @@ Half-min imputation collapses the imputed subset's variance to zero, understatin
 - **Fix:** Use PQN/MSTUS or log-ratios; if "many features moved together," suspect closure from one big mover before believing coordination.
 
 ### ComBat under imbalance
-- **Trigger:** Biological groups unbalanced across batches.
-- **Mechanism:** Empirical-Bayes shrinkage confounds class with batch; under imbalance it can fabricate thousands of false differences or, without the covariate, delete real ones (Nygaard 2016).
+- **Trigger:** Biological groups unbalanced across batches. Risk scales with the *degree* of association, not just its presence -- report a chi-square test or Cramer's V on the batch x group table before deciding how worried to be. Near-total confounding (one group dominates a batch) is the regime Nygaard 2016 demonstrates; mild imbalance (e.g. 85/15 vs 50/50 across batches, not perfectly separated) did not reproduce the same false-positive inflation in a spot-check and can look deceptively safe -- absence of the effect at mild imbalance is not evidence it is absent at severe imbalance.
+- **Mechanism:** Empirical-Bayes shrinkage confounds class with batch; under near-total confounding it can fabricate thousands of false differences or, without the covariate, delete real ones (Nygaard 2016).
 - **Fix:** Prefer QC-anchored between-batch alignment (the pool has no group, so it cannot confound). Reserve ComBat for balanced designs and always pass the biological covariate via `mod=`. Randomize so it is never needed.
 
 ### Wrong imputation mechanism
@@ -211,6 +230,8 @@ Thresholds are conventions, not laws: choose them a priori, report each one, and
 | `could not find function "statTarget"` | No such entry point | Use `shiftCor()` (drift correction) and `statAnalysis()` (post-hoc stats) |
 | `mv_imputation` errors on `method='sm'` | Small-value method is `'sv'`, not `'sm'` | Use `method='sv'` (also valid: `knn`, `rf`, `bpca`, `mn`, `md`) |
 | QRILC output is malformed | `impute.QRILC` returns a list, not a matrix; expects features in rows | Index `[[1]]`; transpose so features are rows |
+| QRILC imputed values are negative | Called on raw (non-log) intensities -- QRILC's truncated-normal model is only valid on log-scale data | `log2()` before the call, `2^x` back-transform after (see Impute section); assert `min(imputed) >= 0` |
+| `QCRSC` output is all-NA for a batch | QC count in that batch is below `minQC`; pmp silently returns NA instead of erroring | Check `rowSums(!is.na(result)) == 0` (features in rows, pmp convention) immediately after every `QCRSC` call; below-`minQC` batches need the coarse median-of-QC fallback, not `QCRSC` |
 | MetaboAnalystR `Normalization` errors | `SanityCheckData(mSet)` not run first | Call `SanityCheckData` -> `ReplaceMin` -> `Normalization` in order |
 | Correction made data worse | Span overfit / weak-in-QC features corrected / order confounded with biology | Back off span, exclude weak-in-QC features, check randomization |
 | Effect vanished after drift correction | Run order confounded with group; trend absorbed the biology | Check the design; report drift and effect as inseparable if confounded |

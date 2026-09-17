@@ -31,6 +31,7 @@ myvariant.info is one of three flagship BioThings APIs (with MyGene.info and MyC
 - Elasticsearch-backed: queries use Lucene operators (AND, OR, NOT, range like `cadd.phred:>20`)
 - Dotted-field-name syntax for nested JSON
 - The `_id` field is canonical HGVS-g per record (e.g., `chr7:g.117199644G>A`)
+- `_id` coordinates are **hg19/GRCh37**, not GRCh38. A GRCh38 HGVS-g string returns 404/notfound by `_id` even when the variant is loaded (live-confirmed 2026-09-16: `chr17:g.43106487A>C` (GRCh38) -> 404; the same BRCA1 variant is keyed `chr17:g.41258504A>C` (hg19)). For GRCh38 input, either convert to hg19 first (rsID via `clinical-databases/dbsnp-queries`, or SPDI via NCBI Variation Services / `clinical-databases/clinvar-lookup`), or search the hg38-namespaced fields directly: `clinvar.hg38.start`/`clinvar.hg38.end` or `dbnsfp.hg38.start`/`dbnsfp.hg38.end` (live-confirmed working 2026-09-16 — do not use the unprefixed `hg38.start`, which is not a valid field; see `find_high_cadd_in_region` below, where CADD has no hg38 coordinates at all and hg19 is the only option)
 
 ## Aggregated Sources: ~21 and Counting
 
@@ -115,6 +116,8 @@ For reproducibility, record per-source versions in analysis output alongside res
 **Goal:** Annotate a list of variants with the canonical clinical fields for downstream prioritization.
 
 **Approach:** Batch `getvariants` with explicit field list; record `/v1/metadata` versions; convert to DataFrame.
+
+**Data governance:** batch-annotating variant lists derived from patients or research participants sends them to myvariant.info, a public API. Confirm consent and IRB/data-use approvals cover this before batch-querying; route PHI-sensitive work to OpenCRAVAT or another local tool instead (see Comparison to Alternatives) when those approvals aren't in place.
 
 ```python
 import myvariant
@@ -277,7 +280,7 @@ def find_alphamissense_pathogenic(gene, min_score=0.564):
 | Rate limit | ~1000 req/sec aggregate; lower per IP | myvariant.info docs |
 | dbNSFP refresh lag | 6-18 months from primary source release | dbNSFP release history |
 | `/v1/metadata` | Per-source versions for the instance; records carry no `_meta` | live check 2026-09-15 |
-| Lucene escape | Special chars need `\` (e.g., `chr7\:140453136`) | Elasticsearch convention |
+| Chrom:pos term | Quote a full HGVS id for an exact match (`"chr7:g.140453136A>T"`, 1 hit); the bare `chrom:pos` term also works unescaped (`chr7:140453136`, 5 hits, all variants at that position) | live check 2026-09-16 |
 | Multi-allelic rsID | ~6-8% of dbSNP rsIDs are multi-allelic | operational estimate |
 | AlphaMissense PP3 calibration | NOT yet ClinGen-endorsed (as of May 2026) | ClinGen SVI |
 | REVEL PP3_Strong calibration | >= 0.932 per Pejaver 2022 | Pejaver 2022 *AJHG* |
@@ -288,12 +291,13 @@ def find_alphamissense_pathogenic(gene, min_score=0.564):
 |---------|-------|----------|
 | `KeyError: 'gnomad_exome'` | Variant absent from gnomAD exome dataset | Use `.get('gnomad_exome', {})` defensively |
 | `None` for AlphaMissense on rare variants | dbNSFP coverage gap; variant in alt-spliced isoform | Query AlphaMissense API directly, or accept None |
-| Search returns 0 hits despite known matches | Lucene escape on `:` in chr coords | Quote the chrom-position term or escape `:` |
+| Search returns 0 hits despite known matches | `:` in a `chrom:pos` term was escaped (`chr7\:140453136`); myvariant does not want that escape | Use the unescaped `chrom:pos` term, or quote a full HGVS id for one exact variant |
 | Batch returns < input IDs | Some IDs not in any source | Check `notfound` field in response |
 | Different AF in myvariant vs gnomAD browser | myvariant carries gnomAD 2.1.1; the browser defaults to v4 | Check `src.gnomad.version` in `/v1/metadata`; use gnomad-frequencies for v4 |
 | Search returns 0 hits for ClinVar or CADD terms | Non-existent field path | Use `clinvar.rcv.clinical_significance`, `clinvar.rcv.review_status`, `cadd.phred` |
 | 503 on bulk query | Rate limit | Reduce chunk to 500; sleep 1s between |
 | `_id` doesn't match input | myvariant uses canonical HGVS-g; input was rsID or non-canonical | Re-query by `_id` after first resolution |
+| GRCh38 HGVS-g by `_id` returns 404/notfound | `_id` is hg19/GRCh37; myvariant does not index GRCh38 coordinates as `_id` | Query `clinvar.hg38.start`/`dbnsfp.hg38.start` to find the hg19 `_id`, or convert via rsID/SPDI first |
 
 ## Anticipated Reviewer Pushback
 

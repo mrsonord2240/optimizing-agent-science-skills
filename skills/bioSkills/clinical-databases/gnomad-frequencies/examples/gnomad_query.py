@@ -5,6 +5,7 @@ v4.1 (May 2024) is current; v4.0 had AN under-counting fixed in v4.1.
 Variants from patients or research participants sent to a public API can disclose them: use only under
 the cohort's consent and institutional approvals.
 '''
+import time
 import requests
 import myvariant
 import pandas as pd
@@ -12,6 +13,25 @@ import pandas as pd
 GNOMAD_API = 'https://gnomad.broadinstitute.org/api'
 
 BOTTLENECK_GROUPS = {'ami', 'asj', 'fin', 'remaining'}
+
+
+def _post_graphql(query, variables, max_retries=5, base_delay=2.0):
+    '''POST to the gnomAD GraphQL API with bounded exponential backoff on HTTP 429.
+
+    The browser API rate-limits sustained querying: HTTP 429 (a plain HTML page, not JSON) was
+    observed live after one gene-variant-list query plus a handful of single lookups (checked
+    2026-09-15). For more than a few dozen variants, use the Hail Table snippet below instead of
+    looping GraphQL calls.
+    '''
+    for attempt in range(max_retries):
+        r = requests.post(GNOMAD_API, json={'query': query, 'variables': variables}, timeout=30)
+        if r.status_code == 429:
+            time.sleep(base_delay * (2 ** attempt))
+            continue
+        r.raise_for_status()
+        return r.json()
+    r.raise_for_status()  # exhausted retries; surface the last response's error
+    return r.json()
 
 
 def query_variant_v4(chrom, pos, ref, alt):
@@ -48,9 +68,7 @@ def query_variant_v4(chrom, pos, ref, alt):
     }
     '''
     variant_id = f'{chrom}-{pos}-{ref}-{alt}'
-    r = requests.post(GNOMAD_API, json={'query': query, 'variables': {'variantId': variant_id}}, timeout=30)
-    r.raise_for_status()
-    body = r.json()
+    body = _post_graphql(query, {'variantId': variant_id})
     errors = [e.get('message') for e in body.get('errors') or []]
     if errors and errors != ['Variant not found']:
         raise RuntimeError(f'gnomAD GraphQL error for {variant_id}: {errors}')
@@ -132,9 +150,7 @@ def query_gene_constraint_v4(gene_symbol):
       }
     }
     '''
-    r = requests.post(GNOMAD_API, json={'query': query, 'variables': {'symbol': gene_symbol}}, timeout=30)
-    r.raise_for_status()
-    gene = r.json().get('data', {}).get('gene')
+    gene = _post_graphql(query, {'symbol': gene_symbol}).get('data', {}).get('gene')
     if gene is None:
         return None
     if gene.get('gnomad_constraint') is None:

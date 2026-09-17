@@ -17,6 +17,27 @@ The single most important input fact: whether the metabolites are confidently id
 If code throws ImportError, AttributeError, or TypeError, introspect the installed
 package and adapt the example to match the actual API rather than retrying.
 
+**Required local-session setup (checked on MetaboAnalystR 4.3.0).** Outside the MetaboAnalyst
+Shiny web app, MetaboAnalystR's own error handler (`AddErrMsg`) does `current.msg <<- c(current.msg, msg)`
+against globals that only the web app initializes; in a plain `library(MetaboAnalystR)` session this
+crashes with `object 'current.msg' not found` on *any* local validation failure (bad background, too
+few features, bad mapping) -- hiding the real diagnostic message behind an unrelated R error. Before
+any MetaboAnalystR call in this Skill, run:
+```r
+current.msg <- character(0); err.vec <- character(0)
+```
+If a call then returns `0` instead of an `mSet` object, print `current.msg` for the actual reason.
+
+**Undisclosed remote call.** `CalculateOraScore()` and `CalculateQeaScore()` against a KEGG pathway
+library do not compute locally, even when run outside the website: `my.ora.kegg()` serializes the
+mapped compound list and POSTs it (`httr::POST`, multipart, serialized `mSet`) to
+`https://www.xialab.ca/api/pathwayora` (or `/pathwayqea`) for every call, filtered or not -- confirmed
+by inspecting `my.ora.kegg`/`.do.api.call`'s source. A user running "locally installed" MetaboAnalystR
+on unpublished compound names/IDs should know they are leaving the machine before running this. If
+that is not acceptable, use the **Local-Only ORA** function below instead, which never leaves the
+machine (it only downloads the public, organism-agnostic KEGG pathway-to-compound reference table --
+no user data is sent).
+
 # Metabolomics Pathway Mapping
 
 **"Map my metabolites to pathways"** -> Test whether a metabolite set or an m/z feature table is statistically enriched for biochemical pathways, given an explicit background.
@@ -61,6 +82,7 @@ Mummichog exists because identification is the rate-limiter: only ~2-10% of unta
 **Approach:** Map names/IDs to the internal library, set the pathway library and metabolome filter (the background), then run the hypergeometric score; report mapping coverage alongside p-values.
 
 ```r
+current.msg <- character(0); err.vec <- character(0)  # required -- see Version Compatibility
 library(MetaboAnalystR)
 
 # 'pathora' = pathway ORA; 'conc' = concentration-style input
@@ -75,13 +97,68 @@ mSet <- CreateMappingResultTable(mSet)          # inspect mapping coverage befor
 
 mSet <- SetKEGG.PathLib(mSet, 'hsa', 'current')
 
-# SetMetabolomeFilter(mSet, TRUE) restricts the background to a user-supplied
-# reference metabolome (the assay-coverage set). FALSE uses the whole library
-# (all of KEGG) -- the inflated default that manufactures false positives.
-mSet <- SetMetabolomeFilter(mSet, FALSE)
-mSet <- CalculateOraScore(mSet, 'rbc', 'hyperg') # node-importance 'rbc'|'dgr'; test 'hyperg'|'fisher'
+# SetMetabolomeFilter(mSet, TRUE) alone does NOT restrict the background --
+# Setup.KEGGReferenceMetabolome() must be called first to load the reference file into
+# mSet$dataSet$metabo.filter.kegg, or the filter silently has no effect. FALSE uses the
+# whole library (all of KEGG) -- the inflated default that manufactures false positives.
+mSet <- SetMetabolomeFilter(mSet, TRUE)
+mSet <- Setup.KEGGReferenceMetabolome(mSet, 'reference_metabolome.txt')  # one KEGG ID per line
 
-ora <- as.data.frame(mSet$analSet$ora.mat)       # columns include Raw p, FDR, Impact, Hits, Total
+mSet <- CalculateOraScore(mSet, 'rbc', 'hyperg') # node-importance 'rbc'|'dgr'; test 'hyperg'|'fisher'
+# This sends the mapped compound list to https://www.xialab.ca/api/pathwayora (see above).
+# Checked on MetaboAnalystR 4.3.0: the server has been observed to reject the FILTERED
+# request outright (CalculateOraScore returns 0; current.msg == "Failed to connect to
+# the API Server!"), even with a correctly-matched reference file, while the unfiltered
+# (FALSE) call to the same endpoint succeeds. If this happens, use Local-Only ORA below --
+# it is the only background-corrected KEGG ORA path verified to run end to end.
+if (is.numeric(mSet)) {
+  cat('ORA failed:', paste(current.msg, collapse = ' | '), '\n')
+} else {
+  ora <- as.data.frame(mSet$analSet$ora.mat)   # columns include Raw p, FDR, Impact, Hits, Total
+}
+```
+
+### Local-Only ORA (no remote calls, verified background correction)
+
+When the compound list must not leave the machine, or when the filtered call above is rejected,
+compute the same hypergeometric ORA locally using KEGGREST's public pathway-to-compound table
+(generic reference data, not user data) instead of MetaboAnalystR's KEGG-library proxy. Checked on
+KEGGREST 1.46.0 -- runs end to end (~3s to fetch/build the table) and reproduces the direction of the
+Skill's own background-inflation claim: on the audit's synthetic 12-compound TCA-cycle input, the
+Citrate cycle (hsa00020) p-value went from 6.2e-19 (all-of-KEGG background, n=6701) to 4.8e-10 (a
+261-compound assay-coverage background) -- less significant with the correct, smaller background, as
+the theory predicts.
+
+```r
+library(KEGGREST)
+
+local_kegg_ora <- function(hit_kegg_ids, universe_kegg_ids, min_hits = 2) {
+  links <- keggLink('pathway', 'compound')             # public reference table; no user data sent
+  cpd_ids  <- sub('^cpd:', '', names(links))
+  path_ids <- sub('^path:map', 'hsa', unname(links))    # generic map#### -> organism-specific hsa####
+  pw2cpd <- lapply(split(cpd_ids, path_ids), unique)
+
+  universe_kegg_ids <- unique(universe_kegg_ids)
+  pw2cpd <- lapply(pw2cpd, function(x) intersect(x, universe_kegg_ids))
+  pw2cpd <- pw2cpd[lengths(pw2cpd) > 0]
+  hits <- intersect(hit_kegg_ids, universe_kegg_ids)
+  N <- length(universe_kegg_ids); k <- length(hits)
+
+  out <- data.frame(
+    pathway = names(pw2cpd),
+    total   = lengths(pw2cpd),
+    hits    = vapply(pw2cpd, function(s) length(intersect(s, hits)), integer(1))
+  )
+  out <- out[out$hits >= min_hits, ]
+  out$p.value <- mapply(function(m, h) phyper(h - 1, m, N - m, k, lower.tail = FALSE), out$total, out$hits)
+  out$fdr <- p.adjust(out$p.value, method = 'BH')
+  out[order(out$p.value), ]
+}
+
+# kegg_ids: from CreateMappingResultTable/GetFinalNameMap above.
+# reference_ids: KEGG IDs from the assay-coverage reference file, restricted to compounds
+# KEGGREST actually links to a pathway (intersect with names(links) first if checking coverage).
+ora_local <- local_kegg_ora(kegg_ids, reference_ids)
 ```
 
 ## Mummichog / PSEA on a Raw m/z Peak Table
@@ -91,7 +168,9 @@ ora <- as.data.frame(mSet$analSet$ora.mat)       # columns include Raw p, FDR, I
 **Approach:** Declare instrument ppm and ionization mode, load the FULL feature table (m/z + p-value + t-score, optionally RT), set the query-defining p-cutoff, and run PSEA whose permutation null is sampled from R_all.
 
 ```r
+current.msg <- character(0); err.vec <- character(0)  # required -- see Version Compatibility
 library(MetaboAnalystR)
+set.seed(123)  # PerformPSEA's permNum resampling is not reproducible run-to-run otherwise
 
 mSet <- InitDataObjects('mass_all', 'mummichog', FALSE)
 mSet <- SetPeakFormat(mSet, 'mpt')               # 'mpt' = m/z, p-value, t-score; 'mprt' adds RT (use with 'v2')
@@ -133,6 +212,9 @@ getExcluded(analysis)                              # compounds that did not map 
 
 # 'diffusion' is the recommended default; runHypergeom = plain ORA over the graph,
 # runPagerank (lowercase r) = directed random walks. The method string is lowercase.
+# approx = 'normality' (shown here) is analytic/deterministic, no seed needed. If using
+# approx = 'simulation' instead, call set.seed() first -- it resamples niter times and is
+# not reproducible run-to-run otherwise.
 analysis <- runDiffusion(object = analysis, data = fella.data, approx = 'normality')
 results <- generateResultsTable(object = analysis, data = fella.data, method = 'diffusion', threshold = 0.05)
 ```
@@ -184,6 +266,7 @@ results <- generateResultsTable(object = analysis, data = fella.data, method = '
 | Garbage candidate compounds | Wrong ionization mode | pos/neg use different adduct tables; set mode in `UpdateInstrumentParameters`; mixed data needs a per-feature mode column |
 | Only TCA / amino-acid pathways enriched | Pathway dark matter | Xenobiotics, lipids, novel structures map to no pathway and are dropped; report coverage; consider ChemRICH (structure-based) |
 | `'v2'` enrichment errors on RT | No RT column in input | `'v2'`/empirical compounds need RT; use `SetPeakFormat(mSet, 'mprt')` |
+| `Error ... object 'current.msg' not found` on any validation failure (bad background, too few features, bad mapping) | `AddErrMsg()` crashes uncatchably outside the MetaboAnalyst web app | Pre-declare `current.msg <- character(0); err.vec <- character(0)` before any MetaboAnalystR call (see Version Compatibility); the real message then prints instead of crashing |
 
 ## References
 

@@ -22,21 +22,43 @@ intensities[case_rows, seq_len(n_true)] <- intensities[case_rows, seq_len(n_true
 # so a clean score plot here is the geometry, not signal -- pQ2 is the honest check.
 null_group <- factor(sample(as.character(group)))
 
+# ropls's own cross-validated significance test on the first predictive component can
+# reject it and silently return a 0-row summaryDF / empty model -- with info.txtC='none'
+# this produces NO warning or error, yet class(model) still reads "opls" and getVipVn()
+# returns a length-0 vector instead of erroring (measured at ~40% of runs at this n/p).
+# ALWAYS check nrow(getSummaryDF()) before trusting a fit; never read R2/Q2/VIP off an
+# unchecked model. See SKILL.md's "OPLS-DA silently returns an empty model" entry.
 run_model <- function(y, scaleC) {
-    opls(intensities, y, predI = 1, orthoI = NA, scaleC = scaleC,
-         permI = 1000, crossvalI = 7, fig.pdfC = 'none', info.txtC = 'none')
+    m <- opls(intensities, y, predI = 1, orthoI = NA, scaleC = scaleC,
+              permI = 1000, crossvalI = 7, fig.pdfC = 'none', info.txtC = 'none')
+    if (nrow(getSummaryDF(m)) > 0) return(list(model = m, type = 'OPLS-DA'))
+    # Empty OPLS-DA: fall back to PLS-DA (orthoI=0) -- identical predictive power, no
+    # orthogonal-component significance gate to fail; verified 0/30 failures on both
+    # signal-bearing and pure-noise synthetic data at this n/p (see the Skill's fix log).
+    m2 <- opls(intensities, y, predI = 1, orthoI = 0, scaleC = scaleC,
+               permI = 1000, crossvalI = 7, fig.pdfC = 'none', info.txtC = 'none')
+    if (nrow(getSummaryDF(m2)) > 0) return(list(model = m2, type = 'PLS-DA (OPLS-DA fallback)'))
+    stop('Neither OPLS-DA nor the PLS-DA fallback produced a usable model: the first ',
+         'predictive component was not significant under ropls\' own cross-validated ',
+         'criterion. Report that no multivariate separation was detected -- do not force a model.')
 }
 
 cat('=== Real labels, Pareto scaling ===\n')
-real_pareto <- run_model(group, 'pareto')
+fit_real_pareto <- run_model(group, 'pareto')
+real_pareto <- fit_real_pareto$model
+cat('Model type actually fit:', fit_real_pareto$type, '\n')
 print(getSummaryDF(real_pareto)[, c('R2X(cum)', 'R2Y(cum)', 'Q2(cum)', 'pR2Y', 'pQ2')])
 
 cat('\n=== Permuted (null) labels, Pareto scaling -- expect high R2Y, failed pQ2 ===\n')
-null_pareto <- run_model(null_group, 'pareto')
+fit_null_pareto <- run_model(null_group, 'pareto')
+null_pareto <- fit_null_pareto$model
+cat('Model type actually fit:', fit_null_pareto$type, '\n')
 print(getSummaryDF(null_pareto)[, c('R2X(cum)', 'R2Y(cum)', 'Q2(cum)', 'pR2Y', 'pQ2')])
 
 cat('\n=== Real labels, unit-variance scaling -- compare the VIP ranking ===\n')
-real_uv <- run_model(group, 'standard')
+fit_real_uv <- run_model(group, 'standard')
+real_uv <- fit_real_uv$model
+cat('Model type actually fit:', fit_real_uv$type, '\n')
 print(getSummaryDF(real_uv)[, c('R2X(cum)', 'R2Y(cum)', 'Q2(cum)', 'pR2Y', 'pQ2')])
 
 vip_pareto <- getVipVn(real_pareto)

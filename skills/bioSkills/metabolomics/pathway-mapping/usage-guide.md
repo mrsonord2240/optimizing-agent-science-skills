@@ -11,9 +11,14 @@ Pathway mapping places metabolomics results in biochemical context through over-
 # MetaboAnalystR (GitHub): see https://github.com/xia-lab/MetaboAnalystR
 BiocManager::install("FELLA")
 BiocManager::install("KEGGREST")
+
+# Required for mummichog/PSEA (PerformPSEA): declared only under MetaboAnalystR's Suggests,
+# so a dependencies=FALSE GitHub install omits them -- install explicitly or PerformPSEA
+# throws "there is no package called 'RJSONIO'". Checked on MetaboAnalystR 4.3.0.
+install.packages(c("fitdistrplus", "RJSONIO"))
 ```
 
-Conceptual prerequisites: know whether the metabolites are confidently identified (KEGG/HMDB IDs -> ORA/MSEA) or are raw m/z features with no IDs (-> mummichog/PSEA); know the MSI confidence level (Schymanski 5-level scale) of the driving compounds; be able to state the background set (the assay-coverage metabolome) in one sentence; know the ionization mode and ppm of the run.
+Conceptual prerequisites: know whether the metabolites are confidently identified (KEGG/HMDB IDs -> ORA/MSEA) or are raw m/z features with no IDs (-> mummichog/PSEA); know the MSI confidence level (Schymanski 5-level scale) of the driving compounds; be able to state the background set (the assay-coverage metabolome) in one sentence; know the ionization mode and ppm of the run; know whether the compound list may leave the machine -- ORA/MSEA against a KEGG library sends it to a remote API by default (see SKILL.md's Version Compatibility section for the disclosed call and the local-only alternative).
 
 ## Quick Start
 

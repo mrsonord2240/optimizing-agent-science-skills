@@ -91,6 +91,31 @@ Tell the agent what to do:
 - v4.1 (May 2024) fixed AN under-counting in v4.0; rare-variant AFs inflated 5-10% in v4.0; always use v4.1 or later.
 - VEP version pinning matters: a variant's consequence prediction can flip between v2 and v4 due to transcript-set updates.
 
+## SV Catalog and CNV
+
+| Resource | Release | Samples | Coverage |
+|----------|---------|---------|----------|
+| gnomAD-SV v2 | Collins 2020 *Nature* 581:444 | 14,891 unrelated WGS | 433k SVs, GRCh37 |
+| gnomAD-SV v4 | Nov 2023 | 63,046 unrelated WGS | 1,199,117 high-confidence SVs, GRCh38 |
+| gnomAD-CNV v4 | Nov 2023 | 464,297 individuals (exome-derived gCNV) | Rare (AF < 1%) autosomal coding CNVs |
+
+gnomAD-CNV v4 is the resource that democratized exome-derived CNV background frequencies; previously only ExAC-CNV provided this at scale.
+
+## mtDNA (Laricchia 2022 *Genome Res* 32:569)
+
+10,850 unique mtDNA variants across 56,434 individuals (v3.1). Frequencies reported per nuclear-ancestry AND per mitochondrial-haplogroup. Heteroplasmy >=10% threshold; ~1/250 individuals carry pathogenic mtDNA variant at heteroplasmy >=10%. mtDNA inheritance is non-Mendelian; standard ACMG criteria do not apply directly; use MITOMAP and HmtVar in parallel.
+
+## Anticipated Reviewer Pushback
+
+| Pushback | Standard response |
+|----------|-------------------|
+| "Why FAF95 instead of AF?" | Raw AF is point estimate; FAF95 is Poisson lower-bound 95% CI; ClinGen SVI recommendation for BS1/BA1. |
+| "Why exclude FIN and ASJ from grpmax?" | Founder-population pathogenic variants reach high AF locally; including them would trigger false BA1. |
+| "This LOEUF differs from the 2020 paper" | We use v4 March 2024 constraint (807k samples); 2020 paper used v2 (141k samples). Decile rank is stable; absolute shifted. |
+| "Why v3 if v4 exists?" | v4 genomes = v3 genomes reprocessed; for genome-only analysis they are equivalent. |
+| "Variant exists in liftover v2 but not v4" | ~0.5-1% of sites differ post-assembly fixes; use v4 native, not liftover, as ground truth. |
+| "Browser AF higher than this value" | Browser includes flagged variants by default; we filter on PASS. |
+
 ## Related Skills
 
 - clinical-databases/clinvar-lookup - Pathogenicity (gnomAD AF used for BS1/BA1 cross-check)

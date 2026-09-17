@@ -33,12 +33,13 @@ references = [
 ]
 
 # Two queries: one that strongly matches hippuric acid (many shared peaks), one
-# low-information spectrum (two generic peaks) that scores high on too few peaks --
-# the classic over-claim trap the matched-peak floor is designed to catch.
+# low-information spectrum (only 2 of the required 6 peaks) whose score still clears
+# the 0.7 floor -- the classic over-claim trap the matched-peak floor, not the score
+# floor, is designed to catch.
 queries = [
     make_spectrum('query_strong', 180.0655, [65.04, 77.04, 91.05, 105.03, 134.06, 162.05, 180.06],
                   [0.21, 0.38, 0.24, 1.0, 0.58, 0.31, 0.16]),
-    make_spectrum('query_promiscuous', 180.0655, [91.05, 105.03], [0.9, 1.0]),
+    make_spectrum('query_promiscuous', 180.0655, [91.05, 105.03], [0.25, 1.0]),
 ]
 
 scores = calculate_scores(references, queries, ModifiedCosine(tolerance=0.01))
@@ -61,7 +62,16 @@ def best_hit(query):
     return ref, float(hit[score_field]), int(hit[match_field])
 
 
+results = {}
 for query in queries:
     ref, score, matches = best_hit(query)
     level = assign_level(score, matches)
+    results[query.get('compound_name')] = level
     print(f"{query.get('compound_name'):>18} -> {ref.get('compound_name'):<20} score={score:.2f} matches={matches} level={level}")
+
+# Regression check: a future matchms version bump should not silently change these
+# levels without failing loudly. query_strong clears both floors (Level 2a); query_promiscuous
+# clears the score floor alone, isolating the matched-peak floor as the reason it is capped
+# at Level 3, not Level 2a (checked on matchms 0.33.1).
+assert results['query_strong'] == '2a', results
+assert results['query_promiscuous'] == 3, results

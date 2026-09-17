@@ -101,12 +101,18 @@ Run `regenie --step 2 ... --check-burden-files --ignore-pred` first to catch var
 # and lof+missense+synonymous (step2_SPAtests.R --help, SAIGE 1.3.1). --maxMAF_in_groupTest passes
 # several MAF cutoffs in ONE run - this multi-cutoff combination is what GENE+ adds over SAIGE-GENE.
 # bgen input also needs --bgenFileIndex and --sampleFile (or use --bedFile/--bimFile/--famFile).
+# --LOCO defaults to TRUE, and gene/region-based tests then require --chrom - without it the tool
+# stops with "chrom needs to be specified in order to apply Leave-one-chromosome-out on gene- or
+# region-based tests" (step2_SPAtests.R --help; SAIGE-doc set_step2 example, SAIGE 1.3.1). Run once
+# per chromosome, each pass pointing at that chromosome's own LOCO null from step 1; only pass
+# --LOCO=FALSE instead if step 1 was NOT fit with LOCO (it loses LOCO's proximal-contamination
+# control, so prefer per-chromosome --chrom whenever step 1 has per-chromosome nulls).
 step2_SPAtests.R --bgenFile geno_wes.bgen --bgenFileIndex geno_wes.bgen.bgi --sampleFile samples.txt \
-    --groupFile groups.txt \
+    --groupFile groups.txt --chrom 1 \
     --GMMATmodelFile null.rda --varianceRatioFile null.varianceRatio.txt \
     --annotation_in_groupTest "lof,missense;lof,missense;lof;synonymous" \
     --maxMAF_in_groupTest 0.0001,0.001,0.01 --is_output_moreDetails TRUE \
-    --SAIGEOutputFile gene_tests.txt
+    --SAIGEOutputFile gene_tests_chr1.txt
 ```
 
 The `groups.txt` file gives, per gene, a line of variant IDs and a matching line of their annotations (and optionally a weight line); the annotation labels there must match `--annotation_in_groupTest`.
@@ -133,7 +139,13 @@ skat <- SKAT(Z, obj, weights.beta = c(1, 25))
 c(skato = skato$p.value, burden = burden$p.value, skat = skat$p.value)
 ```
 
-For genome-wide gene scans, build an SSD file with `Generate_SSD_SetID(bed, bim, fam, SetID, SSD, Info)`, `Open_SSD()`, then `SKAT.SSD.All(SSD.INFO, obj)` to test every set without holding all matrices in memory.
+For genome-wide gene scans, build an SSD file with `Generate_SSD_SetID(bed, bim, fam, SetID, SSD, Info)`, `Open_SSD()`, then `SKAT.SSD.All(SSD.INFO, obj)` to test every set without holding all matrices in memory. `SKAT.SSD.All` matches `obj`'s covariate/phenotype rows to the SSD genotypes purely by ROW POSITION (no ID join) - before fitting the null model, confirm `covar_df` is already sorted to the same sample order as the `.fam` file the SSD was built from:
+
+```r
+fam <- read.table(fam_file, header = FALSE, stringsAsFactors = FALSE)  # PLINK .fam: FID IID PAT MAT SEX PHENOTYPE
+stopifnot(identical(fam$V2, covar_df$IID))  # IID is column 2 (V2); must match covar_df row order exactly
+obj <- SKAT_Null_Model(phenotype ~ age + sex + PC1 + PC2, out_type = 'D', data = covar_df)
+```
 
 ## Per-Method Failure Modes
 
@@ -180,6 +192,8 @@ Thresholds are conventions; inspect the per-gene QQ plot and verify current best
 | Single MAF cutoff misses ultra-rare signal | one `--aaf-bins`/`--maxMAF` value | pass nested cutoffs (0.0001,0.001,0.01) in one run |
 | Same single-variant p reported as "gene" | testing markers, not a set | confirm a set/group file is supplied and the test is set-based |
 | Gene hit driven by one artifactual variant | ACAT/burden dominated by a miscalled site | QC inputs (INFO/R2, genotype quality) before aggregating |
+| regenie step 1 `phenotype '...' has very few unique values` | binary/case-control trait run without `--bt` (regenie defaults to QT) | add `--bt` to step 1 (it must match step 2's trait type) |
+| regenie step 1 `Uh-oh, SNP ... has low variance` | step 1's ridge null fit on the rare-variant set instead of common variants | fit step 1 on QC'd common array-type variants (MAF-filtered, LD-pruned), not the rare-variant set under test |
 
 ## References
 

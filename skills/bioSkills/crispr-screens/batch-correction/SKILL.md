@@ -86,6 +86,14 @@ def batch_diagnostic(counts_df, metadata_df, batch_col='batch', condition_col='c
 
 **Interpretation:** If PC1 has batch F-stat > condition F-stat by 10x, batch is dominating and correction is warranted. If condition dominates PC1, no correction needed.
 
+## Related but out of scope
+
+ComBat, RUV and SVA are general methods and the code here would run on bulk RNA-seq or proteomics
+matrices, but everything that makes this Skill a *screen* Skill is CRISPR-specific: the NTC-count
+rules, the CEGv2 PR-AUC and essential-dropout validation, and the MAGeCK MLE / Chronos integration.
+For batch correction outside CRISPR screens, keep the method and replace those checks with the
+assay's own.
+
 ## ComBat Empirical-Bayes Correction
 
 **Goal:** Remove batch-specific location and scale shifts while preserving biological condition signal.
@@ -94,20 +102,50 @@ def batch_diagnostic(counts_df, metadata_df, batch_col='batch', condition_col='c
 
 ```python
 import numpy as np
+import pandas as pd
 from combat.pycombat import pycombat
 
-def combat_correct(counts_df, batch_vector, condition_vector=None):
+def combat_correct(counts_df, batch_vector, condition_vector=None, verbose=True):
     '''ComBat on log-counts with optional biological covariate (condition).
-    Preserves condition signal while removing batch shifts.'''
-    data = np.log2(counts_df.values + 1)
+    Preserves condition signal while removing batch shifts.
+
+    pycombat takes the matrix as a DataFrame (rows = features, columns = samples) and both
+    `batch` and `mod` as plain lists of labels -- it one-hot-encodes `mod` itself, so passing a
+    pre-encoded array fails inside pycombat.
+
+    Features that are constant within any one batch (e.g. a guide with zero counts across that
+    batch) make ComBat's standardization divide by zero, and the NaNs propagate to EVERY value
+    it returns -- with no exception and exit code 0. Measured on real TKOv3 counts: 6 such
+    guides out of 2,000 produced an all-NaN matrix. They are dropped from the fit here and
+    returned uncorrected.
+    '''
+    data = pd.DataFrame(np.log2(counts_df.values + 1),
+                        index=counts_df.index, columns=counts_df.columns)
+    batch = pd.Series(list(batch_vector), index=counts_df.columns)
+    usable = pd.Series(True, index=data.index)
+    for b in batch.unique():
+        usable &= data.loc[:, batch.index[batch == b]].std(axis=1) > 0
+    if verbose and (~usable).any():
+        print(f'ComBat: {(~usable).sum()} features are constant within a batch; '
+              f'left uncorrected to keep them from NaN-ing the whole matrix')
+
     if condition_vector is not None:
-        mod = pd.get_dummies(condition_vector).values.astype(float)
-        corrected = pycombat(data, list(batch_vector), mod=mod)      # data must be a DataFrame
+        corrected = pycombat(data[usable], list(batch_vector), mod=list(condition_vector))
     else:
-        corrected = pycombat(data, list(batch_vector))               # data must be a DataFrame
-    return pd.DataFrame(np.power(2, corrected) - 1,
-                         index=counts_df.index, columns=counts_df.columns).clip(lower=0)
+        corrected = pycombat(data[usable], list(batch_vector))
+
+    # ComBat can also return all-NaN when the pooled variance is near zero -- e.g. when the
+    # design has no real batch effect to remove. Fail loudly rather than pass a dead matrix on.
+    if corrected.isna().any().any():
+        raise ValueError('ComBat returned NaN values: pooled variance is near zero. Check that a '
+                         'batch effect is actually present before correcting.')
+
+    out = pd.DataFrame(np.power(2, corrected.values) - 1,
+                       index=corrected.index, columns=corrected.columns).clip(lower=0)
+    return out.reindex(counts_df.index).fillna(counts_df)   # dropped features keep raw counts
 ```
+
+**Do not correct a design with no batch effect.** If replicate correlation is already >0.95 both within and across batches, ComBat's empirical-Bayes step divides by a near-zero pooled variance and returns an all-NaN matrix while exiting cleanly -- which is why `combat_correct()` above checks. Diagnose first (PCA + variance decomposition), correct only if batch dominates.
 
 **Critical caveat:** ComBat assumes batch effects are linear shifts of mean and variance in log space. Non-linear effects (e.g., gene-specific batch sensitivity) remain. Always re-check PCA after correction to confirm batches now overlap.
 
@@ -120,10 +158,15 @@ def combat_correct(counts_df, batch_vector, condition_vector=None):
 ```r
 library(RUVSeq)
 # counts_df: rows = sgRNAs, columns = samples
-ntc_indices <- which(rownames(counts_df) %in% ntc_sgrna_names)
+# RUVg's SeqExpressionSet method takes cIdx as control ROWNAMES (character), not positions;
+# which() returns integers and fails S4 dispatch here (the matrix method would accept them).
+ntc_rownames <- rownames(counts_df)[rownames(counts_df) %in% ntc_sgrna_names]
+stopifnot(length(ntc_rownames) > 0)
 seqset <- newSeqExpressionSet(counts = as.matrix(counts_df))
-ruv_corrected <- RUVg(seqset, cIdx = ntc_indices, k = 2)  # k = 2 unwanted factors
-# Access corrected data
+ruv_corrected <- RUVg(seqset, cIdx = ntc_rownames, k = 2)  # k = 2 unwanted factors
+# Two outputs. The W factors are what goes into a downstream model (MAGeCK MLE design matrix,
+# edgeR/DESeq2 design); normCounts() is the adjusted matrix for PCA and visual checks.
+W <- pData(ruv_corrected)          # W_1, W_2: the estimated unwanted factors, one column per k
 corrected_counts <- normCounts(ruv_corrected)
 ```
 
@@ -171,8 +214,14 @@ EOF
 mageck mle \
     --count-table counts.txt \
     --design-matrix design.txt \
+    --permutation-round 10 \
     --output-prefix batch_aware_mle
 ```
+
+**Reproducibility:** the beta estimates are deterministic, but `mageck mle`'s significance comes from
+a permutation procedure that is not seeded, so p-values and FDRs move slightly between reruns on
+identical input. Fix `--permutation-round` (higher = more stable, linearly slower) and report the
+value, or treat borderline FDRs as borderline.
 
 **Why this is preferred:** ComBat shifts counts before testing; the MLE-with-covariates approach correctly propagates uncertainty from the batch term into the condition beta's standard error. ComBat-then-test pretends the corrected counts are noise-free, biasing FDR.
 

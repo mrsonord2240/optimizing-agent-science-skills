@@ -67,6 +67,7 @@ Tell the AI agent what to design:
 
 ## What the Agent Will Do
 
+0. **Before designing anything, stop and confirm the required inputs are present:** gene list (HGNC/Ensembl), target genome assembly, screen chemistry (Cas9/CRISPRi/CRISPRa/Cas12a/BE/PE), and either FANTOM5 CAGE peaks (CRISPRi/a) or coding-exon coordinates (Cas9 KO). If any is missing, ask for it explicitly rather than defaulting to Cas9 KO or inventing a gene list from context.
 1. Confirm chemistry from goal: KO vs knockdown vs activation vs paralog vs variant-function
 2. Resolve target coordinates: coding exons for Cas9; FANTOM5 highest-rank CAGE TSS for CRISPRi/a; full transcript for tiling
 3. Enumerate PAM-adjacent protospacers in the relevant window per chemistry

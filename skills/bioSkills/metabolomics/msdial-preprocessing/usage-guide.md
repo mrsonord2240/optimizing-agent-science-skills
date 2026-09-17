@@ -8,12 +8,14 @@ MS-DIAL turns LC-MS or GC-MS raw data into an aligned feature table, with its di
 
 ```bash
 # MS-DIAL: https://systemsomicslab.github.io/compms/msdial/main.html (GUI is Windows-only)
-# Console (cross-platform): MsdialConsoleApp ships in the same release
+# Console (cross-platform): a separately-packaged release asset, MSDIALCUI.exe
+#   (confirm the current subcommand list by running it with no arguments -- current
+#   5.x builds expose one `lcms` subcommand for both DDA and DIA, plus `gcms`)
 # Vendor raw -> mzML (DDA/GC) via ProteoWizard msconvert; -> ABF (DIA) via the Reifycs ABF converter
 pip install pandas numpy   # for parsing the export in Python
 ```
 
-Conceptual prerequisites: the acquisition mode (DDA vs DIA/SWATH), the platform (LC-ESI vs GC-EI), and that MS-DIAL 5-alpha excludes GC-MS (GC stays in the MS-DIAL 4 lineage). The MS-DIAL vs XCMS choice should be made before processing.
+Conceptual prerequisites: the acquisition mode (DDA vs DIA/SWATH, set per file rather than by console subcommand) and the platform (LC-ESI vs GC-EI, both supported directly by the current MS-DIAL 5.x console). The MS-DIAL vs XCMS choice should be made before processing.
 
 ## Quick Start
 
@@ -32,7 +34,7 @@ Tell your AI agent what you want to do:
 > "I have GC-EI data - can I use MS-DIAL 5, and what alignment scale should I use?"
 
 ### Running
-> "Build the MsdialConsoleApp command to process my DDA folder headless on a Linux cluster."
+> "Build the MSDIALCUI console command to process my DDA folder headless on a Linux cluster."
 > "Set the alignment reference to a pooled QC instead of the first file."
 
 ### Importing and Filtering
@@ -43,19 +45,19 @@ Tell your AI agent what you want to do:
 ## What the Agent Will Do
 
 1. Decide MS-DIAL vs XCMS, and DDA vs DIA vs GC, for the data at hand
-2. Build the correct MsdialConsoleApp command with the right input format
-3. Flag the MS-DIAL 5 GC-MS exclusion and route GC to a v4 build or AMDIS/eRah
-4. Parse the alignment export (correct header offset, metadata vs sample columns)
-5. Filter on Fill%, MS/MS support, and QC/blank thresholds
+2. Build the correct MSDIALCUI console command (`lcms` for DDA/DIA, `gcms` for GC-MS) with the right input format
+3. For DIA, or a mixed-mode batch, set `acquisition_type` per file via a CSV passed to `-i`
+4. Parse the alignment export (correct header offset, metadata vs sample columns anchored on the header block, not a fixed column position)
+5. Filter on Fill% (0-1 fraction), MS/MS support (case-insensitive), and QC/blank thresholds
 6. Tie annotation tags to MSI levels and hand off identification to metabolite-annotation
 
 ## Tips
 
-- DIA/SWATH mode (`lcmsdia`) accepts ABF input only; convert before running.
-- The GUI is Windows-only; use MsdialConsoleApp for headless and cluster runs.
+- DIA/SWATH mode accepts ABF input only; convert before running, and set `acquisition_type=DIA` per file (it is not a separate console subcommand).
+- The GUI is Windows-only and hangs on `--help`; use the separately-packaged MSDIALCUI console for headless and cluster runs.
 - Set the alignment reference to a pooled QC, never to file #1 by default.
-- A low Fill% means the value is mostly gap-filled noise; report the filled fraction of every hit.
-- An annotation name without MS/MS is at best a putative (MSI Level 3) ID - require MS/MS before believing it.
+- A low Fill% means the value is mostly gap-filled noise; report the filled fraction of every hit. MS-DIAL 5.x reports Fill% as 0-1, not 0-100.
+- An annotation name without MS/MS is at best a putative (MSI Level 3) ID - require MS/MS before believing it (real value is `True`/`False` text; compare case-insensitively).
 - Replicate strong findings across a second pipeline (e.g. XCMS); one-software hits are candidates, not results.
 
 ## Related Skills

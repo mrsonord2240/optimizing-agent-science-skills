@@ -8,10 +8,12 @@
     "archived": "2026-08-15; the repository accepts no pull requests or issues, and its own README asks people to branch and customize"
   },
   "exported_from": {
-    "repository": "https://github.com/mrsonord2240/bioSkills",
+    "repository": "https://github.com/mrsonord2240/bioSkills-Improved",
+    "renamed_from": "https://github.com/mrsonord2240/bioSkills; renamed 2026-09-16. Audit records written before the rename cite the old name and GitHub's redirect keeps them resolving.",
     "branch": "openscience-fixes",
-    "commit": "a62c7097f37cde2f1d44763ac22c3f5c6d5350bb",
-    "note": "Fork of the upstream commit above, carrying only audit-evidenced fixes. Upstream is archived, so this fork is the maintained line rather than a staging area for pull requests; this directory is the export of it that Specialist releases ship."
+    "commit": "9d31109159d4d490ec375d4ae88c9b77570f3840",
+    "note": "Fork of the upstream commit above, carrying only audit-evidenced fixes. Upstream is archived, so this fork is the maintained line rather than a staging area for pull requests; this directory is the export of it that Specialist releases ship.",
+    "verified": "2026-09-16: every one of the 2054 files in this directory is byte-identical to the fork tree at this commit, compared by git blob hash rather than by re-reading the files."
   },
   "modified": true,
   "modified_by": "Samuel Nord, via Claude (Anthropic) fixer agents",
@@ -23,6 +25,7 @@
   "fixed_so_far": {
     "phylogenetics": "10 Skills, re-audited, viable; published as molecular-phylogenetics-analyst 1.0.0",
     "variant-calling, clinical-databases, population-genetics": "11 Skills, re-audited, viable",
-    "proteomics": "11 Skills across five fix passes, all re-audited; every core Skill >= 85 and every Skill deployable as of 2026-09-15"
+    "proteomics": "11 Skills across five fix passes, all re-audited; every core Skill >= 85 and every Skill deployable as of 2026-09-15",
+    "crispr-screens, metabolomics, pathway-analysis, experimental-design": "24 Skills fixed in one pass and all re-audited by separate agents on 2026-09-16; both candidates viable. Every core Skill >= 85 and every bundled Skill deployable, with copy-number-correction re-marked supporting (82). Four blocking vetoes cleared: BAGEL2 determinism, the CRISPResso output parser, the CRISPR pipeline's replicate grouping, and base-editing code usability (54 -> 92)."
   }
 }

@@ -34,10 +34,13 @@ CRISPResso \
     --quantification_window_size 10
 
 # Compare samples
+# CRISPRessoCompare takes the two output folders as positional arguments, not
+# --crispresso_output_folder_1/_2 flags -- those flags do not exist and CRISPRessoCompare
+# exits with "unrecognized arguments" if used (verified against CRISPResso2 2.3.4 --help).
 echo "Comparing samples..."
 CRISPRessoCompare \
-    --crispresso_output_folder_1 "$OUTPUT_DIR/CRISPResso_on_control" \
-    --crispresso_output_folder_2 "$OUTPUT_DIR/CRISPResso_on_edited" \
+    "$OUTPUT_DIR/CRISPResso_on_control" \
+    "$OUTPUT_DIR/CRISPResso_on_edited" \
     --output_folder "$OUTPUT_DIR/comparison"
 
 echo "Analysis complete!"
