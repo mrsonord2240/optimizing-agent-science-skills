@@ -27,7 +27,7 @@ smoke test are recorded in `F:\OpenScience\audit-envs\mendelian-randomization-an
 | No fabrication guard for "give me numbers without real data" requests | P1 | Same "## Scope" section: do not invent a heritability/enrichment number; run the real pipeline or offer a clearly-cited literature estimate labeled as external | docs | Matches the audit's Input 7 finding |
 | `ldsc.py`'s own exception handler is broken (`traceback.format_exc(ex)`), compounding every crash | P1 | Not applicable after the tool switch: `CBIIT/ldsc`'s exception handling was exercised directly during verification (the `--h2-cts` pre-patch run) and printed a normal traceback, no second `TypeError`. Noted this in the Version Compatibility "LDSC fork history" paragraph instead of adding a separate caveat | ran | Confirmed while reproducing the pre-patch `--h2-cts` crash: a clean traceback, not a masked one |
 | SKILL.md is a 452-line monolith with no `references/` split | P2 | Not fixed -- time-boxed behind the P0/P1 tool fix and the mandatory redundancy pass; left for a future pass | -- | Left unfixed, reason given |
-| No bundled example/test data | P2 | Added `examples/data/` (sumstats, chromosome-split LD scores, `.ldcts` manifest, README) copied from `CBIIT/ldsc`'s own test suite, plus `examples/smoke_test_ldsc.sh` exercising `--h2`, `--rg`, `--h2-cts` | ran | `bash examples/smoke_test_ldsc.sh` (via the same env) exits 0 and prints the same real, differentiated `--h2`/`--rg`/`--h2-cts` output as the ad hoc verification above |
+| No bundled example/test data | P2 | Added `examples/smoke_test_ldsc.sh` exercising `--h2`, `--rg`, `--h2-cts` on the simulated fixtures in the user's own CBIIT/ldsc clone (`test/`); not bundled, since they are GPL-3 and the Skill is MIT | ran | `bash examples/smoke_test_ldsc.sh` (via the same env) exits 0 and prints the same real, differentiated `--h2`/`--rg`/`--h2-cts` output as the ad hoc verification above |
 
 All 7 `recommendations[]` entries addressed (2 P0 fixed, 2 P1 fixed, 1 P1 resolved by the tool switch
 and noted, 1 P2 fixed, 1 P2 left unfixed with reason).
@@ -66,5 +66,5 @@ fix above).
 
 ## 2026-09-17, integration (orchestrator)
 
-- Merged to fork main at `10ac5b0`. Follow-up `c3dff65`: `examples/data/` bundled ~2,000 lines of CBIIT/ldsc GPL-3 test fixtures inside an MIT Skill, so it was deleted; `smoke_test_ldsc.sh` now stages the same fixtures from the user's own clone (`test/simulate_test`, `test/munge_test`), writes `test.ldcts` inline and gzips the LD scores. Re-run: identical numbers.
+- Merged to fork main at `10ac5b0`, including `c3dff65`, which replaced the fixer's bundled copy of CBIIT's GPL-3 fixtures with staging from the user's clone. Re-run: identical numbers.
 - `285e2b0` (merged `c602f2a`): genetic-correlation, genomic-sem, `causal-genomics/README.md` and `workflows/causal-genomics-pipeline/usage-guide.md` still recommended abdenlab/ldsc-python3; all now give the CBIIT route. Verified from a fresh GitHub clone with the documented install in a throwaway WSL env: h2 0.3783 (0.0419), rg 0.1117 (0.0776), h2-cts CellTypeB P=3.5e-4 / CellTypeA P=0.99.
