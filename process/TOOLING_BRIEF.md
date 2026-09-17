@@ -36,8 +36,13 @@ Linux-only tools — MAGeCK, MAFFT, IQ-TREE, Kraken 2, GATK, QIIME 2, CAUSE, LHC
 recorded as unexecutable.
 
 ```bash
-MSYS2_ARG_CONV_EXCL='*' wsl.exe -d science -- bash -lc 'micromamba activate bio && mageck --version'
+MSYS2_ARG_CONV_EXCL='*' wsl.exe -d science -- bash -lc 'mageck --version'
 ```
+
+The `bio` environment is already active in every login shell, so **do not write
+`micromamba activate bio`** — `~/.bashrc` returns early for non-interactive shells, so the hook there
+never runs and `activate` fails. The activation is in `~/.profile` instead. If you need a different
+environment, use `micromamba run -n <env> <command>`.
 
 - **`MSYS2_ARG_CONV_EXCL='*'` is required** when driving `wsl.exe` from Bash, or Unix paths are
   rewritten to `C:/Program Files/Git/...`. A round-trip test appeared to pass without it while the
