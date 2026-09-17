@@ -1,0 +1,197 @@
+{
+  "meta": {
+    "skill_name": "bio-pathway-enrichment-visualization",
+    "description": "Turns an enrichResult or gseaResult from clusterProfiler/enrichplot into a figure that collapses or shows gene-set redundancy, using dotplot, barplot, cnetplot, emapplot, treeplot, ridgeplot, gseaplot2, and upsetplot. Covers why cnetplot/emapplot/treeplot need pairwise_termsim first, why enrichplot ships no barplot for gseaResult, why GeneRatio is not fold enrichment, and why showCategory silently truncates.",
+    "evaluated_on": "2026-09-17",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Moderate",
+    "n_inputs": 5,
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:pathway-analysis/enrichment-visualization"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity":  { "result": "PASS", "detail": "All citations checked against real, correctly-attributed papers (Wu 2021 The Innovation, Yu 2010 Bioinformatics, Supek 2011 PLoS One, Merico 2010 PLoS One, Reimand 2019 Nat Protoc, Subramanian 2005 PNAS). No fabricated statistics; all numeric claims (GeneRatio formula, redundancy counts, NES signs) verified against live execution, not invented." },
+      "practice_boundaries":   { "result": "PASS", "detail": "Pure bioinformatics visualization of researcher-supplied gene-set objects; no patient data, no diagnostic or prescriptive content; medical disclaimer not applicable to this scope." },
+      "methodological_ground": { "result": "PASS", "detail": "No methodological fallacy found across 5 executed inputs; the Skill's central claims (GeneRatio != fold enrichment, GSEA NES is signed and must not be barplotted, GO-DAG redundancy inflates naive top-N lists) were independently verified against real clusterProfiler/enrichplot output, not merely asserted." },
+      "code_usability":        { "result": "PASS", "detail": "Both shipped example scripts (visualization_ora.R, visualization_gsea.R) ran end-to-end with zero modification on real clusterProfiler/enrichplot/org.Hs.eg.db (exit 0, valid PDFs). All 5 constructed inputs executed; failures found (treeplot on compareClusterResult, upsetplot needing ggupset) are missing-dependency/API-churn issues, not syntax errors or unrunnable code -- see recommendations." }
+    }
+  },
+  "static_score": {
+    "subtotal": 95,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 11, "max": 12, "note": "Covers the full enrichplot surface (dotplot/barplot/cnetplot/emapplot/treeplot/ridgeplot/gseaplot2/upsetplot/goplot/heatplot) with a decision tree, object model, and quantitative thresholds. Correctness verified largely accurate by execution (GeneRatio formula, no-barplot-for-gseaResult, redundancy claim all confirmed); minor imprecision: treeplot is listed as 'ORA + GSEA' with no caveat that it crashes on compareClusterResult under the installed enrichplot/ggplot2 combination, and the primary example's own 'nCluster' argument is already flagged deprecated by the installed package." },
+      "reliability":            { "score": 11, "max": 12, "note": "Common Errors table (8 rows) and Per-Method Failure Modes section (6 entries) are specific and give a Fix for each. Two gaps found only by execution: upsetplot's ggupset dependency is entirely undocumented (ridgeplot/goplot's ggridges/ggarchery ARE documented), and treeplot-on-compareClusterResult's crash is not covered by the Version Compatibility note, which otherwise correctly anticipates cnetplot/emapplot/goplot argument churn." },
+      "performance_context":    { "score": 7,  "max": 8,  "note": "SKILL.md (~230 lines) is dense but entirely load-bearing for a plotting decision-support skill; example code and prompt catalogue are correctly offloaded to usage-guide.md and examples/, not inlined. Workflow itself (class -> redundancy decision -> termsim if needed -> plot -> save) is linear with no redundant round-trips." },
+      "agent_usability":        { "score": 16, "max": 16, "note": "Strong cold-start clarity (leads with the one modeling-choice insight the rest of the skill hangs off), consistent terminology throughout, explicit output/caption expectations (report total significant count, similarity method, min_edge), and two full sections (Per-Method Failure Modes, Common Errors) proactively warning against the exact mistakes execution testing reproduced." },
+      "human_usability":        { "score": 7,  "max": 8,  "note": "Frontmatter description is somewhat technical (leads with enrichResult/gseaResult/S4 class terms); usage-guide.md's Quick Start compensates with natural phrasing ('Make a dotplot of my GO enrichment...'). Category-3 Scene Override credited: the 'introspect and adapt rather than pin one API generation' instruction is the correct forgiving design for cross-version enrichplot churn, not a usability defect." },
+      "security":               { "score": 12, "max": 12, "note": "No credentials, no raw-string execution, no sensitive-data handling; operates entirely on already-computed in-memory R objects from sibling Skills." },
+      "maintainability":        { "score": 12, "max": 12, "note": "Clean 3-way separation (SKILL.md concept/reference, usage-guide.md prompts, examples/ runnable scripts); both example scripts verified to run unmodified end-to-end, which is a strong, unusual-for-this-corpus testability signal." },
+      "agent_specific":         { "score": 19, "max": 20, "note": "Precise trigger scope with explicit hand-offs to sibling Skills for out-of-scope requests (statistics -> go-enrichment/gsea, generic ggplot grammar -> ggplot2-fundamentals). One point held back on Escape Hatches: the Skill never explicitly tells the agent what to do when zero terms/sets survive filtering (clusterProfiler itself degrades gracefully, but the Skill gives no guidance for that case, unlike its shipped GSEA example which does handle it defensively)." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 85.8,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 19, "total": 21 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Collapse GO-DAG redundancy with simplify() before dotplot, report term counts",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "enrichGO on a 24-gene synthetic cell-cycle hit list -> 203 raw significant BP terms -> simplify(cutoff=0.7) -> 77 survive; both raw and simplified dotplots rendered to a valid 3-page PDF. Top raw terms were confirmed near-duplicate ('mitotic cell cycle phase transition', 'regulation of mitotic cell cycle phase transition', ...), directly demonstrating the Skill's central claim.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Output computes and reports both the raw and simplified GO term counts", "result": "PASS", "note": "Printed '203' raw, '77' after simplify(cutoff=0.7)" },
+          { "text": "Output produces a valid, non-empty, multi-page PDF figure", "result": "PASS", "note": "input1_output.pdf, 12243 bytes, 3 PDF page objects, opens cleanly" },
+          { "text": "Output does not fabricate p-values or enrichment statistics", "result": "PASS", "note": "All values are real clusterProfiler-computed enrichGO output, not invented" },
+          { "text": "Output follows the Skill's prescribed collapse-then-dotplot workflow rather than a raw top-20 plot alone", "result": "PASS", "note": "simplify() called before the second dotplot exactly as SKILL.md prescribes" }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "GSEA plots preserving direction (NES dotplot, ridgeplot, gseaplot2)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "gseGO on a synthetic 3000-gene ranked list (cell-cycle genes pushed to the top) returned 347 significant sets, all positive NES (consistent with the synthetic signal). NES dotplot and gseaplot2 rendered correctly. ridgeplot failed with 'The package \"ggridges\" is required' -- this is exactly the failure mode the Skill's own Prerequisites/usage-guide.md documents (Suggests-only dependency), not installed per the audit's 'install nothing' rule. barplot(gse) independently confirmed to have no method for gseaResult, matching the Skill's claim.",
+        "basic": 35,
+        "specialized": 52,
+        "total": 87,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Output preserves GSEA direction (signed NES) rather than collapsing to unsigned magnitude", "result": "PASS", "note": "dotplot(gse, x='NES', color='p.adjust') rendered; 347/347 sets shown with sign intact" },
+          { "text": "Output does not force a barplot onto the gseaResult", "result": "PASS", "note": "existsMethod('barplot','gseaResult') confirmed FALSE; barplot(gse) throws as expected" },
+          { "text": "A missing optional dependency fails with the same message the Skill's own documentation anticipates", "result": "PASS", "note": "ridgeplot error text matches usage-guide.md's documented 'the package ... is required' Suggests-only warning verbatim" },
+          { "text": "Output produces a valid non-empty PDF with the plots that did succeed", "result": "PASS", "note": "input2_output.pdf, 66003 bytes" }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Small significant-term-count gene-concept network and similarity-map judgment call",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "A 6-gene subset still produced 28 significant BP terms at pvalueCutoff=0.01 (the prompt's premise of a near-empty result did not materialize from this gene subset -- recorded honestly rather than re-framed as a clean pass). cnetplot and emapplot both ran correctly at n=28. A supplementary direct test (forcing an enrichResult down to exactly 1 row) confirmed emapplot degrades gracefully (a benign max()-on-empty warning, not a crash) rather than erroring, which is the actual robustness property the edge case was probing.",
+        "basic": 34,
+        "specialized": 54,
+        "total": 88,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Output attempts the requested cnetplot colored by fold change", "result": "PASS", "note": "cnetplot(ego_small, foldChange=fc_sub) rendered" },
+          { "text": "Output reasons about whether a similarity map is informative at the observed term count", "result": "PASS", "note": "Printed an explicit judgment ('a map is only informative with several terms')" },
+          { "text": "pairwise_termsim/emapplot does not hard-crash at very low term counts", "result": "PASS", "note": "Supplementary n=1 test: emapplot succeeded with only a benign warning" },
+          { "text": "Output produces a valid non-empty PDF", "result": "PASS", "note": "input3_output.pdf, 17582 bytes" }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "compareCluster faceted dotplot plus enrichment map and treeplot",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "Synthetic Up (22 genes) / Down (4 genes) compareCluster over enrichGO produced 661 rows. dotplot(ck) faceted comparison and emapplot(pairwise_termsim(ck)) both rendered correctly. treeplot(ck_ts, nCluster=5) crashed reproducibly with a ggplot2 'Aesthetics must be either length 1 or the same as the data' error -- confirmed NOT caused by the deprecated 'nCluster' argument (re-tried with the suggested replacement 'cluster.params=list(n=5)', same crash). This combination is not covered by SKILL.md's Version Compatibility note, which only calls out cnetplot/emapplot/goplot argument churn, not a genuine treeplot-on-compareClusterResult crash under the installed enrichplot 1.26.6 / ggplot2 4.0.3.",
+        "basic": 30,
+        "specialized": 46,
+        "total": 76,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Output produces the requested faceted dotplot comparing Up/Down clusters", "result": "PASS", "note": "dotplot(ck) rendered as page 1 of the PDF" },
+          { "text": "Output produces the requested enrichment map on the compareCluster result", "result": "PASS", "note": "emapplot(pairwise_termsim(ck)) rendered as page 2" },
+          { "text": "Output produces the requested treeplot with 5 named clusters", "result": "FAIL", "note": "treeplot() crashed both with nCluster=5 and the suggested cluster.params=list(n=5) replacement; not anticipated by the Skill" },
+          { "text": "Output surfaces a clear, legible error rather than failing silently", "result": "PASS", "note": "ggplot2's check_aesthetics() error is specific (names the offending mappings), not a silent failure" }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Full modeling-choice figure set: raw vs simplified dotplot, FoldEnrichment ordering, emapplot, treeplot, cnetplot, heatplot, upsetplot",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "7 of 8 requested plots rendered correctly (raw dotplot, simplified dotplot, FoldEnrichment-ordered dotplot, emapplot, treeplot [on a plain enrichResult -- succeeded here, unlike Input 4's compareClusterResult case], cnetplot, heatplot). The GeneRatio-vs-FoldEnrichment reordering claim was quantitatively confirmed (Spearman rho = -0.113 between the two orderings, i.e. they meaningfully disagree). upsetplot() failed with 'The package \"ggupset\" is required' -- a real, previously-undocumented gap: unlike ridgeplot/goplot, whose ggridges/ggarchery Suggests-only dependencies ARE listed in usage-guide.md's Prerequisites, ggupset is never mentioned anywhere in SKILL.md or usage-guide.md.",
+        "basic": 33,
+        "specialized": 51,
+        "total": 84,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Output reports both raw and simplified term counts / redundancy comparison", "result": "PASS", "note": "203 raw terms printed, simplify() applied and plotted" },
+          { "text": "Output produces the FoldEnrichment-ordered dotplot and quantifies the difference from GeneRatio ordering", "result": "PASS", "note": "Spearman rho -0.113 computed and printed as the caption-worthy explanation" },
+          { "text": "Output produces the requested emapplot, treeplot, cnetplot, and heatplot", "result": "PASS", "note": "All 4 rendered without error on the plain enrichResult" },
+          { "text": "Output produces the requested upsetplot", "result": "FAIL", "note": "ggupset missing and undocumented anywhere in the Skill" },
+          { "text": "Output produces a valid non-empty PDF with the successful plots", "result": "PASS", "note": "input5_output.pdf, 42838 bytes" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 38.0,
+    "dynamic_weighted": 51.5,
+    "score": 90,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Both shipped example scripts (visualization_ora.R, visualization_gsea.R) ran end-to-end unmodified against real clusterProfiler/enrichplot/org.Hs.eg.db -- a reliability signal rare in this corpus.",
+    "The Skill's central claims are not just asserted but independently verifiable: the redundancy count (203 raw -> 77 simplified), the no-barplot-for-gseaResult design decision, and GeneRatio != FoldEnrichment were all confirmed by real execution against real package internals.",
+    "Common Errors and Per-Method Failure Modes sections correctly anticipate and pre-empt most real failure modes an agent will actually hit (missing termsim slot, deprecated cnetplot args, GeneRatio misread as effect size).",
+    "Clean progressive disclosure: SKILL.md carries the conceptual/reference load, usage-guide.md carries prompts and quick reference, examples/ carries the two runnable scripts -- each file does one job."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "upsetplot()'s ggupset dependency is undocumented",
+      "observed_in": [5],
+      "problem": "upsetplot() fails with 'The package \"ggupset\" is required' on a stock install, but unlike ridgeplot/goplot (whose ggridges/ggarchery Suggests-only dependencies ARE listed), ggupset is never mentioned in SKILL.md or usage-guide.md.",
+      "root_cause": "The Prerequisites section in usage-guide.md was written before or without checking upsetplot()'s own Suggests requirement.",
+      "fix": "Add ggupset to usage-guide.md's Prerequisites install line and to SKILL.md's Common Errors table, matching the existing ggridges/ggarchery pattern exactly."
+    },
+    {
+      "priority": "P1",
+      "title": "treeplot() on a compareClusterResult crashes under the current enrichplot/ggplot2 combination",
+      "observed_in": [4],
+      "problem": "treeplot(pairwise_termsim(compareClusterResult), nCluster=5) throws a ggplot2 aesthetics-length error, reproducible with both the documented 'nCluster' argument and its suggested replacement 'cluster.params=list(n=5)'. SKILL.md's Version Compatibility note calls out cnetplot/emapplot/goplot argument churn but not this crash.",
+      "root_cause": "The Skill's Tool Taxonomy table lists treeplot as supporting 'ORA + GSEA' without a per-class caveat, and its own worked treeplot example only exercises a plain enrichResult, so the compareClusterResult path was never verified against the installed package combination.",
+      "fix": "Either verify and fix the compareClusterResult + treeplot path against a current enrichplot release, or add an explicit caveat in the Decision Tree / Common Errors table that treeplot on a compareClusterResult should be verified with a minimal example before use, with emapplot offered as the working alternative for that class (already confirmed working in this audit)."
+    },
+    {
+      "priority": "P2",
+      "title": "No explicit guidance for zero-surviving-terms/sets",
+      "observed_in": [],
+      "problem": "SKILL.md never tells the agent what to do when enrichGO/gseGO returns zero significant rows, even though the Skill's own shipped GSEA example defensively handles exactly this case in its own code.",
+      "root_cause": "The defensive pattern lives only in examples/visualization_gsea.R's if (nrow(...) > 0) branch, not called out as a general rule in SKILL.md's Escape Hatches or Common Errors.",
+      "fix": "Add one line to the Common Errors table: 'zero significant terms/sets -> report the count and stop, do not attempt to plot an empty object' (mirroring what the shipped example already does)."
+    },
+    {
+      "priority": "P2",
+      "title": "Deprecated 'nCluster' argument used in the Skill's own primary treeplot example",
+      "observed_in": [1, 5],
+      "problem": "The installed enrichplot (1.26.6) already warns 'Use cluster.params = list(n = your_value) instead of nCluster. The nCluster parameter will be removed in the next version', but SKILL.md's own code examples use nCluster= throughout.",
+      "root_cause": "SKILL.md was written against an enrichplot version where nCluster was still the primary (non-deprecated) argument name.",
+      "fix": "Switch the Skill's treeplot() examples to cluster.params=list(n=5) and mention the rename in the Version Compatibility note alongside the cnetplot/emapplot/goplot churn it already documents."
+    }
+  ]
+}

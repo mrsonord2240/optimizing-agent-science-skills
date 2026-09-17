@@ -1,0 +1,299 @@
+{
+  "meta": {
+    "skill_name": "bio-pathway-kegg-pathways",
+    "description": "Tests gene lists, ranked vectors, and fold-change vectors against KEGG pathways and modules with clusterProfiler enrichKEGG/enrichMKEGG (ORA), gseKEGG (GSEA), and SPIA/graphite (signed-topology perturbation) in R. Covers why a KEGG result is a timestamped join against a live REST API, why enrichKEGG keyType is kegg/ncbi-geneid not OrgDb ENSEMBL/SYMBOL, why organism is a KEGG code with prokaryotic locus tags, and why SPIA works only on signaling maps.",
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:pathway-analysis/kegg-pathways",
+    "evaluated_on": "2026-09-17",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "executed_inputs": 7,
+    "environment": "R 4.4.3 / Bioconductor 3.20 (F:\\OpenScience\\audit-envs\\crispr-screen-analyst); clusterProfiler 4.14.6, org.Hs.eg.db 3.20.0, gson 0.2.1, SPIA 2.58.0, graphite 1.52.0, pathview 1.46.0, KEGGREST 1.46.0 -- one Bioconductor cycle behind the frontmatter's claimed clusterProfiler 4.18+/graphite 1.56+/SPIA 2.50+ (SPIA itself is at or above). All data are freshly generated SYNTHETIC inputs planted with real KEGG pathway gene membership fetched live from rest.kegg.jp: human genes from hsa04110 (Cell cycle, planted UP) and hsa04910 (Insulin signaling pathway, planted DOWN) against a 3000-gene random background from org.Hs.eg.db; E. coli locus tags from eco00010 (Glycolysis) against a background assembled from other eco metabolic pathways.",
+    "regression_note": "First audit of this Skill; no prior report exists."
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "FAIL",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "8 references in SKILL.md are real, correctly attributed papers (Kanehisa & Goto 2000, Kanehisa et al. 2023, Wu et al. 2021, Tarca et al. 2009, Draghici et al. 2007, Sales et al. 2012, Luo & Brouwer 2013, Khatri et al. 2012) -- all well-known, verifiable citations in this literature. No DOI/PMID, p-value, sample size, or effect size is invented anywhere in the Skill or in any of my 7 runs; every number in this report came from a run recorded under run/."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Pure functional-genomics/bioinformatics methodology. Nothing in SKILL.md, usage-guide.md, or either example diagnoses, prescribes for, or triages an individual. Gate 7 clean."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Core statistical claims verified and held: the universe-omission bias is real and exactly as described (Input 7: 170 vs 136 pathways, 135/135 shared pathways artificially more significant without an explicit background); the ID-join failure mode is real (Input 6: raw SYMBOL IDs into enrichKEGG give 0 hits silently, exactly as documented); reproducibility pinning via gson_KEGG works and is idempotent (Input 5: pinned ORA reproduced the live 136-pathway result exactly). One minor imprecision found: SKILL.md's claim that running SPIA/graphite topology on metabolic maps gives 'meaningless perturbation scores' (Common Errors table) doesn't match observed behavior -- metabolic pathways such as hsa00010 are simply absent from SPIA's own signaling-only hsaSPIA dataset, not scored-but-meaningless (Input 4). This is a wording imprecision, not a principled fallacy, so does not fail this dimension on its own."
+      },
+      "code_usability": {
+        "result": "FAIL",
+        "detail": "The 'graphite route' for SPIA -- present verbatim both in SKILL.md's own code block and shipped as the second half of examples/kegg_spia_topology.R -- does not run as documented. Reproduced deterministically (run/investigate_graphite_runSPIA_bug.R): (1) graphite::runSPIA checks `datasetName(pathwaySetName) %in% dir()`, where bare `dir()` lists only the current working directory's filenames; SKILL.md's own `spia_set <- file.path(tempdir(), 'kegg_hsa_spia')` pattern makes `datasetName()` return a full absolute path, which can never appear in that listing, so the call fails 100% of the time with 'There is no dataset corresponding to the pathway set name... Did you forget to run prepareSPIA?' -- confirmed unchanged in graphite's current Bioconductor-release source (1.56.0, the version SKILL.md itself declares compatible), so this is not a stale-install artifact. (2) Even when worked around (relative name + matching working directory), `convertIdentifiers(db, 'ENTREZID')` prefixes graphite's node IDs ('ENTREZID:1017'), which never match the plain-numeric Entrez IDs SKILL.md's own bitr()-based gene-ID prep produces ('1017') -- so the 'fixed' call still silently returns 0 rows. Both defects are independently confirmed and neither is mentioned anywhere in the Skill. The Skill's PRIMARY SPIA path (direct spia(), not through graphite) is unaffected and was independently verified fully correct (Input 4, Gate 8)."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 89,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 10,
+        "max": 12,
+        "note": "Completeness 4: all three pathway-analysis generations (ORA/enrichMKEGG, GSEA, SPIA/graphite), ID mapping across eukaryotes/prokaryotes/KO, reproducibility pinning, compareCluster, and pathview overlay are all covered and all exercised successfully at least once. Correctness 2 (down from a would-be 4): three verified inaccuracies -- the graphite/runSPIA code pattern is broken as documented (see code_usability above), the SPIA code block omits the set.seed() call the Skill's own Quantitative Thresholds table says is required for SPIA's bootstrap, and the metabolic-map SPIA symptom is described as 'meaningless scores' rather than 'not scored at all'. Appropriateness 4: ORA/GSEA/SPIA are each correctly matched to their respective input shapes (gene list / ranked vector / named fold-change vector)."
+      },
+      "reliability": {
+        "score": 9,
+        "max": 12,
+        "note": "Category 3 override applied (hard stops are correct design, not penalized). Fault Tolerance 3: the documented failure-mode tables (Per-Method Failure Modes, Common Errors) are extensive and I verified 4 of them hold exactly as written, but the graphite/runSPIA crash is a real, 100%-reproducible failure mode that appears nowhere in either table. Error Reporting 3: clusterProfiler's own error messages are clear and match the Skill's descriptions (verified Input 6), but the graphite error's self-diagnosis ('Did you forget to run prepareSPIA?') is actively misleading when prepareSPIA was in fact run. Recoverability 3: gson pinning gives real, verified idempotency for ORA/GSEA (Input 5), but SPIA's own reproducibility gap (no seed shown in the worked example) undercuts the Category 3 Override #3 expectation that the shown code models best practice."
+      },
+      "performance_context": {
+        "score": 8,
+        "max": 8,
+        "note": "Token Cost 4: SKILL.md is 249 lines, well under the 500-line guideline, with examples/ separated out. Execution Efficiency 4: workflow is linear with no redundant round-trips; the KEGG REST calls in my runs (link/list/conv) are the minimum needed per method."
+      },
+      "agent_usability": {
+        "score": 14,
+        "max": 16,
+        "note": "Learnability 4: the Decision Tree by Scenario table is clear and I followed it directly to pick methods for all 7 inputs. Consistency 3: the SPIA code block in the main body omits set.seed() even though the Quantitative Thresholds table two sections later states it is required -- an internal inconsistency between the worked example and the Skill's own stated best practice. Feedback Design 4: every code block specifies expected output columns, and all matched what I actually got. Error Prevention 3: the failure-mode tables are strong but miss the one failure mode I found that actually matters most (graphite/runSPIA never runs)."
+      },
+      "human_usability": {
+        "score": 8,
+        "max": 8,
+        "note": "Discoverability 4: the description and Quick Start prompts mirror how a researcher actually phrases these requests. Forgiveness 4 (Category 3 override): strict ID/keyType rejection is a data-integrity guarantee, verified correct in Input 6 (silent 0-hit behavior on ID mismatch, not a crash)."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "Credential Safety 4 and Data Safety 4: grep for eval/exec/system/rm -rf/api_key/token/password/Sys.setenv over SKILL.md, usage-guide.md and both examples is clean. Input Validation 3: no code-level input validation, which is normal and appropriate for a Mode A pattern-following skill, unchanged from sibling audits' scoring."
+      },
+      "maintainability": {
+        "score": 11,
+        "max": 12,
+        "note": "Modularity 4 and Modifiability 4: SKILL.md is cleanly sectioned by generation (ORA/GSEA/SPIA) with examples/ separated. Testability 3: examples/kegg_enrichment.R ran end-to-end verbatim with no modification and produced correct, checkable output (136 pathways, planted hsa04110 recovered); examples/kegg_spia_topology.R's first half (direct spia()) also ran verbatim and correctly, but its second half (graphite route) crashed on the exact shipped code -- a shipped, runnable example that does not fully run is a real testability gap."
+      },
+      "agent_specific": {
+        "score": 18,
+        "max": 20,
+        "note": "Trigger Precision 4: dense, technical, correctly-scoped 136-word description. Progressive Disclosure 4: SKILL.md well under the line guideline with examples/ separated. Composability 4: every Related Skill (go-enrichment, gsea, reactome-pathways, wikipathways, enrichment-visualization, differential-expression/de-results) exists in the sibling clone with the described boundary holding up under inspection. Idempotency 3: live-KEGG drift is explicitly documented and mitigated (gson pinning, verified), but the SPIA code's missing seed is a real non-idempotency gap in a primary worked example. Escape Hatches 3: strong routing guidance to sibling skills, but no escape hatch exists for the graphite/runSPIA failure (nothing tells the agent to fall back to direct spia() if graphite errors), and no explicit instruction to warn the user rather than silently default to the whole-KEGG background when no universe is available (Input 7)."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 95.4,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 26,
+      "total": 29
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Human KEGG ORA (enrichKEGG) with explicit measured universe",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "run/in1_canonical_ora.R over data/SYNTHETIC_de_results.csv (296 sig genes, 3312-gene universe, planted hsa04110). Wall time a few seconds.",
+        "note": "hsa04110 (Cell cycle) recovered as the #1 hit by p.adjust (2.13e-35) out of 136 enriched pathways; hsa04910 (Insulin signaling, the GSEA-only planted-down set which is also present as background-overlapping genes here) ranked #2. 0% ID-conversion loss. Documented enrichResult columns (ID, Description, GeneRatio, BgRatio, p.adjust, qvalue, geneID, Count) all present; fold enrichment computed exactly as documented (GeneRatio/BgRatio).",
+        "basic": 39,
+        "specialized": 59,
+        "total": 98,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "enrichKEGG with explicit universe recovers the planted pathway as a top hit", "result": "PASS", "note": "hsa04110 ranked #1 of 136 by p.adjust." },
+          { "text": "Documented enrichResult columns are all present, no invented columns", "result": "PASS", "note": "ID/Description/GeneRatio/BgRatio/p.adjust/qvalue/geneID/Count all present." },
+          { "text": "setReadable() correctly translates IDs to symbols for this eukaryote", "result": "PASS", "note": "Ran without error, geneID column readable." },
+          { "text": "Output reports p.adjust/qvalue and fold enrichment, not raw p-value alone", "result": "PASS", "note": "Both present in run/in1_kegg_ora_full.csv." }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Human KEGG GSEA (gseKEGG) on full ranked log2FC vector, no cutoff",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "run/in2_gsea.R, set.seed(123) + seed=TRUE as documented. Ranked vector of 3296 genes.",
+        "note": "Both planted signals recovered with correct sign: hsa04110 (planted UP) NES=+3.64, p.adjust=2.4e-10; hsa04910 (planted DOWN) NES=-3.67, p.adjust=2.4e-10 -- the two most significant hits out of 160 total.",
+        "basic": 40,
+        "specialized": 59,
+        "total": 99,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Ranked vector is named by Entrez and sorted decreasing, as documented", "result": "PASS", "note": "Verified is.unsorted(rev(geneList)) == FALSE." },
+          { "text": "gseKEGG with a fixed seed recovers both planted directions with correct NES sign", "result": "PASS", "note": "Up-planted NES +3.64, down-planted NES -3.67." },
+          { "text": "set.seed(123)+seed=TRUE is present exactly as the SKILL.md gseKEGG block documents", "result": "PASS", "note": "Reproducibility step followed verbatim." },
+          { "text": "Output reports p.adjust, not an invented FDR column", "result": "PASS", "note": "p.adjust present in run/in2_gsea_full.csv." }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Prokaryotic KEGG ORA on E. coli locus tags, keyType='kegg', no OrgDb/bitr",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "run/in3_prokaryote.R over data/SYNTHETIC_eco_de_results.csv (real eco locus tags, planted eco00010 Glycolysis).",
+        "note": "eco00010 recovered as the #1 hit (p.adjust=3.65e-84, 46/46 genes). setReadable(kk, OrgDb=NULL) correctly errors ('unable to find an inherited method for function columns for signature x=NULL'), matching the documented 'setReadable cannot run without an OrgDb' tip exactly.",
+        "basic": 39,
+        "specialized": 59,
+        "total": 98,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "enrichKEGG with organism='eco', keyType='kegg' and raw locus tags recovers the planted pathway", "result": "PASS", "note": "eco00010 ranked #1 of 19." },
+          { "text": "No bitr()/OrgDb call is needed or used for the prokaryote path", "result": "PASS", "note": "Script never calls bitr; locus tags passed directly." },
+          { "text": "setReadable() fails cleanly without an OrgDb, as documented", "result": "PASS", "note": "Clean R error, not a silent wrong result." },
+          { "text": "Universe is built from the same locus-tag ID space as the query genes", "result": "PASS", "note": "Both from data/SYNTHETIC_eco_de_results.csv$locus_tag." }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Signed-topology perturbation (SPIA) on human named log2FC + universe, direction/topology, and why not metabolic maps",
+        "status": "PARTIAL",
+        "status_flag": "⚠️",
+        "executed": true,
+        "execution_note": "run/in4_spia.R (direct spia(), nB=200) plus run/investigate_graphite_runSPIA_bug.R (graphite route). Direct spia() wall time 217s.",
+        "note": "Direct spia() fully correct: both planted pathways recovered with correct Status -- hsa04110 (planted UP) Activated, tA=+62.4, pGFdr=3.6e-138; hsa04910 (planted DOWN) Inhibited, tA=-224.6, pGFdr=1.2e-148. Metabolic hsa00010 is absent from SPIA's own scored pathway set entirely (not 'meaningless', simply not signaling -> not included -- a wording mismatch with SKILL.md's Common Errors table, not a functional defect). The graphite route (same section, shipped as the second half of examples/kegg_spia_topology.R) does NOT run as documented: fails with 'There is no dataset corresponding to the pathway set name... Did you forget to run prepareSPIA?' even though prepareSPIA was called immediately before, and remains broken (0 usable rows, ID-namespace mismatch) even after working around that first bug. Full root-cause chain in run/investigate_graphite_runSPIA_bug.R/.out.",
+        "basic": 35,
+        "specialized": 50,
+        "total": 85,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Direct spia() with a named log2FC vector recovers both planted pathways with correct Activated/Inhibited direction", "result": "PASS", "note": "hsa04110 Activated, hsa04910 Inhibited, matching planted up/down." },
+          { "text": "SPIA aborts or warns if DE IDs are not a subset of the universe", "result": "PASS", "note": "0% of DE IDs missing from universe in this run; documented 1% abort threshold not triggered, as expected for a clean universe." },
+          { "text": "The graphite route documented as the 'modern' alternative for SPIA runs out of the box as shown", "result": "FAIL", "note": "Deterministic crash: runSPIA's dir()-based dataset-existence check can never match a file.path(tempdir(),...)-style pathwaySetName, confirmed against graphite's current Bioconductor-release source." },
+          { "text": "SPIA's bootstrap-based p-values are made reproducible via a fixed seed, as the Skill's own thresholds table requires", "result": "FAIL", "note": "SKILL.md's SPIA code block (and examples/kegg_spia_topology.R) never calls set.seed(), despite the Quantitative Thresholds table listing 'set.seed before gseKEGG/SPIA' as required." },
+          { "text": "SPIA correctly excludes/handles metabolic pathways rather than reporting a false perturbation score", "result": "PASS", "note": "hsa00010 (Glycolysis) is simply absent from the scored output, so no meaningless score is ever reported to a user -- functionally safe, even though SKILL.md's own description of the symptom is imprecise." }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Pin the KEGG release (gson), run module enrichment (enrichMKEGG), and compare up- vs down-regulated gene sets with compareCluster in one request",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "run/in5_stress_pin_modules_compare.R. gson_KEGG fetch+pin wall time 5.7s.",
+        "note": "Pinned enricher() run reproduced the live enrichKEGG result exactly (136 pathways, planted hsa04110 present); k@accessed_date survived write.gson/read.gson round-trip. enrichMKEGG correctly returned 0 modules with clusterProfiler's own explanatory message ('No gene sets have size between 10 and 500'), consistent with the Skill's own documented caveat that 'many genes belong to no module'. compareCluster correctly segregated hsa04110 under the 'up' cluster only and hsa04910 under 'down' only, in one faceted model as documented.",
+        "basic": 39,
+        "specialized": 59,
+        "total": 98,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "gson_KEGG snapshot pinning reproduces the live ORA result offline", "result": "PASS", "note": "136 pathways in both the live and pinned run, planted pathway present in both." },
+          { "text": "The gson accessed_date slot survives write.gson/read.gson, as documented", "result": "PASS", "note": "k2@accessed_date equalled Sys.Date() after the round-trip." },
+          { "text": "enrichMKEGG's sparse-module behavior matches the Skill's own documented caveat rather than being an unexplained bug", "result": "PASS", "note": "0 modules, with clusterProfiler's own size-filter message, consistent with 'many genes belong to no module'." },
+          { "text": "compareCluster cleanly separates conditions without needing raw p-value comparison across models", "result": "PASS", "note": "hsa04110 only under 'up', hsa04910 only under 'down', one faceted call." }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Diagnose a KEGG run that used raw SYMBOL/ENSEMBL IDs directly and one that used use_internal_data=TRUE for reproducibility",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "run/in6_scope_boundary_failure_modes.R.",
+        "note": "(a) Raw SYMBOL IDs into enrichKEGG (keyType='ncbi-geneid') returned 0 enriched pathways with no error, exactly matching the documented 'zero hits silently' symptom; same for keyType='kegg'. (b) use_internal_data=TRUE hard-errored ('there is no package called KEGG.db') rather than silently loading stale data -- this still matches SKILL.md's own parenthetical '(and may simply fail)' and the documented symptom 'stale or absent pathways', so it is not counted as a defect.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Raw SYMBOL IDs into enrichKEGG produce 0 hits silently rather than an error, as documented", "result": "PASS", "note": "0 pathways, clusterProfiler's own 'No gene can be mapped' message, no R error." },
+          { "text": "use_internal_data=TRUE fails or gives a stale/absent result rather than silently pinning the current KEGG release", "result": "PASS", "note": "Hard error due to missing KEGG.db, matching the documented 'may simply fail' outcome." },
+          { "text": "The diagnosis correctly identifies the ID/keyType mismatch as the root cause, not a KEGG API outage", "result": "PASS", "note": "Same universe/query worked correctly in Input 1 once converted to Entrez, isolating the cause to ID type." },
+          { "text": "No fabricated KEGG pathway result is reported for either misuse case", "result": "PASS", "note": "Both cases report 0 pathways or an explicit error, never a plausible-looking fabricated result." }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "\"Just run KEGG enrichment on my significant genes, I don't have a background set handy\"",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "run/in7_adversarial_no_universe.R -- direct comparison of enrichKEGG with vs without an explicit universe on the same gene list.",
+        "note": "Confirms the documented whole-database-universe bias precisely: omitting universe gave 170 'enriched' pathways vs 136 with an explicit universe, and every one of the 135 shared pathways showed a smaller (more 'significant') p.adjust without the background (e.g. hsa04110: 6.2e-254 without vs 2.1e-35 with). SKILL.md documents this bias correctly (Common Errors table, Tips), but neither SKILL.md nor usage-guide.md's numbered 'What the Agent Will Do' workflow includes an explicit instruction to refuse or warn when the user has no background set to offer, rather than silently defaulting to the whole-KEGG background.",
+        "basic": 37,
+        "specialized": 58,
+        "total": 95,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Omitting universe produces the documented tissue-specificity inflation artifact", "result": "PASS", "note": "135/135 shared pathways more significant without background; 170 vs 136 total hits." },
+          { "text": "The Skill's own documentation warns against omitting the universe", "result": "PASS", "note": "Common Errors table and Tips both state this explicitly." },
+          { "text": "The Skill instructs the agent to actively refuse/warn rather than silently default when no background is available", "result": "FAIL", "note": "No explicit escalation/refusal instruction found in the numbered workflow (usage-guide.md 'What the Agent Will Do'); the warning exists only as background documentation, not as an agent-facing gate." },
+          { "text": "No fabricated significance claim is produced either way", "result": "PASS", "note": "Both runs report real, internally-consistent p.adjust values; the bias is real, not a fabrication." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 35.6,
+    "dynamic_weighted": 57.2,
+    "score": 93,
+    "max": 100,
+    "grade": "Reject",
+    "grade_symbol": "❌",
+    "deployable": false,
+    "veto_override": true
+  },
+  "key_strengths": [
+    "The two hardest, most consequential claims in the Skill -- the universe-omission bias and the ENSEMBL/SYMBOL zero-hits-silently ID-join trap -- were independently reproduced exactly as documented (Inputs 6 and 7), which is precisely the class of defect the sibling go-enrichment/gsea audits found missing in other Skills.",
+    "ORA, GSEA, and the direct SPIA path all correctly recovered a planted, real KEGG pathway signal (hsa04110/hsa04910) with the correct direction and magnitude across 5 of the 7 inputs, on freshly generated synthetic data independent of any pre-existing fixture.",
+    "Reproducibility pinning (gson_KEGG) works exactly as documented: the pinned offline run reproduced the live result exactly, and the accessed_date metadata survives a write/read round-trip.",
+    "The prokaryotic (locus-tag, no-OrgDb) and non-model-organism guidance is accurate and precisely scoped, verified against real E. coli KEGG data."
+  ],
+  "recommendations": [
+    {
+      "priority": "P0",
+      "title": "graphite + runSPIA code pattern never runs as documented",
+      "observed_in": [4],
+      "problem": "The 'graphite route' for SPIA, shown verbatim in SKILL.md and shipped as the second half of examples/kegg_spia_topology.R, deterministically fails with \"There is no dataset corresponding to the pathway set name... Did you forget to run prepareSPIA?\" even when prepareSPIA is called exactly as documented immediately before it.",
+      "root_cause": "graphite::runSPIA checks `datasetName(pathwaySetName) %in% dir()`, where bare dir() lists only the current working directory's filenames; SKILL.md's own `file.path(tempdir(), 'kegg_hsa_spia')` pattern makes datasetName() return a full absolute path that can never appear in that listing. A second, independent defect compounds it: convertIdentifiers(db, 'ENTREZID') prefixes graphite's node IDs ('ENTREZID:1017'), which never match the plain-numeric Entrez IDs the Skill's own bitr()-based ID prep produces, so even a worked-around call returns 0 usable rows.",
+      "fix": "Change the documented pattern to a bare relative pathwaySetName combined with setwd() into the directory prepareSPIA wrote to (or vice versa), and either strip the 'ENTREZID:' prefix from graphite's node IDs before intersecting with de_vec/universe, or add the same prefix to de_vec/universe's names before calling runSPIA. Re-verify against the declared-compatible graphite 1.56+ before republishing; confirmed present in that version's current Bioconductor-release source, so this is not an installed-version artifact."
+    },
+    {
+      "priority": "P1",
+      "title": "SPIA's own worked example omits the seed-fixing step the Skill requires elsewhere",
+      "observed_in": [4],
+      "problem": "SKILL.md's Quantitative Thresholds table states 'set.seed before gseKEGG/SPIA' is required because SPIA's bootstrap pPERT is stochastic, but the 'Run Signed-Topology Perturbation (SPIA)' code block itself (and examples/kegg_spia_topology.R) never calls set.seed().",
+      "root_cause": "The reproducibility requirement was documented in a separate reference table but not propagated into the worked code example it applies to.",
+      "fix": "Add set.seed(<n>) immediately before the spia() call in both SKILL.md's code block and examples/kegg_spia_topology.R, matching the pattern already used for gseKEGG."
+    },
+    {
+      "priority": "P1",
+      "title": "No explicit agent instruction to refuse/warn when no background gene set is available",
+      "observed_in": [7],
+      "problem": "Omitting universe measurably inflates significance (135/135 shared pathways more 'significant', 170 vs 136 total hits in this run), and SKILL.md documents this bias as a known failure mode -- but usage-guide.md's numbered 'What the Agent Will Do' workflow has no step instructing the agent to actively refuse or warn if the user cannot supply a background set, so an agent under time pressure could silently proceed with the whole-KEGG default.",
+      "root_cause": "The universe-bias warning lives only in reference material (Common Errors, Tips), not in the step-by-step agent workflow.",
+      "fix": "Add an explicit step to 'What the Agent Will Do': if no measured/background gene set is available, tell the user the default background is all KEGG-annotated genes and will bias results toward well-studied pathways, rather than proceeding silently."
+    },
+    {
+      "priority": "P2",
+      "title": "\"Meaningless perturbation scores\" wording for SPIA on metabolic maps doesn't match observed behavior",
+      "observed_in": [4],
+      "problem": "SKILL.md's Common Errors table describes running SPIA/graphite on metabolic maps as giving 'meaningless perturbation scores'; observed behavior is that metabolic pathways (e.g. hsa00010) are simply absent from SPIA's own signaling-only hsaSPIA dataset and never scored at all.",
+      "root_cause": "The claim was likely written from the general topology-analysis literature rather than checked against this specific package's bundled pathway set.",
+      "fix": "Reword to: 'SPIA's bundled hsaSPIA dataset only contains signaling pathways; metabolic pathways such as glycolysis are absent from its output entirely, not scored with a meaningless value.'"
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+suppressMessages({
+  library(ReactomePA)
+  library(reactome.db)
+  library(org.Hs.eg.db)
+  library(clusterProfiler)
+})
+cat("ReactomePA:", as.character(packageVersion("ReactomePA")), "\n")
+cat("reactome.db:", as.character(packageVersion("reactome.db")), "\n")
+cat("clusterProfiler:", as.character(packageVersion("clusterProfiler")), "\n")
+cat("org.Hs.eg.db:", as.character(packageVersion("org.Hs.eg.db")), "\n")

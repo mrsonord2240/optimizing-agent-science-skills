@@ -1,0 +1,188 @@
+{
+  "meta": {
+    "skill_name": "bio-metabolomics-targeted-analysis",
+    "description": "Designs and validates quantitative targeted metabolomics assays (MRM/SRM on triple-quadrupole, PRM on high-resolution instruments) to report absolute concentrations. Covers the internal-standard strategy (external cal -> global IS -> standard addition -> stable-isotope-labeled IS), weighted calibration judged by back-calculated %RE not R-squared, ion-ratio quantifier/qualifier confirmation, matrix-effect/recovery characterization, and ICH M10 method validation. Use when quantifying a closed panel of known metabolites with units, building or validating an LC-MS/MS assay, choosing an IS or calibration weighting, or judging whether a reported concentration is trustworthy.",
+    "evaluated_on": "2026-09-17",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Moderate",
+    "n_inputs": 5,
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:metabolomics/targeted-analysis"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All 8 cited references (MacLean 2010, Matuszewski 2003, ICH M10, Broadhurst 2018, Wang 2007, Teo 2020, Peterson 2012) are real, verifiable publications; no fabricated DOI/PMID/statistics in any of the 5 executed/generated outputs, all of which derive numbers from computed synthetic data." },
+      "practice_boundaries": { "result": "PASS", "detail": "Scope is bioanalytical assay validation and method development, not individual patient diagnosis or prescription; no diagnostic/prescriptive language appears in any output." },
+      "methodological_ground": { "result": "PASS", "detail": "No output inverted a conclusion or committed a principled fallacy. Input 5 surfaced a real completeness gap -- SKILL.md's threshold table requires both intra- and inter-day precision acceptance but gives no formula for the correct nested-variance ('inter-day') computation, and a naive pooled-SD inter-day CV (18.9%) would have passed while the true intra-day CV (20.6-21.7%) fails -- but because the skill does explicitly require checking both tiers, the generated code checked both and reached the correct 'not fit for use' verdict. Recorded as a P1 recommendation, not a veto." },
+      "code_usability": { "result": "PASS", "detail": "All R code across 5 inputs (calibration/back-calc, IS normalization, LOD/LLOQ, ion-ratio + matrix factor, full ICH M10 validation + carryover) ran to completion with base R + ggplot2 only, no missing dependencies, no syntax errors. The skill's own bundled example (examples/targeted_quantification.R) ran unmodified on first try." }
+    }
+  },
+  "static_score": {
+    "subtotal": 90,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 11, "max": 12, "note": "Comprehensive coverage of calibration/weighting, IS normalization, ion-ratio, LOD/LLOQ, decision-tree IS/validation strategy, and ICH M10 thresholds; runnable code exists for calibration/IS-normalization/ion-ratio but not for the promised full validation-metrics step (precision/accuracy per QC level, matrix factor, carryover, recovery) -- an agent must synthesize that code from a threshold table alone (confirmed in Input 5)." },
+      "reliability": { "score": 9, "max": 12, "note": "Hard-stop / NA-below-LLOQ is correct defensive design per the Category-3 scene override; boolean pass/id_confirmed flags are structured, agent-parseable signals rather than prose error messages. No documented handling for missing calibrator levels, non-monotonic curves, or negative back-calculated concentrations." },
+      "performance_context": { "score": 7, "max": 8, "note": "SKILL.md is a compact 211 lines with usage-guide.md carrying prompts/prerequisites separately; workflow is linear with no redundant round-trips." },
+      "agent_usability": { "score": 15, "max": 16, "note": "Learnability and consistency are strong (terminology and code patterns match across SKILL.md/usage-guide/example, verified by direct reuse in all 5 inputs); Error Prevention is excellent (Common Errors + Per-Method Failure Modes tables, verified accurate in Inputs 2/3/5); Feedback Design has a minor gap -- no explicit final-report/output-format template is specified." },
+      "human_usability": { "score": 7, "max": 8, "note": "usage-guide.md's natural-language example prompts aid discoverability; the frontmatter description itself is technically dense (MRM/SRM/ion-ratio jargon), a minor risk for non-expert phrasings. Strict-input-rejection posture is intentional per the Category-3 Forgiveness override, not a defect." },
+      "security": { "score": 12, "max": 12, "note": "No credentials, no eval/exec of raw strings, no unsafe input handling; all code reads local numeric data only." },
+      "maintainability": { "score": 10, "max": 12, "note": "Content is well modularized by concern (calibration, IS-normalization, ion-ratio, LOD, failure modes); the one bundled example script is deterministic (set.seed) and reproduced exactly in this audit. No scripts/ directory or bundled expected-output fixture beyond that one example." },
+      "agent_specific": { "score": 19, "max": 20, "note": "Trigger description explicitly scopes itself against 3 sibling Skills (xcms-preprocessing, statistical-analysis, isotope-tracing) to prevent mis-triggering; strong escape-hatch culture (upfront 'three inputs the code cannot supply', single-transition method flagged as a documented compromise). Minor Progressive Disclosure deduction for keeping most code inline in SKILL.md rather than a scripts/ directory." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 89.2,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 20, "total": 20 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Weighted calibration + IS-normalized quantification of unknown plasma samples",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. 1/x^2-weighted calibration + back-calculated %RE acceptance recovered all 6 planted-true unknown concentrations within 1.1% error (data/input1_*.csv, run/input1_canonical.R); LLOQ correctly applied to a boundary sample.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "All non-below-LLOQ samples quantified within +-15% of planted true concentration", "result": "PASS", "note": "Max observed error 1.09% across 5 reportable samples (U1-U5)." },
+          { "text": "Boundary sample (true=3 ng/mL, LLOQ=2 ng/mL) correctly reported (not suppressed)", "result": "PASS", "note": "conc_est=2.99, reportable=TRUE, -0.22% error." },
+          { "text": "Calibration accepted by per-level back-calculated %RE, not R-squared", "result": "PASS", "note": "Code implements the SKILL.md pattern exactly; no R-squared gate used for acceptance." },
+          { "text": "Output does not fabricate concentrations beyond what the fit computes", "result": "PASS", "note": "All 6 reported values trace directly to the weighted-fit coefficients and input areas." }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "IS-strategy advisory: 40-analyte panel, one global internal standard",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true (Mode A direct advisory response, no code generation required by this prompt type; see run/input2_variantA_response.md).",
+        "basic": 35,
+        "specialized": 49,
+        "total": 84,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Response correctly identifies precision/accuracy decoupling for shared-IS panels", "result": "PASS", "note": "Matches SKILL.md's 'One IS shared across chemically diverse analytes' failure mode verbatim." },
+          { "text": "Response ties recommendation to the skill's own Decision Tree tier for the stated (unspecified) study type", "result": "PASS", "note": "Correctly defaults to the 'Exploratory research, ranking' row and flags escalation if the study is regulated." },
+          { "text": "Response does not fabricate specific numeric results not derivable from the prompt", "result": "PASS", "note": "No invented p-values, CVs, or concentrations; guidance stays qualitative/procedural." },
+          { "text": "Response flags need to upgrade IS/validation tier if study becomes regulated", "result": "PASS", "note": "Explicit escalation path stated at the end of the response." }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "LOD/LLOQ from blank scatter + single-transition (no qualifier) defensibility",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. LOD computed from real blank replicate scatter (S/N~3); defensibility answer follows SKILL.md's explicit 'documented compromise, not a default' language (run/input3_edge_lod_lloq.R).",
+        "basic": 36,
+        "specialized": 54,
+        "total": 90,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "LOD computed from real blank scatter (S/N~3), not hardcoded", "result": "PASS", "note": "LOD=1.329 ng/mL, derived from 5 real synthetic blank replicates." },
+          { "text": "Response states single-transition reporting is a documented compromise, not forbidden outright", "result": "PASS", "note": "Direct quote of SKILL.md's Ion-Ratio Confirmation section used correctly." },
+          { "text": "Response does not claim a single-transition method meets full ICH M10 selectivity standard", "result": "PASS", "note": "Explicitly recommends flagging the limitation and substituting selectivity/RT-match data." },
+          { "text": "LOD value is consistent with the stated LLOQ (LOD < LLOQ)", "result": "PASS", "note": "LOD 1.33 ng/mL < stated 2 ng/mL LLOQ, confirming the LLOQ is accuracy-bound not noise-bound." }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Ion-ratio confirmation + IS-normalized matrix factor across 6 lots (planted interference)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. Planted isobaric-interference sample correctly flagged id_confirmed=FALSE (ion ratio 0.167 vs calibrator 0.39, outside +-30%); 6 clean QC-mid lots correctly confirmed; IS-normalized matrix factor CV=4.44% correctly passed the <=15% threshold (run/input4_variantB_ion_ratio_matrix_factor.R).",
+        "basic": 37,
+        "specialized": 57,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Planted-interference sample correctly flagged id_confirmed=FALSE", "result": "PASS", "note": "Ion ratio 0.167, |0.167-0.39|/0.39=57% > 30% tolerance." },
+          { "text": "All 6 clean QC-mid lots correctly confirmed (id_confirmed=TRUE)", "result": "PASS", "note": "Ion ratios 0.390-0.393, all within +-30% of calibrator 0.39." },
+          { "text": "IS-normalized matrix factor CV correctly computed and compared to <=15% threshold", "result": "PASS", "note": "CV=4.44%, correctly below the ICH M10/Matuszewski threshold." },
+          { "text": "Output does not fabricate lot data beyond what was provided", "result": "PASS", "note": "All 7 rows trace directly to data/input4_ion_ratio_matrix_factor.csv." }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Full ICH M10 validation (intra/inter-day accuracy+precision, carryover) for a clinical PK assay",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. Correctly flagged a planted intra-day LLOQ precision failure (CV 20.6-21.7% both days) and a planted carryover failure (427% of LLOQ vs 20% threshold); overall verdict correctly 'not fit for regulated PK decision'. Exposed a real SKILL.md gap: the threshold table requires intra- AND inter-day acceptance but gives no formula for computing inter-day precision correctly (nested variance vs. naive pooled SD) -- a naive pooled-SD inter-day CV (18.9%) alone would have passed the same failing LLOQ level (run/input5_stress_ich_m10.R).",
+        "basic": 32,
+        "specialized": 52,
+        "total": 84,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Carryover correctly flagged as failing the <=20%-of-LLOQ threshold", "result": "PASS", "note": "Computed 427.2% of LLOQ from the planted high blank-after-ULOQ signal." },
+          { "text": "Intra-day LLOQ precision correctly flagged as failing (CV>20%)", "result": "PASS", "note": "Day 1 CV=21.7%, Day 2 CV=20.6%, both above the 20% LLOQ tolerance." },
+          { "text": "Overall assay verdict correctly concludes 'not fit for regulated PK decision'", "result": "PASS", "note": "all_acc_prec_pass=FALSE and carryover_pass=FALSE correctly combine to an overall FALSE verdict." },
+          { "text": "LOW/MID/HIGH QC tiers correctly pass accuracy and precision (clean planted data)", "result": "PASS", "note": "All 3 tiers within +-15% accuracy and <=15% CV, both intra- and inter-day." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 36.0,
+    "dynamic_weighted": 53.5,
+    "score": 90,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Calibration/back-calculated-%RE code is directly executable and, verified against planted-truth synthetic data spanning 3 orders of magnitude, recovers concentrations within ~1% error (Input 1).",
+    "Extensive, citation-backed 'Common Errors' and 'Per-Method Failure Modes' tables (deuterium isotope effect, isotopic crosstalk, pre-analytical degradation) produced accurate, correctly-scoped advisory answers in Inputs 2 and 3.",
+    "Ion-ratio confirmation and IS-normalized matrix-factor code correctly distinguished one planted isobaric interference from six clean QC lots (Input 4).",
+    "Clear escape-hatch culture: explicitly names the three inputs code cannot supply (authentic standard, co-eluting SIL-IS, per-analyte validation record) and flags single-transition methods as 'a documented compromise, not a default.'"
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "No runnable code for accuracy/precision/matrix-factor/carryover validation metrics",
+      "observed_in": [5],
+      "problem": "SKILL.md's 'What the Agent Will Do' step 6 promises computing accuracy, precision, matrix factor, recovery, and carryover, but only calibration/IS-normalization/ion-ratio ship as code; the Quantitative Thresholds table states both intra- and inter-day precision must pass but gives no formula for the correct inter-day computation.",
+      "root_cause": "The skill documents ICH M10 acceptance thresholds as a reference table rather than as runnable code, unlike the calibration and ion-ratio sections which pair the threshold with a code block.",
+      "fix": "Add a code block for precision/accuracy-by-level-and-day (explicitly using a nested/ANOVA variance-components model for inter-day, not a pooled SD across days), matrix-factor-across-lots, and carryover, matching the style of the existing calibration/IS-normalization/ion-ratio snippets."
+    },
+    {
+      "priority": "P2",
+      "title": "No explicit final-output/report-format template",
+      "observed_in": [],
+      "problem": "'What the Agent Will Do' lists 6 workflow steps but never specifies the expected shape of the final deliverable (e.g. a concentrations table with sample/analyte/conc/unit/flag columns).",
+      "root_cause": "SKILL.md focuses on methodological correctness (weighting, IS strategy, thresholds) and leaves output formatting to agent discretion.",
+      "fix": "Add a short 'Report Format' example showing the expected final table/columns, mirroring the calibration code block's style."
+    },
+    {
+      "priority": "P2",
+      "title": "Description is jargon-dense for non-expert trigger phrasing",
+      "observed_in": [],
+      "problem": "The frontmatter description relies on MRM/SRM/ion-ratio/%RE vocabulary; a user phrasing a request without this vocabulary (e.g. 'how much of X is in my sample') may under-trigger relative to the untargeted-discovery sibling skill.",
+      "root_cause": "Description is written for an expert audience already familiar with targeted-vs-untargeted terminology.",
+      "fix": "Add one plain-language trigger phrase to the description (e.g. 'give me a concentration in units for a known compound') alongside the technical terms."
+    }
+  ]
+}

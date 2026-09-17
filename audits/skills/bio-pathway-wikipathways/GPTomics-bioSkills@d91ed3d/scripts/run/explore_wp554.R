@@ -1,0 +1,6 @@
+suppressMessages(library(rWikiPathways))
+info <- getPathwayInfo('WP554')
+print(info)
+genes <- getXrefList('WP554', 'L')
+cat("n genes (Entrez):", length(genes), "\n")
+print(genes)

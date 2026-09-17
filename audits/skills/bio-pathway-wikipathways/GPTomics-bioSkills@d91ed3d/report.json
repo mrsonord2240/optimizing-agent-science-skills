@@ -1,0 +1,196 @@
+{
+  "meta": {
+    "skill_name": "bio-pathway-wikipathways",
+    "description": "Tests a gene list (ORA, enrichWP) or a ranked gene vector (GSEA, gseWP) against the WikiPathways community-curated pathway collection with clusterProfiler and rWikiPathways. Covers why a WikiPathways result is a snapshot of a live, monthly-updated database (enrichWP/gseWP/gson_WP silently pull data.wikipathways.org/current/), why reproducibility requires pinning a dated GMT via downloadPathwayArchive(date=, format='gmt'), why the WP GMT is Entrez-keyed so symbols and Ensembl silently overlap nothing, why universe=NULL gives a biased all-WP-genes background, how to split the name%version%wpid%org term, and why WikiPathways (CC0, no peer review) complements KEGG/Reactome.",
+    "evaluated_on": "2026-09-17",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:pathway-analysis/wikipathways",
+    "executed_inputs": "7/7 (input 4's SKILL.md/usage-guide.md example date 404s against the live server -- executed anyway with a currently-valid date to test the mechanism itself; the shipped examples/wikipathways_explore.R was also run byte-for-byte and halts at the identical call; see P1)"
+  },
+  "veto_gates": {
+    "skill_veto": { "gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS" },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All executed numbers come from live runs against the real WikiPathways API/GMT archive and real org.Hs.eg.db annotations (clusterProfiler 4.14.6, rWikiPathways 1.26.0, org.Hs.eg.db 3.20.0). DE hit/background labels and the log2FC/padj values are synthetic and labeled as such in data/make_wp_inputs.R; the six cited references (Pico 2008 PLoS Biol, Martens 2021 NAR, Agrawal 2024 NAR, Hanspers 2020 Genome Biol, Shin 2023 BMC Genomics, Wu 2021 Innovation) are real, correctly attributed WikiPathways/clusterProfiler papers." },
+      "practice_boundaries": { "result": "PASS", "detail": "Gene-set/pathway enrichment on de-identified expression data only; no individual-level, diagnostic, or prescriptive content; no disclaimer required for this scope." },
+      "methodological_ground": { "result": "PASS", "detail": "The Skill's central methodological claim (unpinned universe=NULL biases the background and inflates significance) was independently reproduced and is the correct statistical framing; the ORA/GSEA method split, BH adjustment, and community-vs-peer-reviewed-source caveats are all sound. No fallacy found in any of the seven executed patterns." },
+      "code_usability": { "result": "PASS", "detail": "All seven R patterns ran to completion (enrichWP, gseWP with seeded determinism, universe comparison, enricher on a dated GMT, compareCluster, cross-species enrichWP, and the documented SYMBOL-not-converted failure mode). The shipped examples/wikipathways_ora.R ran end-to-end verbatim, unmodified, and produced correct output. examples/wikipathways_explore.R halts with an unhandled R error ('Execution halted') when run top-to-bottom, unmodified, at the exact same downloadPathwayArchive(date='20240310', ...) call -- confirmed by running the shipped file byte-for-byte, not just the SKILL.md prose example. The call itself, its arguments, and the downstream read.gmt()/separate()/enricher() logic are all correct (verified end-to-end once a currently-valid date was substituted); the defect is a stale hardcoded date literal against a live server with a 12-month retention window, not a syntax error, missing dependency, or logic bug, so this stays PASS rather than triggering M4 -- but it is scored down under Functional Suitability/Maintainability and is the audit's top P1 (see below)." }
+    }
+  },
+  "static_score": {
+    "subtotal": 90,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 11, "max": 12, "note": "Completeness 4/4 (ORA, GSEA, dated-GMT reproducibility, direct DB queries, multi-organism, WP-vs-KEGG/Reactome contrast, PFOCR scoping, all covered). Appropriateness 4/4 (clusterProfiler+rWikiPathways is exactly the right stack; scope cleanly deferred to sibling Skills). Correctness 3/4: every mechanistic claim this audit checked held (universe=NULL inflation, Entrez-only GMT, searchPathways removal, format=gpml default, BridgeDb xref codes, get_wp_organisms), but the one worked reproducibility example (date='20240310') is stale -- it 404s today because the live archive retains only 12 months, and the Skill never states that retention window (P1)." },
+      "reliability": { "score": 10, "max": 12, "note": "Category-3 override applied: Mode A instructional skill, so documented failure-mode tables substitute for in-code error handling. Error Reporting 4/4 (an 8-row Common Errors table plus a parallel Per-Method Failure Modes section, both symptom->cause->fix, both spot-checked and accurate). Fault Tolerance 3/4 and Recoverability 3/4: thorough for ID-type/universe/date-format pitfalls but silent on the archive-retention 404 and the wrong-organism-string silent-NULL case, both reproduced live this pass (P1, P2)." },
+      "performance_context": { "score": 8, "max": 8, "note": "SKILL.md is 207 lines with depth correctly pushed to usage-guide.md and examples/; workflow is linear (bitr -> enrichWP/gseWP -> setReadable -> read result) with no redundant round-trips." },
+      "agent_usability": { "score": 15, "max": 16, "note": "Learnability 4, Consistency 4, Feedback Design 4 (documented output columns exactly matched what enrichWP/gseWP/compareCluster returned in every run). Error Prevention 3/4: proactively warns against the ID-type, universe, current/-drift, and gpml-default pitfalls, but not the archive-retention-window trap that this audit's own SKILL.md-documented example hit." },
+      "human_usability": { "score": 6, "max": 8, "note": "Discoverability 3/4 (precise but dense, technical trigger language typical of this Skill family). Category-3 override applied to Forgiveness: 3/4 -- the underlying functions degrade to a clean NULL/empty result rather than a crash or a silently-wrong number on bad ID types or organism strings, which is the correct data-integrity posture, not a usability defect." },
+      "security": { "score": 12, "max": 12, "note": "No credentials, no eval/exec of raw strings, no destructive operations; all file output routed to tempdir() in the shipped examples; only network calls are to the public, unauthenticated WikiPathways API/archive as documented." },
+      "maintainability": { "score": 10, "max": 12, "note": "Modularity 4/4 (SKILL.md/usage-guide.md/examples/ cleanly separated). Modifiability 3/4: extension points are implicit via the Related Skills list rather than explicitly documented. Testability 3/4: examples/wikipathways_ora.R ran verbatim end-to-end with correct output, but examples/wikipathways_explore.R halts with an unhandled R error when run unmodified from top to bottom (same stale date literal as P1) -- one of the two shipped, runnable-by-design example scripts does not in fact complete as shipped." },
+      "agent_specific": { "score": 18, "max": 20, "note": "Trigger Precision 4, Progressive Disclosure 4, Composability 4 (explicit Related Skills handoffs to differential-expression, kegg-pathways, reactome-pathways, enrichment-visualization, all verified consistent with what this Skill actually produces). Idempotency 3/4 (current/ drift is explicitly and correctly flagged as intentional, not accidental, but is still a re-run hazard by design). Escape Hatches 3/4: states the internet requirement up front but gives no explicit stop-condition for an unsupported organism or a stale reproducibility date." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 93.0,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 29, "total": 32 },
+    "inputs": [
+      {
+        "index": 1, "type": "Canonical",
+        "label": "ORA on ~63 significant human genes (SYMBOL) against a ~3080-gene tested universe, top 15 by p.adjust with readable symbols",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "enrichWP recovered both planted pathways among 15 significant terms: WP430 (planted DOWN-signal pathway, used here as a second real positive control) rank 1 (p.adjust 9.5e-22, 31/31 genes), WP554 (ACE inhibitor pathway, the primary planted signal) rank 3 (p.adjust 6.9e-11, 17/17 genes). bitr conversion 63/63 (sig) and 3080/3048 (universe, 1:many).",
+        "executed": true,
+        "execution_note": "run/in1_canonical.R against data/de_results_synthetic.csv (synthetic DE calls over real org.Hs.eg.db identities, planted with real WP554/WP430 WikiPathways membership); output run/in1_canonical.out.",
+        "basic": 38, "specialized": 57, "total": 95,
+        "assertions_passed": 5, "assertions_total": 5,
+        "assertions": [
+          { "text": "bitr converts SYMBOL sig and universe lists to ENTREZID with a reported conversion rate", "result": "PASS", "note": "63/63 sig, 3080/3048 universe (1:many expansion)" },
+          { "text": "enrichWP is called with universe= set to the tested-gene Entrez vector, not left NULL", "result": "PASS", "note": "universe = all_entrez, per the SKILL's own recommended pattern" },
+          { "text": "The planted WikiPathways signal is recovered among the top hits by p.adjust", "result": "PASS", "note": "WP554 rank 3/15, WP430 rank 1/15, both with exact planted gene counts (17/17, 31/31)" },
+          { "text": "setReadable() converts the geneID column from Entrez back to gene symbols", "result": "PASS", "note": "wp <- setReadable(wp, OrgDb=org.Hs.eg.db, keyType='ENTREZID') ran without error" },
+          { "text": "Output reports p.adjust (BH-adjusted), not raw p, as the column to act on", "result": "PASS", "note": "usage-guide.md's Understanding Results table and the printed columns agree" }
+        ]
+      },
+      {
+        "index": 2, "type": "Variant A",
+        "label": "GSEA (gseWP) on the full ranked gene list, no cutoff",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Named decreasing Entrez vector (n=3080) built correctly; gseWP recovered both planted terms with correct-sign NES: WP554 NES +2.77 (p.adjust 1.1e-10), WP430 NES -3.05 (p.adjust 1.1e-10). Re-run with the same set.seed(123) produced an identical term set and identical NES values (all.equal TRUE), confirming the Skill's determinism guidance is both present and effective.",
+        "executed": true,
+        "execution_note": "run/in2_gsea.R; output run/in2_gsea.out. gseWP itself took ~61s on this 3080-gene ranked list (fgsea backend), not a Skill defect.",
+        "basic": 37, "specialized": 59, "total": 96,
+        "assertions_passed": 5, "assertions_total": 5,
+        "assertions": [
+          { "text": "The ranked vector is a NAMED Entrez vector sorted DECREASING", "result": "PASS", "note": "is.character(names(gl))==TRUE, !is.unsorted(rev(gl))==TRUE" },
+          { "text": "set.seed(123) fixes permutation reproducibility as the SKILL states", "result": "PASS", "note": "identical term set and NES on re-run with the same seed" },
+          { "text": "Both planted terms recovered with the biologically correct NES sign (up-planted positive, down-planted negative)", "result": "PASS", "note": "WP554 NES +2.77, WP430 NES -3.05" },
+          { "text": "No universe= argument is used for gseWP (FCS uses the whole ranked list, as documented)", "result": "PASS", "note": "gseWP has no universe parameter; call matches the SKILL's GSEA pattern exactly" },
+          { "text": "NES and core_enrichment are the columns to read, as usage-guide.md's Understanding Results section states", "result": "PASS", "note": "both present in the returned enrichResult" }
+        ]
+      },
+      {
+        "index": 3, "type": "Edge",
+        "label": "universe=NULL vs a matched tested-gene universe, on both a null gene list and the planted-signal list",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Direct, live reproduction of the SKILL's central safety claim. On the planted-signal list, background N jumped from 186 (matched universe, tested-genes-annotated-in-WP) to 9031 (default universe=NULL, all-WP-genes) for the identical WP554 hit, and its p.adjust dropped from 6.86e-11 to 9.34e-39 -- roughly 28 orders of magnitude more 'significant' purely from the biased background, exactly the direction and mechanism the SKILL.md Common Errors table describes. On a 150-gene list with NO planted biology, neither universe setting fabricated a false hit (0 terms both ways -- too few of the 150 random genes clear the WP minGSSize=10 annotation floor to test the inflation effect on a true null; a minor gap in this input's design, not a Skill defect).",
+        "executed": true,
+        "execution_note": "run/in3_universe.R; output run/in3_universe.out.",
+        "basic": 38, "specialized": 57, "total": 95,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "universe=NULL uses a biased all-WP-genes background, as documented", "result": "PASS", "note": "BgRatio denominator 186 (matched) vs 9031 (NULL) for the identical query" },
+          { "text": "Passing the tested-gene universe produces a smaller, defensible background N", "result": "PASS", "note": "186 vs 9031" },
+          { "text": "p.adjust for the same true-positive term is dramatically more significant under the default (biased) universe, confirming the stated risk", "result": "PASS", "note": "6.86e-11 (matched) vs 9.34e-39 (NULL)" },
+          { "text": "A gene list with no planted biology does not fabricate false pathway hits under either universe setting", "result": "PASS", "note": "0 significant terms both ways on the null 150-gene list" }
+        ]
+      },
+      {
+        "index": 4, "type": "Variant B",
+        "label": "Reproducible analysis: pin a dated GMT, split the term field, run enricher on the pinned sets, report the date",
+        "status": "PARTIAL", "status_flag": "❌",
+        "note": "The exact worked example in both SKILL.md and usage-guide.md, downloadPathwayArchive(date='20240310', organism='Homo sapiens', format='gmt'), returns an HTTP 404 today (2026-09-17): data.wikipathways.org's own index page states it retains only 'the last 12 months' of monthly archives, and the live folder listing confirms it -- entries jump from a 3-file 20230810 stray straight to 20260110, i.e. every monthly folder between Aug 2023 and Jan 2026 is gone. Substituting a currently-valid date (20260810) made the rest of the documented pattern work exactly as described: read.gmt() -> separate(term, c('name','version','wpid','org'), sep='%') -> enricher(TERM2GENE=, TERM2NAME=) recovered both planted terms (WP554 p.adjust 6.4e-11, WP430 p.adjust 8.9e-22) from a term list that split cleanly into all four documented fields. gson_WP() also ran without error, consistent with the SKILL's claim that it snapshots current/ rather than pinning a date.",
+        "executed": true,
+        "execution_note": "run/in4_dated_gmt.R; output run/in4_dated_gmt.out. First run against the literal documented date failed (404, captured in the same output file); the script was then edited in place to use a valid date and re-run to test the mechanism. Independently confirmed against the shipped file itself: run/verbatim_examples/wikipathways_explore.R, copied byte-for-byte from the Skill and run unmodified, halts at the identical call (run/verbatim_examples/wikipathways_explore.out) -- see the P1 recommendation.",
+        "basic": 33, "specialized": 49, "total": 82,
+        "assertions_passed": 3, "assertions_total": 5,
+        "assertions": [
+          { "text": "downloadPathwayArchive(date='20240310', format='gmt') as literally given in SKILL.md's own worked example downloads successfully", "result": "FAIL", "note": "HTTP 404 -- the date is outside the live server's 12-month retention window" },
+          { "text": "SKILL.md documents the archive's retention window or a long-term citable fallback (e.g. Zenodo) so a stale date doesn't silently strand a reproducible-analysis workflow", "result": "FAIL", "note": "no mention of retention limits or the Zenodo GMT/GPML archive anywhere in SKILL.md or usage-guide.md, even though data.wikipathways.org's own landing page recommends Zenodo for exactly this case" },
+          { "text": "With a currently-valid date, the term field splits correctly into name/version/wpid/org and enricher recovers the planted terms", "result": "PASS", "note": "both WP554 and WP430 present, correct p.adjust values" },
+          { "text": "format='gmt' is required because the default is 'gpml', as documented", "result": "PASS", "note": "args(downloadPathwayArchive) confirms format=c('gpml','gmt','svg'), i.e. gpml is the default match" },
+          { "text": "gson_WP() is correctly characterized as a current/ snapshot, not a cross-time reproducibility pin", "result": "PASS", "note": "ran without error; SKILL's distinction between it and the dated-GMT pattern holds" }
+        ]
+      },
+      {
+        "index": 5, "type": "Stress",
+        "label": "compareCluster(fun='enrichWP') across up- and down-regulated gene clusters in one call",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "compareCluster with geneClusters=list(up=.., down=..) produced 16 cluster-tagged rows; the planted UP pathway (WP554) was assigned exclusively to the up cluster and the planted DOWN pathway (WP430) exclusively to the down cluster, with 0 cross-cluster leakage (3 terms unique to up, 13 unique to down, 0 shared).",
+        "executed": true,
+        "execution_note": "run/in5_comparecluster.R; output run/in5_comparecluster.out.",
+        "basic": 38, "specialized": 57, "total": 95,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "compareCluster(fun='enrichWP') runs against two named gene clusters (up/down) in one call, as the Decision Tree table states", "result": "PASS", "note": "ran to completion, 16 rows returned" },
+          { "text": "Planted UP signal (WP554) assigned exclusively to the up cluster", "result": "PASS", "note": "WP554 in up cluster only" },
+          { "text": "Planted DOWN signal (WP430) assigned exclusively to the down cluster", "result": "PASS", "note": "WP430 in down cluster only" },
+          { "text": "Result is a standard clustered enrichResult usable downstream by enrichment-visualization's dotplot(), per the Skill's own scope note", "result": "PASS", "note": "as.data.frame(cc) returns the expected Cluster/ID/Description/p.adjust/Count columns" }
+        ]
+      },
+      {
+        "index": 6, "type": "Scope Boundary",
+        "label": "Non-model organism: zebrafish (Danio rerio) enrichWP, first confirming the exact organism string",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "get_wp_organisms() and listOrganisms() both confirmed 'Danio rerio' live (39 organisms total, consistent with the SKILL's '~30+' claim). enrichWP against the real zebrafish WikiPathways pathway WP468 ('ACE inhibitor pathway') recovered it exactly (p.adjust 1.15e-9, 7/7 genes). Passing the common name 'zebrafish' instead of the exact scientific binomial returned NULL with a terse console message, not a crash -- consistent with the SKILL's general 'verify the exact string' guidance, but that specific silent-NULL consequence is not itself documented anywhere in the Common Errors or Per-Method Failure Modes tables (P2).",
+        "executed": true,
+        "execution_note": "run/in6_zebrafish.R; output run/in6_zebrafish.out.",
+        "basic": 37, "specialized": 56, "total": 93,
+        "assertions_passed": 4, "assertions_total": 5,
+        "assertions": [
+          { "text": "get_wp_organisms()/listOrganisms() both confirm 'Danio rerio' as the exact organism string", "result": "PASS", "note": "both TRUE" },
+          { "text": "enrichWP with organism='Danio rerio' recovers the real, planted zebrafish pathway exactly", "result": "PASS", "note": "WP468, p.adjust 1.15e-9, 7/7 genes" },
+          { "text": "An incorrect organism string is handled without a crash", "result": "PASS", "note": "returned NULL, no R error" },
+          { "text": "SKILL.md documents what actually happens on an incorrect organism string, not just 'verify it first'", "result": "FAIL", "note": "the failure-mode tables cover ID-type and universe/date pitfalls but not this one" },
+          { "text": "The Skill's '~30+ species' coverage claim is consistent with the live listOrganisms() count", "result": "PASS", "note": "39 organisms returned" }
+        ]
+      },
+      {
+        "index": 7, "type": "Adversarial",
+        "label": "\"Just run enrichWP directly on my gene symbols, don't bother converting IDs\" -- deliberately skips bitr",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "enrichWP on raw SYMBOL input (not converted to Entrez) returned NULL with a diagnostic console message ('No gene can be mapped') and did not throw an R error or fabricate a misleading non-empty result -- exactly the failure mode the SKILL.md Common Errors table and Per-Method Failure Modes section both predict for this exact mistake.",
+        "executed": true,
+        "execution_note": "run/in7_adversarial_symbols.R; output run/in7_adversarial_symbols.out.",
+        "basic": 38, "specialized": 57, "total": 95,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "enrichWP on raw SYMBOL input (skipping bitr) does not throw an R error/crash", "result": "PASS", "note": "returned NULL cleanly" },
+          { "text": "Result is NULL/empty rather than a misleading non-empty table, exactly as documented", "result": "PASS", "note": "0 terms, is.null(wp_wrong)==TRUE" },
+          { "text": "The Skill's own Common Errors table entry for this exact failure predicts this outcome", "result": "PASS", "note": "'enrichWP returns 0 terms | passed SYMBOL/ENSEMBL not Entrez | bitr to ENTREZID first'" },
+          { "text": "No fabricated pathway hits are returned despite the malformed input", "result": "PASS", "note": "0 terms, no spurious matches" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 36.0,
+    "dynamic_weighted": 55.8,
+    "score": 92,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "The Skill's central safety claim -- an unpinned universe=NULL biases the background and inflates significance -- was reproduced almost exactly as described: the same true-positive term's p.adjust dropped from 6.9e-11 to 9.3e-39 (about 28 orders of magnitude) purely from swapping the background from the tested-gene universe to the default.",
+    "All seven executed R patterns (ORA, seeded/deterministic GSEA, universe comparison, dated-GMT reproducibility mechanics, compareCluster up/down, cross-species zebrafish enrichment, and the documented SYMBOL-into-Entrez-GMT failure mode) ran against live WikiPathways data and recovered real, planted pathway signal with correct statistics.",
+    "Every one of the SKILL's documented API/failure-mode claims this audit spot-checked (searchPathways() removal, format defaulting to gpml, get_wp_organisms(), the three BridgeDb xref codes, the silent-empty-result on non-Entrez IDs) reproduced exactly as claimed on the installed clusterProfiler 4.14.6 / rWikiPathways 1.26.0.",
+    "Clean SKILL.md/usage-guide.md/examples/ layering with a precise, specific trigger description and explicit scope handoffs to five sibling Skills, all consistent with what this Skill actually produces."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "Reproducibility worked example uses a date the live archive no longer serves",
+      "observed_in": [4],
+      "problem": "SKILL.md's and usage-guide.md's own 'correct, reproducible pattern' example, downloadPathwayArchive(date='20240310', organism='Homo sapiens', format='gmt'), returns an HTTP 404 today because data.wikipathways.org retains only the last 12 months of monthly archives; nothing in the Skill states this retention window or names the Zenodo GMT/GPML archive that WikiPathways' own site recommends for anything older. This is not just a documentation staleness issue: the shipped examples/wikipathways_explore.R file itself, run byte-for-byte unmodified, halts on this exact call ('Execution halted').",
+      "root_cause": "The reproducibility guidance treats the dated-archive endpoint as a permanent pin when it is only durable for about a year on WikiPathways' own infrastructure.",
+      "fix": "Replace the hardcoded date in both worked examples with guidance to use a date within the last 12 months, and add one sentence noting the retention window plus the Zenodo GMT/GPML community archive (https://zenodo.org/communities/wikipathways) as the citable long-term fallback for anything published beyond that window."
+    },
+    {
+      "priority": "P2",
+      "title": "Wrong-organism-string failure mode is undocumented",
+      "observed_in": [6],
+      "problem": "enrichWP(organism='zebrafish') (a plausible common-name mistake instead of the required scientific binomial) returns NULL silently, but this specific symptom is absent from the otherwise-thorough Common Errors and Per-Method Failure Modes tables, which only say to verify the string first without saying what a wrong one does.",
+      "root_cause": "The failure-mode tables were written around the ID-type, universe, and date/format pitfalls but not the free-text organism parameter, which fails the same silent-NULL way.",
+      "fix": "Add one row to the Common Errors table: 'enrichWP/gseWP returns NULL with no terms | wrong/non-canonical organism string | verify with listOrganisms()/get_wp_organisms() first; the string must match exactly.'"
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+library(PROPER)
+cat("=== makeMeanExpr.2grp ===\n")
+print(getAnywhere("makeMeanExpr.2grp"))
+cat("\n=== RNAseq.SimOptions.2grp default lfc ===\n")
+print(args(RNAseq.SimOptions.2grp))
+so <- RNAseq.SimOptions.2grp(ngenes=100)
+cat("class(lfc):", class(so$lfc), "\n")
+print(so$lfc)

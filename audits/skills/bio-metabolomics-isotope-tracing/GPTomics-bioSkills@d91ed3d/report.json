@@ -1,0 +1,197 @@
+{
+  "meta": {
+    "skill_name": "bio-metabolomics-isotope-tracing",
+    "description": "Designs and analyzes stable-isotope-resolved metabolomics (SIRM / isotope tracing / fluxomics) experiments that measure metabolic ACTIVITY via 13C/15N/2H tracers, distinct from steady-state pool profiling. Covers tracer choice, isotopologue vs isotopomer, mass-isotopomer distributions (MID), fractional enrichment, the mandatory natural-abundance + tracer-purity correction (IsoCor, AccuCor), and the metabolic/isotopic steady-state vs non-stationary (INST-MFA) distinction.",
+    "evaluated_on": "2026-09-17",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Moderate",
+    "n_inputs": 5,
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:metabolomics/isotope-tracing"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All 5 outputs use synthetic or independently-sourced real (accucor extdata) numeric inputs; no fabricated DOI/PMID, trial results, sample sizes, or p-values in any output." },
+      "practice_boundaries": { "result": "PASS", "detail": "No diagnostic/prescriptive claims in any output; the Skill is scoped to bench-research metabolomics, not patient care; Input 4's cancer-cell-line question is answered as a tracer-design question only." },
+      "methodological_ground": { "result": "PASS", "detail": "No principled methodological fallacy (no correlation-for-causation, no inverted conclusion via mismatched model) in any output. Input 3 exposed a real but lesser gap -- the SKILL.md steady-state snippet checks only the last time-point pair against a fixed threshold, which can pass a still-decelerating series as 'plateau'. This is an incompleteness/robustness gap, not a fallacy, so it does not meet the M3 FAIL bar; filed as a P1 recommendation instead." },
+      "code_usability": { "result": "PASS", "detail": "All executed code (Inputs 1, 2, 3, 5) ran without syntax errors, missing dependencies, or infinite loops, using the real installed isocor 2.2.4 / accucor 0.3.1.9000 packages; Input 2's corrected output matched accucor's own shipped ground-truth reference to 2.8e-17." }
+    }
+  },
+  "static_score": {
+    "subtotal": 94,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 11, "max": 12, "note": "All documented use cases (isocor low-res correction, accucor high-res/QqQ correction, MID/enrichment math, steady-state check, tracer decision tree) covered and run-verified; docked 1 point for the steady-state check's incomplete robustness (see Input 3)." },
+      "reliability": { "score": 11, "max": 12, "note": "Common Errors table's causes are accurate and its length-mismatch entry matches the real isocor ValueError text exactly; docked 1 point because the real error text for the documented 'half-defined resolution' case is more generic than the table implies (verified, Inputs 3 & 5)." },
+      "performance_context": { "score": 8, "max": 8, "note": "SKILL.md ~187 lines, usage-guide kept separate, one reference example script; correct progressive disclosure, nothing loaded that isn't needed." },
+      "agent_usability": { "score": 14, "max": 16, "note": "Consistent terminology and clear, runnable code patterns throughout; Feedback Design and Error Prevention both docked slightly for the same steady-state under-specification affecting Reliability." },
+      "human_usability": { "score": 7, "max": 8, "note": "Description trigger language is strong and natural; Category-3 scene override applied to Forgiveness (strict input validation is correct design here) -- docked 1 point because isocor/accucor raise plain, non-Skill-specific ValueErrors rather than structured recovery codes." },
+      "security": { "score": 12, "max": 12, "note": "No credentials, no destructive operations, no injection surface anywhere in SKILL.md, usage-guide, or the example script; pure numeric analysis on user-supplied arrays." },
+      "maintainability": { "score": 11, "max": 12, "note": "Clean 3-file separation (SKILL.md / usage-guide.md / examples/isotope_correction.py), each with one clear responsibility; docked 1 point because only one worked example ships and no additional test fixtures are provided." },
+      "agent_specific": { "score": 20, "max": 20, "note": "Description precisely disambiguates from 4 adjacent Skills (targeted-analysis, xcms-preprocessing, pathway-mapping, flux-balance-analysis), reducing mis-triggering; verified idempotent/deterministic; correctly hands flux-fitting off to INCA/13CFLUX2 rather than reimplementing MFA." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 87.2,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 20, "total": 21 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "IsoCor natural-abundance correction of synthetic U-13C5-glutamine areas",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. Ran unmodified against SKILL.md's MetaboliteCorrectorFactory().correct() pattern on a metabolite/tracer pair not in the Skill's own example (glutamine, not glucose); output verified internally consistent (MID sums to 1, near-zero residuum).",
+        "basic": 37,
+        "specialized": 53,
+        "total": 90,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Output reports corrected MID as a vector summing to 1", "result": "PASS", "note": "Script asserts abs(sum(iso_fraction)-1.0)<1e-6, prints True." },
+          { "text": "Output does not fabricate DOI/PMID or invented statistical claims", "result": "PASS", "note": "All values computed by isocor's correct(); no citations invented." },
+          { "text": "Output stays within isotope-correction analysis, does not attempt flux fitting", "result": "PASS", "note": "Script only computes MID/enrichment, matching the Skill's documented hand-off to INCA/13CFLUX2." },
+          { "text": "Output reports both the corrected MID and fractional enrichment as requested", "result": "PASS", "note": "Both printed explicitly." },
+          { "text": "No medical diagnostic/prescriptive claims made", "result": "PASS", "note": "Pure lab-analysis context throughout." }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "AccuCor correction of real accucor extdata vs shipped ground truth",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. Corrected Normalized MID for glucose-6-phosphate matched accucor's own shipped C_Sample_Input_Simple_corrected.xlsx reference to 2.8e-17. Process note: first attempt without output_base wrote into the shared R package's extdata/ (same filename as the reference); re-run with output_base pointed at this audit's run/ dir. Flagged as a P1 (SKILL.md never mentions this side effect).",
+        "basic": 37,
+        "specialized": 55,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Corrected values match AccuCor's own shipped reference output", "result": "PASS", "note": "Max abs difference 2.775558e-17 across the full Normalized table for glucose-6-phosphate." },
+          { "text": "Output presents normalized MID per isotopologue (C_Label) per sample", "result": "PASS", "note": "Full 7x11 tibble printed." },
+          { "text": "Output does not fabricate values beyond what accucor computed", "result": "PASS", "note": "All values are natural_abundance_correction()'s own return object." },
+          { "text": "Comparison against ground truth explicitly performed and reported", "result": "PASS", "note": "Max-diff check computed and printed in the script." }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Steady-state boundary check + IsoCor length-mismatch error",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "executed: true. Part B (length-mismatch ValueError) matched the Common Errors table exactly. Part A exposed a real methodological gap: the SKILL.md steady-state snippet's last-pair-only <2% check returns 'plateau reached' on a series (deltas 0.08, 0.06, 0.01) that is still visibly decelerating, not flat -- filed as P1.",
+        "basic": 34,
+        "specialized": 44,
+        "total": 78,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Steady-state call correctly matches the SKILL.md-documented <2% threshold rule", "result": "PASS", "note": "0.01 < 0.02 computed and applied exactly as documented." },
+          { "text": "Output flags the documented ValueError for a length-mismatched isotopologue vector", "result": "PASS", "note": "Exact match: 'length of the measured isotopic cluster (3) is different than the required number of measurements: 7'." },
+          { "text": "Output does not overclaim flux-readiness from an unconverged/boundary time course", "result": "FAIL", "note": "The literal SKILL.md rule (last-pair-only) returns True on a still-decelerating series; nothing in SKILL.md prompts checking earlier deltas or the overall trend before calling plateau." },
+          { "text": "Output addresses both parts of the multi-part prompt (steady-state check + error explanation)", "result": "PASS", "note": "Both Part A and Part B present and labeled." }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Tracer-selection guidance for PPP vs glycolysis (decision-tree reasoning)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: false -- Mode A direct-reasoning input, no code expected. Evaluated as a text response against SKILL.md's Decision Tree row (positional 1,2-13C2-glucose tracer; M+1 vs M+2 split separates PPP from glycolysis).",
+        "basic": 37,
+        "specialized": 49,
+        "total": 86,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Recommended tracer and readout match the isotope-tracing literature (oxidative-PPP C1-decarboxylation logic)", "result": "PASS", "note": "Textbook-correct 1,2-13C2-glucose / M+1-vs-M+2 reasoning, matching SKILL.md's own Decision Tree row." },
+          { "text": "Output correctly stays in tracing scope rather than redirecting to abundance profiling", "result": "PASS", "note": "Explicitly frames this as a route/activity question, not a concentration question." },
+          { "text": "Answer names both the tracer AND the specific readout (M+1 vs M+2 split)", "result": "PASS", "note": "Both present in the response." },
+          { "text": "No prescriptive/diagnostic clinical claims about the cancer cell line", "result": "PASS", "note": "Research-only framing throughout." }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "GC-MS derivative-formula correction + half-defined-resolution error (multi-part)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. Part A/A2 comparison confirmed the documented derivative-formula failure mode with real numbers (0.08 max MID shift when the derivative formula is omitted). Part B reproduced the ValueError but with generic wording, same finding as Input 3 Part B.",
+        "basic": 37,
+        "specialized": 53,
+        "total": 90,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Derivative-formula correction demonstrably changes the MID vs. omitting it", "result": "PASS", "note": "0.0795 max-abs difference shown between with/without derivative_formula runs." },
+          { "text": "Documented half-defined-resolution error is reproduced as a ValueError", "result": "PASS", "note": "ValueError confirmed, matching the Common Errors table's claim that this raises a ValueError." },
+          { "text": "Both parts of the multi-part prompt are addressed with labeled output", "result": "PASS", "note": "Part A and Part B both present and clearly labeled." },
+          { "text": "No fabricated claims about instrument-specific behavior beyond what the API returns", "result": "PASS", "note": "Output limited to what correct() and the factory actually returned." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 37.6,
+    "dynamic_weighted": 52.3,
+    "score": 90,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Every documented code pattern in SKILL.md (isocor MetaboliteCorrectorFactory().correct(), accucor natural_abundance_correction()) ran unmodified and correctly: the isocor path matches the real API's 4-tuple return signature exactly, and the accucor path matched the package's own shipped ground-truth reference output to 2.8e-17.",
+    "The 'Per-Method Failure Modes' and 'Common Errors' sections are largely fact-checked, not decorative: the length-mismatch ValueError text and the derivative-formula MID shift (0.08 max) both reproduced exactly as documented.",
+    "Precise skill-boundary discipline: the description explicitly disambiguates from 4 adjacent Skills (targeted-analysis, xcms-preprocessing, pathway-mapping, flux-balance-analysis), which should reduce mis-triggering in a multi-Skill Specialist.",
+    "Correctly hands off flux modeling (13C-MFA / INST-MFA) to specialized external tools (INCA, 13CFLUX2) rather than attempting to reimplement it -- appropriate scope discipline for a correction/interpretation Skill."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "Steady-state check only compares the last time-point pair",
+      "observed_in": [3],
+      "problem": "The documented steady-state snippet (`abs(fe[-1]-fe[-2]) < 0.02`) can return 'plateau reached' on a time course that is still clearly decelerating but not flat, licensing classical-MFA flux inference prematurely.",
+      "root_cause": "SKILL.md's steady-state guidance checks only the final pair of points against a fixed threshold, with no check of the trend across the full time course.",
+      "fix": "Add guidance to require the delta to be shrinking (or below threshold) across at least the last 2-3 consecutive intervals, or recommend fitting a saturating-exponential curve to the full time course and checking its asymptote, per the already-cited Cheah & Young 2018 reference."
+    },
+    {
+      "priority": "P1",
+      "title": "Documented error text for 'half-defined resolution' is more specific than the real message",
+      "observed_in": [3, 5],
+      "problem": "The Common Errors table implies IsoCor reports a resolution-specific problem when `mz_of_resolution`/`charge` are given without `resolution`; the real raised text is a generic 'unable to select a correction strategy' ValueError that does not name resolution at all.",
+      "root_cause": "The table paraphrases isocor's internal factory-selection failure rather than quoting the real (generic) message an agent will actually see.",
+      "fix": "Either quote the real isocor error text verbatim in the Common Errors table, or add a pre-check in the Skill's guidance that raises a more specific message before delegating to isocor's factory."
+    },
+    {
+      "priority": "P1",
+      "title": "AccuCor code pattern omits a real filesystem side effect",
+      "observed_in": [2],
+      "problem": "`natural_abundance_correction(path=...)` writes an output file next to the input path by default; the SKILL.md R snippet does not mention this side effect or the `output_base` parameter that controls it.",
+      "root_cause": "The snippet was written to show the return value, not the function's default file-write behavior.",
+      "fix": "Add a one-line note to the AccuCor code block: 'writes <input>_corrected.xlsx next to the input by default -- pass output_base= to redirect it', so an agent following the pattern doesn't write into an unintended directory."
+    },
+    {
+      "priority": "P2",
+      "title": "No inline recovery guidance in the code snippets themselves",
+      "observed_in": [],
+      "problem": "Both the isocor and accucor code blocks in SKILL.md show only the happy path; error handling exists only as prose in a separate Common Errors table, not as a try/except pattern in the snippets.",
+      "root_cause": "SKILL.md separates 'how to call it' from 'what can go wrong' into different sections rather than integrating them.",
+      "fix": "Add one line to each code snippet (e.g. '# wrap in try/except ValueError -- see Common Errors table below') so the recovery path is visible at the point of use."
+    }
+  ]
+}

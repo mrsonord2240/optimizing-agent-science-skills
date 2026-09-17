@@ -1,0 +1,11 @@
+suppressMessages({
+  library(clusterProfiler)
+  library(enrichplot)
+  library(org.Hs.eg.db)
+  library(ggplot2)
+})
+cat("clusterProfiler:", as.character(packageVersion("clusterProfiler")), "\n")
+cat("enrichplot:", as.character(packageVersion("enrichplot")), "\n")
+cat("ggplot2:", as.character(packageVersion("ggplot2")), "\n")
+cat("ggridges installed:", requireNamespace("ggridges", quietly=TRUE), "\n")
+cat("ggarchery installed:", requireNamespace("ggarchery", quietly=TRUE), "\n")
