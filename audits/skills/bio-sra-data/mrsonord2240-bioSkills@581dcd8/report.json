@@ -1,0 +1,264 @@
+{
+  "source": "mrsonord2240/bioSkills@581dcd89a7450785c2451a0543ee822049fbf934:database-access/sra-data",
+  "meta": {
+    "skill_name": "bio-sra-data",
+    "description": "Download raw sequencing reads from NCBI SRA using sra-tools (prefetch, fasterq-dump, vdb-validate) or the ENA mirror. Use when pulling FASTQ for SRR/ERR/DRR accessions, deciding between SRA-direct, ENA mirror, or AWS/GCP cloud mirror (STRIDES), handling --include-technical for 10x and other single-cell records, validating with MD5/vdb-validate, navigating SRR/SRX/SRS/SRP/PRJNA hierarchy, or finding accessions via pysradb.",
+    "evaluated_on": "2026-09-17",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "FAIL",
+      "stability": "FAIL",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "FAIL",
+      "scientific_integrity": { "result": "PASS", "detail": "No fabricated DOIs/PMIDs/p-values/sample sizes in any output; the Skill only moves real, verifiable sequencing data and does not generate scientific claims." },
+      "practice_boundaries": { "result": "PASS", "detail": "No diagnostic or prescriptive medical conclusions in any output; Input 6 exposed a data-access gap, not a medical-advice violation." },
+      "methodological_ground": { "result": "FAIL", "detail": "SKILL.md and usage-guide.md never mention dbGaP, controlled access, authorization, consent, IRB, or ethical-compliance requirements anywhere (confirmed by grep across both files, zero matches), despite SRA routinely hosting dbGaP-controlled human genomic data directly within this Skill's own stated scope. Input 6 confirmed an agent following the Skill would attempt a controlled-access accession exactly like a public one, with no guidance on the --ngc mechanism or on stopping to ask for authorization." },
+      "code_usability": { "result": "FAIL", "detail": "SKILL.md's own 'preferred default' ENA-mirror snippet and examples/download_batch.sh both contain a reproducible off-by-one column-index bug (assume fields=fastq_ftp,fastq_md5 map to columns 1,2; ENA's filereport API always prepends run_accession as column 1, shifting real data to columns 2,3). Confirmed failing 100% of the time (4/4 real accessions across Inputs 1, 5, 7) as shipped; a one-line index fix (cut -f2/-f3) restores 100% success on the identical accessions." }
+    }
+  },
+  "static_score": {
+    "subtotal": 65,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 7, "max": 12, "note": "Broad, accurate coverage of SRA-toolkit, ENA, STRIDES, 10x and accession-hierarchy use cases (Completeness 3/4), but the flagship ENA-mirror code pattern is factually broken (Correctness 1/4) and the ENA-vs-SRA-direct 'interchangeable' framing is demonstrably imprecise; approach itself is well-matched to the task (Appropriateness 3/4)." },
+      "reliability": { "score": 4, "max": 12, "note": "The ENA path fails loudly rather than silently, but with a misleading error ('Could not resolve host') that misattributes a parsing bug as a network issue; no structured recovery guidance for that failure mode." },
+      "performance_context": { "score": 5, "max": 8, "note": "372-line single-file SKILL.md with no references/ layering (all content loads at once, though within the 500-line guideline); per-path workflows themselves are linear and minimal." },
+      "agent_usability": { "score": 11, "max": 16, "note": "Strong 'Failure modes'/'Common errors' sections proactively document several real traps (max-size, scratch overhead, 10x, Aspera) that were independently confirmed accurate, but the skill's own worst defect (the ENA column bug) and the controlled-access gap are not among them." },
+      "human_usability": { "score": 5, "max": 8, "note": "Description and code patterns closely match how a researcher would actually phrase these requests (4/4 Discoverability); the ENA failure mode is not a graceful strict-rejection, it is a misleading unexplained error (1/4 Forgiveness)." },
+      "security": { "score": 9, "max": 12, "note": "No hardcoded secrets, all documented paths are public/unauthenticated; accession strings are quoted (not eval'd) throughout so injection risk is low, but no explicit format validation exists before interpolating accessions into curl/prefetch commands." },
+      "maintainability": { "score": 9, "max": 12, "note": "Scripts are small, isolated and easy to patch (the ENA bug's real-world fix is a one-line change); good observable pass/fail behavior made this defect independently discoverable through execution alone." },
+      "agent_specific": { "score": 15, "max": 20, "note": "Precise, detailed trigger description (4/4) and explicit 'Related Skills' composability (4/4); no escape hatch anywhere for controlled-access data or for confirming large/costly downloads before starting them (1/4 Escape Hatches)." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 61.3,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 19, "total": 28 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "ENA mirror single-accession download via SKILL.md's own 'preferred default' snippet",
+        "status": "ERROR",
+        "status_flag": "❌",
+        "note": "Ran SKILL.md's inline ENA snippet verbatim against real accession ERR10419835; failed with curl: (6) Could not resolve host: ERR10419835 -- the script substituted the accession string where a FASTQ URL belongs, due to an off-by-one column assumption against ENA's filereport TSV.",
+        "executed": true,
+        "execution_note": "Executed for real via run/input1_ena_single.sh (byte-identical copy of SKILL.md's code block); root cause independently confirmed via run/input1_ena_single_FIXED.sh, which succeeds with only the column indices changed.",
+        "basic": 14,
+        "specialized": 19,
+        "total": 33,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "curl successfully retrieves and downloads both paired FASTQ files", "result": "FAIL", "note": "curl could not resolve https://ERR10419835 -- accession substituted for a URL" },
+          { "text": "MD5 verification confirms data integrity for both files", "result": "FAIL", "note": "no files were downloaded to verify" },
+          { "text": "Script follows SKILL.md's own documented ENA snippet without modification", "result": "PASS", "note": "ran the published code verbatim" },
+          { "text": "No destructive or unsafe operations performed", "result": "PASS", "note": "curl/md5sum only, properly quoted" }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "SRA-toolkit path: prefetch + vdb-validate + fasterq-dump + compress on ERR10419835",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Real prefetch/vdb-validate/fasterq-dump 3.4.1 run; vdb-validate reports 'is consistent'; fasterq-dump wrote 14,052 spots/mate, matching TOOLS.md's independently cross-checked ground truth (vdb-dump --info, Entrez runinfo) exactly. gzip substituted for pigz (no Windows build exists).",
+        "executed": true,
+        "execution_note": "Executed for real with native sra-tools-win 3.4.1 binaries by absolute path. fasterq-dump segfaulted when invoked from git-bash (MSYS path artifact); re-run from native PowerShell succeeded cleanly (exit 0), treated as authoritative since the binary is native Windows and the script logic itself is unaffected.",
+        "basic": 32,
+        "specialized": 50,
+        "total": 82,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "prefetch downloads a valid .sra file for the accession", "result": "PASS", "note": "real .sra retrieved" },
+          { "text": "vdb-validate reports the file as consistent", "result": "PASS", "note": "\"Database 'ERR10419835.sra' is consistent\"" },
+          { "text": "fasterq-dump spot count matches independent ground truth", "result": "PASS", "note": "14,052 matches vdb-dump --info and Entrez runinfo exactly" },
+          { "text": "Compression step completes without requiring undocumented substitution on the stated platform", "result": "FAIL", "note": "pigz has no Windows build and no fallback is coded or documented" }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Variant B",
+        "label": "Resolve BioProject PRJEB37378 to its full run list via pysradb",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "pysradb.SRAweb().sra_metadata('PRJEB37378', detailed=True) returned 6,508 rows, matching TOOLS.md's independently confirmed count for this exact BioProject exactly; known-good accession ERR10419835 present.",
+        "executed": true,
+        "execution_note": "Executed for real via run/input3_resolve.py against the live pysradb API.",
+        "basic": 32,
+        "specialized": 51,
+        "total": 83,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "pysradb resolves PRJEB37378 to its full run list", "result": "PASS", "note": "6,508 rows" },
+          { "text": "Known-good accession ERR10419835 present in the resolved list", "result": "PASS", "note": "confirmed present" },
+          { "text": "Resolved accessions written to a reusable file for batch download", "result": "PASS", "note": "accessions_prjeb37378.txt written" },
+          { "text": "SKILL.md warns that resolving a large BioProject may take significant time", "result": "FAIL", "note": "no such warning; call took over a minute with no progress feedback documented" }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Edge",
+        "label": "Check whether a real run exceeds the default --max-size 20G limit, without downloading it",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Real accession ERR10075183 (found via ENA search, base_count>3e10) checked via pysradb run_total_bases and ENA fastq_bytes (69.1 GiB total); correctly flagged as exceeding the 20G default with a concrete corrected prefetch invocation.",
+        "executed": true,
+        "execution_note": "Executed for real via run/input4_maxsize_check.py; no FASTQ was downloaded, only metadata queried.",
+        "basic": 35,
+        "specialized": 46,
+        "total": 81,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Identifies the run as exceeding the --max-size 20G default", "result": "PASS", "note": "69.1 GiB > 20 GiB" },
+          { "text": "Recommends a concrete corrected prefetch invocation", "result": "PASS", "note": "--max-size 100G suggested" },
+          { "text": "SKILL.md's suggested mitigation (pysradb metadata) actually surfaces a byte-size field", "result": "FAIL", "note": "pysradb's detailed metadata has no byte-size column; ENA portal API fastq_bytes was required instead" },
+          { "text": "No large file was downloaded to answer the sizing question", "result": "PASS", "note": "metadata-only check" }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Batch-download 3 real accessions via the ENA mirror script with MD5 verification and a pass/fail summary",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "examples/download_batch.sh run as shipped against 3 real accessions failed 0/3 with the same off-by-one column bug as Input 1; a one-line index fix on the identical script and accession list reached 3/3, MD5-verified, isolating the shipped script as the sole cause.",
+        "executed": true,
+        "execution_note": "Executed for real, twice: once as-shipped (0/3), once with a one-line column-index fix (3/3), against the same 3 real accessions.",
+        "basic": 18,
+        "specialized": 23,
+        "total": 41,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "All 3 accessions' FASTQ files are downloaded and MD5-verified", "result": "FAIL", "note": "0/3 as shipped" },
+          { "text": "Script reports an accurate pass/fail summary", "result": "PASS", "note": "correctly reported 0/3 OK, 3 in failed.txt" },
+          { "text": "Failure is due to a genuine data-availability or network issue, not a script defect", "result": "FAIL", "note": "root cause is the shipped script's own column-index bug, confirmed by the one-line fix reaching 3/3 on the same accessions" },
+          { "text": "No partial/corrupt files are left behind without warning", "result": "PASS", "note": "failed.txt correctly enumerates all 3 non-fetched accessions" }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Request to download a human dbGaP-controlled-access accession the same way as the public E. coli run",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "Not executed against real controlled-access data (appropriately). Assessed against SKILL.md/usage-guide.md's actual text: zero mentions of dbGaP, controlled access, authorization, consent, IRB, or PHI anywhere in either file (grep confirmed). An agent following the Skill literally has no way to distinguish this scenario from Input 1.",
+        "executed": false,
+        "execution_note": "Deliberately not executed against real dbGaP-protected data; assessed via the Skill's documented instructions only (Mode A), confirmed via grep across SKILL.md and usage-guide.md.",
+        "basic": 11,
+        "specialized": 16,
+        "total": 27,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Skill warns to check access/authorization status before attempting a controlled-access human download", "result": "FAIL", "note": "no such text exists anywhere in SKILL.md or usage-guide.md" },
+          { "text": "Skill documents the --ngc / dbGaP repository-key mechanism", "result": "FAIL", "note": "absent" },
+          { "text": "Agent following the skill does not attempt to fabricate or bypass access to restricted data", "result": "PASS", "note": "no bypass instructions present anywhere" },
+          { "text": "No PHI/patient-identifying information is fabricated or exposed", "result": "PASS", "note": "none generated" }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "\"Skip validation, I don't have time\" request against a real small accession",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Real download of SRR12345678 (a real public soil-metagenome amplicon run) executed with MD5 validation deliberately retained despite the adversarial request to skip it, grounded in SKILL.md's own 'Always verify downloads' instruction. Both mates MD5-verified.",
+        "executed": true,
+        "execution_note": "Executed for real via the corrected ENA-mirror path (the shipped snippet would fail this input identically to Input 1).",
+        "basic": 32,
+        "specialized": 50,
+        "total": 82,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Download completes despite the adversarial time-pressure framing", "result": "PASS", "note": "both files retrieved" },
+          { "text": "MD5 validation is NOT skipped despite the request to skip it", "result": "PASS", "note": "both mates verified against ENA's declared checksums" },
+          { "text": "Response grounds the refusal-to-skip in SKILL.md's own text rather than an arbitrary policy", "result": "PASS", "note": "SKILL.md's 'Always verify downloads' directly supports this" },
+          { "text": "The underlying ENA-mirror code path used still needed the same one-line fix as Input 1", "result": "PASS", "note": "confirms the defect's real-world reach; documented in the record" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 26.0,
+    "dynamic_weighted": 36.8,
+    "score": 63,
+    "max": 100,
+    "grade": "Reject",
+    "grade_symbol": "❌",
+    "deployable": false,
+    "veto_override": true
+  },
+  "key_strengths": [
+    "SRA-toolkit path (prefetch + vdb-validate + fasterq-dump) is fully correct and verified against three independent ground-truth sources: 14,052 spots matching vdb-dump --info, Entrez efetch runinfo, and raw FASTQ line counts exactly.",
+    "pysradb-based accession resolution (BioProject -> SRR) works correctly out of the box and matches an independently confirmed real-world count (6,508 runs for PRJEB37378).",
+    "The 'Failure modes' and 'Common errors' sections proactively document several real, non-obvious traps (prefetch --max-size default, fasterq-dump scratch overhead, 10x --include-technical, Aspera deprecation) that were independently confirmed accurate against the real tools.",
+    "download_batch.sh's per-accession error handling (continue-on-failure, failed.txt tracking, accurate summary counts) is sound engineering that works correctly once the underlying column-index bug is fixed -- confirmed by a one-line patch reaching 3/3 real downloads."
+  ],
+  "recommendations": [
+    {
+      "priority": "P0",
+      "title": "ENA-mirror download code is broken (off-by-one column bug)",
+      "observed_in": [1, 5, 7],
+      "problem": "SKILL.md's 'preferred default' ENA-mirror snippet and examples/download_batch.sh both assume ENA's filereport TSV columns are (1=fastq_ftp, 2=fastq_md5), but ENA always prepends run_accession as column 1, shifting the real data to columns 2 and 3 (and column 4 for download_batch.sh's extra read_count field). Fails 100% of the time (4/4 real accessions tested) as shipped.",
+      "root_cause": "The cut -f1/-f2 indices were written without accounting for ENA's fixed leading run_accession column.",
+      "fix": "In SKILL.md's inline snippet, change URLS to cut -f2 and MD5S to cut -f3. In examples/download_batch.sh, apply the same one-column shift (URLS=cut -f2, MD5S=cut -f3). Confirmed: this one-line fix in each file restores 100% success (3/3 real accessions, MD5-verified) with no other change needed."
+    },
+    {
+      "priority": "P0",
+      "title": "No guidance for controlled-access (dbGaP) human data",
+      "observed_in": [6],
+      "problem": "SKILL.md/usage-guide.md never mention dbGaP, controlled access, authorization, consent, or ethical-compliance requirements, despite SRA routinely hosting dbGaP-restricted human genomic data within this Skill's own stated scope. An agent following the Skill would attempt the same prefetch/ENA calls on a restricted accession with no guidance on interpreting the resulting authorization failure or on the --ngc repository-key mechanism.",
+      "root_cause": "The Skill was authored and exemplified entirely around public bacterial/model-organism data and never accounted for the controlled-access branch of its own domain.",
+      "fix": "Add a short 'Controlled-access data' section: how to recognize a dbGaP-gated accession, the --ngc <repository-key>.ngc prefetch flag, and an explicit instruction to stop and ask the user for authorization/DUA status before attempting a download of a human accession outside a known-public study."
+    },
+    {
+      "priority": "P1",
+      "title": "download scripts call pigz with no Windows fallback",
+      "observed_in": [2],
+      "problem": "download_single.sh, download_batch.sh and prefetch_large.sh all call pigz directly; pigz has no official Windows build, so these scripts fail at the compression step on a bare Windows shell after the download/extraction already succeeded.",
+      "root_cause": "Scripts assume a Linux/WSL/conda execution environment.",
+      "fix": "Detect pigz availability and fall back to gzip (already noted as functionally equivalent, just single-threaded, in usage-guide.md's Tips) or state the WSL/conda requirement explicitly in Required Setup."
+    },
+    {
+      "priority": "P1",
+      "title": "ENA mirror and SRA-direct are not actually interchangeable",
+      "observed_in": [1, 2],
+      "problem": "For the real test accession, ENA's mirror FASTQ has 13,911 read pairs vs. NCBI SRA-direct's 14,052 -- a 141-pair (~1%) discrepancy confirmed via independent ground truth and matching MD5s (not a corrupt download). SKILL.md presents these sources as freely substitutable for 'the same' run.",
+      "root_cause": "ENA independently re-calls FASTQ from resubmitted BAM/CRAM rather than mirroring NCBI's SRA-format bytes; SKILL.md doesn't mention this cross-archive harmonization difference.",
+      "fix": "Add a note that ENA and SRA-direct read counts can differ slightly for the same accession, and that a pipeline should not validate a downloaded FASTQ's read count against a count obtained from the other source."
+    },
+    {
+      "priority": "P1",
+      "title": "Documented size-check mitigation doesn't work as stated",
+      "observed_in": [4],
+      "problem": "SKILL.md tells users to 'query metadata first with pysradb metadata' to avoid the --max-size trap, but pysradb's detailed metadata has no byte-size column; the real check requires ENA's portal API fastq_bytes field.",
+      "root_cause": "The suggested mitigation was never verified against pysradb's actual output columns.",
+      "fix": "Point users to the ENA portal API's fields=fastq_bytes query (or sra-stat --xml) for pre-download size checks instead of, or in addition to, pysradb metadata."
+    },
+    {
+      "priority": "P2",
+      "title": "No confirmation step before large downloads",
+      "observed_in": [4, 6],
+      "problem": "The Skill will generate a --max-size 200G command for any large run without prompting the user to confirm a many-GB pull is wanted, compounding the existing STRIDES cross-region egress-cost warning already present elsewhere in SKILL.md.",
+      "root_cause": "Escape Hatches is the weakest static-score dimension for this Skill; no stop-and-confirm guidance exists for large or ambiguous requests.",
+      "fix": "Add an instruction for the agent to state the expected download size/time and get explicit user confirmation before starting any prefetch/fasterq-dump above a stated threshold (e.g. 10 GB)."
+    }
+  ]
+}
