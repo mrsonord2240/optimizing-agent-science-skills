@@ -1,0 +1,258 @@
+{
+  "source": "mrsonord2240/bioSkills@eb9a071:database-access/biomart-queries",
+  "meta": {
+    "skill_name": "bio-biomart-queries",
+    "description": "Bulk-query Ensembl BioMart (and other BioMart instances) for cross-database ID mapping, gene/transcript/exon coordinates, and ortholog tables. Use when batch-converting Ensembl IDs to other namespaces (HGNC, RefSeq, UniProt, Entrez), pulling gene coordinate tables for thousands of genes, or building ortholog wide-tables across species.",
+    "evaluated_on": "2026-09-17",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "No fabricated DOIs/PMIDs/p-values/trial results across any of the 7 inputs; every returned value (HGNC IDs, gene coordinates, ortholog calls, GO terms) was cross-checked against known real biology across independent live runs." },
+      "practice_boundaries": { "result": "PASS", "detail": "No diagnostic/prescriptive medical conclusions; operates on population-level reference genome data (Ensembl BioMart), not individual patient data. No disclaimer required." },
+      "methodological_ground": { "result": "PASS", "detail": "Query design is methodologically sound where it works (correct filter/attribute semantics now, correct one2one ortholog logic, correct long-format GO join). The two newly-found gaps (scale limit on ID-list filters, broken Ensembl-Genomes host-swap claim) are code-usability/documentation-accuracy defects, not methodological fallacies -- scored under static Correctness and M4 instead." },
+      "code_usability": { "result": "PASS", "detail": "Both original P0s are genuinely fixed and independently reproduced: the flagship bulk-ID-mapping pattern and shipped example, the GO-annotation pattern, and the coordinate-table pattern all run end-to-end with correct real biology at realistic small/chromosome-level scale. Code is not broadly unrunnable. One real gap found this session (query_raw()'s GET-based transport 414s at ~2000+ IDs, undermining the Skill's own '5,000 IDs' claim) is scale-specific to one pattern, produces a clear catchable error rather than silent corruption, and is reported as a P1 recommendation rather than a veto trigger." }
+    }
+  },
+  "static_score": {
+    "subtotal": 92,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 10, "max": 12, "note": "Completeness/Correctness improved substantially: all 5 regression patterns plus both shipped examples now run end-to-end with real biology (both original P0s confirmed fixed). Two claims still fail in practice: the Goal text's '5,000 Ensembl Gene IDs' scale claim (414 at 2066 IDs) and the newly-promoted 'swap host for Ensembl Genomes' claim (Dataset NOT FOUND, reproduced via pybiomart's own ds.query() too)." },
+      "reliability": { "score": 10, "max": 12, "note": "query_raw()'s outage-page guard is real and independently verified across 5 canned response shapes (unit test, no false positives). Plain HTTP errors (429/500/414) from pybiomart's own raise_for_status() propagate as uncaught, undocumented exceptions outside query_raw()'s guarded/documented error surface." },
+      "performance_context": { "score": 8, "max": 8, "note": "SKILL.md 360 lines, usage-guide.md trimmed in this fix's redundancy pass (removed restated 'What the Agent Will Do'/'Tips' sections), examples/ cleanly separated." },
+      "agent_usability": { "score": 14, "max": 16, "note": "Consistent terminology (attribute vs filter now carefully distinguished throughout). Failure modes/Common errors tables are extensive (9 entries) but do not mention the GET-based URL-length ceiling that breaks the flagship pattern at the Skill's own advertised scale." },
+      "human_usability": { "score": 8, "max": 8, "note": "Natural trigger language; discovery-first guidance pattern (Input 3) remains the single most useful workflow in the Skill." },
+      "security": { "score": 12, "max": 12, "note": "No credentials, no destructive operations, public reference data only. Filter values confirmed safely XML-escaped for special characters (&, <, >, \") via an offline round-trip test." },
+      "maintainability": { "score": 10, "max": 12, "note": "query_raw() is duplicated byte-identically in SKILL.md and both examples (confirmed via diff -- no drift yet, but 3 places to update for any future fix to the shared helper). Redundancy pass cleanly trimmed usage-guide.md's restated sections." },
+      "agent_specific": { "score": 20, "max": 20, "note": "Precise triggering, correct progressive disclosure, strong 'Related Skills' composability section, fully idempotent read-only queries, and a working BioMart-vs-REST decision-matrix escape hatch." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 84.4,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 26, "total": 30 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Bulk ID mapping: shipped example + SKILL.md inline pattern (BRCA2/TP53/PTEN/EGFR/MYC)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Both examples/bulk_id_mapping.py (shipped, subprocess) and SKILL.md's inline query_raw() pattern ran end-to-end; real HGNC IDs for all 5 genes; the fixer's extra NaN/groupby fix confirmed working.",
+        "basic": 38,
+        "specialized": 55,
+        "total": 93,
+        "executed": true,
+        "execution_note": "Ran run/input1_bulk_id_mapping.py (SKILL.md inline pattern, exit 0) and run/input_shipped_bulk_id_mapping.py (shipped example via subprocess, exit 0, one 429 retry).",
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Code executes without unhandled exceptions", "result": "PASS", "note": "Both the inline pattern and shipped example completed with exit 0" },
+          { "text": "Returned HGNC IDs match known ground truth", "result": "PASS", "note": "TP53=HGNC:11998, BRCA2=HGNC:1101, EGFR=HGNC:3236, PTEN=HGNC:9588, MYC=HGNC:7553, all real and correct" },
+          { "text": "NaN/groupby collapse step (fixer's extra fix) completes without crashing", "result": "PASS", "note": "Shipped example's 'Collapse to one row per gene' section printed cleanly for all 5 genes; pd.notna() correctly drops float NaN" },
+          { "text": "Row multiplication for multi-isoform genes documented and observed as expected", "result": "PASS", "note": "TP53 alone produced dozens of RefSeq rows via many-to-many join, matching SKILL.md's own documented failure mode" },
+          { "text": "No fabricated biological data in output", "result": "PASS", "note": "All values traced to a live Ensembl response" }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Coordinate table: chr17 protein-coding genes with the corrected gene_biotype attribute",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "SKILL.md inline pattern (block_4) ran verbatim; 1187 real chr17 protein-coding genes returned with correct real gene symbols -- confirms the P1 attribute-name fix live.",
+        "basic": 38,
+        "specialized": 54,
+        "total": 92,
+        "executed": true,
+        "execution_note": "Ran run/input2_coordinate_table.py; succeeded on 2nd attempt after one live 500 Server Error.",
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Code executes without unhandled exceptions", "result": "PASS", "note": "Succeeded after one live-service retry" },
+          { "text": "Attribute list uses gene_biotype, not the filter-only name biotype", "result": "PASS", "note": "SKILL.md text and code both now correctly distinguish the two" },
+          { "text": "Returned rows are real, known chr17 genes", "result": "PASS", "note": "SCGB1C2, DOC2B, RPH3AL, LIAT1, RFLNB all real chr17 loci" },
+          { "text": "No fabricated biological data", "result": "PASS", "note": "Live, real data confirmed" }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Discover attributes/filters; independently re-verify SKILL.md's own Version Compatibility claims",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Confirmed live: ensembl_gene_id/external_gene_name absent from ds.filters (root cause of the original P0); gene_biotype present as attribute, biotype absent as attribute but present as filter -- exactly as the fixed SKILL.md now documents.",
+        "basic": 38,
+        "specialized": 53,
+        "total": 91,
+        "executed": true,
+        "execution_note": "Ran run/input3_discover.py; all assertions checked with live ds.attributes/ds.filters membership tests.",
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "ds.attributes / ds.filters execute without error", "result": "PASS", "note": "Clean execution, 3208 attributes / 45 top-level filters enumerated" },
+          { "text": "ensembl_gene_id and external_gene_name are confirmed absent from ds.filters (the client-side gap)", "result": "PASS", "note": "Matches SKILL.md's Version Compatibility claim exactly" },
+          { "text": "gene_biotype present / biotype absent as attribute; biotype present as filter", "result": "PASS", "note": "All three checks confirmed live" },
+          { "text": "No fabricated data", "result": "PASS", "note": "Live real metadata" }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Ortholog wide-table: human/mouse/zebrafish chr17, 1:1 only",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Both the SKILL.md inline pattern and shipped examples/ortholog_table.py ran end-to-end; 4298 chr17 rows, 532 real 1:1 orthologs -- matches the fix log's own claimed numbers, independently reproduced.",
+        "basic": 38,
+        "specialized": 55,
+        "total": 93,
+        "executed": true,
+        "execution_note": "Ran run/input4_ortholog.py (succeeded on 4th attempt after repeated live 429s) and run/input_shipped_ortholog_table.py (succeeded on 1st attempt after fixing an unrelated path-join bug in my own test harness).",
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Code executes without unhandled exceptions", "result": "PASS", "note": "Both inline pattern and shipped example completed" },
+          { "text": "1:1 ortholog counts and gene symbols match known biology", "result": "PASS", "note": "DOC2B, YWHAE, CRK, TIMM22, VPS53 etc. all real chr17 genes with correct one2one calls" },
+          { "text": "Column-name resolution (mouse_col/zebra_col via next()) does not crash on real data", "result": "PASS", "note": "Defensive column lookup worked correctly against real display-name columns" },
+          { "text": "No fabricated ortholog calls produced", "result": "PASS", "note": "All values real and cross-checked" }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "GO annotation for 4 genes + MARCH1 HGNC-rename check",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "380 real GO rows for BRCA1/EGFR/MYC/TP53; MARCH1 correctly absent (renamed MARCHF1 post-2020), empirically confirming the documented failure mode this session (the pre-fix audit was blocked by an outage before reaching this check).",
+        "basic": 38,
+        "specialized": 54,
+        "total": 92,
+        "executed": true,
+        "execution_note": "Ran run/input5_go_and_rename.py; succeeded on 2nd attempt after one live 500 Server Error.",
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Code executes without unhandled exceptions", "result": "PASS", "note": "Same filter bug that broke this pre-fix is now fixed" },
+          { "text": "Output distinguishes found vs. not-found gene symbols", "result": "PASS", "note": "BRCA1/EGFR/MYC/TP53 present, MARCH1 correctly absent" },
+          { "text": "MARCH1-rename failure mode empirically confirmed live", "result": "PASS", "note": "Unlike the pre-fix audit, which was blocked by a live outage before reaching this check" },
+          { "text": "No fabricated data", "result": "PASS", "note": "Live real GO annotations" }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Non-vertebrate species: swap host to the Ensembl Genomes Plants BioMart (SKILL.md/usage-guide claim)",
+        "status": "ERROR",
+        "status_flag": "❌",
+        "note": "Both query_raw() and pybiomart's own high-level ds.query() reject athaliana_eg_gene with 'Dataset NOT FOUND' -- confirmed NOT a query_raw()-specific defect (pybiomart's built-in method fails identically, same host/port/path/virtual_schema), but the one-line claim as documented does not work in practice for a real Ensembl Plants dataset.",
+        "basic": 25,
+        "specialized": 37,
+        "total": 62,
+        "executed": true,
+        "execution_note": "Ran run/input6_scope_boundary_plants.py (fails), run/input6b_diagnose_virtual_schema.py (ruled out a virtualSchemaName mismatch -- it's genuinely 'default' per the server's own registry), run/input6c_diagnose_host.py (confirmed pybiomart's own ds.query() fails identically on the same host/port/path).",
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Code executes without an unhandled exception (clear RuntimeError, not a crash)", "result": "PASS", "note": "query_raw() raised a clean RuntimeError with BioMart's own error text" },
+          { "text": "Host-swap produces a working query as documented", "result": "FAIL", "note": "'Query ERROR: ... Dataset athaliana_eg_gene NOT FOUND', both via query_raw() and pybiomart's own ds.query()" },
+          { "text": "Error message identifies the real cause", "result": "PASS", "note": "BioMart's own Query ERROR text is surfaced verbatim, not swallowed" },
+          { "text": "No fabricated data", "result": "PASS", "note": "Clean failure, no garbage data returned" }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Outage-page guard (unit test), XML-escaping safety, realistic-scale ID list (2066 IDs), degenerate filters (unknown ID, empty list)",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "Outage-page guard fires correctly on 5 canned non-TSV response shapes with zero false positives on valid TSV (monkeypatched unit test, exercises the production code path). XML-escaping of special characters (&, <, >, \") confirmed safe via a captured-and-reparsed outgoing query. Long-ID-list (2066 real chr1 protein-coding IDs, ~33KB filter value) fails with 414 Request-URI Too Large -- query_raw() inherits pybiomart's GET-based transport, which cannot support the Skill's own advertised '5,000 Ensembl Gene IDs' scale. Unknown-ID and empty-list filters both hit a genuine live 'Service unavailable' outage page on all 4 isolated attempts (confirmed byte-for-byte via raw response capture, ruling out a guard malfunction) -- inconclusive on normal-condition behavior for these two specific inputs, though the guard correctly caught the outage every time instead of returning garbage.",
+        "basic": 28,
+        "specialized": 40,
+        "total": 68,
+        "executed": true,
+        "execution_note": "Ran run/input6_outage_guard.py (offline, no network), run/input7a_escaping_offline.py (offline), run/input7b_scale_and_unknown_ids.py, run/input7c_unknown_and_empty.py (x2 isolated retries), run/input7d_raw_body_diagnosis.py (raw-body capture, confirmed genuine live outage page, not synthetic).",
+        "assertions_passed": 2,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Outage-page guard fires on non-TSV/empty/whitespace/Query-ERROR responses and does not false-positive on valid TSV", "result": "PASS", "note": "5/5 canned response shapes handled correctly in an isolated unit test against the real query_raw() code" },
+          { "text": "Filter values containing XML special characters (&, <, >, \") are safely escaped", "result": "PASS", "note": "Confirmed via captured outgoing XML, round-tripped through ElementTree.fromstring with the exact original values preserved" },
+          { "text": "Bulk ID mapping succeeds at the Skill's own advertised scale (thousands of IDs)", "result": "FAIL", "note": "2066 real IDs -> 414 Request-URI Too Large; a GET-based transport cannot support this, and the Skill's Goal text specifically advertises '5,000 Ensembl Gene IDs'" },
+          { "text": "An unknown/fake ID mixed with a real one returns a clear, usable result", "result": "FAIL", "note": "Hit a genuine live outage page on 2/2 isolated attempts (confirmed via raw response capture); not demonstrated working under normal conditions this session" },
+          { "text": "An empty ID list is handled predictably (clear result or a clear, distinct error)", "result": "FAIL", "note": "Same outage page on 2/2 attempts; separately, query_raw()'s single generic RuntimeError message would not distinguish 'empty/degenerate query' from 'service outage' even under normal conditions" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 36.8,
+    "dynamic_weighted": 50.6,
+    "score": 87,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Both original P0s are genuinely fixed and independently reproduced from scratch: the flagship bulk-ID-mapping pattern and its shipped example run end-to-end with real HGNC/RefSeq/UniProt data (TP53=HGNC:11998, BRCA2=HGNC:1101, EGFR=HGNC:3236, PTEN=HGNC:9588, MYC=HGNC:7553), and the pybiomart version pin is corrected to 0.2.0.",
+    "The outage-page guard in query_raw() is real, not decorative: independently verified to fire on 5 different non-TSV response shapes (HTML outage page, empty body, whitespace-only body, genuine Query ERROR body) via a monkeypatched unit test on the actual production code path, with zero false positives on valid TSV.",
+    "The P1 gene_biotype/biotype attribute-vs-filter fix is confirmed live and reproduced independently (1187 real chr17 protein-coding genes, correct real gene symbols), as is the ortholog pattern (532 real 1:1 orthologs) and the GO/HGNC-rename pattern (380 real rows, MARCH1 correctly absent).",
+    "The extra shipped-example bug the fixer found during verification (NaN/groupby collapse crash in bulk_id_mapping.py) is real and genuinely fixed -- confirmed by running the shipped example end-to-end through the previously-crashing code path."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "Bulk ID-mapping fails at the Skill's own advertised scale (414 Request-URI Too Large)",
+      "observed_in": [7],
+      "problem": "query_raw() calls ds.get(), which is pybiomart's ServerBase.get() -- a plain HTTP GET with the entire XML query embedded in the URL. At 2066 real Ensembl gene IDs (~33KB filter value alone), Ensembl rejects the request with 414 Request-URI Too Large. SKILL.md's own Goal text advertises '5,000 Ensembl Gene IDs' and usage-guide.md's Quick Start example says '8,000 Ensembl Gene IDs' -- both would fail the same way, worse.",
+      "root_cause": "query_raw() inherits pybiomart's GET-based transport unchanged; nothing in the fix's new helper switches to POST or chunks large ID lists client-side.",
+      "fix": "Either build the query_raw() request as an HTTP POST (BioMart's martservice endpoint accepts POST for the same XML payload) or chunk ID lists above a safe size (empirically ~500-1000 IDs) into multiple queries joined client-side, and correct the '5,000'/'8,000 IDs' claims in SKILL.md and usage-guide.md to state the real, tested limit."
+    },
+    {
+      "priority": "P2",
+      "title": "Ensembl Genomes 'swap the host' claim does not work for a real dataset",
+      "observed_in": [6],
+      "problem": "SKILL.md's tool listing (promoted into the main document by this fix, moved from usage-guide.md's Tips) claims 'Non-vertebrate species: swap the host for the Ensembl Genomes BioMart, e.g. Server(host='http://plants.ensembl.org')'. Querying the real athaliana_eg_gene dataset this way fails with 'Dataset NOT FOUND', via both query_raw() and pybiomart's own built-in ds.query() -- so it is not a query_raw()-specific bug, but the claim itself is unverified and inaccurate as a one-line instruction.",
+      "root_cause": "The claim was carried over/relocated from usage-guide.md's Tips without being run against a real Ensembl Genomes dataset before being given more prominence in SKILL.md's main tool listing.",
+      "fix": "Either verify a working end-to-end Ensembl Genomes example (may need a different martservice path/virtual schema handling than the main Ensembl host) before shipping it as a one-line claim, or caveat it clearly as unverified / requiring additional configuration."
+    },
+    {
+      "priority": "P2",
+      "title": "query_raw()'s error guard can't distinguish a genuine live outage from a degenerate query",
+      "observed_in": [7],
+      "problem": "An empty ID-list filter and an all-unknown-ID filter both surfaced the same generic 'non-TSV response' RuntimeError that the guard also raises for a genuine service outage. An agent catching this exception has no reliable way to tell 'retry me later' from 'this query itself was malformed, don't retry.'",
+      "root_cause": "query_raw() uses one exception type and message for every non-TSV/empty-body case, regardless of cause.",
+      "fix": "Raise a distinct exception (or include a machine-checkable flag/code) for a genuinely empty response versus an HTML outage page, and document pre-flight validation (e.g. reject an empty filter list before sending the request) so agents get a clear, immediate error instead of a round trip to the server."
+    },
+    {
+      "priority": "P2",
+      "title": "R-side gene_biotype fix remains unverified live (5 total attempts across fixer + re-audit)",
+      "observed_in": [],
+      "problem": "Neither the fixer (3 attempts) nor this re-audit (2 further attempts, one of which got further than before -- a live connection succeeded via useMart() directly against the archive host, but the subsequent getBM() call itself then failed with 'HTTP 405 Method Not Allowed') could complete a live R biomaRt round trip this session to confirm gene_biotype works identically in R.",
+      "root_cause": "Live Ensembl BioMart mirror-selection and archive-host behavior remains intermittently unreachable/inconsistent for R's biomaRt client specifically, independent of this fix's code.",
+      "fix": "No code change indicated -- re-run block_7/coordinate_table.sh's R pattern when Ensembl's R-reachable mirrors stabilize, to close out the one item still verified only by schema-equivalence rather than a live run."
+    },
+    {
+      "priority": "P2",
+      "title": "query_raw() is duplicated verbatim in 3 files",
+      "observed_in": [],
+      "problem": "The same ~30-line query_raw() helper is byte-identical in SKILL.md and both examples/*.py (confirmed via diff, no drift yet). This is explicitly allowed for shipped examples under the redundancy policy, but it is still 3 places to update correctly if the helper needs a future fix (e.g. the POST/chunking fix above).",
+      "root_cause": "Examples are kept standalone-runnable by design, which requires the helper to be copied rather than imported from a shared module.",
+      "fix": "No action required under current policy; if the helper changes again, verify all 3 copies are updated in the same commit (as this fix did correctly)."
+    }
+  ]
+}

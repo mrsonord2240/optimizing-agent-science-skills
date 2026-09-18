@@ -1,9 +1,9 @@
 {
   "skill_id": "bio-biomart-queries",
-  "version": "mrsonord2240-bioSkills@581dcd8",
+  "version": "mrsonord2240-bioSkills@eb9a071",
   "source": {
     "repository": "mrsonord2240/bioSkills",
-    "commit": "581dcd89a7450785c2451a0543ee822049fbf934",
+    "commit": "eb9a071e28dec6fef79e277bd94aa8d41afd5695",
     "path": "database-access/biomart-queries",
     "author": "GPTomics",
     "author_url": "https://github.com/GPTomics",
@@ -13,7 +13,7 @@
       "repository": "GPTomics/bioSkills",
       "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
     },
-    "url": "https://github.com/mrsonord2240/bioSkills/tree/581dcd89a7450785c2451a0543ee822049fbf934/database-access/biomart-queries"
+    "url": "https://github.com/mrsonord2240/bioSkills/tree/eb9a071e28dec6fef79e277bd94aa8d41afd5695/database-access/biomart-queries"
   },
   "audit": {
     "method": {
@@ -31,11 +31,11 @@
     "commissioned_by": "Samuel Nord",
     "test_data": "synthetic"
   },
-  "supersedes": null,
+  "supersedes": "mrsonord2240-bioSkills@581dcd8",
   "files": {
     "report": "report.json",
     "viewer": "viewer.md",
     "fixes": "fixes.md",
-    "scripts": 9
+    "scripts": 21
   }
 }
