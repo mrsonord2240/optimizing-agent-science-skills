@@ -22,7 +22,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: mu=10 is far below a realistic mean count for 20,000 genes at usable depth, maxN=30 truncates the search below the answer, res$ssize is a 1x3 matrix rather than the scalar the comment claims, and the example was demonstrably never executed against the versions the Skill says it was tested with.
 - Fix: Set the worked example's mu from the pilot's normalized means (order 100 to 500), raise maxN to 200, print res$ssize[, "ssize"], and add a guard: if (is.na(n)) stop("no n <= maxN reaches the target; raise maxN or revise fc/dispersion").
 
-## P1 (78)
+## P1 (75)
 
 ### `bio-experimental-design-sample-size` — PROPER and powsimR routes ship with no executable pattern
 
@@ -63,38 +63,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: Following SKILL.md's batch-mode recipe literally (write the CSV to the current directory via the shown heredoc, then run the documented command) throws FileNotFoundError, because the real CLI's --input-dir defaults to ./input and SKILL.md never mentions this.
 - Root cause: The batch-mode example's fix pass verified the --summarize and CSV-column defects by running from a directory that already had an input/ subdirectory (or with an explicit --input-dir), without checking whether the documented recipe alone (as literally written) creates one.
 - Fix: Either add `mkdir -p input && mv variants.csv input/` (or `--input-dir .`) to both batch-mode code blocks, or note explicitly that the CSV must be placed under ./input/ (the CLI's own --help default) before running.
-
-### `bio-experimental-design-multiple-testing` — IHW is a headline power lever with no failure-mode coverage
-
-- Skill: 82, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/experimental-design/multiple-testing) · [viewer](skills/bio-experimental-design-multiple-testing/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 4
-- Problem: The exact call printed in SKILL.md, ihw(pvalue ~ mean_expression, data = de_table, alpha = 0.05), segfaulted the R session in 2 of 3 attempts on an 18,000-gene table under IHW 1.34.0 / R 4.4.3 / Bioconductor 3.20; the positional form from examples/ also crashed at default nbins for m >= 8000, and only nbins <= 5 was stable at 18,000 genes. The failure kills the interpreter, so nothing the analyst can catch is raised.
-- Root cause: The Per-Method Failure Modes section covers Bonferroni, BH, statsmodels, filtering and FCR but has no entry for IHW, so there is no documented fallback, no nbins guidance, no mention of the lpsymphony LP backend the method depends on, and no note that IHW silently reduces to Benjamini-Hochberg when the bin count collapses (which it printed at m = 2000).
-- Fix: Add an IHW failure-mode block: name the lpsymphony/Rsymphony solver dependency, give nbins as the first parameter to reduce when the call fails or hangs, note the built-in 'more than 1000 p-values' guard, and instruct a documented fall back to plain BH with the power loss stated when IHW cannot be made to run.
-
-### `bio-experimental-design-multiple-testing` — The q-value one-liner is unreliable on small families and pi0 is unstable there
-
-- Skill: 82, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/experimental-design/multiple-testing) · [viewer](skills/bio-experimental-design-multiple-testing/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 1, 3
-- Problem: qvalue(pvalues) as printed failed with 'Error in smooth.spline(lambda, pi0, df = smooth.df): missing or infinite values in inputs are not allowed' in 178 of 500 all-null families at m = 20 and 35 of 500 at m = 50. Where it did return, pi0-hat fell as low as 0.301 against a planted truth of 1.0 at m = 50 and 0.376 at m = 100, so the number the skill tells the analyst to report can be badly wrong on small families.
-- Root cause: The q-value section presents a bare one-liner with no minimum family size and never mentions the lambda or pi0.method arguments that govern the spline fit which is what actually breaks.
-- Fix: State a working floor in the q-value section (pi0 estimation needs a family in the thousands), show qvalue(p, pi0.method = 'bootstrap') and qvalue(p, lambda = 0) as the documented fallbacks, and add a q-value entry to Per-Method Failure Modes with the smooth.spline error as its symptom.
-
-### `bio-experimental-design-multiple-testing` — The BH-to-BY rule prescribes a large power loss on an undiagnosable symptom
-
-- Skill: 82, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/experimental-design/multiple-testing) · [viewer](skills/bio-experimental-design-multiple-testing/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 2
-- Problem: Across 1,200 replicate datasets BH never lost FDR control: mean realized FDP was 0.0444 under independence, 0.0393 under strong positive block dependence (rho = 0.8) and 0.0453 under pairwise negative dependence at rho = -0.95. The stated symptom, 'realized FDR exceeds nominal', never appeared -- and could not be observed by a real analyst in any case. Meanwhile switching to BY cost 53% of power (0.605 to 0.288) and more than half the rejections (312 to 141).
-- Root cause: The failure-mode entry presents a worst-case theoretical guarantee as an observable symptom, and the decision tree converts it into an unconditional recommendation for 'strong/unknown/negative dependence', which sweeps in the common case of merely unknown dependence.
-- Fix: Replace the symptom line with what dependence actually does -- under positive block dependence the FDP standard deviation rose from 0.011 to 0.043 and the chance of FDP exceeding 0.10 went from 0.000 to 0.092 while the mean stayed controlled -- quantify BY's power cost, and narrow the decision-tree row to cases where negative dependence is actually expected rather than merely unestablished.
-
-### `bio-experimental-design-multiple-testing` — The false-coverage-rate fix is named four times and shipped nowhere
-
-- Skill: 82, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/experimental-design/multiple-testing) · [viewer](skills/bio-experimental-design-multiple-testing/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 7
-- Problem: The decision tree, the Per-Method Failure Modes block and the Common Errors table all end at 'FCR-adjusted intervals for the selected set', but no formula, package or worked example exists anywhere in the skill, so a routine request for confidence intervals on the reported hits cannot be completed from it. The gap is not cosmetic: naive 95% intervals on the BH-0.05 selected set covered the true effect only 82.4% of the time, and the Benjamini-Yekutieli 2005 construction restored 97.6%, but had to be written from the primary literature.
-- Root cause: FCR is treated as a caution to be raised rather than a procedure to be executed, unlike BH, BY, q-value and IHW which all get code.
-- Fix: Add a short code block computing the FCR-adjusted level as 1 - alpha*R/m and applying it to the selected set, alongside the Benjamini & Yekutieli 2005 citation, so the warning ends in an action the way the other failure modes do.
 
 ### `bio-sra-data` — Header-based ENA column lookup fails ungracefully when a requested field is genuinely absent
 
@@ -536,6 +504,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The plain-text/CSV EFetch routes have no content validation before parsing, unlike the Entrez.read()-based routes (pubmed_full, lineage, History-server fetch), which Biopython itself protects by raising RuntimeError on a backend <ERROR> element.
 - Fix: Before splitting on commas, check that the first line looks like the expected CSV header (e.g., starts with 'Run,') and raise a clear error otherwise -- mirroring the sniff-and-raise pattern SKILL.md's own Failure Modes section already recommends for the HTML-error-page case.
 
+### `bio-experimental-design-multiple-testing` — The bare IHW one-liner in the code block is still unsafe if copied without the caution comment above it
+
+- Skill: 89, Production Ready · [mrsonord2240/bioSkills@1f9a730](https://github.com/mrsonord2240/bioSkills/tree/1f9a7307f1ea83733cc63c66e46ce697c05a7069/experimental-design/multiple-testing) · [viewer](skills/bio-experimental-design-multiple-testing/mrsonord2240-bioSkills@1f9a730/viewer.md)
+- Observed in inputs: 4
+- Problem: The documented mitigation (child-process retry, BH fallback) is proven to work, but it lives in prose and in examples/, not in the primary code block itself. An agent that copies only `res <- ihw(pvalue ~ mean_expression, data = de_table, alpha = 0.05, nbins = 5)` still has roughly a 50% chance of crashing the analyst's R session on a con table this size, measured directly in this re-audit (6/12).
+- Root cause: The safe pattern is documented as a caution and a pointer to examples/, not embedded as the default code an agent would paste.
+- Fix: Make the child-process-wrapped call the primary code block for IHW, with the bare formula call moved into the caution comment as the thing NOT to run directly -- inverting which version an agent is likely to copy first.
+
 ### `bio-machine-learning-prediction-explanation` — The conditional-SHAP 'credit to an unused feature' claim does not reproduce
 
 - Skill: 89, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/prediction-explanation) · [viewer](skills/bio-machine-learning-prediction-explanation/GPTomics-bioSkills@d91ed3d/viewer.md)
@@ -648,7 +624,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (260)
+## P2 (259)
 
 ### `bio-experimental-design-sample-size` — SKILL.md code blocks omit set.seed
 
@@ -713,30 +689,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: None of the three real Chronos training runs across this audit's inputs set or discussed a random seed, and SKILL.md gives no guidance on reproducibility between training runs.
 - Root cause: Carried over from both prior audits' static notes (Idempotency, Agent-Specific); unrelated to and untouched by this fix pass.
 - Fix: Add a one-line note to the Chronos code block: set a seed (or document that Chronos training is stochastic and gene-effect estimates should be treated as approximate across runs) so agents don't present a single run's numbers as exactly reproducible.
-
-### `bio-experimental-design-multiple-testing` — The shipped example teaches the wrong lesson twice
-
-- Skill: 82, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/experimental-design/multiple-testing) · [viewer](skills/bio-experimental-design-multiple-testing/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 1, 4
-- Problem: Run as shipped, examples/multiple_testing_correction.R prints a realized FDR of 0.108 for BH at a nominal 0.05 -- the 99.7th percentile of that same simulation's FDP distribution over 300 seeds, whose mean is 0.0472 -- so every reader sees the recommended method apparently failing by a factor of two. Its IHW section then prints 'IHW discoveries at FDR 0.05 = 93 (vs BH = 93)', zero gain, for a section whose stated purpose is that IHW 'recovers power vs plain BH'; the same rgamma covariate on the audit data gave 196 against BH's 204, an outright loss.
-- Root cause: The seed was never checked against the distribution it draws from, and the demo covariate satisfies only the null-independence half of the IHW precondition while carrying no information about power, which is the other half.
-- Fix: Average the method-comparison table over replicates, or pick a seed near the median of the FDP distribution; and generate the IHW covariate so power genuinely depends on it (for example tie per-gene noise to mean expression, which produced a 17% discovery gain here) so the section demonstrates the effect it claims.
-
-### `bio-experimental-design-multiple-testing` — The filtering rule is right but names the wrong instance
-
-- Skill: 82, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/experimental-design/multiple-testing) · [viewer](skills/bio-experimental-design-multiple-testing/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 5
-- Problem: The skill groups 'a pre-test on variance' with 'a preliminary t-test' as filters that are not null-independent and bias the FDR anti-conservatively. Measured over 200 replicates, the preliminary t-test behaved exactly as described (null p<0.05 rate 0.1001, mean FDP 0.0831, alpha exceeded in 86.7% of replicates), but group-blind variance filtering left the null p-value rate at 0.0502 against a 0.0500 target and doubled power, and within-group variance biased p-values conservatively (0.0138) rather than anti-conservatively. Following the skill's mean-only prescription on this data halved power, from 0.105 to 0.055.
-- Root cause: One sentence collapses three filter statistics with three different behaviours into a single warning, and the allow-list contains exactly one entry (overall mean count) borrowed from the count-data setting where a mean-variance trend makes it informative.
-- Fix: Name the statistics separately with the direction of each bias, say that the mean filter buys power only where mean predicts power, and add the one-line diagnostic used here -- check that null p-values stay uniform within strata of the filter statistic -- so an analyst can test any proposed filter instead of consulting a two-item list.
-
-### `bio-experimental-design-multiple-testing` — Three advertised topics appear only as taxonomy rows
-
-- Skill: 82, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/experimental-design/multiple-testing) · [viewer](skills/bio-experimental-design-multiple-testing/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 1
-- Problem: The frontmatter description promises local FDR, independent filtering and reproducibility ranking via IDR. In the body, IDR is a single taxonomy row naming an unspecified 'idr (ENCODE)' package with no code and no citation link in the workflow, and local FDR is one assignment, qobj$lfdr, with no cutoff, no interpretation rule and no statement of how it relates to the q-value threshold. Choosing a cutoff of 0.20 arbitrarily returned 364 features at a realized FDP of 0.0934, which no guidance in the skill would have predicted or sanctioned.
-- Root cause: The description was written to the full breadth of the topic while the body was written to the four methods that carry code, leaving a gap between what triggers the skill and what it can do.
-- Fix: Either add one sentence each giving a conventional lfdr cutoff with the per-feature-versus-tail-average distinction, and a concrete IDR entry point, or trim those promises out of the description so the trigger matches the content.
 
 ### `bio-sra-data` — SKILL.md's dbGaP boundary is advisory text only; no shipped script surfaces its own documented recognition signal
 
@@ -1857,6 +1809,22 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The Failure Modes section prescribes sniffing the first line of the response (LOCUS for GB, > for FASTA) and raising on mismatch for the 'EFetch returns HTML error page' case, but SKILL.md's own fetch_genbank() code pattern does not apply this guard -- only the separate examples/fetch_sequences.py's sniff_then_parse() does.
 - Root cause: The defensive-coding section was written independently of the primary code pattern and never cross-applied to it.
 - Fix: Apply the same sniff-and-raise guard inside fetch_genbank() itself, not just in the examples/ file, so the primary documented pattern gets the clear error message the Failure Modes section promises rather than relying on SeqIO's own less-specific ValueError.
+
+### `bio-experimental-design-multiple-testing` — The shipped example's BH step still teaches the wrong lesson
+
+- Skill: 89, Production Ready · [mrsonord2240/bioSkills@1f9a730](https://github.com/mrsonord2240/bioSkills/tree/1f9a7307f1ea83733cc63c66e46ce697c05a7069/experimental-design/multiple-testing) · [viewer](skills/bio-experimental-design-multiple-testing/mrsonord2240-bioSkills@1f9a730/viewer.md)
+- Observed in inputs: 4
+- Problem: examples/multiple_testing_correction.R, run seven times in this re-audit, consistently prints a realized FDR of 0.108 for BH at nominal 0.05 on its fixed seed -- unchanged from the pre-fix audit, and explicitly left unfixed per the fix log's own scope note.
+- Root cause: The fixer correctly deprioritized this as requiring a data-generator change outside the P1 fix pass's scope.
+- Fix: Average the method-comparison table over a few replicate seeds, or pick a seed nearer the median of the FDP distribution, so the shipped example does not appear to show its own recommended method failing by 2x.
+
+### `bio-experimental-design-multiple-testing` — Local FDR and IDR remain underspecified relative to what the description promises
+
+- Skill: 89, Production Ready · [mrsonord2240/bioSkills@1f9a730](https://github.com/mrsonord2240/bioSkills/tree/1f9a7307f1ea83733cc63c66e46ce697c05a7069/experimental-design/multiple-testing) · [viewer](skills/bio-experimental-design-multiple-testing/mrsonord2240-bioSkills@1f9a730/viewer.md)
+- Observed in inputs: 1
+- Problem: qobj$lfdr is computed with no threshold-interpretation rule (an arbitrary 0.20 cutoff returned 987 features at realized FDP 0.0375 in this re-audit's Input 1), and IDR is still one taxonomy row with no code, unchanged from the pre-fix audit.
+- Root cause: The fix pass targeted the four flagged P1s; this gap was not one of them and was not touched.
+- Fix: Either add a conventional lfdr cutoff convention and a concrete IDR entry point, or trim those promises from the frontmatter description to match the body's actual coverage.
 
 ### `bio-machine-learning-prediction-explanation` — The aggregation snippet requires a module map the Skill never tells you how to build
 
