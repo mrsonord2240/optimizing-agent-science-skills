@@ -46,3 +46,43 @@ Left unfixed: the `references/` progressive-disclosure split (P2, declined — s
 scope for this pass).
 
 Needs Sam: nothing. All five findings addressed (four fixed, one explicitly declined with reason).
+
+## 2026-09-17 — second fix pass (re-audit 86, Limited Release)
+
+Branch `fix/db-esearch2`, worktree `F:\OpenScience\wt\db-esearch2`, staging base
+`89269897`. Second re-audit's three P2s (`eval_report_bio-entrez-search_result.json`, 86/100). Verified
+live 2026-09-17 with the shared venv's Biopython 1.88
+(`F:\OpenScience\audit-envs\database-access\Scripts\python.exe`); no NCBI `<ERROR>` bodies observed
+during this pass's calls.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| `CURATED_DBS` decision-table row implies exhaustive coverage; covers only 10 of NCBI's live databases, undisclosed | P2 | Decision-table question reworded to "Which of the 10 `CURATED_DBS` databases mention X?". Added a disclosure paragraph in "Cross-database counts": states 10/38 coverage and gives the one-line widen-to-all-databases snippet (`dbs=Entrez.read(Entrez.einfo())['DbList']`). usage-guide.md's Quick Start bullet and "Cross-database discovery" prompt reworded to match (no longer say "which NCBI databases", say "which of the curated/10 databases"). | ran: live `Entrez.einfo()` -> 38 databases, all 10 `CURATED_DBS` names confirmed valid live db names; ran the widen snippet against 2 of the 38 (pubmed 5,703,545; protein 18,388,431) to confirm it executes and returns real counts | figure independently reconfirmed, not taken from the audit/brief |
+| No progressive disclosure; SKILL.md grew longer in the first fix pass | P2 | **Declined the `references/` split again** (out of `FIX_BRIEF.md`'s restructuring limit; not reversing the first fixer's judgement call). Did the required redundancy pass instead: collapsed 4 Failure Modes entries (Silent retmax cap, WebEnv expiration, Index lag, Organism over-expansion) that fully restated Trigger/Mechanism already given in earlier SKILL.md sections, to a one-line pointer + Fix only; moved a PMC-subset fact that existed only in usage-guide.md's Tips into SKILL.md's field-qualified-pattern table (agent-needed, was nowhere in SKILL.md); deleted usage-guide.md's entire Tips section (all 6 bullets were either now-duplicate of SKILL.md or moved into it, none were unique human-facing content) | docs (structural collapse, no runtime behavior) | **SKILL.md net +5 lines (334 -> 339)**, not shorter: the two other findings' fixes (CURATED_DBS disclosure, term-validation paragraph) add more than the collapse removes. usage-guide.md net -9 lines (74 -> 65). Declining the restructuring finding again, same reasoning as the first pass, now with the redundancy pass done and documented rather than only the cheap cross-link half |
+| No input-validation guidance for term strings | P2 | Added a short paragraph after "Required Setup": term strings are URL query parameters (Biopython URL-encodes, no shell/eval risk); sanity-check length/count before large batch loops (long OR-joined term is a common HTTPError 400 cause); points to EPost chunking instead | docs (prose guidance, ties into existing "Common errors" HTTPError 400 row and EPost's 200-IDs/call limit already documented in "retmax silent caps") | |
+
+**Found while collapsing, fixed inline:** the old "Index lag for fresh deposits" Failure Modes entry
+said the indexer is "batch (Tue/Fri primary)", contradicting the "Index lag" section two screens above
+it, which says the indexer "runs nightly". Could not verify NCBI's exact schedule live; dropped the
+unhedged, contradicting "Tue/Fri primary" claim rather than keep two disagreeing statements, per
+document doctrine (resolve on recency/support, not invention).
+
+**Deleted passages and where the content now lives:**
+- usage-guide.md Tips bullet 1 (gene-symbol/HGNC lookup) -> already stated in SKILL.md's "Query
+  translation mismatch" Failure Mode; not duplicated elsewhere, deleted outright.
+- usage-guide.md Tips bullet 2 ([Organism] taxonomy walk) -> already stated in SKILL.md's "Organism
+  field gotcha" section; deleted outright.
+- usage-guide.md Tips bullet 3 (fresh deposits/EFetch) -> already stated in SKILL.md's "Index lag"
+  section; deleted outright.
+- usage-guide.md Tips bullet 4 (history server for large sets) -> already stated in SKILL.md's
+  "History server" section; deleted outright.
+- usage-guide.md Tips bullet 5 (PMC subset `pubmed pmc[sb]`) -> did not previously exist in SKILL.md;
+  moved into SKILL.md's field-qualified-pattern table, pubmed row.
+- usage-guide.md Tips bullet 6 (`Entrez.egquery()` doesn't exist) -> already stated in SKILL.md's
+  "Cross-database counts" section; deleted outright.
+- SKILL.md Failure Modes' Trigger/Mechanism text for Silent retmax cap, WebEnv expiration, Index lag,
+  Organism over-expansion -> each already stated in an earlier SKILL.md section (named inline);
+  collapsed to a one-line pointer, Fix line kept.
+
+Left unfixed: the `references/` progressive-disclosure split (P2, declined a second time — see table
+above). Needs Sam: nothing.

@@ -672,7 +672,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: This divergence was undiscoverable before this fix round because the graphite route never completed a single successful run pre-fix (Research Veto M4 FAIL); the fixer's own verification (fixes/bio-pathway-kegg-pathways.md) checked that runSPIA returned real rows but did not cross-check its direction calls against the direct spia() route.
 - Fix: Add a caveat to the SPIA section (and the Common Errors / Per-Method Failure Modes tables) stating that graphite's harmonized topology can disagree with SPIA's native KEGG-bundled topology on perturbation direction for a meaningful fraction of pathways, and recommend treating the two routes as complementary evidence rather than interchangeable, or explicitly stating which one to prefer as the default and why.
 
-## P2 (261)
+## P2 (260)
 
 ### `bio-experimental-design-sample-size` — SKILL.md code blocks omit set.seed
 
@@ -1130,30 +1130,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: All material kept in SKILL.md.
 - Fix: Move catalogs and pushback tables to the usage guide.
 
-### `bio-entrez-search` — CURATED_DBS decision-table row overpromises exhaustive database coverage
-
-- Skill: 86, Limited Release · [mrsonord2240/bioSkills@1d50a42](https://github.com/mrsonord2240/bioSkills/tree/1d50a42db19bbfba3cfca8530ab9853cb38c409c/database-access/entrez-search) · [viewer](skills/bio-entrez-search/mrsonord2240-bioSkills@1d50a42/viewer.md)
-- Observed in inputs: 6
-- Problem: SKILL.md's decision table still asks 'Which NCBI databases mention X at all?' and routes to the ESearch-loop-over-CURATED_DBS fallback, but CURATED_DBS covers only 10 of the 38 live Entrez databases (confirmed via EInfo in this audit). The question's phrasing implies exhaustive coverage, inherited unchanged from the EGQuery row it replaced -- EGQuery actually did query all databases in one call.
-- Root cause: The fix promoted the ESearch-loop's 'how' to primary without re-scoping the decision table's 'what': the question text was carried over from the old EGQuery-backed row without being narrowed to match the fallback's actual, smaller, coverage.
-- Fix: Reword the decision-table question to reflect the curated scope (e.g. 'Which of these N curated databases mention X?'), or add one line disclosing that CURATED_DBS is a deliberate subset with a pointer to EInfo's full db list for exhaustive coverage.
-
-### `bio-entrez-search` — No progressive disclosure despite SKILL.md growing longer in this fix pass
-
-- Skill: 86, Limited Release · [mrsonord2240/bioSkills@1d50a42](https://github.com/mrsonord2240/bioSkills/tree/1d50a42db19bbfba3cfca8530ab9853cb38c409c/database-access/entrez-search) · [viewer](skills/bio-entrez-search/mrsonord2240-bioSkills@1d50a42/viewer.md)
-- Observed in inputs: —
-- Problem: SKILL.md grew from ~300 to ~335 lines in this fix pass (new 'Cross-database counts' section) rather than shrinking; still a single flat file with all failure-mode and field tables inline. examples/ is now cross-linked from the 'Code patterns' section, which is an improvement, but no references/ split exists.
-- Root cause: Declined as out of scope for this fix pass per FIX_BRIEF.md's restructuring limit -- a reasonable call given the pass's mandate, but the underlying static-score gap remains.
-- Fix: In a future pass with restructuring scope, split the field-qualified-pattern tables and Failure Modes/Common Errors tables into a references/ file.
-
-### `bio-entrez-search` — No input-validation guidance for term strings
-
-- Skill: 86, Limited Release · [mrsonord2240/bioSkills@1d50a42](https://github.com/mrsonord2240/bioSkills/tree/1d50a42db19bbfba3cfca8530ab9853cb38c409c/database-access/entrez-search) · [viewer](skills/bio-entrez-search/mrsonord2240-bioSkills@1d50a42/viewer.md)
-- Observed in inputs: —
-- Problem: Neither SKILL.md's Required Setup nor any code pattern mentions validating or sanitizing the 'term' string before passing it to Entrez.esearch(term=...). Low risk in practice (it is a URL query parameter, not executed code), but unaddressed.
-- Root cause: Never covered in original authoring; not part of either fix round's finding list.
-- Fix: Add one line noting term strings are passed as URL query parameters (no shell/eval risk) but should be length/encoding-sanity-checked before very large batch loops.
-
 ### `bio-molecular-descriptors` — Gasteiger snippet prints charges that do not sum to the formal charge
 
 - Skill: 86, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/molecular-descriptors) · [viewer](skills/bio-molecular-descriptors/GPTomics-bioSkills@d91ed3d/viewer.md)
@@ -1545,6 +1521,22 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: After the directory-creation fix, FluteRRA still fails downstream against MAGeCKFlute 1.99.2001 (the unreleased GitHub-HEAD build in TOOLS.md) with 'undefined columns selected'. This is already honestly documented in SKILL.md's Common Errors table as a known compatibility gap, which is the correct interim fix, but the underlying MAGeCKFlute-side bug remains unresolved.
 - Root cause: MAGeCKFlute's own plotting code has a column-handling incompatibility with this build; not something SKILL.md's text can fix directly.
 - Fix: No action needed from this Skill beyond what's already documented; track the upstream MAGeCKFlute issue and update the Version Compatibility note if a newer stable release resolves it.
+
+### `bio-entrez-search` — No progressive disclosure despite SKILL.md growing longer across two fix passes
+
+- Skill: 88, Limited Release · [mrsonord2240/bioSkills@1b1dd1d](https://github.com/mrsonord2240/bioSkills/tree/1b1dd1d7c11113e788ae408f2a8c62405b7ead71/database-access/entrez-search) · [viewer](skills/bio-entrez-search/mrsonord2240-bioSkills@1b1dd1d/viewer.md)
+- Observed in inputs: —
+- Problem: SKILL.md is now 339 lines (up from ~300 pre-fix), still a single flat file with all failure-mode and field tables inline. Both fix passes declined the references/ split as out of scope for FIX_BRIEF.md's restructuring limit.
+- Root cause: Restructuring beyond the redundancy rule was explicitly out of scope for both fix passes; a reasonable call given the mandate, but the underlying static-score gap remains.
+- Fix: In a future pass with restructuring scope, split the field-qualified-pattern tables and Failure Modes/Common Errors tables into a references/ file.
+
+### `bio-entrez-search` — Term-validation guidance is prose-only, no runnable helper
+
+- Skill: 88, Limited Release · [mrsonord2240/bioSkills@1b1dd1d](https://github.com/mrsonord2240/bioSkills/tree/1b1dd1d7c11113e788ae408f2a8c62405b7ead71/database-access/entrez-search) · [viewer](skills/bio-entrez-search/mrsonord2240-bioSkills@1b1dd1d/viewer.md)
+- Observed in inputs: 9
+- Problem: The new paragraph after Required Setup correctly explains that terms are URL-encoded (verified true in this audit), but gives no code example for the length/count sanity-check it recommends before large batch loops.
+- Root cause: The finding was addressed with documentation only, matching its P2 priority from the fix log.
+- Fix: Add a 3-line helper function (e.g. warn if len(term) > N or term.count(' OR ') > M) alongside the existing EPost-chunking pointer.
 
 ### `bio-phylo-modern-tree-inference` — Remove the false IQ-TREE flag-form warnings
 

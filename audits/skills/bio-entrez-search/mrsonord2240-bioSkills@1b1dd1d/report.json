@@ -1,0 +1,258 @@
+{
+  "source": "mrsonord2240/bioSkills@1b1dd1d:database-access/entrez-search",
+  "meta": {
+    "skill_name": "bio-entrez-search",
+    "description": "Search NCBI databases using Biopython Bio.Entrez (ESearch, EInfo, ESpell), including cross-database counts via an ESearch loop over a disclosed 10-of-38 curated database subset, with a verified widen-to-all-databases escape hatch (EGQuery is broken on current Biopython/NCBI). Use when finding records by keyword, building reproducible field-qualified queries, navigating the Entrez Query Translator, exploiting the history server for large result sets, handling retmax caps, or interpreting weekly index lag. Covers PubMed, Nucleotide, Protein, Gene, SRA, GEO, Assembly, Taxonomy, ClinVar, dbSNP.",
+    "evaluated_on": "2026-09-17",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Evidence Insight",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 9
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All counts, UIDs, field lists, database counts, and the 38-database EInfo figure across all 9 executed inputs came from live NCBI E-utilities calls made independently in this re-audit (not reused from the fix log or prior reports); none fabricated." },
+      "practice_boundaries": { "result": "PASS", "detail": "Pure database-search tooling; no output makes diagnostic, prescriptive, or treatment claims about an individual." },
+      "methodological_ground": { "result": "PASS", "detail": "No correlation/causation conflation. The second fix pass's disclosure of CURATED_DBS's 10/38 scope (rather than implying exhaustive coverage) and its dropping of the unverifiable 'Tue/Fri' indexer claim in favor of the supported 'nightly' claim are both methodologically sound choices, independently confirmed in this audit." },
+      "code_usability": { "result": "PASS", "detail": "All 9 inputs executed to completion with real, checked output; no syntax errors, no missing dependencies. Fenced code blocks were extracted programmatically from the shipped SKILL.md in the fix worktree, not hand-copied, and ran unmodified." }
+    }
+  },
+  "static_score": {
+    "subtotal": 92,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 12, "max": 12, "note": "The one remaining pre-fix gap (CURATED_DBS decision-table row implying exhaustive coverage) is now closed: reworded to name the 10 curated databases, with a disclosure paragraph and a widen-to-all-databases snippet independently verified in this audit to run clean across all 38 live databases, not just the fixer's 2-db spot check." },
+      "reliability": { "score": 11, "max": 12, "note": "Failure Modes and Common Errors tables remain thorough and re-verified live (retmax cap, WebEnv expiration body, RuntimeError-not-fabrication on <ERROR> bodies). Unchanged from the prior re-audit; no new reliability gap found." },
+      "performance_context": { "score": 6, "max": 8, "note": "SKILL.md net +5 lines this pass (334 -> 339); still a single flat file with no references/ split despite the redundancy pass. usage-guide.md shrank (74 -> 65) by removing genuinely duplicated content, a real but small efficiency gain." },
+      "agent_usability": { "score": 16, "max": 16, "note": "The CURATED_DBS coverage gap that previously cost a point here (undisclosed scope, an error-prevention miss) is fixed and disclosed as a pitfall. The Failure Modes internal contradiction (indexer 'Tue/Fri' vs 'nightly') found and resolved during this fix pass removes a real consistency defect; confirmed absent in this audit." },
+      "human_usability": { "score": 8, "max": 8, "note": "Unchanged; MARCH1 worked example still matches live reality, natural trigger language retained." },
+      "security": { "score": 10, "max": 12, "note": "New term-validation paragraph after Required Setup, independently tested in this audit: Bio.Entrez has no shell/eval call sites, builds requests via urllib.parse (percent-encoding), and a live call with a shell-metacharacter-laden term transmitted safely with no unescaped metacharacters. Guidance is prose-only (no runnable sanitization helper), so not full marks." },
+      "maintainability": { "score": 10, "max": 12, "note": "Redundancy pass collapsed 4 duplicated Failure Modes entries to one-line pointers and removed usage-guide.md's entire Tips section (content verified to have migrated to SKILL.md, not lost -- see eval_viewer). This reduces future drift risk (single source of truth) but references/ modularity split is still absent." },
+      "agent_specific": { "score": 19, "max": 20, "note": "Trigger description now names the disclosed 10/38 scope accurately. Progressive disclosure (8.2) remains the one held-back point: examples/ are cross-linked but no references/ split exists despite the file's complexity." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 84.7,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 37, "total": 37 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Regression: reproducible PubMed TMB/NSCLC 2024 query with QueryTranslation",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. Re-run via SKILL.md's search_ncbi() code block, extracted programmatically from the fix/db-esearch2 worktree. Count=65, real QueryTranslation, retmax-cap warning fired correctly -- identical behavior to the prior re-audit.",
+        "basic": 38,
+        "specialized": 46,
+        "total": 84,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Output prints QueryTranslation for the constructed query", "result": "PASS", "note": "Printed verbatim." },
+          { "text": "retmax cap warning issued when Count > retmax", "result": "PASS", "note": "WARNING printed (65 > 20)." },
+          { "text": "Output does not fabricate PMIDs", "result": "PASS", "note": "20 real, live 8-digit PMIDs returned." },
+          { "text": "Output stays within ESearch's stated capability (UIDs only, not full records)", "result": "PASS", "note": "No record content claimed." }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "EInfo DbInfo[0] fix, generalized to databases outside the fixer's own verification set",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. list_fields() run against taxonomy (21 fields) and assembly (51 fields); direct DbInfo-shape check against structure and biosample both confirm the list-of-one indexing fix generalizes. No TypeError.",
+        "basic": 38,
+        "specialized": 47,
+        "total": 85,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "list_fields() as shipped in SKILL.md runs without error against taxonomy and assembly", "result": "PASS", "note": "Both returned non-empty FieldList." },
+          { "text": "The DbInfo[0] fix generalizes to databases not in the fixer's test set (structure, biosample)", "result": "PASS", "note": "Both confirmed list-of-one shape, correct DbName/Count/LastUpdate after [0] indexing." },
+          { "text": "Field lists, Count, and LastUpdate are real, non-fabricated live values", "result": "PASS", "note": "structure Count=259,356; biosample Count=59,383,983, both live." },
+          { "text": "No TypeError or other exception raised", "result": "PASS", "note": "Clean execution." }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Variant B",
+        "label": "Regression: history-server queue, human RefSeq protein set",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. Count 197,929 (>9,999 non-history cap), real WebEnv/QueryKey returned, matches SKILL.md's history-server pattern.",
+        "basic": 39,
+        "specialized": 49,
+        "total": 88,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "Count exceeds retmax non-history cap (9,999), justifying history-server use", "result": "PASS", "note": "197,929 > 9,999." },
+          { "text": "WebEnv and QueryKey both returned and non-empty", "result": "PASS", "note": "Confirmed present." },
+          { "text": "No UIDs fetched directly (history-server path defers retrieval to EFetch)", "result": "PASS", "note": "retmax=0, no IdList requested." }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Edge",
+        "label": "Regression: MARCH1 ambiguous gene symbol vs current usage-guide.md wording",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. Live Count=702; usage-guide.md's current wording ('a big pile of loosely-related hits') matches live reality.",
+        "basic": 39,
+        "specialized": 50,
+        "total": 89,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "QueryTranslation printed for the original query", "result": "PASS", "note": "Printed." },
+          { "text": "Corrected query uses a field-qualified HGNC-permanent symbol", "result": "PASS", "note": "MARCHF1[Gene Name] used." },
+          { "text": "Corrected query returns fewer, more precise hits than the original", "result": "PASS", "note": "1 vs 702." },
+          { "text": "usage-guide.md's current wording matches the live count observed", "result": "PASS", "note": "702 is a big pile, not zero." }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Regression: chained history-server intersection + spell-check, TP53/colorectal cancer",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. Real counts for both legs (3,033 / 216,862), real intersection (15), real spell correction ('colen carsinoma' -> 'colon carcinoma').",
+        "basic": 37,
+        "specialized": 51,
+        "total": 88,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Intersection count does not exceed either parent set", "result": "PASS", "note": "15 <= 3,033 and <= 216,862." },
+          { "text": "WebEnv reused (not re-fetched) across all three ESearch calls", "result": "PASS", "note": "Same WebEnv string passed through." },
+          { "text": "Spell-check correction resolves the misspelling", "result": "PASS", "note": "'colen carsinoma' -> 'colon carcinoma'." },
+          { "text": "All three counts and the correction are real API values, not fabricated", "result": "PASS", "note": "Live NCBI call." }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "EGQuery replacement path with PTEN, plus re-check of the CURATED_DBS decision-table wording fix",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. Entrez.egquery() AttributeError reproduced; ESearch-loop fallback returned real nonzero counts for PTEN across all 10 curated dbs; gene UID 5728 matched the real NCBI Gene ID for human PTEN. egquery.fcgi 301-redirect-to-unresolvable-host claim independently reconfirmed. NEW this audit: the decision-table question, previously worded 'Which NCBI databases mention X at all?' (implying exhaustive coverage the 10-db loop doesn't provide), now reads 'Which of the 10 CURATED_DBS databases mention X?' -- matches what the loop actually checks. The assertion that FAILED in the prior re-audit now PASSES.",
+        "basic": 39,
+        "specialized": 50,
+        "total": 89,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Entrez.egquery() is attempted/demonstrated and the AttributeError is caught, not silently swallowed", "result": "PASS", "note": "Printed explicitly with type and message." },
+          { "text": "Fallback CURATED_DBS loop returns nonzero counts for a real gene symbol", "result": "PASS", "note": "10/10 curated databases returned nonzero counts for PTEN." },
+          { "text": "Gene UID resolved matches the real NCBI Gene ID for the queried symbol", "result": "PASS", "note": "UID 5728, the real NCBI Gene ID for human PTEN." },
+          { "text": "The egquery.fcgi-unusable justification (301 redirect to an unresolvable internal host) holds up under independent verification", "result": "PASS", "note": "301 to ext-http-eutils.linkerd.ncbi.nlm.nih.gov confirmed; socket.gethostbyname() confirmed non-resolution." },
+          { "text": "The decision-table question now matches what CURATED_DBS actually checks (no longer implies exhaustive coverage)", "result": "PASS", "note": "Reworded to 'Which of the 10 CURATED_DBS databases mention X?' -- this FAILED in the prior re-audit against the old wording, now PASSES." }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Regression: <ERROR>-body parsing raises rather than fabricates",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. Two realistic captured <ERROR> bodies (WebEnv-expired, 502-outage-shaped) fed through Bio.Entrez.read() both raised RuntimeError; neither returned parsed or fabricated data. Control case (real successful ESearch) confirms the parser isn't just throwing on everything.",
+        "basic": 37,
+        "specialized": 42,
+        "total": 79,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Feeding a WebEnv-expired <ERROR> body to Bio.Entrez.read() raises rather than returning parsed/fabricated data", "result": "PASS", "note": "RuntimeError('WebEnv not found') raised." },
+          { "text": "Feeding an outage-shaped 502 <ERROR> body also raises rather than silently returning fabricated data", "result": "PASS", "note": "RuntimeError('Search Backend failed: Exception: 502 Proxy Error') raised." },
+          { "text": "The raised exception is RuntimeError specifically", "result": "PASS", "note": "Confirmed in both cases." },
+          { "text": "A real successful parse is unaffected by the same code path (control case)", "result": "PASS", "note": "Live ESearch parsed fine, Count=23,326." }
+        ]
+      },
+      {
+        "index": 8,
+        "type": "Scope Boundary",
+        "label": "NEW: CURATED_DBS 10/38 disclosure and the widen-to-all-databases snippet, run exhaustively across all 38 live databases (not the fixer's 2-db spot check)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. Live EInfo returned exactly 38 databases (matches SKILL.md's disclosed figure). All 10 CURATED_DBS names confirmed valid live databases (10/38 = 26.3%, matches the disclosed fraction). The documented widen snippet (dbs=Entrez.read(Entrez.einfo())['DbList']) was run against the FULL 38-database list with a real gene symbol (BRCA1): 38/38 succeeded, 0 exceptions, 32 databases returned nonzero real counts. The fixer's own verification only spot-checked 2 of the 38; this is the exhaustive run the brief asked for.",
+        "basic": 38,
+        "specialized": 48,
+        "total": 86,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Live EInfo database count matches SKILL.md's disclosed figure (38)", "result": "PASS", "note": "Live count = 38." },
+          { "text": "All 10 CURATED_DBS names are valid, real, live database names", "result": "PASS", "note": "0 of 10 missing from the live EInfo DbList." },
+          { "text": "The widen-to-all-databases snippet executes without error across all 38 databases, not a sample", "result": "PASS", "note": "38/38 succeeded, 0 exceptions, run in 25.3s under the required 0.34s/call spacing." },
+          { "text": "Widen snippet returns real, non-fabricated per-database counts", "result": "PASS", "note": "32 databases returned real nonzero counts for BRCA1; spot-checked against known high-volume dbs (protein, geoprofiles, pmc)." },
+          { "text": "SKILL.md's disclosed coverage fraction (10/38) matches the live-measured fraction", "result": "PASS", "note": "10/38 = 26.3%, matches the disclosure paragraph's framing exactly." }
+        ]
+      },
+      {
+        "index": 9,
+        "type": "Adversarial",
+        "label": "NEW: term-validation / injection-safety claim in the new Required-Setup paragraph, tested rather than trusted",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "executed: true. Static scan of Bio/Entrez/__init__.py and Parser.py found no os.system/subprocess/eval/exec/shell=True call sites; confirmed request construction goes through urllib.parse (percent-encoding). A live ESearch call with a term containing shell metacharacters and quotes (';', backtick, '$()', '&&', quotes) transmitted with every metacharacter percent-encoded and returned a normal Count=0 with no crash or server-side execution. SKILL.md's claim ('no shell/eval injection risk') holds under direct test, not just inspection.",
+        "basic": 37,
+        "specialized": 37,
+        "total": 74,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Bio.Entrez source contains no shell/eval call sites (os.system, subprocess, eval, exec, shell=True)", "result": "PASS", "note": "0 matches across __init__.py and Parser.py." },
+          { "text": "Bio.Entrez builds request query strings via urllib.parse, not raw string interpolation", "result": "PASS", "note": "urlencode/urllib.parse usage confirmed in source." },
+          { "text": "A term with shell metacharacters is fully percent-encoded before transmission", "result": "PASS", "note": "None of ; ` $ | & survived unescaped in the encoded form." },
+          { "text": "A live call with the malicious-looking term completes normally with no crash or execution", "result": "PASS", "note": "Count=0 returned; QueryTranslation shows the term parsed as ordinary search terms, not executed." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 36.8,
+    "dynamic_weighted": 50.8,
+    "score": 88,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "The CURATED_DBS exhaustiveness defect that held the prior re-audit below Production Ready (Layer-2 specialized average 47.3 against a 48 floor) is genuinely fixed: the decision table now names the 10-db scope, a disclosure paragraph states the 10/38 fraction, and the widen-to-all-databases escape hatch was independently run in this audit across the FULL 38-database list (38/38 succeeded, 0 errors) -- not just the fixer's 2-db spot check.",
+    "The internal contradiction the fixer caught while collapsing Failure Modes (indexer 'batch Tue/Fri primary' vs 'runs nightly') is confirmed gone from both SKILL.md and usage-guide.md; the surviving 'nightly' claim is the one with documentation support.",
+    "The new term-validation paragraph's security claim ('no shell/eval injection risk') was tested, not trusted: source inspection plus a live call with a shell-metacharacter-laden term confirmed percent-encoding and no server-side execution.",
+    "The redundancy pass's claimed content migrations (PMC-subset fact, 4 collapsed Failure Modes entries) were spot-checked in this audit and confirmed present in SKILL.md, not lost.",
+    "Both pre-fix P1 code-crash defects (EGQuery AttributeError, EInfo DbInfo dict-indexing) remain durably fixed across all inputs in this audit, including databases and terms never touched by either fixer."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "No progressive disclosure despite SKILL.md growing longer across two fix passes",
+      "observed_in": [],
+      "problem": "SKILL.md is now 339 lines (up from ~300 pre-fix), still a single flat file with all failure-mode and field tables inline. Both fix passes declined the references/ split as out of scope for FIX_BRIEF.md's restructuring limit.",
+      "root_cause": "Restructuring beyond the redundancy rule was explicitly out of scope for both fix passes; a reasonable call given the mandate, but the underlying static-score gap remains.",
+      "fix": "In a future pass with restructuring scope, split the field-qualified-pattern tables and Failure Modes/Common Errors tables into a references/ file."
+    },
+    {
+      "priority": "P2",
+      "title": "Term-validation guidance is prose-only, no runnable helper",
+      "observed_in": [9],
+      "problem": "The new paragraph after Required Setup correctly explains that terms are URL-encoded (verified true in this audit), but gives no code example for the length/count sanity-check it recommends before large batch loops.",
+      "root_cause": "The finding was addressed with documentation only, matching its P2 priority from the fix log.",
+      "fix": "Add a 3-line helper function (e.g. warn if len(term) > N or term.count(' OR ') > M) alongside the existing EPost-chunking pointer."
+    }
+  ]
+}
