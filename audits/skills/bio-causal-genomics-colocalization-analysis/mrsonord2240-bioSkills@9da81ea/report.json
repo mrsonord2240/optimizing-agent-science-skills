@@ -1,0 +1,248 @@
+{
+  "meta": {
+    "skill_name": "bio-causal-genomics-colocalization-analysis",
+    "description": "Test whether a GWAS signal and a molecular QTL (eQTL/sQTL/pQTL/mQTL) share the same causal variant -- e.g. \"does my GWAS lead SNP colocalize with this eQTL, or is it just LD\" -- using Bayesian colocalization (coloc.abf, coloc.susie, HyPrColoc, moloc, eCAVIAR, SMR/HEIDI, PWCoCo, SharePro). Use when integrating GWAS with eQTL/sQTL/pQTL/mQTL, distinguishing shared causal variants from LD-driven coincidence, handling allelic heterogeneity, choosing between single-causal vs multi-causal methods, picking PP.H4 thresholds, running sensitivity over p12, or harmonising summary statistics for colocalization.",
+    "evaluated_on": "2026-09-18",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "mrsonord2240/bioSkills@9da81ea758e0b0d631f72199a4679211dc89f5d4:causal-genomics/colocalization-analysis",
+    "reaudit_of": "bio-causal-genomics-colocalization-analysis (pre-fix archived at F:/OpenScience/audits/_pre-fix-20260918/bio-causal-genomics-colocalization-analysis/, score 86, Limited Release, 2026-09-17)"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All 7 re-audit datasets are freshly generated and explicitly labelled synthetic/planted-truth (independent seeds/parameters from both the pre-fix audit and the fixer's own scratch scripts). No fabricated DOI/PMID, trial results, sample sizes, or p-values presented as real." },
+      "practice_boundaries": { "result": "PASS", "detail": "Population-genomics / statistical-genetics research tooling only; no output makes an individual diagnostic or prescriptive claim." },
+      "methodological_ground": { "result": "PASS", "detail": "No principled methodological fallacy found. One real precision gap remains in the revised PP.H3-inflation trigger text (see Input 6, P1 recommendation): the fix correctly added a power/effect-size clause, but independent testing shows the specific 'limited power' condition as currently worded does not reliably produce the claimed PP.H3-dominant symptom (H1 dominates instead in both tested power regimes). This is a documentation-precision gap, not a fallacy: no output inverts a causal conclusion." },
+      "code_usability": { "result": "PASS", "detail": "Both previously-crashing coloc.susie example files (examples/coloc_susie.R, examples/coloc_susie_multicausal.R) were re-run byte-for-byte, unmodified, from the fork, and both completed cleanly with exact planted-truth recovery -- the P0 defect from the pre-fix audit is confirmed gone, independently, not on the fixer's word. All other executed code (coloc.abf pipeline, flag_excluded_region() gate, harmonise(), the real SMR 1.3.1 + plink2 CLI pipeline) ran without syntax errors, missing dependencies, or crashes across all 7 inputs." }
+    }
+  },
+  "static_score": {
+    "subtotal": 97,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 11, "max": 12, "note": "Completeness and appropriateness remain 4/4 each (broad, accurate 8-method coverage with a clear decision tree, unchanged from pre-fix). Correctness improves from 2/4 to 3/4: both P0 example crashes are independently confirmed fixed (Inputs 2-3), and the PP.H3-inflation trigger text was rewritten with the missing power/effect-size clause -- but a new independent test (Input 6) shows that clause is not yet empirically well-calibrated (H1, not PP.H3, dominates under the documented 'limited power' condition), so correctness is not yet a clean 4/4." },
+      "reliability": { "score": 12, "max": 12, "note": "Category-3 override applied, unchanged from pre-fix: extensive Common Errors table, explicit hard-stop diagnostics (estimate_s_rss lambda>0.05, and now also flag_excluded_region()), precise error-text matching remain exemplary." },
+      "performance_context": { "score": 7, "max": 8, "note": "Unchanged from pre-fix: linear, non-redundant workflow (4/4 execution efficiency); SKILL.md is now 531 lines (up from 460, from consolidating usage-guide.md content, not new redundancy) with still no references/ folder to defer detail into -- token cost still 3/4." },
+      "agent_usability": { "score": 16, "max": 16, "note": "Unchanged from pre-fix: consistent terminology, explicit output-format guidance, thorough proactive error-prevention guidance; already maximal." },
+      "human_usability": { "score": 8, "max": 8, "note": "Discoverability improves from 3/4 to 4/4: the frontmatter description now folds in a natural-language framing clause (\"does my GWAS lead SNP colocalize with this eQTL, or is it just LD\") ahead of the method-name list, closing the pre-fix P2. Forgiveness remains 4/4 under the Category-3 override." },
+      "security": { "score": 12, "max": 12, "note": "Unchanged from pre-fix: no credentials, extensive input validation, no sensitive-data handling." },
+      "maintainability": { "score": 11, "max": 12, "note": "Modifiability remains 4/4. Testability improves from 2/4 to 4/4: both previously-crashing shipped examples now independently verified to run and recover planted truth exactly (Inputs 2-3); no other example files were reported broken. Modularity stays 3/4 -- still one large monolithic SKILL.md with no references/ split, though the redundancy pass did remove cross-file duplication (harmonise(), PWCoCo recipe, lead-SNP-swap steps now live once, in SKILL.md, not partially duplicated in usage-guide.md)." },
+      "agent_specific": { "score": 20, "max": 20, "note": "Escape hatches improves from 3/4 to 4/4: the MHC/chr8-inversion exclusion is now a real, tested, runnable flag_excluded_region() stop() gate (Input 4, 9/9 independent boundary + integration cases pass), closing the pre-fix P1 that this rule was prose-only. Trigger precision, composability, and idempotency remain 4/4 each; progressive disclosure remains 3/4 (same monolithic-file issue as performance_context)." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 95.3,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 32, "total": 35 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Fresh coloc.abf standard pipeline with p12 sensitivity and the flag_excluded_region() gate (synthetic single shared causal variant, chr10)",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "PP.H4=1.0000 exact match to planted causal SNP rs501; top per-SNP PP.H4 correctly identifies rs501; flag_excluded_region() correctly returns NA for this non-excluded chr10 locus and the pipeline proceeds; p12 sensitivity grid passes rule 'H4>0.75' at 100/100 points.",
+        "executed": true,
+        "execution_note": "Ran via r.sh; full output in run/input1_output.txt.",
+        "basic": 39,
+        "specialized": 58,
+        "total": 97,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "PP.H4 exceeds the 0.75 screening threshold and matches the planted shared-causal-variant SNP exactly", "result": "PASS", "note": "PP.H4=1.0000, top SNP rs501 matches planted causal exactly" },
+          { "text": "All five posteriors (H0-H4) are reported, not PP.H4 alone", "result": "PASS", "note": "res$summary printed all five PP columns" },
+          { "text": "p12 sensitivity analysis is run and PP.H4 stays above threshold across the grid", "result": "PASS", "note": "100/100 grid points pass rule H4>0.75" },
+          { "text": "flag_excluded_region() correctly does not fire for a locus genuinely outside MHC/chr8-inversion", "result": "PASS", "note": "Returned NA for chr10 locus; pipeline proceeded" },
+          { "text": "Output does not fabricate any claim beyond the simulated input", "result": "PASS", "note": "Data explicitly generated and labelled synthetic" }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "P0 regression test: examples/coloc_susie.R re-run byte-for-byte, unmodified, from the fixed fork",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "The file that crashed unconditionally pre-fix now completes cleanly: 1 GWAS credible set + 1 eQTL credible set recovered (planted truth: 1 each), best CS pair PP.H4=1.000, lead SNP rs149 matches planted causal exactly.",
+        "executed": true,
+        "execution_note": "Ran the shipped file unmodified via r.sh (no copy edits); full output in run/input2_coloc_susie_shipped_output.txt.",
+        "basic": 39,
+        "specialized": 58,
+        "total": 97,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Shipped examples/coloc_susie.R runs to completion without any modification (P0 regression check)", "result": "PASS", "note": "Exit 0, no errors" },
+          { "text": "GWAS and eQTL credible sets recovered match planted truth (1 each)", "result": "PASS", "note": "1 GWAS CS, 1 eQTL CS" },
+          { "text": "PP.H4 for the matched credible-set pair equals planted truth", "result": "PASS", "note": "PP.H4=1.000" },
+          { "text": "Best CS pair correctly identifies the planted shared causal SNP by ID", "result": "PASS", "note": "rs149 x rs149" },
+          { "text": "Output does not present a fabricated result", "result": "PASS", "note": "Real susieR/coloc convergence output" }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "P0 regression test: examples/coloc_susie_multicausal.R re-run byte-for-byte, unmodified, from the fixed fork",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "The allelic-heterogeneity example that crashed pre-fix (lambda 0.21-0.39) now shows lambda=0.0000 for both traits, recovers 2 GWAS credible sets + 1 eQTL credible set exactly matching planted truth, and correctly separates the shared-causal pair (PP.H4=1.000) from the GWAS-only pair (PP.H3=1.000).",
+        "executed": true,
+        "execution_note": "Ran the shipped file unmodified via r.sh; full output in run/input3_coloc_susie_multicausal_shipped_output.txt.",
+        "basic": 39,
+        "specialized": 59,
+        "total": 98,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Shipped examples/coloc_susie_multicausal.R runs to completion without any modification (P0 regression check)", "result": "PASS", "note": "Exit 0, no errors" },
+          { "text": "estimate_s_rss lambda = 0.0000 for both traits given self-consistent genotype-derived data", "result": "PASS", "note": "GWAS lambda=0.0000, eQTL lambda=0.0000" },
+          { "text": "2 GWAS credible sets + 1 eQTL credible set recovered, matching planted truth", "result": "PASS", "note": "Exactly 2 and 1" },
+          { "text": "Shared-causal CS pair resolves to PP.H4=1.0; GWAS-only CS pair resolves to PP.H3=1.0", "result": "PASS", "note": "rs79xrs79 PP.H4=1.0; rs198xrs79 PP.H3=1.0" },
+          { "text": "Output does not present a fabricated result", "result": "PASS", "note": "Real susieR/coloc convergence output" }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "P1 regression + extension test: flag_excluded_region() MHC/chr8-inversion gate, 9 boundary/integration cases",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "All 4 of the fixer's own test cases plus 5 new boundary cases (exact-inclusive boundaries, one-bp-past-boundary, 'chr' prefix handling) pass; build='hg19' correctly stop()s; the full region_flag+stop() gate block correctly aborts the pipeline for an MHC locus rather than just returning an ignorable flag.",
+        "executed": true,
+        "execution_note": "Ran via r.sh; full output in run/input4_output.txt.",
+        "basic": 39,
+        "specialized": 56,
+        "total": 95,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "flag_excluded_region() correctly flags all documented MHC/chr8-inversion coordinates, including exact boundaries", "result": "PASS", "note": "chr6:25e6, chr6:35e6, chr8:8.1e6 all flagged correctly" },
+          { "text": "flag_excluded_region() correctly returns NA just outside both exclusion zones", "result": "PASS", "note": "chr6:35,000,001 and chr8:11,900,001 both NA" },
+          { "text": "flag_excluded_region() correctly stop()s when build != 'hg38'", "result": "PASS", "note": "hg19 input raised the documented liftover error" },
+          { "text": "The full gate block (region_flag + stop()) actually aborts the pipeline, not just returns an ignorable flag", "result": "PASS", "note": "stop() fired with the documented redirect message for an MHC locus" },
+          { "text": "'chr' prefix on the chromosome argument is handled correctly", "result": "PASS", "note": "'chr8' normalized via gsub, flagged correctly" }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "P1 regression test: real SMR 1.3.1 + HEIDI pipeline, independent fresh synthetic data, shared-causal vs linkage scenarios",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Built a full plink bfile (via plink2 --pedmap) and two real .besd eQTL files (via smr --make-besd) from freshly-simulated liability-threshold genotypes (independent seed/params from the fixer's own tmp_smr_test/). Shared-causal scenario: p_SMR=4.58e-45, p_HEIDI=0.993 -- correctly non-rejecting (pleiotropy). Linkage scenario (distinct eQTL-causal SNP in weak-moderate LD with the GWAS causal SNP): p_SMR=1.36e-8 (still nominally significant), p_HEIDI=9.08e-12 -- correctly rejects (linkage, not shared causal). Top SNP recovered exactly matches planted truth in both scenarios (rs9025 shared, rs9027 linkage).",
+        "executed": true,
+        "execution_note": "Ran via real SMR 1.3.1-win binary and plink2 alpha 7.6 (both already installed in the shared env per TOOLS.md); full commands and outputs in run/input5_smr_prep.R, run/smr_test/smr_run_output.txt, run/smr_test/result_shared.smr, run/smr_test/result_linkage.smr. Note: nsnp_HEIDI=9 in both runs, one below the Skill's own documented >=10 reliability floor -- an artifact of this test's smaller synthetic SNP panel (50 SNPs vs the fixer's 60), not a Skill defect; the qualitative SMR/HEIDI interpretation was unambiguous regardless (p_HEIDI differs by 11 orders of magnitude between scenarios).",
+        "basic": 37,
+        "specialized": 59,
+        "total": 96,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Shared-causal scenario: SMR significant AND HEIDI non-rejecting (p>0.05), matching the Skill's documented pleiotropy interpretation", "result": "PASS", "note": "p_SMR=4.58e-45, p_HEIDI=0.993" },
+          { "text": "Linkage scenario: HEIDI correctly rejects (p<=0.05) despite significant SMR, matching the Skill's documented linkage interpretation", "result": "PASS", "note": "p_SMR=1.36e-8, p_HEIDI=9.08e-12" },
+          { "text": "Top SNP recovered by SMR matches the planted causal SNP exactly in both scenarios", "result": "PASS", "note": "rs9025 (shared), rs9027 (linkage)" },
+          { "text": "SMR output surfaces nsnp_HEIDI so an agent can apply the Skill's own >=10 reliability threshold rather than blindly trusting HEIDI p", "result": "PASS", "note": "nsnp_HEIDI=9 printed in both .smr files, readable and actionable despite being marginal in this test's panel" },
+          { "text": "Full pipeline executed against the real SMR 1.3.1 binary end-to-end (bfile + gwas-summary + beqtl-summary), not simulated or described only", "result": "PASS", "note": "Real --make-besd and full SMR run, both completed" }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "New test: does the REVISED PP.H3-inflation trigger condition (r2 0.3-0.6 AND comparable effect sizes / limited power) actually produce PP.H3 dominance?",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Two power regimes tested at r2=0.505 with comparable modest effect sizes (both causal SNPs beta=0.12): eQTL N=150 (severely underpowered) and N=400 (moderately underpowered). In BOTH cases PP.H1 (GWAS-only) dominates (0.94 and 0.86 respectively), not PP.H3 as the revised trigger text implies; PP.H3 stayed below 0.05 in both. This is a genuine, independently-discovered finding: the fix's added power/effect-size clause is directionally right (r2 alone is not sufficient) but not yet empirically calibrated -- see P1 recommendation.",
+        "executed": true,
+        "execution_note": "Ran via r.sh; full output in run/input6_output.txt.",
+        "basic": 35,
+        "specialized": 55,
+        "total": 90,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "r2 between the two planted causal SNPs falls in the documented 0.3-0.6 trigger band", "result": "PASS", "note": "r2=0.505" },
+          { "text": "Under comparable effect sizes + severely underpowered eQTL (N=150), PP.H3 becomes the dominant posterior as the revised trigger text implies", "result": "FAIL", "note": "PP.H1=0.943 dominates instead; PP.H3=0.0275" },
+          { "text": "Under comparable effect sizes + moderately underpowered eQTL (N=400), PP.H3 becomes the dominant posterior", "result": "FAIL", "note": "PP.H1=0.861 dominates instead; PP.H3=0.0450" },
+          { "text": "PP.H3 and PP.H4 remain closely matched/ambiguous (neither near 1) under these conditions, consistent with the qualitative 'ambiguous' symptom description", "result": "PASS", "note": "0.0275 vs 0.0295 at N=150 -- ambiguous between the two, though both dwarfed by PP.H1" },
+          { "text": "Output does not fabricate a claim beyond what the simulation shows", "result": "PASS", "note": "Both regimes' exact posteriors reported plainly, including the mismatch with the documented claim" }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "New test: harmonise() function, moved from usage-guide.md into SKILL.md by the redundancy pass, exercised with flip/palindromic/strand-mismatch cases",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "The function survived the move intact: same-coded, flip-coded, and low-MAF-palindromic SNPs are all handled exactly per its documented logic, with no corruption from being relocated. Found one new, previously-unflagged minor gap: a non-palindromic strand-complement mismatch (A/G vs its complement T/C) is silently dropped, since harmonise() only checks literal allele-order swaps, not strand complements -- and none of the 'Harmonisation pitfalls to watch for' bullets mention this case.",
+        "executed": true,
+        "execution_note": "Ran via r.sh; full output in run/input7_output.txt.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Kept-SNP set matches the function's documented same/flip/palindromic-drop logic (rs1, rs2, rs6 retained)", "result": "PASS", "note": "Exact match" },
+          { "text": "Flip-coded SNP (rs2) has its beta sign correctly negated", "result": "PASS", "note": "-0.28 -> 0.28" },
+          { "text": "Palindromic-but-low-MAF SNP (rs6) is kept and flip-corrected, not dropped", "result": "PASS", "note": "Correctly kept, beta negated" },
+          { "text": "Allele-mismatched SNP with no A1/A2 overlap (rs3) is dropped, not silently mis-flipped", "result": "PASS", "note": "Correctly absent from output" },
+          { "text": "harmonise() resolves non-palindromic strand-complement mismatches (rs4, A/G vs T/C) via a strand-flip branch", "result": "FAIL", "note": "Confirmed gap: silently dropped, no strand-complement resolution branch exists, and no pitfall bullet warns about it" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 38.8,
+    "dynamic_weighted": 57.2,
+    "score": 96,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "\u2b50",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Both P0-crashing coloc.susie example files are now independently confirmed fixed: re-run byte-for-byte from the fork with zero modification, both complete cleanly and recover planted truth exactly (Inputs 2-3) -- this is not the fixer's own claim being taken on faith, it is an independent re-execution.",
+    "flag_excluded_region() is now a real, tested, runnable safeguard: 9/9 independent boundary and pipeline-integration test cases pass, closing the pre-fix P1 that MHC/chr8-inversion exclusion was prose-only.",
+    "The SMR + HEIDI recipe is now independently verified end-to-end against the real SMR 1.3.1 binary with a completely fresh synthetic dataset (different seed, sample size, and LD structure from the fixer's own test), correctly discriminating a shared-causal scenario from a linkage scenario and recovering the planted top SNP exactly in both.",
+    "The redundancy pass moved real, working content (harmonise(), the PWCoCo CLI recipe, the lead-SNP-swap operational steps) into SKILL.md without corruption or loss -- independently verified by executing the moved harmonise() function -- and usage-guide.md no longer duplicates it."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "Revised PP.H3-inflation trigger condition is not yet empirically calibrated",
+      "observed_in": [6],
+      "problem": "SKILL.md's fixed trigger text requires r2~0.3-0.6 AND 'comparable effect sizes / limited power' for PP.H3 inflation. Independent testing at r2=0.505 with comparable effect sizes and two different reduced-power eQTL sample sizes (N=150 and N=400) shows PP.H1 (GWAS-only), not PP.H3, dominates in both cases; PP.H3 stayed below 0.05 throughout.",
+      "root_cause": "The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.",
+      "fix": "Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up."
+    },
+    {
+      "priority": "P2",
+      "title": "harmonise() has no strand-complement-flip branch and no pitfall callout for it",
+      "observed_in": [7],
+      "problem": "A SNP pair coded on opposite strands without being palindromic (e.g. A/G vs its complement T/C) is neither 'same' nor 'flip' under harmonise()'s literal definition and is silently dropped. None of the five 'Harmonisation pitfalls to watch for' bullets mention this case (they cover build mismatch and palindromic-at-high-MAF only).",
+      "root_cause": "harmonise() implements only an allele-order-swap check, not a strand-complement check, and the pitfalls list was not updated to reflect this scope limit when the function moved from usage-guide.md into SKILL.md this fix pass.",
+      "fix": "Add a sixth pitfall bullet documenting that harmonise() does not resolve non-palindromic strand mismatches and that upstream strand-harmonization is required before calling it, or extend the function with a complement-check branch if silent SNP loss at scale is a concern."
+    },
+    {
+      "priority": "P2",
+      "title": "HyPrColoc cross-tissue clustering remains unverified (carried forward, still environment-blocked)",
+      "observed_in": [],
+      "problem": "hyprcoloc still fails to build in the shared audit env (Eigen::IndexedView / RcppEigen incompatibility, per TOOLS.md); the multi-tissue decision-tree branch's HyPrColoc half has never been executed across either audit round.",
+      "root_cause": "Environment-level C++ toolchain incompatibility, not a Skill defect; not resolvable by a fixer or auditor working under the no-version-change/shared-env rule.",
+      "fix": "Build hyprcoloc in an isolated environment with a different Eigen/GCC pairing, or on a Linux/WSL seat where the Eigen::IndexedView API is supported, then re-run the multi-tissue HyPrColoc branch."
+    }
+  ]
+}
