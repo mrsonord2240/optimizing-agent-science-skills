@@ -8,31 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (70)
-
-### `bio-causal-genomics-effector-gene-prioritization` — No explicit research-only / clinical-boundary language anywhere in the Skill
-
-- Skill: 84, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/causal-genomics/effector-gene-prioritization) · [viewer](skills/bio-causal-genomics-effector-gene-prioritization/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 6
-- Problem: A patient-specific prescribing question (PCSK9 inhibitor vs. statin) was correctly declined and redirected to a clinician, but this relied entirely on the base model's general safety training -- SKILL.md and usage-guide.md contain zero occurrences of patient/diagnos/prescri/disclaimer language.
-- Root cause: The Skill is written entirely for population-level statistical genomics and never anticipates a user reframing its output as individual clinical guidance, despite covering drug-target-adjacent genes (e.g. PCSK9).
-- Fix: Add a short Scope note to SKILL.md stating that effector-gene calls are population-level and hypothesis-generating, not individual clinical decisions, and instructing the agent to redirect any patient-specific treatment question to a qualified clinician.
-
-### `bio-causal-genomics-effector-gene-prioritization` — MAGMA gene-set enrichment step has an undocumented minimum-gene-count requirement
-
-- Skill: 84, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/causal-genomics/effector-gene-prioritization) · [viewer](skills/bio-causal-genomics-effector-gene-prioritization/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 2
-- Problem: Running the Skill's own examples/magma_genebased.sh Step 3 (--set-annot) on a small locus-scale gene set (5 genes) fails with MAGMA's own 'insufficient degrees of freedom' error, because the regression conditions on 6 internal covariates.
-- Root cause: The example script and SKILL.md assume genome-wide scale (~20k genes) implicitly and never state a minimum gene count for this step.
-- Fix: Add a note to the MAGMA section of SKILL.md and to examples/magma_genebased.sh stating that gene-set enrichment requires substantially more genes than the ~6 internal covariates (rule of thumb: several hundred+), and that locus-level MAGMA runs should skip Step 3.
-
-### `bio-causal-genomics-effector-gene-prioritization` — Undocumented Windows filename mismatch between MAGMA output and PoPS input
-
-- Skill: 84, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/causal-genomics/effector-gene-prioritization) · [viewer](skills/bio-causal-genomics-effector-gene-prioritization/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 2
-- Problem: This MAGMA v1.10 Windows build writes <prefix>.genes.out.txt (extra .txt suffix), while pops.py hard-codes <prefix>.genes.out. Following the Skill's PoPS section verbatim on Windows raises FileNotFoundError with no guidance to explain it.
-- Root cause: The Skill's PoPS instructions were written/tested against a Linux/Mac MAGMA build and never account for the Windows binary's differing output filename.
-- Fix: Add a one-line Windows-specific note to the PoPS section of SKILL.md instructing users to copy/rename the MAGMA .genes.out.txt to .genes.out (or symlink) before invoking pops.py on Windows.
+## P1 (67)
 
 ### `bio-phylo-tree-visualization` — Root before colouring clades by MRCA
 
@@ -619,30 +595,6 @@ None open.
 - Problem: 330-line SKILL.md loads TCS, MACSE, PhyIN, Gblocks and HMMcleaner detail for every trimming request.
 - Root cause: Monolithic layout.
 - Fix: Keep the decision rules in SKILL.md and move per-tool command blocks to references/.
-
-### `bio-causal-genomics-effector-gene-prioritization` — SKILL.md is dense and un-layered relative to its size
-
-- Skill: 84, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/causal-genomics/effector-gene-prioritization) · [viewer](skills/bio-causal-genomics-effector-gene-prioritization/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: —
-- Problem: All large reference tables (Algorithmic Taxonomy, Quantitative Thresholds, Per-Method Failure Modes) live inline in the 422-line SKILL.md, so every invocation loads the full 10-tool comparison regardless of which single tool the task actually needs.
-- Root cause: No references/ subfolder is used despite the Skill having clear candidates for one, unlike the progressive-disclosure pattern used by leaner Skills.
-- Fix: Split the Algorithmic Taxonomy, Quantitative Thresholds, and Per-Method Failure Modes tables into references/*.md files, leaving SKILL.md as a lean router that loads them conditionally.
-
-### `bio-causal-genomics-effector-gene-prioritization` — Thin file-level modularity relative to the Skill's scope
-
-- Skill: 84, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/causal-genomics/effector-gene-prioritization) · [viewer](skills/bio-causal-genomics-effector-gene-prioritization/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: —
-- Problem: 10+ distinct tools are described, but only 2 runnable example scripts exist (MAGMA CLI, R concordance scoring); PoPS, Open Targets GraphQL, cS2G, and ABC/ENCODE-rE2G are prose-only with inline snippets.
-- Root cause: Example coverage was prioritized for the two most central tools (MAGMA, concordance scoring) but not extended to the others as the Skill's scope grew.
-- Fix: Add examples/pops_run.py and examples/opentargets_l2g_query.py mirroring the two that already exist, so agents have a working, runnable template for every named tool, not just two.
-
-### `bio-causal-genomics-effector-gene-prioritization` — No bundled toy/test fixture data
-
-- Skill: 84, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/causal-genomics/effector-gene-prioritization) · [viewer](skills/bio-causal-genomics-effector-gene-prioritization/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: —
-- Problem: Unlike some Skills, there is no small sample GWAS/gene-loc fixture shipped for a user to sanity-check their MAGMA/PoPS install offline before pointing the pipeline at real data.
-- Root cause: The Skill relies entirely on the user supplying real data and a working reference panel from the start.
-- Fix: Ship a tiny synthetic sumstats + gene-loc fixture (as this audit built for its own testing) under examples/, so users can smoke-test the pipeline before using real GWAS data.
 
 ### `bio-clinical-databases-clinvar-lookup` — Batch CA-ID helper aborts on non-400 Registry errors
 
@@ -2131,6 +2083,30 @@ None open.
 - Problem: `bcftools view -s <order>` adds INFO/AC and INFO/AN header lines, so `concat --naive` then refuses with 'incompatible headers' (also with -I). Plain concat after the reorder works.
 - Root cause: The fix was checked against plain concat, not --naive.
 - Fix: Say: reorder with view -s, then use plain `bcftools concat` (or re-create every file with the same view -s so headers match) before --naive.
+
+### `bio-causal-genomics-effector-gene-prioritization` — magma_genebased.sh's Bonferroni line depends on `bc`, absent from standard Windows Git-Bash
+
+- Skill: 91, Production Ready · [mrsonord2240/bioSkills@f4755df](https://github.com/mrsonord2240/bioSkills/tree/f4755df08871073a2bfbcc4370863fe72026e5d5/causal-genomics/effector-gene-prioritization) · [viewer](skills/bio-causal-genomics-effector-gene-prioritization/mrsonord2240-bioSkills@f4755df/viewer.md)
+- Observed in inputs: 2
+- Problem: The script's Bonferroni-threshold print (`echo "... $(echo "0.05 / ${N_GENES}" \| bc -l)"`) silently produces a blank value instead of a number when `bc` is not installed, which is the default state of a standard Windows Git-for-Windows bash install. The script still reports overall success.
+- Root cause: The Windows-specific fixes in this same script (filename rename, gene-count guard) were tested and verified, but this pre-existing, unrelated line was not re-exercised end-to-end on a standard Windows Git-Bash install as part of the same fix pass.
+- Fix: Replace `bc -l` with a portable computation (e.g. `awk 'BEGIN{printf "%.6g", 0.05/'"$N_GENES"'}'` or a one-line Python/PowerShell call), or detect `bc`'s absence and fall back with a clear message instead of a silent blank.
+
+### `bio-causal-genomics-effector-gene-prioritization` — magma_genebased.sh's printed gene count is off by one (counts the .genes.out header row)
+
+- Skill: 91, Production Ready · [mrsonord2240/bioSkills@f4755df](https://github.com/mrsonord2240/bioSkills/tree/f4755df08871073a2bfbcc4370863fe72026e5d5/causal-genomics/effector-gene-prioritization) · [viewer](skills/bio-causal-genomics-effector-gene-prioritization/mrsonord2240-bioSkills@f4755df/viewer.md)
+- Observed in inputs: 2
+- Problem: `N_GENES=$(wc -l < "$GENES_OUT")` counts every line of `.genes.out`, including its header row, so a 3-gene run prints 'across 4 genes' instead of 3. Purely cosmetic (not used elsewhere in the script) but wrong.
+- Root cause: wc -l was applied directly to a file with a header row without subtracting 1.
+- Fix: Use `tail -n +2 "$GENES_OUT" \| wc -l` (or the same `grep -vc '^#'` pattern already used elsewhere in the script for `.genes.raw`, adapted for the header-row case) for the gene count feeding the Bonferroni print.
+
+### `bio-causal-genomics-effector-gene-prioritization` — 6 of 10 named V2G tools remain prose-only with no runnable example
+
+- Skill: 91, Production Ready · [mrsonord2240/bioSkills@f4755df](https://github.com/mrsonord2240/bioSkills/tree/f4755df08871073a2bfbcc4370863fe72026e5d5/causal-genomics/effector-gene-prioritization) · [viewer](skills/bio-causal-genomics-effector-gene-prioritization/mrsonord2240-bioSkills@f4755df/viewer.md)
+- Observed in inputs: —
+- Problem: FUMA, cS2G, DEPICT, INQUISIT, and FLAMES still have no runnable code path anywhere in the Skill (ABC/ENCODE-rE2G is prose-only here but reasonably cross-referenced to atac-seq/enhancer-gene-linking's own examples).
+- Root cause: The fix pass scoped its two new examples (PoPS, Open Targets L2G) to the two highest-priority second-line tools rather than the full remaining list; FUMA is web-only and DEPICT/INQUISIT/FLAMES are lower-priority legacy or narrow-domain methods.
+- Fix: If further hardening is prioritized, add a minimal runnable cS2G lookup example (a static Zenodo-hosted table read) since it requires no install, before FUMA/DEPICT/INQUISIT/FLAMES which are lower-value (web-only or narrow-domain).
 
 ### `bio-causal-genomics-mediation-analysis` — SKILL.md's own Mediational E-Value code example crashes as written
 
