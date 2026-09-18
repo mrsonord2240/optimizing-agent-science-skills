@@ -1,0 +1,5 @@
+suppressPackageStartupMessages(library(PROPER))
+print(names(formals(comparePower)))
+cat("---body tail (return value construction)---\n")
+b <- deparse(body(comparePower))
+cat(tail(b, 30), sep="\n")
