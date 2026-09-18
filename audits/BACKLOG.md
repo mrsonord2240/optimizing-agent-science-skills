@@ -8,7 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (72)
+## P1 (71)
 
 ### `bio-crispr-screens-prime-editing-screens` — PRIDICT2 batch CLI example omits the CLI's required input/ subdirectory (or --input-dir flag)
 
@@ -17,14 +17,6 @@ None open.
 - Problem: Following SKILL.md's batch-mode recipe literally (write the CSV to the current directory via the shown heredoc, then run the documented command) throws FileNotFoundError, because the real CLI's --input-dir defaults to ./input and SKILL.md never mentions this.
 - Root cause: The batch-mode example's fix pass verified the --summarize and CSV-column defects by running from a directory that already had an input/ subdirectory (or with an explicit --input-dir), without checking whether the documented recipe alone (as literally written) creates one.
 - Fix: Either add `mkdir -p input && mv variants.csv input/` (or `--input-dir .`) to both batch-mode code blocks, or note explicitly that the CSV must be placed under ./input/ (the CLI's own --help default) before running.
-
-### `bio-sra-data` — Header-based ENA column lookup fails ungracefully when a requested field is genuinely absent
-
-- Skill: 82, Limited Release · [mrsonord2240/bioSkills@d1f9486](https://github.com/mrsonord2240/bioSkills/tree/d1f94867649eda9539d55954daeeae828b2f62fb/database-access/sra-data) · [viewer](skills/bio-sra-data/mrsonord2240-bioSkills@d1f9486/viewer.md)
-- Observed in inputs: 5, 6, 8
-- Problem: The fix correctly makes the ENA-mirror column lookup name-based instead of position-based, but neither the inline SKILL.md snippet nor examples/download_batch.sh guards the case where the requested field (e.g. fastq_ftp) is simply not in the response -- exactly the scenario the Skill's own new dbGaP section names as a recognition signal. The inline snippet (no set -e, no empty-column guard) silently reports a false-positive 'md5 OK' with zero files downloaded. download_batch.sh aborts the ENTIRE batch (not just the one bad accession) because set -euo pipefail plus grep -nx's non-match exit status fires before the script's own pre-existing 'if [ -z "${URLS}" ]' continue-on-failure guard is ever reached.
-- Root cause: FTP_COL/MD5_COL are computed via a pipeline that can legitimately exit non-zero (grep -nx no match) with no guard immediately after, before URLS/MD5S are derived from them.
-- Fix: Add an explicit check right after computing FTP_COL/MD5_COL in both the SKILL.md inline snippet and download_batch.sh: if either is empty, print a clear, accession-attributed message (e.g. pointing at the 'Controlled-access (dbGaP) data' section) and, in the batch script, 'continue' to the next accession rather than letting the pipeline's exit status trigger set -e mid-batch.
 
 ### `bio-causal-genomics-effector-gene-prioritization` — No explicit research-only / clinical-boundary language anywhere in the Skill
 
@@ -586,7 +578,7 @@ None open.
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (257)
+## P2 (256)
 
 ### `bio-crispr-screens-prime-editing-screens` — Failure Modes / Common Errors do not yet cover the input-dir gap
 
@@ -627,22 +619,6 @@ None open.
 - Problem: None of the three real Chronos training runs across this audit's inputs set or discussed a random seed, and SKILL.md gives no guidance on reproducibility between training runs.
 - Root cause: Carried over from both prior audits' static notes (Idempotency, Agent-Specific); unrelated to and untouched by this fix pass.
 - Fix: Add a one-line note to the Chronos code block: set a seed (or document that Chronos training is stochastic and gene-effect estimates should be treated as approximate across runs) so agents don't present a single run's numbers as exactly reproducible.
-
-### `bio-sra-data` — SKILL.md's dbGaP boundary is advisory text only; no shipped script surfaces its own documented recognition signal
-
-- Skill: 82, Limited Release · [mrsonord2240/bioSkills@d1f9486](https://github.com/mrsonord2240/bioSkills/tree/d1f94867649eda9539d55954daeeae828b2f62fb/database-access/sra-data) · [viewer](skills/bio-sra-data/mrsonord2240-bioSkills@d1f9486/viewer.md)
-- Observed in inputs: 6, 8
-- Problem: The 'Controlled-access (dbGaP) data' section correctly tells an agent to recognize an omitted fastq_ftp field as a controlled-access signal, but no shipped script actually detects or names that condition in its output -- see P1-1, which shows the current behavior actively obscures it in one script and crashes opaquely in the other.
-- Root cause: The boundary was added as documentation in the same pass that also fixed the column-index bug, without connecting the two: the new prose describes a signal the (also-changed) code doesn't yet surface.
-- Fix: Once P1-1's guard is added, point its error message directly at the 'Controlled-access (dbGaP) data' section, so the code and the documentation reinforce each other instead of the documentation describing a signal the code silently swallows.
-
-### `bio-sra-data` — SRA-toolkit path evidence relies on native binaries run directly, not the shipped download_single.sh wrapper end-to-end
-
-- Skill: 82, Limited Release · [mrsonord2240/bioSkills@d1f9486](https://github.com/mrsonord2240/bioSkills/tree/d1f94867649eda9539d55954daeeae828b2f62fb/database-access/sra-data) · [viewer](skills/bio-sra-data/mrsonord2240-bioSkills@d1f9486/viewer.md)
-- Observed in inputs: 2
-- Problem: This re-audit (like the pre-fix one) verified prefetch/vdb-validate/fasterq-dump via direct native-binary calls in PowerShell rather than running examples/download_single.sh itself end-to-end, because of the known git-bash/MSYS fasterq-dump segfault. The script's pigz->gzip fallback was only syntax-checked (bash -n), not exercised.
-- Root cause: Platform-specific shell incompatibility (MSYS path handling) with fasterq-dump, pre-existing and outside this fix's scope.
-- Fix: No Skill change needed; note for future auditors to run download_single.sh's compression step specifically (not just the raw toolkit calls) when a non-MSYS shell is available, to get one full end-to-end confirmation of the pigz fallback in context.
 
 ### `bio-alignment-trimming` — Caution on trimAl sequence-overlap thresholds
 
@@ -1275,6 +1251,14 @@ None open.
 - Problem: The CellTypist snippet passes majority_voting=True but never says where the over-clustering comes from. Left to itself CellTypist runs its own Leiden; given an unseeded upstream clustering, the smoothed labels differ between runs of the same script.
 - Root cause: The dependency on a clustering is implicit in the argument name.
 - Fix: Pass over_clustering='leiden' explicitly in the snippet and note that the upstream clustering must be seeded for the annotation to be reproducible.
+
+### `bio-sra-data` — Guard's error message hardcodes 'fastq_ftp not found' regardless of which column is actually missing
+
+- Skill: 87, Production Ready · [mrsonord2240/bioSkills@086e443](https://github.com/mrsonord2240/bioSkills/tree/086e4439c0b8b7c13d5892ccc51492b9a0828e70/database-access/sra-data) · [viewer](skills/bio-sra-data/mrsonord2240-bioSkills@086e443/viewer.md)
+- Observed in inputs: 6
+- Problem: When fastq_md5 (not fastq_ftp) is the column genuinely absent from the ENA response, the guard still fires correctly (zero files written, exit 1) but prints 'fastq_ftp not found in ENA response for ${SRR}...', which is factually wrong in this case and could send a user diagnosing the failure toward the wrong field.
+- Root cause: The guard's echo message hardcodes the fastq_ftp field name instead of naming whichever of FTP_COL/MD5_COL was actually found empty.
+- Fix: Build the message from which variable is actually empty, e.g. name the missing field(s) explicitly: '[ -z "${FTP_COL}" ] && echo fastq_ftp missing'; '[ -z "${MD5_COL}" ] && echo fastq_md5 missing', combined into one accession-attributed message.
 
 ### `bio-workflows-proteomics-pipeline` — The PCA guard and the contrast logic now live in two places that deliberately disagree
 

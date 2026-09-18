@@ -1,0 +1,225 @@
+{
+  "source": "mrsonord2240/bioSkills@086e443:database-access/sra-data",
+  "meta": {
+    "skill_name": "bio-sra-data",
+    "description": "Download raw sequencing reads from NCBI SRA using sra-tools (prefetch, fasterq-dump, vdb-validate) or the ENA mirror. Use when pulling FASTQ for SRR/ERR/DRR accessions, deciding between SRA-direct, ENA mirror, or AWS/GCP cloud mirror (STRIDES), handling --include-technical for 10x and other single-cell records, validating with MD5/vdb-validate, navigating SRR/SRX/SRS/SRP/PRJNA hierarchy, or finding accessions via pysradb. Encodes SRA cloud-egress economics, the fasterq-dump uncompressed-scratch trap, and the --max-size default that silently truncates large prefetches.",
+    "evaluated_on": "2026-09-18",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "No fabricated DOIs/PMIDs/p-values/sample sizes in any of the 7 outputs; the Skill only moves real, verifiable sequencing data. Unchanged from the prior re-audit." },
+      "practice_boundaries": { "result": "PASS", "detail": "No diagnostic or prescriptive medical conclusions anywhere in this session's outputs. Unchanged from the prior re-audit." },
+      "methodological_ground": { "result": "PASS", "detail": "The 'Controlled-access (dbGaP) data' section remains accurate and present (confirmed by direct reading of the shipped SKILL.md at commit 086e443). This round's fix additionally makes the section's own documented recognition signal (an ENA response omitting fastq_ftp) something the shipped code now actually surfaces, closing the second P1 from the pre-fix report -- verified by direct execution (Inputs 3, 4, 5, 6, 7)." },
+      "code_usability": { "result": "PASS", "detail": "The first P1 (false-positive 'md5 OK' with zero files; whole-batch abort on one bad accession) is fixed and verified far beyond the fixer's own test: this re-audit independently confirmed the guard on a synthetic fixture built from a different real accession than the fixer used, in a mixed batch at all three list positions (first/middle/last), on a reverse-column-omission case, and on a fully empty/malformed response -- 7/7 inputs executed, all behaving correctly, zero new P0/P1 found." }
+    }
+  },
+  "static_score": {
+    "subtotal": 84,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 11, "max": 12, "note": "Up from 10/12. Correctness now 4/4: the false-positive/whole-batch-abort defect that capped this at 3/4 is fixed and independently verified across 5 new scenarios (mixed-batch at 3 positions, reverse column omission, empty response), none of which reveal a further correctness gap. Completeness 4/4 and Appropriateness 3/4 unchanged." },
+      "reliability": { "score": 11, "max": 12, "note": "Up from 8/12. Fault tolerance and recoverability are now strong: the guard fires correctly regardless of which column is missing or the bad accession's position in a batch, and a batch with one bad accession now finishes with only that one accession skipped -- verified with real, live good-accession downloads in every mixed-batch test. Not full marks: error reporting has a real, reproducible message-accuracy defect (see Input 6) where the guard's message always says 'fastq_ftp not found' even when fastq_md5 is the field actually missing." },
+      "performance_context": { "score": 5, "max": 8, "note": "Unchanged from the pre-fix report -- this round's fix is a small, localized guard and did not materially change SKILL.md's length or token cost." },
+      "agent_usability": { "score": 13, "max": 16, "note": "Up from 12/16. The false-success failure mode that agent_usability was previously docked for no longer exists; feedback design and error prevention are meaningfully better since the guard reliably fires with an accession-attributed message pointing at the right SKILL.md section. Not full marks: the Common-errors table does not document the message-accuracy quirk found in Input 6 (message names the wrong field in the reverse-omission case)." },
+      "human_usability": { "score": 7, "max": 8, "note": "Up from 6/8. Forgiveness is substantially improved: across every tested failure shape (missing fastq_ftp, missing fastq_md5, empty response, at any batch position) the script now fails loudly and specifically instead of reporting false success. Not 8/8 because the reverse-omission message names the wrong field, which could send a user chasing the wrong cause even though the safety behavior itself is correct." },
+      "security": { "score": 9, "max": 12, "note": "Unchanged. No hardcoded secrets, no eval/exec of raw strings; accession-format validation before interpolation into curl/prefetch is still absent (out of scope for this fix pass)." },
+      "maintainability": { "score": 10, "max": 12, "note": "Unchanged. This round's fix is a small, localized two-line guard added identically to the SKILL.md inline snippet and download_batch.sh; no new duplication introduced (confirmed by re-reading usage-guide.md against the current SKILL.md, per the fix log's own redundancy check, independently spot-checked)." },
+      "agent_specific": { "score": 18, "max": 20, "note": "Up from 17/20. Escape Hatches now 4/4: the dbGaP boundary is no longer advisory-text-only -- the shipped code now surfaces the section's own documented recognition signal, verified by direct execution in 5 of this round's 7 inputs. This closes the second P1 from the pre-fix report. Trigger Precision and Composability remain strong." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 89.3,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 27, "total": 28 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Regression: ENA-mirror single-accession happy path via SKILL.md's own inline snippet, real accession",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Extracted the shipped 'Single SRR via ENA mirror' code fence programmatically (Python regex, not hand-copied) and ran it against ERR10419835 (a real accession used by prior audits/the fixer). Confirms the new guard does not regress the working case.",
+        "executed": true,
+        "execution_note": "Executed for real: run/full_transcript_inputs1-4.txt. Real network calls to ENA's live portal API and FTP mirror.",
+        "basic": 38,
+        "specialized": 54,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "curl successfully retrieves and downloads both paired FASTQ files", "result": "PASS", "note": "both mates downloaded, 1,090,725 + 1,125,857 bytes" },
+          { "text": "MD5 verification confirms data integrity for both files", "result": "PASS", "note": "874cef39... and 52f4a6a4... match ENA's declared checksums" },
+          { "text": "The new guard (added right after FTP_COL/MD5_COL) does not fire or interfere on a well-formed response", "result": "PASS", "note": "no guard message printed; normal download path unaffected" },
+          { "text": "No destructive or unsafe operations performed", "result": "PASS", "note": "curl/md5sum only, properly quoted" }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Regression: shipped download_batch.sh, all-good 3-accession batch, real accessions",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "examples/download_batch.sh run as shipped, unmodified, against ERR10419835, ERR10419931, ERR10419946 (the fixer's own 3-accession list). Confirms the fix does not regress the all-good batch happy path.",
+        "executed": true,
+        "execution_note": "Executed for real: run/full_transcript_inputs1-4.txt. All 3 accessions, both mates each, MD5-verified.",
+        "basic": 38,
+        "specialized": 54,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "All 3 accessions' FASTQ files are downloaded and MD5-verified", "result": "PASS", "note": "3/3, all 6 files MD5 OK" },
+          { "text": "Script reports an accurate pass/fail summary", "result": "PASS", "note": "OK: 3/3, empty failed.txt" },
+          { "text": "The new guard does not produce any false positive on well-formed responses", "result": "PASS", "note": "no accession incorrectly flagged" },
+          { "text": "No partial/corrupt files left behind", "result": "PASS", "note": "6/6 files present, correctly named" }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "NEW: independent synthetic missing-fastq_ftp fixture, inline snippet",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Built CONTROLLEDTEST1 from ERR10419972's own real, live-fetched 4-column ENA TSV shape (a different real accession's shape than the fixer's own fixture), with fastq_ftp stripped. Ran via a fake-curl wrapper that intercepts only this fake accession name and passes every other call through to real curl.",
+        "executed": true,
+        "execution_note": "Executed for real: run/full_transcript_inputs1-4.txt (Input 3 section) and run/data/README.md.",
+        "basic": 37,
+        "specialized": 53,
+        "total": 90,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Script exits non-zero (loud failure) instead of reporting false success", "result": "PASS", "note": "exit 1" },
+          { "text": "Zero files are written for the bad accession", "result": "PASS", "note": "output dir empty" },
+          { "text": "Message is accession-attributed and points at the 'Controlled-access (dbGaP) data' section", "result": "PASS", "note": "message names CONTROLLEDTEST1 and the exact section heading" },
+          { "text": "Fixture is independently built, not reused verbatim from the fixer's own verification", "result": "PASS", "note": "built from ERR10419972's real TSV shape, a different accession than the fixer used" }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Stress",
+        "label": "THE CRUX: mixed 3-accession batch -- real good, synthetic bad (middle), real good",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "examples/download_batch.sh (shipped, unmodified) run against ERR10419969 (real, fresh), CONTROLLEDTEST1 (synthetic bad), ERR10419972 (real, fresh). Pre-fix, this exact shape would have aborted the whole batch at accession 2 (verified by the fix log and the pre-fix report). Post-fix: OK 2/3, both real accessions fully downloaded and MD5-verified, only the bad one skipped and logged.",
+        "executed": true,
+        "execution_note": "Executed for real twice (once interactively, once via the consolidated run/run_all_inputs.sh driver) with byte-identical MD5 results both times: run/full_transcript_inputs1-4.txt.",
+        "basic": 38,
+        "specialized": 55,
+        "total": 93,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Both real accessions in the batch are fully downloaded and MD5-verified", "result": "PASS", "note": "4/4 files present, all MD5s match ENA's declared checksums exactly" },
+          { "text": "The bad accession is skipped, not aborting the whole batch", "result": "PASS", "note": "batch continues past CONTROLLEDTEST1 to accession 3" },
+          { "text": "Batch summary is accurate", "result": "PASS", "note": "'OK: 2/3', failed.txt contains exactly CONTROLLEDTEST1" },
+          { "text": "The accession after the bad one is still attempted and succeeds", "result": "PASS", "note": "ERR10419972 (position 3) completes normally" }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Variant B",
+        "label": "NEW: position robustness -- bad accession moved to FIRST and to LAST in the batch",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Re-ran the same 3-accession mixed batch with CONTROLLEDTEST1 moved to position 1, then to position 3. Both sub-cases: OK 2/3, both real accessions' files present with MD5s identical to Input 4's.",
+        "executed": true,
+        "execution_note": "Executed for real, both sub-cases: run/interactive_transcript_inputs5-7.txt. The bad-first sub-case was also independently reproduced by the consolidated driver before it was stopped (see run/full_transcript_inputs1-4.txt's tail), with an identical first line of output.",
+        "basic": 37,
+        "specialized": 53,
+        "total": 90,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Bad-accession-first: guard fires immediately, both subsequent good accessions still complete", "result": "PASS", "note": "OK 2/3, both good files MD5-verified" },
+          { "text": "Bad-accession-last: both good accessions complete first, bad one caught last without disturbing them", "result": "PASS", "note": "OK 2/3, same MD5s" },
+          { "text": "Guard behavior does not depend on the bad accession's position in the list", "result": "PASS", "note": "identical outcome at position 1, 2 (Input 4), and 3" },
+          { "text": "No accession after a caught bad one is silently dropped", "result": "PASS", "note": "in the bad-first case, both subsequent accessions still run" }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Adversarial",
+        "label": "NEW: reverse omission -- fastq_ftp PRESENT, fastq_md5 genuinely ABSENT",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Built CONTROLLEDTEST2, the mirror image of Input 3's fixture: fastq_md5 stripped instead of fastq_ftp. The guard's safety property holds (MD5_COL is empty, so the `-z` check still fires, exit 1, zero files) -- but the hardcoded message text always reads 'fastq_ftp not found', which is factually wrong here. A real, reproducible message-accuracy defect the fixer's own single-fixture verification would not have caught.",
+        "executed": true,
+        "execution_note": "Executed for real via the fake-curl wrapper: run/interactive_transcript_inputs5-7.txt.",
+        "basic": 33,
+        "specialized": 47,
+        "total": 80,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Guard correctly detects a genuinely-missing fastq_md5 column even though fastq_ftp is present", "result": "PASS", "note": "MD5_COL empty, guard fires" },
+          { "text": "Zero files are written despite only one of the two columns being absent", "result": "PASS", "note": "output dir empty" },
+          { "text": "Script exits non-zero rather than continuing with a partial/undefined MD5S", "result": "PASS", "note": "exit 1" },
+          { "text": "Error message accurately names which field is actually missing", "result": "FAIL", "note": "message hardcodes 'fastq_ftp not found' even though fastq_ftp was present and fastq_md5 was the missing field" }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Verification",
+        "label": "NEW: completely empty/malformed ENA response, inline snippet + batch",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Fixture EMPTYRESP1: fake curl returns a fully empty response body (no header, no data row at all) -- harsher than a well-formed TSV missing one column. Both the inline snippet and the shipped batch script (mixed with 2 real accessions) handle it via the same FTP_COL/MD5_COL emptiness guard, with no new failure mode.",
+        "executed": true,
+        "execution_note": "Executed for real, both the inline snippet and the batch script: run/interactive_transcript_inputs5-7.txt.",
+        "basic": 36,
+        "specialized": 52,
+        "total": 88,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Inline snippet exits non-zero on a totally empty response, zero files written", "result": "PASS", "note": "exit 1, output dir empty" },
+          { "text": "Batch script skips only the malformed-response accession", "result": "PASS", "note": "OK 2/3" },
+          { "text": "Both real neighboring accessions in the batch still complete and MD5-verify", "result": "PASS", "note": "both good accessions' files present and correct" },
+          { "text": "No new, undocumented failure mode (e.g. a raw shell error) surfaces on this harsher input", "result": "PASS", "note": "same guard message as the missing-column case, no bare shell errors observed" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 33.6,
+    "dynamic_weighted": 53.6,
+    "score": 87,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Both P1s from the pre-fix report are confirmed genuinely fixed by this independent re-audit: the ENA-mirror guard now correctly skips only the bad accession in a mixed batch, verified at all three list positions (first, middle, last) with real live good-accession downloads alongside independently-built synthetic fixtures.",
+    "The fix generalizes beyond exactly what the fixer tested: it also correctly catches a reverse-column-omission case (fastq_md5 missing, fastq_ftp present) and a completely empty/malformed ENA response, not just the exact fixture shape the fixer verified.",
+    "The dbGaP boundary's own documented recognition signal is now genuinely surfaced by the shipped code (both the inline SKILL.md snippet and download_batch.sh), closing the second P1 (advisory-text-only gap) with a message that names the accession and points directly at the 'Controlled-access (dbGaP) data' section.",
+    "No regression: the happy-path single-accession and all-good 3-accession batch flows remain fully correct after the fix, independently re-verified with real accessions and MD5-matched downloads.",
+    "No new P0/P1 found across 7 executed inputs; the one new defect (a guard message that misnames which column is actually missing in the reverse-omission case) is cosmetic and does not weaken the guard's safety behavior."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "Guard's error message hardcodes 'fastq_ftp not found' regardless of which column is actually missing",
+      "observed_in": [6],
+      "problem": "When fastq_md5 (not fastq_ftp) is the column genuinely absent from the ENA response, the guard still fires correctly (zero files written, exit 1) but prints 'fastq_ftp not found in ENA response for ${SRR}...', which is factually wrong in this case and could send a user diagnosing the failure toward the wrong field.",
+      "root_cause": "The guard's echo message hardcodes the fastq_ftp field name instead of naming whichever of FTP_COL/MD5_COL was actually found empty.",
+      "fix": "Build the message from which variable is actually empty, e.g. name the missing field(s) explicitly: '[ -z \"${FTP_COL}\" ] && echo fastq_ftp missing'; '[ -z \"${MD5_COL}\" ] && echo fastq_md5 missing', combined into one accession-attributed message."
+    }
+  ]
+}

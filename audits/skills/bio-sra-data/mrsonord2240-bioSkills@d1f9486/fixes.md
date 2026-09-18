@@ -43,3 +43,27 @@ Shipped `examples/` scripts are out of the redundancy rule (a runnable file besi
 SKILL.md block is not a duplicate) -- `download_batch.sh`, `download_single.sh` and
 `prefetch_large.sh` were fixed in place for the same bugs their SKILL.md counterparts had;
 `find_sra_runs.py` was untouched (no defect; not exercised by any P0/P1/P2 finding).
+
+# bio-sra-data fixes (2026-09-18) -- second fix round
+
+Worktree `F:\OpenScience\wt\db-sra2`, branch `fix/db-sra2`, based on staging `main` @ `1f07281`.
+Fixer: Claude Sonnet 5. Current score going in: 82, Limited Release (deployable, no open P0).
+Findings from `audits/BACKLOG.md`; a third listed finding ("No Skill change needed", auditor
+methodology note) was out of scope and is not addressed here.
+
+| finding | priority | change | verified | notes |
+|---|---|---|---|---|
+| Header-based ENA column lookup (correctly fixed in the 2026-09-17 round to be name-based, not positional) fails ungracefully when the requested field is genuinely absent -- inline SKILL.md snippet has no `set -e`/guard so it silently prints a false "md5 OK" with zero files downloaded; `download_batch.sh`'s `set -euo pipefail` plus `grep -nx`'s non-match exit status aborts the ENTIRE batch before the script's own pre-existing `if [ -z "${URLS}" ]` guard is ever reached | P1 | Added `set -euo pipefail` to the SKILL.md inline snippet (it had none) and, in both the SKILL.md snippet and `download_batch.sh`, changed `FTP_COL=$(...)`/`MD5_COL=$(...)` to `... || true` (so a `grep -nx` non-match no longer trips `set -e` via the pipefail-propagated exit status) followed by an explicit `if [ -z "${FTP_COL}" ] || [ -z "${MD5_COL}" ]` check right after: the SKILL.md snippet (single accession) prints the message to stderr and `exit 1`; `download_batch.sh` prints it, records the accession to `failed.txt`, and `continue`s to the next accession | ran | Built a synthetic ENA-response fixture (a real 4-column TSV header/row with `fastq_ftp` entirely stripped, matching how ENA actually omits it for controlled-access runs) and a fake `curl` serving it plus two good fixtures, in scratchpad. Pre-fix (git HEAD): inline snippet on the bad fixture -> `cut: option requires an argument`, `md5 OK`, exit 0, **zero files written** (the exact false-positive named in the finding); `download_batch.sh` on a 3-accession batch (good, bad, good) -> aborted at the bad accession, exit 1, third accession never attempted. Post-fix: inline snippet on the bad fixture -> prints the accession-attributed message, exit 1, no files; `download_batch.sh` on the same 3-accession batch -> skips only the bad accession, finishes `OK: 2/3`, both good accessions' files present and MD5-verified. `bash -n` passed on both changed `.sh` files |
+| dbGaP boundary (SKILL.md's own "Controlled-access (dbGaP) data" section) is advisory text only -- no shipped script detects or names an absent `fastq_ftp` as that signal, so the code silently swallows the exact condition the prose describes | P1 | Once the guard above exists, pointed its message directly at the section: `"fastq_ftp not found in ENA response for $ACC -- may indicate controlled-access (dbGaP) data, see SKILL.md 'Controlled-access (dbGaP) data' section"` (accession-attributed via `${SRR}`/`${ACC}`), in both files | ran | Same fixture run as above -- the message actually prints for the missing-field case in both the inline snippet and the batch script, naming the section by its exact heading text |
+
+Both dispatched findings fixed (2/2 P1). Nothing left unfixed. Nothing needs Sam.
+
+Redundancy check: re-read `usage-guide.md` against the current `SKILL.md` -- still clean from the
+2026-09-17 pass (overview/quick-start/example-prompts/related-skills only, with a pointer to
+SKILL.md's decision-matrix/`--max-size`/dbGaP/failure-modes sections for agent-facing detail). No
+new duplication introduced by this round's two-line guard, since it lives once in SKILL.md's inline
+snippet and once in `download_batch.sh` (a shipped script, exempt from the redundancy rule as a
+runnable file beside an inline block). `download_single.sh` and `prefetch_large.sh` were not
+touched -- neither does ENA column lookup, so the finding doesn't apply to them.
+
+Commit: `086e443` on `fix/db-sra2`.
