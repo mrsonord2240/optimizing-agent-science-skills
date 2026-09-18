@@ -21,7 +21,7 @@ import sys
 REC = "F:/optimizing-agent-science-skills"
 FORK = "F:/OpenScience/external/mrsonord2240__bioSkills"
 UPSTREAM_COMMIT = "d91ed3d563019e649dc854c56ccd62551359488a"
-FORK_COMMIT = "659c780ba818fb627d3dc85b1925a6aef70885a9"
+FORK_COMMIT = "2b281a5f0874fb0ea36813676b2c6d45dc8a004b"
 AUDITS = "F:/OpenScience/audits"
 OUT = "F:/optimized-scientific-skills"
 
