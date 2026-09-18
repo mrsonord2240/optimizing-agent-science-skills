@@ -22,3 +22,23 @@ All 3 P0s, both P1s, and the P2 fixed, plus one additional wrong-column-name def
 fixed while verifying the third P0 (same root cause: fabricated field names never checked against
 real PRIDICT2 output). Nothing left unfixed. `usage-guide.md` had none of the audited defects
 (checked: no pegRNA-architecture diagram, no `np.sign` snippet) and is untouched.
+
+## Fix pass — 2026-09-18
+
+Worktree `F:\OpenScience\wt\cs-pes`, branch `fix/cs-pes`, off staging `main` (`0ffa663`). Runtime:
+`crispr-screen-analyst` env's `tools\pridict2-venv\` (PRIDICT2 git HEAD 2026-09-16). Audit evidence:
+`F:\optimizing-agent-science-skills\audits\skills\bio-crispr-screens-prime-editing-screens\mrsonord2240-bioSkills@6847328\`
+(score 81.2, Limited Release, deployable, no open P0). Two P1s from `audits/BACKLOG.md`; a third
+listed item (Docker-environment-hang note) was for the auditor, not a Skill defect, and is out of
+scope here.
+
+| finding | priority | change | verified | notes |
+|---|---|---|---|---|
+| PRIDICT2 batch CLI example omits the CLI's required `input/` subdirectory (`--input-dir` defaults to `./input`, confirmed against the CLI source's own argparse help string); following SKILL.md's batch recipe literally throws `FileNotFoundError` | P1 | Both batch code blocks (the reference section and the "Run PRIDICT2 on a Custom pegRNA Library" walkthrough) now `mkdir -p input predictions` and write/move the CSV into `input/` before invoking the CLI | ran | Reproduced the unfixed recipe's crash from a clean directory via `pridict2-venv`: `pd.read_csv` raised `FileNotFoundError: ...\input\variants.csv` (isolated case) and, with no output dir either, an `os.listdir` `FileNotFoundError` on the output dir (the more literal failure mode -- see next row). Then ran the fixed recipe end-to-end on a real PRIDICT2 example sequence (from the tool's own `input/batch_template.csv`, `replacement1` row): completed with `Batch processing completed!` and a real, non-empty summary CSV (`PRIDICT2_0_editing_Score_deep_K562`/`_HEK` = 28.857/72.964, non-zero, non-NaN). |
+| Failure Modes / Common Errors did not cover the input-dir gap | P1 | Added the requested Common Errors row (`FileNotFoundError referencing input/<file>` -> CSV not in `./input` -> `mkdir input` and move it, or `--input-dir`) plus one more row for an adjacent defect found while reproducing: `--summarize` also raises `FileNotFoundError` if `--output-dir` doesn't exist yet, since it lists `.csv` files there before the run starts (`os.listdir` on a missing path). Extended the matching "Batch CLI argument or CSV column mismatch" Failure Mode's Fix line to mention both directory requirements, rather than opening a new subsection (single-home rule) | ran | Same fixed-recipe run as above required both `mkdir -p input` and `mkdir -p predictions` to complete; confirmed by first running with only `input/` created (crashed on `os.listdir(out_dir)`), then with both present (completed). |
+| Redundancy (not separately flagged, per FIX_BRIEF's standing rule) | housekeeping | usage-guide.md's "Decision Cheat Sheet" and "Thresholds" tables duplicated SKILL.md's "Cas9 vs BE vs PE for Variant Installation" decision tree and "Quantitative Thresholds" table almost row-for-row. Folded the two rows unique to the cheat sheet (iPSC/primary-cell; cancer-line/drug-resistance) into SKILL.md's decision tree, then deleted both usage-guide.md tables and replaced them with a one-line pointer to the two SKILL.md sections. | n/a (doc restructuring only) | Diffed both tables row-by-row before deleting to confirm no value existed only in usage-guide.md beyond the two folded rows. |
+
+Both P1s fixed; nothing left unfixed. The output-dir `FileNotFoundError` was not in the dispatch's
+two named findings but surfaced immediately while reproducing the first one (it fires before the
+input-dir read is even reached, when `--output-dir` doesn't pre-exist) -- fixed inline per the
+project's "fix, don't report" rule rather than left as a fresh gap. Nothing needs Sam.

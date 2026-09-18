@@ -1,0 +1,263 @@
+{
+  "meta": {
+    "skill_name": "bio-crispr-screens-prime-editing-screens",
+    "description": "Designs and analyzes pooled prime-editor (PE) screens: pegRNA design with PRIDICT/PRIDICT2, PE2/PE3/PE3b/PEmax chemistry choice, MOSAIC saturation mutagenesis, the PRIME pooled-screen methodology, CRISPResso2 quantification of intended-edit vs scaffold-incorporation vs indel, and cross-modal validation with base-editor screens.",
+    "evaluated_on": "2026-09-18",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "mrsonord2240/bioSkills@4b3a86b:crispr-screens/prime-editing-screens",
+    "re_audit_of": "F:\\OpenScience\\audits\\_pre-fix-20260918\\bio-crispr-screens-prime-editing-screens\\ (pre-fix score 81.2, Limited Release, deployable, no open P0)",
+    "note": "Different agent from the 2026-09-16 auditor, the 2026-09-18 fixer, and the fixer's own verification. Scope is the 2026-09-18 fix pass only (fix log: F:\\optimizing-agent-science-skills\\fixes\\bio-crispr-screens-prime-editing-screens.md, dated section at bottom), which targeted two P1s from the 81.2 report: (1) SKILL.md's PRIDICT2 batch recipe omitted the CLI's undocumented ./input default and the requirement that --output-dir pre-exist before --summarize; (2) Failure Modes/Common Errors did not cover either gap. Diff-verified (git diff 558aea5 4b3a86b) that the fix touched only SKILL.md's two batch code blocks, the Common Errors table, the decision-tree row-folding, and usage-guide.md's redundancy dedup -- no other file or section changed, so the pegRNA-architecture diagram, design_pegrna_pridict2.py, CRISPResso2 section, and Cross-Validate PE/BE snippet (all verified PASS in the 81.2 report) are carried forward unchanged and were not re-executed this pass. All 7 inputs are fresh this pass: none reuse the fixer's own test CSV/sequence (fixer used a 'replacement1' substitution variant; this audit used deletion/insertion/multi-replacement variants and additional robustness probes the fixer did not run)."
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "Unaffected by this fix pass (diff-verified: no citation or claim text changed). Citations, thresholds, and mechanistic claims outside the two touched batch-CLI blocks are unchanged from the 81.2 report."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Unaffected by this fix pass; grep-reconfirmed no patient- or individual-directed diagnostic/prescriptive language anywhere in SKILL.md or usage-guide.md after the fix."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Unaffected by this fix pass; the touched content is purely CLI/filesystem operational guidance, not methodology."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "Both targeted defects independently confirmed fixed by fresh execution on new variant sets: following SKILL.md's batch recipe verbatim from a genuinely clean directory (no pre-existing input/ or predictions/) now completes end-to-end and writes real, non-empty, non-NaN PRIDICT2_0_editing_Score_deep_K562/HEK scores (inputs 1-2). A negative control confirms both original crashes are still genuinely reproducible on this exact CLI version without the fix's mkdir steps (input 6), and the fix's own steps resolve both in sequence in the same script run. The already-documented wrong-CSV-header failure mode was re-confirmed unaffected by this fix (input 4). One new, minor (P2) documentation-completeness gap found: the pre-existing Common Errors row for an empty '\"\"' summary file names only one cause (wrong header); two further causes -- zero data rows, and zero PE-designable variants -- produce the identical symptom without crashing (inputs 3 and 5). Not a veto trigger: nothing crashes, hangs, or produces fabricated/wrong output; it is a documented symptom with an incomplete cause list."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 94,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 11,
+        "max": 12,
+        "note": "Completeness and Correctness for the two targeted defects are now confirmed right: the batch recipe as documented, run verbatim, produces real predictions. Docked 1pt for a newly found, narrower gap: the Common Errors row for the empty-summary symptom is accurate but not exhaustive of its causes (see recommendations)."
+      },
+      "reliability": {
+        "score": 11,
+        "max": 12,
+        "note": "Improved from 10/12: Failure Modes and Common Errors now cover both the input-dir and output-dir gaps with concrete, verified fix guidance (both new rows independently confirmed accurate against fresh tracebacks). Docked 1pt (down from 2) for the residual empty-summary causal-completeness gap found this pass."
+      },
+      "performance_context": {
+        "score": 8,
+        "max": 8,
+        "note": "Improved from 7/8: the usage-guide.md/SKILL.md threshold-table duplication noted in the 81.2 report is now resolved (usage-guide.md's Decision Cheat Sheet and Thresholds tables were removed and replaced with pointers to SKILL.md; diff-verified no information was lost, the two unique rows were folded into SKILL.md's decision tree first)."
+      },
+      "agent_usability": {
+        "score": 15,
+        "max": 16,
+        "note": "Improved from 14/16: Feedback Design and Error Prevention now both cover the input-dir and output-dir gaps with exact, verified error-message text and fixes. Docked 1pt (down from 2) for the same empty-summary causal-completeness gap, which affects Feedback Design (an agent hitting the zero-designs case gets no signal pointing away from 'check your CSV header')."
+      },
+      "human_usability": {
+        "score": 8,
+        "max": 8,
+        "note": "Improved from 7/8: both previously-undocumented crashes now have a documented, verified remediation directly in Common Errors. The residual empty-summary gap degrades gracefully (no crash, a file that looks empty) rather than confusing a human with a hang or traceback, so it does not cost a point here."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "Unaffected by this fix pass; unchanged from 81.2 report. No hardcoded secrets or injection vectors; all inputs are sequence strings/CSV fields/file paths passed as CLI arguments."
+      },
+      "maintainability": {
+        "score": 12,
+        "max": 12,
+        "note": "Unaffected by this fix pass; unchanged from 81.2 report (full marks -- the bundled example script, unaffected by this fix, was independently re-verified there)."
+      },
+      "agent_specific": {
+        "score": 18,
+        "max": 20,
+        "note": "Unaffected by this fix pass; unchanged from 81.2 report. Triggering, progressive disclosure, and composability strong; Escape Hatches still generic (no explicit human/wet-lab handoff beyond piloting advice)."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 82.7,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 21,
+      "total": 24
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "PRIDICT2 batch pegRNA design following SKILL.md's fixed recipe verbatim, from a genuinely clean directory, on a fresh deletion+insertion variant pair (not the fixer's own fixture)",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "executed": true,
+        "execution_note": "run/input1_canonical_test_A.sh: mktemp'd a fresh directory with no pre-existing input/ or predictions/, followed the fixed recipe's own mkdir -p input predictions + CSV placement exactly, ran the batch CLI via the real installed PRIDICT2 (tools/pridict2-venv/) on a deletion1+insertion1 CSV (from PRIDICT2's own batch_template.csv, not the fixer's replacement1 fixture). Completed with 'Batch processing completed!', no FileNotFoundError. Summary CSV has 6 real rows (3 per variant), K562/HEK scores 16.9-41.5 (deletion1) and 38.0-39.2 (insertion1), all non-empty, non-NaN, with populated PBSrevcomp/RTrevcomp/pegRNA columns.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {"text": "Following the fixed recipe verbatim from a clean directory completes without FileNotFoundError", "result": "PASS", "note": "No traceback; 'Batch processing completed!' printed."},
+          {"text": "The variant set is not the fixer's own test fixture", "result": "PASS", "note": "deletion1/insertion1 from PRIDICT2's own batch_template.csv; fixer used only a replacement1-style substitution."},
+          {"text": "Output summary CSV is non-empty and contains real, non-NaN efficiency scores", "result": "PASS", "note": "6 rows, scores 16.9-41.5 and 38.0-39.2, both cell types populated."},
+          {"text": "Per-sequence full prediction CSVs are also written to the output directory", "result": "PASS", "note": "deletion1_pegRNA_Pridict_full.csv (818KB) and insertion1_pegRNA_Pridict_full.csv (1.1MB) both present."}
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Fixed recipe with a single-row batch CSV and --summarize HEK",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "executed": true,
+        "execution_note": "run/input2_variantA_test_C_single_row.sh: clean directory, single multireplacement1 variant, --summarize HEK. Completed cleanly; summary CSV has 3 real rows, HEK scores 71.8-74.6, all non-NaN.",
+        "basic": 37,
+        "specialized": 55,
+        "total": 92,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {"text": "A single-row batch CSV does not hit any multiprocessing edge case (e.g. an off-by-one in the worker pool)", "result": "PASS", "note": "Completed normally with --cores 1."},
+          {"text": "--summarize HEK (the other documented cell-line value) works identically to K562", "result": "PASS", "note": "Real HEK scores produced, non-empty summary."},
+          {"text": "Output is not the fixer's own reused fixture", "result": "PASS", "note": "multireplacement1 variant, distinct from both this audit's Input 1 and the fixer's fixture."}
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Fixed recipe (directories correctly pre-created) with a correctly-headed but empty (zero-row) batch CSV",
+        "status": "PARTIAL",
+        "status_flag": "\u26a0\ufe0f",
+        "executed": true,
+        "execution_note": "run/input3_edge_test_B_empty_csv.sh: CSV has the correct sequence_name,editseq header and zero data rows. The CLI does not crash or hang -- it prints 'Designing pegRNAs for 0 sequences', then 'Batch processing completed!', and writes a summary CSV containing only the literal text \"\". This is the identical byte-for-byte symptom the existing Common Errors row attributes solely to a wrong CSV header, which is not the cause here.",
+        "basic": 28,
+        "specialized": 38,
+        "total": 66,
+        "assertions_passed": 2,
+        "assertions_total": 3,
+        "assertions": [
+          {"text": "A zero-row (but correctly-headed) CSV does not crash the CLI", "result": "PASS", "note": "Exits 0, 'Batch processing completed!'"},
+          {"text": "The resulting empty-looking summary file is covered by an accurate Common Errors row", "result": "FAIL", "note": "The existing row names only 'wrong CSV header' as the cause of an empty \"\" summary; a zero-row CSV with the CORRECT header produces the identical symptom and is not mentioned."},
+          {"text": "No fabricated or non-deterministic output for an empty input", "result": "PASS", "note": "Summary file genuinely contains only the empty-DataFrame placeholder, nothing invented."}
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Regression-consistency check: the already-documented wrong-CSV-header failure mode, with directories correctly pre-created per the new fix",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "executed": true,
+        "execution_note": "run/input4_variantB_test_F_wrong_column.sh: isolates the pre-existing (2026-09-16 fix pass) wrong-column-name defect from this pass's two new fixes by pre-creating both input/ and predictions/ correctly, but keeping the CSV header as 'sequence' instead of 'editseq'. Reproduced exactly as SKILL.md's pre-existing Common Errors row describes: stdout prints 'Please check your input-file! (Missing \"editseq\" column.)', exits 0, summary file contains only \"\". Confirms this fix pass did not regress or alter that unrelated, already-documented behavior.",
+        "basic": 36,
+        "specialized": 52,
+        "total": 88,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {"text": "The pre-existing wrong-CSV-header failure mode still reproduces exactly as documented", "result": "PASS", "note": "Identical stdout warning and empty summary file as SKILL.md describes."},
+          {"text": "This fix pass's directory changes did not alter or mask that unrelated failure mode", "result": "PASS", "note": "Same symptom with directories correctly pre-created as without this pass's changes."},
+          {"text": "No new crash introduced by combining a wrong-header CSV with the now-required input/predictions directories", "result": "PASS", "note": "Clean exit 0, no traceback."}
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Approximating 'run --summarize before any real prediction exists': a batch input with zero PE-designable variants (no PAM in range)",
+        "status": "PARTIAL",
+        "status_flag": "\u26a0\ufe0f",
+        "executed": true,
+        "execution_note": "run/input5_stress_test_D_no_pam.sh: the CLI has no standalone summarize-only mode, so this constructs a single variant with no NGG PAM within the search window (all-AT flanks). The batch step logs 'No PAM (NGG) found in proximity of edit!' to stdout only, produces zero per-sequence prediction CSVs in the output directory, and --summarize then runs against an output directory with nothing to summarize -- again producing the byte-identical empty \"\" summary file, gracefully, with exit code 0. This is the second distinct root cause (after Input 3's zero-row CSV) that produces the same symptom the Common Errors table attributes only to a wrong header.",
+        "basic": 27,
+        "specialized": 37,
+        "total": 64,
+        "assertions_passed": 2,
+        "assertions_total": 3,
+        "assertions": [
+          {"text": "A batch input where every variant fails PE-designability does not crash the CLI", "result": "PASS", "note": "Exits 0, no traceback; the No-PAM exception is caught and logged, not raised to top level."},
+          {"text": "The resulting empty summary file's cause (zero designable variants) is covered by the Common Errors table", "result": "FAIL", "note": "Same gap as Input 3: only the wrong-header cause is documented; this is a third distinct cause producing the identical symptom."},
+          {"text": "The no-PAM failure reason is visible somewhere a user/agent would see it", "result": "PASS", "note": "Printed to stdout ('No PAM (NGG) found in proximity of edit!') during the run, even though not persisted to a file."}
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Negative control: deliberately skip the fixed recipe's own mkdir steps to confirm both pre-fix P1 crashes are genuinely real, then apply the fix's steps in the same run",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "executed": true,
+        "execution_note": "run/input6_scopeboundary_test_E_negative_control.sh, three sub-cases in sequence: (1) no input/ or predictions/ at all -> FileNotFoundError: [WinError 3] ...\\predictions (the --summarize output-dir precondition, fires first); (2) predictions/ created, input/ still missing -> FileNotFoundError: [Errno 2] ...\\input\\variants.csv (the input-dir default); (3) both directories created and CSV moved into input/, exactly as the fix's own mkdir -p input predictions + mv steps show -> completes cleanly with real, non-empty predictions. This independently reproduces both defects the fix log claims to have fixed, on this session's own environment and PRIDICT2 build, not just by reading the fix log's claims.",
+        "basic": 36,
+        "specialized": 54,
+        "total": 90,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {"text": "Without the fix's mkdir steps, the output-dir FileNotFoundError is genuinely reproducible on this environment", "result": "PASS", "note": "Sub-case 1: FileNotFoundError on the predictions/ path, exit code 1."},
+          {"text": "Without the fix's mkdir steps, the input-dir FileNotFoundError is genuinely reproducible", "result": "PASS", "note": "Sub-case 2: FileNotFoundError on input/variants.csv, exit code 1."},
+          {"text": "Applying exactly the fix's own documented steps resolves both in the same session", "result": "PASS", "note": "Sub-case 3: identical command, both dirs present, CSV moved -- completes with real predictions."},
+          {"text": "The output-dir check fires before the input-dir read (order matters for diagnosing which error appears first)", "result": "PASS", "note": "Sub-case 1 fails on the output-dir check (line ~1181, before parallel_batch_analysis is even called) even though input/ is also missing -- source-confirmed."}
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Try to break every claim in the new/changed Common Errors rows and the usage-guide.md dedup, rather than take them at face value",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "executed": true,
+        "execution_note": "run/input7_adversarial_docs_accuracy_check.md: cross-checked both new Common Errors rows and the pre-existing wrong-header row against the exact tracebacks from Inputs 1-6, and diff-verified (git diff 558aea5 4b3a86b) that usage-guide.md's dedup preserved both rows unique to its deleted Decision Cheat Sheet by folding them into SKILL.md's own decision tree. All claims held up under direct execution except the one gap already found in Inputs 3/5 (surfaces again here as the same claim, re-tested from the documentation side).",
+        "basic": 35,
+        "specialized": 50,
+        "total": 85,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {"text": "Both new Common Errors rows match their real tracebacks verbatim in cause and symptom", "result": "PASS", "note": "Confirmed against Input 6's sub-case 1/2 tracebacks exactly."},
+          {"text": "The usage-guide.md dedup did not silently drop the two rows unique to its old Decision Cheat Sheet", "result": "PASS", "note": "git diff confirms both (iPSC/primary-cell; cancer-line/drug-resistance) now appear in SKILL.md's decision tree."},
+          {"text": "The pre-existing wrong-header Common Errors row is unaffected by this pass's changes", "result": "PASS", "note": "Cross-referenced against Input 4; unchanged and still accurate."},
+          {"text": "The empty-summary Common Errors row's stated cause is the ONLY cause that produces that symptom", "result": "FAIL", "note": "Two more causes found this pass (Inputs 3, 5) produce the identical '\"\"' summary; the row does not mention either."}
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 37.6,
+    "dynamic_weighted": 49.6,
+    "score": 87.2,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "\u2b50",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Both P1s this fix pass targeted are independently confirmed fixed, not just re-asserted from the fix log: a negative control (Input 6) reproduces both original FileNotFoundErrors on this exact environment/PRIDICT2 build without the fix's steps, and the fixed recipe -- followed verbatim from a genuinely clean directory on THREE fresh variant sets not reused from the fixer's own fixture (Inputs 1, 2, 6) -- completes end-to-end with real, non-empty, non-NaN K562/HEK scores every time.",
+    "The two new Common Errors rows are accurate to the exact traceback text produced by live execution, not paraphrased or guessed (Inputs 6, 7).",
+    "usage-guide.md's redundancy dedup removed the SKILL.md/usage-guide.md threshold-table duplication flagged in the 81.2 report, with no information loss (diff-verified: the two rows unique to the deleted table were folded into SKILL.md's own decision tree first).",
+    "The fix's scope is narrow and diff-confirmed (only two SKILL.md code blocks, the Common Errors table, and usage-guide.md dedup changed), so nothing outside that surface -- the pegRNA-architecture diagram, the bundled design script, the CRISPResso2 section, the Cross-Validate PE/BE snippet -- was put at risk of regression, and the one adjacent failure mode close enough to check (wrong CSV header) was reconfirmed unaffected (Input 4).",
+    "The fixer's own 'bonus find' (the --output-dir precondition for --summarize) is real and is the FIRST check the CLI runs in batch mode -- fires even when input/ is also missing (Input 6, sub-case 1) -- so documenting it was not redundant with the input-dir fix."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "The empty-summary-file Common Errors row names only one of at least three causes",
+      "observed_in": [3, 5, 7],
+      "problem": "SKILL.md's Common Errors row 'PRIDICT2 batch: summary file is \"\"' attributes the symptom solely to a wrong CSV header (sequence vs editseq). This pass found two further, unrelated inputs that produce the byte-identical '\"\"' summary file with exit code 0 and no error: (1) a correctly-headed CSV with zero data rows, and (2) a correctly-headed, non-empty CSV whose only variant has no PE-designable PAM anywhere in the CLI's search window (a realistic case: a variant list that includes some non-PE-installable edits).",
+      "root_cause": "The row was written and verified against the specific defect the 2026-09-16 fix pass found (a wrong column name); the underlying summarize_top_scoring() function silently writes an empty DataFrame to CSV whenever os.listdir(out_dir) finds zero matching per-sequence files, regardless of why there are zero -- and this generalization was not tested for when the row was written.",
+      "fix": "Broaden the row (or add a sibling row) to state that ANY batch run producing zero successful pegRNA designs -- wrong header, an empty input CSV, or every variant lacking a usable PAM -- yields the same empty '\"\"'-only summary file with exit code 0, and that this is a graceful no-op, not a hang or crash; direct the reader to check the per-sequence prediction CSVs (or stdout's 'No PAM' / '0 sequences' messages) for the real cause."
+    }
+  ]
+}

@@ -8,15 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (71)
-
-### `bio-crispr-screens-prime-editing-screens` — PRIDICT2 batch CLI example omits the CLI's required input/ subdirectory (or --input-dir flag)
-
-- Skill: 81.2, Limited Release · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/crispr-screens/prime-editing-screens) · [viewer](skills/bio-crispr-screens-prime-editing-screens/mrsonord2240-bioSkills@6847328/viewer.md)
-- Observed in inputs: 1, 9
-- Problem: Following SKILL.md's batch-mode recipe literally (write the CSV to the current directory via the shown heredoc, then run the documented command) throws FileNotFoundError, because the real CLI's --input-dir defaults to ./input and SKILL.md never mentions this.
-- Root cause: The batch-mode example's fix pass verified the --summarize and CSV-column defects by running from a directory that already had an input/ subdirectory (or with an explicit --input-dir), without checking whether the documented recipe alone (as literally written) creates one.
-- Fix: Either add `mkdir -p input && mv variants.csv input/` (or `--input-dir .`) to both batch-mode code blocks, or note explicitly that the CSV must be placed under ./input/ (the CLI's own --help default) before running.
+## P1 (70)
 
 ### `bio-causal-genomics-effector-gene-prioritization` — No explicit research-only / clinical-boundary language anywhere in the Skill
 
@@ -578,23 +570,7 @@ None open.
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (256)
-
-### `bio-crispr-screens-prime-editing-screens` — Failure Modes / Common Errors do not yet cover the input-dir gap
-
-- Skill: 81.2, Limited Release · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/crispr-screens/prime-editing-screens) · [viewer](skills/bio-crispr-screens-prime-editing-screens/mrsonord2240-bioSkills@6847328/viewer.md)
-- Observed in inputs: 1, 9
-- Problem: The two defect classes found pre-fix (element order, --summarize/CSV-column mismatch) are now documented in Failure Modes and Common Errors, but the newly found input-dir gap is not.
-- Root cause: This defect was found in this re-audit pass, after the Failure Modes tables were last updated.
-- Fix: Add one row: 'PRIDICT2 batch: FileNotFoundError referencing input/<file>' -> 'CSV not placed in the CLI's default ./input directory' -> 'mkdir input && move the CSV there, or pass --input-dir explicitly'.
-
-### `bio-crispr-screens-prime-editing-screens` — Live CRISPResso2 regression on a fresh locus could not be executed this pass due to a Docker environment hang
-
-- Skill: 81.2, Limited Release · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/crispr-screens/prime-editing-screens) · [viewer](skills/bio-crispr-screens-prime-editing-screens/mrsonord2240-bioSkills@6847328/viewer.md)
-- Observed in inputs: 3
-- Problem: A new, independently-constructed CRISPResso2 test (different locus and read composition than both the pre-fix audit and SKILL.md's own worked example) was built but could not be run: `docker run` left the container stuck in 'Created' state across 4 attempts this session, including with a previously-proven-working mount directory and with no volume mount at all.
-- Root cause: Docker Desktop container-start hang on this shared machine at the time of this audit -- not a Skill or code defect; a Python orientation-proxy check (reproducing CRISPResso2's own substring/revcomp allele-matching logic) was substituted and passed, and the pre-fix audit's own real CRISPResso2 run remains on file as live-tool confirmation of the same mechanism on a different locus.
-- Fix: Not a Skill fix. A future auditor or the tooling agent should re-attempt run/make_crispresso_round2.py's Docker invocation once the daemon is confirmed healthy (docker run --rm pinellolab/crispresso2:latest CRISPResso --version should return immediately, not hang) to close this out with a live-tool result.
+## P2 (255)
 
 ### `bio-crispr-screens-copy-number-correction` — negative_control_sgrnas empty-dict case raises an undocumented ValueError
 
@@ -1259,6 +1235,14 @@ None open.
 - Problem: When fastq_md5 (not fastq_ftp) is the column genuinely absent from the ENA response, the guard still fires correctly (zero files written, exit 1) but prints 'fastq_ftp not found in ENA response for ${SRR}...', which is factually wrong in this case and could send a user diagnosing the failure toward the wrong field.
 - Root cause: The guard's echo message hardcodes the fastq_ftp field name instead of naming whichever of FTP_COL/MD5_COL was actually found empty.
 - Fix: Build the message from which variable is actually empty, e.g. name the missing field(s) explicitly: '[ -z "${FTP_COL}" ] && echo fastq_ftp missing'; '[ -z "${MD5_COL}" ] && echo fastq_md5 missing', combined into one accession-attributed message.
+
+### `bio-crispr-screens-prime-editing-screens` — The empty-summary-file Common Errors row names only one of at least three causes
+
+- Skill: 87.2, Production Ready · [mrsonord2240/bioSkills@4b3a86b](https://github.com/mrsonord2240/bioSkills/tree/4b3a86bc204d6eedbd0c24d7b2619f57ced0bbbd/crispr-screens/prime-editing-screens) · [viewer](skills/bio-crispr-screens-prime-editing-screens/mrsonord2240-bioSkills@4b3a86b/viewer.md)
+- Observed in inputs: 3, 5, 7
+- Problem: SKILL.md's Common Errors row 'PRIDICT2 batch: summary file is ""' attributes the symptom solely to a wrong CSV header (sequence vs editseq). This pass found two further, unrelated inputs that produce the byte-identical '""' summary file with exit code 0 and no error: (1) a correctly-headed CSV with zero data rows, and (2) a correctly-headed, non-empty CSV whose only variant has no PE-designable PAM anywhere in the CLI's search window (a realistic case: a variant list that includes some non-PE-installable edits).
+- Root cause: The row was written and verified against the specific defect the 2026-09-16 fix pass found (a wrong column name); the underlying summarize_top_scoring() function silently writes an empty DataFrame to CSV whenever os.listdir(out_dir) finds zero matching per-sequence files, regardless of why there are zero -- and this generalization was not tested for when the row was written.
+- Fix: Broaden the row (or add a sibling row) to state that ANY batch run producing zero successful pegRNA designs -- wrong header, an empty input CSV, or every variant lacking a usable PAM -- yields the same empty '""'-only summary file with exit code 0, and that this is a graceful no-op, not a hang or crash; direct the reader to check the per-sequence prediction CSVs (or stdout's 'No PAM' / '0 sequences' messages) for the real cause.
 
 ### `bio-workflows-proteomics-pipeline` — The PCA guard and the contrast logic now live in two places that deliberately disagree
 
