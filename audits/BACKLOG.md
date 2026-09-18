@@ -30,7 +30,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: Both files build a toy exponential-decay LD matrix independently of the simulated per-SNP betas/SEs, so the LD is not internally consistent with any genotype process that could have produced those z-scores; estimate_s_rss correctly detects this (lambda 0.21-0.39, far above the Skill's own 0.05 threshold).
 - Fix: Regenerate both example datasets from a single simulated genotype matrix, deriving both the GWAS/eQTL summary statistics AND the LD matrix from that same genotype matrix (verified working in this audit's run/input2b_susie_selfconsistent.R, which recovers the planted 2-credible-set truth exactly with lambda=0).
 
-## P1 (82)
+## P1 (80)
 
 ### `bio-experimental-design-sample-size` — PROPER and powsimR routes ship with no executable pattern
 
@@ -111,22 +111,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The fix correctly makes the ENA-mirror column lookup name-based instead of position-based, but neither the inline SKILL.md snippet nor examples/download_batch.sh guards the case where the requested field (e.g. fastq_ftp) is simply not in the response -- exactly the scenario the Skill's own new dbGaP section names as a recognition signal. The inline snippet (no set -e, no empty-column guard) silently reports a false-positive 'md5 OK' with zero files downloaded. download_batch.sh aborts the ENTIRE batch (not just the one bad accession) because set -euo pipefail plus grep -nx's non-match exit status fires before the script's own pre-existing 'if [ -z "${URLS}" ]' continue-on-failure guard is ever reached.
 - Root cause: FTP_COL/MD5_COL are computed via a pipeline that can legitimately exit non-zero (grep -nx no match) with no guard immediately after, before URLS/MD5S are derived from them.
 - Fix: Add an explicit check right after computing FTP_COL/MD5_COL in both the SKILL.md inline snippet and download_batch.sh: if either is empty, print a clear, accession-attributed message (e.g. pointing at the 'Controlled-access (dbGaP) data' section) and, in the batch script, 'continue' to the next accession rather than letting the pipeline's exit status trigger set -e mid-batch.
-
-### `bio-entrez-search` — EGQuery documented as a core utility but nonexistent on Biopython 1.88
-
-- Skill: 83, Limited Release · [mrsonord2240/bioSkills@581dcd8](https://github.com/mrsonord2240/bioSkills/tree/581dcd89a7450785c2451a0543ee822049fbf934/database-access/entrez-search) · [viewer](skills/bio-entrez-search/mrsonord2240-bioSkills@581dcd8/viewer.md)
-- Observed in inputs: 6
-- Problem: SKILL.md's decision table and usage-guide.md's 'Cross-database discovery' worked example both route through Entrez.egquery(), which raises AttributeError on the installed Biopython 1.88 -- the entire EGQuery code path, including examples/global_query.py's only top-level call, is unusable as shipped.
-- Root cause: SKILL.md's reference code was written/tested against a Biopython version where Bio.Entrez.egquery existed; the function's removal from the installed 1.88 public API was never re-verified against.
-- Fix: Promote the already-correct ESearch-loop-over-CURATED_DBS fallback (examples/global_query.py) to the primary documented path, or add a version-pinned note flagging Bio.Entrez.egquery as broken on Biopython >=1.85 with a direct pointer to the fallback.
-
-### `bio-entrez-search` — EInfo DbInfo indexed as a dict in SKILL.md and examples/database_info.py, but Biopython 1.88 returns a list-of-one
-
-- Skill: 83, Limited Release · [mrsonord2240/bioSkills@581dcd8](https://github.com/mrsonord2240/bioSkills/tree/581dcd89a7450785c2451a0543ee822049fbf934/database-access/entrez-search) · [viewer](skills/bio-entrez-search/mrsonord2240-bioSkills@581dcd8/viewer.md)
-- Observed in inputs: 2
-- Problem: Both SKILL.md's list_fields() (r['DbInfo']['FieldList']) and examples/database_info.py's db_info() (info['DbName']) raise TypeError: list indices must be integers or slices, not str on the installed Biopython version -- every EInfo code pattern in the Skill fails as written.
-- Root cause: Biopython 1.88 wraps DbInfo as a one-element list; the return-shape change was never re-verified against the Skill's reference code.
-- Fix: Change both patterns to index r['DbInfo'][0], and add a one-line comment noting the list-of-one wrapping. Confirmed working after this one-line fix in this audit's Input 2.
 
 ### `bio-causal-genomics-effector-gene-prioritization` — No explicit research-only / clinical-boundary language anywhere in the Skill
 
@@ -818,30 +802,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: Monolithic layout.
 - Fix: Keep the decision rules in SKILL.md and move per-tool command blocks to references/.
 
-### `bio-entrez-search` — No progressive disclosure despite non-trivial SKILL.md length
-
-- Skill: 83, Limited Release · [mrsonord2240/bioSkills@581dcd8](https://github.com/mrsonord2240/bioSkills/tree/581dcd89a7450785c2451a0543ee822049fbf934/database-access/entrez-search) · [viewer](skills/bio-entrez-search/mrsonord2240-bioSkills@581dcd8/viewer.md)
-- Observed in inputs: —
-- Problem: SKILL.md is roughly 300 lines with all failure-modes, field tables, and code patterns inline; examples/ exists but is never referenced or linked from SKILL.md or usage-guide.md.
-- Root cause: The Skill was authored as a single flat file without a references/ split or explicit examples/ cross-links.
-- Fix: Split the field-qualified-pattern tables and Failure Modes table into a references/ file, and add explicit 'See examples/basic_search.py' pointers next to the matching code patterns in SKILL.md.
-
-### `bio-entrez-search` — API key documented as a hardcoded placeholder, not an env-var pattern
-
-- Skill: 83, Limited Release · [mrsonord2240/bioSkills@581dcd8](https://github.com/mrsonord2240/bioSkills/tree/581dcd89a7450785c2451a0543ee822049fbf934/database-access/entrez-search) · [viewer](skills/bio-entrez-search/mrsonord2240-bioSkills@581dcd8/viewer.md)
-- Observed in inputs: —
-- Problem: 'Required Setup' shows Entrez.api_key = 'YOUR_KEY' as a literal assignment with no guidance to source it from an environment variable or secrets store.
-- Root cause: The setup snippet was optimized for copy-paste clarity over credential hygiene.
-- Fix: Change the example to Entrez.api_key = os.environ.get('NCBI_API_KEY') and add one line warning never to commit a real key.
-
-### `bio-entrez-search` — MARCH1 worked example premise ('no hits') no longer reproduces against live data
-
-- Skill: 83, Limited Release · [mrsonord2240/bioSkills@581dcd8](https://github.com/mrsonord2240/bioSkills/tree/581dcd89a7450785c2451a0543ee822049fbf934/database-access/entrez-search) · [viewer](skills/bio-entrez-search/mrsonord2240-bioSkills@581dcd8/viewer.md)
-- Observed in inputs: 4
-- Problem: usage-guide.md's 'Diagnosing a wrong count bug' prompt claims the original MARCH1 query returns zero hits; live testing today (gene db) returns 702 hits via the [All Fields] fallback, not zero -- the diagnostic technique still works but the narrative premise is stale.
-- Root cause: NCBI's Entrez Query Translator / indexed content for this term has drifted since the example was authored; the example was never revisited.
-- Fix: Regenerate the worked example against a currently-reproducible ambiguous symbol, or soften the prompt to 'returned surprisingly broad/ambiguous hits' rather than a hard 'no hits' claim.
-
 ### `bio-causal-genomics-effector-gene-prioritization` — SKILL.md is dense and un-layered relative to its size
 
 - Skill: 84, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/causal-genomics/effector-gene-prioritization) · [viewer](skills/bio-causal-genomics-effector-gene-prioritization/GPTomics-bioSkills@d91ed3d/viewer.md)
@@ -1169,6 +1129,30 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: 430 lines load SV/CNV/mtDNA catalogs and pushback tables for one-variant queries.
 - Root cause: All material kept in SKILL.md.
 - Fix: Move catalogs and pushback tables to the usage guide.
+
+### `bio-entrez-search` — CURATED_DBS decision-table row overpromises exhaustive database coverage
+
+- Skill: 86, Limited Release · [mrsonord2240/bioSkills@1d50a42](https://github.com/mrsonord2240/bioSkills/tree/1d50a42db19bbfba3cfca8530ab9853cb38c409c/database-access/entrez-search) · [viewer](skills/bio-entrez-search/mrsonord2240-bioSkills@1d50a42/viewer.md)
+- Observed in inputs: 6
+- Problem: SKILL.md's decision table still asks 'Which NCBI databases mention X at all?' and routes to the ESearch-loop-over-CURATED_DBS fallback, but CURATED_DBS covers only 10 of the 38 live Entrez databases (confirmed via EInfo in this audit). The question's phrasing implies exhaustive coverage, inherited unchanged from the EGQuery row it replaced -- EGQuery actually did query all databases in one call.
+- Root cause: The fix promoted the ESearch-loop's 'how' to primary without re-scoping the decision table's 'what': the question text was carried over from the old EGQuery-backed row without being narrowed to match the fallback's actual, smaller, coverage.
+- Fix: Reword the decision-table question to reflect the curated scope (e.g. 'Which of these N curated databases mention X?'), or add one line disclosing that CURATED_DBS is a deliberate subset with a pointer to EInfo's full db list for exhaustive coverage.
+
+### `bio-entrez-search` — No progressive disclosure despite SKILL.md growing longer in this fix pass
+
+- Skill: 86, Limited Release · [mrsonord2240/bioSkills@1d50a42](https://github.com/mrsonord2240/bioSkills/tree/1d50a42db19bbfba3cfca8530ab9853cb38c409c/database-access/entrez-search) · [viewer](skills/bio-entrez-search/mrsonord2240-bioSkills@1d50a42/viewer.md)
+- Observed in inputs: —
+- Problem: SKILL.md grew from ~300 to ~335 lines in this fix pass (new 'Cross-database counts' section) rather than shrinking; still a single flat file with all failure-mode and field tables inline. examples/ is now cross-linked from the 'Code patterns' section, which is an improvement, but no references/ split exists.
+- Root cause: Declined as out of scope for this fix pass per FIX_BRIEF.md's restructuring limit -- a reasonable call given the pass's mandate, but the underlying static-score gap remains.
+- Fix: In a future pass with restructuring scope, split the field-qualified-pattern tables and Failure Modes/Common Errors tables into a references/ file.
+
+### `bio-entrez-search` — No input-validation guidance for term strings
+
+- Skill: 86, Limited Release · [mrsonord2240/bioSkills@1d50a42](https://github.com/mrsonord2240/bioSkills/tree/1d50a42db19bbfba3cfca8530ab9853cb38c409c/database-access/entrez-search) · [viewer](skills/bio-entrez-search/mrsonord2240-bioSkills@1d50a42/viewer.md)
+- Observed in inputs: —
+- Problem: Neither SKILL.md's Required Setup nor any code pattern mentions validating or sanitizing the 'term' string before passing it to Entrez.esearch(term=...). Low risk in practice (it is a URL query parameter, not executed code), but unaddressed.
+- Root cause: Never covered in original authoring; not part of either fix round's finding list.
+- Fix: Add one line noting term strings are passed as URL query parameters (no shell/eval risk) but should be length/encoding-sanity-checked before very large batch loops.
 
 ### `bio-molecular-descriptors` — Gasteiger snippet prints charges that do not sum to the formal charge
 

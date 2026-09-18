@@ -1,0 +1,227 @@
+{
+  "source": "mrsonord2240/bioSkills@1d50a42:database-access/entrez-search",
+  "meta": {
+    "skill_name": "bio-entrez-search",
+    "description": "Search NCBI databases using Biopython Bio.Entrez (ESearch, EInfo, ESpell), including cross-database counts via an ESearch loop (EGQuery is broken on current Biopython/NCBI). Use when finding records by keyword, building reproducible field-qualified queries, navigating the Entrez Query Translator, exploiting the history server for large result sets, handling retmax caps, or interpreting weekly index lag. Covers PubMed, Nucleotide, Protein, Gene, SRA, GEO, Assembly, Taxonomy, ClinVar, dbSNP.",
+    "evaluated_on": "2026-09-17",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Evidence Insight",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 7
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All counts, UIDs, field lists, and query translations across all 7 executed inputs came from live NCBI E-utilities calls made in this re-audit (not reused from the pre-fix report or the fix log); none were fabricated." },
+      "practice_boundaries": { "result": "PASS", "detail": "Pure database-search tooling; no output makes diagnostic, prescriptive, or treatment claims about an individual." },
+      "methodological_ground": { "result": "PASS", "detail": "No correlation/causation conflation or statistical fallacy observed; the Skill's EGQuery-removal and DbInfo-shape guidance was applied correctly and matched live behavior." },
+      "code_usability": { "result": "PASS", "detail": "All 7 executed scripts ran to completion with real, checked output; no syntax errors, no missing dependencies. Fenced code blocks were extracted programmatically straight from the shipped SKILL.md, not hand-copied, and ran without modification." }
+    }
+  },
+  "static_score": {
+    "subtotal": 88,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 11, "max": 12, "note": "Both pre-fix P1 code-crash defects (EGQuery AttributeError, EInfo DbInfo dict-indexing) are confirmed fixed and generalize to databases/terms the fixer never tested. One point held back: the decision table's 'Which NCBI databases mention X at all?' row still implies exhaustive coverage but CURATED_DBS checks only 10 of 38 live databases, undisclosed." },
+      "reliability": { "score": 11, "max": 12, "note": "Failure Modes and Common Errors tables remain unusually thorough and accurate; re-verified against live behavior (retmax cap, WebEnv-expiration RuntimeError, rate limits) in this audit." },
+      "performance_context": { "score": 6, "max": 8, "note": "SKILL.md grew from ~300 to ~335 lines in this fix pass rather than shrinking; still a single flat file with no references/ split, though examples/*.py are now cross-linked from the 'Code patterns' section (previously they were not linked at all)." },
+      "agent_usability": { "score": 15, "max": 16, "note": "Decision table plus Goal/Approach/Reference structure remains clear and consistent; the CURATED_DBS coverage gap is a minor error-prevention miss (not flagged as a pitfall)." },
+      "human_usability": { "score": 8, "max": 8, "note": "MARCH1 worked example now matches live reality (702 hits, softened wording), closing the pre-fix P2; natural trigger language retained." },
+      "security": { "score": 9, "max": 12, "note": "API key now sourced via os.environ.get('NCBI_API_KEY') with documented None-when-unset fallback, verified working in this audit -- closes the pre-fix P2. No input-validation guidance for term strings still present (new, minor)." },
+      "maintainability": { "score": 9, "max": 12, "note": "Small reusable functions per pattern; examples/ now cross-linked improving testability discovery, but no references/ modularity split despite the file growing longer." },
+      "agent_specific": { "score": 19, "max": 20, "note": "Trigger description now accurately documents the EGQuery removal; examples/ cross-links partially address progressive disclosure (up from not-linked-at-all pre-fix), though no references/ split exists." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 85.0,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 27, "total": 28 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Regression: reproducible PubMed TMB/NSCLC 2024 query with QueryTranslation",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. Re-run of the pre-fix Input 1 via SKILL.md's search_ncbi() code block, extracted programmatically. Identical live result to the pre-fix audit: Count=65, same QueryTranslation, retmax-cap warning fired correctly.",
+        "basic": 38,
+        "specialized": 46,
+        "total": 84,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Output prints QueryTranslation for the constructed query", "result": "PASS", "note": "Printed verbatim, matches pre-fix run exactly." },
+          { "text": "retmax cap warning issued when Count > retmax", "result": "PASS", "note": "WARNING printed (65 > 20)." },
+          { "text": "Output does not fabricate PMIDs", "result": "PASS", "note": "20 real, live 8-digit PMIDs returned." },
+          { "text": "Output stays within ESearch's stated capability (UIDs only, not full records)", "result": "PASS", "note": "No record content claimed." }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "EInfo DbInfo[0] fix, generalized to databases the fixer's own verification never touched (taxonomy, assembly, structure, biosample)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. Fixer verified nuccore/pubmed/sra/gds; pre-fix auditor verified clinvar. This input deliberately uses 4 different databases via SKILL.md's list_fields() code block, extracted programmatically, plus a direct DbInfo-shape check.",
+        "basic": 38,
+        "specialized": 47,
+        "total": 85,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "list_fields() as shipped in SKILL.md runs without error against taxonomy and assembly", "result": "PASS", "note": "Both returned non-empty FieldList (21 and 51 fields) with no TypeError." },
+          { "text": "The DbInfo[0] fix generalizes to databases the fixer did not test (structure, biosample)", "result": "PASS", "note": "Both confirmed list-of-one shape, len==1, correct DbName/Count/LastUpdate after [0] indexing." },
+          { "text": "Field lists, Count, and LastUpdate are real, non-fabricated live values", "result": "PASS", "note": "structure Count=259,356; biosample Count=59,383,983, both live." },
+          { "text": "No TypeError or other exception raised across any of the 4 new databases", "result": "PASS", "note": "Clean execution throughout." }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Variant B",
+        "label": "Regression: history-server queue, new term (human RefSeq protein set)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. Count 197,929 (>9,999 non-history cap), real WebEnv/QueryKey returned, matches SKILL.md's history-server pattern exactly.",
+        "basic": 39,
+        "specialized": 49,
+        "total": 88,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "Count exceeds retmax non-history cap (9,999), justifying history-server use", "result": "PASS", "note": "197,929 > 9,999." },
+          { "text": "WebEnv and QueryKey both returned and non-empty", "result": "PASS", "note": "Confirmed present." },
+          { "text": "No UIDs fetched directly (history-server path defers retrieval to EFetch)", "result": "PASS", "note": "retmax=0, no IdList requested." }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Edge",
+        "label": "Regression: MARCH1 ambiguous gene symbol, checking the SOFTENED usage-guide.md wording against live data",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. Live Count=702, identical to the pre-fix run. The pre-fix report flagged the old 'no hits' wording as false; usage-guide.md now says 'a big pile of loosely-related hits', which this input confirms matches live reality (702 >> 1, not 0).",
+        "basic": 39,
+        "specialized": 50,
+        "total": 89,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "QueryTranslation printed for the original query", "result": "PASS", "note": "Printed." },
+          { "text": "Corrected query uses a field-qualified HGNC-permanent symbol", "result": "PASS", "note": "MARCHF1[Gene Name] used." },
+          { "text": "Corrected query returns fewer, more precise hits than the original", "result": "PASS", "note": "1 vs 702." },
+          { "text": "usage-guide.md's current wording ('a big pile of loosely-related hits') matches the live count observed", "result": "PASS", "note": "702 is indeed a big pile, not zero; the old 'no hits' claim would have FAILED this assertion, the new wording does not." }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Regression: chained history-server intersection + spell-check, new terms (TP53/colorectal cancer)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. Real counts for both legs (3,033 / 216,862), real intersection (15, sanity-checked <= both parents), real spell correction ('colen carsinoma' -> 'colon carcinoma').",
+        "basic": 37,
+        "specialized": 51,
+        "total": 88,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Intersection count does not exceed either parent set", "result": "PASS", "note": "15 <= 3,033 and <= 216,862." },
+          { "text": "WebEnv reused (not re-fetched) across all three ESearch calls", "result": "PASS", "note": "Same WebEnv string passed through all three calls." },
+          { "text": "Spell-check correction resolves the misspelling", "result": "PASS", "note": "'colen carsinoma' -> 'colon carcinoma'." },
+          { "text": "All three counts and the correction are real API values, not fabricated", "result": "PASS", "note": "Live NCBI call." }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "EGQuery replacement path with a NEW term (PTEN, not the fixer's CRISPR/DDX3X), plus independent verification of the egquery.fcgi-unusable claim and CURATED_DBS coverage honesty",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. Entrez.egquery() AttributeError reproduced and caught; ESearch-loop fallback returned real nonzero counts for PTEN across all 10 curated dbs; gene UID 5728 matched the real NCBI Gene ID for human PTEN. Independently (not trusting the fix log) confirmed egquery.fcgi 301-redirects to ext-http-eutils.linkerd.ncbi.nlm.nih.gov, which does not resolve here -- both halves of the fixer's justification hold. New finding: CURATED_DBS covers only 10 of 38 live Entrez databases (confirmed via EInfo), and the decision-table question ('Which NCBI databases mention X at all?') does not disclose this narrower scope.",
+        "basic": 36,
+        "specialized": 46,
+        "total": 82,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Entrez.egquery() is attempted/demonstrated and the AttributeError is caught, not silently swallowed", "result": "PASS", "note": "Printed explicitly with type and message." },
+          { "text": "Fallback CURATED_DBS loop returns nonzero counts for a real gene symbol", "result": "PASS", "note": "10/10 curated databases returned nonzero counts for PTEN." },
+          { "text": "Gene UID resolved matches the real NCBI Gene ID for the queried symbol", "result": "PASS", "note": "UID 5728, the real NCBI Gene ID for human PTEN." },
+          { "text": "The egquery.fcgi-unusable justification (301 redirect to an unresolvable internal host) holds up under independent verification", "result": "PASS", "note": "301 to ext-http-eutils.linkerd.ncbi.nlm.nih.gov confirmed; socket.gethostbyname() confirmed non-resolution, independently of the fix log's claim." },
+          { "text": "The decision-table question ('which NCBI databases mention X at all') matches what CURATED_DBS actually checks", "result": "FAIL", "note": "EInfo lists 38 live databases; CURATED_DBS covers 10 (26%). The question's phrasing implies exhaustive coverage (inherited from the old EGQuery, which did query all databases); no disclosure of the narrower scope exists in SKILL.md." }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "New: independent verification of the fix log's <ERROR>-body claim, using the sibling Skill's fabrication defect as the adversarial premise",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. The dispatch specifically warned that bio-entrez-fetch was caught silently fabricating rows from an <ERROR> body, and that the difference was which parser was used. Fed two realistic captured <ERROR> bodies (a WebEnv-expired body matching SKILL.md's own Failure Modes table, and a 502-outage body matching today's real NCBI outage shape) through Bio.Entrez.read(), which every pattern in this Skill uses. Both raised RuntimeError; neither returned parsed or fabricated data. A control case (real successful ESearch) confirmed the parser isn't just throwing on everything.",
+        "basic": 37,
+        "specialized": 42,
+        "total": 79,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Feeding a documented WebEnv-expired <ERROR> body to Bio.Entrez.read() raises rather than returning parsed/fabricated data", "result": "PASS", "note": "RuntimeError('WebEnv not found') raised." },
+          { "text": "Feeding an outage-shaped 502 <ERROR> body (matching today's real NCBI outage format) also raises rather than silently returning empty/fabricated data", "result": "PASS", "note": "RuntimeError('Search Backend failed: Exception: 502 Proxy Error') raised." },
+          { "text": "The raised exception is RuntimeError specifically, matching the fix log's claim -- not a different, more easily-missed failure path", "result": "PASS", "note": "Confirmed RuntimeError in both cases, not a silent return or a different exception type." },
+          { "text": "A real successful parse is unaffected by the same code path (control case)", "result": "PASS", "note": "Live ESearch parsed fine, Count=23,326 -- confirms the RuntimeError isn't a blanket failure." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 35.2,
+    "dynamic_weighted": 51.0,
+    "score": 86,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Both pre-fix P1 code-crash defects (EGQuery AttributeError, EInfo DbInfo dict-indexing) are genuinely and durably fixed -- verified in this re-audit against databases and terms the fixer never tested (taxonomy, assembly, structure, biosample; PTEN instead of CRISPR/DDX3X), not merely by re-running the fixer's own checks.",
+    "The fixer's central judgement call -- that egquery.fcgi is unusable (301 redirect to an NCBI-internal, non-public hostname) and therefore the ESearch-loop replacement was the right call over a raw-HTTP repair -- was independently reproduced byte-for-byte in this re-audit.",
+    "The fixer's claim that Bio.Entrez.read() already raises RuntimeError on <ERROR> bodies (unlike the sibling Skill's silent-fabrication defect) was independently verified against two realistic captured error bodies, including the shape of today's real NCBI outage.",
+    "MARCH1 worked example's wording now matches live reality exactly (702 hits, not the old false 'no hits' claim), and the field-qualification technique it teaches remains correct.",
+    "API key now sourced from an environment variable with a documented, verified-working None-when-unset fallback -- closes the credential-hygiene P2 cleanly."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "CURATED_DBS decision-table row overpromises exhaustive database coverage",
+      "observed_in": [6],
+      "problem": "SKILL.md's decision table still asks 'Which NCBI databases mention X at all?' and routes to the ESearch-loop-over-CURATED_DBS fallback, but CURATED_DBS covers only 10 of the 38 live Entrez databases (confirmed via EInfo in this audit). The question's phrasing implies exhaustive coverage, inherited unchanged from the EGQuery row it replaced -- EGQuery actually did query all databases in one call.",
+      "root_cause": "The fix promoted the ESearch-loop's 'how' to primary without re-scoping the decision table's 'what': the question text was carried over from the old EGQuery-backed row without being narrowed to match the fallback's actual, smaller, coverage.",
+      "fix": "Reword the decision-table question to reflect the curated scope (e.g. 'Which of these N curated databases mention X?'), or add one line disclosing that CURATED_DBS is a deliberate subset with a pointer to EInfo's full db list for exhaustive coverage."
+    },
+    {
+      "priority": "P2",
+      "title": "No progressive disclosure despite SKILL.md growing longer in this fix pass",
+      "observed_in": [],
+      "problem": "SKILL.md grew from ~300 to ~335 lines in this fix pass (new 'Cross-database counts' section) rather than shrinking; still a single flat file with all failure-mode and field tables inline. examples/ is now cross-linked from the 'Code patterns' section, which is an improvement, but no references/ split exists.",
+      "root_cause": "Declined as out of scope for this fix pass per FIX_BRIEF.md's restructuring limit -- a reasonable call given the pass's mandate, but the underlying static-score gap remains.",
+      "fix": "In a future pass with restructuring scope, split the field-qualified-pattern tables and Failure Modes/Common Errors tables into a references/ file."
+    },
+    {
+      "priority": "P2",
+      "title": "No input-validation guidance for term strings",
+      "observed_in": [],
+      "problem": "Neither SKILL.md's Required Setup nor any code pattern mentions validating or sanitizing the 'term' string before passing it to Entrez.esearch(term=...). Low risk in practice (it is a URL query parameter, not executed code), but unaddressed.",
+      "root_cause": "Never covered in original authoring; not part of either fix round's finding list.",
+      "fix": "Add one line noting term strings are passed as URL query parameters (no shell/eval risk) but should be length/encoding-sanity-checked before very large batch loops."
+    }
+  ]
+}

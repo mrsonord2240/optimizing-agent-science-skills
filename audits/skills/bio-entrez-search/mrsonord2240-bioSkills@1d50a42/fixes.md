@@ -1,0 +1,48 @@
+# bio-entrez-search — fixes (2026-09-17)
+
+Branch `fix/db-esearch`, worktree `F:\OpenScience\wt\db-esearch`, staging base
+`49aef6ad496292fcad78360ca4c4c6a7331d62ad`. Verified live 2026-09-17 against public NCBI E-utilities
+with the shared venv's Biopython 1.88 (`F:\OpenScience\audit-envs\database-access\Scripts\python.exe`).
+Every changed Python snippet (`examples/database_info.py`, `examples/global_query.py`) was run to
+completion and its output checked against real values (real FieldList/LastUpdate for
+nuccore/pubmed/sra/gds; real per-database CRISPR counts), not just exit code. No NCBI `<ERROR>` bodies
+were observed on any call made during this fix (the earlier-reported outage did not recur while
+verifying).
+
+**Judgement call on EGQuery (P1):** confirmed the auditor's finding a second, independent way —
+`Entrez.egquery()` raising `AttributeError` is a Biopython-side removal, and calling the underlying
+`egquery.fcgi` endpoint directly with raw `urllib` is not a working substitute either: it 301-redirects
+to `ext-http-eutils.linkerd.ncbi.nlm.nih.gov`, an NCBI-internal hostname that does not resolve outside
+their network (checked live 2026-09-17). That rules out "write a raw-HTTP egquery()" as an option, so I
+took the brief's other path: promoted the already-correct, already-verified-working
+ESearch-loop-over-`CURATED_DBS` fallback (`examples/global_query.py`) to the primary documented route
+in SKILL.md's decision table and usage-guide.md's worked example, and rewrote
+`examples/global_query.py` so it demonstrates the `AttributeError` explicitly (matching what the
+auditor's Input 6 actually ran) before falling back to the loop as the main path, rather than leaving
+`egquery()` as the only top-level call.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| `Entrez.egquery()` documented as core utility, doesn't exist on Biopython 1.88; breaks SKILL.md's decision table, `examples/global_query.py`, and usage-guide.md's "Cross-database discovery" prompt | P1 | SKILL.md: decision-table row now routes to the ESearch loop, with a new "Cross-database counts (EGQuery is broken)" section explaining both the Biopython and HTTP-level breakage. `examples/global_query.py` rewritten: `confirm_egquery_broken()` surfaces the `AttributeError` explicitly, `cross_db_counts()` (the old `loop_esearch_counts`) is now the primary path. usage-guide.md's worked example and Tips line updated to match. | ran: `examples/global_query.py` end-to-end, exit 0 — `Entrez.egquery() unavailable as documented: module 'Bio.Entrez' has no attribute 'egquery'`, then real per-db CRISPR counts (protein 201,718,454 ... clinvar 254) | also checked `egquery.fcgi` directly via raw `urllib`: HTTP 301 -> `ext-http-eutils.linkerd.ncbi.nlm.nih.gov` (unresolvable outside NCBI), ruling out a raw-HTTP rewrite as viable |
+| EInfo `DbInfo` indexed as a dict in SKILL.md's `list_fields()` and `examples/database_info.py`'s `db_info()`; Biopython 1.88 returns a list-of-one | P1 | Both changed to index `r['DbInfo'][0]`, with a one-line comment noting the list-of-one wrapping | ran: `examples/database_info.py` end-to-end, exit 0 — real `FieldList`/`LastUpdate`/`Count` for nuccore (740,365,563 records), pubmed, sra, gds | |
+| No progressive disclosure despite ~300-line SKILL.md; `examples/` never linked from SKILL.md/usage-guide.md | P2 | Declined the `references/` restructuring — out of this fix pass's scope per FIX_BRIEF.md ("restructuring beyond the redundancy rule is not in scope"). Did add the cheap, in-scope half of the finding: a "Code patterns" intro line and inline comments pointing to `examples/basic_search.py`, `examples/database_info.py`, `examples/global_query.py` | docs (cross-reference only, no runtime behavior to verify) | left unfixed by design; noted to re-auditor |
+| API key documented as a hardcoded placeholder (`Entrez.api_key = 'YOUR_KEY'`) | P2 | SKILL.md's Required Setup now reads `Entrez.api_key = os.environ.get('NCBI_API_KEY')`, with a note never to hardcode a real key | ran: `import os` + the corrected setup block compiles and `os.environ.get` returns `None` when unset (Biopython treats `None` as "no key", same 3 req/sec fallback) | |
+| MARCH1 worked example's "no hits" premise doesn't reproduce (live Count=702) | P2 | usage-guide.md's "Diagnosing a 'wrong count' bug" prompt softened from "returned no hits" to "returns a big pile of loosely-related hits" — the field-qualification technique (702 -> 1) is unchanged and still correct | ran: live `Entrez.esearch(db='gene', term='MARCH1 AND human')` -> Count 702, matches the new wording | |
+
+**Checked, not a defect:** per the dispatch's warning about `entrez-fetch`'s sibling silently
+fabricating rows from an `<ERROR>` body, tested whether `Bio.Entrez.read()` (used by every pattern
+touched here) does the same — fed it a synthetic `<ERROR>Search Backend failed: Exception: 502 Proxy
+Error</ERROR>` body and it raised `RuntimeError: Search Backend failed...` rather than returning
+fabricated data. No fix needed; noted for the re-auditor as evidence, not left silent.
+
+**Redundancy pass:** usage-guide.md's "Prerequisites" section restated SKILL.md's Required Setup code
+block (`Entrez.email`/`Entrez.api_key` assignment) verbatim — trimmed to a pointer at SKILL.md's
+"Required Setup" section, keeping only the human-facing content (`pip install`, why to get an API key,
+the settings URL). usage-guide.md's Overview and "Cross-database discovery"/Tips lines that referenced
+EGQuery as if it worked were updated to match SKILL.md rather than left to drift as a second, now-wrong
+copy of the same fact.
+
+Left unfixed: the `references/` progressive-disclosure split (P2, declined — see table above, out of
+scope for this pass).
+
+Needs Sam: nothing. All five findings addressed (four fixed, one explicitly declined with reason).
