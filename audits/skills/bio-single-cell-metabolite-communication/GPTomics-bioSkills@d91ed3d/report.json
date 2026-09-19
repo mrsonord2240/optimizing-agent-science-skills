@@ -1,0 +1,189 @@
+{
+  "meta": {
+    "skill_name": "bio-single-cell-metabolite-communication",
+    "description": "Infers metabolite-mediated cell-cell communication from scRNA-seq by scoring enzyme-to-sensor pairs (MEBOCOST), with metabolic flux (scFEA), FBA state (Compass), and neurotransmitter (NeuronChat) alternatives. Use when studying metabolic crosstalk between cell types, predicting metabolite secretion and sensing, or deciding which metabolic-communication method fits and how speculative the result is.",
+    "evaluated_on": "2026-09-19",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Moderate",
+    "n_inputs": 5,
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:single-cell/metabolite-communication"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "No fabricated DOI/PMID/p-values across any of the 5 outputs; reported scores and FDRs are the real MEBOCOST tool output on the audit's synthetic dataset, not invented figures. Cited references (e.g. PMID 40568942) are the genuine MEBOCOST publication." },
+      "practice_boundaries": { "result": "PASS", "detail": "No diagnostic or prescriptive medical conclusion in any output. Every output frames results as hypothesis-generation only and requires orthogonal validation before any claim, per the Skill's Governing Principle." },
+      "methodological_ground": { "result": "PASS", "detail": "No principled fallacy observed: filtering is done on permutation_test_fdr (not raw p-value) throughout; cross-condition comparison correctly avoids raw interaction-count comparisons and frames condition-restricted hits as hypotheses (Input 4); transporter-based sensor calls are correctly flagged as lower-confidence/bidirectional (Input 5)." },
+      "code_usability": { "result": "PASS", "detail": "All executed code parses and runs correctly and reproducibly once a standard Python multiprocessing idiom (if __name__=='__main__':) is added; this is not a syntax error, infinite loop, or missing dependency, and the documented code is correct as written on non-Windows (fork start-method) platforms. Recorded as a P1 finding (see recommendations), not a veto: the identical defect class was already observed and treated as a documented finding rather than a veto for single-cell/cell-communication's cellphonedb example in this audit environment." }
+    }
+  },
+  "static_score": {
+    "subtotal": 89,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 10, "max": 12, "note": "Covers the core MEBOCOST workflow completely and correctly (verified by execution); description promises scFEA/Compass/NeuronChat as 'alternatives' but ships no runnable pattern for any of them, which is a real but minor completeness gap given the Method Decision Table clearly scopes them as separate full pipelines, not code MEBOCOST wraps." },
+      "reliability": { "score": 9, "max": 12, "note": "Common Errors table's documented failure modes matched real tool behavior exactly in testing (Input 3); the undocumented Windows multiprocessing crash (Inputs 1/2/4) is the main gap." },
+      "performance_context": { "score": 8, "max": 8, "note": "SKILL.md is 149 lines; usage-guide.md and examples/ are cleanly separated; workflow is linear (run -> filter -> summarize -> compare) with no redundant steps." },
+      "agent_usability": { "score": 14, "max": 16, "note": "Applied correctly from cold start in every executed input; column names and terminology are consistent with the real tool output; feedback/output format is specified but the Windows multiprocessing trap is not called out as a common pitfall." },
+      "human_usability": { "score": 7, "max": 8, "note": "Example prompts in usage-guide.md are natural user language; input requirements (gene symbols, log-normalization, species match) are stated explicitly, and errors are reasonably clear when those requirements are violated (Category-3 Forgiveness override: strict rejection is correct design here, not scored down)." },
+      "security": { "score": 12, "max": 12, "note": "No credentials, no eval/exec of raw strings, no unvalidated input paths; MEBOCOST performs its own gene-overlap validation and hard-stops on mismatch." },
+      "maintainability": { "score": 9, "max": 12, "note": "SKILL.md / usage-guide.md / examples/*.py are cleanly separated; parameter rationale table aids modification; testability is limited because the Skill ships no bundled synthetic dataset or expected-output fixture, so verifying a fresh install requires building test data from scratch (as this audit had to)." },
+      "agent_specific": { "score": 20, "max": 20, "note": "Trigger description is precise; progressive disclosure is correct (SKILL.md concise, depth in usage-guide.md/examples/); Related Skills section gives genuine composability into a larger pipeline; idempotency confirmed empirically (byte-identical output across repeated runs with the same seed); escape hatches (Governing Principle, non-optional validation framing) are the strongest part of this Skill." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 87.4,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 18, "total": 21 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Run MEBOCOST and filter on permutation FDR",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Crashed as literally documented (RuntimeError, Windows multiprocessing bootstrap); completed correctly (19.4s) once wrapped in if __name__=='__main__'; recovered both planted signaling axes; byte-identical on re-run.",
+        "basic": 35,
+        "specialized": 49,
+        "total": 84,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Output uses documented column names (Sender, Receiver, Metabolite_Name, Sensor, Commu_Score, permutation_test_fdr)", "result": "PASS", "note": "Confirmed exact match against real commu_res.columns" },
+          { "text": "Filtering applied on permutation_test_fdr, not the raw p-value", "result": "PASS", "note": "sig = commu_res[commu_res['permutation_test_fdr'] < 0.05] as documented" },
+          { "text": "Code runs as documented without modification on the target platform", "result": "FAIL", "note": "Raised RuntimeError from mebocost's internal multiprocessing.Pool; required adding an if __name__=='__main__' guard" },
+          { "text": "Recovered the planted CD73-adenosine-A2A and PTGES-PGE2-EP2/EP4 axes at FDR<0.05", "result": "PASS", "note": "Both axes present in the significant set with FDR=0.0" },
+          { "text": "No fabricated statistics in the output", "result": "PASS", "note": "All scores/FDRs are the tool's real numeric output on the synthetic dataset" }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Which cells express PGE2 enzymes vs. sensors",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Reused analyze_specific_metabolite() from examples/metabolite_communication.py; same __main__ guard fix required; correctly isolated PGE2 rows.",
+        "basic": 35,
+        "specialized": 49,
+        "total": 84,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Correctly isolates only Prostaglandin E2 rows", "result": "PASS", "note": "Filter on Metabolite_Name == 'Prostaglandin E2' matches the documented helper" },
+          { "text": "Uses FDR threshold consistent with SKILL.md", "result": "PASS", "note": "fdr_threshold=0.05 as documented" },
+          { "text": "Code runs as documented without modification on the target platform", "result": "FAIL", "note": "Same multiprocessing RuntimeError as Input 1" },
+          { "text": "Recovered the planted Tumor->TCell PGE2 axis via PTGER2/PTGER4", "result": "PASS", "note": "Both receptors present with FDR=0.0" }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Mouse-cased gene symbols against species='human'",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Hard-stopped with the exact documented KeyError in 0.1s; no multiprocessing reached, so no guard fix needed.",
+        "basic": 38,
+        "specialized": 54,
+        "total": 92,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "Hard-stops with the exact documented species/gene-symbol mismatch failure mode", "result": "PASS", "note": "KeyError message matches Common Errors table's description verbatim" },
+          { "text": "Error is not swallowed silently", "result": "PASS", "note": "Exception propagates with an informative message rather than returning empty/wrong results" },
+          { "text": "Fails loudly rather than returning a misleading near-empty result", "result": "PASS", "note": "Category-3 Fault Tolerance override: a hard stop here is correct defensive design, not a defect" }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Compare metabolite communication tumor vs normal",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Per-condition subset loop from SKILL.md 'Compare Conditions'; same __main__ guard fix required; exactly reproduced the planted condition-restricted signal (4/4 axes tumor-only).",
+        "basic": 34,
+        "specialized": 50,
+        "total": 84,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Uses per-condition subset loop, not a merged-condition comparison", "result": "PASS", "note": "Matches SKILL.md pattern exactly" },
+          { "text": "Frames tumor-only hits as hypothesis-only, per SKILL.md language", "result": "PASS", "note": "Comment in script and expected framing both use 'HYPOTHESIS for metabolomics'" },
+          { "text": "Code runs as documented without modification on the target platform", "result": "FAIL", "note": "Same multiprocessing RuntimeError as Input 1, occurring twice (once per condition)" },
+          { "text": "Correctly recovered the condition-restricted signal", "result": "PASS", "note": "4/4 planted axes significant in 'tumor' only; 0 significant in 'normal'" }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Decide MEBOCOST vs scFEA vs Compass for macrophage lactate; validation plan",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Reasoning/decision task (Mode A); no code executed (Skill provides none for scFEA/Compass, correctly). Full transcript in run/input5_stress_reasoning.md.",
+        "basic": 38,
+        "specialized": 55,
+        "total": 93,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Selects MEBOCOST over scFEA/Compass using the Skill's own decision-table language", "result": "PASS", "note": "Correctly cites 'not a CCC tool itself' (scFEA) and 'reaction favorability, not secretion' (Compass)" },
+          { "text": "Proactively surfaces the lactate/MCT bidirectional-transporter caveat, unprompted", "result": "PASS", "note": "Connects the general Confounds-table entry to the specific SLC16A1/SLC16A3 gene family without being asked" },
+          { "text": "States the enzyme->flux->level->sensing inference chain explicitly", "result": "PASS", "note": "Governing Principle chain restated in the framing paragraph" },
+          { "text": "Provides concrete, non-fabricated orthogonal validation methods", "result": "PASS", "note": "LC-MS metabolomics, ECAR/lactate assay, isotope tracing, enzyme/sensor knockdown -- all specific and appropriate, no invented results" },
+          { "text": "No diagnostic or prescriptive medical claim anywhere in the response", "result": "PASS", "note": "Entirely research-hypothesis framed" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 35.6,
+    "dynamic_weighted": 52.4,
+    "score": 88,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Governing Principle and Confounds table make the double-inference nature of metabolite CCC explicit, and the agent applies this caveat unprompted in a novel case (lactate/MCT transporters, Input 5) rather than only reciting it where the Skill spells it out verbatim",
+    "All executed code patterns recovered the correct planted signal in synthetic data and were byte-identical across repeated runs with the same seed -- genuinely reproducible under test, not merely documented as such",
+    "Common Errors table's documented failure modes (species/gene-symbol mismatch) matched the tool's real behavior exactly when tested",
+    "Validation requirements (metabolomics, isotope tracing, enzyme/sensor perturbation) are treated as non-optional throughout, keeping the Skill firmly inside research-hypothesis scope with no diagnostic drift"
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "Canonical example code crashes on Windows (multiprocessing bootstrap)",
+      "observed_in": [1, 2, 4],
+      "problem": "SKILL.md's 'Run MEBOCOST' and 'Compare Conditions' code blocks are flat top-level scripts. mebocost.infer_commu() calls multiprocessing.Pool(thread) internally, and on Windows this re-imports the top-level script in each worker, raising RuntimeError before any output is produced.",
+      "root_cause": "The code examples are not wrapped in the standard `if __name__ == '__main__':` guard that Windows' spawn-based multiprocessing requires.",
+      "fix": "Wrap all three inline code blocks in SKILL.md (Run MEBOCOST, Filter and Summarize, Compare Conditions) in a `def main(): ... \\n if __name__ == '__main__': main()` structure, and add one row to the Common Errors table naming the RuntimeError and its fix."
+    },
+    {
+      "priority": "P2",
+      "title": "No bundled synthetic dataset or expected-output fixture",
+      "observed_in": [],
+      "problem": "The Skill ships no example h5ad, mebocost.conf, or expected-output snippet, so a fresh install cannot be sanity-checked without building test data from scratch, as this audit had to.",
+      "root_cause": "examples/metabolite_communication.py contains helper functions but no runnable end-to-end example with real or synthetic data attached.",
+      "fix": "Add a tiny synthetic h5ad (a handful of cell types x a handful of signaling genes) plus a minimal mebocost.conf under examples/, and one expected-output snippet a user can diff against."
+    },
+    {
+      "priority": "P2",
+      "title": "SKILL.md's main code path skips its own data-QC helper",
+      "observed_in": [],
+      "problem": "examples/metabolite_communication.py's prepare_data_for_mebocost() (log-normalization check, rare-cell-type filtering) is a reasonable QC step but is never referenced from SKILL.md's main 'Run MEBOCOST' flow, which only comments that data must already be prepared.",
+      "root_cause": "The QC helper and the main documented workflow were written as separate artifacts without a cross-link.",
+      "fix": "Add one line to SKILL.md's 'Run MEBOCOST' section pointing at examples/metabolite_communication.py's prepare_data_for_mebocost() as the recommended pre-step."
+    }
+  ]
+}

@@ -8,7 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (74)
+## P1 (75)
 
 ### `bio-alignment-multiple` — Fix MUSCLE5 ensemble commands (-super5 has no .efa)
 
@@ -346,6 +346,14 @@ None open.
 - Root cause: The snippet was written against an object whose .X still held counts; the Skill's own 'Defaults that bite' row ('Aggregate RAW counts (summed), never normalized') is the correct rule and the R snippet on the next line follows it.
 - Fix: Change the call to sc.get.aggregate(cell_type, by='sample', func='sum', layer='counts') and add a one-line assertion that the aggregated values are integral, so the contradiction cannot survive a copy-paste.
 
+### `bio-single-cell-metabolite-communication` — Canonical example code crashes on Windows (multiprocessing bootstrap)
+
+- Skill: 88, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/metabolite-communication) · [viewer](skills/bio-single-cell-metabolite-communication/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 1, 2, 4
+- Problem: SKILL.md's 'Run MEBOCOST' and 'Compare Conditions' code blocks are flat top-level scripts. mebocost.infer_commu() calls multiprocessing.Pool(thread) internally, and on Windows this re-imports the top-level script in each worker, raising RuntimeError before any output is produced.
+- Root cause: The code examples are not wrapped in the standard `if __name__ == '__main__':` guard that Windows' spawn-based multiprocessing requires.
+- Fix: Wrap all three inline code blocks in SKILL.md (Run MEBOCOST, Filter and Summarize, Compare Conditions) in a `def main(): ... \n if __name__ == '__main__': main()` structure, and add one row to the Common Errors table naming the RuntimeError and its fix.
+
 ### `bio-single-cell-perturb-seq` — SCEPTRE install instructions in SKILL.md remain factually wrong
 
 - Skill: 88, Production Ready · [mrsonord2240/bioSkills@420b60b](https://github.com/mrsonord2240/bioSkills/tree/420b60b5eae0c3313a988cfff42d2653362c0b56/single-cell/perturb-seq) · [viewer](skills/bio-single-cell-perturb-seq/mrsonord2240-bioSkills@420b60b/viewer.md)
@@ -602,7 +610,7 @@ None open.
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (303)
+## P2 (305)
 
 ### `bio-crispr-screens-copy-number-correction` — negative_control_sgrnas empty-dict case raises an undocumented ValueError
 
@@ -1579,6 +1587,22 @@ None open.
 - Problem: The Skill prescribes a filter but never says what a marker table should carry into a figure or methods section - the filter thresholds used, the fraction-expressing gap, and the explicit statement that the p-values are descriptive all had to be supplied by the agent.
 - Root cause: Feedback design is not covered.
 - Fix: Add a three-line 'what to report' block: the test and thresholds used, per-cluster top markers with pct.1/pct.2, and a standing note that cluster-marker p-values are descriptive.
+
+### `bio-single-cell-metabolite-communication` — No bundled synthetic dataset or expected-output fixture
+
+- Skill: 88, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/metabolite-communication) · [viewer](skills/bio-single-cell-metabolite-communication/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: —
+- Problem: The Skill ships no example h5ad, mebocost.conf, or expected-output snippet, so a fresh install cannot be sanity-checked without building test data from scratch, as this audit had to.
+- Root cause: examples/metabolite_communication.py contains helper functions but no runnable end-to-end example with real or synthetic data attached.
+- Fix: Add a tiny synthetic h5ad (a handful of cell types x a handful of signaling genes) plus a minimal mebocost.conf under examples/, and one expected-output snippet a user can diff against.
+
+### `bio-single-cell-metabolite-communication` — SKILL.md's main code path skips its own data-QC helper
+
+- Skill: 88, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/metabolite-communication) · [viewer](skills/bio-single-cell-metabolite-communication/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: —
+- Problem: examples/metabolite_communication.py's prepare_data_for_mebocost() (log-normalization check, rare-cell-type filtering) is a reasonable QC step but is never referenced from SKILL.md's main 'Run MEBOCOST' flow, which only comments that data must already be prepared.
+- Root cause: The QC helper and the main documented workflow were written as separate artifacts without a cross-link.
+- Fix: Add one line to SKILL.md's 'Run MEBOCOST' section pointing at examples/metabolite_communication.py's prepare_data_for_mebocost() as the recommended pre-step.
 
 ### `bio-single-cell-perturb-seq` — scMAGeCK's Bioconductor history is described imprecisely
 
