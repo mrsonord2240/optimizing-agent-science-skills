@@ -33,3 +33,32 @@ Nothing from the audit's P0/P1 list. Did not chase the tiny residual non-determi
 verification) — it is far smaller than the veto-triggering effect, does not affect genus (the
 rank SKILL.md and the veto turn on), and chasing it further would mean debugging DADA2's own
 multithreaded C internals, which is out of scope for a Skill-doc fix pass.
+
+## 2026-09-19 — second pass: sibling `IdTaxa()` non-determinism (re-audit 87, Reject — Skill Veto T3 still fired)
+
+Re-audit (`F:\OpenScience\audits\bio-microbiome-taxonomy-assignment\eval_viewer_...md`, third
+independent agent) confirmed the first pass's `assignTaxonomy()` fix and DECIPHER flattening fix
+both fully held on regression, but found a bug the first pass never tested: `DECIPHER::IdTaxa()`
+is itself non-deterministic without a seed, and SKILL.md's DECIPHER section never called
+`set.seed()` anywhere — the same bug class as `assignTaxonomy()`, larger in magnitude (re-auditor:
+33/770 and 23/770, 3.0–4.3%, genus differences across unseeded runs on the same 770 real ASVs, vs.
+1.9–3.4% for the original `assignTaxonomy()` bug). Worktree `F:\OpenScience\wt\mb-tax`, branch
+`fix/mb-taxonomy-assignment`, starting commit `c50ea85`, fix commit `7552317`.
+
+| finding | priority | change | verified (ran/help/docs) | notes |
+|---|---|---|---|---|
+| `IdTaxa()` non-deterministic without `set.seed()` — fires Skill Veto T3 (re-audit finding) | P0 | Added `set.seed(100)` immediately before the `IdTaxa()` call in SKILL.md's DECIPHER section (one call site serves both the pre-trained-`.RData` path and the from-scratch `LearnTaxa()` path); added a matching Common Errors row | ran — reused the re-audit's cached `trainingSet.rds` (real 60K-seq region-matched SILVA-138) and the same 770 real moving-pictures ASVs; ran 3 independent seeded `IdTaxa()` runs (stricter than the re-audit's own 2-run test) in both default multithreaded (`processors=NULL`) and single-threaded (`processors=1`) configs — all 3 pairwise comparisons `identical()==TRUE` at all 7 ranks (domain..species), 0 differences anywhere, both threading modes | Same seed value/convention (`set.seed(100)`) as the first pass's `assignTaxonomy()` fix |
+| `LearnTaxa()` itself is also internally stochastic (not raised by the re-audit; found while verifying the above) — its own docs: tree-descent tuning "is repeated with 100 random subsamples" | P0 | Added `set.seed(100)` before the commented `LearnTaxa()` training example, with a comment explaining why | ran — independent test on a different real data slice than the re-audit used (fresh random 5000-sequence subsample of the same SILVA-138 region-matched reference, not the re-audit's full 60K set): two unseeded `LearnTaxa()` calls on identical input produced non-identical `trainingSet` objects (`identical()==FALSE`); `set.seed()` before each call made them `identical()==TRUE`. Downstream seeded `IdTaxa()` genus calls against the two unseeded-trainingSets still matched by chance (0/770 differing) for this particular slice, but the underlying object is confirmed non-deterministic, so the seed was added defensively rather than relying on that outcome | A third sibling instance the brief warned about — caught by testing the training step in isolation rather than only re-running the re-auditor's own test |
+
+## Redundancy pass
+
+No new duplication introduced — the change is additive within SKILL.md's existing DECIPHER code
+block and Common Errors table; `usage-guide.md` was checked and contains no DECIPHER/IdTaxa code
+or claims to go stale.
+
+## Left unfixed
+
+Nothing. Grepped SKILL.md, usage-guide.md, and `examples/` for every other call to a stochastic
+method (`assignTaxonomy` already seeded from pass 1; `classify-sklearn`, `classify-consensus-vsearch`,
+`fit-classifier-naive-bayes`, `addSpecies` are all deterministic algorithms/models) — found no
+further unseeded sibling instance.
