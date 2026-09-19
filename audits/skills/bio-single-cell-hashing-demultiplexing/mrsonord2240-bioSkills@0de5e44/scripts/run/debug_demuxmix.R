@@ -1,0 +1,17 @@
+.libPaths(c('F:/OpenScience/audit-envs/single-cell-transcriptomics-analyst/R-lib', .libPaths()))
+suppressPackageStartupMessages(library(demuxmix))
+set.seed(20260919)
+hto_df <- read.csv('data/hto_counts_weak.csv', row.names = 1)
+tag_cols <- c('HTO_X', 'HTO_Y', 'HTO_Z')
+hto_mat <- t(as.matrix(hto_df[, tag_cols]))
+n_cells <- ncol(hto_mat)
+rna_counts <- rpois(n_cells, lambda = 150)
+cat('summary of hto_mat rows:\n')
+print(apply(hto_mat, 1, summary))
+cat('any NA in hto_mat:', any(is.na(hto_mat)), '\n')
+cat('any NA in rna_counts:', any(is.na(rna_counts)), '\n')
+res <- tryCatch({
+  dmm <- demuxmix(as.matrix(hto_mat), rna = rna_counts)
+  'OK'
+}, warning = function(w) { cat('WARNING:', conditionMessage(w), '\n'); invokeRestart('muffleWarning') })
+print(warnings())

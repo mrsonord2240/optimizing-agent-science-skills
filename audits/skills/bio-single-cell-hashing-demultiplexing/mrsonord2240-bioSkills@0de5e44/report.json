@@ -1,0 +1,185 @@
+{
+  "source": "mrsonord2240/bioSkills@0de5e44090dd0428293282bc6feff9e1389817f6:single-cell/hashing-demultiplexing",
+  "meta": {
+    "skill_name": "bio-single-cell-hashing-demultiplexing",
+    "description": "Assign cells to their sample of origin from cell or nucleus hashing (CITE-seq HTOs, MULTI-seq lipid/cholesterol tags, CellPlex CMOs) and call cross-sample doublets using Seurat HTODemux/MULTIseqDemux, hashsolo, demuxEM, GMM-Demux, and demuxmix. Use when assigning pooled hashed cells back to their sample, calling cross-sample doublets from HTO counts, choosing a demultiplexing method, deciding between hashtag and genetic demultiplexing, or rescuing an oversized Negative pile from weak HTO staining or ambient spillover.",
+    "evaluated_on": "2026-09-19",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Moderate",
+    "n_inputs": 5,
+    "note": "RE-AUDIT of a fixed Skill. Fresh independent auditor; different from both the 2026-09-19 original auditor (score 78) and the 2026-09-19 fixer (branch fix/sc-hashing, commit 0de5e440). Pre-fix report archived to F:\\OpenScience\\audits\\_pre-fix-20260919\\bio-single-cell-hashing-demultiplexing\\. All 5 inputs below use freshly generated synthetic data (different seeds, different cell counts) from both the original auditor's and the fixer's own test data, to avoid re-measuring only the exact scenario the fixer was told about. Inputs unaffected by the fix diff (HTODemux canonical, modality-choice consultation, unequal-pooling stress) were not re-executed this round -- the diff (single-cell/hashing-demultiplexing/{SKILL.md,usage-guide.md,examples/hashsolo_scanpy.py} only) confirms those code paths are byte-identical to the same-day original audit that scored them 90, 88, and 92; those scores are not carried into this report's dynamic_score to avoid claiming an execution that did not happen this round."
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "No fabricated DOIs/PMIDs, p-values, sample sizes, or clinical claims in any of the 5 outputs; all reported numbers trace to code I executed this round or synthetic ground truth I generated." },
+      "practice_boundaries": { "result": "PASS", "detail": "Skill remains scoped to lab computational sample-assignment, not patient diagnosis or treatment; no diagnostic/prescriptive language; a medical disclaimer is not applicable to this scope." },
+      "methodological_ground": { "result": "PASS", "detail": "hashsolo's number_of_noise_barcodes fix, demuxmix's model='naive' fallback (with its accuracy trade-off honestly caveated and the convergence warning surfaced), and GMM-Demux's Gaussian-mixture approach all match verified tool behavior and documented statistics; no fallacy found." },
+      "code_usability": { "result": "PASS", "detail": "All code I executed this round (fixed hashsolo pattern, fixed demuxmix tryCatch guard, GMM-Demux CLI pattern) ran to completion without syntax errors or missing dependencies on fresh, independently-generated data." }
+    }
+  },
+  "static_score": {
+    "subtotal": 93,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 11, "max": 12, "note": "All 5 named tools now have coverage: HTODemux/MULTIseqDemux (unchanged), hashsolo (P0 fixed), demuxmix (P1 crash-guard added), GMM-Demux (new, verified example), and demuxEM/pegasus (honestly documented as non-buildable on Windows rather than shipping an unverified example -- verified independently, see M4/recommendations). Docked 1 for a factual overclaim found in the new GMM-Demux section (see P2)." },
+      "reliability": { "score": 10, "max": 12, "note": "hashsolo now raises a RuntimeError if the Negative fraction exceeds 90% (verified it would have fired on the pre-fix behavior); demuxmix now retries with model='naive' on the documented glm.nb crash (verified independently on fresh data, including disproving the alternative clusterInit-alone remedy). Docked for Recoverability: the hashsolo guard is a hard stop requiring the agent to manually re-parameterize, not an auto-recovery (correct design per Category-3 override, but not full marks either)." },
+      "performance_context": { "score": 8, "max": 8, "note": "Progressive disclosure unchanged and still clean; SKILL.md ~230 lines, code in examples/." },
+      "agent_usability": { "score": 15, "max": 16, "note": "Learnability, consistency, and feedback design all strong and unchanged in quality. Error prevention much improved (all 3 previously-silent failure modes now called out with preventive guidance) but the demuxEM/pegasus pattern remains unverified on this platform by necessity, docked 1." },
+      "human_usability": { "score": 8, "max": 8, "note": "usage-guide.md's 'What the Agent Will Do' step 4 now has an explicit stop-and-diagnose threshold (Category-3 Forgiveness override: a hard stop on a degenerate result is correct design, not a usability defect)." },
+      "security": { "score": 12, "max": 12, "note": "Unchanged: no credentials, no unsanitized execution, standard local-file workflow." },
+      "maintainability": { "score": 10, "max": 12, "note": "Clean file separation maintained; new sections isolated and don't ripple into unrelated parts. Still no bundled example dataset/expected-output fixture shipped with the Skill itself for smoke-testing the fixed patterns." },
+      "agent_specific": { "score": 19, "max": 20, "note": "Trigger precision, progressive disclosure, and composability unchanged and strong. Idempotency verified this round for all 3 fixed tools (hashsolo 2x, GMM-Demux 2x, demuxmix naive-fallback 2x -- all identical on identical input). Docked 1 point overall for the GMM-Demux documentation overclaim (see P2), which is a completeness/accuracy issue that spans multiple categories." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 88.2,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 21, "total": 23 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical (P0 regression)",
+        "label": "hashsolo, 2-hashtag scanpy AnnData -- re-verify the P0 fix on fresh, unseen data",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Real execution (scanpy 1.12.4) on a freshly generated 750-cell 2-tag dataset (seed 919200226, independent of both the original auditor's and the fixer's data). BASELINE (pre-fix pattern, no number_of_noise_barcodes): 100% Negative, 11.3% agreement with ground truth -- confirms the original P0 still reproduces on new data. FIXED pattern (number_of_noise_barcodes=1): 91.9% global agreement (689/750), 100% singlet sample-ID agreement (621/621), identical classifications across 2 repeated runs.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Fixed pattern correctly assigns singlet samples for the large majority of true singlets", "result": "PASS", "note": "621/621 = 100% singlet sample-ID agreement" },
+          { "text": "The pre-fix (unfixed) pattern still reproduces the original silent 100%-Negative failure on fresh data", "result": "PASS", "note": "750/750 cells classified Negative, 11.3% agreement -- confirms this is a genuine, generalizable defect, not a one-off in the original auditor's data" },
+          { "text": "SKILL.md documents the number_of_noise_barcodes degeneracy at 2-3 tags with a concrete threshold check", "result": "PASS", "note": "Explicit paragraph, code guard, parameter-reference row, and Common Errors row all present" },
+          { "text": "Fixed output is deterministic across repeated runs on identical input", "result": "PASS", "note": "2 runs, identical Classification column" },
+          { "text": "Fix generalizes beyond the fixer's own test data", "result": "PASS", "note": "Independently generated dataset, different seed and cell count from both the fixer's and original auditor's data" }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Edge (P1 regression)",
+        "label": "demuxmix glm.nb crash-guard -- re-verify the fix and the fixer's clusterInit claim on fresh underdispersed data",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Real execution (demuxmix 1.8.0, R 4.4.3) on a freshly generated 600-cell 3-tag near-constant-background dataset (seed 90210, independent of the fixer's data). Reproduced the exact crash: 'missing value where TRUE/FALSE needed'. Independently tested the fixer's specific claim that manual clusterInit alone does NOT avoid this crash (using demuxmix's documented clusterInit format, confirmed via ?demuxmix): clusterInit alone still threw the identical error. The Skill's fixed tryCatch -> model='naive' guard completed successfully on the same data (with the expected 'Not all models converged' warning, which the Skill correctly tells the agent to check). Naive-fallback output verified deterministic across 2 runs.",
+        "basic": 37,
+        "specialized": 55,
+        "total": 92,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "The underdispersion glm.nb crash reproduces on fresh, independently-generated data", "result": "PASS", "note": "Identical error message on 2 independently-generated underdispersed datasets" },
+          { "text": "The fixed tryCatch guard recovers via model='naive' instead of crashing", "result": "PASS", "note": "Completed with a classification table on the exact data that crashed the raw call" },
+          { "text": "Manual clusterInit alone does NOT avoid this specific crash, as the fixer's log claims", "result": "PASS", "note": "Independently verified using demuxmix's documented clusterInit list format; still threw the identical error" },
+          { "text": "dmmClassify()'s convergence warning is surfaced and the Skill tells the agent to check it", "result": "PASS", "note": "'Not all models converged' warning fired; SKILL.md's guard code comment and prose both flag this" },
+          { "text": "Naive-fallback output is deterministic across repeated runs", "result": "PASS", "note": "2 runs on identical input, identical HTO call vector" }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Variant A (new tool coverage)",
+        "label": "GMM-Demux CLI, end-to-end on fresh 4-tag data -- the Skill previously had no runnable GMM-Demux example",
+        "status": "COMPLETED",
+        "status_flag": "\u26a0\ufe0f",
+        "note": "Real execution (GMM-Demux 0.2.2.3, tools/demuxem-venv). Freshly generated 1000-cell 4-tag dataset (seed 31337). Followed the Skill's exact CLI pattern including the float-dtype caveat. Result: 1000/1000 global class agreement, 840/840 singlet sample-ID agreement against ground truth; identical Cluster_id across 2 repeated runs. One documentation inaccuracy found: SKILL.md claims the SSD-mtx writer step 'always' fails after classification -- on my run it completed with exit 0 and wrote SSD_mtx/ successfully. The advice to check GMM_full.csv rather than the exit code remains safe regardless, but 'always' is not accurate; see recommendations.",
+        "basic": 37,
+        "specialized": 53,
+        "total": 90,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "GMM-Demux CLI runs end-to-end on fresh data per the Skill's documented pattern", "result": "PASS", "note": "GMM_full.csv and GMM_full.config both written correctly" },
+          { "text": "Classification matches ground truth", "result": "PASS", "note": "1000/1000 global, 840/840 singlet sample-ID" },
+          { "text": "The float-dtype CSV caveat is accurate and necessary", "result": "PASS", "note": "Applied it proactively per the Skill's instructions; avoided the documented LossySetitemError" },
+          { "text": "Output is deterministic across repeated runs", "result": "PASS", "note": "2 runs, identical Cluster_id column" },
+          { "text": "The SSD-mtx writer 'always' fails after classification, as SKILL.md states", "result": "FAIL", "note": "My run exited 0 and wrote SSD_mtx/{barcodes,features,matrix} without error -- the failure is not universal; SKILL.md's 'always' overclaims" }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B (P1 verification)",
+        "label": "demuxEM/pegasus Windows build-failure claim -- is this a genuine incompatibility or a fixer shortcut?",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Independently attempted `pip install pegasusio` in the fixer's tools/demuxem-venv (fresh install attempt, not reusing any cached build artifact). Reproduced the exact failure the fixer reported: `io_funcs.obj : error LNK2001: unresolved external symbol getline` / `fatal error LNK1120: 1 unresolved externals`, compiling against `getline` in ext_modules/io_funcs.c, which MSVC does not provide. Confirmed the venv's pinned numpy/scipy/scikit-learn (needed for GMM-Demux) were untouched by the failed attempt.",
+        "basic": 37,
+        "specialized": 52,
+        "total": 89,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "pegasusio genuinely fails to build on Windows with the documented error", "result": "PASS", "note": "Identical LNK2001/getline error reproduced independently" },
+          { "text": "The failure is a platform incompatibility, not a missed install step or version pin", "result": "PASS", "note": "getline is POSIX-only; MSVC's link.exe has no equivalent symbol" },
+          { "text": "The failed build attempt did not corrupt the shared GMM-Demux venv", "result": "PASS", "note": "numpy 1.26.4 / scipy 1.13.1 / scikit-learn 1.5.2 / GMM-Demux 0.2.2.3 unchanged after the attempt" },
+          { "text": "SKILL.md accurately discloses this limitation rather than shipping a broken/unverified example", "result": "PASS", "note": "Version Compatibility line and the ambient-background section both state the Linux/Mac-only limitation inline" }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress (documentation-accuracy audit)",
+        "label": "Cross-check the fixed Skill's own factual claims against everything executed in Inputs 1-4",
+        "status": "COMPLETED",
+        "status_flag": "\u26a0\ufe0f",
+        "note": "Reviewed every claim added by the fix (hashsolo threshold/guard, demuxmix failure mode/remedy, GMM-Demux caveats, Common Errors and Threshold-reference rows, usage-guide.md dedup) against Inputs 1-4's real execution evidence. hashsolo and demuxmix claims all matched exactly. The GMM-Demux 'always fails' claim (Input 3) did not hold on my run -- the one inaccuracy found across the whole fix. usage-guide.md's Tips section correctly points to SKILL.md rather than restating it (no redundant duplication introduced by the fix).",
+        "basic": 32,
+        "specialized": 44,
+        "total": 76,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "hashsolo and demuxmix Common Errors / threshold-reference entries accurately reflect verified behavior", "result": "PASS", "note": "Matches Inputs 1-2 exactly" },
+          { "text": "GMM-Demux Common Errors / prose entry accurately reflects verified behavior", "result": "FAIL", "note": "'Always' fails does not hold; see Input 3" },
+          { "text": "usage-guide.md avoids restating SKILL.md content added by the fix (dedup)", "result": "PASS", "note": "Single one-line pointer added, not a restatement" },
+          { "text": "The fix introduces no new scope violations or fabricated claims", "result": "PASS", "note": "All added content is either verified-executed or explicitly disclosed as an environment limitation" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 37.2,
+    "dynamic_weighted": 52.9,
+    "score": 90,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "\u2b50",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "The P0 (hashsolo silently misclassifying 100% of cells Negative at 2 hashtags) is genuinely fixed: independently reproduced the original failure on fresh, unseen data (11.3% accuracy) and confirmed the fix recovers it (91.9% global, 100% singlet sample-ID agreement), deterministically.",
+    "The demuxmix P1 crash-guard fix is genuinely resolved, and the fixer's specific claim that manual clusterInit alone does NOT fix this crash (only model='naive' does) was independently verified true -- a checkable claim that held up.",
+    "The new GMM-Demux example is verified end-to-end on independently-generated data (1000/1000 global, 840/840 singlet sample-ID agreement), closing the 'no runnable example for 2 of 5 named tools' P1.",
+    "demuxEM/pegasus's Windows build failure is a genuine platform incompatibility (independently reproduced the exact LNK2001/getline linker error), not a fixer shortcut for skipping an inconvenient example.",
+    "All three fixed code paths (hashsolo, demuxmix naive-fallback, GMM-Demux) are independently verified fully deterministic on repeated identical input."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "GMM-Demux's SSD-mtx writer does not 'always' fail as SKILL.md states",
+      "observed_in": [3, 5],
+      "problem": "SKILL.md says the SSD-mtx writer step 'always attempts to write a same-sample-droplet mtx file after classification and that step throws ValueError... even on an otherwise-correct run.' On a fresh 1000-cell 4-tag run, GMM-Demux exited 0 and wrote SSD_mtx/ without error.",
+      "root_cause": "The fixer's own test run happened to trigger the failure and generalized it as universal; it appears to be data- or environment-dependent rather than deterministic across all inputs.",
+      "fix": "Soften 'always attempts... and that step throws' to something like 'can throw... on some inputs/environments'; keep the underlying advice (judge success by GMM_full.csv, not exit code) unchanged, since it is safe regardless of whether the mtx step fails."
+    },
+    {
+      "priority": "P2",
+      "title": "No bundled example dataset for smoke-testing the fixed patterns",
+      "observed_in": [],
+      "problem": "The Skill still ships no small synthetic HTO dataset alongside examples/, so verifying the hashsolo/demuxmix/GMM-Demux patterns requires generating data from scratch each time (as this audit and the original audit both did independently).",
+      "root_cause": "examples/ contains only code, no fixture data.",
+      "fix": "Add a small synthetic 2-3 tag HTO CSV under examples/data/ so the hashsolo and GMM-Demux patterns are runnable as-is without the agent first writing a data generator."
+    }
+  ]
+}
