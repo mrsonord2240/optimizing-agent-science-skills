@@ -8,39 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (72)
-
-### `bio-ncbi-datasets-cli` — 'Gene metadata across species' pattern does not work as documented
-
-- Skill: 73, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/database-access/ncbi-datasets-cli) · [viewer](skills/bio-ncbi-datasets-cli/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 2
-- Problem: SKILL.md's code pattern and examples/gene_metadata.sh's own default (TAXON=Mammalia) call `datasets summary gene symbol BRCA1 --taxon Mammalia`, which fails outright: 'gene requires an at-or-below-species-level taxon.' There is no supported way to get multi-species gene records via this subcommand.
-- Root cause: The doc treats --taxon on `summary gene symbol` as a clade-level filter, but the flag's real contract (confirmed via live --help and the error text) is single-species only; the only true multi-species mechanism is the separate --ortholog flag, which returns a materially narrower result (one representative per species).
-- Fix: Rewrite 'Gene metadata across species' to either loop --taxon <species> per species of interest, or point at --ortholog all and remove the false claim that --taxon <clade> performs a cross-species query. Change gene_metadata.sh's default TAXON to a real species.
-
-### `bio-ncbi-datasets-cli` — dataformat --fields names are stale across every shipped code block
-
-- Skill: 73, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/database-access/ncbi-datasets-cli) · [viewer](skills/bio-ncbi-datasets-cli/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 1, 2
-- Problem: `dataformat tsv genome --fields assembly-level,scaffold-n50,contig-n50,total-sequence-length` and `dataformat tsv gene --fields taxname,nomenclature-authority-symbol` both error 'field(s) [...] not recognized' on the installed CLI (18.37.0).
-- Root cause: SKILL.md is pinned to '16.0+ (2024)'; the field-name catalog was renamed by 18.37.0 and none of the doc's own dataformat calls were re-verified against a current --help catalog.
-- Fix: Update every --fields list to: assminfo-level, assmstats-scaffold-n50, assmstats-contig-n50, assmstats-total-sequence-len, tax-name. Drop nomenclature-authority-symbol entirely; no replacement field exists.
-
-### `bio-ncbi-datasets-cli` — bulk_dehydrated.sh silently corrupts every downloaded filename
-
-- Skill: 73, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/database-access/ncbi-datasets-cli) · [viewer](skills/bio-ncbi-datasets-cli/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 3, 5
-- Problem: fetch.txt is 3 tab-separated columns (<url>, a '0' placeholder, <path>) on the installed CLI, not the 2 columns the script's comment and its awk line (line 31) assume. Running it unmodified writes 'out=0' for every queued file, with no error at any point — confirmed at both 1-file and 273-file scale.
-- Root cause: fetch.txt's schema gained a byte-size-placeholder middle column since the script was last verified against a live CLI version.
-- Fix: Change line 31 to `awk -F'\t' '{print $1"\n out="$3}'` (third field, not second), and add a sanity check that fails loudly if any generated 'out=' line reads 'out=0'.
-
-### `bio-ncbi-datasets-cli` — --ortholog bare-flag syntax is broken with a misleading error
-
-- Skill: 73, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/database-access/ncbi-datasets-cli) · [viewer](skills/bio-ncbi-datasets-cli/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 4
-- Problem: SKILL.md's 'Find orthologs for a gene' pattern and usage-guide.md's ortholog example call `--ortholog --as-json-lines` (bare flag). On 18.37.0 this makes the CLI consume '--as-json-lines' as --ortholog's argument, then fail trying to resolve it as a taxon name, printing 10 unrelated taxonomic suggestions with no indication the real problem is a missing flag value.
-- Root cause: --ortholog changed from a boolean flag to `--ortholog strings` between CLI major versions; the doc's Version Compatibility section anticipates this class of drift abstractly but its own examples were not re-verified.
-- Fix: Change every --ortholog invocation in SKILL.md and usage-guide.md to `--ortholog all` (or an explicit taxon list).
+## P1 (69)
 
 ### `bio-alignment-multiple` — Fix MUSCLE5 ensemble commands (-super5 has no .efa)
 
@@ -233,6 +201,14 @@ None open.
 - Problem: The newly supported multi-condition path inherits treat(lfc = log2(1.5)) = 0.585 log2 from the two-condition workflow. On a dose design whose LowDose effect is a real 0.7 log2, Low_vs_Ctl returns 0 calls while High_vs_Ctl returns 20 -- a reader following the block would report "no effect at low dose" for 120 proteins that genuinely respond. The floor is correct practice for a single pairwise comparison; on a monotonic dose series it is a design decision that must be stated.
 - Root cause: The contrast machinery was generalised to N levels while the effect-size threshold stayed a single global constant written for the two-condition case.
 - Fix: Add one line beside the treat() call: "lfc = log2(1.5) is a per-contrast minimum effect. On a dose series or time course the intermediate levels carry a SMALLER true effect than the extreme one, so the same floor can return zero calls there while the top level is significant -- lower lfc, or screen with the eBayes/topTable F-test documented below and report the pairwise contrasts only for direction."
+
+### `bio-ncbi-datasets-cli` — `datasets rehydrate` does not verify pre-existing files -- 'Checksum verification (automatic)' claim is false for the documented aria2c + rehydrate pattern
+
+- Skill: 87.8, Production Ready · [mrsonord2240/bioSkills@bac15cc](https://github.com/mrsonord2240/bioSkills/tree/bac15ccbda059dfec158576ae61cf7249a673cdb/database-access/ncbi-datasets-cli) · [viewer](skills/bio-ncbi-datasets-cli/mrsonord2240-bioSkills@bac15cc/viewer.md)
+- Observed in inputs: 10
+- Problem: SKILL.md's 'Checksum verification (automatic)' section states 'Rehydrate workflows also verify. If a file fails checksum, Datasets retries up to 3 times then errors,' and bulk_dehydrated.sh's own Step 3 comment says 'datasets rehydrate validates checksums of all files.' Neither is true when the target file already exists at the expected path: `datasets rehydrate` reports 'All N files already rehydrated' without checking size or checksum, confirmed both via a real NCBI bot-block (aria2c wrote an HTML error page as if it were genome data) and via manual corruption against the tool's own recorded expected byte length in dataset_catalog.json.
+- Root cause: `datasets rehydrate`'s local-state check appears to be presence-only (does a file exist at the expected relative path), not a size or checksum comparison against the values it itself records in dataset_catalog.json.uncompressedLengthBytes.
+- Fix: Add a step to bulk_dehydrated.sh (and a note in SKILL.md's Checksum verification section) that independently verifies file size against dataset_catalog.json's uncompressedLengthBytes (or re-downloads into a clean directory) after the aria2c leg, rather than trusting `datasets rehydrate`'s 'already rehydrated' report as a correctness signal. Downgrade the 'Rehydrate workflows also verify' claim to state this limitation explicitly.
 
 ### `bio-causal-genomics-genomic-sem` — commonfactorGWAS() Q_SNP does not discriminate under DWLS on two independent synthetic panels
 
@@ -586,23 +562,7 @@ None open.
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (273)
-
-### `bio-ncbi-datasets-cli` — Nonexistent accessions fail silently, undocumented
-
-- Skill: 73, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/database-access/ncbi-datasets-cli) · [viewer](skills/bio-ncbi-datasets-cli/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 7
-- Problem: `datasets summary genome accession GCF_999999999.1` exits 0 and prints `{"total_count": 0}` with no 'not found' message; an agent or script checking exit code alone would treat this as success.
-- Root cause: Not covered by SKILL.md's 'Common errors' table, which lists 7 other rows but not this response shape.
-- Fix: Add a Common errors row: '{"total_count": 0}, exit 0 -> accession doesn't exist, was withdrawn, or was superseded; verify at ncbi.nlm.nih.gov/datasets.'
-
-### `bio-ncbi-datasets-cli` — 'dataformat version' prints the literal string 'undefined'
-
-- Skill: 73, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/database-access/ncbi-datasets-cli) · [viewer](skills/bio-ncbi-datasets-cli/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: —
-- Problem: `dataformat.exe version` exits 0 with stdout exactly 'undefined', despite --help describing it as printing the client version. datasets --version works correctly.
-- Root cause: Version-reporting is unimplemented for dataformat specifically in this CLI build.
-- Fix: Note this defect explicitly in the Version Compatibility section; tell the agent to confirm the dataformat build via its --help banner or by checking it shipped alongside a known-good datasets binary, not via dataformat version.
+## P2 (272)
 
 ### `bio-crispr-screens-copy-number-correction` — negative_control_sgrnas empty-dict case raises an undocumented ValueError
 
@@ -1283,6 +1243,14 @@ None open.
 - Problem: results now carries a contrast column and a global-BH significant column, but the schema is discoverable only by reading the code. An agent chaining this into a pathway Skill has no named contract, and the per-contrast breakdown is printed rather than returned.
 - Root cause: Output shape has always been implicit in the write.csv line.
 - Fix: State the columns once above step 7 -- protein, contrast, logFC, AveExpr, t, P.Value, adj.P.Val, significant -- and note that significance comes from the global decideTests, not from adj.P.Val alone.
+
+### `bio-ncbi-datasets-cli` — Virus download workflow has no worked code pattern
+
+- Skill: 87.8, Production Ready · [mrsonord2240/bioSkills@bac15cc](https://github.com/mrsonord2240/bioSkills/tree/bac15ccbda059dfec158576ae61cf7249a673cdb/database-access/ncbi-datasets-cli) · [viewer](skills/bio-ncbi-datasets-cli/mrsonord2240-bioSkills@bac15cc/viewer.md)
+- Observed in inputs: 9
+- Problem: SKILL.md's scope table names `datasets download virus` as in-scope, and the command works correctly when run, but there is no 'Code patterns' entry for it (unlike genome/gene), no --include guidance, and no dataformat virus-genome field example.
+- Root cause: The Skill's worked examples focus on genome/gene; virus was likely added to the scope table without a matching code-pattern section.
+- Fix: Add a short 'Download virus assemblies' code pattern alongside the existing genome/gene patterns, including a dataformat tsv virus-genome --fields example verified against a live --help catalog.
 
 ### `bio-causal-genomics-genomic-sem` — Second-order p-factor identification rule not stated
 

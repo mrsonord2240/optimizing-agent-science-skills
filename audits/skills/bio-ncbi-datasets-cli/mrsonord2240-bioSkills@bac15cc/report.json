@@ -1,0 +1,224 @@
+{
+  "meta": {
+    "skill_name": "bio-ncbi-datasets-cli",
+    "description": "Download genome assemblies, gene records, and ortholog data from NCBI using the modern Datasets v2 CLI (replaces assembly_summary.txt scraping and many EFetch workflows). Use when bulk-pulling genome assemblies, gene metadata across species, ortholog sets, or BLAST databases; when E-utilities are too slow for genome-scale work; or when automatic checksum verification, parallel download, and clean accession-driven retrieval are required.",
+    "evaluated_on": "2026-09-19",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 10,
+    "source": "mrsonord2240/bioSkills@bac15cc:database-access/ncbi-datasets-cli",
+    "reaudit_of": "F:/OpenScience/audits/_pre-fix-20260919/bio-ncbi-datasets-cli (73, Beta Only, not deployable)",
+    "fix_log": "F:/optimizing-agent-science-skills/fixes/bio-ncbi-datasets-cli.md"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "Every value checked across all 10 inputs (organism names, lengths, gene IDs, ortholog counts, assembly stats, release dates) traced to real, live NCBI Datasets API responses on CLI 18.37.0; no fabricated accessions, counts, or metadata observed anywhere, including in the two wholly new workflows exercised (virus download, Insecta ortholog set)." },
+      "practice_boundaries": { "result": "PASS", "detail": "Not applicable in practice -- this Skill retrieves public genome/gene database records only; no diagnostic, prescriptive, or patient-level content is produced or possible via this CLI." },
+      "methodological_ground": { "result": "PASS", "detail": "No statistical or causal claims are made. The ortholog-set caveat (one representative per species, not tree-reconciled orthology) remains accurately stated in both SKILL.md and usage-guide.md." },
+      "code_usability": { "result": "PASS", "detail": "All 3 shipped example scripts (gene_metadata.sh, download_genome.sh, bulk_dehydrated.sh) now run unmodified against the installed CLI (18.37.0) and produce correct output -- confirmed by direct execution, not inspection. This reverses the pre-fix veto-adjacent finding (Code Usability was PASS pre-fix too, but only because the CLI itself worked while the Skill's own scripts failed; now both the CLI and the Skill's scripts work)." }
+    }
+  },
+  "static_score": {
+    "subtotal": 90,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 11, "max": 12, "note": "Genome/gene/ortholog/virus/dehydrate-rehydrate workflows all verified correct on live re-run, including two workflows (virus download, Insecta ortholog set) beyond the fixer's own tests. -1 for the newly found rehydrate-verification gap (see reliability) not yet reflected in the doc's 'Checksum verification (automatic)' claim." },
+      "reliability": { "score": 9, "max": 12, "note": "The aria2c filename-corruption P1 is genuinely fixed (awk $2->$3 plus a fail-loud sanity check, verified on 2 fresh species the fixer never tried) and the not-found case is now documented. NEW finding: `datasets rehydrate` -- the script's own documented 'Step 3: verify' safety net and SKILL.md's 'Checksum verification (automatic)' claim -- does not actually verify pre-existing files at all (confirmed twice: via a live NCBI bot-block that silently wrote an HTML error page as 'real' data, and via manual byte corruption against the tool's own recorded expected file size). This is a real, reproducible gap in the documented safety net for the exact bulk/HPC pattern the Skill recommends, not introduced by this fix but not caught by it either." },
+      "performance_context": { "score": 8, "max": 8, "note": "usage-guide.md's redundancy pass (Prerequisites/8-step summary/Tips removed, all facts preserved once in SKILL.md) reduces token cost further without losing coverage; dehydrated-first guidance remains genuinely efficient." },
+      "agent_usability": { "score": 14, "max": 16, "note": "All four live failures from the pre-fix audit (taxon-level gene query, two field-name sets, bare --ortholog) are gone; an agent following SKILL.md's code patterns verbatim now succeeds on every documented pattern tested, including on genes/clades the fix was never explicitly verified against (TP53, Insecta). -2 because the new rehydrate-verification gap is not yet reflected in Failure Modes/Common Errors." },
+      "human_usability": { "score": 8, "max": 8, "note": "Error messages remain mostly clear; the two previously-misleading cases (silent zero-count, bare --ortholog) are now both documented in Common errors, so an agent hitting them has a path forward even though the CLI's own messages are unchanged." },
+      "security": { "score": 10, "max": 12, "note": "Unchanged from pre-fix: consistent shell-variable quoting, no hardcoded secrets, --api-key documented only as an inline argument." },
+      "maintainability": { "score": 11, "max": 12, "note": "All 3 example scripts now run unmodified against the pinned CLI version (Testability was the pre-fix weak point at 8/12); redundancy pass improved modularity by removing duplicated content between SKILL.md and usage-guide.md." },
+      "agent_specific": { "score": 19, "max": 20, "note": "Escape-hatch table and composability remain strong and independently verified (still true: datasets download has no SRA subcommand); virus workflow -- named in the scope table but never tested by either the original audit or the fix -- also verified correct, broadening confidence in the doc's other scope claims." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 86.3,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 33, "total": 37 },
+    "inputs": [
+      {
+        "index": 1, "type": "Canonical",
+        "label": "Download phiX174 reference genome (GCF_000819615.1) + assembly stats [regression]",
+        "status": "COMPLETED", "status_flag": "\u2705",
+        "note": "Corrected --fields list (assminfo-level, assmstats-scaffold-n50, assmstats-contig-n50, assmstats-total-sequence-len) resolves cleanly, no 'not recognized' error. Also cross-checked a different field combination (assminfo-release-date, via the Salmonella date-filter pattern) -- 1764 real rows with real 2024+ dates.",
+        "basic": 38, "specialized": 55, "total": 93,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Output reports the correct organism, genome length, and protein count for GCF_000819615.1", "result": "PASS", "note": "Organism 'Escherichia phage phiX174', 5,386 bp, 11 CDS in protein.faa -- matches the known reference record and the pre-fix run." },
+          { "text": "dataformat tsv conversion succeeds using SKILL.md's own documented --fields list", "result": "PASS", "note": "Corrected field names resolve with no error; one row returned, all values correct (level=Complete Genome, N50=5386)." },
+          { "text": "Downloaded zip contains all --include file types requested", "result": "PASS", "note": "genomic.fna, protein.faa, cds_from_genomic.fna, genomic.gff, sequence_report.jsonl all present." },
+          { "text": "A second, independent --fields combination (assminfo-release-date pattern) also resolves cleanly", "result": "PASS", "note": "Salmonella enterica chromosome/complete, released-after 2024-01-01: 1,764 real rows with real release dates, no field errors." }
+        ]
+      },
+      {
+        "index": 2, "type": "Variant A",
+        "label": "BRCA1 gene metadata across Mammalia via --ortholog [regression]",
+        "status": "COMPLETED", "status_flag": "\u2705",
+        "note": "The reworked pattern (--ortholog <taxon> replacing the broken --taxon Mammalia) reproduces the fixer's own 272-row result exactly.",
+        "basic": 37, "specialized": 54, "total": 91,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "datasets summary gene symbol BRCA1 --ortholog Mammalia completes successfully", "result": "PASS", "note": "272 real rows (271 species + header), matches fix log's claim exactly." },
+          { "text": "examples/gene_metadata.sh runs with its own new defaults (BRCA1, Mammalia)", "result": "PASS", "note": "Ran unmodified, no arguments changed; correct output, no crash." },
+          { "text": "dataformat tsv gene conversion succeeds using the doc's corrected --fields list", "result": "PASS", "note": "gene-id, symbol, tax-name, description, chromosomes all resolve; nomenclature-authority-symbol correctly removed (no replacement exists)." },
+          { "text": "SKILL.md correctly states --taxon is single-species-only and --ortholog is the cross-species mechanism", "result": "PASS", "note": "Confirmed live: --taxon Mammalia on gene symbol still errors 'gene requires an at-or-below-species-level taxon'; the doc's own text matches this exactly." }
+        ]
+      },
+      {
+        "index": 3, "type": "Edge",
+        "label": "Dehydrated discovery + rehydrate for a single accession [regression]",
+        "status": "COMPLETED", "status_flag": "\u2705",
+        "note": "fetch.txt is still 3 columns on 18.37.0 (unchanged CLI behavior) but SKILL.md/bulk_dehydrated.sh now correctly document 3, not 2. Clean-state rehydrate recovers the file correctly. See Input 10 for a deeper probe of rehydrate's verification behavior that this input's happy path does not surface.",
+        "basic": 36, "specialized": 53, "total": 89,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "fetch.txt matches SKILL.md's documented 3-column format", "result": "PASS", "note": "3 tab-separated columns confirmed (url, '0' placeholder, path) -- doc text updated to match reality." },
+          { "text": "datasets rehydrate completes and produces files identical to a direct download, from a clean directory", "result": "PASS", "note": "Fresh dehydrated download, immediately rehydrated, correct 5,386 bp phiX174 FASTA recovered." },
+          { "text": "bulk_dehydrated.sh's awk transform (line 33, now $3) produces a usable, correct aria2c input file", "result": "PASS", "note": "out= line reads the real relative path, not '0'; confirmed on this accession and independently on 2 more species in Input 5." },
+          { "text": "The script's own sanity check (grep for 'out=0') would catch a regression of the original bug", "result": "PASS", "note": "Manually reverted the awk field index to $2 and confirmed the sanity check correctly fires and exits 1 before any download starts." }
+        ]
+      },
+      {
+        "index": 4, "type": "Variant B",
+        "label": "NCBI ortholog set for human BRCA1 via --ortholog all [regression]",
+        "status": "COMPLETED", "status_flag": "\u2705",
+        "note": "558 real ortholog records reproduced exactly; bare --ortholog still fails with the same misleading error, but this is now correctly documented rather than presented as working.",
+        "basic": 38, "specialized": 55, "total": 93,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Corrected --ortholog all returns real, biologically correct ortholog records", "result": "PASS", "note": "558 records, matches fix log exactly; human/mouse/rat/chimp/macaque/dog/chicken/cow BRCA1 orthologs confirmed present." },
+          { "text": "SKILL.md no longer presents the broken bare-flag form as the working pattern", "result": "PASS", "note": "Code pattern now reads '--ortholog all --as-json-lines' explicitly; the bare-flag failure is documented separately in Common errors, not presented as a happy path." },
+          { "text": "Output correctly scopes to the requested gene (BRCA1) only", "result": "PASS", "note": "All 558 rows are BRCA1 orthologs, no unrelated genes present." },
+          { "text": "The bare-flag error, when it does occur, matches SKILL.md's Common errors table description", "result": "PASS", "note": "Live error: \"The taxonomy name '--as-json-lines' is not exact\" with unrelated taxa suggested -- exact match to the table's documented symptom." }
+        ]
+      },
+      {
+        "index": 5, "type": "Stress",
+        "label": "Bulk dehydrated pull, fresh species not used by the fixer (Mycoplasma genitalium, Buchnera aphidicola)",
+        "status": "COMPLETED", "status_flag": "\u2705",
+        "note": "The fixer verified the awk fix on Deinococcus radiodurans and GCF_000819615.1 only. Re-ran the identical mechanism on two different, unrelated genera to confirm the fix isn't accidentally specific to the fixer's own test data.",
+        "basic": 37, "specialized": 54, "total": 91,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Dehydrated discovery + awk transform produces correct paths on a genus the fixer never tested", "result": "PASS", "note": "Mycoplasma genitalium (1 genome, 3 files) and Buchnera aphidicola (1 genome, 3 files): both produce correct 'out=' paths, zero 'out=0' lines." },
+          { "text": "datasets rehydrate recovers 100% of queued files from a clean directory", "result": "PASS", "note": "Both species: 'Completed 3 of 3' / 'Found 3 of 3', real file content confirmed (correct FASTA/GFF/protein headers, sizes matching the tool's own dataset_catalog.json)." },
+          { "text": "Pull stays bounded to the requested taxon", "result": "PASS", "note": "1 genome each, consistent with --reference on a low-diversity genus; no scope explosion." },
+          { "text": "Fix generalizes across CLI 'kind' of genome (small bacterial vs the fixer's own Deinococcus/phiX)", "result": "PASS", "note": "Same 3-column fetch.txt shape and same correct awk behavior on unrelated taxa confirms this is a general CLI-version fact, not an accession-specific fix." }
+        ]
+      },
+      {
+        "index": 6, "type": "Scope Boundary",
+        "label": "Request raw SRA sequencing reads via the Datasets CLI [regression]",
+        "status": "COMPLETED", "status_flag": "\u2705",
+        "note": "Unchanged from pre-fix; correctly out of scope.",
+        "basic": 39, "specialized": 54, "total": 93,
+        "assertions_passed": 3, "assertions_total": 3,
+        "assertions": [
+          { "text": "Agent declines to use Datasets CLI for raw SRA reads and names the correct tool", "result": "PASS", "note": "SKILL.md's scope table and Failure Modes both explicitly name sra-data." },
+          { "text": "datasets download genuinely has no SRA-read subcommand", "result": "PASS", "note": "Live 'datasets download --help' lists only gene, genome, taxonomy, virus -- confirmed again on 18.37.0." },
+          { "text": "No wasted or incorrect CLI attempt is made against a nonexistent subcommand", "result": "PASS", "note": "Scope table alone answers correctly." }
+        ]
+      },
+      {
+        "index": 7, "type": "Adversarial",
+        "label": "Nonexistent and malformed genome accessions [regression]",
+        "status": "COMPLETED", "status_flag": "\u2705",
+        "note": "Same underlying CLI behavior as pre-fix (silent {\"total_count\": 0}, exit 0), but this is now documented in SKILL.md's Common errors table, closing the pre-fix P2.",
+        "basic": 36, "specialized": 52, "total": 88,
+        "assertions_passed": 3, "assertions_total": 3,
+        "assertions": [
+          { "text": "A nonexistent-but-well-formed accession still silently returns {\"total_count\": 0}, exit 0 (unchanged CLI behavior)", "result": "PASS", "note": "GCF_999999999.1: reproduced exactly, confirming this is a real, stable CLI quirk, not a one-off." },
+          { "text": "A malformed accession produces a clear, actionable error", "result": "PASS", "note": "'invalid or unsupported assembly accession: NOT_AN_ACCESSION', exit code 1 -- unchanged, correct." },
+          { "text": "SKILL.md's Common errors table now covers the not-found-silent-success case", "result": "PASS", "note": "New row present: '{\"total_count\": 0}, exit code 0 | Accession doesn't exist, was withdrawn, or was superseded | ...' -- closes the pre-fix P2." }
+        ]
+      },
+      {
+        "index": 8, "type": "Variant C (new)",
+        "label": "Ortholog generalization beyond BRCA1: TP53 (Mammalia) and white (Insecta)",
+        "status": "COMPLETED", "status_flag": "\u2705",
+        "note": "The fixer verified --ortholog only on BRCA1. This tests a second human gene and, separately, the other clade SKILL.md claims coverage for (insects), using a Drosophila-specific gene with no human ortholog.",
+        "basic": 38, "specialized": 55, "total": 93,
+        "assertions_passed": 3, "assertions_total": 3,
+        "assertions": [
+          { "text": "gene_metadata.sh TP53 Mammalia (a gene the fixer never tested) produces a correct, real ortholog set", "result": "PASS", "note": "272 rows (271 species: human, mouse, rat, dog, pig, cattle, macaque, cat, rabbit, horse, ...), all real TP53/Trp53/Tp53 orthologs." },
+          { "text": "--ortholog Insecta (the clade the fixer never tested) produces a correct, real ortholog set", "result": "PASS", "note": "150+ real insect species (Drosophila melanogaster, Anopheles gambiae, Bombyx mori, Aedes aegypti, Tribolium castaneum, ...) for the 'white' pigmentation gene, using --taxon 'Drosophila melanogaster' to anchor the query." },
+          { "text": "No fabricated species or gene records appear in either generalization", "result": "PASS", "note": "All organism names, gene IDs, and descriptions cross-checked as real, biologically correct entries." }
+        ]
+      },
+      {
+        "index": 9, "type": "Scope Boundary (new)",
+        "label": "Virus genome download (named in SKILL.md's scope table, untested by the original 7 inputs)",
+        "status": "COMPLETED", "status_flag": "\u26a0\ufe0f",
+        "note": "`datasets download virus genome taxon SARS-CoV-2 --refseq` was never exercised by the original audit or the fix. It works correctly, but SKILL.md's scope table is the only place this command appears -- there is no worked code pattern for it (unlike genome/gene), so an agent has to infer the exact flags from the one-line scope-table entry.",
+        "basic": 33, "specialized": 47, "total": 80,
+        "assertions_passed": 3, "assertions_total": 4,
+        "assertions": [
+          { "text": "datasets download virus genome taxon SARS-CoV-2 --refseq succeeds", "result": "PASS", "note": "5-file zip produced (genomic.fna, data_report.jsonl, dataset_catalog.json, md5sum.txt, README.md), no error." },
+          { "text": "Downloaded genome is real, correctly sized SARS-CoV-2 reference sequence", "result": "PASS", "note": "genomic.fna is 30,428 bytes, consistent with the known ~29.9 kb SARS-CoV-2 genome; not a placeholder or truncated file." },
+          { "text": "The command matches SKILL.md's documented form", "result": "PASS", "note": "SKILL.md's scope table shows exactly 'datasets download virus genome taxon SARS-CoV-2'; --refseq was inferred, not required, but the base command alone also succeeds." },
+          { "text": "SKILL.md provides a complete, testable code pattern for virus workflows (like it does for genome/gene)", "result": "FAIL", "note": "Only a one-line scope-table mention exists; no 'Code patterns' section entry, no --include guidance, no dataformat virus-genome field example -- an agent has less to go on here than for any other in-scope workflow." }
+        ]
+      },
+      {
+        "index": 10, "type": "Adversarial (new)",
+        "label": "Does `datasets rehydrate` actually verify pre-existing/corrupted files, as SKILL.md and bulk_dehydrated.sh's own Step 3 comment claim?",
+        "status": "PARTIAL", "status_flag": "\u274c",
+        "note": "NEW DEFECT, not part of the fixer's 6 findings and not introduced by the fix. Reproduced twice: (1) a live NCBI bot-block during the WSL aria2c leg silently wrote the misuse.ncbi.nlm.nih.gov abuse-page HTML as if it were real genome data, and a subsequent `datasets rehydrate --directory .` reported 'All 3 files already rehydrated' without touching the corrupted files; (2) manually replaced a 373,156-byte genomic.gff (the tool's own dataset_catalog.json records this exact expected size) with a 50-byte placeholder string and re-ran rehydrate -- same 'already rehydrated' result, file untouched. rehydrate appears to check only file presence at the expected path, not size or checksum, despite SKILL.md's 'Checksum verification (automatic) ... Rehydrate workflows also verify' claim and bulk_dehydrated.sh's Step 3 comment ('datasets rehydrate validates checksums of all files').",
+        "basic": 22, "specialized": 30, "total": 52,
+        "assertions_passed": 1, "assertions_total": 4,
+        "assertions": [
+          { "text": "datasets rehydrate runs without crashing on a directory with pre-existing files", "result": "PASS", "note": "Exits 0, prints a completion message, no crash." },
+          { "text": "rehydrate detects and re-fetches a file that is present but the wrong size (373,156 expected vs 50 actual, per its own catalog)", "result": "FAIL", "note": "Reported 'already rehydrated'; file left unchanged at 50 bytes." },
+          { "text": "rehydrate detects and re-fetches a file corrupted by a real network failure (NCBI bot-block writing an HTML error page)", "result": "FAIL", "note": "Same 'already rehydrated' result; the abuse.shtml HTML content was left in place under the real genome filename." },
+          { "text": "SKILL.md's 'Checksum verification (automatic)' claim holds for the documented aria2c + rehydrate HPC pattern", "result": "FAIL", "note": "The claim is true for a clean, from-scratch rehydrate (verified in Inputs 3/5) but false for the compound pattern the Skill itself recommends as the bulk/HPC path (dehydrate -> aria2c parallel pull -> rehydrate 'to verify')." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 36.0,
+    "dynamic_weighted": 51.8,
+    "score": 87.8,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "\u2b50",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "All 4 P1s and both P2s from the pre-fix audit are genuinely fixed, verified by live execution on data the fixer never tested: a second human gene (TP53), a second clade (Insecta), and two species the fixer's own aria2c/rehydrate tests didn't cover (Mycoplasma genitalium, Buchnera aphidicola).",
+    "The Python wrapper's camelCase -> snake_case field fix and the dataformat --fields corrections both hold against fresh live API responses, not just the fixer's own cached examples.",
+    "usage-guide.md's redundancy pass is real and clean: every fact it lost is present, correct, and non-duplicated in SKILL.md; no orphaned or contradictory claims found.",
+    "A genuinely new, previously-undetected defect was found and precisely characterized: `datasets rehydrate` does not verify pre-existing files against its own recorded expected size, silently undermining the documented safety net for the Skill's recommended bulk/HPC download pattern."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "`datasets rehydrate` does not verify pre-existing files -- 'Checksum verification (automatic)' claim is false for the documented aria2c + rehydrate pattern",
+      "observed_in": [10],
+      "problem": "SKILL.md's 'Checksum verification (automatic)' section states 'Rehydrate workflows also verify. If a file fails checksum, Datasets retries up to 3 times then errors,' and bulk_dehydrated.sh's own Step 3 comment says 'datasets rehydrate validates checksums of all files.' Neither is true when the target file already exists at the expected path: `datasets rehydrate` reports 'All N files already rehydrated' without checking size or checksum, confirmed both via a real NCBI bot-block (aria2c wrote an HTML error page as if it were genome data) and via manual corruption against the tool's own recorded expected byte length in dataset_catalog.json.",
+      "root_cause": "`datasets rehydrate`'s local-state check appears to be presence-only (does a file exist at the expected relative path), not a size or checksum comparison against the values it itself records in dataset_catalog.json.uncompressedLengthBytes.",
+      "fix": "Add a step to bulk_dehydrated.sh (and a note in SKILL.md's Checksum verification section) that independently verifies file size against dataset_catalog.json's uncompressedLengthBytes (or re-downloads into a clean directory) after the aria2c leg, rather than trusting `datasets rehydrate`'s 'already rehydrated' report as a correctness signal. Downgrade the 'Rehydrate workflows also verify' claim to state this limitation explicitly."
+    },
+    {
+      "priority": "P2",
+      "title": "Virus download workflow has no worked code pattern",
+      "observed_in": [9],
+      "problem": "SKILL.md's scope table names `datasets download virus` as in-scope, and the command works correctly when run, but there is no 'Code patterns' entry for it (unlike genome/gene), no --include guidance, and no dataformat virus-genome field example.",
+      "root_cause": "The Skill's worked examples focus on genome/gene; virus was likely added to the scope table without a matching code-pattern section.",
+      "fix": "Add a short 'Download virus assemblies' code pattern alongside the existing genome/gene patterns, including a dataformat tsv virus-genome --fields example verified against a live --help catalog."
+    }
+  ]
+}
