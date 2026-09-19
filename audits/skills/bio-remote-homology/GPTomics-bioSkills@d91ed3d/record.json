@@ -1,14 +1,14 @@
 {
-  "skill_id": "bio-differential-abundance-microbiome",
+  "skill_id": "bio-remote-homology",
   "version": "GPTomics-bioSkills@d91ed3d",
   "source": {
     "repository": "GPTomics/bioSkills",
     "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
-    "path": "microbiome/differential-abundance",
+    "path": "database-access/remote-homology",
     "author": "GPTomics",
     "author_url": "https://github.com/GPTomics",
     "license": "MIT",
-    "url": "https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/microbiome/differential-abundance"
+    "url": "https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/database-access/remote-homology"
   },
   "audit": {
     "method": {
@@ -31,6 +31,6 @@
     "report": "report.json",
     "viewer": "viewer.md",
     "fixes": null,
-    "scripts": 9
+    "scripts": 5
   }
 }

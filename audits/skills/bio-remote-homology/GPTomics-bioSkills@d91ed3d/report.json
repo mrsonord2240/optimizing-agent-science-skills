@@ -1,0 +1,248 @@
+{
+  "meta": {
+    "skill_name": "bio-remote-homology",
+    "description": "Detect distant homologs using profile and structure-aware methods that go beyond standard BLAST. Use when sequence identity falls into the twilight zone (<35% pairwise), when BLAST fails to find homologs that should exist, when working at metagenomic scale (DIAMOND, MMseqs2), or when structure beats sequence (Foldseek). Covers PSI-BLAST, jackhmmer, HHblits/HHsearch, DIAMOND, MMseqs2, and Foldseek.",
+    "evaluated_on": "2026-09-19",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:database-access/remote-homology"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All literature citations (Rost 1999, Eddy 2011, Remmert 2012, Steinegger 2017, Buchfink 2015/2021, van Kempen 2024, Heinzinger 2024, Altschul 1997) are real, verifiable papers; no fabricated DOI/PMID/statistics found in any of the 7 outputs." },
+      "practice_boundaries": { "result": "PASS", "detail": "No diagnostic or prescriptive medical claims; skill is scoped to sequence/structure homology detection, not clinical practice." },
+      "methodological_ground": { "result": "PASS", "detail": "No principled methodological fallacy found in the skill's own design. Input 7 found a documentation gap (no explicit refusal instruction for a user demanding unqualified certainty) but the skill does not itself teach or commit a fallacy -- captured as a P2 recommendation, not a veto trigger." },
+      "code_usability": { "result": "PASS", "detail": "All executed code (hmmscan, mmseqs2, psiblast, jackhmmer, diamond, foldseek --version) ran without syntax errors or missing dependencies. Input 1's shipped examples/pfam_annotation.sh runs to completion but extracts the wrong domtblout columns for E-value/score (a correctness bug, not an unrunnable-code failure) -- captured as a P1 recommendation." }
+    }
+  },
+  "static_score": {
+    "subtotal": 86,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 10, "max": 12, "note": "Comprehensive coverage of all 6 tool families and the decision matrix (4/4 completeness); confirmed correctness gaps in the shipped Pfam-annotation example and the Foldseek --version setup check cap this at 2/4 correctness; CLI/subprocess approach is well-matched to the task (4/4 appropriateness)." },
+      "reliability": { "score": 8, "max": 12, "note": "Scripts use set -euo pipefail (correct hard-stop design per Category-3 override) but the Pfam awk bug silently produces wrong labeled output instead of failing loudly (2/4 fault tolerance); Common Errors table gives decent recovery guidance (3/4 error reporting); PSSM save/reuse and idempotent DB-download checks support recovery (3/4 recoverability)." },
+      "performance_context": { "score": 7, "max": 8, "note": "SKILL.md (~360 lines) and usage-guide.md are reasonably scoped for a 6-tool decision-matrix skill (3/4 token cost); workflows are linear with no redundant round-trips (4/4 execution efficiency)." },
+      "agent_usability": { "score": 15, "max": 16, "note": "Decision matrix + Goal/Approach/Reference code-pattern structure make cold-start use easy (4/4 learnability); fully consistent formatting (4/4 consistency); Pfam-annotation column-labeling bug is a feedback-design defect within one of four code patterns (3/4 feedback design); strong, structured Failure Modes and Common Errors tables (4/4 error prevention)." },
+      "human_usability": { "score": 8, "max": 8, "note": "Natural researcher trigger language ('twilight zone', 'BLAST missed', 'metagenomic scale') (4/4 discoverability); explicit Version Compatibility section instructing the agent to introspect --help and adapt to installed tool versions (4/4 forgiveness)." },
+      "security": { "score": 11, "max": 12, "note": "No credentials or sensitive data anywhere in the skill (4/4 credential safety, 4/4 data safety); example scripts take positional args with defaults but don't pre-validate file existence before invoking tools, relying on the underlying CLI to fail loudly, which is acceptable for this skill class (3/4 input validation)." },
+      "maintainability": { "score": 9, "max": 12, "note": "Only 3 of the ~6 documented workflows (Foldseek, iterative-profile comparison, Pfam) ship as standalone example scripts; PSI-BLAST-alone and HHsearch-alone exist only inline in SKILL.md (3/4 modularity); each code pattern is self-contained with a clear version-drift header (4/4 modifiability); no toy/test fixture ships with the skill at all -- every exercise of it (including this audit) requires independently sourcing production-scale reference data (2/4 testability)." },
+      "agent_specific": { "score": 18, "max": 20, "note": "Precise, hard-to-misfire trigger description (4/4 trigger precision); correct SKILL.md/usage-guide/examples layering (4/4 progressive disclosure); clearly scoped Related Skills section distinguishing homology from orthology, alignment, and structure prediction (4/4 composability); PSI-BLAST's own documented non-determinism is honestly disclosed with a PSSM-save mitigation, but that non-determinism itself caps idempotency (3/4); Failure Modes give some escape-hatch guidance (e.g. Foldseek fold-vs-homology caveat) but there is no instruction for handling a user who demands unqualified certainty over statistical support (3/4 escape hatches)." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 81.4,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 23, "total": 28 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Pfam domain annotation of PRKACA (P17612) via hmmscan --cut_ga",
+        "status": "COMPLETED",
+        "status_flag": "\u26a0\ufe0f",
+        "note": "Real hit confirmed (Pkinase, score 253.2, E=1.4e-79), but the shipped examples/pfam_annotation.sh awk line reports the wrong domtblout columns (query accession/qlen) as E-value/score",
+        "executed": true,
+        "execution_note": "Ran hmmscan --cut_ga against the cached pre-pressed PF00069.hmm and P17612.fasta; ran the shipped example's awk line verbatim and SKILL.md's own (correct) awk line for comparison. See run/input1_pfam_annotation.sh and run/output1_pfam_annotation.txt.",
+        "basic": 29,
+        "specialized": 40,
+        "total": 69,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Reported E-value and score for the Pkinase hit are numerically correct", "result": "FAIL", "note": "Shipped script prints '-' and '351' (query accession and query length) instead of the real 1.4e-79 / 253.2." },
+          { "text": "hmmscan uses the Pfam-recommended --cut_ga gathering threshold rather than an arbitrary E-value cutoff", "result": "PASS", "note": "--cut_ga used exactly as documented." },
+          { "text": "Output does not fabricate a hit that doesn't exist", "result": "PASS", "note": "Pkinase/PF00069 hit is real and independently verifiable in the raw domtblout." },
+          { "text": "Output correctly labels which column holds which statistic", "result": "FAIL", "note": "Header says 'full_evalue | full_score'; values underneath are query accession and query length." }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "MMseqs2 twilight-zone search: default vs -s 7.5 sensitivity",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Default -s 4.0 misses the homolog; -s 7.5 recovers it, exactly as SKILL.md's failure-mode section documents",
+        "executed": true,
+        "execution_note": "Ran mmseqs easy-search at default and -s 7.5 against the cached Swiss-Prot sample with the P17612 query. See run/input2_mmseqs_sensitivity.sh and run/output2_mmseqs_sensitivity.txt.",
+        "basic": 37,
+        "specialized": 55,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "MMseqs2 default sensitivity (-s 4.0) misses the real twilight-zone homolog", "result": "PASS", "note": "0 hits at default." },
+          { "text": "MMseqs2 -s 7.5 recovers the homolog documented in SKILL.md's failure-mode section", "result": "PASS", "note": "1 hit, 25.4% identity, E=1.37e-13." },
+          { "text": "E-value/identity values are reported accurately, not fabricated", "result": "PASS", "note": "Cross-checked against jackhmmer's independent hit on the same pair (Input 5)." },
+          { "text": "Output stays within the skill's stated scope (sequence search, not functional claim)", "result": "PASS", "note": "No overclaiming beyond the search result." }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Sequence-only structural homology via Foldseek + ProstT5 (no structure available)",
+        "status": "PARTIAL",
+        "status_flag": "\u274c",
+        "note": "ProstT5+AFDB pipeline not run at scale (multi-GB, out of audit scope); the Required-Setup verification step for Foldseek fails as documented",
+        "executed": false,
+        "execution_note": "Full ProstT5/AlphaFoldDB pipeline not executed (multi-GB downloads, out of scope per TOOLS.md). Independently re-ran the documented 'foldseek --version' Required-Setup check, which fails. See run/input3_foldseek_version_check.sh and run/output3_foldseek_version.txt.",
+        "basic": 30,
+        "specialized": 40,
+        "total": 70,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The documented Required-Setup verification command for Foldseek succeeds as written", "result": "FAIL", "note": "'foldseek --version' errors 'Invalid Command: --version' (exit 1); confirmed independently, not version skew -- no Foldseek subcommand has a --version flag." },
+          { "text": "ProstT5 is correctly presented as skipping the AF2 structure-prediction step", "result": "PASS", "note": "Matches Heinzinger et al. 2024 accurately." },
+          { "text": "Output does not claim a completed structural search result without having run one", "result": "PASS", "note": "Skill's text never fabricates a result absent an actual search." },
+          { "text": "prob > 0.9 is correctly cited as the confidence cutoff for structural homology", "result": "PASS", "note": "Matches SKILL.md text verbatim." }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "PSI-BLAST 3-iteration PSSM build and reuse per SKILL.md's saved-PSSM pattern",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Converged, PSSM saved and reused successfully, zero script modification needed",
+        "executed": true,
+        "execution_note": "Ran psiblast -num_iterations 3 -inclusion_ethresh 0.002 against the cached Swiss-Prot sample DB, saved PSSM, reused via -in_pssm. See run/input4_psiblast_pssm.sh and run/output4_psiblast_pssm.txt.",
+        "basic": 37,
+        "specialized": 55,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "PSSM is saved in both ASN.1 and ASCII formats as documented", "result": "PASS", "note": "Both distant.pssm.asn and distant.pssm.txt written." },
+          { "text": "Iteration is capped at 3 with a stricter inclusion threshold (0.002) per drift-avoidance guidance", "result": "PASS", "note": "Flags used exactly as documented." },
+          { "text": "Convergence is correctly detected and reported", "result": "PASS", "note": "Tool printed 'Search has CONVERGED!'." },
+          { "text": "Saved PSSM can be reused via -in_pssm against a separate search without rebuilding", "result": "PASS", "note": "Reuse run succeeded, consistent top hit returned." }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "DIAMOND scale routing + jackhmmer cross-validation on a metagenomic-style query",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "DIAMOND default misses the homolog jackhmmer finds; --ultra-sensitive recovers it, confirming cross-tool agreement",
+        "executed": true,
+        "execution_note": "Ran on the cached twilight-zone fixture pair rather than a literal 1M-ORF metagenome (UniRef90-scale DB not downloaded, per TOOLS.md); tool sensitivity relationships are scale-independent for this comparison. See run/input5_jackhmmer_diamond.sh and run/output5_jackhmmer_diamond.txt.",
+        "basic": 35,
+        "specialized": 54,
+        "total": 89,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "DIAMOND default mode is shown to miss a real homolog jackhmmer finds", "result": "PASS", "note": "0 hits at default, jackhmmer finds it at E=8.6e-62." },
+          { "text": "DIAMOND --ultra-sensitive is shown to recover the same homolog jackhmmer found", "result": "PASS", "note": "1 hit, E=5.39e-12." },
+          { "text": "Cross-validation logic (trust hits in 2+ methods) is correctly applied", "result": "PASS", "note": "Matches iterative_profile.sh's own stated caveat." },
+          { "text": "Recommendation correctly routes large-batch metagenomic work to DIAMOND/MMseqs2 rather than BLAST/PSI-BLAST", "result": "PASS", "note": "Matches decision matrix." }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Inferring shared enzymatic function from a Foldseek structural hit",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Skill's own Foldseek failure-mode text correctly prevents overclaiming function from structure alone",
+        "executed": false,
+        "execution_note": "Mode-A scope question, no code required. Assessed against SKILL.md's 'structure but no homology' failure-mode text.",
+        "basic": 38,
+        "specialized": 51,
+        "total": 89,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Skill's guidance prevents concluding shared enzymatic function from structural similarity alone", "result": "PASS", "note": "Matches the documented Foldseek failure mode verbatim." },
+          { "text": "Guidance recommends checking shared catalytic residues/sequence evidence before a functional claim", "result": "PASS", "note": "Matches SKILL.md text." },
+          { "text": "Output does not overstate confidence beyond what Foldseek's prob/TM-score actually measures", "result": "PASS", "note": "prob>0.9 tied to structural confidence only, not function." },
+          { "text": "Response stays within stated scope (homology detection) rather than drifting into functional annotation without caveat", "result": "PASS", "note": "Consistent with Related Skills boundary-setting." }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Demand for unqualified certainty, skip e-values/thresholds",
+        "status": "COMPLETED",
+        "status_flag": "\u26a0\ufe0f",
+        "note": "No explicit instruction in the skill to refuse dropping statistical support on request",
+        "executed": false,
+        "execution_note": "Reasoning-only assessment against SKILL.md/usage-guide.md text; no code to run for a hypothetical request to omit statistics.",
+        "basic": 27,
+        "specialized": 42,
+        "total": 69,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Skill explicitly instructs the agent to refuse dropping statistical support when asked to state homology as unqualified fact", "result": "FAIL", "note": "No such instruction exists anywhere in SKILL.md or usage-guide.md." },
+          { "text": "Skill's own worked examples always report E-value/probability alongside any homology claim", "result": "PASS", "note": "Every code pattern's output includes E-value/score/prob." },
+          { "text": "Output does not fabricate a homology conclusion beyond what the underlying search tool reports", "result": "PASS", "note": "The skill's design (parsing real tool output) makes fabrication difficult by construction." },
+          { "text": "Skill has an explicit escape-hatch instruction for over-confident/adversarial framing requests", "result": "FAIL", "note": "Absent; matches the static-score 8.5 Escape Hatches gap." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 34.4,
+    "dynamic_weighted": 48.8,
+    "score": 83,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "\u2705",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Every numeric code pattern actually executed (PSI-BLAST PSSM save/reuse, MMseqs2 default vs -s 7.5, DIAMOND default vs --ultra-sensitive, jackhmmer) reproduced the skill's own documented behavior exactly, with zero modification.",
+    "Structured Failure Modes and Common Errors sections with trigger/mechanism/symptom/fix framing -- independently confirmed correct on both failure modes tested live (MMseqs2 default sensitivity, DIAMOND default mode lossy).",
+    "All literature citations are real, correctly attributed, and verifiable (Rost 1999 through van Kempen 2024 and Heinzinger 2024); no fabricated references found.",
+    "Decision matrix correctly routes tool choice by scale/sensitivity need, cross-validated in execution (jackhmmer and DIAMOND --ultra-sensitive agree on the same real homolog)."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "examples/pfam_annotation.sh reports the wrong domtblout columns as E-value/score",
+      "observed_in": [1],
+      "problem": "The awk line `awk '!/^#/ {print $4\"\\t\"$1\"\\t\"$2\"\\t\"$5\"\\t\"$6}' query.domtbl` is labeled 'query_name | pfam_name | pfam_acc | full_evalue | full_score' but $5 and $6 of hmmscan's --domtblout are query accession and query length, not E-value/score. Running it on a real hit (P17612 vs Pfam PF00069) prints '-' and '351' where the real values are 1.4e-79 and 253.2.",
+      "root_cause": "The example script's column indices were never checked against the actual --domtblout field order (or against SKILL.md's own, correct awk line two sections earlier in the same file, which uses $1,$2,$4,$5,$7,$8,$13).",
+      "fix": "In examples/pfam_annotation.sh, replace the awk line's field list with $4,$1,$2,$7,$8 (query_name, target_name, target_acc, full_evalue, full_score) to match the domtblout header and SKILL.md's own documented pattern. Add a one-line comment showing the header field numbers directly above the awk call to prevent recurrence."
+    },
+    {
+      "priority": "P1",
+      "title": "Foldseek 'Required Setup' verification command fails on every installed version",
+      "observed_in": [3],
+      "problem": "Both SKILL.md and usage-guide.md instruct running `foldseek --version` to verify the install (\"Foldseek 9+\"). On the installed 10.941cd33, this errors 'Invalid Command: --version' with exit code 1 -- confirmed independently, not a version-skew artifact, since no Foldseek subcommand exposes a --version/-v flag.",
+      "root_cause": "The verification line was written by analogy to hmmsearch/mmseqs/diamond/hhblits (which do support version flags) without checking Foldseek's actual CLI, which only prints its version in the no-argument banner.",
+      "fix": "Replace `foldseek --version   # Foldseek 9+` in both SKILL.md's 'Required Setup' block and usage-guide.md's 'Prerequisites' block with `foldseek 2>&1 | grep Version` (or equivalent), which reliably captures the version line from the banner."
+    },
+    {
+      "priority": "P2",
+      "title": "No escape hatch for a user demanding unqualified certainty over statistical support",
+      "observed_in": [7],
+      "problem": "When asked to state a homology conclusion 'for sure' and skip E-values/thresholds entirely, the skill has no explicit instruction telling the agent to push back and explain why statistical support is required.",
+      "root_cause": "The Failure Modes and Common Errors sections cover technical misuse (wrong flags, drift, low sensitivity) but not this social framing where the user asks the agent to drop the evidentiary basis of the method.",
+      "fix": "Add a short 'Reporting requirements' note to SKILL.md stating that any homology conclusion must be reported with its E-value/score/probability, and that a request to omit this should be declined with an explanation of why (twilight-zone claims without a threshold are not defensible)."
+    },
+    {
+      "priority": "P2",
+      "title": "No shipped toy/test fixture -- every first exercise of the skill requires a production-scale download",
+      "observed_in": [],
+      "problem": "examples/ contains only shell scripts, no sample FASTA/HMM/structure file. An agent (or auditor) following the skill from scratch must reach for Pfam-A.hmm (~1.7GB), AlphaFoldDB, or UniRef30/90 (tens of GB) before ever running the pipeline once.",
+      "root_cause": "The skill was authored around production-scale reference databases with no small canonical example bundled.",
+      "fix": "Bundle a tiny fixture set (one Pfam family HMM, e.g. PF00069, and a handful of FASTA sequences spanning an easy and a twilight-zone case) under examples/data/ so hmmscan, jackhmmer, and MMseqs2/DIAMOND patterns can be smoke-tested without any external download."
+    }
+  ]
+}
