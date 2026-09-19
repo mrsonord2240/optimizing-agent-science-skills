@@ -1,0 +1,11 @@
+.libPaths(c("F:/OpenScience/audit-envs/microbiome-metagenomics-analyst/R-lib", .libPaths()))
+suppressPackageStartupMessages(library(DECIPHER))
+data_dir <- "F:/OpenScience/audits/bio-microbiome-taxonomy-assignment/data"
+ids_result <- readRDS(file.path(data_dir, "idtaxa_result.rds"))
+cat("class:", class(ids_result[[1]]), "\n")
+str(ids_result[[1]])
+cat("\n--- taxon ---\n"); print(ids_result[[1]]$taxon)
+cat("\n--- rank (if present) ---\n"); print(ids_result[[1]]$rank)
+cat("\n--- confidence ---\n"); print(ids_result[[1]]$confidence)
+cat("\nSummary across all 770:\n")
+print(table(sapply(ids_result, function(x) length(x$taxon))))

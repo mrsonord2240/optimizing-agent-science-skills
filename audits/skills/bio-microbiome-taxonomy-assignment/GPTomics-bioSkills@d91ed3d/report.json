@@ -1,0 +1,286 @@
+{
+  "meta": {
+    "skill_name": "bio-microbiome-taxonomy-assignment",
+    "description": "Assigns taxonomy to amplicon ASVs/OTUs (16S, ITS, 18S) with a classifier conditioned on a reference database and primer region - DADA2 assignTaxonomy + addSpecies (RDP naive Bayes), DECIPHER IDTAXA, and QIIME2 q2-feature-classifier (classify-sklearn naive Bayes, classify-consensus-vsearch alignment-consensus).",
+    "evaluated_on": "2026-09-19",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:microbiome/taxonomy-assignment"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "FAIL",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "FAIL",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "All 7 inputs used real tools (DADA2 1.34.0, DECIPHER 3.2.0, QIIME2 2024.10.1) against real reference data (SILVA 138 QIIME2 artifacts) and real ASVs (770 sequences denoised from the public moving-pictures dataset). No fabricated DOIs, PMIDs, p-values, or effect sizes anywhere in SKILL.md or in this audit's outputs; all cited papers (Bokulich 2018, Wang 2007, Murali 2018, Werner 2012, Kaehler 2019) are real, correctly attributed methodological references."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "No diagnostic or prescriptive claims about an individual anywhere in SKILL.md or the 7 outputs; scope is community/environmental marker-gene taxonomy, not clinical diagnosis. Input 7 (adversarial over-claiming test) correctly refuses to validate an unsupported species identification rather than rubber-stamping it."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "No principled methodological fallacy found; the Skill is unusually rigorous about the classifier-confidence-vs-database-completeness distinction and about not inferring species from a single hypervariable region. The one real defect found (assignTaxonomy() non-determinism, see skill_veto.determinism) is a reproducibility/engineering gap, not a methodological fallacy, and is captured under the Skill Veto instead."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All code across all 7 inputs executed without syntax errors, and no missing-dependency failures occurred once the environment was tooled. One real caveat, deliberately scored here as PASS rather than FAIL because it does not meet M4's literal trigger (syntax error / infinite loop / missing dependency -- i.e. 'not runnable'): SKILL.md's DECIPHER IdTaxa flattening line (`x$taxon[match(ranks, x$rank)]`) executes without any exception but silently returns 100%-NA output against a trainingSet built the natural way (LearnTaxa without an explicit rank= argument, which is the only way available since SKILL.md never demonstrates building a custom trainingSet). This is recorded as a P0 recommendation and drives Input 4's low score, but the code technically 'runs'."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 84,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 10,
+        "max": 12,
+        "note": "Completeness: covers DADA2/DECIPHER/QIIME2 thoroughly, but the DECIPHER section never shows how to build a custom/region-matched trainingSet when no pre-trained .RData exists, unlike its own DADA2 (extract-reads unnecessary, full SILVA fine) and QIIME2 (explicit extract-reads -> fit-classifier-naive-bayes) sections, both of which cover exactly this 'no pre-trained artifact' case. Correctness: excellent domain content overall (confidence semantics, region-matching rationale, real citations) but two real code-level defects found in execution (assignTaxonomy non-determinism; DECIPHER flattening silently wrong). Appropriateness: the four-method, decision-tree-driven approach is well matched to the task."
+      },
+      "reliability": {
+        "score": 7,
+        "max": 12,
+        "note": "Fault Tolerance: no seed-management guidance anywhere despite explicitly naming the method as '100 bootstraps'; the DECIPHER custom-training path is entirely unaddressed. Error Reporting: the DECIPHER silent all-NA failure mode is not caught or warned about anywhere, and the Common Errors table does not cover either of the two real defects found. Recoverability: once known, both defects have simple, verified fixes (set.seed(); positional flattening), but nothing today helps a user discover or diagnose them."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "SKILL.md (~256 lines) is well under the 500-line guideline, with good progressive disclosure via usage-guide.md and examples/. Minor gap: no warning that training against the full, un-subsampled SILVA reference (400K+ sequences) can exhaust memory -- this audit's fit-classifier-naive-bayes and LearnTaxa() runs both had to fall back to a 60,000-sequence subsample after the full-scale attempt crashed the VM outright."
+      },
+      "agent_usability": {
+        "score": 13,
+        "max": 16,
+        "note": "Learnability and Consistency are strong (clear decision tree, quantitative thresholds table, uniform structure). Feedback Design: doesn't tell the agent how to sanity-check IdTaxa output for the degenerate all-NA case. Error Prevention: doesn't warn about the two defects found (unseeded bootstrap; DECIPHER custom-training gap) or the full-reference OOM risk, despite otherwise having a strong Per-Method Failure Modes section."
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Discoverability strong (natural trigger language throughout usage-guide.md's Example Prompts). Forgiveness good for documented scenarios but silent on how to recognize/recover from the two defects found."
+      },
+      "security": {
+        "score": 12,
+        "max": 12,
+        "note": "No hardcoded credentials, no unsanitized execution of user-provided strings, no sensitive-data handling concerns anywhere in SKILL.md or the two example scripts."
+      },
+      "maintainability": {
+        "score": 10,
+        "max": 12,
+        "note": "Modularity and Modifiability are strong (clean SKILL.md/usage-guide.md/examples/ separation). Testability: the two real defects found in this audit (non-determinism; DECIPHER silent-NA) both shipped without any check that would have caught them -- no example verifies its own output is non-degenerate or reproducible."
+      },
+      "agent_specific": {
+        "score": 18,
+        "max": 20,
+        "note": "Trigger Precision, Progressive Disclosure, Composability and Escape Hatches (explicit shotgun-reads redirect, explicit 'DO NOT report species from one region' guidance) are all strong and independently confirmed by Inputs 6-7. Idempotency: directly docked here -- this audit empirically confirmed the DADA2 path is NOT idempotent (15/770 genus calls differ between two back-to-back runs of SKILL.md's own shipped code on identical input)."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 87.1,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 26, "total": 30 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "QIIME2 classify-sklearn, region-matched (extract-reads -> fit-classifier-naive-bayes) on real 16S V4 ASVs",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "770 real V4 ASVs denoised from the public moving-pictures dataset, classified against a region-matched (515-806) SILVA 138 classifier trained via the SKILL's exact recommended path. 653/770 (84.8%) genus-assigned, 403/770 species-labeled at the 0.7 default confidence (min observed confidence 0.7000755, confirming the truncation mechanism). Calls are biologically plausible (Bacteroides, Streptococcus, Neisseria, Haemophilus, Staphylococcus, Fusobacterium -- all real human gut/oral taxa) and cross-validated against an independent DADA2 assignTaxonomy run on the same ASVs (653/770 genus, matching count).",
+        "executed": true,
+        "execution_note": "Full real pipeline in WSL qiime2-amplicon-2024.10: extract-reads (515F/806R) against the full cached silva-138-99-seqs.qza (432,916 region-matched sequences, ~28 min), then fit-classifier-naive-bayes + classify-sklearn against rep-seqs.qza. The full-scale (432,916-seq) fit-classifier-naive-bayes crashed the WSL VM via OOM after ~10 min; re-run successfully against a 60,000-sequence random subsample (seed 42) of the same real extracted reference -- a practical scale compromise, not a synthetic substitution.",
+        "basic": 36,
+        "specialized": 55,
+        "total": 91,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Classifier is trained on a region-matched (515-806) reference, not full-length", "result": "PASS", "note": "extract-reads run against the real SILVA-138 reference before fit-classifier-naive-bayes" },
+          { "text": "Every emitted taxonomy call's confidence is >= the stated 0.7 threshold", "result": "PASS", "note": "min observed confidence across all 770 calls = 0.7000755" },
+          { "text": "Output states the classifier + database release + region conditioning triple", "result": "PASS", "note": "classify-sklearn NB / SILVA 138 / 515-806 V4 documented alongside results" },
+          { "text": "Calls are biologically plausible and cross-checked against an independent method", "result": "PASS", "note": "653/770 genus matches DADA2 assignTaxonomy's independent 653/770 count on the same ASVs" }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "DADA2 assignTaxonomy + addSpecies, region-matched, on the same 770 real V4 ASVs",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "minBoot=50 (SKILL default), tryRC=TRUE: 653/770 (84.8%) genus-assigned. addSpecies (exact match only): 131/770 (17.0%) species-assigned, honestly reflecting the low-recall behaviour SKILL.md describes. This is also the input where the Skill Veto T3 (determinism) defect was discovered and confirmed: running SKILL.md's own shipped assign_silva.R code twice, back to back, with no set.seed() (exactly as shipped), produced different genus calls for 15/770 (1.9%) ASVs. Confirmed fixable: set.seed(100) before each call made the two runs bit-for-bit identical.",
+        "executed": true,
+        "execution_note": "Ran via rr.sh against regionmatched_dada2_train.fasta / regionmatched_dada2_species.fasta (60,000-sequence real subsample of the same region-matched extraction used for Input 1). Determinism check re-ran assignTaxonomy() twice unseeded, then twice with set.seed(100), on identical input.",
+        "basic": 35,
+        "specialized": 48,
+        "total": 83,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "assignTaxonomy uses a region-matched reference per SKILL's Trap-1 guidance", "result": "PASS", "note": "Trained on the real extract-reads output" },
+          { "text": "minBoot=50 documented and ranks below threshold left NA, not guessed", "result": "PASS", "note": "117/770 (15.2%) left NA at genus, none force-filled" },
+          { "text": "addSpecies reports species ONLY by exact match (low recall)", "result": "PASS", "note": "131/770 (17.0%) -- consistent with SKILL's stated 'high-precision, low recall' description" },
+          { "text": "Two back-to-back runs of SKILL.md's own shipped (unseeded) code reproduce identical genus calls", "result": "FAIL", "note": "15/770 (1.9%) genus calls differ between identical runs; identical()==FALSE. Confirmed fixed by set.seed(100) (identical()==TRUE with it)" },
+          { "text": "Output states the classifier + database + region conditioning triple", "result": "PASS", "note": "DADA2 assignTaxonomy (RDP NB) / SILVA 138 / 515-806 V4 documented" }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Full-length vs. region-matched classifier: quantifying SKILL.md's central 'Trap 1' claim on real data",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Same 770 real V4 ASVs classified with assignTaxonomy against (a) a full-length 60,000-seq SILVA subsample and (b) the region-matched (515-806) 60,000-seq subsample. Genus-level comparison: 580 agree, 71 both NA, 50 cases where region-matching RECOVERED a call the full-length classifier missed, 46 cases where the full-length classifier OVER-called relative to region-matched refusal, and 23 outright DISAGREEMENTS (different genus called by each). This directly and quantitatively confirms SKILL.md's flagship claim that a full-length-trained classifier on a V4 read both fabricates and erases calls relative to a region-matched one.",
+        "executed": true,
+        "execution_note": "run/assign_fulllength.R (full-length 60k SILVA subsample) + run/assign_regionmatched.R (region-matched 60k subsample, same seed/sampling method), both against the identical 770 real ASVs; direct rowname-keyed comparison in R.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Full-length classifier produces different genus calls than region-matched on the same real ASVs", "result": "PASS", "note": "23/770 outright disagreements" },
+          { "text": "Full-length classifier over-calls (fabricates) relative to region-matched refusal in some cases", "result": "PASS", "note": "46/770 cases: full-length assigned, region-matched correctly left NA" },
+          { "text": "Region-matched classifier recovers valid calls the full-length one missed (erasure)", "result": "PASS", "note": "50/770 cases: full-length NA, region-matched assigned" },
+          { "text": "Comparison is quantitative across the full real ASV set, not anecdotal", "result": "PASS", "note": "Full 770x770 rowname-matched comparison, not a cherry-picked example" }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "DECIPHER IdTaxa, trained (LearnTaxa) on the real region-matched SILVA subset, on the same 770 ASVs",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Real LearnTaxa (26 min on 60,000 real region-matched sequences) + IdTaxa (51 sec) run. SKILL.md's own shipped flattening code (`x$taxon[match(ranks, x$rank)]`) silently returned 100% NA at every rank for all 770 ASVs -- x$rank is NULL because LearnTaxa() was never given an explicit rank= data.frame, which SKILL.md never demonstrates how to supply (its DECIPHER section only shows loading a pre-trained .RData, never training one). After correcting the flattening logic positionally (not a SKILL.md fix, an audit workaround), the REAL classification was recovered: 62.6% genus-assigned (482/770) vs DADA2 NB's 84.8% -- exactly the more-conservative behaviour SKILL.md describes for IDTAXA, with 458/482 of IdTaxa's calls agreeing with the independent NB result where both called a genus.",
+        "executed": true,
+        "execution_note": "run/decipher_idtaxa.R (LearnTaxa + IdTaxa, real execution) then run/reflatten_idtaxa.R (audit-side fix to recover the real result for evaluation purposes, separate from documenting the SKILL.md defect itself).",
+        "basic": 24,
+        "specialized": 40,
+        "total": 64,
+        "assertions_passed": 2,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "IdTaxa produces more conservative (lower genus-assignment-rate) calls than naive Bayes", "result": "PASS", "note": "62.6% (IdTaxa) vs 84.8% (DADA2 NB) genus-assignment rate, once correctly flattened" },
+          { "text": "SKILL.md's own documented flattening code extracts a usable taxonomy table from a real IdTaxa result", "result": "FAIL", "note": "x$rank is NULL for a LearnTaxa()-trained set without explicit rank=; match(ranks, x$rank) returns all-NA silently, no error" },
+          { "text": "Unclassified/refused calls are surfaced honestly, not force-filled", "result": "PASS", "note": "Once correctly flattened: 125/770 (16.2%) genuinely refused before genus, left NA" },
+          { "text": "SKILL.md shows how to build a trainingSet when no pre-trained artifact is available (mirroring its DADA2/QIIME2 sections)", "result": "FAIL", "note": "No LearnTaxa training example anywhere in SKILL.md's DECIPHER section" },
+          { "text": "This failure mode is caught or warned about in SKILL.md's Common Errors table", "result": "FAIL", "note": "Not mentioned; Common Errors table has no row for degenerate/all-NA IdTaxa flattening" }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "classify-consensus-vsearch vs classify-sklearn disagreement analysis + host organelle filtering (multi-part)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "classify-consensus-vsearch run directly against the full-length SILVA reference (no training, per SKILL.md's own documented command) on the same 770 ASVs: 699/770 genus-assigned. Compared against Input 1's region-matched classify-sklearn result: 599/770 agree, 42 both NA, 29 sklearn-only, 75 vsearch-only, 25 outright disagreements -- a real, quantified answer to SKILL's own suggested 'classify two ways and tell me where they disagree' prompt. Host-organelle filtering (qiime taxa filter-table --p-exclude mitochondria,chloroplast) correctly removed 29/770 features (770->741) and 2,307/153,807 reads (~1.5%), consistent with SKILL.md's own caveat that organelle contamination is heaviest in plant/biopsy samples, not general human gut (this dataset).",
+        "executed": true,
+        "execution_note": "classify-consensus-vsearch run in WSL against the full 97MB silva-138-99-seqs.qza directly (SKILL's own documented command, no training step). Organelle filter run against Input 1's table.qza + the vsearch taxonomy; verified by both qiime taxa filter-table and an independent grep count of Mitochondria/Chloroplast rows in the exported taxonomy (both gave 29).",
+        "basic": 36,
+        "specialized": 55,
+        "total": 91,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "classify-consensus-vsearch runs with no trained/pickled model (immune to sklearn version pinning)", "result": "PASS", "note": "Ran directly against silva-138-99-seqs.qza with no fit-classifier step" },
+          { "text": "Method disagreement between sklearn and vsearch-consensus is quantified, not hand-waved", "result": "PASS", "note": "599 agree / 25 disagree / 146 differ in whether a call was made, out of 770" },
+          { "text": "Organelle filtering correctly identifies and removes Mitochondria/Chloroplast features using the taxonomy just assigned", "result": "PASS", "note": "29/770 features removed; cross-validated by an independent grep count of the taxonomy file (also 29)" },
+          { "text": "Read-retention fraction after filtering is reported, not silently dropped", "result": "PASS", "note": "151,500/153,807 reads retained (98.5%)" },
+          { "text": "Low organelle fraction in this dataset is consistent with SKILL's own stated expectation for gut (vs plant/biopsy) samples", "result": "PASS", "note": "1.5% of reads removed, well below SKILL's flagged 'heaviest in plant/rhizosphere/biopsy' scenario" }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Raw shotgun metagenomic reads submitted for classification (should redirect, not attempt)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Correctly declines and redirects to metagenomics/kraken-classification and metagenomics/metaphlan-profiling per SKILL.md's own explicit Scope line and Decision Tree's last row, without attempting to force raw FASTQ through any of the four ASV-input classifiers documented here.",
+        "executed": true,
+        "execution_note": "Direct-mode (no code): full response drafted and archived at run/input6_scope_boundary_response.md, generated by following SKILL.md's stated scope and decision tree exactly.",
+        "basic": 38,
+        "specialized": 55,
+        "total": 93,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "Correctly declines raw shotgun reads as out of scope for this Skill", "result": "PASS", "note": "Matches SKILL.md's Scope paragraph and decision-tree row verbatim" },
+          { "text": "Explicitly redirects to kraken-classification / metaphlan-profiling", "result": "PASS", "note": "Both named, matching SKILL.md's Related Skills section" },
+          { "text": "Does not attempt to force shotgun FASTQ through an ASV-input classifier", "result": "PASS", "note": "No code generated attempting this" }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Request to validate a confirmed species ID from one V4 region at 99% classifier confidence",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Correctly refuses to validate the over-claim, citing SKILL.md's own two-part mechanism (confidence-within-database vs proof-of-presence; V4-region cross-species/genus ambiguity) and its 'Over-reading species from 16S' failure mode by name, then gives a concrete, actionable path to a defensible claim (report genus; addSpecies exact match; a species-resolving marker or culturing).",
+        "executed": true,
+        "execution_note": "Direct-mode (no code): full response drafted and archived at run/input7_adversarial_response.md, generated by following SKILL.md's 'Single Most Important Modern Insight' section and Per-Method Failure Modes table exactly.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Does not validate a confirmed species ID from a single V4 region + high confidence alone", "result": "PASS", "note": "Explicitly refuses" },
+          { "text": "Cites the specific mechanism (confidence-within-database; V4 cross-species ambiguity)", "result": "PASS", "note": "Both mechanisms named and explained" },
+          { "text": "Gives a concrete, actionable path to a defensible claim", "result": "PASS", "note": "addSpecies exact match / alternate marker / culturing, not a vague deflection" },
+          { "text": "Grounds the refusal in SKILL.md's own named failure mode rather than generic caution", "result": "PASS", "note": "References 'Over-reading species from 16S' by name" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 33.6,
+    "dynamic_weighted": 52.3,
+    "score": 86,
+    "max": 100,
+    "grade": "Reject",
+    "grade_symbol": "❌",
+    "deployable": false,
+    "veto_override": true
+  },
+  "key_strengths": [
+    "SKILL.md's central 'Trap 1' claim (a full-length-trained classifier fabricates and erases calls on a V4 read) is directly and quantitatively confirmed on real data: 23/770 genus disagreements and 96/770 differences in whether a call is made at all, between full-length and region-matched classifiers run on the identical 770 real ASVs.",
+    "Three independently-implemented classification methods (QIIME2 classify-sklearn, DADA2 assignTaxonomy, QIIME2 classify-consensus-vsearch) converge closely on the same real human-microbiome ASVs (653/770 and 653/770 genus calls from two independent naive-Bayes implementations; 599/770 sklearn-vsearch agreement), and addSpecies' documented low-recall exact-match behaviour is confirmed honest (17.0% species rate).",
+    "Host-organelle filtering guidance is accurate and its stated caveat (contamination heaviest in plant/biopsy, not general gut samples) is confirmed on real data: only 1.5% of reads removed from the real moving-pictures (human gut/skin/tongue) dataset.",
+    "Scope boundaries and over-classification refusals are both correctly and specifically grounded in the Skill's own stated mechanisms rather than generic caution, confirmed by directly testing both (Inputs 6-7)."
+  ],
+  "recommendations": [
+    {
+      "priority": "P0",
+      "title": "assignTaxonomy() is non-deterministic without set.seed() -- fires Skill Veto T3",
+      "observed_in": [2, 3],
+      "problem": "Two back-to-back runs of SKILL.md's own shipped code (examples/assign_silva.R, no set.seed anywhere) on the same 770 real ASVs against the same reference produce different genus calls for 15/770 (1.9%) ASVs; identical()==FALSE.",
+      "root_cause": "assignTaxonomy() runs an RDP-style naive Bayes classifier with 100 bootstrap resamples (SKILL.md's own text names this), which is inherently stochastic; SKILL.md never calls or mentions set.seed(), despite this being DADA2's own official tutorial's explicit recommendation immediately before this exact call.",
+      "fix": "Add set.seed(100) (or any fixed seed) immediately before every assignTaxonomy() call in SKILL.md's 'DADA2 assignTaxonomy + addSpecies' section and in examples/assign_silva.R. Verified in this audit: with set.seed(100) before each call, two runs are bit-for-bit identical (identical()==TRUE) across all 6 ranks on the same 770 ASVs."
+    },
+    {
+      "priority": "P0",
+      "title": "DECIPHER flattening code silently produces 100%-NA output against a self-trained trainingSet",
+      "observed_in": [4],
+      "problem": "SKILL.md's IdTaxa flattening line `x$taxon[match(ranks, x$rank)]` returns all-NA for every rank on all 770 real ASVs, with no error or warning, when applied to a trainingSet built via LearnTaxa(seqs, taxonomy=tax) with no rank= argument -- the natural way to build one, which is also the ONLY way demonstrated anywhere in SKILL.md's DECIPHER section (it never shows loading OR building a rank-aware trainingSet, only assumes a pre-trained .RData exists).",
+      "root_cause": "IdTaxa() only populates x$rank when the trainingSet was built with an explicit `rank` data.frame passed to LearnTaxa(); SKILL.md's DECIPHER section never demonstrates training a custom/region-matched trainingSet at all, unlike its own DADA2 and QIIME2 sections, both of which explicitly cover the 'no pre-trained artifact' scenario.",
+      "fix": "Either (a) add a DECIPHER training-from-scratch example that supplies rank= to LearnTaxa(), or (b) make the flattening code robust to rank-less trainingSets by using positional extraction (x$taxon[-1], padded/truncated to length(ranks)) instead of match(ranks, x$rank). Also add a Common Errors row for 'IdTaxa flattening returns all NA' naming the rank-metadata cause."
+    },
+    {
+      "priority": "P1",
+      "title": "No memory-budget warning for training against the full, un-subsampled SILVA reference",
+      "observed_in": [1, 4],
+      "problem": "fit-classifier-naive-bayes and LearnTaxa() on the full-scale SILVA 138 reference (400K+ sequences / its ~433K-sequence region-extracted subset) exhausted memory and crashed the WSL VM outright on a 31GB machine during this audit; both methods completed reliably only after falling back to a 60,000-sequence subsample of the same real reference.",
+      "root_cause": "SKILL.md gives no guidance on the memory footprint of training against a full-scale reference database -- only a --p-n-jobs parallelism note for classify-sklearn's classification step, not its training step.",
+      "fix": "Add a note under both the QIIME2 fit-classifier-naive-bayes and DECIPHER LearnTaxa sections that training against a full SILVA/GTDB reference needs substantial RAM (tens of GB) and can crash on constrained hardware; suggest --p-reads-per-batch tuning or reference subsampling/pre-filtering as a mitigation."
+    }
+  ]
+}
