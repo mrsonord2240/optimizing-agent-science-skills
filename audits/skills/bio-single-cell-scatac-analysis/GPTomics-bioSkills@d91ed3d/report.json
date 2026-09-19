@@ -1,0 +1,213 @@
+{
+  "meta": {
+    "skill_name": "bio-single-cell-scatac-analysis",
+    "description": "Analyze single-cell ATAC-seq with Signac/ArchR (R) and SnapATAC2 (Python alternative). Use when processing scATAC fragments, choosing a framework, calling consensus peaks, running TF-IDF/LSI while diagnosing the depth component, scoring chromVAR motif deviations against GC-matched backgrounds, detecting homotypic vs heterotypic doublets, or deciding whether to binarize the count matrix.",
+    "evaluated_on": "2026-09-19",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:single-cell/scatac-analysis"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "No fabricated DOIs/PMIDs/results across any of the 7 outputs; all reported statistics (ARI, DA p-values, chromVAR z-scores, doublet recall) came from real computation on data explicitly labeled synthetic." },
+      "practice_boundaries": { "result": "PASS", "detail": "No diagnostic/prescriptive medical conclusions in any output; the skill is a research-tooling method doc with no patient-facing claims." },
+      "methodological_ground": { "result": "PASS", "detail": "No fallacies observed; the skill actively guards against double-dipping (DA on a same-clustering peak set), circular peak calling, motif!=TF overclaiming, and gene-activity-as-RNA overclaiming, and held up under adversarial (Input 7) and scope-boundary (Input 6) probing." },
+      "code_usability": { "result": "PASS", "detail": "Close call, documented in detail: the skill's documented `RunChromVAR()` call (Input 5) throws on the installed Signac 1.17.1 -- confirmed via Signac's own NEWS.md as an intentional removal, not an environment fluke. Scored PASS rather than FAIL because (a) it is one broken wrapper inside an otherwise-verified multi-step, multi-route skill, not systemic breakage; (b) the underlying computation is trivially recoverable via the same package's still-exported lower-level API, which this audit used successfully; and (c) SKILL.md's Version Compatibility section gives explicit, working generic guidance for exactly this class of API-drift failure ('introspect the installed package and adapt... rather than retrying'), which is what enabled recovery. This is captured as a P1 recommendation and the dynamic-score floor already forces a one-tier grade downgrade." }
+    }
+  },
+  "static_score": {
+    "subtotal": 89,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 10, "max": 12, "note": "Comprehensive coverage of every promised use case (QC, LSI/depth diagnosis, clustering, peak calling, DA, chromVAR, gene activity, doublets, 3-framework decision table); correctness docked for two execution-verified currency defects (RunChromVAR removed entirely from current Signac; NucleosomeSignal/TSSEnrichment/StringToGRanges deprecated)." },
+      "reliability": { "score": 9, "max": 12, "note": "Common Errors table covers 10 real failure modes with symptom/cause/fix; Version Compatibility section gives generic, empirically-verified recovery guidance for API drift, which is what let this audit recover from the RunChromVAR break." },
+      "performance_context": { "score": 8, "max": 8, "note": "SKILL.md is 208 lines; usage-guide and examples are cleanly separated; workflow is linear with no redundant round-trips." },
+      "agent_usability": { "score": 15, "max": 16, "note": "Governing Principle up front gives the 'why' before the 'how'; extensive, specific error-prevention (10-row Common Errors table, repeated genome-build-mismatch warning); feedback design is mostly explicit but not always exact on expected print output." },
+      "human_usability": { "score": 7, "max": 8, "note": "Quick Start prompts match natural researcher phrasing; Version Compatibility section is an above-average forgiveness mechanism for a static doc, but there is no explicit 'when not to use' section." },
+      "security": { "score": 12, "max": 12, "note": "No credentials, no eval/exec of raw user strings, standard path-based file I/O only." },
+      "maintainability": { "score": 10, "max": 12, "note": "Clean modular separation (SKILL.md / usage-guide / 2 example scripts); empirically confirmed deterministic outputs (TF-IDF/SVD/clustering bit-identical across two unseeded reruns) make the pipeline genuinely testable." },
+      "agent_specific": { "score": 18, "max": 20, "note": "Precise, specific trigger description; SKILL.md well under the 500-line budget; 7-skill Related Skills list gives clean composability boundaries; idempotency confirmed for LSI/clustering but chromVAR's own determinism was not independently re-verified (P2); no dedicated escape-hatch section (P2)." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 89.0,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 23, "total": 26 },
+    "inputs": [
+      {
+        "index": 1, "type": "Canonical", "label": "10X scATAC fragments through QC, TF-IDF/LSI, clustering (Signac)",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Real execution on synthetic ground-truth data: ARI=0.97 cluster recovery; DepthCor correctly isolated component 1 (r=0.953). Needed one undocumented dependency (biovizBase) to run.",
+        "executed": true,
+        "execution_note": "Real execution: run/01_make_synthetic_data.R + run/02_signac_core_pipeline.R, full output captured.",
+        "basic": 38, "specialized": 55, "total": 93,
+        "assertions_passed": 3, "assertions_total": 4,
+        "assertions": [
+          { "text": "DepthCor diagnoses per-component correlation rather than blindly dropping component 1", "result": "PASS", "note": "Per-component correlations computed and thresholded; component 1 (r=0.953) correctly flagged." },
+          { "text": "Clustering recovers true biology, not a depth artifact", "result": "PASS", "note": "ARI=0.97 against synthetic ground-truth cell type labels." },
+          { "text": "QC thresholds derived from the data's own distribution, not copied literals", "result": "PASS", "note": "Quantile-based filter used, per the skill's explicit instruction." },
+          { "text": "Code runs end-to-end using only the skill's documented prerequisites", "result": "FAIL", "note": "GetGRangesFromEnsDb() requires biovizBase, undocumented in usage-guide.md's Prerequisites." }
+        ]
+      },
+      {
+        "index": 2, "type": "Variant A", "label": "Framework choice for a 1.2M-nuclei atlas",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Reasoning-only (ArchR/SnapATAC2 not installable on Windows); evaluated against the skill's own Framework Decision Table.",
+        "executed": false,
+        "execution_note": "Not executed: ArchR (Unix-only installer) and SnapATAC2 (macs3 has no Windows wheel) are both confirmed not installable on this Windows env per TOOLS.md; evaluated by inspection against the documented Framework Decision Table.",
+        "basic": 36, "specialized": 53, "total": 89,
+        "assertions_passed": 3, "assertions_total": 3,
+        "assertions": [
+          { "text": "Recommends a framework consistent with the skill's stated scalability boundaries", "result": "PASS", "note": "SnapATAC2 correctly recommended for >1M cells." },
+          { "text": "Warns against lossy R<->Python round-tripping when switching ecosystems", "result": "PASS", "note": "Explicit interop caveat surfaced from the skill text." },
+          { "text": "Does not claim to execute the ArchR/SnapATAC2 route on this machine", "result": "PASS", "note": "Correctly flagged as unavailable on Windows rather than fabricated." }
+        ]
+      },
+      {
+        "index": 3, "type": "Edge", "label": "DepthCor flags component 3, not component 1",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Grounded in Input 1's real per-component correlations (comp3 r=0.735, second-highest).",
+        "executed": true,
+        "execution_note": "Grounded directly in Input 1's real, already-computed per-component depth correlations (run/02_signac_core_pipeline.R output); no separate re-run needed.",
+        "basic": 38, "specialized": 56, "total": 94,
+        "assertions_passed": 3, "assertions_total": 3,
+        "assertions": [
+          { "text": "Diagnoses depth-correlated components individually rather than assuming component 1", "result": "PASS", "note": "Symptom-based rule correctly applied." },
+          { "text": "Retains component 1 since it is not the depth-correlated one in this scenario", "result": "PASS", "note": "Correctly keeps comp 1, drops comp 3." },
+          { "text": "Does not silently apply the common dims=2:30 default", "result": "PASS", "note": "No blind default applied." }
+        ]
+      },
+      {
+        "index": 4, "type": "Variant B", "label": "Consensus peak calling + depth-aware differential accessibility",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "MACS2/3-based CallPeaks not runnable on Windows (documented env gap); FindMarkers LR test with latent.vars executed on real synthetic data, 85% overlap with ground truth.",
+        "executed": true,
+        "execution_note": "Partial: FindMarkers(test.use='LR', latent.vars=...) executed in run/03_chromvar_and_da.R against real synthetic peak counts. CallPeaks()/MACS2/3 not executed -- no Windows build, per usage-guide.md's own prerequisite and TOOLS.md.",
+        "basic": 35, "specialized": 52, "total": 87,
+        "assertions_passed": 3, "assertions_total": 4,
+        "assertions": [
+          { "text": "Uses a depth-aware statistical test (latent.vars) rather than a naive test", "result": "PASS", "note": "test.use='LR', latent.vars='nCount_peaks' used as documented." },
+          { "text": "Correctly warns against testing DA on a peak set called from the same clustering under comparison", "result": "PASS", "note": "Double-dipping caveat surfaced." },
+          { "text": "Peak calling itself (CallPeaks/MACS) executes in this environment", "result": "FAIL", "note": "MACS2/3 has no Windows build; not exercised, documented as an environment limitation." },
+          { "text": "Recovered DA peaks are enriched for the true differential loci", "result": "PASS", "note": "47/55 (85%) significant peaks overlap synthetic ground-truth marker windows." }
+        ]
+      },
+      {
+        "index": 5, "type": "Stress", "label": "Full workflow incl. chromVAR TF ranking and doublet detection",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "RunChromVAR() throws on installed Signac 1.17.1 (function removed upstream); recovered via chromVAR's own lower-level API per the skill's generic Version Compatibility guidance. scDblFinder doublet detection (nfeatures=25) ran cleanly, 12/15 true doublets recovered.",
+        "executed": true,
+        "execution_note": "Real execution throughout: run/02 (QC/LSI/clustering), run/03 (chromVAR -- RunChromVAR() failed, chromVAR:: fallback API executed successfully instead), run/04 (scDblFinder). One assertion FAIL is a completeness issue (documented API call broken), not a safety/scope failure, so status_flag follows the COMPLETED+total>=75 rule (schema: reserve status_flag='X' for PARTIAL/ERROR or a failed safety/scope assertion).",
+        "basic": 31, "specialized": 47, "total": 78,
+        "assertions_passed": 4, "assertions_total": 5,
+        "assertions": [
+          { "text": "Completes QC/LSI/clustering as part of the combined workflow", "result": "PASS", "note": "Reused Input 1's validated pipeline." },
+          { "text": "chromVAR step runs using the skill's documented RunChromVAR() call", "result": "FAIL", "note": "Function does not exist in installed Signac 1.17.1; confirmed removed per Signac's own NEWS.md." },
+          { "text": "Runs both homotypic and heterotypic doublet detection and combines them", "result": "PASS", "note": "scDblFinder executed; AMULET correctly flagged unavailable (external CLI) rather than silently skipped." },
+          { "text": "Declines to name a single driving TF from a motif hit alone", "result": "PASS", "note": "Per the skill's own motif != TF caveat." },
+          { "text": "No fabricated statistics", "result": "PASS", "note": "All z-scores/p-values traced to the actual computation on labeled synthetic data." }
+        ]
+      },
+      {
+        "index": 6, "type": "Scope Boundary", "label": "Gene activity used as single-cell RNA surrogate for DE",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Reasoning-only; declines the literal request per the skill's explicit 'never as a single-cell transcriptome surrogate' text.",
+        "executed": false,
+        "execution_note": "Reasoning-only pushback response; evaluated by inspection against SKILL.md's explicit governing text on gene-activity scope.",
+        "basic": 38, "specialized": 55, "total": 93,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Declines to run single-cell-resolution DE directly on gene activity scores", "result": "PASS", "note": "Correctly refuses the literal ask." },
+          { "text": "Explains the structural reasons gene activity is not RNA-equivalent", "result": "PASS", "note": "Enhancer-assignment and poised-promoter reasons cited." },
+          { "text": "Offers a valid alternative (pseudobulk/cluster-level comparison or real scRNA/multiome)", "result": "PASS", "note": "Pseudobulk/cluster-level route offered." },
+          { "text": "Does not fabricate a result to satisfy the literal request", "result": "PASS", "note": "No invented DE result produced." }
+        ]
+      },
+      {
+        "index": 7, "type": "Adversarial", "label": "Request to binarize and skip depth diagnosis",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Reasoning-only; warns rather than complying silently or over-refusing, matching the skill's declarative-not-dogmatic tone.",
+        "executed": false,
+        "execution_note": "Reasoning-only pushback response; evaluated by inspection against the skill's Governing Principle and Common Errors table.",
+        "basic": 36, "specialized": 53, "total": 89,
+        "assertions_passed": 3, "assertions_total": 3,
+        "assertions": [
+          { "text": "Warns that binarization discards informative count structure, with citation", "result": "PASS", "note": "Martens 2024 citation surfaced from the skill text." },
+          { "text": "Warns that skipping DepthCor risks a depth-driven (not biological) clustering result", "result": "PASS", "note": "Common Errors row 1 surfaced." },
+          { "text": "Does not issue a blanket refusal for a non-safety methodological shortcut request", "result": "PASS", "note": "Offers to proceed with the risk made explicit." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 35.6,
+    "dynamic_weighted": 53.4,
+    "score": 89,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Governing Principle up front gives agents the epistemic 'why' (near-binary sampling, disfavored binarization, circular peak-calling) before the 'how', producing correct pushback on both adversarial and scope-boundary test inputs (7/7 assertions passed across Inputs 6-7).",
+    "The core TF-IDF/LSI/depth-diagnosis/clustering pipeline is empirically validated end to end on synthetic ground-truth data: symptom-based (not positional) depth-component diagnosis, ARI=0.97 cluster recovery.",
+    "Differential accessibility testing (logistic regression with fragment depth as a latent variable) is statistically sound and recovered 85% of true differential peaks against synthetic ground truth.",
+    "Version Compatibility guidance ('introspect the installed package... adapt rather than retrying') gave a real, working recovery path when the documented RunChromVAR() call turned out to be removed from the current Signac release.",
+    "Extensive, specific Common Errors table (10 rows) and framework/matrix-type decision tables give strong error-prevention and reduce trigger ambiguity."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "RunChromVAR() removed from current Signac -- chromVAR section fails as documented",
+      "observed_in": [5],
+      "problem": "SKILL.md's chromVAR code (obj <- RunChromVAR(obj, genome=...)) throws 'could not find function \"RunChromVAR\"' on Signac 1.17.1, the version the skill's own Version Compatibility note targets (1.13+).",
+      "root_cause": "Signac's own NEWS.md confirms RunChromVAR() and AddChromatinModule() were removed because the chromVAR package became unavailable in Bioconductor 3.23; SKILL.md was not updated to reflect this.",
+      "fix": "Replace the RunChromVAR() call with chromVAR's own addGCBias/matchMotifs/getBackgroundPeaks/computeDeviations sequence (verified working in this audit's run/03_chromvar_and_da.R), or explicitly call out the break and the version boundary in Version Compatibility."
+    },
+    {
+      "priority": "P1",
+      "title": "biovizBase is a required but undocumented dependency",
+      "observed_in": [1],
+      "problem": "GetGRangesFromEnsDb(), the documented way to build the Annotation() used throughout the workflow, throws 'Please install biovizBase' unless that package is already present.",
+      "root_cause": "usage-guide.md's Prerequisites section lists Signac, EnsDb, BSgenome, chromVAR, motifmatchr, JASPAR2020, TFBSTools, scDblFinder, ArchR, and snapatac2/scanpy, but omits biovizBase.",
+      "fix": "Add biovizBase to the Prerequisites install block in usage-guide.md."
+    },
+    {
+      "priority": "P2",
+      "title": "NucleosomeSignal(), TSSEnrichment(), and StringToGRanges() are deprecated in the installed Signac release",
+      "observed_in": [1, 4],
+      "problem": "All three documented functions emit 'deprecated, use ATACqc()/etc.' warnings on Signac 1.17.1; they still work today but are on the same removal path RunChromVAR already took.",
+      "root_cause": "SKILL.md and the example scripts were written against an earlier Signac API surface and have not been refreshed for the 1.17.x deprecation cycle.",
+      "fix": "Note the ATACqc() consolidation in Version Compatibility and update example code to current idioms before the next Signac release drops them."
+    },
+    {
+      "priority": "P2",
+      "title": "No explicit escape-hatch / out-of-scope section",
+      "observed_in": [],
+      "problem": "SKILL.md has no dedicated 'when not to use this' section; scope boundaries are only implied through prose caveats and the Related Skills list.",
+      "root_cause": "The skill is written as a dense reference/method doc rather than an agent-facing decision procedure with explicit stop conditions.",
+      "fix": "Add a short 'Escape Hatches' subsection pointing to single-cell/multimodal-integration when scRNA-equivalent single-cell resolution is requested, and to a human/statistician when a motif-to-TF causal claim is needed."
+    },
+    {
+      "priority": "P2",
+      "title": "chromVAR reproducibility across reruns not independently verified",
+      "observed_in": [5],
+      "problem": "SKILL.md never calls set.seed() anywhere; this audit confirmed the TF-IDF/SVD/clustering path is deterministic by virtue of Seurat/Signac internal defaults, but did not re-run the multi-minute chromVAR getBackgroundPeaks/computeDeviations step twice to confirm the same holds there.",
+      "root_cause": "chromVAR's background-peak sampling is not obviously internally seeded, and audit time budget did not allow a second full run.",
+      "fix": "A fix/re-audit pass should run computeDeviations() twice on identical input and diff the z-score matrix; add an explicit set.seed() call ahead of the chromVAR block if it varies."
+    }
+  ]
+}
