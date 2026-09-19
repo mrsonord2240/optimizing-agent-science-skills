@@ -11,7 +11,7 @@ Source: `GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:chemoinform
 Category: Data Analysis | Execution Mode: A (Direct — agent writes/adapts code from SKILL.md patterns; one runnable reference module in `examples/shape_search.py`) | Complexity: Complex (N=7)
 Env: `F:\OpenScience\audit-envs\cheminformatics-hit-triage-analyst\` (RDKit 2026.03.6, ShaEP 1.4.2, Open Babel 3.1.0)
 
-> **Note for reviewer:** Check Inputs 3 and 4 first — both surface the same class of defect (silent success/silent data loss on inputs the Skill's own code path does not anticipate).
+> **Note for reviewer:** Check Inputs 3 and 4 first — both surface the same class of defect (silent success/silent data loss on inputs the Skill's own code path does not anticipate). Input 4's finding (P1: `shape_search_ensemble` drops a whole molecule over one non-converged conformer, with zero reporting) is the most severe: it doesn't meet the strict P0 trigger (no veto fire, no 2+ safety-assertion fails, score above 60) but is flagged as the top P1 and should be fixed first.
 
 ## Summary Table
 

@@ -196,7 +196,7 @@
   ],
   "recommendations": [
     {
-      "priority": "P0",
+      "priority": "P1",
       "title": "shape_search_ensemble silently drops a whole molecule on one failed conformer",
       "observed_in": [4],
       "problem": "SKILL.md's own Conformer-Ensemble Shape Searching function discards an entire library molecule from the results if even 1 of n_conf (e.g. 20) MMFF-optimized conformers fails to converge, with no error, warning, or log line. In a 3-compound test, 2 molecules vanished silently.",
