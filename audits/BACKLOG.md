@@ -8,7 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (71)
+## P1 (73)
 
 ### `bio-remote-homology` — examples/pfam_annotation.sh reports the wrong domtblout columns as E-value/score
 
@@ -562,6 +562,22 @@ None open.
 - Root cause: The Version Compatibility disclosure block added in the last fix pass covered only the two functions the fixer was explicitly told about (CalculateOraScore/CalculateQeaScore); it was not extended to the library-loading functions that also reach out to a remote server.
 - Fix: Add one sentence to Version Compatibility or Prerequisites noting that SetKEGG.PathLib/CrossReferencing/Setup.KEGGReferenceMetabolome download generic (non-user) reference libraries from metaboanalyst.ca on first use or after a 30-day cache expiry, mirroring the existing FELLA/KEGGREST live-dependency disclosure.
 
+### `bio-microbiome-diversity-analysis` — Shipped example script crashes on its own demo data
+
+- Skill: 92, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/microbiome/diversity-analysis) · [viewer](skills/bio-microbiome-diversity-analysis/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: —
+- Problem: examples/diversity_analysis.R crashes with "object 'Group' not found" at the adonis2 call because meta <- data.frame(sample_data(ps_rare)) never receives a Group column -- only the separate alpha data.frame does (alpha$Group <- sample_data(ps_rare)$SampleType).
+- Root cause: Copy-paste oversight: the demo script's grouping-variable name ('Group') doesn't match GlobalPatterns' real column name ('SampleType'), and the fix applied to alpha was never mirrored onto meta.
+- Fix: Add meta$Group <- sample_data(ps_rare)$SampleType immediately after the meta <- data.frame(sample_data(ps_rare)) line; verified this one-line fix fully resolves the crash and the script runs to completion.
+
+### `bio-microbiome-diversity-analysis` — No repeated-measures/pseudo-replication guidance for beta diversity
+
+- Skill: 92, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/microbiome/diversity-analysis) · [viewer](skills/bio-microbiome-diversity-analysis/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 5
+- Problem: SKILL.md's Alpha Diversity section says to escalate to lme4/nlme for repeated measures, but the Beta Diversity/PERMANOVA section and its code block never mention non-independence or vegan's strata= argument. On a real 3-visits-per-subject fixture, a naive pooled PERMANOVA gives p=0.098 (borderline) while a properly restricted analysis (strata=SubjectID) gives p=1 (no signal).
+- Root cause: The Beta Diversity in R section's adonis2 pattern has no repeated-measures branch or warning, unlike the parallel alpha-diversity section.
+- Fix: Add a repeated-measures note to the Beta Diversity section mirroring the alpha-diversity one: when samples are nested within subjects/repeated over time, use adonis2(..., strata = SubjectID) and warn that pooling all timepoints without restriction inflates apparent significance.
+
 ### `bio-pathway-kegg-pathways` — graphite route disagrees with direct spia() on perturbation direction for 30% of pathways, undocumented
 
 - Skill: 94, Production Ready · [mrsonord2240/bioSkills@424a053](https://github.com/mrsonord2240/bioSkills/tree/424a0533ba4b67063c884886c727b1f3ecab6342/pathway-analysis/kegg-pathways) · [viewer](skills/bio-pathway-kegg-pathways/mrsonord2240-bioSkills@424a053/viewer.md)
@@ -578,7 +594,7 @@ None open.
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (267)
+## P2 (268)
 
 ### `bio-crispr-screens-copy-number-correction` — negative_control_sgrnas empty-dict case raises an undocumented ValueError
 
@@ -2507,6 +2523,14 @@ None open.
 - Problem: SKILL.md's decontam section still does not name and reject the specific shortcut of replacing decontam with a flat abundance-percentage filter, unchanged from the original audit.
 - Root cause: Out of scope for this fix pass, which targeted the truncLen ceiling defect only.
 - Fix: Add one sentence to the decontam section naming this shortcut and explaining why control-based statistical testing (decontam) is not interchangeable with an arbitrary abundance cutoff.
+
+### `bio-microbiome-diversity-analysis` — NMDS and RPCA are named but not backed by worked code
+
+- Skill: 92, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/microbiome/diversity-analysis) · [viewer](skills/bio-microbiome-diversity-analysis/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: —
+- Problem: The Skill documents PCoA thoroughly (R and QIIME2) but never mentions NMDS at all, and RPCA/DEICODE appears only as a one-line CLI reference with no worked R/Python example, despite being listed in the Tool Taxonomy and Decision Tree.
+- Root cause: Progressive disclosure stopped one level short for these two secondary methods.
+- Fix: Add a short NMDS snippet (vegan::metaMDS) alongside the PCoA one, and either a worked RPCA example or an explicit note routing to qiime2-workflow for the full deicode/gemelli command.
 
 ### `bio-workflows-metabolomics-pipeline` — MS-DIAL alternate entry point still has zero glue code
 

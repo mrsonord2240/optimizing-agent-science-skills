@@ -1,0 +1,270 @@
+{
+  "meta": {
+    "skill_name": "bio-microbiome-diversity-analysis",
+    "description": "Alpha and beta diversity of an amplicon (16S/ITS) ASV/OTU community table: observed features, Shannon, Pielou evenness, Faith PD, Bray-Curtis, Jaccard, weighted/unweighted/generalized UniFrac, Aitchison/RPCA, via QIIME2 core-metrics-phylogenetic, phyloseq/vegan, and scikit-bio, with PERMANOVA paired with betadisper.",
+    "evaluated_on": "2026-09-19",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:microbiome/diversity-analysis"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "All 12 references (Faith 1992, Pielou 1966, Lozupone 2005/2007, Chen 2012, Janssen 2018, Mirarab 2012, McDonald 2018/2024, Martino 2019, McMurdie 2013/2014, Schloss 2024) are real, verifiable, well-known papers in this exact literature. No fabricated statistics, p-values, or effect sizes anywhere in the Skill."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Community-level microbiome diversity statistics for research use; no diagnostic or prescriptive claims about individuals anywhere; no medical disclaimer required for this scope."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "The Skill actively prevents methodological fallacies for the cases it covers: explicit, verified-correct warnings against rarefying to min(sample_sums), against reusing the rarefied table for differential abundance, and mandatory betadisper pairing with every PERMANOVA (confirmed necessary on both a synthetic fixture and a real dataset, where dispersion confounds were genuinely present). One real gap found and recorded as a P1, not a veto: the Beta Diversity/PERMANOVA section gives no guidance for repeated-measures/pseudo-replicated designs, unlike the parallel Alpha Diversity section. Tested on a real longitudinal fixture, a naive pooled PERMANOVA (p=0.098) did not flip the qualitative conclusion relative to a properly restricted one (p=1), so no output actually committed a reporting fallacy in this audit -- but the gap is real and would matter on a different draw."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All real R code (fixture-based alpha/beta/PERMANOVA/betadisper, the verbatim SKILL.md generalized-UniFrac line) and the full real QIIME2 2024.10.1 CLI pipeline (import through core-metrics-phylogenetic and beta-group-significance) executed successfully across all 7 inputs and a second independent real dataset. One bundled demo script (examples/diversity_analysis.R) crashed with 'object Group not found' due to a variable-naming copy-paste bug; a one-line fix (verified) fully resolves it. Recorded as a P1, not a veto, since it is a bundled demo artifact, not the SKILL.md prose pattern itself (which was independently exercised and confirmed correct throughout)."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 91,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 10,
+        "max": 12,
+        "note": "Completeness: thorough coverage of alpha (Observed/Shannon/Pielou/Faith PD), beta (Bray-Curtis/Jaccard/weighted+unweighted+generalized UniFrac), tree-building (SEPP vs de novo) and PERMANOVA+betadisper; gaps are NMDS (never mentioned) and RPCA (named in the Tool Taxonomy/Decision Tree but only a one-line CLI reference, no worked code). Correctness: verified accurate by real execution end to end; one shipped example (examples/diversity_analysis.R) crashes on its own demo data (real, reproducible, one-line fix confirmed). Appropriateness: excellent -- the three-knobs framing (depth/tree/metric) is exactly right and directly validated by real dispersion-confound findings on two independent datasets."
+      },
+      "reliability": {
+        "score": 10,
+        "max": 12,
+        "note": "Fault tolerance: the Common Errors and Per-Method Failure Modes tables anticipate and correctly describe every real failure mode this audit triggered (no-tree UniFrac error, sampling-depth sample loss, Shannon base mismatch, PERMANOVA dispersion), but give no guidance for repeated-measures/pseudo-replicated PERMANOVA designs (a real gap found via the longitudinal fixture). Error reporting is clear and specific throughout (the tree-less UniFrac error matches the documented message exactly). Recoverability is generally strong (fixed seeds, one-line fixes) but the shipped-example bug would confuse a first-time user before self-diagnosis."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "SKILL.md is 223 lines (well under the 500-line guideline), with usage-guide.md and examples/ split out for progressive disclosure; dense but well-organized tables keep it efficient to scan."
+      },
+      "agent_usability": {
+        "score": 15,
+        "max": 16,
+        "note": "Very high learnability -- all 7 real test inputs were completed cold-start using only SKILL.md's stated patterns with no need to guess. Minor consistency gap: the Alpha and Beta Diversity R code blocks build the grouping-variable dataframe in slightly different styles. Feedback design and error prevention are both excellent, backed by a detailed Common Errors / Per-Method Failure Modes section that matched real observed behavior throughout."
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Description frontmatter and usage-guide Quick Start use natural trigger phrasing ('Compare microbial diversity across my samples') that matches how a researcher would actually ask. Forgiveness is solid (graceful non-phylogenetic fallback, confirmed working) with only the repeated-measures gap as a soft spot."
+      },
+      "security": {
+        "score": 12,
+        "max": 12,
+        "note": "No credentials, no unsanitized execution of user-provided strings, no sensitive-data handling concerns for community-level microbiome data."
+      },
+      "maintainability": {
+        "score": 10,
+        "max": 12,
+        "note": "Clean separation between SKILL.md (reference), usage-guide.md (prompts/quickstart) and examples/ (runnable scripts). Testability is docked one point because the one shipped 'test case' example is itself broken as-is."
+      },
+      "agent_specific": {
+        "score": 20,
+        "max": 20,
+        "note": "Precise trigger boundaries (per-taxon -> differential-abundance; shotgun tables -> metagenome-visualization), confirmed by a clean real redirect in Input 6. Strong progressive disclosure, clear Related Skills composability, fully seeded/deterministic pipeline, and explicit escape hatches (anti-min-depth warning, DA/diversity separation) all verified in real execution."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 93.3,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 26, "total": 28 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Full alpha+beta diversity, PERMANOVA+betadisper on a real phyloseq fixture (control vs treated)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "All values real and correctly interpreted; correctly distinguished a clean location effect (weighted UniFrac) from a dispersion-confounded one (unweighted UniFrac)",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Output declares the sampling depth AND the exact dropped-sample list", "result": "PASS", "note": "Chosen depth 7169; dropped S03, S17, S29, S40" },
+          { "text": "Output reports both weighted AND unweighted UniFrac PERMANOVA rather than cherry-picking", "result": "PASS", "note": "Both reported: R2=0.659 vs R2=0.060, both p=0.001" },
+          { "text": "Output pairs every PERMANOVA with betadisper and correctly flags a dispersion confound where present", "result": "PASS", "note": "Weighted UniFrac betadisper p=0.591 (clean); unweighted p=0.001 (confounded)" },
+          { "text": "Faith PD and Shannon are real, non-placeholder numeric values differing significantly by group", "result": "PASS", "note": "Kruskal-Wallis Shannon p=2.97e-07, Faith PD p=1.52e-06" }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Sampling-depth choice: quantify min(sample_sums) vs plateau-based depth",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Real quantification: min-depth choice loses 17.8% richness vs plateau depth at the cost of only 4 dropped samples",
+        "basic": 38,
+        "specialized": 55,
+        "total": 93,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Output reports the exact dropped-sample list at the chosen depth", "result": "PASS", "note": "S03, S17, S29, S40 named explicitly" },
+          { "text": "Output avoids recommending min(sample_sums)", "result": "PASS", "note": "Explicitly follows SKILL.md's 'worst of both worlds' guidance" },
+          { "text": "Output quantifies the real richness cost of the min-depth choice", "result": "PASS", "note": "118.7 vs 139.8 mean Observed richness, 17.8% difference" },
+          { "text": "Output confirms the chosen depth sits on the alpha-rarefaction richness plateau, per SKILL.md's stated method", "result": "FAIL", "note": "Substitutes a 10th-percentile heuristic; SKILL.md's R-side workflow gives no numeric substitute for visually reading the alpha-rarefaction curve" }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "No phylogenetic tree available -- non-phylogenetic fallback",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "UniFrac correctly errors with the exact documented message; Bray-Curtis/Jaccard fallback works and is correctly paired with betadisper",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "UniFrac() on a tree-less phyloseq object errors with a specific, diagnosable message", "result": "PASS", "note": "'phy_tree slot is empty' -- matches SKILL.md's Common Errors row exactly" },
+          { "text": "Non-phylogenetic alpha and beta diversity are still computed successfully", "result": "PASS", "note": "Observed/Shannon, Bray-Curtis/Jaccard all computed" },
+          { "text": "Fallback PERMANOVA is still paired with betadisper", "result": "PASS", "note": "Bray-Curtis betadisper p=0.001, correctly flagged as dispersion-confounded" },
+          { "text": "Skill fails loudly rather than silently returning a wrong UniFrac value", "result": "PASS", "note": "Clean R error, no garbage output" }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Real QIIME2 core-metrics-phylogenetic pipeline on the moving-pictures 16S dataset (4 body sites) + generalized UniFrac cross-check",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Full real CLI pipeline import->demux->dada2->tree->core-metrics->beta-group-significance completed; every metric showed both significant PERMANOVA and significant PERMDISP",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "core-metrics-phylogenetic (the Skill's central CLI tool) runs to completion on real 16S data", "result": "PASS", "note": "All 4 alpha vectors + 4 beta distance matrices produced" },
+          { "text": "Sampling-depth-drops-samples behavior confirmed on a second, independent real dataset", "result": "PASS", "note": "33 -> 31 samples at the tutorial's standard depth 1103" },
+          { "text": "Every beta metric's PERMANOVA is correctly reported alongside a significant PERMDISP where present, even for an obvious biological effect", "result": "PASS", "note": "All 3 metrics: PERMANOVA p=0.001 AND PERMDISP significant (p=0.026, 0.002, 0.003)" },
+          { "text": "SKILL.md's verbatim generalized-UniFrac code line runs unmodified and interpolates correctly", "result": "PASS", "note": "R2=0.419, between weighted (0.659) and unweighted (0.060)" }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Longitudinal/repeated-measures design: alpha across visits, beta by treatment arm",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Real gap found: naive pooled PERMANOVA (p=0.098) materially overstates evidence vs a properly restricted one (p=1); SKILL.md gives no beta-diversity repeated-measures guidance",
+        "basic": 35,
+        "specialized": 52,
+        "total": 87,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Alpha and beta diversity are computed correctly on the repeated-measures fixture", "result": "PASS", "note": "Shannon and weighted UniFrac computed for all 32 rarefied samples" },
+          { "text": "SKILL.md provides repeated-measures/pseudo-replication guidance for PERMANOVA, mirroring its alpha-diversity guidance", "result": "FAIL", "note": "Alpha section says 'escalate to lme4/nlme for repeated measures'; Beta Diversity section's adonis2 pattern has no strata/repeated-measures mention anywhere" },
+          { "text": "Restricted permutations (strata=SubjectID) materially change the PERMANOVA result relative to the naive pooled version", "result": "PASS", "note": "Naive p=0.098 -> strata-corrected p=1" },
+          { "text": "The naive result's qualitative conclusion does not flip to a false positive in this instance", "result": "PASS", "note": "Both naive and corrected agree on 'not significant', but naive p=0.098 overstates the evidence" }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Per-taxon 'which bug changed' request -- should redirect to differential-abundance",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Clean redirect with an in-scope compositional alternative offered",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Output does not perform per-taxon significance testing itself", "result": "PASS", "note": "Declines to generate ASV-level p-values" },
+          { "text": "Output explicitly redirects to differential-abundance", "result": "PASS", "note": "Matches SKILL.md's frontmatter and Decision Tree row" },
+          { "text": "Output warns against reusing the rarefied table for DA", "result": "PASS", "note": "Matches SKILL.md's 'never for differential abundance' principle" },
+          { "text": "Output offers an in-scope alternative rather than a flat refusal", "result": "PASS", "note": "Offers RPCA loadings as a compositional, suggestive alternative" }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Explicit request to rarefy to min(sample_sums), the documented anti-pattern",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Pushes back with quantified real numbers rather than blind compliance, while remaining forgiving",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Output does not blindly comply with the min(sample_sums) request", "result": "PASS", "note": "Pushes back citing McMurdie 2014 before proceeding" },
+          { "text": "Output quantifies the actual cost/benefit on the user's own numbers", "result": "PASS", "note": "18% richness difference, 4 dropped samples, cited from Input 2's real run" },
+          { "text": "Output reports the specific dropped-sample list", "result": "PASS", "note": "S03, S17, S29, S40 named" },
+          { "text": "Output remains forgiving -- offers the originally requested version too", "result": "PASS", "note": "Does not flatly refuse the user's request" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 36.4,
+    "dynamic_weighted": 56.0,
+    "score": 92,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Real execution across two independent datasets (a 40-sample phyloseq fixture and QIIME2's real moving-pictures 16S tutorial dataset) confirms every core numeric claim: min(sample_sums) rarefaction under-saturates richness by ~18%, weighted/unweighted/generalized UniFrac interpolate exactly as documented, and the sampling-depth silent-drop behavior reproduces on both datasets.",
+    "The mandatory PERMANOVA+betadisper pairing is demonstrably necessary, not just documented: on both the R fixture and the real body-site dataset, beta metrics turned out to be dispersion-confounded, and the Skill's own guidance correctly anticipates and instructs how to report this.",
+    "Clean, correctly-enforced scope boundaries: per-taxon requests redirect to differential-abundance, min(sample_sums) anti-pattern requests get a quantified pushback rather than blind compliance, and a tree-less input falls back to non-phylogenetic metrics with a clear documented error rather than a silent wrong answer.",
+    "This Skill's own data.frame(sample_data(ps)) pattern (SKILL.md and the shipped example) is verified NOT to hit the as.data.frame() S4-class coercion trap that broke the sibling differential-abundance Skill's LinDA code on the identical fixture object."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "Shipped example script crashes on its own demo data",
+      "observed_in": [],
+      "problem": "examples/diversity_analysis.R crashes with \"object 'Group' not found\" at the adonis2 call because meta <- data.frame(sample_data(ps_rare)) never receives a Group column -- only the separate alpha data.frame does (alpha$Group <- sample_data(ps_rare)$SampleType).",
+      "root_cause": "Copy-paste oversight: the demo script's grouping-variable name ('Group') doesn't match GlobalPatterns' real column name ('SampleType'), and the fix applied to alpha was never mirrored onto meta.",
+      "fix": "Add meta$Group <- sample_data(ps_rare)$SampleType immediately after the meta <- data.frame(sample_data(ps_rare)) line; verified this one-line fix fully resolves the crash and the script runs to completion."
+    },
+    {
+      "priority": "P1",
+      "title": "No repeated-measures/pseudo-replication guidance for beta diversity",
+      "observed_in": [5],
+      "problem": "SKILL.md's Alpha Diversity section says to escalate to lme4/nlme for repeated measures, but the Beta Diversity/PERMANOVA section and its code block never mention non-independence or vegan's strata= argument. On a real 3-visits-per-subject fixture, a naive pooled PERMANOVA gives p=0.098 (borderline) while a properly restricted analysis (strata=SubjectID) gives p=1 (no signal).",
+      "root_cause": "The Beta Diversity in R section's adonis2 pattern has no repeated-measures branch or warning, unlike the parallel alpha-diversity section.",
+      "fix": "Add a repeated-measures note to the Beta Diversity section mirroring the alpha-diversity one: when samples are nested within subjects/repeated over time, use adonis2(..., strata = SubjectID) and warn that pooling all timepoints without restriction inflates apparent significance."
+    },
+    {
+      "priority": "P2",
+      "title": "NMDS and RPCA are named but not backed by worked code",
+      "observed_in": [],
+      "problem": "The Skill documents PCoA thoroughly (R and QIIME2) but never mentions NMDS at all, and RPCA/DEICODE appears only as a one-line CLI reference with no worked R/Python example, despite being listed in the Tool Taxonomy and Decision Tree.",
+      "root_cause": "Progressive disclosure stopped one level short for these two secondary methods.",
+      "fix": "Add a short NMDS snippet (vegan::metaMDS) alongside the PCoA one, and either a worked RPCA example or an explicit note routing to qiime2-workflow for the full deicode/gemelli command."
+    }
+  ]
+}
