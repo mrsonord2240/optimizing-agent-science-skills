@@ -218,17 +218,17 @@ None open.
 - Root cause: query_raw() inherits pybiomart's GET-based transport unchanged; nothing in the fix's new helper switches to POST or chunks large ID lists client-side.
 - Fix: Either build the query_raw() request as an HTTP POST (BioMart's martservice endpoint accepts POST for the same XML payload) or chunk ID lists above a safe size (empirically ~500-1000 IDs) into multiple queries joined client-side, and correct the '5,000'/'8,000 IDs' claims in SKILL.md and usage-guide.md to state the real, tested limit.
 
-### `bio-differential-abundance-microbiome` — LinDA section's own example code crashes on a real phyloseq object
+### `bio-microbiome-differential-abundance` — LinDA section's own example code crashes on a real phyloseq object
 
-- Skill: 87, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/microbiome/differential-abundance) · [viewer](skills/bio-differential-abundance-microbiome/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Skill: 87, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/microbiome/differential-abundance) · [viewer](skills/bio-microbiome-differential-abundance/GPTomics-bioSkills@d91ed3d/viewer.md)
 - Observed in inputs: 3
 - Problem: The 'LinDA: Fast CLR Regression With Native Mixed Models' section's shown code (`meta <- as.data.frame(sample_data(ps))`) crashes with 'invalid class "sample_data" object: Sample Data must have non-zero dimensions' when fed a real phyloseq object -- confirmed by running the snippet verbatim.
 - Root cause: phyloseq's own as.data.frame() method on a sample_data object is effectively an identity operation and silently keeps the S4 class 'sample_data' rather than converting to a plain data.frame; MicrobiomeStat::linda() later does raw column-subsetting internally (scale(Z[, ind])) that requires a true data.frame and fails deep inside its own code.
 - Fix: Replace `meta <- as.data.frame(sample_data(ps))` with `meta <- data.frame(as(sample_data(ps), 'data.frame'))` in the LinDA section's code block, and add a one-line Common Errors table row naming this exact error message and fix so it's discoverable without a stack-trace dive.
 
-### `bio-differential-abundance-microbiome` — ZicoSeq crashes outright on zero-variance features with no SKILL.md warning or code example
+### `bio-microbiome-differential-abundance` — ZicoSeq crashes outright on zero-variance features with no SKILL.md warning or code example
 
-- Skill: 87, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/microbiome/differential-abundance) · [viewer](skills/bio-differential-abundance-microbiome/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Skill: 87, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/microbiome/differential-abundance) · [viewer](skills/bio-microbiome-differential-abundance/GPTomics-bioSkills@d91ed3d/viewer.md)
 - Observed in inputs: 4
 - Problem: GUniFrac::ZicoSeq() throws a hard error ('Feature 5,17 have identical values (e.g. all 0s)! Please remove them!') on zero-variance features rather than dropping them internally the way the other panel tools' prv_cut/prevalence-filter arguments do. SKILL.md gives ZicoSeq no runnable code block at all (only a one-sentence prose description), so nothing warns the reader this crash exists or shows the fix.
 - Root cause: ZicoSeq's own filtering (perm.no-based winsorization/reference selection) assumes non-degenerate features and does not implement a prv_cut-style auto-drop the way ALDEx2/ANCOM-BC2/LinDA do; the SKILL.md's 'Filter Before Testing' section presents its prv_cut=0.10 example as a generic step without noting it is a hard prerequisite specifically for ZicoSeq.
@@ -1132,22 +1132,6 @@ None open.
 - Root cause: Examples are kept standalone-runnable by design, which requires the helper to be copied rather than imported from a shared module.
 - Fix: No action required under current policy; if the helper changes again, verify all 3 copies are updated in the same commit (as this fix did correctly).
 
-### `bio-differential-abundance-microbiome` — 4 of 8 named DA tools have no runnable code example anywhere in the Skill
-
-- Skill: 87, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/microbiome/differential-abundance) · [viewer](skills/bio-differential-abundance-microbiome/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: —
-- Problem: ZicoSeq, MaAsLin3, LEfSe, and DESeq2 are all named in the frontmatter description and Tool Taxonomy table as covered methods, but only ALDEx2, ANCOM-BC2, LinDA, and MaAsLin2 get full worked code blocks. LEfSe in particular needs a non-standard invocation path (a separate Python-2-era environment, per this audit folder's TOOLS.md) with zero guidance anywhere in the Skill for how to actually run it.
-- Root cause: The Skill's worked-example coverage was prioritized toward the 'ALWAYS run >=2' consensus-anchor tools and did not extend to the rest of the named panel.
-- Fix: Add at minimum a short runnable code block for ZicoSeq (see the P1 fix above) and MaAsLin3; for LEfSe, either add its CLI invocation pattern (lefse-format_input.py / lefse_run.py) or explicitly scope it out of the 'covered methods' list in the frontmatter description if it is meant as citation-only context.
-
-### `bio-differential-abundance-microbiome` — ALDEx2 example omits set.seed(), so its Monte-Carlo output is not reproducible run-to-run
-
-- Skill: 87, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/microbiome/differential-abundance) · [viewer](skills/bio-differential-abundance-microbiome/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 1
-- Problem: The shown `aldex()` call draws mc.samples=128 Dirichlet Monte-Carlo instances but the code example never sets a seed beforehand, so re-running the exact shown snippet on the same data produces slightly different expected p-values and effect sizes each time.
-- Root cause: The Skill documents the mc.samples parameter's effect on stability (128 standard, 256+ for publication) but does not treat seed management as part of the same reproducibility concern.
-- Fix: Add `set.seed(<n>)` immediately before the `aldex()` call in the ALDEx2 code block, with a one-line note that this is required for bit-reproducible results, not just a larger mc.samples.
-
 ### `bio-experimental-design-batch-design` — Bridge-channel block doesn't inherit the soft imbalance warning
 
 - Skill: 87, Production Ready · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/experimental-design/batch-design) · [viewer](skills/bio-experimental-design-batch-design/mrsonord2240-bioSkills@6847328/viewer.md)
@@ -1171,6 +1155,22 @@ None open.
 - Problem: OSAT appears in the frontmatter (primary_tool alternative) and taxonomy but no OSAT code exists anywhere in SKILL.md or examples/.
 - Root cause: The Skill was written designit-first; OSAT is a one-line mention.
 - Fix: Add a minimal OSAT optimal.shuffle() example, or drop the OSAT promise from the taxonomy line to avoid implying code that isn't shown.
+
+### `bio-microbiome-differential-abundance` — 4 of 8 named DA tools have no runnable code example anywhere in the Skill
+
+- Skill: 87, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/microbiome/differential-abundance) · [viewer](skills/bio-microbiome-differential-abundance/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: —
+- Problem: ZicoSeq, MaAsLin3, LEfSe, and DESeq2 are all named in the frontmatter description and Tool Taxonomy table as covered methods, but only ALDEx2, ANCOM-BC2, LinDA, and MaAsLin2 get full worked code blocks. LEfSe in particular needs a non-standard invocation path (a separate Python-2-era environment, per this audit folder's TOOLS.md) with zero guidance anywhere in the Skill for how to actually run it.
+- Root cause: The Skill's worked-example coverage was prioritized toward the 'ALWAYS run >=2' consensus-anchor tools and did not extend to the rest of the named panel.
+- Fix: Add at minimum a short runnable code block for ZicoSeq (see the P1 fix above) and MaAsLin3; for LEfSe, either add its CLI invocation pattern (lefse-format_input.py / lefse_run.py) or explicitly scope it out of the 'covered methods' list in the frontmatter description if it is meant as citation-only context.
+
+### `bio-microbiome-differential-abundance` — ALDEx2 example omits set.seed(), so its Monte-Carlo output is not reproducible run-to-run
+
+- Skill: 87, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/microbiome/differential-abundance) · [viewer](skills/bio-microbiome-differential-abundance/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 1
+- Problem: The shown `aldex()` call draws mc.samples=128 Dirichlet Monte-Carlo instances but the code example never sets a seed beforehand, so re-running the exact shown snippet on the same data produces slightly different expected p-values and effect sizes each time.
+- Root cause: The Skill documents the mc.samples parameter's effect on stability (128 standard, 256+ for publication) but does not treat seed management as part of the same reproducibility concern.
+- Fix: Add `set.seed(<n>)` immediately before the `aldex()` call in the ALDEx2 code block, with a one-line note that this is required for bit-reproducible results, not just a larger mc.samples.
 
 ### `bio-phylo-bayesian-inference` — Make the example refuse a single .p file
 
