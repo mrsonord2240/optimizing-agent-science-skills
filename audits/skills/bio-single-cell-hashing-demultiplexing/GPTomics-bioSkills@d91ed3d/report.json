@@ -1,0 +1,200 @@
+{
+  "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:single-cell/hashing-demultiplexing",
+  "meta": {
+    "skill_name": "bio-single-cell-hashing-demultiplexing",
+    "description": "Assign cells to their sample of origin from cell or nucleus hashing (CITE-seq HTOs, MULTI-seq lipid/cholesterol tags, CellPlex CMOs) and call cross-sample doublets using Seurat HTODemux/MULTIseqDemux, hashsolo, demuxEM, GMM-Demux, and demuxmix. Use when assigning pooled hashed cells back to their sample, calling cross-sample doublets from HTO counts, choosing a demultiplexing method, deciding between hashtag and genetic demultiplexing, or rescuing an oversized Negative pile from weak HTO staining or ambient spillover.",
+    "evaluated_on": "2026-09-19",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Moderate",
+    "n_inputs": 5
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "No fabricated DOIs/PMIDs, p-values, sample sizes, or clinical claims in any of the 5 outputs; all reported numbers trace to executed code or synthetic ground truth." },
+      "practice_boundaries": { "result": "PASS", "detail": "Skill operates on cell/sample data in a lab computational context, not patient diagnosis or treatment; no diagnostic/prescriptive language in any output; a medical disclaimer is not applicable to this scope." },
+      "methodological_ground": { "result": "PASS", "detail": "No principled methodological fallacy found. The cross-sample-doublet / within-sample-doublet distinction, the 1/k calibration heuristic, and the genetic-vs-hashtag applicability rules (Input 4) all matched verified tool behavior and the Skill's own governing principle." },
+      "code_usability": { "result": "PASS", "detail": "All executed code ran to completion without syntax errors, infinite loops, or missing dependencies. Input 2's hashsolo call is a severe accuracy defect (see P0), not an unrunnable-code defect in the strict M4 sense, so it is scored via dynamic_score and recommendations rather than this gate." }
+    }
+  },
+  "static_score": {
+    "subtotal": 79,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 9, "max": 12, "note": "Decision table and 2 of 5 named tools (HTODemux, hashsolo) have working examples; demuxEM/pegasus and GMM-Demux have no runnable pattern. hashsolo's own advertised 2-hashtag use case (usage-guide.md) silently fails with default parameters (see Input 2)." },
+      "reliability": { "score": 4, "max": 12, "note": "No warning anywhere in the Skill about hashsolo's number_of_noise_barcodes default degenerating at 2 tags, or about demuxmix's glm.nb hard-crash on poor fits; neither failure mode surfaces an actionable message to the agent." },
+      "performance_context": { "score": 8, "max": 8, "note": "Clean progressive disclosure: SKILL.md ~70 lines, usage-guide.md for prompts/tips, examples/ for code." },
+      "agent_usability": { "score": 11, "max": 16, "note": "Governing principle and decision table are clear and consistent; feedback design and error prevention both miss the empirically-found silent-failure mode in Input 2." },
+      "human_usability": { "score": 7, "max": 8, "note": "Natural trigger language in Quick Start prompts; input-requirement documentation is explicit (Category-3 Forgiveness override applied)." },
+      "security": { "score": 12, "max": 12, "note": "No credentials, no unsanitized user-string execution, no data-retention concerns; standard local-file bioinformatics workflow." },
+      "maintainability": { "score": 10, "max": 12, "note": "Clean file separation (SKILL.md/usage-guide.md/examples/); no bundled expected-output test fixtures to verify future changes against." },
+      "agent_specific": { "score": 18, "max": 20, "note": "Precise trigger description; excellent Related Skills composability section with correct scope handoffs; all 3 executed tools verified deterministic, but the Skill itself never states this or flags GMM-Demux (untested here) either way." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 77.4,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 19, "total": 23 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "HTODemux, 4-sample equal pooling, clean staining",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Real execution (Seurat 5.5.0, synthetic 1600-cell dataset). Global classification 1600/1600 matched ground truth; singlet sample-ID assignment 1360/1360 matched ground truth.",
+        "basic": 38,
+        "specialized": 52,
+        "total": 90,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Output classifies every cell into Singlet/Doublet/Negative", "result": "PASS", "note": "table(HTO_classification.global) accounts for all 1600 cells" },
+          { "text": "Output reports the cross-sample doublet rate for sanity-checking", "result": "PASS", "note": "Printed doublet_rate = 0.077" },
+          { "text": "Sample assignment matches ground truth", "result": "PASS", "note": "1600/1600 global class agreement, 1360/1360 singlet sample-ID agreement" },
+          { "text": "Code follows the Skill's documented CLR margin=2 / positive.quantile=0.99 pattern exactly", "result": "PASS", "note": "Verified inline against examples/htodemux_seurat.R" },
+          { "text": "Output does not exceed stated skill scope", "result": "PASS", "note": "Pure computational classification, no diagnostic claims" }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "hashsolo, 2-hashtag scanpy AnnData (Skill's own advertised use case)",
+        "status": "COMPLETED",
+        "status_flag": "❌",
+        "note": "Real execution (scanpy 1.12.4). ALL 900 cells classified Negative regardless of true class -- 5.4% accuracy. Root cause: sce.pp.hashsolo's number_of_noise_barcodes defaults to len(columns)-2 = 0 for exactly 2 tags, confirmed by setting number_of_noise_barcodes=1 explicitly, which recovered 100% accuracy on the same data.",
+        "basic": 16,
+        "specialized": 23,
+        "total": 39,
+        "assertions_passed": 2,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Output correctly assigns singlet samples for the majority of true singlets", "result": "FAIL", "note": "0% of true singlets recovered; all called Negative" },
+          { "text": "Output surfaces an actionable error/warning when classification degenerates to 100% Negative", "result": "FAIL", "note": "Only an unrelated numpy 'Mean of empty slice' RuntimeWarning appears; it does not name the cause" },
+          { "text": "Code follows the Skill's documented hashsolo call pattern without syntax errors", "result": "PASS", "note": "Ran to completion, exit 0" },
+          { "text": "Skill documents that hashsolo's number_of_noise_barcodes degenerates with exactly 2 hashtags", "result": "FAIL", "note": "Not mentioned in SKILL.md, usage-guide.md, or examples/hashsolo_scanpy.py, despite usage-guide.md explicitly offering 'when I only have two hashtags' as a supported prompt" },
+          { "text": "Output does not fabricate claims / stays in scope", "result": "PASS", "note": "No fabrication; a silently wrong computational result, not an invented one" }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "demuxmix rescue of an oversized Negative pile (weak staining)",
+        "status": "COMPLETED",
+        "status_flag": "❌",
+        "note": "Real execution (demuxmix 1.8.0). On realistic overdispersed ambient background, demuxmix outperformed a baseline HTODemux-style quantile call (0.961 vs 0.951 accuracy) as the Skill claims. Separately, on a more Poisson-like (underdispersed) synthetic background, the same demuxmix() call threw an uncaught R error from glm.nb ('missing value where TRUE/FALSE needed'); demuxmix's own warning named the cause (underdispersion) and suggested the clusterInit parameter, which the Skill never mentions.",
+        "basic": 33,
+        "specialized": 45,
+        "total": 78,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Output identifies demuxmix as the recommended rescue tool for weak staining", "result": "PASS", "note": "Matches SKILL.md/usage-guide.md guidance exactly" },
+          { "text": "demuxmix classification improves or matches accuracy vs. baseline HTODemux on the same data", "result": "PASS", "note": "0.961 vs 0.951 against ground truth" },
+          { "text": "Output reports the resulting Negative fraction so the rescue can be judged", "result": "PASS", "note": "0.405 (demuxmix) vs 0.406 (baseline) vs 0.432 true" },
+          { "text": "Skill warns that demuxmix's regression can hard-fail on poorly-dispersed data and documents clusterInit as the remedy", "result": "FAIL", "note": "Not mentioned anywhere in the Skill; found only via demuxmix's own runtime warning" }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Choosing genetic vs. hashtag demultiplexing (no hashing performed)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Mode A text-only consultation, no code generated for this input. Correctly redirected to single-cell/batch-integration for genetic demux, stated the same-donor limitation, and restated the within-sample-doublet blind spot and 1/k calibration heuristic from the Skill's own governing principle.",
+        "basic": 38,
+        "specialized": 50,
+        "total": 88,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Output identifies genetic demultiplexing as the appropriate modality given no hashing library", "result": "PASS", "note": "Matches SKILL.md's Choosing a demultiplexing modality table" },
+          { "text": "Output states the same-donor limitation of genetic demux", "result": "PASS", "note": "Matches SKILL.md verbatim ('Cannot do' column)" },
+          { "text": "Output states within-sample doublets require separate expression-based detection regardless of modality", "result": "PASS", "note": "Matches SKILL.md governing principle" },
+          { "text": "Output does not exceed stated skill scope", "result": "PASS", "note": "Hands off to single-cell/batch-integration rather than inventing a genetic-demux procedure" }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "4-sample unequal pooling (5% minority tag) + doublet-rate reconciliation + downstream note",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Real execution (Seurat 5.5.0). Global classification 98.8% accuracy, singlet sample-ID agreement 100% including the minority tag (HTO-D, ~4% of singlets, correctly distinguished from a failed antibody). Correctly reconciled observed doublet rate (0.107) against the Skill's own 1/k heuristic and closed with the required expression-doublet-detection follow-up.",
+        "basic": 38,
+        "specialized": 54,
+        "total": 92,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Output classifies all cells and reports per-sample counts including the minority tag", "result": "PASS", "note": "HTO-D: 38 singlets printed" },
+          { "text": "Output reconciles observed cross-sample doublet rate against the k-sample expected fraction", "result": "PASS", "note": "0.107 observed vs. 1/4=0.250 within-sample-expected framing, per SKILL.md's own heuristic" },
+          { "text": "Output distinguishes a genuine rare-sample minority tag from a failed antibody", "result": "PASS", "note": "Correctly reasons the minority tag's fraction is well above near-zero" },
+          { "text": "Output notes expression-based doublet detection is still required afterward", "result": "PASS", "note": "Explicit closing note matches Related Skills / governing principle" },
+          { "text": "Sample assignment accuracy verified against ground truth", "result": "PASS", "note": "100% singlet sample-ID agreement, 98.8% global" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 31.6,
+    "dynamic_weighted": 46.4,
+    "score": 78,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Governing-principle and decision-table framing (hashtag vs. genetic vs. expression-doublet detection) is accurate and matches verified tool behavior, including the 1/k within-sample-doublet calibration heuristic confirmed on synthetic data (Input 5, 98.8% global accuracy).",
+    "HTODemux example (CLR margin=2, positive.quantile=0.99) reproduced ground truth exactly (1600/1600 global, 1360/1360 sample-ID) with zero modification to the Skill's documented pattern.",
+    "Tips section covers real, non-obvious pitfalls (minority-tag vs. failed-antibody, nucleus vs. whole-cell capture, CLR margin choice) that a less experienced agent would otherwise miss.",
+    "All three tested tools (HTODemux, hashsolo, demuxmix) are verified fully deterministic across repeated runs on identical input -- no unseeded stochastic calls.",
+    "Related Skills section correctly scopes handoffs (genetic demux to batch-integration, within-sample doublets to doublet-detection) rather than over-reaching into adjacent skills' territory."
+  ],
+  "recommendations": [
+    {
+      "priority": "P0",
+      "title": "hashsolo silently misclassifies 100% of cells as Negative with exactly 2 hashtags",
+      "observed_in": [2],
+      "problem": "Following the Skill's own documented pattern (and usage-guide.md's own example prompt 'when I only have two hashtags') with scanpy.external.pp.hashsolo on a 2-tag dataset, every cell is classified Negative regardless of true sample assignment (94.6% error rate vs. ground truth), with no error raised.",
+      "root_cause": "sce.pp.hashsolo's number_of_noise_barcodes parameter defaults to len(cell_hashing_columns) - 2, which is 0 for exactly 2 tags, degenerating the noise-distribution fit; SKILL.md, usage-guide.md, and examples/hashsolo_scanpy.py never mention this parameter.",
+      "fix": "Add an explicit warning in SKILL.md and usage-guide.md: when calling hashsolo with exactly 2 or 3 hashing columns, pass number_of_noise_barcodes explicitly (e.g. 1) instead of relying on the default, and instruct the agent to check that Classification counts are not ~100% Negative before trusting the result."
+    },
+    {
+      "priority": "P1",
+      "title": "No runnable example for demuxEM/pegasus or GMM-Demux",
+      "observed_in": [],
+      "problem": "SKILL.md and the Version Compatibility line name pegasus/demuxEM and GMM-Demux as recommended tools, but examples/ contains only Seurat HTODemux and scanpy hashsolo patterns.",
+      "root_cause": "Reference examples were written for 2 of the 5 named tools only.",
+      "fix": "Add a short demuxEM/pegasus code pattern (or at minimum a CLI-invocation sketch for GMM-Demux) to examples/, matching the depth of the two existing examples."
+    },
+    {
+      "priority": "P1",
+      "title": "demuxmix's negative-binomial regression can hard-crash rather than degrade gracefully",
+      "observed_in": [3],
+      "problem": "On HTO data with underdispersed ambient background, demuxmix's internal glm.nb fit throws an uncaught R error ('missing value where TRUE/FALSE needed') that halts the R session; demuxmix's own warning correctly names the cause (underdispersion) and suggests clusterInit, but the Skill never mentions this failure mode or remedy.",
+      "root_cause": "The Skill's demuxmix guidance ('use demuxmix with the detected-gene count to handle uneven staining') does not cover demuxmix's own documented clusterInit escape hatch for poor GLM fits.",
+      "fix": "Add a tip: if demuxmix throws a glm.nb/underdispersion error or warning, re-run with a manual clusterInit (e.g., k-means on log HTO counts) as demuxmix's own documentation recommends."
+    },
+    {
+      "priority": "P2",
+      "title": "No explicit sanity-check threshold for an oversized Negative pile before trusting output",
+      "observed_in": [2, 3],
+      "problem": "The Tips section warns qualitatively about large Negative piles from weak staining but gives the agent no concrete check to catch a degenerate run (such as Input 2's 100% Negative result) before subsetting or reporting results.",
+      "root_cause": "Guidance is descriptive ('rescue it') rather than a concrete escape-hatch check.",
+      "fix": "Add a line to 'What the Agent Will Do': after classification, if the Negative fraction exceeds roughly 50%, stop and diagnose (wrong tool parameters, failed staining, or barcode mismatch) before proceeding."
+    }
+  ]
+}
