@@ -8,7 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (83)
+## P1 (80)
 
 ### `bio-single-cell-multimodal-integration` — totalVI pattern is undocumented as non-deterministic
 
@@ -33,30 +33,6 @@ None open.
 - Problem: SKILL.md's Common Errors table correctly warns that passing a filtered-only matrix as empty_drop_matrix produces 'nonsense output', but the DSB code block itself performs no check and DSBNormalizeProtein raises no error or warning when this happens -- confirmed it runs silently to completion with a visibly different, invalid output range.
 - Root cause: The failure mode is documented in prose but not defended against in the shipped code pattern.
 - Fix: Add a minimal sanity check before calling DSBNormalizeProtein, e.g. compare median total ADT counts between cell_protein_matrix and empty_drop_matrix and warn/stop if they are not clearly lower in the empty matrix.
-
-### `bio-shape-similarity` — shape_search_ensemble silently drops a whole molecule on one failed conformer
-
-- Skill: 81, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/shape-similarity) · [viewer](skills/bio-shape-similarity/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 4
-- Problem: SKILL.md's own Conformer-Ensemble Shape Searching function discards an entire library molecule from the results if even 1 of n_conf (e.g. 20) MMFF-optimized conformers fails to converge, with no error, warning, or log line. In a 3-compound test, 2 molecules vanished silently.
-- Root cause: `if any(status != 0 for status, _ in optimization): continue` gates on ANY conformer failing rather than excluding only the failed conformer(s) and scoring the rest of the ensemble.
-- Fix: Change the loop to skip only the non-converged conformer IDs (filter `ids` by `status == 0` before scoring) and print/return the count and identity of any molecule that ends up with zero usable conformers, so silent data loss becomes a visible, countable event.
-
-### `bio-shape-similarity` — Disconnected-fragment (salt) SMILES silently pass MMFF validation and produce meaningless conformers
-
-- Skill: 81, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/shape-similarity) · [viewer](skills/bio-shape-similarity/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 3
-- Problem: A simple salt SMILES like `[Fe+2].[Cl-].[Cl-]` passes MMFFHasAllMoleculeParams() (True) and 'successfully' embeds 10 conformers, even though the fragments are unbonded single ions with no real shape to compare.
-- Root cause: MMFF parameterization trivially succeeds on molecules with zero bonds per fragment; the Skill's failure-mode guidance only anticipates embedding/MMFF failures, not this silent-success case.
-- Fix: Add a documented pre-check (e.g. `len(Chem.GetMolFrags(mol)) > 1` or explicit valid-atom-type filtering) to the Per-Tool Failure Modes table, with guidance to warn or reject multi-fragment/salt inputs before shape comparison.
-
-### `bio-shape-similarity` — ShaEP example omits the SMILES-to-mol2 conversion step it depends on
-
-- Skill: 81, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/shape-similarity) · [viewer](skills/bio-shape-similarity/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 6
-- Problem: The ESP Similarity section's `shaep -q query.mol2 target.mol2 ...` example assumes .mol2 files already exist but never shows how to produce them from a SMILES query, and RDKit itself has no Mol2 writer.
-- Root cause: The section documents the ShaEP invocation in isolation without cross-referencing the molecular-io Skill or naming a specific converter (e.g. Open Babel).
-- Fix: Add one line naming Open Babel (`obabel -:"<SMILES>" -O out.mol2 --gen3D`) or point explicitly to chemoinformatics/molecular-io for the SMILES->mol2 step before the shaep invocation.
 
 ### `bio-alignment-multiple` — Fix MUSCLE5 ensemble commands (-super5 has no .efa)
 
@@ -691,14 +667,6 @@ None open.
 - Problem: PrepareBridgeReference() is named in the skill's opening summary line and in the method decision table as a primary unpaired/diagonal method, but unlike GLUE it never gets a worked code example.
 - Root cause: Same pattern as the mosaic gap: the decision table is ahead of the worked examples.
 - Fix: Add a short worked bridge-integration example (reference multiome dataset, PrepareBridgeReference, MapQuery) alongside the GLUE block.
-
-### `bio-shape-similarity` — ESPSim is named as a supported method but has no code example
-
-- Skill: 81, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/shape-similarity) · [viewer](skills/bio-shape-similarity/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 1
-- Problem: The frontmatter description and the method taxonomy table both list ESPSim as a supported shape+electrostatics tool, but only ShaEP gets an actual CLI example; ESPSim has no code pattern anywhere in SKILL.md.
-- Root cause: The ESP Similarity section was written around the ShaEP CLI only, even though the description promises both tools.
-- Fix: Either add a minimal ESPSim code example (it is a pip-installable Python package) or remove it from the frontmatter description/taxonomy row to avoid promising coverage the Skill doesn't deliver.
 
 ### `bio-crispr-screens-copy-number-correction` — negative_control_sgrnas empty-dict case raises an undocumented ValueError
 
@@ -2763,6 +2731,14 @@ None open.
 - Problem: Auditor-added Input 9 confirms the script does not crash on a query with no real Pfam hit (correct, no regression), but it also prints no explicit message -- just an empty section under 'Per-protein Pfam domain summary'. An agent running this unattended could mistake a silent-empty result for a script failure or an unset query.
 - Root cause: The script was written assuming a query that has at least one domain hit; it has no explicit branch for the zero-hit case.
 - Fix: Add an `if [ ! -s query.domtbl ] \|\| ! grep -qv '^#' query.domtbl; then echo 'No Pfam-A domains found above the gathering threshold.'; fi` check after the hmmscan call in both examples/pfam_annotation.sh and examples/pfam_annotation_toy.sh.
+
+### `bio-shape-similarity` — obabel --gen3D can warn 'NaN in calculated coordinates' on some fused-ring scaffolds while still producing usable output
+
+- Skill: 92, Production Ready · [mrsonord2240/bioSkills@cb11853](https://github.com/mrsonord2240/bioSkills/tree/cb118537c46641fd5820681ffd41fd451b97005a/chemoinformatics/shape-similarity) · [viewer](skills/bio-shape-similarity/mrsonord2240-bioSkills@cb11853/viewer.md)
+- Observed in inputs: 6
+- Problem: Building a mol2 for a naphthalene-containing SMILES via the SKILL.md's own obabel --gen3D command printed an Open Babel warning about NaN coordinates during 3D building, even though the final mol2 had valid non-zero coordinates and ShaEP scored it sensibly (not the silent all-zero-coordinate trap the audit env's TOOLS.md separately documents and works around).
+- Root cause: Open Babel's force-field builder can emit an internal NaN warning mid-build on some conformers before recovering; SKILL.md's obabel step doesn't tell the reader to sanity-check the printed mol2 block when this specific warning appears.
+- Fix: Add one line to the ShaEP subsection: if obabel prints a coordinate-related warning during --gen3D, inspect the output mol2's @<TRIPOS>ATOM block for non-zero, non-repeating coordinates before trusting the downstream ShaEP score.
 
 ### `bio-single-cell-data-io` — scale.data workaround shows extraction but not how to persist it alongside the h5ad
 

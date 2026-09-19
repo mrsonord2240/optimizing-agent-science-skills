@@ -1,0 +1,207 @@
+{
+  "meta": {
+    "skill_name": "bio-shape-similarity",
+    "description": "Performs 3D shape-based similarity searching using ROCS (OpenEye), USRCAT (ultra-fast), Open3DAlign (RDKit), ESPSim (electrostatic), and ShaEP with explicit handling of Tanimoto-Combo (shape + color), shape vs ECFP4 complementarity, conformer-ensemble searching, alignment optimization, and scaffold hopping. Use when searching for shape-mimicking compounds with different scaffolds, identifying bioisosteric replacements, prospective scaffold hopping, or expanding hit series beyond 2D similarity.",
+    "evaluated_on": "2026-09-19",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "mrsonord2240/bioSkills@cb11853:chemoinformatics/shape-similarity"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All 5 cited DOIs (ROCS Hawkins 10.1021/jm0603365, USRCAT Schreyer/Blundell 10.1186/1758-2946-4-27, ShaEP Vainio/Puranen/Johnson 10.1021/ci800315d, Open3DALIGN Tosco/Balle/Shiri 10.1007/s10822-011-9462-9) are real, correctly attributed papers. No invented benchmark numbers presented as literature results; every numeric value in the illustrative code is explicitly labeled a repository starting default requiring calibration, not a validated finding. Unchanged from the pre-fix audit." },
+      "practice_boundaries": { "result": "PASS", "detail": "Compound virtual-screening tool; no diagnostic or prescriptive statements about individuals. Unchanged from the pre-fix audit." },
+      "methodological_ground": { "result": "PASS", "detail": "No principled fallacy detected. The Skill correctly and repeatedly distinguishes normalized shape Tanimoto (0-1), unnormalized O3A score, and ROCS TanimotoCombo (0-2, a sum not an average). Unchanged from the pre-fix audit." },
+      "code_usability": { "result": "PASS", "detail": "7 of 7 inputs completed; 6 executed real code against installed RDKit 2026.03.6 / ShaEP 1.4.2 / Open Babel 3.1.0 / espsim 0.0.1 with zero syntax or import errors. The Input-4 defect from the pre-fix audit (shape_search_ensemble silently dropping 2/3 library molecules) is fixed and independently re-verified: a fresh re-run of the original audit's exact Input 4 reproducer now scores 3/3 molecules with explicit WARNING lines for partial-convergence drops (1/20 and 4/20 conformers). A second, never-before-used disconnected-fragment case (diphenhydramine hydrochloride, distinct from the pre-fix audit's [Fe+2].[Cl-].[Cl-]) is correctly rejected with a clear reason while a normal molecule in the same batch scores normally." }
+    }
+  },
+  "static_score": {
+    "subtotal": 96,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 12, "max": 12, "note": "Fixed: ESPSim now has its own runnable example (EmbedAlignScore), independently re-run on a fresh molecule pair (ibuprofen vs a chloro-analog, different from the fixer's acetanilide pair) -- shape_sim=0.935 in [0,1], esp_sim (default carbo, unbounded)=0.850, renormalize=True bounds it to 0.905, exactly as newly documented. The conformer-ensemble convergence-gating bug is fixed (see reliability). USRCAT, Open3DAlign, ROCS/TanimotoCombo (commercial, correctly flagged unexecutable here) and ShaEP remain correctly covered." },
+      "reliability": { "score": 11, "max": 12, "note": "Fixed: shape_search_ensemble now filters to converged conformer ids, scores survivors, drops a molecule only on zero convergence, and prints a WARNING with SMILES + reason for every drop -- independently re-verified on both the original audit's Input 4 library (3/3 now score, was 1/3) and a fresh case. Disconnected-fragment input is now rejected everywhere it can occur (the library loop and examples/shape_search.py's prepare_mol_3d, the latter verified directly to raise ValueError on a fresh salt SMILES and still embed CCO normally). Held at 11/12, not 12/12: no automated regression test accompanies these fixes in the repo (matches the pre-existing maintainability gap), so a future edit could silently reintroduce the same class of bug." },
+      "performance_context": { "score": 8, "max": 8, "note": "Unchanged: SKILL.md remains well-layered against usage-guide.md and examples/shape_search.py; no upfront bloat from the additions." },
+      "agent_usability": { "score": 16, "max": 16, "note": "Fixed: the Per-Tool Failure Modes table now has an explicit 'Disconnected-fragment (salt) input' row naming the exact mechanism and fix, and the Conformer-Ensemble Shape Searching section's prose now states the partial-drop/full-drop distinction and the printed-warning contract directly -- both gaps the pre-fix audit flagged this category for are closed." },
+      "human_usability": { "score": 8, "max": 8, "note": "Fixed: the ensemble path's prior total silence on drops (a forgiveness/communication gap) is closed by the printed WARNING lines, independently confirmed in two separate re-runs." },
+      "security": { "score": 12, "max": 12, "note": "Fixed: the data-integrity gap (disconnected-fragment SMILES silently producing physically meaningless conformers) is closed by the upfront GetMolFrags check, independently re-verified with a fresh salt SMILES the fixer did not use." },
+      "maintainability": { "score": 10, "max": 12, "note": "Unchanged: clean 3-way split (SKILL.md / usage-guide.md / examples/shape_search.py) preserved; redundancy check confirms usage-guide.md still does not restate the new ESPSim or ShaEP mol2-conversion content. No accompanying automated test harness, as before." },
+      "agent_specific": { "score": 19, "max": 20, "note": "Fixed: escape-hatch guidance now covers both failure modes the pre-fix audit found (silent ensemble drop; disconnected-fragment blind spot) in the Failure Modes table and the ensemble section's prose. Held at 19/20: the Common Errors table itself (as distinct from Per-Tool Failure Modes) still has no row for the ensemble partial-convergence case." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 89.9,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 25, "total": 25 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "USRCAT pre-filter + Open3DAlign rescore, 10-compound synthetic library, run twice for determinism",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. Unaffected by the fix (does not call shape_search_ensemble or the disconnected-fragment path); re-inspected against the fixed SKILL.md and unchanged from the pre-fix audit.",
+        "basic": 37,
+        "specialized": 53,
+        "total": 90,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Library is ranked correctly by USRCAT similarity", "result": "PASS", "note": "Unchanged from pre-fix audit" },
+          { "text": "Shape Tanimoto values fall in [0,1], distinct from the unnormalized O3A score", "result": "PASS", "note": "Unchanged from pre-fix audit" },
+          { "text": "Re-running with the same seed reproduces identical results", "result": "PASS", "note": "Unchanged from pre-fix audit" },
+          { "text": "No fabricated or unverifiable numerical claims", "result": "PASS", "note": "Unchanged from pre-fix audit" }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Scaffold-hop candidate search with thresholds calibrated on a labeled reference set",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. Calls prepare_mol_3d/open3dalign_score (examples/shape_search.py), not shape_search_ensemble; confirmed prepare_mol_3d's disconnected-fragment guard (independently re-run: raises ValueError on a fresh salt SMILES, embeds CCO normally) but this input's own library had no salts, so its result is unchanged from the pre-fix audit.",
+        "basic": 35,
+        "specialized": 54,
+        "total": 89,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "Thresholds are calibrated from labeled reference data, not hard-coded defaults", "result": "PASS", "note": "Unchanged from pre-fix audit" },
+          { "text": "No compound is labeled a scaffold hop without meeting both calibrated criteria", "result": "PASS", "note": "Unchanged from pre-fix audit" },
+          { "text": "No fabricated benchmark statistics presented as literature values", "result": "PASS", "note": "Unchanged from pre-fix audit" }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Failure-mode handling: malformed SMILES, empty string, disconnected-fragment (salt) input",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true, re-run. examples/shape_search.py's prepare_mol_3d now raises ValueError('Disconnected fragments...') directly on [Fe+2].[Cl-].[Cl-]-class input (re-verified) and, independently, on a fresh disconnected SMILES (diphenhydramine HCl) via shape_search_ensemble's own guard, which prints the drop reason instead of raising (correct for its library-loop context) while a normal molecule in the same batch scores normally. Malformed SMILES and empty-molecule handling unchanged (already correct pre-fix).",
+        "basic": 36,
+        "specialized": 55,
+        "total": 91,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Malformed SMILES raises a clear, catchable error", "result": "PASS", "note": "Unchanged from pre-fix audit" },
+          { "text": "Empty-molecule input raises a clear, catchable error", "result": "PASS", "note": "Unchanged from pre-fix audit" },
+          { "text": "Disconnected-fragment/organometallic input is flagged rather than silently producing conformers", "result": "PASS", "note": "FIXED, independently re-verified: GetMolFrags(mol) > 1 check rejects the fragment with a clear reason in both prepare_mol_3d (raises ValueError) and shape_search_ensemble (logs a drop reason), on both the audit's original salt and a fresh one" },
+          { "text": "No unhandled exception crashes the process", "result": "PASS", "note": "Unchanged from pre-fix audit" }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Conformer-ensemble shape search (n_conf=20) over a 3-compound library using SKILL.md's shape_search_ensemble() pattern verbatim",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true, re-run verbatim against the fixed function with the original audit's exact query + lib_A/lib_B/lib_C SMILES, n_conf=20, seed 42. All 3/3 library molecules now score (was 1/3): lib_A (0.9594, printed WARNING for 1/20 non-convergent conformers), lib_B (0.6016, printed WARNING for 4/20), lib_C (0.4828, all 20 converged, no warning). Independently re-verified.",
+        "basic": 35,
+        "specialized": 54,
+        "total": 89,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Every library molecule that RDKit can successfully embed appears in the ranked output", "result": "PASS", "note": "FIXED, independently re-verified: 3/3 molecules scored (was 1/3 pre-fix)" },
+          { "text": "A dropped/skipped library molecule is reported, not silently omitted", "result": "PASS", "note": "FIXED, independently re-verified: explicit 'WARNING: <smiles>: n/20 conformers failed MMFF convergence; scoring the remaining k' printed for every molecule with partial non-convergence" },
+          { "text": "Best-shape score per retained molecule is in [0,1]", "result": "PASS", "note": "All 3 scores (0.9594, 0.6016, 0.4828) in range" },
+          { "text": "No unhandled exception; process completes", "result": "PASS", "note": "Exit code 0, no traceback" }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Full 15-compound pipeline: USRCAT pre-filter to top 8, Open3DAlign rescore, ECFP4, shape/ECFP4 quadrant classification",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. Unaffected by the fix (single-conformer embedding path, no shape_search_ensemble call, no salts in the library); re-inspected against the fixed SKILL.md and unchanged from the pre-fix audit.",
+        "basic": 36,
+        "specialized": 55,
+        "total": 91,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "All pipeline stages execute in sequence without manual intervention", "result": "PASS", "note": "Unchanged from pre-fix audit" },
+          { "text": "Quadrant classification matches SKILL.md's shape/ECFP4 definitions", "result": "PASS", "note": "Unchanged from pre-fix audit" },
+          { "text": "No compound is silently dropped without being logged", "result": "PASS", "note": "Unchanged from pre-fix audit" },
+          { "text": "Thresholds used for 'high' are stated explicitly, not presented as universal constants", "result": "PASS", "note": "Unchanged from pre-fix audit" }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Real ShaEP 1.4.2 CLI run using SKILL.md's exact documented invocation syntax, including the now-documented SMILES->mol2 step",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true, re-run end to end on a fresh molecule pair (ibuprofen/naproxen-like scaffolds, different from the pre-fix audit's pair and from the fixer's verification pair) using the exact obabel command now printed in SKILL.md: `obabel -:\"<SMILES>\" -O out.mol2 --gen3D`. Both mol2 files got real, non-degenerate 3D coordinates; shaep 1.4.2 then produced shape_similarity=0.704, ESP_similarity=0.564. The pre-fix gap (undocumented SMILES->mol2 bridge) is closed. Minor observation, not a defect: obabel printed a 'NaN in calculated coordinates' warning while building the naphthalene-containing target, but still emitted valid non-zero coordinates and shaep still returned a sensible non-degenerate score -- not the all-zero-coordinate silent-failure trap documented in the env's TOOLS.md note 4.",
+        "basic": 37,
+        "specialized": 56,
+        "total": 93,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "Documented ShaEP CLI syntax matches the real installed 1.4.2 binary", "result": "PASS", "note": "Ran unmodified, returncode 0" },
+          { "text": "Output reports both shape_similarity and ESP_similarity per the Skill's shape+ESP framing", "result": "PASS", "note": "similarity_shaep.txt has separate shape_similarity and ESP_similarity columns" },
+          { "text": "SMILES-to-mol2 step is documented and reproducible from SKILL.md alone", "result": "PASS", "note": "FIXED, independently re-verified on a fresh molecule pair: the obabel --gen3D line in SKILL.md reproduces the mol2 inputs ShaEP needs with no undocumented steps" }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "User asks to apply the 0.7/0.5 defaults as universal cutoffs and reports a 'shape Tanimoto of 1.4'",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "executed: false (Mode A direct-reasoning response, no code to run). Response unaffected by the fix; unchanged from the pre-fix audit.",
+        "basic": 35,
+        "specialized": 51,
+        "total": 86,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "Response refuses to present 0.7/0.5 as universal/validated cutoffs", "result": "PASS", "note": "Unchanged from pre-fix audit" },
+          { "text": "Response correctly explains why a shape Tanimoto > 1 cannot be genuine", "result": "PASS", "note": "Unchanged from pre-fix audit" },
+          { "text": "Response does not fabricate a specific 'safe' cutoff value it has no basis for", "result": "PASS", "note": "Unchanged from pre-fix audit" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 38.4,
+    "dynamic_weighted": 53.9,
+    "score": 92,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "All 3 P1 and 1 P2 findings from the pre-fix audit (81, Limited Release) are independently re-verified fixed, each on at least one case the fixer did not use: shape_search_ensemble now scores 3/3 molecules with printed drop warnings (was 1/3, silent); a fresh disconnected-fragment SMILES (diphenhydramine HCl) is correctly rejected; the ShaEP example runs end to end from raw SMILES including the new obabel step; the new ESPSim example runs on a fresh molecule pair with the documented bounded/unbounded score behavior confirmed.",
+    "ETKDGv3 conformer generation remains correctly seeded (randomSeed=42) in every documented pattern; bit-identical reruns confirmed as before.",
+    "The Per-Tool Failure Modes table now names the exact disconnected-fragment mechanism found during audit, and the Conformer-Ensemble section's prose states the partial-vs-total-drop distinction and warning contract explicitly -- both are gaps the pre-fix audit specifically flagged this Skill for.",
+    "Redundancy check confirms usage-guide.md was not touched to duplicate the new SKILL.md content (ESPSim, ShaEP mol2 step): the SKILL.md/usage-guide.md split from the pre-fix audit is preserved."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "obabel --gen3D can warn 'NaN in calculated coordinates' on some fused-ring scaffolds while still producing usable output",
+      "observed_in": [6],
+      "problem": "Building a mol2 for a naphthalene-containing SMILES via the SKILL.md's own obabel --gen3D command printed an Open Babel warning about NaN coordinates during 3D building, even though the final mol2 had valid non-zero coordinates and ShaEP scored it sensibly (not the silent all-zero-coordinate trap the audit env's TOOLS.md separately documents and works around).",
+      "root_cause": "Open Babel's force-field builder can emit an internal NaN warning mid-build on some conformers before recovering; SKILL.md's obabel step doesn't tell the reader to sanity-check the printed mol2 block when this specific warning appears.",
+      "fix": "Add one line to the ShaEP subsection: if obabel prints a coordinate-related warning during --gen3D, inspect the output mol2's @<TRIPOS>ATOM block for non-zero, non-repeating coordinates before trusting the downstream ShaEP score."
+    }
+  ]
+}
