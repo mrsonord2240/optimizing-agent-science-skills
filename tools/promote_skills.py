@@ -11,12 +11,14 @@ Skill in PROVENANCE.json, which is the only place provenance should be read from
 
 Source of Skill bytes is the fork at the pinned commit, not the working tree.
 """
+import atexit
 import json
 import os
 import re
 import shutil
 import subprocess
 import sys
+import time
 
 REC = "F:/optimizing-agent-science-skills"
 FORK = "F:/OpenScience/external/mrsonord2240__bioSkills"
@@ -128,11 +130,38 @@ def unmerged_records(rep, idx):
     return bad
 
 
+def acquire_promote_lock(out_dir=OUT, timeout=600, poll=2):
+    """Atomic mkdir lock so two concurrent `--apply` runs never race the same rmtree/rebuild of
+    `skills/`. Several agents hit this collision by hand on 2026-09-19 (crash mid-rmtree, or one
+    run's output silently clobbered by another's) before recovering manually each time. Blocks up
+    to `timeout` seconds, then fails loudly rather than racing anyway. Released via atexit so a
+    raised SystemExit (e.g. a blob-hash mismatch) still frees it for the next run.
+    """
+    os.makedirs(out_dir, exist_ok=True)
+    lock_dir = os.path.join(out_dir, ".promote.lock")
+    waited = 0
+    while True:
+        try:
+            os.mkdir(lock_dir)
+            break
+        except FileExistsError:
+            if waited >= timeout:
+                raise SystemExit(
+                    f"{lock_dir}: another promote_skills.py --apply run holds this lock "
+                    f"(waited {timeout}s). Retry once it finishes, or rmdir it by hand if it's "
+                    "stale (its owner crashed without cleaning up).")
+            time.sleep(poll)
+            waited += poll
+    atexit.register(lambda: shutil.rmtree(lock_dir, ignore_errors=True))
+
+
 def main():
     # Every Skill whose latest audit is deployable with no open P0 is promoted, whatever its score
     # (Sam, 2026-09-17). Skills that have not yet been through a fix pass are promoted too, and are
     # flagged `fix_pass: needed` in PROVENANCE.json and listed in REMAINING.md.
     apply = "--apply" in sys.argv
+    if apply:
+        acquire_promote_lock()
     idx = skill_index()
     rep = audits()
     fixlogs = {f[:-3] for f in os.listdir(os.path.join(REC, "fixes")) if f.endswith(".md")}
