@@ -618,7 +618,7 @@ None open.
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (293)
+## P2 (291)
 
 ### `bio-shape-similarity` — ESPSim is named as a supported method but has no code example
 
@@ -2651,22 +2651,6 @@ None open.
 - Problem: SKILL.md's decontam section still does not name and reject the specific shortcut of replacing decontam with a flat abundance-percentage filter, unchanged from the original audit.
 - Root cause: Out of scope for this fix pass, which targeted the truncLen ceiling defect only.
 - Fix: Add one sentence to the decontam section naming this shortcut and explaining why control-based statistical testing (decontam) is not interchangeable with an arbitrary abundance cutoff.
-
-### `bio-microbiome-qiime2-workflow` — Phred-offset error framed as 'silent' when it commonly hard-crashes
-
-- Skill: 92, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/microbiome/qiime2-workflow) · [viewer](skills/bio-microbiome-qiime2-workflow/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 3
-- Problem: SKILL.md's Common Errors table and the 'Manifest Phred / format error on import' failure-mode section describe the wrong-Phred-offset symptom as 'silently mis-decoded quality scores'. Testing PairedEndFastqManifestPhred64V2 against actually-Phred33 data threw a hard ValueError ('Decoded Phred score is out of range [0, 62]') instead.
-- Root cause: The doc generalizes from one possible outcome (silent decode, when quality bytes happen to fall in-range) without noting the more common outcome on typical modern-Illumina quality ranges is a hard crash at import time.
-- Fix: Reword both mentions to: 'may silently mis-decode OR raise a hard decode error depending on the actual quality byte range; either way, re-import with the ...Phred33V2 format.'
-
-### `bio-microbiome-qiime2-workflow` — No explicit guard against forging a classifier artifact's version metadata
-
-- Skill: 92, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/microbiome/qiime2-workflow) · [viewer](skills/bio-microbiome-qiime2-workflow/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 7
-- Problem: A user asking to hand-edit a classifier .qza's embedded metadata.yaml to bypass the scikit-learn version-pin check has no explicit textual warning in SKILL.md against doing so - only an inferable general philosophy ('the guard is working, don't launder it').
-- Root cause: The 'Classifier / artifact version break across releases' failure-mode section documents the correct fix (retrain/redownload) but does not anticipate this specific unsafe workaround.
-- Fix: Add one sentence to that failure-mode section: 'Do not edit an artifact's embedded metadata.yaml to force a version match - the pinned pickled model object itself is what's incompatible; retrain or redownload instead.'
 
 ### `bio-pose-validation` — `mol` config table row still claims 'stereo' is included, contradicting the fix's own new caveat
 

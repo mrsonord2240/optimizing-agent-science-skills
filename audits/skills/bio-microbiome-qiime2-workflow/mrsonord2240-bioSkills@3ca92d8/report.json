@@ -1,0 +1,376 @@
+{
+  "meta": {
+    "skill_name": "bio-microbiome-qiime2-workflow",
+    "description": "Operates the QIIME2 framework as the glue for an amplicon analysis - the .qza/.qzv artifact model, semantic types, embedded provenance plus provenance replay, import (Casava/manifest/EMP/BIOM), export, the Metadata object, and the q2cli vs Artifact API interfaces. Defers every scientific parameter choice (denoising, classifier/DB, diversity metric, DA tool, PICRUSt2) to five sibling skills.",
+    "evaluated_on": "2026-09-19",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "mrsonord2240/bioSkills@3ca92d897ecec4ac3022ecc59421cf4b1eca5293:microbiome/qiime2-workflow"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "References section cites real, verifiable papers (Bolyen 2019, Keefe 2023, Lin & Peddada 2020, Rideout 2016, Bokulich 2018); qiime tools replay-citations independently regenerated the real Bolyen 2019 and Callahan 2016 citations matching the skill's own list, run against real provenance."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "No diagnostic or prescriptive medical content; this is bioinformatics pipeline/framework tooling only."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "No methodological fallacies found across 7 inputs; correctly separates PERMANOVA from the betadisper confound, correctly recommends modern q2-composition ancombc over legacy add-pseudocount+ancom, and its own --p-sampling-depth 10000 placeholder is explicitly and correctly flagged as non-authoritative (confirmed to fail on real data in Input 5)."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "Every CLI snippet exercised (import x3 paths, denoise-paired, phylogeny, core-metrics-phylogenetic, composition ancombc, da-barplot, tools peek/validate/export/extract/replay-provenance/replay-citations) ran unmodified and produced valid, typed QIIME2 artifacts against real QIIME2 2024.10.1."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 95,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 12,
+        "max": 12,
+        "note": "Covers import (Casava/manifest/EMP/BIOM), export, provenance replay, metadata, and orchestration comprehensively; every claim tested was empirically accurate."
+      },
+      "reliability": {
+        "score": 12,
+        "max": 12,
+        "note": "Common Errors table is detailed and now accurate throughout: the Phred-offset entry was reworded (fix commit 3ca92d8) to state a hard ValueError at import time is at least as likely as a silent mis-decode - re-verified by an independent fresh run of both the Phred64V2-on-Phred33-data crash and the correct Phred33V2 positive control (this re-audit)."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "SKILL.md is ~245 lines with a usage-guide.md and examples/ script as separate layers, reasonably disclosed but not maximally split into references/."
+      },
+      "agent_usability": {
+        "score": 15,
+        "max": 16,
+        "note": "Very clear, cold-start-friendly, consistent terminology throughout; feedback-design guidance (expected confirmations at each step) could be slightly more explicit."
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Natural trigger phrasing in description and Quick Start examples; decision-tree table covers most realistic variants."
+      },
+      "security": {
+        "score": 12,
+        "max": 12,
+        "note": "No credentials, no injection vectors; documents proper metadata validation (Keemei) as a hygiene practice."
+      },
+      "maintainability": {
+        "score": 11,
+        "max": 12,
+        "note": "Clean SKILL.md / usage-guide.md / examples/ separation with explicit Related Skills cross-references; example script is runnable end-to-end mechanics (verified)."
+      },
+      "agent_specific": {
+        "score": 19,
+        "max": 20,
+        "note": "Composability and deferral-routing remain a standout (9 sibling-skill cross-references). The one escape-hatch gap found in the original audit (no explicit warning against forging a classifier artifact's version metadata) is fixed: the 'Classifier / artifact version break' section now explicitly names the pinned pickled model object as the real incompatibility and forbids the metadata.yaml edit. Held at 19/20 rather than a full restore since only this one specific workaround scenario was addressed textually; other untested adversarial phrasings are not independently confirmed."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 94.4,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 31,
+      "total": 31
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Casava per-sample paired-end import",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Real import + summarize + peek + validate, all confirmed exactly as documented",
+        "basic": 39,
+        "specialized": 59,
+        "total": 98,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "qiime tools import with CasavaOneEightSingleLanePerSampleDirFmt succeeds on Casava-named paired FASTQ",
+            "result": "PASS",
+            "note": "real exit 0, artifact produced"
+          },
+          {
+            "text": "qiime tools peek reports Type: SampleData[PairedEndSequencesWithQuality]",
+            "result": "PASS",
+            "note": "verbatim match"
+          },
+          {
+            "text": "qiime tools validate --level max reports the artifact valid",
+            "result": "PASS",
+            "note": "verbatim match"
+          },
+          {
+            "text": "qiime demux summarize produces a real .qzv visualization",
+            "result": "PASS",
+            "note": "317 KB visualization written"
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Alternate import on-ramps (V2 manifest + BIOM)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Manifest import and BIOM re-import both succeeded and validated",
+        "basic": 38,
+        "specialized": 58,
+        "total": 96,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "V2 manifest import (PairedEndFastqManifestPhred33V2) succeeds with arbitrary absolute paths",
+            "result": "PASS",
+            "note": "real exit 0"
+          },
+          {
+            "text": "Manifest-imported artifact has the same semantic type/format as the Casava import",
+            "result": "PASS",
+            "note": "different UUID, same Type and Data format, as expected"
+          },
+          {
+            "text": "BIOM import (BIOMV210Format -> FeatureTable[Frequency]) of an exported feature-table.biom succeeds and validates",
+            "result": "PASS",
+            "note": "real exit 0, validate PASS"
+          },
+          {
+            "text": "Both on-ramps produce artifacts with distinct UUIDs",
+            "result": "PASS",
+            "note": "confirmed via qiime tools peek"
+          },
+          {
+            "text": "SKILL.md's claim that BIOM import needs metadata attached separately matches observed behavior",
+            "result": "PASS",
+            "note": "re-imported table carries no sample metadata"
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Import/type/visualization error handling",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "All 3 documented failure modes reproduced with real error text; the Phred-offset wording inaccuracy found in the original audit is fixed and re-verified this session (independent fresh Phred64-on-Phred33 crash + Phred33 positive control, both byte-matching the documented ValueError).",
+        "basic": 39,
+        "specialized": 57,
+        "total": 96,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "PairedEndFastqManifestPhred64V2 import of actually-Phred33 data fails, confirming the documented Phred-offset failure mode is real",
+            "result": "PASS",
+            "note": "real ValueError: Decoded Phred score is out of range [0, 62]"
+          },
+          {
+            "text": "SKILL.md's phrase 'silently mis-decoded quality scores' accurately describes the observed failure mode",
+            "result": "PASS",
+            "note": "Fixed in commit 3ca92d8: SKILL.md now says a hard ValueError at import time is 'at least as likely' as a silent mis-decode, framed as depending on the real quality byte range - matches this re-audit's independently reproduced crash (identical ValueError text) and the Phred33 positive control that succeeded on the same data."
+          },
+          {
+            "text": "feature-table summarize on a FeatureData[Sequence] artifact is rejected with a semantic-type error naming both expected and provided types",
+            "result": "PASS",
+            "note": "real message: Expected an artifact of at least type FeatureTable[Frequency | PresenceAbsence]. An artifact of type FeatureData[Sequence] was provided."
+          },
+          {
+            "text": "dada2 denoise-paired rejects a .qzv passed as --i-demultiplexed-seqs, naming it a Visualization",
+            "result": "PASS",
+            "note": "real message also suggested the matching .qza by name - better UX than the doc implies"
+          },
+          {
+            "text": "Error messages are specific enough to self-correct without external docs",
+            "result": "PASS",
+            "note": "all 3 real errors were directly actionable"
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Metadata typing, provenance replay, export/extract",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Metadata numeric-cast, provenance replay/citations, and export-vs-extract provenance behavior all confirmed exactly as documented",
+        "basic": 39,
+        "specialized": 59,
+        "total": 98,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "An all-integer metadata column with no #q2:types row is inferred TYPE=numeric",
+            "result": "PASS",
+            "note": "qiime tools inspect-metadata confirmed"
+          },
+          {
+            "text": "The same column annotated #q2:types categorical is inferred TYPE=categorical",
+            "result": "PASS",
+            "note": "confirmed"
+          },
+          {
+            "text": "qiime tools export drops the provenance/ subtree",
+            "result": "PASS",
+            "note": "exported/ contains only feature-table.biom"
+          },
+          {
+            "text": "qiime tools extract keeps the provenance/ subtree",
+            "result": "PASS",
+            "note": "extracted/<uuid>/data + provenance/action + provenance/artifacts present"
+          },
+          {
+            "text": "replay-provenance/replay-citations regenerate a real CLI script and a real BibTeX matching SKILL.md's own References",
+            "result": "PASS",
+            "note": "citations.bib contained the real Bolyen 2019 and Callahan 2016 entries"
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Full pipeline orchestration + determinism",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "phylogeny -> core-metrics-phylogenetic -> composition ancombc -> da-barplot all completed; ancombc re-run bit-identical",
+        "basic": 38,
+        "specialized": 59,
+        "total": 97,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "align-to-tree-mafft-fasttree produces a valid Phylogeny[Rooted] artifact",
+            "result": "PASS",
+            "note": "confirmed via qiime tools peek"
+          },
+          {
+            "text": "SKILL.md's own --p-sampling-depth 10000 placeholder would fail on this real dataset",
+            "result": "PASS",
+            "note": "max sample total ~2546; the doc explicitly flags 10000 as a placeholder, not a default - confirmed true"
+          },
+          {
+            "text": "core-metrics-phylogenetic completes and produces every expected alpha/beta diversity artifact + Emperor visualization",
+            "result": "PASS",
+            "note": "17 outputs, all real, at a real data-derived sampling depth of 300"
+          },
+          {
+            "text": "composition ancombc + da-barplot produce a valid FeatureData[DifferentialAbundance] artifact and visualization",
+            "result": "PASS",
+            "note": "confirmed"
+          },
+          {
+            "text": "Re-running composition ancombc on identical inputs produces bit-identical output (T3 determinism)",
+            "result": "PASS",
+            "note": "all 5 exported CSV slices (lfc/p_val/q_val/w/se) byte-identical across 2 independent runs"
+          }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Denoising parameter deferral",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Correctly defers the trunc-len-r choice to amplicon-processing",
+        "basic": 37,
+        "specialized": 53,
+        "total": 90,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "Output defers the trunc-len-r value to amplicon-processing rather than inventing a number",
+            "result": "PASS",
+            "note": "deferral is stated in 4 separate places in SKILL.md"
+          },
+          {
+            "text": "Output still shows the correct dada2 denoise-paired invocation shape/mechanics",
+            "result": "PASS",
+            "note": "consistent with the Orchestration Skeleton section"
+          },
+          {
+            "text": "Output does not claim ownership of a scientific threshold this skill explicitly disclaims",
+            "result": "PASS",
+            "note": "confirmed"
+          }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Classifier version-mismatch workaround request",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Correct refusal was already inferable from the doc's general philosophy; the specific textual gap found in the original audit (no explicit warning against this exact metadata-forgery workaround) is now fixed with a verbatim-matching sentence in the 'Classifier / artifact version break' section.",
+        "basic": 36,
+        "specialized": 50,
+        "total": 86,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Output refuses the hex-edit-metadata workaround",
+            "result": "PASS",
+            "note": "correct refusal extrapolated from the doc's stated philosophy"
+          },
+          {
+            "text": "Output explains why the workaround doesn't fix the underlying binary incompatibility",
+            "result": "PASS",
+            "note": "the pickled model object, not just a metadata string, is what's version-pinned"
+          },
+          {
+            "text": "Output points to the documented correct fix (retrain/redownload release-namespaced classifier)",
+            "result": "PASS",
+            "note": "matches the Classifier / artifact version break failure-mode section"
+          },
+          {
+            "text": "SKILL.md contains an explicit warning against this specific class of workaround (metadata forgery to bypass a version guard)",
+            "result": "PASS",
+            "note": "Fixed in commit 3ca92d8: the failure-mode section now reads 'Do not hand-edit an artifact's embedded metadata.yaml to force a version match - the pinned pickled model object itself is what's incompatible, not just the recorded version string; retrain or redownload instead.' - names this exact workaround and refuses it explicitly, verified by reading the merged SKILL.md."
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 38.0,
+    "dynamic_weighted": 56.6,
+    "score": 95,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Every documented CLI pattern (Casava/manifest/BIOM import, DADA2 denoise-paired, phylogeny, core-metrics-phylogenetic, composition ancombc, da-barplot, tools peek/validate/export/extract/replay-provenance/replay-citations) ran unmodified against real QIIME2 2024.10.1, despite the skill nominally targeting 2026.1+ - the documented CLI surface is stable across a ~3-release gap.",
+    "The provenance/type-system claims that are this skill's central thesis are all empirically true: export measurably drops the provenance/ subtree while extract measurably keeps it, replay-provenance/replay-citations regenerate real executable commands and a real BibTeX matching the skill's own References section, and a semantic-type mismatch is rejected with a clear, actionable error before running.",
+    "The skill's own example placeholder is honestly flagged and behaves exactly as warned: --p-sampling-depth 10000 would fail outright on the tested dataset, and SKILL.md explicitly calls this out as a non-default placeholder rather than presenting it as a real recommendation.",
+    "Composability is a standout: every scientific parameter is explicitly and repeatedly routed to the correct sibling skill, verified consistent across the frontmatter, the orchestration skeleton's inline comments, and a dedicated thresholds table.",
+    "Both P2s from the original audit (92, Production Ready) were fixed in commit 3ca92d8 and independently re-verified in this re-audit: the Phred-offset hard-crash wording was reproduced fresh (byte-identical ValueError) and the classifier-forgery guard now names the exact workaround the adversarial input proposed."
+  ],
+  "recommendations": []
+}
