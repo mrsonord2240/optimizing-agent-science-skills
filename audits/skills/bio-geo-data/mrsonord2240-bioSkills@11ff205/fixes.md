@@ -25,3 +25,27 @@ Score 78/100, Beta Only, not deployable (no veto). Fixed on `fix/db-geo-data` in
 None of the P0/P1/cheap-P2 findings were left unfixed.
 
 Co-authored by Claude Sonnet 5.
+
+---
+
+## 2026-09-19 — second fix pass (re-audit found 1 remaining defect, score 84)
+
+Re-audit source: `F:\OpenScience\audits\bio-geo-data\` (score 84, Limited Release — 1 point below
+this project's core >= 85 landing bar). Fixed on `fix/db-geo-data` in `F:\OpenScience\wt\db-gd`
+against commit `11ff205`. Commit `3327847`.
+
+| finding | priority | change | verified | notes |
+| --- | --- | --- | --- | --- |
+| SKILL.md's own inline `check_super_or_sub_series('GSE346738')` worked example raises `UnicodeDecodeError` on default Windows Python 3.12 (cp1252 locale, no `PYTHONUTF8`): `gzip.open(path, 'rt')` has no `encoding=`, falls back to locale encoding; real GSE346738 SOFT file has genuine UTF-8 non-ASCII bytes | P1 | Added `encoding='utf-8', errors='replace'` to the `gzip.open(f'{gse}.soft.gz', 'rt', ...)` call (SKILL.md line 206) | ran (confirmed this machine's default locale is `cp1252`; ran SKILL.md's snippet copied out verbatim against live GSE346738): `{'super_of': ['GSE283260', 'GSE346737'], 'sub_of': None}`, no exception, matches documented expected output | the underlying SuperSeries claim was already true (re-auditor independently confirmed); only the code was unrunnable |
+| Sibling instance of the same missing-encoding bug in `parse_series_matrix()`'s `gzip.open(path, 'rt')` (SKILL.md line 239) — not flagged by the re-audit because no cached fixture it used happened to contain non-ASCII bytes, but the same class of defect | P1 (found via brief's "grep for siblings" instruction) | Added `encoding='utf-8', errors='replace'` to this `gzip.open()` call too | ran (verbatim snippet against cached real `GSE470_series_matrix.txt.gz`): `expr.shape == (12625, 12)`, `metadata['!Series_geo_accession'] == ['GSE470']` — matches `TOOLS.md`'s recorded expected values, no regression | `pd.read_csv(f, ...)` continuing to read from the same now-encoding-safe text handle still works correctly |
+
+Grepped all of `SKILL.md`, `usage-guide.md` and `examples/` for any other `gzip.open(..., 'rt')` /
+`GzipFile(..., 'rt')` call: only the two above and the already-fixed `examples/search_geo.py`
+(`GzipFile(mode='rb')` + `TextIOWrapper(encoding='utf-8', errors='replace')`, from the first pass)
+exist. No other instances found.
+
+### Left unfixed
+
+None.
+
+Co-authored by Claude Sonnet 5.

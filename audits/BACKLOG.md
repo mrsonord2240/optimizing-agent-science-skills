@@ -8,15 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (71)
-
-### `bio-geo-data` — SKILL.md's own SuperSeries worked example crashes on default Windows Python
-
-- Skill: 84, Limited Release · [mrsonord2240/bioSkills@11ff205](https://github.com/mrsonord2240/bioSkills/tree/11ff205b0dd9f184e2279db93ec35d06e600a877/database-access/geo-data) · [viewer](skills/bio-geo-data/mrsonord2240-bioSkills@11ff205/viewer.md)
-- Observed in inputs: 8
-- Problem: check_super_or_sub_series('GSE346738'), SKILL.md's own newly-corrected flagship worked example for 'the single most-missed gotcha', raises UnicodeDecodeError when run exactly as documented on a default (non-UTF8-mode) Windows Python 3.12 -- reproduced twice. The underlying SuperSeries claim is real and correctly documented; only the runnable code snippet is broken.
-- Root cause: gzip.open(f'{gse}.soft.gz', 'rt') in SKILL.md's inline docstring function has no encoding parameter, so it falls back to the OS locale's preferred encoding (cp1252 on Windows by default), which cannot decode the UTF-8 non-ASCII characters present in real GEO SOFT text. The 2026-09-19 fix pass added the equivalent encoding='utf-8', errors='replace' fix to examples/search_geo.py's copy of this same logic but did not carry it into SKILL.md's own inline copy.
-- Fix: Change SKILL.md's check_super_or_sub_series() to open the file with explicit encoding, e.g. gzip.open(f'{gse}.soft.gz', 'rt', encoding='utf-8', errors='replace') -- a one-line change mirroring the fix already applied to examples/search_geo.py's detect_super_series().
+## P1 (70)
 
 ### `bio-alignment-multiple` — Fix MUSCLE5 ensemble commands (-super5 has no .efa)
 
@@ -578,7 +570,7 @@ None open.
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (268)
+## P2 (270)
 
 ### `bio-crispr-screens-copy-number-correction` — negative_control_sgrnas empty-dict case raises an undocumented ValueError
 
@@ -1747,6 +1739,22 @@ None open.
 - Problem: Independent inspection of the corrected accessor (power.marginal) on this re-audit's synthetic 6v6 pilot showed it returning NaN across most Nreps/strata cells at nsims=10-20, likely from sparse per-stratum true-discovery counts on a modest pilot.
 - Root cause: PROPER's per-stratum marginal power estimate can be undefined when a stratum has too few genes or simulated discoveries at low nsims; the Skill does not warn about this.
 - Fix: After fixing the field-name bug above, add a one-line caveat that power.marginal can return NaN for sparse strata or low nsims, and suggest increasing nsims or nrow(pilot_counts) before trusting a stratum's value, mirroring the existing NaN-true-FDR guidance already written for check.power.
+
+### `bio-geo-data` — No automated regression test guards against a third recurrence of the missing-encoding pattern
+
+- Skill: 89, Production Ready · [mrsonord2240/bioSkills@3327847](https://github.com/mrsonord2240/bioSkills/tree/33278470a8252c645f41842f24d3419748498866/database-access/geo-data) · [viewer](skills/bio-geo-data/mrsonord2240-bioSkills@3327847/viewer.md)
+- Observed in inputs: 8, 10
+- Problem: This is the second time an encoding-omission defect in this Skill's gzip.open() calls required a live-execution audit pass to catch (first the examples/ copy, then SKILL.md's own inline copy, then its sibling in parse_series_matrix()). Nothing in the Skill mechanically prevents a fourth recurrence if the code is edited again.
+- Root cause: No bundled test/fixture asserts that every gzip.open('rt', ...) call in the Skill includes explicit encoding handling; verification currently depends on a human or auditor grepping the whole Skill and executing each snippet against a real non-ASCII fixture.
+- Fix: Add a small bundled test (or a documented pytest-style check under examples/) that runs check_super_or_sub_series() and parse_series_matrix() against a cached real non-ASCII fixture (e.g. a trimmed copy of GSE283260's SOFT/matrix files) and asserts no UnicodeDecodeError -- this would have caught both the original bug and its sibling without needing a dedicated re-audit pass.
+
+### `bio-geo-data` — Python/R default-encoding risk asymmetry on Windows is undocumented
+
+- Skill: 89, Production Ready · [mrsonord2240/bioSkills@3327847](https://github.com/mrsonord2240/bioSkills/tree/33278470a8252c645f41842f24d3419748498866/database-access/geo-data) · [viewer](skills/bio-geo-data/mrsonord2240-bioSkills@3327847/viewer.md)
+- Observed in inputs: 11
+- Problem: SKILL.md and usage-guide.md present the Python (Bio.Entrez/GEOparse) and R (GEOquery) paths as interchangeable ('Both contain the same content'). This re-audit found that on this Windows runtime, R's default locale is UTF-8 (Sys.getlocale() LC_CTYPE=English_United States.utf8) while Python's is cp1252 -- so the encoding bug class fixed in this pass was never symmetrically a risk on the R side here. This is not a functional defect (both paths handled the same non-ASCII fixture correctly), but an agent following the Skill's guidance could reasonably assume both language paths carry identical encoding risk, which is not demonstrated to be true.
+- Root cause: The Skill's GEOparse vs GEOquery comparison table covers maturity, output format, supplementary-file reliability, and use-case, but not default text-encoding behavior on Windows.
+- Fix: Add a one-line note near the GEOparse vs GEOquery table or the Version Compatibility section: Python's default text encoding on Windows depends on locale/PYTHONUTF8 and can differ from R's; always pass explicit encoding='utf-8', errors='replace' to gzip.open() in Python code regardless of the R path's behavior.
 
 ### `bio-machine-learning-prediction-explanation` — The aggregation snippet requires a module map the Skill never tells you how to build
 
