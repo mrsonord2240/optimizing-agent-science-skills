@@ -22,7 +22,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: SKILL.md's own reference implementation of the identical pattern (checkpointed_batch_download) already has the guard 'if isinstance(body, bytes): body = body.decode("utf-8", errors="replace")' immediately after h.read(); this line was dropped when robust_download.py was written as a separate, expanded copy.
 - Fix: Add the identical isinstance(body, bytes) decode guard to robust_download.py, in the same place SKILL.md's own inline pattern has it. Also replace the script's stale worked-example query (mouse 'hemoglobin[Gene Name]', Count=0 live) with a verified-nonzero one, matching the P0-1 fix.
 
-## P1 (67)
+## P1 (68)
 
 ### `bio-batch-downloads` — No hard stop-condition for requests far outside E-utilities' efficient range
 
@@ -183,6 +183,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: SKILL.md says "Channel is 'channel.1' ... 'channel.N' and maps to the evidence's 'Reporter intensity corrected <n>' columns". MaxQuant writes those columns 0-indexed for a 10-plex ("Reporter intensity corrected 0" through "9"), so the channel names MSstatsTMT derives are channel.0 .. channel.9. An annotation built to the Skill's spec is rejected with "** Please check the annotation file. The channel name must be matched with that in input data." -- a message that says nothing about an off-by-one. Reproduced by running both indexings on the same evidence: channel.1..10 fails, channel.0..9 completes.
 - Root cause: The channel naming was written from the MSstatsTMT convention rather than from a MaxQuant evidence file's actual column suffixes.
 - Fix: Change the comment to: "Channel names follow the reporter-column suffixes MaxQuant wrote -- for a 10-plex those are `Reporter intensity corrected 0` .. `9`, so the annotation needs `channel.0` .. `channel.9`. Read the suffixes off your own evidence header before writing the annotation; a mismatch gives `the channel name must be matched with that in input data`, which does not mention the index."
+
+### `bio-amplicon-processing` — Shipped default truncLen fails on realistic V4/2x250 input
+
+- Skill: 87, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/microbiome/amplicon-processing) · [viewer](skills/bio-amplicon-processing/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 1, 5
+- Problem: SKILL.md's inline example (truncLen=c(240,160)) and the shipped examples/dada2_workflow.R (truncLen <- c(240, 200)) both set the forward-read truncation length (240bp) above the actual usable read length after correctly removing the documented 515F primer (19bp) from a real 250bp MiSeq read (231bp remain). filterAndTrim discards any read shorter than truncLen, so every read is dropped and the pipeline produces zero output.
+- Root cause: The worked example's truncLen numbers appear to have been chosen against the raw (pre-primer-removal) 250bp read length rather than the actual post-cutadapt length, an inconsistency between the Skill's own primer-removal step and its own truncation-budget worked numbers.
+- Fix: Change the worked defaults to values that fit within the primer-trimmed read length (e.g. c(220,200)), and add an explicit line to the 'Per-Method Failure Modes' table: 'truncLen must be chosen against the primer-trimmed read length, not the raw sequencer read length.'
 
 ### `bio-biomart-queries` — Bulk ID-mapping fails at the Skill's own advertised scale (414 Request-URI Too Large)
 
@@ -560,7 +568,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (259)
+## P2 (262)
 
 ### `bio-batch-downloads` — [Gene Name]/[GENE] field-tag precision is undocumented, and caused both broken example queries
 
@@ -1025,6 +1033,30 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: 391 -> 478 lines, three large taxonomy tables and a 23-entry reference list, all loaded on every invocation, with no references/ split.
 - Root cause: The TMT route necessarily grew the file and splitting is a restructure.
 - Fix: Move the Tool Taxonomy, the Per-Method Failure Modes and the reference list into references/ and leave the decision tree, the input contract and the code blocks in SKILL.md.
+
+### `bio-amplicon-processing` — No reproducibility/seed guidance
+
+- Skill: 87, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/microbiome/amplicon-processing) · [viewer](skills/bio-amplicon-processing/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: —
+- Problem: None of the shown DADA2 examples set an explicit random seed, and the Skill gives no reproducibility-hygiene note beyond version-compatibility checks.
+- Root cause: Omission in the worked examples.
+- Fix: Add a one-line note recommending set.seed() before learnErrors()/dada() calls and pinning package versions when reproducibility across runs/machines matters.
+
+### `bio-amplicon-processing` — ITS pipeline has no bundled example/fixture to verify against
+
+- Skill: 87, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/microbiome/amplicon-processing) · [viewer](skills/bio-amplicon-processing/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 4
+- Problem: Unlike the 16S path, the ITS pipeline (itsxpress + truncLen=0) ships no example data, so this audit could only verify CLI flag syntax, not a full run.
+- Root cause: examples/ only contains a 16S-paired-end-oriented script (dada2_workflow.R) and a primer-trimming script (remove_primers.sh); no ITS equivalent.
+- Fix: Add a minimal synthetic ITS example (or a note in usage-guide.md's prerequisites) so ITS runs can be smoke-tested end-to-end before production use.
+
+### `bio-amplicon-processing` — Chimera removal's known low-abundance recall limit is undocumented
+
+- Skill: 87, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/microbiome/amplicon-processing) · [viewer](skills/bio-amplicon-processing/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 1
+- Problem: removeBimeraDenovo(method='consensus') missed one of two synthetic chimeras seeded in the audit's real-data test (a low-abundance, 115-total-read chimera).
+- Root cause: This is a documented statistical limitation of consensus bimera detection at low abundance, not a Skill authoring defect, but the Skill doesn't mention it.
+- Fix: Add one sentence to the chimera-removal section noting that removeBimeraDenovo can miss low-abundance chimeras, and that method='pooled' or manual inspection of borderline-abundance 'chimera-like' ASVs is a useful supplementary check.
 
 ### `bio-biomart-queries` — Ensembl Genomes 'swap the host' claim does not work for a real dataset
 
