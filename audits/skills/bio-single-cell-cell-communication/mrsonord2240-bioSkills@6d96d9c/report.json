@@ -1,0 +1,250 @@
+{
+  "meta": {
+    "skill_name": "bio-single-cell-cell-communication",
+    "description": "Infers ligand-receptor cell-cell communication from scRNA-seq with a consensus-first workflow (LIANA), plus CellPhoneDB specificity tests, CellChat pathway probabilities, and NicheNet downstream ligand-activity. Use when ranking ligand-receptor interactions between cell types, comparing communication across conditions, asking which ligand drives a receiver response, or deciding which CCC method and resource to trust.",
+    "evaluated_on": "2026-09-19",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 8,
+    "source": "mrsonord2240/bioSkills@6d96d9c0c90124466fdecd0694b0bfd1dc177b07:single-cell/cell-communication",
+    "audit_type": "re-audit (fix pass follow-up)",
+    "prior_audit": "F:/OpenScience/audits/_pre-fix-20260919/bio-single-cell-cell-communication/ (score 86, Limited Release, 2026-09-19)",
+    "fix_log": "F:/optimizing-agent-science-skills/fixes/bio-single-cell-cell-communication.md"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "No fabricated DOIs, PMIDs, statistics, or biology anywhere in the fixed SKILL.md or in this re-audit's own real-data outputs (930 resource-robust pairs, CellPhoneDB significant pairs all correspond to real, named receptor-ligand biology: HLA-E/F-VSIR/LILRB1 checkpoints, ICAM2/3-LFA1, CD47-SIRPG, GAS6-MERTK)." },
+      "practice_boundaries": { "result": "PASS", "detail": "Still purely basic-research scRNA-seq analysis; no individual-patient diagnostic or prescriptive claims. Unchanged from the pre-fix audit." },
+      "methodological_ground": { "result": "PASS", "detail": "Governing Principle and Confounds table remain intact and correct. The new Condition Comparison section correctly avoids comparing raw counts and hedges gained/lost pairs as 'candidates', not proof -- it does not teach a fallacy. It does, however, omit a baseline-noise caveat (see P1 recommendation): a re-auditor-constructed null-case split with no true biological difference still produced 271/981 (27.6%) 'gained or lost' calls from sampling noise alone. This is a completeness gap, not an active methodological fallacy, so it does not meet the M3 FAIL bar." },
+      "code_usability": { "result": "PASS", "detail": "All executable code paths (LIANA consensus, LIANA resource-sensitivity, CellPhoneDB guarded specificity, Condition Comparison) ran to completion on real PBMC 1k v3 data in fresh, independent re-auditor runs with zero crashes. CellPhoneDB's documented debug_seed=1337 call is runnable and mostly but not fully deterministic at the documented threads=4 (see P1) -- a reliability defect, not an 'unrunnable code' defect, so it does not meet the M4 FAIL bar. CellChat/NicheNet remain out of live-execution scope on this Windows box (unchanged, GitHub-only packages per TOOLS.md); not touched by this fix, verified by git diff." }
+    }
+  },
+  "static_score": {
+    "subtotal": 87,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 10, "max": 12, "note": "Both original factual inaccuracies are now fixed and independently re-verified (single-group ValueError text matches the real exception; CellPhoneDB no longer crashes on Windows). Offsetting this, the Permutation Rationale table's debug_seed claim ('set it explicitly for reproducible reporting') is not fully accurate for the documented threads=4 call -- re-verified: 82/120,375 significance flags still flip across two fresh runs at the exact shipped parameters." },
+      "reliability": { "score": 10, "max": 12, "note": "The __main__ guard and its rationale are now documented inline. No proactive warning that reproducibility depends on threads=1, and no structured SKILL_* error codes for the agent-first context -- unchanged from the pre-fix audit." },
+      "performance_context": { "score": 7, "max": 8, "note": "SKILL.md grew from 221 to 270 lines (new Prerequisites and Condition Comparison sections) but remains well within a manageable budget; still loads all five methods' code eagerly rather than layering into references/." },
+      "agent_usability": { "score": 15, "max": 16, "note": "Method Decision Table and terminology remain unambiguous and fully consistent; unaffected by the fix." },
+      "human_usability": { "score": 7, "max": 8, "note": "usage-guide.md is now leaner (redundant sections removed) without losing Example Prompts; unaffected in substance." },
+      "security": { "score": 12, "max": 12, "note": "Unchanged: no credentials, no raw-string execution, no injection vectors." },
+      "maintainability": { "score": 10, "max": 12, "note": "Still only 2 of 5 documented methods (LIANA, CellChat) have a matching examples/ script; CellPhoneDB, NicheNet, and the new Condition Comparison section exist only as inline SKILL.md code." },
+      "agent_specific": { "score": 16, "max": 20, "note": "Idempotency remains mixed: LIANA fully deterministic (re-confirmed), CellPhoneDB now deterministic at threads=1 but NOT at the documented threads=4 -- the core idempotency gap from the pre-fix audit persists in the shipped code path, just narrower (252/120,375 -> 82/120,375 flips)." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 87.5,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 31, "total": 33 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "LIANA rank_aggregate consensus on real annotated PBMC 1k v3 data (regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Re-ran SKILL.md's unmodified Consensus Inference block, independently, in a fresh process, reusing the same real CellTypist-annotated PBMC data as the pre-fix audit. Result is an exact regression match: 31,812 total pairs, 1,122 robust pairs, identical top-10 ranked hits (S100A9-ITGB2, B2M-KLRD1, S100A8-ITGB2). This section was untouched by the fix.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Code from SKILL.md's Consensus Inference block runs unmodified (aside from file path) on real annotated PBMC data", "result": "PASS", "note": "Re-run independently by the re-auditor; zero code changes." },
+          { "text": "Output reports both magnitude_rank and specificity_rank as documented, not a single combined rank", "result": "PASS", "note": "Both columns present in adata.uns['liana_res']." },
+          { "text": "Top-ranked robust interactions correspond to known immune biology, not random noise", "result": "PASS", "note": "Same B2M-KLRD1 (NK checkpoint), S100A8/9-ITGB2 (monocyte-DAMP) top hits as the pre-fix audit." },
+          { "text": "Results reproduce exactly across the original audit and this independent re-audit run", "result": "PASS", "note": "1,122 robust pairs and identical top-10 magnitude_rank ordering reproduced exactly in a separate process, days apart." }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "CellPhoneDB v5 guarded, seeded specificity test -- fresh independent dual-run determinism check",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Ran SKILL.md's now-guarded, now-seeded (debug_seed=1337) 'Specificity Test' block twice, independently, exactly as documented (threshold=0.1, iterations=1000, threads=4, score_interactions=True). Crash is genuinely fixed: both fresh runs completed with no RuntimeError. Determinism is NOT fully fixed at the documented threads=4: comparing the FULL pvalues matrix (120,375 cell-pair x interaction values, not a spot check) across the two fresh runs found 5,150 differing cells (max abs diff 0.075) and 82/120,375 flipped significance flags at p<0.05 -- down from the pre-fix audit's 252/120,375, but not the 0/120,375 the fix log and SKILL.md's own Permutation Rationale table claim. A follow-up isolation run at threads=1 (the fixer's actual verification setting, per the fix commit message) reproduced the fix log's claim exactly: 0/120,375 differing cells, fully bit-identical. The non-determinism is specific to the threads=4 multiprocessing path that SKILL.md actually documents.",
+        "basic": 33,
+        "specialized": 45,
+        "total": 78,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "SKILL.md's documented CellPhoneDB code block (with its now-included __main__ guard) runs out-of-the-box on Windows without modification", "result": "PASS", "note": "Copied the shipped code block verbatim; ran twice with no crash." },
+          { "text": "Once guarded, the code executes and returns p-values/means matching the documented output structure", "result": "PASS", "note": "results['pvalues'] and results['means'] both (535, 238), both fresh runs." },
+          { "text": "Significant interactions include known immune ligand-receptor biology, not spurious hits", "result": "PASS", "note": "HLA-E-VSIR, HLA-F-LILRB1 (checkpoints), ICAM2/3-integrin aLb2 (LFA-1), CD58-CD2, CD47-SIRPG all significant, matching the pre-fix audit's findings." },
+          { "text": "Permutation p-values are reproducible across repeated runs with the documented call (debug_seed=1337, threads=4 as shipped)", "result": "FAIL", "note": "Two independent fresh runs at the exact documented parameters differed on 5,150/120,375 p-values and flipped 82/120,375 significance flags; the SKILL.md rationale table's reproducibility claim does not hold at the threads value the code block actually uses." },
+          { "text": "The Skill documents CellPhoneDB's human-only-database limitation elsewhere so a user hitting near-empty mouse results has an explanation", "result": "PASS", "note": "Common Errors table row unchanged and still present." }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "CCC requested with only one cell-type group present (regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Re-ran the single-group groupby case independently on real PBMC data. SKILL.md's corrected text ('a single group raises a ValueError... not a silent autocrine-only result') now matches the actual exception verbatim, including the exact message text.",
+        "basic": 36,
+        "specialized": 55,
+        "total": 91,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "Skill correctly identifies that CCC requires >=2 cell types in groupby", "result": "PASS", "note": "Unchanged, correct in both versions." },
+          { "text": "SKILL.md's description of the single-group failure mode now matches what LIANA actually does", "result": "PASS", "note": "Corrected sentence matches the real ValueError text exactly, verified fresh." },
+          { "text": "The actual error is a clear, actionable exception rather than a crash or silent bad output", "result": "PASS", "note": "ValueError names the exact cause (no comparison group for log2FC)." }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "NicheNet: which Monocyte ligand best explains activated-vs-naive CD8 T cell DE genes (carried over, not re-executed)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Carried over from the pre-fix audit: git diff of commit 6d96d9c confirms only SKILL.md's Prerequisites/CellPhoneDB/Condition-Comparison/single-group text and usage-guide.md changed -- the NicheNet section's R code and prose are byte-identical to the pre-fix version. nichenetr remains a GitHub-only package, unbuildable in this Windows env per TOOLS.md's batch-7 log, so it was not re-executed. Static-API-inspection conclusions are unchanged and were independently confirmed not to have regressed.",
+        "basic": 34,
+        "specialized": 47,
+        "total": 81,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Response builds the receiver DE gene set via the documented FindMarkers pattern before ranking ligands", "result": "PASS", "note": "Unchanged section, follows SKILL.md's geneset_oi construction exactly." },
+          { "text": "Response frames the ligand ranking as a hypothesis, not proof of mechanism, per the Governing Principle", "result": "PASS", "note": "Unchanged." },
+          { "text": "Response correctly cites aupr_corrected, not the outdated pearson metric, as the ranking column", "result": "PASS", "note": "Unchanged, matches the real current nichenetr API." },
+          { "text": "Response flags nichenetr's additional Zenodo model-file prerequisite, not just the GitHub package install", "result": "PASS", "note": "usage-guide.md Prerequisites text unchanged in substance (moved to SKILL.md, content intact)." }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Compare CCC between two conditions using the new Condition Comparison section -- re-auditor's own null-case split",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The fixer's own verification used an arbitrary 50/50 split with no stated rationale. To test whether the new section actually protects against spurious differences (its stated purpose), the re-auditor built an independent, stratified-by-cell_type random split (different RNG seed, 20260919) that preserves per-cell-type composition and, by construction, has NO true biological difference between 'conditionA' and 'conditionB'. The code ran end-to-end with zero errors (555 vs 558 cells, 827 vs 864 robust pairs). Finding: even under this true null, 154 gained + 117 lost pairs out of 981 union robust pairs (27.6%) were flagged purely from sampling noise and the halved per-condition cell count -- comparable in scale to the fixer's own demo (409 gained/70 lost). SKILL.md gives no warning that a similar fraction of any real two-condition gained/lost call may be noise, and recommends no stability check (e.g. repeat-split or bootstrap).",
+        "basic": 33,
+        "specialized": 44,
+        "total": 77,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "SKILL.md now provides a concrete, runnable code pattern for cross-condition comparison, as its frontmatter promises", "result": "PASS", "note": "New Condition Comparison section exists with a full code block, unlike the pre-fix version." },
+          { "text": "The runnable code executes end-to-end on real PBMC data without errors", "result": "PASS", "note": "Ran clean on the re-auditor's own stratified split, independent of the fixer's." },
+          { "text": "The section warns against comparing raw interaction/pair counts across conditions", "result": "PASS", "note": "Diffs robust sets (specificity_rank & magnitude_rank < 0.05), not raw counts." },
+          { "text": "Gained/lost calls are distinguishable from sampling noise: a null-case split (no true condition difference) yields a small gained/lost fraction", "result": "FAIL", "note": "A true null split still produced a 27.6% gained/lost fraction of the robust-pair union; no caveat or stability-check guidance exists in SKILL.md for this." },
+          { "text": "Section does not fabricate a nonexistent function call to fill the gap", "result": "PASS", "note": "Uses the real, already-verified li.mt.rank_aggregate; no invented API." }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Visium spatial transcriptomics data offered to the non-spatial LIANA consensus workflow (carried over, not re-executed)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Carried over: git diff confirms the Spatial-Aware Methods table is byte-identical pre- and post-fix. Mode A reasoning output, no code to execute.",
+        "basic": 37,
+        "specialized": 55,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Response does not recommend running the non-spatial LIANA consensus workflow directly on Visium spot data without qualification", "result": "PASS", "note": "Unchanged: redirects to the spatial-aware branch." },
+          { "text": "Response flags that Visium spots contain multiple cells and recommends deconvolution first", "result": "PASS", "note": "Unchanged." },
+          { "text": "Response names at least one real spatial-aware method from the Skill's own table", "result": "PASS", "note": "Unchanged: Squidpy/COMMOT/CellChat v2 spatial/LIANA+ bivariate all real." },
+          { "text": "Response does not overclaim spatial co-expression as proof of physical binding", "result": "PASS", "note": "Unchanged framing." }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Run CellPhoneDB on mouse spleen scRNA-seq data (carried over, not re-executed)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Carried over: git diff confirms the Method Decision Table's mouse-DB row and Common Errors table row are byte-identical pre- and post-fix. Mode A reasoning output, no code to execute.",
+        "basic": 37,
+        "specialized": 56,
+        "total": 93,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Response proactively warns, before running, that CellPhoneDB's default database is human-only", "result": "PASS", "note": "Unchanged." },
+          { "text": "Response recommends a real, verifiable alternative resource for mouse data", "result": "PASS", "note": "Unchanged: li.rs.select_resource('mouseconsensus') previously confirmed to exist." },
+          { "text": "Response does not silently run CellPhoneDB on mouse data and present near-empty results as meaningful", "result": "PASS", "note": "Unchanged." },
+          { "text": "Response notes the ortholog-mapping-error risk if CellPhoneDB is used anyway via ortholog mapping", "result": "PASS", "note": "Unchanged." }
+        ]
+      },
+      {
+        "index": 8,
+        "type": "Variant B",
+        "label": "Resource-Sensitivity Check: does a top hit survive consensus/cellphonedb/cellchatdb resources? (new, never executed by any prior audit)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "This SKILL.md section existed before the fix but was never executed by the original audit or the fixer. Ran unmodified on real PBMC data across all three named resources. 930 pairs survive all three resources, including real, well-known biology: HLA-C-KIR2DL3 (NK inhibitory checkpoint), CD40LG-integrin (T-cell costimulation), GAS6-MERTK (efferocytosis), CCL4-CCR5 (chemokine), SEMA4D-PLXNB2 (semaphorin signaling).",
+        "basic": 37,
+        "specialized": 56,
+        "total": 93,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "SKILL.md's Resource-Sensitivity Check code block runs unmodified on real PBMC data across all three named resources", "result": "PASS", "note": "consensus/cellphonedb/cellchatdb all ran with only the file path changed." },
+          { "text": "Output allows identifying which pairs survive multiple resources, as the section promises", "result": "PASS", "note": "930/981-ish candidate pairs computed and intersected across all three resources' significant sets." },
+          { "text": "Surviving pairs correspond to known immune biology, not noise", "result": "PASS", "note": "HLA-C-KIR2DL3, CD40LG-integrin, GAS6-MERTK, CCL4-CCR5 are all real, well-characterized pathways." },
+          { "text": "Section does not claim more precision than the method supports", "result": "PASS", "note": "SKILL.md's own text hedges correctly: 'a pair that survives both resources is robust, one that flips is not' -- descriptive, not overclaiming." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 34.8,
+    "dynamic_weighted": 52.5,
+    "score": 87,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Governing Principle and Method Decision Table framing remain genuinely excellent and were untouched by the fix.",
+    "Two of the three original P1s are now cleanly and independently re-verified as fixed: the CellPhoneDB Windows crash (two fresh score_interactions=True runs, zero crashes) and the single-group edge case (SKILL.md text now matches the real ValueError verbatim).",
+    "The new Condition Comparison section is real, runnable code -- verified end-to-end on real PBMC data with an independently constructed stratified-random split, not just the fixer's own demo -- genuinely extending the Skill's promised cross-condition capability.",
+    "The Resource-Sensitivity Check section, dormant and never executed by any prior audit, ran cleanly on first try and surfaced 930 real ligand-receptor pairs stable across three independent databases.",
+    "The redundancy pass genuinely shrank usage-guide.md (Prerequisites relocated to SKILL.md, two fully-duplicative sections deleted) without losing unique content."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "CellPhoneDB determinism fix is verified only at threads=1, but SKILL.md documents threads=4",
+      "observed_in": [2],
+      "problem": "SKILL.md's shipped 'Specificity Test' code block uses threads=4 with debug_seed=1337. Two fresh, independent re-audit runs at those exact parameters differed on 5,150/120,375 p-values and flipped 82/120,375 significance flags. The Permutation Rationale table's claim ('set it explicitly for reproducible reporting') is not accurate for the code block directly above it. A threads=1 run with the same seed is fully bit-identical (0/120,375 differ) -- this is what the fix log and commit message actually verified, per their own stated iterations=100, threads=1 parameters.",
+      "root_cause": "cellphonedb's multiprocessing.Pool-based permutation workers do not deterministically replay the RNG stream across worker counts even with debug_seed fixed; the fixer's verification used a thread count the shipped code does not use.",
+      "fix": "Either change the documented call to threads=1 for reproducible reporting (accept ~3-5x slower runtime on datasets this size), or add an explicit caveat to the Permutation Rationale table: 'debug_seed is bit-reproducible at threads=1; at threads>1, marginal (near p=0.05) calls may still flip run-to-run.'"
+    },
+    {
+      "priority": "P1",
+      "title": "Condition Comparison section has no baseline sampling-noise warning",
+      "observed_in": [5],
+      "problem": "A re-auditor-constructed null-case split (stratified random, no true biological difference, different seed than the fixer's) still produced a 27.6% gained/lost fraction of the robust-pair union from sampling noise and halved per-condition cell counts alone. SKILL.md gives no guidance that a comparable fraction of any real two-condition comparison's gained/lost pairs may be noise, and recommends no stability check.",
+      "root_cause": "The new section was validated by confirming it runs and produces plausible counts, not by checking its behavior under a known-null comparison.",
+      "fix": "Add a caveat recommending a repeat-split or bootstrap stability check (e.g., re-run the split N times and report each pair's gained/lost frequency) before treating a single split's gained/lost set as a finding, mirroring the rigor of the existing Resource-Sensitivity Check."
+    },
+    {
+      "priority": "P2",
+      "title": "usage-guide.md's Related Skills list still duplicates SKILL.md verbatim",
+      "observed_in": [],
+      "problem": "Both files list an identical 8-line Related Skills block. The fix's mandatory redundancy pass removed the Prerequisites duplication and two fully-duplicative sections but did not catch this one.",
+      "root_cause": "The redundancy pass diffed the two flagged sections, not the full file.",
+      "fix": "Keep the list in SKILL.md only (the agent-loaded file) and replace usage-guide.md's copy with a one-line pointer: 'See SKILL.md Related Skills.'"
+    }
+  ]
+}

@@ -8,7 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (73)
+## P1 (72)
 
 ### `bio-single-cell-trajectory-inference` — 2 of 3 documented scVelo velocity modes are broken against the Skill's own declared-compatible version
 
@@ -146,30 +146,6 @@ None open.
 - Root cause: Seed management was applied to the SKILL.md pattern and not propagated to the shipped helper.
 - Fix: Set params.randomSeed explicitly in calculate_3d_descriptors, accept it as an argument, and state in the usage guide that a recorded seed is required for any descriptor that feeds a model.
 
-### `bio-single-cell-cell-communication` — CellPhoneDB code block is not Windows-safe as documented
-
-- Skill: 86, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/cell-communication) · [viewer](skills/bio-single-cell-cell-communication/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 2
-- Problem: SKILL.md's 'Specificity Test (CellPhoneDB v5)' code block (lines ~106-119) is written as flat top-level script code. Run exactly as given on Windows with score_interactions=True, it crashes with a multiprocessing RuntimeError ('An attempt has been made to start a new process before the current process has finished its bootstrapping phase') because cellphonedb's score_interactions path calls multiprocessing.Pool internally.
-- Root cause: The example omits the standard `if __name__ == '__main__':` guard that Windows multiprocessing.Pool requires; the code was presumably only tested on Linux/macOS (fork-based), where this guard is not needed.
-- Fix: Wrap the code block's body in `def main(): ...` / `if __name__ == '__main__': main()`, or add a one-line note before the block: 'On Windows, wrap this in `if __name__ == "__main__":` -- score_interactions=True uses multiprocessing.Pool.'
-
-### `bio-single-cell-cell-communication` — CellPhoneDB permutation results are non-deterministic by default
-
-- Skill: 86, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/cell-communication) · [viewer](skills/bio-single-cell-cell-communication/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 2
-- Problem: The documented cpdb_statistical_analysis_method.call(...) example never sets debug_seed, which defaults to -1 (unseeded). Two identical runs on the same real PBMC data produced different p-values for 252 of 120,375 (cell-pair, interaction) combinations at the p<0.05 threshold.
-- Root cause: debug_seed is an explicit parameter of the real cellphonedb API (confirmed via inspect.signature) that the Skill's example simply never sets, unlike LIANA's rank_aggregate, which defaults to a fixed seed=1337 and was empirically confirmed deterministic across repeated runs.
-- Fix: Add `debug_seed=<int>` (e.g. 42) to the documented cpdb_statistical_analysis_method.call(...) example and add a row to the Threshold and Permutation Rationale table noting that debug_seed must be set for reproducible reporting, mirroring the existing n_perms/iterations row.
-
-### `bio-single-cell-cell-communication` — Cross-condition comparison is promised but has no runnable code pattern
-
-- Skill: 86, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/cell-communication) · [viewer](skills/bio-single-cell-cell-communication/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 5
-- Problem: The frontmatter description explicitly promises 'comparing communication across conditions', and the Governing Principle and Common Errors table both name the correct approach (Tensor-cell2cell decomposition, or CellChat differential comparison) -- but neither gets a code block, unlike the other four capabilities (LIANA, CellPhoneDB, CellChat pathway, NicheNet), each of which has a full runnable example.
-- Root cause: The condition-comparison capability was documented at the conceptual/warning level (what not to do) but never built out to the same code-example depth as the rest of the Skill.
-- Fix: Add a 'Condition Comparison' section with a runnable code block -- e.g. LIANA rank_aggregate run per-condition subset feeding into Tensor-cell2cell, or CellChat's mergeCellChat()/netVisual_diffInteraction() two-object workflow -- matching the depth of the existing Consensus Inference and Pathway Probability sections.
-
 ### `bio-variant-annotation` — csq --phase modes m and s are described wrongly
 
 - Skill: 86, Limited Release · [mrsonord2240/bioSkills@c1237cd](https://github.com/mrsonord2240/bioSkills/tree/c1237cdbc9bb199947696f3909de26a55d259116/variant-calling/variant-annotation) · [viewer](skills/bio-variant-annotation/mrsonord2240-bioSkills@c1237cd/viewer.md)
@@ -217,6 +193,22 @@ None open.
 - Problem: SKILL.md:138-139 screens for suspect clusters with median conf_score < 0.5. On a dataset containing labelled doublet and low-quality clusters, that screen selected six ordinary clusters and none of the four artifact clusters, which scored 0.59 to 0.97.
 - Root cause: Self-contradiction: the Skill's own Governing Principle says a state outside the reference is forced to the nearest label 'often with high apparent confidence', which is precisely why artifact clusters are confident. Low confidence instead tracks fine-granularity ambiguity between similar reference labels.
 - Fix: Invert the entry point. Screen every cluster on the QC covariates the same code block already computes - pct_counts_mt, n_genes_by_counts, doublet rate, batch purity - and use low annotation confidence only as a secondary signal for 'not in reference'. In this run the QC columns separated the artifacts perfectly (21-22% mito against a 2.5% baseline; doublet rates 0.44 and 0.22 against 0.02).
+
+### `bio-single-cell-cell-communication` — CellPhoneDB determinism fix is verified only at threads=1, but SKILL.md documents threads=4
+
+- Skill: 87, Production Ready · [mrsonord2240/bioSkills@6d96d9c](https://github.com/mrsonord2240/bioSkills/tree/6d96d9c0c90124466fdecd0694b0bfd1dc177b07/single-cell/cell-communication) · [viewer](skills/bio-single-cell-cell-communication/mrsonord2240-bioSkills@6d96d9c/viewer.md)
+- Observed in inputs: 2
+- Problem: SKILL.md's shipped 'Specificity Test' code block uses threads=4 with debug_seed=1337. Two fresh, independent re-audit runs at those exact parameters differed on 5,150/120,375 p-values and flipped 82/120,375 significance flags. The Permutation Rationale table's claim ('set it explicitly for reproducible reporting') is not accurate for the code block directly above it. A threads=1 run with the same seed is fully bit-identical (0/120,375 differ) -- this is what the fix log and commit message actually verified, per their own stated iterations=100, threads=1 parameters.
+- Root cause: cellphonedb's multiprocessing.Pool-based permutation workers do not deterministically replay the RNG stream across worker counts even with debug_seed fixed; the fixer's verification used a thread count the shipped code does not use.
+- Fix: Either change the documented call to threads=1 for reproducible reporting (accept ~3-5x slower runtime on datasets this size), or add an explicit caveat to the Permutation Rationale table: 'debug_seed is bit-reproducible at threads=1; at threads>1, marginal (near p=0.05) calls may still flip run-to-run.'
+
+### `bio-single-cell-cell-communication` — Condition Comparison section has no baseline sampling-noise warning
+
+- Skill: 87, Production Ready · [mrsonord2240/bioSkills@6d96d9c](https://github.com/mrsonord2240/bioSkills/tree/6d96d9c0c90124466fdecd0694b0bfd1dc177b07/single-cell/cell-communication) · [viewer](skills/bio-single-cell-cell-communication/mrsonord2240-bioSkills@6d96d9c/viewer.md)
+- Observed in inputs: 5
+- Problem: A re-auditor-constructed null-case split (stratified random, no true biological difference, different seed than the fixer's) still produced a 27.6% gained/lost fraction of the robust-pair union from sampling noise and halved per-condition cell counts alone. SKILL.md gives no guidance that a comparable fraction of any real two-condition comparison's gained/lost pairs may be noise, and recommends no stability check.
+- Root cause: The new section was validated by confirming it runs and produces plausible counts, not by checking its behavior under a known-null comparison.
+- Fix: Add a caveat recommending a repeat-split or bootstrap stability check (e.g., re-run the split N times and report each pair's gained/lost frequency) before treating a single split's gained/lost set as a finding, mirroring the rigor of the existing Resource-Sensitivity Check.
 
 ### `bio-workflows-proteomics-pipeline` — The fixed treat() fold-change floor silently zeroes the intermediate level of a dose series
 
@@ -1036,14 +1028,6 @@ None open.
 - Root cause: Named only.
 - Fix: Add 'rootdigger --msa aln --tree tree --exhaustive' or route to the IQ-TREE command.
 
-### `bio-single-cell-cell-communication` — Single-group failure mode is documented incorrectly
-
-- Skill: 86, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/cell-communication) · [viewer](skills/bio-single-cell-cell-communication/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 3
-- Problem: SKILL.md states a single groupby category 'yields only autocrine self-edges, not intercellular signaling.' Empirically, li.mt.rank_aggregate on a constant-value groupby column raises `ValueError: Cannot compute log2FC for group '...': every cell belongs to it...` instead of returning autocrine edges.
-- Root cause: The sentence describes an intuitive but unverified assumption about the failure mode rather than the tool's actual behavior.
-- Fix: Correct the sentence to: 'CCC needs >=2 cell types in `groupby`; a single group raises a ValueError (log2FC has no comparison group), not a silent autocrine-only result.'
-
 ### `bio-variant-annotation` — SKILL.md annotate line needs an indexed target
 
 - Skill: 86, Limited Release · [mrsonord2240/bioSkills@c1237cd](https://github.com/mrsonord2240/bioSkills/tree/c1237cdbc9bb199947696f3909de26a55d259116/variant-calling/variant-annotation) · [viewer](skills/bio-variant-annotation/mrsonord2240-bioSkills@c1237cd/viewer.md)
@@ -1275,6 +1259,14 @@ None open.
 - Problem: The CellTypist snippet passes majority_voting=True but never says where the over-clustering comes from. Left to itself CellTypist runs its own Leiden; given an unseeded upstream clustering, the smoothed labels differ between runs of the same script.
 - Root cause: The dependency on a clustering is implicit in the argument name.
 - Fix: Pass over_clustering='leiden' explicitly in the snippet and note that the upstream clustering must be seeded for the annotation to be reproducible.
+
+### `bio-single-cell-cell-communication` — usage-guide.md's Related Skills list still duplicates SKILL.md verbatim
+
+- Skill: 87, Production Ready · [mrsonord2240/bioSkills@6d96d9c](https://github.com/mrsonord2240/bioSkills/tree/6d96d9c0c90124466fdecd0694b0bfd1dc177b07/single-cell/cell-communication) · [viewer](skills/bio-single-cell-cell-communication/mrsonord2240-bioSkills@6d96d9c/viewer.md)
+- Observed in inputs: —
+- Problem: Both files list an identical 8-line Related Skills block. The fix's mandatory redundancy pass removed the Prerequisites duplication and two fully-duplicative sections but did not catch this one.
+- Root cause: The redundancy pass diffed the two flagged sections, not the full file.
+- Fix: Keep the list in SKILL.md only (the agent-loaded file) and replace usage-guide.md's copy with a one-line pointer: 'See SKILL.md Related Skills.'
 
 ### `bio-sra-data` — Guard's error message hardcodes 'fastq_ftp not found' regardless of which column is actually missing
 
