@@ -8,7 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (77)
+## P1 (80)
 
 ### `bio-causal-genomics-transcriptome-wide-association` — pip install pyfocus (as documented) is non-functional under modern pandas
 
@@ -193,6 +193,30 @@ None open.
 - Problem: query_raw() calls ds.get(), which is pybiomart's ServerBase.get() -- a plain HTTP GET with the entire XML query embedded in the URL. At 2066 real Ensembl gene IDs (~33KB filter value alone), Ensembl rejects the request with 414 Request-URI Too Large. SKILL.md's own Goal text advertises '5,000 Ensembl Gene IDs' and usage-guide.md's Quick Start example says '8,000 Ensembl Gene IDs' -- both would fail the same way, worse.
 - Root cause: query_raw() inherits pybiomart's GET-based transport unchanged; nothing in the fix's new helper switches to POST or chunks large ID lists client-side.
 - Fix: Either build the query_raw() request as an HTTP POST (BioMart's martservice endpoint accepts POST for the same XML payload) or chunk ID lists above a safe size (empirically ~500-1000 IDs) into multiple queries joined client-side, and correct the '5,000'/'8,000 IDs' claims in SKILL.md and usage-guide.md to state the real, tested limit.
+
+### `bio-proteomics-spectral-libraries` — OpenSWATH decoy generation's real data requirements are undocumented
+
+- Skill: 87, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/spectral-libraries) · [viewer](skills/bio-proteomics-spectral-libraries/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 4
+- Problem: TargetedFileConverter -> OpenSwathDecoyGenerator silently produces 0 decoys ('missing annotation' / 'below the 80% threshold') unless the transition list carries a literal Annotation column (e.g. 'y3^1') AND chemically real theoretical fragment m/z values -- placeholder or approximate ProductMz values are not enough, even though the TraML converts and validates without error.
+- Root cause: usage-guide.md's Format Conversion section names the tool ('generate decoys with OpenSwathDecoyGenerator') but not the field-level TraML/TSV schema the shuffle algorithm needs to match target and decoy annotations.
+- Fix: Add a short note to usage-guide.md's Format Conversion section: OpenSWATH TSV/TraML must include a literal Annotation column and real theoretical fragment m/z (not placeholders) for decoy generation to succeed; point to the OpenMS OpenSwathDecoyGenerator docs for the exact format.
+
+### `bio-proteomics-spectral-libraries` — Decoy shuffle generation is non-deterministic with no documented seed control
+
+- Skill: 87, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/spectral-libraries) · [viewer](skills/bio-proteomics-spectral-libraries/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 4
+- Problem: OpenSwathDecoyGenerator's -method shuffle produced a different decoy peptide sequence on two runs with identical input, and its CLI exposes no seed flag, while every other calibration/merge step in the Skill is explicitly seeded.
+- Root cause: The Skill's Tips section documents seeded, reproducible steps elsewhere but does not flag that this specific external tool step is intentionally randomized by design (target-decoy shuffle) and not reproducible run-to-run.
+- Fix: Add a Tips note that shuffle-decoy peptide identities vary run-to-run (expected behavior of the shuffle algorithm, not a bug) and that -method shift is available when exact reproducibility of decoy m/z values is required.
+
+### `bio-proteomics-spectral-libraries` — Reference DeepLC code example is stale against the installed API
+
+- Skill: 87, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/spectral-libraries) · [viewer](skills/bio-proteomics-spectral-libraries/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 2
+- Problem: The commented reference line 'from deeplc import DeepLC; dlc = DeepLC(); dlc.calibrate_preds(...)' in examples/build_library.py (and the equivalent in SKILL.md) does not run against deeplc 4.5.0, which ships only a module-level API.
+- Root cause: The snippet was written against an older deeplc release and not updated as the package moved from a class-based to a module-level API.
+- Fix: Update the reference comment to deeplc.predict_and_calibrate(...) / deeplc.calibrate(...) matching the current package API; keep the existing Version Compatibility caveat as a backstop for future drift.
 
 ### `bio-single-cell-cell-annotation` — The triage screens on the one signal artifacts do not trip
 
@@ -626,7 +650,7 @@ None open.
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (308)
+## P2 (310)
 
 ### `bio-causal-genomics-transcriptome-wide-association` — MA-FOCUS colon-separated paths collide with Windows drive letters
 
@@ -1251,6 +1275,22 @@ None open.
 - Problem: The diagnostic is described but not coded.
 - Root cause: Conceptual section only.
 - Fix: Add the regression of HPD width on posterior mean from out.txt.
+
+### `bio-proteomics-spectral-libraries` — MS2PIP's first-run model retrieval can hang with no documented workaround
+
+- Skill: 87, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/spectral-libraries) · [viewer](skills/bio-proteomics-spectral-libraries/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 2
+- Problem: ms2pip.predict_batch(...) printed 'Model hash not recognized.' then produced no further output for 5+ minutes in this network environment.
+- Root cause: ms2pip resolves/downloads model files on first use; the Skill's Prerequisites section lists 'pip install ... ms2pip' but says nothing about first-run model retrieval or how to pre-cache it.
+- Fix: Add a Prerequisites note to pre-fetch or point model_dir at a locally cached MS2PIP model set before relying on it in network-restricted environments.
+
+### `bio-proteomics-spectral-libraries` — No input-validation guidance before submitting peptides to Koina
+
+- Skill: 87, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/spectral-libraries) · [viewer](skills/bio-proteomics-spectral-libraries/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 3
+- Problem: Submitting a peptide with a non-standard residue or an unusually long sequence to Koina raises an uncaught InferenceServerException rather than a Skill-anticipated, user-facing message.
+- Root cause: The Skill does not mention validating peptide sequences (standard 20-AA alphabet, reasonable length) before calling an external prediction service.
+- Fix: Add a one-line tip recommending a basic peptide-sequence sanity check (alphabet, length) before submission, with a pointer to catch and report InferenceServerException clearly.
 
 ### `bio-single-cell-cell-annotation` — Two 'wrong input' symptoms are stale for current tool versions
 

@@ -1,0 +1,207 @@
+{
+  "meta": {
+    "skill_name": "bio-proteomics-spectral-libraries",
+    "description": "Builds and manages DIA spectral libraries as peptide query parameters (precursor m/z, a few fragment m/z plus relative intensities, normalized RT, optional CCS), covering experimental DDA, chromatogram, and in-silico predicted libraries via Koina-served Prosit, AlphaPeptDeep, MS2PIP, and DeepLC, with iRT/CiRT RT calibration, NCE tuning, format conversion (DIA-NN tsv/speclib/parquet, OpenSWATH pqp/TraML, Spectronaut, blib/dlib/elib), and library QC/merge.",
+    "evaluated_on": "2026-09-19",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Moderate",
+    "n_inputs": 5,
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:proteomics/spectral-libraries"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "Tool Taxonomy citations (Gillet 2012, Searle 2018/2020, Gessulat 2019, Zeng 2022, Bouwmeester 2021) are genuine, correctly attributed papers in the field; no fabricated DOI/PMID, sample sizes, or efficacy numbers found across any of the 5 outputs." },
+      "practice_boundaries": { "result": "PASS", "detail": "No clinical, diagnostic, or prescriptive content; the Skill operates entirely on peptide/spectral data with no patient-facing scope." },
+      "methodological_ground": { "result": "PASS", "detail": "Core methodological claims (predicted RT/CCS require empirical calibration; NCE must match predictor training) are scientifically sound and were positively confirmed: LOWESS calibration measurably outperformed a linear fit on nonlinear synthetic data (residual SS 0.21 vs 10.91), and the R^2>0.95 calibration gate correctly guards against under-calibrated fits." },
+      "code_usability": { "result": "PASS", "detail": "The Skill's own executable example (examples/build_library.py) ran to completion unmodified. One reference-only code comment (deeplc DeepLC class) is stale against the installed deeplc 4.5.0 API; this is a documentation accuracy issue (flagged as P1), not an unrunnable-code veto, since it is explicitly marked as non-executable reference and the module-level replacement API worked correctly when substituted." }
+    }
+  },
+  "static_score": {
+    "subtotal": 92,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 11, "max": 12, "note": "Covers all promised library types/calibration/conversion paths; one documented code pattern (DeepLC class) is stale against current deeplc, though the Skill's own Version Compatibility section anticipates and mitigates this." },
+      "reliability": { "score": 8, "max": 12, "note": "Documents the field's major silent-failure modes (uncalibrated RT, NCE mismatch) well, but gives no guidance on interpreting or recovering from actual tool errors (Koina exceptions, decoy-generator threshold failures, ms2pip model-cache stalls)." },
+      "performance_context": { "score": 8, "max": 8, "note": "232-line SKILL.md, progressive disclosure into usage-guide.md and one example; no bloat." },
+      "agent_usability": { "score": 15, "max": 16, "note": "Very clear, code-exact instructions and strong error-prevention warnings; output/feedback expectations are described at a workflow level but not per-step." },
+      "human_usability": { "score": 7, "max": 8, "note": "Natural-language quick-start prompts match how a researcher would actually ask; strict input handling is correct-by-design for a data-analysis Skill (Category 3 override), not a forgiveness defect." },
+      "security": { "score": 11, "max": 12, "note": "No credentials; Koina is a public unauthenticated endpoint; no PII. No explicit input-sanitization guidance before submitting peptide sequences to external services." },
+      "maintainability": { "score": 12, "max": 12, "note": "Clean SKILL.md/usage-guide/example separation; build_library.py is a genuinely standalone, deterministic, verifiable test artifact — confirmed by running it." },
+      "agent_specific": { "score": 20, "max": 20, "note": "Precisely scoped trigger description with explicit in/out-of-scope boundaries and hand-offs to 4 sibling Skills; deterministic, idempotent example code." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 83.6,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 19, "total": 22 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Prosit-via-Koina prediction + iRT calibration",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Fully executed against the live public Koina server; iRT calibration R^2=0.998.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Output uses the Skill's documented Koina(...).predict(df) pattern", "result": "PASS", "note": "Matched koinapy 0.0.11's real constructor/predict signature exactly" },
+          { "text": "Predicted iRT is calibrated to observed RT with an R^2>0.95 check before use", "result": "PASS", "note": "R^2=0.998 computed via scipy.stats.linregress, per the Skill's own calibrate_irt() gate" },
+          { "text": "Fragment intensities are annotated with ion type/series, not raw unlabeled values", "result": "PASS", "note": "annotation column returned (y1+1, b2+1, ...)" },
+          { "text": "No fabricated numerical claims presented as verified ground truth", "result": "PASS", "note": "Simulated observed RT clearly labeled synthetic" },
+          { "text": "Code executes without modification against the installed koinapy version", "result": "PASS", "note": "Confirmed via inspect.signature before running" }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Local MS2PIP + DeepLC prediction (no Koina dependency)",
+        "status": "PARTIAL",
+        "status_flag": "⚠️",
+        "note": "deeplc RT prediction succeeded with the real module-level API; ms2pip predict_batch hung after 'Model hash not recognized.' and never completed (waited 5+ min)",
+        "basic": 27,
+        "specialized": 39,
+        "total": 66,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Code adapts the documented-but-stale DeepLC class example to the real module-level API per the Skill's Version Compatibility guidance", "result": "PASS", "note": "deeplc.predict() used; DeepLC class confirmed absent via ImportError first" },
+          { "text": "MS2PIP fragment-intensity prediction completes and returns per-fragment intensities", "result": "FAIL", "note": "Hung indefinitely after 'Model hash not recognized.'; reproduced with 90s and 300s timeouts" },
+          { "text": "No proprietary/paid API called without disclosure", "result": "PASS", "note": "Both tools are open-source/local" },
+          { "text": "Output does not silently claim both predictions succeeded", "result": "PASS", "note": "Failure reported transparently rather than masked" }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "NCE scan + malformed peptide inputs",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "7-point NCE scan against a synthetic reference spectrum; invalid-residue and oversized peptide correctly raised a clean, catchable server exception",
+        "basic": 36,
+        "specialized": 53,
+        "total": 89,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Candidate NCE values are scanned and compared rather than a single hardcoded value used", "result": "PASS", "note": "NCE 20-40 scanned live against Koina" },
+          { "text": "Best NCE selected via a quantitative similarity metric against a reference spectrum", "result": "PASS", "note": "Pearson correlation against fixed synthetic spectrum; NCE=40 selected" },
+          { "text": "Malformed/out-of-scope peptide input produces a clear, catchable error rather than silent wrong output", "result": "PASS", "note": "InferenceServerException raised and caught, not silently returned as zeros" },
+          { "text": "No fabricated ground-truth spectrum presented as real empirical data", "result": "PASS", "note": "Explicitly synthetic, labeled as such in code comments" }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "OpenSWATH format conversion + decoy generation",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Succeeded on the third attempt once real theoretical fragment m/z + an explicit Annotation column were supplied; decoy peptide sequences are non-reproducible run-to-run (no seed option)",
+        "basic": 31,
+        "specialized": 43,
+        "total": 74,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "TSV is successfully converted to TraML via OpenMS TargetedFileConverter", "result": "PASS", "note": "Converted cleanly on first attempt" },
+          { "text": "Decoys generated only for the OpenSWATH route, not duplicated for DIA-NN/Spectronaut", "result": "PASS", "note": "Followed the Skill's explicit tip; no double-decoy step attempted" },
+          { "text": "Generated decoy peptides are shuffled versions of targets, not simple duplicates", "result": "PASS", "note": "DECOY_LGGNEQVTR_2 -> shuffled sequence e.g. LNGGVQTEK" },
+          { "text": "Decoy generation is reproducible/seed-controlled run-to-run", "result": "FAIL", "note": "Diffed two identical runs: decoy peptide sequences differ; OpenSwathDecoyGenerator --helphelp exposes no seed flag" },
+          { "text": "Required TraML/TSV fields for successful decoy generation are documented in the Skill", "result": "FAIL", "note": "Needed 3 iterations (missing Annotation column, then unrealistic placeholder ProductMz) to discover the real requirement from tool error logs alone" }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "CiRT calibration (no spike-in) + LOWESS (nonlinear gradient) + QC report",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "All three sub-requests completed correctly; LOWESS quantitatively outperformed linear fit as the Skill predicts",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "CiRT endogenous peptides used when no iRT spike-in is available", "result": "PASS", "note": "Published CiRT/Biognosys peptide values used as anchors" },
+          { "text": "LOWESS used instead of linear fit for a nonlinear gradient", "result": "PASS", "note": "statsmodels lowess() applied per the Skill's explicit Tips guidance" },
+          { "text": "Calibration quality is quantitatively compared between linear and LOWESS fits", "result": "PASS", "note": "Residual SS 10.91 (linear) vs 0.21 (LOWESS)" },
+          { "text": "Final QC report includes precursor/protein/transition counts", "result": "PASS", "note": "precursors: 4, proteins: 3, rows: 4 reported" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 36.8,
+    "dynamic_weighted": 50.2,
+    "score": 87,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Documented API patterns (Koina constructor/predict, ms2pip predict_batch) matched the real installed package signatures exactly and ran correctly against a live public inference server.",
+    "Clear, well-justified scope boundaries with explicit hand-offs to 4 sibling Skills (dia-analysis, peptide-identification, ptm-analysis, quantification).",
+    "Correctly identifies and defends against the field's most consequential failure mode -- an uncalibrated predicted library -- with a concrete, working R^2>0.95 QC gate.",
+    "The shipped example (examples/build_library.py) is a genuinely standalone, deterministic, verifiable test: it ran unmodified with no network or input files and produced checkable output.",
+    "LOWESS-vs-linear RT calibration guidance is not just asserted but empirically correct: LOWESS reduced residual sum of squares by >50x on a nonlinear synthetic gradient in this audit's own test."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "OpenSWATH decoy generation's real data requirements are undocumented",
+      "observed_in": [4],
+      "problem": "TargetedFileConverter -> OpenSwathDecoyGenerator silently produces 0 decoys ('missing annotation' / 'below the 80% threshold') unless the transition list carries a literal Annotation column (e.g. 'y3^1') AND chemically real theoretical fragment m/z values -- placeholder or approximate ProductMz values are not enough, even though the TraML converts and validates without error.",
+      "root_cause": "usage-guide.md's Format Conversion section names the tool ('generate decoys with OpenSwathDecoyGenerator') but not the field-level TraML/TSV schema the shuffle algorithm needs to match target and decoy annotations.",
+      "fix": "Add a short note to usage-guide.md's Format Conversion section: OpenSWATH TSV/TraML must include a literal Annotation column and real theoretical fragment m/z (not placeholders) for decoy generation to succeed; point to the OpenMS OpenSwathDecoyGenerator docs for the exact format."
+    },
+    {
+      "priority": "P1",
+      "title": "Decoy shuffle generation is non-deterministic with no documented seed control",
+      "observed_in": [4],
+      "problem": "OpenSwathDecoyGenerator's -method shuffle produced a different decoy peptide sequence on two runs with identical input, and its CLI exposes no seed flag, while every other calibration/merge step in the Skill is explicitly seeded.",
+      "root_cause": "The Skill's Tips section documents seeded, reproducible steps elsewhere but does not flag that this specific external tool step is intentionally randomized by design (target-decoy shuffle) and not reproducible run-to-run.",
+      "fix": "Add a Tips note that shuffle-decoy peptide identities vary run-to-run (expected behavior of the shuffle algorithm, not a bug) and that -method shift is available when exact reproducibility of decoy m/z values is required."
+    },
+    {
+      "priority": "P1",
+      "title": "Reference DeepLC code example is stale against the installed API",
+      "observed_in": [2],
+      "problem": "The commented reference line 'from deeplc import DeepLC; dlc = DeepLC(); dlc.calibrate_preds(...)' in examples/build_library.py (and the equivalent in SKILL.md) does not run against deeplc 4.5.0, which ships only a module-level API.",
+      "root_cause": "The snippet was written against an older deeplc release and not updated as the package moved from a class-based to a module-level API.",
+      "fix": "Update the reference comment to deeplc.predict_and_calibrate(...) / deeplc.calibrate(...) matching the current package API; keep the existing Version Compatibility caveat as a backstop for future drift."
+    },
+    {
+      "priority": "P2",
+      "title": "MS2PIP's first-run model retrieval can hang with no documented workaround",
+      "observed_in": [2],
+      "problem": "ms2pip.predict_batch(...) printed 'Model hash not recognized.' then produced no further output for 5+ minutes in this network environment.",
+      "root_cause": "ms2pip resolves/downloads model files on first use; the Skill's Prerequisites section lists 'pip install ... ms2pip' but says nothing about first-run model retrieval or how to pre-cache it.",
+      "fix": "Add a Prerequisites note to pre-fetch or point model_dir at a locally cached MS2PIP model set before relying on it in network-restricted environments."
+    },
+    {
+      "priority": "P2",
+      "title": "No input-validation guidance before submitting peptides to Koina",
+      "observed_in": [3],
+      "problem": "Submitting a peptide with a non-standard residue or an unusually long sequence to Koina raises an uncaught InferenceServerException rather than a Skill-anticipated, user-facing message.",
+      "root_cause": "The Skill does not mention validating peptide sequences (standard 20-AA alphabet, reasonable length) before calling an external prediction service.",
+      "fix": "Add a one-line tip recommending a basic peptide-sequence sanity check (alphabet, length) before submission, with a pointer to catch and report InferenceServerException clearly."
+    }
+  ]
+}
