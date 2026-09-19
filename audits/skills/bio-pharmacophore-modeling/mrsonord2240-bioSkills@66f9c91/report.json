@@ -1,0 +1,211 @@
+{
+  "meta": {
+    "skill_name": "bio-pharmacophore-modeling",
+    "description": "Builds and applies 3D pharmacophore models using RDKit Pharm3D, the apo2ph4 receptor-based workflow, Pharmer/Pharmit for search, and PharmacoForge for protein-pocket-conditioned pharmacophore generation, covering ligand-based pharmacophores from active-set alignment and receptor-based pharmacophores from binding-pocket geometry, with explicit handling of feature types, geometric tolerances, partial matching, and pharmacophore-based virtual screening.",
+    "evaluated_on": "2026-09-19",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "mrsonord2240/bioSkills@66f9c91:chemoinformatics/pharmacophore-modeling",
+    "re_audit_of": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:chemoinformatics/pharmacophore-modeling",
+    "pre_fix_report_archived_at": "F:/OpenScience/audits/_pre-fix-20260919/bio-pharmacophore-modeling/",
+    "fix_log": "F:/optimizing-agent-science-skills/fixes/bio-pharmacophore-modeling.md"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All executed outputs traced to real installed RDKit 2026.03.6 / PLIP 3.0.1 on real structures and real drug SMILES; no fabricated statistics or citations. Prior audit's 5 verified DOIs are unchanged." },
+      "practice_boundaries": { "result": "PASS", "detail": "Molecular-modeling tool skill; no diagnostic/prescriptive medical conclusions in any output." },
+      "methodological_ground": { "result": "PASS", "detail": "The fixer's added PLACEHOLDER COORDINATES warning (verified present, correctly placed, and correctly cites the real enrichment=0.5 finding) strengthens the skill's existing warning against treating illustrative bounds as validated." },
+      "code_usability": { "result": "PASS", "detail": "py_compile passes on the modified examples/pharmacophore.py; every SKILL.md code sample and the shipped example ran unmodified against real installed APIs across 7 independently executed/reviewed inputs." }
+    }
+  },
+  "static_score": {
+    "subtotal": 89,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 12, "max": 12, "note": "Unchanged from the prior audit: covers ligand-based, receptor-based, pocket-conditioned generation, library search, and quality validation end to end." },
+      "reliability": { "score": 10, "max": 12, "note": "+1 from prior audit's 9: shared_feature_types_prefilter/has_feature_types now report which query feature(s) a rejected molecule lacks instead of failing silently, and the PLIP inchikey ValueError now has a Common Errors row with two verified workarounds. Still no defensive try/except around EmbedPharmacophore's bounds-infeasible failure mode." },
+      "performance_context": { "score": 7, "max": 8, "note": "SKILL.md is now 298 lines (was ~293); usage-guide.md's Tips section was trimmed from two near-duplicate bullets to one pointer, a net simplification." },
+      "agent_usability": { "score": 15, "max": 16, "note": "Unchanged from the prior audit." },
+      "human_usability": { "score": 7, "max": 8, "note": "Unchanged from the prior audit." },
+      "security": { "score": 11, "max": 12, "note": "Unchanged from the prior audit." },
+      "maintainability": { "score": 10, "max": 12, "note": "+1 from prior audit's 9: has_feature_types' docstring now points directly at the SKILL.md failure-mode fix; usage-guide.md/SKILL.md duplication reduced. The has_feature_types return-type change (bool -> (bool, missing)) is internally consistent -- verified by source inspection that its only caller (feature_family_prefilter, in the same file) already unpacks the tuple, and no other file references the function." },
+      "agent_specific": { "score": 17, "max": 20, "note": "Unchanged from the prior audit." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 86.6,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 25, "total": 26 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Regression: PLIP receptor-based pharmacophore on real co-crystal PDB 1HSG, re-run using the workaround now DOCUMENTED in SKILL.md's Common Errors table (the original audit used an undocumented ad-hoc patch)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. Independently re-downloaded/re-used 1hsg.pdb, applied exactly the monkeypatch text SKILL.md now documents. Result: 6 h-bonds, 15 hydrophobic contacts, 2 salt bridges, 4 water bridges -- matches the original pre-fix audit's finding (2 salt bridges, 4 water bridges) exactly, confirming the documented fix reproduces the same correct chemistry.",
+        "basic": 37,
+        "specialized": 50,
+        "total": 87,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "PLIP analyze() completes without raising after applying SKILL.md's own documented workaround", "result": "PASS", "note": "No exception; ran to completion" },
+          { "text": "Interaction counts match the pre-fix audit's finding on the same real structure (2 salt bridges, 4 water bridges)", "result": "PASS", "note": "6 h-bonds / 15 hydrophobic / 2 salt bridges / 4 water bridges reproduced exactly" },
+          { "text": "No fabricated interaction records; all derived from real atomic coordinates in the RCSB 1HSG structure", "result": "PASS", "note": "Same real PDB file used in the original audit" },
+          { "text": "The Common Errors row's documented fix text is accurate and sufficient to resolve the error unmodified", "result": "PASS", "note": "Applied the monkeypatch exactly as worded in the new SKILL.md row; no additional changes needed" }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Diagnostic verification on an independent real-molecule set: indinavir/saquinavir queries vs ritonavir + 4 real unrelated drugs (different molecules than the fixer's own verification)",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "executed: true. feature_family_prefilter's new diagnostic correctly printed, for every rejected library molecule, which query feature(s) it lacks. Ritonavir reported missing exactly [('LumpedHydrophobe','tButyl'), ('PosIonizable','BasicGroup')] -- the same feature pair the fix log reports (verified independently, not copy-checked). The underlying false-negative (ritonavir still rejected) is unchanged, as expected: the fix adds diagnosis, not a retrieval-accuracy fix.",
+        "basic": 35,
+        "specialized": 46,
+        "total": 81,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "feature_family_prefilter prints a per-rejected-molecule breakdown of which query feature(s) are missing", "result": "PASS", "note": "Printed for all 5 library molecules on this independent query/library pair" },
+          { "text": "Diagnostic feature tuples are verified against real RDKit BaseFeatures.fdef output, not merely echoed", "result": "PASS", "note": "Missing-feature tuples for ritonavir cross-checked against direct FeatureFactory output" },
+          { "text": "Diagnostic runs without error on a new query pair and library not used in the fixer's own verification", "result": "PASS", "note": "indinavir/saquinavir queries and a 5-drug library, none copied from the fix log's own test" },
+          { "text": "Ritonavir (a real, same-class HIV-1 protease inhibitor) is correctly retrieved as a pharmacophore match", "result": "FAIL", "note": "Still rejected -- the 2-active intersection over indinavir/saquinavir happens to require 2 coincidental features ritonavir lacks; this is the pre-existing 'diverse actives confound' limitation the fix diagnosed but did not eliminate (by design -- P2 recommendation asked only for a diagnostic)" }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "T3 determinism verification (has_feature_types / EmbedMolecule path) plus SKILL.md's own ligand-based EmbedPharmacophore code block, run verbatim",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true, twice, as two fully independent python.exe process invocations. EmbedMolecule with the newly added randomSeed=23 produced bit-identical atomic coordinates (SHA-256 hash ab3b8443...90ff9eb7) across both runs. SKILL.md's own worked code block also ran unmodified and succeeded exactly as before the fix.",
+        "basic": 39,
+        "specialized": 54,
+        "total": 93,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "SKILL.md's own ligand-based EmbedPharmacophore code block runs unmodified and succeeds as documented", "result": "PASS", "note": "phenethylamine: can_match=True, embeddings produced, unaffected by the fix (this code block already had randomSeed=23 before the fix; only the example file's calls lacked it)" },
+          { "text": "has_feature_types' EmbedMolecule call with the newly added randomSeed=23 produces bit-identical atomic coordinates across two independent process invocations", "result": "PASS", "note": "SHA-256 of all conformer coordinates identical byte-for-byte across two separate python.exe runs" },
+          { "text": "The tuple-return change (is_match, missing) does not break the function's only caller", "result": "PASS", "note": "Verified by source inspection: feature_family_prefilter (same file) is the only caller and already unpacks the tuple; grep across the whole skill folder finds no other reference to has_feature_types" },
+          { "text": "No fabricated chemistry; molecule is a real, valid SMILES structure", "result": "PASS", "note": "c1ccc(cc1)CCN parses and embeds correctly" }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "T3 determinism verification (shared_feature_types_prefilter / EmbedMultipleConfs path), 20 conformers, two independent process runs",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true, twice. EmbedMultipleConfs(numConfs=20) with the newly added randomSeed=23 produced bit-identical coordinates for all 20 conformers (SHA-256 hash identical) across two fully independent python.exe invocations. The shipped __main__ demo's full output (feature-family prefilter hits list) was also byte-identical across both runs.",
+        "basic": 38,
+        "specialized": 52,
+        "total": 90,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "EmbedMultipleConfs (numConfs=20) with randomSeed=23 produces bit-identical conformer geometry across two independent process runs", "result": "PASS", "note": "SHA-256 hash of all 20 conformers' coordinates identical in both runs" },
+          { "text": "The shipped example's __main__ demo output is identical across both runs", "result": "PASS", "note": "Full stdout diffed byte-for-byte: identical, including the new diagnostic lines" },
+          { "text": "No exception raised in either run", "result": "PASS", "note": "Both runs completed cleanly" }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Scaled diagnostic + determinism stress test: 10 structurally diverse real drugs as library, 2 different real HIV-1 protease inhibitor queries (nelfinavir/amprenavir, not used elsewhere in this audit)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true, twice. No crash on a larger, class-diverse real library (analgesics, cardiovascular, steroid, alkaloid, HIV-PI). 6/10 passed the coarse family prefilter (expected -- it is documented as coarse, not a full 3D match); diagnostic correctly named the missing feature(s) for all 4 rejects. Output byte-identical across both independent runs.",
+        "basic": 36,
+        "specialized": 48,
+        "total": 84,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "feature_family_prefilter completes without error on a 10-molecule, structurally diverse real-drug library", "result": "PASS", "note": "No exception across ibuprofen, nicotine, salicylic acid, propranolol, testosterone-like and other real structures" },
+          { "text": "Output (hits list and per-molecule diagnostic) is bit-identical across two independent process runs", "result": "PASS", "note": "diff of full stdout: no differences" },
+          { "text": "Diagnostic correctly reports specific missing feature-type tuples for each rejected molecule, verified against real RDKit feature assignments", "result": "PASS", "note": "4 rejects each reported a distinct, chemically sensible missing-feature set" },
+          { "text": "Behavior scales reasonably to a larger, unrelated real-molecule set (no silent truncation or crash)", "result": "PASS", "note": "All 10 library molecules processed and reported" }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "New input: PLIP receptor-based analysis on a real structure not used anywhere in the original audit (PDB 3PTB, trypsin + benzamidine), applying exactly the SKILL.md-documented workaround",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. Confirms the documented fix generalizes beyond the single structure (1HSG) the fixer verified it on. analyze() completed without raising; 9 real interaction records returned (h-bond, hydrophobic, metal-complex classes), all traced to real atomic coordinates in the RCSB 3PTB structure.",
+        "basic": 37,
+        "specialized": 49,
+        "total": 86,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "PLIP analyze() completes on a real structure not used in the original audit, using exactly the workaround text now documented in SKILL.md", "result": "PASS", "note": "PDB 3PTB, no modification to the documented monkeypatch text" },
+          { "text": "Real, non-fabricated interaction records are returned", "result": "PASS", "note": "9 interaction records across 3 real interaction classes, from real 3PTB coordinates" },
+          { "text": "The Common Errors table's documented fix generalizes beyond the single structure the fixer verified it on", "result": "PASS", "note": "Same fix text worked unmodified on a second, independently chosen real structure" }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Review (not executed -- documentation-only fix): does the PLACEHOLDER COORDINATES warning actually sit where an agent reading top-to-bottom would see it before reusing the demo coordinates?",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: false (this fix is documentation-only; reviewed directly in SKILL.md). The warning is present immediately above `query_features = [` in the Ligand-Based Pharmacophore code block, names the real enrichment=0.5 finding, and py_compile / the shipped example's demo output are unaffected by this change (confirmed unchanged in inputs 3-5 above).",
+        "basic": 36,
+        "specialized": 49,
+        "total": 85,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "A PLACEHOLDER COORDINATES warning appears directly above query_features at its point of definition", "result": "PASS", "note": "SKILL.md line 86-88, immediately preceding the query_features assignment" },
+          { "text": "The warning cites a concrete, verifiable finding rather than a generic caveat", "result": "PASS", "note": "Cites the real enrichment=0.5 result on a 5-active/5-inactive real HIV protease inhibitor set" },
+          { "text": "The warning is positioned so an agent reading the code top-to-bottom encounters it before using the coordinates", "result": "PASS", "note": "Inline comment directly above the list literal, not only in separate prose elsewhere in the file" },
+          { "text": "No code behavior changed by this doc-only fix", "result": "PASS", "note": "py_compile passes; demo output in inputs 3 and 4 above is unaffected" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 35.6,
+    "dynamic_weighted": 52.0,
+    "score": 88,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "All 4 fixed P2 findings independently re-verified by real execution on molecules/structures the fixer did not use, not just re-run of the fixer's own test cases.",
+    "T3 determinism (the veto dimension most at risk from this fix) is now bit-identical -- SHA-256 of full conformer coordinate sets matches exactly across independent process invocations, for both EmbedMultipleConfs and EmbedMolecule.",
+    "The documented PLIP inchikey workaround was proven to generalize: it resolves the error and produces correct real chemistry on a second, independently chosen real structure (PDB 3PTB) beyond the one the fixer checked (1HSG).",
+    "The diagnostic fix's own known limit (ritonavir still not retrieved) is honestly reported rather than hidden -- the fix added diagnosis, not a retrieval-accuracy guarantee, and SKILL.md's own failure-mode table already names the correct remedy (cluster by scaffold)."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "Diagnostic explains but does not resolve the diverse-actives false-negative",
+      "observed_in": [2, 5],
+      "problem": "feature_family_prefilter still rejects genuine same-class actives (e.g. ritonavir) when the query set is small and structurally diverse; the fix adds a clear diagnostic but the underlying strict-intersection matching is unchanged.",
+      "root_cause": "No per-feature relaxation or scaffold-clustering fallback in shared_feature_types_prefilter, as already noted in SKILL.md's own 'Ligand-based -- diverse actives confound' failure-mode row.",
+      "fix": "Optional follow-up (not required for this fix pass): have feature_family_prefilter accept a min_shared_fraction parameter so a molecule missing only 1-2 non-essential features can still pass, with the strict-intersection behavior remaining the default."
+    }
+  ]
+}
