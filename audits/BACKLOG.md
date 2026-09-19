@@ -8,7 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (82)
+## P1 (83)
 
 ### `bio-single-cell-multimodal-integration` — totalVI pattern is undocumented as non-deterministic
 
@@ -610,6 +610,14 @@ None open.
 - Root cause: The fix was written from a single test session's stated output rather than independently reproduced or checked against the installed function's actual method dispatch; the confident '(checked on clusterProfiler 4.14.6)' citation makes the wrong claim more likely to be trusted and propagated than the original vaguer 'redundancy not removed, or an error'.
 - Fix: Before restating this claim, run selectMethod('simplify', 'enrichResult') or inspect clusterProfiler:::simplify_ALL directly. State plainly that clusterProfiler >= (whatever version introduced simplify_ALL; confirmed present in 4.14.6) already de-redundifies ont='ALL' objects correctly per ontology, and drop the three now-false 'checked' citations. If older clusterProfiler versions truly have the BP-only bug, gate the warning on a version check instead of stating it unconditionally.
 
+### `bio-protac-degraders` — Named primary tool and all ternary predictors are unexecutable locally
+
+- Skill: 90, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/protac-degraders) · [viewer](skills/bio-protac-degraders/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 2, 7
+- Problem: The frontmatter's primary_tool (PRosettaC) and every other named ternary-complex predictor (DeepTernary, AlphaFold3, Boltz) are a web service, licence-gated, or GPU/weights-gated -- none can run in a typical agent environment, leaving only 2D linker enumeration as executable content.
+- Root cause: The Skill's core 'ternary complex prediction' capability was designed entirely around external services rather than any bundled or freely runnable local method.
+- Fix: Add a lightweight local fallback (e.g. a documented RDKit conformer-based exit-vector distance/strain heuristic, or a wrapper for a locally runnable open tool such as HADDOCK3) so ternary-hypothesis generation is not 100% dependent on unavailable external services.
+
 ### `bio-similarity-searching` — The 'Tanimoto = 1.0' failure mode has the wrong cause and a fix that does not work
 
 - Skill: 90, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/similarity-searching) · [viewer](skills/bio-similarity-searching/GPTomics-bioSkills@d91ed3d/viewer.md)
@@ -666,7 +674,7 @@ None open.
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (293)
+## P2 (295)
 
 ### `bio-single-cell-multimodal-integration` — Bundled CITE-seq examples skip the skill's own DSB-before-WNN recommendation
 
@@ -2219,6 +2227,22 @@ None open.
 - Problem: SKILL.md's 'Whole-genome or default universe' failure mode describes the symptom as 'a confident table where tissue-restricted / lowly-expressed-gene terms dominate'. On a null (no-biology) 150-gene list, omitting universe= produced exactly one additional term (p.adjust 0.033), not a dominated table -- reproduced this pass and in the pre-fix audit.
 - Root cause: The failure mode's magnitude was written from the general mechanism rather than from a run against data of this scale.
 - Fix: Soften the symptom description to note that the effect scales with list size and background mismatch severity -- sometimes one spurious term, sometimes many -- rather than always implying a dominated table.
+
+### `bio-protac-degraders` — No shipped example for cooperativity alpha or DC50/Dmax calculation
+
+- Skill: 90, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/protac-degraders) · [viewer](skills/bio-protac-degraders/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 5
+- Problem: SKILL.md documents the alpha formula and DC50/Dmax/hook-effect workflow in prose, but examples/ contains only the linker-enumeration script; an agent must write the analysis code from scratch each time, as this audit did.
+- Root cause: examples/ has a single file (protac_enumerate.py) covering only linker connectivity, not the dose-response or binding-data workflows.
+- Fix: Add examples/cooperativity_dc50.py implementing the alpha formula and a 4-parameter-logistic DC50/Dmax fit with hook-effect flagging.
+
+### `bio-protac-degraders` — Version Compatibility pin is stale relative to the audited RDKit
+
+- Skill: 90, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/protac-degraders) · [viewer](skills/bio-protac-degraders/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: —
+- Problem: Version Compatibility section pins 'RDKit 2024.09+'; the audit environment's RDKit 2026.03.6 worked without any API changes needed, but the pin is over a year old.
+- Root cause: Skill written before later RDKit releases; the generic 'introspect and adapt' escape hatch already mitigates this, so it is cosmetic.
+- Fix: Refresh the pinned 'tested with' versions during routine Skill maintenance passes.
 
 ### `bio-proteomics-peptide-identification` — dda_search.sh hides Percolator's error from the operator
 
