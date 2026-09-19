@@ -8,7 +8,39 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (68)
+## P1 (72)
+
+### `bio-ncbi-datasets-cli` — 'Gene metadata across species' pattern does not work as documented
+
+- Skill: 73, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/database-access/ncbi-datasets-cli) · [viewer](skills/bio-ncbi-datasets-cli/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 2
+- Problem: SKILL.md's code pattern and examples/gene_metadata.sh's own default (TAXON=Mammalia) call `datasets summary gene symbol BRCA1 --taxon Mammalia`, which fails outright: 'gene requires an at-or-below-species-level taxon.' There is no supported way to get multi-species gene records via this subcommand.
+- Root cause: The doc treats --taxon on `summary gene symbol` as a clade-level filter, but the flag's real contract (confirmed via live --help and the error text) is single-species only; the only true multi-species mechanism is the separate --ortholog flag, which returns a materially narrower result (one representative per species).
+- Fix: Rewrite 'Gene metadata across species' to either loop --taxon <species> per species of interest, or point at --ortholog all and remove the false claim that --taxon <clade> performs a cross-species query. Change gene_metadata.sh's default TAXON to a real species.
+
+### `bio-ncbi-datasets-cli` — dataformat --fields names are stale across every shipped code block
+
+- Skill: 73, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/database-access/ncbi-datasets-cli) · [viewer](skills/bio-ncbi-datasets-cli/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 1, 2
+- Problem: `dataformat tsv genome --fields assembly-level,scaffold-n50,contig-n50,total-sequence-length` and `dataformat tsv gene --fields taxname,nomenclature-authority-symbol` both error 'field(s) [...] not recognized' on the installed CLI (18.37.0).
+- Root cause: SKILL.md is pinned to '16.0+ (2024)'; the field-name catalog was renamed by 18.37.0 and none of the doc's own dataformat calls were re-verified against a current --help catalog.
+- Fix: Update every --fields list to: assminfo-level, assmstats-scaffold-n50, assmstats-contig-n50, assmstats-total-sequence-len, tax-name. Drop nomenclature-authority-symbol entirely; no replacement field exists.
+
+### `bio-ncbi-datasets-cli` — bulk_dehydrated.sh silently corrupts every downloaded filename
+
+- Skill: 73, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/database-access/ncbi-datasets-cli) · [viewer](skills/bio-ncbi-datasets-cli/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 3, 5
+- Problem: fetch.txt is 3 tab-separated columns (<url>, a '0' placeholder, <path>) on the installed CLI, not the 2 columns the script's comment and its awk line (line 31) assume. Running it unmodified writes 'out=0' for every queued file, with no error at any point — confirmed at both 1-file and 273-file scale.
+- Root cause: fetch.txt's schema gained a byte-size-placeholder middle column since the script was last verified against a live CLI version.
+- Fix: Change line 31 to `awk -F'\t' '{print $1"\n out="$3}'` (third field, not second), and add a sanity check that fails loudly if any generated 'out=' line reads 'out=0'.
+
+### `bio-ncbi-datasets-cli` — --ortholog bare-flag syntax is broken with a misleading error
+
+- Skill: 73, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/database-access/ncbi-datasets-cli) · [viewer](skills/bio-ncbi-datasets-cli/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 4
+- Problem: SKILL.md's 'Find orthologs for a gene' pattern and usage-guide.md's ortholog example call `--ortholog --as-json-lines` (bare flag). On 18.37.0 this makes the CLI consume '--as-json-lines' as --ortholog's argument, then fail trying to resolve it as a taxon name, printing 10 unrelated taxonomic suggestions with no indication the real problem is a missing flag value.
+- Root cause: --ortholog changed from a boolean flag to `--ortholog strings` between CLI major versions; the doc's Version Compatibility section anticipates this class of drift abstractly but its own examples were not re-verified.
+- Fix: Change every --ortholog invocation in SKILL.md and usage-guide.md to `--ortholog all` (or an explicit taxon list).
 
 ### `bio-alignment-multiple` — Fix MUSCLE5 ensemble commands (-super5 has no .efa)
 
@@ -554,7 +586,23 @@ None open.
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (271)
+## P2 (273)
+
+### `bio-ncbi-datasets-cli` — Nonexistent accessions fail silently, undocumented
+
+- Skill: 73, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/database-access/ncbi-datasets-cli) · [viewer](skills/bio-ncbi-datasets-cli/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 7
+- Problem: `datasets summary genome accession GCF_999999999.1` exits 0 and prints `{"total_count": 0}` with no 'not found' message; an agent or script checking exit code alone would treat this as success.
+- Root cause: Not covered by SKILL.md's 'Common errors' table, which lists 7 other rows but not this response shape.
+- Fix: Add a Common errors row: '{"total_count": 0}, exit 0 -> accession doesn't exist, was withdrawn, or was superseded; verify at ncbi.nlm.nih.gov/datasets.'
+
+### `bio-ncbi-datasets-cli` — 'dataformat version' prints the literal string 'undefined'
+
+- Skill: 73, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/database-access/ncbi-datasets-cli) · [viewer](skills/bio-ncbi-datasets-cli/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: —
+- Problem: `dataformat.exe version` exits 0 with stdout exactly 'undefined', despite --help describing it as printing the client version. datasets --version works correctly.
+- Root cause: Version-reporting is unimplemented for dataformat specifically in this CLI build.
+- Fix: Note this defect explicitly in the Version Compatibility section; tell the agent to confirm the dataformat build via its --help banner or by checking it shipped alongside a known-good datasets binary, not via dataformat version.
 
 ### `bio-crispr-screens-copy-number-correction` — negative_control_sgrnas empty-dict case raises an undocumented ValueError
 

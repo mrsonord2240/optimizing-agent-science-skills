@@ -1,0 +1,213 @@
+{
+  "meta": {
+    "skill_name": "bio-ncbi-datasets-cli",
+    "description": "Download genome assemblies, gene records, and ortholog data from NCBI using the modern Datasets v2 CLI (replaces assembly_summary.txt scraping and many EFetch workflows). Use when bulk-pulling genome assemblies, gene metadata across species, ortholog sets, or BLAST databases; when E-utilities are too slow for genome-scale work; or when automatic checksum verification, parallel download, and clean accession-driven retrieval are required.",
+    "evaluated_on": "2026-09-19",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:database-access/ncbi-datasets-cli"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All values returned across all 7 inputs (organism names, lengths, gene IDs, ortholog counts) traced to real, live NCBI Datasets API responses; no fabricated accessions, counts, or metadata observed." },
+      "practice_boundaries": { "result": "PASS", "detail": "Not applicable in practice — this Skill retrieves public genome/gene database records, no diagnostic, prescriptive, or patient-level content is produced or possible via this CLI." },
+      "methodological_ground": { "result": "PASS", "detail": "No statistical or causal claims are made; the ortholog-set caveat (one representative per species, not tree-reconciled orthology) is stated accurately in both SKILL.md and usage-guide.md." },
+      "code_usability": { "result": "PASS", "detail": "The datasets/dataformat CLI itself runs correctly throughout; several of the Skill's own shipped code patterns and example scripts fail unmodified against the installed CLI (18.37.0) due to flag/field renames (Inputs 1, 2, 3, 4) — scored down heavily in Code Executability and Correctness rather than vetoed, consistent with how equivalent API-drift breakage was handled in sibling Skills in this same folder (entrez-fetch, entrez-link, local-blast) — none of which crossed into infinite loops, injection risk, or complete non-functionality of the underlying tool." }
+    }
+  },
+  "static_score": {
+    "subtotal": 74,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 8, "max": 12, "note": "Covers genome/gene/ortholog/virus/dehydrate-rehydrate workflows as promised, but Correctness is weak: nearly every dataformat --fields example and the entire 'gene metadata across species' pattern fail on the installed CLI (18.37.0) exactly as written." },
+      "reliability": { "score": 7, "max": 12, "note": "A nonexistent-but-well-formed accession returns exit 0 with {\"total_count\": 0} and no not-found signal (undocumented); bulk_dehydrated.sh's aria2c transform corrupts every downloaded filename silently, with no error at any point." },
+      "performance_context": { "score": 7, "max": 8, "note": "SKILL.md is concise (~300 lines) with usage-guide.md and examples/ carrying the depth; dehydrated-first guidance for bulk pulls is genuinely efficient and was confirmed to avoid a scope-explosion pull." },
+      "agent_usability": { "score": 9, "max": 16, "note": "Clear Datasets-vs-E-utilities decision table and subcommand taxonomy, but an agent following the doc's own code patterns hits four distinct live failures (taxon-level gene query, two field-name sets, bare --ortholog) that the Failure Modes/Common Errors sections do not cover." },
+      "human_usability": { "score": 7, "max": 8, "note": "Natural trigger language in the description; CLI error messages are mostly clear and actionable except the silent zero-count case and the misleading --ortholog error." },
+      "security": { "score": 10, "max": 12, "note": "Example scripts consistently quote shell variables; no hardcoded secrets; --api-key is documented only as an inline CLI argument with no env-var alternative suggested." },
+      "maintainability": { "score": 8, "max": 12, "note": "Clean modular layering (SKILL.md / usage-guide.md / 3 single-purpose example scripts); Testability is low because none of the 3 shipped example scripts currently runs unmodified against the pinned CLI version." },
+      "agent_specific": { "score": 18, "max": 20, "note": "Precise, well-scoped trigger description; strong Related-Skills composability and escape-hatch table — independently verified true (datasets download has no SRA subcommand at all), not just asserted." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 73.1,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 14, "total": 26 },
+    "inputs": [
+      {
+        "index": 1, "type": "Canonical",
+        "label": "Download phiX174 reference genome (GCF_000819615.1) + assembly stats",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Real download and stats correct (Escherichia phage phiX174, 5,386 bp, 11 CDS/proteins) but only after correcting SKILL.md's own dataformat --fields list, which errors as documented.",
+        "basic": 34, "specialized": 48, "total": 82,
+        "assertions_passed": 3, "assertions_total": 4,
+        "assertions": [
+          { "text": "Output reports the correct organism, genome length, and protein count for GCF_000819615.1", "result": "PASS", "note": "Organism 'Escherichia phage phiX174', 5,386 bp, 11 CDS in cds_from_genomic.fna and protein.faa — matches the known reference record." },
+          { "text": "dataformat tsv conversion succeeds using SKILL.md's own documented --fields list", "result": "FAIL", "note": "Errors 'field(s) [assembly-level], [scaffold-n50], [contig-n50], [total-sequence-length] not recognized' on the installed CLI (18.37.0)." },
+          { "text": "Downloaded zip contains all --include file types requested (genome, protein, cds, seq-report)", "result": "PASS", "note": "All 4 file types present: genomic .fna, protein.faa, cds_from_genomic.fna, sequence_report.jsonl." },
+          { "text": "No fabricated or hallucinated values in the reported assembly stats", "result": "PASS", "note": "All values traced directly to real CLI/dataformat output, no invented figures." }
+        ]
+      },
+      {
+        "index": 2, "type": "Variant A",
+        "label": "BRCA1 gene metadata across Mammalia (dataformat tsv gene)",
+        "status": "PARTIAL", "status_flag": "❌",
+        "note": "SKILL.md's flagship 'gene metadata across species' pattern is not achievable via the documented command at all; --taxon rejects any taxon above species rank for gene symbol lookups.",
+        "basic": 23, "specialized": 22, "total": 45,
+        "assertions_passed": 1, "assertions_total": 4,
+        "assertions": [
+          { "text": "The documented command (datasets summary gene symbol BRCA1 --taxon Mammalia) completes successfully", "result": "FAIL", "note": "Errors: 'gene requires an at-or-below-species-level taxon'; confirmed via live --help that --taxon on this subcommand is single-species only." },
+          { "text": "examples/gene_metadata.sh runs with its own default arguments", "result": "FAIL", "note": "Its default TAXON=Mammalia triggers the same taxonomy error immediately, with zero arguments changed." },
+          { "text": "dataformat tsv gene conversion succeeds using the doc's own --fields list", "result": "FAIL", "note": "'taxname' and 'nomenclature-authority-symbol' both not recognized; the latter does not exist anywhere in the current field catalog." },
+          { "text": "No fabricated gene data is produced in place of the failure", "result": "PASS", "note": "The CLI fails loudly rather than fabricating cross-species rows." }
+        ]
+      },
+      {
+        "index": 3, "type": "Edge",
+        "label": "Dehydrated discovery + rehydrate for a single accession",
+        "status": "COMPLETED", "status_flag": "⚠️",
+        "note": "datasets rehydrate (the Skill's own documented alternative) worked perfectly; the shipped bulk_dehydrated.sh's own aria2c awk transform silently corrupts every filename.",
+        "basic": 28, "specialized": 40, "total": 68,
+        "assertions_passed": 1, "assertions_total": 4,
+        "assertions": [
+          { "text": "fetch.txt matches SKILL.md's documented 2-column (<url>\\t<path>) format", "result": "FAIL", "note": "Confirmed 3 tab-separated columns (<url>, byte-size placeholder '0', <path>) on the installed CLI." },
+          { "text": "datasets rehydrate completes and produces files identical to a direct download", "result": "PASS", "note": "'Found 3 of 3 files for rehydration'; all 4 data files present and checksummed." },
+          { "text": "examples/bulk_dehydrated.sh's own awk transform (line 31) produces a usable aria2c input file", "result": "FAIL", "note": "Every row's 'out=' value is literally '0' — would overwrite all downloads into one file named 0, with no error raised." },
+          { "text": "No data loss occurs silently", "result": "FAIL", "note": "The aria2c-path corruption produces no warning or error at any point in the pipeline." }
+        ]
+      },
+      {
+        "index": 4, "type": "Variant B",
+        "label": "NCBI ortholog set for human BRCA1 (dataformat tsv gene)",
+        "status": "COMPLETED", "status_flag": "⚠️",
+        "note": "558 real, biologically correct ortholog records retrieved once corrected; SKILL.md's own bare --ortholog flag pattern fails with a misleading error.",
+        "basic": 30, "specialized": 43, "total": 73,
+        "assertions_passed": 2, "assertions_total": 4,
+        "assertions": [
+          { "text": "SKILL.md's documented bare --ortholog flag pattern succeeds", "result": "FAIL", "note": "--ortholog now requires an explicit value; bare flag consumes '--as-json-lines' as its argument and errors trying to resolve it as a taxon." },
+          { "text": "Corrected --ortholog all returns real, biologically correct ortholog records", "result": "PASS", "note": "558 records including human/mouse/rat/chimp/macaque/dog/chicken/cow BRCA1 orthologs, correct gene IDs and organism names." },
+          { "text": "Error message for the bad flag usage is actionable", "result": "FAIL", "note": "Suggests 10 unrelated random taxa (yeast, viruses, Streptomyces); never names the actual missing-argument problem." },
+          { "text": "Output correctly scopes to the requested gene (BRCA1) only", "result": "PASS", "note": "All 558 rows are BRCA1 orthologs, no unrelated genes present." }
+        ]
+      },
+      {
+        "index": 5, "type": "Stress",
+        "label": "Bulk dehydrated pull of all annotated RefSeq Deinococcus genomes",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "273 genomes queued and fully rehydrated (275 files on disk) via the documented --dehydrated + verify pattern; same fetch.txt column defect as Input 3 confirmed to be systemic, not a one-off.",
+        "basic": 34, "specialized": 49, "total": 83,
+        "assertions_passed": 3, "assertions_total": 4,
+        "assertions": [
+          { "text": "Dehydrated discovery step completes and reports a manifest without pulling full data", "result": "PASS", "note": "Small metadata-only zip produced; fetch.txt lists 273 queued files." },
+          { "text": "datasets rehydrate recovers 100% of queued files", "result": "PASS", "note": "Reported 'Completed 273 of 273'; 275 files on disk after (273 data files + 2 metadata files)." },
+          { "text": "fetch.txt matches the 2-column format bulk_dehydrated.sh's awk line assumes", "result": "FAIL", "note": "Same 3-column format as Input 3 — confirms the defect is systemic across scales, not accession-specific." },
+          { "text": "Pull stays bounded to the requested taxon (no scope explosion beyond Deinococcus)", "result": "PASS", "note": "273 genomes is consistent with a real annotated-RefSeq genus-level pull, not a runaway multi-thousand-genome fetch." }
+        ]
+      },
+      {
+        "index": 6, "type": "Scope Boundary",
+        "label": "Request raw SRA sequencing reads via the Datasets CLI",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Correctly out-of-scope per SKILL.md's own decision table and Failure Modes section; independently verified the CLI genuinely has no SRA-related subcommand at all.",
+        "basic": 39, "specialized": 54, "total": 93,
+        "assertions_passed": 3, "assertions_total": 3,
+        "assertions": [
+          { "text": "Agent declines to use Datasets CLI for raw SRA reads and names the correct tool", "result": "PASS", "note": "SKILL.md's scope table and 'Choosing Datasets for the wrong question' failure mode both explicitly name sra-data." },
+          { "text": "datasets download genuinely has no SRA-read subcommand (claim is verified, not just asserted)", "result": "PASS", "note": "Live 'datasets download --help' lists only gene, genome, taxonomy, virus — no SRA/reads subcommand exists." },
+          { "text": "No wasted or incorrect CLI attempt is made against a nonexistent subcommand", "result": "PASS", "note": "Scope table alone is sufficient to answer correctly without needing a failing CLI call." }
+        ]
+      },
+      {
+        "index": 7, "type": "Adversarial",
+        "label": "Nonexistent and malformed genome accessions",
+        "status": "COMPLETED", "status_flag": "⚠️",
+        "note": "Malformed accession errors clearly; a well-formed but nonexistent accession silently 'succeeds' with a zero-count result and exit 0 — undocumented and easy to mistake for a real answer.",
+        "basic": 28, "specialized": 40, "total": 68,
+        "assertions_passed": 1, "assertions_total": 3,
+        "assertions": [
+          { "text": "A nonexistent-but-well-formed accession produces a clear 'not found' signal", "result": "FAIL", "note": "GCF_999999999.1 returns {\"total_count\": 0} with exit code 0; no not-found message; SKILL.md never documents this response shape." },
+          { "text": "A malformed accession produces a clear, actionable error", "result": "PASS", "note": "'invalid or unsupported assembly accession: NOT_AN_ACCESSION', exit code 1 — clear and correct." },
+          { "text": "SKILL.md's 'Common errors' table covers the not-found-silent-success case", "result": "FAIL", "note": "The table lists 7 other error/symptom rows; this exit-0-empty-result case is absent from all of them." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 29.6,
+    "dynamic_weighted": 43.9,
+    "score": 73,
+    "max": 100,
+    "grade": "Beta Only",
+    "grade_symbol": "⚠️",
+    "deployable": false,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Live, biologically correct results across every core workflow once corrected for current-CLI syntax: accurate phiX174 assembly stats, a real 558-record BRCA1 ortholog set, and a real 273-genome bulk Deinococcus pull.",
+    "Scope discipline is not just documented but verifiably true — the CLI genuinely has no SRA-read subcommand, confirming the Skill's own decision table routes correctly to sra-data.",
+    "The dehydrate-then-rehydrate design (with automatic MD5 verification) worked flawlessly end to end at both single-accession and 273-genome scale via datasets rehydrate.",
+    "Clean progressive disclosure across SKILL.md, usage-guide.md, and three single-purpose example scripts, with a Version Compatibility section that correctly anticipates the exact class of CLI drift that broke its own examples."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "'Gene metadata across species' pattern does not work as documented",
+      "observed_in": [2],
+      "problem": "SKILL.md's code pattern and examples/gene_metadata.sh's own default (TAXON=Mammalia) call `datasets summary gene symbol BRCA1 --taxon Mammalia`, which fails outright: 'gene requires an at-or-below-species-level taxon.' There is no supported way to get multi-species gene records via this subcommand.",
+      "root_cause": "The doc treats --taxon on `summary gene symbol` as a clade-level filter, but the flag's real contract (confirmed via live --help and the error text) is single-species only; the only true multi-species mechanism is the separate --ortholog flag, which returns a materially narrower result (one representative per species).",
+      "fix": "Rewrite 'Gene metadata across species' to either loop --taxon <species> per species of interest, or point at --ortholog all and remove the false claim that --taxon <clade> performs a cross-species query. Change gene_metadata.sh's default TAXON to a real species."
+    },
+    {
+      "priority": "P1",
+      "title": "dataformat --fields names are stale across every shipped code block",
+      "observed_in": [1, 2],
+      "problem": "`dataformat tsv genome --fields assembly-level,scaffold-n50,contig-n50,total-sequence-length` and `dataformat tsv gene --fields taxname,nomenclature-authority-symbol` both error 'field(s) [...] not recognized' on the installed CLI (18.37.0).",
+      "root_cause": "SKILL.md is pinned to '16.0+ (2024)'; the field-name catalog was renamed by 18.37.0 and none of the doc's own dataformat calls were re-verified against a current --help catalog.",
+      "fix": "Update every --fields list to: assminfo-level, assmstats-scaffold-n50, assmstats-contig-n50, assmstats-total-sequence-len, tax-name. Drop nomenclature-authority-symbol entirely; no replacement field exists."
+    },
+    {
+      "priority": "P1",
+      "title": "bulk_dehydrated.sh silently corrupts every downloaded filename",
+      "observed_in": [3, 5],
+      "problem": "fetch.txt is 3 tab-separated columns (<url>, a '0' placeholder, <path>) on the installed CLI, not the 2 columns the script's comment and its awk line (line 31) assume. Running it unmodified writes 'out=0' for every queued file, with no error at any point — confirmed at both 1-file and 273-file scale.",
+      "root_cause": "fetch.txt's schema gained a byte-size-placeholder middle column since the script was last verified against a live CLI version.",
+      "fix": "Change line 31 to `awk -F'\\t' '{print $1\"\\n  out=\"$3}'` (third field, not second), and add a sanity check that fails loudly if any generated 'out=' line reads 'out=0'."
+    },
+    {
+      "priority": "P1",
+      "title": "--ortholog bare-flag syntax is broken with a misleading error",
+      "observed_in": [4],
+      "problem": "SKILL.md's 'Find orthologs for a gene' pattern and usage-guide.md's ortholog example call `--ortholog --as-json-lines` (bare flag). On 18.37.0 this makes the CLI consume '--as-json-lines' as --ortholog's argument, then fail trying to resolve it as a taxon name, printing 10 unrelated taxonomic suggestions with no indication the real problem is a missing flag value.",
+      "root_cause": "--ortholog changed from a boolean flag to `--ortholog strings` between CLI major versions; the doc's Version Compatibility section anticipates this class of drift abstractly but its own examples were not re-verified.",
+      "fix": "Change every --ortholog invocation in SKILL.md and usage-guide.md to `--ortholog all` (or an explicit taxon list)."
+    },
+    {
+      "priority": "P2",
+      "title": "Nonexistent accessions fail silently, undocumented",
+      "observed_in": [7],
+      "problem": "`datasets summary genome accession GCF_999999999.1` exits 0 and prints `{\"total_count\": 0}` with no 'not found' message; an agent or script checking exit code alone would treat this as success.",
+      "root_cause": "Not covered by SKILL.md's 'Common errors' table, which lists 7 other rows but not this response shape.",
+      "fix": "Add a Common errors row: '{\"total_count\": 0}, exit 0 -> accession doesn't exist, was withdrawn, or was superseded; verify at ncbi.nlm.nih.gov/datasets.'"
+    },
+    {
+      "priority": "P2",
+      "title": "'dataformat version' prints the literal string 'undefined'",
+      "observed_in": [],
+      "problem": "`dataformat.exe version` exits 0 with stdout exactly 'undefined', despite --help describing it as printing the client version. datasets --version works correctly.",
+      "root_cause": "Version-reporting is unimplemented for dataformat specifically in this CLI build.",
+      "fix": "Note this defect explicitly in the Version Compatibility section; tell the agent to confirm the dataformat build via its --help banner or by checking it shipped alongside a known-good datasets binary, not via dataformat version."
+    }
+  ]
+}
