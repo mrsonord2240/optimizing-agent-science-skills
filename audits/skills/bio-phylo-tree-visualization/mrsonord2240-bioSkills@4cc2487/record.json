@@ -1,9 +1,9 @@
 {
   "skill_id": "bio-phylo-tree-visualization",
-  "version": "mrsonord2240-bioSkills@966f838",
+  "version": "mrsonord2240-bioSkills@4cc2487",
   "source": {
     "repository": "mrsonord2240/bioSkills",
-    "commit": "966f838b0ba32918310bd223a34f71d78f190560",
+    "commit": "4cc2487c5f22541d9891e00ae9705793fd0135f8",
     "path": "phylogenetics/tree-visualization",
     "author": "GPTomics",
     "author_url": "https://github.com/GPTomics",
@@ -13,7 +13,7 @@
       "repository": "GPTomics/bioSkills",
       "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
     },
-    "url": "https://github.com/mrsonord2240/bioSkills/tree/966f838b0ba32918310bd223a34f71d78f190560/phylogenetics/tree-visualization"
+    "url": "https://github.com/mrsonord2240/bioSkills/tree/4cc2487c5f22541d9891e00ae9705793fd0135f8/phylogenetics/tree-visualization"
   },
   "audit": {
     "method": {
@@ -26,16 +26,16 @@
       "url": "https://github.com/aipoch/medical-research-skills/tree/f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26/skill-auditor"
     },
     "evaluator_version": "skill-auditor@1.0",
-    "audited_on": "2026-09-15",
+    "audited_on": "2026-09-19",
     "performed_by": "Claude (Anthropic) auditor agents",
     "commissioned_by": "Samuel Nord",
     "test_data": "synthetic"
   },
-  "supersedes": "GPTomics-bioSkills@d91ed3d",
+  "supersedes": "mrsonord2240-bioSkills@966f838",
   "files": {
     "report": "report.json",
     "viewer": "viewer.md",
     "fixes": "fixes.md",
-    "scripts": 32
+    "scripts": 43
   }
 }

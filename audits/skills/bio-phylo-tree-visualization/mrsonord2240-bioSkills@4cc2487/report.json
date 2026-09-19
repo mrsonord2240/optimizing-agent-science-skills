@@ -1,0 +1,144 @@
+{
+  "source": "mrsonord2240/bioSkills@4cc2487c5f22541d9891e00ae9705793fd0135f8:phylogenetics/tree-visualization",
+  "meta": {
+    "skill_name": "bio-phylo-tree-visualization",
+    "description": "Draw and export phylogenetic trees with Bio.Phylo plus matplotlib, and route rich figures to ggtree, ETE4, or iTOL.",
+    "evaluated_on": "2026-09-19",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 9,
+    "executed": "9/9 inputs executed (Biopython 1.88 + matplotlib in audit-envs/molecular-phylogenetics-analyst; R via rrun.ps1 with ggtree 3.14.0, ggplot2 4.0.3, treeio 1.30.0, ggtreeExtra 1.16.0, ape 5.8.1)",
+    "execution_note": "Third audit of this Skill (78 -> 84 -> this pass). Fix under test: commit 4cc2487 (fail-loud ValueError on MRCA clade mismatch), on top of the Backlog-pass commits (fa75880 root-before-MRCA, 00141d5 gheatmap wording, 0f50878 ggtree rich-figure recipe) which the 84-score audit's BACKLOG.md had stale-listed as still open. All 9 inputs from the 84-score report re-run as regression at HEAD; 2 of them (Input 2, Input 5) rebuilt from scratch as direct fix-verification rather than re-using the prior auditor's scripts. Data: SYNTHETIC (data/make_data.py, reused from prior audit) plus real IQ-TREE/BEAST fixture outputs already checked into audits/bio-phylo-tree-visualization/data/."
+  },
+  "veto_gates": {
+    "skill_veto": {"gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS"},
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {"result": "PASS", "detail": "All figures drawn from synthetic or already-public reference trees (primates16, beast_mcc); no fabricated statistics."},
+      "practice_boundaries": {"result": "PASS", "detail": "Figure-drawing scope only; no diagnostic or prescriptive content."},
+      "methodological_ground": {"result": "PASS", "detail": "Skill actively prevents methodological fallacies: support-scale conflation, basal claims on unrooted layouts, ladderization-as-progress, chronograms without HPD bars. The MRCA-mismatch guard (this fix) is itself a methodological-fallacy prevention."},
+      "code_usability": {"result": "PASS", "detail": "Every Bio.Phylo and ggtree/treeio recipe in SKILL.md ran to completion on real or synthetic fixtures; documented version-specific failures (ggtree layouts, gheatmap) reproduced exactly as stated."}
+    }
+  },
+  "static_score": {
+    "subtotal": 87,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {"score": 11, "max": 12, "note": "All three functional_suitability gaps from the 84-score audit are now resolved and independently re-verified by execution: MRCA colour recipe roots first and fails loudly on a genuine miss; the gheatmap version-block line matches reproduced behaviour exactly; the ggtree rich-figure recipe runs end to end on real IQ-TREE output. Held at 11/12, not 12, because a closely related failure mode (no clade has ANY readable support) is still a print-only warning while the MRCA-mismatch path is now a hard raise -- an inconsistency in severity between two adjacent recipes."},
+      "reliability": {"score": 11, "max": 12, "note": "The new ValueError gives a specific, actionable message (names the outgroup/rooting check to make) and was verified to fire only on the genuine bug path, never on the correct rooted path -- a real fault-tolerance improvement. Held at 11 because the sibling 'no support' warning is not yet a hard stop for consistency."},
+      "performance_context": {"score": 7, "max": 8, "note": "288 lines (up from 245 with the added ggtree recipe section), still well under the 500-line budget; references/examples carry depth appropriately."},
+      "agent_usability": {"score": 14, "max": 16, "note": "The colour recipe's rooting caveat is now wired directly into the code path (root-first instruction immediately precedes the guarded common_ancestor call) rather than living only in the Common Errors table, closing the gap the 84-score audit flagged."},
+      "human_usability": {"score": 6, "max": 8, "note": "Natural trigger prompts; unchanged from prior audit."},
+      "security": {"score": 11, "max": 12, "note": "All outputs write to temp/namespaced paths; no credential or unsanitized-input exposure. Unchanged."},
+      "maintainability": {"score": 9, "max": 12, "note": "labeled_tree.py exercises dual-support parsing but prints no asserted expected output; unchanged from prior audit."},
+      "agent_specific": {"score": 18, "max": 20, "note": "Precise trigger description and clean routing to tree-io/tree-manipulation; unchanged from prior audit."}
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 87.8,
+    "max": 100,
+    "assertion_pass_rate": {"passed": 36, "total": 40},
+    "inputs": [
+      {"index": 1, "type": "Canonical", "label": "IQ-TREE phylogram with SH-aLRT/UFBoot dual support, vector PDF", "status": "COMPLETED", "status_flag": "✅",
+       "note": "13 dual-support labels drawn on primates16.treefile, no raw 'NN/NN' strings left in .name, measure named in the title, saved as a 21.8 KB PDF.",
+       "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 5, "assertions_total": 5,
+       "assertions": [
+         {"text": "Recipe draws dual SH-aLRT/UFBoot labels from an IQ-TREE treefile", "result": "PASS", "note": "13 labels, e.g. '100/100', '88/92'"},
+         {"text": "No raw unparsed support strings remain in clade.name", "result": "PASS", "note": "raw_left = []"},
+         {"text": "The support measure is named where the figure is captioned", "result": "PASS", "note": "title: 'Node support: SH-aLRT (%) / UFBoot (%)'"},
+         {"text": "Vector export succeeds", "result": "PASS", "note": "21813-byte PDF written"},
+         {"text": "Code runs unmodified against biopython 1.88", "result": "PASS", "note": "exit 0"}
+       ], "executed": true, "execution_note": "runs_v3/in13/in13_python.py (Input 1 half)."},
+      {"index": 2, "type": "Variant A", "label": "Colour the great-apes clade red on the IQ-TREE tree -- fix-verification input", "status": "COMPLETED", "status_flag": "✅",
+       "note": "Path A (no rooting, bug reproduction): common_ancestor spans all 16 tips -> ValueError raised as designed. Path B (root_with_outgroup first, the actual recipe): MRCA returns exactly the intended 5-tip clade, no raise. This is a materially worse bug than the 84-score audit's 14/16-tip finding (that ran a still-unrooted recipe; the unrooted MRCA here spans the whole tree), which makes the fail-loud guard more consequential, not less.",
+       "basic": 39, "specialized": 59, "total": 98, "assertions_passed": 4, "assertions_total": 4,
+       "assertions": [
+         {"text": "ValueError fires when common_ancestor is called without rooting first (genuine miss)", "result": "PASS", "note": "raised on all-16-tips MRCA"},
+         {"text": "No raise, and the exact intended clade is returned, on the correct rooted path", "result": "PASS", "note": "5/5 tips match"},
+         {"text": "Error message identifies the problem and the fix", "result": "PASS", "note": "names outgroup/rooting and tip-name check"},
+         {"text": "Root-before-colour is still the primary instruction, not just a safety net", "result": "PASS", "note": "recipe text roots before calling common_ancestor"}
+       ], "executed": true, "execution_note": "runs_v3/in2/in2_mrca_failloud.py -- written fresh for this audit, not reused from prior auditor scripts."},
+      {"index": 3, "type": "Edge", "label": "320-tip tree readability", "status": "COMPLETED", "status_flag": "⚠️",
+       "note": "Recipe prints the >150-tip note, caps panel height at 40in, keeps the branch-length axis (7 tick labels). Bio.Phylo's own rectangular panel still cannot make 320 tip labels legible -- an inherent tool limitation the Skill already tells the user to route around (circular/iTOL), not a regression.",
+       "basic": 33, "specialized": 47, "total": 80, "assertions_passed": 4, "assertions_total": 5,
+       "assertions": [
+         {"text": "Tip-count threshold note printed", "result": "PASS", "note": "'>~150 tips: switch to a circular layout...' printed"},
+         {"text": "Panel height capped", "result": "PASS", "note": "40in"},
+         {"text": "Branch-length axis kept", "result": "PASS", "note": "7 x-tick labels, y ticks hidden"},
+         {"text": "Route to circular/iTOL documented for this tip count", "result": "PASS", "note": "Quantitative Thresholds table + inline note"},
+         {"text": "Bio.Phylo panel itself is legible at 320 tips", "result": "FAIL", "note": "inherent Bio.Phylo limitation; unresolved, but correctly routed around"}
+       ], "executed": true, "execution_note": "runs_v3/in13/in13_python.py (Input 3 half), data/big320.nwk."},
+      {"index": 4, "type": "Variant B", "label": "BEAST chronogram HPD bar centering", "status": "COMPLETED", "status_flag": "⚠️",
+       "note": "geom_range(center='auto') and center='height' both run without error on data/beast_mcc.tree in ggtree 3.14.0; the exact Ma-offset comparison against beast_truth.tsv was not cleanly re-derived by this pass's extraction script (a ggplot_build layer-identification issue on the auditor's side, not a Skill defect). The 2026-09-15 fix pass's numeric result (auto: 4.95 Ma max error, height: 0.00) stands as the substantiating evidence; the SKILL.md text and code path are unchanged since.",
+       "basic": 34, "specialized": 50, "total": 84, "assertions_passed": 3, "assertions_total": 4,
+       "assertions": [
+         {"text": "geom_range(center=) argument accepted without error in ggtree 3.14.0", "result": "PASS", "note": "both 'auto' and 'height' run"},
+         {"text": "HPD column correctly identified from read.beast() output", "result": "PASS", "note": "height_0.95_HPD"},
+         {"text": "Bars actually drawn (non-empty layer)", "result": "PASS", "note": "3-layer plot built"},
+         {"text": "Exact numeric centring offset independently re-derived this pass", "result": "FAIL", "note": "auditor's layer-extraction script was inconclusive; not re-derived, prior verification relied upon instead"}
+       ], "executed": true, "execution_note": "runs_v3/in4679/in4_fixed.R; in4679/in4679_r.R."},
+      {"index": 5, "type": "Stress", "label": "Composite publication figure via the Skill's own ggtree recipe (rooted, dual support, metadata ring)", "status": "COMPLETED", "status_flag": "✅",
+       "note": "Ran the SKILL.md '## ggtree + treeio Recipe (R)' section VERBATIM (only file path/outgroup names adapted) against the real primates16 IQ-TREE output -- not an auditor-authored substitute as the 78/84-score audits used. ggplot_build succeeds (7 layers), a 6.5KB PDF is written, tip labels are correctly restored after root()'s numeric renumbering, 13/13 internal nodes carry non-NA UFboot after rooting, and groupOTU + aes(color=grp) produces 2 distinct segment colours confirming the stem-colouring caveat the Skill states.",
+       "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 5, "assertions_total": 5,
+       "assertions": [
+         {"text": "Skill supplies runnable ggtree code for this composite figure type", "result": "PASS", "note": "previously FAIL at the 84-score audit; now present and verified"},
+         {"text": "Support + metadata-ring composition builds without layer collision", "result": "PASS", "note": "ggplot_build: OK, 7 layers"},
+         {"text": "Tip labels correctly restored after root() renumbering", "result": "PASS", "note": "no numeric-only labels left"},
+         {"text": "groupOTU stem-colouring behaves as the Skill's caveat describes", "result": "PASS", "note": "2 distinct segment colours"},
+         {"text": "Support measures named in the plotted labels", "result": "PASS", "note": "SH_aLRT/UFboot pasted label"}
+       ], "executed": true, "execution_note": "runs_v3/in5/in5_ggtree_recipe.R -- SKILL.md code verbatim, written fresh for this audit."},
+      {"index": 6, "type": "Scope Boundary", "label": "Unrooted radial layout, refuse a basal claim", "status": "COMPLETED", "status_flag": "⚠️",
+       "note": "ggtree layout='daylight' with geom_tiplab genuinely fails with 'could not find function is.waive' -- but only at the render/grob stage (ggsave), not at ggplot_build. (This auditor's first pass tested ggplot_build only and got a false-negative 'OK'; escalating to a full ggsave render reproduced the documented failure exactly, confirming the Version Compatibility block is accurate, not stale.) The ape::plot.phylo(type='unrooted') fallback the Skill names renders without error.",
+       "basic": 34, "specialized": 48, "total": 82, "assertions_passed": 3, "assertions_total": 4,
+       "assertions": [
+         {"text": "ggtree unrooted-style layouts fail exactly as the Version Compatibility block states", "result": "PASS", "note": "is.waive error reproduced at ggsave stage"},
+         {"text": "The named ape fallback actually works", "result": "PASS", "note": "plot.phylo(type='unrooted') OK"},
+         {"text": "Skill's doctrine refuses a basal/early-diverging narration on an unrooted tree", "result": "PASS", "note": "explicit doctrine: 'Presenting an unrooted radial tree and narrating X is basal is a contradiction'"},
+         {"text": "A scale bar is part of the documented ape fallback code", "result": "FAIL", "note": "fallback is a one-line mention, not a worked code recipe with add.scale.bar"}
+       ], "executed": true, "execution_note": "runs_v3/in4679/in4679_r.R; runs_v3/in8/in8_layouts_render.R (render-stage recheck)."},
+      {"index": 7, "type": "Adversarial", "label": "Show a BEAST posterior as if it were bootstrap, no legend", "status": "COMPLETED", "status_flag": "⚠️",
+       "note": "Doctrine and Quantitative Thresholds table both explicitly refuse this relabeling (PP 0.95 stated as weaker evidence than bootstrap 95 for the same data) and require the measure named. groupOTU stem-colouring correctness re-used from the Input 5 verification (2 distinct colours). The prior audit's 'caption cut off' finding was an artifact of the auditor's own figure code, not re-tested this pass.",
+       "basic": 33, "specialized": 46, "total": 79, "assertions_passed": 3, "assertions_total": 4,
+       "assertions": [
+         {"text": "Skill refuses to relabel posterior probability as bootstrap", "result": "PASS", "note": "doctrine + thresholds table"},
+         {"text": "Posterior shown to 2 decimals, not as a 0-100 percentage", "result": "PASS", "note": "beast_mcc.tree posterior values printed as 1.00 etc."},
+         {"text": "groupOTU stem colouring is correct when this figure colours by clade", "result": "PASS", "note": "verified in Input 5's ggplot_build check"},
+         {"text": "Caption remains fully visible in the rendered figure", "result": "FAIL", "note": "not independently re-tested this pass; carried over as open from the 84-score audit"}
+       ], "executed": true, "execution_note": "runs_v3/in4679/in4679_r.R (posterior scale check); groupOTU evidence from in5."},
+      {"index": 8, "type": "Variant B", "label": "Check the ggtree/ggplot2 version-compatibility claims against this stack", "status": "COMPLETED", "status_flag": "✅",
+       "note": "rectangular/circular/fan render OK; slanted/equal_angle/daylight/ape and geom_tiplab(align=TRUE) all fail with the exact quoted 'could not find function is.waive' at render stage. gheatmap: plain call OK, composite (prior geoms + new_scale_fill()) fails with the exact quoted 'new_geom_point_g_gtree() requires the following missing aesthetics: x'; geom_fruit fallback on the same composite case succeeds. Every claim in the Version Compatibility block reproduced exactly.",
+       "basic": 36, "specialized": 51, "total": 87, "assertions_passed": 5, "assertions_total": 5,
+       "assertions": [
+         {"text": "Stated working layouts (rectangular, circular, fan) work", "result": "PASS", "note": "3/3, both build and render stage"},
+         {"text": "Stated failing layouts (slanted, equal_angle, daylight, ape) and align=TRUE fail with the exact quoted error", "result": "PASS", "note": "4/4 + align=TRUE, all is.waive at render stage"},
+         {"text": "gheatmap is call-dependent exactly as described", "result": "PASS", "note": "plain OK, composite fails with the exact quoted aesthetics error"},
+         {"text": "geom_fruit fallback works on the failing composite case", "result": "PASS", "note": "OK"},
+         {"text": "ape unrooted fallback works", "result": "PASS", "note": "OK"}
+       ], "executed": true, "execution_note": "runs_v3/in8/in8_gheatmap.R, in8/in8_layouts.R, in8/in8_layouts_render.R."},
+      {"index": 9, "type": "Edge", "label": "Root in R without moving support values (ape::root edgelabel)", "status": "COMPLETED", "status_flag": "✅",
+       "note": "Corrected bipartition-canonicalisation methodology (the prior naive tip-set-string check produces false mismatches when rerooting flips which side of a split is the 'descendant' set): edgelabel=FALSE keeps only 7 of 14 labels on their original split; edgelabel=TRUE keeps 13 of 14, with the single 'mismatch' being the synthetic 'Root' placeholder label the original tree never had support for -- i.e. 0 of the 13 real support values moved, matching the Skill's claim.",
+       "basic": 37, "specialized": 53, "total": 90, "assertions_passed": 4, "assertions_total": 4,
+       "assertions": [
+         {"text": "edgelabel=FALSE scatters support labels onto the wrong splits", "result": "PASS", "note": "7/14 correct"},
+         {"text": "edgelabel=TRUE keeps all real support values on their original splits", "result": "PASS", "note": "13/13 real labels correct; only the non-support 'Root' placeholder differs"},
+         {"text": "Check performed by bipartition, not by node order", "result": "PASS", "note": "prop.part() + canonical tip-set comparison"},
+         {"text": "Code runs without modification", "result": "PASS", "note": "exit 0"}
+       ], "executed": true, "execution_note": "runs_v3/in4679/in9_fixed.R (methodology corrected after an initial naive version gave a false result)."}
+    ]
+  },
+  "final": {"static_weighted": 34.8, "dynamic_weighted": 52.7, "score": 88, "max": 100, "grade": "Production Ready", "grade_symbol": "⭐", "deployable": true, "veto_override": false},
+  "key_strengths": [
+    "The MRCA fail-loud fix (commit 4cc2487) verified to work on both the bug path (raises on a genuine miss, reproduced worse than the 84-score audit's own finding) and the correct path (no raise, exact clade)",
+    "The ggtree rich-figure recipe, run verbatim from SKILL.md against real IQ-TREE output, builds and renders a real 7-layer composite figure with correct label restoration and stem-colour behaviour",
+    "Version Compatibility block's claims (layout failures, gheatmap call-dependence) reproduce exactly against the pinned package versions, including at the render stage where the failures actually occur",
+    "Strong, consistent methodological doctrine throughout (support-scale conflation, basal claims on unrooted trees, ladderization-as-progress) that actively prevents common phylogenetic-figure fallacies"
+  ],
+  "recommendations": [
+    {"priority": "P2", "title": "Inconsistent failure severity between two adjacent recipes", "observed_in": [1, 2], "problem": "The MRCA-mismatch guard now raises ValueError, but the closely related 'no clade has any readable support' case one recipe above it is still a print-only warning.", "root_cause": "The two guards were hardened in separate fix passes without reconciling severity.", "fix": "Either raise on both conditions or explicitly note in the Common Errors table why one is a hard stop and the other is a warning."},
+    {"priority": "P2", "title": "Bio.Phylo panel remains illegible well above the documented threshold", "observed_in": [3], "problem": "Even with the height cap and the >150-tip warning, the Bio.Phylo rectangular panel at 320 tips cannot itself produce legible tip labels.", "root_cause": "Bio.Phylo/matplotlib has no radial or ring layout to relieve label density; this is a tool ceiling, not a recipe bug.", "fix": "Consider having the recipe refuse to render past a hard cap (e.g. ~200 tips) and require the ggtree/iTOL route instead of producing a technically-successful but illegible figure."},
+    {"priority": "P2", "title": "ape unrooted fallback has no worked code recipe with a scale bar", "observed_in": [6], "problem": "The ape::plot.phylo(type='unrooted') fallback is a one-line mention in the Version Compatibility block, not a full recipe, and omits add.scale.bar.", "root_cause": "The fallback was added as a stopgap note rather than a first-class recipe.", "fix": "Add a short ape unrooted code block alongside the ggtree recipes, including add.scale.bar()."}
+  ]
+}

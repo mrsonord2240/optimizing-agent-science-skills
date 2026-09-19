@@ -14,7 +14,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: Current Biopython (1.88) / NCBI ELink XML returns LinkInfo entries keyed 'LinkName', not 'Name'. The Skill was written against an older schema and never updated.
 - Fix: In examples/discover_links.py line 15, change i['Name'] to i['LinkName']. In SKILL.md lines 69-70 and 236, change ls['Name']/i['Name'] to ls['LinkName']/i['LinkName']. Add a one-line regression test asserting the corrected key against a live acheck call.
 
-## P1 (70)
+## P1 (69)
 
 ### `bio-entrez-link` — acheck LinkInfo entries can omit MenuTag entirely, unguarded
 
@@ -39,14 +39,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: gene_clinvar/gene_omim/gene_gtr/gene_medgen_diseases return large, real curated clinical-variant/disease linksets (16,064 for BRCA1's gene_clinvar alone). Nothing in SKILL.md or usage-guide.md instructs the agent to add a not-diagnostic / consult-a-clinician caveat when this output is surfaced in response to a patient-framed request.
 - Root cause: The Skill was designed purely as a database-navigation tool and never considered that its own link tables include clinically-actionable data.
 - Fix: Add a short guardrail note to SKILL.md: when gene_clinvar/gene_omim/gene_gtr/gene_medgen_diseases links are returned in response to a request that frames a specific patient or personal diagnosis, include an explicit non-diagnostic disclaimer and a referral to a clinician or genetic counselor.
-
-### `bio-phylo-tree-visualization` — Root before colouring clades by MRCA
-
-- Skill: 84, Limited Release · [mrsonord2240/bioSkills@966f838](https://github.com/mrsonord2240/bioSkills/tree/966f838b0ba32918310bd223a34f71d78f190560/phylogenetics/tree-visualization) · [viewer](skills/bio-phylo-tree-visualization/mrsonord2240-bioSkills@966f838/viewer.md)
-- Observed in inputs: 2
-- Problem: The colour recipe on an unrooted IQ-TREE treefile coloured 14 of 16 tips for a 5-species clade.
-- Root cause: common_ancestor on an arbitrarily rooted tree returns a basal node.
-- Fix: Root on the outgroup (tree-manipulation) before common_ancestor, check the MRCA tip set, and clear raw support names.
 
 ### `bio-alignment-multiple` — Fix MUSCLE5 ensemble commands (-super5 has no .efa)
 
@@ -576,7 +568,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (257)
+## P2 (258)
 
 ### `bio-entrez-link` — Related Skills section omits the sequence-similarity redirect
 
@@ -689,22 +681,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The Skill routes PHI-sensitive work to OpenCRAVAT but does not say that sending participant variants to a public API needs consent and approvals.
 - Root cause: Governance mentioned only as a tool choice.
 - Fix: Add a one-line consent/approvals note beside the batch workflow.
-
-### `bio-phylo-tree-visualization` — Correct the gheatmap line in the version block
-
-- Skill: 84, Limited Release · [mrsonord2240/bioSkills@966f838](https://github.com/mrsonord2240/bioSkills/tree/966f838b0ba32918310bd223a34f71d78f190560/phylogenetics/tree-visualization) · [viewer](skills/bio-phylo-tree-visualization/mrsonord2240-bioSkills@966f838/viewer.md)
-- Observed in inputs: 8
-- Problem: gheatmap rendered on ggtree 3.14.0 + ggplot2 4.0.3 here.
-- Root cause: Failure depends on the call used.
-- Fix: Say gheatmap may fail with certain data mappings; keep geom_fruit as the fallback.
-
-### `bio-phylo-tree-visualization` — Add ggtree patterns for rich figures
-
-- Skill: 84, Limited Release · [mrsonord2240/bioSkills@966f838](https://github.com/mrsonord2240/bioSkills/tree/966f838b0ba32918310bd223a34f71d78f190560/phylogenetics/tree-visualization) · [viewer](skills/bio-phylo-tree-visualization/mrsonord2240-bioSkills@966f838/viewer.md)
-- Observed in inputs: 5, 7
-- Problem: Composite figures still need auditor-written ggtree code.
-- Root cause: Routing only.
-- Fix: Add read.iqtree -> root(edgelabel=TRUE) -> geom_nodelab -> geom_fruit example with groupOTU stem caveat.
 
 ### `bio-alignment-multiple` — Correct the 'mafft --auto' strategy table
 
@@ -1393,6 +1369,30 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: Bio.Phylo writes NeXML without confidences or taxonomy.
 - Root cause: Format table covers capability, not writer behaviour.
 - Fix: Add a row: use DendroPy to write annotated NeXML.
+
+### `bio-phylo-tree-visualization` — Inconsistent failure severity between two adjacent recipes
+
+- Skill: 88, Production Ready · [mrsonord2240/bioSkills@4cc2487](https://github.com/mrsonord2240/bioSkills/tree/4cc2487c5f22541d9891e00ae9705793fd0135f8/phylogenetics/tree-visualization) · [viewer](skills/bio-phylo-tree-visualization/mrsonord2240-bioSkills@4cc2487/viewer.md)
+- Observed in inputs: 1, 2
+- Problem: The MRCA-mismatch guard now raises ValueError, but the closely related 'no clade has any readable support' case one recipe above it is still a print-only warning.
+- Root cause: The two guards were hardened in separate fix passes without reconciling severity.
+- Fix: Either raise on both conditions or explicitly note in the Common Errors table why one is a hard stop and the other is a warning.
+
+### `bio-phylo-tree-visualization` — Bio.Phylo panel remains illegible well above the documented threshold
+
+- Skill: 88, Production Ready · [mrsonord2240/bioSkills@4cc2487](https://github.com/mrsonord2240/bioSkills/tree/4cc2487c5f22541d9891e00ae9705793fd0135f8/phylogenetics/tree-visualization) · [viewer](skills/bio-phylo-tree-visualization/mrsonord2240-bioSkills@4cc2487/viewer.md)
+- Observed in inputs: 3
+- Problem: Even with the height cap and the >150-tip warning, the Bio.Phylo rectangular panel at 320 tips cannot itself produce legible tip labels.
+- Root cause: Bio.Phylo/matplotlib has no radial or ring layout to relieve label density; this is a tool ceiling, not a recipe bug.
+- Fix: Consider having the recipe refuse to render past a hard cap (e.g. ~200 tips) and require the ggtree/iTOL route instead of producing a technically-successful but illegible figure.
+
+### `bio-phylo-tree-visualization` — ape unrooted fallback has no worked code recipe with a scale bar
+
+- Skill: 88, Production Ready · [mrsonord2240/bioSkills@4cc2487](https://github.com/mrsonord2240/bioSkills/tree/4cc2487c5f22541d9891e00ae9705793fd0135f8/phylogenetics/tree-visualization) · [viewer](skills/bio-phylo-tree-visualization/mrsonord2240-bioSkills@4cc2487/viewer.md)
+- Observed in inputs: 6
+- Problem: The ape::plot.phylo(type='unrooted') fallback is a one-line mention in the Version Compatibility block, not a full recipe, and omits add.scale.bar.
+- Root cause: The fallback was added as a stopgap note rather than a first-class recipe.
+- Fix: Add a short ape unrooted code block alongside the ggtree recipes, including add.scale.bar().
 
 ### `bio-qsar-modeling` — chemprop reproducibility advice names a flag that does not exist
 

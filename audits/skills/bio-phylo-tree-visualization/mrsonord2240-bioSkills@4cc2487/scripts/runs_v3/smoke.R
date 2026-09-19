@@ -1,0 +1,6 @@
+suppressPackageStartupMessages({library(ggtree); library(treeio); library(ggtreeExtra); library(ape); library(ggplot2)})
+cat('ggtree', as.character(packageVersion('ggtree')), '\n')
+cat('treeio', as.character(packageVersion('treeio')), '\n')
+cat('ggtreeExtra', as.character(packageVersion('ggtreeExtra')), '\n')
+cat('ggplot2', as.character(packageVersion('ggplot2')), '\n')
+cat('ape', as.character(packageVersion('ape')), '\n')

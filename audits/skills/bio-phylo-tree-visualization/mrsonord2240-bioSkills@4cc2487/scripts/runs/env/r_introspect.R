@@ -1,0 +1,10 @@
+suppressPackageStartupMessages({library(ggtree); library(treeio); library(ggtreeExtra); library(ggplot2)})
+cat("ggtree", as.character(packageVersion("ggtree")), "treeio", as.character(packageVersion("treeio")),
+    "ggtreeExtra", as.character(packageVersion("ggtreeExtra")), "ggplot2", as.character(packageVersion("ggplot2")), "\n")
+cat("geom_range args:\n"); print(args(ggtree::geom_range))
+cat("layouts in ggtree():\n"); print(eval(formals(ggtree::ggtree)$layout))
+for (f in c("read.beast","read.iqtree","read.mrbayes","as.polytomy","root")) cat(f, "treeio:", exists(f, envir=asNamespace("treeio")), "ggtree:", exists(f, envir=asNamespace("ggtree")), "\n")
+for (f in c("geom_cladelab","geom_treescale","gheatmap","geom_facet","geom_nodelab","geom_tiplab","revts","theme_tree2","geom_fruit")) cat(f, exists(f), "\n")
+cat("ggnewscale:", requireNamespace("ggnewscale", quietly=TRUE), " svglite:", requireNamespace("svglite", quietly=TRUE), "\n")
+b <- read.beast("../../data/beast_mcc.tree"); print(get.fields(b))
+iq <- read.iqtree("../../data/iq/primates16.treefile"); print(get.fields(iq)); print(head(as_tibble(iq), 20))
