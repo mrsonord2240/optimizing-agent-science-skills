@@ -24,3 +24,39 @@ additions — escape-hatch section, independent chromVAR-determinism rerun —
 or scoped restructuring beyond a cheap fix (NucleosomeSignal/TSSEnrichment/
 StringToGRanges deprecation-warning update); left for a future pass, not a
 correction in scope here.
+
+---
+
+## 2026-09-19 — fix round 2 (T3 determinism veto)
+
+Fixer for `single-cell/scatac-analysis` (fork branch `fix/sc-atac`, worktree
+`F:\OpenScience\wt\sc-atac`, commit `4c65703`, on top of round 1's `1935af7`).
+Source: the re-audit that independently re-verified round 1's two P1 fixes as
+correct, then found a **new** defect while doing so — `chromVAR`'s
+`getBackgroundPeaks()` is unseeded, giving 24/4/4 significant motifs and only
+3/10 top-motif overlap across 3 reruns of the same object. This fired a T3
+Result Determinism Skill Veto, forcing the Skill from 89 (Limited Release) to
+a diagnostic Reject; it was pulled off the published shelf pending this fix.
+Report: `F:\OpenScience\audits\bio-single-cell-scatac-analysis\eval_viewer_bio-single-cell-scatac-analysis.md`.
+Env: `F:\OpenScience\audit-envs\single-cell-transcriptomics-analyst\` — reused
+as-is, no installs, no version changes.
+
+| finding | priority | change | verified | notes |
+|---|---|---|---|---|
+| `chromVAR::getBackgroundPeaks()` is unseeded — SKILL.md's documented chromVAR block gave different differential-motif results (24/4/4 significant motifs, 3/10 top-10 overlap) across identical reruns of the same object | P1 (T3 Skill Veto) | `SKILL.md` chromVAR section: added `set.seed(1)` immediately before the `getBackgroundPeaks()` call | ran — copied the re-audit's `obj_qc.rds` (160 cells, 3 cell types) to scratch and ran the exact documented block as a fresh function call 4 times: byte-identical `bg_peaks` and z-score matrices, 10/10 top-10 motif overlap, identical significant-motif counts (4/4/4/4) across all 4 runs; confirmed `computeDeviations()` is already deterministic given identical background peaks, so seeding only `getBackgroundPeaks()` is sufficient | this is the exact fix the re-audit itself validated; independently reconfirmed here rather than trusted |
+| Common Errors table still named the dead `RunChromVAR()` function (removed by round 1's own fix) as an option for GC-rich-background troubleshooting | P2 (internal contradiction, cheap) | Replaced with the current `getBackgroundPeaks()` API; added a new row for the determinism failure mode and its fix | re-read against the corrected chromVAR section above — no remaining `RunChromVAR` mentions in the file | found incidentally while fixing the determinism issue in the same table |
+
+All 6 R code blocks in `SKILL.md` re-parsed clean after the edit
+(`Rscript -e "parse(file=...)"` per block, via the env's `tools/rs.sh`
+wrapper).
+
+### Findings fixed: 1/1 P1 (the T3 veto). 1 incidental P2 fixed (dead
+`RunChromVAR` reference). 2 pre-existing P2s from round 1 re-checked and
+still left unfixed:
+- **Escape-hatch section** — still a substantial addition, not a correction.
+- **NucleosomeSignal()/TSSEnrichment() deprecation** — checked further this
+  round: Signac's replacement `ATACqc()` is not a drop-in swap, it requires
+  an external `fragtk.path` binary (confirmed via `getAnywhere("ATACqc.Seurat")`
+  in the audit env), so this remains beyond a cheap fix.
+
+Not merged, not re-audited — per dispatch, that is a separate agent's job.

@@ -1,9 +1,9 @@
 {
   "skill_id": "bio-single-cell-scatac-analysis",
-  "version": "mrsonord2240-bioSkills@1935af7",
+  "version": "mrsonord2240-bioSkills@4c65703",
   "source": {
     "repository": "mrsonord2240/bioSkills",
-    "commit": "1935af7c20305a64959a56af16fb50f2d3abc3a7",
+    "commit": "4c6570385038b1bb1f091f1dd06f853fc51bf48c",
     "path": "single-cell/scatac-analysis",
     "author": "GPTomics",
     "author_url": "https://github.com/GPTomics",
@@ -13,7 +13,7 @@
       "repository": "GPTomics/bioSkills",
       "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
     },
-    "url": "https://github.com/mrsonord2240/bioSkills/tree/1935af7c20305a64959a56af16fb50f2d3abc3a7/single-cell/scatac-analysis"
+    "url": "https://github.com/mrsonord2240/bioSkills/tree/4c6570385038b1bb1f091f1dd06f853fc51bf48c/single-cell/scatac-analysis"
   },
   "audit": {
     "method": {
@@ -31,7 +31,7 @@
     "commissioned_by": "Samuel Nord",
     "test_data": "synthetic"
   },
-  "supersedes": "GPTomics-bioSkills@d91ed3d",
+  "supersedes": "mrsonord2240-bioSkills@1935af7",
   "files": {
     "report": "report.json",
     "viewer": "viewer.md",
