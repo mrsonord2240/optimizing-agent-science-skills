@@ -8,7 +8,23 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (75)
+## P1 (77)
+
+### `bio-causal-genomics-transcriptome-wide-association` — pip install pyfocus (as documented) is non-functional under modern pandas
+
+- Skill: 80, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/causal-genomics/transcriptome-wide-association) · [viewer](skills/bio-causal-genomics-transcriptome-wide-association/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 3, 6
+- Problem: focus finemap/focus import crash with TypeError: read_csv() got an unexpected keyword argument 'delim_whitespace' on a fresh install matching usage-guide.md's own 'pip install pyfocus' instruction, because pandas>=2.2 removed that kwarg.
+- Root cause: pyfocus 0.802's setup.py pins only 'pandas>=0.23.0' with no upper bound, and its own gwas.py/exprref.py/ldref.py/convert.py all call pd.read_csv(..., delim_whitespace=True); the Skill's install instruction doesn't pin pandas either.
+- Fix: Add 'pip install pyfocus "pandas<2.2"' to the FOCUS install step in usage-guide.md and add this exact error string to the Common Errors table.
+
+### `bio-causal-genomics-transcriptome-wide-association` — FUSION.post_process.R crashes on single-SNP ('top1') genes
+
+- Skill: 80, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/causal-genomics/transcriptome-wide-association) · [viewer](skills/bio-causal-genomics-transcriptome-wide-association/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 2
+- Problem: The conditional/joint analysis step throws 'Error in wgt.matrix[qc$flip,] : incorrect number of dimensions' whenever a gene's weight model has exactly one SNP -- exactly the low-N-tissue scenario SKILL.md itself documents as common.
+- Root cause: fusion_twas's FUSION.post_process.R (line ~168/251) drops a 1-row matrix to a bare vector via 'wgt.matrix[m.keep,]' without drop=FALSE.
+- Fix: Add this error and cause to the Common Errors table, with the workaround of filtering single-SNP genes out before the conditional step (or patching drop=FALSE in a local fork).
 
 ### `bio-alignment-multiple` — Fix MUSCLE5 ensemble commands (-super5 has no .efa)
 
@@ -610,7 +626,31 @@ None open.
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (305)
+## P2 (308)
+
+### `bio-causal-genomics-transcriptome-wide-association` — MA-FOCUS colon-separated paths collide with Windows drive letters
+
+- Skill: 80, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/causal-genomics/transcriptome-wide-association) · [viewer](skills/bio-causal-genomics-transcriptome-wide-association/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 6
+- Problem: pyfocus 0.802 genuinely splits its gwas/ref/weights positional args on ':' (matching the Skill's own colon-separated documentation), but on Windows this also splits the drive-letter colon in an absolute path, silently multiplying 'detected populations'.
+- Root cause: The Skill's MA-FOCUS example assumes POSIX-style relative or non-drive-letter paths and doesn't call out the Windows caveat; pyfocus's own --help text is also wrong (says 'semicolon' when the code uses ':').
+- Fix: Add a Windows-specific note to the MA-FOCUS section: use relative paths or run under WSL/Linux, since absolute Windows paths break the colon-separated multi-ancestry syntax.
+
+### `bio-causal-genomics-transcriptome-wide-association` — SKILL.md is a single 464-line file with no references/ split
+
+- Skill: 80, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/causal-genomics/transcriptome-wide-association) · [viewer](skills/bio-causal-genomics-transcriptome-wide-association/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: —
+- Problem: Despite a Complex rating (12-tool taxonomy, heavy branching decision tree), everything is front-loaded into one file, penalizing performance_context and agent_specific/progressive_disclosure.
+- Root cause: No references/ subdirectory exists to move per-tool CLI detail, HLA/QC caveats, or the Common Errors table out of the main file.
+- Fix: Split into references/ (e.g., hla-and-qc-caveats.md, per-tool-cli-examples.md, common-errors.md) with SKILL.md as a thin router, matching the convention used by other Complex skills in this corpus.
+
+### `bio-causal-genomics-transcriptome-wide-association` — FUSION (the declared primary_tool) has no standalone example script
+
+- Skill: 80, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/causal-genomics/transcriptome-wide-association) · [viewer](skills/bio-causal-genomics-transcriptome-wide-association/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: —
+- Problem: examples/ only ships s_predixcan_pipeline.sh and focus_finemap.sh; FUSION.assoc_test.R usage lives only as an inline bash fence in SKILL.md, and no fixture data is shipped for any of the 12 tools.
+- Root cause: Example coverage was built out for S-PrediXcan and FOCUS but not extended to FUSION despite FUSION being the frontmatter primary_tool.
+- Fix: Add examples/fusion_assoc_test.sh mirroring the other two scripts, plus a tiny synthetic fixture set so --weights_dir/--ref_ld_chr paths are copy-paste runnable.
 
 ### `bio-crispr-screens-copy-number-correction` — negative_control_sgrnas empty-dict case raises an undocumented ValueError
 
