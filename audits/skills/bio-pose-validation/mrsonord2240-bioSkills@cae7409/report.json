@@ -1,0 +1,210 @@
+{
+  "meta": {
+    "skill_name": "bio-pose-validation",
+    "description": "Validates docked / generated protein-ligand poses using PoseBusters physical-validity tests, strain energy quantification, geometric checks (planarity, vdW overlap, bond/angle distortion), and pose-energy reasonableness. Use when QC-ing docking results, comparing classical vs ML docking outputs, or filtering pose lists before SAR analysis.",
+    "evaluated_on": "2026-09-19",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Moderate",
+    "n_inputs": 7,
+    "source": "mrsonord2240/bioSkills@cae7409:chemoinformatics/pose-validation",
+    "re_audit_of": "F:\\OpenScience\\audits\\_pre-fix-20260919\\bio-pose-validation (score 89, Limited Release, 2026-09-19 original audit)",
+    "fix_log": "F:\\optimizing-agent-science-skills\\fixes\\bio-pose-validation.md"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "No fabricated DOI/PMID, trial results, or statistics. All numeric claims in the fixed SKILL.md were independently re-verified against a running installation: dock=22/redock=28 columns (my own script, reaudit_dock_vs_redock.py), the strain value 4.162648 kcal/mol (reproduced 3x, deterministic), and the 0.29 Å pass / 0.42-0.45 Å fail planarity bracket (reproduced with a different ring atom and different step series than either the original auditor or the fixer used)." },
+      "practice_boundaries": { "result": "PASS", "detail": "Purely computational cheminformatics QC on docked poses; no diagnostic or prescriptive claims about a patient." },
+      "methodological_ground": { "result": "PASS", "detail": "Unchanged from the original audit's finding: the Skill correctly avoids overgeneralizing benchmark numbers and frames strain energy as a diagnostic, not a rigorous free energy. The fix pass added new empirical claims (the planarity bracket) with correct hedging ('roughly double', 'reliably passes/fails') rather than asserting a new false-precision cutoff." },
+      "code_usability": { "result": "PASS", "detail": "All 7 inputs' code ran to completion with no syntax errors or missing dependencies. examples/validate_poses.py now has a real, runnable __main__ (previously a no-op) that I independently re-ran 3x, reproducing the fixer's exact strain value each time." }
+    }
+  },
+  "static_score": {
+    "subtotal": 90,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 11, "max": 12, "note": "Same broad, well-matched coverage as the original audit. Correctness improved from 10->11: the dock-config claim was independently re-verified as now accurate (5-column gap, not just RMSD). Still docked 1 point: re-audit found a new, unaddressed factual gap -- the `mol` config table row still lists 'stereo' as included, but the installed library's `mol` config has no tetrahedral_chirality/double_bond_stereochemistry columns (verified directly), contradicting the fix's own new caveat sentence three lines above the table." },
+      "reliability":            { "score": 9,  "max": 12, "note": "Unchanged from the original audit. Common Errors table now also covers the filter-vs-reject pitfall (moved in from usage-guide.md), but the PDBQT-to-SDF bond-order conversion pitfall a real Vina-docking user hits before ever calling PoseBusters is still undocumented." },
+      "performance_context":    { "score": 7,  "max": 8,  "note": "Unchanged. SKILL.md length and structure are unaffected by the fix; the new fixtures/ files live under examples/, not inline." },
+      "agent_usability":        { "score": 15, "max": 16, "note": "Improved from 14->15: the Common Errors table now covers all issues the original audit found, and the dock-config table row is precise about which checks require mol_true. Docked 1 point for the new mol-config-row/stereo inconsistency (see functional_suitability), which sits exactly where an agent skimming the config table for a quick answer would be misled." },
+      "human_usability":        { "score": 7,  "max": 8,  "note": "Unchanged." },
+      "security":               { "score": 11, "max": 12, "note": "Unchanged." },
+      "maintainability":        { "score": 11, "max": 12, "note": "Improved from 9->11: examples/validate_poses.py now ships real fixtures (RCSB 3PTB, CC0 receptor + a real Vina-redocked benzamidine pose) and a runnable, assertion-backed __main__ block, independently re-verified here. The redundancy pass also removed usage-guide.md's restatements of SKILL.md content, improving modularity without losing any agent-actionable guidance (verified by diffing old vs. new usage-guide.md)." },
+      "agent_specific":         { "score": 19, "max": 20, "note": "Unchanged from the original audit." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 93.4,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 25, "total": 26 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical (regression)",
+        "label": "PoseBusters dock config on the real Vina-redocked benzamidine pose vs 3PTB receptor",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Re-ran the original auditor's exact script unmodified. 22/22 boolean checks pass, pb_valid=True, identical to the pre-fix run. The config-table assertion that FAILED in the original audit now PASSES: SKILL.md's dock row accurately states the 5-column gap.",
+        "basic": 39,
+        "specialized": 57,
+        "total": 96,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "bust(config='dock') and the AND-aggregation code produce a pb_valid flag matching the Skill's documented pattern", "result": "PASS", "note": "Ran the Skill's exact snippet; pb_valid computed correctly from 22 boolean columns, unchanged from the original audit." },
+          { "text": "The real Vina-docked benzamidine pose against 3PTB is classified PB-valid", "result": "PASS", "note": "All 22 checks True, as before." },
+          { "text": "Printed output reflects real bust() DataFrame content, not fabricated values", "result": "PASS", "note": "Table printed directly from the DataFrame." },
+          { "text": "SKILL.md's dock-config row accurately describes the returned columns vs redock", "result": "PASS", "note": "Fixed. Independently re-derived (reaudit_dock_vs_redock.py, not the fixer's script): dock=22 cols, redock=28 cols, diff={double_bond_stereochemistry, mol_true_loaded, molecular_bonds, molecular_formula, rmsd_\u2264_2\u00e5, tetrahedral_chirality} -- exactly the 5 checks (excluding the mol_true_loaded status column) the corrected SKILL.md now names." }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A (regression)",
+        "label": "MMFF94 relative strain energy on the same docked pose, using the Skill's ligand_strain_mmff verbatim",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Unaffected by the fix; re-ran unmodified and got the identical value.",
+        "basic": 37,
+        "specialized": 55,
+        "total": 92,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "ligand_strain_mmff runs unmodified from the Skill and returns a strain value for the docked pose", "result": "PASS", "note": "Copied verbatim; ran without edits." },
+          { "text": "Repeated runs produce the same strain value", "result": "PASS", "note": "4.162648 kcal/mol, matching the pre-fix audit exactly." },
+          { "text": "Strain value is physically plausible for a well-docked pose", "result": "PASS", "note": "Unchanged assessment." }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge (regression)",
+        "label": "Deliberately implausible poses (clash, stretched bond, puckered ring) plus a control good pose",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Clash and stretched-bond poses still correctly flagged invalid, identical to pre-fix. The puckered-ring assertion that FAILED pre-fix (against the old hard 0.25 A claim) now PASSES: the Skill no longer asserts a hard cutoff, and its corrected bracket (0.29 A passes, 0.45 A fails) matches this pose's real behavior (0.6 A raw displacement, ~0.289 A by the formula, still bust()-valid).",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Clash pose is flagged pb_valid=False with protein-distance/overlap failures", "result": "PASS", "note": "min_distance_to_protein and volume_overlap_with_protein both False, unchanged." },
+          { "text": "Stretched-bond pose is flagged pb_valid=False with bond-geometry failures", "result": "PASS", "note": "bond_lengths and bond_angles both False, unchanged." },
+          { "text": "SKILL.md's revised aromatic-planarity guidance (no hard 0.25 A gate; defer to bust()'s own column) accurately describes the installed library's real pass/fail boundary", "result": "PASS", "note": "puckered_ring.sdf (0.6 A raw displacement, ~0.289 A by the Skill's SVD formula) still passes aromatic_ring_flatness -- consistent with the corrected text and inconsistent with the old, now-removed 0.25 A claim." },
+          { "text": "Control (unperturbed) pose passes all mol-config checks", "result": "PASS", "note": "pb_valid=True, unchanged." },
+          { "text": "Every reported pass/fail traces to a real bust() DataFrame column, not a fabricated claim", "result": "PASS", "note": "Unchanged." }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B (regression)",
+        "label": "redock config with the real 3PTB co-crystal benzamidine as mol_true: RMSD + PB-valid reconciliation",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "RMSD<=2A and PB-valid both True, unchanged. The assertion that FAILED pre-fix (dock->redock adds only RMSD) now PASSES per the corrected table.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "redock config with mol_true returns an RMSD column plus PB-valid, matching the Skill's config table", "result": "PASS", "note": "rmsd_\u2264_2\u00e5 column present and True, unchanged." },
+          { "text": "The real re-docked pose reproduces the co-crystal binding mode and is placed in the documented Yes/Yes reconciliation quadrant", "result": "PASS", "note": "Unchanged." },
+          { "text": "Switching from 'dock' to 'redock' config adds exactly the 5 columns the corrected table names, not just RMSD", "result": "PASS", "note": "Confirmed via my own independent script (reaudit_dock_vs_redock.py) run against this same input pair." }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress (regression)",
+        "label": "Batch pose_qc_pipeline over all 8 real Vina modes plus the deliberately clashing pose",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Identical result to the pre-fix run: all 8 genuine modes PB-valid, clash pose correctly excluded, top pose matches best Vina score.",
+        "basic": 36,
+        "specialized": 56,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "pose_qc_pipeline runs unmodified from SKILL.md's Integration section across a batch of real docked poses", "result": "PASS", "note": "Unchanged." },
+          { "text": "All genuinely valid Vina modes are retained in the PB-valid shortlist", "result": "PASS", "note": "Unchanged." },
+          { "text": "The deliberately clashing pose is excluded from the shortlist", "result": "PASS", "note": "Unchanged." },
+          { "text": "The best-ranked valid pose matches the best real Vina score among valid poses", "result": "PASS", "note": "Unchanged: mode1_fixed.sdf, -6.106 kcal/mol." }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "New (chirality-config gap)",
+        "label": "\"I docked a chiral fragment blind (no reference structure) and QC'd it with the Skill's 'dock' config -- does PoseBusters actually catch a chirality-inverted pose that way, or only under redock?\" -- (R)-1-phenylethanol vs its (S) enantiomer, a molecule and chemotype used nowhere else in this audit or the fixer's checks.",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "redock (with mol_true = correct R enantiomer) correctly flags tetrahedral_chirality=False for the inverted S pose. dock and mol configs both lack the tetrahedral_chirality column entirely -- structurally incapable of catching the inversion, exactly as the fix's new caveat warns. But this also surfaced an unfixed defect: SKILL.md's config table still lists 'stereo' as part of what `mol` config includes, which is false (verified: mol config has 12 columns, none of them tetrahedral_chirality or double_bond_stereochemistry) and contradicts the fix's own caveat sentence.",
+        "basic": 36,
+        "specialized": 54,
+        "total": 90,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "redock config with the correct enantiomer as mol_true flags a stereo-inverted docked pose via tetrahedral_chirality=False", "result": "PASS", "note": "Verified on a molecule/system used nowhere else in this audit." },
+          { "text": "dock config (no reference) structurally cannot catch the same inversion -- no tetrahedral_chirality column is present at all", "result": "PASS", "note": "Confirmed: dock config returns 12 columns for this ligand-only case (no organic/inorganic-cofactor columns triggered), none of them chirality-related." },
+          { "text": "The Skill's new caveat ('chirality/stereo checks only run when mol_true is supplied') correctly predicts this behavior for a molecule outside the benzamidine/3PTB system used throughout the rest of the audit", "result": "PASS", "note": "Caveat holds on an independent chemotype, not just the system it was verified against during the fix." },
+          { "text": "SKILL.md's `mol` config table row ('Intra-ligand only: sanity, bonds, angles, rings, stereo, energy') accurately reflects the installed library's mol-config columns", "result": "FAIL", "note": "New finding, not caught by the original audit or the fix pass. mol config returns 12 columns (mol_pred_loaded, sanitization, inchi_convertible, all_atoms_connected, no_radicals, bond_lengths, bond_angles, internal_steric_clash, aromatic_ring_flatness, non-aromatic_ring_non-flatness, double_bond_flatness, internal_energy) -- no tetrahedral_chirality, no double_bond_stereochemistry. The row's 'stereo' claim directly contradicts the caveat added 3 lines above the table in this same fix." }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "New (independent planarity bisection)",
+        "label": "\"A colleague's SVD ring-planarity check said a 0.6 A ring pucker was fine but flagged 1.0 A as bad -- does PoseBusters' real check agree, and where does the true cutoff fall?\" -- independent series: a different ring atom than either the original auditor's or the fixer's puck files, and different step values.",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Two independently constructed series (ring atom index 7 of the ring tuple, vs. the fixer's/original auditor's index 0): a fine series (0.15-0.46 A) never failed, and an extended series (0.6-2.2 A) found the real pass/fail transition between 0.29 A (passes) and 0.42 A (fails) by the Skill's own formula -- closely matching the fixer's claimed ~0.29-0.45 A bracket and clearly refuting the old, removed 0.25 A figure, using different data than the fixer used to derive that claim.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "Independently perturbing a different ring atom with a different step series still finds the real bust() pass/fail transition inside the fixer's claimed 0.29-0.45 A bracket, not at 0.25 A", "result": "PASS", "note": "Transition found between 0.2901 A (passes) and 0.4175 A (fails) -- both inside the claimed bracket." },
+          { "text": "A pose measuring ~0.29 A by the Skill's own formula -- right at the old documented 0.25 A 'implausible' cutoff -- still passes the real PoseBusters check", "result": "PASS", "note": "0.2901 A: aromatic_ring_flatness=True. Confirms the removed 0.25 A claim would have misclassified this pose as a false positive for 'implausible'." },
+          { "text": "The formula and bust() results are deterministic across repeated construction of the same perturbation", "result": "PASS", "note": "SVD-based perturbation is a pure deterministic geometric transform; no randomness in this path." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 36.0,
+    "dynamic_weighted": 56.0,
+    "score": 92.0,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "\u2b50",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Both P1 findings from the original audit are genuinely fixed and independently reproduced here with different code and, for the planarity claim, a different ring atom and different displacement steps than either the original auditor or the fixer used -- not just re-run, but re-derived.",
+    "The bundled fixtures (RCSB 3PTB, CC0 receptor + a real AutoDock-Vina-redocked benzamidine pose) and the now-runnable examples/validate_poses.py __main__ were independently re-executed 3x here (plus once more via the input2 regression script), reproducing the exact strain value 4.162648 kcal/mol every time.",
+    "The redundancy pass is accurate and lossless: diffed usage-guide.md before/after against the fix's own claims and confirmed every deleted section was either a true restatement of SKILL.md or (the filter-not-reject tip) was moved rather than dropped.",
+    "A genuinely new test on a molecule/chemotype outside the benzamidine/3PTB system used throughout the rest of the audit (a chirality-inversion probe) confirms the fix's new caveat generalizes beyond the specific pose it was verified against."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "`mol` config table row still claims 'stereo' is included, contradicting the fix's own new caveat",
+      "observed_in": [6],
+      "problem": "The fix correctly rewrote the `dock` row and added a caveat stating chirality/double-bond-stereo checks 'only run when mol_true is supplied (config=\"redock\")'. It left the `mol` row untouched: 'Intra-ligand only (sanity, bonds, angles, rings, stereo, energy)'. Verified against installed PoseBusters 0.6.5: `PoseBusters(config='mol').bust()` returns 12 columns, none of them tetrahedral_chirality or double_bond_stereochemistry -- the same reference-dependent checks the fix pass already established require mol_true. An agent skimming the config table (rather than the caveat prose three lines above it) would conclude mol-only conformer QC catches stereo inversions; it does not.",
+      "root_cause": "The fix pass's diff (verified via `git diff` on the staging commit) touched only the `dock` row and the caveat sentence; the `mol` row was not cross-checked against the same verification.",
+      "fix": "Change the `mol` row's parenthetical from '(sanity, bonds, angles, rings, stereo, energy)' to '(sanity, bonds, angles, rings, double-bond geometry, energy)' or explicitly note '-- stereo/chirality excluded, same as dock; requires mol_true'."
+    }
+  ]
+}

@@ -8,7 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (74)
+## P1 (72)
 
 ### `bio-alignment-multiple` — Fix MUSCLE5 ensemble commands (-super5 has no .efa)
 
@@ -473,22 +473,6 @@ None open.
 - Problem: The Skill states three times -- in the method taxonomy, in the core section and in a failure mode -- that tree_path_dependent SHAP can give nonzero attribution to a feature the model never uses, with the symptom 'a gene the model never splits on ranks high'. On a depth-1 tree that splits only on A, its twin B (r = 0.9995) received exactly 0.0000 under tree_path_dependent as well as under interventional. Path-dependent TreeSHAP walks the fitted tree's own paths, so a feature absent from every split contributes nothing by construction. The Skill's own example script asserts only the weaker, correct claim: the A-versus-B credit split differs by mode.
 - Root cause: A property of conditional Shapley in general has been attributed to the tree_path_dependent implementation specifically, where the tree structure prevents it.
 - Fix: Restate the taxonomy row and the failure mode: under tree_path_dependent the credit split among correlated features that the model DOES use shifts toward the conditionally implied ones, which is why within-module ordering is not a finding. Reserve the 'nonzero credit to an entirely unused feature' statement for conditional estimators that sample from p(x_dropped \| x_S) without reference to the fitted structure, and align the prose with what examples/shap_omics_classifier.py already prints.
-
-### `bio-pose-validation` — 'dock' config table omits that stereo/formula checks, not just RMSD, need mol_true
-
-- Skill: 89, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/pose-validation) · [viewer](skills/bio-pose-validation/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 1, 4
-- Problem: SKILL.md's config table says `dock` includes 'All checks except RMSD reference,' implying only RMSD is dropped versus `redock`. Verified: bust(config='dock') returns 22 boolean columns; bust(config='redock', mol_true=...) returns 27 -- the extra 5 are molecular_formula, molecular_bonds, double_bond_stereochemistry, tetrahedral_chirality, and RMSD. The main check table (lines 30-42) lists 'Chirality' and 'Double-bond stereo' as if part of the standard check set without noting they require a reference molecule.
-- Root cause: The check-group table was written from PoseBusters' full ~20-check catalogue rather than verified against the actual column sets each config preset returns in the installed version.
-- Fix: Change the `dock` row's 'Includes' text to 'All non-reference checks (drops RMSD, molecular formula/bond identity, and double-bond-stereo/chirality comparison -- these require mol_true).' Add a one-line caveat under the main check table: 'Chirality and double-bond-stereo checks only run when mol_true is supplied (config="redock").'
-
-### `bio-pose-validation` — Aromatic-ring-planarity snippet's 0.25A cutoff disagrees with real PoseBusters threshold
-
-- Skill: 89, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/pose-validation) · [viewer](skills/bio-pose-validation/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 3
-- Problem: SKILL.md's standalone aromatic_planarity() function and the prose 'Aromatic ring deviation > 0.25 A is implausible; flag' state a specific numeric acceptance criterion. Empirically, a pose measuring 0.289A by the Skill's own SVD-max-deviation formula still passed installed PoseBusters 0.6.5's aromatic_ring_flatness check; the real check only started failing between 0.289A and 0.452A on the same perturbation series -- roughly double the documented cutoff.
-- Root cause: The snippet reimplements a simplified max-deviation-from-SVD-plane metric that does not match PoseBusters' internal flatness computation, so the two diverge near the documented threshold.
-- Fix: Either drop the numeric 0.25A claim from the standalone snippet (present it as a supplementary diagnostic only) or add: 'This reimplementation is an approximation; treat bust()'s own aromatic_ring_flatness column as authoritative, not this snippet's raw deviation value.'
 
 ### `bio-proteomics-differential-abundance` — The centring section's stated mechanism is refuted
 
@@ -1852,14 +1836,6 @@ None open.
 - Root cause: The table predates the fixes.
 - Fix: Add both rows with their fixes (--bt; fit step 1 on QC'd common variants).
 
-### `bio-pose-validation` — No bundled test fixtures; examples/validate_poses.py __main__ is a no-op
-
-- Skill: 89, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/pose-validation) · [viewer](skills/bio-pose-validation/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: —
-- Problem: examples/validate_poses.py ships no sample .sdf/.pdb, and its `if __name__` block only prints 'Example: provide docked.sdf and receptor.pdb to run' rather than executing anything.
-- Root cause: The examples file was written as a function library without an accompanying runnable smoke test or fixture data.
-- Fix: Add a small synthetic or public-domain ligand+receptor pair under examples/ and wire the __main__ block to run pose_qc_pipeline against it, so the code path can be verified before adapting it to real data.
-
 ### `bio-proteomics-differential-abundance` — The MSstats block ships the normalization the Skill blames
 
 - Skill: 89, Production Ready · [mrsonord2240/bioSkills@1110c24](https://github.com/mrsonord2240/bioSkills/tree/1110c241c27760ad0127bd803e8832d54651e31c/proteomics/differential-abundance) · [viewer](skills/bio-proteomics-differential-abundance/mrsonord2240-bioSkills@1110c24/viewer.md)
@@ -2603,6 +2579,14 @@ None open.
 - Problem: A user asking to hand-edit a classifier .qza's embedded metadata.yaml to bypass the scikit-learn version-pin check has no explicit textual warning in SKILL.md against doing so - only an inferable general philosophy ('the guard is working, don't launder it').
 - Root cause: The 'Classifier / artifact version break across releases' failure-mode section documents the correct fix (retrain/redownload) but does not anticipate this specific unsafe workaround.
 - Fix: Add one sentence to that failure-mode section: 'Do not edit an artifact's embedded metadata.yaml to force a version match - the pinned pickled model object itself is what's incompatible; retrain or redownload instead.'
+
+### `bio-pose-validation` — `mol` config table row still claims 'stereo' is included, contradicting the fix's own new caveat
+
+- Skill: 92, Production Ready · [mrsonord2240/bioSkills@cae7409](https://github.com/mrsonord2240/bioSkills/tree/cae740920eb752a820afd1efb953e28916bf41e5/chemoinformatics/pose-validation) · [viewer](skills/bio-pose-validation/mrsonord2240-bioSkills@cae7409/viewer.md)
+- Observed in inputs: 6
+- Problem: The fix correctly rewrote the `dock` row and added a caveat stating chirality/double-bond-stereo checks 'only run when mol_true is supplied (config="redock")'. It left the `mol` row untouched: 'Intra-ligand only (sanity, bonds, angles, rings, stereo, energy)'. Verified against installed PoseBusters 0.6.5: `PoseBusters(config='mol').bust()` returns 12 columns, none of them tetrahedral_chirality or double_bond_stereochemistry -- the same reference-dependent checks the fix pass already established require mol_true. An agent skimming the config table (rather than the caveat prose three lines above it) would conclude mol-only conformer QC catches stereo inversions; it does not.
+- Root cause: The fix pass's diff (verified via `git diff` on the staging commit) touched only the `dock` row and the caveat sentence; the `mol` row was not cross-checked against the same verification.
+- Fix: Change the `mol` row's parenthetical from '(sanity, bonds, angles, rings, stereo, energy)' to '(sanity, bonds, angles, rings, double-bond geometry, energy)' or explicitly note '-- stereo/chirality excluded, same as dock; requires mol_true'.
 
 ### `bio-remote-homology` — PSI-BLAST-alone and HHsearch-alone workflows still lack standalone example scripts
 
