@@ -8,7 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (72)
+## P1 (74)
 
 ### `bio-alignment-multiple` — Fix MUSCLE5 ensemble commands (-super5 has no .efa)
 
@@ -145,6 +145,22 @@ None open.
 - Problem: calculate_3d_descriptors calls EmbedMolecule(mol, AllChem.ETKDGv3()) with no randomSeed, so three identical calls returned asphericity 0.7876, 0.7216 and 0.7210 -- a 9% swing in a value that may become a QSAR feature. SKILL.md's ensemble snippet does set randomSeed=42.
 - Root cause: Seed management was applied to the SKILL.md pattern and not propagated to the shipped helper.
 - Fix: Set params.randomSeed explicitly in calculate_3d_descriptors, accept it as an argument, and state in the usage guide that a recorded seed is required for any descriptor that feeds a model.
+
+### `bio-single-cell-data-io` — zellkonverter raw=TRUE silently drops raw on current anndata writes
+
+- Skill: 86, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/data-io) · [viewer](skills/bio-single-cell-data-io/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 3
+- Problem: Following SKILL.md's documented `readH5AD(path, reader='R', raw=TRUE)` route to preserve `.raw` produces an SCE with empty altExpNames, even though the source h5ad genuinely contains the full 33,538-gene raw group (confirmed via direct h5py inspection). SKILL.md states this mapping as fact with no reliability caveat.
+- Root cause: zellkonverter's raw=TRUE parsing does not handle the raw-group format written by the anndata version in current use (0.13.x), and SKILL.md's conversion section does not flag this version sensitivity.
+- Fix: Add a caveat to the zellkonverter table row noting raw=TRUE can silently fail to populate altExp on current anndata writes, recommend `schard::h5ad2sce(path, use.raw=TRUE)` as the verified-reliable raw-recovery route (confirmed working, Input 5), and give a one-line verification snippet (e.g. check `length(altExpNames(sce)) > 0`) so 'diff slot inventories' is runnable, not just prose.
+
+### `bio-single-cell-data-io` — No code pattern for the advertised 'Seurat to h5ad' example prompt; scale.data silently dropped
+
+- Skill: 86, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/data-io) · [viewer](skills/bio-single-cell-data-io/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 4
+- Problem: usage-guide.md lists 'Move this Seurat object to h5ad for Python and verify no layers were dropped' as a supported request, but SKILL.md gives no code for Seurat->h5ad at all. The only inferable route (as.SingleCellExperiment + zellkonverter::writeH5AD) silently drops the scale.data layer (3 layers before, 2 after) with no warning anywhere in the skill.
+- Root cause: The skill advertises a workflow direction it never documents; its one documented tool for this exact direction (anndataR) requires R>=4.5 and is not installable in many current R 4.4 environments (confirmed blocked in this audit's own environment).
+- Fix: Add an explicit Seurat->h5ad code block (as.SingleCellExperiment + zellkonverter::writeH5AD) with an explicit 'scale.data is dropped here, save it separately if needed' caveat, or remove the unsupported example prompt from usage-guide.md.
 
 ### `bio-variant-annotation` — csq --phase modes m and s are described wrongly
 
@@ -586,7 +602,7 @@ None open.
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (280)
+## P2 (282)
 
 ### `bio-crispr-screens-copy-number-correction` — negative_control_sgrnas empty-dict case raises an undocumented ValueError
 
@@ -987,6 +1003,22 @@ None open.
 - Problem: RootDigger is recommended without a command.
 - Root cause: Named only.
 - Fix: Add 'rootdigger --msa aln --tree tree --exhaustive' or route to the IQ-TREE command.
+
+### `bio-single-cell-data-io` — Tool table omits that schard silently drops the counts layer
+
+- Skill: 86, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/data-io) · [viewer](skills/bio-single-cell-data-io/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 3
+- Problem: schard::h5ad2sce() returns an SCE with only an X assay; the source h5ad's counts layer is silently absent, and SKILL.md's tool-comparison table does not mention this asymmetry against zellkonverter (which does keep counts).
+- Root cause: The table's 'Use when' column captures general lossiness but not per-tool slot-fidelity trade-offs.
+- Fix: Add a one-line note to schard's row: 'reads X only; does not carry layers -- pair with zellkonverter or reattach manually if a raw-counts layer is required downstream.'
+
+### `bio-single-cell-data-io` — anndataR listed as 'first choice' without flagging its R>=4.5 requirement
+
+- Skill: 86, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/data-io) · [viewer](skills/bio-single-cell-data-io/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: —
+- Problem: The conversion tool table lists anndataR as the first-choice, Python-free converter, but does not mention it requires R>=4.5+ and can fail to build on R 4.4 stacks (its Rarr dependency fails to compile under gcc 15's C23 default in this audit's real environment).
+- Root cause: The table's 'Maintained 2026' column notes version but not the R floor that blocks installation on still-common R 4.4 setups.
+- Fix: Add an R-version caveat to anndataR's row so an agent checks `getRversion()` before recommending it as the default, falling back to zellkonverter/schard when R<4.5.
 
 ### `bio-variant-annotation` — SKILL.md annotate line needs an indexed target
 
