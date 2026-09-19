@@ -8,7 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (68)
+## P1 (70)
 
 ### `bio-alignment-multiple` — Fix MUSCLE5 ensemble commands (-super5 has no .efa)
 
@@ -105,6 +105,22 @@ None open.
 - Problem: The OOD and hERG failure modes both prescribe 'check the uncertainty band' and 'if kNN distance to training set > P95, treat as low-confidence'. The only route that can be executed emits neither: zero of 105 output columns carry uncertainty or applicability-domain information, and sodium chloride came back with BBB_Martins 0.967 and AMES 0.905.
 - Root cause: The applicability-domain guidance is written against the hosted service's evidential uncertainty and was never re-grounded in what an offline user can compute.
 - Fix: Add a toolkit-independent AD gate the reader can always run: max Tanimoto similarity to a reference set plus a heavy-atom/element sanity filter that rejects inorganics and metals before prediction, with the worked numbers from this audit as the motivating example.
+
+### `bio-conformer-generation` — CREST + GFN2-xTB workflow is unrunnable on Windows with no documented caveat
+
+- Skill: 86, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/conformer-generation) · [viewer](skills/bio-conformer-generation/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 6
+- Problem: The documented `crest xtbopt.xyz --gfn2 --T 12 --ewin 6` command fails with FileNotFoundError because CREST publishes no Windows build anywhere upstream (Linux binaries only, no win-64 conda-forge package). The Prerequisites section's `conda install -c conda-forge xtb crest` line gives no indication this half of the install will silently fail to resolve on Windows.
+- Root cause: The Skill was written/tested assuming a Unix-like environment and does not distinguish xtb (which does have a Windows build and was confirmed working) from CREST (which does not).
+- Fix: Add an explicit platform note to Prerequisites and to the 'CREST + GFN2-xTB for High-Quality Sampling' section: CREST requires Linux/macOS or WSL; on native Windows, fall back to RDKit ETKDGv3 macrocycle-aware embedding (already documented elsewhere in the Skill) or a WSL-hosted CREST install.
+
+### `bio-conformer-generation` — gen_conformers() in SKILL.md lacks the None-guard used elsewhere in the same file
+
+- Skill: 86, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/conformer-generation) · [viewer](skills/bio-conformer-generation/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 7
+- Problem: Calling the SKILL.md-documented gen_conformers() on an unparseable SMILES raises an opaque boost.python ArgumentError from Chem.AddHs(None) instead of a clear error, even though malformed/missing SMILES are a routine occurrence in the batch workflows the usage-guide explicitly promotes ('for each compound in library.csv').
+- Root cause: macrocycle_conformers() and crest_workflow() both include `if mol is None: raise ValueError(...)`, but the ETKDGv3 section's gen_conformers() omits the same guard -- an inconsistency within the Skill's own code, not a missing capability.
+- Fix: Add `if mol is None: raise ValueError(f'Invalid SMILES: {smiles!r}')` immediately after `Chem.MolFromSmiles(smiles)` in the SKILL.md gen_conformers() code block, matching the pattern already used in macrocycle_conformers() and crest_workflow().
 
 ### `bio-molecular-descriptors` — 3D convergence guard rejects valid ensembles for ordinary flexible drugs
 
@@ -554,7 +570,7 @@ None open.
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (277)
+## P2 (279)
 
 ### `bio-crispr-screens-copy-number-correction` — negative_control_sgrnas empty-dict case raises an undocumented ValueError
 
@@ -875,6 +891,22 @@ None open.
 - Problem: 430 lines load SV/CNV/mtDNA catalogs and pushback tables for one-variant queries.
 - Root cause: All material kept in SKILL.md.
 - Fix: Move catalogs and pushback tables to the usage guide.
+
+### `bio-conformer-generation` — Function names differ between SKILL.md and examples/gen_conformers.py for the same operations
+
+- Skill: 86, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/conformer-generation) · [viewer](skills/bio-conformer-generation/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 1, 5
+- Problem: SKILL.md uses gen_conformers/prune_conformers_rmsd/filter_by_energy while the shipped examples/gen_conformers.py uses gen_conformer_ensemble/prune_rmsd/filter_energy_window for the equivalent operations, with no cross-reference noting the rename.
+- Root cause: The reference example was evidently refactored independently of the SKILL.md prose.
+- Fix: Align names between SKILL.md and examples/gen_conformers.py (pick one canonical set), or add a one-line note where each is introduced pointing to its counterpart.
+
+### `bio-conformer-generation` — Macrocycle-aware embedding's claimed benefit has no worked before/after example
+
+- Skill: 86, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/conformer-generation) · [viewer](skills/bio-conformer-generation/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 4
+- Problem: Testing useMacrocycleTorsions=True on a genuine >=12-atom ring found default ETKDGv3 settings succeeded equally (50/50) on the same simple carbocyclic test molecule, so the documented claim that 'ETKDGv3 default knowledge base under-samples macrocycle torsions' is not demonstrated by any example in the Skill itself.
+- Root cause: No worked example compares macrocycle-aware vs. default settings on a genuinely difficult macrocycle (e.g. the cyclosporine A case named in usage-guide.md but never coded).
+- Fix: Add a concrete before/after example (e.g. cyclosporine A or another stereochemically constrained macrocycle) showing embedding failure or degraded diversity under default settings versus success under useMacrocycleTorsions=True.
 
 ### `bio-molecular-descriptors` — Gasteiger snippet prints charges that do not sum to the formal charge
 

@@ -1,0 +1,200 @@
+{
+  "meta": {
+    "skill_name": "bio-conformer-generation",
+    "description": "Generates 3D conformer ensembles using RDKit ETKDGv3 with knowledge-enhanced distance geometry, MMFF94/UFF force-field optimization, CREST + GFN2-xTB semi-empirical refinement, and macrocycle-aware torsion preferences. Provides explicit decision rules for single vs ensemble conformer use, RMSD pruning, energy windows, conformer count, and force-field choice. Use when preparing 3D ligands for docking, generating descriptor input for 3D QSAR, or sampling macrocycle/peptide conformational ensembles.",
+    "evaluated_on": "2026-09-19",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:chemoinformatics/conformer-generation"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All cited references (Riniker & Landrum 2015 JCIM, Wang et al. 2020 ETKDGv3, Halgren 1996 MMFF94, Rappe 1992 UFF, Pracht et al. 2024 CREST 3.0, Bannwarth/Ehlert/Grimme 2019 GFN2-xTB, Hawkins et al. 2010 OMEGA) are real, verifiable papers with correct DOIs. No fabricated data, statistics, or results in any of the 7 executed outputs." },
+      "practice_boundaries": { "result": "PASS", "detail": "Skill is a pure computational-chemistry geometry tool (molecular conformer generation); no diagnostic, prescriptive, or patient-facing content appears anywhere, so no medical disclaimer is applicable." },
+      "methodological_ground": { "result": "PASS", "detail": "No methodological fallacy detected. Adversarial probe (Input 7) confirmed the skill's own framing does not support a 'global minimum with certainty' claim -- reported minima are correctly the best-of-n-sampled value, consistent with SKILL.md's own caveats about Boltzmann populations being 'exploratory surrogates, not generally validated populations.'" },
+      "code_usability": { "result": "PASS", "detail": "All 7 code paths executed to completion without unhandled crashes; every path either ran correctly or failed with a real, traceable exception (CREST FileNotFoundError in Input 6; ArgumentError from an unguarded mol=None in Input 7). No syntax errors, infinite loops, or unexplained missing-dependency failures. The unguarded-input case (Input 7) is a real defect but is runnable code with a real (if unfriendly) exception, not the unrunnable-code condition this gate targets -- recorded instead as a P1 code-quality recommendation." }
+    }
+  },
+  "static_score": {
+    "subtotal": 84,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 11, "max": 12, "note": "All promised methods (ETKDGv3, MMFF94/UFF, RMSD pruning, energy windows, macrocycle handling, CREST+GFN2-xTB, Boltzmann averaging) are covered and mostly accurate; the CREST Prerequisites line gives no Windows caveat even though CREST has no Windows build at all (verified: FileNotFoundError, no conda-forge win-64 package)." },
+      "reliability": { "score": 8, "max": 12, "note": "Strong failure-mode/common-errors tables, but the SKILL.md-body gen_conformers() omits the 'mol is None' guard that macrocycle_conformers() and crest_workflow() both include elsewhere in the same file; confirmed to raise an opaque C++ ArgumentError on malformed SMILES instead of a clear ValueError." },
+      "performance_context": { "score": 7, "max": 8, "note": "Reasonable progressive disclosure via usage-guide.md + examples/gen_conformers.py, though a fair amount of full code is duplicated inline in SKILL.md rather than solely referenced from the examples file." },
+      "agent_usability": { "score": 12, "max": 16, "note": "Clear decision tree and version-compatibility guidance; confirmed function-name mismatch between SKILL.md (gen_conformers, prune_conformers_rmsd, filter_by_energy) and examples/gen_conformers.py (gen_conformer_ensemble, prune_rmsd, filter_energy_window) for the same operations." },
+      "human_usability": { "score": 7, "max": 8, "note": "Natural example prompts in usage-guide.md match how a researcher would actually ask; version-drift adaptation guidance ('introspect the installed package') is a genuine forgiveness strength." },
+      "security": { "score": 10, "max": 12, "note": "No credentials, no eval/exec of raw strings, subprocess calls use list-form args (not shell strings). Input validation is inconsistent across the skill's own functions (see reliability note)." },
+      "maintainability": { "score": 11, "max": 12, "note": "Clean per-topic modular sections (Goal/Approach/code each); no shipped assertion-based tests, only a printing __main__ demo, verified to run correctly." },
+      "agent_specific": { "score": 18, "max": 20, "note": "Precise trigger description; clean 'Related Skills' composability section; confirmed bit-identical idempotency under a fixed seed. Escape-hatch guidance for organometallics/unusual chemistry is present but thin." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 86.7,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 24, "total": 28 },
+    "inputs": [
+      {
+        "index": 1, "type": "Canonical",
+        "label": "20 ETKDGv3 conformers for aspirin, MMFF94-optimized",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "20/20 embedded and optimized, 20/20 converged; energies 18.91-20.83 kcal/mol (2 unique values, chemically correct for a near-rigid molecule).",
+        "basic": 37, "specialized": 55, "total": 92,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Output reports the requested 20 embedded conformer IDs", "result": "PASS", "note": "AllChem.EmbedMultipleConfs returned exactly 20 IDs" },
+          { "text": "All conformers are MMFF94s-optimized with recorded convergence status", "result": "PASS", "note": "20/20 converged=True" },
+          { "text": "Reported energies are real ff.CalcEnergy() floats, not placeholders", "result": "PASS", "note": "Range 18.9098-20.8331 kcal/mol printed" },
+          { "text": "No fabricated claims beyond what RDKit computed", "result": "PASS", "note": "No invented literature comparison values stated" }
+        ]
+      },
+      {
+        "index": 2, "type": "Variant A",
+        "label": "Single low-energy ibuprofen conformer for docking, written to SDF",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "EmbedMolecule status 0, MMFFOptimizeMolecule status 0 (converged), energy 24.3422 kcal/mol; SDF round-trip confirmed genuine non-planar 3D (z-range -4.03 to 3.46 A).",
+        "basic": 37, "specialized": 55, "total": 92,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "SDF output contains a genuine non-planar 3D structure", "result": "PASS", "note": "z-range 6.9 A confirmed after round-trip read" },
+          { "text": "Reported energy is a real MMFF94s-computed value", "result": "PASS", "note": "24.3422 kcal/mol" },
+          { "text": "Workflow matches SKILL.md's documented single-conformer docking-input scenario", "result": "PASS", "note": "Follows Decision Tree row 'Single initial 3D structure'" },
+          { "text": "Output stays within stated scope", "result": "PASS", "note": "Ligand prep only, no unwarranted docking-score claims" }
+        ]
+      },
+      {
+        "index": 3, "type": "Edge",
+        "label": "Phenylboronic acid: MMFF94-parameter-missing -> UFF fallback",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "MMFFGetMoleculeProperties correctly returned None for boron; code fell back to UFF; 10/10 conformers generated, energies 11.4524-11.4747 kcal/mol.",
+        "basic": 38, "specialized": 55, "total": 93,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "MMFF94 is correctly identified as inapplicable to a boron-containing molecule", "result": "PASS", "note": "mmff_props is None, as documented" },
+          { "text": "UFF fallback executes and produces valid energies", "result": "PASS", "note": "11.4524-11.4747 kcal/mol" },
+          { "text": "Behavior matches SKILL.md's 'MMFF94 -- parameter missing' failure-mode table exactly", "result": "PASS", "note": "Trigger/mechanism/symptom/fix all verified" },
+          { "text": "No silent no-op or wrong-answer path taken", "result": "PASS", "note": "Explicit fallback branch, not a swallowed failure" }
+        ]
+      },
+      {
+        "index": 4, "type": "Variant B",
+        "label": "Macrocycle-aware embedding on a 14-membered ring",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Ring size verified 14 atoms; 50/50 macrocycle-aware conformers embedded and converged, 48/50 unique energies (13.40-31.97 kcal/mol). Default (non-macrocycle) settings also succeeded 50/50 on this same simple carbocycle, so the specific claimed benefit of useMacrocycleTorsions was not independently demonstrated by this test case.",
+        "basic": 35, "specialized": 52, "total": 87,
+        "assertions_passed": 3, "assertions_total": 4,
+        "assertions": [
+          { "text": "Test ring verified to meet the >=12-atom macrocycle threshold", "result": "PASS", "note": "GetRingInfo confirmed a 14-atom ring" },
+          { "text": "useMacrocycleTorsions=True path embeds the requested 50/50 conformers", "result": "PASS", "note": "50/50 embedded and converged" },
+          { "text": "Optimized energies show real conformational diversity", "result": "PASS", "note": "48/50 unique energy values" },
+          { "text": "Macrocycle-aware embedding measurably outperforms default ETKDGv3 settings on this test case", "result": "FAIL", "note": "Default settings also embedded 50/50 on the same ring; a plain carbocycle was too conformationally easy to stress the claimed feature" }
+        ]
+      },
+      {
+        "index": 5, "type": "Stress",
+        "label": "Imatinib: heuristic-sized ensemble through embed->optimize->prune->filter->Boltzmann-average",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "n_conf heuristic (5*7 rotatable bonds+10=45) applied correctly; 45/45 embedded and converged; RMSD-pruned 45->43; energy-windowed 43->38; Boltzmann-averaged asphericity 0.4316 vs simple mean 0.4355.",
+        "basic": 38, "specialized": 56, "total": 94,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "n_conf heuristic (5*NumRotatableBonds+10) is correctly computed and applied", "result": "PASS", "note": "7 rotatable bonds -> 45 conformers requested and embedded" },
+          { "text": "Full documented pipeline runs end-to-end on a real drug molecule without error", "result": "PASS", "note": "embed->optimize->RMSD-prune->energy-window->Boltzmann-average all completed" },
+          { "text": "Boltzmann-weighted average differs meaningfully from the unweighted mean", "result": "PASS", "note": "0.4316 vs 0.4355 -- confirms the weighting math is real, not a no-op" },
+          { "text": "All reported values are traceable to RDKit computation", "result": "PASS", "note": "No fabricated statistics" }
+        ]
+      },
+      {
+        "index": 6, "type": "Scope Boundary",
+        "label": "CREST + GFN2-xTB workflow, run as literally documented, on Windows",
+        "status": "COMPLETED", "status_flag": "⚠️",
+        "note": "The documented `crest xtbopt.xyz --gfn2 --T 12 --ewin 6` command is entirely unrunnable here: CREST publishes no Windows build anywhere upstream (FileNotFoundError). The RDKit prep half (embed+MMFF94-relax+write XYZ) and the xtb GFN2 --opt sub-step both work correctly in isolation.",
+        "basic": 28, "specialized": 41, "total": 69,
+        "assertions_passed": 2, "assertions_total": 4,
+        "assertions": [
+          { "text": "The documented `conda install -c conda-forge xtb crest` + CREST CLI invocation runs as shown on this platform", "result": "FAIL", "note": "crest is not on PATH and has no Windows build to install; FileNotFoundError" },
+          { "text": "The RDKit preparation half of the workflow (embed, MMFF94-relax, write XYZ) completes correctly", "result": "PASS", "note": "Valid XYZ written, 2015 bytes" },
+          { "text": "The semi-empirical sub-step (xtb GFN2 optimization) works independently of CREST", "result": "PASS", "note": "xtb --opt normal exit code 0, xtbopt.xyz produced" },
+          { "text": "SKILL.md documents a Windows-specific caveat or fallback for the CREST prerequisite", "result": "FAIL", "note": "Prerequisites section gives one unqualified conda install line with no platform note" }
+        ]
+      },
+      {
+        "index": 7, "type": "Adversarial",
+        "label": "Malformed SMILES through the un-guarded gen_conformers() path, plus a 'guaranteed global minimum' / determinism probe",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Malformed SMILES: MolFromSmiles correctly returns None, but SKILL.md's own gen_conformers() (unlike macrocycle_conformers()/crest_workflow() in the same file) has no None-guard, so Chem.AddHs(None) raises an opaque boost.python ArgumentError. Determinism: seeded runs bit-identical across 2 runs; unseeded runs differ (expected, undocumented as a consequence but not contradicted by any claim in the Skill).",
+        "basic": 32, "specialized": 48, "total": 80,
+        "assertions_passed": 3, "assertions_total": 4,
+        "assertions": [
+          { "text": "Fixed-seed runs are bit-for-bit reproducible (Skill Veto T3)", "result": "PASS", "note": "Identical sorted energy lists across two seeded runs" },
+          { "text": "SKILL.md's gen_conformers() handles an invalid SMILES with a clear, actionable error", "result": "FAIL", "note": "Raises an opaque C++/boost.python ArgumentError from Chem.AddHs(None) instead of a guarded ValueError" },
+          { "text": "No 'proven global minimum' overclaim appears in the executed code path or its outputs", "result": "PASS", "note": "Reported minimum is explicitly the best of n_conf sampled conformers" },
+          { "text": "Unseeded non-determinism does not contradict any explicit claim in the Skill", "result": "PASS", "note": "Skill only promises reproducibility when randomSeed is set, which it always does in its own examples" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 33.6,
+    "dynamic_weighted": 52.0,
+    "score": 86,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Core ETKDGv3 + MMFF94s/UFF pipeline (embed, optimize, RMSD-prune, energy-window filter, Boltzmann-average) runs correctly end-to-end on real drug-like molecules (aspirin, ibuprofen, imatinib) with no code changes needed.",
+    "The documented MMFF94-parameter-missing -> UFF fallback is accurate and verified to work exactly as described on a real boron-containing molecule.",
+    "Fixed-seed runs are exactly reproducible across independent runs, satisfying both the Skill's own reproducibility claim and the Skill Veto's T3 determinism requirement.",
+    "Literature citations (Riniker & Landrum 2015, Wang et al. 2020, Halgren 1996, Rappe 1992, Pracht et al. 2024, Bannwarth et al. 2019) are real, verifiable, and correctly attributed -- no fabrication detected.",
+    "Detailed per-tool failure-mode and common-errors tables give an agent concrete troubleshooting guidance for most (though not all) real failure scenarios."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "CREST + GFN2-xTB workflow is unrunnable on Windows with no documented caveat",
+      "observed_in": [6],
+      "problem": "The documented `crest xtbopt.xyz --gfn2 --T 12 --ewin 6` command fails with FileNotFoundError because CREST publishes no Windows build anywhere upstream (Linux binaries only, no win-64 conda-forge package). The Prerequisites section's `conda install -c conda-forge xtb crest` line gives no indication this half of the install will silently fail to resolve on Windows.",
+      "root_cause": "The Skill was written/tested assuming a Unix-like environment and does not distinguish xtb (which does have a Windows build and was confirmed working) from CREST (which does not).",
+      "fix": "Add an explicit platform note to Prerequisites and to the 'CREST + GFN2-xTB for High-Quality Sampling' section: CREST requires Linux/macOS or WSL; on native Windows, fall back to RDKit ETKDGv3 macrocycle-aware embedding (already documented elsewhere in the Skill) or a WSL-hosted CREST install."
+    },
+    {
+      "priority": "P1",
+      "title": "gen_conformers() in SKILL.md lacks the None-guard used elsewhere in the same file",
+      "observed_in": [7],
+      "problem": "Calling the SKILL.md-documented gen_conformers() on an unparseable SMILES raises an opaque boost.python ArgumentError from Chem.AddHs(None) instead of a clear error, even though malformed/missing SMILES are a routine occurrence in the batch workflows the usage-guide explicitly promotes ('for each compound in library.csv').",
+      "root_cause": "macrocycle_conformers() and crest_workflow() both include `if mol is None: raise ValueError(...)`, but the ETKDGv3 section's gen_conformers() omits the same guard -- an inconsistency within the Skill's own code, not a missing capability.",
+      "fix": "Add `if mol is None: raise ValueError(f'Invalid SMILES: {smiles!r}')` immediately after `Chem.MolFromSmiles(smiles)` in the SKILL.md gen_conformers() code block, matching the pattern already used in macrocycle_conformers() and crest_workflow()."
+    },
+    {
+      "priority": "P2",
+      "title": "Function names differ between SKILL.md and examples/gen_conformers.py for the same operations",
+      "observed_in": [1, 5],
+      "problem": "SKILL.md uses gen_conformers/prune_conformers_rmsd/filter_by_energy while the shipped examples/gen_conformers.py uses gen_conformer_ensemble/prune_rmsd/filter_energy_window for the equivalent operations, with no cross-reference noting the rename.",
+      "root_cause": "The reference example was evidently refactored independently of the SKILL.md prose.",
+      "fix": "Align names between SKILL.md and examples/gen_conformers.py (pick one canonical set), or add a one-line note where each is introduced pointing to its counterpart."
+    },
+    {
+      "priority": "P2",
+      "title": "Macrocycle-aware embedding's claimed benefit has no worked before/after example",
+      "observed_in": [4],
+      "problem": "Testing useMacrocycleTorsions=True on a genuine >=12-atom ring found default ETKDGv3 settings succeeded equally (50/50) on the same simple carbocyclic test molecule, so the documented claim that 'ETKDGv3 default knowledge base under-samples macrocycle torsions' is not demonstrated by any example in the Skill itself.",
+      "root_cause": "No worked example compares macrocycle-aware vs. default settings on a genuinely difficult macrocycle (e.g. the cyclosporine A case named in usage-guide.md but never coded).",
+      "fix": "Add a concrete before/after example (e.g. cyclosporine A or another stereochemically constrained macrocycle) showing embedding failure or degraded diversity under default settings versus success under useMacrocycleTorsions=True."
+    }
+  ]
+}
