@@ -1,0 +1,322 @@
+{
+  "meta": {
+    "skill_name": "bio-microbiome-taxonomy-assignment",
+    "description": "Assigns taxonomy to amplicon ASVs/OTUs (16S, ITS, 18S) with a classifier conditioned on a reference database and primer region - DADA2 assignTaxonomy + addSpecies (RDP naive Bayes), DECIPHER IDTAXA, and QIIME2 q2-feature-classifier (classify-sklearn naive Bayes, classify-consensus-vsearch alignment-consensus).",
+    "evaluated_on": "2026-09-19",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 9,
+    "source": "mrsonord2240/bioSkills@c50ea85:microbiome/taxonomy-assignment",
+    "re_audit_of": "F:/OpenScience/audits/_pre-fix-20260919/bio-microbiome-taxonomy-assignment (pre-fix score 86 diagnostic, Reject, Skill Veto T3)",
+    "fix_log": "F:/optimizing-agent-science-skills/fixes/bio-microbiome-taxonomy-assignment.md"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "FAIL",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "FAIL",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "All 9 inputs (7 regression + 2 new) used real tools (DADA2 1.34.0, DECIPHER 3.2.0, QIIME2 2024.10.1) against real reference data (SILVA 138 QIIME2 artifacts, both region-matched and full-length real subsamples) and real ASVs (770 sequences denoised from the public moving-pictures dataset). No fabricated DOIs, PMIDs, p-values, or effect sizes anywhere."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "No diagnostic or prescriptive claims about an individual anywhere; scope remains community/environmental marker-gene taxonomy. Unchanged from the pre-fix audit."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "The newly-found IdTaxa() non-determinism (see skill_veto.determinism) is an engineering/reproducibility gap of the same class as the original assignTaxonomy() finding, not a principled methodological fallacy, and is captured under the Skill Veto instead."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All code across all 9 inputs executed without syntax errors and no missing-dependency failures in the reused microbiome-metagenomics-analyst environment. Every finding in this re-audit (including the new IdTaxa defect) was discovered by code that ran to completion and produced a checked, non-trivial result -- never an exit-code-only claim."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 89,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 11,
+        "max": 12,
+        "note": "Completeness improved: the DECIPHER section now demonstrates training a custom trainingSet from scratch (independently verified end-to-end: real LearnTaxa() + real IdTaxa() on a real 60K-sequence reference, real 770 ASVs). Correctness: assignTaxonomy() non-determinism and DECIPHER flattening are both genuinely fixed and verified. One point held back: this re-audit found a NEW correctness gap of the same class (IdTaxa() itself is non-deterministic; see reliability/agent_specific) that the fix pass did not address."
+      },
+      "reliability": {
+        "score": 8,
+        "max": 12,
+        "note": "Fault Tolerance: assignTaxonomy()'s stochasticity is now managed (set.seed guidance, verified effective 7/7 runs). But IdTaxa()'s equally-real stochasticity (up to 4.3% genus-level variance between identical unseeded calls, independently discovered and verified fixable by the same set.seed() mechanism) remains completely unaddressed anywhere in SKILL.md's DECIPHER section -- the same category of gap the original audit docked, now just relocated to the sibling method."
+      },
+      "performance_context": {
+        "score": 8,
+        "max": 8,
+        "note": "Memory-budget warnings added under both QIIME2 fit-classifier-naive-bayes and DECIPHER LearnTaxa, matching the original audit's confirmed OOM finding. No new performance issues found."
+      },
+      "agent_usability": {
+        "score": 14,
+        "max": 16,
+        "note": "Error Prevention improved for assignTaxonomy (seed guidance, Common Errors row) and for the DECIPHER all-NA flattening failure (fixed code, Common Errors row). Still docked: no guidance anywhere warns an agent that IdTaxa() itself needs seeding -- an agent following SKILL.md's Common Errors table verbatim would seed assignTaxonomy but not IdTaxa, exactly the gap Input 9 of this re-audit demonstrates."
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Forgiveness improved for the two originally-found defects (both now documented and fixed). Still silent on how a user would recognize or recover from IdTaxa()'s own non-determinism, which this re-audit found to be a real, larger-magnitude instance of the same problem."
+      },
+      "security": {
+        "score": 12,
+        "max": 12,
+        "note": "Unchanged: no hardcoded credentials, no unsanitized execution of user-provided strings, no sensitive-data handling concerns anywhere in SKILL.md or the two example scripts."
+      },
+      "maintainability": {
+        "score": 10,
+        "max": 12,
+        "note": "Testability: the DECIPHER training-from-scratch path is now demonstrated and testable (improvement). But no example anywhere -- old or new -- includes a self-check that a repeated run reproduces its own prior output, which is exactly the class of defect (now found twice: assignTaxonomy pre-fix, IdTaxa still) that ships silently without one."
+      },
+      "agent_specific": {
+        "score": 19,
+        "max": 20,
+        "note": "Idempotency: the DADA2 assignTaxonomy() path is now confirmed idempotent under set.seed() (7/7 runs, two different real references, zero exceptions) -- full credit for that half. One point held back because DECIPHER IdTaxa(), a core, equally-documented method in the Skill's own Tool Taxonomy and Decision Tree, is confirmed NOT idempotent as shipped (33/770 and 23/770 genus differences across three independent unseeded runs)."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 85.4,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 35, "total": 38 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "QIIME2 classify-sklearn, region-matched, on real 16S V4 ASVs (regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "SKILL.md's QIIME2 command blocks are byte-identical pre-fix vs post-fix (only a MEMORY comment added); classify-sklearn is deterministic. Spot-verified against the original audit's still-live WSL cached output: 653/770 (84.8%) genus-assigned, exact match to the pre-fix audit.",
+        "executed": true,
+        "execution_note": "Regression via SKILL.md diff (run/skill_md_diff_upstream_vs_fix.diff) + spot-check re-derivation from cached real WSL output (run/regression_input1_5_spotcheck.sh); full ~30 CPU-min pipeline not re-run since the command path is unchanged and non-stochastic.",
+        "basic": 36,
+        "specialized": 55,
+        "total": 91,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Classifier is trained on a region-matched (515-806) reference, not full-length", "result": "PASS", "note": "Unchanged code path, confirmed via diff" },
+          { "text": "Every emitted taxonomy call's confidence is >= the stated 0.7 threshold", "result": "PASS", "note": "Unchanged from pre-fix verification" },
+          { "text": "Output states the classifier + database release + region conditioning triple", "result": "PASS", "note": "classify-sklearn NB / SILVA 138 / 515-806 V4" },
+          { "text": "Calls are biologically plausible and cross-checked against an independent method", "result": "PASS", "note": "653/770 genus, exact match to pre-fix audit and to Input 2's independent DADA2 result" }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "DADA2 assignTaxonomy + addSpecies determinism -- the veto-clearing test (regression + expanded)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "7 independent seeded assignTaxonomy() runs (5 against the real region-matched 60K reference, 2 against a different real full-length ~380K reference) are ALL pairwise identical() == TRUE at every rank including genus, 0/770 differences in every comparison. addSpecies() also confirmed deterministic. Unseeded regression baseline reproduces the original bug (16/770 genus differ), confirming the fix is real and necessary, not a no-op.",
+        "executed": true,
+        "execution_note": "run/determinism_seeded_3x.R (3 runs, one process) + run/single_seeded_run.R x2 (fresh processes, run4.rds/run5.rds) + run/compare_5.R (10 pairwise comparisons) + run/determinism_fulllength_and_addspecies.R (2 more seeded runs, different real reference, plus addSpecies) + run/determinism_unseeded_2x.R (regression baseline).",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "assignTaxonomy uses a region-matched reference per SKILL's Trap-1 guidance", "result": "PASS", "note": "Trained on the real region-matched extraction" },
+          { "text": "minBoot=50 documented and ranks below threshold left NA, not guessed", "result": "PASS", "note": "Confirmed in output" },
+          { "text": "addSpecies reports species ONLY by exact match (low recall)", "result": "PASS", "note": "Confirmed deterministic and exact-match-only" },
+          { "text": "Repeated runs of SKILL.md's own shipped, now-seeded code reproduce identical genus calls", "result": "PASS", "note": "7/7 independent seeded runs, 2 different real references, 0 exceptions -- the strongest evidence collected in this re-audit" },
+          { "text": "Output states the classifier + database + region conditioning triple", "result": "PASS", "note": "Documented alongside results" }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Full-length vs region-matched classifier Trap-1 quantification (regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Not touched by the fix beyond the same set.seed() addition verified exhaustively under Input 2. Content and conclusions unchanged from the pre-fix audit.",
+        "executed": true,
+        "execution_note": "Regression via SKILL.md diff -- no change to this comparison's logic or commands.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Full-length classifier produces different genus calls than region-matched on the same real ASVs", "result": "PASS", "note": "Unchanged finding" },
+          { "text": "Full-length classifier over-calls relative to region-matched refusal in some cases", "result": "PASS", "note": "Unchanged finding" },
+          { "text": "Region-matched classifier recovers valid calls the full-length one missed", "result": "PASS", "note": "Unchanged finding" },
+          { "text": "Comparison is quantitative across the full real ASV set, not anecdotal", "result": "PASS", "note": "Unchanged finding" }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "DECIPHER IdTaxa training + classification + flattening (regression -- where the NEW defect was found)",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Flattening fix CONFIRMED: old code still gives 0/770 (100% NA, matches pre-fix finding exactly); new positional code recovers 480/770 (62.3%) genus-assigned, closely matching the fix log's claimed 482/770. NEW DEFECT: the small 480-vs-482 gap is explained by, and is itself evidence of, IdTaxa() being non-deterministic even with the trainingSet held fixed -- two back-to-back IdTaxa() calls (no seed, exactly as SKILL.md ships it) differ at 33/770 (4.3%) genus calls, LARGER than the original assignTaxonomy() bug. A third independent unseeded run differs from the first at 23/770 (3.0%) genus, confirming this is not a fluke. set.seed(100) before IdTaxa() fully fixes it (verified multithreaded and single-threaded) -- SKILL.md just never calls it.",
+        "executed": true,
+        "execution_note": "run/decipher_verify.R (real LearnTaxa training, 21.7 min on real 60K sequences; real IdTaxa, 48.0 sec) + run/idtaxa_determinism.R (2x IdTaxa on fixed trainingSet, unseeded) + run/idtaxa_seeded_test.R (seeded, multithreaded and single-threaded) + run/idtaxa_unseeded_3rd.R + run/compare_unseeded_1_3.R.",
+        "basic": 28,
+        "specialized": 44,
+        "total": 72,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "IdTaxa produces more conservative (lower genus-assignment-rate) calls than naive Bayes", "result": "PASS", "note": "62.3% (IdTaxa) vs 85.5% (DADA2 NB, seeded)" },
+          { "text": "SKILL.md's own documented (fixed) flattening code extracts a usable taxonomy table from a real IdTaxa result", "result": "PASS", "note": "480/770 genus recovered, matching the audit's expectation" },
+          { "text": "Unclassified/refused calls are surfaced honestly, not force-filled", "result": "PASS", "note": "290/770 (37.7%) genuinely refused before genus" },
+          { "text": "SKILL.md shows how to build a trainingSet when no pre-trained artifact is available", "result": "PASS", "note": "New LearnTaxa training example present and independently verified to work end-to-end" },
+          { "text": "Two back-to-back runs of SKILL.md's own shipped (still-unseeded) IdTaxa code reproduce identical genus calls", "result": "FAIL", "note": "33/770 (4.3%) differ; identical()==FALSE; no set.seed() anywhere in SKILL.md's DECIPHER section" }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "classify-consensus-vsearch vs classify-sklearn + host organelle filtering (regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "SKILL.md's classify-consensus-vsearch and organelle-filtering command blocks are byte-identical pre-fix vs post-fix; both are deterministic. Spot-verified against cached real WSL output: 699/770 (90.8%) genus-assigned, exact match to the pre-fix audit.",
+        "executed": true,
+        "execution_note": "run/regression_input1_5_spotcheck.sh.",
+        "basic": 36,
+        "specialized": 55,
+        "total": 91,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "classify-consensus-vsearch runs with no trained/pickled model", "result": "PASS", "note": "Unchanged code path" },
+          { "text": "Method disagreement between sklearn and vsearch-consensus is quantified", "result": "PASS", "note": "Unchanged finding" },
+          { "text": "Organelle filtering correctly identifies and removes Mitochondria/Chloroplast features", "result": "PASS", "note": "Unchanged finding" },
+          { "text": "Read-retention fraction after filtering is reported", "result": "PASS", "note": "Unchanged finding" },
+          { "text": "Low organelle fraction is consistent with SKILL's own stated expectation for gut samples", "result": "PASS", "note": "Unchanged finding" }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Raw shotgun metagenomic reads submitted for classification (regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "SKILL.md's Scope paragraph and Decision Tree shotgun-redirect row are unchanged by the fix.",
+        "executed": true,
+        "execution_note": "Direct-mode; regression via SKILL.md diff (no change to this section).",
+        "basic": 38,
+        "specialized": 55,
+        "total": 93,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "Correctly declines raw shotgun reads as out of scope", "result": "PASS", "note": "Unchanged" },
+          { "text": "Explicitly redirects to kraken-classification / metaphlan-profiling", "result": "PASS", "note": "Unchanged" },
+          { "text": "Does not attempt to force shotgun FASTQ through an ASV-input classifier", "result": "PASS", "note": "Unchanged" }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Request to validate a confirmed species ID from one V4 region at 99% confidence (regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "SKILL.md's 'Single Most Important Modern Insight' and 'Over-reading species from 16S' failure-mode text are unchanged by the fix.",
+        "executed": true,
+        "execution_note": "Direct-mode; regression via SKILL.md diff (no change to this section).",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Does not validate a confirmed species ID from a single V4 region + high confidence alone", "result": "PASS", "note": "Unchanged" },
+          { "text": "Cites the specific mechanism", "result": "PASS", "note": "Unchanged" },
+          { "text": "Gives a concrete, actionable path to a defensible claim", "result": "PASS", "note": "Unchanged" },
+          { "text": "Grounds the refusal in SKILL.md's own named failure mode", "result": "PASS", "note": "Unchanged" }
+        ]
+      },
+      {
+        "index": 8,
+        "type": "New (re-auditor)",
+        "label": "Train IDTAXA from scratch and classify (verbatim follow of SKILL.md's new DECIPHER training example)",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Following SKILL.md's new DECIPHER training example verbatim (not an audit workaround) trains and classifies successfully, recovering a real, non-degenerate result (480/770 genus, 62.3%) -- a genuinely new, working capability. But an identical unseeded second run of the same shipped code gives a materially different result (see Input 4), with no warning anywhere in the Skill.",
+        "executed": true,
+        "execution_note": "Same execution as Input 4, run/decipher_verify.R, reading SKILL.md's DECIPHER section as a real user would.",
+        "basic": 24,
+        "specialized": 40,
+        "total": 64,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Following SKILL.md's own commented LearnTaxa() example (no rank=) trains successfully on a real reference", "result": "PASS", "note": "21.7 min, real 60K-sequence reference, no error" },
+          { "text": "IdTaxa() classification completes without error on real ASVs", "result": "PASS", "note": "48.0 sec, real 770 ASVs" },
+          { "text": "SKILL.md's own flattening code (copied verbatim) recovers non-degenerate results, not 100% NA", "result": "PASS", "note": "480/770 genus-assigned" },
+          { "text": "Repeated, identical, unseeded execution of SKILL.md's own shipped DECIPHER workflow reproduces identical genus calls", "result": "FAIL", "note": "See Input 4: 33/770 and 23/770 genus differences across 3 independent unseeded runs" }
+        ]
+      },
+      {
+        "index": 9,
+        "type": "New (re-auditor)",
+        "label": "Reproducibility guarantee for a paper's methods section -- does SKILL.md's guidance actually cover all its methods?",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "An agent following SKILL.md's DADA2 Common Errors guidance verbatim correctly seeds assignTaxonomy() and can truthfully claim genus-level reproducibility (confirmed true by Input 2). But nothing in SKILL.md's DECIPHER section, Common Errors table, or Quantitative Thresholds table mentions that IdTaxa() needs the same treatment -- an agent relying only on the Skill's own documentation would give an incomplete and, for any DECIPHER-based pipeline, incorrect reproducibility guarantee.",
+        "executed": true,
+        "execution_note": "Direct-mode response cross-checked against the executed determinism evidence from Inputs 2, 4, 8.",
+        "basic": 30,
+        "specialized": 46,
+        "total": 76,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "assignTaxonomy(), seeded per SKILL.md's own guidance, is bit-identical across repeated runs", "result": "PASS", "note": "7/7 runs, two different real references" },
+          { "text": "addSpecies() is inherently deterministic and unaffected", "result": "PASS", "note": "Confirmed" },
+          { "text": "SKILL.md's Common Errors / seed guidance, followed literally, fully covers the assignTaxonomy() case", "result": "PASS", "note": "Confirmed" },
+          { "text": "SKILL.md's Common Errors / seed guidance, followed literally, also covers IdTaxa()'s identical stochasticity", "result": "FAIL", "note": "Not mentioned anywhere; an agent using only SKILL.md would not know to seed IdTaxa()" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 35.6,
+    "dynamic_weighted": 51.2,
+    "score": 87,
+    "max": 100,
+    "grade": "Reject",
+    "grade_symbol": "❌",
+    "deployable": false,
+    "veto_override": true
+  },
+  "key_strengths": [
+    "The assignTaxonomy() non-determinism fix is completely and robustly verified: 7/7 independent seeded runs (2 different real large SILVA references, multithreaded default config) are bit-identical at every rank including genus, and addSpecies() is confirmed inherently deterministic. This half of the original veto is genuinely closed.",
+    "The DECIPHER IdTaxa flattening fix is verified end-to-end from scratch: the old code reproduces the original 100%-NA bug exactly (regression-confirmed), and the new code, copied verbatim from SKILL.md and run via a completely independent LearnTaxa() training pass, recovers a real 480/770 (62.3%) genus-assignment rate closely matching the fix log's own claim.",
+    "The redundancy pass on usage-guide.md is real and substantial (50 lines removed, 5 added; verified via diff): it now holds only Overview, Prerequisites, Quick Start, Example Prompts, and Related Skills, with no restated facts from SKILL.md.",
+    "Inputs 1, 3, 5, 6, 7 (QIIME2 classify-sklearn/vsearch, Trap-1 comparison, scope/adversarial guidance) show zero regression -- confirmed via SKILL.md diff analysis plus a direct spot-check re-derivation from the original audit's still-live cached real outputs for Inputs 1 and 5, both exact matches."
+  ],
+  "recommendations": [
+    {
+      "priority": "P0",
+      "title": "DECIPHER IdTaxa() is non-deterministic without set.seed() -- the same Skill Veto T3 defect, now in a sibling method, unaddressed by this fix pass",
+      "observed_in": [4, 8, 9],
+      "problem": "Two back-to-back IdTaxa() calls on the identical trainingSet and identical 770 real ASVs, exactly as SKILL.md's DECIPHER section ships them (no set.seed() anywhere in that section), differ at 33/770 (4.3%) genus calls -- a larger effect than the original, veto-firing assignTaxonomy() bug (1.9-3.4%). A third independent unseeded run confirms this is not a fluke (23/770, 3.0%, vs the first run).",
+      "root_cause": "The fix pass added set.seed() only to assignTaxonomy() calls, following the original audit's P0 finding literally. IdTaxa() is a separate, equally-stochastic classification method (also documented as a core, recommended option in SKILL.md's own Tool Taxonomy and Decision Tree) that the original audit's inputs never specifically tested for repeat-run determinism, so the fixer had no signal that it needed the same treatment.",
+      "fix": "Add set.seed(100) (or any fixed seed) immediately before every IdTaxa() call in SKILL.md's DECIPHER section, exactly as already done for assignTaxonomy() -- both in the existing pre-trained-trainingSet path and the new from-scratch LearnTaxa()+IdTaxa() training example. Verified in this re-audit: with set.seed(100) before each call, two runs are bit-for-bit identical (identical()==TRUE) at every rank, confirmed both with the default multithreaded config (processors=NULL) and single-threaded (processors=1). Also add a Common Errors row and a code comment analogous to the assignTaxonomy() one, and update the Quantitative Thresholds / reproducibility framing to cover IdTaxa() explicitly so an agent following SKILL.md alone gives a complete reproducibility guarantee."
+    },
+    {
+      "priority": "P2",
+      "title": "No self-check anywhere in the Skill catches non-degenerate-output or run-to-run-reproducibility failures",
+      "observed_in": [4, 8],
+      "problem": "Both real defects found across the original audit and this re-audit (assignTaxonomy non-determinism, DECIPHER all-NA flattening, and now IdTaxa non-determinism) shipped silently -- no example script or SKILL.md guidance includes a lightweight check (e.g. 'rerun and diff', or 'assert >0 non-NA calls') that would have caught any of them before a user did.",
+      "root_cause": "Examples are written to demonstrate the happy path only; none include a verification step.",
+      "fix": "Add a short 'sanity-check your output' pattern to both the DADA2 and DECIPHER sections: rerun the classification once and diff, or assert a non-trivial fraction of non-NA genus calls, before trusting the result for downstream analysis."
+    }
+  ]
+}
