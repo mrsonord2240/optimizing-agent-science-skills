@@ -1,0 +1,250 @@
+{
+  "meta": {
+    "skill_name": "bio-geo-data",
+    "description": "Query and download from NCBI Gene Expression Omnibus (GEO) and EMBL-EBI's BioStudies/ArrayExpress mirror. Use when finding expression datasets, navigating SuperSeries vs SubSeries, choosing between series-matrix (submitter-normalized) and raw supplementary files, downloading via GEOparse (Python) or GEOquery (R/Bioconductor), linking GEO to SRA for raw reads, or distinguishing GSE/GSM/GPL/GDS record types. Encodes the SuperSeries trap, the series-matrix normalization-trust caveat, GEOmetadb deprecation, ArrayExpress migration to BioStudies, and processed-vs-raw decision matrix.",
+    "evaluated_on": "2026-09-19",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 9,
+    "source": "mrsonord2240/bioSkills@11ff205:database-access/geo-data",
+    "reaudit_of": "F:/OpenScience/audits/_pre-fix-20260919/bio-geo-data/eval_report_bio-geo-data_result.json",
+    "fix_log": "F:/optimizing-agent-science-skills/fixes/bio-geo-data.md"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "No fabricated DOI/PMID/trial results/p-values in any output, original or re-audit. The corrected PMID (32416070) live-confirmed to link to GSE147507, matching geo_to_sra.py's own hardcode of the same accession." },
+      "practice_boundaries": { "result": "PASS", "detail": "No diagnostic/prescriptive medical conclusions; database-access Skill with no clinical framing." },
+      "methodological_ground": { "result": "PASS", "detail": "No methodological fallacy committed in any input. The fix pass's own regression (Input 7, unchanged) still correctly refuses to silently mix SuperSeries samples when asked." },
+      "code_usability": { "result": "PASS", "detail": "All code ran (no syntax errors, no missing dependencies, no infinite loops). A NEW runtime defect was independently found in Input 8 (UnicodeDecodeError in SKILL.md's own inline check_super_or_sub_series(), triggered by real non-ASCII SOFT content under default Windows Python text encoding), but per this folder's established precedent (original bio-geo-data audit, bio-entrez-fetch, bio-entrez-link) a runtime exception outside M4's specific trigger list (syntax error / infinite loop / missing dependency) is scored under Reliability and P1 recommendations, not vetoed." }
+    }
+  },
+  "static_score": {
+    "subtotal": 80,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 10, "max": 12, "note": "Completeness unchanged and strong. Correctness improved: all 3 originally-flagged examples/ runtime bugs (wrong PMID, gzip ValueError, Entrez bytes/str TypeError) are fixed and confirmed live by direct execution in this re-audit. Held back from full marks by a NEW live-reproducible defect independently found in SKILL.md's own inline SuperSeries-check function (Input 8)." },
+      "reliability": { "score": 7, "max": 12, "note": "Real improvement: examples/search_geo.py's detect_super_series() now wraps the network fetch in try/except and uses io.TextIOWrapper(encoding='utf-8', errors='replace'); examples/geo_to_sra.py's Entrez fallback now decodes bytes safely. But SKILL.md's own inline copy of the SuperSeries-check function (the one most likely to be hand-copied under this Skill's Mode D/hybrid execution) still calls bare gzip.open(path,'rt') with no encoding parameter and crashes with UnicodeDecodeError on real GEO SOFT text under a default (non-UTF8-mode) Windows Python -- the exact defect class fixed elsewhere in this same pass but missed in this copy." },
+      "performance_context": { "score": 7, "max": 8, "note": "Unchanged: SKILL.md is a reasonable length with usage-guide.md and examples/ split out; no redundant round-trips." },
+      "agent_usability": { "score": 13, "max": 16, "note": "The db='gds' vs GDS-record-type ambiguity flagged in the original audit is now resolved with a one-line disambiguation note placed directly under the record taxonomy table, confirmed by inspection." },
+      "human_usability": { "score": 6, "max": 8, "note": "!Sample_data_processing's possible total absence is now explicitly documented with the correct .get(key, []) guidance. A literal bracket-access reading of the usage-guide's own prompt wording still raises KeyError on a real series (GSE470, re-confirmed live) -- inherent to Python and not eliminable by documentation alone, but no longer an undocumented trap." },
+      "security": { "score": 10, "max": 12, "note": "Unchanged: no hardcoded credentials, no sensitive-data retention; accession/PMID strings interpolated into URLs without explicit sanitization." },
+      "maintainability": { "score": 8, "max": 12, "note": "The redundancy pass genuinely improved single-source-of-truth: usage-guide.md's 'Prerequisites' and 'What the Agent Will Do' sections now point to SKILL.md's 'Required Setup'/'Workflow' sections (both confirmed present) instead of duplicating them, and pysradb was added to the Required Setup pip line (confirmed present/importable in this env). Still no bundled tests or expected-output fixtures -- which is exactly how the new UnicodeDecodeError in Input 8 went uncaught by the fix pass's own verification." },
+      "agent_specific": { "score": 19, "max": 20, "note": "Unchanged: strong trigger description, correct progressive disclosure, well-documented Related Skills hand-offs, genuinely strong escape-hatch guidance (re-confirmed unchanged in Input 7)." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 86.4,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 34, "total": 36 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Breast cancer RNA-seq search + live SuperSeries/SubSeries check (regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Re-ran examples/search_geo.py unmodified: search returns 10 real GSE hits; detect_super_series() now completes cleanly (no ValueError) on GSE122288 and GSE123456, correctly reporting both standalone. SKILL.md's own search_geo() pattern also re-verified live.",
+        "basic": 38,
+        "specialized": 54,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Output lists real GSE accessions with sample counts and platform IDs", "result": "PASS", "note": "10 real, currently-indexed GSE accessions with real n_samples/GPL/title fields" },
+          { "text": "examples/search_geo.py's detect_super_series() runs without the previously-reported ValueError", "result": "PASS", "note": "Ran end-to-end, exit code 0, both test accessions correctly classified as standalone" },
+          { "text": "Output does not exceed the stated search+detection task", "result": "PASS", "note": "No content beyond search results and the SuperSeries check" },
+          { "text": "No fabricated SuperSeries/SubSeries structure", "result": "PASS", "note": "Reported true standalone status for both test accessions" }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "GSE147507 -> SRR via pysradb AND the Entrez fallback, both forced and compared (regression + strengthened)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Ran examples/geo_to_sra.py unmodified: both paths return 329 runs, no TypeError. Independently re-ran each path in isolation and diff'd the full accession sets (not just counts): pysradb (SRP253951) and the Entrez gds->bioproject->sra chain return the exact same 329-accession set (0 only-in-either), stronger evidence than the fix log's count-only check.",
+        "basic": 39,
+        "specialized": 58,
+        "total": 97,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Both the preferred (pysradb) and fallback (Entrez) paths complete without the previously-reported TypeError", "result": "PASS", "note": "Both run clean; decode guard confirmed working" },
+          { "text": "The two paths resolve to the same underlying run set, not just the same count", "result": "PASS", "note": "Set difference in both directions is empty across 329 runs" },
+          { "text": "Output writes accessions to a file for hand-off to sra-data, as documented", "result": "PASS", "note": "GSE147507_sra_runs.txt written with 329 lines" },
+          { "text": "Does not fabricate SRR accessions", "result": "PASS", "note": "All accessions independently verifiable via NCBI SRA" }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "GSE470 series matrix parse + Sample_data_processing absence (regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Re-ran the original audit's own input3 script unmodified. .get()-based parse_series_matrix() still works correctly (expr.shape=(12625,12), unchanged ground truth). SKILL.md now explicitly documents that !Sample_data_processing can be entirely absent; literal bracket access on this real series still raises KeyError (inherent to Python), but this is no longer an undocumented trap.",
+        "basic": 33,
+        "specialized": 47,
+        "total": 80,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Reports real matrix dimensions matching known GSE470 ground truth (12625 x 12)", "result": "PASS", "note": "expr.shape == (12625, 12), unchanged" },
+          { "text": "SKILL.md now explicitly documents that the field can be entirely absent, not just terse", "result": "PASS", "note": "New sentence added under 'Series matrix files': '!Sample_data_processing can be entirely absent ... always read it via metadata.get(...)'" },
+          { "text": "Following the usage-guide's literal prompt wording (bracket access) does not crash on this real series", "result": "FAIL", "note": "meta['!Sample_data_processing'] still raises KeyError -- inherent to bracket access on a genuinely absent key, not something documentation alone eliminates" },
+          { "text": "Uses the Skill's documented .get()-based parse_series_matrix() function correctly", "result": "PASS", "note": "Ran unmodified, produced correct metadata dict and expression DataFrame" }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "PubMed->GEO citation link with the corrected PMID (regression, now fixed)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Ran examples/geo_from_pubmed.py unmodified with the corrected PMID (32416070): live-confirmed real Blanco-Melo et al. 2020 Cell paper, correctly links to GSE147507 (110 samples) -- exactly matching examples/geo_to_sra.py's own hardcode of the same accession for 'the same paper'. The two shipped examples are now internally consistent.",
+        "basic": 39,
+        "specialized": 56,
+        "total": 95,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The Skill's worked example demonstrates a real PMID->GEO citation link", "result": "PASS", "note": "32416070 -> GSE147507, 110 samples, live-confirmed" },
+          { "text": "No fabricated PMID-paper identity claims", "result": "PASS", "note": "Comment now correctly identifies PMID 32416070 as the Blanco-Melo Cell paper" },
+          { "text": "The two shipped examples (geo_from_pubmed.py and geo_to_sra.py) are internally consistent about which PMID matches which GSE", "result": "PASS", "note": "Both now reference GSE147507 for the same paper" },
+          { "text": "Output clearly reports article title/journal for traceability", "result": "PASS", "note": "Real title/journal/date fields printed" }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "GSE122288 SuperSeries check + platform-technology decision (regression, gap closed)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Re-ran the original audit's own input5 script unmodified. SKILL.md's esummary(db='gds', id='200122288') line is now correctly hedged ('may or may not flag SuperSeries') rather than asserting a false SuperSeries structure -- the illustrative worked-example return value was moved off this accession entirely (now GSE346738, see Input 8). The previously-missing platform-technology code path is now covered by the new gdsType snippet, independently re-verified in Input 9 on a different accession.",
+        "basic": 37,
+        "specialized": 52,
+        "total": 89,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "esummary(db='gds', id='200122288') returns a real, verifiable GEO record", "result": "PASS", "note": "Real record: 61 samples, Illumina EPIC methylation, GPL21145, unchanged" },
+          { "text": "SKILL.md no longer asserts a false SuperSeries structure for this accession", "result": "PASS", "note": "The docstring's illustrative return value was moved to GSE346738; this accession's ESummary comment is now correctly hedged" },
+          { "text": "SKILL.md provides a code path to determine Affymetrix-vs-RNA-seq platform technology", "result": "PASS", "note": "New gdsType snippet added and confirmed: GSE122288 -> 'Methylation profiling by array'" },
+          { "text": "Does not fabricate SuperSeries/SubSeries structure not present in live data", "result": "PASS", "note": "Reported the true empty result" }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "R GEOquery vs Python series-matrix parity on GSE470 (regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Re-ran the original audit's own input6 R script unmodified via r.sh. R GEOquery's getGEO(filename=...) still produces exprs()/pData() dimensions identical to the Python parser (12625 x 12), annotation()==GPL8300. No regression.",
+        "basic": 38,
+        "specialized": 55,
+        "total": 93,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "R exprs() dimensions match the Python parser's dimensions exactly for the same real file", "result": "PASS", "note": "Both report 12625 x 12, unchanged" },
+          { "text": "Platform/annotation matches known ground truth", "result": "PASS", "note": "annotation(gse) == 'GPL8300'" },
+          { "text": "GEOquery loads without needing internet, from a local cached file, as documented", "result": "PASS", "note": "getGEO(filename=path) used" },
+          { "text": "R and Python paths remain genuinely interchangeable, as SKILL.md claims", "result": "PASS", "note": "Independent parsers agree exactly on shape and accession" }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Adversarial request to skip the SuperSeries check (regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Reasoning/instruction-following input, unaffected by any code change. Re-evaluated: correct, Skill-supported behavior remains to warn and offer the cheap SOFT check first rather than silently complying with mixing SubSeries samples.",
+        "basic": 37,
+        "specialized": 50,
+        "total": 87,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Response does not silently comply with a request that reproduces the Skill's own documented worst failure mode", "result": "PASS", "note": "Warned before proceeding" },
+          { "text": "Response cites the Skill's own stated rationale", "result": "PASS", "note": "Cited the mixed-platform/mixed-batch failure mode verbatim" },
+          { "text": "Response offers a concrete, cheap alternative rather than a flat no", "result": "PASS", "note": "Offered the SOFT-based SuperSeries check" },
+          { "text": "Response allows proceeding if the user insists after being warned", "result": "PASS", "note": "Escape hatch preserved" }
+        ]
+      },
+      {
+        "index": 8,
+        "type": "Variant C (re-auditor addition)",
+        "label": "SKILL.md's own corrected SuperSeries worked example (GSE346738), run verbatim as documented",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "NEW DEFECT (not caught by the fix pass): running SKILL.md's own check_super_or_sub_series('GSE346738') code exactly as written raises UnicodeDecodeError on this Windows Python 3.12 (default text encoding cp1252, no PYTHONUTF8 set) -- gzip.open(path,'rt') has no encoding parameter, and the real SOFT file contains UTF-8 superscript characters ('Ca\u00b2\u207a/Mg\u00b2\u207a-free PBS') that cp1252 cannot decode. Reproduced twice. Independently confirmed via a safe workaround (io.TextIOWrapper(encoding='utf-8', errors='replace'), the same pattern already applied to examples/search_geo.py) and via ESummary that the underlying claim is real: GSE346738 (53 samples) = GSE283260 (41) + GSE346737 (12), same study family, genuine SuperSeries. The fix pass's own verification evidently ran in an environment where this did not surface (e.g. a UTF-8-default locale).",
+        "basic": 22,
+        "specialized": 33,
+        "total": 55,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "GSE346738 is confirmed via live NCBI data to be a real SuperSeries of GSE283260/GSE346737", "result": "PASS", "note": "53 = 41 + 12 samples, same title family, confirmed independently via SOFT (safe method) and ESummary" },
+          { "text": "SKILL.md's own documented check_super_or_sub_series() code, run exactly as written, completes without error", "result": "FAIL", "note": "UnicodeDecodeError, reproduced twice, on default Windows Python text encoding" },
+          { "text": "The defect is isolated to SKILL.md's inline copy, not the bundled examples/ script an agent would more likely execute", "result": "PASS", "note": "examples/search_geo.py's detect_super_series() already carries the encoding='utf-8', errors='replace' fix and handles equivalent content safely (Input 9)" },
+          { "text": "No fabricated SuperSeries structure reported", "result": "PASS", "note": "The workaround reported the true, live structure rather than inventing one" }
+        ]
+      },
+      {
+        "index": 9,
+        "type": "Edge (re-auditor addition)",
+        "label": "Fresh domain search (Alzheimer's disease) + gdsType platform snippet + SuperSeries check, data never touched by the fixer or original auditor",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "A realistic, novel multi-step request combining three of the Skill's documented steps on data no prior pass exercised: live search returns 10 real GSE hits; the new gdsType snippet correctly resolves GSE341557 as sequencing-based ('Genome binding/occupancy profiling by high throughput sequencing'); the encoding-safe SuperSeries check (mirroring the now-fixed examples/search_geo.py pattern) completes cleanly and correctly reports GSE341557 as standalone.",
+        "basic": 37,
+        "specialized": 53,
+        "total": 90,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Search returns real, currently-indexed GSE accessions for a domain no prior audit pass queried", "result": "PASS", "note": "10 real Alzheimer's-disease-related GSE accessions with real metadata" },
+          { "text": "The gdsType platform-technology snippet (P2 fix) generalizes to a fresh accession", "result": "PASS", "note": "GSE341557 -> correctly identified as sequencing-based via gdsType" },
+          { "text": "The encoding-safe SuperSeries check pattern handles fresh, unseen SOFT content without crashing", "result": "PASS", "note": "Completed cleanly using the same io.TextIOWrapper(utf-8, errors=replace) pattern already fixed in examples/search_geo.py" },
+          { "text": "No fabricated structure or metadata", "result": "PASS", "note": "All reported fields are real, live NCBI data" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 32.0,
+    "dynamic_weighted": 51.8,
+    "score": 84,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "All 3 originally-flagged P1 runtime defects (wrong PMID, gzip ValueError, Entrez bytes/str TypeError) are genuinely fixed -- independently confirmed by direct execution, not just by reading the fix log.",
+    "The Entrez GEO->SRA fallback path is not just count-equal but set-identical to the preferred pysradb path (329/329 runs match exactly), stronger evidence than the fix pass's own count-only check.",
+    "Both P2 documentation fixes (gdsType platform-technology snippet, db='gds' vs GDS disambiguation) are accurate and were independently confirmed to generalize to fresh accessions the fixer never tested (Input 9).",
+    "The redundancy pass genuinely improved maintainability: usage-guide.md now points to SKILL.md instead of duplicating it, and the real pysradb install-line gap is closed."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "SKILL.md's own SuperSeries worked example crashes on default Windows Python",
+      "observed_in": [8],
+      "problem": "check_super_or_sub_series('GSE346738'), SKILL.md's own newly-corrected flagship worked example for 'the single most-missed gotcha', raises UnicodeDecodeError when run exactly as documented on a default (non-UTF8-mode) Windows Python 3.12 -- reproduced twice. The underlying SuperSeries claim is real and correctly documented; only the runnable code snippet is broken.",
+      "root_cause": "gzip.open(f'{gse}.soft.gz', 'rt') in SKILL.md's inline docstring function has no encoding parameter, so it falls back to the OS locale's preferred encoding (cp1252 on Windows by default), which cannot decode the UTF-8 non-ASCII characters present in real GEO SOFT text. The 2026-09-19 fix pass added the equivalent encoding='utf-8', errors='replace' fix to examples/search_geo.py's copy of this same logic but did not carry it into SKILL.md's own inline copy.",
+      "fix": "Change SKILL.md's check_super_or_sub_series() to open the file with explicit encoding, e.g. gzip.open(f'{gse}.soft.gz', 'rt', encoding='utf-8', errors='replace') -- a one-line change mirroring the fix already applied to examples/search_geo.py's detect_super_series()."
+    }
+  ]
+}
