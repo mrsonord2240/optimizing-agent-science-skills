@@ -8,7 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (76)
+## P1 (72)
 
 ### `bio-alignment-multiple` — Fix MUSCLE5 ensemble commands (-super5 has no .efa)
 
@@ -145,30 +145,6 @@ None open.
 - Problem: The Skill says -p m merges only phased hets and -p s keeps unphased hets separate. bcftools 1.21/1.24: m merges all GTs into one haplotype regardless of phase (merged a trans pair); s skips unphased hets (no consequence emitted).
 - Root cause: Mode semantics written from memory, not from 'bcftools csq' help.
 - Fix: Use the help text: a = take GTs as is (0/1 -> 0\|1), m = merge all GTs into one haplotype, r = require phase, R = non-reference haplotypes, s = skip unphased hets; recommend -p a for phased data (SKILL.md and usage guide).
-
-### `bio-virtual-screening` — 'mk_prepare_receptor.py' is not the installed command name
-
-- Skill: 86, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/virtual-screening) · [viewer](skills/bio-virtual-screening/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 1
-- Problem: SKILL.md's prepare_receptor() (line 76) and examples/virtual_screen.py's prepare_receptor() (line 42) both call subprocess with the literal command 'mk_prepare_receptor.py'. meeko 0.8.0 installs a console-script entry point named 'mk_prepare_receptor' (no .py suffix); the literal call raises FileNotFoundError.
-- Root cause: The documented command name does not match the console-script name that pip actually installs for meeko 0.5+.
-- Fix: Change both call sites to 'mk_prepare_receptor' (or invoke the module directly for portability), and note in the Version Compatibility section that meeko's CLI entry points have no .py suffix once installed via pip.
-
-### `bio-virtual-screening` — Documented --read_pqr receptor-prep route crashes on insertion-code residues
-
-- Skill: 86, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/virtual-screening) · [viewer](skills/bio-virtual-screening/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 1
-- Problem: SKILL.md's prepare_receptor() pipes pdb2pqr's default .pqr output into mk_prepare_receptor --read_pqr. On PDB 3PTB (trypsin, chymotrypsin numbering with insertion-code residues like '184A'), this raises ValueError: invalid literal for int() with base 10: '184A' inside meeko's PQR parser. Chymotrypsin-numbered serine proteases are a standard docking-benchmark family, not a synthetic edge case.
-- Root cause: meeko 0.8.0's PQR reader assumes an all-integer residue-number column; pdb2pqr's PQR output does not pad/strip insertion codes into a format that parser accepts.
-- Fix: Switch the documented pipeline to `pdb2pqr --pdb-output <file>.pdb ...` followed by `mk_prepare_receptor --read_pdb <file>.pdb` -- verified working on the same structure in this audit, and already the pattern examples/virtual_screen.py uses (without showing how to produce the protonated PDB it expects). Unify the two receptor-prep code paths and add an insertion-code note to the Common Errors table.
-
-### `bio-virtual-screening` — No seed/determinism guidance for Vina docking
-
-- Skill: 86, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/virtual-screening) · [viewer](skills/bio-virtual-screening/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 1, 2
-- Problem: dock_single() and virtual_screen() never set or expose a Vina seed. Top-1 affinity was empirically stable (-6.031, -6.020, -6.023 kcal/mol across 3 unseeded runs on the tested benchmark), but poses ranked 2+ reordered run to run, and SKILL.md never mentions --seed anywhere despite this skill's own emphasis elsewhere on reproducibility and recording run conditions.
-- Root cause: The dock_single()/virtual_screen() function signatures omit a seed parameter, and no reproducibility guidance for the stochastic search step is given.
-- Fix: Add a seed parameter (e.g. default 42) to dock_single()/virtual_screen(), and one sentence recommending recording the seed for any screen whose top-N poses (not just the single best) will be reported or compared.
 
 ### `bio-proteomics-dia-analysis` — The headline predicted-library command is rejected as 'incorrect settings' by DIA-NN 2.x
 
@@ -546,14 +522,6 @@ None open.
 - Root cause: The fix was written from a single test session's stated output rather than independently reproduced or checked against the installed function's actual method dispatch; the confident '(checked on clusterProfiler 4.14.6)' citation makes the wrong claim more likely to be trusted and propagated than the original vaguer 'redundancy not removed, or an error'.
 - Fix: Before restating this claim, run selectMethod('simplify', 'enrichResult') or inspect clusterProfiler:::simplify_ALL directly. State plainly that clusterProfiler >= (whatever version introduced simplify_ALL; confirmed present in 4.14.6) already de-redundifies ont='ALL' objects correctly per ontology, and drop the three now-false 'checked' citations. If older clusterProfiler versions truly have the BP-only bug, gate the warning on a version check instead of stating it unconditionally.
 
-### `bio-protac-degraders` — Named primary tool and all ternary predictors are unexecutable locally
-
-- Skill: 90, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/protac-degraders) · [viewer](skills/bio-protac-degraders/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 2, 7
-- Problem: The frontmatter's primary_tool (PRosettaC) and every other named ternary-complex predictor (DeepTernary, AlphaFold3, Boltz) are a web service, licence-gated, or GPU/weights-gated -- none can run in a typical agent environment, leaving only 2D linker enumeration as executable content.
-- Root cause: The Skill's core 'ternary complex prediction' capability was designed entirely around external services rather than any bundled or freely runnable local method.
-- Fix: Add a lightweight local fallback (e.g. a documented RDKit conformer-based exit-vector distance/strain heuristic, or a wrapper for a locally runnable open tool such as HADDOCK3) so ternary-hypothesis generation is not 100% dependent on unavailable external services.
-
 ### `bio-similarity-searching` — The 'Tanimoto = 1.0' failure mode has the wrong cause and a fix that does not work
 
 - Skill: 90, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/similarity-searching) · [viewer](skills/bio-similarity-searching/GPTomics-bioSkills@d91ed3d/viewer.md)
@@ -618,7 +586,7 @@ None open.
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (302)
+## P2 (300)
 
 ### `bio-crispr-screens-copy-number-correction` — negative_control_sgrnas empty-dict case raises an undocumented ValueError
 
@@ -1035,30 +1003,6 @@ None open.
 - Problem: With chr1 vs 1 naming, annotate exits 0 and annotates nothing; the fix lives only in Common Errors.
 - Root cause: Silent zero-match behaviour of bcftools annotate.
 - Fix: Add a one-line pre-check (compare `bcftools index -s` contig names of target and source) next to the annotate commands.
-
-### `bio-virtual-screening` — 'from vina import Vina' has no Windows wheel
-
-- Skill: 86, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/virtual-screening) · [viewer](skills/bio-virtual-screening/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 1, 2
-- Problem: pip install vina fails to build on Windows ('Boost library location was not found'), so the primary documented Python-API code path in the 'Vina Docking (Single Ligand)' section and examples/virtual_screen.py cannot run at all on Windows; only the CLI works.
-- Root cause: SKILL.md's existing CLI-fallback comment anticipates a Vina-*version* mismatch ('for Vina 1.1 use subprocess CLI') but not this platform-based one.
-- Fix: Add a one-line platform note next to the existing version-based CLI-fallback comment: 'On Windows, pip install vina does not build a wheel; use the Vina CLI via subprocess instead.'
-
-### `bio-virtual-screening` — Docked poses are not sanity-filtered before being returned
-
-- Skill: 86, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/virtual-screening) · [viewer](skills/bio-virtual-screening/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 1
-- Problem: Vina's raw energies()/results.csv can include physically nonsensical outlier modes; a +68.69 kcal/mol pose appeared among 9 returned modes in testing here, which a downstream consumer could mistake for a real (if poor) binding estimate rather than a search artifact.
-- Root cause: dock_single() and virtual_screen() return/report every mode Vina emits without a plausibility filter.
-- Fix: Note in the 'Vina Docking (Single Ligand)' section that positive-energy modes should be filtered or flagged before reporting, or clip n_poses reporting to affinity < 0.
-
-### `bio-virtual-screening` — PDBQT-to-downstream-tool handoff is lossy for charged ligands
-
-- Skill: 86, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/virtual-screening) · [viewer](skills/bio-virtual-screening/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 5
-- Problem: Converting a Vina/meeko PDBQT pose for a charged ligand (protonated amidinium) to SDF for PoseBusters -- the Skill's own cross-referenced QC step -- loses formal bond-order/charge information and fails RDKit sanitization, even though the pose's spatial placement (protein-ligand distance/overlap checks) is otherwise valid.
-- Root cause: PDBQT does not encode formal bond orders; reconstructing them from atom types and distances during format conversion is unreliable for charged/aromatic-adjacent groups.
-- Fix: Note the PDBQT round-trip caveat in the pose-validation hand-off (Related Skills), or recommend carrying the original RDKit Mol (with correct formal charges) alongside the PDBQT rather than reconstructing bonds from docked coordinates alone.
 
 ### `bio-proteomics-dia-analysis` — The EasyPQP library is not loadable by DIA-NN without fragment-annotation columns
 
@@ -2188,22 +2132,6 @@ None open.
 - Root cause: The failure mode's magnitude was written from the general mechanism rather than from a run against data of this scale.
 - Fix: Soften the symptom description to note that the effect scales with list size and background mismatch severity -- sometimes one spurious term, sometimes many -- rather than always implying a dominated table.
 
-### `bio-protac-degraders` — No shipped example for cooperativity alpha or DC50/Dmax calculation
-
-- Skill: 90, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/protac-degraders) · [viewer](skills/bio-protac-degraders/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 5
-- Problem: SKILL.md documents the alpha formula and DC50/Dmax/hook-effect workflow in prose, but examples/ contains only the linker-enumeration script; an agent must write the analysis code from scratch each time, as this audit did.
-- Root cause: examples/ has a single file (protac_enumerate.py) covering only linker connectivity, not the dose-response or binding-data workflows.
-- Fix: Add examples/cooperativity_dc50.py implementing the alpha formula and a 4-parameter-logistic DC50/Dmax fit with hook-effect flagging.
-
-### `bio-protac-degraders` — Version Compatibility pin is stale relative to the audited RDKit
-
-- Skill: 90, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/protac-degraders) · [viewer](skills/bio-protac-degraders/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: —
-- Problem: Version Compatibility section pins 'RDKit 2024.09+'; the audit environment's RDKit 2026.03.6 worked without any API changes needed, but the pin is over a year old.
-- Root cause: Skill written before later RDKit releases; the generic 'introspect and adapt' escape hatch already mitigates this, so it is cosmetic.
-- Fix: Refresh the pinned 'tested with' versions during routine Skill maintenance passes.
-
 ### `bio-proteomics-peptide-identification` — dda_search.sh hides Percolator's error from the operator
 
 - Skill: 90, Production Ready · [mrsonord2240/bioSkills@1110c24](https://github.com/mrsonord2240/bioSkills/tree/1110c241c27760ad0127bd803e8832d54651e31c/proteomics/peptide-identification) · [viewer](skills/bio-proteomics-peptide-identification/mrsonord2240-bioSkills@1110c24/viewer.md)
@@ -2740,6 +2668,14 @@ None open.
 - Root cause: The fix pass's diff (verified via `git diff` on the staging commit) touched only the `dock` row and the caveat sentence; the `mol` row was not cross-checked against the same verification.
 - Fix: Change the `mol` row's parenthetical from '(sanity, bonds, angles, rings, stereo, energy)' to '(sanity, bonds, angles, rings, double-bond geometry, energy)' or explicitly note '-- stereo/chirality excluded, same as dock; requires mol_true'.
 
+### `bio-protac-degraders` — DC50/Dmax fit underestimates when a hook's onset is not well-separated from DC50
+
+- Skill: 92, Production Ready · [mrsonord2240/bioSkills@bfcde6d](https://github.com/mrsonord2240/bioSkills/tree/bfcde6d6e676730230728e37142eca8054ac06aa/chemoinformatics/protac-degraders) · [viewer](skills/bio-protac-degraders/mrsonord2240-bioSkills@bfcde6d/viewer.md)
+- Observed in inputs: 9
+- Problem: cooperativity_dc50.py's ascending-arm-only fit strategy assumes the hook effect declines sharply after a clear plateau. When the hook onset is gradual and its concentration is not far above DC50 (ratio ~20 with a shallow hook_hill, vs. the shipped demo's ratio of 125), the truncated ascending-arm data never reaches the true plateau, and Dmax is underestimated by >12 percentage points (reproduced noise-free, so it is a structural bias, not sampling noise). No warning is surfaced when this happens -- the output looks identical in confidence to the well-separated cases.
+- Root cause: detect_hook()/fit_dc50() were designed and verified against a single well-separated demo curve (hook_k/dc50 ~125); the ascending-arm truncation heuristic has no check for whether the retained pre-peak data actually reaches a plateau.
+- Fix: Add a diagnostic in fit_dc50() (e.g., compare the retained arm's maximum observed value against the fitted dmax_fit, or require a minimum number of near-plateau points before the peak) and surface a caveat in the output -- 'ascending-arm data may not reach the true plateau; treat Dmax as a lower bound' -- when that check fails.
+
 ### `bio-remote-homology` — PSI-BLAST-alone and HHsearch-alone workflows still lack standalone example scripts
 
 - Skill: 92, Production Ready · [mrsonord2240/bioSkills@1d0172a](https://github.com/mrsonord2240/bioSkills/tree/1d0172afd19ebbb57b51e5a48dca85451a093286/database-access/remote-homology) · [viewer](skills/bio-remote-homology/mrsonord2240-bioSkills@1d0172a/viewer.md)
@@ -2899,6 +2835,22 @@ None open.
 - Problem: The documented incompatibility (enrichplot 1.26.6/ggtree/ggplot2 4.0.3) may be fixed in a future enrichplot or ggtree release, at which point the Skill's 'do not retry' guidance and emapplot-only recommendation for compareClusterResult would become stale.
 - Root cause: The fix correctly documents a point-in-time incompatibility but has no built-in trigger to revisit it as dependency versions move forward.
 - Fix: Add a one-line note to Version Compatibility: 're-test treeplot on a compareClusterResult after any enrichplot/ggtree upgrade; this may be fixed upstream'.
+
+### `bio-virtual-screening` — Insertion-code failure mode documented too narrowly
+
+- Skill: 93, Production Ready · [mrsonord2240/bioSkills@0ce62bd](https://github.com/mrsonord2240/bioSkills/tree/0ce62bdfbb3cce49c45142c9aa0692ea7e3fe270/chemoinformatics/virtual-screening) · [viewer](skills/bio-virtual-screening/mrsonord2240-bioSkills@0ce62bd/viewer.md)
+- Observed in inputs: 3
+- Problem: SKILL.md's pitfall note and Common Errors row name the --read_pqr crash trigger as 'chymotrypsin-numbered serine proteases (trypsin, chymotrypsin, and relatives)'. The actual root cause (meeko's PQR reader assumes an all-integer residue-number column) is generic to any insertion-code-bearing PDB deposition, confirmed here on elastase (1EAI), a different protein family with a denser insertion-code pattern.
+- Root cause: The fix's documentation was written and verified against the fixer's own trypsin/3PTB test case only, so the framing inherited that case's specificity.
+- Fix: Broaden the pitfall/Common Errors wording to state the root cause generically (any residue with a PDB insertion code) and cite chymotrypsin-numbered serine proteases as one example family, not the defining trigger.
+
+### `bio-virtual-screening` — PDBQT->SDF bond-order/charge loss remains unresolved (correctly documented, not fixed)
+
+- Skill: 93, Production Ready · [mrsonord2240/bioSkills@0ce62bd](https://github.com/mrsonord2240/bioSkills/tree/0ce62bdfbb3cce49c45142c9aa0692ea7e3fe270/chemoinformatics/virtual-screening) · [viewer](skills/bio-virtual-screening/mrsonord2240-bioSkills@0ce62bd/viewer.md)
+- Observed in inputs: 5
+- Problem: Converting a charged ligand's docked PDBQT pose to SDF for PoseBusters still fails RDKit sanitization (3/12 checks pass in a ligand-only run), exactly as the fix's new 'Handoff caveat' describes. The underlying cross-skill integration gap between virtual-screening's PDBQT output and pose-validation's expected input is still open.
+- Root cause: PDBQT does not encode formal bond order; no clean programmatic reconstruction exists for charged/aromatic-adjacent groups, as the fixer's own log states.
+- Fix: No action required this round -- documentation is now accurate. Tracking only: a real fix would need pose-validation (or virtual-screening) to accept the original RDKit Mol object alongside the PDBQT rather than reconstructing bonds from the pose, as the new caveat already recommends as a workaround.
 
 ### `bio-crispr-screens-screen-qc` — Documented sgRNA-identifier-column requirement is not enforced by validate_counts()
 

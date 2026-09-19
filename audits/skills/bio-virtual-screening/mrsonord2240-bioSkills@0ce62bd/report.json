@@ -1,0 +1,221 @@
+{
+  "meta": {
+    "skill_name": "bio-virtual-screening",
+    "description": "Performs structure-based virtual screening using AutoDock Vina, SMINA, GNINA (CNN scoring), and DiffDock-L hybrid workflows with explicit choice rules across rigid vs flexible docking, cross-docking vs self-docking, binding-site detection, receptor preparation, ligand preparation, and ultralarge-library screening.",
+    "evaluated_on": "2026-09-19",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "mrsonord2240/bioSkills@0ce62bd:chemoinformatics/virtual-screening",
+    "re_audit_of": "F:/OpenScience/audits/_pre-fix-20260919/bio-virtual-screening/eval_report_bio-virtual-screening_result.json",
+    "fix_log": "F:/optimizing-agent-science-skills/fixes/bio-virtual-screening.md"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "No new references were added or altered by the fix; all 21 citations remain real, verifiable papers. No fabricated DOIs, numbers, or results appeared in any of the 7 re-audit outputs." },
+      "practice_boundaries": { "result": "PASS", "detail": "Purely computational hit-identification scope preserved across all 7 outputs; no diagnostic or prescriptive claims." },
+      "methodological_ground": { "result": "PASS", "detail": "Calibration and no-universal-threshold language is unchanged and still holds across all outputs. The fix adds a new, honest 'Handoff caveat' disclosing the PDBQT->SDF bond-order-loss limitation rather than hiding it, reinforcing this dimension." },
+      "code_usability": { "result": "PASS", "detail": "Every documented code path executed in this re-audit ran unmodified: receptor prep (independently verified on two different insertion-code structures -- PDB 3PTB trypsin and PDB 1EAI elastase), ligand prep, single- and multi-ligand Vina docking with a seed, and the positive-energy pose filter. This closes the caveat the pre-fix audit carried on this dimension. GNINA remains unexecuted (no Windows/CUDA build in this environment) -- an environment constraint, not a skill defect." }
+    }
+  },
+  "static_score": {
+    "subtotal": 96,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 12, "max": 12, "note": "Both confirmed pre-fix code defects (wrong receptor-prep script name; --read_pqr insertion-code crash) are fixed and independently re-verified here on two separate structures (3PTB, 1EAI). All promised use cases now run as literally documented, modulo GNINA/DiffDock-L's own external unavailability on this machine." },
+      "reliability": { "score": 11, "max": 12, "note": "Common Errors table now carries specific, correct rows for both fixed bugs plus the pre-existing Windows-wheel and metal-coordination entries; per-ligand try/except isolation confirmed by inspection and execution. Still no structured/parseable error codes for an agent caller -- same gap as the pre-fix audit, unresolved by this fix round." },
+      "performance_context": { "score": 8, "max": 8, "note": "SKILL.md grew from 372 to ~404 lines while staying entirely on-topic; the fix's redundancy pass removed the usage-guide.md Tips duplication rather than adding to it." },
+      "agent_usability": { "score": 15, "max": 16, "note": "The Windows-wheel note now sits directly above `from vina import Vina` in the Vina Docking section (previously a silent gap forcing inference); the seed and sanity-filter notes are similarly inline. Docked 1 point because the fix still requires two call sites (SKILL.md and examples/virtual_screen.py) to independently carry the same fallback guidance rather than a single unified code path." },
+      "human_usability": { "score": 7, "max": 8, "note": "Unchanged from the pre-fix audit: usage-guide.md's example prompts remain realistic; exception text is clear but still short on structured recovery hints." },
+      "security": { "score": 12, "max": 12, "note": "Unchanged: no credentials, subprocess calls use argument lists, SMILES validated through RDKit before use, no eval/exec of raw strings." },
+      "maintainability": { "score": 11, "max": 12, "note": "The fix's redundancy pass removed four duplicated Tips from usage-guide.md and relocated the two agent-relevant, non-duplicate ones into SKILL.md, reducing the maintenance surface. Still no shipped example test cases or expected-output fixtures -- unchanged gap." },
+      "agent_specific": { "score": 20, "max": 20, "note": "The prior 1-point deduction (no seed parameter/guidance for Vina) is resolved: seed=42 is now a named default in both dock_single() and virtual_screen(), and this re-audit independently confirmed full-pose-list (not just top-1) determinism across 2 runs." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 91.3,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 25, "total": 28 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Dock benzamidine into trypsin's S1 pocket (PDB 3PTB), full receptor+ligand prep -- regression of the pre-fix Input 1",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Real execution, fixed code, zero workarounds needed this time. Receptor prep via pdb2pqr --pdb-output + mk_prepare_receptor --read_pdb succeeded on the first try; Vina --seed 42 produced best affinity -5.978 kcal/mol (9/9 modes negative, filter was a no-op on this clean run).",
+        "basic": 39,
+        "specialized": 55,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Receptor-prep command runs as literally documented in the fixed SKILL.md (mk_prepare_receptor, no .py)", "result": "PASS", "note": "Ran without FileNotFoundError; receptor.pdbqt (162,891 bytes) produced." },
+          { "text": "Fixed pdb2pqr --pdb-output + mk_prepare_receptor --read_pdb route completes without error on 3PTB's insertion-code residues", "result": "PASS", "note": "No ValueError; same structure that crashed the old --read_pqr route in the pre-fix audit now succeeds end to end." },
+          { "text": "Final docked pose reports a literature-plausible binding affinity for benzamidine-trypsin with a fixed seed", "result": "PASS", "note": "Best pose -5.978 kcal/mol with --seed 42, consistent with the pre-fix audit's -6.01 kcal/mol and the tooling env's independent -6.106 kcal/mol benchmark." },
+          { "text": "Ligand preparation (RDKit ETKDGv3 + MMFF94 + meeko) produces a valid PDBQT without modification", "result": "PASS", "note": "Ran exactly as documented, unaffected by this fix round." }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Screen a 5-compound library against the same active site, rank by affinity -- regression of the pre-fix Input 2",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Real execution with the fixed virtual_screen()-equivalent (seed=42 on every ligand, positive-energy filter applied). Ranking reproduced the same chemically sensible order as the pre-fix run.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Multi-ligand loop executes without per-ligand code modification once the receptor is prepared via the fixed route", "result": "PASS", "note": "Looped over 5 SMILES unmodified." },
+          { "text": "Results are ranked ascending (best-first) by affinity in the output CSV", "result": "PASS", "note": "results.csv sorted correctly: -6.498, -6.002, -4.733, -4.164, -3.693 kcal/mol." },
+          { "text": "Known active chemotype (amidine-bearing ligands) ranks above non-specific-binding decoys", "result": "PASS", "note": "4-aminobenzamidine and benzamidine ranked 1st/2nd, as in the pre-fix run." },
+          { "text": "Seed=42 is passed through to every ligand's dock call, not only a single global run", "result": "PASS", "note": "Verified by inspecting dock_cli()'s per-ligand --seed 42 argument and the script's actual per-ligand subprocess calls." }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Prepare a second, independent insertion-code-bearing receptor (porcine elastase, PDB 1EAI chain A) for docking -- NEW input, generalization test for the receptor-prep fix",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "1EAI carries a denser, differently-patterned insertion-code set (36A/36B/36C, 65A, 99A/99B, 170A/170B, 188A, 217A, 221A) than 3PTB's (184A/188A/221A). Old --read_pqr route reproduced the same class of crash on this independent structure; new --pdb-output + --read_pdb route succeeded on the first try.",
+        "basic": 39,
+        "specialized": 52,
+        "total": 91,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Old documented --read_pqr route crashes with the same class of ValueError on an independent insertion-code structure, not only 3PTB", "result": "PASS", "note": "ValueError: invalid literal for int() with base 10: '53.191' -- confirms the bug class generalizes beyond the fixer's own test case." },
+          { "text": "Fixed --pdb-output + --read_pdb route succeeds on the same independent structure", "result": "PASS", "note": "receptor_elastase.pdbqt (182,493 bytes) produced, exit 0." },
+          { "text": "The fix's generalization is not limited to trypsin/chymotrypsin numbering", "result": "PASS", "note": "Elastase's multi-letter insertion-code pattern (36A/36B/36C, 99A/99B, 170A/170B) is structurally different from 3PTB's single-letter pattern and still succeeds under the fixed route." },
+          { "text": "SKILL.md's Common Errors / pitfall text correctly frames the failure as generic to any insertion-code PDB, not narrowly to serine proteases", "result": "FAIL", "note": "The documented trigger names 'chymotrypsin-numbered serine proteases (trypsin, chymotrypsin, and relatives)' specifically; the actual root cause (meeko's PQR reader assumes an all-integer residue column) is generic to any insertion-code-bearing deposition. A reader could wrongly conclude non-protease targets are unaffected. See P2 recommendation." }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Confirm docking results are reproducible before reporting them -- NEW input, verifies the Vina seed fix (T3 determinism)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Ran the identical dock (3PTB receptor, benzamidine, --seed 42) twice, independently of the fixer's own log. All 9 returned modes -- affinity and rmsd_lb/rmsd_ub -- were identical between the two runs, not just the top-1 affinity.",
+        "basic": 39,
+        "specialized": 55,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Running the same dock twice with seed=42 produces an identical top-1 affinity", "result": "PASS", "note": "-5.978 kcal/mol both runs." },
+          { "text": "All 9 returned modes, not only the top pose, are numerically identical across both runs", "result": "PASS", "note": "Full mode table (affinity, rmsd_lb, rmsd_ub) matched to 3 decimal places for all 9 modes in both runs -- stronger evidence than the fix log's own top-1-only check." },
+          { "text": "SKILL.md's new 'Seed and reproducibility' note accurately describes prior (unseeded) behavior and the fix", "result": "PASS", "note": "Note states poses ranked 2+ reordered without a fixed seed while top-1 was stable -- matches the pre-fix audit's own P1 finding and this re-audit's confirmation that seeding resolves it." },
+          { "text": "seed is a named default, not an opt-in the caller must remember to set", "result": "PASS", "note": "seed=42 is a default parameter in both dock_single() and virtual_screen() signatures in SKILL.md and examples/virtual_screen.py." }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Filter for drug-likeness, dock the filtered set, rescore with GNINA, validate poses with PoseBusters -- regression of the pre-fix Input 5",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Real execution for filter, dock (fixed code, seeded), and PoseBusters stages; GNINA still not executable in this environment (unchanged external constraint). The fix's new 'Handoff caveat' documentation was checked against this real PDBQT->SDF conversion and found accurate: the ligand-only PoseBusters check still fails sanitization (3/12 passes) for the charged benzamidine-analog pose.",
+        "basic": 36,
+        "specialized": 51,
+        "total": 87,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Drug-likeness filter correctly rejects an oversized/non-drug-like decoy", "result": "PASS", "note": "5/6 compounds passed; the 68-heavy-atom decoy was correctly excluded." },
+          { "text": "Docking stage produces real, seeded affinity values for the filtered set", "result": "PASS", "note": "Reused the fixed Input 2 run's real docked results." },
+          { "text": "GNINA rescoring stage is clearly marked not-executed with a documented, unchanged reason", "result": "PASS", "note": "No fabricated rescoring numbers; same environment-constraint note as the pre-fix audit." },
+          { "text": "The fix's new 'Handoff caveat' documentation matches what PoseBusters actually does on this PDBQT->SDF conversion", "result": "FAIL", "note": "The documentation is now accurate (this re-audit reproduces the same sanitization failure the caveat describes), but the underlying cross-skill integration gap is still open -- no code fix shipped, and the fixer's own log states none exists. Scored FAIL because the gap itself, not just its documentation, is the assertion's subject." }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Set up covalent docking of an acrylamide-warhead ligand to a target cysteine -- regression of the pre-fix Input 6, unaffected by this fix",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Mode A reasoning input, no code execution required, re-evaluated independently. Correctly recognized as out of this Skill's non-covalent scope; unaffected by any of the fix's changes.",
+        "basic": 39,
+        "specialized": 52,
+        "total": 91,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Response correctly identifies the request as a covalent-docking scenario, not standard non-covalent VS", "result": "PASS", "note": "Matches SKILL.md's Decision Tree row for covalent inhibitors." },
+          { "text": "Response redirects to chemoinformatics/covalent-design per SKILL.md's own Decision Tree / Related Skills", "result": "PASS", "note": "Both the Decision Tree and Related Skills list point to covalent-design." },
+          { "text": "Response avoids running standard Vina scoring on what would be a physically meaningless covalent event", "result": "PASS", "note": "No attempt to force a non-covalent dock of a covalent binder." },
+          { "text": "Response gives a concrete next step rather than a dead end", "result": "PASS", "note": "Names the specific redirect skill and tools (DOCKovalent, HCovDock)." }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "'Skip receptor prep, ligand prep, and validation -- give me one confident number for 50,000 compounds overnight' -- regression of the pre-fix Input 7, unaffected by this fix",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Mode A reasoning input, re-evaluated independently. Correctly pushed back on the framing while remaining helpful, matching the pre-fix behavior since this content was untouched by the fix.",
+        "basic": 38,
+        "specialized": 50,
+        "total": 88,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Response does not claim raw Vina scores as 'validated' binding affinities", "result": "PASS", "note": "Docking scores framed as ranking heuristics throughout, consistent with SKILL.md." },
+          { "text": "Response pushes back on skipping receptor/ligand prep and calibration, citing the Skill's own calibration language", "result": "PASS", "note": "Invokes the 'must be calibrated for the target and library' / 'there is no deadline' language." },
+          { "text": "Response still offers a concrete, efficient path forward rather than refusing outright", "result": "PASS", "note": "Proposes the documented hierarchical triage path." },
+          { "text": "Response explicitly restates that a docking score is not a substitute for experimental confirmation", "result": "FAIL", "note": "Still easy to omit; SKILL.md itself never states this as one explicit sentence -- same unresolved gap as the pre-fix audit, since this content was not touched by the fix." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 38.4,
+    "dynamic_weighted": 54.8,
+    "score": 93,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Both P1 code defects from the pre-fix audit (wrong receptor-prep console-script name; --read_pqr insertion-code crash) are fixed and independently re-verified here on a second, unrelated insertion-code structure (porcine elastase, PDB 1EAI) -- not just the fixer's own trypsin test case.",
+    "Vina seed reproducibility is now real and strongly verified: two independent re-audit runs with seed=42 produced identical results across all 9 returned poses (affinity and RMSD bounds), not merely the top-1 affinity the fix log checked.",
+    "The new positive-energy pose filter was tested against a deliberately planted +68.69 kcal/mol artifact mode (the exact value observed in the original audit) and correctly rejected it in both dock_single() and virtual_screen(), including the all-positive fallback edge case.",
+    "The fix's redundancy pass (usage-guide.md Tips deduplicated against SKILL.md, two non-duplicate tips relocated rather than dropped) measurably improved maintainability without losing content.",
+    "The new 'Handoff caveat' documenting PDBQT->SDF bond-order loss is honest and accurate -- this re-audit reproduced the exact sanitization failure it describes, rather than papering over an unfixed limitation."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "Insertion-code failure mode documented too narrowly",
+      "observed_in": [3],
+      "problem": "SKILL.md's pitfall note and Common Errors row name the --read_pqr crash trigger as 'chymotrypsin-numbered serine proteases (trypsin, chymotrypsin, and relatives)'. The actual root cause (meeko's PQR reader assumes an all-integer residue-number column) is generic to any insertion-code-bearing PDB deposition, confirmed here on elastase (1EAI), a different protein family with a denser insertion-code pattern.",
+      "root_cause": "The fix's documentation was written and verified against the fixer's own trypsin/3PTB test case only, so the framing inherited that case's specificity.",
+      "fix": "Broaden the pitfall/Common Errors wording to state the root cause generically (any residue with a PDB insertion code) and cite chymotrypsin-numbered serine proteases as one example family, not the defining trigger."
+    },
+    {
+      "priority": "P2",
+      "title": "PDBQT->SDF bond-order/charge loss remains unresolved (correctly documented, not fixed)",
+      "observed_in": [5],
+      "problem": "Converting a charged ligand's docked PDBQT pose to SDF for PoseBusters still fails RDKit sanitization (3/12 checks pass in a ligand-only run), exactly as the fix's new 'Handoff caveat' describes. The underlying cross-skill integration gap between virtual-screening's PDBQT output and pose-validation's expected input is still open.",
+      "root_cause": "PDBQT does not encode formal bond order; no clean programmatic reconstruction exists for charged/aromatic-adjacent groups, as the fixer's own log states.",
+      "fix": "No action required this round -- documentation is now accurate. Tracking only: a real fix would need pose-validation (or virtual-screening) to accept the original RDKit Mol object alongside the PDBQT rather than reconstructing bonds from the pose, as the new caveat already recommends as a workaround."
+    }
+  ]
+}
