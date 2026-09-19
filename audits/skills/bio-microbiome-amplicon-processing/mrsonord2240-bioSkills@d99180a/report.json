@@ -1,0 +1,266 @@
+{
+  "meta": {
+    "skill_name": "bio-microbiome-amplicon-processing",
+    "description": "Infers exact amplicon sequence variants (ASVs) from demultiplexed 16S rRNA or ITS amplicon FASTQ with DADA2 - removing primers with cutadapt, learning a per-run error model, merging run-level tables, then one removeBimeraDenovo. Covers truncLen as a merge-overlap budget, DADA2 vs Deblur, ASV vs OTU, NovaSeq binned-quality error-fit breakage, ITSxpress for ITS, and decontam removal of reagent/kit contaminants.",
+    "evaluated_on": "2026-09-19",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 9,
+    "source": "mrsonord2240/bioSkills@d99180a:microbiome/amplicon-processing",
+    "re_audit": {
+      "prior_report": "F:/OpenScience/audits/_pre-fix-20260919/bio-microbiome-amplicon-processing/eval_report_bio-microbiome-amplicon-processing_result.json",
+      "prior_score": 87,
+      "prior_grade": "Limited Release",
+      "fix_log": "F:/optimizing-agent-science-skills/fixes/bio-microbiome-amplicon-processing.md",
+      "auditor_role": "re-auditor (independent of original auditor and fixer)"
+    }
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All cited papers remain real, verifiable, well-known publications in the field. No fabricated statistics, p-values, or results found in the fixed content; the fix added no new citations." },
+      "practice_boundaries": { "result": "PASS", "detail": "Environmental/microbiome research methodology skill, not clinical/diagnostic. No direct diagnostic or prescriptive claims about individuals; unaffected by the fix." },
+      "methodological_ground": { "result": "PASS", "detail": "No principled methodological fallacy. The fix corrects an implementation defect (truncLen ceiling), not a methodology claim; ASV vs OTU framing and decontam guidance are unchanged and remain sound." },
+      "code_usability": { "result": "PASS", "detail": "The shipped examples/dada2_workflow.R now runs to completion, unmodified, with real dependencies: no crash (the ggsave/library(ggplot2) defect found during the fix pass is independently confirmed fixed here), no zero-output failure (the truncLen defect is independently confirmed fixed here), correct output verified against ground truth." }
+    }
+  },
+  "static_score": {
+    "subtotal": 95,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 12, "max": 12, "note": "Previously docked 2 points for the shipped worked-example truncLen discarding every read on realistic input (verified by execution in the original audit). Independently re-verified fixed: the corrected c(220,200) default now runs the full documented scenario (16S paired multi-run, decontam) correctly end-to-end with no modification. Full marks restored." },
+      "reliability": { "score": 11, "max": 12, "note": "The fix adds a precise 'silent ceiling' explanation, a new Quantitative Thresholds row, and a sharpened Common Errors row naming this exact failure mode by cause - independently confirmed accurate at an exact base-pair boundary in this audit (Input 9). Docked 1 point only because recoverability is still prose-guided, not machine-structured (typical for R bioinformatics tooling, per the Category-3 scene override)." },
+      "performance_context": { "score": 7, "max": 8, "note": "Unchanged by the fix. SKILL.md remains long but well laid out with progressive disclosure via usage-guide.md and two example scripts; no redundant execution steps." },
+      "agent_usability": { "score": 16, "max": 16, "note": "Previously docked because the Skill's own proactive-failure-mode table didn't warn about its own worked truncLen numbers. That gap is now closed: the Common Errors table and Quantitative Thresholds table both name the exact ceiling defect by cause, independently confirmed accurate. Full marks." },
+      "human_usability": { "score": 7, "max": 8, "note": "Unchanged by the fix. Category-3 scene override applied to Forgiveness (strict input validation is correct here)." },
+      "security": { "score": 12, "max": 12, "note": "Unchanged. No credentials, no eval/exec of raw user strings, no injection vectors." },
+      "maintainability": { "score": 10, "max": 12, "note": "Unchanged. The fixer checked (not assumed) whether a set.seed() note was warranted, found the documented default workflow has no RNG step (randomize=FALSE default, independently re-verified via ?learnErrors in this audit), and correctly declined to add inaccurate boilerplate. That is good engineering judgment, but does not itself add a maintainability feature, so the score is unchanged from the original audit." },
+      "agent_specific": { "score": 20, "max": 20, "note": "Previously docked slightly for the missing seed-management/self-consistency note. Idempotency is independently confirmed in this audit (Input 8: two independent runs of the unmodified script produced a bit-for-bit identical ASV table). Combined with the closed truncLen gap, full marks." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 89.2,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 28, "total": 30 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Multi-run 16S V4 paired DADA2 pipeline - examples/dada2_workflow.R run VERBATIM, unmodified (regression of original Input 1)",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "executed: true. Independently regenerated primer-trimmed input from raw_reads with the Skill's own remove_primers.sh (confirmed 231bp/230bp post-trim, 1989/1989 pairs kept), then copied examples/dada2_workflow.R byte-for-byte from the worktree (diffed against source to confirm no edits) and ran it end-to-end via rr.sh with no modification. Completed with exit 0, no ggsave/library(ggplot2) crash, 99.5% reads retained, 11 ASVs (12->11 after 1 bimera removed), matching the fix log's own numbers. Cross-checked against truth.tsv: 8/8 real community ASVs retained, mitochondria/kit-contaminant decoys correctly left in for downstream steps, 1/2 seeded chimeras removed (CHIMERA_1 removed, CHIMERA_2 survived - a known consensus-bimera-detection limit at low abundance, already flagged as a separate P2 in the original audit and untouched by this fix).",
+        "basic": 39,
+        "specialized": 58,
+        "total": 97,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Pipeline produces a chimera-free ASV table with a read-tracking summary", "result": "PASS", "note": "seqtab_nochim.rds and read_tracking.csv produced with real per-sample input/filtered/denoisedF/denoisedR/merged counts, all samples at 100% filter pass rate." },
+          { "text": "All real community ASVs from the input data are retained in the output", "result": "PASS", "note": "8/8 truth.tsv community-labeled ASVs present in the final chimera-free table (exact sequence match)." },
+          { "text": "The Skill's own documented default truncLen runs successfully on realistic V4 2x250 primer-trimmed input without modification, and the shipped example script does not crash", "result": "PASS", "note": "REGRESSION FIXED: previously FAIL (old c(240,160)/c(240,200) discarded every read). The new c(220,200) default passes 12017/12017 reads through the filter, and the ggsave() call (found broken during the fix pass, not in the original audit) completes and writes real PNG files with library(ggplot2) now loaded." },
+          { "text": "Chimera removal is applied exactly once, after combining per-run tables (not per-run)", "result": "PASS", "note": "mergeSequenceTables() called once across both runs, removeBimeraDenovo() called once on the combined table." }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Low-biomass decontam using real blank-control metadata (regression of original Input 2)",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "executed: true. Independently re-ran decontam::isContaminant(method='combined') on my own freshly-generated chimera-free table (not reusing the archived pre-fix output) using the fixture's real is_control/dna_conc metadata. Result identical to the original audit: exactly 1/11 ASVs flagged, matching the fixture's designated kit contaminant (Ralstonia) with zero false positives. This section of the Skill (and its underlying data) was untouched by the fix, and behavior is confirmed unchanged.",
+        "basic": 39,
+        "specialized": 59,
+        "total": 98,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "decontam flags at least one contaminant ASV using the negative controls", "result": "PASS", "note": "1 of 11 ASVs flagged." },
+          { "text": "The flagged contaminant matches a real reagent/kit-associated taxon, not a real community member", "result": "PASS", "note": "Flagged ASV = ASV_true_10 (Ralstonia), the fixture's own designated kit_contaminant." },
+          { "text": "No true community ASVs are misclassified as contaminants", "result": "PASS", "note": "0 false positives among the 8 community ASVs + mitochondria decoy." },
+          { "text": "Code follows the Skill's documented sample-orientation convention (samples x ASVs) without needing transposition", "result": "PASS", "note": "Ran without orientation errors on the first try." }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "V3-V4 near-zero merge rate diagnosis (truncation budget) (regression of original Input 3)",
+        "status": "COMPLETED",
+        "status_flag": "\u26a0\ufe0f",
+        "note": "executed: false. Still no V3-V4 (341F/805R) fixture exists in the audit env; the fix did not touch this section's content (only the V4 example and the ceiling explanation changed). Re-verified the Skill's stated merge-overlap arithmetic independently: unchanged and still correct.",
+        "basic": 36,
+        "specialized": 48,
+        "total": 84,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "The stated merge-overlap budget arithmetic for V3-V4 2x250 is numerically correct", "result": "PASS", "note": "500bp raw pair - (460bp amplicon + 12bp minOverlap) = 28bp slack, matching the Skill's stated '~28bp slack' exactly." },
+          { "text": "The recommended fix (preserve read length, loosen maxEE on the reverse read) is consistent with DADA2's documented merge-overlap mechanics", "result": "PASS", "note": "Correct per DADA2's mergePairs minOverlap requirement; unchanged by the fix." },
+          { "text": "Guidance does not claim the resulting merge rate will reach 100%", "result": "PASS", "note": "Text frames the budget as a threshold to clear, not a guarantee." }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Fungal ITS2 processing with ITSxpress + truncLen=0 (regression of original Input 4)",
+        "status": "PARTIAL",
+        "status_flag": "\u274c",
+        "note": "executed: false (flags only). Still no ITS fixture data exists in the audit env; the fixer deliberately left this P2 unfixed (checked and re-confirmed ITSxpress's own --help still lists all documented flags, rather than fabricating a synthetic fixture that wouldn't meaningfully exercise the HMM step). Independently re-verified this claim myself (not trusting the fix log): ran `itsxpress --help` in the WSL science distro's dedicated itsxpress env and confirmed --fastq/--fastq2/--region/--taxa/--outfile/--threads all present, ITS2 and Fungi both valid enum values.",
+        "basic": 34,
+        "specialized": 45,
+        "total": 79,
+        "assertions_passed": 2,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "All documented ITSxpress CLI flags exist in the installed tool version", "result": "PASS", "note": "Independently confirmed via a fresh --help call, not reused from the audit or fix log." },
+          { "text": "--region ITS2 and --taxa Fungi are valid enum values for the installed version", "result": "PASS", "note": "Both confirmed as valid choices in real --help output." },
+          { "text": "The full ITS trimming + DADA2 truncLen=0 pipeline was verified end-to-end on real or synthetic ITS data", "result": "FAIL", "note": "Still not executed; no ITS fixture data available. Unchanged status from the original audit - correctly left as an open P2, not silently claimed as fixed." }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Empirical test: leftover primers inflate false-chimera detection (regression of original Input 5)",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "executed: true. Independently re-ran from scratch (not reusing any archived output): same 5 samples, identical DADA2 parameters (including the NEW fixed truncLen=c(220,200)), varying only whether cutadapt ran first. Reproduced the exact magnitude reported in the original audit and the fix log.",
+        "basic": 39,
+        "specialized": 56,
+        "total": 95,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Leaving primers on measurably inflates the fraction of reads flagged as chimeric, relative to properly primer-trimmed input", "result": "PASS", "note": "0.5% (primers removed) vs 31.7% (primers left on), identical samples/parameters, independently reproduced exactly." },
+          { "text": "The effect size is large enough to be a real methodological signal, not noise", "result": "PASS", "note": "170/403 vs 1/12 bimeras - an order-of-magnitude difference." },
+          { "text": "Guidance correctly attributes a large chimeric-read fraction to leftover primers rather than 'bad data'", "result": "PASS", "note": "Matches the Skill's Common Errors table entry (unchanged by the fix)." },
+          { "text": "The comparison used identical filtering/denoising parameters in both conditions (controlled comparison)", "result": "PASS", "note": "Same truncLen/maxEE/truncQ, same 5 samples, only the primer-removal step varied." }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Request for definitive species ID + switch to 97% OTUs (regression of original Input 6)",
+        "status": "COMPLETED",
+        "status_flag": "\u26a0\ufe0f",
+        "note": "executed: false. Scope question, no code to run; this section's content is untouched by the fix. Re-inspected SKILL.md's routing and ASV-vs-OTU section - unchanged and still sound.",
+        "basic": 36,
+        "specialized": 46,
+        "total": 82,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "Skill does not itself claim to assign species-level taxonomy from ASVs", "result": "PASS", "note": "Explicitly routed to taxonomy-assignment." },
+          { "text": "Skill presents ASV vs 97% OTU as a genuine methodological tradeoff with citations on both sides", "result": "PASS", "note": "Callahan 2017 vs Schloss 2021 / Pan 2023, framed as 'both sides are live'; unchanged by the fix." },
+          { "text": "Skill flags the specific real risk of over-interpreting ASV richness (16S copy-number inflation)", "result": "PASS", "note": "Explicit dedicated section plus a Per-Method Failure Modes entry." }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Proposal to replace decontam with an arbitrary 1% abundance filter (regression of original Input 7)",
+        "status": "COMPLETED",
+        "status_flag": "\u274c",
+        "note": "executed: false. Adversarial methodology question, no code to run; decontam section untouched by the fix. Re-checked against the real fixture's own abundance numbers - unchanged.",
+        "basic": 33,
+        "specialized": 43,
+        "total": 76,
+        "assertions_passed": 2,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "Guidance grounds contamination removal in evidence from negative controls / DNA concentration, not a raw abundance threshold", "result": "PASS", "note": "Confirmed in the decontam section's method selection rule." },
+          { "text": "The shortcut (abundance filtering) is not equivalent to decontam and the Skill's content supports explaining why", "result": "PASS", "note": "The true kit contaminant (Ralstonia, 1005 reads) and the lowest-abundance true community ASV (Escherichia-Shigella, 843 reads) are the same order of magnitude - a flat cutoff cannot separate them." },
+          { "text": "SKILL.md explicitly anticipates and pre-empts this specific shortcut by name", "result": "FAIL", "note": "Still not addressed by name; unchanged from the original audit, and out of scope for this fix (which targeted truncLen, not decontam)." }
+        ]
+      },
+      {
+        "index": 8,
+        "type": "Stress (auditor-added)",
+        "label": "NEW - Determinism check: run the unmodified fixed pipeline twice from scratch, compare bit-for-bit",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "executed: true. Re-auditor's own input, not run by the fixer. Ran examples/dada2_workflow.R unmodified twice in two separate working directories from the same primer-trimmed input, then diffed the resulting seqtab_nochim.rds objects directly in R. This is a direct check of Skill Veto T3 (Result Determinism), which prior reports asserted (PASS) but never tested with a real repeat-run comparison.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "Two independent runs of the identical unmodified script on identical input produce bit-identical ASV tables", "result": "PASS", "note": "identical(dim), identical(ASV set), and identical(values) all TRUE." },
+          { "text": "The fixer's claim that DADA2 learnErrors() defaults to randomize=FALSE (no RNG step in the documented workflow) is independently correct", "result": "PASS", "note": "Confirmed via formals(learnErrors)$randomize in the installed DADA2 1.34.0, not by trusting the fix log or the ?learnErrors doc text alone." },
+          { "text": "The Skill's documented default workflow (pool=FALSE, no randomize=TRUE anywhere in its examples) does not silently depend on multithread execution order for correctness", "result": "PASS", "note": "Both runs used multithread=TRUE and still matched exactly." }
+        ]
+      },
+      {
+        "index": 9,
+        "type": "Edge (auditor-added)",
+        "label": "NEW - truncLen 'silent ceiling' boundary test at the exact post-cutadapt read length",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "executed: true. Re-auditor's own input, not run by the fixer (the fix log tested only the specific chosen truncLen values, 240 vs 220, not the exact boundary). Ran filterAndTrim at truncLen=c(231,230) (exactly the real post-cutadapt length for this fixture), c(232,230) (1bp over on the forward read only), and the shipped c(220,200) default, on the same 5-sample run.",
+        "basic": 39,
+        "specialized": 58,
+        "total": 97,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "truncLen exactly at the post-cutadapt read length (231,230) passes the large majority of reads through the filter", "result": "PASS", "note": "11974/12017 (99.6%) passed - not silently zeroed." },
+          { "text": "truncLen exceeding the post-cutadapt length by even 1bp (232,230) silently drops every read, exactly matching the fixed SKILL.md's new 'silent ceiling' claim", "result": "PASS", "note": "0/12017 passed, with the exact 'No reads passed the filter. Please revisit your filtering parameters.' warning the fix's new prose describes." },
+          { "text": "The shipped fixed default (220,200) sits safely below the ceiling with real margin, not just barely passing", "result": "PASS", "note": "12017/12017 (100%) passed - ~10-11bp of margin below the 231/230bp ceiling on each read." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 38.0,
+    "dynamic_weighted": 53.5,
+    "score": 92,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "\u2b50",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "The P1 truncLen defect (shipped default discarding every read on realistic V4/2x250 input) is genuinely fixed: independently reproduced from scratch in this re-audit, including a new boundary-exact test (Input 9) showing the fix has real margin, not just a lucky specific value.",
+    "A second crash (missing library(ggplot2) for ggsave()) found during the fixer's own verification is confirmed fixed here by running the unmodified shipped example script end-to-end without error.",
+    "Core multi-run DADA2 pipeline, decontam contaminant identification, and the primer-left-on false-chimera experiment all regression-tested independently from scratch in this audit and match the pre-fix numbers exactly where the fix did not touch that logic (8/8 community ASVs, exact Ralstonia kit-contaminant match, 0.5%/31.7% chimera rates).",
+    "Determinism (Skill Veto T3), previously asserted but not empirically tested, is now confirmed bit-for-bit across two independent full pipeline runs (new Input 8).",
+    "The two P2s the fixer chose not to fix (ITS fixture, seed/reproducibility note) were independently re-verified in this audit rather than trusted: the ITSxpress flag claim and the learnErrors randomize=FALSE default were both re-derived from real tool output, not the fix log's prose."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "No ITS fixture exists to verify the ITS analysis path end-to-end",
+      "observed_in": [4],
+      "problem": "The ITS pipeline (itsxpress + truncLen=0) still ships no example data, so only CLI flag syntax can be verified, not a full run.",
+      "root_cause": "examples/ only contains a 16S-paired-end-oriented script and a primer-trimming script; no ITS equivalent. Correctly left unfixed - building a synthetic fixture ITSxpress's HMM step would meaningfully exercise needs real conserved SSU/5.8S/LSU flanking sequence, not arbitrary synthetic reads.",
+      "fix": "If a real ITS reference sequence becomes available, add a minimal ITS fixture and a matching example script; otherwise leave documented-but-untested as is."
+    },
+    {
+      "priority": "P2",
+      "title": "removeBimeraDenovo's low-abundance recall limit remains undocumented",
+      "observed_in": [1],
+      "problem": "One of two synthetic chimeras seeded in the fixture (a low-abundance chimera) is still not caught by removeBimeraDenovo(method='consensus'), unchanged from the original audit; this fix pass did not target chimera removal.",
+      "root_cause": "Documented statistical limitation of consensus bimera detection at low abundance, not a Skill authoring defect.",
+      "fix": "Add one sentence to the chimera-removal section noting that removeBimeraDenovo can miss low-abundance chimeras, and that method='pooled' or manual inspection of borderline-abundance ASVs is a useful supplementary check."
+    },
+    {
+      "priority": "P2",
+      "title": "Adversarial abundance-filter-instead-of-decontam shortcut is not pre-empted by name",
+      "observed_in": [7],
+      "problem": "SKILL.md's decontam section still does not name and reject the specific shortcut of replacing decontam with a flat abundance-percentage filter, unchanged from the original audit.",
+      "root_cause": "Out of scope for this fix pass, which targeted the truncLen ceiling defect only.",
+      "fix": "Add one sentence to the decontam section naming this shortcut and explaining why control-based statistical testing (decontam) is not interchangeable with an arbitrary abundance cutoff."
+    }
+  ]
+}

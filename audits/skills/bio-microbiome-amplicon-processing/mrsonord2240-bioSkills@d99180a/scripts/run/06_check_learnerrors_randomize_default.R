@@ -1,0 +1,5 @@
+library(dada2)
+cat("Formal args of learnErrors:\n")
+print(args(learnErrors))
+cat("\nDefault randomize value:\n")
+print(formals(learnErrors)$randomize)

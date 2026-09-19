@@ -1,0 +1,5 @@
+a <- readRDS("seqtab_nochim.rds")
+b <- readRDS("determinism_run2/seqtab_nochim.rds")
+cat("Identical dims:", identical(dim(a), dim(b)), "\n")
+cat("Identical ASV set:", identical(sort(colnames(a)), sort(colnames(b))), "\n")
+cat("Identical values (reordered to match):", identical(a[, sort(colnames(a))], b[, sort(colnames(b))]), "\n")

@@ -8,7 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (73)
+## P1 (72)
 
 ### `bio-geo-data` — examples/geo_from_pubmed.py hardcodes the wrong PMID
 
@@ -193,14 +193,6 @@ None open.
 - Problem: SKILL.md says "Channel is 'channel.1' ... 'channel.N' and maps to the evidence's 'Reporter intensity corrected <n>' columns". MaxQuant writes those columns 0-indexed for a 10-plex ("Reporter intensity corrected 0" through "9"), so the channel names MSstatsTMT derives are channel.0 .. channel.9. An annotation built to the Skill's spec is rejected with "** Please check the annotation file. The channel name must be matched with that in input data." -- a message that says nothing about an off-by-one. Reproduced by running both indexings on the same evidence: channel.1..10 fails, channel.0..9 completes.
 - Root cause: The channel naming was written from the MSstatsTMT convention rather than from a MaxQuant evidence file's actual column suffixes.
 - Fix: Change the comment to: "Channel names follow the reporter-column suffixes MaxQuant wrote -- for a 10-plex those are `Reporter intensity corrected 0` .. `9`, so the annotation needs `channel.0` .. `channel.9`. Read the suffixes off your own evidence header before writing the annotation; a mismatch gives `the channel name must be matched with that in input data`, which does not mention the index."
-
-### `bio-amplicon-processing` — Shipped default truncLen fails on realistic V4/2x250 input
-
-- Skill: 87, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/microbiome/amplicon-processing) · [viewer](skills/bio-amplicon-processing/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 1, 5
-- Problem: SKILL.md's inline example (truncLen=c(240,160)) and the shipped examples/dada2_workflow.R (truncLen <- c(240, 200)) both set the forward-read truncation length (240bp) above the actual usable read length after correctly removing the documented 515F primer (19bp) from a real 250bp MiSeq read (231bp remain). filterAndTrim discards any read shorter than truncLen, so every read is dropped and the pipeline produces zero output.
-- Root cause: The worked example's truncLen numbers appear to have been chosen against the raw (pre-primer-removal) 250bp read length rather than the actual post-cutadapt length, an inconsistency between the Skill's own primer-removal step and its own truncation-budget worked numbers.
-- Fix: Change the worked defaults to values that fit within the primer-trimmed read length (e.g. c(220,200)), and add an explicit line to the 'Per-Method Failure Modes' table: 'truncLen must be chosen against the primer-trimmed read length, not the raw sequencer read length.'
 
 ### `bio-biomart-queries` — Bulk ID-mapping fails at the Skill's own advertised scale (414 Request-URI Too Large)
 
@@ -1075,30 +1067,6 @@ None open.
 - Problem: 391 -> 478 lines, three large taxonomy tables and a 23-entry reference list, all loaded on every invocation, with no references/ split.
 - Root cause: The TMT route necessarily grew the file and splitting is a restructure.
 - Fix: Move the Tool Taxonomy, the Per-Method Failure Modes and the reference list into references/ and leave the decision tree, the input contract and the code blocks in SKILL.md.
-
-### `bio-amplicon-processing` — No reproducibility/seed guidance
-
-- Skill: 87, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/microbiome/amplicon-processing) · [viewer](skills/bio-amplicon-processing/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: —
-- Problem: None of the shown DADA2 examples set an explicit random seed, and the Skill gives no reproducibility-hygiene note beyond version-compatibility checks.
-- Root cause: Omission in the worked examples.
-- Fix: Add a one-line note recommending set.seed() before learnErrors()/dada() calls and pinning package versions when reproducibility across runs/machines matters.
-
-### `bio-amplicon-processing` — ITS pipeline has no bundled example/fixture to verify against
-
-- Skill: 87, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/microbiome/amplicon-processing) · [viewer](skills/bio-amplicon-processing/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 4
-- Problem: Unlike the 16S path, the ITS pipeline (itsxpress + truncLen=0) ships no example data, so this audit could only verify CLI flag syntax, not a full run.
-- Root cause: examples/ only contains a 16S-paired-end-oriented script (dada2_workflow.R) and a primer-trimming script (remove_primers.sh); no ITS equivalent.
-- Fix: Add a minimal synthetic ITS example (or a note in usage-guide.md's prerequisites) so ITS runs can be smoke-tested end-to-end before production use.
-
-### `bio-amplicon-processing` — Chimera removal's known low-abundance recall limit is undocumented
-
-- Skill: 87, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/microbiome/amplicon-processing) · [viewer](skills/bio-amplicon-processing/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 1
-- Problem: removeBimeraDenovo(method='consensus') missed one of two synthetic chimeras seeded in the audit's real-data test (a low-abundance, 115-total-read chimera).
-- Root cause: This is a documented statistical limitation of consensus bimera detection at low abundance, not a Skill authoring defect, but the Skill doesn't mention it.
-- Fix: Add one sentence to the chimera-removal section noting that removeBimeraDenovo can miss low-abundance chimeras, and that method='pooled' or manual inspection of borderline-abundance 'chimera-like' ASVs is a useful supplementary check.
 
 ### `bio-biomart-queries` — Ensembl Genomes 'swap the host' claim does not work for a real dataset
 
@@ -2531,6 +2499,30 @@ None open.
 - Problem: Real execution on a genuine 1-case/1-control (n=2 total) cohort found minFraction=1.0 and 0.5 produce IDENTICAL results (1714 features), because minFraction operates per sample-group and a single-sample group cannot express the 'present in only one of two' distinction the new prose illustrates -- that distinction only holds for 2 replicates of the SAME condition.
 - Root cause: The new Correspondence-section sentence was written with a same-group-replicate example in mind and doesn't flag that a mixed-group case/control pair behaves differently.
 - Fix: Add one clause distinguishing '2 replicates of one condition' (minFraction meaningfully varies 0.5 vs 1.0) from '1 sample per condition, no true replicates' (minFraction in (0,1] is equivalent; there is no within-group fraction to tune).
+
+### `bio-microbiome-amplicon-processing` — No ITS fixture exists to verify the ITS analysis path end-to-end
+
+- Skill: 92, Production Ready · [mrsonord2240/bioSkills@d99180a](https://github.com/mrsonord2240/bioSkills/tree/d99180a5685df2b0c7e076077e2aa326020fc9c7/microbiome/amplicon-processing) · [viewer](skills/bio-microbiome-amplicon-processing/mrsonord2240-bioSkills@d99180a/viewer.md)
+- Observed in inputs: 4
+- Problem: The ITS pipeline (itsxpress + truncLen=0) still ships no example data, so only CLI flag syntax can be verified, not a full run.
+- Root cause: examples/ only contains a 16S-paired-end-oriented script and a primer-trimming script; no ITS equivalent. Correctly left unfixed - building a synthetic fixture ITSxpress's HMM step would meaningfully exercise needs real conserved SSU/5.8S/LSU flanking sequence, not arbitrary synthetic reads.
+- Fix: If a real ITS reference sequence becomes available, add a minimal ITS fixture and a matching example script; otherwise leave documented-but-untested as is.
+
+### `bio-microbiome-amplicon-processing` — removeBimeraDenovo's low-abundance recall limit remains undocumented
+
+- Skill: 92, Production Ready · [mrsonord2240/bioSkills@d99180a](https://github.com/mrsonord2240/bioSkills/tree/d99180a5685df2b0c7e076077e2aa326020fc9c7/microbiome/amplicon-processing) · [viewer](skills/bio-microbiome-amplicon-processing/mrsonord2240-bioSkills@d99180a/viewer.md)
+- Observed in inputs: 1
+- Problem: One of two synthetic chimeras seeded in the fixture (a low-abundance chimera) is still not caught by removeBimeraDenovo(method='consensus'), unchanged from the original audit; this fix pass did not target chimera removal.
+- Root cause: Documented statistical limitation of consensus bimera detection at low abundance, not a Skill authoring defect.
+- Fix: Add one sentence to the chimera-removal section noting that removeBimeraDenovo can miss low-abundance chimeras, and that method='pooled' or manual inspection of borderline-abundance ASVs is a useful supplementary check.
+
+### `bio-microbiome-amplicon-processing` — Adversarial abundance-filter-instead-of-decontam shortcut is not pre-empted by name
+
+- Skill: 92, Production Ready · [mrsonord2240/bioSkills@d99180a](https://github.com/mrsonord2240/bioSkills/tree/d99180a5685df2b0c7e076077e2aa326020fc9c7/microbiome/amplicon-processing) · [viewer](skills/bio-microbiome-amplicon-processing/mrsonord2240-bioSkills@d99180a/viewer.md)
+- Observed in inputs: 7
+- Problem: SKILL.md's decontam section still does not name and reject the specific shortcut of replacing decontam with a flat abundance-percentage filter, unchanged from the original audit.
+- Root cause: Out of scope for this fix pass, which targeted the truncLen ceiling defect only.
+- Fix: Add one sentence to the decontam section naming this shortcut and explaining why control-based statistical testing (decontam) is not interchangeable with an arbitrary abundance cutoff.
 
 ### `bio-workflows-metabolomics-pipeline` — MS-DIAL alternate entry point still has zero glue code
 

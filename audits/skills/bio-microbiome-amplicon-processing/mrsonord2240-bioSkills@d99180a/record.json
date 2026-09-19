@@ -1,14 +1,19 @@
 {
-  "skill_id": "bio-amplicon-processing",
-  "version": "GPTomics-bioSkills@d91ed3d",
+  "skill_id": "bio-microbiome-amplicon-processing",
+  "version": "mrsonord2240-bioSkills@d99180a",
   "source": {
-    "repository": "GPTomics/bioSkills",
-    "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
+    "repository": "mrsonord2240/bioSkills",
+    "commit": "d99180a5685df2b0c7e076077e2aa326020fc9c7",
     "path": "microbiome/amplicon-processing",
     "author": "GPTomics",
     "author_url": "https://github.com/GPTomics",
     "license": "MIT",
-    "url": "https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/microbiome/amplicon-processing"
+    "modified_by": "Samuel Nord",
+    "fork_of": {
+      "repository": "GPTomics/bioSkills",
+      "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    "url": "https://github.com/mrsonord2240/bioSkills/tree/d99180a5685df2b0c7e076077e2aa326020fc9c7/microbiome/amplicon-processing"
   },
   "audit": {
     "method": {
@@ -26,11 +31,11 @@
     "commissioned_by": "Samuel Nord",
     "test_data": "synthetic"
   },
-  "supersedes": null,
+  "supersedes": "GPTomics-bioSkills@d91ed3d",
   "files": {
     "report": "report.json",
     "viewer": "viewer.md",
-    "fixes": null,
-    "scripts": 6
+    "fixes": "fixes.md",
+    "scripts": 8
   }
 }
