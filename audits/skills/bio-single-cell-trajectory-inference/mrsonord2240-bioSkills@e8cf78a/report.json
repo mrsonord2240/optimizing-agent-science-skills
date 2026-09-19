@@ -1,0 +1,211 @@
+{
+  "meta": {
+    "skill_name": "bio-single-cell-trajectory-inference",
+    "description": "Infers developmental trajectories, pseudotime, RNA velocity, and directed fate probabilities from single-cell data using PAGA, Slingshot, Monocle3, DPT, Palantir, scVelo, and CellRank 2. Use when ordering cells along a differentiation continuum, choosing a trajectory method by topology, rooting pseudotime, estimating RNA velocity direction, computing fate probabilities near a bifurcation, or judging whether an inferred trajectory is real.",
+    "evaluated_on": "2026-09-19",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 9,
+    "source": "mrsonord2240/bioSkills@e8cf78a:single-cell/trajectory-inference",
+    "re_audit": true,
+    "prior_report": "F:/OpenScience/audits/_pre-fix-20260919/bio-single-cell-trajectory-inference/eval_report_bio-single-cell-trajectory-inference_result.json",
+    "fix_log": "F:/optimizing-agent-science-skills/fixes/bio-single-cell-trajectory-inference.md"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All references unchanged from the original audit's PASS finding; no fabricated statistics, DOIs, or results in any of the 9 executed outputs." },
+      "practice_boundaries": { "result": "PASS", "detail": "Population-level computational biology methodology only; no individual diagnostic/prescriptive claims; out of clinical scope entirely." },
+      "methodological_ground": { "result": "PASS", "detail": "Rigorous methodological framing preserved and further validated: new Input A independently confirmed the Governing Principle's root-sensitivity claim (rule 3) empirically on real data, rather than merely re-asserting it." },
+      "code_usability": { "result": "PASS", "detail": "All 9 executed code-based inputs completed successfully with correct, real-data-validated results. Both original P1 code-usability defects (scVelo dynamical/stochastic crashes, CellRank fate-mapping crashes) are resolved: scVelo's compatibility note is independently verified accurate (including a deeper investigation into whether a call-site monkeypatch could recover dynamical mode -- it partially can, but the downstream latent_time() step re-triggers the same unfixable numpy internals bug, confirming the fixer's practical conclusion), and CellRank's fixed code runs with no RuntimeError/ValueError on real branching data." }
+    }
+  },
+  "static_score": {
+    "subtotal": 94,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 12, "max": 12, "note": "Comprehensive real coverage of topology (PAGA), pseudotime (DPT), fate probabilities (Palantir, CellRank, now including VelocityKernel), R methods (Slingshot, tradeSeq) and RNA velocity (scVelo). The prior 1-point deduction for undocumented broken modes is resolved: the RNA Velocity section now accurately documents which mode works and why, independently verified correct." },
+      "reliability": { "score": 11, "max": 12, "note": "The 'Version Compatibility' preamble continues to guide real recovery. Both original P1 recovery gaps are closed: scVelo has a documented, verified working fallback (deterministic + velocity_pseudotime), and CellRank has allow_overlap=True inline plus a Windows guard note. Docked 1 point: the CellRank guard is described in a comment rather than built into the code fence (see P2)." },
+      "performance_context": { "score": 7, "max": 8, "note": "SKILL.md grew from ~207 to ~242 lines to carry the new compatibility notes, still concise for a 7-method Complex skill relative to its real, now-accurate scope." },
+      "agent_usability": { "score": 15, "max": 16, "note": "Governing Principle + Method Decision Table + Common Errors table remain exemplary; the Common Errors table now correctly covers all 4 real failure modes hit during the original audit (scVelo modes, CellRank Windows guard, PAGA threshold, tradeSeq raw counts) -- Inputs 3-6 all regression-tested clean this round. Docked 1 point for the residual density of caveats an agent must track across the RNA Velocity and CellRank sections." },
+      "human_usability": { "score": 8, "max": 8, "note": "Clear structure preserved; the mandatory redundancy pass removed genuine duplication from usage-guide.md (Tips section, restated Governing Principle content) without losing any unique information -- verified nothing deleted was unique to usage-guide.md." },
+      "security": { "score": 12, "max": 12, "note": "No credentials, no unsafe eval/exec patterns, no destructive operations in any reviewed or executed code; unchanged from the original audit." },
+      "maintainability": { "score": 10, "max": 12, "note": "scvelo_velocity.py now matches the installed scvelo 0.3.4 API and was independently re-verified end-to-end (Input 4). Docked 2 points: the compatibility note is inherently version-pinned (scvelo 0.3.4 + numpy 2.5.3 + pandas 3.0.5) and will need re-verification whenever any of the three changes -- the Skill correctly flags this itself, but it remains an ongoing maintenance burden of documenting around a live upstream defect rather than a version pin." },
+      "agent_specific": { "score": 19, "max": 20, "note": "primary_tool changed from Monocle3 (doesn't install on Windows, contradicted the topology-first philosophy) to PAGA (the Governing Principle's own 'mandatory first step') -- now internally consistent and verified installable/runnable in this environment. Docked 1 point: monocle3_trajectory.R still ships as an example but Monocle3 itself remains uninstallable on Windows and untested by any audit to date (unchanged limitation, not introduced by this fix)." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 90.3,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 32, "total": 33 },
+    "inputs": [
+      {
+        "index": 1, "type": "Canonical", "label": "PAGA continuum test + DPT rooted on a known marker (Paul15, regression)",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Fresh script, real Paul15 data, unchanged SKILL.md section. Matches original audit's numbers closely.",
+        "basic": 36, "specialized": 55, "total": 91,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "PAGA shows Paul15 as one connected continuum, consistent with known biology", "result": "PASS", "note": "All clusters retain connectivity above threshold=0.03" },
+          { "text": "Root is anchored on a real progenitor marker (MEP), not chosen by eye", "result": "PASS", "note": "adata.uns['iroot'] set from a real MEP-labelled cell" },
+          { "text": "Mean DPT pseudotime is lower in the MEP progenitor pool than in mature/terminal fate labels", "result": "PASS", "note": "MEP mean 0.033 vs mature mean 0.379" },
+          { "text": "DPT pseudotime is monotonic along the real erythroid maturation series", "result": "PASS", "note": "0.587 -> 0.439 -> 0.390 -> 0.351 -> 0.237 -> 0.099" }
+        ]
+      },
+      {
+        "index": 2, "type": "Variant A", "label": "Palantir fate probabilities + entropy at a real branch point (Paul15, regression)",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Fresh script, matches original's entropy-falls-with-commitment finding.",
+        "basic": 36, "specialized": 55, "total": 91,
+        "assertions_passed": 3, "assertions_total": 3,
+        "assertions": [
+          { "text": "Palantir code runs exactly as SKILL.md documents it against the installed API", "result": "PASS", "note": "run_diffusion_maps -> determine_multiscale_space -> run_palantir matched palantir 1.4.5's real signatures" },
+          { "text": "Fate-probability entropy falls from the progenitor pool to committed/mature cells", "result": "PASS", "note": "Mean entropy 0.6995 (MEP) -> 0.0599 (mature)" },
+          { "text": "Auto-detected terminal states are consistent with the known branch structure", "result": "PASS", "note": "3 terminal states, consistent with Paul15's branch structure" }
+        ]
+      },
+      {
+        "index": 3, "type": "Edge", "label": "PAGA continuum-vs-discrete test on real PBMC 1k (regression, caveat re-tested)",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Numeric finding unchanged (0/15 isolated at 0.03, matching original); SKILL.md's claim was corrected to match reality rather than the code being changed -- re-scored against the corrected claim.",
+        "basic": 33, "specialized": 51, "total": 84,
+        "assertions_passed": 3, "assertions_total": 3,
+        "assertions": [
+          { "text": "PAGA code executes without error on real discrete PBMC data", "result": "PASS", "note": "15 leiden clusters, ran cleanly" },
+          { "text": "SKILL.md no longer claims a single fixed threshold suffices to detect discrete populations; it prescribes sweeping + marker corroboration, matching real behavior", "result": "PASS", "note": "0/15 isolated at 0.03 even now; the caveat's own numeric range (0/15 at 0.03) matches this run" },
+          { "text": "No forced trajectory ordering is asserted when continuum status is doubtful", "result": "PASS", "note": "Conceptual guidance holds; no forced-ordering claim produced" }
+        ]
+      },
+      {
+        "index": 4, "type": "Variant B", "label": "scVelo RNA velocity, deterministic mode, real pancreatic data (P1 fix, regression)",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Ran end-to-end exit 0. Independently investigated the 'unfixable from call site' claim one level deeper than the fix log (see viewer) -- confirmed correct.",
+        "basic": 38, "specialized": 57, "total": 95,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "scv.pp.filter_and_normalize + separate HVG step runs exactly as documented", "result": "PASS", "note": "No TypeError; matches fixed SKILL.md" },
+          { "text": "mode='deterministic' is documented as the working path with an accurate compatibility note", "result": "PASS", "note": "Independently reproduced all 3 named internal scvelo/numpy/pandas bugs" },
+          { "text": "The 'not fixable from the call site' claim holds under independent, deeper investigation", "result": "PASS", "note": "A private-internals monkeypatch gets recover_dynamics() to complete, but latent_time() re-triggers the same unfixable numpy leastsq_generalized bug -- no usable end-to-end path exists" },
+          { "text": "Resulting pseudotime matches the real known progenitor-to-terminal direction", "result": "PASS", "note": "Ductal 0.13 -> Ngn3 low EP 0.19 -> Ngn3 high EP 0.66 -> terminal ~0.90-0.96" }
+        ]
+      },
+      {
+        "index": 5, "type": "Stress", "label": "Slingshot lineage curves + tradeSeq pseudotime DE (P2 fix, independently re-run)",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Fix log noted this caveat was 'not independently re-run'; this re-audit is the first to confirm both halves on real data.",
+        "basic": 38, "specialized": 55, "total": 93,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Slingshot runs exactly as documented, multiple lineages consistent with known branching", "result": "PASS", "note": "5 lineages detected; MEP near the origin" },
+          { "text": "SKILL.md now explicitly states fitGAM needs raw counts, distinct from the scaled matrix -- confirmed both halves", "result": "PASS", "note": "Scaled matrix confirmed to fail identically to the original; raw counts confirmed to succeed" },
+          { "text": "Once given raw counts, tradeSeq's associationTest yields a sensible, non-degenerate fraction of significant genes", "result": "PASS", "note": "40/300 (~13%) significant at p<0.05" },
+          { "text": "MEP progenitor mean pseudotime is near the minimum across its lineage", "result": "PASS", "note": "MEP mean 1.19 on lineage 1, near the low end" }
+        ]
+      },
+      {
+        "index": 6, "type": "Scope Boundary", "label": "CellRank 2 GPCCA directed fate mapping on real branching data (P1 fix, regression)",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "No RuntimeError, no ValueError -- both original P1 defects confirmed resolved. One minor documentation-completeness gap found.",
+        "basic": 35, "specialized": 53, "total": 88,
+        "assertions_passed": 3, "assertions_total": 4,
+        "assertions": [
+          { "text": "PseudotimeKernel + ConnectivityKernel + GPCCA macrostate computation run exactly as documented", "result": "PASS", "note": "Ran correctly with the fixed code" },
+          { "text": "predict_initial_states(n_states=1, allow_overlap=True) runs on real branching data without the original ValueError", "result": "PASS", "note": "allow_overlap=True is now inline in the code block; no overlap error" },
+          { "text": "Fate-probability entropy falls from the progenitor pool to committed/mature cells", "result": "PASS", "note": "Mean entropy 1.786 (MEP) -> 0.819 (mature), matches original" },
+          { "text": "The documented code fence is self-contained and copy-paste-safe on Windows (including the multiprocessing guard)", "result": "FAIL", "note": "The fence carries a comment instructing the agent to add if __name__=='__main__': but is not itself wrapped; a literal copy-paste still crashes until the agent applies the guard" }
+        ]
+      },
+      {
+        "index": 7, "type": "Adversarial", "label": "Velocity-confidence over-trust trap on mature/non-dividing tissue (regression, content unchanged)",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Content unchanged by the fix (confirmed by diff); all 3 cited passages still present and unchanged.",
+        "basic": 39, "specialized": 56, "total": 95,
+        "assertions_passed": 5, "assertions_total": 5,
+        "assertions": [
+          { "text": "Response does not confirm the adversarial premise as established fact", "result": "PASS", "note": "Explicitly declines to write it up as evidence" },
+          { "text": "Response cites the Skill's own stated default that velocity is unreliable in mature/non-dividing systems", "result": "PASS", "note": "Bergen 2021 passage unchanged, still present" },
+          { "text": "Response correctly states that high velocity_confidence does not validate arrow direction", "result": "PASS", "note": "Common Errors row unchanged" },
+          { "text": "Response proposes concrete, Skill-documented validation steps", "result": "PASS", "note": "Phase portraits, orthogonal markers, second quantifier all still named" },
+          { "text": "Response stays in scope and does not fabricate claims", "result": "PASS", "note": "No invented specifics" }
+        ]
+      },
+      {
+        "index": 8, "type": "Variant B", "label": "NEW -- root-sensitivity test empirically validating Governing Principle rule 3 (Paul15)",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Not in the original 7 inputs; not separately verified by the fixer. Fresh test of an existing SKILL.md claim.",
+        "basic": 37, "specialized": 54, "total": 91,
+        "assertions_passed": 3, "assertions_total": 3,
+        "assertions": [
+          { "text": "Root choice materially changes the resulting pseudotime ordering", "result": "PASS", "note": "Correlation between MEP-rooted and Neu-rooted pseudotime only 0.72" },
+          { "text": "The early-vs-late label assignment genuinely inverts between the two roots", "result": "PASS", "note": "MEP goes from lowest (0.033) to highest (0.235) mean pseudotime when the root changes" },
+          { "text": "SKILL.md's guidance to anchor the root with orthogonal evidence is the correct mitigation for this real sensitivity", "result": "PASS", "note": "Empirically confirms rather than merely repeats the Governing Principle's rule 3" }
+        ]
+      },
+      {
+        "index": 9, "type": "Stress", "label": "NEW -- CellRank VelocityKernel + deterministic-mode velocity (real pancreatic data)",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Not in the original 7 inputs (which only exercised PseudotimeKernel); not separately verified by the fixer. Tests whether the fixed deterministic-mode velocity is usable by a different, documented CellRank code path.",
+        "basic": 34, "specialized": 51, "total": 85,
+        "assertions_passed": 3, "assertions_total": 3,
+        "assertions": [
+          { "text": "VelocityKernel + ConnectivityKernel + GPCCA runs end-to-end on the fixed deterministic-mode velocity graph with no crash", "result": "PASS", "note": "Ran cleanly through macrostates, terminal states, and fate probabilities" },
+          { "text": "Terminal states and initial state are biologically correct", "result": "PASS", "note": "Terminal: Delta, Alpha, Beta (real terminal endocrine fates); initial: Ductal (real progenitor)" },
+          { "text": "Fate-probability entropy is higher in the progenitor pool than in terminal cells", "result": "PASS", "note": "0.360 (Ductal) vs 0.317 (Alpha/Beta) -- real but much weaker separation than the PseudotimeKernel route (1.79 vs 0.82); documented as a finding, not a failure" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 37.6,
+    "dynamic_weighted": 54.2,
+    "score": 92,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Both original P1 defects are independently confirmed resolved end-to-end on real data: scVelo's deterministic-mode fallback (Input 4) and CellRank's allow_overlap/Windows-guard fix (Input 6), with numbers matching the original audit's captured values.",
+    "The 'scVelo dynamical/stochastic unfixable from the call site' claim was independently investigated one level deeper than the fix log itself (a dual monkeypatch of pandas.unique and scvelo's internal _read_pars) and confirmed correct -- the fixer's decision to document rather than chase the bug further was the right call, not giving up early.",
+    "Both P2 documentation-only fixes (PAGA threshold caveat, tradeSeq raw-counts caveat) were independently re-run on real data for the first time by any auditor and both hold up numerically.",
+    "New coverage beyond the original 7 inputs and the fix log's own verification (root-sensitivity empirical test, CellRank VelocityKernel path) both passed, and the root-sensitivity test provides genuine empirical evidence for a Governing Principle claim that was previously only asserted, not tested.",
+    "The redundancy pass on usage-guide.md removed genuine duplication without losing unique content, verified by inspection."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "CellRank code fence is not self-contained -- guard is a comment, not built in",
+      "observed_in": [6],
+      "problem": "The CellRank code block's Windows multiprocessing-guard requirement is documented in a comment above the fence ('Run this block inside if __name__ == \"__main__\":') but the fence itself is not wrapped, so a literal copy-paste into a standalone .py file still crashes with the original RuntimeError until the agent manually applies the guard.",
+      "root_cause": "A markdown code fence meant to be pasted inline into a larger script cannot itself contain the enclosing if __name__ guard without restructuring the whole example as a standalone script.",
+      "fix": "Either ship the CellRank example as a complete standalone script (like examples/scvelo_velocity.py) with the guard built in, or add one line making the requirement impossible to miss, e.g. a one-line minimal scaffold showing `if __name__ == \"__main__\": <indented block>`."
+    },
+    {
+      "priority": "P2",
+      "title": "CellRank's VelocityKernel path with deterministic-mode velocity is not caveated",
+      "observed_in": [9],
+      "problem": "This re-audit's new Input B found that feeding the fix's own recommended mode='deterministic' velocity into CellRank's VelocityKernel gives much weaker fate-probability entropy separation (0.36 vs 0.32) than the PseudotimeKernel route documented and tested elsewhere in the Skill (1.79 vs 0.82).",
+      "root_cause": "Deterministic mode is the Skill's own 'least recommended... quick first pass' option; its weaker per-cell velocity estimates propagate into weaker CellRank fate discrimination when used as a VelocityKernel input, but this specific combination is not called out.",
+      "fix": "Add a short note near the CellRank section or the RNA Velocity compatibility note: when only mode='deterministic' velocity is available, prefer PseudotimeKernel (or another non-velocity-derived direction source) over VelocityKernel for fate mapping, or explicitly flag that VelocityKernel fate probabilities inherit deterministic mode's weaker discrimination."
+    },
+    {
+      "priority": "P2",
+      "title": "monocle3_trajectory.R ships as an example but remains untested on this platform",
+      "observed_in": [],
+      "problem": "Unchanged from the original audit: Monocle3/SeuratWrappers do not install on Windows in this environment (confirmed by TOOLS.md), so examples/monocle3_trajectory.R has never been executed by any audit.",
+      "root_cause": "The Skill correctly frames Monocle3 as a documented alternative rather than the primary path (now that primary_tool is PAGA), but the shipped example itself carries no compatibility note of its own.",
+      "fix": "Add a one-line note at the top of examples/monocle3_trajectory.R matching the Installation section's Windows caveat, so an agent reading the example file alone (without SKILL.md context) is not misled."
+    }
+  ]
+}
