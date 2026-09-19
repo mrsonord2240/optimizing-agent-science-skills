@@ -8,7 +8,39 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (67)
+## P1 (71)
+
+### `bio-geo-data` — examples/geo_from_pubmed.py hardcodes the wrong PMID
+
+- Skill: 78, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/database-access/geo-data) · [viewer](skills/bio-geo-data/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 4
+- Problem: PMID '32228226' is labeled 'Blanco-Melo et al. 2020 Cell (COVID-19 transcriptional response)' but is a live-confirmed different paper (Emerg Microbes Infect) with zero linked GDS records, so the example silently produces an empty, unhelpful result.
+- Root cause: Wrong PMID was hardcoded when the example was written; never validated against a live elink call.
+- Fix: Replace PMID '32228226' with '32416070' (live-confirmed to link to GSE147507), and align the comment with examples/geo_to_sra.py, which already hardcodes GSE147507 for 'the same paper' -- the two examples are currently internally inconsistent about which PMID matches which GSE.
+
+### `bio-geo-data` — examples/search_geo.py's detect_super_series() crashes with ValueError on every call
+
+- Skill: 78, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/database-access/geo-data) · [viewer](skills/bio-geo-data/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 1, 5
+- Problem: gzip.GzipFile(fileobj=io.BytesIO(data), mode='rt') raises ValueError: Invalid mode: 'rt' -- GzipFile has no text mode. This breaks the shipped example on its very first live FTP round-trip, even though SKILL.md's own inline check_super_or_sub_series() (save to disk, then gzip.open(path, 'rt')) works correctly and was used successfully in this audit's Inputs 1 and 5.
+- Root cause: The examples/ copy restructured the download to stay in-memory via BytesIO but kept the disk-based gzip.open() call signature, which GzipFile does not support in text mode.
+- Fix: Either call gzip.open() via io.TextIOWrapper(gzip.GzipFile(fileobj=..., mode='rb'), encoding='utf-8'), or simply reuse SKILL.md's own save-to-disk pattern that already works.
+
+### `bio-geo-data` — examples/geo_to_sra.py's Entrez fallback raises TypeError on current Biopython
+
+- Skill: 78, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/database-access/geo-data) · [viewer](skills/bio-geo-data/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: —
+- Problem: gse_to_srr_entrez()'s Entrez.efetch(db='sra', ..., retmode='text').read() returns bytes on the installed Biopython 1.88, but the code calls text.strip().split('\n') directly, raising TypeError: a bytes-like object is required, not 'str'. Not separately re-run in this audit (already confirmed by this folder's tooling pass 2026-09-17), listed here as an open, unfixed defect a fixer should still address.
+- Root cause: Entrez.efetch's retmode='text' does not text-wrap this particular SRA content type on the current Biopython version; the code assumes it does.
+- Fix: Decode the handle content before string operations, e.g. text = h.read(); text = text.decode() if isinstance(text, bytes) else text.
+
+### `bio-geo-data` — SKILL.md's own SuperSeries worked example no longer demonstrates a SuperSeries
+
+- Skill: 78, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/database-access/geo-data) · [viewer](skills/bio-geo-data/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 5
+- Problem: SKILL.md's inline docstring shows check_super_or_sub_series('GSE122288') returning {'super_of': ['GSExxxxx', 'GSEyyyyy'], 'sub_of': None}, but running the exact code against the real, live accession returns {'super_of': [], 'sub_of': None} -- GSE122288 is a standalone Series, not a SuperSeries.
+- Root cause: The docstring's return value is an illustrative placeholder that was never validated against live data for this specific accession, and is presented as if it were the call's real output.
+- Fix: Either label the shown return value explicitly as illustrative/placeholder, or replace GSE122288 with a real, currently-still-a-SuperSeries accession so a user who runs the snippet verbatim sees a populated super_of list.
 
 ### `bio-alignment-multiple` — Fix MUSCLE5 ensemble commands (-super5 has no .efa)
 
@@ -546,7 +578,31 @@ None open.
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (263)
+## P2 (266)
+
+### `bio-geo-data` — No documented way to determine Affymetrix vs RNA-seq platform technology
+
+- Skill: 78, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/database-access/geo-data) · [viewer](skills/bio-geo-data/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 5
+- Problem: The processed-vs-raw decision matrix repeatedly asks 'is this Affymetrix or RNA-seq' but no code pattern anywhere in SKILL.md, usage-guide.md, or examples/ shows how to determine platform technology from a GSE/GPL accession.
+- Root cause: The decision matrix assumes the user already knows the platform technology rather than showing how to derive it from the GDS/GPL record.
+- Fix: Add a short code snippet resolving platform technology from the GDS record's title/technology fields or a GPL esummary call, ahead of the decision matrix.
+
+### `bio-geo-data` — Series-matrix section doesn't warn that !Sample_data_processing can be entirely absent
+
+- Skill: 78, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/database-access/geo-data) · [viewer](skills/bio-geo-data/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 3
+- Problem: The usage-guide's 'Submitter-data-processing audit' prompt, taken literally with bracket access, raises KeyError on a real series (GSE470) that has zero !Sample_data_processing lines. SKILL.md's own parse function uses the safe .get(key, []) form but nothing in the prose states the field can be fully absent, only that its content 'varies'.
+- Root cause: The Series matrix section documents content variability but not field-absence as a distinct case.
+- Fix: Add one sentence: '!Sample_data_processing may be entirely absent on some series (e.g., older records) -- always use metadata.get(key, []) rather than direct key access.'
+
+### `bio-geo-data` — 'GDS' is overloaded between the Entrez db name and the GDS record type
+
+- Skill: 78, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/database-access/geo-data) · [viewer](skills/bio-geo-data/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: —
+- Problem: db='gds' is the Entrez endpoint indexing all four record types (GSE/GSM/GPL/GDS), but the GEO record taxonomy table immediately below uses 'GDS' to mean specifically the frozen curated-DataSet type. SKILL.md never disambiguates the two uses sitting right next to each other.
+- Root cause: Terminology overlap between NCBI's own naming (db='gds') and the GEO record-type prefix (GDS) was not called out.
+- Fix: Add a one-line note: "Entrez's db='gds' indexes all four record types despite the name; don't confuse it with the GDS record type specifically."
 
 ### `bio-crispr-screens-copy-number-correction` — negative_control_sgrnas empty-dict case raises an undocumented ValueError
 
