@@ -1,0 +1,41 @@
+{
+  "skill_id": "bio-microbiome-functional-prediction",
+  "version": "mrsonord2240-bioSkills@47a62df",
+  "source": {
+    "repository": "mrsonord2240/bioSkills",
+    "commit": "47a62df7dad7982fbe62dd35613ee094d17acf41",
+    "path": "microbiome/functional-prediction",
+    "author": "GPTomics",
+    "author_url": "https://github.com/GPTomics",
+    "license": "MIT",
+    "modified_by": "Samuel Nord",
+    "fork_of": {
+      "repository": "GPTomics/bioSkills",
+      "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    "url": "https://github.com/mrsonord2240/bioSkills/tree/47a62df7dad7982fbe62dd35613ee094d17acf41/microbiome/functional-prediction"
+  },
+  "audit": {
+    "method": {
+      "name": "skill-auditor",
+      "author": "AIPOCH",
+      "repository": "aipoch/medical-research-skills",
+      "commit": "f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26",
+      "path": "skill-auditor",
+      "license": "MIT",
+      "url": "https://github.com/aipoch/medical-research-skills/tree/f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26/skill-auditor"
+    },
+    "evaluator_version": "skill-auditor@1.0",
+    "audited_on": "2026-09-19",
+    "performed_by": "Claude (Anthropic) auditor agents",
+    "commissioned_by": "Samuel Nord",
+    "test_data": "synthetic"
+  },
+  "supersedes": "GPTomics-bioSkills@d91ed3d",
+  "files": {
+    "report": "report.json",
+    "viewer": "viewer.md",
+    "fixes": "fixes.md",
+    "scripts": 7
+  }
+}

@@ -1,0 +1,212 @@
+{
+  "meta": {
+    "skill_name": "bio-microbiome-functional-prediction",
+    "description": "Predicts community functional POTENTIAL from 16S amplicon ASVs with PICRUSt2 (or q2-picrust2) by phylogenetic interpolation of reference-genome gene content - EPA-ng placement, gappa, castor hidden-state prediction of KO/EC/Pfam copy number, 16S copy-number normalization, and MinPath MetaCyc/KEGG pathways - gated by the NSTI quality index.",
+    "evaluated_on": "2026-09-19",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "mrsonord2240/bioSkills@47a62df:microbiome/functional-prediction",
+    "reaudit": true,
+    "reaudit_role": "third independent agent (different from original auditor and fixer)",
+    "pre_fix_report_archived_at": "F:/OpenScience/audits/_pre-fix-20260919/bio-microbiome-functional-prediction/",
+    "pre_fix_score": 80
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "Every number in this re-audit traces to a fresh, independently executed run by this re-auditor (own PICRUSt2 2.6.3 pipeline run from a fresh biom export, own R ALDEx2/MaAsLin2/LinDA runs on a new gut-vs-left-palm comparison), not reused figures from the original audit or the fix log." },
+      "practice_boundaries": { "result": "PASS", "detail": "No diagnostic or prescriptive medical conclusions; unaffected by the fix." },
+      "methodological_ground": { "result": "PASS", "detail": "Circularity and activity-claim guidance (Inputs 6-7) is unchanged by the fix and re-verified by inspection to still correctly steer an agent away from both fallacies." },
+      "code_usability": { "result": "PASS", "detail": "Cleanly PASS this time: the pre-fix audit had to argue PASS despite a real, reproducible FileNotFoundError because SKILL.md's Version Compatibility note told the agent to self-heal. Post-fix, the mandatory NSTI snippet was run verbatim (only the output path substituted) against a completely independent fresh PICRUSt2 run and completed without error, reproducing the exact NSTI numbers (mean 0.077, median 0.001, 3/751 dropped) three separate times now across the original audit, the fix log, and this re-audit." }
+    }
+  },
+  "static_score": {
+    "subtotal": 92,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 11, "max": 12, "note": "The unsubstantiated '/ITS' claim is removed from the frontmatter and usage-guide.md (verified via diff); the two real factual/output-format errors found on execution (NSTI filename, biom-TSV format) are both corrected and independently re-verified by fresh execution. Not full marks: Appropriateness/Completeness were already strong pre-fix and are unchanged." },
+      "reliability": { "score": 10, "max": 12, "note": "Common Errors table now covers all three real failure modes independently re-verified this pass (NSTI filename, hard-abort vs near-empty split, biom-TSV comment-line trap), each with an accurate fix. Recoverability substantially improved: an agent following the docs in order now avoids the crash instead of hitting a blind FileNotFoundError. Not full marks: no bundled fixture/expected-output test harness exists to catch a future regression automatically." },
+      "performance_context": { "score": 8, "max": 8, "note": "The Input Format Trap callout now appears immediately after the pipeline invocation and before any command is run, preventing the ~10-30 minute wasted-compute scenario this re-audit independently reproduced when the warning is ignored." },
+      "agent_usability": { "score": 15, "max": 16, "note": "Output file specs are now verified accurate against a real, independently-executed PICRUSt2 2.6.3 run (combined_/bac_/arc_ prefixes all confirmed present and correctly named). Not full marks: Mode D hybrid complexity (CLI + Python + R across two languages and an external tool chain) remains inherently demanding regardless of the fix." },
+      "human_usability": { "score": 8, "max": 8, "note": "The hardcoded, version-drifted filename that was 'the opposite of forgiving' pre-fix is corrected and confirmed forgiving in practice: this re-auditor ran the mandatory snippet verbatim with zero manual correction needed." },
+      "security": { "score": 11, "max": 12, "note": "Unaffected by the fix; unchanged from the pre-fix audit. No credentials, no eval/exec of raw strings, no injection vectors." },
+      "maintainability": { "score": 10, "max": 12, "note": "The shipped example script's embedded filename bug is fixed (verified via diff and independent execution of the corrected NSTI logic). The redundancy pass removed usage-guide.md's verbatim duplication of SKILL.md (Prerequisites/What the Agent Will Do/Tips), tightening separation of concerns. Not full marks: still no bundled fixture/expected-output to catch a future regression before shipping." },
+      "agent_specific": { "score": 19, "max": 20, "note": "Trigger precision improved with the ITS overclaim removed; the Quantitative Thresholds row for CoDA intersection now includes the normalize-first caveat. Escape hatches and composability remain excellent and unchanged." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 88.9,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 25, "total": 25 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Full PICRUSt2 pipeline on real moving-pictures 16S ASVs (770 ASVs, 34 gut/palm/tongue samples) -- independently re-executed end to end, own output directory",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Re-exported the biom feature table to TSV independently (own execution, confirmed the comment-line trap is still present on a fresh export), then ran the full corrected pipeline fresh (picrust2_out_reaudit, 31m19s real compute, exit 0): 751/770 ASVs placed, 503 MetaCyc pathways, add_descriptions.py clean. SKILL.md's Input Format Trap callout now precedes the pipeline command in reading order, so an agent following the docs avoids the crash instead of hitting it after expensive compute -- separately confirmed the crash still occurs if the warning is ignored (run/02, run/08).",
+        "basic": 37,
+        "specialized": 54,
+        "total": 91,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Output produces real KO/EC/MetaCyc pathway abundance tables as promised", "result": "PASS", "note": "751 ASVs placed, 503 MetaCyc pathways, KO/EC tables present, add_descriptions.py exit 0 -- independently regenerated." },
+          { "text": "The documented pipeline avoids the biom-TSV crash when SKILL.md is followed in reading order", "result": "PASS", "note": "The Input Format Trap warning now sits directly below the pipeline invocation, before the command is run; deliberately re-ran the crash path separately to confirm it is real and unrelated to whether the warning exists." },
+          { "text": "add_descriptions.py step completes successfully", "result": "PASS", "note": "Ran clean (exit 0) on the corrected, independently-generated pathway table." },
+          { "text": "Placement/HSP quality is appropriate for the claimed best-case environment (human gut)", "result": "PASS", "note": "Mean NSTI 0.077, median 0.001, 3/751 dropped, 0.0% reads dropped -- from this re-auditor's own fresh run." }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "QIIME2 .qza path via q2-picrust2 plugin",
+        "status": "COMPLETED",
+        "status_flag": "\u26a0\ufe0f",
+        "note": "Unaffected by the fix (decision-tree routing text unchanged in the diff). q2-picrust2 plugin still not installed in this env; evaluated by inspection as in the original audit.",
+        "basic": 30,
+        "specialized": 44,
+        "total": 74,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "Correctly identifies the QIIME2 .qza path and hands off to qiime2-workflow", "result": "PASS", "note": "Decision-tree row unchanged and accurate." },
+          { "text": "Does not fabricate an untested q2-picrust2 CLI invocation", "result": "PASS", "note": "Still correctly delegates to qiime2-workflow." },
+          { "text": "Explains why the same engine applies (FeatureTable in, FeatureTable out)", "result": "PASS", "note": "Unchanged and accurate." }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "PICRUSt2 on out-of-reference synthetic ASVs (poor alignment, expected quality-gate refusal) -- independently re-executed",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Independently re-ran the original audit's 11-ASV synthetic fixture (run/07): reproduced the exact hard placement abort ('all 11 input sequences aligned poorly to reference sequences'), no output directory beyond an empty intermediate/. The corrected Common Errors table's new split row ('Hard failure, no output directory created at all') now matches this exact symptom.",
+        "basic": 34,
+        "specialized": 56,
+        "total": 90,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Skill anticipates a poor-reference-coverage failure mode", "result": "PASS", "note": "Common Errors table anticipates this class of problem." },
+          { "text": "Skill's error-table description matches the observed failure mode exactly", "result": "PASS", "note": "The new split row names the hard --min_align abort precisely, distinct from the post-hoc --max_nsti drop row. Independently reproduced this exact abort." },
+          { "text": "No fabricated NSTI numbers reported for a run that produced none", "result": "PASS", "note": "Correctly zero output / hard failure, no NSTI file exists." },
+          { "text": "Recommends checking environment / FAPROTAX or shotgun", "result": "PASS", "note": "Unchanged guidance, matches." }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Mandatory NSTI distribution + dropped-read-fraction QC report -- run verbatim against a genuinely independent fresh PICRUSt2 output",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "SKILL.md's corrected 'Report NSTI (mandatory)' snippet run verbatim (only the output-dir path substituted) against picrust2_out_reaudit -- this re-auditor's own fresh run, not the original audit's or fixer's cached picrust2_out_real. Completed without error: mean NSTI 0.077, median 0.001, 3/751 dropped, 0.0% reads dropped -- exact match to the original audit and fix log, expected given PICRUSt2's fixed seed (100), and here backed by a genuinely independent execution rather than a reused output directory.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The documented NSTI file path (combined_marker_predicted_and_nsti.tsv.gz) exists after a real full-pipeline run", "result": "PASS", "note": "Confirmed present in an independently generated output directory." },
+          { "text": "The mandatory NSTI code, run verbatim as documented, completes without error", "result": "PASS", "note": "No FileNotFoundError -- ran clean on first try." },
+          { "text": "The code produces accurate NSTI summary numbers", "result": "PASS", "note": "mean 0.077, median 0.001, 3/751 dropped, 0.0% reads dropped -- correct for gut." },
+          { "text": "No error is silently swallowed", "result": "PASS", "note": "N/A this pass -- no error occurred." }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Predicted MetaCyc pathway table -> compositional DA (ALDEx2 + MaAsLin2 + LinDA), gut vs LEFT PALM (a comparison the fixer never ran), report the intersection",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Full real chain, own freshly-generated pathway table, a comparison neither the original auditor nor the fixer used: ALDEx2 275/487 significant (we.eBH<0.05), MaAsLin2 421 significant (qval<0.25). Naive intersect() on raw hit names: 2 (near-empty, wrong). Normalized (make.names() both sides, per SKILL.md's corrected guidance): 242 real shared pathways. Independently reproduces the exact P1 phenomenon on new data and confirms the fix resolves it. LinDA crashed on this comparison (prev.filter=0.0 + near-zero features) -- a new, separately root-caused defect (see recommendations), did not block the ALDEx2/MaAsLin2 reproduction.",
+        "basic": 37,
+        "specialized": 56,
+        "total": 93,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Uses >=2 CoDA tools as the skill's decision tree instructs", "result": "PASS", "note": "ALDEx2, MaAsLin2, and (attempted) LinDA all run for real." },
+          { "text": "Correctly formats ALDEx2 input as count-like features-as-rows", "result": "PASS", "note": "Matches SKILL.md's explicit warning; this is what made aldex() run without error." },
+          { "text": "Reports the cross-tool intersection accurately when following the skill's literal (now-corrected) instruction", "result": "PASS", "note": "Normalizing before intersecting recovers 242 real shared hits vs a naive 2 -- confirms the fix on a comparison the fixer never tested." },
+          { "text": "Frames the predicted-pathway DA result as hypothesis-generating per the circularity guidance", "result": "PASS", "note": "Unchanged guidance, consistent." }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Marine sediment nitrification question: PICRUSt2 or FAPROTAX?",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Unaffected by the fix (Decision Tree by Scenario and Tool Taxonomy unchanged in the diff); pure reasoning, evaluated by inspection as in the original audit.",
+        "basic": 35,
+        "specialized": 55,
+        "total": 90,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "Recommends FAPROTAX over PICRUSt2 for a marine-sediment nitrification question", "result": "PASS", "note": "Matches the unchanged Decision Tree row exactly." },
+          { "text": "Explains why (reference-tree bias / high expected NSTI)", "result": "PASS", "note": "Unchanged and accurate." },
+          { "text": "Does not claim FAPROTAX predicts gene content", "result": "PASS", "note": "Unchanged Tool Taxonomy framing." }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Rewrite a predicted-pathway DA result as 'increased butyrate production' for a paper",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Unaffected by the fix (Per-Method Failure Modes' activity/expression section unchanged in the diff); pure reasoning, evaluated by inspection.",
+        "basic": 35,
+        "specialized": 55,
+        "total": 90,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "Refuses/corrects 'increased butyrate production' to a potential/capacity framing", "result": "PASS", "note": "Matches the unchanged Common Error row's fix." },
+          { "text": "Warns that activity/expression claims need metatranscriptomics", "result": "PASS", "note": "Unchanged guidance." },
+          { "text": "Flags potential circularity if taxonomy was already reported", "result": "PASS", "note": "Unchanged Common Error section." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 36.8,
+    "dynamic_weighted": 53.3,
+    "score": 90,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "\u2b50",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "All 5 findings from the pre-fix audit independently re-verified as fixed by fresh execution, not by reading the diff: the NSTI filename fix was confirmed against a genuinely independent full PICRUSt2 run (own biom export, own 31-minute pipeline execution, own output directory), not the original audit's or fixer's cached output.",
+    "The CoDA ID-mismatch fix was re-derived on a comparison neither the original auditor nor the fixer used (gut vs left palm instead of gut vs tongue): naive intersection 2 vs normalized 242, the same phenomenon and the same fix, on new data -- strong evidence the fix generalizes rather than being tuned to one dataset.",
+    "The biom-TSV crash and the synthetic-ASV hard-abort were both independently reproduced end to end (own fresh biom export; own fresh placement run) and both now match the corrected Common Errors table's framing exactly.",
+    "Assertion pass rate rose from 20/25 (80%) pre-fix to 25/25 (100%) this pass, and execution average rose from 78.9 to 88.9, entirely from real re-execution -- not a re-reading of the same evidence.",
+    "The redundancy pass (usage-guide.md) was verified: Prerequisites/What the Agent Will Do/Tips sections (which duplicated SKILL.md verbatim, including a second copy of the pre-fix NSTI filename bug) are gone; the one unique fact (conda install commands) correctly migrated into SKILL.md."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "LinDA crashes outright on predicted-pathway tables with near-zero-count features under default (no) prevalence filtering",
+      "observed_in": [5],
+      "problem": "Discovered independently while adding LinDA as a third CoDA tool for a new comparison (gut vs left palm): MicrobiomeStat::linda() throws 'contrasts can be applied only to factors with 2 or more levels' and aborts the ENTIRE run (not just the offending feature) when prev.filter = 0.0 (no prevalence filtering, the natural default since SKILL.md's DA guidance says nothing about pre-filtering) and at least one of the 503 predicted pathways has fewer than 2 nonzero values across the compared groups. Root-caused with a minimal repro (run/06_linda_crash_diagnostic.R): prev.filter = 0.1 fixes it completely (469/503 features fit cleanly).",
+      "root_cause": "SKILL.md names LinDA as one of four CoDA tools an agent might pick for the '>=2 CoDA tools, report intersection' guidance, but gives no caveat about prevalence-filtering near-zero predicted pathways before running it -- unlike the ALDEx2 features-as-rows warning, which IS present.",
+      "fix": "Add a one-line caveat next to the CoDA-tools guidance: filter near-zero-prevalence pathways (e.g. prev.filter/min_prevalence >= 0.1) before running LinDA on a predicted pathway table, since an unfiltered near-zero feature can abort the entire run rather than failing gracefully per-feature. This is out of this skill's own shipped code (no LinDA example lives here) -- also worth flagging for the differential-abundance skill, which owns LinDA's actual example code and may have the same gap."
+    }
+  ]
+}
