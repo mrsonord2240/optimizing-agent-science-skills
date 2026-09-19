@@ -1,0 +1,231 @@
+{
+  "meta": {
+    "skill_name": "bio-pharmacophore-modeling",
+    "description": "Builds and applies 3D pharmacophore models using RDKit Pharm3D, the apo2ph4 receptor-based workflow, Pharmer/Pharmit for search, and PharmacoForge for protein-pocket-conditioned pharmacophore generation, covering ligand-based pharmacophores from active-set alignment and receptor-based pharmacophores from binding-pocket geometry, with explicit handling of feature types, geometric tolerances, partial matching, and pharmacophore-based virtual screening.",
+    "evaluated_on": "2026-09-19",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:chemoinformatics/pharmacophore-modeling"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All 5 cited DOIs (apo2ph4 10.1021/acs.jcim.2c00814, PharmacoForge 10.3389/fbinf.2025.1628800, PLIP 10.1093/nar/gkab294, Pharmit 10.1093/nar/gkw287, LigandScout 10.1021/ci049885e) verified real and correctly titled via Crossref. No fabricated statistics: all reported numbers (PLIP distances, EmbedPharmacophore embedding counts, enrichment ratios) come from real executed code on real structures." },
+      "practice_boundaries": { "result": "PASS", "detail": "Molecular-modeling tool skill; no diagnostic/prescriptive medical conclusions in any output. Not applicable to a clinical-disclaimer requirement." },
+      "methodological_ground": { "result": "PASS", "detail": "No principled methodological fallacy. The skill explicitly separates 'feature-type presence' from 'validated geometric bounds' and explicitly warns that its own illustrative coordinates/bounds are placeholders requiring validated derivation -- exactly the caveat that input 5's real-data test (enrichment 0.5, worse than random) shows is necessary." },
+      "code_usability": { "result": "PASS", "detail": "Every code sample from SKILL.md ran unmodified against real installed RDKit 2026.03.6 and PLIP 3.0.1. The PLIP snippet additionally required a documented, environment-level workaround (openbabel-wheel ships no InChI writer on Windows, per TOOLS.md note 5) unrelated to the Skill's own code -- not a Skill defect, logged as a P2 documentation opportunity." }
+    }
+  },
+  "static_score": {
+    "subtotal": 87,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 12, "max": 12, "note": "Covers ligand-based (RDKit Pharm3D), receptor-based (apo2ph4, PLIP), pocket-conditioned generation (PharmacoForge), library search (Pharmit), and quality validation end to end; every code sample verified correct against the real installed APIs." },
+      "reliability": { "score": 9, "max": 12, "note": "Common Errors and Per-Tool Failure Modes tables cover most failure modes with symptom/cause/fix, but the code samples themselves show no defensive handling (input3's EmbedPharmacophore call raised an uncaught ValueError on a real molecule; I had to add the try/except)." },
+      "performance_context": { "score": 7, "max": 8, "note": "SKILL.md is long (~293 lines) but well-organized into tables; usage-guide.md and one small example file keep the split reasonable." },
+      "agent_usability": { "score": 15, "max": 16, "note": "Decision Tree by Scenario and Method Taxonomy make the right method immediately selectable; output-format guidance ('ranked hits + retrospective enrichment') is present but not detailed per scenario." },
+      "human_usability": { "score": 7, "max": 8, "note": "Description text triggers naturally on scaffold-hopping / pharmacophore language; strict input handling is correct-by-design for this Category-3 skill, not penalized." },
+      "security": { "score": 11, "max": 12, "note": "No credential or injection risk; the shipped example only lightly validates SMILES parse failures (if mol is None: continue)." },
+      "maintainability": { "score": 9, "max": 12, "note": "Clean 3-file split, but no dedicated test cases beyond the one demo print in examples/pharmacophore.py's __main__ block." },
+      "agent_specific": { "score": 17, "max": 20, "note": "Well-scoped trigger with explicit Related Skills cross-references preventing overlap with scaffold-analysis/shape-similarity/virtual-screening/generative-design; SKILL.md length is just over the 500-line progressive-disclosure ideal margin is fine, minor deduction for escape-hatch phrasing not always being an explicit stop directive." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 85.6,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 23, "total": 25 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Receptor-based pharmacophore from a real co-crystal (PDB 1HSG, HIV-1 protease + indinavir precursor MK1) via PLIP",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. Real PLIP 3.0.1 run on RCSB 1HSG. Correctly identified H-bonds to the catalytic Asp25/Asp25' dyad, hydrophobic contacts to the canonical S1/S1'/S2/S2' pocket residues, 2 salt bridges, and 4 water bridges -- chemically correct, matches known HIV protease inhibitor SAR. Required one documented, environment-only workaround (openbabel-wheel inchikey writer missing) unrelated to the Skill's own instructions.",
+        "basic": 37,
+        "specialized": 49,
+        "total": 86,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Output identifies specific interacting residues with correct chemical typing (donor/acceptor H-bond, hydrophobic, salt bridge, water bridge)", "result": "PASS", "note": "Asp25/25' H-bonds, S1/S1'/S2/S2' hydrophobic contacts, 2 salt bridges, 4 water bridges all correctly typed by PLIP on the real structure" },
+          { "text": "Output does not fabricate interaction records not present in the real structural geometry", "result": "PASS", "note": "All distances are PLIP-computed from real atomic coordinates in the downloaded 1HSG.pdb" },
+          { "text": "Code executes against the documented PLIP API without modification to the Skill's own logic", "result": "PASS", "note": "Only a runtime monkeypatch for openbabel-wheel's missing InChI writer was needed (environment gap, not a Skill code defect); the Skill's own PLIP snippet was used unchanged" },
+          { "text": "Output maps cleanly onto pharmacophore feature classes the Skill says to derive from a co-crystal (donor/acceptor/hydrophobe/ionizable)", "result": "PASS", "note": "H-bonds map to donor/acceptor features, hydrophobic contacts to hydrophobe features, salt bridges to ionizable features" }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Shipped examples/pharmacophore.py feature-family prefilter, real HIV protease inhibitors vs real unrelated drugs",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "executed: true. Ran unmodified against real SMILES. Correctly rejected 4/4 real decoys (caffeine, metformin, aspirin, acetaminophen) but also incorrectly rejected ritonavir -- a real, structurally distinct HIV-1 protease inhibitor from the same class as the 2 query actives -- because the strict feature-type intersection over only 2 actives happened to include 2 non-essential coincidental features ritonavir lacks.",
+        "basic": 32,
+        "specialized": 42,
+        "total": 74,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "A real, structurally distinct HIV protease inhibitor sharing the documented pharmacophore mechanism is retrieved as a match", "result": "FAIL", "note": "ritonavir (real HIV-PR inhibitor) rejected because it lacks 2 incidental feature types (tButyl, PosIonizable BasicGroup) that happened to be shared by only the 2 query actives" },
+          { "text": "Function runs without error on real SMILES actives and real library compounds", "result": "PASS", "note": "Completed in 13.1s, no exceptions" },
+          { "text": "Code/docstrings correctly disclose this is a coarse prefilter, not a full 3D pharmacophore match", "result": "PASS", "note": "shared_feature_types_prefilter docstring explicitly says 'this does not derive a 3D pharmacophore'" },
+          { "text": "No fabricated chemistry; all feature assignments trace to real RDKit FeatureFactory output on real molecules", "result": "PASS", "note": "Verified feature-type lists directly (Acceptor/Aromatic/Donor/Hydrophobe/PosIonizable) against RDKit's BaseFeatures.fdef output" }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "SKILL.md's own ligand-based EmbedPharmacophore code block, run verbatim on real molecules (single-active edge case)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. The exact code block from SKILL.md ran unmodified: phenethylamine (the Skill's own example molecule) matched and embedded 20/20 successfully. cyclohexylamine (no aromatic ring) correctly failed can_match. tyramine and phenol (aromatic+donor present but geometrically too close) correctly raised the documented 'could not smooth bounds matrix' error rather than a silent wrong answer.",
+        "basic": 38,
+        "specialized": 53,
+        "total": 91,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "SKILL.md's own worked code example runs and succeeds exactly as documented", "result": "PASS", "note": "phenethylamine: can_match=True, EmbedPharmacophore produced 20/20 embeddings, 0 failed" },
+          { "text": "A real molecule lacking the required feature type is correctly rejected at the feature-type level", "result": "PASS", "note": "cyclohexylamine (no aromatic ring): can_match=False" },
+          { "text": "A real molecule with the right feature types but wrong geometry triggers the documented bounds-infeasible error rather than a silently wrong match", "result": "PASS", "note": "tyramine and phenol both raised 'could not smooth bounds matrix', matching the Common Errors table's documented failure mode" },
+          { "text": "Output does not fabricate chemistry; all molecules used are real, common, correctly-parsed compounds", "result": "PASS", "note": "phenethylamine, tyramine, cyclohexylamine, phenol all valid RDKit structures" }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "PLIP water-bridge detection, direct contrast test of the Skill's own documented failure mode on 1HSG with/without crystallographic waters",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. With crystallographic waters retained: 4 water bridges detected, including the physiologically critical Ile50(chain A) flap water bridging the protease flap to the ligand. With every HOH HETATM stripped from the same structure: 0 water bridges, no warning or error -- silent, exactly as SKILL.md's Per-Tool Failure Modes table describes.",
+        "basic": 38,
+        "specialized": 53,
+        "total": 91,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "The Skill's documented PLIP water-bridge failure mode (missing crystallographic water -> missing feature) is reproduced exactly with real structural data", "result": "PASS", "note": "4 water bridges -> 0 water bridges when HOH records were stripped from the real 1HSG.pdb" },
+          { "text": "PLIP correctly identifies the physiologically meaningful Ile50 flap water bridge when waters are retained", "result": "PASS", "note": "ILE50A water bridge at d(acceptor-water)=2.68/2.80 A, matching the well-documented HIV protease inhibitor flap-water interaction" },
+          { "text": "The failure mode is silent (no error or warning raised), matching the Skill's stated symptom", "result": "PASS", "note": "Water-stripped run completed normally and simply reported 0 water bridges" }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Full retrospective enrichment (SKILL.md's pharmacophore_enrichment function) on 5 real HIV protease inhibitors vs 5 real unrelated drugs",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. The Skill's own enrichment function, copied verbatim, ran correctly end to end. Plugging in the SKILL.md worked example's illustrative 2-feature (aromatic+donor, 3.5-5.0 A) model as-is against real actives/inactives gave enrichment=0.5 (worse than random) -- confirming, on real data, exactly why SKILL.md repeatedly warns that its illustrative bounds are placeholders and must not be reused without a validated derivation step.",
+        "basic": 34,
+        "specialized": 47,
+        "total": 81,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Enrichment function correctly computes active-rate/inactive-rate from real match results, including safe division for zero-inactive-match", "result": "PASS", "note": "Verified against the verbatim function; 1/5 active match, 2/5 inactive match -> 0.2/0.4 = 0.5" },
+          { "text": "Result is computed on real, verifiable active/inactive compounds, not synthetic placeholders", "result": "PASS", "note": "5 real ChEMBL HIV-1 protease inhibitors (indinavir, saquinavir, ritonavir, nelfinavir, amprenavir) vs 5 real unrelated marketed drugs" },
+          { "text": "SKILL.md's own caveats (bounds must be validated, enrichment threshold must be calibrated) are directly relevant and would have prevented over-trusting this result", "result": "PASS", "note": "SKILL.md explicitly states 'Coordinates and bounds must come from a validated consensus-derivation workflow' and that the >=5x heuristic 'must be calibrated for the dataset'" },
+          { "text": "The specific 2-feature demo model, used as-is, achieves real discrimination on a real active/inactive HIV protease inhibitor set", "result": "FAIL", "note": "Enrichment 0.5 is worse than random; the demo model is not a usable pharmacophore without validated derivation" }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "\"Given this pharmacophore, generate 10 novel drug-like molecules that satisfy it\" (tests PharmacoForge generation-vs-retrieval scope)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true (Mode A direct reasoning against SKILL.md). Correctly declined to fabricate 10 novel molecules; explained PharmacoForge generates candidate pharmacophores conditioned on a pocket but does not itself generate molecular structures, and that the validated workflow is pocket-conditioned pharmacophore generation -> library retrieval via a search engine -> docking/strain/physical-validity evaluation; redirected downstream molecule generation/optimization to chemoinformatics/generative-design.",
+        "basic": 37,
+        "specialized": 50,
+        "total": 87,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "Output does not claim to directly generate novel molecular structures from a pharmacophore alone", "result": "PASS", "note": "Response explicitly states PharmacoForge/pharmacophore models do not generate molecules directly" },
+          { "text": "Output correctly cites the documented, validated workflow (pocket-conditioned generation -> library retrieval -> evaluation)", "result": "PASS", "note": "Matches SKILL.md's 4-step Pocket-Conditioned Pharmacophore Generation workflow verbatim" },
+          { "text": "Output redirects downstream molecule generation/optimization to the correct related skill", "result": "PASS", "note": "Points to chemoinformatics/generative-design as SKILL.md's own Related Skills section directs" }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "\"Just call RDKit's EmbedPharmacophore directly on my 5 active compounds to get the automatic consensus pharmacophore\" (false-premise correction test)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true (Mode A direct reasoning against SKILL.md). Correctly refused the flawed premise: explained EmbedPharmacophore embeds conformers of a molecule against an ALREADY DEFINED pharmacophore and does not derive a consensus model from a set of actives; described the actual required steps (align defensible bioactive conformers, identify conserved feature correspondences, assign distance bounds via a documented method) before EmbedPharmacophore can be meaningfully applied.",
+        "basic": 38,
+        "specialized": 51,
+        "total": 89,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "Output explicitly corrects the false premise that EmbedPharmacophore derives a consensus pharmacophore automatically", "result": "PASS", "note": "Matches SKILL.md's explicit statement almost verbatim: 'RDKit does not provide a single EmbedPharmacophore call that performs those steps'" },
+          { "text": "Output does not silently comply with the flawed technical request", "result": "PASS", "note": "Declines to write code that would misapply EmbedPharmacophore as a consensus-derivation tool" },
+          { "text": "Output describes the actual required consensus-derivation workflow before EmbedPharmacophore can be applied", "result": "PASS", "note": "Alignment, conserved feature correspondence, and distance-bound assignment described as prerequisite steps" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 34.8,
+    "dynamic_weighted": 51.4,
+    "score": 86,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Every code sample in SKILL.md runs exactly as documented against the real installed RDKit 2026.03.6 / PLIP 3.0.1 APIs, with zero modification required to the Skill's own logic.",
+    "All 5 literature citations (apo2ph4, PharmacoForge, PLIP, Pharmit, LigandScout) verified as real, correctly-titled DOIs via Crossref -- no fabricated references.",
+    "The Skill repeatedly and explicitly warns against treating its own illustrative bounds/coordinates as validated, and a real-data stress test (enrichment=0.5 on 5 real HIV protease inhibitors vs 5 real unrelated drugs, using the demo's literal 2-feature model) confirms exactly why that warning is necessary.",
+    "PLIP's documented water-bridge failure mode was reproduced precisely on a real co-crystal (PDB 1HSG): the physiologically important Ile50 flap-water bridge is detected with crystallographic waters present and silently vanishes when they are stripped, matching the Skill's own Per-Tool Failure Modes table."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "Shipped feature-family prefilter is fragile with small/diverse active sets",
+      "observed_in": [2],
+      "problem": "shared_feature_types_prefilter intersects feature-type sets across all supplied actives with no fallback; on 2 real, structurally distinct HIV protease inhibitors, the resulting common set incidentally includes 2 non-essential coincidental features that a genuine third active from the same class (ritonavir) lacks, silently rejecting it with no diagnostic of which feature was missing.",
+      "root_cause": "Strict issubset matching over a 2-active intersection, with no per-feature relaxation or scaffold-clustering step, even though the Skill's own Per-Tool Failure Modes table already documents this exact 'diverse actives confound' failure and its fix.",
+      "fix": "Have feature_family_prefilter report which query feature(s) each rejected library molecule is missing, and add a one-line pointer in its docstring to the 'cluster actives by scaffold first' fix already documented in SKILL.md's failure-mode table."
+    },
+    {
+      "priority": "P2",
+      "title": "Example conformer embedding has no fixed random seed",
+      "observed_in": [2],
+      "problem": "AllChem.EmbedMultipleConfs(m, numConfs=n_conf, params=AllChem.ETKDGv3()) in examples/pharmacophore.py leaves the seed unset, so repeated runs are not guaranteed to reproduce identical conformer geometries.",
+      "root_cause": "params.randomSeed is never assigned before calling EmbedMultipleConfs in the shipped example.",
+      "fix": "Set params.randomSeed to a fixed integer (matching the randomSeed=23 convention already used in SKILL.md's own EmbedPharmacophore snippet) for reproducibility."
+    },
+    {
+      "priority": "P2",
+      "title": "No troubleshooting note for the common openbabel-wheel InChI gap that breaks PLIP on Windows",
+      "observed_in": [1, 4],
+      "problem": "PDBComplex.analyze() raises ValueError: inchikey is not a recognised Open Babel format on any install using the standard pip openbabel-wheel distribution, because PLIP's Ligand.__init__ unconditionally calls pybel.write(format='inchikey') and that wheel ships no InChI writer at all (a known Windows packaging gap, not something specific to this audit run).",
+      "root_cause": "SKILL.md's receptor-based PLIP snippet has no troubleshooting entry for this common environment failure.",
+      "fix": "Add a row to the Common Errors table: 'PLIP analyze() raises ValueError: inchikey is not a recognised Open Babel format | openbabel-wheel ships no InChI writer | Use a conda-forge openbabel build with InChI support, or monkeypatch pybel.Molecule.write to no-op for format=\"inchikey\".'"
+    },
+    {
+      "priority": "P2",
+      "title": "Worked ligand-based example has no inline warning against reuse",
+      "observed_in": [5],
+      "problem": "Plugging SKILL.md's illustrative 2-feature (aromatic+donor, 3.5-5.0 A) bounds directly into a real active/inactive HIV protease inhibitor screen gives enrichment 0.5 (worse than random), confirming the demo bounds must never be reused as-is; the prose caveat exists elsewhere in SKILL.md but the code block itself carries no inline warning.",
+      "root_cause": "The demo's query_features/bounds are placeholders by design, but nothing in the code comment signals that at the point of definition.",
+      "fix": "Add '# PLACEHOLDER COORDINATES -- do not reuse without deriving from a validated workflow' directly above the query_features block in SKILL.md's Ligand-Based Pharmacophore snippet."
+    }
+  ]
+}

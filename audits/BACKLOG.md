@@ -570,7 +570,7 @@ None open.
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (285)
+## P2 (289)
 
 ### `bio-crispr-screens-copy-number-correction` — negative_control_sgrnas empty-dict case raises an undocumented ValueError
 
@@ -939,6 +939,38 @@ None open.
 - Problem: The Skill warns QED can under-rank fragment-like molecules. Measured the opposite: indole 0.544 and phenol 0.515 clear a 0.5 gate while imatinib, a marketed drug, scores 0.389.
 - Root cause: The caveat generalises the natural-product case, where under-ranking is real (paclitaxel 0.130), to fragments, where the desirability functions are permissive instead.
 - Fix: Split the caveat: QED under-ranks large natural-product and peptide chemistry and over-ranks small fragments, with these numbers as worked examples, and repeat that it must not be the sole gate in either regime.
+
+### `bio-pharmacophore-modeling` — Shipped feature-family prefilter is fragile with small/diverse active sets
+
+- Skill: 86, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/pharmacophore-modeling) · [viewer](skills/bio-pharmacophore-modeling/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 2
+- Problem: shared_feature_types_prefilter intersects feature-type sets across all supplied actives with no fallback; on 2 real, structurally distinct HIV protease inhibitors, the resulting common set incidentally includes 2 non-essential coincidental features that a genuine third active from the same class (ritonavir) lacks, silently rejecting it with no diagnostic of which feature was missing.
+- Root cause: Strict issubset matching over a 2-active intersection, with no per-feature relaxation or scaffold-clustering step, even though the Skill's own Per-Tool Failure Modes table already documents this exact 'diverse actives confound' failure and its fix.
+- Fix: Have feature_family_prefilter report which query feature(s) each rejected library molecule is missing, and add a one-line pointer in its docstring to the 'cluster actives by scaffold first' fix already documented in SKILL.md's failure-mode table.
+
+### `bio-pharmacophore-modeling` — Example conformer embedding has no fixed random seed
+
+- Skill: 86, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/pharmacophore-modeling) · [viewer](skills/bio-pharmacophore-modeling/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 2
+- Problem: AllChem.EmbedMultipleConfs(m, numConfs=n_conf, params=AllChem.ETKDGv3()) in examples/pharmacophore.py leaves the seed unset, so repeated runs are not guaranteed to reproduce identical conformer geometries.
+- Root cause: params.randomSeed is never assigned before calling EmbedMultipleConfs in the shipped example.
+- Fix: Set params.randomSeed to a fixed integer (matching the randomSeed=23 convention already used in SKILL.md's own EmbedPharmacophore snippet) for reproducibility.
+
+### `bio-pharmacophore-modeling` — No troubleshooting note for the common openbabel-wheel InChI gap that breaks PLIP on Windows
+
+- Skill: 86, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/pharmacophore-modeling) · [viewer](skills/bio-pharmacophore-modeling/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 1, 4
+- Problem: PDBComplex.analyze() raises ValueError: inchikey is not a recognised Open Babel format on any install using the standard pip openbabel-wheel distribution, because PLIP's Ligand.__init__ unconditionally calls pybel.write(format='inchikey') and that wheel ships no InChI writer at all (a known Windows packaging gap, not something specific to this audit run).
+- Root cause: SKILL.md's receptor-based PLIP snippet has no troubleshooting entry for this common environment failure.
+- Fix: Add a row to the Common Errors table: 'PLIP analyze() raises ValueError: inchikey is not a recognised Open Babel format \| openbabel-wheel ships no InChI writer \| Use a conda-forge openbabel build with InChI support, or monkeypatch pybel.Molecule.write to no-op for format="inchikey".'
+
+### `bio-pharmacophore-modeling` — Worked ligand-based example has no inline warning against reuse
+
+- Skill: 86, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/pharmacophore-modeling) · [viewer](skills/bio-pharmacophore-modeling/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 5
+- Problem: Plugging SKILL.md's illustrative 2-feature (aromatic+donor, 3.5-5.0 A) bounds directly into a real active/inactive HIV protease inhibitor screen gives enrichment 0.5 (worse than random), confirming the demo bounds must never be reused as-is; the prose caveat exists elsewhere in SKILL.md but the code block itself carries no inline warning.
+- Root cause: The demo's query_features/bounds are placeholders by design, but nothing in the code comment signals that at the point of definition.
+- Fix: Add '# PLACEHOLDER COORDINATES -- do not reuse without deriving from a validated workflow' directly above the query_features block in SKILL.md's Ligand-Based Pharmacophore snippet.
 
 ### `bio-phylo-species-trees` — Add a leaf-name consistency check before ASTRAL
 
