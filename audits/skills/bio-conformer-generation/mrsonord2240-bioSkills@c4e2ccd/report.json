@@ -1,0 +1,223 @@
+{
+  "meta": {
+    "skill_name": "bio-conformer-generation",
+    "description": "Generates 3D conformer ensembles using RDKit ETKDGv3 with knowledge-enhanced distance geometry, MMFF94/UFF force-field optimization, CREST + GFN2-xTB semi-empirical refinement, and macrocycle-aware torsion preferences. Provides explicit decision rules for single vs ensemble conformer use, RMSD pruning, energy windows, conformer count, and force-field choice. Use when preparing 3D ligands for docking, generating descriptor input for 3D QSAR, or sampling macrocycle/peptide conformational ensembles.",
+    "evaluated_on": "2026-09-19",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 9,
+    "source": "mrsonord2240/bioSkills@c4e2ccd:chemoinformatics/conformer-generation",
+    "audit_type": "re-audit",
+    "supersedes": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:chemoinformatics/conformer-generation (score 86, Limited Release)",
+    "fix_log": "F:/optimizing-agent-science-skills/fixes/bio-conformer-generation.md"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All cited references remain real, verifiable, correctly attributed (unchanged from pre-fix audit). No fabricated data, statistics, or results in any of the 9 executed outputs, including the 2 new inputs." },
+      "practice_boundaries": { "result": "PASS", "detail": "Pure computational-chemistry geometry tool; no diagnostic, prescriptive, or patient-facing content. No medical disclaimer applicable." },
+      "methodological_ground": { "result": "PASS", "detail": "No methodological fallacy detected. The Skill's own caveats about Boltzmann populations being 'exploratory surrogates, not generally validated populations' still hold and are not contradicted by any executed output." },
+      "code_usability": { "result": "PASS", "detail": "All 9 code paths executed to completion. The two P1 defects from the pre-fix audit (opaque ArgumentError on malformed SMILES; undocumented CREST Windows failure) are both resolved and verified fixed. Two new minor (P2) edge-case gaps were found (empty-string SMILES bypasses the new guard's message; filter_by_energy() crashes ungracefully on an empty conformer list) but both still raise real, traceable ValueErrors, not silent failures or crashes -- consistent with PASS." }
+    }
+  },
+  "static_score": {
+    "subtotal": 93,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 12, "max": 12, "note": "Windows/CREST caveat now present, accurate, and independently verified: crest_workflow() raises FileNotFoundError exactly as documented; the recommended fallback (RDKit macrocycle-aware embedding + standalone xtb --opt) was executed on a molecule the fixer did not test and produced a real GFN2-optimized geometry. Up from 11/12 pre-fix." },
+      "reliability": { "score": 11, "max": 12, "note": "gen_conformers() now guards mol is None and raises a clear ValueError, verified against 2 malformed SMILES the fixer never tested. New minor gap found: empty-string SMILES parses to a valid 0-atom Mol (not None) in this RDKit build, so the guard doesn't fire; RDKit's own EmbedMultipleConfs raises 'molecule has no atoms' instead -- still a ValueError, not the opaque C++ error the P1 fixed, so this is a residual gap, not a regression. Up from 8/12 pre-fix." },
+      "performance_context": { "score": 7, "max": 8, "note": "Unaffected by this fix pass; SKILL.md still inlines the same code shown in examples/gen_conformers.py rather than referencing it exclusively. Unchanged from pre-fix." },
+      "agent_usability": { "score": 14, "max": 16, "note": "Function-name divergence between SKILL.md and examples/gen_conformers.py is now cross-referenced with a one-line note naming all three pairs (gen_conformers/gen_conformer_ensemble, prune_conformers_rmsd/prune_rmsd, filter_by_energy/filter_energy_window). Improves discoverability without eliminating the two-name-set overhead entirely. Up from 12/16 pre-fix." },
+      "human_usability": { "score": 7, "max": 8, "note": "Unaffected directly by the P1 fixes; the redundancy pass (usage-guide.md Prerequisites/Tips replaced with pointers) makes the two-document set easier to navigate without adding new content that needs re-synchronizing. Unchanged from pre-fix." },
+      "security": { "score": 11, "max": 12, "note": "Input validation is now consistent across gen_conformers()/macrocycle_conformers()/crest_workflow() (all three guard mol is None). filter_by_energy() still has an unguarded min() call on an empty conformer list -- a residual minor inconsistency found in this re-audit (Input 9). Up from 10/12 pre-fix." },
+      "maintainability": { "score": 12, "max": 12, "note": "Redundancy pass verified directly: usage-guide.md no longer restates SKILL.md's Decision Tree/Macrocycle Handling/Common Errors content; its Prerequisites section is now a one-line pointer to SKILL.md's Installation section. No unique content was lost. Up from 11/12 pre-fix." },
+      "agent_specific": { "score": 19, "max": 20, "note": "The Windows/CREST caveat itself functions as a new, verified escape hatch. The two remaining gaps (macrocycle worked example still absent, per the fixer's own explicit scoping decision; the two new minor edge-case findings) are the only remaining thinness. Up from 18/20 pre-fix." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 88.2,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 32, "total": 36 },
+    "inputs": [
+      {
+        "index": 1, "type": "Canonical",
+        "label": "20 ETKDGv3 conformers for aspirin, MMFF94-optimized (regression)",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Bit-identical to the pre-fix run: 20/20 embedded and optimized, 20/20 converged, energies 18.91-20.83 kcal/mol.",
+        "basic": 37, "specialized": 55, "total": 92,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Output reports the requested 20 embedded conformer IDs", "result": "PASS", "note": "EmbedMultipleConfs returned exactly 20 IDs" },
+          { "text": "All conformers are MMFF94s-optimized with recorded convergence status", "result": "PASS", "note": "20/20 converged=True" },
+          { "text": "Reported energies are real ff.CalcEnergy() floats, not placeholders", "result": "PASS", "note": "Range 18.9098-20.8331 kcal/mol, matches pre-fix run exactly" },
+          { "text": "No fabricated claims beyond what RDKit computed", "result": "PASS", "note": "No invented literature comparison values" }
+        ]
+      },
+      {
+        "index": 2, "type": "Variant A",
+        "label": "Single low-energy ibuprofen conformer for docking, SDF (regression)",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Bit-identical to pre-fix: embed/optimize status 0, energy 24.3422 kcal/mol, SDF round-trip confirmed non-planar 3D.",
+        "basic": 37, "specialized": 55, "total": 92,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "SDF output contains a genuine non-planar 3D structure", "result": "PASS", "note": "Z-range -4.03 to 3.46 confirmed after round-trip read" },
+          { "text": "Reported energy is a real MMFF94s-computed value", "result": "PASS", "note": "24.3422 kcal/mol, matches pre-fix run exactly" },
+          { "text": "Workflow matches SKILL.md's documented single-conformer docking-input scenario", "result": "PASS", "note": "Follows Decision Tree row 'Single initial 3D structure'" },
+          { "text": "Output stays within stated scope", "result": "PASS", "note": "Ligand prep only, no unwarranted docking-score claims" }
+        ]
+      },
+      {
+        "index": 3, "type": "Edge",
+        "label": "Phenylboronic acid: MMFF94-parameter-missing -> UFF fallback (regression)",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Bit-identical to pre-fix: MMFFGetMoleculeProperties None for boron, UFF fallback executed, 10/10 conformers, energies 11.4524-11.4747 kcal/mol.",
+        "basic": 38, "specialized": 55, "total": 93,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "MMFF94 is correctly identified as inapplicable to a boron-containing molecule", "result": "PASS", "note": "mmff_props is None, as documented" },
+          { "text": "UFF fallback executes and produces valid energies", "result": "PASS", "note": "11.4524-11.4747 kcal/mol" },
+          { "text": "Behavior matches SKILL.md's 'MMFF94 -- parameter missing' failure-mode table exactly", "result": "PASS", "note": "Trigger/mechanism/symptom/fix all verified" },
+          { "text": "No silent no-op or wrong-answer path taken", "result": "PASS", "note": "Explicit fallback branch, not a swallowed failure" }
+        ]
+      },
+      {
+        "index": 4, "type": "Variant B",
+        "label": "Macrocycle-aware embedding on a 14-membered ring (regression)",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Bit-identical outcome to pre-fix: 50/50 macrocycle-aware embedded; default (non-macrocycle) settings also embedded 50/50 on this same simple carbocycle, so the claimed benefit is still not independently demonstrated.",
+        "basic": 35, "specialized": 52, "total": 87,
+        "assertions_passed": 3, "assertions_total": 4,
+        "assertions": [
+          { "text": "Test ring verified to meet the >=12-atom macrocycle threshold", "result": "PASS", "note": "GetRingInfo confirmed a 14-atom ring" },
+          { "text": "useMacrocycleTorsions=True path embeds the requested 50/50 conformers", "result": "PASS", "note": "50/50 embedded" },
+          { "text": "Optimized energies show real conformational diversity", "result": "PASS", "note": "Consistent with pre-fix run" },
+          { "text": "Macrocycle-aware embedding measurably outperforms default ETKDGv3 settings on this test case", "result": "FAIL", "note": "Unchanged from pre-fix; this P2 was explicitly left out of scope by the fixer (fix log: 'not in this dispatch's scope')" }
+        ]
+      },
+      {
+        "index": 5, "type": "Stress",
+        "label": "Imatinib: heuristic-sized ensemble, full pipeline (regression)",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Bit-identical to pre-fix: n_conf=45 (5*7 rotatable bonds+10), 45/45 embedded/converged, RMSD-pruned 45->43, energy-windowed 43->38, Boltzmann-avg asphericity 0.4316 vs mean 0.4355.",
+        "basic": 38, "specialized": 56, "total": 94,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "n_conf heuristic (5*NumRotatableBonds+10) is correctly computed and applied", "result": "PASS", "note": "7 rotatable bonds -> 45 conformers" },
+          { "text": "Full documented pipeline runs end-to-end on a real drug molecule without error", "result": "PASS", "note": "embed->optimize->RMSD-prune->energy-window->Boltzmann-average all completed" },
+          { "text": "Boltzmann-weighted average differs meaningfully from the unweighted mean", "result": "PASS", "note": "0.4316 vs 0.4355, matches pre-fix exactly" },
+          { "text": "All reported values are traceable to RDKit computation", "result": "PASS", "note": "No fabricated statistics" }
+        ]
+      },
+      {
+        "index": 6, "type": "Scope Boundary",
+        "label": "CREST + GFN2-xTB workflow on Windows, RE-VERIFIED against the new caveat, plus fallback execution on a new molecule",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "CRITICAL P1 RE-VERIFICATION. crest_workflow() still raises FileNotFoundError exactly as the new caveat predicts. The documented fallback (RDKit macrocycle-aware embedding + standalone xtb --opt) was executed on cyclododecanone -- a molecule the fixer did not test -- and produced a real GFN2-optimized geometry (TOTAL ENERGY -40.9859 Eh, xtbopt.xyz written, returncode 0).",
+        "basic": 36, "specialized": 52, "total": 88,
+        "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "SKILL.md documents a Windows-specific caveat or fallback for the CREST prerequisite", "result": "PASS", "note": "Was FAIL pre-fix; now present, accurate against TOOLS.md's own findings" },
+          { "text": "The RDKit preparation half of the fallback workflow completes correctly", "result": "PASS", "note": "10/10 macrocycle-aware conformers embedded, MMFF94s pre-relaxed" },
+          { "text": "The documented fallback (RDKit macrocycle embedding + standalone xtb --opt) executes to completion and produces a real optimized geometry", "result": "PASS", "note": "xtb returncode 0, xtbopt.xyz produced, real TOTAL ENERGY computed -- verified on a NEW molecule not used by the fixer" },
+          { "text": "crest_workflow() fails with the exact predicted exception type, not a different/opaque error", "result": "PASS", "note": "FileNotFoundError, matching the caveat's own claim" }
+        ]
+      },
+      {
+        "index": 7, "type": "Adversarial",
+        "label": "Malformed SMILES through the FIXED gen_conformers() -- 2 new strings the fixer never tested -- plus determinism re-check",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "CRITICAL P1 RE-VERIFICATION. 'Xyz[[[invalid' and 'c1ccccc1(((' both correctly raise the guard's ValueError. NEW FINDING: empty string '' bypasses the guard (MolFromSmiles('') returns a valid 0-atom Mol, not None) and instead raises RDKit's own 'molecule has no atoms' ValueError from EmbedMultipleConfs -- still a clear ValueError, not the opaque ArgumentError the P1 fixed, but not the guard's own message either. Determinism: seed=7 bit-identical across 2 runs; seed=99 differs as expected.",
+        "basic": 34, "specialized": 50, "total": 84,
+        "assertions_passed": 3, "assertions_total": 4,
+        "assertions": [
+          { "text": "Fixed-seed runs are bit-for-bit reproducible", "result": "PASS", "note": "Identical sorted energy lists across two seeded runs" },
+          { "text": "Genuinely malformed (syntactically broken) SMILES raise the guard's intended ValueError", "result": "PASS", "note": "Verified with 2 different strings than the fixer used: 'Xyz[[[invalid' and 'c1ccccc1((('" },
+          { "text": "ALL invalid-SMILES inputs, including empty string, are caught by the guard's own message", "result": "FAIL", "note": "Empty string bypasses the guard; RDKit's own 'molecule has no atoms' ValueError fires instead -- new minor (P2) gap, not a regression of the P1 fix" },
+          { "text": "No 'proven global minimum' overclaim appears in the executed code path", "result": "PASS", "note": "Reported minimum is explicitly the best of n_conf sampled conformers" }
+        ]
+      },
+      {
+        "index": 8, "type": "Adversarial",
+        "label": "NEW: organometallic ferrocene ion-pair -- probing the 'neither MMFF nor UFF covers' Common Errors claim",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Neither the pre-fix audit nor the fix log tested this scenario. MMFF94 unexpectedly returned usable (non-None) properties for this Fe-containing ion pair despite UFFTYPER warning of an unrecognized atom type, so the documented 'neither MMFF nor UFF covers -> ValueError' branch was not independently demonstrated. Code ran to completion without an unhandled crash either way.",
+        "basic": 34, "specialized": 44, "total": 78,
+        "assertions_passed": 3, "assertions_total": 4,
+        "assertions": [
+          { "text": "Organometallic/disconnected-ion input embeds or fails gracefully without an unhandled crash", "result": "PASS", "note": "5/5 conformers embedded" },
+          { "text": "MMFF94-vs-UFF coverage status is accurately reported for a metal-containing molecule", "result": "PASS", "note": "mmff_props correctly non-None; no incorrect claim made by the code" },
+          { "text": "optimize_conformers() executes to completion consistent with whichever force field actually has params", "result": "PASS", "note": "MMFF branch taken, ran without raising" },
+          { "text": "This input independently demonstrates the documented 'neither MMFF nor UFF covers' ValueError path", "result": "FAIL", "note": "Not reached -- inconclusive test design, not scored as a Skill defect beyond noting the branch remains unverified" }
+        ]
+      },
+      {
+        "index": 9, "type": "Edge",
+        "label": "NEW: RMSD-pruning / energy-window boundary conditions -- empty list, single conformer, identical energies",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Neither the pre-fix audit nor the fix log tested these boundary conditions. prune_conformers_rmsd handles empty and single-item lists gracefully. NEW FINDING: filter_by_energy() (and examples/gen_conformers.py's filter_energy_window()) call min() unguarded and crash with a raw 'min() iterable argument is empty' ValueError on an empty conformer list -- e.g. if RMSD pruning ever removes every conformer. Boltzmann weighting on all-identical energies is numerically correct: uniform weights, sums to 1.0, no division-by-zero.",
+        "basic": 36, "specialized": 50, "total": 86,
+        "assertions_passed": 3, "assertions_total": 4,
+        "assertions": [
+          { "text": "Empty-list RMSD pruning is handled gracefully", "result": "PASS", "note": "prune_conformers_rmsd(mol, []) returns []" },
+          { "text": "Empty-list energy filtering fails gracefully with an informative error, consistent with the rest of the Skill's error-handling pattern", "result": "FAIL", "note": "Raises raw 'min() iterable argument is empty' -- new minor (P2) gap, inconsistent with the guarded-error pattern just applied to gen_conformers()" },
+          { "text": "Single-conformer boundary case handled correctly by both pruning and filtering", "result": "PASS", "note": "Both functions return the single conformer unchanged" },
+          { "text": "All-identical-energy Boltzmann weighting is numerically correct (uniform, no div-by-zero)", "result": "PASS", "note": "Weights [0.333, 0.333, 0.333], sum=1.0" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 37.2,
+    "dynamic_weighted": 52.9,
+    "score": 90,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Both P1 defects from the pre-fix audit are genuinely fixed and independently re-verified by execution using different test inputs than the fixer used: the Windows/CREST caveat correctly predicts the FileNotFoundError and its recommended fallback (RDKit macrocycle embedding + standalone xtb --opt) was executed successfully on a new molecule; gen_conformers() now raises a clear ValueError (not an opaque C++ ArgumentError) on syntactically malformed SMILES.",
+    "The redundancy pass is real and complete: usage-guide.md no longer restates SKILL.md content, and no unique information was lost in the process.",
+    "Core ETKDGv3 + MMFF94s/UFF pipeline (embed, optimize, RMSD-prune, energy-window filter, Boltzmann-average) continues to run correctly end-to-end on real drug-like molecules with bit-identical regression results to the pre-fix audit.",
+    "Fixed-seed determinism remains exact, satisfying the Skill Veto's T3 requirement.",
+    "The function-name cross-reference note (P2 fix) correctly names all three SKILL.md/examples.py pairs and materially improves discoverability."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "filter_by_energy() / filter_energy_window() crash ungracefully on an empty conformer list",
+      "observed_in": [9],
+      "problem": "Both the SKILL.md gen_conformers() pipeline's filter_by_energy() and examples/gen_conformers.py's filter_energy_window() call min(energies) unguarded. If RMSD pruning ever removes every conformer, the next pipeline step raises a raw 'ValueError: min() iterable argument is empty' with no context, unlike the clear guarded errors the rest of the Skill now uses consistently.",
+      "root_cause": "The energy-window filter was not included in the same guard-consistency pass that fixed gen_conformers()'s missing mol-is-None check.",
+      "fix": "Add an explicit check at the top of both functions: 'if not conf_ids: return []' (or raise a clear ValueError naming the empty-pruning cause), matching the empty-input handling already present in filter_energy_window()'s own conf_data check in examples/gen_conformers.py."
+    },
+    {
+      "priority": "P2",
+      "title": "gen_conformers()'s mol-is-None guard does not catch empty-string SMILES",
+      "observed_in": [7],
+      "problem": "Chem.MolFromSmiles('') returns a valid Mol object with 0 atoms (not None) in the installed RDKit build, so the new 'if mol is None' guard does not fire for this input; RDKit's own EmbedMultipleConfs eventually raises 'ValueError: molecule has no atoms' instead of the guard's intended 'Invalid SMILES' message.",
+      "root_cause": "The guard checks only for None; it does not also check GetNumAtoms() == 0, which is a second way RDKit signals an unusable SMILES.",
+      "fix": "Extend the guard to 'if mol is None or mol.GetNumAtoms() == 0: raise ValueError(...)' in gen_conformers(), macrocycle_conformers(), and crest_workflow() for consistency."
+    },
+    {
+      "priority": "P2",
+      "title": "Macrocycle-aware embedding's claimed benefit still has no worked before/after example",
+      "observed_in": [4],
+      "problem": "Unchanged from the pre-fix audit: a genuine >=12-atom carbocycle test still shows default ETKDGv3 settings succeeding equally (50/50) alongside useMacrocycleTorsions=True, so the documented under-sampling claim remains undemonstrated by any example in the Skill.",
+      "root_cause": "This P2 was explicitly scoped out of the current fix dispatch (fix log: 'not in this dispatch's scope... left for a future pass').",
+      "fix": "Add a concrete before/after example (e.g. cyclosporine A, already named in usage-guide.md but never coded) showing embedding failure or degraded diversity under default settings versus success under useMacrocycleTorsions=True."
+    }
+  ]
+}
