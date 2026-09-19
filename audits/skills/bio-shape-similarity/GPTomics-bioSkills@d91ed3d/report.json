@@ -1,0 +1,231 @@
+{
+  "meta": {
+    "skill_name": "bio-shape-similarity",
+    "description": "Performs 3D shape-based similarity searching using ROCS (OpenEye), USRCAT (ultra-fast), Open3DAlign (RDKit), ESPSim (electrostatic), and ShaEP with explicit handling of Tanimoto-Combo (shape + color), shape vs ECFP4 complementarity, conformer-ensemble searching, alignment optimization, and scaffold hopping. Use when searching for shape-mimicking compounds with different scaffolds, identifying bioisosteric replacements, prospective scaffold hopping, or expanding hit series beyond 2D similarity.",
+    "evaluated_on": "2026-09-19",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:chemoinformatics/shape-similarity"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All 5 cited DOIs (ROCS Hawkins 10.1021/jm0603365, USRCAT Schreyer/Blundell 10.1186/1758-2946-4-27, ShaEP Vainio/Puranen/Johnson 10.1021/ci800315d, Open3DALIGN Tosco/Balle/Shiri 10.1007/s10822-011-9462-9) are real, correctly attributed papers in the shape-similarity literature. No invented benchmark numbers presented as literature results; every numeric value in the illustrative code (0.7/0.5 cutoffs, TanimotoCombo range) is explicitly labeled a repository starting default requiring calibration, not a validated finding." },
+      "practice_boundaries": { "result": "PASS", "detail": "Compound virtual-screening tool; no diagnostic or prescriptive statements about individuals. No clinical-disclaimer requirement applies to this domain." },
+      "methodological_ground": { "result": "PASS", "detail": "No principled fallacy detected. The Skill correctly and repeatedly distinguishes normalized shape Tanimoto (0-1), unnormalized O3A score, and ROCS TanimotoCombo (0-2, a sum not an average) -- a real execution (Input 1) reproduced exactly the scale gap the Skill warns about (O3A.Score()=151.54 vs shape Tanimoto=1.0 for the same pair). Repeated, explicit warnings against treating illustrative thresholds as universal cutoffs." },
+      "code_usability": { "result": "PASS", "detail": "6 of 7 inputs executed real code against the installed RDKit 2026.03.6 / ShaEP 1.4.2 / Open Babel 3.1.0 with zero syntax or import errors. Note: Input 4 (conformer-ensemble search, SKILL.md's own documented shape_search_ensemble pattern) ran to completion (exit 0) but silently dropped 2 of 3 library molecules due to a real logic defect -- this is a correctness/reliability defect scored in dynamic_score, not an M4 'unrunnable code' trigger, since no syntax error, infinite loop, or missing dependency occurred." }
+    }
+  },
+  "static_score": {
+    "subtotal": 82,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 9, "max": 12, "note": "USRCAT, Open3DAlign, conformer-ensemble, ROCS/TanimotoCombo (conceptual, correctly flagged as commercial/unexecutable here), and ShaEP are all covered with working patterns. ESPSim is named in the frontmatter description and the 'ESP Similarity' section but never gets its own code example (only ShaEP does) -- a real completeness gap. Correctness is dented by the conformer-ensemble function's convergence-gating bug found in Input 4." },
+      "reliability": { "score": 6, "max": 12, "note": "prepare_mol_3d-style functions raise clear, specific ValueError/RuntimeError with the offending SMILES (verified in Input 3). shape_search_ensemble, by contrast, silently `continue`s past a failed molecule with zero message -- exactly the failure mode Category-3 Override 1 says should instead be 'caught and reported clearly'. It is not." },
+      "performance_context": { "score": 8, "max": 8, "note": "SKILL.md (~301 lines) is well-layered against usage-guide.md and examples/shape_search.py; no upfront bloat." },
+      "agent_usability": { "score": 14, "max": 16, "note": "Clear, consistently-named workflow steps and a strong 'Common Errors' + 'Per-Tool Failure Modes' pairing, but neither table anticipates the exact silent-drop conformer-ensemble bug or the disconnected-fragment (salt) MMFF blind spot found during execution." },
+      "human_usability": { "score": 6, "max": 8, "note": "Natural trigger language for medicinal/computational chemists. Strict SMILES validation is correct-by-design for a Category-3 skill and not penalized (Override 2), but the ensemble path's total silence on drops is a real forgiveness/communication gap, not a strictness one." },
+      "security": { "score": 11, "max": 12, "note": "No credentials, no eval/exec of raw strings, subprocess calls (ShaEP, obabel) use argument lists rather than shell=True. Disconnected-fragment SMILES (e.g. simple salts) pass MMFFHasAllMoleculeParams trivially and generate physically meaningless conformers with no warning -- a data-integrity gap rather than an injection risk." },
+      "maintainability": { "score": 10, "max": 12, "note": "Clean 3-way split (SKILL.md concepts/API, usage-guide.md quick-start, examples/shape_search.py runnable reference with an executable self-check). Inline SKILL.md snippets themselves have no accompanying test harness." },
+      "agent_specific": { "score": 18, "max": 20, "note": "Sharp trigger scope with explicit 'For X, see Y' cross-references into molecular-io/conformer-generation/similarity-searching/pharmacophore-modeling/scaffold-analysis/virtual-screening prevent overlap. Confirmed idempotent (bit-identical reruns, seed=42). Escape-hatch guidance does not cover the two failure modes actually found (silent ensemble drop; disconnected-fragment blind spot)." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 80.0,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 22, "total": 25 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "USRCAT pre-filter + Open3DAlign rescore, 10-compound synthetic library, run twice for determinism",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. USRCAT ranking and Open3DAlign rescore both correct (identical library member scored USRCAT=1.0/shape Tanimoto=1.0); rerun with the same seed=42 was bit-identical, confirming Skill Veto T3 (determinism) passes for this pattern.",
+        "basic": 37,
+        "specialized": 53,
+        "total": 90,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Library is ranked correctly by USRCAT similarity", "result": "PASS", "note": "Identical molecule scored 1.0000, chemically sensible ordering otherwise" },
+          { "text": "Shape Tanimoto values fall in [0,1], distinct from the unnormalized O3A score", "result": "PASS", "note": "Assertion coded and passed; O3A scores (83-152) confirmed on a completely different scale" },
+          { "text": "Re-running with the same seed reproduces identical results", "result": "PASS", "note": "run1 vs run2 bit-identical for all 5 rescored hits" },
+          { "text": "No fabricated or unverifiable numerical claims", "result": "PASS", "note": "All values computed live from RDKit on the audit's own synthetic library" }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Scaffold-hop candidate search with thresholds calibrated on a labeled reference set (not the illustrative 0.7/0.5 defaults)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. Calibrated shape_threshold=0.598 / ecfp_threshold=0.275 from 2 known hops + 3 known non-hops, then screened a 4-compound library; correctly returned 0 candidates because the screen library's 2D similarity exceeded the calibrated ceiling -- a legitimate, non-buggy scientific result.",
+        "basic": 35,
+        "specialized": 54,
+        "total": 89,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "Thresholds are calibrated from labeled reference data, not hard-coded defaults", "result": "PASS", "note": "shape_threshold/ecfp_threshold derived from the midpoint of reference true-hop vs non-hop scores" },
+          { "text": "No compound is labeled a scaffold hop without meeting both calibrated criteria", "result": "PASS", "note": "0 false positives; all 4 screened compounds correctly rejected" },
+          { "text": "No fabricated benchmark statistics presented as literature values", "result": "PASS", "note": "Reference set is explicitly synthetic, written for this audit" }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Failure-mode handling: malformed SMILES, empty string, disconnected-fragment (salt) input",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "executed: true. Malformed SMILES and empty-molecule inputs raised clear, catchable ValueErrors exactly as the Skill's prepare_mol_3d pattern intends. But [Fe+2].[Cl-].[Cl-] (a disconnected multi-fragment/salt SMILES) silently 'succeeded', producing 10 conformers: MMFFHasAllMoleculeParams() returns True trivially for isolated single-atom ions with no bonds to parameterize, so the documented ValueError guard never fires -- confirmed via a direct isolation test.",
+        "basic": 28,
+        "specialized": 44,
+        "total": 72,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Malformed SMILES raises a clear, catchable error", "result": "PASS", "note": "ValueError with the offending SMILES string" },
+          { "text": "Empty-molecule input raises a clear, catchable error", "result": "PASS", "note": "ValueError: molecule has no atoms" },
+          { "text": "Disconnected-fragment/organometallic input that MMFF cannot meaningfully parameterize is flagged rather than silently producing conformers", "result": "FAIL", "note": "Silently 'succeeded' with 10 physically meaningless conformers; MMFFHasAllMoleculeParams trivially True for isolated ions" },
+          { "text": "No unhandled exception crashes the process", "result": "PASS", "note": "All 4 test cases completed without an unhandled traceback" }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Conformer-ensemble shape search (n_conf=20) over a 3-compound library using SKILL.md's shape_search_ensemble() pattern verbatim",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "executed: true. Only 1 of 3 library molecules appeared in the output. Root cause isolated directly: `if any(status != 0 for status, _ in optimization): continue` discards the ENTIRE molecule if even one of its 20 MMFF-optimized conformers fails to converge (status 1), rather than excluding only that conformer. 2 of 3 realistic test molecules hit this and vanished with zero message -- the exact 'ran without printing a checked result' trap the audit brief warns about, in the Skill's own documented code.",
+        "basic": 17,
+        "specialized": 27,
+        "total": 44,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Every library molecule that RDKit can successfully embed appears in the ranked output", "result": "FAIL", "note": "2 of 3 embeddable molecules silently absent from results" },
+          { "text": "A dropped/skipped library molecule is reported, not silently omitted", "result": "FAIL", "note": "No print, log, or return value indicates anything was dropped" },
+          { "text": "Best-shape score per retained molecule is in [0,1]", "result": "PASS", "note": "The 1 surviving molecule scored 0.4828, in range" },
+          { "text": "No unhandled exception; process completes", "result": "PASS", "note": "Exit code 0, no traceback" }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Full 15-compound pipeline: USRCAT pre-filter to top 8, Open3DAlign rescore, ECFP4, shape/ECFP4 quadrant classification",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. All 15/15 compounds embedded and accounted for; USRCAT->O3A->ECFP4->quadrant pipeline ran end to end with no manual intervention; quadrant labels matched SKILL.md's Shape vs ECFP4 Complementarity table definitions.",
+        "basic": 36,
+        "specialized": 55,
+        "total": 91,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "All pipeline stages execute in sequence without manual intervention", "result": "PASS", "note": "Single script run, no errors" },
+          { "text": "Quadrant classification matches SKILL.md's shape/ECFP4 definitions", "result": "PASS", "note": "High/high -> close analog, high/low -> scaffold-hop candidate, etc., applied consistently" },
+          { "text": "No compound is silently dropped without being logged", "result": "PASS", "note": "15/15 embedded and reported; contrasts with Input 4's failure" },
+          { "text": "Thresholds used for 'high' are stated explicitly, not presented as universal constants", "result": "PASS", "note": "0.5/0.4 stated inline as this run's choice" }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Real ShaEP 1.4.2 CLI run using SKILL.md's exact documented invocation syntax",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. `shaep -q query.mol2 target.mol2 -s aligned_hits.sdf similarity.txt` matched the real installed binary's flags exactly (no corrections needed) and produced a similarity.txt with separate shape_similarity=0.9988 and ESP_similarity=0.8232 columns, confirming the Skill's shape+ESP framing is not just conceptual. Gap: SKILL.md never documents how to get from a SMILES query to the .mol2 input ShaEP needs; obabel was used as the (undocumented) bridge.",
+        "basic": 36,
+        "specialized": 52,
+        "total": 88,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "Documented ShaEP CLI syntax matches the real installed 1.4.2 binary", "result": "PASS", "note": "Ran unmodified, returncode 0" },
+          { "text": "Output reports both shape_similarity and ESP_similarity per the Skill's shape+ESP framing", "result": "PASS", "note": "similarity.txt has separate shape_similarity and ESP_similarity columns" },
+          { "text": "No fabricated similarity values", "result": "PASS", "note": "Numbers come from the real ShaEP run" }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "User asks to apply the 0.7/0.5 defaults as universal cutoffs and reports a 'shape Tanimoto of 1.4'",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "executed: false (Mode A direct-reasoning response, no code to run). Response correctly refused to universalize the illustrative thresholds and correctly diagnosed the >1 'shape Tanimoto' as a mislabeled raw O3A score or TanimotoCombo, citing SKILL.md's own Common Errors table; corroborated with Input 1's real O3A.Score()=151.54 vs shape Tanimoto=1.0 result on the same pair.",
+        "basic": 35,
+        "specialized": 51,
+        "total": 86,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "Response refuses to present 0.7/0.5 as universal/validated cutoffs", "result": "PASS", "note": "Explicitly cites SKILL.md's calibration requirement" },
+          { "text": "Response correctly explains why a shape Tanimoto > 1 cannot be genuine", "result": "PASS", "note": "Cites the O3A/TanimotoCombo distinction; corroborated by Input 1's real numbers" },
+          { "text": "Response does not fabricate a specific 'safe' cutoff value it has no basis for", "result": "PASS", "note": "Asks for the actual computed score instead of guessing" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 32.8,
+    "dynamic_weighted": 48.0,
+    "score": 81,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "ETKDGv3 conformer generation is correctly seeded (randomSeed=42) in every documented pattern; verified bit-for-bit identical output across repeated runs with no Skill Veto T3 concern.",
+    "The ShaEP CLI example matches the real, exact-version-named binary (1.4.2) flag-for-flag; a live run produced correct, separate shape_similarity and ESP_similarity columns with zero corrections needed.",
+    "Explicit, repeated guidance against treating illustrative thresholds (0.7/0.5, TanimotoCombo range) as universal cutoffs, backed by a working calibration-from-reference-set example.",
+    "The Common Errors table's warning that shape Tanimoto (0-1) is often confused with the unnormalized O3A score was independently reproduced: a real run returned O3A.Score()=151.54 for a pair whose true shape Tanimoto was 1.0."
+  ],
+  "recommendations": [
+    {
+      "priority": "P0",
+      "title": "shape_search_ensemble silently drops a whole molecule on one failed conformer",
+      "observed_in": [4],
+      "problem": "SKILL.md's own Conformer-Ensemble Shape Searching function discards an entire library molecule from the results if even 1 of n_conf (e.g. 20) MMFF-optimized conformers fails to converge, with no error, warning, or log line. In a 3-compound test, 2 molecules vanished silently.",
+      "root_cause": "`if any(status != 0 for status, _ in optimization): continue` gates on ANY conformer failing rather than excluding only the failed conformer(s) and scoring the rest of the ensemble.",
+      "fix": "Change the loop to skip only the non-converged conformer IDs (filter `ids` by `status == 0` before scoring) and print/return the count and identity of any molecule that ends up with zero usable conformers, so silent data loss becomes a visible, countable event."
+    },
+    {
+      "priority": "P1",
+      "title": "Disconnected-fragment (salt) SMILES silently pass MMFF validation and produce meaningless conformers",
+      "observed_in": [3],
+      "problem": "A simple salt SMILES like `[Fe+2].[Cl-].[Cl-]` passes MMFFHasAllMoleculeParams() (True) and 'successfully' embeds 10 conformers, even though the fragments are unbonded single ions with no real shape to compare.",
+      "root_cause": "MMFF parameterization trivially succeeds on molecules with zero bonds per fragment; the Skill's failure-mode guidance only anticipates embedding/MMFF failures, not this silent-success case.",
+      "fix": "Add a documented pre-check (e.g. `len(Chem.GetMolFrags(mol)) > 1` or explicit valid-atom-type filtering) to the Per-Tool Failure Modes table, with guidance to warn or reject multi-fragment/salt inputs before shape comparison."
+    },
+    {
+      "priority": "P1",
+      "title": "ShaEP example omits the SMILES-to-mol2 conversion step it depends on",
+      "observed_in": [6],
+      "problem": "The ESP Similarity section's `shaep -q query.mol2 target.mol2 ...` example assumes .mol2 files already exist but never shows how to produce them from a SMILES query, and RDKit itself has no Mol2 writer.",
+      "root_cause": "The section documents the ShaEP invocation in isolation without cross-referencing the molecular-io Skill or naming a specific converter (e.g. Open Babel).",
+      "fix": "Add one line naming Open Babel (`obabel -:\"<SMILES>\" -O out.mol2 --gen3D`) or point explicitly to chemoinformatics/molecular-io for the SMILES->mol2 step before the shaep invocation."
+    },
+    {
+      "priority": "P2",
+      "title": "ESPSim is named as a supported method but has no code example",
+      "observed_in": [1],
+      "problem": "The frontmatter description and the method taxonomy table both list ESPSim as a supported shape+electrostatics tool, but only ShaEP gets an actual CLI example; ESPSim has no code pattern anywhere in SKILL.md.",
+      "root_cause": "The ESP Similarity section was written around the ShaEP CLI only, even though the description promises both tools.",
+      "fix": "Either add a minimal ESPSim code example (it is a pip-installable Python package) or remove it from the frontmatter description/taxonomy row to avoid promising coverage the Skill doesn't deliver."
+    }
+  ]
+}
