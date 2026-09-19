@@ -1,0 +1,320 @@
+{
+  "meta": {
+    "skill_name": "bio-microbiome-diversity-analysis",
+    "description": "Alpha and beta diversity of an amplicon (16S/ITS) ASV/OTU community table: observed features, Shannon, Pielou evenness, Faith PD, Bray-Curtis, Jaccard, weighted/unweighted/generalized UniFrac, Aitchison/RPCA, via QIIME2 core-metrics-phylogenetic, phyloseq/vegan, and scikit-bio, with PERMANOVA paired with betadisper.",
+    "evaluated_on": "2026-09-19",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 9,
+    "source": "mrsonord2240/bioSkills@7536f5f:microbiome/diversity-analysis",
+    "re_audit_of": "F:\\OpenScience\\audits\\_pre-fix-20260919\\bio-microbiome-diversity-analysis\\eval_report_bio-microbiome-diversity-analysis_result.json",
+    "fix_log": "F:\\optimizing-agent-science-skills\\fixes\\bio-microbiome-diversity-analysis.md"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "All 12 references unchanged and unaffected by the fix. No fabricated statistics, p-values, or effect sizes in any of the 9 outputs, including the two re-auditor-added inputs."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Unchanged: community-level microbiome diversity statistics for research use; no diagnostic or prescriptive claims about individuals."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "The original audit's one real methodological gap (no repeated-measures/pseudo-replication guidance in the Beta Diversity section) is now closed and independently re-verified twice: on the original longitudinal fixture (regression Input 5, naive p=0.098 -> strata p=1, matches exactly) and on a brand-new fixture built by this re-auditor with known ground truth of no real effect (Input 8, naive p=0.001 -> strata p=1 -- a clean, textbook false-positive correction). No new methodological gaps found across 9 inputs."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "The one code-usability defect from the original audit (examples/diversity_analysis.R crashing with \"object 'Group' not found\") is fixed and independently re-verified: ran the unmodified shipped script end-to-end against GlobalPatterns, completes with 'Done.' and both plots written, no error. All real R code across 9 inputs (5 regression re-executions reproducing the original audit's exact numbers, plus 2 new re-auditor fixtures) executed successfully. No new code-usability regressions found."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 97,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 11,
+        "max": 12,
+        "note": "Completeness and appropriateness unchanged from the original audit (both already strong). Correctness improves: the shipped example script's crash is fixed and independently re-verified end-to-end. Remaining gap unaffected by this fix pass: NMDS still never mentioned, RPCA still only a one-line CLI reference with no worked example (open P2, not part of this fix; fixer's rationale for leaving it -- installing DEICODE/gemelli would downgrade the shared QIIME2 env's pinned scipy/scikit-bio -- checked and still holds per TOOLS.md)."
+      },
+      "reliability": {
+        "score": 12,
+        "max": 12,
+        "note": "Fault tolerance: the Per-Method Failure Modes table now also covers repeated-measures PERMANOVA, closing the one gap this audit's own regression testing could find; no other gaps found across 9 inputs. Error reporting unchanged and still clear/specific (re-confirmed: tree-less UniFrac error still matches documented message exactly). Recoverability improves to full marks: the shipped-example bug that would have confused a first-time user before self-diagnosis is fixed and re-verified by direct execution."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "Unchanged from the original audit. SKILL.md grew by ~26 lines (Required Setup section + repeated-measures note) but remains well under the 500-line guideline (~250 lines); usage-guide.md is now leaner after the redundancy pass, improving progressive disclosure slightly, but this does not change the execution-efficiency half of this category."
+      },
+      "agent_usability": {
+        "score": 15,
+        "max": 16,
+        "note": "Learnability, consistency, feedback design, and error prevention all remain strong; all 9 inputs (5 regression + 2 new + 2 carried-forward text) completed cold-start using only SKILL.md's stated patterns. The pre-existing minor consistency gap (Alpha and Beta Diversity R code blocks build the grouping-variable dataframe in slightly different styles) is untouched by this fix pass and still present -- not docked further, but not resolved either."
+      },
+      "human_usability": {
+        "score": 8,
+        "max": 8,
+        "note": "Discoverability unchanged (still strong, natural trigger phrasing). Forgiveness improves to full marks: the repeated-measures gap that was the original audit's only soft spot here is closed and independently re-verified on two fixtures, including one with known ground truth."
+      },
+      "security": {
+        "score": 12,
+        "max": 12,
+        "note": "Unchanged: no credentials, no unsanitized execution of user-provided strings, no sensitive-data handling concerns."
+      },
+      "maintainability": {
+        "score": 12,
+        "max": 12,
+        "note": "Modularity and modifiability unchanged (clean SKILL.md/usage-guide.md/examples/ separation, now cleaner still after the redundancy pass -- diff-reviewed directly and confirmed nothing the agent needs was lost, only true duplication removed). Testability improves to full marks: the one shipped 'test case' example is no longer broken -- re-run end to end and confirmed clean in this audit."
+      },
+      "agent_specific": {
+        "score": 20,
+        "max": 20,
+        "note": "Unchanged from the original audit's maximum score: precise trigger boundaries, strong progressive disclosure (improved slightly by the redundancy pass), clear Related Skills composability, fully seeded/deterministic pipeline (re-confirmed: 5 regression inputs reproduced bit-for-bit identical numbers), explicit escape hatches, all re-verified in this audit's real execution."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 94.1,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 35, "total": 36 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Full alpha+beta diversity, PERMANOVA+betadisper on a real phyloseq fixture (control vs treated) -- regression",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Re-executed fresh; reproduces the original audit's numbers exactly (R2=0.659/0.060/0.635, Shannon KW p=2.97e-07). No regression.",
+        "executed": true,
+        "execution_note": "Ran run/regression_input1_canonical.R (unmodified copy of the original audit's script) against datagen/asvtable/phyloseq_object.rds.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Output declares the sampling depth AND the exact dropped-sample list", "result": "PASS", "note": "Depth 7169; dropped S03, S17, S29, S40 -- exact match to original" },
+          { "text": "Output reports both weighted AND unweighted UniFrac PERMANOVA", "result": "PASS", "note": "R2=0.6585 vs R2=0.0596, both p=0.001 -- exact match" },
+          { "text": "Output pairs every PERMANOVA with betadisper and flags dispersion confounds correctly", "result": "PASS", "note": "Weighted p=0.591 (clean); unweighted p=0.001 (confounded) -- exact match" },
+          { "text": "Faith PD and Shannon differ significantly by group", "result": "PASS", "note": "Shannon KW p=2.968e-07, Faith PD KW p=1.516e-06 -- exact match" }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Sampling-depth choice: min(sample_sums) vs plateau-based depth -- regression",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Re-executed fresh; reproduces the original audit's numbers exactly. The plateau-heuristic gap (assertion 4) is unchanged -- still open, not part of this fix pass.",
+        "executed": true,
+        "execution_note": "Ran run/regression_input2_depth.R.",
+        "basic": 38,
+        "specialized": 55,
+        "total": 93,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Output reports the exact dropped-sample list at the chosen depth", "result": "PASS", "note": "S03, S17, S29, S40 -- exact match" },
+          { "text": "Output avoids recommending min(sample_sums)", "result": "PASS", "note": "Unchanged guidance, still followed" },
+          { "text": "Output quantifies the real richness cost of the min-depth choice", "result": "PASS", "note": "118.7 vs 139.8, 17.8% -- exact match" },
+          { "text": "Output confirms the chosen depth sits on the alpha-rarefaction plateau per SKILL.md's stated method", "result": "FAIL", "note": "Still no numeric substitute for visually reading the curve -- pre-existing open P2, untouched by this fix pass" }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "No phylogenetic tree available -- non-phylogenetic fallback -- regression",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Re-executed fresh; reproduces the original audit's numbers exactly. No regression.",
+        "executed": true,
+        "execution_note": "Ran run/regression_input3_edge_notree.R.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "UniFrac() on a tree-less phyloseq object errors with a specific, diagnosable message", "result": "PASS", "note": "\"phy_tree slot is empty\" -- exact match to documented row" },
+          { "text": "Non-phylogenetic alpha and beta diversity are still computed successfully", "result": "PASS", "note": "Observed/Shannon, Bray-Curtis/Jaccard all computed" },
+          { "text": "Fallback PERMANOVA is still paired with betadisper", "result": "PASS", "note": "Bray-Curtis betadisper p=0.001 -- exact match" },
+          { "text": "Skill fails loudly rather than silently returning a wrong UniFrac value", "result": "PASS", "note": "Clean R error, no garbage output" }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "QIIME2 core-metrics-phylogenetic pipeline + generalized UniFrac cross-check -- regression (partial)",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "The R-only generalized-UniFrac portion was re-executed fresh and matches the original audit exactly (R2=0.4187 vs original 0.419). The full QIIME2 CLI pipeline on the real moving-pictures dataset was NOT re-executed this pass -- that code path is byte-unchanged by the fix (confirmed by direct git diff), so its original numbers are carried forward, not independently re-verified in this audit.",
+        "executed": true,
+        "execution_note": "Ran run/regression_input4_generalized_unifrac_Ronly.R fresh. QIIME2 CLI portion: not re-run; low regression risk since unchanged by the fix, but flagged as carried-forward evidence, not fresh evidence.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "core-metrics-phylogenetic runs to completion on real 16S data", "result": "PASS", "note": "Carried forward from original audit -- not re-executed this pass" },
+          { "text": "Sampling-depth-drops-samples behavior confirmed on a second, independent real dataset", "result": "PASS", "note": "Carried forward from original audit -- not re-executed this pass" },
+          { "text": "Every beta metric's PERMANOVA is reported alongside PERMDISP where present", "result": "PASS", "note": "Carried forward from original audit -- not re-executed this pass" },
+          { "text": "SKILL.md's verbatim generalized-UniFrac code line runs unmodified and interpolates correctly", "result": "PASS", "note": "Freshly re-executed: R2=0.4187, between weighted (0.6585) and unweighted (0.0596)" }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Longitudinal/repeated-measures design -- regression (P1 fix target)",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Re-executed fresh on the same longitudinal fixture; reproduces the fixer's and original audit's numbers exactly (naive p=0.098 -> strata p=1). The assertion that FAILed in the original audit now PASSes: SKILL.md's Beta Diversity section now carries the repeated-measures guidance. Score rises from 87 (original) to 94.",
+        "executed": true,
+        "execution_note": "Ran run/regression_input5_stress.R against datagen/asvtable/long_phyloseq.rds.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Alpha and beta diversity are computed correctly on the repeated-measures fixture", "result": "PASS", "note": "Shannon and weighted UniFrac computed for all 36 samples -- exact match" },
+          { "text": "SKILL.md provides repeated-measures/pseudo-replication guidance for PERMANOVA, mirroring its alpha-diversity guidance", "result": "PASS", "note": "FIXED: Beta Diversity section now has a strata=SubjectID adonis2 line and explanatory note, verified present in the fixed SKILL.md" },
+          { "text": "Restricted permutations (strata=SubjectID) materially change the PERMANOVA result relative to the naive pooled version", "result": "PASS", "note": "Naive p=0.098 -> strata p=1 -- exact match to original audit and fix log" },
+          { "text": "The naive result does not flip the qualitative conclusion to a false positive in this instance", "result": "PASS", "note": "Both agree 'not significant', naive still overstates evidence -- unchanged" }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Per-taxon 'which bug changed' request -- should redirect to differential-abundance -- regression (text)",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Not re-generated as a fresh response this pass (no code). Verified by direct diff review that the Decision Tree row and DA-warning language it depends on are byte-unchanged by the fix. Scores carried forward from the original audit.",
+        "executed": true,
+        "execution_note": "No code to execute; verified via git diff that the relied-upon SKILL.md text is unchanged.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Output does not perform per-taxon significance testing itself", "result": "PASS", "note": "Unchanged" },
+          { "text": "Output explicitly redirects to differential-abundance", "result": "PASS", "note": "Decision Tree row confirmed unchanged by diff" },
+          { "text": "Output warns against reusing the rarefied table for DA", "result": "PASS", "note": "Unchanged" },
+          { "text": "Output offers an in-scope alternative rather than a flat refusal", "result": "PASS", "note": "Unchanged" }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Explicit request to rarefy to min(sample_sums) -- regression (text)",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Not re-generated as a fresh response this pass (no code). Verified by direct diff review that the min-depth anti-pattern language it depends on is byte-unchanged. Scores carried forward.",
+        "executed": true,
+        "execution_note": "No code to execute; verified via git diff that the relied-upon SKILL.md text is unchanged.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Output does not blindly comply with the min(sample_sums) request", "result": "PASS", "note": "Unchanged" },
+          { "text": "Output quantifies the actual cost/benefit on the user's own numbers", "result": "PASS", "note": "Unchanged (17.8% richness difference, cites Input 2's fresh numbers)" },
+          { "text": "Output reports the specific dropped-sample list", "result": "PASS", "note": "Unchanged" },
+          { "text": "Output remains forgiving -- offers the originally requested version too", "result": "PASS", "note": "Unchanged" }
+        ]
+      },
+      {
+        "index": 8,
+        "type": "New (re-auditor)",
+        "label": "Independent strata ground-truth fixture -- naive false positive corrected by strata=",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Self-contained fixture built by this re-auditor (seed 20260919, 14 subjects x 3 visits, no real Arm effect simulated). Naive PERMANOVA gives p=0.001 (a clean false positive); strata=SubjectID correctly gives p=1, matching the known ground truth. Stronger, independent confirmation of the new SKILL.md guidance's accuracy than either the fixer's or original auditor's shared fixture provided.",
+        "executed": true,
+        "execution_note": "Ran run/input_new1_reauditor_strata_check.R -- fully self-contained, no shared fixture files.",
+        "basic": 38,
+        "specialized": 58,
+        "total": 96,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Fixture has a known, simulated ground truth of no real Arm effect", "result": "PASS", "note": "Constructed with per-subject fixed baseline only, no Arm-dependent generative parameter" },
+          { "text": "Naive pooled PERMANOVA materially misleads", "result": "PASS", "note": "p=0.001, would be reported as a strong, real effect" },
+          { "text": "strata=SubjectID PERMANOVA correctly reveals no signal", "result": "PASS", "note": "p=1, matches ground truth exactly" },
+          { "text": "Result is independent of the fixer's/original auditor's shared fixture", "result": "PASS", "note": "Fresh seed, fresh subject/visit counts, fresh generative model, no file reuse" }
+        ]
+      },
+      {
+        "index": 9,
+        "type": "New (re-auditor)",
+        "label": "SKILL.md verbatim Alpha+Beta code blocks on fresh synthetic data -- non-regression check",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Confirms the newly added strata= line does not disturb the unchanged adonis2/betadisper lines directly above it, on a dataset this re-auditor built from scratch (not GlobalPatterns, not the shared fixture).",
+        "executed": true,
+        "execution_note": "Ran run/input_new2_reauditor_skillmd_verbatim.R -- self-contained synthetic phyloseq object, seed 777.",
+        "basic": 37,
+        "specialized": 54,
+        "total": 91,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "SKILL.md's Alpha Diversity in R block runs unmodified on fresh, independent data", "result": "PASS", "note": "Kruskal-Wallis Shannon p=3.067e-06" },
+          { "text": "SKILL.md's Beta Diversity in R block (unchanged lines) runs unmodified", "result": "PASS", "note": "adonis2 R2=0.284 p=0.001, betadisper p=0.198" },
+          { "text": "A real, injected compositional shift is correctly detected", "result": "PASS", "note": "adonis2 p=0.001 on a dataset with a deliberately injected 'treated' shift" },
+          { "text": "The new strata= line does not alter output of the unchanged lines above it", "result": "PASS", "note": "No SubjectID column in this fixture; strata line is inert by construction, confirming non-interference" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 38.8,
+    "dynamic_weighted": 56.5,
+    "score": 95,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "\u2b50",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Both P1 defects from the original audit are fixed and independently re-verified by fresh execution, not just re-reading the fix log: the shipped examples/diversity_analysis.R now runs end-to-end on GlobalPatterns, and the Beta Diversity section's new strata=SubjectID guidance is confirmed accurate on two separate fixtures, including one this re-auditor built from scratch with known ground truth (naive p=0.001 false positive corrected to p=1).",
+    "Five of seven original inputs were re-executed fresh in this audit and reproduce the exact same real numbers as the original audit, bit for bit -- no regression anywhere in the fix.",
+    "The mandatory redundancy pass was verified by direct git diff, not by trusting the fix log: every one of the 17 deleted usage-guide.md bullet points was checked against its corresponding SKILL.md section and confirmed present; nothing the agent needs was lost.",
+    "The two open P2s (NMDS never mentioned, RPCA thin) remain correctly out of scope for this fix pass -- the fixer's rationale for not installing DEICODE/gemelli (would downgrade the shared QIIME2 env's pinned scipy/scikit-bio) was checked against TOOLS.md and still holds."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "NMDS and RPCA remain named but not backed by worked code",
+      "observed_in": [2],
+      "problem": "Still open from the original audit: PCoA is thorough, but NMDS is never mentioned and RPCA/DEICODE is only a one-line CLI reference with no worked example.",
+      "root_cause": "Progressive disclosure stops one level short for these two secondary methods; the backing tools for RPCA are deliberately not installed in the shared audit env (would downgrade pinned scipy/scikit-bio).",
+      "fix": "Add a short NMDS snippet (vegan::metaMDS) alongside the PCoA one; add a worked RPCA example once DEICODE/gemelli can be installed without a version conflict, or explicitly route to qiime2-workflow for the full command."
+    },
+    {
+      "priority": "P2",
+      "title": "Sampling-depth plateau choice still has no numeric heuristic",
+      "observed_in": [2],
+      "problem": "SKILL.md's guidance to pick the depth 'where the alpha-rarefaction curve plateaus' has no numeric substitute for an agent that cannot visually read a plot; this audit's Input 2 still has to improvise a percentile heuristic.",
+      "root_cause": "The plateau-detection method as written assumes a human visually inspecting a QIIME2 .qzv plot.",
+      "fix": "Add a numeric plateau-detection approach (e.g., the depth at which incremental richness gain per additional read falls below a stated threshold) as an agent-usable alternative to visual inspection."
+    }
+  ]
+}

@@ -8,7 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (70)
+## P1 (68)
 
 ### `bio-alignment-multiple` — Fix MUSCLE5 ensemble commands (-super5 has no .efa)
 
@@ -538,22 +538,6 @@ None open.
 - Root cause: The Version Compatibility disclosure block added in the last fix pass covered only the two functions the fixer was explicitly told about (CalculateOraScore/CalculateQeaScore); it was not extended to the library-loading functions that also reach out to a remote server.
 - Fix: Add one sentence to Version Compatibility or Prerequisites noting that SetKEGG.PathLib/CrossReferencing/Setup.KEGGReferenceMetabolome download generic (non-user) reference libraries from metaboanalyst.ca on first use or after a 30-day cache expiry, mirroring the existing FELLA/KEGGREST live-dependency disclosure.
 
-### `bio-microbiome-diversity-analysis` — Shipped example script crashes on its own demo data
-
-- Skill: 92, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/microbiome/diversity-analysis) · [viewer](skills/bio-microbiome-diversity-analysis/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: —
-- Problem: examples/diversity_analysis.R crashes with "object 'Group' not found" at the adonis2 call because meta <- data.frame(sample_data(ps_rare)) never receives a Group column -- only the separate alpha data.frame does (alpha$Group <- sample_data(ps_rare)$SampleType).
-- Root cause: Copy-paste oversight: the demo script's grouping-variable name ('Group') doesn't match GlobalPatterns' real column name ('SampleType'), and the fix applied to alpha was never mirrored onto meta.
-- Fix: Add meta$Group <- sample_data(ps_rare)$SampleType immediately after the meta <- data.frame(sample_data(ps_rare)) line; verified this one-line fix fully resolves the crash and the script runs to completion.
-
-### `bio-microbiome-diversity-analysis` — No repeated-measures/pseudo-replication guidance for beta diversity
-
-- Skill: 92, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/microbiome/diversity-analysis) · [viewer](skills/bio-microbiome-diversity-analysis/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 5
-- Problem: SKILL.md's Alpha Diversity section says to escalate to lme4/nlme for repeated measures, but the Beta Diversity/PERMANOVA section and its code block never mention non-independence or vegan's strata= argument. On a real 3-visits-per-subject fixture, a naive pooled PERMANOVA gives p=0.098 (borderline) while a properly restricted analysis (strata=SubjectID) gives p=1 (no signal).
-- Root cause: The Beta Diversity in R section's adonis2 pattern has no repeated-measures branch or warning, unlike the parallel alpha-diversity section.
-- Fix: Add a repeated-measures note to the Beta Diversity section mirroring the alpha-diversity one: when samples are nested within subjects/repeated over time, use adonis2(..., strata = SubjectID) and warn that pooling all timepoints without restriction inflates apparent significance.
-
 ### `bio-pathway-kegg-pathways` — graphite route disagrees with direct spia() on perturbation direction for 30% of pathways, undocumented
 
 - Skill: 94, Production Ready · [mrsonord2240/bioSkills@424a053](https://github.com/mrsonord2240/bioSkills/tree/424a0533ba4b67063c884886c727b1f3ecab6342/pathway-analysis/kegg-pathways) · [viewer](skills/bio-pathway-kegg-pathways/mrsonord2240-bioSkills@424a053/viewer.md)
@@ -570,7 +554,7 @@ None open.
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (270)
+## P2 (271)
 
 ### `bio-crispr-screens-copy-number-correction` — negative_control_sgrnas empty-dict case raises an undocumented ValueError
 
@@ -2500,14 +2484,6 @@ None open.
 - Root cause: Out of scope for this fix pass, which targeted the truncLen ceiling defect only.
 - Fix: Add one sentence to the decontam section naming this shortcut and explaining why control-based statistical testing (decontam) is not interchangeable with an arbitrary abundance cutoff.
 
-### `bio-microbiome-diversity-analysis` — NMDS and RPCA are named but not backed by worked code
-
-- Skill: 92, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/microbiome/diversity-analysis) · [viewer](skills/bio-microbiome-diversity-analysis/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: —
-- Problem: The Skill documents PCoA thoroughly (R and QIIME2) but never mentions NMDS at all, and RPCA/DEICODE appears only as a one-line CLI reference with no worked R/Python example, despite being listed in the Tool Taxonomy and Decision Tree.
-- Root cause: Progressive disclosure stopped one level short for these two secondary methods.
-- Fix: Add a short NMDS snippet (vegan::metaMDS) alongside the PCoA one, and either a worked RPCA example or an explicit note routing to qiime2-workflow for the full deicode/gemelli command.
-
 ### `bio-remote-homology` — PSI-BLAST-alone and HHsearch-alone workflows still lack standalone example scripts
 
 - Skill: 92, Production Ready · [mrsonord2240/bioSkills@1d0172a](https://github.com/mrsonord2240/bioSkills/tree/1d0172afd19ebbb57b51e5a48dca85451a093286/database-access/remote-homology) · [viewer](skills/bio-remote-homology/mrsonord2240-bioSkills@1d0172a/viewer.md)
@@ -2667,6 +2643,22 @@ None open.
 - Problem: Unlike the matchms section (full runnable synthetic example in examples/annotate_features.py) and SIRIUS's complete bash chain, the new MetFrag section supplies only the params.txt key/value template and the candidates.csv column schema -- an agent must still originate real peak masses and a real candidate structure list from outside knowledge to actually run it, as this audit did.
 - Root cause: The fix prioritized closing the 'zero executable guidance' P1 gap with a runnable template; a fully worked data sample was out of scope for that fix.
 - Fix: Ship a small worked candidates.csv + peaklist.txt (e.g. the citrate/isocitrate/glucose triple this Skill's own prose already describes) alongside examples/annotate_features.py so an agent can run the MetFrag path with zero external chemistry lookup, mirroring the matchms example's self-containedness.
+
+### `bio-microbiome-diversity-analysis` — NMDS and RPCA remain named but not backed by worked code
+
+- Skill: 95, Production Ready · [mrsonord2240/bioSkills@7536f5f](https://github.com/mrsonord2240/bioSkills/tree/7536f5f114733ef0961f746614435789cf1f68d9/microbiome/diversity-analysis) · [viewer](skills/bio-microbiome-diversity-analysis/mrsonord2240-bioSkills@7536f5f/viewer.md)
+- Observed in inputs: 2
+- Problem: Still open from the original audit: PCoA is thorough, but NMDS is never mentioned and RPCA/DEICODE is only a one-line CLI reference with no worked example.
+- Root cause: Progressive disclosure stops one level short for these two secondary methods; the backing tools for RPCA are deliberately not installed in the shared audit env (would downgrade pinned scipy/scikit-bio).
+- Fix: Add a short NMDS snippet (vegan::metaMDS) alongside the PCoA one; add a worked RPCA example once DEICODE/gemelli can be installed without a version conflict, or explicitly route to qiime2-workflow for the full command.
+
+### `bio-microbiome-diversity-analysis` — Sampling-depth plateau choice still has no numeric heuristic
+
+- Skill: 95, Production Ready · [mrsonord2240/bioSkills@7536f5f](https://github.com/mrsonord2240/bioSkills/tree/7536f5f114733ef0961f746614435789cf1f68d9/microbiome/diversity-analysis) · [viewer](skills/bio-microbiome-diversity-analysis/mrsonord2240-bioSkills@7536f5f/viewer.md)
+- Observed in inputs: 2
+- Problem: SKILL.md's guidance to pick the depth 'where the alpha-rarefaction curve plateaus' has no numeric substitute for an agent that cannot visually read a plot; this audit's Input 2 still has to improvise a percentile heuristic.
+- Root cause: The plateau-detection method as written assumes a human visually inspecting a QIIME2 .qzv plot.
+- Fix: Add a numeric plateau-detection approach (e.g., the depth at which incremental richness gain per additional read falls below a stated threshold) as an agent-usable alternative to visual inspection.
 
 ### `bio-pathway-reactome` — 7-organism ceiling claim still not independently verifiable in this shared env
 
