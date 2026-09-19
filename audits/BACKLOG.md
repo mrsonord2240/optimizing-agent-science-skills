@@ -8,7 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (69)
+## P1 (68)
 
 ### `bio-alignment-multiple` — Fix MUSCLE5 ensemble commands (-super5 has no .efa)
 
@@ -169,22 +169,6 @@ None open.
 - Problem: query_raw() calls ds.get(), which is pybiomart's ServerBase.get() -- a plain HTTP GET with the entire XML query embedded in the URL. At 2066 real Ensembl gene IDs (~33KB filter value alone), Ensembl rejects the request with 414 Request-URI Too Large. SKILL.md's own Goal text advertises '5,000 Ensembl Gene IDs' and usage-guide.md's Quick Start example says '8,000 Ensembl Gene IDs' -- both would fail the same way, worse.
 - Root cause: query_raw() inherits pybiomart's GET-based transport unchanged; nothing in the fix's new helper switches to POST or chunks large ID lists client-side.
 - Fix: Either build the query_raw() request as an HTTP POST (BioMart's martservice endpoint accepts POST for the same XML payload) or chunk ID lists above a safe size (empirically ~500-1000 IDs) into multiple queries joined client-side, and correct the '5,000'/'8,000 IDs' claims in SKILL.md and usage-guide.md to state the real, tested limit.
-
-### `bio-microbiome-differential-abundance` — LinDA section's own example code crashes on a real phyloseq object
-
-- Skill: 87, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/microbiome/differential-abundance) · [viewer](skills/bio-microbiome-differential-abundance/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 3
-- Problem: The 'LinDA: Fast CLR Regression With Native Mixed Models' section's shown code (`meta <- as.data.frame(sample_data(ps))`) crashes with 'invalid class "sample_data" object: Sample Data must have non-zero dimensions' when fed a real phyloseq object -- confirmed by running the snippet verbatim.
-- Root cause: phyloseq's own as.data.frame() method on a sample_data object is effectively an identity operation and silently keeps the S4 class 'sample_data' rather than converting to a plain data.frame; MicrobiomeStat::linda() later does raw column-subsetting internally (scale(Z[, ind])) that requires a true data.frame and fails deep inside its own code.
-- Fix: Replace `meta <- as.data.frame(sample_data(ps))` with `meta <- data.frame(as(sample_data(ps), 'data.frame'))` in the LinDA section's code block, and add a one-line Common Errors table row naming this exact error message and fix so it's discoverable without a stack-trace dive.
-
-### `bio-microbiome-differential-abundance` — ZicoSeq crashes outright on zero-variance features with no SKILL.md warning or code example
-
-- Skill: 87, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/microbiome/differential-abundance) · [viewer](skills/bio-microbiome-differential-abundance/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 4
-- Problem: GUniFrac::ZicoSeq() throws a hard error ('Feature 5,17 have identical values (e.g. all 0s)! Please remove them!') on zero-variance features rather than dropping them internally the way the other panel tools' prv_cut/prevalence-filter arguments do. SKILL.md gives ZicoSeq no runnable code block at all (only a one-sentence prose description), so nothing warns the reader this crash exists or shows the fix.
-- Root cause: ZicoSeq's own filtering (perm.no-based winsorization/reference selection) assumes non-degenerate features and does not implement a prv_cut-style auto-drop the way ALDEx2/ANCOM-BC2/LinDA do; the SKILL.md's 'Filter Before Testing' section presents its prv_cut=0.10 example as a generic step without noting it is a hard prerequisite specifically for ZicoSeq.
-- Fix: Add a short runnable ZicoSeq code block (mirroring the MaAsLin2 block already present) that explicitly drops zero-variance features first (`apply(otu, 1, function(x) length(unique(x)) > 1)`), and add a Common Errors row for the exact crash message.
 
 ### `bio-single-cell-cell-annotation` — The triage screens on the one signal artifacts do not trip
 
@@ -473,6 +457,14 @@ None open.
 - Problem: The rule an agent can actually execute - merge clusters whose top markers are indistinguishable - passed every artifactual split constructed in this audit. A single true cell type split in two gave 0.00 marker overlap and adjusted p = 9.1e-153; a 100%-pure subcluster split gave 0.00 overlap and p = 7.7e-46.
 - Root cause: Marker distinctness is itself a double-dipped quantity, so it cannot adjudicate a split chosen to maximise separation - the Skill says exactly this two paragraphs earlier and then still offers it as the stop rule.
 - Fix: Replace the marker-overlap stop rule with checks that are not circular and are runnable today: does the split align with batch/sample/QC covariates (ARI against each), does it survive on held-out cells, and does it reproduce in a second half of the data. Keep scSHC/CHOIR as the formal answer but give one of them a code block, since the Skill's thesis depends on it.
+
+### `bio-microbiome-differential-abundance` — MaAsLin2's own shown random_effects='SubjectID' code block silently returns zero usable rows on a cross-sectional fixture -- the same defect class already fixed for LinDA, left undocumented in the code block two sections above
+
+- Skill: 89.2, Limited Release · [mrsonord2240/bioSkills@aeee6e0](https://github.com/mrsonord2240/bioSkills/tree/aeee6e017ce77b3e04d41da860de76496d8b1e68/microbiome/differential-abundance) · [viewer](skills/bio-microbiome-differential-abundance/mrsonord2240-bioSkills@aeee6e0/viewer.md)
+- Observed in inputs: 8
+- Problem: SKILL.md's MaAsLin2 code block (unchanged by this fix pass) shows random_effects = c('SubjectID') as the canonical pattern for longitudinal/repeated designs. Run verbatim against the fixture used throughout the rest of the Skill's examples (40 samples, 40 unique SubjectID -- one sample per subject), every per-feature lme4 fit fails with 'number of levels of each grouping factor must be < number of observations', caught internally with only a per-feature WARNING, and the written result table ends up with zero rows for the Group coefficient -- a silently empty, useless result reached without any top-level R error.
+- Root cause: A random effect grouping variable with as many levels as observations is degenerate (no within-group replication to estimate a variance component from) -- the identical mismatch class that produced the original LinDA P1 (formula '~ Group + Age + (1 \| SubjectID)' against a cross-sectional fixture), but MaAsLin2's block sits in the very next section and was not touched by this fix pass because it was not part of the original audit's tested inputs.
+- Fix: Either change the MaAsLin2 code block's demo formula to drop random_effects (matching how the LinDA block was fixed, since this SKILL.md's canonical demo fixture is cross-sectional) and add a comment showing random_effects=c('SubjectID') as the pattern for a true repeated-measures fixture, or add a Common Errors row for the exact 'number of levels of each grouping factor' message with the same explanation already given for LinDA.
 
 ### `bio-crispr-screens-drugz-chemogenomic` — Common Errors table still lacks a half_window_size/IndexError row
 
@@ -1075,22 +1067,6 @@ None open.
 - Problem: OSAT appears in the frontmatter (primary_tool alternative) and taxonomy but no OSAT code exists anywhere in SKILL.md or examples/.
 - Root cause: The Skill was written designit-first; OSAT is a one-line mention.
 - Fix: Add a minimal OSAT optimal.shuffle() example, or drop the OSAT promise from the taxonomy line to avoid implying code that isn't shown.
-
-### `bio-microbiome-differential-abundance` — 4 of 8 named DA tools have no runnable code example anywhere in the Skill
-
-- Skill: 87, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/microbiome/differential-abundance) · [viewer](skills/bio-microbiome-differential-abundance/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: —
-- Problem: ZicoSeq, MaAsLin3, LEfSe, and DESeq2 are all named in the frontmatter description and Tool Taxonomy table as covered methods, but only ALDEx2, ANCOM-BC2, LinDA, and MaAsLin2 get full worked code blocks. LEfSe in particular needs a non-standard invocation path (a separate Python-2-era environment, per this audit folder's TOOLS.md) with zero guidance anywhere in the Skill for how to actually run it.
-- Root cause: The Skill's worked-example coverage was prioritized toward the 'ALWAYS run >=2' consensus-anchor tools and did not extend to the rest of the named panel.
-- Fix: Add at minimum a short runnable code block for ZicoSeq (see the P1 fix above) and MaAsLin3; for LEfSe, either add its CLI invocation pattern (lefse-format_input.py / lefse_run.py) or explicitly scope it out of the 'covered methods' list in the frontmatter description if it is meant as citation-only context.
-
-### `bio-microbiome-differential-abundance` — ALDEx2 example omits set.seed(), so its Monte-Carlo output is not reproducible run-to-run
-
-- Skill: 87, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/microbiome/differential-abundance) · [viewer](skills/bio-microbiome-differential-abundance/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 1
-- Problem: The shown `aldex()` call draws mc.samples=128 Dirichlet Monte-Carlo instances but the code example never sets a seed beforehand, so re-running the exact shown snippet on the same data produces slightly different expected p-values and effect sizes each time.
-- Root cause: The Skill documents the mc.samples parameter's effect on stability (128 standard, 256+ for publication) but does not treat seed management as part of the same reproducibility concern.
-- Fix: Add `set.seed(<n>)` immediately before the `aldex()` call in the ALDEx2 code block, with a one-line note that this is required for bit-reproducible results, not just a larger mc.samples.
 
 ### `bio-phylo-bayesian-inference` — Make the example refuse a single .p file
 
@@ -1915,6 +1891,22 @@ None open.
 - Problem: On a REF mismatch the last pipe step aborts after creating a 0-record non-BGZF file; the next 'bcftools index' fails with 'not BGZF compressed', hiding the real cause.
 - Root cause: The workflow blocks omit the REF pre-check the example now has.
 - Fix: Add `set -o pipefail` and a `bcftools norm -f ref.fa -c w` pre-check (or the example's MISMATCH count) before the pipeline.
+
+### `bio-microbiome-differential-abundance` — Shared WSL lefse env is broken for both LDA and SVM ranking, independently reproduced -- needs a tooling-pass fix, not a SKILL.md change
+
+- Skill: 89.2, Limited Release · [mrsonord2240/bioSkills@aeee6e0](https://github.com/mrsonord2240/bioSkills/tree/aeee6e017ce77b3e04d41da860de76496d8b1e68/microbiome/differential-abundance) · [viewer](skills/bio-microbiome-differential-abundance/mrsonord2240-bioSkills@aeee6e0/viewer.md)
+- Observed in inputs: 9
+- Problem: run_lefse.py crashes on any input (confirmed on a fresh, independently-built input file, not reusing the fixer's) with a None return from its internal rpy2/R interop step, in both the default LDA ranking and the -r svm alternative.
+- Root cause: R in the shared lefse env is 4.5.3, not the R 3.2/3.3 TOOLS.md describes rpy2 as needing -- a version mismatch between the 'modern noarch build' of LEfSe 1.1.1 actually installed and the R version it was built to interoperate with via rpy2.
+- Fix: A future tooling pass on microbiome-metagenomics-analyst should rebuild the lefse env pinned to an R version rpy2 actually resolves against, then re-verify run_lefse.py end to end before any Skill's LEfSe example is scored as execution-verified.
+
+### `bio-microbiome-differential-abundance` — Maaslin2() crashes on plot generation with a ggplot2 API-version error when there are real significant results to plot
+
+- Skill: 89.2, Limited Release · [mrsonord2240/bioSkills@aeee6e0](https://github.com/mrsonord2240/bioSkills/tree/aeee6e017ce77b3e04d41da860de76496d8b1e68/microbiome/differential-abundance) · [viewer](skills/bio-microbiome-differential-abundance/mrsonord2240-bioSkills@aeee6e0/viewer.md)
+- Observed in inputs: 8
+- Problem: A default Maaslin2() call (plot_heatmap/plot_scatter left at their defaults) that finds real significant associations crashes partway through plotting with '<ggplot2::labels> object is invalid: every label must be named', after already having written all_results.tsv/significant_results.tsv to disk.
+- Root cause: Likely a ggplot2-version mismatch between what Maaslin2 1.20.0's plotting code expects and the env's installed ggplot2 4.0.3 (TOOLS.md records this version); not exercised by the original or this re-audit's other runs because sink()/capture.output() suppressed it or plot_heatmap=FALSE/plot_scatter=FALSE were passed.
+- Fix: Either note in SKILL.md's MaAsLin2 section that plot_heatmap=FALSE, plot_scatter=FALSE can be passed to skip plotting entirely (the numeric results are unaffected), or fix the env's ggplot2 pin in a future tooling pass.
 
 ### `bio-causal-genomics-mendelian-randomization` — CAUSE still crashes inside its own ELPD model comparison against the installed loo version
 

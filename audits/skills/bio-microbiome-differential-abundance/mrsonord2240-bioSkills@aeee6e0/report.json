@@ -1,0 +1,308 @@
+{
+  "meta": {
+    "skill_name": "bio-microbiome-differential-abundance",
+    "description": "Tests which taxa differ between groups on an amplicon ASV table using compositionally-aware methods (ALDEx2, ANCOM-BC2, LinDA, MaAsLin2/3, ZicoSeq, LEfSe), delivering a consensus of >=2 tools rather than one tool's hit list, with prevalence filtering, effect-size/FDR gating, and covariate/repeated-measures handling.",
+    "evaluated_on": "2026-09-19",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 9,
+    "source": "mrsonord2240/bioSkills@aeee6e0:microbiome/differential-abundance",
+    "reaudit_of": "bio-microbiome-differential-abundance (pre-fix score 87, archived at F:/OpenScience/audits/_pre-fix-20260919/bio-microbiome-differential-abundance/)",
+    "fix_log": "F:/optimizing-agent-science-skills/fixes/bio-microbiome-differential-abundance.md"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "References unchanged from the original audit and still verified real/well-known (Fernandes 2014, Gloor 2016, Lin & Peddada 2020/2024, Mallick 2021, Nickols 2026, Zhou 2022, Yang & Chen 2022/2023, Pelto 2025, Nearing 2022, Segata 2011, Love 2014, Benjamini & Hochberg 1995). No fabricated statistics anywhere in the fixed SKILL.md."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Still community/taxon-level statistics for research use; no diagnostic or prescriptive claims about individuals."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Failure Modes table still actively prevents fallacies (cherry-picking, pseudo-replication) and now documents two more real traps (LinDA coercion, ZicoSeq zero-variance) rather than committing them."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All 7 R code blocks now present (ALDEx2, ANCOM-BC2, LinDA, MaAsLin2, MaAsLin3, ZicoSeq, DESeq2-caveat) were independently re-executed end to end against the real fixture and completed without an R-level halt; LEfSe's CLI syntax was independently verified against real --help output. One new, real defect was found and is recorded as a P1 (see recommendations), not a veto trigger: MaAsLin2's own shown random_effects='SubjectID' code silently returns zero usable result rows on the cross-sectional fixture (an lme4 'number of levels ... must be < number of observations' error caught per-feature, not an R-level crash) -- syntactically valid, dependency-complete, and it runs to completion, so it does not meet M4's 'unrunnable' bar, but it is functionally useless for the exact repeated-measures scenario the Skill recommends it for."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 91,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 10,
+        "max": 12,
+        "note": "Completeness much improved: 7 of 8 named tools now have a runnable code block (only LEfSe remains CLI-only, execution-blocked by an external env, not undocumented). Correctness: both prior P1s (LinDA coercion crash, ZicoSeq zero-variance crash) are genuinely fixed and re-verified by direct execution, including a standalone re-test of the ZicoSeq fix on the RAW unfiltered fixture (not just riding along on the prv_cut filter). Docked 2 points for a newly found correctness defect: MaAsLin2's own shown random_effects='SubjectID' block silently returns zero usable rows on the fixture used throughout the rest of the Skill (independently discovered this pass, not part of the fix's scope)."
+      },
+      "reliability": {
+        "score": 10,
+        "max": 12,
+        "note": "Common Errors table now correctly documents both fixed traps (LinDA sample_data coercion, ZicoSeq zero-variance) with the exact error text and fix, verified accurate against real error messages this pass. Docked 2 points (down from a possible full score) because the newly found MaAsLin2 SubjectID/cross-sectional trap -- the same defect class -- is undocumented in this same table."
+      },
+      "performance_context": {
+        "score": 8,
+        "max": 8,
+        "note": "Unchanged: SKILL.md length and workflow structure are unaffected by the fix; the new Installation section is short and appropriately placed."
+      },
+      "agent_usability": {
+        "score": 15,
+        "max": 16,
+        "note": "Learnability improved: only LEfSe now requires external API inference (ZicoSeq/MaAsLin3/DESeq2 all gained real code blocks this pass). Consistency and feedback design remain strong and unchanged. Error-prevention is stronger (2 more documented failure modes verified this pass), offset by the one newly found undocumented MaAsLin2 trap."
+      },
+      "human_usability": {
+        "score": 6,
+        "max": 8,
+        "note": "Unchanged from the original audit: still jargon-dense relative to a bench biologist's phrasing, softened by usage-guide.md's Quick Start; forgiveness is still deliberately rigid about integer-count input (a data-integrity guarantee, Category-3 override applies, not a defect)."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "Unchanged: no credentials/secrets, no sensitive-data retention; input validation still delegated to the underlying R packages."
+      },
+      "maintainability": {
+        "score": 11,
+        "max": 12,
+        "note": "Improved by the redundancy pass: install notes now live once, in SKILL.md's new Installation section; usage-guide.md's 'What the Agent Will Do' and 'Tips' sections (previously fully restated from SKILL.md's own tables) were replaced with a one-line pointer, confirmed by direct inspection of the current usage-guide.md -- a real single-source-of-truth improvement. Testability remains modest: still only one bundled worked-example script, no bundled ground-truth file."
+      },
+      "agent_specific": {
+        "score": 20,
+        "max": 20,
+        "note": "The one prior deduction (ALDEx2 missing set.seed) is fixed and independently re-verified this pass: two aldex() runs with the same seed=42 produced an identical hit set AND a bit-identical effect column. Trigger precision, composability, and escape hatches remain excellent and unchanged from the original audit."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 88.0,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 30, "total": 34 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "ALDEx2 + ANCOM-BC2 consensus, control vs treated (regression re-run of the original audit's Input 1, now with set.seed(42))",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "executed: true. run/reaudit01_skillmd_blocks_verbatim.R. Reproduces the original audit's numbers: ALDEx2 sig=16 TP=16/17 FP=0; ANCOM-BC2 robust sig=18 TP=17/17 FP=1; consensus intersection sig=16 TP=16/17 FP=0. New this pass: verified aldex() is now bit-reproducible across 2 runs with the same seed (identical hit set and identical effect column).",
+        "basic": 35,
+        "specialized": 53,
+        "total": 88,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Output reports the consensus (intersection) of >=2 compositionally-aware tools, not a single tool's list", "result": "PASS", "note": "ALDEx2 and ANCOM-BC2 both run; intersection reported as high-confidence." },
+          { "text": "Consensus hits match the planted ground-truth taxa with correct direction of effect", "result": "PASS", "note": "16/17 recovered, 0 false positives, matching the original audit's regression numbers." },
+          { "text": "BH/q-value correction applied within each tool, never pooled across tools", "result": "PASS", "note": "we.eBH for ALDEx2, independent BH q for ANCOM-BC2; no pooling." },
+          { "text": "ALDEx2 output is bit-reproducible run-to-run given the same seed (new this pass, was a P2 last audit)", "result": "PASS", "note": "identical(sort(hits_run1), sort(hits_run2)) and identical(effect columns) both TRUE with set.seed(42) before each call." }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "ANCOM-BC2 with Age+Sex covariates, BH vs default Holm, passed_ss required (regression re-run)",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "executed: true. run/reaudit01_skillmd_blocks_verbatim.R. Reproduces the original: BH + passed_ss robust set sig=18, TP=17/17, FP=1 (ASV063, consistent with Input 1).",
+        "basic": 35,
+        "specialized": 54,
+        "total": 89,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "p_adj_method is deliberately set to BH rather than left at the package default", "result": "PASS", "note": "Default (Holm) and explicit BH both exercised via the shown code." },
+          { "text": "Only hits with passed_ss==TRUE are reported as confident", "result": "PASS", "note": "Robust set defined as diff_Grouptreated & passed_ss_Grouptreated." },
+          { "text": "Covariate-adjusted model still recovers the planted true positives", "result": "PASS", "note": "17/17 recovered with Age+Sex in the model." },
+          { "text": "No excessive spurious covariate associations beyond expected FDR noise", "result": "PASS", "note": "Consistent with the original audit's ~1% spurious Age-hit rate." }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Variant B",
+        "label": "LinDA repeated-measures mixed model vs naive pseudo-replicated model -- the P1 this fix pass targeted",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "executed: true. run/reaudit01_skillmd_blocks_verbatim.R (fixed-effects block on phyloseq_object.rds) and run/reaudit04_zicoseq_raw_and_linda_mixed.R part B (mixed-model formula '~ Arm + (1 | SubjectID)' on long_phyloseq.rds, 12 subjects x 3 visits). BOTH claimed fixes independently confirmed: (1) SKILL.md's shown LinDA code (now using data.frame(as(sample_data(ps),'data.frame'))) runs to completion on a real phyloseq object -- no crash, reproduced twice. (2) The mixed-model formula shown in the comment ('+ (1 | SubjectID)') also runs to completion on the longitudinal fixture with no crash (0 significant hits, consistent with the original audit's finding that this fixture carries no reliable planted repeated-measures signal -- a fixture limitation, not a Skill defect). The Common Errors table now documents the exact crash message and fix.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "SKILL.md's shown LinDA code example runs without modification on a real phyloseq object", "result": "PASS", "note": "FIXED. No crash, reproduced independently twice against phyloseq_object.rds." },
+          { "text": "A subject random effect is used for repeated/paired samples per SKILL.md's own guidance", "result": "PASS", "note": "The commented '+ (1 | SubjectID)' pattern independently re-run on long_phyloseq.rds -- ran to completion." },
+          { "text": "The mixed model avoids the false-positive inflation of pseudo-replication that SKILL.md's Failure Modes table warns about", "result": "PASS", "note": "Mixed model found 0 hits on the longitudinal fixture -- no pseudo-replication inflation observed." },
+          { "text": "SKILL.md documents the sample_data-to-data.frame coercion needed before calling linda()", "result": "PASS", "note": "FIXED. Common Errors table row added: 'linda() errors invalid class sample_data object' -> fix given verbatim." }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Edge",
+        "label": "ZicoSeq with Batch covariate; zero-variance-feature crash trap -- the second P1 this fix pass targeted",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "executed: true. run/reaudit01_skillmd_blocks_verbatim.R and, independently, run/reaudit04_zicoseq_raw_and_linda_mixed.R part A which re-ran the SKILL.md's own zero-variance-drop line standalone against the RAW/unfiltered 200-taxon fixture (bypassing the prv_cut filter that incidentally also removes the same features) to confirm the fix works on its own merits, not just as a side effect of upstream filtering. Both runs: zero-variance features correctly identified and dropped, ZicoSeq completes, TP=17/17, FP=3, consistent across both filtered and raw-then-dropped paths.",
+        "basic": 38,
+        "specialized": 58,
+        "total": 96,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "ZicoSeq is correctly used for permutation-grounded, covariate-adjusted testing", "result": "PASS", "note": "adj.name='Batch' correctly incorporated; permutation FDR reported." },
+          { "text": "Recovers planted differentially abundant taxa with correct direction", "result": "PASS", "note": "17/17 recovered in both the filtered-first and raw-then-explicitly-dropped runs." },
+          { "text": "SKILL.md documents that ZicoSeq crashes outright on zero-variance features, unlike the panel's other tools", "result": "PASS", "note": "FIXED. Common Errors row + inline code comment added, verified against the real error text." },
+          { "text": "The zero-variance-drop fix works standalone, not only as an incidental side effect of the upstream prv_cut filter", "result": "PASS", "note": "Independently re-tested on the RAW unfiltered table (2 zero-variance features present, ASV042/ASV156) -- the shown line correctly identifies and drops them, ZicoSeq then completes." }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Full consensus panel (ALDEx2+LinDA) with prevalence-filter sensitivity check, 10% vs 25% (regression re-run)",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "executed: true. run/reaudit06_input5_sensitivity_regression.R. Code paths unchanged by the fix except the LinDA formula/coercion and ALDEx2 seeding, both exercised here. Qualitative finding reproduces: consensus set is not perfectly stable across the two cutoffs (10%: 16 taxa TP=16/17 FP=0; 25%: 17 taxa TP=16/17 FP=1, gains ASV037) -- consistent with the original audit's Tips-section-validation finding, exact taxon churn differs slightly from the original run because ALDEx2 is now seeded (a correctness improvement, not a regression).",
+        "basic": 34,
+        "specialized": 54,
+        "total": 88,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The prevalence-filter sensitivity check SKILL.md's Tips section recommends is actually performed (10% vs 25%)", "result": "PASS", "note": "Both cutoffs run end to end with the now-fixed ALDEx2 + LinDA blocks." },
+          { "text": "The headline consensus result is reported as mostly, not perfectly, stable across the two cutoffs", "result": "PASS", "note": "16-17 taxa depending on cutoff, one additional taxon gained at 25% -- reported honestly." },
+          { "text": "Taxon-level gain/loss from changing the filter is explicitly tabulated", "result": "PASS", "note": "setdiff() comparisons reported by name for both directions." },
+          { "text": "No p-value pooling across tools; consensus is intersection-based only", "result": "PASS", "note": "intersect() used at both cutoffs." }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Shotgun MetaPhlAn species table submitted for the same amplicon DA pipeline (unchanged text, re-inspected)",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "executed: false. Frontmatter scope line and Decision Tree row are unchanged by the fix; re-inspected and still route this case correctly to metagenomics/metagenome-visualization.",
+        "basic": 39,
+        "specialized": 60,
+        "total": 99,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "Does not attempt to run amplicon-specific DA code directly on a shotgun profiler table without redirecting", "result": "PASS", "note": "Decision Tree unchanged, still routes this case elsewhere first." },
+          { "text": "Names the correct sibling Skill (metagenomics/metagenome-visualization) for shotgun DA", "result": "PASS", "note": "Named verbatim, unchanged." },
+          { "text": "States that the same compositional/CoDA theory still applies even though the pipeline differs", "result": "PASS", "note": "Unchanged framing." }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Request to selectively report only the favorable ANCOM-BC2 result and omit the other tools tried (unchanged text, re-inspected)",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "executed: false. Failure Modes table's cherry-picking entry is unchanged by the fix; re-inspected and still requires reporting all tools plus the consensus and disagreement.",
+        "basic": 38,
+        "specialized": 60,
+        "total": 98,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "Refuses to selectively report only the favorable tool's result", "result": "PASS", "note": "Unchanged Failure Modes entry names this exact pattern." },
+          { "text": "Explains cherry-picking as uncorrected multiplicity / p-hacking by software, citing the Nearing 2022 finding", "result": "PASS", "note": "Unchanged citation." },
+          { "text": "Insists on reporting all tools run plus the consensus and disagreement", "result": "PASS", "note": "Unchanged Fix line." }
+        ]
+      },
+      {
+        "index": 8,
+        "type": "New (Re-auditor)",
+        "label": "MaAsLin2 with random_effects='SubjectID' on the cross-sectional fixture -- a re-auditor-discovered defect, same class as the fixed LinDA bug but in an untouched code block",
+        "status": "COMPLETED",
+        "status_flag": "\u274c",
+        "note": "executed: true. run/reaudit02_maaslin2_diagnostic.R and run/reaudit03_maaslin2_noplots.R. SKILL.md's own MaAsLin2 code block (unchanged by this fix pass, present verbatim since before the fix) shows fixed_effects=c('Group','Age'), random_effects=c('SubjectID') -- run verbatim against phyloseq_object.rds (40 samples, 40 unique SubjectID -- 1 sample per subject, the SAME cross-sectional fixture the fixed LinDA example now correctly avoids pairing with a subject random effect). Every one of the 192 per-feature lme4 fits fails with 'number of levels of each grouping factor must be < number of observations (problems: SubjectID)', caught internally by MaAsLin2 with a per-feature WARNING (not an R-level halt) and 'returning NA'. The written all_results.tsv ends up with ZERO rows for the Group coefficient -- a completely empty, useless result, reached without any top-level error. Confirmed this is the SubjectID/cross-sectional mismatch specifically (not a general MaAsLin2 problem) by re-running with random_effects omitted: 188 Group rows, 50 significant, TP=17/17, FP=33 -- the tool works correctly once the same cross-sectional/random-effect mismatch that was fixed for LinDA is avoided. Separately (not scored here, noted for the record): a plain Maaslin2() call that DOES have real significant results to plot crashes on plot generation with a ggplot2 API-version error ('<ggplot2::labels> object is invalid: every label must be named'), most likely an environment ggplot2-version mismatch (TOOLS.md records ggplot2 4.0.3 in this env) rather than a SKILL.md code defect -- reproducible with plot_heatmap/plot_scatter left at their defaults.",
+        "basic": 26,
+        "specialized": 38,
+        "total": 64,
+        "assertions_passed": 1,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "MaAsLin2's shown random_effects='SubjectID' code example produces usable significant-taxa output on the fixture used throughout the rest of the Skill", "result": "FAIL", "note": "0 rows for the Group coefficient -- every per-feature fit fails, confirmed by reading the written all_results.tsv directly." },
+          { "text": "MaAsLin2 fails loudly/clearly rather than silently when the random-effect/fixture mismatch occurs", "result": "FAIL", "note": "No top-level R error; the script completes and writes an empty results table with only a buried per-feature WARNING in the verbose log -- easy to miss." },
+          { "text": "SKILL.md documents this SubjectID/cross-sectional trap analogous to the fixed LinDA and ZicoSeq traps in the same document", "result": "FAIL", "note": "Not documented anywhere in Common Errors or the MaAsLin2 prose, despite the identical defect class already being fixed and documented for LinDA two sections above." },
+          { "text": "Without the random effect, MaAsLin2 correctly recovers the planted differentially abundant taxa", "result": "PASS", "note": "17/17 planted taxa recovered (FP=33, consistent with MaAsLin2's known weaker FDR control relative to the panel's other tools)." }
+        ]
+      },
+      {
+        "index": 9,
+        "type": "New (Re-auditor)",
+        "label": "Independent verification of the fix log's LEfSe-env-is-broken claim -- a fresh input file, both LDA and SVM ranking paths",
+        "status": "COMPLETED",
+        "status_flag": "\u26a0\ufe0f",
+        "note": "executed: true. run/reaudit05_make_lefse_input.py built a fresh lefse_input.txt from the fixture (independent of anything the fixer produced); run/reaudit07_lefse_run.sh ran it through the shared WSL 'science' distro's lefse env exactly as SKILL.md's CLI block documents. lefse-format_input.py succeeded (76 features passed the internal Wilcoxon pre-filter). run_lefse.py (default -r lda) crashed: AttributeError: 'NoneType' object has no attribute 'rownames' inside lefse.py's test_lda_r, from an rpy2 call to R returning None. Re-ran with -r svm: crashed with a parallel TypeError: cannot unpack non-iterable NoneType object in test_svm. Both independently reproduce the fixer's claim on fresh input. R in this env is 4.5.3 (confirmed via micromamba run -n lefse R --version), consistent with the fixer's rpy2/R-version-mismatch hypothesis -- TOOLS.md's note that rpy2 'only resolves against R 3.2/3.3' evidently does not describe what this 'modern noarch build' of the lefse env actually installed. CLAIM HOLDS: this is a real, input-independent bug in the shared lefse env, not something SKILL.md's CLI invocation can route around.",
+        "basic": 30,
+        "specialized": 45,
+        "total": 75,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "LEfSe CLI invocation flags match the installed version's --help output", "result": "PASS", "note": "-c 1 -u -1 -o 1000000 for lefse-format_input.py and the two positional args for run_lefse.py all match --help exactly." },
+          { "text": "LEfSe CLI syntax follows SKILL.md's documented format exactly (features in rows, class row first)", "result": "PASS", "note": "Independently built lefse_input.txt in this format, format_input.py accepted it without error." },
+          { "text": "LEfSe runs end-to-end to produce a ranked hit list", "result": "FAIL", "note": "Both -r lda (default) and -r svm crash with a None-return from the internal R/rpy2 step -- independently reproduced on fresh input, not the fixer's files." },
+          { "text": "SKILL.md correctly frames LEfSe as exploratory/non-FDR, not a required consensus-panel member", "result": "PASS", "note": "Unchanged prose: 'does not count as one of the required consensus tools ... use it only as an exploratory add-on, never alone.'" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 36.4,
+    "dynamic_weighted": 52.8,
+    "score": 89.2,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "\u2705",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Both original P1s are genuinely fixed and independently re-verified by fresh execution, including a standalone re-test of the ZicoSeq fix that bypasses the prv_cut filter to confirm the fix works on its own merits, not as an incidental side effect.",
+    "3 of the 4 previously-uncovered tools (ZicoSeq, MaAsLin3, DESeq2) now have real, runnable code blocks, all independently re-executed end to end on the fixture with correct TP/FP numbers matching the fix log's claims exactly.",
+    "The fix log's most excusable claim -- that the shared WSL lefse env is broken, not the Skill -- was independently reproduced on a freshly built input file across both LDA and SVM ranking paths, confirming it is a real, input-independent environment bug.",
+    "The redundancy pass is real and verified by direct inspection: install notes now live once (SKILL.md's new Installation section), and usage-guide.md's previously-duplicated sections were replaced with pointers."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "MaAsLin2's own shown random_effects='SubjectID' code block silently returns zero usable rows on a cross-sectional fixture -- the same defect class already fixed for LinDA, left undocumented in the code block two sections above",
+      "observed_in": [8],
+      "problem": "SKILL.md's MaAsLin2 code block (unchanged by this fix pass) shows random_effects = c('SubjectID') as the canonical pattern for longitudinal/repeated designs. Run verbatim against the fixture used throughout the rest of the Skill's examples (40 samples, 40 unique SubjectID -- one sample per subject), every per-feature lme4 fit fails with 'number of levels of each grouping factor must be < number of observations', caught internally with only a per-feature WARNING, and the written result table ends up with zero rows for the Group coefficient -- a silently empty, useless result reached without any top-level R error.",
+      "root_cause": "A random effect grouping variable with as many levels as observations is degenerate (no within-group replication to estimate a variance component from) -- the identical mismatch class that produced the original LinDA P1 (formula '~ Group + Age + (1 | SubjectID)' against a cross-sectional fixture), but MaAsLin2's block sits in the very next section and was not touched by this fix pass because it was not part of the original audit's tested inputs.",
+      "fix": "Either change the MaAsLin2 code block's demo formula to drop random_effects (matching how the LinDA block was fixed, since this SKILL.md's canonical demo fixture is cross-sectional) and add a comment showing random_effects=c('SubjectID') as the pattern for a true repeated-measures fixture, or add a Common Errors row for the exact 'number of levels of each grouping factor' message with the same explanation already given for LinDA."
+    },
+    {
+      "priority": "P2",
+      "title": "Shared WSL lefse env is broken for both LDA and SVM ranking, independently reproduced -- needs a tooling-pass fix, not a SKILL.md change",
+      "observed_in": [9],
+      "problem": "run_lefse.py crashes on any input (confirmed on a fresh, independently-built input file, not reusing the fixer's) with a None return from its internal rpy2/R interop step, in both the default LDA ranking and the -r svm alternative.",
+      "root_cause": "R in the shared lefse env is 4.5.3, not the R 3.2/3.3 TOOLS.md describes rpy2 as needing -- a version mismatch between the 'modern noarch build' of LEfSe 1.1.1 actually installed and the R version it was built to interoperate with via rpy2.",
+      "fix": "A future tooling pass on microbiome-metagenomics-analyst should rebuild the lefse env pinned to an R version rpy2 actually resolves against, then re-verify run_lefse.py end to end before any Skill's LEfSe example is scored as execution-verified."
+    },
+    {
+      "priority": "P2",
+      "title": "Maaslin2() crashes on plot generation with a ggplot2 API-version error when there are real significant results to plot",
+      "observed_in": [8],
+      "problem": "A default Maaslin2() call (plot_heatmap/plot_scatter left at their defaults) that finds real significant associations crashes partway through plotting with '<ggplot2::labels> object is invalid: every label must be named', after already having written all_results.tsv/significant_results.tsv to disk.",
+      "root_cause": "Likely a ggplot2-version mismatch between what Maaslin2 1.20.0's plotting code expects and the env's installed ggplot2 4.0.3 (TOOLS.md records this version); not exercised by the original or this re-audit's other runs because sink()/capture.output() suppressed it or plot_heatmap=FALSE/plot_scatter=FALSE were passed.",
+      "fix": "Either note in SKILL.md's MaAsLin2 section that plot_heatmap=FALSE, plot_scatter=FALSE can be passed to skip plotting entirely (the numeric results are unaffected), or fix the env's ggplot2 pin in a future tooling pass."
+    }
+  ]
+}
