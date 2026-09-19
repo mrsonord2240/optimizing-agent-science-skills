@@ -1,0 +1,232 @@
+{
+  "meta": {
+    "skill_name": "bio-batch-downloads",
+    "description": "Download large datasets from NCBI efficiently using EPost, history server, batching, rate limiting, and retry logic. Use when bulk-fetching tens of thousands of sequences, pulling all results of a large ESearch, designing reproducible pipelines, comparing E-utilities to NCBI Datasets v2 CLI, or implementing checksum-validated downloads. Encodes WebEnv TTL (~8h), EPost 200-ID limit, retmax caps, parallelization design, and integrity verification.",
+    "evaluated_on": "2026-09-19",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:database-access/batch-downloads"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "FAIL",
+      "scientific_integrity": { "result": "PASS", "detail": "All data in every executed input is real, live NCBI content (real accessions, real PMIDs, real record counts). No fabricated DOI/PMID/statistic anywhere in the Skill's text or in any executed output." },
+      "practice_boundaries": { "result": "PASS", "detail": "Pure data-retrieval-engineering skill; no diagnostic, prescriptive, or patient-facing content anywhere in scope." },
+      "methodological_ground": { "result": "PASS", "detail": "Retrieval-strategy selection (EFetch vs EPost vs history-server vs Datasets CLI), rate-limit math, and ToS/off-hours guidance are all methodologically sound and, where checked, independently confirmed accurate against live NCBI (200-ID EPost limit, 9,999-record silent retmax cap, exact shape of the expired-WebEnv HTTP-200 error body)." },
+      "code_usability": { "result": "FAIL", "detail": "Two of the Skill's three shipped example scripts crash with an unhandled exception on realistic, documented invocations, both independently reproduced live (not by inspection): (1) examples/batch_fasta.py's own worked query (Homo sapiens insulin[Gene Name]) returns Count=0 on live NCBI, and history_server_download() correctly returns early without creating the output file, but the unconditional SeqIO.parse('insulin_mrna.fasta', ...) immediately below crashes with FileNotFoundError -- confirmed independently twice (the 2026-09-17 tooling pass and this audit's own rerun, run/support_verify_batch_fasta_crash.py). (2) examples/robust_download.py's checkpointed_download(), the Skill's 'production-grade' example built specifically to demonstrate WebEnv-expiry recovery, raises TypeError: a bytes-like object is required, not 'str' on the exact documented expired-session response (HTTP 200 with an <ERROR> body) -- live-confirmed in this audit's Input 5 by forging an invalid WebEnv/QueryKey pair and observing NCBI's real response shape first (run/support_check_bad_webenv.py), then running the shipped, unmodified checkpointed_download() against it (run/input5_robust_expiry.py). SKILL.md's own inline reference implementation of the same pattern has the missing bytes-decode guard the shipped example lacks. This matches the standard this audit lineage applied to the comparable pre-fix, unmodified-upstream state of entrez-fetch (3 confirmed unhandled-exception bugs on documented code patterns -> FAIL)." }
+    }
+  },
+  "static_score": {
+    "subtotal": 75,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 10, "max": 12, "note": "Decision matrix, rate-limit math, EPost specifics, and batch-size guidance are complete and (where checked) correct; Correctness docked because 2 of 3 shipped examples crash on their own worked cases (see Reliability / Research Veto)." },
+      "reliability": { "score": 5, "max": 12, "note": "SKILL.md's own inline checkpoint/retry/WebEnv-refresh pattern is genuinely robust (verified live through a simulated crash, Input 2), but the flagship 'production-grade' example (robust_download.py) crashes with a raw, undiagnosed TypeError on exactly the failure mode it exists to demonstrate, and batch_fasta.py crashes with a raw FileNotFoundError on its own default query." },
+      "performance_context": { "score": 7, "max": 8, "note": "Reasonable length, table-driven, no unnecessary repetition; usage-guide.md separates prompts from reference material." },
+      "agent_usability": { "score": 14, "max": 16, "note": "Strong, consistent terminology and a genuinely useful decision matrix / failure-modes / common-errors table set; feedback design is good but not perfect (some code patterns print progress, others don't)." },
+      "human_usability": { "score": 4, "max": 8, "note": "usage-guide.md's Example Prompts read naturally, but Forgiveness is low: the two broken examples fail with raw stack traces on an entirely foreseeable real-world case (a query that returns 0 results today), not a clean, documented stop." },
+      "security": { "score": 10, "max": 12, "note": "No hardcoded real secrets (API key is a documented 'YOUR_KEY' placeholder, consistent with the sibling Entrez skills in this folder); query strings go into GET params only, no code execution of user input." },
+      "maintainability": { "score": 8, "max": 12, "note": "Decent modularity across 3 example files plus SKILL.md/usage-guide.md; Testability docked because the Skill's own verify_fasta_count()/integrity-check idea is sound but not actually applied defensively inside 2 of its 3 own examples." },
+      "agent_specific": { "score": 17, "max": 20, "note": "Excellent Related-Skills composability and correct, verified idempotency (checkpoint/resume). Escape Hatches is the one real gap: strong hard caps for worker concurrency but only a soft 'consider' for record counts far beyond the documented brackets (see Input 7)." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 82.1,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 22, "total": 26 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "EPost 600 real distinct nucleotide IDs in 200-chunks, fetch by WebEnv/QueryKey",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "SKILL.md's 'EPost large ID list, then EFetch' pattern run against 600 real, distinct live UIDs (not the example's duplicated 6-accession demo list). 600/600 FASTA records recovered, 0 loss/dup.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "EPost chunking respects the documented 200-ID-per-call hard limit", "result": "PASS", "note": "600 IDs posted in exactly 3 chunks of 200/200/200, one QueryKey issued per chunk." },
+          { "text": "Final FASTA record count exactly matches the posted ID count (no loss/duplication)", "result": "PASS", "note": "600 records parsed by SeqIO for 600 posted IDs." },
+          { "text": "Pattern runs unmodified against a live, distinct (non-duplicated) ID set, not just the example's dup-laden demo", "result": "PASS", "note": "All 600 UIDs from a live ESearch were distinct; used as-is." },
+          { "text": "WebEnv is correctly reused/accumulated across chunked EPost calls", "result": "PASS", "note": "Same WebEnv string returned and reused for chunks 2 and 3; a new QueryKey issued per chunk as documented." }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "History-server download with disk checkpoint, resumed after a simulated mid-job crash",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "SKILL.md's own checkpointed_batch_download() run verbatim on a real 368-record BRCA1 mRNA query; interrupted after 2 chunks (simulated SSH-drop) and resumed by a second call to the same function.",
+        "basic": 39,
+        "specialized": 57,
+        "total": 96,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Checkpoint file correctly records progress (retstart cursor) after each successful chunk", "result": "PASS", "note": "ckpt read {'start': 200, 'total': 368} exactly after the simulated crash." },
+          { "text": "Resuming from checkpoint does not re-fetch or duplicate already-downloaded records", "result": "PASS", "note": "Final count 368 == 200 (pre-crash) + 168 (post-resume), no overlap." },
+          { "text": "Checkpoint file is deleted only on full, successful completion", "result": "PASS", "note": "ckpt.json present after the crash, absent after phase 2 completed." },
+          { "text": "Final record count exactly matches an independently-run ESearch Count", "result": "PASS", "note": "368 records parsed == 368 from a separate, standalone ESearch call." }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Exact 200/201-ID EPost boundary using examples/batch_by_ids.py's own functions, unmodified",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "direct_efetch()/chained_epost_fetch() copied verbatim from examples/batch_by_ids.py, run against real 200- and 201-ID sets.",
+        "basic": 38,
+        "specialized": 54,
+        "total": 92,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "direct_efetch() succeeds for exactly 200 IDs (the documented limit)", "result": "PASS", "note": "200/200 records recovered." },
+          { "text": "direct_efetch() refuses (assertion error, no network call) for 201 IDs, per its own guard", "result": "PASS", "note": "Raised 'Use chained EPost for >200 IDs' exactly as written." },
+          { "text": "chained_epost_fetch() recovers the full, correct 201-record set when routed through EPost instead", "result": "PASS", "note": "201/201 records recovered, 0 loss." }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "\"Download every PubMed abstract for 'CRISPR AND 2024[PDAT]' in MEDLINE format\" (usage-guide.md Quick Start, verbatim)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "History-server bulk MEDLINE download at real scale (Count=8,768), batch_size=1,500 per SKILL.md's documented pubmed/medline 1000-2000 guidance.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "MEDLINE record count exactly matches ESearch Count, no truncation", "result": "PASS", "note": "8,768 MEDLINE records parsed by Bio.Medline == 8,768 ESearch Count." },
+          { "text": "Recovered PMID set equals an independently-paginated ground-truth PMID set exactly", "result": "PASS", "note": "0 extra, 0 missing PMIDs between the history-server batch and a separate full-pagination ESearch." },
+          { "text": "Batch size used falls within SKILL.md's documented pubmed/medline guidance (1000-2000)", "result": "PASS", "note": "batch_size=1500 used throughout." },
+          { "text": "Sampled records contain the required non-empty MEDLINE fields", "result": "PASS", "note": "3 spot-checked records all have a non-empty Title (TI) field." }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "robust_download.py's checkpointed_download(), forced onto a real expired-WebEnv response",
+        "status": "ERROR",
+        "status_flag": "❌",
+        "note": "examples/robust_download.py's shipped, unmodified checkpointed_download() run against a real BRCA1 query, with the first EFetch call redirected onto a forged WebEnv/QueryKey to reproduce NCBI's real expired-session response (confirmed separately: HTTP 200, XML body containing <ERROR>Unable to obtain query #999</ERROR>). Crashed with TypeError before the intended recovery branch ever ran.",
+        "basic": 14,
+        "specialized": 27,
+        "total": 41,
+        "assertions_passed": 1,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "checkpointed_download() detects the documented WebEnv-expiry response (an <ERROR> body) without crashing", "result": "FAIL", "note": "TypeError: a bytes-like object is required, not 'str' raised at 'if '<ERROR>' in body[:500]' before the RuntimeError handler is ever reached; body is bytes, not str, on this Biopython/urllib stack." },
+          { "text": "On expiry detection, the function refreshes WebEnv/QueryKey via refresh_session() and continues", "result": "FAIL", "note": "Never reached -- the process crashes first." },
+          { "text": "The script's exception handling covers the exact failure mode it was written to demonstrate", "result": "FAIL", "note": "The one scenario this 'production-grade' example exists for is the one it fails on." },
+          { "text": "No output-file corruption or partial record left behind after the crash", "result": "PASS", "note": "Crash occurred before any write for that chunk; output file left in a consistent (if incomplete) state, not a half-written record." }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "\"I need every RefSeq bacterial genome assembly -- loop EFetch, or use Datasets CLI?\" (usage-guide.md Example Prompt, verbatim)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Advisory Mode-A response only, no code executed (ncbi-datasets-cli is a separate, not-installed Skill in this candidate). Response followed the Skill's own decision-matrix row and cited its own worked datasets_cli_genome() command pattern rather than inventing new flags.",
+        "basic": 37,
+        "specialized": 45,
+        "total": 82,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "Response does not recommend looping EFetch for bulk genome-assembly retrieval", "result": "PASS", "note": "Correctly cited the decision matrix's 'All RefSeq for a species -> Datasets CLI' row and the Failure Modes 'Datasets / E-utils confusion' entry." },
+          { "text": "Response correctly cites the Datasets v2 CLI command pattern documented in this Skill's own examples", "result": "PASS", "note": "Matched examples/batch_fasta.py's own datasets_cli_genome()/comment pattern (datasets download genome taxon ... --reference)." },
+          { "text": "Response defers exact Datasets CLI flags/output handling to the dedicated ncbi-datasets-cli Skill rather than inventing untested flags", "result": "PASS", "note": "Explicitly deferred per this Skill's own 'Related Skills' section." }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "\"Download the entire nucleotide database (500M+ sequences) via EFetch, 20 parallel workers to go faster\"",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Advisory Mode-A response only, no code executed. Grounded strictly in SKILL.md's own rate-limit-math and decision-matrix tables (independently verified elsewhere in this audit: 200-ID limit, 9,999 retmax cap).",
+        "basic": 36,
+        "specialized": 40,
+        "total": 76,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Response refuses/strongly discourages 20 concurrent workers, citing the documented <=4-worker cap", "result": "PASS", "note": "Cited SKILL.md's 'Never exceed 4 concurrent workers with an API key, or 1 without' verbatim." },
+          { "text": "Response identifies 500M+ records as outside E-utilities' efficient range and recommends a bulk-FTP/Datasets alternative", "result": "PASS", "note": "Cited the '>100,000 sequences: Consider FTP mirror or Datasets CLI' decision-matrix row and scaled the reasoning to 5,000x that threshold." },
+          { "text": "Response does not fabricate an untested flag or endpoint for the bulk alternative", "result": "PASS", "note": "Stayed within what SKILL.md documents/implies (public NCBI FTP/BLAST-db mirrors), did not invent specific undocumented parameters." },
+          { "text": "SKILL.md provides an explicit hard-stop / escape-hatch instruction for requests at this extreme scale, not just a soft 'consider' suggestion", "result": "FAIL", "note": "Genuine Skill-design gap, not an output defect: no quantified hard cap exists for record-count scale the way one exists for worker concurrency -- see static_score.agent_specific and the P1 recommendation below." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 30.0,
+    "dynamic_weighted": 49.3,
+    "score": 79,
+    "max": 100,
+    "grade": "Reject",
+    "grade_symbol": "❌",
+    "deployable": false,
+    "veto_override": true
+  },
+  "key_strengths": [
+    "Core EPost + history-server + WebEnv/QueryKey batching pattern (SKILL.md's own inline code and examples/batch_by_ids.py) is fully correct: verified live across 4 independent tests (600-ID EPost/fetch, 368-record checkpoint+resume through a simulated crash, exact 200/201 EPost boundary enforcement, and an 8,768-record PubMed MEDLINE bulk pull) with zero record loss or duplication in every case.",
+    "Documented numeric constraints are accurate and independently verified against live NCBI: the 200-ID EPost hard limit, the legacy-ESearch 9,999-record silent retmax cap, and the exact HTTP-200-with-<ERROR>-body shape of an expired/invalid WebEnv session.",
+    "Checkpoint/resume design (SKILL.md's checkpointed_batch_download) survives a simulated mid-job crash cleanly: correct resume point, no duplicate or missing records, checkpoint file removed only on true completion.",
+    "Decision-matrix and rate-limit/ToS guidance (when to defect to Datasets CLI, worker-concurrency cap, off-hours scheduling) produced correct agent guidance under both a scope-boundary and an adversarial test."
+  ],
+  "recommendations": [
+    {
+      "priority": "P0",
+      "title": "batch_fasta.py crashes on its own worked example (0-count query, no file guard)",
+      "observed_in": [],
+      "problem": "Running examples/batch_fasta.py as shipped raises an unhandled FileNotFoundError. history_server_download() correctly detects a live Count=0 for its own worked query and returns early without creating 'insulin_mrna.fasta', but the module-level code immediately below unconditionally calls SeqIO.parse('insulin_mrna.fasta', 'fasta'), which crashes because the file was never created. Independently confirmed twice: the 2026-09-17 tooling pass and this audit's own rerun (run/support_verify_batch_fasta_crash.py).",
+      "root_cause": "The integrity-check block has no guard for the 0-count case the function itself already detects and returns for; separately, the shipped query ('insulin[Gene Name]') is stale -- NCBI's [Gene Name] field requires the official gene symbol, not a descriptive English word, and has returned Count=0 on every date checked in this audit lineage.",
+      "fix": "Guard the integrity-check block, e.g. 'if elapsed == 0: print(\"No records found -- nothing to verify\") else: records = list(SeqIO.parse(...))'. Replace the query with one verified to return a non-trivial live count, e.g. 'Homo sapiens[ORGN] AND INS[GENE] AND srcdb_refseq[PROP] AND biomol_mrna[PROP]' or the already-verified 'BRCA1[GENE] AND Homo sapiens[ORGN] AND biomol_mrna[PROP] AND srcdb_refseq[PROP]' (368 hits, confirmed live 2026-09-19)."
+    },
+    {
+      "priority": "P0",
+      "title": "robust_download.py crashes with TypeError on the exact WebEnv-expiry scenario it exists to demonstrate",
+      "observed_in": [5],
+      "problem": "checkpointed_download()'s error-body check ('<ERROR>' in body[:500]) assumes body is str, but Entrez.efetch(...).read() returns bytes on the currently-installed Biopython 1.88/urllib stack. Live-confirmed in Input 5: forcing the documented expired-session response (HTTP 200 with an XML <ERROR> body, independently reproduced against a forged WebEnv/QueryKey) raises TypeError: a bytes-like object is required, not 'str' before the intended recovery branch ever runs -- defeating the entire purpose of this 'production-grade' example.",
+      "root_cause": "SKILL.md's own reference implementation of the identical pattern (checkpointed_batch_download) already has the guard 'if isinstance(body, bytes): body = body.decode(\"utf-8\", errors=\"replace\")' immediately after h.read(); this line was dropped when robust_download.py was written as a separate, expanded copy.",
+      "fix": "Add the identical isinstance(body, bytes) decode guard to robust_download.py, in the same place SKILL.md's own inline pattern has it. Also replace the script's stale worked-example query (mouse 'hemoglobin[Gene Name]', Count=0 live) with a verified-nonzero one, matching the P0-1 fix."
+    },
+    {
+      "priority": "P1",
+      "title": "No hard stop-condition for requests far outside E-utilities' efficient range",
+      "observed_in": [7],
+      "problem": "For a request to bulk-download the entire nucleotide database (500M+ sequences) via EFetch, the decision matrix only offers a soft '>100,000 sequences: Consider FTP mirror or Datasets CLI; chunk if E-utils still [used]' -- there is no instruction to refuse or hard-redirect at extreme scale, unlike the explicit, quantified hard cap given for worker concurrency ('Never exceed 4 concurrent workers... or 1 without').",
+      "root_cause": "The Skill's Agent-Specific escape-hatch guidance is strong for the parallelism anti-pattern but was never extended to the scale dimension, leaving a literal-minded agent able to be talked into a technically-compliant but multi-week single-stream E-utilities loop for a request this Skill's own tools were never designed to serve.",
+      "fix": "Add an explicit escape hatch to the decision matrix: for record counts far beyond the documented >100,000 bracket (e.g. >1,000,000, or a literal 'entire database' request), instruct the agent to refuse the EFetch-loop approach outright and point only to NCBI's full bulk FTP/BLAST-db mirrors or Datasets CLI, the same way the Failure Modes section already hard-warns against parallelism."
+    },
+    {
+      "priority": "P2",
+      "title": "[Gene Name]/[GENE] field-tag precision is undocumented, and caused both broken example queries",
+      "observed_in": [],
+      "problem": "Neither SKILL.md nor usage-guide.md warns that NCBI's [Gene Name]/[GENE] search field requires the official gene symbol, not a descriptive English word -- the exact gap that made both batch_fasta.py's (insulin[Gene Name]) and robust_download.py's (hemoglobin[Gene Name]) shipped queries return Count=0 on live NCBI.",
+      "root_cause": "The Skill documents rate limits, WebEnv lifecycle, and batching precisely, but has no equivalent precision note for query-term construction, an easy blind spot to reproduce when writing new example queries.",
+      "fix": "Add a one-line note near the Decision Matrix: 'Gene-related field tags ([GENE], [Gene Name]) require the database's official gene symbol (verify via ESearch or the entrez-search skill's EInfo pattern), not a descriptive term.'"
+    }
+  ]
+}
