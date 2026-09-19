@@ -1,0 +1,18 @@
+import traceback
+import scanpy as sc
+import scvelo as scv
+adata = sc.read_h5ad('../data/pancreas_raw.h5ad')
+scv.pp.filter_and_normalize(adata, min_shared_counts=20)
+adata.layers['normalized_X'] = adata.X.copy()
+sc.pp.log1p(adata)
+sc.pp.highly_variable_genes(adata, n_top_genes=2000)
+adata = adata[:, adata.var['highly_variable']].copy()
+adata.X = adata.layers.pop('normalized_X')
+scv.pp.moments(adata, n_pcs=30, n_neighbors=30)
+try:
+    scv.tl.velocity(adata, mode='deterministic')
+    print('DETERMINISTIC MODE SUCCEEDED')
+except Exception:
+    traceback.print_exc()
+import numpy, pandas, scvelo
+print('numpy', numpy.__version__, 'pandas', pandas.__version__, 'scvelo', scvelo.__version__)

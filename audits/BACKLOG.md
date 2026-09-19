@@ -8,7 +8,23 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (68)
+## P1 (70)
+
+### `bio-single-cell-trajectory-inference` — 2 of 3 documented scVelo velocity modes are broken against the Skill's own declared-compatible version
+
+- Skill: 84, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/trajectory-inference) · [viewer](skills/bio-single-cell-trajectory-inference/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 4
+- Problem: mode='dynamical' (SKILL.md line 157, the mode explicitly instructed instead of the default) and mode='stochastic' (scvelo's own default) both crash with real tracebacks against installed scvelo 0.3.4 -- the exact version range ('scVelo 0.3+') SKILL.md and examples/scvelo_velocity.py declare. recover_dynamics fails inside scvelo's own make_unique_list on a pandas-3.x incompatibility (confirmed unrecoverable via two call-site workarounds); velocity(mode='stochastic') fails inside leastsq_generalized on a numpy-2.x incompatibility. Only mode='deterministic', the least-recommended 'quick first pass' option, works.
+- Root cause: scvelo 0.3.x's internal utilities were not updated for numpy>=2 / pandas>=3, and the Skill's compatibility note was never re-verified against a current numpy/pandas stack.
+- Fix: Add an explicit fallback note to the RNA Velocity section and to examples/scvelo_velocity.py: if recover_dynamics or velocity(mode='stochastic') raise TypeError/ValueError referencing pandas 'unique' or numpy array assignment, fall back to mode='deterministic' and use scv.tl.velocity_pseudotime instead of scv.tl.latent_time (which requires recover_dynamics). Also fix the shipped scv.pp.filter_and_normalize(adata, min_shared_counts=20, n_top_genes=2000) call (SKILL.md line 154, examples/scvelo_velocity.py line 13) -- n_top_genes is not accepted by filter_and_normalize in current scvelo; do HVG selection via a separate sc.pp.highly_variable_genes call after log1p.
+
+### `bio-single-cell-trajectory-inference` — CellRank's documented fate-mapping block needs 3 undocumented fixes to complete on real branching data
+
+- Skill: 84, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/trajectory-inference) · [viewer](skills/bio-single-cell-trajectory-inference/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 6
+- Problem: predict_initial_states(n_states=1) as literally written (SKILL.md line 111, no allow_overlap) raised ValueError on real data (30 cells overlapped between predicted initial and terminal macrostates). Separately, PseudotimeKernel.compute_transition_matrix() and compute_fate_probabilities() both spawn worker processes via multiprocessing.Manager(), which raises RuntimeError on Windows when the documented code is run as a plain .py script without an if __name__=='__main__': guard.
+- Root cause: The documented code block was written/tested in a context (likely an interactive notebook, or non-Windows, or data where states happened not to overlap) that doesn't surface either failure mode; neither is mentioned in the text.
+- Fix: Add allow_overlap=True (or a one-line note on handling the ValueError) to the predict_initial_states example, and add a short Windows note near the CellRank and RNA Velocity code blocks: standalone .py scripts using cellrank/scvelo's parallel routines need if __name__=='__main__': guarding (or n_jobs=1) on Windows.
 
 ### `bio-alignment-multiple` — Fix MUSCLE5 ensemble commands (-super5 has no .efa)
 
@@ -554,7 +570,7 @@ None open.
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (282)
+## P2 (285)
 
 ### `bio-crispr-screens-copy-number-correction` — negative_control_sgrnas empty-dict case raises an undocumented ValueError
 
@@ -651,6 +667,30 @@ None open.
 - Problem: The Skill routes PHI-sensitive work to OpenCRAVAT but does not say that sending participant variants to a public API needs consent and approvals.
 - Root cause: Governance mentioned only as a tool choice.
 - Fix: Add a one-line consent/approvals note beside the batch workflow.
+
+### `bio-single-cell-trajectory-inference` — PAGA's documented isolated-cluster heuristic does not distinguish real discrete cell types from a continuum
+
+- Skill: 84, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/trajectory-inference) · [viewer](skills/bio-single-cell-trajectory-inference/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 3
+- Problem: The Governing Principle's rule 2 and the Common Errors table both operationalize the continuum-vs-discrete decision as 'isolated clusters with no surviving connectivity edges are discrete cell types.' On real, genuinely discrete PBMC 1k data (T/B/NK/Mono/Platelet), 0 of 15 leiden clusters were isolated at the documented threshold=0.03, and even sweeping the threshold up to 0.5 isolated only 1/15 (median real connectivity value 0.29).
+- Root cause: A single low, fixed threshold on PAGA connectivity is not, by itself, a reliable discrete-vs-continuum test on real data; the Method Decision Table already notes PAGA's 'threshold is manual; resolution-dependent' but the Governing Principle and Common Errors table present the isolated-cluster check as if it were sufficient on its own.
+- Fix: Add a caveat next to the PAGA continuum-test code: sweep the threshold and inspect the connectivity value distribution (not just cluster isolation at one fixed value), and treat PAGA connectivity as one input to a continuum judgment that should also draw on marker-based cell-type identity, not a standalone automatic test.
+
+### `bio-single-cell-trajectory-inference` — tradeSeq's fitGAM silently requires raw counts, not the matrix already in hand from Slingshot/clustering
+
+- Skill: 84, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/trajectory-inference) · [viewer](skills/bio-single-cell-trajectory-inference/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 5
+- Problem: The text says 'downstream DE goes through tradeSeq (fitGAM then associationTest...)' immediately after the Slingshot code block, implying continuity, but fitGAM raised 'All values of the count matrix should be non-negative' when given the same scaled/log-transformed matrix used for clustering/UMAP.
+- Root cause: The Slingshot and tradeSeq code blocks are presented back-to-back without stating that tradeSeq's counts argument must be the untouched raw count matrix, not the normalized/scaled matrix used upstream.
+- Fix: Add one line before or in the tradeSeq mention: 'fitGAM needs raw counts (assay(sce, "counts") or equivalent), not the scaled matrix used for clustering/UMAP.'
+
+### `bio-single-cell-trajectory-inference` — Frontmatter primary_tool: Monocle3 is the hardest of the 7 documented methods to install and is in tension with the body's own topology-first philosophy
+
+- Skill: 84, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/trajectory-inference) · [viewer](skills/bio-single-cell-trajectory-inference/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: —
+- Problem: SKILL.md declares primary_tool: Monocle3, but Monocle3 (and its SeuratWrappers dependency) are GitHub-only R packages that fail to install on Windows (confirmed by this corpus's own tooling agent after a dedicated attempt logged in TOOLS.md). The body text itself argues against any single default method ('Methodology evolves... no single method wins across all topologies,' Saelens 2019).
+- Root cause: The frontmatter metadata field appears to have been filled with a single representative tool name without reconciling it against the Skill's own topology-first, multi-method design.
+- Fix: Either drop primary_tool or change it to reflect the actual entry point (PAGA, since Governing Principle rule 2 calls it 'the mandatory first step' for every topology).
 
 ### `bio-alignment-multiple` — Correct the 'mafft --auto' strategy table
 

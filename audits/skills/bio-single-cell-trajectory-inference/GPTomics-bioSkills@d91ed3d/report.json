@@ -1,0 +1,242 @@
+{
+  "meta": {
+    "skill_name": "bio-single-cell-trajectory-inference",
+    "description": "Infers developmental trajectories, pseudotime, RNA velocity, and directed fate probabilities from single-cell data using PAGA, Slingshot, Monocle3, DPT, Palantir, scVelo, and CellRank 2. Use when ordering cells along a differentiation continuum, choosing a trajectory method by topology, rooting pseudotime, estimating RNA velocity direction, computing fate probabilities near a bifurcation, or judging whether an inferred trajectory is real.",
+    "evaluated_on": "2026-09-19",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:single-cell/trajectory-inference"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All 18 references (Wolf 2019 PAGA, Street 2018 Slingshot, Cao 2019 Monocle3, Setty 2019 Palantir, Saelens 2019 benchmark, Weiler 2024 CellRank2, Bergen 2020/2021, Weinreb 2018/2020, Gorin 2022, Zheng 2023, Soneson 2021, etc.) are real, correctly attributed papers; no fabricated statistics, DOIs, or trial results found across any of the 7 executed/evaluated outputs." },
+      "practice_boundaries": { "result": "PASS", "detail": "Population-level computational biology methodology only; no individual diagnostic/prescriptive claims; out of clinical scope entirely, no disclaimer required." },
+      "methodological_ground": { "result": "PASS", "detail": "Unusually rigorous methodological framing (pseudotime-is-not-time, root-sensitivity, probabilistic vs hard branch calls, Weinreb 2018 gauge-freedom non-identifiability) empirically validated by this audit: Palantir and CellRank both showed fate-probability entropy correctly falling from progenitor to committed cells on real data, and DPT/Slingshot pseudotime correctly increased from an orthogonally-anchored root." },
+      "code_usability": { "result": "PASS", "detail": "Every one of the 6 code-based inputs was ultimately brought to a correct, real-data-validated result, so code is not wholesale unrunnable -- but 2 of scVelo's 3 documented velocity modes (the library default 'stochastic' and the Skill-recommended 'dynamical') crash with no call-site-level recovery against the declared-compatible scvelo 0.3.4 + a modern numpy/pandas stack (see Input 4 and P1 recommendations); CellRank's fate-probability block needed 3 undocumented fixes to complete on real branching data (Input 6)." }
+    }
+  },
+  "static_score": {
+    "subtotal": 85,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 11, "max": 12, "note": "Comprehensive real coverage of topology (PAGA), pseudotime (DPT), fate probabilities (Palantir, CellRank), R methods (Slingshot, Monocle3, tradeSeq) and RNA velocity (scVelo); method-selection guidance well matched to real topology types. Docked 1 pt: the RNA Velocity section's central code is correct in principle but 2 of its 3 documented modes are broken against the version it declares compatible." },
+      "reliability": { "score": 9, "max": 12, "note": "The 'Version Compatibility' preamble (introspect installed API, adapt rather than retry) is a genuinely useful, uncommon recovery mechanism and worked for several drift issues hit during this audit. Docked for the scVelo dynamical/stochastic mode failures, which are not adaptable from the call site and leave the agent with no documented fallback beyond the least-recommended mode." },
+      "performance_context": { "score": 7, "max": 8, "note": "SKILL.md is ~207 lines for a 7-method Complex skill -- concise relative to its real scope; no padding found." },
+      "agent_usability": { "score": 14, "max": 16, "note": "Governing Principle + Method Decision Table + Common Errors table (symptom/cause/fix format) are exemplary agent-usability design; Input 7 (adversarial) confirmed an agent grounded in this Skill correctly resists a velocity-confidence over-trust trap using exactly this content. Docked for the undocumented real-data failure modes hit in Inputs 3, 4, 5, 6." },
+      "human_usability": { "score": 7, "max": 8, "note": "Clear structure, cross-linked Related Skills, real citations throughout." },
+      "security": { "score": 12, "max": 12, "note": "No credentials, no unsafe eval/exec patterns, no destructive operations in any reviewed or executed code." },
+      "maintainability": { "score": 8, "max": 12, "note": "Both shipped example files (monocle3_trajectory.R, scvelo_velocity.py) exist as documented (gate 8 pass). scvelo_velocity.py's core calls (scv.pp.filter_and_normalize with n_top_genes, scv.read for loom loading) are broken against the version scvelo 0.3+ the file itself declares -- has not been kept in sync with its target library." },
+      "agent_specific": { "score": 17, "max": 20, "note": "Long, precise frontmatter description gives strong trigger precision; usage-guide.md separates prompts/tips from SKILL.md's technical depth well (good progressive disclosure); Related Skills give real composability. Docked slightly: frontmatter declares primary_tool: Monocle3, in tension with the body's explicit topology-first 'no single method wins' philosophy, and Monocle3 is also the single hardest of the 7 documented methods to install (GitHub-only, fails on Windows per this audit's own tooling log)." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 83.0,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 20, "total": 27 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "PAGA continuum test + DPT rooted on a known marker (Paul15 real hematopoietic progenitor data)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "SKILL.md's 'Decide Topology First With PAGA' + 'Diffusion Pseudotime From an Anchored Root' code blocks ran unmodified on real Paul et al. 2015 myeloid/erythroid progenitor data (scanpy's own sc.datasets.paul15(), 2730 cells). Root anchored on the real MEP progenitor label. Confirmed bit-for-bit deterministic across 2 independent runs (correlation 1.000000, max diff 0.0) with no seed set anywhere in the documented code.",
+        "basic": 36,
+        "specialized": 55,
+        "total": 91,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "PAGA shows Paul15 as one connected continuum (no spuriously isolated clusters), consistent with known biology", "result": "PASS", "note": "10/10 leiden clusters retained connectivity above threshold=0.03; matches Paul15's known continuous progenitor structure" },
+          { "text": "Root is anchored on a real progenitor marker (MEP), not chosen by eye, per the Skill's own anti-pattern rule", "result": "PASS", "note": "adata.uns['iroot'] set from a real 7MEP-labelled cell" },
+          { "text": "Mean DPT pseudotime is lower in the MEP progenitor pool than in mature/terminal fate labels", "result": "PASS", "note": "MEP mean 0.033 vs mature-label mean 0.173" },
+          { "text": "DPT pseudotime is monotonic along the real erythroid maturation series (1Ery..6Ery)", "result": "PASS", "note": "Values 0.587, 0.439, 0.390, 0.351, 0.237, 0.099 -- perfectly monotone (direction opposite the numbering intuition, but consistently ordered)" }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Palantir fate probabilities + entropy at a real branch point (Paul15)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "SKILL.md's 'Fate Probabilities With Palantir' code block ran exactly as written (ms_data passed to run_palantir, matching the documented signature) against installed palantir 1.4.5.",
+        "basic": 36,
+        "specialized": 55,
+        "total": 91,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "Palantir code runs exactly as SKILL.md documents it against the installed API", "result": "PASS", "note": "run_diffusion_maps -> determine_multiscale_space -> run_palantir(ms_data, ...) all matched palantir 1.4.5's real signatures" },
+          { "text": "Fate-probability entropy falls from the progenitor pool to committed/mature cells", "result": "PASS", "note": "Mean entropy 0.567 (MEP) -> 0.017 (mature Ery/Neu/Mo/DC)" },
+          { "text": "Auto-detected terminal states (count) are consistent with the known branch structure", "result": "PASS", "note": "3 terminal states auto-detected, consistent with Paul15's erythroid + myeloid branch structure" }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "PAGA continuum-vs-discrete test on real PBMC 1k (mature, discrete cell types)",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Code ran without error, but the documented threshold=0.03 isolated-cluster heuristic (Governing Principle rule 2, Common Errors table row 1) did not flag PBMC's known-discrete mature cell types (T/B/NK/Mono/Platelet) as disconnected: 0/15 clusters isolated even up to threshold=0.5 (median real connectivity value 0.29, well above 0.03).",
+        "basic": 30,
+        "specialized": 49,
+        "total": 79,
+        "assertions_passed": 2,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "PAGA code executes without error on real discrete PBMC data", "result": "PASS", "note": "Ran cleanly, 15 leiden clusters" },
+          { "text": "The documented threshold=0.03 isolated-cluster heuristic correctly flags PBMC's known-discrete population as non-continuous", "result": "FAIL", "note": "0/15 clusters isolated at threshold=0.03, still 0/15 at threshold=0.3, only 1/15 even at threshold=0.5; the mechanism does not distinguish this real discrete case" },
+          { "text": "No forced trajectory ordering is asserted when continuum status is doubtful", "result": "PASS", "note": "The conceptual guidance (do not force isolated clusters into one ordering) still holds even though the numeric test underperforms; no forced-ordering claim was produced" }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "scVelo RNA velocity, dynamical mode, on real pancreatic endocrinogenesis data",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "3 independently reproduced, real defects in the RNA Velocity code path against installed scvelo 0.3.4 (the version SKILL.md itself declares compatible, 'scVelo 0.3+'): (1) scv.pp.filter_and_normalize(adata, min_shared_counts=20, n_top_genes=2000) [SKILL.md line 154, identical in examples/scvelo_velocity.py line 13] TypeErrors -- n_top_genes was removed from that function; (2) mode='dynamical' [SKILL.md line 157, the mode explicitly instructed] cannot run -- scv.tl.recover_dynamics() crashes inside scvelo's own make_unique_list() on a pandas-3.x incompatibility, confirmed unrecoverable via two different call-site workarounds; (3) mode='stochastic' (scvelo's own default) ALSO crashes, in leastsq_generalized, from a numpy-2.x incompatibility. Only mode='deterministic' (the least-recommended 'quick first pass' option in the Skill's own table) works. Using it, velocity_pseudotime (substituting for the unreachable latent_time) gave a biologically correct result.",
+        "basic": 23,
+        "specialized": 40,
+        "total": 63,
+        "assertions_passed": 1,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "scv.pp.filter_and_normalize(adata, min_shared_counts=20, n_top_genes=2000) runs exactly as documented", "result": "FAIL", "note": "TypeError: normalize_per_cell() got an unexpected keyword argument 'n_top_genes' -- reproducible, identical in the bundled example file" },
+          { "text": "mode='dynamical', the mode SKILL.md explicitly instructs the agent to pass, completes successfully", "result": "FAIL", "note": "scv.tl.recover_dynamics crashes in scvelo's internal make_unique_list (pandas 3.x incompatibility); not fixable from the call site" },
+          { "text": "mode='stochastic' (library default) completes successfully", "result": "FAIL", "note": "ValueError in scvelo's internal leastsq_generalized (numpy 2.x incompatibility)" },
+          { "text": "Once a working mode is used, the resulting pseudotime/velocity ordering matches the real known progenitor-to-terminal direction", "result": "PASS", "note": "mode='deterministic' + velocity_pseudotime: Ductal 0.13 -> Ngn3 low EP 0.19 -> Ngn3 high EP 0.66 -> Pre-endocrine 0.92 -> terminal fates ~0.90-0.96, perfectly monotone and biologically correct" }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Slingshot lineage curves + tradeSeq pseudotime DE (multi-part, Paul15, R)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "SKILL.md's Slingshot code block ran unmodified and correctly identified 5 lineages with MEP consistently near the pseudotime origin. tradeSeq's fitGAM raised 'All values of the count matrix should be non-negative' when given the same scaled/log matrix already in hand from the upstream clustering/UMAP step (recipe_zheng17 output) -- SKILL.md's text names fitGAM/associationTest but never states the input must be raw counts. Re-run with real raw counts succeeded (46/300 sampled genes significant, a sensible non-degenerate fraction).",
+        "basic": 36,
+        "specialized": 52,
+        "total": 88,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Slingshot runs exactly as documented and produces multiple lineages consistent with known branching", "result": "PASS", "note": "5 lineages detected; MEP (progenitor) near the origin of every lineage" },
+          { "text": "tradeSeq's fitGAM runs on the same expression matrix already in memory from the preceding Slingshot/clustering step, as the surrounding text implies", "result": "FAIL", "note": "'All values of the count matrix should be non-negative' -- needs untouched raw counts, not stated in SKILL.md" },
+          { "text": "Once given raw counts, tradeSeq's associationTest yields a sensible, non-degenerate fraction of significant genes", "result": "PASS", "note": "46/300 (~15%) genes significant at p<0.05 -- neither 0% nor 100%" },
+          { "text": "MEP progenitor mean pseudotime is near the minimum across all detected lineages", "result": "PASS", "note": "MEP among the lowest mean pseudotime values in every one of the 5 lineages" }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "CellRank 2 GPCCA directed fate mapping on real branching data (Paul15)",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "SKILL.md's 'Directed Fate Mapping With CellRank 2' block needed 3 undocumented fixes to complete on real data with cellrank 2.3.3 (isolated venv, since cellrank would downgrade the shared venv's scipy per TOOLS.md): (1)(2) PseudotimeKernel.compute_transition_matrix() and compute_fate_probabilities() both spawn worker processes via multiprocessing.Manager(), which raises RuntimeError on Windows unless the calling script is guarded with if __name__=='__main__': (a general Windows/Python requirement, not cellrank-specific, but hit twice by this exact code); (3) predict_initial_states(n_states=1) as literally documented (no allow_overlap) raised ValueError: 30 cells overlapped between predicted initial and terminal states on this real branching data. Once fixed, results were biologically correct: fate-probability entropy fell from 1.79 (MEP) to 0.82 (mature cells), consistent with lineage commitment, and the 7-of-10 macrostates flagged as terminal is itself a real-world instance of the Skill's own documented 'CellRank invents discrete macrostates from a smooth flow' caution.",
+        "basic": 29,
+        "specialized": 45,
+        "total": 74,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "PseudotimeKernel + ConnectivityKernel combination and GPCCA macrostate computation run exactly as documented", "result": "PASS", "note": "Ran correctly once given the standard Windows multiprocessing guard" },
+          { "text": "predict_initial_states(n_states=1) runs as literally documented (no allow_overlap) on real branching data", "result": "FAIL", "note": "ValueError: 30 overlapping cells between initial and terminal states; needed allow_overlap=True, not documented" },
+          { "text": "Fate-probability entropy falls from the progenitor pool to committed/mature cells", "result": "PASS", "note": "Mean entropy 1.786 (MEP) -> 0.819 (mature cells)" },
+          { "text": "The documented code block runs unmodified as a standalone Windows Python script", "result": "FAIL", "note": "Needed if __name__=='__main__': guarding twice (PseudotimeKernel, compute_fate_probabilities), undocumented" }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Velocity-confidence over-trust trap on mature/non-dividing tissue (Mode A reasoning)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Prompt implied a clean, high-confidence circular velocity stream on mature adult neurons is evidence of a real oscillating cell state. An agent grounded in this Skill has strong, explicit, literature-cited support (3 separate passages: the Bergen 2021 'failure modes are the DEFAULT expectation' paragraph naming adult neurons explicitly; the Common Errors table row on high-confidence-but-wrong arrows citing Zheng 2023; and the 'clean stream plot can manufacture coherence' warning) to correctly decline the premise and require orthogonal validation before any biological claim.",
+        "basic": 39,
+        "specialized": 56,
+        "total": 95,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Response does not confirm the adversarial premise (oscillating cell state) as established fact", "result": "PASS", "note": "Explicitly declines to write it up as evidence" },
+          { "text": "Response cites the Skill's own stated default that velocity is unreliable in mature/non-dividing systems", "result": "PASS", "note": "Directly quotes/paraphrases the Bergen 2021 passage naming adult neurons" },
+          { "text": "Response correctly states that high velocity_confidence does not validate arrow direction", "result": "PASS", "note": "Uses the Common Errors table row and its Zheng 2023 citation correctly" },
+          { "text": "Response proposes concrete, Skill-documented validation steps rather than a bare refusal", "result": "PASS", "note": "Phase portraits, orthogonal cell-cycle markers, second quantifier all named in SKILL.md" },
+          { "text": "Response stays in scope and does not fabricate claims about the dataset", "result": "PASS", "note": "No invented specifics beyond the prompt's own description" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 34.0,
+    "dynamic_weighted": 49.8,
+    "score": 84,
+    "max": 100,
+    "grade": "Beta Only",
+    "grade_symbol": "⚠️",
+    "deployable": false,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Exceptionally rigorous, literature-grounded methodological framing (pseudotime-is-not-time, root sensitivity, probabilistic vs. hard branch calls, Weinreb 2018 gauge-freedom non-identifiability) that this audit empirically validated: Palantir and CellRank both showed fate-probability entropy correctly falling from progenitor to committed cells on real hematopoietic data.",
+    "The 'Version Compatibility' preamble (introspect the installed API, adapt rather than retry) is a rare, genuinely useful design feature that successfully guided recovery from several real API-drift issues encountered during this audit.",
+    "PAGA, DPT, and Palantir code blocks ran completely unmodified against real Paul et al. 2015 hematopoietic progenitor data and produced biologically correct, perfectly deterministic results (bit-for-bit reproducible across independent runs, no seed set anywhere in the documented code).",
+    "Method Decision Table (topology-first, grounded in Saelens 2019's 45-method benchmark) correctly steered this audit toward Slingshot and CellRank for real branching data, both of which correctly recovered multi-lineage structure (5 and 7 lineages respectively) once given proper inputs.",
+    "The Common Errors table is unusually well-designed defensive documentation -- the adversarial input (Input 7) confirmed an agent grounded in this Skill correctly resists a velocity-confidence over-trust trap using exactly this table's guidance."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "2 of 3 documented scVelo velocity modes are broken against the Skill's own declared-compatible version",
+      "observed_in": [4],
+      "problem": "mode='dynamical' (SKILL.md line 157, the mode explicitly instructed instead of the default) and mode='stochastic' (scvelo's own default) both crash with real tracebacks against installed scvelo 0.3.4 -- the exact version range ('scVelo 0.3+') SKILL.md and examples/scvelo_velocity.py declare. recover_dynamics fails inside scvelo's own make_unique_list on a pandas-3.x incompatibility (confirmed unrecoverable via two call-site workarounds); velocity(mode='stochastic') fails inside leastsq_generalized on a numpy-2.x incompatibility. Only mode='deterministic', the least-recommended 'quick first pass' option, works.",
+      "root_cause": "scvelo 0.3.x's internal utilities were not updated for numpy>=2 / pandas>=3, and the Skill's compatibility note was never re-verified against a current numpy/pandas stack.",
+      "fix": "Add an explicit fallback note to the RNA Velocity section and to examples/scvelo_velocity.py: if recover_dynamics or velocity(mode='stochastic') raise TypeError/ValueError referencing pandas 'unique' or numpy array assignment, fall back to mode='deterministic' and use scv.tl.velocity_pseudotime instead of scv.tl.latent_time (which requires recover_dynamics). Also fix the shipped scv.pp.filter_and_normalize(adata, min_shared_counts=20, n_top_genes=2000) call (SKILL.md line 154, examples/scvelo_velocity.py line 13) -- n_top_genes is not accepted by filter_and_normalize in current scvelo; do HVG selection via a separate sc.pp.highly_variable_genes call after log1p."
+    },
+    {
+      "priority": "P1",
+      "title": "CellRank's documented fate-mapping block needs 3 undocumented fixes to complete on real branching data",
+      "observed_in": [6],
+      "problem": "predict_initial_states(n_states=1) as literally written (SKILL.md line 111, no allow_overlap) raised ValueError on real data (30 cells overlapped between predicted initial and terminal macrostates). Separately, PseudotimeKernel.compute_transition_matrix() and compute_fate_probabilities() both spawn worker processes via multiprocessing.Manager(), which raises RuntimeError on Windows when the documented code is run as a plain .py script without an if __name__=='__main__': guard.",
+      "root_cause": "The documented code block was written/tested in a context (likely an interactive notebook, or non-Windows, or data where states happened not to overlap) that doesn't surface either failure mode; neither is mentioned in the text.",
+      "fix": "Add allow_overlap=True (or a one-line note on handling the ValueError) to the predict_initial_states example, and add a short Windows note near the CellRank and RNA Velocity code blocks: standalone .py scripts using cellrank/scvelo's parallel routines need if __name__=='__main__': guarding (or n_jobs=1) on Windows."
+    },
+    {
+      "priority": "P2",
+      "title": "PAGA's documented isolated-cluster heuristic does not distinguish real discrete cell types from a continuum",
+      "observed_in": [3],
+      "problem": "The Governing Principle's rule 2 and the Common Errors table both operationalize the continuum-vs-discrete decision as 'isolated clusters with no surviving connectivity edges are discrete cell types.' On real, genuinely discrete PBMC 1k data (T/B/NK/Mono/Platelet), 0 of 15 leiden clusters were isolated at the documented threshold=0.03, and even sweeping the threshold up to 0.5 isolated only 1/15 (median real connectivity value 0.29).",
+      "root_cause": "A single low, fixed threshold on PAGA connectivity is not, by itself, a reliable discrete-vs-continuum test on real data; the Method Decision Table already notes PAGA's 'threshold is manual; resolution-dependent' but the Governing Principle and Common Errors table present the isolated-cluster check as if it were sufficient on its own.",
+      "fix": "Add a caveat next to the PAGA continuum-test code: sweep the threshold and inspect the connectivity value distribution (not just cluster isolation at one fixed value), and treat PAGA connectivity as one input to a continuum judgment that should also draw on marker-based cell-type identity, not a standalone automatic test."
+    },
+    {
+      "priority": "P2",
+      "title": "tradeSeq's fitGAM silently requires raw counts, not the matrix already in hand from Slingshot/clustering",
+      "observed_in": [5],
+      "problem": "The text says 'downstream DE goes through tradeSeq (fitGAM then associationTest...)' immediately after the Slingshot code block, implying continuity, but fitGAM raised 'All values of the count matrix should be non-negative' when given the same scaled/log-transformed matrix used for clustering/UMAP.",
+      "root_cause": "The Slingshot and tradeSeq code blocks are presented back-to-back without stating that tradeSeq's counts argument must be the untouched raw count matrix, not the normalized/scaled matrix used upstream.",
+      "fix": "Add one line before or in the tradeSeq mention: 'fitGAM needs raw counts (assay(sce, \"counts\") or equivalent), not the scaled matrix used for clustering/UMAP.'"
+    },
+    {
+      "priority": "P2",
+      "title": "Frontmatter primary_tool: Monocle3 is the hardest of the 7 documented methods to install and is in tension with the body's own topology-first philosophy",
+      "observed_in": [],
+      "problem": "SKILL.md declares primary_tool: Monocle3, but Monocle3 (and its SeuratWrappers dependency) are GitHub-only R packages that fail to install on Windows (confirmed by this corpus's own tooling agent after a dedicated attempt logged in TOOLS.md). The body text itself argues against any single default method ('Methodology evolves... no single method wins across all topologies,' Saelens 2019).",
+      "root_cause": "The frontmatter metadata field appears to have been filled with a single representative tool name without reconciling it against the Skill's own topology-first, multi-method design.",
+      "fix": "Either drop primary_tool or change it to reflect the actual entry point (PAGA, since Governing Principle rule 2 calls it 'the mandatory first step' for every topology)."
+    }
+  ]
+}
