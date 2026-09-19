@@ -8,7 +8,31 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (72)
+## P1 (75)
+
+### `bio-single-cell-perturb-seq` — Default guide-assignment method needs an undocumented JAX extra
+
+- Skill: 75, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/perturb-seq) · [viewer](skills/bio-single-cell-perturb-seq/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 1
+- Problem: assign_mixture_model -- the skill's stated default ('Governing Principle: a mixture problem, not a threshold') -- raises ImportError under the skill's own documented `pip install pertpy scanpy anndata`; it needs the optional `pertpy[jax]` extra (optax), never mentioned in Prerequisites.
+- Root cause: pertpy made the mixture-model backend an optional JAX extra at some point before 1.3.0; SKILL.md's Prerequisites section was not updated to match.
+- Fix: Add `pip install 'pertpy[jax]'` (or `pip install optax`) to Prerequisites, and document assign_by_threshold's real signature (`assignment_threshold`, `output_layer`, binary cell x guide layer output, not a single obs column) as the concrete fallback.
+
+### `bio-single-cell-perturb-seq` — Shipped pertpy_analysis.py crashes against its own reference dataset
+
+- Skill: 75, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/perturb-seq) · [viewer](skills/bio-single-cell-perturb-seq/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 1, 4
+- Problem: ms.mixscape(adata, pert_key='gene_target'/'perturbation', ...) raises KeyError because adata = mdata.mod['rna'] only carries ['nCount_RNA','nFeature_RNA','percent.mito']; the perturbation/gene_target columns live on the joined mdata.obs, not on adata.obs, confirmed by running pt.dt.papalexi_2021() directly.
+- Root cause: The example was written or tested against an older pertpy/papalexi_2021 loader that auto-propagated modality-joined metadata into `.mod['rna'].obs`; the current loader keeps it on the outer MuData only.
+- Fix: Add one line pulling the needed columns across before the guide-assignment/Mixscape calls (`for col in [...]: adata.obs[col] = mdata.obs[col].to_numpy()`), in both SKILL.md's inline snippet and examples/pertpy_analysis.py.
+
+### `bio-single-cell-perturb-seq` — Milo compositional-shift example is structurally incompatible with pooled Perturb-seq design
+
+- Skill: 75, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/perturb-seq) · [viewer](skills/bio-single-cell-perturb-seq/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 5
+- Problem: milo.da_nhoods(mdata_milo, design='~ target_gene') after count_nhoods(..., sample_col='replicate') raises AssertionError: pertpy's own da_nhoods docstring requires the design covariate to be constant per sample_col-defined sample, but gene_target/target_gene varies cell-by-cell within each replicate in a pooled screen -- it cannot be, by construction.
+- Root cause: The Milo example appears adapted from a non-pooled tutorial (condition constant per sample) without accounting for Perturb-seq's per-cell perturbation identity.
+- Fix: Either build one Milo pseudo-sample per (replicate x guide) before count_nhoods, or replace the worked example with a method actually compatible with per-cell design (e.g. per-target-vs-NT subset_samples contrasts, or scCODA at the guide level).
 
 ### `bio-alignment-multiple` — Fix MUSCLE5 ensemble commands (-super5 has no .efa)
 
@@ -586,7 +610,31 @@ None open.
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (300)
+## P2 (303)
+
+### `bio-single-cell-perturb-seq` — scMAGeCK has no code example despite being a first-class decision-table entry
+
+- Skill: 75, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/perturb-seq) · [viewer](skills/bio-single-cell-perturb-seq/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 6
+- Problem: Every other method in the Method Decision Table (Mixscape, SCEPTRE, E-distance, Pseudobulk DE, Milo) gets a full worked code block; scMAGeCK gets one table row and nothing else, so an agent recommending it for high-MOI/combinatorial designs has no grounded implementation to offer.
+- Root cause: scMAGeCK section was scoped as a pointer/reference only, inconsistent with the rest of the skill's pattern.
+- Fix: Add a minimal scMAGeCK worked example (R, scmageck_lr() or RRA) mirroring the other sections' format, or explicitly note 'no bundled example -- see scMAGeCK docs' if genuinely out of scope.
+
+### `bio-single-cell-perturb-seq` — SKILL.md doesn't flag sceptre's R>=4.5 requirement
+
+- Skill: 75, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/perturb-seq) · [viewer](skills/bio-single-cell-perturb-seq/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 2
+- Problem: install.packages('sceptre') / BiocManager::install('sceptre') is a silent no-op on R<4.5 (current CRAN release requires R>=4.5); SKILL.md's Version Compatibility section lists only 'sceptre 0.10+' with no R-version caveat, so a user on an older R gets no package and no explanation.
+- Root cause: Version Compatibility section tracks package versions but not the R-version floor that gates package availability at all.
+- Fix: Note the R>=4.5 requirement next to the sceptre version pin, and mention explicitly that BiocManager::install silently no-ops rather than erroring when the version gate is hit.
+
+### `bio-single-cell-perturb-seq` — E-test permutation has no documented or exposed seed
+
+- Skill: 75, Beta Only · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/perturb-seq) · [viewer](skills/bio-single-cell-perturb-seq/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 4
+- Problem: pt.tl.DistanceTest exposes no seed/random_state parameter, and SKILL.md never instructs setting a global seed before calling it, so p-values near the 1/(n_perms+1) floor are not strictly reproducible run-to-run.
+- Root cause: SKILL.md's code snippet was written for illustration and doesn't address reproducibility of the permutation step specifically.
+- Fix: Add `np.random.seed(...)` before the etest(...) call in the example and note it as an explicit reproducibility caveat, alongside the existing 'crushed by multiple testing' warning.
 
 ### `bio-crispr-screens-copy-number-correction` — negative_control_sgrnas empty-dict case raises an undocumented ValueError
 

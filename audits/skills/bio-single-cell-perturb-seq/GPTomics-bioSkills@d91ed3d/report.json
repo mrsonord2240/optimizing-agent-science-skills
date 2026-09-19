@@ -1,0 +1,251 @@
+{
+  "meta": {
+    "skill_name": "bio-single-cell-perturb-seq",
+    "description": "Analyze Perturb-seq / CROP-seq single-cell CRISPR screens. Use when assigning guides as a mixture problem, removing non-perturbed escaper cells with Mixscape, choosing a calibrated test (SCEPTRE conditional resampling) over naive DE, quantifying effect size with E-distance, separating compositional shifts from within-state expression change, or judging whether a perturbation-prediction foundation model actually beats a baseline.",
+    "evaluated_on": "2026-09-19",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:single-cell/perturb-seq"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All 7 outputs use real data or real citations (Dixit 2016, Datlinger 2017, Replogle 2020, Papalexi 2021, Yang 2020, Barry 2021, Squair 2021, Peidli 2024, Heumos 2026, Dann 2022, Ahlmann-Eltze 2025, Kernfeld 2025, Csendes 2025 all verified as real papers); no fabricated DOIs, p-values, or results in any executed input." },
+      "practice_boundaries": { "result": "PASS", "detail": "Purely computational/research skill; no diagnostic, prescriptive, or patient-level claims in any of the 7 outputs; no medical disclaimer required." },
+      "methodological_ground": { "result": "PASS", "detail": "Core prose guidance (mixture over threshold, calibrated testing over naive DE, pseudobulk over pseudoreplication, composition-vs-expression) is textbook-correct and well-cited across all inputs; the Milo code defect (Input 5) is an API/design-formula bug, not a stated methodological fallacy in the prose." },
+      "code_usability": { "result": "PASS", "detail": "5 of 7 inputs produced real, runnable code once the skill's own documented fallback pattern (Version Compatibility section: 'introspect the installed package and adapt') was applied; the two code defects found (Input 1/4 KeyError, Input 5 AssertionError) are real but are exactly the class of drift the skill explicitly tells the agent to expect and repair, not silent unexplained failures. Scored down in dynamic_score rather than vetoed." }
+    }
+  },
+  "static_score": {
+    "subtotal": 80,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 8, "max": 12, "note": "Covers all 7 promised capabilities conceptually, but the two flagship worked examples (guide mixture assignment, Mixscape via examples/pertpy_analysis.py) do not run as shipped: assign_mixture_model needs an undocumented JAX extra, and the example's pert_key columns don't exist on adata.obs as written (KeyError, confirmed by execution)." },
+      "reliability": { "score": 9, "max": 12, "note": "Excellent Common Errors table (8 symptom/cause/fix rows) gives strong error-reporting value; recoverability is weaker because the ImportError from the missing JAX extra and the Milo AssertionError are not anticipated anywhere in the text." },
+      "performance_context": { "score": 7, "max": 8, "note": "SKILL.md is 207 lines, code kept concise, usage-guide.md and examples/ separated cleanly; E-test compute cost on realistic cell counts (~3.5 min for 100 perms here) is not flagged." },
+      "agent_usability": { "score": 12, "max": 16, "note": "Governing Principle and decision tables are very clear; one real inconsistency found: SKILL.md's prose Mixscape snippet uses pert_key='target_gene' while examples/pertpy_analysis.py uses pert_key='gene_target' for the same real dataset -- a copy-paste of either alone, mixed with the other, breaks." },
+      "human_usability": { "score": 5, "max": 8, "note": "Description is precise but written for domain specialists (Mixscape, SCEPTRE conditional resampling, E-distance) -- correctly targeted at its actual audience, not a general user; SKILL.md doesn't spell out concrete input-shape requirements (expected MuData/obs schema) up front, which is exactly what produced the Input 1/4 KeyError above." },
+      "security": { "score": 11, "max": 12, "note": "No credentials, no eval/exec of raw user strings, no injection surface; this is a code-pattern skill, not a service with untrusted inputs." },
+      "maintainability": { "score": 9, "max": 12, "note": "Clean SKILL.md / usage-guide.md / examples/ split with one responsibility each; testability is hurt because the bundled example is not runnable out of the box against pertpy's own real reference dataset, and there are no expected-output assertions anywhere in the skill." },
+      "agent_specific": { "score": 19, "max": 20, "note": "Trigger description is precise, SKILL.md stays under 500 lines with real progressive disclosure, Related Skills section (9 entries) gives excellent composability, and the Foundation-Model Reality Check / all-NP caveats are exemplary escape hatches. Idempotency docked slightly: default seeds exist in the underlying pertpy API (mixture seed=2024, Mixscape random_state=0, Milo seed=0) but SKILL.md never calls this out, and the E-test permutation has no exposed seed at all." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 71.9,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 22, "total": 29 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Assign guides with a mixture model, run Mixscape to remove escapers (real papalexi_2021 CROP-seq data)",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "assign_mixture_model raised ImportError (missing optional 'optax'/JAX extra, undocumented in SKILL.md Prerequisites); fell back to the documented assign_by_threshold alternative. Mixscape then required patching adata.obs with columns pulled from mdata.obs -- SKILL.md's own shipped example crashes with KeyError('perturbation') as written. After both fixes: real KO=4699 / NP=13644 / NT=2386 classification produced.",
+        "basic": 30,
+        "specialized": 39,
+        "total": 69,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Guide assignment uses a per-guide mixture posterior, not a flat threshold, per SKILL.md's Governing Principle", "result": "FAIL", "note": "The mixture method itself could not execute in this environment (missing optax); the executed path used the threshold fallback instead." },
+          { "text": "Mixscape correctly separates KO/NP/NT populations and reports the perturbed fraction", "result": "PASS", "note": "4699 KO / 13644 NP / 2386 NT computed and printed from real data." },
+          { "text": "Code runs against the skill's own recommended real dataset (pt.dt.papalexi_2021) without modification", "result": "FAIL", "note": "KeyError('perturbation') as shipped; required pulling columns from mdata.obs into adata.obs." },
+          { "text": "Output does not claim genes are non-functional from a high NP fraction alone", "result": "PASS", "note": "No such claim made; purely descriptive counts." },
+          { "text": "No fabricated statistics; all counts are from real execution", "result": "PASS", "note": "All figures traced to the printed value_counts() output of a real run." }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Calibrated SCEPTRE test with a negative-control calibration check first (R)",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "sceptre is unavailable in this audit's R 4.4.3 environment: the current CRAN release requires R>=4.5, so install is a silent no-op; confirmed independently by directory listing (no 'sceptre' folder in R-lib), corroborating the tooling agent's TOOLS.md. Code reviewed against the real sceptre API (import_data/set_analysis_parameters/assign_grnas/run_qc/run_calibration_check/run_discovery_analysis) but not executed.",
+        "basic": 24,
+        "specialized": 38,
+        "total": 62,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Calibration check (negative controls) runs before discovery analysis", "result": "PASS", "note": "Code order matches SKILL.md and sceptre's documented best practice." },
+          { "text": "Code executes successfully producing discovery results", "result": "FAIL", "note": "Not executed -- sceptre cannot be installed under this environment's R 4.4.3." },
+          { "text": "SKILL.md documents sceptre's minimum R-version requirement", "result": "FAIL", "note": "Version Compatibility section lists only 'sceptre 0.10+', no R>=4.5 caveat, so a user hits a silent no-op with no explanation." },
+          { "text": "No fabricated results reported", "result": "PASS", "note": "Execution status honestly reported as blocked; nothing invented." }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "All cells for target gene X are Mixscape 'NP' -- is the gene non-functional?",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Direct reasoning task (Mode A). Correctly reproduces SKILL.md's explicit guidance: does not conclude non-functional, flags the no-phenotype/no-editing confound, recommends independent guide-efficiency verification before drawing conclusions.",
+        "basic": 38,
+        "specialized": 54,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Does not conclude the gene is non-functional from an all-NP result alone", "result": "PASS", "note": "Matches SKILL.md's Deep Caveat and Common Errors table exactly." },
+          { "text": "Recommends independent verification of guide editing efficiency", "result": "PASS", "note": "Suggests genotyping/indel or protein-level checks before concluding." },
+          { "text": "Cites the specific confound (no-phenotype vs no-editing)", "result": "PASS", "note": "Directly named, matching the skill's own terminology." },
+          { "text": "No medical/clinical diagnostic overreach", "result": "PASS", "note": "Stays in pure research-computation scope." }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Rank perturbations by E-distance and run the permutation E-test in a pinned PCA embedding",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Ran cleanly on real data (same adata as Input 1, post-fix). Pairwise E-distance produced sensible real values (e.g. STAT1-CAV1=2.84, near-zero for similar groups). E-test with n_perms=100 took ~3.5 min and reproduced SKILL.md's own documented caveat exactly: raw p-values floor at 0.01 (~1/(n_perms+1)) and none of the top hits survive Holm-Sidak adjustment.",
+        "basic": 33,
+        "specialized": 51,
+        "total": 84,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Pins a fixed PCA embedding and edistance metric before computing pairwise distances", "result": "PASS", "note": "obsm_key='X_pca' and metric='edistance' set explicitly, matching SKILL.md." },
+          { "text": "Permutation E-test reproduces SKILL.md's documented 'p ~ 1/(n_perms+1), crushed by multiple testing' caveat", "result": "PASS", "note": "Empirically confirmed: raw p=0.01 floor, 0/5 top hits significant after adjustment." },
+          { "text": "No fabricated distance values; all figures from real computation", "result": "PASS", "note": "Values traced directly to dist.pairwise() and etest() output." },
+          { "text": "Output correctly distinguishes raw vs adjusted significance", "result": "PASS", "note": "pvalue vs pvalue_adj / significant vs significant_adj both reported and correctly diverge." }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Pseudobulk DESeq2 per replicate plus Milo to separate composition from within-state DE",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "Pseudobulk step (PseudobulkSpace.compute, RAW counts summed by (gene_target, replicate)) ran cleanly: 78 = 26 targets x 3 replicates pseudobulk samples with correct columns. Milo step failed: da_nhoods(design='~gene_target') after count_nhoods(sample_col='replicate') raised AssertionError('Values ... cannot be unambiguously assigned to each sample') -- confirmed via pertpy's own da_nhoods docstring that design covariates must be constant per sample_col-defined sample, but gene_target varies cell-by-cell within each replicate in a pooled screen. This is a real structural mismatch in SKILL.md's own worked Milo example for Perturb-seq's pooled design, not an environment quirk.",
+        "basic": 26,
+        "specialized": 33,
+        "total": 59,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Pseudobulk sums RAW counts (not normalized) per (target, replicate)", "result": "PASS", "note": "layer_key='counts' used; 78-sample pseudobulk matrix with correct n_obs_aggregated." },
+          { "text": "Milo differential-abundance test completes and reports composition separately from expression", "result": "FAIL", "note": "AssertionError; da_nhoods did not complete." },
+          { "text": "Design formula is compatible with the per-cell nature of pooled Perturb-seq perturbation labels", "result": "FAIL", "note": "gene_target is not constant per sample_col='replicate' sample -- confirmed structural mismatch, not fixable by a one-line patch." },
+          { "text": "No fabricated pseudobulk or DA results reported", "result": "PASS", "note": "Failure surfaced honestly (traceback captured); nothing fabricated." }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "High-MOI combinatorial guides -- deconvolve with scMAGeCK",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "scMAGeCK is listed only in the Method Decision Table (one row: what it answers / use when / fails when); SKILL.md and usage-guide.md contain zero code, install instructions, or function names for it, unlike every other method in the same table. scMAGeCK is also not installed anywhere in this audit environment (confirmed absent from R-lib). Not executed -- no code exists to run.",
+        "basic": 21,
+        "specialized": 24,
+        "total": 45,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "SKILL.md provides runnable code or clear step-by-step guidance for scMAGeCK", "result": "FAIL", "note": "No code anywhere in SKILL.md, usage-guide.md, or examples/ for scMAGeCK." },
+          { "text": "Skill correctly identifies scMAGeCK as the appropriate tool for combinatorial/high-MOI deconvolution", "result": "PASS", "note": "Decision table entry is directionally correct." },
+          { "text": "Skill warns about the NEGCTRL-choice pitfall for scMAGeCK", "result": "PASS", "note": "Present in the table's 'Fails when' column." },
+          { "text": "Output does not fabricate scMAGeCK function names/parameters not grounded in the skill", "result": "PASS", "note": "SKILL.md's own Version Compatibility preamble tells the agent to introspect the installed package rather than guess; a competent agent following it would caveat rather than invent an API." }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Foundation model claims 0.95 correlation on held-out cells -- safe to skip experimental validation?",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Direct reasoning task (Mode A). Correctly invokes SKILL.md's Foundation-Model Reality Check: demands DE-gene-only metrics (not all-gene correlation, which a do-nothing baseline also scores well on), demands an explicit additive/mean baseline, flags cell-level vs whole-perturbation-holdout split as the key leakage risk, and explicitly refuses to endorse skipping validation, citing the 2025 benchmark literature.",
+        "basic": 38,
+        "specialized": 54,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Refuses to endorse skipping experimental validation based on all-gene correlation alone", "result": "PASS", "note": "Explicit refusal with reasoning." },
+          { "text": "Requests DE-gene-only metric and explicit additive/mean baseline comparison", "result": "PASS", "note": "Matches SKILL.md's defensible reviewer stance exactly." },
+          { "text": "Flags cell-level vs whole-perturbation-holdout split as the key confound", "result": "PASS", "note": "Directly named as the train-test leakage risk." },
+          { "text": "Cites that foundation models do not yet reliably beat trivial baselines (with reference)", "result": "PASS", "note": "Cites Ahlmann-Eltze 2025 / Kernfeld 2025 / Csendes 2025, all real papers matching SKILL.md's References section." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 32.0,
+    "dynamic_weighted": 43.1,
+    "score": 75,
+    "max": 100,
+    "grade": "Beta Only",
+    "grade_symbol": "⚠️",
+    "deployable": false,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Foundation-Model Reality Check (Input 7, 92/100) correctly prevents a dangerous overconfidence trap: pushes back on all-gene-correlation claims, demands DE-gene metrics and whole-perturbation holdout, cites 3 real 2025 benchmark papers.",
+    "All-NP / escaper guidance (Input 3, 92/100) correctly stops the agent from concluding a gene is non-functional from a Mixscape all-NP call, matching a well-known literature confound.",
+    "The E-test's real run reproduced SKILL.md's own documented caveat exactly: raw p-values floor at ~1/(n_perms+1) and nothing survives multiple-testing correction -- the warning is empirically accurate, not decorative.",
+    "Determinism defaults are solid where they matter: assign_mixture_model (seed=2024), Mixscape (random_state=0), and Milo make_nhoods (seed=0) are all seeded by default in the installed pertpy 1.3.0."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "Default guide-assignment method needs an undocumented JAX extra",
+      "observed_in": [1],
+      "problem": "assign_mixture_model -- the skill's stated default ('Governing Principle: a mixture problem, not a threshold') -- raises ImportError under the skill's own documented `pip install pertpy scanpy anndata`; it needs the optional `pertpy[jax]` extra (optax), never mentioned in Prerequisites.",
+      "root_cause": "pertpy made the mixture-model backend an optional JAX extra at some point before 1.3.0; SKILL.md's Prerequisites section was not updated to match.",
+      "fix": "Add `pip install 'pertpy[jax]'` (or `pip install optax`) to Prerequisites, and document assign_by_threshold's real signature (`assignment_threshold`, `output_layer`, binary cell x guide layer output, not a single obs column) as the concrete fallback."
+    },
+    {
+      "priority": "P1",
+      "title": "Shipped pertpy_analysis.py crashes against its own reference dataset",
+      "observed_in": [1, 4],
+      "problem": "ms.mixscape(adata, pert_key='gene_target'/'perturbation', ...) raises KeyError because adata = mdata.mod['rna'] only carries ['nCount_RNA','nFeature_RNA','percent.mito']; the perturbation/gene_target columns live on the joined mdata.obs, not on adata.obs, confirmed by running pt.dt.papalexi_2021() directly.",
+      "root_cause": "The example was written or tested against an older pertpy/papalexi_2021 loader that auto-propagated modality-joined metadata into `.mod['rna'].obs`; the current loader keeps it on the outer MuData only.",
+      "fix": "Add one line pulling the needed columns across before the guide-assignment/Mixscape calls (`for col in [...]: adata.obs[col] = mdata.obs[col].to_numpy()`), in both SKILL.md's inline snippet and examples/pertpy_analysis.py."
+    },
+    {
+      "priority": "P1",
+      "title": "Milo compositional-shift example is structurally incompatible with pooled Perturb-seq design",
+      "observed_in": [5],
+      "problem": "milo.da_nhoods(mdata_milo, design='~ target_gene') after count_nhoods(..., sample_col='replicate') raises AssertionError: pertpy's own da_nhoods docstring requires the design covariate to be constant per sample_col-defined sample, but gene_target/target_gene varies cell-by-cell within each replicate in a pooled screen -- it cannot be, by construction.",
+      "root_cause": "The Milo example appears adapted from a non-pooled tutorial (condition constant per sample) without accounting for Perturb-seq's per-cell perturbation identity.",
+      "fix": "Either build one Milo pseudo-sample per (replicate x guide) before count_nhoods, or replace the worked example with a method actually compatible with per-cell design (e.g. per-target-vs-NT subset_samples contrasts, or scCODA at the guide level)."
+    },
+    {
+      "priority": "P2",
+      "title": "scMAGeCK has no code example despite being a first-class decision-table entry",
+      "observed_in": [6],
+      "problem": "Every other method in the Method Decision Table (Mixscape, SCEPTRE, E-distance, Pseudobulk DE, Milo) gets a full worked code block; scMAGeCK gets one table row and nothing else, so an agent recommending it for high-MOI/combinatorial designs has no grounded implementation to offer.",
+      "root_cause": "scMAGeCK section was scoped as a pointer/reference only, inconsistent with the rest of the skill's pattern.",
+      "fix": "Add a minimal scMAGeCK worked example (R, scmageck_lr() or RRA) mirroring the other sections' format, or explicitly note 'no bundled example -- see scMAGeCK docs' if genuinely out of scope."
+    },
+    {
+      "priority": "P2",
+      "title": "SKILL.md doesn't flag sceptre's R>=4.5 requirement",
+      "observed_in": [2],
+      "problem": "install.packages('sceptre') / BiocManager::install('sceptre') is a silent no-op on R<4.5 (current CRAN release requires R>=4.5); SKILL.md's Version Compatibility section lists only 'sceptre 0.10+' with no R-version caveat, so a user on an older R gets no package and no explanation.",
+      "root_cause": "Version Compatibility section tracks package versions but not the R-version floor that gates package availability at all.",
+      "fix": "Note the R>=4.5 requirement next to the sceptre version pin, and mention explicitly that BiocManager::install silently no-ops rather than erroring when the version gate is hit."
+    },
+    {
+      "priority": "P2",
+      "title": "E-test permutation has no documented or exposed seed",
+      "observed_in": [4],
+      "problem": "pt.tl.DistanceTest exposes no seed/random_state parameter, and SKILL.md never instructs setting a global seed before calling it, so p-values near the 1/(n_perms+1) floor are not strictly reproducible run-to-run.",
+      "root_cause": "SKILL.md's code snippet was written for illustration and doesn't address reproducibility of the permutation step specifically.",
+      "fix": "Add `np.random.seed(...)` before the etest(...) call in the example and note it as an explicit reproducibility caveat, alongside the existing 'crushed by multiple testing' warning."
+    }
+  ]
+}
