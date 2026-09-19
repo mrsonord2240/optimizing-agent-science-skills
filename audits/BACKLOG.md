@@ -8,7 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (70)
+## P1 (72)
 
 ### `bio-alignment-multiple` — Fix MUSCLE5 ensemble commands (-super5 has no .efa)
 
@@ -458,6 +458,22 @@ None open.
 - Root cause: A property of conditional Shapley in general has been attributed to the tree_path_dependent implementation specifically, where the tree structure prevents it.
 - Fix: Restate the taxonomy row and the failure mode: under tree_path_dependent the credit split among correlated features that the model DOES use shifts toward the conditionally implied ones, which is why within-module ordering is not a finding. Reserve the 'nonzero credit to an entirely unused feature' statement for conditional estimators that sample from p(x_dropped \| x_S) without reference to the fitted structure, and align the prose with what examples/shap_omics_classifier.py already prints.
 
+### `bio-pose-validation` — 'dock' config table omits that stereo/formula checks, not just RMSD, need mol_true
+
+- Skill: 89, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/pose-validation) · [viewer](skills/bio-pose-validation/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 1, 4
+- Problem: SKILL.md's config table says `dock` includes 'All checks except RMSD reference,' implying only RMSD is dropped versus `redock`. Verified: bust(config='dock') returns 22 boolean columns; bust(config='redock', mol_true=...) returns 27 -- the extra 5 are molecular_formula, molecular_bonds, double_bond_stereochemistry, tetrahedral_chirality, and RMSD. The main check table (lines 30-42) lists 'Chirality' and 'Double-bond stereo' as if part of the standard check set without noting they require a reference molecule.
+- Root cause: The check-group table was written from PoseBusters' full ~20-check catalogue rather than verified against the actual column sets each config preset returns in the installed version.
+- Fix: Change the `dock` row's 'Includes' text to 'All non-reference checks (drops RMSD, molecular formula/bond identity, and double-bond-stereo/chirality comparison -- these require mol_true).' Add a one-line caveat under the main check table: 'Chirality and double-bond-stereo checks only run when mol_true is supplied (config="redock").'
+
+### `bio-pose-validation` — Aromatic-ring-planarity snippet's 0.25A cutoff disagrees with real PoseBusters threshold
+
+- Skill: 89, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/pose-validation) · [viewer](skills/bio-pose-validation/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 3
+- Problem: SKILL.md's standalone aromatic_planarity() function and the prose 'Aromatic ring deviation > 0.25 A is implausible; flag' state a specific numeric acceptance criterion. Empirically, a pose measuring 0.289A by the Skill's own SVD-max-deviation formula still passed installed PoseBusters 0.6.5's aromatic_ring_flatness check; the real check only started failing between 0.289A and 0.452A on the same perturbation series -- roughly double the documented cutoff.
+- Root cause: The snippet reimplements a simplified max-deviation-from-SVD-plane metric that does not match PoseBusters' internal flatness computation, so the two diverge near the documented threshold.
+- Fix: Either drop the numeric 0.25A claim from the standalone snippet (present it as a supplementary diagnostic only) or add: 'This reimplementation is an approximation; treat bust()'s own aromatic_ring_flatness column as authoritative, not this snippet's raw deviation value.'
+
 ### `bio-proteomics-differential-abundance` — The centring section's stated mechanism is refuted
 
 - Skill: 89, Production Ready · [mrsonord2240/bioSkills@1110c24](https://github.com/mrsonord2240/bioSkills/tree/1110c241c27760ad0127bd803e8832d54651e31c/proteomics/differential-abundance) · [viewer](skills/bio-proteomics-differential-abundance/mrsonord2240-bioSkills@1110c24/viewer.md)
@@ -570,7 +586,7 @@ None open.
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (279)
+## P2 (280)
 
 ### `bio-crispr-screens-copy-number-correction` — negative_control_sgrnas empty-dict case raises an undocumented ValueError
 
@@ -1803,6 +1819,14 @@ None open.
 - Problem: The regenie errors 'very few unique values' (no --bt) and 'low variance' (rare SNPs in step 1) are explained only in code comments.
 - Root cause: The table predates the fixes.
 - Fix: Add both rows with their fixes (--bt; fit step 1 on QC'd common variants).
+
+### `bio-pose-validation` — No bundled test fixtures; examples/validate_poses.py __main__ is a no-op
+
+- Skill: 89, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/pose-validation) · [viewer](skills/bio-pose-validation/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: —
+- Problem: examples/validate_poses.py ships no sample .sdf/.pdb, and its `if __name__` block only prints 'Example: provide docked.sdf and receptor.pdb to run' rather than executing anything.
+- Root cause: The examples file was written as a function library without an accompanying runnable smoke test or fixture data.
+- Fix: Add a small synthetic or public-domain ligand+receptor pair under examples/ and wire the __main__ block to run pose_qc_pipeline against it, so the code path can be verified before adapting it to real data.
 
 ### `bio-proteomics-differential-abundance` — The MSstats block ships the normalization the Skill blames
 

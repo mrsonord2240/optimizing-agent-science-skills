@@ -1,0 +1,187 @@
+{
+  "meta": {
+    "skill_name": "bio-pose-validation",
+    "description": "Validates docked / generated protein-ligand poses using PoseBusters physical-validity tests, strain energy quantification, geometric checks (planarity, vdW overlap, bond/angle distortion), and pose-energy reasonableness. Use when QC-ing docking results, comparing classical vs ML docking outputs, or filtering pose lists before SAR analysis.",
+    "evaluated_on": "2026-09-19",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Moderate",
+    "n_inputs": 5,
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:chemoinformatics/pose-validation"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "No fabricated DOI/PMID, trial results, or statistics in any output; all numeric results are real bust()/RDKit computations on real docking data, and the cited literature (Buttenschoen 2024, Boström 1998) is real and correctly attributed." },
+      "practice_boundaries": { "result": "PASS", "detail": "Purely computational cheminformatics QC on docked poses; no diagnostic or prescriptive claims about a patient, and no medical-disclaimer requirement applies to this data type." },
+      "methodological_ground": { "result": "PASS", "detail": "The Skill explicitly avoids overgeneralizing benchmark numbers (e.g. 'do not generalize that result to a fixed failure rate on other datasets', 'does not establish a universal acceptance cutoff') and correctly frames strain energy as a diagnostic, not a rigorous free energy." },
+      "code_usability": { "result": "PASS", "detail": "All 5 inputs' code (the Skill's own PoseBusters aggregation pattern, ligand_strain_mmff, and pose_qc_pipeline, each copied unmodified) ran to completion with no syntax errors or missing core dependencies in the tooled env." }
+    }
+  },
+  "static_score": {
+    "subtotal": 86,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 10, "max": 12, "note": "Covers PoseBusters QC, strain quantification, standalone planarity snippet, model-specific diagnosis, RMSD/PB-valid reconciliation, and VS-pipeline integration -- complete and well-matched approach. Correctness docked 2 points: two verified factual gaps between documented behavior and installed-tool behavior (config-table completeness, planarity-snippet threshold; see dynamic findings)." },
+      "reliability":            { "score": 9,  "max": 12, "note": "Common Errors table covers realistic failure modes (missing rows, wrong receptor format, false positives on covalent, slow strain calc, config errors); strain function returns structured per-row failure notes. Does not address the PDBQT-to-SDF bond-order conversion pitfall a real Vina-docking user will hit before ever calling PoseBusters." },
+      "performance_context":    { "score": 7,  "max": 8,  "note": "SKILL.md is 293 lines with depth correctly pushed to usage-guide.md and examples/; workflow is linear with no redundant round-trips." },
+      "agent_usability":        { "score": 14, "max": 16, "note": "Copy-pasteable, consistent code patterns and a clear When-to-Apply table; Common Errors table is good error-prevention but omits the two discrepancies this audit found." },
+      "human_usability":        { "score": 7,  "max": 8,  "note": "Description trigger language is natural ('QC-ing docking results', 'filtering pose lists'); strict input validation is appropriate for this data-integrity-sensitive task (Category 3 scene override)." },
+      "security":               { "score": 11, "max": 12, "note": "No secrets, no eval/exec of raw strings; code checks for None/malformed molecules before proceeding rather than trusting input blindly." },
+      "maintainability":        { "score": 9,  "max": 12, "note": "Clean separation across SKILL.md/usage-guide.md/examples/validate_poses.py, each function single-purpose. Testability capped: examples/validate_poses.py ships no sample .sdf/.pdb and its __main__ block is a no-op print statement rather than a runnable smoke test." },
+      "agent_specific":         { "score": 19, "max": 20, "note": "Precise, well-scoped trigger description; correct progressive disclosure; clean composability via the Related Skills section (virtual-screening, ml-docking-rescoring, conformer-generation, free-energy-calculations); verified idempotent. Escape-hatch guidance ('use as filter, not absolute reject') present but no explicit out-of-scope section." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 91.6,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 16, "total": 19 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "PoseBusters dock config on a real Vina-redocked benzamidine pose vs 3PTB receptor",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "22/22 boolean checks pass, pb_valid=True on the real best-scoring Vina pose (-6.106 kcal/mol). The Skill's documented dock-config claim ('all checks except RMSD reference') is inaccurate -- see assertion 4.",
+        "basic": 37,
+        "specialized": 55,
+        "total": 92,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "bust(config='dock') and the AND-aggregation code produce a pb_valid flag matching the Skill's documented pattern", "result": "PASS", "note": "Ran the Skill's exact snippet; pb_valid column computed correctly from 22 boolean columns." },
+          { "text": "The real Vina-docked benzamidine pose against 3PTB is classified PB-valid", "result": "PASS", "note": "All 22 checks True; expected for a legitimate high-scoring pose." },
+          { "text": "Printed output reflects real bust() DataFrame content, not fabricated values", "result": "PASS", "note": "Table printed directly from the DataFrame; no hand-edited numbers." },
+          { "text": "SKILL.md's claim that 'dock' config includes 'all checks except RMSD reference' accurately describes the returned columns vs 'redock'", "result": "FAIL", "note": "dock returns 22 columns; redock returns 27 -- the extra 5 are molecular_formula, molecular_bonds, double_bond_stereochemistry, tetrahedral_chirality, and RMSD, not RMSD alone." }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "MMFF94 relative strain energy on the same docked pose, using the Skill's ligand_strain_mmff verbatim",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "strain = 4.16 kcal/mol vs lowest-sampled reference conformer; identical result across 3 repeated runs (no unseeded nondeterminism observed).",
+        "basic": 37,
+        "specialized": 55,
+        "total": 92,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "ligand_strain_mmff runs unmodified from the Skill and returns a strain value for the docked pose", "result": "PASS", "note": "Copied verbatim from SKILL.md; ran without edits." },
+          { "text": "Repeated runs produce the same strain value", "result": "PASS", "note": "3 independent runs all returned 4.162648 kcal/mol." },
+          { "text": "Strain value is physically plausible for a well-docked pose", "result": "PASS", "note": "4.16 kcal/mol is a small, single-digit strain consistent with the pose's high PoseBusters pass rate." }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Deliberately implausible poses (clash, stretched bond, puckered ring) plus a control good pose",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Clash (min_distance_to_protein, volume_overlap_with_protein) and stretched-bond (bond_lengths, bond_angles) correctly flagged invalid. Puckered-ring case (0.6A displacement, 0.289A by the Skill's own formula) incorrectly PASSES the real aromatic_ring_flatness check, which only fails between ~0.29A and 0.45A on this series -- not at the documented 0.25A cutoff.",
+        "basic": 36,
+        "specialized": 54,
+        "total": 90,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Clash pose is flagged pb_valid=False with protein-distance/overlap failures", "result": "PASS", "note": "min_distance_to_protein and volume_overlap_with_protein both False." },
+          { "text": "Stretched-bond pose is flagged pb_valid=False with bond-geometry failures", "result": "PASS", "note": "bond_lengths and bond_angles both False; bond doubled from 1.32A to 2.63A." },
+          { "text": "SKILL.md's 'Aromatic Ring Planarity' 0.25A cutoff matches installed PoseBusters aromatic_ring_flatness's real pass/fail boundary", "result": "FAIL", "note": "A pose measuring 0.289A by the Skill's own SVD formula still passes; real threshold verified between 0.29A and 0.45A, roughly 2x the documented figure." },
+          { "text": "Control (unperturbed) pose passes all mol-config checks", "result": "PASS", "note": "pb_valid=True, confirming the perturbation pipeline itself introduces no false positives." },
+          { "text": "Every reported pass/fail traces to a real bust() DataFrame column, not a fabricated claim", "result": "PASS", "note": "All failed-checks lists printed directly from r[check_cols]." }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "redock config with the real 3PTB co-crystal benzamidine as mol_true: RMSD + PB-valid reconciliation",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "RMSD<=2A True and PB-valid True -- correctly lands in the SKILL.md reconciliation table's Yes/Yes quadrant. Corroborates Input 1's finding that dock-vs-redock differ by more than just the RMSD column.",
+        "basic": 37,
+        "specialized": 55,
+        "total": 92,
+        "assertions_passed": 2,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "redock config with mol_true returns an RMSD column plus PB-valid, matching the Skill's config table", "result": "PASS", "note": "rmsd_≤2å column present and True." },
+          { "text": "The real re-docked pose reproduces the co-crystal binding mode and is placed in the documented Yes/Yes reconciliation quadrant", "result": "PASS", "note": "RMSD<=2A and pb_valid both True for the best Vina pose vs the real 3PTB benzamidine coordinates." },
+          { "text": "Switching from 'dock' to 'redock' config only adds the RMSD column, as the dock-config table row implies", "result": "FAIL", "note": "redock has 27 columns vs dock's 22 -- a 5-column gap (formula/bonds/stereo/chirality/RMSD), not a 1-column gap." }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Batch pose_qc_pipeline over all 8 real Vina modes plus the deliberately clashing pose",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "All 8 genuine Vina modes are PB-valid; the clash pose is correctly excluded from the shortlist; best-ranked valid pose matches the best Vina score (-6.106 kcal/mol).",
+        "basic": 36,
+        "specialized": 56,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "pose_qc_pipeline runs unmodified from SKILL.md's Integration section across a batch of real docked poses", "result": "PASS", "note": "Copied verbatim; ran over 9 SDFs without edits." },
+          { "text": "All genuinely valid Vina modes are retained in the PB-valid shortlist", "result": "PASS", "note": "All 8 mode*_fixed.sdf entries appear in valid_top." },
+          { "text": "The deliberately clashing pose is excluded from the shortlist", "result": "PASS", "note": "clash_pose.sdf pb_valid=False, absent from valid_top." },
+          { "text": "The best-ranked valid pose matches the best real Vina score among valid poses", "result": "PASS", "note": "mode1_fixed.sdf, -6.106 kcal/mol, correctly selected as top." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 34.4,
+    "dynamic_weighted": 55.0,
+    "score": 89,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "All 5 execution inputs ran real code against a genuine AutoDock Vina docking run (trypsin 3PTB + benzamidine) and a real PDB co-crystal reference, not synthetic mocks.",
+    "PoseBusters correctly distinguishes physically plausible poses from deliberately constructed clashing and bond-distorted poses, exactly as the Skill's own aggregation pattern predicts.",
+    "The redock RMSD/PB-valid reconciliation table is empirically validated end to end: a real re-docked pose lands in the documented Yes/Yes quadrant.",
+    "Strain-energy and batch-ranking pipeline code (ligand_strain_mmff, pose_qc_pipeline) run unmodified from SKILL.md/examples/validate_poses.py with no edits required and are reproducible across repeated runs."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "'dock' config table omits that stereo/formula checks, not just RMSD, need mol_true",
+      "observed_in": [1, 4],
+      "problem": "SKILL.md's config table says `dock` includes 'All checks except RMSD reference,' implying only RMSD is dropped versus `redock`. Verified: bust(config='dock') returns 22 boolean columns; bust(config='redock', mol_true=...) returns 27 -- the extra 5 are molecular_formula, molecular_bonds, double_bond_stereochemistry, tetrahedral_chirality, and RMSD. The main check table (lines 30-42) lists 'Chirality' and 'Double-bond stereo' as if part of the standard check set without noting they require a reference molecule.",
+      "root_cause": "The check-group table was written from PoseBusters' full ~20-check catalogue rather than verified against the actual column sets each config preset returns in the installed version.",
+      "fix": "Change the `dock` row's 'Includes' text to 'All non-reference checks (drops RMSD, molecular formula/bond identity, and double-bond-stereo/chirality comparison -- these require mol_true).' Add a one-line caveat under the main check table: 'Chirality and double-bond-stereo checks only run when mol_true is supplied (config=\"redock\").'"
+    },
+    {
+      "priority": "P1",
+      "title": "Aromatic-ring-planarity snippet's 0.25A cutoff disagrees with real PoseBusters threshold",
+      "observed_in": [3],
+      "problem": "SKILL.md's standalone aromatic_planarity() function and the prose 'Aromatic ring deviation > 0.25 A is implausible; flag' state a specific numeric acceptance criterion. Empirically, a pose measuring 0.289A by the Skill's own SVD-max-deviation formula still passed installed PoseBusters 0.6.5's aromatic_ring_flatness check; the real check only started failing between 0.289A and 0.452A on the same perturbation series -- roughly double the documented cutoff.",
+      "root_cause": "The snippet reimplements a simplified max-deviation-from-SVD-plane metric that does not match PoseBusters' internal flatness computation, so the two diverge near the documented threshold.",
+      "fix": "Either drop the numeric 0.25A claim from the standalone snippet (present it as a supplementary diagnostic only) or add: 'This reimplementation is an approximation; treat bust()'s own aromatic_ring_flatness column as authoritative, not this snippet's raw deviation value.'"
+    },
+    {
+      "priority": "P2",
+      "title": "No bundled test fixtures; examples/validate_poses.py __main__ is a no-op",
+      "observed_in": [],
+      "problem": "examples/validate_poses.py ships no sample .sdf/.pdb, and its `if __name__` block only prints 'Example: provide docked.sdf and receptor.pdb to run' rather than executing anything.",
+      "root_cause": "The examples file was written as a function library without an accompanying runnable smoke test or fixture data.",
+      "fix": "Add a small synthetic or public-domain ligand+receptor pair under examples/ and wire the __main__ block to run pose_qc_pipeline against it, so the code path can be verified before adapting it to real data."
+    }
+  ]
+}
