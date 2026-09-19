@@ -30,7 +30,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: sce.pp.hashsolo's number_of_noise_barcodes parameter defaults to len(cell_hashing_columns) - 2, which is 0 for exactly 2 tags, degenerating the noise-distribution fit; SKILL.md, usage-guide.md, and examples/hashsolo_scanpy.py never mention this parameter.
 - Fix: Add an explicit warning in SKILL.md and usage-guide.md: when calling hashsolo with exactly 2 or 3 hashing columns, pass number_of_noise_barcodes explicitly (e.g. 1) instead of relying on the default, and instruct the agent to check that Classification counts are not ~100% Negative before trusting the result.
 
-## P1 (79)
+## P1 (82)
 
 ### `bio-single-cell-lineage-tracing` — NeighborJoiningSolver's documented example throws an uncaught error
 
@@ -215,6 +215,30 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The Skill says -p m merges only phased hets and -p s keeps unphased hets separate. bcftools 1.21/1.24: m merges all GTs into one haplotype regardless of phase (merged a trans pair); s skips unphased hets (no consequence emitted).
 - Root cause: Mode semantics written from memory, not from 'bcftools csq' help.
 - Fix: Use the help text: a = take GTs as is (0/1 -> 0\|1), m = merge all GTs into one haplotype, r = require phase, R = non-reference haplotypes, s = skip unphased hets; recommend -p a for phased data (SKILL.md and usage guide).
+
+### `bio-virtual-screening` — 'mk_prepare_receptor.py' is not the installed command name
+
+- Skill: 86, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/virtual-screening) · [viewer](skills/bio-virtual-screening/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 1
+- Problem: SKILL.md's prepare_receptor() (line 76) and examples/virtual_screen.py's prepare_receptor() (line 42) both call subprocess with the literal command 'mk_prepare_receptor.py'. meeko 0.8.0 installs a console-script entry point named 'mk_prepare_receptor' (no .py suffix); the literal call raises FileNotFoundError.
+- Root cause: The documented command name does not match the console-script name that pip actually installs for meeko 0.5+.
+- Fix: Change both call sites to 'mk_prepare_receptor' (or invoke the module directly for portability), and note in the Version Compatibility section that meeko's CLI entry points have no .py suffix once installed via pip.
+
+### `bio-virtual-screening` — Documented --read_pqr receptor-prep route crashes on insertion-code residues
+
+- Skill: 86, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/virtual-screening) · [viewer](skills/bio-virtual-screening/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 1
+- Problem: SKILL.md's prepare_receptor() pipes pdb2pqr's default .pqr output into mk_prepare_receptor --read_pqr. On PDB 3PTB (trypsin, chymotrypsin numbering with insertion-code residues like '184A'), this raises ValueError: invalid literal for int() with base 10: '184A' inside meeko's PQR parser. Chymotrypsin-numbered serine proteases are a standard docking-benchmark family, not a synthetic edge case.
+- Root cause: meeko 0.8.0's PQR reader assumes an all-integer residue-number column; pdb2pqr's PQR output does not pad/strip insertion codes into a format that parser accepts.
+- Fix: Switch the documented pipeline to `pdb2pqr --pdb-output <file>.pdb ...` followed by `mk_prepare_receptor --read_pdb <file>.pdb` -- verified working on the same structure in this audit, and already the pattern examples/virtual_screen.py uses (without showing how to produce the protonated PDB it expects). Unify the two receptor-prep code paths and add an insertion-code note to the Common Errors table.
+
+### `bio-virtual-screening` — No seed/determinism guidance for Vina docking
+
+- Skill: 86, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/virtual-screening) · [viewer](skills/bio-virtual-screening/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 1, 2
+- Problem: dock_single() and virtual_screen() never set or expose a Vina seed. Top-1 affinity was empirically stable (-6.031, -6.020, -6.023 kcal/mol across 3 unseeded runs on the tested benchmark), but poses ranked 2+ reordered run to run, and SKILL.md never mentions --seed anywhere despite this skill's own emphasis elsewhere on reproducibility and recording run conditions.
+- Root cause: The dock_single()/virtual_screen() function signatures omit a seed parameter, and no reproducibility guidance for the stochastic search step is given.
+- Fix: Add a seed parameter (e.g. default 42) to dock_single()/virtual_screen(), and one sentence recommending recording the seed for any screen whose top-N poses (not just the single best) will be reported or compared.
 
 ### `bio-proteomics-dia-analysis` — The headline predicted-library command is rejected as 'incorrect settings' by DIA-NN 2.x
 
@@ -664,7 +688,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (298)
+## P2 (301)
 
 ### `bio-single-cell-lineage-tracing` — No runtime-expectation warning for CoSpar
 
@@ -1089,6 +1113,30 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: With chr1 vs 1 naming, annotate exits 0 and annotates nothing; the fix lives only in Common Errors.
 - Root cause: Silent zero-match behaviour of bcftools annotate.
 - Fix: Add a one-line pre-check (compare `bcftools index -s` contig names of target and source) next to the annotate commands.
+
+### `bio-virtual-screening` — 'from vina import Vina' has no Windows wheel
+
+- Skill: 86, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/virtual-screening) · [viewer](skills/bio-virtual-screening/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 1, 2
+- Problem: pip install vina fails to build on Windows ('Boost library location was not found'), so the primary documented Python-API code path in the 'Vina Docking (Single Ligand)' section and examples/virtual_screen.py cannot run at all on Windows; only the CLI works.
+- Root cause: SKILL.md's existing CLI-fallback comment anticipates a Vina-*version* mismatch ('for Vina 1.1 use subprocess CLI') but not this platform-based one.
+- Fix: Add a one-line platform note next to the existing version-based CLI-fallback comment: 'On Windows, pip install vina does not build a wheel; use the Vina CLI via subprocess instead.'
+
+### `bio-virtual-screening` — Docked poses are not sanity-filtered before being returned
+
+- Skill: 86, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/virtual-screening) · [viewer](skills/bio-virtual-screening/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 1
+- Problem: Vina's raw energies()/results.csv can include physically nonsensical outlier modes; a +68.69 kcal/mol pose appeared among 9 returned modes in testing here, which a downstream consumer could mistake for a real (if poor) binding estimate rather than a search artifact.
+- Root cause: dock_single() and virtual_screen() return/report every mode Vina emits without a plausibility filter.
+- Fix: Note in the 'Vina Docking (Single Ligand)' section that positive-energy modes should be filtered or flagged before reporting, or clip n_poses reporting to affinity < 0.
+
+### `bio-virtual-screening` — PDBQT-to-downstream-tool handoff is lossy for charged ligands
+
+- Skill: 86, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/virtual-screening) · [viewer](skills/bio-virtual-screening/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 5
+- Problem: Converting a Vina/meeko PDBQT pose for a charged ligand (protonated amidinium) to SDF for PoseBusters -- the Skill's own cross-referenced QC step -- loses formal bond-order/charge information and fails RDKit sanitization, even though the pose's spatial placement (protein-ligand distance/overlap checks) is otherwise valid.
+- Root cause: PDBQT does not encode formal bond orders; reconstructing them from atom types and distances during format conversion is unreliable for charged/aromatic-adjacent groups.
+- Fix: Note the PDBQT round-trip caveat in the pose-validation hand-off (Related Skills), or recommend carrying the original RDKit Mol (with correct formal charges) alongside the PDBQT rather than reconstructing bonds from docked coordinates alone.
 
 ### `bio-proteomics-dia-analysis` — The EasyPQP library is not loadable by DIA-NN without fragment-annotation columns
 

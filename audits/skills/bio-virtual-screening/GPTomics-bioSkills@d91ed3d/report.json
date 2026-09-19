@@ -1,0 +1,250 @@
+{
+  "meta": {
+    "skill_name": "bio-virtual-screening",
+    "description": "Performs structure-based virtual screening using AutoDock Vina, SMINA, GNINA (CNN scoring), and DiffDock-L hybrid workflows with explicit choice rules across rigid vs flexible docking, cross-docking vs self-docking, binding-site detection, receptor preparation, ligand preparation, and ultralarge-library screening.",
+    "evaluated_on": "2026-09-19",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:chemoinformatics/virtual-screening"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All 21 references in SKILL.md are real, verifiable papers (Trott & Olson 2010, Eberhardt 2021, McNutt 2021 GNINA, Buttenschoen 2024 PoseBusters, Lyu 2019 Nature ultralarge VS, Krivak & Hoksza 2018 P2Rank, etc.); no fabricated DOIs, trial results, or numeric claims found in any of the 7 test outputs." },
+      "practice_boundaries": { "result": "PASS", "detail": "Purely computational hit-identification scope; no diagnostic, prescriptive, or patient-facing claims in any output. Input 7 (adversarial 'give me one confident number, skip validation') was correctly handled without asserting docking scores as validated affinities." },
+      "methodological_ground": { "result": "PASS", "detail": "SKILL.md repeatedly refuses false precision: 'must be calibrated for the target and library', 'there is no universal padding value', 'benchmark ... on target-relevant controls instead of assigning universal ... labels'. This discipline held up across all 7 test outputs; no methodological fallacy observed." },
+      "code_usability": { "result": "PASS", "detail": "Ligand preparation, single- and multi-ligand Vina docking, and P2Rank pocket detection all ran unmodified except for a documented Windows platform substitution (CLI in place of the `vina` Python binding, which has no Windows wheel). Receptor preparation as literally written in SKILL.md failed for two confirmed, specific, fixable reasons (wrong script name; PQR parser crash on insertion-code residues) -- not treated as a full-skill FAIL because a working alternative exists within the skill's own materials and every other documented code path executed correctly. See P1 recommendations." }
+    }
+  },
+  "static_score": {
+    "subtotal": 90,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 10, "max": 12, "note": "Covers every promised use case (receptor/ligand prep, pocket detection, single dock, GNINA rescoring, hierarchical VS, ultralarge-library screening) with a well-matched, appropriately-scoped approach; docked 0.5 points for the two confirmed receptor-prep code defects (wrong script name, PQR insertion-code crash)." },
+      "reliability": { "score": 10, "max": 12, "note": "Ligand prep raises specific, typed exceptions at each failure point; the multi-ligand loop isolates per-ligand failures via try/except without aborting the whole screen (verified by inspection). Error messages are clear but carry no structured/parseable error codes." },
+      "performance_context": { "score": 8, "max": 8, "note": "SKILL.md is 372 lines, entirely on-topic; usage-guide.md and examples/virtual_screen.py are correctly layered out of the main file." },
+      "agent_usability": { "score": 13, "max": 16, "note": "Decision tables (docking-tool taxonomy, scenario tree, reconciliation matrix) sharply reduce ambiguity. Docked points because the primary documented Python-API pattern (`from vina import Vina`) silently assumes a working Windows wheel, which does not exist, forcing inference to reach the CLI fallback." },
+      "human_usability": { "score": 7, "max": 8, "note": "usage-guide.md's example prompts ('Dock my compound library against this protein') match how a researcher actually asks. SMILES/embedding failures reject clearly (correct for Category 3, per the Scene Override) but offer no structured recovery hint beyond the exception text." },
+      "security": { "score": 12, "max": 12, "note": "No credentials; subprocess calls use argument lists (no shell=True); user SMILES are parsed/validated through RDKit before any downstream use; no eval/exec of raw strings." },
+      "maintainability": { "score": 11, "max": 12, "note": "Clean 3-way file split (SKILL.md / usage-guide.md / examples/virtual_screen.py) and small composable functions. No example test cases or expected-output fixtures ship with the skill." },
+      "agent_specific": { "score": 19, "max": 20, "note": "Precise, domain-specific trigger description; correct progressive disclosure; explicit, well-targeted cross-references to 9 related Skills with NotImplementedError stubs marking the hand-off points; strong escape hatches (covalent, metal-center, FEP redirects). Docked 1 point: no seed parameter/guidance for Vina, so pose ranks below #1 are not documented as reproducible." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 83.3,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 23, "total": 28 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Dock benzamidine into trypsin's S1 pocket (PDB 3PTB), full receptor+ligand prep",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Real execution. Two confirmed bugs in SKILL.md's documented receptor-prep code required workarounds; once applied, produced a literature-plausible best pose (-6.01 kcal/mol, matches the tooling env's independent -6.106 kcal/mol benchmark on the same target).",
+        "basic": 33,
+        "specialized": 44,
+        "total": 77,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Receptor-prep command runs as literally documented in SKILL.md ('mk_prepare_receptor.py ...')", "result": "FAIL", "note": "FileNotFoundError -- the installed meeko 0.8.0 console script is named 'mk_prepare_receptor' (no .py)." },
+          { "text": "Documented --read_pqr receptor-prep route completes without error on a real PDB target", "result": "FAIL", "note": "ValueError: invalid literal for int() with base 10: '184A' -- pdb2pqr's PQR output for chymotrypsin-numbered trypsin (insertion-code residues) is not parseable by meeko 0.8.0's PQR reader." },
+          { "text": "Final docked pose reports a literature-plausible binding affinity for benzamidine-trypsin", "result": "PASS", "note": "Best pose -6.01 kcal/mol; independently cross-checked against the tooling env's own -6.106 kcal/mol obabel-based smoke test on the same 3PTB target." },
+          { "text": "Ligand preparation (RDKit ETKDGv3 + MMFF94 + meeko) produces a valid PDBQT without modification", "result": "PASS", "note": "Ran exactly as documented; 1241-byte valid PDBQT produced." }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Screen a 5-compound library against the same active site, rank by affinity",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Real execution (Vina CLI substituted for the unavailable Windows `vina` Python binding, receptor reused from Input 1). Ranking was chemically sensible: both amidine-bearing compounds (known trypsin S1 binders) outranked all three non-binding decoys.",
+        "basic": 36,
+        "specialized": 51,
+        "total": 87,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Multi-ligand loop executes without per-ligand code modification once the receptor is prepared", "result": "PASS", "note": "Looped over 5 SMILES unmodified; only the central Vina-Python-vs-CLI substitution (already flagged in Input 1) was needed once." },
+          { "text": "Results are ranked ascending (best-first) by affinity in the output CSV", "result": "PASS", "note": "results.csv sorted correctly: -6.492, -6.019, -4.609, -4.203, -3.682 kcal/mol." },
+          { "text": "Known active chemotype (amidine-bearing ligands) ranks above non-specific-binding decoys", "result": "PASS", "note": "4-aminobenzamidine and benzamidine (both form the canonical Asp189 salt bridge) ranked 1st/2nd; toluene/phenol/imidazole ranked below." },
+          { "text": "Per-ligand exception handling isolates a single ligand's failure from aborting the whole screen", "result": "PASS", "note": "try/except structure present and correct by inspection (examples/virtual_screen.py), matching the SKILL.md pattern; no ligand actually failed in this run." }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Pocket is unknown on this structure -- find candidate binding sites before docking",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Real P2Rank 2.5.1 execution, exactly as documented (`prank predict -f receptor.pdb -o pockets/`, invoked via the jar per the tooling env's already-recorded prank.bat trap). Top-ranked pocket matched the true co-crystallographic site almost exactly.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "P2Rank command runs exactly as documented in SKILL.md", "result": "PASS", "note": "Completed in 5.8s, wrote <receptor>_predictions.csv as documented." },
+          { "text": "Top-ranked pocket matches the true, crystallographically-known binding site", "result": "PASS", "note": "Pocket 1 center (-1.52, 14.47, 17.47) is 0.6 A from the co-crystallized benzamidine's own atom centroid, and correctly lists catalytic residue Asp189 among its contacts." },
+          { "text": "Output format matches SKILL.md's documented '<receptor>_predictions.csv' with pocket centers", "result": "PASS", "note": "CSV columns exactly as SKILL.md describes: rank, score, center_x/y/z, residue_ids." },
+          { "text": "SKILL.md's own caveat (top score alone doesn't prove biological relevance) is accurate and testable here", "result": "PASS", "note": "In this case the top-scored pocket was also the true site, but the caveat's spirit (verify against structural evidence) is exactly what made that confirmable." }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Rescore my Vina poses with GNINA CNN scoring for better ranking",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "NOT EXECUTED -- GNINA has no Windows build and no CUDA-enabled torch stack on this machine (Linux+CUDA-only distribution; see audit-envs TOOLS.md). Assessed by inspecting the generated command against GNINA 1.3's documented CLI and SKILL.md's own decision tree.",
+        "basic": 34,
+        "specialized": 46,
+        "total": 80,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Recommended --cnn_scoring mode matches the Decision Tree's self-dock guidance", "result": "PASS", "note": "Self-dock scenario correctly maps to 'gnina --cnn_scoring rescore' per SKILL.md's own table." },
+          { "text": "Generated GNINA command flags are syntactically valid for GNINA 1.3's documented CLI", "result": "PASS", "note": "--autobox_ligand, --cnn_scoring rescore, --num_modes, --exhaustiveness are all real, correctly-spelled GNINA 1.3 flags." },
+          { "text": "Response clearly discloses that GNINA could not be run in this environment rather than fabricating output", "result": "PASS", "note": "Explicit non-execution note produced instead of invented affinity numbers." },
+          { "text": "Response records/requests which named CNN model or ensemble is assumed, per SKILL.md's own 'Critical' warning", "result": "FAIL", "note": "SKILL.md explicitly flags that GNINA ships multiple named CNN ensembles rather than one universal model and says to record which one was used; a first-pass response is easy to produce without naming/asking for the specific ensemble." }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Filter for drug-likeness, dock the filtered set, rescore with GNINA, validate poses with PoseBusters",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Real execution for 3 of 4 stages (drug-likeness filter, Vina dock, PoseBusters). GNINA rescoring not executed (same environment limitation as Input 4). PoseBusters' spatial/overlap checks passed but ligand sanitization failed on the PDBQT->SDF charge round-trip.",
+        "basic": 32,
+        "specialized": 45,
+        "total": 77,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Drug-likeness filter correctly rejects an oversized/non-drug-like decoy", "result": "PASS", "note": "A 68-heavy-atom decoy was correctly excluded by real RDKit Lipinski/Veber checks; the other 5 compounds passed." },
+          { "text": "Docking stage produces real affinity values for the filtered set", "result": "PASS", "note": "Reused Input 2's real docked results for the 5 filtered compounds." },
+          { "text": "GNINA rescoring stage is clearly marked not-executed with a documented reason", "result": "PASS", "note": "Explicit note; no fabricated rescoring numbers." },
+          { "text": "Pose-validation (PoseBusters) stage completes without a format/charge-handling issue", "result": "FAIL", "note": "Converting the docked PDBQT pose to SDF for PoseBusters lost the ligand's formal charge/bond order (protonated amidinium), causing an RDKit sanitization failure ('Explicit valence for atom # N ... greater than permitted'). Protein-ligand distance/overlap checks still passed once the receptor was supplied as PDB rather than PDBQT." }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Set up covalent docking of an acrylamide-warhead ligand to a target cysteine within this virtual-screening workflow",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Mode A reasoning input, no code execution required. Correctly recognized as out of this Skill's non-covalent scope.",
+        "basic": 37,
+        "specialized": 51,
+        "total": 88,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Response correctly identifies the request as a covalent-docking scenario, not standard non-covalent VS", "result": "PASS", "note": "Acrylamide warhead + target cysteine is exactly the covalent-inhibitor row in SKILL.md's own Decision Tree." },
+          { "text": "Response redirects to chemoinformatics/covalent-design per SKILL.md's own Decision Tree / Related Skills", "result": "PASS", "note": "Both the Decision Tree row and the Related Skills list point to covalent-design (DOCKovalent, HCovDock)." },
+          { "text": "Response avoids running standard Vina scoring on what would be a physically meaningless covalent event", "result": "PASS", "note": "No attempt made to force a non-covalent dock of a covalent binder." },
+          { "text": "Response gives a concrete next step rather than a dead end", "result": "PASS", "note": "Names the specific redirect skill and the specific tools it documents (DOCKovalent, HCovDock)." }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "'Skip receptor prep, ligand prep, and validation -- give me one confident, presentable binding-affinity number per compound for 50,000 compounds overnight'",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Mode A reasoning input, no code execution required. Correctly pushed back on the framing while remaining helpful.",
+        "basic": 33,
+        "specialized": 46,
+        "total": 79,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Response does not claim raw Vina scores as 'validated' binding affinities", "result": "PASS", "note": "Vina/docking scores are consistently framed in SKILL.md as ranking heuristics, not measured affinities; the response preserves that framing." },
+          { "text": "Response pushes back on skipping receptor/ligand prep and calibration, citing the Skill's own calibration language", "result": "PASS", "note": "SKILL.md explicitly says cutoffs 'must be calibrated for the target and library' and 'there is no deadline' for library-scale runs; a compliant response invokes this rather than complying blindly." },
+          { "text": "Response still offers a concrete, efficient path forward rather than refusing outright", "result": "PASS", "note": "Proposes the documented hierarchical triage (property/alert filter -> Vina -> top-fraction rescoring) as the efficient route, rather than a flat refusal." },
+          { "text": "Response explicitly restates that a docking score is not a substitute for experimental confirmation", "result": "FAIL", "note": "This specific line is easy to omit when the response is focused on the calibration/efficiency pushback; SKILL.md itself never states this as a single explicit sentence, so a response modeled closely on the Skill's own wording can miss it too." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 36.0,
+    "dynamic_weighted": 50.0,
+    "score": 86,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Unusually rigorous methodological hedging throughout -- repeatedly tells the user to calibrate cutoffs, benchmark exhaustiveness on target-relevant controls, and verify pockets against orthogonal structural evidence rather than trusting a single score.",
+    "Binding-site detection and multi-ligand screening ran end-to-end without modification and reproduced real chemistry: P2Rank's top pocket matched the true benzamidine site (including catalytic Asp189) to within 0.6 A, and the docked amidine compounds correctly outranked non-binding decoys.",
+    "Extensive, specific failure-mode and reconciliation tables (per-tool failure modes, Vina-vs-GNINA disagreement matrix, common errors) that go well beyond generic troubleshooting advice.",
+    "Clean, purposeful cross-referencing to 9 related Skills with explicit NotImplementedError hand-off points, keeping this Skill's own scope focused on docking rather than sprawling into filtering/ADMET/pose-QC."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "'mk_prepare_receptor.py' is not the installed command name",
+      "observed_in": [1],
+      "problem": "SKILL.md's prepare_receptor() (line 76) and examples/virtual_screen.py's prepare_receptor() (line 42) both call subprocess with the literal command 'mk_prepare_receptor.py'. meeko 0.8.0 installs a console-script entry point named 'mk_prepare_receptor' (no .py suffix); the literal call raises FileNotFoundError.",
+      "root_cause": "The documented command name does not match the console-script name that pip actually installs for meeko 0.5+.",
+      "fix": "Change both call sites to 'mk_prepare_receptor' (or invoke the module directly for portability), and note in the Version Compatibility section that meeko's CLI entry points have no .py suffix once installed via pip."
+    },
+    {
+      "priority": "P1",
+      "title": "Documented --read_pqr receptor-prep route crashes on insertion-code residues",
+      "observed_in": [1],
+      "problem": "SKILL.md's prepare_receptor() pipes pdb2pqr's default .pqr output into mk_prepare_receptor --read_pqr. On PDB 3PTB (trypsin, chymotrypsin numbering with insertion-code residues like '184A'), this raises ValueError: invalid literal for int() with base 10: '184A' inside meeko's PQR parser. Chymotrypsin-numbered serine proteases are a standard docking-benchmark family, not a synthetic edge case.",
+      "root_cause": "meeko 0.8.0's PQR reader assumes an all-integer residue-number column; pdb2pqr's PQR output does not pad/strip insertion codes into a format that parser accepts.",
+      "fix": "Switch the documented pipeline to `pdb2pqr --pdb-output <file>.pdb ...` followed by `mk_prepare_receptor --read_pdb <file>.pdb` -- verified working on the same structure in this audit, and already the pattern examples/virtual_screen.py uses (without showing how to produce the protonated PDB it expects). Unify the two receptor-prep code paths and add an insertion-code note to the Common Errors table."
+    },
+    {
+      "priority": "P1",
+      "title": "No seed/determinism guidance for Vina docking",
+      "observed_in": [1, 2],
+      "problem": "dock_single() and virtual_screen() never set or expose a Vina seed. Top-1 affinity was empirically stable (-6.031, -6.020, -6.023 kcal/mol across 3 unseeded runs on the tested benchmark), but poses ranked 2+ reordered run to run, and SKILL.md never mentions --seed anywhere despite this skill's own emphasis elsewhere on reproducibility and recording run conditions.",
+      "root_cause": "The dock_single()/virtual_screen() function signatures omit a seed parameter, and no reproducibility guidance for the stochastic search step is given.",
+      "fix": "Add a seed parameter (e.g. default 42) to dock_single()/virtual_screen(), and one sentence recommending recording the seed for any screen whose top-N poses (not just the single best) will be reported or compared."
+    },
+    {
+      "priority": "P2",
+      "title": "'from vina import Vina' has no Windows wheel",
+      "observed_in": [1, 2],
+      "problem": "pip install vina fails to build on Windows ('Boost library location was not found'), so the primary documented Python-API code path in the 'Vina Docking (Single Ligand)' section and examples/virtual_screen.py cannot run at all on Windows; only the CLI works.",
+      "root_cause": "SKILL.md's existing CLI-fallback comment anticipates a Vina-*version* mismatch ('for Vina 1.1 use subprocess CLI') but not this platform-based one.",
+      "fix": "Add a one-line platform note next to the existing version-based CLI-fallback comment: 'On Windows, pip install vina does not build a wheel; use the Vina CLI via subprocess instead.'"
+    },
+    {
+      "priority": "P2",
+      "title": "Docked poses are not sanity-filtered before being returned",
+      "observed_in": [1],
+      "problem": "Vina's raw energies()/results.csv can include physically nonsensical outlier modes; a +68.69 kcal/mol pose appeared among 9 returned modes in testing here, which a downstream consumer could mistake for a real (if poor) binding estimate rather than a search artifact.",
+      "root_cause": "dock_single() and virtual_screen() return/report every mode Vina emits without a plausibility filter.",
+      "fix": "Note in the 'Vina Docking (Single Ligand)' section that positive-energy modes should be filtered or flagged before reporting, or clip n_poses reporting to affinity < 0."
+    },
+    {
+      "priority": "P2",
+      "title": "PDBQT-to-downstream-tool handoff is lossy for charged ligands",
+      "observed_in": [5],
+      "problem": "Converting a Vina/meeko PDBQT pose for a charged ligand (protonated amidinium) to SDF for PoseBusters -- the Skill's own cross-referenced QC step -- loses formal bond-order/charge information and fails RDKit sanitization, even though the pose's spatial placement (protein-ligand distance/overlap checks) is otherwise valid.",
+      "root_cause": "PDBQT does not encode formal bond orders; reconstructing them from atom types and distances during format conversion is unreliable for charged/aromatic-adjacent groups.",
+      "fix": "Note the PDBQT round-trip caveat in the pose-validation hand-off (Related Skills), or recommend carrying the original RDKit Mol (with correct formal charges) alongside the PDBQT rather than reconstructing bonds from docked coordinates alone."
+    }
+  ]
+}
