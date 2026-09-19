@@ -1,0 +1,235 @@
+{
+  "meta": {
+    "skill_name": "bio-single-cell-cell-communication",
+    "description": "Infers ligand-receptor cell-cell communication from scRNA-seq with a consensus-first workflow (LIANA), plus CellPhoneDB specificity tests, CellChat pathway probabilities, and NicheNet downstream ligand-activity. Use when ranking ligand-receptor interactions between cell types, comparing communication across conditions, asking which ligand drives a receiver response, or deciding which CCC method and resource to trust.",
+    "evaluated_on": "2026-09-19",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:single-cell/cell-communication"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All cited papers (Vento-Tormo 2018, Efremova 2020, Jin 2021, Browaeys 2020, Dimitrov 2022/2024, Hou 2020, Cang 2023, Palla 2022, Luo 2023, Young 2020, van den Brink 2017) are real, correctly attributed. No fabricated statistics anywhere in the Skill or in the audit's own real-data outputs." },
+      "practice_boundaries": { "result": "PASS", "detail": "Purely basic-research scRNA-seq analysis; no individual-patient diagnostic or prescriptive claims anywhere in the Skill, so no clinical disclaimer is required." },
+      "methodological_ground": { "result": "PASS", "detail": "The Skill actively prevents methodological fallacies: explicit Governing Principle against treating co-expression as proof of signaling, explicit warning against comparing raw interaction counts across conditions (abundance/depth confound), explicit warning against CellPhoneDB-on-mouse-data ortholog errors." },
+      "code_usability": { "result": "PASS", "detail": "LIANA code block ran unmodified on real PBMC data (Input 1). CellPhoneDB code block ran successfully on real PBMC data after adding the standard `if __name__=='__main__':` Windows multiprocessing guard that SKILL.md's example omits (Input 2) -- a fixable portability gap, not a logic bug or missing dependency, so it does not meet M4's FAIL bar; recorded as a P1 instead. CellChat/NicheNet (R, GitHub-only packages) could not be executed in this Windows audit environment (TOOLS.md: RcppPlanc-chain compile failure, explicitly out of core scope) but were verified by static inspection against the real, documented package APIs with no fabricated functions found." }
+    }
+  },
+  "static_score": {
+    "subtotal": 86,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 9, "max": 12, "note": "Covers LIANA consensus, CellPhoneDB specificity, CellChat pathway, NicheNet mechanism, and spatial-aware branching well, but two factual inaccuracies were empirically found: the single-group 'autocrine self-edges' claim does not match LIANA's real behavior (raises ValueError instead), and the CellPhoneDB code block does not run as-is on Windows." },
+      "reliability": { "score": 10, "max": 12, "note": "Common Errors table (8 rows) gives clear symptom/cause/fix guidance; Confounds table proactively warns before running. No structured SKILL_* error codes for the agent-first context, and no proactive check for the Windows multiprocessing guard issue found in Input 2." },
+      "performance_context": { "score": 7, "max": 8, "note": "SKILL.md is 221 lines, concise; all four methods' full code blocks are loaded eagerly rather than layered into references/, but the file stays well within a manageable budget." },
+      "agent_usability": { "score": 15, "max": 16, "note": "Method Decision Table gives immediate, unambiguous routing; terminology (magnitude/specificity rank, resource, groupby) is fully consistent; Common Errors + Confounds tables are strong proactive error prevention." },
+      "human_usability": { "score": 7, "max": 8, "note": "Description and usage-guide.md Example Prompts match natural researcher phrasing well." },
+      "security": { "score": 12, "max": 12, "note": "No credentials, no raw-string execution, no injection vectors; all inputs are file paths and biological parameters." },
+      "maintainability": { "score": 10, "max": 12, "note": "Method sections are cleanly separated and independently modifiable, but only 2 of 4 documented methods (LIANA, CellChat) have a matching examples/ script; CellPhoneDB and NicheNet code exists only inline in SKILL.md." },
+      "agent_specific": { "score": 16, "max": 20, "note": "Trigger description is precise and composability (8-skill Related Skills cross-links) is excellent. Idempotency is mixed: LIANA is deterministic by the tool's own seed=1337 default (empirically confirmed identical across 2 runs), but CellPhoneDB's documented call never sets debug_seed and was empirically shown non-deterministic on marginal p-values across repeated runs." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 85.1,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 24, "total": 28 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "LIANA rank_aggregate consensus on real annotated PBMC 1k v3 data",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "SKILL.md's Consensus Inference code ran unmodified (only file path/groupby changed) on real 10x PBMC data annotated with CellTypist Immune_All_Low + Leiden. 31,812 pairs scored, 1,122 robust (both ranks <0.05); top hits are real immune biology (B2M-KLRD1 NK-inhibitory axis, S100A8/9-ITGB2/CD68/CD36 monocyte-DAMP signaling, APP-CD74 DC-B cell), not noise. Reran twice: identical magnitude_rank/specificity_rank and identical robust set both times.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Code from SKILL.md's Consensus Inference block runs unmodified (aside from file path) on real annotated PBMC data", "result": "PASS", "note": "Ran with zero code changes beyond the input file path." },
+          { "text": "Output reports both magnitude_rank and specificity_rank as documented, not a single combined rank", "result": "PASS", "note": "adata.uns['liana_res'] contains both columns exactly as SKILL.md states." },
+          { "text": "Top-ranked robust interactions correspond to known immune biology, not random noise", "result": "PASS", "note": "B2M-KLRD1 (NK inhibitory checkpoint), S100A8/9-ITGB2/CD68/CD36 (monocyte DAMP-to-scavenger/integrin signaling), APP-CD74 (DC-B cell) dominate the top of the ranked list." },
+          { "text": "Results are reproducible across repeated runs with the documented call", "result": "PASS", "note": "Two independent runs produced identical magnitude_rank/specificity_rank values (max abs diff 0.0) and an identical 1,122-pair robust set (liana's internal seed=1337 default)." }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "CellPhoneDB v5 statistical (permutation) specificity test on the same real PBMC data",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Executed successfully and found real immune biology (HLA-E/F-VSIR/LILRB1/2 checkpoint pairs, CCL3/CCL5-CCR1, ICAM2/3-integrin aLb2, ANXA1-FPR1/2), but only after two real defects were found and worked around: (1) the documented top-level script crashes on Windows with a multiprocessing RuntimeError under score_interactions=True unless wrapped in `if __name__=='__main__':`; (2) reran the (fixed) script twice with identical inputs and the default (unset) debug_seed=-1 and found 252/120,375 p<0.05 significance flags flipped between runs.",
+        "basic": 34,
+        "specialized": 46,
+        "total": 80,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "SKILL.md's documented CellPhoneDB code block runs out-of-the-box as a standalone script on Windows without modification", "result": "FAIL", "note": "Crashes with RuntimeError ('An attempt has been made to start a new process before the current process has finished its bootstrapping phase') from score_interactions=True's internal multiprocessing.Pool call; fixed by adding an `if __name__=='__main__':` guard, which SKILL.md's example does not have." },
+          { "text": "Once correctly entry-point-guarded, the code executes and returns p-values/means matching the documented output structure", "result": "PASS", "note": "results['pvalues'] and results['means'] returned as documented, shape (535, 238)." },
+          { "text": "Significant interactions include known immune ligand-receptor biology, not spurious hits", "result": "PASS", "note": "HLA-E/HLA-F-VSIR/LILRB1/LILRB2 (inhibitory checkpoints), CCL3/CCL5-CCR1, ICAM2/3-integrin aLb2 (LFA-1 adhesion), ANXA1-FPR1/2 all significant (p=0.0) for monocyte->NK, matching textbook immune biology." },
+          { "text": "Permutation p-values are reproducible across repeated runs with identical inputs, as the documented call is written (no debug_seed set)", "result": "FAIL", "note": "Two runs with identical inputs and the default debug_seed=-1 disagreed on 252 of 120,375 (p<0.05) significance flags (max single p-value swing 0.29); the deep/robust hits (p=0.0) were stable, only marginal calls near the cutoff flipped." },
+          { "text": "The Skill documents CellPhoneDB's human-only-database limitation elsewhere so a user hitting near-empty mouse results has an explanation", "result": "PASS", "note": "Common Errors table row: 'Mouse CellPhoneDB run returns almost nothing | CellPhoneDB DB is human-only'." }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "CCC requested with only one cell-type group present",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "SKILL.md states a single groupby category 'yields only autocrine self-edges, not intercellular signaling.' Empirically, li.mt.rank_aggregate on a constant single-value groupby column instead raises a clear ValueError ('Cannot compute log2FC for group... every cell belongs to it') rather than returning autocrine edges. Practical guidance (need >=2 groups) is correct; the described mechanism is not.",
+        "basic": 33,
+        "specialized": 51,
+        "total": 84,
+        "assertions_passed": 2,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "Skill correctly identifies that CCC requires >=2 cell types in groupby", "result": "PASS", "note": "Practical conclusion is correct even though the described mechanism is not." },
+          { "text": "The failure mode described in SKILL.md ('yields only autocrine self-edges') matches what LIANA actually does with a single-group column", "result": "FAIL", "note": "LIANA raises a ValueError instead of silently returning autocrine-only edges." },
+          { "text": "The actual error is a clear, actionable exception rather than a crash or silent bad output", "result": "PASS", "note": "ValueError message names the exact cause (no comparison group for log2FC)." }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "NicheNet: which Monocyte ligand best explains activated-vs-naive CD8 T cell DE genes",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Mode A/D reasoning output following SKILL.md's Downstream Ligand-Activity section; R execution not possible (nichenetr is a GitHub-only package explicitly named out-of-core-scope in TOOLS.md after the batch-7 RcppPlanc compile failure). Code inspected statically against the real nichenetr API from training knowledge: function names, argument order, and the aupr_corrected ranking column all match the real package.",
+        "basic": 34,
+        "specialized": 47,
+        "total": 81,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Response builds the receiver DE gene set via the documented FindMarkers pattern before ranking ligands", "result": "PASS", "note": "Follows SKILL.md's geneset_oi construction exactly." },
+          { "text": "Response frames the ligand ranking as a hypothesis, not proof of mechanism, per the Governing Principle", "result": "PASS", "note": "States results are 'consistent with the response under a generic prior', matching SKILL.md's own caveat language." },
+          { "text": "Response correctly cites aupr_corrected, not the outdated pearson metric, as the ranking column", "result": "PASS", "note": "Matches SKILL.md's version note and the real current nichenetr API." },
+          { "text": "Response flags nichenetr's additional Zenodo model-file prerequisite, not just the GitHub package install", "result": "PASS", "note": "usage-guide.md Prerequisites explicitly names 'plus NicheNet model files from Zenodo'." }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Compare CCC between control and LPS-stimulated PBMC conditions; are differences real or a cell-count artifact",
+        "status": "PARTIAL",
+        "status_flag": "⚠️",
+        "note": "Mode A reasoning output. The Skill correctly warns against comparing raw interaction counts across conditions and recommends depth normalization, but 'comparing communication across conditions' is explicitly promised in the frontmatter description and named conceptually (Tensor-cell2cell, CellChat differential) without ever providing a runnable code pattern for it, unlike the other three methods, each of which gets a full code block.",
+        "basic": 31,
+        "specialized": 40,
+        "total": 71,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Response warns against comparing raw interaction/pair counts across conditions", "result": "PASS", "note": "Matches SKILL.md Common Errors table row on interaction counts scaling with cell number/depth." },
+          { "text": "Response recommends normalizing for sequencing depth before cross-condition comparison", "result": "PASS", "note": "Matches the Confounds table's 'Sequencing depth' row." },
+          { "text": "Response can give a concrete, runnable code pattern for the recommended cross-condition comparison, as it does for every other capability the Skill's description promises", "result": "FAIL", "note": "SKILL.md names Tensor-cell2cell and 'CellChat differential' only in prose; no code block exists for either, unlike LIANA/CellPhoneDB/CellChat/NicheNet." },
+          { "text": "Response does not fabricate a plausible-looking but nonexistent function call to fill the gap", "result": "PASS", "note": "Correctly describes the concept and recommends consulting Tensor-cell2cell/CellChat docs rather than inventing an API." }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Visium spatial transcriptomics data offered to the non-spatial LIANA consensus workflow",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Mode A reasoning output; correctly redirects to the Spatial-Aware Methods table rather than applying the dissociated-data consensus workflow to spot data.",
+        "basic": 37,
+        "specialized": 55,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Response does not recommend running the non-spatial LIANA consensus workflow directly on Visium spot data without qualification", "result": "PASS", "note": "Redirects to the spatial-aware branch instead." },
+          { "text": "Response flags that Visium spots contain multiple cells and recommends deconvolution first", "result": "PASS", "note": "Matches the Squidpy row's documented caveat verbatim." },
+          { "text": "Response names at least one real spatial-aware method from the Skill's own table", "result": "PASS", "note": "Squidpy sq.gr.ligrec / COMMOT / CellChat v2 spatial / LIANA+ bivariate are all real, correctly named methods." },
+          { "text": "Response does not overclaim spatial co-expression as proof of physical binding", "result": "PASS", "note": "Reuses the Skill's own 'demonstrate spatially-coherent co-expression under modeling assumptions, not binding' framing." }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Run CellPhoneDB on mouse spleen scRNA-seq data",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Mode A reasoning output; correctly and proactively warns before running rather than after a near-empty result, and recommends a real, verified-to-exist alternative.",
+        "basic": 37,
+        "specialized": 56,
+        "total": 93,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Response proactively warns, before running, that CellPhoneDB's default database is human-only", "result": "PASS", "note": "Matches the Method Decision Table's CellPhoneDB 'Fails when' column and the Common Errors table." },
+          { "text": "Response recommends a real, verifiable alternative resource for mouse data", "result": "PASS", "note": "li.rs.select_resource('mouseconsensus') was empirically confirmed to exist and return 3,989 real mouse ligand-receptor pairs." },
+          { "text": "Response does not silently run CellPhoneDB on mouse data and present near-empty results as meaningful", "result": "PASS", "note": "Warns first instead." },
+          { "text": "Response notes the ortholog-mapping-error risk if CellPhoneDB is used anyway via ortholog mapping", "result": "PASS", "note": "Matches SKILL.md's 'Fails when' column: 'ortholog mapping errors'." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 34.4,
+    "dynamic_weighted": 51.1,
+    "score": 86,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Governing Principle and Method Decision Table give an unusually rigorous, correct methodological framing (distinct estimands across LIANA/CellPhoneDB/CellChat/NATMI, consensus-first default, resource-sensitivity check) rarely seen at this depth in a single Skill.",
+    "LIANA consensus workflow ran unmodified on real 10x PBMC data and surfaced genuine, textbook immune biology (B2M-KLRD1 NK-checkpoint, S100A8/9-monocyte-DAMP signaling) with zero code changes.",
+    "CellPhoneDB specificity test, once entry-point-guarded, likewise surfaced real biology (HLA-E/F-VSIR/LILRB checkpoints, CCL3/5-CCR1, ICAM2/3-LFA1) on the same real data.",
+    "Common Errors and Confounds tables proactively cover 8+ real failure modes (ambient RNA, abundance/depth confounds, dissociation stress, mouse-vs-human DB, resource sensitivity) before they occur.",
+    "Excellent composability: 8-skill Related Skills cross-links correctly identify every real upstream/downstream dependency (annotation, clustering, doublet detection, preprocessing, DE for NicheNet's gene set)."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "CellPhoneDB code block is not Windows-safe as documented",
+      "observed_in": [2],
+      "problem": "SKILL.md's 'Specificity Test (CellPhoneDB v5)' code block (lines ~106-119) is written as flat top-level script code. Run exactly as given on Windows with score_interactions=True, it crashes with a multiprocessing RuntimeError ('An attempt has been made to start a new process before the current process has finished its bootstrapping phase') because cellphonedb's score_interactions path calls multiprocessing.Pool internally.",
+      "root_cause": "The example omits the standard `if __name__ == '__main__':` guard that Windows multiprocessing.Pool requires; the code was presumably only tested on Linux/macOS (fork-based), where this guard is not needed.",
+      "fix": "Wrap the code block's body in `def main(): ...` / `if __name__ == '__main__': main()`, or add a one-line note before the block: 'On Windows, wrap this in `if __name__ == \"__main__\":` -- score_interactions=True uses multiprocessing.Pool.'"
+    },
+    {
+      "priority": "P1",
+      "title": "CellPhoneDB permutation results are non-deterministic by default",
+      "observed_in": [2],
+      "problem": "The documented cpdb_statistical_analysis_method.call(...) example never sets debug_seed, which defaults to -1 (unseeded). Two identical runs on the same real PBMC data produced different p-values for 252 of 120,375 (cell-pair, interaction) combinations at the p<0.05 threshold.",
+      "root_cause": "debug_seed is an explicit parameter of the real cellphonedb API (confirmed via inspect.signature) that the Skill's example simply never sets, unlike LIANA's rank_aggregate, which defaults to a fixed seed=1337 and was empirically confirmed deterministic across repeated runs.",
+      "fix": "Add `debug_seed=<int>` (e.g. 42) to the documented cpdb_statistical_analysis_method.call(...) example and add a row to the Threshold and Permutation Rationale table noting that debug_seed must be set for reproducible reporting, mirroring the existing n_perms/iterations row."
+    },
+    {
+      "priority": "P1",
+      "title": "Cross-condition comparison is promised but has no runnable code pattern",
+      "observed_in": [5],
+      "problem": "The frontmatter description explicitly promises 'comparing communication across conditions', and the Governing Principle and Common Errors table both name the correct approach (Tensor-cell2cell decomposition, or CellChat differential comparison) -- but neither gets a code block, unlike the other four capabilities (LIANA, CellPhoneDB, CellChat pathway, NicheNet), each of which has a full runnable example.",
+      "root_cause": "The condition-comparison capability was documented at the conceptual/warning level (what not to do) but never built out to the same code-example depth as the rest of the Skill.",
+      "fix": "Add a 'Condition Comparison' section with a runnable code block -- e.g. LIANA rank_aggregate run per-condition subset feeding into Tensor-cell2cell, or CellChat's mergeCellChat()/netVisual_diffInteraction() two-object workflow -- matching the depth of the existing Consensus Inference and Pathway Probability sections."
+    },
+    {
+      "priority": "P2",
+      "title": "Single-group failure mode is documented incorrectly",
+      "observed_in": [3],
+      "problem": "SKILL.md states a single groupby category 'yields only autocrine self-edges, not intercellular signaling.' Empirically, li.mt.rank_aggregate on a constant-value groupby column raises `ValueError: Cannot compute log2FC for group '...': every cell belongs to it...` instead of returning autocrine edges.",
+      "root_cause": "The sentence describes an intuitive but unverified assumption about the failure mode rather than the tool's actual behavior.",
+      "fix": "Correct the sentence to: 'CCC needs >=2 cell types in `groupby`; a single group raises a ValueError (log2FC has no comparison group), not a silent autocrine-only result.'"
+    }
+  ]
+}

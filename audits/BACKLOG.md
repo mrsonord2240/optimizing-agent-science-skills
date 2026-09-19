@@ -8,7 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (70)
+## P1 (73)
 
 ### `bio-single-cell-trajectory-inference` — 2 of 3 documented scVelo velocity modes are broken against the Skill's own declared-compatible version
 
@@ -145,6 +145,30 @@ None open.
 - Problem: calculate_3d_descriptors calls EmbedMolecule(mol, AllChem.ETKDGv3()) with no randomSeed, so three identical calls returned asphericity 0.7876, 0.7216 and 0.7210 -- a 9% swing in a value that may become a QSAR feature. SKILL.md's ensemble snippet does set randomSeed=42.
 - Root cause: Seed management was applied to the SKILL.md pattern and not propagated to the shipped helper.
 - Fix: Set params.randomSeed explicitly in calculate_3d_descriptors, accept it as an argument, and state in the usage guide that a recorded seed is required for any descriptor that feeds a model.
+
+### `bio-single-cell-cell-communication` — CellPhoneDB code block is not Windows-safe as documented
+
+- Skill: 86, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/cell-communication) · [viewer](skills/bio-single-cell-cell-communication/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 2
+- Problem: SKILL.md's 'Specificity Test (CellPhoneDB v5)' code block (lines ~106-119) is written as flat top-level script code. Run exactly as given on Windows with score_interactions=True, it crashes with a multiprocessing RuntimeError ('An attempt has been made to start a new process before the current process has finished its bootstrapping phase') because cellphonedb's score_interactions path calls multiprocessing.Pool internally.
+- Root cause: The example omits the standard `if __name__ == '__main__':` guard that Windows multiprocessing.Pool requires; the code was presumably only tested on Linux/macOS (fork-based), where this guard is not needed.
+- Fix: Wrap the code block's body in `def main(): ...` / `if __name__ == '__main__': main()`, or add a one-line note before the block: 'On Windows, wrap this in `if __name__ == "__main__":` -- score_interactions=True uses multiprocessing.Pool.'
+
+### `bio-single-cell-cell-communication` — CellPhoneDB permutation results are non-deterministic by default
+
+- Skill: 86, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/cell-communication) · [viewer](skills/bio-single-cell-cell-communication/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 2
+- Problem: The documented cpdb_statistical_analysis_method.call(...) example never sets debug_seed, which defaults to -1 (unseeded). Two identical runs on the same real PBMC data produced different p-values for 252 of 120,375 (cell-pair, interaction) combinations at the p<0.05 threshold.
+- Root cause: debug_seed is an explicit parameter of the real cellphonedb API (confirmed via inspect.signature) that the Skill's example simply never sets, unlike LIANA's rank_aggregate, which defaults to a fixed seed=1337 and was empirically confirmed deterministic across repeated runs.
+- Fix: Add `debug_seed=<int>` (e.g. 42) to the documented cpdb_statistical_analysis_method.call(...) example and add a row to the Threshold and Permutation Rationale table noting that debug_seed must be set for reproducible reporting, mirroring the existing n_perms/iterations row.
+
+### `bio-single-cell-cell-communication` — Cross-condition comparison is promised but has no runnable code pattern
+
+- Skill: 86, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/cell-communication) · [viewer](skills/bio-single-cell-cell-communication/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 5
+- Problem: The frontmatter description explicitly promises 'comparing communication across conditions', and the Governing Principle and Common Errors table both name the correct approach (Tensor-cell2cell decomposition, or CellChat differential comparison) -- but neither gets a code block, unlike the other four capabilities (LIANA, CellPhoneDB, CellChat pathway, NicheNet), each of which has a full runnable example.
+- Root cause: The condition-comparison capability was documented at the conceptual/warning level (what not to do) but never built out to the same code-example depth as the rest of the Skill.
+- Fix: Add a 'Condition Comparison' section with a runnable code block -- e.g. LIANA rank_aggregate run per-condition subset feeding into Tensor-cell2cell, or CellChat's mergeCellChat()/netVisual_diffInteraction() two-object workflow -- matching the depth of the existing Consensus Inference and Pathway Probability sections.
 
 ### `bio-variant-annotation` — csq --phase modes m and s are described wrongly
 
@@ -570,7 +594,7 @@ None open.
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (289)
+## P2 (290)
 
 ### `bio-crispr-screens-copy-number-correction` — negative_control_sgrnas empty-dict case raises an undocumented ValueError
 
@@ -1011,6 +1035,14 @@ None open.
 - Problem: RootDigger is recommended without a command.
 - Root cause: Named only.
 - Fix: Add 'rootdigger --msa aln --tree tree --exhaustive' or route to the IQ-TREE command.
+
+### `bio-single-cell-cell-communication` — Single-group failure mode is documented incorrectly
+
+- Skill: 86, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/cell-communication) · [viewer](skills/bio-single-cell-cell-communication/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 3
+- Problem: SKILL.md states a single groupby category 'yields only autocrine self-edges, not intercellular signaling.' Empirically, li.mt.rank_aggregate on a constant-value groupby column raises `ValueError: Cannot compute log2FC for group '...': every cell belongs to it...` instead of returning autocrine edges.
+- Root cause: The sentence describes an intuitive but unverified assumption about the failure mode rather than the tool's actual behavior.
+- Fix: Correct the sentence to: 'CCC needs >=2 cell types in `groupby`; a single group raises a ValueError (log2FC has no comparison group), not a silent autocrine-only result.'
 
 ### `bio-variant-annotation` — SKILL.md annotate line needs an indexed target
 
