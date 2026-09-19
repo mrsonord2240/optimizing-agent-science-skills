@@ -1,0 +1,228 @@
+{
+  "meta": {
+    "skill_name": "bio-single-cell-perturb-seq",
+    "description": "Analyze Perturb-seq / CROP-seq single-cell CRISPR screens. Use when assigning guides as a mixture problem, removing non-perturbed escaper cells with Mixscape, choosing a calibrated test (SCEPTRE conditional resampling) over naive DE, quantifying effect size with E-distance, separating compositional shifts from within-state expression change, or judging whether a perturbation-prediction foundation model actually beats a baseline.",
+    "evaluated_on": "2026-09-19",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "mrsonord2240/bioSkills@420b60b5eae0c3313a988cfff42d2653362c0b56:single-cell/perturb-seq",
+    "reaudit_of": "F:/OpenScience/audits/_pre-fix-20260919/bio-single-cell-perturb-seq/eval_report_bio-single-cell-perturb-seq_result.json (score 75, Beta Only, not deployable)"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All 7 outputs use real data, real installed packages, or real citations. New this round: independently verified via CRAN/Bioconductor/GitHub that sceptre is GitHub-only (Katsevich-Lab/sceptre, R>=4.1 per its own DESCRIPTION) and scMAGeCK was released then removed from Bioconductor at 3.17 (not merely 'unreleased staging' as SKILL.md now states) -- both are real, checkable facts, and neither output fabricates a DOI, p-value, or result." },
+      "practice_boundaries": { "result": "PASS", "detail": "Purely computational/research skill; no diagnostic, prescriptive, or patient-level claims anywhere." },
+      "methodological_ground": { "result": "PASS", "detail": "Core prose guidance remains textbook-correct. The Milo replacement (per-(replicate x target) pseudo-sample, one-target-vs-NT contrast) is methodologically sound and independently confirmed to generalize to a second target (ATF2) beyond the one the fixer verified (STAT1)." },
+      "code_usability": { "result": "PASS", "detail": "6 of 7 inputs now produce real, independently-executed, runnable code (up from 5/7 pre-fix): Mixscape (confirmed via a 4,000-cell subsample of the real dataset -- clean run, no KeyError, no CSC error), SCEPTRE (fully executed end to end after this re-audit independently corrected the sceptre install/R-version documentation and installed it live), E-distance/E-test, and Pseudobulk+Milo (confirmed on 2 targets). scMAGeCK remains code-free by design (honestly reframed, not fabricated) -- N/A, not a failure." }
+    }
+  },
+  "static_score": {
+    "subtotal": 89,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 11, "max": 12, "note": "Both flagship worked examples (guide assignment + Mixscape, Milo/pseudobulk) now run correctly as shipped. Residual gap found this round: SKILL.md's SCEPTRE Prerequisites (`install.packages('sceptre')`, 'requires R >= 4.5') is itself factually wrong -- sceptre is not on CRAN or Bioconductor at all (both return 404); it is GitHub-only (Katsevich-Lab/sceptre) and its DESCRIPTION requires R (>= 4.1), confirmed by installing and running it live in this env's real R 4.4.3." },
+      "reliability": { "score": 10, "max": 12, "note": "Common Errors table now covers both fixed defects (KeyError, Milo AssertionError) with accurate fixes. Docked because the sceptre guidance actively misdirects: it tells the agent 'R needs upgrading' when the real fix (remotes::install_github) works fine under R 4.4.3 -- a dead end, not a fix." },
+      "performance_context": { "score": 6, "max": 8, "note": "New finding this round: `Mixscape.perturbation_signature()` on the real, full 20,729-cell papalexi_2021 dataset shows heavy, undocumented resource cost -- two independent clean-environment attempts grew past 20GB RAM and were terminated to protect the shared machine before completing (the fixer's own report and my subsample-of-4,000-cells run both completed cleanly, so the code is correct, just resource-heavy in a way SKILL.md never flags). E-test compute cost also still unflagged (carried over from pre-fix)." },
+      "agent_usability": { "score": 15, "max": 16, "note": "The target_gene/gene_target inconsistency between SKILL.md and the example is fully resolved -- standardized on gene_target everywhere, verified by reading both files." },
+      "human_usability": { "score": 7, "max": 8, "note": "The mdata.obs-vs-adata.obs input-shape gap that caused the original KeyError is now spelled out inline, exactly where an agent needs it, with the one-line fix (`mdata.push_obs(...)`)." },
+      "security": { "score": 11, "max": 12, "note": "Unchanged: no credentials, no eval/exec of raw strings, no injection surface." },
+      "maintainability": { "score": 10, "max": 12, "note": "The bundled example now runs end-to-end as shipped (mod the resource caveat above). Still no automated expected-output assertions bundled with the Skill itself." },
+      "agent_specific": { "score": 19, "max": 20, "note": "Unchanged: precise trigger, real progressive disclosure (277-line SKILL.md), 9-entry Related Skills composability, strong escape hatches (Foundation-Model Reality Check, all-NP caveat)." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 87.0,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 27, "total": 29 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Assign guides with a mixture model, run Mixscape to remove escapers (real papalexi_2021 CROP-seq data)",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Independently re-executed the FIXED examples/pertpy_analysis.py. The mixture-model ImportError still occurs in this env (optax absent) but is now fully documented with the exact working fallback -- expected, not a defect. Confirmed clean on a 4,000-cell subsample of the real dataset: push_obs resolves the KeyError, gdo.X.tocsr() resolves the CSC error, mixscape_class_global comes out sensible (NP 2699 / KO 840 / NT 461, proportions matching the fixer's full-dataset run). New finding: the full 20,729-cell run of perturbation_signature+mixscape is heavy enough that two independent, unloaded attempts grew past 20GB RAM and were killed before completing -- a real, undocumented resource-cost risk, not a correctness defect (the fixer's own full run and my subsample both completed correctly).",
+        "basic": 35,
+        "specialized": 52,
+        "total": 87,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Guide assignment uses a per-guide mixture posterior, not a flat threshold, per SKILL.md's Governing Principle", "result": "FAIL", "note": "Still cannot execute in this env (optax missing) -- now fully documented as an expected, non-defect gap with a working fallback, but the mixture path itself remains unexecuted here." },
+          { "text": "Mixscape correctly separates KO/NP/NT populations and reports the perturbed fraction", "result": "PASS", "note": "Confirmed on a real 4,000-cell subsample: NP 2699/KO 840/NT 461, proportionally consistent with the fixer's full-dataset run." },
+          { "text": "Code runs against the skill's own recommended real dataset (pt.dt.papalexi_2021) without further modification beyond what SKILL.md now documents", "result": "PASS", "note": "push_obs is now part of the shipped example itself; running it verbatim (or on a clean subsample) no longer raises KeyError." },
+          { "text": "Output does not claim genes are non-functional from a high NP fraction alone", "result": "PASS", "note": "No such claim made." },
+          { "text": "No fabricated statistics; all counts are from real execution", "result": "PASS", "note": "All figures traced to real printed value_counts() output, independently re-run this round." }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Calibrated SCEPTRE test with a negative-control calibration check first (R)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "MAJOR finding this round: sceptre is not on CRAN or Bioconductor at all (both cran.r-project.org/package=sceptre and the Bioconductor package page return 404); it is GitHub-only (Katsevich-Lab/sceptre) and its own DESCRIPTION requires R (>= 4.1), not R (>= 4.5) as SKILL.md, the original audit, and TOOLS.md all claimed. Independently installed sceptre 0.99.0 via remotes::install_github under this env's real R 4.4.3 (compiled clean with the env's existing Rtools) and ran a full real analysis on sceptre's own bundled lowmoi_example_data: import_data -> set_analysis_parameters -> assign_grnas(method='mixture') -> run_qc -> run_calibration_check -> run_discovery_analysis, all exactly matching SKILL.md's documented code pattern. Calibration check: 399 negative-control pairs, well-behaved p-values. Discovery analysis: 400 pairs, 38 significant at p<0.05. SKILL.md's actual Prerequisites install command remains wrong and needs a further fix.",
+        "basic": 35,
+        "specialized": 50,
+        "total": 85,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Calibration check (negative controls) runs before discovery analysis", "result": "PASS", "note": "Code order matches SKILL.md and ran in that order for real." },
+          { "text": "Code executes successfully producing discovery results", "result": "PASS", "note": "Now true: full real execution, 38/400 significant discoveries at p<0.05." },
+          { "text": "SKILL.md documents sceptre's minimum R-version requirement and a working install method", "result": "FAIL", "note": "SKILL.md documents an R-version requirement, but the wrong one (R>=4.5 vs the real R>=4.1), and `install.packages('sceptre')` does not work at all since sceptre is not on CRAN -- verified independently against the real package source." },
+          { "text": "No fabricated results reported", "result": "PASS", "note": "All numbers from a real, independently-run sceptre analysis on the package's own bundled example data." }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "All cells for target gene X are Mixscape 'NP' -- is the gene non-functional?",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Unchanged section of SKILL.md; direct reasoning task (Mode A), still reproduces the correct guidance exactly.",
+        "basic": 38,
+        "specialized": 54,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Does not conclude the gene is non-functional from an all-NP result alone", "result": "PASS", "note": "Matches SKILL.md's Deep Caveat and Common Errors table exactly." },
+          { "text": "Recommends independent verification of guide editing efficiency", "result": "PASS", "note": "Suggests genotyping/indel or protein-level checks before concluding." },
+          { "text": "Cites the specific confound (no-phenotype vs no-editing)", "result": "PASS", "note": "Directly named, matching the skill's own terminology." },
+          { "text": "No medical/clinical diagnostic overreach", "result": "PASS", "note": "Stays in pure research-computation scope." }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Rank perturbations by E-distance and run the permutation E-test in a pinned PCA embedding",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Code unchanged from the pre-fix version except one added line: np.random.seed(0) before etest(...), fixing the previously-flagged reproducibility gap (DistanceTest exposes no seed of its own). Not independently re-executed this round (trivial, low-risk one-line addition to already-verified code); original audit's real run on this exact code path stands as the execution evidence.",
+        "basic": 34,
+        "specialized": 52,
+        "total": 86,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Pins a fixed PCA embedding and edistance metric before computing pairwise distances", "result": "PASS", "note": "obsm_key='X_pca' and metric='edistance' set explicitly, matching SKILL.md." },
+          { "text": "Permutation E-test reproduces SKILL.md's documented 'p ~ 1/(n_perms+1), crushed by multiple testing' caveat", "result": "PASS", "note": "Established by the original audit's real run; code unchanged besides the added seed." },
+          { "text": "Global RNG is seeded before the permutation test for reproducibility", "result": "PASS", "note": "np.random.seed(0) added with an explanatory comment, addressing the prior P2 finding directly." },
+          { "text": "Output correctly distinguishes raw vs adjusted significance", "result": "PASS", "note": "pvalue vs pvalue_adj / significant vs significant_adj both reported and correctly diverge." }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Pseudobulk DESeq2 per replicate plus Milo to separate composition from within-state DE",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Independently re-executed the FIXED Milo section end-to-end on real data, and deliberately extended beyond the fixer's own verification: fixer verified STAT1 vs NT only (22/194 neighborhoods significant); this re-audit reproduced that exact result (22/194, exact match) AND additionally tested a second target the fixer did not use, ATF2 vs NT (0/226 significant, ran without error) -- confirming the per-(replicate x target) pseudo-sample fix generalizes rather than being overfit to one target. Also independently extended the pseudobulk step with a real pydeseq2 DE call (SKILL.md only describes this in prose, does not show the literal DESeq2/pyDESeq2 code) -- ran cleanly, 0/18649 genes padj<0.1 for the weaker ATF2 perturbation, a sane result.",
+        "basic": 36,
+        "specialized": 56,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Pseudobulk sums RAW counts (not normalized) per (target, replicate)", "result": "PASS", "note": "layer_key='counts' used; 78-sample pseudobulk matrix with correct n_obs_aggregated, confirmed again this round." },
+          { "text": "Milo differential-abundance test completes and reports composition separately from expression", "result": "PASS", "note": "Now true on 2 independent targets (STAT1: 22/194 sig; ATF2: 0/226 sig), no AssertionError." },
+          { "text": "Design formula is compatible with the per-cell nature of pooled Perturb-seq perturbation labels", "result": "PASS", "note": "The per-(replicate x target) pseudo-sample column resolves the structural mismatch; confirmed to generalize to a second target." },
+          { "text": "No fabricated pseudobulk or DA results reported", "result": "PASS", "note": "All numbers from real, independently-run execution this round." }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "High-MOI combinatorial guides -- deconvolve with scMAGeCK",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "SKILL.md now adds an honest paragraph explaining why no worked example is bundled (not on CRAN/Bioc release, needs a compiled C++ component, absent from this Skill's tested env) and points to the real upstream repos. Independently verified: github.com/weili-lab/scMAGeCK exists and correctly states it defers to the Bitbucket page for current code; scmageck_lr and scmageck_rra are confirmed as the real entry points (via rdrr.io mirrors of the Bioconductor/GitHub package docs). One inaccuracy found: SKILL.md says scMAGeCK is on 'Bioconductor's unreleased staging index' -- it was actually released and then REMOVED from Bioconductor at release 3.17 (confirmed via bioconductor.org/about/removed-packages/), a different and more precise history than 'unreleased staging'. Minor, does not amount to fabrication.",
+        "basic": 33,
+        "specialized": 42,
+        "total": 75,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "SKILL.md provides runnable code or clear, actionable guidance for scMAGeCK", "result": "PASS", "note": "Now true: real repo pointers and real function names, upgraded from a bare table row pre-fix." },
+          { "text": "Skill correctly identifies scMAGeCK as the appropriate tool for combinatorial/high-MOI deconvolution", "result": "PASS", "note": "Decision table entry is directionally correct." },
+          { "text": "Skill warns about the NEGCTRL-choice pitfall for scMAGeCK", "result": "PASS", "note": "Present in the table's 'Fails when' column." },
+          { "text": "Output does not fabricate scMAGeCK function names/parameters not grounded in reality", "result": "PASS", "note": "scmageck_lr/scmageck_rra names verified real; the 'unreleased staging' framing is imprecise (it was released then removed at Bioc 3.17) but not a fabrication of a fact that does not exist." }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Foundation model claims 0.95 correlation on held-out cells -- safe to skip experimental validation?",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Unchanged section of SKILL.md; direct reasoning task (Mode A), still correctly invokes the Foundation-Model Reality Check.",
+        "basic": 38,
+        "specialized": 54,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Refuses to endorse skipping experimental validation based on all-gene correlation alone", "result": "PASS", "note": "Explicit refusal with reasoning." },
+          { "text": "Requests DE-gene-only metric and explicit additive/mean baseline comparison", "result": "PASS", "note": "Matches SKILL.md's defensible reviewer stance exactly." },
+          { "text": "Flags cell-level vs whole-perturbation-holdout split as the key confound", "result": "PASS", "note": "Directly named as the train-test leakage risk." },
+          { "text": "Cites that foundation models do not yet reliably beat trivial baselines (with reference)", "result": "PASS", "note": "Cites Ahlmann-Eltze 2025 / Kernfeld 2025 / Csendes 2025, all real papers matching SKILL.md's References section." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 35.6,
+    "dynamic_weighted": 52.2,
+    "score": 88,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "SCEPTRE now fully executes end to end for real (import_data -> calibration check -> discovery analysis, 38/400 significant) after this re-audit independently corrected a documentation error inherited from the original TOOLS.md/audit chain (sceptre is GitHub-only, R>=4.1, not 'CRAN release requires R>=4.5').",
+    "The Milo differential-abundance fix is confirmed to generalize: independently reproduced the fixer's STAT1 result exactly (22/194) and additionally verified a second target, ATF2 (0/226, no error), that the fixer never tested.",
+    "The Mixscape KeyError/CSC fixes are independently confirmed clean on a real 4,000-cell subsample of papalexi_2021, with sensible KO/NP/NT proportions matching the fixer's full-dataset numbers.",
+    "The scMAGeCK reframing is honest, not fabricated -- verified its real upstream repos and real function names -- and the redundancy pass (usage-guide.md) was independently confirmed via diff to have preserved every unique fact."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "SCEPTRE install instructions in SKILL.md remain factually wrong",
+      "observed_in": [2],
+      "problem": "SKILL.md's Prerequisites still say `install.packages('sceptre')` and 'requires R >= 4.5'. Neither is correct: sceptre is not distributed on CRAN or Bioconductor at all (both return 404), it is GitHub-only (Katsevich-Lab/sceptre), and its own DESCRIPTION requires R (>= 4.1). This re-audit installed and ran it successfully under this env's real R 4.4.3.",
+      "root_cause": "The original tooling env's TOOLS.md misdiagnosed a 'not on CRAN' failure as 'filtered by R-version gate,' and both the original audit and the fix inherited that claim without checking the package's actual distribution channel.",
+      "fix": "Replace `install.packages('sceptre')` with `remotes::install_github('Katsevich-Lab/sceptre')` and correct the R-version note to R >= 4.1 (per the package's own DESCRIPTION)."
+    },
+    {
+      "priority": "P1",
+      "title": "Mixscape's perturbation_signature is undocumented-heavy on the real full-size dataset",
+      "observed_in": [1],
+      "problem": "Two independent, unloaded attempts to run the shipped example verbatim on the full 20,729-cell papalexi_2021 dataset grew past 20GB RAM without completing and were terminated to protect the shared machine. A clean run on a 4,000-cell subsample of the same data completed correctly in under a minute, so the fix is correct -- the cost is real and scales badly with cell count, not the fixer's bug.",
+      "root_cause": "pertpy 1.3.0's Mixscape.perturbation_signature implementation appears to have superlinear memory scaling with cell count for this dataset's neighbor-signature computation; SKILL.md gives no resource guidance at all for this step (only the E-test's runtime is flagged, not Mixscape's memory footprint).",
+      "fix": "Add a note next to the Mixscape section warning that perturbation_signature can require significant memory on datasets of this size (tens of GB observed on ~20k cells) and suggesting a subsample or batched approach for memory-constrained environments."
+    },
+    {
+      "priority": "P2",
+      "title": "scMAGeCK's Bioconductor history is described imprecisely",
+      "observed_in": [6],
+      "problem": "SKILL.md says scMAGeCK is on 'Bioconductor's unreleased staging index' -- it was actually released and then removed from Bioconductor at release 3.17 (confirmed via bioconductor.org/about/removed-packages/), which is a different history than 'never released.'",
+      "root_cause": "The reframing correctly identified scMAGeCK's current unavailability but did not check whether it had ever had a full release.",
+      "fix": "Change 'unreleased staging index' to 'released through Bioconductor 3.16, then removed at 3.17' for accuracy."
+    }
+  ]
+}
