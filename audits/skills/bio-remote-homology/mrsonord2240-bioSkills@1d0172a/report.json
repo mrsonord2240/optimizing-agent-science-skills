@@ -1,0 +1,275 @@
+{
+  "meta": {
+    "skill_name": "bio-remote-homology",
+    "description": "Detect distant homologs using profile and structure-aware methods that go beyond standard BLAST. Use when sequence identity falls into the twilight zone (<35% pairwise), when BLAST fails to find homologs that should exist, when working at metagenomic scale (DIAMOND, MMseqs2), or when structure beats sequence (Foldseek). Covers PSI-BLAST, jackhmmer, HHblits/HHsearch, DIAMOND, MMseqs2, and Foldseek.",
+    "evaluated_on": "2026-09-19",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 9,
+    "source": "mrsonord2240/bioSkills@1d0172a:database-access/remote-homology"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All literature citations (Rost 1999, Eddy 2011, Remmert 2012, Steinegger 2017, Buchfink 2015/2021, van Kempen 2024, Heinzinger 2024, Altschul 1997) remain real, verifiable papers; no fabricated DOI/PMID/statistics found in any of the 9 outputs, including the two auditor-added inputs." },
+      "practice_boundaries": { "result": "PASS", "detail": "No diagnostic or prescriptive medical claims; skill remains scoped to sequence/structure homology detection." },
+      "methodological_ground": { "result": "PASS", "detail": "The P2 gap from the original audit (no explicit refusal instruction for a user demanding unqualified certainty) is now closed: SKILL.md's intro instructs the agent to report the real E-value/score/probability inline rather than dropping it. Re-verified in Input 7." },
+      "code_usability": { "result": "PASS", "detail": "Both P1 code defects from the original audit are fixed and independently re-verified by direct execution: examples/pfam_annotation.sh now prints the real full_evalue/full_score ($7,$8) instead of query accession/qlen ($5,$6); the documented Foldseek version-check command now exits 0. No new code-usability regressions found across 9 executed/assessed inputs, including a new no-hit edge case that confirms the fixed script degrades gracefully (exit 0) rather than crashing." }
+    }
+  },
+  "static_score": {
+    "subtotal": 94,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 12, "max": 12, "note": "Comprehensive coverage of all 6 tool families and the decision matrix unchanged (4/4 completeness); both correctness defects found in the original audit (Pfam awk columns, Foldseek version check) are fixed and independently re-confirmed by direct execution in this re-audit, raising correctness to 4/4; CLI/subprocess approach remains well-matched to the task (4/4 appropriateness)." },
+      "reliability": { "score": 9, "max": 12, "note": "The one concrete fault-tolerance defect found originally (the Pfam script silently mislabeling correct data as the wrong statistic) is fixed; a new auditor-run no-hit edge case confirms the script degrades gracefully under set -euo pipefail rather than crashing (3/4 fault tolerance -- not 4/4, since no other input validation was added). Error reporting (3/4) and recoverability (3/4) unchanged from the original audit -- Common Errors table and PSSM save/reuse are unchanged in this fix pass." },
+      "performance_context": { "score": 8, "max": 8, "note": "The redundancy pass removed ~35 duplicated lines from usage-guide.md (Prerequisites/Tips/What the Agent Will Do), migrating only the handful of facts unique to it into SKILL.md -- net token cost improved without losing information (4/4, up from 3/4); execution efficiency unchanged, still no redundant round-trips (4/4)." },
+      "agent_usability": { "score": 16, "max": 16, "note": "Learnability (4/4) and consistency (4/4) unchanged. Feedback design was capped at 3/4 by the Pfam column-labeling bug; now fixed and re-verified against the raw domtblout, so 4/4. Error prevention (4/4) unchanged -- Failure Modes/Common Errors tables untouched by this fix pass." },
+      "human_usability": { "score": 8, "max": 8, "note": "Unchanged from the original audit: natural researcher trigger language (4/4 discoverability); Version Compatibility section instructing introspection (4/4 forgiveness)." },
+      "security": { "score": 11, "max": 12, "note": "Unchanged: no credentials or sensitive data (4/4 credential safety, 4/4 data safety); example scripts still rely on the underlying CLI to fail loudly rather than pre-validating file existence, acceptable for this skill class (3/4 input validation)." },
+      "maintainability": { "score": 11, "max": 12, "note": "Modularity stays at 3/4 -- the new toy script is a fixture variant of the existing Pfam workflow, not a new standalone workflow; PSI-BLAST-alone and HHsearch-alone still exist only inline in SKILL.md (open P2, not part of this fix pass). Modifiability unchanged (4/4). Testability was capped at 2/4 by the complete absence of a toy/test fixture; a bundled PF00069.hmm + P17612.fasta + pfam_annotation_toy.sh now ships and was independently re-run end to end in this audit from a byte-identical, independently-sourced copy of the Pfam reference file, so 4/4." },
+      "agent_specific": { "score": 19, "max": 20, "note": "Trigger precision (4/4), progressive disclosure (4/4, and the redundancy pass makes the SKILL.md/usage-guide layering cleaner), composability (4/4) all unchanged. Idempotency stays at 3/4 -- PSI-BLAST's inherent non-determinism (not a target of this fix pass) still caps it. Escape hatches was capped at 3/4 by the missing unqualified-certainty instruction; the new sentence in SKILL.md's intro closes this gap, re-verified against Input 7, so 4/4." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 90.1,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 36, "total": 36 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Pfam domain annotation of PRKACA (P17612) via hmmscan --cut_ga",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Regression of original Input 1 (P1 fix): ran the shipped examples/pfam_annotation.sh end-to-end, unmodified, against the same real fixture -- now correctly reports E=1.4e-79, score=253.2, matching the raw domtblout ground truth exactly.",
+        "executed": true,
+        "execution_note": "Ran the actual shipped script (not just the awk line in isolation) by pre-pressing a copy of the cached PF00069.hmm as Pfam-A.hmm so the script's own download guard is satisfied. See run/01_pfam_annotation_real.sh and run/output01_pfam_annotation_real.txt.",
+        "basic": 37,
+        "specialized": 55,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Reported E-value and score for the Pkinase hit are numerically correct", "result": "PASS", "note": "Script prints 1.4e-79 / 253.2, matching the raw domtblout columns 7/8 exactly." },
+          { "text": "hmmscan uses the Pfam-recommended --cut_ga gathering threshold rather than an arbitrary E-value cutoff", "result": "PASS", "note": "--cut_ga used exactly as documented, unchanged." },
+          { "text": "Output does not fabricate a hit that doesn't exist", "result": "PASS", "note": "Pkinase/PF00069 hit independently re-confirmed against raw domtblout." },
+          { "text": "Output correctly labels which column holds which statistic", "result": "PASS", "note": "awk now reads $7/$8 (full_evalue/full_score); header and values agree." }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "MMseqs2 twilight-zone search: default vs -s 7.5 sensitivity",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Regression of original Input 2, independently re-run (not reused): default -s 4.0 still misses the homolog; -s 7.5 still recovers it at the same real numbers.",
+        "executed": true,
+        "execution_note": "Ran mmseqs easy-search at default and -s 7.5 fresh, against the cached Swiss-Prot sample. Default: 0 hits. -s 7.5: 1 hit, P17612/Q197B6, 25.4% identity, E=1.37e-13, bits=66 -- identical to the original audit's numbers. See run/04_mmseqs_sensitivity_regression.sh and run/output04_mmseqs_sensitivity.txt.",
+        "basic": 37,
+        "specialized": 55,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "MMseqs2 default sensitivity (-s 4.0) misses the real twilight-zone homolog", "result": "PASS", "note": "0 hits at default, reproduced independently." },
+          { "text": "MMseqs2 -s 7.5 recovers the homolog documented in SKILL.md's failure-mode section", "result": "PASS", "note": "1 hit, 25.4% identity, E=1.37e-13, reproduced independently." },
+          { "text": "E-value/identity values are reported accurately, not fabricated", "result": "PASS", "note": "Matches the original audit's independently-run numbers exactly." },
+          { "text": "Output stays within the skill's stated scope (sequence search, not functional claim)", "result": "PASS", "note": "No overclaiming beyond the search result." }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Structural homology via Foldseek -- Required-Setup version check (P1 fix) plus a real structure-vs-structure search",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Regression of original Input 3 (P1 fix): the documented version-check command now succeeds. Unlike the original audit (PARTIAL, version-check only), this re-audit also executed the actual Foldseek search pipeline end to end on a freshly-fetched real structure.",
+        "executed": true,
+        "execution_note": "foldseek 2>&1 | grep -i '^foldseek Version' exits 0, prints 'foldseek Version: 10.941cd33'; the old 'foldseek --version' re-confirmed failing (exit 1) for contrast. Separately fetched real PDB structure 1ATP from RCSB, built a foldseek DB, and ran easy-search per SKILL.md's documented --format-output pattern: self-hit, fident=1.000, prob=1.000, qtmscore=ttmscore=1.000, E=1.94e-68. See run/02_foldseek_version_check.sh, run/output02_foldseek_version_check.txt, run/07_foldseek_real_search.sh, run/output07_foldseek_real_search.txt.",
+        "basic": 36,
+        "specialized": 52,
+        "total": 88,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The documented Required-Setup verification command for Foldseek succeeds as written", "result": "PASS", "note": "foldseek 2>&1 | grep -i '^foldseek Version' exits 0 and prints the real version string." },
+          { "text": "ProstT5 is correctly presented as skipping the AF2 structure-prediction step", "result": "PASS", "note": "Matches Heinzinger et al. 2024 accurately, unchanged." },
+          { "text": "SKILL.md's documented easy-search --format-output pattern produces a real, correctly-shaped alignment record", "result": "PASS", "note": "New evidence: real 1ATP self-search returns fident/evalue/bits/prob/qtmscore/ttmscore fields exactly as documented." },
+          { "text": "prob > 0.9 is correctly cited as the confidence cutoff for structural homology", "result": "PASS", "note": "Matches SKILL.md text verbatim; the real self-hit's prob=1.000 is consistent with this cutoff." }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "PSI-BLAST 3-iteration PSSM build and reuse per SKILL.md's saved-PSSM pattern",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Regression of original Input 4, independently re-run: converged, PSSM saved and reused successfully, zero script modification needed -- unchanged by this fix pass.",
+        "executed": true,
+        "execution_note": "Ran psiblast -num_iterations 3 -inclusion_ethresh 0.002 fresh against the cached Swiss-Prot sample DB, saved PSSM, reused via -in_pssm. 'Search has CONVERGED!' printed; reuse run returned a consistent top hit. See run/05_psiblast_pssm_regression.sh and run/output05_psiblast_pssm.txt.",
+        "basic": 37,
+        "specialized": 55,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "PSSM is saved in both ASN.1 and ASCII formats as documented", "result": "PASS", "note": "Both psiblast.pssm.asn and psiblast.pssm.txt written, reproduced independently." },
+          { "text": "Iteration is capped at 3 with a stricter inclusion threshold (0.002) per drift-avoidance guidance", "result": "PASS", "note": "Flags used exactly as documented." },
+          { "text": "Convergence is correctly detected and reported", "result": "PASS", "note": "Tool printed 'Search has CONVERGED!'." },
+          { "text": "Saved PSSM can be reused via -in_pssm against a separate search without rebuilding", "result": "PASS", "note": "Reuse run succeeded, consistent top hit (Q197B6) returned." }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "DIAMOND scale routing + jackhmmer cross-validation on a metagenomic-style query",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Regression of original Input 5, independently re-run: DIAMOND default still misses the homolog jackhmmer finds; --ultra-sensitive still recovers it -- unchanged by this fix pass.",
+        "executed": true,
+        "execution_note": "Ran jackhmmer -N 3, DIAMOND default, and DIAMOND --ultra-sensitive -e 1 fresh against the cached Swiss-Prot sample. jackhmmer: E=8.6e-62. DIAMOND default: 0 hits. DIAMOND --ultra-sensitive: 2 hits incl. Q197B6 at E=5.39e-12 -- matches the original audit's numbers exactly. See run/06_diamond_jackhmmer_regression.sh and run/output06_diamond_jackhmmer.txt.",
+        "basic": 35,
+        "specialized": 54,
+        "total": 89,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "DIAMOND default mode is shown to miss a real homolog jackhmmer finds", "result": "PASS", "note": "0 hits at default, reproduced independently." },
+          { "text": "DIAMOND --ultra-sensitive is shown to recover the same homolog jackhmmer found", "result": "PASS", "note": "E=5.39e-12, matches the original audit's independently-run number exactly." },
+          { "text": "Cross-validation logic (trust hits in 2+ methods) is correctly applied", "result": "PASS", "note": "Matches iterative_profile.sh's own stated caveat, unchanged." },
+          { "text": "Recommendation correctly routes large-batch metagenomic work to DIAMOND/MMseqs2 rather than BLAST/PSI-BLAST", "result": "PASS", "note": "Matches decision matrix, and now the explicit '>50 sequences' threshold migrated from usage-guide.md into SKILL.md's own intro." }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Inferring shared enzymatic function from a Foldseek structural hit",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Regression of original Input 6 (reasoning-only, no code involved): unchanged by this fix pass, still correctly prevents overclaiming function from structure alone.",
+        "executed": false,
+        "execution_note": "Mode-A scope question, no code required. Re-assessed against SKILL.md's 'structure but no homology' failure-mode text, which this fix pass did not touch.",
+        "basic": 38,
+        "specialized": 51,
+        "total": 89,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Skill's guidance prevents concluding shared enzymatic function from structural similarity alone", "result": "PASS", "note": "Matches the documented Foldseek failure mode verbatim, unchanged." },
+          { "text": "Guidance recommends checking shared catalytic residues/sequence evidence before a functional claim", "result": "PASS", "note": "Matches SKILL.md text, unchanged." },
+          { "text": "Output does not overstate confidence beyond what Foldseek's prob/TM-score actually measures", "result": "PASS", "note": "prob>0.9 tied to structural confidence only, not function." },
+          { "text": "Response stays within stated scope (homology detection) rather than drifting into functional annotation without caveat", "result": "PASS", "note": "Consistent with Related Skills boundary-setting." }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Demand for unqualified certainty, skip e-values/thresholds",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Regression of original Input 7 (P2 fix): SKILL.md's intro now explicitly instructs the agent to keep the statistic rather than dropping it or refusing to answer.",
+        "executed": false,
+        "execution_note": "Reasoning-only assessment against the updated SKILL.md text; no code to run for a hypothetical request to omit statistics.",
+        "basic": 36,
+        "specialized": 53,
+        "total": 89,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Skill explicitly instructs the agent to refuse dropping statistical support when asked to state homology as unqualified fact", "result": "PASS", "note": "New sentence: 'report the match, but keep the statistic ... answer with the actual E-value/score/probability inline ... rather than dropping it or refusing to answer.'" },
+          { "text": "Skill's own worked examples always report E-value/probability alongside any homology claim", "result": "PASS", "note": "Every code pattern's output includes E-value/score/prob, unchanged." },
+          { "text": "Output does not fabricate a homology conclusion beyond what the underlying search tool reports", "result": "PASS", "note": "The skill's design (parsing real tool output) makes fabrication difficult by construction." },
+          { "text": "Skill has an explicit escape-hatch instruction for over-confident/adversarial framing requests", "result": "PASS", "note": "Present as of this fix pass; matches the static-score Escape Hatches criterion now at 4/4." }
+        ]
+      },
+      {
+        "index": 8,
+        "type": "Stress (auditor-added)",
+        "label": "Real Foldseek structure-vs-structure search on an independently-fetched PDB entry",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "New input, not run by the fixer (who verified only the version-check command) or the original auditor (who marked the search pipeline PARTIAL). Exercises SKILL.md's Foldseek easy-search code pattern for real, on data this auditor fetched independently.",
+        "executed": true,
+        "execution_note": "Fetched real PDB structure 1ATP (cAMP-dependent protein kinase, RCSB, unauthenticated public download) fresh; built a foldseek DB with foldseek createdb; ran easy-search with the exact --format-output field list SKILL.md documents. Self-hit: fident=1.000, alnlen=336, E=1.94e-68, bits=2860, prob=1.000, qtmscore=ttmscore=1.000. See run/07_foldseek_real_search.sh and run/output07_foldseek_real_search.txt.",
+        "basic": 38,
+        "specialized": 54,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Foldseek easy-search successfully builds a structure DB and returns a real alignment record", "result": "PASS", "note": "Ran to completion, exit 0, non-empty result.m8." },
+          { "text": "qtmscore/ttmscore reported match SKILL.md's documented TM-score-equivalent interpretation", "result": "PASS", "note": "Self-comparison correctly returns qtmscore=ttmscore=1.000." },
+          { "text": "prob > 0.9 correctly flags a confidently homologous hit, consistent with SKILL.md's stated cutoff", "result": "PASS", "note": "prob=1.000 for a true self-hit." },
+          { "text": "Output format matches the --format-output fields documented in SKILL.md's Foldseek code pattern", "result": "PASS", "note": "query,target,fident,alnlen,evalue,bits,prob,qtmscore,ttmscore all present and correctly ordered." }
+        ]
+      },
+      {
+        "index": 9,
+        "type": "Edge (auditor-added)",
+        "label": "Fixed examples/pfam_annotation.sh against a query with no real Pfam hit",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "New input, not tested by the fixer or the original auditor. Checks whether the P1 fix introduced a regression under set -euo pipefail when hmmscan reports zero domains -- it did not.",
+        "executed": true,
+        "execution_note": "Ran the fixed script against a synthetic low-complexity sequence with no expected Pfam-A/PF00069 hit. Script exits 0, prints an empty (but correctly labeled) domain summary section rather than crashing. See run/08_pfam_annotation_no_hit_edge.sh and run/output08_pfam_no_hit_edge.txt.",
+        "basic": 36,
+        "specialized": 52,
+        "total": 88,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Script does not crash (non-zero exit) when hmmscan finds zero domains", "result": "PASS", "note": "Exit status 0." },
+          { "text": "Script does not fabricate a hit when none exists", "result": "PASS", "note": "raw domtbl and awk output both empty of data lines." },
+          { "text": "set -euo pipefail design does not turn an empty-result awk/sort/head pipeline into a script failure", "result": "PASS", "note": "awk on zero matching lines exits 0; pipeline completes." },
+          { "text": "Output remains correctly labeled (header columns) even with zero data rows", "result": "PASS", "note": "Column header line still printed; no misleading placeholder values shown." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 37.6,
+    "dynamic_weighted": 54.1,
+    "score": 92,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Both P1 defects from the original audit are fixed and independently re-verified by fresh execution, not just re-reading the fix log: the shipped examples/pfam_annotation.sh now reports the real full_evalue/full_score (1.4e-79/253.2) end to end, and the documented Foldseek version-check command now exits 0.",
+    "All four independently executable original inputs (Pfam annotation, MMseqs2 sensitivity, PSI-BLAST PSSM, DIAMOND/jackhmmer) were re-run from scratch in this audit and reproduced the exact same real numbers as the original audit -- no regression anywhere in the fix.",
+    "The redundancy pass genuinely removed duplication (usage-guide.md's Prerequisites/Tips/What-the-Agent-Will-Do sections, ~35 lines) while correctly migrating every fact unique to those sections (twilight-zone range, >50-sequence default, HHsearch/Foldseek-for-AlphaFoldDB note, Foldseek multimer mode) into SKILL.md, verified by diff -- nothing was silently dropped.",
+    "Two new inputs beyond the fixer's own verification -- a real Foldseek structure-vs-structure search on an independently-fetched PDB entry, and a no-hit edge case for the fixed Pfam script -- both passed cleanly, giving positive evidence the fix pass introduced no new defects.",
+    "The new toy fixture (examples/data/PF00069.hmm + P17612.fasta) is byte-identical to the independently-sourced InterPro/UniProt reference files already cached in the audit environment, and examples/pfam_annotation_toy.sh reproduces the true hit end to end from a completely fresh WSL working directory."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "PSI-BLAST-alone and HHsearch-alone workflows still lack standalone example scripts",
+      "observed_in": [],
+      "problem": "Carried over from the original audit, untouched by this fix pass: only Foldseek, iterative-profile-comparison, and Pfam annotation ship as standalone examples/ scripts. PSI-BLAST and HHsearch/HHblits exist only as inline code blocks in SKILL.md.",
+      "root_cause": "This fix pass scoped itself to the audit's P1/P2 findings and did not add new example scripts beyond the Pfam toy fixture.",
+      "fix": "If a future fix pass touches this Skill again, bundle examples/psiblast_pssm.sh and examples/hhsearch_pdb70.sh mirroring the existing script structure, using the same cached Swiss-Prot sample this audit used for PSI-BLAST."
+    },
+    {
+      "priority": "P2",
+      "title": "Fixed pfam_annotation.sh gives no explicit 'no domains found' message on a zero-hit query",
+      "observed_in": [9],
+      "problem": "Auditor-added Input 9 confirms the script does not crash on a query with no real Pfam hit (correct, no regression), but it also prints no explicit message -- just an empty section under 'Per-protein Pfam domain summary'. An agent running this unattended could mistake a silent-empty result for a script failure or an unset query.",
+      "root_cause": "The script was written assuming a query that has at least one domain hit; it has no explicit branch for the zero-hit case.",
+      "fix": "Add an `if [ ! -s query.domtbl ] || ! grep -qv '^#' query.domtbl; then echo 'No Pfam-A domains found above the gathering threshold.'; fi` check after the hmmscan call in both examples/pfam_annotation.sh and examples/pfam_annotation_toy.sh."
+    }
+  ]
+}

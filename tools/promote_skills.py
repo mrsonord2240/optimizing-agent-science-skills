@@ -21,7 +21,7 @@ import sys
 REC = "F:/optimizing-agent-science-skills"
 FORK = "F:/OpenScience/external/mrsonord2240__bioSkills"
 UPSTREAM_COMMIT = "d91ed3d563019e649dc854c56ccd62551359488a"
-FORK_COMMIT = "9007224"
+FORK_COMMIT = "ff10062"
 AUDITS = "F:/OpenScience/audits"
 OUT = "F:/optimized-scientific-skills"
 
@@ -99,6 +99,35 @@ def audited_bytes_differ(source, path):
     return any(l != "+license: MIT" for l in changed)
 
 
+def audit_source_commit(source):
+    """The fork commit an audit record was run against, or None for an upstream-sourced record."""
+    m = re.match(r"^mrsonord2240/bioSkills(?:-Improved)?@([0-9a-f]{7,40}):", source or "")
+    return m.group(1) if m else None
+
+
+def unmerged_records(rep, idx):
+    """Records audited on a fork commit that never landed on the path to FORK_COMMIT.
+
+    Distinct from ordinary staleness (`audited_bytes_differ`, where the fork simply moved on since a
+    passing audit — safe to promote with `reaudit: needed`). Here the record's own commit is not an
+    ancestor of FORK_COMMIT at all: a re-audit that scored a fix worktree, then declined to land it
+    (still failing, or landed by a run that hasn't pushed yet), leaves that better score sitting in
+    the canonical report while the Skill's actual bytes at FORK_COMMIT are whatever they were before
+    — often not deployable. Promoting on that record's `deployable` flag would ship the old, rejected
+    content under the new score. Caught by hand once (bio-geo-data, 2026-09-19); this closes it.
+    """
+    bad = []
+    for sid, r in rep.items():
+        if sid not in idx:
+            continue
+        commit = audit_source_commit(r.get("source") or r.get("meta", {}).get("source"))
+        if commit is None:
+            continue
+        if git(["merge-base", "--is-ancestor", commit, FORK_COMMIT]).returncode != 0:
+            bad.append((sid, commit))
+    return bad
+
+
 def main():
     # Every Skill whose latest audit is deployable with no open P0 is promoted, whatever its score
     # (Sam, 2026-09-17). Skills that have not yet been through a fix pass are promoted too, and are
@@ -107,6 +136,16 @@ def main():
     idx = skill_index()
     rep = audits()
     fixlogs = {f[:-3] for f in os.listdir(os.path.join(REC, "fixes")) if f.endswith(".md")}
+
+    # Records whose own commit never landed on the path to FORK_COMMIT: skip them entirely this run
+    # rather than promoting (or rejecting) on a score that does not describe the published bytes.
+    # Everything else still promotes normally. See unmerged_records()'s docstring.
+    unmerged = dict(unmerged_records(rep, idx))
+    if unmerged:
+        for sid, c in unmerged.items():
+            print(f"skipping  : {sid} (audited at {c[:8]}, not an ancestor of {FORK_COMMIT[:8]} "
+                  "-- that fix has not landed; record does not describe the published bytes)")
+        rep = {sid: r for sid, r in rep.items() if sid not in unmerged}
 
     finished, excluded = [], []
     for sid, r in rep.items():

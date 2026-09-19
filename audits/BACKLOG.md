@@ -8,23 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (73)
-
-### `bio-remote-homology` — examples/pfam_annotation.sh reports the wrong domtblout columns as E-value/score
-
-- Skill: 83, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/database-access/remote-homology) · [viewer](skills/bio-remote-homology/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 1
-- Problem: The awk line `awk '!/^#/ {print $4"\t"$1"\t"$2"\t"$5"\t"$6}' query.domtbl` is labeled 'query_name \| pfam_name \| pfam_acc \| full_evalue \| full_score' but $5 and $6 of hmmscan's --domtblout are query accession and query length, not E-value/score. Running it on a real hit (P17612 vs Pfam PF00069) prints '-' and '351' where the real values are 1.4e-79 and 253.2.
-- Root cause: The example script's column indices were never checked against the actual --domtblout field order (or against SKILL.md's own, correct awk line two sections earlier in the same file, which uses $1,$2,$4,$5,$7,$8,$13).
-- Fix: In examples/pfam_annotation.sh, replace the awk line's field list with $4,$1,$2,$7,$8 (query_name, target_name, target_acc, full_evalue, full_score) to match the domtblout header and SKILL.md's own documented pattern. Add a one-line comment showing the header field numbers directly above the awk call to prevent recurrence.
-
-### `bio-remote-homology` — Foldseek 'Required Setup' verification command fails on every installed version
-
-- Skill: 83, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/database-access/remote-homology) · [viewer](skills/bio-remote-homology/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 3
-- Problem: Both SKILL.md and usage-guide.md instruct running `foldseek --version` to verify the install ("Foldseek 9+"). On the installed 10.941cd33, this errors 'Invalid Command: --version' with exit code 1 -- confirmed independently, not a version-skew artifact, since no Foldseek subcommand exposes a --version/-v flag.
-- Root cause: The verification line was written by analogy to hmmsearch/mmseqs/diamond/hhblits (which do support version flags) without checking Foldseek's actual CLI, which only prints its version in the no-argument banner.
-- Fix: Replace `foldseek --version # Foldseek 9+` in both SKILL.md's 'Required Setup' block and usage-guide.md's 'Prerequisites' block with `foldseek 2>&1 \| grep Version` (or equivalent), which reliably captures the version line from the banner.
+## P1 (71)
 
 ### `bio-geo-data` — SKILL.md's own SuperSeries worked example crashes on default Windows Python
 
@@ -643,22 +627,6 @@ None open.
 - Problem: 330-line SKILL.md loads TCS, MACSE, PhyIN, Gblocks and HMMcleaner detail for every trimming request.
 - Root cause: Monolithic layout.
 - Fix: Keep the decision rules in SKILL.md and move per-tool command blocks to references/.
-
-### `bio-remote-homology` — No escape hatch for a user demanding unqualified certainty over statistical support
-
-- Skill: 83, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/database-access/remote-homology) · [viewer](skills/bio-remote-homology/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 7
-- Problem: When asked to state a homology conclusion 'for sure' and skip E-values/thresholds entirely, the skill has no explicit instruction telling the agent to push back and explain why statistical support is required.
-- Root cause: The Failure Modes and Common Errors sections cover technical misuse (wrong flags, drift, low sensitivity) but not this social framing where the user asks the agent to drop the evidentiary basis of the method.
-- Fix: Add a short 'Reporting requirements' note to SKILL.md stating that any homology conclusion must be reported with its E-value/score/probability, and that a request to omit this should be declined with an explanation of why (twilight-zone claims without a threshold are not defensible).
-
-### `bio-remote-homology` — No shipped toy/test fixture -- every first exercise of the skill requires a production-scale download
-
-- Skill: 83, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/database-access/remote-homology) · [viewer](skills/bio-remote-homology/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: —
-- Problem: examples/ contains only shell scripts, no sample FASTA/HMM/structure file. An agent (or auditor) following the skill from scratch must reach for Pfam-A.hmm (~1.7GB), AlphaFoldDB, or UniRef30/90 (tens of GB) before ever running the pipeline once.
-- Root cause: The skill was authored around production-scale reference databases with no small canonical example bundled.
-- Fix: Bundle a tiny fixture set (one Pfam family HMM, e.g. PF00069, and a handful of FASTA sequences spanning an easy and a twilight-zone case) under examples/data/ so hmmscan, jackhmmer, and MMseqs2/DIAMOND patterns can be smoke-tested without any external download.
 
 ### `bio-clinical-databases-clinvar-lookup` — Batch CA-ID helper aborts on non-400 Registry errors
 
@@ -2531,6 +2499,22 @@ None open.
 - Problem: The Skill documents PCoA thoroughly (R and QIIME2) but never mentions NMDS at all, and RPCA/DEICODE appears only as a one-line CLI reference with no worked R/Python example, despite being listed in the Tool Taxonomy and Decision Tree.
 - Root cause: Progressive disclosure stopped one level short for these two secondary methods.
 - Fix: Add a short NMDS snippet (vegan::metaMDS) alongside the PCoA one, and either a worked RPCA example or an explicit note routing to qiime2-workflow for the full deicode/gemelli command.
+
+### `bio-remote-homology` — PSI-BLAST-alone and HHsearch-alone workflows still lack standalone example scripts
+
+- Skill: 92, Production Ready · [mrsonord2240/bioSkills@1d0172a](https://github.com/mrsonord2240/bioSkills/tree/1d0172afd19ebbb57b51e5a48dca85451a093286/database-access/remote-homology) · [viewer](skills/bio-remote-homology/mrsonord2240-bioSkills@1d0172a/viewer.md)
+- Observed in inputs: —
+- Problem: Carried over from the original audit, untouched by this fix pass: only Foldseek, iterative-profile-comparison, and Pfam annotation ship as standalone examples/ scripts. PSI-BLAST and HHsearch/HHblits exist only as inline code blocks in SKILL.md.
+- Root cause: This fix pass scoped itself to the audit's P1/P2 findings and did not add new example scripts beyond the Pfam toy fixture.
+- Fix: If a future fix pass touches this Skill again, bundle examples/psiblast_pssm.sh and examples/hhsearch_pdb70.sh mirroring the existing script structure, using the same cached Swiss-Prot sample this audit used for PSI-BLAST.
+
+### `bio-remote-homology` — Fixed pfam_annotation.sh gives no explicit 'no domains found' message on a zero-hit query
+
+- Skill: 92, Production Ready · [mrsonord2240/bioSkills@1d0172a](https://github.com/mrsonord2240/bioSkills/tree/1d0172afd19ebbb57b51e5a48dca85451a093286/database-access/remote-homology) · [viewer](skills/bio-remote-homology/mrsonord2240-bioSkills@1d0172a/viewer.md)
+- Observed in inputs: 9
+- Problem: Auditor-added Input 9 confirms the script does not crash on a query with no real Pfam hit (correct, no regression), but it also prints no explicit message -- just an empty section under 'Per-protein Pfam domain summary'. An agent running this unattended could mistake a silent-empty result for a script failure or an unset query.
+- Root cause: The script was written assuming a query that has at least one domain hit; it has no explicit branch for the zero-hit case.
+- Fix: Add an `if [ ! -s query.domtbl ] \|\| ! grep -qv '^#' query.domtbl; then echo 'No Pfam-A domains found above the gathering threshold.'; fi` check after the hmmscan call in both examples/pfam_annotation.sh and examples/pfam_annotation_toy.sh.
 
 ### `bio-workflows-metabolomics-pipeline` — MS-DIAL alternate entry point still has zero glue code
 
