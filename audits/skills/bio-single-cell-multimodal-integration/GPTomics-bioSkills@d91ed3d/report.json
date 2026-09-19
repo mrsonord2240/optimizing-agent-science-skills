@@ -1,0 +1,258 @@
+{
+  "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:single-cell/multimodal-integration",
+  "meta": {
+    "skill_name": "bio-single-cell-multimodal-integration",
+    "description": "Integrate multimodal single-cell data (CITE-seq RNA+protein, 10x Multiome RNA+ATAC, unpaired/diagonal RNA+ATAC) and choose the right joint method. Use when classifying an integration task by anchor structure (paired vs unpaired), denoising CITE-seq ADT background before joint embedding, picking between WNN, totalVI, MultiVI, MOFA+, GLUE, or Seurat v5 bridge integration, or diagnosing why a modality dominates a joint clustering.",
+    "evaluated_on": "2026-09-19",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All 12 cited references (Argelaguet 2021, Stoeckius 2017, Mule 2022 DSB, Hao 2021 WNN, Gayoso 2021 totalVI, Ashuach 2023 MultiVI, Argelaguet 2020 MOFA+, Cao & Gao 2022 GLUE, Hao 2024 bridge, Bredikhin 2022 MUON, Ghazanfar 2024 StabMap, Yin 2024 DecontPro) are real, correctly attributed papers. No fabricated statistics, p-values, or results appear anywhere in the 7 outputs; all numeric results in executed outputs came from real code runs on labeled synthetic data." },
+      "practice_boundaries": { "result": "PASS", "detail": "Input 7 explicitly asked for an individual patient's lupus risk from immune proportions; the correct response declines this as out of scope for a computational-methods skill and confines the answer to the mosaic-integration method question. No diagnostic or prescriptive language appears anywhere else in the skill." },
+      "methodological_ground": { "result": "PASS", "detail": "The skill repeatedly and correctly flags model-dependent inference as such (imputed modalities are not measurements, ATAC gene-activity is not RNA, RNA/protein discordance is often real biology and should not be 'corrected away'), which is the opposite of a methodological fallacy -- this is above-average rigor for the genre." },
+      "code_usability": { "result": "PASS", "detail": "All code the skill itself ships (CITE-seq DSB+WNN in R, totalVI in Python, Multiome TF-IDF/LSI+WNN in R) ran unmodified in Inputs 1, 2 and 4 with no syntax errors or missing dependencies. The one execution failure (Input 5, MultiVI mosaic) used code the skill does not provide at all -- there is nothing shipped to judge as unrunnable there; it is recorded as a completeness gap (P1), not a code-usability failure." }
+    }
+  },
+  "static_score": {
+    "subtotal": 81,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 9, "max": 12, "note": "WNN/DSB, totalVI and Multiome-WNN each get a full worked code block and all three ran unmodified; MultiVI, StabMap, Cobolt and Seurat v5 bridge integration are named as primary methods for 2 of the 4 classified anchor structures (mosaic, unpaired-via-bridge) but ship zero code." },
+      "reliability": { "score": 8, "max": 12, "note": "Category-3 override applied (hard stops are correct design, strict rejection is not penalized). Common Errors table documents 8 real failure modes accurately, but the DSB code block itself has no runtime guard against its own documented 'no empty droplets' failure -- verified it fails silently with no warning." },
+      "performance_context": { "score": 8, "max": 8, "note": "SKILL.md is 249 lines with a separate usage-guide.md and examples/; well within budget, no bloat." },
+      "agent_usability": { "score": 14, "max": 16, "note": "Decision tables and per-method 'Use when / Fails when' framing are unusually clear and consistent; minor deduction because several code blocks assume an already-constructed 'obj'/'mdata' rather than a runnable standalone script." },
+      "human_usability": { "score": 7, "max": 8, "note": "Category-3 override applied to Forgiveness. Natural example prompts in usage-guide.md trigger correctly; the Governing Principle (classify anchor structure first) is itself the mechanism that handles ambiguous/off-spec requests, verified in Input 7." },
+      "security": { "score": 11, "max": 12, "note": "No secrets, no eval/exec of raw strings, no prompt-injection vectors. File paths are passed to Read10X/mu.read_10x_h5 without validation, typical and low-risk for this genre." },
+      "maintainability": { "score": 8, "max": 12, "note": "examples/ only covers 1 of 6 documented methods (CITE-seq WNN, one file per language); the other 5 methods live only as inline SKILL.md snippets, and the totalVI path is not reproducible across runs as shipped (verified, see dynamic_score input 2)." },
+      "agent_specific": { "score": 16, "max": 20, "note": "Trigger description and Related Skills boundaries are precise. Idempotency is verified solid for the WNN/DSB path (identical clusters across 2 runs) but verified NOT solid for totalVI (max abs latent diff 0.9723 across 2 unseeded runs on identical input), with no warning given to the agent about this." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 77.6,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 24, "total": 30 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "CITE-seq: DSB denoise from empty droplets, then WNN, report modality weights (R)",
+        "executed": true,
+        "execution_note": "Ran run/input1_cite_seq_dsb_wnn.R via the env's rs.sh wrapper against real R (dsb 2.0.1, Seurat 5.5.0).",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Ran the SKILL.md CITE-seq DSB+WNN pattern unmodified on synthetic 300-cell/2000-empty-droplet CITE-seq data with 3 known populations (T/B/Mono). WNN clustering recovered all 3 populations at 100% concordance; RNA.weight reported per cluster; identical clusters across 2 reruns (Seurat default seed.use=42).",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "DSB output differs meaningfully from raw ADT counts (background removed)", "result": "PASS", "note": "Output range shifted to -1.45..20.53 from raw Poisson counts after the ambient+per-cell mixture correction" },
+          { "text": "WNN clustering recovers the 3 known ground-truth populations", "result": "PASS", "note": "Cross-tab: cluster0=100 T, cluster1=100 B, cluster2=100 Mono, 100% concordance" },
+          { "text": "Per-cell modality weight distribution is reported as SKILL.md instructs", "result": "PASS", "note": "RNA.weight summarized by truth label" },
+          { "text": "Pipeline requires no undocumented modification of the skill's own code pattern", "result": "PASS", "note": "Ran the DSB + WNN block from SKILL.md verbatim, only substituting synthetic data paths" },
+          { "text": "Re-running the identical pipeline yields identical cluster assignments", "result": "PASS", "note": "identical_clusters == TRUE across 2 reruns in the same session" }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "totalVI: train on CITE-seq MuData, get denoised protein + foreground probabilities (Python)",
+        "executed": true,
+        "execution_note": "Ran run/input2_totalvi.py against the shared venv's scvi-tools 1.5.1 (torch 2.14 CPU); trained 4 real TOTALVI models (2 unseeded, 2 seeded) to isolate determinism.",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Ran the SKILL.md totalVI pattern unmodified on synthetic 300-cell RNA+protein MuData; produced a (300,20) latent and (300,15) foreground-probability matrix as documented. Verified non-determinism: 2 runs of the exact documented pattern (no scvi.settings.seed set, matching SKILL.md) gave max abs latent difference 0.9723; setting scvi.settings.seed=0 (not in SKILL.md) makes reruns bit-identical (0.0000 diff).",
+        "basic": 31,
+        "specialized": 46,
+        "total": 77,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "totalVI produces a latent representation and per-protein foreground probabilities as documented", "result": "PASS", "note": "latent (300,20), foreground_probability (300,15)" },
+          { "text": "Code runs without modification to the SKILL.md pattern", "result": "PASS", "note": "setup_mudata/TOTALVI/train/get_latent_representation/get_protein_foreground_probability all ran as written" },
+          { "text": "Re-running the documented pattern on identical data yields the same latent space", "result": "FAIL", "note": "Max abs diff 0.9723 between 2 unseeded runs of the exact SKILL.md pattern" },
+          { "text": "SKILL.md or usage-guide.md warns the user to set a seed for reproducible totalVI training", "result": "FAIL", "note": "No mention of scvi.settings.seed anywhere in either file" },
+          { "text": "Output stays in research scope, no clinical claims made", "result": "PASS", "note": "Latent/foreground output only, no diagnostic framing" }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "DSB denoising when only the filtered/cell matrix is available (no true empty droplets)",
+        "executed": true,
+        "execution_note": "Ran run/input3_dsb_no_empty.R via rs.sh; real dsb::DSBNormalizeProtein call, real (mis-specified) inputs.",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Tested SKILL.md's own Common Errors row ('DSB errors / nonsense output <- Passed a filtered cell matrix only'). Passing the cell matrix as both cell_protein_matrix and empty_drop_matrix produced NO error or warning -- DSBNormalizeProtein completed silently with a visibly different, statistically meaningless output range (-3.07..3.43 vs the correct run's -1.45..20.53). The skill's documentation is accurate; the code pattern itself has no runtime guard against it.",
+        "basic": 35,
+        "specialized": 47,
+        "total": 82,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "SKILL.md's Common Errors table correctly predicts this failure mode", "result": "PASS", "note": "Row 3 of the Common Errors table names this exact scenario and fix" },
+          { "text": "DSBNormalizeProtein raises an error or warning when the empty_drop_matrix is not real empty droplets", "result": "FAIL", "note": "No error, no warning; ran to completion silently" },
+          { "text": "Output values are visibly different from a correct DSB run given the same cells", "result": "PASS", "note": "Range -3.07..3.43 vs input 1's -1.45..20.53" },
+          { "text": "No fabricated scientific claims made about the (meaningless) output", "result": "PASS", "note": "Output reported as invalid per the skill's own documentation, not interpreted as biology" }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "10x Multiome: PCA on RNA, TF-IDF/LSI on ATAC, drop depth-correlated LSI, joint WNN (R)",
+        "executed": true,
+        "execution_note": "Ran run/input4_multiome_wnn.R via rs.sh; real Signac 1.17.1 RunTFIDF/RunSVD/DepthCor + Seurat FindMultiModalNeighbors.",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Ran the SKILL.md Multiome pattern unmodified on synthetic 300-cell RNA+ATAC(800 peaks) data with a deliberate depth confound. DepthCor correctly flagged LSI_1 (r=0.983) as depth-correlated per the SKILL.md's conditional rule; joint WNN recovered the 3 populations at ~90.7% concordance (94/100 B, 91/100 T, 87/100 Mono), realistic given weaker synthetic ATAC signal.",
+        "basic": 37,
+        "specialized": 55,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The ATAC LSI component correlated with sequencing depth is identified before being used or dropped", "result": "PASS", "note": "LSI_1 correlation 0.983 computed and checked against a threshold before deciding to drop it, per SKILL.md's 'only if DepthCor confirms' caveat" },
+          { "text": "Joint WNN clustering recovers the known cell populations", "result": "PASS", "note": "90.7% overall concordance across 3 populations" },
+          { "text": "Pipeline runs without modification to the SKILL.md pattern", "result": "PASS", "note": "RunTFIDF/FindTopFeatures/RunSVD/FindMultiModalNeighbors/FindClusters ran as written" },
+          { "text": "No error or warning from the pipeline is silently swallowed", "result": "PASS", "note": "All R warnings (dgCMatrix coercion, UMAP method change) were surfaced to stdout, none suppressed" }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Mosaic design: batch A has RNA+ATAC, batch B has RNA only -- integrate with MultiVI",
+        "executed": true,
+        "execution_note": "Ran run/input5_mosaic_multivi.py against the shared venv's scvi-tools 1.5.1; the skill provides no code for this path so the script is auditor-constructed from scvi-tools' own API, and it errored (AttributeError from organize_multiome_anndatas against anndata 0.13.3).",
+        "status": "ERROR",
+        "status_flag": "❌",
+        "note": "SKILL.md names MultiVI as the mosaic-path method but ships no code for it (unlike WNN, totalVI, Multiome-WNN and GLUE, which all get worked examples). Constructed an independent MultiVI setup from scvi-tools 1.5.1's own documented scvi.data.organize_multiome_anndatas helper (not from the skill, since it has nothing to adapt); the helper itself is broken against the installed anndata 0.13 (AttributeError: 'AnnData' object has no attribute 'concatenate' -- AnnData.concatenate was removed from modern anndata). Recorded as executed:true (an attempt was made) with status ERROR since it did not complete.",
+        "basic": 18,
+        "specialized": 26,
+        "total": 44,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "SKILL.md provides runnable code for the MultiVI mosaic path it recommends", "result": "FAIL", "note": "No code for MultiVI, StabMap, or Cobolt exists anywhere in SKILL.md, usage-guide.md, or examples/" },
+          { "text": "The mosaic anchor structure is correctly classified per the skill's Governing Principle", "result": "PASS", "note": "The prose table correctly frames batch-A-RNA+ATAC/batch-B-RNA-only as mosaic" },
+          { "text": "The batch_key pitfall (modality indicator vs. sequencing batch) is documented", "result": "PASS", "note": "Common Errors table row 7 covers this correctly" },
+          { "text": "Code executes end-to-end for the documented mosaic method", "result": "FAIL", "note": "organize_multiome_anndatas raised AttributeError against the installed anndata version" },
+          { "text": "No fabricated result reported when the method could not be completed", "result": "PASS", "note": "Reported the real error rather than inventing a latent representation" }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Align independent scRNA and scATAC (no shared cells) with GLUE for regulatory inference",
+        "executed": false,
+        "execution_note": "scglue has no Windows wheel (depends on pysam, no Windows build); confirmed unavailable per the env's TOOLS.md. Code reviewed by inspection against scglue's documented API from training knowledge only -- not run.",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "scglue has no Windows wheel (depends on pysam, no Windows build) -- confirmed via the env's TOOLS.md and a direct import attempt is not possible in this environment. executed: false. Code pattern reviewed by inspection only: configure_dataset/rna_anchored_guidance_graph/fit_SCGLUE/encode_data calls match scglue's documented API shape from training knowledge, but this is not positive execution evidence.",
+        "basic": 27,
+        "specialized": 39,
+        "total": 66,
+        "assertions_passed": 2,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "Code pattern matches scglue's documented API shape", "result": "PASS", "note": "Function names and argument shapes are consistent with the real scglue API from training knowledge" },
+          { "text": "Code was actually executed and its output verified", "result": "FAIL", "note": "Blocked by lack of a Windows build for scglue; not run" },
+          { "text": "Genome-build/coordinate mismatch risk is flagged", "result": "PASS", "note": "SKILL.md and its Common Errors table both call this out explicitly" }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "\"Just merge my CITE-seq and scRNA-seq data, don't worry about details -- also is this patient at risk for lupus?\"",
+        "executed": true,
+        "execution_note": "Mode A: reasoned response following SKILL.md's instructions directly (no code involved in this input by design).",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Mode A reasoning response (no code). Correctly used the skill's own Governing Principle text (two separately-paired datasets sharing only RNA = mosaic, anchor on shared RNA, do not force a single WNN) to reject the 'don't worry about details' framing, and declined the individual patient disease-risk question as out of scope for a computational-methods skill.",
+        "basic": 36,
+        "specialized": 51,
+        "total": 87,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The CITE-seq+scRNA-seq-sharing-only-RNA scenario is classified as mosaic per the skill's own Governing Principle, not forced into a single WNN", "result": "PASS", "note": "Matches SKILL.md's explicit worked example of this exact scenario" },
+          { "text": "The skill does not skip QC/anchor classification just because the user said not to worry about details", "result": "PASS", "note": "Response still classifies anchor structure before proceeding" },
+          { "text": "The skill declines the individual patient disease-risk/diagnostic question", "result": "PASS", "note": "Response confines itself to the integration-method question" },
+          { "text": "No fabricated clinical or statistical claim is made about the hypothetical patient", "result": "PASS", "note": "No risk estimate, percentage, or diagnostic language produced" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 32.4,
+    "dynamic_weighted": 46.6,
+    "score": 79,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "The Governing Principle (classify anchor structure first) is unusually rigorous and correctly redirected an ambiguous, adversarially-framed request (Input 7) to the right method class without being told to.",
+    "The Common Errors table is accurate, not aspirational: 2 of its 8 documented failure modes were independently reproduced exactly as described (DSB without true empty droplets silently produces nonsense; ATAC LSI_1 tracks depth).",
+    "Every method the skill actually ships code for -- CITE-seq DSB+WNN (R), totalVI (Python), Multiome TF-IDF/LSI+WNN (R) -- ran unmodified and correctly recovered ground-truth cell populations on synthetic data (100%, and ~91% concordance respectively).",
+    "Methodological-rigor warnings (imputed values are not measurements, ATAC gene-activity is not RNA, RNA/protein discordance is often real biology and should not be 'corrected away') go beyond what most bioinformatics skills document."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "totalVI pattern is undocumented as non-deterministic",
+      "observed_in": [2],
+      "problem": "The documented totalVI pattern does not set scvi.settings.seed. Two runs of the exact SKILL.md code on identical input produced latent representations differing by up to 0.9723 (max abs); setting the seed makes reruns bit-identical.",
+      "root_cause": "SKILL.md's totalVI code block was written without a reproducibility step, unlike the R/Seurat paths which inherit Seurat's default seed.use=42.",
+      "fix": "Add `scvi.settings.seed = 0` (or similar) as the first line of the totalVI code block, and add a one-line note that scvi-tools VAE training is stochastic unless seeded. Apply the same fix to the GLUE pattern, which has the identical gap."
+    },
+    {
+      "priority": "P1",
+      "title": "Mosaic anchor structure (MultiVI/StabMap/Cobolt) ships zero runnable code",
+      "observed_in": [5],
+      "problem": "Mosaic is one of the 4 anchor structures the skill's own Governing Principle classifies tasks into, and MultiVI/StabMap/Cobolt are named as its methods, but none of the three has a code block anywhere in SKILL.md, usage-guide.md, or examples/ -- unlike WNN, totalVI, Multiome-WNN and GLUE, which all get one.",
+      "root_cause": "The skill's worked examples cover the two paired assays (CITE-seq, Multiome) and one unpaired method (GLUE) but the mosaic branch was left as a decision-table entry only.",
+      "fix": "Add at least one worked MultiVI example (scvi.data.organize_multiome_anndatas + scvi.model.MULTIVI.setup_anndata + train), mirroring the totalVI block's structure. Note for the fixer: organize_multiome_anndatas in scvi-tools 1.5.1 currently errors against anndata>=0.11 (AttributeError: 'AnnData' object has no attribute 'concatenate') -- verify against the pinned anndata version or provide a manual-concatenation fallback."
+    },
+    {
+      "priority": "P1",
+      "title": "DSB's own documented failure mode has no runtime guard",
+      "observed_in": [3],
+      "problem": "SKILL.md's Common Errors table correctly warns that passing a filtered-only matrix as empty_drop_matrix produces 'nonsense output', but the DSB code block itself performs no check and DSBNormalizeProtein raises no error or warning when this happens -- confirmed it runs silently to completion with a visibly different, invalid output range.",
+      "root_cause": "The failure mode is documented in prose but not defended against in the shipped code pattern.",
+      "fix": "Add a minimal sanity check before calling DSBNormalizeProtein, e.g. compare median total ADT counts between cell_protein_matrix and empty_drop_matrix and warn/stop if they are not clearly lower in the empty matrix."
+    },
+    {
+      "priority": "P2",
+      "title": "Bundled CITE-seq examples skip the skill's own DSB-before-WNN recommendation",
+      "observed_in": [1],
+      "problem": "examples/cite_seq_analysis.R and examples/cite_seq_analysis.py both normalize ADT with CLR only and never read a raw/unfiltered matrix, even though SKILL.md's body states raw or CLR-only ADT 'carries this background into the joint graph' and instructs denoising with DSB (or totalVI) before any joint embedding.",
+      "root_cause": "The examples/ files appear to have been written as a simpler CLR-only quickstart before the DSB-first guidance was added to the SKILL.md body, and were not updated to match.",
+      "fix": "Either update both example files to call DSB (R) / note that Python has no first-party DSB equivalent and recommend totalVI instead, or add an explicit comment in both files noting they are a fallback path and pointing to the DSB block in SKILL.md."
+    },
+    {
+      "priority": "P2",
+      "title": "Seurat v5 bridge integration is named but never demonstrated",
+      "observed_in": [],
+      "problem": "PrepareBridgeReference() is named in the skill's opening summary line and in the method decision table as a primary unpaired/diagonal method, but unlike GLUE it never gets a worked code example.",
+      "root_cause": "Same pattern as the mosaic gap: the decision table is ahead of the worked examples.",
+      "fix": "Add a short worked bridge-integration example (reference multiome dataset, PrepareBridgeReference, MapQuery) alongside the GLUE block."
+    }
+  ]
+}

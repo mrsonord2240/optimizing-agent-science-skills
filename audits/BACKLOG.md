@@ -8,7 +8,31 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (76)
+## P1 (79)
+
+### `bio-single-cell-multimodal-integration` — totalVI pattern is undocumented as non-deterministic
+
+- Skill: 79, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/multimodal-integration) · [viewer](skills/bio-single-cell-multimodal-integration/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 2
+- Problem: The documented totalVI pattern does not set scvi.settings.seed. Two runs of the exact SKILL.md code on identical input produced latent representations differing by up to 0.9723 (max abs); setting the seed makes reruns bit-identical.
+- Root cause: SKILL.md's totalVI code block was written without a reproducibility step, unlike the R/Seurat paths which inherit Seurat's default seed.use=42.
+- Fix: Add `scvi.settings.seed = 0` (or similar) as the first line of the totalVI code block, and add a one-line note that scvi-tools VAE training is stochastic unless seeded. Apply the same fix to the GLUE pattern, which has the identical gap.
+
+### `bio-single-cell-multimodal-integration` — Mosaic anchor structure (MultiVI/StabMap/Cobolt) ships zero runnable code
+
+- Skill: 79, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/multimodal-integration) · [viewer](skills/bio-single-cell-multimodal-integration/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 5
+- Problem: Mosaic is one of the 4 anchor structures the skill's own Governing Principle classifies tasks into, and MultiVI/StabMap/Cobolt are named as its methods, but none of the three has a code block anywhere in SKILL.md, usage-guide.md, or examples/ -- unlike WNN, totalVI, Multiome-WNN and GLUE, which all get one.
+- Root cause: The skill's worked examples cover the two paired assays (CITE-seq, Multiome) and one unpaired method (GLUE) but the mosaic branch was left as a decision-table entry only.
+- Fix: Add at least one worked MultiVI example (scvi.data.organize_multiome_anndatas + scvi.model.MULTIVI.setup_anndata + train), mirroring the totalVI block's structure. Note for the fixer: organize_multiome_anndatas in scvi-tools 1.5.1 currently errors against anndata>=0.11 (AttributeError: 'AnnData' object has no attribute 'concatenate') -- verify against the pinned anndata version or provide a manual-concatenation fallback.
+
+### `bio-single-cell-multimodal-integration` — DSB's own documented failure mode has no runtime guard
+
+- Skill: 79, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/multimodal-integration) · [viewer](skills/bio-single-cell-multimodal-integration/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 3
+- Problem: SKILL.md's Common Errors table correctly warns that passing a filtered-only matrix as empty_drop_matrix produces 'nonsense output', but the DSB code block itself performs no check and DSBNormalizeProtein raises no error or warning when this happens -- confirmed it runs silently to completion with a visibly different, invalid output range.
+- Root cause: The failure mode is documented in prose but not defended against in the shipped code pattern.
+- Fix: Add a minimal sanity check before calling DSBNormalizeProtein, e.g. compare median total ADT counts between cell_protein_matrix and empty_drop_matrix and warn/stop if they are not clearly lower in the empty matrix.
 
 ### `bio-shape-similarity` — shape_search_ensemble silently drops a whole molecule on one failed conformer
 
@@ -618,7 +642,23 @@ None open.
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (291)
+## P2 (293)
+
+### `bio-single-cell-multimodal-integration` — Bundled CITE-seq examples skip the skill's own DSB-before-WNN recommendation
+
+- Skill: 79, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/multimodal-integration) · [viewer](skills/bio-single-cell-multimodal-integration/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 1
+- Problem: examples/cite_seq_analysis.R and examples/cite_seq_analysis.py both normalize ADT with CLR only and never read a raw/unfiltered matrix, even though SKILL.md's body states raw or CLR-only ADT 'carries this background into the joint graph' and instructs denoising with DSB (or totalVI) before any joint embedding.
+- Root cause: The examples/ files appear to have been written as a simpler CLR-only quickstart before the DSB-first guidance was added to the SKILL.md body, and were not updated to match.
+- Fix: Either update both example files to call DSB (R) / note that Python has no first-party DSB equivalent and recommend totalVI instead, or add an explicit comment in both files noting they are a fallback path and pointing to the DSB block in SKILL.md.
+
+### `bio-single-cell-multimodal-integration` — Seurat v5 bridge integration is named but never demonstrated
+
+- Skill: 79, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/multimodal-integration) · [viewer](skills/bio-single-cell-multimodal-integration/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: —
+- Problem: PrepareBridgeReference() is named in the skill's opening summary line and in the method decision table as a primary unpaired/diagonal method, but unlike GLUE it never gets a worked code example.
+- Root cause: Same pattern as the mosaic gap: the decision table is ahead of the worked examples.
+- Fix: Add a short worked bridge-integration example (reference multiome dataset, PrepareBridgeReference, MapQuery) alongside the GLUE block.
 
 ### `bio-shape-similarity` — ESPSim is named as a supported method but has no code example
 
