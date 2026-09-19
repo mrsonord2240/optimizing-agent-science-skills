@@ -8,7 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (80)
+## P1 (77)
 
 ### `bio-single-cell-multimodal-integration` — totalVI pattern is undocumented as non-deterministic
 
@@ -289,30 +289,6 @@ None open.
 - Problem: examples/phewas_drug_target_mr.R runs lapply(outcomes_filt$id[1:200], scan_one_outcome) as its literal example code, while SKILL.md's prose a few lines below calls this same [1:200] pattern 'a debug shortcut, not a defensible pheWAS protocol.'
 - Root cause: The cautionary note was added to SKILL.md's prose without updating the actual shipped example it refers to.
 - Fix: Remove the [1:200] slice from examples/phewas_drug_target_mr.R (loop over the full outcomes_filt$id) or replace it with a clearly-marked, commented-out debug line so the copy-pasteable example matches the documented best practice.
-
-### `bio-covalent-design` — Shipped warhead catalog omits 2 of 14 SKILL.md-documented classes
-
-- Skill: 88, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/covalent-design) · [viewer](skills/bio-covalent-design/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 5
-- Problem: examples/warhead_classifier.py's WARHEAD_SMARTS dict has no entry for alpha-haloketone or alpha,beta-unsaturated ketone, both explicitly named in SKILL.md's own Warhead Chemistry table (alpha-haloketone rated 'Very high' reactivity, Cys-selective). Verified: phenacyl chloride and a chalcone-type Michael acceptor both return classify_warheads()=={}, a silent false negative.
-- Root cause: The example script's catalog was not kept in sync with SKILL.md's taxonomy table.
-- Fix: Add 'alpha_haloketone': '[CX3](=O)C[F,Cl,Br]' and an alpha,beta-unsaturated-ketone SMARTS (scoped to exclude the amide/acrylamide case) to WARHEAD_SMARTS/REACTIVITY_TIER/RESIDUE_SELECTIVITY, and add a regression test asserting every row of SKILL.md's table has a matching catalog key.
-
-### `bio-covalent-design` — Overlapping SMARTS matches on the same compound are not flagged as ambiguous
-
-- Skill: 88, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/covalent-design) · [viewer](skills/bio-covalent-design/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 2, 5
-- Problem: acrylamide, alpha_substituted_acrylamide, and methacrylamide SMARTS all fire simultaneously on the same substituted-acrylamide substructure (verified on 3 compounds). classify_warheads() correctly returns all three keys, but nothing documents that a 'take one tier' consumption pattern will silently pick the least-specific (here, incorrectly 'moderate' rather than 'context_dependent'/'low') tier.
-- Root cause: The three SMARTS patterns are not mutually exclusive by construction, and this overlap is undocumented.
-- Fix: Add a short note in both warhead_classifier.py and SKILL.md's Warhead Chemistry section: these three keys can co-match; use the most specific matched key for tier assignment, never a fixed lookup order.
-
-### `bio-covalent-design` — No explicit escape hatch for individual-patient / clinical-decision misuse
-
-- Skill: 88, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/covalent-design) · [viewer](skills/bio-covalent-design/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 7
-- Problem: SKILL.md and usage-guide.md give no explicit out-of-scope statement for patient-specific diagnostic or treatment-efficacy requests. Input 7 was correctly declined, but only via general model safety training, not any instruction in the Skill itself.
-- Root cause: The Skill was written purely for lead-optimization/medicinal-chemistry design use and never addresses a clinical-misuse vector.
-- Fix: Add a short Scope/Escape-Hatches note: this Skill supports lead-optimization and covalent-SAR research design; it does not diagnose disease, predict individual patient outcomes, or substitute for oncology clinical judgment, and kinact/Ki or reactivity data must not be used for individual treatment decisions.
 
 ### `bio-crispr-screens-bagel-essentiality` — Reference-set failure modes are documented but not defended by any runtime guard
 
@@ -1412,22 +1388,6 @@ None open.
 - Root cause: Examples are written as illustrative code patterns rather than self-contained, runnable smoke tests.
 - Fix: Bundle a small synthetic dataset (as this audit built) alongside each example so an agent can run it directly to verify the pattern before substituting real data.
 
-### `bio-covalent-design` — Covalent docking section is documentation-only, no runnable local workflow
-
-- Skill: 88, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/covalent-design) · [viewer](skills/bio-covalent-design/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 6
-- Problem: All 7 listed covalent-docking tools (DOCKovalent, GOLD, AD4 covalent, CovDock, MOE, HCovDock, ICM-Pro) are commercial, web-service-only, or unimplemented; the one code example (add_acrylamide) is a deliberate NotImplementedError stub.
-- Root cause: No open-source, Windows-runnable covalent-docking backend exists to ship (independently confirmed in this environment's TOOLS.md: DOCKovalent/HCovDock are web services with no downloadable build).
-- Fix: This gap is honestly disclosed rather than overclaimed, so treat as low priority; optionally point to AutoDock Vina's manual covalent-restraint workaround (already installed in this env) as a partial local fallback.
-
-### `bio-covalent-design` — usage-guide.md duplicates several SKILL.md caveats verbatim
-
-- Skill: 88, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/covalent-design) · [viewer](skills/bio-covalent-design/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: —
-- Problem: The GSH half-life caveat and the alpha-substitution/LUMO caveat appear near-verbatim in both SKILL.md and usage-guide.md's Tips section, adding token cost without new information.
-- Root cause: The two files were likely drafted independently rather than one deferring to the other.
-- Fix: Trim usage-guide.md's Tips to a one-line cross-reference to SKILL.md's Intrinsic Reactivity Assays / Reactivity Surrogates sections instead of restating the caveats.
-
 ### `bio-crispr-screens-bagel-essentiality` — No explicit practice-boundary disclaimer despite repeated 'clinical-grade' language
 
 - Skill: 88, Production Ready · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/crispr-screens/bagel-essentiality) · [viewer](skills/bio-crispr-screens-bagel-essentiality/mrsonord2240-bioSkills@6847328/viewer.md)
@@ -2115,6 +2075,22 @@ None open.
 - Problem: Unchanged from the pre-fix audit: a genuine >=12-atom carbocycle test still shows default ETKDGv3 settings succeeding equally (50/50) alongside useMacrocycleTorsions=True, so the documented under-sampling claim remains undemonstrated by any example in the Skill.
 - Root cause: This P2 was explicitly scoped out of the current fix dispatch (fix log: 'not in this dispatch's scope... left for a future pass').
 - Fix: Add a concrete before/after example (e.g. cyclosporine A, already named in usage-guide.md but never coded) showing embedding failure or degraded diversity under default settings versus success under useMacrocycleTorsions=True.
+
+### `bio-covalent-design` — Covalent docking section remains documentation-only, no runnable local workflow
+
+- Skill: 90, Production Ready · [mrsonord2240/bioSkills@f768d37](https://github.com/mrsonord2240/bioSkills/tree/f768d37b1d60ce4995d6aa5ce935b3f4b50cc154/chemoinformatics/covalent-design) · [viewer](skills/bio-covalent-design/mrsonord2240-bioSkills@f768d37/viewer.md)
+- Observed in inputs: 6
+- Problem: All 7 listed covalent-docking tools (DOCKovalent, GOLD, AD4 covalent, CovDock, MOE, HCovDock, ICM-Pro) remain commercial, web-service-only, or unimplemented; the one code example (add_acrylamide) is a deliberate NotImplementedError stub.
+- Root cause: No open-source, Windows-runnable covalent-docking backend exists to ship (independently confirmed in this environment's TOOLS.md).
+- Fix: Left unfixed by design per the fixer's own log and the pre-fix audit's own recommendation; this re-audit concurs the disclosure is honest, not overclaimed. Does not block landing.
+
+### `bio-covalent-design` — Iodoacetamide, named in SKILL.md's own Decision Tree table, is not in the warhead catalog
+
+- Skill: 90, Production Ready · [mrsonord2240/bioSkills@f768d37](https://github.com/mrsonord2240/bioSkills/tree/f768d37b1d60ce4995d6aa5ce935b3f4b50cc154/chemoinformatics/covalent-design) · [viewer](skills/bio-covalent-design/mrsonord2240-bioSkills@f768d37/viewer.md)
+- Observed in inputs: 9
+- Problem: SKILL.md's 'Decision Tree by Scenario' table names 'Iodoacetamide / chloroacetamide' as the ABPP warhead class, but classify_warheads() returns {} for an iodoacetamide-class SMILES -- a silent false negative for a Skill-documented class, narrower in scope than the pre-fix P1 (this is one named example in a secondary table, not the primary Warhead Chemistry table) but the same failure mode.
+- Root cause: WARHEAD_SMARTS only catalogues Cl/Br leaving groups for the haloacetamide family ([CH2][Cl], [CH2][Br]); no iodo variant exists despite the pattern being trivially extensible.
+- Fix: Add an 'iodoacetamide' key ([CX3](=[OX1])([NX3])[CH2][I]) or generalize the existing patterns to [F,Cl,Br,I], and extend the regression assertion to cover Decision-Tree-named classes, not only the main Warhead Chemistry table rows.
 
 ### `bio-crispr-screens-drugz-chemogenomic` — Escape Hatches for a crashed run or low replicate concordance remain thin
 
