@@ -8,7 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (79)
+## P1 (82)
 
 ### `bio-single-cell-multimodal-integration` — totalVI pattern is undocumented as non-deterministic
 
@@ -241,6 +241,30 @@ None open.
 - Problem: A re-auditor-constructed null-case split (stratified random, no true biological difference, different seed than the fixer's) still produced a 27.6% gained/lost fraction of the robust-pair union from sampling noise and halved per-condition cell counts alone. SKILL.md gives no guidance that a comparable fraction of any real two-condition comparison's gained/lost pairs may be noise, and recommends no stability check.
 - Root cause: The new section was validated by confirming it runs and produces plausible counts, not by checking its behavior under a known-null comparison.
 - Fix: Add a caveat recommending a repeat-split or bootstrap stability check (e.g., re-run the split N times and report each pair's gained/lost frequency) before treating a single split's gained/lost set as a finding, mirroring the rigor of the existing Resource-Sensitivity Check.
+
+### `bio-single-cell-cnv-inference` — inferCNV malignant-calling code reads a file inferCNV 1.20+ doesn't write
+
+- Skill: 87, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/cnv-inference) · [viewer](skills/bio-single-cell-cnv-inference/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 1
+- Problem: Both SKILL.md and the shipped examples/infercnv_malignant_calling.R call read.table('infercnv_out/infercnv.observations.txt', ...) immediately after an HMM=TRUE run, but that plain-text file is not written under inferCNV 1.22.0's default HMM/subclusters mode -- confirmed by real execution and by listing the output directory.
+- Root cause: The documented code pattern assumes an older inferCNV output-file convention that changed when HMM subclusters became the effective default analysis mode.
+- Fix: Replace the read.table() call with readRDS('infercnv_out/run.final.infercnv_obj') and extract obj@expr.data, subset to observation cells via obj@observation_grouped_cell_indices -- verified working in this audit.
+
+### `bio-single-cell-cnv-inference` — Numbat df_allele column list is incomplete
+
+- Skill: 87, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/cnv-inference) · [viewer](skills/bio-single-cell-cnv-inference/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 4
+- Problem: SKILL.md documents df_allele as having 'columns include cell, snp_id, CHROM, POS, AD, DP, GT', but numbat 1.5.2's check_allele_df() hard-requires cM, REF, and ALT as well; a df_allele built to the documented spec is immediately rejected before any computation runs.
+- Root cause: Documentation likely written against pileup_and_phase.R's output description rather than enumerating exactly what run_numbat() itself validates.
+- Fix: List all required df_allele columns explicitly (cell, snp_id, CHROM, POS, cM, REF, ALT, AD, DP, GT) and note that cM comes from the genetic-map file passed to pileup_and_phase.R.
+
+### `bio-single-cell-cnv-inference` — SCEVAN has zero example code despite being recommended
+
+- Skill: 87, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/cnv-inference) · [viewer](skills/bio-single-cell-cnv-inference/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: —
+- Problem: The method-choice table recommends SCEVAN ('Want automatic malignant/non-malignant + subclones in one call'), but no code block, parameter-table entry, or example file covers it anywhere in SKILL.md, usage-guide.md, or examples/ -- unlike the other 3 methods.
+- Root cause: A SCEVAN code section appears to have been omitted when the skill was authored.
+- Fix: Add a SCEVAN code block (pipelineCNA(count_mtx, sample=..., par_cores=..., SUBCLONES=TRUE, ...), verified against the real installed API in this audit) matching the depth given to inferCNV/copyKAT/Numbat.
 
 ### `bio-workflows-proteomics-pipeline` — The fixed treat() fold-change floor silently zeroes the intermediate level of a dose series
 
@@ -642,7 +666,7 @@ None open.
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (290)
+## P2 (293)
 
 ### `bio-single-cell-multimodal-integration` — Bundled CITE-seq examples skip the skill's own DSB-before-WNN recommendation
 
@@ -1291,6 +1315,30 @@ None open.
 - Problem: Both files list an identical 8-line Related Skills block. The fix's mandatory redundancy pass removed the Prerequisites duplication and two fully-duplicative sections but did not catch this one.
 - Root cause: The redundancy pass diffed the two flagged sections, not the full file.
 - Fix: Keep the list in SKILL.md only (the agent-loaded file) and replace usage-guide.md's copy with a one-line pointer: 'See SKILL.md Related Skills.'
+
+### `bio-single-cell-cnv-inference` — Parameter reference table omits small-panel / allele-table parameters this audit found load-bearing
+
+- Skill: 87, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/cnv-inference) · [viewer](skills/bio-single-cell-cnv-inference/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 2, 4
+- Problem: copyKAT's min.gene.per.cell and Numbat's cM/REF/ALT requirement aren't in the 'Threshold and parameter reference' table, leaving no guidance for a user tuning smaller/custom gene panels or building a df_allele by hand.
+- Root cause: The table only covers parameters shown in the main code blocks.
+- Fix: Extend the parameter table with these fields, or add a short note on minimum panel-size / required-column assumptions.
+
+### `bio-single-cell-cnv-inference` — No explicit clinical-practice-boundary disclaimer
+
+- Skill: 87, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/cnv-inference) · [viewer](skills/bio-single-cell-cnv-inference/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 7
+- Problem: Nothing in SKILL.md explicitly instructs the agent to avoid staging/treatment conclusions from CNV calls; the safe refusal observed in testing relied on general judgment plus the skill's hypothesis-language framing, not an explicit instruction.
+- Root cause: The skill focuses on technical correctness rather than practice-boundary framing, despite touching cancer/tumor calls.
+- Fix: Add a short 'not for diagnosis or treatment' note near the Governing Principle, alongside the existing hypothesis-language cautions.
+
+### `bio-single-cell-cnv-inference` — No mention of patient-privacy handling for real tumor samples
+
+- Skill: 87, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/cnv-inference) · [viewer](skills/bio-single-cell-cnv-inference/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: —
+- Problem: Real tumor scRNA-seq is patient-derived clinical data; the skill gives no guidance on de-identification or data handling.
+- Root cause: Out of the skill's stated technical scope, but adjacent given the clinical origin of typical input data.
+- Fix: Add a one-line pointer to organizational data-handling policy, consistent with peer clinical-adjacent skills.
 
 ### `bio-sra-data` — Guard's error message hardcodes 'fastq_ftp not found' regardless of which column is actually missing
 
