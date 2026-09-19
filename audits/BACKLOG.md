@@ -8,7 +8,31 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (69)
+## P1 (72)
+
+### `bio-microbiome-functional-prediction` — Mandatory NSTI snippet's hardcoded filename does not exist in real PICRUSt2 output
+
+- Skill: 80, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/microbiome/functional-prediction) · [viewer](skills/bio-microbiome-functional-prediction/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 1, 4
+- Problem: SKILL.md's 'Report NSTI (mandatory)' Python snippet, and the identical snippet embedded verbatim in examples/run_picrust2.sh, read 'picrust2_out/marker_predicted_and_nsti.tsv.gz'. A real full-pipeline run on 770 real 16S ASVs (bacterial + archaeal markers predicted, PICRUSt2's default full-pipeline behavior) produces bac_marker_predicted_and_nsti.tsv.gz, arc_marker_predicted_and_nsti.tsv.gz, and combined_marker_predicted_and_nsti.tsv.gz -- never an unprefixed marker_predicted_and_nsti.tsv.gz. Running the documented snippet verbatim throws FileNotFoundError 100% of the time on real output from PICRUSt2 2.6.3, the version this skill claims compatibility with ('2.5+').
+- Root cause: The Version Compatibility notice and filename were written for an older PICRUSt2 release whose full-pipeline output was named or organized differently, and were never re-verified against 2.6.3's actual combined bac+arc output.
+- Fix: Change both occurrences (SKILL.md's 'Report NSTI (mandatory)' section and examples/run_picrust2.sh) to read 'combined_marker_predicted_and_nsti.tsv.gz'. Also fix the Common Errors table row ('metadata_NSTI / NSTI file not found'), which currently names the WRONG filename (marker_predicted_and_nsti.tsv.gz) as the fix for the wrong filename it warns against (marker_nsti_predicted.tsv) -- neither name matches 2.6.3's real output.
+
+### `bio-microbiome-functional-prediction` — Standard biom-exported TSV input crashes picrust2_pipeline.py after 9+ minutes of compute, with no warning
+
+- Skill: 80, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/microbiome/functional-prediction) · [viewer](skills/bio-microbiome-functional-prediction/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 1
+- Problem: SKILL.md documents '-i asv_table.tsv' (or .biom) as valid input, and its own canonical example prompt assumes the user 'has ... an ASV abundance table.' The single most standard way to produce that TSV from a QIIME2/biom-format pipeline (`biom convert -i feature-table.biom -o feature-table.tsv --to-tsv`) prepends a '# Constructed from biom file' comment line. Feeding that file to picrust2_pipeline.py's -i flag runs the full, expensive placement + hidden-state-prediction stages (9m25s wall time observed on 770 real ASVs, 4 threads) and only then fails at the final metagenome_pipeline.py table-parsing step ('this line of the sequence abundance table has a differing number of fields'), discarding the entire output directory.
+- Root cause: SKILL.md and examples/run_picrust2.sh assume asv_table.tsv is already in PICRUSt2's exact expected format and never mention the biom-convert comment-line trap, even though biom-format TSV export is the standard provenance for anyone coming from QIIME2/amplicon-processing.
+- Fix: Add a line to the Run the Pipeline / Common Errors sections: strip the leading '# Constructed from biom file' comment line before passing a biom-convert-produced TSV to -i (e.g. `tail -n +2 feature-table.tsv > asv_table.tsv`), or pass the .biom file directly to -i instead of converting to TSV at all (SKILL.md already documents BIOM as an accepted format, which sidesteps this entirely).
+
+### `bio-microbiome-functional-prediction` — 'Report the intersection' DA guidance silently breaks on real MetaCyc pathway IDs across tools
+
+- Skill: 80, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/microbiome/functional-prediction) · [viewer](skills/bio-microbiome-functional-prediction/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 5
+- Problem: Running ALDEx2 and MaAsLin2 (two of the four tools SKILL.md names) on the same real predicted MetaCyc pathway table and naively intersecting their significant-feature lists by name returns 0 pathways, even though MaAsLin2 actually recovered all 162 of ALDEx2's 162 real hits. MaAsLin2 sanitizes feature names via R's make.names() (hyphens -> dots, e.g. 'PWY-6829' -> 'PWY.6829'); ALDEx2 preserves the original MetaCyc IDs. Since nearly all real MetaCyc pathway IDs contain hyphens, a naive intersection following the skill's literal instruction silently returns an empty, wrong consensus set.
+- Root cause: The 'DA: >=2 CoDA tools, report intersection' guidance does not mention that different R tools sanitize feature/pathway names differently by default.
+- Fix: Add a note to the DA-handoff guidance (here or in differential-abundance, which this skill points to): normalize feature names (e.g. via make.names()) on both sides before computing a cross-tool intersection of predicted-pathway hits.
 
 ### `bio-alignment-multiple` — Fix MUSCLE5 ensemble commands (-super5 has no .efa)
 
@@ -562,7 +586,23 @@ None open.
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (272)
+## P2 (274)
+
+### `bio-microbiome-functional-prediction` — Common Errors table's 'near-empty output' framing understates the real out-of-reference failure mode
+
+- Skill: 80, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/microbiome/functional-prediction) · [viewer](skills/bio-microbiome-functional-prediction/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 3
+- Problem: Running PICRUSt2 on ASVs with poor reference alignment (reproduced on the amplicon-processing synthetic fixture) does not produce 'near-empty output' as the Common Errors table states -- it aborts with a hard error ('Stopping - all N input sequences aligned poorly...') at the placement stage, before any NSTI file or output directory is created at all.
+- Root cause: The Common Errors table conflates two different failure modes: (a) post-hoc NSTI-based dropping of a subset of ASVs after a successful run, and (b) a total placement failure (--min_align gate) that aborts the whole pipeline with zero output when most/all ASVs fail to align.
+- Fix: Split the Common Errors row into two: one for partial NSTI-based dropping (near-empty but present output), and one for the harder total place_seqs.py failure (no output directory created at all, --min_align 0.8 gate), each with its own diagnostic guidance.
+
+### `bio-microbiome-functional-prediction` — Frontmatter description promises ITS support the skill body never substantiates
+
+- Skill: 80, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/microbiome/functional-prediction) · [viewer](skills/bio-microbiome-functional-prediction/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: —
+- Problem: The frontmatter description states the skill predicts function 'from 16S/ITS amplicon ASVs,' but the entire body (five-stage pipeline, tool taxonomy, decision tree, references) discusses only the 16S/bacterial-archaeal reference PICRUSt2 ships. PICRUSt2 has no fungal/ITS reference genome set; running it on ITS ASVs is not a documented or supported use case anywhere in this skill.
+- Root cause: Likely a copy-paste overclaim from a generic amplicon-skill description template.
+- Fix: Remove '/ITS' from the frontmatter description, or add an explicit note that PICRUSt2 (and this skill) is bacterial/archaeal-16S only, and route ITS-functional questions elsewhere if such guidance exists.
 
 ### `bio-crispr-screens-copy-number-correction` — negative_control_sgrnas empty-dict case raises an undocumented ValueError
 

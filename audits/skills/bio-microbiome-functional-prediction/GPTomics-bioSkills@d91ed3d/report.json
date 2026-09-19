@@ -1,0 +1,239 @@
+{
+  "meta": {
+    "skill_name": "bio-microbiome-functional-prediction",
+    "description": "Predicts community functional POTENTIAL from 16S/ITS amplicon ASVs with PICRUSt2 (or q2-picrust2) by phylogenetic interpolation of reference-genome gene content - EPA-ng placement, gappa, castor hidden-state prediction of KO/EC/Pfam copy number, 16S copy-number normalization, and MinPath MetaCyc/KEGG pathways - gated by the NSTI quality index.",
+    "evaluated_on": "2026-09-19",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:microbiome/functional-prediction"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "No fabricated DOIs, PMIDs, p-values, or sample sizes in any of the 7 outputs; all quantitative claims traced to real computed output (real PICRUSt2 run, real ALDEx2/MaAsLin2 runs)." },
+      "practice_boundaries": { "result": "PASS", "detail": "No diagnostic or prescriptive medical conclusions; this is a community-function research tool with no individual-subject claims." },
+      "methodological_ground": { "result": "PASS", "detail": "Input 7 (adversarial 'write this up as increased butyrate production') and Input 6 (marine-sediment method choice) both show the skill's own guidance correctly steering an agent away from real methodological fallacies (activity/expression overclaim from predicted-only data; circularity of predicted function vs taxonomy) rather than committing one." },
+      "code_usability": { "result": "PASS", "detail": "Real defects were found (see P0 recommendations): the skill's own 'mandatory' NSTI-reporting snippet, run verbatim in Inputs 1 and 4, throws FileNotFoundError against real PICRUSt2 2.6.3 output because the hardcoded filename (marker_predicted_and_nsti.tsv.gz) does not match what a combined bac+arc run actually produces (combined_marker_predicted_and_nsti.tsv.gz). This is graded PASS rather than FAIL because SKILL.md's own 'Version Compatibility' section explicitly instructs the agent to verify installed versions and adapt example code to the actual observed API/output rather than retrying blindly -- exactly the self-healing behavior that resolved this in practice (confirmed: the corrected filename produces accurate NSTI numbers immediately). The defect is real, reproducible, and scored heavily in the numeric assertions/recommendations below; it does not meet the veto bar of unrunnable-without-any-recovery-path." }
+    }
+  },
+  "static_score": {
+    "subtotal": 81,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 9, "max": 12, "note": "Covers the full documented use-case set well, but the frontmatter description promises '16S/ITS' support that nothing in the body substantiates (PICRUSt2 has no ITS/fungal reference); two real, verified factual/output-format errors found on execution (NSTI filename, biom-TSV comment line) cost Correctness points." },
+      "reliability": { "score": 7, "max": 12, "note": "The Common Errors table exists and is generally good, but misses both real failure modes actually triggered in testing (biom-export comment-line crash; hard pre-NSTI placement-abort vs the documented 'near-empty output' framing), and offers no recovery guidance once the mandatory NSTI code's hardcoded filename is wrong." },
+      "performance_context": { "score": 7, "max": 8, "note": "Good SKILL.md/usage-guide.md/examples layering; loses a point because nothing warns that the CLI validates table format only AFTER the expensive placement+HSP stages, so a bad input format wastes the most expensive part of the run (9m25s wall time observed on 770 real ASVs) before failing." },
+      "agent_usability": { "score": 13, "max": 16, "note": "Clear, consistent, well-structured; output file specs are given for each stage but two of those specs are demonstrably wrong/incomplete against the real, currently-installed tool version." },
+      "human_usability": { "score": 7, "max": 8, "note": "Natural trigger phrasing and good Tips section; loses a point because a hardcoded, version-drifted filename in the 'mandatory' step is the opposite of forgiving to a real run." },
+      "security": { "score": 11, "max": 12, "note": "No credentials, no eval/exec of raw strings, no injection vectors; standard CLI-invocation pattern with file-path arguments only." },
+      "maintainability": { "score": 9, "max": 12, "note": "Clean separation (SKILL.md / usage-guide.md / examples/run_picrust2.sh) but low Testability: the shipped example script itself embeds the wrong NSTI filename, so running it verbatim on real output fails at the last step and there is no bundled fixture/expected-output to catch this before shipping." },
+      "agent_specific": { "score": 18, "max": 20, "note": "Excellent composability (six Related Skills, clean handoffs) and escape hatches (explicit FAPROTAX/shotgun routing, explicit 'never activity' framing); trigger precision docked slightly for the unsubstantiated ITS claim." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 78.9,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 20, "total": 25 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Full PICRUSt2 pipeline on real moving-pictures 16S ASVs (770 ASVs, 34 gut/palm/tongue samples, DADA2-denoised)",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "Documented invocation (-i asv_table.tsv from a standard biom-convert --to-tsv export) crashed after 9m25s of real placement+HSP compute on a comment-line parsing error; required a manual fix (strip the '# Constructed from biom file' line) to complete. Corrected run succeeded fully: 751/770 ASVs placed, 503 MetaCyc pathways, 8101 KOs, add_descriptions.py ran clean.",
+        "basic": 28,
+        "specialized": 45,
+        "total": 73,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Output produces real KO/EC/MetaCyc pathway abundance tables as promised", "result": "PASS", "note": "751 ASVs placed, 8101 KOs and 503 MetaCyc pathways predicted across 34 real samples; add_descriptions.py attached human-readable names successfully." },
+          { "text": "The documented CLI invocation runs without crashing on a real, standard-provenance ASV table (biom-exported TSV)", "result": "FAIL", "note": "picrust2_pipeline.py -i asv_table.tsv (produced by biom convert --to-tsv, the standard QIIME2-ecosystem path) crashed at the table-parsing stage AFTER 9m25s of placement/HSP compute, discarding the whole output directory; SKILL.md gives no warning." },
+          { "text": "add_descriptions.py step (documented in SKILL.md and examples/run_picrust2.sh) completes successfully", "result": "PASS", "note": "Ran clean on the corrected pathway table, produced path_abun_described.tsv.gz." },
+          { "text": "Placement/HSP quality is appropriate for the claimed best-case environment (human gut)", "result": "PASS", "note": "Mean NSTI 0.077, median 0.001, only 3/751 ASVs dropped at the default NSTI>2 cutoff, 0.0% reads dropped -- consistent with SKILL.md's claimed gut-environment accuracy ceiling." }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "QIIME2 .qza path via q2-picrust2 plugin (feature table + rep-seqs already in QIIME2)",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "q2-picrust2 plugin confirmed NOT installed in the tooled qiime2-amplicon-2024.10 env ('QIIME 2 has no plugin/command named picrust2'); evaluated by inspection of the routing guidance rather than execution, per the audit brief's rule that non-executed guidance can still score on correctness.",
+        "basic": 30,
+        "specialized": 44,
+        "total": 74,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "Correctly identifies the QIIME2 .qza path and hands off to qiime2-workflow", "result": "PASS", "note": "Decision-tree row explicitly routes '.qza artifacts -> qiime2-workflow (q2-picrust2 plugin)'." },
+          { "text": "Does not fabricate an untested q2-picrust2 CLI invocation", "result": "PASS", "note": "SKILL.md correctly delegates the concrete command to qiime2-workflow rather than guessing q2-picrust2 flags itself." },
+          { "text": "Explains why the same engine applies (FeatureTable in, FeatureTable out)", "result": "PASS", "note": "Decision-tree row states this explicitly and accurately." }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "PICRUSt2 on out-of-reference synthetic ASVs (poor alignment, expected quality-gate refusal)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Independently reproduced the tooling pass's finding: picrust2_pipeline.py correctly refused all 11 synthetic ASVs ('all 11 input sequences aligned poorly to reference sequences') -- the tool's own --min_align 0.8 quality gate working as designed, not a tooling or skill failure.",
+        "basic": 31,
+        "specialized": 51,
+        "total": 82,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Skill anticipates a poor-reference-coverage failure mode", "result": "PASS", "note": "Common Errors table's 'Near-empty output / most ASVs dropped' row and the broader NSTI-quality framing anticipate this class of problem." },
+          { "text": "Skill's error-table description matches the observed failure mode exactly", "result": "FAIL", "note": "The real failure is a hard place_seqs.py abort with NO output directory created at all, occurring BEFORE any NSTI file exists -- not the softer 'near-empty output, most ASVs dropped' framing in the Common Errors table, which describes post-hoc NSTI-based dropping after a completed run." },
+          { "text": "No fabricated NSTI numbers reported for a run that produced none", "result": "PASS", "note": "Correctly reported zero output / hard failure rather than inventing plausible-looking NSTI numbers." },
+          { "text": "Recommends checking environment / considering FAPROTAX or shotgun for a failure like this", "result": "PASS", "note": "Matches the skill's own 'Wrong environment (reference coverage too sparse)' failure-mode guidance." }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Mandatory NSTI distribution + dropped-read-fraction QC report on real PICRUSt2 output",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "SKILL.md's 'Report NSTI (mandatory)' Python snippet run VERBATIM (only the output-directory name substituted) against real PICRUSt2 2.6.3 output throws FileNotFoundError: the documented filename marker_predicted_and_nsti.tsv.gz does not exist; the real file is combined_marker_predicted_and_nsti.tsv.gz. Corrected snippet produced real, accurate numbers.",
+        "basic": 23,
+        "specialized": 41,
+        "total": 64,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The documented NSTI file path (marker_predicted_and_nsti.tsv.gz) exists after a real full-pipeline run", "result": "FAIL", "note": "Real output only contains bac_/arc_/combined_/*_reduced_ prefixed marker_predicted_and_nsti files; no unprefixed file exists." },
+          { "text": "The mandatory NSTI code, run verbatim as documented, completes without error", "result": "FAIL", "note": "FileNotFoundError: 'picrust2_out_real/marker_predicted_and_nsti.tsv.gz' -- reproduced directly." },
+          { "text": "Once the correct filename is substituted, the code produces accurate NSTI summary numbers", "result": "PASS", "note": "mean NSTI 0.077, median 0.001, 3/751 ASVs dropped at NSTI>2, 0.0% reads dropped -- correct and sensible for the claimed best-case gut environment." },
+          { "text": "No error is silently swallowed", "result": "PASS", "note": "The crash is a loud, clear Python traceback, not a silent wrong-answer -- an attentive agent can self-correct even though the docs give no warning." }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Predicted MetaCyc pathway table -> compositional DA (ALDEx2 + MaAsLin2), gut vs tongue, report the intersection",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "Full real chain executed: PICRUSt2 pathway table -> ALDEx2 (162/385 significant, we.eBH<0.05) and MaAsLin2 (294/362 significant, qval<0.25) on real gut(8) vs tongue(9) samples. Following the skill's literal 'report the intersection' instruction naively returned 0 overlapping pathways; the real overlap (after normalizing MaAsLin2's make.names()-sanitized feature names against ALDEx2's raw MetaCyc IDs) is 162/162 -- MaAsLin2's hits are a strict superset of ALDEx2's.",
+        "basic": 31,
+        "specialized": 48,
+        "total": 79,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Uses >=2 CoDA tools as the skill's decision tree instructs", "result": "PASS", "note": "ALDEx2 and MaAsLin2 both run for real on the real predicted pathway table." },
+          { "text": "Correctly formats ALDEx2 input as count-like features-as-rows per SKILL.md's explicit warning", "result": "PASS", "note": "Rounded predicted abundances, features (pathways) as rows, samples as columns -- matches SKILL.md's 'ALDEx2 wants count-like features-as-rows, NOT relab-normalized output' instruction exactly; this is what made aldex() run without error." },
+          { "text": "Reports the cross-tool intersection accurately when following the skill's literal instruction", "result": "FAIL", "note": "A naive intersect() on the two tools' raw hit-name lists returns 0, because MaAsLin2 sanitizes MetaCyc IDs (hyphens -> dots via make.names()) and ALDEx2 does not -- the skill's guidance does not warn about this, so following it literally silently produces a wrong (empty) consensus set." },
+          { "text": "Frames the predicted-pathway DA result as hypothesis-generating per the circularity guidance", "result": "PASS", "note": "Consistent with SKILL.md's explicit circularity warning for predicted-function DA between groups." }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Marine sediment nitrification question: PICRUSt2 or FAPROTAX?",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Pure reasoning/routing response (no code to execute); evaluated by inspection against the skill's documented decision tree and tool taxonomy.",
+        "basic": 35,
+        "specialized": 55,
+        "total": 90,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "Recommends FAPROTAX over PICRUSt2 for a marine-sediment nitrification question", "result": "PASS", "note": "Matches the Decision Tree by Scenario row exactly: 'Soil / marine / sediment / novel environment, biogeochemical question -> FAPROTAX'." },
+          { "text": "Explains why (reference-tree bias / high expected NSTI)", "result": "PASS", "note": "Cites the gut/host-biased reference tree and the resulting high-NSTI extrapolation risk, matching SKILL.md's stated rationale." },
+          { "text": "Does not claim FAPROTAX predicts gene content (correctly distinguishes curated lookup from de-novo prediction)", "result": "PASS", "note": "Tool Taxonomy table correctly frames FAPROTAX as 'NOT gene-content prediction', a curated taxon->function lookup." }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Rewrite a predicted-pathway DA result as 'increased butyrate production' for a paper",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Pure reasoning response (no code to execute); tests whether the skill's guidance correctly refuses/corrects the activity-verb overclaim and flags circularity.",
+        "basic": 35,
+        "specialized": 55,
+        "total": 90,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "Refuses/corrects 'increased butyrate production' to a potential/capacity framing", "result": "PASS", "note": "Directly matches the 'Claiming activity or expression' Common Error row's fix: 'restrict every claim to potential / predicted capacity'." },
+          { "text": "Warns that activity/expression claims need metatranscriptomics, not PICRUSt2", "result": "PASS", "note": "Matches SKILL.md's explicit 'for activity, cite metatranscriptomics, not this skill' guidance." },
+          { "text": "Flags potential circularity if a taxonomic difference was already reported for the same groups", "result": "PASS", "note": "Matches the 'Circularity (taxonomy double-counted as a second finding)' Common Error section." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 32.4,
+    "dynamic_weighted": 47.3,
+    "score": 80,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Explicit, well-sourced guardrails against the two most common PICRUSt2 misuses (claiming activity/expression, double-counting predicted function as independent corroboration of taxonomy) -- verified in real adversarial and scope-boundary testing (Inputs 6-7) to correctly steer an agent away from both.",
+    "The core prediction pipeline is real and correct: a full run on 770 real 16S ASVs from a public gut dataset produced accurate, sensible output (751/770 ASVs placed, mean NSTI 0.077, 503 MetaCyc pathways, 8101 KOs) matching the skill's own claimed gut-environment accuracy ceiling.",
+    "Strong, specific decision-tree routing: correctly recommends FAPROTAX over PICRUSt2 for an environmental/biogeochemical marine-sediment question, with the right justification (reference-tree bias, expected high NSTI).",
+    "Clean modular structure (SKILL.md / usage-guide.md / examples/run_picrust2.sh) with a well-documented, citation-backed five-stage mechanism explanation and a genuinely useful cross-skill decision tree."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "Mandatory NSTI snippet's hardcoded filename does not exist in real PICRUSt2 output",
+      "observed_in": [1, 4],
+      "problem": "SKILL.md's 'Report NSTI (mandatory)' Python snippet, and the identical snippet embedded verbatim in examples/run_picrust2.sh, read 'picrust2_out/marker_predicted_and_nsti.tsv.gz'. A real full-pipeline run on 770 real 16S ASVs (bacterial + archaeal markers predicted, PICRUSt2's default full-pipeline behavior) produces bac_marker_predicted_and_nsti.tsv.gz, arc_marker_predicted_and_nsti.tsv.gz, and combined_marker_predicted_and_nsti.tsv.gz -- never an unprefixed marker_predicted_and_nsti.tsv.gz. Running the documented snippet verbatim throws FileNotFoundError 100% of the time on real output from PICRUSt2 2.6.3, the version this skill claims compatibility with ('2.5+').",
+      "root_cause": "The Version Compatibility notice and filename were written for an older PICRUSt2 release whose full-pipeline output was named or organized differently, and were never re-verified against 2.6.3's actual combined bac+arc output.",
+      "fix": "Change both occurrences (SKILL.md's 'Report NSTI (mandatory)' section and examples/run_picrust2.sh) to read 'combined_marker_predicted_and_nsti.tsv.gz'. Also fix the Common Errors table row ('metadata_NSTI / NSTI file not found'), which currently names the WRONG filename (marker_predicted_and_nsti.tsv.gz) as the fix for the wrong filename it warns against (marker_nsti_predicted.tsv) -- neither name matches 2.6.3's real output."
+    },
+    {
+      "priority": "P1",
+      "title": "Standard biom-exported TSV input crashes picrust2_pipeline.py after 9+ minutes of compute, with no warning",
+      "observed_in": [1],
+      "problem": "SKILL.md documents '-i asv_table.tsv' (or .biom) as valid input, and its own canonical example prompt assumes the user 'has ... an ASV abundance table.' The single most standard way to produce that TSV from a QIIME2/biom-format pipeline (`biom convert -i feature-table.biom -o feature-table.tsv --to-tsv`) prepends a '# Constructed from biom file' comment line. Feeding that file to picrust2_pipeline.py's -i flag runs the full, expensive placement + hidden-state-prediction stages (9m25s wall time observed on 770 real ASVs, 4 threads) and only then fails at the final metagenome_pipeline.py table-parsing step ('this line of the sequence abundance table has a differing number of fields'), discarding the entire output directory.",
+      "root_cause": "SKILL.md and examples/run_picrust2.sh assume asv_table.tsv is already in PICRUSt2's exact expected format and never mention the biom-convert comment-line trap, even though biom-format TSV export is the standard provenance for anyone coming from QIIME2/amplicon-processing.",
+      "fix": "Add a line to the Run the Pipeline / Common Errors sections: strip the leading '# Constructed from biom file' comment line before passing a biom-convert-produced TSV to -i (e.g. `tail -n +2 feature-table.tsv > asv_table.tsv`), or pass the .biom file directly to -i instead of converting to TSV at all (SKILL.md already documents BIOM as an accepted format, which sidesteps this entirely)."
+    },
+    {
+      "priority": "P1",
+      "title": "'Report the intersection' DA guidance silently breaks on real MetaCyc pathway IDs across tools",
+      "observed_in": [5],
+      "problem": "Running ALDEx2 and MaAsLin2 (two of the four tools SKILL.md names) on the same real predicted MetaCyc pathway table and naively intersecting their significant-feature lists by name returns 0 pathways, even though MaAsLin2 actually recovered all 162 of ALDEx2's 162 real hits. MaAsLin2 sanitizes feature names via R's make.names() (hyphens -> dots, e.g. 'PWY-6829' -> 'PWY.6829'); ALDEx2 preserves the original MetaCyc IDs. Since nearly all real MetaCyc pathway IDs contain hyphens, a naive intersection following the skill's literal instruction silently returns an empty, wrong consensus set.",
+      "root_cause": "The 'DA: >=2 CoDA tools, report intersection' guidance does not mention that different R tools sanitize feature/pathway names differently by default.",
+      "fix": "Add a note to the DA-handoff guidance (here or in differential-abundance, which this skill points to): normalize feature names (e.g. via make.names()) on both sides before computing a cross-tool intersection of predicted-pathway hits."
+    },
+    {
+      "priority": "P2",
+      "title": "Common Errors table's 'near-empty output' framing understates the real out-of-reference failure mode",
+      "observed_in": [3],
+      "problem": "Running PICRUSt2 on ASVs with poor reference alignment (reproduced on the amplicon-processing synthetic fixture) does not produce 'near-empty output' as the Common Errors table states -- it aborts with a hard error ('Stopping - all N input sequences aligned poorly...') at the placement stage, before any NSTI file or output directory is created at all.",
+      "root_cause": "The Common Errors table conflates two different failure modes: (a) post-hoc NSTI-based dropping of a subset of ASVs after a successful run, and (b) a total placement failure (--min_align gate) that aborts the whole pipeline with zero output when most/all ASVs fail to align.",
+      "fix": "Split the Common Errors row into two: one for partial NSTI-based dropping (near-empty but present output), and one for the harder total place_seqs.py failure (no output directory created at all, --min_align 0.8 gate), each with its own diagnostic guidance."
+    },
+    {
+      "priority": "P2",
+      "title": "Frontmatter description promises ITS support the skill body never substantiates",
+      "observed_in": [],
+      "problem": "The frontmatter description states the skill predicts function 'from 16S/ITS amplicon ASVs,' but the entire body (five-stage pipeline, tool taxonomy, decision tree, references) discusses only the 16S/bacterial-archaeal reference PICRUSt2 ships. PICRUSt2 has no fungal/ITS reference genome set; running it on ITS ASVs is not a documented or supported use case anywhere in this skill.",
+      "root_cause": "Likely a copy-paste overclaim from a generic amplicon-skill description template.",
+      "fix": "Remove '/ITS' from the frontmatter description, or add an explicit note that PICRUSt2 (and this skill) is bacterial/archaeal-16S only, and route ITS-functional questions elsewhere if such guidance exists."
+    }
+  ]
+}
