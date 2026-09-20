@@ -1,0 +1,508 @@
+{
+  "meta": {
+    "skill_name": "bio-duplicate-handling",
+    "description": "Mark and remove PCR/optical duplicates using samtools fixmate and markdup. Use when preparing alignments for variant calling or when duplicate reads would bias analysis.",
+    "evaluated_on": "2026-09-20",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "B",
+    "complexity": "Complex",
+    "n_inputs": 8,
+    "source": "mrsonord2240/bioSkills@3e4087ce9b3d9c4d89df6765e6dd4c4d8c063dc9:alignment-files/duplicate-handling",
+    "audit_kind": "re-audit of a fixed Skill (pre-fix 77, Limited Release, first audit 2026-09-20; fixer: fix/af-dup 3e4087c)",
+    "executed": "8/8 inputs executed (inputs 1-6 = the pre-fix inputs re-run as regression against the fixed text, with the fixer's blocks extracted verbatim from SKILL.md by run/blocks.py; inputs 7 and 8 are new, built on the auditor's own planted truth).",
+    "execution_note": "WSL science, env alignment-files (samtools 1.24, pysam 0.24.1, Picard 3.5.0 side env, fgbio 4.1.1 side env, umi_tools 1.1.6, sambamba 1.0.1, samblaster 0.1.26, bwa-mem2 2.3, mapDamage 2.2.2 side env) plus the fixer's env af-dup-extra (biobambam2 2.0.185, pbmarkdup 1.2.0; not in TOOLS.md, driven with micromamba run) and a throwaway macs3 3.0.4 venv. Real data from public-data (nf-core human PE/RNA/UMI BAMs, 1000G HG00349 slice, ARTIC nanopore, sarscov2 FASTQ pairs) plus planted_dups.bam (truth 50 pairs) and SYNTHETIC data written by run/ scripts (multi-library, same-library 2 RG, amplicon, optical, planted2 soft-clip/SE/reverse, HiFi-style unaligned BAM, damaged SE BAM, planted duplex-UMI BAM, 800k-read timing BAM, ChIP-like BAM). Scripts: run/. Skill folder run from a COPY (run/skill_copy, diff-identical to the worktree at 3e4087c).",
+    "execution_mode_note": "SKILL.md CLI patterns plus one shipped shell example (examples/markdup_pipeline.sh); no scripts/ dir. Classified B (CLI/script)."
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated identifiers or results. Every count quoted traces to a logged run. Unmeasured speed claims are qualitative, recorded as P2, not fabricated data."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Alignment-file processing only; no diagnostic or prescriptive clinical output."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Assay decision table verified again (RNA-seq 38% flagged at the top locus, amplicon 1980/2000, multi-library over-marking, RG-ID vs LB); UMI branches equal planted truth; the two former factual errors (error strings, silent-under-mark pitfall) are corrected."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "Every code block was extracted verbatim and run: SKILL.md workflow, optimized pipeline, pysam x3, umi_tools, fgbio single-strand and duplex, Picard UmiAware, biobambam2, sambamba, pbmarkdup, mapDamage --rescale, samblaster, the shipped example. All ran and produced checked output; the two pre-fix runnable-code defects (clean-dir pipeline, duplex after adjacency) are gone."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 83,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 11,
+        "max": 12,
+        "note": "Completeness 4 (every tool the tables name now has a run block: biobambam2, sambamba, pbmarkdup, mapDamage --rescale, Picard UmiAware, umi_tools, fgbio single-strand and duplex), correctness 3 (all blocks reproduced; unmeasured '~30% faster' and biobambam2 'Fastest' claims, and my 800k-read timing contradicts the first), appropriateness 4."
+      },
+      "reliability": {
+        "score": 10,
+        "max": 12,
+        "note": "Fault tolerance 3 (pipefail + mkdir + record-count check in the block; example exits 1/2/3 and leaves no half-written output: verified for missing, truncated, empty, unwritable, unknown-assay inputs), error reporting 4 (8 of 8 Common Errors messages match tool output), recoverability 3 (the SKILL.md block still leaves a partial marked.bam; the text says to delete it)."
+      },
+      "performance_context": {
+        "score": 5,
+        "max": 8,
+        "note": "Token cost 3 (SKILL.md 421 lines but usage-guide cut to 60 and duplicates removed), execution efficiency 2 (the 'Optimized' pipeline measured 6.4 s vs 4.6 s for the plain 5-step chain on an 800k-read BAM at 4 threads; the ~30% faster claim is unsupported)."
+      },
+      "agent_usability": {
+        "score": 14,
+        "max": 16,
+        "note": "Learnability 3, consistency 4 (usage-guide contradictions gone, one copy of each fact), feedback design 3 (example prints stats + warnings; SKILL.md blocks assert counts), error prevention 4 (Step 0 assay gate, -c, @RG, tmpdir, --paired, MQ prerequisite all stated)."
+      },
+      "human_usability": {
+        "score": 6,
+        "max": 8,
+        "note": "Discoverability 3 (frontmatter description still omits the assay/UMI caveats), forgiveness 3 (name-sorts first, accepts any-order input; ASSAY must be declared by the user)."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "No credentials, no eval; variables quoted; example uses mktemp -d + trap and writes output by temp-then-mv; silently overwrites an existing output path."
+      },
+      "maintainability": {
+        "score": 10,
+        "max": 12,
+        "note": "Modularity 4 (usage-guide is now an index into SKILL.md), modifiability 3 (large single SKILL.md), testability 3 (verifiable counts, one runnable example, no shipped test data)."
+      },
+      "agent_specific": {
+        "score": 16,
+        "max": 20,
+        "note": "Trigger 3, progressive disclosure 3 (421 lines, no references/), composability 4 (Related Skills exist), idempotency 3 (example overwrites; umi_tools output varies by 1 record run to run without --random-seed), escape hatches 3 (assay gate refuses eight assay names; a mis-declared RNA-seq BAM under ASSAY=wgs passes with no warning at 38% flagged)."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 89.4,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 36,
+      "total": 39
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Workflow steps, stats, -r, pysam blocks vs planted truth and 4 independent tools",
+        "prompt": "I have paired-end Illumina alignments (coordinate sorted). Mark the PCR duplicates with the standard fixmate/markdup workflow, index the result, tell me how many reads were flagged and the duplicate rate. Then do the same in Python with pysam and filter the duplicates out.",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "SKILL.md 'Duplicate Marking Workflow', 'Percentage Duplicates', '-s', '-r' and all three pysam blocks extracted verbatim and run: planted 100/100, real human BAM 1656; Picard, sambamba, samblaster agree",
+        "basic": 37,
+        "specialized": 56,
+        "total": 93,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "SKILL.md workflow steps 1-5 (extracted verbatim) flag exactly the planted 100 reads and index the output",
+            "result": "PASS",
+            "note": "view -c -f 1024 = 100; flagstat '100 + 0 duplicates'; marked.bam.bai written; -s stats DUPLICATE TOTAL 100"
+          },
+          {
+            "text": "Independent tools agree: Picard 50 pairs (=100 reads), sambamba 100, samblaster 100; on the real BAM samtools and Picard flag the identical (name,flag) set",
+            "result": "PASS",
+            "note": "1656 for all four on the human BAM; set difference 0. On planted, ties are broken differently but counts are equal"
+          },
+          {
+            "text": "-r returns total minus flagged; -c/-F counting blocks agree",
+            "result": "PASS",
+            "note": "500->400 and 5644->3988; 1656 dup / 3988 non-dup"
+          },
+          {
+            "text": "'Percentage Duplicates' block agrees with the pysam rate (same primary-only denominator)",
+            "result": "PASS",
+            "note": "29.35 vs pysam 29.35%; 20.00 on planted; the usage-guide/SKILL.md denominator contradiction is gone"
+          },
+          {
+            "text": "Every pysam block runs verbatim and matches samtools; tool errors surface as exceptions",
+            "result": "PASS",
+            "note": "flagged 100/1656, filter 400/3988, SamtoolsError text includes the samtools message"
+          }
+        ],
+        "executed": true,
+        "execution_note": "scripts: in01_canonical.sh -> in01.log"
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Rewritten 'Pipeline Version (Optimized)' from a clean dir: valid exit 0, failure exit non-zero; optical vs Picard; speed claim",
+        "prompt": "This is a NovaSeq 6000 WGS run. Give me the fast piped duplicate-marking command with 4 threads, optical duplicates at the right distance, per-read-group handling and a stats file, then tell me how many duplicates are optical vs PCR.",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Pre-fix P1 fixed: block from a clean dir now exits 0 with 100/1656, and without its mkdir line exits 1; failure modes exit non-zero. Only the unmeasured '~30% faster' claim fails (measured slower)",
+        "basic": 34,
+        "specialized": 51,
+        "total": 85,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The verbatim optimized pipeline runs from a clean working directory and flags the truth counts",
+            "result": "PASS",
+            "note": "exit 0; 100 planted, 1656 human; 500/500 and 5644/5644 records; index written"
+          },
+          {
+            "text": "Every failure mode of the block exits non-zero (missing tmpdir, missing input, truncated input)",
+            "result": "PASS",
+            "note": "exit 1 in all three; pre-fix defect (exit 0 with an empty 501-byte marked.bam) is gone"
+          },
+          {
+            "text": "Optical claims hold: -d 0 emits no dt tag, -d emits dt:Z:SQ/LB, counts match Picard",
+            "result": "PASS",
+            "note": "samtools optical pairs 0/1/2 vs Picard 0/1/2 at -d 0/100/2500 on synthetic truth"
+          },
+          {
+            "text": "-f stats file and --use-read-groups are accepted and do not change the flagged count",
+            "result": "PASS",
+            "note": "flags in 1.24 help; 100 flagged; stats file has ALL + READ GROUP blocks"
+          },
+          {
+            "text": "The claim 'This is ~30% faster than sort -n | fixmate | sort | markdup' holds",
+            "result": "FAIL",
+            "note": "Not reproduced: optimized 6.4 s vs 5-step 4.6 s on 800k reads (equal flagged counts). Scale caveat (30x WGS is ~1e9 reads) but the claim is unmeasured and contradicted here"
+          }
+        ],
+        "executed": true,
+        "execution_note": "scripts: in02_pipeline_optical.sh; in09_timing_claim.sh -> in02.log; in09.log"
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Verbatim Common Errors table (8 rows), Critical pitfall, fixmate -r, -c on a pre-marked BAM",
+        "prompt": "samtools markdup errors out or marks nothing on my BAM and I'm not sure of the sort order I used. What is wrong, how do I fix it, and can I drop secondary/unmapped reads with fixmate on the way? My BAM was already marked once.",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Pre-fix P2 fixed: 8 of 8 table messages match tool output (6 triggered here, fgbio MQ and umi_tools index in input 5); pitfall text now accurate; -c claim reproduced",
+        "basic": 37,
+        "specialized": 56,
+        "total": 93,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "All eight Common Errors messages match the tools' real output",
+            "result": "PASS",
+            "note": "8/8: six triggered here on real data; fgbio 'Mate mapping quality (MQ) tag not present' and umi_tools 'fetch called on bamfile without index' reproduced in input 5"
+          },
+          {
+            "text": "The Critical pitfall (lost ms/MC tags) is accurate: samtools 1.24 stops with an error, not a silent under-mark",
+            "result": "PASS",
+            "note": "ms and MC stripped: exit 1 + message, 0 flagged"
+          },
+          {
+            "text": "Stated prerequisites and fixes are correct (name-sort before fixmate, -m, coordinate-sort before markdup, mkdir for tmpdir, @RG for Picard)",
+            "result": "PASS",
+            "note": "each violation reproduced and each stated fix verified (addreplacerg -> Picard 1656)"
+          },
+          {
+            "text": "The -c paragraph is accurate (111 without -c vs 101 with -c and Picard on the pre-marked 1000G slice)",
+            "result": "PASS",
+            "note": "111 / 101 / 101 reproduced exactly"
+          },
+          {
+            "text": "fixmate -r -m removes secondary/unmapped as documented and 'a partial output file is left behind' is true",
+            "result": "PASS",
+            "note": "5644->5640, 0 left; row1 leaves a 28-byte out file, row2 an output with 0 flagged"
+          }
+        ],
+        "executed": true,
+        "execution_note": "scripts: in03_errors_edge.sh; in03b_sort_T.sh; 03_strip_tags.py -> in03.log; in03b.log"
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Rewritten shipped example: valid runs exit 0, failures non-zero, assay gate; aligner block with -R; Picard on its output",
+        "prompt": "Use the shipped markdup_pipeline.sh on my BAM, refuse it if it's the wrong assay, and also show me how to mark duplicates inline during alignment with bwa-mem2 and samblaster.",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Pre-fix P1/P2 fixed: pipefail, temp-then-mv, stats beside output, record-count check, -d, assay gate all verified by exit codes and files; -R block gives @RG and Picard runs. Only design limit: a mis-declared RNA-seq BAM passes silently",
+        "basic": 36,
+        "specialized": 54,
+        "total": 90,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Shipped example run from a copy flags the truth counts, indexes, and writes stats beside the output",
+            "result": "PASS",
+            "note": "100 / 1656; index and <out>.markdup_stats.txt present; no cwd litter"
+          },
+          {
+            "text": "Every failing run exits non-zero and leaves no half-written output",
+            "result": "PASS",
+            "note": "missing 1, truncated 1, empty 3, unwritable 1, missing dir 1; out.bam absent in all"
+          },
+          {
+            "text": "Assay gate refuses: unset and eight refused or unknown assay values exit 2 without writing",
+            "result": "PASS",
+            "note": "exit 2 x9, no output file"
+          },
+          {
+            "text": "Wrong-assay heuristic warns on an amplicon BAM declared as wgs",
+            "result": "PASS",
+            "note": "1980/2000 flagged, WARNING printed, exit 0"
+          },
+          {
+            "text": "bwa-mem2 -R | samblaster block flags exactly the planted clones and Picard then runs on its output",
+            "result": "PASS",
+            "note": "40 of 40 flagged reads are clones; Picard exit 0 (pre-fix NullPointerException gone)"
+          }
+        ],
+        "executed": true,
+        "execution_note": "scripts: in04_example_gate_aligner.sh -> in04.log"
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "UMI paired-end capture BAM: umi_tools block + guard, fgbio single-strand and duplex blocks, table rows",
+        "prompt": "My paired-end capture BAM has duplex UMIs in the RX tag. Deduplicate it with the UMIs and call consensus reads, duplex if possible. Also I have a 10x BAM.",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Pre-fix P1s fixed: duplex branch (--strategy=paired) and umi_tools --paired/sort/index verified on the real UMI BAM; empty-output guard returns 1. Quoted 5689 varies +-1 run to run (no --random-seed)",
+        "basic": 34,
+        "specialized": 50,
+        "total": 84,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "umi_tools sorted+indexed requirement and --paired figures (2805 without vs 5689 with) reproduce",
+            "result": "PASS",
+            "note": "'fetch called on bamfile without index' on unsorted; 2805 and 5689 on the sorted BAM"
+          },
+          {
+            "text": "The empty-output guard on the scRNA form returns non-zero when CB/UB are absent",
+            "result": "PASS",
+            "note": "grep -c prints 0; test returns 1; dedup.bam 0 records"
+          },
+          {
+            "text": "fgbio single-strand and duplex branches run verbatim; consensus reads are unmapped; MI /A /B on every duplex-grouped read",
+            "result": "PASS",
+            "note": "5646 consensus, 4042 duplex, 15766/15766 with /A|/B, 0 mapped"
+          },
+          {
+            "text": "SetMateInformation alternative equals the fixmate -m route, and adjacency -> duplex crashes as the comment says",
+            "result": "PASS",
+            "note": "15766/2823 both routes; StringIndexOutOfBoundsException reproduced"
+          },
+          {
+            "text": "The quoted umi_tools record counts (5689 / 2805) are reproducible run to run as written",
+            "result": "FAIL",
+            "note": "unseeded umi_tools gave 5688 in 3 of 6 runs; Skill does not mention --random-seed (seeded: 5689 x3)"
+          }
+        ],
+        "executed": true,
+        "execution_note": "scripts: in05_umi.sh; in05b_umi_determinism.sh -> in05.log; in05b.log"
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Assay decisions: multi-library, same-library 2 RG, amplicon panel, real RNA-seq; Step 0 gate",
+        "prompt": "I have a bulk RNA-seq BAM, an amplicon-panel BAM and a pooled 2-library WGS BAM. Remove the duplicates from all three.",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Decision table and multi-library claims re-verified by output; the workflow text now has a Step 0 assay gate (pre-fix P2) which the example enforces",
+        "basic": 35,
+        "specialized": 53,
+        "total": 88,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Multi-library over-marking prediction and the --use-read-groups fix are correct (SKILL.md block run verbatim)",
+            "result": "PASS",
+            "note": "60 -> 0 flagged, Picard 0"
+          },
+          {
+            "text": "'--use-read-groups keys on RG ID, Picard on LB' is accurate",
+            "result": "PASS",
+            "note": "same-library 2-RG BAM: 0 / 60 / Picard 60"
+          },
+          {
+            "text": "'Amplicon panel: markdup erases the dataset' is accurate",
+            "result": "PASS",
+            "note": "1980 of 2000 flagged; -r leaves 20 records"
+          },
+          {
+            "text": "The workflow now gates on assay (Step 0) in SKILL.md, usage-guide and the example",
+            "result": "PASS",
+            "note": "text present in both docs; example refuses eight assay values (input 4)"
+          }
+        ],
+        "executed": true,
+        "execution_note": "scripts: in06_assay_scope.sh; 00_make_synth.py; 00b_make_synth2.py -> in06.log"
+      },
+      {
+        "index": 7,
+        "type": "Variant B",
+        "label": "NEW: soft-clip/SE/reverse planted truth vs every tool block; pbmarkdup, mapDamage --rescale, Picard UmiAware blocks",
+        "prompt": "Mark duplicates in this mixed paired/single-end BAM with soft clips, tell me if samtools, Picard, biobambam2 and sambamba agree; also I have a PacBio HiFi amplicon BAM (pbmarkdup), an ancient-DNA BAM (mapDamage rescale) and a UMI BAM (Picard UmiAware).",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "All five fixer-added blocks run verbatim and match planted truth (140/140 on planted2 for samtools workflow, pipeline block, example, Picard, biobambam2, sambamba, samblaster; pbmarkdup 12/60; mapDamage quality drop; UmiAware exit 0)",
+        "basic": 36,
+        "specialized": 55,
+        "total": 91,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Every tool block (workflow, pipeline block, example, Picard, biobambam2, sambamba, samblaster) flags the planted 140 reads, soft-clip, reverse-SE and near-miss cases handled correctly",
+            "result": "PASS",
+            "note": "140 each; per-family 80/30/30/0/0 identical across tools"
+          },
+          {
+            "text": "The biobambam2 and sambamba blocks run verbatim on coordinate-sorted input without fixmate",
+            "result": "PASS",
+            "note": "both exit 0, 140 flagged"
+          },
+          {
+            "text": "pbmarkdup block flags the planted duplicates in an unaligned HiFi BAM and --rmdup/--dup-file behave as the comment says",
+            "result": "PASS",
+            "note": "12 flagged of 60; --rmdup 48; --dup-file 48+12"
+          },
+          {
+            "text": "mapDamage --rescale block writes marked.rescaled.bam and lowers the quality of damage-consistent bases only",
+            "result": "PASS",
+            "note": "Q 40 -> 0 for C->T at 5' pos 1 (n=452); unchanged bases 40; 6000/6000 records"
+          },
+          {
+            "text": "Picard UmiAwareMarkDuplicatesWithMateCigar block runs verbatim and is between plain markdup and exact-UMI counts",
+            "result": "PASS",
+            "note": "exit 0; 10127 flagged vs 11783 plain and 9879 exact-UMI"
+          }
+        ],
+        "executed": true,
+        "execution_note": "scripts: in07_extra_tools.sh; in07b_pbmarkdup.sh; 10_make_planted2.py; mk_hifi.py; mk_damage.py; md_check.py -> in07.log; in07b.log"
+      },
+      {
+        "index": 8,
+        "type": "Adversarial",
+        "label": "NEW: planted duplex-UMI library (truth 80/110/50) through umi_tools, fgbio, Picard UmiAware, samtools --barcode-tag; gap hunt",
+        "prompt": "My capture library has duplex UMIs in RX and some molecules share coordinates. Deduplicate with the UMIs, call consensus, duplex if possible. And what if my RX only holds one UMI?",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Every UMI-aware path equals planted truth (80 strand-aware families, 110 exact-UMI, 50 duplex molecules). Only gap: --strategy=paired needs RX 'A-B' and the Skill does not say so (tool error is clear)",
+        "basic": 36,
+        "specialized": 55,
+        "total": 91,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "umi_tools bulk block gives the strand-aware truth (directional 80 pairs) and unique gives exact-UMI truth (110)",
+            "result": "PASS",
+            "note": "80 / 110"
+          },
+          {
+            "text": "fgbio adjacency and paired branches give truth: 80 groups -> 80 consensus pairs; 50 duplex molecules -> 50 duplex pairs; strand purity of /A and /B",
+            "result": "PASS",
+            "note": "80/80, 50/50, 30 of 30 molecules"
+          },
+          {
+            "text": "Picard UmiAware block keeps the 80 true UMI families and samtools --barcode-tag RX matches exact-UMI truth (110)",
+            "result": "PASS",
+            "note": "keeps 80; barcode-tag keeps 110"
+          },
+          {
+            "text": "The Skill warns that coordinate-only markdup is wrong for a UMI library, and the numbers back it (keeps 40 pairs vs 80)",
+            "result": "PASS",
+            "note": "decision table + intro; samtools and Picard both flag 340 reads"
+          },
+          {
+            "text": "The Skill states the input requirement of --strategy=paired (RX must be 'A-B')",
+            "result": "FAIL",
+            "note": "not stated; a single-UMI RX fails with a clear IllegalArgumentException, so the cost is one retry"
+          }
+        ],
+        "executed": true,
+        "execution_note": "scripts: in08_planted_umi.sh; 20_make_planted_umi.py; in11_gap_hunt.sh -> in08.log; in11.log"
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 33.2,
+    "dynamic_weighted": 53.6,
+    "score": 87,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "All seven pre-fix findings verified fixed by output: clean-dir pipeline exits 0 valid and 1 on failure, duplex branch (--strategy=paired) works, umi_tools --paired/sort/index with a working empty-output guard, 8 of 8 error messages verbatim, -c and @RG guidance, Step 0 assay gate",
+    "Every tool named in the decision tables now has a runnable block that matched auditor-planted truth: biobambam2, sambamba, samblaster, Picard, pbmarkdup (12/60), mapDamage rescale (Q 40 -> 0 on damage-consistent bases), Picard UmiAware (keeps 80 of 80 planted families)",
+    "UMI section is correct end to end on a planted duplex library: umi_tools 80/110, fgbio 80 groups -> 80 consensus and 50 duplex molecules -> 50 duplex reads, strand purity 30/30",
+    "Shipped example is now a real guard: exits 1/2/3 on missing, truncated, empty, unwritable, wrong-assay input and leaves no half-written output"
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "Unmeasured speed claims; the optimized pipeline measured slower",
+      "observed_in": [
+        2
+      ],
+      "problem": "'~30% faster than sort -n | fixmate | sort | markdup on typical 30x WGS' is still asserted and biobambam2 is labelled 'Fastest'. On an 800k-read BAM at 4 threads the collate/-u pipeline took 6.4 s vs 4.6 s for the plain chain (3 reps, equal flagged counts). 30x WGS scale was not tested.",
+      "root_cause": "Speed claims were carried over from prose and never benchmarked.",
+      "fix": "Delete the percentage and the 'Fastest' label, or state the measured setup (reads, threads, disk) next to the number."
+    },
+    {
+      "priority": "P2",
+      "title": "umi_tools counts vary by 1 without --random-seed",
+      "observed_in": [
+        5
+      ],
+      "problem": "The Skill quotes '5689 vs 2805 records'; unseeded umi_tools dedup returned 5688 in 3 of 6 runs on the same input (5689 in all three seeded runs).",
+      "root_cause": "umi_tools picks among tied reads randomly; the bulk block has no seed.",
+      "fix": "Add --random-seed=1 to the umi_tools blocks and say the figure is approximate without it."
+    },
+    {
+      "priority": "P2",
+      "title": "--strategy=paired input requirement not stated",
+      "observed_in": [
+        8
+      ],
+      "problem": "The ctDNA row and the duplex branch send the agent to GroupReadsByUmi --strategy=paired, which needs RX as 'A-B'. A single-UMI RX fails with IllegalArgumentException (clear message, one retry).",
+      "root_cause": "Duplex branch documents the MI /A /B output but not the RX format it requires.",
+      "fix": "One sentence: 'paired needs RX as UMI1-UMI2 (as in this BAM); single-UMI libraries use adjacency + CallMolecularConsensusReads'."
+    },
+    {
+      "priority": "P2",
+      "title": "Assay gate relies on the user's declared ASSAY",
+      "observed_in": [
+        4,
+        6
+      ],
+      "problem": "The example refuses eight assay names and warns above 50% flagged, but a real RNA-seq BAM declared ASSAY=wgs exits 0 with 2570/8828 flagged and no warning (38% at the top locus).",
+      "root_cause": "The gate checks a label, not the BAM; the 50% heuristic catches amplicon panels only.",
+      "fix": "Optionally refuse when @PG names a splice-aware aligner (STAR, HISAT2) or when many CIGARs contain N, and print the flagged percentage even below 50%."
+    },
+    {
+      "priority": "P2",
+      "title": "Frontmatter description omits the assay and UMI caveats",
+      "observed_in": [],
+      "problem": "The description still says 'Use when preparing alignments for variant calling' with no hint that RNA-seq, amplicon, scRNA and UMI libraries need a different tool.",
+      "root_cause": "Description untouched by the fix.",
+      "fix": "Append one clause: 'Not for RNA-seq, amplicon or UMI libraries (see the decision table)'."
+    }
+  ]
+}
