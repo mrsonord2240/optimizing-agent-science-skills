@@ -8,7 +8,31 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (78)
+## P1 (81)
+
+### `bio-alignment-sorting` — `sort -n` described as lexicographic; it is natural order
+
+- Skill: 76, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/alignment-sorting) · [viewer](skills/bio-alignment-sorting/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 2, 5
+- Problem: The collate-vs-sort table calls `sort -n` a 'full lexicographic sort / strict total order by QNAME' and advises it for tools needing true lexicographic order. In samtools 1.24 -n is natural order (SS:queryname:natural) and -N is ASCII; Picard MarkDuplicates crashes on `sort -n` output ('Alignments added out of order') and ValidateSamFile reports RECORD_OUT_OF_ORDER, while `sort -N` works.
+- Root cause: The table predates or ignores the -n/-N split and the Skill never mentions -N or the SS header tag.
+- Fix: State that -n = natural, -N = ASCII/Picard-compatible; recommend -N (or Picard SortSam) whenever a Picard/GATK/htsjdk consumer reads the file; add SS: to the header-check section. Fix the RSEM/Salmon advice (they need mates adjacent, not lexicographic order) and give the same -n/-N note for merge.
+
+### `bio-alignment-sorting` — Shipped example needs an undocumented bwa index and masks aligner failure
+
+- Skill: 76, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/alignment-sorting) · [viewer](skills/bio-alignment-sorting/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 5
+- Problem: From a clean copy the example fails ('fail to locate the index files') because nothing says to run `bwa index`; and with `set -e` but no pipefail a mid-stream aligner failure (simulated exit 3) still gives exit 0, 'Done' and a truncated BAM (57 of 100 reads). The same pattern appears in the SKILL's Python subprocess/shell=True snippet.
+- Root cause: The script assumes a prepared reference and reads only the last pipeline stage's exit status.
+- Fix: Add `set -eo pipefail`, an index-exists check with a `bwa index` hint, an input-file existence check, and a final read-count sanity check (flagstat total vs FASTQ reads); use `set -o pipefail; ...` in the Python shell string.
+
+### `bio-alignment-sorting` — 'Trust the @HD SO: header' is unsafe; verification is header-only
+
+- Skill: 76, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/alignment-sorting) · [viewer](skills/bio-alignment-sorting/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 3
+- Problem: The Skill calls the header 'simpler and authoritative' and ensure_coordinate_sorted() returns a mislabelled (SO:coordinate but shuffled) BAM unchanged, which then fails to index; the awk check catches this but cannot see contig-order violations, and nothing recommends `samtools quickcheck` or an index attempt.
+- Root cause: Sort state is inferred from metadata rather than checked against the records.
+- Fix: Make the awk/pysam record check the primary verification (or call `samtools index` as the test), keep the header as a fast hint only, add `samtools quickcheck` after long sorts, and drop 'authoritative'.
 
 ### `bio-alignment-amplicon-clipping` — Wrong primer BED passes the example; claim attributed to checker
 
@@ -634,7 +658,39 @@ None open.
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (357)
+## P2 (361)
+
+### `bio-alignment-sorting` — Merge section omissions
+
+- Skill: 76, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/alignment-sorting) · [viewer](skills/bio-alignment-sorting/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 4
+- Problem: No -n/-N (or -t) for merging name- or tag-sorted inputs, so a plain merge silently yields non-name-ordered output; `-R` requires indexed inputs (fails otherwise); the 'Safe Merge' label sits on -c, which collapses distinct RGs that share an ID.
+- Root cause: Merge examples cover only the coordinate-sorted case.
+- Fix: Add `merge -n/-N` and the -R index requirement, and rename the block 'Merge (dedup identical @RG/@PG)' with the RG-collision warning first.
+
+### `bio-alignment-sorting` — Unreproduced performance claims and small flag inaccuracies
+
+- Skill: 76, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/alignment-sorting) · [viewer](skills/bio-alignment-sorting/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 2, 3, 5
+- Problem: 'collate ~3-10x faster than sort -n' (measured: collate 4x slower on 192k reads), the compression table (-l 9 wall +853%, sizes far from claims) are unsourced; `-T` is labelled 'Temporary Directory' but is a PREFIX; `-m` below 1M is rejected and not stated; total memory is (threads+1) x -m, not threads x -m; the HTSeq row says '-p for paired' but -p is --samout-format.
+- Root cause: Numbers and flag semantics copied from general knowledge without checking against 1.19+.
+- Fix: Remove or source the numeric claims (or mark them data-dependent), label -T as a prefix, add the -m 1M floor and the (threads+1) memory note, and correct the HTSeq/featureCounts parenthetical.
+
+### `bio-alignment-sorting` — Missing modern sort options that the Skill itself recommends
+
+- Skill: 76, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/alignment-sorting) · [viewer](skills/bio-alignment-sorting/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 3, 5
+- Problem: fgbio GroupReadsByUmi is said to prefer template-coordinate order but no command is given (`samtools sort --template-coordinate` works); `--write-index` (sort + index in one pass) and the fact that -n/-N/-t outputs cannot be indexed are not mentioned.
+- Root cause: Section written around the classic coordinate/name/tag trio.
+- Fix: Add a short template-coordinate and --write-index entry and a one-line 'cannot be indexed' note under name and tag sorts.
+
+### `bio-alignment-sorting` — SKILL.md and usage-guide.md duplicate each other
+
+- Skill: 76, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/alignment-sorting) · [viewer](skills/bio-alignment-sorting/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: —
+- Problem: Nearly every command, the fixmate/markdup workflow, collate FASTQ extraction and the pysam snippets appear in both files (503 lines together for a three-topic Skill), doubling maintenance and context cost.
+- Root cause: usage-guide.md restates SKILL.md instead of holding only prompts and troubleshooting.
+- Fix: Keep commands only in SKILL.md; reduce usage-guide.md to example prompts, what-the-agent-does and troubleshooting.
 
 ### `bio-crispr-screens-copy-number-correction` — negative_control_sgrnas empty-dict case raises an undocumented ValueError
 
