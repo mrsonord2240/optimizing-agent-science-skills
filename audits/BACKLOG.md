@@ -8,7 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (80)
+## P1 (78)
 
 ### `bio-causal-genomics-transcriptome-wide-association` — pip install pyfocus (as documented) is non-functional under modern pandas
 
@@ -193,30 +193,6 @@ None open.
 - Problem: query_raw() calls ds.get(), which is pybiomart's ServerBase.get() -- a plain HTTP GET with the entire XML query embedded in the URL. At 2066 real Ensembl gene IDs (~33KB filter value alone), Ensembl rejects the request with 414 Request-URI Too Large. SKILL.md's own Goal text advertises '5,000 Ensembl Gene IDs' and usage-guide.md's Quick Start example says '8,000 Ensembl Gene IDs' -- both would fail the same way, worse.
 - Root cause: query_raw() inherits pybiomart's GET-based transport unchanged; nothing in the fix's new helper switches to POST or chunks large ID lists client-side.
 - Fix: Either build the query_raw() request as an HTTP POST (BioMart's martservice endpoint accepts POST for the same XML payload) or chunk ID lists above a safe size (empirically ~500-1000 IDs) into multiple queries joined client-side, and correct the '5,000'/'8,000 IDs' claims in SKILL.md and usage-guide.md to state the real, tested limit.
-
-### `bio-proteomics-spectral-libraries` — OpenSWATH decoy generation's real data requirements are undocumented
-
-- Skill: 87, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/spectral-libraries) · [viewer](skills/bio-proteomics-spectral-libraries/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 4
-- Problem: TargetedFileConverter -> OpenSwathDecoyGenerator silently produces 0 decoys ('missing annotation' / 'below the 80% threshold') unless the transition list carries a literal Annotation column (e.g. 'y3^1') AND chemically real theoretical fragment m/z values -- placeholder or approximate ProductMz values are not enough, even though the TraML converts and validates without error.
-- Root cause: usage-guide.md's Format Conversion section names the tool ('generate decoys with OpenSwathDecoyGenerator') but not the field-level TraML/TSV schema the shuffle algorithm needs to match target and decoy annotations.
-- Fix: Add a short note to usage-guide.md's Format Conversion section: OpenSWATH TSV/TraML must include a literal Annotation column and real theoretical fragment m/z (not placeholders) for decoy generation to succeed; point to the OpenMS OpenSwathDecoyGenerator docs for the exact format.
-
-### `bio-proteomics-spectral-libraries` — Decoy shuffle generation is non-deterministic with no documented seed control
-
-- Skill: 87, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/spectral-libraries) · [viewer](skills/bio-proteomics-spectral-libraries/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 4
-- Problem: OpenSwathDecoyGenerator's -method shuffle produced a different decoy peptide sequence on two runs with identical input, and its CLI exposes no seed flag, while every other calibration/merge step in the Skill is explicitly seeded.
-- Root cause: The Skill's Tips section documents seeded, reproducible steps elsewhere but does not flag that this specific external tool step is intentionally randomized by design (target-decoy shuffle) and not reproducible run-to-run.
-- Fix: Add a Tips note that shuffle-decoy peptide identities vary run-to-run (expected behavior of the shuffle algorithm, not a bug) and that -method shift is available when exact reproducibility of decoy m/z values is required.
-
-### `bio-proteomics-spectral-libraries` — Reference DeepLC code example is stale against the installed API
-
-- Skill: 87, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/spectral-libraries) · [viewer](skills/bio-proteomics-spectral-libraries/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 2
-- Problem: The commented reference line 'from deeplc import DeepLC; dlc = DeepLC(); dlc.calibrate_preds(...)' in examples/build_library.py (and the equivalent in SKILL.md) does not run against deeplc 4.5.0, which ships only a module-level API.
-- Root cause: The snippet was written against an older deeplc release and not updated as the package moved from a class-based to a module-level API.
-- Fix: Update the reference comment to deeplc.predict_and_calibrate(...) / deeplc.calibrate(...) matching the current package API; keep the existing Version Compatibility caveat as a backstop for future drift.
 
 ### `bio-single-cell-cell-annotation` — The triage screens on the one signal artifacts do not trip
 
@@ -633,6 +609,14 @@ None open.
 - Problem: SetKEGG.PathLib(), CrossReferencing(), and Setup.KEGGReferenceMetabolome() all route through MetaboAnalystR's internal .get.my.lib(), which silently downloads generic pathway/compound reference libraries from https://www.metaboanalyst.ca/resources/libs/ whenever the local cache is missing or older than 30 days. This is not disclosed anywhere in SKILL.md/usage-guide.md, unlike the two fixed P0s and unlike FELLA's/KEGGREST's comparable live-network caveats, which ARE disclosed.
 - Root cause: The Version Compatibility disclosure block added in the last fix pass covered only the two functions the fixer was explicitly told about (CalculateOraScore/CalculateQeaScore); it was not extended to the library-loading functions that also reach out to a remote server.
 - Fix: Add one sentence to Version Compatibility or Prerequisites noting that SetKEGG.PathLib/CrossReferencing/Setup.KEGGReferenceMetabolome download generic (non-user) reference libraries from metaboanalyst.ca on first use or after a 30-day cache expiry, mirroring the existing FELLA/KEGGREST live-dependency disclosure.
+
+### `bio-proteomics-spectral-libraries` — OpenSWATH TSV schema guidance omits transition_group_id
+
+- Skill: 93, Production Ready · [mrsonord2240/bioSkills@3f601a1](https://github.com/mrsonord2240/bioSkills/tree/3f601a1a50af8c52724edd5393938e2bda44cd79/proteomics/spectral-libraries) · [viewer](skills/bio-proteomics-spectral-libraries/mrsonord2240-bioSkills@3f601a1/viewer.md)
+- Observed in inputs: 4
+- Problem: A transition list lacking a transition_group_id column (or equivalent unique per-precursor identifier) can have TargetedFileConverter silently merge two distinct peptides that share a PrecursorCharge into a single peptide group -- corrupting target/decoy peptide counts with no error, worse than the now-documented 0-decoy threshold failure because it produces no error at all.
+- Root cause: The fix's new 'OpenSwathDecoyGenerator's real input requirements' section documents the Annotation column and real fragment m/z as the requirements, but the reference OpenSWATH TSV example (and the fixer's own verification data) already included transition_group_id without calling it out as a requirement.
+- Fix: Add transition_group_id (unique per PeptideSequence+PrecursorCharge) to the documented required-fields list in 'Convert Library Formats' and the runnable pyteomics snippet, alongside Annotation and real fragment m/z.
 
 ### `bio-pathway-kegg-pathways` — graphite route disagrees with direct spia() on perturbation direction for 30% of pathways, undocumented
 
@@ -1275,22 +1259,6 @@ None open.
 - Problem: The diagnostic is described but not coded.
 - Root cause: Conceptual section only.
 - Fix: Add the regression of HPD width on posterior mean from out.txt.
-
-### `bio-proteomics-spectral-libraries` — MS2PIP's first-run model retrieval can hang with no documented workaround
-
-- Skill: 87, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/spectral-libraries) · [viewer](skills/bio-proteomics-spectral-libraries/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 2
-- Problem: ms2pip.predict_batch(...) printed 'Model hash not recognized.' then produced no further output for 5+ minutes in this network environment.
-- Root cause: ms2pip resolves/downloads model files on first use; the Skill's Prerequisites section lists 'pip install ... ms2pip' but says nothing about first-run model retrieval or how to pre-cache it.
-- Fix: Add a Prerequisites note to pre-fetch or point model_dir at a locally cached MS2PIP model set before relying on it in network-restricted environments.
-
-### `bio-proteomics-spectral-libraries` — No input-validation guidance before submitting peptides to Koina
-
-- Skill: 87, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/proteomics/spectral-libraries) · [viewer](skills/bio-proteomics-spectral-libraries/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 3
-- Problem: Submitting a peptide with a non-standard residue or an unusually long sequence to Koina raises an uncaught InferenceServerException rather than a Skill-anticipated, user-facing message.
-- Root cause: The Skill does not mention validating peptide sequences (standard 20-AA alphabet, reasonable length) before calling an external prediction service.
-- Fix: Add a one-line tip recommending a basic peptide-sequence sanity check (alphabet, length) before submission, with a pointer to catch and report InferenceServerException clearly.
 
 ### `bio-single-cell-cell-annotation` — Two 'wrong input' symptoms are stale for current tool versions
 
@@ -2979,6 +2947,22 @@ None open.
 - Problem: The documented incompatibility (enrichplot 1.26.6/ggtree/ggplot2 4.0.3) may be fixed in a future enrichplot or ggtree release, at which point the Skill's 'do not retry' guidance and emapplot-only recommendation for compareClusterResult would become stale.
 - Root cause: The fix correctly documents a point-in-time incompatibility but has no built-in trigger to revisit it as dependency versions move forward.
 - Fix: Add a one-line note to Version Compatibility: 're-test treeplot on a compareClusterResult after any enrichplot/ggtree upgrade; this may be fixed upstream'.
+
+### `bio-proteomics-spectral-libraries` — -method reverse's determinism claim is slightly overstated
+
+- Skill: 93, Production Ready · [mrsonord2240/bioSkills@3f601a1](https://github.com/mrsonord2240/bioSkills/tree/3f601a1a50af8c52724edd5393938e2bda44cd79/proteomics/spectral-libraries) · [viewer](skills/bio-proteomics-spectral-libraries/mrsonord2240-bioSkills@3f601a1/viewer.md)
+- Observed in inputs: 4
+- Problem: SKILL.md states both -method reverse and -method pseudo-reverse are deterministic ('confirmed byte-identical across repeated runs'). Independent re-testing found pseudo-reverse fully byte-identical across 5 runs, but reverse differed in 1 of 5 runs by a last-ULP floating-point value in a non-scored isolation-window metadata field (not the decoy peptide sequence or fragment content).
+- Root cause: The fix's own verification diffed only 2 runs of each method, which was not enough to catch an intermittent (1-in-5) floating-point discrepancy.
+- Fix: Soften the reverse claim (note it is deterministic for decoy peptide/fragment content but has been observed to vary in a metadata-only field) and recommend pseudo-reverse as the primary example when exact reproducibility matters, keeping reverse as a secondary option.
+
+### `bio-proteomics-spectral-libraries` — No input-validation guidance before submitting peptides to Koina
+
+- Skill: 93, Production Ready · [mrsonord2240/bioSkills@3f601a1](https://github.com/mrsonord2240/bioSkills/tree/3f601a1a50af8c52724edd5393938e2bda44cd79/proteomics/spectral-libraries) · [viewer](skills/bio-proteomics-spectral-libraries/mrsonord2240-bioSkills@3f601a1/viewer.md)
+- Observed in inputs: 3
+- Problem: Submitting a peptide with a non-standard residue or an unusually long sequence to Koina still raises an uncaught InferenceServerException rather than a Skill-anticipated, user-facing message. Unchanged from the prior audit; not addressed by this fix.
+- Root cause: The Skill does not mention validating peptide sequences (standard 20-AA alphabet, reasonable length) before calling an external prediction service.
+- Fix: Add a one-line tip recommending a basic peptide-sequence sanity check (alphabet, length) before submission, with a pointer to catch and report InferenceServerException clearly.
 
 ### `bio-virtual-screening` — Insertion-code failure mode documented too narrowly
 
