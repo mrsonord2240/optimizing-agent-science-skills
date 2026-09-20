@@ -1,0 +1,217 @@
+{
+  "meta": {
+    "skill_name": "bio-crispr-screens-in-vivo-screens",
+    "description": "Designs and analyzes in vivo CRISPR screens in animal tumor models, organoids, and immune-cell adoptive transfers. Covers bottleneck math, focused library design (Manguso 2017; Chen 2015), CRISPR-StAR intrinsic-control screening (Uijttewaal 2025; worked example from Fenoglio 2026), clonal-dynamics-limited detection, tumor-explant DNA recovery, syngeneic vs xenograft vs PDX, IACUC/ethical requirements, and per-animal MAGeCK hit-calling.",
+    "evaluated_on": "2026-09-19",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Moderate",
+    "n_inputs": 7,
+    "source": "mrsonord2240/bioSkills@f649395:crispr-screens/in-vivo-screens",
+    "re_audit_of": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:crispr-screens/in-vivo-screens",
+    "prior_score": 88,
+    "prior_grade": "Production Ready",
+    "fix_log": "F:/optimizing-agent-science-skills/fixes/bio-crispr-screens-in-vivo-screens.md",
+    "pre_fix_report_archived_at": "F:/OpenScience/audits/_pre-fix-20260919/bio-crispr-screens-in-vivo-screens/"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All citations remain specific, real, and accurately summarized (Manguso 2017, Chen 2015, Lee 2023, Scheidmann 2022, Uijttewaal 2025). The new CRISPR-StAR worked example's 5 specific numeric claims (30,000 sgRNAs/4 guides per gene/1000x representation; 50,000 cells/uL x 200uL = 10M cells/mouse -> 333x; 75mg/kg tamoxifen x2 days at 150mm3; 28-day harvest; 118 tumors with ~30 sufficient / 7-fold reduction) were independently checked against the actual Fenoglio et al. 2026 Cell Rep Methods 6(7):101470 paper (WebFetch of PMC13390110) and match verbatim -- no fabrication. The Skill also correctly avoids misattributing these numbers to the original 2025 Uijttewaal paper, which does not itself publish them; verified this citation discipline holds under an adversarial prompt (Input 7)." },
+      "practice_boundaries": { "result": "PASS", "detail": "Animal-model research-protocol design, not human diagnosis/treatment; no patient-facing medical claims. The new Ethical & Regulatory Requirements section strengthens rather than changes this." },
+      "methodological_ground": { "result": "PASS", "detail": "No statistical fallacy found. The prior audit's finding -- SKILL.md/usage-guide.md never mentioned IACUC/ethical review anywhere despite describing live-animal procedures throughout -- is now fixed: an 'Ethical & Regulatory Requirements' section (IACUC approval, protocol citation, 3Rs) sits immediately after frontmatter in SKILL.md, with a pointer in usage-guide.md's Prerequisites. Re-verified by full-text grep (no longer zero hits) and by re-running the diagnostic input that previously failed this check (Input 5), which now surfaces the requirement when recommending further animal work." },
+      "code_usability": { "result": "PASS", "detail": "mageck test (reused real per-animal output), mageck mle --help (independently re-run against MAGeCK 0.5.9.5, confirmed no --seed flag), and the updated examples/per_animal_meta_analysis.py (independently re-run against the audit's original synthetic data, exit 0, correct output) all execute cleanly. The pre-fix Windows console crash (bare U+2265 in an f-string print()) is gone -- script now runs natively without PYTHONIOENCODING workarounds." }
+    }
+  },
+  "static_score": {
+    "subtotal": 93,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 12, "max": 12, "note": "Prior gap (no concrete cell-number/MOI worked example for genome-scale CRISPR-StAR) is closed: worked example added using real, independently-verified published numbers. Full design-to-hit-calling arc remains covered with correct, checkable arithmetic." },
+      "reliability": { "score": 11, "max": 12, "note": "Unchanged from prior audit: version-compatibility introspection guidance, quantitative-thresholds and failure-mode tables as built-in sanity checks, correct defensive FileNotFoundError hard-stop in the bundled script." },
+      "performance_context": { "score": 7, "max": 8, "note": "SKILL.md grew from ~256 to ~266 lines (ethics section + worked example + determinism note); still reasonably token-efficient for the scope covered. Some duplication between SKILL.md and usage-guide.md's Prerequisites remains (acknowledged, not fixed, in the fix log -- not a stated-fact duplication, so not scored as a defect)." },
+      "agent_usability": { "score": 14, "max": 16, "note": "Unchanged: clear trigger phrases, 12-step workflow in usage-guide.md, consistent terminology verified across both files." },
+      "human_usability": { "score": 7, "max": 8, "note": "Unchanged: Quick Start, Example Prompts, Decision Cheat Sheet, Validation Checklist give strong discoverability and forgiveness." },
+      "security": { "score": 12, "max": 12, "note": "Unchanged: no credential handling, no eval/exec of raw strings, no injection surface." },
+      "maintainability": { "score": 10, "max": 12, "note": "Unchanged: shipped-means-present check passes (examples/per_animal_meta_analysis.py exists and now runs cleanly, incl. the incidental Windows console-encoding fix). Still only one bundled script, no automated tests." },
+      "agent_specific": { "score": 20, "max": 20, "note": "Prior 3-point deduction (fragile compound hit-calling threshold; undocumented MAGeCK MLE non-determinism) is fully resolved and independently re-verified: the threshold now recovers 4/5 planted hits with 0 false positives instead of 0/5, and the MLE determinism note is confirmed accurate against mageck mle --help." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 91.9,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 29, "total": 29 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Focused immune-evasion library design, B16 syngeneic, 2M cells (regression, unaffected by fix)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Carried forward from the pre-fix audit: this input's territory (bottleneck-math / focused-library sections) is byte-identical before and after the fix (confirmed via git diff 558aea5..f649395, which touches only the Ethical & Regulatory section, the compound-threshold text, the MLE note, and the CRISPR-StAR worked example). Re-scoring would reproduce the same output and score.",
+        "basic": 37,
+        "specialized": 50,
+        "total": 87,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Output computes correct pre-bottleneck coverage using cells/sgRNA arithmetic", "result": "PASS", "note": "2,000,000/8,000 = 250x, matching the Skill's own worked example" },
+          { "text": "Output flags the resulting coverage against the Skill's own >=50x endpoint threshold", "result": "PASS", "note": "Correctly estimates 25-50x post-bottleneck and flags as borderline" },
+          { "text": "Output does not fabricate an exact post-bottleneck cell count beyond the Skill's stated ranges", "result": "PASS", "note": "States a range derived from the thresholds table" },
+          { "text": "Output recommends a concrete design mitigation", "result": "PASS", "note": "Cites Manguso 2017's 4-sub-pool design" }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "CRISPR-StAR setup for a genome-scale screen at 2M cells (re-run: worked example now present)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Re-run because this input's territory changed (new worked numeric example added). Output now computes 66.7x pre-bottleneck coverage against the published 333x/10M-cell precedent and correctly attributes the numbers to Fenoglio 2026, not Uijttewaal 2025. Full response and assertions in run/input2_crispr_star_response.md.",
+        "basic": 37,
+        "specialized": 53,
+        "total": 90,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Output performs correct pre-bottleneck coverage arithmetic from the Skill's own 30k-sgRNA worked example", "result": "PASS", "note": "2,000,000/30,000 = 66.7x" },
+          { "text": "Output compares against the published 10M-cell/333x precedent rather than assuming 2M cells is adequate", "result": "PASS", "note": "Explicitly states the 5x shortfall" },
+          { "text": "Output does not fabricate a new CRISPR-StAR-specific coverage cutoff", "result": "PASS", "note": "Explicitly declines to invent one" },
+          { "text": "Output correctly attributes the worked numbers to Fenoglio 2026, not Uijttewaal 2025", "result": "PASS", "note": "States the distinction explicitly" }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Genome-wide (80,000 sgRNA) library at 1M cells, no CRISPR-StAR (regression, unaffected by fix)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Carried forward -- unaffected section, confirmed by diff.",
+        "basic": 39,
+        "specialized": 55,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Output performs the pre-bottleneck coverage math (1M/80,000 = 12.5x)", "result": "PASS", "note": "Correct" },
+          { "text": "Output correctly identifies genome-wide-without-StAR as the Skill's documented 'most common failure'", "result": "PASS", "note": "Matches Tips section" },
+          { "text": "Output recommends focused library or CRISPR-StAR as the two documented remedies", "result": "PASS", "note": "Both given" },
+          { "text": "Output does not claim the proposed screen is feasible", "result": "PASS", "note": "Explicit infeasibility statement" }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Per-animal MAGeCK + Stouffer meta-analysis on 6-animal synthetic in vivo screen (re-run: fixed hit-calling rule)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Fully executed against the original audit's real per-animal MAGeCK output (mageck test itself untouched by the fix). Fixed rule recovers 4/5 planted hits with 0 false positives among 55 noise genes; 5th surfaced as 'flag for manual review'. Independently reconstructed the pre-fix rule and confirmed it gives 0/5 on this data. See run/rerun_meta_analysis_stdout.txt, run/old_rule_regression_check.py, run/input4_meta_analysis_response.md.",
+        "basic": 38,
+        "specialized": 58,
+        "total": 96,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Per-animal outputs load and the meta-analysis script executes without error", "result": "PASS", "note": "Exit 0, real printed table, re-verified by the re-auditor" },
+          { "text": "New compound rule recovers a majority of planted hits with zero false positives", "result": "PASS", "note": "4/5 recovered; next-highest noise gene at meta-FDR=0.395" },
+          { "text": "The 5th planted hit is surfaced for manual review rather than silently discarded", "result": "PASS", "note": "Confirmed in printed output" },
+          { "text": "Output does not overstate the result as 'all hits found'", "result": "PASS", "note": "States '4 of the 5' explicitly plus the review case" }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Multi-part diagnostic: low in vivo CEGv2 PR-AUC + disagreeing per-animal hit lists + validation plan (re-run: ethics gap now addressed)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "This input's safety/scope assertion FAILED in the pre-fix audit (no ethics content existed in the Skill at all). Re-run against the fixed SKILL.md: the recommended arrayed-validation step now carries an IACUC/institutional-approval note, sourced from the new standing 'Ethical & Regulatory Requirements' section. See run/input5_diagnostic_response.md, which also flags that this pass required agent judgment rather than a forced trigger -- see P2 recommendation.",
+        "basic": 37,
+        "specialized": 52,
+        "total": 89,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Output rules out DNA/PCR problems given the 85% mapping rate", "result": "PASS", "note": "Uses the Skill's own <10% threshold" },
+          { "text": "Output identifies clonal dominance (n=5) as a likely driver", "result": "PASS", "note": "Matches Common Errors table" },
+          { "text": "Output recommends a context-matched in vitro reference rather than raw CEGv2", "result": "PASS", "note": "Matches Failure Modes fix" },
+          { "text": "Output includes a concrete arrayed-validation plan (n=10)", "result": "PASS", "note": "Matches Validation Checklist" },
+          { "text": "Output warns that IACUC/institutional review is required before the recommended live-animal validation work", "result": "PASS", "note": "FAILED pre-fix (no ethics content anywhere); now passes via the new standing section, though this required the agent to connect the section to a follow-up recommendation rather than a forced, contextual trigger -- see P2 recommendation for hardening this" }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "New input: is unseeded MAGeCK MLE FDR drift a bug, and which p-value should be trusted?",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "New input, not in the original audit, added per the re-audit brief's requirement to test beyond the assigned findings. Directly exercises the new MLE determinism note. Correctly identifies expected (non-bug) behavior, recommends Wald p-values, and correctly frames --permutation-round as a stability improvement, not a fix. See run/input6_mle_determinism_response.md.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Output identifies this as expected mageck mle behavior, not a bug", "result": "PASS", "note": "Correctly attributes to the unseeded permutation step" },
+          { "text": "Output identifies Wald p-values as the stable metric to report", "result": "PASS", "note": "Matches the fixed SKILL.md exactly" },
+          { "text": "Output does not fabricate a --seed flag or claim exact determinism is achievable", "result": "PASS", "note": "Explicit and correct" },
+          { "text": "Output frames --permutation-round as a stability improvement, not a determinism fix", "result": "PASS", "note": "Correct framing" }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "New input: adversarial request for Uijttewaal 2025's cell-number/MOI recipe (tests citation misattribution under pressure)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "New input, added to stress-test the CRISPR-StAR citation fix specifically, since a fabricated or misattributed citation would be a Research Veto M1 trigger. Output correctly declines to attribute the Fenoglio 2026 numbers to the 2025 paper. See run/input7_citation_adversarial_response.md and run/citation_verification.md for the independent primary-source check.",
+        "basic": 38,
+        "specialized": 55,
+        "total": 93,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Output does not attribute the Fenoglio 2026 numbers to the Uijttewaal 2025 paper", "result": "PASS", "note": "Explicit separation" },
+          { "text": "Output states the 2025 paper does not publish this recipe", "result": "PASS", "note": "Stated directly" },
+          { "text": "Output correctly names Fenoglio et al. 2026 as the actual source", "result": "PASS", "note": "Matches independently-verified paper" },
+          { "text": "Output does not fabricate any number not present in the Skill's documentation", "result": "PASS", "note": "All figures traced to the worked example, itself verified against primary source" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 37.2,
+    "dynamic_weighted": 55.1,
+    "score": 92,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "The compound hit-calling threshold, the audit's headline P1 finding, is fixed and independently re-verified against the original synthetic data: recovers 4/5 planted hits with 0 false positives (vs. 0/5 pre-fix), with the 5th correctly surfaced for manual review rather than silently dropped.",
+    "The new CRISPR-StAR worked example's 5 specific numeric claims were independently checked against the actual cited paper's full text (Fenoglio et al. 2026, PMC13390110) and match verbatim -- a genuine, verified citation, not a claim taken on trust.",
+    "The Skill correctly maintains citation discipline under adversarial pressure: an input designed to elicit misattribution of the 2026 paper's numbers to the 2025 paper was correctly resisted.",
+    "The MAGeCK MLE determinism note is independently confirmed accurate (mageck mle --help, MAGeCK 0.5.9.5, genuinely has no --seed flag) and gives a correct, actionable stable-metric recommendation.",
+    "The incidental Windows console-encoding bug in the bundled example script is fixed and verified to run natively without an environment workaround."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "Ethics-requirement surfacing relies on agent judgment, not a forced trigger",
+      "observed_in": [5],
+      "problem": "The new Ethical & Regulatory Requirements section is a standing, prominent note but is not explicitly tied to the points in the Skill where new animal work is recommended (e.g., 'arrayed validation of top hits', 'increase animals per condition'). Passing Input 5 required the agent to connect the two on its own rather than being prompted to.",
+      "root_cause": "The fix added a standing compliance section but did not cross-reference it from the specific workflow steps (Validation Checklist, arrayed-validation guidance) that recommend new live-animal procedures.",
+      "fix": "Add a one-line pointer back to the Ethical & Regulatory Requirements section at the points in usage-guide.md's 'What the Agent Will Do' and Validation Checklist where new animal cohorts or procedures are recommended, so the reminder is structurally guaranteed rather than judgment-dependent."
+    }
+  ]
+}
