@@ -1,9 +1,9 @@
 {
   "skill_id": "bio-long-read-splicing",
-  "version": "mrsonord2240-bioSkills@44ff43b",
+  "version": "mrsonord2240-bioSkills@887eaed",
   "source": {
     "repository": "mrsonord2240/bioSkills",
-    "commit": "44ff43bb35e5741c3ddd3c003590e1f1da8a4a4b",
+    "commit": "887eaeddf09532feee6caaf5f325d0c9b3ce7101",
     "path": "alternative-splicing/long-read-splicing",
     "author": "GPTomics",
     "author_url": "https://github.com/GPTomics",
@@ -13,7 +13,7 @@
       "repository": "GPTomics/bioSkills",
       "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
     },
-    "url": "https://github.com/mrsonord2240/bioSkills/tree/44ff43bb35e5741c3ddd3c003590e1f1da8a4a4b/alternative-splicing/long-read-splicing"
+    "url": "https://github.com/mrsonord2240/bioSkills/tree/887eaeddf09532feee6caaf5f325d0c9b3ce7101/alternative-splicing/long-read-splicing"
   },
   "audit": {
     "method": {
@@ -31,11 +31,11 @@
     "commissioned_by": "Samuel Nord",
     "test_data": "synthetic"
   },
-  "supersedes": null,
+  "supersedes": "mrsonord2240-bioSkills@c07c53c",
   "files": {
     "report": "report.json",
     "viewer": "viewer.md",
     "fixes": "fixes.md",
-    "scripts": 37
+    "scripts": 85
   }
 }
