@@ -1,0 +1,209 @@
+#!/usr/bin/env python3
+"""Assemble eval_report_bio-alignment-filtering_result.json and verify the schema pre-emit checklist."""
+import json, sys
+OUT = sys.argv[1]
+A = lambda t, r, n: {'text': t, 'result': r, 'note': n}
+
+inputs = [
+ dict(index=1, type='Canonical', label='Standard quality filter (primary, mapped, non-dup, MAPQ>=30) on real 1000G and nf-core BAMs',
+      status='COMPLETED', status_flag='✅',
+      note='CLI and pysam recipes match a hand-count from raw flag/MAPQ integers on 9601- and 5644-record real BAMs (9437 and 5640 kept). SKILL.md (-F 3332) and usage-guide (-F 2308) define "standard" differently: 101 duplicate-flagged reads survive the usage-guide version.',
+      basic=35, specialized=53, executed=True,
+      execution_note='in1_standard.py in WSL: samtools 1.24 and pysam 0.24.1 on HG00349 chr20 slice and human PE test BAM, output read back and compared record-by-record.',
+      assertions=[
+        A('samtools view -F 3332 -q 30 output equals an independent hand-count of records with (flag&3332)==0 and MAPQ>=30', 'PASS', '9437/9437 (1000g) and 5640/5640 (human); -o x.bam without -b writes BGZF BAM; quickcheck OK'),
+        A('SKILL.md pysam passes_filter yields exactly the CLI standard-filter record set', 'PASS', 'Record-by-record (flag, MAPQ, qname) identical on both BAMs'),
+        A('usage-guide AlignmentFilter / count_with_filter agree with samtools counts', 'PASS', 'count_with_filter before/after 9601/9538 equals samtools view -c and -c -F 2308 -q 30'),
+        A('Filtered BAM keeps the header (SQ/RG) and is a valid BAM', 'PASS', 'RG dict identical to input; flagstat 9437 + 0 primary'),
+        A('SKILL.md and usage-guide give one consistent definition of the "standard" filter', 'FAIL', 'SKILL.md -F 3332 -q 30 vs usage-guide -F 2308 -q 30 (and "-F 2308 for most downstream analyses"); the latter leaves 101 duplicate-flagged reads in the 1000G BAM'),
+      ]),
+ dict(index=2, type='Variant A', label='Assay-aware flag recipes and flag arithmetic, exhaustive over all 4096 FLAG values (synthetic)',
+      status='COMPLETED', status_flag='✅',
+      note='28/28 -f/-F/-G/-q recipes equal bit arithmetic over every flag value; every "N = a + b" breakdown and the flag table match `samtools flags`. Semantics gaps: "Forward Strand Only" (-F 16) also returns unmapped reads; the somatic recipe drops the supplementary reads its own rationale wants kept.',
+      basic=36, specialized=55, executed=True,
+      execution_note='make_synthetic_flags.py (SYNTHETIC: one read per flag 0..4095, because no real BAM here holds supplementary or QC-fail reads) then in2_flags.py; ground truth is Python bit arithmetic plus `samtools flags`.',
+      assertions=[
+        A('Every -f/-F/-G/-q recipe in SKILL.md and usage-guide selects exactly the records predicted by bit arithmetic', 'PASS', '28 recipes x 4096 flags; repeated "-F 256 -F 2048" is OR-ed (1024 records) in samtools 1.24'),
+        A('All flag-sum breakdowns (2304, 3328, 3332, 1284, 1804, 2308) are arithmetically right and match `samtools flags` names', 'PASS', '8 doc claims parsed by regex plus 6 explicit; all equal'),
+        A('Common FLAG table (12 rows) and usage-guide decode examples match samtools', 'PASS', 'names and hex identical, e.g. 99 = PAIRED,PROPER_PAIR,MREVERSE,READ1'),
+        A('"Forward Strand Only" (-F 16) and "Keep Read1 Only" (-f 64) return only the reads their headings say', 'FAIL', '-F 16 returns 1024 unmapped records among 2048; -f 64 returns 1536 secondary/supplementary and 1024 duplicate records'),
+        A('The somatic recipe (-F 3328 -q 1) is consistent with its stated rationale (chimeric reads may carry real somatic SNVs)', 'FAIL', '3328 contains 2048, so 0 of 2048 supplementary records survive'),
+      ]),
+ dict(index=3, type='Edge', label='Region/BED filtering, shipped examples/filter_bam.py, CRAM output (real human PE BAM, real UMI BAM)',
+      status='COMPLETED', status_flag='⚠️',
+      note='samtools region, multi-region, -L BED and CRAM output are right. The pysam BED recipe writes 802 duplicated records (3410 vs 2608) in unsorted order. The shipped filter_bam.py has a 1-based/0-based off-by-one at the region start and crashes on bare contig, comma coordinates and colon-containing contig names; on name-sorted input it writes the BAM then dies at index.',
+      basic=27, specialized=38, executed=True,
+      execution_note='in3_regions.py in WSL from a copy of the Skill; truth = own overlap arithmetic (1-based inclusive regions, 0-based half-open BED); UMI BAM sorted+indexed into out/ (contig chr22:16570000-16610000).',
+      assertions=[
+        A('samtools view region, multi-region and usage-guide argument order return exactly the overlapping reads (1-based inclusive)', 'PASS', '4 regions + multi-region union equal overlap truth (802, 0, 2, 1806, 2608 reads)'),
+        A('samtools view -L targets.bed returns each overlapping read once', 'PASS', '2608 = truth with two overlapping BED rows'),
+        A('CRAM output (-C -T ref) round-trips with the mapped count', 'PASS', '5642 mapped records read back with -T'),
+        A('The pysam "Filter from BED File" recipe returns the same reads as samtools -L', 'FAIL', '3410 records vs 2608: 802 reads overlapping two BED rows are written twice; output not coordinate-sorted; BED with a track line raises IndexError'),
+        A('examples/filter_bam.py --region uses the same coordinates as samtools and accepts normal region strings', 'FAIL', 'chr22:2043-... drops 2 reads samtools returns (fetch is 0-based); "chr22", "chr22:1952", "chr22:1,952-2,100" and the colon-named contig raise ValueError'),
+      ]),
+ dict(index=4, type='Variant B', label='Reproducible and pair-consistent subsampling: samtools -s recipes, coverage matching, pysam crc32 recipe (real 1000G BAM)',
+      status='COMPLETED', status_flag='⚠️',
+      note='samtools -s 42.1 is deterministic and pair-consistent; independent-seed and nested-seed claims hold (1197 vs 1200 expected). But "-s 0.1 is non-reproducible" is false (identical reruns), the pysam recipe ignores its seed (Jaccard 1.000 across 5 seeds), and both target-count snippets silently mis-sample when the target exceeds the read count (750 and 1445 records kept of 9601).',
+      basic=28, specialized=37, executed=True,
+      execution_note='in4_subsample.sh runs SKILL.md and usage-guide snippets verbatim; in4_subsample_pysam.py runs the crc32 recipe with seeds 42, 1, 7, 100, 12345; man samtools-view (1.24) read for --subsample-seed auto.',
+      assertions=[
+        A('samtools view -s 42.1 is reproducible and keeps mates together, at about 10% of templates', 'PASS', '1016 records twice, cmp identical; in4c: 512 of 4828 templates (10.6%), 0 templates with partial records'),
+        A('Sequential cuts: independent seeds give 12.5%, same seed nests (SKILL.md claims)', 'PASS', 'quarter=1197 vs 1200 expected; -s 1.25 on half1 == -s 1.25 on original (2256 both)'),
+        A('Coverage-matching snippet reaches the requested read count when the target is below the total', 'PASS', '2851 kept for target 3000 (-5%, template-hash variance); tumor-normal block 5628 vs 5640'),
+        A('Claim "bare -s 0.1 is non-reproducible; production pipelines should reject it" is true', 'FAIL', 'Two runs of -s 0.1 are byte-identical (1015 records); seed 0 is deterministic, only --subsample-seed auto is header-derived'),
+        A('The pysam pair-consistent recipe honours its `seed` variable', 'FAIL', 'zlib.crc32(qname) ^ seed only flips low bits: seeds 42/1/7/100/12345 keep the identical 453 templates (Jaccard 1.000)'),
+      ]),
+ dict(index=5, type='Stress', label='Aligner-aware MAPQ thresholds tested on 5 aligners (synthetic repeat genome) plus a real STAR RNA-seq BAM',
+      status='COMPLETED', status_flag='⚠️',
+      note='"Drop ambiguous: -q 1" is wrong for Bowtie2 (399/400 exact-repeat reads kept, MAPQ 1) and HISAT2 (374/400 kept), and the "Universal -q 1 ... works for all aligners" line contradicts the STAR row (real STAR BAM: -q 1 keeps 1246 of 1274 multi-mapped primaries). BWA, minimap2 and STAR -q 255 rows are right.',
+      basic=26, specialized=40, executed=True,
+      execution_note='make_repeat_genome.py (SYNTHETIC 60 kb genome, repeat families x2/x3/x5/x8, 2720 SE reads) aligned with bwa mem 0.7.19, bowtie2 2.5.5, hisat2 2.2.3, minimap2 2.31 -ax sr, STAR 2.7.11b; retention counted with samtools view -F 2308 -q N. pbmm2 row not run (long-read only).',
+      assertions=[
+        A('BWA-MEM and minimap2 "-q 1" drops truly ambiguous (exact-repeat) reads', 'PASS', '0/400 exact-repeat reads survive on both; BWA unique reads all MAPQ 60'),
+        A('STAR "-q 255" keeps only uniquely mapped reads', 'PASS', 'Real STAR BAM: MAPQ 255 <=> NH==1 (5768 records; -e [NH]==1 identical)'),
+        A('HISAT2 "-q 60" high-confidence threshold keeps unique and drops repeats', 'PASS', '1995/2000 unique kept, 0/400 exact-repeat kept'),
+        A('Bowtie2 "-q 1" drops ambiguous reads', 'FAIL', 'Bowtie2 gives exact-repeat reads MAPQ 1 (319/320) and 0: -q 1 keeps 399/400'),
+        A('"-q 1 ... works for all aligners" (Universal) holds', 'FAIL', 'HISAT2 keeps 374/400 (MAPQ 1 = multi-mapped), STAR real BAM keeps 1246/1274 multi-mapped (MAPQ 1 and 3)'),
+      ]),
+ dict(index=6, type='Scope Boundary', label='Expression (-e) and read-group filtering, composite "insert size + soft clip + NM" request (real BAMs)',
+      status='COMPLETED', status_flag='✅',
+      note='All -e recipes (NM, AS, cigar=~, sclen/qlen, ![NM]) equal tag/CIGAR truth; -R works. `-r library_A` is a library-style label but -r takes an RG ID (a real LB value returns 0 reads; `-l` is not mentioned), and -r also emits reads with no RG tag. A composite tlen expression needs a symmetric tlen test that the Skill does not show (naive keeps 2109 vs 4225).',
+      basic=33, specialized=51, executed=True,
+      execution_note='in6_expr.py in WSL on nf-core human BAM (NM/AS tags), HG00349 BAM (2 RGs), STAR RNA BAM; SYNTHETIC 9-read BAM for reads lacking RG; samtools 1.24 man page (expression variables, -r) read.',
+      assertions=[
+        A('-e recipes ([NM]>=2, cigar=~"^[0-9]+S", sclen/qlen<0.2, combined -F -q -e) equal tag/CIGAR truth', 'PASS', '229, 16, 5628 and 4206 records equal pysam truth; verbatim `rname=="chr1"` correctly returns 0 on a chr22 BAM'),
+        A('"![NM]" selects only reads missing NM (1.16+ claim) and -e [NH]==1 equals -q 255 on real STAR data', 'PASS', '2 reads (the unmapped pair); 5768 = 5768'),
+        A('-r <RG ID> and -R file select exactly that read group', 'PASS', 'SRR702039 4438, SRR702040 5163, -R file 4438 equal RG-tag truth'),
+        A('The "Filter by Read Group" example `-r library_A` selects a library', 'FAIL', '-r matches RG ID only: a real LB value returns 0 of 9601 reads while -l returns all; -l is not documented'),
+        A('`-r` returns only the named read group', 'FAIL', 'Synthetic 3 RG-a + 3 RG-b + 3 no-RG reads: `-r a` returns 6 (samtools 1.24 also outputs untagged reads)'),
+      ]),
+ dict(index=7, type='Adversarial', label='"Remove duplicates, keep unique high-confidence proper pairs, then run Manta" on an unmarked-duplicate BAM',
+      status='COMPLETED', status_flag='⚠️',
+      note='The SV warning is correct and reproduced (-F 1024 keeps supplementary reads; -F 3332/-F 2308 remove all). But "Remove Duplicates" (-F 1024) on the planted BAM with unmarked duplicates keeps 500 of 500 with no warning (only a Related-Skills line says to mark first); after markdup it keeps the correct 400. "Count unique: -F 2304 (primary only)" is mislabelled: 1274 of 7042 STAR primaries are multi-mapped.',
+      basic=27, specialized=42, executed=True,
+      execution_note='in7_adversarial.sh in WSL: planted_dups.bam, collate/fixmate -m/sort/markdup, synthetic all-flag BAM, real STAR BAM. Manta not installed, so "zero SV calls" was not executed; only the flag-level cause (supplementary reads removed) was verified.',
+      assertions=[
+        A('SV guidance is right: -F 1024 keeps supplementary reads while -F 3332 / -F 2304 / -F 2308 remove every one', 'PASS', '1024 of 2048 kept vs 0; the Skill says so explicitly with the cost of the mistake'),
+        A('Mark-then-filter (Related Skill order) removes exactly the planted 50 pairs', 'PASS', 'samtools markdup flags 100; -F 1024 leaves 400 of 500'),
+        A('The Skill tells the user to check that duplicates are actually flagged before -F 1024', 'FAIL', '-F 1024 on the unmarked BAM leaves 500 of 500; only "duplicate-handling - Mark duplicates before filtering" in Related Skills'),
+        A('Every filter row is labelled with what it does ("Count unique: -F 2304 (primary only)")', 'FAIL', '-F 2304 keeps 7042 records including 1274 with NH>1; uniqueness needs -q 255 / NH==1'),
+        A('The Skill flags the conflict between a proper-pair filter and SV calling', 'PASS', 'Assay table lists Manta/GRIDSS/Delly with "-F 1024 only"; -f 2 is not recommended for SV'),
+      ]),
+]
+for i in inputs:
+    i['total'] = i['basic'] + i['specialized']
+    i['assertions_total'] = len(i['assertions'])
+    i['assertions_passed'] = sum(1 for a in i['assertions'] if a['result'] == 'PASS')
+
+cats = {
+ 'functional_suitability': (8, 12, 'Completeness 3, Correctness 2, Appropriateness 3. Flag arithmetic is exact, but the aligner MAPQ table, the -s 0.1 claim, the pysam BED and seed recipes, and the "Count unique" label are wrong.'),
+ 'reliability': (7, 12, 'Fault tolerance 2 (shipped script crashes on normal region strings; snippets silently mis-sample when target > total), error reporting 2 (raw tracebacks), recoverability 3 (writes new files; partial BAM left on index failure).'),
+ 'performance_context': (5, 8, 'Token cost 2 (usage-guide repeats most of SKILL.md, 411-line SKILL.md), execution efficiency 3 (streaming CLI, single pass).'),
+ 'agent_usability': (11, 16, 'Learnability 3, consistency 2 (SKILL.md -F 3332 vs usage-guide -F 2308; "Universal -q 1" vs the STAR row), feedback 3 (count before/after, quickcheck, flagstat), error prevention 3 (excellent SV warning; no unmarked-duplicate guard).'),
+ 'human_usability': (7, 8, 'Discoverability 4 (natural example prompts), forgiveness 3.'),
+ 'security': (11, 12, 'No credentials, no shell=True or eval, argparse; -o silently overwrites existing outputs.'),
+ 'maintainability': (8, 12, 'Modularity 2 (duplicated content in two docs; example script not referenced from either), modifiability 3, testability 3 (deterministic, count-before/after advice, no sample inputs).'),
+ 'agent_specific': (17, 20, 'Trigger 3, progressive disclosure 3, composability 4 (Related Skills, pipe-friendly), idempotency 4, escape hatches 3.'),
+}
+static = {k: {'score': v[0], 'max': v[1], 'note': v[2]} for k, v in cats.items()}
+subtotal = sum(v[0] for v in cats.values())
+n = len(inputs)
+avg = round(sum(i['total'] for i in inputs) / n, 1)
+sw = round(subtotal * 0.4, 1); dw = round(avg * 0.6, 1)
+score = int(round(sw + dw))
+passed = sum(i['assertions_passed'] for i in inputs); total_a = sum(i['assertions_total'] for i in inputs)
+l1 = sum(i['basic'] for i in inputs) / n; l2 = sum(i['specialized'] for i in inputs) / n
+print('subtotal', subtotal, 'avg', avg, 'sw', sw, 'dw', dw, 'score', score, 'assertions', passed, total_a, round(100 * passed / total_a, 1),
+      'L1', round(l1, 1), 'L2', round(l2, 1))
+assert subtotal == 74
+
+recs = [
+ dict(priority='P1', title='Aligner table: "-q 1 drops ambiguous" wrong for Bowtie2, HISAT2', observed_in=[5],
+      problem='On exact-repeat reads -q 1 keeps 399/400 (Bowtie2, MAPQ 1) and 374/400 (HISAT2, MAPQ 1); the "Universal -q 1 works for all aligners" line also fails on real STAR data (1246 of 1274 multi-mapped primaries kept) and contradicts the STAR row.',
+      root_cause='MAPQ 0 is treated as the only ambiguous value, but Bowtie2 and HISAT2 use MAPQ 1 (and STAR 1/3) for multi-mappers.',
+      fix='Set "Drop ambiguous" to -q 2 for Bowtie2, -q 2 (or -q 60) for HISAT2, -q 4 or -q 255 for STAR, keep -q 1 for BWA/minimap2, and delete or rewrite the "Universal" block.'),
+ dict(priority='P1', title='pysam BED recipe duplicates reads and returns unsorted output', observed_in=[3],
+      problem='A read overlapping two BED rows is written once per row (3410 records vs 2608 from samtools -L, 802 duplicates); output is not coordinate-sorted; a BED with a track or blank line raises IndexError.',
+      root_cause='One fetch() per interval with no de-duplication or sort, and a fragile BED parser.',
+      fix='Merge intervals first (or track written (qname, flag, pos) keys), skip track/browser/blank lines, and say to sort/index the output, or point to `samtools view -L`.'),
+ dict(priority='P1', title='examples/filter_bam.py region handling is off-by-one and brittle', observed_in=[3],
+      problem='--region is documented as chr:start-end but passed to fetch() as 0-based start, so reads ending exactly at the start base are dropped (2 lost at chr22:2043); bare contig, "chr22:1952", comma coordinates and colon-containing contig names raise ValueError; name-sorted input writes the BAM then fails at pysam.index.',
+      root_cause='region.split(":") and map(int, ...) with no parsing, no coordinate convention, and no sort check.',
+      fix='Use pysam fetch(region=...) (samtools syntax) or start-1, accept commas and bare contigs, and check header SO:coordinate before indexing. Reference the script from SKILL.md.'),
+ dict(priority='P1', title='Subsampling: false "-s 0.1 non-reproducible", dead pysam seed, silent target>total', observed_in=[4],
+      problem='Bare -s 0.1 is deterministic (identical reruns), yet both docs say to reject it; the pysam crc32 recipe ignores its seed (identical 453 templates for 5 seeds); the coverage-matching and usage-guide bc snippets keep 750 and 1445 of 9601 reads when the target exceeds the read count.',
+      root_cause='Seed semantics were assumed rather than tested; the fraction is spliced textually into the -s argument with no >=1 guard.',
+      fix='State that seed 0 is deterministic and that `--subsample-seed auto` derives a seed from the header; mix the seed into the hash (e.g. crc32(f"{seed}:{qname}")) ; add `[ frac >= 1 ]` -> copy the file.'),
+ dict(priority='P1', title='"Remove Duplicates" gives no guard when duplicates are unmarked', observed_in=[7],
+      problem='samtools view -F 1024 on the planted-duplicate BAM keeps 500 of 500 with no warning; the correct 400 appears only after collate/fixmate/sort/markdup.',
+      root_cause='The recipe assumes FLAG 0x400 is already set; the only hint is a Related-Skills line.',
+      fix='Add a check (`samtools view -c -f 1024`; if 0, run duplicate-handling first) next to the -F 1024 recipe and in the usage-guide "What the Agent Will Do" steps.'),
+ dict(priority='P2', title='SKILL.md and usage-guide disagree on the standard filter', observed_in=[1],
+      problem='SKILL.md standard = -F 3332 -q 30; usage-guide standard = -F 2308 -q 30 and "use -F 2308 for most downstream analyses", which keeps duplicate-flagged reads (101 in the 1000G BAM). The usage-guide repeats most of SKILL.md.',
+      root_cause='Two copies of the recipes maintained separately.',
+      fix='Keep one definition in SKILL.md and reduce the usage-guide to prompts and a pointer.'),
+ dict(priority='P2', title='Mislabelled rows: "Count unique -F 2304", "Forward Strand Only -F 16"', observed_in=[2, 7],
+      problem='-F 2304 keeps multi-mapped primaries (1274 of 7042 STAR records have NH>1); -F 16 also returns unmapped reads and -f 64 returns secondary, supplementary and duplicate records.',
+      root_cause='Headings describe intent, not the flag arithmetic.',
+      fix='Rename "Count unique" to "Count primary alignments" (unique = -q 255 / NH==1) and add -F 20 / -F 2308 to the strand and read1/read2 recipes.'),
+ dict(priority='P2', title='Somatic recipe drops the reads its rationale wants kept', observed_in=[2, 7],
+      problem='-F 3328 removes all supplementary reads while the Why column says chimeric reads at SVs may carry real somatic SNVs.',
+      root_cause='3328 copied from the germline row.',
+      fix='Use -F 1280 -q 1 (keep supplementary) or drop the chimeric rationale.'),
+ dict(priority='P2', title='Read-group example and undocumented options', observed_in=[6],
+      problem='`-r library_A` is a library-style label but -r takes an RG ID (a real LB value returns 0 reads); -r also outputs reads with no RG tag; -l, -P (fetch pairs) and --subsample-seed auto are not mentioned.',
+      root_cause='Options not checked against the samtools man page.',
+      fix='Rename the example to an RG ID, add `-l LIB`, note the no-RG behaviour, and mention -P for region queries with mates outside the region.'),
+ dict(priority='P2', title='Version-introduction claims unverified', observed_in=[],
+      problem='"-e since 1.12", "sclen and null-tag handling in 1.16" and the pbmm2/Mutect2/Strelka2 recipe rationale could not be verified (installed samtools 1.24 has no NEWS file; caller tools not run).',
+      root_cause='Version notes copied from memory.',
+      fix='Cite the samtools NEWS entries or drop the version numbers.'),
+]
+key_strengths = [
+ 'Flag arithmetic is exact: 28 recipes checked over all 4096 FLAG values and every "N = a + b" breakdown matches samtools 1.24.',
+ 'Assay-aware table and the explicit "keep supplementary for SV callers" warning are correct and reproduced on data.',
+ 'samtools -s subsampling advice (QNAME hash, pair consistency, nested vs independent seeds) is accurate and verified on a real BAM.',
+ '-e expression recipes (NM, AS, cigar, sclen/qlen, ![NM]) equal independent tag/CIGAR truth, and the STAR MAPQ sentinel claim matches a real STAR BAM.',
+]
+report = {
+ 'source': 'mrsonord2240/bioSkills@c206dff76d081a5126f8497fbabe10995c9b6026:alignment-files/alignment-filtering',
+ 'meta': {
+   'skill_name': 'bio-alignment-filtering',
+   'description': 'Filter alignments by flags, mapping quality, and regions using samtools view and pysam. Use when extracting specific reads, removing low-quality alignments, or subsetting to target regions.',
+   'evaluated_on': '2026-09-20', 'evaluator_version': 'skill-auditor@1.0', 'category': 'Data Analysis',
+   'execution_mode': 'D', 'complexity': 'Complex', 'n_inputs': n,
+   'source': 'mrsonord2240/bioSkills@c206dff76d081a5126f8497fbabe10995c9b6026:alignment-files/alignment-filtering',
+   'audit_type': 'first audit',
+   'executed': True,
+   'execution_note': 'Executed 7/7 inputs in WSL science env alignment-files (samtools 1.24, pysam 0.24.1, bwa 0.7.19, bowtie2 2.5.5, hisat2 2.2.3, minimap2 2.31, STAR 2.7.11b). All 42 fenced code blocks of SKILL.md/usage-guide were also run verbatim from a copy (36 clean; 6 warned or failed only because fixtures use chr22 and no conda). Real data: nf-core human PE/RNA/UMI BAMs, 1000G HG00349 chr20 slice, planted-duplicate BAM. Synthetic (labelled): all-4096-flag BAM, 60 kb repeat genome + reads, 9-read RG BAM. Not executed: Manta/Mutect2/HaplotypeCaller recipes (prose), pbmm2 row, version-introduction claims. No __pycache__ in the external clone or run/.',
+   'grade_note': 'Score 75 maps to Limited Release, but the assertion pass rate is 22/35 = 62.9% (< 80% floor), so the grade is downgraded one tier to Beta Only per scoring_rubric section 5.',
+ },
+ 'veto_gates': {
+   'skill_veto': {'gate': 'PASS', 'stability': 'PASS', 'contract': 'PASS', 'determinism': 'PASS', 'security': 'PASS'},
+   'research_veto': {
+     'applicable': True, 'gate': 'PASS',
+     'scientific_integrity': {'result': 'PASS', 'detail': 'No fabricated citations, p-values or results; all numeric claims in outputs come from executed runs.'},
+     'practice_boundaries': {'result': 'PASS', 'detail': 'File-processing Skill with no diagnostic or prescriptive content about individuals; no disclaimer required.'},
+     'methodological_ground': {'result': 'PASS', 'detail': 'The wrong -q 1 rows for Bowtie2/HISAT2 mis-state aligner MAPQ semantics (reported as P1) but do not invert a conclusion or breach an ethical requirement.'},
+     'code_usability': {'result': 'PASS', 'detail': 'All 42 snippets and the shipped script parse and run on valid inputs; failures are edge-case (region parsing) or silent-wrong (BED duplicates) and are reported as P1 rather than unrunnable code.'}}},
+ 'static_score': {'subtotal': subtotal, 'max': 100, 'categories': static},
+ 'dynamic_score': {'execution_avg': avg, 'max': 100, 'assertion_pass_rate': {'passed': passed, 'total': total_a},
+   'inputs': [{k: i[k] for k in ('index', 'type', 'label', 'status', 'status_flag', 'note', 'basic', 'specialized', 'total',
+                                 'assertions_passed', 'assertions_total', 'assertions')} | {'executed': i['executed'], 'execution_note': i['execution_note']} for i in inputs]},
+ 'final': {'static_weighted': sw, 'dynamic_weighted': dw, 'score': score, 'max': 100, 'grade': 'Beta Only', 'grade_symbol': '⚠️',
+           'deployable': False, 'veto_override': False},
+ 'key_strengths': key_strengths,
+ 'recommendations': recs,
+}
+# ---- pre-emit checklist ----
+for i in report['dynamic_score']['inputs']:
+    assert 3 <= len(i['assertions']) <= 5
+    assert i['assertions_passed'] == sum(1 for a in i['assertions'] if a['result'] == 'PASS')
+    assert i['basic'] + i['specialized'] == i['total']
+assert len(report['dynamic_score']['inputs']) == report['meta']['n_inputs']
+assert sum(c['score'] for c in static.values()) == subtotal and len(static) == 8
+assert 2 <= len(key_strengths) <= 5
+order = {'P0': 0, 'P1': 1, 'P2': 2}
+assert [order[r['priority']] for r in recs] == sorted(order[r['priority']] for r in recs)
+json.dump(report, open(OUT, 'w', encoding='utf-8'), ensure_ascii=False, indent=2)
+print('written', OUT)

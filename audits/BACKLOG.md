@@ -8,7 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (82)
+## P1 (87)
 
 ### `bio-alignment-amplicon-clipping` — Shipped example succeeds silently on mismatched inputs
 
@@ -49,6 +49,46 @@ None open.
 - Problem: fgbio 4.1.1 ClipBam has no BED, primer or amplicon option; it clips a fixed number of bases (matched planted truth on 79% of reads with a fixed 25-base clip) or overlapping mates.
 - Root cause: Tool listed by association with mate-aware clipping, not checked against its options.
 - Fix: Remove ClipBam from the primer-trimming alternatives or describe it as fixed-length/overlap clipping for a different job; replace with a tool that does take a primer file.
+
+### `bio-alignment-filtering` — Aligner table: "-q 1 drops ambiguous" wrong for Bowtie2, HISAT2
+
+- Skill: 75, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/alignment-filtering) · [viewer](skills/bio-alignment-filtering/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 5
+- Problem: On exact-repeat reads -q 1 keeps 399/400 (Bowtie2, MAPQ 1) and 374/400 (HISAT2, MAPQ 1); the "Universal -q 1 works for all aligners" line also fails on real STAR data (1246 of 1274 multi-mapped primaries kept) and contradicts the STAR row.
+- Root cause: MAPQ 0 is treated as the only ambiguous value, but Bowtie2 and HISAT2 use MAPQ 1 (and STAR 1/3) for multi-mappers.
+- Fix: Set "Drop ambiguous" to -q 2 for Bowtie2, -q 2 (or -q 60) for HISAT2, -q 4 or -q 255 for STAR, keep -q 1 for BWA/minimap2, and delete or rewrite the "Universal" block.
+
+### `bio-alignment-filtering` — pysam BED recipe duplicates reads and returns unsorted output
+
+- Skill: 75, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/alignment-filtering) · [viewer](skills/bio-alignment-filtering/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 3
+- Problem: A read overlapping two BED rows is written once per row (3410 records vs 2608 from samtools -L, 802 duplicates); output is not coordinate-sorted; a BED with a track or blank line raises IndexError.
+- Root cause: One fetch() per interval with no de-duplication or sort, and a fragile BED parser.
+- Fix: Merge intervals first (or track written (qname, flag, pos) keys), skip track/browser/blank lines, and say to sort/index the output, or point to `samtools view -L`.
+
+### `bio-alignment-filtering` — examples/filter_bam.py region handling is off-by-one and brittle
+
+- Skill: 75, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/alignment-filtering) · [viewer](skills/bio-alignment-filtering/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 3
+- Problem: --region is documented as chr:start-end but passed to fetch() as 0-based start, so reads ending exactly at the start base are dropped (2 lost at chr22:2043); bare contig, "chr22:1952", comma coordinates and colon-containing contig names raise ValueError; name-sorted input writes the BAM then fails at pysam.index.
+- Root cause: region.split(":") and map(int, ...) with no parsing, no coordinate convention, and no sort check.
+- Fix: Use pysam fetch(region=...) (samtools syntax) or start-1, accept commas and bare contigs, and check header SO:coordinate before indexing. Reference the script from SKILL.md.
+
+### `bio-alignment-filtering` — Subsampling: false "-s 0.1 non-reproducible", dead pysam seed, silent target>total
+
+- Skill: 75, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/alignment-filtering) · [viewer](skills/bio-alignment-filtering/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 4
+- Problem: Bare -s 0.1 is deterministic (identical reruns), yet both docs say to reject it; the pysam crc32 recipe ignores its seed (identical 453 templates for 5 seeds); the coverage-matching and usage-guide bc snippets keep 750 and 1445 of 9601 reads when the target exceeds the read count.
+- Root cause: Seed semantics were assumed rather than tested; the fraction is spliced textually into the -s argument with no >=1 guard.
+- Fix: State that seed 0 is deterministic and that `--subsample-seed auto` derives a seed from the header; mix the seed into the hash (e.g. crc32(f"{seed}:{qname}")) ; add `[ frac >= 1 ]` -> copy the file.
+
+### `bio-alignment-filtering` — "Remove Duplicates" gives no guard when duplicates are unmarked
+
+- Skill: 75, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/alignment-filtering) · [viewer](skills/bio-alignment-filtering/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 7
+- Problem: samtools view -F 1024 on the planted-duplicate BAM keeps 500 of 500 with no warning; the correct 400 appears only after collate/fixmate/sort/markdup.
+- Root cause: The recipe assumes FLAG 0x400 is already set; the only hint is a Related-Skills line.
+- Fix: Add a check (`samtools view -c -f 1024`; if 0, run duplicate-handling first) next to the -F 1024 recipe and in the usage-guide "What the Agent Will Do" steps.
 
 ### `bio-alignment-multiple` — Fix MUSCLE5 ensemble commands (-super5 has no .efa)
 
@@ -666,7 +706,7 @@ None open.
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (343)
+## P2 (348)
 
 ### `bio-alignment-amplicon-clipping` — Raw ampliconclip output is unsorted and unclipped reads are invisible
 
@@ -683,6 +723,46 @@ None open.
 - Problem: usage-guide.md repeats SKILL.md's decision points and tips nearly verbatim; the pileup-generation pointer '-aa -A -d 600000 -B' is valid for samtools mpileup but bcftools mpileup rejects '-aa' ('Could not parse tag a').
 - Root cause: Documents drifted apart and the flags were not run with both tools.
 - Fix: Keep decision points in one file and name the tool in the pointer.
+
+### `bio-alignment-filtering` — SKILL.md and usage-guide disagree on the standard filter
+
+- Skill: 75, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/alignment-filtering) · [viewer](skills/bio-alignment-filtering/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 1
+- Problem: SKILL.md standard = -F 3332 -q 30; usage-guide standard = -F 2308 -q 30 and "use -F 2308 for most downstream analyses", which keeps duplicate-flagged reads (101 in the 1000G BAM). The usage-guide repeats most of SKILL.md.
+- Root cause: Two copies of the recipes maintained separately.
+- Fix: Keep one definition in SKILL.md and reduce the usage-guide to prompts and a pointer.
+
+### `bio-alignment-filtering` — Mislabelled rows: "Count unique -F 2304", "Forward Strand Only -F 16"
+
+- Skill: 75, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/alignment-filtering) · [viewer](skills/bio-alignment-filtering/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 2, 7
+- Problem: -F 2304 keeps multi-mapped primaries (1274 of 7042 STAR records have NH>1); -F 16 also returns unmapped reads and -f 64 returns secondary, supplementary and duplicate records.
+- Root cause: Headings describe intent, not the flag arithmetic.
+- Fix: Rename "Count unique" to "Count primary alignments" (unique = -q 255 / NH==1) and add -F 20 / -F 2308 to the strand and read1/read2 recipes.
+
+### `bio-alignment-filtering` — Somatic recipe drops the reads its rationale wants kept
+
+- Skill: 75, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/alignment-filtering) · [viewer](skills/bio-alignment-filtering/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 2, 7
+- Problem: -F 3328 removes all supplementary reads while the Why column says chimeric reads at SVs may carry real somatic SNVs.
+- Root cause: 3328 copied from the germline row.
+- Fix: Use -F 1280 -q 1 (keep supplementary) or drop the chimeric rationale.
+
+### `bio-alignment-filtering` — Read-group example and undocumented options
+
+- Skill: 75, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/alignment-filtering) · [viewer](skills/bio-alignment-filtering/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 6
+- Problem: `-r library_A` is a library-style label but -r takes an RG ID (a real LB value returns 0 reads); -r also outputs reads with no RG tag; -l, -P (fetch pairs) and --subsample-seed auto are not mentioned.
+- Root cause: Options not checked against the samtools man page.
+- Fix: Rename the example to an RG ID, add `-l LIB`, note the no-RG behaviour, and mention -P for region queries with mates outside the region.
+
+### `bio-alignment-filtering` — Version-introduction claims unverified
+
+- Skill: 75, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/alignment-filtering) · [viewer](skills/bio-alignment-filtering/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: —
+- Problem: "-e since 1.12", "sclen and null-tag handling in 1.16" and the pbmm2/Mutect2/Strelka2 recipe rationale could not be verified (installed samtools 1.24 has no NEWS file; caller tools not run).
+- Root cause: Version notes copied from memory.
+- Fix: Cite the samtools NEWS entries or drop the version numbers.
 
 ### `bio-crispr-screens-copy-number-correction` — negative_control_sgrnas empty-dict case raises an undocumented ValueError
 
