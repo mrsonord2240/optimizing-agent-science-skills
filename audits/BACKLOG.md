@@ -8,7 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (84)
+## P1 (88)
 
 ### `bio-alignment-io` — maf_to_plus_strand_coords is silently wrong for minus strand
 
@@ -41,6 +41,38 @@ None open.
 - Problem: Align.read/parse('stockholm') raises TypeError on the real Pfam seed and Align.write('stockholm') raises AttributeError on a FASTA-read Alignment, yet the SKILL recommends Bio.Align for new code. The 'NOT in BioPython' table lists PSL and chain, which Bio.Align 1.88 parses; A2M and MSF are marked unsupported though both exist.
 - Root cause: Tables and recommendation were not checked against Biopython 1.88.
 - Fix: Recommend AlignIO for Stockholm until Bio.Align handles Pfam per-residue annotations, add the observed failure to Common Errors, and correct the format tables (Bio.Align.formats lists a2m, chain, msf, psl).
+
+### `bio-alignment-msa-parsing` — Gap symbol hard-coded to '-'; '.' and lowercase break every helper silently
+
+- Skill: 78, Beta Only · [mrsonord2240/bioSkills@354b499](https://github.com/mrsonord2240/bioSkills/tree/354b4992cd8d2f1bee039510af618da0333821f1/alignment/msa-parsing) · [viewer](skills/bio-alignment-msa-parsing/mrsonord2240-bioSkills@354b499/viewer.md)
+- Observed in inputs: 3, 7
+- Problem: On '.'-gapped input (hmmalign/A2M) gaps_per_column returns zeros, coordinate_map treats '.' as residues (len 6 instead of 4) and consensus emits '.'; on soft-masked DNA consensus gives ACGTNNNN and find_conserved_positions reports 0 of 8 unanimous columns.
+- Root cause: All snippets compare against the literal '-' and use case-sensitive Counter without a normalisation step.
+- Fix: Add a documented normalize_alignment() step (replace '.' with '-', optionally upper-case) that every snippet and example calls, or accept gap_chars and case_sensitive arguments; assert on a '.'-gapped synthetic file.
+
+### `bio-alignment-msa-parsing` — mi_apc.py ignores the Skill's own APC guard; output is noise on the shipped test case
+
+- Skill: 78, Beta Only · [mrsonord2240/bioSkills@354b499](https://github.com/mrsonord2240/bioSkills/tree/354b4992cd8d2f1bee039510af618da0333821f1/alignment/msa-parsing) · [viewer](skills/bio-alignment-msa-parsing/mrsonord2240-bioSkills@354b499/viewer.md)
+- Observed in inputs: 5
+- Problem: On the real Pfam seed (L=141, Neff/L=0.47) mi_apc.py prints 20 'coevolving column pairs' with no caveat; the top score (0.603) is below a column-shuffled null (0.616) and 0/30 top pairs are contacts in 1MBN (baseline 0.11). Thresholds also disagree: SKILL.md Neff section and neff.py say Neff/L > 0.5, the APC section says Neff/L > 1.
+- Root cause: Guard exists only in prose; the example applies APC unconditionally and the DCA threshold is stated two ways.
+- Fix: Compute Neff inside mi_apc.py main, print a warning and return raw MI (or refuse) when L<=100 or Neff/L<=1, unify the Neff/L threshold across SKILL.md and neff.py, and add a shuffled-column null to the example.
+
+### `bio-alignment-msa-parsing` — Protein consensus default 'N' is asparagine
+
+- Skill: 78, Beta Only · [mrsonord2240/bioSkills@354b499](https://github.com/mrsonord2240/bioSkills/tree/354b4992cd8d2f1bee039510af618da0333821f1/alignment/msa-parsing) · [viewer](skills/bio-alignment-msa-parsing/mrsonord2240-bioSkills@354b499/viewer.md)
+- Observed in inputs: 1
+- Problem: consensus_sequence(ambiguous='N') on the real 73-globin seed returns 124 'N' at 0.5, of which only 2 are true Asn-plurality columns, so the consensus cannot be read as a protein sequence. The shipped consensus_sequence.py uses the same default.
+- Root cause: Default placeholder was chosen for nucleotides and the function is not alphabet-aware.
+- Fix: Default to 'X' for protein (detect alphabet or add an alphabet argument), keep 'N' for DNA, and state that the threshold denominator includes gap rows.
+
+### `bio-alignment-msa-parsing` — Henikoff/Neff prose contradicts itself and Easel; NaN on all-gappy alignments
+
+- Skill: 78, Beta Only · [mrsonord2240/bioSkills@354b499](https://github.com/mrsonord2240/bioSkills/tree/354b4992cd8d2f1bee039510af618da0333821f1/alignment/msa-parsing) · [viewer](skills/bio-alignment-msa-parsing/mrsonord2240-bioSkills@354b499/viewer.md)
+- Observed in inputs: 5
+- Problem: SKILL.md says HMMER pb 'includes gaps as a residue type'; the example docstring says it 'restricts to ungapped columns'; pyhmmer docs say pb ignores gaps, uses consensus columns and double-normalises by length (skill vs Easel max diff 0.0091, Spearman 0.909). Easel pb/blosum weights sum to N (73) so they are not an Neff, yet the Neff table uses pb as 'baseline'; hmmbuild eff_nseq is 6.35 vs 66.08 (10x, not '2-3x'). henikoff_weights returns NaN when every column has a gap.
+- Root cause: Estimator descriptions were written from memory and never checked against pyhmmer output.
+- Fix: Rewrite the Henikoff edge-case and Neff-estimator paragraphs from pyhmmer's documented behaviour, state that compute_weights() outputs sum to N, add a guard raising ValueError when no gap-free column exists, and give one runnable pyhmmer comparison snippet.
 
 ### `bio-alignment-pairwise` — aligner.max_alignments does not exist in Biopython 1.88
 
@@ -682,7 +714,7 @@ None open.
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (324)
+## P2 (328)
 
 ### `bio-alignment-io` — PHYLIP guidance overstated or incomplete
 
@@ -707,6 +739,38 @@ None open.
 - Problem: The format-selection table and PHYLIP/Stockholm tips appear in both files.
 - Root cause: Two files carry overlapping content.
 - Fix: Keep the table and tips in one place (SKILL.md) and let usage-guide.md carry only prompts and prerequisites.
+
+### `bio-alignment-msa-parsing` — Cleaning helpers silently drop annotations and can return empty alignments
+
+- Skill: 78, Beta Only · [mrsonord2240/bioSkills@354b499](https://github.com/mrsonord2240/bioSkills/tree/354b4992cd8d2f1bee039510af618da0333821f1/alignment/msa-parsing) · [viewer](skills/bio-alignment-msa-parsing/mrsonord2240-bioSkills@354b499/viewer.md)
+- Observed in inputs: 2, 7
+- Problem: remove_gappy_columns rebuilds SeqRecords without annotations/letter_annotations/column_annotations, so writing Stockholm afterwards loses GC/GR lines; filter_by_gap_content(0.1) on the real seed returns 0 of 73 without any message.
+- Root cause: New SeqRecord objects carry only id and description; no post-filter size check.
+- Fix: Slice records (record[i:j] style or copy annotations) or note the loss next to the code; raise/print when a filter removes every sequence.
+
+### `bio-alignment-msa-parsing` — GUIDANCE2 recommended twice but no longer installable; pyhmmer minimum version missing
+
+- Skill: 78, Beta Only · [mrsonord2240/bioSkills@354b499](https://github.com/mrsonord2240/bioSkills/tree/354b4992cd8d2f1bee039510af618da0333821f1/alignment/msa-parsing) · [viewer](skills/bio-alignment-msa-parsing/mrsonord2240-bioSkills@354b499/viewer.md)
+- Observed in inputs: 6
+- Problem: GUIDANCE2 (0.93 threshold) is named in unreliable-region step 3 and the trimming matrix; its download URL now returns an HTML page. compute_weights needs pyhmmer >= 0.11.3 but the version block lists only BioPython and numpy. SummaryInfo is called deprecated while its methods are removed in 1.88.
+- Root cause: External-tool advice and version block not re-verified.
+- Fix: Give the MUSCLE5 route as the runnable command (muscle -align in.fa -stratified -output ens.efa; muscle -letterconf ens.efa -ref aln.afa -output conf.afa, both verified to exist in 5.3), add pyhmmer>=0.11.3 to the version block, say SummaryInfo methods are removed.
+
+### `bio-alignment-msa-parsing` — Duplicated code has drifted; weighting guidance not actionable; unverified estimator claims
+
+- Skill: 78, Beta Only · [mrsonord2240/bioSkills@354b499](https://github.com/mrsonord2240/bioSkills/tree/354b4992cd8d2f1bee039510af618da0333821f1/alignment/msa-parsing) · [viewer](skills/bio-alignment-msa-parsing/mrsonord2240-bioSkills@354b499/viewer.md)
+- Observed in inputs: 1, 7
+- Problem: Every function is duplicated in SKILL.md and examples/ (dedup per doctrine); find_conserved differs between the two; 'compute weights before any column-wise statistic' but no statistic accepts weights; gap-handling advice says prefer SIC 'or fifth-state' right after calling fifth-state biologically problematic; AlphaFold2 'unweighted cluster count at 62%' ratio table is unsourced.
+- Root cause: Prose and example scripts maintained separately.
+- Fix: Keep one copy (import from examples/ or trim SKILL.md to signatures), add a weights= argument to the conservation/consensus helpers, fix the contradictory sentence, and source or remove the unsupported table rows.
+
+### `bio-alignment-msa-parsing` — Examples need input files that are not shipped; position-numbering ambiguity
+
+- Skill: 78, Beta Only · [mrsonord2240/bioSkills@354b499](https://github.com/mrsonord2240/bioSkills/tree/354b4992cd8d2f1bee039510af618da0333821f1/alignment/msa-parsing) · [viewer](skills/bio-alignment-msa-parsing/mrsonord2240-bioSkills@354b499/viewer.md)
+- Observed in inputs: 3, 4
+- Problem: Examples read alignment.fasta and hhsearch_output.a2m that the Skill does not ship (all 9 ran only after supplying data); the docs name seq_to_aln[42] 'column_for_residue_42' although it is the 43rd residue (0-based); the PDB numbering offset (1MBN is UniProt index n = residue n) is real but only referenced.
+- Root cause: Examples are illustrative fragments without fixtures.
+- Fix: Ship a tiny FASTA and A2M under examples/data, take the path as argv, and add a one-line note that PDB numbers are offset from UniProt (checked: 1MBN His93 = UniProt 94).
 
 ### `bio-alignment-pairwise` — 'Alignment Output Format' block is wrong
 

@@ -1,0 +1,504 @@
+{
+  "source": "mrsonord2240/bioSkills@354b4992cd8d2f1bee039510af618da0333821f1:alignment/msa-parsing",
+  "meta": {
+    "skill_name": "bio-alignment-msa-parsing",
+    "description": "Parse and analyze multiple sequence alignments using Biopython. Extract sequences, identify conserved regions, analyze gaps, work with annotations, and manipulate alignment data for downstream analysis.",
+    "evaluated_on": "2026-09-19",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "mrsonord2240/bioSkills@354b4992cd8d2f1bee039510af618da0333821f1:alignment/msa-parsing",
+    "executed_inputs": "7/7 (input 6 executed except the GUIDANCE2 step)",
+    "environment": "Windows venv Biopython 1.88 / pyhmmer 0.12.3 / clipkit 2.14.0; WSL env alignment: MAFFT 7.526, HMMER 3.4, trimAl 1.5.1, MUSCLE 5.3. Real data: Pfam PF00042 seed, 8 UniProt globins, PDB 1MBN. See F:/OpenScience/audit-envs/alignment/TOOLS.md"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated identifiers or results across 7 inputs; cited references (Henikoff 1994, Dunn 2008, Ekeberg 2013, Hopf 2017, etc.) are real. Two estimator claims are unsupported or wrong (AlphaFold2 62% gating table, HMMER pb gap handling) and are P1/P2 defects, not fabrication."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Sequence-analysis skill; no diagnostic, prescriptive or individual-level content in any output."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Skill text itself warns about APC on short/shallow alignments, Neff estimator dependence and gap treatment. The shipped mi_apc.py does not enforce that guard (P1) but no output asserted a wrong scientific conclusion."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All SKILL.md functions and all 9 shipped examples ran from a copy with correct printed values checked against independent implementations; only GUIDANCE2 (an external tool, no code shown) could not be run."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 76,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 9,
+        "max": 12,
+        "note": "Completeness 3, Correctness 3, Appropriateness 3. Core primitives match independent implementations; gaps recognised only as '-', no case handling, no weighted statistics; prose errors on HMMER pb gap handling and the Neff estimator table; protein consensus placeholder 'N' is Asn."
+      },
+      "reliability": {
+        "score": 7,
+        "max": 12,
+        "note": "Fault tolerance 2, Error reporting 2, Recoverability 3. Relies on Biopython errors; silent wrong answers on '.' gaps, NaN from Henikoff, empty alignments after filtering; functions are pure and never mutate input."
+      },
+      "performance_context": {
+        "score": 6,
+        "max": 8,
+        "note": "Token cost 3, Efficiency 3. SKILL.md is 454 lines with full code duplicated in examples/; MI-APC and Neff use python pair loops (1.5 s and 0.1 s at 73x141)."
+      },
+      "agent_usability": {
+        "score": 11,
+        "max": 16,
+        "note": "Learnability 3, Consistency 2, Feedback 3, Error prevention 3. Goal/Approach blocks are clear; SKILL.md and examples disagree (find_conserved variants, HMMER-weight statements, Neff/L 0.5 vs 1, fifth-state advice); good pitfall callouts (APC over-correction, PDB numbering, Neff estimator)."
+      },
+      "human_usability": {
+        "score": 5,
+        "max": 8,
+        "note": "Discoverability 3, Forgiveness 2. Natural trigger phrasing and example prompts; strict '-' only handling with no normalisation or warning."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "Credential safety 4, Input validation 3, Data safety 4. No secrets or network; user regex is compiled unvalidated (raises re.error); no eval/exec."
+      },
+      "maintainability": {
+        "score": 9,
+        "max": 12,
+        "note": "Modularity 3, Modifiability 3, Testability 3. Independent functions and per-task examples; every function is duplicated in SKILL.md and examples and has already drifted; examples read alignment.fasta / hhsearch_output.a2m that are not shipped."
+      },
+      "agent_specific": {
+        "score": 18,
+        "max": 20,
+        "note": "Trigger 3, Progressive disclosure 3, Composability 4, Idempotency 4, Escape hatches 4. Description omits weights/Neff/MI-APC; all 7 Related Skills paths resolve; clear hand-offs (trimming, PDB mapping, plmDCA, pyhmmer)."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 79.9,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 24,
+      "total": 35
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Pfam globin seed: IDs, conserved columns, gaps, consensus (real data)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "All SKILL.md snippets and 4 shipped examples ran on the real 73x141 Pfam seed; results equal an independent numpy/pandas implementation (2 fully conserved columns F17/H77, 3 at >=80%, 1943 gap chars counted 2 ways). Protein consensus emits 124 \"N\" placeholders, only 2 of which are real Asn.",
+        "executed": true,
+        "execution_note": "executed: true. Assertions on printed values vs independent implementation. Script: in1_canonical.py (+ shipped analyze_alignment.py, find_conserved.py, gap_analysis.py, consensus_sequence.py from a copy).",
+        "prompt": "Here is the Pfam globin seed alignment (PF00042, 73 sequences, Stockholm). List the sequence IDs, show me the GLB2_LUMTE record, find the fully conserved columns and the ones conserved in at least 80% of sequences, count gaps per sequence and per column, and give me a 70% consensus.",
+        "basic": 35,
+        "specialized": 51,
+        "total": 86,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Loaded shape is 73x141 and IDs/lookup (get_sequence_by_id) return the right records",
+            "result": "PASS",
+            "note": "shape (73,141); GLB2_LUMTE/31-141 found; missing id returns None"
+          },
+          {
+            "text": "find_conserved_positions equals an independent numpy/pandas count at 1.0 and 0.8",
+            "result": "PASS",
+            "note": "[(17,F),(77,H)] and 3 columns at >=0.8 identical to independent code"
+          },
+          {
+            "text": "Gap counts per sequence and per column agree and equal an independent count",
+            "result": "PASS",
+            "note": "1943 = 1943 = 1943; gap_analysis.py per-column lines sum to 1943"
+          },
+          {
+            "text": "Shipped examples analyze_alignment/find_conserved/gap_analysis/consensus_sequence run from a copy and print the verified values",
+            "result": "PASS",
+            "note": "rc=0, stderr empty; consensus in output equals independent consensus"
+          },
+          {
+            "text": "Protein consensus uses a placeholder that cannot be confused with a residue",
+            "result": "FAIL",
+            "note": "default ambiguous='N' is asparagine: 124 'N' in the 0.5 consensus, only 2 columns have Asn as the plurality residue"
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Clean: gappy columns, gappy/duplicate sequences, ID filter, save",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Real Pfam seed: 141 -> 118 columns identical to an independent mask; synthetic 5x12 alignment with hand-computed gap counts matches. Cleaning silently drops all per-record and column annotations; a 0.1 gap filter keeps 0 of 73 sequences and returns an empty alignment with no message.",
+        "executed": true,
+        "execution_note": "executed: true. Script: in2_cleaning.py (+ shipped clean_alignment.py from a copy).",
+        "prompt": "Clean this alignment: drop columns that are 50% gaps or more, drop sequences with more than 20% gaps, remove exact duplicates, keep only IDs starting with GLB, and save the cleaned alignment.",
+        "basic": 34,
+        "specialized": 49,
+        "total": 83,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "remove_gappy_columns(0.5) keeps exactly the columns an independent numpy mask keeps, with identical content",
+            "result": "PASS",
+            "note": "118 columns, all 73 rows equal arr[:, keep]"
+          },
+          {
+            "text": "Sequence filters (gap fraction, duplicates, regex ID) return the same IDs as independent code and hand-known synthetic answers",
+            "result": "PASS",
+            "note": "species_E dropped as duplicate of A; 44 of 73 kept at 0.2; ^GLB -> 32"
+          },
+          {
+            "text": "Shipped clean_alignment.py output equals the independent pipeline (column trim then sequence filter)",
+            "result": "PASS",
+            "note": "73 x 118, same IDs"
+          },
+          {
+            "text": "Cleaning preserves record/column annotations (accession, start, end, GC seq_cons)",
+            "result": "FAIL",
+            "note": "after: annotations {} and column_annotations {} (before: 3 keys and GC:seq_cons)"
+          },
+          {
+            "text": "An over-strict filter that empties the alignment is reported to the user",
+            "result": "FAIL",
+            "note": "filter_by_gap_content(0.1) on the real seed keeps 0 of 73; returns an empty alignment silently"
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Messy files: all-gap column, single sequence, ragged, A2M '.' gaps, A3M",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Synthetic data. All-gap column, single sequence, ragged error, A2M match-only extraction (hand-known 9 match columns, inserts 0/2/1) and A3M-must-be-reformatted all behave as documented. Every function recognises only '-' as a gap: on '.'-gapped input gaps_per_column returns all zeros, coordinate_map counts '.' as residues and consensus emits '.'.",
+        "executed": true,
+        "execution_note": "executed: true. Data synthetic (syn_*.fasta/.a2m/.a3m). Script: in3_edge.py (+ shipped a2m_a3m_io.py from a copy).",
+        "prompt": "Some of my alignment files are messy: an HMMER/hhsearch A2M with lowercase inserts and '.' gaps, an alignment with an all-gap column, a single-sequence file, a ragged file and a ColabFold A3M. Give me match-only columns and a consensus without it blowing up.",
+        "basic": 33,
+        "specialized": 43,
+        "total": 76,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "All-gap column: consensus keeps \"-\" (AC-G), is not reported conserved, and is removed by remove_gappy_columns",
+            "result": "PASS",
+            "note": "consensus AC-G; 3 columns after removal"
+          },
+          {
+            "text": "Single-sequence alignment loads and consensus reproduces it",
+            "result": "PASS",
+            "note": "1x6, consensus ACDE-G"
+          },
+          {
+            "text": "Shipped a2m_a3m_io.py gives the hand-known result (3 seq x 11 cols -> 9 match columns; inserts 0, 2, 1)",
+            "result": "PASS",
+            "note": "match_only_columns == ['ACDEFGHIK','AC-EFGHIK','ACDEFG-IK']"
+          },
+          {
+            "text": "Ragged and unpadded A3M inputs fail loudly (Common Errors / A2M-A3M section)",
+            "result": "PASS",
+            "note": "ValueError: Sequences must all be the same length; pyhmmer MSAFile(format=a2m) pads the A3M so the hand-off works"
+          },
+          {
+            "text": "'.' gap characters (HMMER/A2M convention) are treated as gaps by the snippets",
+            "result": "FAIL",
+            "note": "gaps_per_column=[0]*6 instead of [0,0,2,2,0,0]; coordinate_map len 6 not 4; consensus 'AC..GT'"
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Map proximal His of myoglobin (PDB 1MBN) to an alignment column",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Real UniProt globins aligned with MAFFT, ground truth from real PDB 1MBN coordinates (Bio.PDB). coordinate_map round-trips for all 8 sequences and equals a loop-based walk; PDB residue 93 = UniProt index 93 (initiator Met offset) maps to column 94 where all 8 globins have His (also fully conserved per find_conserved_positions).",
+        "executed": true,
+        "execution_note": "executed: true. MAFFT 7.526 in WSL; Windows Python for analysis. Script: in4_mafft.sh (MAFFT L-INS-i in WSL) + in4_position_map.py.",
+        "prompt": "In my 8-globin alignment, which column is the proximal histidine of sperm whale myoglobin (PDB 1MBN His93), what residue does every other globin have there, and how do I convert between column numbers and residue numbers?",
+        "basic": 36,
+        "specialized": 54,
+        "total": 90,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "coordinate_map: ungapped == original UniProt sequence, seq->aln->seq round-trips, gap columns are -1, for all 8 records",
+            "result": "PASS",
+            "note": "8/8 records"
+          },
+          {
+            "text": "Vectorised map equals the loop-based walk the SKILL describes for single lookups",
+            "result": "PASS",
+            "note": "identical for MYG_PHYMC"
+          },
+          {
+            "text": "Ground truth: PDB 1MBN residue 93 is HIS and maps to the column where all 8 globins have His",
+            "result": "PASS",
+            "note": "column 94, {H} in 8/8; distal His64 -> column 65 also His"
+          },
+          {
+            "text": "PDB-numbering offset is real and the correct route lands on His while the naive 1-based route does not",
+            "result": "PASS",
+            "note": "1MBN starts at UniProt residue 2; index 92 is Ser, index 93 is His"
+          },
+          {
+            "text": "Skill function find_conserved_positions agrees with the structure (proximal His column is fully conserved)",
+            "result": "PASS",
+            "note": "(94,'H') in the fully conserved list"
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Henikoff weights, Neff/L, MI-APC on the Pfam seed",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Numerics exact vs independent code (weights diff 0.0, Neff 66.08/73.00, MI-APC diff 5e-15), all 3 examples exit 0. But mi_apc.py prints \"top coevolving pairs\" with no caveat when Neff/L=0.47 (the Skill says skip APC below 1): top score 0.603 vs 0.616 for a column-shuffled null, 0/30 top pairs are 1MBN contacts (baseline 0.11). Henikoff returns NaN when every column has a gap. Neff table conflates weights (sum to N=73) with Neff; hmmbuild eff_nseq is 6.35 vs skill Neff 66.08.",
+        "executed": true,
+        "execution_note": "executed: true. Ground truth: pyhmmer/Easel weights, scipy entropy, hmmbuild 3.4 (WSL), real PDB 1MBN contacts. Script: in5_weights_neff_mi.py, in5b_examples_main.py, in5_hmmbuild.sh (+ shipped henikoff_weights.py, neff.py, mi_apc.py).",
+        "prompt": "Compute Henikoff sequence weights for the Pfam globin seed, report Neff and Neff/L at 62% and 80% identity, and find the top coevolving column pairs with MI-APC.",
+        "basic": 30,
+        "specialized": 42,
+        "total": 72,
+        "assertions_passed": 2,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Henikoff weights equal an independent textbook implementation (sum to 1, no zero weights)",
+            "result": "PASS",
+            "note": "max abs diff 0.0; Spearman 0.909 vs Easel PB weights"
+          },
+          {
+            "text": "neff() and mi_matrix_apc() equal independent implementations, and the three shipped __main__ blocks run with correct printed values",
+            "result": "PASS",
+            "note": "Neff 66.08 / 73.00 vs 66.0833 / 73.0; MI-APC max diff 5.3e-15; 73 weight lines sum 1.0000"
+          },
+          {
+            "text": "Skill's own guard (APC only when L>100 and Neff/L>1) is enforced or warned in mi_apc.py output",
+            "result": "FAIL",
+            "note": "Neff/L=0.469 yet prints 20 \"coevolving\" pairs; top 0.603 < shuffled-null max 0.616; contact precision 0.00 vs baseline 0.11"
+          },
+          {
+            "text": "Henikoff weights return finite values or a clear error when every column contains a gap",
+            "result": "FAIL",
+            "note": "weights [nan nan nan nan] with only a RuntimeWarning"
+          },
+          {
+            "text": "Skill claims about HMMER pb equivalence and estimator spread hold",
+            "result": "FAIL",
+            "note": "Easel PB max diff 0.0091 vs skill weights (docstring says it matches); hmmbuild eff_nseq 6.35 vs Neff 66.08 = 10.4x, not \"2-3x\""
+          }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Trimming/reliability routing claims and pyhmmer streaming",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Skill only routes to alignment-trimming; the routed claims were run on the real seed. trimAl -gappyout -colnumbering mapping is exact (103 of 141 columns); ClipKIT kpic-smart-gap valid (121 of 141); MUSCLE5 ensemble flags exist; pyhmmer MSAFile streaming + compute_weights(method=\"pb\") works. GUIDANCE2 (recommended twice, threshold 0.93) is not obtainable so that part was NOT executed; version block omits pyhmmer.",
+        "executed": true,
+        "execution_note": "executed: true for everything except GUIDANCE2 (not executed: package unobtainable, TOOLS.md Blocked). Script: in6_wsl.sh (trimAl, ClipKIT, muscle help in WSL) + in6_scope_trimming.py.",
+        "prompt": "Trim this alignment for tree building and separately for HMM building, keep the original column numbers, mask unreliable columns with GUIDANCE2, then stream the file with pyhmmer weights.",
+        "basic": 34,
+        "specialized": 46,
+        "total": 80,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "trimAl -colnumbering map reproduces the trimmed alignment from original columns (0-based, correct)",
+            "result": "PASS",
+            "note": "103 map entries; every trimmed row == original columns at mapped indices"
+          },
+          {
+            "text": "ClipKIT kpic-smart-gap (decision-matrix first-line tool for trees) is a valid mode with sane output",
+            "result": "PASS",
+            "note": "121 of 141 kept, 14.2% trimmed, 73 sequences"
+          },
+          {
+            "text": "pyhmmer streaming pattern (iterate MSAFile, compute_weights(method='pb')) works",
+            "result": "PASS",
+            "note": "[(73,73.0),(73,73.0)] on a 2-alignment Stockholm file"
+          },
+          {
+            "text": "GUIDANCE2 column masking, recommended twice with a 0.93 threshold, can actually be run",
+            "result": "FAIL",
+            "note": "NOT executed: distribution URL now serves an HTML page; the Skill gives no install path or alternative command"
+          },
+          {
+            "text": "Version block lists every library needing a minimum version (pyhmmer compute_weights needs >= 0.11.3)",
+            "result": "FAIL",
+            "note": "Version Compatibility mentions only BioPython 1.83+ and numpy 1.26+"
+          }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Annotations, soft-masked DNA consensus, user regex",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Synthetic data. The usage-guide annotation snippet is correct on Biopython 1.88 (keys 'secondary_structure', column 'secondary_structure'); Stockholm round-trip keeps GC/GR/GS; a malformed regex raises re.error. Failures: cleaning then writing Stockholm drops all GC/GR lines; consensus/conservation are case-sensitive (mixed-case DNA gives ACGTNNNN and 0/8 conserved columns); SummaryInfo is said to be 'deprecated' but its methods are gone in 1.88; 'weight before any column-wise statistic' is not actionable because no function accepts weights.",
+        "executed": true,
+        "execution_note": "executed: true. Data synthetic (syn_annot.sto, syn_dna_mixedcase.fasta). Script: in7_adversarial.py.",
+        "prompt": "Pull the secondary structure and RF annotation out of my Stockholm alignment and keep it after cleaning; also give me the consensus of my soft-masked (mixed-case) DNA alignment, and filter sequences with this regex I typed: '['.",
+        "basic": 31,
+        "specialized": 41,
+        "total": 72,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "usage-guide 'Working with Annotations' snippet, run verbatim, returns SS per record and SS_cons",
+            "result": "PASS",
+            "note": "printed [('seqA','HHHEEEC'),('seqB','HHH-EEC')]; column SS_cons 'HHHEEEC'"
+          },
+          {
+            "text": "Stockholm write/read round trip keeps GC (SS_cons, RF), GR SS and GS organism; FASTA write drops them (documented behaviour)",
+            "result": "PASS",
+            "note": "round trip identical; FASTA text has no annotation"
+          },
+          {
+            "text": "Malformed user regex given to filter_by_id fails with a clear error rather than an empty alignment",
+            "result": "PASS",
+            "note": "re.error: unterminated character set at position 0"
+          },
+          {
+            "text": "Consensus and conservation are case-insensitive for soft-masked DNA",
+            "result": "FAIL",
+            "note": "consensus@0.7 'ACGTNNNN'; find_conserved_positions(1.0) reports 0 of 8 unanimous columns"
+          },
+          {
+            "text": "SKILL guidance 'compute sequence weights before any column-wise statistic' is actionable with the shipped functions",
+            "result": "FAIL",
+            "note": "no function among find_conserved_positions/consensus_sequence/gaps_per_column accepts weights"
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 30.4,
+    "dynamic_weighted": 47.9,
+    "score": 78,
+    "max": 100,
+    "grade": "Beta Only",
+    "grade_symbol": "⚠️",
+    "deployable": false,
+    "veto_override": false,
+    "grade_note": "Numeric score 78 maps to Limited Release; assertion pass rate 24/35 = 68.6% is below the 80% Limited Release floor, so the grade drops one tier per scoring_rubric section 5. Static 76 (>=70), execution average 79.9 (>=75), Layer 1 avg 33.3 (>=28) and Layer 2 avg 46.6 (>=42) all meet the Limited Release floors. No P0 and no veto."
+  },
+  "key_strengths": [
+    "Every core primitive (conserved columns, gaps, consensus, coordinate_map, Henikoff, Neff, MI-APC) matched an independent implementation exactly on the real Pfam PF00042 seed; coordinate_map also checked against real PDB 1MBN residue numbering.",
+    "Honest, useful cautions in prose: APC over-correction on short alignments, Neff estimator dependence, PDB SEQRES/ATOM offset, gap-treatment tradeoffs; routing claims to alignment-trimming (trimAl -colnumbering, ClipKIT kpic-smart-gap, MUSCLE5 ensemble flags) all verified by running the tools.",
+    "All 9 shipped examples run from a copy; all 7 Related Skills paths and the alignment-io cross-references exist; pyhmmer streaming pattern and Stockholm annotation snippet are correct on Biopython 1.88 / pyhmmer 0.12."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "Gap symbol hard-coded to '-'; '.' and lowercase break every helper silently",
+      "observed_in": [
+        3,
+        7
+      ],
+      "problem": "On '.'-gapped input (hmmalign/A2M) gaps_per_column returns zeros, coordinate_map treats '.' as residues (len 6 instead of 4) and consensus emits '.'; on soft-masked DNA consensus gives ACGTNNNN and find_conserved_positions reports 0 of 8 unanimous columns.",
+      "root_cause": "All snippets compare against the literal '-' and use case-sensitive Counter without a normalisation step.",
+      "fix": "Add a documented normalize_alignment() step (replace '.' with '-', optionally upper-case) that every snippet and example calls, or accept gap_chars and case_sensitive arguments; assert on a '.'-gapped synthetic file."
+    },
+    {
+      "priority": "P1",
+      "title": "mi_apc.py ignores the Skill's own APC guard; output is noise on the shipped test case",
+      "observed_in": [
+        5
+      ],
+      "problem": "On the real Pfam seed (L=141, Neff/L=0.47) mi_apc.py prints 20 'coevolving column pairs' with no caveat; the top score (0.603) is below a column-shuffled null (0.616) and 0/30 top pairs are contacts in 1MBN (baseline 0.11). Thresholds also disagree: SKILL.md Neff section and neff.py say Neff/L > 0.5, the APC section says Neff/L > 1.",
+      "root_cause": "Guard exists only in prose; the example applies APC unconditionally and the DCA threshold is stated two ways.",
+      "fix": "Compute Neff inside mi_apc.py main, print a warning and return raw MI (or refuse) when L<=100 or Neff/L<=1, unify the Neff/L threshold across SKILL.md and neff.py, and add a shuffled-column null to the example."
+    },
+    {
+      "priority": "P1",
+      "title": "Protein consensus default 'N' is asparagine",
+      "observed_in": [
+        1
+      ],
+      "problem": "consensus_sequence(ambiguous='N') on the real 73-globin seed returns 124 'N' at 0.5, of which only 2 are true Asn-plurality columns, so the consensus cannot be read as a protein sequence. The shipped consensus_sequence.py uses the same default.",
+      "root_cause": "Default placeholder was chosen for nucleotides and the function is not alphabet-aware.",
+      "fix": "Default to 'X' for protein (detect alphabet or add an alphabet argument), keep 'N' for DNA, and state that the threshold denominator includes gap rows."
+    },
+    {
+      "priority": "P1",
+      "title": "Henikoff/Neff prose contradicts itself and Easel; NaN on all-gappy alignments",
+      "observed_in": [
+        5
+      ],
+      "problem": "SKILL.md says HMMER pb 'includes gaps as a residue type'; the example docstring says it 'restricts to ungapped columns'; pyhmmer docs say pb ignores gaps, uses consensus columns and double-normalises by length (skill vs Easel max diff 0.0091, Spearman 0.909). Easel pb/blosum weights sum to N (73) so they are not an Neff, yet the Neff table uses pb as 'baseline'; hmmbuild eff_nseq is 6.35 vs 66.08 (10x, not '2-3x'). henikoff_weights returns NaN when every column has a gap.",
+      "root_cause": "Estimator descriptions were written from memory and never checked against pyhmmer output.",
+      "fix": "Rewrite the Henikoff edge-case and Neff-estimator paragraphs from pyhmmer's documented behaviour, state that compute_weights() outputs sum to N, add a guard raising ValueError when no gap-free column exists, and give one runnable pyhmmer comparison snippet."
+    },
+    {
+      "priority": "P2",
+      "title": "Cleaning helpers silently drop annotations and can return empty alignments",
+      "observed_in": [
+        2,
+        7
+      ],
+      "problem": "remove_gappy_columns rebuilds SeqRecords without annotations/letter_annotations/column_annotations, so writing Stockholm afterwards loses GC/GR lines; filter_by_gap_content(0.1) on the real seed returns 0 of 73 without any message.",
+      "root_cause": "New SeqRecord objects carry only id and description; no post-filter size check.",
+      "fix": "Slice records (record[i:j] style or copy annotations) or note the loss next to the code; raise/print when a filter removes every sequence."
+    },
+    {
+      "priority": "P2",
+      "title": "GUIDANCE2 recommended twice but no longer installable; pyhmmer minimum version missing",
+      "observed_in": [
+        6
+      ],
+      "problem": "GUIDANCE2 (0.93 threshold) is named in unreliable-region step 3 and the trimming matrix; its download URL now returns an HTML page. compute_weights needs pyhmmer >= 0.11.3 but the version block lists only BioPython and numpy. SummaryInfo is called deprecated while its methods are removed in 1.88.",
+      "root_cause": "External-tool advice and version block not re-verified.",
+      "fix": "Give the MUSCLE5 route as the runnable command (muscle -align in.fa -stratified -output ens.efa; muscle -letterconf ens.efa -ref aln.afa -output conf.afa, both verified to exist in 5.3), add pyhmmer>=0.11.3 to the version block, say SummaryInfo methods are removed."
+    },
+    {
+      "priority": "P2",
+      "title": "Duplicated code has drifted; weighting guidance not actionable; unverified estimator claims",
+      "observed_in": [
+        1,
+        7
+      ],
+      "problem": "Every function is duplicated in SKILL.md and examples/ (dedup per doctrine); find_conserved differs between the two; 'compute weights before any column-wise statistic' but no statistic accepts weights; gap-handling advice says prefer SIC 'or fifth-state' right after calling fifth-state biologically problematic; AlphaFold2 'unweighted cluster count at 62%' ratio table is unsourced.",
+      "root_cause": "Prose and example scripts maintained separately.",
+      "fix": "Keep one copy (import from examples/ or trim SKILL.md to signatures), add a weights= argument to the conservation/consensus helpers, fix the contradictory sentence, and source or remove the unsupported table rows."
+    },
+    {
+      "priority": "P2",
+      "title": "Examples need input files that are not shipped; position-numbering ambiguity",
+      "observed_in": [
+        3,
+        4
+      ],
+      "problem": "Examples read alignment.fasta and hhsearch_output.a2m that the Skill does not ship (all 9 ran only after supplying data); the docs name seq_to_aln[42] 'column_for_residue_42' although it is the 43rd residue (0-based); the PDB numbering offset (1MBN is UniProt index n = residue n) is real but only referenced.",
+      "root_cause": "Examples are illustrative fragments without fixtures.",
+      "fix": "Ship a tiny FASTA and A2M under examples/data, take the path as argv, and add a one-line note that PDB numbers are offset from UniProt (checked: 1MBN His93 = UniProt 94)."
+    }
+  ]
+}
