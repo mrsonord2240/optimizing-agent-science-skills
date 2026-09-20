@@ -8,7 +8,31 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (77)
+## P1 (80)
+
+### `bio-alignment-pairwise` — aligner.max_alignments does not exist in Biopython 1.88
+
+- Skill: 80, Limited Release · [mrsonord2240/bioSkills@354b499](https://github.com/mrsonord2240/bioSkills/tree/354b4992cd8d2f1bee039510af618da0333821f1/alignment/pairwise-alignment) · [viewer](skills/bio-alignment-pairwise/mrsonord2240-bioSkills@354b499/viewer.md)
+- Observed in inputs: 7
+- Problem: SKILL.md ('Iterating Over Multiple Alignments' and Common Errors table) and usage-guide.md tell the agent to set aligner.max_alignments; it raises AttributeError. The first snippet's len(alignments) also raises OverflowError on repetitive input, and the table's remedy is the broken attribute.
+- Root cause: The attribute was dropped from PairwiseAligner in the lazy-alignments API and the file was not re-verified against current Biopython despite the '1.83+' banner.
+- Fix: Replace with itertools.islice(alignments, n) or the existing lazy enumerate/break loop, wrap len(alignments) in try/except OverflowError, and drop max_alignments from the error table and usage-guide.
+
+### `bio-alignment-pairwise` — 'Default gap penalties are 0' is false on Biopython 1.88
+
+- Skill: 80, Limited Release · [mrsonord2240/bioSkills@354b499](https://github.com/mrsonord2240/bioSkills/tree/354b4992cd8d2f1bee039510af618da0333821f1/alignment/pairwise-alignment) · [viewer](skills/bio-alignment-pairwise/mrsonord2240-bioSkills@354b499/viewer.md)
+- Observed in inputs: 3
+- Problem: PairwiseAligner() defaults are open_gap_score = extend_gap_score = -1.0 (printed), not 0; the section's claim that BLOSUM62 with defaults gives 'gaps cost nothing' is wrong (defaults still give a gappy 40-segment alignment, but for a different reason).
+- Root cause: Statement was written against older Biopython and not re-checked.
+- Fix: Rewrite the section: state the installed defaults (print(aligner)), keep the advice to always set gaps explicitly, and tag the version where defaults changed.
+
+### `bio-alignment-pairwise` — 'BLASTP defaults open=-11, extend=-1' is off by one for Biopython
+
+- Skill: 80, Limited Release · [mrsonord2240/bioSkills@354b499](https://github.com/mrsonord2240/bioSkills/tree/354b4992cd8d2f1bee039510af618da0333821f1/alignment/pairwise-alignment) · [viewer](skills/bio-alignment-pairwise/mrsonord2240-bioSkills@354b499/viewer.md)
+- Observed in inputs: 1
+- Problem: In Biopython/EMBOSS a gap of length k costs open+(k-1)*extend, in BLAST/Biostrings open+k*extend. Biopython -11/-1 reproduces EMBOSS 11/1 (288) not BLASTP (285); BLASTP 11/1 needs -12/-1, verified by raw score and HSP coordinates. The 'Protein Alignment' config is presented as the BLASTP default.
+- Root cause: Gap-cost convention of BLAST vs Biopython not distinguished.
+- Fix: State the two conventions, say Biopython -12/-1 reproduces BLASTP 11/1 and Biostrings gapOpening=10/gapExtension=1 reproduces Biopython -11/-1, and correct the 'BLASTP defaults' wording.
 
 ### `bio-alignment-multiple` — Fix MUSCLE5 ensemble commands (-super5 has no .efa)
 
@@ -626,7 +650,55 @@ None open.
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (315)
+## P2 (321)
+
+### `bio-alignment-pairwise` — 'Alignment Output Format' block is wrong
+
+- Skill: 80, Limited Release · [mrsonord2240/bioSkills@354b499](https://github.com/mrsonord2240/bioSkills/tree/354b4992cd8d2f1bee039510af618da0333821f1/alignment/pairwise-alignment) · [viewer](skills/bio-alignment-pairwise/mrsonord2240-bioSkills@354b499/viewer.md)
+- Observed in inputs: 1
+- Problem: The illustrative match line shows '\|\|\|\|\|.\|\|\|\|.\|\|' but the real output for the same sequences is '\|\|\|\|.\|\|\|\|\|.\|\|' (mismatch at index 4, not 5).
+- Root cause: Hand-typed output.
+- Fix: Paste the printed output of the snippet.
+
+### `bio-alignment-pairwise` — Semiglobal snippet omits argument order and uses deprecated names
+
+- Skill: 80, Limited Release · [mrsonord2240/bioSkills@354b499](https://github.com/mrsonord2240/bioSkills/tree/354b4992cd8d2f1bee039510af618da0333821f1/alignment/pairwise-alignment) · [viewer](skills/bio-alignment-pairwise/mrsonord2240-bioSkills@354b499/viewer.md)
+- Observed in inputs: 3
+- Problem: 'query_*_open_gap_score' works only when the fragment is the SECOND argument (align(reference, fragment)); swapped order scored -279 instead of 40. On 1.88 the four attribute names emit BiopythonDeprecationWarning (renamed open_left_deletion_score etc.); the snippet also never sets scoring.
+- Root cause: Snippet is schematic.
+- Fix: Give a complete runnable example with explicit scores and the target/query roles, and mention end_gap_score first (it is order-independent).
+
+### `bio-alignment-pairwise` — No guidance on off-spec input
+
+- Skill: 80, Limited Release · [mrsonord2240/bioSkills@354b499](https://github.com/mrsonord2240/bioSkills/tree/354b4992cd8d2f1bee039510af618da0333821f1/alignment/pairwise-alignment) · [viewer](skills/bio-alignment-pairwise/mrsonord2240-bioSkills@354b499/viewer.md)
+- Observed in inputs: 3, 6
+- Problem: Lowercase sequences, U in NUC.4.4, J/U residues, empty sequences and trailing whitespace raise ValueError; a SeqRecord is silently accepted; reverse-complement queries score 34.5 vs 268.0 with no strand advice; CDS with internal stops (rabbit HBB2) is not flagged.
+- Root cause: Skill covers scoring theory but not input hygiene.
+- Fix: Add a short 'Input checks' list: uppercase, strip, alphabet, non-empty, strand, internal-stop check.
+
+### `bio-alignment-pairwise` — parasail/edlib claims lack code, saturation warning and realistic speed figures
+
+- Skill: 80, Limited Release · [mrsonord2240/bioSkills@354b499](https://github.com/mrsonord2240/bioSkills/tree/354b4992cd8d2f1bee039510af618da0333821f1/alignment/pairwise-alignment) · [viewer](skills/bio-alignment-pairwise/mrsonord2240-bioSkills@354b499/viewer.md)
+- Observed in inputs: 5
+- Problem: Table gives no runnable parasail/edlib/pywfa/mappy snippet; parasail 16-bit variants return 0 (saturated) on 20 kb pairs; measured speedups on 300-nt pairs are 5-11x (parasail) and 15-39x (edlib) versus the tabulated 10-100x and 100-1000x.
+- Root cause: Table copied from literature, not measured.
+- Fix: Add one verified snippet per library with the 32-bit or sat variant and a saturated-flag check, and cite the size at which each ratio was measured.
+
+### `bio-alignment-pairwise` — R bullet out of date and gap convention not mapped
+
+- Skill: 80, Limited Release · [mrsonord2240/bioSkills@354b499](https://github.com/mrsonord2240/bioSkills/tree/354b4992cd8d2f1bee039510af618da0333821f1/alignment/pairwise-alignment) · [viewer](skills/bio-alignment-pairwise/mrsonord2240-bioSkills@354b499/viewer.md)
+- Observed in inputs: 7
+- Problem: Biostrings::pairwiseAlignment() warns it moved to pwalign in Bioconductor 3.20; gapOpening semantics differ from Biopython by one.
+- Root cause: Single unversioned bullet.
+- Fix: Say pwalign::pairwiseAlignment and give the parameter mapping.
+
+### `bio-alignment-pairwise` — alignment_from_file.py and affine-vs-linear example are not self-demonstrating
+
+- Skill: 80, Limited Release · [mrsonord2240/bioSkills@354b499](https://github.com/mrsonord2240/bioSkills/tree/354b4992cd8d2f1bee039510af618da0333821f1/alignment/pairwise-alignment) · [viewer](skills/bio-alignment-pairwise/mrsonord2240-bioSkills@354b499/viewer.md)
+- Observed in inputs: 1
+- Problem: alignment_from_file.py crashes with FileNotFoundError because sequences.fasta is not shipped; global_alignment.py's 'affine vs linear' comparison prints 108.0 vs 108.0 because the alignment is gap-free.
+- Root cause: Examples not run end-to-end after writing.
+- Fix: Ship a tiny sequences.fasta (or take argv) and use a pair with an indel in the affine-vs-linear demo.
 
 ### `bio-crispr-screens-copy-number-correction` — negative_control_sgrnas empty-dict case raises an undocumented ValueError
 
