@@ -8,7 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (88)
+## P1 (93)
 
 ### `bio-bam-statistics` — Mean-depth and >=Nx recipes divide by covered positions
 
@@ -65,6 +65,46 @@ None open.
 - Problem: ZeroDivisionError on single-end and header-only BAMs, awk division by zero on empty input, '0% mitochondrial' for an MT contig with 40 reads and for BAMs with no chrM, 'X:Y = 0.00' without chrX/chrY.
 - Root cause: Snippets assume paired human data with UCSC contig names and never check that the numerator contig exists.
 - Fix: Match '^(chr)?(M\|MT)$' and print a warning when no contig matches, guard divisions, and add a one-line 'check contig names with idxstats first' note.
+
+### `bio-differential-splicing` — SUPPA2 "-m classical for n<=3" has zero power
+
+- Skill: 73, Beta Only · [mrsonord2240/bioSkills@44ff43b](https://github.com/mrsonord2240/bioSkills/tree/44ff43bb35e5741c3ddd3c003590e1f1da8a4a4b/alternative-splicing/differential-splicing) · [viewer](skills/bio-differential-splicing/mrsonord2240-bioSkills@44ff43b/viewer.md)
+- Observed in inputs: 3, 4
+- Problem: Classical mode is an unpaired Mann-Whitney U test; smallest two-sided p is 0.1 at 3v3 and 0.33 at 2v2 and BH cannot lower it. On the planted 3v3 set it detected 0/30 events; on real 2v2 it returned no p below 0.22. The table lists it with min reps n>=2.
+- Root cause: The fallback was chosen for robustness without checking attainable p-values.
+- Fix: Delete the advice to switch to classical for n<=3; state that SUPPA2 needs n>=4 per group (rank-sum min p 0.029) for any significance, and route n<=3 to rMATS/leafcutter/Shiba. Change the "Min reps" cell for SUPPA2 classical to n>=4.
+
+### `bio-differential-splicing` — leafcutter n>=2/3 claim vs leafcutter_ds.R defaults
+
+- Skill: 73, Beta Only · [mrsonord2240/bioSkills@44ff43b](https://github.com/mrsonord2240/bioSkills/tree/44ff43bb35e5741c3ddd3c003590e1f1da8a4a4b/alternative-splicing/differential-splicing) · [viewer](skills/bio-differential-splicing/mrsonord2240-bioSkills@44ff43b/viewer.md)
+- Observed in inputs: 2, 3
+- Problem: With the options the Skill shows, leafcutter_ds.R stops at 3v3 and 2v2 ("smallest group is less than min_samples_per_intron"); the Common-Errors flags (--min_samples_per_intron 5 --min_samples_per_group 3) stop identically. Upstream says calibration is only checked down to 4 per group.
+- Root cause: Defaults (-i 5 -g 3 -c 20) were not reconciled with the stated minimum replicates.
+- Fix: Give the runnable command for 3v3 (e.g. -i 3 -g 3 -c 10) and 2v2 (-i 2 -g 2 -c 5), note the n>=4 calibration limit, and remove the -i 5 pre-filter suggestion for small designs. Also state that groups-file sample names must equal the .junc basenames and that non-chr contigs need -k True.
+
+### `bio-differential-splicing` — Confounder route (residual + rank-sum) is powerless at n=3 and biased if confounded
+
+- Skill: 73, Beta Only · [mrsonord2240/bioSkills@44ff43b](https://github.com/mrsonord2240/bioSkills/tree/44ff43bb35e5741c3ddd3c003590e1f1da8a4a4b/alternative-splicing/differential-splicing) · [viewer](skills/bio-differential-splicing/mrsonord2240-bioSkills@44ff43b/viewer.md)
+- Observed in inputs: 7
+- Problem: Regressing out batch and RIN and testing residuals by group with a rank-sum test cannot give p<0.05 at 3v3 (0/20 strong events, min p 0.1); OLS with group and batch terms found 13/20 with 1/55 false positives. Regressing out only batch removes group signal when batch is imbalanced.
+- Root cause: Residualisation was chosen for simplicity; the group term is left out of the model.
+- Fix: Replace with logit-PSI ~ group + batch (+ covariates) and test the group coefficient (or limma/DEXSeq), and warn that residual+rank-sum needs n>=4 per group. State that a batch identical to condition cannot be adjusted (leafcutter silently returns results).
+
+### `bio-differential-splicing` — Shipped examples fail or mislead from a clean copy
+
+- Skill: 73, Beta Only · [mrsonord2240/bioSkills@44ff43b](https://github.com/mrsonord2240/bioSkills/tree/44ff43bb35e5741c3ddd3c003590e1f1da8a4a4b/alternative-splicing/differential-splicing) · [viewer](skills/bio-differential-splicing/mrsonord2240-bioSkills@44ff43b/viewer.md)
+- Observed in inputs: 1, 2
+- Problem: diff_splicing_rmats.sh hard-codes READ_LENGTH=150: on 75 nt reads it exits 0, prints "analysis complete" and writes 0 SE rows; its awk filter has no coverage filter (4 hits at 0-3 reads). diff_splicing_leafcutter.R writes groups.txt with sample1..6 that cannot match the counts-table column names, so the following leafcutter_ds.R call dies with "undefined columns selected".
+- Root cause: Examples were never run end to end against real data.
+- Fix: Take READ_LENGTH from the data (or add --variable-read-length and an assertion that SE.MATS.JC.txt has rows), add the per-replicate coverage filter to the awk, and make the R example derive sample names from the .junc basenames and check them against the counts header before calling leafcutter_ds.R.
+
+### `bio-differential-splicing` — --paired-stats advertised without its dependency; silent header-only output
+
+- Skill: 73, Beta Only · [mrsonord2240/bioSkills@44ff43b](https://github.com/mrsonord2240/bioSkills/tree/44ff43bb35e5741c3ddd3c003590e1f1da8a4a4b/alternative-splicing/differential-splicing) · [viewer](skills/bio-differential-splicing/mrsonord2240-bioSkills@44ff43b/viewer.md)
+- Observed in inputs: 6
+- Problem: SKILL.md recommends rMATS --paired-stats for tumor-normal. On a stock install rMATS logged "no package called PAIRADISE", returned rc 0 and wrote header-only tables without an FDR column.
+- Root cause: R/PAIRADISE prerequisite not listed; no post-run check.
+- Fix: List PAIRADISE (R) as a prerequisite, add a check that the FDR column exists and the file has rows, and say -t single is needed for single-end data.
 
 ### `bio-alignment-amplicon-clipping` — Wrong primer BED passes the example; claim attributed to checker
 
@@ -714,7 +754,7 @@ None open.
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (394)
+## P2 (397)
 
 ### `bio-bam-statistics` — Cross-check identity and 'primary' table row ignore QC-failed and secondary
 
@@ -771,6 +811,30 @@ None open.
 - Problem: 'mosdepth 3-10x faster than samtools depth', the assay-threshold table values and the historic depth-cap statement were not verifiable with the available data; SKILL.md and usage-guide.md carry parallel CLI and pysam recipes that already diverge.
 - Root cause: Literature/lore claims without a source and no single owner for each recipe.
 - Fix: Cite or drop the speed claim and mark threshold values as literature ranges; keep each recipe in one file and link from the other.
+
+### `bio-differential-splicing` — ΔPSI sign conventions differ by tool; reconciliation table blames event class
+
+- Skill: 73, Beta Only · [mrsonord2240/bioSkills@44ff43b](https://github.com/mrsonord2240/bioSkills/tree/44ff43bb35e5741c3ddd3c003590e1f1da8a4a4b/alternative-splicing/differential-splicing) · [viewer](skills/bio-differential-splicing/mrsonord2240-bioSkills@44ff43b/viewer.md)
+- Observed in inputs: 4, 5
+- Problem: rMATS IncLevelDifference = group1 - group2; SUPPA2 dPSI and leafcutter deltapsi = group2 - group1; Shiba dPSI = alt - ref. The table row "Both sig, opposite direction" attributes it to event mismatch only.
+- Root cause: Only the rMATS sign is documented.
+- Fix: Add a one-line sign convention per tool and list it first in the opposite-direction row.
+
+### `bio-differential-splicing` — Shiba and MAJIQ sections are not runnable or checkable as written
+
+- Skill: 73, Beta Only · [mrsonord2240/bioSkills@44ff43b](https://github.com/mrsonord2240/bioSkills/tree/44ff43bb35e5741c3ddd3c003590e1f1da8a4a4b/alternative-splicing/differential-splicing) · [viewer](skills/bio-differential-splicing/mrsonord2240-bioSkills@44ff43b/viewer.md)
+- Observed in inputs: 3, 5, 6
+- Problem: snakeshiba.smk sits in the package share directory and needs a container key in config.yaml (KeyError otherwise); shiba.py config.yaml runs directly but needs XS tags, a GTF with every event type and reads for each type. Shiba 0.8.2 crashes (KeyError) otherwise. MAJIQ V3 flags were not verifiable (licence-gated) and --minreads/--minpos/--mem-profile are V2-era flags. Shiba superiority at n=2 is a citation, not tested (no advantage on a sim with no imbalance).
+- Root cause: Sections written from tool websites, not run.
+- Fix: Give a minimal config.yaml, the direct shiba.py call, the XS requirement, and mark the MAJIQ block as unverified against V3 with the docs link.
+
+### `bio-differential-splicing` — Missing practical prerequisites and guards
+
+- Skill: 73, Beta Only · [mrsonord2240/bioSkills@44ff43b](https://github.com/mrsonord2240/bioSkills/tree/44ff43bb35e5741c3ddd3c003590e1f1da8a4a4b/alternative-splicing/differential-splicing) · [viewer](skills/bio-differential-splicing/mrsonord2240-bioSkills@44ff43b/viewer.md)
+- Observed in inputs: 1, 2, 7
+- Problem: No mention of -t single for single-end data (verbatim command exits 0 with 0 events), no stop condition for n=1 vs n=1 (rMATS returns 4/118 null false positives), leafcutter_ds.R is not on PATH after installing the R package, the gencode_exons.txt.gz source is unspecified, and SUPPA2 TPM files need a sample-names-only header.
+- Root cause: Assumes a specific standard design.
+- Fix: Add a short "design gate" (single-end, n=1, batch = condition) and the four prerequisites above.
 
 ### `bio-crispr-screens-copy-number-correction` — negative_control_sgrnas empty-dict case raises an undocumented ValueError
 
