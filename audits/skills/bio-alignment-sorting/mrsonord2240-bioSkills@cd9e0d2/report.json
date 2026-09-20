@@ -1,0 +1,260 @@
+{
+  "meta": {
+    "skill_name": "bio-alignment-sorting",
+    "description": "Sort alignment files by coordinate or read name using samtools and pysam. Use when preparing BAM files for indexing, variant calling, or paired-end analysis.",
+    "source": "mrsonord2240/bioSkills@cd9e0d284852ed0c6989fedd401e74d00b863a51:alignment-files/alignment-sorting",
+    "evaluated_on": "2026-09-20",
+    "evaluator_version": "skill-auditor@1.0",
+    "audit_kind": "re-audit of a fixed Skill (pre-fix: 76 Beta Only, archived under _pre-fix-20260920)",
+    "category": "Data Analysis",
+    "execution_mode": "B",
+    "complexity": "Moderate",
+    "n_inputs": 7,
+    "n_inputs_note": "Moderate rule gives 5; 5 regression inputs re-run from the first audit plus 2 new inputs (6, 7) added for the re-audit, so N = 7. Inputs 5 and 7 each include several sub-runs.",
+    "executed": "7/7 executed (input 5: every row whose tool exists was run; featureCounts, Salmon, RSEM, Sniffles, cuteSV, Manta, Delly are not installed and were not run)",
+    "environment": "WSL science, env alignment-files: samtools 1.24, pysam 0.24.1, bwa 0.7.19, bcftools 1.24, Picard 3.5.0 (side env af-picard3), GATK 4.6.2.0, fgbio 4.1.1 (side env), umi_tools 1.1.6, HTSeq 2.1.2"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "No fabricated data or citations. Every quoted number and message that was re-run reproduced (Picard errors, 100 dup reads / 50 pairs, 39x -l 0 size, htseq 2820 vs 5599, -m 1M floor, index error text); the collate 0.74 s vs 0.66 s timing reproduces on WSL-native ext4 (0.658 vs 0.66 s)." },
+      "practice_boundaries": { "result": "PASS", "detail": "File-format utility with no clinical or diagnostic output." },
+      "methodological_ground": { "result": "PASS", "detail": "The -n natural vs -N ASCII rule is correct and verified against Picard 3.5.0, samtools and pysam. Unverified downstream rows are marked with a dagger. The fgbio CallMolecularConsensusReads row omits the template-coordinate requirement (P1), but this is an incomplete requirement, not a principled fallacy, and the tool fails loudly." },
+      "code_usability": { "result": "PASS", "detail": "All shipped code ran: 18-line pysam is_coordinate_sorted / ensure_coordinate_sorted extracted verbatim from SKILL.md, the pysam.sort/merge calls, the Python pipefail snippet, every bash block, and the rewritten sort_pipeline.sh. Limits (uBAM, CRAM without reference) raise errors rather than returning wrong answers." }
+    }
+  },
+  "static_score": {
+    "subtotal": 86,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 11, "max": 12, "note": "Covers coordinate, -n, -N, -t, template-coordinate sorts, collate, merge, record-level verification, downstream requirement table, example pipeline. Deductions: Picard row says -n output is rejected without the natural==ASCII exception; fgbio CallMolecularConsensusReads row incomplete; -T is said to be never a directory." },
+      "reliability": { "score": 10, "max": 12, "note": "Example script is now fail-loud (input and index checks, pipefail, read-count check) and Common Errors has 8 rows whose messages match real output. Deductions: a failed run leaves a truncated but valid BAM at OUTPUT; is_coordinate_sorted raises on unaligned BAM and on CRAM without a reference (misleading 'truncated file')." },
+      "performance_context": { "score": 7, "max": 8, "note": "SKILL.md 323 lines, usage-guide 65 lines after dedup; the duplicated commands are gone. Measured claims are hedged as direction, not promises." },
+      "agent_usability": { "score": 14, "max": 16, "note": "Sort Orders table lists header lines and use cases; the -n/-N rule is one paragraph; verification and pitfalls are explicit. Minor: dagger rows, Picard wording and N+1 threads wording are imprecise." },
+      "human_usability": { "score": 6, "max": 8, "note": "Description still omits merge, collate and record verification, which the Skill now covers; strict fail-loud behaviour is appropriate and not penalised." },
+      "security": { "score": 11, "max": 12, "note": "No credentials, no eval of user strings, script variables quoted (verified with paths containing spaces). The THREADS argument is not validated (bwa accepted 'abc' and produced correct output)." },
+      "maintainability": { "score": 10, "max": 12, "note": "SKILL.md, usage-guide and example now have separate roles (no duplicated command blocks). No shipped test cases; the measured numbers depend on hardware." },
+      "agent_specific": { "score": 17, "max": 20, "note": "Progressive disclosure and idempotency good (re-run of sort_pipeline.sh over an existing output reproduced the same records); explicit trust-the-header hazard removed. Trigger text misses merge/collate/verify; no explicit human hand-off." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 86.1,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 29, "total": 34 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Coordinate-sort shuffled real BAMs, verify order, index, CRAM (regression + new Check Sort Order text)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed=true. 20/20 in-script checks passed (in01, log_in01.txt). Real shuffled nf-core (5644), 1000G (9601), real UMI BAM without @HD all sorted, multiset-identical to originals, indexed. New text run verbatim: --write-index writes .csi not .bai; samtools index test fails on shuffled/umi_unsorted; pysam is_coordinate_sorted True/False correctly; ensure_coordinate_sorted re-sorts a mislabelled BAM (first-audit P1 defect) and the result indexes.",
+        "basic": 36,
+        "specialized": 54,
+        "total": 90,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Sorted output is coordinate-ordered by an independent pysam walk and keeps the exact record multiset of the original BAM", "result": "PASS", "note": "coordinate_sorted=True, multiset md5 1267f5d9a548 equals the original sorted BAM" },
+          { "text": "sort --write-index produces a .csi (not .bai) that idxstats can use", "result": "PASS", "note": "wi.bam.csi present, no wi.bam.bai, idxstats chr22 5642 mapped" },
+          { "text": "SKILL's is_coordinate_sorted returns False on a shuffled BAM and True on the sorted one; ensure_coordinate_sorted re-sorts a header-mislabelled BAM", "result": "PASS", "note": "liar.bam -> liar_fixed.bam, is_coordinate_sorted True and samtools index succeeds" },
+          { "text": "-@ 8 -m 4G, -T prefix, -l 1, -O bam and pysam.sort variants give identical records to the default sort", "result": "PASS", "note": "identical record md5 for every variant" },
+          { "text": "CRAM output with --reference is written, indexable and has SO:coordinate", "result": "PASS", "note": "5644 records, .crai created" }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Name sort, -n vs -N vs Picard, duplicate marking, FASTQ extraction",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed=true. 16/16 in-script checks (in02, log_in02.txt). On read1..read1000 names: -n gives read1 read2..read10 and header SS:queryname:natural; -N gives read1 read10 read100 and SS:queryname:lexicographical; Picard SortSam order == -N (python natural key and bytes sort as second method). Picard MarkDuplicates on planted BAM: -n dies with 'Alignments added out of order ... Sort order is queryname', -N gives 50 pair dups / 100 flagged reads. On three real BAMs (RNA, 1000G, human) -n order differs from -N and Picard ValidateSamFile flags RECORD_OUT_OF_ORDER only for -n. With zero-padded names (natural==ASCII) Picard MarkDuplicates accepted -n output, so the table wording '-n output is rejected' is too broad.",
+        "basic": 36,
+        "specialized": 53,
+        "total": 89,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "SKILL describes -n as natural and -N as ASCII with the correct @HD SS: values", "result": "PASS", "note": "headers matched; read2 before read10 in -n, read10 before read2 in -N; python sorts agree" },
+          { "text": "The -N order equals Picard's queryname order and Picard MarkDuplicates works on -N but dies on -n", "result": "PASS", "note": "quoted exception text matched; 100 dup reads / READ_PAIR_DUPLICATES 50 on -N" },
+          { "text": "Duplicate-marking pipeline (collate, and sort -n / -N in its place) flags 100 reads equal to Picard", "result": "PASS", "note": "100/100/100; real human BAM 1656 == Picard 1656" },
+          { "text": "Paired FASTQ extraction from collate output gives 250 R1 and 250 R2 reads in identical name order", "result": "PASS", "note": "250/250, names identical" },
+          { "text": "SKILL statements about Picard's treatment of -n output are accurate for all name sets tested", "result": "FAIL", "note": "Zero-padded names q001..q040 (natural==ASCII order): -n output header says natural yet MarkDuplicates ran rc=0. The 'rejected' wording holds only when the two orders differ" }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Tag sort, mislabelled/truncated/empty BAM, tiny memory, template-coordinate",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed=true. 11/11 in-script checks (in03, log_in03.txt). The header-trust hazard is fixed: liar BAM rejected by samtools index and by is_coordinate_sorted; contig-order violation (chr2 block before chr1) caught by pysam, accepted by samtools index exactly as the SKILL documents (old awk snippet's false pass is gone). quickcheck rc 16 (missing EOF), 4 (zero byte) as quoted; -m 100K message text as quoted; spill output == in-memory; template-coordinate without MC gives the quoted 'no MC tag' message. Index errors: -t gives NO_COOR..., -n/-N give 'Chromosome blocks not continuous' (all also contain 'cannot be indexed').",
+        "basic": 35,
+        "specialized": 52,
+        "total": 87,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "-t CB header and ordering match the SKILL table (SO:unsorted SS:unsorted:CB:coordinate, position secondary) and output cannot be indexed", "result": "PASS", "note": "checked on synthetic CB and on real UMI RX (15788/15788 tagged, ASCII non-decreasing)" },
+          { "text": "A BAM labelled SO:coordinate but shuffled is detected by the record-level checks in the SKILL", "result": "PASS", "note": "samtools index: 'Unsorted positions on sequence #1'; is_coordinate_sorted False" },
+          { "text": "A contig-order violation is caught by the pysam check and documented as invisible to samtools index", "result": "PASS", "note": "index rc 0 wrote a .bai; is_coordinate_sorted False" },
+          { "text": "Quoted error messages and quickcheck return codes appear as documented (truncated file, -m below 1M, no MC tag, rc 16 and rc 4)", "result": "PASS", "note": "all matched, spill 'merging from 14 files' output identical to in-memory sort" },
+          { "text": "Determinism: -@ 0/4/8 give identical record streams", "result": "PASS", "note": "identical md5" }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Merge per-lane BAMs: consistency check, -c/-p, RG collision, name-sorted merge, -R",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed=true. 11/11 in-script checks (in04, log_in04.txt). Consistency loop prints 1 line for a consistent set and 2 lines for coordinate+name and for -n+-N mixes (as the new comment says). -c collapses two different read groups sharing an ID into one (warning true); addreplacerg remedy works. merge -n / -N keep natural / ASCII order and headers; plain merge of name-sorted inputs is not name-ordered; Picard flags RECORD_OUT_OF_ORDER on merge -n output only. -R on unindexed inputs gives 'Could not retrieve index file' rc 1. pysam.merge equals CLI.",
+        "basic": 35,
+        "specialized": 53,
+        "total": 88,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "The -c warning is true: two different read groups with the same ID collapse into one and B reads are relabelled", "result": "PASS", "note": "1 @RG line, B reads carry RG:Z:L1 with SM:sampleA header" },
+          { "text": "merge -n and -N of same-flag name-sorted inputs give natural / ASCII order with matching SS: headers", "result": "PASS", "note": "qname_natural=True and qname_ascii=True respectively; -o form also works" },
+          { "text": "Merge of coordinate and name-sorted inputs silently yields a mis-ordered file under an SO:coordinate header, as claimed", "result": "PASS", "note": "rc 0, header SO:coordinate, coordinate_sorted=False, index fails" },
+          { "text": "-R needs indexed inputs and the quoted message matches; region count equals sum of per-file counts", "result": "PASS", "note": "3232 == 3232; 'Could not retrieve index file' rc 1" },
+          { "text": "pysam.merge(-c -p -f) equals the CLI and missing inputs raise SamtoolsError", "result": "PASS", "note": "6144 records identical" }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Rewritten example, downstream table rows, perf/threads/memory claims, dagger rows",
+        "status": "PARTIAL",
+        "status_flag": "⚠️",
+        "note": "executed=true for everything whose tool exists (in05a-f). Example and table rows hold: index, fixmate -n/-N, markdup, Picard -n/-N, GATK MarkDuplicatesSpark (100 dups on coordinate, -n, -N), bcftools ('The input is not sorted'), HaplotypeCaller and Mutect2 (need index), umi_tools (15788 -> 5689), fgbio GroupReadsByUmi (any order), HTSeq (2820 vs 5599 reproduced with a one-gene GTF on the DNA BAM, -p is --samout-format). Compression table reproduces on WSL-native ext4 (39.2x, +5.8%, -4.5%, 10.3x slower). Collate 0.658 s vs sort -n 0.66 s reproduces on ext4 but collate is ~4x slower when temp files land on the /mnt (9p) mount. -@ 0/2/4/8 peak 2/6/7/11 threads (not exactly N+1); RSS with -m 20M: 49 MB at -@ 0, 83 MB at -@ 3 (~(N+1) x m plus base). -T given an existing directory is used as a directory (files inside it), contrary to 'not a directory'. Dagger rows: featureCounts, Salmon, RSEM, Sniffles, cuteSV, Manta, Delly really absent (which), so their marking is honest; fgbio CallMolecularConsensusReads and Mutect2 are installed and the footnote 'not installed' is false for them. CallMolecularConsensusReads (fgbio 4.1.1) fails with 'not sorted correctly. Please sort with fgbio SortBam -s TemplateCoordinate' on coordinate-sorted and on sort -t MI input, so 'grouped by MI tag' is incomplete. Mutect2 row (coordinate + indexed) verified.",
+        "basic": 32,
+        "specialized": 46,
+        "total": 78,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Shipped sort_pipeline.sh from a clean copy runs valid paired and single-end input to exit 0 with the right records and fails loudly on missing index/inputs, truncated FASTQ and a dying aligner", "result": "PASS", "note": "PE 200 records rc 0; no index rc 1 with 'bwa index' hint; shim bwa exit 3 -> script rc 3; quiet truncation -> 'has 57 primary records, expected 100' rc 1" },
+          { "text": "Every downstream-table row whose tool is installed behaves as stated", "result": "PASS", "note": "13 rows run, quoted messages and counts matched (5599 vs 2820 reproduced; conditions of that number are not stated in the SKILL)" },
+          { "text": "Performance and flag claims (compression table, collate vs sort -n, -m per thread, -T prefix) reproduce", "result": "PASS", "note": "reproduce on native disk; wording gaps: -T with an existing directory is used as a directory; -@ N thread total is more than N+1; collate/-l 0 timings depend on the temp-file filesystem" },
+          { "text": "The dagger footnote ('tool not installed in the checking environment') is true for every row that carries a dagger", "result": "FAIL", "note": "fgbio and GATK are installed: CallMolecularConsensusReads and Mutect2 were runnable and are now verified here; the other seven daggered tools are truly absent" },
+          { "text": "fgbio CallMolecularConsensusReads row gives a requirement an agent can follow successfully", "result": "FAIL", "note": "row says 'grouped by MI tag'; coordinate-sorted and sort -t MI input fail with Fatal 'not sorted correctly'; only template-coordinate order (GroupReadsByUmi output as written) works" }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Adversarial",
+        "label": "NEW: verify a folder of BAM/CRAM files at record level, incl. 960k-read file and planted defects",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed=true (in06, log_in06.txt). SKILL's is_coordinate_sorted extracted verbatim. 8/8 real sorted BAMs (nf-core DNA/RNA with 1786 supplementary, 1000G, planted, nanopore ARTIC, 4 SARS-CoV-2) -> True (no false positive). 14/14 negatives False (and the good 2-contig file True): shuffled, liar headers, -n, -N, -t, template-coordinate, collate, 4 single-swap mutations (start, middle, end, mapped-after-unmapped) and a 2-contig real-read file with the chrB block before chrA (samtools index accepts it, pysam catches it). 960,100 records: 1.9 s, 27 MB RSS; a single swapped pair near the end found (False, 2.0 s). ensure_coordinate_sorted output indexes for every fixable negative. Limits: unaligned BAM (no @SQ) raises ValueError; CRAM without a resolvable reference raises OSError 'truncated file' (works with a cached reference).",
+        "basic": 34,
+        "specialized": 50,
+        "total": 84,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "No false positives: every real coordinate-sorted BAM is reported True", "result": "PASS", "note": "8/8 True; second method samtools index agrees on all 8" },
+          { "text": "Every planted defect (shuffle, header liar, wrong name/tag/template order, single swap anywhere, contig-order violation) is reported False", "result": "PASS", "note": "14/14 negatives False (good file True); contig swap found only by the pysam walk" },
+          { "text": "The check scales to about a million records without loading them into memory", "result": "PASS", "note": "960,100 records 1.9 s, 27 MB max RSS" },
+          { "text": "ensure_coordinate_sorted repairs every re-sortable negative into a file that passes the check and indexes", "result": "PASS", "note": "0 failures over 15 files (14 fixable + 1 already sorted)" },
+          { "text": "The check function handles the input types the workflow can meet (unaligned BAM, CRAM)", "result": "FAIL", "note": "uBAM: ValueError 'file has no sequences defined'; CRAM without reference: OSError 'truncated file' (cause not evident)" }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Scope Boundary",
+        "label": "NEW: rewritten sort_pipeline.sh on real read pairs under hostile conditions",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed=true (in07, log_in07.txt). 14/14 in-script checks. 2821 real pairs from the nf-core human BAM: plain and gz FASTQ give identical records, exit 0, primary count 5642 == 2 x pairs (bwa adds supplementary lines, so total 5644: the -F 0x900 read-count check has no false alarm); spaces in paths, re-run over existing output, trailing blank line, all-N read, zero-length read all fine. Fail-loud cases: partial bwa index (.sa missing) rc 1, unwritable output dir rc 1, unequal R1/R2 rc 1, no 'Done'. Leftovers: a failed run leaves a valid but truncated BAM at OUTPUT (57 of 100 records in the shim tests), and THREADS is not validated ('abc' accepted by bwa). SE with threads requires an empty R2 argument.",
+        "basic": 35,
+        "specialized": 52,
+        "total": 87,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "A valid paired, single-end, gz, plain and space-path run exits 0 with primary records equal to input reads", "result": "PASS", "note": "5642 == 2 x 2821; gz == plain; 2821 SE" },
+          { "text": "Each hostile condition (partial index, unwritable output, unequal mates, missing files) exits non-zero and never prints Done", "result": "PASS", "note": "all rc 1; bwa messages preserved on stderr" },
+          { "text": "The read-count check raises no false alarm on supplementary alignments, blank trailing line, all-N or zero-length reads", "result": "PASS", "note": "all rc 0 with correct primary counts" },
+          { "text": "A failed run leaves no misleading output file at the requested path", "result": "FAIL", "note": "truncated BAM (57 records, valid BGZF, no .bai) remained after the count-check failure and after the aligner-crash failure" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 34.4,
+    "dynamic_weighted": 51.7,
+    "score": 86,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "The -n natural vs -N ASCII documentation is correct and independently confirmed with Picard 3.5.0 (SortSam order, MarkDuplicates exception, ValidateSamFile), samtools headers and Python sorts, on synthetic and three real BAMs",
+    "The pysam record-level order check catches every planted defect (shuffle, header liar, contig-order violation, single swaps, wrong name/tag/template order) with no false positives on 8 real BAMs, and handles 960k records in 1.9 s at 27 MB",
+    "sort_pipeline.sh is now fail-loud and its read-count check has no false alarm on real data; every hostile condition tested (partial index, unwritable output, unequal mates, dying aligner) exits non-zero",
+    "SKILL.md and usage-guide.md no longer duplicate each other and nothing needed by an agent was lost; the quoted error messages and numbers match real tool output"
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "Dagger footnote false for two rows; CMCR row incomplete",
+      "observed_in": [5],
+      "problem": "The footnote says the daggered tools were not installed, but fgbio and GATK are installed here. fgbio 4.1.1 CallMolecularConsensusReads rejects coordinate-sorted and sort -t MI input ('not sorted correctly. Please sort with fgbio SortBam -s TemplateCoordinate') although the row says 'grouped by MI tag'. Mutect2 needs coordinate and index (verified).",
+      "root_cause": "The fixer hedged rows by tool family without checking which tools were actually present.",
+      "fix": "Remove the dagger from Mutect2 (verified: coordinate-sorted and indexed) and change the CMCR row to 'template-coordinate order, as written by GroupReadsByUmi'. Keep the dagger only on featureCounts, Salmon, RSEM, Sniffles, cuteSV, Manta, Delly, which are genuinely unverified."
+    },
+    {
+      "priority": "P2",
+      "title": "Picard '-n output is rejected' is too broad",
+      "observed_in": [2],
+      "problem": "With zero-padded names where natural and ASCII order coincide, Picard MarkDuplicates accepted -n output (rc 0). With numeric-suffix names (all three real BAMs) it is rejected.",
+      "root_cause": "The claim was tested only on names whose two orders differ.",
+      "fix": "Say 'rejected whenever natural and ASCII order differ (most real names); use -N to be safe'."
+    },
+    {
+      "priority": "P2",
+      "title": "is_coordinate_sorted fails opaquely on uBAM and CRAM",
+      "observed_in": [6],
+      "problem": "Unaligned BAM raises ValueError (no @SQ); CRAM without a resolvable reference raises OSError 'truncated file'.",
+      "root_cause": "The function opens with pysam.AlignmentFile(path, 'rb') and no check_sq or reference options.",
+      "fix": "Add check_sq=False (an unaligned BAM is not coordinate sorted) and a one-line note that CRAM needs REF_PATH or reference_filename."
+    },
+    {
+      "priority": "P2",
+      "title": "Failed pipeline run leaves a truncated BAM in place",
+      "observed_in": [5, 7],
+      "problem": "After a read-count mismatch or aligner crash sort_pipeline.sh exits non-zero but the partial, valid-looking BAM stays at OUTPUT; THREADS is not validated and SE-with-threads needs an empty R2 argument.",
+      "root_cause": "No cleanup on failure; positional-argument design.",
+      "fix": "rm -f \"$OUTPUT\" before exiting on the count error (or a trap on failure), and validate THREADS as an integer."
+    },
+    {
+      "priority": "P2",
+      "title": "Small flag and performance wording gaps",
+      "observed_in": [5],
+      "problem": "-T with an existing directory is used as a directory (samtools.PID.tmp.NNNN.bam inside it), contrary to 'not a directory'; -@ N gave 2/6/7/11 threads for N = 0/2/4/8, not N+1; collate and -l 0 timings reverse on a network mount (collate ~4x slower on 9p); HTSeq 2820/5599 is quoted without its GTF and BAM.",
+      "root_cause": "Statements come from help text and one machine.",
+      "fix": "Soften each to the observed behaviour and name the conditions (local disk, one-gene GTF over the DNA test BAM)."
+    },
+    {
+      "priority": "P2",
+      "title": "Description omits merge, collate and record verification",
+      "observed_in": [],
+      "problem": "Frontmatter description mentions only sorting for indexing, variant calling or paired-end analysis, though the Skill covers merge, collate and order verification.",
+      "root_cause": "Description not updated when sections were added.",
+      "fix": "Add 'merge, collate and verify sort order' to the description."
+    }
+  ]
+}

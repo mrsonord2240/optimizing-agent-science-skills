@@ -23,7 +23,7 @@ import time
 REC = "F:/optimizing-agent-science-skills"
 FORK = "F:/OpenScience/external/mrsonord2240__bioSkills"
 UPSTREAM_COMMIT = "d91ed3d563019e649dc854c56ccd62551359488a"
-FORK_COMMIT = "85a3e4de9a56ad5b24911ee7c21a039eb57ef216"
+FORK_COMMIT = "ed0ff44371bd7a2bea70cbf9aa0309acb01b28f6"
 AUDITS = "F:/OpenScience/audits"
 OUT = "F:/optimized-scientific-skills"
 
@@ -69,6 +69,15 @@ def audits():
         if d.startswith("_"):
             continue
         p = os.path.join(AUDITS, d, f"eval_report_{d}_result.json")
+        if not os.path.exists(p):
+            # A re-audit in flight has cleared the live report: the Skill keeps the status of its last
+            # completed audit, which is the newest archive under _pre-fix-*/. Without this the Skill
+            # drops off the promoted shelf until the re-audit lands.
+            for a in sorted((x for x in os.listdir(AUDITS) if x.startswith("_pre-fix-")), reverse=True):
+                q = os.path.join(AUDITS, a, d, f"eval_report_{d}_result.json")
+                if os.path.exists(q):
+                    p = q
+                    break
         if os.path.exists(p):
             out[d] = json.load(open(p, encoding="utf-8"))
     return out
