@@ -8,7 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (95)
+## P1 (98)
 
 ### `bio-alignment-validation` — Validators miss unplaced unmapped reads: false PASS at 70% mapped
 
@@ -145,6 +145,30 @@ None open.
 - Problem: The Skill calls the header 'simpler and authoritative' and ensure_coordinate_sorted() returns a mislabelled (SO:coordinate but shuffled) BAM unchanged, which then fails to index; the awk check catches this but cannot see contig-order violations, and nothing recommends `samtools quickcheck` or an index attempt.
 - Root cause: Sort state is inferred from metadata rather than checked against the records.
 - Fix: Make the awk/pysam record check the primary verification (or call `samtools index` as the test), keep the header as a fast hint only, add `samtools quickcheck` after long sorts, and drop 'authoritative'.
+
+### `bio-duplicate-handling` — Duplex consensus step crashes after adjacency grouping
+
+- Skill: 77, Limited Release · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/duplicate-handling) · [viewer](skills/bio-duplicate-handling/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 7
+- Problem: SKILL.md groups with --strategy=adjacency and then says 'or for duplex' CallDuplexConsensusReads on the same grouped.bam; on the real UMI BAM this throws StringIndexOutOfBoundsException (exit 1). With --strategy=paired the same call emits 4042 duplex reads.
+- Root cause: Duplex calling needs MI tags with /A /B strand suffixes, which only the paired strategy writes; the Skill shares one grouping command between two consensus paths.
+- Fix: Show two separate branches: adjacency -> CallMolecularConsensusReads, and 'GroupReadsByUmi --strategy=paired' -> CallDuplexConsensusReads. State the input prerequisites for GroupReadsByUmi (mate info via SetMateInformation on queryname-grouped input, or samtools fixmate -m output).
+
+### `bio-duplicate-handling` — umi_tools dedup example omits sort/index and --paired
+
+- Skill: 77, Limited Release · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/duplicate-handling) · [viewer](skills/bio-duplicate-handling/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 7
+- Problem: The umi_tools command fails on an unsorted/unindexed BAM ('fetch called on bamfile without index') and, on a sorted paired-end BAM without --paired, silently outputs 2805 records instead of 5689 (mates dropped). Neither requirement is stated.
+- Root cause: Example was written for single-end 10x BAMs and generalised to bulk/ctDNA capture BAMs without the prerequisites.
+- Fix: Add: input must be coordinate-sorted and indexed; add --paired for paired-end libraries; note that --per-cell with absent CB/UB tags gives an empty BAM with exit 0, so check the tags first.
+
+### `bio-duplicate-handling` — Optimized pipeline fails from a clean directory and hides it
+
+- Skill: 77, Limited Release · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/duplicate-handling) · [viewer](skills/bio-duplicate-handling/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 2, 5
+- Problem: 'samtools collate ... tmpdir/collate' fails when tmpdir/ does not exist; the pipe still exits 0 and writes an empty 501-byte marked.bam. The shipped markdup_pipeline.sh has the same no-pipefail structure and only exits non-zero because the later index step fails.
+- Root cause: No mkdir for the temp dir and no 'set -o pipefail' or output check in either the SKILL.md pipeline or the shipped example.
+- Fix: Add 'mkdir -p tmpdir' (or use mktemp -d) before the pipeline, 'set -o pipefail' in the example, and an assertion that the flagstat 'duplicates' line and record count are sane after marking.
 
 ### `bio-alignment-amplicon-clipping` — Wrong primer BED passes the example; claim attributed to checker
 
@@ -770,7 +794,7 @@ None open.
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (373)
+## P2 (377)
 
 ### `bio-alignment-validation` — Production IGNORE recipe removes checks that catch real defects
 
@@ -899,6 +923,38 @@ None open.
 - Problem: Nearly every command, the fixmate/markdup workflow, collate FASTQ extraction and the pysam snippets appear in both files (503 lines together for a three-topic Skill), doubling maintenance and context cost.
 - Root cause: usage-guide.md restates SKILL.md instead of holding only prompts and troubleshooting.
 - Fix: Keep commands only in SKILL.md; reduce usage-guide.md to example prompts, what-the-agent-does and troubleshooting.
+
+### `bio-duplicate-handling` — Common Errors table and Critical pitfall do not match samtools 1.24
+
+- Skill: 77, Limited Release · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/duplicate-handling) · [viewer](skills/bio-duplicate-handling/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 3
+- Problem: Real messages are 'no ms score tag', 'Coordinate sorted, require grouped/sorted by queryname' and 'queryname sorted, must be sorted by coordinate'; the table lists 'mate not found', 'no MC tag' (for a missing -m) and 'not coordinate sorted'. The pitfall says missing tags silently mark almost nothing, but 1.24 exits 1 with an error.
+- Root cause: Error strings were paraphrased or taken from older versions.
+- Fix: Replace the table with the verbatim messages and delete or version-qualify the 'silently marks almost nothing' claim.
+
+### `bio-duplicate-handling` — No guidance on -c (re-marking) or read groups for Picard
+
+- Skill: 77, Limited Release · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/duplicate-handling) · [viewer](skills/bio-duplicate-handling/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 3, 5
+- Problem: Re-running markdup on an already-flagged BAM without -c retained old flags (111 vs 101 from -c and Picard on the 1000G slice). Picard MarkDuplicates throws a NullPointerException on a BAM without @RG, which is what the Skill's own bwa-mem2 example produces (no -R).
+- Root cause: Options in samtools markdup --help (-c, -S) and Picard's RG requirement are not covered.
+- Fix: Add one line on -c for pre-marked or merged BAMs, add -R '@RG...' to the bwa-mem2 example, and note Picard needs @RG.
+
+### `bio-duplicate-handling` — usage-guide repeats SKILL.md and contradicts it
+
+- Skill: 77, Limited Release · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/duplicate-handling) · [viewer](skills/bio-duplicate-handling/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 2, 4, 5
+- Problem: usage-guide says '-d 2500 for NovaSeq, NextSeq' and 'HiSeq -d 100' while SKILL.md gives NextSeq 500/550 and MiSeq 100, HiSeq 3000/4000/X 2500; duplicate-rate denominators differ (all records vs -F 256 vs primary only); the example script omits -d; the 'markdup -@ 8 fixes high memory' tip is unsupported (maxRSS rose 7.4 -> 13.8 MB).
+- Root cause: Two documents restate the same facts and drifted apart.
+- Fix: Keep the platform/-d matrix, workflow and rate formula only in SKILL.md, point usage-guide at it, and delete the memory tip or replace it with -T on a large scratch disk.
+
+### `bio-duplicate-handling` — Workflow steps do not gate on assay
+
+- Skill: 77, Limited Release · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/duplicate-handling) · [viewer](skills/bio-duplicate-handling/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 6
+- Problem: The decision table says NO for bulk RNA-seq, amplicon and UMI assays (verified: 1980/2000 amplicon reads and 38% of reads at the top RNA locus get flagged), but the usage-guide 'What the Agent Will Do' and the shipped example run markdup on any BAM.
+- Root cause: Assay check lives only in a table.
+- Fix: Add step 0 to the workflow and to the example: confirm assay (RNA-seq, amplicon, UMI, scRNA), stop and hand off to the named tool if it is on the NO list.
 
 ### `bio-crispr-screens-copy-number-correction` — negative_control_sgrnas empty-dict case raises an undocumented ValueError
 

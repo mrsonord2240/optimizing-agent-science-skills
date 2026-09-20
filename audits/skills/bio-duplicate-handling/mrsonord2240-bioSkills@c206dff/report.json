@@ -1,0 +1,480 @@
+{
+  "meta": {
+    "skill_name": "bio-duplicate-handling",
+    "description": "Mark and remove PCR/optical duplicates using samtools fixmate and markdup. Use when preparing alignments for variant calling or when duplicate reads would bias analysis.",
+    "evaluated_on": "2026-09-20",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "B",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "mrsonord2240/bioSkills@c206dff76d081a5126f8497fbabe10995c9b6026:alignment-files/duplicate-handling",
+    "executed": "7/7 inputs executed. Not executed (no tool/data): biobambam2 bammarkduplicates2, pbmarkdup, mapDamage --rescale row, macs3 --keep-dup, ATAC Tn5 shift, real Cell Ranger CB/UB umi_tools dedup, Picard UmiAwareMarkDuplicatesWithMateCigar (help only; class exists, marked EXPERIMENTAL).",
+    "execution_note": "WSL science env alignment-files: samtools 1.24, pysam 0.24.1, Picard 3.5.0, fgbio 4.1.1, umi_tools 1.1.6, sambamba 1.0.1, samblaster 0.1.26, bwa-mem2 2.3. Real data from public-data (nf-core human/RNA/UMI BAMs, 1000G HG00349 slice, ARTIC nanopore) plus planted_dups.bam (truth 50 pairs) and labelled SYNTHETIC BAMs in run/data (optical, multi-library, same-library 2 RG, amplicon) and synthetic FASTQ clones (in05b).",
+    "execution_mode_note": "SKILL.md CLI patterns plus one shipped shell example (examples/markdup_pipeline.sh); no scripts/ dir. Classified B (CLI/script).",
+    "skill_commit_note": "Skill folder unchanged since c206dff (git diff c206dff..HEAD empty); last touched by 558aea5. First audit, not a re-audit."
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated identifiers or results; every count reported in the audit traces to a logged command output. Unsupported statements (~30% faster, biobambam2 'fastest') are qualitative and were not executed."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Alignment-file processing only; no diagnostic or prescriptive clinical output."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Assay-driven decision table is sound (verified for RNA-seq, amplicon and multi-library). Two factual errors (error strings; 'silently marks nothing') are not methodological fallacies."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All Skill commands parse and use flags that exist in samtools 1.24, Picard 3.5.0, umi_tools 1.1.6, fgbio 4.1.1. Two documented commands fail on realistic input (clean-dir optimized pipeline, duplex after adjacency); recorded as P1, not unrunnable code."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 73,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 9,
+        "max": 12,
+        "note": "Completeness 3, Correctness 2, Appropriateness 4. Core mark/remove/stats/optical/multi-library/assay workflow verified by output; UMI duplex step, umi_tools prerequisites, error-string table and the 'silently marks nothing' pitfall are wrong"
+      },
+      "reliability": {
+        "score": 7,
+        "max": 12,
+        "note": "Fault tolerance 2, error reporting 2, recoverability 3. Optimized pipeline and shipped example have no pipefail/mkdir; error table paraphrases do not match the tool; default is mark-not-remove with a lossy-operation warning"
+      },
+      "performance_context": {
+        "score": 5,
+        "max": 8,
+        "note": "Token cost 2 (372-line SKILL.md plus a usage-guide that repeats most of it), execution efficiency 3"
+      },
+      "agent_usability": {
+        "score": 11,
+        "max": 16,
+        "note": "Learnability 3, consistency 2 (usage-guide vs SKILL.md disagree on -d for NextSeq/HiSeq X and on rate denominators), feedback design 3, error prevention 3 (strong assay table; misses tmpdir, -c, RG for Picard, --paired)"
+      },
+      "human_usability": {
+        "score": 6,
+        "max": 8,
+        "note": "Discoverability 3 (description omits assay/UMI caveats), forgiveness 3 (accepts any-order input by name-sorting first)"
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "No credentials or eval; example quotes its variables; lossy -r is flagged; example writes markdup_stats.txt to cwd"
+      },
+      "maintainability": {
+        "score": 8,
+        "max": 12,
+        "note": "Modularity 3, modifiability 2 (facts duplicated between SKILL.md and usage-guide), testability 3 (counts verifiable, one example, no test data)"
+      },
+      "agent_specific": {
+        "score": 16,
+        "max": 20,
+        "note": "Trigger 3, progressive disclosure 3, composability 4 (Related Skills all exist), idempotency 3 (re-mark without -c inflates), escape hatches 3 (assay table says NO for RNA/amplicon/UMI; workflow steps do not gate)"
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 79.1,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 26,
+      "total": 32
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Standard fixmate-markdup workflow, count vs planted truth and 3 independent tools",
+        "prompt": "I have paired-end Illumina alignments (coordinate sorted). Mark the PCR duplicates with the standard fixmate/markdup workflow, index the result, and tell me how many reads were flagged and the duplicate rate.",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "SKILL.md steps 1-5 verbatim: planted BAM 100/100 flagged; real human BAM 1656 flagged, identical read set to Picard",
+        "basic": 36,
+        "specialized": 55,
+        "total": 91,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "samtools markdup after the SKILL.md workflow flags exactly the 100 planted duplicate reads",
+            "result": "PASS",
+            "note": "view -c -f 1024 = 100; flagstat '100 + 0 duplicates'; -s stats DUPLICATE PAIR 100 (truth: 50 pairs)"
+          },
+          {
+            "text": "Independent tools agree: Picard 50 pairs (=100 reads), sambamba 100, samblaster 100 flagged",
+            "result": "PASS",
+            "note": "Picard READ_PAIR_DUPLICATES 50; samtools vs Picard flag different member of each identical pair (tie), counts equal"
+          },
+          {
+            "text": "On the real human BAM samtools markdup and Picard flag the identical read set",
+            "result": "PASS",
+            "note": "1656 flagged by samtools, Picard, sambamba, samblaster; (name,flag) set difference 0"
+          },
+          {
+            "text": "-r removal returns total minus flagged and the marked output is indexed",
+            "result": "PASS",
+            "note": "500->400 and 5644->3988 records; marked.bam.bai written"
+          },
+          {
+            "text": "SKILL.md percentage one-liner agrees with flagstat / Picard PERCENT_DUPLICATION",
+            "result": "PASS",
+            "note": "20.00% (100/500); 29.34% vs Picard 0.2936 (2 secondary + 2 unmapped in denominator)"
+          }
+        ],
+        "executed": true,
+        "execution_note": "in01_canonical.sh -> in01.log; planted_dups.bam and test.paired_end.sorted.bam, samtools 1.24, Picard 3.5.0, sambamba 1.0.1, samblaster 0.1.26"
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Optimized piped workflow + optical distance on a NovaSeq-style request",
+        "prompt": "This is a NovaSeq 6000 WGS run. Give me the fast piped duplicate-marking command with 4 threads, optical duplicates at the right distance, per-read-group handling and a stats file, then tell me how many duplicates are optical vs PCR.",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Verbatim 'Pipeline Version (Optimized)' fails from a clean directory (tmpdir/ not created), pipeline exit 0, 501-byte empty BAM; works after mkdir; optical logic correct",
+        "basic": 30,
+        "specialized": 44,
+        "total": 74,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The verbatim optimized pipeline runs from a clean working directory",
+            "result": "FAIL",
+            "note": "samtools collate: Cannot open intermediate file tmpdir/collate.0000.bam; downstream stages exit 0 and write an empty 501-byte marked.bam (per-stage exit codes 1 0 0 0, no pipefail)"
+          },
+          {
+            "text": "After creating tmpdir the pipeline flags exactly the planted 100 reads",
+            "result": "PASS",
+            "note": "100 flagged; stats file has ALL block + 'READ GROUP: 1' block, DUPLICATE TOTAL 100"
+          },
+          {
+            "text": "Optical claims hold: -d 0 emits no dt tag, -d emits dt:Z:SQ/LB, counts match Picard",
+            "result": "PASS",
+            "note": "synthetic Illumina names, truth 4 dup pairs: samtools OPTICAL reads 0/2/4 at -d 0/100/2500 = Picard optical pairs 0/1/2; dt tags 4 SQ + 4 LB at 2500; -t adds 'do' tag"
+          },
+          {
+            "text": "-f stats file and --use-read-groups are accepted by the installed samtools and do not change the flagged count",
+            "result": "PASS",
+            "note": "samtools 1.24 markdup --help lists both; 100 flagged"
+          }
+        ],
+        "executed": true,
+        "execution_note": "in02_pipeline_optical.sh -> in02.log; synth_optical.bam is SYNTHETIC (00_make_synth.py). Note: -d on the real BAM (names testN:n) only prints 'cannot decipher read name' warnings, flags unchanged (1656)"
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Wrong-order pipelines and the Common Errors / Critical pitfall text",
+        "prompt": "samtools markdup errors out or marks nothing on my BAM and I'm not sure of the sort order I used. What is wrong, how do I fix it, and can I drop secondary/unmapped reads with fixmate on the way?",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "All prerequisites correct (ms+MC tags, name-sort before fixmate, coord-sort before markdup) but the documented error strings and the 'silently marks almost nothing' pitfall do not match samtools 1.24",
+        "basic": 32,
+        "specialized": 44,
+        "total": 76,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Stated prerequisites are correct: fixmate -m needs name-grouped input, markdup needs ms+MC tags and coordinate order",
+            "result": "PASS",
+            "note": "each violation stops the tool: no ms score tag / no MC tag / queryname sorted, must be sorted by coordinate / fixmate 'Coordinate sorted, require grouped/sorted by queryname'"
+          },
+          {
+            "text": "Documented Common Errors strings match the real messages",
+            "result": "FAIL",
+            "note": "table says 'mate not found', 'no MC tag' (for missing -m) and 'not coordinate sorted'; real: 'Coordinate sorted, require grouped/sorted by queryname', 'no ms score tag', 'queryname sorted, must be sorted by coordinate'"
+          },
+          {
+            "text": "Critical pitfall 'lost tags silently produce a markdup output that marks almost nothing' is accurate",
+            "result": "FAIL",
+            "note": "stripping ms and/or MC makes samtools 1.24 exit 1 with an error (output left with 0 flagged); not silent"
+          },
+          {
+            "text": "Wrong-order pipelines never yield a silently wrong duplicate count",
+            "result": "PASS",
+            "note": "every wrong order (3a-3e) exits 1 with dup_flagged 0; correct order control flags 100"
+          },
+          {
+            "text": "fixmate -r -m removes secondary and unmapped reads as claimed",
+            "result": "PASS",
+            "note": "5644 -> 5640 records, 0 secondary, 0 unmapped; markdup still flags 1656"
+          }
+        ],
+        "executed": true,
+        "execution_note": "in03_edge_wrong_order.sh, in03b_fixmate_r.sh, 03_strip_tags.py -> in03.log, in03b.log. Side finding: re-marking an already-flagged BAM without -c gave 111 flagged vs 101 with -c and Picard (1000G slice); SKILL.md never mentions -c"
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "pysam alternative for the workflow and duplicate rate",
+        "prompt": "Do the duplicate marking in Python with pysam instead of the shell, filter out the duplicates, and give me the duplicate rate.",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "All SKILL.md and usage-guide pysam snippets run verbatim and match samtools counts; only the rate denominators differ between the two documents",
+        "basic": 36,
+        "specialized": 53,
+        "total": 89,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "SKILL.md pysam pipeline (sort -n, fixmate -m, sort, markdup, index) flags the truth counts",
+            "result": "PASS",
+            "note": "100/100 planted and 1656/1656 real; marked.bam.bai written"
+          },
+          {
+            "text": "usage-guide mark_duplicates() flags truth and cleans its temp files",
+            "result": "PASS",
+            "note": "100 and 1656 flagged, no temp_* left"
+          },
+          {
+            "text": "Python errors surface as exceptions with tool stderr, not silent output",
+            "result": "PASS",
+            "note": "SamtoolsError on markdup without ms tag and on missing input"
+          },
+          {
+            "text": "The 'production tools, not hand-rolled' warning is present and the filter/rate helpers are consistent with samtools",
+            "result": "PASS",
+            "note": "remove_duplicates == view -F 1024; duplicate_rate total == primary count (5642). SKILL.md rate counts all records (29.34%) vs usage-guide primary-only (29.35%): trivial"
+          }
+        ],
+        "executed": true,
+        "execution_note": "in04_pysam.py -> in04.log; pysam 0.24.1 (embeds samtools 1.24)"
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Shipped example, usage-guide pipelines, failure exits, aligner+samblaster alternative",
+        "prompt": "Use the shipped markdup_pipeline.sh (and the usage-guide pipeline) on my BAM, and also show me how to mark duplicates inline during alignment with bwa-mem2 and samblaster.",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Example and usage-guide pipelines correct (100/1656); example fails only by accident (index step) and leaves a 28-byte out.bam; samblaster path 40/40; Picard alternative NPEs on the RG-less BAM the aligner example produces",
+        "basic": 32,
+        "specialized": 45,
+        "total": 77,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Shipped examples/markdup_pipeline.sh, run from a copy, flags the truth counts and prints stats",
+            "result": "PASS",
+            "note": "planted 100 (threads 2), real 1656; bash -n OK; usage 1-arg path exit 1"
+          },
+          {
+            "text": "Failures of the example surface as a non-zero exit",
+            "result": "PASS",
+            "note": "missing, truncated and unwritable-output inputs all end exit 1, but only because the later 'samtools index' fails: the script has no pipefail and the tee pipeline itself returns 0; a 28-byte junk out.bam is left behind"
+          },
+          {
+            "text": "Example mirrors the Skill's own advice (explicit -d, pipefail, tmp handling)",
+            "result": "FAIL",
+            "note": "no -d although SKILL.md says -d 0 disables optical detection; no pipefail; markdup_stats.txt written to cwd"
+          },
+          {
+            "text": "bwa-mem2 | samblaster | samtools sort flags exactly the planted clone pairs",
+            "result": "PASS",
+            "note": "SYNTHETIC 20 clone pairs + 100 real pairs: 40 flagged, 40 of 40 are clones; samtools markdup gives 40 too"
+          },
+          {
+            "text": "usage-guide 'Pipeline (No Intermediate Files)', step-by-step, -s/-f variants and rate one-liner give the truth counts",
+            "result": "PASS",
+            "note": "100 flagged, exit codes 0 0 0 0, rate 20.00%, DUPLICATE TOTAL 100"
+          }
+        ],
+        "executed": true,
+        "execution_note": "in05_shipped_example.sh, in05b_aligner_alternatives.sh -> in05.log, in05b.log. Not executed: biobambam2 bammarkduplicates2, pbmarkdup (not installed). Side findings: usage-guide 'markdup -@ 8 reduces high memory' unsupported (maxRSS 7.4 MB at -@0 vs 13.8 MB at -@8, tiny input); picard MarkDuplicates NullPointerException on a BAM without @RG"
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Assay decision: bulk RNA-seq, amplicon panel, pooled multi-library",
+        "prompt": "I have a bulk RNA-seq BAM, an amplicon-panel BAM and a pooled 2-library WGS BAM. Remove the duplicates from all three.",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Decision table and multi-library claims verified by output (RG-ID vs LB claim included); amplicon 1980/2000 flagged, RNA 2570/8828 flagged with 38% of reads at the top locus; no assay gate in the workflow steps",
+        "basic": 34,
+        "specialized": 52,
+        "total": 86,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Multi-library over-marking prediction and --use-read-groups fix are correct",
+            "result": "PASS",
+            "note": "synthetic 2-library BAM, truth 0 dups: default 60 flagged, --use-read-groups 0, Picard 0"
+          },
+          {
+            "text": "'--use-read-groups keys on RG ID, Picard on LB' is accurate",
+            "result": "PASS",
+            "note": "synthetic 2 RG / 1 LB BAM, truth 60: --use-read-groups 0, default 60, Picard 60"
+          },
+          {
+            "text": "'Amplicon panel: markdup erases the dataset' is accurate",
+            "result": "PASS",
+            "note": "synthetic 10 amplicons x 100 pairs: 1980 of 2000 reads flagged, -r leaves 20; real ARTIC nanopore amplicon BAM 3981 of 4916 flagged"
+          },
+          {
+            "text": "'Bulk RNA-seq: NO' is supported and the Skill steers the agent away from it",
+            "result": "PASS",
+            "note": "real RNA BAM 2570 of 8828 flagged (Picard 2570 too); 2443 of 6489 primary reads (38%) at the highest-expression 500 bp bin flagged; decision table precedes the workflow"
+          }
+        ],
+        "executed": true,
+        "execution_note": "in06_assay_scope.sh, 00b_make_synth2.py -> in06.log; synth_multilib/samelib_2rg/amplicon are SYNTHETIC. Not executed: ATAC/Tn5 shift, ChIP macs3 keep-dup, aDNA mapDamage rows, Cell Ranger/STARsolo BAMs (no such data)"
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "UMI paired-end capture BAM: umi_tools, samtools --barcode-tag, fgbio grouping, consensus and duplex",
+        "prompt": "My paired-end capture BAM has duplex UMIs in the RX tag. Deduplicate it with the UMIs and call consensus reads, duplex if possible.",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "umi_tools without --paired halves the output (2805 vs 5689) and errors on an unindexed BAM; the Skill's duplex step crashes (CallDuplexConsensusReads needs --strategy=paired); molecular consensus path works",
+        "basic": 27,
+        "specialized": 34,
+        "total": 61,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Flags in the Skill's umi_tools, fgbio AnnotateBamWithUmis / GroupReadsByUmi / CallMolecularConsensusReads commands exist in the installed tools and run",
+            "result": "PASS",
+            "note": "umi_tools 1.1.6 help lists all flags; fgbio 4.1.1: annotate 15788 records, group 15766, 2823 MI groups, 5646 consensus reads"
+          },
+          {
+            "text": "--method=directional default and 'unique keeps more molecules' claims are correct",
+            "result": "PASS",
+            "note": "help: default=directional; --paired unique 5927 vs directional 5689 records"
+          },
+          {
+            "text": "The duplex command after the Skill's own --strategy=adjacency grouping works",
+            "result": "FAIL",
+            "note": "CallDuplexConsensusReads on adjacency-grouped BAM: StringIndexOutOfBoundsException, exit 1 (no MI /A /B suffix); after --strategy=paired: 4042 duplex reads"
+          },
+          {
+            "text": "The umi_tools example is safe for a real paired-end / unsorted BAM as written",
+            "result": "FAIL",
+            "note": "unsorted BAM: 'fetch called on bamfile without index'; sorted+indexed but without --paired: 2805 records (mates dropped) vs 5689 with --paired; Skill states neither requirement"
+          },
+          {
+            "text": "samtools markdup --barcode-tag RX behaves as described (exact-match UMI)",
+            "result": "PASS",
+            "note": "flags 9879 vs 11783 without the tag; -r leaves 5909 records"
+          }
+        ],
+        "executed": true,
+        "execution_note": "in07_umi.sh, in07b_fgbio.sh -> in07.log, in07b.log; real nf-core UMI BAM (unsorted, no @HD, dash-joined RX). Side findings: umi_tools --per-cell with no CB tag returns an empty BAM with exit 0; fgbio GroupReadsByUmi fails on the raw BAM (MQ tag not present) but works on samtools fixmate -m output here (4.1.1). Not executed: real Cell Ranger CB/UB dedup"
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 29.2,
+    "dynamic_weighted": 47.5,
+    "score": 77,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Core mark/remove/stat workflow is exact: planted truth 100/100 and real-BAM 1656 reproduced by samtools, Picard, sambamba and samblaster, identical read set vs Picard",
+    "Assay decision table is accurate and verified: amplicon 1980/2000 reads flagged, RNA-seq top locus 38% flagged, multi-library over-marking and the RG-ID vs LB distinction both reproduced",
+    "Optical-duplicate section is correct: -d 0 disables detection, dt:Z:SQ/LB tags, per-platform distances give counts matching Picard on Illumina-named reads",
+    "Every pysam snippet and the shipped example run verbatim from a copy and match samtools counts; all Related Skills and files exist"
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "Duplex consensus step crashes after adjacency grouping",
+      "observed_in": [
+        7
+      ],
+      "problem": "SKILL.md groups with --strategy=adjacency and then says 'or for duplex' CallDuplexConsensusReads on the same grouped.bam; on the real UMI BAM this throws StringIndexOutOfBoundsException (exit 1). With --strategy=paired the same call emits 4042 duplex reads.",
+      "root_cause": "Duplex calling needs MI tags with /A /B strand suffixes, which only the paired strategy writes; the Skill shares one grouping command between two consensus paths.",
+      "fix": "Show two separate branches: adjacency -> CallMolecularConsensusReads, and 'GroupReadsByUmi --strategy=paired' -> CallDuplexConsensusReads. State the input prerequisites for GroupReadsByUmi (mate info via SetMateInformation on queryname-grouped input, or samtools fixmate -m output)."
+    },
+    {
+      "priority": "P1",
+      "title": "umi_tools dedup example omits sort/index and --paired",
+      "observed_in": [
+        7
+      ],
+      "problem": "The umi_tools command fails on an unsorted/unindexed BAM ('fetch called on bamfile without index') and, on a sorted paired-end BAM without --paired, silently outputs 2805 records instead of 5689 (mates dropped). Neither requirement is stated.",
+      "root_cause": "Example was written for single-end 10x BAMs and generalised to bulk/ctDNA capture BAMs without the prerequisites.",
+      "fix": "Add: input must be coordinate-sorted and indexed; add --paired for paired-end libraries; note that --per-cell with absent CB/UB tags gives an empty BAM with exit 0, so check the tags first."
+    },
+    {
+      "priority": "P1",
+      "title": "Optimized pipeline fails from a clean directory and hides it",
+      "observed_in": [
+        2,
+        5
+      ],
+      "problem": "'samtools collate ... tmpdir/collate' fails when tmpdir/ does not exist; the pipe still exits 0 and writes an empty 501-byte marked.bam. The shipped markdup_pipeline.sh has the same no-pipefail structure and only exits non-zero because the later index step fails.",
+      "root_cause": "No mkdir for the temp dir and no 'set -o pipefail' or output check in either the SKILL.md pipeline or the shipped example.",
+      "fix": "Add 'mkdir -p tmpdir' (or use mktemp -d) before the pipeline, 'set -o pipefail' in the example, and an assertion that the flagstat 'duplicates' line and record count are sane after marking."
+    },
+    {
+      "priority": "P2",
+      "title": "Common Errors table and Critical pitfall do not match samtools 1.24",
+      "observed_in": [
+        3
+      ],
+      "problem": "Real messages are 'no ms score tag', 'Coordinate sorted, require grouped/sorted by queryname' and 'queryname sorted, must be sorted by coordinate'; the table lists 'mate not found', 'no MC tag' (for a missing -m) and 'not coordinate sorted'. The pitfall says missing tags silently mark almost nothing, but 1.24 exits 1 with an error.",
+      "root_cause": "Error strings were paraphrased or taken from older versions.",
+      "fix": "Replace the table with the verbatim messages and delete or version-qualify the 'silently marks almost nothing' claim."
+    },
+    {
+      "priority": "P2",
+      "title": "No guidance on -c (re-marking) or read groups for Picard",
+      "observed_in": [
+        3,
+        5
+      ],
+      "problem": "Re-running markdup on an already-flagged BAM without -c retained old flags (111 vs 101 from -c and Picard on the 1000G slice). Picard MarkDuplicates throws a NullPointerException on a BAM without @RG, which is what the Skill's own bwa-mem2 example produces (no -R).",
+      "root_cause": "Options in samtools markdup --help (-c, -S) and Picard's RG requirement are not covered.",
+      "fix": "Add one line on -c for pre-marked or merged BAMs, add -R '@RG...' to the bwa-mem2 example, and note Picard needs @RG."
+    },
+    {
+      "priority": "P2",
+      "title": "usage-guide repeats SKILL.md and contradicts it",
+      "observed_in": [
+        2,
+        4,
+        5
+      ],
+      "problem": "usage-guide says '-d 2500 for NovaSeq, NextSeq' and 'HiSeq -d 100' while SKILL.md gives NextSeq 500/550 and MiSeq 100, HiSeq 3000/4000/X 2500; duplicate-rate denominators differ (all records vs -F 256 vs primary only); the example script omits -d; the 'markdup -@ 8 fixes high memory' tip is unsupported (maxRSS rose 7.4 -> 13.8 MB).",
+      "root_cause": "Two documents restate the same facts and drifted apart.",
+      "fix": "Keep the platform/-d matrix, workflow and rate formula only in SKILL.md, point usage-guide at it, and delete the memory tip or replace it with -T on a large scratch disk."
+    },
+    {
+      "priority": "P2",
+      "title": "Workflow steps do not gate on assay",
+      "observed_in": [
+        6
+      ],
+      "problem": "The decision table says NO for bulk RNA-seq, amplicon and UMI assays (verified: 1980/2000 amplicon reads and 38% of reads at the top RNA locus get flagged), but the usage-guide 'What the Agent Will Do' and the shipped example run markdup on any BAM.",
+      "root_cause": "Assay check lives only in a table.",
+      "fix": "Add step 0 to the workflow and to the example: confirm assay (RNA-seq, amplicon, UMI, scRNA), stop and hand off to the named tool if it is on the NO list."
+    }
+  ]
+}
