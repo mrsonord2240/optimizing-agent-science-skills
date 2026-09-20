@@ -1,0 +1,242 @@
+{
+  "meta": {
+    "skill_name": "bio-blast-searches",
+    "description": "Run remote BLAST searches against NCBI servers using Biopython Bio.Blast.NCBIWWW. Use when identifying unknown sequences, finding homologs, picking the correct BLAST program (blastn/blastp/blastx/tblastn/tblastx/psiblast/megablast/dc-megablast), interpreting Karlin-Altschul E-values, avoiding the max_target_seqs trap (Shah 2019), choosing composition-based statistics, or limiting searches by organism. Covers RID lifecycle, database choice (nt/nr/refseq_select/swissprot), word-size and CBS taxonomy.",
+    "evaluated_on": "2026-09-19",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:database-access/blast-searches"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All citations (Karlin & Altschul 1990, Altschul et al. 1990/1997, Yu et al. 2006, Shah et al. 2019, Camacho et al. 2009) are real, correctly attributed papers; no fabricated DOIs/PMIDs/statistics anywhere in SKILL.md, usage-guide.md, or the 7 test outputs." },
+      "practice_boundaries": { "result": "PASS", "detail": "Pure bioinformatics database-query tool; no diagnostic, prescriptive, or clinical claims in scope or in any output." },
+      "methodological_ground": { "result": "PASS", "detail": "No principled statistical fallacy found. The one overstated claim (megablast 'zero hits' on cross-species query, input 5) is an imprecise symptom description, not a correlation/causation or model-inversion error, and is captured as a P2 finding instead." },
+      "code_usability": { "result": "PASS", "detail": "2 of 7 documented code patterns (short-peptide PAM30 search, input 3; megablast invocation, input 5) fail exactly as written against the live NCBI API. Both are incorrect-parameter/incorrect-API-contract bugs (NCBI-side ValueError), not syntax errors, infinite loops, or missing dependencies -- the literal M4 trigger conditions -- and both have a confirmed one-line fix. The Skill's primary, most-used patterns (canonical blastn, organism-filtered blastp, XML save/parse, hit filtering) all ran unmodified and correctly. Treated as P1 findings, not a veto, consistent with how equivalent runtime API-contract bugs were handled in the sibling entrez-search/entrez-fetch audits." }
+    }
+  },
+  "static_score": {
+    "subtotal": 87,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 10, "max": 12, "note": "Covers the full promised scope (program/db choice, E-value math, CBS, max_target_seqs, RID lifecycle, failure modes) with clear, complete instructions (4/4 completeness). Correctness docked to 2/4: the megablast/dc-megablast program-value guidance and the PAM30 short-peptide code pattern both fail against the live API exactly as documented. Approach is well-matched to the stated one-off/few-sequence identification task (4/4 appropriateness)." },
+      "reliability": { "score": 9, "max": 12, "note": "A genuinely strong Failure Modes section (6 documented failure modes with trigger/mechanism/symptom/fix) and a Common Errors table give an agent real guidance, but none of it is demonstrated as executable error-handling code (no try/except in any of the 3 example scripts), and the specific NCBI validation errors hit in this audit (PAM30 gap-cost rejection, invalid megablast program string) are not covered by that table." },
+      "performance_context": { "score": 7, "max": 8, "note": "SKILL.md is a single ~300-line file (under the 500-line guideline) with usage-guide.md and examples/ kept separate; workflow is linear (choose program -> choose db -> submit -> parse -> filter) with no redundant round-trips." },
+      "agent_usability": { "score": 15, "max": 16, "note": "Excellent proactive error-prevention (max_target_seqs trap with citation, megablast cross-species misuse called out, CBS defaults explained, nt/nr reproducibility loss flagged repeatedly) and fully consistent terminology between prose and code. Feedback design slightly under-specified -- no explicit output-format contract beyond what the example print() statements show." },
+      "human_usability": { "score": 7, "max": 8, "note": "Description and Quick Start prompts use natural researcher phrasing a real user would type. Forgiveness scored down slightly: the Skill anticipates the 'empty FASTA defline' input slip but not the 'program=megablast'/'matrix=PAM30 without gapcosts' slips its own tables would lead an agent into." },
+      "security": { "score": 12, "max": 12, "note": "No credentials of any kind (remote BLAST is unauthenticated), no eval/exec of user strings, sequences pass through Biopython's own request-building code to a public NCBI CGI endpoint, no sensitive-data handling anywhere in scope." },
+      "maintainability": { "score": 9, "max": 12, "note": "SKILL.md, usage-guide.md, and 3 examples/ are cleanly separated by purpose, but there is no references/ directory at all despite genuinely deep quantitative content (Karlin-Altschul statistics, CBS mode math) that would otherwise be a good progressive-disclosure candidate; the 3 example scripts are directly re-runnable and gave verifiable output." },
+      "agent_specific": { "score": 18, "max": 20, "note": "Precise trigger scope with an explicit Related Skills section that hands off cleanly to local-blast/remote-homology/ortholog-inference/entrez-fetch. Non-idempotency against nt/nr is disclosed rather than hidden (the T3 determinism consideration for this Skill). Progressive disclosure docked 1 point for the missing references/ split noted above." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 75.1,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 21, "total": 27 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Identify an unknown partial DNA sequence via BLASTN (reproducible db)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "SKILL.md's 'Standard remote BLASTN' reference pattern run unmodified against live NCBI (blastn, refseq_select_rna, hitlist_size=500). 61.6s; top hit NM_000518 (HBB itself), 100% identity/coverage, E=5.9e-41 -- exactly the expected self-hit.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Uses a reproducible database (refseq_select_rna) rather than nt, per the Skill's own guidance", "result": "PASS", "note": "Matches SKILL.md's explicit reproducibility recommendation" },
+          { "text": "hitlist_size set large (500) to avoid the max_target_seqs trap", "result": "PASS", "note": "hitlist_size=500 as documented" },
+          { "text": "Top hit is the correct self-match", "result": "PASS", "note": "NM_000518 HBB, 100% id/cov" },
+          { "text": "Results sorted/filtered by bit-score, not raw E-value", "result": "PASS", "note": "top_n_by_bitscore() used verbatim" },
+          { "text": "Code ran unmodified from the SKILL.md reference pattern", "result": "PASS", "note": "Zero code changes needed" }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Find mammalian homologs of human hemoglobin alpha in Swiss-Prot",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "SKILL.md's 'Protein search with organism restriction' pattern run unmodified (blastp, swissprot, entrez_query='Mammalia[Organism]', CBS=2). 241.4s; top hit P69905 (human HBA), 100% identity; all 200 returned hits real Swiss-Prot hemoglobin-alpha records.",
+        "basic": 37,
+        "specialized": 57,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "entrez_query pre-filter used for organism restriction rather than post-filtering", "result": "PASS", "note": "Matches SKILL.md's stated rationale (faster, more meaningful E-values)" },
+          { "text": "composition_based_statistics=2 set explicitly", "result": "PASS", "note": "As documented" },
+          { "text": "Top hit is a correct, real Mammalia Swiss-Prot alpha-globin record", "result": "PASS", "note": "P69905, 100% identity" },
+          { "text": "Code ran unmodified from the SKILL.md reference pattern", "result": "PASS", "note": "Zero code changes needed" }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "BLAST a 12-aa proteomics peptide (short-query parameters)",
+        "status": "ERROR",
+        "status_flag": "❌",
+        "note": "SKILL.md's 'Short peptide search' pattern (matrix_name=PAM30, word_size=2, CBS=3, no gapcosts) fails on first call: NCBI ValueError 'Gap existence and extension values of 11 and 1 not supported for PAM30'. Root cause: default gap costs are BLOSUM62's 11,1; PAM30 needs 9,1 per SKILL.md's OWN word-size table two sections earlier, but the runnable code block never sets gapcosts. Adding gapcosts='9 1' fixes it (confirmed live: 100 hits, correct self-family matches at E~2-7, consistent with the Skill's own note that short queries need permissive E cutoffs).",
+        "basic": 21,
+        "specialized": 32,
+        "total": 53,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Parameters (PAM30/word=2/CBS=3/expect=1000) match the Skill's short-peptide guidance", "result": "PASS", "note": "Parameter choice itself is sound; only gapcosts is missing" },
+          { "text": "Code pattern executes without error as documented", "result": "FAIL", "note": "NCBI rejects the request outright" },
+          { "text": "SKILL.md's Common Errors table helps diagnose this specific failure", "result": "FAIL", "note": "This exact NCBI validation message is not listed anywhere in the Skill" },
+          { "text": "A fix consistent with the Skill's own word-size table (gapcosts=9,1) resolves the error", "result": "PASS", "note": "Verified live: 100 hits returned once gapcosts='9 1' is added" }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Whether E-values from an nr search and a swissprot search can be compared directly",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Reasoning-only input (no code artifact to run). Assessed against SKILL.md's own 'E-value interpretation' section for whether an agent following the Skill would give the correct answer. executed=false.",
+        "basic": 37,
+        "specialized": 51,
+        "total": 88,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Correctly states E-values are not comparable across databases of different sizes", "result": "PASS", "note": "Directly and explicitly stated in SKILL.md" },
+          { "text": "Recommends bit-score as the correct cross-database metric", "result": "PASS", "note": "Explicit in both SKILL.md and usage-guide.md" },
+          { "text": "Reflects the Karlin-Altschul E = K*m*n*exp(-lambda*S) relationship accurately", "result": "PASS", "note": "Formula and citation both present and correct" },
+          { "text": "Does not fabricate specific numeric values not supplied by the user", "result": "PASS", "note": "Answer stays qualitative/methodological, as the prompt requires" }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Cross-species mRNA query: megablast vs blastn, plus XML save/reparse",
+        "status": "ERROR",
+        "status_flag": "❌",
+        "note": "SKILL.md's Program table lists 'megablast' as a program= value; NCBIWWW.qblast(program='megablast', ...) raises ValueError immediately ('Expected one of blastn, blastp, blastx, tblastn, tblastx') -- megablast/dc-megablast are never valid qblast(program=) strings and no code pattern anywhere in the Skill shows the real form (program='blastn', megablast=True). Corrected call (300.9s) found only 5/11 of the cross-species hits Input 1's blastn/word=11 run found on the identical query, missing rat entirely -- confirms reduced cross-species sensitivity but not the table's literal 'zero hits' symptom. XML save-to-disk + re-parse (save_and_parse.py pattern) worked correctly once the program bug was fixed.",
+        "basic": 23,
+        "specialized": 35,
+        "total": 58,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "megablast invocation works as documented (program='megablast')", "result": "FAIL", "note": "qblast rejects this string; real form is program='blastn', megablast=True, undocumented anywhere in the Skill" },
+          { "text": "Demonstrates reduced cross-species sensitivity vs blastn word=11 on the identical query", "result": "PASS", "note": "5 vs 11 alignments; rat orthologs entirely missed by megablast" },
+          { "text": "Failure Modes table's literal 'zero hits' symptom is reproduced", "result": "FAIL", "note": "2 species (human+mouse) still found, not zero" },
+          { "text": "XML save-to-disk + re-parse round trip works correctly", "result": "PASS", "note": "save_and_parse.py pattern reproduced the in-memory results exactly" }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "200 unknown CDS from a new genome assembly -- best BLAST approach?",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Reasoning-only input (no code artifact to run -- correctly abstaining from 200 sequential remote qblast() calls is itself the correct behavior). Assessed against SKILL.md's and usage-guide.md's explicit sequence-count thresholds. executed=false.",
+        "basic": 39,
+        "specialized": 53,
+        "total": 92,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "Identifies 200 sequences as exceeding this Skill's own stated remote-BLAST scope (>50)", "result": "PASS", "note": "SKILL.md: 'For >50 sequences, switch to local-blast or DIAMOND/MMseqs2'" },
+          { "text": "Recommends local-blast and/or remote-homology (DIAMOND/MMseqs2) per the Related Skills section", "result": "PASS", "note": "Both named explicitly in SKILL.md's Related Skills" },
+          { "text": "Does not attempt to loop 200 sequential remote qblast() calls", "result": "PASS", "note": "Correct hand-off instead of brute-forcing an NCBI-unfriendly approach" }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Bare sequence, no defline, no parameters stated -- 'just BLAST it'",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "Applied the Skill's own reproducibility-first defaults (blastn, refseq_select_rna) to a bare sequence with no '>id' defline, testing the documented 'Empty FASTA defline submitted' failure mode. The qblast() call did not return within 20+ minutes (vs 61.6s for the identical query WITH a defline in Input 1) and was still unresolved when this audit closed. Inconclusive whether this is Skill-attributable (Biopython/NCBI mishandling a deflineless submission) or an artifact of shared-machine/NCBI-queue load at the time -- flagged as an open finding rather than a confirmed defect. executed=true (attempted, did not complete).",
+        "basic": 16,
+        "specialized": 30,
+        "total": 46,
+        "assertions_passed": 1,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "Applies the Skill's own reproducibility-first defaults without being told to", "result": "PASS", "note": "blastn + refseq_select_rna chosen correctly, matching Input 1's pattern" },
+          { "text": "Submission completes within a reasonable multiple of the observed baseline latency (~61s for the same query with a defline)", "result": "FAIL", "note": "Did not complete after 20+ minutes; inconclusive root cause" },
+          { "text": "If completed, record.query would show None/empty per the documented failure mode", "result": "FAIL", "note": "Could not verify -- execution never completed" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 34.8,
+    "dynamic_weighted": 45.1,
+    "score": 80,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Explicit, correctly-cited misuse warnings (max_target_seqs early-termination trap, Shah et al. 2019) head off one of the most common published-workflow BLAST errors.",
+    "Canonical and organism-filtered protein search patterns ran unmodified against live NCBI and reproduced textbook-correct top hits (self-matches at 100% identity).",
+    "Accurate Karlin-Altschul E-value math with the correct, well-explained guidance to compare bit-scores rather than E-values across databases.",
+    "Strong, explicit scope discipline: hands off to local-blast/remote-homology/ortholog-inference for >50 sequences or deep remote homology via a named Related Skills section.",
+    "Discloses rather than hides the nt/nr non-determinism/non-reproducibility tradeoff, with a concrete mitigation (refseq_select, snapshot dating)."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "megablast/dc-megablast are not valid NCBIWWW.qblast() program values",
+      "observed_in": [5],
+      "problem": "SKILL.md's Program decision table and Failure Modes section treat 'megablast' and 'dc-megablast' as program= values; passing either to NCBIWWW.qblast() raises an immediate ValueError. No code pattern anywhere in the Skill shows the real invocation (program='blastn', megablast=True, plus template_type/template_length for dc-megablast).",
+      "root_cause": "The Skill's decision table was written at the BLAST+ CLI's conceptual level (where -task megablast is a first-class program choice) without checking that Biopython's remote qblast() API models megablast as a boolean flag on blastn instead.",
+      "fix": "Add a 'Requesting megablast/dc-megablast via qblast()' code pattern showing program='blastn', megablast=True (and template_type='coding'/'optimal', template_length=16|18|21 for dc-megablast), and correct the Program table's program column note to point at it instead of implying program='megablast' is callable directly."
+    },
+    {
+      "priority": "P1",
+      "title": "Short-peptide PAM30 code pattern crashes: missing gapcosts",
+      "observed_in": [3],
+      "problem": "The 'Short peptide search' reference code (matrix_name='PAM30', word_size=2, CBS=3) omits gapcosts; NCBI defaults to BLOSUM62's gap costs (11,1), which PAM30 does not support, and the call fails immediately.",
+      "root_cause": "The word-size/gap-cost table earlier in the same SKILL.md correctly lists PAM30's required gap costs as 9,1, but that value was never carried into the executable code block below it.",
+      "fix": "Add gapcosts='9 1' to the short-peptide qblast() call so it matches the Skill's own word-size table, and add this exact NCBI error string to the Common Errors table so an agent that hits it elsewhere can self-diagnose."
+    },
+    {
+      "priority": "P2",
+      "title": "Megablast cross-species 'zero hits' symptom is overstated",
+      "observed_in": [5],
+      "problem": "Failure Modes claims megablast on a cross-species query produces 'zero hits or only hits to the same species'; a live test on a real 92-nt cross-species query found megablast still returned 2 of 3 species (missing only the most diverged, rat), not zero.",
+      "root_cause": "The symptom description was likely written from the mechanism (28-nt exact-match seeding) rather than validated against a real query where enough by-chance 28-mers still matched a moderately diverged ortholog.",
+      "fix": "Soften the claimed symptom to 'reduced or missing cross-species hits, worse for more diverged sequences' and keep the mechanism explanation, which is accurate."
+    },
+    {
+      "priority": "P2",
+      "title": "Deflineless-sequence behavior may hang rather than return record.query=None",
+      "observed_in": [7],
+      "problem": "SKILL.md documents submitting a bare sequence (no '>id' line) as producing hits with record.query=None. A live test instead did not return within 20+ minutes (vs 61s for the same query with a defline). Root cause unconfirmed -- may be Skill-attributable or an artifact of NCBI/machine load at test time.",
+      "root_cause": "Unconfirmed; needs a clean, isolated re-test to separate Biopython/NCBI defline handling from unrelated load on the audit machine.",
+      "fix": "Re-run this specific case in isolation; if it reproduces, document a client-side timeout/retry wrapper around qblast() for deflineless input rather than relying on NCBI to fail fast."
+    },
+    {
+      "priority": "P2",
+      "title": "No references/ directory despite deep quantitative content",
+      "observed_in": [],
+      "problem": "Karlin-Altschul statistics and composition-based-statistics mode selection are nontrivial quantitative content living entirely inline in SKILL.md, with no references/ split.",
+      "root_cause": "The Skill was authored as a single self-contained file rather than following the progressive-disclosure pattern used elsewhere in this corpus.",
+      "fix": "Move the E-value derivation and CBS mode table into a references/statistics.md, leaving SKILL.md with the decision tables and pointers -- optional, not blocking."
+    }
+  ]
+}
