@@ -8,63 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (84)
-
-### `bio-alignment-structural` — Foldmason example is not reproducible (no seed)
-
-- Skill: 73, Beta Only · [mrsonord2240/bioSkills@354b499](https://github.com/mrsonord2240/bioSkills/tree/354b4992cd8d2f1bee039510af618da0333821f1/alignment/structural-alignment) · [viewer](skills/bio-alignment-structural/mrsonord2240-bioSkills@354b499/viewer.md)
-- Observed in inputs: 4
-- Problem: foldmason_msa.py defaults to --refine-iters 100; three identical runs give three different MSAs (377/378 columns, aligned-pair Jaccard 0.74, homolog pairs 0.88). --refine-seed is never mentioned.
-- Root cause: Random refinement default (--refine-seed -1) shipped without a seed or a note.
-- Fix: Add --refine-seed <N> to the example and SKILL.md command, state that --refine-iters 0 is deterministic, and say unseeded runs are not comparable.
-
-### `bio-alignment-structural` — Foldseek-Multimer commands are wrong or silently lossy
-
-- Skill: 73, Beta Only · [mrsonord2240/bioSkills@354b499](https://github.com/mrsonord2240/bioSkills/tree/354b4992cd8d2f1bee039510af618da0333821f1/alignment/structural-alignment) · [viewer](skills/bio-alignment-structural/mrsonord2240-bioSkills@354b499/viewer.md)
-- Observed in inputs: 5
-- Problem: easy-multimersearch --multimer-tm-threshold is rejected (flag only exists on easy-multimercluster); easy-multimercluster with a file list/glob clusters only the last file and exits 0; 'Foldseek-MM-TM' has no command (it is --alignment-type 1) and the complex-level TM is in the separate <out>_report file, which is not mentioned.
-- Root cause: Commands written from the paper/README rather than run against a release; Skill-level flag list not checked against --help.
-- Fix: Use a directory argument for easy-multimercluster, drop the threshold flag from multimersearch (or use --tmscore-threshold), document --alignment-type 1 as the -TM mode and the _report file columns, and add a run-and-check line.
-
-### `bio-alignment-structural` — '-mm 4 -byresi 0' remedy for unequal stoichiometry is wrong
-
-- Skill: 73, Beta Only · [mrsonord2240/bioSkills@354b499](https://github.com/mrsonord2240/bioSkills/tree/354b4992cd8d2f1bee039510af618da0333821f1/alignment/structural-alignment) · [viewer](skills/bio-alignment-structural/mrsonord2240-bioSkills@354b499/viewer.md)
-- Observed in inputs: 5
-- Problem: USalign -mm 4 is multiple-structure alignment (structure_2 ignored) and segfaulted on two complexes; -byresi 0 is unrelated. US-align -mm 1 -ter 0 already handles dimer vs tetramer (0.977/0.494).
-- Root cause: Mode taxonomy taken from memory.
-- Fix: Replace with: -mm 1 -ter 0 handles unequal stoichiometry; report both normalisations; -mm 2 for chains into an oligomer.
-
-### `bio-alignment-structural` — Per-column LDDT recipe returns None
-
-- Skill: 73, Beta Only · [mrsonord2240/bioSkills@354b499](https://github.com/mrsonord2240/bioSkills/tree/354b4992cd8d2f1bee039510af618da0333821f1/alignment/structural-alignment) · [viewer](skills/bio-alignment-structural/mrsonord2240-bioSkills@354b499/viewer.md)
-- Observed in inputs: 4
-- Problem: report.get('per_column_lddt') is None on Foldmason 4.dd3c235; the JSON keys are entries, scores, tree, statistics and the per-column values are in 'scores' (-1 for uncomputed columns).
-- Root cause: Key name guessed; the Skill hedges ('may evolve') but ships a broken line.
-- Fix: Use report['scores'] and note -1 = no LDDT; assert len(scores) equals the MSA column count.
-
-### `bio-alignment-structural` — Superimposer example silently mis-pairs atoms
-
-- Skill: 73, Beta Only · [mrsonord2240/bioSkills@354b499](https://github.com/mrsonord2240/bioSkills/tree/354b4992cd8d2f1bee039510af618da0333821f1/alignment/structural-alignment) · [viewer](skills/bio-alignment-structural/mrsonord2240-bioSkills@354b499/viewer.md)
-- Observed in inputs: 3
-- Problem: Selecting every atom whose id is 'CA' pulls in Ca2+ ions and all models; positional truncation then pairs ions with residues. Apo/holo calmodulin printed 13.38 A instead of 10.83 A and no warning because the CA counts happened to be equal.
-- Root cause: Atom selection by name only; correspondence assumed positional.
-- Fix: Select ATOM-record CA of one model (residue.id[0]==' '), pair by (chain, resseq, icode), print the pair count and refuse when the pairing is empty or offset.
-
-### `bio-alignment-structural` — alignment_type=1 breaks the example's confidence filter
-
-- Skill: 73, Beta Only · [mrsonord2240/bioSkills@354b499](https://github.com/mrsonord2240/bioSkills/tree/354b4992cd8d2f1bee039510af618da0333821f1/alignment/structural-alignment) · [viewer](skills/bio-alignment-structural/mrsonord2240-bioSkills@354b499/viewer.md)
-- Observed in inputs: 2
-- Problem: With --alignment-type 1 Foldseek reports E-values of 0.88-0.99 for true homologs, so 'evalue < 1e-3' returns 0 hits although alnTM is 0.93; the default max_seqs=200 also caps the printed count.
-- Root cause: E-value is not meaningful for TM-align re-alignment; filter written for type 2 only.
-- Fix: Filter on alntmscore (and lddt) when alignment_type=1, and raise or state the max_seqs cap in the printed summary.
-
-### `bio-alignment-structural` — Guard tm_align() against degenerate input
-
-- Skill: 73, Beta Only · [mrsonord2240/bioSkills@354b499](https://github.com/mrsonord2240/bioSkills/tree/354b4992cd8d2f1bee039510af618da0333821f1/alignment/structural-alignment) · [viewer](skills/bio-alignment-structural/mrsonord2240-bioSkills@354b499/viewer.md)
-- Observed in inputs: 7
-- Problem: TM-align exits 0 with no data row for a <3-residue or ligand-only file, so tm_align() returns None and the example crashes on result['tm1'].
-- Root cause: Exit code trusted; parse result not checked.
-- Fix: Raise a clear error when parse_outfmt2 returns None and include TM-align's stdout message.
+## P1 (77)
 
 ### `bio-alignment-multiple` — Fix MUSCLE5 ensemble commands (-super5 has no .efa)
 
@@ -684,38 +628,6 @@ None open.
 
 ## P2 (341)
 
-### `bio-alignment-structural` — 'Larger TM' headline metric inflates small-chain scores
-
-- Skill: 73, Beta Only · [mrsonord2240/bioSkills@354b499](https://github.com/mrsonord2240/bioSkills/tree/354b4992cd8d2f1bee039510af618da0333821f1/alignment/structural-alignment) · [viewer](skills/bio-alignment-structural/mrsonord2240-bioSkills@354b499/viewer.md)
-- Observed in inputs: 7
-- Problem: max(TM1,TM2) called 'the standard fold-similarity metric' contradicts TM-align's own printed advice (normalise by the reference); 3/38 known-different-fold pairs exceed 0.5 and a synthetic 10-residue helix scores 0.846; interpret_tmscore ignores the <60-residue caveat given in prose and labels >0.8 'homologous'.
-- Root cause: Length-asymmetry handled only in prose.
-- Fix: Report both normalisations, add a length guard in interpret_tmscore, say fold similarity is not homology, and name a source for the Xu-Zhang p-value or drop the reference.
-
-### `bio-alignment-structural` — usage-guide installs a broken tmalign package
-
-- Skill: 73, Beta Only · [mrsonord2240/bioSkills@354b499](https://github.com/mrsonord2240/bioSkills/tree/354b4992cd8d2f1bee039510af618da0333821f1/alignment/structural-alignment) · [viewer](skills/bio-alignment-structural/mrsonord2240-bioSkills@354b499/viewer.md)
-- Observed in inputs: —
-- Problem: conda install -c bioconda tmalign gives a 2018 Fortran binary that dies with libgfortran.so.3; -o writes <name>.pdb (superposed.pdb.pdb) not the named file; Expresso needs BLAST/FTP and 3D-Coffee (`-mode 3dcoffee` and an explicit TMalign_pair method) both timed out at 120 s retrying retired RCSB/wwPDB endpoints (rc 124) with no alignment written; ChimeraX not executed.
-- Root cause: Install line and outputs not run on a clean machine.
-- Fix: Point to the US-align source build or the zhanggroup binary, fix the -o wording, and give the T-Coffee template-file format with a working command.
-
-### `bio-alignment-structural` — GDT-TS and DALI have no runnable path
-
-- Skill: 73, Beta Only · [mrsonord2240/bioSkills@354b499](https://github.com/mrsonord2240/bioSkills/tree/354b4992cd8d2f1bee039510af618da0333821f1/alignment/structural-alignment) · [viewer](skills/bio-alignment-structural/mrsonord2240-bioSkills@354b499/viewer.md)
-- Observed in inputs: 6
-- Problem: SKILL lists GDT-TS >50 and DALI Z bands but names no installed tool or command for either; the Zhang-lab TMscore binary prints GDT-TS but pairs by residue number (0.508 vs 0.985 for an off-by-one model).
-- Root cause: Reference tables without procedures.
-- Fix: Add a one-line DaliLite (dali.pl) or web-server step and a TMscore/renumbering note, or remove the bands the Skill cannot help compute.
-
-### `bio-alignment-structural` — Summary counts chains as structures
-
-- Skill: 73, Beta Only · [mrsonord2240/bioSkills@354b499](https://github.com/mrsonord2240/bioSkills/tree/354b4992cd8d2f1bee039510af618da0333821f1/alignment/structural-alignment) · [viewer](skills/bio-alignment-structural/mrsonord2240-bioSkills@354b499/viewer.md)
-- Observed in inputs: 4
-- Problem: foldmason_msa.py prints 'MSA: 19 sequences' for 11 input files because Foldmason emits one row per chain (<file>_<chain>).
-- Root cause: Row count reported as structure count.
-- Fix: Print files vs chains, or say so in the docstring.
-
 ### `bio-crispr-screens-copy-number-correction` — negative_control_sgrnas empty-dict case raises an undocumented ValueError
 
 - Skill: 82, Limited Release · [mrsonord2240/bioSkills@9d31109](https://github.com/mrsonord2240/bioSkills/tree/9d31109159d4d490ec375d4ae88c9b77570f3840/crispr-screens/copy-number-correction) · [viewer](skills/bio-crispr-screens-copy-number-correction/mrsonord2240-bioSkills@9d31109/viewer.md)
@@ -835,6 +747,38 @@ None open.
 - Problem: The 476-line SKILL.md loads BAli-Phy, OMM_MACSE, HyPhy, vcMSA and T-Coffee detail for every request.
 - Root cause: No progressive-disclosure layer.
 - Fix: Keep the decision tables and MAFFT/MUSCLE/PAL2NAL core in SKILL.md; move per-tool detail to references/*.md loaded on demand.
+
+### `bio-alignment-structural` — Inline Superimposer block and MSE handling are less safe than the example
+
+- Skill: 85, Production Ready · [mrsonord2240/bioSkills@b611de1](https://github.com/mrsonord2240/bioSkills/tree/b611de1c303cb454f76e2e10ae39cba0db3e3c06/alignment/structural-alignment) · [viewer](skills/bio-alignment-structural/mrsonord2240-bioSkills@b611de1/viewer.md)
+- Observed in inputs: 3, 9
+- Problem: The SKILL.md inline block pairs by residue number with no name check (1MBN vs 1A3N prints 7.539 A over 141 pairs, exit 0), and both it and the example drop HETATM MSE/modified residues (1-4% of residues in six real entries) without mention.
+- Root cause: The refusals were added to examples/biopython_superimposer.py but not to the shorter block in SKILL.md; id[0]==' ' was chosen to exclude ions.
+- Fix: Add the residue-name check to the inline block (or say 'use examples/biopython_superimposer.py') and one sentence that modified residues such as MSE are excluded; optionally accept id[0]=='H_MSE'.
+
+### `bio-alignment-structural` — Foldseek-Multimer speed and database-name claims are unverified
+
+- Skill: 85, Production Ready · [mrsonord2240/bioSkills@b611de1](https://github.com/mrsonord2240/bioSkills/tree/b611de1c303cb454f76e2e10ae39cba0db3e3c06/alignment/structural-alignment) · [viewer](skills/bio-alignment-structural/mrsonord2240-bioSkills@b611de1/viewer.md)
+- Observed in inputs: 5
+- Problem: The 10-100x pairwise and >99% chain-pairing figures were left unchecked; on 62 small oligomers Foldseek-Multimer was 1.7x (directory, incl. createdb) to 5.8x (prebuilt DB) faster than US-align, and foldseek databases lists no AFDB-Multimer or PDB100 database that the text and a usage-guide prompt name.
+- Root cause: Literature numbers copied without a source location; the bioRxiv abstract supports only 3-4 orders of magnitude at database scale.
+- Fix: Cite the figure to the paper as a scale claim (thousands of complexes and up), drop the pairwise 10-100x and PDB100-Multimer, and name a target that exists (PDB or a folder of complexes).
+
+### `bio-alignment-structural` — The unseeded Foldmason variance figures are set-specific
+
+- Skill: 85, Production Ready · [mrsonord2240/bioSkills@b611de1](https://github.com/mrsonord2240/bioSkills/tree/b611de1c303cb454f76e2e10ae39cba0db3e3c06/alignment/structural-alignment) · [viewer](skills/bio-alignment-structural/mrsonord2240-bioSkills@b611de1/viewer.md)
+- Observed in inputs: 4
+- Problem: '74% of aligned pairs shared; homologous pairs 88%' came from a 5-structure set; re-measured 56%/87% there but 99.4% on the 11-structure globin/kinase set.
+- Root cause: One measurement quoted as a general fact.
+- Fix: Say 'unseeded refinement changes the MSA (as little as 0.6% to as much as 44% of aligned pairs in our runs)' or drop the numbers; the seed advice stays.
+
+### `bio-alignment-structural` — Housekeeping left from the fix
+
+- Skill: 85, Production Ready · [mrsonord2240/bioSkills@b611de1](https://github.com/mrsonord2240/bioSkills/tree/b611de1c303cb454f76e2e10ae39cba0db3e3c06/alignment/structural-alignment) · [viewer](skills/bio-alignment-structural/mrsonord2240-bioSkills@b611de1/viewer.md)
+- Observed in inputs: 2, 8
+- Problem: Description still says 'Predict' (no prediction path); the Hamamsy 2024 (TM-Vec) reference outlives the deleted pLM section; example __main__ blocks keep placeholder names; foldseek_search dumps Foldseek's parameter table on every call; SKILL.md is one 330-line file with no references/ split.
+- Root cause: Deletions and rewrites did not sweep the description, reference list and examples.
+- Fix: Reword the description ('Score and superpose...'), drop the Hamamsy reference, add -v 1 to the Foldseek calls and read paths from argv in the examples.
 
 ### `bio-single-cell-doublet-detection` — The lineage co-expression heuristic needs an ambient caveat where it is stated
 

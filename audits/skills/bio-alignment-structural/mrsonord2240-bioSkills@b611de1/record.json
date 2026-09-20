@@ -1,9 +1,9 @@
 {
   "skill_id": "bio-alignment-structural",
-  "version": "mrsonord2240-bioSkills@354b499",
+  "version": "mrsonord2240-bioSkills@b611de1",
   "source": {
     "repository": "mrsonord2240/bioSkills",
-    "commit": "354b4992cd8d2f1bee039510af618da0333821f1",
+    "commit": "b611de1c303cb454f76e2e10ae39cba0db3e3c06",
     "path": "alignment/structural-alignment",
     "author": "GPTomics",
     "author_url": "https://github.com/GPTomics",
@@ -13,7 +13,7 @@
       "repository": "GPTomics/bioSkills",
       "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
     },
-    "url": "https://github.com/mrsonord2240/bioSkills/tree/354b4992cd8d2f1bee039510af618da0333821f1/alignment/structural-alignment"
+    "url": "https://github.com/mrsonord2240/bioSkills/tree/b611de1c303cb454f76e2e10ae39cba0db3e3c06/alignment/structural-alignment"
   },
   "audit": {
     "method": {
@@ -31,11 +31,11 @@
     "commissioned_by": "Samuel Nord",
     "test_data": "synthetic"
   },
-  "supersedes": null,
+  "supersedes": "mrsonord2240-bioSkills@354b499",
   "files": {
     "report": "report.json",
     "viewer": "viewer.md",
     "fixes": "fixes.md",
-    "scripts": 25
+    "scripts": 23
   }
 }
