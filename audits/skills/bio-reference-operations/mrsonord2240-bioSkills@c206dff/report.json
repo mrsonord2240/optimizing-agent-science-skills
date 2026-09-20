@@ -1,0 +1,403 @@
+{
+  "meta": {
+    "skill_name": "bio-reference-operations",
+    "description": "Generate consensus sequences and manage reference files using samtools. Use when creating consensus from alignments, indexing references, or creating sequence dictionaries.",
+    "source": "mrsonord2240/bioSkills@c206dff76d081a5126f8497fbabe10995c9b6026:alignment-files/reference-operations",
+    "evaluated_on": "2026-09-20",
+    "evaluator_version": "skill-auditor@1.0",
+    "audit_kind": "first audit (unfixed Skill)",
+    "category": "Data Analysis",
+    "execution_mode": "B",
+    "complexity": "Moderate",
+    "n_inputs": 5,
+    "n_inputs_note": "Moderate rule (3 files, ~4 task types: reference indexing/dict, sequence extraction, contig/CRAM identity, consensus) gives 5. Each input bundles several sub-runs; every sub-run is a script in run/.",
+    "executed": "5/5 executed. Not executed: prose mentions of Pilon/medaka; the GRCh38 flavour and contig-name tables were checked against public sources fetched 2026-09-20 (NCBI assembly report, 1000G FTP fai/README), not by alignment.",
+    "environment": "WSL science, env alignment-files (audit-envs/alignment-files/TOOLS.md): samtools 1.24, bcftools 1.24, pysam 0.24.1, Picard 3.5.0 (side env), GATK 4.6.2.0, minimap2 2.31, bwa 0.7.19, seq_cache_populate.pl from htslib 1.24"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated citations or data. Factual errors exist (NCBI RefSeq and 1000G rows of the contig/flavour tables; \"no clean conversion for BAM\") but they are checkable claims that are wrong, not fabricated results; they are P1 findings."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "File-format and reference utility; no clinical or diagnostic content."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "M5-as-identity, faidx 1-based vs pysam 0-based, samtools vs bcftools consensus distinction all verified correct. The Python majority vote is labelled pedagogical in SKILL.md (with the correct reason). No principled fallacy."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All shipped bash blocks, the example script and every Python snippet ran verbatim. BORDERLINE: build_consensus / simple_consensus / compare_to_ref run but return position-shifted output over any coverage gap (581 false differences vs 1 true on the real human slice); usage-guide versions carry no caveat. Recorded as P1, not as unrunnable code."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 72,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 8,
+        "max": 12,
+        "note": "Core faidx/dict/consensus/CRAM-identity content is right and verified. Wrong or misleading: NCBI RefSeq contig names, the 1000G/hs38DH rows, \"no clean conversion for BAM -- re-align\", -a description, --het-fract/--call-fract in default mode, Python build_consensus/compare_to_ref alignment. Nothing on .fasta/.fa.gz dict naming or on samtools reference."
+      },
+      "reliability": {
+        "score": 7,
+        "max": 12,
+        "note": "prepare_reference.sh checks the argument and the file, uses set -e, is idempotent. Guide recipes are unguarded (subset block exits 0 with a chr3 LN:0 dict; seq_cache_populate.pl uses an undefined $REF_CACHE_DIR and silently does nothing). Troubleshooting titles do not match real tool messages."
+      },
+      "performance_context": {
+        "score": 5,
+        "max": 8,
+        "note": "SKILL.md 377 lines + usage-guide 251 lines with heavy duplication: three pysam consensus functions, faidx recipes twice, FAI table twice, dict recipe three times."
+      },
+      "agent_usability": {
+        "score": 11,
+        "max": 16,
+        "note": "Clear task-oriented headings and a useful contig-naming section. Inconsistencies: min_depth 3 vs 5, -a described two ways, dict header VN 1.0 vs pysam VN 1.6, \"verify via samtools consensus --help\" which exits 1."
+      },
+      "human_usability": {
+        "score": 6,
+        "max": 8,
+        "note": "Description triggers naturally on \"index my reference / consensus / dictionary\". Region extraction and CRAM references are in the body but not in the description."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "No credentials, quoted expansions, no destructive commands; samtools dict -o silently overwrites an existing dict."
+      },
+      "maintainability": {
+        "score": 7,
+        "max": 12,
+        "note": "Three files with a clean split, but the same snippets are duplicated in two files, version-sensitive claims (flags, added-in versions) are scattered, and there is no test data or expected output."
+      },
+      "agent_specific": {
+        "score": 17,
+        "max": 20,
+        "note": "All 8 Related Skills paths resolve. Idempotent. Good pedagogical-only warning and \"different operations\" table for samtools/bcftools consensus. Description omits faidx extraction and CRAM references; contig-conversion advice is wrong (a stop condition that is incorrect)."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 74.6,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 15,
+      "total": 25
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Prepare a reference for GATK/Picard: index, dict, chrom.sizes, validate",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Outputs correct on .fa; .fasta/.fa.gz produce a dict GATK cannot find and the validate block says OK.",
+        "executed": true,
+        "execution_note": "run/in1.sh, run/in1b.sh, run/in1_check.py, run/in7.py. Shipped examples/prepare_reference.sh run FROM A COPY on: synthetic 3-contig 80-col soft-masked FASTA (ref.fa), REAL human chr22 slice named genome.fasta, a bgzipped ref.fa.gz, a path with a space, a read-only dir, no-arg and missing-file cases; then samtools dict -a/-s, Picard 3.5.0 CreateSequenceDictionary as independent producer, GATK ValidateSamFile and HaplotypeCaller as consumers, the usage-guide validate block, and SKILL.md create_dict_header verbatim.",
+        "basic": 32,
+        "specialized": 45,
+        "total": 77,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": ".fai, chrom.sizes and dict SN/LN/M5 equal an independent computation (real and synthetic, soft-masked input)",
+            "result": "PASS",
+            "note": "pure-Python parse + hashlib MD5; Picard dict identical"
+          },
+          {
+            "text": "The dictionary is produced under the name GATK/Picard look for when the reference is named genome.fasta",
+            "result": "FAIL",
+            "note": "genome.fasta.dict written; GATK HaplotypeCaller: \"Fasta dict file genome.dict ... does not exist\""
+          },
+          {
+            "text": "The usage-guide validation block only reports DICT: OK when downstream tools can find the dictionary",
+            "result": "FAIL",
+            "note": "block printed DICT: OK for genome.fasta.dict"
+          },
+          {
+            "text": "The shipped script fails loudly on no argument, missing file and read-only directory, and is idempotent",
+            "result": "PASS",
+            "note": "exit 1 in all three; md5 of outputs unchanged on re-run; path with space works"
+          },
+          {
+            "text": "Output stays in scope: no destructive commands, no clinical content",
+            "result": "PASS",
+            "note": "writes only beside the input FASTA"
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Extract regions, reverse complement, per-chromosome subset (samtools faidx + pysam)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Core extraction and coordinate claims verified against independent truth; recipes lack bounds/contig guards; troubleshooting text inaccurate.",
+        "executed": true,
+        "execution_note": "run/in2.py (30 checks). Synthetic 3-contig reference (80-col, lowercase soft-mask 1000-1299, N run) + REAL human chr22 slice + SARS-CoV-2 MN908947.3 + the padded 1000G chr20 FASTA whose 100 kb of real sequence has an independent external truth (Ensembl REST chr20:1400001-1500000). Every documented faidx command, the pysam snippets and usage-guide \"Extract Multiple Regions\" (verbatim), plus the troubleshooting scenarios.",
+        "basic": 34,
+        "specialized": 49,
+        "total": 83,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "samtools faidx regions equal an independent 1-based inclusive slice of the FASTA (synthetic, real human, SARS-CoV-2, 1000G vs Ensembl)",
+            "result": "PASS",
+            "note": "all equal; 30/30 checks"
+          },
+          {
+            "text": "The stated coordinate conventions (faidx 1-based, pysam 0-based half-open) are correct and consistent",
+            "result": "PASS",
+            "note": "fetch(999,2000) == faidx :1000-2000 == 1001 bases"
+          },
+          {
+            "text": "Troubleshooting titles and advice match real tool behaviour",
+            "result": "FAIL",
+            "note": "faidx auto-indexes; real messages differ from the guide titles; out-of-range returns empty record rc 0"
+          },
+          {
+            "text": "Subset / multi-region recipes guard against a missing contig or out-of-range region",
+            "result": "FAIL",
+            "note": "block exits 0 and leaves a dict with chr3 LN:0; ug_10 prints empty records with confident headers"
+          },
+          {
+            "text": "Output stays in scope",
+            "result": "PASS",
+            "note": "no clinical content"
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "chr22 vs 22 contig mismatch, fixing it, CRAM/M5/REF_CACHE offline, flavour tables",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "M5/CRAM/cache claims verified; contig-conversion advice and two table rows are wrong.",
+        "executed": true,
+        "execution_note": "run/in3.py (32 checks). REAL human BAM + nf-core CRAM + 1000G HG00349 BAM with padded chr20 FASTA; the Skill detection commands verbatim; samtools/bcftools mpileup, consensus -T, calmd, pysam, Picard 3.5.0 and GATK against the renamed reference; samtools reheader; CRAM full decode with -T, empty REF_PATH, mutated reference (M5), seq_cache_populate.pl -root + REF_PATH/REF_CACHE, each with its own empty cache dir; public sources fetched 2026-09-20 (run/ncbi/).",
+        "basic": 31,
+        "specialized": 45,
+        "total": 76,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The M5 identity / CRAM enforcement claim is reproduced (decode against a one-base-different reference fails with an MD5 error)",
+            "result": "PASS",
+            "note": "\"MD5 checksum reference mismatch at chr22:1952-4617\"; BAM accepts the same reference"
+          },
+          {
+            "text": "The documented detection commands expose the chr22-vs-22 mismatch",
+            "result": "PASS",
+            "note": "SN lists differ; downstream tools fail loudly"
+          },
+          {
+            "text": "The contig-naming and GRCh38-flavour tables match public sources",
+            "result": "FAIL",
+            "note": "RefSeq names are NC_*; 1000G reference has ALT (261) and HLA (525) contigs and is hs38DH-derived"
+          },
+          {
+            "text": "The guidance for renaming BAM contigs is correct",
+            "result": "FAIL",
+            "note": "says re-align; samtools reheader gives identical records and a clean Picard validation"
+          },
+          {
+            "text": "seq_cache_populate.pl -root <dir> populates a cache from which CRAM decodes offline (no -T, no network)",
+            "result": "PASS",
+            "note": "REF_PATH or REF_CACHE = <dir>/%2s/%2s/%s decoded 5644 records; $REF_CACHE_DIR is never defined in the Skill (P2)"
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Consensus from BAM: options, IUPAC, indels, real SARS-CoV-2 and human data, bcftools consensus",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Options that matter mostly correct; the het threshold flags in the shipped examples are no-ops and -a is misdescribed.",
+        "executed": true,
+        "execution_note": "run/in4x.sh, run/in4.py (43 checks), run/in6.sh (all shipped bash blocks verbatim). Planted-truth synthetic BAM (hom-alt, 50/50, 20%, 3% error, 500 bp gap, depth-2 island, 3-bp deletion + 2-bp insertion) with an independent pysam-pileup oracle; REAL SARS-CoV-2 Illumina PE (200 reads), ARTIC v5.3.2 nanopore (4916 reads, vs MN908947.3) and the human chr22 slice; minimap2 compare-back; bcftools consensus on a phased VCF vs an independent applier.",
+        "basic": 32,
+        "specialized": 47,
+        "total": 79,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Default samtools consensus reproduces the planted truth (hom-alt, error suppressed, gap N, indel haplotype exact)",
+            "result": "PASS",
+            "note": "chr2 230 nt == planted haplotype"
+          },
+          {
+            "text": "--ambig is required for IUPAC output, and depth/region/config options behave as documented",
+            "result": "PASS",
+            "note": "M only with --ambig; -d 5 => N exactly where depth < 5; 5 configs accepted"
+          },
+          {
+            "text": "The het-threshold flags in the shipped example commands (--het-fract 0.2 --call-fract 0.5) change the output",
+            "result": "FAIL",
+            "note": "byte-identical for 0.05, 0.9 and 0.2/0.5 in the default Bayesian mode"
+          },
+          {
+            "text": "The -a description matches behaviour",
+            "result": "FAIL",
+            "note": "-a only pads to reference ends; low-coverage calls unchanged"
+          },
+          {
+            "text": "Real-data consensus equals an independent majority vote at unambiguous columns; compare-back with minimap2 works",
+            "result": "PASS",
+            "note": "0 disagreements at 871 (Illumina) and human-slice columns; ARTIC consensus maps MAPQ 60"
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Majority-vote consensus and compare-to-reference in Python (pysam), verbatim snippets",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Runs and is right on contiguous coverage; silently wrong over gaps (581 false differences vs 1 true on real data).",
+        "executed": true,
+        "execution_note": "run/in5.py (15 checks). SKILL.md consensus_at_position, build_consensus and usage-guide simple_consensus, compare_to_ref exec'd verbatim from the extracted snippets (only file names substituted); synthetic gap/soft-mask data and the REAL human chr22 slice (1157 of 2666 positions covered); oracles: samtools consensus and an independent pysam count.",
+        "basic": 26,
+        "specialized": 32,
+        "total": 58,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "consensus_at_position returns the correct base at covered and uncovered sites",
+            "result": "PASS",
+            "note": "C at planted hom-alt, ref at 3% error, N at gap"
+          },
+          {
+            "text": "build_consensus / simple_consensus return one character per reference position so results are position-aligned",
+            "result": "FAIL",
+            "note": "1200 chars for a 1700-bp region; 1157 for a 2666-bp region"
+          },
+          {
+            "text": "compare_to_ref reports only true differences from the reference",
+            "result": "FAIL",
+            "note": "581 reported vs 1 true on the real human slice; +300 case artefacts on a soft-masked reference"
+          },
+          {
+            "text": "The pedagogical-only warning and the reason (ignores base quality) are present in SKILL.md",
+            "result": "PASS",
+            "note": "present; usage-guide copies lack it"
+          },
+          {
+            "text": "Output stays in scope",
+            "result": "PASS",
+            "note": "no clinical content; no destructive commands"
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 28.8,
+    "dynamic_weighted": 44.8,
+    "score": 74,
+    "max": 100,
+    "grade": "Beta Only",
+    "grade_symbol": "⚠️",
+    "deployable": false,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Core reference facts verified against independent computation: faidx 1-based inclusive regions (incl. Ensembl ground truth for 100 kb), pysam 0-based half-open, fai columns, dict SN/LN/M5 (md5 of the uppercase sequence), all equal to a pure-Python/hashlib parse and to Picard 3.5.0.",
+    "The CRAM identity story is right and reproducible: M5 mismatch fails decode (\"MD5 checksum reference mismatch\"), BAM does not check it, and seq_cache_populate.pl -root plus REF_PATH/REF_CACHE gives offline decode.",
+    "samtools consensus guidance is largely correct on planted truth (default calls, indel haplotype, --ambig, -d, --show-*, --config names, -r) and clearly separates samtools consensus from bcftools consensus; -H 1/-H 2 verified against an independent VCF applier.",
+    "examples/prepare_reference.sh is small, quoted, set -e, idempotent, and every one of the 8 Related Skills paths resolves."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "Python build_consensus / compare_to_ref shift over coverage gaps",
+      "observed_in": [
+        5
+      ],
+      "problem": "build_consensus, simple_consensus and compare_to_ref (SKILL.md + usage-guide) iterate pileup columns, which skip uncovered positions, so the consensus string is shorter than the region and misaligned to the reference: 581 false differences vs 1 true on the real human slice, 156 spurious on the synthetic island. compare_to_ref is also case-sensitive (300 false differences on a soft-masked reference).",
+      "root_cause": "Position is inferred from the string index instead of pileup.reference_pos; no upper-casing of the reference.",
+      "fix": "Key by reference_pos and emit N for every uncovered position (or call samtools consensus -a --show-del yes --show-ins no and compare column by column); upper-case the reference; add the pedagogical-only caveat to the usage-guide copies; keep one copy of the function."
+    },
+    {
+      "priority": "P1",
+      "title": "--het-fract/--call-fract are no-ops in the default mode; -a misdescribed",
+      "observed_in": [
+        4
+      ],
+      "problem": "SKILL lines 161 and 193 pass --het-fract/--call-fract to the default Bayesian consensus, where they are ignored (identical output for 0.05, 0.9, 0.2/0.5). They only act with -m simple. \"-a: call all positions (including low coverage)\" (SKILL, usage-guide \"Include N for no coverage\") is wrong: -a only pads to the reference start/end. \"verify via samtools consensus --help\" exits 1 (unrecognized option).",
+      "root_cause": "Options copied from the simple-mode help without checking which mode they belong to.",
+      "fix": "State that --het-fract/--call-fract need -m simple, or drop them from the Bayesian examples and explain --ambig alone; document that a minor-allele column is N without --ambig; describe -a/-aa as reference-end padding; tell readers to run samtools consensus with no arguments (or man samtools-consensus) for the option list."
+    },
+    {
+      "priority": "P1",
+      "title": "Contig naming and GRCh38 flavour tables contain factual errors; BAM rename advice is wrong",
+      "observed_in": [
+        3
+      ],
+      "problem": "\"NCBI RefSeq (recent): chr1 / chrM\" is wrong (RefSeq FASTA names are NC_000001.11 / NC_012920.1; chr1 only in the assembly-report UCSC column). The \"1000G analysis set: ALT no, HLA no\" row is wrong (the 1000G GRCh38 reference has 261 _alt and 525 HLA contigs and is the bwakit hs38DH set the table lists as a separate flavour). \"for BAM there is no clean conversion -- re-align\" is false: samtools reheader gave identical records, identical pileup and a clean Picard validation for chr22 -> 22 and chr1/chr2/chrM -> 1/2/MT.",
+      "root_cause": "Reference-identity facts written from memory and not checked against the sources; reheader not considered.",
+      "fix": "Correct the two rows (or link the NCBI assembly report / 1000G README), separate the no-alt analysis set from the full hs38DH set, and replace the re-align advice with: samtools view -H | sed | samtools reheader (only when sequences are identical; compare M5), noting that hg19 chrM differs from GRCh37 MT."
+    },
+    {
+      "priority": "P1",
+      "title": "prepare_reference.sh and validate block name the dict wrongly for .fasta / .fa.gz",
+      "observed_in": [
+        1
+      ],
+      "problem": "${REF%.fa} only strips \".fa\": for genome.fasta the dict is genome.fasta.dict and chrom sizes genome.fasta.chrom.sizes; GATK HaplotypeCaller then fails with \"Fasta dict file .../genome.dict ... does not exist\". The usage-guide validate block prints DICT: OK for the misnamed file. ref.fa.gz gives ref.fa.gz.dict.",
+      "root_cause": "Extension stripping hard-coded to .fa.",
+      "fix": "Use base=\"${REF%.gz}\"; base=\"${base%.*}\" (handles .fa/.fasta/.fna, .gz) for the .dict/.chrom.sizes names; make the validate block check that name; drop the duplicated ls glob."
+    },
+    {
+      "priority": "P2",
+      "title": "Unguarded recipes exit 0 after a partial failure",
+      "observed_in": [
+        2,
+        3
+      ],
+      "problem": "The subset recipes (chr1..chrM) exit 0 with a truncated FASTA and a dict containing \"chr3 LN:0 M5:d41d8cd9...\" when a contig is absent (Ensembl-style names fail for every contig). \"seq_cache_populate.pl -root $REF_CACHE_DIR\" uses a variable defined nowhere; unset, it treats reference.fa as the root and exits 0 having populated nothing. ug \"Extract Multiple Regions\" prints confident headers with empty sequences for out-of-range coordinates.",
+      "root_cause": "No set -e / existence checks in the guide recipes; undefined variable.",
+      "fix": "Add set -e and a contig-exists check (cut -f1 ref.fa.fai) before subsetting; define REF_CACHE_DIR=/path in the recipe and quote it; bounds-check regions against get_reference_length."
+    },
+    {
+      "priority": "P2",
+      "title": "Troubleshooting titles and the \"index first\" advice do not match tool behaviour",
+      "observed_in": [
+        2
+      ],
+      "problem": "samtools faidx builds the .fai itself when a region is requested; real errors are \"[faidx] Could not load fai index\" and \"Failed to fetch sequence in 1:1-100\", not the guide titles. A region wholly beyond the contig end exits 0 with an empty record and only a stderr warning. -i appends /rc to the header (--mark-strand no removes it); -f fastq consensus is wrapped at 70 columns (-l 0 for 4-line FASTQ).",
+      "root_cause": "Troubleshooting written from older tool behaviour.",
+      "fix": "Quote the real messages, note the auto-index, document --mark-strand and consensus -l 0."
+    },
+    {
+      "priority": "P2",
+      "title": "SKILL.md / usage-guide redundancy and small doc defects",
+      "observed_in": [
+        1,
+        4,
+        5
+      ],
+      "problem": "Three copies of the pysam consensus code, faidx recipes and the FAI table appear in both files; min_depth 3 vs 5; the printed \"Consensus at chr1:1000000\" labels a 0-based argument; pysam.pileup defaults (Q<13, duplicates, overlaps) contradict \"ignores base qualities\"; create_dict_header has no M5 and is not a .dict; bcftools consensus default applies IUPAC codes for het GTs in a single-sample VCF (not mentioned); script prints each file twice.",
+      "root_cause": "Two overlapping documents maintained separately.",
+      "fix": "Keep one copy of each recipe (SKILL.md) and make usage-guide a prompt/troubleshooting page; state pileup filter defaults; note the bcftools -H/IUPAC default."
+    }
+  ]
+}

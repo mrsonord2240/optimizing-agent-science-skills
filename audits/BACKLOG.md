@@ -8,7 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (92)
+## P1 (96)
 
 ### `bio-bam-statistics` — Mean-depth and >=Nx recipes divide by covered positions
 
@@ -113,6 +113,38 @@ None open.
 - Problem: With a FASTA missing the BAM contig samtools mpileup prints `The sequence "MN908947.3" was not found`, still writes 4.2 MB of rows with reference base N and exits 0; the Skill's Common Errors and Troubleshooting rows quote different text ('No sequences in common', 'Reference mismatch').
 - Root cause: Error text and behaviour not checked against samtools 1.24.
 - Fix: Document the real message and exit status and add a `samtools view -H \| grep @SQ` vs `.fai` contig-name check before running (mpileup without -f also succeeds with N, so 'No FASTA reference' is not an error).
+
+### `bio-reference-operations` — Python build_consensus / compare_to_ref shift over coverage gaps
+
+- Skill: 74, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/reference-operations) · [viewer](skills/bio-reference-operations/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 5
+- Problem: build_consensus, simple_consensus and compare_to_ref (SKILL.md + usage-guide) iterate pileup columns, which skip uncovered positions, so the consensus string is shorter than the region and misaligned to the reference: 581 false differences vs 1 true on the real human slice, 156 spurious on the synthetic island. compare_to_ref is also case-sensitive (300 false differences on a soft-masked reference).
+- Root cause: Position is inferred from the string index instead of pileup.reference_pos; no upper-casing of the reference.
+- Fix: Key by reference_pos and emit N for every uncovered position (or call samtools consensus -a --show-del yes --show-ins no and compare column by column); upper-case the reference; add the pedagogical-only caveat to the usage-guide copies; keep one copy of the function.
+
+### `bio-reference-operations` — --het-fract/--call-fract are no-ops in the default mode; -a misdescribed
+
+- Skill: 74, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/reference-operations) · [viewer](skills/bio-reference-operations/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 4
+- Problem: SKILL lines 161 and 193 pass --het-fract/--call-fract to the default Bayesian consensus, where they are ignored (identical output for 0.05, 0.9, 0.2/0.5). They only act with -m simple. "-a: call all positions (including low coverage)" (SKILL, usage-guide "Include N for no coverage") is wrong: -a only pads to the reference start/end. "verify via samtools consensus --help" exits 1 (unrecognized option).
+- Root cause: Options copied from the simple-mode help without checking which mode they belong to.
+- Fix: State that --het-fract/--call-fract need -m simple, or drop them from the Bayesian examples and explain --ambig alone; document that a minor-allele column is N without --ambig; describe -a/-aa as reference-end padding; tell readers to run samtools consensus with no arguments (or man samtools-consensus) for the option list.
+
+### `bio-reference-operations` — Contig naming and GRCh38 flavour tables contain factual errors; BAM rename advice is wrong
+
+- Skill: 74, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/reference-operations) · [viewer](skills/bio-reference-operations/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 3
+- Problem: "NCBI RefSeq (recent): chr1 / chrM" is wrong (RefSeq FASTA names are NC_000001.11 / NC_012920.1; chr1 only in the assembly-report UCSC column). The "1000G analysis set: ALT no, HLA no" row is wrong (the 1000G GRCh38 reference has 261 _alt and 525 HLA contigs and is the bwakit hs38DH set the table lists as a separate flavour). "for BAM there is no clean conversion -- re-align" is false: samtools reheader gave identical records, identical pileup and a clean Picard validation for chr22 -> 22 and chr1/chr2/chrM -> 1/2/MT.
+- Root cause: Reference-identity facts written from memory and not checked against the sources; reheader not considered.
+- Fix: Correct the two rows (or link the NCBI assembly report / 1000G README), separate the no-alt analysis set from the full hs38DH set, and replace the re-align advice with: samtools view -H \| sed \| samtools reheader (only when sequences are identical; compare M5), noting that hg19 chrM differs from GRCh37 MT.
+
+### `bio-reference-operations` — prepare_reference.sh and validate block name the dict wrongly for .fasta / .fa.gz
+
+- Skill: 74, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/reference-operations) · [viewer](skills/bio-reference-operations/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 1
+- Problem: ${REF%.fa} only strips ".fa": for genome.fasta the dict is genome.fasta.dict and chrom sizes genome.fasta.chrom.sizes; GATK HaplotypeCaller then fails with "Fasta dict file .../genome.dict ... does not exist". The usage-guide validate block prints DICT: OK for the misnamed file. ref.fa.gz gives ref.fa.gz.dict.
+- Root cause: Extension stripping hard-coded to .fa.
+- Fix: Use base="${REF%.gz}"; base="${base%.*}" (handles .fa/.fasta/.fna, .gz) for the .dict/.chrom.sizes names; make the validate block check that name; drop the duplicated ls glob.
 
 ### `bio-alignment-amplicon-clipping` — Wrong primer BED passes the example; claim attributed to checker
 
@@ -746,7 +778,7 @@ None open.
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (389)
+## P2 (392)
 
 ### `bio-bam-statistics` — Cross-check identity and 'primary' table row ignore QC-failed and secondary
 
@@ -851,6 +883,30 @@ None open.
 - Problem: Allele counting, frequency, quality filtering, region/BED, bcftools pipelines and depth advice are written twice (375 + 258 lines) with small divergences (-d 250 vs 1000000 in multi-sample examples).
 - Root cause: usage-guide restates SKILL.md.
 - Fix: Keep the command reference in SKILL.md and reduce usage-guide.md to prompts and troubleshooting.
+
+### `bio-reference-operations` — Unguarded recipes exit 0 after a partial failure
+
+- Skill: 74, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/reference-operations) · [viewer](skills/bio-reference-operations/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 2, 3
+- Problem: The subset recipes (chr1..chrM) exit 0 with a truncated FASTA and a dict containing "chr3 LN:0 M5:d41d8cd9..." when a contig is absent (Ensembl-style names fail for every contig). "seq_cache_populate.pl -root $REF_CACHE_DIR" uses a variable defined nowhere; unset, it treats reference.fa as the root and exits 0 having populated nothing. ug "Extract Multiple Regions" prints confident headers with empty sequences for out-of-range coordinates.
+- Root cause: No set -e / existence checks in the guide recipes; undefined variable.
+- Fix: Add set -e and a contig-exists check (cut -f1 ref.fa.fai) before subsetting; define REF_CACHE_DIR=/path in the recipe and quote it; bounds-check regions against get_reference_length.
+
+### `bio-reference-operations` — Troubleshooting titles and the "index first" advice do not match tool behaviour
+
+- Skill: 74, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/reference-operations) · [viewer](skills/bio-reference-operations/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 2
+- Problem: samtools faidx builds the .fai itself when a region is requested; real errors are "[faidx] Could not load fai index" and "Failed to fetch sequence in 1:1-100", not the guide titles. A region wholly beyond the contig end exits 0 with an empty record and only a stderr warning. -i appends /rc to the header (--mark-strand no removes it); -f fastq consensus is wrapped at 70 columns (-l 0 for 4-line FASTQ).
+- Root cause: Troubleshooting written from older tool behaviour.
+- Fix: Quote the real messages, note the auto-index, document --mark-strand and consensus -l 0.
+
+### `bio-reference-operations` — SKILL.md / usage-guide redundancy and small doc defects
+
+- Skill: 74, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/reference-operations) · [viewer](skills/bio-reference-operations/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 1, 4, 5
+- Problem: Three copies of the pysam consensus code, faidx recipes and the FAI table appear in both files; min_depth 3 vs 5; the printed "Consensus at chr1:1000000" labels a 0-based argument; pysam.pileup defaults (Q<13, duplicates, overlaps) contradict "ignores base qualities"; create_dict_header has no M5 and is not a .dict; bcftools consensus default applies IUPAC codes for het GTs in a single-sample VCF (not mentioned); script prints each file twice.
+- Root cause: Two overlapping documents maintained separately.
+- Fix: Keep one copy of each recipe (SKILL.md) and make usage-guide a prompt/troubleshooting page; state pileup filter defaults; note the bcftools -H/IUPAC default.
 
 ### `bio-crispr-screens-copy-number-correction` — negative_control_sgrnas empty-dict case raises an undocumented ValueError
 
