@@ -8,7 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (96)
+## P1 (101)
 
 ### `bio-bam-statistics` — Mean-depth and >=Nx recipes divide by covered positions
 
@@ -145,6 +145,46 @@ None open.
 - Problem: ${REF%.fa} only strips ".fa": for genome.fasta the dict is genome.fasta.dict and chrom sizes genome.fasta.chrom.sizes; GATK HaplotypeCaller then fails with "Fasta dict file .../genome.dict ... does not exist". The usage-guide validate block prints DICT: OK for the misnamed file. ref.fa.gz gives ref.fa.gz.dict.
 - Root cause: Extension stripping hard-coded to .fa.
 - Fix: Use base="${REF%.gz}"; base="${base%.*}" (handles .fa/.fasta/.fna, .gz) for the .dict/.chrom.sizes names; make the validate block check that name; drop the duplicated ls glob.
+
+### `bio-sam-bam-basics` — CRAM check: `samtools view -c` does not prove the reference is reachable
+
+- Skill: 77, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/sam-bam-basics) · [viewer](skills/bio-sam-bam-basics/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 4
+- Problem: SKILL.md says `samtools view -c file.cram` forces a full decode and proves the reference is reachable. With the reference FASTA moved away and no cache, `view -c` printed 5644 and exited 0, and it also passed a mid-file-corrupted CRAM; only a real decode fails (rc 1).
+- Root cause: Count-only mode in samtools 1.24 does not decode bases, so it never resolves the reference; the statement was written from assumption, not from a run.
+- Fix: Replace with `samtools view -o /dev/null file.cram && echo reference-ok` (or pipe to `md5sum`) and say `-c` and `quickcheck` only prove header/EOF and index counts.
+
+### `bio-sam-bam-basics` — Shipped view_bam.py fails or lies outside indexed BAM input
+
+- Skill: 77, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/sam-bam-basics) · [viewer](skills/bio-sam-bam-basics/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 1, 3, 4
+- Problem: On an unindexed BAM (also an empty one) it raises ValueError from bam.mapped; on SAM it raises AttributeError; on an indexed CRAM it prints "Mapped: 0 / Unmapped: 0" for a file with 5642+2 records; it prints reference_start 0-based unlabelled and unmapped reads as "None:-1 + None".
+- Root cause: bam.mapped/bam.unmapped need BAM index counts and are unavailable for SAM and CRAM; the script opens with mode "rb" and has no error handling or format detection.
+- Fix: Open with mode "r" (autodetect), wrap the mapped/unmapped print in try/except (ValueError, AttributeError) and fall back to counting, label the coordinate as 0-based, and print "unmapped" for is_unmapped records.
+
+### `bio-sam-bam-basics` — Multi-region extraction is a silent-wrong trap with no guidance
+
+- Skill: 77, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/sam-bam-basics) · [viewer](skills/bio-sam-bam-basics/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 1
+- Problem: usage-guide.md prompts "Get reads from multiple regions" but no snippet exists; `samtools view bam chr22:2000-3000 chr22:2500-3500` returned 7356 records of which 1930 were duplicates (5426 unique) with exit 0, and summing pysam fetch() calls double-counts the same way.
+- Root cause: Neither document mentions -M (multi-region iterator), -L BED, or de-duplicating overlapping fetches.
+- Fix: Add a "Multiple regions" example using `samtools view -M bam r1 r2` or `-L regions.bed` (0-based BED), and a pysam note to merge intervals before fetching.
+
+### `bio-sam-bam-basics` — Several failure-mode and compatibility statements are wrong for 1.24
+
+- Skill: 77, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/sam-bam-basics) · [viewer](skills/bio-sam-bam-basics/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 4, 5
+- Problem: (a) markdup without MC/ms "silently" marks nothing: it exits 1 with "run samtools fixmate"; (b) MD:Z "required by bcftools mpileup BAQ": mpileup output is byte-identical with MD/NM stripped; (c) "bcftools / Picard often need M": bcftools mpileup output is identical on a minimap2 --eqx BAM; (d) Bowtie2 MAPQ 42 "(rare)": 97.4% of records; (e) different reference "silently corrupts": hard MD5-mismatch error unless ignore_md5=1.
+- Root cause: Claims were copied from older tool behaviour or folklore and never run against the tools.
+- Fix: Correct each sentence to the observed behaviour above; keep the "verify with `samtools view \| awk` and @PG" workflow.
+
+### `bio-sam-bam-basics` — convert_formats.sh cannot do what the Skill advertises for CRAM input and can destroy its input
+
+- Skill: 77, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/sam-bam-basics) · [viewer](skills/bio-sam-bam-basics/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 2
+- Problem: The reference argument is only used for .cram output, so CRAM->BAM/SAM never gets -T (it worked only because the CRAM header UR pointed at a reachable FASTA); `.BAM` is rejected as an unknown format; `convert_formats.sh h.bam h.bam` left a 0-record BAM.
+- Root cause: The case statement passes -T only in the cram branch, lower-cases nothing, and never compares input and output paths.
+- Fix: Build a `${REFERENCE:+-T "$REFERENCE"}` argument used in every branch, lower-case the extension, and exit with an error when INPUT and OUTPUT resolve to the same file.
 
 ### `bio-alignment-amplicon-clipping` — Wrong primer BED passes the example; claim attributed to checker
 
@@ -778,7 +818,7 @@ None open.
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (392)
+## P2 (394)
 
 ### `bio-bam-statistics` — Cross-check identity and 'primary' table row ignore QC-failed and secondary
 
@@ -907,6 +947,22 @@ None open.
 - Problem: Three copies of the pysam consensus code, faidx recipes and the FAI table appear in both files; min_depth 3 vs 5; the printed "Consensus at chr1:1000000" labels a 0-based argument; pysam.pileup defaults (Q<13, duplicates, overlaps) contradict "ignores base qualities"; create_dict_header has no M5 and is not a .dict; bcftools consensus default applies IUPAC codes for het GTs in a single-sample VCF (not mentioned); script prints each file twice.
 - Root cause: Two overlapping documents maintained separately.
 - Fix: Keep one copy of each recipe (SKILL.md) and make usage-guide a prompt/troubleshooting page; state pileup filter defaults; note the bcftools -H/IUPAC default.
+
+### `bio-sam-bam-basics` — Duplicated documents and missing explicit CIGAR/TLEN rules
+
+- Skill: 77, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/sam-bam-basics) · [viewer](skills/bio-sam-bam-basics/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 3
+- Problem: usage-guide.md repeats SKILL.md (header, fields, FLAG, CIGAR, commands, pysam, tips) with a smaller, less complete FLAG/CIGAR table; neither states which CIGAR ops consume query/reference, the TLEN sign rule, or that MAPQ 255 means "not available" outside STAR.
+- Root cause: usage-guide.md was written as a standalone human doc and never de-duplicated against SKILL.md.
+- Fix: Keep one copy of the format tables in SKILL.md, reduce usage-guide.md to prompts and troubleshooting, and add a 9-row CIGAR consumption table and a TLEN/MAPQ-255 note.
+
+### `bio-sam-bam-basics` — Small accuracy and documentation gaps
+
+- Skill: 77, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/sam-bam-basics) · [viewer](skills/bio-sam-bam-basics/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 1, 2, 4, 5
+- Problem: `samtools view -H` appends its own @PG line (use --no-PG); a wrong contig name returns 0 rows with exit 0; the SKILL.md SAM example is space-delimited and not parseable; `-C` without -T exits 0 with warnings and embeds the reference (embed_ref/no_ref never mentioned); CRAM re-orders optional tags; SA:Z is described as a "comma-list" but is semicolon-separated 6-field records; minimap2 also emits an unrelated ms:i tag.
+- Root cause: Behaviours of samtools 1.24 that drifted from the 1.19-era examples were not re-checked.
+- Fix: Add one line each: --no-PG, contig-name check via `samtools idxstats`, embed_ref for portable CRAM, SA:Z format, and that `ms` from minimap2 is not the fixmate mate score.
 
 ### `bio-crispr-screens-copy-number-correction` — negative_control_sgrnas empty-dict case raises an undocumented ValueError
 
