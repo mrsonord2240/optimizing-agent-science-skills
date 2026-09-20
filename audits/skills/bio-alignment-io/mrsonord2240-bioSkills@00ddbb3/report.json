@@ -1,0 +1,508 @@
+{
+  "meta": {
+    "skill_name": "bio-alignment-io",
+    "description": "Read, write, and convert multiple sequence alignment files using Biopython Bio.AlignIO. Supports Clustal, PHYLIP, Stockholm, FASTA, Nexus, and other alignment formats for phylogenetics and conservation analysis. Use when reading, writing, or converting alignment file formats.",
+    "evaluated_on": "2026-09-20",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 8,
+    "source": "mrsonord2240/bioSkills@00ddbb34e81668b221fb96daa59530e7432495fa:alignment/alignment-io",
+    "audit_type": "re-audit (second) of the fixed Skill fix/al-io2; regression of the archived first re-audit inputs plus two new inputs (5 and 8)",
+    "executed": true,
+    "execution_note": "Executed 8/8 inputs. Windows venv (Biopython 1.88, pyhmmer 0.12.3) plus WSL tools: MAFFT 7.526, HMMER 3.4, Infernal 1.1.5, HH-suite reformat.pl/hhfilter, RAxML-NG 1.2.2 and 2.0.3, PhyML 3.3.20220408 and 3.3.20260528, IQ-TREE 3.1.3, MrBayes 3.2.7, PAML 4.10.10, Foldmason. Shipped examples ran from copies; no __pycache__ in the worktree or the external clone. Previous (first re-audit) result: 85 Limited Release, 32/39 assertions."
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated DOI, statistic or result. Every tool claim in the corrected dialect table (RAxML-NG star handling and name rejection, PhyML name handling on two builds, IQ-TREE checks, MrBayes quoted-id failure) reproduced on the real tools. The Rfam/Pfam/HBB/UniProt data used are real; synthetic injections are labelled."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "File-format and phylogenetics-input skill; no diagnostic or prescriptive content."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "No principled methodological fallacy. The example's alphabet heuristic (>= 90% ACGTUN) is a documented approximation, not a fallacy; its silent mislabel of nucleotide alignments with >10% IUPAC/X letters is recorded as a P2 silent-wrong edge case (input 8)."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All 20 Python blocks in SKILL.md and all 4 shipped examples parse and ran (Batch block now runs verbatim without a pre-existing converted/); the MrBayes recipe block executed verbatim and its output loaded in MrBayes 3.2.7 (DNA, protein, RNA)."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 86,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 11,
+        "max": 12,
+        "note": "Completeness 4, correctness 3, appropriateness 4. Round 2 corrected the two false tool claims and added the MrBayes recipe; remaining imprecision: the MrBayes explanation covers only quoted ids (unquoted pipe ids also fail), the sanitiser regex leaves [ ], Clustal 30-char truncation is not mentioned."
+      },
+      "reliability": {
+        "score": 9,
+        "max": 12,
+        "note": "Common Errors rows reproduce exactly; examples refuse bad input. Gaps: alphabet inference mislabels nucleotide data with >10% IUPAC/X as protein, mixed T/U writes an unreadable NEXUS labelled dna, an RNA-vs-DNA override raises a Biopython traceback after fasta/phy were already written."
+      },
+      "performance_context": {
+        "score": 6,
+        "max": 8,
+        "note": "472 lines / ~3,300 words in one SKILL.md with no references/ layer; usage-guide.md is a 54-line pointer."
+      },
+      "agent_usability": {
+        "score": 14,
+        "max": 16,
+        "note": "Goal/Approach blocks, version stamps, MAF ground-truth loop, IQ-TREE zero-iteration check, datatype assert in the example. Error prevention lacks Clustal id truncation and the [ ] names."
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Natural example prompts; format choice is table-driven; the example's single failure message for unknown override is clear, the RNA/DNA mismatch message is a traceback."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "No credentials, eval/exec, shell or network. Examples write output.* and converted/ into the cwd and overwrite silently."
+      },
+      "maintainability": {
+        "score": 10,
+        "max": 12,
+        "note": "Version-stamped with the downstream tool versions; every changed claim re-verified in this audit; single file; examples verifiable from a clean copy."
+      },
+      "agent_specific": {
+        "score": 18,
+        "max": 20,
+        "note": "Precise trigger, all cross-referenced Skills and neff.py exist, safe re-runs; no references/ layer."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 86.9,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 33,
+      "total": 39
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Shipped examples from a clean copy, round-2 inference/override/cwd targets (regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "47/47 probes; convert_formats.py infers DNA/RNA/protein correctly on the shipped sample, synthetic RNA and real Pfam, writes datatype=dna|rna|protein and asserts it; read_alignment.py and the other examples now run from any cwd. RNA/DNA override mismatch leaves a traceback and a 0-byte output.nex.",
+        "basic": 36,
+        "specialized": 53,
+        "total": 89,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "All four shipped examples run from a clean copy on the shipped sample and on real Pfam PF00042 (73x141) and their outputs re-read with identical ids and residues",
+            "result": "PASS",
+            "note": "4x21 identical for fasta/phylip-relaxed/nexus; slice 4x10 equals source columns 5:15; batch converts 1 file; real Pfam 73x141 identical"
+          },
+          {
+            "text": "convert_formats.py labels the real protein alignment protein by default (no argument) and the NEXUS says datatype=protein",
+            "result": "PASS",
+            "note": "default, override protein and override Protein all give datatype=protein and re-read 73x141; shipped DNA sample gives datatype=dna, synthetic RNA gives datatype=rna"
+          },
+          {
+            "text": "Overrides that contradict the residues (protein on DNA, DNA on protein, unknown value) exit non-zero with a message and write no NEXUS",
+            "result": "PASS",
+            "note": "foo, protein, Protein on DNA and DNA on protein all exit 1 with the message; batch on an empty dir and slice past the end exit 1 and write nothing"
+          },
+          {
+            "text": "Every example resolves its own input regardless of cwd (round-2 target)",
+            "result": "PASS",
+            "note": "read_alignment.py, slice_alignment.py, batch_convert.py and convert_formats.py all exit 0 with 4 sequences from an unrelated cwd; label reads columns not bp"
+          },
+          {
+            "text": "A nucleotide-vs-nucleotide override that contradicts the residues (RNA on a T-containing alignment, DNA on U) is refused by the example with a clean message and no partial output",
+            "result": "FAIL",
+            "note": "Biopython ValueError traceback 'seq1 contains T, but RNA alignment'; output.fasta and output.phy already written, output.nex is 0 bytes"
+          }
+        ],
+        "executed": true,
+        "execution_note": "Executed: run/i1_examples.py (examples copied to run/scratch, removed afterwards)."
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Stockholm: real Pfam + real Rfam RF00005 (954x118) + synthetic RNA, annotations, NEXUS, Infernal/HMMER rebuild (regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "30/30 probes. Annotation snippet returns SS from GR and GC lines on synthetic RNA and real Rfam (ss_cons equals the file); GF header lines dropped (56 -> 1 on Pfam) as stated; Bio.Align Stockholm errors reproduce; cmbuild and hmmbuild rebuild the same models from the round trip (ACC/DESC lost).",
+        "basic": 36,
+        "specialized": 54,
+        "total": 90,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The SKILL's Stockholm annotation snippet, run verbatim, prints the per-record SS and returns a column SS equal to the file's #=GC SS_cons on synthetic RNA and on real Rfam",
+            "result": "PASS",
+            "note": "ss_cons length 118 equals the source string for Rfam; RF is exposed as reference_annotation"
+          },
+          {
+            "text": "The claim that AlignIO drops #=GF header lines while keeping GS/GR/GC is accurate",
+            "result": "PASS",
+            "note": "Pfam 56 -> 1 GF lines, Rfam 40 -> 1; #=GC SS_cons kept; #=GF ID/AC/DE absent after the round trip"
+          },
+          {
+            "text": "The Common Errors rows for Bio.Align Stockholm (TypeError on real Pfam, AttributeError on write) reproduce message-for-message",
+            "result": "PASS",
+            "note": "TypeError 'Any per-letter annotation should be a Python sequence' and AttributeError 'no attribute column_annotations'"
+          },
+          {
+            "text": "The molecule-type NEXUS route works for RNA and fails loudly without it",
+            "result": "PASS",
+            "note": "stockholm->nexus molecule_type=RNA re-reads 2x17 and 954x118 with datatype=rna; without it ValueError"
+          },
+          {
+            "text": "Infernal and HMMER can still build models from the AlignIO round trip, with the metadata loss the SKILL states",
+            "result": "PASS",
+            "note": "cmbuild: 954 seqs, clen 71 both; hmmbuild LENG 117 both; ACC/DESC lost, NAME becomes the file stem"
+          }
+        ],
+        "executed": true,
+        "execution_note": "Executed: run/i2_stockholm.py, run/i2b_rfam_real.py, run/i2b_infernal.sh (WSL cmbuild/hmmbuild). Real Pfam PF00042 and Rfam RF00005; SYNTHETIC data/synthetic_rna.sto."
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "PHYLIP pitfalls, every plain SKILL code block verbatim (incl. Batch, MrBayes recipe, pyhmmer streaming), Common Errors (regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "51/51 probes. The Batch Processing block now runs verbatim without a pre-existing converted/; the MrBayes recipe block runs verbatim, produces [A-Za-z0-9_]+ unique ids on 73 real Pfam ids and its own assertion fires on colliding ids; the streaming block prints Globin_copyN 73 141 sum_w=73.0 x3.",
+        "basic": 36,
+        "specialized": 54,
+        "total": 90,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Strict PHYLIP writers raise on colliding 10-char prefixes and the writer rewrites ':' to '|' and drops '(' ',' as the SKILL states",
+            "result": "PASS",
+            "note": "Repeated name 'Homo_sapie' for phylip and phylip-sequential; a:1 -> a|1, b(2) -> b2, c,3 -> c3; real NCBI ids collide in phylip-sequential"
+          },
+          {
+            "text": "Every plain code block in SKILL.md runs verbatim against real Pfam, including the corrected Batch Processing block",
+            "result": "PASS",
+            "note": "converted/ did not exist beforehand and g1.fasta, g2.fasta were written and re-read 73 records"
+          },
+          {
+            "text": "The Common Errors table reproduces message-for-message and the 0-byte NEXUS claim holds",
+            "result": "PASS",
+            "note": "5/5 messages; z.nex size 0 after the molecule-type failure"
+          },
+          {
+            "text": "The MrBayes id recipe block, run verbatim, yields unique quote-free ids and its collision assertion fires when ids collide",
+            "result": "PASS",
+            "note": "GLB2_LUMTE/31-141 -> GLB2_LUMTE_31_141; a-1 / a+1 -> AssertionError 'ids collide after sanitizing'; unrecipe NEXUS has 146 quote chars"
+          },
+          {
+            "text": "The pyhmmer streaming block runs verbatim and its stated API notes hold",
+            "result": "PASS",
+            "note": "msa.name is str, no .nseq/.alen, PB weights sum to 73.0; pyhmmer format cells read Biopython-written files"
+          }
+        ],
+        "executed": true,
+        "execution_note": "Executed: run/i3_phylip.py, run/i3b_blocks.py, run/i3c_streaming.py. Real Pfam ids and NCBI ids; SYNTHETIC name-collision alignments."
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "MAF minus-strand helper on real UCSC MAF with UCSC-API ground truth; real hmmalign A2M and HH-suite A3M (regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "28/28 probes. Fixed helper equals genome sequence for 40/40 real minus rows and 12/12 plus rows (old helper 0/40); hmmalign A2M ragged and the match-column snippet gives 117 = model length; A3M has no reader anywhere.",
+        "basic": 37,
+        "specialized": 54,
+        "total": 91,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The fixed maf_to_plus_strand_coords helper is correct on synthetic ground truth and on 40 real minus-strand UCSC rows",
+            "result": "PASS",
+            "note": "60 == 60 synthetic; real 40/40 minus and 12/12 plus match; old '== \"-\"' helper 0/40"
+          },
+          {
+            "text": "The SKILL's ground-truth loop detects a wrong helper",
+            "result": "PASS",
+            "note": "AssertionError when the old test is substituted"
+          },
+          {
+            "text": "hmmalign A2M is ragged and the SeqIO match-column snippet returns one character per model match state",
+            "result": "PASS",
+            "note": "row lengths 149-161, AlignIO fasta ValueError; snippet 8 rows x 117 = LENG 117"
+          },
+          {
+            "text": "reformat.pl A2M is rectangular and the first-record pitfall is real",
+            "result": "PASS",
+            "note": "73x141, 111 match columns; reordered A3M changes A2M residues at 104 positions"
+          },
+          {
+            "text": "A3M has no reader in AlignIO, Bio.Align or pyhmmer and hhfilter does not reorder records",
+            "result": "PASS",
+            "note": "Unknown format; pyhmmer InvalidParameter; first id unchanged after hhfilter"
+          }
+        ],
+        "executed": true,
+        "execution_note": "Executed: run/i4_maf.py (real UCSC MAF, UCSC REST API ground truth), run/i4b_a2m.sh (WSL hmmbuild/hmmalign/reformat.pl/hhfilter), run/i4b_a2m.py."
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "NEW end-to-end: real HBB CDS x6 and UniProt globins x8, MAFFT, shipped convert_formats.py, MrBayes / IQ-TREE / RAxML-NG / codeml",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "27 probes. The example infers DNA/protein correctly and IQ-TREE, RAxML-NG and codeml accept the files; MrBayes rejects the example's NEXUS for real ids containing a pipe (unquoted, so not the SKILL's quoted-id explanation) and loads it after the SKILL recipe. Biopython's Clustal writer truncates ids to 30 characters silently, even into duplicates, and the SKILL never says so.",
+        "basic": 33,
+        "specialized": 48,
+        "total": 81,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The shipped convert_formats.py labels real MAFFT-aligned HBB CDS as DNA and real UniProt globins as protein and its fasta/phylip-relaxed/nexus outputs re-read identical",
+            "result": "PASS",
+            "note": "6x444 datatype=dna, 8x155 datatype=protein; ids lcl|NM_000518.5 and sp|P02185|MYG_PHYMC preserved"
+          },
+          {
+            "text": "The NEXUS the shipped example writes for real NCBI and UniProt ids loads in MrBayes 3.2.7",
+            "result": "FAIL",
+            "note": "Unrecognized DNA/RNA character '|' and Unrecognized Protein character '|': Biopython does not quote the pipe ids, so the SKILL's quoting explanation does not describe this failure"
+          },
+          {
+            "text": "The NEXUS produced with the SKILL's id recipe loads in MrBayes and completes a run for DNA and protein",
+            "result": "PASS",
+            "note": "lcl|NM_000518.5 -> lcl_NM_000518_5; both hbb6_recipe.nex (datatype=dna) and globins8_recipe.nex (datatype=protein) end 'Analysis completed'"
+          },
+          {
+            "text": "The files the SKILL says to write are accepted by the downstream tools: IQ-TREE and RAxML-NG read phylip-relaxed with real ids, codeml reads phylip-sequential and rejects relaxed with the quoted message",
+            "result": "PASS",
+            "note": "IQ-TREE 6x444 and 8x155; RAxML-NG 2.0.3 successfully read; codeml omega 0.28841, lnL -1255.06; relaxed gives 'Error in sequence data file'"
+          },
+          {
+            "text": "The SKILL warns about id truncation for every text format it tells the agent to write",
+            "result": "FAIL",
+            "note": "Clustal writer cuts ids to 30 characters and returns two ids that differ after character 30 as the same id with no error; only PHYLIP truncation is documented"
+          }
+        ],
+        "executed": true,
+        "execution_note": "Executed: run/i5_mafft.sh, run/i5_e2e_prep.py, run/i5_tools.sh (MrBayes, IQ-TREE, RAxML-NG, codeml in WSL), run/i5_check.py. Real RefSeq HBB CDS and UniProt globins."
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Format Coverage Map checked cell by cell (regression + round-2 Bio.Align cells)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "75 probes, all pass. Round-2 cells hold: A2M R and W (writer needs column_annotations['state']; A2M read-write-read identical 73x141), PHYLIP strict-only (relaxed file with long ids raises on read, writer truncates to 10), PSL/chain/BED/SAM/exonerate/bigMaf/bigPsl/bigBed R/W, HHR and tabular read-only.",
+        "basic": 36,
+        "specialized": 54,
+        "total": 90,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Every Bio.Align cell in the corrected table is exact, including A2M R/W, PHYLIP strict-only, the PSL family and HHR/tabular",
+            "result": "PASS",
+            "note": "reader/writer presence checked per module in Biopython 1.88; A2M writer fails on a FASTA-read Alignment and round-trips an A2M-read one"
+          },
+          {
+            "text": "The AlignIO column and the not-in-Biopython table (HAL, net, AXT, GFA/rGFA, GAF) are accurate",
+            "result": "PASS",
+            "note": "none present in Bio.Align.formats or AlignIO readers/writers; msf R only, mauve R/W, emboss/fasta-m10 as stated"
+          },
+          {
+            "text": "The pyhmmer format column is exact",
+            "result": "PASS",
+            "note": "afa, clustal, phylip, phylips, stockholm, a2m read/write; nexus, maf, a3m, msf raise"
+          },
+          {
+            "text": "Foldmason result_aa.fa and result_3di.fa load with AlignIO and the per-column report is HTML",
+            "result": "PASS",
+            "note": "3x153 both; 1MBN vs 1A6M identity 1.000; result.html not parseable"
+          }
+        ],
+        "executed": true,
+        "execution_note": "Executed: run/i6_format_table.py (75 probes with i6c), run/i6c_foldmason.sh, run/i6c_foldmason_read.py. Real Pfam, Biopython test MSF/Mauve files, PDB structures; SYNTHETIC PSL/chain one-liners."
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Downstream-tool claims of the corrected dialect table on real RAxML-NG, PhyML, IQ-TREE, MrBayes",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "30 probes, all pass. Both round-2 corrections are right: RAxML-NG 1.2.2 and 2.0.3 reject star only for nucleotides and score it like a gap in proteins (identical lnL with -, X and *); PhyML 3.3.20220408 and 3.3.20260528 keep 138-char names and reject : and , only. New: the sanitiser regex leaves [ ]; PhyML crashes (exit 139) and RAxML-NG rejects a name containing [.",
+        "basic": 35,
+        "specialized": 51,
+        "total": 86,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The corrected RAxML-NG row is right on 1.2.2 and 2.0.3: star in a nucleotide alignment gives 'Invalid character in sequence N at position P: *', star in protein data is accepted and not scored",
+            "result": "PASS",
+            "note": "DNA error text reproduced on both builds; protein --search1 lnL -2826.143822 (1.2.2) and -2826.143824 (2.0.3) identical for *, - and X"
+          },
+          {
+            "text": "The replaced PhyML row is right on two builds: ':' and ',' rejected with the quoted message, '(' ')' accepted and written into the Newick, 138-character names kept",
+            "result": "PASS",
+            "note": "3.3.20260528: both messages, GLB(1):0.5138 in the tree; 12 names of 138 chars in both 3.3.20220408 and 3.3.20260528"
+          },
+          {
+            "text": "The IQ-TREE guidance holds on 3.1.3 (zero-iteration check text, wrong-length error, --check invalid, rename warning) and the 138-char names are accepted",
+            "result": "PASS",
+            "note": "Alignment has 12 sequences with 141 columns; ERROR: Line 39: Sequence MYG_HETPO/23-138 has wrong sequence length 137; Invalid --check option; WARNING: Some sequence names are changed"
+          },
+          {
+            "text": "The MrBayes paragraph holds: Biopython's quoted Pfam ids fail with the quoted message and the recipe's output loads and runs on MrBayes 3.2.7",
+            "result": "PASS",
+            "note": "Instead found ''' in command 'Matrix' on pf12.nex; Analysis completed on pf12_recipe.nex"
+          },
+          {
+            "text": "Names sanitised with the SKILL's regex [():,] are accepted by PhyML and RAxML-NG for the punctuation a real id can carry",
+            "result": "FAIL",
+            "note": "a name with [ is rejected by RAxML-NG ('taxon name contains invalid characters') and makes PhyML exit 139 after the initial tree; the neighbouring recipe [^A-Za-z0-9_] would have caught it"
+          }
+        ],
+        "executed": true,
+        "execution_note": "Executed: run/i7_prep.py, run/i7b_prep.py, run/i7_recipe.py, run/i7_tools.sh (RAxML-NG x2, PhyML x2, IQ-TREE, MrBayes in WSL), run/i7_check.py. Real Pfam rows; SYNTHETIC injected characters labelled in the scripts."
+      },
+      {
+        "index": 8,
+        "type": "Edge",
+        "label": "NEW alphabet-inference stress of convert_formats.py (15 cases, real HBB/Rfam/Pfam/UniProt + labelled synthetic) and RNA NEXUS in MrBayes",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "15 cases run through the shipped script. Correct: real lower-case HBB (DNA), real Rfam tRNA 954 seqs (RNA), Pfam and UniProt (protein), 5% IUPAC, 12% N, 90% gaps, lower-case RNA, tiny 3x4 DNA, terminal star, all-gap (clean exit). Wrong: 12% IUPAC codes and 12% X mask labelled protein; mixed T+U labelled dna, exit 0, and the NEXUS cannot be re-read (NexusError). RNA datatype loads in MrBayes 3.2.7 after the recipe ('Data is Rna', 12 taxa, 90 chars).",
+        "basic": 32,
+        "specialized": 46,
+        "total": 78,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Real data is labelled correctly (lower-case HBB CDS as DNA, Rfam tRNA seed as RNA, Pfam and UniProt globins as protein) and the NEXUS re-reads with the same shape",
+            "result": "PASS",
+            "note": "datatype=dna, rna, protein, protein; Rfam re-reads 954x118"
+          },
+          {
+            "text": "Lower-case residues, 90% gaps, 12% N, lower-case RNA, a terminal star and a tiny 3x4 DNA are labelled correctly and an all-gap alignment exits with a clear message",
+            "result": "PASS",
+            "note": "all correct; all-gap: 'No residues in the alignment', exit 1"
+          },
+          {
+            "text": "The datatype the example infers for RNA loads in MrBayes 3.2.7 (real Rfam subset, ids sanitised with the recipe)",
+            "result": "PASS",
+            "note": "Data is Rna; Defining new matrix with 12 taxa and 90 characters; Analysis completed. Unsanitised example NEXUS fails with the documented quoted-id error"
+          },
+          {
+            "text": "A nucleotide alignment with >10% ambiguity codes or X masks is labelled nucleotide",
+            "result": "FAIL",
+            "note": "12% R/Y/K/M/S/W and 12% X both labelled protein and written datatype=protein with exit 0 (ACGTUN counts 4 of 11 IUPAC nucleotide letters)"
+          },
+          {
+            "text": "A mixed T+U alignment fails loudly or produces a readable file",
+            "result": "FAIL",
+            "note": "labelled DNA, exit 0, the 'Checked: datatype=dna' assert passes, but AlignIO.read of output.nex raises NexusError"
+          }
+        ],
+        "executed": true,
+        "execution_note": "Executed: run/i8_infer.py (15 cases through the shipped script), run/i8_mb_prep.py, run/i8_mb.sh, run/i8_mb_check.py (MrBayes on datatype=rna). Real HBB/Rfam/Pfam/UniProt; SYNTHETIC substitutions and tiny cases labelled."
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 34.4,
+    "dynamic_weighted": 52.1,
+    "score": 87,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Both round-2 tool corrections are right on the real tools: RAxML-NG 1.2.2 and 2.0.3 (star rejected only for nucleotides, scored like a gap in proteins) and PhyML on two builds (138-char names kept, only : and , rejected).",
+    "The MrBayes id recipe works as written: verbatim block output loads in MrBayes 3.2.7 for DNA, protein and RNA data and its uniqueness assertion fires on collisions.",
+    "convert_formats.py now infers the alphabet on real data (lower-case HBB, Rfam tRNA, Pfam, UniProt), asserts the datatype line and re-reads every output; all four examples run from any cwd.",
+    "Every claim I could test was tested by the Skill's own checks: MAF ground-truth loop, IQ-TREE zero-iteration check, Common Errors messages, and the 75 format-table probes all reproduce."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "Alphabet inference mislabels IUPAC/X-heavy and mixed T/U data",
+      "observed_in": [
+        8
+      ],
+      "problem": "convert_formats.py counts only ACGTUN, so a nucleotide alignment with more than 10% R/Y/K/M/S/W or X is written as datatype=protein with exit 0, and a mixed T+U alignment is written as datatype=dna into a NEXUS that AlignIO cannot re-read.",
+      "root_cause": "The 90% ACGTUN threshold ignores the other IUPAC nucleotide letters and the post-write assert only greps the datatype line.",
+      "fix": "Count ACGTUNRYKMSWBDHV as nucleotide, exit with a message when both T and U occur, and re-read output.nex before printing the check line."
+    },
+    {
+      "priority": "P2",
+      "title": "RNA/DNA override mismatch ends in a traceback and a 0-byte NEXUS",
+      "observed_in": [
+        1
+      ],
+      "problem": "Overriding RNA on a T-containing alignment (or DNA on a U-containing one) is not caught by the example's guard; Biopython raises after output.fasta and output.phy are written and leaves output.nex empty.",
+      "root_cause": "The mismatch guard compares only protein against nucleotide.",
+      "fix": "Reject an override whose alphabet contradicts the inferred DNA or RNA before writing anything."
+    },
+    {
+      "priority": "P2",
+      "title": "Clustal 30-character id truncation is not documented",
+      "observed_in": [
+        5
+      ],
+      "problem": "The Clustal writer silently cuts ids to 30 characters and returns two ids that differ only after character 30 as identical, unlike PHYLIP which raises; the SKILL documents only PHYLIP name limits while all shipped examples use Clustal.",
+      "root_cause": "Format-specific notes cover PHYLIP truncation only.",
+      "fix": "Add one sentence to the Format Coverage Map or Format-Specific Notes: Clustal writer truncates ids to 30 characters with no collision check; check id uniqueness after a Clustal round trip."
+    },
+    {
+      "priority": "P2",
+      "title": "MrBayes explanation and example miss unquoted pipe ids",
+      "observed_in": [
+        5
+      ],
+      "problem": "The shipped example writes NEXUS with ids such as sp|P02185|MYG_PHYMC and lcl|NM_000518.5 unquoted and MrBayes 3.2.7 rejects them (Unrecognized character '|'), which is not the quoted-id failure the SKILL describes; the recipe fixes both.",
+      "root_cause": "The SKILL attributes the MrBayes failure to Biopython quoting only, and convert_formats.py does not apply the recipe.",
+      "fix": "State that MrBayes needs ids of [A-Za-z0-9_] only (quoted or not) and either apply the recipe in convert_formats.py or print a warning when ids contain other characters."
+    },
+    {
+      "priority": "P2",
+      "title": "Sanitiser regex [():,] leaves square brackets",
+      "observed_in": [
+        7
+      ],
+      "problem": "A name containing [ is rejected by RAxML-NG 2.0.3 and makes PhyML 3.3.20260528 exit 139 after the initial tree, but the PHYLIP dialect table tells the agent to sanitise with [():,].",
+      "root_cause": "The table's fix regex lists the characters found in earlier probes only.",
+      "fix": "Point the table's fix cells at the recipe regex [^A-Za-z0-9_] used for MrBayes."
+    },
+    {
+      "priority": "P2",
+      "title": "SKILL.md is one 472-line file with no references/ layer",
+      "observed_in": [],
+      "problem": "MAF, A2M/A3M, Stockholm and pyhmmer streaming sections sit in the main file, so every load pays for all of them.",
+      "root_cause": "No progressive disclosure split.",
+      "fix": "Move MAF coordinates, A2M/A3M conventions and streaming into references/ files and link them from the Format Coverage Map."
+    }
+  ]
+}
