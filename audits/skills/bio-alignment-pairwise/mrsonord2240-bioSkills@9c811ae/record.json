@@ -1,9 +1,9 @@
 {
   "skill_id": "bio-alignment-pairwise",
-  "version": "mrsonord2240-bioSkills@354b499",
+  "version": "mrsonord2240-bioSkills@9c811ae",
   "source": {
     "repository": "mrsonord2240/bioSkills",
-    "commit": "354b4992cd8d2f1bee039510af618da0333821f1",
+    "commit": "9c811aed171970a7188fa0a62396373dfd9a428d",
     "path": "alignment/pairwise-alignment",
     "author": "GPTomics",
     "author_url": "https://github.com/GPTomics",
@@ -13,7 +13,7 @@
       "repository": "GPTomics/bioSkills",
       "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
     },
-    "url": "https://github.com/mrsonord2240/bioSkills/tree/354b4992cd8d2f1bee039510af618da0333821f1/alignment/pairwise-alignment"
+    "url": "https://github.com/mrsonord2240/bioSkills/tree/9c811aed171970a7188fa0a62396373dfd9a428d/alignment/pairwise-alignment"
   },
   "audit": {
     "method": {
@@ -31,11 +31,11 @@
     "commissioned_by": "Samuel Nord",
     "test_data": "synthetic"
   },
-  "supersedes": null,
+  "supersedes": "mrsonord2240-bioSkills@354b499",
   "files": {
     "report": "report.json",
     "viewer": "viewer.md",
     "fixes": "fixes.md",
-    "scripts": 25
+    "scripts": 33
   }
 }

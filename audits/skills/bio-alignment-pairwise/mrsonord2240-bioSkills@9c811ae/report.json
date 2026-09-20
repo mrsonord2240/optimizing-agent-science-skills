@@ -1,0 +1,532 @@
+{
+  "meta": {
+    "skill_name": "bio-alignment-pairwise",
+    "description": "Perform pairwise sequence alignment using Biopython Bio.Align.PairwiseAligner. Use when comparing two sequences, finding optimal alignments, scoring similarity, and identifying local or global matches between DNA, RNA, or protein sequences.",
+    "evaluated_on": "2026-09-19",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 9,
+    "source": "mrsonord2240/bioSkills@9c811aed171970a7188fa0a62396373dfd9a428d:alignment/pairwise-alignment",
+    "reaudit_of": "F:\\OpenScience\\audits\\_pre-fix-20260919d\\bio-alignment-pairwise (80, Limited Release)",
+    "fix_log": "F:\\optimizing-agent-science-skills\\fixes\\bio-alignment-pairwise.md (read; not used as evidence)",
+    "executed_inputs": "9/9",
+    "environment": "Windows venv (Biopython 1.88, parasail 1.3.4, edlib 1.3.9); WSL env alignment (EMBOSS 6.6.0, BLAST+ 2.17.0, MMseqs2 18.8cc5c, MAFFT 7.526, PAL2NAL 14, pywfa 0.5.1, mappy 2.31, Biopython 1.88); R 4.4.3 with pwalign 1.2.0 + Biostrings 2.74.1 via r.sh",
+    "execution_note": "All 9 inputs (7 regression from the pre-fix audit re-written against the fixed Skill's new claims, 2 NEW on real data the fixer did not use) executed with printed, asserted checks against independent ground truth (own Gotoh DP, EMBOSS needle/water, BLAST+ blastp, pwalign, parasail, edlib, pywfa, mappy, MMseqs2, PAL2NAL, planted coordinates). The Skill's 16 python blocks were extracted from a byte-identical copy and run in one namespace (WSL 16/16, Windows 15/16: the pywfa/mappy block is Linux-only as the Skill states). Not executed: ushuffle (pip build fails on Windows and WSL); HHsearch/jackhmmer/DIAMOND named in prose only; Kallenborn/MMseqs2-GPU claims not run (citations verified on Crossref)."
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "Benchmark numbers were re-measured (parasail 1.7-5x, edlib 14-40x at 300 nt; 20 kb 2-4x and 437-822x) and the saturation example reproduces; all nine References resolve on Crossref; no fabricated scores or statistics in any output."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Sequence-comparison guidance only; no diagnostic or prescriptive content in any of the 9 inputs."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Gap-convention mapping, significance bands, DNA-vs-protein routing, semiglobal usage and the 'alignment exists is not homology' warning are all correct; every Skill claim I tested against independent tools held except one sequence-specific number (P2)."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "16/16 SKILL.md python blocks run in WSL with DeprecationWarning promoted to error (15/16 on Windows; the failing block is the Linux-only pywfa/mappy one, stated in the Skill); 5/5 shipped examples run from a copy; every snippet's own comment assertion reproduced."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 82,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 10,
+        "max": 12,
+        "note": "Every operation the guide teaches was executed and matched independent ground truth (own Gotoh, EMBOSS needle/water, BLAST+ 2.17, parasail, edlib, pywfa, mappy, pwalign): scores, coordinates, gap convention, semiglobal, input checks, saturation. Completeness gap: PAL2NAL, MMseqs2, needle/water, HHsearch are named without command lines; DNA dinucleotide shuffle points to ushuffle with no code. One sequence-specific number ('reverse complement 0') and the 'edlib returns edit distance only' wording are imprecise."
+      },
+      "reliability": {
+        "score": 9,
+        "max": 12,
+        "note": "Version-drift fallback ('introspect and adapt') kept; new Input Checks section documents ValueError cases (lowercase, newline, J/U, empty), silent acceptances (*, X/B/Z, SeqRecord), strand and internal-stop traps, all reproduced. Biopython's ValueError does not name the offending letter; alignment_from_file.py still has no missing-file handling."
+      },
+      "performance_context": {
+        "score": 5,
+        "max": 8,
+        "note": "SKILL.md grew from 402 to 449 lines (28 KB) with no references/ split; library table, gap-convention table, significance theory and BLAST flags all load up front. The workflow itself is linear with a score-only fast path."
+      },
+      "agent_usability": {
+        "score": 14,
+        "max": 16,
+        "note": "Goal/Approach pairs with copy-pasteable snippets; 16/16 python blocks run in one namespace in WSL (15/16 on Windows, the pywfa/mappy block is Linux-only as the Skill says). Expected values sit in the snippets' comments (score 40, span [[300, 320]]) and all reproduce. Strong pitfall coverage: gap defaults, BLAST vs EMBOSS convention, argument order, saturation, off-spec input. Minor: snippets use undefined user variables (query, target, reference) without saying so; -10/-0.5 vs -11/-1 conventions coexist."
+      },
+      "human_usability": {
+        "score": 6,
+        "max": 8,
+        "note": "Description matches natural requests but omits Needleman-Wunsch, Smith-Waterman, percent identity, semiglobal and needle/water trigger words. Input requirements are now explicit in Input Checks (uppercase alphabet, no whitespace, no empty sequence)."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "No credentials, network calls, eval/exec/subprocess anywhere in SKILL.md, usage-guide.md or examples (grep clean); local computation only; the example takes a user-supplied FASTA path as given."
+      },
+      "maintainability": {
+        "score": 9,
+        "max": 12,
+        "note": "One dense SKILL.md, a slimmed usage-guide.md that points at it (dedup verified: every removed item is still in SKILL.md), five single-purpose examples that all run from a copy (alignment_from_file.py now takes argv and ships sequences.fasta). Version-specific facts are still scattered through one file; examples print no expected values."
+      },
+      "agent_specific": {
+        "score": 18,
+        "max": 20,
+        "note": "Escape hatches are the strongest part (identity-based 'when NOT appropriate' table, routing to MMseqs2/jackhmmer/Foldseek; all 7 Related Skills exist in the repo); deterministic and idempotent; every file the guide points at exists. Statistical theory and library routing could live in references/."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 88.8,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 40,
+      "total": 42
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "[regression] Global BLOSUM62 alignment of real human HBA vs HBB with the Skill's gap-convention section",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Executed 100% (run/input1*.py, input1_emboss_blast.sh, input1c_blast_default.sh, input7_R_biostrings.R). Every score matched three independent tools.",
+        "executed": true,
+        "execution_note": "Executed 100% (run/input1*.py, input1_emboss_blast.sh, input1c_blast_default.sh, input7_R_biostrings.R). Every score matched three independent tools.",
+        "basic": 36,
+        "specialized": 55,
+        "total": 91,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Global scores equal independent ground truth: -11/-1 = 286 (own Gotoh, parasail, needle 11/1) and -10/-0.5 = 292.5 (Gotoh, needle)",
+            "result": "PASS",
+            "note": "all four tools agree; re-scoring the returned alignment strings gives the reported score"
+          },
+          {
+            "text": "The Skill's BLASTP mapping holds: Biopython -12/-1 local = blastp raw 285 with the identical HSP; -11/-1 = water 11/1 = 288",
+            "result": "PASS",
+            "note": "blastp -comp_based_stats 0 raw 285, HSP 3-141 / 4-146; water 288 (11/1) and 285 (12/1)"
+          },
+          {
+            "text": "pwalign gap convention in the Skill is right (gapOpening = BLAST gapopen; global 10/1 = 286, local 11/1 = 285)",
+            "result": "PASS",
+            "note": "R via r.sh; Biostrings warning text matches the Skill's 'still works but warns'"
+          },
+          {
+            "text": "PairwiseAligner() defaults and the '55 gap positions in 37 blocks vs 9 in 5' claim reproduce",
+            "result": "PASS",
+            "note": "(1.0, 0.0, -1.0, -1.0); (55, 37, 9, 5)"
+          },
+          {
+            "text": "counts() recipe and percent-identity caveat are correct",
+            "result": "PASS",
+            "note": "identities/mismatches/gaps 65/75/9 == manual recount; PID1 43.6 (needle) vs PID2 46.4, and the Skill says the recipe is 'similar to PID2'"
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "[regression] Local DNA alignment of a mutated real HBB segment inside a 1.15 kb synthetic sequence, plus strand recovery",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Executed 100% (input2_local_dna.py). Flanks SYNTHETIC (seed 7); the 150-nt segment is real NM_000518.5 with 5 planted substitutions and a 3-nt deletion.",
+        "executed": true,
+        "execution_note": "Executed 100% (input2_local_dna.py). Flanks SYNTHETIC (seed 7); the 150-nt segment is real NM_000518.5 with 5 planted substitutions and a 3-nt deletion.",
+        "basic": 35,
+        "specialized": 54,
+        "total": 89,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Local score equals independent Gotoh DP and the hand-derived planted-alignment score (268)",
+            "result": "PASS",
+            "note": "268.0 == 268.0 == 142*2 - 5 - 11"
+          },
+          {
+            "text": "Aligned span and counts match the planted segment",
+            "result": "PASS",
+            "note": "target 600..750; identities 142, mismatches 5, gaps 3"
+          },
+          {
+            "text": "Biopython local 10/1 equals parasail sw_scan 10/1",
+            "result": "PASS",
+            "note": "267.0 vs 267"
+          },
+          {
+            "text": "The Skill's strand recipe works on a flipped read",
+            "result": "PASS",
+            "note": "revcomp 34.5 vs forward 268.0; best-of-both recovers 268.0"
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "[regression] Semiglobal fragment placement, length mismatch, and every 'Input Checks' bullet",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Executed 100% (input3_edge_semiglobal.py). Reference SYNTHETIC (seed 11); CDS data real. One assertion fails: the '30-nt exact match 60, reverse complement 0' numbers.",
+        "executed": true,
+        "execution_note": "Executed 100% (input3_edge_semiglobal.py). Reference SYNTHETIC (seed 11); CDS data real. One assertion fails: the '30-nt exact match 60, reverse complement 0' numbers.",
+        "basic": 35,
+        "specialized": 53,
+        "total": 88,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Both semiglobal snippets run as written (warnings as errors) and give 40.0 / [[300, 320]]; swapped order gives the -279 the Skill quotes",
+            "result": "PASS",
+            "note": "mutated fragment 25.0 == independent semiglobal DP"
+          },
+          {
+            "text": "Every Input Checks ValueError / silent-accept bullet reproduces on Biopython 1.88",
+            "result": "PASS",
+            "note": "lowercase, newline, J, U, NUC.4.4+U, empty; *, XBZ, SeqRecord accepted; match/mismatch aligner four mismatches"
+          },
+          {
+            "text": "The internal-stop expression flags NM_001314043.1 and none of the six clean CDS",
+            "result": "PASS",
+            "note": "1 of 7 flagged"
+          },
+          {
+            "text": "The deprecated query_left/right_* names are accepted with a DeprecationWarning and give the same result",
+            "result": "PASS",
+            "note": "score 40.0; 'was renamed' warning"
+          },
+          {
+            "text": "The strand bullet's numbers reproduce ('30-nt exact match scored 60, reverse complement 0')",
+            "result": "FAIL",
+            "note": "60 reproduces; reverse complement does not score 0 in local mode (median 17.5, max 29 over 50 random 30-mers). Qualitatively right (strand-specific), number sequence-specific"
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "[regression] Is HBA/HBB significant? Empirical p-values with the Skill's own example on related, distant and unrelated real pairs",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Executed 100% (input4_significance.py imports a copy of examples/empirical_pvalue.py). ushuffle (DNA dinucleotide shuffle named by the Skill) not executed: pip build fails on Windows and in WSL.",
+        "executed": true,
+        "execution_note": "Executed 100% (input4_significance.py imports a copy of examples/empirical_pvalue.py). ushuffle (DNA dinucleotide shuffle named by the Skill) not executed: pip build fails on Windows and in WSL.",
+        "basic": 35,
+        "specialized": 53,
+        "total": 88,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Skill's empirical_pvalue.py is deterministic (identical p and null on rerun, seed 42)",
+            "result": "PASS",
+            "note": "3 of 3 pairs identical"
+          },
+          {
+            "text": "Results fall in the Skill's bit-score bands: related 115 bits likely homology, distant 47 possible, unrelated 17 not significant (p 0.248)",
+            "result": "PASS",
+            "note": "p 0.001 / 0.001 / 0.248"
+          },
+          {
+            "text": "Karlin-Altschul bits agree with BLASTP and the shuffled null agrees with NCBI lambda",
+            "result": "PASS",
+            "note": "115.5 bits vs blastp 114; lambda 0.262 vs 0.267"
+          },
+          {
+            "text": "The DNA path is honest: preserve='di' refuses and points to ushuffle rather than faking a dinucleotide shuffle",
+            "result": "PASS",
+            "note": "NotImplementedError raised"
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "[regression] Library-selection table re-measured: parasail, edlib, pywfa, mappy on long synthetic DNA, saturation, every Skill snippet",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Executed 100% on Windows (parasail, edlib) and WSL (all four, plus the SKILL.md extraction harness). All DNA SYNTHETIC (seeds 4/5/9/3/21) except the real HBB CDS used by the harness.",
+        "executed": true,
+        "execution_note": "Executed 100% on Windows (parasail, edlib) and WSL (all four, plus the SKILL.md extraction harness). All DNA SYNTHETIC (seeds 4/5/9/3/21) except the real HBB CDS used by the harness.",
+        "basic": 36,
+        "specialized": 54,
+        "total": 90,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Every Verified snippet reproduces its own comment: parasail == Biopython, edlib == -Levenshtein, pywfa == Biopython gap-affine, mappy hits the planted locus",
+            "result": "PASS",
+            "note": "harness 6/6 assertions PASS in WSL"
+          },
+          {
+            "text": "Cross-library agreement at scale: 1000/1000 pairs for parasail and edlib",
+            "result": "PASS",
+            "note": "1000 == 1000"
+          },
+          {
+            "text": "Measured speed ranges hold within run-to-run variation (parasail 1.7-3.9x at 300 nt, edlib 14-27x, 20 kb edlib 437x)",
+            "result": "PASS",
+            "note": "Windows and WSL, min of 3 runs"
+          },
+          {
+            "text": "The saturation warning is real: fixed-width nw_striped_16 silently returns 0 on a 20 kb pair; the _sat variant is correct",
+            "result": "PASS",
+            "note": "0 with saturated=True vs 35644"
+          },
+          {
+            "text": "edlib alphabet and mode claims: works on protein; HW mode = query anywhere in target",
+            "result": "PASS",
+            "note": "15 == 15; HW 2 == 2"
+          }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "[regression] Human vs cow HBB CDS for dN/dS (protein first, back-translate), the internal-stop trap, and a many-vs-many request",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Executed 100% (input6_scope.py, input6_pal2nal.py, input6_pal2nal_mafft.py, input6_mmseqs.sh). Real RefSeq CDS and UniProt. The Skill names PAL2NAL and MMseqs2 but ships no command, so the auditor wrote both.",
+        "executed": true,
+        "execution_note": "Executed 100% (input6_scope.py, input6_pal2nal.py, input6_pal2nal_mafft.py, input6_mmseqs.sh). Real RefSeq CDS and UniProt. The Skill names PAL2NAL and MMseqs2 but ships no command, so the auditor wrote both.",
+        "basic": 33,
+        "specialized": 48,
+        "total": 81,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "DNA-vs-protein routing is right on real orthologs (nucleotide identity 87% > 70% -> DNA is fine) and protein-first back-translation is frame-consistent",
+            "result": "PASS",
+            "note": "441 codon columns; re-translation equals the protein row"
+          },
+          {
+            "text": "The internal-stop warning is correct on the realistic MAFFT + PAL2NAL route (rabbit NM_001314043.1 gives empty output, exit 0)",
+            "result": "PASS",
+            "note": "0 records vs 2 records for the control"
+          },
+          {
+            "text": "The many-vs-many route (MMseqs2) is supported by a real run and the Skill does not loop DP over a database",
+            "result": "PASS",
+            "note": "54 rows; HBA->HBB bits 115"
+          },
+          {
+            "text": "Skill's escape hatch is correct: 'alignment exists' is not the homology gate, E-value/bit score is",
+            "result": "PASS",
+            "note": "MMseqs2 E 3e-34 for the true homolog"
+          },
+          {
+            "text": "The Skill supplies runnable commands for the tools it routes to (PAL2NAL, MMseqs2, needle/water, HHsearch)",
+            "result": "FAIL",
+            "note": "names only, no command lines or flags; the auditor wrote all three"
+          }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "[regression] pairwise2, aligner.max_alignments, EMBOSS-style percent identity, IUPAC DNA, algorithm names, R, printed output block",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Executed 100% (input7_adversarial.py, input7_R_biostrings.R, run_examples.py). Every pre-fix defect in this input is gone.",
+        "executed": true,
+        "execution_note": "Executed 100% (input7_adversarial.py, input7_R_biostrings.R, run_examples.py). Every pre-fix defect in this input is gone.",
+        "basic": 36,
+        "specialized": 54,
+        "total": 90,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "pairwise2 is flagged deprecated but present and agrees with PairwiseAligner",
+            "result": "PASS",
+            "note": "292.5 == 292.5"
+          },
+          {
+            "text": "max_alignments handling is correct: attribute absent (AttributeError), OverflowError on len(), islice works; the guide no longer tells the agent to set it",
+            "result": "PASS",
+            "note": "grep of SKILL.md and usage-guide.md clean"
+          },
+          {
+            "text": "Percent-identity definitions match EMBOSS and pwalign",
+            "result": "PASS",
+            "note": "43.6 / 46.4 / 45.8 / 45.0"
+          },
+          {
+            "text": "NUC.4.4 IUPAC claims, 30-matrix listing, six algorithm names and the printed output block are accurate",
+            "result": "PASS",
+            "note": "score 35.0 == hand sum; name sets equal; output block equals real output"
+          },
+          {
+            "text": "All five shipped examples run from a copy and print checked values; the affine-vs-linear demo now differs (86.0 vs 84.0)",
+            "result": "PASS",
+            "note": "alignment_from_file.py 26.0 == independent 26.0"
+          }
+        ]
+      },
+      {
+        "index": 8,
+        "type": "Variant B",
+        "label": "[NEW] PKA (1ATP) vs CDK2 (1HCK): distant real kinase pair, gap convention verified on a pair the fixer never used",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Executed 100% (input8_kinase_conv.py, input8_ground_truth.sh, input8_R_pwalign.R). Real PDB SEQRES from public-data; nothing synthetic.",
+        "executed": true,
+        "execution_note": "Executed 100% (input8_kinase_conv.py, input8_ground_truth.sh, input8_R_pwalign.R). Real PDB SEQRES from public-data; nothing synthetic.",
+        "basic": 37,
+        "specialized": 56,
+        "total": 93,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Global -11/-1 = 124 equals needle 11/1, pwalign 10/1 and an independent Gotoh; -10/-0.5 = 186.5 equals needle",
+            "result": "PASS",
+            "note": "four tools agree"
+          },
+          {
+            "text": "The Skill's central fix holds on a new pair: BLASTP 11/1 = Biopython -12/-1 (local 222 = blastp raw 222, same HSP) and water 12/1 = 222",
+            "result": "PASS",
+            "note": "blastp 222 q40-244 s1-209"
+          },
+          {
+            "text": "-11/-1 is EMBOSS 11/1, not BLASTP: local -11/-1 = 228 = water 11/1 = pwalign 10/1",
+            "result": "PASS",
+            "note": "228 == 228 == 228"
+          },
+          {
+            "text": "pwalign conversion (gapOpening = BLAST gapopen) is right",
+            "result": "PASS",
+            "note": "global 10/1 124, local 11/1 222"
+          },
+          {
+            "text": "Identity band and significance guidance fit a real distant homolog pair: pid2 29.1% (25-40% row), 90 bits 'likely homology', empirical p at the floor",
+            "result": "PASS",
+            "note": "K-A bits 90.1 == blastp 90.1"
+          }
+        ]
+      },
+      {
+        "index": 9,
+        "type": "Edge",
+        "label": "[NEW] Six real mammal HBB CDS: DNA global scores vs EMBOSS needle, DNA-vs-protein table, unknown-strand read placement",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Executed 100% in WSL (input9_real_dna.py). Real RefSeq CDS; rabbit HBB2 excluded here (covered in input 6).",
+        "executed": true,
+        "execution_note": "Executed 100% in WSL (input9_real_dna.py). Real RefSeq CDS; rabbit HBB2 excluded here (covered in input 6).",
+        "basic": 35,
+        "specialized": 54,
+        "total": 89,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "NUC.4.4 global -10/-0.5 equals EMBOSS needle EDNAFULL 10/0.5 on all five ortholog pairs and an independent Gotoh DP",
+            "result": "PASS",
+            "note": "5/5 equal"
+          },
+          {
+            "text": "The Skill's DNA-vs-protein table fits real orthologs (all nucleotide identities > 70%)",
+            "result": "PASS",
+            "note": "min 85.2%"
+          },
+          {
+            "text": "The Skill's strand recipe (score seq and its reverse complement, keep the higher) reproduces the un-flipped score and locus",
+            "result": "PASS",
+            "note": "183.0 == 183.0; 126..246"
+          },
+          {
+            "text": "The wrong orientation scores far lower and edlib HW independently finds the same locus",
+            "result": "PASS",
+            "note": "28.5 vs 183.0; edlib 126..245"
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 32.8,
+    "dynamic_weighted": 53.3,
+    "score": 86,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Every headline fix reproduces against independent tools on two different protein pairs: BLASTP 11/1 = Biopython -12/-1 (blastp raw 285 and 222, identical HSPs), -11/-1 = EMBOSS 11/1, pwalign gapOpening = BLAST gapopen",
+    "New Verified snippets for parasail, edlib, pywfa and mappy all reproduce their own comments; the 16-bit saturation trap is real and correctly warned about",
+    "Input Checks section is accurate line by line (ValueErrors, silent accepts, strand, internal-stop CDS that really does make PAL2NAL return empty output via MAFFT)",
+    "Deduplicated usage-guide.md lost nothing the agent needs; all five shipped examples run from a copy and the affine-vs-linear demo now differs",
+    "Clear escape hatches: identity-band table, MMseqs2/jackhmmer/Foldseek routing, E-value as the homology gate"
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "SKILL.md is 449 lines / 28 KB with no references/ split",
+      "observed_in": [],
+      "problem": "The guide grew from 402 to 449 lines; the gap-convention table, library table, significance theory and BLAST flags all load up front.",
+      "root_cause": "All depth lives in one file and the fix added content to it.",
+      "fix": "Move Statistical Significance, Pairwise Library Selection and When Alignment Is NOT Appropriate into references/ files loaded on demand; keep the aligner recipes and gap-convention table in SKILL.md."
+    },
+    {
+      "priority": "P2",
+      "title": "Routed-to tools are named without command lines",
+      "observed_in": [
+        4,
+        6
+      ],
+      "problem": "PAL2NAL, MMseqs2 (easy-search / --num-iterations), EMBOSS needle/water and HHsearch are named but no flags or invocations are shown, and the DNA dinucleotide shuffle points at ushuffle with no code (ushuffle failed to build via pip on Windows and in WSL here).",
+      "root_cause": "The guide documents the Python path in depth and treats the CLI/R paths as one-line pointers.",
+      "fix": "Add a short CLI block: `needle -gapopen 11 -gapextend 1 ...`, `water ...`, `mmseqs easy-search ...`, `pal2nal.pl prot.aln nuc.fa -output fasta`, with a note that pal2nal exits 0 with empty output on inconsistent input; say how to install ushuffle or give a short dinucleotide-shuffle function."
+    },
+    {
+      "priority": "P2",
+      "title": "Strand bullet quotes a sequence-specific number",
+      "observed_in": [
+        3
+      ],
+      "problem": "'a 30-nt exact match scored 60, reverse complement 0' reproduces the 60 but not the 0: over 50 random 30-mers the local score of the reverse complement had median 17.5 and max 29.",
+      "root_cause": "A single example sequence was generalised.",
+      "fix": "Say 'the reverse complement scores far lower (typically under half)'; keep the score-both-strands recipe, which was verified."
+    },
+    {
+      "priority": "P2",
+      "title": "'edlib returns edit distance only' is misleading",
+      "observed_in": [
+        5
+      ],
+      "problem": "edlib.align(..., task='path') returns a CIGAR and alignment (verified); its scoring is unit-cost edit distance, which is what the sentence means.",
+      "root_cause": "Wording conflates the scoring model with the output.",
+      "fix": "Reword to 'unit-cost edit distance scoring only (no matrix, no affine gaps); task=\"path\" returns the alignment'."
+    },
+    {
+      "priority": "P2",
+      "title": "Description omits common trigger phrases",
+      "observed_in": [],
+      "problem": "The description says 'pairwise sequence alignment' but not Needleman-Wunsch, Smith-Waterman, semiglobal, percent identity, needle/water, or 'reverse complement'.",
+      "root_cause": "Description was not touched by the fix.",
+      "fix": "Add those terms to the frontmatter description."
+    }
+  ]
+}

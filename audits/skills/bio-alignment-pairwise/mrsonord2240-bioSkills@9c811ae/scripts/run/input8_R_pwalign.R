@@ -1,0 +1,8 @@
+# pwalign gap-convention check on the PKA/CDK2 pair (Skill: pwalign gapOpening = BLAST gapopen; global 10/1 == needle 11/1; local 11/1 == blastp raw)
+suppressPackageStartupMessages({library(pwalign); library(Biostrings)})
+fa <- readAAStringSet("F:/OpenScience/audits/bio-alignment-pairwise/run/data/kin.fasta")
+sc <- function(type, o, e) score(pairwiseAlignment(fa[[1]], fa[[2]], substitutionMatrix = "BLOSUM62", gapOpening = o, gapExtension = e, type = type))
+res <- c(global_10_1 = sc("global", 10, 1), local_11_1 = sc("local", 11, 1), local_10_1 = sc("local", 10, 1))
+print(res)
+stopifnot(res[["global_10_1"]] == 124, res[["local_11_1"]] == 222, res[["local_10_1"]] == 228)
+cat("PASS pwalign on PKA/CDK2: global 10/1 = 124 (= needle 11/1 = Biopython -11/-1); local 11/1 = 222 (= blastp raw = Biopython -12/-1); local 10/1 = 228 (= water 11/1)\n")
