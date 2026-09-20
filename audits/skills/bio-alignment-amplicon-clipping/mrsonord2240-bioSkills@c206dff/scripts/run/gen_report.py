@@ -1,0 +1,156 @@
+"""Builds eval_report_bio-alignment-amplicon-clipping_result.json from the scores decided in the audit and self-checks
+the schema's Pre-Emit Checklist. Windows python, utf-8."""
+import json, os, sys
+A = r"F:\OpenScience\audits\bio-alignment-amplicon-clipping"
+NAME = "bio-alignment-amplicon-clipping"
+
+def a(text, ok, note): return {"text": text, "result": "PASS" if ok else "FAIL", "note": note}
+
+inputs = [
+ dict(index=1, type="Canonical", label="Real ARTIC v5.3.2 nanopore BAM: Skill's basic workflow verbatim", status="COMPLETED", status_flag="⚠️",
+  note="Executed on real data. Every clip is correct against a BED-derived oracle and calmd MD/NM are exact, but the recommended --strand leaves the 3' primer footprint in 97.5% of full-length reads and the Skill has no check that says so.",
+  executed=True, execution_note="run/i1_real_artic.sh, i1_check.py, i1b_ivar_compare.sh, i1c_modes.sh, i1d_residual.py; samtools 1.24, pysam 0.24.1, iVar 1.4.4.",
+  basic=30, specialized=43, assertions=[
+   a("Every clipped forward read starts exactly at a '+' primer end and every clipped reverse read ends at a '-' primer start (BED-derived oracle)", True, "2353/2353 forward and 2471/2471 reverse clipped reads match; 0 bad"),
+   a("calmd MD and NM equal an independent recomputation from reference, CIGAR and SEQ", True, "0 MD and 0 NM mismatches over 4916 reads; raw ampliconclip output had removed NM and MD on all 4916"),
+   a("Final BAM is coordinate-sorted, indexed and keeps every record", True, "sort -n | fixmate -m | sort then calmd; index OK; 4916 in, 4916 out"),
+   a("No primer-derived bases remain at either end of the read after the Skill's recommended strand-aware run", False, "97.5% (4793/4916) of reads still have the 3' end inside an opposite-strand primer footprint under --strand; 0% under --both-ends"),
+   a("Result agrees with an independent tool (iVar trim) on the same reads", False, "--strand vs iVar: 114/4824 identical (name,flag,pos,cigar); --both-ends vs iVar: 4674/4909 (95%)"),
+  ]),
+ dict(index=2, type="Variant A", label="Synthetic paired-end panel through the shipped example script, planted SNP under a primer", status="COMPLETED", status_flag="✅",
+  note="Executed from a copy. 800/800 reads match planted truth in every mode, TLEN/MPOS/MC/ms repaired, planted SNP VAF 0.50 to 1.00, markdup marks 89% of reads.",
+  executed=True, execution_note="run/make_synth.py (SYNTHETIC data), i2_synth.sh, i2_check.py; shipped examples/ampliconclip_workflow.sh run from run/out/i2/skillcopy.",
+  basic=36, specialized=54, assertions=[
+   a("Clipped read boundaries equal the planted primer boundaries in default, --strand, --both-ends, --both-ends --strand, --hard-clip and the shipped example", True, "800/800 in all six runs (jittered 5' starts inside the 5-base tolerance included)"),
+   a("Mate fields repaired after clipping (MPOS, TLEN, MC, ms)", True, "0 bad MPOS, 0 bad TLEN, MC equals mate CIGAR, ms present, for every mode"),
+   a("calmd MD/NM equal independent recomputation, including hard-clipped reads", True, "0 mismatches in all six outputs"),
+   a("Planted variant under a primer is recovered after clipping", True, "pos310 T:100/C:100 before, T:100 after; pos335 A:100/G:100 before, G:100 after"),
+   a("Skill's claim that markdup on an amplicon BAM marks essentially every read is reproduced", True, "710/800 (88.8%) marked duplicate on 5'-jittered synthetic pairs"),
+  ]),
+ dict(index=3, type="Edge", label="--strand / --both-ends semantics and the Skill's own BED format (synthetic reads)", status="PARTIAL", status_flag="❌",
+  note="Executed. The 'both-ends overrides strand' claim is contradicted by behaviour, the strand-bias diagnosis is inverted, and the Skill's 5-column BED example makes --strand fail.",
+  executed=True, execution_note="run/i3_strand_cases.py + i3_strand_cases.sh: 8 planted single-read geometries x 4 flag sets, plus the 5-column BED.",
+  basic=27, specialized=32, assertions=[
+   a("Without --strand a reverse read whose 5' end sits in a '+' primer is clipped (off-strand over-clipping, as the Skill states)", True, "c1: default 251:50M10S, --strand 251:60M"),
+   a("A '#' comment line at the top of the BED (as in the Skill's example) is accepted", True, "no parse error; run completes"),
+   a("--both-ends with --strand gives the same result as --both-ends alone (Skill: '--both-ends overrides --strand')", False, "c4 50M30S vs 75M5S, c5 50M15S vs 65M, c7 20S50M vs 70M; real ARTIC data 4830 vs 4817 forward-clipped reads. The man page says 'ignored'; the 1.24 binary does not ignore it"),
+   a("The Skill's BED example (5 columns, strand in column 5) works with --strand", False, "samtools ampliconclip --strand: 'Parsed 5 columns, but need at least 6', exit 1; the prose says column 6 while the example puts the strand in column 5"),
+   a("'Variant calls with strand bias at every amplicon end | Forgot --strand' is a consistent diagnosis", False, "forgetting --strand only adds off-strand clipping (c1); real data: 4834 clipped without vs 4824 with, so it cannot leave primer bases on one strand"),
+  ]),
+ dict(index=4, type="Variant B", label="Hard-clip archive copy, tool alternatives (iVar, fgbio ClipBam) and IUPAC consensus", status="COMPLETED", status_flag="✅",
+  note="Executed. Hard-clip, iVar and consensus claims verified against planted truth; fgbio ClipBam has no primer input at all and clips a fixed length, so it is not the BED-driven alternative the table implies.",
+  executed=True, execution_note="run/i4_tools.sh, i4_check.py (SYNTHETIC data); fgbio 4.1.1 side env, iVar 1.4.4, samtools consensus 1.24.",
+  basic=33, specialized=50, assertions=[
+   a("--hard-clip removes the primer bases from SEQ (irreversible) and downstream repair still works", True, "800/800 H-CIGAR reads, mean SEQ length 94.9 to 70.3, boundaries match truth, calmd MD/NM exact"),
+   a("'samtools consensus --config hiseq --ambig' after clipping returns the planted alleles; before clipping it emits IUPAC codes", True, "unclipped Y at 310 and R at 335; clipped T and G (planted ALT)"),
+   a("iVar trim gives the same boundaries as samtools ampliconclip on the same primer BED", True, "800/800 exactly match planted truth for both tools"),
+   a("fgbio ClipBam can consume a primer BED as the Tool Selection table implies", False, "0 of 101 help lines mention bed/primer/amplicon; the closest use (fixed 25-base 5' clip) matched truth for 632/800 (79%)"),
+   a("Soft clip keeps the trimmed bases in SEQ so the clip is reversible", True, "soft-clipped output: 800/800 reads byte-identical SEQ to the original, S ops in CIGAR (i4b_softseq.sh); ampliconclip --original also exists but is not mentioned"),
+  ]),
+ dict(index=5, type="Adversarial", label="Contig-name and reference mismatch driven through the shipped example script", status="PARTIAL", status_flag="❌",
+  note="Executed. With MT192765.1 reads and the MN908947.3 ARTIC BED the example exits 0 with 0 reads clipped; with the wrong FASTA calmd fails silently (stderr sent to /dev/null), exit 0, and the output BAM carries no MD tags.",
+  executed=True, execution_note="run/i5_failures.sh (F1-F5), i5b_f2_md.sh, real nf-core data.",
+  basic=19, specialized=23, assertions=[
+   a("Contig-name mismatch between BAM and primer BED is detected or warned about", False, "F1: example exit 0, 'Clipped BAM:' printed, TOTAL CLIPPED: 0, 200 records unchanged; nothing in the Skill says to compare contig names or check TOTAL CLIPPED"),
+   a("Wrong reference FASTA for calmd makes the workflow fail", False, "F2: exit 0, f2.bam + .bai written; calmd's '[bam_fillmd] fail to find sequence' is discarded by 2>/dev/null; output has 0 MD tags on 4916 reads"),
+   a("Final BAM carries MD/NM as the Skill promises", False, "F2 output: 0 MD, 7 NM of 4916"),
+   a("Example is safe on inputs: temp dir, quoted variables, input untouched, temp cleaned", True, "mktemp -d + trap cleanup, all variables quoted; identical record md5 across THREADS=4/1/4 runs"),
+   a("ampliconclip's own statistics reveal the no-op", True, "raw run prints 'TOTAL CLIPPED: 0' on stderr, but the example does not test it"),
+  ]),
+]
+for i in inputs:
+    i["total"] = i["basic"] + i["specialized"]
+    i["assertions_passed"] = sum(x["result"] == "PASS" for x in i["assertions"])
+    i["assertions_total"] = len(i["assertions"])
+
+cats = {
+ "functional_suitability": (8, 12, "Core clip/fixmate/calmd workflow verified correct on real and synthetic data; but the both-ends/strand override claim, the strand-bias diagnosis and the fgbio ClipBam row are wrong, the BED example fails with --strand, and ARTIC nanopore reads need --both-ends without saying so"),
+ "reliability": (5, 12, "Shipped example exits 0 on a contig mismatch and on a wrong calmd reference (stderr to /dev/null); no verification of clip counts or MD presence; input untouched and temp dir cleaned"),
+ "performance_context": (6, 8, "160-line SKILL.md with usage-guide.md repeating decision points and tips; workflow is linear (collate variant in the example is efficient)"),
+ "agent_usability": (9, 16, "Clear stepwise workflow but inconsistent between sections (strand col 5 vs col 6, --strand default vs example using --both-ends, override claim vs behaviour); no success assertion or expected output"),
+ "human_usability": (5, 8, "Natural trigger phrasing; brittle to the Skill's own BED format and silent on mismatched inputs"),
+ "security": (10, 12, "No credentials; variables quoted; mktemp/trap cleanup; no input checks on paths or contig names"),
+ "maintainability": (8, 12, "Three files with a clear split; one example, no test data or expected output, no version-specific notes for ampliconclip options"),
+ "agent_specific": (16, 20, "Precise trigger; deterministic and rerunnable; related-skill pointers exist (all targets found) but SKILL.md and usage-guide.md duplicate content; stop condition for markdup present, few others"),
+}
+cat_out = {k: {"score": v[0], "max": v[1], "note": v[2]} for k, v in cats.items()}
+static = sum(v[0] for v in cats.values())
+exec_avg = round(sum(i["total"] for i in inputs) / len(inputs), 1)
+sw = round(static * 0.4, 1); dw = round(exec_avg * 0.6, 1); score = int(round(sw + dw))
+grade = "Production Ready" if score >= 85 else "Limited Release" if score >= 75 else "Beta Only" if score >= 60 else "Reject"
+sym = {"Production Ready": "⭐", "Limited Release": "✅", "Beta Only": "⚠️", "Reject": "❌"}[grade]
+passed = sum(i["assertions_passed"] for i in inputs); total = sum(i["assertions_total"] for i in inputs)
+
+report = {
+ "source": "mrsonord2240/bioSkills@c206dff76d081a5126f8497fbabe10995c9b6026:alignment-files/alignment-amplicon-clipping",
+ "meta": {
+  "skill_name": NAME,
+  "description": "Trim PCR primers from aligned reads in amplicon-panel BAMs using samtools ampliconclip. Use when processing SARS-CoV-2 ARTIC, hereditary cancer panels, ctDNA hot-spot panels, or any amplicon assay where primer-derived bases would falsely confirm reference at primer footprints.",
+  "evaluated_on": "2026-09-20", "evaluator_version": "skill-auditor@1.0", "category": "Data Analysis", "execution_mode": "B",
+  "complexity": "Moderate", "n_inputs": 5, "inputs_executed": 5,
+  "environment": "WSL science env alignment-files: samtools 1.24, pysam 0.24.1, iVar 1.4.4, fgbio 4.1.1 (af-fgbio2); real data: nf-core ARTIC v5.3.2 nanopore BAM + primer BED, MN908947.3 FASTA, Illumina SARS-CoV-2 PE BAM; synthetic: run/data/ (labelled SYNTHETIC)",
+ },
+ "veto_gates": {
+  "skill_veto": {"gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS"},
+  "research_veto": {
+   "applicable": True, "gate": "PASS",
+   "scientific_integrity": {"result": "PASS", "detail": "No fabricated citations or numbers in outputs; the Grubaugh 2019 Genome Biol 20:8 (iVar) citation and the artic minion align_trim statement are correct"},
+   "practice_boundaries": {"result": "PASS", "detail": "Processing-tool Skill with no diagnostic or prescriptive content; hereditary-cancer and ctDNA panels are mentioned only as assay types"},
+   "methodological_ground": {"result": "PASS", "detail": "Core method (post-alignment primer soft-clip, then mate and MD/NM repair; never markdup amplicon BAMs) is sound and verified against planted truth; the strand/both-ends misstatements are tool-behaviour errors, recorded as P1, not a principled methodological fallacy"},
+   "code_usability": {"result": "PASS", "detail": "Every snippet and the shipped example ran from a copy on samtools 1.24 and produced asserted correct output on valid inputs (5/5 inputs executed); the 5-column BED example fails only with --strand and is recorded as P1"},
+  }},
+ "static_score": {"subtotal": static, "max": 100, "categories": cat_out},
+ "dynamic_score": {"execution_avg": exec_avg, "max": 100, "assertion_pass_rate": {"passed": passed, "total": total},
+                   "inputs": [{k: i[k] for k in ["index", "type", "label", "status", "status_flag", "note", "basic", "specialized", "total", "assertions_passed", "assertions_total", "assertions", "executed", "execution_note"]} for i in inputs]},
+ "final": {"static_weighted": sw, "dynamic_weighted": dw, "score": score, "max": 100, "grade": grade, "grade_symbol": sym,
+           "deployable": grade in ("Production Ready", "Limited Release"), "veto_override": False},
+ "key_strengths": [
+  "The core recipe (ampliconclip, sort -n | fixmate -m | sort, calmd -b, index) is correct: 4824/4824 real clips and 800/800 synthetic clips match BED-derived truth, TLEN/MPOS/MC/ms and MD/NM are exact afterwards",
+  "Verified 'why' claims: a planted SNP under a primer goes from VAF 0.50 to 1.00 after clipping, IUPAC codes disappear in samtools consensus --config hiseq --ambig, and markdup marks 89% of amplicon reads",
+  "Soft-clip default, hard-clip irreversibility, 0-based half-open BED, since-1.11 and the artic minion / iVar attribution notes are all accurate; every file the Skill points at exists",
+  "Deterministic and safe: identical record md5 across three runs and thread counts, quoted variables, mktemp workdir with trap cleanup, input never modified",
+ ],
+ "recommendations": [
+  {"priority": "P1", "title": "Shipped example succeeds silently on mismatched inputs", "observed_in": [5],
+   "problem": "With a BAM on MT192765.1 and an MN908947.3 primer BED the example exits 0 and reports 'Clipped BAM' with TOTAL CLIPPED: 0; with the wrong reference FASTA calmd fails, its stderr goes to /dev/null, and the output BAM has no MD tags at exit 0.",
+   "root_cause": "The example does no input checks and discards calmd's stderr; SKILL.md has no verification step.",
+   "fix": "In ampliconclip_workflow.sh compare BAM @SQ names with BED column 1 and the FASTA .fai and stop on no overlap, drop 2>/dev/null on calmd, and assert TOTAL CLIPPED > 0 and MD present (samtools view -c ... | grep -c MD:Z) before printing success. Add a 'Verify' step to SKILL.md."},
+  {"priority": "P1", "title": "'--both-ends overrides --strand' and the strand-bias diagnosis are wrong", "observed_in": [1, 3],
+   "problem": "On samtools 1.24 --both-ends --strand differs from --both-ends alone (synthetic c4, c5, c7; real ARTIC 4830 vs 4817 forward-clipped reads). The Common Errors row says forgetting --strand causes strand bias at every amplicon end, but forgetting it only adds off-strand clipping.",
+   "root_cause": "The override statement was copied from the samtools man page without being tested, and the error row has cause and remedy inverted.",
+   "fix": "State that --strand restricts which primers (by BED strand) can clip each read end, also with --both-ends, and give the tested outcomes. Rewrite the row: primer bases surviving at every amplicon end means the wrong or missing ampliconclip, tolerance too small, or 3' primers not clipped (--both-ends)."},
+  {"priority": "P1", "title": "ARTIC/long-read default (--strand) leaves the 3' primer in nearly all reads", "observed_in": [1],
+   "problem": "On the real ARTIC v5.3.2 nanopore BAM the recommended strand-aware run leaves 97.5% of reads with the 3' end inside a primer footprint (0% with --both-ends) and agrees with iVar on only 114 of 4824 reads (4674/4909 with --both-ends).",
+   "root_cause": "The <300 bp rule for --both-ends ignores read length; full-length long reads carry both primers regardless of amplicon size.",
+   "fix": "Make the --both-ends rule depend on whether reads span the whole amplicon (nanopore, long reads, read length >= amplicon), say ARTIC nanopore needs it, and add a check that counts reads with a 3' end still inside a primer."},
+  {"priority": "P1", "title": "Primer BED example is 5-column but --strand needs column 6", "observed_in": [3],
+   "problem": "The example puts the strand in column 5 (chr1 100 125 primer_1_F +); samtools ampliconclip --strand rejects it: 'Parsed 5 columns, but need at least 6', exit 1. The prose next to it says column 6.",
+   "root_cause": "Illustrative BED written without running it.",
+   "fix": "Replace with a real 6-column example (chrom, start, end, name, score, strand) and note that 7-column ARTIC BEDs are accepted."},
+  {"priority": "P1", "title": "fgbio ClipBam presented as a primer-trimming alternative", "observed_in": [4],
+   "problem": "fgbio 4.1.1 ClipBam has no BED, primer or amplicon option; it clips a fixed number of bases (matched planted truth on 79% of reads with a fixed 25-base clip) or overlapping mates.",
+   "root_cause": "Tool listed by association with mate-aware clipping, not checked against its options.",
+   "fix": "Remove ClipBam from the primer-trimming alternatives or describe it as fixed-length/overlap clipping for a different job; replace with a tool that does take a primer file."},
+  {"priority": "P2", "title": "Raw ampliconclip output is unsorted and unclipped reads are invisible", "observed_in": [1, 5],
+   "problem": "The Quick Reference command writes a BAM with SO:unknown that samtools index rejects ('Unsorted positions'); 92 reads (1.9%) with no matching primer pass through unclipped without mention, and --clipped, --tolerance, --fail, --primer-counts and --original are not covered. MD and NM are deleted by default, not stale.",
+   "root_cause": "Only the flags used in the workflow are documented; the man page caveats were not carried over.",
+   "fix": "Say the output must be re-sorted before indexing, document the unclipped-read count and --clipped/--tolerance/--primer-counts, and change 'invalidated' to 'removed by default (--keep-tag keeps them)'."},
+  {"priority": "P2", "title": "Duplicated content and one invalid pointer", "observed_in": [],
+   "problem": "usage-guide.md repeats SKILL.md's decision points and tips nearly verbatim; the pileup-generation pointer '-aa -A -d 600000 -B' is valid for samtools mpileup but bcftools mpileup rejects '-aa' ('Could not parse tag a').",
+   "root_cause": "Documents drifted apart and the flags were not run with both tools.",
+   "fix": "Keep decision points in one file and name the tool in the pointer."},
+ ],
+}
+# self-check (Pre-Emit Checklist)
+assert report["static_score"]["subtotal"] == sum(c["score"] for c in cat_out.values())
+for i in report["dynamic_score"]["inputs"]:
+    assert 3 <= len(i["assertions"]) <= 5 and i["assertions_passed"] == sum(x["result"] == "PASS" for x in i["assertions"])
+    assert i["basic"] + i["specialized"] == i["total"] and i["basic"] <= 40 and i["specialized"] <= 60
+assert len(report["dynamic_score"]["inputs"]) == report["meta"]["n_inputs"] == 5
+assert 2 <= len(report["key_strengths"]) <= 5
+order = {"P0": 0, "P1": 1, "P2": 2}
+assert [order[r["priority"]] for r in report["recommendations"]] == sorted(order[r["priority"]] for r in report["recommendations"])
+out = os.path.join(A, f"eval_report_{NAME}_result.json")
+with open(out, "w", encoding="utf-8", newline="\n") as f: json.dump(report, f, indent=2, ensure_ascii=False)
+print("static", static, "exec_avg", exec_avg, "score", score, grade, "assertions", passed, "/", total)
+print("L1 avg", sum(i["basic"] for i in inputs)/5, "L2 avg", sum(i["specialized"] for i in inputs)/5)

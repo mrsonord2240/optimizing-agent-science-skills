@@ -8,7 +8,47 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (77)
+## P1 (82)
+
+### `bio-alignment-amplicon-clipping` — Shipped example succeeds silently on mismatched inputs
+
+- Skill: 68, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/alignment-amplicon-clipping) · [viewer](skills/bio-alignment-amplicon-clipping/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 5
+- Problem: With a BAM on MT192765.1 and an MN908947.3 primer BED the example exits 0 and reports 'Clipped BAM' with TOTAL CLIPPED: 0; with the wrong reference FASTA calmd fails, its stderr goes to /dev/null, and the output BAM has no MD tags at exit 0.
+- Root cause: The example does no input checks and discards calmd's stderr; SKILL.md has no verification step.
+- Fix: In ampliconclip_workflow.sh compare BAM @SQ names with BED column 1 and the FASTA .fai and stop on no overlap, drop 2>/dev/null on calmd, and assert TOTAL CLIPPED > 0 and MD present (samtools view -c ... \| grep -c MD:Z) before printing success. Add a 'Verify' step to SKILL.md.
+
+### `bio-alignment-amplicon-clipping` — '--both-ends overrides --strand' and the strand-bias diagnosis are wrong
+
+- Skill: 68, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/alignment-amplicon-clipping) · [viewer](skills/bio-alignment-amplicon-clipping/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 1, 3
+- Problem: On samtools 1.24 --both-ends --strand differs from --both-ends alone (synthetic c4, c5, c7; real ARTIC 4830 vs 4817 forward-clipped reads). The Common Errors row says forgetting --strand causes strand bias at every amplicon end, but forgetting it only adds off-strand clipping.
+- Root cause: The override statement was copied from the samtools man page without being tested, and the error row has cause and remedy inverted.
+- Fix: State that --strand restricts which primers (by BED strand) can clip each read end, also with --both-ends, and give the tested outcomes. Rewrite the row: primer bases surviving at every amplicon end means the wrong or missing ampliconclip, tolerance too small, or 3' primers not clipped (--both-ends).
+
+### `bio-alignment-amplicon-clipping` — ARTIC/long-read default (--strand) leaves the 3' primer in nearly all reads
+
+- Skill: 68, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/alignment-amplicon-clipping) · [viewer](skills/bio-alignment-amplicon-clipping/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 1
+- Problem: On the real ARTIC v5.3.2 nanopore BAM the recommended strand-aware run leaves 97.5% of reads with the 3' end inside a primer footprint (0% with --both-ends) and agrees with iVar on only 114 of 4824 reads (4674/4909 with --both-ends).
+- Root cause: The <300 bp rule for --both-ends ignores read length; full-length long reads carry both primers regardless of amplicon size.
+- Fix: Make the --both-ends rule depend on whether reads span the whole amplicon (nanopore, long reads, read length >= amplicon), say ARTIC nanopore needs it, and add a check that counts reads with a 3' end still inside a primer.
+
+### `bio-alignment-amplicon-clipping` — Primer BED example is 5-column but --strand needs column 6
+
+- Skill: 68, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/alignment-amplicon-clipping) · [viewer](skills/bio-alignment-amplicon-clipping/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 3
+- Problem: The example puts the strand in column 5 (chr1 100 125 primer_1_F +); samtools ampliconclip --strand rejects it: 'Parsed 5 columns, but need at least 6', exit 1. The prose next to it says column 6.
+- Root cause: Illustrative BED written without running it.
+- Fix: Replace with a real 6-column example (chrom, start, end, name, score, strand) and note that 7-column ARTIC BEDs are accepted.
+
+### `bio-alignment-amplicon-clipping` — fgbio ClipBam presented as a primer-trimming alternative
+
+- Skill: 68, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/alignment-amplicon-clipping) · [viewer](skills/bio-alignment-amplicon-clipping/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 4
+- Problem: fgbio 4.1.1 ClipBam has no BED, primer or amplicon option; it clips a fixed number of bases (matched planted truth on 79% of reads with a fixed 25-base clip) or overlapping mates.
+- Root cause: Tool listed by association with mate-aware clipping, not checked against its options.
+- Fix: Remove ClipBam from the primer-trimming alternatives or describe it as fixed-length/overlap clipping for a different job; replace with a tool that does take a primer file.
 
 ### `bio-alignment-multiple` — Fix MUSCLE5 ensemble commands (-super5 has no .efa)
 
@@ -626,7 +666,23 @@ None open.
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (341)
+## P2 (343)
+
+### `bio-alignment-amplicon-clipping` — Raw ampliconclip output is unsorted and unclipped reads are invisible
+
+- Skill: 68, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/alignment-amplicon-clipping) · [viewer](skills/bio-alignment-amplicon-clipping/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 1, 5
+- Problem: The Quick Reference command writes a BAM with SO:unknown that samtools index rejects ('Unsorted positions'); 92 reads (1.9%) with no matching primer pass through unclipped without mention, and --clipped, --tolerance, --fail, --primer-counts and --original are not covered. MD and NM are deleted by default, not stale.
+- Root cause: Only the flags used in the workflow are documented; the man page caveats were not carried over.
+- Fix: Say the output must be re-sorted before indexing, document the unclipped-read count and --clipped/--tolerance/--primer-counts, and change 'invalidated' to 'removed by default (--keep-tag keeps them)'.
+
+### `bio-alignment-amplicon-clipping` — Duplicated content and one invalid pointer
+
+- Skill: 68, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/alignment-amplicon-clipping) · [viewer](skills/bio-alignment-amplicon-clipping/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: —
+- Problem: usage-guide.md repeats SKILL.md's decision points and tips nearly verbatim; the pileup-generation pointer '-aa -A -d 600000 -B' is valid for samtools mpileup but bcftools mpileup rejects '-aa' ('Could not parse tag a').
+- Root cause: Documents drifted apart and the flags were not run with both tools.
+- Fix: Keep decision points in one file and name the tool in the pointer.
 
 ### `bio-crispr-screens-copy-number-correction` — negative_control_sgrnas empty-dict case raises an undocumented ValueError
 
