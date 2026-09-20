@@ -1,10 +1,10 @@
 {
-  "skill_id": "bio-sashimi-plots",
+  "skill_id": "bio-splicing-qc",
   "version": "mrsonord2240-bioSkills@44ff43b",
   "source": {
     "repository": "mrsonord2240/bioSkills",
     "commit": "44ff43bb35e5741c3ddd3c003590e1f1da8a4a4b",
-    "path": "alternative-splicing/sashimi-plots",
+    "path": "alternative-splicing/splicing-qc",
     "author": "GPTomics",
     "author_url": "https://github.com/GPTomics",
     "license": "MIT",
@@ -13,7 +13,7 @@
       "repository": "GPTomics/bioSkills",
       "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
     },
-    "url": "https://github.com/mrsonord2240/bioSkills/tree/44ff43bb35e5741c3ddd3c003590e1f1da8a4a4b/alternative-splicing/sashimi-plots"
+    "url": "https://github.com/mrsonord2240/bioSkills/tree/44ff43bb35e5741c3ddd3c003590e1f1da8a4a4b/alternative-splicing/splicing-qc"
   },
   "audit": {
     "method": {
@@ -35,7 +35,7 @@
   "files": {
     "report": "report.json",
     "viewer": "viewer.md",
-    "fixes": "fixes.md",
-    "scripts": 37
+    "fixes": null,
+    "scripts": 57
   }
 }
