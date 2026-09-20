@@ -1,0 +1,532 @@
+{
+  "meta": {
+    "skill_name": "bio-reference-operations",
+    "description": "Generate consensus sequences and manage reference files using samtools. Use when creating consensus from alignments, indexing references, or creating sequence dictionaries.",
+    "source": "mrsonord2240/bioSkills@0d22089b40e9195801f3980b64fcbb24ed4e278f:alignment-files/reference-operations",
+    "evaluated_on": "2026-09-20",
+    "evaluator_version": "skill-auditor@1.0",
+    "audit_kind": "re-audit of the fixed Skill (third agent; first audit 74 Beta Only, fixer 0d22089)",
+    "category": "Data Analysis",
+    "execution_mode": "B",
+    "complexity": "Moderate",
+    "n_inputs": 8,
+    "n_inputs_note": "Moderate rule gives 5 (task types: reference index/dict, extraction, contig naming/CRAM identity, consensus). 5 regression inputs re-run the pre-fix inputs against the fixed text; 3 new inputs use planted truth of my own (planted.fa/planted.bam, seed 7; graded-allele fixture, seed 11; mixed mate/unmapped/CRAM header fixture).",
+    "executed": "8/8 executed; none was inspected only. One conditional prose claim was not reproduced and is not scored: that reheader on a CRAM warns \"Failed to populate reference\" when nothing resolves the renamed reference (no warning in any of my CRAM runs, which had M5 in the header).",
+    "pre_fix": {
+      "score": 74,
+      "grade": "Beta Only",
+      "static": 72,
+      "execution_avg": 74.6,
+      "assertions": "15/25",
+      "p1_open": 4,
+      "p2_open": 3
+    },
+    "environment": "WSL science, env alignment-files (audit-envs/alignment-files/TOOLS.md): samtools 1.24, bcftools 1.24, pysam 0.24.1, GATK 4.6.2.0, Picard 3.5.0 (af-picard3), minimap2 2.31. Windows Python only for network fetches and this builder."
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated data or citations. Every table figure I spot-checked matches real files fetched 2026-09-20 (UCSC hg38 455 contigs / 261 _alt, hg19 chrM 16,571, 1000G hs38DH 3,366 = 261 ALT + 2,385 decoy + 525 HLA + chrEBV, Broad fai identical, hs37d5, Ensembl top-level names, NCBI GRCh38/GRCh37 assembly reports, hg38 chrM sequence == Ensembl MT)."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "File-format and reference utility; no clinical or diagnostic content."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Majority vote is labelled pedagogical with the right reason; the pysam pileup filters are stated and reproduce (Q13, dup/secondary/QC-fail, overlap dedup 40 vs 80, max_depth 8000). Samtools vs bcftools consensus distinction, M5 identity, 0- vs 1-based coordinates all verified."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "Every Python block, all 15 samtools consensus command lines (r10_blocks.sh), the faidx/dict/subset/reheader/cache blocks (placeholders substituted) and prepare_reference.sh ran from copies of the shipped text; the bcftools consensus lines were exercised with equivalent commands (input 8). The reheader recipe is runnable but fails loudly on a full hg38 header (4 contigs get the name \"na\"); recorded as P1, not as unrunnable code."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 82,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 10,
+        "max": 12,
+        "note": "Completeness 3, Correctness 3, Appropriateness 4. Far more of the body is verified than before (tables, consensus flags, dict naming, Python consensus). Left: the reheader recipe fails on a full hg38 header (map emits \"na\"), -T is described as filling \"low coverage\" (it fills only zero-coverage columns), plain-gzip .gz references fail (bgzip never mentioned)."
+      },
+      "reliability": {
+        "score": 10,
+        "max": 12,
+        "note": "Fault tolerance 3, Error reporting 4, Recoverability 3. faidx error table matches real messages and exit codes; subset recipe stops on a missing contig; script exits 1 on no-arg/missing file and is idempotent. The reheader recipe leaves a 0-byte renamed.bam when it fails."
+      },
+      "performance_context": {
+        "score": 6,
+        "max": 8,
+        "note": "Token cost 3, Efficiency 3. One copy of every recipe now; SKILL.md grew 377 -> 456 lines, guide shrank 251 -> 53. The consensus and contig sections are dense but each line earns its place."
+      },
+      "agent_usability": {
+        "score": 14,
+        "max": 16,
+        "note": "Learnability 3, Consistency 4, Feedback design 3, Error prevention 4. min_depth is 3 everywhere, one -a description, explicit traps (--ambig required, omitted --het-fract is not 0.15, dict name rule, primary-only sed, ties). A few numbers are stated without the flag that produces them (chr22 1-vs-2 differences needs -d 3)."
+      },
+      "human_usability": {
+        "score": 6,
+        "max": 8,
+        "note": "Discoverability 3, Forgiveness 3. The description still names only consensus/indexing/dictionaries although the body (and the usage-guide prompts) now cover contig renaming, GRCh38 flavour, CRAM references and extraction. faidx auto-indexing and the error table forgive most slips."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "No credentials, every expansion quoted; a file name containing ; $( ) \" and a single quote went through prepare_reference.sh without executing anything. samtools dict -o overwrites an existing dict by design."
+      },
+      "maintainability": {
+        "score": 8,
+        "max": 12,
+        "note": "Modularity 3, Modifiability 3, Testability 2. Single copy of each snippet and dated version notes (checked: -T is in 1.22, instrument --config in 1.17, -aa in 1.18 per NEWS). Still no shipped test data or expected outputs; one script."
+      },
+      "agent_specific": {
+        "score": 17,
+        "max": 20,
+        "note": "Trigger precision 3, Progressive disclosure 3, Composability 4, Idempotency 4, Escape hatches 3. All 8 Related Skills paths resolve; pedagogical-only warning and not-polishing boundary kept; description under-triggers relative to the body."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 87.5,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 36,
+      "total": 39
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Prepare a reference for GATK/Picard: index, dict, chrom.sizes for 12 filename shapes",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "All claimed shapes load in GATK and Picard; only gaps are undocumented bgzip need and a Picard-specific over-statement (Picard 3.5.0 also accepts genome.fasta.dict).",
+        "basic": 35,
+        "specialized": 54,
+        "total": 89,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "prepare_reference.sh writes <name>.dict and <name>.chrom.sizes for .fa, .fasta, .fna, bgzipped .fa.gz/.fna.gz/.fasta.gz, dotted names, a name with a space, and a hostile name (; $( ) \" ')",
+            "result": "PASS",
+            "note": "dicts named genome.dict, ref.dict, ref2.dict, refz.dict, Homo_sapiens.GRCh38.dna.primary_assembly.dict, hg38.p14.v2.dict, my genome.dict"
+          },
+          {
+            "text": "GATK 4.6.2.0 HaplotypeCaller (VCF with #CHROM, no USER ERROR) and Picard 3.5.0 ValidateSamFile (\"No errors found\") load the result for all 9 claimed shapes plus .fas",
+            "result": "PASS",
+            "note": "noext and GENOME.FA are rejected by the tools themselves (\"not a supported reference file type\"), not by the Skill; negative control (old genome.fasta.dict only) reproduces the GATK USER ERROR"
+          },
+          {
+            "text": ".dict SN/LN/M5 equals an independent md5 of the upper-cased sequence in all 12 dicts; chrom.sizes exact; Picard-made dict identical on the planted N/IUPAC reference",
+            "result": "PASS",
+            "note": "37/37 checks in r1_check.py; r6 part A"
+          },
+          {
+            "text": "The \"Check Reference Setup\" block prints DICT: OK (derived name) for every shape and DICT: MISSING when only genome.fasta.dict exists",
+            "result": "PASS",
+            "note": "verbatim block, REF substituted"
+          },
+          {
+            "text": "Error paths exit 1 with a message (no argument, missing file, plain-gzip .gz); re-run is byte-identical",
+            "result": "PASS",
+            "note": "plain gzip fails with samtools \"please use bgzip\"; neither the Skill nor the script usage line mentions bgzip (P2)"
+          }
+        ],
+        "executed": true,
+        "execution_note": "Ran in WSL (env alignment-files) from copies; outputs asserted on content and cross-checked with a second method; scripts: r1_prepare.sh, r1_consume.sh, r1_check.py, r1c_picard_dict.sh",
+        "kind": "regression"
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Extract regions / revcomp / subset / pysam multi-region, error table",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Every extraction claim reproduces; error table now matches real tool messages.",
+        "basic": 36,
+        "specialized": 55,
+        "total": 91,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "faidx region, multi-region, whole contig and -i/--mark-strand output equal an independent 1-based inclusive slice of the FASTA (case and N run preserved)",
+            "result": "PASS",
+            "note": "synthetic 3-contig reference with widths 80/60/70, soft-mask, N run"
+          },
+          {
+            "text": "The faidx error table rows are true: wrong contig rc 1 \"Failed to fetch sequence in 22:1-100\"; missing FASTA rc 1; region past the end rc 0 \"Zero length sequence\"; auto-index without prior faidx",
+            "result": "PASS",
+            "note": "exact stderr strings match"
+          },
+          {
+            "text": "Subset recipe stops (rc 1, no subset.dict) on a missing contig and writes fai + 3-@SQ dict when contigs exist",
+            "result": "PASS",
+            "note": "chr3 absent -> chain rc 1; chr1 chr2 chrM -> LN 5000/3007/1000"
+          },
+          {
+            "text": "pysam blocks run verbatim; the multi-region loop clips to the contig end and skips an outside region without printing an empty record",
+            "result": "PASS",
+            "note": "skip message reads \"chr2:5001-3007\" (start > end), cosmetic"
+          },
+          {
+            "text": "Extracted sequences equal external truth: Ensembl REST chr20:1,400,001-1,500,000 (100,000 bp) and SARS-CoV-2 S gene (3,822 nt ATG...TAA)",
+            "result": "PASS",
+            "note": "24/24 checks in r2_extract.py"
+          }
+        ],
+        "executed": true,
+        "execution_note": "Ran in WSL (env alignment-files) from copies; outputs asserted on content and cross-checked with a second method; scripts: r2_extract.py",
+        "kind": "regression"
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "chr22 vs 22, GRCh38 flavour/contig tables against real files, reheader recipe (BAM, CRAM, VCF)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The tables the fixer rebuilt are right (the first audit had them wrong); the one recipe defect appears only on real full-header BAMs, which the fixer did not try.",
+        "basic": 30,
+        "specialized": 46,
+        "total": 76,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Contig-naming and GRCh38-flavour table entries match real files: UCSC hg38/hg19, 1000G hs38DH 3,366 = 261+2,385+525, Broad fai identical, hs37d5, Ensembl names (scaffolds = GenBank accessions), NCBI GRCh38/GRCh37 reports and README, hg38 chrM == Ensembl MT, hg19 chrM 16,571 bp different",
+            "result": "PASS",
+            "note": "independent parse of the fetched files; sequence compare for chrM"
+          },
+          {
+            "text": "Reheader recipe on the real chr22 BAM gives records identical except RNAME/RNEXT (5,644), identical mpileup, Picard \"No errors found\"; CRAM reheader decodes identical with -T; SA/XA keep old names and view -x removes them; bcftools annotate --rename-chrs works",
+            "result": "PASS",
+            "note": "36/36 script checks"
+          },
+          {
+            "text": "The documented block (assembly-report map -> awk -> reheader) runs on a BAM with the full hg38/hs38DH header (1000G HG00349)",
+            "result": "FAIL",
+            "note": "map.tsv gets \"chr11_KI270721v1_random na\" x4 (contigs without a RefSeq accession); reheader stops \"Duplicate entry na in sam header\", rc 1, 0-byte renamed.bam. Adding $7!=\"na\" fixes it (451 contigs renamed, records identical)"
+          },
+          {
+            "text": "The Check line (diff SN/LN vs .fai) prints OK for the matching reference and does not for wrong name, wrong length or wrong order",
+            "result": "PASS",
+            "note": "three mismatch cases produce a diff, no OK"
+          },
+          {
+            "text": "Rename claims about CRAM identity: a 1-base-different reference fails the decode with an MD5 mismatch",
+            "result": "PASS",
+            "note": "[E::cram_decode_slice] MD5 checksum reference mismatch"
+          }
+        ],
+        "executed": true,
+        "execution_note": "Ran in WSL (env alignment-files) from copies; outputs asserted on content and cross-checked with a second method; scripts: r3_contigs.py, r3b_mito.sh, r0_news.sh",
+        "kind": "regression"
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Consensus from real BAMs: SKILL commands, viral command, real-data agreement, version notes",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Real-data consensus behaves as documented; one statistic is quoted without the flag that produces it.",
+        "basic": 35,
+        "specialized": 53,
+        "total": 88,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The SKILL viral command runs verbatim: one record, no * ; with --show-del yes --show-ins no it is exactly the header LN (29,829) and every depth<10 column is N (or * at a deletion)",
+            "result": "PASS",
+            "note": "the nf-core Illumina test BAM has only 200 reads, so 29,810 of 29,829 columns are N"
+          },
+          {
+            "text": "ARTIC nanopore BAM: one 29,903 bp record, 99.98% identical to MN908947.3 over called bases",
+            "result": "PASS",
+            "note": "77 N"
+          },
+          {
+            "text": "Real 1000G HG00349 chr20 100 kb: samtools consensus and the majority vote agree at all 92,207 jointly called columns; differences from the Ensembl sequence 120 (1.3 per kb)",
+            "result": "PASS",
+            "note": "external truth = Ensembl REST sequence"
+          },
+          {
+            "text": "The sentence \"chr22 slice: 1 difference by majority vote and by -m simple --call-fract 0.5 --min-BQ 13, 2 by the default Bayesian mode\" reproduces with the options as printed",
+            "result": "FAIL",
+            "note": "with the options as printed (-d 1) simple gives 5 and Bayesian 4 differences; 1 and 2 need -d 3"
+          },
+          {
+            "text": "Version notes match the samtools NEWS: -T added in 1.22, instrument --config in 1.17, -aa in 1.18",
+            "result": "PASS",
+            "note": "ncbi/samtools_NEWS.md"
+          }
+        ],
+        "executed": true,
+        "execution_note": "Ran in WSL (env alignment-files) from copies; outputs asserted on content and cross-checked with a second method; scripts: r4_real_consensus.py, r0_news.sh",
+        "kind": "regression"
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Python build_consensus / compare_to_ref verbatim on real slices (the pre-fix 581-difference case)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The headline defect of the first audit is fixed and holds up on independent methods.",
+        "basic": 36,
+        "specialized": 55,
+        "total": 91,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "build_consensus returns exactly end-start characters and equals the samtools mpileup -B -Q13 majority (independent parser) at every column with depth>=3: 1,016 columns on chr22 and 92,318 on chr20; uncovered columns are N in place",
+            "result": "PASS",
+            "note": "pre-fix version returned 1,157 characters and 581 false differences"
+          },
+          {
+            "text": "compare_to_ref on chr22 == the samtools consensus -m simple -d 3 difference list [(3266,T,C)]; identical with an all-lower-case reference",
+            "result": "PASS",
+            "note": ""
+          },
+          {
+            "text": "compare_to_ref on the padded chr20 reference == direct diff against the independent Ensembl sequence (120 differences)",
+            "result": "PASS",
+            "note": "external truth"
+          },
+          {
+            "text": "The pysam pileup prose (Q<13 dropped, duplicates/secondary skipped, overlapping mates once, max_depth 8000) reproduces",
+            "result": "PASS",
+            "note": "overlap: 40 vs 80 with ignore_overlaps=False on planted pairs; 353,982 vs 670,370 pileup bases on the real PE BAM; 9,000 reads -> 8,000"
+          },
+          {
+            "text": "Deep columns (depth up to 2,532) are fully used (max_depth raised): called columns == mpileup depth>=3 columns",
+            "result": "PASS",
+            "note": "1016 == 1016"
+          }
+        ],
+        "executed": true,
+        "execution_note": "Ran in WSL (env alignment-files) from copies; outputs asserted on content and cross-checked with a second method; scripts: r4_real_consensus.py, r6_planted.py",
+        "kind": "regression"
+      },
+      {
+        "index": 6,
+        "type": "Adversarial",
+        "label": "NEW: planted-truth reference (N run, IUPAC R/Y, soft-mask, empty contig) and BAM (SNPs, hets, deletion, insertion, gap, edges, decoy reads)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Both consensus paths agree with planted truth; one wording defect on -T.",
+        "basic": 34,
+        "specialized": 52,
+        "total": 86,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "build_consensus (verbatim) equals an independent cigar-walk majority at all 6,000 columns: gap, edges, deleted columns N, DUP/secondary/Q5 decoys ignored, MAPQ-0 decoys outvoted",
+            "result": "PASS",
+            "note": "0 mismatches; het cols 700/900 follow the majority"
+          },
+          {
+            "text": "samtools consensus -a --show-del yes --show-ins no is 6,000 characters and equals the planted sample at every column with depth>=6 (SNPs incl. under the reference N run and R/Y, * at the 2-bp deletion, N over the gap and -d 3 zones); default output shows GTA after 4500 (length 6001)",
+            "result": "PASS",
+            "note": "samtools and the Python function agree at all 5,696 jointly called columns"
+          },
+          {
+            "text": "-a / -aa behaviour as documented: default only contigs with reads; -a pads ctgB to LN 1500; -aa adds the read-less ctgC as 800 N; ends are not padded without -a",
+            "result": "PASS",
+            "note": ""
+          },
+          {
+            "text": "The -T description (\"report ref base where consensus unavailable (low coverage; ... FASTA case)\") matches behaviour",
+            "result": "FAIL",
+            "note": "-T fills only zero-coverage columns (gap 1500-1799 -> reference). Columns below -d (depth 2 with -d 3; depth 25 with -d 30) and ambiguous columns stay N. The case claim is right."
+          },
+          {
+            "text": "prepare_reference.sh dict for the hostile reference: M5 = md5 of the upper-cased sequence (N and IUPAC kept), identical to Picard 3.5.0",
+            "result": "PASS",
+            "note": "compare_to_ref reports the 30 N-run and 2 IUPAC positions as differences (35 total) - unstated, sensible"
+          }
+        ],
+        "executed": true,
+        "execution_note": "Ran in WSL (env alignment-files) from copies; outputs asserted on content and cross-checked with a second method; scripts: make_planted.py, r6_planted.py",
+        "kind": "new"
+      },
+      {
+        "index": 7,
+        "type": "Edge",
+        "label": "NEW: mixed-mate BAM/CRAM with M5, rename recipe, name/length/order mismatches",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The recipe generalises to CRAM and awkward mate fields; contig-order mismatch is not mentioned by the Skill (silent).",
+        "basic": 34,
+        "specialized": 52,
+        "total": 86,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Recipe (verbatim awk + reheader + index) on a BAM with inter-contig mates, \"=\" mates, unmapped-with-position and fully unmapped reads: 100 records identical except RNAME/RNEXT; Picard \"No errors found\" against the renamed reference",
+            "result": "PASS",
+            "note": ""
+          },
+          {
+            "text": "CRAM made with -T (M5 in every @SQ): reheader rc 0, header M5 kept, decodes identically with the renamed reference; with the old-named reference it fails loudly",
+            "result": "PASS",
+            "note": "no \"Failed to populate reference\" warning appeared (M5 present, UR pointed at an existing file); the SKILL sentence is conditional and not scored"
+          },
+          {
+            "text": "The Check line does not print OK for a reference with different names, a 1-base-longer contig, or reordered contigs",
+            "result": "PASS",
+            "note": "Picard 3.5.0 ValidateSamFile and GATK CountReads accept the reordered reference silently, so the Check line is the only guard"
+          },
+          {
+            "text": "M5 advice: header M5 equals samtools dict M5 for the right reference and differs only for the 1-base-longer contig",
+            "result": "PASS",
+            "note": "a CRAM decode against the longer contig only WARNS (Header @SQ length mismatch) and decodes 100 records: the CRAM MD5 is per slice region"
+          }
+        ],
+        "executed": true,
+        "execution_note": "Ran in WSL (env alignment-files) from copies; outputs asserted on content and cross-checked with a second method; scripts: r7_rename_order.py",
+        "kind": "new"
+      },
+      {
+        "index": 8,
+        "type": "Variant B",
+        "label": "NEW: consensus-mode semantics on a graded-allele fixture (depth 20/60, minor 50%-5%) and bcftools consensus note",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Every documented flag statement the fixer added holds on data the fixer never saw.",
+        "basic": 37,
+        "specialized": 56,
+        "total": 93,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The -m simple rule (IUPAC iff --ambig and minor/major >= --het-fract; else base iff major/depth >= --call-fract; else N) predicts all 48 (het-fract x call-fract x ambig) outputs across 16 columns",
+            "result": "PASS",
+            "note": "independent predictor written before comparing"
+          },
+          {
+            "text": "Omitted --het-fract is not 0.15 (15% column plain base, explicit 0.15 gives Y); omitted behaves like 0.5-0.6; --call-fract default 0.75",
+            "result": "PASS",
+            "note": "matches SKILL \"always pass it explicitly\""
+          },
+          {
+            "text": "Bayesian mode: --het-fract/--call-fract byte-identical; no IUPAC without --ambig (the 13 ambiguous columns are N); --het-scale 0.01/1/100 gives 0/13/16 IUPAC calls; -A == --ambig",
+            "result": "PASS",
+            "note": ""
+          },
+          {
+            "text": "-d works in both modes; -a pads to LN, -aa == -a for a contig with reads; -T fills the uncovered soft-masked gap in lower case; FASTQ -l 0 gives 4 lines, default wrap 70",
+            "result": "PASS",
+            "note": ""
+          },
+          {
+            "text": "bcftools consensus: default writes IUPAC for unphased 0/1 and phased 0|1, 1|0; -H 1 / -H 2 pick haplotypes; -H A and -s - apply every ALT",
+            "result": "PASS",
+            "note": "bcftools 1.24 note text \"applying IUPAC codes based on FORMAT/GT\""
+          }
+        ],
+        "executed": true,
+        "execution_note": "Ran in WSL (env alignment-files) from copies; outputs asserted on content and cross-checked with a second method; scripts: r8_modes.py",
+        "kind": "new"
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 32.8,
+    "dynamic_weighted": 52.5,
+    "score": 85,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false,
+    "floors": {
+      "static>=80": true,
+      "exec>=85": true,
+      "L1>=32": true,
+      "L2>=48": true,
+      "assert>=90%": true
+    },
+    "layer1_avg": 34.6,
+    "layer2_avg": 52.9
+  },
+  "key_strengths": [
+    "The Python consensus defect is fixed and holds up: build_consensus equals a cigar-walk truth at all 6,000 planted columns and the samtools mpileup majority at 1,016 real chr22 and 92,318 real chr20 columns; compare_to_ref matches samtools consensus and Ensembl.",
+    "prepare_reference.sh derives <name>.dict correctly: GATK 4.6.2.0 HaplotypeCaller and Picard 3.5.0 loaded the output for every claimed filename shape, and a hostile file name executed nothing.",
+    "The rebuilt contig and GRCh38 tables match real files (UCSC, 1000G, Broad, hs37d5, Ensembl, NCBI reports, chrM sequences) and the reheader recipe gives records identical except RNAME/RNEXT on BAM and CRAM.",
+    "Consensus flag documentation (--het-fract/--call-fract/--ambig/--het-scale/-d/-a/-aa/-T case, bcftools IUPAC note, version notes) reproduced on a fixture the fixer never saw; usage-guide dedup lost nothing an agent needs."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "Reheader recipe fails on full hg38 headers (map emits \"na\")",
+      "observed_in": [
+        3
+      ],
+      "problem": "The UCSC->RefSeq map line keeps 4 contigs whose RefSeq column is \"na\" (chr11_KI270721v1_random, chr22_KI270734v1_random, chrUn_KI270752v1, chr10_KI270825v1_alt). On a hs38DH/UCSC header (1000G BAM) reheader stops with \"Duplicate entry na in sam header\" and leaves a 0-byte renamed.bam.",
+      "root_cause": "The recipe was verified only on a single-contig BAM.",
+      "fix": "Change the awk filter to $10!=\"na\" && $7!=\"na\" (tested: rc 0, 451 of 3,366 contigs renamed, records identical) and write reheader output to a temp name, mv on success."
+    },
+    {
+      "priority": "P2",
+      "title": "-T is described as filling low-coverage columns",
+      "observed_in": [
+        6,
+        8
+      ],
+      "problem": "-T fills only zero-coverage columns with the reference base (in FASTA case). Columns below -d or ambiguous stay N.",
+      "root_cause": "Wording \"consensus unavailable (low coverage; ...)\" was written without testing a depth-below--d column.",
+      "fix": "Say \"columns with no reads (depth 0)\"; add \"columns below -d and ambiguous columns stay N\"."
+    },
+    {
+      "priority": "P2",
+      "title": "Description omits contig renaming, extraction, CRAM references",
+      "observed_in": [
+        3,
+        7
+      ],
+      "problem": "The frontmatter still names consensus / indexing / dictionaries only, while the body and the usage-guide prompts now answer \"my BAM says chr22, reference says 22\" and \"which GRCh38 is this?\".",
+      "root_cause": "Description left untouched during the fix.",
+      "fix": "Add \"rename/match contig names (chr22 vs 22, GRCh38 flavours), extract regions, CRAM reference resolution\" to the description."
+    },
+    {
+      "priority": "P2",
+      "title": "bgzip requirement and test data are undocumented",
+      "observed_in": [
+        1
+      ],
+      "problem": "The script usage line and SKILL accept \".gz\", but plain-gzip FASTA (as downloaded from Ensembl/NCBI) fails in faidx (\"please use bgzip\") and the Skill never says so. There is still no shipped sample data or expected output.",
+      "root_cause": ".gz support was tested with bgzip only; test data was declined in the fix.",
+      "fix": "Add one line: \"gunzip -c x.fa.gz | bgzip > x.fa.gz2\" (or gzip -> bgzip) and a 3-line toy FASTA + expected .dict in examples/."
+    },
+    {
+      "priority": "P2",
+      "title": "Small stated-but-imprecise details",
+      "observed_in": [
+        1,
+        3,
+        4,
+        6
+      ],
+      "problem": "Picard 3.5.0 does accept genome.fasta.dict (only GATK ignores it); the chr22 \"1 vs 2 differences\" needs -d 3; the dict example shows UR:file:reference.fa but samtools writes an absolute file:/// URL; the UCSC->Ensembl sed one-liner rewrites non-primary contigs too (chr1_KI..._alt -> 1_KI..._alt); the multi-region skip message prints chr2:5001-3007; compare_to_ref reports reference N/IUPAC positions as differences and build_consensus writes N at deleted columns and ignores insertions without saying so.",
+      "root_cause": "Prose written from one tool or one run.",
+      "fix": "One clause each: name GATK for the ignored-dict sentence, add -d 3 to the chr22 sentence, show an absolute UR, restrict the sed to a chr1-22/X/Y/M pattern, print the unclipped end in the skip message, note the N/IUPAC and indel behaviour of the pedagogical functions."
+    }
+  ]
+}
