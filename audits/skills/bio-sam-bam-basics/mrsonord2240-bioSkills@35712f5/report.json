@@ -1,0 +1,537 @@
+{
+  "meta": {
+    "skill_name": "bio-sam-bam-basics",
+    "description": "View, convert, and understand SAM/BAM/CRAM alignment files using samtools and pysam. Use when inspecting alignments, converting between formats, or understanding alignment file structure.",
+    "evaluated_on": "2026-09-20",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Moderate",
+    "n_inputs": 8,
+    "source": "mrsonord2240/bioSkills@35712f5f1c1177aec6e6f1fab165b8c49a832aab:alignment-files/sam-bam-basics",
+    "audit_type": "re-audit of a fixed Skill (branch fix/af-sambam); pre-fix report 77, Beta Only, not deployable (archived at audits/_pre-fix-20260920/bio-sam-bam-basics)",
+    "tools": "samtools 1.24, htslib 1.24, pysam 0.24.1, bcftools 1.24, bwa 0.7.19, bwa-mem2, minimap2 2.31, bowtie2 2.5.5, hisat2 2.2.3, STAR 2.7.11b, fgbio 4.1.1, mapDamage 2.2.2 (WSL science, env alignment-files + side envs); Rsamtools 2.22.0 (Windows R via r.sh)",
+    "checks_executed": "303 asserted checks ran, 302 passed; the single failing check is the CRAM round-trip sentence (inputs 7 and 8)",
+    "floors_check": "Static 82 >= 80; execution avg 87.1 >= 85; Layer1 avg 34.5 >= 32; Layer2 avg 52.6 >= 48; assertion pass rate 36/39 = 92.3% >= 90 -> no downgrade",
+    "complexity_note": "Moderate: 4 files (SKILL.md, usage-guide.md, 2 examples), 3-5 task types; the rule gives 5 inputs. Run as 8: the 5 pre-fix inputs as regression tests plus 3 new inputs (multi-region vs full-scan truth; hand-written planted-truth SAM with view_bam.py matrix; CRAM reference states on a second real dataset).",
+    "pre_fix": {
+      "score": 77,
+      "grade": "Beta Only",
+      "static": 72,
+      "execution_avg": 80.4,
+      "assertion_pass": "19/25",
+      "deployable": false
+    }
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated identifiers, statistics or results. Unverified rows (DRAGEN, Cell Ranger/STARsolo, featureCounts/RSEM) are unmarked but are tool-behaviour statements, recorded as a P2, not fabrications."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "File-format tooling only; no diagnostic or prescriptive content."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "No principled methodological fallacy; the CRAM round-trip sentence is a correctness imprecision (P2)."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "Both shipped examples and every SKILL.md/usage-guide snippet, including fetch_regions() and the HPC cache recipe extracted verbatim, ran from a copy on samtools 1.24 / pysam 0.24.1 with asserted output."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 82,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 10,
+        "max": 12,
+        "note": "Completeness 4 / Correctness 3 / Appropriateness 3. Every promised use case now has a working recipe (multi-region added); 302 of 303 asserted checks hold. Correctness loses a point for the over-general CRAM round-trip sentence and unverified aligner/assay rows; SKILL.md carries MAPQ, tag and provenance tables beyond \"basics\"."
+      },
+      "reliability": {
+        "score": 9,
+        "max": 12,
+        "note": "Fault tolerance 3 / Error reporting 3 / Recoverability 3. view_bam.py handles no index, empty, unmapped-only, SAM, CRAM (with/without reference) and exits 1 with readable messages; convert_formats.sh guards input==output and missing CRAM reference. Left: raw ValueError on a non-numeric limit, header-only partial output left behind when samtools fails, pysam's \"truncated file\" wording for a missing CRAM reference."
+      },
+      "performance_context": {
+        "score": 6,
+        "max": 8,
+        "note": "Token cost 3 / Efficiency 3. usage-guide duplication removed (210 -> 53 lines), one copy of each fact; SKILL.md grew to 431 lines with no references/ layering."
+      },
+      "agent_usability": {
+        "score": 14,
+        "max": 16,
+        "note": "Learnability 4 / Consistency 3 / Feedback design 3 / Error prevention 4. Coordinates, MAPQ portability, CRAM reference, multi-region duplicates and secondary-vs-supplementary footguns are explicit with checked commands; example @PG IDs differ from real ones, and a few rows carry no verification marker."
+      },
+      "human_usability": {
+        "score": 6,
+        "max": 8,
+        "note": "Discoverability 3 / Forgiveness 3. Natural trigger wording; helper accepts any-case extensions and points at the CRAM reference; non-numeric limit still crashes."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "Credential 4 / Input validation 3 / Data safety 4. No secrets, no eval, variables quoted; the input==output guard closes the data-loss path found in the first audit; input existence is left to samtools."
+      },
+      "maintainability": {
+        "score": 9,
+        "max": 12,
+        "note": "Modularity 3 / Modifiability 3 / Testability 3. Facts live once; examples print checkable output; no shipped test data or expected outputs, and version-pinned claims (htslib 1.22 default) need re-verification when tools move."
+      },
+      "agent_specific": {
+        "score": 17,
+        "max": 20,
+        "note": "Trigger precision 3 / Progressive disclosure 3 / Composability 4 / Idempotency 4 / Escape hatches 3. Related Skills all exist; conversions deterministic and refuse to overwrite their input; no explicit when-not-to-use."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 87.1,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 36,
+      "total": 39
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Regression: inspect the real human PE BAM (header, FLAG decode, coordinates, counts, regions, view_bam.py, Rsamtools, usage-guide dedup)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "All 40 asserted checks pass (regress in1/in1b, dedup_check, misc_claims) + Rsamtools scanBam run; pre-fix defects (view_bam crash without an index, unlabelled 0-based rows, multi-region duplicates, unparseable SAM example) are gone.",
+        "basic": 35,
+        "specialized": 54,
+        "total": 89,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "FLAG decoding (samtools flags, 12-row table, 99/147 text, pysam is_* properties) equals an independent SAM-spec decoder; coordinate rules (POS = reference_start+1, view chr:a-b == fetch(a-1,b), faidx 1-based) hold on real reads",
+            "result": "PASS",
+            "note": "in1 + in1b + dedup_check + misc_claims: 40/40 pass (flagstat primary 5642 == view -c -F 2304; NM filter 5516 == pysam scan; r/rb/rc x SAM/BAM/CRAM all read 5644)"
+          },
+          {
+            "text": "Shipped examples/view_bam.py works on the canonical indexed BAM and on an UNINDEXED copy, with a labelled 0-based coordinate column",
+            "result": "PASS",
+            "note": "indexed: Mapped 5642 Unmapped 2 (from index); unindexed: same numbers (from scan); header row \"name chrom:start(0-based) strand cigar\""
+          },
+          {
+            "text": "Instructions degrade safely on multi-region, wrong contig and missing index and say so",
+            "result": "PASS",
+            "note": "view r1 r2 = 7356 rows vs 5426 truth as documented; wrong contig warning text and exit 0 as documented; missing index message as documented"
+          },
+          {
+            "text": "usage-guide dedup (210 -> 53 lines) lost nothing the agent needs",
+            "result": "PASS",
+            "note": "33/33 facts of the old guide still present in SKILL.md/usage-guide.md, 12/12 advertised prompts have a command or section, 9/9 claims the fix log calls removed are absent, both usage-guide pointers resolve; only \"Phred-scaled\", \"PL:ILLUMINA\", \"context manager\" wording dropped (judged immaterial)"
+          },
+          {
+            "text": "SAM example block and the R bullet work as written",
+            "result": "PASS",
+            "note": "SKILL.md SAM block extracted verbatim parses with samtools view -b and reads back as read1 chr1:100 8M; Rsamtools scanBam: 5644 records, pos 1952, flag 99, 130M13S"
+          }
+        ],
+        "executed": true,
+        "execution_note": "executed: 5644-record nf-core BAM read by samtools 1.24 + pysam 0.24.1 + Rsamtools 2.22.0 (r.sh); every SKILL.md/usage-guide snippet and shipped example ran from the run/skill copy.",
+        "checks": {
+          "passed": 40,
+          "total": 40
+        }
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Regression: BAM<->SAM<->CRAM conversions with samtools, pysam and convert_formats.sh",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "All 40 checks pass; the helper now passes the reference for CRAM input, accepts .BAM, refuses input==output (same path, ./path, symlink) and exits non-zero without a usable reference.",
+        "basic": 35,
+        "specialized": 54,
+        "total": 89,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Every documented conversion (BAM->SAM->BAM->CRAM->BAM, pipe form) round-trips 5644 records with identical fields and tag sets",
+            "result": "PASS",
+            "note": "md5 of tag-sorted SAM text identical for o.bam, o.cram, o2.bam, pipe.bam; only tag ORDER differs after CRAM (5644 of 5644 tag sets identical, 2 orders identical), as SKILL.md says"
+          },
+          {
+            "text": "pysam conversions (w, wb, wc + reference_filename) preserve all records and the mode table is right",
+            "result": "PASS",
+            "note": "p.sam/p.bam/p.cram identical to original; 'r' reads a BAM; 'rc' with reference reads CRAM"
+          },
+          {
+            "text": "convert_formats.sh performs SAM->BAM, BAM->SAM, BAM->CRAM(+ref) and CRAM->BAM/SAM(+ref) correctly, including on the original nf-core CRAM whose header UR is dead",
+            "result": "PASS",
+            "note": "h3.bam/h3.sam identical to the original 5644 records; without the reference: rc 1, no silent success"
+          },
+          {
+            "text": "Helper guards: uppercase .BAM works; input==output (same path, ./path, symlink) exits 1 and leaves the input at 5644 records; missing input and missing CRAM reference exit non-zero",
+            "result": "PASS",
+            "note": "rc=1, rc2=1, rc3=1 with 5644 records intact each time; h5.BAM identical to the original"
+          },
+          {
+            "text": "Format statements hold: SAM > BAM > CRAM in size; header preserved; CRAM without -T warns and embeds",
+            "result": "PASS",
+            "note": "sizes ordered; @SQ M5/UR added at CRAM write; -C without -T exit 0 with embed_ref=2 warning"
+          }
+        ],
+        "executed": true,
+        "execution_note": "executed: real BAM/CRAM (CRAM UR path dead, REF_PATH empty, so only the 3rd argument can resolve it); 5644 records compared as SAM text with sorted tags.",
+        "checks": {
+          "passed": 40,
+          "total": 40
+        }
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Regression: synthetic edge SAM (unmapped-with-position, secondary/supplementary, hard/soft clips, N, MAPQ 255/0, 66,000-op CIGAR, empty BAM)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "All 48 checks pass; view_bam.py now labels unmapped rows (placed: ctgA:49 ... unmapped; unplaced: * ... unmapped) and handles an empty unindexed BAM.",
+        "basic": 35,
+        "specialized": 53,
+        "total": 88,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "CIGAR semantics stated by the Skill (N not covered, S kept in SEQ, H absent, M overloaded, =/X, P) match an independent spec model and pysam",
+            "result": "PASS",
+            "note": "r2_spliced: 50 covered positions vs span 1050; hard clip query_length 30 vs infer_read_length 50; P consumes neither"
+          },
+          {
+            "text": "Secondary vs supplementary arithmetic and flag bits hold",
+            "result": "PASS",
+            "note": "-F 256 = 14, -F 2304 = 13, -F 2048 = 14 on the 15-record BAM"
+          },
+          {
+            "text": "Unmapped-with-position, \"*\" SEQ/QUAL, MAPQ 255/0, mate fields, TLEN sign, 66,000-op CIGAR and empty BAM behave as the Skill says",
+            "result": "PASS",
+            "note": "placed unmapped returned by region query; \"* *\" printed; TLEN +90/-90; pysam sees 66000 ops; empty BAM 0 records"
+          },
+          {
+            "text": "Shipped view_bam.py copes with the edge inputs",
+            "result": "PASS",
+            "note": "empty unindexed and indexed BAM: Mapped 0 Unmapped 0; synthetic BAM: unmapped rows labelled, no None:-1; SAM input reads"
+          },
+          {
+            "text": "Skill alone answers the prompt (bases consumed per op, TLEN sign, unplaced vs placed unmapped)",
+            "result": "PASS",
+            "note": "consumption table + TLEN sentence present and correct"
+          }
+        ],
+        "executed": true,
+        "execution_note": "executed: synthetic (seeded) 15-record BAM built with samtools sort/index; independent CIGAR model from the SAM spec.",
+        "checks": {
+          "passed": 48,
+          "total": 48
+        }
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Regression: CRAM offline (resolution order, REF_CACHE recipe, proving a CRAM readable, archive lossless)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "All 36 checks pass; the corrected CRAM section now matches samtools 1.24: view -c does not decode, view -o /dev/null does, wrong reference is refused with MD5 mismatch.",
+        "basic": 35,
+        "specialized": 54,
+        "total": 89,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Resolution order -T > REF_CACHE > REF_PATH > @SQ UR and the seq_cache_populate.pl layout hold",
+            "result": "PASS",
+            "note": "poisoned-cache/poisoned-path/-T/UR experiments each behave in the stated order"
+          },
+          {
+            "text": "The recommended check `samtools view -o /dev/null f.cram && echo ok` fails (no \"ok\", rc 1) with the reference unreachable and prints ok when it is reachable; view -c / flagstat / idxstats / quickcheck pass without the reference",
+            "result": "PASS",
+            "note": "view -c 5644 rc 0, quickcheck rc 0, view -o /dev/null rc 1 \"Unable to fetch reference\"; stats fails; mid-file corruption: quickcheck rc 0 but full decode rc 1"
+          },
+          {
+            "text": "A different reference is refused, not silently accepted; silent only with ignore_md5=1",
+            "result": "PASS",
+            "note": "MD5 checksum reference mismatch rc 1; ignore_md5=1 rc 0 with different SEQ column"
+          },
+          {
+            "text": "htslib >= 1.22 does no network lookup by default; archive preset is lossless and smallest",
+            "result": "PASS",
+            "note": "no ebi/ena/proxy activity; libhts holds no ebi.ac.uk/ena/cram string; archive records identical to source, smallest profile"
+          },
+          {
+            "text": "view_bam.py on CRAM: indexed CRAM gives 5642/2, unreachable reference gives exit 1 with the reference hint, 3rd argument resolves it",
+            "result": "PASS",
+            "note": "Mapped 5642 Unmapped 2 (scan); \"Error reading ...: truncated file (CRAM needs its reference: pass reference.fa as the 3rd argument)\"; with 3rd arg rc 0"
+          }
+        ],
+        "executed": true,
+        "execution_note": "executed: real human CRAM plus CRAMs written here; 1.22+ network default checked with a bogus proxy and by inspecting libhts.",
+        "checks": {
+          "passed": 36,
+          "total": 36
+        }
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Regression: six aligners on a synthetic repeat genome (MAPQ scale, -q, tags, @PG chain, fixmate/markdup, failure-mode table)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "All 39 checks pass (in5, in5c mapDamage, tags_check). Table rows for DRAGEN, Cell Ranger/STARsolo, featureCounts/RSEM and pbmm2 could not be run and are stated as fact without a marker.",
+        "basic": 34,
+        "specialized": 51,
+        "total": 85,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "MAPQ table rows hold: bwa/bwa-mem2/minimap2 0-60 max 60, HISAT2 {0,1,60}, Bowtie2 max 42 (97.4% of records) and max 44 with --local (94.7%), STAR {0,1,3,255} with -q 30 == -q 255",
+            "result": "PASS",
+            "note": "histograms in out/in5.txt; Bowtie2 -q 60 keeps 0"
+          },
+          {
+            "text": "Tag/provenance rows hold: NM/MD from bwa, MC from bwa mem, ms in minimap2 unrelated to fixmate, cs with --cs, RX from fgbio AnnotateBamWithUmis, HI 1-based, @PG names the aligner",
+            "result": "PASS",
+            "note": "tags_check 6/6 and in5 tag checks pass"
+          },
+          {
+            "text": "The corrected failure-mode table is true: markdup refuses (rc 1, \"no ms score tag. Please run samtools fixmate\"), MD/NM not needed by bcftools mpileup or mapDamage, =/X gives identical mpileup",
+            "result": "PASS",
+            "note": "mpileup body md5 identical with/without MD/NM and on eqx vs M; mapDamage misincorporation/dnacomp/lgdistribution bodies identical with MD/NM stripped"
+          },
+          {
+            "text": "@PG chain links through PP and the head -1 command names the aligner",
+            "result": "PASS",
+            "note": "six-line chain linear; example IDs in SKILL.md (bwa-mem, samtools.1) are illustrative, real IDs are bwa / samtools"
+          },
+          {
+            "text": "Rows that could not be run (DRAGEN --mapq-max, Cell Ranger/STARsolo MAPQ 255 and CB/UB, featureCounts/RSEM tag consumers, pbmm2) are marked as unverified in the Skill",
+            "result": "FAIL",
+            "note": "stated as fact with no marker; the fix log admits they are unverifiable"
+          }
+        ],
+        "executed": true,
+        "execution_note": "executed: bwa 0.7.19, bwa-mem2, minimap2 (+--eqx, --cs, splice), bowtie2 (end-to-end and --local), hisat2, STAR on a seeded synthetic genome; fgbio 4.1.1 AnnotateBamWithUmis; mapDamage 2.2.2; bcftools 1.24. DRAGEN, Cell Ranger, featureCounts, RSEM, pbmm2 NOT run.",
+        "checks": {
+          "passed": 39,
+          "total": 39
+        }
+      },
+      {
+        "index": 6,
+        "type": "Stress",
+        "label": "NEW: multi-region recipes (-M, -M -L, --region-file, pysam fetch_regions) vs a full-scan truth: overlapping, adjacent, nested, gap, identical, chained, multi-contig, 60 + 80 random sets",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "All 23 checks pass. Truth = parse of `samtools view` (no region) with an independent overlap model; fetch_regions() extracted verbatim from SKILL.md.",
+        "basic": 36,
+        "specialized": 55,
+        "total": 91,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "-M, -M -L bed, --region-file and fetch_regions() each return exactly the full-scan truth (each record once) on 10 named region sets",
+            "result": "PASS",
+            "note": "overlap 5426, adjacent 5550, nested 5550, gap-9bp 802, gap-100bp 802, identical-twice 2732, chained 1170, reverse-order 5058, single-base 539, far-apart 539; default query rows = per-region sum (7356, 7112, 7480, 950, ...)"
+          },
+          {
+            "text": "The same on 60 random multi-region sets (real BAM) and 80 random multi-contig sets (synthetic BAM incl. placed-unmapped, secondary, supplementary, 66,000-op CIGAR)",
+            "result": "PASS",
+            "note": "140/140 sets equal truth for all four recipes; default duplicates in 19 of 60 real-BAM sets; fetch_regions never repeated a record"
+          },
+          {
+            "text": "Skill numbers reproduce (default 7356, -M/-M -L/--region-file 5426) and the BED convention (0-based half-open) holds for both -L and --region-file",
+            "result": "PASS",
+            "note": "single-base BEDs at 4 positions select exactly the 1-based base"
+          },
+          {
+            "text": "Error paths behave as documented or fail loudly: -M on an unindexed BAM exits 1 naming the index; an unknown contig in a multi-region call warns with exit 0; fetch_regions with a wrong contig raises ValueError",
+            "result": "PASS",
+            "note": "the Skill does not itself say -M needs an index (noted, P2)"
+          }
+        ],
+        "executed": true,
+        "execution_note": "executed: real 5644-record BAM (10 named sets + 60 random) and the 15-record synthetic multi-contig BAM (80 random sets) with samtools 1.24 and pysam 0.24.1.",
+        "checks": {
+          "passed": 23,
+          "total": 23
+        }
+      },
+      {
+        "index": 7,
+        "type": "Edge",
+        "label": "NEW: 32-record HAND-WRITTEN SAM with planted truth (every FLAG bit, CIGAR ops M/I/D/N/S/H/=/X/P, placed/unplaced unmapped, secondary/supplementary, \"*\" SEQ, three pair kinds) + view_bam.py matrix + convert_formats.sh",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "53 of 54 checks pass; the failing check is a Skill statement: \"a round trip keeps every field and tag but not the tag order\" is false for CRAM (=/X CIGAR rewritten to M; NM/MD added). view_bam.py raw traceback on a non-numeric limit.",
+        "basic": 33,
+        "specialized": 50,
+        "total": 83,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "FLAG decoding and counts equal hand truth: 12 single bits, 1536/73/133/65/129, and 12 filters (-f/-F/-q, -F 2304 = 28 of 32)",
+            "result": "PASS",
+            "note": "samtools flags and view -c match all hand counts; Skill FLAG table hex==decimal and meanings match the spec"
+          },
+          {
+            "text": "CIGAR consumption table, span/SEQ formulas, N not covered, soft vs hard clip, TLEN (+71/-71, 0 for mate-unmapped and cross-contig), \"*\" SEQ and SA:Z shape are correct",
+            "result": "PASS",
+            "note": "all 9 ops match htslib; 17 hand-written (SEQ length, span) pairs match; TLEN as planted"
+          },
+          {
+            "text": "view_bam.py: correct counts and exit codes on SAM, sorted/unsorted/unindexed BAM, unmapped-only BAM, empty SAM/BAM, CRAM with the reference reachable / unreachable / 3rd argument; readable errors on missing, text and truncated files",
+            "result": "PASS",
+            "note": "28/4 mapped/unmapped agrees with -F 4 / -f 4 on every file; unmapped-only 0/4; empty 0/0; CRAM without reference exit 1 with hint; all errors readable"
+          },
+          {
+            "text": "convert_formats.sh SAM->BAM->CRAM(+ref)->SAM/BAM on the hand SAM: rc 0, 32 records; no-reference CRAM output and input==output refused",
+            "result": "PASS",
+            "note": "SAM->BAM byte-identical records; BAM->CRAM->SAM/BAM agree with each other; rc 1 with messages for the two guarded cases"
+          },
+          {
+            "text": "SKILL.md: \"a round trip keeps every field and tag but not the tag order\" (CRAM)",
+            "result": "FAIL",
+            "note": "CRAM leg turned 4=1X4= into 9M and added MD:Z/NM:i to 16 of 30 realistic records (reference available); MAPQ of an unmapped read 10->0"
+          }
+        ],
+        "executed": true,
+        "execution_note": "executed: expectations written by hand from the SAM spec before running; SAM, sorted BAM, unsorted BAM, unindexed BAM, unmapped-only BAM (indexed and not), empty SAM/BAM, CRAM with and without its reference, missing file, text file, truncated BAM.",
+        "checks": {
+          "passed": 53,
+          "total": 54
+        }
+      },
+      {
+        "index": 8,
+        "type": "Adversarial",
+        "label": "NEW: CRAM reference states on a second real dataset (nf-core SARS-CoV-2): -T, UR, gone, REF_PATH/REF_CACHE, the Skill recipe verbatim, wrong/missing-contig reference, ignore_md5, embed_ref, -C without -T; =/X and MD through CRAM on real minimap2 --eqx output",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "23 of 23 checks pass, but two of them confirm that the Skill's CRAM round-trip sentence is inaccurate on real aligner output (=/X lost, MD added).",
+        "basic": 33,
+        "specialized": 50,
+        "total": 83,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "For every reference state the Skill's check `view -o /dev/null f.cram && echo ok` gives the right verdict and an independent decode agrees",
+            "result": "PASS",
+            "note": "-T ok; UR ok; gone -> no \"ok\", rc 1 \"Unable to fetch reference\"; REF_PATH (M5-named) ok; REF_CACHE ok; embed_ref=1 ok with nothing reachable; wrong reference and lacking-contig reference fail (MD5 mismatch)"
+          },
+          {
+            "text": "The HPC recipe in SKILL.md runs verbatim: cache created under $HOME/cram_cache, quickcheck silent, full-decode check prints ok",
+            "result": "PASS",
+            "note": "one cache file created; ok, rc 0"
+          },
+          {
+            "text": "view -c / flagstat / idxstats / quickcheck succeed with the reference gone while stats and pysam iteration fail loudly; ignore_md5=1 makes the wrong-reference decode silent",
+            "result": "PASS",
+            "note": "view -c 200, flagstat 200+0, idxstats 197/3, qc rc 0; stats non-zero; pysam OSError; ignore_md5 rc 0 with different SEQ column"
+          },
+          {
+            "text": "-C without -T and no reachable reference exits 0 with the embed_ref=2 warning and the CRAM decodes with no reference",
+            "result": "PASS",
+            "note": "as SKILL.md states"
+          },
+          {
+            "text": "SKILL.md: \"a round trip keeps every field and tag but not the tag order\" holds for real aligner output",
+            "result": "FAIL",
+            "note": "minimap2 --eqx BAM: 5000/5000 reads lose their =/X ops to M in the CRAM; minimap2 default BAM: MD:Z appears on 5000 reads that had none"
+          }
+        ],
+        "executed": true,
+        "execution_note": "executed: every state decoded with the Skill's own check and independently by md5 of columns 1-11 against the source BAM; HOME redirected so no ~/.cache/hts-ref could rescue a decode; pysam read attempt with the reference gone.",
+        "checks": {
+          "passed": 23,
+          "total": 23
+        }
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 32.8,
+    "dynamic_weighted": 52.3,
+    "score": 85,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Every quantitative claim I could run held: 302 of 303 asserted checks pass across eight inputs, including a 32-record hand-written SAM with planted truth, 140 random multi-region sets against a full-scan truth and every CRAM reference state.",
+    "The multi-region section is correct and complete: -M, -M -L, --region-file and the pysam fetch_regions helper all equal the full-scan truth, including adjacent, nested and gap-spanning cases the default query duplicates.",
+    "The CRAM section is now trustworthy: the recommended full-decode check fails exactly when the reference cannot be resolved, and the text says which commands (view -c, flagstat, idxstats, quickcheck) cannot prove it.",
+    "view_bam.py and convert_formats.sh no longer fail on the inputs the Skill advertises (unindexed, empty, unmapped-only, CRAM, uppercase extensions) and refuse to overwrite their input.",
+    "usage-guide dedup lost nothing: 33 of 33 old facts and all 12 advertised prompts are still served from one copy."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "CRAM round trip is not lossless: =/X become M, NM/MD get added",
+      "observed_in": [
+        7,
+        8
+      ],
+      "problem": "SKILL.md says a CRAM round trip \"keeps every field and tag but not the tag order\". On a hand SAM the =/X CIGAR of one read became 9M, and on real minimap2 --eqx output 5000 of 5000 reads lost their =/X ops; on a minimap2 BAM without MD, decoding with the reference added MD:Z to all 5000 reads (unmapped-read MAPQ also becomes 0).",
+      "root_cause": "The sentence was verified only on the nf-core BAM, whose CIGARs use M and whose reads already carry NM/MD.",
+      "fix": "Replace with: a CRAM round trip preserves reads and quality but rewrites =/X to M, regenerates NM/MD when the reference is available and reorders tags; use BAM if the exact CIGAR ops matter."
+    },
+    {
+      "priority": "P2",
+      "title": "Unverifiable table rows presented as fact",
+      "observed_in": [
+        5
+      ],
+      "problem": "DRAGEN \"--mapq-max (default 60)\", Cell Ranger/STARsolo \"inherits STAR / 255\" and CB/UB, featureCounts/RSEM as consumers of NH/HI, and the pbmm2 row are stated without any marker, although the fix log says none could be run.",
+      "root_cause": "Rows were kept from the upstream text; the fixer deleted only the claims it could disprove.",
+      "fix": "Append \"(not verified here)\" to those rows, or cite the vendor documentation for each, or drop the DRAGEN flag name."
+    },
+    {
+      "priority": "P2",
+      "title": "Residual robustness gaps in the shipped examples",
+      "observed_in": [
+        7
+      ],
+      "problem": "view_bam.py with a non-numeric limit dies with a raw ValueError traceback (the int() sits outside the try); on an unindexed CRAM pysam prints several [E::cram_index_load] lines on stderr although the run succeeds; convert_formats.sh leaves a header-only output file behind when samtools fails after opening it (rc 1, file present).",
+      "root_cause": "Argument parsing and cleanup were not covered by the rewrite.",
+      "fix": "Move int(sys.argv[2]) into the try and print a usage error; delete OUTPUT in an EXIT trap when the run fails; mention that the cram_index_load lines are harmless."
+    },
+    {
+      "priority": "P2",
+      "title": "Small text inaccuracies and gaps",
+      "observed_in": [
+        1,
+        5,
+        6,
+        8
+      ],
+      "problem": "Mode table says pysam \"wc\" needs reference_filename= but it writes an embedded-reference CRAM with warnings when omitted; the @PG example uses IDs bwa-mem and samtools.1 where real files have bwa and samtools; the multi-region section does not say -M needs an index; the \"mapping quality distribution\" command prints distinct values, not counts.",
+      "root_cause": "Illustrative examples were not aligned with tool output.",
+      "fix": "Reword the wc row (\"should be given\"), use real @PG IDs, add \"(needs an index)\" to the -M line, and add `| uniq -c` to the MAPQ command."
+    }
+  ]
+}
