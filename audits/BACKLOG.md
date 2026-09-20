@@ -8,7 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (87)
+## P1 (83)
 
 ### `bio-alignment-filtering` — Aligner table: "-q 1 drops ambiguous" wrong for Bowtie2, HISAT2
 
@@ -49,38 +49,6 @@ None open.
 - Problem: samtools view -F 1024 on the planted-duplicate BAM keeps 500 of 500 with no warning; the correct 400 appears only after collate/fixmate/sort/markdup.
 - Root cause: The recipe assumes FLAG 0x400 is already set; the only hint is a Related-Skills line.
 - Fix: Add a check (`samtools view -c -f 1024`; if 0, run duplicate-handling first) next to the -F 1024 recipe and in the usage-guide "What the Agent Will Do" steps.
-
-### `bio-alignment-indexing` — Staleness snippet and batch loop break for CSI-indexed BAMs
-
-- Skill: 75, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/alignment-indexing) · [viewer](skills/bio-alignment-indexing/mrsonord2240-bioSkills@c206dff/viewer.md)
-- Observed in inputs: 5
-- Problem: '[ x.bam -nt x.bam.bai ]' is true whenever no .bai exists, so a CSI-only BAM gets a redundant .bai; if the BAM changed, the stale .csi still takes precedence (htslib prefers .csi, which the SKILL itself states) and region queries error or return wrong reads after the 'fix'. The usage-guide batch loop also only tests for .bai.
-- Root cause: Both snippets assume the index is always x.bam.bai.
-- Fix: Test whichever index exists (.bai, .csi, .bai alternative) and its mtime; when re-indexing, delete every other index file for that BAM first (or index with -o/-c explicitly), and make the batch loop skip any BAM that has a fresh .bai or .csi.
-
-### `bio-alignment-indexing` — CRAM: no reference guidance; pysam idxstats silently 0; helpers ignore .crai
-
-- Skill: 75, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/alignment-indexing) · [viewer](skills/bio-alignment-indexing/mrsonord2240-bioSkills@c206dff/viewer.md)
-- Observed in inputs: 2
-- Problem: Region retrieval from CRAM needs the reference (-T / reference_filename / REF_PATH); without it pysam raises 'OSError: truncated file' and samtools view prints no records. pysam get_index_statistics() on a CRAM returns 0 mapped while samtools idxstats returns the true counts. is_indexed() and fetch_regions.py only know .bai/.csi, so a CRAM is re-indexed on every call and then crashes.
-- Root cause: The CRAM section is three lines (samtools index x.cram) and the Python patterns were written for BAM only.
-- Fix: Add a CRAM subsection: samtools view -T ref.fa, pysam AlignmentFile(f,'rb',reference_filename=ref), REF_PATH, and use `samtools idxstats` (not pysam) for CRAM counts. Make is_indexed/ensure_indexed check .crai and choose the mode automatically.
-
-### `bio-alignment-indexing` — Large-genome section is factually wrong in four places
-
-- Skill: 75, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/alignment-indexing) · [viewer](skills/bio-alignment-indexing/mrsonord2240-bioSkills@c206dff/viewer.md)
-- Observed in inputs: 4
-- Problem: samtools index on a >537 Mbp contig fails loudly and writes no .bai (the table says 'silently truncates'); default `samtools index -c` already auto-raises the depth (min_shift 14, depth 6 = 2^32) so `-m 18` is not needed and actually gives depth 4 = 2^30, not the claimed 2^33; and contigs beyond 2^31-1 bp cannot be stored in BAM at all ('Positional data is too large for BAM format'), so the pine/axolotl 'multi-Gbp \| CSI with larger -m' row is not achievable.
-- Root cause: CSI parameters were described from the format's theoretical limits rather than from htslib's behaviour.
-- Fix: State: BAI hard-errors above 2^29; `samtools index -c` (default -m) works up to ~2^31; -m only sets the smallest bin size; contigs above 2^31-1 need the reference split before alignment. Delete the '2^(18+15)' comment and the silent-truncation row.
-
-### `bio-alignment-indexing` — '-L regions.bed' shown as index-based region access
-
-- Skill: 75, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/alignment-indexing) · [viewer](skills/bio-alignment-indexing/mrsonord2240-bioSkills@c206dff/viewer.md)
-- Observed in inputs: 5
-- Problem: Under 'Using Indices for Region Access' and in the usage-guide, `samtools view -L regions.bed in.bam` is presented as index use. It is a full-file filter: on a damaged-tail BAM it fails like a full scan and on a 1.2 M-read BAM it took 1.57 s versus 0.02 s for `-M -L` / `--region-file`.
-- Root cause: samtools' -L (filter) versus -M (index + multi-region iterator) distinction is not documented in the Skill.
-- Fix: Use `samtools view -M -L regions.bed in.bam` (or --region-file) for index-based BED access and add one line that plain -L scans the whole file.
 
 ### `bio-alignment-amplicon-clipping` — Wrong primer BED passes the example; claim attributed to checker
 
@@ -706,7 +674,7 @@ None open.
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (356)
+## P2 (357)
 
 ### `bio-alignment-filtering` — SKILL.md and usage-guide disagree on the standard filter
 
@@ -747,46 +715,6 @@ None open.
 - Problem: "-e since 1.12", "sclen and null-tag handling in 1.16" and the pbmm2/Mutect2/Strelka2 recipe rationale could not be verified (installed samtools 1.24 has no NEWS file; caller tools not run).
 - Root cause: Version notes copied from memory.
 - Fix: Cite the samtools NEWS entries or drop the version numbers.
-
-### `bio-alignment-indexing` — Common Errors strings do not match the installed tools
-
-- Skill: 75, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/alignment-indexing) · [viewer](skills/bio-alignment-indexing/mrsonord2240-bioSkills@c206dff/viewer.md)
-- Observed in inputs: 3
-- Problem: 'file is not sorted' (SKILL) and 'file is not coordinate sorted' (usage-guide) do not appear; samtools 1.24 prints 'Unsorted positions on sequence #1 ... failed to create index'. 'chromosome not found' is really 'specifies an invalid region or unknown reference. Continue anyway.' with exit 0, or pysam 'invalid contig'.
-- Root cause: Messages were written from memory, and the two files disagree.
-- Fix: Quote the exact current messages, keep one table, and say that samtools returns 0 reads with rc 0 on an unknown contig.
-
-### `bio-alignment-indexing` — fetch_regions.py rejects region forms samtools accepts
-
-- Skill: 75, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/alignment-indexing) · [viewer](skills/bio-alignment-indexing/mrsonord2240-bioSkills@c206dff/viewer.md)
-- Observed in inputs: 3
-- Problem: Raw ValueError tracebacks for 'chr22:1,952-4,700', 'chr22', 'chr22:1952-' and contig names containing ':' (HLA-A*01:01:01:01, the real UMI BAM's contig). Also no CRAM support and no staleness check.
-- Root cause: Region parsed with split(':') and int().
-- Fix: Pass the region string to bam.fetch(region=...) (pysam parses it like samtools), or rsplit(':',1) with comma stripping and a clear error; check index freshness and CRAM.
-
-### `bio-alignment-indexing` — is_indexed() misses input.bai, .crai and gives sibling false positives
-
-- Skill: 75, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/alignment-indexing) · [viewer](skills/bio-alignment-indexing/mrsonord2240-bioSkills@c206dff/viewer.md)
-- Observed in inputs: 1, 2
-- Problem: The helper returns False for alt.bam + alt.bai (a location the SKILL lists) and for a real .crai; for x.cram it looks for x.bam.bai, so a sibling x.bam.bai gives a false True.
-- Root cause: with_suffix('.bam.bai') is BAM-specific.
-- Fix: Use pysam.AlignmentFile(path).has_index() or test the exact candidate list per format.
-
-### `bio-alignment-indexing` — usage-guide mito fraction awk hard-codes chrM
-
-- Skill: 75, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/alignment-indexing) · [viewer](skills/bio-alignment-indexing/mrsonord2240-bioSkills@c206dff/viewer.md)
-- Observed in inputs: 1
-- Problem: `/^chrM/` reports 'MT: 0.00%' on an Ensembl-style BAM whose contig is 'MT' (true 33.33% in the test), the exact naming trap the SKILL warns about elsewhere; division by zero on an empty BAM. The 'X/Y ratio for sex determination' prompt has no code.
-- Root cause: Naming convention not handled in the snippet.
-- Fix: Match /^(chr)?(M\|MT)$/ and guard total==0; either add the X/Y snippet (normalised by contig length) or drop the prompt.
-
-### `bio-alignment-indexing` — 'primary only' recipe, FASTA off-by-one, threads claim, duplication
-
-- Skill: 75, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/alignment-indexing) · [viewer](skills/bio-alignment-indexing/mrsonord2240-bioSkills@c206dff/viewer.md)
-- Observed in inputs: 2, 5
-- Problem: `samtools view -c -F 2304 in.bam chr` also counts placed unmapped reads (5 vs 4 primary mapped in the test; use -F 2308). SKILL.md FastaFile.fetch('chr1',1000,2000) is 1000 bp while faidx chr1:1000-2000 and the usage-guide (999,2000) are 1001 bp. `-@ 8` gave no measurable speedup on a 43 MB BAM (1.61 s -> 1.58 s). SKILL.md and usage-guide.md duplicate most content.
-- Root cause: Unverified claims and copy-paste between the two files.
-- Fix: Use -F 2308 for primary mapped, align the FASTA coordinates, soften or measure the threads claim, and cut the duplicated sections from usage-guide.md.
 
 ### `bio-crispr-screens-copy-number-correction` — negative_control_sgrnas empty-dict case raises an undocumented ValueError
 
@@ -923,6 +851,54 @@ None open.
 - Problem: iVar 1.4.4 trimmed an unindexed sorted BAM (4909 reads) although SKILL says it needs an indexed BAM; --tolerance N is described as the distance a read end may sit from a primer edge, but reads starting inside the primer always clip and N only extends the match N bases upstream of the primer start.
 - Root cause: Statements copied from tool documentation without a run.
 - Fix: Say 'iVar expects sorted input (index optional on 1.4.4)' and 'a read start up to N bases before the primer start still matches; starts inside the primer always match'.
+
+### `bio-alignment-indexing` — fetch_regions.py: 0-based start and end<start traceback
+
+- Skill: 85, Limited Release · [mrsonord2240/bioSkills@68a47bf](https://github.com/mrsonord2240/bioSkills/tree/68a47bf30aae303543db67ce46ecc8b068b06f78/alignment-files/alignment-indexing) · [viewer](skills/bio-alignment-indexing/mrsonord2240-bioSkills@68a47bf/viewer.md)
+- Observed in inputs: 3, 6
+- Problem: chr22:0-4000 (samtools counts 5550) and chr22:5000-4000 raise an uncaught ValueError with a raw pysam traceback; the fix log says bad coordinates exit with a message.
+- Root cause: parse_region returns start=-1 for 0, and the fetch call catches only OSError.
+- Fix: Clamp a start of 0 to 0 in parse_region (samtools treats 0 as the first base) and catch ValueError around fetch, exiting with 'Bad region ...: start after end'.
+
+### `bio-alignment-indexing` — fetch_regions.py rejects contig names containing a comma
+
+- Skill: 85, Limited Release · [mrsonord2240/bioSkills@68a47bf](https://github.com/mrsonord2240/bioSkills/tree/68a47bf30aae303543db67ce46ecc8b068b06f78/alignment-files/alignment-indexing) · [viewer](skills/bio-alignment-indexing/mrsonord2240-bioSkills@68a47bf/viewer.md)
+- Observed in inputs: 6
+- Problem: 'ctg,1' and 'ctg,1:100-200' fail with 'unknown contig' although samtools returns the reads (260 rejected strings in the synthetic BAM).
+- Root cause: region.replace(',', '') runs on the whole string before the contig lookup.
+- Fix: Test the whole string and the rpartition contig against aln.references first; strip commas only from the coordinate part.
+
+### `bio-alignment-indexing` — Bash ensure_index can delete a sibling file's index
+
+- Skill: 85, Limited Release · [mrsonord2240/bioSkills@68a47bf](https://github.com/mrsonord2240/bioSkills/tree/68a47bf30aae303543db67ce46ecc8b068b06f78/alignment-files/alignment-indexing) · [viewer](skills/bio-alignment-indexing/mrsonord2240-bioSkills@68a47bf/viewer.md)
+- Observed in inputs: 7
+- Problem: With alternate-style names, ensure_index sample.cram removes sample.bai (the BAM's index) and ensure_index sample.bam removes sample.crai. Standard .bam.bai / .cram.crai names are safe.
+- Root cause: The candidate list crosses formats (both .bai/.csi and .crai names for every file) and the stem-form names are shared between sibling files; the Python twin does not cross formats, so the two helpers differ.
+- Fix: Make the bash candidate list format-specific like index_candidates(): BAM -> .csi, stem.csi, .bai, stem.bai; CRAM -> .crai, stem.crai.
+
+### `bio-alignment-indexing` — Genome table row implies pine needs CSI; 'cannot be stored in BAM at all' overstated
+
+- Skill: 85, Limited Release · [mrsonord2240/bioSkills@68a47bf](https://github.com/mrsonord2240/bioSkills/tree/68a47bf30aae303543db67ce46ecc8b068b06f78/alignment-files/alignment-indexing) · [viewer](skills/bio-alignment-indexing/mrsonord2240-bioSkills@68a47bf/viewer.md)
+- Observed in inputs: 4
+- Problem: Sugar pine's longest scaffold is ~24 Mbp and loblolly N50 ~107 kb, so BAI works; and a BAM with an LN=3e9 header and reads below 2^31-1 writes, CSI-indexes and queries correctly. Only positions above 2^31-1 fail.
+- Root cause: The row and the sentence generalise from genome size and from the header limit to per-contig and per-position limits; the fixer could not verify real contig sizes.
+- Fix: Say 'assembled pine/fir scaffolds are usually far below 537 Mbp; check the longest with cut -f2 ref.fa.fai \| sort -nr \| head -1; axolotl chromosome arms exceed 537 Mbp', and 'reads positioned beyond 2^31-1 cannot be written to BAM'.
+
+### `bio-alignment-indexing` — REF_PATH advice omits its required format
+
+- Skill: 85, Limited Release · [mrsonord2240/bioSkills@68a47bf](https://github.com/mrsonord2240/bioSkills/tree/68a47bf30aae303543db67ce46ecc8b068b06f78/alignment-files/alignment-indexing) · [viewer](skills/bio-alignment-indexing/mrsonord2240-bioSkills@68a47bf/viewer.md)
+- Observed in inputs: 2
+- Problem: 'or REF_PATH' suggests pointing REF_PATH at a reference; a directory holding genome.fasta gives 0 records. Only flat MD5-named files or a %2s/%2s/%s pattern work.
+- Root cause: The CRAM section names the variable without the MD5-store convention.
+- Fix: Add one line: REF_PATH is a cache of files named by the @SQ M5 checksum (REF_CACHE=dir/%2s/%2s/%s populates it), not a FASTA directory; -T ref.fa is the simple route.
+
+### `bio-alignment-indexing` — Batch loop and helper edge behaviour undocumented
+
+- Skill: 85, Limited Release · [mrsonord2240/bioSkills@68a47bf](https://github.com/mrsonord2240/bioSkills/tree/68a47bf30aae303543db67ce46ecc8b068b06f78/alignment-files/alignment-indexing) · [viewer](skills/bio-alignment-indexing/mrsonord2240-bioSkills@68a47bf/viewer.md)
+- Observed in inputs: 7
+- Problem: for f in *.bam in a directory with no BAMs runs samtools on the literal '*.bam'; a stale CSI built with -m 12 is rebuilt at the default; a truncated but fresh index (or a BAM restored with an old mtime) passes as fresh.
+- Root cause: mtime-only freshness test and no nullglob.
+- Fix: Add 'shopt -s nullglob' to the loop, a one-line note that freshness is by mtime only (verify with samtools idxstats vs samtools view -c after restores), and pass -m through when a CSI was rebuilt.
 
 ### `bio-alignment-multiple` — Correct the 'mafft --auto' strategy table
 

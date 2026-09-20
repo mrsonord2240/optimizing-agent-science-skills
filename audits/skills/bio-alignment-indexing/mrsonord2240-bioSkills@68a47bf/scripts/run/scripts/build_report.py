@@ -1,0 +1,175 @@
+#!/usr/bin/env python3
+"""Builds eval_report_bio-alignment-indexing_result.json from the scores decided after reading out/*.stdout.txt, and checks the schema arithmetic.
+Run from Git Bash / Windows:  PYTHONIOENCODING=utf-8 python run/scripts/build_report.py   (from audits/bio-alignment-indexing/)"""
+import json, os, sys
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+OUT = os.path.abspath(os.path.join(HERE, "..", "..", "eval_report_bio-alignment-indexing_result.json"))
+
+def A(text, ok, note): return {"text": text, "result": "PASS" if ok else "FAIL", "note": note}
+
+inputs = [
+ dict(index=1, type="Canonical", label="REGRESSION: index real 1000G + human BAMs (BAI/CSI), region fetch, idxstats cross-check, shipped snippets",
+      status="COMPLETED", basic=37, specialized=56, executed=True,
+      note="r1_canonical.py 42/42 checks PASS: 53 regions x 6 methods == full-scan truth, custom-named index via -X and index_filename=, shipped ensure_indexed (fresh/none/CSI-only/alt x.bai), shipped mito awk on chrM/MT/none/empty BAMs, shipped pysam idxstats block.",
+      assertions=[
+        A("All 53 regions give identical counts by full-scan truth, samtools view -c (BAI and CSI) and pysam fetch/count (BAI and CSI)", True, "0 mismatches; bedtools full scan agrees"),
+        A("Shipped ensure_indexed leaves a fresh .bam.bai / a CSI-only BAM / an alt-named x.bai untouched and builds a BAI when none exists", True, "mtimes unchanged; no redundant .bai next to .csi"),
+        A("Shipped mitochondrial-fraction awk prints the true value on chrM (50.00%), MT (33.33%) and prints nothing on an empty BAM", True, "no division by zero"),
+        A("Non-standard index name is found only with -X / index_filename= as SKILL says, and counts equal the standard-name counts", True, "default lookup fails with 'Could not retrieve index file'; -X and pysam index_filename count identical"),
+        A("Shipped fetch_regions.py Total, (qname, position) list and strand column equal samtools view; it auto-indexes on stderr", True, "e.g. chr20:1440001-1440500 lists identical")]),
+ dict(index=2, type="Variant A", label="REGRESSION: index a CRAM, reference handling (-T, pysam reference_filename, REF_PATH, @SQ UR), idxstats, faidx",
+      status="COMPLETED", basic=35, specialized=52, executed=True,
+      note="r2_cram_faidx.py 22/22 checks PASS, refpath_probe.sh confirms REF_PATH semantics. Every new CRAM claim reproduced; only gap is that 'REF_PATH' is named without saying it must be an MD5-named store.",
+      assertions=[
+        A("samtools view -T ref.fa on the CRAM returns 5642 records equal to the BAM; the 'no reference' behaviour (no records, 'Failed to populate reference', view -c still 5642) is as documented", True, "6 sub-regions also equal"),
+        A("The shipped pysam CRAM recipe (mode 'rc', reference_filename=) counts 5642, pysam without reference raises OSError 'truncated file', get_index_statistics() returns 0 and pysam.idxstats gives 5642", True, "each claim reproduced"),
+        A("fetch_regions.py --reference on a CRAM matches the BAM count, does not re-index a fresh .crai, and without --reference exits with a --reference hint and no traceback", True, "clean message"),
+        A("Shipped FastaFile.fetch('chr22', 999, 2000) equals faidx chr22:1000-2000 (1001 bp): the FASTA off-by-one is fixed", True, "compared with a plain-python FASTA parse"),
+        A("The advice 'set REF_PATH' is actionable as written", False, "REF_PATH must point at an MD5-named store: a directory holding genome.fasta gives 0 records; only flat <md5> files or a %2s/%2s/%s pattern work (refpath_probe.sh)")]),
+ dict(index=3, type="Edge", label="REGRESSION: unsorted BAM, missing index, lying @HD, colon contigs, odd region strings, wrong contig names, empty BAM",
+      status="COMPLETED", basic=34, specialized=50, executed=True,
+      note="r3_edge.py 27/27 checks PASS: every Common Errors string matches samtools 1.24 / pysam 0.24.1 output verbatim. Informational: the example still tracebacks on chr22:0-100 and chr22:5000-4000 (see input 6).",
+      assertions=[
+        A("Every string in the new Common Errors table appears verbatim in real samtools/pysam output (unsorted, missing index, unknown contig, idxstats slow method, ValueError texts)", True, "the two wrong pre-fix strings are gone from the whole folder"),
+        A("Unsorted real UMI BAM fails to index with no index written; sort then index preserves all 15788 records and idxstats sums to 15788", True, "lying @HD header also refused by samtools index"),
+        A("fetch_regions.py accepts comma, bare-contig, open-end and single-start region forms with Total == samtools view -c, and colon-named contigs", True, "chr22:1,952-4,700 / chr22 / chr22:1952- / chr22:1952 all 5642"),
+        A("Header-only BAM indexes and idxstats prints 'chr22 40001 0 0' plus the '*' row", True, "output asserted"),
+        A("fetch_regions.py exits cleanly (no traceback) on every malformed or out-of-range region", False, "chr22:0-100 -> uncaught 'ValueError: start out of range (-1)'; chr22:5000-4000 -> uncaught 'invalid coordinates' traceback")]),
+ dict(index=4, type="Variant B", label="REGRESSION: wheat-scale genome (contigs > 537 Mbp): BAI vs CSI, -m, 2.0 Gbp, > 2^31-1 bp",
+      status="COMPLETED", basic=34, specialized=50, executed=True,
+      note="r4_large_genome.py 15/15 checks PASS: BAI fails loudly, default -c depth 6 on 830 Mbp, -m 18 gives depth 4 (2^30), 2.0 Gbp depth 6 / 5, all queries == hand truth. New probes: a BAM with an LN=3e9 header is writable and CSI-indexable when reads sit below 2^31-1; real sugar-pine max scaffold is 23,976,851 bp (G3 2017 Table 2).",
+      assertions=[
+        A("BAI on a contig > 2^29 fails loudly (exit 1, no .bai) with the quoted 'Try using a csi index' message; pysam.index raises", True, "pre-fix 'silently truncates' claim is gone"),
+        A("Default samtools index -c works on 830 Mbp and 2.0 Gbp contigs, -m 18 reproduces the stated depths (4 and 5), and 6 chr3B queries plus the 2.0 Gbp queries equal hand-computed truth", True, "CSI header parsed"),
+        A("A read placed beyond 2^31-1 fails with 'Positional data is too large for BAM format'", True, "reproduced"),
+        A("'A contig above 2^31-1 bp cannot be stored in BAM at all' is accurate", False, "a BAM with an LN=3,000,000,000 header and reads at 1000 and 2,000,000,000 writes, CSI-indexes (min_shift 14, depth 6) and returns both reads; only positions above 2^31-1 fail"),
+        A("The genome table row 'Pine, fir, axolotl, sugar pine -> CSI' is supported by real contig sizes", False, "sugar pine longest scaffold is 23,976,851 bp (rescaffolded) and loblolly N50 is ~107 kb, so BAI suffices; axolotl arm sizes not verifiable offline; the fixer's 'up to 2^31-1' is a limit, not a measurement")]),
+ dict(index=5, type="Stress", label="REGRESSION: stale/dual indices, ensure_index, batch loop, -L vs --region-file, threads, idxstats semantics, GATK precedence",
+      status="COMPLETED", basic=37, specialized=55, executed=True,
+      note="r5_stress.py 29/29 checks PASS. The pre-fix trap (stale .csi beating a fresh .bai after the snippet) is closed: shipped ensure_index leaves one correct index in all four stale/mixed cases, batch loop keeps BAI as BAI and CSI as CSI, --region-file == -M -L == truth and survives a damaged tail, -F 2308 == hand truth, -@ gives no speedup (1.62/1.57/1.82 s).",
+      assertions=[
+        A("Shipped ensure_index turns a stale-CSI BAM into a single fresh .csi with count == truth (was: stale .csi still won), and fresh .bai + stale .csi is repaired", True, "count 1095 == full scan"),
+        A("Shipped batch loop leaves fresh BAI and fresh CSI untouched, builds the missing index, errors on the unsorted BAM and continues", True, "file listing asserted"),
+        A("--region-file, -M -L and region arguments use the index (succeed on a BAM with a damaged tail, == truth 1791); plain -L is a whole-file filter (rc 1 on the damaged tail; 1.52 s vs 0.02 s)", True, "SKILL wording now correct"),
+        A("idxstats semantics: chrA 7 mapped / 1 unmapped and '*' 0 0 2 on the hand-built BAM; -F 2308 primary-mapped == 4", True, "the old -F 2304 recipe gave 5"),
+        A("Precedence claims: htslib prefers .csi over .bai, htsjdk/GATK prefers .bai", True, "wrong-index fixtures in both directions (GATK: Invalid GZIP header vs 1095 records)")]),
+ dict(index=6, type="Scope Boundary", label="NEW: fetch_regions.py region parser vs samtools view -c vs full scan (5 real/synthetic BAMs, ~2600 region strings)",
+      status="COMPLETED", basic=30, specialized=44, executed=True,
+      note="n6_region_parser.py 9/16 checks. 2,604 of 2,605 region strings (chr:s-e, with commas, chr:s-, chr:s, {braced}, bare contig; edges at read start/end +-1; contigs with ':' '-' '.'; a 3,366-contig 1000G header) gave identical counts by shipped parser+fetch, samtools and full scan. Failures: contig names containing a comma are rejected (260 strings), chr22:0-N crashes (samtools counts 5550 for chr22:0-4000), chr22:5000-4000 crashes; both crashes print a raw traceback although the fix log says bad coordinates exit with a message.",
+      assertions=[
+        A("On ordinary and colon/dash/dot contig names the example's count equals samtools view -c and the full-scan truth for every region form (open-ended, commas, braced, single-base, +-1 edges)", True, "2,604/2,605; the one miss is the comma contig"),
+        A("Contig names containing ':' ('a:1-5', '12:34', 'HLA-A*01:01:01:01') resolve as samtools does", True, "with and without coordinates, all equal"),
+        A("A contig name containing a comma ('ctg,1') is accepted", False, "parse_region strips commas from the whole string first -> unknown contig 'ctg1' / ''; samtools returns 30"),
+        A("A 0-based start (chr22:0-4000) is handled like samtools (5550)", False, "uncaught ValueError: start out of range (-1)"),
+        A("An end-before-start region exits with a one-line message", False, "uncaught ValueError traceback from pysam")]),
+ dict(index=7, type="Adversarial", label="NEW: shipped ensure_index (bash) and ensure_indexed (Python) under mtime, layout, naming and shell-mode edge cases",
+      status="COMPLETED", basic=33, specialized=48, executed=True,
+      note="n7_ensure_index_edges.py 29/29 and n7b_sibling_index_probe.py 1/3. Held: equal mtimes, stale vs fresh, .bai+.csi in all fresh/stale mixes, alt x.bai and s.crai, spaces/brackets, symlinks, set -euo pipefail, -@ 4, unsorted replacement (fails loudly, leaves no index). Broke: with alternate-style names, bash ensure_index of sample.cram deletes sample.bai (the BAM's index) and of sample.bam deletes sample.crai, because it checks BAM and CRAM index names for every file. Also probed: truncated-but-fresh index and old-mtime restore are undetected (mtime heuristic), an empty directory runs samtools on the literal '*.bam', CSI -m 12 is rebuilt at default.",
+      assertions=[
+        A("Both helpers treat equal mtimes as fresh and a BAM 1 s newer than its index as stale, then answer region queries equal to the full scan", True, "bash and Python"),
+        A("With .bai and .csi both present (fresh/fresh, stale/stale, stale .bai + fresh .csi) both helpers end with a correct index and untouched fresh ones", True, "counts == truth"),
+        A("The bash function is safe under spaces/parentheses in names, symlinked BAMs and set -euo pipefail, and accepts -@ 4", True, "prints DONE, no unbound variable"),
+        A("An unsortable replacement BAM fails loudly and leaves no wrong index (bash rc 1, Python SamtoolsError)", True, "old index removed, none written"),
+        A("The bash helper never removes another file's index", False, "alternate-style names: ensure_index sample.cram removed sample.bai; ensure_index sample.bam removed sample.crai (n7b_sibling_index_probe.py); standard .bam.bai/.cram.crai names are safe")]),
+]
+
+for i in inputs:
+    i["total"] = i["basic"] + i["specialized"]
+    i["assertions_passed"] = sum(a["result"] == "PASS" for a in i["assertions"])
+    i["assertions_total"] = len(i["assertions"])
+    assert 3 <= i["assertions_total"] <= 5
+    i["status_flag"] = "✅" if (i["status"] == "COMPLETED" and i["total"] >= 75) else "⚠️"
+    i["execution_note"] = "executed in WSL science env alignment-files (samtools 1.24, pysam 0.24.1); see run/out/"
+    i["note"] = i["note"]
+n = len(inputs)
+avg = round(sum(i["total"] for i in inputs) / n, 1)
+ap = sum(i["assertions_passed"] for i in inputs); at = sum(i["assertions_total"] for i in inputs)
+
+cats = {
+ "functional_suitability": (10, 12, "Completeness 4 (BAI/CSI/CRAI, region access, idxstats, faidx, staleness, CRAM reference, large genomes, contig naming, errors), correctness 3 (all nine first-audit defects verified fixed; residual: 'cannot be stored in BAM at all' overstated, pine/sugar-pine row implies CSI although real scaffolds are tens of Mbp, REF_PATH given without its MD5-store format), appropriateness 3."),
+ "reliability": (10, 12, "Fault tolerance 3 (loud failure paths documented; example traceback on chr:0-N and end<start, batch loop on an empty directory runs samtools on a literal '*.bam', bash ensure_index can remove a sibling's alt-named index), error reporting 4 (Common Errors strings verified verbatim), recoverability 3 (idempotent helpers, CSI kept, but custom -m reset and no integrity check of a fresh-but-truncated index)."),
+ "performance_context": (7, 8, "SKILL.md 361 lines in one file, usage-guide.md cut from 190 to 50 lines with nothing the agent needs lost; workflow linear."),
+ "agent_usability": (14, 16, "Learnability 3 (REF_PATH advice vague), consistency 4 (one error table, one helper per language), feedback design 3, error prevention 4 (stale-CSI trap, CRAM reference, BAI limit, chr/MT naming all warned with the real message)."),
+ "human_usability": (6, 8, "Discoverability 3 (description still omits idxstats/faidx/CRAM/staleness that the body covers), forgiveness 3 (example now accepts comma, open-ended, colon-contig regions; still crashes on 0-based start and rejects comma contigs)."),
+ "security": (11, 12, "No credentials or eval. Region strings are parsed to ints and quoted in shell snippets. Bash ensure_index runs rm -f on index candidates only, but its candidate list crosses BAM and CRAM names (sibling index removal with alt names)."),
+ "maintainability": (9, 12, "Modularity 3 (SKILL + slim usage-guide + one example; bash and Python helpers duplicate logic and already differ on candidate lists), modifiability 3, testability 3 (example verifiable, no self-test or expected outputs)."),
+ "agent_specific": (17, 20, "Trigger precision 3, progressive disclosure 3 (single file, no references), composability 4, idempotency 4 (ensure_index is a no-op when fresh), escape hatches 3 (unsorted, unreachable reference, > 2^31-1 covered; integrity of a fresh index and empty-directory loop not)."),
+}
+sub = sum(v[0] for v in cats.values())
+sw = round(sub * 0.4, 1); dw = round(avg * 0.6, 1); score = int(round(sw + dw))
+
+rep = {
+ "meta": {
+  "skill_name": "bio-alignment-indexing",
+  "description": "Create and use BAI/CSI indices for BAM/CRAM files using samtools and pysam. Use when enabling random access to alignment files or fetching specific genomic regions.",
+  "evaluated_on": "2026-09-20",
+  "evaluator_version": "skill-auditor@1.0",
+  "category": "Data Analysis", "execution_mode": "D", "complexity": "Moderate", "n_inputs": n,
+  "source": "mrsonord2240/bioSkills@68a47bf30aae303543db67ce46ecc8b068b06f78:alignment-files/alignment-indexing",
+  "mode": "re-audit of a fixed Skill (fix/af-index); pre-fix report 75 Beta Only (archived _pre-fix-20260920)",
+  "pre_fix_score": 75,
+  "executed": f"{n}/{n}",
+  "inputs_note": "Inputs 1-5 re-run the first audit's inputs as regression tests against the fixed text (snippets extracted verbatim from the shipped SKILL.md by run/scripts/common.py); inputs 6 and 7 are new and target the fixer's own code (fetch_regions.py parser, ensure_index / ensure_indexed). N=7 rather than the Moderate default 5 because of the two added inputs.",
+  "environment": "WSL science env alignment-files: samtools 1.24, htslib 1.24, pysam 0.24.1, bedtools 2.31.1, GATK 4.6.2.0; real data from audit-envs/alignment-files/public-data (human chr22 slice BAM+CRAM+FASTA, 1000G HG00349 chr20 slice with a 3,366-contig header, ARTIC nanopore BAM, RNA BAM, unsorted UMI BAM) plus labelled synthetic BAMs in run/data",
+  "checks_run": "174 of 183 scripted checks PASS; the 9 FAILs are all in inputs 6 and 7 and are the findings below",
+  "floors_note": "Weighted score 84.6 rounds to 85 (Production Ready band). The assertion-pass-rate floor for Production Ready (>=90%) is not met (27/35 = 77.1%), so the grade is downgraded exactly one tier to Limited Release per scoring_rubric section 5 ('downgrade by exactly one grade tier'). Note 77.1% is also under the Limited Release floor (>=80%); a reading that applies the floor again would give Beta Only. All other floors are met (static 84 >= 80, execution 85.0 >= 85, Layer 1 avg 34.3 >= 32, Layer 2 avg 50.7 >= 48). No P0 or P1 is open; no veto fired.",
+  "judgements": {
+   "pine_axolotl_contig_sizes": "Not verifiable as the fixer left them. Sugar pine longest scaffold is 23,976,851 bp after rescaffolding (4,064,336 bp originally; Table 2 of the G3 2017 paper, PMC5427496); loblolly v2.0 scaffold N50 is ~107 kb (PMC5437942). So BAI is enough for current pine assemblies and the 'Pine, fir, ... -> CSI' row is misleading; 'up to 2^31-1 bp (BAM limit)' is a limit rather than a size. Axolotl: the assembly is split into 28 p/q chromosome arms 'for technical reasons' and scaffold N50 is 1.2 Gb (PNAS 2021, PMC8053990), so arms above 537 Mbp are plausible and CSI is the right advice, but the exact largest arm was not obtainable.",
+   "dropped_xy_ratio_prompt": "Acceptable. The prompt had no code, no verification and needs PAR handling; deleting it removes an unsupported claim. Small cost: sex-determination from idxstats is no longer offered.",
+   "usage_guide_dedup": "Nothing the agent needs was lost: every deleted command, table and troubleshooting entry exists in SKILL.md, corrected. Only trivia went: pysam FastaFile.get_reference_length example, a per-chromosome percent-share pysam snippet, and the '8 threads' prompt.",
+   "fix_log_discrepancy": "The fix log says bad coordinates exit 1 with a message; that holds for malformed text and unknown contigs but not for chr22:0-N or end<start, which exit 1 with a raw pysam traceback."}
+ },
+ "veto_gates": {
+  "skill_veto": {"gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS"},
+  "research_veto": {
+   "applicable": True, "gate": "PASS",
+   "scientific_integrity": {"result": "PASS", "detail": "No fabricated identifiers or values in any output; every quantitative claim (counts, CSI depths, timings, error strings) was reproduced from tool output."},
+   "practice_boundaries": {"result": "PASS", "detail": "Indexing utility; no diagnostic or prescriptive content. The sex-determination prompt that could have drifted toward individual inference was removed by the fix."},
+   "methodological_ground": {"result": "PASS", "detail": "The first audit's principled errors (BAI 'silently truncates', -L presented as index access, 2^33 reach from -m 18, -F 2304 as primary-mapped) are corrected and re-verified; remaining items are imprecise wording, not fallacies."},
+   "code_usability": {"result": "PASS", "detail": "All shipped snippets executed (bash ensure_index and batch loop, Python ensure_indexed, pysam CRAM/idxstats/FastaFile blocks, mito awk, fetch_regions.py). Two region strings make the example raise an uncaught ValueError, which is a robustness defect, not unrunnable code."}}
+ },
+ "static_score": {"subtotal": sub, "max": 100, "categories": {k: {"score": v[0], "max": v[1], "note": v[2]} for k, v in cats.items()}},
+ "dynamic_score": {"execution_avg": avg, "max": 100, "assertion_pass_rate": {"passed": ap, "total": at}, "inputs": [
+   {k: i[k] for k in ("index", "type", "label", "status", "status_flag", "note", "basic", "specialized", "total", "assertions_passed", "assertions_total", "assertions")} | {"executed": i["executed"], "execution_note": i["execution_note"]} for i in inputs]},
+ "final": {"static_weighted": sw, "dynamic_weighted": dw, "score": score, "max": 100, "grade": "Limited Release", "grade_symbol": "✅", "deployable": True, "veto_override": False},
+ "key_strengths": [
+  "All nine first-audit findings are fixed and re-verified by output: stale-CSI trap closed, CRAM reference guidance correct, large-genome section matches real CSI headers, -L vs --region-file corrected, Common Errors strings verbatim",
+  "The shipped ensure_index / ensure_indexed helpers survived 29 adversarial layout and mtime cases (fresh/stale BAI+CSI mixes, alt names, .crai, spaces, symlinks, set -euo pipefail)",
+  "fetch_regions.py's own parser matched samtools view -c and a full scan on 2,604 of 2,605 region strings across five BAMs, including colon-named contigs and a 3,366-contig header",
+  "usage-guide.md deduplication lost nothing the agent needs; SKILL.md is now the single source and every claim carries a measured number",
+ ],
+ "recommendations": [
+  {"priority": "P2", "title": "fetch_regions.py: 0-based start and end<start traceback", "observed_in": [3, 6],
+   "problem": "chr22:0-4000 (samtools counts 5550) and chr22:5000-4000 raise an uncaught ValueError with a raw pysam traceback; the fix log says bad coordinates exit with a message.",
+   "root_cause": "parse_region returns start=-1 for 0, and the fetch call catches only OSError.",
+   "fix": "Clamp a start of 0 to 0 in parse_region (samtools treats 0 as the first base) and catch ValueError around fetch, exiting with 'Bad region ...: start after end'."},
+  {"priority": "P2", "title": "fetch_regions.py rejects contig names containing a comma", "observed_in": [6],
+   "problem": "'ctg,1' and 'ctg,1:100-200' fail with 'unknown contig' although samtools returns the reads (260 rejected strings in the synthetic BAM).",
+   "root_cause": "region.replace(',', '') runs on the whole string before the contig lookup.",
+   "fix": "Test the whole string and the rpartition contig against aln.references first; strip commas only from the coordinate part."},
+  {"priority": "P2", "title": "Bash ensure_index can delete a sibling file's index", "observed_in": [7],
+   "problem": "With alternate-style names, ensure_index sample.cram removes sample.bai (the BAM's index) and ensure_index sample.bam removes sample.crai. Standard .bam.bai / .cram.crai names are safe.",
+   "root_cause": "The candidate list crosses formats (both .bai/.csi and .crai names for every file) and the stem-form names are shared between sibling files; the Python twin does not cross formats, so the two helpers differ.",
+   "fix": "Make the bash candidate list format-specific like index_candidates(): BAM -> .csi, stem.csi, .bai, stem.bai; CRAM -> .crai, stem.crai."},
+  {"priority": "P2", "title": "Genome table row implies pine needs CSI; 'cannot be stored in BAM at all' overstated", "observed_in": [4],
+   "problem": "Sugar pine's longest scaffold is ~24 Mbp and loblolly N50 ~107 kb, so BAI works; and a BAM with an LN=3e9 header and reads below 2^31-1 writes, CSI-indexes and queries correctly. Only positions above 2^31-1 fail.",
+   "root_cause": "The row and the sentence generalise from genome size and from the header limit to per-contig and per-position limits; the fixer could not verify real contig sizes.",
+   "fix": "Say 'assembled pine/fir scaffolds are usually far below 537 Mbp; check the longest with cut -f2 ref.fa.fai | sort -nr | head -1; axolotl chromosome arms exceed 537 Mbp', and 'reads positioned beyond 2^31-1 cannot be written to BAM'."},
+  {"priority": "P2", "title": "REF_PATH advice omits its required format", "observed_in": [2],
+   "problem": "'or REF_PATH' suggests pointing REF_PATH at a reference; a directory holding genome.fasta gives 0 records. Only flat MD5-named files or a %2s/%2s/%s pattern work.",
+   "root_cause": "The CRAM section names the variable without the MD5-store convention.",
+   "fix": "Add one line: REF_PATH is a cache of files named by the @SQ M5 checksum (REF_CACHE=dir/%2s/%2s/%s populates it), not a FASTA directory; -T ref.fa is the simple route."},
+  {"priority": "P2", "title": "Batch loop and helper edge behaviour undocumented", "observed_in": [7],
+   "problem": "for f in *.bam in a directory with no BAMs runs samtools on the literal '*.bam'; a stale CSI built with -m 12 is rebuilt at the default; a truncated but fresh index (or a BAM restored with an old mtime) passes as fresh.",
+   "root_cause": "mtime-only freshness test and no nullglob.",
+   "fix": "Add 'shopt -s nullglob' to the loop, a one-line note that freshness is by mtime only (verify with samtools idxstats vs samtools view -c after restores), and pass -m through when a CSI was rebuilt."},
+ ],
+}
+
+for cat, v in rep["static_score"]["categories"].items():
+    assert 0 <= v["score"] <= v["max"]
+assert rep["dynamic_score"]["execution_avg"] == avg
+json.dump(rep, open(OUT, "w", encoding="utf-8"), indent=2, ensure_ascii=False)
+print("static", sub, "avg", avg, "assertions", ap, "/", at, "final", sw, dw, score, "->", rep["final"]["grade"])
+print("L1 avg", round(sum(i["basic"] for i in inputs) / n, 1), "L2 avg", round(sum(i["specialized"] for i in inputs) / n, 1))
