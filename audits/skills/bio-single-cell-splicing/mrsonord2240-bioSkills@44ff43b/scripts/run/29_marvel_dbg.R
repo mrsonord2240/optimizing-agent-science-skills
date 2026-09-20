@@ -1,0 +1,1 @@
+suppressMessages(library(MARVEL)); m<-readRDS(system.file('extdata/data/marvel.demo.rds', package='MARVEL')); x <- m$SpliceFeature$SE$tran_id; print(x[grepl(':-@',x)][1:2]); print(sum(grepl(':-@',x))); cat(deparse(MARVEL::ComputePSI.SE)[75:140], sep='\n')

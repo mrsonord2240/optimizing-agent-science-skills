@@ -1,0 +1,11 @@
+suppressMessages(library(MARVEL))
+f <- system.file('extdata/data/marvel.demo.rds', package='MARVEL')
+m <- readRDS(f)
+cat('class', class(m), '\nnames:', names(m), '\n')
+for (n in names(m)) { x <- m[[n]]; cat('\n##', n, ':', class(x)[1], if (is.data.frame(x)||is.matrix(x)) paste(dim(x), collapse='x') else if (is.list(x)) paste(names(x), collapse=',') else '', '\n') }
+cat('\nSplicePheno head\n'); print(head(m$SplicePheno,3)); print(table(m$SplicePheno$cell.type))
+cat('\nSpliceJunction[1:3,1:4]\n'); print(m$SpliceJunction[1:3,1:4])
+cat('\nSpliceFeature$SE head\n'); print(head(m$SpliceFeature$SE,2))
+cat('\nGeneFeature head\n'); print(head(m$GeneFeature,2)); cat('\nExp[1:2,1:3]\n'); print(m$Exp[1:2,1:3]); cat('\nGTF class', class(m$GTF), '\n')
+cat('\nPSI names / SE dim\n'); print(names(m$PSI)); if(!is.null(m$PSI$SE)) print(dim(m$PSI$SE))
+cat('\nSpliceFeatureValidated SE dim\n'); print(dim(m$SpliceFeatureValidated$SE))

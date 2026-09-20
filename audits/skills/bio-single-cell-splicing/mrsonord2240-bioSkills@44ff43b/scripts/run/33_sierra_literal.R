@@ -1,0 +1,6 @@
+suppressMessages(library(Sierra))
+cat('FindPeaks junctions.file default:', deparse(formals(FindPeaks)$junctions.file), '\n')
+r <- tryCatch(FindPeaks(output.file = 'peaks.txt', gtf.file = 'annotation.gtf', bam.file = 'F:/OpenScience/audits/bio-single-cell-splicing/run/data/real/10xData/neuron_1k_v3_possorted_genome_bam.50events.bam'), error=function(e) conditionMessage(e))
+cat('Skill literal FindPeaks(bam.file=) ->', r, '\n')
+r <- tryCatch(FindPeaks(output.file = 'peaks.txt', gtf.file = 'annotation.gtf', bamfile = 'F:/OpenScience/audits/bio-single-cell-splicing/run/data/real/10xData/neuron_1k_v3_possorted_genome_bam.50events.bam'), error=function(e) conditionMessage(e))
+cat('FindPeaks(bamfile=, no junctions.file) ->', substr(r,1,200), '\n')

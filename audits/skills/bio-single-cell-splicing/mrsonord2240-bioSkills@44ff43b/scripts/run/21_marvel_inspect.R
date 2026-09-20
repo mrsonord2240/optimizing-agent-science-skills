@@ -1,0 +1,5 @@
+suppressMessages(library(MARVEL))
+cat('--- ComputePSI body (first 60 lines)\n'); b <- deparse(ComputePSI); cat(head(b, 70), sep='\n')
+cat('\n--- CreateMarvelObject body\n'); cat(head(deparse(CreateMarvelObject), 40), sep='\n')
+cat('\n--- pkg dirs\n'); print(list.files(system.file(package='MARVEL')))
+cat('\nvignettes/doc/data:\n'); print(list.files(system.file(package='MARVEL'), recursive=TRUE)[1:40])
