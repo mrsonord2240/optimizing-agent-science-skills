@@ -1,0 +1,211 @@
+#!/usr/bin/env python3
+"""Builds eval_report_bio-bam-statistics_result.json (schema: skill-auditor/references/report_json_schema.md) and validates the pre-emit checklist.
+Scores are the auditor's judgement from the run outputs in run/out/*.txt (each note names the output file)."""
+import json, os, sys
+
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+def A(text, ok, note):
+    return {"text": text, "result": "PASS" if ok else "FAIL", "note": note}
+
+inputs = [
+ dict(index=1, type="Canonical", label="Real human PE BAM and real 1000G BAM: flagstat/idxstats/stats/coverage, batch row, every mean-depth and >=Nx recipe (regression of pre-fix inputs 1 and 2)",
+  status="COMPLETED", note="[t1_canonical.sh, t1b_depth_real.sh] Every count equals record-flag truth (5644/5642/5640/5638; 1000G 9601/9595/9557/9450/101 dups). Block 018 -aa recipe prints 16.77x / 2.43% / 2.34% = alignment-block truth (16.7743/2.4299/2.3424); the old 568x average still reproduces only as the documented warning. Overlap table reproduced (16.77/8.86/8.85/16.75/16.77); bcftools -x gave 16.77 not 16.75.",
+  basic=37, specialized=55,
+  assertions=[
+   A("flagstat, idxstats, stats and coverage numbers on the real BAMs equal counts hand-derived from record flags", True, "8/8 flagstat fields on both BAMs equal truth.py; stats raw total 5642 / 9595; coverage meandepth 16.7743"),
+   A("The corrected mean-depth / >=10x / >=20x recipe (block 018) equals depth rebuilt from alignment blocks", True, "16.77x, 2.43%, 2.34% vs truth 16.7743, 2.4299%, 2.3424%; same with -a -r region form"),
+   A("region_depth_stats() (block 030) equals truth and samtools depth -a on 4 regions incl. a 1-bp position and an empty region", True, "1562.0000 at chr22:3000 and 0.0000 on the uncovered tail, all to 1e-9"),
+   A("Mate-overlap convention table values reproduce on this machine", True, "depth 16.77, depth -s 8.86, mpileup 8.85, mpileup -x 16.75, -Q 0 16.77, bcftools default 8.85; bcftools -x measured 16.77 vs 16.75 claimed (0.02x, table row lumps the two tools)"),
+   A("Idxstats mito and sex recipes on a chr22-only BAM exit 1 with a message instead of printing 0", True, "'no chrM/MT contig in idxstats' and 'no chrX/chrY contig in idxstats', rc=1"),
+  ]),
+ dict(index=2, type="Variant A", label="NEW synthetic planted-depth BAM: zero-coverage regions, contig with no reads, contig-end stack, deletions, spliced reads, excluded reads, overlapping pairs; denominators",
+  status="COMPLETED", note="[t2_planted.sh, t2_region_vs_truth.py] Truth by construction (22000 bp: mean 2.568182, >=10x 9.3182%, >=20x 5.6818%). Block 018 -aa prints 2.57x/9.32%/5.68% (exact); with -a it prints 2.97x/10.79% because the read-less contig is dropped, as the Skill says. region_depth_stats exact on 13 regions. Two Skill statements fail: 'depth -a -b' gives 2810 rows not 3110 (read-less chrC dropped, needs -aa), and mosdepth's summary total uses 19000 bp (2.95x).",
+  basic=34, specialized=50,
+  assertions=[
+   A("Block 018 (depth -aa) mean and breadth equal the planted truth over every @SQ position", True, "2.57x / 9.32% / 5.68% = 2.568182 / 9.3182 / 5.6818; -a variant 2.97x shows the read-less contig effect the Skill warns about"),
+   A("region_depth_stats() equals per-base truth arrays and samtools depth -a on 13 regions incl. read-less contig, contig end, deletion and spliced regions", True, "REGION_TRUTH_MISMATCHES 0; deletions (D) and N skips not counted, matching samtools depth"),
+   A("The coverage-from-BED loop (block 026) equals truth and mosdepth --by on 7 regions with extra BED columns, start=0 and a read-less contig", True, "means 30 / 9.4 / 12 / 3 / 0 / 18.1818 / 2.5 equal truth and mosdepth --by; but a 'track' header line in the BED prints a cryptic parse error"),
+   A("'samtools depth -a -b regions.bed' returns every base of every region, zeros included (SKILL.md 'Depth from BED Regions')", False, "2810 rows, not 3110: the 300 bp region on the read-less contig chrC is missing; -aa returns 3110"),
+   A("mosdepth summary mean uses the same every-reference-position denominator the Skill teaches", False, "mosdepth total row is 19000 bp / 2.95x (chrC with no reads omitted) vs 22000 bp / 2.57x from coverage and depth -aa; not mentioned in the Skill"),
+  ]),
+ dict(index=3, type="Edge", label="Planted flag categories (secondary, supplementary, QC-fail, duplicate, unmapped, singleton, mate on other chr) plus 9 NEW edge BAMs: qc_report.py and block 028 vs flagstat -O tsv (regression of pre-fix input 3)",
+  status="COMPLETED", note="[t3_edge.sh, t3_qc_vs_flagstat.py, t3_expected.py] qc_report.py and block 028 equal flagstat -O tsv (QC-passed column and percentages) and record-flag hand counts on 17 of 18 BAMs: synth (proper 92.31% as flagstat; pre-fix 88.9%), real human/1000G/ARTIC/RNA/SE, planted dups, empty, all-QC-fail, supp/sec-heavy, QC-fail-heavy, unmapped-only, mixed pairs. The Skill's cross-check identity now holds (520 = 540-10-10). The unaligned BAM with no @SQ crashes both with a ValueError traceback.",
+  basic=35, specialized=51,
+  assertions=[
+   A("qc_report.py counts and percentages equal samtools flagstat -O tsv (QC-passed column) on real and synthetic BAMs", True, "17/18 BAMs equal incl. empty and all-QC-fail ('nothing to report'); only the no-@SQ uBAM fails"),
+   A("The Count Reads snippet (block 028) equals flagstat primary / primary mapped / properly paired and exits with a message when nothing qualifies", True, "equal on every BAM with reads; empty and all-QC-fail exit 1 with 'no QC-passed primary reads', no traceback"),
+   A("Counts planted by construction in 8 edge BAMs are reproduced by qc_report.py (records, primary, secondary, supplementary, QC-fail, mapped, proper, duplicates)", True, "8/8 match data/edge/expected.json, independent of flagstat"),
+   A("The corrected cross-check identity flagstat_total(passed+failed) - secondary - supplementary = stats raw total sequences holds with QC-failed reads present", True, "540 - 10 - 10 = 520 = raw total sequences; the QC-passed-only reading would give 500"),
+   A("The pysam snippets and qc_report.py accept an unaligned BAM (no @SQ) that flagstat handles", False, "flagstat: 30 records; qc_report.py and block 028: ValueError 'file has no sequences defined ... check_sq=False'"),
+  ]),
+ dict(index=4, type="Variant B", label="Depth-cap trap: synthetic 9500x stack plus real ARTIC nanopore BAM, every tool in the cap table (regression of pre-fix input 4)",
+  status="COMPLETED", note="[t4_depth_cap.sh, t4_helper.py] Every default in the per-tool cap table reproduced on a 9500x stack (depth uncapped and -d ignored; coverage -d 1000000; mosdepth uncapped; samtools mpileup 8000 -> 9500 with -d 1000000; bcftools mpileup 250 -> 9500; pysam 8000 -> 9500). region_depth_stats mean 1000.0000 and 9500 max = truth. ARTIC real BAM: recipe, coverage and pysam helper all 68.8373x = truth; mosdepth reports 69.97x because it counts deletions, which the Skill does not mention.",
+  basic=37, specialized=54,
+  assertions=[
+   A("Each default depth cap listed in the Skill's table is reproduced (samtools depth, coverage, mosdepth, samtools mpileup, bcftools mpileup, pysam)", True, "max 9500 / 9500 / 9500 / 8000 / 250 / 8000 under defaults; 9500 with the documented raise flag; coverage -d 8000 gives mean 850"),
+   A("region_depth_stats() returns the true mean 1000.0 and max 9500 on the deep stack (old snippets gave 850 and 4250)", True, "[0,1000) mean 1000.0000 max 9500; [100,200) 9500.0000; [300,400) 500.0000"),
+   A("The block 018 recipe gives the true mean and breadth on the stack", True, "mean 1000.00x, >=10x 20.00% = truth 200/1000"),
+   A("On the real ARTIC BAM the recipe, samtools coverage and the pysam helper equal alignment-block truth", True, "68.8373x, 99.7425% covered/>=10x, max 159, in all three; mosdepth 69.97x differs by counting D bases (undocumented, minor)"),
+   A("samtools depth -d is silently ignored as the Skill states", True, "-d 100 still returns max 9500"),
+  ]),
+ dict(index=5, type="Stress", label="Batch summary loop on 15 BAMs (real, synthetic, empty, uBAM, QC-fail) plus plot-bamstats, MultiQC and stats GC-depth (regression of pre-fix input 5)",
+  status="COMPLETED", note="[t5_batch_plots.sh, t5_batch_check.py] Block 006 verbatim ran on 15 BAMs; all 15 rows (Records, QCfail, Primary, PrimaryMapped, ProperPair, PrimaryDup) equal record-flag hand counts, incl. 101 duplicates on 1000G, QC-failed 220 on the QC-fail-heavy BAM, empty and uBAM rows. plot-bamstats wrote 11 PNGs; MultiQC built a 2.2 MB report from the stats/flagstat/idxstats text. The 1000G GC-depth comparison with the padded FASTA crashed in samtools (data artefact), so the -r claim rests on --help only.",
+  basic=36, specialized=52,
+  assertions=[
+   A("Every batch-loop row equals counts derived from record flags on 15 BAMs", True, "BATCH_FAILS 0; includes QC-failed and empty and unaligned inputs"),
+   A("plot-bamstats works as installed in the Skill's install line (perl-uri)", True, "11 PNGs plus gnuplot scripts written from real samtools stats"),
+   A("multiqc . ingests the samtools stats / flagstat / idxstats text files", True, "Found 1 stats, 1 flagstat, 1 idxstats reports; report 2.27 MB; flagstat table columns present"),
+   A("'samtools stats -r ref.fa' for GC-depth and CRAM 'needs --reference' match the tool", True, "--help: '-r, --ref-seq ... required for GC-depth'; stats --reference works on CRAM, -r fails with a reference-load error; effect of -r on GCD values not shown (padded 1000G FASTA crashed samtools)"),
+  ]),
+ dict(index=6, type="Scope Boundary", label="Mate-pair insert size, adapter read-through via soft-clipping, Picard HsMetrics, VerifyBamID2/somalier hand-offs and unverified-number labelling (regression of pre-fix input 6)",
+  status="COMPLETED", note="[t6_scope.sh, t6_softclip.py, t6b_qc_insert_cap.sh, t10_vb2.sh] The soft-clip awk recipe equals a CIGAR walk with pysam on 11 BAMs under gawk and mawk (incl. hand-built H/S/N/I/D/=/X/P CIGARs); the old grep is still empty; the empty-output guard exits 1 with a message. RF library: stats reports IS with outward pairs dominating, flag set or unset. Picard BedToIntervalList and CollectHsMetrics run (PCT_OFF_BAIT 0, MEAN_TARGET_COVERAGE 131.06). VerifyBamID2 command syntax is accepted (panel read, 204 of 10000 markers shared) but no FREEMIX is producible (Insufficient markers); somalier fails on missing chr1, as labelled. qc_report.py silently drops inserts >=1000 bp.",
+  basic=34, specialized=49,
+  assertions=[
+   A("The soft-clip recipe reproduces a pysam CIGAR walk and guards empty output", True, "SOFTCLIP_MISMATCHES 0 on 11 BAMs x 2 awks; unmapped-only/empty/uBAM exit 1 with 'nothing to compute'"),
+   A("The corrected Insert Size Caveats hold: stats reports IS and orientation counts for a mate-pair library with the proper-pair flag set or unset", True, "average 2000.0, outward 100, inward 0 in both cases; qc_report.py prints 0.00% proper for the unset case"),
+   A("The Picard CollectHsMetrics / BedToIntervalList commands run and produce the metrics the Skill names", True, "1 interval, 2666 bases; PCT_OFF_BAIT 0, PCT_SELECTED_BASES 1, MEAN_TARGET_COVERAGE 131.06 (samtools depth -s 132.94)"),
+   A("Unverified numbers and commands are labelled as such: assay table 'literature ranges, not verified', FREEMIX cut-offs 'commonly cited', VerifyBamID2/somalier 'not run end to end'", True, "labelling is honest and matches what I could reproduce (VerifyBamID2 accepts the syntax but cannot produce FREEMIX on available data); no citations are given for the numbers"),
+   A("qc_report.py insert-size summary agrees with samtools stats and block 031 on a mate-pair library", False, "rf.bam: stats and block 031 give 2000; qc_report.py prints no insert lines because it silently keeps only 0 < TLEN < 1000; the cap is documented nowhere"),
+  ]),
+ dict(index=7, type="Adversarial", label="Empty, single-end, unindexed BAM, Ensembl MT contig, space in file name, plus NEW uBAM, SAM text and CRAM input through the fixed recipes (regression of pre-fix input 7)",
+  status="COMPLETED", note="[t7_adversarial.sh, t8_misc_claims.sh, t0_stability_determinism.sh, t9_syntax_sweep.sh] Empty/SE/MT/unindexed inputs now give correct results or an exit-1 message (pre-fix: ZeroDivisionError and silent 0): mito recipe 7.62% on chrM and on renamed MT, 'no mapped reads' on a zero-read MT contig, batch loop OK with a space in the name. New: an unaligned BAM (no @SQ) and a CRAM given to qc_report.py fail with ValueError / 'OSError: truncated file' (no reference option, error does not say why); a zero-length region raises ZeroDivisionError. Determinism 10/10 identical; 28 bash blocks pass bash -n and 4 Python blocks compile.",
+  basic=33, specialized=47,
+  assertions=[
+   A("Empty and single-end BAMs give a message or a correct value, never a traceback (block 028, qc_report.py, block 031, recipes)", True, "empty: 'no QC-passed primary reads' rc 1 / 'nothing to report' rc 0; SE: 'Single-end data'; depth -aa recipe on empty prints 0.00x"),
+   A("The mito recipe finds an Ensembl-style MT contig and does not divide by zero on a zero-read contig", True, "7.62% on chrM and MT (40/525); zero-read MT prints 'no mapped reads', rc 1"),
+   A("An absent chrM/chrX/chrY prints a message and exits 1 instead of a false 0", True, "verified on empty, SE and chr22-only BAMs"),
+   A("An unaligned BAM with only @RG (no @SQ) is handled by the pysam tools", False, "qc_report.py and block 028: ValueError 'file has no sequences defined'"),
+   A("A CRAM input to qc_report.py / pysam snippets works or the Skill says a reference is needed", False, "OSError 'truncated file' with the CRAM's dead UR path and with REF_PATH set to the reference directory; the Skill documents CRAM only for stats and mosdepth"),
+  ]),
+]
+
+for i in inputs:
+    i["total"] = i["basic"] + i["specialized"]
+    i["assertions_passed"] = sum(a["result"] == "PASS" for a in i["assertions"])
+    i["assertions_total"] = len(i["assertions"])
+    i["status_flag"] = "✅" if i["status"] == "COMPLETED" and i["total"] >= 75 else "⚠️"
+    i["executed"] = True
+INPUT_EXEC = {
+ 1: "Executed in WSL science (samtools 1.24, mosdepth 0.3.14, bcftools 1.24, pysam 0.24.1) on real human and 1000G BAMs",
+ 2: "Executed on a SYNTHETIC BAM (seed 7707), truth by construction",
+ 3: "Executed on SYNTHETIC BAMs (seeds 20260920 and 88) and 6 real BAMs",
+ 4: "Executed on a SYNTHETIC 9500x stack and the real ARTIC BAM",
+ 5: "Executed on 15 BAMs, plot-bamstats, MultiQC 1.35",
+ 6: "Executed; VerifyBamID2 ran but produced no FREEMIX (204 of 10000 panel markers on synthetic chr20 data), somalier extract not runnable without a whole-GRCh38 FASTA; the assay-threshold table is not executable",
+ 7: "Executed",
+}
+for i in inputs:
+    i["execution_note"] = INPUT_EXEC[i["index"]]
+
+execavg = round(sum(i["total"] for i in inputs) / len(inputs), 1)
+cats = {
+ "functional_suitability": (10, 12, "Completeness 4, Correctness 3, Appropriateness 3. Every recipe the fixer changed reproduces truth; remaining correctness gaps are small (depth -a -b on read-less contigs, mosdepth summary denominator, qc_report 1000 bp window, uBAM/CRAM in the pysam tools)."),
+ "reliability": (9, 12, "Fault tolerance 3, Error reporting 3, Recoverability 3. Empty/SE/MT/absent-contig/zero-denominator cases now exit with a message; uBAM and CRAM input crash the pysam tools, and the CRAM error ('truncated file') does not say why."),
+ "performance_context": (6, 8, "Token cost 3, Execution efficiency 3. SKILL.md grew to 505 lines (was 427) with recipes folded in; usage-guide.md is now a 42-line prompt list; no references/ directory."),
+ "agent_usability": (13, 16, "Learnability 3, Consistency 3, Feedback 3, Error prevention 4. Explicit traps (raw depth average, depth caps, -aa vs -a, -b on coverage, soft-clip grep, QC-failed columns); qc_report.py's undocumented 1000 bp insert window disagrees with block 031."),
+ "human_usability": (6, 8, "Discoverability 3, Forgiveness 3. Natural example prompts in the usage guide; off-spec input mostly handled with messages, except uBAM/CRAM/BED header lines."),
+ "security": (11, 12, "Credentials 4, Input validation 3, Data safety 4. No eval/exec/network/credentials in the Skill or examples/qc_report.py (grep clean); file paths are not validated before use."),
+ "maintainability": (9, 12, "Modularity 3, Modifiability 3, Testability 3. Duplication between usage-guide.md and SKILL.md removed; checked values are quoted in the text but no test data or expected outputs ship."),
+ "agent_specific": (17, 20, "Trigger precision 3, Progressive disclosure 3, Composability 4, Idempotency 4, Escape hatches 3. All Related Skills exist; hand-offs to Picard, VerifyBamID2, somalier are given with honest 'not run end to end' labelling; SKILL.md is 505 lines, five over the guideline."),
+}
+subtotal = sum(v[0] for v in cats.values())
+sw = round(subtotal * 0.4, 1); dw = round(execavg * 0.6, 1); score = int(round(sw + dw))
+tot_pass = sum(i["assertions_passed"] for i in inputs); tot_all = sum(i["assertions_total"] for i in inputs)
+avg_basic = sum(i["basic"] for i in inputs) / 7; avg_spec = sum(i["specialized"] for i in inputs) / 7
+grade = "Production Ready" if score >= 85 else "Limited Release" if score >= 75 else "Beta Only" if score >= 60 else "Reject"
+# floors (scoring_rubric section 5): assertion pass rate >= 90% for Production Ready; not met -> one tier down
+rate = tot_pass / tot_all
+if grade == "Production Ready" and (subtotal < 80 or execavg < 85 or avg_basic < 32 or avg_spec < 48 or rate < 0.90):
+    grade = "Limited Release"
+symbol = {"Production Ready": "⭐", "Limited Release": "✅", "Beta Only": "⚠️", "Reject": "❌"}[grade]
+
+recs = [
+ dict(priority="P1", title="pysam tools fail on unaligned BAM and CRAM input", observed_in=[3, 7],
+  problem="examples/qc_report.py and the Count Reads / insert-size snippets raise ValueError ('file has no sequences defined') on an unaligned BAM with no @SQ, and 'OSError: truncated file' on a CRAM (no reference argument); flagstat and stats handle both.",
+  root_cause="AlignmentFile is opened with 'rb' only, without check_sq=False or reference_filename, and the Skill documents CRAM only for stats and mosdepth.",
+  fix="Open with pysam.AlignmentFile(path, 'rb', check_sq=False) and add an optional reference argument (reference_filename=...) to qc_report.py; add one line in SKILL.md saying CRAM needs a reference in pysam too."),
+ dict(priority="P2", title="'depth -a -b regions.bed' does not print every base of every region", observed_in=[2],
+  problem="SKILL.md says the command gives every base of every region with zeros; regions on a contig with no reads are dropped (2810 rows instead of 3110 in the test; -aa gives 3110).",
+  root_cause="The fixer added -a but samtools depth -a omits contigs that have no reads, which the same document states elsewhere.",
+  fix="Change the recipe to 'samtools depth -aa -b regions.bed' or add the caveat next to it."),
+ dict(priority="P2", title="mosdepth summary denominator differs from the teaching recipe", observed_in=[2],
+  problem="The mosdepth summary total row drops contigs with no reads (19000 bp, 2.95x versus 22000 bp, 2.57x from depth -aa and coverage), and mosdepth counts deletion bases as covered (69.97x vs 68.84x on the ARTIC BAM); the Skill's denominator warnings do not cover either.",
+  root_cause="The denominator and D/N conventions are documented for samtools recipes and the mate-overlap table only.",
+  fix="Add one sentence to the mosdepth section: summary 'total' covers only contigs that have reads, and D bases count as covered; for a whole-reference mean use samtools coverage / depth -aa."),
+ dict(priority="P2", title="qc_report.py insert size window undocumented", observed_in=[6],
+  problem="qc_report.py keeps only 0 < template_length < 1000; on a 2000 bp mate-pair library it prints no insert lines while samtools stats and block 031 report 2000.",
+  root_cause="An unexplained magic constant in the shipped example.",
+  fix="Drop the cap or name it (MAX_INSERT with a comment) and mention it under Insert Size Caveats."),
+ dict(priority="P2", title="Coverage-from-BED loop and small text nits", observed_in=[1, 2, 6],
+  problem="The while-read loop prints a cryptic 'Failed to parse region track:1-' on a BED with a track/browser header line; region_depth_stats() raises ZeroDivisionError for a zero-length region; the mate-overlap table gives 16.75x for both mpileup tools (bcftools -x measured 16.77x); 'faster than depth' for samtools coverage is unmeasured; SKILL.md is 505 lines.",
+  root_cause="Recipes were checked on clean inputs; a few statements were carried over without measurement.",
+  fix="Skip lines starting with track/browser/# in the loop, guard length <= 0, split the table row per tool, drop or measure the speed phrase."),
+ dict(priority="P2", title="Assay thresholds and FREEMIX cut-offs are unsourced; VerifyBamID2/somalier not run end to end", observed_in=[6],
+  problem="The labelling is honest (literature ranges, commonly cited, not run end to end) and I could not falsify it, but no source is given for any number and no FREEMIX or somalier output was ever produced (VerifyBamID2 accepted the syntax and shared 204 of 10000 panel markers, then stopped for insufficient markers).",
+  root_cause="No whole-genome BAM or GRCh38 FASTA exists on the audit machine.",
+  fix="Cite one reference per row of the assay table or the 1000 Genomes/GATK documentation for the FREEMIX values, and keep the 'not run end to end' note until a whole-genome test exists."),
+]
+
+report = {
+ "meta": {
+  "skill_name": "bio-bam-statistics",
+  "description": "Generate alignment statistics using samtools flagstat, stats, depth, coverage, and mosdepth. Use when assessing alignment quality, calculating coverage, or generating QC reports.",
+  "source": "mrsonord2240/bioSkills@377e36864bf398a94814cd3408350f9d382d3108:alignment-files/bam-statistics",
+  "evaluated_on": "2026-09-20",
+  "evaluator_version": "skill-auditor@1.0",
+  "category": "Data Analysis",
+  "execution_mode": "D",
+  "complexity": "Complex",
+  "n_inputs": 7,
+  "audit_type": "re-audit of a fixed Skill (fix/af-bamstat); pre-fix report 71 Beta Only archived at audits/_pre-fix-20260920/bio-bam-statistics/",
+  "pre_fix_score": 71,
+  "regression_inputs": "Inputs 1, 3, 4, 5, 6, 7 re-run the pre-fix inputs (the pre-fix data generators and truth helper were re-run and re-used); NEW: input 2 (planted-depth BAM, wholly new), the 9 edge BAMs and the coverage/uBAM/CRAM/BED-header/VerifyBamID2 probes inside inputs 3, 6 and 7, and the second real BAM (1000G) in input 1.",
+  "executed": "7/7 inputs executed (input 6 partly: VerifyBamID2 accepted the command but produced no FREEMIX and somalier could not be run for lack of a whole-GRCh38 FASTA; the assay-threshold table is not executable)",
+  "tools": "samtools 1.24, pysam 0.24.1, mosdepth 0.3.14, bcftools 1.24, Picard 3.5.0, MultiQC 1.35, plot-bamstats, VerifyBamID2 2.0.3, somalier 0.3.5 (WSL science, env alignment-files); run from a copy of the Skill in run/skill, worktree untouched"
+ },
+ "veto_gates": {
+  "skill_veto": {"gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS"},
+  "research_veto": {
+   "applicable": True, "gate": "PASS",
+   "scientific_integrity": {"result": "PASS", "detail": "No PMIDs, trial data or invented numbers; every value the Skill states was compared with an independent computation, and the unverified assay ranges and cut-offs are labelled as literature values."},
+   "practice_boundaries": {"result": "PASS", "detail": "QC statistics only; the sex-check is a raw X/Y read ratio with no clinical interpretation; contamination and enrichment are handed to Picard, VerifyBamID2 and somalier."},
+   "methodological_ground": {"result": "PASS", "detail": "The covered-position denominator fallacy is fixed (block 018 equals truth); the remaining denominator gaps (mosdepth summary, depth -a -b on read-less contigs) are recorded as P2."},
+   "code_usability": {"result": "PASS", "detail": "All 28 bash blocks pass bash -n and 4 Python blocks compile; the recipes ran on real and synthetic data; qc_report.py ran deterministically (10/10) and equals flagstat on 17 of 18 BAMs. The uBAM and CRAM crashes are recorded as P1, not judged unrunnable."}
+  }
+ },
+ "static_score": {"subtotal": subtotal, "max": 100, "categories": {k: {"score": v[0], "max": v[1], "note": v[2]} for k, v in cats.items()}},
+ "dynamic_score": {
+  "execution_avg": execavg, "max": 100,
+  "assertion_pass_rate": {"passed": tot_pass, "total": tot_all},
+  "inputs": inputs,
+ },
+ "final": {"static_weighted": sw, "dynamic_weighted": dw, "score": score, "max": 100, "grade": grade, "grade_symbol": symbol,
+           "deployable": grade in ("Production Ready", "Limited Release"), "veto_override": False},
+ "key_strengths": [
+  "Every recipe the fixer changed reproduces independent truth: mean depth and breadth (16.77x / 2.43% / 2.34% on real data, 2.57x on a planted BAM with a read-less contig), the depth-cap table, the soft-clip recipe and the batch loop",
+  "examples/qc_report.py and the Count Reads snippet equal samtools flagstat -O tsv and record-flag hand counts on 17 of 18 BAMs, including QC-fail, supplementary/secondary-heavy, empty and single-end data",
+  "Empty, single-end, absent-contig and MT-named inputs now exit with a message or a correct value; pre-fix ZeroDivisionError and silent zeros are gone",
+  "Unverified assay ranges, FREEMIX cut-offs and the not-run-end-to-end VerifyBamID2/somalier commands are labelled honestly in the text",
+  "The speed claim was removed and usage-guide.md duplication was cut without losing anything an agent needs"
+ ],
+ "recommendations": recs,
+}
+
+# ---- pre-emit checklist ----
+r = report
+assert len(r["static_score"]["categories"]) == 8
+assert r["static_score"]["subtotal"] == sum(v["score"] for v in r["static_score"]["categories"].values())
+assert all(0 <= v["score"] <= v["max"] for v in r["static_score"]["categories"].values())
+assert len(inputs) == r["meta"]["n_inputs"] == 7
+for i in inputs:
+    assert 3 <= len(i["assertions"]) <= 5 and i["assertions_passed"] == sum(a["result"] == "PASS" for a in i["assertions"])
+    assert i["basic"] + i["specialized"] == i["total"] and i["basic"] <= 40 and i["specialized"] <= 60
+assert 2 <= len(r["key_strengths"]) <= 5
+assert r["dynamic_score"]["execution_avg"] == round(sum(i["total"] for i in inputs) / 7, 1)
+assert [x["priority"] for x in recs] == sorted(x["priority"] for x in recs)
+print(json.dumps({"static": subtotal, "exec_avg": execavg, "static_w": sw, "dyn_w": dw, "score": score, "grade": grade,
+                  "assertions": f"{tot_pass}/{tot_all} = {rate:.1%}", "avg_basic": round(avg_basic, 1), "avg_spec": round(avg_spec, 1)}))
+with open(os.path.join(ROOT, "eval_report_bio-bam-statistics_result.json"), "w", encoding="utf-8", newline="\n") as fh:
+    json.dump(report, fh, indent=2, ensure_ascii=False)
+    fh.write("\n")
