@@ -8,7 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (80)
+## P1 (77)
 
 ### `bio-alignment-multiple` — Fix MUSCLE5 ensemble commands (-super5 has no .efa)
 
@@ -185,30 +185,6 @@ None open.
 - Problem: Once a real pyfocus-schema FOCUS weight DB is used (rather than the wrong-schema DB that masked this during the fix's own verification), `focus finemap` reaches the 'Calculating PIPs' step and crashes with `TypeError: DataFrame.pivot() takes 1 positional argument but 4 were given`, and after that is worked around, with `AttributeError: 'DataFrame' object has no attribute 'append'` -- both inside pyfocus's own finemap.py, not the Skill's authored content.
 - Root cause: pyfocus/finemap.py:1012 calls `attr_tmp.pivot("model_id", "attr_name", "value")` (positional args, removed by pandas>=2.0) and finemap.py:188 calls `df.append(null_dict, ignore_index=True)` (removed by pandas>=2.0). The pandas<2.2 pin only prevents the earlier delim_whitespace/np.warnings crashes; it does not avoid these because pandas<2.0 pins were never applied, and pyfocus's own code was never updated for pandas>=2.0's stricter API.
 - Fix: Document two further one-line patches in SKILL.md's Tool Install Notes: `attr_tmp.pivot(index="model_id", columns="attr_name", values="value")` at finemap.py:1012, and replace `df.append(null_dict, ignore_index=True)` with `pd.concat([df, pd.DataFrame([null_dict])], ignore_index=True)` at finemap.py:188. Both were confirmed this session: with both patches, focus finemap produces correct real PIP output (pips_pop1=1.0 for a true gene, ~3.4e-08 for the null-model row).
-
-### `bio-crispr-screens-combinatorial-screens` — gi_score() column names don't match the Skill's own documented file format
-
-- Skill: 87, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/crispr-screens/combinatorial-screens) · [viewer](skills/bio-crispr-screens-combinatorial-screens/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 1, 5
-- Problem: SKILL.md's gi_score(paired_lfc_df, single_lfc_df) docstring specifies columns 'paired_lfc'/'single_lfc', but examples/gi_scoring.py and the usage-guide's own file-format description use 'lfc' for both files, causing a confirmed KeyError when the function is applied verbatim to the tsv format the Skill itself names.
-- Root cause: The SKILL.md inline function and examples/gi_scoring.py are two independently-maintained implementations of the same algorithm that have drifted out of sync.
-- Fix: Rename the SKILL.md gi_score() docstring and body to use 'lfc' consistently (matching examples/gi_scoring.py), or add one line stating the required column rename before use.
-
-### `bio-crispr-screens-combinatorial-screens` — MAGeCK MLE interaction\|fdr is not reproducible across identical reruns
-
-- Skill: 87, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/crispr-screens/combinatorial-screens) · [viewer](skills/bio-crispr-screens-combinatorial-screens/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 4
-- Problem: Two consecutive `mageck mle` runs on byte-identical count/design files produced different interaction\|fdr values for 39 of 40 genes (point-estimate betas remained identical); mageck mle exposes no seed-control flag.
-- Root cause: mageck mle's permutation-based FDR estimation has no exposed random seed, and SKILL.md does not flag this non-determinism.
-- Fix: Add a note under the MAGeCK MLE section stating that interaction\|fdr is not bit-reproducible across reruns, reinforcing the Skill's existing guidance to use the deterministic explicit GI z-score method for any reported significance claim.
-
-### `bio-crispr-screens-combinatorial-screens` — No explicit clinical/practice-boundary escape hatch
-
-- Skill: 87, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/crispr-screens/combinatorial-screens) · [viewer](skills/bio-crispr-screens-combinatorial-screens/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 6
-- Problem: When asked to recommend patient therapy from a screen-derived synthetic-lethal pair, the correct decline relied entirely on general model judgment; SKILL.md never states that screen-derived hits are research leads only, not validated therapeutic indications.
-- Root cause: SKILL.md frames outputs as 'drug-target nomination' but stops short of stating the boundary between a screen hit and a clinical recommendation.
-- Fix: Add a short Scope/Escape-Hatch note: synthetic-lethal calls from a screen are research leads requiring standard preclinical and clinical translation pathways, not patient-facing treatment recommendations.
 
 ### `bio-single-cell-cell-annotation` — The triage screens on the one signal artifacts do not trip
 
@@ -650,7 +626,7 @@ None open.
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (314)
+## P2 (313)
 
 ### `bio-crispr-screens-copy-number-correction` — negative_control_sgrnas empty-dict case raises an undocumented ValueError
 
@@ -1179,30 +1155,6 @@ None open.
 - Problem: examples/ only ships s_predixcan_pipeline.sh and focus_finemap.sh; FUSION.assoc_test.R usage lives only as an inline bash fence in SKILL.md, and no fixture data is shipped for any of the 12 tools. Unchanged from the pre-fix audit; deliberately out of scope for this fix pass.
 - Root cause: Example coverage was built out for S-PrediXcan and FOCUS but not extended to FUSION despite FUSION being the frontmatter primary_tool.
 - Fix: Add examples/fusion_assoc_test.sh mirroring the other two scripts, plus a tiny synthetic fixture set.
-
-### `bio-crispr-screens-combinatorial-screens` — No multiple-testing correction guidance for genome-scale z-score GI calling
-
-- Skill: 87, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/crispr-screens/combinatorial-screens) · [viewer](skills/bio-crispr-screens-combinatorial-screens/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 1, 5
-- Problem: The fixed z<-2/z>2 cutoff is applied without discussion of false-discovery control when testing thousands of pairs simultaneously at genome scale.
-- Root cause: SKILL.md documents a single raw z-score cutoff with no FDR/BH correction step.
-- Fix: Add a brief note recommending FDR (Benjamini-Hochberg) correction across all tested pairs, or an empirical null from all-singleton controls, alongside the existing raw z-score cutoff.
-
-### `bio-crispr-screens-combinatorial-screens` — No minimum-N guidance for the z-score GI cutoff
-
-- Skill: 87, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/crispr-screens/combinatorial-screens) · [viewer](skills/bio-crispr-screens-combinatorial-screens/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 3
-- Problem: At N=8 tested pairs, two planted strong synthetic-lethal interactions were the most extreme values in the set (z=-1.55, -1.49) but did not cross the documented z<-2 cutoff, purely because a small pair count under-populates the null distribution used for z-normalization.
-- Root cause: SKILL.md documents cassette/singleton-count thresholds but never states a minimum number of tested pairs needed for the z-normalization itself to be well-calibrated.
-- Fix: Add a line noting that z-score normalization needs a reasonably large tested-pair set (dozens or more) for a stable null; for small, specific pair sets (e.g., a handful of Big Papi pairs) recommend ranking by raw GI effect size instead of a z-score cutoff.
-
-### `bio-crispr-screens-combinatorial-screens` — Duplicated threshold/decision tables between SKILL.md and usage-guide.md
-
-- Skill: 87, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/crispr-screens/combinatorial-screens) · [viewer](skills/bio-crispr-screens-combinatorial-screens/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: —
-- Problem: The Quantitative Thresholds table and the architecture Decision Cheat Sheet appear near-verbatim in both SKILL.md and usage-guide.md, adding token cost with no added value.
-- Root cause: The two files were authored with overlapping reference content instead of one file owning the canonical table.
-- Fix: Keep one canonical copy of each table (in SKILL.md) and cross-reference it from usage-guide.md instead of duplicating it.
 
 ### `bio-experimental-design-batch-design` — Bridge-channel block doesn't inherit the soft imbalance warning
 
@@ -2651,6 +2603,22 @@ None open.
 - Problem: Calling find_be_spacers() with an invalid `editor` string raises a bare `KeyError: 'NOT_A_REAL_EDITOR'` from the window_by_editor dict lookup, rather than a clear message listing the valid editor names.
 - Root cause: window_by_editor[editor] is indexed directly with no existence check, the same pattern the fix pass replaced with explicit ValueErrors in the other 3 functions.
 - Fix: Add `if editor not in window_by_editor: raise ValueError(f"editor={editor!r} not recognized; valid editors: {sorted(window_by_editor)}")` at the top of the function, consistent with the validation style already added elsewhere in this Skill.
+
+### `bio-crispr-screens-combinatorial-screens` — No minimum-N guidance for the z-score GI cutoff (open; re-auditor disagrees this is out of fixer scope)
+
+- Skill: 92, Production Ready · [mrsonord2240/bioSkills@7763a3c](https://github.com/mrsonord2240/bioSkills/tree/7763a3c04fd12306e4f1a546b3cdf91820900755/crispr-screens/combinatorial-screens) · [viewer](skills/bio-crispr-screens-combinatorial-screens/mrsonord2240-bioSkills@7763a3c/viewer.md)
+- Observed in inputs: 3
+- Problem: At low N (independently re-confirmed at N=9, distinct from the original N=8 case), planted strong synthetic-lethal interactions were the most extreme values in the set but did not cross the documented z<-2 cutoff, purely because a small pair count under-populates the null distribution used for z-normalization. SKILL.md still gives no minimum-N guidance.
+- Root cause: SKILL.md documents cassette/singleton-count thresholds but never states a minimum number of tested pairs needed for z-normalization to be well-calibrated. The fixer judged this 'new statistical guidance' and left it open, deferring to the re-auditor per the fix log.
+- Fix: Re-auditor's judgment: this should have been fixed. FIX_BRIEF's own bar for a method-level change is 'the audit demonstrated the problem with a run' -- Input 3 already demonstrated it pre-fix, and this re-audit reproduced it independently on different data. Cheap, one-line addition: note that z-score normalization needs a reasonably large tested-pair set (dozens or more) for a stable null, and recommend raw GI effect-size ranking instead of a z-cutoff for small, specific pair sets (e.g. a handful of Big Papi pairs). Does not block landing (P2, no veto, no P0).
+
+### `bio-crispr-screens-combinatorial-screens` — No multiple-testing correction guidance for genome-scale z-score GI calling (open; re-auditor agrees out of fixer scope)
+
+- Skill: 92, Production Ready · [mrsonord2240/bioSkills@7763a3c](https://github.com/mrsonord2240/bioSkills/tree/7763a3c04fd12306e4f1a546b3cdf91820900755/crispr-screens/combinatorial-screens) · [viewer](skills/bio-crispr-screens-combinatorial-screens/mrsonord2240-bioSkills@7763a3c/viewer.md)
+- Observed in inputs: 1, 5
+- Problem: The fixed z<-2/z>2 cutoff is applied without discussion of false-discovery control when testing thousands of pairs simultaneously at genome scale.
+- Root cause: SKILL.md documents a single raw z-score cutoff with no FDR/BH correction step.
+- Fix: Re-auditor's judgment: correctly left open. Unlike the minimum-N issue, no audit run has ever demonstrated this producing a wrong call in practice (both the first audit's 200-pair run and this re-audit's 150-pair run recovered ground truth with 0 false positives at the documented cutoff). This is prospective best-practice guidance, not a correction of a demonstrated defect, so it is legitimately outside the fixer's 'correction, not new content' mandate. Worth adding in a future content pass: recommend Benjamini-Hochberg correction across all tested pairs at genome scale.
 
 ### `bio-crispr-screens-in-vivo-screens` — Ethics-requirement surfacing relies on agent judgment, not a forced trigger
 
