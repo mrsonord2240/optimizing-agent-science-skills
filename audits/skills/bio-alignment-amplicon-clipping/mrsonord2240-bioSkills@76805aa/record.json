@@ -1,9 +1,9 @@
 {
   "skill_id": "bio-alignment-amplicon-clipping",
-  "version": "mrsonord2240-bioSkills@c206dff",
+  "version": "mrsonord2240-bioSkills@76805aa",
   "source": {
     "repository": "mrsonord2240/bioSkills",
-    "commit": "c206dff76d081a5126f8497fbabe10995c9b6026",
+    "commit": "76805aaab9347c8022c25df34c533cc3abd0b898",
     "path": "alignment-files/alignment-amplicon-clipping",
     "author": "GPTomics",
     "author_url": "https://github.com/GPTomics",
@@ -13,7 +13,7 @@
       "repository": "GPTomics/bioSkills",
       "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
     },
-    "url": "https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/alignment-amplicon-clipping"
+    "url": "https://github.com/mrsonord2240/bioSkills/tree/76805aaab9347c8022c25df34c533cc3abd0b898/alignment-files/alignment-amplicon-clipping"
   },
   "audit": {
     "method": {
@@ -31,11 +31,11 @@
     "commissioned_by": "Samuel Nord",
     "test_data": "synthetic"
   },
-  "supersedes": null,
+  "supersedes": "mrsonord2240-bioSkills@c206dff",
   "files": {
     "report": "report.json",
     "viewer": "viewer.md",
     "fixes": "fixes.md",
-    "scripts": 19
+    "scripts": 32
   }
 }
