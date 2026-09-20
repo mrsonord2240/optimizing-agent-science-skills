@@ -1,9 +1,9 @@
 {
   "skill_id": "bio-differential-splicing",
-  "version": "mrsonord2240-bioSkills@44ff43b",
+  "version": "mrsonord2240-bioSkills@ec5b9cf",
   "source": {
     "repository": "mrsonord2240/bioSkills",
-    "commit": "44ff43bb35e5741c3ddd3c003590e1f1da8a4a4b",
+    "commit": "ec5b9cf46e2b1c73a361724dab97168c464fcbac",
     "path": "alternative-splicing/differential-splicing",
     "author": "GPTomics",
     "author_url": "https://github.com/GPTomics",
@@ -13,7 +13,7 @@
       "repository": "GPTomics/bioSkills",
       "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
     },
-    "url": "https://github.com/mrsonord2240/bioSkills/tree/44ff43bb35e5741c3ddd3c003590e1f1da8a4a4b/alternative-splicing/differential-splicing"
+    "url": "https://github.com/mrsonord2240/bioSkills/tree/ec5b9cf46e2b1c73a361724dab97168c464fcbac/alternative-splicing/differential-splicing"
   },
   "audit": {
     "method": {
@@ -31,11 +31,11 @@
     "commissioned_by": "Samuel Nord",
     "test_data": "synthetic"
   },
-  "supersedes": null,
+  "supersedes": "mrsonord2240-bioSkills@44ff43b",
   "files": {
     "report": "report.json",
     "viewer": "viewer.md",
     "fixes": "fixes.md",
-    "scripts": 26
+    "scripts": 45
   }
 }

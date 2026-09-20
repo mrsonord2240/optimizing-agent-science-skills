@@ -38,7 +38,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: Flags copied from FLAIR 2.x docs and IsoQuant's git-checkout script name; Version Compatibility line claims 2.0+/3.5+ without a test.
 - Fix: Rewrite FLAIR correct as `flair correct -q reads.bed -f anno.gtf --junction_bed\|--junction_tab sr_junctions -o out -t N`, state the BAM->BED12 step (bedtools bamtobed -bed12 or flair align), use `isoquant`, pin tested versions (FLAIR 3.0.1, IsoQuant 4.0.0, SQANTI3 6.0.2, Bambu 3.8.3 needs xgboost 1.x).
 
-## P1 (101)
+## P1 (96)
 
 ### `bio-isoform-switching` — Manual DTU pipeline stops at samples(d) after library(DEXSeq)
 
@@ -159,46 +159,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: 'rMATS-long: GTF-Only Input' says BAMs are rejected while the workflow above uses BAMs (which ran fine). 'Transcript identity is read-level, not inferred' ignores ambiguous and 5'-truncated reads (IsoQuant 22/300 ambiguous reads in the microexon run; counts off by up to 19%).
 - Root cause: Failure-mode prose written independently of the workflow.
 - Fix: Delete or correct the rMATS-long failure mode; replace the no-uncertainty claim with 'assignment uncertainty is lower but not zero' and mention IsoQuant's unique_only default.
-
-### `bio-differential-splicing` — SUPPA2 "-m classical for n<=3" has zero power
-
-- Skill: 73, Beta Only · [mrsonord2240/bioSkills@44ff43b](https://github.com/mrsonord2240/bioSkills/tree/44ff43bb35e5741c3ddd3c003590e1f1da8a4a4b/alternative-splicing/differential-splicing) · [viewer](skills/bio-differential-splicing/mrsonord2240-bioSkills@44ff43b/viewer.md)
-- Observed in inputs: 3, 4
-- Problem: Classical mode is an unpaired Mann-Whitney U test; smallest two-sided p is 0.1 at 3v3 and 0.33 at 2v2 and BH cannot lower it. On the planted 3v3 set it detected 0/30 events; on real 2v2 it returned no p below 0.22. The table lists it with min reps n>=2.
-- Root cause: The fallback was chosen for robustness without checking attainable p-values.
-- Fix: Delete the advice to switch to classical for n<=3; state that SUPPA2 needs n>=4 per group (rank-sum min p 0.029) for any significance, and route n<=3 to rMATS/leafcutter/Shiba. Change the "Min reps" cell for SUPPA2 classical to n>=4.
-
-### `bio-differential-splicing` — leafcutter n>=2/3 claim vs leafcutter_ds.R defaults
-
-- Skill: 73, Beta Only · [mrsonord2240/bioSkills@44ff43b](https://github.com/mrsonord2240/bioSkills/tree/44ff43bb35e5741c3ddd3c003590e1f1da8a4a4b/alternative-splicing/differential-splicing) · [viewer](skills/bio-differential-splicing/mrsonord2240-bioSkills@44ff43b/viewer.md)
-- Observed in inputs: 2, 3
-- Problem: With the options the Skill shows, leafcutter_ds.R stops at 3v3 and 2v2 ("smallest group is less than min_samples_per_intron"); the Common-Errors flags (--min_samples_per_intron 5 --min_samples_per_group 3) stop identically. Upstream says calibration is only checked down to 4 per group.
-- Root cause: Defaults (-i 5 -g 3 -c 20) were not reconciled with the stated minimum replicates.
-- Fix: Give the runnable command for 3v3 (e.g. -i 3 -g 3 -c 10) and 2v2 (-i 2 -g 2 -c 5), note the n>=4 calibration limit, and remove the -i 5 pre-filter suggestion for small designs. Also state that groups-file sample names must equal the .junc basenames and that non-chr contigs need -k True.
-
-### `bio-differential-splicing` — Confounder route (residual + rank-sum) is powerless at n=3 and biased if confounded
-
-- Skill: 73, Beta Only · [mrsonord2240/bioSkills@44ff43b](https://github.com/mrsonord2240/bioSkills/tree/44ff43bb35e5741c3ddd3c003590e1f1da8a4a4b/alternative-splicing/differential-splicing) · [viewer](skills/bio-differential-splicing/mrsonord2240-bioSkills@44ff43b/viewer.md)
-- Observed in inputs: 7
-- Problem: Regressing out batch and RIN and testing residuals by group with a rank-sum test cannot give p<0.05 at 3v3 (0/20 strong events, min p 0.1); OLS with group and batch terms found 13/20 with 1/55 false positives. Regressing out only batch removes group signal when batch is imbalanced.
-- Root cause: Residualisation was chosen for simplicity; the group term is left out of the model.
-- Fix: Replace with logit-PSI ~ group + batch (+ covariates) and test the group coefficient (or limma/DEXSeq), and warn that residual+rank-sum needs n>=4 per group. State that a batch identical to condition cannot be adjusted (leafcutter silently returns results).
-
-### `bio-differential-splicing` — Shipped examples fail or mislead from a clean copy
-
-- Skill: 73, Beta Only · [mrsonord2240/bioSkills@44ff43b](https://github.com/mrsonord2240/bioSkills/tree/44ff43bb35e5741c3ddd3c003590e1f1da8a4a4b/alternative-splicing/differential-splicing) · [viewer](skills/bio-differential-splicing/mrsonord2240-bioSkills@44ff43b/viewer.md)
-- Observed in inputs: 1, 2
-- Problem: diff_splicing_rmats.sh hard-codes READ_LENGTH=150: on 75 nt reads it exits 0, prints "analysis complete" and writes 0 SE rows; its awk filter has no coverage filter (4 hits at 0-3 reads). diff_splicing_leafcutter.R writes groups.txt with sample1..6 that cannot match the counts-table column names, so the following leafcutter_ds.R call dies with "undefined columns selected".
-- Root cause: Examples were never run end to end against real data.
-- Fix: Take READ_LENGTH from the data (or add --variable-read-length and an assertion that SE.MATS.JC.txt has rows), add the per-replicate coverage filter to the awk, and make the R example derive sample names from the .junc basenames and check them against the counts header before calling leafcutter_ds.R.
-
-### `bio-differential-splicing` — --paired-stats advertised without its dependency; silent header-only output
-
-- Skill: 73, Beta Only · [mrsonord2240/bioSkills@44ff43b](https://github.com/mrsonord2240/bioSkills/tree/44ff43bb35e5741c3ddd3c003590e1f1da8a4a4b/alternative-splicing/differential-splicing) · [viewer](skills/bio-differential-splicing/mrsonord2240-bioSkills@44ff43b/viewer.md)
-- Observed in inputs: 6
-- Problem: SKILL.md recommends rMATS --paired-stats for tumor-normal. On a stock install rMATS logged "no package called PAIRADISE", returned rc 0 and wrote header-only tables without an FDR column.
-- Root cause: R/PAIRADISE prerequisite not listed; no post-run check.
-- Fix: List PAIRADISE (R) as a prerequisite, add a check that the FDR column exists and the file has rows, and say -t single is needed for single-end data.
 
 ### `bio-alignment-amplicon-clipping` — Wrong primer BED passes the example; claim attributed to checker
 
@@ -848,7 +808,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (404)
+## P2 (406)
 
 ### `bio-isoform-switching` — dmFilter 'default too strict' claim is wrong; thresholds hard-coded for 6 samples
 
@@ -929,30 +889,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: usage-guide.md repeats the description and SKILL tips; SKILL.md is 488 lines with no references/.
 - Root cause: Single-file authoring.
 - Fix: Move per-tool recipes to references/ and remove duplicated text (dedup pass).
-
-### `bio-differential-splicing` — ΔPSI sign conventions differ by tool; reconciliation table blames event class
-
-- Skill: 73, Beta Only · [mrsonord2240/bioSkills@44ff43b](https://github.com/mrsonord2240/bioSkills/tree/44ff43bb35e5741c3ddd3c003590e1f1da8a4a4b/alternative-splicing/differential-splicing) · [viewer](skills/bio-differential-splicing/mrsonord2240-bioSkills@44ff43b/viewer.md)
-- Observed in inputs: 4, 5
-- Problem: rMATS IncLevelDifference = group1 - group2; SUPPA2 dPSI and leafcutter deltapsi = group2 - group1; Shiba dPSI = alt - ref. The table row "Both sig, opposite direction" attributes it to event mismatch only.
-- Root cause: Only the rMATS sign is documented.
-- Fix: Add a one-line sign convention per tool and list it first in the opposite-direction row.
-
-### `bio-differential-splicing` — Shiba and MAJIQ sections are not runnable or checkable as written
-
-- Skill: 73, Beta Only · [mrsonord2240/bioSkills@44ff43b](https://github.com/mrsonord2240/bioSkills/tree/44ff43bb35e5741c3ddd3c003590e1f1da8a4a4b/alternative-splicing/differential-splicing) · [viewer](skills/bio-differential-splicing/mrsonord2240-bioSkills@44ff43b/viewer.md)
-- Observed in inputs: 3, 5, 6
-- Problem: snakeshiba.smk sits in the package share directory and needs a container key in config.yaml (KeyError otherwise); shiba.py config.yaml runs directly but needs XS tags, a GTF with every event type and reads for each type. Shiba 0.8.2 crashes (KeyError) otherwise. MAJIQ V3 flags were not verifiable (licence-gated) and --minreads/--minpos/--mem-profile are V2-era flags. Shiba superiority at n=2 is a citation, not tested (no advantage on a sim with no imbalance).
-- Root cause: Sections written from tool websites, not run.
-- Fix: Give a minimal config.yaml, the direct shiba.py call, the XS requirement, and mark the MAJIQ block as unverified against V3 with the docs link.
-
-### `bio-differential-splicing` — Missing practical prerequisites and guards
-
-- Skill: 73, Beta Only · [mrsonord2240/bioSkills@44ff43b](https://github.com/mrsonord2240/bioSkills/tree/44ff43bb35e5741c3ddd3c003590e1f1da8a4a4b/alternative-splicing/differential-splicing) · [viewer](skills/bio-differential-splicing/mrsonord2240-bioSkills@44ff43b/viewer.md)
-- Observed in inputs: 1, 2, 7
-- Problem: No mention of -t single for single-end data (verbatim command exits 0 with 0 events), no stop condition for n=1 vs n=1 (rMATS returns 4/118 null false positives), leafcutter_ds.R is not on PATH after installing the R package, the gencode_exons.txt.gz source is unspecified, and SUPPA2 TPM files need a sample-names-only header.
-- Root cause: Assumes a specific standard design.
-- Fix: Add a short "design gate" (single-end, n=1, batch = condition) and the four prerequisites above.
 
 ### `bio-crispr-screens-copy-number-correction` — negative_control_sgrnas empty-dict case raises an undocumented ValueError
 
@@ -1265,6 +1201,46 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The frontmatter description names metrics only; the body also covers file integrity, dictionary identity, contamination and sample swap.
 - Root cause: Description not updated when those sections were added.
 - Fix: Add 'BAM integrity, reference dictionary match, contamination / sample swap' to the description.
+
+### `bio-differential-splicing` — leafcutter batch = group sentence is wrong
+
+- Skill: 85, Limited Release · [mrsonord2240/bioSkills@ec5b9cf](https://github.com/mrsonord2240/bioSkills/tree/ec5b9cf46e2b1c73a361724dab97168c464fcbac/alternative-splicing/differential-splicing) · [viewer](skills/bio-differential-splicing/mrsonord2240-bioSkills@ec5b9cf/viewer.md)
+- Observed in inputs: 7
+- Problem: SKILL.md says leafcutter_ds.R with batch = group "exits 0 and returns significant clusters, with no warning". Run with both label and 0/1 encodings: exit 0, no warning, 86 clusters tested, every p ~ 1, 0 significant.
+- Root cause: The claim came from the first audit's wording and was not re-run when the section was rewritten.
+- Fix: Say it exits 0 without a warning and returns non-informative p ~ 1 for every cluster; keep the rank check as the guard.
+
+### `bio-differential-splicing` — Coverage filter uses per-group minima and drops true events
+
+- Skill: 85, Limited Release · [mrsonord2240/bioSkills@ec5b9cf](https://github.com/mrsonord2240/bioSkills/tree/ec5b9cf46e2b1c73a361724dab97168c464fcbac/alternative-splicing/differential-splicing) · [viewer](skills/bio-differential-splicing/mrsonord2240-bioSkills@ec5b9cf/viewer.md)
+- Observed in inputs: 5
+- Problem: min_inc and min_skip are minima over all replicates of both groups, added together; on sim2 it kept 20-22 of 28 strong events (26-28 without it), and loses more as n grows. usage-guide prompts ask for >= 10 reads per replicate.
+- Root cause: The sum of two separate minima is not a per-replicate total, and the minimum over more replicates only falls.
+- Fix: Filter on the per-replicate total (IJC + SJC >= 10 in every replicate, or in at least half) and state the recall cost; update the shipped example the same way.
+
+### `bio-differential-splicing` — MAJIQ HET "conservative at n=5-10" is not in the docs
+
+- Skill: 85, Limited Release · [mrsonord2240/bioSkills@ec5b9cf](https://github.com/mrsonord2240/bioSkills/tree/ec5b9cf46e2b1c73a361724dab97168c464fcbac/alternative-splicing/differential-splicing) · [viewer](skills/bio-differential-splicing/mrsonord2240-bioSkills@ec5b9cf/viewer.md)
+- Observed in inputs: 6
+- Problem: The MAJIQ section is labelled as taken from the 3.0.11.dev7 docs, but the docs recommend TNOM for n<5 and Wilcoxon for n>5 and never call HET conservative.
+- Root cause: A benchmark impression was left in a section that claims documentation as its source.
+- Fix: Attribute it to the MAJIQ-HET paper or delete it; keep the docs-based n<5 / n>5 statistic advice.
+
+### `bio-differential-splicing` — Shipped leafcutter example fails opaquely on zero introns
+
+- Skill: 85, Limited Release · [mrsonord2240/bioSkills@ec5b9cf](https://github.com/mrsonord2240/bioSkills/tree/ec5b9cf46e2b1c73a361724dab97168c464fcbac/alternative-splicing/differential-splicing) · [viewer](skills/bio-differential-splicing/mrsonord2240-bioSkills@ec5b9cf/viewer.md)
+- Observed in inputs: 2
+- Problem: With contigs outside chr1..22,X,Y (or -m too high) clustering yields an empty counts table and the example dies inside leafcutter with a colnames<- error.
+- Root cause: No check after the clustering step, unlike the rMATS example.
+- Fix: After Step 2 count rows in leafcutter_perind_numers.counts.gz and stop with the -k True / -m hint when there are none.
+
+### `bio-differential-splicing` — Confounder guidance: PCA wording and the better route at small n
+
+- Skill: 85, Limited Release · [mrsonord2240/bioSkills@ec5b9cf](https://github.com/mrsonord2240/bioSkills/tree/ec5b9cf46e2b1c73a361724dab97168c464fcbac/alternative-splicing/differential-splicing) · [viewer](skills/bio-differential-splicing/mrsonord2240-bioSkills@ec5b9cf/viewer.md)
+- Observed in inputs: 7
+- Problem: "If PC1 separates by batch" would not flag the simulated design (PC1 tracks group, r 0.97; batch is on PC2). The per-event regression found 4/30 true events at 4v4, while leafcutter with a batch column kept 18/30 with 0 batch-driven calls. PAIRADISE default PSOCK also hangs after reaching 100% (2 of 3 runs), not only at a few percent.
+- Root cause: Advice written from a 3v3 case and one hang pattern.
+- Fix: Say "check every leading PC against batch", name leafcutter with a batch column as the first choice at n<=4, and add a timeout note to the PAIRADISE paragraph.
 
 ### `bio-pileup-generation` — allele_counts counts read-base N as an allele; find_variants drops it
 
