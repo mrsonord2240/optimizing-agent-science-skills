@@ -8,7 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (77)
+## P1 (79)
 
 ### `bio-alignment-multiple` — Fix MUSCLE5 ensemble commands (-super5 has no .efa)
 
@@ -265,6 +265,22 @@ None open.
 - Problem: Species mismatch still raises a raw, uncaught Python traceback and the -e/-n swap still writes a fully silent all-NaN bayes_factor.txt with exit 0 -- both symptoms are now accurately described in the Skill's Common Errors table, but a user who does not consult the table in advance gets no runtime signal beyond the documentation.
 - Root cause: The fix addressed documentation accuracy, not the underlying BAGEL.py CLI wrapper -- no pre-flight check validates -e/-n gene-list overlap with the input's GENE column, and no post-run check flags an all-NaN BF column before declaring success.
 - Fix: Add a lightweight pre-flight or post-run sanity check to the Skill's example code: verify at least some overlap between -e/-n reference genes and the count file's GENE column before running, and assert the BF column is not >95% NaN after bf completes, printing an explicit warning naming the likely cause (argument swap or species mismatch) rather than relying on the user reading Common Errors.
+
+### `bio-crispr-screens-in-vivo-screens` — No mention anywhere of IACUC / institutional animal-ethics approval
+
+- Skill: 88, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/crispr-screens/in-vivo-screens) · [viewer](skills/bio-crispr-screens-in-vivo-screens/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 5
+- Problem: SKILL.md and usage-guide.md describe live-animal tumor implantation, tamoxifen induction, and tumor harvest/sacrifice across every design pattern, but never mention institutional animal-care-and-use committee (IACUC) approval or any ethical-review requirement.
+- Root cause: The Skill was written purely as a quantitative/statistical design guide and never added a standing ethics-compliance note.
+- Fix: Add a one-line standing requirement to the Prerequisites section of both SKILL.md and usage-guide.md: 'All procedures require prior IACUC (or equivalent institutional) approval; this Skill assumes approval is already in place and does not itself provide ethical review.'
+
+### `bio-crispr-screens-in-vivo-screens` — Compound hit-calling threshold can report zero hits despite strong meta-signal
+
+- Skill: 88, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/crispr-screens/in-vivo-screens) · [viewer](skills/bio-crispr-screens-in-vivo-screens/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 4
+- Problem: The bundled per-animal meta-analysis's hit-calling rule (meta-FDR<0.05 AND >=50% of animals individually at per-animal FDR<0.05) called 0/5 planted true hits even though the 5 planted genes were unambiguously the top 5 by meta-z and meta-FDR (down to 3e-6), because per-animal MAGeCK RRA power was too low for any single animal to individually cross FDR<0.05.
+- Root cause: The per-animal consistency requirement assumes each animal's own RRA test has enough power to reach FDR<0.05 on its own, which does not hold for typical in vivo cohort sizes and gene-universe sizes -- exactly the scenario this Skill exists to handle.
+- Fix: Document the minimum per-animal power needed for the strict consistency rule to ever fire, and offer a documented fallback (e.g., meta-FDR-only threshold, or a per-animal nominal-p rather than FDR consistency check) for realistic cohort sizes.
 
 ### `bio-crispr-screens-mageck-analysis` — 'RRA does not support pairing' is factually incorrect
 
@@ -626,7 +642,7 @@ None open.
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (310)
+## P2 (312)
 
 ### `bio-crispr-screens-copy-number-correction` — negative_control_sgrnas empty-dict case raises an undocumented ValueError
 
@@ -1427,6 +1443,22 @@ None open.
 - Problem: A synthetic 3-sgRNA/gene library (below the Skill's own 4-6/gene recommendation) produced implausibly extreme BF magnitudes under thin coverage, but none of 200 genes showed the literal documented symptom (STD column larger than BF, CI spanning zero) at -NB 1000 -- the entry may overstate how reliably that specific symptom appears versus a more general 'extreme, less trustworthy point estimates' pattern.
 - Root cause: The Failure Mode entry was written from the general statistical expectation (small-sample CI widening) rather than checked against a concrete low-coverage run.
 - Fix: Either verify the CI-spans-zero symptom against a low-coverage run with realistic (not exaggerated) effect sizes and adjust the wording accordingly, or broaden the documented symptom to also mention implausibly large BF magnitude as an equally valid red flag for thin per-gene coverage.
+
+### `bio-crispr-screens-in-vivo-screens` — MAGeCK MLE's permutation-based FDR values are non-deterministic run-to-run, undocumented
+
+- Skill: 88, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/crispr-screens/in-vivo-screens) · [viewer](skills/bio-crispr-screens-in-vivo-screens/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 4
+- Problem: Re-running 'mageck mle' (the Skill's Option A) on identical count data and design matrix produced different permutation-derived FDR-like p-values between runs (effect sizes and Wald p-values stayed identical); MAGeCK 0.5.9.5 exposes no --seed flag to control this.
+- Root cause: MLE's default variance/permutation modeling draws from an unseeded random process with no user-facing seed control in the underlying tool.
+- Fix: Add a note to the MLE section of SKILL.md that permutation-derived FDR columns are not exactly reproducible run-to-run, and recommend reporting Wald p-values (which are stable) as the primary significance metric, or increasing --permutation-round for more stable estimates.
+
+### `bio-crispr-screens-in-vivo-screens` — CRISPR-StAR section lacks a concrete genome-scale worked example
+
+- Skill: 88, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/crispr-screens/in-vivo-screens) · [viewer](skills/bio-crispr-screens-in-vivo-screens/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 2
+- Problem: Unlike the focused-library section, the CRISPR-StAR section gives no worked cell-number/MOI example, so an agent following the Skill for a genome-scale screen cannot verify feasibility the way it can for a focused library.
+- Root cause: The section was written narratively from Uijttewaal 2025's qualitative description without porting over any of the paper's own quantitative design parameters.
+- Fix: Add a worked numeric example analogous to the Manguso 2017 bottleneck-math example, using Uijttewaal 2025's actual reported cell numbers and MOI.
 
 ### `bio-crispr-screens-mageck-analysis` — FluteRRA's remaining 'undefined columns selected' error is a real, still-open upstream gap
 

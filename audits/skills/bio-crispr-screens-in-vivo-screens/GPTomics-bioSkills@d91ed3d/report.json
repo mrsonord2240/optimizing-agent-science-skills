@@ -1,0 +1,198 @@
+{
+  "meta": {
+    "skill_name": "bio-crispr-screens-in-vivo-screens",
+    "description": "Designs and analyzes in vivo CRISPR screens in animal tumor models, organoids, and immune-cell adoptive transfers. Covers bottleneck math (250x cells/sgRNA requires ~25M cells implanted; impossible for most syngeneic models, forcing focused libraries), focused library design (Manguso 2017 Nature 547:413 immune screen; Chen 2015 tumor screens), CRISPR-StAR intrinsic-control screening (Uijttewaal 2025 Nat Biotechnol 43:1848), clonal-dynamics-limited detection, tumor-explant DNA recovery, syngeneic vs xenograft vs PDX considerations, and the relationship to downstream MAGeCK / drugZ analysis.",
+    "evaluated_on": "2026-09-19",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Moderate",
+    "n_inputs": 5,
+    "source": "GPTomics/bioSkills@d91ed3d563019e649dc854c56ccd62551359488a:crispr-screens/in-vivo-screens"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All citations (Manguso 2017 Nature 547:413, Chen 2015 Cell 160:1246, Lee 2023 Cancer Gene Ther 30:1610, Scheidmann 2022 Cancer Res 82:681, Uijttewaal 2025 Nat Biotechnol 43:1848) are specific, real, and accurately summarized. No output across the 5 tested inputs fabricated a p-value, sample size, or effect size; Input 4's real MAGeCK/meta-analysis numbers were all produced by actual code execution on disclosed-synthetic data." },
+      "practice_boundaries": { "result": "PASS", "detail": "This is animal-model research-protocol design, not human diagnosis or treatment; no patient-facing medical claims were made in any output, so no clinical disclaimer is required." },
+      "methodological_ground": { "result": "PASS", "detail": "No statistical fallacy (e.g. correlation-as-causation, mismatched test) found in the Skill or in any of the 5 outputs. Flagged separately (see P1 recommendation, not a veto trigger): SKILL.md and usage-guide.md never mention IACUC / institutional animal-ethics approval anywhere, despite the Skill covering live-animal tumor implantation and sacrifice throughout -- confirmed by a full-text grep for 'IACUC|ethic|welfare|approval|humane|3Rs|institutional' returning zero hits. This is a documentation omission worth fixing, not a methodological fallacy that invalidates any output's conclusions, so it is scored PASS with a P1 recommendation rather than failing the gate." },
+      "code_usability": { "result": "PASS", "detail": "All executed code ran without syntax errors or missing dependencies: mageck test (6/6 animals), mageck mle (design-matrix run), and the bundled examples/per_animal_meta_analysis.py's exact groupby().apply() call (verified separately with DeprecationWarning/FutureWarning promoted to errors -- no warning raised on pandas 3.0.5)." }
+    }
+  },
+  "static_score": {
+    "subtotal": 89,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 11, "max": 12, "note": "Covers the full design-to-hit-calling arc (bottleneck math, focused library, CRISPR-StAR, model choice, DNA recovery, hit calling, diagnostics) with correct, checkable arithmetic. Minor gap: no concrete cell-number/MOI worked example for genome-scale CRISPR-StAR (found in Input 2)." },
+      "reliability": { "score": 11, "max": 12, "note": "Version-compatibility section instructs introspection when APIs differ; quantitative thresholds table and failure-mode table function as built-in sanity checks. Bundled script hard-stops with FileNotFoundError when no per-animal files are found -- correct defensive design for Category 3 per the Scene Override, not a defect." },
+      "performance_context": { "score": 7, "max": 8, "note": "SKILL.md is ~240 lines, usage-guide.md ~135 -- reasonably token-efficient for the scope covered; a few tables (Quantitative Thresholds, Common Errors) slightly duplicate content already in the body prose." },
+      "agent_usability": { "score": 14, "max": 16, "note": "Clear trigger phrases, a numbered 12-step 'What the Agent Will Do' workflow in usage-guide.md, and consistent terminology across both files (verified: 'CEGv2 PR-AUC >0.4', '10+ animals', 'focused library 3,000-15,000 sgRNAs' repeated identically in SKILL.md, usage-guide.md, and Common Errors table)." },
+      "human_usability": { "score": 7, "max": 8, "note": "Quick Start, Example Prompts, Decision Cheat Sheet, and Validation Checklist give strong discoverability; forgiveness is good (Common Errors table maps symptom -> cause -> fix)." },
+      "security": { "score": 12, "max": 12, "note": "No credential handling, no eval/exec of raw strings, no prompt-injection surface; all bundled code (per_animal_meta_analysis.py) only reads local TSVs and calls scipy/pandas/statsmodels." },
+      "maintainability": { "score": 10, "max": 12, "note": "Shipped-means-present check passed: the one file SKILL.md points to (examples/per_animal_meta_analysis.py) exists and runs as documented. Only one bundled script for a Skill this broad, and no automated tests bundled." },
+      "agent_specific": { "score": 17, "max": 20, "note": "Strong trigger precision (139-word description covering many specific scenarios) and composability (8-entry Related Skills list, all real crispr-screens/pathway-analysis skill paths). Docked 3 points: the compound hit-calling threshold in the bundled example is fragile under realistic per-animal power (Input 4 finding), and the MLE path's permutation-based FDR values are non-deterministic run-to-run with no seed-control flag exposed by MAGeCK 0.5.9.5, undocumented by the Skill." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 87.2,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 20, "total": 21 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Focused immune-evasion library design, B16 syngeneic, 2M cells",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Reasoning-only (Mode A). Correct bottleneck arithmetic (2,000,000/8,000=250x pre-bottleneck); correctly flags the post-bottleneck estimate (25-50x) as borderline against the Skill's own >=50x floor and recommends Manguso's 4-sub-pool design as mitigation.",
+        "basic": 37,
+        "specialized": 50,
+        "total": 87,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Output computes correct pre-bottleneck coverage using cells/sgRNA arithmetic", "result": "PASS", "note": "2,000,000 cells / 8,000 sgRNAs = 250x, matching the Skill's own usage-guide.md worked example exactly" },
+          { "text": "Output flags the resulting coverage against the Skill's own >=50x endpoint threshold", "result": "PASS", "note": "Correctly estimates 25-50x post-bottleneck using the Skill's documented 5-10x further reduction and flags it as borderline" },
+          { "text": "Output does not fabricate an exact post-bottleneck cell count beyond the Skill's stated ranges", "result": "PASS", "note": "States the estimate as a range derived from the Skill's own thresholds table, not a fabricated precise figure" },
+          { "text": "Output recommends a concrete design mitigation rather than a vague caveat", "result": "PASS", "note": "Cites Manguso 2017's 4-sub-pool design (1 sgRNA/gene per sub-pool) as the specific mitigation" }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "CRISPR-StAR setup for a genome-scale (72,000 sgRNA) screen at 2M cells",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Reasoning-only. Correctly computes the pre-engraftment shortfall (2M/72,000=28x, and ~8x at MOI 0.3) and correctly declines to invent genome-scale-specific cell-number thresholds the Skill does not provide, deferring to Uijttewaal 2025 for exact figures.",
+        "basic": 34,
+        "specialized": 44,
+        "total": 78,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Output correctly computes pre-engraftment coverage for the 72,000-sgRNA library at 2M cells", "result": "PASS", "note": "2,000,000/72,000 = 27.8x; with MOI 0.3, ~600,000 transduced cells / 72,000 sgRNAs = ~8x, both stated" },
+          { "text": "Output explains the CRISPR-StAR induction timeline (engraft -> re-expand -> tamoxifen induction -> paired active/inactive contrast)", "result": "PASS", "note": "All four stages from the Skill's own 'How it works' list reproduced correctly and in order" },
+          { "text": "Output does not fabricate genome-scale-specific MOI/cell-number thresholds not supported by the Skill's documentation", "result": "PASS", "note": "Explicitly states the Skill gives no exact cell-number recipe for genome-scale CRISPR-StAR and recommends piloting or consulting Uijttewaal 2025 directly rather than inventing a number" },
+          { "text": "Output flags the specific gap in the Skill's own guidance rather than silently proceeding as if it were fully specified", "result": "PASS", "note": "States plainly that 2M cells may still be insufficient even with CRISPR-StAR, contradicting an over-optimistic reading of the Skill's 'enables genome-scale' claim" }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Genome-wide (80,000 sgRNA) library at 1M cells, no CRISPR-StAR",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Reasoning-only. Cleanly matches the Skill's own explicitly-documented failure pattern ('single most common failure') almost verbatim; correct arithmetic (1,000,000/80,000=12.5x); gives both documented remedies.",
+        "basic": 39,
+        "specialized": 55,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Output performs the pre-bottleneck coverage math (1M cells / 80,000 sgRNAs = 12.5x)", "result": "PASS", "note": "Arithmetic correct and shown" },
+          { "text": "Output correctly identifies genome-wide-without-StAR as the Skill's documented 'most common failure' pattern", "result": "PASS", "note": "Matches the Tips section's 'trying to use a genome-wide library (70k+ sgRNAs) in vivo' language" },
+          { "text": "Output recommends either a focused library (<=15,000 sgRNAs) or CRISPR-StAR as the two documented remedies", "result": "PASS", "note": "Both remedies given, matching SKILL.md's 'Solution' and CRISPR-StAR section" },
+          { "text": "Output does not claim the screen as proposed is feasible", "result": "PASS", "note": "Explicitly states infeasibility at 12.5x coverage, well below even the loosest in vivo threshold" }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Per-animal MAGeCK + Stouffer meta-analysis on 6-animal synthetic in vivo screen (executed)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Fully executed (Mode D). mageck test run on 6 synthetic animals vs plasmid (RRA); bundled Stouffer meta-analysis script run unmodified on the real gene_summary.txt outputs. Meta-analysis correctly ranked all 5 planted true hits at the top (meta-z 3.7-5.3, meta-FDR down to 3e-6), but the documented compound threshold (meta-FDR<0.05 AND >=50% of animals individually at per-animal FDR<0.05) yielded 0 called hits because per-animal RRA power was too low for any single animal to cross FDR<0.05 -- a real, reproducible finding, disclosed rather than hidden. mageck test itself re-ran byte-identical (T3 determinism confirmed); a separate mageck mle run on the same data showed permutation-derived FDR columns drifting between runs (Wald p-values and betas stayed identical) -- documented as a P2/P1 finding, not used to fail this input since the Skill's primary path (RRA+meta) avoids it.",
+        "basic": 36,
+        "specialized": 56,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "mageck test executes successfully on all 6 synthetic per-animal count columns and produces gene_summary.txt files", "result": "PASS", "note": "6/6 animals produced gene_summary.txt after adding MAGeCK's RRA.exe to PATH (a known env trap already documented in TOOLS.md, not a Skill defect)" },
+          { "text": "Meta-analysis correctly ranks the 5 planted true-hit genes above background noise by Stouffer meta-z / meta-FDR", "result": "PASS", "note": "Gene000-Gene004 (the 5 planted hits) are exactly the top 5 of 60 genes by meta_z (3.71-5.30) and meta_fdr (down to 3e-6); next-ranked noise gene has meta_fdr=0.40" },
+          { "text": "Output does not silently report the compound threshold's zero hit calls as screen success; it surfaces and explains the discrepancy", "result": "PASS", "note": "Explicitly reports 0/5 called by the strict rule despite the clear meta-signal, and attributes it to low single-animal RRA power, matching the Skill's own 'Common Errors' entry for clonal dominance" },
+          { "text": "Re-running mageck test on identical input reproduces byte-identical gene_summary.txt (T3 determinism check)", "result": "PASS", "note": "diff of animal_1.gene_summary.txt across two independent runs: 0 differing lines" }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Multi-part diagnostic: low in vivo CEGv2 PR-AUC + disagreeing per-animal hit lists + validation plan",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Reasoning-only, multi-part. Correctly rules out DNA/PCR technical failure using the stated 85% mapping rate, converges on clonal dominance (n=5 animals, below the Skill's 10+ recommendation) plus context-specific essentialome as the two most likely causes, and gives a concrete arrayed-validation plan. Does not mention IACUC/ethical-review requirements for the described live-animal procedures -- neither does the Skill itself (see M3 finding).",
+        "basic": 36,
+        "specialized": 49,
+        "total": 85,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Output rules out DNA-extraction/PCR/library problems given the stated 85% mapping rate", "result": "PASS", "note": "Correctly uses the Skill's own '<10% mapping rate' failure-mode threshold to rule this cause out" },
+          { "text": "Output identifies clonal dominance/bottleneck (n=5, below the Skill's 10+ recommendation) as the most likely driver of both symptoms", "result": "PASS", "note": "Matches the Skill's own Common Errors row: 'Per-animal hit lists differ -> Clonal dominance -> increase animals'" },
+          { "text": "Output recommends a context-matched in vitro reference rather than generic CEGv2 for in vivo PR-AUC benchmarking", "result": "PASS", "note": "Matches the Skill's own Failure Modes fix: 'use cell-type-and-context-specific essentialome'" },
+          { "text": "Output includes a concrete arrayed-validation plan matching the Skill's Validation Checklist (n=10 mice, top hits)", "result": "PASS", "note": "Plan specifies n=10 arrayed validation of top hits, matching usage-guide.md's checklist item" },
+          { "text": "Output warns that IACUC / institutional ethical review is required before proceeding with the described live-animal procedures", "result": "FAIL", "note": "Neither the Skill nor the generated output mentions ethical/institutional animal-use approval anywhere; this is a genuine, skill-wide documentation gap (see P1 recommendation), not specific to this input" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 35.6,
+    "dynamic_weighted": 52.3,
+    "score": 88,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Bottleneck math and coverage thresholds are internally consistent and match the worked usage-guide.md examples exactly (verified: 2M cells / 8,000 sgRNAs = 250x).",
+    "The bundled per-animal Stouffer meta-analysis script (examples/per_animal_meta_analysis.py) ran unmodified on real MAGeCK output and correctly ranked all 5 planted true hits above 55 background noise genes (meta-FDR as low as 3e-6).",
+    "The Skill's primary recommended hit-calling path (MAGeCK RRA via mageck test) is fully deterministic -- verified by re-running on identical synthetic data and diffing gene_summary.txt byte-for-byte with zero differences.",
+    "Extensive, real, verifiable citations (Manguso 2017 Nature 547:413, Uijttewaal 2025 Nat Biotechnol 43:1848, Chen 2015 Cell 160:1246, Lee 2023, Scheidmann 2022) with correctly stated findings.",
+    "Failure-mode and Common Errors tables predict real behavior observed in testing: the 'per-animal hit lists differ / clonal dominance' entry accurately anticipates the compound hit-calling threshold's zero-hit outcome found in Input 4."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "No mention anywhere of IACUC / institutional animal-ethics approval",
+      "observed_in": [5],
+      "problem": "SKILL.md and usage-guide.md describe live-animal tumor implantation, tamoxifen induction, and tumor harvest/sacrifice across every design pattern, but never mention institutional animal-care-and-use committee (IACUC) approval or any ethical-review requirement.",
+      "root_cause": "The Skill was written purely as a quantitative/statistical design guide and never added a standing ethics-compliance note.",
+      "fix": "Add a one-line standing requirement to the Prerequisites section of both SKILL.md and usage-guide.md: 'All procedures require prior IACUC (or equivalent institutional) approval; this Skill assumes approval is already in place and does not itself provide ethical review.'"
+    },
+    {
+      "priority": "P1",
+      "title": "Compound hit-calling threshold can report zero hits despite strong meta-signal",
+      "observed_in": [4],
+      "problem": "The bundled per-animal meta-analysis's hit-calling rule (meta-FDR<0.05 AND >=50% of animals individually at per-animal FDR<0.05) called 0/5 planted true hits even though the 5 planted genes were unambiguously the top 5 by meta-z and meta-FDR (down to 3e-6), because per-animal MAGeCK RRA power was too low for any single animal to individually cross FDR<0.05.",
+      "root_cause": "The per-animal consistency requirement assumes each animal's own RRA test has enough power to reach FDR<0.05 on its own, which does not hold for typical in vivo cohort sizes and gene-universe sizes -- exactly the scenario this Skill exists to handle.",
+      "fix": "Document the minimum per-animal power needed for the strict consistency rule to ever fire, and offer a documented fallback (e.g., meta-FDR-only threshold, or a per-animal nominal-p rather than FDR consistency check) for realistic cohort sizes."
+    },
+    {
+      "priority": "P2",
+      "title": "MAGeCK MLE's permutation-based FDR values are non-deterministic run-to-run, undocumented",
+      "observed_in": [4],
+      "problem": "Re-running 'mageck mle' (the Skill's Option A) on identical count data and design matrix produced different permutation-derived FDR-like p-values between runs (effect sizes and Wald p-values stayed identical); MAGeCK 0.5.9.5 exposes no --seed flag to control this.",
+      "root_cause": "MLE's default variance/permutation modeling draws from an unseeded random process with no user-facing seed control in the underlying tool.",
+      "fix": "Add a note to the MLE section of SKILL.md that permutation-derived FDR columns are not exactly reproducible run-to-run, and recommend reporting Wald p-values (which are stable) as the primary significance metric, or increasing --permutation-round for more stable estimates."
+    },
+    {
+      "priority": "P2",
+      "title": "CRISPR-StAR section lacks a concrete genome-scale worked example",
+      "observed_in": [2],
+      "problem": "Unlike the focused-library section, the CRISPR-StAR section gives no worked cell-number/MOI example, so an agent following the Skill for a genome-scale screen cannot verify feasibility the way it can for a focused library.",
+      "root_cause": "The section was written narratively from Uijttewaal 2025's qualitative description without porting over any of the paper's own quantitative design parameters.",
+      "fix": "Add a worked numeric example analogous to the Manguso 2017 bottleneck-math example, using Uijttewaal 2025's actual reported cell numbers and MOI."
+    }
+  ]
+}
