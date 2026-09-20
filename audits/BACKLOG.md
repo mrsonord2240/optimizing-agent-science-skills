@@ -8,23 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (78)
-
-### `bio-causal-genomics-transcriptome-wide-association` — pip install pyfocus (as documented) is non-functional under modern pandas
-
-- Skill: 80, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/causal-genomics/transcriptome-wide-association) · [viewer](skills/bio-causal-genomics-transcriptome-wide-association/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 3, 6
-- Problem: focus finemap/focus import crash with TypeError: read_csv() got an unexpected keyword argument 'delim_whitespace' on a fresh install matching usage-guide.md's own 'pip install pyfocus' instruction, because pandas>=2.2 removed that kwarg.
-- Root cause: pyfocus 0.802's setup.py pins only 'pandas>=0.23.0' with no upper bound, and its own gwas.py/exprref.py/ldref.py/convert.py all call pd.read_csv(..., delim_whitespace=True); the Skill's install instruction doesn't pin pandas either.
-- Fix: Add 'pip install pyfocus "pandas<2.2"' to the FOCUS install step in usage-guide.md and add this exact error string to the Common Errors table.
-
-### `bio-causal-genomics-transcriptome-wide-association` — FUSION.post_process.R crashes on single-SNP ('top1') genes
-
-- Skill: 80, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/causal-genomics/transcriptome-wide-association) · [viewer](skills/bio-causal-genomics-transcriptome-wide-association/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 2
-- Problem: The conditional/joint analysis step throws 'Error in wgt.matrix[qc$flip,] : incorrect number of dimensions' whenever a gene's weight model has exactly one SNP -- exactly the low-N-tissue scenario SKILL.md itself documents as common.
-- Root cause: fusion_twas's FUSION.post_process.R (line ~168/251) drops a 1-row matrix to a bare vector via 'wgt.matrix[m.keep,]' without drop=FALSE.
-- Fix: Add this error and cause to the Common Errors table, with the workaround of filtering single-SNP genes out before the conditional step (or patching drop=FALSE in a local fork).
+## P1 (77)
 
 ### `bio-alignment-multiple` — Fix MUSCLE5 ensemble commands (-super5 has no .efa)
 
@@ -193,6 +177,14 @@ None open.
 - Problem: query_raw() calls ds.get(), which is pybiomart's ServerBase.get() -- a plain HTTP GET with the entire XML query embedded in the URL. At 2066 real Ensembl gene IDs (~33KB filter value alone), Ensembl rejects the request with 414 Request-URI Too Large. SKILL.md's own Goal text advertises '5,000 Ensembl Gene IDs' and usage-guide.md's Quick Start example says '8,000 Ensembl Gene IDs' -- both would fail the same way, worse.
 - Root cause: query_raw() inherits pybiomart's GET-based transport unchanged; nothing in the fix's new helper switches to POST or chunks large ID lists client-side.
 - Fix: Either build the query_raw() request as an HTTP POST (BioMart's martservice endpoint accepts POST for the same XML payload) or chunk ID lists above a safe size (empirically ~500-1000 IDs) into multiple queries joined client-side, and correct the '5,000'/'8,000 IDs' claims in SKILL.md and usage-guide.md to state the real, tested limit.
+
+### `bio-causal-genomics-transcriptome-wide-association` — pyfocus pandas<2.2 pin+patch is insufficient to reach real FOCUS PIP output
+
+- Skill: 87, Production Ready · [mrsonord2240/bioSkills@4a67b94](https://github.com/mrsonord2240/bioSkills/tree/4a67b94a22f798e17ad9d4ebe4c0c58276ce9efb/causal-genomics/transcriptome-wide-association) · [viewer](skills/bio-causal-genomics-transcriptome-wide-association/mrsonord2240-bioSkills@4a67b94/viewer.md)
+- Observed in inputs: 3
+- Problem: Once a real pyfocus-schema FOCUS weight DB is used (rather than the wrong-schema DB that masked this during the fix's own verification), `focus finemap` reaches the 'Calculating PIPs' step and crashes with `TypeError: DataFrame.pivot() takes 1 positional argument but 4 were given`, and after that is worked around, with `AttributeError: 'DataFrame' object has no attribute 'append'` -- both inside pyfocus's own finemap.py, not the Skill's authored content.
+- Root cause: pyfocus/finemap.py:1012 calls `attr_tmp.pivot("model_id", "attr_name", "value")` (positional args, removed by pandas>=2.0) and finemap.py:188 calls `df.append(null_dict, ignore_index=True)` (removed by pandas>=2.0). The pandas<2.2 pin only prevents the earlier delim_whitespace/np.warnings crashes; it does not avoid these because pandas<2.0 pins were never applied, and pyfocus's own code was never updated for pandas>=2.0's stricter API.
+- Fix: Document two further one-line patches in SKILL.md's Tool Install Notes: `attr_tmp.pivot(index="model_id", columns="attr_name", values="value")` at finemap.py:1012, and replace `df.append(null_dict, ignore_index=True)` with `pd.concat([df, pd.DataFrame([null_dict])], ignore_index=True)` at finemap.py:188. Both were confirmed this session: with both patches, focus finemap produces correct real PIP output (pips_pop1=1.0 for a true gene, ~3.4e-08 for the null-model row).
 
 ### `bio-single-cell-cell-annotation` — The triage screens on the one signal artifacts do not trip
 
@@ -635,30 +627,6 @@ None open.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
 ## P2 (310)
-
-### `bio-causal-genomics-transcriptome-wide-association` — MA-FOCUS colon-separated paths collide with Windows drive letters
-
-- Skill: 80, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/causal-genomics/transcriptome-wide-association) · [viewer](skills/bio-causal-genomics-transcriptome-wide-association/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 6
-- Problem: pyfocus 0.802 genuinely splits its gwas/ref/weights positional args on ':' (matching the Skill's own colon-separated documentation), but on Windows this also splits the drive-letter colon in an absolute path, silently multiplying 'detected populations'.
-- Root cause: The Skill's MA-FOCUS example assumes POSIX-style relative or non-drive-letter paths and doesn't call out the Windows caveat; pyfocus's own --help text is also wrong (says 'semicolon' when the code uses ':').
-- Fix: Add a Windows-specific note to the MA-FOCUS section: use relative paths or run under WSL/Linux, since absolute Windows paths break the colon-separated multi-ancestry syntax.
-
-### `bio-causal-genomics-transcriptome-wide-association` — SKILL.md is a single 464-line file with no references/ split
-
-- Skill: 80, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/causal-genomics/transcriptome-wide-association) · [viewer](skills/bio-causal-genomics-transcriptome-wide-association/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: —
-- Problem: Despite a Complex rating (12-tool taxonomy, heavy branching decision tree), everything is front-loaded into one file, penalizing performance_context and agent_specific/progressive_disclosure.
-- Root cause: No references/ subdirectory exists to move per-tool CLI detail, HLA/QC caveats, or the Common Errors table out of the main file.
-- Fix: Split into references/ (e.g., hla-and-qc-caveats.md, per-tool-cli-examples.md, common-errors.md) with SKILL.md as a thin router, matching the convention used by other Complex skills in this corpus.
-
-### `bio-causal-genomics-transcriptome-wide-association` — FUSION (the declared primary_tool) has no standalone example script
-
-- Skill: 80, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/causal-genomics/transcriptome-wide-association) · [viewer](skills/bio-causal-genomics-transcriptome-wide-association/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: —
-- Problem: examples/ only ships s_predixcan_pipeline.sh and focus_finemap.sh; FUSION.assoc_test.R usage lives only as an inline bash fence in SKILL.md, and no fixture data is shipped for any of the 12 tools.
-- Root cause: Example coverage was built out for S-PrediXcan and FOCUS but not extended to FUSION despite FUSION being the frontmatter primary_tool.
-- Fix: Add examples/fusion_assoc_test.sh mirroring the other two scripts, plus a tiny synthetic fixture set so --weights_dir/--ref_ld_chr paths are copy-paste runnable.
 
 ### `bio-crispr-screens-copy-number-correction` — negative_control_sgrnas empty-dict case raises an undocumented ValueError
 
@@ -1163,6 +1131,30 @@ None open.
 - Problem: The same ~30-line query_raw() helper is byte-identical in SKILL.md and both examples/*.py (confirmed via diff, no drift yet). This is explicitly allowed for shipped examples under the redundancy policy, but it is still 3 places to update correctly if the helper needs a future fix (e.g. the POST/chunking fix above).
 - Root cause: Examples are kept standalone-runnable by design, which requires the helper to be copied rather than imported from a shared module.
 - Fix: No action required under current policy; if the helper changes again, verify all 3 copies are updated in the same commit (as this fix did correctly).
+
+### `bio-causal-genomics-transcriptome-wide-association` — `focus import ... fusion` (the Skill's own documented custom-DB route) has an undocumented mygene+rpy2 dependency, and rpy2 needs R built as a shared library
+
+- Skill: 87, Production Ready · [mrsonord2240/bioSkills@4a67b94](https://github.com/mrsonord2240/bioSkills/tree/4a67b94a22f798e17ad9d4ebe4c0c58276ce9efb/causal-genomics/transcriptome-wide-association) · [viewer](skills/bio-causal-genomics-transcriptome-wide-association/mrsonord2240-bioSkills@4a67b94/viewer.md)
+- Observed in inputs: 3
+- Problem: Following SKILL.md's own documented `focus import custom_panel.pos fusion --tissue ... --output ...` command fails silently (0 genes imported, no error surfaced to the user) unless `mygene` and `rpy2` are separately installed; even then, rpy2 requires R compiled as a shared library (`R was not built as a library`), which the standard R distribution referenced elsewhere in this Skill's own tooling is not.
+- Root cause: pyfocus's import submodule imports mygene/rpy2 lazily and only logs an ERROR-level message rather than raising, so a user following the documented command gets an apparently-successful but empty database with no indication why.
+- Fix: Document the mygene+rpy2 (and R-as-shared-library) requirement in Tool Install Notes, or document the workaround used this session: build the DB directly via pyfocus's own SQLAlchemy schema (`pyfocus.models.db.load_db`/`build_model`) for a custom panel, bypassing `focus import`'s gene-symbol-lookup step entirely.
+
+### `bio-causal-genomics-transcriptome-wide-association` — SKILL.md is a single 464-line file with no references/ split
+
+- Skill: 87, Production Ready · [mrsonord2240/bioSkills@4a67b94](https://github.com/mrsonord2240/bioSkills/tree/4a67b94a22f798e17ad9d4ebe4c0c58276ce9efb/causal-genomics/transcriptome-wide-association) · [viewer](skills/bio-causal-genomics-transcriptome-wide-association/mrsonord2240-bioSkills@4a67b94/viewer.md)
+- Observed in inputs: —
+- Problem: Despite a Complex rating (12-tool taxonomy, heavy branching decision tree), everything remains front-loaded into one file, penalizing performance_context and agent_specific/progressive_disclosure. Unchanged from the pre-fix audit; deliberately out of scope for this fix pass.
+- Root cause: No references/ subdirectory exists to move per-tool CLI detail, HLA/QC caveats, or the Common Errors table out of the main file.
+- Fix: Split into references/ (e.g., hla-and-qc-caveats.md, per-tool-cli-examples.md, common-errors.md) with SKILL.md as a thin router.
+
+### `bio-causal-genomics-transcriptome-wide-association` — FUSION (the declared primary_tool) has no standalone example script
+
+- Skill: 87, Production Ready · [mrsonord2240/bioSkills@4a67b94](https://github.com/mrsonord2240/bioSkills/tree/4a67b94a22f798e17ad9d4ebe4c0c58276ce9efb/causal-genomics/transcriptome-wide-association) · [viewer](skills/bio-causal-genomics-transcriptome-wide-association/mrsonord2240-bioSkills@4a67b94/viewer.md)
+- Observed in inputs: —
+- Problem: examples/ only ships s_predixcan_pipeline.sh and focus_finemap.sh; FUSION.assoc_test.R usage lives only as an inline bash fence in SKILL.md, and no fixture data is shipped for any of the 12 tools. Unchanged from the pre-fix audit; deliberately out of scope for this fix pass.
+- Root cause: Example coverage was built out for S-PrediXcan and FOCUS but not extended to FUSION despite FUSION being the frontmatter primary_tool.
+- Fix: Add examples/fusion_assoc_test.sh mirroring the other two scripts, plus a tiny synthetic fixture set.
 
 ### `bio-experimental-design-batch-design` — Bridge-channel block doesn't inherit the soft imbalance warning
 

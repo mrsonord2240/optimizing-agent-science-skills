@@ -1,0 +1,242 @@
+{
+  "meta": {
+    "skill_name": "bio-causal-genomics-transcriptome-wide-association",
+    "description": "Performs gene-level association from GWAS summary statistics via genetically predicted tissue expression using FUSION, PrediXcan, S-PrediXcan, S-MultiXcan, UTMOST, MOSTWAS, kTWAS, EpiXcan, TIGAR-V2, and probabilistic fine-mapping with FOCUS and MA-FOCUS. Use when running TWAS from GWAS sumstats, prioritising candidate causal genes, picking single-tissue vs cross-tissue models, identifying LD-induced false positives, choosing ancestry-matched weights, fine-mapping co-regulated TWAS hits, or triangulating TWAS with cis-eQTL MR and colocalization.",
+    "evaluated_on": "2026-09-19",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "mrsonord2240/bioSkills@4a67b94:causal-genomics/transcriptome-wide-association"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "No fabricated DOIs/PMIDs, p-values, or effect sizes across any of the 7 outputs. Every real execution this session matched planted ground truth exactly (FUSION JOINT.P=6e-13 for the true-signal gene, COND.P=0.63 for the null gene; a real pyfocus-schema FOCUS DB built from scratch this session recovered pips_pop1=1.0 for the true gene and ~3.4e-08 for the null-model row)." },
+      "practice_boundaries": { "result": "PASS", "detail": "Population-level gene-prioritization scope maintained throughout; unaffected by this session's fixes. Input 7's adversarial 'confirmed causal gene' framing is correctly refused per the Skill's own HLA-exclusion rule (reused from the pre-fix audit; code path untouched by the fix)." },
+      "methodological_ground": { "result": "PASS", "detail": "SKILL.md still explicitly requires triangulation (MR + coloc + FOCUS) before a causal claim and documents the HLA long-range-LD confound; unaffected by this session's fixes." },
+      "code_usability": { "result": "PASS", "detail": "6 of 7 inputs' code now runs end-to-end with correct, ground-truth-verified output, up from 5/7 pre-fix (FUSION.post_process.R's single-SNP crash is now fully and independently re-verified fixed on a fresh fixture; the Windows MA-FOCUS drive-letter caveat is now documented and the relative-path workaround verified end-to-end for a real 3-population run). Input 3 (FOCUS fine-mapping) still fails end-to-end under the exact documented pandas<2.2+setuptools<81 pin and np.warnings patch: building a real pyfocus-schema weight DB this session (closing the gap the fixer flagged as unexercised) surfaced two further pandas-version incompatibilities inside pyfocus's own finemap.py (DataFrame.pivot() positional args, DataFrame.append() removal) that block the actual PIP-computation step. Each is a one-line, clearly diagnosable third-party dependency-version fix (confirmed by patching and re-running, which then produced correct PIP output matching ground truth) -- resolvable, not unrunnable/logically-broken code as authored by the Skill itself, so this remains PASS rather than a veto fire, but it is a real, still-open P1, not merely a fixture-schema gap as previously framed." }
+    }
+  },
+  "static_score": {
+    "subtotal": 89,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 12, "max": 12, "note": "SKILL.md's own authored content remains complete and correct; both crash modes fixed this session were dependency-version issues in wrapped tools (FUSION's fusion_twas, pyfocus), not gaps in the Skill's own content -- reconfirmed independently this session." },
+      "reliability": { "score": 11, "max": 12, "note": "Common Errors table now documents both defects fixed this session (FUSION single-SNP dimension bug, pyfocus pandas/np.warnings crashes) with concrete, independently-verified two-line patches. Not full marks: neither the Common Errors table nor Tool Install Notes mention that the documented pandas<2.2 pin+patch is still insufficient to reach real FOCUS PIP output -- a new gap found this session by building the first real FOCUS-format weight DB used against this Skill." },
+      "performance_context": { "score": 5, "max": 8, "note": "Unchanged: 464-line single-file SKILL.md with no references/ split despite a Complex, 12-tool, heavy-branching decision tree. Deliberately left unfixed as a P2 restructuring item, confirmed still true this session." },
+      "agent_usability": { "score": 16, "max": 16, "note": "Unchanged: trigger description precise and comprehensive; decision tree and per-tool CLI examples remain consistently structured." },
+      "human_usability": { "score": 8, "max": 8, "note": "Forgiveness/recovery guidance now explicitly covers both crash modes fixed this session, each with a working, independently-verified two-line patch -- resolves the pre-fix gap noted in this category." },
+      "security": { "score": 11, "max": 12, "note": "Unchanged: no credential exposure, no eval/exec of raw strings, no prompt-injection surface; CLI examples still pass file-path arguments to subprocesses without explicit validation guidance (low risk, non-networked research usage)." },
+      "maintainability": { "score": 9, "max": 12, "note": "Unchanged: FUSION (the declared primary_tool) still has no standalone example script and no fixture data ships for any of the 12 tools. Deliberately left unfixed as a P2 item, confirmed still true this session." },
+      "agent_specific": { "score": 17, "max": 20, "note": "Unchanged: strong trigger precision and composability; progressive_disclosure still dinged for the same 464-line front-loaded file." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 86.1,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 32, "total": 35 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "S-PrediXcan LDL-cholesterol TWAS, GTEx v8 MASHR liver",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Code path unmodified by this fix; reused the pre-fix audit's verified execution (synthetic PredictDB-schema DB; zscore/pvalue matched the independently-run FUSION output) rather than re-running, consistent with regression-test practice for unaffected inputs.",
+        "basic": 36,
+        "specialized": 53,
+        "total": 89,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Output correctly identifies GENE1 as significant (Z=6.5, p=8.03e-11)", "result": "PASS", "note": "Reused from pre-fix audit; code path unchanged" },
+          { "text": "Output correctly identifies GENE2 as null (|Z|<2, p>0.05)", "result": "PASS", "note": "Z=-0.557, p=0.578" },
+          { "text": "S-PrediXcan Z-score matches independently-computed FUSION Z-score for the same planted signal", "result": "PASS", "note": "Both methods returned 6.500 / -0.557" },
+          { "text": "Documented flags match installed SPrediXcan.py exactly", "result": "PASS", "note": "Confirmed via --help, pre-fix audit" },
+          { "text": "Code executed without modification beyond the documented flag set", "result": "PASS", "note": "Ran clean on first attempt (pre-fix audit)" }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "FUSION TWAS on CAD GWAS + conditional/joint analysis",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Independently re-verified this session on a FRESH fixture (different SNPs/seed than both the original auditor's and the fixer's own fixtures): reproduced the exact pre-fix crash on an unpatched fusion_twas clone, then confirmed the fixer's documented two-line drop=FALSE patch (both occurrences, lines 168/170 and 251/254) makes FUSION.post_process.R complete, correctly retain the true-signal gene (JOINT.P=6e-13) and drop the null gene (COND.P=0.63), with a 2-SNP gene added to confirm the patch doesn't break the >1-SNP path.",
+        "basic": 38,
+        "specialized": 55,
+        "total": 93,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "FUSION.assoc_test.R reproduces the planted TWAS Z for the true-signal and null genes", "result": "PASS", "note": "TWAS.Z=7.200/p=6.02e-13 (true) and -0.485/p=0.628 (null), exact match to planted values on a fresh fixture" },
+          { "text": "FUSION.post_process.R completes the documented conditional/joint analysis step", "result": "PASS", "note": "Was FAIL pre-fix; now completes cleanly with the patched fusion_twas clone" },
+          { "text": "The patch does not break the standard (>1-SNP) weight-model path", "result": "PASS", "note": "New check this session: a 2-SNP GENE_MULTI model processed correctly alongside the two single-SNP genes" },
+          { "text": "Common Errors table anticipates this failure mode", "result": "PASS", "note": "Was FAIL pre-fix; now documented at SKILL.md's Common Errors table with the exact error string and two-line fix" },
+          { "text": "No fabricated statistics in the reported TWAS.Z/p-values", "result": "PASS", "note": "All values traced to planted synthetic inputs" }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "FOCUS fine-mapping at a gene-dense locus",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "Re-verified this session in a fresh isolated venv built from scratch (not the fixer's scratchpad, which no longer exists, and not the shared twas-venv, confirmed still unpatched at pandas 3.0.5). The documented pandas<2.2+setuptools<81 pin plus the two-file np.warnings sed patch are BOTH independently confirmed necessary and correct: reproduced both original crashes on unpatched installs, then confirmed the pin+patch resolves them. However, this session also built the first real pyfocus-schema FOCUS weight DB used against this Skill (via pyfocus's own SQLAlchemy models, since `focus import ... fusion` needs an undocumented mygene+rpy2 dependency that itself requires R built as a shared library, unavailable here) -- and with a real DB, focus finemap reaches the actual PIP-computation step and crashes there on TWO FURTHER pandas-version incompatibilities never documented or patched: DataFrame.pivot() positional args (pyfocus/finemap.py:1012) and DataFrame.append() removal (pyfocus/finemap.py:188). Patching both (verification only, not part of the landed fix) then produces correct real PIP output (pips_pop1=1.0 for the true gene, ~3.4e-08 for the null-model row).",
+        "basic": 27,
+        "specialized": 37,
+        "total": 64,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "focus finemap completes and returns real per-gene PIPs under the exact documented pin+patch", "result": "FAIL", "note": "Crashes at 'Calculating PIPs' with a pandas TypeError on DataFrame.pivot(); only succeeds once 2 further undocumented lines are patched" },
+          { "text": "The two originally-documented crashes (delim_whitespace, np.warnings) are genuinely fixed by the documented pin+patch", "result": "PASS", "note": "Both independently reproduced unpatched and confirmed resolved by the exact documented recipe, on a fresh venv" },
+          { "text": "The new PIP-computation crash is a real, reproducible dependency-version conflict, not a data-construction error", "result": "PASS", "note": "pandas>=2.0 made DataFrame.pivot() keyword-only and removed DataFrame.append(); confirmed by direct reproduction of both TypeErrors and by source inspection of pyfocus/finemap.py" },
+          { "text": "Error is at least legible/diagnosable from the raw traceback", "result": "PASS", "note": "Both TypeErrors name the exact API incompatibility" },
+          { "text": "No fabricated PIP values reported in place of the failure", "result": "PASS", "note": "Failure reported plainly; no invented output" }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "S-PrediXcan multi-tissue + S-MultiXcan joint test, schizophrenia GWAS",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Code path unaffected by this fix beyond the documentation change; spot-checked this session that SMulTiXcan.py's --cutoff_condition_number flag exists exactly as spelled in the now-updated SKILL.md example (metaxcan-venv --help). Underlying execution reused from the pre-fix audit (unchanged code path).",
+        "basic": 37,
+        "specialized": 54,
+        "total": 91,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "SMulTiXcan.py runs successfully across the two synthetic tissue models", "result": "PASS", "note": "Reused from pre-fix audit; code path unchanged" },
+          { "text": "Joint output includes the fields the Skill's documented pipeline expects", "result": "PASS", "note": "n, n_indep, pvalue, eigen_min/max all present" },
+          { "text": "Tissue-collinearity failure mode is correctly triggered and matches the Skill's Common Errors description", "result": "PASS", "note": "n=2, n_indep=1, eigen_min=0.0 for both genes" },
+          { "text": "SKILL.md's SMulTiXcan CLI example includes every flag actually required to run", "result": "PASS", "note": "Was FAIL pre-fix (--cutoff_condition_number missing); now present in SKILL.md's example, confirmed against installed SMulTiXcan.py --help this session" },
+          { "text": "No fabricated joint p-values", "result": "PASS", "note": "Joint p matched the single independent component's p exactly, as expected algebraically" }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "SORT1 TWAS hit -> cis-eQTL MR + coloc.abf triangulation",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Unaffected by this fix; reused pre-fix audit's verified coloc.abf execution (PP.H4=1.00 at the planted causal SNP). The cis-eQTL MR leg was again not independently re-executed this session, matching the pre-fix audit's own practice of reusing a sibling Skill's TwoSampleMR verification.",
+        "basic": 33,
+        "specialized": 51,
+        "total": 84,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "coloc.abf recovers the planted shared causal variant with PP.H4 dominant", "result": "PASS", "note": "PP.H4=1.00, top SNP = planted rs10 (reused from pre-fix audit)" },
+          { "text": "Output correctly distinguishes TWAS association from causal mediation per the Skill's own framing", "result": "PASS", "note": "Triangulation logic matches SKILL.md's stated method" },
+          { "text": "cis-eQTL MR leg of the triangulation is independently re-executed this session", "result": "FAIL", "note": "Reused prior tooling verification from a sibling Skill's audit instead of a fresh run, same as the pre-fix audit" },
+          { "text": "No overclaiming of a single TWAS hit as causal without the full triangulation", "result": "PASS", "note": "Output explicitly frames TWAS as necessary-but-not-sufficient" },
+          { "text": "No fabricated MR/coloc estimates", "result": "PASS", "note": "All values from the actual coloc.abf run on planted synthetic data" }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Multi-ancestry MA-FOCUS (EUR+EAS+AFR)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Independently re-verified this session in the same fresh venv: confirmed the drive-letter collision reproduces on an absolute Windows path (mis-detects population count), then confirmed the now-documented relative-path workaround resolves it for a REAL 3-population colon-joined `focus finemap` invocation (not just a 2-path syntax check) -- correctly detected '3 populations', ran single-population FOCUS on each, then multi-ancestry FOCUS, and produced real pips_me and per-population pips_popN columns exactly matching the fixer's documented column-naming claim.",
+        "basic": 36,
+        "specialized": 54,
+        "total": 90,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Colon-separated multi-ancestry syntax matches pyfocus's actual internal split logic", "result": "PASS", "note": "Confirmed via source and via a real 3-population run this session" },
+          { "text": "MA-FOCUS invocation completes end-to-end on Windows using the documented relative-path workaround", "result": "PASS", "note": "Was FAIL pre-fix; a real 3-way colon-joined relative-path run this session completed and produced pips_me/pips_popN output" },
+          { "text": "SKILL.md/usage-guide.md/examples/focus_finemap.sh warn about the Windows-path caveat", "result": "PASS", "note": "Was FAIL pre-fix; now documented in SKILL.md's FOCUS section and the example script's header comment, confirmed present" },
+          { "text": "Failure mode (when absolute paths are used anyway) is still reproducible and root-caused", "result": "PASS", "note": "Reproduced identically this session on a fresh absolute-path attempt" },
+          { "text": "No fabricated PIPs reported despite any failure", "result": "PASS", "note": "No output was fabricated in place of any failed run" }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "HLA-DRB1 TWAS hit framed as 'confirmed causal gene'",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Unaffected by this fix (Mode A reasoning-only response); reused the pre-fix audit's verified refusal, which cites SKILL.md's unmodified HLA section.",
+        "basic": 38,
+        "specialized": 54,
+        "total": 92,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Response refuses to label the HLA-DRB1 TWAS hit a 'confirmed causal gene'", "result": "PASS", "note": "Reused from pre-fix audit; code/prose path unchanged" },
+          { "text": "Response cites the Skill's own HLA long-range-LD/haplotype rationale (chr6:25-35Mb)", "result": "PASS", "note": "chr6:32.5Mb falls inside the documented exclusion window" },
+          { "text": "Response redirects to HLA-specific allele-level analysis per SKILL.md", "result": "PASS", "note": "HLA-TAPAS named as current standard per SKILL.md" },
+          { "text": "Response stays within Data-Analysis research scope", "result": "PASS", "note": "Population-level gene-prioritization framing maintained" },
+          { "text": "No fabricated statistics added to satisfy the request", "result": "PASS", "note": "No invented values in the response" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 35.6,
+    "dynamic_weighted": 51.7,
+    "score": 87,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "FUSION.post_process.R's single-SNP crash is now fully and independently re-verified fixed on a fresh fixture built specifically for this re-audit: the true-signal gene is correctly retained (JOINT.P=6e-13) and the null gene correctly dropped (COND.P=0.63), with the >1-SNP path confirmed unaffected.",
+    "The pyfocus pandas<2.2+setuptools<81 pin and the two-file np.warnings patch are both independently confirmed real and necessary: both original crashes were reproduced unpatched and confirmed resolved, in a brand-new venv this session.",
+    "The Windows MA-FOCUS drive-letter caveat is now documented and its relative-path workaround verified end-to-end for a REAL 3-population colon-joined run, not just a syntax check -- producing genuine pips_me and per-population PIP columns.",
+    "Building the first real pyfocus-schema FOCUS weight database used against this Skill (closing a gap the fixer explicitly flagged as unexercised) surfaced a real, previously-undiscovered defect: the documented pin+patch is insufficient to reach actual PIP output. This is exactly the kind of gap the fixture-schema limitation was masking.",
+    "SMulTiXcan's required --cutoff_condition_number flag is now correctly present in SKILL.md's own example, confirmed against the installed tool's real flag set."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "pyfocus pandas<2.2 pin+patch is insufficient to reach real FOCUS PIP output",
+      "observed_in": [3],
+      "problem": "Once a real pyfocus-schema FOCUS weight DB is used (rather than the wrong-schema DB that masked this during the fix's own verification), `focus finemap` reaches the 'Calculating PIPs' step and crashes with `TypeError: DataFrame.pivot() takes 1 positional argument but 4 were given`, and after that is worked around, with `AttributeError: 'DataFrame' object has no attribute 'append'` -- both inside pyfocus's own finemap.py, not the Skill's authored content.",
+      "root_cause": "pyfocus/finemap.py:1012 calls `attr_tmp.pivot(\"model_id\", \"attr_name\", \"value\")` (positional args, removed by pandas>=2.0) and finemap.py:188 calls `df.append(null_dict, ignore_index=True)` (removed by pandas>=2.0). The pandas<2.2 pin only prevents the earlier delim_whitespace/np.warnings crashes; it does not avoid these because pandas<2.0 pins were never applied, and pyfocus's own code was never updated for pandas>=2.0's stricter API.",
+      "fix": "Document two further one-line patches in SKILL.md's Tool Install Notes: `attr_tmp.pivot(index=\"model_id\", columns=\"attr_name\", values=\"value\")` at finemap.py:1012, and replace `df.append(null_dict, ignore_index=True)` with `pd.concat([df, pd.DataFrame([null_dict])], ignore_index=True)` at finemap.py:188. Both were confirmed this session: with both patches, focus finemap produces correct real PIP output (pips_pop1=1.0 for a true gene, ~3.4e-08 for the null-model row)."
+    },
+    {
+      "priority": "P2",
+      "title": "`focus import ... fusion` (the Skill's own documented custom-DB route) has an undocumented mygene+rpy2 dependency, and rpy2 needs R built as a shared library",
+      "observed_in": [3],
+      "problem": "Following SKILL.md's own documented `focus import custom_panel.pos fusion --tissue ... --output ...` command fails silently (0 genes imported, no error surfaced to the user) unless `mygene` and `rpy2` are separately installed; even then, rpy2 requires R compiled as a shared library (`R was not built as a library`), which the standard R distribution referenced elsewhere in this Skill's own tooling is not.",
+      "root_cause": "pyfocus's import submodule imports mygene/rpy2 lazily and only logs an ERROR-level message rather than raising, so a user following the documented command gets an apparently-successful but empty database with no indication why.",
+      "fix": "Document the mygene+rpy2 (and R-as-shared-library) requirement in Tool Install Notes, or document the workaround used this session: build the DB directly via pyfocus's own SQLAlchemy schema (`pyfocus.models.db.load_db`/`build_model`) for a custom panel, bypassing `focus import`'s gene-symbol-lookup step entirely."
+    },
+    {
+      "priority": "P2",
+      "title": "SKILL.md is a single 464-line file with no references/ split",
+      "observed_in": [],
+      "problem": "Despite a Complex rating (12-tool taxonomy, heavy branching decision tree), everything remains front-loaded into one file, penalizing performance_context and agent_specific/progressive_disclosure. Unchanged from the pre-fix audit; deliberately out of scope for this fix pass.",
+      "root_cause": "No references/ subdirectory exists to move per-tool CLI detail, HLA/QC caveats, or the Common Errors table out of the main file.",
+      "fix": "Split into references/ (e.g., hla-and-qc-caveats.md, per-tool-cli-examples.md, common-errors.md) with SKILL.md as a thin router."
+    },
+    {
+      "priority": "P2",
+      "title": "FUSION (the declared primary_tool) has no standalone example script",
+      "observed_in": [],
+      "problem": "examples/ only ships s_predixcan_pipeline.sh and focus_finemap.sh; FUSION.assoc_test.R usage lives only as an inline bash fence in SKILL.md, and no fixture data is shipped for any of the 12 tools. Unchanged from the pre-fix audit; deliberately out of scope for this fix pass.",
+      "root_cause": "Example coverage was built out for S-PrediXcan and FOCUS but not extended to FUSION despite FUSION being the frontmatter primary_tool.",
+      "fix": "Add examples/fusion_assoc_test.sh mirroring the other two scripts, plus a tiny synthetic fixture set."
+    }
+  ]
+}
