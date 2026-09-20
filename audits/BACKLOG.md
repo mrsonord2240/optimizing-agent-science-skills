@@ -22,7 +22,47 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: Flags copied from FLAIR 2.x docs and IsoQuant's git-checkout script name; Version Compatibility line claims 2.0+/3.5+ without a test.
 - Fix: Rewrite FLAIR correct as `flair correct -q reads.bed -f anno.gtf --junction_bed\|--junction_tab sr_junctions -o out -t N`, state the BAM->BED12 step (bedtools bamtobed -bed12 or flair align), use `isoquant`, pin tested versions (FLAIR 3.0.1, IsoQuant 4.0.0, SQANTI3 6.0.2, Bambu 3.8.3 needs xgboost 1.x).
 
-## P1 (91)
+## P1 (96)
+
+### `bio-isoform-switching` — Manual DTU pipeline stops at samples(d) after library(DEXSeq)
+
+- Skill: 66, Beta Only · [mrsonord2240/bioSkills@44ff43b](https://github.com/mrsonord2240/bioSkills/tree/44ff43bb35e5741c3ddd3c003590e1f1da8a4a4b/alternative-splicing/isoform-switching) · [viewer](skills/bio-isoform-switching/mrsonord2240-bioSkills@44ff43b/viewer.md)
+- Observed in inputs: 2
+- Problem: Biobase::samples masks DRIMSeq::samples, so model.matrix(~ condition, data = samples(d)) and sampleData = samples(d) fail with 'unable to find an inherited method' (verified with the Skill's exact library order, DRIMSeq 1.34.0, DEXSeq 1.52.0).
+- Root cause: Snippet was never run with all four packages attached; the design_full line is also unused.
+- Fix: Write DRIMSeq::samples(d) in both places (or drop the unused design_full line) and state the masking.
+
+### `bio-isoform-switching` — Default count route silently changes DTU results; shipped example stops on real data
+
+- Skill: 66, Beta Only · [mrsonord2240/bioSkills@44ff43b](https://github.com/mrsonord2240/bioSkills/tree/44ff43bb35e5741c3ddd3c003590e1f1da8a4a4b/alternative-splicing/isoform-switching) · [viewer](skills/bio-isoform-switching/mrsonord2240-bioSkills@44ff43b/viewer.md)
+- Observed in inputs: 3
+- Problem: importIsoformExpression defaults (scaledTPM counts) followed by isoformSwitchTestDEXSeq found 0 switches on real chrX 2v2 (RPL10 dIF -0.33, q=1) while raw NumReads or lengthScaledTPM found 26 isoforms in 20-22 genes; run_switch_analysis in the example then stops with 'No genes were considered switching'. The Skill never discusses count v abundance scaling.
+- Root cause: Count derivation (calculateCountsFromAbundance / countsFromAbundance) and reduceToSwitchingGenes=TRUE hard stop are undocumented; example was never run on data.
+- Fix: Add a short section: which count route the tests use, compare calculateCountsFromAbundance=TRUE/FALSE on the user's data, and wrap the test in a check that reports zero switches instead of erroring; run the example on the shipped test data.
+
+### `bio-isoform-switching` — Shipped example is a banner plus functions that do not run in the order given
+
+- Skill: 66, Beta Only · [mrsonord2240/bioSkills@44ff43b](https://github.com/mrsonord2240/bioSkills/tree/44ff43bb35e5741c3ddd3c003590e1f1da8a4a4b/alternative-splicing/isoform-switching) · [viewer](skills/bio-isoform-switching/mrsonord2240-bioSkills@44ff43b/viewer.md)
+- Observed in inputs: 3, 4
+- Problem: Run as shipped it prints one line. Calling its functions: extract_sequences fails on GTF without CDS (ORFs not yet predicted) and when the output directory does not exist; analyze_consequences fails because intron_retention needs analyzeAlternativeSplicing() (SKILL.md calls it, the example does not) and signal_peptide_identified needs SignalP; annotation.gtf/transcripts.fa are hard-coded.
+- Root cause: Example was written from the API names, not executed end to end.
+- Fix: Make the example runnable on a bundled toy dataset: analyzeORF before extractSequence when the GTF has no CDS, dir.create the output, add analyzeAlternativeSplicing, and build the consequence list only from annotators that were imported.
+
+### `bio-isoform-switching` — Consequence workflow order and annotator formats are wrong or missing
+
+- Skill: 66, Beta Only · [mrsonord2240/bioSkills@44ff43b](https://github.com/mrsonord2240/bioSkills/tree/44ff43bb35e5741c3ddd3c003590e1f1da8a4a4b/alternative-splicing/isoform-switching) · [viewer](skills/bio-isoform-switching/mrsonord2240-bioSkills@44ff43b/viewer.md)
+- Observed in inputs: 4
+- Problem: SKILL.md runs extractSequence before analyzeORF (fails without CDS); says analyzeSwitchConsequences 'silently drops' consequence types with no annotation, but it errors ('the result of the SignalP analysis must be available'); names hmmscan for Pfam but analyzePFAM needs pfam_scan-style rows containing a CL clan (raw --domtblout fails); calls analyzeORF(longest) unconditionally, which overwrote annotated ORFs on real chrX (PTC v Ensembl NMD biotype sens 0.96 -> 0.64, spec 1.00 -> 0.89); CPC2 removeNoncodinORFs=TRUE removed 2/10 planted poison isoforms from the NMD call.
+- Root cause: External-annotator interfaces and ISAR ORF logic were paraphrased rather than exercised.
+- Fix: Give the exact order (addAnnotatedORFs/ analyzeORF first when needed), the pfam_scan or web-server format analyzePFAM expects, the real failure text for missing annotators, and a warning that CPC2 filtering can drop PTC-bearing isoforms; use annotated ORFs when the GTF has CDS.
+
+### `bio-isoform-switching` — Design construction is positional and ignores replicates and batch
+
+- Skill: 66, Beta Only · [mrsonord2240/bioSkills@44ff43b](https://github.com/mrsonord2240/bioSkills/tree/44ff43bb35e5741c3ddd3c003590e1f1da8a4a4b/alternative-splicing/isoform-switching) · [viewer](skills/bio-isoform-switching/mrsonord2240-bioSkills@44ff43b/viewer.md)
+- Observed in inputs: 1, 5, 7
+- Problem: The design vector is hard-coded positionally against colnames(counts)[-1] (alphabetical): with SRR-style IDs it mislabels half the samples and recovered 0/20 planted switches with no warning. The Skill gives no minimum-replicate guidance (1v1 only stops through ISAR's own error) and does not mention that ISAR accepts a batch column (batch-confounded data: 19/30 artefact genes called without it, 0 with it). The 3v3 example uses satuRn although the Skill's own rule and ISAR's warning say DEXSeq for <=5 replicates.
+- Root cause: Example design matrix is illustrative but presented as the recipe.
+- Fix: Build the design by joining sample metadata on sampleID, add a batch/covariate line, state n>=3 per condition and choose DEXSeq for <=5 replicates in the example call.
 
 ### `bio-long-read-splicing` — -uf prescribed for unstranded ONT cDNA in three places
 
@@ -752,7 +792,47 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (398)
+## P2 (403)
+
+### `bio-isoform-switching` — dmFilter 'default too strict' claim is wrong; thresholds hard-coded for 6 samples
+
+- Skill: 66, Beta Only · [mrsonord2240/bioSkills@44ff43b](https://github.com/mrsonord2240/bioSkills/tree/44ff43bb35e5741c3ddd3c003590e1f1da8a4a4b/alternative-splicing/isoform-switching) · [viewer](skills/bio-isoform-switching/mrsonord2240-bioSkills@44ff43b/viewer.md)
+- Observed in inputs: 3
+- Problem: DRIMSeq 1.34.0 dmFilter defaults are all 0 (no filtering); the quoted 3/10 values are the Skill's own example. min_samps_gene_expr=6 errors on n=4 with a cryptic message.
+- Root cause: Example values described as defaults.
+- Fix: Say these are suggested values, scale min_samps_* to group sizes.
+
+### `bio-isoform-switching` — Common Errors table is paraphrased and partly misdirected
+
+- Skill: 66, Beta Only · [mrsonord2240/bioSkills@44ff43b](https://github.com/mrsonord2240/bioSkills/tree/44ff43bb35e5741c3ddd3c003590e1f1da8a4a4b/alternative-splicing/isoform-switching) · [viewer](skills/bio-isoform-switching/mrsonord2240-bioSkills@44ff43b/viewer.md)
+- Observed in inputs: 7
+- Problem: Real messages: 'The annotation and quantification ... seems to be different (Jaccard similarity < 0.925)', '!No genes left after filtering!', 'No genes were considered switching with the used cutoff values' (at the test step), 'there are no inferential replicates in the assays'. Version-suffixed IDs need ignoreAfterPeriod, not a new Salmon index.
+- Root cause: Messages written from memory.
+- Fix: Quote the real text and the right argument.
+
+### `bio-isoform-switching` — ISAR v2 claims (auto-select satuRn, long-read/single-cell mode, 2.11+) not verifiable
+
+- Skill: 66, Beta Only · [mrsonord2240/bioSkills@44ff43b](https://github.com/mrsonord2240/bioSkills/tree/44ff43bb35e5741c3ddd3c003590e1f1da8a4a4b/alternative-splicing/isoform-switching) · [viewer](skills/bio-isoform-switching/mrsonord2240-bioSkills@44ff43b/viewer.md)
+- Observed in inputs: 1, 6
+- Problem: Installed ISAR 2.6.0 (Bioc 3.20) has no auto-selection wrapper and no long-read/single-cell argument; the bioRxiv paper (Han et al 2025, 10.64898/2025.12.08.693027) exists but the version pin 2.11+ does not correspond to an installable Bioconductor release here.
+- Root cause: Claims taken from the preprint abstract.
+- Fix: Name the exact version/branch, or describe the explicit isoformSwitchTestSatuRn/DEXSeq choice.
+
+### `bio-isoform-switching` — swish/tximeta snippets are incomplete
+
+- Skill: 66, Beta Only · [mrsonord2240/bioSkills@44ff43b](https://github.com/mrsonord2240/bioSkills/tree/44ff43bb35e5741c3ddd3c003590e1f1da8a4a4b/alternative-splicing/isoform-switching) · [viewer](skills/bio-isoform-switching/mrsonord2240-bioSkills@44ff43b/viewer.md)
+- Observed in inputs: 6
+- Problem: coldata is undefined and its condition column must be a factor for swish; rowData(se)$gene_id from tximeta is a CharacterList so the txdf data.frame() line misbehaves (simulated); infRV filtering is described but no code; tximeta needs a linkedTxome matching the Salmon index.
+- Root cause: Snippets not executed against tximeta output.
+- Fix: Show coldata construction with factor(), unlist the gene_id, and add computeInfRV().
+
+### `bio-isoform-switching` — Small factual points and licence gating
+
+- Skill: 66, Beta Only · [mrsonord2240/bioSkills@44ff43b](https://github.com/mrsonord2240/bioSkills/tree/44ff43bb35e5741c3ddd3c003590e1f1da8a4a4b/alternative-splicing/isoform-switching) · [viewer](skills/bio-isoform-switching/mrsonord2240-bioSkills@44ff43b/viewer.md)
+- Observed in inputs: —
+- Problem: STMN2 cryptic exon is a premature-polyadenylation truncation, not PTC-NMD like UNC13A; the '~22% escape NMD' figure is not verified; SignalP, IUPred2A and DeepTMHMM are licence/cloud-gated and not flagged; SKILL.md is 440 lines with no references/ and a repeating usage-guide.
+- Root cause: Prose summarised from reviews.
+- Fix: Correct the STMN2 mechanism, cite the figure or drop it, flag the gated tools, move detail into references/ and dedupe the usage guide.
 
 ### `bio-long-read-splicing` — SQANTI3 inputs and report step underspecified
 

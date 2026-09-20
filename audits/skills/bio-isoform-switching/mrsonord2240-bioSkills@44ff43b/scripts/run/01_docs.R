@@ -1,0 +1,10 @@
+suppressPackageStartupMessages({library(IsoformSwitchAnalyzeR); library(DRIMSeq); library(fishpond)})
+h <- function(topic, pkg) { cat("\n########", topic, "\n"); tools::Rd2txt(utils:::.getHelpFile(do.call(utils::help, list(topic, pkg))), options=list(underline_titles=FALSE)) }
+h("analyzePFAM","IsoformSwitchAnalyzeR")
+h("isoformSwitchTestSatuRn","IsoformSwitchAnalyzeR")
+h("analyzeCPC2","IsoformSwitchAnalyzeR")
+cat("\ndmFilter formals:\n"); print(formals(DRIMSeq::dmFilter)[c("min_samps_gene_expr","min_gene_expr","min_samps_feature_expr","min_feature_expr","min_samps_feature_prop","min_feature_prop")])
+cat("\nfishpond isoformProportions exists:", exists("isoformProportions"), "\n")
+cat("\nimportRdata args grep long/single:\n"); print(grep("long|single|cell", names(formals(importRdata)), value=TRUE, ignore.case=TRUE))
+cat("\nISAR exports with 'long' or 'cell':\n"); print(grep("long|cell|auto", ls("package:IsoformSwitchAnalyzeR"), value=TRUE, ignore.case=TRUE))
+cat("\nISAR NEWS head:\n"); f <- system.file("NEWS", package="IsoformSwitchAnalyzeR"); if (nzchar(f)) cat(head(readLines(f), 40), sep="\n") else cat("no NEWS\n")
