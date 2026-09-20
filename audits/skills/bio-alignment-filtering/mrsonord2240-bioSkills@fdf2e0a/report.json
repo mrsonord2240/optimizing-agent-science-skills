@@ -1,0 +1,536 @@
+{
+  "meta": {
+    "skill_name": "bio-alignment-filtering",
+    "description": "Filter alignments by flags, mapping quality, and regions using samtools view and pysam. Use when extracting specific reads, removing low-quality alignments, or subsetting to target regions.",
+    "evaluated_on": "2026-09-20",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 9,
+    "source": "mrsonord2240/bioSkills@fdf2e0a288f37dd697b40adf06cfcdc6341cc654:alignment-files/alignment-filtering",
+    "audit_type": "re-audit (third agent, after fix/af-filter)",
+    "pre_fix_score": 75,
+    "pre_fix_grade": "Beta Only",
+    "executed": true,
+    "execution_note": "Executed 9/9 inputs in WSL science env alignment-files (samtools 1.24, pysam 0.24.1, bwa 0.7.19, bowtie2 2.5.5, hisat2 2.2.3, minimap2 2.31, STAR 2.7.11b, pbmm2 26.2.99, GATK 4.6.2.0). Seven pre-fix inputs re-run as regression from a COPY of the fixed skill, with every SKILL.md code block extracted and executed (24 blocks in a smoke run: 18 clean, 6 warned or failed only because of fixture names: chr1 on a chr22 BAM x3, no conda, expected warnings x2) plus 3 new evidence sets: real Illumina DNA and RNA reads re-aligned with six aligner modes (input 8), synthetic long reads through pbmm2/minimap2 and the real ARTIC nanopore BAM (input 9), real GATK Mutect2 and HaplotypeCaller runs on a BAM with planted low-MAPQ reads (input 9), and the samtools NEWS.md for version claims (inputs 6). Real data: nf-core human PE / RNA-seq / UMI BAMs, 1000G HG00349 slice, ARTIC nanopore BAM, planted-duplicate BAM. Synthetic (labelled): 4096-flag BAM, 60 kb repeat genome, 300 kb long-read repeat genome, 9-read RG BAM. Not executed: Strelka2, DeepVariant, clair3, Sniffles, cuteSV, Manta, GRIDSS, Delly, SvABA (not installed; judged by reading). No __pycache__ in the external clone, the worktree or run/."
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "Every number in the text that was tested (399/374/80 of 400, 5768, 1001 vs 1015, 8%, 802 duplicated records) reproduces; no fabricated identifiers or results. One release number (-n, 1.23 vs 1.24) and one caller rationale are wrong and are P2 findings, not fabrications."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "File-level BAM filtering only; no diagnosis, prescription or individual triage."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "MAPQ thresholds are aligner-specific with checked semantics; SV, RNA and duplicate-marking dependencies are called out; no principled fallacy in the 9 inputs."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All 24 code blocks, the shipped filter_bam.py and every extracted recipe ran; the only failures were fixture-name artifacts (chr1 on a chr22 BAM) and one non-standard-input crash (space-delimited BED, P2)."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 84,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 10,
+        "max": 12,
+        "note": "Completeness 3: covers flags, MAPQ per aligner, regions, BED, assay recipes, subsampling, -e, read groups, pysam and output; gaps the fixer noticed and left (orphaned mates, signed tlen, discordant pairs). Correctness 3: every recipe runs and matches truth, but a wrong release number (-n), a contradicted caller rationale and an over-claimed BED equivalence remain. Appropriateness 4."
+      },
+      "reliability": {
+        "score": 9,
+        "max": 12,
+        "note": "Fault tolerance 3: filter_bam.py validates regions, index and sort order and the snippets guard target>total and unmarked duplicates; the pysam BED recipe still crashes on space-delimited BED and mishandles zero-width rows. Error reporting 3: clean messages from the script, samtools stays silent (rc 0) on an absent contig but the text says so. Recoverability 3: every command writes a new file, none touches the input."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "SKILL.md 426 lines / ~20 KB with tables carrying most content; usage-guide reduced to 64 lines with no duplicated recipes. Token cost 3, execution efficiency 4."
+      },
+      "agent_usability": {
+        "score": 14,
+        "max": 16,
+        "note": "Learnability 4; consistency 3 (input.bam / in.bam / mapped.bam naming shifts between blocks); feedback design 3 (count-before-write advice, script prints Kept/Removed and warnings); error prevention 4 (each trap carries a checked number)."
+      },
+      "human_usability": {
+        "score": 6,
+        "max": 8,
+        "note": "Discoverability 3: the description does not mention subsampling, duplicate removal or read groups, all covered; forgiveness 3 (strict region parsing is correct for this category)."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "No credentials, no eval/exec, region strings validated; bash blocks use unquoted variable expansion of user paths (input validation 3)."
+      },
+      "maintainability": {
+        "score": 10,
+        "max": 12,
+        "note": "One SKILL.md, a slim usage-guide and one runnable example; no references/ directory; flag lists still appear in two forms (table and breakdown list). Modularity 3, modifiability 3, testability 4 (checked numbers in the text, runnable example script)."
+      },
+      "agent_specific": {
+        "score": 17,
+        "max": 20,
+        "note": "Trigger precision 3; progressive disclosure 3 (no references, but under 500 lines); composability 4 (Related Skills, explicit hand-offs to duplicate-handling, sorting, indexing); idempotency 4; escape hatches 3 (SV warning, \"no universal threshold\", pbmm2 caveat, but caller rows are not marked unverified)."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 89.0,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 39,
+      "total": 42
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "[regression] Standard quality filter + Remove-Duplicates pre-check on real 1000G, nf-core and planted-duplicate BAMs",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Standard filter (-F 3332 -q 30) equals a hand count on both real BAMs (9437 and 5640); pysam passes_filter identical record for record; the new duplicate pre-check marks 100 reads on the unmarked BAM and leaves 400.",
+        "basic": 37,
+        "specialized": 57,
+        "total": 94,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The SKILL.md Standard Quality Filter block (-F 3332 -q 30) equals a hand count from raw FLAG/MAPQ integers on two real BAMs",
+            "result": "PASS",
+            "note": "9437/9601 and 5640/5644 records; output is BGZF; quickcheck OK"
+          },
+          {
+            "text": "The pysam passes_filter block is record-for-record identical to the CLI result",
+            "result": "PASS",
+            "note": "to_string() lists equal on both BAMs"
+          },
+          {
+            "text": "The extracted Remove-Duplicates snippet marks first when no duplicate flag exists and then removes them",
+            "result": "PASS",
+            "note": "planted BAM: \"marking first\", 100 flagged (one template of each of the 50 planted pairs), 400 left, 0 dup-flagged; 1000G (already marked): straight -F 1024, 9500"
+          },
+          {
+            "text": "The text is right that plain -F 1024 on an unmarked BAM keeps everything",
+            "result": "PASS",
+            "note": "500 of 500 reproduced"
+          },
+          {
+            "text": "usage-guide.md no longer contradicts SKILL.md about the \"standard\" filter",
+            "result": "PASS",
+            "note": "no -F 2308 or -F 3332 left in usage-guide.md"
+          }
+        ],
+        "executed": true,
+        "execution_note": "Executed in WSL science (env alignment-files); outputs in run/out/r1_standard.txt; assertions checked on content (counts, record identity, truth arithmetic), not exit codes."
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "[regression] Every flag/MAPQ recipe, exhaustive over all 4096 FLAG values (synthetic BAM) and the flag tables",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "14 recipes harvested by regex from the fixed SKILL.md bash blocks and 9 assay-table recipes: all equal bit arithmetic over 4096 flags; relabelled forward/reverse/read1/read2 rows clean; all 7 breakdown lines equal `samtools flags`.",
+        "basic": 37,
+        "specialized": 57,
+        "total": 94,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Every -f/-F/-G/-q recipe in the bash blocks equals bit arithmetic over all 4096 flag values",
+            "result": "PASS",
+            "note": "14 recipes, all equal"
+          },
+          {
+            "text": "Every assay-table recipe equals bit arithmetic",
+            "result": "PASS",
+            "note": "9 recipes (germline, somatic, long-read, ChIP, ATAC, coverage, HISAT2, STAR, SV)"
+          },
+          {
+            "text": "The relabelled rows return what their labels say (forward -F 20, reverse -f 16 -F 4, read1/read2 -f 64/128 -F 2308)",
+            "result": "PASS",
+            "note": "0 unmapped in strand outputs; 0 secondary/supplementary/unmapped in read outputs"
+          },
+          {
+            "text": "The somatic row keeps the supplementary reads its rationale keeps, while -F 2304/2308/3328/3332 remove them all",
+            "result": "PASS",
+            "note": "503 supplementary kept by -F 1280 -q 1; 0 left by the other four"
+          },
+          {
+            "text": "The FLAG table, `samtools flags 99` line and the 7 \"N = a + b\" breakdowns match samtools",
+            "result": "PASS",
+            "note": "12 table rows, 7 breakdowns (bits and prose term counts)"
+          }
+        ],
+        "executed": true,
+        "execution_note": "Executed in WSL science (env alignment-files); outputs in run/out/r2_flags.txt; assertions checked on content (counts, record identity, truth arithmetic), not exit codes."
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "[regression] Region, -L BED, pysam region/BED recipes and the shipped examples/filter_bam.py (three real BAMs, fuzzed)",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "The first-audit defects here (BED recipe duplicating and unsorting reads, filter_bam.py off-by-one and crashes) are fixed: recipe identical to samtools -L on 81 fuzz BEDs without zero-width rows; filter_bam.py equals samtools on every region form. Left: the recipe drops what samtools keeps for zero-width (start==end) rows (13/81 fuzz BEDs) and crashes on a space-delimited BED.",
+        "basic": 34,
+        "specialized": 51,
+        "total": 85,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "samtools region semantics quoted in the text hold (1-based inclusive, absent contig warns with rc 0, index required, -L skips track/#/browser lines, -P needs region or -L, CRAM needs -T)",
+            "result": "PASS",
+            "note": "14 semantic checks pass"
+          },
+          {
+            "text": "The pysam rule fetch(c, start-1, end) equals samtools c:start-end, and the region snippet runs",
+            "result": "PASS",
+            "note": "60 random regions identical"
+          },
+          {
+            "text": "The pysam BED recipe equals samtools -L in content and order on BEDs with track/#/browser/blank/nested/touching/CRLF/6-column/unsorted/unknown-contig rows and on 81 fuzz BEDs (3 real BAMs)",
+            "result": "PASS",
+            "note": "0 mismatches without zero-width rows; output keeps SO:coordinate"
+          },
+          {
+            "text": "The text claim \"same records as samtools view -L\" holds for zero-width (start==end) and space-delimited BED rows",
+            "result": "FAIL",
+            "note": "13/81 fuzz BEDs differ, every one containing a start==end row (samtools keeps the base at s, fetch(c,s,s) returns nothing); space-delimited BED raises IndexError"
+          },
+          {
+            "text": "examples/filter_bam.py equals samtools on bare contig / contig:start / open end / commas / colon contigs / 180 random regions on 3 BAMs, refuses bad regions cleanly, and handles unindexed and name-sorted input",
+            "result": "PASS",
+            "note": "no Traceback on 5 bad regions; -d warns on an unmarked BAM; -q 30 -d -p -P == samtools -f 2 -F 3332 -q 30"
+          }
+        ],
+        "executed": true,
+        "execution_note": "Executed in WSL science (env alignment-files); outputs in run/out/r3_regions.txt; assertions checked on content (counts, record identity, truth arithmetic), not exit codes."
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "[regression] Reproducible, pair-consistent subsampling: samtools -s, coverage-matching guard, pysam blake2b recipe (real 1000G BAM)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Every claim reproduces: -s 42.1 template-consistent and deterministic; bare -s 0.1 == seed 0 (1015); --subsample 0.1 auto seed 1001; guarded coverage matching lands within 8%; pysam recipe honours its seed (Jaccard 0.044-0.069).",
+        "basic": 37,
+        "specialized": 57,
+        "total": 94,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "-s 42.1 keeps or drops every record of a template together, is ~10%, and is deterministic",
+            "result": "PASS",
+            "note": "512 of 4828 templates, all records kept, identical rerun"
+          },
+          {
+            "text": "The corrected 1.24 seed statements hold (bare -s 0.1 deterministic and equal to seed 0; --subsample without a seed uses a header-derived seed and differs)",
+            "result": "PASS",
+            "note": "1015 = 1015; auto 1001; NEWS.md 1.24 states the default-seed change (n11)"
+          },
+          {
+            "text": "Sequential cuts with independent seeds give 12.5%; same-seed cuts nest",
+            "result": "PASS",
+            "note": "1197 of 9601; nested 2256 == direct 2256"
+          },
+          {
+            "text": "The extracted coverage-matching and tumor-normal block is safe when target > total and lands near the target otherwise",
+            "result": "PASS",
+            "note": "target 10M -> unchanged copy 9601; 3000/1000/6000 -> -5.0/-7.8/-0.6%; tumor 5604 vs normal 5640; target == total copies, total-1 keeps all"
+          },
+          {
+            "text": "The pysam blake2b recipe is pair-consistent, honours its seed, reproducible and unbiased",
+            "result": "PASS",
+            "note": "6 seeds ~10%, all records of a template kept, pairwise Jaccard 0.044-0.069, mean fraction 0.0999, differs from samtools -s (Jaccard 0.062)"
+          }
+        ],
+        "executed": true,
+        "execution_note": "Executed in WSL science (env alignment-files); outputs in run/out/r4_subsample.txt; assertions checked on content (counts, record identity, truth arithmetic), not exit codes."
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "[regression] Aligner-aware MAPQ table on five aligners (synthetic repeat genome, known multiplicity) and the real STAR RNA-seq BAM",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "All thresholds in the fixed table remove 400/400 exact-repeat reads and keep 96-100% of unique reads; every number quoted in the prose (399/400, 374/400, 80/400, 5768) reproduces.",
+        "basic": 36,
+        "specialized": 56,
+        "total": 92,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Every \"drop ambiguous\" and \"high confidence\" threshold read out of the table removes the 400 exact-repeat reads for BWA, Bowtie2, HISAT2, minimap2 and STAR",
+            "result": "PASS",
+            "note": "0/400 survive in all ten cases"
+          },
+          {
+            "text": "The same thresholds keep the unique reads",
+            "result": "PASS",
+            "note": "2000/2000 BWA and Bowtie2, 1995/2000 HISAT2 and STAR, minimap2 -q 60 1927/2000"
+          },
+          {
+            "text": "The numbers quoted in the prose reproduce (old -q 1 kept 399 Bowtie2, 374 HISAT2, 80 STAR)",
+            "result": "PASS",
+            "note": "exact match"
+          },
+          {
+            "text": "The STAR facts hold: MAPQ only 0/1/3/255 with NH 5+/3-4/2/1, -q 4..255 equivalent, -e [NH]==1 == -q 255 (synthetic and real 5768)",
+            "result": "PASS",
+            "note": "(255,1) 5768, (3,2) 954, (1,3-4) 292, (0,5-6) 28 on the real BAM"
+          },
+          {
+            "text": "-e [NH]==1 removes 400/400 exact repeats on HISAT2 and returns 0 silently (rc 0) on BWA, Bowtie2 and minimap2 as the text says; Bowtie2 max MAPQ is 42",
+            "result": "PASS",
+            "note": "n=0 rc=0 stderr empty for the three NH-less aligners"
+          }
+        ],
+        "executed": true,
+        "execution_note": "Executed in WSL science (env alignment-files); outputs in run/out/r5_align.txt, r5_mapq.txt; assertions checked on content (counts, record identity, truth arithmetic), not exit codes."
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "[regression] Expression (-e) and read-group filtering, version-introduction claims, composite insert-size request (real BAMs)",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "-e recipes, -r/-R/-l and the new -n all behave as written; the fix added a wrong release number (-n arrived in samtools 1.23, not 1.24) and the composite insert-size request still exposes the signed-tlen trap the text never mentions.",
+        "basic": 35,
+        "specialized": 51,
+        "total": 86,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The -e recipes equal tag/CIGAR truth (NM, cigar=~, sclen, combined with -F/-q, sclen/qlen, ![NM]) and an -e on an absent tag is silently empty",
+            "result": "PASS",
+            "note": "229, 16, 28, 4206, 5628, 2 records match truth; [XY] rc 0, 0 rows, no warning"
+          },
+          {
+            "text": "Read-group semantics match the text: -r takes the ID and also emits untagged reads, -e [RG]== is strict, -R file, -l LIBRARY, -n drops untagged, --expr accepted",
+            "result": "PASS",
+            "note": "6 = 3 tagged + 3 untagged; -e 3; -n 3; -l 9601 of 9601; --expr == -e 5768"
+          },
+          {
+            "text": "Real STAR BAM: -e [NH]==1 equals -q 255",
+            "result": "PASS",
+            "note": "5768 = 5768"
+          },
+          {
+            "text": "The version-introduction claims match the samtools NEWS (-e 1.12, sclen 1.16, --subsample seed 1.24, -n 1.24)",
+            "result": "FAIL",
+            "note": "NEWS.md puts --exclude-no-read-group under Release 1.23 (16 Dec 2025), not 1.24; the other three are right (n11)"
+          }
+        ],
+        "executed": true,
+        "execution_note": "Executed in WSL science (env alignment-files); outputs in run/out/r6_expr.txt, n11_news_check.txt; assertions checked on content (counts, record identity, truth arithmetic), not exit codes."
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "[regression] \"Remove duplicates, keep unique high-confidence proper pairs, then run Manta\" on an unmarked-duplicate BAM",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The dedup trap is closed on all three sort orders and the supplementary/SV warning is correct; the text still says nothing about the discordant-pair signal that -f 2 destroys, or about orphaned mates (53 singletons after -F 3332 -q 30 on the 1000G BAM).",
+        "basic": 35,
+        "specialized": 51,
+        "total": 86,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The Remove-Duplicates snippet yields 400 records from the unmarked BAM whether it is coordinate-sorted, name-sorted or shuffled, with every remaining template still paired",
+            "result": "PASS",
+            "note": "400/400/400; 200 templates of size 2"
+          },
+          {
+            "text": "The SV recipe -F 1024 keeps the supplementary reads that -F 2304/2308/3328/3332 remove, and the text warns about it",
+            "result": "PASS",
+            "note": "1024 supplementary kept vs 0; \"NOT -F 2304, 2308, 3328 or 3332\" and \"Cost of getting this wrong\" present"
+          },
+          {
+            "text": "The text warns before the command that -F 1024 is a no-op on an unmarked BAM",
+            "result": "PASS",
+            "note": "\"silently removes nothing\" within the Remove Duplicates section"
+          },
+          {
+            "text": "\"Primary is not unique\" holds on real data",
+            "result": "PASS",
+            "note": "real STAR BAM: -F 2304 keeps 7042 primaries of which 1274 have NH>1; -q 255 keeps 5768"
+          }
+        ],
+        "executed": true,
+        "execution_note": "Executed in WSL science (env alignment-files); outputs in run/out/r7_adversarial.txt; assertions checked on content (counts, record identity, truth arithmetic), not exit codes."
+      },
+      {
+        "index": 8,
+        "type": "Variant B",
+        "label": "[NEW] MAPQ table on REAL reads: 2821 DNA pairs and 3521 RNA-seq pairs re-aligned with BWA, Bowtie2 (e2e and local), HISAT2, minimap2, STAR",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The thresholds keep >= 99.9% of real mapped reads for BWA, Bowtie2, HISAT2 and STAR. The slice has no distinct-locus multi-mappers (bowtie2 -k 10 finds none; STAR NH>1 is alternative splicing at one locus), so \"drop ambiguous\" is not exercised on real data here. minimap2 -ax sr real reads: -q 60 keeps only 58.5%.",
+        "basic": 34,
+        "specialized": 52,
+        "total": 86,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Table thresholds keep >= 97% of real mapped reads for BWA (-q 1/-q 30), Bowtie2 (-q 2/-q 23), HISAT2 (-q 2/-q 60), STAR (-q 255) on 2821 real DNA pairs",
+            "result": "PASS",
+            "note": "100% / 99.9% / 100% / 99.9%"
+          },
+          {
+            "text": "The Bowtie2 \"MAPQ maxes at 42 end-to-end\" statement holds on real reads",
+            "result": "PASS",
+            "note": "e2e max 42; --local max 44 (text restricts the statement to end-to-end)"
+          },
+          {
+            "text": "-q 255 and -e [NH]==1 select the same real STAR records; the re-aligned RNA reads keep STAR MAPQ 255 for all NH==1 records",
+            "result": "PASS",
+            "note": "5768 in the original BAM; STAR re-alignment: unique kept 5768/5768"
+          },
+          {
+            "text": "The 3521 real RNA pairs re-aligned with each aligner keep the reads STAR calls unique (NH==1) under the table thresholds",
+            "result": "PASS",
+            "note": "BWA 5768/5768, HISAT2 2207/2207, minimap2 5711/5711, STAR 5768/5768; Bowtie2 -q 2 5084/5432 (93.6%, unspliced aligner on spliced reads)"
+          }
+        ],
+        "executed": true,
+        "execution_note": "Executed in WSL science (env alignment-files); outputs in run/out/n8_align_real.txt, n8_align_rna.txt, n8_analyze.txt; assertions checked on content (counts, record identity, truth arithmetic), not exit codes."
+      },
+      {
+        "index": 9,
+        "type": "Scope Boundary",
+        "label": "[NEW] The two rows the fixer left unverified: pbmm2/minimap2 long-read MAPQ rows and the assay-table caller rationale (real GATK runs)",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "pbmm2 and minimap2 long-read rows are right (0/80 exact repeats, 300/300 unique kept; pbmm2 CCS MAPQ identical to minimap2 map-hifi for 580/580 reads). The somatic row rationale (\"somatic callers handle low MAPQ\") is contradicted by a real Mutect2 run: it filters the 120 MAPQ<20 reads itself. Strelka2, DeepVariant, clair3, Sniffles, cuteSV, Manta, GRIDSS, Delly, SvABA are not installed: unverified.",
+        "basic": 34,
+        "specialized": 50,
+        "total": 84,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "pbmm2 row (-q 1 drop ambiguous, -q 60 high confidence) removes the exact-repeat reads and keeps the unique ones for HiFi (CCS) and ONT (SUBREAD) profiles",
+            "result": "PASS",
+            "note": "0/80 exact repeats, 300/300 unique at both thresholds; the SKILL.md text still says the row was not run, which is now checkable"
+          },
+          {
+            "text": "The minimap2 long-read row (map-hifi, map-ont) behaves the same",
+            "result": "PASS",
+            "note": "0/80 and 300/300; 8%-diverged copies keep MAPQ 60"
+          },
+          {
+            "text": "The long-read recipe -F 3328 -q 5 and the SV recipe -F 1024 equal bit arithmetic on the real 4916-record ARTIC nanopore BAM",
+            "result": "PASS",
+            "note": "4916 = 4916; the real BAM has no supplementary reads, so the SV claim is exercised on the synthetic flag BAM only"
+          },
+          {
+            "text": "The germline row (-f 2 -F 3328 -q 20) is consistent with what HaplotypeCaller filters itself",
+            "result": "PASS",
+            "note": "real HaplotypeCaller run: MappingQualityReadFilter 120, NotSecondary 2 of 5642; --help lists MAPQ>=20, not-duplicate, not-secondary defaults"
+          },
+          {
+            "text": "The somatic row rationale \"somatic callers handle low MAPQ\" is supported for Mutect2",
+            "result": "FAIL",
+            "note": "real Mutect2 run filtered 120 of 5642 reads by MappingQualityReadFilter (MAPQ<20, default 20); Mutect2 also drops chimeric-original alignments by default"
+          }
+        ],
+        "executed": true,
+        "execution_note": "Executed in WSL science (env alignment-files); outputs in run/out/n9_align_long.txt, n9_analyze.txt, n10_caller_docs.txt, n10_caller_assert.txt, n10_mutect2_run.txt; assertions checked on content (counts, record identity, truth arithmetic), not exit codes."
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 33.6,
+    "dynamic_weighted": 53.4,
+    "score": 87,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Every first-audit P1 defect verified fixed by independent runs (13 numbered findings re-run, 11-13 partly): aligner table (Bowtie2/HISAT2 -q 2, STAR sentinels, NH), pysam BED recipe, filter_bam.py region handling, dead pysam seed, silent -F 1024, target>total subsampling, mislabelled flag rows, RG example.",
+    "Every recipe carries a checked number: the fixed text quotes 399/374/80 of 400, 5768, 1001 vs 1015, 802 duplicated records, and each reproduces exactly on an independent run.",
+    "The pysam BED recipe and the shipped filter_bam.py equal samtools record for record (81 fuzz BEDs and 180 random regions on three real BAMs), colon-named contigs and name-sorted input included.",
+    "Traps are stated before the command: -F 1024 on unmarked duplicates, supplementary reads for SV callers, target above total in coverage matching, absent contig or tag returning zero reads with rc 0.",
+    "usage-guide.md dedup lost nothing an agent needs: each deleted block maps to a SKILL.md section, and the contradicting -F 2308 \"standard\" filter is gone."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "-n (--exclude-no-read-group) arrived in 1.23, not 1.24",
+      "observed_in": [
+        6
+      ],
+      "problem": "\"Samtools 1.24 adds -n (--exclude-no-read-group)\" is wrong: samtools NEWS.md lists the option under Release 1.23 (16 Dec 2025). The fix log recorded it as 1.24 without the release heading.",
+      "root_cause": "Version claim taken from a NEWS entry without checking which release section it sits under.",
+      "fix": "Write \"Samtools 1.23 adds -n (--exclude-no-read-group)\". The 1.24 --help spells the long option --exclude-no-read_group; the hyphenated form in the text also works on 1.24 (checked)."
+    },
+    {
+      "priority": "P2",
+      "title": "Somatic-row rationale contradicted by a real Mutect2 run",
+      "observed_in": [
+        9
+      ],
+      "problem": "\"Somatic callers handle low MAPQ\" is not what a real Mutect2 run does: 120 of 5642 reads (MAPQ 10 and 0) were removed by its MappingQualityReadFilter (default minimum 20), and by default it also drops chimeric-original alignments. The assay table does not say that no caller row was run.",
+      "root_cause": "Caller behaviour written from memory; only aligner/flag behaviour was tested.",
+      "fix": "Reword the somatic row: -F 1280 -q 1 is only a light pre-filter because Mutect2 applies MAPQ>=20, not-secondary, not-duplicate and non-chimeric filters itself. Add one line that the caller-specific rationale comes from caller documentation and was not run for Strelka2, DeepVariant, clair3, Sniffles, cuteSV, Manta, GRIDSS, Delly, SvABA."
+    },
+    {
+      "priority": "P2",
+      "title": "pysam BED recipe differs from -L on zero-width/space rows",
+      "observed_in": [
+        3
+      ],
+      "problem": "The text says the recipe gives \"the same records as samtools view -L\". 13 of 81 fuzz BEDs differ, each with a start==end row (samtools returns the reads covering base s; fetch(c, s, s) returns nothing), and a space-delimited BED raises IndexError at parts[2].",
+      "root_cause": "The fix was validated on one zero-width row placed where no reads exist, and on tab-delimited BED only.",
+      "fix": "Say \"tab-delimited BED with start < end\", or make the recipe match: parts = line.split(); end = max(int(parts[2]), int(parts[1]) + 1)."
+    },
+    {
+      "priority": "P2",
+      "title": "Three known filter pitfalls still missing from the text",
+      "observed_in": [
+        6,
+        7
+      ],
+      "problem": "(1) Read-level filters leave orphaned mates (53 single-record templates after -F 3332 -q 30 on the 1000G BAM); (2) -f 2 would also discard the discordant pairs an SV caller needs, but the SV rows only say \"-F 1024 only\"; (3) tlen is signed, so \"-e tlen>=100 && tlen<=500\" keeps 2109 of the 4225 intended records.",
+      "root_cause": "The fix log lists them as \"needs a new section, not a correction\".",
+      "fix": "Add a short \"Pitfalls\" section: samtools fixmate after read-level filtering when pairing matters; do not add -f 2 for SV callers; use abs(tlen)-style symmetric tests in -e."
+    },
+    {
+      "priority": "P2",
+      "title": "minimap2 row silent about short-read MAPQ ceilings",
+      "observed_in": [
+        8
+      ],
+      "problem": "The minimap2 row says \"(DNA, long-read)\" and -q 60. With -ax sr on real Illumina reads -q 60 kept only 58.5% of uniquely mapped reads (unique MAPQ mostly 48-59); on synthetic reads 96%.",
+      "root_cause": "The row was checked only for long reads.",
+      "fix": "State that -q 60 is for long-read presets; for -x sr use -q 1 for \"drop ambiguous\" and a lower high-confidence value (measured MAPQ 48-59 for unique real reads)."
+    }
+  ]
+}
