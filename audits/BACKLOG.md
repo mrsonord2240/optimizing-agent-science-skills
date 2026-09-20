@@ -8,7 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (88)
+## P1 (95)
 
 ### `bio-alignment-validation` — Validators miss unplaced unmapped reads: false PASS at 70% mapped
 
@@ -65,6 +65,62 @@ None open.
 - Problem: Hard-coded `-gt 1000` makes the one-liner exit 1 on valid 100-, 200- and 500-read BAMs, so it cannot be dropped into a pipeline unmodified.
 - Root cause: Illustrative threshold presented as a general check.
 - Fix: Make the minimum a variable (`MIN=${MIN_READS:-1}`) or drop the count test and keep quickcheck plus `samtools view -c` as the decode check.
+
+### `bio-bam-statistics` — Mean-depth and >=Nx recipes divide by covered positions
+
+- Skill: 71, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/bam-statistics) · [viewer](skills/bio-bam-statistics/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 2
+- Problem: 'samtools depth \| awk sum/n' (SKILL.md Quick Reference, usage-guide) returns 568.15x on a BAM whose true mean depth is 16.77x, the '>=10x/>=20x' one-liner returns 82.3%/79.3% for a true 2.43%/2.34%, and the pysam mean_depth() snippet returns 579.7.
+- Root cause: The recipes omit 'samtools depth -a' and divide by the number of covered positions / pileup columns instead of the region length.
+- Fix: Use 'samtools depth -a' (or divide by end-start) in every mean-depth and >=Nx recipe, make mean_depth() divide by (end - start) like coverage_stats(), and point 'mean depth' at samtools coverage / mosdepth as the primary answer.
+
+### `bio-bam-statistics` — pysam counting snippets count secondary/supplementary/QC-fail
+
+- Skill: 71, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/bam-statistics) · [viewer](skills/bio-bam-statistics/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 1, 3
+- Problem: 'Count Reads', the usage-guide flagstat() and examples/qc_report.py count every record: mapped 5642 vs flagstat primary 5640 on the real BAM; on the planted BAM properly-paired is 88.9% vs flagstat 92.0%. The SE and empty cases raise ZeroDivisionError.
+- Root cause: Loops over all alignments with no is_secondary/is_supplementary/is_qcfail filter and unguarded divisions, contradicting the Skill's own 'what each tool counts' table.
+- Fix: Skip secondary and supplementary records for read-level rates (count them separately), state the denominator in the printed labels, and guard every division (if paired / if total).
+
+### `bio-bam-statistics` — pysam pileup recipes silently cap depth at 8000 and drop orphans
+
+- Skill: 71, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/bam-statistics) · [viewer](skills/bio-bam-statistics/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 4
+- Problem: On a 9500x stack the pysam recipes report max 8000 and mean 850 (planted 1000), and pileup drops 20 non-proper paired reads (total depth 2000 vs samtools depth 3500); mean_depth() prints 4250.
+- Root cause: pysam pileup defaults (max_depth=8000, ignore_orphans=True, columns include deletions) are never mentioned although the Skill warns about the same cap for mpileup.
+- Fix: Pass max_depth=1_000_000 (and ignore_orphans=False, stepper='nofilter' as needed) in every pileup snippet, add a note that pileup.n counts deletions, and extend the cap warning to pysam and bcftools mpileup (-d 250).
+
+### `bio-bam-statistics` — 'samtools coverage -b regions.bed' is not a BED option
+
+- Skill: 71, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/bam-statistics) · [viewer](skills/bio-bam-statistics/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 2
+- Problem: In samtools 1.24 -b is --bam-list, so the documented 'Coverage from BED' command fails with 'Cannot open file list "exome.bed"'.
+- Root cause: Flag copied from 'samtools depth -b' where -b is a BED file.
+- Fix: Delete the example or replace it with 'samtools coverage -r chr:start-end' per region, 'samtools depth -b bed', or 'mosdepth --by regions.bed'.
+
+### `bio-bam-statistics` — Adapter-readthrough detector greps a stats field that does not exist
+
+- Skill: 71, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/bam-statistics) · [viewer](skills/bio-bam-statistics/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 6
+- Problem: 'samtools stats \| grep "bases soft-clipped"' prints nothing on samtools 1.24 (0 matches on a BAM with 863 soft-clipped bases, and on a synthetic BAM with 400), and the '>5%' threshold cannot apply to an absolute count.
+- Root cause: The SN line was assumed, not checked against the installed samtools.
+- Fix: Compute the soft-clipped fraction from CIGARs (samtools view -F 2308 \| awk on the CIGAR, or pysam cigartuples op 4 over primary reads) and state the denominator; keep the >5% rule for that fraction.
+
+### `bio-bam-statistics` — 'Insert Size Caveats' misstate what samtools stats reports
+
+- Skill: 71, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/bam-statistics) · [viewer](skills/bio-bam-statistics/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 6
+- Problem: The Skill says stats reports the IS section only for FR-oriented properly paired reads and leaves it empty for RF mate-pair libraries; on a synthetic RF library stats reports 100 outward-oriented pairs and IS average 2000.0 with the proper flag set or unset.
+- Root cause: Behaviour inferred from aligner flag conventions rather than from samtools stats output.
+- Fix: State that stats reports IS for any pair with both mates mapped and gives inward/outward/other orientation counts; tell the agent to read those counts for mate-pair libraries, and only the pysam proper-pair snippet needs an orientation change.
+
+### `bio-bam-statistics` — Recipes crash or print a silent 0 on SE, empty and differently named contigs
+
+- Skill: 71, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/bam-statistics) · [viewer](skills/bio-bam-statistics/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 7
+- Problem: ZeroDivisionError on single-end and header-only BAMs, awk division by zero on empty input, '0% mitochondrial' for an MT contig with 40 reads and for BAMs with no chrM, 'X:Y = 0.00' without chrX/chrY.
+- Root cause: Snippets assume paired human data with UCSC contig names and never check that the numerator contig exists.
+- Fix: Match '^(chr)?(M\|MT)$' and print a warning when no contig matches, guard divisions, and add a one-line 'check contig names with idxstats first' note.
 
 ### `bio-alignment-sorting` — `sort -n` described as lexicographic; it is natural order
 
@@ -714,7 +770,7 @@ None open.
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (366)
+## P2 (373)
 
 ### `bio-alignment-validation` — Production IGNORE recipe removes checks that catch real defects
 
@@ -755,6 +811,62 @@ None open.
 - Problem: About half of usage-guide.md re-states SKILL.md (flagstat, pairing/strand calculations, insert-size python, Picard commands, a second validator class with the fetch() blind spot). The ATAC bullet says a missing ~180 bp peak = over-transposition while the paragraph adds under-titration; 'sample-swap rates of 0.5-1%' and 'FREEMIX > 0.03' are unsourced.
 - Root cause: Two documents evolved separately.
 - Fix: Keep prompts, workflow and troubleshooting in usage-guide and remove every command block that also lives in SKILL.md; cite or soften the swap-rate and FREEMIX statements.
+
+### `bio-bam-statistics` — Cross-check identity and 'primary' table row ignore QC-failed and secondary
+
+- Skill: 71, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/bam-statistics) · [viewer](skills/bio-bam-statistics/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 3
+- Problem: flagstat 'in total' is 'QC-passed + QC-failed'; the identity as written gives 500 vs stats 520 on the planted BAM, and the table row 'primary = in total minus supp' omits secondary.
+- Root cause: The sample output shows '+ 0' columns and the text never explains them.
+- Fix: Write the identity as total(pass+fail) - secondary - supplementary = stats raw total sequences, explain the two flagstat columns, and correct the table row to 'minus secondary and supplementary'.
+
+### `bio-bam-statistics` — 'reads mapped and paired' is described as properly paired
+
+- Skill: 71, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/bam-statistics) · [viewer](skills/bio-bam-statistics/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 3
+- Problem: Key summary fields list 'reads mapped and paired - Properly paired'; on the planted BAM stats shows 500 mapped-and-paired vs 480 properly paired.
+- Root cause: Two different SN lines conflated.
+- Fix: Relabel it 'both mates mapped' and list 'reads properly paired' / 'percentage of properly paired reads' as the proper-pair fields.
+
+### `bio-bam-statistics` — Mate-overlap defaults differ 2x across tools and are not tabulated
+
+- Skill: 71, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/bam-statistics) · [viewer](skills/bio-bam-statistics/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 2
+- Problem: Same BAM: samtools depth/coverage and mosdepth --fast-mode 16.77x, mosdepth default and depth -s 8.86x; the Quick Summary table presents them as interchangeable.
+- Root cause: Only 'depth -s' and mosdepth are discussed for overlap; samtools coverage (no overlap option) and mosdepth --fast-mode are not.
+- Fix: Add one row per tool for default overlap handling and tell the agent to state which convention it reports.
+
+### `bio-bam-statistics` — 'Calculate Depth at Position' snippet prints whole read footprints
+
+- Skill: 71, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/bam-statistics) · [viewer](skills/bio-bam-statistics/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 2
+- Problem: pileup('chr22', 2999, 3000) without truncate=True printed 232 columns (2907-3138) for a 1-bp query; the requested position 1562x is correct.
+- Root cause: truncate=True is used in the later snippets but omitted here.
+- Fix: Add truncate=True (and max_depth) to the single-position snippet.
+
+### `bio-bam-statistics` — Batch loop drops QC-failed reads and mislabels columns
+
+- Skill: 71, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/bam-statistics) · [viewer](skills/bio-bam-statistics/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 5
+- Problem: The usage-guide loop takes only flagstat's first column: 20 QC-failed records vanish (Total 520 of 540), the 'Paired' column is properly-paired, and Total/Mapped include secondary/supplementary (RNA 1786).
+- Root cause: awk uses $1 only and column names are loose.
+- Fix: Sum both flagstat columns or report QC-fail separately, rename the column 'ProperPair' and add a 'Primary' column.
+
+### `bio-bam-statistics` — Stale or incomplete tool notes (idxstats, CRAM, plot-bamstats, mosdepth)
+
+- Skill: 71, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/bam-statistics) · [viewer](skills/bio-bam-statistics/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 7
+- Problem: idxstats no longer needs an index in 1.24 (slow-scan fallback, rc 0); 'samtools stats -r ref.fa' does not decode CRAM (needs --reference; fails with 'Failure while decoding file'); mosdepth CRAM needs a .crai; tooling pass found plot-bamstats needs perl-URI (not re-run here); 'depth -r chr1:1-10000000 # Single chromosome' is a 10 Mb region; the historic depth cap is attributed to mpileup only.
+- Root cause: Notes written from memory of older versions.
+- Fix: Update each note to samtools 1.24 behaviour and add the CRAM/index and perl-URI prerequisites.
+
+### `bio-bam-statistics` — Unverified claims and duplicated recipes
+
+- Skill: 71, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/bam-statistics) · [viewer](skills/bio-bam-statistics/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: —
+- Problem: 'mosdepth 3-10x faster than samtools depth', the assay-threshold table values and the historic depth-cap statement were not verifiable with the available data; SKILL.md and usage-guide.md carry parallel CLI and pysam recipes that already diverge.
+- Root cause: Literature/lore claims without a source and no single owner for each recipe.
+- Fix: Cite or drop the speed claim and mark threshold values as literature ranges; keep each recipe in one file and link from the other.
 
 ### `bio-alignment-sorting` — Merge section omissions
 
