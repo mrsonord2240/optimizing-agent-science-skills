@@ -8,7 +8,39 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (80)
+## P1 (84)
+
+### `bio-alignment-io` — maf_to_plus_strand_coords is silently wrong for minus strand
+
+- Skill: 74, Beta Only · [mrsonord2240/bioSkills@354b499](https://github.com/mrsonord2240/bioSkills/tree/354b4992cd8d2f1bee039510af618da0333821f1/alignment/alignment-io) · [viewer](skills/bio-alignment-io/mrsonord2240-bioSkills@354b499/viewer.md)
+- Observed in inputs: 4
+- Problem: Biopython 1.88 returns MAF strand as int (+1/-1); the SKILL helper tests `== '-'`, so minus-strand rows are returned unconverted (66 vs true 60 on a synthetic genome) and land on the wrong locus with no error.
+- Root cause: Helper written against the MAF text spec, not against what AlignIO.parse(..., 'maf') stores.
+- Fix: Test `row_anno['strand'] in ('-', -1)` (or `== -1`), state that the strand annotation is an int, and add a one-line ground-truth check (revcomp of contig[plus_start:plus_start+size] equals the ungapped row).
+
+### `bio-alignment-io` — Shipped examples do not run from a clean copy; canonical convert crashes
+
+- Skill: 74, Beta Only · [mrsonord2240/bioSkills@354b499](https://github.com/mrsonord2240/bioSkills/tree/354b4992cd8d2f1bee039510af618da0333821f1/alignment/alignment-io) · [viewer](skills/bio-alignment-io/mrsonord2240-bioSkills@354b499/viewer.md)
+- Observed in inputs: 1
+- Problem: convert_formats.py raises ValueError (molecule type) at the NEXUS write on the shipped sample and real Pfam, leaving a 0-byte output.nex; convert_formats.py and slice_alignment.py need an unshipped alignment.aln; batch_convert.py exits 0 having converted nothing; slice_alignment.py writes 0-column FASTA on the 21-column sample.
+- Root cause: Examples were not executed against the shipped data; Clustal reader sets no molecule_type, which NEXUS output requires.
+- Fix: Point the examples at sample_alignment.aln (or ship the files they read), set record.annotations['molecule_type'] (or use AlignIO.convert(..., molecule_type=...)) before the NEXUS write, fail loudly when the input dir has no matches, and guard slice bounds against the alignment size.
+
+### `bio-alignment-io` — pyhmmer streaming snippet and A3M/A2M claims do not match pyhmmer 0.12.3 / HMMER
+
+- Skill: 74, Beta Only · [mrsonord2240/bioSkills@354b499](https://github.com/mrsonord2240/bioSkills/tree/354b4992cd8d2f1bee039510af618da0333821f1/alignment/alignment-io) · [viewer](skills/bio-alignment-io/mrsonord2240-bioSkills@354b499/viewer.md)
+- Observed in inputs: 4, 5, 6
+- Problem: msa.nseq and msa.alen do not exist (AttributeError) and msa.name is str, not bytes; pyhmmer has no 'a3m' format although the table says A2M/A3M R/W; real hmmalign A2M output is ragged (no '.' padding), so 'A2M loads as a rectangular MSA' is false for it.
+- Root cause: API and format claims were written from memory and not run against installed versions.
+- Fix: Use len(msa.sequences), len(msa.alignment[0]) and msa.name (str), drop A3M from the pyhmmer column, state that padded A2M comes from HH-suite reformat.pl and that HMMER a2m may need match-state extraction per row (verified: uppercase/'-' filter gives 117 = model length), and record the pyhmmer version tested.
+
+### `bio-alignment-io` — Bio.Align recommended as modern API but fails on real Stockholm; format tables stale
+
+- Skill: 74, Beta Only · [mrsonord2240/bioSkills@354b499](https://github.com/mrsonord2240/bioSkills/tree/354b4992cd8d2f1bee039510af618da0333821f1/alignment/alignment-io) · [viewer](skills/bio-alignment-io/mrsonord2240-bioSkills@354b499/viewer.md)
+- Observed in inputs: 2, 6
+- Problem: Align.read/parse('stockholm') raises TypeError on the real Pfam seed and Align.write('stockholm') raises AttributeError on a FASTA-read Alignment, yet the SKILL recommends Bio.Align for new code. The 'NOT in BioPython' table lists PSL and chain, which Bio.Align 1.88 parses; A2M and MSF are marked unsupported though both exist.
+- Root cause: Tables and recommendation were not checked against Biopython 1.88.
+- Fix: Recommend AlignIO for Stockholm until Bio.Align handles Pfam per-residue annotations, add the observed failure to Common Errors, and correct the format tables (Bio.Align.formats lists a2m, chain, msf, psl).
 
 ### `bio-alignment-pairwise` — aligner.max_alignments does not exist in Biopython 1.88
 
@@ -650,7 +682,31 @@ None open.
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (321)
+## P2 (324)
+
+### `bio-alignment-io` — PHYLIP guidance overstated or incomplete
+
+- Skill: 74, Beta Only · [mrsonord2240/bioSkills@354b499](https://github.com/mrsonord2240/bioSkills/tree/354b4992cd8d2f1bee039510af618da0333821f1/alignment/alignment-io) · [viewer](skills/bio-alignment-io/mrsonord2240-bioSkills@354b499/viewer.md)
+- Observed in inputs: 3, 5
+- Problem: Strict PHYLIP write of colliding 10-char names raises ValueError (not silent); ':' in names is rewritten to '\|' by the writer; phylip-sequential for PAML fails for real NCBI headers and the SKILL never says to shorten ids first; 'iqtree2 -s file.phy --check' is not a valid IQ-TREE option.
+- Root cause: Claims were not reproduced with Biopython 1.88 and IQ-TREE.
+- Fix: Say the write fails loudly and silence occurs when reading foreign strict files; add 'shorten ids to <=10 unique characters before phylip-sequential'; replace --check with a real validation such as a short iqtree run (`-n 0 -m LG`) or a Biopython re-read.
+
+### `bio-alignment-io` — Pfam id / GF metadata statements inaccurate
+
+- Skill: 74, Beta Only · [mrsonord2240/bioSkills@354b499](https://github.com/mrsonord2240/bioSkills/tree/354b4992cd8d2f1bee039510af618da0333821f1/alignment/alignment-io) · [viewer](skills/bio-alignment-io/mrsonord2240-bioSkills@354b499/viewer.md)
+- Observed in inputs: 2
+- Problem: Biopython already fills record.annotations['start'/'end'/'accession'] from name/start-end (only the id keeps the suffix); AlignIO drops #=GF header lines (ID, AC, DE) on Stockholm round trip, contradicting 'Stockholm preserves annotations'.
+- Root cause: Annotation-preservation table written without a round-trip test on a real Pfam file.
+- Fix: Correct the Pfam id paragraph and list #=GF header lines as not preserved by AlignIO on read.
+
+### `bio-alignment-io` — usage-guide.md duplicates SKILL.md; no references/ layer
+
+- Skill: 74, Beta Only · [mrsonord2240/bioSkills@354b499](https://github.com/mrsonord2240/bioSkills/tree/354b4992cd8d2f1bee039510af618da0333821f1/alignment/alignment-io) · [viewer](skills/bio-alignment-io/mrsonord2240-bioSkills@354b499/viewer.md)
+- Observed in inputs: —
+- Problem: The format-selection table and PHYLIP/Stockholm tips appear in both files.
+- Root cause: Two files carry overlapping content.
+- Fix: Keep the table and tips in one place (SKILL.md) and let usage-guide.md carry only prompts and prerequisites.
 
 ### `bio-alignment-pairwise` — 'Alignment Output Format' block is wrong
 
