@@ -42,9 +42,9 @@
     }
   },
   "dynamic_score": {
-    "execution_avg": 75.1,
+    "execution_avg": 80.0,
     "max": 100,
-    "assertion_pass_rate": { "passed": 21, "total": 27 },
+    "assertion_pass_rate": { "passed": 22, "total": 28 },
     "inputs": [
       {
         "index": 1,
@@ -164,26 +164,27 @@
         "index": 7,
         "type": "Adversarial",
         "label": "Bare sequence, no defline, no parameters stated -- 'just BLAST it'",
-        "status": "PARTIAL",
-        "status_flag": "❌",
-        "note": "Applied the Skill's own reproducibility-first defaults (blastn, refseq_select_rna) to a bare sequence with no '>id' defline, testing the documented 'Empty FASTA defline submitted' failure mode. The qblast() call did not return within 20+ minutes (vs 61.6s for the identical query WITH a defline in Input 1) and was still unresolved when this audit closed. Inconclusive whether this is Skill-attributable (Biopython/NCBI mishandling a deflineless submission) or an artifact of shared-machine/NCBI-queue load at the time -- flagged as an open finding rather than a confirmed defect. executed=true (attempted, did not complete).",
-        "basic": 16,
-        "specialized": 30,
-        "total": 46,
-        "assertions_passed": 1,
-        "assertions_total": 3,
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Applied the Skill's own reproducibility-first defaults (blastn, refseq_select_rna) to a bare sequence with no '>id' defline, testing the documented 'Empty FASTA defline submitted' failure mode. Completed in 781.4s (13.0 min) -- 12.7x Input 1's 61.6s baseline for the identical query WITH a defline -- with Biopython itself emitting 'BiopythonWarning: BLAST request ... is taking longer than 10 minutes'. Result was otherwise fully correct: 11 alignments, top hit NM_000518 (HBB self-hit), identical to Input 1. record.query came back as the literal string 'No definition line', not None/empty as SKILL.md's Failure Modes section claims.",
+        "basic": 30,
+        "specialized": 50,
+        "total": 80,
+        "assertions_passed": 2,
+        "assertions_total": 4,
         "assertions": [
           { "text": "Applies the Skill's own reproducibility-first defaults without being told to", "result": "PASS", "note": "blastn + refseq_select_rna chosen correctly, matching Input 1's pattern" },
-          { "text": "Submission completes within a reasonable multiple of the observed baseline latency (~61s for the same query with a defline)", "result": "FAIL", "note": "Did not complete after 20+ minutes; inconclusive root cause" },
-          { "text": "If completed, record.query would show None/empty per the documented failure mode", "result": "FAIL", "note": "Could not verify -- execution never completed" }
+          { "text": "Submission completes within a reasonable multiple of the observed baseline latency (~61s for the same query with a defline)", "result": "FAIL", "note": "Took 781.4s, a confirmed 12.7x slowdown attributable to the missing defline alone" },
+          { "text": "record.query reflects the Skill's documented None/empty symptom for a missing defline", "result": "FAIL", "note": "Actual value is the placeholder string 'No definition line', not None/empty" },
+          { "text": "Search results (alignments, top hit) are correct and unaffected by the missing defline", "result": "PASS", "note": "11 alignments, same top hit (NM_000518) as Input 1" }
         ]
       }
     ]
   },
   "final": {
     "static_weighted": 34.8,
-    "dynamic_weighted": 45.1,
-    "score": 80,
+    "dynamic_weighted": 48.0,
+    "score": 83,
     "max": 100,
     "grade": "Limited Release",
     "grade_symbol": "✅",
@@ -215,20 +216,20 @@
       "fix": "Add gapcosts='9 1' to the short-peptide qblast() call so it matches the Skill's own word-size table, and add this exact NCBI error string to the Common Errors table so an agent that hits it elsewhere can self-diagnose."
     },
     {
+      "priority": "P1",
+      "title": "Missing FASTA defline costs 12.7x latency and mislabels record.query",
+      "observed_in": [7],
+      "problem": "SKILL.md documents submitting a bare sequence (no '>id' line) as producing hits with record.query=None. A live test with the identical query used in Input 1 took 781.4s to complete (vs 61.6s WITH a defline) -- Biopython itself warned the request was taking longer than 10 minutes -- and record.query came back as the placeholder string 'No definition line', not None/empty. Results were otherwise correct.",
+      "root_cause": "SKILL.md's documented symptom describes an older or different Biopython/NCBI behavior; on the currently-installed Biopython 1.88 / live NCBI service, a missing defline is accepted but appears to push the search onto a slower server-side path, and Biopython substitutes a placeholder string rather than leaving the field empty.",
+      "fix": "Correct the documented symptom to the actual placeholder string, and add an explicit warning that omitting the FASTA defline can multiply wait time by an order of magnitude -- always pass a defline ('>query\\n...') even for quick, disposable searches."
+    },
+    {
       "priority": "P2",
       "title": "Megablast cross-species 'zero hits' symptom is overstated",
       "observed_in": [5],
       "problem": "Failure Modes claims megablast on a cross-species query produces 'zero hits or only hits to the same species'; a live test on a real 92-nt cross-species query found megablast still returned 2 of 3 species (missing only the most diverged, rat), not zero.",
       "root_cause": "The symptom description was likely written from the mechanism (28-nt exact-match seeding) rather than validated against a real query where enough by-chance 28-mers still matched a moderately diverged ortholog.",
       "fix": "Soften the claimed symptom to 'reduced or missing cross-species hits, worse for more diverged sequences' and keep the mechanism explanation, which is accurate."
-    },
-    {
-      "priority": "P2",
-      "title": "Deflineless-sequence behavior may hang rather than return record.query=None",
-      "observed_in": [7],
-      "problem": "SKILL.md documents submitting a bare sequence (no '>id' line) as producing hits with record.query=None. A live test instead did not return within 20+ minutes (vs 61s for the same query with a defline). Root cause unconfirmed -- may be Skill-attributable or an artifact of NCBI/machine load at test time.",
-      "root_cause": "Unconfirmed; needs a clean, isolated re-test to separate Biopython/NCBI defline handling from unrelated load on the audit machine.",
-      "fix": "Re-run this specific case in isolation; if it reproduces, document a client-side timeout/retry wrapper around qblast() for deflineless input rather than relying on NCBI to fail fast."
     },
     {
       "priority": "P2",

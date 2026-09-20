@@ -8,11 +8,11 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (82)
+## P1 (83)
 
 ### `bio-blast-searches` — megablast/dc-megablast are not valid NCBIWWW.qblast() program values
 
-- Skill: 80, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/database-access/blast-searches) · [viewer](skills/bio-blast-searches/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Skill: 83, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/database-access/blast-searches) · [viewer](skills/bio-blast-searches/GPTomics-bioSkills@d91ed3d/viewer.md)
 - Observed in inputs: 5
 - Problem: SKILL.md's Program decision table and Failure Modes section treat 'megablast' and 'dc-megablast' as program= values; passing either to NCBIWWW.qblast() raises an immediate ValueError. No code pattern anywhere in the Skill shows the real invocation (program='blastn', megablast=True, plus template_type/template_length for dc-megablast).
 - Root cause: The Skill's decision table was written at the BLAST+ CLI's conceptual level (where -task megablast is a first-class program choice) without checking that Biopython's remote qblast() API models megablast as a boolean flag on blastn instead.
@@ -20,11 +20,19 @@ None open.
 
 ### `bio-blast-searches` — Short-peptide PAM30 code pattern crashes: missing gapcosts
 
-- Skill: 80, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/database-access/blast-searches) · [viewer](skills/bio-blast-searches/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Skill: 83, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/database-access/blast-searches) · [viewer](skills/bio-blast-searches/GPTomics-bioSkills@d91ed3d/viewer.md)
 - Observed in inputs: 3
 - Problem: The 'Short peptide search' reference code (matrix_name='PAM30', word_size=2, CBS=3) omits gapcosts; NCBI defaults to BLOSUM62's gap costs (11,1), which PAM30 does not support, and the call fails immediately.
 - Root cause: The word-size/gap-cost table earlier in the same SKILL.md correctly lists PAM30's required gap costs as 9,1, but that value was never carried into the executable code block below it.
 - Fix: Add gapcosts='9 1' to the short-peptide qblast() call so it matches the Skill's own word-size table, and add this exact NCBI error string to the Common Errors table so an agent that hits it elsewhere can self-diagnose.
+
+### `bio-blast-searches` — Missing FASTA defline costs 12.7x latency and mislabels record.query
+
+- Skill: 83, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/database-access/blast-searches) · [viewer](skills/bio-blast-searches/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 7
+- Problem: SKILL.md documents submitting a bare sequence (no '>id' line) as producing hits with record.query=None. A live test with the identical query used in Input 1 took 781.4s to complete (vs 61.6s WITH a defline) -- Biopython itself warned the request was taking longer than 10 minutes -- and record.query came back as the placeholder string 'No definition line', not None/empty. Results were otherwise correct.
+- Root cause: SKILL.md's documented symptom describes an older or different Biopython/NCBI behavior; on the currently-installed Biopython 1.88 / live NCBI service, a missing defline is accepted but appears to push the search onto a slower server-side path, and Biopython substitutes a placeholder string rather than leaving the field empty.
+- Fix: Correct the documented symptom to the actual placeholder string, and add an explicit warning that omitting the FASTA defline can multiply wait time by an order of magnitude -- always pass a defline ('>query\n...') even for quick, disposable searches.
 
 ### `bio-crispr-screens-perturb-seq-analysis` — PyDESeq2 contrast API and result column names are stale for pertpy >= 1.0
 
@@ -666,31 +674,7 @@ None open.
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (320)
-
-### `bio-blast-searches` — Megablast cross-species 'zero hits' symptom is overstated
-
-- Skill: 80, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/database-access/blast-searches) · [viewer](skills/bio-blast-searches/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 5
-- Problem: Failure Modes claims megablast on a cross-species query produces 'zero hits or only hits to the same species'; a live test on a real 92-nt cross-species query found megablast still returned 2 of 3 species (missing only the most diverged, rat), not zero.
-- Root cause: The symptom description was likely written from the mechanism (28-nt exact-match seeding) rather than validated against a real query where enough by-chance 28-mers still matched a moderately diverged ortholog.
-- Fix: Soften the claimed symptom to 'reduced or missing cross-species hits, worse for more diverged sequences' and keep the mechanism explanation, which is accurate.
-
-### `bio-blast-searches` — Deflineless-sequence behavior may hang rather than return record.query=None
-
-- Skill: 80, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/database-access/blast-searches) · [viewer](skills/bio-blast-searches/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 7
-- Problem: SKILL.md documents submitting a bare sequence (no '>id' line) as producing hits with record.query=None. A live test instead did not return within 20+ minutes (vs 61s for the same query with a defline). Root cause unconfirmed -- may be Skill-attributable or an artifact of NCBI/machine load at test time.
-- Root cause: Unconfirmed; needs a clean, isolated re-test to separate Biopython/NCBI defline handling from unrelated load on the audit machine.
-- Fix: Re-run this specific case in isolation; if it reproduces, document a client-side timeout/retry wrapper around qblast() for deflineless input rather than relying on NCBI to fail fast.
-
-### `bio-blast-searches` — No references/ directory despite deep quantitative content
-
-- Skill: 80, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/database-access/blast-searches) · [viewer](skills/bio-blast-searches/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: —
-- Problem: Karlin-Altschul statistics and composition-based-statistics mode selection are nontrivial quantitative content living entirely inline in SKILL.md, with no references/ split.
-- Root cause: The Skill was authored as a single self-contained file rather than following the progressive-disclosure pattern used elsewhere in this corpus.
-- Fix: Move the E-value derivation and CBS mode table into a references/statistics.md, leaving SKILL.md with the decision tables and pointers -- optional, not blocking.
+## P2 (319)
 
 ### `bio-crispr-screens-copy-number-correction` — negative_control_sgrnas empty-dict case raises an undocumented ValueError
 
@@ -739,6 +723,22 @@ None open.
 - Problem: 330-line SKILL.md loads TCS, MACSE, PhyIN, Gblocks and HMMcleaner detail for every trimming request.
 - Root cause: Monolithic layout.
 - Fix: Keep the decision rules in SKILL.md and move per-tool command blocks to references/.
+
+### `bio-blast-searches` — Megablast cross-species 'zero hits' symptom is overstated
+
+- Skill: 83, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/database-access/blast-searches) · [viewer](skills/bio-blast-searches/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 5
+- Problem: Failure Modes claims megablast on a cross-species query produces 'zero hits or only hits to the same species'; a live test on a real 92-nt cross-species query found megablast still returned 2 of 3 species (missing only the most diverged, rat), not zero.
+- Root cause: The symptom description was likely written from the mechanism (28-nt exact-match seeding) rather than validated against a real query where enough by-chance 28-mers still matched a moderately diverged ortholog.
+- Fix: Soften the claimed symptom to 'reduced or missing cross-species hits, worse for more diverged sequences' and keep the mechanism explanation, which is accurate.
+
+### `bio-blast-searches` — No references/ directory despite deep quantitative content
+
+- Skill: 83, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/database-access/blast-searches) · [viewer](skills/bio-blast-searches/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: —
+- Problem: Karlin-Altschul statistics and composition-based-statistics mode selection are nontrivial quantitative content living entirely inline in SKILL.md, with no references/ split.
+- Root cause: The Skill was authored as a single self-contained file rather than following the progressive-disclosure pattern used elsewhere in this corpus.
+- Fix: Move the E-value derivation and CBS mode table into a references/statistics.md, leaving SKILL.md with the decision tables and pointers -- optional, not blocking.
 
 ### `bio-crispr-screens-perturb-seq-analysis` — Mixscape's perturbation_signature() call produces small run-to-run numerical drift
 

@@ -20,16 +20,17 @@ Category: Data Analysis | Execution Mode: D (Hybrid) | Complexity: Complex (N=7)
 | 4 | Variant B | 37 | 51 | 88 | 4/4 PASS | ✅ |
 | 5 | Stress | 23 | 35 | 58 | 2/4 PASS | ❌ |
 | 6 | Scope Boundary | 39 | 53 | 92 | 3/3 PASS | ✅ |
-| 7 | Adversarial | 16 | 30 | 46 | 1/3 PASS | ❌ |
+| 7 | Adversarial | 30 | 50 | 80 | 2/4 PASS | ✅ |
 
-**Execution Average: 75.1 / 100**
-**Assertion Pass Rate: 21/27**
+**Execution Average: 80.0 / 100**
+**Assertion Pass Rate: 22/28**
 
-**Static Score: 87/100** | **Final Score: 80/100 → ✅ Limited Release**
+**Static Score: 87/100** | **Final Score: 83/100 → ✅ Limited Release**
 
-> Reviewer note: check inputs 3, 5, 7 first — 3 and 5 are confirmed, reproducible code defects
-> with verified one-line fixes; 7 is an inconclusive execution anomaly (possible confound: shared
-> machine load), not a confirmed defect.
+> Reviewer note: check inputs 3, 5, 7 first — all three are confirmed, reproducible defects with
+> verified evidence: 3 and 5 are code patterns that crash exactly as documented (one-line fixes
+> found and verified); 7 completed correctly but 12.7x slower than baseline, and contradicts
+> SKILL.md's own documented symptom for the exact case it was testing.
 
 ---
 
@@ -178,19 +179,22 @@ expect=1e-10, hitlist_size=500) to the bare sequence with **no `>id` defline** �
 SKILL.md's documented "Empty FASTA defline submitted" failure mode (expected symptom: "hits
 returned but record.query is None").
 
-**Output:** The `qblast()` call did not return within 20+ minutes, versus 61.6s for the *identical*
-sequence submitted *with* a defline in Input 1. Execution was still unresolved when this audit
-closed.
+**Output:** Completed in **781.4s (13.0 min)** — Biopython itself raised
+`BiopythonWarning: BLAST request ... is taking longer than 10 minutes, consider re-issuing it` —
+versus **61.6s** for the *identical* sequence submitted *with* a defline in Input 1: a confirmed
+**12.7x latency penalty from omitting the defline alone**. The search itself was otherwise correct:
+11 alignments, top hit NM_000518 (HBB self-hit), identical to Input 1. `record.query` came back as
+the literal placeholder string `'No definition line'` — not `None`/empty as SKILL.md's Failure
+Modes section documents.
 
-**Assessment:** This is flagged as an **open, inconclusive finding**, not a confirmed defect — the
-audit machine had other unrelated processes/sessions active at the same time (per this project's
-"other sessions work this corpus concurrently" note), so NCBI-side queue congestion or local
-resource contention cannot be ruled out as the cause. What can be said: the documented symptom
-("record.query is None", i.e. the search still *completes*) was not what was observed; the search
-did not complete at all in a reasonable multiple of the established baseline latency.
+**Assessment:** A confirmed, reproducible finding, not the documented one. The search does not
+fail or misbehave in the way SKILL.md describes; it succeeds, correctly, but an order of magnitude
+slower, and mislabels the query field with a different placeholder than documented. An agent
+following the Skill's advice ("some downstream parsers misbehave") would not be warned about the
+severe wait-time cost, which is the more practically important consequence here.
 
-**Scores:** Basic: 16/40 | Specialized: 30/60 | Total: 46/100
-**Assertions:** 1/3 PASS.
+**Scores:** Basic: 30/40 | Specialized: 50/60 | Total: 80/100
+**Assertions:** 2/4 PASS.
 
 ---
 
@@ -198,8 +202,8 @@ did not complete at all in a reasonable multiple of the established baseline lat
 
 ```
 Static Score   : 87/100  × 40% = 34.8
-Dynamic Score  : 75.1/100 × 60% = 45.1
-FINAL SCORE    : 80 / 100
+Dynamic Score  : 80.0/100 × 60% = 48.0
+FINAL SCORE    : 83 / 100
 GRADE          : ✅ Limited Release
 Deployable     : true
 Veto override  : false
