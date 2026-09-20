@@ -8,7 +8,31 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (77)
+## P1 (80)
+
+### `bio-crispr-screens-perturb-seq-analysis` — PyDESeq2 contrast API and result column names are stale for pertpy >= 1.0
+
+- Skill: 83, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/crispr-screens/perturb-seq-analysis) · [viewer](skills/bio-crispr-screens-perturb-seq-analysis/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 1
+- Problem: SKILL.md and examples/run_pertpy.py call de.test_contrasts(contrast=('perturbation', pert, 'NT')) and read results_df[['log2FoldChange', 'padj']]; against the currently pip-installable pertpy (1.3.0) this raises TypeError, and the correct columns are 'log_fc'/'adj_p_value' via de.test_contrasts(de.contrast('perturbation', baseline, group)).
+- Root cause: The Skill's reference examples were pinned to pertpy 0.6+ and never re-validated against the 1.x API, which renamed the contrast-building convention and output columns.
+- Fix: Update both the SKILL.md code block and examples/run_pertpy.py to use de.contrast(...) and the log_fc/adj_p_value column names, and bump the stated 'tested with' version to pertpy 1.3+.
+
+### `bio-crispr-screens-perturb-seq-analysis` — Multiomic RNA+ATAC section is a non-functional stub despite being listed in the frontmatter description
+
+- Skill: 83, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/crispr-screens/perturb-seq-analysis) · [viewer](skills/bio-crispr-screens-perturb-seq-analysis/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 6
+- Problem: The description promises 'multiome' coverage, but the Multiomic Perturb-seq section is 4 lines of comments and an empty MuData construction with no chromatin-accessibility method named.
+- Root cause: The section was left as a placeholder pointing to external tools (ArchR/Signac) rather than written out as an actual workflow.
+- Fix: Either write a concrete peak-calling + perturbation-to-accessibility-change workflow (e.g., ChromVAR or a pseudobulk peak DE step) or narrow the frontmatter description to drop the multiome/chromatin claim and defer explicitly to single-cell/multimodal-integration.
+
+### `bio-crispr-screens-perturb-seq-analysis` — Genome-scale cost/channel figures don't scale-check against a literal whole-genome gene count
+
+- Skill: 83, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/crispr-screens/perturb-seq-analysis) · [viewer](skills/bio-crispr-screens-perturb-seq-analysis/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 5
+- Problem: The cited '$50-100K' and '10-30 channels' figures are calibrated to Replogle 2022's actual ~9,866-gene/2,057-essential-gene screen; the Skill's own usage-guide.md example prompt asks for a ~19,000-protein-coding-gene design, which at the same per-perturbation cell budget needs roughly 2x the cells/channels/cost.
+- Root cause: The Quantitative Thresholds table presents Replogle-derived figures as generic 'genome-scale' constants without stating the gene count they were calibrated to.
+- Fix: State explicitly that the cited cost/channel range assumes Replogle's ~9,866-gene scope, and give the linear scaling formula (cells = genes x cells-per-pert / cells-per-channel / channels) so an agent can re-derive the budget for a different target gene count.
 
 ### `bio-alignment-multiple` — Fix MUSCLE5 ensemble commands (-super5 has no .efa)
 
@@ -626,7 +650,7 @@ None open.
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (313)
+## P2 (317)
 
 ### `bio-crispr-screens-copy-number-correction` — negative_control_sgrnas empty-dict case raises an undocumented ValueError
 
@@ -675,6 +699,38 @@ None open.
 - Problem: 330-line SKILL.md loads TCS, MACSE, PhyIN, Gblocks and HMMcleaner detail for every trimming request.
 - Root cause: Monolithic layout.
 - Fix: Keep the decision rules in SKILL.md and move per-tool command blocks to references/.
+
+### `bio-crispr-screens-perturb-seq-analysis` — Mixscape's perturbation_signature() call produces small run-to-run numerical drift
+
+- Skill: 83, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/crispr-screens/perturb-seq-analysis) · [viewer](skills/bio-crispr-screens-perturb-seq-analysis/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 1
+- Problem: perturbation_signature() (called exactly as SKILL.md documents, with no seed argument) uses pertpy's pynndescent-based approximate nearest-neighbor search internally with random_state=None; two identical runs on the same 2000-cell synthetic dataset produced differing X_pert values for 5/2000 cells (max abs diff 0.24), though the final mixscape_class_global calls happened to match in this trial.
+- Root cause: pertpy does not pass a random_state through to pynndescent.NNDescent by default, and the Skill's own code examples never set one via the documented **kwargs passthrough.
+- Fix: Add an explicit random_state kwarg to the perturbation_signature() call in every code example (it passes straight through to NNDescent) so escaper-filtering results are exactly reproducible.
+
+### `bio-crispr-screens-perturb-seq-analysis` — No Escape Hatches / scope-boundary language anywhere in the Skill
+
+- Skill: 83, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/crispr-screens/perturb-seq-analysis) · [viewer](skills/bio-crispr-screens-perturb-seq-analysis/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 7
+- Problem: Neither SKILL.md nor usage-guide.md states that this is a research-only tool or that its outputs should not drive patient-care decisions; the correct refusal on the adversarial input came from the executing agent's own judgment, not the Skill.
+- Root cause: The Skill was written purely as a technical/methods reference with no scope-boundary section, unlike some sibling research Skills.
+- Fix: Add a short 'Scope' note (as several sibling Skills in this corpus already do) stating this Skill supports research-stage screen analysis only and is not a substitute for clinical evaluation.
+
+### `bio-crispr-screens-perturb-seq-analysis` — NTC vs NT non-targeting-control label used inconsistently across code blocks
+
+- Skill: 83, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/crispr-screens/perturb-seq-analysis) · [viewer](skills/bio-crispr-screens-perturb-seq-analysis/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 1, 4
+- Problem: SKILL.md's own inline examples use 'NTC' in some code blocks and 'NT' (matching pertpy's papalexi_2021() dataset convention) in others, which could lead an agent to pass the wrong control label and get an empty control set.
+- Root cause: Different code blocks were adapted from different upstream examples without normalizing the control-label convention.
+- Fix: Pick one placeholder convention throughout (or explicitly note that the label must match whatever the user's own data uses) and apply it consistently.
+
+### `bio-crispr-screens-perturb-seq-analysis` — Bundled example script fails as shipped
+
+- Skill: 83, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/crispr-screens/perturb-seq-analysis) · [viewer](skills/bio-crispr-screens-perturb-seq-analysis/GPTomics-bioSkills@d91ed3d/viewer.md)
+- Observed in inputs: 1
+- Problem: examples/run_pertpy.py is the Skill's one concrete runnable example, and it contains the same stale test_contrasts()/column-name API calls that fail against pertpy 1.3.0.
+- Root cause: Same root cause as the P1 above; the example script was never re-run against a current pertpy release.
+- Fix: Pin a tested pertpy version in a requirements note and re-verify examples/run_pertpy.py runs end-to-end before each Skill update.
 
 ### `bio-clinical-databases-clinvar-lookup` — Batch CA-ID helper aborts on non-400 Registry errors
 
