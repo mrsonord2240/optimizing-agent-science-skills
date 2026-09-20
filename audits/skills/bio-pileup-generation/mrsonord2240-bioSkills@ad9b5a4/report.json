@@ -1,0 +1,461 @@
+{
+  "meta": {
+    "skill_name": "bio-pileup-generation",
+    "description": "Generate pileup data for variant calling using samtools mpileup and pysam. Use when preparing data for variant calling, analyzing per-position read data, or calculating allele frequencies.",
+    "evaluated_on": "2026-09-20",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Moderate",
+    "n_inputs": 7,
+    "source": "mrsonord2240/bioSkills@ad9b5a4ec484bcfc7d12e38a03a31d2a60cf6429:alignment-files/pileup-generation",
+    "audit_type": "re-audit of a fixed Skill (pre-fix 71, Beta Only); auditor differs from first auditor and fixer",
+    "executed": "7/7 inputs executed; 223/230 scripted checks pass",
+    "execution_note": "WSL science, env alignment-files: samtools 1.24, bcftools 1.24, pysam 0.24.1 (TOOLS.md). Skill copied from worktree F:\\OpenScience\\wt\\af-pileup (commit ad9b5a4) to run/skill; Python and bash blocks extracted verbatim from the copied SKILL.md; the worktree and external clone were never written (no __pycache__). Inputs 1-5 re-run the archived pre-fix inputs as regression tests (pre-fix generator re-used unchanged for data/syn, deep, multi, s1, s2); inputs 6-7 are new: own synthetic BAM (data/new.*, hand-derived truth), two random-read BAMs (fz_clean, fz_exotic), real human/RNA/1000G/ARTIC BAMs. Complexity Moderate (5 regression inputs) plus 2 new inputs = 7."
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated DOIs, results or numbers. Every number in the Skill's examples that was checked (1087/1157, 1000G example rows, depth 8->4, memory-hog thresholds) reproduced; the one unsourced '~30% slower' claim was removed."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "No diagnosis or prescription; somatic, WGS production and long-read work are routed to dedicated callers."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "No principled fallacy. Three statements are wrong in detail (stepper='all'+fastafile BAQ, bcftools --nu vs samtools --rf, pileup_text on adjacent indels) and are listed as P1/P2; none inverts a conclusion of the recommended workflows."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All Python helpers, the shipped example and every bash block ran on real and synthetic data (7/7 inputs executed); helpers equal samtools mpileup row-for-row on 432,147 real rows and 4,486 random rows x 13 option sets."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 81,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 9,
+        "max": 12,
+        "note": "Completeness 3: text pileup, region/BED, multi-BAM, filters, defaults table, BAQ, bcftools calling/joint/parallel, pysam helpers all present and verified; indel allele counting deliberately out of scope (stated). Correctness 3: every checked command, default and message reproduced, but three statements are wrong (stepper='all'+fastafile BAQ, --nu == --rf, pileup_text on adjacent I/D). Appropriateness 3: a 40-line Python pileup_text re-implements a tool that is one shell command."
+      },
+      "reliability": {
+        "score": 10,
+        "max": 12,
+        "note": "Fault tolerance 3 and error reporting 3: Common Errors quote real messages and the exit-0-with-N trap plus a contig pre-check; the shipped example rejects 9 hostile inputs with one 'Error:' line (a missing file also prints an htslib line first); the parallel block stops on failure. Recoverability 4: read-only, idempotent, safe to re-run."
+      },
+      "performance_context": {
+        "score": 6,
+        "max": 8,
+        "note": "Token cost 3: SKILL.md grew to 446 lines (was 375) but the guide fell from 258 to 46 lines and the duplicated recipes are gone; no references/ split. Execution efficiency 3: linear workflows, one long helper (pileup_text)."
+      },
+      "agent_usability": {
+        "score": 14,
+        "max": 16,
+        "note": "Learnability 3, consistency 4 (0/1-based rule and 'depth = len(pileups)' stated and used everywhere), feedback design 3 (formats, message texts and example rows given; no expected-output self-check for the pipelines), error prevention 4 (max depth, BAQ, -Q 13, default flags, ref mismatch exit 0, max_depth=0, concat order, memory hog all called out and verified)."
+      },
+      "human_usability": {
+        "score": 6,
+        "max": 8,
+        "note": "Discoverability 3: description unchanged and terse (no mention of text pileup/depth/BAQ). Forgiveness 3: example accepts commas and colon contigs and rejects ranges/typos with a one-line message."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "No credentials, no eval/exec, no shell built from user strings in the example; helpers take paths only. Input validation 3: shell blocks assume trusted file names."
+      },
+      "maintainability": {
+        "score": 9,
+        "max": 12,
+        "note": "Modularity 3 (one SKILL.md holds everything, guide is thin), modifiability 3, testability 3 (real example rows and message texts to check against; still one example and no test script)."
+      },
+      "agent_specific": {
+        "score": 16,
+        "max": 20,
+        "note": "Trigger precision 3, progressive disclosure 3 (446 lines, under 500, no references/), composability 3 (Related Skills all exist), idempotency 4, escape hatches 3 (tool table sends somatic/WGS production/long-read work elsewhere)."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 86.1,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 29,
+      "total": 35
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Text pileup of the real human chr22 BAM (region/BED/-q/-Q), columns and symbols, depth cross-checked (REGRESSION of pre-fix input 1)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed; 27/28 checks pass (t01). One Skill claim is false: stepper='all' + fastafile DOES apply BAQ",
+        "basic": 35,
+        "specialized": 54,
+        "total": 89,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Output Format table and the quoted example row 'chr22 1952 T 0 * *' are true: 6 columns, depth == symbols == qualities, depth-0 rows exist",
+            "result": "PASS",
+            "note": "1157 rows; 3 depth-0 rows incl. the exact quoted row"
+          },
+          {
+            "text": "pysam len(pileups) == samtools mpileup depth at every position: pysam defaults == -B, stepper='samtools'+fastafile == default; n differs at 1087 of 1157",
+            "result": "PASS",
+            "note": "0 of 1157 differ in both comparisons; 1087 reproduced"
+          },
+          {
+            "text": "-q/-Q/-Q 13 default/--ff default UNMAP,SECONDARY,QCFAIL,DUP behave as documented against independent pysam-record counts and samtools depth",
+            "result": "PASS",
+            "note": "-q 20/60 and -Q 13/20/30 equal at every position; named --ff list == default"
+          },
+          {
+            "text": "Region, BED, multi-BAM (9 columns), '[E::mpileup] fail to parse region' message, 1000G example rows and bcftools DP (minus '*') are as documented",
+            "result": "PASS",
+            "note": "1000G rows identical to the Skill's example"
+          },
+          {
+            "text": "Skill statement 'stepper=all + fastafile does not apply BAQ' is true",
+            "result": "FAIL",
+            "note": "false in pysam 0.24.1: depth equals mpileup default (BAQ) at all 1157 positions and differs from -B at 40"
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "pysam allele counts / frequency / find_variants / pileup_text on planted synthetic BAM and real BAM, shipped example (REGRESSION of pre-fix input 2)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed; 28/28 checks pass (t02); every pre-fix pysam defect here is gone",
+        "basic": 35,
+        "specialized": 53,
+        "total": 88,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "allele_counts / allele_frequency / find_variants recover the planted SNP (T30/C10, 25%), report ref-skips as nothing (was DEL 3) and equal a mpileup -B parse at 110 real positions",
+            "result": "PASS",
+            "note": "find_variants on real chr22 == independent parse (4 sites)"
+          },
+          {
+            "text": "Module snippets print what they claim: 'Basic Pileup' only the 10 requested columns, refskip vs deletion, quality-filtered depth 4 at synA:725",
+            "result": "PASS",
+            "note": "all equal mpileup -B -q20 -Q20"
+          },
+          {
+            "text": "pileup_text == samtools mpileup row-for-row (623 rows, default and -B and -q20 -Q20 -x -A) and hand counts +2AC x3 / +2ac x2, -3CGT x2 / -3cgt x2, '>><'",
+            "result": "PASS",
+            "note": "was 5 columns, 31 wrong depths, no markers pre-fix"
+          },
+          {
+            "text": "examples/allele_counts.py: synA:100 -> T 30 / C 10; real chr22:3000 depth 781 == mpileup",
+            "result": "PASS",
+            "note": "runs from the copy"
+          },
+          {
+            "text": "usage-guide dedup lost nothing an agent needs",
+            "result": "FAIL",
+            "note": "the read-name + strand print variant (query_name / is_reverse) was dropped; examples/allele_counts.py is not referenced from SKILL.md or the guide"
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Exact symbol decoding, every silent default, max depth and the shipped example on hostile input (REGRESSION of pre-fix input 3)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed; 41/41 checks pass (t03)",
+        "basic": 36,
+        "specialized": 54,
+        "total": 90,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Symbol table (^], $, +2AC/+2ac, -3CGT/-3cgt, *, #, >/<, soft clips absent) matches planted truth; default BAQ hides the deletion (depth 8 -> 4)",
+            "result": "PASS",
+            "note": "hand-derived counts"
+          },
+          {
+            "text": "Defaults table verified by behaviour: -Q 13 (4 vs 10), --ff default (10 vs 16), overlap 5 vs 10 with -x and both long forms, orphans 0 vs 4 with -A, bcftools --ns/-Q 1/-d 250, -a vs -aa",
+            "result": "PASS",
+            "note": "and help text for -Q/-d/-q/--ff"
+          },
+          {
+            "text": "Max depth: samtools 8000 cap, -d 0 unlimited, bcftools 250 vs -d 0/100000/1000000 = 9000, pysam default 8000 and max_depth=0 NOT unlimited; all 8 cheat-sheet rows run without capping",
+            "result": "PASS",
+            "note": "9000x BAM"
+          },
+          {
+            "text": "Common Errors/BAQ statements: no -f -> N (rc 0), bcftools refuses, -B with -E rejected, samtools mpileup -g removed",
+            "result": "PASS",
+            "note": "real messages"
+          },
+          {
+            "text": "Shipped example on 9 hostile inputs (range, no colon, pos 0, unknown contig, unindexed, garbage/nonexistent file, letters, empty) exits 1 with a last line 'Error: ...' and no traceback; commas and pos beyond contig end handled",
+            "result": "PASS",
+            "note": "was raw ValueError tracebacks"
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "bcftools mpileup | call: germline, BCF intermediate, multi-sample -d 100000, parallel-by-contig, the 'WRONG' pipe (REGRESSION of pre-fix input 4)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed; 21/21 checks pass (t04); bash blocks extracted verbatim from SKILL.md",
+        "basic": 35,
+        "specialized": 54,
+        "total": 89,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Germline, BCF-intermediate and multi-sample blocks reproduce planted truth: SNP 100 AD 30,10 DP 40, AA>AACA, TCGT>T, per-sample AD 17,3 | 8,12",
+            "result": "PASS",
+            "note": "verbatim blocks"
+          },
+          {
+            "text": "Multi-sample -d 100000 example is safe and the note is true: no memory warning at 2 samples/-d 100000, warning at -d 1000000 x 2 samples and at 11 files x 100000; none for one sample",
+            "result": "PASS",
+            "note": "bcftools 1.24 prints 'Potential memory hog'"
+          },
+          {
+            "text": "The 'WRONG' pipe explanation is now correct: text pileup is not VCF/BCF, real error text 'Failed to read from standard input: unknown file type', exit 255",
+            "result": "PASS",
+            "note": "no 'double cap' rationale left"
+          },
+          {
+            "text": "Parallel-by-Contig block: header contig order chr1..chr11 (not glob order), index built, missing reference / bad contig -> non-zero and no all.vcf.gz",
+            "result": "PASS",
+            "note": "was chr1,chr10,chr11,chr2,... with exit 0"
+          },
+          {
+            "text": "Real chr22 slice: every strong (>=30% alt, >=10 reads) site of an independent mpileup parse is called; --max-BQ 30 is the ont preset value",
+            "result": "PASS",
+            "note": "sites 3266, 3413"
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Library cheat sheet on real ARTIC, spliced RNA-seq and 1000G BAMs; reference mismatch and index errors (REGRESSION of pre-fix input 5)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed; 28/28 checks pass (t05); real data only",
+        "basic": 35,
+        "specialized": 53,
+        "total": 88,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "All 8 cheat-sheet rows (read from the SKILL.md table) run; no row uses -d 250; bcftools ONT variant accepted",
+            "result": "PASS",
+            "note": "exome row now -d 0"
+          },
+          {
+            "text": "ARTIC: 29903 rows, depth (minus '*') == pysam count at every position, -a == -aa for one contig, 77 zero-depth rows vanish without -a",
+            "result": "PASS",
+            "note": "0 differ"
+          },
+          {
+            "text": "RNA-seq: allele_counts at the 40 positions with most ref-skips == mpileup parse; chr22:25548 gives {'G': 5} (was DEL 54)",
+            "result": "PASS",
+            "note": "no false DEL"
+          },
+          {
+            "text": "1000G: all-filters-off depth == pysam count; default --ff drops the 101 pre-flagged duplicates (sum 948889 vs 959299)",
+            "result": "PASS",
+            "note": ""
+          },
+          {
+            "text": "Reference mismatch and index errors match the fixed Common Errors table: '[E::faidx_adjust_position] ... not found' with exit 0 and N rows, contig pre-check works, no -f, '[E::idx_find_and_load] Could not retrieve index file', empty region",
+            "result": "PASS",
+            "note": "real message texts"
+          }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Variant B",
+        "label": "NEW: re-auditor's planted-truth BAM (11 event types, soft-masked/N reference, colon contig) + 1,862-read randomized differential test of pileup_text",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed; 54/56 checks pass (t06). Two real defects found: pileup_text drops the 2nd marker of adjacent I/D, find_variants reports N artifacts",
+        "basic": 33,
+        "specialized": 49,
+        "total": 82,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Planted events match hand truth: -2CC/-2cc, +3ACG/+1T/+2GG, -q 20 boundary (9 of 14), -Q 13 boundary (12 of 15), '^~' cap, overlap 6 vs 12, N ref/read, lower-case reference col3, flags 10/14/12/16, clips, refskip; colon contig works in samtools and pysam",
+            "result": "PASS",
+            "note": "all E1-E11 checks pass"
+          },
+          {
+            "text": "pileup_text == samtools mpileup row-for-row on 1,862 random reads (mixed-case reference with N, S/H/I/D/N CIGARs, MAPQ 0-255, Q2-93, overlapping mates, odd flags): 13 option combinations x 4,486 rows",
+            "result": "PASS",
+            "note": "0 differing rows; also equal on the planted BAM apart from one row"
+          },
+          {
+            "text": "pileup_text prints the same row as mpileup where an insertion is directly followed by a deletion (10M2I2D10M)",
+            "result": "FAIL",
+            "note": "mpileup '+2ca-2at', pileup_text '+2ca'; ~5% of rows differ in exotic-CIGAR fuzz, all indel-marker-only"
+          },
+          {
+            "text": "find_variants reports only real SNVs on the planted data",
+            "result": "FAIL",
+            "note": "also reports nA:790 G>N (1/7) and the reference-N site nA:800 N>A (9/9)"
+          },
+          {
+            "text": "allele_counts, find_variants and examples/allele_counts.py give exact truth on the colon-named contig and the soft-masked block (G6/A4, G5/A3, 3/8 alt, 3 of 6 at the overlap site)",
+            "result": "PASS",
+            "note": "min_base_quality boundary equals -Q"
+          }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Stress",
+        "label": "NEW: pysam-vs-samtools parameter table re-tested on 4 real + 2 synthetic BAMs, 432,147 real pileup_text rows, stepper/BAQ/flag/BQ-tag probes, usage-guide token diff",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed; 24/28 checks pass (t07). Two documented claims are false (stepper='all'+fastafile; bcftools --nu == samtools --rf)",
+        "basic": 31,
+        "specialized": 46,
+        "total": 77,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "12 Skill-table rows: pysam len(pileups) == samtools mpileup depth at every position on human DNA, RNA-seq, 1000G, ARTIC, syn.bam and new.bam (max_depth passed explicitly)",
+            "result": "PASS",
+            "note": "72/72 row x BAM comparisons equal"
+          },
+          {
+            "text": "pileup_text == samtools mpileup row-for-row on 432,147 real rows (default, -B, -q20 -Q20 -x -A, --ff 0 -Q 0)",
+            "result": "PASS",
+            "note": "0 differing rows"
+          },
+          {
+            "text": "nofilter vs --ff 0 (16 vs 12), flag_filter=0 == --ff 0, flag_require == --rf (16/17/3/2049), existing BQ tag reused by default (35) and ignored by -E/-B (40) / redo_baq",
+            "result": "PASS",
+            "note": "all as documented"
+          },
+          {
+            "text": "'stepper=all + fastafile does not apply BAQ' (pysam table and text)",
+            "result": "FAIL",
+            "note": "BAQ IS applied: depth 4 at synA:250 (== mpileup default), 8 only with compute_baq=False"
+          },
+          {
+            "text": "Table row '--rf FLAGS (bcftools --nu)': both keep the same reads",
+            "result": "FAIL",
+            "note": "mask 65: samtools --rf keeps 6 reads (any bit), bcftools --nu keeps 2 (all bits required)"
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 32.4,
+    "dynamic_weighted": 51.7,
+    "score": 84,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Every pre-fix defect is gone and verified by output: pileup_text now equals samtools mpileup row-for-row (0 differing rows on 432,147 real rows and 4,486 random rows x 13 option sets), ref-skips no longer counted as deletions, the parallel block keeps header contig order and stops on failure.",
+    "The pysam-to-mpileup parameter table holds position by position for 12 options on 4 real and 2 synthetic BAMs, including max_depth=0 not being unlimited, flag_filter/nofilter and the BQ-tag rules.",
+    "Defaults that silently change results are documented and true: -Q 13/1, excluded flags, depth-0 rows, BAQ hiding a deletion, exit status 0 on a reference mismatch, memory warning at -d 1000000 with 2 samples.",
+    "usage-guide.md is now 46 lines and SKILL.md keeps one copy of each recipe; the shipped example turns nine hostile inputs into one-line errors."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "False claim: pysam stepper='all' + fastafile applies no BAQ",
+      "observed_in": [
+        1,
+        7
+      ],
+      "problem": "SKILL.md says the default stepper='all' does not apply BAQ even with a fastafile. In pysam 0.24.1 it does: depth equals samtools mpileup default (BAQ on) at all 1157 real positions, differs from -B at 40, and is 4 vs 8 at the planted deletion; only compute_baq=False restores -B.",
+      "root_cause": "The fixer verified stepper='samtools'+fastafile and the no-fastafile default, but never the combination it asserted a negative about.",
+      "fix": "Replace the sentence with: passing fastafile enables BAQ with either stepper ('all' or 'samtools'); use compute_baq=False (or omit fastafile) to match `-B`. Keep the table row `-f ref.fa` -> fastafile=..., and drop the stepper='samtools' requirement or say it is optional."
+    },
+    {
+      "priority": "P2",
+      "title": "Options table equates bcftools --nu with samtools --rf",
+      "observed_in": [
+        7
+      ],
+      "problem": "Row '--rf FLAGS (bcftools --nu): keep only reads with any of these flags set' is wrong for bcftools: --nu skips reads with ANY bit unset, i.e. needs ALL bits. Mask 65 keeps 6 reads in samtools --rf and 2 in bcftools --nu.",
+      "root_cause": "Names were paired by position in the two help texts, not by behaviour.",
+      "fix": "Give bcftools its own wording ('--nu: skip reads missing any listed bit = require all bits') or restrict the row to single-bit masks."
+    },
+    {
+      "priority": "P2",
+      "title": "pileup_text drops a second indel marker next to another indel",
+      "observed_in": [
+        6
+      ],
+      "problem": "For a read whose CIGAR has an insertion directly before a deletion (10M2I2D10M) or a deletion before an insertion, samtools prints '+2ca-2at' and pileup_text prints '+2ca'. Equal on 4,486 clean-CIGAR fuzz rows x 13 option sets and 432,147 real rows; ~5% of exotic-CIGAR fuzz rows differ, all indel-marker only.",
+      "root_cause": "pysam exposes one indel value per pileup read; the helper cannot see the adjacent second event.",
+      "fix": "Add to the docstring: 'CIGARs with adjacent I/D ops lose the second marker; use samtools mpileup for exact text.'"
+    },
+    {
+      "priority": "P2",
+      "title": "find_variants reports N artifacts",
+      "observed_in": [
+        6
+      ],
+      "problem": "On the planted N sites it returns nA:800 ref N > A (9/9) and nA:790 G>N (1/7) as variants (min_base_quality default 20 keeps the Q40 N read).",
+      "root_cause": "No skip for reference N or read-base N.",
+      "fix": "Skip columns where ref_base == 'N' and alleles equal to 'N' (one condition each)."
+    },
+    {
+      "priority": "P2",
+      "title": "Dedup dropped read-name/strand access; example not referenced",
+      "observed_in": [
+        2,
+        7
+      ],
+      "problem": "The old 'Access Individual Reads' variant printed alignment.query_name and strand; SKILL.md keeps only base+quality, so 'which reads carry the alt allele' has no snippet. examples/allele_counts.py is mentioned nowhere in SKILL.md or the guide.",
+      "root_cause": "Dedup removed the only snippet showing read-level attributes and never linked the shipped example.",
+      "fix": "Add one line to the Access Reads snippet printing pileup_read.alignment.query_name and is_reverse, and one sentence pointing to examples/allele_counts.py."
+    },
+    {
+      "priority": "P2",
+      "title": "Soft-masked FASTA prints lower-case reference bases",
+      "observed_in": [
+        6
+      ],
+      "problem": "With a soft-masked reference (UCSC-style hg38.fa) samtools mpileup column 3 is lower-case ('g'); the Output Format table says only 'Reference base'. pileup_text reproduces it, allele helpers upper-case.",
+      "root_cause": "Real-data case not in the Skill's examples.",
+      "fix": "Add '(lower-case where the FASTA is soft-masked)' to column 3."
+    }
+  ]
+}
