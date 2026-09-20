@@ -8,7 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (96)
+## P1 (102)
 
 ### `bio-alignment-validation` — Validators miss unplaced unmapped reads: false PASS at 70% mapped
 
@@ -121,6 +121,54 @@ None open.
 - Problem: ZeroDivisionError on single-end and header-only BAMs, awk division by zero on empty input, '0% mitochondrial' for an MT contig with 40 reads and for BAMs with no chrM, 'X:Y = 0.00' without chrX/chrY.
 - Root cause: Snippets assume paired human data with UCSC contig names and never check that the numerator contig exists.
 - Fix: Match '^(chr)?(M\|MT)$' and print a warning when no contig matches, guard divisions, and add a one-line 'check contig names with idxstats first' note.
+
+### `bio-pileup-generation` — pysam examples print pileup_column.n as depth
+
+- Skill: 71, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/pileup-generation) · [viewer](skills/bio-pileup-generation/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 1, 2
+- Problem: `pileup_column.n` ignores overlap removal and min_base_quality: on the real human BAM it differs from samtools mpileup depth at 1087 of 1157 positions (sum 670718 vs 353910), and pileup_text writes a depth column that disagrees with its own base column in 31 of 623 synthetic rows.
+- Root cause: The pysam blocks were written as if n equalled the mpileup depth column and never compared with mpileup output.
+- Fix: Report len(pileup_column.pileups) (or get_num_aligned()) as depth, and add a pysam-to-samtools parameter table: truncate=True, stepper='samtools' plus fastafile for BAQ, min_base_quality default 13, ignore_overlaps True, max_depth 8000, compute_baq.
+
+### `bio-pileup-generation` — Ref-skips counted as deletions in every pysam helper
+
+- Skill: 71, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/pileup-generation) · [viewer](skills/bio-pileup-generation/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 2, 5
+- Problem: pysam sets is_del=True on N-skips, and every helper tests is_del first, so allele_counts reports 'DEL' for spliced reads ({'DEL': 3} at synA:400; {'DEL': 54, 'G': 5} at a real RNA-seq intron with 0 deletions) and pileup_text writes '*' instead of '>'/'<'; the is_refskip branch is dead code.
+- Root cause: Branch order assumes is_del and is_refskip are exclusive.
+- Fix: Test `pileup_read.is_refskip` before `is_del` in allele_counts, allele_frequency, pileup_text and both usage-guide functions.
+
+### `bio-pileup-generation` — pileup_text is not a pileup: no ^ $ indels or qualities
+
+- Skill: 71, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/pileup-generation) · [viewer](skills/bio-pileup-generation/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 2
+- Problem: The 'Generate Pileup Text' helper emits 5 columns, no read-start/end markers, no +N/-N indel text, no quality column, and 200 of 623 synthetic positions differ from samtools mpileup (spliced positions).
+- Root cause: Simplified re-implementation of mpileup presented under the same heading as the 6-column format.
+- Fix: Either add the quality column, ^/$ and indel text using pileup_read.indel, or retitle it 'simplified base string' and point to samtools mpileup for the real format.
+
+### `bio-pileup-generation` — Defaults that change the output are undocumented
+
+- Skill: 71, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/pileup-generation) · [viewer](skills/bio-pileup-generation/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 1, 3, 5
+- Problem: The Skill never gives samtools mpileup's default -Q 13 (bcftools: 1), the default excluded flags UNMAP,SECONDARY,QCFAIL,DUP (1000G BAM: 101 duplicate-flagged reads silently dropped), the depth-0 '*' rows, or that default BAQ removes bases beside a deletion (planted 3 bp deletion: depth 8 -> 4, no '-3CGT' marker unless -B).
+- Root cause: Only -d, BAQ on/off and -A are treated as traps; the rest of the default filter set is left implicit.
+- Fix: Add a 'What mpileup drops by default' table (flags, -q 0, -Q 13, orphans, overlap removal, -d 8000, BAQ) with the --ff/--rf, -Q, -x, -A, -B overrides.
+
+### `bio-pileup-generation` — 'WRONG' pipe rationale false; parallel concat order broken
+
+- Skill: 71, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/pileup-generation) · [viewer](skills/bio-pileup-generation/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 4
+- Problem: samtools mpileup \| bcftools call fails because a text pileup is not VCF/BCF ('unknown file type'), not from a double depth cap; and `bcftools concat chr*.vcf.gz` puts contigs in lexicographic order (chr1,chr10,chr11,chr2...), silently, with exit 0 and a valid index.
+- Root cause: Rationale written from memory of the removed `mpileup -u` pipeline; loop shown with 3 contigs so the glob looks harmless.
+- Fix: Reword the comment to 'samtools mpileup output is text and cannot feed bcftools call'; build the concat file list in header order (`bcftools view -h ref \| ...` or `samtools idxstats \| cut -f1`) and add `set -e`/wait status checks.
+
+### `bio-pileup-generation` — Reference mismatch does not fail: exit 0 with N reference
+
+- Skill: 71, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/pileup-generation) · [viewer](skills/bio-pileup-generation/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 5
+- Problem: With a FASTA missing the BAM contig samtools mpileup prints `The sequence "MN908947.3" was not found`, still writes 4.2 MB of rows with reference base N and exits 0; the Skill's Common Errors and Troubleshooting rows quote different text ('No sequences in common', 'Reference mismatch').
+- Root cause: Error text and behaviour not checked against samtools 1.24.
+- Fix: Document the real message and exit status and add a `samtools view -H \| grep @SQ` vs `.fai` contig-name check before running (mpileup without -f also succeeds with N, so 'No FASTA reference' is not an error).
 
 ### `bio-duplicate-handling` — Duplex consensus step crashes after adjacency grouping
 
@@ -778,7 +826,7 @@ None open.
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (378)
+## P2 (384)
 
 ### `bio-alignment-validation` — Production IGNORE recipe removes checks that catch real defects
 
@@ -875,6 +923,54 @@ None open.
 - Problem: 'mosdepth 3-10x faster than samtools depth', the assay-threshold table values and the historic depth-cap statement were not verifiable with the available data; SKILL.md and usage-guide.md carry parallel CLI and pysam recipes that already diverge.
 - Root cause: Literature/lore claims without a source and no single owner for each recipe.
 - Fix: Cite or drop the speed claim and mark threshold values as literature ranges; keep each recipe in one file and link from the other.
+
+### `bio-pileup-generation` — Cheat-sheet exome row contradicts the depth warning
+
+- Skill: 71, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/pileup-generation) · [viewer](skills/bio-pileup-generation/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 3
+- Problem: `-d 250` for capture/exome (and usage-guide `-d 500` for memory) silently caps depth at 250/500 (reproduced: 9000 reads -> 250) right after a 'Critical Trap' section warning about silent truncation.
+- Root cause: Cheat-sheet rows copied from bcftools defaults.
+- Fix: Use `-d 0` or a documented high cap for capture, or state the expected coverage at which the cap is safe.
+
+### `bio-pileup-generation` — 'Basic Pileup' snippet prints out-of-region columns; 0/1-based ambiguity
+
+- Skill: 71, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/pileup-generation) · [viewer](skills/bio-pileup-generation/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 2
+- Problem: `bam.pileup('chr1', 1000000, 1001000)` without truncate=True prints 50 columns for a 10-column request; SKILL.md functions take 0-based pos while prompts say 'chr1:1000000' (calling allele_counts(..., 100) for 1-based 100 silently returns the neighbour base).
+- Root cause: truncate=True and the coordinate convention appear only in some blocks and in usage-guide Tips.
+- Fix: Add truncate=True to the first snippets and state '0-based pos; pass position-1' in the SKILL.md function docstrings.
+
+### `bio-pileup-generation` — Shipped example fails with raw tracebacks on common inputs
+
+- Skill: 71, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/pileup-generation) · [viewer](skills/bio-pileup-generation/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 3
+- Problem: examples/allele_counts.py raises ValueError for contigs containing ':' (HLA-A*01:01:01:01, real UMI BAM contig), 'chr:100-110', 'chr:1,000', an unindexed BAM and an unknown contig.
+- Root cause: region.split(':') without validation or try/except.
+- Fix: Use rsplit(':', 1), strip commas, catch ValueError and print a one-line message naming the missing index or contig.
+
+### `bio-pileup-generation` — Unverified or overstated statements
+
+- Skill: 71, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/pileup-generation) · [viewer](skills/bio-pileup-generation/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 5
+- Problem: 'BAQ ~30% slower' measured +152% / +178%; '-aa is required for ARTIC' is true only for multi-contig or read-less references (-a gives identical 29903 rows); '(computed from CIGAR if MD missing)' is not how mpileup BAQ works (reference-based HMM, no MD needed); format examples show depth 15 with 11 quality characters; '+NNN'/'-NNN' should read +2AC / -3CGT.
+- Root cause: Numbers and notation not checked against tool output.
+- Fix: Remove or source the numeric claim, say '-a is enough for a single contig; -aa adds read-less contigs', and correct the format examples.
+
+### `bio-pileup-generation` — Indels invisible in pysam counters; prompts steer to removed -g
+
+- Skill: 71, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/pileup-generation) · [viewer](skills/bio-pileup-generation/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: 2
+- Problem: allele_counts/find_variants never read pileup_read.indel, so the planted 2 bp insertion and 3 bp deletion are never reported although the Skill lists 'SNP/indel detection'; usage-guide example prompts 'Call variants using samtools mpileup and bcftools' and 'Generate BCF file' point at the removed mpileup -g route.
+- Root cause: Helpers written for SNPs only; prompts predate the deprecation note.
+- Fix: Add an indel branch (pileup_read.indel) or state SNP-only scope; reword the two prompts to bcftools mpileup.
+
+### `bio-pileup-generation` — SKILL.md and usage-guide.md duplicate the same recipes
+
+- Skill: 71, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/pileup-generation) · [viewer](skills/bio-pileup-generation/mrsonord2240-bioSkills@c206dff/viewer.md)
+- Observed in inputs: —
+- Problem: Allele counting, frequency, quality filtering, region/BED, bcftools pipelines and depth advice are written twice (375 + 258 lines) with small divergences (-d 250 vs 1000000 in multi-sample examples).
+- Root cause: usage-guide restates SKILL.md.
+- Fix: Keep the command reference in SKILL.md and reduce usage-guide.md to prompts and troubleshooting.
 
 ### `bio-duplicate-handling` — Common Errors table and Critical pitfall do not match samtools 1.24
 
