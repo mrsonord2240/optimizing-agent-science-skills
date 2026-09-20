@@ -8,7 +8,39 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (83)
+## P1 (87)
+
+### `bio-alignment-msa-statistics` — No case / gap-glyph / ambiguity normalisation (silent wrong output)
+
+- Skill: 66, Beta Only · [mrsonord2240/bioSkills@354b499](https://github.com/mrsonord2240/bioSkills/tree/354b4992cd8d2f1bee039510af618da0333821f1/alignment/msa-statistics) · [viewer](skills/bio-alignment-msa-statistics/mrsonord2240-bioSkills@354b499/viewer.md)
+- Observed in inputs: 2, 4, 7
+- Problem: Lowercase input (MAFFT nucleotide default, hmmalign inserts), "." gaps and B/Z/X/U letters are treated as distinct residues: Ti/Tv 0.00 vs 1.21, DNA IC 29.9 vs 2.0 bits, Pfam-dot identity 32.0% vs 19.6%, SP drops pairs, DistanceCalculator raises. Nothing warns.
+- Root cause: Every function assumes uppercase A-Z plus "-" and never validates the alphabet.
+- Fix: Add a normalise step to Required Import (upper-case, map ".", "~" to "-") and a validation call that reports letters outside the alphabet; apply it at the top of every example; warn that MAFFT nucleotide output is lowercase.
+
+### `bio-alignment-msa-statistics` — PID1 code does not implement its stated definition
+
+- Skill: 66, Beta Only · [mrsonord2240/bioSkills@354b499](https://github.com/mrsonord2240/bioSkills/tree/354b4992cd8d2f1bee039510af618da0333821f1/alignment/msa-statistics) · [viewer](skills/bio-alignment-msa-statistics/mrsonord2240-bioSkills@354b499/viewer.md)
+- Observed in inputs: 3, 5
+- Problem: PID1 is documented as aligned positions plus internal gaps, but the code counts every column with at least one residue, including terminal overhangs: 50% vs 80% on the hand example, 25.0% vs 40.7% (pwalign::pid) on a fragment pair. identity_matrix.py uses this PID1 while the text recommends PID4.
+- Root cause: Denominator written as (a != "-" or b != "-") without excluding terminal gaps.
+- Fix: Exclude gap columns outside each sequence's residue span (or rename the metric), add a method argument to identity_matrix.py and default the example to PID4 to match the text.
+
+### `bio-alignment-msa-statistics` — alignment_score charges gap/gap pairs
+
+- Skill: 66, Beta Only · [mrsonord2240/bioSkills@354b499](https://github.com/mrsonord2240/bioSkills/tree/354b4992cd8d2f1bee039510af618da0333821f1/alignment/msa-statistics) · [viewer](skills/bio-alignment-msa-statistics/mrsonord2240-bioSkills@354b499/viewer.md)
+- Observed in inputs: 1, 3
+- Problem: alignment_score returns -330,976 on the Pfam seed where standard sum-of-pairs gives -215,960, and an all-gap column changes the score. It also contradicts sum_of_pairs, which skips gaps.
+- Root cause: The gap branch tests c1 == "-" or c2 == "-" without excluding the both-gap case.
+- Fix: Skip pairs where both characters are gaps (score 0) and state the convention.
+
+### `bio-alignment-msa-statistics` — information_content fallback of 1e-9 inflates IC by ~26 bits per unknown letter
+
+- Skill: 66, Beta Only · [mrsonord2240/bioSkills@354b499](https://github.com/mrsonord2240/bioSkills/tree/354b4992cd8d2f1bee039510af618da0333821f1/alignment/msa-statistics) · [viewer](skills/bio-alignment-msa-statistics/mrsonord2240-bioSkills@354b499/viewer.md)
+- Observed in inputs: 1, 2, 4, 7
+- Problem: Letters missing from the background dictionary (B, Z, X, U, lowercase, DNA N) add ~26 bits x frequency; IC exceeded 29 bits on real alignments and +0.58 bits on the Pfam seed (27 B/Z residues).
+- Root cause: background.get(r, 1e-9) is used instead of dropping and renormalising.
+- Fix: Drop letters outside the background (report the count) and renormalise the column before the KL sum.
 
 ### `bio-alignment-msa-parsing` — Gap symbol hard-coded to '-'; '.' and lowercase break every helper silently
 
@@ -674,7 +706,39 @@ None open.
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (329)
+## P2 (333)
+
+### `bio-alignment-msa-statistics` — substitution_counts.py prints Ti/Tv for protein and misses lowercase/RNA
+
+- Skill: 66, Beta Only · [mrsonord2240/bioSkills@354b499](https://github.com/mrsonord2240/bioSkills/tree/354b4992cd8d2f1bee039510af618da0333821f1/alignment/msa-statistics) · [viewer](skills/bio-alignment-msa-statistics/mrsonord2240-bioSkills@354b499/viewer.md)
+- Observed in inputs: 1, 4
+- Problem: On the protein Pfam seed it prints "Ti/Tv ratio: 0.02" (Ala/Gly and Cys/Thr counted as transitions); on lowercase DNA it prints 0.00; U is not handled.
+- Root cause: No alphabet detection; transition set is hard-coded to upper-case A/G/C/T.
+- Fix: Detect nucleotide alignments, upper-case, map U to T, and print Ti/Tv only for DNA/RNA.
+
+### `bio-alignment-msa-statistics` — average_conservation/conservation columns ignore occupancy
+
+- Skill: 66, Beta Only · [mrsonord2240/bioSkills@354b499](https://github.com/mrsonord2240/bioSkills/tree/354b4992cd8d2f1bee039510af618da0333821f1/alignment/msa-statistics) · [viewer](skills/bio-alignment-msa-statistics/mrsonord2240-bioSkills@354b499/viewer.md)
+- Observed in inputs: 1, 3
+- Problem: Columns with 2-33 residues of 73 score up to 100% conserved (5 such columns >50% gapped) and all-gap columns score 0, so the mean is inflated (37.9% vs 34.3%) or diluted depending on the alignment.
+- Root cause: ignore_gaps=True divides by residue count only; no minimum occupancy.
+- Fix: Add a min_occupancy argument (or return NaN for empty columns) and report it with the mean.
+
+### `bio-alignment-msa-statistics` — Stale or inaccurate statements
+
+- Skill: 66, Beta Only · [mrsonord2240/bioSkills@354b499](https://github.com/mrsonord2240/bioSkills/tree/354b4992cd8d2f1bee039510af618da0333821f1/alignment/msa-statistics) · [viewer](skills/bio-alignment-msa-statistics/mrsonord2240-bioSkills@354b499/viewer.md)
+- Observed in inputs: 6, 1
+- Problem: The claim that Array.get((c1,c2),0) silently returns 0 is false in Biopython 1.88; primary_tool says Bio.Align but code needs MultipleSeqAlignment (Alignment.get_alignment_length raises AttributeError); ROBINSON_BACKGROUND deviates from the published table by up to 5% relative and sums to 1.0036; "Laplace add-one" is a total pseudocount of 1; Common Errors lists ZeroDivisionError and Negative IC causes that do not occur.
+- Root cause: Text written against older Biopython and not re-verified.
+- Fix: Correct or delete these statements; use the published Robinson values or label the table approximate; state that AlignIO (MultipleSeqAlignment) is required.
+
+### `bio-alignment-msa-statistics` — Minor gaps
+
+- Skill: 66, Beta Only · [mrsonord2240/bioSkills@354b499](https://github.com/mrsonord2240/bioSkills/tree/354b4992cd8d2f1bee039510af618da0333821f1/alignment/msa-statistics) · [viewer](skills/bio-alignment-msa-statistics/mrsonord2240-bioSkills@354b499/viewer.md)
+- Observed in inputs: 1, 3, 7
+- Problem: "Build a substitution matrix" (usage-guide) yields only counts; the "Built-in Pairwise Substitutions" snippet reuses gapped MSA rows so "-" appears in the matrix; conservation_profile window is [i-5, i+4]; all-gap sequence returns 0% identity and average identity is NaN for one sequence; no shipped expected outputs.
+- Root cause: Snippets are illustrations, not tested.
+- Fix: Add a log-odds matrix helper or reword, strip gaps before PairwiseAligner, centre or document the window, return NaN for undefined identities and ship a small alignment.fasta with expected numbers.
 
 ### `bio-alignment-msa-parsing` — Cleaning helpers silently drop annotations and can return empty alignments
 
