@@ -1,0 +1,5 @@
+suppressPackageStartupMessages(library(FRASER))
+print(getMethod("plotEncDimSearch", "FraserDataSet"))
+print(FRASER::plotEncDimSearch)
+print(args(FRASER::estimateBestQ))
+print(getMethod("estimateBestQ","FraserDataSet"))

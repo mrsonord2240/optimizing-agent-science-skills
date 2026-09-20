@@ -1,0 +1,523 @@
+{
+  "meta": {
+    "skill_name": "bio-outlier-splicing-detection",
+    "description": "Detects aberrant splicing in single rare-disease patients versus a control panel using FRASER 2.0, OUTRIDER, LeafcutterMD and the DROP pipeline (single-sample-versus-cohort outlier detection), with SpliceAI/FRASER variant-outlier integration, cohort-size, tissue-choice and hyperparameter guidance.",
+    "evaluated_on": "2026-09-20",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "mrsonord2240/bioSkills@44ff43bb35e5741c3ddd3c003590e1f1da8a4a4b:alternative-splicing/outlier-splicing-detection",
+    "data_note": "SYNTHETIC: 30-sample paired-end cohort with planted splicing/expression events (run/data/synth, 01_make_synth_cohort.py, seed 20260920), 3000x30 count matrix (run/data/outrider) and SpliceAI-style hits (run/scripts/80_integration.R). REAL: DROP public demo (10 chr21 RNA-seq BAMs). Versions: Windows R 4.4.3 FRASER 2.2.0 / OUTRIDER 1.24.0; WSL as-drop R 4.5.3 FRASER 2.6.1 / OUTRIDER 1.28.1 / DROP 1.6.1; regtools 1.0.0; leafcutter 0.2.9.",
+    "grade_note": "Numeric score 67 (Beta Only band); not deployable. No veto fired: every runtime failure has a one-line fix and the Skill hedges outliers as candidates."
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "References checked are real (Mertes 2021, Scheller 2023, Brechtmann 2018, Jenkinson 2020, Yepez 2021, Brown 2022, Klim 2019, Darman 2015, Walker 2023); no invented DOI/PMID or data. The quoted error messages in Common Errors are invented tool output and are recorded as a P1, not a fabricated result."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "No output diagnoses or names a causal gene; Skill says outliers are candidates, not pathogenic, and treats PS3 as one ACMG evidence line. Gap recorded as P1: 'clinical report with PS3 weight' has no research-use or qualified-reviewer caveat."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Single-sample-versus-cohort framing is correct; warns about tissue, batch, small cohorts and negative blood RNA-seq. OUTRIDER power guidance is over-optimistic (P1) but not a principled fallacy."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "Code parses and every block ran after minimal edits (DataFrame wrapper, bestQ accessor, drop init without argument, wrapper path for leafcutter); verbatim, the FRASER, OUTRIDER (1.28.1) and drop init blocks fail. Recorded as P1 because each has a one-line fix and the Skill tells the agent to adapt on API errors."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 67,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 8,
+        "max": 12,
+        "note": "Covers FRASER/OUTRIDER/LeafcutterMD/DROP/variant integration with a sound decision tree, but the FRASER and OUTRIDER blocks crash as written on the installed versions, the DROP init command fails, the MAE test is misdescribed (negative binomial, not z-score), the plotEncDimSearch comment is inverted and the Common Errors table quotes messages that do not exist in FRASER 2.6.1 / OUTRIDER 1.28.1."
+      },
+      "reliability": {
+        "score": 7,
+        "max": 12,
+        "note": "Per-tool failure modes and tissue/cohort warnings are good, but the listed error strings are invented so an agent waits for errors that never come (n=8 runs silently), and there is no hard stop for n<20 or tissue mismatch."
+      },
+      "performance_context": {
+        "score": 5,
+        "max": 8,
+        "note": "One 387-line SKILL.md plus a 69-line usage guide that repeats it; no references/ split; example covers FRASER only."
+      },
+      "agent_usability": {
+        "score": 10,
+        "max": 16,
+        "note": "Clear structure and tables; inconsistent on thresholds (table |z|>=2 vs code zScoreCutoff=0; n>=20 'minimum' vs OUTRIDER power), FRASER 'autoencoder' wording vs PCA default, and no output/result-column specification (LeafcutterMD outputs, FRASER results columns)."
+      },
+      "human_usability": {
+        "score": 6,
+        "max": 8,
+        "note": "Natural trigger wording and worked prompts; no input validation or guidance when inputs are off-spec."
+      },
+      "security": {
+        "score": 9,
+        "max": 12,
+        "note": "No credentials or eval; quoted shell variables. Patient-derived RNA-seq and controlled-access GTEx controls (dbGaP) are suggested with no data-handling or access note; no licence caveat (see recommendations)."
+      },
+      "maintainability": {
+        "score": 7,
+        "max": 12,
+        "note": "Version-pinned prose ('FRASER 2.0 >=1.99.0') is already wrong for two API points; a single example with hard-coded 'PATIENT_001' and bams/; no test data or expected output."
+      },
+      "agent_specific": {
+        "score": 15,
+        "max": 20,
+        "note": "Good related-skill links (all target folders exist) and stop conditions for small cohorts and tissue choice; no research-use/clinical-boundary hand-off, and FRASER AE runs without a seed are not reproducible."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 66.3,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 16,
+      "total": 32
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "FRASER2: one patient vs 29 controls, planted outliers (synthetic)",
+        "executed": true,
+        "execution_note": "SYNTHETIC 30-sample 2x75 cohort (data/synth, seed 20260920) with 4 planted splicing events + 2 expression-only events + 1 tissue-mismatch sample. Verbatim example: 'is(value, DataFrame) is not TRUE' on both versions (logs 10, 11). Fixed workflow on FRASER 2.6.1 (as-drop) and 2.2.0 (Windows R): identical calls (S05 g010 skipping padj 4.8e-3, S20 g050 retention 3.4e-3, S25 g070 pseudoexon 3.6e-2). q sweep (PCA): q=1-3 -> 4/4, q=5-10 -> 3/4, q=15 -> 1/4; non-planted calls 0 throughout.",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Shipped example and SKILL.md workflow crash verbatim on FRASER 2.2.0 and 2.6.1 (colData data.frame). With one-line DataFrame() fix, q=10: 3/4 planted splicing events found, 0 non-planted calls; cryptic donor missed at q>=5, found at q<=3.",
+        "basic": 28,
+        "specialized": 39,
+        "total": 67,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The SKILL.md / shipped-example FRASER workflow runs verbatim from a clean copy",
+            "result": "FAIL",
+            "note": "FraserDataSet(colData=data.frame) errors on FRASER 2.2.0 and 2.6.1; needs S4Vectors::DataFrame()"
+          },
+          {
+            "text": "After the minimal fix, planted exon-skipping, intron-retention and pseudoexon events are flagged in the right sample and gene at padj<0.05, |dPsi|>=0.1",
+            "result": "PASS",
+            "note": "S05/g010 padj 4.8e-3 dPsi 0.52; S20/g050 3.4e-3 dPsi 0.79; S25/g070 3.6e-2 dPsi 0.63"
+          },
+          {
+            "text": "The Skill's default q=10 detects the planted cryptic-donor event (S12/g030, 60% usage)",
+            "result": "FAIL",
+            "note": "Not detected at q=5..15; detected at q=1..3 (padj 9e-3..1.3e-2) and by OHT estimateBestQ (q=1)"
+          },
+          {
+            "text": "False-positive rate stays low: no calls outside the planted sample/gene pairs",
+            "result": "PASS",
+            "note": "0 non-planted calls among 667 junctions x 30 samples at the stated cut-offs, every q tested"
+          },
+          {
+            "text": "Expression-only events (S15 g090 x0.05, S28 g100 x6) are not reported as splicing outliers",
+            "result": "PASS",
+            "note": "0 FRASER calls for both"
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "OUTRIDER expression outliers, n=30 synthetic counts + OUTRIDER's own simulator",
+        "executed": true,
+        "execution_note": "SYNTHETIC 3000x30 NB count matrix with 8 planted outliers (x0.05-x8), hidden batch on 25% of genes. Windows R OUTRIDER 1.24.0: q_best numeric (8), 'No significant events', 0 calls, 0 false. as-drop OUTRIDER 1.28.1: 'Error in is.numeric(q) & q > 1' because estimateBestQ(ods) returns an OutriderDataSet (bestQ(ods) is the accessor). Cohort-size check with makeExampleOutriderDataSet (2000 genes, freq 1e-3): m=12 0/14, m=30 0/57, m=60 67/115, m=100 116/192 (1 false call).",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "SKILL.md OUTRIDER block: crashes on OUTRIDER 1.28.1 (estimateBestQ returns an object); runs on 1.24.0 but detects 0/8 planted outliers at n=30 (0/57 on OUTRIDER's own simulator; 67/115 at n=60).",
+        "basic": 25,
+        "specialized": 32,
+        "total": 57,
+        "assertions_passed": 2,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The OUTRIDER snippet runs verbatim on the current installed release (1.28.1)",
+            "result": "FAIL",
+            "note": "OUTRIDER(ods, q = <OutriderDataSet>) -> 'operations are possible only for numeric, logical or complex types'"
+          },
+          {
+            "text": "The snippet runs and returns a scalar q on the release the Skill's comment describes (1.24.0)",
+            "result": "PASS",
+            "note": "class numeric, q=8 (n=30), 6 (n=12), 5 (n=8)"
+          },
+          {
+            "text": "Planted strong outliers are detected at the n>=20 cohort size the Skill calls 'Acceptable'",
+            "result": "FAIL",
+            "note": "0/8 planted at n=30; 0/57 on OUTRIDER's simulator at m=30; only 58% at m=60"
+          },
+          {
+            "text": "No false-positive expression outliers are reported",
+            "result": "PASS",
+            "note": "0 calls at padj<0.05 (0/90,000 tests)"
+          },
+          {
+            "text": "Cohort-size failure mode matches the Skill's stated symptom ('convergence warnings; uncalibrated p-values')",
+            "result": "FAIL",
+            "note": "Actual symptom is a silent 'No significant events' warning; no convergence warning at n=8..30"
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "FRASER with a cohort below the stated minimum (n=12 and n=8)",
+        "executed": true,
+        "execution_note": "Subsets of the synthetic cohort containing S05 (planted skipping). FRASER 2.6.1: q=10 (Skill default) and OHT q=2 both call 0 events at n=12 and n=8 (0 false). OHT prints 'Optimal latent space dimension is smaller than 2 ... set to 2'. String search over every function in FRASER 2.6.1 and OUTRIDER 1.28.1 for 'cohort too small' / 'convergence not reached' / 'encoding-dim search' found none (log 72).",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Skill's 'cohort <20 is insufficient' is borne out: a 75%-skipping planted event is missed at n=12 and n=8 with no error. The Common-Errors row 'FRASER: cohort too small' does not exist.",
+        "basic": 29,
+        "specialized": 43,
+        "total": 72,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Advice for n<20 (insufficient / recruit more) agrees with observed behaviour",
+            "result": "PASS",
+            "note": "Strong planted event missed at n=12 and n=8 at both q=10 and OHT q=2"
+          },
+          {
+            "text": "Error strings quoted in Common Errors ('FRASER: cohort too small', 'estimateBestQ: convergence not reached') are produced by the tools",
+            "result": "FAIL",
+            "note": "Not present in either package; n=8 fit completes silently"
+          },
+          {
+            "text": "Small cohort gives no false positives",
+            "result": "PASS",
+            "note": "0 calls at n=12 and n=8"
+          },
+          {
+            "text": "Skill's tuning route (estimateBestQ useOHT=TRUE + bestQ) works and warns when the cohort is degenerate",
+            "result": "PASS",
+            "note": "estimateBestQ(fds,'jaccard',useOHT=TRUE) -> bestQ 2 with an explicit 'smaller than 2' message (2.6.1 only)"
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "LeafcutterMD annotation-free outliers on the same synthetic cohort",
+        "executed": true,
+        "execution_note": "WSL as-core regtools 1.0.0 + as-rleaf leafcutter 0.2.9, 30 synthetic BAMs with XS:A tags (a first attempt with XS written as type Z gave strand '?', empty counts and a leafcutterMD crash: my data bug, fixed and regenerated). 86 clusters, 2580 cluster x sample tests; BH q<0.05: 11 (S29 tissue-mismatch sample 9, planted 2, other 0); raw p<0.05 outside planted/S29: 4 of 2492 (0.2%).",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "SKILL.md bash block ran (regtools -> cluster -> leafcutterMD.R); exon skipping (p 5e-10) and cryptic donor (BH q 0.02) detected, 0 BH false positives; intron retention and pseudoexon give no p-value. Outputs and multiple-testing are not described.",
+        "basic": 31,
+        "specialized": 44,
+        "total": 75,
+        "assertions_passed": 3,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The three-step bash block runs from a clean directory and writes <prefix>_pVals/_clusterPvals/_effSize",
+            "result": "PASS",
+            "note": "All three files written (86 x 30 cluster matrix, 257 x 30 intron matrices)"
+          },
+          {
+            "text": "Planted annotation-free events (skipping, cryptic donor) are flagged in the right sample",
+            "result": "PASS",
+            "note": "S05 raw p 5.0e-10 (q 6.4e-7); S12 raw p 6.9e-5 (q 0.020)"
+          },
+          {
+            "text": "Skill states that LeafcutterMD reports raw p-values needing correction, and what the three output files contain",
+            "result": "FAIL",
+            "note": "Only 'per-sample p-values per intron-cluster'; no BH advice, no file/column description"
+          },
+          {
+            "text": "Skill states the method's blind spots (junction-only: intron retention / pseudoexon clusters untested)",
+            "result": "FAIL",
+            "note": "S20 retention and S25 pseudoexon produced no cluster p-value; not mentioned"
+          },
+          {
+            "text": "No false positives at BH<0.05 outside the planted set and the tissue-mismatch sample",
+            "result": "PASS",
+            "note": "0 of 2492 tests"
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "DROP integrated pipeline: init, config, demo run on real chr21 RNA-seq",
+        "executed": true,
+        "execution_note": "WSL as-drop, DROP 1.6.1 (FRASER 2.6.1, OUTRIDER 1.28.1). Verbatim `drop init my_diagnostic_run`: 'Got unexpected extra argument'. mkdir+cd+`drop init` works and prints the CC-BY-NC notice; config.yaml has aberrantSplicing.run: true, implementation: PCA, deltaPsiCutoff 0.1, padjCutoff 0.1, quantileForFiltering 0.75; no rule file contains a `conda:` directive (so --use-conda is a no-op). `snakemake aberrantSplicing --cores 10` on a clean copy of the public demo: results.tsv (258 rows, min padjust 1, 0 significant; demo config has padjCutoff 1, deltaPsiCutoff 0.05); results_all 9820 rows. Not executed: mamba create (env pre-built by tooling pass), MAE and OUTRIDER modules, --use-conda on a fresh init.",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "`drop init my_diagnostic_run` fails as written; config prose does not match keys (run: true, implementation PCA); MAE described as a z-score test but DROP uses a negative binomial test. Demo (real chr21, 10 samples, 10 cores) reached results.tsv after about 85 min: 258 rows, 0 significant. Pipeline status: rc=124 | Sun Sep 20 13:31:22 PDT 2026 | Output/processed_results/aberrant_splicing/results/v29/fraser/fraser/results.tsv | Output/processed_results/aberrant_splicing/results/v29/fraser/fraser/results_gene_all.tsv | Output/processed_results/aberrant_splicing/results/v29/fraser/fraser/results_per_junction.tsv",
+        "basic": 24,
+        "specialized": 36,
+        "total": 60,
+        "assertions_passed": 2,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "`drop init my_diagnostic_run` (as written) creates the project",
+            "result": "FAIL",
+            "note": "drop 1.6.1: 'Got unexpected extra argument (my_diagnostic_run)'; init takes no positional argument"
+          },
+          {
+            "text": "Config edit instructions ('aberrantSplicing: enabled', 'mae: enabled') match the generated config.yaml",
+            "result": "FAIL",
+            "note": "Keys are aberrantSplicing.run: true / mae.run: true; not mentioned that implementation defaults to PCA, not an autoencoder"
+          },
+          {
+            "text": "The MAE module description is accurate",
+            "result": "FAIL",
+            "note": "Skill: 'custom z-score test'; DROP's deseq_mae.R: negative binomial test (Kremer 2017)"
+          },
+          {
+            "text": "The demo aberrantSplicing target produces a results table with the documented FRASER columns",
+            "result": "PASS",
+            "note": "results.tsv with sampleID, hgncSymbol, pValue, padjust, deltaPsi, counts, totalCounts, potentialImpact, ...; 258 rows"
+          },
+          {
+            "text": "A 10-sample cohort behaves as the Skill predicts (below the n>=30 DROP guidance: no confident outliers)",
+            "result": "PASS",
+            "note": "0 of 258 rows with padjust<0.05 (min 1); Skill's own cut-offs on the fitted fds also give 0 calls"
+          }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "SpliceAI hit + FRASER outlier integration, ACMG PS3 framing",
+        "executed": true,
+        "execution_note": "SYNTHETIC SpliceAI-style hits (chr21:90190 d=0.85, chr21:130000 d=0.90, chr21:250233 d=0.40) joined to FRASER 2.6.1 results for PATIENT_001 (junction 90194-92840, padj 4.8e-3). Skill's block verbatim: 1 confirmed row (pos 90190). With chrom '21' vs 'chr21' the join silently returns 0 rows (as the Skill's error table says). The Skill does not say how to derive delta_max from SpliceAI's DS_* INFO fields; FRASER result columns match the join. Licence: FRASER 2.6.1 / OUTRIDER 1.28.1 LICENSE files say CC BY NC 4.0 (2.2.0/1.24.0: MIT).",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "dplyr join runs and returns only the concordant variant (decoy 40 kb away excluded). The Skill directs a 'clinical report' with an ACMG PS3 weight but gives no research-use / qualified-reviewer caveat, and omits that current FRASER/OUTRIDER are CC-BY-NC (Skill says MIT).",
+        "basic": 29,
+        "specialized": 41,
+        "total": 70,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The variant-outlier join block runs verbatim and returns the concordant variant only",
+            "result": "PASS",
+            "note": "1 row (pos 90190, delta_max 0.85, junction 90194-92840); decoy 130000 excluded"
+          },
+          {
+            "text": "Output frames the result as candidate evidence, not a diagnosis",
+            "result": "PASS",
+            "note": "Skill says 'treat all outliers as candidates, not pathogenic'"
+          },
+          {
+            "text": "Where a clinical report / ACMG PS3 weight is requested the Skill supplies a research-use / qualified-clinician-review caveat",
+            "result": "FAIL",
+            "note": "usage-guide step 7 'Generate clinical report with PS3 functional evidence weight'; no caveat anywhere"
+          },
+          {
+            "text": "Skill discloses tool licensing relevant to diagnostic use",
+            "result": "FAIL",
+            "note": "Frontmatter license: MIT; installed FRASER/OUTRIDER 2.6.1/1.28.1 are CC BY NC 4.0 (DROP prints the notice)"
+          }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Tissue-mismatched patient: 'which gene causes her disease?'",
+        "executed": true,
+        "execution_note": "S29 = synthetic mismatch stand-in (half of genes have ~5x baseline exon skipping; a milder shift than a real tissue change). FRASER 2.6.1: PCA q=1..15 -> 0 calls for S29; AE q=10 -> 15 calls in 13 genes; AE q=5 -> 3; LeafcutterMD BH<0.05 -> 9 calls. Two AE runs with no seed differ (9,882 of 19,981 site p-values differ by >1e-6; only 12 of 25-28 p<0.001 cells shared); PCA and OUTRIDER AE are bit-identical run to run.",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Skill's tissue-mismatch symptom ('hundreds of significant outliers') is not reproduced: default PCA calls 0 for the shifted sample (mismatch is invisible); AE q=10 calls 15 (13 genes). No QC step to detect mismatch is given.",
+        "basic": 26,
+        "specialized": 37,
+        "total": 63,
+        "assertions_passed": 1,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Skill's warning that tissue mismatch inflates outlier calls is reproduced",
+            "result": "FAIL",
+            "note": "0 calls (PCA) to 15 calls (AE) for the shifted sample; not 'hundreds'"
+          },
+          {
+            "text": "Skill gives a check that would reveal the mismatch before interpretation",
+            "result": "FAIL",
+            "note": "Only 'strict tissue matching'; no sample-correlation / PCA / expression-tissue QC step"
+          },
+          {
+            "text": "Output does not name a causal gene or diagnose from outliers alone",
+            "result": "PASS",
+            "note": "Skill: outliers are candidates; verify tissue expression; RNA-only outlier may be cellular state or artefact"
+          },
+          {
+            "text": "Fit is reproducible across repeated runs on identical input",
+            "result": "FAIL",
+            "note": "FRASER AE (no seed) differs run to run; only the PCA default is deterministic; Skill gives no set.seed guidance"
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 26.8,
+    "dynamic_weighted": 39.8,
+    "score": 67,
+    "max": 100,
+    "grade": "Beta Only",
+    "grade_symbol": "⚠️",
+    "deployable": false,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "FRASER core claims hold on planted data: 3/4 events at the Skill's own settings and 4/4 at q<=3, 0 false positives, identical on FRASER 2.2.0 and 2.6.1",
+    "Decision tree, tissue-choice and n<20 warnings are sound; the small-cohort advice is confirmed (strong event missed at n=8 and 12)",
+    "LeafcutterMD block runs verbatim and finds the planted skipping and cryptic-donor events with no BH false positives",
+    "Variant-outlier join returns only the concordant variant; all referenced files and sibling Skills exist; references are real"
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "Main FRASER workflow and shipped example crash as written",
+      "observed_in": [
+        1,
+        3,
+        6,
+        7
+      ],
+      "problem": "FraserDataSet(colData = <data.frame>) fails on FRASER 2.2.0 and 2.6.1 ('is(value, DataFrame) is not TRUE'), so SKILL.md and examples/fraser2_rare_disease.R stop at line 30.",
+      "root_cause": "Snippets were never run against a released FRASER.",
+      "fix": "Wrap the sample table in S4Vectors::DataFrame() in SKILL.md and the example; add a pass/fail print (n junctions, n calls) so the example asserts something."
+    },
+    {
+      "priority": "P1",
+      "title": "Version-fragile API: estimateBestQ and plotEncDimSearch guidance",
+      "observed_in": [
+        1,
+        2,
+        3
+      ],
+      "problem": "FRASER::estimateBestQ does not exist in 2.2.0 (optimHyperParams there); OUTRIDER::estimateBestQ returns a scalar in 1.24.0 but an OutriderDataSet in 1.28.1, so the OUTRIDER snippet crashes; plotEncDimSearch defaults to the OHT singular-value plot and returns NULL after useOHT=FALSE (the comment says the opposite; plotType='auc'/'loss' show the grid).",
+      "root_cause": "Version line says 'FRASER 2.0 (>=1.99.0), OUTRIDER 1.20+' but the code targets Bioc 3.22 FRASER and Bioc 3.20 OUTRIDER.",
+      "fix": "Pin one Bioconductor release, use bestQ(ods)/bestQ(fds, 'jaccard') after estimateBestQ in both tools, and correct the plotEncDimSearch comment."
+    },
+    {
+      "priority": "P1",
+      "title": "OUTRIDER cohort-size guidance contradicts measured power",
+      "observed_in": [
+        2
+      ],
+      "problem": "n=20-50 is called 'Acceptable' and n<20 fails with 'convergence warnings', but OUTRIDER on its own simulator detected 0/57 injected outliers at 30 samples and 67/115 at 60, with only a 'No significant events' warning.",
+      "root_cause": "Single cohort table shared by FRASER and OUTRIDER.",
+      "fix": "Give OUTRIDER its own size guidance (>=50-60 samples for useful power), and say that an empty result at n<50 is expected, not an error."
+    },
+    {
+      "priority": "P1",
+      "title": "Default q=10 hard-coded; q advice does not match the data",
+      "observed_in": [
+        1,
+        3
+      ],
+      "problem": "The example fixes q=10 although the text says to tune it; on a 30-sample cohort q=10 missed a 60%-usage cryptic donor that q<=3 and OHT found, and q=15 found 1/4. Text says q=8-15 typical and 5-8 for n=20-30.",
+      "root_cause": "q ranges are convention, not derived; the example skips the estimateBestQ step it recommends.",
+      "fix": "Call estimateBestQ(useOHT=TRUE)/bestQ in the example and use its value; state that q must stay well below n."
+    },
+    {
+      "priority": "P1",
+      "title": "No research-use / clinical-boundary caveat, and licence misstated",
+      "observed_in": [
+        6
+      ],
+      "problem": "The Skill positions FRASER/DROP for clinical diagnostics and the usage guide directs a 'clinical report with PS3 weight' with no research-use, validation or qualified-reviewer caveat; frontmatter says MIT while FRASER 2.6.1 / OUTRIDER 1.28.1 (and DROP) are CC BY NC 4.0.",
+      "root_cause": "Clinical framing copied from programme descriptions without a boundary statement.",
+      "fix": "Add a Practice Boundaries paragraph (candidate findings only; ACMG classification by a qualified geneticist; RNA-seq assay validation) and a licence note for commercial/diagnostic use."
+    },
+    {
+      "priority": "P1",
+      "title": "DROP section: failing init command, wrong config and MAE description",
+      "observed_in": [
+        5
+      ],
+      "problem": "`drop init my_diagnostic_run` errors in DROP 1.6.1; config keys are `run: true` (not 'enabled'); default implementation is PCA; MAE uses a negative binomial test (not a z-score test); `--use-conda` does nothing (no conda: directives); the 10-sample demo needs roughly 85 minutes on 10 cores.",
+      "root_cause": "DROP steps written from memory of the docs.",
+      "fix": "Use `mkdir run && cd run && drop init`, quote the real config keys, fix the MAE sentence, drop --use-conda, and state the runtime of the demo."
+    },
+    {
+      "priority": "P1",
+      "title": "Invented error messages and unreproducible AE fits",
+      "observed_in": [
+        3,
+        7
+      ],
+      "problem": "Common Errors lists 'FRASER: cohort too small', 'estimateBestQ: convergence not reached', 'OUTRIDER: encoding-dim search slow' which appear nowhere in FRASER 2.6.1/OUTRIDER 1.28.1; and FRASER correction='AE' without a seed differs run to run (12 of ~26 significant cells shared) with no set.seed advice.",
+      "root_cause": "Table written from expectations rather than observed output.",
+      "fix": "Replace the table with real messages (e.g. 'Optimal latent space dimension is smaller than 2', 'No significant events') and add set.seed() before any AE fit."
+    },
+    {
+      "priority": "P1",
+      "title": "LeafcutterMD block lacks outputs, correction and limits",
+      "observed_in": [
+        4
+      ],
+      "problem": "The block runs, but the Skill does not say the output files are _pVals/_clusterPvals/_effSize, that p-values are raw and need FDR control, where leafcutter_cluster_regtools.py lives, or that intron retention and some novel-exon clusters give no p-value.",
+      "root_cause": "One-paragraph treatment of the tool.",
+      "fix": "Add output description, a BH step (11 calls at q<0.05 vs 39 at raw p<0.05 on the test cohort) and the junction-only limitation."
+    },
+    {
+      "priority": "P2",
+      "title": "Tissue-mismatch symptom and detection",
+      "observed_in": [
+        7
+      ],
+      "problem": "'Hundreds of outliers' was not seen (PCA absorbed the shifted sample; AE flagged 15), and no QC step exposes mismatch.",
+      "root_cause": "Claim stated without a check.",
+      "fix": "Add a sample-correlation / PCA outlier check on the count matrix before fitting."
+    },
+    {
+      "priority": "P2",
+      "title": "Threshold and default inconsistencies",
+      "observed_in": [
+        2,
+        1
+      ],
+      "problem": "Quality table says OUTRIDER |z|>=2 but the code uses zScoreCutoff=0; example filter uses quantile=0.05/quantileMinExpression=1 versus FRASER defaults 0.75/10 (86% of junctions kept); FRASER 'Beta-binomial autoencoder' wording while the default fit is PCA.",
+      "root_cause": "Parameters copied from different sources.",
+      "fix": "Align table and code, explain the filter choice, and name PCA as default and AE as an option."
+    },
+    {
+      "priority": "P2",
+      "title": "Integration block details and control-data access",
+      "observed_in": [
+        6
+      ],
+      "problem": "delta_max is not a SpliceAI output column and no derivation is given; the 1 kb junction-end rule is a loose heuristic; chr-naming mismatch fails silently; pooling GTEx controls needs dbGaP access which is not mentioned.",
+      "root_cause": "Block written as sketch.",
+      "fix": "Show the DS_* -> delta_max step, add a chromosome-name assertion, and note controlled access for GTEx BAMs."
+    },
+    {
+      "priority": "P2",
+      "title": "Single-file layout, one FRASER-only example",
+      "observed_in": [],
+      "problem": "387-line SKILL.md plus a usage guide repeating it; no references/ or test data; example hard-codes bams/ and PATIENT_001.",
+      "root_cause": "No progressive disclosure.",
+      "fix": "Move tool details to references/, add a tiny planted-outlier test set with expected output."
+    }
+  ]
+}
