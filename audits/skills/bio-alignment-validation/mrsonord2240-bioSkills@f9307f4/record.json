@@ -1,9 +1,9 @@
 {
   "skill_id": "bio-alignment-validation",
-  "version": "mrsonord2240-bioSkills@c206dff",
+  "version": "mrsonord2240-bioSkills@f9307f4",
   "source": {
     "repository": "mrsonord2240/bioSkills",
-    "commit": "c206dff76d081a5126f8497fbabe10995c9b6026",
+    "commit": "f9307f4029f87c79892a5d2832dee4b903038056",
     "path": "alignment-files/alignment-validation",
     "author": "GPTomics",
     "author_url": "https://github.com/GPTomics",
@@ -13,7 +13,7 @@
       "repository": "GPTomics/bioSkills",
       "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
     },
-    "url": "https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/alignment-validation"
+    "url": "https://github.com/mrsonord2240/bioSkills/tree/f9307f4029f87c79892a5d2832dee4b903038056/alignment-files/alignment-validation"
   },
   "audit": {
     "method": {
@@ -31,11 +31,11 @@
     "commissioned_by": "Samuel Nord",
     "test_data": "synthetic"
   },
-  "supersedes": null,
+  "supersedes": "mrsonord2240-bioSkills@c206dff",
   "files": {
     "report": "report.json",
     "viewer": "viewer.md",
     "fixes": "fixes.md",
-    "scripts": 40
+    "scripts": 54
   }
 }

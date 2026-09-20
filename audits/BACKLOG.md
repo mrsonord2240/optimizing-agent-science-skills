@@ -8,63 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (102)
-
-### `bio-alignment-validation` — Validators miss unplaced unmapped reads: false PASS at 70% mapped
-
-- Skill: 66, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/alignment-validation) · [viewer](skills/bio-alignment-validation/mrsonord2240-bioSkills@c206dff/viewer.md)
-- Observed in inputs: 7, 1
-- Problem: validate_alignment.py (bam.fetch()) and the usage-guide AlignmentValidator (get_index_statistics()) never see reads with RNAME '*', so a BAM with 30% unmapped reads prints 'Mapped 100.0%' and 'All metrics within normal range'. The SKILL.md bash script reports the true 70.00%.
-- Root cause: pysam fetch() without until_eof and per-contig index statistics exclude unplaced unmapped reads; nothing cross-checks against flagstat.
-- Fix: Iterate with fetch(until_eof=True) or take mapped/total from `samtools flagstat` primary counts (and add the idxstats '*' line), skip secondary/supplementary in every rate, and add a planted 30%-unmapped fixture to the examples.
-
-### `bio-alignment-validation` — Validators exit 0 on failure and print no verdict
-
-- Skill: 66, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/alignment-validation) · [viewer](skills/bio-alignment-validation/mrsonord2240-bioSkills@c206dff/viewer.md)
-- Observed in inputs: 4, 7
-- Problem: validate_alignment.py prints 'WARNINGS: ...' and exits 0; validate_alignment.sh and the SKILL.md script exit 0 on a missing or truncated BAM after printing 'Mapped: / (%)' and 40+ stderr lines, and print no pass/warn/fail although the section Approach promises it.
-- Root cause: No `set -euo pipefail`, no file/quickcheck precondition, no sys.exit status, no threshold logic in the bash script.
-- Fix: Start every script with `test -s "$BAM" && samtools quickcheck "$BAM" \|\| { echo ...; exit 2; }`, quote all variables, and exit 1 when any threshold is not met (python: sys.exit(1)).
-
-### `bio-alignment-validation` — bc truncates before multiplying: 99.96% prints as 90.0% / 99.00%
-
-- Skill: 66, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/alignment-validation) · [viewer](skills/bio-alignment-validation/mrsonord2240-bioSkills@c206dff/viewer.md)
-- Observed in inputs: 1, 4
-- Problem: validate_alignment.sh uses scale=1 with `$mapped/$total*100`, printing 'Mapped: 5642 / 5644 (90.0%)'; the SKILL.md script and usage-guide use scale=2 and print 99.00%. Any rate from 90.0 to 99.99 prints as 90.0 in the shipped script, on the WARN band of the Skill's own table.
-- Root cause: Division is truncated at `scale` digits before the *100.
-- Fix: Multiply first: `echo "scale=2; 100*$mapped/$total" \| bc`, or use awk '{printf "%.2f", 100*$1/$2}'.
-
-### `bio-alignment-validation` — Strand-balance value printed by the bash snippets is not the quantity the 0.48-0.52 band describes
-
-- Skill: 66, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/alignment-validation) · [viewer](skills/bio-alignment-validation/mrsonord2240-bioSkills@c206dff/viewer.md)
-- Observed in inputs: 1, 5
-- Problem: 'Calculate Strand Ratio' and validate_alignment.sh print F/R = 1.0007 for a balanced BAM while the Strand Balance text, Quality Thresholds table and usage-guide define Good as 0.48-0.52 (a forward fraction, which validate_alignment.py prints as 0.500). An agent applying the table to the bash output flags every BAM.
-- Root cause: Two definitions (F/R vs F/(F+R)) used interchangeably.
-- Fix: Print forward/(forward+reverse) in every snippet, label it, and count only mapped primary reads (-F 2308 for the forward count).
-
-### `bio-alignment-validation` — M5 diff false-alarms without M5 tags and cannot see name or assignment errors
-
-- Skill: 66, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/alignment-validation) · [viewer](skills/bio-alignment-validation/mrsonord2240-bioSkills@c206dff/viewer.md)
-- Observed in inputs: 3
-- Problem: Real BAMs from bwa/minimap2/STAR carry no M5 (7 of 8 inspected here), so the snippet exits 1 against their own reference; a chr22 vs 22 rename or two contigs with swapped M5 give rc 0 although 'chr vs no-chr' is listed as a covered failure mode.
-- Root cause: Only the sorted M5 values are compared; SN and LN are dropped and missing M5 is not treated as 'cannot verify'.
-- Fix: Compare `SN LN M5` triples (`cut -f2-4`), report 'no M5 in BAM header: compare SN/LN against samtools dict instead' when absent, and state that renaming is detected by SN, not M5.
-
-### `bio-alignment-validation` — Example python validator crashes on empty, all-unmapped and unindexed BAMs
-
-- Skill: 66, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/alignment-validation) · [viewer](skills/bio-alignment-validation/mrsonord2240-bioSkills@c206dff/viewer.md)
-- Observed in inputs: 4
-- Problem: ZeroDivisionError on empty and all-unmapped BAMs; bare ValueError on any BAM without an index, which rejects valid name-sorted and unsorted-UMI real files; the header always prints the requested sample size ('sampled 100000 reads') rather than the count actually read.
-- Root cause: No guards on total/len(mapqs) and bam.fetch() requires an index.
-- Fix: Use until_eof=True (no index needed), handle zero totals with a clear message and exit code, print the actual n sampled.
-
-### `bio-alignment-validation` — CI-safe integrity one-liner rejects small valid BAMs
-
-- Skill: 66, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/alignment-validation) · [viewer](skills/bio-alignment-validation/mrsonord2240-bioSkills@c206dff/viewer.md)
-- Observed in inputs: 2
-- Problem: Hard-coded `-gt 1000` makes the one-liner exit 1 on valid 100-, 200- and 500-read BAMs, so it cannot be dropped into a pipeline unmodified.
-- Root cause: Illustrative threshold presented as a general check.
-- Fix: Make the minimum a variable (`MIN=${MIN_READS:-1}`) or drop the count test and keep quickcheck plus `samtools view -c` as the decode check.
+## P1 (95)
 
 ### `bio-bam-statistics` — Mean-depth and >=Nx recipes divide by covered positions
 
@@ -826,47 +770,7 @@ None open.
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (384)
-
-### `bio-alignment-validation` — Production IGNORE recipe removes checks that catch real defects
-
-- Skill: 66, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/alignment-validation) · [viewer](skills/bio-alignment-validation/mrsonord2240-bioSkills@c206dff/viewer.md)
-- Observed in inputs: 2
-- Problem: `IGNORE=INVALID_MAPPING_QUALITY IGNORE=MISMATCH_FLAG_MATE_NEG_STRAND` is presented as 'expected-but-noisy' with no condition; on the planted files it turns 40, 2 and 2820 real errors into 'No errors found'. Picard also flags legitimate region slices (MATE_NOT_FOUND on the 1000G slice) with no note.
-- Root cause: Ignore list copied without an evidence trail for when these errors are benign.
-- Fix: State which aligner/pipeline emits these errors benignly, or drop the example; add a line that MATE_NOT_FOUND is expected on region-extracted BAMs.
-
-### `bio-alignment-validation` — Per-chromosome and aneuploidy awk snippets are brittle
-
-- Skill: 66, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/alignment-validation) · [viewer](skills/bio-alignment-validation/mrsonord2240-bioSkills@c206dff/viewer.md)
-- Observed in inputs: 5
-- Problem: Loop hard-coded to chr1-chr3 (bc 'Divide by zero' when a strand has zero reads or the contig is absent); idxstats awk dies on the '*' line (length 0); aneuploidy awk needs gawk (mawk: 'function asort never defined'; other non-GNU awks were not tested), divides by a zero median, and its regex leaves 824 of 846 contigs (chr1_KI270706v1_random, HLA, alt) in the median.
-- Root cause: Snippets written against one GRCh38 layout and one awk.
-- Fix: Drive the loop from `samtools idxstats \| awk '$3>0'`, skip length-0 lines, guard zero denominators, state 'requires gawk', and restrict to ^(chr)?([0-9]+)$.
-
-### `bio-alignment-validation` — verifybamid2 prefix, Picard units and GC-bias band do not match the tools
-
-- Skill: 66, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/alignment-validation) · [viewer](skills/bio-alignment-validation/mrsonord2240-bioSkills@c206dff/viewer.md)
-- Observed in inputs: 6, 1
-- Problem: --SVDPrefix /resources/1000g.b38.vcf.gz.SVD matches no released file (released prefix ends .dat; run gives 'Open file ...SVD.bed failed, exit!'); Picard reports fractions (0.9996, 0.002) while the table lists percentages; the 1.2x GC-bias band is tied to no Picard column; Related Skills use folder names without the bio- prefix.
-- Root cause: Placeholders and units not checked against tool output.
-- Fix: Use `1000g.phase3.10k.b38.vcf.gz.dat`, note Picard fractions x100, name the GC-bias metric (e.g. min/max NORMALIZED_COVERAGE or GC_DROPOUT), and use the frontmatter names.
-
-### `bio-alignment-validation` — Mean-MAPQ helper counts unmapped reads; thresholds disagree across files
-
-- Skill: 66, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/alignment-validation) · [viewer](skills/bio-alignment-validation/mrsonord2240-bioSkills@c206dff/viewer.md)
-- Observed in inputs: 5
-- Problem: `awk '{sum+=$5}'` over all records gives 41.995 vs 59.99 on the 30%-unmapped fixture; the table calls mean MAPQ >40 'Good', the script warns at <30, and the text says mean MAPQ is misleading. Strand, pairing and MAPQ bands are hard-coded in SKILL.md, usage-guide and the script.
-- Root cause: No single source of thresholds; helper lacks -F 4.
-- Fix: Use `samtools view -F 2308`, prefer the MAPQ>=30 fraction the text recommends, and keep one threshold table (the usage-guide should point to it).
-
-### `bio-alignment-validation` — usage-guide duplicates SKILL.md and small text inconsistencies
-
-- Skill: 66, Beta Only · [mrsonord2240/bioSkills@c206dff](https://github.com/mrsonord2240/bioSkills/tree/c206dff76d081a5126f8497fbabe10995c9b6026/alignment-files/alignment-validation) · [viewer](skills/bio-alignment-validation/mrsonord2240-bioSkills@c206dff/viewer.md)
-- Observed in inputs: —
-- Problem: About half of usage-guide.md re-states SKILL.md (flagstat, pairing/strand calculations, insert-size python, Picard commands, a second validator class with the fetch() blind spot). The ATAC bullet says a missing ~180 bp peak = over-transposition while the paragraph adds under-titration; 'sample-swap rates of 0.5-1%' and 'FREEMIX > 0.03' are unsourced.
-- Root cause: Two documents evolved separately.
-- Fix: Keep prompts, workflow and troubleshooting in usage-guide and remove every command block that also lives in SKILL.md; cite or soften the swap-rate and FREEMIX statements.
+## P2 (388)
 
 ### `bio-bam-statistics` — Cross-check identity and 'primary' table row ignore QC-failed and secondary
 
@@ -1243,6 +1147,78 @@ None open.
 - Problem: Description still says 'Predict' (no prediction path); the Hamamsy 2024 (TM-Vec) reference outlives the deleted pLM section; example __main__ blocks keep placeholder names; foldseek_search dumps Foldseek's parameter table on every call; SKILL.md is one 330-line file with no references/ split.
 - Root cause: Deletions and rewrites did not sweep the description, reference list and examples.
 - Fix: Reword the description ('Score and superpose...'), drop the Hamamsy reference, add -v 1 to the Foldseek calls and read paths from argv in the examples.
+
+### `bio-alignment-validation` — Crosscheck misses a swap when both BAMs share RG ID/PU
+
+- Skill: 85, Limited Release · [mrsonord2240/bioSkills@f9307f4](https://github.com/mrsonord2240/bioSkills/tree/f9307f4029f87c79892a5d2832dee4b903038056/alignment-files/alignment-validation) · [viewer](skills/bio-alignment-validation/mrsonord2240-bioSkills@f9307f4/viewer.md)
+- Observed in inputs: 6
+- Problem: With the Skill's CrosscheckFingerprints command, two BAMs that both carry read group ID:1 PU:1 collapse into one group: RESULT EXPECTED_MATCH, LOD 7.7, exit 0, also with EXPECT_ALL_GROUPS_TO_MATCH=true, although the genotypes differ at every planted site.
+- Root cause: Picard groups by read group by default and the added tumor/normal block does not say the two BAMs need distinct read-group IDs / PUs.
+- Fix: Add CROSSCHECK_BY=FILE (or give each BAM a unique RG ID and PU) to the tumor/normal command and one sentence on the collapse; measured: CROSSCHECK_BY=FILE LOD -64.4, rc 1 under EXPECT_ALL_GROUPS_TO_MATCH=true.
+
+### `bio-alignment-validation` — Picard chart commands need R; Skill never says so
+
+- Skill: 85, Limited Release · [mrsonord2240/bioSkills@f9307f4](https://github.com/mrsonord2240/bioSkills/tree/f9307f4029f87c79892a5d2832dee4b903038056/alignment-files/alignment-validation) · [viewer](skills/bio-alignment-validation/mrsonord2240-bioSkills@f9307f4/viewer.md)
+- Observed in inputs: 1, 6
+- Problem: CollectInsertSizeMetrics H= and CollectGcBiasMetrics CHART= exit 1 and leave no metrics file when Rscript is missing ('R is not installed on this machine...'). SKILL.md lists no R prerequisite.
+- Root cause: Version Compatibility names samtools, picard, pysam, matplotlib, numpy only.
+- Fix: Add R to the install line, or say the chart options need Rscript and that omitting H= / CHART= still writes the metrics (measured: CollectInsertSizeMetrics without H= wrote its metrics file).
+
+### `bio-alignment-validation` — validate_alignment.sh prints FAIL, rc 1 on unreadable CRAM
+
+- Skill: 85, Limited Release · [mrsonord2240/bioSkills@f9307f4](https://github.com/mrsonord2240/bioSkills/tree/f9307f4029f87c79892a5d2832dee4b903038056/alignment-files/alignment-validation) · [viewer](skills/bio-alignment-validation/mrsonord2240-bioSkills@f9307f4/viewer.md)
+- Observed in inputs: 4
+- Problem: On a CRAM whose reference cannot be resolved the mean-MAPQ pipeline fails silently: 'Mean MAPQ: ' is blank and the verdict is 'FAIL: Mean MAPQ' with exit 1 (should be 2). The python validator returns rc 2.
+- Root cause: samtools view -c never decodes bases, so the quickcheck and count preconditions pass; the later `samtools view \| awk` errors are not checked.
+- Fix: Decode once up front (samtools view -c on the CRAM with the reference, or check the exit status of the MAPQ pipeline) and exit 2; or state that CRAM needs REF_PATH / -T.
+
+### `bio-alignment-validation` — 'R= enables the NM/MD checks' overstates Picard
+
+- Skill: 85, Limited Release · [mrsonord2240/bioSkills@f9307f4](https://github.com/mrsonord2240/bioSkills/tree/f9307f4029f87c79892a5d2832dee4b903038056/alignment-files/alignment-validation) · [viewer](skills/bio-alignment-validation/mrsonord2240-bioSkills@f9307f4/viewer.md)
+- Observed in inputs: 8
+- Problem: With R=, ValidateSamFile reported INVALID_TAG_NM 40 for the inflated NM tags but 'No errors found' for 40 shifted MD tags that samtools calmd shows are wrong.
+- Root cause: The comment on the ValidateSamFile line was written for NM only.
+- Fix: Write '(R= enables the NM check)' and point to samtools calmd for MD.
+
+### `bio-alignment-validation` — usage-guide still says forward/reverse ratio
+
+- Skill: 85, Limited Release · [mrsonord2240/bioSkills@f9307f4](https://github.com/mrsonord2240/bioSkills/tree/f9307f4029f87c79892a5d2832dee4b903038056/alignment-files/alignment-validation) · [viewer](skills/bio-alignment-validation/mrsonord2240-bioSkills@f9307f4/viewer.md)
+- Observed in inputs: —
+- Problem: Three example prompts and step 4 of 'What the Agent Will Do' still ask for the forward/reverse ratio; SKILL.md says the 0.48-0.52 quantity is the forward fraction and warns against F/R.
+- Root cause: The strand section was corrected in SKILL.md and the scripts but the guide's wording was not.
+- Fix: Replace 'forward/reverse strand ratio' by 'forward fraction F/(F+R)' in the guide.
+
+### `bio-alignment-validation` — Picard noise note is incomplete
+
+- Skill: 85, Limited Release · [mrsonord2240/bioSkills@f9307f4](https://github.com/mrsonord2240/bioSkills/tree/f9307f4029f87c79892a5d2832dee4b903038056/alignment-files/alignment-validation) · [viewer](skills/bio-alignment-validation/mrsonord2240-bioSkills@f9307f4/viewer.md)
+- Observed in inputs: 2
+- Problem: The valid nanopore BAM draws HEADER_RECORD_MISSING_REQUIRED_TAG 3, INVALID_TAG_NM 22 and MISSING_PLATFORM_VALUE 3 from Picard; the note lists only MATE_NOT_FOUND, MISSING_TAG_NM and RECORD_OUT_OF_ORDER.
+- Root cause: The note was drawn from short-read data.
+- Fix: Add one clause: long-read BAMs also draw header (@RG PL / required tag) and NM-convention errors.
+
+### `bio-alignment-validation` — Validators grade tiny inputs and disagree on edge files
+
+- Skill: 85, Limited Release · [mrsonord2240/bioSkills@f9307f4](https://github.com/mrsonord2240/bioSkills/tree/f9307f4029f87c79892a5d2832dee4b903038056/alignment-files/alignment-validation) · [viewer](skills/bio-alignment-validation/mrsonord2240-bioSkills@f9307f4/viewer.md)
+- Observed in inputs: 4, 9
+- Problem: One- and two-read BAMs print 'FAIL: Strand balance' rc 1 with no small-sample note; -n output has no bias warning; python rc 1 vs shell rc 2 on an unaligned BAM without @SQ.
+- Root cause: No minimum-n guard and no shared precondition between the two implementations.
+- Fix: Print 'too few reads to grade strand/pairing (n<...)' instead of a grade below a threshold n, print the -n bias warning in the output, and make both scripts treat a no-@SQ BAM the same way.
+
+### `bio-alignment-validation` — Cost of the whole-file default
+
+- Skill: 85, Limited Release · [mrsonord2240/bioSkills@f9307f4](https://github.com/mrsonord2240/bioSkills/tree/f9307f4029f87c79892a5d2832dee4b903038056/alignment-files/alignment-validation) · [viewer](skills/bio-alignment-validation/mrsonord2240-bioSkills@f9307f4/viewer.md)
+- Observed in inputs: 5
+- Problem: The python validator keeps every mapped read's MAPQ in a list (149 MB at 5.6M reads, ~1.9 GB extrapolated to 100M) and the shell validator makes ~10 passes (124 s at 5.6M reads).
+- Root cause: Metrics computed from full lists rather than counters; one samtools call per metric.
+- Fix: Use counters for MAPQ and insert size, and take shell counts from one `samtools flagstat` / `stats` pass.
+
+### `bio-alignment-validation` — Description omits integrity and contamination triggers
+
+- Skill: 85, Limited Release · [mrsonord2240/bioSkills@f9307f4](https://github.com/mrsonord2240/bioSkills/tree/f9307f4029f87c79892a5d2832dee4b903038056/alignment-files/alignment-validation) · [viewer](skills/bio-alignment-validation/mrsonord2240-bioSkills@f9307f4/viewer.md)
+- Observed in inputs: —
+- Problem: The frontmatter description names metrics only; the body also covers file integrity, dictionary identity, contamination and sample swap.
+- Root cause: Description not updated when those sections were added.
+- Fix: Add 'BAM integrity, reference dictionary match, contamination / sample swap' to the description.
 
 ### `bio-single-cell-doublet-detection` — The lineage co-expression heuristic needs an ambient caveat where it is stated
 
