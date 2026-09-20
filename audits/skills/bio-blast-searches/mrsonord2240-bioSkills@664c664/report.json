@@ -1,0 +1,221 @@
+{
+  "meta": {
+    "skill_name": "bio-blast-searches",
+    "description": "Run remote BLAST searches against NCBI servers using Biopython Bio.Blast.NCBIWWW. Use when identifying unknown sequences, finding homologs, picking the correct BLAST program (blastn/blastp/blastx/tblastn/tblastx/psiblast/megablast/dc-megablast), interpreting Karlin-Altschul E-values, avoiding the max_target_seqs trap (Shah 2019), choosing composition-based statistics, or limiting searches by organism. Covers RID lifecycle, database choice (nt/nr/refseq_select/swissprot), word-size and CBS taxonomy.",
+    "evaluated_on": "2026-09-19",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "mrsonord2240/bioSkills@664c664:database-access/blast-searches",
+    "reaudit_of": "F:/OpenScience/audits/_pre-fix-20260919/bio-blast-searches (score 83, Limited Release)",
+    "fix_log": "F:/optimizing-agent-science-skills/fixes/bio-blast-searches.md"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All citations (Karlin & Altschul 1990, Altschul et al. 1990/1997, Yu et al. 2006, Shah et al. 2019, Camacho et al. 2009, Rost 1999) remain real, correctly attributed papers, now split correctly between SKILL.md and the new references/statistics.md; no fabricated DOIs/PMIDs/statistics anywhere, including in this re-audit's own outputs." },
+      "practice_boundaries": { "result": "PASS", "detail": "Pure bioinformatics database-query tool; no diagnostic, prescriptive, or clinical claims in scope or in any output." },
+      "methodological_ground": { "result": "PASS", "detail": "The one imprecise claim from the prior audit (megablast 'zero hits' on cross-species query) is now corrected to 'reduced or missing... not necessarily zero' with the citing evidence inline. No principled statistical fallacy found anywhere." },
+      "code_usability": { "result": "PASS", "detail": "Both code defects found in the prior audit (PAM30 short-peptide pattern missing gapcosts; megablast/dc-megablast documented as invalid program= values) are fixed and independently reverified live in THIS re-audit, on sequences neither the original auditor nor the fixer used: PAM30 short-peptide search on human insulin B-chain residues 1-15 (gapcosts='9 1') -> 82 real hits, top matches genuine insulin/insulin-B-chain Swiss-Prot records at 15/15 identity; corrected megablast (program='blastn', megablast=True) on a live-fetched human ACTB mRNA window -> 12 real alignments, exact self-hit plus genuine mouse/rat actin orthologs and human paralogs. Both unfixed forms were also independently regression-tested and confirmed to still fail exactly as the prior audit described (NCBI ValueError, instant). Every code pattern in the Skill now runs correctly as documented." }
+    }
+  },
+  "static_score": {
+    "subtotal": 96,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 12, "max": 12, "note": "Completeness 4/4 (unchanged, full promised scope covered). Correctness raised from 2/4 to 4/4: all three inaccuracies found pre-fix (PAM30 crash, megablast crash, wrong empty-defline symptom) are now fixed and independently reverified live in this re-audit on fresh sequences (insulin B-chain peptide, human ACTB mRNA); the softened cross-species claim also now matches evidence. Appropriateness 4/4 (unchanged)." },
+      "reliability": { "score": 10, "max": 12, "note": "Error Reporting raised to 4/4: the Common Errors table now lists the exact NCBI ValueError text for both previously-crashing patterns together with their one-line fixes, both confirmed correct live. Fault Tolerance and Recoverability remain 3/4 each -- no example script demonstrates try/except around any of the six documented Failure Modes; an agent must translate table entries into code itself." },
+      "performance_context": { "score": 8, "max": 8, "note": "Token Cost raised to 4/4: the new references/statistics.md correctly defers the Karlin-Altschul derivation and full CBS mode table (depth not needed for the two day-to-day decisions) out of SKILL.md, which stays under 500 lines. Execution Efficiency unchanged at 4/4 (linear program->db->submit->parse->filter workflow, no redundant round-trips)." },
+      "agent_usability": { "score": 16, "max": 16, "note": "Consistency raised to 4/4: the new 'qblast() API note' under Program decision explicitly reconciles the table's megablast/dc-megablast entries with the real Biopython call signature, removing the table-vs-code contradiction the prior audit flagged. Learnability, Feedback Design, and Error Prevention unchanged at 4/4, 3/4, 4/4 respectively -- output-format contract is still implicit, shown only via example print() statements." },
+      "human_usability": { "score": 8, "max": 8, "note": "Forgiveness raised to 4/4: the two parameter slips an agent would naturally make from reading the Skill's own tables (PAM30 without gapcosts, program='megablast') are now both called out inline with the exact NCBI error text and the one-line fix, alongside the pre-existing empty-defline warning. Discoverability unchanged at 4/4." },
+      "security": { "score": 12, "max": 12, "note": "Unchanged. No credentials of any kind (remote BLAST is unauthenticated), no eval/exec of user strings, sequences pass through Biopython's own request-building code to a public NCBI CGI endpoint." },
+      "maintainability": { "score": 11, "max": 12, "note": "Modularity raised to 4/4: references/statistics.md now gives the deep quantitative content (E-value derivation, CBS mode table, twilight-zone note) its own home, matching the alignment-trimming precedent the prior audit cited as missing. Modifiability raised to 4/4 (the new references/ split establishes a clear extension point for future quantitative content). Testability unchanged at 3/4 -- the 3 example scripts remain directly re-runnable and gave verifiable output, but there is still no automated test harness." },
+      "agent_specific": { "score": 19, "max": 20, "note": "Progressive Disclosure raised from 3/4 to 4/4 with the references/ split, resolving the single point the prior audit docked. Trigger Precision, Composability, Idempotency-disclosure, and Escape Hatches unchanged at 4/4, 4/4, 4/4, 3/4." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 91.3,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 27, "total": 28 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Identify an unknown partial DNA sequence via BLASTN (reproducible db)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Unaffected by the fix; not independently re-run this session (unchanged code path, already live-verified in the prior audit: 61.6s, top hit NM_000518 HBB self-hit, 100% id/cov). Reused per the fix-verification dispatch, which scoped fresh live calls to the two fixed patterns.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Uses a reproducible database (refseq_select_rna) rather than nt, per the Skill's own guidance", "result": "PASS", "note": "Matches SKILL.md's explicit reproducibility recommendation" },
+          { "text": "hitlist_size set large (500) to avoid the max_target_seqs trap", "result": "PASS", "note": "hitlist_size=500 as documented" },
+          { "text": "Top hit is the correct self-match", "result": "PASS", "note": "NM_000518 HBB, 100% id/cov (prior audit's live evidence)" },
+          { "text": "Results sorted/filtered by bit-score, not raw E-value", "result": "PASS", "note": "top_n_by_bitscore() used verbatim" },
+          { "text": "Code ran unmodified from the SKILL.md reference pattern", "result": "PASS", "note": "Zero code changes needed" }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Find mammalian homologs of human hemoglobin alpha in Swiss-Prot",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Unaffected by the fix; not independently re-run this session (unchanged code path, already live-verified in the prior audit: 241.4s, top hit P69905 human HBA, 100% identity, 200 real Swiss-Prot hits).",
+        "basic": 37,
+        "specialized": 57,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "entrez_query pre-filter used for organism restriction rather than post-filtering", "result": "PASS", "note": "Matches SKILL.md's stated rationale" },
+          { "text": "composition_based_statistics=2 set explicitly", "result": "PASS", "note": "As documented" },
+          { "text": "Top hit is a correct, real Mammalia Swiss-Prot alpha-globin record", "result": "PASS", "note": "P69905, 100% identity (prior audit's live evidence)" },
+          { "text": "Code ran unmodified from the SKILL.md reference pattern", "result": "PASS", "note": "Zero code changes needed" }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "BLAST a short proteomics peptide (short-query PAM30 parameters) -- fix verification",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Previously ERROR (P1 finding #2). Independently re-verified live in THIS re-audit on a peptide neither the original auditor nor the fixer used: human insulin B-chain residues 1-15 (FVNQHLCGSHLVEAL). Regression check confirmed the UNFIXED pattern (no gapcosts) still fails instantly (0.5s, identical NCBI ValueError). Fixed pattern (gapcosts='9 1') succeeded: 82 hits, top 7 all genuine insulin/insulin-B-chain Swiss-Prot records at 15/15 identity (E=2.7e-3 to 9.6e-3, permissive range as documented). New finding: this run took 1141.5s (19.0 min), far exceeding both the Skill's own '30-60s typical' framing and the prior audit's 181.4s benchmark for the same code pattern -- Biopython itself raised the >10-minute warning. Likely NCBI queue congestion (several other audits were concurrently hitting NCBI on this machine) rather than a Skill defect, but the Skill gives no guidance that permissive/short-peptide searches can spike an order of magnitude beyond its documented ranges.",
+        "basic": 35,
+        "specialized": 54,
+        "total": 89,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Parameters (PAM30/word=2/CBS=3/expect=1000/gapcosts='9 1') match the Skill's short-peptide guidance", "result": "PASS", "note": "Now fully consistent with the word-size/gap-cost table" },
+          { "text": "Code pattern executes without error as documented, using gapcosts='9 1'", "result": "PASS", "note": "Confirmed live on an independent peptide; unfixed form independently reconfirmed to still fail" },
+          { "text": "Results are real, biologically correct top hits for the query peptide", "result": "PASS", "note": "82 hits; top hits are genuine insulin/insulin-B-chain Swiss-Prot records at 100% identity" },
+          { "text": "Observed latency stays within the Skill's documented range for this pattern (no order-of-magnitude spikes)", "result": "FAIL", "note": "1141.5s observed vs. 181.4s in the prior audit and '30-60s typical' in SKILL.md's opening line -- not warned about anywhere" }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Whether E-values from an nr search and a swissprot search can be compared directly",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Reasoning-only input (no code artifact to run), unaffected by the fix. Reassessed against the current SKILL.md's E-value interpretation section (now partly relocated to references/statistics.md) -- content and correctness unchanged. executed=false.",
+        "basic": 37,
+        "specialized": 51,
+        "total": 88,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Correctly states E-values are not comparable across databases of different sizes", "result": "PASS", "note": "Explicit in SKILL.md and references/statistics.md" },
+          { "text": "Recommends bit-score as the correct cross-database metric", "result": "PASS", "note": "Explicit in both files" },
+          { "text": "Reflects the Karlin-Altschul E = K*m*n*exp(-lambda*S) relationship accurately", "result": "PASS", "note": "Formula and citation correct, now in references/statistics.md" },
+          { "text": "Does not fabricate specific numeric values not supplied by the user", "result": "PASS", "note": "Answer stays qualitative/methodological" }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Cross-species mRNA query: megablast vs blastn, plus XML save/reparse -- fix verification",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Previously ERROR (P1 finding #1). Independently re-verified live in THIS re-audit on a gene neither the original auditor nor the fixer used: a 95nt window of human ACTB mRNA (fetched live via Entrez from NM_001101.5 to avoid any hand-transcription error). Regression check confirmed the UNFIXED program='megablast' string still fails instantly (0.0s, identical NCBI ValueError). Fixed pattern (program='blastn', megablast=True) succeeded: 181.6s, 12 real alignments -- exact self-hit (human ACTB, 100% identity) plus genuine cross-species orthologs (mouse Actg1, rat skeletal-muscle actin) and human paralogs (ACTG1, ACTC1, POTE family). Confirms the corrected pattern works and still finds real non-human hits, consistent with the Skill's now-softened 'reduced, not necessarily zero' claim. save_and_parse.py's XML round-trip was not separately re-exercised this session (unchanged, simple file I/O, already confirmed working in the prior audit).",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "megablast invocation works as documented (program='blastn', megablast=True)", "result": "PASS", "note": "Confirmed live on an independent, live-fetched gene (human ACTB)" },
+          { "text": "Corrected pattern documents dc-megablast's template_type/template_length parameters alongside megablast", "result": "PASS", "note": "Present in SKILL.md's 'Requesting megablast / dc-megablast' code pattern" },
+          { "text": "Softened cross-species claim ('reduced or missing... not necessarily zero') matches observed result", "result": "PASS", "note": "Found human self-hit plus real mouse and rat orthologs -- non-zero cross-species hits, as now documented" },
+          { "text": "XML save-to-disk + re-parse round trip (save_and_parse.py pattern) works correctly", "result": "PASS", "note": "Not re-executed this session; unaffected by the fix, already confirmed working live in the prior audit" }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "200 unknown CDS from a new genome assembly -- best BLAST approach?",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Reasoning-only input, unaffected by the fix. Reassessed against the current SKILL.md/usage-guide.md thresholds -- unchanged. executed=false.",
+        "basic": 39,
+        "specialized": 53,
+        "total": 92,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "Identifies 200 sequences as exceeding this Skill's own stated remote-BLAST scope (>50)", "result": "PASS", "note": "SKILL.md: 'For >50 sequences, switch to local-blast or DIAMOND/MMseqs2'" },
+          { "text": "Recommends local-blast and/or remote-homology (DIAMOND/MMseqs2) per the Related Skills section", "result": "PASS", "note": "Both named explicitly" },
+          { "text": "Does not attempt to loop 200 sequential remote qblast() calls", "result": "PASS", "note": "Correct hand-off instead of brute-forcing an NCBI-unfriendly approach" }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Bare sequence, no defline, no parameters stated -- 'just BLAST it' (fix verification, doc-only)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Previously ERROR (P1 finding #3, documentation defect). NOT independently re-executed this session by design -- the dispatch explicitly authorized relying on the prior audit's own captured live evidence (781.4s vs 61.6s, 12.7x penalty; record.query='No definition line') given the ~13-minute cost of reproducing it and the fact that the fixer's change was purely documentary. Verified instead by direct inspection: SKILL.md's Failure Modes and Common Errors sections now state the actual placeholder string and the actual 12.7x latency figure, word-for-word consistent with the prior audit's archived numbers, correcting the previously-wrong 'record.query=None' claim. executed=false.",
+        "basic": 34,
+        "specialized": 53,
+        "total": 87,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Applies the Skill's own reproducibility-first defaults without being told to", "result": "PASS", "note": "blastn + refseq_select_rna, matching Input 1's pattern" },
+          { "text": "SKILL.md's documented latency penalty (12.7x, ~781s vs ~62s) matches the original audit's directly observed values", "result": "PASS", "note": "Previously FAIL pre-fix (undocumented); now stated explicitly in Failure Modes and Common Errors" },
+          { "text": "record.query symptom documented (placeholder string 'No definition line') matches directly observed behavior", "result": "PASS", "note": "Previously FAIL pre-fix (claimed None/empty); now corrected" },
+          { "text": "Search results (alignments, top hit) are correct and unaffected by the missing defline", "result": "PASS", "note": "11 alignments, NM_000518 top hit, per the prior audit's evidence" }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 38.4,
+    "dynamic_weighted": 54.8,
+    "score": 93,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Both P1 code-pattern defects (PAM30 gap-cost rejection, invalid megablast program string) are fixed and independently reverified live in this re-audit on sequences neither the original auditor nor the fixer used -- human insulin B-chain peptide (82 real hits) and a live-fetched human ACTB mRNA window (12 real ortholog/paralog hits).",
+    "Documentation now matches observed reality instead of an assumed one: the empty-defline failure mode states the actual placeholder string and the actual 12.7x latency penalty; the cross-species megablast claim is no longer overstated as 'zero hits'.",
+    "references/statistics.md now gives the Karlin-Altschul derivation and CBS mode table a proper progressive-disclosure home, matching precedent elsewhere in the corpus, while SKILL.md keeps the two decisions that matter day-to-day.",
+    "Canonical and organism-filtered protein search patterns remain correct and reproduce textbook top hits, entirely unaffected by the fix.",
+    "Explicit, correctly-cited misuse warnings (max_target_seqs early-termination trap, Shah et al. 2019) continue to head off one of the most common published-workflow BLAST errors."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "No guidance that permissive/short-peptide searches can spike an order of magnitude beyond documented latency",
+      "observed_in": [3],
+      "problem": "This re-audit's independent PAM30 short-peptide run (gapcosts='9 1', expect=1000, on a different peptide than any prior run) took 1141.5s (19.0 min), versus 181.4s for the same code pattern in the prior audit and SKILL.md's own '30-60s typical' framing for the general case.",
+      "root_cause": "Likely NCBI queue congestion (concurrent audits were hitting NCBI from the same machine) rather than a property of the query itself, but the Skill gives no guidance distinguishing 'this is slow because of your parameters' from 'this is slow because the queue is busy,' and no suggested timeout/retry behavior for either.",
+      "fix": "Add a line to Required Setup or the RID lifecycle section noting that permissive-cutoff, high-hitlist_size, or low-word-size searches (PAM30/word=2/expect=1000 among them) can take substantially longer than the general '30-60s typical' guidance, independent of any code defect, and that an agent should not treat a multi-minute wait on these specific parameter combinations as a hang."
+    },
+    {
+      "priority": "P2",
+      "title": "Failure Modes still has no executable error-handling example",
+      "observed_in": [],
+      "problem": "The Common Errors table now correctly lists the exact NCBI error text for every defect found across both audit rounds, but no example script demonstrates catching and handling any of the six documented Failure Modes in code.",
+      "root_cause": "The Skill is instructional (Mode D); it was authored to describe failure modes in prose rather than to ship a reusable error-handling wrapper.",
+      "fix": "Optional: add one small try/except example around a qblast() call that catches ValueError and looks up the message against the Common Errors table -- not blocking, since the prose guidance is already accurate and complete enough for an agent to act on."
+    }
+  ]
+}
