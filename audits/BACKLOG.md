@@ -14,7 +14,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The example passes cluster_rows=<OLO dendrogram> together with row_split=gene_info$pathway, a combination ComplexHeatmap rejects; the script was never run.
 - Fix: Drop row_split or use a numeric row_split (works with the dendrogram), or apply OLO within each pathway group; supply a runnable data preamble and state the constraint in SKILL.md next to the OLO block.
 
-## P1 (102)
+## P1 (107)
 
 ### `bio-data-visualization-distribution-plots` — The headline R raincloud depends on gghalves, archived and broken on ggplot2 4.x
 
@@ -95,6 +95,46 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: With savefig.bbox=tight the saved page is 89.42 mm (Skill rcParams) or 91.96 mm (example, default pad), over Nature's 89 mm column. The example's so.Plot figure is 162.56 x 121.92 mm with 11-12 pt text and no rasterization.
 - Root cause: bbox tight resizes the figure; so.Plot uses its own theme and size.
 - Fix: For exact size use constrained_layout without bbox tight (or set savefig.pad_inches=0 and state the tolerance); for so.Plot add .layout(size=(w,h)) and .theme(mpl.rcParams) then re-check the size.
+
+### `bio-data-visualization-forest-funnel-plots` — mlab bquote(paste()) prints 'paste', hiding I2/tau2/Q
+
+- Skill: 76, Limited Release · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/forest-funnel-plots) · [viewer](skills/bio-data-visualization-forest-funnel-plots/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 1
+- Problem: In both the SKILL.md forest block and examples/forest_phd.R the pooled-row label renders as the word 'paste' because bquote() returns a call, not an expression; the heterogeneity footer the Skill calls mandatory never appears.
+- Root cause: mlab needs an expression or character; the snippet was never rendered and checked.
+- Fix: Wrap in as.expression(bquote(...)) (verified: prints 'RE Model (Q = 163.16, df = 12; I2 = 92.1%)') or use sprintf() to a character mlab; then add a rendered-output check.
+
+### `bio-data-visualization-forest-funnel-plots` — ggforest is not a subgroup forest and no interaction code is given
+
+- Skill: 76, Limited Release · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/forest-funnel-plots) · [viewer](skills/bio-data-visualization-forest-funnel-plots/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 4
+- Problem: The decision tree and usage guide route 'Cox subgroup forest with interaction p-values' to ggforest, which draws covariate HRs from one additive coxph model and has no interaction argument; per-subgroup treatment HRs and the interaction LRT (p 0.893 here) had to be built by hand.
+- Root cause: ggforest was conflated with a stratified subgroup display; only prose mentions the interaction term.
+- Fix: Rename that section 'multivariable Cox forest', and add a subgroup block: fit treatment*subgroup, extract stratum HRs with CIs, plot with metafor forest or forestplot, annotate the anova() interaction p. Warn that sparse strata (ECOG3 N=1) must be collapsed.
+
+### `bio-data-visualization-forest-funnel-plots` — Shipped example halts at step 8 and never runs step 9
+
+- Skill: 76, Limited Release · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/forest-funnel-plots) · [viewer](skills/bio-data-visualization-forest-funnel-plots/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 4, 5
+- Problem: forest_phd.R stops with object 'clinical_df' not found; step 9 uses undefined bx/bxse/by/byse. Only steps 1-7 are runnable, so the example cannot serve as a test.
+- Root cause: Placeholder data objects are used without definitions or a synthetic fallback.
+- Fix: Define small inline data for steps 8-9 (e.g. survival::lung and MendelianRandomization::ldlc/chdlodds) so the whole script runs, and print the expected values.
+
+### `bio-data-visualization-forest-funnel-plots` — Small-k rules live only in prose; HKSJ overstated at k=3
+
+- Skill: 76, Limited Release · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/forest-funnel-plots) · [viewer](skills/bio-data-visualization-forest-funnel-plots/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 3
+- Problem: The code blocks print I2 at k=3 and run regtest() at k=3 (p=0.028) with no guard, despite the k<5 and k>=10 rules; the text says HKSJ is 'well-calibrated even at k=3' while the k=3 CI here spans OR 0.24-3.36.
+- Root cause: Guards are stated as advice, not encoded; the calibration claim goes beyond IntHout 2014.
+- Fix: Wrap I2 and regtest in if (res$k >= 5) / if (res$k >= 10) with a message otherwise, and soften the HKSJ sentence to 'better calibrated than z-based CIs, still very wide at k<=3'.
+
+### `bio-data-visualization-forest-funnel-plots` — MR forest unreadable with outlier SNP; p-value annotation unsupported
+
+- Skill: 76, Limited Release · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/forest-funnel-plots) · [viewer](skills/bio-data-visualization-forest-funnel-plots/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 5
+- Problem: mr_forest with default SNP rows lets one SNP (CI to 380) set the axis so the four method estimates overlap; the usage guide promises per-method p-value annotation that mr_forest cannot draw.
+- Root cause: No guidance on snp_estimates=FALSE or axis control, and the annotation claim was not tested.
+- Fix: Show mr_forest(..., snp_estimates = FALSE) for the method comparison, note the outlier effect, and either add a ggplot annotation snippet for p-values or delete the promise.
 
 ### `bio-data-visualization-volcano-and-ma-plots` — Threshold line drawn on the wrong axis quantity
 
@@ -832,7 +872,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (450)
+## P2 (454)
 
 ### `bio-data-visualization-distribution-plots` — Wrong bandwidth sentence: nrd (Scott) is 1.178x nrd0, so it oversmooths more
 
@@ -929,6 +969,38 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The Skill does not say to leave R/ggplot users, interactive figures or genome tracks to other Skills.
 - Root cause: Escape hatches only in Related Skills.
 - Fix: Add three lines of scope limits.
+
+### `bio-data-visualization-forest-funnel-plots` — refline = res$b triggers array-recycling warnings
+
+- Skill: 76, Limited Release · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/forest-funnel-plots) · [viewer](skills/bio-data-visualization-forest-funnel-plots/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 2
+- Problem: res$b is a 1x1 matrix; funnel() emits four deprecation warnings under R 4.4.
+- Root cause: Matrix passed where a scalar is expected.
+- Fix: Use refline = res$b[1] or coef(res).
+
+### `bio-data-visualization-forest-funnel-plots` — at= ticks clip most CIs on the BCG forest
+
+- Skill: 76, Limited Release · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/forest-funnel-plots) · [viewer](skills/bio-data-visualization-forest-funnel-plots/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 1
+- Problem: at = log(c(0.25..4)) also sets the plotting range, so 7 of 13 CIs and the PI are cut with arrows.
+- Root cause: Tick set chosen without regard to data range.
+- Fix: Say that at also sets alim, or add alim/xlim so all intervals are shown.
+
+### `bio-data-visualization-forest-funnel-plots` — Frontmatter promises tools with no code; netmeta described as Bayesian
+
+- Skill: 76, Limited Release · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/forest-funnel-plots) · [viewer](skills/bio-data-visualization-forest-funnel-plots/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: —
+- Problem: forestplot (with boxsize), ggforestplot, netmeta and metafor::cumul are named but no snippet exists; netmeta is frequentist yet the table says 'Bayesian or frequentist'.
+- Root cause: Description broader than the body.
+- Fix: Add one short block per promised tool or trim the description; correct the netmeta row.
+
+### `bio-data-visualization-forest-funnel-plots` — usage-guide.md repeats SKILL.md tips; example data contradicts its own lesson
+
+- Skill: 76, Limited Release · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/forest-funnel-plots) · [viewer](skills/bio-data-visualization-forest-funnel-plots/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 2
+- Problem: The Tips list is a near-copy of SKILL.md text; the example's synthetic data give I2 = 0% (so the prediction interval is invisible) and a significant Egger p = 0.0039, unremarked.
+- Root cause: Data were not designed to show the lessons.
+- Fix: Remove the duplicate Tips, and choose example data with visible heterogeneity and a stated Egger outcome.
 
 ### `bio-data-visualization-volcano-and-ma-plots` — EnhancedVolcano 'selectLab filtered by thresholds' does not reproduce
 
