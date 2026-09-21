@@ -49,3 +49,63 @@ human-only, so they moved rather than being deleted:
 - None of the 6 recommendations were left unfixed. The `vina` Python-API `seed`
   kwarg is verified against documentation only (package cannot build on this
   Windows machine at all, a pre-existing constraint, not introduced by this fix).
+
+---
+
+# 2026-09-21 (Production Ready P2 batch)
+
+Worktree `F:\OpenScience\wt\chemoinformatics-virtual-screening`, branch
+`fix/chemoinformatics-virtual-screening` off staging `431aa55`. Commits: `745ffa9` (fix),
+`2158b54` (split), `7dc9c5d` (scripts). Env `cheminformatics-hit-triage-analyst`: Vina 1.2.7 CLI,
+meeko 0.8.0, RDKit 2026.03.6, PoseBusters 0.6.5, pdb2pqr 3.7.1. Data: audit fixture
+`data\rec.pdb` / `lig_benzamidine.pdbqt` (PDB 3PTB), copied to scratchpad.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| Insertion-code failure mode documented too narrowly | P2 | Pitfall note and Common Errors row now state the generic cause (any residue with a PDB insertion code; trypsin 3PTB and elastase 1EAI as examples) | ran: wording matches the audit's runs on 3PTB and 1EAI; the `--pdb-output` route re-ran on 3PTB (receptor PDBQT 162,891 bytes) | |
+| PDBQT->SDF bond-order/charge loss left open | P2 | Replaced the "no clean fix" caveat with a working recipe: meeko `PDBQTMolecule.from_file(..., skip_typing=True)` + `RDKitMolCreate.from_pdbqt_mol` rebuilds the pose from the `REMARK SMILES` that Vina keeps in its output; new Common Errors row | ran: benzamidine docked to 3PTB, `obabel` route PoseBusters 3/12, meeko route 12/12 on all 5 poses; snippet extracted from SKILL.md and executed; also on a ligand freshly made by `examples/virtual_screen.py` | Needs a meeko-written ligand PDBQT (carries the SMILES); caveat says to carry the RDKit `Mol` otherwise. Contradicts the audit's "no clean fix exists": the audit converted with `obabel` only. |
+
+## Redundancy pass
+
+Already done in the 2026-09-19 pass (`usage-guide.md` Tips point at SKILL.md); nothing further
+duplicated. The pointer to "Per-Tool Failure Modes" in `usage-guide.md` now names
+`references/failure-modes.md`.
+
+## Split (commit `2158b54`)
+
+SKILL.md 419 -> 268 lines (405 originally; +14 from the fix). Verbatim moves; no non-blank line lost
+(checked by multiset comparison; only the three decision-tree rows that gained pointers differ);
+moved fences parse.
+
+| old location | new home |
+|---|---|
+| "GNINA with CNN Scoring" section | `references/gnina.md` |
+| "Virtual Screening Pipeline (Hierarchical)" and "Ultralarge Library Screening" | `references/ultralarge-screening.md` |
+| "Per-Tool Failure Modes" and "Reconciliation: Vina vs GNINA" | `references/failure-modes.md` |
+
+SKILL.md gained a "Reference Files" index and pointers in three decision-tree rows.
+
+## Scripts (commit `7dc9c5d`)
+
+SKILL.md 268 -> 214 lines.
+
+| old location | script |
+|---|---|
+| `prepare_receptor()` block, Receptor Preparation | `scripts/prepare_receptor.py` (argparse CLI) |
+| `dock_single()` block, Vina Docking | `scripts/dock_single.py` (Vina API; Vina CLI fallback where the `vina` wheel does not build; positive-energy filter; argparse CLI) |
+| `prepare_ligand()` block, Ligand Preparation | not moved: duplicated `examples/virtual_screen.py`; block deleted, SKILL.md imports the example's function |
+
+Ran as SKILL.md invokes them: `prepare_receptor.py` on 3PTB gave a 162,891-byte PDBQT (same as the
+2026-09-19 run); `dock_single.py` (CLI path) best mode -5.978, byte-identical output over two runs at
+seed 42, all 9 modes negative; the positive-energy filter was exercised with a fabricated +68 mode
+(8 of 9 kept); a bad ligand path raises with Vina's own message. The `vina` Python-API branch is not
+executable here (no Windows wheel) and is checked against the API docs only. `virtual_screen()` in the
+example already carried its own copy of the filter.
+
+## Left unfixed
+
+- Nothing from the audit. The `vina` Python-API branch of `dock_single.py` and `examples/virtual_screen.py`
+  stays unrun: `pip install vina` cannot build on this machine.
+- Not fixed, noticed: `pose_validate`/`drug_like_filter`/`gnina_rescore` in
+  `references/ultralarge-screening.md` remain `NotImplementedError` stubs (orchestrator skeleton, by design).
+  GNINA has no Windows binary, so nothing there was run.
