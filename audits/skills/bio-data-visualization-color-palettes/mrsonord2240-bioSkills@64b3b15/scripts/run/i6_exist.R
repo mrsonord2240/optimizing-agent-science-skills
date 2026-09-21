@@ -1,0 +1,7 @@
+suppressMessages({library(ggsci);library(viridis);library(scico);library(RColorBrewer);library(khroma);library(colorspace);library(ggplot2)})
+fn <- c("scale_color_npg","scale_color_aaas","scale_color_lancet","scale_color_jama","scale_color_jco","scale_color_nejm","scale_color_viridis_c","scale_fill_scico","scale_color_scico","display.brewer.all","brewer.pal","demoplot","deutan","protan","tritan","desaturate","cvd_emulator","palette.colors","colorRampPalette","show_col")
+for (f in fn) cat(sprintf("%-24s %s\n", f, exists(f)))
+cat("khroma palettes containing Crameri names (batlow/vik/roma):", any(c("batlow","vik","roma") %in% rownames(khroma::info())) , "\n")
+info <- khroma::info(); cat("khroma n palettes:", nrow(info), "\n"); print(head(info$palette,60))
+cat("display.brewer.all(colorblindFriendly=TRUE) signature:", paste(names(formals(display.brewer.all)), collapse=","), "\n")
+cat("viridis turbo option ok:", length(viridis(5, option="turbo")), "\n")

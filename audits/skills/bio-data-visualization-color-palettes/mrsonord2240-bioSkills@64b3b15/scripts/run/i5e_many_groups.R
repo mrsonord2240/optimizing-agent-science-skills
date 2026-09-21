@@ -1,0 +1,5 @@
+suppressMessages(library(RColorBrewer))
+w <- function(n, x) writeLines(x, file.path("../data", paste0("pal_", n, ".txt")))
+w("polychrome36", unname(palette.colors(36, "Polychrome 36")))
+w("paired12", brewer.pal(12,"Paired")); w("set3_12", brewer.pal(12,"Set3")); w("alphabet26", unname(palette.colors(26,"Alphabet")))
+cat("Polychrome 36 n:", length(palette.colors(36,"Polychrome 36")), " Paired:", length(brewer.pal(12,"Paired")), "\n")
