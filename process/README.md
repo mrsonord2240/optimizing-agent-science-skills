@@ -9,7 +9,7 @@ if a brief is wrong, the audits it produced are wrong, so change them deliberate
 | `AUDIT_BRIEF.md` | auditor | writing inputs, running the code, scoring, what a report must contain, and how a re-audit of a fixed Skill differs |
 | `FIX_BRIEF.md` | fixer | what counts as an audit-evidenced defect, what is out of scope, how every change is verified, one commit per Skill, the fix log format |
 | `THRESHOLD.md` | all | gates 2 and 3: deployable with no open P0 and a score ≥ 75, and ≥ 85 for a core Skill |
-| `specialists/` | nobody now | parked Specialist material: `CANDIDATES.md`, `AUTHOR_BRIEF.md`, and gates 1 and 4-9 |
+| *(moved)* | nobody now | the Specialist material (`CANDIDATES.md`, `AUTHOR_BRIEF.md`, gates 1 and 4-9) lives in `authoring/` of the `openscience-specialists` repo |
 
 ## The one rule behind all of them
 

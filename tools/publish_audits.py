@@ -10,13 +10,12 @@ Each audited Skill version lands in audits/skills/<skill-id>/<owner>-<repo>@<sha
 
 Usage:
   publish_audits.py --repo F:/optimizing-agent-science-skills --skill ID [--skill ID ...]
-                    [--specialist ID=viable | --specialist ID=not-viable:<failing gate>]
 
 Afterwards regenerate the index: npm run audits:index
 
 Re-running is safe: each version folder is replaced.
 
-AUDITS and SPECIALIST_SRC are the live working area on F: where auditors run — raw outputs and
+AUDITS is the live working area on F: where auditors run — raw outputs and
 generated data stay there and are never published. FIXES is this repository's own fix logs.
 """
 import argparse
@@ -31,7 +30,6 @@ AUDITS = os.environ.get("OASS_AUDITS", "F:/OpenScience/audits")
 # A second fix round on the same day archives under a letter suffix: _pre-fix-20260917b.
 PRE_FIX_RE = re.compile(r"^_pre-fix-(20\d\d)-?(\d\d)-?(\d\d)([a-z]?)$")
 FIXES = os.path.join(REPO_ROOT, "fixes")
-SPECIALIST_SRC = os.environ.get("OASS_SPECIALIST_SRC", "F:/OpenScience/specialist-src")
 
 SOURCE_RE = re.compile(r"^(?P<repository>[\w.-]+/[\w.-]+)@(?P<commit>[0-9a-f]{7,40}):(?P<path>.+)$")
 UPSTREAM_BIOSKILLS = {"repository": "GPTomics/bioSkills", "commit": "d91ed3d563019e649dc854c56ccd62551359488a"}
@@ -354,40 +352,14 @@ def publish_skill(repo, skill_id):
     return previous, name, count
 
 
-def publish_specialist(repo, spec):
-    specialist_id, _, verdict_text = spec.partition("=")
-    verdict, _, gate = verdict_text.partition(":")
-    if verdict not in ("viable", "not-viable"):
-        raise SystemExit(f"--specialist {spec}: verdict must be viable or not-viable[:gate]")
-    source_dir = os.path.join(SPECIALIST_SRC, specialist_id)
-    target = os.path.join(repo, "audits", "specialists", specialist_id)
-    os.makedirs(target, exist_ok=True)
-    with open(os.path.join(source_dir, "AUDIT.md"), encoding="utf-8") as f:
-        write_text(os.path.join(target, "AUDIT.md"), f.read().replace("\r\n", "\n"))
-    recorded_on = None
-    match = re.search(r"\b(20\d\d-\d\d-\d\d)\b", open(os.path.join(target, "AUDIT.md"), encoding="utf-8").read())
-    if match:
-        recorded_on = match.group(1)
-    write_text(os.path.join(target, "verdict.json"), json.dumps({
-        "specialist_id": specialist_id,
-        "verdict": verdict.replace("-", " "),
-        "failing_gate": gate or None,
-        "recorded_on": recorded_on,
-    }, indent=2) + "\n")
-
-
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--repo", required=True)
     parser.add_argument("--skill", action="append", default=[])
-    parser.add_argument("--specialist", action="append", default=[])
     args = parser.parse_args()
     for skill_id in args.skill:
         supersedes, name, count = publish_skill(args.repo, skill_id)
         print(f"{skill_id}: {name} ({count} scripts)" + (f", supersedes {supersedes}" if supersedes else ""))
-    for spec in args.specialist:
-        publish_specialist(args.repo, spec)
-        print(f"specialist {spec}")
 
 
 if __name__ == "__main__":

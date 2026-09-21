@@ -75,18 +75,7 @@ export async function loadAudits(auditsDirectory) {
     });
   }
 
-  const specialists = [];
-  for (const id of await directories(
-    path.join(auditsDirectory, "specialists"),
-  )) {
-    specialists.push({
-      id,
-      verdict: await readJson(
-        path.join(auditsDirectory, "specialists", id, "verdict.json"),
-      ),
-    });
-  }
-  return { skills, specialists };
+  return { skills };
 }
 
 const cell = (text) =>
@@ -115,22 +104,8 @@ const openCounts = (report) =>
 
 const finish = (lines) => `${lines.join("\n").replace(/\n+$/, "")}\n`;
 
-export function renderIndex({ skills, specialists }) {
-  const lines = ["# Audit index", "", GENERATED, "", "## Specialists", ""];
-  if (specialists.length === 0) {
-    lines.push("None recorded yet.", "");
-  } else {
-    lines.push(
-      "| Specialist | Verdict | Failing gate | Recorded | Record |",
-      "| --- | --- | --- | --- | --- |",
-    );
-    for (const { id, verdict } of specialists) {
-      lines.push(
-        `| \`${id}\` | ${cell(verdict.verdict)} | ${cell(verdict.failing_gate ?? "—")} | ${cell(verdict.recorded_on ?? "—")} | [AUDIT.md](specialists/${id}/AUDIT.md) |`,
-      );
-    }
-    lines.push("");
-  }
+export function renderIndex({ skills }) {
+  const lines = ["# Audit index", "", GENERATED, ""];
 
   lines.push(
     "## Skills — latest audit",

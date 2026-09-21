@@ -17,9 +17,12 @@ we made and how that change was verified.
    [`fixes/`].
 3. **Re-audit** — a fresh agent re-scores the fixed Skill, re-running the original inputs as
    regression tests plus new ones of its own.
-4. **Publish** — Skills that pass are bundled into Specialists in
-   [mrsonord2240/openscience-specialists](https://github.com/mrsonord2240/openscience-specialists),
-   which sources Skill content from this repository and cites the audit that justified it.
+4. **Promote** — Skills that did not fail move to the published shelf, `optimized-scientific-skills`,
+   with their audit status flagged (`fix_pass`, `reaudit`).
+
+Turning Skills into Specialists is a separate, parked workflow. Its briefs, gates, candidate audits and
+cross-references live in [`authoring/`](https://github.com/mrsonord2240/openscience-specialists/tree/main/authoring)
+of [mrsonord2240/openscience-specialists](https://github.com/mrsonord2240/openscience-specialists).
 
 Fixes are made in a fork of the original repository. Where that upstream is still maintained they
 go back as pull requests; `GPTomics/bioSkills` was archived on 2026-08-15, so for those Skills the
@@ -31,13 +34,11 @@ fork is the maintained line rather than a staging area.
 | --- | --- |
 | `skills/<upstream>/` | Fixed Skill trees, one directory per upstream source, with `UPSTREAM.json` and the upstream `LICENSE` |
 | `audits/skills/<skill-id>/<owner>-<repo>@<sha7>/` | `report.json`, `viewer.md`, `record.json`, `fixes.md`, and the scripts the auditor ran |
-| `audits/specialists/<id>/` | The candidate's `AUDIT.md` and its viability verdict |
 | `fixes/<skill-id>.md` | What changed, why, and how it was verified, per fix pass |
-| `process/` | The briefs agents follow, and the viability gates |
+| `process/` | The briefs agents follow, and the audit thresholds |
 | `tools/` | `publish_audits.py`, which writes audit records into `audits/` |
 | `scripts/` | `audit-index.mjs`, which generates `audits/INDEX.md` and `BACKLOG.md` (`npm run audits:index`) |
-| `crossref/` | Cross-references between Skill corpora: what duplicates what, and which of two overlapping Skills a Specialist should bundle |
-| `environments/` | How each candidate's runtime was built: interpreters, packages, command-line tools and versions |
+| `environments/` | How each audit runtime was built: interpreters, packages, command-line tools and versions |
 
 ## What is deliberately not here
 

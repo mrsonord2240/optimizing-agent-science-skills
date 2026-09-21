@@ -11,9 +11,6 @@ audits/skills/<skill-id>/<owner>-<repo>@<sha7>/
   fixes.md       present on fixed versions: every change and how it was verified
   scripts/       the scripts the auditor ran, including synthetic-data generators
 
-audits/specialists/<specialist-id>/
-  AUDIT.md       every Skill considered, its score, and the verdict against the gates
-  verdict.json   viable or not viable, and the gate it failed
 ```
 
 One directory per audited version, so a Skill audited before and after a fix keeps both, and
@@ -27,5 +24,5 @@ rebuild the runtime that ran them.
 recommendation, most severe first. Both are generated — don't hand-edit them.
 
 Records are published here by `tools/publish_audits.py`, and the index is regenerated afterwards.
-[mrsonord2240/openscience-specialists](https://github.com/mrsonord2240/openscience-specialists) links
-to these records rather than keeping its own copy.
+The per-candidate Specialist audits moved to `authoring/audits/` in
+[mrsonord2240/openscience-specialists](https://github.com/mrsonord2240/openscience-specialists).

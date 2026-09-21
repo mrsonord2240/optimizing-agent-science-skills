@@ -1,9 +1,9 @@
 # environments/
 
-How each candidate's runtime was built, so an audit can be reproduced: interpreters, packages and
+How each audit runtime was built, so an audit can be reproduced: interpreters, packages and
 command-line tools with their versions, where they came from, and which Skills need them.
 
-One file per candidate, e.g. `mass-spec-proteomics-analyst.md`.
+One file per env, e.g. `mass-spec-proteomics-analyst.md`.
 
 No binaries, no virtual environments, no package libraries — those live outside the repository and are
 rebuilt from these notes.
