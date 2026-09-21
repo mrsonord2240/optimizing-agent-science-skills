@@ -1,0 +1,5 @@
+for (p in c("ComplexUpset","UpSetR","ggplot2","patchwork","msigdbr","dplyr")) cat(p, as.character(packageVersion(p)), "\n")
+print(.libPaths())
+print(names(formals(ComplexUpset::upset)))
+print(names(formals(ComplexUpset::intersection_size)))
+print(formals(ComplexUpset::upset)[c("sort_intersections","sort_intersections_by","mode","min_size","min_degree","max_degree","n_intersections","intersections","set_sizes")])

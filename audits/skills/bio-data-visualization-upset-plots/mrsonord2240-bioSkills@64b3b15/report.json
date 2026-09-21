@@ -1,0 +1,386 @@
+{
+ "meta": {
+  "skill_name": "bio-data-visualization-upset-plots",
+  "description": "Build UpSet plots to visualize set intersections beyond 4 sets (where Venn fails) using ComplexUpset (modern, ggplot2-grammar) or the unmaintained UpSetR, with explicit cardinality vs degree sorting, attribute panels, and query highlighting. Use when comparing overlap across many gene sets, peak sets, variant lists, or any set membership matrix where Venn diagrams become illegible.",
+  "evaluated_on": "2026-09-20",
+  "evaluator_version": "skill-auditor@1.0",
+  "category": "Data Analysis",
+  "execution_mode": "A",
+  "complexity": "Moderate",
+  "n_inputs": 5,
+  "source": "mrsonord2240/bioSkills@64b3b150c9b989c102f7ee69e0bb07c16842d894:data-visualization/upset-plots",
+  "audit_type": "first audit (unmodified upstream GPTomics/bioSkills content)",
+  "executed": true,
+  "execution_note": "Executed 5/5 inputs on the data-visualization env: R 4.4.3 (ComplexUpset 1.3.3, UpSetR 1.4.0, ggplot2 4.0.3, patchwork 1.3.2, msigdbr 26.1.0) and Python 3.12 (upsetplot 0.9.0 in venv-pd2 with pandas 2.3.3, numpy 2.5.3, matplotlib 3.11.2; the main pandas 3.0.6 venv was run to record its failure). Every code block in SKILL.md and both shipped examples were run. Every figure was checked against an independent set-operation truth (two implementations, R and Python, agreed) by reading what was drawn (ggplot_build layer data, grob trees, matplotlib artists) and 11 PNGs were opened. Data: SYNTHETIC planted 8-set data (D is a strict subset of A, H is empty, seed-free by construction), the Skill's own 4-set toy, the shipped example's simulated 6 sets, and REAL MSigDB Hallmark sets (10 immune/inflammatory sets). One extra private ComplexUpset build against ggplot2 3.5.2 was made inside the audit folder to test the Skill's pin advice; no shared env was changed."
+ },
+ "veto_gates": {
+  "skill_veto": {
+   "gate": "PASS",
+   "stability": "PASS",
+   "contract": "PASS",
+   "determinism": "PASS",
+   "security": "PASS"
+  },
+  "research_veto": {
+   "applicable": true,
+   "gate": "PASS",
+   "scientific_integrity": {
+    "result": "PASS",
+    "detail": "No fabricated DOI, statistic or result; the three cited papers (Lex 2014, Conway 2017, Krassowski) are real. Several factual statements do not hold (ComplexUpset 'CRAN active through 2025-07' when 1.3.3 of 2021-12-11 is current, fromList duplicates 'inflate counts', 2^N columns, mode='intersect' as a 1-set fix); recorded as accuracy defects, not invented evidence."
+   },
+   "practice_boundaries": {
+    "result": "PASS",
+    "detail": "Visualization Skill; no diagnostic or prescriptive content."
+   },
+   "methodological_ground": {
+    "result": "PASS",
+    "detail": "Every intersection count the packages draw equals the independent set computation in all 5 inputs (exclusive counts, ordering, set sizes, degree filtering, min_size, subset-of-another set). The Skill's advice creates silently wrong figures in two places (UpSetR nsets=4 on more than 4 sets; NA/blank IDs counted as shared genes) but never inverts a conclusion; both are P1."
+   },
+   "code_usability": {
+    "result": "PASS",
+    "detail": "Borderline. The R route (ComplexUpset block 1, sorting, annotations with columns present, UpSetR block, shipped upset_gene_sets.R) runs and draws correctly. The Python route does not run as shipped on the installed stack: every snippet uses show_counts=True, which raises TypeError at savefig with numpy 2.5.3 even in the pandas-2 venv, the main pandas-3 venv fails earlier with 'Invalid RGBA argument: nan', and the shipped upset_python.py also has a stack-independent bug (data.to_frame() on a DataFrame). With show_counts=False the Python route is correct. Recorded as P1 rather than a veto because the R route is the Skill's stated primary tool and a workaround exists; a Python-only user would be blocked."
+   }
+  }
+ },
+ "static_score": {
+  "subtotal": 71,
+  "max": 100,
+  "categories": {
+   "functional_suitability": {
+    "score": 8,
+    "max": 12,
+    "note": "Completeness 3, correctness 2, appropriateness 3. Covers ComplexUpset, UpSetR and upsetplot with sorting, queries and annotations, and the plotted numbers are right. Several stated behaviours do not reproduce: 'duplicates inflate fromList counts', degree sort 'descending' shows 3-set groups first, mode='intersect' does not remove 1-set bars, style_subsets(present=) highlights supersets, intersection_plot_elements is a height not a cap, 1023 columns for 10 sets (137 real)."
+   },
+   "reliability": {
+    "score": 7,
+    "max": 12,
+    "note": "Fault tolerance 2, error reporting 2, recoverability 3. Empty sets are dropped without a message by ComplexUpset and UpSetR, UpSetR nsets=4 silently keeps only the 4 largest sets, NA and '' IDs count as shared genes, a second upset_query on an empty intersection crashes render with a cryptic aesthetics error, upsetplot fails at savefig."
+   },
+   "performance_context": {
+    "score": 5,
+    "max": 8,
+    "note": "Token cost 2, efficiency 3. 248-line SKILL.md plus an 88-line usage-guide.md that restates the same tips, failure modes and prompts; no references/ layer."
+   },
+   "agent_usability": {
+    "score": 11,
+    "max": 16,
+    "note": "Learnability 3, consistency 2, feedback 3, error prevention 3. Goal/Approach blocks and a failure-mode section help. Inconsistent: text says cardinality sort is the default (true for ComplexUpset, false for upsetplot, whose default is degree), the blocks pair 'descending' with a degree sort the text describes as 1-set first, and a 4-set toy where every bar is 1 cannot show any sorting."
+   },
+   "human_usability": {
+    "score": 6,
+    "max": 8,
+    "note": "Discoverability 4, forgiveness 2. Natural example prompts; off-spec inputs (empty set, NA, more sets than nsets) fail silently instead of asking."
+   },
+   "security": {
+    "score": 11,
+    "max": 12,
+    "note": "No credentials, network, eval or shell. Examples write PDFs/PNGs to the cwd and overwrite silently."
+   },
+   "maintainability": {
+    "score": 7,
+    "max": 12,
+    "note": "Modularity 2, modifiability 3, testability 2. Everything in one SKILL.md plus two examples; the Python example cannot run (to_frame) and its third plot has no working path; no known-answer test data."
+   },
+   "agent_specific": {
+    "score": 16,
+    "max": 20,
+    "note": "Trigger precision 4, progressive disclosure 3, composability 3, idempotency 4, escape hatches 2. Related Skills exist as folders. No guidance on when not to draw an UpSet plot beyond 'too many sets'; both R packages export upset() and the Skill never warns that attaching both masks one."
+   }
+  }
+ },
+ "dynamic_score": {
+  "execution_avg": 70.0,
+  "max": 100,
+  "assertion_pass_rate": {
+   "passed": 13,
+   "total": 25
+  },
+  "inputs": [
+   {
+    "index": 1,
+    "type": "Canonical",
+    "label": "ComplexUpset block 1 verbatim on the Skill's 4 sets, then the same call on SYNTHETIC planted 8 sets (D subset of A, H empty, 14 non-empty exclusive intersections)",
+    "status": "COMPLETED",
+    "status_flag": "✅",
+    "note": "Bars, labels, set sizes and order are exactly right: all 14 planted bars equal the exclusive truth (12 9 7 6 6 5 4 4 3 3 2 2 2 1), set-size bars 30/23/17/13/7/7/6, D never appears without A, PNG opened. Two problems: the Skill's own 4-set example gives eight bars of height 1 so it shows no sorting at all, and the empty set H is dropped from the matrix with no warning or message.",
+    "basic": 33,
+    "specialized": 49,
+    "total": 82,
+    "assertions_passed": 4,
+    "assertions_total": 5,
+    "assertions": [
+     {
+      "text": "Every drawn bar height on the Skill's 4-set example equals the independent exclusive intersection size, the number of columns equals the number of non-empty exclusive combinations, and the bars sum to the union",
+      "result": "PASS",
+      "note": "8 columns, all 1, sum 8 = union 8; extracted from ggplot_build layers, PNG opened"
+     },
+     {
+      "text": "On planted 8-set data every bar equals the set-operation exclusive count and the order is cardinality-descending",
+      "result": "PASS",
+      "note": "14/14 match; R set-ops truth agrees with an independent Python set-ops truth on 19 combos"
+     },
+     {
+      "text": "Set-size bars equal the input list lengths and the subset relation D within A is respected (no D bar without A)",
+      "result": "PASS",
+      "note": "A30 B23 C17 E13 D7 F7 G6; only A-D and A-B-D contain D"
+     },
+     {
+      "text": "Count labels drawn on the bars equal the bar heights",
+      "result": "PASS",
+      "note": "GeomText labels == heights for all columns"
+     },
+     {
+      "text": "An empty input set is reported or drawn rather than silently discarded",
+      "result": "FAIL",
+      "note": "H (0 genes) is absent from the matrix rows G,D,F,E,C,B,A; no warning or message raised (withCallingHandlers only saw the ggplot2 linewidth deprecation)"
+     }
+    ],
+    "executed": true,
+    "execution_note": "Executed: run/i1_canonical_complexupset.R, i1b_planted_cardinality.R, i1c_empty_set_warning.R with run/helpers.R and d0_make_planted.py; PNGs out/i1_block1.png and out/i1b_planted_card.png opened. ggsave emits ggplot2 'size for lines' deprecation warnings from ComplexUpset."
+   },
+   {
+    "index": 2,
+    "type": "Variant A",
+    "label": "ComplexUpset queries (block 3), attribute panels (block 4), degree vs cardinality sort, min_degree/min_size/n_intersections/intersections filters, mode='intersect'",
+    "status": "COMPLETED",
+    "status_flag": "⚠️",
+    "note": "Panels, sorts and filters are numerically right (boxplot medians and significant-fraction bars equal independent per-intersection statistics on all 14 columns; every filter equals the filtered truth). The query block is the failure: with the two queries as written the Skill's own 4-set data raises a cryptic 'Aesthetics must be either length 1' error at render (the second query targets an empty exclusive intersection), and with two existing but non-adjacent targets the highlight bars are drawn as one wide rectangle (width 6.3 instead of 0.9) covering several other bars, on ggplot2 4.0.3 and on 3.5.2. Block 4 as written errors (log2FC and significant are not in df). 'sort_intersections=descending' with sort by degree puts 3-set groups first, opposite to the text; mode='intersect' turns 1-set bars into the full set size instead of removing them.",
+    "basic": 27,
+    "specialized": 38,
+    "total": 65,
+    "assertions_passed": 3,
+    "assertions_total": 5,
+    "assertions": [
+     {
+      "text": "Attribute panels (block 4, with the columns present) draw per-intersection statistics that equal an independent computation",
+      "result": "PASS",
+      "note": "14 boxplot medians == median(log2FC) per membership pattern; 14 stacked significant fractions == mean(significant); PNG opened"
+     },
+     {
+      "text": "min_degree=2, min_size=4, n_intersections=5 and intersections=list(...) each draw exactly the filtered truth",
+      "result": "PASS",
+      "note": "9/9, 8/8, top-5 heights, and 3 requested bars with correct heights"
+     },
+     {
+      "text": "A single upset_query highlights exactly the requested (exclusive) intersection bar and its matrix dots",
+      "result": "PASS",
+      "note": "A&B orange, A&B&D not; PNG opened"
+     },
+     {
+      "text": "The two-query block 3 renders a correct figure (each highlight covers one bar)",
+      "result": "FAIL",
+      "note": "verbatim on the Skill's data: ggsave error (query on empty A&C&D); on planted data two queries render a 6.3-wide overlay; same width bug with ggplot2 3.5.2 (private build), so the Skill's ggplot2 4.0 explanation is incomplete"
+     },
+     {
+      "text": "The documented remedies for single-set dominance behave as described (degree sort groups 1-set first with the Skill's descending setting; mode='intersect' addresses 1-set bars)",
+      "result": "FAIL",
+      "note": "degree + descending gives degrees 3 3 3 2 2 2 2 2 2 1 1 1 1 1; mode='intersect' bars are inclusive (A = 30 = |A|) and 1-set bars stay first"
+     }
+    ],
+    "executed": true,
+    "execution_note": "Executed: run/i2_queries_sort_annotations.R, i2a_query_break.R, i2g_query_geometry.R, i5a_install_cu_gg35.R + i5b_gg35_query_geometry.R (private ComplexUpset built against ggplot2 3.5.2 in R-lib-cu-gg35_private). Logs in run/out/. PNGs i2c, i2f, i2a_block3_query1_only, i5b_gg35_2q opened."
+   },
+   {
+    "index": 3,
+    "type": "Variant B",
+    "label": "Python upsetplot: SKILL.md block verbatim, shipped upset_python.py verbatim, then planted 8-set and its filters, highlight and constructors",
+    "status": "PARTIAL",
+    "status_flag": "❌",
+    "note": "As shipped the Python route does not run. The SKILL block and every line of upset_python.py that draws use show_counts=True, which raises 'only 0-dimensional arrays can be converted to Python scalars' at savefig (root cause: upsetplot 0.9.0 passes a 1-element numpy array from np.diff to Axes.text, numpy 2.5.3 refuses it; show_counts=False, '{:d}' and show_percentages all confirm), and the main venv with pandas 3.0.6 fails earlier with 'Invalid RGBA argument: nan'. Independently, the example's third plot crashes with AttributeError (from_contents returns a DataFrame, not a Series). With show_counts=False and pandas 2.3.3 the results are right: 14/14 planted bars == truth, totals right and the empty set kept as a 0 row, degree/-degree, min_subset_size, max_subset_rank, min/max_degree all equal filtered truth, from_memberships and from_indicators agree. style_subsets(present=[A,B]) also highlights A&B&C and A&B&D (the comment says 'specific intersection'); intersection_plot_elements=15 is plot height, not 'max intersections'; the shipped first plot leaves a stray empty axes.",
+    "basic": 24,
+    "specialized": 36,
+    "total": 60,
+    "assertions_passed": 2,
+    "assertions_total": 5,
+    "assertions": [
+     {
+      "text": "The SKILL.md Python block runs verbatim and saves upset.pdf",
+      "result": "FAIL",
+      "note": "TypeError at savefig (numpy 2.5.3) in venv-pd2; ValueError nan RGBA in the pandas-3 main venv"
+     },
+     {
+      "text": "examples/upset_python.py runs to completion and writes its three PNGs",
+      "result": "FAIL",
+      "note": "fails at the first savefig; after replacing show_counts it writes 2 of 3 PNGs and dies on data.to_frame(); i3d shows a minimal repair draws the catplot panel"
+     },
+     {
+      "text": "With show_counts=False every drawn bar, set total, ordering and filter on the planted 8-set data equals the independent set-operation truth",
+      "result": "PASS",
+      "note": "Q1 to Q6 and five filter configurations all True; drawn from matplotlib artists, PNGs opened"
+     },
+     {
+      "text": "Alternative constructors and duplicate handling behave as the Skill states (from_memberships/from_indicators reproduce the truth; a duplicated element is refused rather than inflating a count)",
+      "result": "PASS",
+      "note": "both == truth; duplicates raise ValueError 'Got duplicate ids in a category' (loud, not silent)"
+     },
+     {
+      "text": "style_subsets(present=['SetA','SetB']) highlights only the specific A-and-B intersection, as the code comment says",
+      "result": "FAIL",
+      "note": "orange columns: A-B, A-B-C (SKILL toy) and A-B, A-B-D, A-B-C (planted); only present=[A,B] with absent=[rest] is exact"
+     }
+    ],
+    "executed": true,
+    "execution_note": "Executed: run/i3_python_upsetplot.py (venv-pd2 and main venv), i3b_showcounts_rootcause.py, i3c_python_planted.py, i3d_example_metadata_part.py, out/ex_py shipped example verbatim and a show_counts=False copy. PNGs out/ex_py/upset_basic.png, upset_customized.png opened. The boxplot medians of the repaired add_catplot were not verified."
+   },
+   {
+    "index": 4,
+    "type": "Stress",
+    "label": "UpSetR route (block verbatim, shipped upset_gene_sets.R verbatim), UpSetR vs ComplexUpset reconciliation, nsets > 4, empty set and duplicate elements",
+    "status": "COMPLETED",
+    "status_flag": "⚠️",
+    "note": "The UpSetR block and the shipped R example run and draw correctly: 40/40 and 30/30 bars of the 6-set simulation equal the exclusive truth, order non-increasing, both example queries highlight exactly Combined-only (47) and Timepoint_6h-and-24h-only (12), three PDFs written, ComplexUpset and UpSetR agree on every shared combination (the 4 that differ are ties cut at rank 40). Wrong: the block's hardcoded nsets = 4 on a 7-set list keeps only the 4 largest sets (A,B,C,E) and draws 17 13 9 8 8 4 3 2 (A-only 17, truth 12) with no message, because D, F, G are silently dropped and merged; an empty set is dropped silently; the Skill's duplicate-element failure mode does not exist for fromList (drawn bars equal the de-duplicated truth) and ComplexUpset and UpSetR do not differ on duplicates as the reconciliation table says. Loading ComplexUpset after UpSetR makes upset() ComplexUpset's, so the Skill's UpSetR block then errors 'unused arguments (nsets...)', which the Skill does not mention.",
+    "basic": 29,
+    "specialized": 44,
+    "total": 73,
+    "assertions_passed": 2,
+    "assertions_total": 5,
+    "assertions": [
+     {
+      "text": "The shipped upset_gene_sets.R runs verbatim and writes its three PDFs; the printed set sizes match the lists",
+      "result": "PASS",
+      "note": "upset_basic/customized/queries.pdf 17,127 / 14,414 / 17,213 B; sizes 172,145,201,125,90,200"
+     },
+     {
+      "text": "Every UpSetR bar (basic nintersects=40, customized 30, planted 7-set) equals the independent exclusive count and the queries highlight exactly the two named intersections",
+      "result": "PASS",
+      "note": "grob-level extraction of labels and dot colours; PNGs i4c_example_queries and i4b_upsetr_nsets7 opened"
+     },
+     {
+      "text": "The Skill's UpSetR block pattern nsets = 4 is safe to reuse on a list with more than 4 sets",
+      "result": "FAIL",
+      "note": "3 of 7 sets vanish; sum of drawn bars 64 vs union 66; A-only bar 17 vs truth 12; PNG opened"
+     },
+     {
+      "text": "Duplicate elements inflate fromList counts unless lapply(sets, unique) is applied (failure mode and reconciliation table)",
+      "result": "FAIL",
+      "note": "6 duplicates in A and 3 in B change nothing in UpSetR or in ComplexUpset (all bars == de-duplicated truth)"
+     },
+     {
+      "text": "An empty set in the input is shown or reported by UpSetR",
+      "result": "FAIL",
+      "note": "H is dropped; matrix rows A,B,C,E,F,D,G; no message"
+     }
+    ],
+    "executed": true,
+    "execution_note": "Executed: run/i4_upsetr_and_reconcile.R (UpSetR::upset and ComplexUpset::upset called namespaced because both export upset), out/ex_R shipped example, v4_explore_upsetr.R / v4b.R / v4c.R for the grob extraction. PNGs i4a, i4b x2, i4c x2 opened."
+   },
+   {
+    "index": 5,
+    "type": "Scope Boundary",
+    "label": "REAL MSigDB Hallmark 10 gene sets at scale (ComplexUpset, UpSetR, upsetplot), 2^N claim, NA/blank identifiers, package-status and ggplot2 4.0 claims",
+    "status": "COMPLETED",
+    "status_flag": "⚠️",
+    "note": "On real data all three implementations agree with the truth: 137 non-empty exclusive intersections for the 10 sets (union 1,211), top 20 = 144 135 132 106 91 90 87 56 39 25 16 9 9 9 8 7 7 7 6 6 from ComplexUpset, UpSetR and upsetplot; set sizes right; the top 8 bars are single-set, so the Skill's 'single-set bars dominate' warning is real; runs in under 1 s. Not supported: the '10 sets and n_intersections=Inf gives 1023 columns' scenario (137 drawn, 0.5 s), ComplexUpset 'CRAN active through 2025-07' (CRAN 1.3.3, 2021-12-11 is what installs) and 'ggplot2 4.0 broke upset()' (upset() builds on 4.0.3; the real defect is the multi-query width bug on both versions). Not covered by the Skill: NA and '' in an ID list are counted as shared genes (S1 and S2 share 3 elements instead of 1, in both R packages). usage-guide step 8 asks for cairo_pdf / Type-42 but no shipped code does it (matplotlib default pdf.fonttype is 3, the R example uses pdf()).",
+    "basic": 28,
+    "specialized": 42,
+    "total": 70,
+    "assertions_passed": 2,
+    "assertions_total": 5,
+    "assertions": [
+     {
+      "text": "ComplexUpset, UpSetR and upsetplot each draw the top 20 exclusive intersections of the real Hallmark sets with heights equal to the set-operation truth",
+      "result": "PASS",
+      "note": "identical 20-value vectors in all three; ComplexUpset PNG opened"
+     },
+     {
+      "text": "Single-set exclusives dominate a cardinality sort on real gene-set data, as the failure mode states",
+      "result": "PASS",
+      "note": "8 of the top 8 bars are single-set (144 to 56)"
+     },
+     {
+      "text": "10 sets with n_intersections=Inf produces about 1,023 unreadable columns",
+      "result": "FAIL",
+      "note": "only non-empty combinations are drawn: 137 columns; 2^N-1 is an upper bound, not the plot"
+     },
+     {
+      "text": "Identifier hygiene is covered: NA and blank IDs do not create false overlaps",
+      "result": "FAIL",
+      "note": "list(S1=c(TP53,MYC,NA,EGFR,''), S2=c(TP53,NA,KRAS,'')) draws S1-S2 = 3 in ComplexUpset and UpSetR; the Skill only advises unique()"
+     },
+     {
+      "text": "The maintenance and compatibility claims (ComplexUpset CRAN-active through 2025-07; ggplot2 4.0 makes upset() error until patched) hold on the installed stack",
+      "result": "FAIL",
+      "note": "installed and source-built ComplexUpset is 1.3.3 (Packaged 2021-12-10); upset() renders on 4.0.3; pinning ggplot2 3.5.2 works (private build) but does not remove the query width bug"
+     }
+    ],
+    "executed": true,
+    "execution_note": "Executed: run/i5_real_hallmark_scale.R (REAL data written to data/hallmark10_sets.tsv), i5c_python_hallmark.py, v5_pkgdates.R, i6_pdf_fonts.py. PNGs i5_hallmark10_top20 opened. upsetplot max_subset_rank=20 drew 21 bars because of a rank tie (not scored)."
+   }
+  ]
+ },
+ "final": {
+  "static_weighted": 28.4,
+  "dynamic_weighted": 42.0,
+  "score": 70.4,
+  "max": 100,
+  "grade": "Beta Only",
+  "grade_symbol": "⚠️",
+  "deployable": false,
+  "veto_override": false,
+  "grade_note": "Numeric 70.4 is Beta Only (60-74). Floors for the next tier also fail: execution 70.0 < 75, Layer 2 average 41.8 < 42, assertion pass rate 13/25 = 52% < 80%. No veto fired and no P0 is open; deployable is false only because the grade is below Limited Release. The R route alone (ComplexUpset sorting/annotations/filters and UpSetR) is numerically correct in every check."
+ },
+ "key_strengths": [
+  "Every intersection count, order, set size and filter that was drawn matched an independent set computation: 14/14 planted bars (including a set that is a strict subset of another), 137 real Hallmark intersections across ComplexUpset, UpSetR and upsetplot, and boxplot/stacked-fraction panels equal the per-intersection statistics.",
+  "The shipped R example and the UpSetR block run and draw correctly, with query highlights on exactly the named intersections.",
+  "The 'single-set exclusives dominate' failure mode is real on real gene sets (8 of the top 8 bars), and the ComplexUpset vs UpSetR choice and the min_degree / intersections filters are the right tools for it.",
+  "Filters that the Skill teaches (n_intersections, intersections=list(), min_degree, min_size) and the upsetplot filters (min_subset_size, max_subset_rank, min/max_degree) all behaved exactly as filtered truth."
+ ],
+ "recommendations": [
+  {
+   "priority": "P1",
+   "title": "Python upsetplot route does not run as shipped",
+   "observed_in": [3],
+   "problem": "Every Python snippet uses show_counts=True: with numpy 2.5.3 it raises TypeError at savefig (upsetplot 0.9.0 passes a 1-element array to Axes.text), and a plain pip install brings pandas 3, where UpSet fails with 'Invalid RGBA argument: nan'. examples/upset_python.py also calls data.to_frame() on the DataFrame that from_contents returns, so its metadata plot cannot run on any version. A Python-only user gets no figure.",
+   "root_cause": "Version stamp says only 'upsetplot 0.9+'; the snippets were not run against a current stack.",
+   "fix": "State the working stack (pandas < 3 for upsetplot 0.9.0) and drop show_counts=True or show a labelling workaround; fix the example: build the attribute frame from from_contents' DataFrame (df['log2FC'] = ...), do not call to_frame(); run the example in CI."
+  },
+  {
+   "priority": "P1",
+   "title": "Query highlighting breaks; the Skill blames the wrong cause",
+   "observed_in": [2],
+   "problem": "Block 3 as written raises a render error on the Skill's own data (the second query targets an empty exclusive intersection), and two queries on non-adjacent existing bars draw a highlight rectangle 6.3 bar-widths wide over neighbouring bars, on ggplot2 4.0.3 and 3.5.2. The Skill attributes ComplexUpset trouble to ggplot2 4.0 (issue #213) and advises pinning ggplot2, which does not fix this. Block 4 as written fails because log2FC/significant are not in df.",
+   "root_cause": "Queries were not rendered with two targets; the 4-set example has no intersection larger than 1 and no empty query target.",
+   "fix": "Use targets that exist, test with two non-adjacent bars, document the width behaviour (or a working alternative such as separate single-query plots or a colour column in base_annotations), remove or correct the ggplot2 4.0 claim, and add the missing columns to block 4's df."
+  },
+  {
+   "priority": "P1",
+   "title": "Silent data-loss patterns are not warned about",
+   "observed_in": [1, 4, 5],
+   "problem": "UpSetR nsets = 4 on a longer list keeps the 4 largest sets and draws merged, wrong bars (A-only 17 vs 12); empty sets vanish from both R plots without a message; NA and '' IDs are counted as shared elements (3 shared instead of 1).",
+   "root_cause": "The Skill's blocks hardcode nsets and never validate set sizes, emptiness or identifiers before plotting.",
+   "fix": "Add a pre-plot checklist: nsets = length(sets); stop on empty sets; drop NA/'' and normalise IDs; print set sizes and the union size and compare with the sum of drawn bars."
+  },
+  {
+   "priority": "P1",
+   "title": "Several stated behaviours are false or unreproduced",
+   "observed_in": [2, 3, 4, 5],
+   "problem": "(a) 'duplicates in fromList inflate counts' and the reconciliation row on duplicate handling: not reproduced in UpSetR or ComplexUpset (upsetplot raises instead). (b) 'ComplexUpset CRAN active through 2025-07': 1.3.3 of 2021-12-11 is the current release. (c) 'ggplot2 4.0 broke upset()': upset() builds on 4.0.3. (d) mode='intersect' as a way to exclude 1-set bars: it makes them the full set size. (e) degree sort shown with 'descending' puts 3-set groups first. (f) style_subsets(present=) is called a specific intersection but highlights supersets. (g) intersection_plot_elements is called a cap on intersections but is a height. (h) 2^10 = 1023 columns: 137 drawn on real data.",
+   "root_cause": "Claims were written from documentation and memory, not checked against an installed stack.",
+   "fix": "Correct or delete each statement using the measured behaviour (exclude 1-set with min_degree=2 or an intersections list; sort_intersections='ascending' for degree; add absent= to style_subsets; use max_subset_rank for a cap)."
+  },
+  {
+   "priority": "P2",
+   "title": "The canonical toy example cannot show anything",
+   "observed_in": [1],
+   "problem": "In the Skill's 4-set example every gene has a unique membership, so all eight bars are 1: sorting, counts, queries and attribute panels cannot be told apart from noise. The example's n_intersections=20 and its second query target an empty intersection.",
+   "root_cause": "Hand-made toy sets without planted overlaps.",
+   "fix": "Replace with planted overlaps of different sizes including a subset set (the planted 8-set table in data/ is a drop-in known-answer test) and state the expected bar heights in the Skill."
+  },
+  {
+   "priority": "P2",
+   "title": "Package masking, stray axes, labels and export claims",
+   "observed_in": [3, 4, 5],
+   "problem": "ComplexUpset and UpSetR both export upset(); attaching ComplexUpset second breaks the UpSetR block with 'unused arguments' (matters for the 'migrate UpSetR to ComplexUpset' prompt). The shipped first Python plot calls plt.subplots then plot(fig=fig), leaving an empty axes drawn over the figure. ComplexUpset leaves the x label 'group'. Usage-guide step 8 (cairo_pdf / Type-42) is implemented nowhere: matplotlib's default pdf.fonttype is 3 and the R example uses pdf().",
+   "root_cause": "Untested integration details.",
+   "fix": "Use ComplexUpset::upset / UpSetR::upset in the migration text, replace plt.subplots by plt.figure, set xlab, and add rcParams['pdf.fonttype'] = 42 and cairo_pdf to the export snippets."
+  },
+  {
+   "priority": "P2",
+   "title": "SKILL.md and usage-guide.md duplicate the same tips",
+   "observed_in": [],
+   "problem": "The usage-guide Tips section and Quick Start restate the SKILL.md failure modes almost verbatim (ggplot2 4.0 note, cap at 20-25, unique(), degree vs cardinality, upset_query), so both load for one task.",
+   "root_cause": "No split between method and quick-start content.",
+   "fix": "Keep the tips once in SKILL.md and reduce usage-guide.md to prompts, or move failure modes to a references/ file."
+  }
+ ]
+}

@@ -14,7 +14,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The example passes cluster_rows=<OLO dendrogram> together with row_split=gene_info$pathway, a combination ComplexHeatmap rejects; the script was never run.
 - Fix: Drop row_split or use a numeric row_split (works with the dendrogram), or apply OLO within each pathway group; supply a runnable data preamble and state the constraint in SKILL.md next to the OLO block.
 
-## P1 (122)
+## P1 (126)
 
 ### `bio-data-visualization-distribution-plots` — The headline R raincloud depends on gghalves, archived and broken on ggplot2 4.x
 
@@ -47,6 +47,38 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: df, df_small, df_med, df_large and df_paired are never created (df falls through to stats::df); with data, the small-N panel labels every group n=80 above 15 points because n_per_group is computed on df; count(group) also counts NA rows.
 - Root cause: Example written as a fragment and N derived once from an unrelated frame.
 - Fix: Build the five frames at the top (or read a shipped CSV), compute N per plot from the plotted frame with sum(!is.na(value)), and add a runnable data file.
+
+### `bio-data-visualization-upset-plots` — Python upsetplot route does not run as shipped
+
+- Skill: 70.4, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/upset-plots) · [viewer](skills/bio-data-visualization-upset-plots/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 3
+- Problem: Every Python snippet uses show_counts=True: with numpy 2.5.3 it raises TypeError at savefig (upsetplot 0.9.0 passes a 1-element array to Axes.text), and a plain pip install brings pandas 3, where UpSet fails with 'Invalid RGBA argument: nan'. examples/upset_python.py also calls data.to_frame() on the DataFrame that from_contents returns, so its metadata plot cannot run on any version. A Python-only user gets no figure.
+- Root cause: Version stamp says only 'upsetplot 0.9+'; the snippets were not run against a current stack.
+- Fix: State the working stack (pandas < 3 for upsetplot 0.9.0) and drop show_counts=True or show a labelling workaround; fix the example: build the attribute frame from from_contents' DataFrame (df['log2FC'] = ...), do not call to_frame(); run the example in CI.
+
+### `bio-data-visualization-upset-plots` — Query highlighting breaks; the Skill blames the wrong cause
+
+- Skill: 70.4, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/upset-plots) · [viewer](skills/bio-data-visualization-upset-plots/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 2
+- Problem: Block 3 as written raises a render error on the Skill's own data (the second query targets an empty exclusive intersection), and two queries on non-adjacent existing bars draw a highlight rectangle 6.3 bar-widths wide over neighbouring bars, on ggplot2 4.0.3 and 3.5.2. The Skill attributes ComplexUpset trouble to ggplot2 4.0 (issue #213) and advises pinning ggplot2, which does not fix this. Block 4 as written fails because log2FC/significant are not in df.
+- Root cause: Queries were not rendered with two targets; the 4-set example has no intersection larger than 1 and no empty query target.
+- Fix: Use targets that exist, test with two non-adjacent bars, document the width behaviour (or a working alternative such as separate single-query plots or a colour column in base_annotations), remove or correct the ggplot2 4.0 claim, and add the missing columns to block 4's df.
+
+### `bio-data-visualization-upset-plots` — Silent data-loss patterns are not warned about
+
+- Skill: 70.4, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/upset-plots) · [viewer](skills/bio-data-visualization-upset-plots/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 1, 4, 5
+- Problem: UpSetR nsets = 4 on a longer list keeps the 4 largest sets and draws merged, wrong bars (A-only 17 vs 12); empty sets vanish from both R plots without a message; NA and '' IDs are counted as shared elements (3 shared instead of 1).
+- Root cause: The Skill's blocks hardcode nsets and never validate set sizes, emptiness or identifiers before plotting.
+- Fix: Add a pre-plot checklist: nsets = length(sets); stop on empty sets; drop NA/'' and normalise IDs; print set sizes and the union size and compare with the sum of drawn bars.
+
+### `bio-data-visualization-upset-plots` — Several stated behaviours are false or unreproduced
+
+- Skill: 70.4, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/upset-plots) · [viewer](skills/bio-data-visualization-upset-plots/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 2, 3, 4, 5
+- Problem: (a) 'duplicates in fromList inflate counts' and the reconciliation row on duplicate handling: not reproduced in UpSetR or ComplexUpset (upsetplot raises instead). (b) 'ComplexUpset CRAN active through 2025-07': 1.3.3 of 2021-12-11 is the current release. (c) 'ggplot2 4.0 broke upset()': upset() builds on 4.0.3. (d) mode='intersect' as a way to exclude 1-set bars: it makes them the full set size. (e) degree sort shown with 'descending' puts 3-set groups first. (f) style_subsets(present=) is called a specific intersection but highlights supersets. (g) intersection_plot_elements is called a cap on intersections but is a height. (h) 2^10 = 1023 columns: 137 drawn on real data.
+- Root cause: Claims were written from documentation and memory, not checked against an installed stack.
+- Fix: Correct or delete each statement using the measured behaviour (exclude 1-set with min_degree=2 or an intersections list; sort_intersections='ascending' for degree; add absent= to style_subsets; use max_subset_rank for a cap).
 
 ### `bio-data-visualization-statistical-annotation` — stat_compare_means(comparisons, p.adjust.method='holm') draws unadjusted p; the argument does not exist
 
@@ -992,7 +1024,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (461)
+## P2 (464)
 
 ### `bio-data-visualization-distribution-plots` — Wrong bandwidth sentence: nrd (Scott) is 1.178x nrd0, so it oversmooths more
 
@@ -1041,6 +1073,30 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The Tips and What the Agent Will Do sections restate SKILL.md rules.
 - Root cause: Two files carry the same guidance.
 - Fix: Reduce usage-guide.md to prompts and prerequisites.
+
+### `bio-data-visualization-upset-plots` — The canonical toy example cannot show anything
+
+- Skill: 70.4, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/upset-plots) · [viewer](skills/bio-data-visualization-upset-plots/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 1
+- Problem: In the Skill's 4-set example every gene has a unique membership, so all eight bars are 1: sorting, counts, queries and attribute panels cannot be told apart from noise. The example's n_intersections=20 and its second query target an empty intersection.
+- Root cause: Hand-made toy sets without planted overlaps.
+- Fix: Replace with planted overlaps of different sizes including a subset set (the planted 8-set table in data/ is a drop-in known-answer test) and state the expected bar heights in the Skill.
+
+### `bio-data-visualization-upset-plots` — Package masking, stray axes, labels and export claims
+
+- Skill: 70.4, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/upset-plots) · [viewer](skills/bio-data-visualization-upset-plots/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 3, 4, 5
+- Problem: ComplexUpset and UpSetR both export upset(); attaching ComplexUpset second breaks the UpSetR block with 'unused arguments' (matters for the 'migrate UpSetR to ComplexUpset' prompt). The shipped first Python plot calls plt.subplots then plot(fig=fig), leaving an empty axes drawn over the figure. ComplexUpset leaves the x label 'group'. Usage-guide step 8 (cairo_pdf / Type-42) is implemented nowhere: matplotlib's default pdf.fonttype is 3 and the R example uses pdf().
+- Root cause: Untested integration details.
+- Fix: Use ComplexUpset::upset / UpSetR::upset in the migration text, replace plt.subplots by plt.figure, set xlab, and add rcParams['pdf.fonttype'] = 42 and cairo_pdf to the export snippets.
+
+### `bio-data-visualization-upset-plots` — SKILL.md and usage-guide.md duplicate the same tips
+
+- Skill: 70.4, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/upset-plots) · [viewer](skills/bio-data-visualization-upset-plots/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: —
+- Problem: The usage-guide Tips section and Quick Start restate the SKILL.md failure modes almost verbatim (ggplot2 4.0 note, cap at 20-25, unique(), degree vs cardinality, upset_query), so both load for one task.
+- Root cause: No split between method and quick-start content.
+- Fix: Keep the tips once in SKILL.md and reduce usage-guide.md to prompts, or move failure modes to a references/ file.
 
 ### `bio-data-visualization-statistical-annotation` — Test-name and label details differ from the tools
 
