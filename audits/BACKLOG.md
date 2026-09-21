@@ -14,7 +14,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The example passes cluster_rows=<OLO dendrogram> together with row_split=gene_info$pathway, a combination ComplexHeatmap rejects; the script was never run.
 - Fix: Drop row_split or use a numeric row_split (works with the dendrogram), or apply OLO within each pathway group; supply a runnable data preamble and state the constraint in SKILL.md next to the OLO block.
 
-## P1 (96)
+## P1 (102)
 
 ### `bio-data-visualization-distribution-plots` — The headline R raincloud depends on gghalves, archived and broken on ggplot2 4.x
 
@@ -47,6 +47,54 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: df, df_small, df_med, df_large and df_paired are never created (df falls through to stats::df); with data, the small-N panel labels every group n=80 above 15 points because n_per_group is computed on df; count(group) also counts NA rows.
 - Root cause: Example written as a fragment and N derived once from an unrelated frame.
 - Fix: Build the five frames at the top (or read a shipped CSV), compute N per plot from the plotted frame with sum(!is.na(value)), and add a runnable data file.
+
+### `bio-data-visualization-matplotlib-fundamentals` — boxplot(labels=) removed in matplotlib 3.11
+
+- Skill: 75, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/matplotlib-fundamentals) · [viewer](skills/bio-data-visualization-matplotlib-fundamentals/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 2
+- Problem: The Common Chart Types boxplot line raises TypeError on 3.11.2 ('labels' removed; deprecated in 3.9). The Skill advertises 3.8+.
+- Root cause: API drift not tracked; the version line stops at 3.8+.
+- Fix: Use tick_labels= (3.9+) and say labels= is for 3.8 only; raise the version floor or show both.
+
+### `bio-data-visualization-matplotlib-fundamentals` — fig.set_rasterization_zorder does not exist
+
+- Skill: 75, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/matplotlib-fundamentals) · [viewer](skills/bio-data-visualization-matplotlib-fundamentals/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 5
+- Problem: Failure Modes tells the agent to call fig.set_rasterization_zorder(0); it raises AttributeError. It is Axes.set_rasterization_zorder.
+- Root cause: Wrong object in prose.
+- Fix: Write ax.set_rasterization_zorder(0) and show that artists with zorder below the threshold are rasterized.
+
+### `bio-data-visualization-matplotlib-fundamentals` — False claim: constrained_layout is the default in 3.6+
+
+- Skill: 75, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/matplotlib-fundamentals) · [viewer](skills/bio-data-visualization-matplotlib-fundamentals/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 5
+- Problem: rcParamsDefault['figure.constrained_layout.use'] is False on 3.11.2; without constrained_layout=True no layout engine is applied. An agent trusting the claim would omit it.
+- Root cause: Confusion with availability of the option.
+- Fix: State that constrained_layout must be requested (constrained_layout=True or layout='constrained') and remove the default claim.
+
+### `bio-data-visualization-matplotlib-fundamentals` — List palette maps colours by appearance order, silently
+
+- Skill: 75, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/matplotlib-fundamentals) · [viewer](skills/bio-data-visualization-matplotlib-fundamentals/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 3
+- Problem: palette=['#999999','#0072B2','#D55E00'] with hue values Up/NS/Down painted Up grey and NS blue (figure opened). A volcano plot with upregulated genes grey is wrong while looking finished.
+- Root cause: Skill and example use a list where a category-keyed dict is needed.
+- Fix: Use palette={'NS':..., 'Up':..., 'Down':...} and hue_order in block 3, the seaborn.objects snippet and the example; add a check that legend colours match.
+
+### `bio-data-visualization-matplotlib-fundamentals` — Hard-coded, invented PC variance labels
+
+- Skill: 75, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/matplotlib-fundamentals) · [viewer](skills/bio-data-visualization-matplotlib-fundamentals/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 1
+- Problem: 'PC1 (45%)' / 'PC1 (45.2%)' are typed into the examples over data whose real variance was 34.6% (canonical input) or random. An agent may copy them.
+- Root cause: Literal placeholders in code.
+- Fix: Compute from pca.explained_variance_ratio_ in the recipe, or mark the labels as placeholders to replace.
+
+### `bio-data-visualization-matplotlib-fundamentals` — '89 mm' is not what is saved; seaborn.objects recipe ignores the setup
+
+- Skill: 75, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/matplotlib-fundamentals) · [viewer](skills/bio-data-visualization-matplotlib-fundamentals/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 1, 5
+- Problem: With savefig.bbox=tight the saved page is 89.42 mm (Skill rcParams) or 91.96 mm (example, default pad), over Nature's 89 mm column. The example's so.Plot figure is 162.56 x 121.92 mm with 11-12 pt text and no rasterization.
+- Root cause: bbox tight resizes the figure; so.Plot uses its own theme and size.
+- Fix: For exact size use constrained_layout without bbox tight (or set savefig.pad_inches=0 and state the tolerance); for so.Plot add .layout(size=(w,h)) and .theme(mpl.rcParams) then re-check the size.
 
 ### `bio-data-visualization-volcano-and-ma-plots` — Threshold line drawn on the wrong axis quantity
 
@@ -784,7 +832,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (444)
+## P2 (450)
 
 ### `bio-data-visualization-distribution-plots` — Wrong bandwidth sentence: nrd (Scott) is 1.178x nrd0, so it oversmooths more
 
@@ -833,6 +881,54 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The Tips and What the Agent Will Do sections restate SKILL.md rules.
 - Root cause: Two files carry the same guidance.
 - Fix: Reduce usage-guide.md to prompts and prerequisites.
+
+### `bio-data-visualization-matplotlib-fundamentals` — Fragments are not self-contained
+
+- Skill: 75, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/matplotlib-fundamentals) · [viewer](skills/bio-data-visualization-matplotlib-fundamentals/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 2, 4
+- Problem: The tick snippet needs np and mismatches 5 ticks with 3 labels (ValueError); the colour block needs data; the heatmap needs vmax defined; the seaborn.objects snippet never renders.
+- Root cause: Snippets lifted from context.
+- Fix: Import numpy where used, make tick and label counts agree, define vmax/data or say so, end the objects snippet with .save() or .plot().
+
+### `bio-data-visualization-matplotlib-fundamentals` — SVG is 'editable' only after svg.fonttype='none'
+
+- Skill: 75, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/matplotlib-fundamentals) · [viewer](skills/bio-data-visualization-matplotlib-fundamentals/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 4
+- Problem: Default svg.fonttype=path: 0 <text> elements in the saved SVG, text is outlines.
+- Root cause: Missing rcParam.
+- Fix: Add 'svg.fonttype': 'none' to the rcParams block or reword the claim.
+
+### `bio-data-visualization-matplotlib-fundamentals` — Inconsistent and unsourced journal numbers
+
+- Skill: 75, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/matplotlib-fundamentals) · [viewer](skills/bio-data-visualization-matplotlib-fundamentals/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 1, 5
+- Problem: Double column 180 mm (SKILL.md, example) vs 183 mm (usage-guide); Nature 5-7 pt, PDF-rejection and the "50 MB" for 100k vector points are unsourced (measured 2.0 MB / 12 s vs 0.36 MB / 2 s).
+- Root cause: Recall-based numbers.
+- Fix: Cite each publisher rule or hedge; use measured numbers.
+
+### `bio-data-visualization-matplotlib-fundamentals` — No guidance for >8 categories or overplotting order
+
+- Skill: 75, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/matplotlib-fundamentals) · [viewer](skills/bio-data-visualization-matplotlib-fundamentals/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 5
+- Problem: Okabe-Ito has 8 colours; seaborn cycles the list for 12 clusters (8 distinct colours, warning only). Marker-gene colouring is drawn in random order.
+- Root cause: Palette section assumes few categories.
+- Fix: Point to color-palettes for >8 levels; add sort-by-value for continuous colouring.
+
+### `bio-data-visualization-matplotlib-fundamentals` — Deprecation and warning debt
+
+- Skill: 75, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/matplotlib-fundamentals) · [viewer](skills/bio-data-visualization-matplotlib-fundamentals/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 2, 5
+- Problem: fig.set_constrained_layout emits PendingDeprecationWarning; seaborn 0.13.2 emits Pandas4Warning on pandas 3; the tight_layout + colorbar clipping claim did not reproduce on 3.11.2.
+- Root cause: Unversioned advice.
+- Fix: Use fig.set_layout_engine('constrained'); note the versions; soften or drop the tight_layout claim.
+
+### `bio-data-visualization-matplotlib-fundamentals` — No when-not-to-use / hand-off section
+
+- Skill: 75, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/matplotlib-fundamentals) · [viewer](skills/bio-data-visualization-matplotlib-fundamentals/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: —
+- Problem: The Skill does not say to leave R/ggplot users, interactive figures or genome tracks to other Skills.
+- Root cause: Escape hatches only in Related Skills.
+- Fix: Add three lines of scope limits.
 
 ### `bio-data-visualization-volcano-and-ma-plots` — EnhancedVolcano 'selectLab filtered by thresholds' does not reproduce
 
