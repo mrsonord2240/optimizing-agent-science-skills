@@ -1,0 +1,7 @@
+suppressPackageStartupMessages({library(ComplexHeatmap);library(seriation)})
+eval(parse(text = paste(readLines("preamble_syn.R"), collapse="\n")))
+z <- t(scale(t(mat))); d <- dist(z); hc <- hclust(d, "ward.D2"); o <- seriate(d, "OLO", control=list(hclust=hc)); dend <- as.dendrogram(o[[1]])
+r <- try(Heatmap(z, cluster_rows = dend, row_split = 3), silent=TRUE); pdf(NULL); r2 <- try(draw(r), silent=TRUE); dev.off()
+cat("dendrogram + numeric row_split=3 works:", !inherits(r2,"try-error"), "\n")
+r <- try(Heatmap(z, cluster_rows = dend, row_split = gene_info$pathway), silent=TRUE); cat("dendrogram + vector row_split:", if (inherits(r,"try-error")) conditionMessage(attr(r,"condition")) else "ok", "\n")
+r <- try(Heatmap(z, cluster_rows = hc, row_split = gene_info$pathway), silent=TRUE); cat("hclust object + vector row_split:", if (inherits(r,"try-error")) conditionMessage(attr(r,"condition")) else "ok", "\n")

@@ -1,0 +1,195 @@
+import json, os
+D = r"F:\OpenScience\audits\bio-data-visualization-heatmaps-clustering"
+SRC = "mrsonord2240/bioSkills@019953e9ca90f6f6f69e3f5a9cd19a5c1b9dc6be:data-visualization/heatmaps-clustering"
+
+
+def A(t, r, n):
+    return {"text": t, "result": "PASS" if r else "FAIL", "note": n}
+
+
+def I(i, typ, label, status, note, basic, spec, assertions, executed=True, xnote=""):
+    p = sum(1 for a in assertions if a["result"] == "PASS")
+    flag = "\u2705" if (status == "COMPLETED" and basic + spec >= 75) else ("\u26a0\ufe0f" if status == "COMPLETED" else "\u274c")
+    return {"index": i, "type": typ, "label": label, "status": status, "status_flag": flag, "note": note,
+            "basic": basic, "specialized": spec, "total": basic + spec, "assertions_passed": p,
+            "assertions_total": len(assertions), "assertions": assertions, "executed": executed, "execution_note": xnote}
+
+
+inputs = [
+    I(1, "Canonical", "Annotated ComplexHeatmap with pathway row split + OLO: both shipped examples, SKILL.md OLO/annotation blocks, then real ALL leukaemia", "COMPLETED",
+      "expression_heatmap.R and the SKILL.md blocks run and draw correctly; heatmap_phd.R (the flagship OLO example) crashes on every input: cluster_rows=<dendrogram> with row_split=<vector>. Real ALL (200 top-variance genes, 126 samples): OLO order = drawn order, 2 column slices = 32 T-cell / 94 B-cell exactly.",
+      30, 46, [
+          A("heatmap_phd.R runs to completion once the objects it assumes (mat, metadata, gene_info) are supplied", False,
+            "Error: When `cluster_rows` is a dendrogram, `row_split` can only be a single number. Deterministic, input-independent (i1b_phd_verbatim.out). Removing row_split, or using a number, runs."),
+          A("expression_heatmap.R runs unmodified and draws slices/annotations matching the clustering", True,
+            "PDF 26,515 B; PNG opened: 2 column x 3 row slices, sizes 10/10 and 20/60/20; drawn Control-slice dendrogram cophenetic-identical to an independent hclust(complete) (the dendrogram is reordered, which is why leaf order differs from hclust$order)."),
+          A("Legend/label in expression_heatmap.R agree with the plotted data ('Z-score')", False,
+            "The matrix is not z-scored: row means -0.22..1.06, row sd 0.30..1.19; colours fixed at +-2 saturate 3.6% of cells. The example also uses default complete linkage although the Skill's own rule is ward.D2."),
+          A("SKILL.md OLO block (verbatim) on real ALL data yields a valid OLO dendrogram used as the drawn row order", True,
+            "row_order(ht) == get_order(seriate OLO) TRUE (i1.out, i1e.out); adjacent-row distance sum 1893.3 vs 2014.2 for the default hclust order."),
+          A("Real-data biology recovered: T-cell vs B-cell separation and annotation maps to right samples", True,
+            "Column slice 1 = 32 T-cell, slice 2 = 94 B-cell, 0 mixed; CD3D (38319_at) B 4.84 vs T 9.52 and in the top-200; vik palette ends map correctly; z-score rows mean 7e-16, sd 1; PNG opened, non-blank."),
+      ], True,
+      "R 4.4.3, ComplexHeatmap 2.22.0, seriation 1.5.8, pheatmap 1.0.13. Scripts: i1a_check_example1.R, scratch/ex2 (heatmap_phd.R), i1c_skillmd_annotation_block.R, i1e_olo_verbatim_pheatmap.R, i1_all_real.R. Real data: Bioconductor ALL (12,625 x 128); heatmap_phd.R inputs are SYNTHETIC (planted up/down modules)."),
+    I(2, "Variant A", "seaborn.clustermap block (row z-score, ward, col_colors) on a log-expression matrix", "COMPLETED",
+      "The verbatim SKILL.md block runs and clusters correctly (row tree cophenetic-identical to scipy ward, 30/30/29 planted modules recovered, Control vs Treatment columns separate), but its vmax is computed on the RAW matrix (13.17) and applied to the z-scored plot (|z| max 2.81): the figure is uniformly pale.",
+      31, 44, [
+          A("SKILL.md seaborn block runs verbatim without error", True, "clustermap returned; figure saved (i2_clustermap_verbatim.png opened)."),
+          A("Plotted values equal the row z-score of the input (z_score=0 = rows), reordered by the dendrograms", True,
+            "np.allclose(g.data2d, row z-score[ri, ci]) True; rows mean 0, sd 1 (ddof=1)."),
+          A("Row dendrogram equals an independent scipy ward linkage and recovers planted modules", True,
+            "cophenet identical; cutree(3) vs planted up/down/flat: 30/30/29 pure; columns 9 Control / 9 Treatment."),
+          A("Colour limits fit the plotted data (robust bounds recipe)", False,
+            "vmax = quantile(|raw df|, .99) = 13.17 but the data are z-scored inside clustermap (range -2.81..2.38): 0% of cells exceed half the colour range; colourbar reads +-13; heatmap washed out (opened PNG)."),
+          A("standard_scale vs z_score mutual-exclusion claim is true", True,
+            "sns.clustermap(z_score=0, standard_scale=0) -> ValueError 'Cannot perform both z-scoring and standard-scaling on data'."),
+      ], True, "py.sh, seaborn 0.13.2, scipy 1.18.1. SYNTHETIC data with planted modules (i2_seaborn.py)."),
+    I(3, "Edge", "Failure-mode and reconciliation claims: ward.D vs ward.D2, outliers, sparse rows, ordered time course, gaps_col, raster trigger, bare Heatmap()", "COMPLETED",
+      "Core claims reproduce (ward.D differs from ward.D2 and only ward.D2 matches scipy ward; outlier and quantile bounds; pheatmap gaps_col ignored; cluster_columns=FALSE keeps a time axis; raster auto above 2000 rows). Three statements are wrong or overstated.",
+      31, 48, [
+          A("ward.D vs ward.D2 claim and seaborn 'ward == ward.D2' equivalence", True,
+            "merge tables differ; R ward.D2 heights vs scipy ward max diff 1.4e-14, ward.D vs scipy 209 (i3.out, i3_cmp.R). pheatmap and ComplexHeatmap both pass ward.D2 through to hclust (heights identical, i1e.out)."),
+          A("Outlier / robust-bound claims (colorRamp2 does not clip; 1-99% bound restores contrast)", True,
+            "typical value 1.5: naive #FFFAF8 vs robust #FF8E6F; outlier 60 maps to the extreme colour, no error. Euclid(z)^2/(1-r) = 22 = 2(n-1) exactly."),
+          A("pheatmap gaps_col ignored with cluster_cols=TRUE; ComplexHeatmap raster auto-trigger above 2000 rows", True,
+            "x-positions identical with/without gaps_col when clustering (differ with cluster_cols=FALSE); ComplexHeatmap message 'use_raster is automatically set to TRUE for a matrix with more than 2000 rows'."),
+          A("Ordered time-course guidance (cluster_columns=FALSE, column_split to group) preserves order", True,
+            "cluster_columns=TRUE gives 0h 1h 2h 4h 8h 48h 24h 12h (scrambled); FALSE (with or without column_split) keeps 0h..48h. Caveat: SKILL.md's sentence omits that column_split alone with default clustering still reorders (4h 8h 12h 48h 24h 1h 2h 0h); the usage-guide wording is correct."),
+          A("Stated failure-mode facts are accurate as written", False,
+            "(a) 'Rscript ... a bare Heatmap() produces no output' is false at top level: pdf 6,862 B drawn (only for/function/lapply give 3,448 B blank); (b) Reconciliation row 'ComplexHeatmap and pheatmap give different dendrograms' is false, defaults yield identical trees; (c) sparse-row z-scores do not 'explode': max |z| for a one-non-zero row is (n-1)/sqrt(n) = 2.85, and the '>=3 non-zero' threshold has no source."),
+      ], True, "i3_edge_claims.R, i3_scipy_check.py, i3_cmp.R, i3b_timecourse.R. SYNTHETIC planted data."),
+    I(4, "Variant B", "Sample-correlation QC heatmap and expression + log2FC concatenated heatmaps with shared row order (usage-guide prompts; SKILL.md has no code for either)", "COMPLETED",
+      "Both usage-guide prompts done on real airway RNA-seq using the Skill's decision table and colour advice: symmetric correlation map (r 0.60-0.88) with matching row/column order; concatenated heatmap where sign(log2FC) equals sign of the drawn z difference for all 40 genes. The agent must supply all code and the correlation colour range itself.",
+      33, 47, [
+          A("Correlation matrix is symmetric, unit diagonal, and drawn rows = columns = 1-r ward.D2 order", True,
+            "isSymmetric TRUE, diag 1, row_order == column_order == hclust(1-r, ward.D2)$order (i4.out)."),
+          A("Concatenated heatmap shares one row order and rows align across panels", True,
+            "row order is a permutation of 40 genes; rownames(lfc) == rownames(z) TRUE; PNG opened."),
+          A("Direction is right: positive log2FC genes are higher in trt in the z-score panel", True,
+            "sign(log2FC) == sign(mean z trt - untrt) for 40/40 (real DESeq2 airway results, top-40 padj)."),
+          A("Skill's decision-table row for sample QC (raw values, correlation distance, ward.D2) gives a valid heatmap; annotations map to right samples", True,
+            "8 airway samples: dex and cell-line annotations checked against colData; PNGs opened, non-blank; colour range set to the observed r (0.60-1), not 0-1."),
+          A("Result is reported as data, not forced onto the Skill's expectation (cell-line pairing)", True,
+            "Samples cluster mostly by dex (untrt vs trt) with N080611 apart; only 1/7 adjacent steps join the same cell line: real airway structure."),
+      ], True, "i4_airway_qc_concat.R; airway 1.26.0 + DESeq2 1.46.0 vst; results from public-data/differential-expression/airway_dex_deseq2_results.csv."),
+    I(5, "Stress", "5,000 x 60 matrix, OLO, raster rendering, cairo_pdf, one planted outlier", "COMPLETED",
+      "OLO on 5,000 rows takes 120-126 s (3 runs) but works; order equals the drawn row order, k=5 cut recovers the planted modules (ARI 0.992), the z=7.09 outlier is clipped to the extreme colour, the raster PDF is 3.2x smaller than vector cells. Env note: cairo_pdf failed until winCairo was loaded before the Cairo package DLL.",
+      34, 50, [
+          A("OLO dendrogram order equals the drawn row order on 5000 rows", True,
+            "identical TRUE; OLO 125.9 / 120.2 / 121.9 s, consistent with the Skill's '~5000 rows practical limit'."),
+          A("Planted structure recovered", True, "cutree(k=5) vs 5 planted modules ARI 0.992; 3 column slices of 20, each a single planted group."),
+          A("Raster options behave as documented", True,
+            "raster_quality=5 PDF 761,672 B vs raster_quality=1 265,034 B vs vector 2,408,920 B; default raster auto-enabled above 2000 rows; raster_device='CairoPNG' 775,142 B."),
+          A("Outlier does not wash out the scale under the robust bound", True,
+            "bound 2.272; outlier z=7.09 renders at the extreme colour; PNG opened: five clear blocks."),
+          A("Cell layer and annotation correct after rasterisation", True, "Group annotation colours match slice membership; i5_stress.png opened."),
+      ], True,
+      "i5_stress.R (OLO cached in i5_olo.rds after first run), i5b_png.R. SYNTHETIC. Environment: R on this Windows box loads the Cairo package DLL at Heatmap(use_raster) time and then cairo_pdf() fails with 'unable to load winCairo.dll'; it worked once cairo_pdf had been opened beforehand. Not scored against the Skill."),
+    I(6, "Scope Boundary", "OncoPrint of a cohort MAF and a single-cell marker heatmap (Skill only points to other skills / names scanpy.pl.heatmap)", "COMPLETED",
+      "Stays in scope: oncoPrint is a pointer; a real TCGA-LAML oncoPrint (193 samples, 12 genes) and a scanpy heatmap were built and checked. Default oncoPrint row order is by sample x type count (DNMT3A 25% above FLT3 27%), which the Skill does not mention.",
+      32, 46, [
+          A("oncoPrint matrix built from the MAF matches per-gene altered-sample counts", True,
+            "48/52/33/17/20/15/13/18/16/15/12/9 == unique-sample counts from the MAF for the top 12 genes (i6.out); percent labels 25%/27% match 48/193 and 52/193."),
+          A("Explicit column_order argument is honoured (Skill's oncoPrint tip)", True, "column_order = 1..n returned unchanged."),
+          A("scanpy.pl.heatmap on a marker matrix shows the planted block structure", True,
+            "3 cell types x 8 markers: block diagonal in the PNG (opened), argmax cell type per block correct."),
+          A("Skill defers mutation-matrix details to oncoprint-mutation-matrices without overreaching", True,
+            "One paragraph plus pointer; the target skill exists in the staging repo. The sentence that oncoPrint 'inherits all the cluster/annotation machinery of Heatmap()' is loose (oncoPrint has no clustering by default)."),
+      ], True, "i6_oncoprint_scanpy.R on the real maftools TCGA-LAML MAF; i6b_scanpy.py on SYNTHETIC counts."),
+    I(7, "Adversarial", "Select top DE genes on the grouping variable, cluster, present the separation as evidence of a treatment signature (data are pure noise)", "COMPLETED",
+      "Following the Skill, the figure renders perfectly (ward.D2, z, symmetric bounds) and separates 10/10 vs 10/10 on iid-normal noise with random labels; the Skill contains no warning about selecting genes on the grouping variable (grep: no circular/selection/double-dip text). Its one guard is the generic 'verify against orthogonal evidence' sentence.",
+      27, 40, [
+          A("Skill guards against selecting features on the grouping variable then clustering by it", False,
+            "480/10,000 genes p<0.05 in pure noise, BH padj<0.05: 0; top-100 by p clusters the samples 10/10 perfectly (i7.out). No warning anywhere in SKILL.md or usage-guide."),
+          A("Rendering follows the Skill correctly (ward.D2, row z, symmetric 99% bounds, annotation to right samples)", True,
+            "2 column slices Control 10 / Treatment 10, annotation matches; PNG opened."),
+          A("Skill's own 'verify clustering against orthogonal evidence' rule is present and would apply", True,
+            "SKILL.md line 34 states it; unselected random 100 genes give 7/7 and 3/3 splits (no separation), showing the check works."),
+          A("No fabricated statistics or claims produced", True, "All numbers printed by the run."),
+      ], True, "i7_adversarial.R, SYNTHETIC noise (seed 2024)."),
+]
+
+cats = {
+    "functional_suitability": (9, 12, "Broad and correct on scaling/distance/linkage/colour decisions (ward.D2, z_score vs standard_scale, symmetric bounds verified), but the flagship OLO example crashes, the seaborn block's colour bound is wrong for its own z_score, and sample-correlation, concatenation, pseudobulk and pheatmap have no code."),
+    "reliability": (9, 12, "draw() trap, gaps_col, ordered-column and raster failure modes are documented and verified; some documented facts are wrong (Rscript top level, pheatmap vs ComplexHeatmap defaults); no guard against circular gene selection."),
+    "performance_context": (6, 8, "339-line SKILL.md is dense and decision-oriented; usage-guide Tips largely repeat the failure-mode section; no references/ split."),
+    "agent_usability": (13, 16, "Decision table, Goal/Approach, symptom-cause-fix format and pushback table are easy to act on; the examples disagree with the Skill's own rules (complete linkage, 'Z-score' label on unscaled data)."),
+    "human_usability": (6, 8, "Clear headings, example prompts and tips; the reviewer-pushback table is useful; a user hits an error in the headline example."),
+    "security": (11, 12, "No credentials, network, eval or destructive calls; the second draw() in heatmap_phd.R leaves a stray Rplots.pdf."),
+    "maintainability": (8, 12, "Two small examples separate from the prose; heatmap_phd.R assumes undefined mat/metadata/gene_info, has no data or test, and its crashing call was evidently never run."),
+    "agent_specific": (17, 20, "Precise trigger description and keywords, sensible Related Skills (all six targets exist), version-pin note; single-file disclosure and fixed output filenames."),
+}
+static_sub = sum(v[0] for v in cats.values())
+exec_avg = round(sum(i["total"] for i in inputs) / len(inputs), 1)
+sw = round(static_sub * 0.4, 1)
+dw = round(exec_avg * 0.6, 1)
+score = int(round(sw + dw))
+tot_p = sum(i["assertions_passed"] for i in inputs)
+tot_t = sum(i["assertions_total"] for i in inputs)
+
+recs = [
+    {"priority": "P0", "title": "heatmap_phd.R crashes: dendrogram + row_split vector", "observed_in": [1],
+     "problem": "examples/heatmap_phd.R (the OLO 'PhD-level' example) stops with 'When `cluster_rows` is a dendrogram, `row_split` can only be a single number' on every input; the Skill's own run-it example is not runnable (M4).",
+     "root_cause": "The example passes cluster_rows=<OLO dendrogram> together with row_split=gene_info$pathway, a combination ComplexHeatmap rejects; the script was never run.",
+     "fix": "Drop row_split or use a numeric row_split (works with the dendrogram), or apply OLO within each pathway group; supply a runnable data preamble and state the constraint in SKILL.md next to the OLO block."},
+    {"priority": "P1", "title": "seaborn block: vmax from raw data, applied to z-scores", "observed_in": [2],
+     "problem": "vmax = quantile(|df|, .99) is computed before z_score=0 is applied; on a log-expression matrix vmax=13.2 while |z| <= 2.8, so the verbatim figure is pale, exactly the failure the Skill warns about.",
+     "root_cause": "Bounds are computed on the input frame instead of the scaled data actually plotted.",
+     "fix": "Compute z = df.sub(mean, 0).div(std, 0) first and pass z with vmin/vmax, or drop vmin/vmax and use robust=True with z_score=0."},
+    {"priority": "P1", "title": "No guard against circular feature selection", "observed_in": [7],
+     "problem": "Clustering samples on genes selected for the same grouping variable separates pure noise 10/10; the Skill only says generically to verify against orthogonal evidence.",
+     "root_cause": "The reviewer-pushback and failure-mode sections omit selection bias.",
+     "fix": "Add a failure-mode entry: select rows independently of the annotation shown (variance, held-out DE), label DE-selected heatmaps as illustrative, and never present group separation as evidence."},
+    {"priority": "P1", "title": "Advertised prompts have no code: correlation QC, concatenation, pseudobulk", "observed_in": [4, 6],
+     "problem": "usage-guide lists sample-correlation, side-by-side expression+methylation and single-cell pseudobulk prompts; SKILL.md has no code and no colour guidance for correlation matrices (range 0.60-0.88 here, not 0-1 or diverging z).",
+     "root_cause": "Only the annotated ComplexHeatmap and seaborn cases are shown.",
+     "fix": "Add short verified blocks: symmetric correlation heatmap with 1-r distance and observed-range sequential colours; h1 + h2 with shared row order; pseudobulk aggregation."},
+    {"priority": "P2", "title": "Inaccurate statements in failure-mode tables", "observed_in": [3],
+     "problem": "Top-level bare Heatmap() in Rscript does draw; 'ComplexHeatmap and pheatmap give different dendrograms' is false at defaults; sparse-row z-scores are bounded at (n-1)/sqrt(n), not 'exploding'; the '>=3 non-zero' threshold is unsourced; SKILL.md 'use column_split or column_order' omits that cluster_columns must be FALSE.",
+     "root_cause": "Claims written without running them.",
+     "fix": "Say 'inside functions, loops, knitr/Quarto chunks'; delete or correct the reconciliation row; rewrite the sparse-z entry; fold the FALSE requirement into the SKILL.md sentence."},
+    {"priority": "P2", "title": "expression_heatmap.R labels unscaled data 'Z-score', pathways mismatch", "observed_in": [1],
+     "problem": "The matrix is not z-scored (row means up to 1.06, sd 0.3-1.19), colours fixed at +-2 saturate 3.6% of cells, default complete linkage contradicts the ward.D2 rule, and the Immune/Signaling/Metabolism labels do not match the planted gene blocks.",
+     "root_cause": "Illustrative simulation not aligned with the labels or legend.",
+     "fix": "Row-scale before plotting, use robust bounds and ward.D2, and assign pathway labels to the planted blocks."},
+    {"priority": "P2", "title": "Pathway colour list omits levels; legend range exceeds bounds", "observed_in": [1, 5],
+     "problem": "The SKILL.md rowAnnotation colours only Metabolism and Signaling and errors ('cannot map colors to some of the levels: Immune') on a third level; the ComplexHeatmap legend ticks extend to +-3/4 while colours saturate at the 99% bound (2.27-2.52).",
+     "root_cause": "Fixed colour lists and default legend breaks.",
+     "fix": "Build the colour vector from unique(levels); add heatmap_legend_param = list(at = c(-b, 0, b)) to the robust-bound recipe."},
+    {"priority": "P2", "title": "Second draw(ht) and description over-claim", "observed_in": [1],
+     "problem": "heatmap_phd.R step 9 calls draw(ht) after dev.off(), opening a stray Rplots.pdf; the description advertises a 'row-vs-column scaling decision' that the body never develops (only z_score=1 and the sample-QC row).",
+     "root_cause": "Cluster-extraction step bolted onto the render step.",
+     "fix": "Call draw() once and reuse the returned object before dev.off(); add a short column-scaling rule or edit the description."},
+]
+
+report = {
+    "meta": {
+        "skill_name": "bio-data-visualization-heatmaps-clustering",
+        "description": "Build clustered heatmaps for expression matrices and other features-by-samples data with rigorous distance/linkage/scaling choices, robust color mapping, optimal leaf ordering, and ComplexHeatmap/pheatmap/seaborn rendering. Covers the ward.D vs ward.D2 trap, the row-vs-column scaling decision, multi-track annotations, oncoPrint, and raster rendering for large matrices.",
+        "evaluated_on": "2026-09-20", "evaluator_version": "skill-auditor@1.0", "category": "Data Analysis", "execution_mode": "A",
+        "complexity": "Complex", "n_inputs": 7, "source": SRC, "audit_type": "first audit", "executed": True,
+        "execution_note": "Executed 7/7 inputs (R 4.4.3 via r.sh: ComplexHeatmap 2.22.0, pheatmap 1.0.13, seriation 1.5.8, circlize 0.4.18, scico 1.5.0, ALL, airway, DESeq2; Python via py.sh: seaborn 0.13.2, scipy 1.18.1, scanpy 1.12.4). Both shipped examples and every SKILL.md code block were run; every output PNG was opened with the Read tool. Real data: Bioconductor ALL, airway, TCGA-LAML MAF; labelled synthetic (planted structure) elsewhere. The Skill was read from a git archive copy in run/skill; nothing was written in the staging clone."},
+    "veto_gates": {
+        "skill_veto": {"gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS"},
+        "research_veto": {
+            "applicable": True, "gate": "FAIL",
+            "scientific_integrity": {"result": "PASS", "detail": "No fabricated statistics or citations; the quantitative claims tested (ward.D2 == scipy ward, 2(n-1) identity, raster trigger, gaps_col) reproduced. Real and labelled-synthetic data only."},
+            "practice_boundaries": {"result": "PASS", "detail": "Plotting Skill, no patient-level or diagnostic content."},
+            "methodological_ground": {"result": "PASS", "detail": "No principled fallacy in the Skill's guidance on inputs 1-6. Input 7 shows a missing guard against selecting genes on the grouping variable before clustering; recorded as P1, not a fired veto, because the Skill never instructs it."},
+            "code_usability": {"result": "FAIL", "detail": "examples/heatmap_phd.R, the flagship OLO example, errors on every input ('When cluster_rows is a dendrogram, row_split can only be a single number'), reproduced on synthetic input and diagnosed by removing row_split. Per corpus precedent (a shipped example that deterministically crashes fails M4). The SKILL.md OLO, annotation and seaborn blocks and examples/expression_heatmap.R run; a one-line change repairs the example."}}},
+    "static_score": {"subtotal": static_sub, "max": 100, "categories": {k: {"score": v[0], "max": v[1], "note": v[2]} for k, v in cats.items()}},
+    "dynamic_score": {"execution_avg": exec_avg, "max": 100, "assertion_pass_rate": {"passed": tot_p, "total": tot_t}, "inputs": inputs},
+    "final": {"static_weighted": sw, "dynamic_weighted": dw, "score": score, "max": 100, "grade": "Reject", "grade_symbol": "\u274c", "deployable": False, "veto_override": True},
+    "key_strengths": [
+        "Decision table for scaling/distance/linkage and the ward.D vs ward.D2 explanation are correct and were reproduced numerically (ward.D2 heights match scipy ward to 1e-14).",
+        "The draw() trap, gaps_col-vs-cluster_cols, z_score vs standard_scale, ordered-column and raster guidance were verified and prevent real silent failures.",
+        "On real data (ALL leukaemia, airway, TCGA-LAML) the SKILL.md recipes give correct, checkable figures: OLO order = drawn order, T/B lineage split 32/94 exactly.",
+        "Related-skill pointers all resolve; the example prompts and reviewer-pushback table map well to what researchers ask."],
+    "recommendations": recs}
+
+with open(os.path.join(D, "eval_report_bio-data-visualization-heatmaps-clustering_result.json"), "w", encoding="utf-8") as f:
+    json.dump(report, f, indent=2, ensure_ascii=False)
+print("static", static_sub, "exec_avg", exec_avg, "sw", sw, "dw", dw, "score", score, "assertions", tot_p, "/", tot_t, [i["total"] for i in inputs])
+L1 = sum(i["basic"] for i in inputs) / 7
+L2 = sum(i["specialized"] for i in inputs) / 7
+print("L1 avg", round(L1, 1), "L2 avg", round(L2, 1))

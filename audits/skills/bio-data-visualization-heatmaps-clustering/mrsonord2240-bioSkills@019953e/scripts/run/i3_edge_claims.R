@@ -1,0 +1,68 @@
+# INPUT 3 (edge): every quantitative / behavioural claim in the Skill's "Per-Method Failure Modes" and "Reconciliation" tables that can be checked.
+suppressPackageStartupMessages({library(ComplexHeatmap);library(circlize);library(pheatmap);library(seriation)})
+set.seed(5)
+hr <- function(t, ...) cat("\n=====", t, "=====\n", ...)
+# A. ward.D vs ward.D2, and equivalence to scipy ward
+hr("A. ward.D vs ward.D2 (planted 3-cluster data)")
+x <- rbind(matrix(rnorm(40*6, 0, 1), 40), matrix(rnorm(40*6, 3, 1), 40), matrix(rnorm(20*6, -3, 2), 20))
+rownames(x) <- paste0("r", 1:100)
+h1 <- hclust(dist(x), "ward.D"); h2 <- hclust(dist(x), "ward.D2")
+cat("ward.D and ward.D2 orders identical:", identical(h1$order, h2$order), "; merge tables identical:", identical(h1$merge, h2$merge), "\n")
+cat("cutree k=3 agreement (adjusted): ", "ward.D sizes", table(cutree(h1,3)), "| ward.D2 sizes", table(cutree(h2,3)), "\n")
+cat("ward.D top merge height", round(max(h1$height),1), " ward.D2", round(max(h2$height),1), "; ward.D height^2-ish vs D2 heights ratio (D on unsquared d): ", round(max(h1$height)/max(h2$height)^2*1000,3), "\n")
+write.csv(x, "i3_x.csv"); saveRDS(h2$height, "i3_h2_heights.rds")
+# B. seaborn 'ward' == ward.D2 (heights compared cross-language in i3_scipy_check.py)
+# C. Euclidean on z-scored rows ~ 1 - Pearson
+hr("C. Euclid(z) vs 1-Pearson")
+m <- matrix(rnorm(30*12), 30); z <- t(scale(t(m)))
+de <- as.matrix(dist(z)); dc <- 1 - cor(t(m))
+cat("d_euclid^2 / (1-r) constant (=2(n-1)):", signif(range(de[upper.tri(de)]^2 / dc[upper.tri(dc)]),6), " expect", 2*(12-1), "\n")
+# D. outlier compresses colour scale
+hr("D. one outlier vs quantile bounds")
+o <- matrix(rnorm(2000), 40); o[1,1] <- 60
+cf_naive <- colorRamp2(c(min(o), 0, max(o)), c("blue","white","red"))
+b <- quantile(abs(o), 0.99); cf_rob <- colorRamp2(c(-b, 0, b), c("blue","white","red"))
+cat("bounds 99%:", round(b,2), " max:", max(o), "\n")
+cat("typical cell value 1.5 -> naive:", cf_naive(1.5), " robust:", cf_rob(1.5), "\n")
+cat("outlier 60 -> robust:", cf_rob(60), " (equals extreme colour col_fun(b):", cf_rob(60)==cf_rob(b), ")\n")
+# E. sparse rows z-score
+hr("E. z-score on sparse rows")
+s <- rbind(c(0,0,0,0,0,0,0,0,0,10), c(0,0,0,0,0,0,0,0,5,6), rnorm(10, 5, 1))
+zs <- t(scale(t(s))); print(round(zs, 2))
+cat("max |z| for 1-nonzero row:", round(max(abs(zs[1,])),2), " (theoretical (n-1)/sqrt(n) =", round(9/sqrt(10),2), ")\n")
+# F. bare Heatmap() behaviours
+hr("F. bare Heatmap() claims")
+mm <- matrix(rnorm(100), 10)
+f1 <- tempfile(fileext=".pdf"); pdf(f1); Heatmap(mm); dev.off()
+cat("F1 top-level bare Heatmap() in Rscript: pdf size", file.size(f1), "(blank page ~ 3-4 KB?)\n")
+f2 <- tempfile(fileext=".pdf"); pdf(f2); Heatmap(mm) -> tmp; dev.off()
+cat("F2 assigned only (no print):             pdf size", file.size(f2), "\n")
+f3 <- tempfile(fileext=".pdf"); pdf(f3); (function() { Heatmap(mm) })(); dev.off()
+cat("F3 bare Heatmap() as value of function call at top-level (auto-prints result): pdf size", file.size(f3), "\n")
+f4 <- tempfile(fileext=".pdf"); pdf(f4); (function() { Heatmap(mm); invisible(NULL) })(); dev.off()
+cat("F4 bare Heatmap() inside function, not returned:  pdf size", file.size(f4), "\n")
+f5 <- tempfile(fileext=".pdf"); pdf(f5); for (i in 1) { Heatmap(mm) }; dev.off()
+cat("F5 bare Heatmap() in for loop:                   pdf size", file.size(f5), "\n")
+f6 <- tempfile(fileext=".pdf"); pdf(f6); draw(Heatmap(mm)); dev.off()
+cat("F6 draw(Heatmap()):                              pdf size", file.size(f6), "\n")
+# G. raster default + args
+hr("G. raster claims")
+big <- matrix(rnorm(2500*8), 2500); small <- matrix(rnorm(100*8), 100)
+cat("use_raster default, 2500 rows:", Heatmap(big)@matrix_param$use_raster %||% "n/a", "\n")
+cat("formals raster_quality default:", deparse(formals(Heatmap)$raster_quality), " raster_device default:", deparse(formals(Heatmap)$raster_device)[1], "\n")
+cat("use_raster default, 100 rows:", deparse(formals(Heatmap)$use_raster), "\n")
+# H. pheatmap gaps_col with cluster_cols=TRUE
+hr("H. pheatmap gaps_col vs cluster_cols")
+pm <- matrix(rnorm(200), 20); colnames(pm) <- paste0("c", 1:10)
+p1 <- pheatmap(pm, gaps_col = c(5), cluster_cols = TRUE, silent = TRUE)
+cat("cluster_cols=TRUE, gaps_col=5: gaps in gtable (widths of colgap): ")
+gt <- p1$gtable; nm <- vapply(gt$grobs, function(g) class(g)[1], ""); cat("returned tree_col present:", !is.null(p1$tree_col), "\n")
+# The real test: does the drawn matrix have a gap? compare heatmap grob width vs no-gap case
+w <- function(p) { hm <- p$gtable$grobs[[which(p$gtable$layout$name=="matrix")]]; length(hm$children[[1]]$x) }
+p0 <- pheatmap(pm, cluster_cols = TRUE, silent = TRUE)
+xs <- function(p) { hm <- p$gtable$grobs[[which(p$gtable$layout$name=="matrix")]]; sort(unique(as.numeric(hm$children[[1]]$x))) }
+gap_cl <- diff(xs(p1)); gap_0 <- diff(xs(p0))
+cat("x-positions equal with vs without gaps_col (cluster_cols=TRUE):", isTRUE(all.equal(xs(p1), xs(p0))), "\n")
+p2 <- pheatmap(pm, gaps_col = c(5), cluster_cols = FALSE, silent = TRUE)
+p3 <- pheatmap(pm, cluster_cols = FALSE, silent = TRUE)
+cat("x-positions equal with vs without gaps_col (cluster_cols=FALSE):", isTRUE(all.equal(xs(p2), xs(p3))), "\n")
