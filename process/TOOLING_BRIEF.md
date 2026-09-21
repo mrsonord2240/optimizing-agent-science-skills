@@ -4,9 +4,6 @@ You are the **tooling agent** for ONE folder. Your only job is to make every too
 Skills reference installed and smoke-tested BEFORE the auditor starts, and to write the inventory
 the auditor reads. **You do not audit, score, fix or edit any Skill.** Do not spawn sub-agents.
 
-Introduced 2026-09-16, after the proteomics folder spent five audit passes discovering its tools
-mid-run. The two folders that got a tooling pass first executed 66/67 and 51/53 of their audit
-inputs.
 
 ## Read first
 

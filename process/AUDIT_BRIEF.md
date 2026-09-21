@@ -133,6 +133,11 @@ in the clone reads clean while byte-identity is broken**. Check the filesystem
 - Do not touch `F:\OpenScience\skills`, `F:\OpenScience\external`, or another agent's audit folder.
 - No network calls to paid or authenticated services. Public downloads for pip/CRAN/Bioconductor
   are fine.
+- **The publisher copies everything under `run\`**, third-party packages included (leidenalg and
+  scikit-misc reached the public repo this way). Install test libraries outside your audit folder.
+- **Never kill a process by image name** (`taskkill /IM Rscript.exe` killed three unrelated runs). Kill
+  by the PID you started.
+- Python on Windows cannot read MSYS `/f/...` paths: use `F:\...`. Read reports with `python -X utf8`.
 
 ## Final message (≤ 80 words)
 
