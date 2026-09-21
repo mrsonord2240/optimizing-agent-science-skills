@@ -1,0 +1,17 @@
+suppressMessages({library(maftools); library(data.table)})
+cat("maftools", as.character(packageVersion("maftools")), " trackViewer", as.character(packageVersion("trackViewer")), " g3viz", as.character(packageVersion("g3viz")), "\n")
+print(args(lollipopPlot))
+print(args(lollipopPlot2))
+cat("--- g3viz exports\n"); print(getNamespaceExports("g3viz"))
+print(args(g3viz::g3Lollipop)); print(args(g3viz::readMAF))
+maffile <- "F:/OpenScience/audit-envs/data-visualization/public-data/mutations/tcga_laml.maf.gz"
+m <- fread(maffile)
+cat("MAF cols:", paste(colnames(m), collapse=","), "\n")
+cat("HGVSp_Short present:", "HGVSp_Short" %in% colnames(m), "\n")
+print(head(m[Hugo_Symbol=="DNMT3A", .(Tumor_Sample_Barcode, Variant_Classification, Protein_Change)]))
+# domain data in maftools
+dd <- system.file("extdata","protein_domains.RDs", package="maftools")
+cat("domains file:", dd, file.exists(dd), "\n")
+pd <- readRDS(dd); print(class(pd)); print(head(pd)); print(colnames(pd))
+print(pd[pd$HGNC=="TP53",])
+print(pd[pd$HGNC=="KRAS",])

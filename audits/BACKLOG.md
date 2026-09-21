@@ -22,7 +22,47 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The example passes cluster_rows=<OLO dendrogram> together with row_split=gene_info$pathway, a combination ComplexHeatmap rejects; the script was never run.
 - Fix: Drop row_split or use a numeric row_split (works with the dendrogram), or apply OLO within each pathway group; supply a runnable data preamble and state the constraint in SKILL.md next to the OLO block.
 
-## P1 (150)
+## P1 (155)
+
+### `bio-data-visualization-lollipop-protein-maps` — Shipped example never completes and paints wrong colours
+
+- Skill: 65, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/lollipop-protein-maps) · [viewer](skills/bio-data-visualization-lollipop-protein-maps/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 3, 4, 5
+- Problem: examples/lollipop_phd.R halts at proteinID='P04637' (V1), at GRanges() on classes outside the palette (V2; unparsable p.Arg175His / p.* positions fail next), and at hgvspChange2protein (V3); where it draws, class_col[<factor>] gives all 55 lollipops the wrong colour and every stem is captioned with its class name.
+- Root cause: The example was written from the API in memory and never executed against a real MAF.
+- Fix: Use class_col[as.character(class)], drop or warn on unparsable HGVSp rows, extend the palette to Translation_Start_Site/Nonstop_Mutation, name lollipops by residue, remove proteinID or pass an NP_ id, and replace the g3viz section with readMAF() -> g3Lollipop() -> saveWidget().
+
+### `bio-data-visualization-lollipop-protein-maps` — Statements about maftools behaviour are false for 2.22.0
+
+- Skill: 65, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/lollipop-protein-maps) · [viewer](skills/bio-data-visualization-lollipop-protein-maps/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 1, 2, 3
+- Problem: printCount=TRUE only prints a console table (no counts on the plot); lollipopPlot returns a data.table (base graphics), not a ggplot2 object; point size is constant (height encodes count); domains come from a bundled CDD table (db_xref), not a live Pfam query; the default isoform is the longest RefSeq, not the canonical UniProt one; proteinID takes NP_ ids.
+- Root cause: API and defaults described from assumption rather than from the installed package.
+- Fix: Rewrite these lines to match maftools 2.22 (or annotate counts yourself with text()), state the domain source and the transcript actually used, and show a working isoform call such as refSeqID='NM_000546'.
+
+### `bio-data-visualization-lollipop-protein-maps` — Wrong domain coordinates and a wrong Ensembl transcript id
+
+- Skill: 65, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/lollipop-protein-maps) · [viewer](skills/bio-data-visualization-lollipop-protein-maps/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 3, 4
+- Problem: TP53 domains coded as 102-291 / 323-352 / 363-392 (SKILL.md) and 1-41 / 102-291 / 323-355 / 363-392 (example) contradict both their own comments and UniProt (TAD 1-44, DNA binding 102-292, oligomerization 325-356, basic 368-387); ENST00000288602 is BRAF-201, not TP53's canonical transcript (ENST00000269305).
+- Root cause: Coordinates typed by hand with IRanges width arithmetic and no lookup.
+- Fix: Pull features from the UniProt JSON (start/end are inclusive; use IRanges(start, end)) or quote the verified values, and correct the transcript id and the invented 'R175H plotted at R177H' example.
+
+### `bio-data-visualization-lollipop-protein-maps` — g3viz section calls a function that does not exist
+
+- Skill: 65, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/lollipop-protein-maps) · [viewer](skills/bio-data-visualization-lollipop-protein-maps/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 5
+- Problem: hgvspChange2protein is not exported by g3viz 1.2.0, and output.filename='TP53_lollipop.html' writes no HTML (it names the download button file).
+- Root cause: g3viz API invented; a package archived on CRAN 2026-02-21 is also not installable with install.packages().
+- Fix: Show mut <- readMAF(file, protein.change.col='HGVSp_Short'); w <- g3Lollipop(mut, gene.symbol='TP53', protein.change.col='HGVSp_Short', ...); htmlwidgets::saveWidget(w, 'TP53.html'), and note the CRAN-archive install.
+
+### `bio-data-visualization-lollipop-protein-maps` — AACol='HGVSp_Short' hard-coded; wrong failure description
+
+- Skill: 65, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/lollipop-protein-maps) · [viewer](skills/bio-data-visualization-lollipop-protein-maps/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 2
+- Problem: maftools' own TCGA-LAML MAF has Protein_Change, so every call as written stops (lollipopPlot: 'Column HGVSp_Short not found.'; lollipopPlot2: "object 'AAChange' not found"), whereas the Skill says maftools 'falls back inconsistently' and reports 'No mutations to plot'.
+- Root cause: Failure modes documented from expectation.
+- Fix: Leave AACol unset (maftools auto-detects HGVSp_Short, Protein_Change, AAChange and says which it used) or document the real messages and how to read them.
 
 ### `bio-data-visualization-sequence-logos` — Bias direction of uniform-background error is reversed
 
@@ -1224,7 +1264,31 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (479)
+## P2 (482)
+
+### `bio-data-visualization-lollipop-protein-maps` — HGVSp edge cases and recurrence semantics undocumented
+
+- Skill: 65, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/lollipop-protein-maps) · [viewer](skills/bio-data-visualization-lollipop-protein-maps/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 1, 3
+- Problem: Counts are mutation rows, not samples (a duplicated call row makes R175H 46 vs 45 samples); different amino-acid changes at one residue draw as separate stems so KRAS G12 shows 30 and 25 rather than 55; p.M1?, silent and empty HGVSp rows are dropped without a note; 3-letter HGVSp is not merged; mutations beyond a shorter isoform are clipped silently.
+- Root cause: The Skill treats 'count' as unambiguous.
+- Fix: Add a short table of these behaviours and recommend deduplicating on sample + change and stating whether height means rows, samples or per-change counts.
+
+### `bio-data-visualization-lollipop-protein-maps` — pyLollipop does not exist; ProteinPaint not runnable
+
+- Skill: 65, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/lollipop-protein-maps) · [viewer](skills/bio-data-visualization-lollipop-protein-maps/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 5
+- Problem: 'pyLollipop (limited maintenance)' has no PyPI distribution; 'ProteinPaint via API' has no example; Bio.PDB is cited for domain coordinates but never used.
+- Root cause: Tool list padded from memory.
+- Fix: Remove pyLollipop and Bio.PDB or give a verified Python alternative; give a real ProteinPaint or cBioPortal URL pattern if kept.
+
+### `bio-data-visualization-lollipop-protein-maps` — Redundant usage guide and cosmetic defects
+
+- Skill: 65, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/lollipop-protein-maps) · [viewer](skills/bio-data-visualization-lollipop-protein-maps/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 2
+- Problem: usage-guide.md repeats SKILL.md tips and prompts; default label overlap ('R248QR273C', domain names over each other) and random per-call domain colours are not mentioned.
+- Root cause: Duplicated prose; no visual check of the outputs.
+- Fix: Fold the guide into SKILL.md, and mention repel = TRUE and domainAlpha/label-size arguments for crowded genes.
 
 ### `bio-data-visualization-sequence-logos` — Stale or inexact API claims
 

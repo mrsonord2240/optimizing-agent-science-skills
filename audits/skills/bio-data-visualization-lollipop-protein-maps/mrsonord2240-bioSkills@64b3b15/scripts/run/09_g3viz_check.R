@@ -1,0 +1,43 @@
+# Inspect g3viz's embedded snvData vs independent truth; write the HTML with saveWidget; KRAS length/domains across tools vs UniProt P01116.
+suppressMessages({library(maftools); library(data.table); library(jsonlite); library(g3viz); library(htmlwidgets)})
+source("F:/OpenScience/audits/bio-data-visualization-lollipop-protein-maps/run/helpers.R")
+D <- "F:/OpenScience/audits/bio-data-visualization-lollipop-protein-maps/data/"
+setwd("F:/OpenScience/audits/bio-data-visualization-lollipop-protein-maps/run/out")
+truth <- fromJSON(paste0(D, "synthetic_truth.json"), simplifyVector = FALSE)
+mut <- readMAF(paste0(D, "synthetic_lollipop.maf"), protein.change.col = "HGVSp_Short")
+w <- g3Lollipop(mut, gene.symbol = "TP53", protein.change.col = "HGVSp_Short", plot.options = g3Lollipop.theme(theme.name = "nature"), output.filename = "TP53_lollipop.html")
+cat("output.filename='TP53_lollipop.html' wrote an html file:", file.exists("TP53_lollipop.html"), "(it only names the PNG/SVG download button file)\n")
+cat("widget class:", class(w), " outputFN:", w$x$outputFN, "\n")
+sv <- fromJSON(w$x$snvData)
+cat("snvData rows:", nrow(sv), " cols:", paste(colnames(sv), collapse = ","), "\n")
+print(head(sv, 3))
+sv <- as.data.table(sv)
+# by position: independent truth counts mutations by position (Silent excluded, unparsable excluded)
+posc <- sv[!is.na(AA_Position), .N, by = .(pos = as.integer(AA_Position))]
+tp <- data.table(pos = as.integer(names(truth$TP53)), truth = sapply(truth$TP53, function(v) v$mutations))
+cmp <- merge(tp, posc, by = "pos", all = TRUE)
+cat("\nPositions where g3viz rows != independent mutation count:\n"); print(cmp[is.na(truth) | is.na(N) | truth != N])
+cat("top by position: "); print(cmp[order(-N)][1:5])
+cat("class labels in g3viz: ", paste(unique(sv$Mutation_Class), collapse = ","), "\n")
+print(sv[as.integer(AA_Position) %in% c(175, 248, 273), .N, by = .(AA_Position, Mutation_Class)])
+htmlwidgets::saveWidget(w, "TP53_g3viz.html", selfcontained = TRUE)  # 394 KB self-contained html (bundles third-party JS): deleted from the published record, PNG kept
+cat("saveWidget html size:", file.size("TP53_g3viz.html"), "\n")
+webshot2::webshot("TP53_g3viz.html", "TP53_g3viz.png", vwidth = 1100, vheight = 700, delay = 3)
+cat("screenshot size:", file.size("TP53_g3viz.png"), "\n")
+
+# ---------- KRAS: protein length / domain / isoform vs UniProt P01116 (length 189) ----------
+uni <- fromJSON(paste0(D, "P01116_uniprot.json"), simplifyVector = FALSE)
+cat("\nUniProt P01116 length:", uni$sequence$length, " (KRAS4A/2A canonical; KRAS4B = P01116-2, 188 aa)\n")
+maf <- read.maf(paste0(D, "synthetic_lollipop.maf"), verbose = FALSE)
+svglite("K1_kras_maftools.svg", width = 20, height = 6)
+r <- lollipopPlot(maf, gene = "KRAS", AACol = "HGVSp_Short", labelPos = c(12, 13, 61), printCount = TRUE)
+dev.off()
+png("K1_kras_maftools.png", 1600, 700, res = 200); invisible(lollipopPlot(maf, gene = "KRAS", AACol = "HGVSp_Short", labelPos = c(12, 13, 61), printCount = TRUE)); dev.off()
+p <- svg_parse("K1_kras_maftools.svg"); cal <- svg_calib(p); pts <- svg_points(p, cal); pts <- pts[!is.na(height) & height > 0.5 & abs(height - round(height)) < .2]
+cat("maftools KRAS drawn protein length (last x tick):", tail(cal$xt$label, 1), "\n")
+print(pts[order(-height)][1:4, .(pos = round(pos, 1), height = round(height, 1), fill)])
+print(as.data.table(maftools:::.getdomains("KRAS", NULL, NULL))[, .(refseq.ID, protein.ID, aa.length, Start, End, Label)])
+mk <- readMAF(paste0(D, "synthetic_lollipop.maf"), protein.change.col = "HGVSp_Short")
+wk <- g3Lollipop(mk, gene.symbol = "KRAS", protein.change.col = "HGVSp_Short")
+cat("g3viz KRAS domainData:", wk$x$domainData, "\n")
+sk <- as.data.table(fromJSON(wk$x$snvData)); print(sk[, .N, by = .(pos = as.integer(AA_Position))][order(-N)][1:4])

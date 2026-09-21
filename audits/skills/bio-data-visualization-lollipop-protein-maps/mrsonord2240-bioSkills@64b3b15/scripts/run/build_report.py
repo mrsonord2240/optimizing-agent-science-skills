@@ -1,0 +1,175 @@
+"""Assemble eval_report_<skill>_result.json from the findings of run/00..13, then run the schema pre-emit checklist."""
+import json
+SK = "bio-data-visualization-lollipop-protein-maps"
+OUT = r"F:\OpenScience\audits\%s\eval_report_%s_result.json" % (SK, SK)
+
+def A(text, ok, note):
+    return {"text": text, "result": "PASS" if ok else "FAIL", "note": note}
+
+inputs = [
+ {"index": 1, "type": "Canonical",
+  "label": "maftools lollipopPlot of TP53 in a synthetic cohort with planted hotspots (R175H, R248Q/W, R273H), class colours, hotspot labels",
+  "status": "COMPLETED", "status_flag": "\u2705",
+  "executed": True,
+  "execution_note": "run/04_maftools_synth.R (synthetic 300-row MAF, planted hotspots + off-domain noise), svglite geometry parse + PNG opened. SKILL.md block 1 verbatim except AACol/colours as coded.",
+  "note": "Positions, heights and 77/77 class colours verified from the drawn SVG; but printCount=TRUE prints nothing on the plot and domains are NCBI CDD (P53 109-288), not UniProt 102-292.",
+  "basic": 33, "specialized": 47, "total": 80,
+  "assertions": [
+    A("Each lollipop sits at the residue given by the input HGVSp and its height equals the independent count of mutations with that change", True, "R175H 46 (45 samples + 1 duplicate row), R248Q 38, R248W 13, R273H 29, R342* 8, X125_splice 6, E286Kfs*9 5 all drawn at the right x with the right height (SVG circle geometry vs regex-parsed truth); only p.M1? was dropped"),
+    A("Variant classes map to the colours the caller supplied", True, "77 of 77 circles at truth positions carry the class_col colour; classes absent from the palette (Translation_Start_Site, Nonstop) do not crash lollipopPlot"),
+    A("printCount = TRUE annotates each lollipop with its count as SKILL.md, usage-guide and the example state", False, "PNG shows no counts; the maftools source only print()s the summary table to the console; the y-axis carries just 1 and the maximum"),
+    A("Protein length and domain boundaries drawn equal UniProt P04637 (393 aa; DNA binding 102-292, TAD 1-44, oligomerization 325-356)", False, "length 393 matches, but drawn domains are P53_TAD 5-29, P53 109-288, P53_tetramer 319-359 from maftools' bundled CDD table, not the 'Pfam via maftools query' the Skill states"),
+    A("Hotspot labels requested through labelPos appear at the named residues", True, "R175H/C/His, R248Q/W and R273H labels drawn over the right stems (label merges the 3-letter variant into the text)")
+  ]},
+ {"index": 2, "type": "Variant A",
+  "label": "Cohort comparison with lollipopPlot2 (Luminal vs Basal synthetic; real TCGA-LAML DNMT3A by FAB group)",
+  "status": "COMPLETED", "status_flag": "\u26a0\ufe0f",
+  "executed": True,
+  "execution_note": "run/05_maftools_plot2.R: SKILL.md lollipopPlot2 block and example section 4 pattern; drawn geometry parsed from svglite; LAML R882H counted independently from the MAF.",
+  "note": "Up/down heights match independent counts exactly (46/18/8 vs 20/5/29; LAML 9 vs 9), but the block as written fails on the LAML MAF with an unhelpful error and domain colours change per call.",
+  "basic": 32, "specialized": 45, "total": 77,
+  "assertions": [
+    A("Cohort 1 hangs above and cohort 2 below the shared domain map with heights equal to per-cohort counts", True, "Luminal R175H 46, R248Q 18, R248W 8; Basal R248Q 20, R248W 5, R273H 29 read from the SVG equal the counts computed from the MAF and the clinical table; LAML DNMT3A R882H 9 up and 9 down equal the independent 9/9"),
+    A("The call as written in the Skill (AACol1/AACol2 = 'HGVSp_Short') runs on maftools' own bundled TCGA-LAML data", False, "LAML has Protein_Change, not HGVSp_Short; lollipopPlot2 dies with the cryptic \"object 'AAChange' not found\" instead of naming the missing column"),
+    A("Domain colours are stable and encode function class as the Skill's advice requires", False, "the same three TP53 domains are blue/salmon/yellow in lollipopPlot and salmon/yellow/blue in lollipopPlot2; the Skill gives no working way to fix them in maftools"),
+    A("Cohort N and mutation rate per cohort are reported on the figure", True, "'Luminal [75.32%; N = 154]' and 'Basal [68.12%; N = 138]' drawn"),
+  ]},
+ {"index": 3, "type": "Edge",
+  "label": "HGVSp edge cases (p.X125_splice, frameshift, p.*394Wext*?, p.M1?, p.=, 3-letter, same-sample multi-hit, duplicate rows) and isoform choice",
+  "status": "PARTIAL", "status_flag": "\u274c",
+  "executed": True,
+  "execution_note": "run/04 (maftools), run/06 + 06b (example section 5 code verbatim on the same MAF), run/11 (short isoform NM_001126115, Ensembl check). All executed.",
+  "note": "maftools itself copes (splice, fs, ext plotted; M1? and silent dropped), but the Skill's trackViewer summary code dies on p.Arg175His / p.* and on classes outside its palette, a shorter isoform silently clips mutations, and the Skill's TP53 transcript ID is BRAF.",
+  "basic": 26, "specialized": 36, "total": 62,
+  "assertions": [
+    A("Splice, frameshift and extension HGVSp strings land at the residue the string names", True, "X125_splice at 125 (6), E286Kfs*9 at 286 (5), P72Lfs*3 at 72 (4), *394Wext*? at 394 (drawn just past the 393 backbone)"),
+    A("The Skill's own position-parsing code survives realistic HGVSp values", False, "sub('p\\\\.[A-Z](\\\\d+).*') returns NA for p.Arg175His and p.*394Wext*?; IRanges(NA) stops with \"'start' or 'width' cannot contain NAs\" (06b); a class missing from the 7-colour palette stops GRanges with \"missing values in 'row.names'\""),
+    A("Isoform handling behaves as the Skill states (maftools uses the canonical UniProt isoform; a specific one is chosen with proteinID)", False, "maftools picks the longest RefSeq from a bundled table (\"Using longer transcript NM_000546\"); proteinID takes a RefSeq NP_ id, and the UniProt id P04637 the example passes fails with ' not found!'; mutations beyond a 261-aa isoform are silently clipped from the figure"),
+    A("Transcript identifiers quoted in the Skill are correct", False, "Ensembl REST: ENST00000269305 = TP53-201 (canonical), ENST00000288602 = BRAF-201; the Skill names the BRAF transcript as canonical TP53"),
+    A("Multi-hit positions are shown at their true recurrence", False, "R248Q (38) and R248W (13) draw as two stems, so the residue's real 51 is never visible; a duplicated call row inflates R175H to 46 against 45 samples; neither behaviour is documented")
+  ]},
+ {"index": 4, "type": "Variant B",
+  "label": "trackViewer::lolliplot with UniProt-derived domains for TP53 (SKILL.md block and example section 5)",
+  "status": "COMPLETED", "status_flag": "\u274c",
+  "executed": True,
+  "execution_note": "run/06_trackviewer.R, run/07_png_measure.py (pixel centroids vs axis ticks), run/11_extras.R (example section 5 verbatim on a cleaned MAF), run/12_factor_color.R. Cached UniProt P04637 JSON.",
+  "note": "SKILL.md block draws heads at 175/248/273 with heights 44.9/37.9/28.9 (pixels), but its domain coordinates disagree with UniProt at three boundaries and the example paints all 55 lollipops with the wrong class colour.",
+  "basic": 24, "specialized": 34, "total": 58,
+  "assertions": [
+    A("Lollipop heads sit at the stated residues and score-height (45, 38, 29)", True, "pixel centroids vs axis ticks: x = 175.0/248.0/273.0, height 44.9/37.9/28.9"),
+    A("Domain boundaries drawn equal UniProt P04637", False, "SKILL.md draws DNA-binding 102-291, Tetramerization 323-352, Regulatory 363-392; the example codes 1-41, 102-291, 323-355, 363-392 while its comments claim 1-42, 102-292, 323-356, 363-393; UniProt has TAD 1-44, DNA binding 102-292, oligomerization 325-356, basic region 368-387 (no 'Regulatory 363-393')"),
+    A("Variant classes map to the intended colours in the example's trackViewer section", False, "class_col[<factor>] indexes by integer code: the 175/248/273 missense hotspots come out #CC79A7 (Splice_Site pink) instead of #D55E00; 55 of 55 lollipops wrong, with no warning (12_factor_color.R)"),
+    A("The same code with as.character() and UniProt coordinates draws the correct map", True, "T3 figure: heads 47/51/29 at 175/248/273, four UniProt domains, orange missense; heads are auto-spread from the dashed true positions when crowded"),
+    A("Every lollipop is labelled with its residue", False, "example sets names(snps) to the variant class, so every stem is captioned 'Missense_Mutation' and the hotspot residue labels the Skill promises are absent")
+  ]},
+ {"index": 5, "type": "Stress",
+  "label": "Interactive g3viz HTML for TP53 and KRAS, and the shipped example run end to end",
+  "status": "PARTIAL", "status_flag": "\u274c",
+  "executed": True,
+  "execution_note": "run/08_g3viz.R, 09_g3viz_check.R (widget JSON parsed, saveWidget + Chrome screenshot opened), 10_example_run.py + 10_run_examples.sh (three variants of examples/lollipop_phd.R), 13_pylollipop_check.sh.",
+  "note": "g3viz works via readMAF -> g3Lollipop (counts equal truth at every position, KRAS G12 = 55), but the Skill's hgvspChange2protein does not exist, output.filename writes no HTML, and the shipped example halts at proteinID, at NA parsing, or at g3viz in the three variants tried.",
+  "basic": 22, "specialized": 33, "total": 55,
+  "assertions": [
+    A("The g3viz code path in SKILL.md and the example runs", False, "could not find function \"hgvspChange2protein\": g3viz 1.2.0 exports no such function; readMAF() is the real entry"),
+    A("g3Lollipop(output.filename = 'TP53_lollipop.html') writes an interactive HTML file", False, "no file is written; the argument only names the PNG/SVG download button; saveWidget() is needed"),
+    A("examples/lollipop_phd.R runs to completion with only its placeholder paths substituted", False, "V1 halts at proteinID='P04637' (step 3); V2 (proteinID removed) halts at step 5 with \"missing values in 'row.names'\" (classes outside the 7-colour palette; unparsable positions would fail next); V3 (clean MAF) reaches step 6 and halts at hgvspChange2protein; no variant produces the g3viz HTML"),
+    A("g3viz counts and positions equal the independent counts and its protein length equals UniProt", True, "TP53 175/248/273 = 48/51/29 and KRAS 12/13/61 = 55/12/8 match the truth table; length 393 and 189 equal P04637 and P01116; Ras domain 5-165 (PF00071)"),
+    A("Every tool the Skill lists as available can be used", False, "pyLollipop does not exist on PyPI (index and HTTP 404); ProteinPaint is hosted-only (not runnable here)")
+  ]}
+]
+for i in inputs:
+    i["assertions_passed"] = sum(a["result"] == "PASS" for a in i["assertions"])
+    i["assertions_total"] = len(i["assertions"])
+    assert i["basic"] + i["specialized"] == i["total"]
+    assert 3 <= i["assertions_total"] <= 5
+
+cats = {
+ "functional_suitability": (7, 12, "Covers maftools, trackViewer, g3viz with a sound hotspot rationale and decision table, but correctness is undermined: printCount, ggplot2-object, point-size, canonical-UniProt, Pfam-query and output.filename claims are false for the installed versions, the TP53 Ensembl id is BRAF, domain coordinates differ from UniProt, and hgvspChange2protein does not exist."),
+ "reliability": (6, 12, "Failure-mode section exists, but its statements describe behaviour maftools does not have; the shipped example halts in every variant tried and silent wrong colours (factor indexing) are not caught; NA positions and palette gaps are not guarded."),
+ "performance_context": (5, 8, "237-line SKILL.md plus an 81-line usage guide that repeats most of it (prompts, tips, failure modes duplicated)."),
+ "agent_usability": (10, 16, "Clear workflow and decision tree; but SKILL.md, usage guide and example disagree on domain coordinates, cohort.maf and clinical are undefined placeholders, and error messages a user will hit (HGVSp_Short missing) are not the ones described."),
+ "human_usability": (5, 8, "Easy to navigate; recovery advice (pull UniProt domains via trackViewer) is given but the coordinates supplied for it are wrong."),
+ "security": (10, 12, "No credentials or eval; hosted-service mentions are read-only; no input validation of MAF columns beyond one stopifnot."),
+ "maintainability": (6, 12, "Single example; hard-coded illustrative counts and coordinates; no fixture data; versions pinned as 'maftools 2.18+' but behaviour claims are unverified against 2.22."),
+ "agent_specific": (15, 20, "Trigger description precise (hotspots, domains, missense vs truncating, two cohorts); progressive disclosure fine; composability listed; escape hatches present but partly wrong (proteinID, hgvspChange2protein).")
+}
+static = {"subtotal": sum(v[0] for v in cats.values()), "max": 100,
+          "categories": {k: {"score": v[0], "max": v[1], "note": v[2]} for k, v in cats.items()}}
+avg = round(sum(i["total"] for i in inputs) / len(inputs), 1)
+sw = round(static["subtotal"] * 0.4, 1); dw = round(avg * 0.6, 1); score = int(round(sw + dw))
+grade = "Production Ready" if score >= 85 else "Limited Release" if score >= 75 else "Beta Only" if score >= 60 else "Reject"
+sym = {"Production Ready": "\u2b50", "Limited Release": "\u2705", "Beta Only": "\u26a0\ufe0f", "Reject": "\u274c"}[grade]
+
+rep = {
+ "meta": {"skill_name": SK,
+  "description": "Plot per-gene mutation distributions on a protein-domain map (lollipop / needle plots) showing mutation position, recurrence count, and variant classification with maftools, g3-lollipop, trackViewer, and ProteinPaint. Use when visualizing recurrent mutation hotspots on a single gene's protein, marking domain boundaries from UniProt/Pfam, comparing missense vs truncating distributions, or contrasting two cohorts on the same lollipop.",
+  "evaluated_on": "2026-09-20", "evaluator_version": "skill-auditor@1.0", "category": "Data Analysis", "execution_mode": "A",
+  "complexity": "Moderate", "n_inputs": 5,
+  "source": "mrsonord2240/bioSkills@64b3b150c9b989c102f7ee69e0bb07c16842d894:data-visualization/lollipop-protein-maps",
+  "audit_type": "first audit of the unmodified upstream Skill (staging commit 64b3b15); role unspecified, scored as a standalone plotting Skill",
+  "executed": True,
+  "execution_note": "Executed 5/5 inputs. R 4.4.3 via r.sh (maftools 2.22.0, trackViewer 1.42.0, g3viz 1.2.0 from the CRAN archive, svglite, webshot2/Chrome); Python via py.sh only for synthetic data generation and pixel measurement. Data: maftools' bundled TCGA-LAML (real), a synthetic 300-row TP53/KRAS MAF with planted hotspots and HGVSp edge cases (synthetic, seeded), cached UniProt P04637 and P01116 JSON (public read-only endpoint), Ensembl REST lookup of two transcript ids. Positions, heights and colours were read back from the drawn SVG/PNG and compared with counts computed independently in Python. Every SKILL.md code block and the shipped example were run (the example in three variants); figures were opened. Nothing was written into the source clone."},
+ "veto_gates": {
+  "skill_veto": {"gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS"},
+  "research_veto": {"applicable": True, "gate": "PASS",
+   "scientific_integrity": {"result": "PASS", "detail": "No fabricated result, statistic or citation. The illustrative counts (45/38/29) are labelled as examples. Borderline: the Skill names ENST00000288602 (BRAF-201) as canonical TP53 and invents an 'R175H plotted at R177H' symptom; recorded as P1 factual errors, not as a fabricated result."},
+   "practice_boundaries": {"result": "PASS", "detail": "Visualization of cohort mutation data; no diagnostic or prescriptive content (druggability is only a pointer to OncoKB/ClinVar layers)."},
+   "methodological_ground": {"result": "PASS", "detail": "The hotspot-needs-independent-validation and annotate-the-isoform guidance is sound; no principled fallacy. The isoform sentence is factually wrong about maftools but the caution itself holds (a 261-aa isoform silently clipped mutations)."},
+   "code_usability": {"result": "PASS", "detail": "The core route runs: lollipopPlot, lollipopPlot2, trackViewer::lolliplot and g3Lollipop (via readMAF) all produced correct figures once the column and argument names were corrected. Not clean: hgvspChange2protein does not exist, proteinID='P04637' errors, the example halts in all three variants tried and paints wrong colours. Recorded as P1 rather than a veto because every tool's main call works and the corrections are small; a stricter reading of M4 would fail the shipped example."}}},
+ "static_score": static,
+ "dynamic_score": {"execution_avg": avg, "max": 100,
+  "assertion_pass_rate": {"passed": sum(i["assertions_passed"] for i in inputs), "total": sum(i["assertions_total"] for i in inputs)},
+  "inputs": inputs},
+ "final": {"static_weighted": sw, "dynamic_weighted": dw, "score": score, "max": 100, "grade": grade, "grade_symbol": sym,
+           "deployable": grade in ("Production Ready", "Limited Release"), "veto_override": False},
+ "key_strengths": [
+  "The core maftools route is correct once the column exists: on a synthetic cohort every lollipop sat at the right residue with the right height (SVG geometry vs independent counts) and 77/77 circles carried the requested class colour",
+  "lollipopPlot2 and g3Lollipop both reproduced independent per-cohort and per-position counts (Luminal/Basal 46/18/8 vs 20/5/29, LAML R882H 9 vs 9, KRAS G12 = 55)",
+  "Sound hotspot rationale, decision table and validation cautions (independent cohort, formal hotspot test, annotate isoform and counts)",
+  "Precise trigger description and a useful list of failure modes, several of which are real (isoform mismatch, saturating point size, outdated domain caches)"],
+ "recommendations": [
+  {"priority": "P1", "title": "Shipped example never completes and paints wrong colours", "observed_in": [3, 4, 5],
+   "problem": "examples/lollipop_phd.R halts at proteinID='P04637' (V1), at GRanges() on classes outside the palette (V2; unparsable p.Arg175His / p.* positions fail next), and at hgvspChange2protein (V3); where it draws, class_col[<factor>] gives all 55 lollipops the wrong colour and every stem is captioned with its class name.",
+   "root_cause": "The example was written from the API in memory and never executed against a real MAF.",
+   "fix": "Use class_col[as.character(class)], drop or warn on unparsable HGVSp rows, extend the palette to Translation_Start_Site/Nonstop_Mutation, name lollipops by residue, remove proteinID or pass an NP_ id, and replace the g3viz section with readMAF() -> g3Lollipop() -> saveWidget()."},
+  {"priority": "P1", "title": "Statements about maftools behaviour are false for 2.22.0", "observed_in": [1, 2, 3],
+   "problem": "printCount=TRUE only prints a console table (no counts on the plot); lollipopPlot returns a data.table (base graphics), not a ggplot2 object; point size is constant (height encodes count); domains come from a bundled CDD table (db_xref), not a live Pfam query; the default isoform is the longest RefSeq, not the canonical UniProt one; proteinID takes NP_ ids.",
+   "root_cause": "API and defaults described from assumption rather than from the installed package.",
+   "fix": "Rewrite these lines to match maftools 2.22 (or annotate counts yourself with text()), state the domain source and the transcript actually used, and show a working isoform call such as refSeqID='NM_000546'."},
+  {"priority": "P1", "title": "Wrong domain coordinates and a wrong Ensembl transcript id", "observed_in": [3, 4],
+   "problem": "TP53 domains coded as 102-291 / 323-352 / 363-392 (SKILL.md) and 1-41 / 102-291 / 323-355 / 363-392 (example) contradict both their own comments and UniProt (TAD 1-44, DNA binding 102-292, oligomerization 325-356, basic 368-387); ENST00000288602 is BRAF-201, not TP53's canonical transcript (ENST00000269305).",
+   "root_cause": "Coordinates typed by hand with IRanges width arithmetic and no lookup.",
+   "fix": "Pull features from the UniProt JSON (start/end are inclusive; use IRanges(start, end)) or quote the verified values, and correct the transcript id and the invented 'R175H plotted at R177H' example."},
+  {"priority": "P1", "title": "g3viz section calls a function that does not exist", "observed_in": [5],
+   "problem": "hgvspChange2protein is not exported by g3viz 1.2.0, and output.filename='TP53_lollipop.html' writes no HTML (it names the download button file).",
+   "root_cause": "g3viz API invented; a package archived on CRAN 2026-02-21 is also not installable with install.packages().",
+   "fix": "Show mut <- readMAF(file, protein.change.col='HGVSp_Short'); w <- g3Lollipop(mut, gene.symbol='TP53', protein.change.col='HGVSp_Short', ...); htmlwidgets::saveWidget(w, 'TP53.html'), and note the CRAN-archive install."},
+  {"priority": "P1", "title": "AACol='HGVSp_Short' hard-coded; wrong failure description", "observed_in": [2],
+   "problem": "maftools' own TCGA-LAML MAF has Protein_Change, so every call as written stops (lollipopPlot: 'Column HGVSp_Short not found.'; lollipopPlot2: \"object 'AAChange' not found\"), whereas the Skill says maftools 'falls back inconsistently' and reports 'No mutations to plot'.",
+   "root_cause": "Failure modes documented from expectation.",
+   "fix": "Leave AACol unset (maftools auto-detects HGVSp_Short, Protein_Change, AAChange and says which it used) or document the real messages and how to read them."},
+  {"priority": "P2", "title": "HGVSp edge cases and recurrence semantics undocumented", "observed_in": [1, 3],
+   "problem": "Counts are mutation rows, not samples (a duplicated call row makes R175H 46 vs 45 samples); different amino-acid changes at one residue draw as separate stems so KRAS G12 shows 30 and 25 rather than 55; p.M1?, silent and empty HGVSp rows are dropped without a note; 3-letter HGVSp is not merged; mutations beyond a shorter isoform are clipped silently.",
+   "root_cause": "The Skill treats 'count' as unambiguous.",
+   "fix": "Add a short table of these behaviours and recommend deduplicating on sample + change and stating whether height means rows, samples or per-change counts."},
+  {"priority": "P2", "title": "pyLollipop does not exist; ProteinPaint not runnable", "observed_in": [5],
+   "problem": "'pyLollipop (limited maintenance)' has no PyPI distribution; 'ProteinPaint via API' has no example; Bio.PDB is cited for domain coordinates but never used.",
+   "root_cause": "Tool list padded from memory.",
+   "fix": "Remove pyLollipop and Bio.PDB or give a verified Python alternative; give a real ProteinPaint or cBioPortal URL pattern if kept."},
+  {"priority": "P2", "title": "Redundant usage guide and cosmetic defects", "observed_in": [2],
+   "problem": "usage-guide.md repeats SKILL.md tips and prompts; default label overlap ('R248QR273C', domain names over each other) and random per-call domain colours are not mentioned.",
+   "root_cause": "Duplicated prose; no visual check of the outputs.",
+   "fix": "Fold the guide into SKILL.md, and mention repel = TRUE and domainAlpha/label-size arguments for crowded genes."}
+ ]
+}
+# pre-emit checklist
+assert len(rep["static_score"]["categories"]) == 8
+assert rep["static_score"]["subtotal"] == sum(c["score"] for c in rep["static_score"]["categories"].values())
+for k, c in rep["static_score"]["categories"].items(): assert 0 <= c["score"] <= c["max"], k
+assert len(rep["dynamic_score"]["inputs"]) == rep["meta"]["n_inputs"]
+assert 2 <= len(rep["key_strengths"]) <= 5
+order = {"P0": 0, "P1": 1, "P2": 2}
+assert [order[r["priority"]] for r in rep["recommendations"]] == sorted(order[r["priority"]] for r in rep["recommendations"])
+json.dump(rep, open(OUT, "w", encoding="utf-8"), indent=2, ensure_ascii=False)
+print("static", static["subtotal"], "exec avg", avg, "weighted", sw, dw, "final", score, grade, "deployable", rep["final"]["deployable"])
+print("assertions", rep["dynamic_score"]["assertion_pass_rate"])
