@@ -1,0 +1,8 @@
+pdf("sample_junc_annot.splice_events.pdf")
+events=c(4.4560838033843675,2.1353746978243353,93.4085414987913)
+pie(events,col=c(2,3,4),init.angle=30,angle=c(60,120,150),density=c(70,70,70),main="splicing events",labels=c("partial_novel 4%","complete_novel 2%","known 93%"))
+dev.off()
+pdf("sample_junc_annot.splice_junction.pdf")
+junction=c(42.42002781641168,22.94853963838665,34.63143254520167)
+pie(junction,col=c(2,3,4),init.angle=30,angle=c(60,120,150),density=c(70,70,70),main="splicing junctions",labels=c("partial_novel 42%","complete_novel 23%","known 35%"))
+dev.off()

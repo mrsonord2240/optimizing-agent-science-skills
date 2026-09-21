@@ -1,0 +1,516 @@
+{
+  "meta": {
+    "skill_name": "bio-splicing-qc",
+    "description": "Assesses RNA-seq data quality for alternative splicing analysis: design audit, STAR cohort-style 2-pass, junction saturation, known-vs-novel junction ratio, overhang, splice-site strength (MaxEntScan, SpliceAI), strandedness, 3-prime bias and rRNA screening.",
+    "evaluated_on": "2026-09-20",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 8,
+    "source": "mrsonord2240/bioSkills@9a5cf9bd40c5aa1c6b7f8a3b1fc227ccd96fa547:alternative-splicing/splicing-qc",
+    "audit_kind": "re-audit of a fixed Skill (pre-fix 67, Reject, Research Veto M4); auditor different from first auditor and fixer",
+    "executed_k_of_n": "8/8 (not executed: featureCounts -s 2, Qualimap, fastq_screen with bowtie2/bwa/bowtie, Picard from a GTF via gtfToGenePred; citation texts not re-fetched offline)",
+    "execution_note": "All 8 inputs executed in WSL envs as-core (RSeQC 5.0.5, STAR 2.7.11b, samtools 1.24, pysam 0.24.1, minimap2, fastq_screen 0.16.0), as-maxent (maxentpy 0.0.2), as-spliceai (SpliceAI 1.3.1) and af-picard3 (Picard 3.5.0). Inputs 1-7 re-run the pre-fix audit inputs (its planted BAMs copied to run/data/synthetic, labelled synthetic); inputs 3, 4, 6, 7 add new data (SE libraries, hand-truth CIGAR BAM, variant panel, fastq_screen reads, real Picard) and input 8 is a new scenario. STAR index and 2-pass runs are my own (scratch F:\\OpenScience\\as-qc-reaudit-scratch).",
+    "env": "WSL science: as-core, as-maxent, as-spliceai, af-picard3; Windows Python only for block extraction. No package installed or changed.",
+    "data": "real: nf-core chrX GRCh37 RNA-seq (4 samples, BAM + FASTQ + GTF), real X.fa; synthetic and labelled: run/data/synthetic (pre-fix auditor planted BAMs), run/data/edge.bam + edge_truth.json, run/work/in3 SE BAMs, run/work/in7/fq reads",
+    "pre_fix": {
+      "score": 67,
+      "grade": "Reject",
+      "veto": "Research Veto M4 code usability"
+    }
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated result, DOI or trial. The chrX MaxEnt figures quoted in the Skill (8,549 donors, 60.7% / 11.6%, 95.5% of 88 decoys) are not the numbers my independent script got (10,095 donors, 62.5% / 10.8%, 94.0% of 2000 decoys, AUC 0.969 / 0.954) but support the same cut-offs; the junction-support and 2-pass numbers reproduced. Literature statements (Veeneman 94%, Brown 2022 / Klim 2019 gene list, Walker 2023 thresholds) could not be re-fetched offline."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "A Scope section states research QC only; SpliceAI PP3/BP4 cut-offs are cited as published references for prioritising sites, and classifying a patient's variant is declared out of scope."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Known fraction is read-weighted with the junction-level number reported beside it; the rRNA recipe is on primary mapped records; no principled fallacy. The plateau rule uses only the known curve (a library with a large low-count novel tail reads PLATEAU), stated as such."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All 12 fenced blocks plus the inline gffread, fastq_screen and awk recipes were run from the copied files with checked output; the pre-fix failures (0.0% snippet, Rscript exit 1, EmptyDataError, wrong overhang, 15.6% rRNA, MaxEnt -7.20 acceptor, exit-255 fastq_screen) are all fixed. The one documented refinement that does not work (-l/-u/-s for 80-100%) is an optional tip beside a correct default path, recorded as P1."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 82,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 10,
+        "max": 12,
+        "note": "Every block the fix touched now runs and matches an independent method (known/novel snippet, overhang, STAR merge, rRNA, MaxEnt example, Picard refFlat, SpliceAI, fastq_screen). Remaining errors: the -l/-u/-s refinement tip, the \"printed summary is junction-level\" wording, depth-blind bias threshold."
+      },
+      "reliability": {
+        "score": 9,
+        "max": 12,
+        "note": "Helper turns the silent RSeQC failures into clear errors (BED6, contig mismatch, no spliced reads, no Rscript); documented error strings are the real ones. Raw RSeQC is still silent by design, and the helper lo/hi/step arguments silently produce a wrong curve when lo != step."
+      },
+      "performance_context": {
+        "score": 6,
+        "max": 8,
+        "note": "SKILL.md is 401 lines with no references/ split; usage-guide is now a short pointer. maxentpy throughput (~0.1 s per acceptor) is undocumented."
+      },
+      "agent_usability": {
+        "score": 14,
+        "max": 16,
+        "note": "One threshold table, design targets separate, BED12 preparation and contig checks explained up front, exact output strings for both strandedness modes; no drill-down recipe for a high novel rate."
+      },
+      "human_usability": {
+        "score": 6,
+        "max": 8,
+        "note": "Clear triggers and prompts, tolerant helper errors; verdicts are depth-blind and a user must read conventions labels to know what is measured."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "No secrets; subprocess with argument lists and no shell; paths passed through unvalidated to RSeQC."
+      },
+      "maintainability": {
+        "score": 11,
+        "max": 12,
+        "note": "One implementation of junction counting, a self-contained test that ran green in two envs; the test does not cover lo != step or the CLI exit codes."
+      },
+      "agent_specific": {
+        "score": 15,
+        "max": 20,
+        "note": "Good biology-vs-artifact framing and honest \"convention\" labelling; unseeded RSeQC subsampling is stated; several literature statements (Veeneman, Brown 2022 gene list, Walker 2023 cut-offs) cannot be checked offline."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 87.1,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 37,
+      "total": 40
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Known vs novel junction ratio: SKILL.md blocks B05 (RSeQC), B06 (pandas snippet) and B01 (helper report) unedited on planted libraries, real chrX, and the failure guards",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "B06 now prints known 93.4% / novel 6.6% (planted clean), 22.3% / 77.7% (novel-rich), 99.5% / 0.5% (real chrX); class counts equal an independent pysam classification exactly; every guarded failure (BED6, contig mismatch, no spliced reads, no Rscript) raises a clear error with exit 1.",
+        "basic": 38,
+        "specialized": 53,
+        "assertions": [
+          {
+            "text": "The SKILL.md pandas snippet (B06, unedited) reports the planted known fraction",
+            "result": "PASS",
+            "note": "clean 93.4% / 6.6% (truth 0.9341), novel-rich 22.3% / 77.7% (truth 0.2235), real chrX ERR188383 99.5% / 0.5%; the pre-fix 0.0% / 0.0% is gone (out/10_in1_annot.log)"
+          },
+          {
+            "text": "RSeQC class counts equal an independent pysam + BED12 classification (no Skill code)",
+            "result": "PASS",
+            "note": "reads and junctions identical on se_clean (11592/553/265; 249/305/165), se_novelrich and real chrX (25023/84/49; 2719/69/45); EQUAL True on all (out/12_in1_indep.log); also True on the 4 STAR pass-2 BAMs (out/82_n1.log)"
+          },
+          {
+            "text": "Silent RSeQC failures are guarded by the helper: BED6, contig mismatch, BAM without spliced reads, Rscript absent",
+            "result": "PASS",
+            "note": "each raises SplicingQCError with the cause, CLI exit 1 (out/15_in1_exitcodes.log); literal RSeQC without --skip-plot and no Rscript on PATH exits 1 as the Skill says, helper --plot with no Rscript still writes the tables (out/14_in1_norscript.log)"
+          },
+          {
+            "text": "Read-weighted vs junction-level known% is distinguished and both numbers are right",
+            "result": "PASS",
+            "note": "helper returns read_known 0.934 and junction_known 0.346 on the same BAM, equal to truth.json; SKILL.md wording \"RSeQC's printed summary is junction-level\" is incomplete: RSeQC prints both Splicing Events (read-weighted) and Splicing Junctions (P2)"
+          },
+          {
+            "text": "B01 helper report runs end to end on planted and real BAMs",
+            "result": "PASS",
+            "note": "annotation + saturation + junction support printed for se_clean, se_novelrich and real chrX (2833 junctions, growth 6.9%, 11.0% of junctions >= 10 reads)"
+          }
+        ],
+        "total": 91,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "executed": true,
+        "execution_note": "B06 now prints known 93.4% / novel 6.6% (planted clean), 22.3% / 77.7% (novel-rich), 99.5% / 0.5% (real chrX); class counts equal an independent pysam classification exactly; every guarded failure (BED6, contig mismatch, no spliced reads, no Rscript) raises a clear error with exit 1."
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Junction saturation: B04 unedited on planted deep / mid / shallow libraries and real chrX, three repeats, plus the documented \"-l/-u/-s for a finer 80-100% range\" tip",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Plateau rule and curve parsing are right (deep 0.0% PLATEAU; mid 2.9-5.3% and shallow 7.8-11.8% STILL RISING; all-junction count at 100% equals pysam 919/1022/951), but the documented -l/-u/-s refinement is wrong: RSeQC accumulates sample size from zero, so with -l 80 the \"80%\" point is 5% of the reads and a saturated library reads STILL RISING.",
+        "basic": 35,
+        "specialized": 50,
+        "assertions": [
+          {
+            "text": "Plateau rule (<2% growth 80->100%) classifies planted libraries correctly, across repeats",
+            "result": "PASS",
+            "note": "deep 0.0% PLATEAU x3; mid 5.3 / 4.7 / 2.9% and shallow 11.1 / 11.8 / 7.8% STILL RISING x3 (analytic 5.6 / 13.6%); the Skill's \"stochastic, compare growth\" advice matches (out/20_in2_sat.log)"
+          },
+          {
+            "text": "Helper parses the .r vectors and the curves agree with independent counts",
+            "result": "PASS",
+            "note": "all-junction curve at 100% = 919 / 1022 / 951 = distinct junctions in truth.json; known curve reaches 180 = annotated junctions"
+          },
+          {
+            "text": "Real chrX gives a plausible verdict and the read-depth caveat holds",
+            "result": "PASS",
+            "note": "known 563 -> 2698, growth 7.6% STILL RISING for a 50k-pair subset; real BED12 from the gffread recipe worked"
+          },
+          {
+            "text": "Contig mismatch / no spliced reads are caught by the helper and described correctly for raw RSeQC",
+            "result": "PASS",
+            "note": "helper raises; literal RSeQC exit 0 with y/z/w all zeros (out/13_in1_guards.log)"
+          },
+          {
+            "text": "The documented refinement \"-l/-u/-s for a finer 80-100% range\" works",
+            "result": "FAIL",
+            "note": "RSeQC source (qcmodule/SAM.py saturation_junction) adds (index_end - index_st) starting from 0, so the labelled percent equals the sampled percent only when -l == -s. -l 80 -u 100 -s 5 on the mid library samples 86 reads at \"80%\" and 428 of 1710 at \"100%\"; helper lo=80 on the deep (saturated) library returns growth 11.1% STILL RISING instead of PLATEAU; lo=50 reaches only 157 of 180 known junctions at \"100%\". lo=2 step=2 (l == s) is correct (out/21_in2_fine.log, 23_deep_fine.log)"
+          }
+        ],
+        "total": 85,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "executed": true,
+        "execution_note": "Plateau rule and curve parsing are right (deep 0.0% PLATEAU; mid 2.9-5.3% and shallow 7.8-11.8% STILL RISING; all-junction count at 100% equals pysam 919/1022/951), but the documented -l/-u/-s refinement is wrong: RSeQC accumulates sample size from zero, so with -l 80 the \"80%\" point is 5% of the reads and a saturated library reads STILL RISING."
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Strandedness: B11 unedited on planted PE dUTP / forward / unstranded / leaky libraries, NEW single-end derived libraries, real chrX, and the documented failure modes",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Every string and fraction in the decision table reproduced, including the single-end strings on new data; contig mismatch, GTF-as-BED and MAPQ-1 messages and the \"-q 0\" remedy behave as documented.",
+        "basic": 37,
+        "specialized": 53,
+        "assertions": [
+          {
+            "text": "PE table maps planted protocols to the right strings and libType",
+            "result": "PASS",
+            "note": "dUTP 1.0000 \"1+-,1-+,2++,2--\"; forward 1.0000 \"1++,1--,2+-,2-+\"; unstranded 0.5011 / 0.4989; BED6 also accepted (out/31_in3_strand.log)"
+          },
+          {
+            "text": "NEW single-end libraries (read 1 of the planted PE data) give the documented SE strings",
+            "result": "PASS",
+            "note": "SE dUTP \"+-,-+\" 1.0000 (0.0000 on \"++,--\"); SE forward \"++,--\" 1.0000"
+          },
+          {
+            "text": "Leaky libraries land in the 70-90% band and the advice is stated",
+            "result": "PASS",
+            "note": "20% and 40% planted leakage read 0.7975 and 0.5914; Skill says report leakage at 0.7-0.9 and treat < 0.7 as unstranded (labelled a convention)"
+          },
+          {
+            "text": "Failure messages and remedy as documented",
+            "result": "PASS",
+            "note": "contig mismatch: \"Total 0 usable reads were sampled\" / \"Unknown data type: Mixture\", rc 0; GTF as BED: 12-column skip notes then the same message; MAPQ-1 BAM: same message at -q 30, 1.0000 dUTP with -q 0"
+          },
+          {
+            "text": "Real unstranded library is read correctly",
+            "result": "PASS",
+            "note": "chrX ERR188383 0.4643 / 0.4525 with 8.3% failed to determine: Skill table says ~0.5 / ~0.5 = unstranded"
+          }
+        ],
+        "total": 90,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "executed": true,
+        "execution_note": "Every string and fraction in the decision table reproduced, including the single-end strings on new data; contig mismatch, GTF-as-BED and MAPQ-1 messages and the \"-q 0\" remedy behave as documented."
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Junction read support: B07 / junction_stats on the planted overhang BAM, a NEW BAM of hand-specified CIGARs and flags, and 4 real STAR pass-2 BAMs vs SJ.out.tab",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Overhang, min_overhang, D/I/S/H/=/X handling, NH and MAPQ rules, mate de-duplication and unindexed input all match hand truth (13/13 junctions), and unique-read counts equal STAR SJ.out.tab on every shared junction of 4 real samples.",
+        "basic": 37,
+        "specialized": 53,
+        "assertions": [
+          {
+            "text": "Overhang equals the adjacent-block overhang on the auditor's planted CIGARs",
+            "result": "PASS",
+            "note": "se_overhang.bam: micro4 -> 4 and 4 (reads>=8 = 0 of 12), micro10 -> 10, ov6 -> 6, ov50 -> 50 (out/42_in4.log); the pre-fix 30 vs 4 error is gone"
+          },
+          {
+            "text": "NEW BAM (10M2D20M500N30M, 5S45M300N50M, 20M1I30M400N50M, 50M300N30M5H, two-junction reads, no-NH / MAPQ 3 / NH=2 / MAPQ 0 with NH=1 / reverse / secondary / supplementary, mates crossing the same, one, or two junctions, 3M overhang, second contig) equals the hand truth table",
+            "result": "PASS",
+            "note": "13 of 13 junctions equal on reads, reads_all and min_overhang; 0 extra junctions; min_overhang 0 / 30 / 60 give 7 / 5 / 0 as predicted (out/42_in4.log, data/edge_truth.json)"
+          },
+          {
+            "text": "Counts equal STAR SJ.out.tab unique reads on real data (4 samples, my own STAR 2.7.11b 2-pass run)",
+            "result": "PASS",
+            "note": "equal on 2765/2765, 2829/2829, 2792/2792, 2919/2919 shared junctions; junctions with >= 10 reads 371 / 398 / 380 / 377 = STAR; 27-50 extra junctions per BAM are absent from SJ.out.tab (ERR204916: 50, all with 1-4 reads, 21 GT..AG and 17 CT..AC canonical; consistent with the SJ.out.tab filters of STAR; out/56_only_helper.log)"
+          },
+          {
+            "text": "Unindexed BAM and BAM without spliced reads give a clear result, no crash",
+            "result": "PASS",
+            "note": "unindexed micro BAM read with until_eof; unspliced BAM gives {} / 0.0%; report raises NoSplicedReadsError (out/13_in1_guards.log)"
+          },
+          {
+            "text": "B07 CLI runs and its summary is internally consistent",
+            "result": "PASS",
+            "note": "se_overhang: 6 junctions, 3 with anchored reads, 3 with >= 10; edge: 13 / 12 / 0; reads_anchored <= reads_total everywhere"
+          }
+        ],
+        "total": 90,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "executed": true,
+        "execution_note": "Overhang, min_overhang, D/I/S/H/=/X handling, NH and MAPQ rules, mate de-duplication and unindexed input all match hand truth (13/13 junctions), and unique-read counts equal STAR SJ.out.tab on every shared junction of 4 real samples."
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Cohort-style STAR 2-pass: B02 and B03 (merge, pass 2, samtools index) on 4 real chrX 2x75 samples with my own index, plus the Common Errors table",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "B02/B03 ran with only path substitutions on all 4 samples; the merged file equals an independent recomputation (6 novel junctions, none annotated); STAR defaults, XS tag and every Common Errors message reproduce verbatim.",
+        "basic": 36,
+        "specialized": 52,
+        "assertions": [
+          {
+            "text": "B02 and B03 run unedited (paths only) on 4 real samples and improve mapping",
+            "result": "PASS",
+            "note": "rc 0 on 8 runs, --sjdbOverhang 149 with 75-nt reads, unique mapping 97.63 -> 97.67, 97.24 -> 97.29, 97.53 -> 97.54, 96.95 -> 96.98 (out/51_in5_star.log)"
+          },
+          {
+            "text": "The merge filter does what the comments say",
+            "result": "PASS",
+            "note": "$6==0 && $5>0 && $7>=3 | cut -f1-4 | sort -u = 6 junctions, 4 columns, equals independent recomputation, 0 present in the GTF (out/53_in5_check.log); pass-2 SJ.out.tab marks 3 of 3 merged junctions found as annotated (col 6 = 1), as the Skill notes"
+          },
+          {
+            "text": "Flag and default claims: alignIntronMax, XS tag, --outSAMtype None, overhang defaults",
+            "result": "PASS",
+            "note": "STAR --help: alignIntronMax 0 = 2^16 x 9 = 589,824; alignSJoverhangMin 5, alignSJDBoverhangMin 3; XS tag on 24113 / 24113 (and 3 other samples 100%) spliced records with --outSAMstrandField intronMotif"
+          },
+          {
+            "text": "Common Errors messages are the real ones",
+            "result": "PASS",
+            "note": "sjdbOverhang mismatch \"present --sjdbOverhang=74 is not equal to the value at the genome generation step =149\"; \"Fatal LIMIT error ... =10552 is larger than the limitSjdbInsertNsj=100 / SOLUTION: re-run with at least --limitSjdbInsertNsj 10552\"; pysam \"fetch called on bamfile without index\"; RSeQC zero-read messages (out/54_in5_errors.log)"
+          },
+          {
+            "text": "Data-derived numbers in the Skill hold on the new samples",
+            "result": "PASS",
+            "note": "junctions with >= 10 reads 10.5-12.0% (Skill: 11%); 5,717 lines / 2,184 distinct / 2,178 annotated in the old merge is a fixer measurement on the same data. Veeneman 2016 wording not re-fetched (offline)"
+          }
+        ],
+        "total": 88,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "executed": true,
+        "execution_note": "B02/B03 ran with only path substitutions on all 4 samples; the merged file equals an independent recomputation (6 novel junctions, none annotated); STAR defaults, XS tag and every Common Errors message reproduce verbatim."
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Splice-site strength: B08 unedited, MaxEntScan on 10k real chrX introns vs decoys via the helper, SpliceAI (B09 command) on a NEW panel of canonical-site, exonic and deep-intronic variants",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "B08 prints the documented [10.86, 2.68] [11.58]; helper keeps one output per input; MaxEnt cut-offs hold on real data (AUC 0.969 / 0.954); SpliceAI separates canonical-site variants (max DS 0.99-1.00) from exonic (<= 0.07) and deep-intronic (0.00) ones.",
+        "basic": 36,
+        "specialized": 51,
+        "assertions": [
+          {
+            "text": "B08 prints the documented scores",
+            "result": "PASS",
+            "note": "[10.858, 2.676] [11.580] exactly; helper on [good, 7-mer, N, lower-case] gives [10.86, nan, nan, 2.68] and acceptors [11.58, -7.20, nan] (out/61_in6.log)"
+          },
+          {
+            "text": "MaxEnt cut-offs (>8 strong, <5 weak) are supported on real sites (independent script)",
+            "result": "PASS",
+            "note": "10,095 annotated GT donors: 62.5% > 8, 10.8% < 5, median 8.68; 451 non-GT donors 100% < 5; 2000 decoy GT donors 94.0% < 5; AUC donor 0.969, acceptor 0.954. The Skill quotes 8,549 donors, 60.7% / 11.6%, 95.5% of 88 decoys: same conclusion, different sampling (not identical numbers)"
+          },
+          {
+            "text": "SpliceAI command works and separates classes on a NEW panel (GRCh37 chrX, -A grch37 because the FASTA is GRCh37, as the Skill requires the assembly to match)",
+            "result": "PASS",
+            "note": "2 donor GT>AT: max DS 0.99, 0.99; 2 acceptor AG>AA: 1.00, 1.00; 3 exon-interior SNVs <= 0.07; 3 deep-intronic 0.00 (out/63_in6b.log)"
+          },
+          {
+            "text": "Splice-site scores stay research-scoped (Practice Boundaries)",
+            "result": "PASS",
+            "note": "Scope section, PP3/BP4 cut-offs framed as references for prioritising sites, \"classifying a patient's variant ... out of scope\"; no individual diagnosis or prescription"
+          },
+          {
+            "text": "Practical throughput of the helper is documented",
+            "result": "PASS",
+            "note": "maxentpy score3 measured ~0.1 s per acceptor under load (300 acceptors 31.8 s; 8k donors + acceptors ~20 min): not stated in the Skill (P2), but nothing wrong"
+          }
+        ],
+        "total": 87,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "executed": true,
+        "execution_note": "B08 prints the documented [10.86, 2.68] [11.58]; helper keeps one output per input; MaxEnt cut-offs hold on real data (AUC 0.969 / 0.954); SpliceAI separates canonical-site variants (max DS 0.99-1.00) from exonic (<= 0.07) and deep-intronic (0.00) ones."
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "rRNA and 3-prime bias: B12 and B10 unedited on planted libraries; Picard with the SKILL.md awk refFlat on real chrX; fastq_screen on NEW reads",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "rRNA recipe now gives 22.2% for a planted 22.2%; the awk refFlat is valid and Picard matches an independent aggregate on real data; fastq_screen reproduces 25.00% on new reads and both documented misconfigurations. The 5'-3' bias threshold contradicts geneBody on a low-depth real sample.",
+        "basic": 35,
+        "specialized": 50,
+        "assertions": [
+          {
+            "text": "samtools rRNA recipe (B12) reproduces the planted 22.2%",
+            "result": "PASS",
+            "note": "22.2% with -F 0x904; the old recipe reads 8170 / 52282 = 15.6% (out/71_in7.log); Picard PCT_RIBOSOMAL_BASES 0.222277"
+          },
+          {
+            "text": "B10 awk refFlat + Picard + geneBody work on planted libraries",
+            "result": "PASS",
+            "note": "PCT_CORRECT_STRAND_READS 1 (SECOND_READ for dUTP, FIRST_READ for forward); MEDIAN_5PRIME_TO_3PRIME_BIAS 1.009 / 1.002 uniform vs 0.0466 3-prime; geneBody 5p/3p 1.03 vs 0.043"
+          },
+          {
+            "text": "The awk refFlat and Picard are correct on real chrX (NEW, independent check)",
+            "result": "PASS",
+            "note": "refFlat 6001 lines, 0 differ from the BED12 blocks (round trip); Picard PF_ALIGNED_BASES 7,373,062 = pysam aligned bases; intergenic 0.025654 vs independent 0.0257; coding+UTR+intronic+intergenic = 1.0000 (out/73_in7_real.log)"
+          },
+          {
+            "text": "fastq_screen setup claims on NEW reads (4000 SE reads, 25% rRNA)",
+            "result": "PASS",
+            "note": "literal --aligner minimap2 command: One_hit_one_genome 25.00% (minimap2 alone 24.9%); missing prefix.fa.gz: rc 0, 100% unmapped, \"Aligner warning ... failed to open ... rrna_ref.fa.gz\"; default aligner: rc 255 (out/74_in7_fqscreen.log)"
+          },
+          {
+            "text": "The 5'-3' bias thresholds give a right verdict on real data",
+            "result": "FAIL",
+            "note": "real chrX library (50k pairs, poly(A) test set): Picard MEDIAN_5PRIME_TO_3PRIME_BIAS 0.2745 -> \"<0.5 = 3' bias\" but geneBody_coverage 5p/3p is 0.847 on the same BAM; the table gives no depth caveat (P2)"
+          }
+        ],
+        "total": 85,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "executed": true,
+        "execution_note": "rRNA recipe now gives 22.2% for a planted 22.2%; the awk refFlat is valid and Picard matches an independent aggregate on real data; fastq_screen reproduces 25.00% on new reads and both documented misconfigurations. The 5'-3' bias threshold contradicts geneBody on a low-depth real sample."
+      },
+      {
+        "index": 8,
+        "type": "NEW (auditor scenario)",
+        "label": "Cohort QC loop over 4 real STAR pass-2 BAMs + 2 planted libraries with the helper API, and diagnosis of a high novel-junction rate (annotation gap vs artifact)",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "The loop flags the novel-rich sample and the real libraries as designed, per-sample classes equal independent pysam; an annotation-gap scenario reads 46.1% known and returns to 93.4% with the full gene model, but the Skill gives no runnable recipe to tell annotation gaps from artifacts.",
+        "basic": 33,
+        "specialized": 48,
+        "assertions": [
+          {
+            "text": "generate_qc_report loop flags the right samples (usage-guide prompt \"report samples below acceptable thresholds\")",
+            "result": "PASS",
+            "note": "novel-rich 0.223 Suspect + \"<30% junctions >= 10 reads\"; clean planted Healthy; real libraries known 0.993-0.996 Healthy, saturation still rising, 10.5-12.0% >= 10 reads (out/82_n1.log)"
+          },
+          {
+            "text": "Per-sample class counts on the 4 real pass-2 BAMs equal independent pysam",
+            "result": "PASS",
+            "note": "EQUAL reads and junctions 4/4"
+          },
+          {
+            "text": "Annotation-gap scenario behaves as the Skill says (Suspect, then Healthy after updating annotation)",
+            "result": "PASS",
+            "note": "clean BAM vs a gene model with half the genes: known 46.1% / novel 53.9%; full model 93.4% / 6.6% (out/80_new_diagnose.log)"
+          },
+          {
+            "text": "The Skill gives a runnable drill-down that separates annotation gaps from mapping artifacts",
+            "result": "FAIL",
+            "note": "the Decision Tree says \"drill down\" for novel% > 40 but no step or helper splits novel junctions by support or overhang; median read_count of novel classes (2 in the gap scenario vs 5-6 in the artifact-like library) had to be computed by hand from the .xls"
+          },
+          {
+            "text": "Helper report verdicts are usable as machine-readable QC",
+            "result": "PASS",
+            "note": "generate_qc_report returns a dict; verdict strings are depth-blind (real 50k-pair libraries print POOR / still rising), acceptable for a subset but not flagged"
+          }
+        ],
+        "total": 81,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "executed": true,
+        "execution_note": "The loop flags the novel-rich sample and the real libraries as designed, per-sample classes equal independent pysam; an annotation-gap scenario reads 46.1% known and returns to 93.4% with the full gene model, but the Skill gives no runnable recipe to tell annotation gaps from artifacts."
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 32.8,
+    "dynamic_weighted": 52.3,
+    "score": 85,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false,
+    "note": "Pre-fix 67 (Reject, M4 fired) -> 85. Layer 1 average 35.9/40, Layer 2 average 51.2/60, assertion pass 37/40. No open P0; one open P1 (the -l/-u/-s refinement tip). Every Production Ready floor is met (static 82 >= 80, execution 87.1 >= 85, L1 >= 32, L2 >= 48, assertions 92% >= 90%), but only just: static and execution each carry 2-5 points of judgment, so treat 85 as the low end of Production Ready."
+  },
+  "key_strengths": [
+    "All three pre-fix P0s are fixed and verified on real output: the known/novel snippet prints 93.4% / 22.3% / 99.5% and equals an independent pysam classification; RSeQC without Rscript, and BAMs without spliced reads, now fail with a stated cause.",
+    "junction_stats equals STAR SJ.out.tab unique-read counts on every shared junction of four real samples (2765/2765, 2829/2829, 2792/2792, 2919/2919) and matches a hand-truth BAM of 13 junctions with D/I/S/H/=/X, NH/MAPQ, flag and mate cases.",
+    "Documented error strings, defaults and recipes are now the observed ones (STAR sjdbOverhang / limitSjdbInsertNsj, pysam, RSeQC zero-read messages, alignIntronMax 589,824, rRNA 22.2%, fastq_screen 25.00%, Picard refFlat matches an independent aggregate).",
+    "A self-contained test ships with the Skill and passes in two envs; usage-guide redundancy is gone and thresholds sit in one table."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "The documented \"-l/-u/-s for a finer 80-100% range\" tip gives wrong curves",
+      "observed_in": [
+        2
+      ],
+      "problem": "RSeQC adds (index_end - index_st) from zero, so with -l 80 -u 100 -s 5 the \"80%\" point is 5% of the reads and \"100%\" is 25%. The mid library gives growth 263% and the saturated deep library flips from PLATEAU to STILL RISING (11.1%) with helper lo=80; lo=50 reaches only 157 of 180 known junctions at \"100%\". The default and l == s (e.g. -l 2 -u 100 -s 2) are correct.",
+      "root_cause": "The refinement was written from the option names, never run, and the helper exposes lo/hi/step without a guard.",
+      "fix": "Replace the tip with \"for a finer curve lower -s and keep -l equal to -s (-l 2 -u 100 -s 2)\"; make junction_saturation() raise or warn when lo != step; add a test on the planted deep BAM."
+    },
+    {
+      "priority": "P2",
+      "title": "RSeQC summary wording and a missing drill-down for a high novel rate",
+      "observed_in": [
+        1,
+        8
+      ],
+      "problem": "The Skill says the printed summary is junction-level; RSeQC prints both Splicing Events (read-weighted) and Splicing Junctions. The Decision Tree says \"drill down\" for novel% > 40 but gives no step to tell annotation gaps from mapping artifacts (novel-junction support, overhang).",
+      "root_cause": "Definitions were inferred from one output; the drill-down is prose only.",
+      "fix": "State that both blocks are printed and which one the thresholds use; add a helper or 6-line recipe that joins the .junction.xls classes with junction_stats() and reports median reads and min overhang per class."
+    },
+    {
+      "priority": "P2",
+      "title": "Depth-blind thresholds: 5'-3' bias and the helper verdicts",
+      "observed_in": [
+        7,
+        8
+      ],
+      "problem": "On a real 50k-pair library Picard MEDIAN_5PRIME_TO_3PRIME_BIAS is 0.2745 (rule: < 0.5 = 3' bias) while geneBody_coverage 5p/3p is 0.847; the helper prints POOR / still rising for four real libraries of that depth.",
+      "root_cause": "Conventions labelled as such but without a depth condition.",
+      "fix": "Say the ratio needs enough reads on the top expressed transcripts and to confirm with geneBody_coverage; print read counts beside the helper verdicts."
+    },
+    {
+      "priority": "P2",
+      "title": "Unstated cost and unverifiable references",
+      "observed_in": [
+        6
+      ],
+      "problem": "maxentpy score3 costs ~0.1 s per acceptor (about 20 min for 10k introns), not mentioned; the quoted chrX MaxEnt numbers differ from an independent re-count; Veeneman 2016, the Brown 2022 gene list and Walker 2023 cut-offs could not be re-checked offline.",
+      "root_cause": "Numbers from one sampling of the test data, prose citations.",
+      "fix": "Add a throughput note and \"about 60% > 8, about 11% < 5\" wording; cite page/table for the paper statements."
+    },
+    {
+      "priority": "P2",
+      "title": "SKILL.md length and residual clinical vocabulary",
+      "observed_in": [
+        5,
+        6
+      ],
+      "problem": "401-line SKILL.md with no references/ split; PP3/BP4 codes remain in the SpliceAI paragraph though scoped as research use.",
+      "root_cause": "Single-file layout.",
+      "fix": "Move STAR 2-pass and Picard details to references/; keep the cut-offs but drop the ACMG code names."
+    }
+  ]
+}
