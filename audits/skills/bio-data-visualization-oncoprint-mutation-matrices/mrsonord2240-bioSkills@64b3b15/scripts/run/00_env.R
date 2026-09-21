@@ -1,0 +1,5 @@
+suppressMessages({library(ComplexHeatmap);library(circlize);library(maftools)})
+cat("CH", as.character(packageVersion("ComplexHeatmap")), "maftools", as.character(packageVersion("maftools")), "circlize", as.character(packageVersion("circlize")), "\n")
+for (p in c("svglite","png","data.table","ragg","xml2")) cat(p, requireNamespace(p, quietly=TRUE), "\n")
+f <- system.file("extdata","tcga_laml.maf.gz",package="maftools"); cat(f,"\n")
+args(oncoPrint)

@@ -14,7 +14,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The example passes cluster_rows=<OLO dendrogram> together with row_split=gene_info$pathway, a combination ComplexHeatmap rejects; the script was never run.
 - Fix: Drop row_split or use a numeric row_split (works with the dendrogram), or apply OLO within each pathway group; supply a runnable data preamble and state the constraint in SKILL.md next to the OLO block.
 
-## P1 (142)
+## P1 (146)
 
 ### `bio-data-visualization-distribution-plots` — The headline R raincloud depends on gghalves, archived and broken on ggplot2 4.x
 
@@ -207,6 +207,38 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: palette_examples.R demonstrates Set1 and an NPG-style vector as the 'qualitative' example, a custom diverging with unmatched luminance ends (L* 70.8 vs 54.1) whose near-zero points are white on white, and ends with Python names (coolwarm, tab10). palettes_phd.R defines no df or de_df, so ggplot fails with 'data cannot be a function'.
 - Root cause: Two examples written independently of the SKILL.md guidance; the second is a template.
 - Fix: Rewrite palette_examples.R with Okabe-Ito (named), scico batlow/vik and a visible midpoint (grey panel or outlined points); add a small simulated df/de_df to palettes_phd.R so it runs, and drop non-R names from the closing cat().
+
+### `bio-data-visualization-oncoprint-mutation-matrices` — comut block cannot run as written
+
+- Skill: 73, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/oncoprint-mutation-matrices) · [viewer](skills/bio-data-visualization-oncoprint-mutation-matrices/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 4
+- Problem: import comut then comut.CoMut() raises AttributeError (class lives in comut.comut); later datasets must have samples inside the first dataset's set, so zero-mutation and unannotated samples raise ValueError; add_continuous_data raises TypeError on pandas 3; category_order draws the top gene at the bottom; no sample sorting; TMB range (0,30) saturates.
+- Root cause: Python equivalent was written from memory of the API and never executed.
+- Fix: Use from comut import comut, set toy_comut.samples to the full cohort first, reverse category_order, pre-sort samples by burden, note pandas<3, derive value_range from the data.
+
+### `bio-data-visualization-oncoprint-mutation-matrices` — Denominator claims contradict tool behaviour
+
+- Skill: 73, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/oncoprint-mutation-matrices) · [viewer](skills/bio-data-visualization-oncoprint-mutation-matrices/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 3, 7
+- Problem: The Skill says percentages differ with remove_empty_columns and that removeNonMutated = FALSE preserves cohort N. ComplexHeatmap % is always over the input matrix; maftools drops samples that are absent from the MAF (16 of 30) regardless of the flag and of clinicalData.
+- Root cause: Behaviour asserted without running it.
+- Fix: State the true denominators, and tell the agent to build the matrix from the explicit cohort sample list (or add zero-mutation samples to the MAF/clinical merge) before plotting.
+
+### `bio-data-visualization-oncoprint-mutation-matrices` — Matrix and annotation construction left as comments
+
+- Skill: 73, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/oncoprint-mutation-matrices) · [viewer](skills/bio-data-visualization-oncoprint-mutation-matrices/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 1, 5, 7
+- Problem: mat, clinical and the Variant_Classification-to-class map are undefined; clinical rows not ordered like colnames(mat) silently mislabel samples (391/600 wrong), non-matching IDs give an all-NA track with no warning, and the maftools example needs a Tumor_Sample_Barcode column.
+- Root cause: The hardest correctness step is the one the Skill does not show.
+- Fix: Ship a short verified MAF-to-matrix function with the class map, and require clinical <- clinical[match(colnames(mat), clinical$Tumor_Sample_Barcode), ] plus a stopifnot on NA matches.
+
+### `bio-data-visualization-oncoprint-mutation-matrices` — Row order is not sample frequency; somaticInteractions return misdescribed
+
+- Skill: 73, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/oncoprint-mutation-matrices) · [viewer](skills/bio-data-visualization-oncoprint-mutation-matrices/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 1, 6
+- Problem: oncoPrint ranks genes by alteration events, so a gene with fewer mutated samples can sit above one with more (DNMT3A 25% above FLT3 27%). somaticInteractions returns a data.table, not a signed -log10 matrix.
+- Root cause: Both descriptions were written from the plot appearance.
+- Fix: Say the default order counts alteration types and pass row_order = order(-rowSums(mat != '')) when sample frequency is wanted; document the data.table columns (pValue, oddsRatio, Event, pAdj).
 
 ### `bio-data-visualization-network-visualization` — examples/cytoscape_automation.py fails silently
 
@@ -1152,7 +1184,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (476)
+## P2 (477)
 
 ### `bio-data-visualization-distribution-plots` — Wrong bandwidth sentence: nrd (Scott) is 1.178x nrd0, so it oversmooths more
 
@@ -1289,6 +1321,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The guide repeats the Okabe-Ito hexes, symmetric-bounds, white-midpoint, grayscale, rainbow, brand-palette and custom-palette tips already in SKILL.md; khroma and colorcet are in the version line and install list but no code block or example uses them.
 - Root cause: Two documents maintained for the same content.
 - Fix: Keep prompts and prerequisites in the guide, reference SKILL.md for the tips, and either add a khroma/colorcet snippet or drop them from the install list.
+
+### `bio-data-visualization-oncoprint-mutation-matrices` — usage-guide and SKILL.md disagree; smaller gaps
+
+- Skill: 73, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/oncoprint-mutation-matrices) · [viewer](skills/bio-data-visualization-oncoprint-mutation-matrices/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 3, 5, 6
+- Problem: Usage-guide prompt gives green Missense and quarter-height Truncating versus SKILL.md; the 'sort by gene 1' failure mode contradicts its own fix; per-panel right bar and 'rasterize the cell layer' / 'side annotation' have no code and are not what oncoPrint does; Haldane-Anscombe OR flips to >1 for a 0-cell mutex pair; an all-empty matrix errors with 'subscript out of bounds'; maftools Multi_Hit black clashes with the Skill's black Truncating; partial annotationColor greys unlisted groups.
+- Root cause: Two documents maintained separately.
+- Fix: Align the two files, delete or implement the unsupported claims, and add one line per gotcha.
 
 ### `bio-data-visualization-network-visualization` — Hub-label rule and edge-width advice are not adaptive
 
