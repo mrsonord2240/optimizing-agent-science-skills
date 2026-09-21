@@ -133,6 +133,8 @@ audit's assertions; fix the defect the assertion exposed.
 - Skills that already score ≥ 85 with no P1 stay byte-identical.
 - Public unauthenticated services (NCBI E-utilities, myvariant.info, gnomAD GraphQL, Ensembl) are fine
   for verifying database Skills; nothing paid or authenticated.
+- **Never kill a process by image name**; kill the PID you started. Python on Windows cannot read
+  MSYS `/f/...` paths: use `F:\...`.
 - Windows: edit with Write/Edit or Python `encoding='utf-8'`; never PowerShell `Get-Content`/`Out-File`.
   Prefix Python with `PYTHONIOENCODING=utf-8` in Bash. Keep paths short.
 - At most one sub-agent of your own at a time; the machine is shared with other agents.

@@ -105,6 +105,7 @@ downloads only — no paid or licence-gated services, and nothing whose terms fo
 
 ## Other rules
 
+- Never kill a process by image name; kill the PID you started.
 - Never launch a bare `python` or `R` REPL from a tool call — one filled the disk with 207 GB.
   Always run scripts.
 - Prefix Python with `PYTHONIOENCODING=utf-8` in Bash. Edit files with Write/Edit or Python

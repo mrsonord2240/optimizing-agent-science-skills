@@ -63,7 +63,9 @@ When your dispatch names a fixed Skill:
   your own so the score does not only measure the defects the fixer was told about. The fix log
   (`F:\optimizing-agent-science-skills\fixes\<skill-id>.md`) says what changed; it is not evidence
   — only your runs are.
-- Write the new report into `F:\OpenScience\audits\<skill-id>\` as for a first audit.
+- Write the new report into `F:\OpenScience\audits\<skill-id>\` as for a first audit. Never file a
+  copy of a final report as `_pre-fix-<date>b`: the publisher then refuses, saying it audits the
+  same commit as the audit it supersedes.
 
 ## Audit the Skill
 
