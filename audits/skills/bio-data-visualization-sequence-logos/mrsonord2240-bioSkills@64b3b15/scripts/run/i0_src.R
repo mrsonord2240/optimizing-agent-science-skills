@@ -1,0 +1,7 @@
+library(ggseqlogo)
+cat("ggseqlogo", as.character(packageVersion("ggseqlogo")), "\n")
+print(args(ggseqlogo)); print(args(geom_logo))
+print(ggseqlogo:::logo_data)
+print(ggseqlogo:::bits_method)
+print(ggseqlogo:::probability_method)
+print(ggseqlogo:::get_font)
