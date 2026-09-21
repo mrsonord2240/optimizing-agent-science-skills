@@ -1,9 +1,9 @@
 {
   "skill_id": "bio-splice-variant-prediction",
-  "version": "mrsonord2240-bioSkills@44ff43b",
+  "version": "mrsonord2240-bioSkills@40aa467",
   "source": {
     "repository": "mrsonord2240/bioSkills",
-    "commit": "44ff43bb35e5741c3ddd3c003590e1f1da8a4a4b",
+    "commit": "40aa467b3e6ca58f2aeb4cbf30a8cc2b81cf7197",
     "path": "alternative-splicing/splice-variant-prediction",
     "author": "GPTomics",
     "author_url": "https://github.com/GPTomics",
@@ -13,7 +13,7 @@
       "repository": "GPTomics/bioSkills",
       "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
     },
-    "url": "https://github.com/mrsonord2240/bioSkills/tree/44ff43bb35e5741c3ddd3c003590e1f1da8a4a4b/alternative-splicing/splice-variant-prediction"
+    "url": "https://github.com/mrsonord2240/bioSkills/tree/40aa467b3e6ca58f2aeb4cbf30a8cc2b81cf7197/alternative-splicing/splice-variant-prediction"
   },
   "audit": {
     "method": {
@@ -31,11 +31,11 @@
     "commissioned_by": "Samuel Nord",
     "test_data": "synthetic"
   },
-  "supersedes": null,
+  "supersedes": "mrsonord2240-bioSkills@44ff43b",
   "files": {
     "report": "report.json",
     "viewer": "viewer.md",
     "fixes": "fixes.md",
-    "scripts": 29
+    "scripts": 76
   }
 }
