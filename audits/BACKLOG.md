@@ -14,7 +14,39 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The example passes cluster_rows=<OLO dendrogram> together with row_split=gene_info$pathway, a combination ComplexHeatmap rejects; the script was never run.
 - Fix: Drop row_split or use a numeric row_split (works with the dendrogram), or apply OLO within each pathway group; supply a runnable data preamble and state the constraint in SKILL.md next to the OLO block.
 
-## P1 (92)
+## P1 (96)
+
+### `bio-data-visualization-distribution-plots` — The headline R raincloud depends on gghalves, archived and broken on ggplot2 4.x
+
+- Skill: 69.5, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/distribution-plots) · [viewer](skills/bio-data-visualization-distribution-plots/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 1, 5
+- Problem: geom_half_violin/geom_half_point fail on ggplot2 4.0.3 with 'argument "layout" is missing'; gghalves was archived on CRAN 2025-12-04; the example's own ggsave then leaves a 1,031-byte blank PDF. The Skill's version line says ggplot2 3.5+.
+- Root cause: The recipe was written against ggplot2 3.5 and the version note claims 3.5+ without a ceiling.
+- Fix: State the ceiling (gghalves needs ggplot2 < 4.0) and give a ggdist raincloud that runs on 4.0.3 (stat_halfeye + geom_boxplot + jittered points; verified with medians equal, run/i1b_ggdist.R); make the example fail early with a clear message.
+
+### `bio-data-visualization-distribution-plots` — bw = 'SJ' blanks the whole violin panel on tied or all-identical data
+
+- Skill: 69.5, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/distribution-plots) · [viewer](skills/bio-data-visualization-distribution-plots/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 3
+- Problem: A single cluster with all-identical values (or 90% ties) makes stats::bw.SJ fail ('sample is too sparse to find TD'); ggplot2 only warns and draws an empty panel, exit 0. The usage guide recommends exactly this for single-cell violins.
+- Root cause: SJ is recommended unconditionally with no tie guard.
+- Fix: Add a guard (n_distinct >= ~10 and tie fraction check, else bw = 'nrd0' with a stated reason) and a Common Errors row for 'Computation failed in stat_ydensity'.
+
+### `bio-data-visualization-distribution-plots` — Split-violin recipe swaps sides when a cell is missing and does not enforce its own N rule
+
+- Skill: 69.5, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/distribution-plots) · [viewer](skills/bio-data-visualization-distribution-plots/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 4
+- Problem: introdataviz::geom_split_violin picks the half by group-id parity, so an empty (cluster, condition) cell flips B/T for every later cluster while the dodged box stays put; n=1 and n=2 cells still get a KDE violin or a silent drop.
+- Root cause: The recipe assumes a complete cluster x condition grid.
+- Fix: Complete the grid with tidyr::complete (or drop clusters without both conditions) before plotting, drop violins for n < 30, and say so in the recipe.
+
+### `bio-data-visualization-distribution-plots` — The shipped example is not standalone and labels N from the wrong data frame
+
+- Skill: 69.5, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/distribution-plots) · [viewer](skills/bio-data-visualization-distribution-plots/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 5
+- Problem: df, df_small, df_med, df_large and df_paired are never created (df falls through to stats::df); with data, the small-N panel labels every group n=80 above 15 points because n_per_group is computed on df; count(group) also counts NA rows.
+- Root cause: Example written as a fragment and N derived once from an unrelated frame.
+- Fix: Build the five frames at the top (or read a shipped CSV), compute N per plot from the plotted frame with sum(!is.na(value)), and add a runnable data file.
 
 ### `bio-data-visualization-volcano-and-ma-plots` — Threshold line drawn on the wrong axis quantity
 
@@ -752,7 +784,55 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (438)
+## P2 (444)
+
+### `bio-data-visualization-distribution-plots` — Wrong bandwidth sentence: nrd (Scott) is 1.178x nrd0, so it oversmooths more
+
+- Skill: 69.5, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/distribution-plots) · [viewer](skills/bio-data-visualization-distribution-plots/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 3
+- Problem: The Silverman pitfall section says nrd oversmooths less than Silverman; bw.nrd/bw.nrd0 = 1.06/0.9 and nrd detected bimodality in 1 of 12 simulated cells where nrd0 was equal or better.
+- Root cause: Rule-of-thumb constants swapped.
+- Fix: Say nrd0 (Silverman) < nrd (Scott) in bandwidth, SJ preferred; drop the sentence.
+
+### `bio-data-visualization-distribution-plots` — stat_summary N-label snippet errors and tick-label N is not shown on raincloud/LV
+
+- Skill: 69.5, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/distribution-plots) · [viewer](skills/bio-data-visualization-distribution-plots/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 3, 5
+- Problem: fun.data returns only label, so geom_text fails ('missing aesthetics: y'); the raincloud and letter-value recipes carry no N although the Skill says always annotate N.
+- Root cause: Snippet never run.
+- Fix: Return data.frame(y = max(x), label = paste0('n=', sum(!is.na(x)))) with vjust, or use the tick-label form in every recipe.
+
+### `bio-data-visualization-distribution-plots` — trim=FALSE with bounded data, and R/Python recipes disagree
+
+- Skill: 69.5, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/distribution-plots) · [viewer](skills/bio-data-visualization-distribution-plots/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 3, 5
+- Problem: trim = FALSE draws density below 0 for expression (down to -1.63) and to -0.98 for a lognormal biomarker; Python uses cut=0. Python bw='scott' leaves the valley at 35% of the peak versus 3% for SJ.
+- Root cause: Blanket advice and no bounded-data caveat.
+- Fix: Recommend trim = TRUE (or an explicit lower bound) for non-negative data and state the Python bandwidth limits (ptitprince has no SJ).
+
+### `bio-data-visualization-distribution-plots` — Inconsistent N thresholds and small-N guidance
+
+- Skill: 69.5, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/distribution-plots) · [viewer](skills/bio-data-visualization-distribution-plots/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 1, 4
+- Problem: Table: letter-value 200-1000, KDE above 1000; operational rule: letter-value above 200; 'drop the violin below N=30' but the raincloud recipe is shown at N=25 and 30-200 is the raincloud band.
+- Root cause: Thresholds stated in three places.
+- Fix: Keep one table and reference it.
+
+### `bio-data-visualization-distribution-plots` — Deprecated seaborn/matplotlib usage and unseeded jitter
+
+- Skill: 69.5, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/distribution-plots) · [viewer](skills/bio-data-visualization-distribution-plots/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 1, 2
+- Problem: boxenplot(palette=...) without hue warns and will be removed in seaborn 0.14; ptitprince triggers the matplotlib 3.13 vert removal; geom_jitter in the first recipe is unseeded so the figure changes each run while the Skill praises determinism.
+- Root cause: Older API forms.
+- Fix: Pass hue with legend=False, note the ptitprince/matplotlib pin, and use position_jitter(seed=).
+
+### `bio-data-visualization-distribution-plots` — usage-guide.md repeats SKILL.md
+
+- Skill: 69.5, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/distribution-plots) · [viewer](skills/bio-data-visualization-distribution-plots/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: —
+- Problem: The Tips and What the Agent Will Do sections restate SKILL.md rules.
+- Root cause: Two files carry the same guidance.
+- Fix: Reduce usage-guide.md to prompts and prerequisites.
 
 ### `bio-data-visualization-volcano-and-ma-plots` — EnhancedVolcano 'selectLab filtered by thresholds' does not reproduce
 

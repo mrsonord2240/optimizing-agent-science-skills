@@ -1,0 +1,7 @@
+suppressMessages({library(ggplot2); library(gghalves)}); cat("ggplot2", as.character(packageVersion("ggplot2")), "\n")
+df <- read.csv("out/i5/df.csv"); df$group <- factor(df$group, levels=c("Ctrl","Low","High"))
+cat("data min per group:", paste(names(tapply(df$value, df$group, min)), round(tapply(df$value, df$group, min),2), collapse=" "), " (High is lognormal, strictly positive)\n")
+p <- ggplot(df, aes(group, value)) + geom_half_violin(side='r', trim=FALSE, adjust=1, bw='SJ')
+vd <- layer_data(p, 1); r <- aggregate(y ~ group, vd, range); print(r)
+cat("High: violin y-range", round(range(vd$y[vd$group==3]),2), "vs data range", round(range(df$value[df$group=="High"]),2), "\n")
+cat("bw.SJ High:", round(bw.SJ(df$value[df$group=="High"]),3), "bw.nrd0:", round(bw.nrd0(df$value[df$group=="High"]),3), "\n")
