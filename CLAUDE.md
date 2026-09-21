@@ -89,7 +89,15 @@ went untracked on 2026-09-17.
   - `reaudit: needed` — its staging bytes changed after its latest audit.
 - To promote: advance `FORK_COMMIT` in `tools/promote_skills.py` to the staging commit, then run
   `python tools/promote_skills.py` as a dry run, then with `--apply`. Afterwards update the Status
-  table in the published `README.md` from the new `PROVENANCE.json`.
+  table in the published `README.md` from the new `PROVENANCE.json`, then commit and push the shelf.
+- **The goal is the Open Science skill marketplace** (`aipoch/openscience-skill-marketplace`,
+  `authoring/README.md`). It takes one `release.config.json` per Skill pinned to a shelf commit, and
+  every version is immutable and reviewed. `promote_skills.py` sets `marketplace_ready` (Production
+  Ready, fix pass done, no change since audit). After the shelf is pushed, run
+  `python tools/marketplace_manifests.py --intake F:/OpenScience/marketplace-intake/openscience-skill-marketplace`:
+  it writes manifests to `F:\OpenScience\marketplace-submissions\`, refuses ids already in the
+  marketplace, and fails unless the marketplace's own `intake:skill` accepts every one. Never rewrite
+  shelf history: a force-push breaks the pinned SHAs.
 
 ## Sharing the machine with other sessions
 

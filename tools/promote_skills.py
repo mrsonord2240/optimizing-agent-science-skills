@@ -23,9 +23,14 @@ import time
 REC = "F:/optimizing-agent-science-skills"
 FORK = "F:/OpenScience/external/mrsonord2240__bioSkills"
 UPSTREAM_COMMIT = "d91ed3d563019e649dc854c56ccd62551359488a"
-FORK_COMMIT = "64b3b150c9b989c102f7ee69e0bb07c16842d894"
+FORK_COMMIT = "431aa55d2dc56d3da947f1c820077a6578691e37"
 AUDITS = "F:/OpenScience/audits"
 OUT = "F:/optimized-scientific-skills"
+
+# The two lines added to every SKILL.md across the corpus: `license: MIT` (558aea5) and
+# `author: GPTomics` (2026-09-21, the marketplace keeps a frontmatter author as the attribution claim).
+# Neither counts as a change to what an audit ran on.
+DECLARATIONS = {"+license: MIT", "+author: GPTomics"}
 
 # Present in the source tree but not candidates for refinement. Recorded in REMAINING.json with the
 # reason rather than silently filtered, so the remaining count always reconciles with the tree.
@@ -91,8 +96,8 @@ def classify(path):
     changed = [l for l in out.splitlines()
                if l[:1] in "+-" and not l.startswith(("+++", "---"))]
     files = sorted({l.split("/")[-1] for l in out.splitlines() if l.startswith("+++ b/")})
-    if all(l == "+license: MIT" for l in changed):
-        return "licence-declaration-only", files
+    if all(l in DECLARATIONS for l in changed):
+        return "declarations-only", files
     return "modified", files
 
 
@@ -100,14 +105,14 @@ def audited_bytes_differ(source, path):
     """True when the bytes at FORK_COMMIT are not the bytes the audit ran on.
 
     A Skill fixed after its audit but not yet re-audited must not be promoted on the old score. The
-    `license: MIT` line added corpus-wide at 558aea5 is the one tolerated difference.
+    declaration lines in DECLARATIONS, added corpus-wide, are the only tolerated difference.
     """
     m = re.match(r"^[\w.-]+/[\w.-]+@([0-9a-f]{7,40}):", source or "")
     if not m:
         return True
     out = git(["diff", "-U0", m.group(1), FORK_COMMIT, "--", path]).stdout or ""
     changed = [l for l in out.splitlines() if l[:1] in "+-" and not l.startswith(("+++", "---"))]
-    return any(l != "+license: MIT" for l in changed)
+    return any(l not in DECLARATIONS for l in changed)
 
 
 def audit_source_commit(source):
@@ -212,6 +217,11 @@ def main():
         kind, files = classify(row["upstream_path"])
         row["relative_to_upstream"] = kind
         row["changed_files"] = files
+        # Cleared to submit to the marketplace: at the Production Ready target (process/THRESHOLD.md),
+        # a fix pass done, and no changes since the last audit. Versions there are immutable and each
+        # is reviewed, so a Skill that is still moving, or short of the target, is not ready.
+        row["marketplace_ready"] = (row["grade"] == "Production Ready" and row["fix_pass"] == "done"
+                                    and row["reaudit"] == "not needed")
 
     finished.sort(key=lambda r: r["id"])
     excluded.sort(key=lambda r: r["id"])
@@ -220,13 +230,15 @@ def main():
     needs_fix = [r for r in finished if r["fix_pass"] == "needed"]
 
     print(f"finished  : {len(finished)}")
-    for k in ("modified", "licence-declaration-only", "unmodified"):
+    for k in ("modified", "declarations-only", "unmodified"):
         print(f"   {k:26s} {sum(1 for r in finished if r['relative_to_upstream'] == k)}")
     print(f"   fix pass done              {len(finished) - len(needs_fix)}")
     print(f"   fix pass needed            {len(needs_fix)}")
     print(f"excluded  : {len(excluded)}  {[r['id'] for r in excluded]}")
     stale = [r for r in finished if r["reaudit"] == "needed"]
     print(f"   re-audit needed            {len(stale)}")
+    ready = [r for r in finished if r["marketplace_ready"]]
+    print(f"   marketplace ready          {len(ready)}")
     print(f"remaining : {len(remaining)}")
 
     if not apply:

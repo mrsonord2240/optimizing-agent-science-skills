@@ -19,8 +19,8 @@ agent re-audits your work afterwards; you never score anything.
 - **Your worktree and branch** are named in your dispatch message. Work only there.
 - Records repository (briefs, thresholds, fix logs, audit records):
   `F:\optimizing-agent-science-skills` — thresholds in `process\THRESHOLD.md`, your fix logs in
-  `fixes\`. The fixed Skill trees are exported there from the fork under `skills\bioSkills\`;
-  that export is a separate step, not yours.
+  `fixes\`. Fixed Skills are promoted from the fork to the published shelf by
+  `tools\promote_skills.py`; that is a separate step, not yours.
 - Evidence per Skill: `F:\OpenScience\audits\<skill-id>\eval_report_<skill-id>_result.json`
   (`recommendations[]`, per-input notes) and `eval_viewer_<skill-id>.md` (the commands that ran, what
   failed, and often the corrected command the auditor verified).
@@ -128,8 +128,7 @@ audit's assertions; fix the defect the assertion exposed.
 
 - Never write in `F:\OpenScience\external\GPTomics__bioSkills`, `F:\OpenScience\audits`, other
   worktrees, `F:\OpenScience\skills`, or the builder. Do not push, merge or rebase. In the records
-  repository write only your `fixes\<skill-id>.md`; `skills\bioSkills\` there is an export of the
-  fork, never edited by hand.
+  repository write only your `fixes\<skill-id>.md`.
 - Skills that already score ≥ 85 with no P1 stay byte-identical.
 - Public unauthenticated services (NCBI E-utilities, myvariant.info, gnomAD GraphQL, Ensembl) are fine
   for verifying database Skills; nothing paid or authenticated.

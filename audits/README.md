@@ -17,8 +17,7 @@ One directory per audited version, so a Skill audited before and after a fix kee
 `record.json` links them through `supersedes`.
 
 **Not kept here:** raw run outputs, generated test data and downloaded datasets. A record names the
-dataset accession or the generator script that produced its inputs, and `environments/` says how to
-rebuild the runtime that ran them.
+dataset accession or the generator script that produced its inputs.
 
 `INDEX.md` lists every Skill with its latest score and open findings; `BACKLOG.md` lists every open
 recommendation, most severe first. Both are generated — don't hand-edit them.
