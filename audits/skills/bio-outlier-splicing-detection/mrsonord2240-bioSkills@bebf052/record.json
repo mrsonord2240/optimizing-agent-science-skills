@@ -1,9 +1,9 @@
 {
   "skill_id": "bio-outlier-splicing-detection",
-  "version": "mrsonord2240-bioSkills@44ff43b",
+  "version": "mrsonord2240-bioSkills@bebf052",
   "source": {
     "repository": "mrsonord2240/bioSkills",
-    "commit": "44ff43bb35e5741c3ddd3c003590e1f1da8a4a4b",
+    "commit": "bebf0525bf72d2737fd3404d1b1abe7e51f050b7",
     "path": "alternative-splicing/outlier-splicing-detection",
     "author": "GPTomics",
     "author_url": "https://github.com/GPTomics",
@@ -13,7 +13,7 @@
       "repository": "GPTomics/bioSkills",
       "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
     },
-    "url": "https://github.com/mrsonord2240/bioSkills/tree/44ff43bb35e5741c3ddd3c003590e1f1da8a4a4b/alternative-splicing/outlier-splicing-detection"
+    "url": "https://github.com/mrsonord2240/bioSkills/tree/bebf0525bf72d2737fd3404d1b1abe7e51f050b7/alternative-splicing/outlier-splicing-detection"
   },
   "audit": {
     "method": {
@@ -31,11 +31,11 @@
     "commissioned_by": "Samuel Nord",
     "test_data": "synthetic"
   },
-  "supersedes": null,
+  "supersedes": "mrsonord2240-bioSkills@44ff43b",
   "files": {
     "report": "report.json",
     "viewer": "viewer.md",
     "fixes": "fixes.md",
-    "scripts": 31
+    "scripts": 127
   }
 }

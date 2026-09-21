@@ -8,71 +8,15 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (93)
+## P1 (86)
 
-### `bio-outlier-splicing-detection` — Main FRASER workflow and shipped example crash as written
+### `bio-outlier-splicing-detection` — AE reproducibility recipe is wrong in SKILL.md and incomplete in the example
 
-- Skill: 67, Beta Only · [mrsonord2240/bioSkills@44ff43b](https://github.com/mrsonord2240/bioSkills/tree/44ff43bb35e5741c3ddd3c003590e1f1da8a4a4b/alternative-splicing/outlier-splicing-detection) · [viewer](skills/bio-outlier-splicing-detection/mrsonord2240-bioSkills@44ff43b/viewer.md)
-- Observed in inputs: 1, 3, 6, 7
-- Problem: FraserDataSet(colData = <data.frame>) fails on FRASER 2.2.0 and 2.6.1 ('is(value, DataFrame) is not TRUE'), so SKILL.md and examples/fraser2_rare_disease.R stop at line 30.
-- Root cause: Snippets were never run against a released FRASER.
-- Fix: Wrap the sample table in S4Vectors::DataFrame() in SKILL.md and the example; add a pass/fail print (n junctions, n calls) so the example asserts something.
-
-### `bio-outlier-splicing-detection` — Version-fragile API: estimateBestQ and plotEncDimSearch guidance
-
-- Skill: 67, Beta Only · [mrsonord2240/bioSkills@44ff43b](https://github.com/mrsonord2240/bioSkills/tree/44ff43bb35e5741c3ddd3c003590e1f1da8a4a4b/alternative-splicing/outlier-splicing-detection) · [viewer](skills/bio-outlier-splicing-detection/mrsonord2240-bioSkills@44ff43b/viewer.md)
-- Observed in inputs: 1, 2, 3
-- Problem: FRASER::estimateBestQ does not exist in 2.2.0 (optimHyperParams there); OUTRIDER::estimateBestQ returns a scalar in 1.24.0 but an OutriderDataSet in 1.28.1, so the OUTRIDER snippet crashes; plotEncDimSearch defaults to the OHT singular-value plot and returns NULL after useOHT=FALSE (the comment says the opposite; plotType='auc'/'loss' show the grid).
-- Root cause: Version line says 'FRASER 2.0 (>=1.99.0), OUTRIDER 1.20+' but the code targets Bioc 3.22 FRASER and Bioc 3.20 OUTRIDER.
-- Fix: Pin one Bioconductor release, use bestQ(ods)/bestQ(fds, 'jaccard') after estimateBestQ in both tools, and correct the plotEncDimSearch comment.
-
-### `bio-outlier-splicing-detection` — OUTRIDER cohort-size guidance contradicts measured power
-
-- Skill: 67, Beta Only · [mrsonord2240/bioSkills@44ff43b](https://github.com/mrsonord2240/bioSkills/tree/44ff43bb35e5741c3ddd3c003590e1f1da8a4a4b/alternative-splicing/outlier-splicing-detection) · [viewer](skills/bio-outlier-splicing-detection/mrsonord2240-bioSkills@44ff43b/viewer.md)
-- Observed in inputs: 2
-- Problem: n=20-50 is called 'Acceptable' and n<20 fails with 'convergence warnings', but OUTRIDER on its own simulator detected 0/57 injected outliers at 30 samples and 67/115 at 60, with only a 'No significant events' warning.
-- Root cause: Single cohort table shared by FRASER and OUTRIDER.
-- Fix: Give OUTRIDER its own size guidance (>=50-60 samples for useful power), and say that an empty result at n<50 is expected, not an error.
-
-### `bio-outlier-splicing-detection` — Default q=10 hard-coded; q advice does not match the data
-
-- Skill: 67, Beta Only · [mrsonord2240/bioSkills@44ff43b](https://github.com/mrsonord2240/bioSkills/tree/44ff43bb35e5741c3ddd3c003590e1f1da8a4a4b/alternative-splicing/outlier-splicing-detection) · [viewer](skills/bio-outlier-splicing-detection/mrsonord2240-bioSkills@44ff43b/viewer.md)
-- Observed in inputs: 1, 3
-- Problem: The example fixes q=10 although the text says to tune it; on a 30-sample cohort q=10 missed a 60%-usage cryptic donor that q<=3 and OHT found, and q=15 found 1/4. Text says q=8-15 typical and 5-8 for n=20-30.
-- Root cause: q ranges are convention, not derived; the example skips the estimateBestQ step it recommends.
-- Fix: Call estimateBestQ(useOHT=TRUE)/bestQ in the example and use its value; state that q must stay well below n.
-
-### `bio-outlier-splicing-detection` — No research-use / clinical-boundary caveat, and licence misstated
-
-- Skill: 67, Beta Only · [mrsonord2240/bioSkills@44ff43b](https://github.com/mrsonord2240/bioSkills/tree/44ff43bb35e5741c3ddd3c003590e1f1da8a4a4b/alternative-splicing/outlier-splicing-detection) · [viewer](skills/bio-outlier-splicing-detection/mrsonord2240-bioSkills@44ff43b/viewer.md)
-- Observed in inputs: 6
-- Problem: The Skill positions FRASER/DROP for clinical diagnostics and the usage guide directs a 'clinical report with PS3 weight' with no research-use, validation or qualified-reviewer caveat; frontmatter says MIT while FRASER 2.6.1 / OUTRIDER 1.28.1 (and DROP) are CC BY NC 4.0.
-- Root cause: Clinical framing copied from programme descriptions without a boundary statement.
-- Fix: Add a Practice Boundaries paragraph (candidate findings only; ACMG classification by a qualified geneticist; RNA-seq assay validation) and a licence note for commercial/diagnostic use.
-
-### `bio-outlier-splicing-detection` — DROP section: failing init command, wrong config and MAE description
-
-- Skill: 67, Beta Only · [mrsonord2240/bioSkills@44ff43b](https://github.com/mrsonord2240/bioSkills/tree/44ff43bb35e5741c3ddd3c003590e1f1da8a4a4b/alternative-splicing/outlier-splicing-detection) · [viewer](skills/bio-outlier-splicing-detection/mrsonord2240-bioSkills@44ff43b/viewer.md)
-- Observed in inputs: 5
-- Problem: `drop init my_diagnostic_run` errors in DROP 1.6.1; config keys are `run: true` (not 'enabled'); default implementation is PCA; MAE uses a negative binomial test (not a z-score test); `--use-conda` does nothing (no conda: directives); the 10-sample demo needs roughly 85 minutes on 10 cores.
-- Root cause: DROP steps written from memory of the docs.
-- Fix: Use `mkdir run && cd run && drop init`, quote the real config keys, fix the MAE sentence, drop --use-conda, and state the runtime of the demo.
-
-### `bio-outlier-splicing-detection` — Invented error messages and unreproducible AE fits
-
-- Skill: 67, Beta Only · [mrsonord2240/bioSkills@44ff43b](https://github.com/mrsonord2240/bioSkills/tree/44ff43bb35e5741c3ddd3c003590e1f1da8a4a4b/alternative-splicing/outlier-splicing-detection) · [viewer](skills/bio-outlier-splicing-detection/mrsonord2240-bioSkills@44ff43b/viewer.md)
-- Observed in inputs: 3, 7
-- Problem: Common Errors lists 'FRASER: cohort too small', 'estimateBestQ: convergence not reached', 'OUTRIDER: encoding-dim search slow' which appear nowhere in FRASER 2.6.1/OUTRIDER 1.28.1; and FRASER correction='AE' without a seed differs run to run (12 of ~26 significant cells shared) with no set.seed advice.
-- Root cause: Table written from expectations rather than observed output.
-- Fix: Replace the table with real messages (e.g. 'Optimal latent space dimension is smaller than 2', 'No significant events') and add set.seed() before any AE fit.
-
-### `bio-outlier-splicing-detection` — LeafcutterMD block lacks outputs, correction and limits
-
-- Skill: 67, Beta Only · [mrsonord2240/bioSkills@44ff43b](https://github.com/mrsonord2240/bioSkills/tree/44ff43bb35e5741c3ddd3c003590e1f1da8a4a4b/alternative-splicing/outlier-splicing-detection) · [viewer](skills/bio-outlier-splicing-detection/mrsonord2240-bioSkills@44ff43b/viewer.md)
-- Observed in inputs: 4
-- Problem: The block runs, but the Skill does not say the output files are _pVals/_clusterPvals/_effSize, that p-values are raw and need FDR control, where leafcutter_cluster_regtools.py lives, or that intron retention and some novel-exon clusters give no p-value.
-- Root cause: One-paragraph treatment of the tool.
-- Fix: Add output description, a BH step (11 calls at q<0.05 vs 39 at raw p<0.05 on the test cohort) and the junction-only limitation.
+- Skill: 82, Limited Release · [mrsonord2240/bioSkills@bebf052](https://github.com/mrsonord2240/bioSkills/tree/bebf0525bf72d2737fd3404d1b1abe7e51f050b7/alternative-splicing/outlier-splicing-detection) · [viewer](skills/bio-outlier-splicing-detection/mrsonord2240-bioSkills@bebf052/viewer.md)
+- Observed in inputs: 7
+- Problem: SKILL.md says set.seed() alone does not fix AE fits and `BPPARAM = SerialParam(RNGseed = 1)` does (0 differ). Measured on FRASER 2.6.1 (AE q=5 fitted twice, 20010 p-values): SerialParam(RNGseed=1) alone leaves 9815 differing (9962 at 5 iterations); set.seed(1) alone 9279; only set.seed(1) together with SerialParam(RNGseed=1) gives 0. The example says 'AE needs set.seed() to be reproducible', which is also incomplete.
+- Root cause: The fixer's measuring script set both seeds in the same call, so the '0 differ' result was attributed to RNGseed alone; the 'set.seed only' number was from that same combined call.
+- Fix: State: for reproducible AE fits call `set.seed(1)` and pass `BPPARAM = SerialParam(RNGseed = 1)` together (0 of 20010 differ; either alone 9-10k differ); make the example comment say the same. PCA stays the default.
 
 ### `bio-single-cell-splicing` — scQuint block fails on real self-consistent STARsolo output
 
@@ -754,39 +698,7 @@ None open.
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (426)
-
-### `bio-outlier-splicing-detection` — Tissue-mismatch symptom and detection
-
-- Skill: 67, Beta Only · [mrsonord2240/bioSkills@44ff43b](https://github.com/mrsonord2240/bioSkills/tree/44ff43bb35e5741c3ddd3c003590e1f1da8a4a4b/alternative-splicing/outlier-splicing-detection) · [viewer](skills/bio-outlier-splicing-detection/mrsonord2240-bioSkills@44ff43b/viewer.md)
-- Observed in inputs: 7
-- Problem: 'Hundreds of outliers' was not seen (PCA absorbed the shifted sample; AE flagged 15), and no QC step exposes mismatch.
-- Root cause: Claim stated without a check.
-- Fix: Add a sample-correlation / PCA outlier check on the count matrix before fitting.
-
-### `bio-outlier-splicing-detection` — Threshold and default inconsistencies
-
-- Skill: 67, Beta Only · [mrsonord2240/bioSkills@44ff43b](https://github.com/mrsonord2240/bioSkills/tree/44ff43bb35e5741c3ddd3c003590e1f1da8a4a4b/alternative-splicing/outlier-splicing-detection) · [viewer](skills/bio-outlier-splicing-detection/mrsonord2240-bioSkills@44ff43b/viewer.md)
-- Observed in inputs: 2, 1
-- Problem: Quality table says OUTRIDER \|z\|>=2 but the code uses zScoreCutoff=0; example filter uses quantile=0.05/quantileMinExpression=1 versus FRASER defaults 0.75/10 (86% of junctions kept); FRASER 'Beta-binomial autoencoder' wording while the default fit is PCA.
-- Root cause: Parameters copied from different sources.
-- Fix: Align table and code, explain the filter choice, and name PCA as default and AE as an option.
-
-### `bio-outlier-splicing-detection` — Integration block details and control-data access
-
-- Skill: 67, Beta Only · [mrsonord2240/bioSkills@44ff43b](https://github.com/mrsonord2240/bioSkills/tree/44ff43bb35e5741c3ddd3c003590e1f1da8a4a4b/alternative-splicing/outlier-splicing-detection) · [viewer](skills/bio-outlier-splicing-detection/mrsonord2240-bioSkills@44ff43b/viewer.md)
-- Observed in inputs: 6
-- Problem: delta_max is not a SpliceAI output column and no derivation is given; the 1 kb junction-end rule is a loose heuristic; chr-naming mismatch fails silently; pooling GTEx controls needs dbGaP access which is not mentioned.
-- Root cause: Block written as sketch.
-- Fix: Show the DS_* -> delta_max step, add a chromosome-name assertion, and note controlled access for GTEx BAMs.
-
-### `bio-outlier-splicing-detection` — Single-file layout, one FRASER-only example
-
-- Skill: 67, Beta Only · [mrsonord2240/bioSkills@44ff43b](https://github.com/mrsonord2240/bioSkills/tree/44ff43bb35e5741c3ddd3c003590e1f1da8a4a4b/alternative-splicing/outlier-splicing-detection) · [viewer](skills/bio-outlier-splicing-detection/mrsonord2240-bioSkills@44ff43b/viewer.md)
-- Observed in inputs: —
-- Problem: 387-line SKILL.md plus a usage guide repeating it; no references/ or test data; example hard-codes bams/ and PATIENT_001.
-- Root cause: No progressive disclosure.
-- Fix: Move tool details to references/, add a tiny planted-outlier test set with expected output.
+## P2 (428)
 
 ### `bio-crispr-screens-copy-number-correction` — negative_control_sgrnas empty-dict case raises an undocumented ValueError
 
@@ -811,6 +723,54 @@ None open.
 - Problem: None of the three real Chronos training runs across this audit's inputs set or discussed a random seed, and SKILL.md gives no guidance on reproducibility between training runs.
 - Root cause: Carried over from both prior audits' static notes (Idempotency, Agent-Specific); unrelated to and untouched by this fix pass.
 - Fix: Add a one-line note to the Chronos code block: set a seed (or document that Chronos training is stochastic and gene-effect estimates should be treated as approximate across runs) so agents don't present a single run's numbers as exactly reproducible.
+
+### `bio-outlier-splicing-detection` — FRASER block stops at its last line when no sample has a call
+
+- Skill: 82, Limited Release · [mrsonord2240/bioSkills@bebf052](https://github.com/mrsonord2240/bioSkills/tree/bebf0525bf72d2737fd3404d1b1abe7e51f050b7/alternative-splicing/outlier-splicing-detection) · [viewer](skills/bio-outlier-splicing-detection/mrsonord2240-bioSkills@bebf052/viewer.md)
+- Observed in inputs: 3
+- Problem: `patient_results[order(patient_results$padjust), ]` fails with 'argument 1 is not a vector' when results() returns an empty table (n=8, 12, 16: 3 of 3 runs). The shipped example already guards it.
+- Root cause: The guard was added to the example only.
+- Fix: Add the example's `if (nrow(patient_results) > 0)` guard to the SKILL.md block, or say the block ends with the example's version.
+
+### `bio-outlier-splicing-detection` — FRASER block is not runnable on FRASER 2.2.0 (Bioc 3.20)
+
+- Skill: 82, Limited Release · [mrsonord2240/bioSkills@bebf052](https://github.com/mrsonord2240/bioSkills/tree/bebf0525bf72d2737fd3404d1b1abe7e51f050b7/alternative-splicing/outlier-splicing-detection) · [viewer](skills/bio-outlier-splicing-detection/mrsonord2240-bioSkills@bebf052/viewer.md)
+- Observed in inputs: 1
+- Problem: The block calls estimateBestQ, absent in 2.2.0 ('could not find function'); the comment and the example (exists() check, optimHyperParams) cover it but the block does not.
+- Root cause: Two release pairs are listed as checked, one block written for the newer.
+- Fix: Use the example's est_q selection in the block, or say 'block for FRASER >= 2.6'.
+
+### `bio-outlier-splicing-detection` — Tissue-mismatch check cannot see a sample the PCA fit absorbed; OHT message placed at the wrong n
+
+- Skill: 82, Limited Release · [mrsonord2240/bioSkills@bebf052](https://github.com/mrsonord2240/bioSkills/tree/bebf0525bf72d2737fd3404d1b1abe7e51f050b7/alternative-splicing/outlier-splicing-detection) · [viewer](skills/bio-outlier-splicing-detection/mrsonord2240-bioSkills@bebf052/viewer.md)
+- Observed in inputs: 3, 7
+- Problem: Calls-per-sample ranks S29 first only under AE; under PCA S29 has 0 calls. The Skill says a zero-call patient must not be read as tissue-matched but gives no check that would show it. 'Optimal latent space dimension is smaller than 2' is said to be seen at n=8-12; it printed at n=4, and at n=8-25 OHT printed 'Optimal encoding dimension: 2'.
+- Root cause: Mismatch detection written around the AE symptom; message location taken from another control composition.
+- Fix: Add a sample-by-sample correlation or PCA-of-counts check on the count matrix before fitting; correct the n for the OHT message.
+
+### `bio-outlier-splicing-detection` — Unsourced tissue and disease tables; LeafcutterMD block needs the script path
+
+- Skill: 82, Limited Release · [mrsonord2240/bioSkills@bebf052](https://github.com/mrsonord2240/bioSkills/tree/bebf0525bf72d2737fd3404d1b1abe7e51f050b7/alternative-splicing/outlier-splicing-detection) · [viewer](skills/bio-outlier-splicing-detection/mrsonord2240-bioSkills@bebf052/viewer.md)
+- Observed in inputs: 4
+- Problem: 'Genes captured' percentages per tissue and the disease-specific expectations table have no source or run behind them; `python leafcutter_cluster_regtools.py` in the block only runs from the leafcutter repo's clustering/ directory (named in the text, not in the block).
+- Root cause: Carried over from upstream; block copies the tool's README usage.
+- Fix: Cite or drop the percentages; write the script path in the block.
+
+### `bio-outlier-splicing-detection` — Single-file layout, no shipped test data
+
+- Skill: 82, Limited Release · [mrsonord2240/bioSkills@bebf052](https://github.com/mrsonord2240/bioSkills/tree/bebf0525bf72d2737fd3404d1b1abe7e51f050b7/alternative-splicing/outlier-splicing-detection) · [viewer](skills/bio-outlier-splicing-detection/mrsonord2240-bioSkills@bebf052/viewer.md)
+- Observed in inputs: —
+- Problem: 392-line SKILL.md, no references/ split, no small planted dataset or expected output; the generator exists only in the audit records.
+- Root cause: Restructure was out of scope for the fix.
+- Fix: Ship the generator (scripts/01_make_synth_cohort.py) with expected results (4/4 events, 0 false calls at n=30).
+
+### `bio-outlier-splicing-detection` — DROP demo runtime stated as about 85 minutes
+
+- Skill: 82, Limited Release · [mrsonord2240/bioSkills@bebf052](https://github.com/mrsonord2240/bioSkills/tree/bebf0525bf72d2737fd3404d1b1abe7e51f050b7/alternative-splicing/outlier-splicing-detection) · [viewer](skills/bio-outlier-splicing-detection/mrsonord2240-bioSkills@bebf052/viewer.md)
+- Observed in inputs: 5
+- Problem: In the cited run the fraser group's results existed after about 90 minutes and the whole target had not finished at the 100-minute limit (fraser_external killed in step 08).
+- Root cause: Runtime taken from the first table of results.
+- Fix: Say 'about 90 minutes to the first results.tsv on 10 cores, longer for the whole target'.
 
 ### `bio-alignment-trimming` — Caution on trimAl sequence-overlap thresholds
 
