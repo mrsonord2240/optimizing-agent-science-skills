@@ -1,0 +1,418 @@
+{
+ "meta": {
+  "skill_name": "bio-data-visualization-volcano-and-ma-plots",
+  "description": "Build volcano and MA plots from differential-expression / association results with LFC shrinkage, FDR-adjusted thresholds, sensible label placement, and axis-truncation conventions. Covers EnhancedVolcano, ggplot2, matplotlib, and the apeglm/ashr/normal shrinkage decision.",
+  "evaluated_on": "2026-09-20",
+  "evaluator_version": "skill-auditor@1.0",
+  "category": "Data Analysis",
+  "execution_mode": "A",
+  "complexity": "Moderate",
+  "n_inputs": 5,
+  "source": "mrsonord2240/bioSkills@019953e9ca90f6f6f69e3f5a9cd19a5c1b9dc6be:data-visualization/volcano-and-ma-plots",
+  "audit_type": "first audit (unmodified upstream GPTomics/bioSkills content)",
+  "executed": true,
+  "execution_note": "Executed 5/5 inputs on the data-visualization env: R 4.4.3 (DESeq2 1.46.0, EnhancedVolcano 1.24.0, ggplot2 4.0.3, ggrepel 0.9.8, limma, ALL, apeglm 1.28.0, ashr 2.2.63) and Python 3.12 (pandas 3.0.6, matplotlib 3.11.2, adjustText 1.4.0). All 5 SKILL.md code blocks and the shipped example were parsed and run (block 01's calls were run as equivalent statements in i0_prep_airway.R). Real data: Bioconductor airway (dex vs untreated) and ALL; the extreme-p table is SYNTHETIC (seed 20260920). Every output PNG/PDF was opened or measured."
+ },
+ "veto_gates": {
+  "skill_veto": {
+   "gate": "PASS",
+   "stability": "PASS",
+   "contract": "PASS",
+   "determinism": "PASS",
+   "security": "PASS"
+  },
+  "research_veto": {
+   "applicable": true,
+   "gate": "PASS",
+   "scientific_integrity": {
+    "result": "PASS",
+    "detail": "No fabricated DOI, statistic or result; the citations checked (Zhu 2019, Stephens 2017, Bourgon 2010, Wong 2011) are real. Several tool-behaviour statements are wrong (selectLab filtering, ashr svalue, limma 'shrunken', 5 MB PDF) but they are recorded as accuracy defects, not invented evidence."
+   },
+   "practice_boundaries": {
+    "result": "PASS",
+    "detail": "Visualization Skill; no diagnostic or prescriptive content."
+   },
+   "methodological_ground": {
+    "result": "PASS",
+    "detail": "No conclusion-inverting fallacy. The raw-p axis with padj colouring and the limma 'shrunken' claim are recorded as P1 defects: the plot can mislead but the classification by padj and |LFC| is computed correctly."
+   },
+   "code_usability": {
+    "result": "PASS",
+    "detail": "All 4 R blocks, the Python block and shipped volcano_phd.R example parse and ran; outputs opened. volcano_plot() does not run on non-DESeq2 column names and the example needs a user dds (P1/P2)."
+   }
+  }
+ },
+ "static_score": {
+  "subtotal": 74,
+  "max": 100,
+  "categories": {
+   "functional_suitability": {
+    "score": 8,
+    "max": 12,
+    "note": "Completeness 3, correctness 2, appropriateness 3. Covers ggplot2, EnhancedVolcano and MA well, but gives no Python volcano code, no non-DESeq2 column mapping and no ID-to-symbol step. Several stated behaviours do not reproduce: EnhancedVolcano selectLab filtering (5 places), ashr svalue, limma logFC 'shrunken', the coord_cartesian 'edge' claim, the 5 MB PDF claim."
+   },
+   "reliability": {
+    "score": 8,
+    "max": 12,
+    "note": "Common Errors table is broad and most rows reproduce (NA padj dropped, apeglm coef). The reference function dies with a cryptic case_when error on any table not named padj/log2FoldChange/pvalue, and the y cap silently hides the top hits."
+   },
+   "performance_context": {
+    "score": 5,
+    "max": 8,
+    "note": "325 lines / ~3,000 words in one SKILL.md with a 91-line usage-guide.md that repeats the same eleven tips and prompts; no references/ layer."
+   },
+   "agent_usability": {
+    "score": 12,
+    "max": 16,
+    "note": "Goal/Approach blocks, a decision tree and version stamps help. Consistency suffers: the Skill's own rule (threshold line on the axis quantity) is broken by its function and example, and the example colours by padj while plotting raw p."
+   },
+   "human_usability": {
+    "score": 6,
+    "max": 8,
+    "note": "Natural example prompts and a reviewer-pushback table; several pushback answers rest on claims that fail."
+   },
+   "security": {
+    "score": 11,
+    "max": 12,
+    "note": "No credentials, network, eval or shell. The example writes volcano.pdf/ma_plot.pdf into the cwd and overwrites silently."
+   },
+   "maintainability": {
+    "score": 8,
+    "max": 12,
+    "note": "Version-stamped and self-contained, but the example is not runnable without a user-supplied dds whose coef name is assumed, and hardcodes labels (TP53, MYC, BRCA1) that need symbol rownames."
+   },
+   "agent_specific": {
+    "score": 16,
+    "max": 20,
+    "note": "Precise trigger description; related Skills all exist. Dangling [[api_gotchas]] link, no progressive disclosure, no escape hatch for non-DESeq2 column names."
+   }
+  }
+ },
+ "dynamic_score": {
+  "execution_avg": 77.8,
+  "max": 100,
+  "assertion_pass_rate": {
+   "passed": 17,
+   "total": 24
+  },
+  "inputs": [
+   {
+    "index": 1,
+    "type": "Canonical",
+    "label": "ggplot2 + ggrepel volcano (SKILL block 02, verbatim) on real airway dex vs untrt, apeglm-shrunken",
+    "status": "COMPLETED",
+    "status_flag": "✅",
+    "note": "33,469 genes, 450 Up / 365 Down; counts, x/y values, vlines and labels match the table. Labels are the right biology (ZBTB16, DUSP1, KLF15, PER1, SPARCL1, VCAM1). But the drawn hline is on the raw-p axis: 1,684 genes that are not FDR-significant (1,596 with padj>=0.05, 88 with NA padj) sit above it, because padj<0.05 really starts at -log10 p = 1.95.",
+    "basic": 33,
+    "specialized": 48,
+    "total": 81,
+    "assertions_passed": 4,
+    "assertions_total": 5,
+    "assertions": [
+     {
+      "text": "Plotted Up/Down/NS counts equal an independent recompute from the DESeq2 table (450/365/32,654) and the point count equals the non-NA-pvalue rows (33,469)",
+      "result": "PASS",
+      "note": "ggplot_build layer data vs res"
+     },
+     {
+      "text": "x is the shrunken LFC and y is -log10(pvalue): x range and max y equal the table's range and -log10(min p)",
+      "result": "PASS",
+      "note": "asserted on layer data"
+     },
+     {
+      "text": "Default top-10 labels are biologically sensible and free of housekeeping genes",
+      "result": "PASS",
+      "note": "SAMHD1 ZBTB16 DUSP1 SPARCL1 VCAM1 KLF15 CACNB2 PER1 MAOA GPX3 (mapped from Ensembl); no GAPDH/ACTB/B2M"
+     },
+     {
+      "text": "User-supplied symbols (DUSP1, KLF15, PER1, TSC22D3, FKBP5, TP53) are all labelled after mapping rownames to symbols",
+      "result": "PASS",
+      "note": "PNG opened; TP53 labelled although |LFC|=0.40"
+     },
+     {
+      "text": "The dashed horizontal threshold line separates colored (padj-significant) from grey points, as the Skill's own 'raw p threshold line on adjusted axis' rule requires",
+      "result": "FAIL",
+      "note": "hline at 1.301 (raw p 0.05); 1,684 not-FDR-significant genes (1,596 padj>=0.05 + 88 NA) lie above it, the largest at y=1.95; the padj<0.05 boundary is 1.95 (i1b_line_recount.R)"
+     }
+    ],
+    "executed": true,
+    "execution_note": "Executed: run/i0_prep_airway.R (DESeq2 1.46.0 fit + apeglm/ashr/normal), run/i1_ggplot_volcano.R; two PNGs opened with Read. Ensembl-to-symbol mapping with org.Hs.eg.db added by the auditor (the Skill is silent on IDs)."
+   },
+   {
+    "index": 2,
+    "type": "Variant A",
+    "label": "EnhancedVolcano block (SKILL block 03, verbatim) plus the Skill's EnhancedVolcano and shrinkage-method claims",
+    "status": "COMPLETED",
+    "status_flag": "✅",
+    "note": "Block runs and draws; NA padj rows are dropped exactly as stated (14,905 of 22,392 drawn); y = padj puts the line at 1.301 on the padj axis. Two documented claims do not reproduce: 'selectLab is filtered by pCutoff/FCcutoff' (GAPDH padj 0.43 and TP53 |LFC| 0.40 are labelled; EnhancedVolcano 1.24 source has no such filter) and 'ashr also returns svalue' (not without svalue=TRUE, which then drops pvalue/padj).",
+    "basic": 31,
+    "specialized": 47,
+    "total": 78,
+    "assertions_passed": 3,
+    "assertions_total": 5,
+    "assertions": [
+     {
+      "text": "Block 03 runs verbatim, returns a ggplot, draws non-blank, and draws exactly the non-NA-padj rows (14,905) as the Skill says NA padj is dropped",
+      "result": "PASS",
+      "note": "layer 1 has 22,392 rows, 14,905 non-NA y; PNG opened"
+     },
+     {
+      "text": "Threshold lines sit at -log10(0.05) = 1.301 on the padj axis with y = 'padj', and no colored point lies below it",
+      "result": "PASS",
+      "note": "min y colored: 1.30 (p-value class), 1.39 (both)"
+     },
+     {
+      "text": "Requested selectLab genes (TP53, MYC, BRCA1) are labelled",
+      "result": "PASS",
+      "note": "all three drawn; PNG opened"
+     },
+     {
+      "text": "Gotcha 1 / failure mode / Common Errors claim reproduces: a selectLab gene failing pCutoff/FCcutoff is silently unlabelled",
+      "result": "FAIL",
+      "note": "GAPDH (padj 0.43, LFC -0.14), ACTB and TP53 (|LFC| 0.40) all labelled in layer data and in the PNG; source uses which(lab %in% selectLab) only. What really vanishes is an NA-padj gene (no y)"
+     },
+     {
+      "text": "Code comment 'ashr also returns svalue column' holds for the shown call lfcShrink(..., type = 'ashr')",
+      "result": "FAIL",
+      "note": "columns are baseMean,log2FoldChange,lfcSE,pvalue,padj; svalue appears only with svalue=TRUE, which removes pvalue/padj"
+     }
+    ],
+    "executed": true,
+    "execution_note": "Executed: run/i2_enhancedvolcano.R, i2b_ev_followup.R, i2c_selectlab_matrix.R, i2d_ashr_svalue.R; three PNGs opened. EnhancedVolcano 1.24.0 with ggplot2 4.0.3 (size/linewidth deprecation warnings come from the package)."
+   },
+   {
+    "index": 3,
+    "type": "Variant B",
+    "label": "MA plots: DESeq2 plotMA (block 04) and the Python ma_plot (block 05), raw MLE vs shrunken fan diagnostic",
+    "status": "COMPLETED",
+    "status_flag": "✅",
+    "note": "Both blocks run verbatim. plotMA draws the 5 |LFC|>5 genes as edge triangles (not dropped); the Python function draws 3,993 significant + 29,476 grey = 33,469 points with x = log10 baseMean and y = the table LFC. The fan diagnostic reproduces (baseMean<5: max |LFC| 5.19 raw vs 2.91 apeglm). Hard-coded '(shrunken)' y label would mislabel a raw table; the '5 MB+ PDF' claim does not hold (0.50 MB for 33k points).",
+    "basic": 35,
+    "specialized": 53,
+    "total": 88,
+    "assertions_passed": 4,
+    "assertions_total": 5,
+    "assertions": [
+     {
+      "text": "plotMA(res_apeglm, alpha = 0.05, ylim = c(-5, 5)) renders and keeps out-of-range genes as edge markers",
+      "result": "PASS",
+      "note": "PNG opened: 5 open triangles at y = 5, matches 5 genes with |LFC|>5"
+     },
+     {
+      "text": "ma_plot draws every gene once: significant layer = padj<0.05 count and the two layers total the table",
+      "result": "PASS",
+      "note": "3,993 + 29,476 = 33,469"
+     },
+     {
+      "text": "Plotted x equals log10(baseMean) and y equals the shrunken log2FoldChange of the input table",
+      "result": "PASS",
+      "note": "sorted-value equality, np.isclose"
+     },
+     {
+      "text": "The fan diagnostic reproduces: low-count extreme LFC in the raw MLE is removed by shrinkage while well-estimated genes are untouched",
+      "result": "PASS",
+      "note": "baseMean<5 max|LFC| 5.19 -> 2.91; baseMean>=1000 median |LFC| 0.1815 -> 0.1655; side-by-side PNG opened"
+     },
+     {
+      "text": "'Vector scatter of >5000 points creates 5MB+ PDFs' holds",
+      "result": "FAIL",
+      "note": "measured 498 KB unrasterized vs 33 KB rasterized for 33,469 points in matplotlib 3.11"
+     }
+    ],
+    "executed": true,
+    "execution_note": "Executed: run/i3a_ma_R.R, run/i3b_ma_python.py (pandas 3.0.6, numpy 2.5.3, matplotlib 3.11.2); PNGs and PDFs measured and opened."
+   },
+   {
+    "index": 4,
+    "type": "Stress",
+    "label": "Shipped examples/volcano_phd.R run verbatim (Ensembl and symbol rownames) plus synthetic extreme p (1e-200 and exactly 0)",
+    "status": "COMPLETED",
+    "status_flag": "⚠️",
+    "note": "The example runs end to end and writes volcano.pdf and ma_plot.pdf (TrueType embedded, no Type 3). With the shipped y_cap = 50 applied unconditionally, 49 significant genes (the top hits, 135 max) fall outside the panel and 9 of 13 labels collapse into an unreadable overprint at the top edge (PDF opened). The usage-guide claim that capped points stay visible at the edge is false for coord_cartesian. The same hline/padj mismatch (line 1.30, boundary 1.91-1.95) is admitted in the example's own comment.",
+    "basic": 29,
+    "specialized": 43,
+    "total": 72,
+    "assertions_passed": 3,
+    "assertions_total": 4,
+    "assertions": [
+     {
+      "text": "volcano_phd.R runs verbatim to completion given a dds with coef condition_treated_vs_control, writing both PDFs",
+      "result": "PASS",
+      "note": "1.07 MB / 1.10 MB (Ensembl), 0.77 MB / 0.78 MB (symbols); no error"
+     },
+     {
+      "text": "cairo_pdf output embeds TrueType fonts (journal requirement stated in the Skill) with no Type 3 fonts",
+      "result": "PASS",
+      "note": "/TrueType 3 and 2, /Type3 0 in every PDF"
+     },
+     {
+      "text": "Extreme p (1e-200 and an underflowed p = 0 on a synthetic 20,000-gene table) does not crash volcano_plot(); the Inf point is drawn at the top edge and labelled",
+      "result": "PASS",
+      "note": "SYNTHETIC data seed 20260920; g955 (p=0) drawn at the edge; PNG opened"
+     },
+     {
+      "text": "With the shipped cap (coord_cartesian ylim 0-50) the significant top hits and their labels remain visible and readable",
+      "result": "FAIL",
+      "note": "49 Up/Down genes above the cap; 9 of 13 labels overprinted at the panel edge; the 'render at the edge' claim is false"
+     }
+    ],
+    "executed": true,
+    "execution_note": "Executed: run/i4_shipped_example.R (sys.source of the shipped file), i4b_pdf_check.py, i4c_extreme_synth.R (SYNTHETIC), i4d_repel_default.R; PDFs and PNGs opened. ggrepel default max.overlaps did not raise a warning for 60 labels on real or synthetic data, so that claim was not reproduced (not scored)."
+   },
+   {
+    "index": 5,
+    "type": "Scope Boundary",
+    "label": "Non-DESeq2 inputs: limma microarray table (real ALL, BCR/ABL vs NEG) and a Python volcano the Skill advertises but does not ship",
+    "status": "COMPLETED",
+    "status_flag": "⚠️",
+    "note": "volcano_plot() fails on a limma topTable as delivered (object 'padj' not found inside case_when); after renaming columns the counts match the table (31 Up / 2 Down) and ABL1 probes rank on top. limma logFC equals the plain group-mean difference to 2e-15, so the Skill's 'limma already shrinks / the original shrunken-LFC method' is wrong, and the function's fixed '(shrunken)' axis label would mislabel it. EnhancedVolcano accepts limma columns. The Python volcano written from the Skill's rules works (450/365, right top genes) but the Skill supplies no code for it.",
+    "basic": 28,
+    "specialized": 42,
+    "total": 70,
+    "assertions_passed": 3,
+    "assertions_total": 5,
+    "assertions": [
+     {
+      "text": "volcano_plot() from SKILL.md runs on a limma topTable as the Skill's 'plot logFC vs adj.P.Val directly' implies",
+      "result": "FAIL",
+      "note": "case_when error, object 'padj' not found; no column-mapping guidance"
+     },
+     {
+      "text": "After renaming logFC/P.Value/adj.P.Val the plot's Up/Down counts equal the table",
+      "result": "PASS",
+      "note": "31/2 both; PNG opened, 1636_g_at 1635_at 1674_at (ABL1) labelled"
+     },
+     {
+      "text": "EnhancedVolcano(x='logFC', y='adj.P.Val') draws all probes from a limma table",
+      "result": "PASS",
+      "note": "12,625 points; PNG opened"
+     },
+     {
+      "text": "A Python volcano built from the Skill's stated rules (matplotlib + adjustText 1.4.0, padj classes, combined-rank labels, raster) is correct",
+      "result": "PASS",
+      "note": "450 Up / 365 Down, same top genes as the R path; PNG opened"
+     },
+     {
+      "text": "The claim that limma logFC is already an empirical-Bayes shrunken estimate holds",
+      "result": "FAIL",
+      "note": "max |logFC - group-mean difference| = 2.2e-15; eBayes moderates the variance, not the LFC"
+     }
+    ],
+    "executed": true,
+    "execution_note": "Executed: run/i5_limma_scope.R, run/i5b_prep_symbols.R + i5b_python_volcano.py (adjustText 1.4.0). sanbomics.tools.volcano (named in the Skill) is not installed and was not run."
+   }
+  ]
+ },
+ "final": {
+  "static_weighted": 29.6,
+  "dynamic_weighted": 46.7,
+  "score": 76,
+  "max": 100,
+  "grade": "Beta Only",
+  "grade_symbol": "⚠️",
+  "deployable": false,
+  "veto_override": false,
+  "grade_note": "Numeric 76.3 is Limited Release, but the assertion pass rate 17/24 = 70.8% is under the 80% Limited Release floor (scoring_rubric section 5), so the grade drops one tier to Beta Only. Static 74 >= 70, execution 77.8 >= 75, L1 avg 31.2 >= 28 and L2 avg 46.6 >= 42 all pass. No veto fired and no P0 is open; deployable is false only because of the grade."
+ },
+ "key_strengths": [
+  "Numerically sound core: every plotted count, x/y value, threshold line and label set checked against the DESeq2 and limma tables was right, and the MA/shrinkage fan diagnostic reproduced (baseMean<5 max |LFC| 5.19 raw to 2.91 apeglm).",
+  "Shrinkage guidance is correct on the installed stack: lfcShrink default is apeglm, apeglm needs coef, ashr accepts contrast, s<0.005 tracks padj<0.05 (3,921 vs 3,993), NA padj rows are dropped by EnhancedVolcano as stated.",
+  "Combined-rank labelling surfaces the real dex biology on airway (ZBTB16, DUSP1, KLF15, PER1, SPARCL1) and never a housekeeping gene; cairo_pdf output embeds TrueType and no Type 3 fonts.",
+  "Extreme values do not crash the function: p = 1e-200 and an underflowed p = 0 draw (Inf lands on the panel edge)."
+ ],
+ "recommendations": [
+  {
+   "priority": "P1",
+   "title": "Threshold line drawn on the wrong axis quantity",
+   "observed_in": [
+    1,
+    4,
+    5
+   ],
+   "problem": "volcano_plot() and examples/volcano_phd.R plot -log10(pvalue), colour by padj, and draw the hline at -log10(fdr). On airway 1,684 genes that are not FDR-significant (padj>=0.05 or NA) sit above the line and the padj<0.05 boundary is really at 1.95. This is the Skill's own 'Raw p threshold line drawn on adjusted axis' failure mode.",
+   "root_cause": "The function was written for y = raw p while the significance class and the line assume padj; the example's comment calls it 'approximate' instead of fixing it.",
+   "fix": "Plot y = -log10(padj) (as the EnhancedVolcano block does) or draw the hline at -log10(max pvalue with padj<fdr); label the axis to match; state that the LFC on x is shrunken while p/padj come from the unshrunken Wald test."
+  },
+  {
+   "priority": "P1",
+   "title": "Shipped y-cap hides the top hits and mangles their labels",
+   "observed_in": [
+    4
+   ],
+   "problem": "y_cap = 50 is applied unconditionally in the example. On airway 49 significant genes (max 135) leave the panel and 9 of 13 labels overprint at the top edge; coord_cartesian does not 'render at the edge' as SKILL.md and the usage-guide prompt state.",
+   "root_cause": "coord_cartesian clips the view; the guidance treats it as a squish, and labels are chosen before the cap.",
+   "fix": "Apply the cap only when max(-log10 p) exceeds it; use pmin(y, cap) with a distinct (triangle) shape for capped points, or exclude off-panel genes from the labels; correct the 'keeps points at the edge' wording."
+  },
+  {
+   "priority": "P1",
+   "title": "Not usable on the non-DESeq2 tables it claims; limma called 'shrunken'",
+   "observed_in": [
+    5
+   ],
+   "problem": "The description and decision tree cover limma/MSstats/ChIP/ATAC, but volcano_plot() fails on logFC/P.Value/adj.P.Val columns (cryptic case_when error), no column mapping is shown, the axis label is hard-coded '(shrunken)', and limma is described as 'the original shrunken-LFC method' though its logFC equals the plain mean difference to 2e-15.",
+   "root_cause": "The function hard-codes DESeq2 column names and the shrinkage claim confuses variance moderation with LFC shrinkage.",
+   "fix": "Add x/y/padj/baseMean column arguments (defaults DESeq2), set the x label from an argument, and rewrite the limma rows: eBayes moderates variances, not the LFC, so the plotted LFC is unshrunken."
+  },
+  {
+   "priority": "P2",
+   "title": "EnhancedVolcano 'selectLab filtered by thresholds' does not reproduce",
+   "observed_in": [
+    2
+   ],
+   "problem": "Stated in the Gotcha, failure-mode, Common Errors, usage-guide tip and the example comment. In EnhancedVolcano 1.24.0 GAPDH (padj 0.43) and TP53 (|LFC| 0.40) are labelled; the only genes that vanish have NA padj (no y).",
+   "root_cause": "Claim not checked against the installed source (selectLab is matched by lab %in% selectLab only).",
+   "fix": "Replace it with: selectLab genes with NA padj (or absent from lab) are not drawn; drop the 'build labels manually' workaround and the 'pre-shrink so genes pass' advice."
+  },
+  {
+   "priority": "P2",
+   "title": "ashr svalue comment wrong; svalue=TRUE removes pvalue/padj",
+   "observed_in": [
+    2
+   ],
+   "problem": "'# ashr also returns svalue column' is false for the shown call; svalue needs svalue=TRUE, which replaces pvalue/padj so volcano_plot() then breaks. (s<0.005 gives 3,921 genes vs 3,993 for padj<0.05, so the stated equivalence itself holds.)",
+   "root_cause": "The svalue argument and its side effect are not mentioned.",
+   "fix": "Show lfcShrink(..., type = 'ashr', svalue = TRUE), note the replaced columns, and let the volcano function take the significance column as an argument."
+  },
+  {
+   "priority": "P2",
+   "title": "Python volcano advertised but not shipped",
+   "observed_in": [
+    5
+   ],
+   "problem": "The description and overview name matplotlib + adjustText (and sanbomics.tools.volcano) for volcanos but only ma_plot() has code; the sanbomics package is not installed and unverified.",
+   "root_cause": "Python section stops at the MA function.",
+   "fix": "Add a short Python volcano (padj classes, combined-rank labels, rasterized scatter, adjust_text) mirroring the R function, or drop the claim; verify or remove the sanbomics mention."
+  },
+  {
+   "priority": "P2",
+   "title": "Ensembl IDs, unrunnable example and dangling link",
+   "observed_in": [
+    1,
+    4
+   ],
+   "problem": "DESeq2 output usually has Ensembl rownames, so the example's TP53/MYC/BRCA1 labels match nothing (silently); the example needs an undefined dds with coef 'condition_treated_vs_control'; SKILL.md links [[api_gotchas]], which does not exist.",
+   "root_cause": "No ID-to-symbol step, no example data and an unresolved wiki link.",
+   "fix": "Add a mapIds/rownames step and a minimal dds constructor to the example, warn when labels are absent from the table, and remove or supply api_gotchas."
+  },
+  {
+   "priority": "P2",
+   "title": "Smaller accuracy and consistency items",
+   "observed_in": [
+    2,
+    3,
+    4
+   ],
+   "problem": "(a) '5MB+ PDF' for vector scatter: 0.50 MB measured. (b) EnhancedVolcano y axis reads '-Log10 P' while plotting padj and the Skill does not set ylab. (c) ma_plot() hard-codes '(shrunken)'. (d) SKILL.md cites Dudoit 2002 as 'JASA' but the reference list says Stat Sin. (e) 'horizontal stripe = batch confound' and 'asymmetry = normalization failure' MA heuristics are stated without support. (f) The example's MA colours by 'significance != NS' (padj and |LFC|) while the SKILL's plotMA colours by padj only.",
+   "root_cause": "Statements were not tested.",
+   "fix": "Correct or soften each (measured PDF size, ylab = expression(-log[10]~adj.~p), label argument, citation, hedge heuristics, one colouring rule)."
+  },
+  {
+   "priority": "P2",
+   "title": "SKILL.md and usage-guide.md duplicate the same tips",
+   "observed_in": [],
+   "problem": "The eleven usage-guide tips and the Quick Start prompts restate SKILL.md failure modes almost word for word (~880 words), and all of it loads with a 325-line SKILL.md.",
+   "root_cause": "No split between method and quick start.",
+   "fix": "Keep the tips once (SKILL.md) and make usage-guide.md a short prompt list, or move failure modes to references/."
+  }
+ ]
+}

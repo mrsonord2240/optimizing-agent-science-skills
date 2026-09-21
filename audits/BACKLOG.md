@@ -8,7 +8,31 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (86)
+## P1 (89)
+
+### `bio-data-visualization-volcano-and-ma-plots` — Threshold line drawn on the wrong axis quantity
+
+- Skill: 76, Beta Only · [mrsonord2240/bioSkills@019953e](https://github.com/mrsonord2240/bioSkills/tree/019953e9ca90f6f6f69e3f5a9cd19a5c1b9dc6be/data-visualization/volcano-and-ma-plots) · [viewer](skills/bio-data-visualization-volcano-and-ma-plots/mrsonord2240-bioSkills@019953e/viewer.md)
+- Observed in inputs: 1, 4, 5
+- Problem: volcano_plot() and examples/volcano_phd.R plot -log10(pvalue), colour by padj, and draw the hline at -log10(fdr). On airway 1,684 genes that are not FDR-significant (padj>=0.05 or NA) sit above the line and the padj<0.05 boundary is really at 1.95. This is the Skill's own 'Raw p threshold line drawn on adjusted axis' failure mode.
+- Root cause: The function was written for y = raw p while the significance class and the line assume padj; the example's comment calls it 'approximate' instead of fixing it.
+- Fix: Plot y = -log10(padj) (as the EnhancedVolcano block does) or draw the hline at -log10(max pvalue with padj<fdr); label the axis to match; state that the LFC on x is shrunken while p/padj come from the unshrunken Wald test.
+
+### `bio-data-visualization-volcano-and-ma-plots` — Shipped y-cap hides the top hits and mangles their labels
+
+- Skill: 76, Beta Only · [mrsonord2240/bioSkills@019953e](https://github.com/mrsonord2240/bioSkills/tree/019953e9ca90f6f6f69e3f5a9cd19a5c1b9dc6be/data-visualization/volcano-and-ma-plots) · [viewer](skills/bio-data-visualization-volcano-and-ma-plots/mrsonord2240-bioSkills@019953e/viewer.md)
+- Observed in inputs: 4
+- Problem: y_cap = 50 is applied unconditionally in the example. On airway 49 significant genes (max 135) leave the panel and 9 of 13 labels overprint at the top edge; coord_cartesian does not 'render at the edge' as SKILL.md and the usage-guide prompt state.
+- Root cause: coord_cartesian clips the view; the guidance treats it as a squish, and labels are chosen before the cap.
+- Fix: Apply the cap only when max(-log10 p) exceeds it; use pmin(y, cap) with a distinct (triangle) shape for capped points, or exclude off-panel genes from the labels; correct the 'keeps points at the edge' wording.
+
+### `bio-data-visualization-volcano-and-ma-plots` — Not usable on the non-DESeq2 tables it claims; limma called 'shrunken'
+
+- Skill: 76, Beta Only · [mrsonord2240/bioSkills@019953e](https://github.com/mrsonord2240/bioSkills/tree/019953e9ca90f6f6f69e3f5a9cd19a5c1b9dc6be/data-visualization/volcano-and-ma-plots) · [viewer](skills/bio-data-visualization-volcano-and-ma-plots/mrsonord2240-bioSkills@019953e/viewer.md)
+- Observed in inputs: 5
+- Problem: The description and decision tree cover limma/MSstats/ChIP/ATAC, but volcano_plot() fails on logFC/P.Value/adj.P.Val columns (cryptic case_when error), no column mapping is shown, the axis label is hard-coded '(shrunken)', and limma is described as 'the original shrunken-LFC method' though its logFC equals the plain mean difference to 2e-15.
+- Root cause: The function hard-codes DESeq2 column names and the shrinkage claim confuses variance moderation with LFC shrinkage.
+- Fix: Add x/y/padj/baseMean column arguments (defaults DESeq2), set the x label from an argument, and rewrite the limma rows: eBayes moderates variances, not the LFC, so the plotted LFC is unshrunken.
 
 ### `bio-outlier-splicing-detection` — AE reproducibility recipe is wrong in SKILL.md and incomplete in the example
 
@@ -698,7 +722,55 @@ None open.
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (428)
+## P2 (434)
+
+### `bio-data-visualization-volcano-and-ma-plots` — EnhancedVolcano 'selectLab filtered by thresholds' does not reproduce
+
+- Skill: 76, Beta Only · [mrsonord2240/bioSkills@019953e](https://github.com/mrsonord2240/bioSkills/tree/019953e9ca90f6f6f69e3f5a9cd19a5c1b9dc6be/data-visualization/volcano-and-ma-plots) · [viewer](skills/bio-data-visualization-volcano-and-ma-plots/mrsonord2240-bioSkills@019953e/viewer.md)
+- Observed in inputs: 2
+- Problem: Stated in the Gotcha, failure-mode, Common Errors, usage-guide tip and the example comment. In EnhancedVolcano 1.24.0 GAPDH (padj 0.43) and TP53 (\|LFC\| 0.40) are labelled; the only genes that vanish have NA padj (no y).
+- Root cause: Claim not checked against the installed source (selectLab is matched by lab %in% selectLab only).
+- Fix: Replace it with: selectLab genes with NA padj (or absent from lab) are not drawn; drop the 'build labels manually' workaround and the 'pre-shrink so genes pass' advice.
+
+### `bio-data-visualization-volcano-and-ma-plots` — ashr svalue comment wrong; svalue=TRUE removes pvalue/padj
+
+- Skill: 76, Beta Only · [mrsonord2240/bioSkills@019953e](https://github.com/mrsonord2240/bioSkills/tree/019953e9ca90f6f6f69e3f5a9cd19a5c1b9dc6be/data-visualization/volcano-and-ma-plots) · [viewer](skills/bio-data-visualization-volcano-and-ma-plots/mrsonord2240-bioSkills@019953e/viewer.md)
+- Observed in inputs: 2
+- Problem: '# ashr also returns svalue column' is false for the shown call; svalue needs svalue=TRUE, which replaces pvalue/padj so volcano_plot() then breaks. (s<0.005 gives 3,921 genes vs 3,993 for padj<0.05, so the stated equivalence itself holds.)
+- Root cause: The svalue argument and its side effect are not mentioned.
+- Fix: Show lfcShrink(..., type = 'ashr', svalue = TRUE), note the replaced columns, and let the volcano function take the significance column as an argument.
+
+### `bio-data-visualization-volcano-and-ma-plots` — Python volcano advertised but not shipped
+
+- Skill: 76, Beta Only · [mrsonord2240/bioSkills@019953e](https://github.com/mrsonord2240/bioSkills/tree/019953e9ca90f6f6f69e3f5a9cd19a5c1b9dc6be/data-visualization/volcano-and-ma-plots) · [viewer](skills/bio-data-visualization-volcano-and-ma-plots/mrsonord2240-bioSkills@019953e/viewer.md)
+- Observed in inputs: 5
+- Problem: The description and overview name matplotlib + adjustText (and sanbomics.tools.volcano) for volcanos but only ma_plot() has code; the sanbomics package is not installed and unverified.
+- Root cause: Python section stops at the MA function.
+- Fix: Add a short Python volcano (padj classes, combined-rank labels, rasterized scatter, adjust_text) mirroring the R function, or drop the claim; verify or remove the sanbomics mention.
+
+### `bio-data-visualization-volcano-and-ma-plots` — Ensembl IDs, unrunnable example and dangling link
+
+- Skill: 76, Beta Only · [mrsonord2240/bioSkills@019953e](https://github.com/mrsonord2240/bioSkills/tree/019953e9ca90f6f6f69e3f5a9cd19a5c1b9dc6be/data-visualization/volcano-and-ma-plots) · [viewer](skills/bio-data-visualization-volcano-and-ma-plots/mrsonord2240-bioSkills@019953e/viewer.md)
+- Observed in inputs: 1, 4
+- Problem: DESeq2 output usually has Ensembl rownames, so the example's TP53/MYC/BRCA1 labels match nothing (silently); the example needs an undefined dds with coef 'condition_treated_vs_control'; SKILL.md links [[api_gotchas]], which does not exist.
+- Root cause: No ID-to-symbol step, no example data and an unresolved wiki link.
+- Fix: Add a mapIds/rownames step and a minimal dds constructor to the example, warn when labels are absent from the table, and remove or supply api_gotchas.
+
+### `bio-data-visualization-volcano-and-ma-plots` — Smaller accuracy and consistency items
+
+- Skill: 76, Beta Only · [mrsonord2240/bioSkills@019953e](https://github.com/mrsonord2240/bioSkills/tree/019953e9ca90f6f6f69e3f5a9cd19a5c1b9dc6be/data-visualization/volcano-and-ma-plots) · [viewer](skills/bio-data-visualization-volcano-and-ma-plots/mrsonord2240-bioSkills@019953e/viewer.md)
+- Observed in inputs: 2, 3, 4
+- Problem: (a) '5MB+ PDF' for vector scatter: 0.50 MB measured. (b) EnhancedVolcano y axis reads '-Log10 P' while plotting padj and the Skill does not set ylab. (c) ma_plot() hard-codes '(shrunken)'. (d) SKILL.md cites Dudoit 2002 as 'JASA' but the reference list says Stat Sin. (e) 'horizontal stripe = batch confound' and 'asymmetry = normalization failure' MA heuristics are stated without support. (f) The example's MA colours by 'significance != NS' (padj and \|LFC\|) while the SKILL's plotMA colours by padj only.
+- Root cause: Statements were not tested.
+- Fix: Correct or soften each (measured PDF size, ylab = expression(-log[10]~adj.~p), label argument, citation, hedge heuristics, one colouring rule).
+
+### `bio-data-visualization-volcano-and-ma-plots` — SKILL.md and usage-guide.md duplicate the same tips
+
+- Skill: 76, Beta Only · [mrsonord2240/bioSkills@019953e](https://github.com/mrsonord2240/bioSkills/tree/019953e9ca90f6f6f69e3f5a9cd19a5c1b9dc6be/data-visualization/volcano-and-ma-plots) · [viewer](skills/bio-data-visualization-volcano-and-ma-plots/mrsonord2240-bioSkills@019953e/viewer.md)
+- Observed in inputs: —
+- Problem: The eleven usage-guide tips and the Quick Start prompts restate SKILL.md failure modes almost word for word (~880 words), and all of it loads with a 325-line SKILL.md.
+- Root cause: No split between method and quick start.
+- Fix: Keep the tips once (SKILL.md) and make usage-guide.md a short prompt list, or move failure modes to references/.
 
 ### `bio-crispr-screens-copy-number-correction` — negative_control_sgrnas empty-dict case raises an undocumented ValueError
 
