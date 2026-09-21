@@ -14,7 +14,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The example passes cluster_rows=<OLO dendrogram> together with row_split=gene_info$pathway, a combination ComplexHeatmap rejects; the script was never run.
 - Fix: Drop row_split or use a numeric row_split (works with the dendrogram), or apply OLO within each pathway group; supply a runnable data preamble and state the constraint in SKILL.md next to the OLO block.
 
-## P1 (126)
+## P1 (131)
 
 ### `bio-data-visualization-distribution-plots` — The headline R raincloud depends on gghalves, archived and broken on ggplot2 4.x
 
@@ -79,6 +79,46 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: (a) 'duplicates in fromList inflate counts' and the reconciliation row on duplicate handling: not reproduced in UpSetR or ComplexUpset (upsetplot raises instead). (b) 'ComplexUpset CRAN active through 2025-07': 1.3.3 of 2021-12-11 is the current release. (c) 'ggplot2 4.0 broke upset()': upset() builds on 4.0.3. (d) mode='intersect' as a way to exclude 1-set bars: it makes them the full set size. (e) degree sort shown with 'descending' puts 3-set groups first. (f) style_subsets(present=) is called a specific intersection but highlights supersets. (g) intersection_plot_elements is called a cap on intersections but is a height. (h) 2^10 = 1023 columns: 137 drawn on real data.
 - Root cause: Claims were written from documentation and memory, not checked against an installed stack.
 - Fix: Correct or delete each statement using the measured behaviour (exclude 1-set with min_degree=2 or an intersections list; sort_intersections='ascending' for degree; add absent= to style_subsets; use max_subset_rank for a cap).
+
+### `bio-data-visualization-multipanel-figures` — plot_annotation(theme=plot.tag) is silently ignored
+
+- Skill: 71, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/multipanel-figures) · [viewer](skills/bio-data-visualization-multipanel-figures/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 1, 4
+- Problem: The headline patchwork recipe sets bold size-10 tags through plot_annotation(theme=...); the PDF shows 13.2 pt regular tags for size 6, 10 and 20, on patchwork 1.2.0/1.3.2 and ggplot2 3.5.2/4.0.3.
+- Root cause: Tags take the theme of each sub-plot, not the annotation theme.
+- Fix: Show '& theme(plot.tag = element_text(face="bold", size=8))' (verified to work) and state the journal label size (8 pt) once; make every snippet match.
+
+### `bio-data-visualization-multipanel-figures` — axes='collect' does nothing in the Skill's nested 2x2 form
+
+- Skill: 71, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/multipanel-figures) · [viewer](skills/bio-data-visualization-multipanel-figures/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 1, 4
+- Problem: (p1+p2)/(p3+p4) + plot_layout(axes='collect', axis_titles='collect') leaves 4 x and 4 y titles even when all scales are identical (patchwork 1.2.0 and 1.3.2); the demo panels do not share scales anyway.
+- Root cause: plot_layout at the top level only reaches the two nested rows.
+- Fix: Use wrap_plots(list, ncol=2) + plot_layout(axes='collect', axis_titles='collect') (verified: one x and one y title), or set plot_layout at every nesting level, and say collection needs identical scales.
+
+### `bio-data-visualization-multipanel-figures` — Python blocks break the mm size and never set Type-42
+
+- Skill: 71, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/multipanel-figures) · [viewer](skills/bio-data-visualization-multipanel-figures/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 3, 5
+- Problem: bbox_inches='tight' turns the 180 mm and 89 mm figures into 182.9 and 91.9 mm; pdf.fonttype is never set so every PDF has Type 3 fonts, although the description advertises Type-42 embedding.
+- Root cause: Snippets copied from a generic export recipe; the rcParams line lives only in a comment and a usage-guide bullet.
+- Fix: Add rcParams['pdf.fonttype']=42 to the block, drop bbox_inches='tight' (or keep labels inside the axes) and assert the saved size in mm.
+
+### `bio-data-visualization-multipanel-figures` — Shipped examples violate the Skill's own rules
+
+- Skill: 71, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/multipanel-figures) · [viewer](skills/bio-data-visualization-multipanel-figures/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 5
+- Problem: multi_panel_figure.R saves 10x8 in with the default pdf device (unembedded Helvetica) and produces four un-merged, clipped legends; multipanel_matplotlib.py is 12x8 in with Type 3 fonts and hspace/wspace instead of constrained layout.
+- Root cause: Examples predate the journal-spec guidance.
+- Fix: Rewrite both examples to 183 mm, units='mm', cairo_pdf / fonttype 42, a single merged legend (same aesthetic and palette across panels), and print the measured size.
+
+### `bio-data-visualization-multipanel-figures` — Several failure-mode explanations are wrong or ineffective
+
+- Skill: 71, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/multipanel-figures) · [viewer](skills/bio-data-visualization-multipanel-figures/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 4
+- Problem: Tag fix plot.tag.position=c(0.02,0.98) does not equalise offsets (14.5 pt vs 14.8 pt); cowplot align='v' does not fail as described; patchwork 1.1.3 raises 'unused argument' instead of silently ignoring axes=; ggsave with default units errors ('Dimensions exceed 50 inches') instead of writing a 180 in file; 'constrained_layout is default-on in 3.6+' is false (default layout engine is None).
+- Root cause: Claims were written from memory and not run.
+- Fix: Re-test and correct each claim; for tag alignment use a tag position relative to the panel (plot.tag.location='panel') or a constant y-label width.
 
 ### `bio-data-visualization-statistical-annotation` — stat_compare_means(comparisons, p.adjust.method='holm') draws unadjusted p; the argument does not exist
 
@@ -1024,7 +1064,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (464)
+## P2 (467)
 
 ### `bio-data-visualization-distribution-plots` — Wrong bandwidth sentence: nrd (Scott) is 1.178x nrd0, so it oversmooths more
 
@@ -1097,6 +1137,30 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The usage-guide Tips section and Quick Start restate the SKILL.md failure modes almost verbatim (ggplot2 4.0 note, cap at 20-25, unique(), degree vs cardinality, upset_query), so both load for one task.
 - Root cause: No split between method and quick-start content.
 - Fix: Keep the tips once in SKILL.md and reduce usage-guide.md to prompts, or move failure modes to a references/ file.
+
+### `bio-data-visualization-multipanel-figures` — Inconsistent label/text sizes and column widths
+
+- Skill: 71, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/multipanel-figures) · [viewer](skills/bio-data-visualization-multipanel-figures/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 1, 3, 5
+- Problem: Panel labels are 8 pt in the table, 9/10 pt in R snippets and 10/12/14 in Python; default text is 8.8-11 pt against the stated 5-7 pt; code uses 180 mm, not 183 (Nature) or 174 (Cell); Nature labels are called 'serif' while the code is sans.
+- Root cause: Numbers and code maintained separately.
+- Fix: One size table (label, body, line) referenced by all snippets, use the per-journal widths from the sizing table, and drop 'serif'.
+
+### `bio-data-visualization-multipanel-figures` — Promised coverage missing
+
+- Skill: 71, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/multipanel-figures) · [viewer](skills/bio-data-visualization-multipanel-figures/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 2, 3
+- Problem: gridExtra, matplotlib shared legends/sharex/sharey and subplot_mosaic are named or implied but have no code; Python panel-label offsets in axes fraction differ with axes width.
+- Root cause: Description wider than the body.
+- Fix: Add a short gridExtra/arrangeGrob block and a fig.legend/subplot_mosaic block, or narrow the description; use a fixed-point offset for labels.
+
+### `bio-data-visualization-multipanel-figures` — Version notes incomplete
+
+- Skill: 71, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/multipanel-figures) · [viewer](skills/bio-data-visualization-multipanel-figures/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 4
+- Problem: patchwork 1.2.0 (CRAN 2024-01-08, not 01-05) errors 'object is not a unit' under ggplot2 4.0.3, and 1.1.3 fails inside add_guides on ggplot2 3.5.2; dropping a legend with legend.position='none' is only safe when the mapping is identical.
+- Root cause: Compatibility matrix not checked.
+- Fix: State patchwork >= 1.3 for ggplot2 4.x, correct the release date, and warn that dropping N-1 legends misleads when palettes differ.
 
 ### `bio-data-visualization-statistical-annotation` — Test-name and label details differ from the tools
 
