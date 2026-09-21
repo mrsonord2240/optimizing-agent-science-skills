@@ -1,9 +1,9 @@
 {
   "skill_id": "bio-isoform-switching",
-  "version": "mrsonord2240-bioSkills@44ff43b",
+  "version": "mrsonord2240-bioSkills@48e3cbc",
   "source": {
     "repository": "mrsonord2240/bioSkills",
-    "commit": "44ff43bb35e5741c3ddd3c003590e1f1da8a4a4b",
+    "commit": "48e3cbc5c3b116ae021618313014e046b688618d",
     "path": "alternative-splicing/isoform-switching",
     "author": "GPTomics",
     "author_url": "https://github.com/GPTomics",
@@ -13,7 +13,7 @@
       "repository": "GPTomics/bioSkills",
       "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
     },
-    "url": "https://github.com/mrsonord2240/bioSkills/tree/44ff43bb35e5741c3ddd3c003590e1f1da8a4a4b/alternative-splicing/isoform-switching"
+    "url": "https://github.com/mrsonord2240/bioSkills/tree/48e3cbc5c3b116ae021618313014e046b688618d/alternative-splicing/isoform-switching"
   },
   "audit": {
     "method": {
@@ -31,11 +31,11 @@
     "commissioned_by": "Samuel Nord",
     "test_data": "synthetic"
   },
-  "supersedes": null,
+  "supersedes": "mrsonord2240-bioSkills@306e225",
   "files": {
     "report": "report.json",
     "viewer": "viewer.md",
     "fixes": "fixes.md",
-    "scripts": 38
+    "scripts": 59
   }
 }
