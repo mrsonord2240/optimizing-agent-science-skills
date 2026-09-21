@@ -1,9 +1,9 @@
 {
   "skill_id": "bio-single-cell-splicing",
-  "version": "mrsonord2240-bioSkills@44ff43b",
+  "version": "mrsonord2240-bioSkills@86ae9ee",
   "source": {
     "repository": "mrsonord2240/bioSkills",
-    "commit": "44ff43bb35e5741c3ddd3c003590e1f1da8a4a4b",
+    "commit": "86ae9ee222b5c1ce1e0a9c835c655e2f33b48ccd",
     "path": "alternative-splicing/single-cell-splicing",
     "author": "GPTomics",
     "author_url": "https://github.com/GPTomics",
@@ -13,7 +13,7 @@
       "repository": "GPTomics/bioSkills",
       "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
     },
-    "url": "https://github.com/mrsonord2240/bioSkills/tree/44ff43bb35e5741c3ddd3c003590e1f1da8a4a4b/alternative-splicing/single-cell-splicing"
+    "url": "https://github.com/mrsonord2240/bioSkills/tree/86ae9ee222b5c1ce1e0a9c835c655e2f33b48ccd/alternative-splicing/single-cell-splicing"
   },
   "audit": {
     "method": {
@@ -31,11 +31,11 @@
     "commissioned_by": "Samuel Nord",
     "test_data": "synthetic"
   },
-  "supersedes": null,
+  "supersedes": "mrsonord2240-bioSkills@44ff43b",
   "files": {
     "report": "report.json",
     "viewer": "viewer.md",
     "fixes": "fixes.md",
-    "scripts": 41
+    "scripts": 62
   }
 }
