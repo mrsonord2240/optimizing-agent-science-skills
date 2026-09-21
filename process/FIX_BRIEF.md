@@ -142,7 +142,9 @@ audit's assertions; fix the defect the assertion exposed.
 - Never write in `F:\OpenScience\external\GPTomics__bioSkills`, `F:\OpenScience\audits`, other
   worktrees, `F:\OpenScience\skills`, or the builder. Do not push, merge or rebase. In the records
   repository write only your `fixes\<skill-id>.md`.
-- Skills that already score ≥ 85 with no P1 stay byte-identical.
+- Skills that already score ≥ 85 with no P1 stay byte-identical, unless they are named in a fix
+  batch (Sam, 2026-09-21: the Production Ready Skills are fixed down to their P2s and split when over
+  300 lines).
 - Public unauthenticated services (NCBI E-utilities, myvariant.info, gnomAD GraphQL, Ensembl) are fine
   for verifying database Skills; nothing paid or authenticated.
 - **Never kill a process by image name**; kill the PID you started. Python on Windows cannot read
