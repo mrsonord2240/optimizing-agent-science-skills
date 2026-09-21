@@ -26,3 +26,21 @@ Left the now-updated BH/BY framing in `## Tips` would have re-introduced the exa
 ## Findings fixed: 4/4 P1s. No P0s existed. One cheap P2 (shipped example's IHW step crashing on `m=10000`, part of the same crash family as the IHW P1) fixed as a side effect of the child-process retry pattern; the other two P2s (shipped example's misleading `rgamma` IHW covariate teaching a zero power gain, and taxonomy-only coverage of IDR/local FDR/independent filtering) were left unfixed — both require restructuring the shared synthetic data generator or new content beyond "extend the existing section," outside this pass's scope.
 
 Nothing needs Sam. Flag for the re-auditor: this pass found the env's `TOOLS.md` claim "IHW... `nbins <= 5` is stable" to be too strong (50% crash rate at nbins 2-5 across 12 of my own trials, vs ~75% at default) — SKILL.md now states the weaker, verified claim (pin nbins, retry in a child process, fall back to BH) rather than the disproven "stable" framing.
+
+
+---
+
+# bio-experimental-design-multiple-testing — 2026-09-21
+
+Worktree: `F:\OpenScience\wt\experimental-design-multiple-testing`, branch `fix/experimental-design-multiple-testing`. Source: latest re-audit (score 89, Production Ready; 1 open P1, 2 P2). Env: `mass-spec-proteomics-analyst\r.sh` (R 4.4.3, IHW 1.34.0, qvalue 2.38.0).
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| Bare `ihw()` one-liner is the primary IHW code block and crashes ~50% | P1 | Replaced the block with `ihw_safe()` (child-process `Rscript` via `system2`, `nbins = 5`, 3 tries, BH fallback returning `method`/`attempts`); states `de_table` has columns `pvalue`, `mean_expression`; the bare call is now only described as the thing not to run. IHW failure-mode Fix points at `ihw_safe()` instead of restating the pattern | ran | SKILL.md block extracted verbatim and run on the audit's 18k `de_pvalues_reaudit.csv`: run 1 IHW on attempt 2 (first child crashed, parent unaffected), 1018 vs BH 1006, realized FDP 0.040; run 2 all 3 children crashed, fell back to BH, 1006, parent exit 0. Forced-failure test (mismatched covariate) also returned the BH fallback, padj identical to `p.adjust(p,'BH')` |
+| Shipped example BH step showed realized FDR 0.108 on its fixed seed | P2 | `examples/multiple_testing_correction.R` section 1 now averages counts and FDP over 50 draws (`mean_fdp` column) | ran (sections 1-2; parses) | BH mean FDP 0.046 vs nominal 0.05, Bonferroni/Holm 0.004, BY 0.005. Section 3 (IHW child retry) unchanged |
+| lfdr had no threshold rule | P2 | Added Efron's `lfdr < 0.2` convention and `mean(lfdr[called])` as the set-FDR estimate to the q-value block | ran | qvalue 2.38.0, m=18,000: 987 called, mean lfdr 0.043, realized FDP 0.0375 (audit reproduced); lfdr < 0.1: 825 called, mean 0.022, realized 0.017 |
+| IDR promised in description/taxonomy/reference with no code | P2 | Chose delete-the-claim: no `idr` binary on this machine and the tool is outside the Skill's scope. Removed from frontmatter `description`, the taxonomy row, and the Li 2011 reference | grep (no `IDR` left) | |
+
+Redundancy: the IHW CAUTION comment block in SKILL.md (segfault rate, nbins, child process, fallback) was restated in the failure mode's Fix; the code-block prose now holds the instruction and the failure mode holds mechanism + pointer. Nothing left the Skill. `usage-guide.md` untouched (no IDR mention, no duplicated facts beyond the previous pass).
+
+Left unfixed: the `de_table` P2 in agent_usability is closed by the same change. Not touched: shipped example's `rgamma` IHW covariate (null covariate, no power gain) and a `locfdr` package mention in the taxonomy row (no code, no audit finding).

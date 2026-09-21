@@ -46,3 +46,21 @@ Shipped `examples/` scripts are out of the redundancy rule (a runnable file besi
 SKILL.md block is not a duplicate) — `fetch_summaries.py` and `fetch_pubmed.py` were fixed in place
 for the same bugs their SKILL.md counterparts had; `fetch_sequences.py` was untouched (no defect,
 already scored 94/100 on both inputs that exercised it).
+
+## Fix pass 2 (2026-09-21)
+
+Worktree `F:\OpenScience\wt\entrez-fetch`, branch `fix/entrez-fetch`. Fixer: Claude Sonnet 5. Biopython 1.88
+(shared venv, unchanged). Verified by extracting the fenced blocks from the shipped `SKILL.md` and running
+them against live NCBI E-utilities, plus an offline probe with the audit's captured 502 error-body shape.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| `sra_runinfo()` fabricates junk rows from an error body | P1 | Added `expect_start(text, prefix)` helper to Required Setup; `sra_runinfo` calls `expect_start(text, 'Run,')` before splitting | ran: live SRA UIDs `8,7` -> 15 rows (first `SRR000001`); offline error body `<?xml ...?><ERROR>502...` -> `RuntimeError` | |
+| No `import time` in SKILL.md blocks | P2 | `import time` added to Required Setup | ran: blocks exec'd from SKILL.md verbatim, no NameError | |
+| `fetch_genbank()` lacks its own Failure Modes guard | P2 | Reads text, `expect_start(text, 'LOCUS')`, then `SeqIO.read(StringIO(...))` | ran: live NM_007294.4 -> 7088 nt; `<html>` body -> `RuntimeError` | |
+| Placeholder `Entrez.api_key = 'optional_api_key'` in Required Setup (new, found while verifying) | P2 | Commented out, with a note that a fake key gives HTTP 400 | ran: pasted verbatim, every efetch returned HTTP 400; without the key, calls succeed | |
+
+Redundancy: the "EFetch returns HTML error page" failure mode now points at the single `expect_start()` helper
+instead of restating the sniff rule in prose; nothing deleted from `usage-guide.md` (already clean).
+
+All open P1/P2 findings fixed (1/1 P1, 2/2 P2). Nothing left unfixed.

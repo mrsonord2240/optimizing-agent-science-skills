@@ -14,3 +14,47 @@ findings (3 P1, 4 P2) per Sam's 2026-09-16 override.
 | No runtime expectation for a genome-wide `gseGO` run | P2 | Added a Quantitative Thresholds row: ~155s / 14,000 genes | ran — matches this fixer's own `gsea_go.R` run (see above) and the audit's 154.8s | |
 
 No findings left unfixed.
+
+---
+
+# bio-pathway-gsea — fix log (2026-09-21)
+
+Branch `fix/pathway-gsea` in `F:\OpenScience\wt\pathway-gsea` (commit hash in the dispatch report). Evidence:
+`F:\OpenScience\comparisons\gsva-vs-gsea\COMPARISON.md`. Env: mass-spec-proteomics-analyst (R 4.4.3, clusterProfiler
+4.14.6, fgsea 1.32.4, limma 3.62.2, GSVA 2.0.7, msigdbr 26.1.0). SKILL.md 218 -> 252 lines (under 300, no split).
+
+| finding | priority | change | verified | notes |
+|---|---|---|---|---|
+| Default preranked GSEA calls 9/20 co-regulated null sets, the Skill's own CAMERA `NA` advice 0/20 | P1 (comparison) | Decision tree: new first row, matrix + design -> `camera(..., inter.gene.cor = NA)` is the DEFAULT, preranked GSEA is for "only a ranked vector" and is labelled screening; Insight #2 and the correlation failure mode now carry the measured 9 / 0 / 7 / 1 numbers; new section "Matrix + Design" with a runnable CAMERA/fry block (ids2indices, size filters) | ran: reproduced the comparison's `q1_ours.R` in scratch (GSEA t 9/20, 68 sig; CAMERA NA 0/20, 41 sig; CAMERA default 7/20; planted cell cycle NES +3.66 / OXPHOS -4.11, CAMERA FDR 3e-17 / 2e-17); then ran the new SKILL.md block: camera NA 0/20, fry 1/20 (54 sig) | the comparison's 24-sample synthetic set only; no real-data check |
+| "GSVA is not installed in the reference environment" | P2 | Sentence deleted; version block now names GSVA 2.0.7 as checked; `gsvaParam`/`ssgseaParam` block given `minSize/maxSize` (defaults 1/Inf) | ran: `gsva(gsvaParam(..., kcdf='Gaussian', minSize=10, maxSize=500))` and `ssgseaParam` gave 186x24 score matrices on the comparison data | |
+| Snippet uses `ncbi_gene` against symbol-named data | P2 | Added the rule "TERM2GENE column must match the ranked vector's IDs (`ncbi_gene` vs `gene_symbol`)" with a symbol example and the KEGG `CP:KEGG_LEGACY` subcollection form | ran: `ncbi_gene` t2g on a symbol-named vector fails with `No gene can be mapped` / `'organism' is not a slot in class "NULL"` (not a silent 0 terms, text says so); `gene_symbol` t2g gave 16 Hallmarks, OXPHOS NES -3.34 | |
+| kcdf undocumented (audit P2) | P2 | Added kcdf paragraph: only on `gsvaParam` (`ssgseaParam` has none, unlike the audit's suggestion), Gaussian for continuous log data, Poisson for counts, log it | help: `args(gsvaParam)` / `args(ssgseaParam)` on GSVA 2.0.7 | |
+| fgsea "ties in the preranked stats" warning undocumented (audit P2) | P2 | Common Errors row (high % = degenerate metric, few % benign) | ran: stat rounded to 1 decimal gave "92.85% of the list" on fgsea 1.32.4 | benign-threshold wording rests on the audit's runs |
+| Version claim "clusterProfiler 4.18.4+, fgsea 1.36+" never run (audit P2) | P2 | Version block and both example headers changed to what was run (clusterProfiler 4.14.6 etc.), plus a note that newer releases were not run | ran `gsea_msigdb.R` (Hallmark OXPHOS planted, NES 3.05, p.adjust 3.1e-22); both examples `parse()` | `gsea_go.R` (~155 s) only comment-edited, not re-run |
+| Per-sample section said "no contrast test" while limma on scores works | P2 | Added a limma-on-scores line and softened the sentence | ran: GSVA+limma cell cycle FDR 2.7e-21, OXPHOS 3.7e-21, 1/20 nulls (matches comparison) | |
+| Phenotype-permutation GSEA named with no runnable code (Missing referenced executables) | P2 | Chose delete-the-claim: row now says concept only, Broad desktop/CLI not run here, use CAMERA | n/a | Broad GSEA is a Java desktop tool, absent from the env |
+| CAMERA and fry named without code (Missing referenced executables) | P2 | Chose write-it: "Matrix + Design" block | ran, see row 1 | |
+
+## Redundancy removed (2026-09-21 rule)
+
+| deleted passage | where its content now lives |
+|---|---|
+| usage-guide Prerequisites (install block, ranked-vector/ID/KEGG-live/set.seed notes) | SKILL.md Version Compatibility "Install" line; ID and live-KEGG and seed content already in SKILL.md |
+| usage-guide "What the Agent Will Do" | SKILL.md sections (procedure) |
+| usage-guide "GSEA vs Over-Representation" table | SKILL.md decision-tree ORA row (now also says ORA finds strong individual changes, GSEA coordinated subtle shifts) |
+| usage-guide "Choosing a Ranking Statistic" table | SKILL.md "Build the Ranked Vector" table (identical) and clamp paragraph / Thresholds |
+| usage-guide "Interpreting NES" | SKILL.md gseaResult paragraph (sign), tiny-leading-edge failure mode (FDR first), Thresholds `pAdjustMethod` row (BH vs 0.25; the "reserve 0.25 for exploratory, say which" clause moved there) |
+| usage-guide "Tips" (7 bullets) | SKILL.md Insight, nPerm/GSVA failure modes, msigdbr comments; "no terms enriched" moved to a Common Errors row |
+| SKILL.md Common Errors rows for nPerm and GSVA `method=` | the "Stale nPerm" and "Stale GSVA call" failure modes (now note the error text) |
+| SKILL.md clamp explanation in the ranked-vector paragraph | Quantitative Thresholds clamp row; paragraph keeps a pointer |
+| SKILL.md "Treat p.adjust as BH..." tail of the nPerm failure mode | Thresholds `pAdjustMethod` row |
+| stale `# GSVA >= 1.50` code comment | Approach sentence above the block |
+
+Disagreement logged: usage-guide gave the edgeR clamp as `1e-30` with the "1e-300 can give >16%" figure; SKILL.md carries the same numbers in its Thresholds row, kept.
+
+## Left unfixed
+
+- **Re-verification on clusterProfiler 4.18.4+ / fgsea 1.36+** (audit P2): the env has 4.14.6 / 1.32.4 and a fixer may not install into the shared library; the version claim was instead narrowed to what ran.
+- **`gsea_go.R` not re-run**: only its header comment changed; a full run is ~155 s and its logic was verified on 2026-09-16.
+- **CAMERA/GSEA guidance validated on one synthetic dataset** (24 samples, 20 nulls): no real-data set with known truth exists in the corpus; 9/20 vs 0/20 is a single run, not a rate estimate.
+- **Phenotype-permutation GSEA has no runnable path**: needs the Broad Java tool, not installed and outside this Skill's R scope; claim reduced to concept.

@@ -83,3 +83,51 @@ All five R fences and the example `parse()` clean.
   here at all.
 - **[P2] Token cost / progressive disclosure.** The file is now 479 lines (from 396). Splitting into
   `references/` is a restructure, explicitly out of scope, and this pass had to add executable guards.
+
+## Pass 6 (2026-09-21)
+
+Fixer for the pass-5 re-audit (87.7, Production Ready; open: 1 P1, 4 P2). Worktree
+`F:\OpenScience\wt\workflows-proteomics-pipeline`, branch `fix/workflows-proteomics-pipeline`. Commits `1dd932b`
+(fixes) and `29d0616` (split). Runtime: R 4.4.3 via the env `r.sh` -- limma 3.62.2, MSstats 4.14.2,
+MSstatsTMT 2.14.2, arrow 23.0.1.2. Blocks re-extracted from the edited files and run on copies of the audit data
+(pass5 `work1`, `workC`, `work2`, `work5`, `work7`) in a scratchpad.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| `treat(lfc = log2(1.5))` silently zeroes intermediate dose levels | P1 | comment beside `treat()`: the floor is a per-contrast minimum; lower `lfc` and screen with the F-test; a zero on an intermediate level means "not detected at this n" | ran on the audit's 3-condition data: High/Low calls 20/0 at log2(1.5), 52/0 at 0.3, 78/8 at 0; F-test 75 hits at BH 5% | the auditor's suggested wording ("lower lfc") is only partly right: at n=4 the low dose is also underpowered (0 calls at lfc 0.3), so the text says so instead of promising a rescue |
+| example hard-codes the two-condition contrast | P2 | `examples/proteomics_workflow.R` builds contrasts from the condition levels and calls significance from global `decideTests`, as SKILL.md does; heatmap protein list now from `results$protein` | ran from an empty dir: 2-condition identical to before (1373 PCA proteins, 16 non-estimable, 79 significant, up 48 / down 31, five files); with `sample_groups` edited to 3 levels it completes | |
+| MSstatsTMT multi-plex route is a comment | P2 | wrote the runnable MaxQuant route (`MaxQtoMSstatsTMTFormat` -> `proteinSummarization` with reference-channel normalization -> `groupComparisonTMT`, moderated, level-driven contrasts, BH across rows) | ran on MSstatsTMT 2.14.2's bundled 5-plex `evidence`/`proteinGroups`/`annotation.mq`: completes, 8 proteins x 3 contrasts. Planted 2x on 3 proteins in the channels of condition `1`: they read +0.64 to +0.68 log2 against -0.31 for the 5 unspiked (difference 0.97 vs planted 1.00; the offset is the median normalization on an 8-protein set) | chose "write it": MSstatsTMT is installed. Package and API are the only source; no synthetic 2-plex was built |
+| FragPipe named as an input, no code | P2 | claim deleted from the description (the only mention) | n/a | chose "delete": FragPipe/MSFragger are licence-gated and absent from this machine |
+| result table has no stated schema | P2 | columns and the meaning of `significant` stated above step 7 | ran: `colnames(results)` = protein, contrast, logFC, AveExpr, t, P.Value, adj.P.Val, significant | |
+| 396 -> 479 lines, no `references/` | P2 | split, see below | see below | |
+
+**Redundancy removed (`usage-guide.md`).** Every passage below is deleted from the guide; its content lives where stated.
+
+| deleted from usage-guide.md | now |
+|---|---|
+| Prerequisites install block | SKILL.md "Inputs and Install" (limited to packages the Skill uses; `ashr` and `iq` were never referenced by SKILL.md and are dropped) |
+| Pipeline Stages 1-7 (import, transform, completeness, missing values, QC, differential, output) | already in the SKILL.md workflow blocks, Governing principle and Pipeline Overview; nothing unique |
+| Input Requirements: MaxQuant files, sample-annotation template and the `batch` / multi-level `condition` paragraph | SKILL.md "Inputs and Install" |
+| Tips: missing values, normalization symmetry, more than two conditions, completeness, contaminants | already in SKILL.md (step 3/4 comments, Common Errors) |
+| Tip "minimum 3 biological replicates per condition" (only here) | SKILL.md QC Checkpoints, new `Design` row |
+
+The guide keeps: overview, quick start, example prompts (one new, for two-plex TMT), the example's output-file table (labelled as the example's), typical results.
+
+**Split.** `SKILL.md` 543 -> 367 lines. Moved verbatim: `references/msstats.md` (MSstats), `references/tmt-isobaric.md`
+(both TMT blocks and the multi-plex route), `references/silac.md`, `references/dia-nn.md`; index in SKILL.md
+"Reference Files" replacing the `## Workflow Variants` heading (the only line not carried over), plus one
+pointer line under the workflow Approach. Checked: a multiset comparison of non-blank lines old vs new found only that heading missing;
+all 5 moved fences and the main block `parse()`; SILAC (453 tested, 49 at BH 5%), DIA-NN (887 x 8, 0 `-Inf`),
+MSstats (296 proteins) and the main block (62 significant, 35 up / 27 down) re-ran unchanged from the extracted
+files. Five comments saying "above" now name the file they point at. Common Errors, the decision-relevant
+scope, thresholds and install stay in SKILL.md, which is why it is still over 300 lines (the main workflow block alone is 206).
+
+## Left unfixed (pass 6)
+
+- **SKILL.md still 367 lines, above the 300-line target.** What is left is what every request needs (206-line main
+  workflow block, Governing principle, Common Errors, install); the brief keeps those in SKILL.md, and splitting the
+  main block or its comments would break the runnable path.
+- **No two-plex TMT run on data with a known effect beyond the bundled 8-protein set.** MSstatsTMT ships only that
+  real dilution set; building a synthetic multi-plex MaxQuant evidence table with planted truth would be new test
+  data, not a correction. The planted-2x check on the bundled set recovered the effect.
+- **FragPipe route not written** (deleted instead): FragPipe/MSFragger are licence-gated and not installed, so no runnable block could be verified.

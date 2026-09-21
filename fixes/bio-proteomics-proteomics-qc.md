@@ -58,3 +58,27 @@ preserved.
   observation from Input 2, but that input scored 91/100 with 5/5 assertions PASS and the audit called
   it a demonstration **supporting** the Skill's control-chart thesis. Not a defect; deliberately not
   written in.
+
+## Pass 6 -- 2026-09-21 (re-audit at 88.1, Production Ready; one open P1)
+
+Branch `fix/proteomics-proteomics-qc` (worktree `F:\OpenScience\wt\proteomics-proteomics-qc`), commit `546864d`, from staging `main`. Runtime: shared venv Python 3.12, pandas 3.0.5, numpy 2.5.3, scikit-learn 1.9.1. All seven SKILL.md python blocks extracted and `exec`'d (11 functions); audit data copied read-only from `audits/.../data` and the real PXD070049 DIA-NN 2.6.1 report.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| Degenerate-design caveats are `print()` only; partial-singleton designs return NaN / omitted rows with no machine-readable signal | P1 | `replicate_correlation` emits a row per singleton group (`r` NaN, `status = not_measurable_n1`) and a `status` column; `median_cv_linear` gets `status`; `pca_batch_check` returns a third value `tests` (`pc, p, status` = tested / not_testable); `raw_sample_qc` adds `loading_rule` (within_group / fallback_all_samples). Prose and the Common Errors row say to filter `status == 'measured'` | ran: 8-sample MaxQuant set -> all `measured`; 2/1/1 design -> Treatment row `not_measurable_n1`, CV NaN + status; batch levels [1,1,1] and [3,1] -> `not_testable` rows | `pca_batch_check` now returns 3 values (was 2); the example does not call it |
+| Sample-swap check named in the decision tree, no code | P2 | New `cross_group_correlation` (centred r, top-300 variable proteins, own vs every other group, `possible_swap`); decision-tree row points at it | ran on the audit's C2/T3 swap: C2 (own -0.510, best Treatment 0.141) and T3 (own -0.508, best Control 0.132) flagged, nothing on the unswapped data; singleton own group -> `not_measurable_n1` | |
+| Levels-1 RT/iRT fit and FWHM advertised, no code | P2 | New section "Level-1 Run Metrics From a DIA-NN Report" with `diann_level1` (RT vs Predicted.RT R^2 < 0.99, FWHM > 1.25x across-run median, `Quantity.Quality` reported only) | ran on the real 3-run report: R^2 0.9994-0.9998, FWHM 0.0475-0.0501, none flagged; FWHM x1.6 on one run flags it; Gaussian noise on one run's Predicted.RT gives R^2 0.28 and flags it | thresholds are the Skill's own Thresholds-table rows; 3 runs is a weak baseline (stated) |
+| Example states no expected output | P2 | "Expected output" block in `examples/qc_analysis.py` docstring | ran twice: byte-identical stdout, matches the block; `py_compile` clean | |
+| Redundancy (brief rule) | -- | see below | text | |
+
+Deleted passages and where the content lives:
+- usage-guide "What the Agent Will Do" (8 steps) -> restates SKILL.md sections in order; deleted.
+- usage-guide Tips (10 bullets) -> each is in SKILL.md (raw first: intro + Default; control chart: insight 2; co-readouts: Level table + Decision tree; log2 / linear CV / MNAR / one run per condition / seeding / Pandoc: their sections + Common Errors). "Document and justify every exclusion, sensitivity check" existed only in the guide -> moved into the PCA/stop-conditions paragraph of SKILL.md.
+- usage-guide Overview (metric list) -> shortened to two sentences pointing at SKILL.md; "NOT Bioconductor" comment on PTXQC -> in Common Errors.
+- SKILL.md CV prose (ln2 x mean figure) -> kept only in the "CV computed on log-transformed data" failure mode; the PCA-seeding code comment shortened, explanation stays in Common Errors.
+
+Left unfixed: QC report / exclusion-decision template (P2) -- new content, not a correction; the audit itself rates it as structure to add. DIA-NN "High precision" claim still untested (see Pass 2).
+
+### 2026-09-21 addendum: QC report template written (requested by Sam)
+
+The P2 "QC report / exclusion-decision template" left unfixed above is done: `references/qc-report-template.md` (dataset, checks run, exclusion log, with/without sensitivity, design limits, result), pointed to from the loading-rule paragraph, the TMT balance section and the PCA/batch paragraph. Thresholds are not restated in the template; it cites the function columns and the Quantitative Thresholds table. The example row (ctrl_3, 0.30x, 287 of 400 quantified) was checked against a run of `examples/qc_analysis.py`.

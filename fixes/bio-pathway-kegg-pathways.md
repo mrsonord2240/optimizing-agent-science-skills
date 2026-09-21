@@ -42,3 +42,22 @@ above). usage-guide.md 113 -> 35 (net -78).
 | "Tips" section (8 bullets) | Already stated in "Prepare the Gene IDs", "Decision Tree", "Compare Multiple Conditions", "Run KEGG ORA", "Common Errors", "Pin the KEGG Release" | deleted, no unique content; the one non-duplicate line (pointer to enrichment-visualization/pathview) is already in the Scope paragraph and pathview section |
 
 No disagreements found between the two files' copies before deletion.
+
+## Fix pass on the 2026-09-17 re-audit (2026-09-21)
+
+Worktree `F:\OpenScience\wt\pathway-kegg-pathways`, branch `fix/pathway-kegg-pathways`. Fixer: Claude
+Sonnet 5. Runtime: R 4.4.3 via `mass-spec-proteomics-analyst.sh`; SPIA 2.58.0, graphite 1.52.0,
+clusterProfiler/org.Hs.eg.db from that env's `R-lib`; nothing installed. Re-audit score was 94 (Production
+Ready) with one P1 and one P2 open.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| graphite route disagrees with direct `spia()` on direction, undocumented | P1 | SKILL.md: SPIA section now names two routes and states they are complementary (report Activated/Inhibited only where both agree; name the topology; prefer `spia()` when only one is run; graphite for current KEGG/Reactome); new failure-mode section "graphite and spia() disagree on SPIA direction", new Common Errors row, Decision Tree row and taxonomy wording changed from "or graphite + runSPIA" to cross-check | ran | Independent re-run on the audit's `SYNTHETIC_de_results.csv` (nB=100, seed 123): Cell cycle direct tA=+70.5 Activated vs graphite tA=-55.7 Inhibited, p53 and MAPK also split, 16 Status calls differ. From the audit's `in4b_direction_comparison.csv`: 99 matched, r=0.60, 14 strictly opposite-sign, 18 Status differ, 19 with a zero tA in one route (the audit's "30/99" counted zero-vs-nonzero as disagreement; the caveat quotes the stricter figures). Cause stated only as differing topology source: `hsaSPIA` holds 139 bundled pathways vs 319 graphite graphs (e.g. Cell cycle 233 binding/association, 269 inhibition edges); no claim which route is right beyond the planted UP/DOWN pathways |
+| Shipped SPIA example has no fast-iteration nB | P2 | comment on `n_boot` in `examples/kegg_spia_topology.R` (200-500 to explore, 2000+ for reported result); same note added to the nB row of Quantitative Thresholds | ran (`parse()` OK) | default kept at 2000 |
+
+Redundancy: the new caveat appears once in the SPIA section; the failure-mode entry and Common Errors row
+point to it in one line each rather than restating the numbers. `usage-guide.md` unchanged (already only
+overview, prompts and related Skills). No passages deleted.
+
+Findings left unfixed: none.
+

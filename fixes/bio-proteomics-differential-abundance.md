@@ -143,3 +143,42 @@ was not touched.
 - The centring check uses a fixed `0.05` threshold, calibrated on one 4 v 4 set (the 7.0% point sits at
   -0.107, the 0.0% points at |offset| ≤ 0.005). A study that genuinely expects a global shift must override
   it deliberately, which the prose says.
+
+---
+
+# Pass 5 -- 2026-09-21 (re-audit at 89, Production Ready; one open P1)
+
+Worktree `F:\OpenScience\wt\proteomics-differential-abundance`, branch `fix/proteomics-differential-abundance`, from staging `main` @ `431aa55`. Evidence: `F:\OpenScience\audits\bio-proteomics-differential-abundance\` (Input 10, Input 9, static). Runtime: R 4.4.3 via the mass-spec env `r.sh`; msqrob2 1.14.1, QFeatures 1.16.0, MsCoreUtils 1.18.0, MSstats 4.14.2, on the audit's `evidence.txt` (4 v 4, planted truth).
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| Centring section's mechanism refuted: a uniform -0.20 offset gives 0 FP; per-run median normalization also halves the null SE (Input 10) | P1 | Approach rewritten: normalization does two things (composition offset AND removal of within-condition loading variance); four-row table of the variants; "hundreds of proteins at once" replaced by the measured 31 FP in 111 calls; Insight 3, the decision-tree row and the failure mode reworded (no longer "the offset alone"); second check added beside the offset guard: `resid_sd()` before/after ratio against `SD_RATIO_MIN` (warning) | ran: residual SD ratio 0.757 (per-run median, all peptides), 0.735 (complete-case), 0.757 (within-condition centring, offset +0.016), 1.000 (uniform -0.20). Shipped block A: 286 tested / 80 calls / 0 FP / median -0.005. With `QFeatures::normalize(method = 'center.median')` inserted per the new text: warning `residual SD fell to 0.75`, 112 calls / 32 FP, offset stop at -0.202 | second independent measure of the same claim: MSstats SE ratio default / none = 0.585 |
+| MSstats block ships the normalization the Skill blames (Input 9) | P2 | comment on the `normalization` argument pointing at the checks, `FALSE` offered with the measured consequence inline and in the Approach; MSstats route of the SD check = compare `median(tested$SE)` across the two fits | ran block verbatim: 290 tested / 101 calls / 21 FP / median -0.184 / median SE 0.119; with `normalization = FALSE`: 79 calls / 0 FP / +0.008 / SE 0.204 | I kept `'equalizeMedians'` as the shipped value (real data may need a normalization) and made the choice visible; `FALSE` requires protein-level normalization routed to proteomics/quantification |
+| 0.05 threshold has no stated basis (Input 10) | P2 | named constants `OFFSET_MAX` and `SD_RATIO_MIN` at the top of the block, stated as empirical trip-wires from one 4 v 4 set, both directions of imperfection (harmless -0.20 would be stopped; within-condition centring passes the offset), and that passing does not certify the normalization; same constant in `examples/msqrob2_peptide_level.R` | ran the example: exit 0 on the audit data (80 calls, median -0.0048, 8 undetected) and on its own simulation (43 calls / 3 FP); `parse()` clean | |
+| Two of three examples unreferenced (static) | P2 | `examples/limma_analysis.R` cited from the limma Approach, `examples/differential_abundance.py` from the Python Approach | text only; both examples untouched and exited 0 in the audit | |
+| 398 lines, no progressive disclosure (static) | P2 | msqrob2, MSstats, centring checks, the per-run-normalization failure mode, their threshold rows and Common Errors rows moved to `references/feature_level.md`; SKILL.md keeps a "Feature-Level Workflows" pointer with the rules that hold on either route. SKILL.md 401 -> 288 lines | code blocks re-extracted and compared: the 6 protein-summary blocks are byte-identical to the previously audited revision; the two msqrob2 blocks moved byte-identical | Common Errors table stays in SKILL.md for the protein-level rows, per the audit's own split |
+
+Decision: the msqrob2 executable question (brief section "Missing referenced executables") was closed in pass 4; nothing new written here beyond the residual-SD check, which ran.
+
+## Redundancy removed (each fact stated once)
+
+| deleted passage | now lives in |
+|---|---|
+| `usage-guide.md` "What the Agent Will Do" (9 steps) | SKILL.md Decision Tree, workflows (deleted; restates them) |
+| `usage-guide.md` "Statistical Method Selection" table | SKILL.md Tool Taxonomy and Decision Tree |
+| `usage-guide.md` "Missing-Value Handling" | SKILL.md Insight 1 and the imputation failure modes |
+| `usage-guide.md` "Fold-Change Reporting" | SKILL.md Fold-Change Reporting; the two facts found only in the guide (raw FC with adj p and CI for tables; meta-analysis pools raw FC + SE, shrink afterwards) moved there |
+| `usage-guide.md` "Tips" (13 bullets) | SKILL.md failure modes, workflows, Common Errors; "rigid near-vertical streaks are imputation artifacts" moved into the downshift failure mode's Symptom; the "matrix is log2 and normalized" tip moved into the Scope sentence |
+| SKILL.md failure mode "FC + significance double filter" | SKILL.md Minimum-fold-change Approach (same mechanism and 50% regime figure) |
+| SKILL.md failure mode "Per-run median normalization..." | `references/feature_level.md` (rewritten there with the corrected mechanism) |
+| Downshift failure mode Mechanism (restated the constant and SD) | reduced to a pointer to Insight 1 |
+| Thresholds rows: residual df, d0, downshift constants, `trend=TRUE`, DEqMS min count, 50% FDR, feature-level offset row, ridge row | Insight 2, Insight 1, Approach text; the two feature-level rows moved to the reference |
+| Common Errors rows: `$FDR` NULL, topTreat no `B`, trend=FALSE, min-FC inflates, treat trend, Student's t, Holm-Sidak, batch-effect anticonservative, anchor/wing | code comments and the failure modes / Approach they restate |
+| Common Errors feature-level rows (7) | `references/feature_level.md` Common Errors |
+
+Nothing the agent acts on left the Skill. Frontmatter untouched. SKILL.md, `usage-guide.md` and the new reference are pure ASCII.
+
+## Left unfixed
+
+None open. Not done: a second, independent data set for the two trip-wire constants (both were read off one 4 v 4 synthetic set, and the text says so).
+

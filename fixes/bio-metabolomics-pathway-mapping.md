@@ -30,3 +30,30 @@ addressed above.
 - `metabolomics/pathway-mapping/usage-guide.md`
 - `metabolomics/pathway-mapping/examples/pathway_analysis.R` untouched (already independently
   verified correct by the audit; no findings referenced it).
+
+## Pass -- 2026-09-21
+
+Worktree `F:\OpenScience\wt\metabolomics-pathway-mapping`, branch `fix/metabolomics-pathway-mapping`.
+R 4.4.3 via `untargeted-metabolomics-analyst\rs.sh`; MetaboAnalystR 4.3.0, KEGGREST 1.46.0. Data: audit's
+`input1_reference_metabolome_synthetic.txt`, `input2_peaks_full_synthetic.csv`.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| `.get.my.lib` reference-library downloads (SetKEGG.PathLib, CrossReferencing, Setup.KEGGReferenceMetabolome, PSEA path) undisclosed | P1 | New "Reference-library downloads" paragraph in Version Compatibility: host, working-dir cache, 30-day staleness, no user data, offline pre-seeding | ran (deparsed `.get.my.lib` via `getFromNamespace`: signature `filenm, sub.dir`; `download.file(...metaboanalyst.ca/resources/libs/...)`; live "Loaded files from MetaboAnalyst web-server." during verification run) | Two independent methods: source + live output |
+| Primary ORA block was the known-failing API path | P2 | ORA section reordered: shared mapping block (now extracts `kegg_ids` explicitly -- previously "from ... above" with no code), Local-Only ORA first (default), API path second as the alternative | ran (mapping + Local-Only blocks executed verbatim; kegg_ids C00022..C00041; hsa00020 p 6.1e-19 all-KEGG n=6709 -> 9.4e-11 320-ID background); API block `parse()`-checked only (server rejects filtered call, per earlier pass) | Numbers in prose updated (were 6.2e-19 / 4.8e-10 with "261-compound"; the reference file has 320 IDs) |
+| Mummichog duplicate-merging undocumented | P2 | One note under the PSEA block plus an inline comment on `SanityCheckMummichogData` | ran (audit log lines) | |
+
+### Redundancy removed (each fact stated once)
+
+| deleted passage | now lives in |
+|---|---|
+| usage-guide Prerequisites install block (FELLA/KEGGREST/fitdistrplus/RJSONIO) | SKILL.md Version Compatibility "Install:" |
+| usage-guide conceptual prerequisites | SKILL.md Version Compatibility and Two Starting Points; guide keeps one pointer sentence |
+| usage-guide "What the Agent Will Do" (6 steps) | SKILL.md method table, failure modes, Quantitative Thresholds |
+| usage-guide Tips (6 bullets: background, mummichog input, p-cutoff, TCA dark matter, granularity, pool vs flux) | SKILL.md Per-Method Failure Modes, Quantitative Thresholds, Common Errors |
+| SKILL.md ORA code comments repeating the remote-POST disclosure | Version Compatibility "Undisclosed remote call" |
+| SKILL.md "Wrong background" Fix line updated to name Local-Only ORA (was API-only) | same section |
+
+## Unfixed
+
+None.

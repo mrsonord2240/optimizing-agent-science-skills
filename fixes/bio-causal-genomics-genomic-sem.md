@@ -96,3 +96,32 @@ Merged to fork main at `f031005` (2026-09-17), with a follow-up commit `4951af0`
 ## 2026-09-17, re-audit
 
 69 Reject -> **88 Production Ready**, Research Veto PASS, at fork `c602f2a` (a different agent; 6 pre-fix inputs re-run as regression plus 2 new). Two open P1s: `commonfactorGWAS(DWLS)`'s Q_pval still fails to discriminate planted heterogeneous SNPs on two independent synthetic panels while ML discriminates correctly both times -- this disconfirms the fixer's flat-SE-artifact hypothesis and needs a real `ldsc()`-derived V to settle; and `commonfactor()` and `usermodel()` name the same standardized-loading quantity differently.
+
+## 2026-09-21, second fix pass (after the 88 re-audit)
+
+Worktree `F:\OpenScience\wt\causal-genomics-genomic-sem`, branch `fix/causal-genomics-genomic-sem`. Checked with `r_gsem.sh`: GenomicSEM 0.0.5 + lavaan 0.6.19, R 4.4.3.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| `commonfactorGWAS(DWLS)` Q_pval does not discriminate on 2 panels; ML does | P1 | New paragraph + code under Common-Factor GWAS with Q_SNP: cross-check Q_pval with `estimation='ML'`, DWLS Q_pval provisional without a genuine `ldsc()` V/N, never call factor-only on DWLS Q_pval alone; `factor_only` now also requires ML Q_pval clean | ran: audit Input 8 panel; DWLS Q_pval 0.93-0.96 for all 10 planted SNPs, ML 0.28-0.48 (factor) vs 2e-24..6e-11 (het); snippet's `factor_only` = TRUE for rs1-5, FALSE for rs6-10 | Cause still unsettled; note says so |
+| `commonfactor()` vs `usermodel()` name standardized loading differently | P1 | Column-name table added after Standard Workflow; noted GWAS functions have no standardized column | ran: `names(cf$results)` = `Standardized_Est`, `names(um$results)` = `STD_Genotype` (+ `Unstand_Est`, `STD_All`) | Audit suggested `commonfactorGWAS` might use `STD_Genotype`; it does not (columns: SNP CHR BP MAF A1 A2 i lhs op rhs est se_c Z_Estimate Pval_Estimate Q Q_df Q_pval fail warning) |
+| Second-order p-factor needs >= 3 first-order factors | P2 | One paragraph in Higher-Order section | ran: 2 first-order + p, DWLS -> chisq ~ 0, NaN SEs, "information matrix could not be inverted" | |
+| (found while fixing) `userGWAS()` output documented as having `Q_pval`/`Q_df`, `Z`, `Pvalue` | P1-class | Comment corrected to the real columns (`Z_Estimate`, `Pval_Estimate`, `chisq`, `chisq_df`, `chisq_pval`, no Q_pval); taxonomy row and intro bullet no longer claim per-path Q_SNP | ran: `userGWAS()` on 6-SNP synthetic input, printed names | Prior text was wrong, not merely incomplete |
+| SKILL.md length / references split | P2 | Not moved; declined again. Redundancy pass below trimmed instead | -- | net 507 -> 509 lines after adding the notes above |
+
+### Redundancy pass (2026-09-21)
+
+| deleted | where it lives now |
+|---|---|
+| `## Anticipated Reviewer Pushback` (8 rows) | Q_SNP/threshold: Operational rule for publication; MaxFDR and overlap and Heywood: Per-Method Failure Modes; model fit: Model Fit Diagnostics; cross-ancestry: Decision Tree; DWLS vs ML: sentence under Standard Workflow (now with Q_SNP exception); "why a factor model not MTAG" CFI >= 0.95 preference folded into the MTAG vs GenomicSEM paragraph |
+| Quantitative Thresholds rows CFI >= 0.95, RMSEA <= 0.05, RMSEA 0.05-0.08 | Model Fit Diagnostics table; one pointer row keeps the "adequate, not good" wording |
+| Common Errors rows: loading > 1; Q_SNP not reported; singular V on nearPD | Per-Method Failure Modes (Heywood; Q_SNP not reported; Non-PD V) |
+
+Disagreements resolved: the Q_SNP failure mode said `p < 5e-8 / N_factor_SNPs`, while Quantitative Thresholds, the code and the Operational rule use `0.05 / N_factor_SNPs`; kept the latter. Common Errors said "do not smooth nearPD as a fix" while the Non-PD V failure mode allows it as a last resort with documentation; kept the failure-mode wording.
+
+All 8 r-fenced SKILL.md blocks re-parsed. `usage-guide.md` unchanged (already holds only overview, prompts, related Skills).
+
+
+### 2026-09-21 addendum: references/ split (requested by Sam)
+
+The P2 "no `references/` split" left unfixed above is done. `SKILL.md` 510 -> 377 lines. Moved verbatim (headings demoted one level) into `references/`: ESEM, `userGWAS()` and higher-order / bifactor / p-factor -> `advanced-models.md`; "MTAG Comparison" and "Reconciliation: When GenomicSEM and MTAG Disagree" -> `mtag-comparison.md`; "Stratified GenomicSEM" -> `stratified-genomicsem.md`. `SKILL.md` gains a "Reference Files" index and pointers from the ESEM and Stratified decision-tree rows. Verified: every moved non-blank line is present in the new files (0 lost), and all 8 R fences (3 + 1 in references/, 4 in SKILL.md) parse under the env's `r.sh`.

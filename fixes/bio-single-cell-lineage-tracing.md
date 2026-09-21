@@ -55,3 +55,30 @@ install (bioconda) was combined with CoSpar/scanpy in one environment. Both are 
 addressed with a verified-working install path (bioconda Cassiopeia + separate CoSpar
 env, file-based handoff) rather than a single combined environment. Re-auditor confirms
 whether this clears T1.
+
+---
+
+## 2026-09-21 second fix pass
+
+Fixer for `single-cell/lineage-tracing`, from the re-audit (86/100, veto cleared, 1 P1 + 2 P2). Branch
+`fix/single-cell-lineage-tracing`, worktree `F:\OpenScience\wt\single-cell-lineage-tracing`, commit
+`c8a441f`. Checked on CoSpar 0.5.0, scanpy 1.12.4, numpy 2.5.3 (existing `cospar-venv`, run through WSL `science`).
+SKILL.md is 293 lines, under the 300-line split threshold, so no `references/` split.
+
+| finding | priority | change | verified | notes |
+|---|---|---|---|---|
+| CoSpar snippet crashes with `KeyError: 'X_emb'` (no PCA/UMAP before `initialize_adata_object`) | P1 | SKILL.md snippet and `examples/cospar_dynamics.py` build `X_pca`/`X_umap` on a log-normalized copy and pass them as `X_pca=`/`X_emb=`; comment explains the late, confusing crash | ran | Literal old snippet reproduced the KeyError. New snippet ran on the audit's 2-timepoint data (200 fate_bias rows) and 3-timepoint data (240 rows). Example ran end to end incl. plots (MPLBACKEND=Agg). Deliberately not the re-audit's suggestion of `sc.pp.log1p` on `adata` itself: CoSpar warns `adata.X` must NOT be log-transformed, so embedding comes from a copy |
+| CoSpar 3-timepoint `ValueError: pre-computed similarity matrix does not have the right dimension` | P2 | Re-audit's diagnosis (timepoint limit) was wrong. Cause is a `data_des` cache collision: the default `data_des='cospar'` caches similarity matrices in `./data/` and the 3-timepoint run reused the 2-timepoint dataset's. Snippet now sets `data_des='my_dataset'`; one paragraph names the error, the cause and both fixes | ran | Reproduced the exact error by running the 2- then 3-timepoint data with default `data_des` in one directory; `compute_new=True` cleared it; a unique `data_des` on 3-timepoint data ran clean. The note states only that 2 and 3 time points were run |
+| No consent/privacy note for mtDNA from primary human tissue | P2 | One sentence at the end of the mtDNA section | n/a (docs) | |
+
+Found while verifying:
+
+- "`infer_Tmap_from_multitime_clones` ~10 minutes for a 200-cell toy dataset" (added by the 2026-09-19 fix from the audit's timing) is
+  contradicted by this pass: ~15 s (2-timepoint) and ~9 s (3-timepoint), similarity matrices included. Replaced with the measured
+  figure, dated, and kept the "grows with cell number" advice. Superseded the older claim.
+
+Dedup: `usage-guide.md` Prerequisites repeated "Do not `pip install cassiopeia-lineage` ..." which SKILL.md's Installation section
+holds in full. Deleted the line; the guide still points at the SKILL.md section.
+
+Left unfixed: none. (The re-audit's Input 3, raw-reads-to-character-matrix, stayed introspection-only: it is not a numbered
+recommendation, and no barcode-read fixture exists to run it; not a Skill defect, so not touched.)

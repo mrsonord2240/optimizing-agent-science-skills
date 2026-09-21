@@ -21,3 +21,30 @@ truth), copied to `F:\OpenScience\wt\_fixdata\drugz\`.
 
 All 4 `recommendations[]` entries (1 P0, 2 P1, 1 P2) fixed, plus three defects found while fixing.
 Nothing left unfixed. `py_compile` clean on `examples/run_drugz.py`.
+
+## Re-audit fix pass — 2026-09-21
+
+Worktree `F:\OpenScience\wt\crispr-screens-drugz-chemogenomic`, branch `fix/crispr-screens-drugz-chemogenomic`. Fixer: Claude Sonnet 5. Runtime: `drugz.py` from the `crispr-screen-analyst` clone (git HEAD 2026-09-16), Python 3.12.13, pandas 3.0.5. Data: the audit's synthetic counts (`audits\bio-crispr-screens-drugz-chemogenomic\data\`).
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| Common Errors table has no `IndexError: single positional indexer is out-of-bounds` row | P1 | Row added, pointing to the "Library size vs `--half_window_size`" section | ran | 200-guide table at default: IndexError; with `--half_window_size 50`: completes, 51 gene rows |
+| No guidance for low replicate concordance or a crashed run | P2 | New failure-mode subsection "Low replicate concordance (Pearson < 0.85) or a crashed run"; Pearson > 0.85 added to Quantitative Thresholds (it lived only in usage-guide) | ran | Dropping the third replicate (`-c Veh_r1,Veh_r2 -x Drug_r1,Drug_r2`) runs, 18,053 genes; a misspelled sample name gives `KeyError: ['VehX'] not in index` |
+| (Found) main `bash` block put `# comments` after line-continuation backslashes, so pasting it runs `-i ...` etc. as separate commands | shipped snippet | Comments moved above the command | ran | Reproduced the break with a minimal script (`b: command not found`); the fixed block then ran on the audit data, 18,051 genes |
+| (Found) usage-guide typo ("excludele` with CEGv2") and the claim that `-r` "excludes from the null" (it drops the genes) | doc defect | Removed with the dedup below | docs (`drugz.py` `load_reads`) | |
+
+### Redundancy removed (every deleted passage and where it now lives)
+
+| deleted from `usage-guide.md` | now |
+|---|---|
+| Prerequisites (clone, pip helpers, required inputs, matched time point) | SKILL.md "Run drugZ" **Input** paragraph (plus existing Version Compatibility clone line) |
+| Quick Start bullets | example prompts (kept, merged) |
+| What the Agent Will Do (10 steps) | SKILL.md Run / Failure Modes / Comparison sections |
+| Tips (8 bullets) | each already in SKILL.md (Day-0 failure mode, drug-target-as-suppressor failure mode, drugZ vs MLE tables, `-r` section); "essentiality plus drug" moved to the SKILL.md comparison table; low-Pearson tip to the new failure mode |
+| Decision Cheat Sheet | SKILL.md comparison table (+ new essentiality row) |
+| Thresholds table | SKILL.md Quantitative Thresholds (+ Pearson > 0.85 row); pseudocount "raise for low-count" now a comment on `-p` |
+| Validation Checklist | SKILL.md failure modes; "library coverage / MAGeCK count QC" added to the Input paragraph |
+
+Inside SKILL.md: the "Dose consistency rule" stated twice (dose section and comparison section) now lives once in "Drug-Dose and Time-Course Designs"; the comparison section points to it. No disagreement between copies.
+
+Both `recommendations[]` entries (1 P1, 1 P2) fixed, plus two defects found. Nothing left unfixed. No `.py`/`.sh` changed in the Skill, so no compile step; `examples/run_drugz.py` untouched.

@@ -69,3 +69,30 @@ shipped `examples/phospho_analysis.py` `py_compile`.
   this pass was already adding the TMT one. Flagged for a later pass rather than bundled in.
 - **[P2] 391 -> 477 lines with no `references/`.** The TMT route necessarily grew the file. Splitting is a
   restructure, out of scope, and the static token-cost mark will get worse before it gets better.
+
+
+## Pass 6 (2026-09-21)
+
+Fix of the pass-5 confirmation audit (83, one open P1). Worktree `F:\OpenScience\wt\proteomics-ptm-analysis`, branch `fix/proteomics-ptm-analysis`. Runtime: R 4.4.3 via `r.sh`, MSstatsPTM 2.8.1, MSstatsTMT 2.14.2. Audit TMT10 synthetic evidence copied to the scratchpad.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| TMT section says Channel is `channel.1` .. `channel.N`; MaxQuant reporter columns are 0-indexed, so the annotation is rejected | P1 | Code comment now says channel names follow the evidence's `Reporter intensity corrected <n>` suffixes (`channel.0` .. `channel.9` for a 10-plex), read them off the header, and quotes the misleading `the channel name must be matched with that in input data` error. New Common Errors row for that message | ran: the SKILL.md TMT block, extracted verbatim, completes on the audit evidence with the 0-indexed annotation (names(input) PTM, PROTEIN; ADJUSTED 35 rows after the site filter); the audit's `channel.1..10` annotation confirmed present in the scratchpad copy. The rejection message itself is from the audit's run (viewer, Input 5) | Header check: evidence columns `Reporter intensity corrected 0` .. `9` |
+| Reverse-direction TMT error quoted as one message could not be reproduced | P2 | Approach paragraph no longer quotes the `by` message; the Common Errors row lists the three loud errors the audit observed and says none names the labeling type, so check `labeling_type` first | docs: audit viewer Input 6 (three configurations, three messages); `by` message kept as one of the observed set (pass-5 capture) | |
+| Redundancy (Sam's 2026-09-17 rule) | -- | `usage-guide.md`: deleted Prerequisites, "What the Agent Will Do" and Tips (all restate SKILL.md); replaced by a one-line pointer. Install commands moved into SKILL.md Version Compatibility | Tips content checked to exist in SKILL.md: paired global proteome (insight 3, decision tree), TiO2 vs Fe-IMAC (insight 1, decision tree), multiplicity columns (Python block comments, Common Errors), chloroacetamide (decision tree, Common Errors), motif background (decision tree, failure mode), prior-limited KSEA (Benchmark line), Ochoa triage (insight 4). Steps list restated the decision tree and TMT route (both in SKILL.md). The CLI search-engine line dropped (named in Scope) | |
+
+All three R fences `parse()`; the shipped `examples/phospho_analysis.py` `py_compile`s (unchanged).
+
+Left unfixed (pass 6):
+- **[P2] PTM-SEA and empirical FLR still have no runnable route.** ssGSEA2.0 (`tools\ssGSEA2.0`) and LuciPHOr2 are installed, so the "missing referenced executables" rule says write them. Not cheap: PTM-SEA needs a flanking-sequence site GCT and PTMsigDB, and LuciPHOr2 needs spectra the audit data lack (no way to check it against truth here). Flagged to Sam, third pass deferring.
+- **[P2] Modification names hard-coded to phospho in three code paths.** Unchanged reasoning (rewrites blocks that work).
+- **[P2] SKILL.md heavy (about 480 lines), no `references/`.** Restructure, out of scope.
+
+
+### 2026-09-21 addendum: LuciPHOr2 removed (Sam's decision)
+
+The P2 "PTM-SEA and empirical FLR have no runnable route" was left open because LuciPHOr2 needs spectra the audit data lack. Sam decided to delete the reference rather than keep an unbacked mention: the LuciPHOr2 table row and its citation are removed from `SKILL.md`. The original LuciPHOr row and its 2013 citation stay (the citation backs the peptide-FDR-vs-site-FDR threshold). PTM-SEA is unchanged and still has no runnable block.
+
+### 2026-09-21 addendum 2: PTM-SEA written (Sam: "go ahead and write it")
+
+New `SKILL.md` section "PTM-SEA With ssGSEA2.0": `write_ptmsea_gct` (MaxQuant `Sequence window` [8:23] + `-p` -> the +/-7 flanking id PTMsigDB uses), the `ssgsea-cli.R` call, and `read_ptmsea`. Verified by extracting the three fences from the committed `SKILL.md` and running them as written (ssGSEA2.0 cae7bed, PTMsigDB v1.9.1, mass-spec env) on a planted table of real PTMsigDB ids: the 588 CDK1 substrate sites shifted +2 among 2,582 sites -> `KINASE-PSP_CDK1` rank 1 of 100 (NES 44.0, FDR 0.0056); the same values shuffled across sites -> CDK1 rank 37 (NES 0.47, FDR 0.95), no signature below FDR 0.05 (two sit at exactly 0.05). Found while testing: PTMsigDB also holds `-ac`/`-m2`/`-m3` ids (noted in the text; the helper builds `-p` only); only 100 of 495 signatures reach `-m 10` on 2,588 ids (checked by counting). Not tested: mouse/rat databases, PTMsigDB v2.0.0, multi-sample input. The audit's own synthetic phospho table has no sequence-window column and made-up proteins, so it could not be the test input.

@@ -33,3 +33,24 @@ transitive dependency from an earlier pass -- not installed or changed here). No
 installed or version-changed in any shared env. Temporary verification files written under the
 shared `tools\ncbi-datasets-cli\` directory (a scratch TSV and a throwaway `fix-verify\` folder) were
 deleted after use; nothing left behind there beyond the pre-existing `datasets.exe`/`dataformat.exe`.
+
+---
+
+## 2026-09-21 -- second fixer pass
+
+Worktree `F:\OpenScience\wt\ncbi-datasets-cli`, branch `fix/ncbi-datasets-cli`, from staging `main`.
+Source audit: latest report for `bio-ncbi-datasets-cli` (87.8, Production Ready, deployable; 1 P1, 1 P2).
+Verified live with `datasets`/`dataformat` 18.37.0 (native Windows), `aria2 1.37.0` (WSL `science`/`bio`),
+Python 3 for the size check. No shared env changed; scratch dir under the tools folder deleted after use.
+
+| finding | priority | change | verified | notes |
+| --- | --- | --- | --- | --- |
+| `datasets rehydrate` does not verify files already on disk; SKILL.md ("Rehydrate workflows also verify... retries up to 3 times") and `bulk_dehydrated.sh` Step 3 comment claimed it does | P1 | Rewrote SKILL.md "Checksum verification" (was "(automatic)"): `download` validates the zip checksum (per `--fast-zip-validation` help); `rehydrate` is presence-only; added a size-check snippet against `dataset_catalog.json` `uncompressedLengthBytes`. `bulk_dehydrated.sh` Step 3 now size-checks, deletes mismatches, rehydrates again, and exits 1 if still wrong. Dropped the unverified "retries up to 3 times" claim and the "MD5 mismatch retried" Common-errors row (replaced by two rows: zip validation failure, and the "already rehydrated" trap). Description: "automatic checksum verification" -> "download-time zip checksum validation". Same claim softened in `download_genome.sh` comments and usage-guide (3 places) | ran | Reproduced: overwrote a rehydrated .fna with 4 bytes -> rehydrate "All 1 files already rehydrated", file untouched; deleting it -> rehydrate restores 5510 bytes. Full `bulk_dehydrated.sh` run (Mycoplasma genitalium) with real WSL aria2c: NCBI bot-block wrote 3.9 KB HTML over 3 files, step 3 detected all 3, deleted, rehydrated, re-check passed (rc 0, sizes 587407/373156/219385). |
+| Virus download has no code pattern | P2 | Added "Virus genomes" pattern (summary + `dataformat tsv virus-genome` + download with `--include`, filters, default package contents) | ran | `summary virus genome taxon "Zika virus" --refseq` -> 2 RefSeq genomes; download with `--include genome,cds,protein` produced genomic.fna/cds.fna/protein.faa/data_report.jsonl; `annotation` include yields annotation_report.jsonl; `virus-genome` field names checked against `--help`. |
+| (found while testing) aria2c `--dir` was `.../ncbi_dataset/data/` in `bulk_dehydrated.sh` and SKILL.md, but fetch.txt column 3 already begins with `data/` | not audited | `--dir` -> `.../ncbi_dataset/`; files were landing in `data/data/`. The 2026-09-19 fix never completed an aria2c transfer, so this was unseen | ran | Real aria2c placed files at `ncbi_dataset/data/<acc>/...` after the change. |
+| (found while testing) SKILL.md's bulk pattern passed raw `fetch.txt` to `aria2c --input-file`; it is 3 tab columns, not aria2c input format | not audited | Added the awk conversion (already in the script) to the SKILL.md pattern and to the dehydrated step 3 prose | ran | Same awk as the script, exercised by the run above. |
+
+Redundancy: no new duplication; the size check appears once in SKILL.md (Checksum verification) and the
+script is the runnable copy, per the shipped-examples exemption.
+
+Unfixed: none. Notes: the size check relies on `python3`; `--gzip` rehydrate was not tested against it.

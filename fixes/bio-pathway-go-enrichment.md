@@ -16,3 +16,20 @@ Scope: all 3 open P2s (no P0/P1; score 90). Sam's 2026-09-16 "fix every known de
 ## Left unfixed
 
 None — all three P2s fixed, and everything else found while reading the Skill checked out.
+
+---
+
+# bio-pathway-go-enrichment - fix log (2026-09-21)
+
+Branch `fix/pathway-go-enrichment` (worktree `F:\OpenScience\wt\pathway-go-enrichment`). Scope: the one open P1 and the one P2 of the latest report.
+
+| finding | priority | change | verified | notes |
+| --- | --- | --- | --- | --- |
+| The 2026-09-16 `simplify()`-on-`ont='ALL'` claim ("silently returns only BP, drops MF/CC", cited as checked) is false | P1 | Deleted the "simplify on ont='ALL'" failure-mode section, its Common Errors row and the usage-guide.md tip (the fact now lives once, in SKILL.md "Reduce GO-DAG Redundancy"). That section now says `simplify()` dispatches on `x@ontology == 'GOALL'` to `simplify_ALL()` (split by ONTOLOGY, simplify each, rbind), gives the 4.14.6 check, and tells users on an older version to confirm with `selectMethod`/`exists('simplify_ALL', ...)` before relying on it. `examples/go_all_ontologies.R` header comment no longer says the object "must be split". | ran + source | clusterProfiler 4.14.6: `selectMethod('simplify','enrichResult')` prints the `GOALL` -> `simplify_ALL` branch; `ont='ALL'` object of 194 terms (BP135/CC10/MF49) simplified to 79 (BP51/CC5/MF23), identical to the per-ontology loop's 51/23/5. Audit's own run: 36 -> 15 (BP7/CC4/MF4). Example script parses. | Version that introduced `simplify_ALL` not determined (no older clusterProfiler here), so the gate is a runtime check, not a version number. |
+| "Whole-genome or default universe" symptom overstated ("table dominated by tissue-restricted terms") | P2 | Symptom rewritten: effect scales with list size and background mismatch; on null 150-gene lists omitting `universe=` added at most one marginal term (p.adjust 0.033, audit) and often none | ran | My null run (150 random genes, 12k universe, BP) gave 0 terms with and without `universe=`; audit saw 1. Both cited. |
+
+Redundancy pass: the only duplicated passage was the ont='ALL' claim (SKILL.md x3, usage-guide.md x1), collapsed to a single statement in SKILL.md; nothing else the agent needs left the Skill.
+
+## Left unfixed
+
+None.

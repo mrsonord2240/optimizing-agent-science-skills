@@ -44,3 +44,21 @@ Not filed upstream (out of scope for this pass); worth a GitHub issue
 against `AntonioDeFalco/SCEVAN` if anyone picks it up later.
 
 ## Findings fixed: 4/6 (3 P1 + 1 P2); 2 P2 left unfixed (reasons above)
+
+---
+
+# bio-single-cell-cnv-inference - fix log (2026-09-21)
+
+Fixer pass 2 for `single-cell/cnv-inference` (branch `fix/single-cell-cnv-inference`, worktree
+`F:\OpenScience\wt\single-cell-cnv-inference`). Source: re-audit of 2026-09-19, 91 static, one P1 open, two P2s.
+Env: WSL `science` distro, micromamba env `cnv-audit`, numbat 1.5.2. `SKILL.md` is 257 lines after the fix, so no `references/` split.
+
+| finding | priority | change | verified | notes |
+|---|---|---|---|---|
+| Numbat `df_allele` docs miss an 11th required column `gene` | P1 | `SKILL.md` Numbat prose and parameter table: `run_numbat()` needs the ten columns; `gene` is added internally by `annotate_genes()`, so it is not hand-built; only a direct `check_allele_df()` call needs it | ran: printed `run_numbat` body (`df_allele = annotate_genes(df_allele, gtf)` then `check_allele_df(df_allele)`); a 10-col frame fails `check_allele_df()` on `gene`, passes after `annotate_genes(df, gtf_hg38)`, and `annotate_genes` drops and recomputes any supplied `gene` | the re-audit called `check_allele_df()` directly, which skips the annotate step `run_numbat()` performs. The re-audit's recommended fix (add `gene` to the required list) would have told users to hand-build a column the package overwrites, so the doc says why instead. Full `run_numbat()` not run: needs BAM + phasing, absent here |
+| Redundancy: `usage-guide.md` Tips and What the Agent Will Do restate `SKILL.md`; Prerequisites install block only in the guide | dedup | deleted the two sections; install block moved to new `SKILL.md` "## Install"; guide points at `SKILL.md` | diff read; every Tips item checked present in `SKILL.md` (reference, per-patient, proxy, CNV-quiet, clustering, cutoff, copyKAT norm cells, cell-cycle, ref size, sex, HLA/Ig, WGD) | nothing the agent needs left the Skill |
+
+## Left unfixed
+
+- **No clinical-practice-boundary disclaimer (P2).** Judged not a correction: it is new prose, and the brief limits fixers to corrections. The re-audit's input 7 showed the agent refusing safely without it, so no defect was demonstrated by a run.
+- **No patient-privacy note (P2).** Same reason, and no run exposed a failure; no peer-Skill convention to copy was named in the report.

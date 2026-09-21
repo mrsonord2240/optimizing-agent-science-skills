@@ -58,3 +58,37 @@ Disagreements between copies, resolved by what the audit's runs support: min_dep
 ## Compile / syntax
 
 No `.py` shipped. `bash -n examples/prepare_reference.sh` passes; the script was run from a copy against six reference names plus the error paths (see finding 4). All SKILL.md fenced python / bash blocks run from the final file by the harnesses above.
+
+# bio-reference-operations - fix log (2026-09-21)
+
+Skill `alignment-files/reference-operations`, branch `fix/reference-operations` (worktree `F:\OpenScience\wteference-operations`, from staging `431aa55`). Commits: `8f275d2` (fixes), `5d5e5f0` (split).
+Evidence: latest re-audit `F:\OpenScienceuditsio-reference-operations\` (85, Production Ready, deployable, no veto, no P0, 1 P1, 4 P2).
+Tools (WSL `science`, env `alignment-files`): samtools 1.24, pysam 0.24.1, GATK 4.6.2.0, Picard 3.5.0. Data: 1000G HG00349 chr20 slice (hs38DH header, 3,366 contigs) + the audit's GRCh38 assembly report, the audit's planted BAM/FASTA, the chr22 slice, a 5 kb / 3 kb synthetic reference. Scratch: `F:\OpenSciencef-refops21`.
+
+| finding | priority | change | verified | notes |
+|---|---|---|---|---|
+| Reheader recipe fails on full hg38 headers (map emits `na`), leaves 0-byte output | P1 | awk filter `$10!="na" && $7!="na"`; reheader writes `renamed.bam.tmp`, `mv` on success | ran the SKILL block verbatim on HG00349: rc 0, 451 of 3,366 contigs renamed (25 NC_, the rest NT_/NW_), records identical to the original except RNAME/RNEXT (md5 of the other columns equal); old recipe reproduced rc 1 "Duplicate entry na", 0-byte file | |
+| `-T` described as filling low coverage | P2 | now "columns with no reads (depth 0)", below-`-d` and ambiguous columns stay N, with the planted numbers | ran planted BAM `-d 3`: 450 N -> 150 N with `-T`; `-d 30`: 6224 -> 5924 | |
+| Description omits renaming / extraction / CRAM | P2 | description extended | read | frontmatter `name` untouched |
+| bgzip requirement, no test data | P2 | one line + `gunzip -c ... \| bgzip` recipe under Create Index; `examples/toy.fa` + `examples/toy.expected.dict`; usage line of `prepare_reference.sh` says bgzip | ran: plain gzip rc 1 with the "please use bgzip" message, bgzip recipe indexes; toy M5 == independent md5 of the sequence; `prepare_reference.sh toy.fa` dict equals expected; `samtools dict -u toy.fa toy.fa \| diff - toy.expected.dict` empty | |
+| Picard accepts `genome.fasta.dict`, only GATK ignores it | P2 | sentence and script comment name GATK | ran: Picard ValidateSamFile "No errors found" with only `genome.fasta.dict`; HaplotypeCaller USER ERROR with it, runs after rename to `genome.dict` | |
+| chr22 "1 vs 2 differences" needs `-d 3` | P2 | window, `-d 3` and the `-d 1` numbers (5 / 4) stated | ran: 1952-4617 simple -d 1 -> 5 diffs, Bayes -d 1 -> 4; -d 3 -> 1 / 2 | |
+| Dict example `UR:file:reference.fa` | P2 | absolute `file:///` shown, `-u` noted | samtools dict output | |
+| sed UCSC->Ensembl rewrote non-primary contigs | P2 | regex limited to `chr1-22/X/Y/M`, comment says the rest keep names | ran on the hs38DH header: 25 primary renamed, 1 `MT`, 18 `chr1_KI...` kept | Ensembl names scaffolds by accession, so kept UCSC names still mismatch Ensembl; already stated in Contig Naming |
+| Multi-region skip message printed `chr2:5001-3007` | P2 | prints requested end and contig length, clips after the check | ran on 5 kb / 3 kb reference: `skip chr2:5001-15000: outside the contig (3007 bp)`, `>chr2:1001-3007` 2007 bases | |
+| `compare_to_ref` / `build_consensus` N, IUPAC, deletion, insertion behaviour unstated | P2 | two sentences added | audit run values (30 N-run + 2 IUPAC listed as differences) | |
+| Unreproduced claim: CRAM reheader warns "Failed to populate reference" | audit note | claim replaced by what was checked (exit 0, M5 kept, identical decode with `-T`) | ran: CRAM reheader chr22->22 rc 0, `-T` decode 5,644 records | I also saw no warning, so the old sentence could not be supported |
+
+## Redundancy (this pass)
+
+No new duplicates introduced. The bgzip line, GATK/Picard naming, `-T` wording and the `-d 3` numbers each replaced text in place; the script comment is a shipped-file note, not a restatement.
+
+## Split into `references/` (SKILL.md 461 -> 280 lines)
+
+Moved verbatim: `references/contig-naming.md` (GRCh38 flavours, contig naming, rename without re-aligning), `references/consensus-modes.md` (IUPAC/`--het-fract`/`--call-fract`/`--het-scale`, platform `--config`, `-T`, samtools vs bcftools consensus), `references/python-consensus.md` (simple/build consensus, `compare_to_ref`, header dict). SKILL.md gained pointers in the intent list and a Reference Files table. Check: every non-blank line of the pre-split SKILL.md is present in SKILL.md or a reference file except the two lines rewritten to carry pointers; the 3 python fences `ast.parse`, all 23 bash fences pass `bash -n`; the rename block ran from the split file's text (see above).
+
+## Left unfixed
+
+- Audit static note "no test data or expected output" beyond the toy: a real-genome sample cannot ship (size/licence); the toy FASTA + expected dict is the shippable part, done.
+- Audit assertion that the CRAM `Failed to populate reference` warning was not reproduced: I did not reproduce it either, so the claim was deleted rather than fixed (see table).
+- `-T` added "in samtools 1.22" / `--config` "1.17+" version notes: still only samtools 1.24 available to check them.

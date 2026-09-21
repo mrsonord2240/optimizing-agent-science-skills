@@ -33,3 +33,24 @@ Not attempted, out of scope: the audit's Input-5 finding (usage-guide.md's dropp
 ## Needs Sam
 
 None. `powsimR` remains uninstalled in the shared env (Bioconductor 3.20 vs `bayNorm`'s `RELEASE_3_23` dependency; documented in the env's `TOOLS.md`, notes 7 and 10) -- the fallback pseudobulk-on-donors route replaces it without needing an install.
+
+---
+
+## 2026-09-21 fix pass 2
+
+Fixer for `experimental-design/sample-size`, worktree `F:\OpenScience\wt\experimental-design-sample-size`, branch `fix/experimental-design-sample-size`. Env: `mass-spec-proteomics-analyst` via its `r.sh` (PROPER 1.38.0, R 4.4.3). Evidence: latest report in `F:\OpenScience\audits\bio-experimental-design-sample-size\` (1 P1, 1 P2).
+
+| Finding | Priority | Change | Verified | Notes |
+|---|---|---|---|---|
+| PROPER block prints `powres$powerAveraged`, a field that does not exist (silent NULL) | P1 | Replaced with `names(powres)`, `powres$Nreps1`, `rowMeans(powres$power.marginal, na.rm = TRUE)` and `summaryPower(powres)`; added a note that `$` on a missing name returns NULL silently. | ran | Block run on the audit's 6v6 pilot (first 2,500 genes, `nsims = 8`): the accessors return real values. `power.marginal` is Nreps x nsims, not Nreps x strata as the audit stated. |
+| `power.marginal` returns NaN (audit P2 said "sparse strata / low nsims") | P2 | Real root cause found and fixed: `comparePower` counts targets by `abs(lfc) > delta` (strict, read from `print(comparePower)`), and `runSims` plants every DE gene at exactly `lfc = log2(1.5)`, so `delta = log2(1.5)` leaves zero target genes. The block now uses `delta = log2(1.5) - 0.01` with a comment saying why; NaN caveat rewritten (low `nsims` / no true discoveries). | ran (two methods: source read plus run) | With `delta = log2(1.5)`: all 32 cells NaN, `summaryPower` marginal power NaN. With `- 0.01`: marginal power 0.006 / 0.060 / 0.219 / 0.612 at n = 3 / 6 / 10 / 20, actual FDR 0.74 / 0.48 / 0.20 / 0.11. `all(simres$lfcs[[1]] == log2(1.5))` is TRUE. A full 8,000-gene, `nsims = 20` run was killed as too slow on the loaded machine, so the documented numbers are from the 2,500-gene subset. |
+
+### Redundancy pass
+
+- SKILL.md "Common Errors" table deleted: rows 1, 3, 4 restated "Per-Method Failure Modes" (technical reps, scRNA on cells, guessed CV); row 2 restated "n=3 by convention" and the Quantitative Thresholds; row 5 (failure margin) is already the "Add 10-20% extra units" threshold row.
+- SKILL.md "Anticipated Reviewer Pushback" "Is n=3 enough?" row shortened: the numbers (mid-40s to 74) now live only in the note under Quantitative Thresholds, which the row points to.
+- `usage-guide.md` Overview trimmed to two sentences; its principles (biological units, donors not cells, pilot dispersion, n=3 convention) live in SKILL.md's "Single Most Important Modern Insight".
+
+### Left unfixed
+
+None.

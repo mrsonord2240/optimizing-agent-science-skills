@@ -53,3 +53,28 @@ pure ASCII with CRLF preserved.
   environment (Comet's and OpenMS `IDFileConverter`'s alike), so the FragPipe route cannot be shown
   producing protein groups here. The block is written so that this fails loudly instead of reporting
   `Converged to 0.00 % FDR`.
+
+## Pass 6 -- 2026-09-21 (fix of the latest re-audit: 1 P1, 3 P2)
+
+Worktree `F:\OpenScience\wt\proteomics-protein-inference`, branch `fix/proteomics-protein-inference`.
+Runtime: pyOpenMS 3.5.0, Percolator 3.09.0. Data: audit `peptides_1pct_fdr_std.idXML` + `truth_std.csv`,
+and the PXD070049 `comet.pin` + `target_decoy.fasta`.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| Percolator route emits a flat list; "one row per group representative" | P1 | CLI block comment now says partners are ELIMINATED, not listed, and never to report `prot.target.tsv` as a group list without `--protein-report-duplicates --protein-report-fragments` (`-g -c`); same caveat added to the taxonomy row and the decision-tree row | ran: default run -> 2,339 rows, 0 with a comma; with both flags -> 28 rows list several accessions (e.g. HS71A,HS71B), 458 groups at q<=0.01 either way; flags checked in `--help` | reproduces the auditor's 2,339 / 0 |
+| Entrapment advice omits its precondition | P2 | Naive-FDR Fix line now requires a proteome absent from the sample and says a HYE-style multi-species mix does not provide one | text | |
+| `DECOY_` hard-coded in shipped code | P2 | `DECOY_PREFIX` constant at the top of the pyOpenMS block; shell variable `DECOY_PREFIX` in the CLI block (Percolator `-P`, Philosopher `--prefix`, `--decoy`, `--tag`) | ran: pyOpenMS block -> 556 groups; Percolator leg verbatim -> 458; `bash -n` clean | |
+| pyOpenMS route has no output schema | P2 | Approach names the group record (`leading_protein`, `accessions`, `n_peptides`, `n_unique_peptides`, `is_decoy`, `qvalue`); the default block now builds it, matching `examples/protein_groups.py` | ran: 556 groups pass, 2 false vs truth = 0.36% FDP (same as pass 1); multi-member isoform groups carry both accessions | |
+
+Redundancy pass (each fact once):
+
+| deleted | now lives in |
+|---|---|
+| Version Compatibility Fido error text; taxonomy Fido row error text | Common Errors `ERROR: the option --protein is invalid.` row |
+| Output contract's philosopher reproduction detail | Common Errors philosopher `filter` / `peptideprophet` rows |
+| Thresholds rows "Two-peptide rule", "Single-peptide IDs" | Insight 3 and the Two-peptide failure mode |
+| Common Errors rows: protein FDR higher than nominal; low-abundance proteins missing; spurious DE on paralogs; unique count changed with DB | Naive-FDR, Two-peptide and Razor failure modes; Vocabulary ("Unique" is DATABASE-RELATIVE) |
+| usage-guide Tips (7 bullets), Prerequisites CLI comment, What-the-Agent-Will-Do steps | SKILL.md Insights 1-3, Vocabulary, decision tree, Output contract, Version Compatibility (new Install line carries the pip/CLI/no-TPP note) |
+
+Unfixed: none.

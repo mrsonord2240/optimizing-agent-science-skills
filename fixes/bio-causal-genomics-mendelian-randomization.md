@@ -71,3 +71,34 @@ the sibling `pleiotropy-detection` Skill, not runnable code here. Per the re-aud
 does not affect the veto or the grade.
 
 Left unfixed: none of the two dispatched findings. Nothing needs Sam.
+
+---
+
+# Round 3 (2026-09-21) -- comparison defect + open P2s + split
+
+Worktree `F:\OpenScience\wt\causal-genomics-mendelian-randomization`, branch
+`fix/causal-genomics-mendelian-randomization`. Commits: `4bcf657` (fixes), `10e2381` (split). Fixer: Claude Sonnet 5.
+Evidence: `F:\OpenScience\comparisons\mr-execution\COMPARISON.md` and its `run\` scripts; the re-audit's two open P2s.
+Runtime: R 4.4.3 via `r.sh`, TwoSampleMR 0.7.9, MRPRESSO 1.0; nothing installed. Verification script: scratchpad `v/verify_presso.R`
+(comparison's harmonisation on `data_A`, `data_B`, NbDistribution 3000, seed 42).
+
+| finding | priority | change | verified | notes |
+|---|---|---|---|---|
+| SKILL.md MR-PRESSO outlier rule `Pvalue < 0.05 / nrow(dat)` double-corrects (MRPRESSO's outlier P is already x n) | P1 (silent under-detection) | Rule now `adjusted P <= SignifThreshold`; string P (`"<3e-04"`) parsed; NULL `Outlier Test` guarded; rows returned by `dat_p[rownames(ot)[...], 'SNP']`; `mr_presso` run on `dat[dat$mr_keep, ]` | ran | Old rule flagged 0 on A and B. New rule: A 11 flagged, 9 planted (of 29 in set); B 8 flagged, 8 planted (of 30). Both identical (`setequal`) to MR-PRESSO's own `Distortion Test$Outliers Indices`; source lines checked with `deparse(mr_presso)` (`refOutlier <- which(OutlierTest$Pvalue <= SignifThreshold)`) |
+| `examples/two_sample_mr.R` STROBE summary line still `signif()` on the string PRESSO p (the 2026-09-17 P0 guard missed this second call) | P1 (crash on pleiotropic data) | Uses `presso_p_fmt`; added outlier-SNP extraction with the same rule and the `mr_keep` filter | ran (whole example end to end, NbDistribution 1000) + parsed | Found while fixing the rule; the crash path fires only when the bootstrap p is exactly 0 |
+| Reconciliation row "IVW sig, WM sig, mode null -> trust IVW + median" endorses the false positive on the null-effect data | P2 | Row conditioned on non-significant Cochran Q and PRESSO global; new row for "IVW, WM and RAPS sig, Egger and mode null, Q and PRESSO global sig -> do not report a causal effect", with the comparison's planted-null numbers | ran (comparison `out_ours_B.txt`, my rerun of PRESSO on B: outlier-corrected IVW 0.070, p 1.5e-4) | |
+| `NbDistribution = 10000` cost undocumented; the "Outlier test unstable" warning had no guidance | P2 | Floor `NbDistribution > nrow(dat)/SignifThreshold` and the 40-minute/shared-CPU cost stated; run in background, 3000-5000 to explore; Common Errors rows updated (new row for the double-correction symptom) | ran (warning text read from MRPRESSO source; comparison `out_theirs_A.txt` shows it at 1000 draws) | My own 3000-draw runs took >20 min each on a loaded machine |
+| Re-audit P2: qhet_mvmr imprecise between conditional F 1 and 10 | P2 | CI caveat added to the existing guard paragraph with the audit's numbers | docs (audit run `input10`) | |
+| Re-audit P2: CAUSE crashes against loo 2.10.1 | P2 | Version note in the CAUSE section | docs (audit Input 8; cause 1.2.0.335 x loo 2.10.1) | Note only; a package mismatch, no Skill file to fix |
+| SKILL.md > 300 lines | structure | Split into `references/`: mr-presso, mvmr-conditional-f, mrlap-overlap-correction, simex-egger-nome, bidirectional-steiger, cis-mr-and-binary-outcomes, bibliography; "Reference Files" index + pointers on 7 decision-tree rows | ran (line diff, 7 R fences `parse()`) | 470 -> 331 lines. No non-blank line lost; 7 table rows only gained a pointer. Still over 300 because what every request needs (taxonomy, decision tree, failure modes, thresholds, standard workflow, common errors, install) stays |
+
+No usage-guide.md change: it restates none of the edited text.
+
+## Left unfixed
+
+- **`cause()` crash under `loo` 2.10.1** (re-audit P2, comparison did not touch it): the fault is inside the installed `cause` package against a newer `loo`; fixing it means installing or pinning a different `loo`/`cause` in the shared env, which the brief forbids. Documented as a version note only.
+- **qhet_mvmr precision (P2)** documented, not "fixed": it is a property of the estimator.
+- **SKILL.md still 331 lines** (> 300): the remaining sections are the ones every request needs; moving them would remove what the brief says must stay.
+- **`I^2_GX` = 0.996 reading / other comparison remarks** (theirs-side gaps, protocol scaffolding Theirs has and ours lacks: tiers, claim-boundary language): out of the Skill's scope (broader coverage the brief excludes).
+- **Comparison note: IVW/WM/RAPS biased +0.04 to +0.10 on data A with 30% invalid IVs**: a property of the estimators on the planted data, not a Skill defect; the corrected reconciliation row and the Egger/mode guidance already cover it.
+- **`examples/` synthetic data use random `A1`/`A2` (can be identical) and no LD clumping**: not hit in any run and not in the audit or comparison findings; judged not a correction.

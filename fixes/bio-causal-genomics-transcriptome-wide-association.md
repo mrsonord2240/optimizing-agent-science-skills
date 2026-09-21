@@ -29,3 +29,35 @@ Source: `causal-genomics/transcriptome-wide-association`. Audit: 80/100, Limited
 Nothing blocking. Two of the four "P1" rows above are the audit's original findings; the other two are
 deeper bugs the same code paths hit immediately after applying the audit's own suggested one-line fixes
 -- flagging in case the re-auditor wants to weigh that when re-scoring reliability.
+
+
+# Fix log addendum: bio-causal-genomics-transcriptome-wide-association (2026-09-21)
+
+Source: `causal-genomics/transcriptome-wide-association`. Re-audit 2026-09-19: 87/100, Production Ready,
+1 P1 + 3 P2 open. Fix commit: `fix/causal-genomics-transcriptome-wide-association` in worktree
+`F:\OpenScience\wt\causal-genomics-transcriptome-wide-association` (not merged). Older entries above untouched.
+
+| finding | priority | change | verified | notes |
+|---|---|---|---|---|
+| pyfocus pin+patch insufficient: `focus finemap` crashes at "Calculating PIPs" with `DataFrame.pivot() takes 1 positional argument` (`finemap.py:1012`) then `'DataFrame' object has no attribute 'append'` (`:188`) | P1 | SKILL.md Tool Install Notes: two more `sed` patches (keyword `pivot`; `pd.concat` for `append`), restructured the note into a bullet list of the four upstream problems, re-dated to 2026-09-21; Common Errors row added; `examples/focus_finemap.sh` header updated | ran: fresh venv (pyfocus 0.802, pandas 2.1.4, numpy 1.26.4, setuptools 80.10.2), extracted the doc's own sed block from SKILL.md and ran it; unpatched run fails (`np.warnings`), patched run completes with `pips_pop1=1` for planted true gene, 3.44e-08 for NULL.MODEL; awk PIP filter of the example run on that output returns only the true gene | Same fixture design as the re-audit (bundled 957-indiv LD, planted Z=7.2), rebuilt by me |
+| `focus import ... fusion` needs undocumented mygene+rpy2 (+ R as shared lib); fails silently with empty DB | P2 | SKILL.md FOCUS section: requirement + silent-failure note + runnable direct-build script (`load_db`/`build_model`) from a `panel.tsv`; Common Errors row; example script comment | ran: the script extracted from SKILL.md built a DB that `focus finemap` consumed (above). `focus import` failure mode itself: audit run + `pyfocus/models/convert.py` source (only `log.error` on ImportError); not re-run | Chose "write it": tool is installed, audit expected it to run |
+| 464-line SKILL.md, no references/ split | P2 | not fixed | | restructuring, out of scope |
+| FUSION has no standalone example script | P2 | not fixed | | new content, out of scope |
+
+## Redundancy removed (dedup pass)
+
+| deleted passage | content now lives |
+|---|---|
+| usage-guide.md install code blocks (pyfocus pip, MetaXcan/FUSION git clone, `install.packages(...)`) | SKILL.md Tool Install Notes (the R package list moved into the FUSION bullet; guide points there) |
+| usage-guide.md Quick Start list | duplicated Example Prompts; deleted |
+| usage-guide.md "What the Agent Will Do" | restated SKILL.md pipeline and failure-mode sections; deleted |
+| usage-guide.md Ancestry-Matched Prediction Panels table | moved to SKILL.md, Ancestry mismatch failure mode |
+| usage-guide.md GTEx v8 N<100 tissue table | moved to SKILL.md, Low-N tissue failure mode |
+| usage-guide.md Tips (10 bullets) | each already in SKILL.md: Tissue Selection Protocol, FOCUS "Fix", Ancestry Fix, HLA, Low-N, Triangulation rule, decision-tree rows (drug-target, splice-TWAS), FUSION Pipeline, version-pinning lines; the one unique fact (post_process returns no PIPs) added to FUSION Pipeline |
+| usage-guide.md overview paragraph 2 and "--joint" aside in FUSION prompt | shortened to a pointer |
+| SKILL.md symptom/fix restating `post_process.R` default conditional analysis (2 places) | FUSION Pipeline section |
+| SKILL.md S-MultiXcan paragraph repeating the cutoff error | Common Errors row (kept) plus one sentence |
+| SKILL.md Common Errors causes/solutions for delim_whitespace, np.warnings, `--locations`, Windows paths | pointers to Tool Install Notes / FOCUS section, which hold the detail |
+
+Left unfixed: nothing else open. `focus import` end-to-end (with mygene+rpy2) was not run: rpy2 needs a
+shared-library R, which this machine's R is not; the direct-build route was verified instead.

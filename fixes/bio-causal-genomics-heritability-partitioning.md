@@ -72,3 +72,32 @@ fix above).
 ## 2026-09-17, re-audit
 
 75 Reject -> **88.2 Production Ready**, Research Veto PASS, at fork `c602f2a` (a different agent; 7 pre-fix inputs re-run as regression plus 2 new, from its own clean CBIIT/ldsc clone). It reverted and re-applied the documented `--h2-cts` patch itself, fetched `bulik/ldsc`'s live README to confirm the CBIIT redirect, and ran the real LDAK 6.3 binary the pre-fix audit could only inspect. New P1: the fork ships no `.gitattributes`, so a default Windows checkout converts `examples/*.sh` to CRLF and every one of them fails under WSL bash, including this Skill's own smoke test -- corpus-wide, not specific to this Skill.
+
+## 2026-09-21, second fix pass (fixer: Claude Sonnet 5)
+
+Worktree `F:\OpenScience\wt\causal-genomics-heritability-partitioning`, branch
+`fix/causal-genomics-heritability-partitioning`, from staging main `431aa55`. Evidence: the 88.2 re-audit
+report (3 P1, 1 P2).
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| `examples/*.sh` break under WSL bash on a default Windows checkout (CRLF) | P1 | No change needed in this branch: staging main already carries a root `.gitattributes` (`* text=auto eol=lf`, added after this re-audit, see the corpus-wide fix at `285e2b0`/later) | ran | `git ls-files --eol` on this worktree: every `examples/*.sh`, SKILL.md and usage-guide.md are `i/lf w/lf`; `grep -c $'\r'` = 0 on all three scripts; `smoke_test_ldsc.sh` then run from this worktree under WSL (result below) |
+| No h2-in-[0,1] sanity check in Quantitative Thresholds | P1 | New first-class row in SKILL.md "Quantitative Thresholds": h2 outside [0,1] (either scale) is never a face-value estimate; if the 95% CI excludes [0,1] (auditor's liability h2 1.4326 (0.1009)) treat as artifact and check `--samp-prev`/`--pop-prev`, N, LD reference; if the CI overlaps the bound, report as boundary noise | docs (audit Input 4 output) | Deliberately not "any point estimate outside [0,1] is invalid": a small true h2 legitimately estimates slightly negative |
+| SKILL.md ~493 lines, no `references/` split | P1 | Split per-method material into `references/ldak-sumher.md`, `references/hess-local-h2.md`, `references/hdl-genetic-correlation.md` (pipeline, install line, failure mode, common-error row each); SKILL.md gained a "Per-Method Reference Files" index and dropped 494 -> 375 lines (+ the new h2 row and index). LDSC/S-LDSC/cell-type/cross-trait stay in SKILL.md | ran (scripted check: every non-blank original line is present in SKILL.md or a reference file, except the deliberate deletions below) | BOLT-REML, GCTA, graphREML, Popcorn have no pipeline section in the original, so no file was invented for them |
+| Usage-guide said "Prefer LDAK for conserved regions per Speed 2019", contradicting SKILL.md's "report both, never pick the model that gives the desired answer" | P2 | Removed the sentence; guide's Prerequisites paragraph now says LDAK/HESS/HDL installs live in `references/` | docs | Internal contradiction; SKILL.md copy kept |
+
+**Redundancy pass (deleted passage -> home):**
+
+| Deleted | Now lives |
+|---|---|
+| SKILL.md failure mode "LDSC vs LDAK enrichment discordance" (trigger/mechanism/symptom/fix) | SKILL.md "LDSC vs LDAK Reconciliation" (mechanism was already the two bullets there; the 25x-vs-10x symptom, "LDSC primary + LDAK confirmatory, directional agreement over magnitude" and "never pick the model that gives the desired answer" folded into its Operational rule) |
+| Common Errors row "LDAK h2 markedly different from LDSC h2" | same Reconciliation section |
+| Common Errors row "HESS locus h2 negative" | `references/hess-local-h2.md` failure mode (same symptom, same fix) |
+| Common Errors rows "HDL rg = NA" and "LDAK tagging file: build mismatch" | moved to a Common Errors table in `references/hdl-genetic-correlation.md` and `references/ldak-sumher.md` |
+| Failure modes "HDL bias with sample overlap", "HESS locus instability" | moved verbatim into the HDL / HESS reference files |
+| Tool Install Notes: LDAK, HDL, HESS lines | moved to `## Install` in the matching reference files; SKILL.md keeps a pointer |
+
+## Not fixed (2026-09-21)
+
+- P2 "HDL, HESS, BOLT-REML, GCTA, Popcorn untested": needs R/Python installs and multi-GB reference panels
+  in a shared env; the brief forbids installing into the shared venv/R library. Left for a tooling pass.

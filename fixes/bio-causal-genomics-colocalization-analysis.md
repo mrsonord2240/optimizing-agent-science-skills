@@ -35,3 +35,19 @@ Nothing the agent needs was deleted — every fact in the "deleted outright" tab
 ## Findings fixed: 5/6 (the P0, both P1s that needed a change, one P1 verified with no change needed, the P2 description reword). 1/6 (HyPrColoc, P2) left unverified — package fails to build in this shared env, not something a fixer working under the no-version-change rule should force.
 
 Nothing needs Sam.
+
+---
+
+# bio-causal-genomics-colocalization-analysis — 2026-09-21
+
+Worktree `F:\OpenScience\wt\causal-genomics-colocalization-analysis`, branch `fix/causal-genomics-colocalization-analysis`, commit `9a02139`. Evidence: latest audit report (1 P1, 2 P2). Tools: coloc 5.2.3 (R 4.4.3 via `r.sh`); hyprcoloc 0.0.2 + RcppEigen 0.3.3.9.4 (WSL `science`, R 4.4.1, g++ 15.2, scratch lib in `/tmp`, removed nothing shared).
+
+| finding | priority | change | verified | notes |
+|---|---|---|---|---|
+| Revised PP.H3 trigger ("limited power") uncalibrated; audit saw PP.H1 dominate at N=150/400 | P1 | Sweep: shared-plus-secondary and distinct scenarios, eQTL N 200/400/700/1000/5000 x effect 0.05/0.12/0.3, r2 ~0.52, 10 reps/cell. Low power gives PP.H0/H1 dominance (PP.H3 <= 0.05), confirming the audit. PP.H3 appears only when both datasets are powered (N>=400 at effect 0.3, or N=5000 at 0.12), where per-replicate output is near-binary (about 40% of replicates PP.H3>0.8 for a truly shared signal; 20-rep distribution checked). Rewrote Trigger, Mechanism and Symptom in SKILL.md to this regime and dropped the "limited power" clause. | ran | Method-level change, evidence = the sweep. Trigger thresholds are for GWAS N=6000, rho=0.85 AR(1); labelled as simulation-specific. |
+| harmonise() had no strand-complement branch and no pitfall bullet | P2 | Added complement branch (non-palindromic only), step-2 text and a "Strand mismatch" pitfall bullet | ran (audit input7 data, block extracted from SKILL.md) | A/G vs T/C kept as same; A/G vs C/T kept and sign-flipped (audit's rs3 was mislabelled "no overlap": it is complement+swap); rs5 palindromic MAF>0.42 still dropped. |
+| HyPrColoc never executed | P2 | Built in WSL: fails on RcppEigen 0.3.4.x (Eigen 3.4 IndexedView, `align2.cpp`), builds on 0.3.3.9.4. Ran the SKILL snippet on 4 simulated traits (3 share rs30, 1 at rs60): cluster {GWAS, eQTL_t1, eQTL_t2}, rs30, posterior 1. Install note now states the RcppEigen pin; version claim fixed ("1.0+" -> 0.0.2, the GitHub DESCRIPTION version; R >= 3.6). | ran | Windows env build still not attempted; Linux route documented. knitr/rmarkdown are in Imports but unused (had to be stubbed from the scratch copy's DESCRIPTION to install). |
+
+Redundancy: nothing new to collapse; the 2026-09-18 pass stands. The old Trigger paragraph's r2=0.51-0.53 well-powered result is retained in condensed form inside the new Trigger.
+
+Left unfixed: none. Nothing needs Sam.

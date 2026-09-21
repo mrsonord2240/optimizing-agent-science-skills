@@ -44,3 +44,31 @@ audit) and all three now run clean against the same real dataset the audit used,
 checkable output (cell-type-split counts matching the audit's own run to within 1 cell; a real DA
 result with an interpretable SpatialFDR). Whether this clears the skill-auditor's execution-avg /
 assertion-pass-rate deployability floor is for the re-auditor to confirm.
+
+# Fix log: bio-single-cell-perturb-seq (2026-09-21)
+
+Second fix pass, from the 2026-09-19 re-audit (score 88, Production Ready; 2 open P1, 1 P2). Branch
+`fix/single-cell-perturb-seq`, worktree `F:\OpenScience\wt\single-cell-perturb-seq`. Env:
+`single-cell-transcriptomics-analyst` (pertpy 1.3.0, scanpy 1.12.4, R 4.4.3). SKILL.md is 287 lines
+after the fixes, under the 300-line split threshold, so no `references/` split.
+
+| finding | priority | change | verified | notes |
+|---|---|---|---|---|
+| SCEPTRE install instructions wrong (`install.packages('sceptre')`, "requires R >= 4.5") | P1 | Prerequisites: `remotes::install_github('Katsevich-Lab/sceptre')`; the R >= 4.5 bullet replaced by "GitHub-only, `R (>= 4.1)`, not on CRAN, install exits 0 having installed nothing"; SCEPTRE section's R >= 4.5 line replaced by a pointer to Prerequisites (one statement of the install); version line now "sceptre 0.99.0 from GitHub (checked 2026-09-21)"; `usage-guide.md` Prerequisites parenthetical no longer says R >= 4.5 | ran: installed sceptre 0.99.0 from GitHub into a scratchpad lib under R 4.4.3 (compiled clean); GitHub `DESCRIPTION` says `Depends: R (>= 4.1)`; `cran.r-project.org/web/packages/sceptre/index.html` returns 404 | Old claim came from `TOOLS.md` (a wrong diagnosis). `TOOLS.md` line 206 in the env is still wrong; not edited (outside the fixer's write scope) |
+| SCEPTRE snippet: `get_result(obj, analysis = 'discovery_analysis')` errors | P1 (found while verifying) | Changed to `analysis = 'run_discovery_analysis'`, with the three valid values in a comment | ran the SKILL's SCEPTRE block on sceptre's bundled `lowmoi_example_data` (20 responses x all targets, 400 pairs): `'discovery_analysis'` raises "`analysis` must be one of `run_calibration_check`, `run_power_check`, or `run_discovery_analysis`"; `'run_discovery_analysis'` returns 400 rows | Not in the audit report; the re-audit's own script used the correct name, the SKILL text did not |
+| `Mixscape.perturbation_signature` exceeds 20 GB on the full 20,729-cell dataset | P1 | Snippet and shipped `examples/pertpy_analysis.py` now densify `adata.X` and pass `batch_size=1000`; new "Memory" note under the Mixscape section with the numbers, the `ValueError` when `batch_size` meets sparse X, and the `ref_selection_mode='split_by'` option | ran on the real papalexi_2021 data with a 14 GB RSS watchdog: `batch_size=1000` + dense X finished in 113 s, peak 7.3 GB, KO/NP/NT = 4698/13645/2386; sparse X + `batch_size=1000` raises `ValueError: shape must have length in (2,). Got new_shape=(1000, 20, 18649)`. Docstring of `perturbation_signature` states `batch_size=None` runs "in the full mode, requiring more memory" | Full example re-run end to end: see the result line below. The `split_by` alternative is documented from the docstring only, not run |
+| scMAGeCK Bioconductor history wrong ("unreleased staging index") | P2 | Reworded to "released through Bioconductor 3.16, removed at 3.17", dated 2026-09-21 | ran: `bioconductor.org/packages/3.16/bioc/html/scMAGeCK.html` is 200, `/3.17/` is 404; the removed-packages page lists it under "removed with Bioconductor 3.17" | |
+
+Redundancy: the SCEPTRE install fact was stated three times in SKILL.md (Prerequisites code comment,
+Prerequisites bullet, SCEPTRE section) and once in `usage-guide.md`; it now lives in the Prerequisites
+bullet, with the SCEPTRE section and the guide pointing at it. Nothing the agent needs was deleted.
+
+## Left unfixed
+
+- Env `TOOLS.md` line 206 still says sceptre needs R >= 4.5 and is CRAN-gated: it is not part of the
+  Skill and the brief bars edits outside the fork and this log. Sam or the tooling owner should correct it.
+- `mixture` guide assignment (`assign_mixture_model`) was still not run: needs `pertpy[jax]` (`optax`,
+  `flax`, `numpyro`, `ott-jax`) in the shared venv, which the brief forbids installing into. The
+  `ImportError` and its fallback are documented and were reproduced by the full example run.
+- Milo/pseudobulk sections were not re-run this pass: untouched, verified in the 2026-09-19 pass.
+

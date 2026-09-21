@@ -92,6 +92,19 @@ repeated line costs the agent context.
 Verify by listing, in the fix log, every deleted passage and where its content now lives. Nothing
 the agent needs may leave the Skill. This is the one restructuring a fixer does.
 
+## Split long Skills into `references/`, and log what is left (2026-09-21)
+
+- **A `SKILL.md` over 300 lines gets split.** Move the method-specific blocks (one method, one tool, one
+  advanced model per file) into `references/<topic>.md` next to `SKILL.md`, verbatim, and leave a
+  "Reference Files" index in `SKILL.md` saying when to read each file, plus a pointer from the decision-tree
+  row that needs it. What every request needs (scope, decision tree, thresholds, Common Errors, install)
+  stays. Verify that no non-blank line was lost (compare the moved lines with the new files) and that every
+  moved R/Python/bash fence still parses. This overrides "no restructuring" for length only.
+- **Every finding you do not fix is logged with its reason**, in the fix log's "left unfixed" list and in
+  your final message: what it is, and why (needs an install the brief forbids, needs data that does not
+  exist, out of the Skill's scope, judged not a correction, and so on). "Not cheap" alone is not a reason;
+  say what the work needs.
+
 **Still not in scope:** broader coverage, new tools the Skill does not reference, restyling prose,
 rewriting what works. Keep diffs minimal. Never change the frontmatter `name`. Change `description`
 only if it is wrong, or to drop a claim you deleted under the rule above. Do not tune text toward the

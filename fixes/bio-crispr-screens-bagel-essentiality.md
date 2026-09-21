@@ -29,3 +29,33 @@ seeding recipe is in this Skill's SKILL.md under "Reproducibility: Fixing the Ra
 it rather than re-deriving; it documents the `-s` flag collision (build 115 declares `-s` for both
 `--use-small-sample` and `--seed`; the seed option wins) that would otherwise silently mislead a
 second fixer reading `--help` alone.
+
+
+## Round-3 fix pass — 2026-09-21
+
+Worktree `F:\OpenScience\wt\crispr-screens-bagel-essentiality`, branch `fix/crispr-screens-bagel-essentiality`,
+commit `d1aad70`. Fixer: Claude Sonnet 5. Runtime: BAGEL2 build 115 (Python 3.12, pandas 3.0.5,
+`crispr-screen-analyst` env); data = the audit's real HAP1 TKOv3 run outputs plus CEGv2/NEGv1/mouse CEG.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| Reference-set failures (species mismatch traceback, swapped `-e`/`-n` all-`nan` exit 0) have no runtime guard | P1 | Wrote `examples/check_bagel_inputs.py` (`pre`: reference overlap >=100 genes each, `-c` columns exist, `-e` mean LFC < `-n` mean LFC; `post`: >5% `nan` BF fails, warns if no BF>6). Wired into `examples/run_bagel2.sh`; SKILL.md gets "Pre-flight" and "Post-run check" paragraphs. Chose "write it" (audit asked for code; pandas installed) | ran | correct call: pre OK (646/684 ess, 797/926 non present; LFC -2.665 vs +0.131), post OK 18053/18053. Swapped: pre exit 1 (LFC reversed), post on real all-`nan` file exit 1 (0/18053). Mouse CEG: pre exit 1 (0/621). Bad `-c`: exit 1. `run_bagel2.sh` run end to end on the real data (control HAP1_T0, CV mode instead of `-b` for time) exit 0. `py_compile`, `bash -n` clean |
+| "clinical-grade" x4 with no practice boundary | P2 | Practice-boundary note at top of SKILL.md; "clinical-grade" -> "high-stringency"/"publication-grade" in SKILL.md and usage-guide | grep (no `clinical` left except the boundary note) | |
+| "Bootstrap CI is wide" symptom did not reproduce (0/200 STD>|BF|) | P2 | Failure Mode retitled "Thin per-gene coverage"; symptom is now implausibly large BF magnitude (top ~2,400 on 3 sgRNA/gene synthetic vs ~132 on real HAP1), CI-spanning-zero kept but marked not reliable; fix no longer claims bootstrapping cures it (only provides `STD`) | audit run 04 (synthetic data, auditor's numbers; not rerun) | |
+| (found) run_bagel2.sh comment called BF<-6 "negative selection" tumor suppressor, contradicting the Skill's own dropout rule | small | Comment corrected to point to `screen_type` gate | bash -n | |
+
+### Redundancy removed (each fact once)
+
+| deleted | now lives |
+|---|---|
+| usage-guide "What the Agent Will Do", Tips, Decision Cheat Sheet, Thresholds, Validation Checklist | SKILL.md (workflow, failure modes, ladder, interpret_bagel); usage-guide has a pointer paragraph |
+| usage-guide Tip: CN-amplified regions appear essential | SKILL.md new Failure Mode "Negative BF for known essentials..." |
+| usage-guide cheat sheet: drugZ for both directions, Chronos for panels, <4 sgRNA | SKILL.md Comparing section "Pick by case" and thin-coverage Failure Mode |
+| usage-guide Tip: BF>6 calibration may not hold outside cancer lines | SKILL.md non-cancer Failure Mode |
+| usage-guide Tip: "BAGEL2 calls more hits than MAGeCK under high variance" | dropped: unsupported by any run |
+| SKILL.md Common Errors table (7 rows) | Failure Modes, Reproducibility, thin-coverage entries (every row had a home) |
+| SKILL.md BF>6/12/30 rows in Quantitative Thresholds, 90%/FDR restatements, seed restatements (step 6, thresholds row, pre-fix commentary) | single BF ladder under "Precision-Recall Curve"; single Reproducibility section |
+| SKILL.md TS paragraph and Interpret "Approach" restating 86.5% result | one verified paragraph after `interpret_bagel` |
+
+Left unfixed: none. Not run: bootstrap (`-b -NB 1000`, ~20 min) end to end for `run_bagel2.sh`; the same `bf`
+call in `-b` mode was run in the earlier pass.

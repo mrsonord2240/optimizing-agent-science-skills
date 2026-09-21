@@ -31,3 +31,28 @@ MAGeCK `sgrna_summary.txt`, and BE-Hive git HEAD — not just checked in a scrat
 `bash -n`.
 
 Nothing left unfixed.
+
+## Round-3 fix pass — 2026-09-21
+
+Worktree `F:\OpenScience\wt\crispr-screens-base-editing-analysis`, branch `fix/crispr-screens-base-editing-analysis`.
+Latest audit (2026-09-16 re-audit, core 87): 1 P1, 1 P2. Runtime: env venv Python 3.12.13, pandas 3.0.5, biopython 1.88.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| `find_be_spacers()` raises bare `KeyError: 'n_bystanders'` when no candidate spacer exists | P1 | Return an empty DataFrame with the six result columns when `candidates` is empty | ran | Old function reproduced the KeyError on `'A'*60`; new one returns shape (0, 6) with the columns. Non-empty output on a seeded random 300nt CDS (target_aa=40) is identical to the old function's (`DataFrame.equals`). |
+| `find_be_spacers()` has no editor-name validation | P2 | `ValueError` listing valid editors | ran | Bad editor raises the ValueError. |
+| Lowercase-masked CDS silently finds no PAMs (audit's root cause for the empty case) | P2 (extra) | Upper-case `cds_sequence` after validation | ran | Lowercase input gives the same 25 candidates as uppercase. |
+| Docstring promised a `predicted_aa_changes` column the function never returns | P2 (extra) | Docstring now lists the real columns | read | Internal contradiction. |
+| `usage-guide.md` restated SKILL.md (dedup rule) | P2 | See below | read | |
+
+### Deleted passages and where the content lives
+
+- usage-guide "Prerequisites": `conda install` line -> SKILL.md Version Compatibility; BE-Hive and be-validation-pipeline clones already in SKILL.md; "Required inputs" -> SKILL.md "Broad be-validation-pipeline" section.
+- usage-guide "What the Agent Will Do" (13-step workflow): steps already in SKILL.md (window math, library design, filtering, CRISPResso flags in `examples/`, hit calling, bystander deconvolution, ratio, ClinVar); MOI 0.3 and Gini <0.1 -> new SKILL.md Quantitative Thresholds rows.
+- usage-guide "Tips": each already in SKILL.md (Failure Modes, Thresholds, Chemistry Selection); drugZ-vs-MAGeCK and "reuse the notebooks" -> SKILL.md be-validation-pipeline section; BE+PE gold standard -> Validation Strategy.
+- usage-guide "Chemistry Cheat Sheet": covered by SKILL.md Chemistry Selection table, its Decision rule and the Cas9 vs BE vs PE table.
+- usage-guide "Validation Strategy" table -> moved to SKILL.md as "Validation Strategy".
+
+Disagreement logged: usage-guide gave `--base_editor_output` in workflow text while SKILL.md/examples use `--base_edit` for CRISPRessoBatch; the usage-guide copy is gone, SKILL.md untouched there.
+
+Nothing left unfixed. Not run: no CRISPResso2/BE-Hive re-run (no change to those parts).

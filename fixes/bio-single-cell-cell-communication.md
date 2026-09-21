@@ -37,3 +37,28 @@ None of the three P1s or the P2 were left unfixed.
 - CellChat and nichenetr remain out of live-execution scope on this Windows box (GitHub-only packages,
   per `TOOLS.md`); their sections were not touched (audit found no defect in them beyond the P1 already
   covered by nichenetr's static review).
+
+---
+
+## 2026-09-21 fix pass (re-audit of 6d96d9c)
+
+Fixer for `single-cell/cell-communication`. Worktree `F:\OpenScience\wt\single-cell-cell-communication`, branch
+`fix/single-cell-cell-communication`. Env: `liana-venv` (cellphonedb 5.0.1, liana 1.10.0), real PBMC 1k v3 audit data.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| CellPhoneDB determinism verified only at threads=1, but the documented block used threads=4 (82/120,375 flags flipped across two seeded runs) | P1 | Documented call now `threads=1`; code comment and the `debug_seed` row of the rationale table say seeding is bit-reproducible only at threads=1 and use `threads>1` for exploration only | ran | Two runs of the exact block (iterations=100, threads=1, debug_seed=1337): p-value frames `equals` True, shape (535, 238). Chose the audit's option 1 (threads=1) plus the caveat, so the block and the table agree |
+| Condition Comparison had no sampling-noise warning or stability check (null split gave 27.6% gained/lost) | P1 | Added a "Stability check" paragraph and code: permute condition labels within cell type, repeat the comparison 10 times, report real gained+lost against the null range, flag pairs gained/lost in >=50% of null splits as noise-prone | ran | Own script on the audit's data with a stratified-random (true null) condition column: "real" 282 gained+lost vs null splits 290, 259 (inside the range, as it must be); 214/282 pairs noise-prone. The exact SKILL.md block was also extracted and run unchanged with 2 null repeats: real 282 vs null 279-294, no errors |
+| usage-guide.md Related Skills duplicated SKILL.md verbatim | P2 | Replaced by a one-line pointer to SKILL.md | read | |
+| SKILL.md was 308 lines after the fixes | length rule | Split into `references/cellphonedb.md`, `references/cellchat.md`, `references/nichenet.md` (the three method sections, verbatim); SKILL.md 234 lines, gets a Reference Files index and pointers from the three Method Decision Table rows | ran | Compared non-blank lines before/after: only the three decision-table rows changed (pointer added). Moved fences: python `ast.parse` OK; both R fences `parse()` OK via `rs.sh` (R 4.4.3) |
+
+### Redundancy pass
+
+- `usage-guide.md` Related Skills (8 lines) deleted; the list lives in SKILL.md Related Skills. Nothing unique.
+- No other repetition found: the Overview, Quick Start and Example Prompts are guide-only content.
+
+### Left unfixed
+
+None of the 2 P1s or the P2 left unfixed. Not run: the CellChat and NicheNet blocks (moved verbatim, parse-checked only)
+because CellChat and nichenetr are GitHub-only and not installed here (`TOOLS.md`); no defect was reported in them.
+

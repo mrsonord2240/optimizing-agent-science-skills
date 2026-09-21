@@ -39,3 +39,23 @@ Audit: `F:\OpenScience\audits\bio-proteomics-spectral-libraries\` (87, Productio
 ## Commit
 
 `fix(proteomics/spectral-libraries): document OpenSWATH decoy requirements, decoy determinism, deeplc 4.5 API, ms2pip model download`
+
+## 2026-09-21 second fix pass (re-audit 87: 1 P1, 2 P2)
+
+Worktree `F:\OpenScience\wt\proteomics-spectral-libraries`, branch `fix/proteomics-spectral-libraries`,
+commit `feda566`. OpenMS 3.5.0, pyteomics, koinapy 0.0.11 (mass-spec-proteomics-analyst env).
+
+| finding | priority | change | verified | notes |
+|---|---|---|---|---|
+| transition_group_id undocumented; peptides sharing a charge silently merge | P1 | SKILL.md "Convert Library Formats": required-columns list now `Annotation` + real m/z + `transition_group_id` (or `FullUniModPeptideName`); replaced the fragment snippet with a runnable `build_openswath_tsv`; `grep -c "<Peptide "` check after conversion; failure-mode section and Common Errors row merged | ran: minimal TSV without either grouping column -> `<Peptide id="_2">` x1, 0 decoys, threshold error; with either column 3/3; snippet output (4 precursors) -> 4 targets / 4 decoys | Either `transition_group_id` or `FullUniModPeptideName` prevents the merge (tested separately) |
+| `-method reverse` determinism overstated | P2 | pseudo-reverse now the recommended reproducible method; reverse noted as not always byte-identical | ran: 8 repeats -> reverse 3 distinct md5 (diff = last digits of isolation-window m/z float only), pseudo-reverse 1 md5 | Auditor saw 1 in 5; I saw 5 of 8 differing from the modal hash |
+| No peptide validation before Koina | P2 | `valid_prosit_peptide` (20 standard residues, length 7-30) and `InferenceServerException` handling added under "Generate a Predicted Library via Koina" | ran live: `LGGNEQVTRX` and a 60-mer flagged; validated batch returned rows; unvalidated batch raised | Koina returned a transient 504 once; retry succeeded |
+
+Redundancy pass: deleted from `usage-guide.md` "What the Agent Will Do" (restated the SKILL.md
+workflow), "Tips" (every bullet already in SKILL.md: RT calibration, NCE, 6 fragments, decoys,
+SpectraST), and the ms2pip download paragraph (Common Errors row in SKILL.md). The pip/CLI install line
+moved into SKILL.md Version Compatibility (plus pyteomics and OpenMS 3.5.0). Prerequisites in the guide
+now point at that section.
+
+Unfixed: none.
+
