@@ -14,7 +14,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The example passes cluster_rows=<OLO dendrogram> together with row_split=gene_info$pathway, a combination ComplexHeatmap rejects; the script was never run.
 - Fix: Drop row_split or use a numeric row_split (works with the dendrogram), or apply OLO within each pathway group; supply a runnable data preamble and state the constraint in SKILL.md next to the OLO block.
 
-## P1 (137)
+## P1 (142)
 
 ### `bio-data-visualization-distribution-plots` — The headline R raincloud depends on gghalves, archived and broken on ggplot2 4.x
 
@@ -207,6 +207,46 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: palette_examples.R demonstrates Set1 and an NPG-style vector as the 'qualitative' example, a custom diverging with unmatched luminance ends (L* 70.8 vs 54.1) whose near-zero points are white on white, and ends with Python names (coolwarm, tab10). palettes_phd.R defines no df or de_df, so ggplot fails with 'data cannot be a function'.
 - Root cause: Two examples written independently of the SKILL.md guidance; the second is a template.
 - Fix: Rewrite palette_examples.R with Okabe-Ito (named), scico batlow/vik and a visible midpoint (grey panel or outlined points); add a small simulated df/de_df to palettes_phd.R so it runs, and drop non-R names from the closing cat().
+
+### `bio-data-visualization-network-visualization` — examples/cytoscape_automation.py fails silently
+
+- Skill: 74, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/network-visualization) · [viewer](skills/bio-data-visualization-network-visualization/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 6
+- Problem: set_node_shape_mapping(..., mapping_type='d') raises TypeError on py4cytoscape 1.13.0 and the closing bare 'except Exception: pass' swallows it, so with Cytoscape running the example prints 'Network created', applies no style and writes no PDF/PNG.
+- Root cause: The function is always discrete and takes no mapping_type; the run block catches everything without reporting.
+- Fix: Drop mapping_type from the shape call, replace the bare except with one that prints the traceback, and pass overwrite_file=True to export_image.
+
+### `bio-data-visualization-network-visualization` — Community legend in network_plots.py mislabels communities
+
+- Skill: 74, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/network-visualization) · [viewer](skills/bio-data-visualization-network-visualization/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 3
+- Problem: Legend swatches use plt.cm.Set2(i) while nodes are coloured by a normalised community index, so 3 of the 4 legend colours differ from the node colours.
+- Root cause: cmap normalisation maps 0..3 to the ends of Set2, not to indices 0..3.
+- Fix: Colour nodes with [palette(node_to_community[n]) for n in G.nodes()] (or a ListedColormap with vmin=0, vmax=len(communities)-1) so legend and nodes share one mapping.
+
+### `bio-data-visualization-network-visualization` — PyVis from_nx destroys edge weights and mutates the graph
+
+- Skill: 74, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/network-visualization) · [viewer](skills/bio-data-visualization-network-visualization/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 5
+- Problem: After from_nx the graph has no 'weight' (moved into 'width'), so the second network in interactive_network.py gets uniform width 1.5 and its printed communities are computed on the mutated graph; the SKILL PyVis block also uses an undefined palette and never mentions Network(directed=True), so regulatory networks lose arrowheads.
+- Root cause: pyvis rewrites edge attributes in place and the recipes never copy the graph or define palette.
+- Fix: Call net.from_nx(G.copy()) or build with add_node/add_edge, compute communities before any from_nx, define palette in the block, and show Network(directed=True) for GRNs.
+
+### `bio-data-visualization-network-visualization` — SKILL.md code blocks are not runnable as written
+
+- Skill: 74, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/network-visualization) · [viewer](skills/bio-data-visualization-network-visualization/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 2, 4, 6
+- Problem: The layout block uses np without import and placeholder names; ggraph block 2 ends on a dangling '+' (parse error); the bundling block uses undefined graph/from_idx/to_idx and fails; the Cytoscape block never creates the 'degree' node attribute it maps, then silently keeps the default style.
+- Root cause: Fragments were written as prose sketches and not tested.
+- Fix: Make each block self-contained (imports, a small toy G, degree assigned with nx.set_node_attributes) and test them; add a working flare-based bundling example.
+
+### `bio-data-visualization-network-visualization` — Description promises recipes that do not exist
+
+- Skill: 74, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/network-visualization) · [viewer](skills/bio-data-visualization-network-visualization/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 2, 7
+- Problem: ForceAtlas2, hive plots, Datashader, adjustText labelling and Python edge bundling have no code; HiveNetX is not on PyPI; the usage-guide prompt for a 5000-node ForceAtlas2, bundled, rasterized network cannot be met (nx.spring_layout takes 104 s at n=5000).
+- Root cause: Decision-tree rows were added without matching recipes.
+- Fix: Add short tested recipes (nx.forceatlas2_layout in networkx >= 3.4, a Datashader raster of a large edge list, pyveplot or a hand-written hive), or remove the names from the description; replace HiveNetX with a real package.
 
 ### `bio-data-visualization-dimensionality-reduction-plots` — Rtsne seed=42 advice is silently ignored
 
@@ -1112,7 +1152,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (473)
+## P2 (476)
 
 ### `bio-data-visualization-distribution-plots` — Wrong bandwidth sentence: nrd (Scott) is 1.178x nrd0, so it oversmooths more
 
@@ -1249,6 +1289,30 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The guide repeats the Okabe-Ito hexes, symmetric-bounds, white-midpoint, grayscale, rainbow, brand-palette and custom-palette tips already in SKILL.md; khroma and colorcet are in the version line and install list but no code block or example uses them.
 - Root cause: Two documents maintained for the same content.
 - Fix: Keep prompts and prerequisites in the guide, reference SKILL.md for the tips, and either add a khroma/colorcet snippet or drop them from the install list.
+
+### `bio-data-visualization-network-visualization` — Hub-label rule and edge-width advice are not adaptive
+
+- Skill: 74, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/network-visualization) · [viewer](skills/bio-data-visualization-network-visualization/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 1, 8
+- Problem: 'degree >= 10' labels 43 of 100 nodes on a dense graph and 0 of 10 on the real STRING TP53 network; the edge-width one-liner raises KeyError on unweighted graphs and shows no normalisation although raw weights are sub-point widths.
+- Root cause: Fixed thresholds and unguarded attribute access.
+- Fix: Label the top-k (about 15-30) by degree or a quantile, use G[u][v].get('weight', 1) and rescale widths to 0.5-4 pt.
+
+### `bio-data-visualization-network-visualization` — Directed regulatory networks have no styling recipe
+
+- Skill: 74, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/network-visualization) · [viewer](skills/bio-data-visualization-network-visualization/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 2, 6, 8
+- Problem: Cytoscape draws no arrowheads by default (EDGE_TARGET_ARROW_SHAPE NONE, and the shipped style sets NONE), the '+'/'-' regulation sign is never encoded, and the networkx dot layout needs pydot plus Graphviz which the prerequisites do not list.
+- Root cause: The directed row of the decision tree has no recipe or prerequisites.
+- Fix: Add a GRN example: DiGraph, dot layout, arrowheads, colour by sign, and list pydot/Graphviz under Prerequisites.
+
+### `bio-data-visualization-network-visualization` — Stale or inexact statements
+
+- Skill: 74, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/network-visualization) · [viewer](skills/bio-data-visualization-network-visualization/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 2, 6
+- Problem: networkx >= 3.4 has forceatlas2_layout but the Skill points to fa2_modified or Gephi; ggraph 'graphopt' is labelled OpenOrd-style (it is not); the PyVis heading appears twice; the block writes network.pdf relative to Cytoscape's working directory.
+- Root cause: Version drift and unchecked comments.
+- Fix: Update the layout notes, use absolute output paths for Cytoscape exports and drop the heading duplication.
 
 ### `bio-data-visualization-dimensionality-reduction-plots` — openTSNE default statements are wrong for openTSNE
 
