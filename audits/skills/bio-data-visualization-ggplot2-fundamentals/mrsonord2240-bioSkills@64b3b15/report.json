@@ -1,0 +1,379 @@
+{
+  "meta": {
+    "skill_name": "bio-data-visualization-ggplot2-fundamentals",
+    "description": "Build publication-quality figures in R with ggplot2 using the grammar of graphics (data + aesthetics + geometries + scales + facets + themes) with CVD-safe palettes, cairo_pdf TrueType embedding, programmatic aes via tidy evaluation, and the theme_classic publication baseline. Use when producing static figures in R for papers, presentations, or reports.",
+    "evaluated_on": "2026-09-20",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Moderate",
+    "n_inputs": 5,
+    "source": "mrsonord2240/bioSkills@64b3b150c9b989c102f7ee69e0bb07c16842d894:data-visualization/ggplot2-fundamentals",
+    "audit_type": "first audit (unmodified upstream GPTomics/bioSkills)",
+    "executed": true,
+    "execution_note": "Executed 5/5 inputs plus a block-by-block run of every SKILL.md snippet. R 4.4.3 via r.sh (ggplot2 4.0.3, ggtext 0.2.0, ggrepel 0.9.8, ggrastr 1.0.2, patchwork 1.3.2) and every script re-run under r-gg35.sh (ggplot2 3.5.2); only differences: p$labels is empty until build on 4.0 and theme_classic's panel.grid element. Each figure was asserted on ggplot_build() layer data against the input (real Bioconductor airway DESeq2 results and counts; synthetic sets labelled per input), PDFs inspected with run/pdfinfo.py (fonts, MediaBox, images), TIFF with PIL, and the key PNGs opened. Shipped example run from run/skill (copy), clone untouched."
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "References (Wickham 2010 JCGS 19(1):3-28, Wickham 2016 ggplot2 2nd ed, Wilkinson 2005) are real; no fabricated statistic or DOI. Factual errors found (ggtext string, rasterize, 'blue') are recorded as P1/P2, not integrity failures."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Plotting Skill for research data; no diagnostic, prescriptive or patient-level content."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "No principled fallacy. The example volcano's dashed line at raw p = 0.05 beside padj-based colouring is a mislabelled threshold, recorded P1, not a fallacy that inverts a conclusion."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "Every R block and the shipped example parse and run on ggplot2 4.0.3 and 3.5.2. Faulty behaviour (literal \\u2212 label, ignored rasterize parameter, inert scale) produces a figure or warning rather than a crash and each has a working alternative documented in the recommendations."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 70,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 8,
+        "max": 12,
+        "note": "Covers grammar, geoms, scales, facets, theme, tidy eval, ggtext, export. Correctness 2/4: five verified factual errors (ggtext \\u2212 string, geom_point(rasterize=TRUE), aes(color='red') 'blue', ggrepel N>10 claim, label_log on free-y panels) plus a nonsense axis-line tip"
+      },
+      "reliability": {
+        "score": 7,
+        "max": 12,
+        "note": "Version-drift note says to introspect, but there is no error handling or verification step; silent failures (unknown parameter rasterize, inert scale_color_manual, {{ }} with strings) are not called out"
+      },
+      "performance_context": {
+        "score": 6,
+        "max": 8,
+        "note": "283-line SKILL.md plus a short usage guide, one example; a little repetition between SKILL.md and usage-guide.md"
+      },
+      "agent_usability": {
+        "score": 10,
+        "max": 16,
+        "note": "Clear layered structure and a good Common Failure Modes section; inconsistent doctrine (cairo_pdf/mm/Okabe-Ito in SKILL.md, default pdf/inches/Set1/Set2/NPG colours in the shipped example), no instruction to open or verify the output"
+      },
+      "human_usability": {
+        "score": 6,
+        "max": 8,
+        "note": "Natural trigger wording and example prompts; strict-example forgiveness is fine for R, but the usage guide's 'panel.grid.off' and 'remove top/right axis lines with element_line()' would mislead"
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "No credentials or network; tidy eval used correctly (.data pronoun, no eval(parse())); writes only to paths the caller supplies"
+      },
+      "maintainability": {
+        "score": 8,
+        "max": 12,
+        "note": "One SKILL.md, one usage guide, one example file, clean separation; no tests or version-pinned expectations, example not exercised by anything"
+      },
+      "agent_specific": {
+        "score": 14,
+        "max": 20,
+        "note": "Description precise; related skills are named and exist; jitter and ggrepel are unseeded so figures are not reproducible; no escape hatch for when a figure is better made elsewhere or how to check it"
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 78.8,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 16,
+      "total": 25
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Publication volcano of real airway DESeq2 results, 89 mm cairo_pdf + 300 dpi PNG",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Data and colours correct; SKILL.md's own ggtext y-label prints a literal backslash-u2212; top-10 Ensembl labels overlap at 89 mm",
+        "basic": 32,
+        "specialized": 48,
+        "assertions": [
+          {
+            "text": "Colour mapping matches the input: 541 Up / 497 Down / 17,200 NS, all Up points have log2FC > 1",
+            "result": "PASS",
+            "note": "layer_data colours counted against an independent dplyr classification of the CSV"
+          },
+          {
+            "text": "cairo_pdf output is 89 x 70 mm with embedded TrueType fonts and no Type 3",
+            "result": "PASS",
+            "note": "pdfinfo.py: MediaBox 252 x 198 pt (88.9 x 69.8 mm), 3 FontFile2, 0 Type3; default ggsave gives unembedded Helvetica, as the Skill says"
+          },
+          {
+            "text": "PNG is 89 mm at 300 dpi (1051 x 827 px), non-blank",
+            "result": "PASS",
+            "note": "1051 x 826 px, nonwhite 0.099, opened"
+          },
+          {
+            "text": "The ggtext y-axis title from SKILL.md renders a minus sign",
+            "result": "FAIL",
+            "note": "'\\u2212' inside single quotes in R source is a literal backslash-u2212; the opened PNG shows '\\u2212log10(p)'"
+          },
+          {
+            "text": "Top-10 gene labels are legible and not overplotted",
+            "result": "FAIL",
+            "note": "max.overlaps = Inf forces all 10 labels but ENSG ids overlap each other in the opened 89 mm PNG; Skill gives no label-size or force guidance"
+          }
+        ],
+        "total": 80,
+        "assertions_total": 5,
+        "assertions_passed": 3
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Faceted box + jitter per tissue, free y, log10 axis (synthetic, seed 42)",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Verbatim 'Grammar in Layers' block runs but scale_color_manual is inert, outliers are drawn twice and label_log() gives 10^3.48 style labels; corrected version verified",
+        "basic": 30,
+        "specialized": 44,
+        "assertions": [
+          {
+            "text": "facet_wrap(~tissue, ncol = 3, scales = 'free_y') yields 1 x 3 panels with independent y ranges",
+            "result": "PASS",
+            "note": "3 panels ROW 1 COL 1-3; Liver/Brain upper y limits differ 223x"
+          },
+          {
+            "text": "Box statistics equal quantile(type 7) of log10 of the raw data for all 9 boxes; whiskers follow 1.5 IQR",
+            "result": "PASS",
+            "note": "asserted on layer_data to 1e-9; stats are computed on the log scale"
+          },
+          {
+            "text": "Corrected plot maps colour to condition correctly (Treatment orange sits highest in Liver, 36 points per colour)",
+            "result": "PASS",
+            "note": "layer_data colour vs y"
+          },
+          {
+            "text": "The Skill's verbatim block honours its own rule 'always suppress outliers when overlaying jitter'",
+            "result": "FAIL",
+            "note": "block has no outlier.shape = NA: 2 outlier points drawn beneath the jitter (opened i2_verbatim.png)"
+          },
+          {
+            "text": "The verbatim block's scale_color_manual takes effect",
+            "result": "FAIL",
+            "note": "no colour aesthetic is mapped, the scale is inert; points stay black (opened)"
+          }
+        ],
+        "total": 74,
+        "assertions_total": 5,
+        "assertions_passed": 3
+      },
+      {
+        "index": 3,
+        "type": "Variant B",
+        "label": "Programmatic plotting with tidy eval on a real PCA of airway counts",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": ".data[[var]], {{ }}, !!sym() all give identical layer data; missing column error names the column; {{ }} with strings silently draws a constant",
+        "basic": 36,
+        "specialized": 52,
+        "assertions": [
+          {
+            "text": "plot_var(df,'PC1','PC2') plots exactly the prcomp scores and titles the axes PC1/PC2",
+            "result": "PASS",
+            "note": "layer_data x,y equal df$PC1,df$PC2; get_labs gives PC1/PC2 on 4.0.3 (p$labels is empty until build) and 3.5.2"
+          },
+          {
+            "text": "plot_var2 with bare names and the !!sym() variant give identical data; a column with a space works",
+            "result": "PASS",
+            "note": "all.equal on layer data"
+          },
+          {
+            "text": "aes_string() still draws but warns, as the Skill states",
+            "result": "PASS",
+            "note": "warning '`aes_string()` was deprecated in ggplot2 3.0.0.' on both ggplot2 versions"
+          },
+          {
+            "text": "Shipped create_pca_plot colours by dex, shapes by cell, axis labels carry the variance explained",
+            "result": "PASS",
+            "note": "4 trt / 4 untrt colours, 4 shapes, 'PC1 (42.2%)' matches prcomp; opened"
+          },
+          {
+            "text": "plot_var2 called with strings (the plot_var calling style) fails loudly",
+            "result": "FAIL",
+            "note": "silently maps the constant string: one point column, only a 'aesthetics have length 1' warning; Skill does not warn"
+          }
+        ],
+        "total": 88,
+        "assertions_total": 5,
+        "assertions_passed": 4
+      },
+      {
+        "index": 4,
+        "type": "Edge",
+        "label": "50,000-point scatter: rasterisation and PDF/PNG/TIFF export (synthetic, seed 7)",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "geom_point(rasterize = TRUE) is not a ggplot2 3.5+ feature: unknown parameter, points stay vector (1.85 MB); ggrastr recipe works (85 KB)",
+        "basic": 32,
+        "specialized": 46,
+        "assertions": [
+          {
+            "text": "geom_point(..., rasterize = TRUE) rasterises the layer ('ggplot2 3.5+ inline')",
+            "result": "FAIL",
+            "note": "warning 'Ignoring unknown parameters: rasterize' on 3.5.2 and 4.0.3; PDF has 0 images and 1,850,716 bytes"
+          },
+          {
+            "text": "ggrastr::rasterise(geom_point(), dpi = 300) with cairo_pdf keeps axes/text vector and shrinks the file",
+            "result": "PASS",
+            "note": "85,303 bytes, 2 image objects, fonts still TrueType, layer keeps 50,000 rows"
+          },
+          {
+            "text": "ggsave TIFF with compression = 'lzw' is LZW at 300 dpi",
+            "result": "PASS",
+            "note": "PIL: tiff_lzw, tag 259 = 5, dpi (300, 300), 1051 x 826"
+          },
+          {
+            "text": "PNG at 89 mm / 300 dpi is 1051 px wide and non-blank",
+            "result": "PASS",
+            "note": "1051 x 826, nonwhite 0.287"
+          },
+          {
+            "text": "The recommended large-N figure is readable",
+            "result": "FAIL",
+            "note": "with alpha 0.5 and default size 50,000 points saturate to a solid black blob (opened); the Skill advises rasterising but says nothing about overplotting"
+          }
+        ],
+        "total": 78,
+        "assertions_total": 5,
+        "assertions_passed": 3
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Shipped examples/publication_figures.R end to end: volcano, boxplot, PCA, 3- and 4-panel figure",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Runs and the numbers are right, but the dashed threshold line is p = 0.05 while colours use padj < 0.05 (1,617 grey genes above it) and save_publication_figure breaks the Skill's own cairo_pdf/mm rule",
+        "basic": 30,
+        "specialized": 44,
+        "assertions": [
+          {
+            "text": "Volcano colour counts equal an independent classification of all 19,772 genes (NA padj kept as NS)",
+            "result": "PASS",
+            "note": "541 / 497 / 18,734"
+          },
+          {
+            "text": "The 10 labels are the 10 smallest padj genes; boxplot medians equal the raw per-group medians",
+            "result": "PASS",
+            "note": "setequal on gene ids; medians all.equal"
+          },
+          {
+            "text": "3- and 4-panel patchwork figures build with tags A-C / A-D and saved PNGs are 3000 x 2100 and non-blank",
+            "result": "PASS",
+            "note": "opened i5_multi3.png and i5_multi4.png"
+          },
+          {
+            "text": "The volcano's dashed horizontal line marks the boundary that colours the points",
+            "result": "FAIL",
+            "note": "line at -log10(0.05) = 1.301 (raw p) but colours use padj < 0.05: 1,617 genes above the line are grey, and coloured points start at 1.956"
+          },
+          {
+            "text": "save_publication_figure follows the Skill's doctrine (cairo_pdf, mm)",
+            "result": "FAIL",
+            "note": "uses default pdf() in inches: PDF has unembedded Helvetica/Symbol (2 Type1, 0 FontFile); the example also draws '− Log10 P − value' with a spaced stray minus"
+          }
+        ],
+        "total": 74,
+        "assertions_total": 5,
+        "assertions_passed": 3
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 28.0,
+    "dynamic_weighted": 47.3,
+    "score": 75,
+    "max": 100,
+    "grade": "Beta Only",
+    "grade_symbol": "⚠️",
+    "deployable": false,
+    "veto_override": false,
+    "grade_note": "Numeric score 75 is in the Limited Release band, but the assertion pass rate 16/25 (64%) is below the 80% Limited Release floor in scoring_rubric.md section 5, so the grade drops one tier to Beta Only. No veto fired and no P0 is open."
+  },
+  "key_strengths": [
+    "Core grammar, tidy evaluation (.data[[var]], {{ }}, !!sym()), facet, scale and theme guidance is correct: all 30+ snippets build on ggplot2 4.0.3 and 3.5.2 and the numbers behind the plots match the input",
+    "cairo_pdf and mm-based export advice is verified: 89 x 70 mm PDF, 3 embedded TrueType fonts, 0 Type 3; default ggsave leaves unembedded Helvetica exactly as claimed",
+    "ggrastr::rasterise recipe cuts a 50,000-point PDF from 1.85 MB to 85 KB with vector text intact; TIFF LZW verified",
+    "Common Failure Modes section targets real pitfalls (units, aes vs constant, aes_string, linewidth) and the aes_string and linewidth warnings reproduce as described"
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "ggtext '\\u2212' label prints a literal backslash sequence",
+      "observed_in": [
+        1
+      ],
+      "problem": "The Labels-with-ggtext snippet writes y = '\\u2212log<sub>10</sub>(*p*)'; in R source that is backslash-u2212, so the opened PNG shows '\\u2212log10(p)' instead of a minus sign.",
+      "root_cause": "A JSON/Python-style escape was pasted into an R single-quoted string.",
+      "fix": "Use '\\u2212' with a single backslash ('−log<sub>10</sub>(*p*)') or the literal character, and add a note to open the rendered label."
+    },
+    {
+      "priority": "P1",
+      "title": "geom_point(rasterize = TRUE) is not a ggplot2 3.5+ feature",
+      "observed_in": [
+        4
+      ],
+      "problem": "The Common Geoms block claims inline rasterisation in ggplot2 3.5+. On 3.5.2 and 4.0.3 it is ignored ('Ignoring unknown parameters: rasterize'), the PDF stays all-vector (1.85 MB, 0 images) and the failure is only a warning.",
+      "root_cause": "Confusion between ggplot2 and ggrastr::geom_point_rast/rasterise.",
+      "fix": "Delete the inline claim and keep only ggrastr::rasterise(geom_point(), dpi = 300); add that overplotting at large N also needs smaller points, alpha, hexbin or density."
+    },
+    {
+      "priority": "P1",
+      "title": "'Grammar in Layers' block contradicts the Skill's own rules",
+      "observed_in": [
+        2
+      ],
+      "problem": "The block calls scale_color_manual without mapping colour (inert), keeps default boxplot outliers under geom_jitter (drawn twice, against the 'always suppress' rule) and label_log() on default free-y breaks yields labels such as 10^3.48 and 10^2.7.",
+      "root_cause": "Block written as a syntax tour, never rendered.",
+      "fix": "Map colour = condition, add outlier.shape = NA, and use scale_y_log10() with breaks_log() or plain labels; note the y-axis title 'Expression (log10)' clashes with 10^n tick labels."
+    },
+    {
+      "priority": "P1",
+      "title": "Shipped example: threshold line, save function and axis label",
+      "observed_in": [
+        5
+      ],
+      "problem": "create_volcano draws the dashed line at -log10(fdr_threshold) on raw p while colouring by padj (1,617 genes above the line are grey); save_publication_figure uses default pdf() in inches (unembedded Helvetica) against the Skill's own cairo_pdf + mm rule; expression(-Log[10]~P-value) draws a spaced '− Log10 P − value'.",
+      "root_cause": "Example was not checked against the doctrine or against the numbers behind the plot.",
+      "fix": "Drop the horizontal line or compute it as the smallest -log10(p) with padj < fdr; pass device = cairo_pdf and units = 'mm'; label with expression(-log[10](italic(p)))."
+    },
+    {
+      "priority": "P2",
+      "title": "Failure-mode claims that do not reproduce",
+      "observed_in": [],
+      "problem": "aes(color='red') points render #F8766D salmon (not 'blue'); ggrepel drops labels because of overlaps, not N > 10 (60 spread labels all drawn; 400 dense labels: 74 text grobs vs 405 with Inf) and no warning was observed at draw time in a non-interactive run.",
+      "root_cause": "Claims written from memory.",
+      "fix": "Correct the colour statement, state the real trigger for label loss and tell the agent to count drawn labels."
+    },
+    {
+      "priority": "P2",
+      "title": "Minor doctrine and reproducibility gaps",
+      "observed_in": [
+        1,
+        3
+      ],
+      "problem": "usage-guide tip 'remove top/right axis lines with theme(axis.line = element_line())' does nothing (theme_classic has no top/right axes); panel.grid = element_blank() is redundant on 4.0.3; jitter and ggrepel are unseeded; {{ x_var }} with a string silently draws a constant; Set1 in create_pca_plot fails above 9 groups; ggplot2 4.0 builds labels at print time so p$labels is empty.",
+      "root_cause": "Tips not tested against a rendered figure or the current ggplot2.",
+      "fix": "Remove the axis-line tip, add position_jitter(seed=) and geom_text_repel(seed=), warn about {{ }} with strings, and note get_labs() for ggplot2 4."
+    }
+  ]
+}

@@ -14,7 +14,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The example passes cluster_rows=<OLO dendrogram> together with row_split=gene_info$pathway, a combination ComplexHeatmap rejects; the script was never run.
 - Fix: Drop row_split or use a numeric row_split (works with the dendrogram), or apply OLO within each pathway group; supply a runnable data preamble and state the constraint in SKILL.md next to the OLO block.
 
-## P1 (113)
+## P1 (117)
 
 ### `bio-data-visualization-distribution-plots` — The headline R raincloud depends on gghalves, archived and broken on ggplot2 4.x
 
@@ -95,6 +95,38 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: palette_examples.R demonstrates Set1 and an NPG-style vector as the 'qualitative' example, a custom diverging with unmatched luminance ends (L* 70.8 vs 54.1) whose near-zero points are white on white, and ends with Python names (coolwarm, tab10). palettes_phd.R defines no df or de_df, so ggplot fails with 'data cannot be a function'.
 - Root cause: Two examples written independently of the SKILL.md guidance; the second is a template.
 - Fix: Rewrite palette_examples.R with Okabe-Ito (named), scico batlow/vik and a visible midpoint (grey panel or outlined points); add a small simulated df/de_df to palettes_phd.R so it runs, and drop non-R names from the closing cat().
+
+### `bio-data-visualization-ggplot2-fundamentals` — ggtext '\u2212' label prints a literal backslash sequence
+
+- Skill: 75, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/ggplot2-fundamentals) · [viewer](skills/bio-data-visualization-ggplot2-fundamentals/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 1
+- Problem: The Labels-with-ggtext snippet writes y = '\u2212log<sub>10</sub>(*p*)'; in R source that is backslash-u2212, so the opened PNG shows '\u2212log10(p)' instead of a minus sign.
+- Root cause: A JSON/Python-style escape was pasted into an R single-quoted string.
+- Fix: Use '\u2212' with a single backslash ('−log<sub>10</sub>(*p*)') or the literal character, and add a note to open the rendered label.
+
+### `bio-data-visualization-ggplot2-fundamentals` — geom_point(rasterize = TRUE) is not a ggplot2 3.5+ feature
+
+- Skill: 75, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/ggplot2-fundamentals) · [viewer](skills/bio-data-visualization-ggplot2-fundamentals/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 4
+- Problem: The Common Geoms block claims inline rasterisation in ggplot2 3.5+. On 3.5.2 and 4.0.3 it is ignored ('Ignoring unknown parameters: rasterize'), the PDF stays all-vector (1.85 MB, 0 images) and the failure is only a warning.
+- Root cause: Confusion between ggplot2 and ggrastr::geom_point_rast/rasterise.
+- Fix: Delete the inline claim and keep only ggrastr::rasterise(geom_point(), dpi = 300); add that overplotting at large N also needs smaller points, alpha, hexbin or density.
+
+### `bio-data-visualization-ggplot2-fundamentals` — 'Grammar in Layers' block contradicts the Skill's own rules
+
+- Skill: 75, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/ggplot2-fundamentals) · [viewer](skills/bio-data-visualization-ggplot2-fundamentals/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 2
+- Problem: The block calls scale_color_manual without mapping colour (inert), keeps default boxplot outliers under geom_jitter (drawn twice, against the 'always suppress' rule) and label_log() on default free-y breaks yields labels such as 10^3.48 and 10^2.7.
+- Root cause: Block written as a syntax tour, never rendered.
+- Fix: Map colour = condition, add outlier.shape = NA, and use scale_y_log10() with breaks_log() or plain labels; note the y-axis title 'Expression (log10)' clashes with 10^n tick labels.
+
+### `bio-data-visualization-ggplot2-fundamentals` — Shipped example: threshold line, save function and axis label
+
+- Skill: 75, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/ggplot2-fundamentals) · [viewer](skills/bio-data-visualization-ggplot2-fundamentals/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 5
+- Problem: create_volcano draws the dashed line at -log10(fdr_threshold) on raw p while colouring by padj (1,617 genes above the line are grey); save_publication_figure uses default pdf() in inches (unembedded Helvetica) against the Skill's own cairo_pdf + mm rule; expression(-Log[10]~P-value) draws a spaced '− Log10 P − value'.
+- Root cause: Example was not checked against the doctrine or against the numbers behind the plot.
+- Fix: Drop the horizontal line or compute it as the smallest -log10(p) with padj < fdr; pass device = cairo_pdf and units = 'mm'; label with expression(-log[10](italic(p))).
 
 ### `bio-data-visualization-matplotlib-fundamentals` — boxplot(labels=) removed in matplotlib 3.11
 
@@ -920,7 +952,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (457)
+## P2 (459)
 
 ### `bio-data-visualization-distribution-plots` — Wrong bandwidth sentence: nrd (Scott) is 1.178x nrd0, so it oversmooths more
 
@@ -993,6 +1025,22 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The guide repeats the Okabe-Ito hexes, symmetric-bounds, white-midpoint, grayscale, rainbow, brand-palette and custom-palette tips already in SKILL.md; khroma and colorcet are in the version line and install list but no code block or example uses them.
 - Root cause: Two documents maintained for the same content.
 - Fix: Keep prompts and prerequisites in the guide, reference SKILL.md for the tips, and either add a khroma/colorcet snippet or drop them from the install list.
+
+### `bio-data-visualization-ggplot2-fundamentals` — Failure-mode claims that do not reproduce
+
+- Skill: 75, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/ggplot2-fundamentals) · [viewer](skills/bio-data-visualization-ggplot2-fundamentals/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: —
+- Problem: aes(color='red') points render #F8766D salmon (not 'blue'); ggrepel drops labels because of overlaps, not N > 10 (60 spread labels all drawn; 400 dense labels: 74 text grobs vs 405 with Inf) and no warning was observed at draw time in a non-interactive run.
+- Root cause: Claims written from memory.
+- Fix: Correct the colour statement, state the real trigger for label loss and tell the agent to count drawn labels.
+
+### `bio-data-visualization-ggplot2-fundamentals` — Minor doctrine and reproducibility gaps
+
+- Skill: 75, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/ggplot2-fundamentals) · [viewer](skills/bio-data-visualization-ggplot2-fundamentals/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 1, 3
+- Problem: usage-guide tip 'remove top/right axis lines with theme(axis.line = element_line())' does nothing (theme_classic has no top/right axes); panel.grid = element_blank() is redundant on 4.0.3; jitter and ggrepel are unseeded; {{ x_var }} with a string silently draws a constant; Set1 in create_pca_plot fails above 9 groups; ggplot2 4.0 builds labels at print time so p$labels is empty.
+- Root cause: Tips not tested against a rendered figure or the current ggplot2.
+- Fix: Remove the axis-line tip, add position_jitter(seed=) and geom_text_repel(seed=), warn about {{ }} with strings, and note get_labs() for ggplot2 4.
 
 ### `bio-data-visualization-matplotlib-fundamentals` — Fragments are not self-contained
 

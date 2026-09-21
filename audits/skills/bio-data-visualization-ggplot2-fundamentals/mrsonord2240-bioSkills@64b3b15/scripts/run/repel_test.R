@@ -1,0 +1,20 @@
+source("F:/OpenScience/audits/bio-data-visualization-ggplot2-fundamentals/run/common.R")
+suppressPackageStartupMessages(library(ggrepel))
+set.seed(3); d <- data.frame(x = rnorm(60, sd = 0.05), y = rnorm(60, sd = 0.05), label = paste0("gene", 1:60))
+cnt <- function(p) {
+  W <- character(0); f <- tempfile(fileext = ".png"); png(f, 800, 600)
+  withCallingHandlers(print(p), warning = function(w) { W <<- c(W, conditionMessage(w)); invokeRestart("muffleWarning") })
+  g <- grid::grid.force(); nm <- grid::grid.ls(g, print = FALSE)$name; dev.off()
+  list(n_text = sum(grepl("^textrepel", nm)), W = W)
+}
+p_def <- ggplot(d, aes(x, y)) + geom_point() + geom_text_repel(aes(label = label))
+p_inf <- ggplot(d, aes(x, y)) + geom_point() + geom_text_repel(aes(label = label), max.overlaps = Inf)
+r1 <- withCallingHandlers({ png(tempfile(fileext=".png"), 800, 600); print(p_def); dev.off() }, warning = function(w) { cat("WARNING at draw:", conditionMessage(w), "\n"); invokeRestart("muffleWarning") }, message = function(m) { cat("MESSAGE at draw:", conditionMessage(m)); invokeRestart("muffleMessage") })
+ggsave(file.path(OUT, "repel_def.png"), p_def, width = 5, height = 4, dpi = 100); ggsave(file.path(OUT, "repel_inf.png"), p_inf, width = 5, height = 4, dpi = 100)
+# dense case: 400 labels in a 5x4 in panel
+set.seed(4); d2 <- data.frame(x = rnorm(400, sd = 0.05), y = rnorm(400, sd = 0.05), label = paste0("gene", 1:400))
+pd <- ggplot(d2, aes(x, y)) + geom_point() + geom_text_repel(aes(label = label))
+withCallingHandlers({ png(tempfile(fileext=".png"), 500, 400); print(pd); dev.off() }, warning = function(w) { cat("DENSE default WARNING at draw:", conditionMessage(w), "\n"); invokeRestart("muffleWarning") })
+pi2 <- ggplot(d2, aes(x, y)) + geom_point() + geom_text_repel(aes(label = label), max.overlaps = Inf)
+withCallingHandlers({ png(tempfile(fileext=".png"), 500, 400); print(pi2); dev.off() }, warning = function(w) { cat("DENSE Inf WARNING at draw:", conditionMessage(w), "\n"); invokeRestart("muffleWarning") })
+cat("done\n")
