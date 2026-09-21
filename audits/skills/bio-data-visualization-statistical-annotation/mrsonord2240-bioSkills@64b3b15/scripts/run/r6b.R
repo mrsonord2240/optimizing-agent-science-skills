@@ -1,0 +1,11 @@
+suppressPackageStartupMessages({library(ggpubr); library(rstatix); library(dplyr)})
+D <- "F:/OpenScience/audits/bio-data-visualization-statistical-annotation"
+cat("stat_compare_means formals:", paste(names(formals(stat_compare_means)), collapse=", "), "\n")
+cat("has p.adjust.method formal:", "p.adjust.method" %in% names(formals(stat_compare_means)), " compare_means has:", "p.adjust.method" %in% names(formals(compare_means)), "\n")
+tg <- read.csv(file.path(D, "data", "three_group.csv")); tg$group <- factor(tg$group)
+r <- rank(tg$value); N <- nrow(tg); ni <- table(tg$group); rb <- tapply(r, tg$group, mean); tie <- table(tg$value); C <- 1 - sum(tie^3 - tie)/(N^3 - N)
+z <- sapply(list(c("Control","Treatment"), c("Control","Vehicle"), c("Treatment","Vehicle")), function(g) (rb[[g[1]]] - rb[[g[2]]]) / sqrt((N*(N+1)/12) * C * (1/ni[[g[1]]] + 1/ni[[g[2]]])))
+p <- 2*pnorm(-abs(z)); cat("manual Dunn z:", signif(z,4), " p:", signif(p,4), " holm:", signif(p.adjust(p,"holm"),4), "\n")
+cat("rstatix dunn_test p:", signif(dunn_test(tg, value ~ group)$p,4), "\n")
+cat("fdr==BH:", isTRUE(all.equal(p.adjust(p,"fdr"), p.adjust(p,"BH"))), "\n"); print(round(1-0.95^c(3,6,15),3))
+fd <- read.csv(file.path(D, "data", "four_group.csv")); th <- tukey_hsd(fd, value ~ group); print(th[, c("group1","group2","p.adj")]); print(round(TukeyHSD(aov(value~group, fd))$group[, "p adj"],4))

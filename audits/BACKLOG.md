@@ -14,7 +14,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The example passes cluster_rows=<OLO dendrogram> together with row_split=gene_info$pathway, a combination ComplexHeatmap rejects; the script was never run.
 - Fix: Drop row_split or use a numeric row_split (works with the dendrogram), or apply OLO within each pathway group; supply a runnable data preamble and state the constraint in SKILL.md next to the OLO block.
 
-## P1 (117)
+## P1 (122)
 
 ### `bio-data-visualization-distribution-plots` — The headline R raincloud depends on gghalves, archived and broken on ggplot2 4.x
 
@@ -47,6 +47,46 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: df, df_small, df_med, df_large and df_paired are never created (df falls through to stats::df); with data, the small-N panel labels every group n=80 above 15 points because n_per_group is computed on df; count(group) also counts NA rows.
 - Root cause: Example written as a fragment and N derived once from an unrelated frame.
 - Fix: Build the five frames at the top (or read a shipped CSV), compute N per plot from the plotted frame with sum(!is.na(value)), and add a runnable data file.
+
+### `bio-data-visualization-statistical-annotation` — stat_compare_means(comparisons, p.adjust.method='holm') draws unadjusted p; the argument does not exist
+
+- Skill: 71.2, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/statistical-annotation) · [viewer](skills/bio-data-visualization-statistical-annotation/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 1, 3
+- Problem: The headline ggpubr block and the second overall-plus-pairwise block label brackets from raw per-pair tests. On the border data raw stars * *** * are drawn where Holm gives ns *** ns; on the canonical data Treatment-Vehicle shows ** (raw 0.0054) where Holm 0.0163 is *. formals(stat_compare_means) has no p.adjust.method and ggpubr 1.0.0 states that comparisons show unadjusted p. The shipped example's ggsignif section repeats it (three unadjusted wilcox pairs, 'NS.' labels) right after its own Holm step.
+- Root cause: The Skill assumes stat_compare_means forwards p.adjust.method to compare_means; it does only for the ref.group route (and then via ... it is ignored).
+- Fix: Make the rstatix route the default (pairwise_wilcox_test(p.adjust.method='holm') \|> add_xy_position() + stat_pvalue_manual(label='p.adj.signif')) or ggpubr's geom_pwc(method='wilcox_test', p.adjust.method='holm', label='p.adj.signif'), both verified against independent p.adjust; delete p.adjust.method from the stat_compare_means calls and say that comparisons= is unadjusted; for ggsignif pass the adjusted stars via annotations= (manual) rather than test=.
+
+### `bio-data-visualization-statistical-annotation` — statannotations holm and BH do not change the displayed p or stars
+
+- Skill: 71.2, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/statistical-annotation) · [viewer](skills/bio-data-visualization-statistical-annotation/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 1, 3, 4
+- Problem: With comparisons_correction='holm' the text is the raw-p star plus ' (ns)' when significance is lost; the SKILL's own block prints ** for a Holm p of 0.0219 (*), and on four groups *** for Holm p 0.0014-0.0043 (**). 'simple' and 'full' print raw p. Only 'bonferroni' rewrites p.
+- Root cause: statannotations treats Holm and BH as 'type 1' corrections that reinterpret significance; the Skill presents the option as if it produced adjusted p.
+- Fix: Say so, and give the working route: compute adjusted p (scipy/statsmodels multipletests) and call annotator.set_pvalues(adjusted); annotator.annotate() (verified: ns * ns), or use 'bonferroni'.
+
+### `bio-data-visualization-statistical-annotation` — False claim that stat_compare_means defaults to a t-test
+
+- Skill: 71.2, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/statistical-annotation) · [viewer](skills/bio-data-visualization-statistical-annotation/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 7
+- Problem: 'The Single Most Important Modern Insight', the '# explicit; default is t-test' comment, the first Failure Mode and usage-guide Tip 1 all say the default is a t-test. ggpubr 1.0.0 defaults to Wilcoxon (two groups) and Kruskal-Wallis (more groups).
+- Root cause: Confuses stat_compare_means with t.test; the failure mode 'Symptom: significant t, rank test n.s.' cannot arise from the default.
+- Fix: Rewrite the section: the danger is choosing method='t.test' on skewed small-n data, or trusting a Wilcoxon default for paired or nested data without checking; keep the explicit-method advice.
+
+### `bio-data-visualization-statistical-annotation` — Shipped example: paired section crashes, Kruskal label overlaps, 'Cliff d' is r
+
+- Skill: 71.2, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/statistical-annotation) · [viewer](skills/bio-data-visualization-statistical-annotation/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 1, 2, 6
+- Problem: Section 5 fails with 'can't find the y.position variable' (stat_pvalue_manual without add_xy_position), so Rscript stops before the LMM and ggsignif sections. In section 4 the Kruskal-Wallis label at 1.15*max sits on the Control-Vehicle bracket, and the caption 'Cliff d ranges 0.28-0.55' prints wilcox_effsize's r (Cliff's delta is -0.37, 0.33, 0.67).
+- Root cause: The example was never run end to end, and wilcox_effsize is not Cliff's delta.
+- Fix: Pipe paired_test into add_xy_position(x='time'); place the Kruskal label above the top bracket (max(stat_test$y.position) + step) ; caption 'effect size r' or compute Cliff's delta (effsize::cliff.delta or rstatix::wilcox_effsize renamed); source the example on a data file it ships.
+
+### `bio-data-visualization-statistical-annotation` — Paired tests pair by row order, silently
+
+- Skill: 71.2, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/statistical-annotation) · [viewer](skills/bio-data-visualization-statistical-annotation/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 2
+- Problem: rstatix pairwise_wilcox_test(paired = TRUE) and statannotations Wilcoxon / t-test_paired have no id argument; the same 28 rows shuffled give p 0.7148 instead of 0.00232 with no message, while ggpaired(id = ) draws the right subject lines, so the figure and the p disagree.
+- Root cause: Skill says 'Verify subjects are correctly matched' but ships no check.
+- Fix: Add arrange(subject_id) (and an assert that both levels have identical id vectors) before any paired test, in the R and Python recipes.
 
 ### `bio-data-visualization-color-palettes` — Turbo offered as a perceptually uniform rainbow fix, but fails the Skill's own luminance test
 
@@ -952,7 +992,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (459)
+## P2 (461)
 
 ### `bio-data-visualization-distribution-plots` — Wrong bandwidth sentence: nrd (Scott) is 1.178x nrd0, so it oversmooths more
 
@@ -1001,6 +1041,22 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The Tips and What the Agent Will Do sections restate SKILL.md rules.
 - Root cause: Two files carry the same guidance.
 - Fix: Reduce usage-guide.md to prompts and prerequisites.
+
+### `bio-data-visualization-statistical-annotation` — Test-name and label details differ from the tools
+
+- Skill: 71.2, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/statistical-annotation) · [viewer](skills/bio-data-visualization-statistical-annotation/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 6, 7
+- Problem: statannotations 't-test_ind' is Student's (0.0425 vs Welch 0.0293, 't-test_welch'); ggsignif prints 'NS.' not 'ns'; ggpubr and statannotations print **** for p <= 1e-4 and use <= at 0.05/0.01/0.001; ggpubr prints 'p < 2e-16', not '<2.22e-16'; R exact and scipy asymptotic Wilcoxon p differ (0.1138 vs 0.1128 at n = 12/15; 0.000228 vs 0.00052 in the tail at n = 14/16) so the R and Python figures of one analysis do not carry identical p.
+- Root cause: Version-specific behaviour was not checked against ggpubr 1.0.0 / statannotations 0.7.2 output.
+- Fix: Fix the table: add the fourth star and the inclusive boundaries, document the ggsignif labels, name 't-test_welch', and note exact vs asymptotic Wilcoxon.
+
+### `bio-data-visualization-statistical-annotation` — Family size, nested annotation and posthoc code gaps
+
+- Skill: 71.2, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/statistical-annotation) · [viewer](skills/bio-data-visualization-statistical-annotation/mrsonord2240-bioSkills@64b3b15/viewer.md)
+- Observed in inputs: 4, 5
+- Problem: The corrected family is the comparisons passed (two pairs x2, not x6) and this is unstated; summary(lmer) shows no p-value and no code draws the LMM/aggregated p on the figure; Dunn is named in the decision table and usage-guide prompt but the example uses pairwise Wilcoxon after Kruskal-Wallis (rstatix::dunn_test works and was verified); the ggsignif block sets two fill colours for a three-group plot and errors on the Skill's own three-group df; Shapiro pre-testing is offered without noting its weakness.
+- Root cause: Decision table and code snippets were written separately.
+- Fix: State the family-size rule; add a dunn_test/tukey_hsd + stat_pvalue_manual snippet and an emmeans-to-stat_pvalue_manual snippet for nested data; use lmerTest or emmeans for the p.
 
 ### `bio-data-visualization-color-palettes` — 9-20 group palettes are recommended without a CVD caveat
 

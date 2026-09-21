@@ -1,0 +1,57 @@
+suppressPackageStartupMessages({library(ggplot2); library(ggpubr); library(ggsignif); library(rstatix); library(dplyr)})
+D <- "F:/OpenScience/audits/bio-data-visualization-statistical-annotation"
+rd <- function(n) read.csv(file.path(D, "data", paste0(n, ".csv")))
+cat("### 1. correct pattern: rstatix pairwise_wilcox_test + stat_pvalue_manual (4 groups, 6 comparisons)\n")
+fd <- rd("four_group"); fd$group <- factor(fd$group)
+prs <- combn(levels(fd$group), 2, simplify = FALSE)
+raw <- sapply(prs, function(p) wilcox.test(fd$value[fd$group==p[1]], fd$value[fd$group==p[2]])$p.value)
+cat("independent raw:", signif(raw,4), "\nholm:", signif(p.adjust(raw,"holm"),4), "\nbonf:", signif(p.adjust(raw,"bonferroni"),4), "\nBH:", signif(p.adjust(raw,"BH"),4), "\n")
+for (m in c("holm","bonferroni","BH")) {
+  st <- fd %>% pairwise_wilcox_test(value ~ group, p.adjust.method = m) %>% add_xy_position(x = "group")
+  cat(m, "rstatix p.adj:", signif(st$p.adj,4), " signif:", st$p.adj.signif, " | raw p:", signif(st$p,4), "\n")
+  stopifnot(all.equal(st$p.adj, p.adjust(raw, m), tolerance = 1e-8), all.equal(st$p, raw, tolerance=1e-8))
+}
+st <- fd %>% pairwise_wilcox_test(value ~ group, p.adjust.method = "holm") %>% add_xy_position(x = "group")
+p <- ggboxplot(fd, x="group", y="value", add="jitter") + stat_pvalue_manual(st, label = "p.adj.signif", tip.length = 0.01)
+ggsave(file.path(D,"figs","r4_rstatix_holm4.png"), p, width=6, height=5, dpi=100)
+ld <- ggplot_build(p)$data; g <- ld[[length(ld)]]; print(g[, intersect(names(g), c("label","x","xend","y"))])
+cat("bracket xmin/xmax per comparison:\n"); print(st[, c("group1","group2","xmin","xmax","p.adj.signif")])
+
+cat("\n### 1b. comparisons= subset shrinks the corrected family\n")
+sub <- list(c("A","C"), c("B","C"))
+st2 <- fd %>% pairwise_wilcox_test(value ~ group, comparisons = sub, p.adjust.method = "bonferroni")
+cat("subset(2) bonferroni p.adj:", signif(st2$p.adj,4), " | raw*2:", signif(raw[c(2,4)]*2,4), " raw*6:", signif(raw[c(2,4)]*6,4), "\n")
+
+cat("\n### 2. star thresholds / labels: tiny p (bigN) and ns\n")
+bn <- rd("bigN"); cat("truth p:", wilcox.test(value~group, bn)$p.value, "\n")
+pa <- ggboxplot(bn, x="group", y="value") + stat_compare_means(comparisons=list(c("X","Y")), label="p.signif")
+pb <- ggplot(bn, aes(group, value)) + geom_boxplot() + geom_signif(comparisons=list(c("X","Y")), test="wilcox.test", map_signif_level=TRUE)
+pc <- ggboxplot(bn, x="group", y="value") + stat_compare_means(comparisons=list(c("X","Y")), label="p.format")
+pd <- ggboxplot(bn, x="group", y="value") + stat_compare_means(comparisons=list(c("X","Y")), label="p.format", method="t.test")
+lab <- function(p) as.character(ggplot_build(p)$data[[length(ggplot_build(p)$data)]]$annotation[1])
+cat("ggpubr p.signif:", lab(pa), "| ggsignif map_signif_level=TRUE:", lab(pb), "| ggpubr p.format:", lab(pc), "| t-test p.format:", lab(pd), "\n")
+# extreme p
+set.seed(1); ex <- data.frame(group=rep(c("U","V"), each=200), value=c(rnorm(200), rnorm(200, 3)))
+pe <- ggboxplot(ex, x="group", y="value") + stat_compare_means(comparisons=list(c("U","V")), label="p.format"); cat("truth p:", t.test(value~group, ex)$p.value, wilcox.test(value~group,ex)$p.value, " ggpubr p.format label:", lab(pe), "\n")
+pe2 <- ggboxplot(ex, x="group", y="value") + stat_compare_means(label="p.format"); print(as.character(ggplot_build(pe2)$data[[2]]$label))
+# boundaries of symnum used by p.signif
+pp <- c(0.05, 0.0499, 0.01, 0.0099, 0.001, 0.00099, 1e-4, 9.9e-5)
+print(rbind(p=pp, ggpubr_symnum = as.character(symnum(pp, corr=FALSE, na=FALSE, cutpoints=c(0,1e-4,1e-3,1e-2,5e-2,1), symbols=c("****","***","**","*","ns")))))
+cat("rstatix add_significance:", as.character(add_significance(data.frame(p=pp), "p")$p.signif), "\n")
+
+cat("\n### 3. paired\n")
+pr <- rd("paired"); pr$time <- factor(pr$time, levels=c("Pre","Post"))
+cat("paired wilcox truth:", wilcox.test(pr$value[pr$time=="Pre"], pr$value[pr$time=="Post"], paired=TRUE)$p.value, " unpaired:", wilcox.test(pr$value[pr$time=="Pre"], pr$value[pr$time=="Post"])$p.value, "\n")
+pt <- pr %>% pairwise_wilcox_test(value ~ time, paired = TRUE, p.adjust.method = "holm"); print(pt)
+p3 <- ggpaired(pr, x="time", y="value", id="subject_id", color="time", line.color="#888888", line.size=0.2, palette=c('#0072B2','#D55E00')) + stat_pvalue_manual(pt %>% add_xy_position(x="time"), label="p.adj") + labs(caption="Wilcoxon signed-rank, paired by subject_id")
+ggsave(file.path(D,"figs","r4_paired_fixed.png"), p3, width=4, height=4, dpi=100)
+cat("ggpaired fixed label:", as.character(ggplot_build(p3)$data[[length(ggplot_build(p3)$data)]]$label), "\n")
+cat("ggpaired + stat_compare_means (the natural ggpubr idiom):"); p4 <- ggpaired(pr, x="time", y="value", id="subject_id") + stat_compare_means(paired=TRUE, method="wilcox.test"); print(ggplot_build(p4)$data[[length(ggplot_build(p4)$data)]]$label)
+# unsorted paired input: does pairwise_wilcox_test(paired=TRUE) pair by id or by row order?
+sh <- pr[sample(nrow(pr)),]; ps <- sh %>% pairwise_wilcox_test(value ~ time, paired=TRUE); cat("shuffled rows paired p:", ps$p, "(truth 0.00232)\n")
+cat("\n### 5. Effect sizes\n")
+tg <- rd("three_group")
+es <- tg %>% wilcox_effsize(value ~ group, ci = FALSE); print(es)
+cd <- function(x,y){ n1<-length(x); n2<-length(y); (sum(outer(x,y,">")) - sum(outer(x,y,"<"))) / (n1*n2) }
+gl <- c("Control","Treatment","Vehicle"); for (pp2 in combn(gl,2,simplify=FALSE)) cat("Cliff delta", pp2[1], "-", pp2[2], ":", round(cd(tg$value[tg$group==pp2[1]], tg$value[tg$group==pp2[2]]),3), "\n")
+cat("cohens_d bigN:", cohens_d(bn, value ~ group)$effsize, "  wilcox_effsize r:", wilcox_effsize(bn, value~group)$effsize, "\n")
