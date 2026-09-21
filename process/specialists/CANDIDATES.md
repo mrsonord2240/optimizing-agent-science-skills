@@ -18,11 +18,8 @@ uses one. So a Specialist cannot mix AIPOCH and bioSkills Skills. Each candidate
 route recorded in `skills/bioSkills/UPSTREAM.json`. A release's `source` is therefore
 `optimizing-agent-science-skills` at the export commit, not the upstream commit above; the
 upstream commit stays the provenance base, and the clone above stays the read-only reference for
-Skills that were never modified. Gate 6 in `THRESHOLD.md` says which bytes are checked against
+Skills that were never modified. Gate 6 in `THRESHOLD.md` (here in `specialists/`) says which bytes are checked against
 which commit.
-
-Skill ID = the SKILL.md frontmatter `name` (e.g. `bio-single-cell-preprocessing`), not the folder
-name.
 
 | Candidate id | Near-miss it answers | Draw from (bioSkills folders) | Scope and boundaries |
 | --- | --- | --- | --- |

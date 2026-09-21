@@ -1,16 +1,15 @@
 # process/
 
-The briefs agents are dispatched with, and the gates a candidate has to pass. These are the method:
+The briefs agents are dispatched with, and the thresholds a Skill has to meet. These are the method:
 if a brief is wrong, the audits it produced are wrong, so change them deliberately and date the change.
 
 | File | Who reads it | What it governs |
 | --- | --- | --- |
-| `TOOLING_BRIEF.md` | tooling agent | building a candidate's audit environment and writing the `TOOLS.md` the auditor reads, before the first audit |
-| `AUDIT_BRIEF.md` | auditor | choosing Skills, writing inputs, running the code, scoring, what a report must contain, and how a re-audit of a fixed Skill differs |
+| `TOOLING_BRIEF.md` | tooling agent | building a folder's audit environment and writing the `TOOLS.md` the auditor reads, before the first audit |
+| `AUDIT_BRIEF.md` | auditor | writing inputs, running the code, scoring, what a report must contain, and how a re-audit of a fixed Skill differs |
 | `FIX_BRIEF.md` | fixer | what counts as an audit-evidenced defect, what is out of scope, how every change is verified, one commit per Skill, the fix log format |
-| `AUTHOR_BRIEF.md` | author | turning passed audits into a Specialist |
-| `CANDIDATES.md` | all | the candidate Specialists, their scope and boundaries, and which Skills each draws from |
-| `THRESHOLD.md` | all | the viability gates, including the score floors: core Skills 85, supporting 75 |
+| `THRESHOLD.md` | all | gates 2 and 3: deployable with no open P0 and a score ≥ 75, and ≥ 85 for a core Skill |
+| `specialists/` | nobody now | parked Specialist material: `CANDIDATES.md`, `AUTHOR_BRIEF.md`, and gates 1 and 4-9 |
 
 ## The one rule behind all of them
 
@@ -27,7 +26,5 @@ count, a value against ground truth, or a file that exists and parses.
 
 ## The order agents run in
 
-`TOOLING_BRIEF` (once per candidate) → `AUDIT_BRIEF` (the candidate's auditor) → `FIX_BRIEF` (a
-different agent, per failing Skill) → `AUDIT_BRIEF` again (a third agent, re-audit) → `AUTHOR_BRIEF`.
-Two candidates can run side by side as long as they share no source folder; more than two auditors on
-this machine makes every run crawl.
+`TOOLING_BRIEF` (once per folder) → `AUDIT_BRIEF` (one auditor per Skill) → `FIX_BRIEF` (a different
+agent, per failing Skill) → `AUDIT_BRIEF` again (a third agent, re-audit).

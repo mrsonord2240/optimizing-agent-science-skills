@@ -7,14 +7,16 @@ honestly how the result could be better.
 
 ## Where things are
 
-- Threshold every Specialist must meet: `F:\optimizing-agent-science-skills\process\THRESHOLD.md`
-  (read first). Round 2 differs in two ways, both already handled by the builder: Skills come from
+- Threshold every Specialist must meet: gates 2 and 3 in
+  `F:\optimizing-agent-science-skills\process\THRESHOLD.md`, the rest in
+  `F:\optimizing-agent-science-skills\process\specialists\THRESHOLD.md` (read first).
+  Round 2 differs in two ways, both already handled by the builder: Skills come from
   the repository, commit and `prefix` pinned in `spec.json`'s `upstream` block — for fixed Skills
   that is `optimizing-agent-science-skills` at the export commit, under `skills/bioSkills/` — and
   gate 6 checks bytes against that commit; and audit reports live in
   `F:\OpenScience\audits\<skill-id>\`.
 - Why every candidate uses bioSkills only:
-  `F:\optimizing-agent-science-skills\process\CANDIDATES.md`. Your candidate's scope and
+  `F:\optimizing-agent-science-skills\process\specialists\CANDIDATES.md`. Your candidate's scope and
   boundaries are its row there.
 - Your spec: `F:\OpenScience\specialist-src\<id>\spec.json` and the auditor's
   `F:\OpenScience\specialist-src\<id>\AUDIT.md`. Do not change the `upstream` block, Skill `id`s

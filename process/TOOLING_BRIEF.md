@@ -1,28 +1,28 @@
-# Brief: build and inventory the audit environment for one candidate Specialist
+# Brief: build and inventory the audit environment for one Skill folder
 
-You are the **tooling agent** for ONE candidate. Your only job is to make every tool the candidate's
+You are the **tooling agent** for ONE folder. Your only job is to make every tool the folder's
 Skills reference installed and smoke-tested BEFORE the auditor starts, and to write the inventory
 the auditor reads. **You do not audit, score, fix or edit any Skill.** Do not spawn sub-agents.
 
-Introduced 2026-09-16, after the proteomics candidate spent five audit passes discovering its tools
-mid-run. The two candidates that got a tooling pass first executed 66/67 and 51/53 of their audit
+Introduced 2026-09-16, after the proteomics folder spent five audit passes discovering its tools
+mid-run. The two folders that got a tooling pass first executed 66/67 and 51/53 of their audit
 inputs.
 
 ## Read first
 
-- `process/CANDIDATES.md` — your candidate's row: scope, boundaries and source folders. The
-  boundaries are load-bearing. Do not install for a Skill the candidate's row puts out of scope; list
-  it instead, so a later reviewer can see it was identified and skipped deliberately.
+- Your dispatch — the folder, and the env name `<env>` its tooling goes in. Reuse an existing env
+  that already covers the folder rather than building a second one. Scope is every Skill in that
+  folder; do not install for another folder's Skills, list them instead, so a later reviewer can see
+  they were identified and skipped deliberately.
 - `F:\OpenScience\audit-envs\mass-spec-proteomics-analyst\TOOLS.md` — the format to follow.
 
 ## Scope of the inventory
 
 Every R package, Python package, command-line tool, model weight file and reference dataset
-referenced by `SKILL.md`, `usage-guide.md`, `examples/` and `references/` in the candidate's source
-folders under `F:\OpenScience\external\mrsonord2240__bioSkills\`.
+referenced by `SKILL.md`, `usage-guide.md`, `examples/` and `references/` in the folder under `F:\OpenScience\external\mrsonord2240__bioSkills\`.
 
-Install in priority order: (1) the Skills the Specialist's central step cannot exist without;
-(2) supporting Skills in scope; (3) list-only — anything out of the candidate's scope, GPU-first, or
+Install in priority order: (1) the tools the folder's central Skills cannot run without;
+(2) the rest of the folder; (3) list-only — anything out of the folder's scope, GPU-first, or
 needing an account. **Linux-only is not blocked (2026-09-17).** There is a dedicated WSL2 science seat
 with bioconda — see below — plus Docker Desktop. Likewise a tool pinned to an older Python gets its own
 `uv` venv (`uv python list` shows what is installed). Try those before recording a tool as not
@@ -69,14 +69,14 @@ the actual error and move on.
 
 **`F:\OpenScience\external\` is read-only.** Never write there, including `__pycache__` from an
 import or a stray `.out`. Those are gitignored, so the clone's `git status` stays clean while
-byte-identity for gate 6 is broken.
+byte-identity with the upstream commit is broken.
 
 ## Environment rules
 
-- Python: one shared venv per candidate at `F:\OpenScience\audit-envs\<candidate-id>\`, created from
+- Python: one shared venv per env at `F:\OpenScience\audit-envs\<env>\`, created from
   `F:\OpenScience\runtime\envs\.p\python.exe` (Python 3.12). Anything that would change an existing
   package's version goes in its own venv under `tools\<name>-venv\`. Record a `pip freeze` per venv.
-- R: private library `...\<candidate-id>\R-lib` against R 4.4.3 / Bioconductor 3.20, run through an
+- R: private library `...\<env>\R-lib` against R 4.4.3 / Bioconductor 3.20, run through an
   `r.sh` wrapper modeled on the proteomics one (it puts Rtools 4.4 from `C:\rtools44` on PATH —
   **never Rtools 4.5**, which risks an ABI mismatch against R 4.4 binaries).
 - **No-version-change rule.** Snapshot `installed.packages()` and `pip freeze` before you start.
@@ -100,8 +100,8 @@ exiting 0.
 Model weights, annotation references and pathway collections the Skills fetch at run time, so the
 audit does not depend on the network or on a service being up. Record where each cache lives.
 
-Also fetch **one small real public dataset** that fits the candidate's central step, into
-`...\<candidate-id>\public-data\` with a README naming the source URL and licence. Real data catches
+Also fetch **one small real public dataset** that fits the folder's central step, into
+`...\<env>\public-data\` with a README naming the source URL and licence. Real data catches
 what synthetic data cannot: the chem audit's hERG set exposed a false-kill rate; a real 10x raw
 matrix is the only honest input for ambient-RNA and empty-droplet Skills. Public, unauthenticated
 downloads only — no paid or licence-gated services, and nothing whose terms forbid automated access.
@@ -113,11 +113,11 @@ downloads only — no paid or licence-gated services, and nothing whose terms fo
 - Prefix Python with `PYTHONIOENCODING=utf-8` in Bash. Edit files with Write/Edit or Python
   `encoding='utf-8'`, never PowerShell `Get-Content`/`Out-File`. Keep paths under 260 characters.
 - Do not touch `F:\OpenScience\skills`, `F:\OpenScience\external`, `F:\OpenScience\audits\`, or
-  another candidate's env.
+  another folder's env.
 
 ## Deliverable
 
-`F:\OpenScience\audit-envs\<candidate-id>\TOOLS.md`, dated, with these sections:
+`F:\OpenScience\audit-envs\<env>\TOOLS.md`, dated, with these sections:
 
 1. **Environment** — what lives where (shared venv, per-tool venvs, R-lib, wrapper scripts, JDK).
 2. **Installed and smoke-tested** — tables for R / Python / CLI / models and reference data. Each
@@ -128,7 +128,7 @@ downloads only — no paid or licence-gated services, and nothing whose terms fo
 4. **Referenced but not installable on Windows** — the reason and what covers the step instead.
    **Try the `science` WSL seat before writing a row here**, and say so in the row: "not on Windows;
    runs in WSL `science` env `bio` as `<command>`" is a covered step, not a blocked one.
-5. **Out of candidate scope (not installed)** — identified and deliberately skipped.
+5. **Out of scope (not installed)** — identified and deliberately skipped.
 6. **Notes for auditors** — every trap you hit: version skew against what a Skill pins, a package
    that only works in a side venv, a flag that changed, a default that segfaults.
 

@@ -2,23 +2,29 @@
 
 Round-2 audits found that many `GPTomics/bioSkills` Skills fail on broken commands, version drift and
 snippets that run but silently compute the wrong thing. Sam decided to ship fixed local versions from
-his own fork instead of dropping those Skills. You are the **fixer** for ONE candidate. A different
+his own fork instead of dropping those Skills. You are the **fixer** for ONE Skill. A different
 agent re-audits your work afterwards; you never score anything.
+
+## Two facts
+
+- **Skill ID is the SKILL.md frontmatter `name`, not the folder name.** Every report, audit folder
+  and `--skill` argument depends on it.
+- **Upstream provenance.** `GPTomics/bioSkills` at `d91ed3d` (MIT) is the base, and the read-only
+  clone is `F:\OpenScience\external\GPTomics__bioSkills`. Diff against it to see the original.
 
 ## Where things are
 
-- Fork (MIT, same history as upstream): `F:\OpenScience\external\mrsonord2240__bioSkills`, base
-  branch `openscience-fixes` at upstream `d91ed3d563019e649dc854c56ccd62551359488a`.
+- Fork (`bioSkills-Improved`, MIT, same history as upstream):
+  `F:\OpenScience\external\mrsonord2240__bioSkills`. Staging is its `main`, and every fix lands there.
 - **Your worktree and branch** are named in your dispatch message. Work only there.
-- Records repository (briefs, gates, fix logs, audit records):
-  `F:\optimizing-agent-science-skills` — gates in `process\THRESHOLD.md`, your fix logs in
+- Records repository (briefs, thresholds, fix logs, audit records):
+  `F:\optimizing-agent-science-skills` — thresholds in `process\THRESHOLD.md`, your fix logs in
   `fixes\`. The fixed Skill trees are exported there from the fork under `skills\bioSkills\`;
   that export is a separate step, not yours.
 - Evidence per Skill: `F:\OpenScience\audits\<skill-id>\eval_report_<skill-id>_result.json`
   (`recommendations[]`, per-input notes) and `eval_viewer_<skill-id>.md` (the commands that ran, what
-  failed, and often the corrected command the auditor verified). Candidate verdict:
-  `F:\OpenScience\specialist-src\<candidate-id>\AUDIT.md` (may still be being written).
-- Runtimes: the candidate venv `F:\OpenScience\audit-envs\<candidate-id>\` (Python 3.12, R library
+  failed, and often the corrected command the auditor verified).
+- Runtimes: the env venv `F:\OpenScience\audit-envs\<env>\` (Python 3.12, R library
   `R-lib`, tools under `tools\` or `Scripts\`), R at `F:\OpenScience\runtime\envs\.r\Scripts\Rscript.exe`
   — **never invoked bare: it exits 0 and prints nothing unless `.r/Library/bin` and
   `.r/Library/mingw-w64/bin` are on `PATH`** (verified 2026-09-17). Use a wrapper such as
@@ -50,9 +56,9 @@ So when the Skill's own `SKILL.md`, `usage-guide.md` or decision tree references
 could reasonably expect to run, you have three options and must take one:
 
 - **write it** — a runnable block in the Skill's existing voice and structure, using a tool that is
-  actually installed on this machine (check the candidate's `TOOLS.md` first); or
-- **install it** — when the tool is a public, unauthenticated install that the candidate's tooling
-  pass simply missed, install it into the candidate's own env under that env's no-version-change
+  actually installed on this machine (check the env's `TOOLS.md` first); or
+- **install it** — when the tool is a public, unauthenticated install that the folder's tooling
+  pass simply missed, install it into the env under its no-version-change
   rule, add it to `TOOLS.md` with a smoke test, and then write the runnable block; or
 - **delete the claim** — remove it from the description, decision tree and prose, so the Skill stops
   advertising what it cannot do.
@@ -124,12 +130,12 @@ audit's assertions; fix the defect the assertion exposed.
   worktrees, `F:\OpenScience\skills`, or the builder. Do not push, merge or rebase. In the records
   repository write only your `fixes\<skill-id>.md`; `skills\bioSkills\` there is an export of the
   fork, never edited by hand.
-- Skills that already pass as core and have no P1 stay byte-identical.
+- Skills that already score ≥ 85 with no P1 stay byte-identical.
 - Public unauthenticated services (NCBI E-utilities, myvariant.info, gnomAD GraphQL, Ensembl) are fine
   for verifying database Skills; nothing paid or authenticated.
 - Windows: edit with Write/Edit or Python `encoding='utf-8'`; never PowerShell `Get-Content`/`Out-File`.
   Prefix Python with `PYTHONIOENCODING=utf-8` in Bash. Keep paths short.
-- At most one sub-agent of your own at a time; the machine is shared with one other fixer.
+- At most one sub-agent of your own at a time; the machine is shared with other agents.
 
 ## Final message (≤ 200 words)
 

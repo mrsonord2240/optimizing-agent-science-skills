@@ -34,8 +34,6 @@ __pycache__/
 Thumbs.db
 
 
-process/*
-
 
 # pybiomart drops its dataset cache into the process working directory
 .pybiomart.sqlite
