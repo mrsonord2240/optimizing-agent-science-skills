@@ -18,7 +18,7 @@ skills/<upstream>/
   "commit": "d91ed3d563019e649dc854c56ccd62551359488a",
   "license": "MIT",
   "author": "GPTomics",
-  "fork": "https://github.com/mrsonord2240/bioSkills",
+  "fork": "https://github.com/mrsonord2240/bioSkills-Improved",
   "fork_branch": "openscience-fixes",
   "modified": true,
   "modified_by": "Samuel Nord (Claude agents)",
