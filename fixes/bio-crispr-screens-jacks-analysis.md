@@ -75,3 +75,32 @@ Worktree `F:\OpenScience\wt\crispr-screens-jacks-analysis`, branch `fix/crispr-s
 | `efficacy_summary()` in the efficacy reference | `scripts/efficacy_summary.py` (ran on example-small: 8,081 guides, median 1.017, matches the audit; on full HAP1 grna output; raises the documented `ValueError` on a renamed guide) |
 
 Left inline: CLI bash block (one command), `n_iter` and hyperparameter override recipes (under 15 lines, JACKS-internals illustrations), `extract_efficacy_prior` (5 lines). No block duplicated `examples/run_jacks.py`. Both scripts `py_compile` clean.
+
+## 2026-09-21 final pass, Phase 1
+
+Worktree `F:\OpenScience\wt\crispr-screens-jacks-analysis`, branch `fix/crispr-screens-jacks-analysis`
+(same worktree/branch as the batch above). Fixer/auditor: Claude Sonnet 5 (final pass, one agent both
+phases per `process/FINAL_PASS_BRIEF.md`). Env `crispr-screen-analyst`. Verification data: the same
+example-small 5-cell-line/1,579-gene/8,081-guide set, plus JACKS' own 90,710-guide/18,056-gene
+`example/` set with its bundled `NEGv1.txt` for a full-genome corroboration.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| `examples/run_jacks.py` `run_jacks_analysis()` runs the JACKS subprocess with `cwd=jacks_dir` but never resolves the caller's file paths, so the natural relative-path call fails with `FileNotFoundError` | P1 | Resolve `counts_file`/`replicatemap_file`/`guidemap_file`/`output_prefix` with `os.path.abspath()` before building `cmd` | ran | Reproduced the failure pre-fix, then ran the fixed function with relative paths end to end through `analyze_results()`/`plot_results()`: 1,579 genes, 266 essential, PNG written |
+| `SKILL.md`/`usage-guide.md` never mention `<outprefix>_logfoldchange_means.txt`/`_logfoldchange_std.txt`, which JACKS 0.2 always writes unless `--reffile` is given | P2 | Added both files to the CLI output comment in `SKILL.md` and usage-guide step 12 | ran (present without `--reffile`, absent with it) | source: `jacks_io.py` `load_data_and_run` |
+
+### Resolved from the prior "left unfixed" list
+
+- Audit Input 3 assertion 4 (silent-success case of a `--reffile` from a different library with
+  matching IDs but different sequences): does **not** need a second real library. JACKS' reffile check
+  is ID-only (never reads sequence), so a same-ID/different-value reffile is a full substitute. Built
+  one synthetically (shuffled the real grna results' `X1`/`X2` under the same sgRNA IDs), ran it as
+  `--reffile`: no error, and 1,364/1,579 gene effects differed from the correctly-matched run by >0.1
+  (max diff 2.29) — confirms `references/failure-modes.md`'s documented claim.
+
+### Left unfixed (unchanged)
+
+- Security note (paths passed to `subprocess` without existence checks in `examples/run_jacks.py`):
+  list-form invocation, no shell; judged not a correction in the prior pass. Still not a correction.
+
+Full detail in `F:\OpenScience\audits\_final_pass\bio-crispr-screens-jacks-analysis\CHECKPOINT.md`.
