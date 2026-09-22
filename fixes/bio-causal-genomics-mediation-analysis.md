@@ -112,3 +112,30 @@ Verbatim moves, verified by multiset comparison of non-blank lines (only the 7 d
 | `references/mr-mediation.md` MVMR block | duplicate of `examples/mvmr_mediation.R`; deleted, pointer |
 
 All four examples were run (exit 0) to back the pointers.
+
+## 2026-09-21, final pass -- Phase 1 (fixer+auditor, checkpoint before re-audit)
+
+Worktree unchanged (`F:\OpenScience\wt\causal-genomics-mediation-analysis`, branch
+`fix/causal-genomics-mediation-analysis`), tip `e46d106`. No entry for this Skill in
+`fixes/README.md`'s revisit list, and every prior fix-log finding above was already resolved. This
+phase re-verified every runnable block independently (fresh synthetic data, fresh scratchpad scripts,
+not reusing the earlier fix passes' own verification scripts) rather than finding new defects:
+`examples/eqtl_mediation.R`, `examples/sensitivity_analysis.R`, `examples/cmaverse_4way.R`,
+`examples/mvmr_mediation.R`, `scripts/hima_ewas.R` (via its documented CLI invocation, fresh n=300/
+p=500/6-planted-mediator/NA-row/3-level-covariate dataset, recovered exactly 6/6), the
+`references/hima-ewas.md` inline `model.matrix()` block (independent n=250/p=200/5-planted dataset,
+recovered exactly 5/5), the `references/time-varying-and-dml.md` medDML block (fresh n=800 data,
+confirmed `$results` shape/names and by-name extraction), the `SKILL.md` E-value block (confirmed the
+fixed form works and the pre-fix `hi=NULL` form still crashes as documented), and the Common Errors
+claim that `medsens()` rejects a logit-link fit (reconfirmed verbatim). No package installs were
+needed; everything used was already in the `mendelian-randomization-analyst` env.
+
+No new fixes made -- nothing broken was found. One pre-existing, already-documented blocker
+reconfirmed rather than newly discovered: the two-step MR code sketch in `references/mr-mediation.md`
+needs a live OpenGWAS JWT token (unauthenticated `extract_instruments()` still 401s, reconfirmed live
+this session); its five called functions all exist in TwoSampleMR 0.7.9 with matching signatures and
+the block parses clean, so only the network call is gated, not the code. Full detail:
+`F:\OpenScience\audits\_final_pass\bio-causal-genomics-mediation-analysis\CHECKPOINT.md`.
+
+### Left unfixed
+Same as before (two-step MR sketch, needs OpenGWAS auth). Nothing else.

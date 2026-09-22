@@ -142,3 +142,59 @@ Differences from the inline blocks, all mechanical: hard-coded file names and co
 
 - **LD clumping path** (`ld_clump()` with plink + 1KG bfile) of `twosample_workflow.R`: no plink, `genetics.binaRies` or reference panel on this machine and the brief forbids installing; the code is verbatim from the inline block and only guarded by the `--bfile` check.
 - **SKILL.md is now 260 lines**, under 300; nothing further to split.
+
+---
+
+# Final pass, Phase 1 (2026-09-21)
+
+Worktree `F:\OpenScience\wt\causal-genomics-mendelian-randomization`, branch
+`fix/causal-genomics-mendelian-randomization`, on top of `9fde5b0`. Same agent as fixer and (in Phase 2)
+auditor, per `FINAL_PASS_BRIEF.md`. Env: `mendelian-randomization-analyst`. No commits this phase
+(doc-only changes; see below) -- `TOOLS.md` and this fix log are outside the fork and not committed to
+the Skill.
+
+## LD-clumping checkpoint item -- closed for real
+
+The prior round's premise ("no plink or 1KG reference on this machine") was stale: a real 1000G Phase 3
+EUR PLINK bfile (`tools/magma/g1000_eur/`, 503 individuals, 22.7M SNPs) was already staged in this same
+env for a sibling Skill, and this env's own scope note says it covers the whole `causal-genomics`
+folder. The only missing piece was a plink **1.9** binary -- `ieugwasr::ld_clump_local()` (what
+`scripts/twosample_workflow.R` calls) is hardcoded to plink1.9's `--clump` syntax and output filename;
+the `plink2` binary already in this env does not work as a substitute (different report format, different
+output file).
+
+| finding | priority | change | verified | notes |
+|---|---|---|---|---|
+| LD-clumping path never executed; `--no-clump` was the only tested route | P1 (checkpoint item, named in dispatch) | No code change needed -- `scripts/twosample_workflow.R`'s `--bfile`/`--plink` path was already correct. Installed `genetics.binaRies` (GitHub, small, public, install-lock protocol) so `get_plink_binary()` resolves to a real plink1.9 binary | ran | End-to-end run of the real script against the real 1000G EUR bfile: 3-SNP synthetic instrument set (1 index SNP, 1 SNP independently confirmed at r2=0.960 with it via a direct `plink --r2` call, 1 independent-locus SNP on chr2) -> clumping correctly dropped the r2=0.960 SNP and kept the other two (`instruments after F/clump: 2`; `harmonised.tsv` confirms). First real run of this code path in this Skill's history |
+| `references/tool-installation.md` recommended plink2 + a generic 1KG download for local clumping | P2 (docs, found while closing the above) | Replaced with the verified `genetics.binaRies` route and an explanation of why plink2 does not work here | ran (same evidence as above) | |
+
+Full detail in `F:\OpenScience\audit-envs\mendelian-randomization-analyst\TOOLS.md` under "Added
+2026-09-21 by the `mendelian-randomization` final-pass fixer".
+
+## Other runnable blocks walked this phase
+
+| Block | Previously verified? | Result |
+|---|---|---|
+| `examples/twosamplemr_analysis.R` | No -- absent from every prior round of this log | Ran end to end, unmodified: IVW b=0.282 p=1.1e-11, Steiger correct direction p=9.3e-109 |
+| `examples/mr_visualization.R` | No -- absent from every prior round of this log | Ran end to end, unmodified: all 4 plots (scatter/forest/leave-one-out/funnel) written as real PDFs |
+| `examples/two_sample_mr.R` (MR-PRESSO battery, NbDistribution=10000) | Yes, Round 3 (2026-09-21), unchanged since | Not re-run this phase (10000-draw bootstrap is a 20-40 min cost per the fix log's own note); no code change since its last verified run |
+| `examples/cis_mr_drug_target.R` | Yes, Round 1 (2026-09-17), unchanged since | Not re-run this phase; no code change since its last verified run |
+| `scripts/mr_presso_outliers.R`, `mvmr_conditional_f.R`, `simex_egger.R`, `twosample_workflow.R` (`--no-clump` path) | Yes, 2026-09-21 (structure pass), unchanged since | Not re-run this phase; `--bfile` path newly verified above |
+| `references/bidirectional-steiger.md`, `mrlap-overlap-correction.md` (non-MRlap parts), `cis-mr-and-binary-outcomes.md` inline fragments | Illustrative fragments depending on external state (per FIX_BRIEF, not standalone scripts) | Parse-checked; function names (`format_data`, `steiger_filtering`, `directionality_test`) confirmed exported by the installed TwoSampleMR 0.7.9 |
+
+## Still blocked (needs a decision)
+
+- **MRlap** (`references/mrlap-overlap-correction.md`): `remotes::install_github('n-mounier/MRlap')` did
+  not finish within a 180-second window under this session's shared-machine load (no error, just did not
+  complete). Not retried further -- this is a secondary target, not the dispatch's named item, and a full
+  `MRlap()` run separately needs an LDSC reference (`eur_w_ld_chr`-style per-chromosome LD scores + a
+  HapMap3 SNP list) that Round 3 already documented as absent here. Needs: either a longer install window
+  on a quieter machine, or building a synthetic single-chromosome LD reference (this env's
+  `genetic-correlation` auditor already built one for a sibling Skill -- untested for MRlap's own format
+  expectations). Everything else about the Skill is otherwise ready.
+- **CAUSE crashing against `loo` 2.10.1** (carried from Round 2/3): unchanged, still a version mismatch in
+  the shared env, not a Skill file defect.
+- **qhet_mvmr imprecision between conditional F 1-10** (carried from Round 2): unchanged, a property of
+  the estimator, already documented with a caveat.
+
+Nothing else needs Sam.
