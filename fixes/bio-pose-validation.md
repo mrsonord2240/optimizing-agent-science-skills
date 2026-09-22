@@ -48,3 +48,20 @@ Also: Common Errors row "Reduce `n_ref`" now says `n_ref_conf`, the example's pa
 None.
 
 Env: `cheminformatics-hit-triage-analyst` Python, PoseBusters 0.6.5, RDKit 2026.03.6, pandas 3.0.5. No installs.
+
+## 2026-09-21 (final-pass, Phase 1)
+
+Final-pass fixer/auditor for the same Skill. Worktree `F:\OpenScience\wt\chemoinformatics-pose-validation`,
+branch `fix/chemoinformatics-pose-validation`, tip commit `e4fa0a7` (unchanged this phase — nothing needed
+fixing). Checked the Revisit list in `fixes\README.md` (no row for this Skill) and this file's "Left
+unfixed" (None, both prior passes).
+
+Walked every runnable block — the two `scripts/` files, `examples/validate_poses.py`, and both inline
+code blocks in `SKILL.md` (`PoseBusters Usage` redock snippet, `mol`/`dock` config claims) — and ran each
+against real fixtures reused from the audit's `data/` dir. All matched their documented behavior exactly
+(column counts, the aromatic-planarity bracket, `pose_qc_batch.py` correctly rejecting a clash pose across
+3 distinct files, `tetrahedral_chirality` firing `False` on a real inverted-stereo pair). Full list in
+`F:\OpenScience\audits\_final_pass\bio-pose-validation\CHECKPOINT.md`. No defects found; no commit this
+phase.
+
+Left unfixed: none. Nothing blocked.
