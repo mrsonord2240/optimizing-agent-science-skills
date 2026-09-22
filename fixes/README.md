@@ -38,3 +38,4 @@ Items a fixer saw and left because the pass was scoped to something else. Added 
 | bio-experimental-design-multiple-testing | `scripts/ihw_safe.R` has no timeout; one IHW child hung (130 s CPU) and the wrapper would wait forever | a timeout changes behaviour; structure-only pass |
 | bio-sam-bam-basics | DRAGEN MAPQ row -- Illumina-licensed hardware/software, no public install path | needs a licence/instance or a real DRAGEN BAM |
 | bio-sam-bam-basics | Cell Ranger itself (STARsolo now stands in for its MAPQ/CB/UB behavior) -- 10x gates the download behind account registration | needs that registration or a real Cell Ranger BAM |
+| bio-sashimi-plots | MAJIQ/VOILA commands checked against --help only | MAJIQ is licence-gated (academic/commercial), not on PyPI/conda, no test credential |
