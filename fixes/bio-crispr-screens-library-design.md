@@ -82,3 +82,20 @@ Verbatim moves: `references/crispri-crispra-tss.md`, `references/library-catalog
 | SKILL.md python block (`find_sgrna_candidates`, `annotate_exon_position`, `select_independent_guides`) | not moved: duplicated `examples/design_library.py` verbatim, so the copy was deleted and SKILL.md points to the example; the docstring rationale (5-65% CDS window, spacing filter and TP53 check, lowercase note) kept as prose | example re-run exit 0 |
 
 Both scripts' docstring rationale for the windows stays in `scripts/tss_windows.py`; the reference keeps only the CRISPRa quota caveat as prose. No python fences remain in SKILL.md or `references/`.
+
+
+# 2026-09-21: final pass, phase 1
+
+Branch `fix/crispr-screens-library-design` @ `F:\OpenScience\wt\crispr-screens-library-design`, commit `f7185c8`. Env `crispr-screen-analyst`. Checkpoint: `F:\OpenScience\audits\_final_pass\bio-crispr-screens-library-design\CHECKPOINT.md`.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+| --- | --- | --- | --- | --- |
+| `crisprScore::getAzimuthScores()` unverified (prior pass: not in R-lib) | P2 (revisit) | Installed crisprScore 1.10.0 (Bioconductor 3.20) into `crispr-screen-analyst`'s R-lib under `install.lock`; rewrote SKILL.md's Version Compatibility text from "neither was installed or smoke-tested" to the precise verified state | ran: `library(crisprScore)` loads from R-lib alone; `getAzimuthScores` confirmed as a real exported function, signature `(sequences, fork=FALSE)` matching the vignette; calling it on the vignette's own 30nt example reaches `basiliskStart()` and fails there (`LibMambaUnsatisfiableError: nothing provides vc 9.* needed by python-2.7.12-0` -- conda-forge/bioconda no longer carry the VC9 runtime Windows Python 2.7 needs) | Real upstream blocker, not a missing install step. 21 new R package names copied into R-lib, 0 existing versions changed (see `TOOLS.md`). Also found and fixed a separate toolchain trap: `BiocManager::install` tries to compile too-new `reticulate` from source and fails on this machine's g++ 15; `options(install.packages.compile.from.source="never")` uses the existing CRAN Windows binary instead -- logged in `TOOLS.md` so it isn't rediscovered |
+
+## Left unfixed (this phase)
+
+- `getAzimuthScores()` cannot execute here: needs a conda channel that still hosts `vc=9.*` + `python=2.7` win-64 builds, which conda-forge/bioconda have dropped. Pinning to an unmaintained legacy channel snapshot to run a 10+-year-old Python 2 model was judged out of scope for this pass. CRISPick (web submission) remains the working real-Rule-Set-2 path; SKILL.md says so.
+
+## Re-verification (no changes needed)
+
+Walked every other runnable block: `examples/design_library.py` (142 rows, matches exactly), `select_independent_guides()` independently re-verified against a fresh live NCBI fetch of TP53, `scripts/tss_windows.py` (all 4 mode/strand combos), `scripts/build_oligo.py` (both subpools, lowercase input, budget-overflow raise). All matched documented/expected output; no defects found.
