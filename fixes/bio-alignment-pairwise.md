@@ -76,3 +76,25 @@ No fenced block reaches 15 lines (largest: 14-line Accessing Alignment Data illu
 ## Left unfixed
 
 - `hhsearch` command not run (no HH-suite database on this machine; a download is tens of GB). Checked against `hhsearch -h` (`-i`, `-d`, `-o`); the block says so.
+
+# 2026-09-21 final pass, phase 1 (fixer+auditor, same agent; see AUDITOR PHASE below for phase 2)
+
+Worktree `F:\OpenScience\wt\alignment-pairwise-alignment`, branch `fix/alignment-pairwise-alignment`, at
+9d72c41. Commit: `d45a647`. Env `alignment` (`F:\OpenScience\audit-envs\alignment\TOOLS.md`), no install
+(everything used was already present). Data: audit `run/data` (HBA/HBB, 8 UniProt globins, HBB CDS
+mammals), copied to `F:\OpenScience\scratch-pairwise-finalpass\` and removed afterwards.
+
+| finding | priority | change | verified | notes |
+|---|---|---|---|---|
+| hhsearch line above ("checked against `--help` only, not run") was the one open item from the 2026-09-19 pass | P2 | built a toy HH-suite database from the 8 test globins (`hhmake`, `ffindex_build` x2, `cstranslate -f`, all present in WSL `bio`, no install) and ran `hhsearch -i query.a3m -d toydb -o query.hhr` as written | ran: HBA_HUMAN self-hit Prob 100.0/E 1.8e-93; other alpha globins 100.0 (E 4.6e-77, 6.4e-46); beta-globin orthologs 99.7 (E ~1e-25); myoglobins 96-97 (E ~1e-9) -- probability tracks phylogenetic distance | Resolves the item; text now points at a real database (`pdb70`/`uniclust30`) for actual use, not the toy one |
+
+Also re-ran, with no change needed: every SKILL.md and `references/*.md` inline Python block (Required
+Import through Iterating/`max_alignments`, `.substitutions`/export formats, substitution-matrix loads
+and the NUC.4.4 `R,A==1.0` claim, `empirical_pvalue(preserve='di')`, parasail/edlib/pywfa/mappy in
+library-selection.md), all 5 `examples/*.py` scripts, and the `needle`/`water`/MAFFT+PAL2NAL (both the
+441-column success case and the rabbit exit-0/0-byte case)/MMseqs2/jackhmmer bash blocks on the audit's
+real data. All values matched what SKILL.md and references already claim; nothing else needed a change.
+
+## Left unfixed (this pass)
+
+None. The single open item carried over from the prior pass (hhsearch) is resolved above.
