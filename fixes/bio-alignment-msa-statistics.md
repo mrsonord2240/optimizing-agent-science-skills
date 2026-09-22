@@ -111,3 +111,19 @@ Verified: all 13 complete Python blocks of SKILL.md and `references/` run verbat
 None of the 5 findings. Noted, not changed:
 - Kimura `inf` for 0.85 <= p < 0.854 is kept as a documented convention rather than extended to the formula's true pole (a cut-off change would alter shipped behaviour the audit's EMBOSS `distmat` cross-check accepted).
 - A2M loading is not implemented here (ragged hmmalign A2M has no AlignIO reader); the Skill points to `alignment/alignment-io`.
+
+## 2026-09-21 (final pass, Phase 1)
+
+Fixer/auditor: Sonnet. Branch `fix/alignment-msa-statistics`, worktree `F:\OpenScience\wt\alignment-msa-statistics`, tip commit `f3a7a62`. Checkpoint: `F:\OpenScience\audits\_final_pass\bio-alignment-msa-statistics\CHECKPOINT.md`.
+
+Walked every runnable block (not just what earlier passes touched): 13 non-skeleton Python blocks in `SKILL.md`+`references/*.md` (one namespace, dotted Pfam seed) and all 11 files under `examples/` (9 examples + `msa_utils.py` + `selftest.py`, Windows venv and WSL) — all ran clean, numbers match the 2026-09-20/21 fix log exactly, no defects found. Also re-ran CLI examples on real (non-toy) data and confirmed the `.aln`/`.phy`/`.nex`/`.sto` format round-trip via `load_alignment`.
+
+### Findings (1 of 1 fixed)
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+| --- | --- | --- | --- | --- |
+| `references/distance-correction.md` `modeltest-ng` bash block had never been executed by any prior fixer or auditor | P2 (found this pass) | Installed ModelTest-NG 0.1.7 into WSL env `alignment` (bioconda, public download, install-lock protocol, before/after `micromamba list --json` diff shows only this package added); added a "Checked on ModelTest-NG 0.1.7" note plus the >=3-real-sequence / no-ragged-input caveat next to the block; tool recorded in `audit-envs\alignment\TOOLS.md` | ran `modeltest-ng -i alignment.fasta -d nt -t ml -p 4` on the real 6-sequence HBB CDS alignment: best model K80+I (BIC) / TPM2uf+I (AIC/AICc); `-d aa -t ml -p 4` on the 8-sequence globin protein alignment: DAYHOFF+G4 (BIC) / LG+I+F (AIC) | the shipped 3-row toy `example_dna.fasta` and the A2M `globins_hmmalign.afa` both fail to parse (needs >=3 clean sequences); real, normalised alignments work |
+
+### Left unfixed
+
+None. The two 2026-09-21 "left unfixed" items above were re-checked and remain deliberate, settled design decisions (not blocked on any resource): nothing here needs Sam's decision.
