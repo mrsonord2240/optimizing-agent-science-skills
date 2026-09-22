@@ -49,3 +49,5 @@ Items a fixer saw and left because the pass was scoped to something else. Added 
 | bio-causal-genomics-mediation-analysis | Two-step MR code sketch needs an OpenGWAS JWT token (unauthenticated extract_instruments() returns 401) | code is sound (parses, matches TwoSampleMR 0.7.9 signatures); needs a token to run live |
 | bio-causal-genomics-mendelian-randomization | MRlap install (n-mounier/MRlap) stalled under shared-machine load; a full run also needs an LDSC reference | retry on a quieter machine, or build the synthetic LD reference template from a sibling Skill's env work |
 | bio-causal-genomics-proteome-mr-drug-target | phewas scripts against live OpenGWAS need a JWT token; Ensembl VEP never run (not installed, GRCh38 cache multi-GB) | same OpenGWAS-token theme recurring across MR skills; VEP checked against docs only |
+| bio-causal-genomics-heritability-partitioning | BOLT-REML binary segfaults immediately on this machine, even on --help | needs a different host or a from-source build (C++ toolchain + Intel MKL) |
+| bio-causal-genomics-heritability-partitioning | HDL needs a ~5GB UKB reference-panel download | not attempted, time-boxed out |
