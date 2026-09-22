@@ -78,3 +78,20 @@ Ran both invocations exactly as written in SKILL.md / the reference on the toy s
 FeCl2 salt): shape 0.656 / 0.572, the salt reported as dropped, 1/20 and 4/20 MMFF-non-convergence warnings,
 `--scaffold-hop` at 0.3/0.55 keeps only the sulfonamide (ECFP4 0.513); two runs byte-identical. USRCAT,
 O3A and ESPSim fragments (under 15 lines) stay inline; `examples/shape_search.py` untouched.
+
+## 2026-09-21 — final-pass phase 1 (verification only, no changes)
+
+Worktree `F:\OpenScience\wt\chemoinformatics-shape-similarity`, branch
+`fix/chemoinformatics-shape-similarity`, tip commit `2f8cee5` (unchanged). Env
+`cheminformatics-hit-triage-analyst`. Checked the fix log's "left unfixed" (none, both prior
+passes) and `fixes/README.md`'s Revisit list (no row for this Skill) — nothing was queued.
+
+Independently re-ran every runnable block in the Skill (not just what a prior fixer touched):
+USRCAT snippet, O3A snippet, both `scripts/shape_search_ensemble.py` invocations (plain and
+`--scaffold-hop`) on a built 3-molecule library, `examples/shape_search.py` standalone, the
+ShaEP `obabel`+`shaep.exe` pipeline, the ShaEP NaN-coordinate awk check (reproduced the
+warning on a naphthalene SMILES and confirmed the check flags it), the ESPSim block, and
+`shaep --help` for the output-file wording. All ran and produced correct, checkable output;
+no new defects found. No installs were needed. Full detail:
+`F:\OpenScience\audits\_final_pass\bio-shape-similarity\CHECKPOINT.md`. No commits this phase
+(nothing to change).
