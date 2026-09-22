@@ -76,3 +76,16 @@ Worktree `F:\OpenScience\wt\crispr-screens-base-editing-analysis`, branch `fix/c
 Nothing stayed inline that qualified; the be-validation-pipeline bash (git clone / docker run / notebook list, ~10 lines of a workflow outline needing a Docker run and external repo) stayed inline as it is not a self-contained runnable script. `examples/base_editing_analysis.sh` untouched; no block duplicated it.
 
 Noticed, not changed (structure-only task): `references/library-design.md` "Approach" says each spacer is annotated with predicted amino acid changes, but `find_be_spacers` returns only target/bystander positions.
+
+## Final pass, Phase 1 — 2026-09-21
+
+Worktree `F:\OpenScience\wt\crispr-screens-base-editing-analysis`, branch `fix/crispr-screens-base-editing-analysis`, commit `dd1d90a`.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| `references/library-design.md` "Approach" line promised `find_be_spacers` annotates spacers with predicted amino acid changes; function returns only nucleotide-level `target_positions`/`bystander_positions` | P2 | Corrected the line to describe the real output; pointed to variant-calling/variant-annotation (VEP) for protein consequence, matching SKILL.md's own Related Skills row. Same overclaim in `usage-guide.md`'s Library Design example prompt corrected to real column names. | ran | Hand-built a CDS with a window position landing exactly in the target codon (spacer_start=22, window pos 6, aa 10): real return is `target_positions=[6]`, `bystander_positions=[]` -- a position list, not an amino-acid label. Confirms the genuine mismatch. |
+| `references/be-validation-pipeline.md` docker `CRISPRessoBatch --batch_settings batch_file.txt --skip_failed --base_edit` -- `--base_edit` is not a valid flag | P0 (broken command) | Replaced with `--base_editor_output`, the real CRISPRessoBatch flag | ran | Real CRISPResso2 2.3.4 (`pinellolab/crispresso2:latest`): `--base_edit` -> `error: ambiguous option: --base_edit could match --base_editor_output, --base_editor_consider_changes_outside_qw, --base_editor_target_ref_skip_allele_count`. Checked `CRISPRessoBatch --help`: `--base_editor_output` is the documented flag. Re-ran with the fix: parses correctly, proceeds past argument handling to file I/O (fails only on the placeholder fastq path, as expected). Not caught by any prior audit or fix pass on this Skill. |
+
+**Every runnable block re-verified this pass** (regression check, no other defects found): `find_be_spacers.py` CLI + empty-result + lowercase + bad-editor cases; `filter_by_editing_efficiency.py` against real CRISPResso2 2.3.4 output (pos5=0.5, pos7=0.3, pos99=ValueError); `deconvolute_bystander.py` against the same run's `Alleles_frequency_table.zip` (40/30/20/10 split); `aggregate_variant_scores.py` against real MAGeCK `sgrna_summary.txt`; `behive_predict.py` against BE-Hive git HEAD (0.9795 total probability). All match prior fix-log ground truth. `examples/base_editing_analysis.sh` passes `bash -n`; its `CRISPResso --base_editor_output`/`--conversion_nuc_from`/`--conversion_nuc_to` flags checked against real `--help` (all valid). All 5 `.py` files `py_compile` clean.
+
+Nothing left unfixed. Checkpoint: `F:\OpenScience\audits\_final_pass\bio-crispr-screens-base-editing-analysis\CHECKPOINT.md`.
