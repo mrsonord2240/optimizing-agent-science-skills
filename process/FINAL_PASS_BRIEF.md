@@ -58,10 +58,23 @@ orchestrator does that. **Then stop and report** — do not start Phase 2 until
 the orchestrator resumes you. Your final message for this phase is the checkpoint's "still blocked"
 list, verbatim, plus your commit hashes.
 
-## Phase 2: the audit (only once resumed)
+## Phase 2 dispatch: resume vs. fresh (Sam, 2026-09-21)
 
-You will be told which checkpoint items to address before auditing (some may stay blocked by
-Sam's decision) and to proceed. Then follow `AUDIT_BRIEF.md`'s "Re-auditing a fixed Skill" section
+The point of resuming the same agent is token efficiency, not identity for its own sake. Once a
+Phase 1 run has already spent a lot of context, resuming it carries that whole history into every
+Phase 2 turn — a fresh agent reading the checkpoint and fix log (a few thousand tokens) and auditing
+cold is cheaper past that point, even though it "starts over." **Rule: if the Phase 1 run's
+`subagent_tokens` was over ~180k, dispatch a fresh Phase 2 agent instead of resuming.** Below that,
+resume. `F:\OpenScience\wt\_final_pass.json` records each Skill's Phase 1 token count and a
+`phase2_mode` field (`"resume"` or `"fresh"`) once decided — check it before dispatching Phase 2 for
+any Skill on the "done" list. A fresh Phase 2 agent gets the checkpoint file, the fix log, and the
+worktree/branch/env — not the Phase 1 agent's transcript.
+
+## Phase 2: the audit (only once resumed, or given the checkpoint+fix log cold if fresh)
+
+If resumed: you will be told which checkpoint items to address before auditing (some may stay
+blocked by Sam's decision) and to proceed. If dispatched fresh: read the checkpoint and fix log
+first, then proceed the same way. Either way, follow `AUDIT_BRIEF.md`'s "Re-auditing a fixed Skill" section
 exactly: source is the fork at your branch's tip commit, archive the pre-fix report if one exists and
 you have not already, run inputs as regression tests plus your own, write
 `F:\OpenScience\audits\<skill-id>\{eval_report_*.json, eval_viewer_*.md, run\}` per schema.
