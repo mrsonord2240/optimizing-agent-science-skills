@@ -63,3 +63,29 @@ Split (bc45b35): `references/base-editor.md` (BE section + bystander failure mod
 before; every one is in SKILL.md or a reference file except the six decision-tree rows that gained pointers.
 Scripts (205c857): SKILL.md "Parse Output in Python" block -> `scripts/parse_crispresso.py`. The other bash
 fences are template commands with placeholders and stay inline; `examples/crispresso_analysis.sh` untouched.
+
+## 2026-09-21: final pass, Phase 1
+
+No content change (HEAD still `205c857`). Re-verified `scripts/parse_crispresso.py --selftest`,
+`py_compile`, `bash -n examples/crispresso_analysis.sh`, and diffed `examples/crispresso_analysis.sh`
+against the audit's own adapted/verified copy -- all clean, no drift. All previously-fixed runnable
+blocks (Cas9, BE window, Pooled, Batch, WGS, Compare) were left as-is; Docker was unavailable this
+whole session (see below) so they were not re-executed, only re-read against what the 2026-09-16/
+2026-09-21 passes already verified.
+
+**Left unresolved, needs a Docker retry (not a Skill defect):** the Prime Editor CRISPResso command
+in `references/prime-editor.md` has never been executed by any pass. Built a realistic synthetic test
+(real HEK3 locus/guide already used elsewhere in the Skill, PAM-destroying single-nt edit,
+`extension_seq` derived from CRISPResso2's own `get_prime_editing_guides()` contract, confirmed
+against upstream's `tests/unit_tests/test_CRISPRessoCORE.py`) and staged it at
+`F:\OpenScience\audit-envs\crispr-screen-analyst\tools\dl\crispresso-editing-audit\pe_final_pass\`
+(`pe_sample.fastq` + `run_pe.sh`, ready to run). Every `docker run` this session -- `hello-world`
+with no volume mount, and the real CRISPResso2 image -- created a container that stuck at
+`create`+`attach` and never reached `start` (`docker events` confirmed no `start` event; `docker
+version`/`ps` answered instantly, so only the container-start path was stuck), reproduced 3 times
+over ~20 minutes. Most likely shared-machine contention (another final-pass worktree,
+`_final_pass\gnina_verify\`, was doing concurrent GPU/Docker work). Full detail and the exact
+command to re-run in `F:\OpenScience\audits\_final_pass\bio-crispr-screens-crispresso-editing\CHECKPOINT.md`.
+Flag names/output rows for PE mode were cross-checked against `CRISPResso2/CRISPRessoCORE.py`
+source (`pinellolab/CRISPResso2@master`) and match what SKILL.md documents -- a docs/source check,
+not a live run.
