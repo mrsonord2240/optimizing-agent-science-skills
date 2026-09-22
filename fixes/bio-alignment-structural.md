@@ -126,3 +126,25 @@ Multimer speed evidence lives once in `references/foldseek-multimer.md`, the tab
 - Foldseek-Multimer ">99% chain-pairing match" is removed, not verified: I could not source it, so it is gone rather than kept.
 - The audit's optional `H_MSE` acceptance in the Superimposer (see finding 1).
 - Foldseek's "Removing temporary files" line still prints under `-v 1` (one line); no flag found to silence it.
+
+## 2026-09-21 - final pass phase 1 (worktree `F:\OpenScience\wt\alignment-structural-alignment`, branch `fix/alignment-structural-alignment`, tip `17418eb`)
+
+No open findings from either pass above needed further work: the Xu & Zhang p-value gap and the
+T-Coffee Expresso/3D-Coffee deletion are already resolved by honest documentation / claim removal (not
+half-repairs), and the Foldseek-Multimer/DALI literature claims are attributed citations, not
+unverified measurements. Checked `fixes/README.md`'s Revisit list: no row names this Skill.
+
+Instead of new fixes, walked every runnable block end to end on a clean 12-structure real-PDB set
+(`public-data/structures`) plus 2 complexes: `TMalign`/`USalign` pairwise and multimer, `TMscore -seq`,
+`foldseek easy-search` (type 1 and 2), `easy-cluster`, `createdb --mask-bfactor-threshold`,
+`easy-multimersearch`/`easy-multimercluster`, DaliLite `import.pl`/`dali.pl`, `foldmason easy-msa`
+(`--report-mode 2`), MUSTANG, PyMOL `super`, and all four `examples/*.py` scripts as SKILL.md invokes
+them. Every result matched the values already documented in SKILL.md/references or TOOLS.md
+(e.g. US-align 1IRD/1A3N 0.9769/0.4943 RMSD 0.94 Lali 286; DaliLite Z 20.3; Superimposer 0.483 A/151
+pairs and its ValueError refusal on 1MBN/1A3N). Confirmed with `-v 0` that Foldseek's
+"Removing temporary files" line cannot be silenced (cosmetic, stderr only). No file in the Skill
+changed; branch tip unchanged at `17418eb`. Full detail: `F:\OpenScience\audits\_final_pass\bio-alignment-structural\CHECKPOINT.md`.
+
+### Still blocked
+
+None.
