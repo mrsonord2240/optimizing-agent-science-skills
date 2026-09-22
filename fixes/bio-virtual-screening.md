@@ -109,3 +109,38 @@ example already carried its own copy of the filter.
 - Not fixed, noticed: `pose_validate`/`drug_like_filter`/`gnina_rescore` in
   `references/ultralarge-screening.md` remain `NotImplementedError` stubs (orchestrator skeleton, by design).
   GNINA has no Windows binary, so nothing there was run.
+
+---
+
+# 2026-09-21 (final pass, phase 1)
+
+Worktree `F:\OpenScience\wt\chemoinformatics-virtual-screening`, branch
+`fix/chemoinformatics-virtual-screening`, tip before this pass `7dc9c5d`. Env
+`cheminformatics-hit-triage-analyst`. Checkpoint: `F:\OpenScience\audits\_final_pass\bio-virtual-screening\CHECKPOINT.md`.
+
+Followed up on the one item the previous pass left "checked against documentation only": the `vina`
+Python-API branch. Per this pass's broadened install permission, tried the WSL `science` distro instead
+of the Windows-native `pip install vina` build failure. conda-forge publishes a prebuilt `vina` 1.2.7
+linux-64 build; installed it (plus numpy/rdkit/meeko/pandas) into a **new, isolated** micromamba env
+(`vscreen-vina-verify`) in WSL -- no existing env touched, no version changed anywhere. Ran
+`scripts/dock_single.py`'s Python-API path and `examples/virtual_screen.py`'s `dock_single()`/
+`virtual_screen()` against the audit's real 3PTB/benzamidine fixture:
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| `vina` Python-API branch only doc-checked, not executed (no Windows wheel) | P2 (was noted P2 in the 2026-09-19 pass) | `SKILL.md` Version Compatibility gained a paragraph: conda-forge/WSL route, confirms the branch executes and matches the Windows-native CLI's affinity on the same fixture; `TOOLS.md`'s blocked-tool row for `vina` updated to record the working WSL path alongside the still-true native-Windows failure | ran: `dock_single()` top affinity -6.019 (own run) / -5.978 (via `examples/virtual_screen.py`'s `virtual_screen()`), matching the Windows CLI run's -5.978 on the same receptor/ligand; `write_poses` produced a valid 9-model PDBQT; `virtual_screen()` also docked aspirin (-5.531) and correctly caught an invalid-SMILES ligand | Native Windows constraint (no `vina` wheel) is unchanged and stays documented; only the "unverified" status changed |
+| `prank predict -f receptor.pdb -o pockets/` (Binding Site Detection) was never executed against this Skill's own fixture | P1 | `SKILL.md` Binding Site Detection: added the working `java -cp ... cz.siret.prank.program.Main predict` invocation with real numbers (4 pockets, pocket1 center matches the Skill's own Vina box center); new Common Errors row for the silent `prank.bat` failure | ran: confirmed `prank.bat` under `cmd.exe /c` returns instantly with no output (matches `TOOLS.md` note 8, but this is the first time the *Skill's own documented command* was shown broken, not just a general installer note); java route ran for real: `rec.pdb_predictions.csv` with pocket1 at (-1.5173, 14.4714, 17.4739) | This was a genuinely broken command in the Skill, not previously caught because P2Rank's general smoke test used the java route already |
+
+Also re-ran (no change needed, confirms prior passes still hold): `scripts/prepare_receptor.py`
+(162,891-byte receptor, byte-identical), `scripts/dock_single.py` CLI-fallback path (9/9 negative
+poses, best -5.978), and the meeko PDBQT->SDF "Handoff caveat" snippet (9/9 poses, PoseBusters 12/12).
+
+## Left unfixed (this pass)
+
+- GNINA CNN rescoring (`references/gnina.md`) stays unexecuted: Linux+CUDA-only distribution (static
+  binary / Docker image), and this machine's GPU passthrough for a Docker+CUDA GNINA stack was judged a
+  materially larger undertaking than this pass's target (the vina branch) -- not attempted. Same
+  standing limitation as the two prior passes; needs Sam's call on whether a GPU-Docker GNINA
+  verification is worth a dedicated pass.
+- `pose_validate`/`drug_like_filter`/`gnina_rescore` stubs in `references/ultralarge-screening.md`
+  remain `NotImplementedError` by design (orchestrator skeleton) -- unchanged from the last pass.
