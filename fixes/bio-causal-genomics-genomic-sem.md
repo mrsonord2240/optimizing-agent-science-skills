@@ -151,3 +151,22 @@ Stayed in SKILL.md: scope, taxonomy, decision tree, Sample-overlap and Q_SNP-not
 Script changes vs the moved text: added `factor_only_dwls` (the old first `factor_only`) so both sets are written; lavaan's multi-line `warning` text is flattened so the TSV keeps one row per SNP (found on the first run: a raw write broke the rows); `parallel = cores > 1`. SKILL.md's output-column note now lists the real columns (`i, lhs, op, rhs, est, se_c, Z_Estimate, Pval_Estimate, Q, Q_df, Q_pval, fail, warning`; leading columns are the `sumstats()` ones), replacing the old `rsID` guess. The planted "factor" SNPs are p ~7e-6 in this panel, so `factor_sig` selects the heterogeneous SNPs; the assertions use that.
 
 Stayed inline: `munge`/`ldsc`/`sumstats` (need real sumstats, an LD-score panel and the 1000G reference, none on this machine); the Standard Workflow commonfactor/usermodel calls (3 and 6 lines, and 3b is a model-syntax illustration); ESEM, userGWAS, p-factor and `s_ldsc`/`enrich` blocks in `references/` (model-syntax fragments or need baselineLD, which is absent). The `.rds` input branch of the script was not exercised (the csv branch was); it is one `readRDS` call.
+
+## 2026-09-21, final pass Phase 1 (checkpoint)
+
+Worktree `F:\OpenScience\wt\causal-genomics-genomic-sem`, branch `fix/causal-genomics-genomic-sem`, tip
+`5475243` -- unchanged this session. Both P1s and both P2s from the 88/Production-Ready re-audit were
+already closed by the two passes above; the revisit list has no row for this Skill. Nothing left to fix.
+
+Re-verified as regressions (all matched prior documentation, nothing changed): `scripts/commonfactor_gwas_qsnp.R`
+on a rebuilt synthetic 3-trait/20-SNP covstruc (DWLS Q_pval 0.86-0.98 for all SNPs, factor-only 5->0 once
+ML is required); Input 4 two-factor `usermodel()` (exact recovery, rF 0.4000 both estimators); Input 9
+p-factor identification rule (2-factor: "information matrix could not be inverted", SEs NaN; 3-factor:
+succeeds); the `examples/genomic_sem_commonfactor.R` lavaan-version guard (fires under 0.7.2, silent under
+0.6.19). All 7 R-fenced SKILL.md/references blocks parse; both `examples/` and `scripts/` files parse;
+`mtag_pipeline.sh` passes `bash -n`. Full checkpoint: `F:\OpenScience\audits\_final_pass\bio-causal-genomics-genomic-sem\CHECKPOINT.md`.
+
+**Still blocked**, carried forward unchanged from every prior pass: `ldsc()`, `sumstats()`, and
+`s_ldsc()`/`enrich()` have never run end-to-end. Needs real (or HapMap3-rsID-aligned synthetic) GWAS
+summary statistics for >=3 traits, `eur_w_ld_chr`, a 1000G MAF reference for `sumstats()`, and
+`baselineLD_v2.2` for `s_ldsc()`. Confirmed none of these exist anywhere under `F:\OpenScience`.
