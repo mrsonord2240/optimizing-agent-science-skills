@@ -19,10 +19,10 @@ Read the fix log's "left unfixed" items and the "Revisit list" section of `fixes
 naming your Skill. For each:
 
 - **If it is genuinely fixable now, fix it.** You may install what real verification needs —
+  Installs over 1gb surface to the user with an explanation that describes how the tool fits in to the skills use.
   packages, CLI tools, model weights — following the env's install-lock protocol
   (`TOOLING_BRIEF.md`: `mkdir install.lock`, install without changing any existing package's version,
-  verify with an import/`packageVersion()` that prints, `rmdir` the lock, add it to `TOOLS.md`). This
-  is wider than a normal fixer's "install nothing": the point of this pass is that nothing ships
+  verify with an import/`packageVersion()` that prints, `rmdir` the lock, add it to `TOOLS.md`). the point of this pass is that nothing ships
   untested because a tool was merely missing from the env.
 - **Then walk every runnable block in the Skill** — not just what an earlier fixer touched — and
   confirm it actually executes as `SKILL.md` invokes it, on the audit's data or a realistic
@@ -52,8 +52,7 @@ Write `F:\OpenScience\audits\_final_pass\<skill-id>\CHECKPOINT.md`:
 - <block> -> <result>
 ```
 
-Commit your phase-1 work as usual (`fix(...)`/`refactor(...)` commits, `Co-Authored-By: Claude Sonnet 5
-<noreply@anthropic.com>`). Append to the fix log but do not commit it in the records repo — the
+Commit your phase-1 work as usual (`fix(...)`/`refactor(...)` commits, `Co-Authored-By: <Model>`). Append to the fix log but do not commit it in the records repo — the
 orchestrator does that. **Then stop and report** — do not start Phase 2 until
 the orchestrator resumes you. Your final message for this phase is the checkpoint's "still blocked"
 list, verbatim, plus your commit hashes.
