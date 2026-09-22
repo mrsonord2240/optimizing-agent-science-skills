@@ -44,6 +44,10 @@ environment, use `micromamba run -n <env> <command>`.
 - **`MSYS2_ARG_CONV_EXCL='*'` is required** when driving `wsl.exe` from Bash, or Unix paths are
   rewritten to `C:/Program Files/Git/...`. A round-trip test appeared to pass without it while the
   `cat` had actually failed.
+- **An inline `wsl.exe -d science -- bash -lc '...'` silently drops shell-variable assignments**
+  (verified 2026-09-21: `A=hello; echo $A` prints empty, with or without the flag above, semicolon or
+  newline). Write the script to a file under `/mnt/openscience/...` and run `bash script.sh` instead
+  of inlining anything that sets or reads a variable.
 - Working user `sci`, passwordless sudo. micromamba at `~/.local/bin`, channels conda-forge + bioconda
   (strict). Environment **`bio`** already has Python 3.12, R 4.4.1, mageck, mafft, iqtree, kraken2,
   samtools, bcftools, bedtools, and a full build toolchain — R compiles packages from source there.

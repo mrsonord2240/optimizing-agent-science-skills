@@ -101,6 +101,36 @@ report (3 P1, 1 P2).
 
 - P2 "HDL, HESS, BOLT-REML, GCTA, Popcorn untested": needs R/Python installs and multi-GB reference panels
   in a shared env; the brief forbids installing into the shared venv/R library. Left for a tooling pass.
+  **Resolved for GCTA, Popcorn and HESS by the 2026-09-21 final pass below; HDL and BOLT-REML remain
+  open, see that pass's checkpoint.**
+
+## 2026-09-21, final pass phase 1 (fixer/auditor: Claude Sonnet 5)
+
+Worktree `F:\OpenScience\wt\causal-genomics-heritability-partitioning`, branch
+`fix/causal-genomics-heritability-partitioning`, continuing from the same branch's prior commits.
+Addressed the P2 above (a tooling pass, not previously done for this Skill): installed GCTA, Popcorn
+and HESS into new, additive envs under `audit-envs/mendelian-randomization-analyst/` (no existing
+package or shared env touched) and ran each end to end on real or planted-truth data.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| GCTA-GREML claimed (taxonomy + decision tree) but no pipeline, install, or example anywhere in the Skill | P2 | New `references/gcta-greml.md` + `examples/gcta_greml.sh`; decision-tree row and "Per-Method Reference Files" index updated | ran | GCTA 1.94.1 (bioconda): built a real GRM from a real 957-individual/14389-SNP panel, recovered h2=0.538 (SE 0.135, p=2.3e-07) from a synthetic h2=0.5 phenotype (200 causal SNPs) -- within 1 SE |
+| Popcorn claimed but no pipeline, install, or example | P2 | New `references/popcorn-transancestry.md` + `examples/popcorn_rg.sh` | ran | Popcorn 1.1 (`brielin/Popcorn` HEAD, the maintained Python3 port) needed two numpy>=2 fixes (`numpy<2` venv pin for `compute`; one-line `dtype=np.bool`->`dtype=bool` source patch in `jackknife.py` for `fit`'s SE step). Ran `compute`+`fit` end to end on the real panel split into two individual-subsets with a planted shared genetic component; real jackknife SEs/p-values produced. h1^2/h2^2 magnitude is a documented toy-scale artifact of the same-ancestry split, not a code defect |
+| HESS reference file claimed a "Python 3 branch" of `huwenboshi/hess` that does not exist; shipped code does not run under Python 3 at all | P0 (a Skill claim contradicted by the tool's actual repo) | `references/hess-local-h2.md` Install section rewritten with the real repo state and five concrete patches (relative imports, `np.float`, `xrange`, pandas `delim_whitespace`, `gzip` text/binary mode); new `examples/hess_local_h2.sh` | ran | Patched clone (`audit-envs/.../tools/hess/`) step 1 (`--local-hsqg`) ran on a real synthetic locus (957 individuals, 1129 chr1 SNPs, 20 planted causal SNPs, real per-SNP OLS Z-scores): correctly reported 505/514 SNPs across the two halves and wrote real `.info/.eig/.prjsq.gz`. Step 2 (needs all 22 autosomes by design) not exercised -- single-chromosome test cannot supply it |
+| BOLT-LMM install URL 404s (`.../BOLT-LMM_v2.4.1.tar.gz`) | P1 (broken command) | Tool Install Notes + Version Compatibility updated to the current URL (v2.5, moved under `.../downloads/BOLT-LMM_v2.5.tar.gz`) | ran (URL fetch confirmed 200 + correct content-length) | Downloaded successfully, but the binary itself segfaults immediately on this machine (even `bolt --help`) -- flagged as unverified in SKILL.md, not chased further per this pass's time-boxing instruction |
+
+Regression-checked, unchanged, no drift found: `examples/smoke_test_ldsc.sh` (`--h2`/`--rg`/`--h2-cts`,
+identical numbers to the prior pass), `references/ldak-sumher.md`'s `--calc-tagging`/`--sum-hers`
+pipeline (toy trio + audit's `ldak_sumstats.txt`).
+
+**Left blocked, in the checkpoint, not chased further per this pass's instruction:**
+- HDL: needs a ~5 GB UKB reference-panel download; not attempted.
+- BOLT-REML: binary segfaults on this machine (see above); needs a different host or a from-source build.
+- HESS step 2 (genome-wide aggregation): needs all-22-autosome step-1 output; not exercised end to end.
+
+Full detail: `F:\OpenScience\audits\_final_pass\bio-causal-genomics-heritability-partitioning\CHECKPOINT.md`.
+Tooling detail: `F:\OpenScience\audit-envs\mendelian-randomization-analyst\TOOLS.md`, "Added 2026-09-21
+by the `heritability-partitioning` final-pass fixer".
 
 ## 2026-09-21 (structure)
 
