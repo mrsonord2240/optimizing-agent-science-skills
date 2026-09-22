@@ -65,3 +65,36 @@ None of the 4 P2s. Note on the audit's assertion "ValueError on batch-free data"
 | `references/combat.md` python block (`combat_correct`) | `scripts/combat_correct.py` (CLI + importable) |
 | SKILL.md Diagnose block (`batch_diagnostic`) | `scripts/batch_diagnostic.py` (CLI + importable) |
 | RUV (13 lines), SVA (10), NTC-anchored (7), MLE design matrix | stayed inline, under the 15-line bar |
+
+## Final pass, Phase 1 — 2026-09-21
+
+Worktree `F:\OpenScience\wt\crispr-screens-batch-correction`, branch `fix/crispr-screens-batch-correction`
+(tip `f04f3c5`, unchanged). Fixer/auditor: Claude Sonnet 5. Env: `crispr-screen-analyst`.
+
+Fix log's own "left unfixed" was already empty and `fixes/README.md`'s revisit list has no row for
+this Skill, so this pass's job was to walk every runnable block in the Skill (not just what earlier
+fixers touched) and confirm it executes as `SKILL.md` invokes it. Real HAP1 TKOv3 counts (planted
+2-batch/2-condition design) and the prior audit's 2,500-guide RUV/SVA synthetic set. No defect found;
+no commit made (nothing to change).
+
+| block | how run | result |
+|---|---|---|
+| `scripts/batch_diagnostic.py` CLI | as SKILL.md invokes it, real HAP1 71,090-guide planted design | batch loads on PC2 (F=52.8, p=0.0003), not PC1; PC1 batch/cond F=0.01 |
+| `scripts/combat_correct.py` CLI, with and without `--condition-col` | same data | both complete, 0 uncorrected, 0 NaN |
+| `combat_correct()` import + assertions | same data | 0 guides dropped (matches "Input-1: 0 dropped" claim), batch centroid dist 233.83->0.98, CEGv2/NEGv1 AUC 0.9947->0.9966, 0 Inf |
+| `combat_correct()` on a batch-free design (forced) | real HAP1 data, batch-free construction | filter drops 320 zero-residual guides, completes without raising -- confirms ValueError is now a backstop only |
+| `references/ruv.md` RUVg block | audit's 2,500-guide hidden-batch set | W_1/W_2 (8x2), corrected 2,500x8, NTC median CV 0.23->0.0016; old `which()`-based `cIdx` regression-confirmed still fails S4 dispatch |
+| `references/sva.md` block | same RUV dataset | 1 significant surrogate variable, 8x3 design matrix, 0 NaN |
+| `references/ntc-anchored-normalization.md` function | same RUV dataset | all 8 sample NTC medians scaled to exactly `target_median` |
+| `examples/batch_correct.py` | standalone, its own synthetic data | runs to completion, 15/15 true hits, 0 false positives |
+| SKILL.md MAGeCK MLE design-matrix block, `--permutation-round 10` | real 1,646-gene/6,460-guide HAP1 subset, mageck 0.5.9.5 | 0/1,646 NaN betas; top treatment betas numerically identical to the prior audit's run (deterministic, as documented) |
+
+Also checked: installed versions (`combat` 0.3.3, `mageck` 0.5.9.5, `sva` 3.54.0, `RUVSeq` 1.40.0) match
+SKILL.md's "Version Compatibility" claims exactly; `--permutation-round` and `--norm-method control`
+are real `mageck` flags (`--help`); `py_compile` clean on all three changed/scripted `.py` files; every
+"Related Skills" cross-reference resolves to a real folder in the fork; `SKILL.md` at 231 lines, all
+`references/*.md` at 16-22 lines (both under the split threshold).
+
+### Left unfixed
+
+Nothing found to fix. Checkpoint: `F:\OpenScience\audits\_final_pass\bio-crispr-screens-batch-correction\CHECKPOINT.md`.
