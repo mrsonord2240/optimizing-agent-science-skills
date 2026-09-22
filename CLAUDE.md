@@ -21,6 +21,13 @@ The method lives in `process/`. This file only says how the work is run.
 Every stage names who does it: `TOOLING_BRIEF` → `AUDIT_BRIEF` → `FIX_BRIEF` → `AUDIT_BRIEF` (re-audit).
 **The auditor, the fixer and the re-auditor are always different agents.**
 
+**Exception (Sam, 2026-09-21): the final pass on an already-fixed batch.** For a batch of Skills that
+have already had a fix pass and are meant to ship as-is afterward, one agent per Skill both finishes
+the fix (with permission to install what real verification needs) and then does the final audit itself
+— see `process/FINAL_PASS_BRIEF.md`. This is not independent re-audit and its report says so
+(`meta.auditor_independent: false`). Reserve it for a final consolidation pass Sam has explicitly
+called; the default remains three different agents.
+
 ## Fresh subagents, as often as sensible
 
 - **One fresh Sonnet per unit:** one tooling agent per folder, one auditor per Skill, one fixer per
