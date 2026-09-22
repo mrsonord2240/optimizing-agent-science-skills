@@ -64,3 +64,24 @@ No move: the only inline code block is `attachment_distance()` (9 lines, an API 
 ## Left unfixed
 
 None.
+
+# 2026-09-21 final-pass phase 1
+
+Worktree `F:\OpenScience\wt\chemoinformatics-protac-degraders`, branch
+`fix/chemoinformatics-protac-degraders`, tip `b3946b2` (unchanged this phase). Env
+`cheminformatics-hit-triage-analyst`.
+
+No findings to fix: prior passes' "left unfixed" was already empty, and `fixes/README.md`'s
+revisit list has no row for this Skill. Re-ran every runnable block as regression plus one new
+check:
+
+- `examples/protac_enumerate.py`, `examples/ternary_geometry_screen.py` (from both `examples/`
+  and the Skill root), `examples/cooperativity_dc50.py` -- all re-run, all internal assertions
+  still PASS, `py_compile` clean.
+- `attachment_distance()` (SKILL.md's one remaining inline snippet, previously unverified) --
+  built two RDKit-embedded/MMFF-optimized fragments as a stand-in for co-crystal poses in a
+  shared frame and ran it: 8.01 A, finite and positive.
+
+Checkpoint: `F:\OpenScience\audits\_final_pass\bio-protac-degraders\CHECKPOINT.md`. Nothing
+blocked; PRosettaC/DeepTernary/AlphaFold3/Boltz/HADDOCK stay correctly framed as external-only,
+per `cheminformatics-hit-triage-analyst`'s TOOLS.md. No commit -- no code changed.
