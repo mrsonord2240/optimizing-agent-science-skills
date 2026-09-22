@@ -45,3 +45,4 @@ Items a fixer saw and left because the pass was scoped to something else. Added 
 | bio-causal-genomics-effector-gene-prioritization | DEPICT (legacy 2015 Java+Python, 2.3-4.3GB bundle) not installed | Sam, 2026-09-21: skip the install, keep as citation-only (superseded by L2G+PoPS) -- resolved, no further action |
 | bio-causal-genomics-effector-gene-prioritization | FUMA is a registration-gated web platform, needs an account/token | Sam is obtaining this directly, 2026-09-21 |
 | bio-causal-genomics-fine-mapping | PAINTOR not on conda; two backgrounded git-clone attempts stalled | needs a foreground retry, not confirmed a network/repo problem |
+| bio-causal-genomics-genomic-sem | ldsc()/sumstats()/s_ldsc()/enrich() never run end-to-end -- needs real (or aligned synthetic) GWAS sumstats for >=3 traits, eur_w_ld_chr, a 1000G MAF reference, and baselineLD_v2.2 | data-engineering gap, not a single download; confirmed absent across three passes |
