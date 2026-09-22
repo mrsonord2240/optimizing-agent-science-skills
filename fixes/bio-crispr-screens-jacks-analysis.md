@@ -29,3 +29,49 @@ copied to `F:\OpenScience\wt\_fixdata\jacks\`; scripts `probe.py` and `verify.py
 
 All 8 `recommendations[]` entries (2 P0, 3 P1, 3 P2) fixed, plus eight defects found while fixing. Nothing
 left unfixed. `py_compile` clean on `examples/run_jacks.py`.
+
+## 2026-09-21 fix batch (P2s, redundancy, split, scripts)
+
+Worktree `F:\OpenScience\wt\crispr-screens-jacks-analysis`, branch `fix/crispr-screens-jacks-analysis`, from staging `main` 431aa55. Fixer: Claude Sonnet 5. Env `crispr-screen-analyst` (JACKS 0.2, pandas 3.0.5, Python 3.12). Verification data: the audit's HAP1 TKOv3 files (full 71,090 guides, and a 156-gene subset for quick runs) and JACKS' `example-small`. Commits: 381d1ba fix + redundancy, 8c35c01 split, db64e42 seed fix, 38c31e4 scripts.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| usage-guide step 12 lists `gene_results.txt`, `sgrna_efficacy.txt`, `library_redesign_candidates.txt`, `comparison_with_mageck.txt`, which no code produces | P2 | Step 12 now names the real outputs (`<outprefix>_gene_`, `_gene_std_`, `_grna_JACKS_results.txt`, `_gene_pval_` only with `--ctrl_genes`, `.pickle`) and labels the redesign list and MAGeCK comparison as agent-written summaries | ran (JACKS CLI/API output names on HAP1 and example-small) | the audit's recommended fix, second option |
+| (found while verifying scripts) `random.seed(<int>)` said to make pseudo-gene p-values reproducible | internal contradiction | Model paragraph, Common Errors row and usage-guide step now require `PYTHONHASHSEED=<int>` as well | ran + docs (source `createPseudoNonessGenes` builds its list from a set of gene-name strings) | 60 control genes, 200 pseudo-genes: `random.seed` alone differs across processes; `random.seed` + `PYTHONHASHSEED=0` twice byte-identical; `PYTHONHASHSEED=1` differs. The 2026-09-16 "seeded runs match" check used a 2-gene control list, too small to show it |
+
+1 of 1 P2 fixed, plus one defect found while fixing.
+
+### Left unfixed
+
+- Audit Input 3 assertion 4 (FAIL: the sequence-vs-ID silent-success case of a `--reffile` from a different library "was not exercised"): not a Skill defect (the auditor marked it not tested), and it needs a second library with matching guide IDs but different sequences, which does not exist on this machine.
+- security note (paths passed to `subprocess` without existence checks in `examples/run_jacks.py`): list-form invocation, no shell; judged not a correction. Left as is.
+
+### Redundancy pass (usage-guide.md was restating SKILL.md)
+
+| deleted passage | new home |
+|---|---|
+| usage-guide Prerequisites (clone/install lines, required-input list, optional priors) | SKILL.md "Version Compatibility" and "Run JACKS Joint Analysis" (input-file list); guide keeps a pointer |
+| "count matrix itself can serve as the guide map" | SKILL.md "Run JACKS Joint Analysis" input list (run: CLI with the HAP1 count matrix as guide map, `--gene_hdr gene`, 156 genes out) |
+| Tips: single-screen, chemistry, Chronos, effect/std z, deterministic-effects | already in SKILL.md (When Not to Use, Critical assumption, Interpretation rule, Model, convergence failure mode); deleted |
+| Tip: 2.5x reduction is conditional on same library and similar cell context | SKILL.md efficacy-prior reference block (now `references/efficacy-prior-and-diagnostics.md`) |
+| Tip: fit per-cell-line, pool downstream as meta-analysis | SKILL.md failure mode "Cross-cell-line efficacy disagreement" (now `references/failure-modes.md`) |
+| Tip: v2 library, drop bottom 25%, every gene >0.4 | `references/efficacy-prior-and-diagnostics.md` "Critical" paragraph |
+| Key Thresholds table (hit call, effective signal, low-efficacy flag, screen count, iterations, reference) | SKILL.md Quantitative Thresholds; "~50 lines, ~10k screen days" moved to the efficacy-prior reference |
+| Decision Comparison table | SKILL.md When JACKS Outperforms / Is Not the Right Tool; its "heavy selection (>40% of guides change): RRA fails, use MLE, BAGEL2 robust" row became a When-Not bullet |
+| SKILL.md "Effective gene signal" threshold row (duplicate of Hit call) | merged into the Hit call row |
+| SKILL.md cross-library and cross-chemistry threshold rows and the When-Not "cross-chemistry" bullet | Critical assumption paragraph and the "Reference efficacy prior from wrong library" failure mode |
+| SKILL.md "Quantified accuracy gain" comparison-table row | first table's ~21% / 9% row (which gained "Allen 2019 did not benchmark BAGEL2") |
+| SKILL.md Common Errors row "Library-reuse prior doesn't help" | same case in the wrong-library failure mode (silent ID-match case) |
+
+### Split
+
+`SKILL.md` 303 -> 171 lines (after the redundancy pass 303, after the split 181, after scripts 171). Moved verbatim: `references/efficacy-prior-and-diagnostics.md` (efficacy prior + per-sgRNA diagnostics), `references/failure-modes.md` (Failure Modes), `references/tool-comparison.md` (comparison + reconciliation tables). Every non-blank line of the old SKILL.md is in the new set (only headers, the Reference Files index and pointer text differ); python fences parse.
+
+### Scripts
+
+| old location | script |
+|---|---|
+| SKILL.md `runJACKS(...)` Python block | `scripts/run_jacks_joint.py` (ran on example-small with `--common-ctrl-sample CTRL`: 1,579 genes x 5 lines; on the HAP1 subset with per-sample `Control`, `--ctrl-genes/--n-pseudo/--seed`: p-value file written, none with `n_pseudo=0`; gene file byte-identical to the CLI run) |
+| `efficacy_summary()` in the efficacy reference | `scripts/efficacy_summary.py` (ran on example-small: 8,081 guides, median 1.017, matches the audit; on full HAP1 grna output; raises the documented `ValueError` on a renamed guide) |
+
+Left inline: CLI bash block (one command), `n_iter` and hyperparameter override recipes (under 15 lines, JACKS-internals illustrations), `extract_efficacy_prior` (5 lines). No block duplicated `examples/run_jacks.py`. Both scripts `py_compile` clean.

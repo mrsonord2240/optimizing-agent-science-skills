@@ -49,3 +49,55 @@ exist. No other instances found.
 None.
 
 Co-authored by Claude Sonnet 5.
+
+---
+
+## 2026-09-21 — P2 pass and split (audit 2 P2s, Production Ready)
+
+Worktree `F:\OpenScience\wt\database-access-geo-data`, branch `fix/database-access-geo-data`, from staging `431aa55`.
+Commits: `7637eef` fix, `97008ed` redundancy, `aa0b1b3` split, `ae7abb8` scripts. Env: `database-access`
+(Python 3.12.13, pandas 3.0, Biopython 1.88, pysradb 2.5.1, R 4.4.3 via `r.sh`).
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+| --- | --- | --- | --- | --- |
+| No regression test guards the missing-encoding bug class | P2 | New `scripts/geo_series.py selftest`: offline, synthetic non-ASCII gz fixtures (U+0141; 0x81 is undefined in cp1252, so a cp1252 read raises) plus an `ast` check that every `gzip.open(..., 'rt')` passes `encoding=`. Fixture is asserted to fail under cp1252 first, so it is discriminating. Landed in the scripts commit (`ae7abb8`) | ran: `selftest OK`; with `encoding=` stripped from `parse_series_matrix` the selftest fails with the file/line | Synthetic fixture instead of the audit's suggested trimmed GSE283260 copy: same failure class, no network, no data to ship |
+| Python/R default-encoding asymmetry on Windows undocumented | P2 | One paragraph in SKILL.md "Version Compatibility": Python default follows the locale (`cp1252` here), R was UTF-8; always pass `encoding='utf-8', errors='replace'` | ran: `locale.getpreferredencoding(False)` -> `cp1252`, `utf8_mode` 0 (Py 3.12.13); `Sys.getlocale('LC_CTYPE')` -> `English_United States.utf8` (R 4.4.3) | Stated as "checked 2026-09-21" for this machine |
+| (found) `download_series_matrix()` fence raised `NameError: urllib` (never imported in that block) | P2 (correction) | Added `import urllib.request` | ran: reproduced the NameError; extracted the fence verbatim from SKILL.md, run on GSE470: `expr.shape == (12625, 12)`, `!Series_geo_accession == ['GSE470']` | Same fence later moved to `scripts/geo_series.py` |
+| (found) `check_super_or_sub_series()` and `examples/search_geo.py::detect_super_series()` downloaded or read the whole SOFT family file (GSE122288: 486 MB, 76 s) although `!Series_relation` sits in the `^SERIES` header | P2 (correction) | Both now stream and stop at the first `^PLATFORM` / `^SAMPLE` | ran: `relation GSE122288` 76 s -> 5.5 s, same result; GSE346738 -> `super_of [GSE283260, GSE346737]`, GSE346737 -> `sub_of GSE346738`; `examples/search_geo.py` completes in 8 s with unchanged output | The old `break` on `^SAMPLE` alone did not help: platform tables of methylation arrays run to millions of lines |
+
+### Redundancy pass
+
+`usage-guide.md` was already deduplicated on 2026-09-19 (Prerequisites, Workflow, Tips); skipped. Inside SKILL.md:
+
+| deleted passage | new home |
+| --- | --- |
+| Common errors row "Submitter 'normalized' matrix gives different result than paper" | Failure modes: "Series matrix is not what it appears to be" |
+| Common errors row "404 on ArrayExpress URL" | Failure modes: "ArrayExpress URL rot" |
+| Common errors row "GEOparse missing CEL files" | Failure modes: "GEOparse supplementary files flakey" |
+| Common errors row "GEOmetadb-based pipeline missing recent series" | Failure modes: "GEOmetadb stale" |
+
+### Split (SKILL.md 398 -> 267 lines, then 222 after scripts)
+
+Verbatim moves, checked by multiset comparison of non-blank lines (only the six pointer-edited lines differ); all
+python fences `ast.parse`, the R fence `parse()`s.
+
+| section | new home |
+| --- | --- |
+| GEOparse vs GEOquery; GEOparse full Series download; R GEOquery | `references/geoparse-geoquery.md` |
+| SOFT vs MINiML; GEOmetadb status; ArrayExpress -> BioStudies | `references/legacy-and-formats.md` |
+| Search GEO; Link GEO Series to SRA; Find datasets by PubMed | `references/entrez-search-and-links.md` |
+
+### scripts/
+
+| old location | new location |
+| --- | --- |
+| SKILL.md "Detect SuperSeries before pulling data" fence | `scripts/geo_series.py relation <GSE>` |
+| SKILL.md "Download series matrix with submitter caveat" fence | `scripts/geo_series.py matrix <GSE> [--outdir]` |
+| `references/entrez-search-and-links.md` Search / SRA / PubMed fences | deleted, each duplicated an `examples/` script (`search_geo.py`, `geo_to_sra.py`, `geo_from_pubmed.py`); pointers left. All three ran live (GSE147507: 329 SRR by pysradb and by the Entrez chain; PMID 32416070 -> GSE147507) |
+| GEOparse (12 lines) and GEOquery (13 lines) fences | left inline: short API illustrations, under the 15-line bar |
+
+### Left unfixed
+
+None. Nothing new for Sam: `examples/geo_to_sra.py` writes `<GSE>_sra_runs.txt` into the current directory when run (intended, not changed).
+
+Co-authored by Claude Sonnet 5.

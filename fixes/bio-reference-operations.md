@@ -92,3 +92,24 @@ Moved verbatim: `references/contig-naming.md` (GRCh38 flavours, contig naming, r
 - Audit static note "no test data or expected output" beyond the toy: a real-genome sample cannot ship (size/licence); the toy FASTA + expected dict is the shippable part, done.
 - Audit assertion that the CRAM `Failed to populate reference` warning was not reproduced: I did not reproduce it either, so the claim was deleted rather than fixed (see table).
 - `-T` added "in samtools 1.22" / `--config` "1.17+" version notes: still only samtools 1.24 available to check them.
+
+## 2026-09-21 (structure)
+
+Branch `fix/reference-operations`, commit `refactor(alignment-files/reference-operations): move runnable code to scripts/` on top of `5d5e5f0`. No behaviour or claim changed.
+
+**Split:** none. SKILL.md is 279 -> 281 lines (two rows added to the Reference Files table), under 300; it already has three `references/` files.
+
+**Moved to `scripts/`**
+
+| old location | script | how it was run |
+|---|---|---|
+| `references/python-consensus.md` `build_consensus` + `compare_to_ref` (verbatim functions, CLI wrapper added) | `scripts/pysam_consensus.py` (`consensus`, `compare`) | from the skill dir as the md now invokes it, on the audit's real chr22 slice (`run/data/real`): `compare ... chr22 1951 4617 --min-depth 3` -> exactly 1 line (`3266 T C`); `consensus` length 2666; planted BAM ran. pysam 0.24.1 |
+| `references/contig-naming.md` rename block (awk header rewrite, `reheader` via `.tmp`+`mv`, index, name/length check) | `scripts/rename_contigs.sh in.bam map.tsv out.bam [ref.fa]` | synthetic `synth_chr.bam` with a chr->numeric map: rc 0, prints `OK` against `synth_numeric.fa.fai`, records identical except RNAME; HG00349 hs38DH slice with the GRCh38 assembly-report map: rc 0, 3,366 `@SQ`, 25 renamed to `NC_`, records identical; missing map -> nonzero and no output file. samtools 1.24 |
+
+The pre-map `awk` line that builds `map.tsv` from the assembly report and the `sed` UCSC->Ensembl variant stay inline (one line each); the sed variant now ends with its own `reheader` + `index` line (before, it wrote `renamed.hdr` and relied on the reheader above it) and ran on the HG00349 header (`chr20` -> `20`). The script's optional 4th argument replaces the separate inline "Check" block.
+
+**Stayed inline:** `consensus_at_position` (single-position teaching snippet, superseded by `build_consensus`), the header-dict `create_dict_header` snippet (16 lines, teaching; run in the earlier pass), the 8-line "Check Reference Setup" block, all one-to-five-line samtools recipes. `examples/prepare_reference.sh` already is the script for the prepare-reference workflow.
+
+Checks: all python fences `ast.parse`, all bash fences `bash -n`; scratch and test data under `F:\OpenScience\f-refops-struct` (audit data copied, not written to).
+
+Noticed, not changed (claim, out of this pass): `python-consensus.md` says the chr22 slice at `-d 1` gives "5 and 4"; the majority-vote script gives 6 at `--min-depth 1`, while `samtools consensus -m simple --call-fract 0.5 --min-BQ 13 -d 1` gives 5 and Bayesian 4. The "1 and 2" at `-d 3` reproduces.

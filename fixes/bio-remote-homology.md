@@ -34,3 +34,54 @@ there into the matching `SKILL.md` section rather than dropping them:
 Nothing from the audit's P1/P2 list. Not attempted: toy fixtures for Foldseek/MMseqs2/DIAMOND/
 HH-suite (multi-GB prebuilt DBs, not cheap — TOOLS.md already documents smaller self-search
 smoke tests for those instead).
+
+---
+
+## 2026-09-21 (P2 batch)
+
+Fixer for the two open P2s of the 92/100 re-audit, plus the length/redundancy pass. Branch
+`fix/database-access-remote-homology` on staging `main` (431aa55), commit `482fd24`. Env:
+`database-access` (WSL `science`/`bio`: HMMER 3.4, MMseqs2 18.8cc5c, DIAMOND 2.2.6, Foldseek
+10.941cd33, BLAST+ 2.17.0+). SKILL.md 370 -> 296 lines, so no split was needed.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| `pfam_annotation.sh` prints nothing on a zero-hit query | P2 | Both `pfam_annotation.sh` and `pfam_annotation_toy.sh` print "No Pfam-A domains found above the gathering threshold." and exit 0. The audit's suggested `[ ! -s query.domtbl ]` would never fire (domtbl always has `#` header lines), so the check is `! grep -qv '^#' query.domtbl` | ran: P17612 vs PF00069 still `1.4e-79 / 253.2`; poly-Q/poly-G query prints the message, exit 0, in both scripts | |
+| PSI-BLAST-only / HHsearch-only example scripts missing | P2 | not changed | | see Left unfixed |
+| (found while running) MMseqs2 default `-s` stated as 4.0 | none (correction) | Default is 5.7 for `easy-search`/`search`; SKILL.md text and the failure mode corrected, `-s 5.7 is a middle ground` dropped, real 0-hit/`-s 7.5` numbers added | ran + help: `mmseqs easy-search -h` says `[5.700]`; default and explicit `-s 5.7` gave 0 hits on P17612 vs the 300-seq Swiss-Prot sample, `-s 7.5` gave Q197B6 (E=1.37e-13) | Contradicted the audit's own run (Input 2: "implicit 5.7") |
+| (found while running) `hmmscan (-gathering)` | none (correction) | `-gathering` -> `--cut_ga` | help: `hmmscan -h` | |
+| (found while running) `hmmsearch iter-3.hmm` after jackhmmer | none (correction) | Uses the highest-numbered `iter-*.hmm` (jackhmmer converged at round 2 on the audit pair, so `iter-3.hmm` did not exist) | ran: `hmmsearch iter-2.hmm` hits Q197B6 (E=8.6e-62) | |
+| (found while running) DIAMOND `--more-sensitive` implied enough for remote homology | none (correction) | Failure-mode line now says default and `--more-sensitive` both returned 0 hits on the 25%-identity pair, only `--ultra-sensitive` recovered it | ran: DIAMOND 2.2.6 on the same pair (0 / 0 / 2 hits, Q197B6 E=5.39e-12) | Same finding as TOOLS.md note 2 |
+| (found while running) `iterative_profile.sh` fails as SKILL.md invokes it | none (correction) | `psiblast -db` got a FASTA path and died: script now runs `makeblastdb` first; `grep -c` on zero jackhmmer hits aborted under `set -e`: `|| true` | ran: on the Swiss-Prot sample psiblast, jackhmmer and MMseqs2 all find Q197B6, exit 0 | |
+| (found while running) `foldseek_search.sh` re-downloads AFDB every run | none (correction) | Guard `[ ! -d afdb_sp ]` (never true, `foldseek databases` writes files) -> `[ ! -f afdb_sp.dbtype ]` | ran: 1ATP self-DB as `afdb_sp`, structure path completes with no download, self-hit prob 1.000, TM 1.000 | Observed by the script starting a real AFDB download; that process was killed by PID |
+| PSI-BLAST failure-mode trigger said "5+ iterations", body said 4+ drift | none (correction) | Trigger reworded to "past 3 rounds, or to convergence" | docs (internal consistency) | |
+
+### Left unfixed
+
+- **PSI-BLAST-only and HHsearch-only `examples/` scripts** (P2 #1): new content, not a correction.
+  The audit's own carry-over note calls it optional. The PSI-BLAST leg (with PSSM output) already ships
+  in `iterative_profile.sh`, and both tools have runnable inline blocks in SKILL.md (PSI-BLAST incl.
+  `-in_pssm` reuse; HHblits + HHsearch). A verified HHsearch script needs UniRef30 and PDB70 (tens of
+  GB, not on disk and not built by the tooling pass); only the flags were checked (`hhblits -h`,
+  `hhsearch -h`).
+- **ProstT5 branch of `foldseek_search.sh`** (`foldseek databases ProstT5` then `--prostt5-model`) was
+  not run: it downloads multi-GB weights. Its `[ ! -d prostt5 ]` guard is unverified for the same
+  reason.
+- **Step 4b (scripts/)**: no complete runnable block of ~15+ lines is left inline. The Foldseek,
+  iterative-profile and Pfam recipes were already `examples/` scripts and their inline copies were
+  deleted (below); the remaining inline blocks (PSI-BLAST 12 lines, HHsearch 7, jackhmmer, MMseqs2,
+  DIAMOND) are short. No `scripts/` directory created.
+
+### Redundancy pass: deleted passage -> new home
+
+`usage-guide.md` was already deduplicated on 2026-09-19 (skipped). This pass collapsed repetition
+inside SKILL.md. Verified by grep that each command survives in its new home.
+
+| deleted (SKILL.md, before) | now lives in |
+|---|---|
+| "Foldseek search against AlphaFoldDB" code block (`foldseek databases Alphafold/Swiss-Prot`, `easy-search --format-output ...`) | `examples/foldseek_search.sh`; SKILL.md "Foldseek search" pointer keeps the field list, TM-score note, `prob > 0.9`; the `easy-search` commands stay in "Foldseek: the 2024 revolution" |
+| "Sequence-only Foldseek via ProstT5" block | "Foldseek: the 2024 revolution" access mode 2 (same two commands), `foldseek_search.sh` sequence branch, "Foldseek without ProstT5" failure mode |
+| "MMseqs2 sensitive iterative search" block (createdb/createindex/search --num-iterations 3 -s 7.5/convertalis) | "MMseqs2" section (`easy-search ... -s 7.5 --num-iterations 3`, iterative bullet) and `examples/iterative_profile.sh` |
+| "Pfam domain annotation (canonical)" block (hmmpress, hmmscan --cut_ga, awk filter) | "HMMER 3" section block (hmmpress + `hmmscan --cut_ga --domtblout`), `examples/pfam_annotation.sh` (awk columns) and the toy script |
+| "DIAMOND ultra-sensitive on a metagenome" block | "DIAMOND" section (makedb + blastp block; `--ultra-sensitive` in table and default-choice line) |
+| Common-errors rows: PSI-BLAST implausible hits, MMseqs2 all unrelated, DIAMOND misses BLAST hits, Foldseek structurally unrelated | the four matching Failure-modes sections (unchanged); the table keeps its two unique rows (HHblits prefilter, jackhmmer ConvergenceError) |

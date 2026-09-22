@@ -20,3 +20,34 @@ None. All P0s and the P1 from the audit's `recommendations[]` were fixed; the on
 ## Environment
 
 Verification ran against live NCBI E-utilities via `F:\OpenScience\audit-envs\database-access\Scripts\python.exe` (biopython 1.88, per that env's `TOOLS.md`). No packages installed or changed.
+
+## 2026-09-21: P2 batch pass
+
+Worktree `F:\OpenScience\wt\database-access-batch-downloads`, branch `fix/database-access-batch-downloads`
+(from staging `431aa55`), commit `8df2313`. Audit: `F:\OpenScience\audits\bio-batch-downloads\`
+(2 P2). Env: `database-access` (biopython 1.88), live NCBI E-utilities, a handful of requests.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+| --- | --- | --- | --- | --- |
+| ">100,000 sequences" matrix row ends mid-clause ("chunk if E-utils still") | P2 | Completed: "if E-utils is still the chosen path, chunk via the history server (single stream)" | read | Wording only; Input 9's soft-bracket behaviour unchanged. |
+| No regression test for the bytes-decode and zero-count guards | P2 | Not added (see left unfixed). Ran both guards by hand instead, see below | ran | Mock: bytes `<ERROR>` body then good body -> re-ESearch, 3/3 written, no TypeError; persistent `<ERROR>` -> `RuntimeError` after `max_retries`, no checkpoint written. Live: SKILL.md snippet on BRCA1 RefSeq mRNA, 368/368, checkpoint removed. |
+| Redundancy: inline `checkpointed_batch_download`, `epost_and_fetch`, `verify_fasta_count` duplicate `examples/` | (doctrine) | Deleted the three blocks; SKILL.md keeps Goal/Approach and points at the examples, with a usage snippet | ran (snippet) | The deleted inline `checkpointed_batch_download` had a defect the example does not: after `max_retries` failures it fell out of the retry loop and advanced `start`, silently skipping the chunk. Snippet sets `Entrez.email` after import because `robust_download` overwrites it with a placeholder at import time. |
+
+Usage-guide: the 2026-09-19 pass already reduced it to overview, prompts, related Skills. Nothing to do.
+
+### Length and scripts
+SKILL.md 322 -> 239 lines, so no `references/` split. `scripts/`: no runnable block of ~15+ lines
+remains inline (the asyncio block is labelled pseudo-code, `estimate_efetch_calls` is 2 lines); no
+scripts commit.
+
+### Left unfixed
+- **No committed regression test (P2).** It would be a new pytest module with mocked Entrez handles: new
+  content, and the Skill ships no test harness or pytest dependency. The guards it would cover are in
+  `examples/robust_download.py` and `examples/batch_fasta.py`, which the audit and this pass ran.
+
+### Deleted passage -> new home
+| deleted (SKILL.md) | now |
+| --- | --- |
+| `checkpointed_batch_download()` inline block | `examples/robust_download.py` `checkpointed_download()`; SKILL.md "Production batch fetch" |
+| `epost_and_fetch()` inline block | `examples/batch_by_ids.py` `chained_epost_fetch()`; SKILL.md "EPost large ID list" |
+| `verify_fasta_count()` inline block | `examples/batch_by_ids.py` `verify_count()`; SKILL.md "Integrity check" |

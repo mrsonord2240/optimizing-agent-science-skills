@@ -32,3 +32,43 @@ addressed above.
 ## Files changed
 
 - `metabolomics/xcms-preprocessing/SKILL.md`
+
+## 2026-09-21: P2 fix batch (Production Ready, 92)
+
+Worktree `F:\OpenScience\wt\metabolomics-xcms-preprocessing`, branch `fix/metabolomics-xcms-preprocessing` (from staging `main` 431aa55), commit bb934d8. Env `untargeted-metabolomics-analyst` via `rs.sh`: xcms 4.4.0, MsExperiment 1.8.0, R 4.4.3. Data: real faahKO CDFs (the audit's data; no synthetic set). Nothing installed.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| `MatchedFilterParam` named in the Decision Tree with no example or parameter guidance | P2 | Peak Detection: worked `MatchedFilterParam(binSize = 0.1, fwhm = 30, snthresh = 10, steps = 2)` block plus notes (`fwhm` = measured EIC FWHM in s, `sigma = fwhm/2.3548`, `binSize` = m/z slice, `mzdiff` default `0.8 - binSize*steps`); decision-tree row points to it | ran + help | Block run verbatim on 1 KO + 1 WT faahKO: 930 peaks (470/460), columns mz/rt/into/sn present. `fwhm = 10` on sample 1: 276 peaks vs 470 at 30. `mzdiff(MatchedFilterParam())` = 0.6 = 0.8 - 0.1*2. Defaults checked against `?MatchedFilterParam`. Per-instrument-class starting values NOT given: no evidence beyond the docs' defaults and the run, so `fwhm` is tied to the measured EIC width instead. |
+| AutoTuner / IPO: one unelaborated Decision Tree cell | P2 | Claim deleted (brief option 3): row now says start from Quantitative Thresholds, measure base-widths on 5-10 known EICs, iterate `peakwidth`/`snthresh`/`ppm`; AutoTuner/IPO kept only as a caution ("not covered here", McLean 2020). New EIC snippet in Peak Detection using `chromatogram()` + `plot()` supplies the "verify against EIC width" step the row depends on | ran | `IPO` and `AutoTuner` are not installed in the env (`requireNamespace` FALSE) and installs are forbidden, so no runnable block could be written. EIC snippet run on the strongest faahKO peak (mz 508.2, rt 3514 s): 77-point chromatogram, peak FWHM about 39 s; `plot()` to a null device OK. |
+| `minFraction` guidance does not distinguish 2 replicates of one condition from 1 sample per condition | P2 | Correspondence: `minFraction` is per sample group; 2 replicates of one condition -> 1.0 vs 0.5 differ; 1 per condition -> every value in (0,1] identical and `minSamples = 2` returns 0 features; to require presence in both, use one group (`sampleGroups = c('all','all')`) | ran | faahKO, CentWave (ppm 25, peakwidth 20-80) + obiwarp then `PeakDensityParam(bw = 5)`: 2 KO replicates 259 (1.0) vs 2158 (0.5); 1 KO + 1 WT as two groups 1926/1926 in one run and 1877/1877 in the second (different files), `minSamples = 2` 0 features; same pair as one group 319 (1.0) vs 1877 (0.5); 2 KO + 2 WT 348 vs 3469. Assertions in scripts checked equality and inequality. Went beyond the audit's suggested clause: its "no true replicates" advice was incomplete because `minSamples` also cannot substitute. |
+
+### Left unfixed
+
+None.
+
+### Redundancy pass (usage-guide.md vs SKILL.md)
+
+| deleted passage (usage-guide.md) | new home |
+|---|---|
+| Prerequisites: `BiocManager::install(c('xcms', 'MsExperiment', 'Spectra', 'CAMERA'))` | SKILL.md Version Compatibility ("Install:", with checked versions) |
+| Prerequisites: centroid in software with a documented algorithm, not irreversible on-instrument centroiding | SKILL.md Decision Tree, "Profile data of any kind" row |
+| Prerequisites: record sample design (groups, QCs, blanks, injection order) per file | SKILL.md Peak Detection, `readMsExperiment` comment |
+| Prerequisites: feature table is a parameterized result reported with its processing spec | already in SKILL.md (Version Compatibility, Insight); deleted |
+| Tips: CentWave vs MatchedFilter, `peakwidth` c(20,50) default, `ppm` 2-3x scatter | already in SKILL.md (Decision Tree, failure modes, Quantitative Thresholds); deleted |
+| Tips: align to pooled QC, not file #1 (outlier propagates) | SKILL.md Retention-Time Alignment approach |
+| Tips: inspect RT-deviation plots and EICs, alignment can look perfect in QCs | SKILL.md Retention-Time Alignment approach (plus Insight, Decision Tree row) |
+| Tips: filled values are imputations, track `is_filled`, MNAR-aware imputation | already in SKILL.md (Gap-Filling, failure mode); deleted |
+| Tips: finding surviving one parameter set is a candidate, not a result | SKILL.md Version Compatibility closing paragraph |
+| What the Agent Will Do (7-step restatement of the workflow) | already in SKILL.md workflow line and per-step sections; deleted |
+| Overview restating the description | shortened to two sentences pointing at SKILL.md |
+
+Both files keep a Related Skills list (guide's, per the brief, and SKILL.md's); left as is. One example prompt (low-res quadrupole run) added to the guide.
+
+### Scripts / split
+
+SKILL.md 236 -> 255 lines: under the 300-line threshold, no split. `scripts/`: the largest fenced block is 12 lines (Peak Detection); none is at the ~15-line threshold, so nothing moved. All 8 fenced R blocks parse (`parse()`). `examples/xcms_workflow.R` untouched; re-run as a regression check, it completes (4 files, 4667 peaks, 2931 features, filled fraction 0.496).
+
+### Noticed, not changed
+
+- Retention-Time Alignment says to align to a pooled QC, but the `ObiwarpParam` example shows no `centerSample`; left as a possible follow-up (not in the audit's findings).

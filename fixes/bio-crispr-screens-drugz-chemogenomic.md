@@ -48,3 +48,24 @@ Worktree `F:\OpenScience\wt\crispr-screens-drugz-chemogenomic`, branch `fix/cris
 Inside SKILL.md: the "Dose consistency rule" stated twice (dose section and comparison section) now lives once in "Drug-Dose and Time-Course Designs"; the comparison section points to it. No disagreement between copies.
 
 Both `recommendations[]` entries (1 P1, 1 P2) fixed, plus two defects found. Nothing left unfixed. No `.py`/`.sh` changed in the Skill, so no compile step; `examples/run_drugz.py` untouched.
+
+## 2026-09-21 (structure)
+
+Worktree `F:\OpenScience\wt\crispr-screens-drugz-chemogenomic`, branch `fix/crispr-screens-drugz-chemogenomic`. Fixer: Claude Sonnet 5. Structure only; no behaviour or claim changed.
+
+**Split** (commit `refactor(...): split SKILL.md into references/`): SKILL.md 318 -> 243 lines (230 after the scripts commit). Verbatim moves, compared non-blank line by line (nothing lost; only the two section headings became file titles, and four pointer edits/index lines were added); both bash fences in the new files pass `bash -n`.
+
+| section | now |
+|---|---|
+| "Removing Reference Genes from the Analysis" (37 lines) | `references/reference-gene-removal.md` |
+| "Failure Modes" (43 lines, six subsections) | `references/failure-modes.md` |
+
+SKILL.md gained a "Reference Files" index and pointers: the `-r` comment in the Run block, the "Hits dominated by essentials" Common Errors row, the Pearson threshold row, and a line after the comparison table. Kept in SKILL.md: scope, algorithm, Run block, dose design, comparison table, Quantitative Thresholds, Common Errors, install.
+
+**Scripts** (commit `refactor(...): move runnable code to scripts/`):
+
+| old location | script | how run |
+|---|---|---|
+| SKILL.md "Drug-Dose and Time-Course Designs", `dose_consistent_hits()` python block (17 lines) | `scripts/dose_consistent_hits.py` (function verbatim, plus CLI, header comment, `--top-dose` validated) | env `crispr-screen-analyst` Python, on the 3-dose drugZ outputs in `_fixdata\drugz\` (built from the audit's synthetic data): `--top-dose high low=... mid=... high=...` returned exactly the 6 planted sensitizers, all normZ < 0 (asserted); `--direction supp` returned the 6 planted suppressors plus the RGS2 drug-target paradox gene; a bad `--top-dose` errors cleanly |
+
+Stayed inline: the bash blocks (all under 15 lines; short invocations and a 3-line CEGv2 `-r` recipe). `examples/run_drugz.py` untouched; its `per_dose_drugz()` also runs drugZ per dose, so it is not a copy of the script.

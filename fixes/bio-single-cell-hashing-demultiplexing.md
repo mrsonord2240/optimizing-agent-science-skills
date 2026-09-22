@@ -23,3 +23,32 @@ R 4.4.3/Bioconductor 3.20, plus the new `tools\demuxem-venv\` (GMM-Demux 0.2.2.3
 compiled clean (`py_compile`); changed `.R` snippets parsed and were run end to end, not just parsed.
 No shared-venv or shared-R-lib package was installed or changed; `demuxem-venv` is a fresh isolated
 venv built from the runtime's own interpreter, following the `sccoda-venv`/`liana-venv` precedent.
+
+## 2026-09-21 (P2 batch)
+
+Fixer for `single-cell/hashing-demultiplexing`, branch `fix/single-cell-hashing-demultiplexing` (worktree
+`F:\OpenScience\wt\single-cell-hashing-demultiplexing`, base staging `main` 431aa55), commit `1e0fff0`.
+Audit: 2 P2. SKILL.md 227 -> 231 lines (under the 300 split threshold, no split).
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| GMM-Demux SSD-mtx writer does not "always" fail | P2 | SKILL.md GMM-Demux section and Common Errors row reworded to "can fail on some inputs/scipy versions"; states where `SSD_mtx/` is written (working dir, or `-o <dir>`); keeps "judge by `GMM_full.csv`, not exit code" | ran: GMM-Demux 0.2.2.3, scipy 1.13.1, on the audit's 4-tag, unequal and weak-staining data: exit 0 and `GMM_full.csv` each time; `-o ../ssd3` wrote the folder there; `--help` for `-o` | The 2026-09-19 claim was generalised from one environment |
+| No bundled example dataset | P2 | none | n/a | see Left unfixed |
+| Redundancy pass (not an audit finding) | - | see table below | grep of each moved fact in SKILL.md | |
+| hashsolo inline block duplicates `examples/hashsolo_scanpy.py` | - | 14-line block cut to the 2-line `sce.pp.hashsolo` call plus a pointer to the example | ran: the example, unchanged, on the audit's `hto_counts_4tag.csv` with synthetic GEX: 1393 singlets/124 doublets/83 negatives, singlet agreement 99.9% vs ground truth, guard did not fire | |
+
+### Left unfixed
+
+- **No bundled example dataset (P2):** it needs new fixture content (synthetic HTO CSV plus a synthetic GEX matrix, since both examples also read `gex.h5ad` / `gex_counts`) and rewiring the examples to read it; `examples/` stays as it is under FIX_BRIEF, and the audit's own synthetic data is not shipped with the Skill.
+- **Scripts step:** no other runnable block is 15+ lines (HTODemux 3, MULTIseqDemux 2, pegasus 5, demuxmix tryCatch 9, GMM-Demux 1), so nothing moved to `scripts/`; the only qualifying block was the hashsolo duplicate, deleted above.
+
+### Deleted passages -> new home
+
+| deleted | new home |
+|---|---|
+| usage-guide.md "Prerequisites" (R/bash install commands) | SKILL.md "Install" section |
+| usage-guide.md "What the Agent Will Do" steps 1-7 | SKILL.md decision tables, method sections, Common Errors; guide keeps a pointer |
+| step 4 "Negative fraction roughly 50%+: stop and diagnose" | SKILL.md hashsolo section (after the example pointer) |
+| usage-guide.md Tips (11 bullets) | SKILL.md Governing principle, Choosing a hashtag caller, Common Errors rows (all already stated there) |
+| usage-guide.md "Related Skills" | SKILL.md "Related Skills" (unchanged) |
+| SKILL.md hashsolo block (imports, `adata.obs[hto_cols] = ...`, classification counts, >90% guard, singlet subset) | `examples/hashsolo_scanpy.py` |

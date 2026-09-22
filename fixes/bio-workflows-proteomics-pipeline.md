@@ -131,3 +131,26 @@ scope, thresholds and install stay in SKILL.md, which is why it is still over 30
   real dilution set; building a synthetic multi-plex MaxQuant evidence table with planted truth would be new test
   data, not a correction. The planted-2x check on the bundled set recovered the effect.
 - **FragPipe route not written** (deleted instead): FragPipe/MSFragger are licence-gated and not installed, so no runnable block could be verified.
+
+## 2026-09-21 (structure)
+
+Branch `fix/workflows-proteomics-pipeline`, commit `ef9b7ee`. Env `mass-spec-proteomics-analyst` (R 4.4.3 via `r.sh`); no FragPipe.
+
+**Split.** SKILL.md was 368 lines (already split once, 543 -> 367). No further `references/` split: what was left was the default path (206-line limma workflow block) and Common Errors, which every request needs, and no method-specific block remained to move. Moving the workflow to `scripts/` did the job instead: **368 -> 175 lines**, no separate split commit.
+
+**Moved to `scripts/`** (verbatim, then parametrised with `commandArgs`; a multiset comparison of non-blank lines old vs new found only the intended path/argument substitutions missing). Each was run as SKILL.md / the reference now invokes it, on audit data (copies in the scratchpad):
+
+| old location | script | run on | result |
+|---|---|---|---|
+| SKILL.md "Complete R Workflow" (206 lines) | `scripts/limma_pipeline.R` | `data/proteinGroups.txt` + `sample_annotation.csv`; also `proteinGroups_failed.txt` | 62 significant (35 up / 27 down), 0 true nulls among them, all signs match `truth_proteins.csv`, output columns asserted; failed file: T4 dropped, 60 significant |
+| references/msstats.md block (39) | `scripts/msstats_maxquant.R` | `data/evidence.txt`, `proteinGroups.txt`, `annotation_msstats.csv` | 296 proteins, 105 called, 21 true nulls at BH 5% (same as the pass-6 numbers) |
+| references/silac.md block (23) | `scripts/silac_limma.R` | `pass5/work7/proteinGroups.txt` + `truth.csv` | 453 tested, 49 at BH 5%, 0 false positives |
+| references/dia-nn.md block (28) | `scripts/diann_matrix.R` | `data/report.parquet` | 887 x 8, no `-Inf` |
+| references/tmt-isobaric.md block 1 (37) | `scripts/tmt_impurity_correct.R` | `pass5/work4/tmt.mzML` + its CoA (channels renamed 126..131) | 24 spectra x 10 channels, no negatives, median relative error vs `tmt10_truth.csv` 0.0221 uncorrected -> 0.0055 corrected; a transposed CoA stops with the orientation error and writes nothing |
+| references/tmt-isobaric.md block 2 (34) | `scripts/msstatstmt_multiplex.R` | MSstatsTMT 2.14.2 bundled `evidence` / `proteinGroups` / `annotation.mq` dumped to files (5 plexes, 8 proteins) | 24 protein x contrast rows, `adj.pvalue.global` present, null centre 0.0 log2, none significant |
+
+Changes beyond the parametrisation: the raw boxplot in `limma_pipeline.R` is wrapped in `pdf(...)`/`dev.off()` (Rscript has no screen device; it would write `Rplots.pdf`); the scripts write their result to a CSV; comments that said "the limma block in SKILL.md" / "as in references/msstats.md" now name the script. SKILL.md keeps a 7-step summary of the limma script with the thresholds, the dose-series floor measurement and the output columns, so the run needs no read of the script to be interpreted. `references/*.md` keep their intro and caveat prose and a one-line "Run ..." in place of each fence. The Reference Files table gained a Run column. Usage lines say `Rscript` (the published Skill has no `r.sh`).
+
+**Stayed inline / not moved.** Install one-liner, the sample-annotation CSV template (data, not code), the bash invocation. `examples/proteomics_workflow.R` untouched; its comments still say "Complete R Workflow of SKILL.md", which still names a real heading. The SKILL.md limma workflow is not a duplicate of the example (the example takes `sample_groups`, no batch, and simulates data), so it moved to `scripts/` rather than being deleted.
+
+**Not run.** FragPipe: no route in the Skill (deleted in pass 6).

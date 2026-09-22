@@ -54,3 +54,36 @@ Redundancy: no new duplication; the size check appears once in SKILL.md (Checksu
 script is the runnable copy, per the shipped-examples exemption.
 
 Unfixed: none. Notes: the size check relies on `python3`; `--gzip` rehydrate was not tested against it.
+
+---
+
+## 2026-09-21 (structure)
+
+Worktree `F:\OpenScience\wt\ncbi-datasets-cli`, branch `fix/ncbi-datasets-cli`, on top of `a7bc8e2`.
+Structure only; no behaviour or claim changed.
+
+**Split** (commit `cc48c31`): `SKILL.md` 397 -> 276 lines (253 after the scripts commit). Verbatim moves,
+no non-blank line lost (the only differing lines are the four scope-table / `--dehydrated` lines that gained
+a pointer); every moved bash fence passes `bash -n`, python fences compile.
+
+| Moved | To |
+| --- | --- |
+| "When to use --dehydrated", "Checksum verification", "Bulk download all reference bacterial genomes" | `references/dehydrated-bulk.md` |
+| "Gene metadata across species", "Find orthologs for a gene" | `references/gene-orthologs.md` |
+| "Virus genomes" | `references/virus-genomes.md` |
+
+"Reference Files" index added before "Code patterns", with pointers from the Gene, Ortholog and Virus scope-table
+rows and from the `--dehydrated` paragraph. Blank runs inside the file were collapsed to single blanks (the
+old python block lost its PEP8 double blanks; the script restores them).
+
+**Scripts** (second commit):
+
+| Old location | Now | How run |
+| --- | --- | --- |
+| SKILL.md "Python wrapper" (33 lines) | `scripts/datasets_wrapper.py` (functions verbatim, argparse `main`) | `--taxon "Escherichia coli" --accession GCF_000819615.1`, datasets 18.37.0: 2 reference assemblies with contig N50, download zip asserted to hold a 5386 bp NC_001422 genome and `protein.faa` |
+| references/dehydrated-bulk.md bulk-bacteria block (26 lines) | deleted; points at `examples/bulk_dehydrated.sh` (duplicate) | Ran the example as now invoked (`<taxon> <zip> <dest> <threads>`, Mycoplasma genitalium, WSL aria2c 1.37.0 via a path shim): rc 0, NCBI blocked the aria2c transfer again, step 3 caught 3 bad files and rehydrated, sizes 587407/373156/219385 match `dataset_catalog.json`, genome 587 kb |
+
+Stayed inline: the 10-line size-check python heredoc (under the 15-line bar, and the example already
+carries the runnable copy); the single-genome download block (11 lines, mirrors `examples/download_genome.sh`);
+the filter-assemblies and ortholog pipelines (short one-liners, `gene_metadata.sh` covers the gene case).
+Scratch dir under `tools\ncbi-datasets-cli\` deleted after use; nothing installed.

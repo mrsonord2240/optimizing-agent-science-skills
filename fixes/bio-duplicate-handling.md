@@ -53,3 +53,51 @@ already in the file); "Filter Commands" now holds the count commands too.
   index requirement (checked on the RX BAM with CB/UB deliberately absent).
 - PacBio-specific pbmarkdup was run on synthetic HiFi-style reads only, no real HiFi amplicon BAM available.
 - `TOOLS.md` in the alignment-files env does not list `af-dup-extra`; outside my write scope.
+
+## 2026-09-21 (branch `fix/alignment-files-duplicate-handling`, worktree `F:\OpenScience\wt\alignment-files-duplicate-handling`, from staging main 431aa55)
+
+Production Ready batch: the 5 open P2s from the re-audit, then the split and the `scripts/` move. Commits: 535e20f (fix),
+9be7866 (split), 8573e10 (scripts), 9480764 (one duplicate sentence). Not re-scored here. Tools (WSL `science`): samtools 1.24,
+pysam 0.24.1, umi_tools 1.1.6, fgbio 4.1.1. Data: audit-env `planted_dups.bam` (truth 100 reads), `test.paired_end.sorted.bam`,
+`test.paired_end.umi_unsorted.bam`, `test.rna.paired_end.sorted.bam`, 1000G slice. Fixed 5/5.
+
+| finding | priority | change | verified | notes |
+| --- | --- | --- | --- | --- |
+| Unmeasured "~30% faster" / biobambam2 "Fastest" | P2 | percentage and "Fastest" deleted; the audit's measured run (800k reads, 4 threads, 6.4 s vs 4.6 s, plain chain faster) stated instead, no 30x claim | audit input 9 timing log (3 reps, equal flagged counts); I did not re-time | biobambam2 speed cell now "Fast" |
+| umi_tools counts vary by 1 without `--random-seed` | P2 | `--random-seed=1` in both umi_tools invocations (now in `scripts/umi_tools_dedup.sh`), sentence saying the unseeded count moves by ~1 | ran: seeded 5689 x4, unseeded 5688 in 1 of 6 runs (audit: 3 of 6) | 5689 vs 2805 figures kept |
+| `--strategy=paired` input requirement not stated | P2 | duplex text now says RX must be `UMI1-UMI2` and single-UMI libraries use the adjacency branch | ran: single-UMI RX -> `IllegalArgumentException: Paired strategy used but umi did not contain 2 segments`; adjacency + `CallMolecularConsensusReads` on it -> 5626 records; dash RX + paired -> 15766 grouped | |
+| Assay gate relies on the declared `ASSAY` | P2 | `examples/markdup_pipeline.sh` also refuses (exit 2) a BAM with STAR/HISAT2 in `@PG` or >1% N-CIGARs in the first 100000 records; `ALLOW_SPLICED=1` overrides; flagged percentage always printed | ran: real RNA-seq BAM under `ASSAY=wgs` exit 2 (805 of 8828 spliced, @PG STAR); with `@PG` stripped still exit 2 by CIGARs; `ALLOW_SPLICED=1` exit 0, 2570 flagged; human 1656 (29.35%), planted 100 (20.00%), 1000G 111 unchanged; rnaseq exit 2, missing input exit 1, empty input exit 3 | SKILL.md Approach line mentions the second check |
+| Description omits assay/UMI caveat | P2 | clause "Not for RNA-seq, amplicon or UMI libraries (see the decision table)" | read | |
+| (structural) SKILL.md 423 lines | split rule | `references/umi-dedup.md`, `references/alternative-markers.md`, `references/pysam.md` (verbatim), Reference Files index, decision-table pointers. **423 -> 297 lines**, 291 after scripts | every non-blank original line present in SKILL.md or a reference (only the 5 pointer-bearing table rows differ); fences balanced; 23 bash blocks `bash -n`, 3 python `ast.parse` | usage-guide pointer updated |
+| (structural) runnable code to `scripts/` | Sam 2026-09-21 | see table below | each script run from the Skill dir as the docs invoke it: pysam_markdup planted 100 / human 1656, dup_rate 29.35% (equals samtools `-F 2304`) and 20.00%, umi bulk-paired 5689, scrna without CB exit 2 and with synthetic CB/UB 698 records, fgbio single 5646 / duplex 4042 (0 mapped), bad mode exit 1 | scRNA branch tested on synthetic CB/UB tags only (no real 10x BAM) |
+
+Redundancy pass: done 2026-09-20 (usage-guide is overview/prompts/what-the-agent-does, pointing at SKILL.md). This pass only
+collapsed one repeat: the example script's command line, given in both the workflow Approach and Pipeline Version.
+
+## Code moved to `scripts/` (old location -> script)
+
+| old location | now |
+| --- | --- |
+| references/pysam.md "Full Pipeline" (was SKILL.md pysam section) | `scripts/pysam_markdup.py` (args in/out, temp dir, record-count check) |
+| references/pysam.md "Check Duplicate Flag" | `scripts/dup_rate.py` (arg BAM; guards zero primary reads) |
+| references/umi-dedup.md umi_tools scRNA and bulk-paired blocks | `scripts/umi_tools_dedup.sh scrna\|bulk-paired in out` (CB pre-check now exits 2; bulk sorts/indexes a temp copy) |
+| references/umi-dedup.md fgbio single-strand and duplex blocks | `scripts/fgbio_consensus.sh single\|duplex in out` (fixmate -m, grouping strategy chosen by mode; comments on the crash and the `A-B` requirement kept in header and reference) |
+| SKILL.md "Pipeline Version (Optimized)" (17-line copy of the example) | deleted; 4-stage pipe fragment kept, pointer to `examples/markdup_pipeline.sh` (pipefail, tmp dir, index and record-count check live there) |
+
+Left inline (under ~15 lines): pysam filter-out-duplicates, Picard UmiAware, samblaster/Picard/biobambam2/sambamba/mapDamage/pbmarkdup blocks, samtools one-liners.
+
+## Deleted passages -> new home (this pass)
+
+| deleted | now |
+| --- | --- |
+| "~30% faster ... on typical 30x WGS" | replaced by the measured 800k-read result in "Pipeline Version" |
+| SKILL.md "Pipeline Version" full block (set -euo pipefail, mkdir tmpdir, index, sanity test) | `examples/markdup_pipeline.sh` (same checks) |
+| SKILL.md sections UMI-Aware Deduplication, Alternative: From Aligner, pysam Full Pipeline/Check/Filter | `references/umi-dedup.md`, `references/alternative-markers.md`, `references/pysam.md` (stubs and Reference Files index remain) |
+
+## Findings left unfixed
+
+None of the 5 P2s. Carried over from 2026-09-20 and still true: macs3 `--keep-dup auto` and the ATAC Tn5 shift are pointers to other
+Skills (audit confirmed the macs3 pointer is valid); no real Cell Ranger CB/UB BAM or real HiFi amplicon BAM on the machine;
+`af-dup-extra` is not in `TOOLS.md` (outside my write scope; the coordinator recorded it as note 19). Also seen, not fixed: on a
+missing input the example leaves an empty `<out>.markdup_stats.txt` (samtools markdup opens it before the pipe fails); the BAM
+itself is not written.

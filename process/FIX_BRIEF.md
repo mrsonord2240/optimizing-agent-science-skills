@@ -105,6 +105,23 @@ the agent needs may leave the Skill. This is the one restructuring a fixer does.
   exist, out of the Skill's scope, judged not a correction, and so on). "Not cheap" alone is not a reason;
   say what the work needs.
 
+## Runnable code goes in `scripts/` (Sam, 2026-09-21)
+
+- **A complete, runnable code block moves to `<skill>/scripts/<name>.py|R|sh`** and `SKILL.md` (or the
+  reference file) keeps a one- to three-line invocation. Candidates are pipelines, helper functions and
+  multi-step recipes of roughly 15+ lines that a user would run or import; one-liners, API-shape
+  illustrations and short fragments explaining a point stay inline. Where sensible, not everywhere.
+- Each script has a header comment (purpose, inputs, usage line), takes its inputs as arguments or
+  clearly named variables at the top rather than hard-coded example paths, and **is run**: on the
+  audit's data, with assertions on output, exactly as `SKILL.md` invokes it. Parse-checks (`py_compile`,
+  `parse()`, `bash -n`) are the minimum, never the evidence.
+- Move verbatim, then parametrise. Log each moved block (old location → script path) in the fix log.
+- `examples/` stays as it is. If a block duplicates an `examples/` script, point at the example and
+  delete the copy; do not create a second one under `scripts/`.
+- This is separate from the `references/` split: `references/` holds prose and method-specific
+  explanation, `scripts/` holds code. A code block inside a reference file moves to `scripts/` too.
+  Do it as its own commit, after the fix and the split.
+
 **Still not in scope:** broader coverage, new tools the Skill does not reference, restyling prose,
 rewriting what works. Keep diffs minimal. Never change the frontmatter `name`. Change `description`
 only if it is wrong, or to drop a claim you deleted under the rule above. Do not tune text toward the

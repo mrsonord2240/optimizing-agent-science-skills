@@ -62,3 +62,29 @@ Fixer for `single-cell/cell-communication`. Worktree `F:\OpenScience\wt\single-c
 None of the 2 P1s or the P2 left unfixed. Not run: the CellChat and NicheNet blocks (moved verbatim, parse-checked only)
 because CellChat and nichenetr are GitHub-only and not installed here (`TOOLS.md`); no defect was reported in them.
 
+
+---
+
+## 2026-09-21 (structure)
+
+Structure only; no behaviour or claim changed. Worktree `F:\OpenScience\wt\single-cell-cell-communication`, branch
+`fix/single-cell-cell-communication`, commit `49c6f69`. Env: `single-cell-transcriptomics-analyst` (`tools\liana-venv`: liana
+1.10.0, cellphonedb 5.0.1).
+
+**Split:** none. SKILL.md was 234 lines (already split into three `references/` files in the earlier pass), so no split.
+
+**SKILL.md 234 -> 213 lines.**
+
+| old location | script | how run |
+|---|---|---|
+| SKILL.md "Stability check" code block (26 lines) | `scripts/condition_stability.py` (argparse: h5ad, `--cond-a/--cond-b`, `--groupby`, `--condition`, `--n-null`, `--n-perms`, `--seed`, `--out`) | Invoked as SKILL.md now shows, on the audit's PBMC 1k `adata_annotated.h5ad` with a within-cell-type random `condition` column, `--n-null 2`, `--n-perms 1000`: real gained+lost 284, null 215-283, 207/284 pairs noise-prone, TSV written (284 rows). Only 2 null repeats to save time (4.5 min); the null-case result matches the earlier fix-pass numbers. Also removed the collapsed line continuation the old block had in the `transform(...)` line |
+| `references/cellphonedb.md` CellPhoneDB block (23 lines) | `scripts/cellphonedb_statistical.py` (args: zip, meta TSV, counts h5ad, `--out-dir`, `--iterations`, `--threads`, `--seed`) | Run twice as documented (`--threads 1 --seed 1337`, `--iterations 100` for speed) on the audit's `run\cpdb_db\cellphonedb.zip`, `meta.tsv`, `counts_normalized.h5ad`: both exit 0, p-value frames `equals` True, shape (535, 238), same as the earlier fix-pass check. Parameter comments and the Windows `__main__` / threads=1 explanation moved into the script header and a short paragraph in the reference |
+
+**Stayed inline:**
+- Consensus (`rank_aggregate`, 9 lines), resource-sensitivity (6 lines) and condition-comparison (13 lines) blocks: under the
+  15-line threshold, and the consensus block is covered by `examples/liana_analysis.py`.
+- CellChat block (15 lines) and NicheNet block (~22 lines): CellChat and nichenetr are GitHub-only and not installed here
+  (`TOOLS.md`), so a script could not be run; moved verbatim earlier and left as they are.
+
+Not done: the "also 15+ lines" condition-comparison block was left as a teaching snippet; the script recomputes its result
+internally (`gained_lost`), so the two do not share code.

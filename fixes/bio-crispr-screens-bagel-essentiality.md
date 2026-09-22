@@ -59,3 +59,33 @@ commit `d1aad70`. Fixer: Claude Sonnet 5. Runtime: BAGEL2 build 115 (Python 3.12
 
 Left unfixed: none. Not run: bootstrap (`-b -NB 1000`, ~20 min) end to end for `run_bagel2.sh`; the same `bf`
 call in `-b` mode was run in the earlier pass.
+
+
+## 2026-09-21 (structure)
+
+Worktree `F:\OpenScience\wt\crispr-screens-bagel-essentiality`, branch `fix/crispr-screens-bagel-essentiality`.
+Commits: `3d7c839` (split), `42c849d` (scripts). Runtime: `crispr-screen-analyst` venv, Python 3.12, pandas 3.0.5.
+
+**Split** (353 -> 272 lines), verbatim moves, "Reference Files" index in SKILL.md plus pointers from the
+Interpretation rule and the two Failure Modes that need them:
+
+| section (old SKILL.md lines) | new file |
+|---|---|
+| Interpret BAGEL2 Results (192-241) | `references/interpret-calls.md` |
+| Bayesian Reasoning Per Sgrna (242-264) | `references/per-sgrna-contributions.md` |
+| Comparing BAGEL2, MAGeCK, drugZ (265-280) | `references/method-comparison.md` |
+
+Verified by multiset comparison of non-blank lines: only the three lines whose pointers were edited differ;
+the moved python fence parsed.
+
+**Scripts**
+
+| old location | script | how run |
+|---|---|---|
+| `interpret_bagel()` python block (33 lines, now in `references/interpret-calls.md`) | `scripts/interpret_bagel.py` (CLI + importable) | `python scripts/interpret_bagel.py bayes_factor.txt [--screen-type ...] -o calls.tsv` on the audit's real HAP1 TKOv3 `run/bayes_factor.txt` (18,053 genes). Asserted: dropout default drops LacZ/luciferase/EGFP, 0 `tumor_suppressor`, 1,746 `essential` (= BF>6 minus controls), sorted by BF; `enrichment` flags 86.6% and warns; `from interpret_bagel import interpret_bagel` works |
+
+Stayed inline: the `fc`, `bf`, `-r` and `pr` bash blocks (10-17 lines of one CLI call each, with explanatory comments; the full pipeline already lives in `examples/run_bagel2.sh`), and the Pre-flight one-liner. `examples/` untouched.
+
+**Claim corrected while running the script** (contradicted by the audit's file): the prose said TSC1/TSC2 are "the two most-negative-BF entries" under `screen_type='enrichment'`. Actual: TSC2 is first (-77.6), DEPDC5 second, TSC1 seventh (-64.9). Text now says so (`references/interpret-calls.md`).
+
+Left unfixed: none.

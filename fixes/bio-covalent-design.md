@@ -26,3 +26,38 @@ Branch `fix/cg-covalent` off `main` (85ca33b). Audit: `F:\OpenScience\audits\bio
   acrylamide/chloroacetamide demo output.
 
 Nothing needs Sam. Not merged, not re-audited — per brief, that is a separate agent's job.
+
+---
+
+# 2026-09-21 fix pass (Production Ready batch, P2s)
+
+Worktree `F:\OpenScience\wt\chemoinformatics-covalent-design`, branch `fix/chemoinformatics-covalent-design`
+off staging `431aa55`. Env `cheminformatics-hit-triage-analyst`, RDKit 2026.03.6. Commits:
+`36673a6` (fix), `b7bd357` (redundancy), `41e3766` (scripts). SKILL.md 283 -> 266 lines, no split needed.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+| --- | --- | --- | --- | --- |
+| Iodoacetamide (Decision Tree ABPP row) not in `WARHEAD_SMARTS`; `classify_warheads('NC(=O)CI')` returned `{}` | P2 | Added `iodoacetamide` (`[CX3](=[OX1])([NX3])[CH2][I]`) to `WARHEAD_SMARTS`, `REACTIVITY_TIER` (high), `RESIDUE_SELECTIVITY` (Cys) in `examples/warhead_classifier.py`; added an Iodoacetamide row to SKILL.md's Warhead Chemistry table; extended the regression assertion to cover Decision-Tree-named classes | ran `examples/warhead_classifier.py`: `NC(=O)CI` -> `{'iodoacetamide': ...}` only (no chloroacetamide/alpha_haloketone co-match), all assertions pass, exit 0 | |
+| Covalent docking documentation-only | P2 | Not fixed | n/a | see Left unfixed |
+
+## Left unfixed
+
+- P2 "covalent docking section is documentation-only, no runnable local workflow": every listed tool
+  is commercial (GOLD, CovDock, MOE, ICM-Pro) or a web service (DOCKovalent, HCovDock), and AutoDock 4
+  covalent is not installed in the env (TOOLS.md has Vina 1.2.7 only, no AD4); installs are forbidden
+  by the brief. The `add_acrylamide` stub is a deliberate hook, not a defect. The audit itself judged
+  the disclosure honest.
+
+## Deleted passage -> new home
+
+| deleted | new home |
+| --- | --- |
+| usage-guide.md Prerequisites code block (`pip install rdkit`; DOCKovalent web service; GOLD commercial; HCovDock standalone) | SKILL.md Version Compatibility (install line, covalent.docking.org, HCovDock standalone note; GOLD already there); guide points at it. Verified by grep. |
+
+## Scripts moved
+
+| old location | script |
+| --- | --- |
+| SKILL.md "Reactivity Surrogates", inline `acrylamide_alpha_substitution_count` (17 lines) | `scripts/acrylamide_alpha_substitution.py` (SMILES as CLI args). Ran: `C=CC(=O)N1CCCCC1` -> 0, `C=C(C)C(=O)N1CCCCC1` -> 1, `C=C(Cl)C(=O)NC` -> 1, `CCO` -> None, unparsable -> None |
+
+The KRAS workflow block is a `NotImplementedError` stub (API-shape illustration) and stays inline.

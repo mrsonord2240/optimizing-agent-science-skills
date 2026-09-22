@@ -33,3 +33,40 @@ re-run in full (same computation, same environment, no reason to expect a differ
 changed `.py` files (`examples/scvelo_velocity.py`, and the ad hoc verification scripts, which are not
 shipped) pass `py_compile`. No R code was changed (only prose), so no `.R` parse check was needed. No
 shared venv/R-library package or version was touched.
+
+
+## 2026-09-21 (P2 pass, fixer: fresh Sonnet)
+
+Worktree `F:\OpenScience\wt\single-cell-trajectory-inference`, branch `fix/single-cell-trajectory-inference` from staging `431aa55`. Commits: `ebc493e` (fix), `4b77029` (redundancy), `44cd2cc` (fix, example), `4ce42c1` (scripts). SKILL.md 242 -> 228 lines (under the split threshold, no `references/`). Env: shared venv (scvelo 0.3.4, numpy 2.5.3, pandas 3.0.5) for velocity, `tools\cellrank-venv` (cellrank 2.3.3) for CellRank.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| CellRank fence not self-contained (guard only in a comment) | P2 | Fence became `main()` + `if __name__ == '__main__':`; then the whole block moved to `scripts/cellrank_fate.py`, SKILL.md keeps the invocation and the Windows note | ran: `cellrank_fate.py` on Paul15 (`paul15_paga_dpt.h5ad`): macrostates identical to the audit, entropy MEP 1.7858 vs mature 0.8189 (audit 1.7858 / 0.8189); `py_compile` clean | |
+| VelocityKernel with deterministic velocity uncaveated | P2 | Added a CellRank-section note with numbers | ran: pancreas, same deterministic velocity, GPCCA `n_states=8`: `VelocityKernel` Ductal 0.3601 vs Alpha/Beta 0.3174; `PseudotimeKernel` on `velocity_pseudotime` 1.0225 vs 0.4466 | Audit compared different datasets (pancreas vs Paul15); the like-for-like pancreas run confirms the point. PseudotimeKernel terminal states on pancreas include Ductal clusters, so the note also says to check terminals against markers |
+| `examples/monocle3_trajectory.R` carries no platform note | P2 | Header comment: no Windows binary, never executed in the audit env, use PAGA/DPT or Slingshot+tradeSeq | docs (SKILL.md Installation, `TOOLS.md`) | Cannot run here: monocle3/SeuratWrappers do not install on Windows |
+| (new) `examples/scvelo_velocity.py` crashed at `scv.pl.scatter` on numeric colors (`KeyError: 0`) | correction found while running | `sc.pl.umap` for `velocity_pseudotime`, `velocity_confidence`, `velocity_length` | ran end to end on pancreas: mean velocity_confidence 0.7126 (audit 0.71) | scvelo 0.3.4 + pandas 3 |
+| (new) same example, top-velocity-genes plot: recarray `.flatten()` gave void scalars (`TypeError: unhashable`), then `scv.pl.velocity` raised the pandas>=3 `unique requires a Series` TypeError | correction found while running | names via `pd.DataFrame(...)`, per-gene `scv.pl.scatter(gene, x='spliced', y='unspliced')` phase portraits; compatibility note in SKILL.md names the failing and working calls | ran: 6 phase figures written; `scv.pl.velocity` and `scv.pl.scatter` with a gene list both confirmed to raise | Not fixable from the call site (same root cause as the dynamical-mode crash) |
+
+### Left unfixed
+
+- `examples/monocle3_trajectory.R` itself remains unexecuted: monocle3/SeuratWrappers are GitHub-only with no Windows binary and cannot be installed (brief forbids installing into the env). Only the note was added.
+- `scv.pl.velocity` and list-of-genes `scv.pl.scatter` stay broken on scvelo 0.3.4 + pandas 3 (library internals); documented with a working workaround, not fixable in the Skill.
+
+### Redundancy pass
+
+usage-guide.md already held only overview, prompts, related Skills (done 2026-09-19); no change. Inside SKILL.md:
+
+| deleted passage | new home |
+|---|---|
+| Common Errors scvelo-internals row: "fall back to ... confirm your numpy/pandas/scvelo versions" (restated the compat note) | row now points to the "scVelo 0.3.4 + numpy>=2 + pandas>=3 compatibility" paragraph, which keeps the full text (grep verified) |
+| Common Errors Windows-guard row: "confirmed fix; verified for CellRank's ..." | row points to the CellRank "Windows note", which keeps the RuntimeError text and the guard rule; scvelo half keeps `show_progress_bar=False, n_jobs=1` |
+| CellRank fence comment "Run this block inside `if __name__ == '__main__':`" and duplicate Windows sentence | guard is in `scripts/cellrank_fate.py`; Windows note keeps the rule once |
+
+### Scripts
+
+| old location | script |
+|---|---|
+| SKILL.md "Directed Fate Mapping With CellRank 2" fence (14 lines) | `scripts/cellrank_fate.py` (parametrised; `run_fate_mapping`, `fate_entropy`); `allow_overlap=True` reasoning kept in SKILL.md prose |
+| SKILL.md RNA Velocity fence (18 lines) | duplicated `examples/scvelo_velocity.py`; SKILL.md keeps the six core calls and points at the example (no copy under `scripts/`) |
+
+Not moved: PAGA (7 lines), diffusion pseudotime (4), Palantir (5), Slingshot/Monocle3 (4 each): short API illustrations.

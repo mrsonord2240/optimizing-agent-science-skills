@@ -125,3 +125,29 @@ All 8 r-fenced SKILL.md blocks re-parsed. `usage-guide.md` unchanged (already ho
 ### 2026-09-21 addendum: references/ split (requested by Sam)
 
 The P2 "no `references/` split" left unfixed above is done. `SKILL.md` 510 -> 377 lines. Moved verbatim (headings demoted one level) into `references/`: ESEM, `userGWAS()` and higher-order / bifactor / p-factor -> `advanced-models.md`; "MTAG Comparison" and "Reconciliation: When GenomicSEM and MTAG Disagree" -> `mtag-comparison.md`; "Stratified GenomicSEM" -> `stratified-genomicsem.md`. `SKILL.md` gains a "Reference Files" index and pointers from the ESEM and Stratified decision-tree rows. Verified: every moved non-blank line is present in the new files (0 lost), and all 8 R fences (3 + 1 in references/, 4 in SKILL.md) parse under the env's `r.sh`.
+
+
+## 2026-09-21 (structure)
+
+Worktree `F:\OpenScience\wt\causal-genomics-genomic-sem`, branch `fix/causal-genomics-genomic-sem`. Env `mendelian-randomization-analyst`, R through `r_gsem.sh` (GenomicSEM 0.0.5 + lavaan 0.6.19). Behaviour and claims unchanged.
+
+### Split (commit `fa2bb31`): SKILL.md 376 -> 298 lines (still at 298 after pointers; 283 after the scripts commit)
+Moved verbatim into `references/`; 0 non-blank lines lost (set comparison; only the pointer edits differ), bash fences pass `bash -n`.
+
+| Block (old SKILL.md section) | New home |
+|---|---|
+| Heywood case; Trait inclusion under heterogeneous factor structure; Non-positive-definite V_LD matrix (Per-Method Failure Modes) | `references/failure-modes.md` (new) |
+| MTAG vs GenomicSEM Common-Factor GWAS (property table); MTAG MaxFDR > 5% failure mode | `references/mtag-comparison.md` (appended) |
+| Computational Footprint; Python tool install (LDSC, MTAG) from Tool Installation | `references/runtime-and-python-tools.md` (new) |
+
+Stayed in SKILL.md: scope, taxonomy, decision tree, Sample-overlap and Q_SNP-not-reported failure modes, fit indices, thresholds, workflow, Common-Factor GWAS, Common Errors, R install. Reference Files index gained two rows and a wider MTAG row; pointers added at the decision-tree MTAG row, the Per-Method Failure Modes heading and Tool Installation.
+
+### Scripts (commit `5475243`): SKILL.md 298 -> 283 lines
+| Old location | Script | How run |
+|---|---|---|
+| SKILL.md "Common-Factor GWAS with Q_SNP": `commonfactorGWAS` DWLS block + Q_SNP classification + ML cross-check block | `scripts/commonfactor_gwas_qsnp.R` (args: covstruc.rds, SNPs rds/csv, out.tsv, cores) | `r_gsem.sh scripts/commonfactor_gwas_qsnp.R cov.rds input2_SNPs_planted_classes.csv out.tsv 1` on the audit's planted 20-SNP panel (S from `input1_S_planted_one_factor.csv`, first 3 traits; V = diag 1e-4 as the audit's input 2). Assertions passed: ML Q_pval < 1e-4 for the 5 heterogeneous SNPs (6e-83 to 7e-8, matching the audit log) and > 0.05 for the 5 factor SNPs; DWLS Q_pval 0.91-0.96 for all (the documented caveat); `factor_only` 5 with DWLS alone, 0 once ML is required. |
+| `references/mtag-comparison.md` MTAG CLI block | deleted; points at `examples/mtag_pipeline.sh` (same `mtag.py` call and `max ?fdr` grep) | duplicate, not run |
+
+Script changes vs the moved text: added `factor_only_dwls` (the old first `factor_only`) so both sets are written; lavaan's multi-line `warning` text is flattened so the TSV keeps one row per SNP (found on the first run: a raw write broke the rows); `parallel = cores > 1`. SKILL.md's output-column note now lists the real columns (`i, lhs, op, rhs, est, se_c, Z_Estimate, Pval_Estimate, Q, Q_df, Q_pval, fail, warning`; leading columns are the `sumstats()` ones), replacing the old `rsID` guess. The planted "factor" SNPs are p ~7e-6 in this panel, so `factor_sig` selects the heterogeneous SNPs; the assertions use that.
+
+Stayed inline: `munge`/`ldsc`/`sumstats` (need real sumstats, an LD-score panel and the 1000G reference, none on this machine); the Standard Workflow commonfactor/usermodel calls (3 and 6 lines, and 3b is a model-syntax illustration); ESEM, userGWAS, p-factor and `s_ldsc`/`enrich` blocks in `references/` (model-syntax fragments or need baselineLD, which is absent). The `.rds` input branch of the script was not exercised (the csv branch was); it is one `readRDS` call.

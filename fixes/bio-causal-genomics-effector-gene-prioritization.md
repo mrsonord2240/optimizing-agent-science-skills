@@ -41,3 +41,60 @@ without treating it as a defect).
 Nothing. The `references/` restructuring follows the sanctioned progressive-disclosure exception
 in `FIX_BRIEF.md`, matched against the existing `bio-alignment-multiple` / `bio-alignment-trimming`
 convention in `optimized-scientific-skills`.
+
+---
+
+## 2026-09-21
+
+Worktree `F:\OpenScience\wt\causal-genomics-effector-gene-prioritization`, branch `fix/causal-genomics-effector-gene-prioritization`
+(from staging `main` 431aa55). Commits: `5737796` fix, `bb021b8` split, `eb1b953` scripts. Audit: 3 P2s
+(report under `F:\OpenScience\audits\bio-causal-genomics-effector-gene-prioritization\`). Env:
+`mendelian-randomization-analyst` (R 4.4.3 via `r.sh`; `venv-pops` Python 3.12.13; MAGMA 1.10 from `tools/magma`).
+None of the three findings was fixed by the 2026-09-18 pass (checked against current `examples/magma_genebased.sh`).
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+| --- | --- | --- | --- | --- |
+| `magma_genebased.sh` Bonferroni line needs `bc`, absent from Git-for-Windows bash (printed blank) | P2 | `bc -l` -> `awk -v n=... 'BEGIN{printf "%.6g", 0.05/n}'` | Ran: whole script end-to-end on the toy fixture with real MAGMA 1.10 (bash here has no `bc`); prints `0.0166667` for 3 genes | |
+| printed gene count off by one (counts `.genes.out` header) | P2 | `wc -l` -> `tail -n +2 ... \| wc -l` | Ran: same run prints "across 3 genes" (fixture has 3); `.genes.out` has 4 lines | |
+| 6 of 10 V2G tools prose-only | P2 | Took "write it" for cS2G: new `examples/cs2g_lookup.py` (stdlib; reads `cS2G_1000GEUR.zip` or an extracted dir) and a `cS2G Lookup` section (now `references/cs2g-lookup.md`) | Ran on the real Zenodo 7754032 zip (95 MB, downloaded to scratchpad), zip and directory modes; rs11206509 -> PCSK9 1 (ABC), rs10788994 -> PCSK9 1, rs114983708 -> FAM87B 0.882 + PLEKHN1 0.118; cross-checked against `zcat \| awk` on the raw file; unknown rsID reported | 1 of the 6 remaining tools now runnable |
+| (found while running) closing echo told users to pass `.genes.raw` as PoPS `--magma_prefix` | not flagged | wording now says pass the prefix `magma_run_gene` | Read against `pops_run.py`/`pops.py` usage in SKILL.md | fixed inline |
+| (found while running) `examples/` headers cited SKILL.md sections that moved | not flagged | repointed to `references/pops.md`, `references/opentargets-l2g.md`, `references/failure-modes.md` | grep | |
+| (found while running) `concordance` R block: an unavailable stream (NA) made the whole row NA, so `filter(concordance >= 3)` silently dropped the gene and the tier fell to `associational_only` | not flagged | NA counts as not passed (`coalesce`); new `n_streams_available` column | Ran the script on a 6-row synthetic table incl. an all-NA row: tiers as expected (6/6 near_certain, 4 with 1 stream missing, all-NA row kept) | matches SKILL.md's own "report per-stream availability" instruction |
+
+### Left unfixed
+
+- FUMA: web platform, account-gated (registration) and server-side; there is nothing to execute locally, and the Skill already says so.
+- DEPICT: Java tool plus a large data bundle (`perslab/depict`), not on this machine; FIX_BRIEF allows an install only for public tools the tooling pass missed, and the data bundle makes this a multi-GB install, so no smoke test could run. Claim kept (legacy method, install line present).
+- INQUISIT: a method from Fachal 2020's supplementary material, not a released tool; no code exists to run. Claim kept as a pointer to the paper.
+- FLAMES: the Skill itself gives no install path ("check the publication's GitHub"), and it needs trained models and their inputs; not installed here.
+- ABC / ENCODE-rE2G: cross-referenced to `atac-seq/enhancer-gene-linking`, which owns their runnable examples (the auditor also called this reasonable).
+
+### Redundancy pass
+
+`usage-guide.md` was already reduced to overview, quick start, example prompts and related Skills on 2026-09-18; nothing left to remove. Skipped.
+
+### Split (SKILL.md 413 -> 295 -> 274 lines)
+
+The 2026-09-18 pass had already moved taxonomy, thresholds and failure modes to `references/`. After the cS2G addition SKILL.md was 413 lines, so the four method blocks moved verbatim. No non-blank line lost (multiset comparison: only the four lines that received a `references/` pointer differ); the python fence ast-parses, the bash fences pass `bash -n`.
+
+| old location (SKILL.md) | new home |
+| --- | --- |
+| `## MAGMA Gene-Based and Gene-Set Pipeline` | `references/magma-gene-based.md` |
+| `## Open Targets L2G via GraphQL` (incl. Platform vs Genetics subsection) | `references/opentargets-l2g.md` |
+| `## PoPS Polygenic Priority Score` | `references/pops.md` |
+| `## cS2G Lookup` | `references/cs2g-lookup.md` |
+
+SKILL.md keeps a "Reference Files" index, decision-tree pointers on the L2G / MAGMA / PoPS rows, and repointed Common Errors rows.
+
+### Scripts (runnable code out of SKILL.md)
+
+| old location | script path | run |
+| --- | --- | --- |
+| SKILL.md concordance-scoring R block (29 lines) | `scripts/concordance_scoring.R` (input TSV and output prefix as arguments; NA handling and `n_streams_available` added, see table) | Ran via `r.sh`, dplyr, assertions on tiers/row count |
+| `references/magma-gene-based.md` three-step MAGMA bash block | not moved: duplicated `examples/magma_genebased.sh`; copy deleted and replaced by a pointer | example ran end to end with MAGMA 1.10 |
+
+Kept inline (short or API-shape illustrations): the two GraphQL queries, the 8-line Python request/`json_normalize` fragment, the 11-line PoPS invocation (wrapped by `examples/pops_run.py`).
+
+### Needs Sam
+
+Nothing.

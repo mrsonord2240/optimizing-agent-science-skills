@@ -51,3 +51,63 @@ None of the audit's recommendations. Noted, out of scope:
 ### Verification
 
 Scratch scripts only, not shipped: clean copy of the Skill, all 9 shipped examples run with no arguments (exit 0, empty stderr); `py_compile` on all 10 .py files; all 17 SKILL.md python blocks executed verbatim on the dotted Pfam seed; `pwalign::pid` comparison via `r.sh` (135 pairs); Windows and WSL `selftest.py`.
+
+## 2026-09-21
+
+Fixer: Sonnet. Branch `fix/alignment-msa-statistics` (from staging `main` 431aa55), worktree `F:\OpenScience\wt\alignment-msa-statistics`.
+Audit: Production Ready with 5 P2s (report `eval_report_bio-alignment-msa-statistics_result.json`). Commits: `c63c33e` fix, `c263706` split, plus the examples/ pointer refactor (see the scripts/ step).
+Tools (versions): Python 3.12 (Windows venv `audit-envs\alignment`) with Biopython 1.88, numpy 2.0.2; WSL env `alignment` numpy 2.5.3 (selftest only). Nothing installed. Data read from `F:\OpenScience\audits\bio-alignment-msa-statistics\run\data\`.
+
+### Findings (5 of 5 fixed)
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+| --- | --- | --- | --- | --- |
+| `average_conservation` ZeroDivisionError when no column reaches `min_occupancy` | P2 | SKILL.md block returns `(nan, 0)` and the caller prints "No column has >= min_occupancy residues"; `conservation_profile.py` exits with the same message instead of `nan% over 0` plus a numpy RuntimeWarning | ran the SKILL.md block verbatim on a 4-fragment alignment: `(nan, 0)`; on the dotted Pfam seed: 34.3% over 118 columns (unchanged); CLI on the fragment file prints the message, exit 1 | |
+| NaN conservation with no NaN-aware ranking guidance | P2 | SKILL.md "Ranking columns" paragraph and a NaN-filtering `top10` snippet beside Per-Column Conservation | ran the snippet verbatim on the Pfam globin seed: naive top-10 values 1.0 ... 0.37, NaN-free 1.0 ... 0.63 (audit's numbers) | |
+| `is_nucleotide()` 0.9 threshold misclassifies IUPAC-rich DNA | P2 | `msa_utils.is_nucleotide`: nucleotide when >= 90% A/C/G/T/U/N, or >= 50% and the remainder is IUPAC ambiguity codes (RYSWKMBDHV); rule stated in SKILL.md; docstring points at `pick_background()`'s label as the check | ran: real HBB MAFFT alignment with 11.9% R/Y/S/W/K/M injected (old rule saw 88.1% and called it protein) is now DNA with the DNA background; Pfam PF00042 and PF00069 seeds, hmmalign AFA, MAFFT protein alignments stay protein; RF00050 RNA seed stays nucleotide | The audit's literal fix "count the full IUPAC set" would classify protein as DNA (full IUPAC letters are ~66% of protein residues), so the 50% core floor is kept |
+| selftest leaves gap/gap fix, `is_nucleotide`, JSD smoothing untested | P2 | New `examples/alignment_scores.py` (the two SKILL.md functions, importable); `gap_statistics()` made a function in `gap_statistics.py`; `selftest.py` now asserts `alignment_score` -12 and `sum_of_pairs` 78 (hand-derived) unchanged by two extra all-gap columns, closed-form JSD for a delta column, the gap penalty (`-,G,G` scaled by 2/3), lambda smoothing (lambda 1 and 0.5), `is_nucleotide`/`pick_background` on DNA, protein and 12% IUPAC DNA, the format map, the Kimura 0.85 cut-off and gap totals | ran `selftest.py` on Windows numpy 2.0.2 and WSL numpy 2.5.3; mutation check: is_nucleotide always False, JSD gap penalty removed, JSD smoothing removed, gap_statistics total and gap-free wrong, gap/gap scored, `.aln` mapped to fasta, Kimura cut-off 0.9 -> 8 of 8 killed (audit's 4 survivors included) | Inline SKILL.md/reference blocks stay as the teaching text; `alignment_scores.py` holds the same code so the test exercises what is shipped |
+| Minor: `guess_format()` two-way, A2M route, Kimura 0.85 band | P2 | `FORMAT_BY_EXTENSION` (.sto/.stk Stockholm, .aln/.clw Clustal, .phy PHYLIP-relaxed, .nex Nexus, else FASTA), documented in SKILL.md; the A2M sentence in the normalisation block points ragged hmmalign A2M loading to `alignment/alignment-io`; `kimura_protein_distance.py` docstring says inf means p >= 0.85 by convention (formula finite to p ~ 0.854) | ran: the Pfam seed written as .aln/.phy/.nex/.sto and reloaded through `load_alignment` with identical rows; `identity_matrix.py x.aln pid2` and `conservation_profile.py x.phy` ran; A2M raggedness checked against `alignment-io/SKILL.md` "A2M / A3M Conventions" (docs) | |
+
+Also ran all 9 shipped examples with no arguments under `-W error::RuntimeWarning` (exit 0, empty stderr), `py_compile` on every changed `.py`, and, after the split, every complete Python block of SKILL.md and `references/` in one namespace on the dotted Pfam seed (13 run, 5 `...` skeletons skipped): `alignment_score` -215960 and SP 186187 as in the 2026-09-20 fix, average conservation 34.3% over 118 columns.
+
+### Redundancy
+
+usage-guide.md and SKILL.md were already deduplicated on 2026-09-20; no change. New passages were added once (ranking snippet, IUPAC rule, format map).
+
+### Split (SKILL.md 499 -> 291 lines)
+
+Verbatim moves (non-blank lines compared before vs SKILL.md + `references/`: only the 4 lines that pointed at moved sections differ; 18 Python fences parse, the bash fence passes `bash -n`):
+
+| old location (SKILL.md section) | new home |
+| --- | --- |
+| Capra-Singh Jensen-Shannon Divergence | `references/capra-singh-jsd.md` |
+| Substitution Counts (with Built-in Pairwise Substitutions, BLOSUM62 Lambda) | `references/substitution-counts.md` |
+| Information Content (Shannon entropy, KL) + PSSM + Neff + MI-APC | `references/information-content-pssm.md` |
+| Gap Statistics | `references/gap-statistics.md` |
+| Alignment Quality Metrics (alignment_score, Sum of Pairs, SP bias) | `references/alignment-quality-scores.md` |
+| Distance Correction Models | `references/distance-correction.md` |
+| References (bibliography) | `references/bibliography.md` |
+
+Pointer edits: "use `pssm_with_pseudocounts()` above" and "`information_content()` earlier in this skill" now name `references/information-content-pssm.md`; two decision-table rows gained a reference pointer; a "Reference Files" index was added.
+
+### scripts/ step (Sam, 2026-09-21): inline copies replaced by pointers to examples/ (`refactor` commit, SKILL.md 291 -> 251 lines)
+
+Sam's answer: where a 15+ line block duplicates an `examples/` script, delete the inline copy and point at the example. Nothing was moved to `scripts/` (the examples already are the runnable code).
+
+| old location (inline block) | now |
+| --- | --- |
+| SKILL.md "Required Import": `normalize_alignment`, `check_alphabet`, `AlignIO.read` line (30 lines) | 4-line import from `examples/msa_utils.py` + `load_alignment`; the `upper=False` A2M/A3M note and the ragged-A2M pointer moved into the prose and into `normalize_alignment`'s docstring |
+| SKILL.md `pairwise_identity` (24 lines) | `from identity_matrix import pairwise_identity` (`examples/identity_matrix.py`) |
+| SKILL.md `average_conservation` (17 lines) | `from conservation_profile import average_conservation`; the function did not exist in the example, so it was added there (the CLI now uses it) |
+| references/information-content-pssm.md `shannon_entropy` (19 lines), `ROBINSON_BACKGROUND` + `DNA_UNIFORM` + `information_content` (16 lines) | imports from `examples/entropy_analysis.py` and `examples/msa_utils.py` (`pick_background`); run command `python examples/entropy_analysis.py [alignment]`; the "values below" and "defined in the IC section above" pointers now name `examples/msa_utils.py` |
+| references/alignment-quality-scores.md `alignment_score` (19 lines), `sum_of_pairs` (18 lines) | imports from `examples/alignment_scores.py`; run command `python examples/alignment_scores.py [alignment]` |
+
+Where inline and example differed the example version was kept: `check_alphabet` (example prints counts and the dropped fraction, takes a label), the `ValueError` text of `pairwise_identity`. Removed lines checked against the examples programmatically: the 15 not found verbatim are the equivalent differently-written lines above plus the pointer sentence. Blocks under 15 lines (`column_conservation`, `conservation_profile`, `gap_profile`, the NaN ranking snippet) and `...` skeletons stay inline.
+
+Verified: all 13 complete Python blocks of SKILL.md and `references/` run verbatim in one namespace (cwd = Skill directory) on the dotted Pfam seed with the same numbers as before (`alignment_score` -215960, SP 186187, mean conservation 34.3% over 118 columns, top-10 `[17, 77, 11, ...]`); all 9 examples run with no arguments under `-W error` (exit 0, empty stderr); `selftest.py` passes on Windows numpy 2.0.2 and WSL numpy 2.5.3; `conservation_profile.py` on the sparse fragment file still exits with the message.
+
+### Left unfixed
+
+None of the 5 findings. Noted, not changed:
+- Kimura `inf` for 0.85 <= p < 0.854 is kept as a documented convention rather than extended to the formula's true pole (a cut-off change would alter shipped behaviour the audit's EMBOSS `distmat` cross-check accepted).
+- A2M loading is not implemented here (ragged hmmalign A2M has no AlignIO reader); the Skill points to `alignment/alignment-io`.

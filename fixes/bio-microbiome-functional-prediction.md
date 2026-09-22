@@ -26,3 +26,39 @@ Start, Example Prompts, and Related Skills.
 Nothing from the audit's P1/P2 list. Not attempted: broader ITS support (would require a different
 reference database entirely — out of scope, the audit's own fix explicitly offered "remove the
 claim" as the correct option here, not "add the capability").
+
+
+---
+
+# bio-microbiome-functional-prediction — P2 batch fix, 2026-09-21
+
+Branch `fix/microbiome-functional-prediction` off staging `main` @ `431aa55`, worktree
+`F:\OpenScience\wt\microbiome-functional-prediction`. Commits: fix `37ff715`, scripts `ea6cfef` (see also git log on
+the branch). Env `microbiome-metagenomics-analyst` (R via `rr.sh`, MicrobiomeStat 1.4, Python 3.12).
+Audit at upstream `47a62df`: 90 Production Ready, 1 open P2.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| `linda()` aborts the whole run on a predicted pathway table under the default `prev.filter = 0` | P2 | Added a `prev.filter = 0.1` caveat (checked on MicrobiomeStat 1.4) to the "DA without compositional correction" failure mode and a new Common Errors row | ran | Re-ran on the audit's fresh PICRUSt2 pathway table (503 pathways), gut vs left palm, 16 samples: `prev.filter = 0` -> "contrasts can be applied only to factors with 2 or more levels", no results; `prev.filter = 0.1` -> 34 features filtered, 469 fit; manual drop of rows with `rowSums(x > 0) < 2` then `prev.filter = 0` -> 469 fit (independent confirmation of the cause) |
+
+Scripts pass (`refactor(...)` commit): SKILL.md "Report NSTI" inline Python block -> `scripts/nsti_report.py`
+(args: PICRUSt2 output dir, ASV TSV, `--max-nsti`). Ran as SKILL.md invokes it on the audit's 751-ASV
+PICRUSt2 2.6.3 output: mean NSTI 0.077, median 0.001, 3/751 dropped, 0.0% reads (matches the audit);
+`--max-nsti 0.5` -> 13/751, 0.1%. `examples/run_picrust2.sh` still carries its own inline copy of the
+NSTI logic as part of the whole-pipeline example; left untouched (`examples/` stays as is).
+
+Redundancy pass: already done on 2026-09-19 (usage-guide.md holds only overview, prompts, related
+Skills); nothing further to remove. Length: SKILL.md 204 -> 206 (fix) -> 196 lines (scripts); under
+300, no split.
+
+## Left unfixed
+
+Nothing from this Skill's audit. Noted outside this Skill: `differential-abundance/examples/aldex2_analysis.R`
+line 62 calls `linda(..., prev.filter = 0)`, the same setting that crashes here on sparse tables; that
+Skill owns it.
+
+## Deleted passage -> new home
+
+| passage | new home |
+|---|---|
+| SKILL.md "Report NSTI" inline Python block | `scripts/nsti_report.py` (invoked from the same section) |

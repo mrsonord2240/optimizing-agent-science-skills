@@ -68,3 +68,35 @@ Worktree `F:\OpenScience\wt\causal-genomics-proteome-mr-drug-target`, branch `fi
 - **P2 references/ split**: declined. The redundancy rule governs duplication, not length; a split is a restructure the brief does not allow.
 - **P2 bundled synthetic data for the examples**: declined. `ld_clump`/`ld_matrix` still need a real plink + 1000G bfile, so bundling the audit's TSVs would not make either example runnable; the LD recipe covers the missing piece. The examples were verified here with stubbed LD.
 - Not run: the `1kg.v3.tgz` download, real plink clumping, sign-flip of `ld_matrix` output.
+
+---
+
+# 2026-09-21 (structure)
+
+Worktree `F:\OpenScience\wt\causal-genomics-proteome-mr-drug-target`, branch `fix/causal-genomics-proteome-mr-drug-target`, on top of `66192a6`. Env `mendelian-randomization-analyst` via `r.sh`. Structure only; no behaviour or claim changed.
+
+## Split (commit `ff22b0d`): SKILL.md 457 -> 294 lines (245 after the scripts commit)
+
+Moved verbatim to `references/`, with a "Reference Files" index in SKILL.md and a pointer in each decision-tree row that needs one:
+
+| SKILL.md section (old lines) | New file |
+|---|---|
+| Data Source Taxonomy + Platform and Cohort Versioning (40-62) | `references/pqtl-datasets.md` |
+| Per-Method Failure Modes, six subsections (95-167) | `references/failure-modes.md` (SKILL.md keeps a one-paragraph stub naming the six) |
+| Phenome-Wide Drug-Target MR (185-216) | `references/phewas.md` (stub in SKILL.md) |
+| Cis-IVW with Correlated Instruments + Robust/Penalized (275-317) | `references/correlated-instruments.md` (stub in SKILL.md) |
+| Drug Repurposing and Target Nomination (371-383) | `references/target-nomination.md` (stub in SKILL.md) |
+
+Verified: every non-blank line of the old SKILL.md is in SKILL.md or a reference file, except seven decision-tree rows, the line-35 bullet and one Common-Errors row, which stayed and only gained a `references/...` pointer. All 4 R fences, the bash fences and the R install fence parse (`parse()` via `r.sh`, `bash -n`). Stayed inline: scope, PP.H4 ladder, methodological taxonomy, decision tree, Triangulation Requirement, Standard Workflow, PAV/VEP recipe, window width, thresholds, reconciliation table, Common Errors, install, references.
+
+## Scripts (commit follows the split)
+
+| old location | result | how run |
+|---|---|---|
+| SKILL.md "Phenome-Wide Drug-Target MR" R block (24 lines, then in `references/phewas.md`) | `scripts/phewas_curated_endpoints.R` (args: pqtl.tsv, endpoints.tsv, out.tsv, min sample size, population; body verbatim otherwise) | `Rscript` through `r.sh` on the audit's synthetic PCSK9 window (top 8 SNPs as instruments, 300-endpoint list); OpenGWAS is gated (401), so `available_outcomes()`/`extract_outcome_data()` stubbed in the calling session, script unchanged. Assertions: 285 of 300 endpoints returned results (10 below the sample-size floor, 5 with no SNPs), all IVW rows, `p_bonf == min(p * 300, 1)`, non-curated id excluded, output file written |
+| SKILL.md "Cis-MR Standard Workflow" R block (50 lines) | deleted; SKILL.md points at `examples/cis_pqtl_mr.R`, which does every step of it and more (PAV flag, adaptive panel, correlated IVW, PAV-excluded rerun) | example run with `ld_clump`/`ld_matrix` and `genetics.binaRies::get_plink_binary()` stubbed (no 1000G bfile or plink here): IVW 0.426, PP.H4 ~1.0, 6 instruments, 5 after PAV exclusion, `triangulation_passed` TRUE |
+
+Small edits made while moving: the script guards `is.null(outcome_dat)` before `nrow()` (the original errors when an outcome has none of the SNPs); `population` argument is named `pop_filter` internally because a variable called `population` would be masked by the column of the same name; it also prints the counts and writes the results table. Comment in `references/correlated-instruments.md` "dat comes from the Standard Workflow above" now says `examples/cis_pqtl_mr.R`; the install-note comment "in the code above" now names the example and reference file.
+
+Stayed inline: the correlated-IVW blocks (10 and 6 lines, fragments that need `dat` and `ld`), the Steiger 5-line block, the VEP bash and install blocks (short, or need VEP/downloads).
+Not run: `phewas_curated_endpoints.R` against the live catalogue (OpenGWAS needs a JWT token).

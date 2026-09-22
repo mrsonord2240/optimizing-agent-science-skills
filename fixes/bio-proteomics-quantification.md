@@ -86,3 +86,45 @@ clean, three `.R` `parse()` clean. The untouched SILAC ratio block re-run verbat
 - The synthetic SILAC protein table carries a genuine ~-0.22 log2 H/L offset on true-unchanged proteins
   (implied incorporation 0.92), consistent with the 93% pilot in the Input-3 prompt. Useful as a fixture;
   it is not a defect in the Skill.
+
+---
+
+# 2026-09-21 - P2 pass, redundancy, split, scripts
+
+Worktree `F:\OpenScience\wt\proteomics-quantification`, branch `fix/proteomics-quantification` (from staging `431aa55`). Commits `d3187a5` (fix + redundancy), `fa1e2b1` (split), `42e619d` (scripts). Evidence: `F:\OpenScience\audits\bio-proteomics-quantification\` (5 P2). Env `mass-spec-proteomics-analyst`: R 4.4.3 via `r.sh` (MSnbase 2.32.0, MSstats 4.14.2, iq 2.0.1), shared venv Python 3.12 (numpy 2.5.3, pandas 3.0.5).
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| TMTpro needs hand-editing; CoA layout omits the leading Tag column | P2 | Commented `quantify(raw, reporters = TMT16, ...)` beside the TMT10 call; CoA layout now names the Tag column (read as row.names, error text quoted) with the extdata header rows inline | ran on `tmt10_synthetic.mzML`: `quantify(TMT16)` gives 24 x 16; a 16-channel CoA csv with Tag column (offset headers `-1`/`1` and `+1`/`+2`) -> `makeImpuritiesMatrix(filename=, edit=FALSE)` 16x16 -> `purityCorrect` 0 negatives (NA only in the 6 channels the 10-plex file lacks) | the commented `imp <- makeImpuritiesMatrix(filename = ...)` line was already there; the finding's second commented line is that one |
+| AP-MS scorer absorbs a failed control IP silently | P2 | Prints `control runs with no data, excluded: [...]`, raises if every control is empty, adds `n_ctrl_runs_used` | ran on `apms_lfq.csv`: baseline 17 called / 3 runs; CtrlIP1 zeroed -> warning, 17 called / 2 runs; all zeroed -> ValueError | now `scripts/apms_score.py` |
+| `min_bait_reps` default trade-off undiscussed | P2 | Approach sentence: strict default costs a one-replicate dropout, `min_bait_reps=2` the usual compromise, report what the looser setting adds | ran (example): prey with one of 3 bait replicates zeroed is missed by the default and called at `min_bait_reps=2` | |
+| Nothing exercises SILAC or AP-MS code | P2 | `examples/lfq_normalization.py` gains a seeded SILAC pilot (asserts incorporation 0.93 +/- 0.02, Arg->Pro 0.08 +/- 0.02) and a seeded AP-MS matrix (asserts called set == planted interactors, sticky binders excluded, dead control counted); cited from the median-centering, IRS, SILAC and AP-MS sections | ran: exit 0, all asserts pass | the pilot's incorporation is read on proline-free peptides: on all peptides Arg->Pro drains the heavy channel and the pooled figure reads low (0.942 for planted 0.95 at 10% conversion); not changed in the Skill |
+| 404 lines in one file | P2 | Split (below) | line counts, fence parse | SKILL.md 428 -> 272 lines after the split |
+
+Line counts: SKILL.md 406 (start) -> 428 after fixes and install line -> 272 after the split -> 247 after scripts. Split moved verbatim: Isobaric section -> `references/tmt_isobaric.md`, SILAC section -> `references/silac.md`, AP-MS section -> `references/affinity_enrichment.md`; Reference Files index plus pointers on four decision-tree rows and two failure-mode cross-references. Checked: only six pointer lines differ from the pre-split text, python fences `ast.parse`, R fences `parse()`.
+
+## Left unfixed
+
+None of the five findings. Noticed, not changed: `silac_labeling_efficiency` reads incorporation on whatever table it is given, so on a pilot with Pro-containing peptides the pooled figure is biased low by Arg->Pro; documented in this log only (method-level change with no audit run behind it).
+
+## Deleted passage -> new home (redundancy pass, `usage-guide.md`)
+
+| deleted | new home |
+|---|---|
+| Prerequisites (pip / BiocManager / iq install) | `SKILL.md` Version Compatibility, "Install:" line (scipy and MSstatsTMT dropped: not used by any block) |
+| "What the Agent Will Do" steps 1-7 | `SKILL.md` decision tree, Insight 2, Quantitative Thresholds, Common Errors (zero -> NaN row; summarizer sensitivity; hand-off to differential-abundance in Scope) |
+| Tips (7 bullets) | zeros -> NaN: Common Errors; median centering is not MaxLFQ: Tool Taxonomy / failure mode; report summarizer: Insight 2; TMT compression, TMT plexes without IRS, SILAC on/off, NSAF: Per-Method Failure Modes |
+| Related Skills (identical to SKILL.md) | `SKILL.md` Related Skills; guide points at it |
+
+Added to the guide: one AP-MS example prompt.
+
+## Moved code (old location -> script path)
+
+| old location | new path | notes |
+|---|---|---|
+| `SKILL.md` MSstats block | `scripts/msstats_summarize.R` | args parametrised, optional MBimpute; ran: 296 proteins, 2305 rows |
+| `SKILL.md` iq MaxLFQ table route | `scripts/maxlfq_iq.R` | single-protein `setNames` snippet stays inline; ran: 299 x 8, 3 disconnected |
+| `references/silac.md` labeling + Arg->Pro functions | `scripts/silac_checks.py` | CLI + import; ran on a seeded pilot: 0.9419 pooled incorporation, conversion 0.10 recovered |
+| `references/affinity_enrichment.md` scorer | `scripts/apms_score.py` | CLI + import; ran on `apms_lfq.csv`: 17 called |
+| `references/tmt_isobaric.md` SL + IRS block | deleted, points at `examples/lfq_normalization.py` | duplicated the example |
+| `references/tmt_isobaric.md` TMT reporter R block, `silac_log2_ratio`, median centering | kept inline | short code; rest is CoA guidance |

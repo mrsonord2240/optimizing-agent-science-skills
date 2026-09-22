@@ -57,3 +57,50 @@ R 4.4.3 via `untargeted-metabolomics-analyst\rs.sh`; MetaboAnalystR 4.3.0, KEGGR
 ## Unfixed
 
 None.
+
+## 2026-09-21 (structure)
+
+Worktree `F:\OpenScience\wt\metabolomics-pathway-mapping`, branch `fix/metabolomics-pathway-mapping`. No
+behaviour or claim changed. R 4.4.3 via `untargeted-metabolomics-analyst\rs.sh`, run from a scratch
+working directory (the libraries MetaboAnalystR downloads land in the working dir), on the audit's
+`data\` files: `input1_ora_compounds.txt`, `input1_reference_metabolome_synthetic.txt`,
+`input2_peaks_full_synthetic.csv`.
+
+### Split (commit 34f94a5): SKILL.md 316 -> 200 lines
+
+Moved verbatim (every non-blank line accounted for; only the five pointer edits differ):
+
+| block (old SKILL.md lines) | new file |
+|---|---|
+| Local-Only ORA and MetaboAnalystR API path (118-182) | `references/ora-local-and-api.md` |
+| Mummichog / PSEA (184-217) | `references/mummichog-psea.md` |
+| Network-Diffusion Enrichment, FELLA (219-244) | `references/fella-diffusion.md` |
+
+Kept in SKILL.md: Version Compatibility (install, required setup, both disclosures), decision-tree and
+comparison tables, ORA goal/approach and the mapping block, failure modes, thresholds, Common Errors.
+Added a "Reference Files" index, a "when to read" pointer in the three decision-tree rows, and pointers
+where the text said "Local-Only ORA below".
+
+### Scripts (commit bc75020): SKILL.md 200 -> 188 lines
+
+Old location -> script, and how each was run (as SKILL.md now invokes it):
+
+| old location | script | run |
+|---|---|---|
+| SKILL.md ORA mapping block | `scripts/map_compounds.R` | 12-compound list -> "Mapped 12 of 12", 12 KEGG IDs (C00022 ... C00024) |
+| references/ora-local-and-api.md Local-Only fence | `scripts/local_ora.R` | those IDs + 320-ID reference; asserted `hsa00020` p = 9.37e-11 (matches the logged 9.4e-11), sorted, hits >= 2, fdr >= p |
+| references/ora-local-and-api.md API fence | `scripts/ora_api.R` | live: `CalculateOraScore` returns 0, prints "Failed to connect to the API Server!", exit 2 -- the documented behaviour (this script does its own mapping because the call needs the `mSet`) |
+| references/mummichog-psea.md fence | `scripts/mummichog_psea.R` | 1500-feature table, 5 ppm negative, p 0.2, permNum 1000, ~1 min; 15-pathway result table, FET/EASE in [0,1], Hits.sig <= Hits.total |
+| references/fella-diffusion.md fence | `scripts/fella_diffusion.R` | fresh database build (~11 min, 633 MB, deleted after) on the 12 IDs; 250 rows, `hsa00020` first, `getExcluded()` empty |
+
+Changes beyond parametrising: `getExcluded()` is wrapped in `print()` (a bare call prints nothing in a
+script); `local_ora.R` reads with `warn = FALSE`; `fella_diffusion.R` reuses an existing database dir
+(the raw block errored when `fella_hsa` already existed). The claims that lived in code comments
+(SetMetabolomeFilter needs Setup.KEGGReferenceMetabolome; server rejects the filtered call; mummichog
+R_all and seed; FELLA method strings and seeding) are kept as prose in the reference files as well as
+in the script headers/comments.
+
+Stayed inline: nothing runnable of 15+ lines. `examples/pathway_analysis.R` is a different (base-R
+statistics demo) script; no duplicate block.
+
+Not verified: `ora_api.R` success path (server rejects the filtered request); non-`hsa` organisms.

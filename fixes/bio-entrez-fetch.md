@@ -64,3 +64,33 @@ Redundancy: the "EFetch returns HTML error page" failure mode now points at the 
 instead of restating the sniff rule in prose; nothing deleted from `usage-guide.md` (already clean).
 
 All open P1/P2 findings fixed (1/1 P1, 2/2 P2). Nothing left unfixed.
+
+## 2026-09-21 (structure)
+
+Worktree `F:\OpenScience\wt\entrez-fetch`, branch `fix/entrez-fetch`. Biopython 1.88 (shared `database-access` venv, unchanged), live NCBI E-utilities.
+
+**Defect found and fixed inline** (`1407e20`): the earlier 2026-09-21 fix documented an `expect_start(text, 'Run,')` guard in `sra_runinfo()` but the function body never called it, so an error body still produced junk rows. Added the call. Ran: live SRA UIDs 8,7 -> 15 rows (first SRR000001); offline 502 error body -> `RuntimeError`.
+
+**Split** (`87b6c40`): `SKILL.md` 411 -> 269 lines. Moved verbatim into `references/`:
+
+| File | Content moved (old SKILL.md lines) |
+|---|---|
+| `pubmed.md` | pubmed matrix (67-74), `pubmed_full()` (228-248) |
+| `gene-taxonomy-gds.md` | gene, taxonomy, gds matrices (76-81, 90-102), `lineage()` (288-297) |
+| `sra.md` | sra matrix (83-88), `sra_runinfo()` (271-286) |
+| `variants-clinvar-snp.md` | clinvar and snp matrices (104-120), `clinvar_record()`/`snp_record()` (299-343) |
+| `history-server-fetch.md` | history-server fetch (250-269) |
+
+`SKILL.md` keeps an "Other databases" table (pointer from the decision matrix), an "Other code patterns" list and a "Reference Files" index. Two lines were intentionally re-pointed (scope note names the history reference; `expect_start` note names `references/sra.md`). Compared non-blank lines old vs new: nothing else lost; every python fence in `SKILL.md` and `references/` parses (`ast.parse`).
+
+**Scripts** (`47bf151`):
+
+| Old location | New | How run |
+|---|---|---|
+| `references/history-server-fetch.md` block | `scripts/history_fetch.py` (argparse, `history_fetch()` importable, `NCBI_API_KEY` env) | live: BRCA1 RefSeq mRNA query, `--chunk 4`; FASTA held 368 records = ESearch Count 368 |
+| `references/variants-clinvar-snp.md` `clinvar_record`, `snp_record` | `scripts/variant_records.py` | live: ClinVar UID 4887763 -> VCV000005107 / Pathogenic; dbSNP UID 429358 -> chr 19 / APOE (same as the 2026-09-17 verification) |
+| `SKILL.md` `bulk_summaries`/`organism_of` block | deleted; duplicates `examples/fetch_summaries.py` (SKILL.md points at it) | example ran live: 4 nucleotide docsums -> Homo sapiens |
+
+Stayed inline (under 15 lines): `fetch_genbank`, `cds_proteins`, `pubmed_full`, `sra_runinfo`, `lineage`, `expect_start`.
+
+Left unfixed: none. Note: the example's `bulk_summaries` sleeps a fixed 0.34 s, while the deleted SKILL.md copy used 0.1 s with an API key; the example is the more conservative one.

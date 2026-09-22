@@ -39,3 +39,31 @@ None. All 3 P1s and both flagged P2s were fixed; the unflagged reviewer-pushback
 ## Findings fixed: 5/5 (3 P1, 2 P2) + 1 unflagged contradiction.
 
 Nothing needs Sam.
+
+---
+
+# 2026-09-21 (P2 batch)
+
+Worktree `F:\OpenScience\wt\experimental-design-power-analysis`, branch `fix/experimental-design-power-analysis` (from staging `431aa55`). Audit: `F:\OpenScience\audits\bio-experimental-design-power-analysis\` (92, Production Ready, 2 P2). Env: crispr-screen-analyst (R 4.4.3 via `r.sh`; RNASeqPower 1.46.0, pwr 1.3.0, edgeR 4.4.2).
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| No documented parameter-range validation across closed-form calls | P2 | Added a "Parameter ranges" paragraph to Version Compatibility. Stated from what actually ran, not the audit's suggested wording: `alpha`/`power` in (0,1); `effect` is a positive fold change != 1 (0.5 == 2, so no separate depletion rule; the audit's "effect > 1 (or < 1)" was refined); `rnapower()` does not validate (power=1.2 -> NaN + warning; power=1 and effect=1 -> Inf; alpha=1.5 -> 0.999; effect=0 -> 1; negative cv treated as positive; effect=-2, negative depth -> NaN + warning), while `pwr.t.test` errors on power/sig.level outside [0,1] | ran | Script run via `r.sh` on RNASeqPower 1.46.0 / pwr 1.3.0; every value quoted is the printed output. |
+
+## Redundancy / dedup this pass
+
+| Deleted passage | Now lives in |
+|---|---|
+| SKILL.md scRNA-seq section, inline 10-line edgeR block (`DGEList` ... `glmQLFTest`, `p.adjust`) | `examples/scrna_pseudobulk_power.R` (same calls, lines under `# --- pseudobulk by donor`); SKILL.md keeps a one-line description of the step and the pointer. Example re-run as invoked: pseudobulk power 0.000 / 0.070, cell-level FDR 0.897 / 0.888 at 4 / 12 donors. |
+
+`usage-guide.md` redundancy pass was already done on 2026-09-17 (see above); nothing further to remove.
+
+## Length and scripts
+
+SKILL.md 264 -> 256 lines: under 300, no split. `scripts/`: no complete runnable block of ~15+ lines is inline (largest are 8-10 lines; the one candidate duplicated the shipped example and was deleted above), so no `scripts/` move and no third commit.
+
+## Left unfixed
+
+- **powsimR unverified (P2):** it is GitHub-only with a compile-required dependency (`bayNorm`), and installing into the shared env is forbidden. The audit itself says no action required for deployment; the Skill already carries a runnable, verified substitute (`examples/scrna_pseudobulk_power.R`) and warns of signature drift in Version Compatibility. Claim kept, not deleted, because it is labelled optional and the Skill backs the same question with code.
+
+Findings fixed: 1/2 P2 (the other left unfixed, reason above).

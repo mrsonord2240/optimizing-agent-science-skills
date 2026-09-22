@@ -49,3 +49,21 @@ where sections were deleted).
 | "Tips" (9 bullets) | Already stated in "Decision Tree", "Show the Redundancy", "Dotplot", "Default-ordering misread", "GeneRatio read as effect size", "Barplot on gseaResult", "Over-trimmed showCategory", "All Outputs Are ggplot Objects", "Common Errors" | deleted, no unique content — all 9 bullets independently checked against SKILL.md before deletion |
 
 No disagreements found between the two files' copies before deletion.
+
+## 2026-09-21 (P2 batch fix; fork `fix/pathway-analysis-enrichment-visualization`, commit 1ccf2f0)
+
+Audited at upstream `d91ed3d`; audit report scored 93, Production Ready, 1 open P2.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| `treeplot()` on a `compareClusterResult` crash needs a re-check trigger | P2 | Version Compatibility: one sentence, re-test `treeplot(pairwise_termsim(ck))` after any enrichplot/ggtree upgrade and drop the "do not retry" guidance (Tool Taxonomy, Decision Tree, Common Errors) if it renders | ran: the audit's `check_treeplot_ck.R` (copied to scratchpad) via the env `r.sh` on enrichplot 1.26.6 / ggtree 3.14.0 / ggplot2 4.0.3 still errors ("Aesthetics must be either length 1 or the same as the data (51)"), so the existing guidance stands | 1/1 P2 fixed |
+
+**Left unfixed:** none.
+
+**Redundancy pass:** `usage-guide.md` was already deduplicated on 2026-09-17 (skipped). One repeat inside SKILL.md collapsed.
+
+| deleted passage | new home |
+|---|---|
+| "Show the Redundancy" paragraph: "`treeplot` on a `compareClusterResult` crashes ... use `emapplot(pairwise_termsim(ck))` instead" | Version Compatibility (full statement), Tool Taxonomy treeplot row, Decision Tree row 2, Common Errors last-but-one row (grep confirms all four present) |
+
+**Length / scripts:** SKILL.md 255 -> 253 lines, under the 300 split threshold, no split. No runnable block of about 15+ lines inline (all fragments of 1-5 lines; the two full scripts already live in `examples/`), so nothing moved to `scripts/`.

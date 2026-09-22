@@ -44,3 +44,15 @@ Worktree: `F:\OpenScience\wt\experimental-design-multiple-testing`, branch `fix/
 Redundancy: the IHW CAUTION comment block in SKILL.md (segfault rate, nbins, child process, fallback) was restated in the failure mode's Fix; the code-block prose now holds the instruction and the failure mode holds mechanism + pointer. Nothing left the Skill. `usage-guide.md` untouched (no IDR mention, no duplicated facts beyond the previous pass).
 
 Left unfixed: the `de_table` P2 in agent_usability is closed by the same change. Not touched: shipped example's `rgamma` IHW covariate (null covariate, no power gain) and a `locfdr` package mention in the taxonomy row (no code, no audit finding).
+
+---
+
+## 2026-09-21 (structure)
+
+Worktree `F:\OpenScience\wt\experimental-design-multiple-testing`, branch `fix/experimental-design-multiple-testing`. Env `crispr-screen-analyst\r.sh` (R 4.4.3, IHW 1.34.0).
+
+- **Split:** none. SKILL.md was 277 lines (under 300).
+- **Moved to `scripts/`:** the `ihw_safe()` block (SKILL.md, "Covariate-Weighted FDR -- IHW", ~18 lines) -> `scripts/ihw_safe.R`, code verbatim plus a header (purpose, inputs, usage) and a CLI entry (`Rscript scripts/ihw_safe.R in.csv pvalue mean_expression out.csv [alpha]`). SKILL.md keeps `source('scripts/ihw_safe.R')` and the three-line call. SKILL.md 277 -> 266 lines. Commit `refactor(experimental-design/multiple-testing): move runnable code to scripts/`.
+- **How run** (audit's `data\de_pvalues_reaudit.csv`, m=18,000, exactly as SKILL.md invokes it): `source()` path returned IHW on attempt 1, 1018 discoveries vs BH 1006, realized FDP 0.040 (asserted < 0.1, padj in [0,1], length = m); CLI path gave the same 1018; forced failure (mismatched covariate length) returned the BH fallback with padj identical to `p.adjust(p, 'BH')` and attempts = 2. A separate full-length run had all 3 children fail (one hung, 130 s CPU, and I killed it by PID; the others exited without output) and fell back to BH, 1006, exit 0.
+- **Stayed inline:** BH/q-value block (commented fragment illustrating a point, not a runnable pipeline), FCR block (10 lines), Python `multipletests` (2 lines). `examples/multiple_testing_correction.R` keeps its own inline IHW child-process retry; examples stay as they are.
+- **Noticed, not changed (behaviour):** `ihw_safe()` has no timeout. On this loaded machine one IHW child hung rather than crashed (130 s CPU on m=18,000, where the normal run is seconds), and the wrapper would wait indefinitely. A per-child timeout is a behaviour change, so it was left.

@@ -61,3 +61,40 @@ overview, prompts and related Skills). No passages deleted.
 
 Findings left unfixed: none.
 
+
+## 2026-09-21 (structure)
+
+Worktree `F:\OpenScience\wt\pathway-kegg-pathways`, branch `fix/pathway-kegg-pathways`. Fixer: Claude
+Sonnet 5. Env `crispr-screen-analyst` (R 4.4.3 via `r.sh`; SPIA 2.58.0, graphite 1.52.0, clusterProfiler
+4.14.6); nothing installed. Structure only, no behaviour or claim changed.
+
+**Split** (commit `2bb21b0`): SKILL.md 324 -> 268 lines. Verbatim moves, checked by sorted non-blank-line
+diff of old SKILL.md against new SKILL.md + references/ (only the three decision-tree rows gained a
+pointer; the new files add titles, one "Read when" line each, and the Reference Files index). All three R
+fences parse (`parse()` via `r.sh`).
+
+| Section moved out of SKILL.md | New file |
+|---|---|
+| Run Signed-Topology Perturbation (SPIA) | `references/spia-topology.md` |
+| Compare Multiple Conditions | `references/compare-conditions.md` |
+| Overlay Data on the KEGG Map (pathview) | `references/pathview-overlay.md` |
+
+Pointers added to the decision-tree rows for SPIA, compareCluster and pathview, plus a "Reference Files"
+index before "Agent Workflow". Scope, decision tree, ID prep, ORA, GSEA, pinning, thresholds, failure modes
+and Common Errors stay in SKILL.md.
+
+**Scripts** (commit `2befc0b`): no file created under `scripts/`. The one block over 15 lines, the SPIA +
+graphite pipeline (31 lines, `references/spia-topology.md`), duplicates `examples/kegg_spia_topology.R`, so
+per the brief the copy is deleted and the reference points at the example (plus the `spia()` output-column
+note and Status meaning kept in prose). Remaining blocks are 3-10 lines (ID prep, enrichKEGG/enrichMKEGG,
+gseKEGG, gson pinning, compareCluster, pathview) and stay inline. ORA/pinning overlap with
+`examples/kegg_enrichment.R` is partial (fragments), left as is.
+
+Run: `examples/kegg_spia_topology.R` on the audit's `SYNTHETIC_de_results.csv` as `de_results.csv`, with
+`n_boot <- 100` (sed on a scratchpad copy) plus assertions: `spia()` and `runSPIA()` both returned scored
+tables (graphite 191 pathways, 180 at FDR<0.05), Status/pG/pGFdr present and finite, Cell cycle
+Activated in `spia()` (tA +70.5). Whole script took 43 min wall at nB=100, so the shipped default of 2000
+is impractical to run end to end; not run at 2000.
+
+**Left inline / not run:** `enrichKEGG`, `gseKEGG`, gson-pinning, `compareCluster` and `pathview` blocks were
+not re-executed (short, unchanged verbatim; not scripts). Findings left unfixed: none.

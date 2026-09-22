@@ -31,3 +31,32 @@ content exists only in usage-guide.md and arguably belongs in SKILL.md per
 the "every pass" dedup rule, but it isn't duplicated (no fact stated twice)
 and isn't part of any of the 4 assigned findings — left alone to keep the
 diff minimal, flagging here in case a future pass wants it.
+
+## 2026-09-21 (P2 batch fix, commit 7a32183 on fix/crispr-screens-in-vivo-screens)
+
+Env: crispr-screen-analyst (Python venv, pandas 3.0.5, scipy 1.18.1). SKILL.md 266 -> 263 lines (under 300, no split).
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+| --- | --- | --- | --- | --- |
+| Ethics requirement not tied to the steps that recommend new animal work | P2 | Pointers to "Ethical & Regulatory Requirements" added at the "increase animals per condition" fix, the arrayed-validation fix, the arrayed-validation threshold row, and a new Validation Checklist section (moved from usage-guide.md, first item is IACUC coverage of follow-up cohorts). The audit named usage-guide.md's steps; those steps now live in SKILL.md, the guide points at SKILL.md. | read + grep (5 references to the section in SKILL.md) | Guide's "What the Agent Will Do" list collapsed to one line naming SKILL.md. |
+
+Also (redundancy pass, no audit finding): the inline `meta_analyze_animals` block duplicated `examples/per_animal_meta_analysis.py`; deleted and pointed at the example. Example run on the audit's 6-animal / 60-gene data (`_pre-fix-20260919/.../mageck_out/animal_1..6.gene_summary.txt`): 4 hits (Gene000-003), Gene004 flagged for review, matching SKILL.md's stated 4/5 + 1 flagged.
+
+### Left unfixed
+
+- Nothing from the audit's single P2 is left open (1/1).
+- `mageck mle` design-matrix heredoc in "Hit Calling for In Vivo" stays inline: a 6-row illustrative matrix, not a runnable script (needs the user's own count table). No `scripts/` move.
+- Disagreement logged: usage-guide.md's checklist said per-animal depth >=100 reads/sgRNA; SKILL.md says >=500 reads/sgRNA at endpoint and >=50x coverage. Kept SKILL.md's, did not carry the 100 figure over.
+
+### Deleted passage -> new home
+
+| deleted (usage-guide.md) | now |
+| --- | --- |
+| Prerequisites install block (`conda install -c bioconda mageck`, pip) | SKILL.md "Version Compatibility" (Install line; added statsmodels, which the example imports) |
+| Required inputs numbers (n=10+, 3,000-15,000 sgRNAs) | guide names SKILL.md "Quantitative Thresholds" / "Focused Library Design" |
+| "What the Agent Will Do" 14-step list | SKILL.md decision flow, Hit Calling, Validation Checklist |
+| Tips: genome-wide library failure, syngeneic for immune screens, n=10+ animals, Cas9 selection, CEGv2 calibration, CRISPR-StAR, heterogeneity | already in SKILL.md (bottleneck math, Syngeneic decision rule, Failure Modes, CRISPR-StAR section) |
+| Tips: n=10 at 100x beats n=3 at 500x | SKILL.md Quantitative Thresholds ("Depth vs breadth") |
+| Tips: metastasis screens per-site | SKILL.md Failure Modes, "Tumor heterogeneity" fix |
+| Decision Cheat Sheet, Thresholds tables | SKILL.md "Syngeneic vs Xenograft vs PDX" and "Quantitative Thresholds" |
+| Validation Checklist | SKILL.md "Validation Checklist" (100 reads/sgRNA item dropped, see above) |

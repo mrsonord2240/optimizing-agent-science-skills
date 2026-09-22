@@ -56,3 +56,38 @@ overview/example-prompts/related-Skills only, no duplication to collapse.
 None from this pass. Flag for Sam: `BACKLOG.md` / the audit pipeline should be re-run to
 regenerate the record against current staging `main`, since the 84-score audit it lists
 predates the Backlog-pass fix it's nominally scoring.
+
+## 2026-09-21 -- P2 batch, redundancy pass, split
+
+Worktree `F:\OpenScience\wt\phylogenetics-tree-visualization`, branch `fix/phylogenetics-tree-visualization`, off staging `431aa55`. Env `molecular-phylogenetics-analyst` (Biopython 1.88, matplotlib, R 4.4 with ape 5.8.1, ggtree 3.14.0). Commits `35d2cce` (fix), `e2e8306` (redundancy), `1d9b6fc` (split). Audit re-run report: 3 P2s, no P0/P1.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| Bio.Phylo panel illegible past the threshold (320 tips) | P2 | Scaled-panel recipe now raises `ValueError` when tips > `MAX_TIPS = 200` (still warns at >150); Common Errors "Labels overlap" row updated | ran (Biopython 1.88): 16 tips draws; 190 tips draws + warns; `big320.nwk` raises | 200 chosen as the ceiling because the 40 in height cap is reached at 160 tips and the audit's 320-tip run was illegible; `MAX_TIPS` is an explicit override |
+| ape unrooted fallback has no recipe or scale bar | P2 | Added `ape::plot.phylo(type='unrooted')` + `add.scale.bar()` block (now in `references/ggtree-ape-recipes.md`); Version Compatibility fallback points to it | ran (ape 5.8.1, `primates16_true.nwk`): PDF written; second check on uncompressed PDF text finds scale-bar label `(0.05)` plus tip labels | |
+| Inconsistent severity between the no-support warning and the MRCA raise | P2 | Kept both behaviours and stated the reason in the Common Errors row: a tree with no support values is legitimate and draws correctly (warn); a wrong MRCA silently colors the wrong clade (raise) | docs / reasoning, no code change | chose "note why" over "raise on both": raising on no-support would break cladograms and unsupported trees |
+
+### Left unfixed
+None.
+
+### Redundancy pass (usage-guide.md 65 -> 28 lines)
+
+| deleted passage | new home |
+|---|---|
+| Overview paragraph 1 (four argument-level choices, cladogram/phylogram/chronogram, ladderization, root, support) | shortened to 3 sentences; full text already in SKILL.md "The Single Most Important Modern Insight" |
+| Overview paragraph 2 (tool decided by I/O layer) | SKILL.md insight #4 and Tool Taxonomy decision rule |
+| Prerequisites: pip / Bioconductor / web+desktop lines | install line added to SKILL.md Version Compatibility (pip, Bioconductor, CRAN ape); iTOL/FigTree already in Tool Taxonomy |
+| Prerequisites: "know branch lengths, rooted, which support" | SKILL.md insight list and Failure Modes |
+| What the Agent Will Do steps 1-5 | SKILL.md insight, Tool Taxonomy, Quantitative Thresholds (tip counts, vector, scale bar, support). "Write outputs to a temp/namespaced path" was generic advice found nowhere else; dropped |
+| Tips: geometry is a claim / chronogram needs age bars | SKILL.md insight #1, Failure Modes "Drawing Meaningless Branch Lengths", "Chronogram Without Age Uncertainty" |
+| Tips: ladderize for legibility only | insight #2, Failure Mode "Non-Monophyly Hidden by Ladderization" |
+| Tips: bare support number, PP vs BP | insight #3, Failure Mode "Unlabeled or Mislabeled Support", Thresholds |
+| Tips: route Bayesian trees to treeio + ggtree | insight #4, Common Errors first row |
+| Tips: vector export, >=600 dpi | Failure Mode "Raster Export", Thresholds |
+| Tips: unrooted has no basal taxon | Layout table, Common Errors "Basal claim" row |
+
+Verified by grep that each target exists in SKILL.md (600 dpi, "basal", install line, failure-mode headings).
+
+### Split (SKILL.md 304 -> 167 lines)
+
+`## Bio.Phylo + matplotlib Recipes` -> `references/bio-phylo-recipes.md` (104 lines); `## ggtree + treeio Recipe (R)` (incl. the new ape block) -> `references/ggtree-ape-recipes.md` (38 lines). "Reference Files" index added, pointer added to the Decision rule, two cross-references in SKILL.md retargeted. Moved text verbatim except four relative references ("above"/"below") retargeted to file names. Verified: multiset compare of non-blank lines shows only the edited lines differ, Python fences `ast.parse`, R fences `parse()` (14 expressions), fence counts even.

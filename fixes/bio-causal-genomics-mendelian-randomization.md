@@ -102,3 +102,43 @@ No usage-guide.md change: it restates none of the edited text.
 - **`I^2_GX` = 0.996 reading / other comparison remarks** (theirs-side gaps, protocol scaffolding Theirs has and ours lacks: tiers, claim-boundary language): out of the Skill's scope (broader coverage the brief excludes).
 - **Comparison note: IVW/WM/RAPS biased +0.04 to +0.10 on data A with 30% invalid IVs**: a property of the estimators on the planted data, not a Skill defect; the corrected reconciliation row and the Egger/mode guidance already cover it.
 - **`examples/` synthetic data use random `A1`/`A2` (can be identical) and no LD clumping**: not hit in any run and not in the audit or comparison findings; judged not a correction.
+
+---
+
+# 2026-09-21 (structure)
+
+Worktree `F:\OpenScience\wt\causal-genomics-mendelian-randomization`, branch `fix/causal-genomics-mendelian-randomization`, on top of `10e2381`. Commits: `189f3b4` (split), `9fde5b0` (scripts). Fixer: Claude Sonnet 5. No behaviour or claim changed; the MR-PRESSO outlier rule (adjusted P <= SignifThreshold, string P parsed, NULL guarded, `mr_keep` filter) is unchanged.
+
+## Split: SKILL.md 331 -> 302 lines (extends the existing 7 files; 9 now)
+
+| Moved from SKILL.md | To | Left in SKILL.md |
+|---|---|---|
+| Cohort Gotchas + Anticipated Reviewer Pushback (18 lines) | `references/cohorts-and-reviewer-pushback.md` (new) | heading + 1-line pointer |
+| Tool Installation Notes (install block and mr.raps/plink note) | `references/tool-installation.md` (new) | heading + 1-line pointer |
+| Winner's curse Mechanism + Fix | appended to `references/mrlap-overlap-correction.md` (its Read-when line updated) | heading, Trigger, Symptom, 1-line pointer |
+
+Two new rows in the Reference Files index. Check: line set of the old SKILL.md against new SKILL.md plus references: only the edited index row differs. R fences `parse()` OK.
+
+## Scripts: SKILL.md 302 -> 260 lines
+
+| Old location | Script | How run |
+|---|---|---|
+| SKILL.md "TwoSampleMR Standard Workflow" R block (48 lines) | `scripts/twosample_workflow.R` (args `--exposure --outcome --outdir --bfile --plink --no-clump`; writes primary/heterogeneity/pleiotropy/leaveoneout/steiger/harmonised TSVs) | `r.sh` on `F:\OpenScience\comparisons\mr-execution\data_A` and `data_B` (the data the round-3 fix used) with `--no-clump`: 97/95 instruments, IVW/Egger/median/mode and `directionality_test()` all returned; numbers match round 3 (B: IVW p 2e-6, Egger p 0.72, mode p 0.82; A: IVW 0.397, planted 0.3). Missing `--bfile` without `--no-clump` stops with a clear error (checked) |
+| `references/mr-presso.md` R block (27 lines) | `scripts/mr_presso_outliers.R` (`--dat --nb --seed --signif --out`) | `r.sh`, `--nb 1000 --seed 42`, on a 40-SNP subset of data_B's harmonised output (14 planted invalid): outliers = MRPRESSO's own `Outliers Indices` (6 SNPs, `setequal`), all 6 planted. Full 95 SNPs at 3000-10000 draws exceeds 20-40 min on this loaded machine, so the subset was used; the rule is the round-3 one, unchanged |
+| `references/mvmr-conditional-f.md` R block (22 lines) | `scripts/mvmr_conditional_f.R` (`--dat --exposures --gencov`) | `r.sh` on the audit's Input 4 generator (seed 21): conditional F 0.87/0.78, guard stops with the message (checked); an independent-instrument case gave conditional F 22.6/25.7, MVMR-IVW 0.342/-0.119 (planted 0.30/-0.10), Q_A p 0.66 |
+| `references/simex-egger-nome.md` R block (20 lines) | `scripts/simex_egger.R` (`--dat --B --seed`) | `r.sh` on the audit's Input 5 generator (seed 33, I^2_GX < 0.9): runs without the `se.outcome` crash; SIMEX slope 1.007 vs naive 0.339 (the audit's own run gave 1.020 at true slope 0.40, so the SIMEX extrapolation instability at I^2_GX ~ 0 is pre-existing, not new); on data_B harmonised: 0.1004 vs naive 0.0995 |
+
+The load-bearing code comments (outlier-rule reasoning, simex weights workaround, NbDistribution cost) are kept in the script headers and as prose in the reference files. The three scripts that read data take the harmonised TSV from `twosample_workflow.R`.
+
+Differences from the inline blocks, all mechanical: hard-coded file names and constants became arguments; `--no-clump` added because plink and a 1KG reference do not exist on this machine (default still clumps); MVMR generalised from `x1,x2` to a list of exposures (default unchanged); `--seed` on SIMEX optional.
+
+## Stayed inline
+
+- `references/bidirectional-steiger.md` block (13 lines) and `references/mrlap-overlap-correction.md` block (13 lines): under the 15-line threshold; MRlap also needs LDSC reference files that do not exist here.
+- `references/tool-installation.md` install block: install commands, not analysis code.
+- `examples/*.R` untouched; no block duplicated an example (the examples simulate their own data, the workflow reads user files).
+
+## Left unfixed / not run
+
+- **LD clumping path** (`ld_clump()` with plink + 1KG bfile) of `twosample_workflow.R`: no plink, `genetics.binaRies` or reference panel on this machine and the brief forbids installing; the code is verbatim from the inline block and only guarded by the `--bfile` check.
+- **SKILL.md is now 260 lines**, under 300; nothing further to split.

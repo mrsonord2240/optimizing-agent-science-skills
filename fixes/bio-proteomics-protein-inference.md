@@ -78,3 +78,30 @@ Redundancy pass (each fact once):
 | usage-guide Tips (7 bullets), Prerequisites CLI comment, What-the-Agent-Will-Do steps | SKILL.md Insights 1-3, Vocabulary, decision tree, Output contract, Version Compatibility (new Install line carries the pip/CLI/no-TPP note) |
 
 Unfixed: none.
+
+## 2026-09-21 (structure)
+
+Worktree `F:\OpenScience\wt\proteomics-protein-inference`, branch `fix/proteomics-protein-inference`. Behaviour and claims unchanged. Env `mass-spec-proteomics-analyst`, pyOpenMS 3.5.0.
+
+**Split** (commit `549e28b`): `SKILL.md` 318 -> 167 lines; four sections moved verbatim into `references/` (0 non-blank lines lost, checked by multiset comparison; python fences `ast.parse`, bash fence `bash -n`).
+
+| old location | new file |
+|---|---|
+| "Group Proteins with pyOpenMS" (lines 87-143) | `references/pyopenms-basic-inference.md` |
+| "Bayesian Inference + Group FDR with EPIFANY" | `references/epifany-bayesian-inference.md` |
+| "Picked Protein-Group FDR" | `references/picked-group-fdr.md` |
+| "Protein Groups from the CLI: Percolator and Philosopher" | `references/percolator-philosopher-cli.md` |
+
+Added: "Reference Files" index, pointers in four decision-tree rows, the Percolator taxonomy row and the default-when-uncertain line. Two dangling cross-references retargeted ("shown above" -> `pyopenms-basic-inference.md`; "Output contract above" -> "in `SKILL.md`").
+
+**Scripts** (commit `2e41419`):
+
+| old location | script | how run |
+|---|---|---|
+| pyOpenMS block (`references/pyopenms-basic-inference.md`) | `scripts/group_proteins_pyopenms.py` (args: idXML, `--decoy-prefix`, `--fdr`, `--out`) | on audit `peptides_1pct_fdr_std.idXML`: 556 groups at 1%; vs `truth_std.csv` 2 false (0.36% FDP), multi-member groups present; `--decoy-prefix rev_` raises as documented |
+| EPIFANY block | `scripts/epifany_inference.py` (`--greedy-group-resolution`, `--out`) | same idXML: 749 groups, posteriors in [0,1] (assertions); flag runs too |
+| `picked_group_fdr` sketch | `scripts/picked_group_fdr.py` (importable function + CLI on a TSV) | on the EPIFANY table: 586 target groups at q<=0.01 (20 false vs truth = 3.4%, matches the 3.43% already logged); `--decoy-prefix REV__` raises `ValueError`; toy pairing case returns the expected two groups |
+
+Kept as a script, not deleted for `examples/protein_groups.py`: the sketch's wrong-prefix guard (raises when no accession carries the prefix) differs from the example's (raises only when `is_decoy` marks none), so it is not a duplicate. SKILL.md Common Errors row now names `scripts/picked_group_fdr.py`.
+
+**Stayed inline:** the Percolator / Philosopher CLI block (`references/percolator-philosopher-cli.md`). The Percolator leg is under 15 lines, and the Philosopher leg cannot produce output on this machine (Philosopher 5.1.0 reads 0 PSMs from any pepXML, see pass 5), so no script could be run to a real result.

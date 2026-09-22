@@ -41,3 +41,56 @@ Verification: SKILL.md python blocks were extracted and executed **without** `ex
 - Raw-MI null cannot catch coupling from singleton residues on very small alignments (the 6-sequence example shows one such pair above its null); the warning line already tells the user the output is noise below the guard.
 - Easel-equivalent `pb` weights not re-implemented (see Henikoff row); pyhmmer is the route.
 - The "2-3x" estimator-ratio claims: replaced by measurements, no attempt to characterise EVcouplings/HHsuite Neff (not installed).
+
+---
+
+# 2026-09-21: P2 fixes, split, scripts/
+
+Skill `alignment/msa-parsing`, branch `fix/alignment-msa-parsing` (worktree `F:\OpenScience\wt\alignment-msa-parsing`) from staging main `431aa55`. Commits: `7d81f81` fix, `e83c870` split, `fea02de` scripts/. Audit: 6 P2s. Tools: Python 3.12.13, Biopython 1.88, numpy 2.0.2 (env `alignment`), MUSCLE 5.3 (WSL). SKILL.md 505 -> 245 lines (fix commit 505 -> 517, split 517 -> 287, scripts 287 -> 245).
+
+| finding | priority | change | verified | notes |
+| --- | --- | --- | --- | --- |
+| `select_columns` / `normalize_alignment` quadratic | P2 | `str(record.seq)` hoisted once per record, full-width fast path (`msa_utils.py`; the inline copy is now an import, see scripts section) | ran: 10 x 100,000 columns normalise 11.34 s -> 0.02 s, output equals independent `upper().replace('.', '-')`; column subset unchanged | all other examples' no-arg output byte-identical before/after |
+| `remove_duplicates` does not normalise | P2 | compares normalised rows, keeps original records (now `scripts/filter_sequences.py`) | ran: `AC-GT`/`AC.GT`/`ac-gt`/`ACGGT` -> 2 rows; `syn_dotgaps.fasta` dedup keeps a,c | |
+| `a2m_a3m_io.py` fails on HMMER A2M | P2 | reads with `SeqIO.parse`, prints padded/unpadded, warns if match-column counts differ; SKILL.md (a2m reference) says HMMER 3.4 writes unpadded A2M and points to `pyhmmer.easel.MSAFile(format='a2m')` | ran on the audit's `hmmalign_globins8.a2m`: row lengths [149..161], 117 match columns per row; padded `example.a2m` still works | `alignment-io` says A2M is padded: other Skill, not touched (see left unfixed) |
+| all-zero weights silent | P2 | `ValueError('weights must sum to a positive value')` in both weighted helpers (`find_conserved.py`, `consensus_sequence.py`), Common Errors row | ran: weights `[0,0,0,0]` raises; `[1,1,1,1]` and `None` unchanged | |
+| description omits weights, Neff, MI-APC, MUSCLE5; SKILL.md over 500 lines | P2 | description extended; split into 7 `references/` files; runnable duplicates replaced by pointers | line counts, fence parse | |
+| doc (a) structure-navigation pointer | P2 | names the sections that exist ("Reading the Declared (SEQRES) Sequence and Locating Gaps", "Reading mmCIF with an Explicit Numbering Scheme") and residue-number/SIFTS mapping; `_pdbx_poly_seq_scheme` dropped | docs: headings read in `structural-biology/structure-navigation/SKILL.md` | |
+| doc (b) "stderr ends best <name>" and bare IndexError | P2 | reworded to the "CC min .., best <name>" line; `muscle5_column_confidence.py` prints a usage line and exits 1 without arguments | ran `muscle -maxcc` (5.3): line `CC min 148, avg 150, max 152, best acb.2`; script no-arg prints usage; with `ens_cc.efa acb.2 0.9` masked output byte-identical to the audit's | position of the line vs the URL varied with how stderr was captured, so the wording no longer claims "last" |
+| doc (c) Stockholm round trip drops tags | P2 | annotation paragraph states Biopython 1.88 keeps only recognised tags | ran on PF00042 seed: raw `GC seq_cons`, `GR pAS`, GS AC x73; written: `GS AC`, `GS DE` (added), `GR AS`; seq_cons and pAS gone | |
+| doc (d) Cocco 2018 attribution unverified | P2 | claim now "reasoning, not a measured cited result"; audit's measured top-30 contact precision (raw MI 0.13, MI-APC 0.00, baseline 0.09) added; Cocco kept only as background reading | audit run in8 (not re-run) | |
+
+## Left unfixed
+
+- `alignment/alignment-io` describes A2M as padded (audit note): different Skill, outside this fix's folder scope. It needs the same "HMMER writes unpadded" caveat there.
+- Cocco 2018 was not checked against the paper (no access); the claim is softened, not confirmed.
+- `henikoff_weights` (14 lines) stays inline in `references/weighting-neff.md` next to `examples/henikoff_weights.py`: under the 15-line threshold.
+
+## Redundancy pass
+
+Already done on 2026-09-20 (see above); `usage-guide.md` holds overview, prompts and a pointer only. No change this pass.
+
+## Split (`SKILL.md` 517 -> 287 lines), verbatim moves
+
+| SKILL.md section | new home |
+| --- | --- |
+| Alignment Trimming; Gap Handling for Phylogenetics; Identifying Unreliable Alignment Regions | `references/trimming-and-reliability.md` |
+| Consensus Sequence | `references/consensus.md` |
+| Sequence Filtering | `references/sequence-filtering.md` |
+| Working with Annotations; Position Mapping | `references/annotations-and-position-mapping.md` |
+| Sequence Weighting and Neff | `references/weighting-neff.md` |
+| Coevolution: Mutual Information with APC | `references/coevolution-mi-apc.md` |
+| A2M / A3M Conventions; Streaming Large Alignments | `references/a2m-a3m-streaming.md` |
+
+Verified: no non-blank line lost (two lines edited to add pointers), 26 fences, python fences `ast.parse`, bash fences `bash -n`.
+
+## Runnable code -> scripts/ (old location -> new)
+
+| old location | new |
+| --- | --- |
+| `references/sequence-filtering.md` code block (26 lines: `_require_kept`, `filter_by_id`, `filter_by_gap_content`, `remove_duplicates`) | `scripts/filter_sequences.py` (adds CLI; imports `msa_utils` from `examples/`) |
+| SKILL.md `select_columns`/`normalize_alignment` block (27 lines) | duplicate of `examples/msa_utils.py`: replaced by prose signature plus import line |
+| SKILL.md `find_conserved_positions` block (23 lines) | duplicate of `examples/find_conserved.py`: replaced by import and usage |
+| `references/consensus.md` `is_nucleotide` + `consensus_sequence` block (27 lines) | duplicate of `examples/consensus_sequence.py` and `msa_utils.is_nucleotide`: replaced by import, usage and signature note |
+
+Ran as SKILL.md invokes them (from the Skill directory): `filter_sequences.py` CLI with `--dedup`, `--id-pattern`, `--max-gap-fraction`, the all-removed error, and Pfam PF00042 Stockholm (44 of 73 rows kept at gap fraction 0.2, equal to an independent count, output re-read as Stockholm); the import snippets and `remove_gappy_columns` from SKILL.md.

@@ -182,3 +182,24 @@ Nothing the agent acts on left the Skill. Frontmatter untouched. SKILL.md, `usag
 
 None open. Not done: a second, independent data set for the two trip-wire constants (both were read off one 4 v 4 synthetic set, and the text says so).
 
+
+---
+
+# 2026-09-21 (structure)
+
+Worktree `F:\OpenScience\wt\proteomics-differential-abundance`, branch `fix/proteomics-differential-abundance`. Structure only; no behaviour or claim changed.
+
+**Split:** not done. SKILL.md was 288 lines (under 300) and already has `references/feature_level.md`.
+
+**Scripts** (one commit, `refactor(proteomics/differential-abundance): move runnable code to scripts/`). SKILL.md 288 -> 244 lines; `references/feature_level.md` 156 -> 87.
+
+| old location | new home | how run (env `mass-spec-proteomics-analyst`, R via `r.sh`, audit data read-only) |
+|---|---|---|
+| SKILL.md limma workflow block (23 lines) | `scripts/limma_de.R` (`run_limma_de()` plus CLI; batch column optional; contrast and `min_valid` are arguments; returns `fit2` for the treat/DEqMS/ashr blocks) | LFQ 4 v 4 (`proteinGroups.txt`, `sample_annotation.csv` with batch): 1297 tested, 99 calls at BH < 0.05 (audit block: 99), 200 dropped by valid-value filter, 3 non-estimable. Paired donor set (`paired_donor_log2.csv`, donor as batch): 795 tested, 84 valid-value drops, 121 non-estimable rows dropped by the estimability filter, 63 calls |
+| `references/feature_level.md` MSstats block (17 lines) | `scripts/msstats_group_comparison.R` (reference/test level names and `normalization` are arguments; tested and undetected written to separate files) | `evidence.txt` + `proteinGroups_evidence_subset.txt`: `equalizeMedians` 290 tested / 6 undetected / 101 calls / median log2FC -0.184 / SE 0.119; `FALSE` 79 calls / +0.008 / 0.204. Both match the fix-log numbers |
+| `references/feature_level.md` centring-checks block (28 lines) | `scripts/centring_checks.R` (`resid_sd()`, `check_sd_ratio()`, `check_offset()`; CLI runs both checks on a peptide table) | peptide table from the audit `evidence.txt`: with per-run median normalization, warning `residual SD fell to 0.75` and stop at median log2FC -0.202; without, 286 tested / 80 calls / -0.0048, check passes |
+| SKILL.md Python workflow block (24 lines) | deleted; duplicates `examples/differential_abundance.py` | `preprocess()` and `differential_abundance()` imported from the example on its own simulation: 400 tested, 43 calls, 0 untestable |
+| `references/feature_level.md` msqrob2 protein-summary block (31 lines) | deleted; duplicates `examples/msqrob2_peptide_level.R` (same chain, same undetected list) | example already ran on the audit data in pass 5 (80 calls, 8 undetected) |
+
+Stayed inline (under 15 lines or API-shape illustrations): treat/topTreat, DEqMS, proDA, ashr, the msqrobAggregate mixed-model block. Nothing failed to run. Test inputs were built in the scratchpad, none under the audit folder.
+Note: a dropped inline detail, the comment "keep = TRUE: the variable exists only on peptideLog", now lives only in the example's code (`filterFeatures(..., keep = TRUE)`), not in prose.

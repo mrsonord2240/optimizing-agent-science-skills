@@ -37,3 +37,42 @@ Disagreements between copies: usage-guide "set `max_alignments`" vs the run (att
 - `examples/empirical_pvalue.py` and `examples/*.py` keep protein gaps -11/-1 (EMBOSS 11/1). They never claim to be BLASTP-equivalent, so no defect; the SKILL.md comment says so.
 - `examples/local_alignment.py` still prints `len(alignments)`; it works on its input (1 alignment) and the Iterating section covers the failure case.
 - pywfa/mappy snippets were run in WSL only (no Windows builds).
+
+# 2026-09-21 fix pass (P2s from the 86-point re-audit, plus the split)
+
+Worktree `F:\OpenScience\wt\alignment-pairwise-alignment`, branch `fix/alignment-pairwise-alignment` from staging main 431aa55. Commits: `9255f81` (fixes), `9d72c41` (split). Tools run: Biopython 1.88, Python 3.12 (Windows venv); WSL env `alignment`: EMBOSS 6.6.0, MMseqs2 18.8cc5c, HMMER 3.4, PAL2NAL 14, MAFFT 7.526; edlib 1.3.9. Data: audit `run\data` (HBA/HBB UniProt, 8 UniProt globins, human/cow/rabbit HBB CDS, HBB mammal CDS). Copied to a scratch dir, removed afterwards.
+
+| finding | priority | change | verified | notes |
+|---|---|---|---|---|
+| SKILL.md 449 lines, no references/ split | P2 | 475 -> 299 lines (after the fixes below added 26). Six files in `references/` (see the move table); Reference Files index; three pointers appended to existing lines | ran: multiset of non-blank lines before/after: only 5 pointer/xref lines and added headings differ; every python/bash fence in SKILL.md and references/ parses (ast / `bash -n`) | Audit suggested moving Significance, Library Selection, When-NOT; also moved Substitution Matrix Selection, Percent Identity and export/substitution counts to reach 300. Gap-convention table and aligner recipes stay |
+| Routed-to tools named without command lines | P2 | Added: `needle`/`water` block (Gap Penalties), PAL2NAL block with the empty-output-exit-0 trap (DNA vs Protein), `mmseqs easy-search --num-iterations 3` / `jackhmmer -N 3` / `hhsearch` block (When NOT appropriate) | ran: needle 11/1 = 286.0, water 11/1 = 288.0 on HBA vs HBB (equal to the log's Biopython numbers); needle default on DNA = EDNAFULL 10/0.5; MAFFT + pal2nal.pl human/cow HBB: 441 codon columns, re-translation equals the protein alignment; rabbit NM_001314043.1: exit 0, 0 bytes; mmseqs and jackhmmer on HBA vs 8 globins: HBB_HUMAN 115 bits, E 3e-34 (mmseqs), all 8 hit (jackhmmer) | `hhsearch` shown from `--help` only: it needs a downloaded HH-suite database that is not on this machine (a toy db would test the wrapper, not the claim). Block says so |
+| DNA dinucleotide shuffle points at `ushuffle` (does not build) | P2 | `examples/empirical_pvalue.py`: pure-Python Altschul-Erickson `dinuc_shuffle`, `preserve='di'` (previously `NotImplementedError`); SKILL.md significance text updated | ran: 200 shuffles of a 444-nt CDS keep dinucleotide counts, first and last letter (200 distinct); uniform over all 3240 Eulerian paths of a 16-mer (300 draws each: chi2 3152, df 3239); protein alphabet works; `empirical_pvalue(..., preserve='di')` deterministic (seed 42), p 0.005 for human vs cow HBB CDS (score 885), p 0.48 for random DNA; mono example unchanged; py_compile | Replaces the "Missing referenced executables" gap by writing it |
+| Strand bullet: "reverse complement 0" | P2 | "far lower ... median 18, never above 29 over 300 random pairs; palindromic or low-complexity queries score higher" | ran: 300 random 30-mers in 100-nt flanks, local 2/-1/-10/-0.5: forward 60 every time, reverse complement median 18, max 29 | The audit's median 17.5 / max 29 reproduced |
+| "edlib returns edit distance only" | P2 | reworded: unit-cost edit-distance scoring only, `task='path'` returns alignment and CIGAR | ran: `edlib.align('ACGTACGT','ACGTTCGT', task='path')` gives distance 1, cigar `4=1X3=`, nice alignment | |
+| Description omits trigger phrases | P2 | Needleman-Wunsch, Smith-Waterman, semiglobal, percent identity, reverse-complement strand, EMBOSS needle/water, BLAST scores added | n/a (text) | frontmatter `name` unchanged |
+
+## Split: moved sections (verbatim) -> new home
+
+| section in SKILL.md (pre-split) | now in |
+|---|---|
+| Pairwise Library Selection (table, caveats, parasail/edlib and pywfa/mappy snippets, `aligner.algorithm` note) | `references/library-selection.md` (with its 4 citations) |
+| Substitution Matrix Selection, incl. Affine Gap Penalties: Biological Rationale | `references/substitution-matrices.md` |
+| Percent Identity: Definitions Matter | `references/percent-identity.md` |
+| Statistical Significance: Karlin-Altschul | `references/significance.md` (with its 4 citations) |
+| When Alignment Is NOT Appropriate (incl. the new MMseqs2/jackhmmer/hhsearch block) | `references/when-not-appropriate.md` (with its 3 citations) |
+| Substitution Matrix from Alignment; Export Alignment to Different Formats | `references/alignment-export.md` |
+| References (11 citations) | distributed to the files that cite them; SKILL.md has no References section now |
+
+Two moved lines changed wording, nothing else: percent-identity.md "the `counts()` method above" -> "(SKILL.md, Alignment Counts)"; substitution-matrices.md "see Gap Penalties" -> "see SKILL.md Gap Penalties". Pointers appended to three existing SKILL.md lines (Common mistake bullet, Protein Alignment config comment, Alignment Counts approach line).
+
+## Redundancy pass
+
+Already done 2026-09-19 (table above); usage-guide.md is overview, prompts and a pointer. No repeat found in the new text; skipped.
+
+## Scripts step
+
+No fenced block reaches 15 lines (largest: 14-line Accessing Alignment Data illustration, 12-line semiglobal pair, 11-line counts recipe, all API-shape snippets with user variables), so nothing moved to `scripts/`. The one substantial new code, `dinuc_shuffle`, lives in the existing `examples/empirical_pvalue.py`.
+
+## Left unfixed
+
+- `hhsearch` command not run (no HH-suite database on this machine; a download is tens of GB). Checked against `hhsearch -h` (`-i`, `-d`, `-o`); the block says so.

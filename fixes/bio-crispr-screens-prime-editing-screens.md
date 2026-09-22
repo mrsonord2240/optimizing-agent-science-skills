@@ -42,3 +42,30 @@ Both P1s fixed; nothing left unfixed. The output-dir `FileNotFoundError` was not
 two named findings but surfaced immediately while reproducing the first one (it fires before the
 input-dir read is even reached, when `--output-dir` doesn't pre-exist) -- fixed inline per the
 project's "fix, don't report" rule rather than left as a fresh gap. Nothing needs Sam.
+
+## Fix pass — 2026-09-21
+
+Worktree `F:\OpenScience\wt\crispr-screens-prime-editing-screens`, branch `fix/crispr-screens-prime-editing-screens`, off staging `main` `431aa55`. Env: `crispr-screen-analyst` (`tools\pridict2-venv\`, PRIDICT2 git HEAD 2026-09-16). Audit: Production Ready, 1 P2. Commits: `a3cd81f` fix, `496fd60` split, `cabdcf2` fix (continuations), `d47ac13` scripts.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| Empty-summary Common Errors row names only the wrong-header cause | P2 | Failure Mode retitled "Batch run exits 0 with an empty summary file": three causes (wrong header, zero-row CSV, no NGG PAM near any edit), each with the stdout message that identifies it; Common Errors row now lists the three and points to it | ran: audit's testB (zero rows), testD (no PAM), testF (wrong header) on PRIDICT2 HEAD: all exit 0, 4-byte `""` summary, messages `Designing pegRNAs for 0 sequences` / `No PAM (NGG) found in proximity of edit!` / `Missing "editseq" column` seen | Also states none of the three hangs or crashes. |
+| `examples/design_pegrna_pridict2.py` comments show bare `--summarize` and the `sequence` header (same two bugs the Skill already documents) | found while fixing | `--summarize K562`, `editseq`, note that the CSV goes under `./input/` and the output dir must exist | help/docs (same evidence as the earlier 2026-09-16/18 fixes); `py_compile` | Comment-only change. |
+| Three bash blocks (PRIDICT2 single, PRIDICT2 batch, CRISPResso) had `\` + spaces + `#` comment, which ends the command so later flags run as separate commands | found while verifying the split | Comments moved to their own lines | ran: stubbed the command in bash; before: `--output-dir: command not found`; after: single 9 args, batch 10 args, CRISPResso all 18 args in one call | Real defect in the shipped text; not in the audit. |
+
+Redundancy pass: `usage-guide.md` was already deduplicated on 2026-09-18 (checked; untouched). Within SKILL.md the empty-summary fact had three homes (inline note, Failure Mode, Common Errors row); now one home (Failure Mode) with pointers.
+
+| deleted passage | new home |
+|---|---|
+| Walkthrough note "If the summary file exists but is empty ... wrong CSV column name" (was SKILL.md) | `references/pridict2-batch-cli.md`: one-line pointer to SKILL.md Failure Modes "Batch run exits 0 with an empty summary file" |
+| Step 1 comment block about `sequence` vs `editseq` and empty summary | same pointer comment in the walkthrough; content in the Failure Mode |
+| Failure Mode "Batch CLI argument or CSV column mismatch" Fix sentence on `./input/` and pre-existing `--output-dir` | Common Errors rows for `FileNotFoundError` (both kept) and the code comments in `references/pridict2-batch-cli.md` (lines 19-21, 88-90) |
+| Common Errors row "summary file is `""`: header is `sequence`" | rewritten as the three-cause row |
+
+Split (SKILL.md 389 -> 238 lines, verbatim, no non-blank line lost by multiset compare, fences even, python fences `ast.parse`): `references/pridict2-batch-cli.md` (PRIDICT and PRIDICT2 Efficiency Prediction + Run PRIDICT2 on a Custom pegRNA Library), `references/pooled-screen-methods.md` (PRIME + MOSAIC + Cross-Validate PE with BE). Reference Files index, scope-bullet pointer and decision-tree pointer added.
+
+Scripts (old location -> new): "Step 3: parse and filter" python block in `references/pridict2-batch-cli.md` -> `scripts/filter_pridict2_summary.py` (ran on a real PRIDICT2 per-sequence output, 459 pegRNAs duplicated under two names: 45/918 pass >20, top-3 per name match an independent `nlargest`; threshold 50 gives 0 kept; real empty summary exits 1 with the Failure Modes pointer). PE/BE cross-validation block in `references/pooled-screen-methods.md` -> `scripts/crossvalidate_pe_be.py` (planted variants: one high-confidence, one sign-discordant, one FDR-fail, exactly as expected). The "Loading PRIDICT2 results" function stays inline (short). The example script in `examples/` is unchanged apart from the comment fix.
+
+Left unfixed:
+- `ePRIDICT` is named as a tool with no runnable code and is not installed in `crispr-screen-analyst` (TOOLS.md lists PRIDICT2 only). Not in the audit; the brief's options would be to install it (not allowed in this batch) or delete the claim, which changes the Skill's scope. Needs Sam's call.
+- Both scripts were verified on the Windows shared venv only; the summary-file test used a summary built from a real per-sequence output because a full batch run took about 15 minutes on the shared machine (the model step, not the scripts).

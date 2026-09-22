@@ -96,3 +96,34 @@ The P2 "PTM-SEA and empirical FLR have no runnable route" was left open because 
 ### 2026-09-21 addendum 2: PTM-SEA written (Sam: "go ahead and write it")
 
 New `SKILL.md` section "PTM-SEA With ssGSEA2.0": `write_ptmsea_gct` (MaxQuant `Sequence window` [8:23] + `-p` -> the +/-7 flanking id PTMsigDB uses), the `ssgsea-cli.R` call, and `read_ptmsea`. Verified by extracting the three fences from the committed `SKILL.md` and running them as written (ssGSEA2.0 cae7bed, PTMsigDB v1.9.1, mass-spec env) on a planted table of real PTMsigDB ids: the 588 CDK1 substrate sites shifted +2 among 2,582 sites -> `KINASE-PSP_CDK1` rank 1 of 100 (NES 44.0, FDR 0.0056); the same values shuffled across sites -> CDK1 rank 37 (NES 0.47, FDR 0.95), no signature below FDR 0.05 (two sit at exactly 0.05). Found while testing: PTMsigDB also holds `-ac`/`-m2`/`-m3` ids (noted in the text; the helper builds `-p` only); only 100 of 495 signatures reach `-m 10` on 2,588 ids (checked by counting). Not tested: mouse/rat databases, PTMsigDB v2.0.0, multi-sample input. The audit's own synthetic phospho table has no sequence-window column and made-up proteins, so it could not be the test input.
+
+
+## 2026-09-21 (structure)
+
+Worktree `F:\OpenScience\wt\proteomics-ptm-analysis`, branch `fix/proteomics-ptm-analysis`. Commits `d3e45ed` (split), `ed98ca2` (scripts). Env `mass-spec-proteomics-analyst` (R 4.4.3 via `r.sh`, MSstatsPTM 2.8.1, MSstatsTMT 2.14.2, KSEAapp 2.0, ssGSEA2.0 `cae7bed`, PTMsigDB v1.9.1, shared-venv Python). No behaviour or claim changed; nothing installed.
+
+**Split: SKILL.md 524 -> 326 lines (then 253 after scripts).** Moved verbatim (multiset compare of non-blank lines: 0 lost, 0 extra; every R/Python/bash fence parses), with a Reference Files index and pointers from the Decision Tree rows:
+
+| old location | new file |
+|---|---|
+| "TMT / isobaric plexes" subsection (60 lines) | `references/tmt-isobaric.md` |
+| "Motif Analysis with the Correct Background" | `references/motif-analysis.md` |
+| "Kinase Activity with KSEAapp" | `references/kinase-activity-ksea.md` |
+| "PTM-SEA With ssGSEA2.0" | `references/ptm-sea.md` |
+
+**Scripts.** Each block moved verbatim, then parametrised (R: `key=value` args; Python: argparse), header comment with purpose, inputs, usage. Run as SKILL.md / the reference now invokes it:
+
+| old location | script | how it was run | result |
+|---|---|---|---|
+| SKILL.md MSstatsPTM label-free R block | `scripts/msstatsptm_labelfree.R` | `r.sh` on audit `data/phospho` (`dir=`, `fasta=synthetic.fasta`) | names(input) PTM PROTEIN; 36 ADJUSTED site rows; 10 regulated by TREAT (5 site_regulated, 2 masked, 3 null); Label `Treatment vs Control`; site_regulated sign 8/8 vs truth; protein_driven called 1/7 (adj.p < 0.05). `use_unmod=TRUE` also runs (4 regulated) |
+| references/tmt-isobaric.md R block | `scripts/msstatsptm_tmt.R` | `r.sh` on audit `pass5/tmt` (0-indexed `channel.0..9` annotation) | 35 ADJUSTED rows, site_regulated sign 8/8 |
+| references/kinase-activity-ksea.md R block | `scripts/ksea_scores.R` | `r.sh`, `adjusted=` the label-free output, audit `pass5/ksea` prior, `data/phospho` proteinGroups | 31 sites in PX, 14 covered; SYN_BASO -2.5514841 (FDR 0.008044892), SYN_PRO 3.3688957 (0.001132050), SYN_RANDOM -0.6524595 (0.257052400): identical to the pass-5 numbers. Coverage guard verified with a 1-row prior (stops, 0 of 31) |
+| references/motif-analysis.md Python block | `scripts/motif_enrichment.py` | shared venv; audit `Phospho (STY)Sites.txt` + `synthetic.fasta` | 35 foreground / 1888 background windows (as in pass 1). With the 8 planted-motif sites as foreground (`--foreground-ids`): P+1 (q 0.029) and R-3 (q 0.029) recovered |
+| references/ptm-sea.md `write_ptmsea_gct` and `read_ptmsea` | `scripts/ptmsea.py` (`write-gct`, `read`) | `write-gct` on a 2,582-site table with 31-aa windows built from the planted PTMsigDB ids (ids and values identical to the planted GCT); the `ssgsea-cli.R` bash fence run as written through `r.sh`; `read` | `KINASE-PSP_CDK1` rank 1 of 100 (NES 41.5, FDR 0.0059), CDK2/CDK5/CDK6 next. The earlier note's NES 44.0 / FDR 0.0056 is a different permutation draw; rank and floor FDR agree (text left as is) |
+| SKILL.md "Expand the MaxQuant Site Table" Python block | deleted; points at `examples/phospho_analysis.py` | example re-run: 3 class-I sites, runs C1/T1 only, GSK3B form switch visible | The block duplicated the example line for line (loader, filter, `site_id`, melt); the example builds a synthetic table, so the pointer says to aim `path` at your own file |
+
+Edits beyond the moves (all wording, no behaviour): `use_unmod <- TRUE` in the Decision Tree and Common Errors is now `use_unmod=TRUE` on `scripts/msstatsptm_labelfree.R`; "exactly as in the label-free route above" and "the KSEA block below" in the TMT script comments became "as in the label-free route" / `msstatsptm_labelfree.R`; the motif foreground moved from an implicit in-memory `phospho` to `load_class_i_sites()` inside the script (same filter); the Approach text under the label-free block was replaced by a summary of what the script does, keeping each trap; a Scripts table sits under the Reference Files index. The label-free script writes `adjusted_sites.csv` and the KSEA script reads it, the hand-off the inline blocks did through the shared R session.
+
+**Stayed inline:** the Ascore illustration (10 lines, an intuition sketch, not a runnable step); the `ssgsea-cli.R` call (5 lines, an invocation of an external tool); one-line invocations. `bash -n` on the invocation fences fails only on `<placeholder>` arguments, by design.
+
+**Left unfixed (carried, unchanged):** modification names hard-coded to phospho in three code paths (a rewrite of blocks that work); PTM-SEA tested on the planted PTMsigDB input only (no mouse/rat database, v2.0.0 or multi-sample input, as noted in the pass-6 addendum).

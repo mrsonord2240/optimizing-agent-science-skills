@@ -43,3 +43,29 @@ No disagreements found between the two files' copies before deletion.
 
 ## Unfixed
 None.
+
+## 2026-09-21 (P2 batch)
+
+Worktree `F:\OpenScience\wt\pathway-analysis-wikipathways`, branch `fix/pathway-analysis-wikipathways`, from staging
+`main` @ `431aa55`. Fixer: Claude Sonnet 5. Runtime: R 4.4.3 via `crispr-screen-analyst.sh` (clusterProfiler 4.14.6,
+rWikiPathways 1.26.0, org.Hs.eg.db 3.20.0, tidyr 1.3.2), nothing installed. Public WikiPathways archive and the public
+KEGG REST list endpoint only.
+
+Commits: `a6740f7` fix (both P2s); `546e876` refactor (runnable code to `scripts/`). No split: SKILL.md is 262 -> 245
+lines. Redundancy pass already done 2026-09-17; skipped.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| No documented recovery when the computed `archive_date` itself 404s | P2 | Dated-GMT recipe now loops newest-first over in-window monthly dates (`Sys.Date() - 60 ... -330`, 10th of month) with `tryCatch`, stops with a Zenodo pointer if none work; same loop in `examples/wikipathways_explore.R`; Common Errors row for the `cannot open URL ... 404` case | ran: recipe on the audit's `de_results_synthetic.csv` recovers WP430 (p.adjust 8.9e-22) and WP554 (6.4e-11) from 20260710; forced-miss test (`20240310`, `20250110` prepended) falls through to 20260710; example run end-to-end, exit 0, WP554 top hit (2.7e-51) | audit suggested stepping back to -90, -120 ...; adopted, made the window explicit |
+| Redundancy pass dropped "WikiPathways has fewer total pathways than KEGG" with no equivalent | P2 | Claim NOT restored: it is false for human. Ran `listPathways('Homo sapiens')` -> 1131 WP pathways; KEGG REST `list/pathway/hsa` -> 372 lines. Added a dated "Human pathways" row (~1,100 vs ~370) to the WP-vs-KEGG/Reactome table instead | ran (both counts, 2026-09-21) | the 2026-09-17 deletion table wrongly filed this bullet as "no unique content"; corrected here |
+
+Also: the SKILL.md dated-GMT R block (26 lines) is now `scripts/wikipathways_pinned_enrich.R`.
+
+| moved block | old location | script |
+|---|---|---|
+| dated-GMT download + split + `enricher` | SKILL.md "Reproducible Analysis with a Dated GMT" (R fence) | `scripts/wikipathways_pinned_enrich.R` (args: sig file, universe file, organism, out csv); run as SKILL.md invokes it on the audit data: release 20260710, WP430 8.9e-22, WP554 6.4e-11, 14 terms |
+
+Deleted-passage -> new-home: only the inline R fence above (-> the script; SKILL.md keeps the invocation and the
+GSEA `t2g`/`t2n` note). Nothing else deleted.
+
+Left unfixed: none.

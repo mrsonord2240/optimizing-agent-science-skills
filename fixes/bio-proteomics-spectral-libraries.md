@@ -59,3 +59,27 @@ now point at that section.
 
 Unfixed: none.
 
+
+## 2026-09-21 (structure)
+
+Worktree `F:\OpenScience\wt\proteomics-spectral-libraries`, branch `fix/proteomics-spectral-libraries`.
+No behaviour or claim changed.
+
+**Split** (commit `ce3578a`): `SKILL.md` 329 -> 203 lines. Moved verbatim to `references/`:
+`koina-prediction.md` (Koina section, 47 lines), `format-conversion.md` (Convert Library Formats
+incl. OpenSwathDecoyGenerator requirements, 70 lines), `library-qc-merge.md` (QC and Merge, 30 lines).
+"Reference Files" index added; pointers added to two decision-tree rows, the OpenSwathDecoyGenerator
+failure-mode Fix line and the merge Common Errors row. Checked: no non-blank line lost (only the three
+moved `###` headings became `##` and the pointer-edited lines differ); all python fences parse.
+
+**Scripts** (commit after the split), old location -> script:
+
+| old location | new | how run |
+|---|---|---|
+| `references/format-conversion.md` `build_openswath_tsv` (17 lines) | `scripts/build_openswath_tsv.py` (CLI: `--peptides tsv --out --n-frag`) | 4 precursors (LGGNEQVTR z2/z3, VEATFGVDESNAK, YILAGVENSK) -> `TargetedFileConverter` 3.5.0 -> 4 `<Peptide>` -> `OpenSwathDecoyGenerator -method pseudo-reverse`: 4 target / 4 decoy peptides; y-ion `ProductMz` and `PrecursorMz` equal to the audit's `input4_library.tsv` |
+| same file, `spectronaut_to_diann` + mapping (12 lines) | `scripts/spectronaut_to_diann.py` (CLI: `--in --out`) | synthetic Spectronaut table from the built TSV: columns renamed, `LibraryIntensity` == `RelativeIntensity`, 24 rows; iRT shifted to 5000+ trips the assertion and writes nothing |
+| `references/library-qc-merge.md` `merge_libraries`/`library_stats` (19 lines) | deleted; points at `examples/build_library.py`, which defines the same functions | example re-run: merged stats 3 precursors / 2 proteins, charge 2 and 3 both retained |
+
+**Stayed inline:**
+- Koina prediction and `valid_prosit_peptide` blocks (`references/koina-prediction.md`): I wrote `scripts/koina_predict.py`, but `koina.wilhelmlab.org:443` returned gRPC `UNAVAILABLE` on every call for 10+ minutes (the unmodified inline snippet failed identically, both models; HTTP `/v2/models/<m>/ready` returned 200), so the script could not be run and was removed rather than shipped untested.
+- `fit_irt_to_rt` + `IRT_PEPTIDES` in SKILL.md (about 15 lines, core to every request and partly duplicated by `examples/build_library.py`), the deeplc API fragment in Version Compatibility (fragment, needs calibration data), and the 3-line TargetedFileConverter/OpenSwathDecoyGenerator bash block.

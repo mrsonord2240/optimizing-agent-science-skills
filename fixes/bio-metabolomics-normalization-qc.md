@@ -25,3 +25,37 @@ None. All five recommendations in `eval_report_bio-metabolomics-normalization-qc
 - `metabolomics/normalization-qc/SKILL.md`
 - `metabolomics/normalization-qc/examples/normalize_data.R`
 - `metabolomics/normalization-qc/usage-guide.md`
+
+## P2 batch -- 2026-09-21
+
+Worktree `F:\OpenScience\wt\metabolomics-normalization-qc`, branch `fix/metabolomics-normalization-qc` (from staging `431aa55`). Env `untargeted-metabolomics-analyst` (R 4.4.3, imputeLCMD 2.1, matrixStats 1.5.0, via `rs.sh`). Commits: `f584469` (fix), `980965f` (scripts/). SKILL.md 265 -> 262 lines: under the split threshold, no `references/` split.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| Permutation guardrail still trips at its nominal ~5% rate on clean data; no caveat | P2 | New "Guardrail" paragraph after the PQN block in SKILL.md (permutation test, and one TRIPPED verdict can be chance: corroborate against a measured dilution quantity); `examples/normalize_data.R` verdict text says the same | ran | Example re-run; 8 seeds of the null (no group effect) give r_grp -0.25..0.30, 1/8 at p<0.05 (seed 5, p=0.047), consistent with the caveat |
+| Non-positive intensities upstream of QRILC not in Common Errors | P2 | Common Errors row for `NA/NaN/Inf in 'y'`; pre-check `stopifnot(min(feature_matrix, na.rm=TRUE) > 0)` added to the "Verify around every QRILC call" line | ran | Reproduced with `impute.QRILC(log2(m))` on a matrix holding one 0: `try-error`, message `NA/NaN/Inf in 'y'`; after replacing the 0, imputation returns 0 NAs, min imputed 14.08 |
+| (found while verifying, not in the audit) `examples/normalize_data.R` tripped its own guardrail on every seed | P1-grade defect in a shipped example | `fold <- ifelse(group[i]=='case', effect, 1)` returns `effect[1]` (length-1 test), so the 1.5x case effect hit all 200 features, not 20 -> `if/else rep(1, n_features)`. Drift `1 + slope*order` went negative (1192 negative intensities in the matrix) -> `exp(slope*order)` | ran | Before: seeds 1-12 all r_grp 0.39-0.69, p=0.001, r_dil 0.68-0.88. After: r_dil 0.95-1.00 on 8 seeds, held-out QC RSD drops 8/8 (e.g. 0.271 -> 0.235), r_grp near 0. The 2026-09-16 entry above that says the example "correctly still trips on its built-in true confound" was the ifelse bug, not a confound: superseded |
+| (redundancy pass) usage-guide restated SKILL.md | -- | See table below | grep | |
+| (scripts/) `robust_dratio_filter()` 17-line block | -- | -> `scripts/robust_dratio_filter.R` (function plus CLI); SKILL.md keeps a 2-line `source()` and the CLI usage line | ran | Rscript and `source()`: planted data, 30 clean features kept 30/30, 30 noisy (technical SD 1.5 vs 0.05) kept 0/30 |
+
+Other code blocks (QCRSC, shiftCor, pqn_normalisation, QRILC/missForest) are 5-13 line API illustrations and stay inline.
+
+### Deleted passage -> new home
+
+| deleted from usage-guide.md | new home |
+|---|---|
+| Prerequisites: install command | SKILL.md Version Compatibility, "Install:" line |
+| Prerequisites: conceptual inputs (table + metadata, matrix type, randomization) | SKILL.md, "Inputs:" line |
+| What the Agent Will Do (7 steps) | already in SKILL.md Pipeline Order / decision trees; deleted |
+| Tip: "QCs cluster tightly", RSD ~0% failure mode, correct only drifting features, closure, filter-before-impute, randomize | already in SKILL.md (Insight, Drift decision tree, Per-Method Failure Modes, Pipeline Order); deleted |
+| Tip: lead with D-ratio; state the data stage of a CV | SKILL.md Filter section (D-ratio) plus pipeline row 3 now says "always state the data stage a CV was computed on" |
+| Tip: permutation test instead of fixed r cutoff (n~40) | SKILL.md Guardrail paragraph |
+| Tip: within-study relative intensities, reference material before cross-study claims | SKILL.md after Pipeline Order |
+
+### Left unfixed
+
+None of the 2 audit P2s. Not touched: 45 benign `simpleLoess` warnings when the example fits LOESS on 6 QC points (span 0.75); output is correct and they are suppressed by no one, but silencing them would hide the very "too few QCs" condition the Skill warns about.
+
+### Files changed
+
+- `metabolomics/normalization-qc/SKILL.md`, `usage-guide.md`, `examples/normalize_data.R`, `scripts/robust_dratio_filter.R` (new)

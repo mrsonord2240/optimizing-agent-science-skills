@@ -27,3 +27,23 @@ Seurat->h5ad output was written to the session scratchpad (not the audit's `data
 reloaded in Python (scanpy, shared venv) to confirm the h5ad is valid and to inspect exactly
 what survived. All 6 R code blocks in the final SKILL.md were parsed together with `parse()`
 to confirm syntax validity.
+
+---
+
+## 2026-09-21 — P2 batch fix
+
+Worktree `F:\OpenScience\wt\single-cell-data-io`, branch `fix/single-cell-data-io` (from staging `431aa55`). Env `single-cell-transcriptomics-analyst`, R 4.4.3, Seurat 5.5.0. Audit had 1 P2.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| `scale.data` workaround shows extraction but not persistence | P2 | Replaced the inline extraction with a 2-line block: `as.matrix(LayerData(..., layer='scale.data'))` then `saveRDS(scale_data, 'scale_data.rds')` (CSV alternative named) | ran | Built a Seurat object from the env's 10x PBMC 1k filtered h5 (NormalizeData, FindVariableFeatures 500, ScaleData), ran the block verbatim, reloaded with `readRDS`: dims 500 x 1176, `all.equal` and `is.matrix` asserted, `write.csv` also produced a file. |
+
+### Left unfixed
+
+None.
+
+### Other passes
+
+- Redundancy: already done in the 2026-09-19 pass (usage-guide.md holds only overview, prompts, related Skills); no deleted passages this pass.
+- Split: SKILL.md is 216 lines after the fix (211 before), under the 300-line threshold; not split.
+- Scripts: no inline block reaches ~15 runnable lines (largest R/Python blocks are 5-10 lines) and `examples/load_10x_scanpy.py` and `examples/load_10x_seurat.R` already cover loading; nothing moved to `scripts/`.

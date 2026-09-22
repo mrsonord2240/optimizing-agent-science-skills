@@ -22,3 +22,44 @@ Real CRISPResso2 output generated this pass (fresh `CRISPResso` run on `FANC.Cas
 
 All 5 `recommendations[]` entries (2 P0, 2 P1, 1 P2) fixed, plus one additional shipped-script
 defect found and fixed during verification. Nothing left unfixed.
+
+## 2026-09-21: P2 batch, redundancy pass, split, scripts
+
+Worktree `F:\OpenScience\wt\crispr-screens-crispresso-editing`, branch `fix/crispr-screens-crispresso-editing`
+(from staging main 431aa55). Audit: score 91, Production Ready, 2 P2. Runtime: CRISPResso2 2.3.4
+(`pinellolab/crispresso2` Docker, `docker cp` in/out, `crispr-screen-analyst` env). Commits: 08add3a, 9dd4ef3,
+574d60a (fixes and dedup), bc45b35 (split), 205c857 (scripts). SKILL.md 391 -> 222 lines.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| CRISPRessoWGS never executed | P2 | Fetched the CRISPResso2 repo's `tests/smallGenome/smallGenome.fa`, ran WGS on `Both.Cas9.fastq.smallGenome.bam` + `Cas9.regions.txt`. The SKILL.md example used `--bam`/`--reference`; `--bam` is rejected (`ambiguous option: --bam could match --bam_output, --bam_file`). Now `--bam_file`/`--reference_file`, output layout and region-file format documented, WGS `--min_reads_to_use_region` (default 10, `NA` row + exit 0 for a 2-read region) documented | ran + help | FANCF 23 reads 26.09% Modified; HEK3 `NA` at default, 50% with `--min_reads_to_use_region 1`. Fixture not shipped: the auditor's request to cache a reference is a test-fixture matter, the Skill now cites the upstream file |
+| Only Python sample has no test | P2 | `parse_crispresso()` moved verbatim to `scripts/parse_crispresso.py` with a CLI and `--selftest` (asserts on a synthetic dir in the real 2.3.4 file format) | ran | selftest OK; on fresh CRISPResso 2.3.4 output: 250 / 235 / 94.0 / 26.38297872 asserted, import form works |
+| (found while running) `\  # comment` lines in the Single-amplicon and Pooled worked examples | fix | Comments moved above the command | ran (stub functions over every bash fence: before, stray " " argument and `--n_processes: command not found` / `--quantification_window_size: command not found`; after, all args received) | Would have run Pooled without `--n_processes 8`, Single without its window and output flags |
+| (found while running) output-path comments wrong: `<out>/<name>/`, `3a.<ref>.Indel_size_distribution.pdf`, batch/pooled summary paths | fix | Now `CRISPResso_on_<name>/`, `3a.Indel_size_distribution.pdf`, `CRISPRessoBatch_on_<batch file>/`, `CRISPRessoPooled_on_<fastq>/` | ran (CRISPResso, Batch, Pooled on the audit data) | |
+| (found) Bystander failure mode called `--quantification_window_size 10` "Default" | fix | Reworded: default is 1 | help | |
+
+### Left unfixed
+
+None of the audit's findings. The auditor's suggestion to cache a reference FASTA beside the audit fixtures
+(P2 1) is an audit-fixture action outside the Skill and was not done; the Skill's WGS claim is now backed by a run.
+
+### Deleted passage -> new home (redundancy pass)
+
+| deleted | new home |
+|---|---|
+| usage-guide Prerequisites (conda line, required inputs) | SKILL.md "Version Compatibility" (Install, Required inputs); guide keeps a pointer |
+| usage-guide "What the Agent Will Do" (15 steps) | steps are SKILL.md's own sections; step 8 (`--min_average_read_quality 30`) is the Single-amplicon example and its note; step 10 (NA rows) is the Pooled/WGS text; section removed |
+| usage-guide Tips | Failure Modes, Common Errors, Pooled/Batch text (each already there); BE indel >5% cause -> Quantitative Thresholds; "randomly chosen regions yield no useful comparison" -> WGS use case; UMI/primer >=3 bp advice -> Decision Tree "Fails when". "matched-tumor BAM" wording dropped (not applicable to editing amplicon/WGS runs) |
+| usage-guide Mode Decision Cheat Sheet | SKILL.md Mode Decision Tree |
+| usage-guide Thresholds | SKILL.md Quantitative Thresholds; added rows: substitution-vs-indel ratio (>10 clean, <3 cut-mediated), read depth 1,000+, PE intended-edit >20% at favorable sites |
+| SKILL.md Common Errors rows: alignment <50%, No alignments, pooled misassignment, pooled `NA`, scaffold high | Failure Modes (low alignment, total alignment failure, scaffold), Decision Tree "Fails when" (misassignment), Pooled section (`NA`) |
+| SKILL.md thresholds rows: quantification window size Cas9 1 / BE 10 | "The Quantification Window" section (the "positions 4-13" rationale was dropped; it contradicted that section's "positions 4-8") |
+| SKILL.md Base Editor "Reading the output" and PE "high-quality run" sentence (numeric cutoffs) | Quantitative Thresholds |
+
+### Split and scripts
+
+Split (bc45b35): `references/base-editor.md` (BE section + bystander failure mode), `references/prime-editor.md`
+(PE section + scaffold failure mode), `references/batch-pooled-wgs.md` (Batch, Pooled, WGS). 320 non-blank lines
+before; every one is in SKILL.md or a reference file except the six decision-tree rows that gained pointers.
+Scripts (205c857): SKILL.md "Parse Output in Python" block -> `scripts/parse_crispresso.py`. The other bash
+fences are template commands with placeholders and stay inline; `examples/crispresso_analysis.sh` untouched.

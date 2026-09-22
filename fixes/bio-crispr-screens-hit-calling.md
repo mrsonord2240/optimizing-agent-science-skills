@@ -28,3 +28,49 @@ installed there.
 Needs Sam: nothing. This Skill's own defects are now all P1/P2-addressed; whether
 78→85+ actually clears the candidate's core-Skill floor depends on the re-audit,
 not on anything left undone here.
+
+
+## 2026-09-21 -- P2 fixes, redundancy pass, split, scripts
+
+Worktree `F:\OpenScience\wt\crispr-screens-hit-calling`, branch `fix/crispr-screens-hit-calling`
+(from staging `431aa55`). Commits: `3d42911` fix, `25a3931` split, `51cfb20` scripts.
+Env `crispr-screen-analyst` (Python 3.12, pandas/scipy/numpy), real HAP1 TKOv3 files copied
+from the audit's `run\`.
+
+| finding | priority | change | verified | notes |
+|---|---|---|---|---|
+| usage-guide Prerequisites: false "drugZ via PyPI" comment + duplicated `git clone` | P2 | one clone line, marked "not on PyPI" | docs: `pypi.org/pypi/drugz/json` 404, `github.com/hart-lab/drugz` 200 | |
+| No `references/` split for the dense method tables (SKILL.md 373 lines) | P2 | split into 3 reference files + index (373 -> 233), then code to `scripts/` (233 -> 191) | ran: non-blank-line diff shows only pointer edits; fences parse | audit suggested `method-catalog.md`; done |
+
+Left unfixed: none.
+
+Redundancy pass (usage-guide.md restated SKILL.md):
+
+| deleted passage (usage-guide.md) | new home |
+|---|---|
+| Tips: pick method by design; consensus for high-stakes; BF>6; CN correction; second-best; heavy selection; BAGEL2 seed; same-comparison check | already in SKILL.md (decision tree, consensus, multiple-testing, Failure Modes, Common Errors) |
+| Tip: PR-AUC vs CEGv2 before hit calling, PR-AUC <0.5 no signal | SKILL.md Order of Operations step 6 |
+| Tip: multi-cell-line per-line first, joint MLE dilutes | SKILL.md decision-tree Chronos row |
+| What the Agent Will Do (12 steps) | SKILL.md decision tree + Order of Operations; batch covariates added to step 8 |
+| Decision Cheat Sheet | SKILL.md decision tree; the two rows only in the guide (cancer + multi-batch, base/prime editing) added to it |
+| Confidence Tiers | SKILL.md Confidence tiers table (identical) |
+
+Split (verbatim, SKILL.md 373 -> 233):
+
+| SKILL.md section | new home |
+|---|---|
+| Statistical Models Compared, RRA vs MLE, Algorithmic Taxonomy | `references/method-catalog.md` |
+| Second-Best sgRNA Conservative Rule, Custom z-score Hit Calling | `references/second-best-and-custom-zscore.md` |
+| Failure Modes | `references/failure-modes.md` |
+
+Scripts (SKILL.md 233 -> 191):
+
+| old location | script | run |
+|---|---|---|
+| SKILL.md `consensus_hits()` + `_check_comparable()` | `scripts/consensus_hits.py` | real MAGeCK/BAGEL2/drugZ: 844 matched-pair consensus genes; overlap warnings fire for the unrelated drugZ table |
+| references/second-best... `second_best_lfc()` | `scripts/second_best_lfc.py` | real sgrna_summary: 231 single-guide genes, all NaN + flagged (asserted) |
+| references/second-best... `custom_zscore_hit_calling()` | `scripts/custom_zscore_hit_calling.py` | synthetic counts, 30 planted dropouts + 60 NTC genes: 30/30 recovered, 0 FP, NTC and all-gene nulls |
+
+`examples/consensus_hits.py` untouched apart from a pointer to `references/failure-modes.md`; the SKILL.md
+three-method block did not duplicate it (the example is two-method).
+

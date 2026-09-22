@@ -20,3 +20,31 @@ None. Both P1s and the flagged P2 were fixed.
 `F:\OpenScience\audit-envs\cheminformatics-hit-triage-analyst\Scripts\python.exe` — PoseBusters 0.6.5, RDKit
 2026.03.6, pandas 3.0.5 (per that env's `TOOLS.md`). `PYTHONIOENCODING=utf-8` needed for the `≤` character
 in PoseBusters' RMSD column name on this Windows console. No packages installed or changed.
+
+## 2026-09-21
+
+Fixer for the Production Ready P2 batch. Worktree `F:\OpenScience\wt\chemoinformatics-pose-validation`, branch
+`fix/chemoinformatics-pose-validation` from staging `431aa55`. Commits: `66bc056` (fix), `e4fa0a7` (scripts).
+No split: SKILL.md was 300 lines (not over threshold) and is 177 after the scripts move.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+| --- | --- | --- | --- | --- |
+| `mol` config row claims "stereo" among its checks | P2 | Row now lists what `mol` returns (sanitization, bond lengths/angles, internal clash, ring and double-bond flatness, energy) and says stereo/chirality need `mol_true` | ran: `PoseBusters(config='mol').bust()` on the bundled fixture, PoseBusters 0.6.5: 12 boolean columns, asserted none contain "stereo" or "chiral" | Audit's suggested wording said "double-bond geometry"; the real column is `double_bond_flatness`, so the row names that |
+| Redundancy pass | - | `dock` row no longer restates the four reference-dependent checks already listed under the check table. `usage-guide.md` was already deduplicated on 2026-09-19 | grep of SKILL.md | - |
+
+### Runnable code moved (old location -> new home)
+
+| old location (SKILL.md) | new home | ran |
+| --- | --- | --- |
+| `aromatic_planarity()` block | `scripts/aromatic_planarity.py` (SDF argument) | puck_0.6 -> 0.2888 A, puck_1.0 -> 0.4524 A, matching the 2026-09-19 bracket |
+| Integration into VS Pipeline `pose_qc_pipeline()` | `scripts/pose_qc_batch.py` (receptor + SDFs arguments) | fixture + a copy: 2/2 files with a PB-valid pose |
+| Strain Energy `ligand_strain()` (65 lines) | deleted, duplicate of `examples/validate_poses.py` `ligand_strain_mmff` | ran from the example: `strain_kcal` 4.162648, note `ok` |
+| Python Library API block | deleted, duplicate of `run_posebusters` in the example | ran: `pb_valid` True |
+
+Also: Common Errors row "Reduce `n_ref`" now says `n_ref_conf`, the example's parameter name. Found while doing the pipeline script: the `rank` column in `pose_qc_pipeline` is a running count of valid poses per file, not a score rank; kept verbatim, left as is.
+
+### Left unfixed
+
+None.
+
+Env: `cheminformatics-hit-triage-analyst` Python, PoseBusters 0.6.5, RDKit 2026.03.6, pandas 3.0.5. No installs.

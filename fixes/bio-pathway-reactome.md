@@ -41,3 +41,26 @@ Kept in usage-guide.md as non-duplicate, human-facing content: the "Reactome vs 
 comparison table (not present anywhere in SKILL.md; aids choosing this Skill over the sibling).
 
 No disagreements found between the two files' copies before deletion.
+
+## 2026-09-21 (P2 batch)
+
+Worktree `F:\OpenScience\wt\pathway-analysis-reactome-pathways`, branch `fix/pathway-analysis-reactome-pathways`
+from staging `main` @ `431aa55`. Commit `e94ae76`. Fixer: Claude Sonnet 5. R 4.4.3 via
+`crispr-screen-analyst.sh`; ReactomePA 1.50.0, reactome.db 1.89.0. Nothing installed.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| 7-organism ceiling claim not verifiable; SKILL said "reactome.db maps only 7 organisms" and "unsupported-organism error" | P2 | Reworded the decision-tree row, the ceiling paragraph, the "Assuming arbitrary-organism support" failure mode and the Common Errors row. The 7 values are what the `enrichPathway` help page documents; `organism` resolves to an `org.*.db` through `ReactomePA:::getDb` (22 names) that must be installed; reactome.db holds pathways for 16 species (no plants, one bacterium); real errors are `object 'org.Xx.eg.db' not found` or a `keys` method error for a name `getDb` does not know | ran: `enrichPathway(organism=)` for mouse (documented), chicken and arabidopsis (undocumented) fail identically at the missing OrgDb, `'ecoli'` fails with the `keys` error; read `getDb` source; `Rd2txt` of the help page; species table from `reactomePATHID2NAME` name prefixes | The original claim was contradicted by the code (the mechanism is not a reactome.db ceiling); the documented seven remain the only supported values |
+
+Redundancy pass: already done 2026-09-17 (above); no new duplication found, skipped.
+Split: SKILL.md is 238 lines (under 300), no split. Scripts: the inline R blocks are 6-10 line
+API illustrations and the two runnable recipes already ship as `examples/reactome_ora.R` and
+`examples/reactome_gsea.R`, so nothing moved to `scripts/`.
+
+### Left unfixed
+- A live `enrichPathway(organism='mouse')` result (the audit's suggested confirmation): needs `org.Mm.eg.db`, which is absent from every audit env and would be an install the brief forbids. The claim no longer depends on it: the documented list, the `getDb` mapping and the identical mouse/chicken/arabidopsis failure are verified.
+
+### Deleted passage -> new home
+None deleted; four passages reworded in place in `SKILL.md`.
+
+**Live mouse run (orchestrator, 2026-09-21, at Sam's request).** The earlier entry could not run mouse because `org.Mm.eg.db` was absent from the env. Installed `org.Mm.eg.db` 3.20.0 (Bioc 3.20) into a private scratch library (not the env's `R-lib`), put it first on `.libPaths()`, and ran `enrichPathway(organism="mouse", readable=TRUE)` on the 34 genes of R-MMU-8964043 plus 40 random mouse pathway genes: 290 enriched terms, the planted pathway rank 1 (`p.adjust` 2.4e-72), its parent and children next. Claim added to the SKILL.md ceiling paragraph. The `'ecoli'` step of the same script was not reached (script error in my harness, not in the Skill); the `keys`-method message rests on the earlier fixer's run.

@@ -60,3 +60,44 @@ still left unfixed:
   in the audit env), so this remains beyond a cheap fix.
 
 Not merged, not re-audited — per dispatch, that is a separate agent's job.
+
+---
+
+## 2026-09-21 — P2 batch (Production Ready Skill, 2 P2s open)
+
+Fixer for `single-cell/scatac-analysis`, branch `fix/single-cell-scatac-analysis` from staging `431aa55`.
+Commits: `1b8c9ef` (fix), `d9bcbfd` (redundancy), `0c0ecaa` (scripts). No split: SKILL.md 227 -> 226 lines
+(249 after the dedup moves, 226 after the chromVAR block moved to `scripts/`). Env:
+`single-cell-transcriptomics-analyst` (Signac 1.17.1, Seurat 5.5.0, R 4.4.3), no installs.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| `NucleosomeSignal()` / `TSSEnrichment()` (and `StringToGRanges()`) deprecated in Signac 1.17.x | P2 | `SKILL.md` Version Compatibility: "checked on Signac 1.17.1" plus a note that the two QC calls are deprecated for `ATACqc()`, still run with a warning, and `ATACqc()` needs the external `fragtk` binary; one comment in `examples/signac_workflow.R` | ran both calls on the audit's `obj_qc.rds` + `fragments.tsv.bgz`: columns filled, `.Deprecated` warning captured; `ATACqc` formals (`fragtk.path`) and `fragtk` absent from PATH confirmed in the installed namespace | the calls were not replaced: `fragtk` is not installed and not installable under the brief. `StringToGRanges()` is not used anywhere in the Skill, so it is not mentioned |
+| No escape-hatch section | P2 | none | n/a | see left unfixed |
+
+### Left unfixed
+- **No escape-hatch / out-of-scope section (P2):** new content, not a correction; nothing in the audit's runs contradicts the Skill. The pointers it would carry (multimodal-integration for RNA-equivalent resolution, motif-to-TF causal claims) are already in the chromVAR prose and Related Skills.
+- **Replacing the deprecated QC calls with `ATACqc()`:** needs the `fragtk` binary, which is absent on this machine; the note documents the switch instead.
+
+### Redundancy pass (commit `d9bcbfd`)
+Guide-only agent content moved into SKILL.md; the rest of the guide's restatements deleted.
+
+| deleted passage (`usage-guide.md`) | new home |
+|---|---|
+| Prerequisites (R/Bioc/ArchR installs, `biovizBase`, pip, MACS on PATH, one genome build) | `SKILL.md` "Install"; guide keeps a pointer |
+| ArchR Workflow | `SKILL.md` "ArchR flow" (under Framework Decision Table) |
+| SnapATAC2 Workflow | `SKILL.md` "SnapATAC2 flow" |
+| Decision Guidance: Framework, Binarize | already in Framework Decision Table / Governing Principle |
+| Decision Guidance: Embedding (cisTopic/LDA, PeakVI/PoissonVI, spectral) | `SKILL.md` "Alternative embeddings" after the depth paragraph |
+| Key Differences table (per-cell non-zeros 1-10% vs 10-45%) | `SKILL.md` Governing Principle; other rows already in SKILL.md |
+| What the Agent Will Do | restated the SKILL.md sections; deleted |
+| Tips (11 bullets) | each already in SKILL.md: Governing Principle, TF-IDF + LSI, chromVAR, Doublet Detection, QC Thresholds, Consensus Peak Calling, Common Errors |
+
+Verified by grep that each moved item is present in SKILL.md. The guide keeps Overview, Quick Start, Example Prompts, Related Skills.
+
+### Scripts (commit `0c0ecaa`)
+| old location | script |
+|---|---|
+| `SKILL.md` chromVAR section, 28-line R block | `scripts/run_chromvar.R` (args: rds, out prefix, ident1, ident2, optional group_by) |
+
+Ran twice through `rs.sh` on the audit's `obj_qc.rds` (270 cells x 222 peaks): 746 motifs scored, 3 significant, 230 DA rows, both output CSVs byte-identical (also confirms the `set.seed` fix). Other SKILL.md blocks are under 10 lines and stay inline; `examples/` untouched.

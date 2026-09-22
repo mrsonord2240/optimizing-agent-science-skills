@@ -101,3 +101,41 @@ report (3 P1, 1 P2).
 
 - P2 "HDL, HESS, BOLT-REML, GCTA, Popcorn untested": needs R/Python installs and multi-GB reference panels
   in a shared env; the brief forbids installing into the shared venv/R library. Left for a tooling pass.
+
+## 2026-09-21 (structure)
+
+Worktree `F:\OpenScience\wt\causal-genomics-heritability-partitioning`, branch
+`fix/causal-genomics-heritability-partitioning`. Structure only; no behaviour or claim changed except the
+one example comment noted below.
+
+**Split** (`f46365d`): SKILL.md 375 -> 291 lines. Moved verbatim into `references/`:
+
+| Section (old lines) | New file |
+|---|---|
+| Cell-Type Prioritization, Finucane 2018 (133-158) | `references/cell-type-prioritization.md` |
+| Cross-Trait LDSC for Genetic Correlation (227-244) | `references/cross-trait-ldsc.md` |
+| Failure modes: LDSC intercept misinterpretation, non-EUR + EUR LD scores, collinear annotations (248-276) | `references/ldsc-failure-modes.md` |
+| Computational Footprint (177-189) | `references/computational-footprint.md` |
+
+Index rows added under "Per-Method Reference Files"; decision-tree rows for cell-type, rg, HESS and LDAK point at
+their files; "Per-Method Failure Modes" keeps the case-control liability subsection plus a pointer. Verified: every
+non-blank original line is in SKILL.md or a reference file except the 6 pointer-edited lines; fences balanced; bash
+fences parse (`bash -n`). The HESS block does not parse because it carries `<placeholder>` arguments (unchanged
+original content, a template).
+
+**Scripts** (`75583db`): no `scripts/` created. Two complete blocks duplicated existing `examples/` scripts, so the
+copies were deleted and replaced by an invocation line:
+
+| Old location | Now |
+|---|---|
+| SKILL.md "LDSC Standard Workflow" bash block (munge, --h2, partitioned --h2; SKILL.md 291 -> 265) | `examples/ldsc_partitioned_h2.sh` (`bash -n` only: needs multi-GB baselineLD/weights bundles not on this machine) |
+| `references/ldak-sumher.md` pipeline block (--sum-hers, --calc-tagging) | `examples/ldak_sumher.sh`, run end to end under WSL `science` with real LDAK 6.3 on the audit's fixtures (toy plink trio, `ldak_sumstats.txt`, audit tagging file, one toy annotation): produced `.hers` and `.enrich` for both steps; scratch removed |
+
+Small fix found on the way: `examples/ldak_sumher.sh` step 3 comment said "Prefer LDAK SumHer for conserved-region
+enrichment per Speed 2019", contradicting SKILL.md's report-both rule (the same sentence was removed from
+usage-guide.md on 2026-09-21); replaced with "Report LDSC primary + LDAK confirmatory; never pick the model that
+gives the desired answer".
+
+**Stayed inline:** HDL R block (15 lines; needs the HDL package and a ~5 GB UKB eigen panel, neither present), HESS
+step 1/2 block (template with `<placeholders>`, HESS not installed), install/download blocks (commands, not a
+runnable pipeline), 12-line cell-type `--h2-cts` block (under 15 lines; also matches step 4 of the LDSC example).

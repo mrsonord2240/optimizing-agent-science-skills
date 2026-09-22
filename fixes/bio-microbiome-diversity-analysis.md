@@ -32,3 +32,36 @@
 `F:\OpenScience\audit-envs\microbiome-metagenomics-analyst\` (R 4.4.3 / Bioconductor 3.20 via `rr.sh`,
 phyloseq 1.50.0, vegan 2.7.3, picante 1.8.2, GUniFrac 1.9). See its `TOOLS.md` for the DEICODE/gemelli
 non-install rationale cited above.
+
+## 2026-09-21 - P2 batch (fixer; branch `fix/microbiome-diversity-analysis`, commit 69c0d36)
+
+Env: `microbiome-metagenomics-analyst` (R 4.4.3 via `rr.sh`; phyloseq 1.50.0, vegan 2.7.3). SKILL.md 251 -> 274 lines (under the 300 threshold, no split).
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+| --- | --- | --- | --- | --- |
+| Sampling-depth plateau has no numeric heuristic | P2 | New `scripts/pick_sampling_depth.R` (analytic `vegan::rarefy` over a depth grid; paired relative richness gain per 1000 reads < `tol`=1%; only depths keeping >= `min_keep`=85% of samples; prints curve, chosen depth, dropped samples, writes `depth_curve.tsv`). Invocation + explanation added to "Choosing the Sampling Depth" | ran | On the audit's `asv_counts.tsv` (40 samples): depth 7771, 35/40 kept, dropped S03, S17, S20, S29, S40 (audit's improvised heuristic gave 7169, 36 kept - same neighbourhood). Independent check in Python (hypergeometric expected richness): 141.176 vs script 141.176; dropped list = samples with total < 7771. Tiny `tol` runs the "no plateau" branch and says so; a QIIME2-style `#OTU ID` header also parses. First draft used a per-step gain that depended on grid width and, at 90% survivors, reported no plateau; changed to per-1000-reads gain and 85% floor. |
+| NMDS never mentioned | P2 | `vegan::metaMDS` snippet (takes the Bray distance, `set.seed`, stress guidance) in new "NMDS and compositional (Aitchison) ordination in R" subsection | ran | Block extracted from SKILL.md and executed on the audit phyloseq object (36 samples after rarefying to 7000) and on GlobalPatterns (stress 0.172). Stress is ~0 on the audit fixture because its two groups collapse to two tight clusters; the text says ~0 means few-points data, not a great fit. Previous fix log declined this as "a tool the Skill never mentioned"; the audit names it as a recommendation and it is a vegan call in the section's own idiom, so it is written. |
+| RPCA only a one-line CLI mention | P2 | Runnable `vegdist(method='robust.aitchison')` + adonis2 and `prcomp(decostand(., 'rclr'))` (axes + loadings); text states this is not DEICODE's RPCA (no OptSpace completion) and points to `qiime deicode rpca`/gemelli in its own env, marked not run here. Decision-tree row updated | ran (R block); docs only (DEICODE command) | Block run with assertions: adonis2 R2=0.52, p=0.001; permutest(betadisper) p=0.231; 40 scores x 200 loadings. DEICODE not installed (TOOLS.md sec.4: pip closure downgrades scipy/scikit-bio in the QIIME2 env; brief forbids install). |
+| Redundancy (each fact once) | - | Deleted 4 Common Errors rows (PCoA fewer points; unweighted-vs-weighted; Shannon base; adonis2 vs overlap) that restate Per-Method Failure Modes, replaced by one pointer sentence; deleted the Alpha-section Shannon-base sentence; added `log2(e)` conversion to the Shannon failure mode | grep | usage-guide.md was already reduced in the earlier pass (overview, prompts, related skills only); nothing to do there. |
+
+### Left unfixed
+
+- Full DEICODE/gemelli RPCA worked example: needs an install into the QIIME2 env (downgrades scipy 1.10.1 / scikit-bio 0.5.9, forbidden) or a new dedicated env, which the batch brief also forbids. Backed instead by the runnable rclr/robust-Aitchison route above; the DEICODE command is documented, not run.
+- Inline bash blocks in "Choosing the Sampling Depth" and "Building the Tree" (10-11 lines each) partly mirror `examples/core_metrics_qiime2.sh`. Left: under the ~15-line script threshold, they carry per-flag comments the agent uses, and `examples/` is exempt from the dedup rule.
+- Thresholds table repeats a few statements from the Knobs and Failure Modes sections (min(sample_sums), alpha=0.5, DA rarefaction). Left: the table is where the citations and numeric floors live; collapsing it would drop the sources.
+
+### Deleted passage -> new home
+
+| deleted | now in |
+| --- | --- |
+| Common Errors: PCoA has fewer points than samples | Per-Method Failure Modes, "Sampling-depth sample-massacre" (symptom + fix) |
+| Common Errors: unweighted UniFrac significant, weighted not | Failure Modes "Unweighted-vs-weighted flip"; Decision Tree row "Do not want to metric-shop" (single-metric hit tentative) |
+| Common Errors: R and QIIME2 Shannon disagree | Failure Modes "Shannon base mismatch" (`log2(e)` added there) |
+| Common Errors: adonis2 p<0.001 but groups overlap | Failure Modes "PERMANOVA dispersion"; Beta Diversity section (betadisper mandatory) |
+| Alpha section: "Shannon from estimate_richness is in nats; QIIME2 log2..." | Failure Modes "Shannon base mismatch"; Tool Taxonomy Shannon row |
+
+### Scripts
+
+| old location | script |
+| --- | --- |
+| (new code, no prior inline copy) plateau-depth heuristic | `microbiome/diversity-analysis/scripts/pick_sampling_depth.R`, invoked from "Choosing the Sampling Depth" |

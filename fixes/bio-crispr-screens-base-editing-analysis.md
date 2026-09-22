@@ -56,3 +56,23 @@ Latest audit (2026-09-16 re-audit, core 87): 1 P1, 1 P2. Runtime: env venv Pytho
 Disagreement logged: usage-guide gave `--base_editor_output` in workflow text while SKILL.md/examples use `--base_edit` for CRISPRessoBatch; the usage-guide copy is gone, SKILL.md untouched there.
 
 Nothing left unfixed. Not run: no CRISPResso2/BE-Hive re-run (no change to those parts).
+
+## 2026-09-21 (structure)
+
+Worktree `F:\OpenScience\wt\crispr-screens-base-editing-analysis`, branch `fix/crispr-screens-base-editing-analysis`. Commits `2d75dcb` (split), `c9c5e09` (scripts). No behaviour or claim changes.
+
+**Split.** `SKILL.md` 448 -> 180 lines (182 after the scripts pointer). Moved verbatim to `references/`: `be-hive-prediction.md` (was BE-Hive section), `library-design.md` (sgRNA Library Design), `screen-analysis.md` (Editing Efficiency Filtering, Bystander Edit Attribution, Hit Calling), `published-screens.md` (Hanna 2021, Cuella-Martin 2021), `be-validation-pipeline.md`. "Reference Files" index added to SKILL.md. Three one-phrase edits so pointers still resolve: "worked example below" -> `references/be-hive-prediction.md`; "the parsers below" -> "the parsers in this Skill"; "editing-efficiency convention above" -> "in `screen-analysis.md`". Verified: multiset comparison of non-blank lines, only those three lines differ; all python fences `ast.parse`, bash fence `bash -n`. Stayed in SKILL.md: chemistry table, window math, Cas9/BE/PE table, Validation Strategy, Failure Modes, Thresholds, Common Errors.
+
+**Scripts** (old location -> script; each has header, argparse CLI, function body unchanged; the reference file keeps a one-command invocation):
+
+| old block | script | run as invoked, on | assertions |
+| --- | --- | --- | --- |
+| `references/be-hive-prediction.md` python | `scripts/behive_predict.py` | BE-Hive venv, synthetic guide | total probability 0.9795, C4/C6 columns, offset assert |
+| `references/library-design.md` `find_be_spacers` | `scripts/find_be_spacers.py` | seeded random 300nt CDS (target_aa 40) | output `.equals` pre-move function (25 spacers); `'A'*60` -> (0,6); lowercase CDS same count; bad editor -> ValueError |
+| `references/screen-analysis.md` `filter_by_editing_efficiency` | `scripts/filter_by_editing_efficiency.py` | audit's real CRISPResso2 2.3.4 output (`base-editing-synthetic\results`) | pos 5 -> 0.50, pos 7 -> 0.30 (ground truth); pos 99 -> ValueError |
+| `deconvolute_bystander` | `scripts/deconvolute_bystander.py` | same run's `Alleles_frequency_table.zip` | 40/10/30/20 split = planted truth |
+| `aggregate_variant_scores` | `scripts/aggregate_variant_scores.py` | real MAGeCK `input1_canonical.sgrna_summary.txt` (71,090 sgRNAs) + synthetic annotation | row counts of target_only/mixed match the annotation |
+
+Nothing stayed inline that qualified; the be-validation-pipeline bash (git clone / docker run / notebook list, ~10 lines of a workflow outline needing a Docker run and external repo) stayed inline as it is not a self-contained runnable script. `examples/base_editing_analysis.sh` untouched; no block duplicated it.
+
+Noticed, not changed (structure-only task): `references/library-design.md` "Approach" says each spacer is annotated with predicted amino acid changes, but `find_be_spacers` returns only target/bystander positions.

@@ -29,3 +29,36 @@ Audit: `F:\OpenScience\audits\bio-crispr-screens-perturb-seq-analysis\` (83, Lim
 None of the 6 audit recommendations were left unfixed. Two extra defects found during the P1 fix (missing `gene_target` merge; log-normalized data fed to PyDESeq2) were fixed inline under "Fix. Don't Report" rather than just noted, since they sit on the exact code path the P1 already required touching and verifying.
 
 Nothing needs Sam.
+
+## 2026-09-21 (structure)
+
+Resumed fixer (previous agent died mid-task from a server error, not bad work). Worktree
+`F:\OpenScience\wt\crispr-screens-perturb-seq-analysis`, branch `fix/crispr-screens-perturb-seq-analysis`,
+env `crispr-screen-analyst`.
+
+**Mixscape filter fix (`0096224`, plain corrections, no open audit findings -- score 93):**
+- SKILL.md Mixscape block: a trailing comment swallowed `].copy()` -- a `SyntaxError`. Moved the
+  comment above the line; block now parses and ran on synthetic data (294 KO cells).
+- SKILL.md Pertpy block and `examples/run_pertpy.py`: both filtered on `mixscape_class` (per-gene
+  labels like `'GENE_A KO'`) for the bare string `'KO'`, matching no cells -- the filter never
+  filtered. Fixed to `mixscape_class_global` (values `KO`/`NP`/`NT`). Ran on real
+  `papalexi_2021()` (20,729 cells): 7,081 kept (4,695 KO + 2,386 NT), sensible top hits
+  (STAT1/IFNGR1/JAK2/IRF1 -> IFN genes; MYC -> ribosomal genes).
+- "KO retention among perturbed" used the wrong denominator (kept/all cells, not kept/perturbed) --
+  fixed; 25.6% on real data, 21.0% on synthetic, both checked.
+
+**Split (`f03e575`):** SKILL.md 208 lines -> `references/` (factor-decomposition.md,
+genome-wide-perturb-seq.md, multiomic-perturb-seq.md, sceptre-low-moi.md), no content lost.
+
+**Scripts (`f82c507`):** moved four runnable blocks (SKILL.md x2, references x2) to
+`scripts/`, each run against real invocations before committing:
+
+| old location | script | ran on | result |
+| --- | --- | --- | --- |
+| SKILL.md sgRNA-assignment block | `scripts/assign_sgrna.py` | audit's `synthetic_sgrna.h5ad` | sane none/multiplet/per-sgRNA fractions |
+| SKILL.md Mixscape block | `scripts/mixscape_filter.py` | audit's `synthetic_perturbseq.h5ad` (normalize_total+log1p'd first, raw counts as shipped) | 294/2000 cells kept, 100% `mixscape_class_global == KO` -- confirms the `0096224` filter fix holds through the script |
+| `references/multiomic-perturb-seq.md` block | `scripts/multiome_differential.py` | synthetic MuData built for this run (audit data has no ATAC modality): planted a signal on 5/50 peaks for GENE_A KO cells | recovered exactly those 5 peaks as the top hits by adjusted p-value |
+| `references/sceptre-low-moi.md` block | `scripts/run_sceptre.R` | sceptre's own bundled `--example` data via the env's `r.sh` | 2000-row real output table (`p_value`, `fold_change`, `significant`) |
+
+No script code changes were needed -- all four ran correctly exactly as extracted. Nothing stayed
+inline; nothing needs Sam.

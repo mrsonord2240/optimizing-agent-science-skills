@@ -61,3 +61,36 @@ Source: `causal-genomics/transcriptome-wide-association`. Re-audit 2026-09-19: 8
 
 Left unfixed: nothing else open. `focus import` end-to-end (with mygene+rpy2) was not run: rpy2 needs a
 shared-library R, which this machine's R is not; the direct-build route was verified instead.
+
+
+## 2026-09-21 (structure)
+
+Worktree `F:\OpenScience\wt\causal-genomics-transcriptome-wide-association`, branch `fix/causal-genomics-transcriptome-wide-association`.
+Commits: split `a2a9881`, scripts `a70dce4`. No behaviour or claim changed.
+
+**Split: SKILL.md 544 -> 189 lines.** Verbatim moves into `references/` (no `references/` existed):
+`algorithmic-taxonomy.md`, `tissue-and-model-selection.md`, `failure-modes.md`, `fusion-pipeline.md`,
+`spredixcan-smultixcan.md`, `focus-finemapping.md`, `escalation-and-reconciliation.md`,
+`reporting-and-review.md`, `citations.md`. Stayed in SKILL.md: scope, PredictDB/MASHR model choice,
+decision tree (rows now point at the reference files), triangulation, thresholds, Common Errors, Tool
+Install Notes, Related Skills, plus a new "Reference Files" index. Checked by multiset comparison: every
+original non-blank line is in the new files except 23 intentional edits (9 decision-tree pointers, 5
+H2 -> H1 titles, 9 cross-reference retargets such as "see FOCUS section" -> path). All 5 bash fences
+pass `bash -n`, the python fence `py_compile`.
+
+**Scripts:**
+
+| old location | new | how run |
+|---|---|---|
+| SKILL.md FUSION Pipeline bash block (loop + `post_process.R`), now `references/fusion-pipeline.md` | `scripts/fusion_twas.sh` (positional args, `RSCRIPT`, `LOCUS_WIN`; header concatenation fixed so only one header line survives; `post_process` now runs per chromosome instead of a hard-coded `--chr 22`) | Audit fixture `data/fusion` (copied), `fusion_twas` HEAD clone with the documented `drop=FALSE` patch, via `r.sh` (`RSCRIPT=`), `CHRS=1`: TWAS.Z GENE1 6.5 (p 8e-11), GENE2 -0.557; `joint_included` = GENE1, `joint_dropped` = GENE2 (COND.P 0.58); same as the 2026-09-19 log |
+| FOCUS section python block (direct DB build), now `references/focus-finemapping.md` | `scripts/build_focus_db.py` (panel.tsv + out.db args; optional `cv_r2`/`cv_r2_pval` columns) | Panel of 2 genes on the audit fusion LD panel, GWAS Z 7.2 planted at the true gene's SNP; then `focus finemap` on that DB: `pips_pop1` = 1.0 for GENE_TRUE, 3.44e-08 for NULL.MODEL (asserted) |
+| S-PrediXcan + S-MultiXcan bash block | deleted; pointer to `examples/s_predixcan_pipeline.sh` (duplicate) | not re-run: example untouched |
+
+Env: pyfocus 0.802 (pandas 2.1.4, numpy 1.26.4, setuptools 80.10.2, SQLAlchemy 2.0.54) was installed into a
+private throwaway venv in my own scratchpad subdirectory (`...\scratchpad\twas\venv`), with the SKILL.md
+sed patches applied; nothing was installed into the shared env, R-lib or `twas-venv`, and TOOLS.md is
+untouched. R only through the env's `r.sh`.
+
+**Stayed inline:** the `focus finemap` CLI calls (about 10 lines, a single command; the example
+`focus_finemap.sh` holds the long form), the MA-FOCUS call, the `focus import` one-liner, and the
+pyfocus `sed` patch block in Tool Install Notes (8 lines, and Common Errors points at it).

@@ -62,3 +62,40 @@ Nothing. Grepped SKILL.md, usage-guide.md, and `examples/` for every other call 
 method (`assignTaxonomy` already seeded from pass 1; `classify-sklearn`, `classify-consensus-vsearch`,
 `fit-classifier-naive-bayes`, `addSpecies` are all deterministic algorithms/models) — found no
 further unseeded sibling instance.
+
+## 2026-09-21 — P2 batch fix, split, scripts (Production Ready, 2 P2 findings)
+
+Worktree `F:\OpenScience\wt\microbiome-taxonomy-assignment`, branch `fix/microbiome-taxonomy-assignment`
+(from staging `431aa55`). Commits: `438ac0b` fix, `ae25dd7` split, `60fd788` scripts. Env
+`microbiome-metagenomics-analyst` (R 4.4.3, dada2 1.34.0, DECIPHER 3.2.0), audit data: 770 real ASVs +
+18k SILVA-138 slice.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| Implied "multithread=FALSE gives bitwise identity at every rank" (P2, viewer Input 11) | P2 | SKILL.md DADA2 notes and `examples/assign_silva.R` now say the seed makes the GENUS calls reproducible, with a ~2/770 Kingdom/Order residual that multithread=FALSE does not remove. The shipped text no longer contained the `multithread=FALSE` recommendation itself; only the unqualified "reproducible" wording was corrected | ran: example with `rerun` on the 770 ASVs / 18k reference, 0 genus differences between seeded runs; the residual figure is the audit's (Input 11) | |
+| No self-check for degenerate / non-reproducible output (P2) | P2 | Genus non-NA assertion added to the DADA2 notes, `examples/assign_silva.R` (plus optional `rerun` diff) and `scripts/idtaxa_classify.R` (plus optional `rerun`, `identical()` on two seeded IdTaxa runs) | ran: example on real data (75.1% genus, rerun 0 differ) and against a deliberately bad reference (stops with the message); IdTaxa script 408/770 genus, rerun identical() TRUE | Example now takes arguments instead of hard-coded paths; CRLF working copy normalised to LF (index was LF) |
+
+### Split (SKILL.md 324 -> 248 lines)
+`## DECIPHER IDTAXA` -> `references/decipher-idtaxa.md`; `## Filtering Host Organelle and Off-Target Features`
+-> `references/organelle-filtering.md`. Reference Files index, decision-tree pointer and the
+Common-Errors / failure-mode pointers updated. Verified: every non-blank line of the old SKILL.md exists in
+the three files except the four pointer-edited lines; all R fences parse, bash fences pass `bash -n`.
+
+### Scripts (SKILL.md 248 -> 208 lines)
+| old location | new home |
+|---|---|
+| `references/decipher-idtaxa.md` R block (LearnTaxa + IdTaxa + flatten) | `scripts/idtaxa_classify.R` (args; optional training from FASTA + taxonomy; `rerun`); ran both paths on audit data (pre-trained 18k set: 408/770 genus, rerun identical; train path on 2,500 seqs: 266/770 genus) |
+| SKILL.md DADA2 R block | duplicate of `examples/assign_silva.R`: cut to the 3 key calls + pointer |
+| SKILL.md QIIME2 extract-reads/fit/classify bash block | duplicate of `examples/assign_qiime2_region.sh`: replaced by pointer + the three steps in prose (example unchanged, not run: needs WSL QIIME2 env + full SILVA) |
+
+### Deleted passage -> new home
+| passage | now in |
+|---|---|
+| DADA2 code comments (seed rationale, minBoot, addSpecies, sanity check) | SKILL.md DADA2 bullet notes; also comments in `examples/assign_silva.R` |
+| DECIPHER code comments (LearnTaxa seed/memory/rank=, IdTaxa seed, threshold, positional flattening) | `references/decipher-idtaxa.md` bullets; comments in `scripts/idtaxa_classify.R` |
+| QIIME2 step comments (region extraction, memory, confidence 0.7/0/disable) | SKILL.md numbered steps; comments in the example |
+| Redundancy pass | already done 2026-09-19; usage-guide re-checked, nothing new |
+
+### Left unfixed
+- `examples/assign_qiime2_region.sh` was not run: needs the WSL QIIME2 env plus a full SILVA-138 reference (training is tens of GB of RAM). Unchanged by this pass; the SKILL.md prose steps are transcribed from it.
+- Not fixable here: the Kingdom/Order residual between seeded `assignTaxonomy()` runs (DADA2 C internals, out of scope; documented instead).

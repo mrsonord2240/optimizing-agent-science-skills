@@ -25,3 +25,43 @@ surrogate variable and an 8 x 3 design matrix with no NAs.
 
 All 5 `recommendations[]` entries (3 P1, 2 P2) fixed, plus two defects found while fixing. Nothing
 left unfixed.
+
+## 2026-09-21 P2 fix pass
+
+Worktree `F:\OpenScience\wt\crispr-screens-batch-correction`, branch `fix/crispr-screens-batch-correction` (from staging `431aa55`).
+Fixer: Claude Sonnet 5. Env: `crispr-screen-analyst` (Python venv, `combat` 0.3.3, mageck 0.5.9.5). Audit: 4 P2s.
+Commits: `03d9a36` fix, `bb597c4` redundancy, `8458687` split, `f04f3c5` scripts. SKILL.md 332 lines -> 231 (split: 252, then scripts: 231).
+Verification data: real HAP1 TKOv3 counts with the audit's planted two-batch design (input 1) and batch-free design (input 7), plus planted zero-residual guides.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| Within-batch-constant filter over-excludes (294/71,090 guides) | P2 | Filter is now the residual sum of squares after regressing out batch (+ condition) with the same design pycombat uses, threshold 1e-8 (not `== 0`, round-off) | ran | Input-1 design: 0 guides dropped, batch centroid distance 233.8 -> 1.0 (old filter: 16.2 on the 70,796 kept guides), essential AUC preserved; the 294 guides constant in one batch are now corrected (batch mean gap 7.2 -> 0.19). Planted: constant-in-both-batches and 0,0,1,1-per-batch guides dropped, constant-in-one-batch guide corrected |
+| Dropped guides only printed, not returned | P2 | `combat_correct()` returns `(corrected, uncorrected)`; prose, Common Errors and the Validation Checklist say to flag them in hit calling | ran | Uncorrected rows equal raw counts; script also writes them to a file |
+| All-NaN framed as the reliable failure signature | P2 | Docstring and prose: the pre-fit filter prevents both NaN and silent constant collapse; NaN check is a backstop | ran | Also corrected a wrong claim: the input-7 NaN was caused by 340 zero-residual guides, not by absence of batch effect. Bare pycombat 100% NaN; with those 340 dropped the wrapper returns a clean matrix (no ValueError any more on that data) |
+| Genome-scale `mageck mle` runtime undisclosed | P2 | Runtime paragraph (multi-hour; subset or lower `--permutation-round` for a sanity check) | docs (TOOLS.md note 7, `mageck mle --help`) | Not re-run: genome-scale is the multi-hour job the note describes |
+| (found) `biological_covariate` named as a ComBat argument in SKILL.md and guide; guide said log10 for a log2 recipe | small | Now `mod` / log2 | ran (signature) | |
+| (found) `batch_diagnostic` errors with fewer than 5 samples | small | `n_pc = min(5, samples, features)`; script prints PCs where batch is significant | ran | Batch was on PC2 in the input-1 design, so PC1-only reading would miss it |
+
+### Left unfixed
+
+None of the 4 P2s. Note on the audit's assertion "ValueError on batch-free data": it no longer raises there, because the filter now handles the cause; the ValueError stays as a backstop.
+
+### Deleted passage -> new home (redundancy pass)
+
+| deleted from `usage-guide.md` | now in |
+|---|---|
+| Prerequisites install block (its `pip install combat` comment swallowed the following package list) | SKILL.md "Version Compatibility" (install line, inputs, versions checked) |
+| Tips: always supply `mod`; ComBat-then-test over-confident FDR; verify after correction; Chronos for panels; NTC >= 500; in-vivo batch sources; sequential correction double-corrects | SKILL.md ComBat failure mode, "Why this is preferred", Validation Checklist, decision tree, NTC section, Batch Sources table, "ComBat after RUV double-corrects" |
+| Tips: CN correction before batch; fall back to median normalization | SKILL.md decision tree (panel row); NTC section |
+| Decision Cheat Sheet rows | SKILL.md decision tree / When NOT to Correct / Thresholds; new row "Several screens sharing one library -> JACKS or Chronos" |
+| What the Agent Will Do (steps 1-9) | SKILL.md decision tree, RUV, Thresholds, Validation Checklist (new last item: compare hit list with the uncorrected one) |
+| Validation Checklist | SKILL.md "Validation Checklist" (+ item for `uncorrected`) |
+
+### Split and scripts
+
+| from | to |
+|---|---|
+| SKILL.md ComBat, RUV, SVA, NTC-anchored sections (verbatim, no non-blank line lost, python fences ast-parse, R fences `parse()`) | `references/combat.md`, `ruv.md`, `sva.md`, `ntc-anchored-normalization.md`; new decision-tree row for unannotated batches points to RUV/SVA |
+| `references/combat.md` python block (`combat_correct`) | `scripts/combat_correct.py` (CLI + importable) |
+| SKILL.md Diagnose block (`batch_diagnostic`) | `scripts/batch_diagnostic.py` (CLI + importable) |
+| RUV (13 lines), SVA (10), NTC-anchored (7), MLE design matrix | stayed inline, under the 15-line bar |

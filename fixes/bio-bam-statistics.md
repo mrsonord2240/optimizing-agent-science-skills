@@ -100,3 +100,25 @@ Verification notes: every command above was run against samtools 1.24 / bcftools
 ## Left unfixed (round 2)
 - Assay-threshold table and FREEMIX cut-offs (1% / 5%): no source could be checked from this machine, and inventing citations would be worse than the current hedge, so the "literature ranges, not verified" and "commonly cited" labels stay.
 - VerifyBamID2 FREEMIX and somalier output: still not produced (no whole-genome BAM / GRCh38 FASTA here); the "not run end to end" label stays. Commands remain `--help`-checked.
+
+---
+
+# P2 pass and split - 2026-09-21
+
+Skill was Production Ready (4 P2 open). Branch `fix/alignment-files-bam-statistics` from staging main 431aa55. Commits: `4582a9d` (fixes), `d8b01b0` (split). Tools (WSL `science`, env `alignment-files`): samtools 1.24, bcftools 1.24, mosdepth 0.3.14, pysam 0.24.1. Scratch: `F:\OpenScience\af-bamstat-scratch\p2\` (audit data copied, not the audit folder).
+
+| finding | priority | change | verified (ran) | notes |
+|---|---|---|---|---|
+| mosdepth `--fast-mode` caveat names D only; overlap table silent on mpileup D/N | P2 | Caveat now "ignores internal CIGAR operations: D and N count as covered" with the RNA-seq numbers; mpileup row says its depth column counts D and N (unlike `samtools depth`) | own_del.bam: mosdepth default sum 4700, fast-mode 9600; `samtools mpileup -Q 0` 9600 vs `depth -aa` 5200; real RNA BAM mosdepth 17.67x default vs 49.40x fast-mode (`depth -aa` 23.67x) | bcftools mpileup not claimed: its per-site output on own_del (5220) differs from both and was not resolved |
+| `MAX_INSERT` described as the `stats -i` default but stats clamps | P2 | SKILL.md (now `references/qc-pitfalls.md`) and `qc_report.py` comment: qc_report drops templates >= 8000, `stats -i 8000` counts them at 8000, so means differ | own_insert.bam: qc_report 2286, `samtools stats` 3555.5, `stats -i 20000` 3611.1 | |
+| Wrong-reference CRAM only says "truncated file" | P2 | `qc_report.py` adds "check that the reference FASTA is the one the CRAM was written against (see the htslib MD5 message above)" when a reference was passed | own_ctg_nourl.cram: no ref -> old hint, rc 1; wrong.fa -> new hint, rc 1; right FASTA -> rc 0, 1091 primary = flagstat; `py_compile` OK | the pileup `multiple_iterators` UserWarning on CRAM not documented (cosmetic) |
+| Assay-threshold table unsourced | P2 | Relabelled "orientation only ... not sourced to a specific study and not checked on this machine's data"; values unchanged | docs | see left unfixed |
+
+Split (SKILL.md 498 -> 243 lines): verbatim moves to `references/depth-coverage.md` (114 lines: samtools depth, mosdepth, coverage), `references/pysam.md` (107), `references/qc-pitfalls.md` (41: What Flagstat Does Not Reveal, Insert Size Caveats). Non-blank-line multiset compared with the pre-split file: only difference is one comment ("see the table above" -> "see the overlap table in SKILL.md ...", because the table stayed in SKILL.md) plus the added index. 4 python fences `ast.parse`, 16 bash fences `bash -n`.
+
+Redundancy pass: already done 2026-09-20 (usage-guide is overview, prompts, pointer only); no change.
+
+## Left unfixed (2026-09-21)
+- Sourcing of the assay-threshold table and FREEMIX 1% / 5% cut-offs: needs citations for each cell and a real WGS/WES run; no such data or source access on this machine and inventing citations would be worse. Labelled orientation only instead.
+- VerifyBamID2 FREEMIX / somalier end-to-end: still needs a whole-genome BAM and GRCh38 FASTA that do not exist here; "not run end to end" label stays.
+- bcftools mpileup D/N behaviour: not established, so not written.

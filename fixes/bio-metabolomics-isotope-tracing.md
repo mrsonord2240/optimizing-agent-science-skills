@@ -31,3 +31,23 @@ None. All P1s and the one cheap P2 were fixed; the second P2 (recovery guidance 
 ## Needs Sam
 
 Nothing.
+
+# 2026-09-21 — P2 batch (Production Ready Skill, open P2 only)
+
+Branch `fix/metabolomics-isotope-tracing`. Audit evidence: `eval_report_bio-metabolomics-isotope-tracing_result.json` (1 P2).
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+| --- | --- | --- | --- | --- |
+| Plateau check gives no guidance for <4 timepoints | P2 | Added one sentence stating the 4-timepoint minimum (3 consecutive deltas) and the wording to report; the snippet now returns `status` = `insufficient timepoints to assess steady state` / `plateau` / `still labeling` instead of a bare `reached_plateau` boolean | ran: snippet extracted from SKILL.md, exec'd with 6-pt plateau series (plateau), 3-pt series (insufficient), 6-pt rising series and 4-pt decelerating series (still labeling); env python 3.12 + numpy | |
+
+## Left unfixed
+
+None.
+
+## Deleted passage -> new home
+
+None deleted. The redundancy pass was already done in an earlier fix (see above), so it was skipped. No split: SKILL.md is 205 lines (was 199).
+
+## scripts/
+
+No block of about 15+ lines exists in SKILL.md (isocor block ~11 lines, the others shorter). The full correction script is already `examples/isotope_correction.py`. Nothing moved.

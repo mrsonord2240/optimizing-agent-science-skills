@@ -33,3 +33,12 @@ Redundancy pass: the only duplicated passage was the ont='ALL' claim (SKILL.md x
 ## Left unfixed
 
 None.
+
+---
+
+## 2026-09-21 (structure)
+
+Branch `fix/pathway-go-enrichment`, worktree `F:\OpenScience\wt\pathway-go-enrichment`. No commit made.
+
+- **Split:** not done. SKILL.md is 228 lines (300 or under).
+- **`scripts/`:** nothing qualifies. The five R fences in SKILL.md are 14 (enrichGO call), 10 (DE table -> foreground/universe), 2, 9 (GOseq), 2 and 2 lines, all under the ~15-line bar. The enrichGO block is an API-shape illustration that `examples/go_enrichment_basic.R` already covers; the DE block is a fragment that reads a user's `de_results.csv`; the GOseq block needs `goseq` plus the hg38 length database, neither installed in `crispr-screen-analyst` (checked `R-lib`), so it could not be run here in any case. `usage-guide.md` has one 7-line fence. `examples/` unchanged.

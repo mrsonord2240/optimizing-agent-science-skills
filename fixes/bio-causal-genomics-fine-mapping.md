@@ -31,3 +31,64 @@ Replaced with one pointer sentence naming the four owning SKILL.md sections. Not
 ## Findings fixed: 2/4 (both P1). Both P2s left unfixed with reasons above, per dispatch scope.
 
 Nothing needs Sam.
+
+---
+
+# bio-causal-genomics-fine-mapping — 2026-09-21
+
+Worktree `F:\OpenScience\wt\causal-genomics-fine-mapping`, branch `fix/causal-genomics-fine-mapping` (from staging `431aa55`). Commits: `e49fd56` (fix + dedup), `dbbf7ea` (split), `4adb8d5` (scripts/ step). Env: `mendelian-randomization-analyst` (R 4.4.3 via `r.sh`, susieR 0.14.2, coloc 5.2.3; plink2 a7.6 in the env's `tools\plink2`).
+
+Audit report read: 3 P2 findings (re-audit of the 2026-09-17 fix). Fixed 1/3 as worded; 1 fixed by the split; 1 left unfixed. Three further defects found while verifying and fixed inline.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| coloc.susie SNP-naming precondition documented but not guarded in code | P2 | `stopifnot(...)` on shared `lbf_variable` colnames placed directly before `coloc.susie()` in the worked example (now in `references/coloc-susie.md`) | ran | Extracted the documented block from SKILL.md and ran it: named input succeeds (PP.H4 = 1, planted SNP rs0020); same block minus the `names()` line stops with the guard message instead of the data.table error. |
+| SKILL.md carries all technical depth inline (444 lines) | P2 | Split into 8 `references/` files, SKILL.md 482 -> 296 lines (see table below) | ran (line-by-line comparison, fence parse: 4 bash fences `bash -n`, 6 R fences `parse()`) | 482 was after the dedup pass added Tool Install Notes (+38 lines). |
+| Individual-level and CLI paths lack a genotype-QC checklist | P2 | Left unfixed | n/a | See left-unfixed list. |
+| `plink --r2 square` given as the in-sample LD recipe | found, not audit-flagged | `--r square` (signed r) with a note that `--r2` writes squared correlations | ran (plink2 a7.6: `--r-unphased square` min -0.13, `--r2-unphased square` min 4.7e-7); docs for PLINK 1.9 | `susie_rss` needs signed R; `examples/finemap_pipeline.sh` already used `--r square`. |
+| Reporting schema `L_used = sum(!fit$sets$pruned)` | found | `sum(fit$V > 0)` | ran | `fit$sets$pruned` does not exist in susieR 0.14.2 (`names(fit$sets)` = cs, purity, cs_index, coverage, requested_coverage), so the old formula evaluated to 0. `sum(fit$V > 0)` = 1 on a one-signal fit. |
+| kriging_rss comment / threshold row name the wrong quantity | found | Name the real column `z_std_diff` (data.frame: z, condmean, condvar, z_std_diff, logLR) | ran (columns printed; audit scripts already used `z_std_diff`) | Shorthand `|z_obs - z_exp|` kept in prose. |
+
+## Redundancy pass (2026-09-21)
+
+The 2026-09-17 pass had removed the Tips block. Remaining guide content that restated or belonged to SKILL.md:
+
+| Deleted passage (usage-guide.md) | New home | Verified |
+|---|---|---|
+| `## Prerequisites` (R install, FINEMAP / PolyFun / PAINTOR / SuSiEx / DAP-G / FOCUS / PLINK install commands) | SKILL.md `## Tool Install Notes`, verbatim | grep |
+| `## What the Agent Will Do` steps 1-8 | SKILL.md Decision Tree, Critical LD Diagnostic Block, Quantitative Thresholds (purity >= 0.5), Required Reporting Schema, Coloc.susie Integration; VEP annotation is in the guide's Related Skills | grep |
+
+Disagreement logged: the guide said a 1-3 Mb locus window; SKILL.md says +/- 500 kb default (5+ Mb only for long-range LD). SKILL.md kept.
+
+## Split map (SKILL.md 482 -> 296; verbatim moves, only pointer-edited rows changed)
+
+| Old SKILL.md section | New home |
+|---|---|
+| Algorithmic Taxonomy; Reconciliation table (the Operational rule stays in SKILL.md) | `references/method-comparison.md` |
+| Per-Tool Failure Modes > Allele Harmonization with the LD Reference | `references/allele-harmonization.md` |
+| Functional Priors with PolyFun (+ Manual Coding-Variant Priors) | `references/polyfun-functional-priors.md` |
+| Cross-Ancestry Fine-Mapping with SuSiEx | `references/susiex-cross-ancestry.md` |
+| FINEMAP CLI Pattern | `references/finemap-cli.md` |
+| Coloc.susie Integration | `references/coloc-susie.md` |
+| HLA and Long-Range LD: When to Stop | `references/hla-long-range-ld.md` |
+| Anticipated Reviewer Pushback | `references/reviewer-pushback.md` |
+
+Check: every non-blank line of the pre-split SKILL.md is found verbatim in SKILL.md + references/ except 8 decision-tree / Common Errors table rows that gained a `references/...` pointer.
+
+## Runnable code -> scripts/ (Sam, 2026-09-21)
+
+No `scripts/` directory created. Code blocks in SKILL.md and references/: install (3 + 25 lines, not runnable code), LD diagnostic (12), allele harmonize helper (8), PolyFun bash (12) and two R fragments (7, 8), coloc.susie (12), SuSiEx (12), FINEMAP (19). None but FINEMAP reaches ~15 lines, and the FINEMAP and SuSiEx blocks duplicate `examples/finemap_pipeline.sh` and `examples/susiex_multiancestry.sh`.
+
+| Old location | Change |
+|---|---|
+| `references/finemap-cli.md` 19-line block | Replaced by a pointer to `examples/finemap_pipeline.sh` plus one line keeping the tuning flags (`--n-iterations`, `--n-convergence`) and the file-format notes |
+| `references/susiex-cross-ancestry.md` 12-line block | Replaced by a pointer to `examples/susiex_multiancestry.sh` (the one-line form stays in SKILL.md) |
+
+Both examples pass `bash -n`; they could not be run because no FINEMAP or SuSiEx binary exists on this machine (audit Input 6).
+
+## Left unfixed
+
+- **Genotype-QC checklist for the individual-level `susie(X, y)` and CLI paths (P2).** New content (call rate, HWE and MAF thresholds), not a correction: the Skill has no existing QC text to fix, and the thresholds would be unsourced from anything the audit ran.
+- FINEMAP / SuSiEx / PAINTOR / DAP-G flags remain checked only against the tools' documentation, not run: no binary exists here (unchanged from the 2026-09-17 audit).
+
+Nothing needs Sam.

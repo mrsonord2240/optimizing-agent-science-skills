@@ -51,3 +51,26 @@ Worktree `F:\OpenScience\wt\causal-genomics-colocalization-analysis`, branch `fi
 Redundancy: nothing new to collapse; the 2026-09-18 pass stands. The old Trigger paragraph's r2=0.51-0.53 well-powered result is retained in condensed form inside the new Trigger.
 
 Left unfixed: none. Nothing needs Sam.
+
+---
+
+## 2026-09-21 (structure)
+
+Worktree `F:\OpenScience\wt\causal-genomics-colocalization-analysis`, branch `fix/causal-genomics-colocalization-analysis`. Commits `7567910` (split), `d241ac7` (scripts). No behaviour or claim changed.
+
+**Split (SKILL.md 540 -> 303 lines, then 273 after scripts).** Moved verbatim into `references/`: `allele-harmonisation.md`, `coloc-susie.md` (LD matrix construction, coloc.susie pipeline, LD-mismatch failure mode), `pwcoco.md`, `smr-heidi.md` (SMR vs coloc reconciliation + SMR pipeline), `ecaviar-clpp.md`, `moloc.md`, `hyprcoloc.md`, `lead-snp-swap.md`, `reporting.md` (reviewer pushback + reporting template). SKILL.md keeps taxonomy, decision tree, per-method failure modes (coloc.abf, trans-eQTL, MHC, underpowered, QTL panel), PP.H4 and p12 tables, the coloc.abf pipeline, Common Errors, install notes. Added a "Reference Files" index (when to read each), pointers from seven decision-tree rows, and a failure-mode pointer list. Verified: multiset comparison of non-blank lines shows only the eight decision-tree rows that gained a pointer differ; every remaining R and bash fence parses (`parse()` via `r.sh`, `bash -n`). `usage-guide.md` pointers updated to the new files.
+
+**Scripts.**
+
+| old location | script | run as SKILL.md invokes it |
+|---|---|---|
+| SKILL.md coloc.abf pipeline block (gate + inputs + `coloc.abf` + `sensitivity`) | `scripts/coloc_abf.R` | `r.sh scripts/coloc_abf.R chr1_gwas.tsv chr1_eqtl.tsv --gwas-type cc ...` on simulated 300-SNP locus (same generator as `examples/coloc_susie.R`, planted causal rs149): PP.H4 = 1.00, PP.H3 < 0.05, top SNP rs149, sensitivity PDF written. Same data relabelled chr6:30 Mb: stops with the MHC message. |
+| SKILL.md `flag_excluded_region()` + gate | `scripts/flag_excluded_region.R` (adds `stop_if_excluded_region()` wrapper; sourced by both coloc scripts) | Asserted 5 boundary cases, `chr8` prefix, hg19 stop (same as audit input 4). |
+| `references/coloc-susie.md` coloc.susie pipeline block | `scripts/coloc_susie.R` | Same simulated locus plus its in-sample LD: `estimate_s_rss` passes, 1 credible-set pair rs149 x rs149, PP.H4 = 1.00; MHC-labelled copy stops. |
+| `references/allele-harmonisation.md` `harmonise()` | `scripts/harmonise.R` (function + CLI) | Audit input 7 table: kept rs1-4 and rs6, dropped palindromic rs5 (MAF 0.45), rs2 and rs3 betas negated, rs4 (complement) unchanged, rs6 negated; also exercised via `source()`. |
+
+Test data lived in the session scratchpad (the audit's `data\` folder is empty; input 7 table copied from the audit's `run\input7_harmonise_test.R`). Scripts take file arguments; the MHC gate falls back to max |z| for the lead SNP when the table has no `P` column (the old block used `which.min(P)`).
+
+**Stayed inline (under 15 lines, or tool not runnable here as a script):** LD-matrix `plink2` command and bigsnpr snippet, eCAVIAR, SMR, PWCoCo (gcta64 + pwcoco) command blocks, moloc and HyPrColoc R snippets (API-shape illustrations of 8-12 lines). No block duplicated an `examples/` script; `examples/coloc_abf_pipeline.R` keeps its own older harmonise without the strand branch (not touched, `examples/` stays as is).
+
+**Left unfixed:** none new. Nothing needs Sam, except noting that `examples/coloc_abf_pipeline.R`'s local `harmonise_summary_stats()` lacks the strand-complement branch that `scripts/harmonise.R` has.

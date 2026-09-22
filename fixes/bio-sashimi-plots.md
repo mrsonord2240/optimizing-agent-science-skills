@@ -51,3 +51,53 @@ Disagreements resolved by the audit's runs: `-M` default (Skill 10, tool 1); `me
 ## Env created
 
 `as-viz-gg34` (WSL `science`, micromamba): R 4.2.3, ggplot2 3.4.4, data.table, gridExtra, gtable, scales, svglite, pysam 0.24.0, samtools 1.24, rmats2sashimiplot 4.0.0, pyGenomeTracks 3.9, seaborn, scikit-learn, pandas. Also `as-viz-gg35` (R 4.4, ggplot2 3.5.2) for the version bisect. Scratch: `F:\OpenScience\as-sashimi-scratch\`.
+
+## 2026-09-21 (fixer: Sonnet; branch `fix/alternative-splicing-sashimi-plots`, worktree `F:\OpenScience\wt\alternative-splicing-sashimi-plots`)
+
+Re-audit of the 2026-09-20 fix: 88, Production Ready, no open P0/P1, 5 P2. All five are corrections and are fixed (5/5). Frontmatter `name` and `description` unchanged. Env: WSL `as-viz-gg34` (R 4.2.3, ggplot2 3.4.4, ggsashimi 1.1.5, rmats2sashimiplot 4.0.0, pyGenomeTracks 3.9, Jutils 1.5, pysam 0.24.0), `as-core` (regtools 1.0.0, samtools 1.24, bedtools 2.31.1), `as-rleaf` (leafcutter 0.2.9). Data: the audit's planted 3v3 set and real chrX 2v2 BAMs; scratch under `F:\OpenScience\as-sashimi-scratch\p2\`.
+
+Commits: `56e90cc` fix (P2s + small redundancy), `285eff8` split into `references/`, ``0669554`` runnable code to `scripts/`.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+| --- | --- | --- | --- | --- |
+| pyGenomeTracks junction arcs cropped | P2 | `[junctions]` `height = 2` -> `5`; sentence that arc height grows with junction span, so raise `height` or narrow `--region` until the widest arc is whole, and look at the figure | ran: planted locus at height 2 (cropped, as the audit saw), 5 and 8 (whole); `compact_arcs_level = 1` still cropped, `= 2` flattened and overlapped, so not used; real chrX PDZD11 region at height 5 (arcs whole); images viewed | height alone is the fix |
+| VOILA block incomplete for MAJIQ V3 | P2 | V2 form (`splicegraph.sql` + `.voila`) kept and the V3 form added (`sg.zarr` + `.psicov` + `.sgc`); "do not mix V2 and V3 inputs"; generic `splicegraph.<ext>` removed; the not-run statement kept | docs: MAJIQ V2-to-V3 migration page (`biociphers.bitbucket.io/majiq-docs/v2-to-v3.html`, fetched 2026-09-21): `voila view sg.zarr <x>.psicov <x>.sgc`, and "not BOTH v2 and v3 inputs at the same time" | not run: MAJIQ/VOILA is licence-gated |
+| no warning when no arc is drawn | P2 | `plot_sashimi` warns whenever the best junction < `min_junc` (and still drops `--shrink`); `plot_specific_event` takes `min_junc` (default 1, was hard-coded 5); SKILL `-M` bullet states the arc-free rc-0 figure | ran on the real DMD region (0-3 reads per junction): `min_junc=1` no warning, arcs drawn; `min_junc=5` prints both warnings and the SVG has fewer labels (no arcs); `plot_specific_event` default draws arcs, `min_junc=5` warns | default 5 -> 1 matches the batch function, which the 09-20 fix moved for the same reason |
+| `ggsashimi.py` called bare, only cloned | P2 | install block: `export PATH=$PWD/ggsashimi:$PATH` with the note that its `#!/usr/bin/env python` needs pysam | ran: `which ggsashimi.py` fails without the export (rc 1) and resolves with it; `--help` runs; `head -1` shows the shebang; pysam 0.24.0 imports in that python | |
+| batch block needs earlier state; secondary reads counted | P2 | batch section now calls `batch_plot_rmats_events()` and says it reuses the TSV and palette; arc-count table row says ggsashimi counts alignment records (secondary and duplicate included, only unmapped skipped); the interpretation paragraph was cut to one non-repeating sentence | source: `ggsashimi.py` line 177 skips only `is_unmapped`; audit input 4 (2/10 labels matched skipping secondary, 10/10 counting them) | |
+
+Also fixed inline: `batch_plot_rmats_events()` gained `palette=` (the deleted inline batch block passed `-P palette.txt`; the function gave R's red/green).
+
+### Redundancy pass
+`usage-guide.md` already carried only overview, prompts and related Skills (09-20 pass): unchanged. In `SKILL.md`:
+
+| deleted | now |
+| --- | --- |
+| Best Practices row "Use `--shrink` for genes with large introns" | `--shrink` flag bullet (added "keeps exons visible in genes with multi-kb introns") |
+| Best Practices row "For MXE events, plot both alternative exons" | Batch section: the MXE `upstreamES`/`downstreamEE` span already covers both exons |
+| Troubleshooting row "Gene model shifted ... ggplot2 >= 3.5" | Version Compatibility paragraph (same symptom, same fix) and the tool matrix |
+| "exits 0 when it drops a missing BAM, draws an empty region or hits an R error" in the ggsashimi Approach | "ggsashimi: Silent Failures" section (pointer left) |
+| "never so high that no junction passes" in the `-M` bullet | Troubleshooting row "No junctions shown" plus the new arc-free sentence in the bullet |
+| second sentence of "Junction count interpretation" restating the table row | Arc-count table row |
+
+### Split (commit `285eff8`)
+`SKILL.md` 439 -> 260 lines (217 after the scripts step). Verbatim moves: `## rmats2sashimiplot` -> `references/rmats2sashimiplot.md`; `## MAJIQ-VOILA Interactive Viewer` -> `references/majiq-voila.md`; `## leafviz Shiny App` and `### leafviz: Annotation Codes Mismatch` -> `references/leafviz.md`; `## Jutils for Tool-Agnostic Output` -> `references/jutils.md`; `## pyGenomeTracks for Multi-Track Figures` -> `references/pygenometracks.md`. Kept in `SKILL.md`: scope, matrix, decision tree (each affected row points at its file), ggsashimi and batch recipes, interpretation, ggsashimi failure modes, Common Errors, Troubleshooting. Verified: comparing non-blank lines before and after, none lost (only the six decision-tree rows changed, to add the pointer); fences balanced; every moved bash block passes `bash -n`.
+
+### Runnable code to `scripts/` (own commit)
+| old location | new home |
+| --- | --- |
+| `SKILL.md` ggsashimi python block (36 lines) | duplicated `examples/plot_sashimi.py`: replaced by a call to `create_grouping_file` / `write_palette` / `plot_sashimi` plus a 4-line bare `ggsashimi.py` command with a figure-exists test; no new script |
+| `SKILL.md` batch python block (38 lines) | duplicated `examples/plot_sashimi.py` `batch_plot_rmats_events()`: replaced by a call (with the new `palette=`); no new script |
+| `references/rmats2sashimiplot.md` bash block (24 lines) | `scripts/rmats2sashimiplot_events.sh` (args: events file, event type, out dir, b1 list, b2 list, labels; env `FDR`, `DPSI`, `COLORS`; group file built from the replicate counts, not hard-coded 3+3) |
+| `references/leafviz.md` bash block (16 lines) | `scripts/leafviz_run.sh` (args: leafcutter dir, gtf, groups, counts, ds prefix, RData; env `LAUNCH`) |
+| `references/jutils.md` bash block (14 lines) | `scripts/jutils_pipeline.sh` (args: Jutils dir, rMATS dir, meta, bam list, gtf, coordinate, out dir; env `Q`) |
+| `references/pygenometracks.md` two bash blocks (6 + 11 lines: bedGraph, BEDPE) | `scripts/pgt_tracks.sh` (args: out dir, ctrl BAM list, trt BAM list); the `tracks.ini` and the final `pyGenomeTracks` command stay inline |
+
+Not moved: install block (package commands, not a run), the VOILA block (3 lines, not run), the short awk one-liner for GTF filtering.
+
+Scripts run as the SKILL/references invoke them (relative paths, run from a working directory): `rmats2sashimiplot_events.sh` on the planted set (1 PDF; 27,925 B in the first run, same as the audit) and real chrX 2v2 (5 PDFs, group file `GBR: 1-2` / `YRI: 3-4`), a bad `--event-type` (rc 2) and an empty selection (message, rc 0); `pgt_tracks.sh` on planted (BEDPE `153 / 150 / 147` equals an independent pysam per-junction sum over the six BAMs, asserted; figure renders) and with a missing BAM (rc 1); `jutils_pipeline.sh` on real chrX (`clustermap*.pdf`, `sashimi.pdf`, `venn_diagram.png`, rc 0) and on planted; `leafviz_run.sh` on planted leafcutter output (annotation files, `.RData`, app "Listening", HTTP 200, `<title>LeafViz</title>`; a wrong prefix exits 1 with "does not exist"). SKILL blocks run after the edit: the `plot_sashimi` call (18,359 B PDF), the bare command as SVG (labels equal the independent pysam means, `LABELS_OK 6/6`), and `batch_plot_rmats_events` (1 event, 20,548 B PDF).
+
+### Left unfixed
+- MAJIQ/VOILA commands (V2 and V3 forms) are checked against the public docs only: MAJIQ is licence-gated and not installed, so nothing could be run.
+- Jutils leafcutter / MntJULiP / MAJIQ converters: only rMATS input was run; documented as following `--help`.
+- Carried over from 2026-09-20: ggsashimi's `--shrink` crash is an upstream bug (worked around in the example and documented, not patched).

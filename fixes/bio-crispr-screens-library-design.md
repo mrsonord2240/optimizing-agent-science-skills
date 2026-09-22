@@ -37,3 +37,48 @@ per the brief's "keep diffs minimal, no broader coverage" rule:
   a real gene's CDS (TP53, NM_000546.6) pulled live from NCBI's public,
   unauthenticated E-utilities — not just import-checked.
 - Nothing installed into the shared venv or R library; no version changes.
+
+
+# 2026-09-21: P2 fixes, redundancy pass, split
+
+Branch `fix/crispr-screens-library-design` @ `F:\OpenScience\wt\crispr-screens-library-design`, commits `24de7b8` (fix), `f5995db` (redundancy), `41b30ac` (split). Env `crispr-screen-analyst` (Python 3.12, pandas/biopython from the shared venv). Audit: 3 P2s.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+| --- | --- | --- | --- | --- |
+| `find_sgrna_candidates` silently returns 0 candidates for lowercase input | P2 | `cds_sequence = cds_sequence.upper()` at the top of the function, in SKILL.md and in the verbatim copy in `examples/design_library.py` | ran: function extracted from SKILL.md, 900-nt random CDS gives 98 candidates upper and 98 lower, DataFrames equal, spacers uppercase; `design_library.py` re-run exit 0 and `py_compile`d | |
+| Azimuth alternative (CRISPick / `crisprScore::getAzimuthScores()`) unverified here | P2 | none | n/a | left unfixed, see below |
+| SKILL.md single 342-line file, usage-guide duplicates it | P2 | usage-guide de-duplicated; SKILL.md split 337 -> 228 lines into 4 `references/` files | ran: non-blank line multiset compare, ast.parse of every python fence, fence balance | see tables below |
+
+## Left unfixed
+
+- CRISPick / `crisprScore::getAzimuthScores()` unverified: `crisprScore` is not in `crispr-screen-analyst`'s `R-lib` (checked `ls R-lib` and TOOLS.md) and the brief forbids installing into the env; CRISPick is a web portal (no scriptable install). SKILL.md keeps its "verify the call signature" wording, which is accurate.
+- The two `Related Skills` lists (SKILL.md and usage-guide.md) were kept: they are navigation, the brief assigns them to the guide, and SKILL.md's is the repo convention. Not a fact the agent acts on twice.
+
+## Deleted passage -> new home
+
+| deleted (usage-guide.md unless noted) | now |
+| --- | --- |
+| Prerequisites: CRISPOR clone, biopython/pandas/numpy, FlashFry JAR, crisprDesignData | SKILL.md Version Compatibility "Install:" paragraph (garbled comment line and the archived-Azimuth note dropped; SKILL.md already says Azimuth is unusable) |
+| Prerequisites: required inputs; "What the Agent Will Do" step 0 and step 10 | SKILL.md "sgRNA Library Design": stop-and-confirm paragraph and Deliverable line |
+| What the Agent Will Do steps 1-9 | already in SKILL.md sections (decision tree, scoring, filters, controls, oligo); guide now points to SKILL.md. Step 4 "Score on-target with Rule Set 2 / Azimuth" contradicted SKILL.md's "Azimuth must not be called" and step 9 "Twist 92K/244K" was wrong (SKILL.md: Twist ~300 nt; 92K = GenScript, 244K = Agilent); both dropped |
+| Tips 1 (off-the-shelf libraries), 6 (Cas9 vs Cas12a not mixable) | SKILL.md decision tree, "Off-the-shelf first" paragraph |
+| Tips 2 (tissue-specific TSS), 3 (plasmid sequencing), 4 (subpool), 5 (paralog GI), 7 (BE/PE efficiency) | already in SKILL.md: CRISPRi/a Critical nuance, Library QC, Subpool design, Library Composition, base-editor bullet |
+| Library Specification Reference Table, Control Composition table | SKILL.md Genome-Wide Library table (now `references/library-catalog-and-pam.md`), Control Guides table, Quantitative Thresholds (coverage 500x) |
+| SKILL.md Failure Modes "Wrong TSS" | SKILL.md CRISPRi/a "Critical nuance" (mechanism +/-100 bp, 1-10 kb annotation error, symptom) |
+| SKILL.md Failure Modes "Wrong control proportion" | SKILL.md Control Guides "Critical pitfall" (<100 NTC, unstable null, erratic FDR) |
+| SKILL.md Thresholds rows: CRISPRi window, CRISPRa window, NTCs, MIT specificity, library skew | decision-tree table, Control Guides table, Off-Target Scoring table, Library QC table; one pointer line under Thresholds |
+| SKILL.md Common Errors rows: wrong TSS, Gini >0.3 | Failure Modes / CRISPRi-a Critical nuance; pointer line under Common Errors |
+
+## Split (SKILL.md 337 -> 228 lines)
+
+Verbatim moves: `references/crispri-crispra-tss.md`, `references/library-catalog-and-pam.md` (Genome-Wide Library Selection + PAM Variants), `references/oligo-design.md`, `references/failure-modes.md`. SKILL.md keeps the decision tree, scoring taxonomy, ranking code, controls, QC, thresholds, Common Errors, and gets a "Reference Files" index plus pointers at the decision-tree rows, Deliverable, Library QC and Common Errors.
+
+## Runnable code to scripts/ (commit `5a732bb`; SKILL.md 228 -> 186 lines)
+
+| old location | new home | verified |
+| --- | --- | --- |
+| `references/crispri-crispra-tss.md` python block (`crispri_window`, `crispra_window`) | `scripts/tss_windows.py` (verbatim + argparse CLI) | ran: 4 mode/strand outputs asserted; audit `input2_crispri_library.csv` (30 guides) and `input3_crispra_library.csv` (8 guides) all inside the windows the script prints for TSS 0 |
+| `references/oligo-design.md` python block (`build_oligo`) | `scripts/build_oligo.py` (verbatim + argparse CLI) | ran: subpool 1 and 2 outputs asserted exactly (71 nt), lowercase spacer accepted, 20 targeting spacers from audit `input6_design_library_output.csv` build within the 200 nt budget |
+| SKILL.md python block (`find_sgrna_candidates`, `annotate_exon_position`, `select_independent_guides`) | not moved: duplicated `examples/design_library.py` verbatim, so the copy was deleted and SKILL.md points to the example; the docstring rationale (5-65% CDS window, spacing filter and TP53 check, lowercase note) kept as prose | example re-run exit 0 |
+
+Both scripts' docstring rationale for the windows stays in `scripts/tss_windows.py`; the reference keeps only the CRISPRa quota caveat as prose. No python fences remain in SKILL.md or `references/`.

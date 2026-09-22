@@ -28,3 +28,38 @@ defect named in `AUDIT.md` (same P0, the skill veto) are addressed above.
 
 `examples/metabolomics_differential.py` and `usage-guide.md` were read and found to have no
 findings against them in this audit; left byte-identical.
+
+## 2026-09-21 -- P2 batch (fixer: fresh Sonnet), branch `fix/metabolomics-statistical-analysis`
+
+Commits: `356417a` (fix + redundancy), `36eff6b` (scripts/). Env: `untargeted-metabolomics-analyst` via `rs.sh`
+(R 4.4.3, ropls 1.38.0). `SKILL.md` 272 -> 241 lines, under the split threshold, so no `references/` split.
+
+### Findings
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+| --- | --- | --- | --- | --- |
+| Pareto-vs-UV VIP sub-check not reconfirmed (example's third fit did not finish in the audit's time budget) | P2 | `examples/metabolomics_stats.R`: `PERM_I` env override (default 1000), guard now a `source()`-able `fit_discriminant_guarded(x, y, scaleC, permI, crossvalI)`, demo wrapped in `if (sys.nframe() == 0)`; SKILL.md says how long it takes and how to smoke-test | ran: full permI=1000 run reached all three fits, real Pareto Q2 0.47 pQ2 0.001, null Q2 0.172 pQ2 0.112, UV Q2 0.442 pQ2 0.001, top-10 VIP overlap 9 of 10 (~30 min, loaded machine); `PERM_I=100` ran to the last line (pQ2 0.01, overlap 9/10); `source()` defines the function only, checked | The first full run died on its last line only because the example was edited while Rscript was still reading it; the PERM_I=100 rerun on the final file completed cleanly. Real-label numbers equal the audit's (seed 1) |
+| Compound-level BH collapse gave 1 false compound (audit read it as a no-promise-of-zero-FDR caveat) | P2 | SKILL.md "Naive FDR under correlation" fix line: BH compound count has non-zero FDR by construction, never report "0 false hits". Put in SKILL.md (canonical), not usage-guide.md as the audit suggested | docs / audit input 5 result (no code change) | The audit called it sampling variation, not a defect; this is the only text change it supports |
+
+### Redundancy pass and scripts
+
+| deleted or moved | new home |
+| --- | --- |
+| usage-guide.md Prerequisites (pip / R install commands, conceptual prerequisites) | SKILL.md top (after Version Compatibility); guide keeps a one-line pointer |
+| usage-guide.md "What the Agent Will Do" (8 steps) | already SKILL.md: decision tree, scaling section, checklist, failure modes; conceptual checks moved to SKILL.md top |
+| usage-guide.md Tips (9 bullets) | SKILL.md: scaling decision rule, Common Errors (scaleC, permI, Holm/hs, Welch, fold change), checklist 6, VIP failure mode, detection-rate failure mode |
+| usage-guide.md References | SKILL.md References (superset); guide points at it |
+| SKILL.md PCA block: Hotelling T2 lines | `scripts/pca_hotelling.R` (`hotelling_t2()` + CLI); SKILL.md keeps the `opls()` PCA lines and a two-line invocation |
+| SKILL.md `fit_discriminant_guarded()` (duplicate of the example's guard) | `examples/metabolomics_stats.R`; SKILL.md `source()`s it and keeps the explanatory prose (also in Common Errors) |
+| SKILL.md Welch/BH Python loop and volcano block (duplicate of `examples/metabolomics_differential.py`) | the example; SKILL.md keeps the 5 trap lines (Welch, log-mean difference, explicit BH) and the hit rule |
+
+`scripts/pca_hotelling.R` run as SKILL.md invokes it (`Rscript scripts/pca_hotelling.R peaks.csv pareto 0.05 t2.csv`):
+MTBLS79 (median-imputed copy) flags 2 of 172, Batch07_C10 and Batch08_C10, T2 crit 8.07, R2X(cum) 0.568 (matches the
+audit); synthetic data with two planted outliers flags exactly S1 (T2 52.62) and S2 (4.76); an input with NAs stops
+with a message. SKILL.md's `source('examples/metabolomics_stats.R')` + `fit_discriminant_guarded()` snippet and
+`source('scripts/pca_hotelling.R')` + `hotelling_t2()` ran on synthetic data (OPLS-DA, VIP length 300).
+`metabolomics_differential.py` ran (7 of 400 hits, all true features, volcano written).
+
+### Left unfixed
+
+None.

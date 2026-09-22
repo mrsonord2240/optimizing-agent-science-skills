@@ -18,3 +18,56 @@ scripts and data: `F:\OpenScience\wt\_fixdata\qc\` — the audit's own CN test s
 
 All 5 `recommendations[]` entries (4 P1, 1 P2) fixed. Nothing left unfixed. `py_compile` clean on
 `examples/screen_qc.py`, and it runs end to end (writes `screen_qc.png`).
+
+## 2026-09-21
+
+Worktree `F:\OpenScience\wt\crispr-screens-screen-qc`, branch `fix/crispr-screens-screen-qc`, from staging `431aa55`.
+Audit: `F:\OpenScience\audits\bio-crispr-screens-screen-qc\eval_report_bio-crispr-screens-screen-qc_result.json` (2 P2). Env `crispr-screen-analyst` (Python 3.12, pandas 3.0.5, numpy 2.5.3, scipy 1.18.1, scikit-learn 1.9.1).
+
+Commits: `1b20045` fix, `3ccf0a8` redundancy, `7aec95b` split, `ea262e3` scripts.
+
+### Findings
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+| --- | --- | --- | --- | --- |
+| `validate_counts()` does not enforce the documented sgRNA-identifier index | P2 | `examples/screen_qc.py`: raises a named `ValueError` when the index is a `RangeIndex` or an integer `0..n-1` index; SKILL.md Input Validation row now says a default index means the ID column was lost | ran: the audit's `input9_validate_counts.py` (pointed at the fixed example, base table given string IDs) passes all 6 documented-failure checks; bare RangeIndex and int `0..n-1` index rejected, `sg{i}` string IDs accepted; example runs end to end on `stage5_mixed.count.txt` | The audit's own `base_table()` used a default index, so it had to be given real IDs once the check existed |
+| Example `STAGE_THRESHOLDS` is a hand copy of SKILL.md's thresholds | P2 | Comment above the dict names the sources (`stage_specific_thresholds()` in `scripts/library_representation.py` / SKILL.md "Library Representation Metrics", and the "Gini Coefficient" stage table) | read against both tables; example re-run after the final edit | Chose the comment option; the example stays standalone by design |
+
+P2 fixed 2/2.
+
+### Redundancy pass (SKILL.md vs usage-guide.md)
+
+| deleted passage | new home |
+| --- | --- |
+| usage-guide "Prerequisites" install block and required inputs | SKILL.md "Install and Inputs"; guide now names the section |
+| "What the Agent Will Do" steps 1-9 | Restate SKILL.md sections; deleted |
+| "What the Agent Will Do" step 10 (hit-calling method by quality grade) | SKILL.md "Interpretation Notes" |
+| Tips: plasmid >=99% detection at >25 reads/guide | Interpretation Notes |
+| Tips: PR-AUC as most diagnostic metric / final gate | Interpretation Notes |
+| Tips: drug screens compare vs vehicle | Interpretation Notes |
+| Tips: CRISPRi/a calibrate against CRISPRi sub-essentialome | Interpretation Notes |
+| Tips: cancer lines always need CN correction; MOI 0.3 non-negotiable; high Pearson / low Spearman -> RRA/drugZ | Already in SKILL.md (Copy-Number failure mode, MOI decision rule, Replicate Concordance) |
+| "QC Decision Reference": Day 0 Pearson with plasmid >0.9 | Interpretation Notes |
+| "QC Decision Reference": other rows | Already in SKILL.md (Stage Hierarchy, Quantitative Thresholds, depth grades, MOI table) |
+| SKILL.md Version Compatibility duplicate `packageVersion('MAGeCKFlute')` bullet | Merged into the R bullet |
+| SKILL.md "Low Day-0 coverage from high MOI" failure-mode mechanism/fix restating the Poisson math | Points at the MOI Verification table and decision rule |
+
+Left as is: the Stage Hierarchy table, the stage-threshold dict/tables and the Quantitative Thresholds table overlap on numbers, but each has a different job (overview, code constants, citation column); collapsing them would drop the sources.
+
+### Split
+
+SKILL.md 434 -> 229 lines (412 at dispatch; +22 from moving guide-only content in). Verbatim into `references/`: `essentialome-recovery.md`, `copy-number-bias.md`, `depth-and-moi.md`, `pca-and-composite-score.md`, `failure-modes.md`. Index "Reference Files" plus a new "Detail" column on the Stage Hierarchy table point at each. Every non-blank line accounted for (differences: the table rows that gained the Detail column, and the "Failure Modes" heading, now that file's H1); all python fences `ast.parse`.
+
+### Scripts
+
+| old location | script |
+| --- | --- |
+| SKILL.md "Library Representation Metrics" code block (`library_representation`, `stage_specific_thresholds`) | `scripts/library_representation.py` |
+| references/copy-number-bias.md `cn_bias_diagnostic` block | `scripts/cn_bias.py` |
+| references/essentialome-recovery.md `essentialome_recovery` block | `scripts/essentialome_recovery.py` |
+
+Ran as SKILL.md invokes them, on the audit data: library table (plasmid 70712 detected, 0.532% zero, skew 4.253) agrees with the example's zero-count output; `cn_bias.py` on the synthetic amplicon gives rho -0.066, gap -0.858, 40 amplified genes, `cn_bias_present: True` (audit: -0.066 / -0.858); `essentialome_recovery.py` on HAP1 TKOv3 canonical counts gives PR-AUC 0.9977, 646 / 797 (audit: 0.9977, 646 / 797), and shuffled LFC gives 0.4495 -> NO SIGNAL. Import-and-assert run also passes. Not moved (under about 15 lines): `gini`, `replicate_concordance`, `depth_audit`, `screen_pca`, `composite_qc_score`; `gini` also has a copy in `examples/screen_qc.py`.
+
+### Left unfixed
+
+None.

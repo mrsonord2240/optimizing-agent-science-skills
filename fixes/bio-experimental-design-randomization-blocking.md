@@ -35,3 +35,29 @@ Deleted-passage -> new-home map (redundancy pass):
 Verification commands ran through `F:\OpenScience\audit-envs\crispr-screen-analyst\r.sh`; no
 packages installed or changed (dplyr/lme4/lmerTest already present per `TOOLS.md`). No R/Python job
 left running.
+
+---
+
+# bio-experimental-design-randomization-blocking — 2026-09-21 (P2 batch)
+
+Worktree `F:\OpenScience\wt\experimental-design-randomization-blocking`, branch
+`fix/experimental-design-randomization-blocking` (from staging main `431aa55`). No commits: the
+Skill needed no byte changes (see below). Env: crispr-screen-analyst (`r.sh`).
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+| --- | --- | --- | --- | --- |
+| usage-guide.md lost its standalone human-skimmable process/tips summary | P2 | none (left unfixed, see below) | n/a | audit itself marks the fix "Optional" |
+
+Left unfixed:
+- **usage-guide "At a glance" summary (P2).** Not a correction: nothing is wrong or drifted, and the
+  audit marks it optional. It would re-add a summary of SKILL.md into usage-guide.md, which FIX_BRIEF
+  "Remove redundancy, every pass" (Sam, 2026-09-17) says is deleted, and it is the very content the
+  2026-09-17 pass removed. Adding it would make the Skill worse under Sam's rule, so it was left out.
+
+Other steps, all no-ops:
+- Redundancy pass: already done 2026-09-17 (usage-guide.md is Overview / Prerequisites / Quick Start /
+  Example Prompts / Related pointer). Deleted-passage map: none this pass.
+- Split: SKILL.md is 229 lines, under the 300 threshold. Not split.
+- scripts/: SKILL.md's inline R blocks are 4-12 line fragments (EU aggregation, seeded block
+  randomization, designit call, lmer call, 2-line flat-vs-mixed contrast); the only long runnable code
+  is already `examples/randomization_blocking.R` (121 lines), which SKILL.md points at. Nothing moved.

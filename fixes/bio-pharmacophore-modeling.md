@@ -37,3 +37,33 @@ None — all 4 P2 recommendations addressed, plus the redundancy pass.
   identical diagnostics across runs (determinism fix).
 - Environment: `F:\OpenScience\audit-envs\cheminformatics-hit-triage-analyst\Scripts\python.exe`,
   RDKit 2026.03.6 (per that env's `TOOLS.md`).
+
+## 2026-09-21 -- P2 batch pass
+
+Worktree `F:\OpenScience\wt\chemoinformatics-pharmacophore-modeling`, branch
+`fix/chemoinformatics-pharmacophore-modeling` (from staging `431aa55`). Commits: `5720d85` (fix), `c83fb1c` (dedup).
+Audit: `F:\OpenScienceuditsio-pharmacophore-modeling\eval_report_bio-pharmacophore-modeling_result.json` (88, 1 P2).
+Env: `cheminformatics-hit-triage-analyst`, RDKit 2026.03.6.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+| --- | --- | --- | --- | --- |
+| `feature_family_prefilter` rejects a same-class active (ritonavir) under strict intersection | P2 | New `min_shared_fraction` parameter (default 1.0 = strict, unchanged); a library molecule passes when it carries at least that fraction of the shared query feature types. SKILL.md "Ligand-based -- diverse actives confound" Fix row (same line, no new line) names it and says it stays a coarse filter | ran: indinavir/saquinavir queries vs ritonavir, caffeine, metformin, aspirin, acetaminophen. Strict: no hits. 0.6: ritonavir admitted, caffeine and metformin still rejected. Default == explicit 1.0. Shipped `__main__` demo unchanged (`CCC(=O)Nc1ccc(C(=O)c2ccc(Cl)cc2)cc1`). `py_compile` ok | At 0.6, aspirin and acetaminophen also pass (they lack the same two types as ritonavir): the feature-family filter cannot separate them, so the docs say to follow with a 3D distance match. Default behaviour is unchanged |
+
+### Left unfixed
+
+- None of the audit's findings. Not moved to `scripts/` (judged illustrations, not runnable pipelines): the
+  Ligand-Based Pharmacophore block (~33 lines, carries deliberately placeholder coordinates that must not be
+  reused, so a script would invite reuse), the PLIP loop (~15 lines, API-shape illustration that prints objects),
+  and `pharmacophore_enrichment` (14 lines, needs a caller-supplied matcher). `examples/pharmacophore.py` already exists.
+- Split: not needed, SKILL.md stays 299 lines (before and after).
+
+### Deleted passage -> new home (usage-guide.md redundancy)
+
+| deleted | now lives in |
+| --- | --- |
+| "What the Agent Will Do" step 3 (ligand-based: align, derive, `EmbedPharmacophore` does not derive consensus) | SKILL.md "Ligand-Based Pharmacophore" Approach (line 72) |
+| step 4 (tolerances from variability/uncertainty/validation) | SKILL.md "Pharmacophore Feature Types" (line 41) |
+| step 5 (convert to search engine's query format) | SKILL.md "Receptor-Based" Approach (line 116) and "Pharmacophore Search" (line 141) |
+| Tip: compare ligand- vs receptor-based, neither more reliable | SKILL.md "Reconciliation" (line 265) |
+| Tip: use bioactive conformer | SKILL.md failure mode "single conformer bias" and Common Errors (lines 218, 275) |
+| Tip: measure specificity/recall on the project dataset | SKILL.md "Pharmacophore Quality Validation" (line 169) |

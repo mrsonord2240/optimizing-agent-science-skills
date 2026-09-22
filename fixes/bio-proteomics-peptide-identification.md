@@ -102,3 +102,48 @@ read-only into the scratchpad.
 ### Nothing needed from Sam
 
 No package was installed and no shared version changed. The worktree is committed and left unpushed.
+
+## 2026-09-21 - six P2 findings, redundancy pass, split, scripts (fixer, branch `fix/proteomics-peptide-identification`)
+
+Audit: `eval_report_bio-proteomics-peptide-identification_result.json` (90, Production Ready, 6 P2s, none left open). Base staging `main` 431aa55. Commits: fix `4067762`, redundancy `13235eb`, split `8fdf52f`, scripts `3bc0227`. Env: `mass-spec-proteomics-analyst` (Sage 0.14.6, Comet 2026.02 rev.2, Percolator 3.09.0, OpenMS 3.5.0 DecoyDatabase, mokapot 0.10.0, pyOpenMS 3.5.0, pandas 3.0.5, numpy 2.5.3). Real data: PXD070049 Astral DDA Conditions A/B/C REP1 and the HYE FASTA; synthetic tables from the audit `data\`. No MSFragger/FragPipe jar was run.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+| --- | --- | --- | --- | --- |
+| dda_search.sh hides Percolator's error | P2 | pre-flight awk check that the pin's `Label` column has both 1 and -1 (prints the counts, exits 1 with the decoy-tag hint); Percolator call wrapped in `if !` that prints `tail -n 5 percolator.log` to stderr | ran: Comet with a `XXX_`-tagged database -> "6113 targets, 0 decoys", exit 1, message on console; fake failing Percolator -> exit 1 with its last line shown; Sage single run unchanged (1,717/222 pin, 1,398 PSMs, 1,367 peptides) | took the audit's second suggestion (check + trap-like tail) rather than `tee` |
+| No shipped route for multi-run pooling | P2 | `MZML` accepts several space-separated paths; Sage gets them in one call, Comet is looped (`-N comet_run<n>`) and the pins merged with the header once; SKILL/cli_route note the pooling recipe | ran: Sage x3 -> 5,006 PSMs / 2,760 peptides (audit: 5,006); Comet x3 -> 20,809 pin rows, 4,120 PSMs / 2,337 peptides | paths with spaces unsupported (stated in the script header) |
+| Zero-decoy stop loses the q-floor hint | P2 | ValueError message now carries the row count and `1/rows` floor (in `scripts/table_fdr.py`, moved from the SKILL.md block) | ran: `pulldown_nodecoy.tsv` -> "...smallest reachable q is 1/33 = 0.030"; `pulldown_topdecoy.tsv` -> 0 kept; rev_ variant -> 2,632 kept | wording is the audit's proposed fix |
+| mokapot/MS2Rescore promised, not routed | P2 | mokapot: command and by-name q-value awk added beside Percolator (`references/cli_route.md`), single/pooled counts stated, Install line, and a Common Errors row. MS2Rescore: claim deleted from the description, decision-tree row, and the taxonomy row (now DeepLC + MS2PIP -> spectral-libraries); Declercq 2022 reference removed | ran: mokapot 0.10.0 on the Sage pins -> 1,406 (single, same as Sage) and 4,970 (pooled; Percolator 5,006, Sage 4,961). Command needs no `--decoy_prefix`; output is targets-only with column `mokapot q-value` | **mokapot 0.10.0 does not run unpatched in this env**: pandas 3.0.5 rejects `pd.to_numeric(errors="ignore")` (`mokapot/parsers/pin.py:238`) and numpy 2.5.3 has no `np.float_` (`qvalues.py:66`). The runs above used a test-only `sitecustomize.py` shim on `PYTHONPATH` (nothing installed, nothing changed in the env). The Common Errors row says so. MS2Rescore is not installed (TOOLS.md: not imported by any Skill; `psm-utils` would pin pyteomics), so "delete the claim" |
+| examples/fdr_filtering.py unreferenced | P2 | cited from Insight 3 (PEP vs q-value) | ran in the audit; text change only, checked the file name against `examples/` | |
+| 366-line SKILL.md, no progressive disclosure | P2 | split (below) | see below | 379 lines after the fix commit -> 200 after the split -> 202 with the scripts line |
+
+Corrections found while moving code (not audit findings): the pyOpenMS FDR block reported 381 PSMs at 1% because `filterHitsByScore` leaves emptied identifications in the list; `scripts/pyopenms_fdr.py` adds `IDFilter().removeEmptyIdentifications` and now prints 311 (audit: 311, max q 0.0096, reloaded idXML has 0 decoy hits).
+
+### Split (SKILL.md 379 -> 200 lines)
+
+Moved verbatim to `references/`: Run a DDA Search + Rescore with Percolator -> `cli_route.md`; pyOpenMS search and FDR -> `pyopenms.md`; results-table and separate-search FDR -> `fdr_from_tables.md`; reference list -> `citations.md`. The database build with the decoy-tag table stays in SKILL.md (every request needs the trap). Reference Files index and two new decision-tree rows plus a pointer on the DDA row. Checked by a multiset comparison of non-blank lines before/after: only the re-pointed lines differ (DDA row, one "built above" sentence, one "code in ... above" sentence, the dropped `## References` heading); python fences `ast.parse`, bash fences `bash -n`.
+
+### Redundancy pass (usage-guide.md 80 -> 47 lines)
+
+| deleted passage | new home |
+| --- | --- |
+| Prerequisites: `pip install pyopenms pandas numpy`, CLI engine list, DecoyDatabase, msconvert/ThermoRawFileParser, BiocManager line | SKILL.md Version Compatibility "Install" line |
+| "Command-line route checked on Sage 0.14.6 ..." + example script sentence | SKILL.md Version Compatibility and the DDA section of `references/cli_route.md` |
+| What the Agent Will Do (7 steps) | SKILL.md Default-when-uncertain line, Insights 1-3, decoy-tag table, Scope |
+| Tips: q vs PEP; raw score; concatenated vs separate; decoys at protein level; decoy tags; rescoring gains; Percolator needs PSMs; few PSMs; open search; PSM vs protein FDR | SKILL.md Insights 1-3, decoy-tag table, `references/cli_route.md` rescoring paragraph, Per-Method Failure Modes, Decision Tree |
+| Tips: "no blanket 2 unique peptides rule" | protein-inference SKILL.md Insight 3 (grep-verified); this Skill's Scope routes protein-level questions there |
+
+### Runnable code to scripts/
+
+| old location | script |
+| --- | --- |
+| `references/pyopenms.md` search block (was SKILL.md "Database Search with pyOpenMS") | `scripts/pyopenms_search.py` |
+| `references/pyopenms.md` FDR block | `scripts/pyopenms_fdr.py` (loads the idXML; `--decoy-string`, `--fdr`) |
+| `references/fdr_from_tables.md` results-table block | `scripts/table_fdr.py` (`--scan/--score/--protein/--out`) |
+| `references/fdr_from_tables.md` separate-search block | deleted; duplicates `examples/separate_search_fdr.py`, which the reference now points to (ran: pi0-hat 0.611, 2,888 kept, true FDP 1.04%) |
+
+Each script run exactly as the reference invokes it: 381 PSMs written / 311 at q <= 0.01; 12,000 spectra, 3,813 decoy hits, 2,632 kept (true FDP 0.72%, unique scans); the `rev_` rewrite gives the same 2,632. The three-line Sage/Comet/MS-GF+ block and the DecoyDatabase block stay inline (config sketches and one-liners; `dda_search.sh` is the runnable form).
+
+### Left unfixed
+
+- None of the six findings. Two caveats: mokapot cannot run unpatched on this env's pandas 3 / numpy 2 (documented, not fixable without changing versions); MS2Rescore was removed rather than routed (not installed).
+- Noticed, not a finding: MSFragger, MaxQuant, MetaMorpheus, X!Tandem and pFind appear in the taxonomy and decision tree without commands. MSFragger's jars are licence-gated here; the others are named for choice guidance only.

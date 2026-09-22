@@ -77,3 +77,60 @@ left alone since collapsing it would break the table's one-stop-lookup purpose a
 named item in the dispatch.
 
 No code changed (moves only, code blocks byte-identical); no R execution required for this pass.
+
+
+## Fix pass on the 3 open P2s, split and scripts (2026-09-21)
+
+Fixer: Claude Sonnet 5. Worktree `F:\OpenScience\wt\causal-genomics-pleiotropy-detection`, branch
+`fix/causal-genomics-pleiotropy-detection`, from staging `main` @ `431aa55`. Audit: upstream `d91ed3d`
+fork audit, 3 P2 findings, none already fixed by the earlier fix (all three are gaps that fix left).
+Runtime: R 4.4.3 via the `mendelian-randomization-analyst` `r.sh`, TwoSampleMR 0.7.9, MRPRESSO 1.0.
+Commits: fix `6484938`, split `30c5cf4`, scripts step `8645346`.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| SIMEX not flagged as able to land further from truth than naive | P2 | SKILL.md NOME failure mode: added a "Caveat" paragraph (report naive and SIMEX slopes side by side with CIs, read against IVW / median / mode); header comment in `examples/simex_egger_correction.R` says the same | docs plus the audit's run 5 (naive 0.666 -> SIMEX 0.854, truth 0.3, IVW 0.314, conmix 0.343) | The example already prints both slopes; no code change |
+| `set.seed` covered only `mr_presso()` | P2 | Moved `set.seed(42)` ahead of `mr()` in the Standard Sensitivity Battery, comment names the weighted-median/mode bootstrap SEs | ran on the audit's `synth_simex.rds` (20 SNPs), block as in SKILL.md with `NbDistribution=500` for speed: two seeded runs identical (median/mode SE 0.0963 / 0.1249, PRESSO global p 0.962); two unseeded runs differ (0.0917 / 0.1293, p 0.958 vs 0.0910 / 0.1209, p 0.974) | `examples/sensitivity_battery.R` already seeds at line 15, before `mr()` |
+| No `references/` split | P2 | Split, see below | line-multiset diff, R fences parsed | SKILL.md 476 -> 251 lines |
+
+All 3 P2s fixed. Nothing left unfixed.
+
+**Split (own commit `30c5cf4`).** Verbatim moves, no non-blank line lost (only the 5 edited pointer
+lines differ), all 7 R fences parse. The audit suggested one `references/pleiotropy-methods.md` with the
+taxonomy and threshold tables; those stay in SKILL.md because every request needs them (scope, decision
+tree, thresholds), and the method-specific blocks moved instead, per FIX_BRIEF.
+
+| SKILL.md section (old) | New home |
+|---|---|
+| Per-Method Failure Modes (all 7 subsections) | `references/failure-modes.md` |
+| CAUSE for CHP-Aware Estimation | `references/cause.md` |
+| MR-RAPS Loss Function and Overdispersion; MR-Clust for Mechanism Heterogeneity | `references/mr-raps-mr-clust.md` |
+| LHC-MR Workflow (with the CAUSE vs LHC-MR table) | `references/lhc-mr.md` |
+| LCV (Latent Causal Variable) incl. gcp table | `references/lcv.md` |
+| Required Supplementary Tables; Anticipated Reviewer Pushback; STROBE-MR Reporting | `references/reporting.md` |
+
+Stayed in SKILL.md: install/version, UHP vs CHP, decision flow, taxonomy, decision tree (rows now point at
+the reference files), thresholds, sensitivity battery, bidirectional MR, reconciliation, Common Errors,
+references, related skills. New "Reference Files" index.
+
+**Redundancy:** already done on 2026-09-17 (section above); no new duplication found.
+
+**Scripts step (commit `8645346`).** No `scripts/` file was created. The only inline block over 15 lines, SKILL.md's
+Standard Sensitivity Battery (26 lines), is a strict subset of `examples/sensitivity_battery.R`, so per the
+brief the copy is deleted and SKILL.md points at the example (seed-once and NbDistribution notes kept).
+Every other block (CAUSE 4, MR-RAPS 5, MR-Clust 8, LHC-MR 3, LCV 3, install 9 lines) is under 15 and stays inline.
+
+| old location | new home |
+|---|---|
+| SKILL.md "Standard Sensitivity Battery" R block | `examples/sensitivity_battery.R` (pointer) |
+
+Found while verifying the pointer target, fixed in the same commit:
+
+| finding | change | verified |
+|---|---|---|
+| `examples/sensitivity_battery.R` crashed at `directionality_test()` (simulated data had no `pval.exposure` / `pval.outcome`) | added both columns | ran the whole example, R 4.4.3, TwoSampleMR 0.7.9, NbDistribution 5000: Steiger 29/30 pass, IVW 0.379 vs planted 0.35, weighted median 0.344, mode 0.332, conmix 0.359 |
+| "All methods agree on direction" printed NA when the PRESSO-corrected row is NA (no outliers) | `na.rm = TRUE` | checked on the run's estimates, file parses |
+| SKILL.md said the example includes SIMEX; it does not | text points at `examples/simex_egger_correction.R` | docs |
+
+SKILL.md 476 -> 251 (split) -> 223 (battery block replaced by pointer).
+

@@ -42,3 +42,50 @@ anndata 0.13.3.post0, mudata 0.4.1. Audit: `F:\OpenScience\audits\bio-single-cel
 - GLUE seed fix is docs-verified only, not run (no Windows wheel for scglue in this
   env) — flagged in the commit message and here so a re-auditor knows it needs live
   verification if a scglue-capable environment becomes available.
+
+# 2026-09-21: P2 pass, split, scripts
+
+Worktree `F:\OpenScience\wt\single-cell-multimodal-integration`, branch `fix/single-cell-multimodal-integration`
+off staging `main` 431aa55. Commits: `3700283` (fix), `532bebc` (split), `7394506` (scripts). Env
+`single-cell-transcriptomics-analyst`: Seurat 5.5.0, Signac 1.17.1, scvi-tools 1.5.1, mudata 0.4.1.
+Audit: 3 P2s. SKILL.md 341 -> 152 lines (308 at start; the bridge example added 33).
+
+## Findings
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| Prerequisites: `pip install scglue` has no platform caveat | P2 | Comment on the install line: no Windows install (pybedtools -> pysam has no wheel), use WSL/Linux/macOS or skip | ran: `pip install --dry-run scglue` in the audit env fails "Failed to build 'pysam'"; `pip install --dry-run --only-binary=:all: pysam` finds no distribution; scglue 0.4.0 wheel metadata lists pybedtools | pysam reaches scglue through pybedtools, not directly |
+| GLUE seed comment claims the same measured gap as totalVI | P2 | Comment now says the seed is pinned for reproducibility, scglue's documented default is already `random_seed=0`, drift not measured for GLUE | docs (scglue API; the audit re-confirmed the default). Not run: no scglue on Windows | |
+| Seurat v5 bridge integration named, never demonstrated | P2 | New "Seurat v5 Bridge Integration (R)" section (PrepareBridgeReference -> FindBridgeTransferAnchors -> MapQuery) and a pointer in the decision-table row. Chose "write it": Seurat and Signac are installed | ran the block extracted from SKILL.md on synthetic 3-population data (300 reference RNA, 300 bridge multiome, 300 ATAC-only query): 81% of query cells recover the planted type with LogNormalize, 75% with SCT (chance 33%); now also as `scripts/seurat_bridge_integration.R`, 81% | Found and documented: `MapQuery(reference = )` must be the object `PrepareBridgeReference` returned, else "assay used to create the anchorset does not match". The audit's own synthetic multiome ATAC was too weak for this (53%, nothing separates in the LSI), so I planted stronger markers |
+
+## Redundancy pass
+
+Already done in the 2026-09-19 pass (`usage-guide.md` holds overview, prompts and related Skills only, and points at SKILL.md); nothing further to remove. Checked again after the new section: no fact stated twice in SKILL.md/references.
+
+## Split (532bebc), SKILL.md 341 -> 152
+
+Moved verbatim (no non-blank line lost, multiset compare; all R/Python fences parse, bash fence passes `bash -n`):
+
+| old location (SKILL.md section) | new home |
+|---|---|
+| CITE-seq: Denoise ADT, Then Joint Embed (Seurat); CITE-seq: WNN Joint Clustering (Seurat) | `references/cite-seq-dsb-wnn.md` |
+| CITE-seq: totalVI; Mosaic: MultiVI | `references/scvi-totalvi-multivi.md` |
+| Multiome (RNA + ATAC, same cell); MOFA+ | `references/multiome-mofa.md` |
+| Unpaired / Diagonal: GLUE; Seurat v5 Bridge Integration | `references/unpaired-glue-bridge.md` |
+
+Additions: "Reference Files" index, and a file pointer in each decision-table row (WNN, totalVI, MultiVI, MOFA+, GLUE, bridge, DSB). One pointer reworded ("see Multiome section" -> "see `references/multiome-mofa.md`").
+
+## Scripts (7394506)
+
+| old location | new home | verified (ran as SKILL invokes it) |
+|---|---|---|
+| totalVI block (`references/scvi-totalvi-multivi.md`) | `scripts/totalvi_cite_seq.py h5mu out_prefix [--max-epochs]` | synthetic 300-cell CITE-seq with planted types: two separate runs, latent max abs diff 0.0; kNN type accuracy 1.0; own-type foreground probability 0.63 vs 0.25 for other types |
+| MultiVI block (same file) | `scripts/multivi_mosaic.py h5mu out_prefix [--max-epochs]` | synthetic 195-cell mosaic (120 paired, 75 RNA-only, 3 types), default epochs: 91% of RNA-only cells have a same-type nearest paired cell (chance 33%). At `--max-epochs 40` the same data gave 29% (undertrained), so the reference file says to leave epochs at the default |
+| Seurat v5 bridge block (`references/unpaired-glue-bridge.md`) | `scripts/seurat_bridge_integration.R rna.rds multi.rds atac.rds out.rds [ndims first_lsi_dim norm]` | 81% of 300 ATAC-only query cells correct; asserted `predicted.celltype`, `predicted.celltype.score`, `ref.umap` present |
+| DSB block (`references/cite-seq-dsb-wnn.md`) | deleted: duplicates `examples/cite_seq_analysis.R`. Its three caveats (no error on a cell matrix passed as empty droplets, isotype names, `use.isotype.control = FALSE` fallback) kept as prose beside the pointer | not re-run (the example was run in the 2026-09-19 pass) |
+
+Left inline (under 15 lines or not runnable here): Multiome WNN R block, MOFA+ (3 lines), GLUE (no Windows build), the WNN fragment (needs `obj` and `adt_dsb` from the example).
+
+## Left unfixed
+
+- GLUE's `random_seed=0` default and the block itself remain unexecuted: scglue has no Windows install (pybedtools -> pysam), and the WSL `science` distro was not built for this Skill. Needs a Linux env with scglue to measure GLUE drift.

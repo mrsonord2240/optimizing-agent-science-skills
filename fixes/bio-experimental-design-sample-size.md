@@ -54,3 +54,15 @@ Fixer for `experimental-design/sample-size`, worktree `F:\OpenScience\wt\experim
 ### Left unfixed
 
 None.
+
+---
+
+## 2026-09-21 (structure)
+
+Structure pass, worktree `F:\OpenScience\wt\experimental-design-sample-size`, branch `fix/experimental-design-sample-size`. Env: `crispr-screen-analyst` via its `r.sh` (PROPER, ssizeRNA, DESeq2, pwr all load).
+
+- **Split:** none. SKILL.md was 296 lines (under 300).
+- **Moved to `scripts/`** (SKILL.md 296 -> 272 lines; commit `refactor(experimental-design/sample-size): move runnable code to scripts/`):
+  - PROPER block (`estParam` -> `comparePower`) -> `scripts/proper_power.R`. Parametrised by counts CSV, reps, nsims, fc, max_genes, seed; keeps the `oldClass` workaround and `delta = log2(fc) - 0.01`; asserts marginal power is finite and in [0,1]. Ran as SKILL.md invokes it on the audit's `pilot_6v6_counts.csv` (first 1,000 genes, reps 3,6,10,20, `nsims = 8`): marginal power 0.020 / 0.050 / 0.147 / 0.532, `names(powres)` and `summaryPower` printed, assertions passed. A first run on 2,500 genes was killed at a 500 s cap because the machine was loaded; the 1,000-gene run finished.
+  - Pseudobulk-on-donors block -> `scripts/pseudobulk_donor_ssize.R`. Parametrised by cell-counts RDS, donor-condition CSV, fc, fdr, power, maxN, seed. Ran on the audit's `scrna_donor_cellcounts.rds` + `scrna_donor_condition.csv` (8 donors, 3,000 genes): median pseudobulk dispersion 0.005, minimum donors per group 5 (achieved power 0.889), assertions passed. The audit data differs from the fix-pass synthetic pilot cited in SKILL.md (dispersion 0.32, 84 donors), so those numbers stay attributed to that earlier pilot.
+- **Stayed inline:** `ssizeRNA_single`/`check.power` (about 8 lines), `ssizeRNA_vary` with pilot vectors, the DESeq2 pilot-dispersion block (13 lines, under the 15-line bar), the `is.na(n)` guard and the `pwr.t.test` block are all short. The ssizeRNA blocks that are longer are already covered by `examples/sample_size_estimation.R`, so nothing was duplicated.

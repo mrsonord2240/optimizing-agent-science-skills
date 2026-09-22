@@ -82,3 +82,32 @@ Left unfixed: QC report / exclusion-decision template (P2) -- new content, not a
 ### 2026-09-21 addendum: QC report template written (requested by Sam)
 
 The P2 "QC report / exclusion-decision template" left unfixed above is done: `references/qc-report-template.md` (dataset, checks run, exclusion log, with/without sensitivity, design limits, result), pointed to from the loading-rule paragraph, the TMT balance section and the PCA/batch paragraph. Thresholds are not restated in the template; it cites the function columns and the Quantitative Thresholds table. The example row (ctrl_3, 0.30x, 287 of 400 quantified) was checked against a run of `examples/qc_analysis.py`.
+
+## 2026-09-21 (structure)
+
+Branch `fix/proteomics-proteomics-qc`, on top of `c1b85c2`. Commits `144d33f` (split), `1f8616e` (scripts). Env `mass-spec-proteomics-analyst`, shared venv Python 3.12 (pandas 3.0.5, numpy 2.5.3, scikit-learn 1.9.1). No behaviour or claim changed.
+
+**Split.** `SKILL.md` 425 -> 258 lines (220 after the scripts step). Moved verbatim to `references/` (which already held `qc-report-template.md`):
+
+| section | lines | new file |
+|---|---|---|
+| Replicate Correlation, CV, Missingness | 140-250 | `references/matrix-metrics.md` |
+| PCA and Batch Detection (incl. stop-and-ask conditions) | 251-294 | `references/pca-batch.md` |
+| Level-1 Run Metrics From a DIA-NN Report | 316-339 | `references/diann-level1.md` |
+
+Added a "Reference Files" index and decision-tree pointers (replicate-swap row, imputation row, and new rows for matrix metrics, PCA/batch, DIA-NN Level 1). Kept in `SKILL.md`: scope, insight, taxonomy, decision tree, raw-signal check, TMT balance, failure modes, thresholds, Common Errors. Checked line-by-line against the old file: 0 non-blank lines lost except the two decision-tree rows I edited to add pointers; all moved python fences `ast.parse`.
+
+**Scripts.** Old location -> script (functions verbatim, header comment, argparse CLI):
+
+| old location | script |
+|---|---|
+| SKILL.md raw-signal block (`strip_contaminant_rows`, `raw_sample_qc`, `contaminant_fraction`) | `scripts/raw_qc.py` |
+| matrix-metrics blocks (`replicate_correlation`, `cross_group_correlation`, `median_cv_linear`, `geometric_cv_from_log`, `missingness_profile`, `completeness_filter`) | `scripts/matrix_metrics.py` |
+| pca-batch block (`pca_batch_check`, still returns 3 values) | `scripts/pca_batch.py` |
+| diann-level1 block (`diann_level1`) | `scripts/diann_level1.py` |
+
+Run as SKILL.md now invokes them (import via `sys.path.insert(0, "scripts")`, plus each CLI) on `audits/.../data` (clean and failed `proteinGroups`, `sample_annotation.csv`) and the real PXD070049 DIA-NN 2.6.1 report. A verify script exec'd the pre-move blocks from `c1b85c2` and asserted frame-for-frame identical output for every function on both files; also asserted T4 flagged only on `Intensity` in the failed file (0.409x total, 0.814x IDs) and never on `LFQ intensity`, 12 replicate pairs r 0.955-0.967, `PC1 ~ batch` p ~ 7e-8, C2/T3 swap flagged (and only those), 2/1/1 design -> `not_measurable_n1`, batch levels [1,1,1] -> `not_testable`, DIA-NN R^2 0.9994-0.9998 with none flagged and FWHM x1.6 on one run flags exactly one. `py_compile` clean.
+
+**Stayed inline.** `tmt_channel_balance` (11 lines, under the ~15-line bar); it ran on the audit plex A and flags nothing. `examples/qc_analysis.py` unchanged (synthesizes its own data, not a copy of these blocks). Also removed a stray user name from the header I wrote in `references/pca-batch.md`.
+
+Not done here (unchanged from before): DIA-NN "High precision" claim still untested.

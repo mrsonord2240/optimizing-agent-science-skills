@@ -14,3 +14,40 @@ Scope: Sam's 2026-09-16 override — fix all four open findings for this Skill.
 ## Unfixed
 
 None.
+
+---
+
+# 2026-09-21 fix pass (P2 batch)
+
+Branch `fix/metabolomics-lipidomics` (worktree `F:\OpenScience\wt\metabolomics-lipidomics`, from staging `431aa55`). Commits: `41ca37c` fix, `bfa3712` redundancy, `f84e29f` scripts. SKILL.md 251 -> 203 lines (under 300, no split needed). Env `untargeted-metabolomics-analyst`: R 4.4.3, lipidr 2.20.0, pygoslin 2.2.5.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+| --- | --- | --- | --- | --- |
+| istd-coverage guard misses Class=NA rows (`table()` drops NA) | P2 | explicit `is.na(Class)` check before the `table()`; drops the rows with a warning naming them (a hard `stop()` would have broken the shipped example, since lipidr's own bundled export has one NA row) | ran | Reproduced 1/279 (`PI 34:1p`, rowname 82) on lipidr's bundled raw export; after the fix `normalize_istd` completes 278 x 56; coverage guard still stops naming `LPC` when the LPC standard is removed from the input |
+| No detection for un-converted `;O#` names | P2 | post-import Class=NA check that warns naming each row and, when `;O` remains, says to run `to_lipidr_sphingoid()`; Common Errors row updated | ran | Audit synthetic table plus `Cer/SM ;O2` and `HexCer ;O1` rows: unconverted -> 4 flagged with the hint; converted -> 0 NA, classes Cer/HexCer/SM |
+
+## Left unfixed
+
+None.
+
+## Scripts (FIX_BRIEF "Runnable code goes in scripts/")
+
+| old location | new home | run |
+| --- | --- | --- |
+| SKILL.md Load/Normalize: `to_lipidr_sphingoid()` + Class=NA check | `scripts/lipidr_import_checks.R` | CLI and `source()` on the synthetic table, assertions on flagged/converted rows |
+| SKILL.md ISTD block (raw load, NA drop, coverage guard, `normalize_istd`, plot) | `scripts/istd_normalize.R` | bundled data (278 x 56, CSV + PNG), explicit-args run (byte-identical CSV), LPC-standard-removed run (stops naming LPC) |
+| SKILL.md Goslin block | `scripts/honest_level.py` | 7 names incl. sum-composition, ether, plasmalogen: 0 exceptions |
+| SKILL.md `de_analysis` block | deleted, duplicated `examples/lipidomics_workflow.R` (pointer left) | example run, exit 0 |
+
+## Redundancy pass: deleted passage -> new home
+
+| deleted | new home |
+| --- | --- |
+| usage-guide Prerequisites (BiocManager, pip, inputs) | SKILL.md header bullet "Install: ... Inputs: ..." |
+| usage-guide Tip "identified-lipid count is a vanity metric" | SKILL.md, end of Honest Annotation-Level Assignment |
+| usage-guide Tip "single-software IDs need orthogonal validation (ECN/RT, second adduct, CCS, MS/MS)" | SKILL.md Quantitative Thresholds, ~half row |
+| usage-guide Quick Start, What the Agent Will Do, other Tips | already in SKILL.md (hierarchy, thresholds, failure modes, Version Compatibility); deleted |
+| SKILL.md pygoslin code comment (verified on four names) | Common Errors `RuntimeException` row |
+| SKILL.md ISTD comments (factor=1, cross-class ratios) | prose bullets under Class-Based Internal-Standard Quantification; the guard text also lives in `scripts/istd_normalize.R` |
+
+Noticed: `examples/lipidomics_workflow.R` prints `NA` among the lipid classes (the same unparsed `PI 34:1p`); harmless there, left as is.
