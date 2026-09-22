@@ -94,3 +94,29 @@ untouched. R only through the env's `r.sh`.
 **Stayed inline:** the `focus finemap` CLI calls (about 10 lines, a single command; the example
 `focus_finemap.sh` holds the long form), the MA-FOCUS call, the `focus import` one-liner, and the
 pyfocus `sed` patch block in Tool Install Notes (8 lines, and Common Errors points at it).
+
+
+# Final-pass Phase 1 (2026-09-21)
+
+Worktree `F:\OpenScience\wt\causal-genomics-transcriptome-wide-association`, branch
+`fix/causal-genomics-transcriptome-wide-association` @ `3e246f1`. Walked every runnable block in the
+Skill (not just what the prior fixer touched) from a fresh scratchpad venv/clone, per
+`FINAL_PASS_BRIEF.md`. Full detail:
+`F:\OpenScience\audits\_final_pass\bio-causal-genomics-transcriptome-wide-association\CHECKPOINT.md`.
+
+| finding | priority | change | verified | notes |
+|---|---|---|---|---|
+| `examples/focus_finemap.sh` / `references/focus-finemapping.md` `LD_REF_PREFIX` written FUSION-style, chr-templated (`1000G_EUR/chr`) | P2 | `focus finemap`'s `ref` arg goes straight to `pandas_plink.read_plink()` (exact prefix or real glob only, no chr-substitution); fixed to a single combined prefix + glob alternative note; Common Errors row added | ran | Found only by testing `read_plink()` directly against the audit's real fusion LD fixture; the literal chr-templated path 404s exactly as predicted |
+| `examples/s_predixcan_pipeline.sh` Step 3 filter used `awk -F','` against `SMulTiXcan.py --output *.csv` | P2 (silent-wrong-answer) | `SMulTiXcan.py` hard-codes `sep="\t"` regardless of extension (`metax/cross_model/Utilities.py:50`); filter fixed to `-F'\t'`; Common Errors row added | ran | Old filter returned 0 rows silently on a real S-MultiXcan run; fixed filter correctly isolates the true-signal gene |
+
+Everything else re-verified with no defect found: pyfocus pin+patch (fresh scratchpad venv,
+`build_focus_db.py` + `focus finemap`, real PIP output matching prior ground truth), FUSION pipeline
+(`scripts/fusion_twas.sh` with the documented `drop=FALSE` patch, exact match to prior ground truth),
+`SPrediXcan.py`/`SMulTiXcan.py` against real audit fixtures (exact match to FUSION's independently
+computed TWAS.Z). Confirmed the shared `twas-venv` is still unpatched (pandas 3.0.5) -- the
+private-scratchpad-venv approach for pyfocus remains correct; nothing installed or changed in any
+shared env this phase.
+
+**Still blocked:** `focus import ... fusion` (mygene+rpy2 route) needs R built as a shared library,
+which this machine's runtime R is not. Already documented with a verified working alternative
+(`scripts/build_focus_db.py`); not a new gap, not chased further.
