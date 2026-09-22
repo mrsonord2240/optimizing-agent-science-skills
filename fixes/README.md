@@ -36,3 +36,5 @@ Items a fixer saw and left because the pass was scoped to something else. Added 
 | bio-differential-expression-deseq2-basics | description lacks the pseudobulk trigger; "what to report" block | needs Sam's call (recommended: add) |
 | bio-workflows-proteomics-pipeline | FragPipe route deleted until MSFragger/IonQuant/diaTracer jars arrive | licences requested |
 | bio-experimental-design-multiple-testing | `scripts/ihw_safe.R` has no timeout; one IHW child hung (130 s CPU) and the wrapper would wait forever | a timeout changes behaviour; structure-only pass |
+| bio-sam-bam-basics | DRAGEN MAPQ row -- Illumina-licensed hardware/software, no public install path | needs a licence/instance or a real DRAGEN BAM |
+| bio-sam-bam-basics | Cell Ranger itself (STARsolo now stands in for its MAPQ/CB/UB behavior) -- 10x gates the download behind account registration | needs that registration or a real Cell Ranger BAM |
