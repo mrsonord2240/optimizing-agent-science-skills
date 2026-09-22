@@ -100,3 +100,24 @@ Small edits made while moving: the script guards `is.null(outcome_dat)` before `
 
 Stayed inline: the correlated-IVW blocks (10 and 6 lines, fragments that need `dat` and `ld`), the Steiger 5-line block, the VEP bash and install blocks (short, or need VEP/downloads).
 Not run: `phewas_curated_endpoints.R` against the live catalogue (OpenGWAS needs a JWT token).
+
+---
+
+# 2026-09-21 final pass, phase 1 (Sonnet 5)
+
+Worktree `F:\OpenScience\wt\causal-genomics-proteome-mr-drug-target`, branch `fix/causal-genomics-proteome-mr-drug-target`, commit `b1df50d`. Walked every runnable block in the Skill (not just what earlier passes touched), following `process/FINAL_PASS_BRIEF.md`. Checkpoint: `F:\OpenScience\audits\_final_pass\bio-causal-genomics-proteome-mr-drug-target\CHECKPOINT.md`.
+
+| finding | priority | change | verified | notes |
+|---|---|---|---|---|
+| `references/failure-modes.md` Reverse-causation snippet (`steiger_filtering()` -> `dat[dat$steiger_dir,]` -> `directionality_test()`) crashes `replacement has 0 rows, data has N` | P1 | added `dat$samplesize.exposure`/`dat$samplesize.outcome` before `steiger_filtering()`; one-line caveat for binary outcomes (need `ncase`/`ncontrol`/`prevalence` instead) | ran: crash reproduced on `dat` built exactly the way `examples/cis_pqtl_mr.R` builds it (no `samplesize_col` anywhere in this Skill's own `format_data()`/`read_outcome_data()` calls); literal fixed block re-run clean, `steiger_dir` all TRUE, `directionality_test` `correct_causal_direction=TRUE`, p=9.2e-31 | TwoSampleMR 0.7.9; root cause is `add_rsq()`'s internal `ind1` check silently going to zero rows and never creating `effective_n.<what>`, which the next step assumes exists |
+| `references/correlated-instruments.md` `mr_ivw` namespace + sign-alignment recipe, previously only stub-verified | check | none needed | ran for real: `genetics.binaRies` (real plink 1.9) was already installed in this env's shared R-lib (not by me); ran `ld_clump()`/`ld_matrix()` against the real 957-individual/14389-SNP panel already cached at `...\tools\src\plink2R\data.bed` (8 real chr1 SNPs, PCSK9 +/-1Mb); deliberately swapped one SNP's A1/A2 and confirmed the `with_alleles=TRUE` row-name convention flags it, and realigning + re-running `mr_ivw` recovers the identical estimate (diff = 0) | converts the prior pass's "sign-flip not run (no plink reference)" line to verified; no doc text changed |
+| `examples/cis_pqtl_mr.R` | check | none needed | regression: IVW 0.4264134 (p 1.3e-49), PP.H4 0.9999999, 6->5 instruments after PAV exclusion — identical to the last fix pass | no drift |
+| `examples/phewas_drug_target_mr.R` full-outcome loop | check | none needed | regression with a corrected stub (previous stub had a fixed-allele bug that zeroed every outcome; fixed for this run only, not shipped): 151/151 filtered outcomes scanned, and for the first time the merge/Bonferroni/forest-input/`write.table` steps after the loop also ran clean | |
+| `scripts/phewas_curated_endpoints.R` | check | none needed | regression: clean run, exit 0, real 131-row output file, against a fresh 300-endpoint synthetic catalogue + 8 real significant cis-pQTLs | still not run against the live catalogue (needs an OpenGWAS token) |
+| SKILL.md R/bash blocks, package versions | check | none needed | R install block and both bash blocks parse (`parse()`, `bash -n`); MendelianRandomization 0.10.0, TwoSampleMR 0.7.9, coloc 5.2.3, ieugwasr 1.1.0.9000 all match every version claim in the Skill | |
+
+## Left unfixed (checkpoint, needs a decision)
+
+- `scripts/phewas_curated_endpoints.R` and `examples/phewas_drug_target_mr.R` against the live OpenGWAS catalogue — needs an OpenGWAS JWT token.
+- `1kg.v3.tgz` 1000G EUR download (~1.5 GB) in SKILL.md's Tool Installation Notes — not downloaded this phase (judged not worth it); the plink/LD mechanism it supports is now independently verified against a different, already-cached real panel instead.
+- Ensembl VEP (SKILL.md PAV Annotation section) — never run; not installed here (real GRCh38 cache is itself multi-GB); checked against VEP's own documented flags only.
