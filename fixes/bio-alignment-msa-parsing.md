@@ -94,3 +94,21 @@ Verified: no non-blank line lost (two lines edited to add pointers), 26 fences, 
 | `references/consensus.md` `is_nucleotide` + `consensus_sequence` block (27 lines) | duplicate of `examples/consensus_sequence.py` and `msa_utils.is_nucleotide`: replaced by import, usage and signature note |
 
 Ran as SKILL.md invokes them (from the Skill directory): `filter_sequences.py` CLI with `--dedup`, `--id-pattern`, `--max-gap-fraction`, the all-removed error, and Pfam PF00042 Stockholm (44 of 73 rows kept at gap fraction 0.2, equal to an independent count, output re-read as Stockholm); the import snippets and `remove_gappy_columns` from SKILL.md.
+
+---
+
+# 2026-09-21: final pass, phase 1 (fixer+auditor same agent)
+
+Skill `alignment/msa-parsing`, branch `fix/alignment-msa-parsing` (worktree `F:\OpenScience\wt\alignment-msa-parsing`), tip `fea02de` -- unchanged. Env `alignment`. Full checkpoint:
+`F:\OpenScience\audits\_final_pass\bio-alignment-msa-parsing\CHECKPOINT.md`.
+
+Walked every runnable block in `SKILL.md`, every `references/*.md` code fence, all 11 `examples/*.py` and `scripts/filter_sequences.py`, from a clean scratch copy, on the real Pfam PF00042 seed, a real HMMER A2M, a fresh synthetic dataset and (for MUSCLE5 column confidence) a from-scratch WSL run on the 8 UniProt globins. Every block reproduced the prior fix log's numbers exactly (Neff 66.08/73.00, gap total 1943, conserved cols 17/77, MI-APC top pair 2.627 <= null 2.671, `filter_sequences.py` 44/73 kept, MUSCLE5 "CC min 148, avg 150, max 152, best acb.2" and 11/155 columns below CC 0.9); no regression found.
+
+One open item resolved without a text change: the Cocco et al 2018 citation (previously "not checked against the paper, no access") is confirmed accurate against IOPscience/PubMed (Reports on Progress in Physics 81(3):032601, Jan 2018) -- the Skill already cites it only as background, so nothing needed correcting.
+
+No code or prose change made this phase; no commit (nothing changed on the branch).
+
+## Left unfixed (out of this Skill's scope, not blocked)
+
+- `alignment/alignment-io`'s A2M-padding note: a different Skill's file; needs that Skill's own fixer.
+- MI-APC/Neff pure-Python pair loops (not vectorised) and the raw-MI null's blind spot on singleton-residue coupling in very small alignments: documented, inherent properties, not incorrect output.
