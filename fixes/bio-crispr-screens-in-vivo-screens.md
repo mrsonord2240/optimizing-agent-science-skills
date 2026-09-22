@@ -60,3 +60,24 @@ Also (redundancy pass, no audit finding): the inline `meta_analyze_animals` bloc
 | Tips: metastasis screens per-site | SKILL.md Failure Modes, "Tumor heterogeneity" fix |
 | Decision Cheat Sheet, Thresholds tables | SKILL.md "Syngeneic vs Xenograft vs PDX" and "Quantitative Thresholds" |
 | Validation Checklist | SKILL.md "Validation Checklist" (100 reads/sgRNA item dropped, see above) |
+
+## 2026-09-21 (final-pass Phase 1, commit afcf1e6 on fix/crispr-screens-in-vivo-screens)
+
+Env: crispr-screen-analyst. Walked every runnable block (not just what earlier passes touched) and
+re-ran each independently against synthetic data, per `process/FINAL_PASS_BRIEF.md`.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+| --- | --- | --- | --- | --- |
+| `mageck count`'s own QC-report writer crashes (`re.error: bad escape \U`) when an absolute Windows path containing `\Users\...` is passed to `--list-seq`/`--fastq`/`--output-prefix`; counting itself completes correctly first | P2 (not in the prior audit — found during this pass's own runs) | Added a "Windows path note" after the `mageck count` block and a Common Errors row, checked on MAGeCK 0.5.9.5 | ran — reproduced the crash with an absolute path containing "Users", then confirmed it disappears with relative filenames (as SKILL.md's own example already showed) and with forward-slash absolute paths | Upstream MAGeCK bug (unescaped `re.sub` replacement string), not something the Skill's own code can fix; documented as a workaround |
+
+Also re-ran, independently, all three of the Skill's runnable blocks end to end (not just parsed):
+`mageck count` on a 6-sample synthetic FASTQ set (exact count recovery), `mageck mle` with SKILL.md's
+exact design matrix on a 5-animal/60-gene table (Wald p-values recover planted hits), and
+`examples/per_animal_meta_analysis.py` re-edited per SKILL.md's own instructions and run against the
+pre-fix audit's 6-animal synthetic data (4/5 hits + 1 flagged for review, 0 false positives — matches
+SKILL.md's stated numbers exactly). See `F:\OpenScience\audits\_final_pass\bio-crispr-screens-in-vivo-screens\CHECKPOINT.md`
+for full detail.
+
+### Left unfixed
+
+Nothing. No open findings from the prior audit, no revisit-list entries for this Skill.

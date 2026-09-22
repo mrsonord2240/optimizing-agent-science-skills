@@ -71,3 +71,17 @@ Ran as SKILL.md invokes them, on the audit data: library table (plasmid 70712 de
 ### Left unfixed
 
 None.
+
+## Final pass, Phase 1 — 2026-09-21
+
+Same worktree/branch, tip `ea262e3` (no new commits this phase — nothing needed fixing).
+Checkpoint: `F:\OpenScience\audits\_final_pass\bio-crispr-screens-screen-qc\CHECKPOINT.md`.
+
+Independently re-verified every claim in the 2026-09-21 pass above (library representation, CN-bias
+two-rule diagnostic, essentialome PR-AUC on real HAP1 TKOv3 data plus a new shuffled-LFC negative
+control, the shipped end-to-end example, and the `validate_counts()` sgRNA-index fix against 7 cases
+including two not in the original audit script) and ran the five short inline blocks that stayed in
+SKILL.md/references/ (`gini`, `replicate_concordance`, `depth_audit`, `screen_pca`,
+`composite_qc_score`) against `stage5_mixed.count.txt` — all real, non-degenerate output. Also
+confirmed `library(MAGeCKFlute)` loads via the env's `r.sh` (1.99.2001). No defect found; nothing
+left unfixed.
