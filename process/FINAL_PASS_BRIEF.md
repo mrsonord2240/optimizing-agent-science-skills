@@ -74,6 +74,11 @@ read as one later.
 
 - Never write in `GPTomics__bioSkills`, other worktrees, or the builder. Do not push, merge, rebase,
   or remove your own worktree.
+- **Never delete an `install.lock` or `R-lib*/00LOCK-*` directory you did not create yourself**, even
+  one that looks stale — another session's install may still be using it. If your own install is
+  blocked by one, wait, or move to a different env/side-library instead of removing it. (2026-09-21:
+  an agent `rm -rf`'d another install's lock; no process turned out to be using it at the time, but it
+  was a real near-miss and the check happened after, not before.)
 - **Never run `git reset --hard` (or any history-rewriting command) in the records repo**
   (`F:\optimizing-agent-science-skills`) — other agents commit and push there concurrently. If your
   push is rejected or your local state conflicts with what is on `origin`, stop, leave your fix log

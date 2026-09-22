@@ -134,3 +134,22 @@ Found while verifying the pointer target, fixed in the same commit:
 
 SKILL.md 476 -> 251 (split) -> 223 (battery block replaced by pointer).
 
+## Final-pass Phase 1 (2026-09-21)
+
+Fixer: Claude Sonnet 5. Same worktree `F:\OpenScience\wt\causal-genomics-pleiotropy-detection`,
+branch `fix/causal-genomics-pleiotropy-detection`, on top of `8645346`. Commit `5c1c030`. No revisit-list
+row named this Skill; walked every runnable block per `FINAL_PASS_BRIEF.md`, not just what earlier
+passes touched.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| `examples/cause_analysis.R` crashes 100% of the time as shipped: only ~55-60 of the intended 150 "significant" SNPs actually cleared p<5e-8; `cause()` crashed hard on the resulting <100-SNP fit (`Error in -1 * comp[2, 1] : non-numeric argument to binary operator` in `in_sample_elpd_loo`) rather than the graceful wide-CI degradation the script's own WARNING implies | P1 (shipped example crashes) | Fixed the synthetic data so all 150 planted SNPs deterministically clear p<5e-8 (`sample(c(-1,1),...) * runif(n_sig, 0.035, 0.07)`, se 0.006; min |z|=5.83 > the ~5.45 threshold for p=5e-8) | ran | No prior audit or fix pass had ever run `cause()` itself (TOOLS.md only had a `library()` load check) |
+| Deeper defect found underneath the above: installed `cause` 1.2.0.335 (jean997/cause GitHub HEAD) itself crashes against `loo` >=2.6 (env had 2.10.1) -- `loo_compare()`'s return layout changed (leading `model` column, rownames `model1`/`model2` -> `1`/`2`), and `cause`'s `in_sample_elpd_loo()` reads the old layout by position | not a Skill-code bug -- env/dependency incompatibility | Built a side R library `R-lib-cause-loo` (loo 2.5.1, CRAN archive, pure R) + `r_cause.sh` wrapper in the shared env, same pattern as its existing GenomicSEM/lavaan side-library fix; documented in the env's `TOOLS.md`, `SKILL.md` Common Errors, and `references/cause.md` | ran / confirmed by direct `loo_compare()` inspection | No install-lock needed (new, unshared directory); no existing package version changed |
+| `examples/mr_presso_analysis.R` crashes 100% of the time as shipped, on its own hardcoded `set.seed(42)`: 0 outliers detected -> Distortion Test `Pvalue` is `NULL`, not a scalar `NA` -> `if (!is.na(distortion_p) && distortion_p < 0.05)` throws "missing value where TRUE/FALSE needed" | P1 (shipped example crashes) | Guarded the length-zero case (`length(distortion_p) > 0 && ...`) | ran | Reproduced independently first (`debug_presso_distortion.R`) before fixing |
+| `references/lcv.md`'s `RunLCV()` snippet crashes at call time (`cannot open file 'MomentFunctions.R'`): `RunLCV()`'s own internal `source()` is relative to the R session's cwd, not `RunLCV.R`'s location, and the snippet never cwd'd into the clone's `R/` folder; the default `ldsc.intercept=1` also silently mis-estimates without real `n.1`/`n.2`, never shown in the snippet | P1 (shipped snippet crashes) | Added `setwd('LCV/R')` before the call and explicit `n.1 = n_exposure, n.2 = n_outcome` args | ran | Re-ran the corrected snippet and LCV's own upstream `ExampleSimulationScript.R`; both recover planted gcp=1 as gcp.pm 0.87-0.89, p<2.22e-16. This also resolves the env's own prior "SimulateLCV() zero-length output" note in `TOOLS.md` -- that was the earlier session's own test script, not a package defect |
+| `examples/bidirectional_mr.R`, never run by any prior audit or fix pass | not a defect | none needed | ran | Built realistic harmonized TwoSampleMR forward/reverse instrument sets and sourced the file unmodified: forward IVW 0.326 vs planted 0.35 (p=1.1e-9), reverse IVW 0.018 vs planted 0 (p=0.73, correctly null), correct interpretation printed |
+| `examples/simex_egger_correction.R`, re-verification | not a defect | none needed | ran | Built a harmonized `dat` with I^2_GX=0.655 (SIMEX-triggering band): SIMEX 0.387 vs naive 0.289 vs planted 0.3; prior pass's weights-precompute fix still holds |
+| `examples/sensitivity_battery.R`, re-verification | not a defect | none needed | ran | Ran as shipped (self-contained data): IVW 0.379, RAPS 0.368, weighted median 0.344 vs planted 0.35; matches the audit's own recorded numbers |
+
+Nothing left unfixed. Nothing needs Sam. Checkpoint:
+`F:\OpenScience\audits\_final_pass\bio-causal-genomics-pleiotropy-detection\CHECKPOINT.md`.
