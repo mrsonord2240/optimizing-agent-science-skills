@@ -44,3 +44,4 @@ Items a fixer saw and left because the pass was scoped to something else. Added 
 | bio-virtual-screening | GNINA CNN rescoring is Linux+CUDA-only, no Windows binary; needs a GPU-passthrough Docker stack | larger undertaking than a fix pass; same status across three passes now |
 | bio-causal-genomics-effector-gene-prioritization | DEPICT (legacy 2015 Java+Python, 2.3-4.3GB bundle) not installed | Sam, 2026-09-21: skip the install, keep as citation-only (superseded by L2G+PoPS) -- resolved, no further action |
 | bio-causal-genomics-effector-gene-prioritization | FUMA is a registration-gated web platform, needs an account/token | Sam is obtaining this directly, 2026-09-21 |
+| bio-causal-genomics-fine-mapping | PAINTOR not on conda; two backgrounded git-clone attempts stalled | needs a foreground retry, not confirmed a network/repo problem |
