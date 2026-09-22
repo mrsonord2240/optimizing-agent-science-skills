@@ -67,3 +67,23 @@ Env: `cheminformatics-hit-triage-analyst`, RDKit 2026.03.6.
 | Tip: compare ligand- vs receptor-based, neither more reliable | SKILL.md "Reconciliation" (line 265) |
 | Tip: use bioactive conformer | SKILL.md failure mode "single conformer bias" and Common Errors (lines 218, 275) |
 | Tip: measure specificity/recall on the project dataset | SKILL.md "Pharmacophore Quality Validation" (line 169) |
+
+## 2026-09-21 -- final pass, Phase 1 (verification only, no code changes)
+
+Worktree `F:\OpenScience\wt\chemoinformatics-pharmacophore-modeling`, branch
+`fix/chemoinformatics-pharmacophore-modeling`, tip `c83fb1c` (unchanged). Env:
+`cheminformatics-hit-triage-analyst`. No entry in `fixes\README.md`'s Revisit list for this Skill, and
+the prior pass's "left unfixed" was empty, so this phase was pure re-verification, not a fix.
+
+Independently re-ran (fresh scripts, on real data) every runnable block in `SKILL.md` and
+`examples/pharmacophore.py`: the `examples/pharmacophore.py` demo, the new `min_shared_fraction=0.6`
+relaxation (matches the fix log's claim: admits ritonavir, still rejects caffeine/metformin), the
+Ligand-Based `EmbedPharmacophore` block (`can_match=True`, 10/10 embeddings), `pharmacophore_enrichment`
+on a fresh active/inactive set never used in any prior audit (enrichment=inf), and the Receptor-Based
+PLIP block on both PDB 1HSG (27 interactions, matches the audit's 6/15/2/4 breakdown) and PDB 3PTB
+(9 interactions, matches the audit's record). All passed. Full detail in
+`F:\OpenScience\audits\_final_pass\bio-pharmacophore-modeling\CHECKPOINT.md`.
+
+### Still blocked
+
+None.
