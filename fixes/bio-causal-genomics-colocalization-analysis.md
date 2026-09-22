@@ -74,3 +74,21 @@ Test data lived in the session scratchpad (the audit's `data\` folder is empty; 
 **Stayed inline (under 15 lines, or tool not runnable here as a script):** LD-matrix `plink2` command and bigsnpr snippet, eCAVIAR, SMR, PWCoCo (gcta64 + pwcoco) command blocks, moloc and HyPrColoc R snippets (API-shape illustrations of 8-12 lines). No block duplicated an `examples/` script; `examples/coloc_abf_pipeline.R` keeps its own older harmonise without the strand branch (not touched, `examples/` stays as is).
 
 **Left unfixed:** none new. Nothing needs Sam, except noting that `examples/coloc_abf_pipeline.R`'s local `harmonise_summary_stats()` lacks the strand-complement branch that `scripts/harmonise.R` has.
+
+---
+
+# bio-causal-genomics-colocalization-analysis — final pass, Phase 1 (2026-09-21)
+
+Worktree `F:\OpenScience\wt\causal-genomics-colocalization-analysis`, branch
+`fix/causal-genomics-colocalization-analysis`, commit `9266ded`. Checkpoint:
+`F:\OpenScience\audits\_final_pass\bio-causal-genomics-colocalization-analysis\CHECKPOINT.md`.
+
+| finding | priority | change | verified | notes |
+|---|---|---|---|---|
+| `examples/coloc_abf_pipeline.R` `harmonise_summary_stats()` had no strand-complement branch (revisit-list item above) | P2 | Ported the complement-then-same/flip branch from `scripts/harmonise.R` verbatim | ran | Audit's own `input7_harmonise_test.R` table against the extracted function: rs4 (A/G vs complement T/C) now recovered instead of silently dropped; rs3 (A/G vs C/T) correctly kept and sign-flipped, matching `scripts/harmonise.R`'s already-verified behaviour exactly. Full example re-run end to end: no regression, PP.H4=0.999, top SNP = planted causal, 1000/1000 harmonised. |
+
+**Walked every runnable block this phase** (not just the one above): `examples/coloc_analysis.R` (PP.H4=1.000), `examples/regional_plots.R` (3 real PDFs, ggplot2 4.0.3/patchwork 1.3.2/data.table 1.18.2.1 confirmed), `scripts/coloc_abf.R` + MHC-gated variant (PP.H4=1.000 on fresh simulated locus, planted-causal SNP recovered exactly; MHC gate correctly `stop()`s), `scripts/coloc_susie.R` (same locus + in-sample LD, PP.H4=1.000), `scripts/harmonise.R` CLI mode (flip/palindromic-drop correct), `scripts/flag_excluded_region.R` (5 boundary cases correct), and regression re-runs of `examples/coloc_susie.R` / `examples/coloc_susie_multicausal.R` (untouched, still reproduce planted truth exactly). All ran via `r.sh`, real output inspected against planted ground truth, not exit codes.
+
+**Left blocked, not fixed:** `references/moloc.md`'s snippet — `install.lock` in the shared `mendelian-randomization-analyst` env is currently held by another session; moloc's GitHub install was not attempted rather than force past a held lock. `references/ecaviar-clpp.md` and `references/pwcoco.md` CLI recipes — both need compiled C++ binaries this env's own tooling pass already time-boxed out (2026-09-17); PWCoCo also needs an individual-level bfile (a candidate one is already cached for a sibling Skill). Neither is a new finding; both pre-date this pass. SMR + HEIDI and HyPrColoc were not re-run this phase — both already have real, documented end-to-end verification from the 2026-09-18 / 2026-09-21 passes above and neither is gated by the held lock.
+
+Nothing needs Sam yet; see CHECKPOINT.md for what each blocked item needs before Phase 2.
