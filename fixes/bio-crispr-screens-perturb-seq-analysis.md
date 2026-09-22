@@ -62,3 +62,59 @@ genome-wide-perturb-seq.md, multiomic-perturb-seq.md, sceptre-low-moi.md), no co
 
 No script code changes were needed -- all four ran correctly exactly as extracted. Nothing stayed
 inline; nothing needs Sam.
+
+## 2026-09-22 (final pass, Phase 1)
+
+Final-pass agent. Worktree `F:\OpenScience\wt\crispr-screens-perturb-seq-analysis`, branch
+`fix/crispr-screens-perturb-seq-analysis`. Every runnable block in SKILL.md, all four
+`references/*.md`, all four `scripts/*` and `examples/` was walked and actually run this pass -- a
+block that parses is not verified.
+
+**Sparse-layer crash in `scripts/assign_sgrna.py` (found this pass):** the script was fine on the
+audit's dense `synthetic_sgrna.h5ad`, but a sparse sgRNA count layer -- the normal 10X /
+FeatureBarcode case -- crashed it. Sparse `.sum(axis=1)` / `.argmax(axis=1)` return `(cells, 1)`
+matrices, so the threshold mask reached `.obs` as a 2-D array (`pyarrow.lib.ArrowInvalid`) and the
+per-cell `np.where` mask raised `numpy.exceptions.AxisError`. Ravelled both. Verified three ways:
+dense output unchanged (none 0.250 / sg_NTC1 0.150 / sg_GENE_B_1 0.144 / sg_GENE_A_2 0.138 /
+sg_GENE_A_1 0.138 / sg_NTC2 0.130 / multiplet 0.050 over 500 cells); the same data as a CSR layer
+gives 0 assignment mismatches vs dense; and both match an independent recompute from `sgrna_counts.npy`.
+
+**`references/multiomic-perturb-seq.md` API error:** `muon.atac.pp.add_peak_annotation` does not exist
+in muon 0.1.9, and the note claimed the gene / distance / peak-type annotations become columns of
+`sc.get.rank_genes_groups_df`. Corrected to `muon.atac.tl.add_peak_annotation` and to the real
+semantics (`.uns['rank_genes_groups']`, keyed by group). Ran both calls on synthetic MuData: raises as
+written, correct after the fix.
+
+**`references/factor-decomposition.md` wrong FR-Perturb flags:** the documented invocation used
+`--input` / `--perturbations`, which the tool does not have. Replaced with the real argparse flags
+(`--input-h5ad`, `--input-perturbation-matrix` / `--perturbation-column-name`, `--out`), switched the
+comment-only python fence to `bash`, and dropped the unused `import pertpy as pt`.
+
+**`usage-guide.md` redundancy:** "What the Agent Will Do" restated three SKILL.md numbers verbatim
+(>=10 reads; 39-92% across four guides; 1,000+ iterations). Removed; items 8 and 10 now point at
+SKILL.md's Quantitative Thresholds. K=20 kept -- it is not a duplicate.
+
+**`examples/run_pertpy.py` deprecation:** `sc.tl.pca(..., use_highly_variable=True)` is deprecated on
+scanpy 1.12 -- the very version SKILL.md:12 claims the examples were checked on. Changed to
+`mask_var='highly_variable'`; verified byte-identical `X_pca` on real `papalexi_2021()` (max abs diff
+0.0) and re-ran the example end-to-end after the edit.
+
+**Newly run this pass (previously only parse-checked, or never exercised):** `scripts/run_sceptre.R`'s
+file-input branch -- built `input.rds` from the bundled `lowmoi_example_data` + a 3-row
+`discovery_pairs`: 3 rows, p 0.74 / 0.812 / 0.892, all `significant = FALSE`, correct for null pairs;
+`scripts/multiome_differential.py` -- 5/5 planted peaks recovered, and a permuted ATAC feature order
+gives byte-identical `pvals_adj`, so the propagation is index-aligned rather than positional;
+`scripts/mixscape_filter.py` -- 297 KO, 21.2% of perturbed, denominator correct;
+`examples/run_pertpy.py` in full on real `papalexi_2021()` -- 186,490 rows (10 perturbations x 18,649
+genes) x 9 columns; SKILL.md's inline PyDESeq2 fragment verbatim -- documented columns asserted
+present, 22 genes at `adj_p_value < 0.05`, top 20 by `adj_p_value` = exactly the 20 planted effect
+genes; SKILL.md:12's version floors checked against the env (pertpy 1.3.0, scanpy 1.12.4, anndata
+0.13.3, pandas 3.0.5, numpy 2.5.3, scipy 1.18.1, muon 0.1.9 -- all satisfied).
+
+**Left as-is on purpose:** `references/genome-wide-perturb-seq.md`'s ```python fence is comment-only
+(design arithmetic -- library elements vs cells), not a tool claim, so there is nothing to run.
+
+**Blocked (see `CHECKPOINT.md`):** FR-Perturb cannot be executed in this seat -- `python-spams` exists
+only on Anaconda's `defaults`/`anaconda` channel, and `spams` has no py3.12 wheel and needs
+`numpy.distutils`. Seurat is not installed in the env's R library, so `Seurat::MixscapeLDA` /
+`?Seurat::PrepLDA` (SKILL.md:18,28) were confirmed from published docs, not by loading the package.
