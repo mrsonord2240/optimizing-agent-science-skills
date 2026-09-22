@@ -74,6 +74,10 @@ read as one later.
 
 - Never write in `GPTomics__bioSkills`, other worktrees, or the builder. Do not push, merge, rebase,
   or remove your own worktree.
+- **Never run `git reset --hard` (or any history-rewriting command) in the records repo**
+  (`F:\optimizing-agent-science-skills`) — other agents commit and push there concurrently. If your
+  push is rejected or your local state conflicts with what is on `origin`, stop, leave your fix log
+  as an uncommitted edit, and say so in your report. Do not self-resolve by discarding history.
 - Never kill a process by image name; kill the PID you started. Python on Windows cannot read MSYS
   `/f/...` paths.
 - No paid/authenticated network calls. Public pip/CRAN/Bioconductor/CLI downloads are fine, and now
