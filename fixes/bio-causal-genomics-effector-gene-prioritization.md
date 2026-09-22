@@ -98,3 +98,41 @@ Kept inline (short or API-shape illustrations): the two GraphQL queries, the 8-l
 ### Needs Sam
 
 Nothing.
+
+---
+
+## 2026-09-21 -- final pass, Phase 1
+
+Worktree `F:\OpenScience\wt\causal-genomics-effector-gene-prioritization`, branch
+`fix/causal-genomics-effector-gene-prioritization`. Same agent fixes and will audit (see
+`process/FINAL_PASS_BRIEF.md`); this entry is Phase 1 (fix) only.
+
+Read the "Left unfixed" list above (2026-09-21 entry) and re-checked each against this session's
+broader install permission:
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+| --- | --- | --- | --- | --- |
+| FLAMES had no runnable example ("check the publication's GitHub for the current install path") | P1 (missing referenced executable) | Installed `Marijn-Schipper/FLAMES` (HEAD `159e83a`, v1.1.3) + a new `flames-py38` micromamba env + the 1.7 GB Zenodo annotation bundle (record 12635505); added `references/flames.md`, updated the `Tool Install Notes` bullet, `Reference Files` index, and the FLAMES row in `references/algorithmic-taxonomy.md` | Ran: `FLAMES.py annotate` + `FLAMES.py FLAMES` end to end on FLAMES' own bundled 4-locus dizygotic-twinning example data; correctly recovers `GNRH1`/`FSHB`/`SMAD3`/`ZFPM1` (the reproductive-hormone/TGF-beta genes, precision 0.88/0.87/0.95/0.98) over other locus candidates | Env details in `mendelian-randomization-analyst/TOOLS.md`, "Added 2026-09-21 ... FLAMES" |
+| `examples/multi_evidence_integration.R` (upstream-original, orphaned after the 2026-09-21 `scripts/` split) duplicated `scripts/concordance_scoring.R` and still carried the pre-fix NA-handling bug the split already fixed | P2 (dedup) | Deleted `examples/multi_evidence_integration.R` | Confirmed nothing in `SKILL.md`/`usage-guide.md`/`references/` referenced it (grep); its two extra outputs (per-locus winner, L2G-vs-PoPS flag on a `pops_score` column) are not part of `concordance_scoring.R`'s documented/tested input schema | |
+
+Re-ran (not previously flagged as needing it, but "walk every runnable block" per `FINAL_PASS_BRIEF.md`):
+`magma_genebased.sh`, `pops_run.py` (this time against PoPS' own bundled real genome-wide
+`PASS_Schizophrenia` example -- 18,384 genes, real non-degenerate score distribution, stronger evidence
+than the toy locus-scale run previously on record), `cs2g_lookup.py` (fresh Zenodo download),
+`concordance_scoring.R` (fresh synthetic NA-inclusive table), `opentargets_l2g_query.py` (live API).
+All still produce the results already on record; no version drift found.
+
+### Left unfixed (checkpoint, needs Sam's call)
+
+- FUMA: web platform, registration-gated; needs a FUMA account/token to test live. Full detail:
+  `F:\OpenScience\audits\_final_pass\bio-causal-genomics-effector-gene-prioritization\CHECKPOINT.md`.
+- DEPICT: legacy (2015) Java+Python tool needing a 2.3-4.3 GB data bundle; not attempted this session
+  (judged lower value than FLAMES for the time budget; Skill's own taxonomy already flags it as
+  superseded). Needs a decision: invest a future pass, or downgrade to a citation-only pointer.
+- INQUISIT: no released software exists (paper-supplementary-methods only) -- not blocked, just
+  nothing to install; `SKILL.md` already frames it correctly as a pointer to the paper.
+
+### Needs Sam
+
+Whether DEPICT's legacy install (2.3-4.3 GB) is worth a future pass, or the claim should be downgraded
+to a citation-only pointer the way INQUISIT already is. Everything else about the Skill is ready.
