@@ -101,3 +101,33 @@ Skills (audit confirmed the macs3 pointer is valid); no real Cell Ranger CB/UB B
 `af-dup-extra` is not in `TOOLS.md` (outside my write scope; the coordinator recorded it as note 19). Also seen, not fixed: on a
 missing input the example leaves an empty `<out>.markdup_stats.txt` (samtools markdup opens it before the pipe fails); the BAM
 itself is not written.
+
+## 2026-09-21 final pass, Phase 1 (branch `fix/alignment-files-duplicate-handling`, same worktree, commit 2d29a1e)
+
+Combined fixer+auditor final pass (`FINAL_PASS_BRIEF.md`). Walked every runnable block in `SKILL.md`, `references/*.md`,
+`scripts/*` and `examples/markdup_pipeline.sh` on the audit env's data (WSL `science`, env `alignment-files` + side envs
+`af-picard3`, `af-fgbio2`, `af-mapdamage`, `af-dup-extra`), not just what earlier passes touched.
+
+| finding | priority | change | verified | notes |
+| --- | --- | --- | --- | --- |
+| Missing/empty input leaves an empty `<out>.markdup_stats.txt` (seen, not fixed, 2026-09-20) | P2 | `examples/markdup_pipeline.sh`: `-f` stats now written to `$TMP/markdup_stats.txt` and `mv`d beside `$OUTPUT` only after the record-count check passes, same pattern already used for `marked.bam` | missing input and a 0-byte input now leave neither `out.bam` nor `out.markdup_stats.txt` (previously an empty stats file was left); full assay-gate suite re-run after the change (rnaseq/no-ASSAY refusal, wgs on planted_dups.bam 100/500=20.00%, real spliced RNA-seq BAM refused then `ALLOW_SPLICED=1`->2570/7042=36.50%, 1000G slice 111/9595=1.16%) all still pass, stats file present on every success path | commit 2d29a1e |
+| scRNA `umi_tools dedup` claim only had synthetic CB/UB data behind it | resolved, no code change | streamed a real region (`1:1000000-1300000`) of the public 10x `pbmc_1k_v3` `possorted_genome_bam.bam` via `samtools view` HTTP range access (its `.bai` is public, no auth) instead of downloading the 4.7 GB file | 11845 records, 11588 with `CB:Z:`, 11838 with `UB:Z:`; `scripts/umi_tools_dedup.sh scrna` on it: 11845 -> 9798 (257 reads skipped for missing tags, tool's own warning) | no Skill text changed; this backs the existing claim with real data instead of only the synthetic substitute |
+
+Re-verified without changes needed (matches every previously logged figure, run fresh this pass): SKILL.md 5-step reference
+pipeline (100/500), all fixmate/markdup variants (basic, `-r`, `-s`, `-f`, `--use-read-groups`), Duplicate Statistics/Filter
+Commands, all three Common Errors messages, `references/pysam.md` filter snippet (500->400), `scripts/pysam_markdup.py` +
+`scripts/dup_rate.py` (100/20.00%), `scripts/umi_tools_dedup.sh bulk-paired` (5689) and `scripts/fgbio_consensus.sh single`/`duplex`
+(5646/4042), `references/alternative-markers.md` biobambam2 (100, READ_PAIR_DUPLICATES 50), sambamba (100), samblaster (redone with
+separated stdout/stderr this time: "50 of 250 read ids" = 100), Picard UmiAware (10127), and `mapDamage` (no `--rescale`, stats/plots
+only, on the human BAM: completed in ~5 min, wrote `misincorporation.txt`/`Fragmisincorporation_plot.pdf` etc. — confirms the
+2026-09-20 `--rescale` run's environment still works).
+
+### Still blocked (checkpoint, needs Sam's decision)
+
+- **PacBio HiFi amplicon `pbmarkdup`**: still only verified on the synthetic 50-read HiFi-style BAM/FASTQ from 2026-09-20 (10/50
+  planted duplicates recovered). No real public HiFi amplicon BAM/FASTQ on this machine; searched PacBio's own `pbmarkdup` and
+  `pbAA` GitHub repos this pass (both closed-source, no test data shipped) and found nothing small enough to fetch. Needs a small
+  (<50 MB) public HiFi amplicon BAM or FASTQ. Everything else about the Skill's `pbmarkdup` row is otherwise ready.
+- macs3/ATAC Tn5 shift, `af-dup-extra`/`TOOLS.md`, and the speed claims are no longer open items (see checkpoint file for why).
+
+Full detail: `F:\OpenScience\audits\_final_pass\bio-duplicate-handling\CHECKPOINT.md`.
