@@ -41,9 +41,10 @@ remains inline (the asyncio block is labelled pseudo-code, `estimate_efetch_call
 scripts commit.
 
 ### Left unfixed
-- **No committed regression test (P2).** It would be a new pytest module with mocked Entrez handles: new
-  content, and the Skill ships no test harness or pytest dependency. The guards it would cover are in
-  `examples/robust_download.py` and `examples/batch_fasta.py`, which the audit and this pass ran.
+- ~~**No committed regression test (P2).**~~ **Closed 2026-09-22** — see the final-pass section below;
+  the module was written and the dependency installed. The rest of this bullet is kept so the
+  reasoning trail is readable: it would be a new pytest module with mocked Entrez handles, the guards
+  it would cover are in `examples/robust_download.py` and `examples/batch_fasta.py`.
 
 ### Deleted passage -> new home
 | deleted (SKILL.md) | now |
@@ -51,3 +52,45 @@ scripts commit.
 | `checkpointed_batch_download()` inline block | `examples/robust_download.py` `checkpointed_download()`; SKILL.md "Production batch fetch" |
 | `epost_and_fetch()` inline block | `examples/batch_by_ids.py` `chained_epost_fetch()`; SKILL.md "EPost large ID list" |
 | `verify_fasta_count()` inline block | `examples/batch_by_ids.py` `verify_count()`; SKILL.md "Integrity check" |
+
+## 2026-09-22: final pass, Phase 1
+
+Worktree `F:\OpenScience\wt\database-access-batch-downloads`, branch
+`fix/database-access-batch-downloads`, commit `5877e10`. Env: `database-access`
+(biopython 1.88, Datasets CLI 18.37.0, pytest 9.1.1 installed this pass; EDirect 26.0 in WSL).
+Checkpoint: `F:\OpenScience\audits\_final_pass\bio-batch-downloads\CHECKPOINT.md`.
+
+Two silent-corruption defects, both producing output that parses cleanly and prints a
+correct-looking record count. Neither was visible to the prior passes, and neither is the kind of
+thing a read-through finds — they needed a crash fixture and a byte-level check.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+| --- | --- | --- | --- | --- |
+| Resume path duplicated records | P0-class | `examples/robust_download.py`: checkpoint now records the output byte length at each committed chunk boundary (`{start, total, offset}`); resume truncates to exactly that offset. `truncate_to_offset()` added, `truncate_to_last_newline()` kept as a warned fallback for pre-offset checkpoints | ran | Live, real 368-record BRCA1 query, checkpoint at `start=100`, 150 records + a torn record on disk: pre-fix resume -> **419** records (duplicated run 100-149 plus a 0-length ghost at 150) while printing `Done: 368 records`; post-fix -> **368**, byte-identical to the reference. A crash after a chunk's bytes reach disk but before the checkpoint update leaves *complete* records past the boundary, so the newline heuristic cannot see them. |
+| Text-mode writes turned LF into CRLF | P0-class | All three examples: `robust_download.py` opens `'ab'`; `batch_by_ids.py` and `batch_fasta.py` use `newline=''` | ran | Pre-fix output measured: 2,274,043-byte FASTA with **31,994 CRLF and zero bare LF**. `SeqIO.parse` still succeeds, so this only shows up as an `md5sum` mismatch against the FTP manifest — and the Skill itself directs users to checksum verification. All four real downloads now LF-only. |
+| `epost \| efetch -mode webenv` advertised as the Entrez Direct route | P1 | SKILL.md corrected to `epost -db <db> -input ids.txt \| efetch -format fasta`; new "Entrez Direct from the shell" section with the runnable block previously only named | ran / help | `-mode` selects the response transport (`text, xml, asn, binary, json` per `efetch -help`), not the record format. The invalid value does not error: efetch falls through to a UID-list request (`rettype=uilist`, visible in the emitted curl line), exits 0, writes an empty FASTA. EDirect 26.0, same input: `-mode webenv` -> 0 records / 212 bytes; `-format fasta` -> 3 records / 22,122 bytes. |
+| No committed regression test | P2 (open since 2026-09-21) | `examples/test_robust_download.py` — 7 network-free pytest tests, ~3 s; pytest 9.1.1 installed into the audit env under an install lock | ran | **Confirmed non-vacuous:** the two resume tests fail against the pre-fix module (4 failures total) and pass against the fixed one. |
+| `datasets_cli_genome()` dead code | (doctrine) | Renamed to `datasets_download()` and made reachable behind an opt-in `--datasets` flag; large pulls stay behind the flag so an import can never fire a hundreds-of-GB download | ran | The Datasets route existed only as `print()` text. Real download verified end-to-end: `GCF_009858895.2`, 22,246 bytes in 1.3 s, exit 0. Also replaced a raw `FileNotFoundError` traceback with an actionable message plus a `$DATASETS` override. |
+| Version banner and per-file headers stale | P2 | `BioPython 1.83+ / Datasets CLI 16.0+ / Entrez Direct 21.0+` -> the versions actually verified: 1.88 / 18.37.0 / 26.0, dated | ran | All three verified live. |
+| "Checkpoint corruption / partial chunk" stated the disproved remedy | P2 | Replaced with two accurate failure modes (*Resume duplicates records*, *Partial record at the end of the file*); added *Output bytes differ from the source payload* (the CRLF trap); added four Common Errors rows | ran | The old text told users to "truncate at the last newline", which is exactly the fix this pass disproved. |
+
+### Test-fixture gotcha worth keeping
+NCBI separates FASTA records with a **blank line** (`...TCCA\n\n>NM_...`). A splitter that consumes only
+one `\n` silently drops the separator and shifts every byte offset by 99 bytes over 100 records —
+which cost real debugging time before the fixture was corrected to assert
+`b''.join(records) == reference`. The committed fixture reproduces the separator for the same reason.
+
+### Left unfixed
+- **`datasets` and the EDirect binaries are not on the audit env's PATH.** Datasets lives at
+  `audit-envs/database-access/tools/ncbi-datasets-cli/datasets.exe`; EDirect is in the WSL `science`
+  distro at `/home/sci/micromamba/envs/bio/bin/`. Both routes were verified live via `$DATASETS` and
+  WSL respectively, so this is audit-env layout, not a Skill defect. Needs a decision on whether
+  future passes should expose either on PATH.
+- **Related Skills `entrez-search` / `entrez-fetch` / `entrez-link` were not checked** for the same
+  `-mode`/`-format` confusion. Out of scope for this Skill, but worth a corpus-wide grep.
+
+### Cost
+Phase 1 runtime ~3,750 s (~62 min); tokens 29,293,907. Both figures are **session-scoped, not
+Skill-scoped** — this Skill's Phase 1 ran in the main thread alongside two subagent dispatches, and
+the token sum (233 assistant turns) is dominated by cache reads, so it is not comparable to the
+subagent counts recorded elsewhere.
