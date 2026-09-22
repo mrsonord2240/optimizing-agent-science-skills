@@ -61,3 +61,31 @@ off staging `431aa55`. Env `cheminformatics-hit-triage-analyst`, RDKit 2026.03.6
 | SKILL.md "Reactivity Surrogates", inline `acrylamide_alpha_substitution_count` (17 lines) | `scripts/acrylamide_alpha_substitution.py` (SMILES as CLI args). Ran: `C=CC(=O)N1CCCCC1` -> 0, `C=C(C)C(=O)N1CCCCC1` -> 1, `C=C(Cl)C(=O)NC` -> 1, `CCO` -> None, unparsable -> None |
 
 The KRAS workflow block is a `NotImplementedError` stub (API-shape illustration) and stays inline.
+
+---
+
+# 2026-09-21 final pass, Phase 1 (fixer=auditor, same agent)
+
+Worktree `F:\OpenScience\wt\chemoinformatics-covalent-design`, branch `fix/chemoinformatics-covalent-design`
+(same worktree/branch as the prior pass, tip `41e3766`). Env `cheminformatics-hit-triage-analyst`.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+| --- | --- | --- | --- | --- |
+| "Covalent docking is documentation-only" (prior pass left unfixed as "no runnable local backend") | P2 | Installed AutoDock 4.2.6 (official Scripps Windows build: `autodock4.exe`, `autogrid4.exe`) into the env under `tools\autodock4\`; downloaded the official covalent-docking tutorial (Bianco, Forli, Goodsell, Olson, *Protein Sci.* 2016, DOI 10.1002/pro.2733) with its worked PDB 3UPO example into `tools\ad4-covalent-tutorial\`. Added a paragraph to SKILL.md's Covalent Docking Tools section citing this, giving the exact `autogrid4`/`autodock4` invocation shape, and stating plainly that per-target input prep still needs MGLTools/AutoDockTools (not installed — see below) | ran: `autodock4.exe -v` / `autogrid4.exe -v` print the 4.2.6 banner (exit 0). **Real regression**: `autogrid4 -p 3upo_priotein.gpf` regenerated all 8 grid maps from scratch (exit 0); `autodock4 -p ligcovalent_3upo_protein.dpf` ran the tutorial's 10-GA-run covalent flexible-residue docking from scratch (exit 0, ~11 min) and reproduced the shipped reference `.dlg`: best pose -10.73 kcal/mol here vs. -10.74 kcal/mol reference, both runs clustering 8/10 poses in the -10.6 to -10.7 kcal/mol band with 2/10 GA runs landing in the same ~-9.5 kcal/mol secondary minimum. Rerun logs archived at the env's `smoke\ad4-covalent\`. Added to `TOOLS.md` with full detail | This upgrades the claim from "no runnable local workflow exists" to "the docking engine is installed and independently verified against the paper's own validated case" — but it is **not** a turnkey pipeline for a new target; see below |
+| Attempted to close the remaining gap: input prep for a *new* covalent-docking target needs MGLTools/AutoDockTools (`prepare_receptor4.py`, `prepare_flexreceptor4.py`, `prepare_gpf4.py`, `prepare_dpf4.py`) | P2 | Not fixed | downloaded `mgltools_win32_1.5.6_Setup.exe` (official ccsb.scripps.edu build, 71 MB) into `tools\dl\`; 7-Zip cannot extract it ("Cannot open the file as [PE] archive" — PECompact2/InstallShield-style self-installer, no documented silent-install flag). Did not run it interactively (out of scope for an unattended env, and Windows GUI installers can block/prompt). Logged in `TOOLS.md`'s Blocked-or-gated table | This is a real, still-open gap, not a documentation choice: without MGLTools, this Skill's covalent-docking guidance stops at "the engine works" and cannot walk a user through preparing their own target/ligand end-to-end locally |
+
+## Left unfixed (checkpoint item, needs a decision)
+
+- MGLTools/AutoDockTools install: needs either (a) an interactive Windows session to run `mgltools_win32_1.5.6_Setup.exe`'s GUI installer once (then re-verify `prepare_receptor4.py` etc. under its bundled Python 2 `pythonsh`), or (b) a from-scratch reimplementation of covalent-ligand/flexible-receptor PDBQT + GPF/DPF generation using only already-installed tools (RDKit/meeko/openbabel) — a nontrivial reimplementation of AutoDockTools' atom-typing and torsion-tree logic that risks producing chemically wrong inputs if done hastily, so it was not attempted this pass. Everything else about the Skill is otherwise ready; this is the one item that would need a decision (accept the current "engine verified, per-target prep is external" framing, or grant time/scope for one of the two paths above).
+
+## Verification (this pass)
+
+- `py_compile examples/warhead_classifier.py scripts/acrylamide_alpha_substitution.py` — OK (both unchanged this pass).
+- Re-ran `examples/warhead_classifier.py` — exit 0, all assertions pass, identical output to the prior pass.
+- Re-ran `scripts/acrylamide_alpha_substitution.py` with the exact SKILL.md-documented invocation — matches documented behavior (0 / 1 / 1 / None / None).
+- Verified the KRAS G12C workflow's `add_acrylamide` stub raises `NotImplementedError` with the documented message (it is an intentional API-shape hook, not a defect).
+- `autodock4.exe -v` / `autogrid4.exe -v` — real version banners, exit 0.
+- Full autogrid4 + autodock4 covalent-docking regression on the official tutorial's PDB 3UPO case — see table above.
+
+Nothing needs Sam beyond the MGLTools decision above. Not merged, not re-audited — Phase 2 of this same
+pass covers the re-audit, per `FINAL_PASS_BRIEF.md`.
