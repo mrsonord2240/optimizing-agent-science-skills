@@ -97,3 +97,25 @@ Checked: no non-blank line lost (only the two pointer-edited lines differ), fenc
 | `references/pysam.md` "Filter with Function" `passes_filter` block (16 lines) | deleted: duplicates `examples/filter_bam.py`; text points at `filter_bam.py -q 30 -d -p` |
 
 Run as invoked: `filter_by_bed.py` md5-identical to `samtools view -L` (2608 records; track/comment/space/unknown-contig rows); `filter_bam.py -q 30 -d -p` md5-identical to `-F 3332 -q 30` (1000G BAM); `subsample_pysam.py` 947/9601 at 0.1, same seed byte-identical, 0 partial templates, seeds 42 and 7 share 49 of ~480 templates (10%, independent); `match_read_count.sh --target 3000` 2849 primary reads, `--target 20000` and `--like` a larger BAM copy unchanged.
+
+---
+
+# 2026-09-21/22 (final pass, phase 1)
+
+Branch `fix/alignment-files-alignment-filtering` (worktree `F:\OpenScience\wt\alignment-files-alignment-filtering`). Commit: `<see git log>`. Scratch `F:\OpenScience\wt\afinal-scratch` (deleted).
+
+## Findings
+
+| finding | priority | change | verified | notes |
+|---|---|---|---|---|
+| pbmm2 MAPQ row stated "not run" (no PacBio data in the env) | P2 | Row now states a checked result | ran: synthetic reference with a planted 3 kb exact repeat (from `human/genome.fasta`), 9 PacBio-HiFi-like reads (0.2% substitution), `pbmm2 26.2.99 --preset CCS` -- 5/5 unique-region reads MAPQ 60, 4/4 repeat-region reads MAPQ 0 | pbmm2 was already installed (TOOLS.md); the blocker was the dataset, resolved with a synthetic substitute per FINAL_PASS_BRIEF |
+
+## Left unfixed
+
+None outstanding. Caller rationale for Strelka2, DeepVariant, clair3, Sniffles, cuteSV, Manta, GRIDSS, Delly, SvABA in the assay-aware table stays documentation-only by design: the table's runnable content is the samtools filter recipe (verified), the text already discloses which caller filters were and were not run, and the Skill's `primary_tool` is samtools/pysam, not these callers. Not a blocked item -- judged resolved by the existing disclosure.
+
+## Re-verification (no prior finding, consolidation)
+
+Every bash block in `SKILL.md` and the three `references/*.md` files, plus `examples/filter_bam.py` and all three `scripts/`, re-run end-to-end in one pass on a fresh copy of the skill folder against real data (`human/test.paired_end.sorted.bam`, chr22; 1000G BAM), including the pysam.md inline "Filter by Region" block (previously only `ast.parse`d post-split). All match the counts/equivalences already on record; no regression from the split or scripts move. `py_compile`/`bash -n` clean on all scripts.
+
+Checkpoint: `F:\OpenScience\audits\_final_pass\bio-alignment-filtering\CHECKPOINT.md`.
