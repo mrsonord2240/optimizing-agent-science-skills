@@ -122,3 +122,19 @@ Redundancy pass: already done 2026-09-20 (usage-guide is overview, prompts, poin
 - Sourcing of the assay-threshold table and FREEMIX 1% / 5% cut-offs: needs citations for each cell and a real WGS/WES run; no such data or source access on this machine and inventing citations would be worse. Labelled orientation only instead.
 - VerifyBamID2 FREEMIX / somalier end-to-end: still needs a whole-genome BAM and GRCh38 FASTA that do not exist here; "not run end to end" label stays.
 - bcftools mpileup D/N behaviour: not established, so not written.
+
+---
+
+# Final pass, Phase 1 - 2026-09-21
+
+Branch `fix/alignment-files-bam-statistics` (same as the P2/split round above), on top of `d8b01b0`. Broad install permission granted for this pass; nothing new needed installing (samtools/bcftools/pysam/mosdepth/Picard/MultiQC/verifybamid2/somalier already in the `alignment-files` env per `TOOLS.md`).
+
+| finding | priority | change | verified (ran) | notes |
+|---|---|---|---|---|
+| bcftools mpileup D behaviour "not established" (round-3 left-unfixed) | P2 | `SKILL.md` "What Each Tool Counts" `bcftools mpileup` row: added that `FORMAT/DP` and `INFO/DP` drop to 0 across a deletion span, unlike `samtools mpileup`'s raw depth column | own_del.bam (20 reads, `40M20D40M`, round-2 fixture): `bcftools mpileup -a FORMAT/DP,FORMAT/AD -r del:530-570` gives DP=0 for the whole 541-560 deletion span; `samtools mpileup` on the identical region/BAM gives depth 20 throughout | bcftools 1.24; N (splice-skip) not tested, left unclaimed as before |
+
+Full re-verification sweep (not just what earlier rounds touched): extracted all 31 fenced code blocks fresh from the current (post-split) `SKILL.md` + `usage-guide.md` + 3 `references/*.md` files; `bash -n`/`ast.parse` clean on all 31; executed every block for real against the env's public data and existing synthetic fixtures (own_del.bam, edge/ BAMs, the human CRAM). All outputs cross-checked against `samtools flagstat -O tsv` / `samtools coverage` / `samtools depth -aa` and matched exactly; no regressions found. `examples/qc_report.py` re-run from a clean copy on 6 cases (real BAM, CRAM with/without reference, uBAM, missing file, all-QC-failed, unmapped-only) — all match flagstat, no tracebacks. Full detail in `F:\OpenScience\audits\_final_pass\bio-bam-statistics\CHECKPOINT.md`.
+
+## Left unfixed (final pass, still blocked)
+- Assay-threshold table / FREEMIX cut-off sourcing: needs literature citations this machine cannot look up, or named sources from Sam. Unchanged from round 3.
+- VerifyBamID2 FREEMIX / somalier end-to-end: needs a real whole-genome/exome GRCh38 BAM + full reference (~3 GB); tried to locate a fetchable full-chromosome CRAM for the sample already used elsewhere in this env (HG00349) via 1000 Genomes' EBI FTP index-based remote range query, but could not find the right path under the population-code directory layout in the time available. A named accession/URL from Sam would unblock a real attempt.
