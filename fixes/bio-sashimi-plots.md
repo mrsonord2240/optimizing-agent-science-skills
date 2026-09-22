@@ -101,3 +101,15 @@ Scripts run as the SKILL/references invoke them (relative paths, run from a work
 - MAJIQ/VOILA commands (V2 and V3 forms) are checked against the public docs only: MAJIQ is licence-gated and not installed, so nothing could be run.
 - Jutils leafcutter / MntJULiP / MAJIQ converters: only rMATS input was run; documented as following `--help`.
 - Carried over from 2026-09-20: ggsashimi's `--shrink` crash is an upstream bug (worked around in the example and documented, not patched).
+
+## 2026-09-21, final-pass Phase 1 (same agent as fixer; branch `fix/alternative-splicing-sashimi-plots`, worktree `F:\OpenScience\wt\alternative-splicing-sashimi-plots`)
+
+Closed one of the three "left unfixed" items from the re-audit above.
+
+| finding | priority | change | verified | notes |
+| --- | --- | --- | --- | --- |
+| Jutils leafcutter/MntJULiP/MAJIQ converters not run, only documented against `--help` | P1 (left unfixed) | `references/jutils.md`: documented `--leafcutter-dir`/`--mntjulip-dir`/`--majiq-dir` input requirements and output names, with the MntJULiP `_raw` naming caveat; `scripts/jutils_pipeline.sh` header comment points at the new section | ran `jutils.py convert-results --leafcutter-dir --mntjulip-dir --majiq-dir --rmats-dir` on Jutils' own shipped test data (`data/` in the `splicebox/Jutils` clone: a real published mouse hippocampus epileptic-vs-control RNA-seq set) -> `leafcutter_results.tsv` (32,555 lines), `majiq_results.tsv` (126,949 lines), `mntjulip_DSR/DSA_results_raw.tsv`; then `heatmap`, `sashimi --group-id g006855`, `venn-diagram` on all four tools' output, all exit 0 with non-empty PNGs | found on the way: MntJULiP's non-`_raw` output (`mntjulip_DS{R,A}_results.tsv`, per-sample estimated PSI) needs a `group_data.txt` in the input directory that the shipped test data doesn't have, so only `_raw.tsv` is written — documented, downstream calls must use whichever file exists |
+
+Left unfixed (unchanged, needs Sam): MAJIQ/VOILA commands remain checked against public docs only — MAJIQ is licence-gated with no test credential available under this pass's public-unauthenticated-only rule. `--shrink` crash: still an upstream bug, workaround unchanged.
+
+Commits: (see branch log at time of writing). Checkpoint: `F:\OpenScience\audits\_final_pass\bio-sashimi-plots\CHECKPOINT.md`.
