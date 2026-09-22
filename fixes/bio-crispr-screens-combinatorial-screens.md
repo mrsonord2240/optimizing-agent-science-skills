@@ -30,7 +30,6 @@ Fresh fixer. Worktree `F:\OpenScience\wt\crispr-screens-combinatorial-screens`, 
 
 ## Left unfixed
 
-- **Multiple-testing (BH/FDR) guidance for genome-scale z calls.** New best-practice content, not a correction: no audit run (200-pair and 150-pair genome-scale runs) produced a false positive at the documented cutoff, and the re-auditor agreed it is outside the correction mandate. Also, a z-cutoff on a z-normalized statistic is not a p-value test, so adding BH would mean specifying a new null model, which nothing here demonstrates.
 - **`scripts/` move: none.** The remaining blocks are the MAGeCK MLE design-matrix heredoc plus one `mageck mle` call (illustrative design matrix, the content is the matrix) and a 9-line `in4mer_pair_analysis` helper; both below the runnable-pipeline bar. The one 18-line function (`gi_score`) duplicated an example and was deleted per the rule.
 
 ## Deleted passages -> new home
@@ -40,3 +39,43 @@ Fresh fixer. Worktree `F:\OpenScience\wt\crispr-screens-combinatorial-screens`, 
 | inline `gi_score()` function (SKILL.md GI Scoring) | `examples/gi_scoring.py` (pointer + description in SKILL.md; the missing-singleton `dropna` and column-name note are in the pointer text) |
 
 Redundancy pass between SKILL.md and usage-guide.md was already done on 2026-09-19 (see above); usage-guide.md not touched.
+
+# 2026-09-21 final pass, Phase 1 (fresh eyes on the multiple-testing P2)
+
+Same-agent fixer+auditor final pass (`process/FINAL_PASS_BRIEF.md`). Worktree
+`F:\OpenScience\wt\crispr-screens-combinatorial-screens`, branch `fix/crispr-screens-combinatorial-screens`
+(same branch as the prior pass), commit `72e75e1`. Env `crispr-screen-analyst` (MAGeCK 0.5.9.5, pandas
+3.0.5, numpy 2.5.3, scipy 1.18.1, statsmodels 0.15.0). SKILL.md 249 -> 251 lines; under 300, no split.
+
+Dispatch asked me to re-examine the "multiple-testing (BH/FDR)" item that two prior passes (fixer
+2026-09-21, re-auditor 2026-09-19 x2) had left open as "new content, no run ever demonstrated a false
+positive." That reasoning turned out to rest on an untested assumption: every genome-scale synthetic
+dataset either pass built planted a handful of *very large*-effect interactions (GI -1.8 to -2.5),
+which inflate the self-normalized z-score's population SD enough to suppress noise from crossing the
+threshold -- a property of that dataset design, not of the method. I ran two scenarios neither pass
+had tried:
+
+| finding | priority | change | verified | notes |
+| --- | --- | --- | --- | --- |
+| No FDR control at genome scale: an all-null 4,435-pair (Inzolia-scale) screen with zero true interactions gets 199-201 pairs falsely called by the raw z<-2/z>2 cutoff (the textbook ~4.5% two-sided rate); 20 true hits at a modest, realistic effect (GI=-0.3, SNR~5, vs. this Skill's own SNR~30 test cases) gives 178 raw calls, 158 (89%) false | P2 (reversed from "left unfixed" to fixed) | Added "Multiple testing at genome scale" bullet to SKILL.md's GI Scoring section with the numbers and exact `scipy.stats.norm.sf` + `statsmodels.stats.multitest.multipletests(..., method='fdr_bh')` call; added the same BH-FDR step to `examples/gi_scoring.py` (STEP 6.5), keeping raw classification alongside for the small hand-curated case; added a Common Errors row; added `statsmodels` to Version Compatibility and usage-guide Prerequisites | ran | BH-FDR on the all-null scenario: 0 false positives (vs 199-201 raw). BH-FDR on the modest-effect scenario: 0 false positives, 17/20 true hits recovered (vs 178 raw calls, 158 false). Re-ran updated `examples/gi_scoring.py` on the audit's own genome-scale data: 8 SL/4 rescue by both raw and BH-FDR -- identical to the prior pass's verified numbers, no regression |
+| Minimum pair count bullet's own numeric claim ("0/400 at N>=20") does not reproduce | P2-level correction | Independent multi-seed reproduction (2 planted GI=-2.5 pairs, null SD 0.4) gives ~4% miss rate at N=20, ~0.5% at N=30, <=0.1% only from N=50. Corrected the bullet's numbers; raised recommended minimum from ~20-30 to ~50 pairs | ran | P(0/400 successes at the true ~3.3% rate) is ~2e-6 -- the original number was very likely one favorable run written up as if reproducible, not a fabrication, but not reliable either |
+
+## Verified this phase (not previously run)
+
+- SKILL.md's literal MAGeCK MLE bash block (heredoc `combo_design.txt` + `mageck mle
+  --count-table/--design-matrix/--output-prefix`), copied verbatim and run against the audit's
+  `combo_counts.txt`: exit 0, real `interaction|beta`/`interaction|fdr` output, planted gene `GENEA`
+  correctly the most negative `interaction|beta` with `interaction|fdr`=0.0. Neither prior pass had
+  run this exact heredoc verbatim (both used a pre-built `.sh` wrapper instead).
+- `in4mer_pair_analysis` helper: never executed by any audit or fix pass before. Ran on a realistic
+  4-pair/2-array-per-pair synthetic dataset; correct per-pair mean/std/count aggregation.
+- `examples/gi_scoring.py` (pre-existing, unmodified logic) independently re-run on the audit's
+  genome-scale data to confirm the baseline before adding the BH-FDR step.
+
+## Left unfixed
+
+- **`scripts/` move: none** (unchanged from the prior pass -- still true; no new runnable block of
+  pipeline length was added this phase, only inline BH-FDR calls a few lines long).
+
+Nothing needs Sam. See `F:\OpenScience\audits\_final_pass\bio-crispr-screens-combinatorial-screens\CHECKPOINT.md`
+for the full checkpoint.

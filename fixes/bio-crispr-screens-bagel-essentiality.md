@@ -89,3 +89,35 @@ Stayed inline: the `fc`, `bf`, `-r` and `pr` bash blocks (10-17 lines of one CLI
 **Claim corrected while running the script** (contradicted by the audit's file): the prose said TSC1/TSC2 are "the two most-negative-BF entries" under `screen_type='enrichment'`. Actual: TSC2 is first (-77.6), DEPDC5 second, TSC1 seventh (-64.9). Text now says so (`references/interpret-calls.md`).
 
 Left unfixed: none.
+
+## Final-pass Phase 1 — 2026-09-21
+
+Worktree `F:\OpenScience\wt\crispr-screens-bagel-essentiality`, branch `fix/crispr-screens-bagel-essentiality`,
+commit `a43fb07` (parent `42c849d`). Fixer/auditor (same agent, final pass): Claude Sonnet 5. Runtime:
+`crispr-screen-analyst` env, BAGEL2 build 115, Python 3.12.13, pandas 3.0.5; data = the audit's real
+HAP1 TKOv3 screen plus its thin-library synthetic dataset and CEGv2/NEGv1/CEG_mouse from the env.
+
+Fix log's own "left unfixed" list (round-3, structure pass) was empty, and no `fixes/README.md`
+Revisit-list row names this Skill. So this phase's work was the brief's verification half: every
+runnable block in the current SKILL.md/examples/scripts/references was re-run against real data.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| `-b -NB 1000` runtime note said "20-25 minutes" | P2 | Timed directly: ~2.2s/bootstrap iteration at genome scale (18,053 genes), measured continuously over 700+ iterations, rate stable 2.13-2.31s/iter across every sampling window -> extrapolates to ~35-40 min. SKILL.md's Output-columns note now gives the measured rate, the corrected range, and recommends timing a short `-NB 50` run first (hardware/load dependent) | ran | Own measurement, not reused from an earlier pass |
+
+Everything else re-run and confirmed correct, no code changes needed: `fc` on the real counts file;
+`check_bagel_inputs.py pre` and `post` (numbers matched round-3's log exactly); `bf -s 42` (CV mode)
+re-run twice and diffed byte-identical; `pr`; `bf -r` (RPS3's 4 per-sgRNA BF values sum to exactly the
+gene-level BF, 66.386 = 66.386); `interpret_bagel.py` CLI and import, both `screen_type` modes (dropout:
+0 tumor_suppressor/1,746 essential; enrichment: 86.6% warning, TSC2/DEPDC5/TSC1 ranking matches
+`references/interpret-calls.md` exactly); the species-mismatch crash (`ValueError: dataset input
+should have multiple elements.`) and swapped-`-e`/`-n` all-`nan` failure modes, reproduced directly;
+the thin-library failure mode on the audit's own synthetic dataset (top BF 2,433 vs ~132 on the real
+library); `examples/run_bagel2.sh` end to end against the real data (bootstrap step run at reduced
+`-NB` for speed, control flow and output schema — including the `-b`-only `STD`/`NumObs` columns —
+otherwise identical to the shipped script); `BAGEL.py fc/bf/pr --help`. `py_compile` and `bash -n`
+clean.
+
+Left unfixed: none. Nothing needs Sam's decision -- see
+`F:\OpenScience\audits\_final_pass\bio-crispr-screens-bagel-essentiality\CHECKPOINT.md` for the full
+list of what ran.

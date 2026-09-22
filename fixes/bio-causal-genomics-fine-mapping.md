@@ -92,3 +92,49 @@ Both examples pass `bash -n`; they could not be run because no FINEMAP or SuSiEx
 - FINEMAP / SuSiEx / PAINTOR / DAP-G flags remain checked only against the tools' documentation, not run: no binary exists here (unchanged from the 2026-09-17 audit).
 
 Nothing needs Sam.
+
+---
+
+# bio-causal-genomics-fine-mapping — final pass, 2026-09-21
+
+Worktree `F:\OpenScience\wt\causal-genomics-fine-mapping`, branch `fix/causal-genomics-fine-mapping`
+(same branch as above). Env: `mendelian-randomization-analyst`. Phase 1 only (fix, broad install
+permission) — full detail in `F:\OpenScience\audits\_final_pass\bio-causal-genomics-fine-mapping\CHECKPOINT.md`.
+
+This pass installed FINEMAP 1.4.2 and SuSiEx 1.1.2 (both bioconda, WSL `science` distro) and built
+DAP-G from source (`xqwen/dap` @ `875ba40`, GSL + OpenMP) — none of the three existed on this machine
+before, so "FINEMAP / SuSiEx / PAINTOR / DAP-G flags remain checked only against docs" (above) is now
+resolved for FINEMAP, SuSiEx, and DAP-G. Real, previously-unverified defects found and fixed by running
+each tool end-to-end on synthetic loci with a planted causal SNP:
+
+| finding | priority | change | verified | notes |
+|---|---|---|---|---|
+| FINEMAP `--prob-tol`/`--n-iterations`/`--n-convergence` don't exist in FINEMAP 1.4.2 | P1 | Renamed to `--prob-conv-sss-tol`/`--n-iter`/`--n-conv-sss` in `SKILL.md`, `references/finemap-cli.md`, `examples/finemap_pipeline.sh` | ran | Old flags aborted with `Cannot recognize flag`; fixed flags ran to completion, planted SNP top-ranked. |
+| `plink --r square` writes tab-delimited output; FINEMAP requires spaces | P1 | Added `spaces` modifier everywhere `--r square` feeds a FINEMAP `.ld` file | ran | Without it: `Expected N SNPs in row 1 ... but encountered only 1 SNPs`. |
+| FINEMAP writes `<prefix>.cred<k>` per causal-count model, never a plain `<prefix>.cred` | P2 | Fixed Outputs description and `examples/finemap_pipeline.sh`'s report step (loops `locus.cred*`) | ran | Only `locus.cred1` was ever written in this session's runs. |
+| SuSiEx 1.1.2 requires `--plink=<path>`, undocumented | P1 | Added to `SKILL.md` one-liner and `examples/susiex_multiancestry.sh` | ran | Omitted: fails inside SuSiEx's own internal PLINK calls with a confusing `No variants remaining after --extract`. |
+| SuSiEx's `--ld_file` is an output prefix it computes itself, not a pre-built matrix (Skill said to pre-build with `plink --r square`) | P1 | Corrected `SKILL.md`, `references/susiex-cross-ancestry.md`, `examples/susiex_multiancestry.sh` | ran | Verified on a synthetic 2-population locus, planted shared causal: `CS_PIP = 1.0`. |
+| `examples/susie_finemapping.R` crashes under susieR 0.14.2 (`estimated prior variance is unreasonably large`) | P1 | Rewrote z-score generation as `z ~ N(R %*% true_z, R)`; added the Skill's own documented PSD ridge fix (LD matrix wasn't PSD) | ran | Now recovers both planted causals at PIP 1.0000. Also fixed a stray "Reference: ggplot2" header comment (script only uses susieR). |
+| DAP-G named throughout (decision tree, method comparison, install notes) with zero runnable code anywhere in the Skill | missing referenced executable | Built DAP-G from source; added `references/dap-g-cli.md` and `examples/dapg_finemap.sh` | ran | Verified against DAP-G's own bundled real example (4 signal clusters) and against the shipped example on the FINEMAP-fix synthetic locus (planted SNP, cluster PIP 0.9998). Also documents a real non-obvious defect: `dap-g` exits status 1 on full success. |
+| FINEMAP/SuSiEx install notes pointed at a dead static-download page / source-only build | P2 | Added bioconda as the verified working route for both | verified: ran (installed + smoke-tested) |
+| PolyFun `pandas<3` pin never recorded in `SKILL.md` | P2 | Added a one-line pin note in Tool Install Notes | docs (the Skill's own documented `--compute-h2-L2` command does not hit this bug — confirmed by the prior audit's real run; other PolyFun flags might) |
+
+`SKILL.md`: 296 -> 300 lines (added Common Errors rows and a references pointer for DAP-G; trimmed
+Tool Install Notes verbosity and merged 3 FINEMAP rows + 2 SuSiEx rows in Common Errors to stay at the
+300-line cap).
+
+Also re-ran (no defect, no change) `examples/susie_rss_finemap.R`, `references/allele-harmonization.md`'s
+`harmonize_z_to_ref()`, and `references/polyfun-functional-priors.md`'s `build_manual_priors()` against
+hand-built assertions — all correct.
+
+## Left unfixed (this pass)
+
+- **PAINTOR**: not on bioconda/conda-forge; two `git clone bogdanlab/PAINTOR_V3.0` attempts under
+  background execution both stalled with the clone left in job-control state `T` (stopped) rather than
+  completing or erroring — looks like an artifact of this session's background-execution setup (a
+  concurrent, unrelated session's own download in the same WSL distro completed normally at the same
+  time), not a confirmed network/repo problem. Needs a foreground/interactive retry. Build deps (GSL,
+  NLopt, Eigen) confirmed available on conda-forge.
+- **Genotype-QC checklist (P2)**: unchanged from above, still new content out of a fixer's scope.
+
+Nothing needs Sam beyond the PAINTOR retry note above.
