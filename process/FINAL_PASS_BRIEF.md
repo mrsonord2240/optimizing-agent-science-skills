@@ -53,7 +53,8 @@ Write `F:\OpenScience\audits\_final_pass\<skill-id>\CHECKPOINT.md`:
 ```
 
 Commit your phase-1 work as usual (`fix(...)`/`refactor(...)` commits, `Co-Authored-By: Claude Sonnet 5
-<noreply@anthropic.com>`). Append to the fix log. **Then stop and report** — do not start Phase 2 until
+<noreply@anthropic.com>`). Append to the fix log but do not commit it in the records repo — the
+orchestrator does that. **Then stop and report** — do not start Phase 2 until
 the orchestrator resumes you. Your final message for this phase is the checkpoint's "still blocked"
 list, verbatim, plus your commit hashes.
 
