@@ -74,3 +74,19 @@ Scripts (SKILL.md 233 -> 191):
 `examples/consensus_hits.py` untouched apart from a pointer to `references/failure-modes.md`; the SKILL.md
 three-method block did not duplicate it (the example is two-method).
 
+## 2026-09-21 -- final pass, phase 1 (fixer+auditor same agent)
+
+Worktree `F:\OpenScience\wt\crispr-screens-hit-calling`, branch `fix/crispr-screens-hit-calling`
+(tip `51cfb20`, unchanged). No revisit-list entry for this Skill; fix log's last entry already said
+"Left unfixed: none." Walked every runnable block and re-verified independently (not by trusting the
+prior fix log): `scripts/consensus_hits.py`, `examples/consensus_hits.py`, `scripts/second_best_lfc.py`
+against real HAP1 TKOv3 data copied from the audit's `run/`; `scripts/custom_zscore_hit_calling.py`
+against a freshly-generated synthetic count table (own seed, own planted dropouts, not reused from the
+prior pass). All numbers matched the fix log's and SKILL.md's claims exactly, including two worked
+examples in prose (Spearman rho -0.806/+0.806 sign-corrected, n=18,053; BAGEL2 rerun max diff 26.719,
+33 flips). All 4 `.py` files `py_compile` clean. Every cross-reference (`[[wikilinks]]`, `references/`,
+`examples/`) resolves to a real file. No defect found; nothing changed. No commit made this phase (no
+diff). Checkpoint: `F:\OpenScience\audits\_final_pass\bio-crispr-screens-hit-calling\CHECKPOINT.md`.
+
+Still blocked: nothing.
+
