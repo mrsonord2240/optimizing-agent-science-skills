@@ -69,3 +69,23 @@ SKILL.md gained a "Reference Files" index and pointers: the `-r` comment in the 
 | SKILL.md "Drug-Dose and Time-Course Designs", `dose_consistent_hits()` python block (17 lines) | `scripts/dose_consistent_hits.py` (function verbatim, plus CLI, header comment, `--top-dose` validated) | env `crispr-screen-analyst` Python, on the 3-dose drugZ outputs in `_fixdata\drugz\` (built from the audit's synthetic data): `--top-dose high low=... mid=... high=...` returned exactly the 6 planted sensitizers, all normZ < 0 (asserted); `--direction supp` returned the 6 planted suppressors plus the RGS2 drug-target paradox gene; a bad `--top-dose` errors cleanly |
 
 Stayed inline: the bash blocks (all under 15 lines; short invocations and a 3-line CEGv2 `-r` recipe). `examples/run_drugz.py` untouched; its `per_dose_drugz()` also runs drugZ per dose, so it is not a copy of the script.
+
+## Final-pass Phase 1 — 2026-09-21
+
+Worktree `F:\OpenScience\wt\crispr-screens-drugz-chemogenomic`, branch `fix/crispr-screens-drugz-chemogenomic` (tip `14e7c1e`, unchanged). Fixer/auditor: Claude Sonnet 5. Env `crispr-screen-analyst` (Python 3.12.13, pandas 3.0.5, `tools\dl\drugz\drugz.py` patched for pandas CoW per `TOOLS.md` Notes #2).
+
+Both `recommendations[]` in the latest audit report (evaluated 2026-09-16: P1 Common Errors IndexError row, P2 low-Pearson guidance) were already closed by the 2026-09-21 re-audit fix pass above. Re-verified every runnable block fresh, not just what earlier fixers touched:
+
+| block | result |
+|---|---|
+| `python drugz.py --help` | flags match SKILL.md exactly |
+| Main CLI run (`-r RPS3,RPL11,EIF3A -p 5`) | 18,052-line output |
+| `references/reference-gene-removal.md` inline-list + CEGv2-derived blocks + `comm -23` check | 646 of 684 CEGv2 genes excluded |
+| Dose loop -> `scripts/dose_consistent_hits.py` (fresh copy) | `synth`: exactly the 6 planted sensitizers; `supp`: 6 planted suppressors + RGS2 paradox gene (7); bad `--top-dose` errors cleanly |
+| `examples/run_drugz.py` end to end, incl. live CEGv2.txt download from raw.githubusercontent.com | 6 sensitizers, 7 suppressors, matches ground truth exactly |
+| `--half_window_size` IndexError | reproduced on 200-guide table at default; `--half_window_size 50` resolves (51 rows) |
+| 2v2 replicate drop / misspelled sample name | runs clean (18,053 genes) / `KeyError: "['VehX'] not in index"` |
+| Rerun determinism claim | two identical runs -> byte-identical output (`cmp`) |
+| Related Skills paths (both files) | all exist in the fork |
+
+No defects found; no code or prose changed this phase; no commit made (nothing to commit). No checkpoint items blocked -- everything in this Skill is public and already installed. See `F:\OpenScience\audits\_final_pass\bio-crispr-screens-drugz-chemogenomic\CHECKPOINT.md`.
