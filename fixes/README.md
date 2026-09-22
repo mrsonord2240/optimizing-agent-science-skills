@@ -39,3 +39,4 @@ Items a fixer saw and left because the pass was scoped to something else. Added 
 | bio-sam-bam-basics | DRAGEN MAPQ row -- Illumina-licensed hardware/software, no public install path | needs a licence/instance or a real DRAGEN BAM |
 | bio-sam-bam-basics | Cell Ranger itself (STARsolo now stands in for its MAPQ/CB/UB behavior) -- 10x gates the download behind account registration | needs that registration or a real Cell Ranger BAM |
 | bio-sashimi-plots | MAJIQ/VOILA commands checked against --help only | MAJIQ is licence-gated (academic/commercial), not on PyPI/conda, no test credential |
+| bio-causal-genomics-colocalization-analysis | eCAVIAR/PWCoCo CLI recipes need compiled C++ binaries not built here (multi-hour build) | out of scope for a fix pass; moloc also blocked transiently by another session's install.lock, retry |
