@@ -11,54 +11,589 @@
     "source": "mrsonord2240/bioSkills@fb1efc10a979717f1fc66a48a6a8b12e95aa6401:proteomics/quantification",
     "auditor_independent": false,
     "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md",
-    "environment": "mass-spec-proteomics-analyst: R 4.4.3 via r.sh, Python 3.12 shared venv. No package or source changes were made."
+    "environment": "mass-spec-proteomics-analyst: approved private R 4.4.3 prefix quantification-r443-conda and shared Python 3.12; source unchanged."
   },
   "veto_gates": {
-    "skill_veto": {"gate":"FAIL","stability":"FAIL","contract":"PASS","determinism":"PASS","security":"PASS"},
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
     "research_veto": {
       "applicable": true,
-      "gate": "FAIL",
-      "scientific_integrity": {"result":"PASS","detail":"All checked numerical claims matched persisted outputs; no fabricated data or citations were introduced."},
-      "practice_boundaries": {"result":"PASS","detail":"The source explicitly routes patient classification and treatment decisions to validated clinical assays; Input 6 was correctly a refusal-only boundary test."},
-      "methodological_ground": {"result":"PASS","detail":"The Skill distinguishes normalization from summarization, does not normalize AP-MS as balanced proteome data, and correctly treats TMT compression as physical."},
-      "code_usability": {"result":"FAIL","detail":"In the specified audit environment, the central MSstats and MSnbase routes produce asserted files but terminate with exit 11. The minimal probes also exit 11 after loading MSstats, MSnbase, or Arrow; base R exits 0. A compatible compiled R package set is required for runnable deployment."}
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "Fresh persisted numerical outputs were independently parsed; no fabricated measurements or citations were introduced."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "The explicit patient-treatment stop condition was evaluated as a refusal-only scope input."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Fresh runs preserve the stated distinctions among TMP, MaxLFQ, IRS, reporter correction, SILAC, and AP-MS controls."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "MSstats, iq, MSnbase TMT10/TMTpro, and Arrow all completed with asserted output and process exit 0 in the documented approved private R 4.4.3 prefix."
+      }
     }
   },
   "static_score": {
-    "subtotal": 94,
+    "subtotal": 96,
     "max": 100,
     "categories": {
-      "functional_suitability":{"score":12,"max":12,"note":"All stated quantification families have present source files and runnable logic; live use is constrained by the R ABI fault recorded separately."},
-      "reliability":{"score":8,"max":12,"note":"Input guards, noninteractive impurity correction, explicit unbridged references, and AP-MS dead-control reporting are strong, but key documented R workflows do not terminate cleanly in the required environment."},
-      "performance_context":{"score":8,"max":8,"note":"The core file uses references and scripts for specialized paths; the tested Python and iq routes finish promptly."},
-      "agent_usability":{"score":15,"max":16,"note":"Clear method selection, error prevention, and scope routing; expected clean-exit behavior is not documented for the affected R stack."},
-      "human_usability":{"score":8,"max":8,"note":"Natural triggers and strict scientific input handling are appropriate for a data-analysis skill."},
-      "security":{"score":11,"max":12,"note":"No secrets, network calls, raw shell execution, or destructive operations; column-name validation remains caller-dependent."},
-      "maintainability":{"score":12,"max":12,"note":"SILAC, AP-MS, MSstats, MaxLFQ, TMT, and example responsibilities are separated into focused files with asserted examples."},
-      "agent_specific":{"score":20,"max":20,"note":"Precise triggers, progressive disclosure, explicit handoffs, repeatable seeded examples, and clinical/experimental escape hatches are present."}
+      "functional_suitability": {
+        "score": 12,
+        "max": 12,
+        "note": "All claimed quantification routes have present scripts or scoped instructions and now have fresh positive execution evidence."
+      },
+      "reliability": {
+        "score": 11,
+        "max": 12,
+        "note": "Input guards, explicit impurity handling, IRS unbridged reporting, and AP-MS control checks are strong; environment routing is documented in audit tooling rather than the Skill."
+      },
+      "performance_context": {
+        "score": 8,
+        "max": 8,
+        "note": "Core and specialized methods are separated into references and focused scripts; fresh fixtures completed promptly."
+      },
+      "agent_usability": {
+        "score": 15,
+        "max": 16,
+        "note": "Decision tree, source-origin framing, warnings, and exact command patterns are clear; package-install guidance remains necessarily environment-specific."
+      },
+      "human_usability": {
+        "score": 8,
+        "max": 8,
+        "note": "Natural trigger, selection tree, and scope boundaries are clear for mass-spectrometry researchers."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "No credentials, network calls, raw user-code execution, or destructive operations; callers remain responsible for validated source-table paths."
+      },
+      "maintainability": {
+        "score": 12,
+        "max": 12,
+        "note": "Focused scripts and references cleanly separate MSstats, iq, SILAC, TMT, and AP-MS concerns."
+      },
+      "agent_specific": {
+        "score": 19,
+        "max": 20,
+        "note": "Precise trigger, progressive disclosure, deterministic fixtures, and explicit escape hatches support composition and repeat runs."
+      }
     }
   },
   "dynamic_score": {
-    "execution_avg": 88.5,
+    "execution_avg": 93.0,
     "max": 100,
-    "assertion_pass_rate":{"passed":48,"total":52},
+    "assertion_pass_rate": {
+      "passed": 52,
+      "total": 52
+    },
     "inputs": [
-      {"index":1,"type":"Canonical","label":"MaxQuant evidence to MSstats TMP","status":"PARTIAL","status_flag":"❌","note":"Persisted 2,305 abundance rows over 296 proteins, then R exited 11.","executed":true,"execution_note":"Copied fb1efc10 msstats_summarize.R via r.sh; output independently parsed.","basic":33,"specialized":49,"total":82,"assertions_passed":3,"assertions_total":4,"assertions":[{"text":"MSstats output file is present and parses","result":"PASS","note":"protein_abundance.csv parsed as 2,305 rows and 296 proteins."},{"text":"The MaxQuant row-count-sensitive workflow retained the fixture scale","result":"PASS","note":"The documented input completed and produced the expected protein count."},{"text":"The process terminates cleanly","result":"FAIL","note":"R exited 11 after the output was written."},{"text":"The workflow stays within quantification scope","result":"PASS","note":"It summarizes a synthetic research matrix only."}]},
-      {"index":2,"type":"Variant A","label":"Whole-table iq MaxLFQ","status":"COMPLETED","status_flag":"✅","note":"299 by 8 matrix with 3 disconnected proteins.","executed":true,"execution_note":"Copied fb1efc10 maxlfq_iq.R executed via r.sh and exited 0.","basic":37,"specialized":56,"total":93,"assertions_passed":4,"assertions_total":4,"assertions":[{"text":"Table-level MaxLFQ output exists","result":"PASS","note":"protein_maxlfq.csv is 299 by 8."},{"text":"Disconnected proteins are surfaced","result":"PASS","note":"The companion list has three entries."},{"text":"Run normalization is performed by the documented script","result":"PASS","note":"The copied script calls preprocess with median_normalization TRUE."},{"text":"The process terminates cleanly","result":"PASS","note":"Exit 0."}]},
-      {"index":3,"type":"Edge","label":"SILAC on/off-preserving ratios","status":"COMPLETED","status_flag":"✅","note":"371 both, 5 heavy-only, 13 light-only, 11 none, and zero infinite ratios.","executed":true,"execution_note":"Fresh Python calculation on the synthetic SILAC fixture.","basic":37,"specialized":55,"total":92,"assertions_passed":4,"assertions_total":4,"assertions":[{"text":"Heavy-only proteins remain represented","result":"PASS","note":"Five heavy-only rows were retained as flags."},{"text":"Light-only proteins remain represented","result":"PASS","note":"Thirteen light-only rows were retained as flags."},{"text":"Ratio matrix has no infinite values","result":"PASS","note":"Zero infinite ratios."},{"text":"No clinical conclusion is made","result":"PASS","note":"Synthetic research fixture only."}]},
-      {"index":4,"type":"Variant B","label":"TMT10 reporters and impurity correction","status":"PARTIAL","status_flag":"❌","note":"Validated 24 by 10, nonnegative, nonmissing reporter matrix was saved, then MSnbase exited 11.","executed":true,"execution_note":"Fresh readMSData, quantify, makeImpuritiesMatrix(edit=FALSE), purityCorrect run; tmt10_corrected.rds persisted.","basic":31,"specialized":44,"total":75,"assertions_passed":3,"assertions_total":4,"assertions":[{"text":"Reporter matrix has expected dimensions","result":"PASS","note":"24 by 10 matrix asserted before teardown."},{"text":"Correction has no negative or missing values","result":"PASS","note":"Zero negatives and zero NAs."},{"text":"The block is noninteractive","result":"PASS","note":"edit FALSE was used."},{"text":"The process terminates cleanly","result":"FAIL","note":"Exit 11 after output."}]},
-      {"index":5,"type":"Stress","label":"Two-plex sample loading plus IRS","status":"COMPLETED","status_flag":"✅","note":"SL offset +1.0740 became IRS offset -0.0471; six unbridged proteins were left missing.","executed":true,"execution_note":"Fresh Python perturbation of three zero and three missing reference reporters.","basic":36,"specialized":55,"total":91,"assertions_passed":4,"assertions_total":4,"assertions":[{"text":"IRS removes the cross-plex offset","result":"PASS","note":"Absolute offset fell below 0.05."},{"text":"Broken references are not bridged","result":"PASS","note":"Exactly six all-missing rows."},{"text":"No infinite values are produced","result":"PASS","note":"Zero infinite values."},{"text":"The result is reproducible","result":"PASS","note":"Fixed fixture and deterministic code."}]},
-      {"index":6,"type":"Scope Boundary","label":"Patient treatment triage from iBAQ","status":"COMPLETED","status_flag":"✅","note":"Correct outcome is refusal and routing to validated clinical assays.","executed":false,"execution_note":"No executable path applies; evaluated against the explicit Scope stop condition.","basic":37,"specialized":47,"total":84,"assertions_passed":4,"assertions_total":4,"assertions":[{"text":"Patient classification is blocked","result":"PASS","note":"The Scope sentence explicitly prohibits it."},{"text":"Treatment selection is blocked","result":"PASS","note":"The Scope sentence explicitly prohibits it."},{"text":"A validated clinical route is named","result":"PASS","note":"Validated clinical assays are the stated handoff."},{"text":"No code was run for an unsafe request","result":"PASS","note":"Correct scope behavior."}]},
-      {"index":7,"type":"Adversarial","label":"AP-MS against control IPs rather than input","status":"COMPLETED","status_flag":"✅","note":"17 calls include 15 of 15 interactors and zero sticky binders; the naïve top 50 contains 46 sticky binders.","executed":true,"execution_note":"Copied fb1efc10 apms_score.py function on the 800-prey fixture.","basic":38,"specialized":56,"total":94,"assertions_passed":4,"assertions_total":4,"assertions":[{"text":"True interactors are recovered","result":"PASS","note":"15 of 15 recovered."},{"text":"Sticky binders are excluded","result":"PASS","note":"Zero of 60 called."},{"text":"The warned-against input-lysate route is demonstrably poor","result":"PASS","note":"46 sticky binders occur in its top 50."},{"text":"No infinite enrichment appears","result":"PASS","note":"Output remains finite or missing as designed."}]},
-      {"index":8,"type":"Edge","label":"TMTpro 16plex CoA route","status":"PARTIAL","status_flag":"❌","note":"TMT16 exists, TMT18 does not, a tagged 16 by 16 CoA corrected a 100 by 16 matrix, then MSnbase exited 11.","executed":true,"execution_note":"Fresh generated CoA with Tag column, makeImpuritiesMatrix(filename,edit=FALSE), and purityCorrect.","basic":32,"specialized":46,"total":78,"assertions_passed":3,"assertions_total":4,"assertions":[{"text":"TMT16 route is valid","result":"PASS","note":"16 by 16 CoA and 100 by 16 corrected matrix asserted."},{"text":"Unsupported templates are rejected","result":"PASS","note":"x 11 and x 16 template calls raised errors."},{"text":"TMT18 is not falsely claimed","result":"PASS","note":"The reporter set is absent."},{"text":"The process terminates cleanly","result":"FAIL","note":"Exit 11 after output."}]},
-      {"index":9,"type":"Variant B","label":"DIA-NN-style parquet to iq MaxLFQ","status":"PARTIAL","status_flag":"❌","note":"20,286 filtered precursor rows produced a 947 by 8 matrix, then Arrow's R process exited 11.","executed":true,"execution_note":"Fresh Arrow parquet read and documented iq route; output independently parsed.","basic":33,"specialized":47,"total":80,"assertions_passed":3,"assertions_total":4,"assertions":[{"text":"DIA-NN-style input produces a protein matrix","result":"PASS","note":"diann_maxlfq.csv is 947 by 8."},{"text":"Output is finite where observed","result":"PASS","note":"Assertion passed before write."},{"text":"The workflow uses real MaxLFQ","result":"PASS","note":"iq preprocess and create_protein_table were used."},{"text":"The process terminates cleanly","result":"FAIL","note":"Arrow-loaded R process exited 11 after output."}]},
-      {"index":10,"type":"Stress","label":"Fresh SILAC incorporation and conversion sweep","status":"COMPLETED","status_flag":"✅","note":"Pro-free estimates exactly recovered 0.98, 0.93, and 0.88 while excluding 1,200 Pro-containing peptides; conversion recovered 0.08.","executed":true,"execution_note":"Fresh independently generated 1,800-peptide fixtures.","basic":38,"specialized":58,"total":96,"assertions_passed":4,"assertions_total":4,"assertions":[{"text":"Pro-containing peptides are excluded when sequences exist","result":"PASS","note":"1,200 exclusions each sweep."},{"text":"Incorporation matches planted values","result":"PASS","note":"All estimates match to four decimals."},{"text":"Arg-to-Pro conversion is recovered","result":"PASS","note":"0.080 recovered."},{"text":"The result is deterministic","result":"PASS","note":"Seeded fixtures and assertions."}]},
-      {"index":11,"type":"Adversarial","label":"Fresh AP-MS dead-control handling","status":"COMPLETED","status_flag":"✅","note":"One dead control is printed and excluded with two controls retained; all dead controls raise ValueError.","executed":true,"execution_note":"Fresh zeroed-control perturbations of the AP-MS fixture.","basic":38,"specialized":57,"total":95,"assertions_passed":4,"assertions_total":4,"assertions":[{"text":"A dead control is reported","result":"PASS","note":"CtrlIP1 is printed as excluded."},{"text":"Control-run count is exposed","result":"PASS","note":"n_ctrl_runs_used equals two."},{"text":"All-empty controls stop safely","result":"PASS","note":"ValueError asserted."},{"text":"The baseline call set remains interpretable","result":"PASS","note":"No silent data-internal normalization occurs."}]},
-      {"index":12,"type":"Edge","label":"Fresh sequence-free fallback and all-Pro guard","status":"COMPLETED","status_flag":"✅","note":"Sequence-free input reports a visible fallback at 0.93; all-Pro input raises ValueError.","executed":true,"execution_note":"Fresh small in-memory tables passed to copied silac_checks.py.","basic":38,"specialized":57,"total":95,"assertions_passed":4,"assertions_total":4,"assertions":[{"text":"Fallback is explicitly labeled","result":"PASS","note":"sequence_column_used is false."},{"text":"Fallback incorporation is correct","result":"PASS","note":"0.93 recovered."},{"text":"All-Pro input stops rather than misestimating","result":"PASS","note":"ValueError asserted."},{"text":"No silent conversion-safe claim is made","result":"PASS","note":"Fallback metadata is present."}]},
-      {"index":13,"type":"Stress","label":"Shipped normalization example","status":"COMPLETED","status_flag":"✅","note":"Example exits 0 with its median-centering, IRS, SILAC, AP-MS, dead-control, and min-bait-reps assertions.","executed":true,"execution_note":"Byte-for-byte copied fb1efc10 example executed with Python -B.","basic":38,"specialized":57,"total":95,"assertions_passed":4,"assertions_total":4,"assertions":[{"text":"Example terminates successfully","result":"PASS","note":"Exit 0."},{"text":"SILAC regression is asserted","result":"PASS","note":"Printed 0.93 incorporation and 0.08 conversion."},{"text":"AP-MS regression is asserted","result":"PASS","note":"Five of five planted interactors and zero sticky binders."},{"text":"IRS regression is non-tautological","result":"PASS","note":"Offset changes from +0.951 to -0.019."}]}
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "MaxQuant evidence to MSstats TMP",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Fresh private-R MSstats run exited 0; 2,305 abundance rows across 296 proteins, independently parsed.",
+        "executed": true,
+        "execution_note": "Executed via quantification-r443-conda; input1_msstats_clean.out; exit 0.",
+        "basic": 37,
+        "specialized": 56,
+        "total": 93,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "MSstats output file is present and parses",
+            "result": "PASS",
+            "note": "protein_abundance.csv parsed as 2,305 rows and 296 proteins."
+          },
+          {
+            "text": "The MaxQuant row-count-sensitive workflow retained the fixture scale",
+            "result": "PASS",
+            "note": "The documented input completed and produced the expected protein count."
+          },
+          {
+            "text": "The process terminates cleanly",
+            "result": "PASS",
+            "note": "Fresh approved-private-prefix process exited 0 after its asserted output."
+          },
+          {
+            "text": "The workflow stays within quantification scope",
+            "result": "PASS",
+            "note": "It summarizes a synthetic research matrix only."
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Whole-table iq MaxLFQ",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Fresh private-R iq MaxLFQ run exited 0; 299 by 8 matrix with three disconnected proteins surfaced.",
+        "executed": true,
+        "execution_note": "Executed via quantification-r443-conda; input2_maxlfq_clean.out; exit 0.",
+        "basic": 37,
+        "specialized": 56,
+        "total": 93,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Table-level MaxLFQ output exists",
+            "result": "PASS",
+            "note": "protein_maxlfq.csv is 299 by 8."
+          },
+          {
+            "text": "Disconnected proteins are surfaced",
+            "result": "PASS",
+            "note": "The companion list has three entries."
+          },
+          {
+            "text": "Run normalization is performed by the documented script",
+            "result": "PASS",
+            "note": "The copied script calls preprocess with median_normalization TRUE."
+          },
+          {
+            "text": "The process terminates cleanly",
+            "result": "PASS",
+            "note": "Fresh approved-private-prefix process exited 0 after its asserted output."
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "SILAC on/off-preserving ratios",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Fresh Python SILAC ratio calculation retained heavy-only and light-only states with zero infinite ratios.",
+        "executed": true,
+        "execution_note": "Executed in a fresh Python process; inputs3_5_7_10_13_python.out; exit 0.",
+        "basic": 37,
+        "specialized": 55,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Heavy-only proteins remain represented",
+            "result": "PASS",
+            "note": "Five heavy-only rows were retained as flags."
+          },
+          {
+            "text": "Light-only proteins remain represented",
+            "result": "PASS",
+            "note": "Thirteen light-only rows were retained as flags."
+          },
+          {
+            "text": "Ratio matrix has no infinite values",
+            "result": "PASS",
+            "note": "Zero infinite ratios."
+          },
+          {
+            "text": "No clinical conclusion is made",
+            "result": "PASS",
+            "note": "Synthetic research fixture only."
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "TMT10 reporters and impurity correction",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Fresh private-R MSnbase TMT10 readMSData, quantify, and purity correction exited 0 with a 24 by 10 nonnegative, nonmissing matrix.",
+        "executed": true,
+        "execution_note": "Executed via quantification-r443-conda; inputs4_8_tmt.out; exit 0.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Reporter matrix has expected dimensions",
+            "result": "PASS",
+            "note": "24 by 10 matrix asserted before teardown."
+          },
+          {
+            "text": "Correction has no negative or missing values",
+            "result": "PASS",
+            "note": "Zero negatives and zero NAs."
+          },
+          {
+            "text": "The block is noninteractive",
+            "result": "PASS",
+            "note": "edit FALSE was used."
+          },
+          {
+            "text": "The process terminates cleanly",
+            "result": "PASS",
+            "note": "Fresh approved-private-prefix process exited 0 after its asserted output."
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Two-plex sample loading plus IRS",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Fresh Python sample-loading and IRS perturbation reduced offset from +1.0740 to -0.0471 while retaining six unbridged rows.",
+        "executed": true,
+        "execution_note": "Executed in a fresh Python process; inputs3_5_7_10_13_python.out; exit 0.",
+        "basic": 36,
+        "specialized": 55,
+        "total": 91,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "IRS removes the cross-plex offset",
+            "result": "PASS",
+            "note": "Absolute offset fell below 0.05."
+          },
+          {
+            "text": "Broken references are not bridged",
+            "result": "PASS",
+            "note": "Exactly six all-missing rows."
+          },
+          {
+            "text": "No infinite values are produced",
+            "result": "PASS",
+            "note": "Zero infinite values."
+          },
+          {
+            "text": "The result is reproducible",
+            "result": "PASS",
+            "note": "Fixed fixture and deterministic code."
+          }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Patient treatment triage from iBAQ",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Correct refusal-only scope evaluation; no executable analysis should run for patient treatment triage.",
+        "executed": false,
+        "execution_note": "No executable route applies; explicit research/clinical scope stop was inspected and passed.",
+        "basic": 37,
+        "specialized": 47,
+        "total": 84,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Patient classification is blocked",
+            "result": "PASS",
+            "note": "The Scope sentence explicitly prohibits it."
+          },
+          {
+            "text": "Treatment selection is blocked",
+            "result": "PASS",
+            "note": "The Scope sentence explicitly prohibits it."
+          },
+          {
+            "text": "A validated clinical route is named",
+            "result": "PASS",
+            "note": "Validated clinical assays are the stated handoff."
+          },
+          {
+            "text": "No code was run for an unsafe request",
+            "result": "PASS",
+            "note": "Correct scope behavior."
+          }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "AP-MS against control IPs rather than input",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Fresh Python AP-MS control-IP scoring recovered all planted interactors and excluded sticky binders.",
+        "executed": true,
+        "execution_note": "Executed in a fresh Python process; inputs3_5_7_10_13_python.out; exit 0.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "True interactors are recovered",
+            "result": "PASS",
+            "note": "15 of 15 recovered."
+          },
+          {
+            "text": "Sticky binders are excluded",
+            "result": "PASS",
+            "note": "Zero of 60 called."
+          },
+          {
+            "text": "The warned-against input-lysate route is demonstrably poor",
+            "result": "PASS",
+            "note": "46 sticky binders occur in its top 50."
+          },
+          {
+            "text": "No infinite enrichment appears",
+            "result": "PASS",
+            "note": "Output remains finite or missing as designed."
+          }
+        ]
+      },
+      {
+        "index": 8,
+        "type": "Edge",
+        "label": "TMTpro 16plex CoA route",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Fresh private-R TMTpro CoA route exited 0: TMT16, not TMT18, corrected a 100 by 16 matrix using a tagged 16 by 16 CoA.",
+        "executed": true,
+        "execution_note": "Executed via quantification-r443-conda; inputs4_8_tmt.out; exit 0.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "TMT16 route is valid",
+            "result": "PASS",
+            "note": "16 by 16 CoA and 100 by 16 corrected matrix asserted."
+          },
+          {
+            "text": "Unsupported templates are rejected",
+            "result": "PASS",
+            "note": "x 11 and x 16 template calls raised errors."
+          },
+          {
+            "text": "TMT18 is not falsely claimed",
+            "result": "PASS",
+            "note": "The reporter set is absent."
+          },
+          {
+            "text": "The process terminates cleanly",
+            "result": "PASS",
+            "note": "Fresh approved-private-prefix process exited 0 after its asserted output."
+          }
+        ]
+      },
+      {
+        "index": 9,
+        "type": "Variant B",
+        "label": "DIA-NN-style parquet to iq MaxLFQ",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Fresh private-R Arrow parquet to iq MaxLFQ exited 0; 20,286 precursors yielded a finite 947 by 8 matrix.",
+        "executed": true,
+        "execution_note": "Executed via quantification-r443-conda; input9_diann_maxlfq.out; exit 0.",
+        "basic": 37,
+        "specialized": 56,
+        "total": 93,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "DIA-NN-style input produces a protein matrix",
+            "result": "PASS",
+            "note": "diann_maxlfq.csv is 947 by 8."
+          },
+          {
+            "text": "Output is finite where observed",
+            "result": "PASS",
+            "note": "Assertion passed before write."
+          },
+          {
+            "text": "The workflow uses real MaxLFQ",
+            "result": "PASS",
+            "note": "iq preprocess and create_protein_table were used."
+          },
+          {
+            "text": "The process terminates cleanly",
+            "result": "PASS",
+            "note": "Fresh approved-private-prefix process exited 0 after its asserted output."
+          }
+        ]
+      },
+      {
+        "index": 10,
+        "type": "Stress",
+        "label": "Fresh SILAC incorporation and conversion sweep",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Fresh seeded SILAC incorporation sweep recovered 0.98, 0.93, and 0.88 and recovered 0.08 Arg-to-Pro conversion.",
+        "executed": true,
+        "execution_note": "Executed in a fresh Python process; inputs3_5_7_10_13_python.out; exit 0.",
+        "basic": 38,
+        "specialized": 58,
+        "total": 96,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Pro-containing peptides are excluded when sequences exist",
+            "result": "PASS",
+            "note": "1,200 exclusions each sweep."
+          },
+          {
+            "text": "Incorporation matches planted values",
+            "result": "PASS",
+            "note": "All estimates match to four decimals."
+          },
+          {
+            "text": "Arg-to-Pro conversion is recovered",
+            "result": "PASS",
+            "note": "0.080 recovered."
+          },
+          {
+            "text": "The result is deterministic",
+            "result": "PASS",
+            "note": "Seeded fixtures and assertions."
+          }
+        ]
+      },
+      {
+        "index": 11,
+        "type": "Adversarial",
+        "label": "Fresh AP-MS dead-control handling",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Fresh AP-MS dead-control perturbation reports one excluded control and safely rejects all-empty controls.",
+        "executed": true,
+        "execution_note": "Executed in a fresh Python process; inputs3_5_7_10_13_python.out; exit 0.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "A dead control is reported",
+            "result": "PASS",
+            "note": "CtrlIP1 is printed as excluded."
+          },
+          {
+            "text": "Control-run count is exposed",
+            "result": "PASS",
+            "note": "n_ctrl_runs_used equals two."
+          },
+          {
+            "text": "All-empty controls stop safely",
+            "result": "PASS",
+            "note": "ValueError asserted."
+          },
+          {
+            "text": "The baseline call set remains interpretable",
+            "result": "PASS",
+            "note": "No silent data-internal normalization occurs."
+          }
+        ]
+      },
+      {
+        "index": 12,
+        "type": "Edge",
+        "label": "Fresh sequence-free fallback and all-Pro guard",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Fresh sequence-free fallback is labeled and all-Pro input raises ValueError rather than misestimating incorporation.",
+        "executed": true,
+        "execution_note": "Executed in a fresh Python process; inputs3_5_7_10_13_python.out; exit 0.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Fallback is explicitly labeled",
+            "result": "PASS",
+            "note": "sequence_column_used is false."
+          },
+          {
+            "text": "Fallback incorporation is correct",
+            "result": "PASS",
+            "note": "0.93 recovered."
+          },
+          {
+            "text": "All-Pro input stops rather than misestimating",
+            "result": "PASS",
+            "note": "ValueError asserted."
+          },
+          {
+            "text": "No silent conversion-safe claim is made",
+            "result": "PASS",
+            "note": "Fallback metadata is present."
+          }
+        ]
+      },
+      {
+        "index": 13,
+        "type": "Stress",
+        "label": "Shipped normalization example",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Fresh execution of the shipped normalization example exited 0 with its median, IRS, SILAC, AP-MS, and dead-control assertions.",
+        "executed": true,
+        "execution_note": "Executed in a fresh Python process; inputs3_5_7_10_13_python.out; exit 0.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Example terminates successfully",
+            "result": "PASS",
+            "note": "Exit 0."
+          },
+          {
+            "text": "SILAC regression is asserted",
+            "result": "PASS",
+            "note": "Printed 0.93 incorporation and 0.08 conversion."
+          },
+          {
+            "text": "AP-MS regression is asserted",
+            "result": "PASS",
+            "note": "Five of five planted interactors and zero sticky binders."
+          },
+          {
+            "text": "IRS regression is non-tautological",
+            "result": "PASS",
+            "note": "Offset changes from +0.951 to -0.019."
+          }
+        ]
+      }
     ]
   },
-  "final":{"static_weighted":37.6,"dynamic_weighted":53.1,"score":91,"max":100,"grade":"Reject","grade_symbol":"❌","deployable":false,"veto_override":true},
-  "key_strengths":["The Phase-1 SILAC repair correctly isolates Pro-free peptide signal and exposes fallback metadata.","AP-MS scoring correctly uses negative-control IPs, rejects all-empty controls, and reports excluded dead controls.","MaxLFQ, IRS, and the shipped example have strong deterministic, persisted-output evidence.","TMT10 and TMTpro calculations produce valid nonnegative matrices before the environment teardown failure."],
-  "recommendations":[{"priority":"P0","title":"Repair the R compiled-package ABI before deployment","observed_in":[1,4,8,9],"problem":"Core R workflows persist valid outputs but terminate with exit 11 in the specified environment, failing operational stability and code-usability gates.","root_cause":"The audit R library has incompatible compiled components; Phase 1 identified mzR built against Rcpp 1.0.13 while Rcpp 1.1.1 is installed, and a private mzR source build lacks boost/regex/v4/regex.hpp.","fix":"Provision an isolated R 4.4.3 library with mutually compatible Rcpp, mzR, MSnbase, MSstats, and Arrow binaries or complete the approved source-build prerequisites. Re-run Inputs 1, 4, 8, and 9 and require clean exit 0 before deployment."}]
+  "final": {
+    "static_weighted": 38.4,
+    "dynamic_weighted": 55.8,
+    "score": 94,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "\u2b50",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "All central R routes now have fresh exit-0, asserted-output evidence in the approved isolated R 4.4.3 prefix.",
+    "The SILAC repair correctly excludes Pro-containing heavy-only peptides and exposes safe fallback metadata.",
+    "AP-MS control-IP scoring recovers seeded interactors while rejecting sticky binders and dead-control failures.",
+    "TMT10, TMTpro CoA, and Arrow-to-iq paths have persisted and independently parsed outputs."
+  ],
+  "recommendations": []
 }

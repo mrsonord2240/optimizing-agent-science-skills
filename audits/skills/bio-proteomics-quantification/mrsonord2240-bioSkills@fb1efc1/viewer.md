@@ -7,62 +7,190 @@
 
 # Eval Viewer — bio-proteomics-quantification
 
-Generated: 2026-09-23 · final-pass Phase 2 fresh audit
+Generated: 2026-09-23 · corrective final-pass Phase 2
 
 Source: `mrsonord2240/bioSkills@fb1efc10a979717f1fc66a48a6a8b12e95aa6401:proteomics/quantification`
 
-Result: **91/100 numeric score, ❌ Reject, not deployable.** The score is overridden by the required veto: core R paths write and validate output, then terminate with exit 11 in the required environment. `auditor_independent: false` is deliberately set because this is the final-pass exception; see `_final_pass/bio-proteomics-quantification/CHECKPOINT.md`.
+**94/100 · ⭐ Production Ready · deployable.** All executable central routes completed with exit 0 in the approved private compatible R 4.4.3 prefix. This final-pass exception deliberately sets `auditor_independent: false`; see `_final_pass/bio-proteomics-quantification/CHECKPOINT.md`.
 
-Prior report preservation: the superseded 2026-09-15 JSON and viewer are copied to `F:\OpenScience\audits\_pre-fix-20260923\bio-proteomics-quantification\` before this report replaced them.
+The superseded rejected report is preserved at `F:\OpenScience\audits\_pre-fix-20260923\bio-proteomics-quantification\`.
 
 ## Summary
 
-| Input | Route | Result | Executed |
-|---|---|---:|---|
-| 1 | MaxQuant to MSstats TMP | 82, partial: output then exit 11 | yes |
-| 2 | Whole-table iq MaxLFQ | 93 | yes |
-| 3 | SILAC on/off ratios | 92 | yes |
-| 4 | TMT10 reporters | 75, partial: output then exit 11 | yes |
-| 5 | SL plus IRS two-plex bridge | 91 | yes |
-| 6 | Patient-treatment scope boundary | 84 | no, correct refusal-only route |
-| 7 | AP-MS control-IP scoring | 94 | yes |
-| 8 | TMTpro 16plex CoA | 78, partial: output then exit 11 | yes |
-| 9 | DIA-NN-style input to iq | 80, partial: output then exit 11 | yes |
-| 10 | Fresh SILAC incorporation sweep | 96 | yes |
-| 11 | Fresh AP-MS dead-control test | 95 | yes |
-| 12 | Fresh SILAC fallback/all-Pro guard | 95 | yes |
-| 13 | Shipped Python example | 95 | yes |
+| Input | Route | Score | Assertions | Executed |
+|---:|---|---:|---:|---|
+| 1 | MaxQuant evidence to MSstats TMP | 93 | 4/4 | ✅ | yes |
+| 2 | Whole-table iq MaxLFQ | 93 | 4/4 | ✅ | yes |
+| 3 | SILAC on/off-preserving ratios | 92 | 4/4 | ✅ | yes |
+| 4 | TMT10 reporters and impurity correction | 94 | 4/4 | ✅ | yes |
+| 5 | Two-plex sample loading plus IRS | 91 | 4/4 | ✅ | yes |
+| 6 | Patient treatment triage from iBAQ | 84 | 4/4 | ✅ | scope-only |
+| 7 | AP-MS against control IPs rather than input | 94 | 4/4 | ✅ | yes |
+| 8 | TMTpro 16plex CoA route | 94 | 4/4 | ✅ | yes |
+| 9 | DIA-NN-style parquet to iq MaxLFQ | 93 | 4/4 | ✅ | yes |
+| 10 | Fresh SILAC incorporation and conversion sweep | 96 | 4/4 | ✅ | yes |
+| 11 | Fresh AP-MS dead-control handling | 95 | 4/4 | ✅ | yes |
+| 12 | Fresh sequence-free fallback and all-Pro guard | 95 | 4/4 | ✅ | yes |
+| 13 | Shipped normalization example | 95 | 4/4 | ✅ | yes |
 
-Execution average: **88.5/100**. Assertions: **48/52**. Calls made: **12/13**; Input 6 has no safe executable route.
+Execution average: **93.0/100**. Assertions: **52/52**. Executable calls: **12/12**, plus one correct non-executable scope-boundary evaluation.
 
-## Evidence
+## Fresh evidence
 
-Scripts, copied source files, and complete stdout/stderr are in [phase2_20260923](F:/OpenScience/audits/bio-proteomics-quantification/run/phase2_20260923). Persisted outputs independently parsed by `verify_outputs.py`:
+`run/phase2_corrective_20260923/` contains the commands, R and PowerShell drivers, stdout/stderr, TMT artifacts, CSV outputs, private-stack probe, and independent parser. `verify_fresh_outputs.out` reports:
 
 ```
-MSstats=2305x11 proteins=296 | MaxLFQ=(299, 8) |
-DIA-NN-MaxLFQ=(947, 8) | TMT-RDS=present
+MSstats=2305x11 proteins=296 | MaxLFQ=(299, 8) | DIA-NN-MaxLFQ=(947, 8) | TMT-RDS=present
 ```
 
-TMT output assertions succeeded before teardown: `matrix=24x10 negatives=0 nas=0`. The TMTpro CoA route also succeeded before teardown: `TMT16=16 TMT18=FALSE coa=16x16 corrected=100x16`.
+The private-stack package probe exited 0. MSstats, iq MaxLFQ, TMT10/TMTpro, and Arrow→iq each exited 0.
 
-The failure is reproducible outside the workflows: `probe_r_exit.R` exits 0 for base R and exit 11 after loading each of MSnbase, MSstats, or Arrow. The Phase-1 checkpoint identifies the known mzR/Rcpp mismatch and failed private source build. No source, shared package, worktree, or records-repository file was changed during this audit.
+## Gates and calculation
 
-## Gates and final calculation
+All structural gates T1–T4 and research gates M1–M4 passed. `96 × 0.4 + 93.0 × 0.6 = 94.2`, rounded to **94**. Production floors pass: static 96, execution 93.0, Layer 1 average 37.5/40, Layer 2 average 55.5/60, assertions 100%.
 
-| Gate | Result | Reason |
-|---|---|---|
-| T1 Operational stability | FAIL | Core documented R workflows terminate nonzero in the specified environment. |
-| T2 Contract | PASS | Required frontmatter and bundled files are present. |
-| T3 Determinism | PASS | Seeded/fixture routes are repeatable. |
-| T4 Security | PASS | No raw user code execution, credentials, network, or destructive operations. |
-| M1 Scientific integrity | PASS | Persisted values and source claims were checked. |
-| M2 Practice boundaries | PASS | Explicit clinical stop condition. |
-| M3 Methodological baseline | PASS | Correct separation of quantification methods and their error models. |
-| M4 Code usability | FAIL | Required R routes do not cleanly run in this deployment environment. |
+## Detailed outputs
 
-`94 × 0.4 + 88.5 × 0.6 = 90.7`, rounded to 91. The two veto failures force **Reject** and `deployable: false`.
+### Input 1 — Canonical: MaxQuant evidence to MSstats TMP
 
-## Required remediation
+**Result:** Fresh private-R MSstats run exited 0; 2,305 abundance rows across 296 proteins, independently parsed.
 
-P0: create a private, mutually compatible compiled R 4.4.3 package set (at minimum Rcpp, mzR, MSnbase, MSstats, and Arrow), then rerun Inputs 1, 4, 8, and 9 and require both asserted output and exit 0. The source itself was not edited because the checkpoint establishes this is an environment ABI issue, not a safe source-side correction.
+**Execution:** Executed via quantification-r443-conda; input1_msstats_clean.out; exit 0.
+
+**Assertions:**
+- [PASS] MSstats output file is present and parses — protein_abundance.csv parsed as 2,305 rows and 296 proteins.
+- [PASS] The MaxQuant row-count-sensitive workflow retained the fixture scale — The documented input completed and produced the expected protein count.
+- [PASS] The process terminates cleanly — Fresh approved-private-prefix process exited 0 after its asserted output.
+- [PASS] The workflow stays within quantification scope — It summarizes a synthetic research matrix only.
+### Input 2 — Variant A: Whole-table iq MaxLFQ
+
+**Result:** Fresh private-R iq MaxLFQ run exited 0; 299 by 8 matrix with three disconnected proteins surfaced.
+
+**Execution:** Executed via quantification-r443-conda; input2_maxlfq_clean.out; exit 0.
+
+**Assertions:**
+- [PASS] Table-level MaxLFQ output exists — protein_maxlfq.csv is 299 by 8.
+- [PASS] Disconnected proteins are surfaced — The companion list has three entries.
+- [PASS] Run normalization is performed by the documented script — The copied script calls preprocess with median_normalization TRUE.
+- [PASS] The process terminates cleanly — Fresh approved-private-prefix process exited 0 after its asserted output.
+### Input 3 — Edge: SILAC on/off-preserving ratios
+
+**Result:** Fresh Python SILAC ratio calculation retained heavy-only and light-only states with zero infinite ratios.
+
+**Execution:** Executed in a fresh Python process; inputs3_5_7_10_13_python.out; exit 0.
+
+**Assertions:**
+- [PASS] Heavy-only proteins remain represented — Five heavy-only rows were retained as flags.
+- [PASS] Light-only proteins remain represented — Thirteen light-only rows were retained as flags.
+- [PASS] Ratio matrix has no infinite values — Zero infinite ratios.
+- [PASS] No clinical conclusion is made — Synthetic research fixture only.
+### Input 4 — Variant B: TMT10 reporters and impurity correction
+
+**Result:** Fresh private-R MSnbase TMT10 readMSData, quantify, and purity correction exited 0 with a 24 by 10 nonnegative, nonmissing matrix.
+
+**Execution:** Executed via quantification-r443-conda; inputs4_8_tmt.out; exit 0.
+
+**Assertions:**
+- [PASS] Reporter matrix has expected dimensions — 24 by 10 matrix asserted before teardown.
+- [PASS] Correction has no negative or missing values — Zero negatives and zero NAs.
+- [PASS] The block is noninteractive — edit FALSE was used.
+- [PASS] The process terminates cleanly — Fresh approved-private-prefix process exited 0 after its asserted output.
+### Input 5 — Stress: Two-plex sample loading plus IRS
+
+**Result:** Fresh Python sample-loading and IRS perturbation reduced offset from +1.0740 to -0.0471 while retaining six unbridged rows.
+
+**Execution:** Executed in a fresh Python process; inputs3_5_7_10_13_python.out; exit 0.
+
+**Assertions:**
+- [PASS] IRS removes the cross-plex offset — Absolute offset fell below 0.05.
+- [PASS] Broken references are not bridged — Exactly six all-missing rows.
+- [PASS] No infinite values are produced — Zero infinite values.
+- [PASS] The result is reproducible — Fixed fixture and deterministic code.
+### Input 6 — Scope Boundary: Patient treatment triage from iBAQ
+
+**Result:** Correct refusal-only scope evaluation; no executable analysis should run for patient treatment triage.
+
+**Execution:** No executable route applies; explicit research/clinical scope stop was inspected and passed.
+
+**Assertions:**
+- [PASS] Patient classification is blocked — The Scope sentence explicitly prohibits it.
+- [PASS] Treatment selection is blocked — The Scope sentence explicitly prohibits it.
+- [PASS] A validated clinical route is named — Validated clinical assays are the stated handoff.
+- [PASS] No code was run for an unsafe request — Correct scope behavior.
+### Input 7 — Adversarial: AP-MS against control IPs rather than input
+
+**Result:** Fresh Python AP-MS control-IP scoring recovered all planted interactors and excluded sticky binders.
+
+**Execution:** Executed in a fresh Python process; inputs3_5_7_10_13_python.out; exit 0.
+
+**Assertions:**
+- [PASS] True interactors are recovered — 15 of 15 recovered.
+- [PASS] Sticky binders are excluded — Zero of 60 called.
+- [PASS] The warned-against input-lysate route is demonstrably poor — 46 sticky binders occur in its top 50.
+- [PASS] No infinite enrichment appears — Output remains finite or missing as designed.
+### Input 8 — Edge: TMTpro 16plex CoA route
+
+**Result:** Fresh private-R TMTpro CoA route exited 0: TMT16, not TMT18, corrected a 100 by 16 matrix using a tagged 16 by 16 CoA.
+
+**Execution:** Executed via quantification-r443-conda; inputs4_8_tmt.out; exit 0.
+
+**Assertions:**
+- [PASS] TMT16 route is valid — 16 by 16 CoA and 100 by 16 corrected matrix asserted.
+- [PASS] Unsupported templates are rejected — x 11 and x 16 template calls raised errors.
+- [PASS] TMT18 is not falsely claimed — The reporter set is absent.
+- [PASS] The process terminates cleanly — Fresh approved-private-prefix process exited 0 after its asserted output.
+### Input 9 — Variant B: DIA-NN-style parquet to iq MaxLFQ
+
+**Result:** Fresh private-R Arrow parquet to iq MaxLFQ exited 0; 20,286 precursors yielded a finite 947 by 8 matrix.
+
+**Execution:** Executed via quantification-r443-conda; input9_diann_maxlfq.out; exit 0.
+
+**Assertions:**
+- [PASS] DIA-NN-style input produces a protein matrix — diann_maxlfq.csv is 947 by 8.
+- [PASS] Output is finite where observed — Assertion passed before write.
+- [PASS] The workflow uses real MaxLFQ — iq preprocess and create_protein_table were used.
+- [PASS] The process terminates cleanly — Fresh approved-private-prefix process exited 0 after its asserted output.
+### Input 10 — Stress: Fresh SILAC incorporation and conversion sweep
+
+**Result:** Fresh seeded SILAC incorporation sweep recovered 0.98, 0.93, and 0.88 and recovered 0.08 Arg-to-Pro conversion.
+
+**Execution:** Executed in a fresh Python process; inputs3_5_7_10_13_python.out; exit 0.
+
+**Assertions:**
+- [PASS] Pro-containing peptides are excluded when sequences exist — 1,200 exclusions each sweep.
+- [PASS] Incorporation matches planted values — All estimates match to four decimals.
+- [PASS] Arg-to-Pro conversion is recovered — 0.080 recovered.
+- [PASS] The result is deterministic — Seeded fixtures and assertions.
+### Input 11 — Adversarial: Fresh AP-MS dead-control handling
+
+**Result:** Fresh AP-MS dead-control perturbation reports one excluded control and safely rejects all-empty controls.
+
+**Execution:** Executed in a fresh Python process; inputs3_5_7_10_13_python.out; exit 0.
+
+**Assertions:**
+- [PASS] A dead control is reported — CtrlIP1 is printed as excluded.
+- [PASS] Control-run count is exposed — n_ctrl_runs_used equals two.
+- [PASS] All-empty controls stop safely — ValueError asserted.
+- [PASS] The baseline call set remains interpretable — No silent data-internal normalization occurs.
+### Input 12 — Edge: Fresh sequence-free fallback and all-Pro guard
+
+**Result:** Fresh sequence-free fallback is labeled and all-Pro input raises ValueError rather than misestimating incorporation.
+
+**Execution:** Executed in a fresh Python process; inputs3_5_7_10_13_python.out; exit 0.
+
+**Assertions:**
+- [PASS] Fallback is explicitly labeled — sequence_column_used is false.
+- [PASS] Fallback incorporation is correct — 0.93 recovered.
+- [PASS] All-Pro input stops rather than misestimating — ValueError asserted.
+- [PASS] No silent conversion-safe claim is made — Fallback metadata is present.
+### Input 13 — Stress: Shipped normalization example
+
+**Result:** Fresh execution of the shipped normalization example exited 0 with its median, IRS, SILAC, AP-MS, and dead-control assertions.
+
+**Execution:** Executed in a fresh Python process; inputs3_5_7_10_13_python.out; exit 0.
+
+**Assertions:**
+- [PASS] Example terminates successfully — Exit 0.
+- [PASS] SILAC regression is asserted — Printed 0.93 incorporation and 0.08 conversion.
+- [PASS] AP-MS regression is asserted — Five of five planted interactors and zero sticky binders.
+- [PASS] IRS regression is non-tautological — Offset changes from +0.951 to -0.019.

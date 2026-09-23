@@ -142,3 +142,17 @@ Worktree `F:\OpenScience\wt\proteomics-quantification`, branch `fix/proteomics-q
 ## Left unfixed / checkpoint blocker
 
 - **P1 verification limitation — TMT reporter R block:** `MSnbase::quantify` -> `purityCorrect` produced and asserted a 24 x 10 reporter matrix with 0 negative values on `tmt10_synthetic.mzML`, but the R process exits 11 after output. A separate `library(MSnbase)` probe also exits 11 and warns that `mzR` was built against Rcpp 1.0.13 while Rcpp 1.1.1 is installed. A private binary `mzR` kept the mismatch; a private source rebuild failed at `boost/regex/v4/regex.hpp` missing. The shared R library was not changed. Resolving this needs a compatible mzR/Rcpp build for the audit R 4.4.3 environment (or an approved environment rebuild); all source-side TMT assertions otherwise pass.
+
+---
+
+# Corrective final-pass Phase 1 — 2026-09-23
+
+No source change was necessary: the Phase-2 rejection at `fb1efc10a979717f1fc66a48a6a8b12e95aa6401` was environmental. The shared Windows R library remains untouched.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| Windows R 4.4.3 paths using MSstats, MSnbase/mzR, or Arrow wrote asserted output and then exited 11 (Inputs 1, 4, 8, 9) | P0 | Created private WSL `tools/quantification-r443-conda`: R 4.4.3, Rcpp 1.1.2, mzR 2.40.0, MSnbase 2.32.0, MSstats 4.14.0, arrow 25.0.0, iq 2.0.1; source-rebuilt lme4 2.0.6 against Matrix 1.7.6 after its initial ABI warning | ran: isolated package-load probe exited 0 without ABI warning; all four inputs exited 0 and their persisted outputs were asserted | The Micromamba solve was 56 MB; the private prefix does not modify `R-lib` or WSL `bio`. |
+
+## Left unfixed
+
+None. The shared Windows `R-lib` remains intentionally unmodified and is not a deployment route for these compiled R workflows; use the recorded private environment.
