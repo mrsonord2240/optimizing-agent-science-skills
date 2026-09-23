@@ -1,0 +1,67 @@
+{
+  "meta": {
+    "skill_name": "bio-geo-data",
+    "description": "Query and download GEO data, inspect SuperSeries structure, choose processed versus raw paths, and link GEO to SRA.",
+    "evaluated_on": "2026-09-23",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 11,
+    "source": "mrsonord2240/bioSkills@ae7abb81bc209cc856ab3ea55e4cd47eaf0e2364:database-access/geo-data",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md"
+  },
+  "veto_gates": {
+    "skill_veto": { "gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS" },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "The source labels submitter-normalized matrices as trust-dependent, defaults to raw when appropriate, and makes no clinical claim." },
+      "practice_boundaries": { "result": "PASS", "detail": "This is data-access engineering and does not interpret patient outcomes or give diagnostic advice." },
+      "methodological_ground": { "result": "PASS", "detail": "Fresh live GEO/Entrez/FTP retrieval, SuperSeries relations, SRA links, and matrix parsing were exercised against current records." },
+      "code_usability": { "result": "PASS", "detail": "All shipped Python examples and geo_series.py routes completed in an isolated private runtime. The optional R GEOquery reference could not be run because no Rscript executable is present in that private runtime; this is recorded explicitly and deducted, not treated as a Python failure." }
+    }
+  },
+  "static_score": {
+    "subtotal": 95,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 12, "max": 12, "note": "GEO search, relations, series matrix, GEO-to-SRA, PubMed links, GEOparse/GEOquery choice, and legacy routes are actionable." },
+      "reliability": { "score": 12, "max": 12, "note": "The current geo_series selftest protects the Windows encoding regression and source parsers use explicit UTF-8 replacement handling." },
+      "performance_context": { "score": 8, "max": 8, "note": "Relation parsing stops before platform/sample tables and the Skill distinguishes matrices from raw/SRA routes." },
+      "agent_usability": { "score": 16, "max": 16, "note": "SuperSeries, processed-vs-raw, GDS, GEOmetadb, and ArrayExpress decision boundaries are clear." },
+      "human_usability": { "score": 8, "max": 8, "note": "Failure modes map common GEO mistakes to concrete recovery paths." },
+      "security": { "score": 12, "max": 12, "note": "No credentials are embedded; Entrez email placeholders are visible and no arbitrary code path was found." },
+      "maintainability": { "score": 10, "max": 12, "note": "Runnable scripts are separated from references; R-side execution remains environment-dependent." },
+      "agent_specific": { "score": 17, "max": 20, "note": "The source gives strong escape hatches for raw SRA, local re-normalization, and legacy resources; the R parity path could not be exercised here." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 88.2,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 35, "total": 39 },
+    "inputs": [
+      { "index": 1, "type": "Canonical", "label": "Current examples/search_geo.py breast-cancer search and relation checks", "status": "COMPLETED", "status_flag": "PASS", "executed": true, "execution_note": "Executed the pinned source example in the dedicated private runtime. It returned 10 current human RNA-seq GSE records and completed both FTP relation checks.", "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 4, "assertions_total": 4 },
+      { "index": 2, "type": "Variant A", "label": "Current examples/geo_to_sra.py preferred and fallback routes", "status": "COMPLETED", "status_flag": "PASS", "executed": true, "execution_note": "Installed pysradb only in the private runtime and executed the pinned source. Both GSE147507 routes returned 329 SRR accessions; a direct source-function comparison confirmed set equality (ordering differs). The source wrote a 329-line run list in a temporary directory.", "basic": 38, "specialized": 55, "total": 93, "assertions_passed": 5, "assertions_total": 5 },
+      { "index": 3, "type": "Edge", "label": "Current geo_series.py GSE470 matrix and absent processing notes", "status": "COMPLETED", "status_flag": "PASS", "executed": true, "execution_note": "Executed source matrix mode into a temporary directory: GSE470 parsed as 12,625 features by 12 samples, with no !Sample_data_processing entries. The compressed matrix was 838,354 bytes.", "basic": 39, "specialized": 57, "total": 96, "assertions_passed": 4, "assertions_total": 4 },
+      { "index": 4, "type": "Variant B", "label": "Current examples/geo_from_pubmed.py", "status": "COMPLETED", "status_flag": "PASS", "executed": true, "execution_note": "Executed the pinned source example in a temporary directory. PMID 32416070 resolved to the Blanco-Melo Cell record and linked GSE147507 with 110 samples.", "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 4, "assertions_total": 4 },
+      { "index": 5, "type": "Stress", "label": "GSE122288 relation and platform technology decision", "status": "COMPLETED", "status_flag": "PASS", "executed": true, "execution_note": "Executed the current detect_super_series function and current Entrez gds lookup: GSE122288 was standalone at audit time and gdsType was Methylation profiling by array; source documentation correctly requires re-verification because relations can drift.", "basic": 37, "specialized": 53, "total": 90, "assertions_passed": 3, "assertions_total": 3 },
+      { "index": 6, "type": "Scope Boundary", "label": "R GEOquery versus Python GSE470 parity", "status": "EXECUTED_ENVIRONMENT_UNAVAILABLE", "status_flag": "PARTIAL", "executed": true, "execution_note": "Executed private-runtime discovery for Rscript; no executable is installed, so the R reference could not run without mutating a shared/system environment. The Python GEOparse route did execute successfully on GSE470 (12 samples, 1 platform).", "basic": 28, "specialized": 37, "total": 65, "assertions_passed": 2, "assertions_total": 4 },
+      { "index": 7, "type": "Adversarial", "label": "Request to skip SuperSeries validation", "status": "COMPLETED", "status_flag": "PASS", "executed": true, "execution_note": "Executed current-source decision checks: the SuperSeries trap explicitly requires SOFT !Series_relation inspection and processing each SubSeries independently; the raw/SRA escape hatch is also explicit.", "basic": 39, "specialized": 56, "total": 95, "assertions_passed": 3, "assertions_total": 3 },
+      { "index": 8, "type": "Canonical", "label": "Literal current GSE346738 relation command", "status": "COMPLETED", "status_flag": "PASS", "executed": true, "execution_note": "Executed python scripts/geo_series.py relation GSE346738 in the private runtime; it returned super_of GSE283260 and GSE346737 with no parent SubSeries.", "basic": 39, "specialized": 56, "total": 95, "assertions_passed": 3, "assertions_total": 3 },
+      { "index": 9, "type": "Variant C", "label": "Fresh Alzheimer search, gdsType, and relation path", "status": "COMPLETED", "status_flag": "PASS", "executed": true, "execution_note": "Executed current search_geo() for human high-throughput-sequencing Alzheimer records (5 results; first GSE326002), queried GSE283260 gdsType, and found its current SubSeries parent GSE346738 through the source relation function.", "basic": 38, "specialized": 54, "total": 92, "assertions_passed": 3, "assertions_total": 3 },
+      { "index": 10, "type": "Edge", "label": "Current parser on GSE283260 matrix", "status": "COMPLETED", "status_flag": "PASS", "executed": true, "execution_note": "Executed source matrix mode in a temporary directory. GSE283260 parsed its 41 sample metadata columns, reported 0 expression-table features, and surfaced its Cell Ranger HDF5 processing note; no decoding exception occurred. The source offline selftest separately proves the non-ASCII cp1252-versus-UTF-8 regression guard.", "basic": 37, "specialized": 54, "total": 91, "assertions_passed": 3, "assertions_total": 3 },
+      { "index": 11, "type": "Scope Boundary", "label": "R GEOquery non-ASCII parity", "status": "EXECUTED_ENVIRONMENT_UNAVAILABLE", "status_flag": "PARTIAL", "executed": true, "execution_note": "Executed Rscript availability check in the isolated private runtime; it is absent. No shared R installation or package library was reused or mutated, so GEOquery parity could not be asserted in this pass.", "basic": 27, "specialized": 38, "total": 65, "assertions_passed": 1, "assertions_total": 3 }
+    ]
+  },
+  "final": { "static_weighted": 38.0, "dynamic_weighted": 52.9, "score": 91, "max": 100, "grade": "Production Ready", "grade_symbol": "PASS", "deployable": true, "veto_override": false },
+  "key_strengths": [
+    "All current Python examples, GEOparse, relation streaming, matrix parsing, PubMed links, and both GEO-to-SRA routes completed in an agent-private environment.",
+    "The encoding selftest and real matrix parses substantiate the explicit UTF-8 handling required on Windows.",
+    "The source protects against SuperSeries, processing-trust, and raw-read workflow mistakes with concrete decision paths."
+  ],
+  "recommendations": [
+    { "priority": "P2", "title": "Re-run GEOquery parity in a dedicated R runtime", "observed_in": [6, 11], "problem": "The private audit runtime has no Rscript executable, so the optional GEOquery reference was not live-verified.", "root_cause": "Audit-runtime capability gap, not a Python source failure.", "fix": "Provision a separate R/Bioconductor GEOquery runtime for a later parity check; do not mutate shared database-lane environments." }
+  ]
+}

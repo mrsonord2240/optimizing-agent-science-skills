@@ -1,0 +1,6 @@
+root <- Sys.getenv('REACTOME_AUDIT_ROOT'); private <- Sys.getenv('REACTOME_AUDIT_PRIVATE_LIB')
+.libPaths(c(private, .libPaths()))
+library(ReactomePA)
+x <- enrichPathway(c('CDK1','CCNB1','CDC20'), organism='human', pvalueCutoff=1, qvalueCutoff=1)
+stopifnot(is.null(x))
+cat('ASSERT symbol_input_returns_NULL\n')

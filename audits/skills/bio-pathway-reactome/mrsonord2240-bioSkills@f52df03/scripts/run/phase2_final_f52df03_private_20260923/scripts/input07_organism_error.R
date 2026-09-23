@@ -1,0 +1,6 @@
+root <- Sys.getenv('REACTOME_AUDIT_ROOT'); private <- Sys.getenv('REACTOME_AUDIT_PRIVATE_LIB')
+.libPaths(c(private, .libPaths()))
+library(ReactomePA)
+msg <- tryCatch({enrichPathway(c('1','2'),organism='ecoli'); 'NO_ERROR'}, error=function(e) conditionMessage(e))
+stopifnot(msg != 'NO_ERROR', grepl('keys|inherited method',msg,ignore.case=TRUE))
+cat('ASSERT undocumented_organism_error=',msg,'\n',sep='')

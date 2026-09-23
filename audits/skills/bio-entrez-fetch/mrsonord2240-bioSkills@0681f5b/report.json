@@ -1,0 +1,163 @@
+{
+  "source": "mrsonord2240/bioSkills@0681f5b171b43eade5c4d81f0285dd9a5dbadb20:database-access/entrez-fetch",
+  "meta": {
+    "skill_name": "bio-entrez-fetch",
+    "description": "Retrieve NCBI records and summaries with Biopython Bio.Entrez across sequence, PubMed, SRA, taxonomy, ClinVar, and dbSNP use cases.",
+    "evaluated_on": "2026-09-23",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All factual outputs came from live NCBI responses and were asserted against known accessions, identifiers, or record structure." },
+      "practice_boundaries": { "result": "PASS", "detail": "The ClinVar route reports only NCBI's record classification and the Skill explicitly excludes diagnosis and treatment recommendations." },
+      "methodological_ground": { "result": "PASS", "detail": "The routes select ESummary for metadata, EFetch for records, use versioned accessions, and reject malformed SRA text before CSV parsing." },
+      "code_usability": { "result": "PASS", "detail": "All three shipped examples, both shipped scripts, and two referenced inline patterns executed from an audit-owned copy in a private Biopython 1.88 runtime." }
+    }
+  },
+  "static_score": {
+    "subtotal": 94,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 12, "max": 12, "note": "All databases named in the frontmatter have a documented route, and the primary examples and scripts are present." },
+      "reliability": { "score": 11, "max": 12, "note": "Versioned-accession, response-prefix, chunking, schema-drift, and rate-limit guards are explicit; ordinary network retries are left to callers." },
+      "performance_context": { "score": 8, "max": 8, "note": "The decision matrix routes metadata work to ESummary and large result sets to the history server without redundant calls." },
+      "agent_usability": { "score": 15, "max": 16, "note": "The workflow, failure modes, reference routing, and runnable entry points are clear; a few output presentations remain implicit in library-returning helpers." },
+      "human_usability": { "score": 8, "max": 8, "note": "Natural triggers, concise examples, and clear recovery steps make the Skill discoverable and forgiving." },
+      "security": { "score": 11, "max": 12, "note": "No secret is embedded and the API-key pattern is externalized; public identifiers are sent to NCBI without local validation, which is low risk but not a full validation layer." },
+      "maintainability": { "score": 11, "max": 12, "note": "References isolate database-specific material and runnable scripts expose arguments; no automated regression suite ships with the Skill." },
+      "agent_specific": { "score": 18, "max": 20, "note": "Trigger precision, progressive disclosure, composability, idempotent fetch semantics, and clinical escape hatches are strong; runtime retry policy is an optional remaining escape hatch." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 95.7,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 28, "total": 28 },
+    "inputs": [
+      {
+        "index": 1, "type": "Canonical", "label": "Version-pinned GenBank and CDS retrieval", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Executed the copied examples/fetch_sequences.py in the audit-owned private Biopython 1.88 venv; every asserted live NCBI response completed with exit code 0.",
+        "note": "NM_007294.4 was 7,088 nt with one CDS; NC_000913.3 returned 4,318 CDS translations; the three-record batch and gbwithparts route completed.",
+        "basic": 39, "specialized": 58, "total": 97, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "The version-pinned BRCA1 GenBank record is returned and parsed.", "result": "PASS", "note": "Output reported NM_007294.4 and 7,088 nt." },
+          { "text": "The CDS feature count is checked rather than inferred.", "result": "PASS", "note": "Output reported one CDS feature." },
+          { "text": "One-shot CDS translation returns real protein records.", "result": "PASS", "note": "Output reported 4,318 translated CDS records." },
+          { "text": "Mixed-accession batch output is checked for truncation.", "result": "PASS", "note": "The example asserted three records for three requested accessions." }
+        ]
+      },
+      {
+        "index": 2, "type": "Variant A", "label": "Bulk nucleotide and PubMed summaries", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Executed the copied examples/fetch_summaries.py in the private runtime; live ESummary and EFetch calls exited 0 with captured output.",
+        "note": "Four nucleotide docsums and three PubMed docsums were printed; the measured four-record EFetch/ESummary payload ratio was 47.3x.",
+        "basic": 38, "specialized": 58, "total": 96, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Nucleotide summaries include accession version and length.", "result": "PASS", "note": "NM_007294.4 and its length appeared in output." },
+          { "text": "Missing Organism fields are handled without KeyError.", "result": "PASS", "note": "The title-derived organism path completed for all four docsums." },
+          { "text": "PubMed summaries include document metadata.", "result": "PASS", "note": "All three requested PMIDs printed title, author, source, and date fields." },
+          { "text": "The metadata-versus-full-record trade-off is measured from live responses.", "result": "PASS", "note": "Output measured a 47.3x EFetch/ESummary payload ratio." }
+        ]
+      },
+      {
+        "index": 3, "type": "Edge", "label": "PubMed MEDLINE and structured XML", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Executed the copied examples/fetch_pubmed.py in the private runtime against its documented PMIDs; process exited 0.",
+        "note": "Both MEDLINE and XML routes returned titles, MeSH counts, grants, and PMC ID PMC9093120 without StringElement indexing failure.",
+        "basic": 38, "specialized": 58, "total": 96, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "MEDLINE parsing produces records for the requested PMIDs.", "result": "PASS", "note": "Two MEDLINE records printed with PMID and source fields." },
+          { "text": "XML parsing returns structured MeSH data.", "result": "PASS", "note": "Output reported seven MeSH terms for the XML record." },
+          { "text": "PMC ID extraction handles Biopython StringElement values.", "result": "PASS", "note": "Output reported PMC9093120." },
+          { "text": "Schema-sensitive nested fields are accessed defensively.", "result": "PASS", "note": "The XML route completed without a missing-field exception." }
+        ]
+      },
+      {
+        "index": 4, "type": "Variant B", "label": "ClinVar VCV retrieval", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Executed copied scripts/variant_records.py with --db clinvar --uid 4887763 in the private runtime; process exited 0.",
+        "note": "ElementTree parsed VCV000005107 and the record's Pathogenic classification.",
+        "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "ClinVar VCV XML is parsed without Entrez.read DTD dependence.", "result": "PASS", "note": "The ElementTree script exited 0." },
+          { "text": "The returned accession matches the requested live record.", "result": "PASS", "note": "Output contained VCV000005107." },
+          { "text": "Clinical significance is reported as record metadata.", "result": "PASS", "note": "Output contained the source classification Pathogenic." },
+          { "text": "The documented route does not make a diagnosis or treatment recommendation.", "result": "PASS", "note": "The script returns a metadata dictionary only and the reference explicitly sets this boundary." }
+        ]
+      },
+      {
+        "index": 5, "type": "Stress", "label": "History-server FASTA fetch", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Executed copied scripts/history_fetch.py with a version-pinned one-record term and chunk size 4; live ESearch plus history-server EFetch exited 0.",
+        "note": "The script reported one requested record and wrote a 7,385-byte FASTA headed by NM_007294.4.",
+        "basic": 39, "specialized": 57, "total": 96, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "History-server search returns a count before record retrieval.", "result": "PASS", "note": "The script reported one requested record." },
+          { "text": "FASTA materializes at the requested output path.", "result": "PASS", "note": "history_small.fasta was written and nonempty." },
+          { "text": "The fetched record is the requested version-pinned accession.", "result": "PASS", "note": "The FASTA begins with >NM_007294.4." },
+          { "text": "The route uses chunked EFetch semantics rather than resending UID lists.", "result": "PASS", "note": "The shipped script completed its usehistory, WebEnv, QueryKey path." }
+        ]
+      },
+      {
+        "index": 6, "type": "Scope Boundary", "label": "dbSNP metadata without clinical overreach", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Executed copied scripts/variant_records.py with --db snp --uid 429358 in the private runtime; process exited 0.",
+        "note": "The route returned chromosome 19 and APOE metadata for rs429358's numeric UID, without interpreting a patient result.",
+        "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "The dbSNP namespaced XML route completes.", "result": "PASS", "note": "The ElementTree script exited 0." },
+          { "text": "Chromosome metadata matches the known rs429358 record.", "result": "PASS", "note": "Output reported chromosome 19." },
+          { "text": "Gene metadata matches the known rs429358 record.", "result": "PASS", "note": "Output reported APOE." },
+          { "text": "The output remains variant metadata rather than medical advice.", "result": "PASS", "note": "The script emits only chr, gene, and record classification fields." }
+        ]
+      },
+      {
+        "index": 7, "type": "Adversarial", "label": "SRA error body and taxonomy reference routes", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Executed audit-owned phase2_inline_refs.py against the copied SRA and taxonomy references; it tested both a synthetic backend-error body and live SRA/taxonomy calls, exiting 0.",
+        "note": "The error body was rejected before CSV parsing; valid SRA UIDs returned 15 rows beginning SRR000001 and taxonomy 9606 returned Homo sapiens.",
+        "basic": 38, "specialized": 58, "total": 96, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "A backend XML error body is rejected before SRA CSV parsing.", "result": "PASS", "note": "Output printed ERROR_GUARD PASS." },
+          { "text": "Valid SRA results parse into run rows.", "result": "PASS", "note": "Output reported 15 rows beginning SRR000001." },
+          { "text": "Taxonomy lineage resolves the documented human TXID.", "result": "PASS", "note": "Output reported LINEAGE Homo sapiens." },
+          { "text": "The mixed error and valid-response probe terminates cleanly.", "result": "PASS", "note": "The private process exited 0 after all assertions." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 37.6,
+    "dynamic_weighted": 57.4,
+    "score": 95,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "All advertised database routes are represented by runnable examples, scripts, or focused reference files.",
+    "The private Biopython 1.88 execution reproduced sequence, summary, PubMed, variant, history-server, SRA, and taxonomy workflows.",
+    "Defensive handling covers response-prefix validation, version-pinned accessions, XML drift, and DTD-less variant XML.",
+    "ClinVar and dbSNP guidance confines outputs to record metadata and explicitly avoids diagnostic or treatment claims."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "Close the CDS-only EFetch handle explicitly",
+      "observed_in": [1],
+      "problem": "cds_proteins() materializes all FASTA records but does not close its EFetch handle explicitly, which can accumulate open connections in a caller loop.",
+      "root_cause": "The compact inline helper returns list(SeqIO.parse(...)) without a finally block or context manager.",
+      "fix": "Read the records, close the handle, then return the list, or use a context-managed handle in the helper."
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+root <- Sys.getenv('REACTOME_AUDIT_ROOT')
+private <- Sys.getenv('REACTOME_AUDIT_PRIVATE_LIB')
+.libPaths(c(private, .libPaths()))
+library(ReactomePA); library(reactome.db); library(clusterProfiler); library(org.Hs.eg.db)
+stopifnot(length(keys(reactome.db, keytype='PATHID')) > 20000)
+stopifnot(packageVersion('ReactomePA') >= '1.50.0')
+cat('ASSERT packages_and_local_reactome_db\n')

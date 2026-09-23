@@ -101,3 +101,36 @@ Verified by grep that each moved item is present in SKILL.md. The guide keeps Ov
 | `SKILL.md` chromVAR section, 28-line R block | `scripts/run_chromvar.R` (args: rds, out prefix, ident1, ident2, optional group_by) |
 
 Ran twice through `rs.sh` on the audit's `obj_qc.rds` (270 cells x 222 peaks): 746 motifs scored, 3 significant, 230 DA rows, both output CSVs byte-identical (also confirms the `set.seed` fix). Other SKILL.md blocks are under 10 lines and stay inline; `examples/` untouched.
+
+---
+
+## 2026-09-23 — corrective Phase 1 after final-pass rejection
+
+Worktree: `F:\OpenScience\wt\single-cell-scatac-analysis`; branch
+`fix/single-cell-scatac-analysis`; corrective source commit
+`a8fef2a02c45b710257e1f5606171fa462e817a8` on rejected tip `0c0ecaa22c89b87f6ec50bbae499cbfa31b995df`.
+Environment: `single-cell-transcriptomics-analyst`; no installs and no shared-environment changes.
+
+| finding | priority | change | verified | notes |
+|---|---|---|---|---|
+| Exact documented `r.sh scripts/run_chromvar.R ...` invocation stopped at `library(Signac)` because `r.sh` configures runtime DLL paths but not the private package library | P0 | Added `.libPaths(c('F:/OpenScience/audit-envs/single-cell-transcriptomics-analyst/R-lib', .libPaths()))` before package loads in `scripts/run_chromvar.R` | Ran the exact documented command twice with no `R_LIBS` export against audit-owned `obj_qc.rds`: both wrote an RDS (23,780,387 bytes) and a 230-row CSV (14,490 bytes), reported 746 motifs / 270 cells / 3 adjusted-significant motifs; CSV SHA-256 matched: `54E787A5341AC63A07B47402A3BA5C10D3A5A9C657E5AE0976A3C446DF3048A7` | The wrapper returned `2816` after both materialized outputs; record this as an environment/runtime follow-up rather than claiming a clean exit. |
+| Opening workflow advertised removed `RunChromVAR()` although the detailed section correctly points to the replacement | P1 | Replaced the overview arrow with `scripts/run_chromvar.R` | `rg RunChromVAR` confirms the remaining occurrences explain its removal or occur in the script's historical compatibility comment | No runnable stale wrapper reference remains. |
+
+### Remaining blockers
+
+- The Windows `r.sh` -> R runtime returns post-output exit status `2816` for both completed chromVAR runs. It needs runtime-level diagnosis before a later audit may call the documented command process-clean.
+- The prior `fragtk` / `ATACqc()` and Linux-only ArchR/SnapATAC2 constraints remain unchanged.
+
+---
+
+## 2026-09-23 — Phase 1 continuation: process-clean isolated chromVAR runtime
+
+Worktree: `F:\OpenScience\wt\single-cell-scatac-analysis`; branch
+`fix/single-cell-scatac-analysis`; corrective source commit
+`e14c7b581acaa271a9bf643febcb5ff0dd40d966`.
+
+| finding | priority | change | verified | notes |
+|---|---|---|---|---|
+| The exact native Windows wrapper materialized chromVAR output but returned `2816` | P0 code-usability veto | Diagnosed with minimal probes: no-package R exits zero, while `library(Signac)` exits `-1073741819` at direct native-R teardown. Removed the audit-machine-specific library overlay and replaced the misleading native-wrapper instruction with a supported isolated WSL/Linux-R route. | Installed private `/home/sci/scatac-private-20260923` without modifying the shared Windows environment; full Signac/chromVAR stack loaded and exited zero. The exact source script ran twice through that private `Rscript` with saved `set -e` evidence, producing identical RDS/CSV outputs (746 motifs, 270 cells, 3 adjusted-significant motifs). | Native Windows Signac teardown remains unsuitable; the documented WSL route avoids claiming materialized output is a clean run. |
+
+The prior `fragtk` / `ATACqc()` and Linux-only ArchR/SnapATAC2 constraints remain unchanged. No scoring, publish, merge, or GBrain project write occurred.

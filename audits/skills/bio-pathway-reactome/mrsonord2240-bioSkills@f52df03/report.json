@@ -1,0 +1,63 @@
+{
+  "meta": {
+    "skill_name": "bio-pathway-reactome",
+    "description": "Tests a gene list or ranked vector against Reactome pathways with ReactomePA local annotations and documents ReactomeGSA as the comparative-service route.",
+    "evaluated_on": "2026-09-23",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 9,
+    "source": "mrsonord2240/bioSkills@f52df03856e4967084ee7010cb81076ac17b64bb:pathway-analysis/reactome-pathways",
+    "audit_kind": "final-pass re-audit at exact branch tip; prior canonical report/viewer archived under _pre-fix-20260923",
+    "inputs_note": "Every input used an agent-specific run directory, a copied source tree, a private R library first on .libPaths(), and a PID-recording runner. All process intervention was limited to identified descendants of the audit runner.",
+    "executed_k_of_n": "9/9 attempted; 6 reached their semantic assertions, 1 source GSEA run was stopped after failing to complete, 1 was stopped as part of the owned batch after no completed assertion, and 1 documented an unexpected organism-error mode",
+    "env": "F:/OpenScience/audit-envs/crispr-screen-analyst/r.sh; R 4.4.3, ReactomePA 1.50.0, reactome.db 1.89.0, clusterProfiler 4.14.6, org.Hs.eg.db 3.20.0; no environment mutation",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md"
+  },
+  "veto_gates": {
+    "skill_veto": {"gate": "FAIL", "stability": "FAIL", "contract": "FAIL", "determinism": "FAIL", "security": "PASS"},
+    "research_veto": {
+      "applicable": true,
+      "gate": "FAIL",
+      "scientific_integrity": {"result": "PASS", "detail": "Assertions and generated CSV/PDF files are reported separately from process exit status; no successful output is presented as a clean run."},
+      "practice_boundaries": {"result": "PASS", "detail": "The source includes non-diagnostic, non-prescriptive practice-boundary guidance."},
+      "methodological_ground": {"result": "PASS", "detail": "The exact ORA and GSEA source logic produced the expected planted results when allowed to reach its assertions."},
+      "code_usability": {"result": "FAIL", "detail": "Every audit invocation that loaded ReactomePA exited 2816 after its assertion/output, and the unmodified GSEA source created an owned 22-worker BiocParallel tree that did not finish before termination. A scientific analysis route lacks a usable clean exit contract."}
+    }
+  },
+  "static_score": {
+    "subtotal": 89,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {"score": 11, "max": 12, "note": "ORA, GSEA, hierarchy and identifier guidance fit Reactome analysis, subject to the runtime blocker."},
+      "reliability": {"score": 9, "max": 12, "note": "Input and NULL guidance is strong, but the runnable default GSEA lacks a safe backend/exit contract."},
+      "performance_context": {"score": 7, "max": 8, "note": "Scope and references are focused; long narrative remains manageable."},
+      "agent_usability": {"score": 15, "max": 16, "note": "Clear decision tree, exact identifier rules and result columns."},
+      "human_usability": {"score": 8, "max": 8, "note": "Good explanation of hierarchy and background-universe caveats."},
+      "security": {"score": 12, "max": 12, "note": "No credentials, destructive operations, or unsupported clinical claims."},
+      "maintainability": {"score": 9, "max": 12, "note": "Examples are explicit but depend on a runtime whose ReactomePA teardown is unstable."},
+      "agent_specific": {"score": 18, "max": 20, "note": "Strong boundary and failure-mode prose; a dynamic backend failure overrides it."}
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 32.0,
+    "max": 100,
+    "assertion_pass_rate": {"passed": 9, "total": 16},
+    "inputs": [
+      {"index":1,"type":"Baseline","label":"ReactomePA package and local reactome.db availability","executed":true,"execution_note":"PID-owned runner 106644 -> bash 196784; logs/input01.log; private audit library first on .libPaths().","status":"FAILED","status_flag":"FAIL","note":"Package/database assertion passed, then process exited 2816.","basic":16,"specialized":17,"total":33,"assertions_passed":1,"assertions_total":2,"assertions":[{"text":"Packages and >20,000 PATHID keys load","result":"PASS","note":"ASSERT packages_and_local_reactome_db."},{"text":"Process exits cleanly","result":"FAIL","note":"owned_bash_exit=2816."}]},
+      {"index":2,"type":"Canonical","label":"Human ORA with measured background","executed":true,"execution_note":"PID-owned runner 159680 -> bash 179908; logs/input02.log; output CSV in outputs/input02_ora.csv.","status":"FAILED","status_flag":"FAIL","note":"ORA returned 20 rows (top R-HSA-69278) and wrote CSV, but exited 2816.","basic":18,"specialized":18,"total":36,"assertions_passed":2,"assertions_total":3,"assertions":[{"text":"ORA returns non-empty result with effect columns","result":"PASS","note":"ASSERT ora_rows=20."},{"text":"Measured universe is used","result":"PASS","note":"BgRatio was present in result CSV."},{"text":"Process exits cleanly","result":"FAIL","note":"owned_bash_exit=2816."}]},
+      {"index":3,"type":"Canonical","label":"Exact copied GSEA example with default backend","executed":true,"execution_note":"PID-owned runner 204692 -> 198504; logs/input03.log. The source created 22 owned BiocParallel Rscript children; after 50 seconds without completion, only that identified tree was terminated with taskkill /T.","status":"FAILED","status_flag":"FAIL","note":"The unmodified source did not finish and has no clean default runtime contract.","basic":4,"specialized":4,"total":8,"assertions_passed":0,"assertions_total":2,"assertions":[{"text":"Source GSEA completes","result":"FAIL","note":"Owned worker tree did not complete before termination."},{"text":"Source exits cleanly","result":"FAIL","note":"Runner recorded exit 1 after owned termination."}]},
+      {"index":4,"type":"Adversarial","label":"SYMBOL input NULL guard","executed":true,"execution_note":"PID-owned runner 232984 -> 234540; logs/input04.log.","status":"FAILED","status_flag":"FAIL","note":"The intended NULL guard asserted, then ReactomePA teardown exited 2816.","basic":16,"specialized":16,"total":32,"assertions_passed":1,"assertions_total":2,"assertions":[{"text":"SYMBOL input returns NULL","result":"PASS","note":"ASSERT symbol_input_returns_NULL."},{"text":"Process exits cleanly","result":"FAIL","note":"owned_bash_exit=2816."}]},
+      {"index":5,"type":"Reproducibility","label":"Seeded GSEA repeated twice","executed":true,"execution_note":"PID-owned runner 92604 started input05; logs/input05.log. It was included in the batch whose identified parent tree was terminated after preceding default-GSEA noncompletion, before it reached an assertion.","status":"ABORTED","status_flag":"FAIL","note":"No result is claimed; the abort was confined to the audit-owned process tree.","basic":0,"specialized":0,"total":0,"assertions_passed":0,"assertions_total":2,"assertions":[{"text":"Repeated seeded results are identical","result":"FAIL","note":"No completed assertion."},{"text":"Process exits cleanly","result":"FAIL","note":"Owned batch terminated after hang."}]},
+      {"index":6,"type":"Workflow","label":"viewPathway local reaction-network PDF","executed":true,"execution_note":"PID-owned runner 12456 -> 178716; logs/input06_retry.log; PDF in outputs/input06_viewpathway.pdf.","status":"FAILED","status_flag":"FAIL","note":"Name-based viewPathway produced a non-empty PDF but exited 2816.","basic":17,"specialized":17,"total":34,"assertions_passed":1,"assertions_total":2,"assertions":[{"text":"Pathway name writes local PDF","result":"PASS","note":"ASSERT viewpathway_name_writes_pdf."},{"text":"Process exits cleanly","result":"FAIL","note":"owned_bash_exit=2816."}]},
+      {"index":7,"type":"Scope Boundary","label":"Undocumented organism error behavior","executed":true,"execution_note":"PID-owned runner 84556 -> 67996; logs/input07_retry.log.","status":"FAILED","status_flag":"FAIL","note":"The observed error differed from the claimed keys-method form: object 'msg' not found followed by a package-length failure, then exit 2816.","basic":8,"specialized":8,"total":16,"assertions_passed":0,"assertions_total":2,"assertions":[{"text":"Claimed undocumented-organism error reproduces","result":"FAIL","note":"Observed message did not match claimed keys-method text."},{"text":"Process exits cleanly","result":"FAIL","note":"owned_bash_exit=2816."}]},
+      {"index":8,"type":"Variant","label":"Exact copied GSEA example under explicit SerialParam","executed":true,"execution_note":"PID-owned runner 23904 -> 234812; logs/input08.log; copied source executed after audit wrapper registered SerialParam; CSV in outputs/input08_gsea_serial.csv.","status":"FAILED","status_flag":"FAIL","note":"The source reached 54 rows and recovered R-HSA-877300 at rank 1, but teardown still exited 2816. SerialParam is audit harness evidence, not a shipped-source fix.","basic":18,"specialized":19,"total":37,"assertions_passed":2,"assertions_total":3,"assertions":[{"text":"Planted source GSEA returns results","result":"PASS","note":"Rows returned: 54."},{"text":"Planted pathway ranks first","result":"PASS","note":"ASSERT serialized_source_gsea_rows=54 planted_rank1."},{"text":"Process exits cleanly","result":"FAIL","note":"owned_bash_exit=2816."}]},
+      {"index":9,"type":"Regression","label":"Exact copied ORA example","executed":true,"execution_note":"PID-owned runner 64520 -> 65088; logs/input09.log.","status":"FAILED","status_flag":"FAIL","note":"Exact source ORA reached 20 rows then exited 2816.","basic":17,"specialized":17,"total":34,"assertions_passed":1,"assertions_total":2,"assertions":[{"text":"Exact source ORA returns rows","result":"PASS","note":"ASSERT source_ora_rows=20."},{"text":"Process exits cleanly","result":"FAIL","note":"owned_bash_exit=2816."}]}
+    ]
+  },
+  "final": {"static_weighted":35.6,"dynamic_weighted":19.2,"score":55,"max":100,"grade":"Reject","grade_symbol":"REJECT","deployable":false,"veto_override":true},
+  "key_strengths":["Exact ORA and serialized exact GSEA logic produced non-empty planted results.","Identifier, universe, hierarchy, and practice-boundary guidance is clear.","All evidence is isolated in an agent-private audit run with PID provenance."],
+  "recommendations":[{"priority":"P0","title":"Repair ReactomePA clean-exit contract","problem":"Every ReactomePA-loaded process exits 2816 after producing output.","root_cause":"The current Windows ReactomePA dependency stack faults during process teardown even when the requested enrichment result has already materialized.","fix":"Reproduce in a fresh private R runtime, identify the package/DLL teardown fault, and verify `library(ReactomePA)` plus ORA/GSEA exit 0 before re-audit."},{"priority":"P0","title":"Make default GSEA backend bounded","problem":"The exact example spawned 22 workers and did not finish.","root_cause":"The shipped GSEA route does not register a serial or bounded BiocParallel backend, so it inherits the host's broad default worker count.","fix":"Set/document an appropriate serial or bounded BiocParallel backend, then verify the unmodified shipped command completes and exits 0 on Windows."},{"priority":"P1","title":"Correct undocumented-organism error claim","problem":"The observed error did not match the stated keys-method message.","root_cause":"The prose hard-codes an error string from a different package/runtime version instead of treating the diagnostic wording as version-dependent.","fix":"Re-run with a clean exit-capable runtime and replace the prose with the exact current error or hedge it as version-dependent."}]
+}

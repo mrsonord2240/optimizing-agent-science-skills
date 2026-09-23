@@ -1,0 +1,57 @@
+{
+  "meta": {
+    "skill_name": "bio-pathway-kegg-pathways",
+    "description": "Runs KEGG ORA, GSEA, reproducible gson snapshots, signed SPIA topology analysis, condition comparison, and pathview overlays in R.",
+    "evaluated_on": "2026-09-23",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md",
+    "source": "mrsonord2240/bioSkills@2befc0bb138ea3b0a035402c78af1c62b8955522:pathway-analysis/kegg-pathways"
+  },
+  "veto_gates": {
+    "skill_veto": { "gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS" },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "Scores and pathway counts are explicitly identified as fresh synthetic/live-service audit output; no biomedical finding was fabricated." },
+      "practice_boundaries": { "result": "PASS", "detail": "The Skill analyzes pathway statistics and does not diagnose, triage, or prescribe for an individual." },
+      "methodological_ground": { "result": "PASS", "detail": "The Skill distinguishes ORA, ranked GSEA, and signaling-only topology; it requires matching IDs, measured universes, seeds, multiple-testing adjustment, and KEGG snapshots." },
+      "code_usability": { "result": "PASS", "detail": "Both shipped examples parsed and all seven isolated-runtime inputs completed with exit 0. The graphite bootstrap knob propagation defect is a P1 usability issue, not a syntax/dependency failure." }
+    }
+  },
+  "static_score": {
+    "subtotal": 87,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 12, "max": 12, "note": "Covers KEGG pathway/module ORA, ranked GSEA, gson pinning, topology, multi-condition comparison, bacterial IDs, and map overlays." },
+      "reliability": { "score": 9, "max": 12, "note": "Excellent ID/universe/seed/live-data safeguards, but the graphite route silently ignores the exposed n_boot setting." },
+      "performance_context": { "score": 5, "max": 8, "note": "The long topology cost is disclosed, but the script's interactive control is not forwarded to graphite, which instead takes SPIA's 2,000-bootstrap default." },
+      "agent_usability": { "score": 14, "max": 16, "note": "Decision tree, explicit arguments, expected failures, and reference routing are strong; one central runtime knob is ineffective for half of the topology workflow." },
+      "human_usability": { "score": 7, "max": 8, "note": "Readable scenario table and focused references make advanced pathway choices approachable." },
+      "security": { "score": 12, "max": 12, "note": "No credential handling, destructive commands, or untrusted-code execution are documented." },
+      "maintainability": { "score": 10, "max": 12, "note": "Version block, references, and examples are well organized, but the duplicated conceptual bootstrap setting was not kept in sync with the graphite call." },
+      "agent_specific": { "score": 18, "max": 20, "note": "Trigger description, scope boundaries, and escape hatches are precise; the topology runtime control should be made operational." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 92.4,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 20, "total": 21 },
+    "inputs": [
+      { "index": 1, "type": "Canonical", "label": "Human KEGG ORA plus gson pinning", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Fresh private kegg-phase2 runtime; exit 0.", "note": "Live ORA returned 169 pathways; persisted gson snapshot returned 169 frozen ORA results dated 2026-09-23; module call completed with a valid zero-term result.", "basic": 37, "specialized": 55, "total": 92, "assertions_passed": 3, "assertions_total": 3, "assertions": [ { "text": "Explicit-universe human enrichKEGG executes", "result": "PASS", "note": "169 live pathway terms returned." }, { "text": "KEGG release can be persisted and reread as gson", "result": "PASS", "note": "write.gson/read.gson then generic enricher returned 169 terms and an access date." }, { "text": "Pathway and module routes both return structured objects", "result": "PASS", "note": "enrichKEGG and enrichMKEGG completed; this synthetic list had no significant module." } ] },
+      { "index": 2, "type": "Variant A", "label": "Ranked KEGG GSEA", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Fresh private kegg-phase2 runtime; exit 0.", "note": "Sorted Entrez log2FC vector produced 169 KEGG GSEA terms; fgsea recorded its expected small-p-value precision warnings.", "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 3, "assertions_total": 3, "assertions": [ { "text": "Seeded gseKEGG executes on decreasing named ranks", "result": "PASS", "note": "169 terms returned with exit 0." }, { "text": "KEGG organism and ncbi-geneid routing work", "result": "PASS", "note": "Live REST annotation resolved successfully." }, { "text": "Precision caveat is visible rather than silent", "result": "PASS", "note": "fgseaMultilevel logged its documented p-value precision warnings." } ] },
+      { "index": 3, "type": "Variant B", "label": "Two-condition compareCluster", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Fresh private kegg-phase2 runtime; exit 0.", "note": "Up/down lists produced 294 rows across two clusters; exit 0.", "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 3, "assertions_total": 3, "assertions": [ { "text": "compareCluster invokes enrichKEGG for named conditions", "result": "PASS", "note": "Completed with two clusters." }, { "text": "Results preserve condition membership", "result": "PASS", "note": "294 rows include both cluster labels." }, { "text": "The shared measured universe is accepted", "result": "PASS", "note": "No fallback to implicit background occurred." } ] },
+      { "index": 4, "type": "Topology", "label": "Direct SPIA and graphite runSPIA", "status": "COMPLETED", "status_flag": "⚠️", "executed": true, "execution_note": "Direct SPIA used nB=10; graphite structural execution explicitly used nB=1 in the audit only. The unmodified shipped form was observed progressing for over eight minutes and stopped only in this audit's identified process group.", "note": "Direct SPIA scored 117 pathways and graphite scored 193 with valid pG/pGFdr/Status columns. Source omission of nB on runSPIA leaves the shipped graphite call at the package default nB=2000.", "basic": 31, "specialized": 51, "total": 82, "assertions_passed": 2, "assertions_total": 3, "assertions": [ { "text": "Direct SPIA returns topology statistics", "result": "PASS", "note": "117 rows with pG, pGFdr, and Status." }, { "text": "Graphite conversion, relative-name workaround, ENTREZID namespace, and runSPIA execute", "result": "PASS", "note": "193 graphite rows with required columns under the explicit audit nB=1 override." }, { "text": "The source n_boot control applies to both topology routes", "result": "FAIL", "note": "examples/kegg_spia_topology.R supplies nB=n_boot only to spia(); runSPIA omits nB and SPIA::spia defaults it to 2000." } ] },
+      { "index": 5, "type": "Organism Boundary", "label": "Prokaryotic locus-tag ORA", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Fresh private kegg-phase2 runtime; exit 0.", "note": "E. coli locus-tag input with keyType=kegg returned 16 terms without an OrgDb; exit 0.", "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 3, "assertions_total": 3, "assertions": [ { "text": "Locus-tag keyType route executes", "result": "PASS", "note": "16 prokaryotic terms returned." }, { "text": "No human OrgDb conversion is required", "result": "PASS", "note": "Call used organism=eco and keyType=kegg." }, { "text": "Returned output is a KEGG enrichment table", "result": "PASS", "note": "Structured result was materialized with exit 0." } ] },
+      { "index": 6, "type": "Visualization", "label": "Cell-cycle pathview overlay", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Fresh private kegg-phase2 runtime; exit 0.", "note": "pathview fetched hsa04110 KGML/PNG and wrote hsa04110.pathview.png in the audit run directory; exit 0.", "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 3, "assertions_total": 3, "assertions": [ { "text": "pathview retrieves the selected KEGG map", "result": "PASS", "note": "KGML and PNG downloads were recorded." }, { "text": "Entrez fold-change overlay renders an artifact", "result": "PASS", "note": "One nonempty hsa04110.pathview.png was produced." }, { "text": "License-sensitive live KEGG dependency is surfaced", "result": "PASS", "note": "pathview's KEGG license notice was captured." } ] },
+      { "index": 7, "type": "Shipped-artifact Check", "label": "Example syntax and exports", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Fresh private kegg-phase2 runtime; exit 0.", "note": "Both shipped R examples parsed; their advertised clusterProfiler and SPIA exports resolved; exit 0.", "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 3, "assertions_total": 3, "assertions": [ { "text": "KEGG enrichment example parses", "result": "PASS", "note": "parse() completed." }, { "text": "SPIA topology example parses", "result": "PASS", "note": "parse() completed." }, { "text": "Referenced package entry points exist in installed versions", "result": "PASS", "note": "clusterProfiler::enrichKEGG and SPIA::spia resolved." } ] }
+    ]
+  },
+  "final": { "static_weighted": 34.8, "dynamic_weighted": 55.4, "score": 90, "max": 100, "grade": "Production Ready", "grade_symbol": "⭐", "deployable": true, "veto_override": false },
+  "key_strengths": [ "Fresh private-runtime tests covered each advertised KEGG workflow, including gson pinning, prokaryotic IDs, topology, comparison, and image rendering.", "The Skill clearly separates live KEGG data from frozen gson releases and prevents common universe/ID and topology-scope errors.", "The graphite relative-name and ENTREZID namespace repair is genuinely executable in the current graphite 1.56.0 runtime." ],
+  "recommendations": [ { "priority": "P1", "title": "Forward n_boot into graphite runSPIA", "observed_in": [4], "problem": "The shipped topology example offers n_boot as its sole performance/reproducibility control but only sends it to direct spia(). The graphite route silently runs 2,000 bootstraps, contradicting the interactive 200-500 guidance and the claimed nB=100 whole-script runtime.", "root_cause": "runSPIA forwards its dots to SPIA::spia, but the example omits nB=n_boot in that call.", "fix": "Change the graphite call to runSPIA(de = de_vec_gr, all = universe_gr, 'kegg_hsa_spia', nB = n_boot), then re-run the topology regression at a reduced documented value and update the reference timing." } ]
+}

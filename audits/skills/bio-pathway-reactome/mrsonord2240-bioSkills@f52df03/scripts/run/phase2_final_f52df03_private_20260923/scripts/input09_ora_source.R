@@ -1,0 +1,5 @@
+root <- Sys.getenv('REACTOME_AUDIT_ROOT'); private <- Sys.getenv('REACTOME_AUDIT_PRIVATE_LIB')
+.libPaths(c(private, .libPaths()))
+source(file.path(root,'source_copy','examples','reactome_ora.R'), echo=FALSE)
+stopifnot(nrow(results_df)>0, file.exists(file.path(tempdir(),'reactome_ora_results.csv')))
+cat('ASSERT source_ora_rows=',nrow(results_df),'\n',sep='')
