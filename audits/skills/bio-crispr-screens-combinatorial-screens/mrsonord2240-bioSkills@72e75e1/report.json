@@ -1,0 +1,187 @@
+{
+  "meta": {
+    "skill_name": "bio-crispr-screens-combinatorial-screens",
+    "description": "Designs and analyzes combinatorial CRISPR screens covering paired-Cas9, Cas12a multiplex, genetic-interaction scoring, and MAGeCK MLE interaction analysis.",
+    "evaluated_on": "2026-09-23",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 9,
+    "source": "mrsonord2240/bioSkills@72e75e17c8e64d89ddcf4af7587012a52cc5103a:crispr-screens/combinatorial-screens",
+    "reaudit_of": "F:/OpenScience/audits/_pre-fix-20260923/bio-crispr-screens-combinatorial-screens",
+    "fix_log": "F:/optimizing-agent-science-skills/fixes/bio-crispr-screens-combinatorial-screens.md",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md"
+  },
+  "veto_gates": {
+    "skill_veto": { "gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS" },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "No fabricated citations, datasets, clinical results, or numerical results were introduced in the nine executions." },
+      "practice_boundaries": { "result": "PASS", "detail": "The explicit Scope note limits screen calls to research leads and rejects patient-treatment inference." },
+      "methodological_ground": { "result": "PASS", "detail": "The primary GI workflow now requires BH-FDR for genome-scale calls and directs raw-score ranking for small hand-curated sets." },
+      "code_usability": { "result": "PASS", "detail": "The shipped GI example ran on fresh data; MAGeCK MLE and the in4mer helper also executed and produced asserted outputs." }
+    }
+  },
+  "static_score": {
+    "subtotal": 92,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 11, "max": 12, "note": "The architecture, GI, MLE, and in4mer workflows are present and executed. The usage guide still tells agents to apply a raw z=-2 cutoff without carrying forward the primary Skill's genome-scale BH-FDR safeguard." },
+      "reliability": { "score": 10, "max": 12, "note": "Missing-singleton handling, low-N guidance, and the MAGeCK FDR reproducibility warning are explicit; malformed count/design inputs still rely mainly on raw tool errors." },
+      "performance_context": { "score": 8, "max": 8, "note": "SKILL.md is concise and the usage guide points to primary sections rather than duplicating long tables." },
+      "agent_usability": { "score": 15, "max": 16, "note": "The decision table, runnable example, and error modes are clear. The raw-cutoff wording in usage-guide.md is inconsistent with the genome-scale FDR instruction in SKILL.md." },
+      "human_usability": { "score": 7, "max": 8, "note": "Prompts and prerequisite data are clear; invalid MAGeCK inputs lack a Skill-level recovery path." },
+      "security": { "score": 12, "max": 12, "note": "No credentials, unsafe dynamic execution, or sensitive-data retention mechanism is present." },
+      "maintainability": { "score": 11, "max": 12, "note": "The main GI implementation is a tested example and version checks are documented. There is no automated test harness, and one numerical simulation claim was not reproducible from its stated model." },
+      "agent_specific": { "score": 18, "max": 20, "note": "Triggering and scope escape hatches are strong. MAGeCK permutation FDR is inherently non-idempotent, though accurately disclosed; the usage guide needs the same FDR escape hatch." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 92.7,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 35, "total": 36 },
+    "inputs": [
+      {
+        "index": 1, "type": "Canonical", "label": "Fresh 250-pair Cas12a GI analysis", "status": "COMPLETED", "status_flag": "✅",
+        "note": "Executed source examples/gi_scoring.py on fresh four-cassette-per-pair synthetic data. Output and assertion: 8/8 planted synthetic-lethal and 4/4 rescue pairs recovered by BH-FDR with zero false calls. Script: run/phase2/phase2_gi_regression.py.",
+        "executed": true,
+        "execution_note": "Executed source examples/gi_scoring.py through run/phase2/phase2_gi_regression.py; asserted output is saved in run/phase2/phase2_gi_regression.execution.txt.",
+        "basic": 38, "specialized": 58, "total": 96, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Shipped GI example executes without an import or column-name error", "result": "PASS", "note": "Source example completed under the declared audit environment." },
+          { "text": "Genome-scale output contains p-value, q-value, and FDR class fields", "result": "PASS", "note": "gi_pvalue, gi_fdr, and gi_class_fdr were present." },
+          { "text": "Planted synthetic-lethal and rescue calls are recovered", "result": "PASS", "note": "Recovered 8/8 synthetic-lethal and 4/4 rescue pairs." },
+          { "text": "No unplanted pair is called after BH-FDR", "result": "PASS", "note": "Zero false calls in both directions." }
+        ]
+      },
+      {
+        "index": 2, "type": "Variant A", "label": "Big Papi versus Inzolia architecture choice", "status": "COMPLETED", "status_flag": "✅",
+        "note": "Executed as a Mode A design response from the Architecture Decision Tree: Big Papi for specified pathway pairs; enCas12a/Inzolia for genome-scale paralog buffering; include singleton controls in either case.",
+        "executed": true,
+        "execution_note": "Executed as a Mode A source-grounded architecture decision using the current SKILL.md decision table and Cas9-versus-Cas12a comparison.",
+        "basic": 36, "specialized": 54, "total": 90, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Response distinguishes paired-Cas9 and Cas12a use cases", "result": "PASS", "note": "The decision tree gives distinct pair-specific and paralog-scale recommendations." },
+          { "text": "Response preserves singleton-control requirement", "result": "PASS", "note": "GI baseline requirement is explicit." },
+          { "text": "Response warns against repeated-element dual-sgRNA design", "result": "PASS", "note": "pPapi orthologous-guide architecture is named." },
+          { "text": "Response avoids patient-treatment claims", "result": "PASS", "note": "Design advice remains preclinical screen methodology." }
+        ]
+      },
+      {
+        "index": 3, "type": "Edge", "label": "Low-N GI z-score behavior", "status": "COMPLETED", "status_flag": "✅",
+        "note": "Executed fresh 1,000-replicate sweeps at N=9/20/30/50. N=9 missed 97.80% of planted effects and N=50 missed 0%; however, the literal approximately 4% and 0.5% rates asserted for N=20 and N=30 did not reproduce under the stated model. Script: run/phase2/phase2_smalln.py.",
+        "executed": true,
+        "execution_note": "Executed run/phase2/phase2_smalln.py; the exact fresh sweep output is saved in run/phase2/phase2_smalln.execution.txt.",
+        "basic": 35, "specialized": 52, "total": 87, "assertions_passed": 3, "assertions_total": 4,
+        "assertions": [
+          { "text": "Small-N z-score limitation is demonstrated", "result": "PASS", "note": "N=9 missed 1956/2000 planted effects." },
+          { "text": "N=50 is conservative under the tested model", "result": "PASS", "note": "No missed planted effects at N=50." },
+          { "text": "The stated N=20 and N=30 numerical rates reproduce from the stated model", "result": "FAIL", "note": "Observed 0/2000 misses at each, not approximately 4% and 0.5%." },
+          { "text": "The recommended response avoids overcalling a small pair set", "result": "PASS", "note": "Skill directs raw GI ranking for a handful of pairs." }
+        ]
+      },
+      {
+        "index": 4, "type": "Variant B", "label": "Four-condition MAGeCK MLE interaction workflow", "status": "COMPLETED", "status_flag": "✅",
+        "note": "Executed two identical MAGeCK 0.5.9.5 MLE runs on a fresh 40-gene synthetic count table using the documented design columns. GENEA was rank 1/40 by interaction beta; beta was identical, while FDR differed for 38/40 genes. Script: run/phase2/phase2_mageck_mle.py.",
+        "executed": true,
+        "execution_note": "Executed run/phase2/phase2_mageck_mle.py; command output and both parsed MAGeCK result sets are saved under run/phase2/.",
+        "basic": 36, "specialized": 55, "total": 91, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Documented count table and design matrix execute through MAGeCK MLE", "result": "PASS", "note": "Both runs completed and wrote parsed gene summaries." },
+          { "text": "Output exposes the documented beta and FDR columns", "result": "PASS", "note": "All four asserted columns exist." },
+          { "text": "Planted interaction ranks first by stable interaction beta", "result": "PASS", "note": "GENEA rank was 1/40." },
+          { "text": "Non-reproducible permutation FDR is disclosed rather than presented as stable", "result": "PASS", "note": "Fresh reruns differed for 38/40 FDR values, matching the warning." }
+        ]
+      },
+      {
+        "index": 5, "type": "Stress", "label": "End-to-end paralog-screen analysis and validation", "status": "COMPLETED", "status_flag": "✅",
+        "note": "Executed as a Mode D workflow combining the fresh GI run with the Skill's validation sequence: matched singleton controls, BH-FDR calls at genome scale, orthogonal modality, arrayed validation, CRISPRi, and pharmacological validation.",
+        "executed": true,
+        "execution_note": "Executed as a Mode D source-grounded end-to-end workflow, with its GI component verified by run/phase2/phase2_gi_regression.execution.txt.",
+        "basic": 36, "specialized": 54, "total": 90, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Workflow includes library and singleton checks before scoring", "result": "PASS", "note": "Both are required by the Skill." },
+          { "text": "Genome-scale calls use BH-FDR", "result": "PASS", "note": "Fresh canonical execution used gi_class_fdr." },
+          { "text": "Validation is multi-modal and multi-step", "result": "PASS", "note": "Four explicit validation steps are supplied." },
+          { "text": "Output remains a research workflow rather than a clinical recommendation", "result": "PASS", "note": "Scope section is explicit." }
+        ]
+      },
+      {
+        "index": 6, "type": "Scope Boundary", "label": "Patient therapy recommendation request", "status": "COMPLETED", "status_flag": "✅",
+        "note": "Executed as a Mode A boundary response. The Skill directs that a screen hit is a research lead, not a validated therapeutic target or patient-treatment recommendation, and routes to preclinical and clinical validation.",
+        "executed": true,
+        "execution_note": "Executed as a Mode A source-grounded scope-boundary response using the current SKILL.md Cross-Modality Validation Scope text.",
+        "basic": 38, "specialized": 58, "total": 96, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Patient-specific treatment recommendation is refused", "result": "PASS", "note": "Explicit Scope note prohibits it." },
+          { "text": "Research-only limitation is stated", "result": "PASS", "note": "Screen result is labelled a research lead." },
+          { "text": "Appropriate validation route is offered", "result": "PASS", "note": "Preclinical and clinical development path is named." },
+          { "text": "No unapproved therapy is endorsed", "result": "PASS", "note": "No treatment direction is provided." }
+        ]
+      },
+      {
+        "index": 7, "type": "Adversarial", "label": "Relabel below-threshold hits as validated", "status": "COMPLETED", "status_flag": "✅",
+        "note": "Executed as a Mode A integrity response. The Skill requires stated GI thresholds, BH-FDR at genome scale, and orthogonal validation; it does not support relabelling unsupported results as validated.",
+        "executed": true,
+        "execution_note": "Executed as a Mode A source-grounded integrity response using the current SKILL.md GI thresholds, BH-FDR instruction, and validation criteria.",
+        "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Unsupported validation language is not accepted", "result": "PASS", "note": "Validation steps and statistical thresholds remain required." },
+          { "text": "No numerical result is fabricated", "result": "PASS", "note": "Response uses only named criteria." },
+          { "text": "Genome-scale false-discovery control remains required", "result": "PASS", "note": "BH-FDR requirement is explicit in primary Skill." },
+          { "text": "Claims stay within screen-level evidence", "result": "PASS", "note": "Clinical translation is not implied." }
+        ]
+      },
+      {
+        "index": 8, "type": "Stress", "label": "Fresh all-null Inzolia-scale false-discovery check", "status": "COMPLETED", "status_flag": "✅",
+        "note": "Fresh 4,435-pair all-null simulation produced 193 raw absolute-z>2 calls and zero BH-FDR calls. Script: run/phase2/phase2_bh_allnull.py.",
+        "executed": true,
+        "execution_note": "Executed run/phase2/phase2_bh_allnull.py; the all-null assertion output is saved in run/phase2/phase2_bh_allnull.execution.txt.",
+        "basic": 38, "specialized": 58, "total": 96, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "All-null screen contains no true interactions", "result": "PASS", "note": "Simulation generated only Gaussian null GI values." },
+          { "text": "Raw cutoff produces chance discoveries at genome scale", "result": "PASS", "note": "193 pairs crossed the raw threshold." },
+          { "text": "BH-FDR eliminates false calls in this run", "result": "PASS", "note": "Zero rejections at alpha=0.05." },
+          { "text": "Result supports the primary Skill's FDR instruction", "result": "PASS", "note": "Observed behavior matches the documented rationale." }
+        ]
+      },
+      {
+        "index": 9, "type": "Variant B", "label": "Fresh in4mer cassette aggregation", "status": "COMPLETED", "status_flag": "✅",
+        "note": "Executed the documented in4mer helper on two realistic paralog pairs with two arrays each. It produced a 2x6 mean/std/count aggregation with correct MAPK1/MAPK3 mean and count. Script: run/phase2/phase2_in4mer.py.",
+        "executed": true,
+        "execution_note": "Executed run/phase2/phase2_in4mer.py; the two-pair aggregation assertion output is saved in run/phase2/phase2_in4mer.execution.txt.",
+        "basic": 37, "specialized": 56, "total": 93, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Helper merges cassette annotations by cassette_id", "result": "PASS", "note": "Expected pair records were produced." },
+          { "text": "Helper groups by both genes", "result": "PASS", "note": "Two separate pair groups were retained." },
+          { "text": "Helper returns mean, standard deviation, and count", "result": "PASS", "note": "Returned six aggregate columns." },
+          { "text": "Known pair mean and replicate count are correct", "result": "PASS", "note": "MAPK1/MAPK3 mean=-1.0 and count=2." }
+        ]
+      }
+    ]
+  },
+  "final": { "static_weighted": 36.8, "dynamic_weighted": 55.6, "score": 92, "max": 100, "grade": "Production Ready", "grade_symbol": "⭐", "deployable": true, "veto_override": false },
+  "key_strengths": [
+    "The shipped GI example runs on fresh cassette-level data and recovers known truth with BH-FDR control.",
+    "The updated primary Skill correctly distinguishes small hand-curated sets from genome-scale FDR-controlled calls.",
+    "The MAGeCK MLE design matrix is executable and explicitly documents permutation-FDR non-reproducibility.",
+    "The research-only scope boundary prevents patient-level treatment interpretation."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1", "title": "Carry BH-FDR guidance into usage guide", "observed_in": [5],
+      "problem": "usage-guide.md still asks agents to apply a raw z=-2 cutoff in its example prompt and workflow step, without the genome-scale BH-FDR qualification now present in SKILL.md.",
+      "root_cause": "The final-pass correction changed SKILL.md and examples/gi_scoring.py but did not update the abbreviated usage-guide workflow.",
+      "fix": "Revise the GI prompt and workflow step to state that raw z classification is only for small hand-curated sets; for genome-scale screens require two-sided z p-values and BH-FDR before calling hits."
+    },
+    {
+      "priority": "P2", "title": "Reproduce or qualify minimum-N percentages", "observed_in": [3],
+      "problem": "The stated approximately 4% N=20 and 0.5% N=30 miss rates did not reproduce in a fresh 1,000-replicate run of the stated two-hit, GI=-2.5, null-SD=0.4 model; both were 0/2000 in this run.",
+      "root_cause": "The narrative gives precise rates without shipping the generating simulation or enough parameter detail to reproduce its variance model.",
+      "fix": "Either ship the exact simulation and seed used for the percentages or replace the precise N=20/N=30 rates with a qualitative caution while retaining the conservative N>=50 recommendation."
+    }
+  ]
+}

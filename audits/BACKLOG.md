@@ -30,7 +30,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The audit R library has incompatible compiled components; Phase 1 identified mzR built against Rcpp 1.0.13 while Rcpp 1.1.1 is installed, and a private mzR source build lacks boost/regex/v4/regex.hpp.
 - Fix: Provision an isolated R 4.4.3 library with mutually compatible Rcpp, mzR, MSnbase, MSstats, and Arrow binaries or complete the approved source-build prerequisites. Re-run Inputs 1, 4, 8, and 9 and require clean exit 0 before deployment.
 
-## P1 (156)
+## P1 (157)
 
 ### `bio-data-visualization-lollipop-protein-maps` — Shipped example never completes and paints wrong colours
 
@@ -1216,6 +1216,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The script indexes pandas string accessors directly without checking that every target and bystander position is an integer in the shared aligned-sequence range.
 - Fix: Before assigning edit flags, reject positions below 1 or above the aligned sequence length with ValueError that names the invalid value and valid range. Validate target_pos and every bystander_pos, and reject missing or unequal-length aligned/reference strings explicitly.
 
+### `bio-crispr-screens-combinatorial-screens` — Carry BH-FDR guidance into usage guide
+
+- Skill: 92, Production Ready · [mrsonord2240/bioSkills@72e75e1](https://github.com/mrsonord2240/bioSkills/tree/72e75e17c8e64d89ddcf4af7587012a52cc5103a/crispr-screens/combinatorial-screens) · [viewer](skills/bio-crispr-screens-combinatorial-screens/mrsonord2240-bioSkills@72e75e1/viewer.md)
+- Observed in inputs: 5
+- Problem: usage-guide.md still asks agents to apply a raw z=-2 cutoff in its example prompt and workflow step, without the genome-scale BH-FDR qualification now present in SKILL.md.
+- Root cause: The final-pass correction changed SKILL.md and examples/gi_scoring.py but did not update the abbreviated usage-guide workflow.
+- Fix: Revise the GI prompt and workflow step to state that raw z classification is only for small hand-curated sets; for genome-scale screens require two-sided z p-values and BH-FDR before calling hits.
+
 ### `bio-metabolomics-pathway-mapping` — Reference-library downloads are an undisclosed network dependency
 
 - Skill: 92, Production Ready · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/metabolomics/pathway-mapping) · [viewer](skills/bio-metabolomics-pathway-mapping/mrsonord2240-bioSkills@6847328/viewer.md)
@@ -1280,7 +1288,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (423)
+## P2 (422)
 
 ### `bio-data-visualization-lollipop-protein-maps` — HGVSp edge cases and recurrence semantics undocumented
 
@@ -4122,21 +4130,13 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The phrase 'real turnkey pipeline' generalizes one successful preparation command to the full novel-target workflow.
 - Fix: Say MGLTools enables the documented per-target preparation workflow, then list the remaining required preparation scripts without calling it turnkey unless a full new-target example is supplied.
 
-### `bio-crispr-screens-combinatorial-screens` — No minimum-N guidance for the z-score GI cutoff (open; re-auditor disagrees this is out of fixer scope)
+### `bio-crispr-screens-combinatorial-screens` — Reproduce or qualify minimum-N percentages
 
-- Skill: 92, Production Ready · [mrsonord2240/bioSkills@7763a3c](https://github.com/mrsonord2240/bioSkills/tree/7763a3c04fd12306e4f1a546b3cdf91820900755/crispr-screens/combinatorial-screens) · [viewer](skills/bio-crispr-screens-combinatorial-screens/mrsonord2240-bioSkills@7763a3c/viewer.md)
+- Skill: 92, Production Ready · [mrsonord2240/bioSkills@72e75e1](https://github.com/mrsonord2240/bioSkills/tree/72e75e17c8e64d89ddcf4af7587012a52cc5103a/crispr-screens/combinatorial-screens) · [viewer](skills/bio-crispr-screens-combinatorial-screens/mrsonord2240-bioSkills@72e75e1/viewer.md)
 - Observed in inputs: 3
-- Problem: At low N (independently re-confirmed at N=9, distinct from the original N=8 case), planted strong synthetic-lethal interactions were the most extreme values in the set but did not cross the documented z<-2 cutoff, purely because a small pair count under-populates the null distribution used for z-normalization. SKILL.md still gives no minimum-N guidance.
-- Root cause: SKILL.md documents cassette/singleton-count thresholds but never states a minimum number of tested pairs needed for z-normalization to be well-calibrated. The fixer judged this 'new statistical guidance' and left it open, deferring to the re-auditor per the fix log.
-- Fix: Re-auditor's judgment: this should have been fixed. FIX_BRIEF's own bar for a method-level change is 'the audit demonstrated the problem with a run' -- Input 3 already demonstrated it pre-fix, and this re-audit reproduced it independently on different data. Cheap, one-line addition: note that z-score normalization needs a reasonably large tested-pair set (dozens or more) for a stable null, and recommend raw GI effect-size ranking instead of a z-cutoff for small, specific pair sets (e.g. a handful of Big Papi pairs). Does not block landing (P2, no veto, no P0).
-
-### `bio-crispr-screens-combinatorial-screens` — No multiple-testing correction guidance for genome-scale z-score GI calling (open; re-auditor agrees out of fixer scope)
-
-- Skill: 92, Production Ready · [mrsonord2240/bioSkills@7763a3c](https://github.com/mrsonord2240/bioSkills/tree/7763a3c04fd12306e4f1a546b3cdf91820900755/crispr-screens/combinatorial-screens) · [viewer](skills/bio-crispr-screens-combinatorial-screens/mrsonord2240-bioSkills@7763a3c/viewer.md)
-- Observed in inputs: 1, 5
-- Problem: The fixed z<-2/z>2 cutoff is applied without discussion of false-discovery control when testing thousands of pairs simultaneously at genome scale.
-- Root cause: SKILL.md documents a single raw z-score cutoff with no FDR/BH correction step.
-- Fix: Re-auditor's judgment: correctly left open. Unlike the minimum-N issue, no audit run has ever demonstrated this producing a wrong call in practice (both the first audit's 200-pair run and this re-audit's 150-pair run recovered ground truth with 0 false positives at the documented cutoff). This is prospective best-practice guidance, not a correction of a demonstrated defect, so it is legitimately outside the fixer's 'correction, not new content' mandate. Worth adding in a future content pass: recommend Benjamini-Hochberg correction across all tested pairs at genome scale.
+- Problem: The stated approximately 4% N=20 and 0.5% N=30 miss rates did not reproduce in a fresh 1,000-replicate run of the stated two-hit, GI=-2.5, null-SD=0.4 model; both were 0/2000 in this run.
+- Root cause: The narrative gives precise rates without shipping the generating simulation or enough parameter detail to reproduce its variance model.
+- Fix: Either ship the exact simulation and seed used for the percentages or replace the precise N=20/N=30 rates with a qualitative caution while retaining the conservative N>=50 recommendation.
 
 ### `bio-crispr-screens-in-vivo-screens` — Ethics-requirement surfacing relies on agent judgment, not a forced trigger
 
