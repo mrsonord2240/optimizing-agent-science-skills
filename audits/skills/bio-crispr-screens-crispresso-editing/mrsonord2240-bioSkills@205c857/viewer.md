@@ -7,99 +7,41 @@
 
 # Eval Viewer — bio-crispr-screens-crispresso-editing
 
-Generated: 2026-09-23  
-Source: `mrsonord2240/bioSkills@205c8574b66f30fb04cb2fdbd0464f6d37a70920:crispr-screens/crispresso-editing`  
-Final-pass exception: `auditor_independent: false` — `final pass: fixed and audited under one brief, see CHECKPOINT.md`
+Generated: 2026-09-23
 
-## Summary
+Source: `mrsonord2240/bioSkills@205c8574b66f30fb04cb2fdbd0464f6d37a70920:crispr-screens/crispresso-editing`
 
-| Input | Type | Executed | Basic /40 | Specialized /60 | Total | Assertions | Status |
-|---|---|---:|---:|---:|---:|---:|---|
-| 1 | Canonical Cas9 | No | 31 | 48 | 79 | 3/4 | Partial |
-| 2 | CBE | No | 31 | 48 | 79 | 3/4 | Partial |
-| 3 | Wrong locus | No | 30 | 46 | 76 | 3/4 | Partial |
-| 4 | Pooled | No | 31 | 48 | 79 | 3/4 | Partial |
-| 5 | Batch + compare | No | 31 | 47 | 78 | 3/4 | Partial |
-| 6 | Parser | Yes | 38 | 56 | 94 | 4/4 | Completed |
-| 7 | WGS | No | 30 | 46 | 76 | 3/4 | Partial |
-| 8 | Ambiguous BE | No | 31 | 47 | 78 | 4/4 | Partial |
-| 9 | Shipped shell example | Yes | 37 | 55 | 92 | 4/4 | Completed |
-| 10 | ABE | No | 31 | 48 | 79 | 3/4 | Partial |
-| 11 | Prime editor | No | 31 | 48 | 79 | 3/4 | Partial |
+## Result
 
-Execution average: **80.8 / 100**. Assertion pass rate: **36/44**.
+**93/100 — Production Ready — deployable: true.** Both veto gates passed. This final-pass audit intentionally records `auditor_independent: false` and `final pass: fixed and audited under one brief, see CHECKPOINT.md`.
 
-## Fresh evidence
+| Input | Test | Basic | Specialized | Total | Assertions | Status |
+|---|---|---:|---:|---:|---:|---|
+| 1 | Cas9 canonical | 38 | 57 | 95 | 4/4 | ✅ |
+| 2 | CBE window | 38 | 57 | 95 | 4/4 | ✅ |
+| 3 | Wrong locus | 35 | 54 | 89 | 4/4 | ✅ |
+| 4 | Pooled pilot | 38 | 58 | 96 | 4/4 | ✅ |
+| 5 | Batch + compare | 38 | 58 | 96 | 4/4 | ✅ |
+| 6 | Parser + WGS | 38 | 58 | 96 | 4/4 | ✅ |
+| 7 | Default BE | 38 | 57 | 95 | 4/4 | ✅ |
+| 8 | Shipped shell syntax | 36 | 57 | 93 | 4/4 | ✅ |
+| 9 | ABE window | 38 | 57 | 95 | 4/4 | ✅ |
+| 10 | Prime editor | 38 | 57 | 95 | 4/4 | ✅ |
+| 11 | Docker recovery probes | 38 | 58 | 96 | 4/4 | ✅ |
 
-The exact checked source is clean (`HEAD` and branch were verified before the audit). The old audit bundle was preserved at `F:\OpenScience\audits\_pre-fix-20260923\bio-crispr-screens-crispresso-editing\` before this bundle was created.
+Execution average: **94.6/100**. Assertion pass rate: **44/44**. Static score: **90/100**.
 
-Freshly passed:
+## Fresh execution evidence
 
-- `scripts/parse_crispresso.py --selftest` → `selftest OK`.
-- `python -m py_compile scripts/parse_crispresso.py` → exit 0.
-- `bash -n examples/crispresso_analysis.sh` → exit 0.
-- Docker daemon probe → `29.7.2`.
+- `run/probe_docker_recovery_20260923.ps1` passed new `hello-world` and `CRISPResso --version` probes; version was 2.3.4.
+- `run/fresh_20260923_complete/validation.json` passed all material checks: Cas9 Modified% 26.38297872, pooled rows 2, batch rows 2, WGS rows 2, 94.0% parser mapping, and prime-edit reference/prime/scaffold rows.
+- All dynamic input records in the JSON set `executed: true` with an explicit `execution_note`.
+- The unmodified source parser self-test, Python compilation, and shipped shell syntax check passed.
 
-Freshly blocked, and not scored as successful execution:
+## Material observation
 
-- `run/run_dynamic.ps1` created `audit_crispresso_input1_cas9_*`, but `docker cp` into that created container hung before `CRISPResso` started. The audit process was stopped and that exact `created` container was removed.
-- `run/docker_start_probe.ps1` separately attempted `CRISPResso --version`; after 45 seconds the process it started was stopped. Its container was still `created`, then removed. See `run/docker_start_probe_status.txt` and `run/docker_start_probe_container_state.txt`.
+For a deliberately wrong amplicon, CRISPResso2 2.3.4 emitted `ERROR: No alignments were found` and wrote no quantification result, but its container exited 0. This does not invalidate the error route, but the Skill must not promise exit code 1. It is the sole P2.
 
-The saved suite includes fresh Cas9, CBE, wrong-locus, pooled, batch, positional-compare, parser, WGS, default-BE, shipped-script, ABE, and prime-editor checks. `run/validate_dynamic.py` is intentionally not claimed to have passed because its container-dependent prerequisites were unavailable.
+## Archive
 
-## Detailed checks
-
-### 1. Canonical Cas9
-
-Prompt: quantify Cas9 indels from the FANC amplicon and report mapping plus edited fraction. The command includes FASTQ, amplicon, guide, and named output. The parser’s fresh self-test confirms the expected 250-input / 235-aligned / 94.0% schema. Quality filtering is disclosed as result-changing. Live output was blocked by Docker.
-
-### 2. CBE
-
-Prompt: report target conversion, bystanders, and indels from a CBE amplicon. The command explicitly requests `C -> T`, base-editor output, and a 10-base window. The reference directs users to the per-position table and separately describes target/bystander interpretation. Docker prevented output production.
-
-### 3. Wrong locus
-
-Prompt: distinguish a complete wrong-locus failure from a low-alignment run. The suite intentionally pairs FANC reads with HEK3 sequence and expects failure. Documentation correctly says no percentage should be invented when no output exists. Docker prevented the new expected failure observation.
-
-### 4. Pooled amplicons
-
-Prompt: quantify the two-amplicon pilot pool. The suite explicitly overrides the silent-NA 1000-read default with `--min_reads_to_use_region 100`; the guide requires inspection for `NA` rows. Docker prevented output production.
-
-### 5. Batch and compare
-
-Prompt: process untreated/Cas9 samples then compare output folders. Batch headers, aggregate output layout, and positional `CRISPRessoCompare` syntax are documented. Docker prevented the batch and comparison runs.
-
-### 6. Parser
-
-Prompt: parse a CRISPResso output directory. This was executed: `--selftest` passed the 94.0% mapping and 26.38297872 Modified% assertions, and `py_compile` passed.
-
-### 7. WGS
-
-Prompt: quantify suspected off-target regions from a small BAM. The audit freshly staged BAM, index, upstream small-genome reference, and region table. The guide uses `--bam_file` and explains WGS `NA` rows. Docker prevented execution.
-
-### 8. Ambiguous BE
-
-Prompt: analyze a base editor without declaring CBE or ABE. The decision tree warns that absent conversion flags assume CBE and can misclassify ABE; direction-specific reference commands are available. Docker prevented the default-behavior run.
-
-### 9. Shipped shell example
-
-Prompt: validate the repository’s executable example. `bash -n` was freshly run successfully. The script uses `set -e`, named configuration variables, and positional `CRISPRessoCompare` folders. End-to-end placeholder FASTQ execution needs Docker.
-
-### 10. ABE
-
-Prompt: quantify A-to-G editing in a widened window. The stored command includes `--base_editor_output`, `A`, `G`, window size 10, and center -10; interpretation requires the per-position table. Docker prevented output production.
-
-### 11. Prime editor
-
-Prompt: quantify an intended HEK3 prime edit and scaffold incorporation. The fresh staged synthetic input and command include spacer, extension, and scaffold parameters. The documentation distinguishes intended, scaffold, indel, and unmodified outcomes. Docker prevented the run.
-
-## Gates and decision
-
-- Skill Veto: **PASS** — frontmatter, structure, determinism, and security passed.
-- Research Veto: **PASS** — no scientific fabrication, medical diagnosis, methodological redline, or unusable shipped code was found.
-- Final score: **84/100 — Limited Release**.
-- Deployable: **false**. This is an evidence hold, not a source-code veto: nine core container-dependent checks have no fresh checked outputs.
-
-## Required next action
-
-Restore Docker’s container-start path, then run `run/run_dynamic.ps1`. It must reach `run/validation.json` successfully and produce checked CRISPResso outputs before this report can become deployable.
+The rejected Docker-blocked canonical report and viewer were copied before replacement to `F:\OpenScience\audits\_pre-fix-20260923\bio-crispr-screens-crispresso-editing\rejected-docker-blocked-20260923\`.

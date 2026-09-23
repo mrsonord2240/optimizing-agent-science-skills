@@ -22,7 +22,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The example passes cluster_rows=<OLO dendrogram> together with row_split=gene_info$pathway, a combination ComplexHeatmap rejects; the script was never run.
 - Fix: Drop row_split or use a numeric row_split (works with the dendrogram), or apply OLO within each pathway group; supply a runnable data preamble and state the constraint in SKILL.md next to the OLO block.
 
-## P1 (159)
+## P1 (158)
 
 ### `bio-data-visualization-lollipop-protein-maps` — Shipped example never completes and paints wrong colours
 
@@ -591,14 +591,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The Decision Tree says use_unmod=TRUE supports a proxy-adjusted analysis without a global proteome, but msstatsptm_labelfree.R unconditionally reads evidence_prot, proteinGroups, and annotation_protein.
 - Root cause: The script has one mandatory paired-global converter path while the documentation exposes a second input contract.
 - Fix: Either add and execute a genuinely no-global branch that omits the global files and labels its output proxy-adjusted, or remove that invocation and state that the script requires paired global-proteome inputs.
-
-### `bio-crispr-screens-crispresso-editing` — Restore Docker execution and rerun core modes
-
-- Skill: 84, Limited Release · [mrsonord2240/bioSkills@205c857](https://github.com/mrsonord2240/bioSkills/tree/205c8574b66f30fb04cb2fdbd0464f6d37a70920/crispr-screens/crispresso-editing) · [viewer](skills/bio-crispr-screens-crispresso-editing/mrsonord2240-bioSkills@205c857/viewer.md)
-- Observed in inputs: 1, 2, 3, 4, 5, 7, 8, 10, 11
-- Problem: The Docker daemon answered version requests but newly created CRISPResso containers never reached start; docker cp and a 45-second CRISPResso --version probe timed out. Fresh core CLI outputs therefore could not be checked.
-- Root cause: Shared Docker Desktop container-start path is unavailable in this audit session, not a defect in the Skill bytes.
-- Fix: Restore the Docker container-start path without disrupting unrelated containers, then rerun run/run_dynamic.ps1 and require the generated validation.json to pass before changing deployable to true.
 
 ### `bio-single-cell-splicing` — scQuint block fails on real self-consistent STARsolo output
 
@@ -1921,14 +1913,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The Skill routes PHI-sensitive work to OpenCRAVAT but does not say that sending participant variants to a public API needs consent and approvals.
 - Root cause: Governance mentioned only as a tool choice.
 - Fix: Add a one-line consent/approvals note beside the batch workflow.
-
-### `bio-crispr-screens-crispresso-editing` — Cite interpretation thresholds more precisely
-
-- Skill: 84, Limited Release · [mrsonord2240/bioSkills@205c857](https://github.com/mrsonord2240/bioSkills/tree/205c8574b66f30fb04cb2fdbd0464f6d37a70920/crispr-screens/crispresso-editing) · [viewer](skills/bio-crispr-screens-crispresso-editing/mrsonord2240-bioSkills@205c857/viewer.md)
-- Observed in inputs: —
-- Problem: Several numerical editing and bystander thresholds are labelled field convention or application-dependent without per-threshold source links.
-- Root cause: Threshold table summarizes practice guidance more compactly than its evidence base.
-- Fix: Add direct citations or clearly mark each threshold as project-specific QC guidance in the quantitative-thresholds table.
 
 ### `bio-isoform-switching` — Manual DTU block fails on non-syntactic sample IDs
 
@@ -4001,6 +3985,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: Live OpenGWAS execution remains JWT-gated, and local VEP with the GRCh38 cache was not installed in this audit environment.
 - Root cause: These are external authenticated or multi-GB runtime prerequisites rather than source-code failures.
 - Fix: At invocation, preflight for an OpenGWAS token and VEP/cache availability, then emit a concise blocked status before starting a long scan; retain the documented local-LD fallback.
+
+### `bio-crispr-screens-crispresso-editing` — Correct the wrong-locus exit-code claim
+
+- Skill: 93, Production Ready · [mrsonord2240/bioSkills@205c857](https://github.com/mrsonord2240/bioSkills/tree/205c8574b66f30fb04cb2fdbd0464f6d37a70920/crispr-screens/crispresso-editing) · [viewer](skills/bio-crispr-screens-crispresso-editing/mrsonord2240-bioSkills@205c857/viewer.md)
+- Observed in inputs: 3
+- Problem: CRISPResso 2.3.4 logged the no-alignments error and produced no quantification table, but its container exit code was 0 rather than the stated 1.
+- Root cause: The Skill assumes the documented error route is a reliable process-status contract without testing this image version.
+- Fix: Require checking the error text and absence of CRISPResso_quantification_of_editing_frequency.txt; do not promise a nonzero exit code.
 
 ### `bio-experimental-design-randomization-blocking` — usage-guide.md lost its standalone human-skimmable process/tips summary
 
