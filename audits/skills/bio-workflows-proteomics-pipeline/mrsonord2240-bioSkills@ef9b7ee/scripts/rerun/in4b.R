@@ -1,0 +1,17 @@
+
+.libPaths(c('F:/OpenScience/audit-envs/mass-spec-proteomics-analyst/R-lib', .libPaths()))
+suppressMessages(library(MSnbase))
+PP <- 'F:/OpenScience/audits/bio-workflows-proteomics-pipeline'
+setwd(file.path(PP, 'rerun', 'work4'))
+tmpl <- makeImpuritiesMatrix(x = 10, edit = FALSE); ch <- colnames(tmpl)
+raw <- readMSData('tmt.mzML', mode = 'onDisk')
+q <- suppressMessages(quantify(raw, reporters = TMT10, method = 'max'))
+truth <- read.csv(file.path(PP,'data','tmt10_truth.csv'), check.names = FALSE)
+tm <- as.matrix(truth[, ch]); rel <- function(m) m / rowSums(m)
+n <- min(nrow(tm), nrow(exprs(q)))
+err <- function(m) median(abs(rel(m[1:n, ]) - rel(tm[1:n, ])))
+good <- purityCorrect(q, tmpl)
+badm <- t(tmpl); dimnames(badm) <- dimnames(tmpl)
+badc <- purityCorrect(q, badm)
+cat(sprintf('correct CoA err %.5f | TRANSPOSED CoA err %.5f | uncorrected %.5f\n', err(exprs(good)), err(exprs(badc)), err(exprs(q))))
+cat('negatives with transposed CoA:', sum(exprs(badc) < 0, na.rm = TRUE), '-> the block stopifnot(negatives==0) passes\n')

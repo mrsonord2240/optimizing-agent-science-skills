@@ -30,7 +30,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The examples contain the required imports but the corresponding inline blocks were changed independently.
 - Fix: Add library(dplyr) to the inline Milo library block and import tensorflow as tf to the inline scCODA block. Execute both inline paths, not only examples, on the saved synthetic fixture before re-audit.
 
-## P1 (156)
+## P1 (157)
 
 ### `bio-data-visualization-lollipop-protein-maps` — Shipped example never completes and paints wrong colours
 
@@ -848,14 +848,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: Self-contradiction: the Skill's own Governing Principle says a state outside the reference is forced to the nearest label 'often with high apparent confidence', which is precisely why artifact clusters are confident. Low confidence instead tracks fine-granularity ambiguity between similar reference labels.
 - Fix: Invert the entry point. Screen every cluster on the QC covariates the same code block already computes - pct_counts_mt, n_genes_by_counts, doublet rate, batch purity - and use low annotation confidence only as a secondary signal for 'not in reference'. In this run the QC columns separated the artifacts perfectly (21-22% mito against a 2.5% baseline; doublet rates 0.44 and 0.22 against 0.02).
 
-### `bio-workflows-proteomics-pipeline` — The fixed treat() fold-change floor silently zeroes the intermediate level of a dose series
-
-- Skill: 87.7, Production Ready · [mrsonord2240/bioSkills@45a0c5a](https://github.com/mrsonord2240/bioSkills/tree/45a0c5a65b7346d47a7b72b6d0a6eb60ea590317/workflows/proteomics-pipeline) · [viewer](skills/bio-workflows-proteomics-pipeline/mrsonord2240-bioSkills@45a0c5a/viewer.md)
-- Observed in inputs: Input 3
-- Problem: The newly supported multi-condition path inherits treat(lfc = log2(1.5)) = 0.585 log2 from the two-condition workflow. On a dose design whose LowDose effect is a real 0.7 log2, Low_vs_Ctl returns 0 calls while High_vs_Ctl returns 20 -- a reader following the block would report "no effect at low dose" for 120 proteins that genuinely respond. The floor is correct practice for a single pairwise comparison; on a monotonic dose series it is a design decision that must be stated.
-- Root cause: The contrast machinery was generalised to N levels while the effect-size threshold stayed a single global constant written for the two-condition case.
-- Fix: Add one line beside the treat() call: "lfc = log2(1.5) is a per-contrast minimum effect. On a dose series or time course the intermediate levels carry a SMALLER true effect than the extreme one, so the same floor can return zero calls there while the top level is significant -- lower lfc, or screen with the eBayes/topTable F-test documented below and report the pairwise contrasts only for direction."
-
 ### `bio-ncbi-datasets-cli` — `datasets rehydrate` does not verify pre-existing files -- 'Checksum verification (automatic)' claim is false for the documented aria2c + rehydrate pattern
 
 - Skill: 87.8, Production Ready · [mrsonord2240/bioSkills@bac15cc](https://github.com/mrsonord2240/bioSkills/tree/bac15ccbda059dfec158576ae61cf7249a673cdb/database-access/ncbi-datasets-cli) · [viewer](skills/bio-ncbi-datasets-cli/mrsonord2240-bioSkills@bac15cc/viewer.md)
@@ -1200,6 +1192,22 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The helper accesses columns before validating the report schema or explaining which acquisition/export route supplies them.
 - Fix: Add an explicit required-column preflight listing Run, RT, Predicted.RT, FWHM, Quantity.Quality, and Global.Q.Value. When unavailable, raise a clear ValueError that labels Level-1 RT/FWHM QC unavailable for that export and routes the user to the vendor/run-metrics export instead of implying the standard report contains the fields.
 
+### `bio-workflows-proteomics-pipeline` — Verify clean R process termination
+
+- Skill: 93, Production Ready · [mrsonord2240/bioSkills@ef9b7ee](https://github.com/mrsonord2240/bioSkills/tree/ef9b7eed11c0dcbea3820d6b97cf7fd8b7c702e4/workflows/proteomics-pipeline) · [viewer](skills/bio-workflows-proteomics-pipeline/mrsonord2240-bioSkills@ef9b7ee/viewer.md)
+- Observed in inputs: 1, 2, 3, 4, 5, 6, 9
+- Problem: Seven fresh positive routes wrote valid, independently parseable artifacts but the shared R host returned Windows status 11 after output; SILAC returned 0.
+- Root cause: The common mass-spec environment has an unstable R native-extension teardown path, including the documented mzR/Rcpp ABI warning for the TMT route.
+- Fix: Reproduce against a maintained compatible Rcpp/mzR stack or isolated environment and require both artifact assertions and a clean process exit before treating clean exit as verified.
+
+### `bio-workflows-proteomics-pipeline` — Add a versioned positive multi-plex fixture
+
+- Skill: 93, Production Ready · [mrsonord2240/bioSkills@ef9b7ee](https://github.com/mrsonord2240/bioSkills/tree/ef9b7eed11c0dcbea3820d6b97cf7fd8b7c702e4/workflows/proteomics-pipeline) · [viewer](skills/bio-workflows-proteomics-pipeline/mrsonord2240-bioSkills@ef9b7ee/viewer.md)
+- Observed in inputs: 10
+- Problem: The exact source correctly rejected an annotation without Norm, but the installed MSstatsTMT package no longer exposes the positive fixture cited by the Phase 1 note.
+- Root cause: Positive multi-plex data are not shipped with this Skill, so current evidence cannot independently rerun the full reference-channel bridge on a small fixture.
+- Fix: Add a compact synthetic evidence/proteinGroups/annotation fixture with two plexes, Norm in each plex, and expected result dimensions; run it in CI with msstatstmt_multiplex.R.
+
 ### `bio-causal-genomics-effector-gene-prioritization` — DEPICT remains a documented unexecuted branch
 
 - Skill: 94, Production Ready · [mrsonord2240/bioSkills@08b73bc](https://github.com/mrsonord2240/bioSkills/tree/08b73bcd2fbccf8b3b667d3805881c98d3b4e6b5/causal-genomics/effector-gene-prioritization) · [viewer](skills/bio-causal-genomics-effector-gene-prioritization/mrsonord2240-bioSkills@08b73bc/viewer.md)
@@ -1280,7 +1288,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (390)
+## P2 (386)
 
 ### `bio-data-visualization-lollipop-protein-maps` — HGVSp edge cases and recurrence semantics undocumented
 
@@ -2921,38 +2929,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: SKILL.md's Common Errors row 'PRIDICT2 batch: summary file is ""' attributes the symptom solely to a wrong CSV header (sequence vs editseq). This pass found two further, unrelated inputs that produce the byte-identical '""' summary file with exit code 0 and no error: (1) a correctly-headed CSV with zero data rows, and (2) a correctly-headed, non-empty CSV whose only variant has no PE-designable PAM anywhere in the CLI's search window (a realistic case: a variant list that includes some non-PE-installable edits).
 - Root cause: The row was written and verified against the specific defect the 2026-09-16 fix pass found (a wrong column name); the underlying summarize_top_scoring() function silently writes an empty DataFrame to CSV whenever os.listdir(out_dir) finds zero matching per-sequence files, regardless of why there are zero -- and this generalization was not tested for when the row was written.
 - Fix: Broaden the row (or add a sibling row) to state that ANY batch run producing zero successful pegRNA designs -- wrong header, an empty input CSV, or every variant lacking a usable PAM -- yields the same empty '""'-only summary file with exit code 0, and that this is a graceful no-op, not a hang or crash; direct the reader to check the per-sequence prediction CSVs (or stdout's 'No PAM' / '0 sequences' messages) for the real cause.
-
-### `bio-workflows-proteomics-pipeline` — The PCA guard and the contrast logic now live in two places that deliberately disagree
-
-- Skill: 87.7, Production Ready · [mrsonord2240/bioSkills@45a0c5a](https://github.com/mrsonord2240/bioSkills/tree/45a0c5a65b7346d47a7b72b6d0a6eb60ea590317/workflows/proteomics-pipeline) · [viewer](skills/bio-workflows-proteomics-pipeline/mrsonord2240-bioSkills@45a0c5a/viewer.md)
-- Observed in inputs: Inputs 1, 3
-- Problem: examples/proteomics_workflow.R gained the same prcomp guard as SKILL.md but deliberately keeps the hard-coded two-condition contrast, with a comment telling the reader not to edit sample_groups. Two copies of near-identical logic that differ on purpose will drift, and the example is the file a newcomer runs first.
-- Root cause: The example is a self-contained demo and the block is the general recipe; the fix updated both rather than unifying them.
-- Fix: Give the example the same level-driven contrast construction as SKILL.md -- it is four lines and collapses to the identical result for two conditions -- so the two files cannot diverge.
-
-### `bio-workflows-proteomics-pipeline` — Two named routes remain uncoded
-
-- Skill: 87.7, Production Ready · [mrsonord2240/bioSkills@45a0c5a](https://github.com/mrsonord2240/bioSkills/tree/45a0c5a65b7346d47a7b72b6d0a6eb60ea590317/workflows/proteomics-pipeline) · [viewer](skills/bio-workflows-proteomics-pipeline/mrsonord2240-bioSkills@45a0c5a/viewer.md)
-- Observed in inputs: Static evaluation
-- Problem: FragPipe is named as a supported input but has no code, and the MSstatsTMT multi-plex (reference-channel/IRS) route is still a comment block inside the TMT section, so a two-plex TMT experiment -- the common case -- has no executable path here.
-- Root cause: Both were deferred while the multi-condition and guard work was done.
-- Fix: Either write the MSstatsTMT multi-plex call (MSstatsTMT 2.14.2 is installed) or state plainly in the decision tree that multi-plex TMT routes out to proteomics/ptm-analysis and proteomics/quantification, which now carry a TMT route.
-
-### `bio-workflows-proteomics-pipeline` — The file has outgrown a single page
-
-- Skill: 87.7, Production Ready · [mrsonord2240/bioSkills@45a0c5a](https://github.com/mrsonord2240/bioSkills/tree/45a0c5a65b7346d47a7b72b6d0a6eb60ea590317/workflows/proteomics-pipeline) · [viewer](skills/bio-workflows-proteomics-pipeline/mrsonord2240-bioSkills@45a0c5a/viewer.md)
-- Observed in inputs: Static evaluation
-- Problem: 396 -> 479 lines in one always-loaded file with no references/ directory, and the token-cost mark dropped accordingly.
-- Root cause: Every fix so far has added prose and guards to the same file.
-- Fix: Move the Tool/Method taxonomy and the Common Errors table into references/ and leave the decision tree, the input contract and the five code blocks in SKILL.md.
-
-### `bio-workflows-proteomics-pipeline` — The result table has no stated schema
-
-- Skill: 87.7, Production Ready · [mrsonord2240/bioSkills@45a0c5a](https://github.com/mrsonord2240/bioSkills/tree/45a0c5a65b7346d47a7b72b6d0a6eb60ea590317/workflows/proteomics-pipeline) · [viewer](skills/bio-workflows-proteomics-pipeline/mrsonord2240-bioSkills@45a0c5a/viewer.md)
-- Observed in inputs: Inputs 1, 3
-- Problem: results now carries a contrast column and a global-BH significant column, but the schema is discoverable only by reading the code. An agent chaining this into a pathway Skill has no named contract, and the per-contrast breakdown is printed rather than returned.
-- Root cause: Output shape has always been implicit in the write.csv line.
-- Fix: State the columns once above step 7 -- protein, contrast, logFC, AveExpr, t, P.Value, adj.P.Val, significant -- and note that significance comes from the global decideTests, not from adj.P.Val alone.
 
 ### `bio-ncbi-datasets-cli` — Virus download workflow has no worked code pattern
 
