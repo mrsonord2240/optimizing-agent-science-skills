@@ -1,0 +1,156 @@
+{
+  "meta": {
+    "skill_name": "bio-pathway-go-enrichment",
+    "description": "Runs Gene Ontology over-representation analysis for a selected gene list using clusterProfiler enrichGO, with explicit background-universe selection, ID conversion, GO-DAG redundancy handling, custom TERM2GENE enrichment, and an optional GOseq length-bias route.",
+    "evaluated_on": "2026-09-23",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "mrsonord2240/bioSkills@1bb08737d3b24d54f00f5d35aa096f9fd2e04b79:pathway-analysis/go-enrichment",
+    "worktree": "F:\\OpenScience\\wt\\pathway-go-enrichment",
+    "branch": "fix/pathway-go-enrichment",
+    "tip_commit": "1bb08737d3b24d54f00f5d35aa096f9fd2e04b79",
+    "environment": "Isolated WSL prefix /home/sci/openscience-go-audit-20260923; R 4.4.3; Bioconductor 3.20; clusterProfiler 4.14.0; org.Hs.eg.db 3.20.0; GOSemSim 2.32.0; goseq 1.58.0; GenomicFeatures 1.58.0; TxDb.Hsapiens.UCSC.hg38.knownGene 3.20.0. The shared Windows environment was not changed.",
+    "audit_type": "Phase 2 final-pass re-audit of the exact pushed corrective tip. The superseded 5ed09f report, viewer, data, and run material were archived under F:\\OpenScience\\audits\\_pre-fix-20260923\\bio-pathway-go-enrichment\\tip-5ed09f789aed05537c7899553ac6ebc005fe7e93.",
+    "executed_inputs": "7/7",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All claims and numeric outcomes in the exercised routes came from local package output; no fabricated studies, identifiers, or biomedical results were generated." },
+      "practice_boundaries": { "result": "PASS", "detail": "The Skill performs research enrichment analysis and explicitly frames output as hypotheses, not clinical diagnosis or treatment advice." },
+      "methodological_ground": { "result": "PASS", "detail": "Executed routes used an explicit tested-gene universe, BH adjustment, ontology-aware redundancy reduction, and the stated Wallenius length-bias correction." },
+      "code_usability": { "result": "PASS", "detail": "Both shipped examples, ORA variants, custom enricher, and the literal corrected GOseq block executed in the recorded isolated runtime." }
+    }
+  },
+  "static_score": {
+    "subtotal": 91,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 11, "max": 12, "note": "Comprehensively covers matched-universe GO ORA, ID conversion, redundancy, custom sets, and RNA-seq length bias; the top compatibility statement conflicts with the verified Bioconductor 3.20 route." },
+      "reliability": { "score": 11, "max": 12, "note": "Clear failure modes and the new GOseq preflight detect package, identifier, length, and GO-coverage problems; other-organism users must provide their own matched local annotation inputs." },
+      "performance_context": { "score": 7, "max": 8, "note": "The workflow is direct and offline at runtime, although deriving exon-union lengths across the full TxDb is intentionally expensive and uncached." },
+      "agent_usability": { "score": 15, "max": 16, "note": "Decision fork, explicit arguments, checks, and error guidance are clear; tested-version wording should agree with the pinned install release." },
+      "human_usability": { "score": 8, "max": 8, "note": "Natural trigger language, concise usage prompts, and explicit interpretation cautions support correct handoff to an agent." },
+      "security": { "score": 11, "max": 12, "note": "No secrets, destructive commands, or raw code execution are present; normal user-provided file tables still rely on the surrounding analysis environment for access control." },
+      "maintainability": { "score": 10, "max": 12, "note": "Sections, examples, references, and local-package interfaces are clear; the 43-line GOseq fence is a substantial inline executable block rather than a reusable parameterized script." },
+      "agent_specific": { "score": 18, "max": 20, "note": "Trigger and routing are precise, scope boundaries point to GSEA and sibling pathway Skills, and the workflow has useful stops and fallbacks." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 94.9,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 28, "total": 28 },
+    "inputs": [
+      {
+        "index": 1, "type": "Canonical", "label": "Shipped basic BP enrichment example", "status": "COMPLETED", "status_flag": "✅", "note": "Executed the unchanged shipped go_enrichment_basic.R; 135 BP terms were returned with the documented result columns.", "executed": true, "execution_note": "Saved runner phase2_inputs_1_5.R sourced the exact example from the verified source tip.", "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "The shipped basic example executes without source edits", "result": "PASS", "note": "The source file completed in a fresh evaluation environment." },
+          { "text": "The result is an enrichResult with GO ORA columns", "result": "PASS", "note": "GeneRatio, BgRatio, FoldEnrichment, p.adjust, and Count were present." },
+          { "text": "The example passes an explicit tested-gene universe", "result": "PASS", "note": "The exact source call includes universe_ids." },
+          { "text": "The output is interpretable without medical claims", "result": "PASS", "note": "Output contains GO hypotheses only." }
+        ]
+      },
+      {
+        "index": 2, "type": "Regression", "label": "Shipped per-ontology simplification example", "status": "COMPLETED", "status_flag": "✅", "note": "Executed unchanged go_all_ontologies.R; BP, MF, and CC simplification produced 85 combined terms.", "executed": true, "execution_note": "Saved runner phase2_inputs_1_5.R sourced the exact shipped example.", "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "The shipped all-ontology example executes without an unshipped input file", "result": "PASS", "note": "It generated its own OrgDb-derived foreground and universe." },
+          { "text": "Each ontology is processed separately before combination", "result": "PASS", "note": "Output reported BP, MF, and CC results and a combined data frame." },
+          { "text": "Simplification returns a nonempty result", "result": "PASS", "note": "The combined output contained 85 terms." },
+          { "text": "The route does not mistake group classification for significance", "result": "PASS", "note": "This example only uses enrichment and simplify." }
+        ]
+      },
+      {
+        "index": 3, "type": "Variant A", "label": "Explicit-universe ORA and adjusted cutoff inspection", "status": "COMPLETED", "status_flag": "✅", "note": "BP ORA with explicit universe and inspection cutoffs returned 2,565 terms over 2,496 annotated universe genes.", "executed": true, "execution_note": "Saved phase2_inputs_1_5.R executed enrichGO using the Skill's explicit-universe argument pattern.", "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Explicit-universe ORA returns at least one term", "result": "PASS", "note": "2,565 terms were returned with pvalueCutoff and qvalueCutoff set to one for inspection." },
+          { "text": "Result columns include effect size and adjusted significance", "result": "PASS", "note": "FoldEnrichment, pvalue, p.adjust, and Count were present." },
+          { "text": "BH adjusted values are not lower than raw p-values", "result": "PASS", "note": "The script asserted p.adjust >= pvalue, allowing NA." },
+          { "text": "The background is recorded as annotated tested genes", "result": "PASS", "note": "The run reported 2,496 annotated universe genes." }
+        ]
+      },
+      {
+        "index": 4, "type": "Variant B", "label": "All-ontology simplify and groupGO boundary", "status": "COMPLETED", "status_flag": "✅", "note": "ont='ALL' simplify retained 85 BP/MF/CC terms; groupGO returned 476 classification rows without p.adjust.", "executed": true, "execution_note": "Saved phase2_inputs_1_5.R executed enrichGO, simplify, and groupGO from the documented argument patterns.", "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Simplify on an ALL ontology object retains all three ontology labels", "result": "PASS", "note": "The retained labels were BP, CC, and MF." },
+          { "text": "Simplify returns a nonempty enrichment result", "result": "PASS", "note": "85 terms remained." },
+          { "text": "groupGO is not presented as a significance test", "result": "PASS", "note": "Its data frame had no p.adjust column." },
+          { "text": "The test uses explicit ontology and universe choices", "result": "PASS", "note": "The run explicitly supplied ont='ALL' and universe." }
+        ]
+      },
+      {
+        "index": 5, "type": "Edge", "label": "UniProt conversion and local custom TERM2GENE", "status": "COMPLETED", "status_flag": "✅", "note": "A realistic UniProt mapping yielded 126 deduplicated Entrez IDs; local enricher returned the expected foreground term.", "executed": true, "execution_note": "Saved phase2_input5_custom.R and its runner executed bitr and enricher with an explicit local universe.", "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "UniProt identifiers are converted before enrichment", "result": "PASS", "note": "126 unique Entrez IDs were returned after bitr." },
+          { "text": "Custom TERM2GENE enrichment runs against an explicit universe", "result": "PASS", "note": "The enricher call supplied custom_universe." },
+          { "text": "The planted foreground category is recovered", "result": "PASS", "note": "FOREGROUND_TERM appeared in the result." },
+          { "text": "The custom route remains local and reproducible", "result": "PASS", "note": "TERM2GENE was constructed in the saved runner." }
+        ]
+      },
+      {
+        "index": 6, "type": "Adversarial", "label": "Literal hg38 GOseq length-bias route", "status": "COMPLETED", "status_flag": "✅", "note": "The current GOseq code fence ran verbatim after a synthetic hg38 Ensembl DE prelude: 300/300 converted, 294/298 retained local GO annotation, 3,346 categories, and BH padj.", "executed": true, "execution_note": "Saved run_phase2_goseq_literal.sh concatenated the current SKILL.md lines 132-174 with the saved synthetic prelude and executed them in isolation.", "basic": 39, "specialized": 57, "total": 96, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "The literal documented route does not use the unavailable implicit hg38 ensGene lookup", "result": "PASS", "note": "It supplied local TxDb-derived bias.data and local gene2cat." },
+          { "text": "The preflight reports usable Ensembl conversion and GO coverage", "result": "PASS", "note": "It reported 300/300 conversion and 294/298 GO coverage." },
+          { "text": "GOseq produces nonempty Wallenius results with BH adjustment", "result": "PASS", "note": "3,346 rows and a padj column were asserted." },
+          { "text": "The execution is isolated from the shared environment", "result": "PASS", "note": "The run used the recorded private WSL Bioconductor 3.20 prefix." }
+        ]
+      },
+      {
+        "index": 7, "type": "Scope Boundary", "label": "Source contract, routing, and scope review", "status": "COMPLETED", "status_flag": "✅", "note": "Ten saved static checks passed for front matter, explicit ORA choices, local GOseq route, referenced files, routing, and non-clinical scope.", "executed": true, "execution_note": "Saved phase2_input7_scope.py inspected the exact source files and run_phase2_input7_scope.sh recorded the output.", "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "The source has the expected Skill identity and supporting files", "result": "PASS", "note": "Front matter, usage guide, and both examples were present." },
+          { "text": "ORA code sets both universe and BP explicitly", "result": "PASS", "note": "Both required source patterns were found." },
+          { "text": "The GOseq code fence uses the local replacement route", "result": "PASS", "note": "The implicit lookup was absent from code and local TxDb and gene2cat were present." },
+          { "text": "The Skill stays within non-clinical research-analysis scope", "result": "PASS", "note": "It routes ranked analysis to GSEA and contains no diagnostic or prescriptive language." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 36.4,
+    "dynamic_weighted": 56.9,
+    "score": 93,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "All seven re-audit inputs executed with saved runners and checked outputs.",
+    "The corrected hg38 GOseq route is locally versioned, guarded, and executed literally without a UCSC or geneLenDataBase hg38 lookup.",
+    "Both shipped examples are self-contained and passed unchanged, including per-ontology redundancy reduction.",
+    "The Skill consistently requires an explicit tested-gene universe and distinguishes ORA, groupGO, custom enrichment, and ranked GSEA scope."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "Reconcile the compatibility statements",
+      "observed_in": [],
+      "problem": "The top compatibility block claims reference examples were tested with clusterProfiler 4.18.4+ and org.Hs.eg.db 3.22+, while the new hg38 GOseq route and usage guide explicitly pin Bioconductor 3.20 and were verified here with clusterProfiler 4.14.0 and org.Hs.eg.db 3.20.0.",
+      "root_cause": "The older global version note was not updated when the executable Bioconductor 3.20 GOseq route was added.",
+      "fix": "Replace the global tested-version claim with the verified Bioconductor 3.20 package set, or clearly separate the independently verified version sets and state which blocks each applies to."
+    },
+    {
+      "priority": "P2",
+      "title": "Extract the long GOseq recipe into a script",
+      "observed_in": [],
+      "problem": "The corrected executable GOseq recipe is now a 43-line inline fence, making reuse, parameterization, and independent testing less convenient.",
+      "root_cause": "The necessary corrective checks and local annotation construction expanded a formerly short illustration in place.",
+      "fix": "Move the complete hg38 recipe to a parameterized scripts/goseq_hg38.R file with a short invocation in SKILL.md, preserving the literal preflight and local bias-data route."
+    }
+  ]
+}

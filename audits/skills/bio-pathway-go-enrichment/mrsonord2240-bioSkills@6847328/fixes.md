@@ -42,3 +42,17 @@ Branch `fix/pathway-go-enrichment`, worktree `F:\OpenScience\wt\pathway-go-enric
 
 - **Split:** not done. SKILL.md is 228 lines (300 or under).
 - **`scripts/`:** nothing qualifies. The five R fences in SKILL.md are 14 (enrichGO call), 10 (DE table -> foreground/universe), 2, 9 (GOseq), 2 and 2 lines, all under the ~15-line bar. The enrichGO block is an API-shape illustration that `examples/go_enrichment_basic.R` already covers; the DE block is a fragment that reads a user's `de_results.csv`; the GOseq block needs `goseq` plus the hg38 length database, neither installed in `crispr-screen-analyst` (checked `R-lib`), so it could not be run here in any case. `usage-guide.md` has one 7-line fence. `examples/` unchanged.
+
+---
+
+## 2026-09-23 — Phase 1 corrective
+
+Branch `fix/pathway-go-enrichment`, worktree `F:\OpenScience\wt\pathway-go-enrichment`. Scope: repair the rejected hg38/`ensGene` GOseq example; no scoring, publication, merge, or shared-environment modification.
+
+| finding | priority | change | verified | notes |
+| --- | --- | --- | --- | --- |
+| `nullp(de_genes, 'hg38', 'ensGene')` fails because goseq/geneLenDataBase has no hg38 `ensGene` length data | P1 | Replaced the implicit genome/ID lookup with a version-pinned local route: Ensembl-to-Entrez conversion, hg38 exon-union lengths from `TxDb.Hsapiens.UCSC.hg38.knownGene`, local GO `gene2cat` from `org.Hs.eg.db`, explicit `bias.data`, enforced TxDb/GO coverage guards with reported rates, and a same-namespace fallback. Added the Bioconductor 3.20 + TxDb/GenomicFeatures install route to `usage-guide.md`. | ran literal documented block | Isolated R 4.4.3 / Bioconductor 3.20: goseq 1.58.0, GenomicFeatures 1.58.0, TxDb.Hsapiens.UCSC.hg38.knownGene 3.20.0, org.Hs.eg.db 3.20.0. Revised literal Skill block: 300/300 (100.0%) Ensembl-to-Entrez, 294/298 (98.7%) TxDb-mapped genes with local GO annotations, `goseq(..., gene2cat=..., method='Wallenius')` completed with 3346 categories, and `padj` was added. Independent standards/spec review found the GO coverage guard absent; it was added and this revised literal run closed the finding. |
+
+## Left unfixed
+
+None for the hg38/Ensembl route. Other organisms or annotation releases must supply a matching local TxDb-derived positive `bias.data` vector and local `gene2cat` map, as the fallback now states.

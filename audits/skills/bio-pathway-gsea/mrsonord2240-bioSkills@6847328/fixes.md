@@ -58,3 +58,18 @@ Disagreement logged: usage-guide gave the edgeR clamp as `1e-30` with the "1e-30
 - **`gsea_go.R` not re-run**: only its header comment changed; a full run is ~155 s and its logic was verified on 2026-09-16.
 - **CAMERA/GSEA guidance validated on one synthetic dataset** (24 samples, 20 nulls): no real-data set with known truth exists in the corpus; 9/20 vs 0/20 is a single run, not a rate estimate.
 - **Phenotype-permutation GSEA has no runnable path**: needs the Broad Java tool, not installed and outside this Skill's R scope; claim reduced to concept.
+
+---
+
+# bio-pathway-gsea — Phase 1 corrective (2026-09-23)
+
+Branch `fix/pathway-gsea`; rejected source tip `d6ecbe33cfc1aa0e9635f83ae2f0b98832557dbe`.
+
+| finding | change | verified | notes |
+|---|---|---|---|
+| Successful GSEA output was followed by exit `2816`, making shipped code unusable in the native Windows runtime | Added an explicit isolated-runtime requirement and fresh micromamba command; documented that a nonzero exit is failure even when results were printed | ran — Linux R 4.5.3 / Bioconductor 3.22 exited 0 for shipped GO/MSigDB and representative nPerm/ID/GSVA/KEGG/Reactome paths | Native R 4.4.3 / Bioc 3.20 package loading reproduced `2816` for clusterProfiler, GSVA, msigdbr, org.Hs.eg.db, and ReactomePA; SerialParam did not help |
+| Package-version claims were stale after the runtime move | Updated SKILL.md compatibility block and both shipped example headers to execution-verified versions | ran — clusterProfiler 4.18.4, fgsea 1.36.2, org.Hs.eg.db 3.20.0, msigdbr 26.1.1, limma 3.66.0, GSVA 2.4.9, ReactomePA 1.54.0, reactome.db 1.95.0 | The isolated org.Hs.eg.db payload was seeded from the pre-existing local 3.20.0 package only; no shared library mutation |
+
+Evidence: `F:\OpenScience\audits\_final_pass\bio-pathway-gsea\verify_r45_all_paths.out` ends `ASSERT kegg_reactome=ok kegg=311 reactome=924` and `exit=0`.
+
+Source commit: `c1c6150cba5570abc754866e90d09ee536917b07` (`fix(pathway-analysis/gsea): document verified isolated R runtime`). Push was attempted and rejected because remote `GPTomics/bioSkills` is archived/read-only (HTTP 403); no publish, merge, or score was attempted.

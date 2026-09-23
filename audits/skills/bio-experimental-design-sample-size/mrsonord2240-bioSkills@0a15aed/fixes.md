@@ -66,3 +66,17 @@ Structure pass, worktree `F:\OpenScience\wt\experimental-design-sample-size`, br
   - PROPER block (`estParam` -> `comparePower`) -> `scripts/proper_power.R`. Parametrised by counts CSV, reps, nsims, fc, max_genes, seed; keeps the `oldClass` workaround and `delta = log2(fc) - 0.01`; asserts marginal power is finite and in [0,1]. Ran as SKILL.md invokes it on the audit's `pilot_6v6_counts.csv` (first 1,000 genes, reps 3,6,10,20, `nsims = 8`): marginal power 0.020 / 0.050 / 0.147 / 0.532, `names(powres)` and `summaryPower` printed, assertions passed. A first run on 2,500 genes was killed at a 500 s cap because the machine was loaded; the 1,000-gene run finished.
   - Pseudobulk-on-donors block -> `scripts/pseudobulk_donor_ssize.R`. Parametrised by cell-counts RDS, donor-condition CSV, fc, fdr, power, maxN, seed. Ran on the audit's `scrna_donor_cellcounts.rds` + `scrna_donor_condition.csv` (8 donors, 3,000 genes): median pseudobulk dispersion 0.005, minimum donors per group 5 (achieved power 0.889), assertions passed. The audit data differs from the fix-pass synthetic pilot cited in SKILL.md (dispersion 0.32, 84 donors), so those numbers stay attributed to that earlier pilot.
 - **Stayed inline:** `ssizeRNA_single`/`check.power` (about 8 lines), `ssizeRNA_vary` with pilot vectors, the DESeq2 pilot-dispersion block (13 lines, under the 15-line bar), the `is.na(n)` guard and the `pwr.t.test` block are all short. The ssizeRNA blocks that are longer are already covered by `examples/sample_size_estimation.R`, so nothing was duplicated.
+
+---
+
+## 2026-09-23 Phase 1 corrective: clean isolated rerun
+
+Source tip audited and repaired: `f3400084fa984a8533bba8f69a15301619fe6a0e` on
+`fix/experimental-design-sample-size`, worktree `F:\OpenScience\wt\experimental-design-sample-size`.
+
+| Finding | Change | Executed | Execution note |
+|---|---|---|---|
+| Shared Windows R exited `139` after valid ssizeRNA/DESeq2 output | Diagnosed as package load/teardown behavior (reproduces after `library(ssizeRNA)` or `library(DESeq2)` alone). Built a private R 4.4.3 library without touching the shared library. | `ssizeRNA` scalar, full worked example, PROPER, and pseudobulk normal paths all exited `0` under private R. | Private route: R 4.4.3, ssizeRNA 1.3.3, PROPER 1.38.0, DESeq2 1.46.0, edgeR 4.4.2, pwr 1.3.0. Each execution used an owned Bash + R child process, recorded in `F:\OpenScience\audits\bio-experimental-design-sample-size\run\phase1_fix_pid_owned_20260923\logs\pids.tsv`; natural waits only, no external PID action. |
+| ssizeRNA 1.3.3 errors at an extremely low `maxN` with `argument is of length zero` | Added `safe_ssize()` / `require_reachable_n()` in the shipped worked scalar example and donor-pseudobulk script. They convert only that exact error to `no n <= maxN reaches the target`; all unrelated package errors propagate. Updated the setup and edge-case guidance in `SKILL.md`. | Scalar contract: `n=47`, power `0.810`, exit `0`; low-`maxN` contract exits `0` after asserting the documented message; pseudobulk `maxN=2` exits `1` with that message, not `139`. | Normal pseudobulk: median dispersion `0.018`, `n=10`, power `0.848`, exit `0`; PROPER also exited `0` with finite marginal power. |
+
+No source publication, scoring, merge, or shared-environment mutation was performed in this corrective pass.

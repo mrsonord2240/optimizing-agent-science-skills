@@ -1,0 +1,6 @@
+args <- commandArgs(trailingOnly = TRUE)
+stopifnot(length(args) >= 1L)
+files <- list.files(args[1], pattern = "\\.R$", recursive = TRUE, full.names = TRUE)
+parsed <- lapply(files, parse)
+stopifnot(length(parsed) == 3L, all(vapply(parsed, length, integer(1)) > 0L))
+cat(sprintf("OK parse: %d shipped R files parsed\n", length(parsed)))

@@ -1,0 +1,57 @@
+{
+  "meta": {
+    "skill_name": "bio-pathway-gsea",
+    "description": "Tests ranked gene vectors for coordinated pathway shifts and scores per-sample pathway activity.",
+    "evaluated_on": "2026-09-23",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md",
+    "source": "mrsonord2240/bioSkills@c1c6150cba5570abc754866e90d09ee536917b07:pathway-analysis/gsea"
+  },
+  "veto_gates": {
+    "skill_veto": { "gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS" },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All numeric claims used for scoring were produced by saved synthetic runs; no fabricated biomedical findings were presented." },
+      "practice_boundaries": { "result": "PASS", "detail": "The Skill analyzes pathway statistics and makes no patient-specific diagnostic or treatment recommendation." },
+      "methodological_ground": { "result": "PASS", "detail": "The Skill distinguishes correlation-sensitive preranked screening from CAMERA and required ID, sorting, seed, and multiple-testing controls executed as documented." },
+      "code_usability": { "result": "PASS", "detail": "All seven fresh regression inputs completed with exit 0 in the documented isolated runtime." }
+    }
+  },
+  "static_score": {
+    "subtotal": 92,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 12, "max": 12, "note": "GO, KEGG, Reactome, MSigDB, CAMERA/fry, GSVA, and ssGSEA claims each have an applicable route." },
+      "reliability": { "score": 10, "max": 12, "note": "Strong validation and failure-mode guidance; live KEGG availability and factor-level orientation require user attention." },
+      "performance_context": { "score": 7, "max": 8, "note": "The 252-line Skill is dense but bounded and identifies the expensive GO run and live KEGG dependency." },
+      "agent_usability": { "score": 15, "max": 16, "note": "Decision tree, input requirements, warnings, and report fields are explicit; contrast orientation needs one explicit line." },
+      "human_usability": { "score": 7, "max": 8, "note": "Natural prompts and short usage guide are present; the advanced statistical content remains necessarily technical." },
+      "security": { "score": 12, "max": 12, "note": "No credentials, destructive operations, or untrusted-code execution are documented." },
+      "maintainability": { "score": 11, "max": 12, "note": "Version block is a single source of truth and examples are present; runtime setup is substantial." },
+      "agent_specific": { "score": 18, "max": 20, "note": "Trigger description and escape hatches are precise; the main file has no reference split but remains below the 300-line repository threshold." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 94.3,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 20, "total": 21 },
+    "inputs": [
+      { "index": 1, "type": "Canonical", "label": "GO preranked GSEA", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Fresh isolated-runtime run completed with exit 0.", "note": "31 terms; planted GO:0006260 NES 3.0484; exit 0.", "basic": 38, "specialized": 58, "total": 96, "assertions_passed": 3, "assertions_total": 3, "assertions": [ { "text": "Example exits successfully with enrichment results", "result": "PASS", "note": "31 GO terms and exit 0." }, { "text": "Planted GO term is positive", "result": "PASS", "note": "GO:0006260 NES 3.0484." }, { "text": "NES, BH adjustment, and leading edge are reported", "result": "PASS", "note": "All appear in the example output." } ] },
+      { "index": 2, "type": "Variant A", "label": "MSigDB Hallmark GSEA", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Fresh isolated-runtime run completed with exit 0.", "note": "Planted OXPHOS Hallmark NES 3.0540; exit 0.", "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 3, "assertions_total": 3, "assertions": [ { "text": "msigdbr collection route executes", "result": "PASS", "note": "Completed with exit 0." }, { "text": "Planted Hallmark is recovered", "result": "PASS", "note": "OXPHOS passed the example assertion." }, { "text": "Direction is retained through NES", "result": "PASS", "note": "The result is positive and grouped by NES." } ] },
+      { "index": 3, "type": "Edge", "label": "nPerm and rank validation", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Fresh isolated-runtime run completed with exit 0.", "note": "Fallback warning, guard, unsorted and duplicate rejections all observed; exit 0.", "basic": 37, "specialized": 57, "total": 94, "assertions_passed": 3, "assertions_total": 3, "assertions": [ { "text": "nPerm fallback is detected", "result": "PASS", "note": "fgseaSimple warning and guard succeeded." }, { "text": "Unsorted vector is rejected", "result": "PASS", "note": "Expected sort error detected." }, { "text": "Duplicate IDs are rejected", "result": "PASS", "note": "Expected duplicate error detected." } ] },
+      { "index": 4, "type": "Variant B", "label": "GSVA and ssGSEA scores", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Fresh isolated-runtime run completed with exit 0.", "note": "Finite 3x16 matrices; GSVA deltas +0.7376 and -0.8415; exit 0.", "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 3, "assertions_total": 3, "assertions": [ { "text": "Current parameter-object API executes", "result": "PASS", "note": "Both GSVA and ssGSEA completed." }, { "text": "Score dimensions are correct", "result": "PASS", "note": "Both matrices are 3x16." }, { "text": "Planted score directions are recovered", "result": "PASS", "note": "Observed positive UP and negative DOWN deltas." } ] },
+      { "index": 5, "type": "Scope Boundary", "label": "Symbol versus Entrez matching", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Fresh isolated-runtime run completed with exit 0.", "note": "50 correct symbol terms and expected mismatch rejection; exit 0.", "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 3, "assertions_total": 3, "assertions": [ { "text": "Symbol mapping returns terms", "result": "PASS", "note": "50 terms returned." }, { "text": "Mismatched mapping is refused", "result": "PASS", "note": "No-gene-mapped error observed." }, { "text": "Failure is actionable", "result": "PASS", "note": "It matches documented ID guidance." } ] },
+      { "index": 6, "type": "Variant C", "label": "KEGG and Reactome", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Fresh isolated-runtime run completed with exit 0.", "note": "KEGG 311 and Reactome 924 terms; exit 0.", "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 3, "assertions_total": 3, "assertions": [ { "text": "Both advertised pathway routes execute", "result": "PASS", "note": "Both returned structured results." }, { "text": "KEGG live-service behavior is visible", "result": "PASS", "note": "REST fetch messages captured." }, { "text": "Reactome route produces local annotation results", "result": "PASS", "note": "924 terms returned." } ] },
+      { "index": 7, "type": "Matrix/design", "label": "CAMERA and fry", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Fresh isolated-runtime run completed with exit 0.", "note": "CAMERA NA and fry completed; planted sets FDR 5.26e-08; coefficient orientation is implicit.", "basic": 37, "specialized": 54, "total": 91, "assertions_passed": 2, "assertions_total": 3, "assertions": [ { "text": "CAMERA with estimated correlation returns significant planted sets", "result": "PASS", "note": "FDR 5.26e-08 for both planted sets." }, { "text": "fry executes on the same indexed pathways", "result": "PASS", "note": "Three rows returned." }, { "text": "Case-vs-control coefficient orientation is explicitly fixed", "result": "FAIL", "note": "The snippet does not set factor levels or relevel before model.matrix." } ] }
+    ]
+  },
+  "final": { "static_weighted": 36.8, "dynamic_weighted": 56.6, "score": 93, "max": 100, "grade": "Production Ready", "grade_symbol": "⭐", "deployable": true, "veto_override": false },
+  "key_strengths": [ "Fresh isolated-runtime execution covered all advertised pathway and scoring routes.", "The Skill explicitly guards ranking order, duplicate IDs, ID mismatch, nPerm fallback, seed use, and correlated-gene inference.", "The version block now treats a nonzero process exit as a failed computation rather than accepting printed output." ],
+  "recommendations": [ { "priority": "P2", "title": "Make case/control coefficient orientation explicit", "observed_in": [7], "problem": "The Matrix + Design snippet invokes model.matrix(~ group) without fixing the reference level, so a default lexical factor order can invert the advertised case-versus-control Direction.", "root_cause": "The example describes factor values but does not construct or relevel the factor before selecting coefficient 2.", "fix": "Set group <- factor(group, levels = c('Control', 'Case')) before model.matrix(~ group), and state that Direction is relative to the resulting Case-versus-Control coefficient." } ]
+}

@@ -1,0 +1,6 @@
+source_path <- "F:/OpenScience/wt/experimental-design-power-analysis/experimental-design/power-analysis/examples/rnaseq_power.R"; lines <- readLines(source_path,warn=FALSE); marker <- grep("^# ---------------------------------------------------------------------------$",lines)[1]; eval(parse(text=lines[1:(marker-1)]))
+must_fail <- function(expr) inherits(try(force(expr),silent=TRUE),"try-error")
+required_n <- checked_rnapower(depth=2,cv=.3,effect=1.05,alpha=.05,power=.95)
+mde <- checked_rnapower(depth=20,n=10,cv=.4,power=.8,alpha=.05)
+stopifnot(required_n>1000,is.finite(mde),must_fail(checked_rnapower(depth=2,n=12,cv=.3,effect=0,alpha=.05)),must_fail(checked_rnapower(depth=2,n=12,cv=.3,effect=1,alpha=.05)),must_fail(checked_rnapower(depth=2,n=12,cv=.3,effect=1.5,alpha=1.5)))
+cat(sprintf("required_n=%.6f mde=%.6f\nEDGE_PREFLIGHT=PASS\n",required_n,mde))

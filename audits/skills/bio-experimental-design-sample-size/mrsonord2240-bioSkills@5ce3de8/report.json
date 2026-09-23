@@ -1,0 +1,148 @@
+{
+  "meta": {
+    "skill_name": "bio-experimental-design-sample-size",
+    "description": "Estimates biological replicate or donor counts for genomics experiments using FDR-aware ssizeRNA calculations, DESeq2/edgeR pilot dispersions, PROPER simulations, donor pseudobulk, and multiplicity-adjusted proteomics calculations.",
+    "evaluated_on": "2026-09-23",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Protocol Design",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "mrsonord2240/bioSkills@5ce3de8235a0bc77f51bd2aecc5ca599cfb6862e:experimental-design/sample-size",
+    "auditor": "Codex /root/p2_sample_size_clean_rerun",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All calculations used synthetic fixtures or explicit formula parameters; no fabricated clinical findings, citations, or study results were asserted." },
+      "practice_boundaries": { "result": "PASS", "detail": "The skill plans study sample sizes, distinguishes human-donor planning from protocol authorization, and routes clinical-trial endpoints elsewhere." },
+      "methodological_ground": { "result": "PASS", "detail": "Executed outputs counted biological units rather than technical replicates or cells, used pilot-derived vectors where required, and applied panel-wide multiplicity adjustment for proteomics." },
+      "code_usability": { "result": "PASS", "detail": "All copied shipped R paths parsed and completed with asserted output and exit code 0 in the supported isolated R 4.4.3/Bioconductor 3.20 route." }
+    }
+  },
+  "static_score": {
+    "subtotal": 92,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 11, "max": 12, "note": "Covers scalar, pilot-vector, fixed-budget, PROPER, donor-pseudobulk, and multiplicity-adjusted proteomics planning; powsimR is explicitly routed to a justified fallback." },
+      "reliability": { "score": 10, "max": 12, "note": "Seeds, assertions, source guards, and actionable unreachable-target errors are present; the lengthy worked example emits routine simulation warnings without a runtime expectation." },
+      "performance_context": { "score": 7, "max": 8, "note": "The complex workflows are moved to parameterized scripts, though the complete simulation example is relatively expensive for an illustrative first run." },
+      "agent_usability": { "score": 15, "max": 16, "note": "Decision tree, unit-of-analysis warnings, parameter explanations, and explicit error messages make the workflow clear from a cold start." },
+      "human_usability": { "score": 8, "max": 8, "note": "The description matches natural planning requests and the skill clearly distinguishes sample-size planning from clinical-trial design." },
+      "security": { "score": 11, "max": 12, "note": "No credentials, destructive operations, or raw code evaluation are present; file inputs rely on R and package diagnostics rather than a separate path preflight." },
+      "maintainability": { "score": 11, "max": 12, "note": "PROPER and pseudobulk routes are modular scripts with bounded arguments; the same small ssizeRNA guard is intentionally duplicated for standalone execution." },
+      "agent_specific": { "score": 19, "max": 20, "note": "Trigger wording is precise, layered guidance is concise, seeded examples are repeatable, and clinical and infeasible-target escape hatches are explicit." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 93.1,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 28, "total": 28 },
+    "inputs": [
+      {
+        "index": 1, "type": "Canonical", "label": "Copied end-to-end genomics sample-size example", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Executed copied source example through owned Bash PID 1429186 and child R PID 1429189; natural wait recorded rc=0 in run/phase2_final_5ce3de8_pid_owned_20260923/logs/pids.tsv.",
+        "note": "The complete copied worked example printed finite sample sizes, fixed-n interpretation, and assay-floor framing.", "basic": 37, "specialized": 56, "total": 93, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Copied shipped example parses as R code", "result": "PASS", "note": "The separate parse run parsed all three copied shipped R files." },
+          { "text": "Example prints a finite headline sample size", "result": "PASS", "note": "It printed n=46 and achieved power=0.801." },
+          { "text": "Fixed-n output explains NaN FDR as zero discoveries", "result": "PASS", "note": "It printed the documented zero-discovery interpretation." },
+          { "text": "Example completes with a zero exit code", "result": "PASS", "note": "The owned child exited 0 after natural wait." }
+        ]
+      },
+      {
+        "index": 2, "type": "Variant A", "label": "No-pilot scalar and fixed-budget calculation", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Executed input02_scalar_budget.R through owned Bash PID 1429864 and child R PID 1429867; natural wait rc=0.",
+        "note": "The scalar estimator and budget-fixed check both met their explicit numeric assertions.", "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Scalar estimator returns a finite n within maxN", "result": "PASS", "note": "It returned n=47 with maxN=200." },
+          { "text": "Scalar output reports achieved power", "result": "PASS", "note": "It printed achieved power=0.810." },
+          { "text": "Fixed-budget check labels zero-discovery FDR correctly", "result": "PASS", "note": "It printed NaN_zero_discoveries with fixed-n power=0.000." },
+          { "text": "Variant completes with a zero exit code", "result": "PASS", "note": "The owned child exited 0." }
+        ]
+      },
+      {
+        "index": 3, "type": "Variant B", "label": "DESeq2-derived pilot-vector sample size", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Executed input03_vector_vary.R with a fresh synthetic 4-vs-4 DESeq2 pilot through owned Bash PID 1430922 and child R PID 1430925; natural wait rc=0.",
+        "note": "The real pilot-derived vector path returned a finite FDR-aware sample size.", "basic": 37, "specialized": 55, "total": 92, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Pilot means and dispersions come from a fitted DESeq2 object", "result": "PASS", "note": "The run fitted DESeq2 before extracting normalized means and dispersions." },
+          { "text": "Vector estimator returns a finite n within maxN", "result": "PASS", "note": "It returned n=26 with maxN=200." },
+          { "text": "Vector output reports achieved power", "result": "PASS", "note": "It printed achieved power=0.820 for 240 retained genes." },
+          { "text": "Pilot-vector run completes with a zero exit code", "result": "PASS", "note": "The owned child exited 0." }
+        ]
+      },
+      {
+        "index": 4, "type": "Edge", "label": "Source low-maxN unreachable-target contract", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Executed input04_low_maxn.R, which sources the copied shipped worked example then exercises its exact safe_ssize and require_reachable_n helpers, through owned Bash PID 1431810 and child R PID 1431812; natural wait rc=0.",
+        "note": "The source helper translated the ssizeRNA low-ceiling edge case to the documented actionable error.", "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "The copied shipped example completes before its helper is exercised", "result": "PASS", "note": "The source example printed all normal sections before the edge assertion." },
+          { "text": "maxN=2 reaches the documented unreachable-target message", "result": "PASS", "note": "The harness asserted the exact no n <= 2 message." },
+          { "text": "The raw ssizeRNA length-zero error is not exposed as the public contract", "result": "PASS", "note": "The helper converts only that exact package error." },
+          { "text": "Low-maxN contract harness exits zero after assertion", "result": "PASS", "note": "The owned child exited 0." }
+        ]
+      },
+      {
+        "index": 5, "type": "Stress", "label": "Copied PROPER pilot-power wrapper", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Executed copied proper_power.R on the fresh 240-gene synthetic 4-vs-4 pilot through owned Bash PID 1431978 and child R PID 1431981; natural wait rc=0.",
+        "note": "The wrapper reached simulation, real accessors, and summaryPower output with finite marginal power values.", "basic": 36, "specialized": 55, "total": 91, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "PROPER pipeline prints requested replicate counts", "result": "PASS", "note": "It printed Nreps 3, 6, and 10." },
+          { "text": "Marginal power is finite for each tested replicate count", "result": "PASS", "note": "It printed 0.278, 0.556, and 0.778." },
+          { "text": "Output exposes nominal and actual FDR", "result": "PASS", "note": "summaryPower printed both columns for each replicate count." },
+          { "text": "Copied PROPER wrapper completes with a zero exit code", "result": "PASS", "note": "The owned child exited 0." }
+        ]
+      },
+      {
+        "index": 6, "type": "Scope Boundary", "label": "Copied donor-pseudobulk sizing wrapper", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Executed copied pseudobulk_donor_ssize.R on the fresh eight-donor synthetic RDS and condition CSV through owned Bash PID 1432164 and child R PID 1432167; natural wait rc=0.",
+        "note": "The wrapper summed cells to donor pseudobulks and returned a donor, not cell, sample size.", "basic": 37, "specialized": 56, "total": 93, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Pseudobulk model uses one aggregate count profile per donor", "result": "PASS", "note": "The synthetic input had eight donor matrices and DESeq2 completed on donor pseudobulks." },
+          { "text": "Output reports donors rather than cells", "result": "PASS", "note": "It printed minimum donors per group=38." },
+          { "text": "Result is finite and within configured maxN", "result": "PASS", "note": "It printed power=0.809 at maxN=200." },
+          { "text": "Copied pseudobulk wrapper completes with a zero exit code", "result": "PASS", "note": "The owned child exited 0." }
+        ]
+      },
+      {
+        "index": 7, "type": "Adversarial", "label": "Proteomics panel-wide multiplicity calculation", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Executed input07_proteomics.R through owned Bash PID 1432343 and child R PID 1432346; natural wait rc=0.",
+        "note": "The calculation demonstrates that a proteome-wide correction materially changes the required n.", "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Unadjusted two-sample t-test n is approximately 12", "result": "PASS", "note": "It returned 11.94." },
+          { "text": "5000-feature adjusted n is approximately 44", "result": "PASS", "note": "It returned 43.26." },
+          { "text": "Multiplicity correction increases planned sample size materially", "result": "PASS", "note": "The adjusted result exceeded three times the unadjusted result." },
+          { "text": "Proteomics calculation completes with a zero exit code", "result": "PASS", "note": "The owned child exited 0." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 36.8,
+    "dynamic_weighted": 55.9,
+    "score": 93,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Every copied shipped R path parsed and completed with an explicit output assertion in the isolated supported runtime.",
+    "The skill consistently distinguishes biological replicates, technical measurements, donors, and cells.",
+    "The new low-maxN guard gives the documented actionable contract without hiding unrelated package errors.",
+    "The proteomics route makes panel-wide multiplicity visible rather than presenting an unadjusted per-protein sample size as sufficient."
+  ],
+  "recommendations": []
+}

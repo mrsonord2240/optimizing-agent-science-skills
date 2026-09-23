@@ -1,0 +1,1 @@
+suppressPackageStartupMessages(library(PROPER)); one<-function(){o<-RNAseq.SimOptions.2grp(ngenes=500,p.DE=.05,lOD='cheung',lBaselineExpr='cheung');summaryPower(comparePower(runSims(Nreps=c(3,6),sim.opts=o,nsims=2,DEmethod='edgeR'),alpha.type='fdr',alpha.nominal=.05,stratify.by='expr',delta=log(1.5)))};a<-one();b<-one();stopifnot(identical(a,b));cat("DETERMINISM=PASS\n")

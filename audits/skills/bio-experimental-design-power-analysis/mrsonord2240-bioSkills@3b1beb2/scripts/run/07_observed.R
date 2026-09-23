@@ -1,0 +1,1 @@
+suppressPackageStartupMessages(library(pwr)); p=c(.65,.4,.19);o=vapply(p,function(x)pwr.t.test(d=qt(1-x/2,38)*sqrt(2/20),n=20,sig.level=.05,type='two.sample')$power,numeric(1));stopifnot(all(diff(o)>0));cat(sprintf("observed=%s\nOBSERVED_POWER=PASS\n",paste(sprintf('%.6f',o),collapse=',')))
