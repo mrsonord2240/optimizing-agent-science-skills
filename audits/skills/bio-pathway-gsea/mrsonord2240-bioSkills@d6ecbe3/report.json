@@ -1,0 +1,76 @@
+{
+  "meta": {
+    "skill_name": "bio-pathway-gsea",
+    "source": "mrsonord2240/bioSkills@d6ecbe33cfc1aa0e9635f83ae2f0b98832557dbe:pathway-analysis/gsea",
+    "worktree": "F:\\OpenScience\\wt\\pathway-gsea",
+    "branch": "fix/pathway-gsea",
+    "tip_commit": "d6ecbe33cfc1aa0e9635f83ae2f0b98832557dbe",
+    "audited_on": "2026-09-23",
+    "evaluated_on": "2026-09-23",
+    "auditor": "Codex Phase 2 fresh auditor",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md",
+    "checkpoint": "F:\\OpenScience\\audits\\_final_pass\\bio-pathway-gsea\\CHECKPOINT.md",
+    "environment": "crispr-screen-analyst via r.sh; R 4.4.3 / Bioconductor 3.20; clusterProfiler 4.14.6, org.Hs.eg.db 3.20.0, fgsea 1.32.4, msigdbr 26.1.1, limma 3.62.2, GSVA 2.0.7, ReactomePA 1.50.0, reactome.db 1.89.0",
+    "execution_mode": "A",
+    "category": "Data Analysis",
+    "complexity": "Complex",
+    "n_inputs": 8,
+    "executed_inputs": 8,
+    "source_scope_clean": true,
+    "worktree_clean": false,
+    "worktree_cleanliness_note": "The audited path pathway-analysis/gsea has no diff against d6ecbe33. The worktree has a pre-existing unrelated modification: alternative-splicing/isoform-switching/SKILL.md."
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "FAIL",
+      "stability": "FAIL",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS",
+      "detail": "Five fresh R executions that produced valid checked output nevertheless returned exit code 2816 (Windows status 0xB00): both shipped examples, ranked/nPerm, GSVA/ssGSEA, ID-mismatch, and KEGG/Reactome. The MSigDB example reproduced this non-zero exit on an immediate second independent run. This exceeds the stability redline even though the materialized results are valid."
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "FAIL",
+      "scientific_integrity": {"result": "PASS", "detail": "No fabricated result, identifier, or citation was found; all reported numerical observations are from archived runs."},
+      "practice_boundaries": {"result": "PASS", "detail": "The skill is functional-genomics methodology and does not diagnose, prescribe, or triage individuals."},
+      "methodological_ground": {"result": "PASS", "detail": "Fresh checks supported signed decreasing ranking, nPerm fallback detection, ID matching, parameter-object GSVA, correlation-adjusted CAMERA, and local/live database routes."},
+      "code_usability": {"result": "FAIL", "detail": "The current designated runtime returns non-zero status after five otherwise successful computations, including both shipped examples. A user or automation cannot treat these as successful runnable commands."}
+    }
+  },
+  "static_score": {
+    "subtotal": 96,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {"score": 12, "max": 12, "note": "Covers ranked GO/KEGG/Reactome/MSigDB, matrix tests, and per-sample scoring with appropriate escape hatches."},
+      "reliability": {"score": 9, "max": 12, "note": "Failure modes are unusually well documented, but the current supported runtime's repeated post-output non-zero exits prevent a higher score."},
+      "performance_context": {"score": 8, "max": 8, "note": "Runtime expectation and focused decision tree are present."},
+      "agent_usability": {"score": 16, "max": 16, "note": "Clear ranking, permutation, ID-type, and correlation safeguards."},
+      "human_usability": {"score": 8, "max": 8, "note": "Natural trigger language and scientifically appropriate strictness."},
+      "security": {"score": 11, "max": 12, "note": "No credentials or dangerous execution patterns; input validation is necessarily caller-owned for a Mode A pattern skill."},
+      "maintainability": {"score": 12, "max": 12, "note": "Small coherent file set with runnable examples."},
+      "agent_specific": {"score": 20, "max": 20, "note": "Precise triggers, related-skill routes, fixed seeds, and explicit stop conditions."}
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 81.9,
+    "max": 100,
+    "assertion_pass_rate": {"passed": 26, "total": 32, "rate": 81.3},
+    "inputs": [
+      {"index": 1, "type": "Canonical", "label": "Run the shipped GO example unchanged through an audit harness", "status": "PARTIAL", "executed": true, "execution_note": "run/input1_gsego_example.R sourced the immutable shipped example. It generated 31 terms and passed all content assertions, then exited 2816; log run/input1_gsego_example.R.out.", "basic": 29, "specialized": 43, "total": 72, "assertions_passed": 3, "assertions_total": 4, "assertions": [{"text":"GO result file and required columns exist","result":"PASS"},{"text":"GO:0006260 is positive and BH-significant","result":"PASS","note":"NES 3.048360; p.adjust 1.51e-14"},{"text":"Non-zero reporting branch ran","result":"PASS","note":"31 terms"},{"text":"Top-level execution returns success","result":"FAIL","note":"exit_code=2816 after output"}]},
+      {"index": 2, "type": "Variant A", "label": "Run the shipped MSigDB Hallmark example twice", "status": "PARTIAL", "executed": true, "execution_note": "run/input2_msigdb_example.R and repeat both recovered one OXPHOS term (NES 3.053965, p.adjust 3.14e-22); each exited 2816. Logs input2_msigdb_example.R.out and input2_msigdb_repeat.out.", "basic": 29, "specialized": 43, "total": 72, "assertions_passed": 3, "assertions_total": 4, "assertions": [{"text":"Hallmark result parses","result":"PASS"},{"text":"Planted OXPHOS is positive and significant","result":"PASS"},{"text":"Repeat is numerically identical","result":"PASS"},{"text":"Both top-level executions return success","result":"FAIL","note":"both exit_code=2816"}]},
+      {"index": 3, "type": "Edge", "label": "Sorted ranking, duplicate/unsorted rejection, and nPerm fallback guard", "status": "PARTIAL", "executed": true, "execution_note": "run/input3_rank_nperm.R obtained 50 terms, caught the two documented warnings and guard, and rejected unsorted/duplicate inputs; exit 2816 after assertions.", "basic": 32, "specialized": 48, "total": 80, "assertions_passed": 4, "assertions_total": 5, "assertions": [{"text":"nPerm warning and fgseaSimple fallback are detected","result":"PASS"},{"text":"Documented guard stops fallback","result":"PASS"},{"text":"Unsorted ranking is rejected","result":"PASS"},{"text":"Duplicate IDs are rejected","result":"PASS"},{"text":"Top-level execution returns success","result":"FAIL","note":"exit_code=2816"}]},
+      {"index": 4, "type": "Variant B", "label": "GSVA and ssGSEA parameter-object scoring on planted continuous expression", "status": "PARTIAL", "executed": true, "execution_note": "run/input4_gsva_scores.R wrote both 3x16 score matrices; GSVA deltas were +0.7376 and -0.8415; exit 2816 after assertions.", "basic": 31, "specialized": 48, "total": 79, "assertions_passed": 3, "assertions_total": 4, "assertions": [{"text":"Both parameter-object APIs return finite 3x16 matrices","result":"PASS"},{"text":"UP and DOWN planted shifts have opposite expected score deltas","result":"PASS"},{"text":"Scores are saved and parseable","result":"PASS"},{"text":"Top-level execution returns success","result":"FAIL","note":"exit_code=2816"}]},
+      {"index": 5, "type": "Stress", "label": "CAMERA and fry on a two-group matrix with up, down, and null sets", "status": "COMPLETED", "executed": true, "execution_note": "run/input5_camera.R rerun after recording the factor contrast. CAMERA found UP FDR=3.60e-06 and DOWN FDR=1.35e-07 with Correlation column; directions correctly reflect the actual Control-minus-Case coefficient. Exit 0; log input5_camera_rerun.out.", "basic": 38, "specialized": 59, "total": 97, "assertions_passed": 5, "assertions_total": 5, "assertions": [{"text":"CAMERA contains all three sets and correlation estimates","result":"PASS"},{"text":"Both planted sets are FDR-significant","result":"PASS"},{"text":"Null set is not FDR-significant","result":"PASS"},{"text":"Directions match documented contrast coding","result":"PASS"},{"text":"fry returns all sets and process exits 0","result":"PASS"}]},
+      {"index": 6, "type": "Scope boundary", "label": "Symbol-matched TERM2GENE versus deliberate Entrez mismatch", "status": "PARTIAL", "executed": true, "execution_note": "run/input6_id_match.R produced 50 symbol-matched terms and caught the expected no-gene-mapped error for mismatched Entrez TERM2GENE; exit 2816 after assertions.", "basic": 32, "specialized": 48, "total": 80, "assertions_passed": 2, "assertions_total": 3, "assertions": [{"text":"Symbol-matched route returns terms","result":"PASS"},{"text":"ID mismatch is rejected rather than silently accepted","result":"PASS"},{"text":"Top-level execution returns success","result":"FAIL","note":"exit_code=2816"}]},
+      {"index": 7, "type": "Adversarial", "label": "Attempt to use raw p-values and an unranked list as a GSEA request", "status": "COMPLETED", "executed": true, "execution_note": "run/input7_scope_and_versions.R verified the raw-p-value warning, CAMERA recommendation, and ORA escape hatch against the exact source; it also captured all live package versions. Exit 0.", "basic": 38, "specialized": 59, "total": 97, "assertions_passed": 4, "assertions_total": 4, "assertions": [{"text":"Raw p-value ranking is warned against","result":"PASS"},{"text":"Matrix/design route names CAMERA with estimated correlation","result":"PASS"},{"text":"Unranked list escape hatch points to ORA","result":"PASS"},{"text":"Live package versions are captured","result":"PASS"}]},
+      {"index": 8, "type": "Regression extension", "label": "Live KEGG plus local Reactome GSEA", "status": "PARTIAL", "executed": true, "execution_note": "run/input8_kegg_reactome.R accessed KEGG REST and local Reactome, writing 311 and 886 parseable rows respectively; exit 2816 after assertions.", "basic": 31, "specialized": 47, "total": 78, "assertions_passed": 2, "assertions_total": 3, "assertions": [{"text":"KEGG REST output parses with NES and BH columns","result":"PASS"},{"text":"Local Reactome output parses with NES and BH columns","result":"PASS"},{"text":"Top-level execution returns success","result":"FAIL","note":"exit_code=2816"}]}
+    ]
+  },
+  "final": {"static_weighted": 38.4, "dynamic_weighted": 49.1, "score": 87.5, "max": 100, "grade": "Reject", "deployable": false, "veto_override": true, "grade_note": "The numerical score is not a release decision. Skill Veto T1 and Research Veto M4 both fail because fresh commands repeatedly exit non-zero in the designated environment; assertion rate 81.3% is also below the Production Ready floor."},
+  "recommendations": [
+    {"priority":"P0","title":"Make the designated Windows R route return zero after GSEA results materialize","observed_in":[1,2,3,4,6,8],"problem":"Five independent current-runtime commands, including both shipped examples and a repeat of the MSigDB example, returned exit code 2816 after valid output.","root_cause":"Unresolved R/clusterProfiler/annotation-stack shutdown or runtime failure under the manifest-selected R 4.4.3 environment; the Phase 1 checkpoint's claimed R 4.6.1 stack is not available as a supported local R runtime.","fix":"Reproduce in an isolated supported R runtime, identify the failing package/runtime layer, then prove each shipped example and representative GO, MSigDB, GSVA, ID-mismatch, KEGG, and Reactome routes return exit code 0. Do not promote on materialized output alone."},
+    {"priority":"P1","title":"Reconcile Phase 1 checkpoint runtime claims with the manifest-selected audit environment","observed_in":[1,2,3,4,6,8],"problem":"CHECKPOINT.md reports R 4.6.1 and newer package versions, while the manifest-selected isolated runtime is R 4.4.3/Bioc 3.20 and produces the P0 failure.","root_cause":"The checkpoint does not name a reproducible runtime path or environment manifest.","fix":"Record the exact executable/library path and package snapshot used for Phase 1, or revise the checkpoint to the manifest environment and retain the failure evidence."}
+  ]
+}

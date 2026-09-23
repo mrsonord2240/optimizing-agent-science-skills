@@ -1,0 +1,8 @@
+suppressPackageStartupMessages(library(pwr))
+suppressPackageStartupMessages(library(RNASeqPower))
+raw <- pwr.t.test(d = 1.2, sig.level = .05, power = .8, type = "two.sample")
+corrected <- pwr.t.test(d = 1.2, sig.level = .05 / 4000, power = .8, type = "two.sample")
+atac <- rnapower(depth = 10, n = 6, cv = .5, effect = 1.5, alpha = .05)
+stopifnot(is.finite(raw$n), is.finite(corrected$n), corrected$n > raw$n, is.finite(atac), atac > 0, atac < 1)
+cat(sprintf("proteomics_raw_n=%.6f corrected_n=%.6f atac_power=%.6f\n", raw$n, corrected$n, atac))
+cat("PROTEOMICS_ATAC_ASSERTIONS=PASS\n")

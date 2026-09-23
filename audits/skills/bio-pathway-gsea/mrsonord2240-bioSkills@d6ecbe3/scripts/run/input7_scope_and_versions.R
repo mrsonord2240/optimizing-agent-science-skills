@@ -1,0 +1,5 @@
+skill <- readLines("F:/OpenScience/wt/pathway-gsea/pathway-analysis/gsea/SKILL.md", warn=FALSE)
+usage <- readLines("F:/OpenScience/wt/pathway-gsea/pathway-analysis/gsea/usage-guide.md", warn=FALSE)
+stopifnot(any(grepl("raw p-value", skill, ignore.case=TRUE)), any(grepl("inter.gene.cor = NA", skill, fixed=TRUE)), any(grepl("ORA", skill, fixed=TRUE)))
+for (p in c("clusterProfiler","org.Hs.eg.db","fgsea","msigdbr","limma","GSVA","ReactomePA","reactome.db")) cat(p, as.character(packageVersion(p)),"\n")
+cat("ASSERT input7 scope_raw_pvalue_warned=TRUE camera_default=TRUE ora_escape_hatch=TRUE usage_lines=",length(usage),"\n",sep="")

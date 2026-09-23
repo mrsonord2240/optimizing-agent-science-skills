@@ -1,0 +1,58 @@
+{
+  "meta": {
+    "skill_name": "bio-pathway-enrichment-visualization",
+    "description": "Turns enrichResult, gseaResult, and compareClusterResult objects into redundancy-aware enrichplot figures.",
+    "evaluated_on": "2026-09-23",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Moderate",
+    "n_inputs": 7,
+    "source": "mrsonord2240/bioSkills@1ccf2f05a3ca93452d2517e1cff2f3e9f2e77b54:pathway-analysis/enrichment-visualization",
+    "reaudit_of": "The 2026-09-17 canonical 93/100 audit and its complete evidence were archived before this audit at F:/OpenScience/audits/_pre-fix-20260923/bio-pathway-enrichment-visualization/.",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md"
+  },
+  "veto_gates": {
+    "skill_veto": { "gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS" },
+    "research_veto": {
+      "applicable": true,
+      "gate": "FAIL",
+      "scientific_integrity": { "result": "PASS", "detail": "The Skill makes no fabricated numerical claim. Its redundancy, signed-NES, and S4-class boundaries remain precisely stated." },
+      "practice_boundaries": { "result": "PASS", "detail": "This is offline visualization of researcher-supplied enrichment objects; it does not provide patient-level diagnostic or treatment advice." },
+      "methodological_ground": { "result": "PASS", "detail": "The new source note correctly scopes the compareClusterResult treeplot failure as version-specific and directs a re-test after enrichplot/ggtree upgrades." },
+      "code_usability": { "result": "FAIL", "detail": "M4: the designated supported Windows R 4.4.3 / Bioconductor 3.20 runtime materialized a valid canonical two-page PDF but did not complete. Its owned R child continued growing to 1,798,709,248 bytes RSS after output, never wrote the runner exit marker, and was stopped after positive process-tree identification. Direct Rscript reproduced a post-load access-violation exit -1073741819. The available isolated WSL R 4.5.2 runtime has none of clusterProfiler, enrichplot, org.Hs.eg.db, GOSemSim, ggplot2, ggridges, or ggupset, so it is not a supported substitute and was not modified. The remaining six dynamic executions were therefore not claimed as fresh successes." }
+    }
+  },
+  "static_score": {
+    "subtotal": 98,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 12, "max": 12, "note": "ORA, GSEA, and compareCluster visualization routes are explicit; the tip's re-test trigger keeps the known treeplot limitation bounded to its stated version context." },
+      "reliability": { "score": 12, "max": 12, "note": "Prerequisites, class dispatch, optional dependencies, empty-result escape hatch, and expected failure modes are explicit." },
+      "performance_context": { "score": 7, "max": 8, "note": "Focused documentation and a compact usage guide keep operational detail near the examples." },
+      "agent_usability": { "score": 16, "max": 16, "note": "Decision tree, object contracts, encoding definitions, and stop conditions are actionable." },
+      "human_usability": { "score": 7, "max": 8, "note": "The quick start is readable, though the main description remains S4-class-heavy." },
+      "security": { "score": 12, "max": 12, "note": "No credentials, raw command execution, sensitive-data handling, or destructive operation is documented." },
+      "maintainability": { "score": 12, "max": 12, "note": "The source change is a precise upstream re-test condition and removes duplicated prose; snapshot SHA-256 matches source: 267DF27BD8FA82B4D1788AC0A54FAB3B33C1C816A4616F489B903E9F288150B1." },
+      "agent_specific": { "score": 20, "max": 20, "note": "The Skill supplies class-specific alternatives and refuses invalid bare-data.frame coercion rather than inventing enrichment slots." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 2.1,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 1, "total": 29 },
+    "inputs": [
+      { "index": 1, "type": "Canonical", "label": "Collapse GO-DAG redundancy with simplify() before dotplot", "status": "PARTIAL", "status_flag": "FAIL", "executed": true, "execution_note": "run/input1_canonical.R was invoked from the fresh 1ccf2f0 snapshot through the designated crispr-screen-analyst/r.sh. It wrote input1_output.pdf (12,243 bytes; direct PDF-object inspection found /Count 2 and two /Type /Page objects), then its owned child Rscript remained live with growing RSS and no exit marker. Runner log retained startup locale warnings only; the process was stopped after positive ownership identification. The raw/simplified count assertions cannot be credited without normal completion.", "basic": 10, "specialized": 5, "total": 15, "assertions_passed": 1, "assertions_total": 4, "assertions": [{"text":"Valid non-empty two-page PDF materialized","result":"PASS","note":"12,243 bytes; /Count 2"},{"text":"Raw and simplified counts reported","result":"NOT VERIFIED","note":"no normal completion/log flush"},{"text":"No fabricated enrichment statistics","result":"NOT VERIFIED","note":"execution did not complete"},{"text":"Prescribed simplify-before-dotplot workflow completes","result":"NOT VERIFIED","note":"process did not exit"}] },
+      { "index": 2, "type": "Variant A", "label": "GSEA plots preserving signed NES", "status": "BLOCKED", "status_flag": "BLOCKED", "executed": false, "execution_note": "Not launched after input 1 reproduced the shared-runtime teardown/hang and no supported isolated runtime was available. Prior 2026-09-17 evidence is archived, not represented as fresh execution.", "basic": 0, "specialized": 0, "total": 0, "assertions_passed": 0, "assertions_total": 4, "assertions": [] },
+      { "index": 3, "type": "Edge", "label": "Small-term cnetplot and similarity-map judgment", "status": "BLOCKED", "status_flag": "BLOCKED", "executed": false, "execution_note": "Blocked by the same verified runtime M4; no fresh-success claim.", "basic": 0, "specialized": 0, "total": 0, "assertions_passed": 0, "assertions_total": 4, "assertions": [] },
+      { "index": 4, "type": "Variant B", "label": "compareCluster dotplot, emapplot, and treeplot boundary", "status": "BLOCKED", "status_flag": "BLOCKED", "executed": false, "execution_note": "Blocked by the same verified runtime M4. The source's new re-test wording was statically verified, but no fresh package-level rendering result is claimed.", "basic": 0, "specialized": 0, "total": 0, "assertions_passed": 0, "assertions_total": 4, "assertions": [] },
+      { "index": 5, "type": "Stress", "label": "Full modeling-choice figure set and ggupset boundary", "status": "BLOCKED", "status_flag": "BLOCKED", "executed": false, "execution_note": "Blocked by the same verified runtime M4; no fresh-success claim.", "basic": 0, "specialized": 0, "total": 0, "assertions_passed": 0, "assertions_total": 5, "assertions": [] },
+      { "index": 6, "type": "Scope Boundary", "label": "Flat non-clusterProfiler GO list redirects to REVIGO", "status": "BLOCKED", "status_flag": "BLOCKED", "executed": false, "execution_note": "Blocked by the same verified runtime M4. Static review confirms the Decision Tree retains the redirect; dynamic S4-dispatch proof is not fresh evidence this pass.", "basic": 0, "specialized": 0, "total": 0, "assertions_passed": 0, "assertions_total": 4, "assertions": [] },
+      { "index": 7, "type": "Adversarial", "label": "setReadable converts Entrez cnetplot labels to symbols", "status": "BLOCKED", "status_flag": "BLOCKED", "executed": false, "execution_note": "Blocked by the same verified runtime M4; no fresh-success claim.", "basic": 0, "specialized": 0, "total": 0, "assertions_passed": 0, "assertions_total": 4, "assertions": [] }
+    ]
+  },
+  "final": { "static_weighted": 39.2, "dynamic_weighted": 1.3, "score": 41, "max": 100, "grade": "Reject", "grade_symbol": "FAIL", "deployable": false, "veto_override": true },
+  "key_strengths": ["The 1ccf2f0 documentation change correctly adds the missing re-test trigger for the version-bounded compareClusterResult treeplot limitation.", "Source snapshot was byte-identical to the clean, exact assigned worktree source."],
+  "recommendations": [{ "priority": "P0", "title": "Provide a supported isolated R runtime for the Phase 2 matrix", "observed_in": [1,2,3,4,5,6,7], "problem": "The only designated package-complete Windows runtime crashes/hangs after materializing output; WSL R has no required packages.", "root_cause": "Runtime/platform failure outside the documentation-only source diff, not a claim that the source's R code is syntactically invalid.", "fix": "Provision or identify a private, package-complete R runtime (clusterProfiler, enrichplot, org.Hs.eg.db, GOSemSim, ggplot2 and optional plot dependencies), then rerun all seven inputs and the two shipped examples before promotion." }]
+}

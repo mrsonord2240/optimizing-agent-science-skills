@@ -1,0 +1,11 @@
+library(clusterProfiler)
+library(msigdbr)
+set.seed(998)
+h <- msigdbr(species="Homo sapiens", collection="H")
+t2g <- unique(h[,c("gs_name","gene_symbol")])
+ids <- unique(as.character(t2g$gene_symbol)); ids <- ids[nzchar(ids)]; ids <- ids[seq_len(min(length(ids),5000))]
+gl <- setNames(rnorm(length(ids)),ids); gl <- sort(gl,decreasing=TRUE)
+ok <- GSEA(gl, TERM2GENE=t2g, minGSSize=10, maxGSSize=500, pvalueCutoff=1, seed=TRUE, verbose=FALSE)
+bad <- tryCatch({GSEA(gl, TERM2GENE=unique(h[,c("gs_name","ncbi_gene")]), minGSSize=10, maxGSSize=500, verbose=FALSE); FALSE}, error=function(e) grepl("No gene can be mapped|organism",conditionMessage(e)))
+stopifnot(nrow(as.data.frame(ok))>0, bad)
+cat(sprintf("ASSERT input6 symbol_terms=%d mismatch_rejected=%s\n",nrow(as.data.frame(ok)),bad))

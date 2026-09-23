@@ -1,0 +1,137 @@
+{
+  "meta": {
+    "skill_name": "bio-experimental-design-sample-size",
+    "description": "Estimates biological replicate or donor counts for genomics experiments using FDR-aware ssizeRNA calculations, DESeq2/edgeR pilot dispersions, PROPER simulations, donor pseudobulk, and multiplicity-adjusted proteomics calculations.",
+    "evaluated_on": "2026-09-23",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Protocol Design",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "mrsonord2240/bioSkills@f3400084fa984a8533bba8f69a15301619fe6a0e:experimental-design/sample-size",
+    "auditor": "Codex /root/p2_sample_size_clean_rerun",
+    "auditor_independent": false,
+    "audit_provenance": "Fresh PID-owned rerun. The invalidated prior report and run were archived before this audit; no prior dynamic evidence or verdict was used."
+  },
+  "veto_gates": {
+    "skill_veto": { "gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS" },
+    "research_veto": {
+      "applicable": true,
+      "gate": "FAIL",
+      "scientific_integrity": { "result": "PASS", "detail": "No fabricated results, clinical claims, or unverifiable citations were introduced in the fresh audit outputs." },
+      "practice_boundaries": { "result": "PASS", "detail": "The skill distinguishes human-donor planning from protocol authorization and includes an ethics/IRB caveat." },
+      "methodological_ground": { "result": "PASS", "detail": "The successful paths count biological units, distinguish donors from cells, and apply multiplicity adjustment to the proteomics calculation." },
+      "code_usability": { "result": "FAIL", "detail": "The copied shipped example, PROPER wrapper, and donor-pseudobulk wrapper printed coherent results but each naturally exited 139 in the supported crispr-screen-analyst R route. A completed stdout result does not make a non-zero, segfaulting shipped command deployable." }
+    }
+  },
+  "static_score": {
+    "subtotal": 86,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 11, "max": 12, "note": "Covers scalar, pilot-vector, fixed-budget, PROPER, donor-pseudobulk, and proteomics routes; the stated NA behavior is not universal at very low maxN." },
+      "reliability": { "score": 8, "max": 12, "note": "Seeds, explicit guards, and input assertions are present, but the low-maxN edge path raises an unhandled package error and several shipped runtime paths end 139." },
+      "performance_context": { "score": 7, "max": 8, "note": "Runnable code is split into scripts and the decision tree is concise; the full ssizeRNA example is computationally expensive without an expected-runtime note." },
+      "agent_usability": { "score": 14, "max": 16, "note": "The decision tree, biological-unit warnings, parameter commentary, and reviewer framing are clear; vector inputs need a tighter preflight contract." },
+      "human_usability": { "score": 7, "max": 8, "note": "Natural research requests are well covered, with clear prompts and scope routing." },
+      "security": { "score": 11, "max": 12, "note": "No credentials, destructive operations, or raw-code evaluation were found; path inputs are accepted without preflight validation." },
+      "maintainability": { "score": 10, "max": 12, "note": "The complex PROPER and pseudobulk workflows are modularized and parameterized; runtime compatibility remains coupled to a fragile package stack." },
+      "agent_specific": { "score": 18, "max": 20, "note": "Precise trigger, progressive disclosure, seeds, stop conditions, and clinical-trial escape hatch are strong." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 70.4,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 19, "total": 28 },
+    "inputs": [
+      {
+        "index": 1, "type": "Canonical", "label": "Copied shipped end-to-end example", "status": "PARTIAL", "status_flag": "❌", "executed": true,
+        "execution_note": "Fresh isolated run input01_shipped_example_isolated_final, owned Bash PID 214479 and owned R PID 214481, exited 139 after natural wait with no stdout calculation result.",
+        "note": "The shipped example parsed but did not complete in the supported R route.", "basic": 23, "specialized": 35, "total": 58, "assertions_passed": 2, "assertions_total": 4,
+        "assertions": [
+          { "text": "Copied shipped example parses as R code", "result": "PASS", "note": "The separate parse check parsed all three shipped R files." },
+          { "text": "Example prints its stated sample-size outputs", "result": "FAIL", "note": "No calculation output was written before exit 139." },
+          { "text": "Example completes with a zero exit code", "result": "FAIL", "note": "Owned R child exited 139." },
+          { "text": "Output keeps biological replicate and FDR framing", "result": "PASS", "note": "The copied source includes the stated framing; the runtime did not reach its output." }
+        ]
+      },
+      {
+        "index": 2, "type": "Variant A", "label": "Scalar ssizeRNA plus fixed-budget check", "status": "PARTIAL", "status_flag": "❌", "executed": true,
+        "execution_note": "Fresh isolated input02_scalar_and_budget, owned Bash PID 213729 and owned R PID 213731, printed checked scalar output then exited 139 after natural wait.",
+        "note": "Scientific values were coherent, but the process did not complete successfully.", "basic": 31, "specialized": 45, "total": 76, "assertions_passed": 3, "assertions_total": 4,
+        "assertions": [
+          { "text": "Scalar estimator returns a finite n within maxN", "result": "PASS", "note": "Printed n=47 and achieved power=0.810." },
+          { "text": "Fixed-budget check labels zero-discovery FDR correctly", "result": "PASS", "note": "Printed power=0.000 and NaN-zero-discoveries." },
+          { "text": "Output uses a seed and target FDR/power inputs", "result": "PASS", "note": "The audit script set seed 20260923 and asserted the configured target." },
+          { "text": "R command completes with zero exit status", "result": "FAIL", "note": "The owned R child exited 139 after output." }
+        ]
+      },
+      {
+        "index": 3, "type": "Variant B", "label": "Vector ssizeRNA and scalar rejection", "status": "ERROR", "status_flag": "❌", "executed": true,
+        "execution_note": "Fresh isolated input03_vector_and_scalar_rejection, owned Bash PID 214356 and owned R PID 214358, failed in ssizeRNA_vary integration and exited 139.",
+        "note": "The documented vector route has no preflight for a non-finite integration failure.", "basic": 23, "specialized": 34, "total": 57, "assertions_passed": 2, "assertions_total": 4,
+        "assertions": [
+          { "text": "Vector route runs on supplied per-gene mean and dispersion vectors", "result": "FAIL", "note": "ssizeRNA_vary raised non-finite function value during integrate()." },
+          { "text": "Scalar misuse of ssizeRNA_vary is explicitly rejected", "result": "PASS", "note": "The source documents this restriction and the attempted call was positioned behind the vector run." },
+          { "text": "Failure reports an actionable input-level diagnosis", "result": "FAIL", "note": "The raw integrate error does not identify a vector preflight or recovery action." },
+          { "text": "Execution remains within statistical-planning scope", "result": "PASS", "note": "The fixture contains synthetic per-gene parameters only." }
+        ]
+      },
+      {
+        "index": 4, "type": "Edge", "label": "Infeasible target guard", "status": "ERROR", "status_flag": "❌", "executed": true,
+        "execution_note": "Fresh isolated input04_infeasible_guard, owned Bash PID 214076 and owned R PID 214078, raised ssizeRNA's length-zero error for maxN=2 and exited 139.",
+        "note": "The observed package error conflicts with the skill's blanket silent-NA description for an infeasible ceiling.", "basic": 22, "specialized": 32, "total": 54, "assertions_passed": 2, "assertions_total": 4,
+        "assertions": [
+          { "text": "Infeasible low-maxN input produces a reportable result", "result": "FAIL", "note": "The estimator errored before the documented is.na guard could run." },
+          { "text": "Documented guard message is reached", "result": "FAIL", "note": "No n value was returned for the guard." },
+          { "text": "The test contains no patient-specific recommendation", "result": "PASS", "note": "It uses synthetic generic parameters." },
+          { "text": "The error identifies the underlying estimator call", "result": "PASS", "note": "The stack names ssizeRNA_single and ssize.twoSampVaryDelta." }
+        ]
+      },
+      {
+        "index": 5, "type": "Stress", "label": "Copied PROPER pilot-power wrapper", "status": "PARTIAL", "status_flag": "❌", "executed": true,
+        "execution_note": "Fresh isolated input05_shipped_proper, owned Bash PID 214176 and owned R PID 214178, used an audit-generated 240-gene 4v4 CSV; it printed three simulations and summaryPower output, then exited 139.",
+        "note": "Accessors, finite marginal powers, and summary output worked before the non-zero exit.", "basic": 31, "specialized": 46, "total": 77, "assertions_passed": 3, "assertions_total": 4,
+        "assertions": [
+          { "text": "PROPER pipeline produces Nreps and marginal-power output", "result": "PASS", "note": "Printed Nreps 3, 6, 10 and marginal powers 0.111, 0.111, 0.667." },
+          { "text": "Output exposes nominal and actual FDR fields", "result": "PASS", "note": "summaryPower printed both columns." },
+          { "text": "PROPER workaround avoids the matrix/array class error", "result": "PASS", "note": "The full pipeline reached simulation and summary output." },
+          { "text": "Copied wrapper exits successfully", "result": "FAIL", "note": "Owned R child exited 139 after printing OK." }
+        ]
+      },
+      {
+        "index": 6, "type": "Scope Boundary", "label": "Copied donor-pseudobulk sizing wrapper", "status": "PARTIAL", "status_flag": "❌", "executed": true,
+        "execution_note": "Fresh isolated input06_shipped_pseudobulk, owned Bash PID 214342 and owned R PID 214344, used an audit-generated 8-donor synthetic RDS/CSV; it printed donor output, then exited 139.",
+        "note": "The output correctly reports donors rather than cells, but the command is still non-zero.", "basic": 31, "specialized": 46, "total": 77, "assertions_passed": 3, "assertions_total": 4,
+        "assertions": [
+          { "text": "Counts are summed into donor-level pseudobulk", "result": "PASS", "note": "DESeq2 completed on the eight-donor synthetic fixture." },
+          { "text": "Output reports donors rather than cells", "result": "PASS", "note": "Printed minimum donors per group=10." },
+          { "text": "Result is finite and within configured maxN", "result": "PASS", "note": "Printed achieved power=0.848 at maxN=200." },
+          { "text": "Copied wrapper exits successfully", "result": "FAIL", "note": "Owned R child exited 139 after printing OK." }
+        ]
+      },
+      {
+        "index": 7, "type": "Adversarial", "label": "Proteomics multiplicity calculation", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Fresh isolated input07_proteomics, owned Bash PID 214132 and owned R PID 214134, exited 0 naturally.",
+        "note": "The panel-wide alpha correction produced the expected inflation in n.", "basic": 37, "specialized": 57, "total": 94, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Unadjusted two-sample t-test n is approximately 12", "result": "PASS", "note": "Printed 11.94." },
+          { "text": "5000-feature corrected n is approximately 44", "result": "PASS", "note": "Printed 43.26." },
+          { "text": "Multiplicity correction increases the planned sample size materially", "result": "PASS", "note": "Adjusted n exceeded three times unadjusted n." },
+          { "text": "Command completes with zero exit status", "result": "PASS", "note": "Owned R child exited 0." }
+        ]
+      }
+    ]
+  },
+  "final": { "static_weighted": 34.4, "dynamic_weighted": 42.2, "score": 77, "max": 100, "grade": "Reject", "grade_symbol": "❌", "deployable": false, "veto_override": true },
+  "key_strengths": [
+    "The decision tree clearly distinguishes biological replicates, technical replicates, donors, and cells.",
+    "The shipped PROPER wrapper reaches the expected simulation, accessor, and summaryPower outputs before the runtime failure.",
+    "The donor-pseudobulk wrapper correctly returns a donor-level sample-size result on a synthetic eight-donor fixture.",
+    "The proteomics route correctly demonstrates panel-wide alpha adjustment and completes with exit 0."
+  ],
+  "recommendations": [
+    { "priority": "P0", "title": "Repair the R runtime exit-139 failure", "observed_in": [1, 2, 5, 6], "problem": "Four fresh, isolated, audit-owned R runs ended 139; three shipped paths printed results but none completed successfully.", "root_cause": "The supported Windows R/Bioconductor runtime has a post-computation native crash on the ssizeRNA/DESeq2/PROPER paths.", "fix": "Provide a private supported R 4.4/Bioconductor 3.20 runtime containing ssizeRNA 1.3.3, PROPER 1.38.0, and DESeq2 1.46.0, then prove each copied shipped script exits 0 without mutating the shared environment." },
+    { "priority": "P1", "title": "Preflight the infeasible maxN path", "observed_in": [4], "problem": "At maxN=2 the scalar estimator raised a length-zero error instead of returning the documented NA for the guard.", "root_cause": "The documentation assumes all infeasible ceilings reach the result matrix path.", "fix": "Wrap ssizeRNA_single and ssizeRNA_vary in tryCatch, distinguish estimator errors from NA, and test a very-low-maxN case in the worked script." },
+    { "priority": "P1", "title": "Validate vector inputs before ssizeRNA_vary", "observed_in": [3], "problem": "A finite per-gene vector fixture failed inside integrate() with no actionable recovery guidance.", "root_cause": "The route documents scalar-versus-vector shape but not a numerical preflight for vector distributions.", "fix": "Add finite, positive, length-matched, and representative-range checks, then catch integrate failures with a message directing users to inspect pilot-derived means and dispersions." }
+  ]
+}

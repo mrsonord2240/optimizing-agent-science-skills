@@ -1,0 +1,235 @@
+{
+  "meta": {
+    "skill_name": "bio-pathway-go-enrichment",
+    "description": "Gene Ontology over-representation analysis of a selected gene list using clusterProfiler enrichGO, with explicit background-universe selection, ID conversion, GO-DAG redundancy handling, and an optional GOseq length-bias branch.",
+    "evaluated_on": "2026-09-23",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "mrsonord2240/bioSkills@5ed09f789aed05537c7899553ac6ebc005fe7e93:pathway-analysis/go-enrichment",
+    "worktree": "F:\\OpenScience\\wt\\pathway-go-enrichment",
+    "branch": "fix/pathway-go-enrichment",
+    "tip_commit": "5ed09f789aed05537c7899553ac6ebc005fe7e93",
+    "environment": "Private WSL runtime /home/sci/openscience-go-audit-20260923; R 4.4.3; clusterProfiler 4.14.0; org.Hs.eg.db 3.20.0; GOSemSim 2.32.0; goseq 1.58.0; geneLenDataBase 1.42.0. Created only after the shared Windows R wrapper orphaned the all-ontology child process; shared environment was not modified.",
+    "audit_type": "Phase 2 final-pass audit of the exact requested source tip. The previous canonical JSON and viewer were archived at F:\\OpenScience\\audits\\_pre-fix-20260923\\bio-pathway-go-enrichment\\ before this report was written.",
+    "executed_inputs": "7/7",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md",
+    "execution_note": "All dynamic probes were executed in the private WSL runtime. Per the canonical-report-only instruction, transient runner output was not archived; all outcomes and exact versions are recorded below. The source worktree remained untouched."
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "FAIL",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "Executed results use only local, versioned GO annotations. The foreground/universe membership used for audit probes is synthetic and labeled as such; no clinical or individual-level claims were made."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "The Skill frames ORA as hypothesis generation and routes ranked-list analyses to GSEA."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "The explicit-universe, adjusted-p, FoldEnrichment, per-ontology simplification, groupGO, ID-conversion, and custom-enricher claims reproduced on the pinned isolated stack."
+      },
+      "code_usability": {
+        "result": "FAIL",
+        "detail": "The GOseq code block was executed verbatim after installing both its documented dependency (goseq 1.58.0) and geneLenDataBase 1.42.0. nullp(de_genes, 'hg38', 'ensGene') reported that no hg38/ensGene length data were available, attempted a UCSC download, then halted: 'Length information for genome hg38 and gene ID ensGene is not available. You will have to specify bias.data manually.' The Skill neither declares this additional TxDb/bias.data requirement nor supplies a runnable fallback."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 87,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 10, "max": 12, "note": "Core ORA, all-ontology, ID-conversion, redundancy, and custom-set paths are runnable; the advertised RNA-seq GOseq path is not." },
+      "reliability": { "score": 10, "max": 12, "note": "Strong explicit-universe and conversion-loss guidance, but no preflight for the GOseq length-data dependency or fallback bias.data path." },
+      "performance_context": { "score": 7, "max": 8, "note": "The examples are self-contained and complete; simplify() cost scales sharply with an unfiltered all-ontology result, which the normal thresholded examples avoid." },
+      "agent_usability": { "score": 14, "max": 16, "note": "Clear execution order and failure modes; the runnable-looking GOseq fence is a misleading dead end on the declared dependency set." },
+      "human_usability": { "score": 7, "max": 8, "note": "Readable prompts, result-column definitions, and caveats; the missing GOseq prerequisite is material." },
+      "security": { "score": 11, "max": 12, "note": "No credentials or destructive operations; local OrgDb route is safe. The failing GOseq route attempts a network download without saying so." },
+      "maintainability": { "score": 11, "max": 12, "note": "Self-contained shipped examples and explicit package-version guidance are strong. The GOseq integration needs a verified, version-pinned data source." },
+      "agent_specific": { "score": 17, "max": 20, "note": "Good routing boundaries and explicit statistical defaults, reduced by an optional branch that cannot execute as written." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 87.9,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 22, "total": 24 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Run shipped go_enrichment_basic.R unchanged",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Executed the actual source file at pathway-analysis/go-enrichment/examples/go_enrichment_basic.R in a fresh environment; no substitutions.",
+        "note": "Exit 0. The self-contained BP example returned 135 terms. Its result frame included RichFactor, FoldEnrichment, and zScore.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Shipped basic example runs without unshipped input", "result": "PASS", "note": "Exit 0; it constructs foreground and universe from org.Hs.eg.db." },
+          { "text": "Explicit BP ORA returns results", "result": "PASS", "note": "135 terms." },
+          { "text": "Fixed enrichResult column list is present", "result": "PASS", "note": "RichFactor, FoldEnrichment, and zScore present." },
+          { "text": "Example uses a matched universe", "result": "PASS", "note": "universe_ids is supplied to enrichGO." }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Regression",
+        "label": "Run shipped go_all_ontologies.R unchanged",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Executed the actual source file at pathway-analysis/go-enrichment/examples/go_all_ontologies.R in a fresh environment; no substitutions.",
+        "note": "Exit 0. The per-ontology loop produced a combined 85-row result with the expected enrichResult columns. Counts differ from older audit evidence because the isolated stack uses its locally pinned annotation release, not because the source was altered.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "Shipped all-ontology example runs end to end", "result": "PASS", "note": "Exit 0; no external de_results.csv is needed." },
+          { "text": "Example simplifies each ontology explicitly", "result": "PASS", "note": "lapply over BP/MF/CC." },
+          { "text": "Combined output preserves enrichment columns", "result": "PASS", "note": "RichFactor, FoldEnrichment, zScore present." }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Variant A",
+        "label": "Canonical ORA contract, pvalueCutoff semantics, and universe effect",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Executed enrichGO with the Skill's BP arguments on synthetic membership over real org.Hs.eg.db annotations, then compared matched-universe and omitted-universe calls.",
+        "note": "Canonical BP call returned 135 rows and exactly the documented 12 columns. Omitting universe changed the parsed annotated background denominator from 2,496 to 18,986. With cutoffs relaxed, 250 terms had raw p < 0.05 but adjusted p >= 0.05; strict output fell from 2,565 to 135 rows, reproducing adjusted-p filtering.",
+        "basic": 39,
+        "specialized": 57,
+        "total": 96,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Canonical enrichGO argument pattern executes", "result": "PASS", "note": "BP call returned 135 rows." },
+          { "text": "Column contract matches documentation", "result": "PASS", "note": "Exact documented 12-column order." },
+          { "text": "Omitting universe changes the null", "result": "PASS", "note": "N 2,496 to 18,986." },
+          { "text": "pvalueCutoff acts on adjusted p", "result": "PASS", "note": "250 raw-significant but adjusted-nonsignificant rows were excluded by strict cutoffs." },
+          { "text": "enrichGO default ontology is MF", "result": "PASS", "note": "formals(enrichGO)$ont == 'MF'." }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Corrected simplify(ont='ALL') claim and groupGO boundary",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Executed ont='ALL' enrichGO at the shipped threshold, then simplify(..., measure='Wang'), and executed groupGO on the same foreground.",
+        "note": "ont='ALL' returned 194 terms; simplify returned 85 spanning BP 54, CC 5, and MF 26. This directly verifies the 5ed09f7 correction: no ontology is silently dropped. groupGO returned 476 classification rows and no pvalue column.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "simplify collapses an all-ontology object without dropping MF or CC", "result": "PASS", "note": "194 to 85; BP54/CC5/MF26." },
+          { "text": "Corrected simplify_ALL dispatch explanation matches behavior", "result": "PASS", "note": "All three ONTOLOGY values remain after simplification." },
+          { "text": "groupGO is descriptive rather than a significance test", "result": "PASS", "note": "476 rows; no pvalue column." }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Edge",
+        "label": "UniProt conversion and custom TERM2GENE enrichment",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Executed bitr(UNIPROT -> ENTREZID) and a two-term local TERM2GENE enricher call against the same explicit universe.",
+        "note": "The sampled 25 UniProt keys mapped to 25 rows and four unique Entrez IDs (the sample includes isoforms, so it is a mapping-mechanics probe rather than a representative conversion rate). The custom enricher returned two rows and the shared RichFactor/FoldEnrichment/zScore columns.",
+        "basic": 37,
+        "specialized": 57,
+        "total": 94,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "Documented bitr route executes", "result": "PASS", "note": "25 input keys, 25 mapped rows." },
+          { "text": "Custom enricher accepts the same explicit universe", "result": "PASS", "note": "Two local TERM2GENE terms returned." },
+          { "text": "Custom enrichResult shares documented effect-size columns", "result": "PASS", "note": "RichFactor, FoldEnrichment, zScore present." }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Adversarial",
+        "label": "GOseq RNA-seq length-bias block executed verbatim",
+        "status": "COMPLETED",
+        "status_flag": "❌",
+        "executed": true,
+        "execution_note": "Executed the exact library/nullp/goseq/BH sequence from SKILL.md with a synthetic named Ensembl 0/1 vector after installing goseq and geneLenDataBase in the isolated runtime.",
+        "note": "The block halted at nullp(de_genes, 'hg38', 'ensGene'). goseq reported no hg38/ensGene length data, attempted UCSC retrieval, then stopped because length information was unavailable. The source contains no required TxDb installation, supplied bias.data, or working fallback.",
+        "basic": 20,
+        "specialized": 30,
+        "total": 50,
+        "assertions_passed": 1,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "The documented goseq dependency loads", "result": "PASS", "note": "goseq 1.58.0 and geneLenDataBase 1.42.0 loaded." },
+          { "text": "nullp(..., 'hg38', 'ensGene') executes from documented prerequisites", "result": "FAIL", "note": "No length data available; downloaded fallback also failed." },
+          { "text": "The full code block reaches BH correction", "result": "FAIL", "note": "Execution halted before goseq() and p.adjust()." }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Scope Boundary",
+        "label": "Source, contract, and scientific-scope audit",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Read the exact source at the verified clean tip and inspected the front matter, routing, stated statistical model, threshold caveats, and references.",
+        "note": "Front matter is parseable; scope cleanly distinguishes ORA, GSEA, other pathway databases, and descriptive groupGO. It properly treats enrichment as hypothesis generation and contains no clinical inference or secret-handling path.",
+        "basic": 38,
+        "specialized": 54,
+        "total": 92,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "Front matter and basic contract are valid", "result": "PASS", "note": "name, description, tool_type, primary_tool, and license are present." },
+          { "text": "Method boundary is scientifically appropriate", "result": "PASS", "note": "ORA versus GSEA and hypothesis-generation boundary are explicit." },
+          { "text": "No unsafe operational or clinical path is introduced", "result": "PASS", "note": "Local annotation analysis only." }
+        ]
+      }
+    ]
+  },
+  "findings": [
+    {
+      "severity": "P1",
+      "title": "GOseq length-bias code fence is not runnable from its documented prerequisites",
+      "problem": "The code calls nullp(de_genes, 'hg38', 'ensGene'), but the documented installation installs only goseq. Even with geneLenDataBase explicitly installed, the isolated current stack reports no hg38/ensGene length data and halts before goseq/BH correction.",
+      "impact": "RNA-seq users following the advertised correction path receive a runtime failure or an undeclared network-dependent retrieval attempt instead of a length-bias-aware analysis.",
+      "recommended_fix": "Provide and verify one complete, version-pinned route: declare the exact TxDb/length-data package and compatible identifier namespace, or show an explicit bias.data input with a checked fallback. Add a preflight that fails clearly before attempting the analysis."
+    }
+  ],
+  "final": {
+    "static_weighted": 34.8,
+    "dynamic_weighted": 52.7,
+    "score": 88,
+    "max": 100,
+    "grade": "Reject",
+    "grade_symbol": "⛔",
+    "deployable": false,
+    "veto_override": true,
+    "summary": "Core ORA and the corrected simplify(ont='ALL') behavior pass, but the advertised GOseq code path is a reproducible code-usability failure on the declared/current dependency stack."
+  }
+}

@@ -1,0 +1,7 @@
+suppressPackageStartupMessages(library(RNASeqPower))
+p4 <- rnapower(depth = .1 * 20, n = 4, cv = .3, effect = 1.5, alpha = .05)
+p8 <- rnapower(depth = .1 * 10, n = 8, cv = .3, effect = 1.5, alpha = .05)
+pdeep <- rnapower(depth = 20, n = 14, cv = .3, effect = 1.5, alpha = .05)
+stopifnot(all(is.finite(c(p4, p8, pdeep))), p8 > p4, pdeep > p8)
+cat(sprintf("20M_depth2_n4=%.6f 10M_depth1_n8=%.6f depth20_n14=%.6f\n", p4, p8, pdeep))
+cat("BUDGET_VARIANT_ASSERTIONS=PASS\n")

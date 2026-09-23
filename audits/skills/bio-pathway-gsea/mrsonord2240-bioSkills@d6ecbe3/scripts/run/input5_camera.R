@@ -1,0 +1,20 @@
+library(limma)
+set.seed(789)
+ng <- 1000; ns <- 16
+group <- factor(rep(c("Control","Case"), each=8))
+design <- model.matrix(~group)
+expr <- matrix(rnorm(ng*ns), nrow=ng, dimnames=list(sprintf("G%04d",seq_len(ng)),sprintf("S%02d",seq_len(ns))))
+up <- sprintf("G%04d",1:40); down <- sprintf("G%04d",41:80); null <- sprintf("G%04d",81:120)
+expr[up, group=="Case"] <- expr[up, group=="Case"] + 0.9
+expr[down, group=="Case"] <- expr[down, group=="Case"] - 0.9
+sets <- list(UP=up, DOWN=down, NULL=null)
+idx <- ids2indices(sets, rownames(expr), remove.empty=TRUE)
+cam <- camera(expr, idx, design, contrast=2, inter.gene.cor=NA)
+fr <- fry(expr, idx, design, contrast=2)
+print(cam)
+print(fr)
+stopifnot(all(c("UP","DOWN","NULL") %in% rownames(cam)), cam["UP","FDR"] < 0.05, cam["DOWN","FDR"] < 0.05, "Correlation" %in% names(cam))
+stopifnot(all(c("UP","DOWN","NULL") %in% rownames(fr)))
+write.csv(cam, "F:/OpenScience/audits/bio-pathway-gsea/data/input5_camera.csv")
+write.csv(fr, "F:/OpenScience/audits/bio-pathway-gsea/data/input5_fry.csv")
+cat(sprintf("ASSERT input5 camera_UP_FDR=%.3g DOWN_FDR=%.3g corr_UP=%.3f\n", cam["UP","FDR"], cam["DOWN","FDR"], cam["UP","Correlation"]))

@@ -1,0 +1,122 @@
+{
+  "meta": {
+    "skill_name": "bio-experimental-design-power-analysis",
+    "description": "Plans power for high-dimensional genomics experiments using RNASeqPower, PROPER, edgeR pseudobulk, and multiplicity-aware proteomics calculations.",
+    "source": "mrsonord2240/bioSkills@57a06f815adfe5c601e399dd72e3ba82249ef370:experimental-design/power-analysis",
+    "audit_type": "fresh corrective final-pass Phase 2 audit after invalidated process intervention",
+    "evaluated_on": "2026-09-23",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Protocol Design",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "executed_inputs": 7,
+    "auditor": "Codex",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md",
+    "freshness": "All conclusions below derive from the fresh run directory only. The earlier report was archived as invalidated-process-intervention-20260923 and was not used as verdict or process evidence.",
+    "environment": "crispr-screen-analyst via F:/OpenScience/audit-envs/crispr-screen-analyst/r.sh; RNASeqPower 1.46.0, PROPER 1.38.0, edgeR 4.4.2, pwr 1.3.0",
+    "source_clean_before_and_after": true
+  },
+  "process_isolation": {
+    "policy": "Every executable input was launched as a separate direct child of the fresh audit runner. No timeout, Stop-Process, taskkill, signal, or intervention outside the auditor-owned process tree was used.",
+    "execution_records": "run/*.execution.json",
+    "all_completed": true,
+    "all_exit_codes_zero": true
+  },
+  "veto_gates": {
+    "skill_veto": { "gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS" },
+    "research_veto": {
+      "applicable": true,
+      "gate": "FAIL",
+      "scientific_integrity": { "result": "PASS", "detail": "All numerical claims are traceable to fresh stdout files or pinned source." },
+      "practice_boundaries": { "result": "PASS", "detail": "The regulated Phase II request is routed to clinical-biostatistics/power-and-sample-size." },
+      "methodological_ground": {
+        "result": "FAIL",
+        "detail": "Independent realized-FDR assessment: the freshly executed shipped rnaseq_power.R printed nominal FDR 0.05 but Actual FDR 0.3692738, 0.1849111, 0.1024990, and 0.0598908 at 3, 5, 8, and 12 replicates. SKILL.md calls summaryPower/plotPower a target-FDR power curve but contains no rule to inspect Actual FDR, reject a failed candidate, increase simulations, or revise the model. The fresh pseudobulk run independently reinforces the gap: its 12-donor configuration reports FDR 0.133. A nominal alpha is a test setting, not evidence that realized FDR is controlled." },
+      "code_usability": { "result": "PASS", "detail": "Both shipped R examples, package parsing, all six other computational inputs, and determinism completed with exit 0 in the designated environment." }
+    }
+  },
+  "static_score": {
+    "subtotal": 87,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 10, "max": 12, "note": "Assay coverage is substantial, but the central simulation does not validate realized FDR before design use." },
+      "reliability": { "score": 9, "max": 12, "note": "Version and failure-mode guidance is strong; no realized-FDR stop/iterate response is given." },
+      "performance_context": { "score": 7, "max": 8, "note": "The primary PROPER example is material work without a reduced documented smoke test." },
+      "agent_usability": { "score": 15, "max": 16, "note": "Decision routing and runnable examples are clear, but the critical FDR validation action is absent." },
+      "human_usability": { "score": 7, "max": 8, "note": "Plain-language explanation of what to do after Actual FDR exceeds target is missing." },
+      "security": { "score": 11, "max": 12, "note": "No secrets or unsafe command construction were found; rnapower input guards remain prose-only." },
+      "maintainability": { "score": 11, "max": 12, "note": "The two source examples parse and the FDR correction is localized." },
+      "agent_specific": { "score": 17, "max": 20, "note": "Named handoffs and seed documentation are good; no explicit failure escape hatch exists for an FDR-invalid design." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 87.9,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 31, "total": 34 },
+    "inputs": [
+      {
+        "index": 1, "type": "Canonical", "label": "Bulk RNA-seq sizing with PROPER confirmation", "executed": true,
+        "execution_note": "Fresh isolated 01_input1_canonical_bulk.R (PID 58604) and exact shipped 08_shipped_rnaseq_power.R (PID 195004); both direct children completed exit 0, without process intervention.",
+        "status": "COMPLETED", "status_flag": "⚠️", "basic": 29, "specialized": 41, "total": 70, "assertions_passed": 4, "assertions_total": 5,
+        "note": "Closed-form values were n=56.335572 and power(n=14)=0.286598. The exact source example completed but its Actual FDR exceeds nominal at every tested n, and the skill supplies no acceptance rule."
+      },
+      {
+        "index": 2, "type": "Variant A", "label": "Fixed-budget depth versus replicate comparison", "executed": true,
+        "execution_note": "Fresh isolated 02_input2_budget_variant.R (PID 78036) completed exit 0 without process intervention.",
+        "status": "COMPLETED", "status_flag": "✅", "basic": 36, "specialized": 54, "total": 90, "assertions_passed": 5, "assertions_total": 5,
+        "note": "20M/depth2/n4=0.112480; 10M/depth1/n8=0.118358; depth20/n14=0.817825."
+      },
+      {
+        "index": 3, "type": "Edge", "label": "Hard target and invalid RNASeqPower inputs", "executed": true,
+        "execution_note": "Fresh isolated 03_input3_boundary.R (PID 207344) completed exit 0 without process intervention.",
+        "status": "COMPLETED", "status_flag": "✅", "basic": 34, "specialized": 52, "total": 86, "assertions_passed": 4, "assertions_total": 5,
+        "note": "Required n=6441.455943; power at n=12=0.035586; invalid alpha=1.5 and effect=0 still return finite numbers, confirming the missing reusable preflight guard."
+      },
+      {
+        "index": 4, "type": "Variant B", "label": "scRNA-seq pseudobulk donor-versus-cell power", "executed": true,
+        "execution_note": "Fresh isolated exact shipped 04_input4_pseudobulk.R (PID 20960) completed exit 0 without process intervention.",
+        "status": "COMPLETED", "status_flag": "⚠️", "basic": 35, "specialized": 52, "total": 87, "assertions_passed": 4, "assertions_total": 5,
+        "note": "At 4/12 donors, pseudobulk power=0.000/0.070 and FDR=0.000/0.133; naive cell FDR=0.897/0.888. Donors are correctly used, but no actual-FDR acceptance condition is given for the pseudobulk output."
+      },
+      {
+        "index": 5, "type": "Stress", "label": "Proteome-wide multiplicity and ATAC per-region power", "executed": true,
+        "execution_note": "Fresh isolated 05_input5_proteomics_atac.R (PID 178000) completed exit 0 without process intervention.",
+        "status": "COMPLETED", "status_flag": "✅", "basic": 37, "specialized": 56, "total": 93, "assertions_passed": 5, "assertions_total": 5,
+        "note": "Raw proteomics n=11.942258, corrected n=42.449567, and ATAC power=0.219796."
+      },
+      {
+        "index": 6, "type": "Scope Boundary", "label": "Regulated Phase II response-rate power", "executed": true,
+        "execution_note": "Fresh isolated 06_input6_scope.py (PID 61676) completed exit 0 without process intervention.",
+        "status": "COMPLETED", "status_flag": "✅", "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 4, "assertions_total": 4,
+        "note": "The exact clinical-biostatistics/power-and-sample-size handoff is present and no clinical calculation was improvised."
+      },
+      {
+        "index": 7, "type": "Adversarial", "label": "Observed power after a non-significant result", "executed": true,
+        "execution_note": "Fresh isolated 07_input7_observed_power.R (PID 69284) completed exit 0 without process intervention.",
+        "status": "COMPLETED", "status_flag": "✅", "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 5, "assertions_total": 5,
+        "note": "p=0.65,0.40,0.19 mapped to observed powers 0.073075,0.131845,0.255462, supporting the source warning not to explain a null with observed power."
+      }
+    ],
+    "additional_fresh_executions": [
+      { "label": "Environment and source parsing", "executed": true, "execution_note": "00_environment_and_parse.R, PID 227352, exit 0; all declared packages loaded and both examples parsed." },
+      { "label": "PROPER determinism", "executed": true, "execution_note": "09_determinism.R, PID 77636, exit 0; two default-seed summary objects were identical." }
+    ]
+  },
+  "final": { "static_weighted": 34.8, "dynamic_weighted": 52.7, "score": 88, "max": 100, "grade": "Reject", "grade_symbol": "❌", "deployable": false, "veto_override": true },
+  "recommendations": [
+    {
+      "priority": "P0", "title": "Make realized FDR an executable design-acceptance rule",
+      "problem": "Both fresh simulations show that a nominal 0.05 setting can produce Actual FDR above 0.05, while the skill permits treating marginal power as target-FDR power.",
+      "root_cause": "The workflow passes a targetFDR setting into PROPER but never checks summaryPower's realized Actual FDR before accepting or reporting a design.",
+      "fix": "Immediately after summaryPower, require Actual FDR <= predefined target with a stated Monte Carlo tolerance before reporting or selecting a replicate count. If it fails, mark the candidate invalid, increase nsims for stability, and refit the dispersion/effect model or revise the DE method. Apply the same rule to pseudobulk simulations."
+    },
+    {
+      "priority": "P1", "title": "Ship a closed-form input preflight guard",
+      "problem": "RNASeqPower accepts invalid alpha and effect values with plausible numeric outputs.",
+      "root_cause": "The documented closed-form route forwards unchecked user inputs to rnapower, whose numeric return value does not enforce the workflow's scientific input domain.",
+      "fix": "Add a runnable validator for finite values, alpha/power in (0,1), positive depth/CV/n, and a positive non-unit fold change before every rnapower call."
+    }
+  ]
+}

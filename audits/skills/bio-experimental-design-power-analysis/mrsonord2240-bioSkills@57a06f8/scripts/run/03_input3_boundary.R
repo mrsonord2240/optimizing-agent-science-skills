@@ -1,0 +1,8 @@
+suppressPackageStartupMessages(library(RNASeqPower))
+required_n <- rnapower(depth = 2, cv = .3, effect = 1.05, alpha = .05, power = .95)
+power_n12 <- rnapower(depth = 2, n = 12, cv = .3, effect = 1.05, alpha = .05)
+bad_alpha <- suppressWarnings(rnapower(depth = 2, n = 12, cv = .3, effect = 1.5, alpha = 1.5))
+bad_effect <- suppressWarnings(rnapower(depth = 2, n = 12, cv = .3, effect = 0, alpha = .05))
+stopifnot(is.finite(required_n), required_n > 1000, is.finite(power_n12), power_n12 < .1, is.finite(bad_alpha), is.finite(bad_effect))
+cat(sprintf("required_n=%.6f power_n12=%.6f alpha_1.5=%.6f effect_0=%.6f\n", required_n, power_n12, bad_alpha, bad_effect))
+cat("BOUNDARY_ASSERTIONS=PASS\n")
