@@ -1280,7 +1280,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The local Philosopher/TPP-derived pepXML ingestion path is incompatible with the available Comet and OpenMS-reserialised fixtures; this is not a silent Skill failure because the guard stops it.
 - Fix: Before a workflow depends on this optional route, run the documented commands against a compatible pepXML fixture or functioning Philosopher/TPP environment and assert nonempty peptideprophet_result, prot.xml, and protein.tsv. Do not retry the prohibited standalone TPP installer.
 
-## P2 (467)
+## P2 (463)
 
 ### `bio-data-visualization-lollipop-protein-maps` — HGVSp edge cases and recurrence semantics undocumented
 
@@ -2945,46 +2945,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: examples/ only ships s_predixcan_pipeline.sh and focus_finemap.sh; FUSION.assoc_test.R usage lives only as an inline bash fence in SKILL.md, and no fixture data is shipped for any of the 12 tools. Unchanged from the pre-fix audit; deliberately out of scope for this fix pass.
 - Root cause: Example coverage was built out for S-PrediXcan and FOCUS but not extended to FUSION despite FUSION being the frontmatter primary_tool.
 - Fix: Add examples/fusion_assoc_test.sh mirroring the other two scripts, plus a tiny synthetic fixture set.
-
-### `bio-duplicate-handling` — Unmeasured speed claims; the optimized pipeline measured slower
-
-- Skill: 87, Production Ready · [mrsonord2240/bioSkills@3e4087c](https://github.com/mrsonord2240/bioSkills/tree/3e4087ce9b3d9c4d89df6765e6dd4c4d8c063dc9/alignment-files/duplicate-handling) · [viewer](skills/bio-duplicate-handling/mrsonord2240-bioSkills@3e4087c/viewer.md)
-- Observed in inputs: 2
-- Problem: '~30% faster than sort -n \| fixmate \| sort \| markdup on typical 30x WGS' is still asserted and biobambam2 is labelled 'Fastest'. On an 800k-read BAM at 4 threads the collate/-u pipeline took 6.4 s vs 4.6 s for the plain chain (3 reps, equal flagged counts). 30x WGS scale was not tested.
-- Root cause: Speed claims were carried over from prose and never benchmarked.
-- Fix: Delete the percentage and the 'Fastest' label, or state the measured setup (reads, threads, disk) next to the number.
-
-### `bio-duplicate-handling` — umi_tools counts vary by 1 without --random-seed
-
-- Skill: 87, Production Ready · [mrsonord2240/bioSkills@3e4087c](https://github.com/mrsonord2240/bioSkills/tree/3e4087ce9b3d9c4d89df6765e6dd4c4d8c063dc9/alignment-files/duplicate-handling) · [viewer](skills/bio-duplicate-handling/mrsonord2240-bioSkills@3e4087c/viewer.md)
-- Observed in inputs: 5
-- Problem: The Skill quotes '5689 vs 2805 records'; unseeded umi_tools dedup returned 5688 in 3 of 6 runs on the same input (5689 in all three seeded runs).
-- Root cause: umi_tools picks among tied reads randomly; the bulk block has no seed.
-- Fix: Add --random-seed=1 to the umi_tools blocks and say the figure is approximate without it.
-
-### `bio-duplicate-handling` — --strategy=paired input requirement not stated
-
-- Skill: 87, Production Ready · [mrsonord2240/bioSkills@3e4087c](https://github.com/mrsonord2240/bioSkills/tree/3e4087ce9b3d9c4d89df6765e6dd4c4d8c063dc9/alignment-files/duplicate-handling) · [viewer](skills/bio-duplicate-handling/mrsonord2240-bioSkills@3e4087c/viewer.md)
-- Observed in inputs: 8
-- Problem: The ctDNA row and the duplex branch send the agent to GroupReadsByUmi --strategy=paired, which needs RX as 'A-B'. A single-UMI RX fails with IllegalArgumentException (clear message, one retry).
-- Root cause: Duplex branch documents the MI /A /B output but not the RX format it requires.
-- Fix: One sentence: 'paired needs RX as UMI1-UMI2 (as in this BAM); single-UMI libraries use adjacency + CallMolecularConsensusReads'.
-
-### `bio-duplicate-handling` — Assay gate relies on the user's declared ASSAY
-
-- Skill: 87, Production Ready · [mrsonord2240/bioSkills@3e4087c](https://github.com/mrsonord2240/bioSkills/tree/3e4087ce9b3d9c4d89df6765e6dd4c4d8c063dc9/alignment-files/duplicate-handling) · [viewer](skills/bio-duplicate-handling/mrsonord2240-bioSkills@3e4087c/viewer.md)
-- Observed in inputs: 4, 6
-- Problem: The example refuses eight assay names and warns above 50% flagged, but a real RNA-seq BAM declared ASSAY=wgs exits 0 with 2570/8828 flagged and no warning (38% at the top locus).
-- Root cause: The gate checks a label, not the BAM; the 50% heuristic catches amplicon panels only.
-- Fix: Optionally refuse when @PG names a splice-aware aligner (STAR, HISAT2) or when many CIGARs contain N, and print the flagged percentage even below 50%.
-
-### `bio-duplicate-handling` — Frontmatter description omits the assay and UMI caveats
-
-- Skill: 87, Production Ready · [mrsonord2240/bioSkills@3e4087c](https://github.com/mrsonord2240/bioSkills/tree/3e4087ce9b3d9c4d89df6765e6dd4c4d8c063dc9/alignment-files/duplicate-handling) · [viewer](skills/bio-duplicate-handling/mrsonord2240-bioSkills@3e4087c/viewer.md)
-- Observed in inputs: —
-- Problem: The description still says 'Use when preparing alignments for variant calling' with no hint that RNA-seq, amplicon, scRNA and UMI libraries need a different tool.
-- Root cause: Description untouched by the fix.
-- Fix: Append one clause: 'Not for RNA-seq, amplicon or UMI libraries (see the decision table)'.
 
 ### `bio-experimental-design-batch-design` — Bridge-channel block doesn't inherit the soft imbalance warning
 
@@ -4905,6 +4865,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: examples/screen_qc.py's STAGE_THRESHOLDS now matches SKILL.md's stage_specific_thresholds() and says so in a comment, but nothing enforces that they stay in sync -- this is exactly how the pre-fix disagreement originally happened.
 - Root cause: The example is a standalone copy-paste script rather than importing SKILL.md's function, by design (so a researcher can run it without the rest of the Skill installed).
 - Fix: Add a one-line comment pointing to the exact SKILL.md section ("QC Stage Hierarchy" / "Library Representation Metrics") so a future editor updating one table is prompted to update the other, or add a small consistency test in a CI-style check if one exists for this repo.
+
+### `bio-duplicate-handling` — Validate pbmarkdup on real HiFi amplicon data
+
+- Skill: 94, Production Ready · [mrsonord2240/bioSkills@2d29a1e](https://github.com/mrsonord2240/bioSkills/tree/2d29a1e3460345c6877ecf9f33c58a210ee5c727/alignment-files/duplicate-handling) · [viewer](skills/bio-duplicate-handling/mrsonord2240-bioSkills@2d29a1e/viewer.md)
+- Observed in inputs: 7
+- Problem: The documented pbmarkdup command was verified only with a deterministic synthetic unaligned HiFi-style BAM. Its behavior on a real HiFi amplicon BAM or FASTQ remains unobserved.
+- Root cause: The audit environment has no small public HiFi amplicon dataset and the checkpoint records no suitable source.
+- Fix: When a public HiFi amplicon BAM or FASTQ under 50 MB is available, run the documented command and assert flag or removal behavior against independently inspected duplicate families.
 
 ### `bio-pathway-kegg-pathways` — Shipped SPIA example defaults to nB=2000, no smaller value suggested for quick iteration
 

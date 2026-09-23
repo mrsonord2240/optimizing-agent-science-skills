@@ -1,0 +1,144 @@
+{
+  "meta": {
+    "skill_name": "bio-duplicate-handling",
+    "description": "Mark and remove PCR/optical duplicates using samtools fixmate and markdup. Use when preparing alignments for variant calling or when duplicate reads would bias analysis. Not for RNA-seq, amplicon or UMI libraries (see the decision table).",
+    "evaluated_on": "2026-09-22",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "B",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "mrsonord2240/bioSkills@2d29a1e3460345c6877ecf9f33c58a210ee5c727:alignment-files/duplicate-handling",
+    "audit_kind": "final-pass Phase 2 fresh audit; every prior report input was re-run as regression coverage, with two new inputs",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md"
+  },
+  "veto_gates": {
+    "skill_veto": { "gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS" },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All reported counts were asserted from this audit's logs; no identifiers, outcomes, or performance claims were fabricated." },
+      "practice_boundaries": { "result": "PASS", "detail": "The Skill processes alignment files and gives no individual diagnosis or treatment recommendation." },
+      "methodological_ground": { "result": "PASS", "detail": "The decision table and executable assay gate correctly refuse RNA-seq and UMI workflows for ordinary markdup; UMI workflows use the documented dedicated tools." },
+      "code_usability": { "result": "PASS", "detail": "The shipped scripts and documented CLI paths completed with asserted BAM counts, indexes, metrics, or expected failure messages in the supplied WSL environment." }
+    }
+  },
+  "static_score": {
+    "subtotal": 92,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 12, "max": 12, "note": "The standard, UMI-aware, alternative-marker, and assay-boundary paths are all present and the exercised commands match their stated purpose." },
+      "reliability": { "score": 11, "max": 12, "note": "Scripts use pipefail, temporary paths, count checks, and explicit failure exits; the remaining gap is real HiFi amplicon validation for pbmarkdup." },
+      "performance_context": { "score": 7, "max": 8, "note": "The 291-line SKILL.md delegates detailed branches to focused references and executable scripts, though several tool choices still require reading a reference." },
+      "agent_usability": { "score": 15, "max": 16, "note": "Assay-first routing, verbatim errors, version checks, and output checks make the workflow clear; alternative environment installation is intentionally left to the user environment." },
+      "human_usability": { "score": 7, "max": 8, "note": "Natural triggers and the concise usage guide are strong; the breadth of assay choices still requires the decision table." },
+      "security": { "score": 11, "max": 12, "note": "No credentials, eval/exec, destructive broad deletion, or sensitive-data handling are present; CLI path arguments rely on the called tools' normal filesystem semantics." },
+      "maintainability": { "score": 11, "max": 12, "note": "References separate UMI, alternative-marker, and pysam concerns, while scripts isolate repeatable workflows and expose checkable counts." },
+      "agent_specific": { "score": 18, "max": 20, "note": "The trigger, progressive disclosure, related skills, assay escape hatches, seeded UMI behavior, and temporary-output handling are strong; pbmarkdup remains real-data unverified." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 95.9,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 34, "total": 35 },
+    "inputs": [
+      {
+        "index": 1, "type": "Canonical", "label": "Standard paired-end duplicate workflow", "status": "COMPLETED", "status_flag": "✅", "note": "The five-step samtools workflow, pysam helper, rate helper, and Picard independent marker all matched the 100-read planted truth.", "executed": true, "execution_note": "phase2_audit.sh INPUT 1; phase2_audit.log records samtools and Picard 100 flags, pysam 100 flags, and 20.00 percent.", "basic": 39, "specialized": 58, "total": 97, "assertions_passed": 5, "assertions_total": 5,
+        "assertions": [
+          { "text": "The documented samtools workflow flags the planted 100 duplicate reads.", "result": "PASS", "note": "samtools view -f 1024 returned 100 of 500." },
+          { "text": "The standard workflow writes an index for the marked BAM.", "result": "PASS", "note": "marked.bam.bai was non-empty." },
+          { "text": "The shipped pysam pipeline matches the samtools duplicate count.", "result": "PASS", "note": "pysam_markdup.py printed 100 flagged reads." },
+          { "text": "The duplicate-rate helper uses the stated primary-only denominator.", "result": "PASS", "note": "dup_rate.py printed 20.00 percent." },
+          { "text": "An independent Picard run agrees on duplicate flags.", "result": "PASS", "note": "Picard MarkDuplicates flagged 100 reads and wrote metrics." }
+        ]
+      },
+      {
+        "index": 2, "type": "Variant A", "label": "Shipped pipeline and failure cleanup", "status": "COMPLETED", "status_flag": "✅", "note": "The shipped pipeline produced a 100-read marked BAM and stats; unset assay and detected RNA inputs exited 2 without outputs, while the explicit override completed.", "executed": true, "execution_note": "phase2_audit.sh INPUT 2; phase2_audit.log records the 100-read success, expected exit 2 refusals, absent outputs, and a non-empty override BAM.", "basic": 38, "specialized": 58, "total": 96, "assertions_passed": 5, "assertions_total": 5,
+        "assertions": [
+          { "text": "The shipped WGS pipeline flags the planted truth and writes its statistics file.", "result": "PASS", "note": "out.bam had 100 flags and out.markdup_stats.txt was non-empty." },
+          { "text": "An unset ASSAY is rejected before output creation.", "result": "PASS", "note": "The run exited 2 and left neither BAM nor stats." },
+          { "text": "A real spliced RNA BAM declared as WGS is refused by the heuristic.", "result": "PASS", "note": "The run exited 2 with the documented RNA-seq message." },
+          { "text": "The RNA refusal leaves no output BAM.", "result": "PASS", "note": "rna.bam was absent after the failed run." },
+          { "text": "ALLOW_SPLICED provides the documented explicit override.", "result": "PASS", "note": "The override wrote a non-empty BAM." }
+        ]
+      },
+      {
+        "index": 3, "type": "Edge", "label": "Common errors and rerun behavior", "status": "COMPLETED", "status_flag": "✅", "note": "Three representative Common Errors rows exactly matched tool output; re-marking with -c restored the planted 100 duplicate flags.", "executed": true, "execution_note": "phase2_audit.sh INPUT 3; phase2_audit.log records expected non-zero fixmate and markdup errors and the 100-flag -c rerun.", "basic": 38, "specialized": 58, "total": 96, "assertions_passed": 5, "assertions_total": 5,
+        "assertions": [
+          { "text": "Coordinate-sorted input to fixmate produces the documented error.", "result": "PASS", "note": "stderr contained the queryname-grouping message." },
+          { "text": "Missing -m produces the documented no-ms-tag markdup error.", "result": "PASS", "note": "stderr contained no ms score tag." },
+          { "text": "Queryname-sorted input to markdup produces the documented error.", "result": "PASS", "note": "stderr contained queryname sorted, must be sorted by coordinate." },
+          { "text": "Re-marking with -c succeeds and yields the expected flags.", "result": "PASS", "note": "The cleared rerun flagged 100 reads." },
+          { "text": "The error paths terminate rather than silently marking incorrect data.", "result": "PASS", "note": "Each asserted misuse exited non-zero." }
+        ]
+      },
+      {
+        "index": 4, "type": "Stress", "label": "Bulk UMI and duplex consensus", "status": "COMPLETED", "status_flag": "✅", "note": "Seeded bulk UMI dedup produced 5,689 records; fgbio single and duplex branches produced 5,646 and 4,042 unmapped consensus records; absent CB tags were rejected.", "executed": true, "execution_note": "phase2_audit.sh INPUT 4; phase2_audit.log records 5689 bulk, 5646 single, 4042 duplex, zero mapped duplex reads, and CB-guard exit 2.", "basic": 39, "specialized": 58, "total": 97, "assertions_passed": 5, "assertions_total": 5,
+        "assertions": [
+          { "text": "Bulk paired UMI dedup is deterministic at the documented output count.", "result": "PASS", "note": "The seeded script wrote 5,689 records." },
+          { "text": "The single-strand fgbio branch produces the documented consensus count.", "result": "PASS", "note": "single.bam contained 5,646 records." },
+          { "text": "The duplex fgbio branch produces the documented consensus count.", "result": "PASS", "note": "duplex.bam contained 4,042 records." },
+          { "text": "Duplex consensus reads are unmapped as documented.", "result": "PASS", "note": "samtools view -F 4 returned zero records." },
+          { "text": "The scRNA form refuses a BAM lacking CB tags.", "result": "PASS", "note": "The guard exited 2 with the no-CB message." }
+        ]
+      },
+      {
+        "index": 5, "type": "Variant B", "label": "Alternative duplicate markers", "status": "COMPLETED", "status_flag": "✅", "note": "biobambam2, sambamba, and samblaster each flagged the 100 planted duplicate reads; Picard UMI-aware marking and mapDamage rescaling also completed on their documented paths.", "executed": true, "execution_note": "phase2_audit.sh INPUT 5 plus phase2_old_extra.sh; logs record 100 flags for three markers, 10127 Picard UMI flags, and mapDamage 5644-to-5644 rescaling.", "basic": 38, "specialized": 58, "total": 96, "assertions_passed": 5, "assertions_total": 5,
+        "assertions": [
+          { "text": "biobambam2 marks the planted duplicate truth.", "result": "PASS", "note": "The output had 100 duplicate flags." },
+          { "text": "sambamba marks the planted duplicate truth.", "result": "PASS", "note": "The output had 100 duplicate flags." },
+          { "text": "samblaster marks the planted duplicate truth with pair accounting.", "result": "PASS", "note": "The output had 100 flags and stderr reported 50 of 250 read IDs." },
+          { "text": "Picard UMI-aware marking completes on a fixmate coordinate BAM.", "result": "PASS", "note": "It flagged 10,127 reads and wrote metrics." },
+          { "text": "mapDamage --rescale writes a parsed rescaled BAM without losing records.", "result": "PASS", "note": "Both marked and rescaled BAMs contained 5,644 records." }
+        ]
+      },
+      {
+        "index": 6, "type": "Scope Boundary", "label": "Declared RNA-seq and amplicon refusal", "status": "COMPLETED", "status_flag": "✅", "note": "This new input separately checked explicit RNA-seq and amplicon labels; both were rejected as wrong uses of ordinary markdup.", "executed": true, "execution_note": "phase2_audit.sh INPUT 6; phase2_audit.log records the declared RNA-seq exit 2 and the amplicon wrong-tool refusal without output BAMs.", "basic": 39, "specialized": 58, "total": 97, "assertions_passed": 5, "assertions_total": 5,
+        "assertions": [
+          { "text": "The pipeline refuses ASSAY=rnaseq.", "result": "PASS", "note": "The run exited 2 with the wrong-tool message." },
+          { "text": "The RNA refusal writes no output BAM.", "result": "PASS", "note": "The requested output was absent." },
+          { "text": "The pipeline refuses ASSAY=amplicon.", "result": "PASS", "note": "The run produced the documented wrong-tool message." },
+          { "text": "The decision table's scope boundary is executable rather than prose-only.", "result": "PASS", "note": "Both declared wrong assays stopped before processing." },
+          { "text": "The refusal gives the user a recovery direction.", "result": "PASS", "note": "Both errors direct the user to the decision table." }
+        ]
+      },
+      {
+        "index": 7, "type": "Adversarial", "label": "PacBio HiFi amplicon command", "status": "COMPLETED", "status_flag": "✅", "note": "This new deterministic synthetic HiFi input confirmed flags and removal behavior, but it cannot establish performance on a real HiFi amplicon library.", "executed": true, "execution_note": "phase2_audit.sh INPUT 7 with make_hifi.py; phase2_audit.log records 12 duplicate flags from 60 reads and 48 reads after --rmdup.", "basic": 37, "specialized": 55, "total": 92, "assertions_passed": 4, "assertions_total": 5,
+        "assertions": [
+          { "text": "The documented pbmarkdup command accepts an unaligned PacBio-style BAM.", "result": "PASS", "note": "pbmarkdup completed on the seeded input." },
+          { "text": "pbmarkdup flags the deterministic planted duplicates.", "result": "PASS", "note": "It flagged 12 of 60 reads." },
+          { "text": "pbmarkdup --rmdup removes the flagged records.", "result": "PASS", "note": "The removal output held 48 reads." },
+          { "text": "The synthetic input is reproducible and clearly labeled as synthetic.", "result": "PASS", "note": "make_hifi.py fixes the random seed and documents its 12-read truth." },
+          { "text": "The PacBio HiFi amplicon claim is validated on a real public amplicon library.", "result": "FAIL", "note": "No small real public HiFi amplicon BAM or FASTQ is available in the audit environment." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 36.8,
+    "dynamic_weighted": 57.5,
+    "score": 94,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Every prior audit input family was re-run on the fixed tip, with checked BAM counts, indexes, metrics, or expected error text.",
+    "The shipped pipeline now prevents wrong-assay use both from the declared assay and from an RNA-seq heuristic, while keeping an explicit override.",
+    "UMI branches are reproducible through a random seed and correctly separate single-strand from duplex consensus.",
+    "Alternative marker coverage includes independent duplicate counts, Picard UMI-aware marking, and mapDamage rescaling."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "Validate pbmarkdup on real HiFi amplicon data",
+      "observed_in": [7],
+      "problem": "The documented pbmarkdup command was verified only with a deterministic synthetic unaligned HiFi-style BAM. Its behavior on a real HiFi amplicon BAM or FASTQ remains unobserved.",
+      "root_cause": "The audit environment has no small public HiFi amplicon dataset and the checkpoint records no suitable source.",
+      "fix": "When a public HiFi amplicon BAM or FASTQ under 50 MB is available, run the documented command and assert flag or removal behavior against independently inspected duplicate families."
+    }
+  ]
+}
