@@ -1,174 +1,110 @@
-# Brief: fix audited defects in Sam's bioSkills fork (2026-09-15)
+# Brief: fix audited defects in one Skill
 
-Round-2 audits found that many `GPTomics/bioSkills` Skills fail on broken commands, version drift and
-snippets that run but silently compute the wrong thing. Sam decided to ship fixed local versions from
-his own fork instead of dropping those Skills. You are the **fixer** for ONE Skill. A different
-agent re-audits your work afterwards; you never score anything.
+Read `COMMON.md` first. You are the **fixer** for ONE Skill. A different agent re-audits your work
+afterwards; you never score anything. Your dispatch names the Skill, your worktree and branch (work only
+there), and the env.
 
-## Two facts
+## Evidence
 
-- **Skill ID is the SKILL.md frontmatter `name`, not the folder name.** Every report, audit folder
-  and `--skill` argument depends on it.
-- **Upstream provenance.** `GPTomics/bioSkills` at `d91ed3d` (MIT) is the base, and the read-only
-  clone is `F:\OpenScience\external\GPTomics__bioSkills`. Diff against it to see the original.
-
-## Where things are
-
-- Fork (`bioSkills-Improved`, MIT, same history as upstream):
-  `F:\OpenScience\external\mrsonord2240__bioSkills`. Staging is its `main`, and every fix lands there.
-- **Your worktree and branch** are named in your dispatch message. Work only there.
-- Records repository (briefs, thresholds, fix logs, audit records):
-  `F:\optimizing-agent-science-skills` — thresholds in `process\THRESHOLD.md`, your fix logs in
-  `fixes\`. Fixed Skills are promoted from the fork to the published shelf by
-  `tools\promote_skills.py`; that is a separate step, not yours.
-- Evidence per Skill: `F:\OpenScience\audits\<skill-id>\eval_report_<skill-id>_result.json`
-  (`recommendations[]`, per-input notes) and `eval_viewer_<skill-id>.md` (the commands that ran, what
-  failed, and often the corrected command the auditor verified).
-- Runtimes: the env venv `F:\OpenScience\audit-envs\<env>\` (Python 3.12, R library
-  `R-lib`, tools under `tools\` or `Scripts\`), R at `F:\OpenScience\runtime\envs\.r\Scripts\Rscript.exe`
-  — **never invoked bare: it exits 0 and prints nothing unless `.r/Library/bin` and
-  `.r/Library/mingw-w64/bin` are on `PATH`** (verified 2026-09-17). Use a wrapper such as
-  `F:\OpenScience\audit-envs\mendelian-randomization-analyst\r.sh`.
+- `F:\OpenScience\audits\<skill-id>\eval_report_<skill-id>_result.json` (`recommendations[]`, per-input
+  notes) and `eval_viewer_<skill-id>.md` (what ran, what failed, often the corrected command the auditor
+  verified).
+- The audit's data at `F:\OpenScience\audits\<skill-id>\data\` is read-only; copy what you need to your
+  scratchpad.
+- Diff against `GPTomics__bioSkills` to see the original.
 
 ## What to fix
 
-Every P0 and P1, and any P2 that is cheap, in the Skills listed in your dispatch — when the fix is a
-correction, not new content:
+Every P0 and P1, and any cheap P2, when the fix is a correction, not new content:
 
-- broken commands, wrong or renamed flags, tool binaries that no longer exist under that name;
-- version drift: update to the current documented usage and name the version it was checked on
-  (e.g. "checked on ClipKIT 2.14.0"); keep an older-version note only if the old form still matters;
+- broken commands, wrong or renamed flags, binaries that no longer exist under that name;
+- version drift: update to the current documented usage and name the version checked (e.g. "checked on
+  ClipKIT 2.14.0"); keep an older-version note only if the old form still matters;
 - wrong field, function, class or column names; API paths that no longer match the live service;
-- shipped `examples/` and scripts that crash, parse wrongly, or use the wrong defaults;
-- claims contradicted by the tool's own help/docs or by what the audit actually ran;
+- shipped `examples/` and scripts that crash, parse wrongly or use the wrong defaults;
+- claims contradicted by the tool's own help/docs or by what the audit ran;
 - internal contradictions (a default that breaks the Skill's own rule).
 
-Method-level changes are allowed only when the audit demonstrated the problem with a run (e.g. a
-recommended default that distorted branch lengths). Say what the evidence was.
+Method-level changes only when the audit demonstrated the problem with a run (e.g. a recommended default
+that distorted branch lengths). Say what the evidence was.
+
+Skills already scoring ≥ 85 with no P1 stay byte-identical unless named in a fix batch (Sam, 2026-09-21:
+Production Ready Skills are fixed down to their P2s and split when over 300 lines).
 
 ## Missing referenced executables (2026-09-15)
 
-A Skill that names a tool, method or routine and ships no runnable code for it has a defect, not a
-gap in coverage — the audits keep capping such Skills below their floor, and three separate fixers
-declined the work as "new content" before Sam settled it: **write the executable.**
+A Skill that names a tool, method or routine a user could reasonably expect to run, and ships no runnable
+code for it, has a defect. Take one of three options:
 
-So when the Skill's own `SKILL.md`, `usage-guide.md` or decision tree references something a user
-could reasonably expect to run, you have three options and must take one:
+- **write it**: a runnable block in the Skill's voice, using a tool installed here (check `TOOLS.md`);
+- **install it**: when it is a public, unauthenticated install the tooling pass missed, install it under
+  COMMON's install rules, add it to `TOOLS.md` with a smoke test, then write the block;
+- **delete the claim** from the description, decision tree and prose, so the Skill stops advertising it.
 
-- **write it** — a runnable block in the Skill's existing voice and structure, using a tool that is
-  actually installed on this machine (check the env's `TOOLS.md` first); or
-- **install it** — when the tool is a public, unauthenticated install that the folder's tooling
-  pass simply missed, install it into the env under its no-version-change
-  rule, add it to `TOOLS.md` with a smoke test, and then write the runnable block; or
-- **delete the claim** — remove it from the description, decision tree and prose, so the Skill stops
-  advertising what it cannot do.
+Leaving an unbacked mention is not an option. Prefer writing when the tool is installed and the audit
+shows a user was expected to run it; prefer deleting when the tool is registration-gated, absent, or out
+of scope. Say which you chose and why. This is bounded by what the Skill already claims: extend existing
+sections, add no tool the Skill never mentioned.
 
-Leaving it as an unbacked mention is not an option. Prefer writing it when the tool is installed and
-the audit's assertions show a user was expected to run it; prefer deleting when the tool is
-registration-gated, absent, or outside the Skill's scope. Say which you chose and why.
+## State each fact once (2026-09-17)
 
-This is bounded by what the Skill already claims. It is not licence for broader coverage: extend the
-existing sections, do not restructure them, and do not add a tool the Skill never mentioned.
+Every Skill you touch leaves with each fact stated once, whether or not the audit flagged it.
 
-## Remove redundancy, every pass (2026-09-17)
-
-Sam's rule: **every Skill a fixer touches leaves with each fact stated once**, whether or not the audit
-flagged duplication. Two copies drift — a fix lands in one and the other keeps the bug — and every
-repeated line costs the agent context.
-
-- `SKILL.md` is what the agent loads, so it is the single home for anything the agent acts on:
-  commands, thresholds, decision flows, failure modes, interpretation tables, install notes, caveats.
-- `usage-guide.md` keeps only what is for the human choosing the Skill: a short overview, example
-  prompts, and related Skills. Everything else in it that restates `SKILL.md` is deleted. Where the
-  guide needs the point, it names the `SKILL.md` section instead of repeating it.
-- Content that exists **only** in `usage-guide.md` but that the agent needs (a table `SKILL.md` points
-  at, a tip found nowhere else) moves into the matching `SKILL.md` section — it is not deleted.
-- Repetition inside `SKILL.md` (a Tips list re-saying the failure-mode sections, a threshold given in
-  three places) collapses to the one section where it belongs.
+- `SKILL.md` is what the agent loads: the single home for commands, thresholds, decision flows, failure
+  modes, interpretation tables, install notes and caveats.
+- `usage-guide.md` keeps only what the human choosing the Skill needs: a short overview, example prompts,
+  related Skills. Anything restating `SKILL.md` is deleted; where the guide needs the point, it names the
+  `SKILL.md` section.
+- Content only in `usage-guide.md` that the agent needs moves into the matching `SKILL.md` section.
+- Repetition inside `SKILL.md` collapses to the one section where it belongs.
 - When two copies disagree, keep the one the audit's runs support, and log the disagreement.
-- Shipped `examples/` scripts are out of this rule: a runnable file beside an inline block is not a
-  duplicate.
+- `examples/` scripts are exempt: a runnable file beside an inline block is not a duplicate.
 
-Verify by listing, in the fix log, every deleted passage and where its content now lives. Nothing
-the agent needs may leave the Skill. This is the one restructuring a fixer does.
+List every deleted passage in the fix log and where its content now lives. Nothing the agent needs may
+leave the Skill.
 
-## Split long Skills into `references/`, and log what is left (2026-09-21)
+## Split long Skills into `references/` (2026-09-21)
 
-- **A `SKILL.md` over 300 lines gets split.** Move the method-specific blocks (one method, one tool, one
-  advanced model per file) into `references/<topic>.md` next to `SKILL.md`, verbatim, and leave a
-  "Reference Files" index in `SKILL.md` saying when to read each file, plus a pointer from the decision-tree
-  row that needs it. What every request needs (scope, decision tree, thresholds, Common Errors, install)
-  stays. Verify that no non-blank line was lost (compare the moved lines with the new files) and that every
-  moved R/Python/bash fence still parses. This overrides "no restructuring" for length only.
-- **Every finding you do not fix is logged with its reason**, in the fix log's "left unfixed" list and in
-  your final message: what it is, and why (needs an install the brief forbids, needs data that does not
-  exist, out of the Skill's scope, judged not a correction, and so on). "Not cheap" alone is not a reason;
-  say what the work needs.
+A `SKILL.md` over 300 lines is split: method-specific blocks (one method, tool or advanced model per file)
+move verbatim to `references/<topic>.md`, with a "Reference Files" index in `SKILL.md` saying when to read
+each, and a pointer from the decision-tree row that needs it. Scope, decision tree, thresholds, Common
+Errors and install stay. Verify no non-blank line was lost and every moved fence still parses.
 
-## Runnable code goes in `scripts/` (Sam, 2026-09-21)
+## Runnable code goes in `scripts/` (2026-09-21)
 
-- **A complete, runnable code block moves to `<skill>/scripts/<name>.py|R|sh`** and `SKILL.md` (or the
-  reference file) keeps a one- to three-line invocation. Candidates are pipelines, helper functions and
-  multi-step recipes of roughly 15+ lines that a user would run or import; one-liners, API-shape
-  illustrations and short fragments explaining a point stay inline. Where sensible, not everywhere.
-- Each script has a header comment (purpose, inputs, usage line), takes its inputs as arguments or
-  clearly named variables at the top rather than hard-coded example paths, and **is run**: on the
-  audit's data, with assertions on output, exactly as `SKILL.md` invokes it. Parse-checks (`py_compile`,
-  `parse()`, `bash -n`) are the minimum, never the evidence.
-- Move verbatim, then parametrise. Log each moved block (old location → script path) in the fix log.
-- `examples/` stays as it is. If a block duplicates an `examples/` script, point at the example and
-  delete the copy; do not create a second one under `scripts/`.
-- This is separate from the `references/` split: `references/` holds prose and method-specific
-  explanation, `scripts/` holds code. A code block inside a reference file moves to `scripts/` too.
-  Do it as its own commit, after the fix and the split.
+- A complete runnable block (pipelines, helpers, multi-step recipes of roughly 15+ lines) moves to
+  `<skill>/scripts/<name>.py|R|sh`, and `SKILL.md` keeps a one- to three-line invocation. One-liners and
+  explanatory fragments stay inline. Where sensible, not everywhere.
+- Each script has a header comment (purpose, inputs, usage), takes inputs as arguments or named variables
+  at the top, and **is run** on the audit's data with assertions, exactly as `SKILL.md` invokes it.
+- Move verbatim, then parametrise. Log each move (old location → script path).
+- If a block duplicates an `examples/` script, point at the example and delete the copy.
+- A code block inside a reference file moves to `scripts/` too. Do it as its own commit, after the fix
+  and the split.
 
-**Still not in scope:** broader coverage, new tools the Skill does not reference, restyling prose,
-rewriting what works. Keep diffs minimal. Never change the frontmatter `name`. Change `description`
-only if it is wrong, or to drop a claim you deleted under the rule above. Do not tune text toward the
-audit's assertions; fix the defect the assertion exposed.
+**Not in scope:** broader coverage, new tools, restyling prose, rewriting what works. Keep diffs minimal.
+Never change the frontmatter `name`. Change `description` only if it is wrong or to drop a deleted claim.
+Do not tune text toward the audit's assertions; fix the defect the assertion exposed.
 
 ## Verify every change
 
-- Run each changed command or snippet when the tool runs on this machine, on the audit's synthetic
-  data (`F:\OpenScience\audits\<skill-id>\data\`, read-only — copy what you need to your scratchpad).
-- If it cannot run here, check it against the tool's `--help` output or official documentation and
-  say which.
-- Every changed `.py` must `py_compile`; every changed `.R` must parse (`Rscript -e "parse('f.R')"`);
-  every changed `.sh` must pass `bash -n`.
-- **Code you write under "Missing referenced executables" must actually execute** — "it parses" is not
-  evidence. Run it, and where you can, show it recovers something checkable (a known spike-in ratio, a
-  realized FDR against planted truth) rather than merely exiting zero. Record the exact version of
-  every tool you invoke.
-- Never install into the shared venv or R library, and never change a version there — other agents
-  are using it. If you need a package that is absent, say so in your final message instead.
-- Never claim a fix ran when it did not, and never diagnose from a single exit code — confirm with a
-  second independent method.
+- Run each changed command or snippet on the audit's data when the tool runs here; otherwise check it
+  against `--help` or official docs and say which.
+- Every changed `.py` must `py_compile`, `.R` must `parse()`, `.sh` must pass `bash -n`. That is the
+  minimum, never the evidence.
+- Code written under "Missing referenced executables" must execute and, where possible, recover something
+  checkable (a known spike-in ratio, a realized FDR against planted truth). Record every tool version.
 
 ## Record
 
-- One commit per Skill on your branch, `git commit -F <msgfile>`:
-  `fix(<folder>/<skill>): <one-line summary>` — or `feat(...)` when the commit is mostly executables
-  written under "Missing referenced executables" — body = one line per finding → change → how
-  verified, ending with `Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>`.
-- `F:\optimizing-agent-science-skills\fixes\<skill-id>.md` (outside the fork, so it never ships):
-  dated heading, then a table `finding | priority | change | verified (ran / help / docs) | notes`, and
-  a list of findings left unfixed with the reason.
-
-## Rules
-
-- Never write in `F:\OpenScience\external\GPTomics__bioSkills`, `F:\OpenScience\audits`, other
-  worktrees, `F:\OpenScience\skills`, or the builder. Do not push, merge or rebase. In the records
-  repository write only your `fixes\<skill-id>.md`.
-- Skills that already score ≥ 85 with no P1 stay byte-identical, unless they are named in a fix
-  batch (Sam, 2026-09-21: the Production Ready Skills are fixed down to their P2s and split when over
-  300 lines).
-- Public unauthenticated services (NCBI E-utilities, myvariant.info, gnomAD GraphQL, Ensembl) are fine
-  for verifying database Skills; nothing paid or authenticated.
-- **Never kill a process by image name**; kill the PID you started. Python on Windows cannot read
-  MSYS `/f/...` paths: use `F:\...`.
-- Windows: edit with Write/Edit or Python `encoding='utf-8'`; never PowerShell `Get-Content`/`Out-File`.
-  Prefix Python with `PYTHONIOENCODING=utf-8` in Bash. Keep paths short.
-- At most one sub-agent of your own at a time; the machine is shared with other agents.
+- One commit per Skill on your branch, via `git commit -F <msgfile>`: `fix(<folder>/<skill>): <summary>`
+  (`feat(...)` when mostly new executables). Body: one line per finding → change → how verified, ending
+  with a `Co-Authored-By:` line for your model.
+- `F:\optimizing-agent-science-skills\fixes\<skill-id>.md`: dated heading, a table
+  `finding | priority | change | verified (ran / help / docs) | notes`, and **every finding left unfixed
+  with its reason** (needs a forbidden install, needs data that does not exist, out of scope, not a
+  correction...). "Not cheap" alone is not a reason; say what the work needs.
+- At most one sub-agent of your own at a time.
 
 ## Final message (≤ 200 words)
 

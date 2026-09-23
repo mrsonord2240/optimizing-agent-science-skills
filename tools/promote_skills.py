@@ -217,7 +217,7 @@ def main():
         kind, files = classify(row["upstream_path"])
         row["relative_to_upstream"] = kind
         row["changed_files"] = files
-        # Cleared to submit to the marketplace: at the Production Ready target (process/THRESHOLD.md),
+        # Cleared to submit to the marketplace: at the Production Ready target (process/COMMON.md, Thresholds),
         # a fix pass done, and no changes since the last audit. Versions there are immutable and each
         # is reviewed, so a Skill that is still moving, or short of the target, is not ready.
         row["marketplace_ready"] = (row["grade"] == "Production Ready" and row["fix_pass"] == "done"

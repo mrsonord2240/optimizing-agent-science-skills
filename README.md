@@ -30,7 +30,7 @@ fork is the maintained line rather than a staging area.
 | --- | --- |
 | `audits/skills/<skill-id>/<owner>-<repo>@<sha7>/` | `report.json`, `viewer.md`, `record.json`, `fixes.md`, and the scripts the auditor ran |
 | `fixes/<skill-id>.md` | What changed, why, and how it was verified, per fix pass |
-| `process/` | The briefs agents follow, and the audit thresholds |
+| `process/` | The briefs agents follow; `COMMON.md` holds the shared rules and thresholds |
 | `tools/` | `publish_audits.py` (audit records into `audits/`), `promote_skills.py` (the published shelf), `marketplace_manifests.py` (Open Science marketplace manifests) |
 | `scripts/` | `audit-index.mjs`, which generates `audits/INDEX.md` and `BACKLOG.md` (`npm run audits:index`) |
 
