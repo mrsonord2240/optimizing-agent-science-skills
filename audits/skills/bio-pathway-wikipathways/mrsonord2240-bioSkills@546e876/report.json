@@ -1,0 +1,57 @@
+{
+  "meta": {
+    "skill_name": "bio-pathway-wikipathways",
+    "description": "Tests gene lists and ranked vectors against live or dated WikiPathways collections with clusterProfiler and rWikiPathways.",
+    "evaluated_on": "2026-09-23",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md",
+    "source": "mrsonord2240/bioSkills@546e876725c9db99b4be698f03975ffa6f9b1e99:pathway-analysis/wikipathways"
+  },
+  "veto_gates": {
+    "skill_veto": { "gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS" },
+    "research_veto": {
+      "applicable": true,
+      "gate": "FAIL",
+      "scientific_integrity": { "result": "PASS", "detail": "All numerical evidence is fresh synthetic/live WikiPathways output with its release date and data source stated; no biomedical claim was invented." },
+      "practice_boundaries": { "result": "PASS", "detail": "The Skill performs pathway enrichment on de-identified gene lists and makes no individual diagnostic or treatment claim." },
+      "methodological_ground": { "result": "PASS", "detail": "ORA, ranked GSEA, explicit universes, Entrez matching, live-data drift, and dated GMT pinning were each exercised and correctly distinguished." },
+      "code_usability": { "result": "FAIL", "detail": "The shipped rWikiPathways-only direct-query/other-organisms guidance calls get_wp_organisms(), which is not exported by rWikiPathways 1.30.0 and errors when followed as written. clusterProfiler happens to export a same-named function, masking the defect in one separate example." }
+    }
+  },
+  "static_score": {
+    "subtotal": 87,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 11, "max": 12, "note": "ORA, GSEA, dated pinning, direct API inspection, and organism coverage are well scoped, but a documented rWikiPathways command is invalid in its stated import context." },
+      "reliability": { "score": 10, "max": 12, "note": "Strong warnings about IDs, universe, archive retention, and community curation; the wrong namespace function defeats the stated organism-validation guard." },
+      "performance_context": { "score": 7, "max": 8, "note": "The Skill has a bounded workflow, records live-data behavior, and uses a retry window for monthly releases." },
+      "agent_usability": { "score": 13, "max": 16, "note": "Decision tree, workflow, and recovery guidance are unusually explicit, but an agent following the direct-query block is stopped before the advertised organism check." },
+      "human_usability": { "score": 7, "max": 8, "note": "Readable scenario guidance and a concise usage guide mitigate necessarily technical pathway content." },
+      "security": { "score": 12, "max": 12, "note": "No credentials, destructive actions, or untrusted-code execution are documented; public archive/API traffic is identified." },
+      "maintainability": { "score": 10, "max": 12, "note": "The pinned procedure is factored into a shipped script and source files are organized, but the version-compatible API boundary was not kept current." },
+      "agent_specific": { "score": 17, "max": 20, "note": "Excellent trigger, scope, and escape-hatch language; the `get_wp_organisms()` mismatch makes a key self-check unreliable." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 91.6,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 19, "total": 21 },
+    "inputs": [
+      { "index": 1, "type": "Canonical API", "label": "Human WikiPathways discovery and WP554 retrieval", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Fresh private wikipathways-phase2 runtime; exit 0.", "note": "listOrganisms returned 41 organisms, listPathways returned 1,131 human pathways, and WP554 returned 17 Entrez identifiers.", "basic": 38, "specialized": 58, "total": 96, "assertions_passed": 3, "assertions_total": 3, "assertions": [ { "text": "Supported organisms can be enumerated", "result": "PASS", "note": "41 organisms returned." }, { "text": "Human pathways can be listed", "result": "PASS", "note": "1,131 rows returned." }, { "text": "A pathway's metadata and Entrez cross-references can be retrieved", "result": "PASS", "note": "WP554 metadata and 17 L-system identifiers returned." } ] },
+      { "index": 2, "type": "Reproducible ORA", "label": "Shipped dated-GMT pinning script", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Fresh private wikipathways-phase2 runtime; shipped script exited 0.", "note": "The script chose release 20260710, wrote its CSV, and recovered WP554 among six terms.", "basic": 38, "specialized": 58, "total": 96, "assertions_passed": 3, "assertions_total": 3, "assertions": [ { "text": "Newest-first dated archive retry succeeds", "result": "PASS", "note": "20260710 downloaded and was printed for methods reporting." }, { "text": "Compound GMT terms are converted to usable TERM2GENE/TERM2NAME", "result": "PASS", "note": "The resulting enrichResult CSV has pathway IDs and descriptions." }, { "text": "Pinned ORA recovers the planted pathway", "result": "PASS", "note": "WP554 was recovered with adjusted p=4.013e-29." } ] },
+      { "index": 3, "type": "Variant A", "label": "Live ORA and ranked GSEA", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Fresh private wikipathways-phase2 runtime; exit 0.", "note": "Explicit-universe ORA produced six terms including WP554; seeded gseWP produced 30 terms.", "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 3, "assertions_total": 3, "assertions": [ { "text": "Entrez ORA with an explicit tested universe executes", "result": "PASS", "note": "Six terms, including WP554, returned." }, { "text": "Named decreasing ranked GSEA executes", "result": "PASS", "note": "30 terms returned." }, { "text": "Live numerical caveats remain visible", "result": "PASS", "note": "fgsea emitted explicit tie and precision warnings." } ] },
+      { "index": 4, "type": "Method Boundary", "label": "Default versus matched ORA universe", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Fresh private wikipathways-phase2 runtime; exit 0.", "note": "The same WP554 query used 17/420 under the matched universe versus 17/9031 by default, changing adjusted p from 4.013e-29 to 2.716e-51.", "basic": 38, "specialized": 58, "total": 96, "assertions_passed": 3, "assertions_total": 3, "assertions": [ { "text": "Matched and default-universe calls both execute", "result": "PASS", "note": "Both returned WP554." }, { "text": "Background ratio changes materially", "result": "PASS", "note": "420 mapped tested genes versus 9,031 default genes." }, { "text": "The result demonstrates the documented default-background inflation", "result": "PASS", "note": "Default p.adjust is substantially smaller." } ] },
+      { "index": 5, "type": "API Compatibility", "label": "rWikiPathways-only organism validation snippet", "status": "COMPLETED", "status_flag": "⚠️", "executed": true, "execution_note": "Fresh private wikipathways-phase2 runtime; the actual documented call was intentionally captured as a failure condition.", "note": "The source parses, but rWikiPathways 1.30.0 has no get_wp_organisms export and the rWikiPathways-only call errors. clusterProfiler has a different export with that name, which masks it only where both packages are attached.", "basic": 27, "specialized": 39, "total": 66, "assertions_passed": 1, "assertions_total": 3, "assertions": [ { "text": "The documented direct-query example parses", "result": "PASS", "note": "parse() completed." }, { "text": "rWikiPathways exports get_wp_organisms as the documentation says", "result": "FAIL", "note": "exists(..., asNamespace('rWikiPathways')) was FALSE." }, { "text": "The rWikiPathways-only organism-validation call runs", "result": "FAIL", "note": "get_wp_organisms() returned an object-not-found error; the output assertion records this expected failure." } ] },
+      { "index": 6, "type": "Shipped Example", "label": "wikipathways_ora.R end to end", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Fresh private wikipathways-phase2 runtime; byte-for-byte shipped example exited 0.", "note": "The example read fresh synthetic input, performed ORA/GSEA, drew its temporary PDF, and wrote its result without errors.", "basic": 38, "specialized": 58, "total": 96, "assertions_passed": 3, "assertions_total": 3, "assertions": [ { "text": "The shipped ORA example runs unmodified", "result": "PASS", "note": "Exit 0." }, { "text": "ORA output is readable and contains the planted pathway", "result": "PASS", "note": "WP554 is top in the captured table." }, { "text": "The advertised GSEA and plotting branches complete", "result": "PASS", "note": "GSEA output and temporary PDF device closure were captured." } ] },
+      { "index": 7, "type": "Shipped Example", "label": "wikipathways_explore.R end to end", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Fresh private wikipathways-phase2 runtime; byte-for-byte shipped example exited 0.", "note": "With clusterProfiler also attached as in this example, the masking export lets the exploration workflow list/query data, pin 20260710, and recover WP554.", "basic": 38, "specialized": 58, "total": 96, "assertions_passed": 3, "assertions_total": 3, "assertions": [ { "text": "The shipped exploration example runs unmodified", "result": "PASS", "note": "Exit 0." }, { "text": "Live inspection and dated archive branches execute", "result": "PASS", "note": "API output and 20260710 archive download were captured." }, { "text": "Self-contained pinned enrichment recovers WP554", "result": "PASS", "note": "WP554 is top in the returned enrichment table." } ] }
+    ]
+  },
+  "final": { "static_weighted": 34.8, "dynamic_weighted": 54.9, "score": 90, "max": 100, "grade": "Reject", "grade_symbol": "❌", "deployable": false, "veto_override": true },
+  "key_strengths": [ "Fresh private-runtime execution confirms live ORA, ranked GSEA, explicit-universe behavior, dated archive pinning, and both shipped examples.", "The dated-GMT script successfully picks an available monthly release and writes a reproducible result with the used release date.", "The Skill accurately teaches the large background-universe inflation effect and the community-curation limitations of WikiPathways." ],
+  "recommendations": [ { "priority": "P0", "title": "Replace the invalid rWikiPathways organism accessor", "observed_in": [5], "problem": "The direct-query and other-organisms guidance says that get_wp_organisms() belongs to rWikiPathways, but rWikiPathways 1.30.0 does not export it. An agent following the stated library(rWikiPathways)-only code errors before it can validate the organism string.", "root_cause": "The documentation conflates clusterProfiler::get_wp_organisms with rWikiPathways' API and the Version Compatibility section does not protect the namespace boundary.", "fix": "Use rWikiPathways::listOrganisms() everywhere the code loads rWikiPathways alone, or explicitly import and namespace clusterProfiler::get_wp_organisms(). Re-run the standalone direct-query block and a non-human organism check in the declared compatible runtime." } ]
+}

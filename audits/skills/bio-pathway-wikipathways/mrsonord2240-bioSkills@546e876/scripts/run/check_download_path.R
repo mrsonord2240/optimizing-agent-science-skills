@@ -1,0 +1,5 @@
+suppressPackageStartupMessages(library(rWikiPathways))
+date <- format(Sys.Date() - 60, '%Y%m10')
+gmt <- downloadPathwayArchive(date = date, organism = 'Homo sapiens', format = 'gmt', destpath = tempdir())
+cat(sprintf('date=%s\nreturned=%s\nreturned_exists=%s\nsource_join_exists=%s\n', date, gmt, file.exists(gmt), file.exists(file.path(tempdir(), gmt))))
+stopifnot(!file.exists(gmt), file.exists(file.path(tempdir(), gmt)))
