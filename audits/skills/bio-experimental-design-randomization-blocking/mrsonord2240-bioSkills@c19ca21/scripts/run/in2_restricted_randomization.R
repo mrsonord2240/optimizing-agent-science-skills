@@ -1,0 +1,8 @@
+set.seed(20260528)
+units <- data.frame(id = sprintf("S%02d", 1:24), block = rep(c("day1", "day2", "day3"), each = 8))
+units$treatment <- ave(units$id, units$block, FUN = function(ids) sample(rep(c("ctrl", "treat"), length.out = length(ids))))
+units$run_order <- sample(nrow(units))
+tab <- table(units$block, units$treatment)
+stopifnot(all(tab[, "ctrl"] == 4L), all(tab[, "treat"] == 4L), identical(sort(units$run_order), seq_len(nrow(units))))
+print(tab)
+cat("balanced_restricted_assignment_and_run_order=PASS\n")
