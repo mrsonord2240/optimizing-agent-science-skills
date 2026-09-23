@@ -1,0 +1,57 @@
+{
+  "meta": {
+    "skill_name": "bio-phylo-tree-visualization",
+    "description": "Draws and exports phylogenetic trees while making layout, support, rooting, and scale claims explicit.",
+    "evaluated_on": "2026-09-23",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md",
+    "source": "mrsonord2240/bioSkills@1d9b6fcb44d3e728d78d653e437abfed59ecb55a:phylogenetics/tree-visualization"
+  },
+  "veto_gates": {
+    "skill_veto": { "gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS" },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "The Skill explicitly distinguishes topology, distance, time, support measures, and uncertainty rather than inventing biological conclusions." },
+      "practice_boundaries": { "result": "PASS", "detail": "It generates research figures only and does not diagnose, prescribe, or triage an individual." },
+      "methodological_ground": { "result": "PASS", "detail": "Rooting, MRCA validation, named support, HPD preservation, scale bars, and layout limits were exercised in fresh runs." },
+      "code_usability": { "result": "PASS", "detail": "All seven sampled Python/R paths completed in the isolated private runtime and produced asserted artifacts." }
+    }
+  },
+  "static_score": {
+    "subtotal": 94,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 12, "max": 12, "note": "Quick Python, rich R, ape fallback, GUI/web routing, support, rooting, large-tree, and export cases are covered." },
+      "reliability": { "score": 11, "max": 12, "note": "Explicit failure modes and guards are strong; web and desktop alternatives cannot be reproducibly executed in this audit." },
+      "performance_context": { "score": 7, "max": 8, "note": "The compact main file routes detailed code to references and gives concrete tip-count limits." },
+      "agent_usability": { "score": 15, "max": 16, "note": "Decision rule, routes, thresholds, and actionable failure messages are clear." },
+      "human_usability": { "score": 7, "max": 8, "note": "Natural prompts and usage guide are concise; necessary phylogenetic terminology is advanced." },
+      "security": { "score": 12, "max": 12, "note": "No credentials, raw-code execution, destructive commands, or sensitive-data handling are present." },
+      "maintainability": { "score": 11, "max": 12, "note": "Recipe separation and version notes are strong; several rendering engines have unavoidable upstream-version variability." },
+      "agent_specific": { "score": 19, "max": 20, "note": "Precise triggering, escape routes, and reference index support cold-start agent use." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 96.7,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 21, "total": 21 },
+    "inputs": [
+      { "index": 1, "type": "Canonical", "label": "ASCII topology inspection", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Shipped ascii_tree.py ran in the private Python runtime with exit 0.", "note": "Tree structure and ASCII topology printed.", "basic": 39, "specialized": 58, "total": 97, "assertions_passed": 3, "assertions_total": 3, "assertions": [ { "text": "Newick tree parses", "result": "PASS", "note": "Tree structure printed." }, { "text": "ASCII topology is emitted", "result": "PASS", "note": "Terminal diagram captured." }, { "text": "Command exits cleanly", "result": "PASS", "note": "Combined example log ends exit=0." } ] },
+      { "index": 2, "type": "Variant A", "label": "Headless vector phylogram", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Shipped basic_tree_plot.py ran in the private Python runtime with exit 0.", "note": "Vector PDF destination printed through Agg backend.", "basic": 39, "specialized": 58, "total": 97, "assertions_passed": 3, "assertions_total": 3, "assertions": [ { "text": "Headless draw executes", "result": "PASS", "note": "No display dependency error." }, { "text": "Vector output is written", "result": "PASS", "note": "PDF path printed." }, { "text": "Branch-length unit is stated", "result": "PASS", "note": "Title names subs/site." } ] },
+      { "index": 3, "type": "Variant B", "label": "Dual IQ-TREE support labels", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Shipped labeled_tree.py ran in the private Python runtime with exit 0.", "note": "Parsed 88/97 and 72/90 and wrote SVG.", "basic": 39, "specialized": 58, "total": 97, "assertions_passed": 3, "assertions_total": 3, "assertions": [ { "text": "Dual labels parse", "result": "PASS", "note": "Both expected labels printed." }, { "text": "Raw internal labels are cleared", "result": "PASS", "note": "Shipped parser sets clade.name=None." }, { "text": "Measures are named", "result": "PASS", "note": "Title names SH-aLRT/UFBoot." } ] },
+      { "index": 4, "type": "Edge", "label": "Root-first MRCA color guard", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Private guard script ran with exit 0.", "note": "Exact four-tip MRCA and a 14348-byte PDF asserted.", "basic": 39, "specialized": 58, "total": 97, "assertions_passed": 3, "assertions_total": 3, "assertions": [ { "text": "Outgroup rooting occurs first", "result": "PASS", "note": "Verification calls root_with_outgroup before MRCA." }, { "text": "MRCA set matches intended tips", "result": "PASS", "note": "Four expected tips recovered." }, { "text": "Color figure materializes", "result": "PASS", "note": "PDF is nonempty." } ] },
+      { "index": 5, "type": "Stress", "label": "201-tip Bio.Phylo ceiling", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Private guard script ran with exit 0.", "note": "201-tip input raised the documented actionable error before rendering.", "basic": 39, "specialized": 58, "total": 97, "assertions_passed": 3, "assertions_total": 3, "assertions": [ { "text": "Hard tip cap is enforced", "result": "PASS", "note": "201 tips rejected." }, { "text": "Failure is actionable", "result": "PASS", "note": "Error names ggtree/iTOL alternative." }, { "text": "Failure occurs before unreadable output", "result": "PASS", "note": "The guard raises before draw." } ] },
+      { "index": 6, "type": "Variant C", "label": "ggtree/treeio rich composite", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Private R ggtree recipe run completed with exit 0.", "note": "Seven layers and 5893-byte composite PDF asserted.", "basic": 39, "specialized": 57, "total": 96, "assertions_passed": 3, "assertions_total": 3, "assertions": [ { "text": "Required R packages load", "result": "PASS", "note": "treeio, ggtree, ggtreeExtra, ggplot2 loaded." }, { "text": "Composite builds expected layers", "result": "PASS", "note": "ggplot_build returned seven layers." }, { "text": "Vector PDF is nonempty", "result": "PASS", "note": "5893 bytes." } ] },
+      { "index": 7, "type": "Fallback", "label": "ape unrooted scale-bar view", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Private R ape fallback run completed with exit 0.", "note": "Unrooted PDF with scale-bar call is 4464 bytes.", "basic": 39, "specialized": 57, "total": 96, "assertions_passed": 3, "assertions_total": 3, "assertions": [ { "text": "ape unrooted route executes", "result": "PASS", "note": "plot.phylo completed." }, { "text": "Scale-bar function executes", "result": "PASS", "note": "add.scale.bar called before device close." }, { "text": "Vector output is nonempty", "result": "PASS", "note": "4464-byte PDF." } ] }
+    ]
+  },
+  "final": { "static_weighted": 37.6, "dynamic_weighted": 58.0, "score": 96, "max": 100, "grade": "Production Ready", "grade_symbol": "⭐", "deployable": true, "veto_override": false },
+  "key_strengths": [ "The Skill makes layout, support, root, and scale choices explicit rather than treating a tree as neutral decoration.", "Python safeguards and isolated-R composite/fallback paths produced concrete asserted vector artifacts.", "Reference splitting keeps the main instruction set compact while preserving runnable recipes." ],
+  "recommendations": []
+}

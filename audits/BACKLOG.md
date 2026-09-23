@@ -6,14 +6,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 ## P0 (5)
 
-### `bio-pathway-enrichment-visualization` — Provide a supported isolated R runtime for the Phase 2 matrix
-
-- Skill: 41, Reject · [mrsonord2240/bioSkills@1ccf2f0](https://github.com/mrsonord2240/bioSkills/tree/1ccf2f05a3ca93452d2517e1cff2f3e9f2e77b54/pathway-analysis/enrichment-visualization) · [viewer](skills/bio-pathway-enrichment-visualization/mrsonord2240-bioSkills@1ccf2f0/viewer.md)
-- Observed in inputs: 1, 2, 3, 4, 5, 6, 7
-- Problem: The only designated package-complete Windows runtime crashes/hangs after materializing output; WSL R has no required packages.
-- Root cause: Runtime/platform failure outside the documentation-only source diff, not a claim that the source's R code is syntactically invalid.
-- Fix: Provision or identify a private, package-complete R runtime (clusterProfiler, enrichplot, org.Hs.eg.db, GOSemSim, ggplot2 and optional plot dependencies), then rerun all seven inputs and the two shipped examples before promotion.
-
 ### `bio-data-visualization-sequence-logos` — ggseqlogo bg_freq does not exist; background silently ignored
 
 - Skill: 69, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/sequence-logos) · [viewer](skills/bio-data-visualization-sequence-logos/mrsonord2240-bioSkills@64b3b15/viewer.md)
@@ -21,6 +13,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: SKILL.md (twice), usage-guide.md and examples/seqlogo_phd.R call ggseqlogo(..., bg_freq = ...) and the example titles the result 'human bg'; heights are identical with and without it (max diff 0), ggplot2 only prints 'Ignoring unknown parameters: bg_freq'. The description's 'background-frequency correction' therefore fails on the primary tool and yields a figure labelled as corrected that is not.
 - Root cause: ggseqlogo 0.2.2 has no background argument (ggseqlogo(data, facet, scales, ncol, nrow, ...) and geom_logo have none; computeBits uses log2(N) and only the e_n term).
 - Fix: Remove bg_freq from ggseqlogo calls; for a non-uniform background compute relative-entropy heights yourself and pass them with method = 'custom' (or use Logomaker background= / WebLogo --composition), verify the change numerically, and drop 'human bg' from titles unless applied.
+
+### `bio-blast-searches` — Re-run live NCBI BLAST verification when Blast.cgi accepts requests
+
+- Skill: 78, Limited Release · [mrsonord2240/bioSkills@d8a2300](https://github.com/mrsonord2240/bioSkills/tree/d8a2300a9a90869eccd13a5867d22d00709c6e6c/database-access/blast-searches) · [viewer](skills/bio-blast-searches/mrsonord2240-bioSkills@d8a2300/viewer.md)
+- Observed in inputs: 1, 2, 5, 7
+- Problem: Every fresh BLAST CGI request in this audit received a connection close without a response, including direct curl verification.
+- Root cause: External NCBI BLAST CGI availability or network path; the same failure spans Biopython qblast and the stdlib RID client.
+- Fix: Do not change source based on this evidence alone. Re-run the four live paths when the endpoint recovers, retaining the current parameter and parser checks as corroborating evidence.
 
 ### `bio-data-visualization-heatmaps-clustering` — heatmap_phd.R crashes: dendrogram + row_split vector
 
@@ -1328,7 +1328,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (358)
+## P2 (351)
 
 ### `bio-data-visualization-lollipop-protein-maps` — HGVSp edge cases and recurrence semantics undocumented
 
@@ -2954,30 +2954,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: Format table covers capability, not writer behaviour.
 - Fix: Add a row: use DendroPy to write annotated NeXML.
 
-### `bio-phylo-tree-visualization` — Inconsistent failure severity between two adjacent recipes
-
-- Skill: 88, Production Ready · [mrsonord2240/bioSkills@4cc2487](https://github.com/mrsonord2240/bioSkills/tree/4cc2487c5f22541d9891e00ae9705793fd0135f8/phylogenetics/tree-visualization) · [viewer](skills/bio-phylo-tree-visualization/mrsonord2240-bioSkills@4cc2487/viewer.md)
-- Observed in inputs: 1, 2
-- Problem: The MRCA-mismatch guard now raises ValueError, but the closely related 'no clade has any readable support' case one recipe above it is still a print-only warning.
-- Root cause: The two guards were hardened in separate fix passes without reconciling severity.
-- Fix: Either raise on both conditions or explicitly note in the Common Errors table why one is a hard stop and the other is a warning.
-
-### `bio-phylo-tree-visualization` — Bio.Phylo panel remains illegible well above the documented threshold
-
-- Skill: 88, Production Ready · [mrsonord2240/bioSkills@4cc2487](https://github.com/mrsonord2240/bioSkills/tree/4cc2487c5f22541d9891e00ae9705793fd0135f8/phylogenetics/tree-visualization) · [viewer](skills/bio-phylo-tree-visualization/mrsonord2240-bioSkills@4cc2487/viewer.md)
-- Observed in inputs: 3
-- Problem: Even with the height cap and the >150-tip warning, the Bio.Phylo rectangular panel at 320 tips cannot itself produce legible tip labels.
-- Root cause: Bio.Phylo/matplotlib has no radial or ring layout to relieve label density; this is a tool ceiling, not a recipe bug.
-- Fix: Consider having the recipe refuse to render past a hard cap (e.g. ~200 tips) and require the ggtree/iTOL route instead of producing a technically-successful but illegible figure.
-
-### `bio-phylo-tree-visualization` — ape unrooted fallback has no worked code recipe with a scale bar
-
-- Skill: 88, Production Ready · [mrsonord2240/bioSkills@4cc2487](https://github.com/mrsonord2240/bioSkills/tree/4cc2487c5f22541d9891e00ae9705793fd0135f8/phylogenetics/tree-visualization) · [viewer](skills/bio-phylo-tree-visualization/mrsonord2240-bioSkills@4cc2487/viewer.md)
-- Observed in inputs: 6
-- Problem: The ape::plot.phylo(type='unrooted') fallback is a one-line mention in the Version Compatibility block, not a full recipe, and omits add.scale.bar.
-- Root cause: The fallback was added as a stopgap note rather than a first-class recipe.
-- Fix: Add a short ape unrooted code block alongside the ggtree recipes, including add.scale.bar().
-
 ### `bio-qsar-modeling` — chemprop reproducibility advice names a flag that does not exist
 
 - Skill: 88, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/qsar-modeling) · [viewer](skills/bio-qsar-modeling/GPTomics-bioSkills@d91ed3d/viewer.md)
@@ -3001,46 +2977,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The symptom is given as 'Confident predictions but actual values different'. On the 50 most novel chemotypes, MAE was 0.667 against 0.659 for the 50 closest analogues -- a ratio of 1.01 -- while R2 fell from 0.621 to 0.015.
 - Root cause: The symptom is described in terms of absolute error, but out-of-domain subsets often also have compressed label ranges, so the damage appears in explained variance instead.
 - Fix: Restate the symptom as loss of explained variance and rank ordering on the out-of-domain subset, and tell the reader to report R2 or Spearman stratified by the AD diagnostic rather than MAE alone.
-
-### `bio-sashimi-plots` — pyGenomeTracks junction arcs are cropped
-
-- Skill: 88, Production Ready · [mrsonord2240/bioSkills@b11c5ab](https://github.com/mrsonord2240/bioSkills/tree/b11c5abf964aa7a7f49acc37dc8e051ea875c4d7/alternative-splicing/sashimi-plots) · [viewer](skills/bio-sashimi-plots/mrsonord2240-bioSkills@b11c5ab/viewer.md)
-- Observed in inputs: 5
-- Problem: In the documented tracks.ini the arcs in the junctions track are cut off at its lower edge (height = 2).
-- Root cause: Arc height scales with junction span, the track is too short.
-- Fix: Raise the junction track height (or shrink the arcs) and re-render; look at the figure as the ggplot2 note already advises.
-
-### `bio-sashimi-plots` — VOILA block incomplete for MAJIQ V3
-
-- Skill: 88, Production Ready · [mrsonord2240/bioSkills@b11c5ab](https://github.com/mrsonord2240/bioSkills/tree/b11c5abf964aa7a7f49acc37dc8e051ea875c4d7/alternative-splicing/sashimi-plots) · [viewer](skills/bio-sashimi-plots/mrsonord2240-bioSkills@b11c5ab/viewer.md)
-- Observed in inputs: 6
-- Problem: Public MAJIQ V3 docs give `voila view sg.zarr <file>.psicov <group>.sgc`; the Skill block names one splicegraph and one voila file.
-- Root cause: The section was written without a licence, generically (usage-guide once mentioned splicegraph.zarr for V3; that hint was dropped).
-- Fix: Add the V3 form with the .sgc coverage file next to the V2 splicegraph.sql form, keep the not-run statement.
-
-### `bio-sashimi-plots` — No warning when no junction is drawn
-
-- Skill: 88, Production Ready · [mrsonord2240/bioSkills@b11c5ab](https://github.com/mrsonord2240/bioSkills/tree/b11c5abf964aa7a7f49acc37dc8e051ea875c4d7/alternative-splicing/sashimi-plots) · [viewer](skills/bio-sashimi-plots/mrsonord2240-bioSkills@b11c5ab/viewer.md)
-- Observed in inputs: 8
-- Problem: ggsashimi -M above every junction writes a coverage-only figure with rc 0; the example drops --shrink and warns only about that; plot_specific_event hard-codes min_junc 5.
-- Root cause: The example checks the shrink crash but not the arc-free result.
-- Fix: Have plot_sashimi warn (or raise) when best < min_junc, and let plot_specific_event take min_junc.
-
-### `bio-sashimi-plots` — ggsashimi.py is called bare but only cloned
-
-- Skill: 88, Production Ready · [mrsonord2240/bioSkills@b11c5ab](https://github.com/mrsonord2240/bioSkills/tree/b11c5abf964aa7a7f49acc37dc8e051ea875c4d7/alternative-splicing/sashimi-plots) · [viewer](skills/bio-sashimi-plots/mrsonord2240-bioSkills@b11c5ab/viewer.md)
-- Observed in inputs: 1, 2
-- Problem: The install block clones the repo, the recipes call `ggsashimi.py` from subprocess; that resolves only if the clone is on PATH (script is executable with a python shebang).
-- Root cause: PATH step missing.
-- Fix: Add `export PATH=$PWD/ggsashimi:$PATH` (and a note that the python it finds needs pysam).
-
-### `bio-sashimi-plots` — Batch block needs earlier state; secondary reads counted
-
-- Skill: 88, Production Ready · [mrsonord2240/bioSkills@b11c5ab](https://github.com/mrsonord2240/bioSkills/tree/b11c5abf964aa7a7f49acc37dc8e051ea875c4d7/alternative-splicing/sashimi-plots) · [viewer](skills/bio-sashimi-plots/mrsonord2240-bioSkills@b11c5ab/viewer.md)
-- Observed in inputs: 2, 4
-- Problem: The batch block uses `groups`, sashimi_groups.tsv, palette.txt from the previous block; and ggsashimi labels reproduce only when secondary alignments are counted (2/10 without).
-- Root cause: Blocks written as a sequence; counting rule not stated.
-- Fix: Say the batch block continues the previous one, and add "counts every alignment record, secondary included" to the arc-count row.
 
 ### `bio-scaffold-analysis` — Worked example quotes non-canonical SMILES for code output
 
@@ -3738,6 +3674,22 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The executable examples focus on comparative iterative search, Pfam, and Foldseek.
 - Fix: When production databases are available, add small parameterized scripts or explicit runnable mini-fixtures for saved-PSSM reuse and HHsearch output inspection.
 
+### `bio-sashimi-plots` — Provide reproducible fixtures
+
+- Skill: 92, Production Ready · [mrsonord2240/bioSkills@0663f11](https://github.com/mrsonord2240/bioSkills/tree/0663f11fbc8026f2134cdcc27c57ad80996c8447/alternative-splicing/sashimi-plots) · [viewer](skills/bio-sashimi-plots/mrsonord2240-bioSkills@0663f11/viewer.md)
+- Observed in inputs: —
+- Problem: The Skill itself has no small test fixture bundle.
+- Root cause: The runnable recipes assume user-provided BAM, event, annotation, and index inputs, while the small deterministic fixtures exist only in audit infrastructure.
+- Fix: Add optional tiny fixtures and a smoke-test recipe so compatibility can be checked without audit infrastructure.
+
+### `bio-sashimi-plots` — Clarify recipe state
+
+- Skill: 92, Production Ready · [mrsonord2240/bioSkills@0663f11](https://github.com/mrsonord2240/bioSkills/tree/0663f11fbc8026f2134cdcc27c57ad80996c8447/alternative-splicing/sashimi-plots) · [viewer](skills/bio-sashimi-plots/mrsonord2240-bioSkills@0663f11/viewer.md)
+- Observed in inputs: —
+- Problem: Some later examples presume files created by earlier blocks or a tool on PATH.
+- Root cause: Prerequisite artifacts and PATH dependencies are described at workflow level rather than repeated beside each independently runnable block.
+- Fix: State dependencies adjacent to every runnable block.
+
 ### `bio-shape-similarity` — Add calibration feasibility check
 
 - Skill: 92, Production Ready · [mrsonord2240/bioSkills@2f8cee5](https://github.com/mrsonord2240/bioSkills/tree/2f8cee570c21b48f08e0b15b1662c6d363bbf09b/chemoinformatics/shape-similarity) · [viewer](skills/bio-shape-similarity/mrsonord2240-bioSkills@2f8cee5/viewer.md)
@@ -3785,22 +3737,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The pure-Python pairwise loops are correct in this audit but scale quadratically with alignment width.
 - Root cause: The examples prioritize transparent implementations over vectorized or compiled kernels.
 - Fix: Retain the existing few-hundred-column guidance and direct wider/deeper production contact prediction to plmDCA or EVcouplings as the Skill already recommends.
-
-### `bio-blast-searches` — No guidance that permissive/short-peptide searches can spike an order of magnitude beyond documented latency
-
-- Skill: 93, Production Ready · [mrsonord2240/bioSkills@664c664](https://github.com/mrsonord2240/bioSkills/tree/664c6644129047ec1118596250dfac1451a1d1bb/database-access/blast-searches) · [viewer](skills/bio-blast-searches/mrsonord2240-bioSkills@664c664/viewer.md)
-- Observed in inputs: 3
-- Problem: This re-audit's independent PAM30 short-peptide run (gapcosts='9 1', expect=1000, on a different peptide than any prior run) took 1141.5s (19.0 min), versus 181.4s for the same code pattern in the prior audit and SKILL.md's own '30-60s typical' framing for the general case.
-- Root cause: Likely NCBI queue congestion (concurrent audits were hitting NCBI from the same machine) rather than a property of the query itself, but the Skill gives no guidance distinguishing 'this is slow because of your parameters' from 'this is slow because the queue is busy,' and no suggested timeout/retry behavior for either.
-- Fix: Add a line to Required Setup or the RID lifecycle section noting that permissive-cutoff, high-hitlist_size, or low-word-size searches (PAM30/word=2/expect=1000 among them) can take substantially longer than the general '30-60s typical' guidance, independent of any code defect, and that an agent should not treat a multi-minute wait on these specific parameter combinations as a hang.
-
-### `bio-blast-searches` — Failure Modes still has no executable error-handling example
-
-- Skill: 93, Production Ready · [mrsonord2240/bioSkills@664c664](https://github.com/mrsonord2240/bioSkills/tree/664c6644129047ec1118596250dfac1451a1d1bb/database-access/blast-searches) · [viewer](skills/bio-blast-searches/mrsonord2240-bioSkills@664c664/viewer.md)
-- Observed in inputs: —
-- Problem: The Common Errors table now correctly lists the exact NCBI error text for every defect found across both audit rounds, but no example script demonstrates catching and handling any of the six documented Failure Modes in code.
-- Root cause: The Skill is instructional (Mode D); it was authored to describe failure modes in prose rather than to ship a reusable error-handling wrapper.
-- Fix: Optional: add one small try/except example around a qblast() call that catches ValueError and looks up the message against the Common Errors table -- not blocking, since the prose guidance is already accurate and complete enough for an agent to act on.
 
 ### `bio-causal-genomics-mendelian-randomization` — Emit an explicit F below 10 CLI warning
 
@@ -3905,22 +3841,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The fixed seed prints 43 calls with 3 planted false positives (7.0%) at nominal 5%; it does not claim calibration but can be overread.
 - Root cause: One compact illustrative simulation is not a calibration benchmark.
 - Fix: Optionally label this printed FDR as an illustrative realization; retain larger planted-truth regressions for calibration evidence.
-
-### `bio-virtual-screening` — Insertion-code failure mode documented too narrowly
-
-- Skill: 93, Production Ready · [mrsonord2240/bioSkills@0ce62bd](https://github.com/mrsonord2240/bioSkills/tree/0ce62bdfbb3cce49c45142c9aa0692ea7e3fe270/chemoinformatics/virtual-screening) · [viewer](skills/bio-virtual-screening/mrsonord2240-bioSkills@0ce62bd/viewer.md)
-- Observed in inputs: 3
-- Problem: SKILL.md's pitfall note and Common Errors row name the --read_pqr crash trigger as 'chymotrypsin-numbered serine proteases (trypsin, chymotrypsin, and relatives)'. The actual root cause (meeko's PQR reader assumes an all-integer residue-number column) is generic to any insertion-code-bearing PDB deposition, confirmed here on elastase (1EAI), a different protein family with a denser insertion-code pattern.
-- Root cause: The fix's documentation was written and verified against the fixer's own trypsin/3PTB test case only, so the framing inherited that case's specificity.
-- Fix: Broaden the pitfall/Common Errors wording to state the root cause generically (any residue with a PDB insertion code) and cite chymotrypsin-numbered serine proteases as one example family, not the defining trigger.
-
-### `bio-virtual-screening` — PDBQT->SDF bond-order/charge loss remains unresolved (correctly documented, not fixed)
-
-- Skill: 93, Production Ready · [mrsonord2240/bioSkills@0ce62bd](https://github.com/mrsonord2240/bioSkills/tree/0ce62bdfbb3cce49c45142c9aa0692ea7e3fe270/chemoinformatics/virtual-screening) · [viewer](skills/bio-virtual-screening/mrsonord2240-bioSkills@0ce62bd/viewer.md)
-- Observed in inputs: 5
-- Problem: Converting a charged ligand's docked PDBQT pose to SDF for PoseBusters still fails RDKit sanitization (3/12 checks pass in a ligand-only run), exactly as the fix's new 'Handoff caveat' describes. The underlying cross-skill integration gap between virtual-screening's PDBQT output and pose-validation's expected input is still open.
-- Root cause: PDBQT does not encode formal bond order; no clean programmatic reconstruction exists for charged/aromatic-adjacent groups, as the fixer's own log states.
-- Fix: No action required this round -- documentation is now accurate. Tracking only: a real fix would need pose-validation (or virtual-screening) to accept the original RDKit Mol object alongside the PDBQT rather than reconstructing bonds from the pose, as the new caveat already recommends as a workaround.
 
 ### `bio-alignment-pairwise` — Name the shown percent-identity formula PID2 exactly
 
@@ -4170,6 +4090,22 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The runtime validation was implemented as a development assertion rather than an unconditional ValueError.
 - Fix: Replace the assert with an if-not-between check that raises ValueError with the same message, preserving the tested failure behavior under python -O.
 
+### `bio-virtual-screening` — Make the example docking function offer the same Vina CLI fallback as scripts/dock_single.py
+
+- Skill: 95, Production Ready · [mrsonord2240/bioSkills@9c76aab](https://github.com/mrsonord2240/bioSkills/tree/9c76aab55da6a7304f99b214feea6a75b5aacd8e/chemoinformatics/virtual-screening) · [viewer](skills/bio-virtual-screening/mrsonord2240-bioSkills@9c76aab/viewer.md)
+- Observed in inputs: 1, 2, 6
+- Problem: The example's docking helper imports the Vina Python API directly, which is unavailable in this native Windows audit environment, while the standalone source CLI path worked.
+- Root cause: The example and CLI script expose different engine integration seams.
+- Fix: Add an optional vina_exe/CLI branch to the example or have the example call the maintained standalone script.
+
+### `bio-virtual-screening` — Keep a small reusable fixture and expected-artifact check with the skill
+
+- Skill: 95, Production Ready · [mrsonord2240/bioSkills@9c76aab](https://github.com/mrsonord2240/bioSkills/tree/9c76aab55da6a7304f99b214feea6a75b5aacd8e/chemoinformatics/virtual-screening) · [viewer](skills/bio-virtual-screening/mrsonord2240-bioSkills@9c76aab/viewer.md)
+- Observed in inputs: 1, 3, 5
+- Problem: The current workflow is runnable but relies on environment-provided fixtures for repeatable verification.
+- Root cause: No bundled smoke-test contract accompanies the scripts.
+- Fix: Ship a tiny non-proprietary receptor/ligand fixture plus assertions for nonempty receptor PDBQT, at least one negative score, and reconstructable pose output.
+
 ### `bio-alignment-filtering` — Make zero-width BED handling explicit at script runtime
 
 - Skill: 96, Production Ready · [mrsonord2240/bioSkills@6c71f04](https://github.com/mrsonord2240/bioSkills/tree/6c71f04151377fe0d412ece85d9dc52cdccdf747/alignment-files/alignment-filtering) · [viewer](skills/bio-alignment-filtering/mrsonord2240-bioSkills@6c71f04/viewer.md)
@@ -4177,6 +4113,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: filter_by_bed.py silently returns no reads for a zero-width row while samtools -L returned 539 on this fixture. The reference accurately discloses the difference, but a direct script user gets no warning.
 - Root cause: The script delegates zero-width intervals to fetch(start, end), whose empty half-open range cannot express samtools behavior.
 - Fix: Reject start >= end with a concise error, or emit a warning identifying rows that must be dropped or widened before continuing.
+
+### `bio-pathway-enrichment-visualization` — Remove stale treeplot-crash wording from usage guide
+
+- Skill: 96, Production Ready · [mrsonord2240/bioSkills@9500048](https://github.com/mrsonord2240/bioSkills/tree/9500048793a19cae65ca89930733581eddcc1375/pathway-analysis/enrichment-visualization) · [viewer](skills/bio-pathway-enrichment-visualization/mrsonord2240-bioSkills@9500048/viewer.md)
+- Observed in inputs: —
+- Problem: usage-guide.md still says that SKILL.md covers a treeplot-on-compareClusterResult crash, although the current Skill and fresh enrichplot 1.30.5 probe document and execute the working nCluster route.
+- Root cause: The Phase 1 source correction updated SKILL.md and the shipped ORA example but did not synchronize the guide's brief failure-mode summary.
+- Fix: Replace the crash reference with current version-sensitive guidance: use nCluster in the tested runtime and perform a small compareCluster treeplot render after an enrichplot or ggtree upgrade.
 
 ### `bio-experimental-design-batch-design` — Treat the bridge-layout site warning as a non-acceptance signal
 

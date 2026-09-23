@@ -1,0 +1,135 @@
+{
+  "meta": {
+    "skill_name": "bio-pathway-enrichment-visualization",
+    "description": "Turns enrichResult, gseaResult, and compareClusterResult objects into redundancy-aware enrichplot figures.",
+    "evaluated_on": "2026-09-23",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "mrsonord2240/bioSkills@9500048793a19cae65ca89930733581eddcc1375:pathway-analysis/enrichment-visualization",
+    "reaudit_of": "The rejected 1ccf2f05a3ca93452d2517e1cff2f3e9f2e77b54 report is superseded by this fresh final-pass execution; the earlier 93/100 audit remains archived at F:/OpenScience/audits/_pre-fix-20260923/bio-pathway-enrichment-visualization/.",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md"
+  },
+  "veto_gates": {
+    "skill_veto": {"gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS"},
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {"result": "PASS", "detail": "Explicitly synthetic audit data produced observed values only; no clinical, efficacy, or citation claims were invented."},
+      "practice_boundaries": {"result": "PASS", "detail": "The Skill visualizes researcher-supplied enrichment objects and makes no individual diagnostic or treatment recommendation."},
+      "methodological_ground": {"result": "PASS", "detail": "Executed routes preserve signed NES, reject GSEA barplots, distinguish GeneRatio from fold enrichment, require S4 objects for similarity plots, and redirect flat lists to REVIGO."},
+      "code_usability": {"result": "PASS", "detail": "All seven inputs, two regression probes, and hash-matched shipped ORA/GSEA examples exited 0 in the private R 4.5.2 runtime; the saved validator checked artifacts and logs."}
+    }
+  },
+  "static_score": {
+    "subtotal": 96,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {"score": 12, "max": 12, "note": "Covers ORA, GSEA, compareCluster, redundancy display or collapse, encoding choices, specialized plots, and scope boundaries."},
+      "reliability": {"score": 12, "max": 12, "note": "Documents class dispatch, optional dependencies, empty-result handling, API inspection, and clean process-exit verification."},
+      "performance_context": {"score": 7, "max": 8, "note": "The compact 249-line Skill keeps the decision tree, thresholds, and failure modes local; the detailed table is justified for this multi-plot Skill."},
+      "agent_usability": {"score": 16, "max": 16, "note": "Object contract, decision tree, taxonomy, code fragments, defaults, and failure-to-fix mappings are directly actionable."},
+      "human_usability": {"score": 7, "max": 8, "note": "The short guide is prompt-oriented, but it still mentions the superseded compareCluster treeplot crash."},
+      "security": {"score": 12, "max": 12, "note": "No credentials, raw command evaluation, destructive operations, or sensitive-data retention pattern appears in source."},
+      "maintainability": {"score": 11, "max": 12, "note": "SKILL.md and the shipped ORA example use the corrected treeplot API; one stale usage-guide phrase remains."},
+      "agent_specific": {"score": 19, "max": 20, "note": "Precise triggers, explicit scope handoffs, and S4/optional-dependency escape hatches prevent invented outputs; guide inconsistency is minor friction."}
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 96.7,
+    "max": 100,
+    "assertion_pass_rate": {"passed": 28, "total": 28},
+    "inputs": [
+      {
+        "index": 1, "type": "Canonical", "label": "Collapse GO-DAG redundancy with simplify before dotplot", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "input1_canonical.R exited 0, reported 248 raw terms and 104 after simplify(cutoff=0.7), and wrote a validated 12,454-byte PDF.", "note": "Canonical ORA redundancy-collapse route completed.",
+        "basic": 39, "specialized": 58, "total": 97, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          {"text": "Raw and simplified term counts are reported.", "result": "PASS", "note": "Log reports 248 raw and 104 simplified terms."},
+          {"text": "The simplify-before-flat-dotplot workflow completes.", "result": "PASS", "note": "Both raw and simplified dotplots are rendered."},
+          {"text": "A non-trivial PDF artifact is produced.", "result": "PASS", "note": "input1_output.pdf begins with %PDF and is 12,454 bytes."},
+          {"text": "Observed statistics are not fabricated.", "result": "PASS", "note": "Counts and term names are printed from the synthetic enrichGO result."}
+        ]
+      },
+      {
+        "index": 2, "type": "Variant A", "label": "GSEA overview and detail preserving signed NES", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "input2_variantA.R exited 0, reported 286 sets with NES -1.49 to 3.03, rejected barplot for gseaResult as expected, and wrote a validated 149,176-byte PDF.", "note": "Signed-NES dotplot, ridgeplot, and running-score route completed; fgsea precision warnings were non-fatal.",
+        "basic": 39, "specialized": 57, "total": 96, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          {"text": "Positive and negative NES values are retained.", "result": "PASS", "note": "The log reports 276 positive and 10 negative sets."},
+          {"text": "No GSEA barplot is used as a valid result.", "result": "PASS", "note": "existsMethod is FALSE and the deliberate attempt errors."},
+          {"text": "Direction-aware overview and detail plots render.", "result": "PASS", "note": "The complete route exits 0 and writes the PDF."},
+          {"text": "The output remains within visualization scope.", "result": "PASS", "note": "It makes no biological or clinical claim."}
+        ]
+      },
+      {
+        "index": 3, "type": "Edge", "label": "Small-set cnetplot and similarity-map judgment", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "input3_edge.R exited 0, observed 37 strict-cutoff terms rather than assuming a near-empty result, printed the map-scale caveat, and wrote a validated 18,462-byte PDF.", "note": "The edge route responds to the actual result and states when a similarity map is not informative.",
+        "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          {"text": "The actual number of surviving terms is reported.", "result": "PASS", "note": "It reports 37 rather than forcing the requested count."},
+          {"text": "The similarity-map scale boundary is stated.", "result": "PASS", "note": "The log explains that n<=2 cannot show redundancy structure."},
+          {"text": "The cnetplot and similarity workflow completes safely.", "result": "PASS", "note": "The script exits 0 and writes the PDF."},
+          {"text": "No unsupported biological conclusion is introduced.", "result": "PASS", "note": "The route limits itself to plot choice and observed count."}
+        ]
+      },
+      {
+        "index": 4, "type": "Variant B", "label": "compareCluster dotplot, emapplot, and current treeplot API", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "input4_variantB.R exited 0 with 708 compareCluster rows and a validated 141,420-byte PDF; its log has no treeplot error. The added probe independently confirms nCluster succeeds while cluster.params is rejected.", "note": "The corrected nCluster route is dynamically verified for compareCluster.",
+        "basic": 39, "specialized": 58, "total": 97, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          {"text": "compareCluster produces a faceted-result substrate.", "result": "PASS", "note": "The run reports 708 result rows."},
+          {"text": "The map and tree route completes without treeplot error.", "result": "PASS", "note": "A PDF is written and no treeplot ERROR marker is logged."},
+          {"text": "The corrected nCluster API works on compareClusterResult.", "result": "PASS", "note": "The API probe reports compareClusterResult nCluster SUCCEEDED."},
+          {"text": "The obsolete cluster.params API is detected.", "result": "PASS", "note": "The probe records the expected unused-argument error."}
+        ]
+      },
+      {
+        "index": 5, "type": "Stress", "label": "Full ORA modeling-choice figure set", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "input5_stress.R identified the documented missing ggupset Suggests dependency. A new private Phase 2 overlay installed ggupset 0.4.1 without changing shared libraries; the exact rerun exited 0, listed all eight plot types, and wrote a validated 53,090-byte PDF.", "note": "Full stress route completes after the Skill's documented optional-dependency installation.",
+        "basic": 38, "specialized": 58, "total": 96, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          {"text": "Raw, simplified, and fold-enrichment views are produced.", "result": "PASS", "note": "The log lists all three and reports Spearman rho -0.215."},
+          {"text": "All requested specialized plots render.", "result": "PASS", "note": "Overlay log lists emapplot, treeplot, cnetplot, heatplot, and upsetplot."},
+          {"text": "The optional upsetplot dependency follows the documented install path.", "result": "PASS", "note": "ggupset 0.4.1 installed only in a new private overlay."},
+          {"text": "The result is a valid non-trivial PDF.", "result": "PASS", "note": "The overlay output is a 53,090-byte PDF."}
+        ]
+      },
+      {
+        "index": 6, "type": "Scope Boundary", "label": "Flat non-clusterProfiler GO list redirects to REVIGO", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "input6_scope.R exited 0 and demonstrated that a data.frame is not an enrichResult; pairwise_termsim and emapplot reject it, and the script explains why fabricating required S4 slots would invent inputs.", "note": "The scope boundary is enforced rather than coercing an unsupported flat list.",
+        "basic": 40, "specialized": 59, "total": 99, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          {"text": "A bare table is not treated as an enrichResult.", "result": "PASS", "note": "is(flat, enrichResult) is FALSE."},
+          {"text": "Similarity plotting rejects unsupported data.frame input.", "result": "PASS", "note": "Both S4 dispatch attempts return inherited-method errors."},
+          {"text": "The output directs to the documented REVIGO boundary.", "result": "PASS", "note": "The conclusion explicitly names the Decision Tree redirect."},
+          {"text": "The route refuses to invent missing fields.", "result": "PASS", "note": "The log identifies unavailable ratios, genes, counts, and universe."}
+        ]
+      },
+      {
+        "index": 7, "type": "Adversarial", "label": "setReadable converts Entrez cnetplot labels to symbols", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "input7_redundancy_check.R exited 0, reported numeric IDs before setReadable and CDKN2A/CDK4/CDK6 afterward, then wrote a validated 16,823-byte two-state cnetplot PDF.", "note": "The documented readability remedy is functionally demonstrated.",
+        "basic": 39, "specialized": 58, "total": 97, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          {"text": "The pre-fix labels are recognized as Entrez IDs.", "result": "PASS", "note": "The sample is numeric and the log reports TRUE."},
+          {"text": "setReadable converts the documented IDs to symbols.", "result": "PASS", "note": "The post-fix sample is CDKN2A, CDK4, CDK6."},
+          {"text": "Both pre-fix and post-fix cnetplots render.", "result": "PASS", "note": "The run exits 0 and writes input7_output.pdf."},
+          {"text": "The remedy stays within visualization scope.", "result": "PASS", "note": "It changes labels only and adds no biological interpretation."}
+        ]
+      }
+    ]
+  },
+  "final": {"static_weighted": 38.4, "dynamic_weighted": 58.0, "score": 96, "max": 100, "grade": "Production Ready", "grade_symbol": "⭐", "deployable": true, "veto_override": false},
+  "key_strengths": [
+    "All seven realistic Mode A routes, two regression probes, and exact shipped ORA/GSEA examples exit cleanly in a private package-complete runtime.",
+    "The Skill clearly separates displaying redundancy from collapsing it and demonstrates both with executable ORA routes.",
+    "The signed-NES GSEA route explicitly prevents invalid barplot interpretation and confirms the absent method dynamically.",
+    "The corrected nCluster treeplot API is independently tested for enrichResult and compareClusterResult."
+  ],
+  "recommendations": [
+    {"priority": "P2", "title": "Remove stale treeplot-crash wording from usage guide", "observed_in": [], "problem": "usage-guide.md still says that SKILL.md covers a treeplot-on-compareClusterResult crash, although the current Skill and fresh enrichplot 1.30.5 probe document and execute the working nCluster route.", "root_cause": "The Phase 1 source correction updated SKILL.md and the shipped ORA example but did not synchronize the guide's brief failure-mode summary.", "fix": "Replace the crash reference with current version-sensitive guidance: use nCluster in the tested runtime and perform a small compareCluster treeplot render after an enrichplot or ggtree upgrade."}
+  ]
+}

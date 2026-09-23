@@ -1,0 +1,216 @@
+{
+  "meta": {
+    "skill_name": "bio-virtual-screening",
+    "description": "Virtual-screening workflow for receptor preparation, binding-site prediction, ligand preparation, docking, pose review, and screening triage.",
+    "source": "mrsonord2240/bioSkills@9c76aab55da6a7304f99b214feea6a75b5aacd8e:chemoinformatics/virtual-screening",
+    "evaluated_on": "2026-09-23",
+    "evaluator_version": "skill-auditor@1.0",
+    "audit_type": "fresh final-pass Phase 2 audit",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "executed_inputs": "7/7",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "The workflow distinguishes docking scores from experimental affinity, asks for orthogonal pose validation, and does not claim a docking pose establishes activity. Fresh receptor preparation, Vina docking, P2Rank pocket prediction, and Meeko pose reconstruction all completed from the documented local toolchain."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "SKILL.md explicitly requires visual/chemical pose validation, identifies covalent inhibitors as outside the ordinary non-covalent workflow, and treats GNINA as an optional rescoring route rather than fabricating a result."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "A fresh source-level adversarial test confirmed that positive Vina energies are excluded; a seed-42 repeat produced identical source-script output; P2Rank and docking provide separable site-prediction and scoring stages."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "The source prepare_receptor.py, dock_single.py, and example prepare_ligand helper were executed against fresh fixture copies. The source CLI fallback is runnable natively on Windows with the documented Vina executable."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 94,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {"score": 11, "max": 12, "note": "Covers the expected receptor, pocket, ligand, docking, and pose-review stages. The optional GNINA route is documented but not bundled as a source wrapper."},
+      "reliability": {"score": 11, "max": 12, "note": "Clear tool-specific handoffs and negative-energy filtering; binding-site coordinates still require scientific review rather than automatic acceptance."},
+      "performance_context": {"score": 8, "max": 8, "note": "The documented Vina and P2Rank local paths complete quickly on the small fixture and expose seed control."},
+      "agent_usability": {"score": 15, "max": 16, "note": "Commands, expected artifacts, and failure boundaries are concrete. Native Vina CLI provides a practical route when the Python API is unavailable."},
+      "human_usability": {"score": 8, "max": 8, "note": "The workflow is staged and gives explicit interpretation cautions instead of presenting a docking score as a conclusion."},
+      "security": {"score": 12, "max": 12, "note": "No credentials, network dependency, or unsafe shell construction in the executed source paths."},
+      "maintainability": {"score": 11, "max": 12, "note": "Small separable scripts with CLI arguments and local tool handoffs; the example's Python-API-only docking helper is environment-sensitive."},
+      "agent_specific": {"score": 18, "max": 20, "note": "Explicit validation and escape hatches are strong. The API-only example branch cannot be run natively in this Windows audit environment, although the source CLI fallback ran."}
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 96.0,
+    "max": 100,
+    "assertion_pass_rate": {"passed": 15, "total": 15},
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Prepare a fresh 3PTB receptor and dock a fresh ligand with the source scripts",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "run/04_receptor_dock_path_repaired.execution.json: Fresh isolated execution; PID 196348 auditor-owned; no process terminated or signaled. Source prepare_receptor.py wrote fresh1/receptor.pdbqt; source dock_single.py returned 10 negative poses, best score -4.392.",
+        "note": "The earlier run/01_receptor_dock record is retained but excluded: its audit child PATH omitted the documented pdb2pqr tool directory. No source was changed; this fresh successful rerun used only an audit-child PATH correction.",
+        "basic": 40, "specialized": 57, "total": 97,
+        "assertions_passed": 3, "assertions_total": 3,
+        "assertions": [
+          {"text": "Source receptor preparation creates a nonempty PDBQT", "result": "PASS", "note": "fresh1/receptor.pdbqt was written."},
+          {"text": "Source docking returns scored poses", "result": "PASS", "note": "10 retained negative-energy poses."},
+          {"text": "Reported best pose is physically selected by the documented score filter", "result": "PASS", "note": "Best returned score -4.392."}
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Exercise the example ligand helper on valid and invalid SMILES",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "run/02_virtual_helpers.execution.json: Fresh isolated execution; PID 138160 auditor-owned; no process terminated or signaled. The exact example produced a ligand PDBQT for guanidino-benzene and raised ValueError for NOT_A_SMILES.",
+        "note": "Confirms the example's input-validation behavior without treating an invalid molecule as a dockable input.",
+        "basic": 40, "specialized": 56, "total": 96,
+        "assertions_passed": 2, "assertions_total": 2,
+        "assertions": [
+          {"text": "Valid SMILES converts to a PDBQT artifact", "result": "PASS", "note": "Fresh output exists and is nonempty."},
+          {"text": "Invalid SMILES is rejected explicitly", "result": "PASS", "note": "ValueError observed."}
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Variant B",
+        "label": "Predict pockets with documented local P2Rank invocation",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "run/08_p2rank.execution.json: Fresh isolated execution; PID 148268 auditor-owned; no process terminated or signaled. P2Rank 2.5.1 Java invocation on a fresh receptor copy wrote two CSV artifacts with center fields.",
+        "note": "This is an independent documented preflight/site-prediction stage, not an assertion that the top site is biologically correct.",
+        "basic": 39, "specialized": 56, "total": 95,
+        "assertions_passed": 2, "assertions_total": 2,
+        "assertions": [
+          {"text": "P2Rank completes on a receptor input", "result": "PASS", "note": "Java process exited 0."},
+          {"text": "Pocket output exposes coordinates for downstream review", "result": "PASS", "note": "CSV center columns found."}
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Adversarial",
+        "label": "Ensure the exact source dock_single function excludes a positive docking energy",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "run/06_filter_unit.execution.json: Fresh isolated execution; PID 28640 auditor-owned; no process terminated or signaled. Exact source function parsed mock REMARK VINA RESULT values -7.0 and +68.0 and returned only [-7.0, 0.0, 0.0].",
+        "note": "This directly validates the repaired realized-FDR-adjacent acceptance behavior for non-favorable docked poses: they do not enter the returned candidate set.",
+        "basic": 40, "specialized": 58, "total": 98,
+        "assertions_passed": 2, "assertions_total": 2,
+        "assertions": [
+          {"text": "Negative energy is retained", "result": "PASS", "note": "-7.0 returned."},
+          {"text": "Positive energy is excluded", "result": "PASS", "note": "+68.0 absent from returned list."}
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Rebuild the fresh source-docking poses to SDF using Meeko",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "run/05_pose_rebuild.execution.json: Fresh isolated execution; PID 39296 auditor-owned; no process terminated or signaled. Meeko rebuilt 1 molecule with 10 conformers from fresh1/poses.pdbqt and wrote poses_rebuilt.sdf.",
+        "note": "Verifies a concrete downstream pose-review artifact rather than stopping at a docking score.",
+        "basic": 39, "specialized": 57, "total": 96,
+        "assertions_passed": 2, "assertions_total": 2,
+        "assertions": [
+          {"text": "Docked PDBQT can be reconstructed", "result": "PASS", "note": "Meeko returned a molecule."},
+          {"text": "Pose multiplicity survives reconstruction", "result": "PASS", "note": "10 conformers written."}
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Determinism",
+        "label": "Repeat exact source Vina CLI docking with seed 42",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "run/07_determinism.execution.json: Fresh isolated execution; PID 15928 auditor-owned; no process terminated or signaled. Two source CLI calls with the same inputs and --seed 42 produced identical stdout.",
+        "note": "Confirms deterministic score reporting for this fixture/tool version; it is not a claim of cross-version reproducibility.",
+        "basic": 40, "specialized": 57, "total": 97,
+        "assertions_passed": 2, "assertions_total": 2,
+        "assertions": [
+          {"text": "Repeated seeded invocation completes", "result": "PASS", "note": "Both subprocesses exited 0."},
+          {"text": "Repeated seeded output is identical", "result": "PASS", "note": "Exact stdout equality asserted."}
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Scope Boundary",
+        "label": "Check documented validation and special-case boundaries",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "run/03_scope.execution.json: Fresh isolated execution; PID 128776 auditor-owned; no process terminated or signaled. Required SKILL.md terms GNINA, validate, PoseBusters, and Covalent inhibitor were all present.",
+        "note": "The workflow names optional rescoring and pose validation, and does not silently apply ordinary non-covalent docking to covalent inhibitors.",
+        "basic": 39, "specialized": 54, "total": 93,
+        "assertions_passed": 2, "assertions_total": 2,
+        "assertions": [
+          {"text": "Pose validation is an explicit requirement", "result": "PASS", "note": "validate and PoseBusters documented."},
+          {"text": "Covalent chemistry is called out as a special case", "result": "PASS", "note": "Covalent inhibitor boundary present."}
+        ]
+      }
+    ],
+    "supplemental": {
+      "parse": "run/00_parse.execution.json completed with PARSE=PASS; all source scripts and the example AST-parse.",
+      "process_isolation": "All accepted formal-input records have executed=true, status=COMPLETED, an auditor-owned direct_child_pid, and ownership.intervention/outside_process_intervention=none. The retained failed run/01_receptor_dock record is explicitly non-evidence and was not retried by signaling or terminating any process."
+    }
+  },
+  "final": {
+    "static_weighted": 37.6,
+    "dynamic_weighted": 57.6,
+    "score": 95,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "✅",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "The complete local path from receptor preparation through source docking and downstream pose reconstruction executed successfully on fresh copies.",
+    "The source correctly drops a deliberately injected positive-energy docking result rather than accepting it as a hit.",
+    "The seeded CLI path produced identical output twice, and the workflow makes pose validation and special chemistry boundaries explicit."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "Make the example docking function offer the same Vina CLI fallback as scripts/dock_single.py",
+      "observed_in": [1, 2, 6],
+      "problem": "The example's docking helper imports the Vina Python API directly, which is unavailable in this native Windows audit environment, while the standalone source CLI path worked.",
+      "root_cause": "The example and CLI script expose different engine integration seams.",
+      "fix": "Add an optional vina_exe/CLI branch to the example or have the example call the maintained standalone script."
+    },
+    {
+      "priority": "P2",
+      "title": "Keep a small reusable fixture and expected-artifact check with the skill",
+      "observed_in": [1, 3, 5],
+      "problem": "The current workflow is runnable but relies on environment-provided fixtures for repeatable verification.",
+      "root_cause": "No bundled smoke-test contract accompanies the scripts.",
+      "fix": "Ship a tiny non-proprietary receptor/ligand fixture plus assertions for nonempty receptor PDBQT, at least one negative score, and reconstructable pose output."
+    }
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "meta": {
+    "skill_name": "bio-blast-searches",
+    "description": "Run remote NCBI BLAST searches with Biopython, documented program selection, RID polling, and result parsing.",
+    "evaluated_on": "2026-09-23",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "mrsonord2240/bioSkills@d8a2300a9a90869eccd13a5867d22d00709c6e6c:database-access/blast-searches",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md"
+  },
+  "veto_gates": {
+    "skill_veto": { "gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS" },
+    "research_veto": {
+      "applicable": true,
+      "gate": "BLOCKED",
+      "scientific_integrity": { "result": "PASS", "detail": "The inspected source retains citations, explicit reproducibility guidance, and no clinical claim." },
+      "practice_boundaries": { "result": "PASS", "detail": "This is a remote bioinformatics retrieval skill, not diagnostic or patient-facing advice." },
+      "methodological_ground": { "result": "PASS", "detail": "The source distinguishes bit-score from cross-database E-values and specifies the corrected program and short-peptide parameters." },
+      "code_usability": { "result": "BLOCKED", "detail": "Fresh executions of all three shipped Biopython examples and scripts/blast_rid.py reached the NCBI BLAST request path but the BLAST CGI closed each connection without a response. A direct curl to the same CGI reproduced an abrupt server close. Thus fresh live retrieval success cannot be asserted at this audit time." }
+    }
+  },
+  "static_score": {
+    "subtotal": 94,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 12, "max": 12, "note": "The documented blastn, blastp, megablast, dc-megablast, RID, and result-parsing routes are present and internally consistent." },
+      "reliability": { "score": 10, "max": 12, "note": "RID polling and error states are documented, although current remote execution could not complete against the CGI." },
+      "performance_context": { "score": 8, "max": 8, "note": "The Skill explicitly warns that queue latency is variable and distinguishes expensive short-peptide parameters." },
+      "agent_usability": { "score": 16, "max": 16, "note": "Program, database, batch-size, and parameter decision boundaries are explicit." },
+      "human_usability": { "score": 8, "max": 8, "note": "Failure-mode and Common Errors guidance gives concrete causes and recovery paths." },
+      "security": { "score": 12, "max": 12, "note": "No credentials or arbitrary code execution path were found." },
+      "maintainability": { "score": 10, "max": 12, "note": "Examples, RID client, and reference files are separated; there is no automated live-test harness." },
+      "agent_specific": { "score": 18, "max": 20, "note": "The current source prevents literal program='megablast' misuse and documents local/remote-homology escape hatches." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 67.4,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 20, "total": 28 },
+    "inputs": [
+      { "index": 1, "type": "Canonical", "label": "Current examples/basic_blast.py", "status": "EXECUTED_EXTERNAL_FAILURE", "status_flag": "BLOCKED", "executed": true, "execution_note": "Executed the pinned source example from a temporary working directory. It entered NCBIWWW.qblast() and then raised http.client.RemoteDisconnected: Remote end closed connection without response.", "basic": 17, "specialized": 18, "total": 35, "assertions_passed": 1, "assertions_total": 5 },
+      { "index": 2, "type": "Variant A", "label": "Current examples/blastp_filtered.py", "status": "EXECUTED_EXTERNAL_FAILURE", "status_flag": "BLOCKED", "executed": true, "execution_note": "Executed the pinned source example from a temporary working directory. Its Swiss-Prot Mammalia request reached NCBIWWW.qblast() and received the same RemoteDisconnected error.", "basic": 18, "specialized": 18, "total": 36, "assertions_passed": 2, "assertions_total": 4 },
+      { "index": 3, "type": "Edge", "label": "Current short-peptide PAM30 reference block", "status": "COMPLETED_NETWORK_FREE", "status_flag": "PASS", "executed": true, "execution_note": "Executed the literal current references/protein-patterns.md block with a controlled NCBIWWW requester to inspect its call contract: PAM30, word_size=2, gapcosts='9 1', expect=1000, CBS=3, and hitlist_size=100 were all supplied. A fresh live request was not assertable because the CGI was closing connections.", "basic": 35, "specialized": 49, "total": 84, "assertions_passed": 4, "assertions_total": 4 },
+      { "index": 4, "type": "Variant B", "label": "Cross-database E-value decision", "status": "COMPLETED", "status_flag": "PASS", "executed": true, "execution_note": "Executed current-source textual decision checks for the E=Kmn exp(-lambda S) explanation, database-size warning, and bit-score recommendation; no remote request is required by this reasoning-only input.", "basic": 38, "specialized": 54, "total": 92, "assertions_passed": 4, "assertions_total": 4 },
+      { "index": 5, "type": "Stress", "label": "Megablast and XML save/reparse paths", "status": "PARTIAL_EXTERNAL_FAILURE", "status_flag": "BLOCKED", "executed": true, "execution_note": "Parsed the pinned test_results.xml through current source functions (33 alignments; NM_000518 top hit; bit-score ordering correct). The literal fixed megablast contract executed network-free with program='blastn', megablast=True; its live request did not complete within 300 s under the repeated CGI connection failure and was stopped. The unfixed literal program='megablast' regression raised the documented ValueError immediately.", "basic": 27, "specialized": 38, "total": 65, "assertions_passed": 3, "assertions_total": 4 },
+      { "index": 6, "type": "Scope Boundary", "label": "200 unknown CDS remote-BLAST boundary", "status": "COMPLETED", "status_flag": "PASS", "executed": true, "execution_note": "Executed current-source decision checks: >50 sequences routes to local-blast and >1000 routes to DIAMOND/MMseqs2 in remote-homology; no remote search was initiated for the deliberately out-of-scope batch.", "basic": 39, "specialized": 56, "total": 95, "assertions_passed": 3, "assertions_total": 3 },
+      { "index": 7, "type": "Adversarial", "label": "RID client and missing-defline protection", "status": "PARTIAL_EXTERNAL_FAILURE", "status_flag": "BLOCKED", "executed": true, "execution_note": "Executed current scripts/blast_rid.py with a missing-defline FASTA; it refused the input with the documented ~12x-latency warning. Its valid HBB run reached the NCBI BLAST CGI and exited cleanly with 'NCBI request failed: Remote end closed connection without response'; CLI help and polling/error branches were also exercised locally.", "basic": 27, "specialized": 38, "total": 65, "assertions_passed": 3, "assertions_total": 4 }
+    ]
+  },
+  "final": { "static_weighted": 37.6, "dynamic_weighted": 40.4, "score": 78, "max": 100, "grade": "Limited Release", "grade_symbol": "BLOCKED", "deployable": false, "veto_override": false },
+  "key_strengths": [
+    "The corrected qblast API contract uses program='blastn' plus megablast/template flags rather than invalid literal program names.",
+    "The literal short-peptide reference block carries PAM30-compatible gapcosts='9 1' and the expected sensitivity parameters.",
+    "Current local parsing, result ordering, defline guard, and decision boundaries execute correctly from the pinned source."
+  ],
+  "recommendations": [
+    { "priority": "P0", "title": "Re-run live NCBI BLAST verification when Blast.cgi accepts requests", "observed_in": [1, 2, 5, 7], "problem": "Every fresh BLAST CGI request in this audit received a connection close without a response, including direct curl verification.", "root_cause": "External NCBI BLAST CGI availability or network path; the same failure spans Biopython qblast and the stdlib RID client.", "fix": "Do not change source based on this evidence alone. Re-run the four live paths when the endpoint recovers, retaining the current parameter and parser checks as corroborating evidence." }
+  ]
+}
