@@ -22,7 +22,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The example passes cluster_rows=<OLO dendrogram> together with row_split=gene_info$pathway, a combination ComplexHeatmap rejects; the script was never run.
 - Fix: Drop row_split or use a numeric row_split (works with the dendrogram), or apply OLO within each pathway group; supply a runnable data preamble and state the constraint in SKILL.md next to the OLO block.
 
-## P1 (153)
+## P1 (154)
 
 ### `bio-data-visualization-lollipop-protein-maps` — Shipped example never completes and paints wrong colours
 
@@ -1144,6 +1144,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The final-pass correction changed SKILL.md and examples/gi_scoring.py but did not update the abbreviated usage-guide workflow.
 - Fix: Revise the GI prompt and workflow step to state that raw z classification is only for small hand-curated sets; for genome-scale screens require two-sided z p-values and BH-FDR before calling hits.
 
+### `bio-metabolomics-metabolite-annotation` — Emit Level 2a in CLI single-hit branch
+
+- Skill: 92, Limited Release · [mrsonord2240/bioSkills@52cdec6](https://github.com/mrsonord2240/bioSkills/tree/52cdec64082fb7a3bc2d84e9d7cf5c05a5fdf9f1/metabolomics/metabolite-annotation) · [viewer](skills/bio-metabolomics-metabolite-annotation/mrsonord2240-bioSkills@52cdec6/viewer.md)
+- Observed in inputs: 1, 6
+- Problem: scripts/match_library.py and SKILL.md promise a Level 2a call for a single passing library hit, but that branch prints only compound name, score, and matched-peak count. A CLI caller cannot reliably carry the mandated confidence level downstream.
+- Root cause: The single-hit print statement omits the label while tied and no-hit branches include their Level 3 and Level 5 labels.
+- Fix: Change the single-hit print statement in scripts/match_library.py to include '-> Level 2a' and add a shipped assertion or CLI fixture checking that text; retain score and matched-peak count.
+
 ### `bio-metabolomics-pathway-mapping` — Reference-library downloads are an undisclosed network dependency
 
 - Skill: 92, Production Ready · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/metabolomics/pathway-mapping) · [viewer](skills/bio-metabolomics-pathway-mapping/mrsonord2240-bioSkills@6847328/viewer.md)
@@ -1248,7 +1256,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (414)
+## P2 (412)
 
 ### `bio-data-visualization-lollipop-protein-maps` — HGVSp edge cases and recurrence semantics undocumented
 
@@ -4465,22 +4473,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The full enrichment example completes but writes to tempdir and is slow/noisy on Windows.
 - Root cause: Output location and runtime expectation are implicit.
 - Fix: Accept an optional output directory and state that enrichment plotting can be slow on constrained Windows hosts.
-
-### `bio-metabolomics-metabolite-annotation` — Inline code comment misplaces where the precursor_mz AssertionError actually fires
-
-- Skill: 95, Production Ready · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/metabolomics/metabolite-annotation) · [viewer](skills/bio-metabolomics-metabolite-annotation/mrsonord2240-bioSkills@6847328/viewer.md)
-- Observed in inputs: 1
-- Problem: The comment on `spectrum = add_precursor_mz(spectrum)` says 'a spectrum with no derivable precursor_mz still raises AssertionError here' -- but add_precursor_mz() itself only logs a warning; the AssertionError actually fires later, inside ModifiedCosine.pair() at calculate_scores() time. Verified by isolating the two calls: add_precursor_mz() completes with a warning, the crash happens on the next call.
-- Root cause: The comment was written to summarize the Version Compatibility paragraph's correct 'raises ... afterward' wording but compressed it onto the filter line itself, losing the 'afterward'.
-- Fix: Move the AssertionError comment to the calculate_scores()/ModifiedCosine() line, or reword to 'a spectrum with no derivable precursor_mz will raise AssertionError when scored below, not here'.
-
-### `bio-metabolomics-metabolite-annotation` — MetFrag section gives the params.txt template and CSV schema but no worked sample data
-
-- Skill: 95, Production Ready · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/metabolomics/metabolite-annotation) · [viewer](skills/bio-metabolomics-metabolite-annotation/mrsonord2240-bioSkills@6847328/viewer.md)
-- Observed in inputs: 3
-- Problem: Unlike the matchms section (full runnable synthetic example in examples/annotate_features.py) and SIRIUS's complete bash chain, the new MetFrag section supplies only the params.txt key/value template and the candidates.csv column schema -- an agent must still originate real peak masses and a real candidate structure list from outside knowledge to actually run it, as this audit did.
-- Root cause: The fix prioritized closing the 'zero executable guidance' P1 gap with a runnable template; a fully worked data sample was out of scope for that fix.
-- Fix: Ship a small worked candidates.csv + peaklist.txt (e.g. the citrate/isocitrate/glucose triple this Skill's own prose already describes) alongside examples/annotate_features.py so an agent can run the MetFrag path with zero external chemistry lookup, mirroring the matchms example's self-containedness.
 
 ### `bio-metabolomics-xcms-preprocessing` — Make the example's parallel backend explicit
 

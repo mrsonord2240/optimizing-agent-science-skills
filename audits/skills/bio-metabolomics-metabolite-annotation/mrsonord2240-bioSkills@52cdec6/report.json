@@ -1,0 +1,162 @@
+{
+  "meta": {
+    "skill_name": "bio-metabolomics-metabolite-annotation",
+    "description": "Turns untargeted LC-MS/MS features into confidence-stratified metabolite annotations using matchms, SIRIUS/CSI:FingerID, MetFrag and molecular networking, assigning a defensible MSI/Schymanski confidence level to each.",
+    "evaluated_on": "2026-09-23",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Moderate",
+    "n_inputs": 7,
+    "source": "mrsonord2240/bioSkills@52cdec64082fb7a3bc2d84e9d7cf5c05a5fdf9f1:metabolomics/metabolite-annotation",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md"
+  },
+  "veto_gates": {
+    "skill_veto": {"gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS"},
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {"result": "PASS", "detail": "All fresh outputs retained explicit confidence caps and fabricated no identities, formulas, or quantitative evidence."},
+      "practice_boundaries": {"result": "PASS", "detail": "The Skill analyses research spectra, limits identities to hypotheses, and makes no individual diagnostic or treatment recommendation."},
+      "methodological_ground": {"result": "PASS", "detail": "Fresh tie, false-tie, no-overlap, MS1-only, and MetFrag checks confirm the stated conservative evidence model."},
+      "code_usability": {"result": "PASS", "detail": "Python sources compiled; the shell wrapper passed bash -n; six runnable inputs executed with asserted outputs. The missing Level 2a text is a P1 output-contract defect, not non-runnable code."}
+    }
+  },
+  "static_score": {
+    "subtotal": 93,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {"score": 10, "max": 12, "note": "Core routes are covered, but the CLI single-hit branch omits its promised Level 2a text."},
+      "reliability": {"score": 11, "max": 12, "note": "No-overlap, missing precursor, ties, and MetFrag zero-row output are handled; one successful output is semantically incomplete."},
+      "performance_context": {"score": 8, "max": 8, "note": "The 235-line SKILL.md routes substantial executable logic into two focused scripts."},
+      "agent_usability": {"score": 14, "max": 16, "note": "Decision table, thresholds, error table, scripts, and evidence caps are clear; the CLI/documentation mismatch weakens feedback design."},
+      "human_usability": {"score": 8, "max": 8, "note": "Natural-language triggers, concise guide, prerequisites, and related-skill routing are clear."},
+      "security": {"score": 12, "max": 12, "note": "No credentials or sensitive data are embedded; shell variables are quoted and user text is not executed as code."},
+      "maintainability": {"score": 12, "max": 12, "note": "Matching and MetFrag logic are focused scripts with headers, worked data, and direct test paths."},
+      "agent_specific": {"score": 18, "max": 20, "note": "Triggers, layering, and escape hatches are strong; the absent single-hit level impairs downstream level-aware composition."}
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 91.3,
+    "max": 100,
+    "assertion_pass_rate": {"passed": 23, "total": 26},
+    "inputs": [
+      {
+        "index": 1, "type": "Canonical", "label": "matchms library CLI plus missing-precursor regression",
+        "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Ran fresh synthetic MGF fixtures with the byte-identical exact-tip match_library.py, then separately exercised its missing precursor scoring path.",
+        "note": "Clean citrate scored 0.9996 with seven matches; no-overlap printed Level 5. The single-hit CLI output omitted Level 2a.",
+        "basic": 36, "specialized": 53, "total": 89, "assertions_passed": 3, "assertions_total": 4,
+        "assertions": [
+          {"text": "A clean seven-peak library match executes and returns candidate plus matched-peak count", "result": "PASS", "note": "citrate printed score 0.9995875520642652 and 7 matches."},
+          {"text": "A zero-overlap query is reported as Level 5 rather than raising IndexError", "result": "PASS", "note": "query_no_overlap printed no confident candidate -> Level 5."},
+          {"text": "A single passing CLI match prints the documented Level 2a confidence label", "result": "FAIL", "note": "The single-hit branch printed only compound name, score, and match count."},
+          {"text": "Missing precursor failure occurs at scoring after add_precursor_mz warns", "result": "PASS", "note": "Fresh run observed warnings then AssertionError: Precursor_mz missing from calculate_scores."}
+        ]
+      },
+      {
+        "index": 2, "type": "Variant A", "label": "SIRIUS 6 formula, structure, and class chain",
+        "status": "PARTIAL", "status_flag": "❌", "executed": false,
+        "execution_note": "Not executed: TOOLS.md records that SIRIUS 6 requires a free academic account/login and this audit had no authorized session.",
+        "note": "The account gate and formula-versus-structure caveat are documented, but no live SIRIUS output was available.",
+        "basic": 32, "specialized": 43, "total": 75, "assertions_passed": 2, "assertions_total": 3,
+        "assertions": [
+          {"text": "The Skill discloses the SIRIUS login/license requirement before the chain", "result": "PASS", "note": "Version Compatibility and the SIRIUS section both disclose it."},
+          {"text": "Formula confidence is distinguished from uncalibrated top-1 structure confidence", "result": "PASS", "note": "Formula trust is directed to ZODIAC and structure confidence needs COSMIC FDR."},
+          {"text": "The exact SIRIUS chain executed successfully in this environment", "result": "FAIL", "note": "No authorized login was available; it was not executed."}
+        ]
+      },
+      {
+        "index": 3, "type": "Edge", "label": "MetFrag wrapper with shipped data and malformed CSV",
+        "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Ran the byte-identical exact-tip run_metfrag.sh with MetFragCommandLine 2.6.1, shipped worked data, and a fresh deliberately unquoted-InChI fixture.",
+        "note": "Three rows were stored; citrate/isocitrate tied at 1.0, glucose did not. The malformed CSV stored zero rows and the wrapper returned exit 1.",
+        "basic": 39, "specialized": 57, "total": 96, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          {"text": "The exact shipped MetFrag wrapper runs on shipped worked data", "result": "PASS", "note": "MetFrag stored 3 candidates and the wrapper exited 0."},
+          {"text": "Citrate/isocitrate ambiguity remains a tie", "result": "PASS", "note": "Exactly two rows scored 1.0."},
+          {"text": "The unrelated glucose candidate does not join the tie", "result": "PASS", "note": "Glucose scored below 1.0."},
+          {"text": "An unquoted InChI CSV cannot silently pass as zero-row success", "result": "PASS", "note": "The wrapper returned exit 1 with its CSV-quoting error."}
+        ]
+      },
+      {
+        "index": 4, "type": "Variant B", "label": "Evidence-to-MSI/Schymanski assignment helper",
+        "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Ran a fresh copy of the SKILL.md assign_level helper across authentic-standard, library, diagnostic-fragment, candidate-set, formula-only, and bare-feature cases.",
+        "note": "All seven cases matched their documented confidence caps.",
+        "basic": 39, "specialized": 58, "total": 97, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          {"text": "An authentic same-method standard is the only tested Level 1 path", "result": "PASS", "note": "Only authentic_standard_same_method returned 1."},
+          {"text": "A library hit needs both score and peak floors for Level 2a", "result": "PASS", "note": "0.7 and 6 returned 2a; 0.99 and 2 did not."},
+          {"text": "Diagnostic, candidate-set, and formula-only evidence retain their caps", "result": "PASS", "note": "The helper returned 2b, 3, and 4 respectively."},
+          {"text": "A bare feature remains Level 5", "result": "PASS", "note": "Empty evidence returned 5."}
+        ]
+      },
+      {
+        "index": 5, "type": "Stress", "label": "Genuine matchms isomer tie through shipped CLI",
+        "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Ran exact-tip CLI on fresh synthetic citrate/isocitrate spectra with identical seven-peak fragmentation.",
+        "note": "The CLI listed both names tied -> Level 3 (isomer wall).",
+        "basic": 39, "specialized": 57, "total": 96, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          {"text": "The tied-candidate branch executes on real matchms score objects", "result": "PASS", "note": "Fresh MGF run completed without error."},
+          {"text": "Both genuine tied candidates are retained", "result": "PASS", "note": "Output listed citrate and isocitrate."},
+          {"text": "A genuine tie is capped at Level 3", "result": "PASS", "note": "Output explicitly said tied -> Level 3."},
+          {"text": "No arbitrary Level 2a winner is emitted", "result": "PASS", "note": "Neither candidate was selected singly."}
+        ]
+      },
+      {
+        "index": 6, "type": "Scope Boundary", "label": "Clearly superior hit versus related non-tied references",
+        "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Ran exact-tip CLI on fresh citrate query with malate and succinate sharing only low-mass fragments.",
+        "note": "Citrate alone scored 0.9997 with seven matches; no false tie occurred, but this branch again omitted Level 2a.",
+        "basic": 36, "specialized": 53, "total": 89, "assertions_passed": 2, "assertions_total": 3,
+        "assertions": [
+          {"text": "A clearly superior match is not spuriously grouped with low-match spectra", "result": "PASS", "note": "Only citrate printed and no Level 3 text appeared."},
+          {"text": "The single winner retains high score and matched-peak count", "result": "PASS", "note": "citrate printed 0.9997151582503054 and 7."},
+          {"text": "The CLI labels this single result Level 2a as documented", "result": "FAIL", "note": "The output omitted Level 2a, reproducing Input 1's defect."}
+        ]
+      },
+      {
+        "index": 7, "type": "Adversarial", "label": "Byte-identical shipped matchms demonstration",
+        "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Copied examples/annotate_features.py byte-for-byte, verified byte equality to the exact tip, and ran it unmodified.",
+        "note": "Its two shipped assertions passed: query_strong was Level 2a and query_promiscuous was Level 3 at two matches.",
+        "basic": 39, "specialized": 58, "total": 97, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          {"text": "Audit copy is byte-identical to the exact-tip shipped example", "result": "PASS", "note": "Harness compared source and audit-copy bytes."},
+          {"text": "Shipped example runs with assertions enabled", "result": "PASS", "note": "It exited 0 with no AssertionError."},
+          {"text": "Strong query clears both score and peak floors for Level 2a", "result": "PASS", "note": "It printed score 1.00, matches 7, level 2a."},
+          {"text": "High-score two-peak query remains Level 3", "result": "PASS", "note": "It printed score 0.78, matches 2, level 3."}
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 37.2,
+    "dynamic_weighted": 54.8,
+    "score": 92,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Fresh direct execution confirms exact-tip matchms handling of zero-overlap spectra, genuine isomer ties, and clearly superior non-tied matches.",
+    "The precursor-mz correction is accurate: the filter warns and ModifiedCosine later raises the documented AssertionError.",
+    "The exact-tip MetFrag wrapper ran on newly shipped worked data, retained the isomer ambiguity, and converted zero-row silent success into exit 1.",
+    "The shipped matchms example was byte-identical to the audited source and both its regression assertions passed."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "Emit Level 2a in CLI single-hit branch",
+      "observed_in": [1, 6],
+      "problem": "scripts/match_library.py and SKILL.md promise a Level 2a call for a single passing library hit, but that branch prints only compound name, score, and matched-peak count. A CLI caller cannot reliably carry the mandated confidence level downstream.",
+      "root_cause": "The single-hit print statement omits the label while tied and no-hit branches include their Level 3 and Level 5 labels.",
+      "fix": "Change the single-hit print statement in scripts/match_library.py to include '-> Level 2a' and add a shipped assertion or CLI fixture checking that text; retain score and matched-peak count."
+    }
+  ]
+}
