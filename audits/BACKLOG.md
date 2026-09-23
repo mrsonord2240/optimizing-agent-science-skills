@@ -22,7 +22,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The example passes cluster_rows=<OLO dendrogram> together with row_split=gene_info$pathway, a combination ComplexHeatmap rejects; the script was never run.
 - Fix: Drop row_split or use a numeric row_split (works with the dendrogram), or apply OLO within each pathway group; supply a runnable data preamble and state the constraint in SKILL.md next to the OLO block.
 
-## P1 (155)
+## P1 (154)
 
 ### `bio-data-visualization-lollipop-protein-maps` — Shipped example never completes and paints wrong colours
 
@@ -1095,14 +1095,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: SKILL.md's MaAsLin2 code block (unchanged by this fix pass) shows random_effects = c('SubjectID') as the canonical pattern for longitudinal/repeated designs. Run verbatim against the fixture used throughout the rest of the Skill's examples (40 samples, 40 unique SubjectID -- one sample per subject), every per-feature lme4 fit fails with 'number of levels of each grouping factor must be < number of observations', caught internally with only a per-feature WARNING, and the written result table ends up with zero rows for the Group coefficient -- a silently empty, useless result reached without any top-level R error.
 - Root cause: A random effect grouping variable with as many levels as observations is degenerate (no within-group replication to estimate a variance component from) -- the identical mismatch class that produced the original LinDA P1 (formula '~ Group + Age + (1 \| SubjectID)' against a cross-sectional fixture), but MaAsLin2's block sits in the very next section and was not touched by this fix pass because it was not part of the original audit's tested inputs.
 - Fix: Either change the MaAsLin2 code block's demo formula to drop random_effects (matching how the LinDA block was fixed, since this SKILL.md's canonical demo fixture is cross-sectional) and add a comment showing random_effects=c('SubjectID') as the pattern for a true repeated-measures fixture, or add a Common Errors row for the exact 'number of levels of each grouping factor' message with the same explanation already given for LinDA.
-
-### `bio-crispr-screens-drugz-chemogenomic` — Common Errors table still lacks a half_window_size/IndexError row
-
-- Skill: 90, Production Ready · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/crispr-screens/drugz-chemogenomic) · [viewer](skills/bio-crispr-screens-drugz-chemogenomic/mrsonord2240-bioSkills@6847328/viewer.md)
-- Observed in inputs: 5
-- Problem: The pre-fix audit's own P1 recommendation proposed adding a Common Errors row for 'IndexError: single positional indexer is out-of-bounds'. The fixer instead documented the fix as prose (per the fix log: 'New paragraph after the algorithm'), and that prose is accurate and complete. But the shipped SKILL.md's Common Errors table (6 rows: No hits / Hits dominated by essentials / Unstable hits / Drug-target as suppressor / MAGeCK-drugZ disagreement / Inconsistent between doses) still has no row for this crash, so an agent that jumps straight to that quick-reference table after hitting the error will not find the fix there.
-- Root cause: The fix addressed the substance (documenting the guide-count / half_window_size relationship) via Algorithm-section prose rather than the Common Errors table the original recommendation suggested; both are legitimate documentation choices, but only the table is a quick-lookup surface for this specific crash message.
-- Fix: Add a row to the Common Errors table: 'IndexError: single positional indexer is out-of-bounds \| half_window_size too large for total guide count \| set --half_window_size to ~1/4 of total guides; see Algorithm section'.
 
 ### `bio-molecular-standardization` — ChEMBL route can return an unstripped organic salt, undocumented
 
@@ -3642,14 +3634,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: This P2 was explicitly scoped out of the current fix dispatch (fix log: 'not in this dispatch's scope... left for a future pass').
 - Fix: Add a concrete before/after example (e.g. cyclosporine A, already named in usage-guide.md but never coded) showing embedding failure or degraded diversity under default settings versus success under useMacrocycleTorsions=True.
 
-### `bio-crispr-screens-drugz-chemogenomic` — Escape Hatches for a crashed run or low replicate concordance remain thin
-
-- Skill: 90, Production Ready · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/crispr-screens/drugz-chemogenomic) · [viewer](skills/bio-crispr-screens-drugz-chemogenomic/mrsonord2240-bioSkills@6847328/viewer.md)
-- Observed in inputs: —
-- Problem: Beyond the checklist item 'Replicate Pearson >0.85', there is still no guidance on what to do when a run crashes generally or when replicate concordance falls below that threshold -- unchanged from the pre-fix audit.
-- Root cause: The fix round targeted the three findings explicitly reported (essentials exclusion, half_window_size, dose pseudocode) and did not extend to this pre-existing, lower-priority gap.
-- Fix: Add a short 'If replicate Pearson <0.85' subsection: hold out the worst replicate and re-run, or flag the screen as QC-failed before trusting drugZ's small-effect sensitivity, which amplifies noise on poor-concordance data.
-
 ### `bio-crispr-screens-hit-calling` — usage-guide.md's Prerequisites section has a confusing duplicated drugZ install line
 
 - Skill: 90, Production Ready · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/crispr-screens/hit-calling) · [viewer](skills/bio-crispr-screens-hit-calling/mrsonord2240-bioSkills@6847328/viewer.md)
@@ -4457,6 +4441,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: JACKS is named as an alternative but Version Compatibility does not state which JACKS release/API was considered.
 - Root cause: The compatibility section concentrates on tools directly executed by the primary path.
 - Fix: Add a brief JACKS version/API compatibility note, or label it as a cross-reference to the dedicated JACKS Skill rather than a tested in-skill dependency.
+
+### `bio-crispr-screens-drugz-chemogenomic` — Validate the dose-helper FDR range
+
+- Skill: 95, Production Ready · [mrsonord2240/bioSkills@14e7c1e](https://github.com/mrsonord2240/bioSkills/tree/14e7c1ec9fb76fd5859c5b4ba5ec70128fb85aeb/crispr-screens/drugz-chemogenomic) · [viewer](skills/bio-crispr-screens-drugz-chemogenomic/mrsonord2240-bioSkills@14e7c1e/viewer.md)
+- Observed in inputs: 9
+- Problem: scripts/dose_consistent_hits.py accepts --fdr 1.5, returns success, and emits 12,043 rows although an FDR threshold must be between 0 and 1.
+- Root cause: argparse constrains direction and top-dose label but not the numeric fdr argument.
+- Fix: Reject fdr values below 0 or above 1 with ap.error or a checked helper before reading output files. Add regression tests for --fdr 1.5 and --fdr -0.01.
 
 ### `bio-crispr-screens-jacks-analysis` — Correct the stale efficacy-prior cross-reference
 
