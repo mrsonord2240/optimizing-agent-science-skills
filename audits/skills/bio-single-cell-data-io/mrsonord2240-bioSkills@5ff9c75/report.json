@@ -1,0 +1,197 @@
+{
+  "meta": {
+    "skill_name": "bio-single-cell-data-io",
+    "description": "Read, write, create, and convert single-cell objects across AnnData (Python), Seurat (R), and SingleCellExperiment (R).",
+    "evaluated_on": "2026-09-23",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 9,
+    "source": "mrsonord2240/bioSkills@5ff9c75dc947fa7c7292315ae64198769d067faf:single-cell/data-io",
+    "audit_type": "final-pass-phase-2",
+    "pre_fix_report": "F:/OpenScience/audits/_pre-fix-20260919/bio-single-cell-data-io/eval_report_bio-single-cell-data-io_result.json",
+    "checkpoint": "F:/OpenScience/audits/_final_pass/bio-single-cell-data-io/CHECKPOINT.md",
+    "fix_log": "F:/optimizing-agent-science-skills/fixes/bio-single-cell-data-io.md",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {"result": "PASS", "detail": "All reported dimensions and retention claims were checked against real 10x PBMC data or synthetic ground truth; no fabricated results."},
+      "practice_boundaries": {"result": "PASS", "detail": "The outputs perform data I/O only and make no clinical or prescriptive claims."},
+      "methodological_ground": {"result": "PASS", "detail": "The raw/filtered distinction, axis orientation, and documented conversion-loss tradeoffs were exercised on live objects."},
+      "code_usability": {"result": "PASS", "detail": "All nine dynamic inputs executed; two Python examples and seven R blocks parsed. The documented raw-recovery route runs, with one minor semantic issue recorded as P2."}
+    }
+  },
+  "static_score": {
+    "subtotal": 93,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {"score": 12, "max": 12, "note": "Covers loading, object construction, storage choice, and conversion across the advertised ecosystems."},
+      "reliability": {"score": 10, "max": 12, "note": "Strong warnings and tested fallbacks; the displayed altExp check inspects sce_hvg rather than the zellkonverter result it claims to diagnose."},
+      "performance_context": {"score": 8, "max": 8, "note": "Sparse-storage and 60-GB dense-materialization warning is concrete and action-oriented."},
+      "agent_usability": {"score": 15, "max": 16, "note": "Clear routing and version caveats; very-large-object escape guidance remains brief."},
+      "human_usability": {"score": 8, "max": 8, "note": "Concise guide plus progressive SKILL.md detail and concrete error table."},
+      "security": {"score": 12, "max": 12, "note": "No credential handling or unsafe execution; preserves originals before lossy conversion."},
+      "maintainability": {"score": 12, "max": 12, "note": "Focused examples, no missing referenced files, and nonredundant guide structure."},
+      "agent_specific": {"score": 16, "max": 20, "note": "Precise triggers and related-skill boundaries; a single inventory-check snippet needs a variable correction."}
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 95.1,
+    "max": 100,
+    "assertion_pass_rate": {"passed": 32, "total": 33},
+    "inputs": [
+      {
+        "index": 1, "type": "Canonical", "label": "Load real raw 10x PBMC H5 with Scanpy",
+        "prompt": "Load the raw Cell Ranger matrix with Ensembl IDs, retain all feature types, and confirm it remains sparse.",
+        "status": "COMPLETED", "status_flag": "PASS", "executed": true,
+        "execution_note": "fp2_input1_raw_load.py executed against public 10x PBMC 1k v3 raw H5: 6,794,880 x 33,538, sparse=True, gene_ids present.",
+        "basic": 39, "specialized": 57, "total": 96, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          {"text": "Correct cell x gene dimensions reported", "result": "PASS", "note": "6,794,880 x 33,538."},
+          {"text": "Matrix remains sparse", "result": "PASS", "note": "scipy.sparse confirmed."},
+          {"text": "Ensembl IDs are available", "result": "PASS", "note": "gene_ids column present."},
+          {"text": "Non-GEX-retaining parameter executes", "result": "PASS", "note": "gex_only=False used."}
+        ]
+      },
+      {
+        "index": 2, "type": "Variant A", "label": "Load real filtered 10x PBMC H5 with Seurat v5",
+        "prompt": "Create a Seurat v5 object from filtered Cell Ranger H5 and report orientation and storage.",
+        "status": "COMPLETED", "status_flag": "PASS", "executed": true,
+        "execution_note": "fp2_input2_seurat_load.R ran through the env wrapper and asserted a 15,246 genes x 1,176 cells sparse counts layer; R returned a nonzero process status after the PASS output, but all explicit assertions completed.",
+        "basic": 39, "specialized": 56, "total": 95, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          {"text": "Seurat orientation is genes x cells", "result": "PASS", "note": "15,246 x 1,176."},
+          {"text": "v5 LayerData path executes", "result": "PASS", "note": "counts layer returned."},
+          {"text": "Counts remain sparse", "result": "PASS", "note": "inherits sparseMatrix."},
+          {"text": "Filtered input is handled without scope creep", "result": "PASS", "note": "I/O only."}
+        ]
+      },
+      {
+        "index": 3, "type": "Edge", "label": "Convert rich AnnData with raw, counts, and PCA to SCE",
+        "prompt": "Convert a rich h5ad to R, retain counts and embeddings, and recover the full raw snapshot.",
+        "status": "COMPLETED", "status_flag": "PASS", "executed": true,
+        "execution_note": "Fresh fp2_rich.h5ad was built from real PBMC data (700 HVGs, raw 33,538 genes). fp2_input3_conversion.R reproduced zellkonverter raw=TRUE altExp length 0 and schard raw recovery at 33,538 x 1,222 with nonzero/non-NA values.",
+        "basic": 37, "specialized": 55, "total": 92, "assertions_passed": 3, "assertions_total": 4,
+        "assertions": [
+          {"text": "Axes transpose correctly in R", "result": "PASS", "note": "700 x 1,222 SCE."},
+          {"text": "zellkonverter counts survive", "result": "PASS", "note": "assays X,counts."},
+          {"text": "schard use.raw=TRUE restores full raw snapshot", "result": "PASS", "note": "33,538 x 1,222, nonzero, no NA."},
+          {"text": "Displayed altExp check examines the zellkonverter object", "result": "FAIL", "note": "SKILL.md calls altExpNames(sce_hvg), not sce_zk/sce from readH5AD; zero does not diagnose zellkonverter."}
+        ]
+      },
+      {
+        "index": 4, "type": "Variant B", "label": "Export Seurat to h5ad and preserve scale.data separately",
+        "prompt": "Move a Seurat object with PCA and UMAP to h5ad; preserve scale.data for later use and verify the Python result.",
+        "status": "COMPLETED", "status_flag": "PASS", "executed": true,
+        "execution_note": "fp2_input4_seurat_to_h5ad.R built real PBMC Seurat data, wrote h5ad and a 500 x 1,176 scale-data RDS. fp2_input4_check_h5ad.py reloaded 1,176 x 15,246 with PCA 1,176x10 and UMAP 1,176x2.",
+        "basic": 39, "specialized": 56, "total": 95, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          {"text": "Documented export route executes", "result": "PASS", "note": "writeH5AD succeeded."},
+          {"text": "Both reductions survive", "result": "PASS", "note": "PCA and UMAP in obsm."},
+          {"text": "scale.data loss is not silent", "result": "PASS", "note": "No scale trace in h5ad; RDS sidecar round-trip equal."},
+          {"text": "Cell count survives", "result": "PASS", "note": "1,176 after Python reload."}
+        ]
+      },
+      {
+        "index": 5, "type": "Stress", "label": "Recover raw while assessing schard counts tradeoff",
+        "prompt": "Choose the reliable raw route for an HVG-subsetted h5ad and state whether counts come along.",
+        "status": "COMPLETED", "status_flag": "PASS", "executed": true,
+        "execution_note": "fp2_input5_raw_and_counts.R separately recovered raw 33,538x1,222 and HVG 700x1,222 objects; the latter exposed assay X only, without counts.",
+        "basic": 39, "specialized": 56, "total": 95, "assertions_passed": 3, "assertions_total": 3,
+        "assertions": [
+          {"text": "Raw shape is full-gene", "result": "PASS", "note": "33,538 x 1,222."},
+          {"text": "Default route is HVG-subsetted", "result": "PASS", "note": "700 x 1,222."},
+          {"text": "Counts caveat is accurate", "result": "PASS", "note": "assayNames X only."}
+        ]
+      },
+      {
+        "index": 6, "type": "Scope Boundary", "label": "Synthetic GEX plus antibody feature split",
+        "prompt": "Keep antibody-capture features on load and split a 20-cell GEX+ADT object without loss.",
+        "status": "COMPLETED", "status_flag": "PASS", "executed": true,
+        "execution_note": "fp2_input6_multimodal.py built synthetic 20x60 AnnData and exactly partitioned 50 GEX plus 10 ADT features.",
+        "basic": 39, "specialized": 58, "total": 97, "assertions_passed": 3, "assertions_total": 3,
+        "assertions": [
+          {"text": "Both feature types retain all cells", "result": "PASS", "note": "20 rows each."},
+          {"text": "No features lost or duplicated", "result": "PASS", "note": "50+10=60 and names disjoint."},
+          {"text": "Partition follows feature_types", "result": "PASS", "note": "Boolean filters used."}
+        ]
+      },
+      {
+        "index": 7, "type": "Adversarial", "label": "Insist on legacy SeuratDisk conversion",
+        "prompt": "Use SeuratDisk to convert my Seurat v5 object to h5ad.",
+        "status": "COMPLETED", "status_flag": "PASS", "executed": true,
+        "execution_note": "fp2_input7_seuratdisk.R created a fresh Seurat object; SaveH5Seurat worked and Convert failed with HDF5 unable-to-copy-object errors, matching the skill warning. The expected-failure process returned nonzero after the explicit PASS assertion.",
+        "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 3, "assertions_total": 3,
+        "assertions": [
+          {"text": "Legacy failure is reproduced", "result": "PASS", "note": "HDF5 object-copy failure."},
+          {"text": "Warning is not fabricated", "result": "PASS", "note": "Observed live."},
+          {"text": "Maintained alternative exists", "result": "PASS", "note": "Inputs 3-5 executed zellkonverter/schard routes."}
+        ]
+      },
+      {
+        "index": 8, "type": "New", "label": "Synthetic 10x MEX with duplicate symbols and non-GEX types",
+        "prompt": "Read this MEX using stable IDs, retain ADT and guide features, and avoid ambiguous symbols.",
+        "status": "COMPLETED", "status_flag": "PASS", "executed": true,
+        "execution_note": "fp2_input8_mex.py wrote and read a synthetic gzipped 10x MEX. Scanpy returned 3x4 with ENSG1, ENSG2, ADT1, GUIDE1 and all three feature types.",
+        "basic": 39, "specialized": 58, "total": 97, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          {"text": "MEX loader executes", "result": "PASS", "note": "3 x 4 object."},
+          {"text": "Stable IDs selected", "result": "PASS", "note": "ENSG IDs retained despite duplicate symbols."},
+          {"text": "ADT retained", "result": "PASS", "note": "Antibody Capture present."},
+          {"text": "Guide retained", "result": "PASS", "note": "CRISPR Guide Capture present."}
+        ]
+      },
+      {
+        "index": 9, "type": "New", "label": "Syntax-check all shipped examples and SKILL code blocks",
+        "prompt": "Validate the shipped data-I/O examples before I use them in a workflow.",
+        "status": "COMPLETED", "status_flag": "PASS", "executed": true,
+        "execution_note": "fp2_input9_code_blocks.py ast-parsed both Python blocks and extracted seven R blocks; fp2_input9_parse_r.R parsed all seven R blocks.",
+        "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          {"text": "Python examples parse", "result": "PASS", "note": "ast.parse passed."},
+          {"text": "All Python fences parse", "result": "PASS", "note": "2 blocks."},
+          {"text": "All R fences parse", "result": "PASS", "note": "7 blocks."},
+          {"text": "No referenced source file is absent", "result": "PASS", "note": "SKILL.md, guide, and two examples present."}
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 37.2,
+    "dynamic_weighted": 57.1,
+    "score": 94,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "All nine Phase-2 inputs executed on the exact required tip, including real raw and filtered 10x PBMC data.",
+    "The documented schard fallback correctly recovered a genuine full raw snapshot where zellkonverter did not expose it.",
+    "The Seurat-to-h5ad route preserved both PCA and UMAP and the new scale.data sidecar persisted exactly.",
+    "Raw-vs-filtered, sparse storage, stable IDs, and non-GEX feature preservation were verified with independent real or synthetic ground truth."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "Correct the zellkonverter raw diagnostic variable",
+      "observed_in": [3],
+      "problem": "The Recovering .raw block calls length(altExpNames(sce_hvg)) while its comment says this diagnoses zellkonverter raw=TRUE. sce_hvg is schard's default output, so its zero result cannot establish the zellkonverter result.",
+      "root_cause": "The check was added beside the schard fallback without retaining a variable for the zellkonverter object.",
+      "fix": "Assign readH5AD(..., raw=TRUE) to sce_zk and use length(altExpNames(sce_zk)); keep schard use.raw=TRUE as the recovery route."
+    }
+  ]
+}

@@ -4226,14 +4226,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The Skill correctly requires task-specific calibration but does not show how to detect non-separability or report that no single cutoff is justified.
 - Fix: Add a short calibration example or decision rule: inspect class overlap, report retrieval/enrichment or a threshold trade-off, and stop rather than emit a misleading universal cutoff when the labels are not separable.
 
-### `bio-single-cell-data-io` — scale.data workaround shows extraction but not how to persist it alongside the h5ad
-
-- Skill: 92, Production Ready · [mrsonord2240/bioSkills@3159a9b](https://github.com/mrsonord2240/bioSkills/tree/3159a9b8554882616c67265041666a3eb8353a7f/single-cell/data-io) · [viewer](skills/bio-single-cell-data-io/mrsonord2240-bioSkills@3159a9b/viewer.md)
-- Observed in inputs: 4, 8
-- Problem: SKILL.md's scale.data workaround (`as.matrix(LayerData(seurat_obj, layer='scale.data'))`) extracts the matrix into an R object but does not show saving it to disk, even though the whole point of the workaround is to preserve the data that the h5ad conversion drops.
-- Root cause: The caveat was added as a documentation fix for the P1 finding and stops at the extraction step rather than a full save-alongside pattern.
-- Fix: Add one more line showing a save call (e.g. `saveRDS(scale_data, 'scale_data.rds')` or `write.csv`), so the workaround is copy-pasteable end to end rather than requiring the agent to infer the persistence step.
-
 ### `bio-single-cell-trajectory-inference` — CellRank code fence is not self-contained -- guard is a comment, not built in
 
 - Skill: 92, Production Ready · [mrsonord2240/bioSkills@e8cf78a](https://github.com/mrsonord2240/bioSkills/tree/e8cf78a7ddb739b108b4a8789e042230aa09911c/single-cell/trajectory-inference) · [viewer](skills/bio-single-cell-trajectory-inference/mrsonord2240-bioSkills@e8cf78a/viewer.md)
@@ -4481,6 +4473,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The deleted usage-guide.md Tips bullet 'WikiPathways has fewer total pathways than KEGG; best used as a complement' has no surviving statement anywhere in SKILL.md or usage-guide.md -- the closest remaining content (the WikiPathways-vs-KEGG/Reactome table's Species row) compares organism counts, not pathway counts.
 - Root cause: The fix log's deletion table classified this bullet as 'no unique content' alongside several bullets that genuinely were duplicates, but this specific quantitative comparison was not actually restated elsewhere.
 - Fix: Either restore a one-line version of the claim (with a source, since the original was unsourced) in the WikiPathways vs KEGG/Reactome section, or drop it deliberately and note the removal in the fix log rather than folding it into the true-duplicate bucket.
+
+### `bio-single-cell-data-io` — Correct the zellkonverter raw diagnostic variable
+
+- Skill: 94, Production Ready · [mrsonord2240/bioSkills@5ff9c75](https://github.com/mrsonord2240/bioSkills/tree/5ff9c75dc947fa7c7292315ae64198769d067faf/single-cell/data-io) · [viewer](skills/bio-single-cell-data-io/mrsonord2240-bioSkills@5ff9c75/viewer.md)
+- Observed in inputs: 3
+- Problem: The Recovering .raw block calls length(altExpNames(sce_hvg)) while its comment says this diagnoses zellkonverter raw=TRUE. sce_hvg is schard's default output, so its zero result cannot establish the zellkonverter result.
+- Root cause: The check was added beside the schard fallback without retaining a variable for the zellkonverter object.
+- Fix: Assign readH5AD(..., raw=TRUE) to sce_zk and use length(altExpNames(sce_zk)); keep schard use.raw=TRUE as the recovery route.
 
 ### `bio-crispr-screens-batch-correction` — State JACKS compatibility or remove version implication
 
