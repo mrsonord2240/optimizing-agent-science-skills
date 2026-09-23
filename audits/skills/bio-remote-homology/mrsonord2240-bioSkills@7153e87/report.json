@@ -1,0 +1,231 @@
+{
+  "meta": {
+    "skill_name": "bio-remote-homology",
+    "description": "Detect distant homologs using profile and structure-aware methods that go beyond standard BLAST.",
+    "evaluated_on": "2026-09-22",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 11,
+    "source": "mrsonord2240/bioSkills@7153e877bfec221df95ba1f5758f4012e788b7aa:database-access/remote-homology",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md",
+    "pre_fix_report_archived_to": "F:\\OpenScience\\audits\\_pre-fix-20260922\\bio-remote-homology"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {"result": "PASS", "detail": "All measured values in the executed outputs came from local tool output; the two reasoning outputs retained uncertainty rather than fabricating a biological conclusion."},
+      "practice_boundaries": {"result": "PASS", "detail": "No individual diagnosis, treatment, or prescriptive medical claim was generated."},
+      "methodological_ground": {"result": "PASS", "detail": "The Skill consistently distinguishes statistical support, structural similarity, homology, and functional inference. Input 11 found an incomplete masking command, not a fallacious inference."},
+      "code_usability": {"result": "PASS", "detail": "All four shipped shell scripts passed bash -n and the three executable workflows completed on cached fixtures. The documented segmasker command runs but is functionally incomplete; it is tracked as P1."}
+    }
+  },
+  "static_score": {
+    "subtotal": 91,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {"score": 11, "max": 12, "note": "The decision matrix covers all claimed tool families and the repaired examples execute. Correctness is 3/4 because the low-complexity mitigation command only reports intervals and does not create a masked sequence for downstream profile construction."},
+      "reliability": {"score": 8, "max": 12, "note": "Scripts use set -euo pipefail, provide a real zero-hit Pfam result, save PSSMs, and cache databases. Fault tolerance is capped because the stated low-complexity recovery action does not deliver its promised masked FASTA."},
+      "performance_context": {"score": 8, "max": 8, "note": "The 296-line SKILL.md routes users through a compact decision matrix, points to executable examples, and avoids duplicated usage-guide content."},
+      "agent_usability": {"score": 15, "max": 16, "note": "Clear setup, method selection, thresholds, output fields, and failure modes make cold-start use strong. Error prevention is reduced by the low-complexity command that does not complete the stated mitigation."},
+      "human_usability": {"score": 8, "max": 8, "note": "Natural trigger language, explicit version introspection, and direct example prompts make the Skill discoverable and forgiving of tool-version drift."},
+      "security": {"score": 11, "max": 12, "note": "No credentials or sensitive data are embedded. Positional file inputs are quoted in shipped scripts, but file existence and output-path validation remain delegated to the CLIs."},
+      "maintainability": {"score": 11, "max": 12, "note": "Foldseek, iterative-profile, and Pfam workflows are separated into tested examples with a bundled toy fixture. PSI-BLAST-alone and HHsearch-alone remain inline rather than standalone examples."},
+      "agent_specific": {"score": 19, "max": 20, "note": "The trigger is precise; usage-guide, SKILL.md, and examples layer well; related-skill boundaries and uncertainty escape hatches are explicit. PSI-BLAST DB/order sensitivity prevents perfect idempotency."}
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 93.4,
+    "max": 100,
+    "assertion_pass_rate": {"passed": 42, "total": 44},
+    "inputs": [
+      {
+        "index": 1, "type": "Canonical", "label": "Pfam annotation of PRKACA",
+        "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Ran the shipped pfam_annotation.sh without edits against a local PF00069 fixture named as Pfam-A; the full production Pfam-A download remains blocked at about 1.7 GB.",
+        "note": "Pkinase PF00069.32 reported at full E=1.4e-79 and score=253.2.",
+        "basic": 38, "specialized": 58, "total": 96, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          {"text": "The shipped script completes with the documented --cut_ga workflow.", "result": "PASS", "note": "Completed from the audited copy with no script modification."},
+          {"text": "The domain row uses full-sequence E-value and score fields.", "result": "PASS", "note": "Reported 1.4e-79 and 253.2 match the HMMER domtbl fields."},
+          {"text": "The expected Pkinase family is recovered.", "result": "PASS", "note": "PF00069.32 Pkinase was present."},
+          {"text": "The reduced fixture is not represented as a production Pfam-A result.", "result": "PASS", "note": "The execution note names the production-database limitation."}
+        ]
+      },
+      {
+        "index": 2, "type": "Variant A", "label": "MMseqs2 twilight-zone sensitivity",
+        "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Ran default easy-search and -s 7.5 independently against the cached 300-sequence Swiss-Prot sample.",
+        "note": "The documented 5.7 default returned zero rows; -s 7.5 recovered Q197B6.",
+        "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          {"text": "Default sensitivity is inspected rather than assumed.", "result": "PASS", "note": "Tool output reports Sensitivity 5.7."},
+          {"text": "The default result contains no remote-homolog row.", "result": "PASS", "note": "default.m8 is empty."},
+          {"text": "The recommended -s 7.5 recovers the known homolog.", "result": "PASS", "note": "s75.m8 contains Q197B6."},
+          {"text": "The comparison uses the same query, database, and cutoff.", "result": "PASS", "note": "Only sensitivity differed."}
+        ]
+      },
+      {
+        "index": 3, "type": "Edge", "label": "Foldseek setup and cached structure search",
+        "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Executed the Required Setup block and the shipped structure branch with a cached 1ATP Foldseek database; multi-GB AFDB and ProstT5 downloads were not started.",
+        "note": "The repaired no-argument Foldseek version check passed and the script reused afdb_sp.dbtype to return a 1ATP self-hit.",
+        "basic": 38, "specialized": 58, "total": 96, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          {"text": "All Required Setup version checks return the advertised banners.", "result": "PASS", "note": "HMMER 3.4, MMseqs2 18.8cc5c, DIAMOND 2.2.6, HHblits 3.3.0, and Foldseek 10.941cd33 were printed."},
+          {"text": "The Foldseek cache guard recognizes a file-prefix database.", "result": "PASS", "note": "The script skipped download using afdb_sp.dbtype."},
+          {"text": "The structure branch emits the promised structural statistics.", "result": "PASS", "note": "results.m8 contains probability, two TM-scores, and lDDT."},
+          {"text": "Large blocked artifacts are not silently downloaded.", "result": "PASS", "note": "Only the cached small fixture was used."}
+        ]
+      },
+      {
+        "index": 4, "type": "Variant B", "label": "Shipped iterative PSI-BLAST, jackhmmer, and MMseqs2 comparison",
+        "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Ran examples/iterative_profile.sh unchanged on P17612 and the cached Swiss-Prot sample.",
+        "note": "All three method outputs contained Q197B6 and the comparison summary printed.",
+        "basic": 39, "specialized": 58, "total": 97, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          {"text": "The script builds a BLAST database before PSI-BLAST.", "result": "PASS", "note": "psiblast_db files were created and PSI-BLAST completed."},
+          {"text": "A reusable PSSM is saved.", "result": "PASS", "note": "Both ASN.1 and ASCII PSSM files were produced."},
+          {"text": "All three methods recover the known remote homolog.", "result": "PASS", "note": "Q197B6 appears in psiblast.tsv, jackhmmer.tbl, and mmseqs.m8."},
+          {"text": "The output warns that hit counts are not directly comparable.", "result": "PASS", "note": "The shipped summary caveat printed."}
+        ]
+      },
+      {
+        "index": 5, "type": "Stress", "label": "DIAMOND mode choice with jackhmmer cross-check",
+        "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Built a local DIAMOND database and ran default, --more-sensitive, and --ultra-sensitive modes plus jackhmmer.",
+        "note": "Default and --more-sensitive had no rows; --ultra-sensitive and jackhmmer recovered Q197B6.",
+        "basic": 38, "specialized": 58, "total": 96, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          {"text": "DIAMOND database construction succeeds.", "result": "PASS", "note": "makedb completed on the cached FASTA."},
+          {"text": "The documented mode distinction is empirically tested.", "result": "PASS", "note": "All three modes ran under the same e-value cutoff."},
+          {"text": "Only ultra-sensitive mode recovers the known homolog here.", "result": "PASS", "note": "ultra.tsv contains Q197B6; default.tsv and more.tsv are empty."},
+          {"text": "An independent profile method corroborates the hit.", "result": "PASS", "note": "jackhmmer.tbl contains Q197B6."}
+        ]
+      },
+      {
+        "index": 6, "type": "Scope Boundary", "label": "Functional inference from a Foldseek hit",
+        "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Direct Mode-D reasoning execution from the Foldseek failure-mode section; no CLI command is required for this scope decision.",
+        "note": "The response would report structural support while refusing an identical-function conclusion without sequence evidence and catalytic-residue checks.",
+        "basic": 37, "specialized": 57, "total": 94, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          {"text": "Structural similarity is not equated with identical function.", "result": "PASS", "note": "The Skill explicitly says fold-level similarity is necessary but not sufficient."},
+          {"text": "A structural statistic remains reportable.", "result": "PASS", "note": "Probability/TM-score can be stated as support, not proof."},
+          {"text": "The response names a next validation step.", "result": "PASS", "note": "Sequence evidence and conserved catalytic residues are required."},
+          {"text": "No clinical or diagnostic conclusion is made.", "result": "PASS", "note": "The task is molecular homology interpretation only."}
+        ]
+      },
+      {
+        "index": 7, "type": "Adversarial", "label": "Demand for certainty without statistics",
+        "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Direct Mode-D reasoning execution from the new explicit uncertainty escape hatch in SKILL.md.",
+        "note": "The response would retain the actual E-value/score/probability and say statistically supported match rather than confirmed homology.",
+        "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          {"text": "The answer keeps a quantitative support statistic.", "result": "PASS", "note": "SKILL.md now instructs this explicitly."},
+          {"text": "The answer avoids unqualified confirmation language.", "result": "PASS", "note": "It specifies statistically supported match rather than confirmed homology."},
+          {"text": "The request is answered rather than ignored.", "result": "PASS", "note": "It reports the match with its uncertainty."},
+          {"text": "The response stays within homology-inference scope.", "result": "PASS", "note": "No unsupported functional conclusion is added."}
+        ]
+      },
+      {
+        "index": 8, "type": "Stress", "label": "Direct documented Foldseek easy-search",
+        "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Executed the exact easy-search field list from SKILL.md independently of the shipped script on the cached 1ATP database.",
+        "note": "The returned self-hit had probability, both TM-scores, and lDDT of 1.000.",
+        "basic": 38, "specialized": 58, "total": 96, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          {"text": "The documented easy-search invocation parses.", "result": "PASS", "note": "Foldseek completed successfully."},
+          {"text": "The advertised output columns are present.", "result": "PASS", "note": "All ten requested columns appear in results.m8."},
+          {"text": "The positive control has strong structural support.", "result": "PASS", "note": "Probability, query TM-score, target TM-score, and lDDT are each 1.000."},
+          {"text": "The fixture limitation is explicit.", "result": "PASS", "note": "This is a cached 1ATP self-search, not AFDB-scale validation."}
+        ]
+      },
+      {
+        "index": 9, "type": "Edge", "label": "Pfam zero-hit response",
+        "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Ran the shipped pfam_annotation.sh unchanged on a synthetic poly-Q/poly-G query using the reduced local Pkinase fixture.",
+        "note": "The script exited 0 and printed the documented no-domains message.",
+        "basic": 39, "specialized": 58, "total": 97, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          {"text": "A zero-hit query does not crash under set -euo pipefail.", "result": "PASS", "note": "The script exited successfully."},
+          {"text": "The output is explicit rather than empty.", "result": "PASS", "note": "It printed No Pfam-A domains found above the gathering threshold."},
+          {"text": "No false Pkinase hit is emitted.", "result": "PASS", "note": "No domain row was printed."},
+          {"text": "The message retains the calibrated-threshold context.", "result": "PASS", "note": "The gathering threshold is named."}
+        ]
+      },
+      {
+        "index": 10, "type": "Variant B", "label": "Iterative HMMER checkpoint selection",
+        "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Ran the fixed SKILL.md jackhmmer block and its exact highest-numbered checkpoint glob on P17612 versus the cached Swiss-Prot sample.",
+        "note": "HMMER wrote iter-1.hmm and iter-2.hmm; the selected iter-2.hmm found Q197B6.",
+        "basic": 39, "specialized": 59, "total": 98, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          {"text": "The checkpoint prefix matches the documented glob.", "result": "PASS", "note": "The run produced iter-1.hmm and iter-2.hmm, not iter.hmm-*.hmm."},
+          {"text": "Early convergence does not require an absent round-3 file.", "result": "PASS", "note": "The dynamic glob selected the highest existing round."},
+          {"text": "The selected checkpoint is a usable HMM.", "result": "PASS", "note": "hmmsearch completed."},
+          {"text": "The downstream search recovers the known homolog.", "result": "PASS", "note": "hits.txt contains Q197B6."}
+        ]
+      },
+      {
+        "index": 11, "type": "Edge", "label": "Low-complexity masking before profile search",
+        "status": "COMPLETED", "status_flag": "⚠️", "executed": true,
+        "execution_note": "Ran the exact documented segmasker command on a synthetic low-complexity sequence, then compared it with an explicit -outfmt fasta invocation.",
+        "note": "The documented command emits interval 12 - 127, not a masked FASTA; -outfmt fasta emits a soft-masked sequence, but that required flag and output handoff are absent from SKILL.md.",
+        "basic": 28, "specialized": 39, "total": 67, "assertions_passed": 2, "assertions_total": 4,
+        "assertions": [
+          {"text": "The documented segmasker command executes.", "result": "PASS", "note": "It completed and reported the low-complexity interval."},
+          {"text": "The command detects the synthetic repeat region.", "result": "PASS", "note": "It reported interval 12 - 127."},
+          {"text": "The documented command emits a masked FASTA ready for profile construction.", "result": "FAIL", "note": "Default output is interval text, not FASTA."},
+          {"text": "The Skill specifies how to feed a masked sequence into the next profile command.", "result": "FAIL", "note": "It omits -outfmt fasta, an output path, and the masked-query handoff."}
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 36.4,
+    "dynamic_weighted": 56.0,
+    "score": 92,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "All shipped shell workflows pass syntax validation and completed on realistic cached molecular fixtures.",
+    "The Phase 1 HMMER checkpoint-prefix and Foldseek file-prefix cache fixes were independently reproduced at the audited tip.",
+    "The Skill preserves quantitative uncertainty and separates structural similarity from functional inference.",
+    "A bundled Pfam toy fixture permits a real hmmscan regression without downloading the full Pfam-A database."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "Make the low-complexity mitigation produce masked FASTA",
+      "observed_in": [11],
+      "problem": "The documented segmasker command prints only interval coordinates, so it does not create the masked query that the next profile-building command must consume.",
+      "root_cause": "The failure-mode section names a detection-only invocation but omits segmasker's output format and file handoff.",
+      "fix": "Replace the command with segmasker -infmt fasta -in query.fa -outfmt fasta > query.masked.fa, then explicitly use query.masked.fa for profile construction. State that the lowercase output is soft masking."
+    },
+    {
+      "priority": "P2",
+      "title": "Add standalone PSI-BLAST and HHsearch examples",
+      "observed_in": [],
+      "problem": "PSI-BLAST-alone and HHsearch-alone are runnable inline blocks but do not have companion example scripts like the other central workflows.",
+      "root_cause": "The executable examples focus on comparative iterative search, Pfam, and Foldseek.",
+      "fix": "When production databases are available, add small parameterized scripts or explicit runnable mini-fixtures for saved-PSSM reuse and HHsearch output inspection."
+    }
+  ]
+}

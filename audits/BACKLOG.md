@@ -22,7 +22,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The example passes cluster_rows=<OLO dendrogram> together with row_split=gene_info$pathway, a combination ComplexHeatmap rejects; the script was never run.
 - Fix: Drop row_split or use a numeric row_split (works with the dendrogram), or apply OLO within each pathway group; supply a runnable data preamble and state the constraint in SKILL.md next to the OLO block.
 
-## P1 (155)
+## P1 (156)
 
 ### `bio-data-visualization-lollipop-protein-maps` — Shipped example never completes and paints wrong colours
 
@@ -1240,6 +1240,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The Version Compatibility disclosure block added in the last fix pass covered only the two functions the fixer was explicitly told about (CalculateOraScore/CalculateQeaScore); it was not extended to the library-loading functions that also reach out to a remote server.
 - Fix: Add one sentence to Version Compatibility or Prerequisites noting that SetKEGG.PathLib/CrossReferencing/Setup.KEGGReferenceMetabolome download generic (non-user) reference libraries from metaboanalyst.ca on first use or after a 30-day cache expiry, mirroring the existing FELLA/KEGGREST live-dependency disclosure.
 
+### `bio-remote-homology` — Make the low-complexity mitigation produce masked FASTA
+
+- Skill: 92, Production Ready · [mrsonord2240/bioSkills@7153e87](https://github.com/mrsonord2240/bioSkills/tree/7153e877bfec221df95ba1f5758f4012e788b7aa/database-access/remote-homology) · [viewer](skills/bio-remote-homology/mrsonord2240-bioSkills@7153e87/viewer.md)
+- Observed in inputs: 11
+- Problem: The documented segmasker command prints only interval coordinates, so it does not create the masked query that the next profile-building command must consume.
+- Root cause: The failure-mode section names a detection-only invocation but omits segmasker's output format and file handoff.
+- Fix: Replace the command with segmasker -infmt fasta -in query.fa -outfmt fasta > query.masked.fa, then explicitly use query.masked.fa for profile construction. State that the lowercase output is soft masking.
+
 ### `bio-proteomics-spectral-libraries` — OpenSWATH TSV schema guidance omits transition_group_id
 
 - Skill: 93, Production Ready · [mrsonord2240/bioSkills@3f601a1](https://github.com/mrsonord2240/bioSkills/tree/3f601a1a50af8c52724edd5393938e2bda44cd79/proteomics/spectral-libraries) · [viewer](skills/bio-proteomics-spectral-libraries/mrsonord2240-bioSkills@3f601a1/viewer.md)
@@ -1264,7 +1272,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (482)
+## P2 (481)
 
 ### `bio-data-visualization-lollipop-protein-maps` — HGVSp edge cases and recurrence semantics undocumented
 
@@ -4778,21 +4786,13 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: detect_hook()/fit_dc50() were designed and verified against a single well-separated demo curve (hook_k/dc50 ~125); the ascending-arm truncation heuristic has no check for whether the retained pre-peak data actually reaches a plateau.
 - Fix: Add a diagnostic in fit_dc50() (e.g., compare the retained arm's maximum observed value against the fitted dmax_fit, or require a minimum number of near-plateau points before the peak) and surface a caveat in the output -- 'ascending-arm data may not reach the true plateau; treat Dmax as a lower bound' -- when that check fails.
 
-### `bio-remote-homology` — PSI-BLAST-alone and HHsearch-alone workflows still lack standalone example scripts
+### `bio-remote-homology` — Add standalone PSI-BLAST and HHsearch examples
 
-- Skill: 92, Production Ready · [mrsonord2240/bioSkills@1d0172a](https://github.com/mrsonord2240/bioSkills/tree/1d0172afd19ebbb57b51e5a48dca85451a093286/database-access/remote-homology) · [viewer](skills/bio-remote-homology/mrsonord2240-bioSkills@1d0172a/viewer.md)
+- Skill: 92, Production Ready · [mrsonord2240/bioSkills@7153e87](https://github.com/mrsonord2240/bioSkills/tree/7153e877bfec221df95ba1f5758f4012e788b7aa/database-access/remote-homology) · [viewer](skills/bio-remote-homology/mrsonord2240-bioSkills@7153e87/viewer.md)
 - Observed in inputs: —
-- Problem: Carried over from the original audit, untouched by this fix pass: only Foldseek, iterative-profile-comparison, and Pfam annotation ship as standalone examples/ scripts. PSI-BLAST and HHsearch/HHblits exist only as inline code blocks in SKILL.md.
-- Root cause: This fix pass scoped itself to the audit's P1/P2 findings and did not add new example scripts beyond the Pfam toy fixture.
-- Fix: If a future fix pass touches this Skill again, bundle examples/psiblast_pssm.sh and examples/hhsearch_pdb70.sh mirroring the existing script structure, using the same cached Swiss-Prot sample this audit used for PSI-BLAST.
-
-### `bio-remote-homology` — Fixed pfam_annotation.sh gives no explicit 'no domains found' message on a zero-hit query
-
-- Skill: 92, Production Ready · [mrsonord2240/bioSkills@1d0172a](https://github.com/mrsonord2240/bioSkills/tree/1d0172afd19ebbb57b51e5a48dca85451a093286/database-access/remote-homology) · [viewer](skills/bio-remote-homology/mrsonord2240-bioSkills@1d0172a/viewer.md)
-- Observed in inputs: 9
-- Problem: Auditor-added Input 9 confirms the script does not crash on a query with no real Pfam hit (correct, no regression), but it also prints no explicit message -- just an empty section under 'Per-protein Pfam domain summary'. An agent running this unattended could mistake a silent-empty result for a script failure or an unset query.
-- Root cause: The script was written assuming a query that has at least one domain hit; it has no explicit branch for the zero-hit case.
-- Fix: Add an `if [ ! -s query.domtbl ] \|\| ! grep -qv '^#' query.domtbl; then echo 'No Pfam-A domains found above the gathering threshold.'; fi` check after the hmmscan call in both examples/pfam_annotation.sh and examples/pfam_annotation_toy.sh.
+- Problem: PSI-BLAST-alone and HHsearch-alone are runnable inline blocks but do not have companion example scripts like the other central workflows.
+- Root cause: The executable examples focus on comparative iterative search, Pfam, and Foldseek.
+- Fix: When production databases are available, add small parameterized scripts or explicit runnable mini-fixtures for saved-PSSM reuse and HHsearch output inspection.
 
 ### `bio-shape-similarity` — obabel --gen3D can warn 'NaN in calculated coordinates' on some fused-ring scaffolds while still producing usable output
 
