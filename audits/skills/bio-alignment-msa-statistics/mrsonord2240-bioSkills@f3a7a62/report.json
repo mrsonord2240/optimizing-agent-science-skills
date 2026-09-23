@@ -1,0 +1,574 @@
+{
+  "meta": {
+    "skill_name": "bio-alignment-msa-statistics",
+    "description": "Calculate alignment statistics including sequence identity, conservation scores, substitution matrices, and similarity metrics. Use when comparing alignment quality, measuring sequence divergence, and analyzing evolutionary patterns.",
+    "evaluated_on": "2026-09-22",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 11,
+    "source": "mrsonord2240/bioSkills@f3a7a62091e42f6e98653b5b626de94c6f7bfff7:alignment/msa-statistics",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "All reported values were asserted against independently constructed data, Pwalign, ModelTest-NG, or deterministic conservation and distance invariants; no fabricated research results were emitted."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "The Skill reports alignment statistics and explicitly routes publication-grade evolutionary-distance modelling to dedicated tools; it makes no diagnostic or treatment claims."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Runs confirmed normalization, occupancy exclusion, gap/gap handling, alphabet-specific information-content bounds, and the documented ModelTest-NG handoff."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All 10 executable examples, the Pwalign comparison, both ModelTest-NG invocations, and the 11 audit inputs completed from an audit-owned source copy."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 96,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 12,
+        "max": 12,
+        "note": "Identity, conservation, information content, substitutions, gaps, quality scores, and distance handoff all have an executable or directly referenced route."
+      },
+      "reliability": {
+        "score": 12,
+        "max": 12,
+        "note": "The Skill documents normalization, alphabet warnings, undefined NaN cases, occupancy handling, ragged-A2M boundaries, and concrete recovery routes."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "A compact SKILL.md directs conditional reading of focused references and examples; the unavoidable exact N-by-N identity cost is explicitly bounded."
+      },
+      "agent_usability": {
+        "score": 16,
+        "max": 16,
+        "note": "Goals, decision table, executable import route, explicit metric definitions, common errors, and reference routing are consistently specified."
+      },
+      "human_usability": {
+        "score": 8,
+        "max": 8,
+        "note": "Natural trigger prompts, metric interpretation, warning-sign table, and short usage guide make the scope discoverable."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "No credentials, destructive operations, or raw user-code execution appear. File paths are necessarily user supplied, so callers retain normal filesystem-scope responsibility."
+      },
+      "maintainability": {
+        "score": 12,
+        "max": 12,
+        "note": "Shared normalization/background helpers, focused examples, reference index, deterministic selftest, and clear version notes support isolated maintenance."
+      },
+      "agent_specific": {
+        "score": 18,
+        "max": 20,
+        "note": "Trigger is precise, examples are composable, re-runs are deterministic, and explicit handoffs cover ragged A2M and publication-grade distance modelling."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 97.0,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 54,
+      "total": 54
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Pfam PF00042 globin seed statistics",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "73 x 141 seed; dotted and dashed forms agreed. Identity, conservation, IC, PSSM, JSD, gaps and quality score were asserted.",
+        "basic": 39,
+        "specialized": 59,
+        "total": 98,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Normalized dotted and dashed seed rows are identical",
+            "result": "PASS",
+            "note": "All 73 normalized rows matched."
+          },
+          {
+            "text": "PID4 identity matrix has unit diagonal",
+            "result": "PASS",
+            "note": "All diagonal values were one."
+          },
+          {
+            "text": "Alignment score preserves the checked Pfam value",
+            "result": "PASS",
+            "note": "alignment_score was -215960."
+          },
+          {
+            "text": "Occupancy-aware conservation matches the documented value",
+            "result": "PASS",
+            "note": "34.3 percent over 118 columns."
+          },
+          {
+            "text": "Protein IC stays physically bounded",
+            "result": "PASS",
+            "note": "Maximum was at most 6.23 bits."
+          }
+        ],
+        "executed": true,
+        "execution_note": "Executed from the audit-owned source copy; assertions and checked output are recorded in run/."
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "MAFFT, Clustal Omega and hmmalign outputs",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Three real aligner outputs completed through the same normalization and statistic routes.",
+        "basic": 39,
+        "specialized": 58,
+        "total": 97,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "All real-tool outputs retain eight rows",
+            "result": "PASS",
+            "note": "MAFFT, Clustal Omega and hmmalign AFA loaded."
+          },
+          {
+            "text": "hmmalign dot gaps normalize",
+            "result": "PASS",
+            "note": "Normalized rows contain standard dash gaps."
+          },
+          {
+            "text": "hmmalign protein IC remains bounded",
+            "result": "PASS",
+            "note": "Maximum was at most 6.23 bits."
+          },
+          {
+            "text": "Each identity matrix has a unit diagonal",
+            "result": "PASS",
+            "note": "All three matrices passed."
+          },
+          {
+            "text": "DistanceCalculator receives normalized alignments",
+            "result": "PASS",
+            "note": "BLOSUM62 distance calculation completed."
+          }
+        ],
+        "executed": true,
+        "execution_note": "Executed from the audit-owned source copy; assertions and checked output are recorded in run/."
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Terminal-overhang PID1-PID4 cross-check",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "169 Pwalign pairs plus six hand cases were replayed; the detailed comparison recorded 12 of 12 checks passing.",
+        "basic": 40,
+        "specialized": 59,
+        "total": 99,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "PID1 and PID2 agree with Pwalign on all raw rows",
+            "result": "PASS",
+            "note": "169-pair comparison had zero mismatches."
+          },
+          {
+            "text": "PID3 and PID4 agree after full-flank reconstruction",
+            "result": "PASS",
+            "note": "88 staggered-flank rows had zero mismatches."
+          },
+          {
+            "text": "Vectorized and scalar PID calculations agree",
+            "result": "PASS",
+            "note": "Maximum difference was 0."
+          },
+          {
+            "text": "The test discriminates the former denominator",
+            "result": "PASS",
+            "note": "Former denominator differed on 22 raw rows and 88 flank rows."
+          },
+          {
+            "text": "Hand-defined undefined identities stay NaN",
+            "result": "PASS",
+            "note": "All six hand cases passed."
+          }
+        ],
+        "executed": true,
+        "execution_note": "Executed from the audit-owned source copy; assertions and checked output are recorded in run/."
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Lowercase HBB DNA Ti/Tv and IC",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Lowercase MAFFT and uppercase HBB inputs normalized identically.",
+        "basic": 39,
+        "specialized": 59,
+        "total": 98,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Lowercase and uppercase DNA rows agree after loading",
+            "result": "PASS",
+            "note": "All normalized rows matched."
+          },
+          {
+            "text": "DNA is detected as nucleotide",
+            "result": "PASS",
+            "note": "The selected background was uniform DNA."
+          },
+          {
+            "text": "Transition count is correct",
+            "result": "PASS",
+            "note": "428 transitions were counted."
+          },
+          {
+            "text": "Transversion count is correct",
+            "result": "PASS",
+            "note": "355 transversions were counted."
+          },
+          {
+            "text": "DNA entropy and IC stay at or below 2 bits",
+            "result": "PASS",
+            "note": "Both bounds held."
+          }
+        ],
+        "executed": true,
+        "execution_note": "Executed from the audit-owned source copy; assertions and checked output are recorded in run/."
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "300 x 300 and 2000 x 300 identity matrices",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "All four methods completed on 300 x 300; PID4 completed on 2000 x 300 with a symmetric unit-diagonal matrix.",
+        "basic": 38,
+        "specialized": 58,
+        "total": 96,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "300 x 300 fixture shape is retained",
+            "result": "PASS",
+            "note": "Fixture loaded at the asserted shape."
+          },
+          {
+            "text": "All PID matrices are symmetric",
+            "result": "PASS",
+            "note": "PID1 through PID4 passed."
+          },
+          {
+            "text": "All PID diagonals are one",
+            "result": "PASS",
+            "note": "PID1 through PID4 passed."
+          },
+          {
+            "text": "2000 x 300 PID4 completes",
+            "result": "PASS",
+            "note": "Matrix shape was 2000 x 2000 with unit diagonal."
+          },
+          {
+            "text": "Stress quality scores are finite",
+            "result": "PASS",
+            "note": "Both alignment score and BLOSUM62 sum of pairs were finite."
+          }
+        ],
+        "executed": true,
+        "execution_note": "Executed from the audit-owned source copy; assertions and checked output are recorded in run/."
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Publication-distance ModelTest-NG handoff",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Both literal ModelTest-NG command forms selected a model on clean, real alignments; the exploratory DistanceCalculator example also executed.",
+        "basic": 38,
+        "specialized": 58,
+        "total": 96,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Exploratory BLOSUM62 distance matrix executes",
+            "result": "PASS",
+            "note": "Eight named rows and non-negative values were returned."
+          },
+          {
+            "text": "Clean nucleotide ModelTest input exists",
+            "result": "PASS",
+            "note": "Six-row normalized HBB FASTA was generated."
+          },
+          {
+            "text": "Clean amino-acid ModelTest input exists",
+            "result": "PASS",
+            "note": "Eight-row aligned globin FASTA was generated."
+          },
+          {
+            "text": "Both documented ModelTest-NG forms select a model",
+            "result": "PASS",
+            "note": "The WSL run emitted MODELTEST_NT_OK and MODELTEST_AA_OK."
+          }
+        ],
+        "executed": true,
+        "execution_note": "Executed from the audit-owned source copy; assertions and checked output are recorded in run/."
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Messy and degenerate alignments",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Case, dot, tilde, X, all-gap row, fragments, and extra all-gap columns were tested.",
+        "basic": 39,
+        "specialized": 58,
+        "total": 97,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Case, dot, tilde and U normalization uses the documented convention",
+            "result": "PASS",
+            "note": "The constructed row normalized to ACG-T-X."
+          },
+          {
+            "text": "All-gap sequence identity is NaN",
+            "result": "PASS",
+            "note": "No false zero identity was emitted."
+          },
+          {
+            "text": "Alphabet warning names unknown residue X",
+            "result": "PASS",
+            "note": "Two X residues were reported."
+          },
+          {
+            "text": "Sparse fragments return nan with zero used columns",
+            "result": "PASS",
+            "note": "average_conservation returned the documented pair."
+          },
+          {
+            "text": "All-gap columns do not affect the flat alignment score",
+            "result": "PASS",
+            "note": "Baseline and padded alignments agreed."
+          }
+        ],
+        "executed": true,
+        "execution_note": "Executed from the audit-owned source copy; assertions and checked output are recorded in run/."
+      },
+      {
+        "index": 8,
+        "type": "Variant B",
+        "label": "Rfam RNA Stockholm and dotted FASTA",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "146 x 221 real RNA seed and a lower/dot transformed FASTA normalized to identical rows.",
+        "basic": 39,
+        "specialized": 59,
+        "total": 98,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "RNA fixture has expected shape",
+            "result": "PASS",
+            "note": "146 rows by 221 columns."
+          },
+          {
+            "text": "Stockholm and dotted FASTA rows agree",
+            "result": "PASS",
+            "note": "All normalized rows matched."
+          },
+          {
+            "text": "RNA U maps to T",
+            "result": "PASS",
+            "note": "No U remained after loading."
+          },
+          {
+            "text": "RNA IC remains at or below 2 bits",
+            "result": "PASS",
+            "note": "Uniform DNA bound held."
+          },
+          {
+            "text": "RNA occupancy conservation matches the checked result",
+            "result": "PASS",
+            "note": "72.0 percent over 139 columns."
+          }
+        ],
+        "executed": true,
+        "execution_note": "Executed from the audit-owned source copy; assertions and checked output are recorded in run/."
+      },
+      {
+        "index": 9,
+        "type": "Edge",
+        "label": "Pfam kinase NaN-safe conservation ranking",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "37 x 419 real kinase seed verified dotted/Stockholm equivalence and NaN-safe ranking.",
+        "basic": 39,
+        "specialized": 58,
+        "total": 97,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Kinase fixture has expected shape",
+            "result": "PASS",
+            "note": "37 rows by 419 columns."
+          },
+          {
+            "text": "Stockholm and dotted FASTA rows agree",
+            "result": "PASS",
+            "note": "All normalized rows matched."
+          },
+          {
+            "text": "Ranked conservation excludes NaN columns",
+            "result": "PASS",
+            "note": "Ten ranked positions all had finite scores."
+          },
+          {
+            "text": "Occupancy handling uses 262 columns",
+            "result": "PASS",
+            "note": "The reported average was finite."
+          },
+          {
+            "text": "Kinase alignment score preserves checked value",
+            "result": "PASS",
+            "note": "alignment_score was -137507."
+          }
+        ],
+        "executed": true,
+        "execution_note": "Executed from the audit-owned source copy; assertions and checked output are recorded in run/."
+      },
+      {
+        "index": 10,
+        "type": "NEW Variant",
+        "label": "Synthetic IUPAC-rich DNA",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "New audit-owned 32-core-plus-4-IUPAC DNA rows test the ambiguity-aware nucleotide classifier.",
+        "basic": 39,
+        "specialized": 59,
+        "total": 98,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "IUPAC-rich rows are detected as nucleotide",
+            "result": "PASS",
+            "note": "The ambiguity-aware branch selected DNA."
+          },
+          {
+            "text": "DNA background is selected",
+            "result": "PASS",
+            "note": "pick_background returned the uniform DNA background."
+          },
+          {
+            "text": "Information content remains physically bounded",
+            "result": "PASS",
+            "note": "All columns were at or below 2 bits."
+          },
+          {
+            "text": "Input is normalized to upper case",
+            "result": "PASS",
+            "note": "All normalized rows were upper case."
+          },
+          {
+            "text": "Synthetic fixture is retained in audit data",
+            "result": "PASS",
+            "note": "phase2_iupac_synthetic.fasta was written under the audit data directory."
+          }
+        ],
+        "executed": true,
+        "execution_note": "Executed from the audit-owned source copy; assertions and checked output are recorded in run/."
+      },
+      {
+        "index": 11,
+        "type": "NEW Edge",
+        "label": "Clustal, PHYLIP, Nexus and Stockholm extension map",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "New round-trip test covered .clw, .phy, .nex and .stk from the Pfam seed; molecule type was supplied only for Biopython Nexus writing.",
+        "basic": 39,
+        "specialized": 59,
+        "total": 98,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Clustal extension reload preserves shape and rows",
+            "result": "PASS",
+            "note": "73 x 141 and all rows matched."
+          },
+          {
+            "text": "PHYLIP extension reload preserves shape and rows",
+            "result": "PASS",
+            "note": "73 x 141 and all rows matched."
+          },
+          {
+            "text": "Nexus extension reload preserves shape and rows",
+            "result": "PASS",
+            "note": "73 x 141 and all rows matched."
+          },
+          {
+            "text": "Stockholm extension reload preserves shape and rows",
+            "result": "PASS",
+            "note": "73 x 141 and all rows matched."
+          },
+          {
+            "text": "All four documented extension routes execute",
+            "result": "PASS",
+            "note": "The dedicated input-11 runner completed all four formats."
+          }
+        ],
+        "executed": true,
+        "execution_note": "Executed from the audit-owned source copy; assertions and checked output are recorded in run/."
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 38.4,
+    "dynamic_weighted": 58.2,
+    "score": 97,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Normalization and alphabet boundaries are explicit, shared by examples, and independently exercised on lowercase, dot-gapped, RNA, IUPAC-rich and unknown-residue inputs.",
+    "PID1-PID4 definitions withstand a 169-pair Pwalign comparison, staggered-flank reconstruction, scalar/vectorized agreement, and hand-defined edge cases.",
+    "Occupancy-aware conservation, NaN-safe ranking, information-content bounds, and gap/gap scoring have deterministic tests that catch their historical failure modes.",
+    "Publication-grade distance modelling is safely handed off to ModelTest-NG while the exploratory Biopython calculation remains runnable and clearly scoped."
+  ],
+  "recommendations": []
+}

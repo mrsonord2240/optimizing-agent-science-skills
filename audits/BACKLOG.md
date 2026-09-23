@@ -1280,7 +1280,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The local Philosopher/TPP-derived pepXML ingestion path is incompatible with the available Comet and OpenMS-reserialised fixtures; this is not a silent Skill failure because the guard stops it.
 - Fix: Before a workflow depends on this optional route, run the documented commands against a compatible pepXML fixture or functioning Philosopher/TPP environment and assert nonempty peptideprophet_result, prot.xml, and protein.tsv. Do not retry the prohibited standalone TPP installer.
 
-## P2 (463)
+## P2 (458)
 
 ### `bio-data-visualization-lollipop-protein-maps` — HGVSp edge cases and recurrence semantics undocumented
 
@@ -3161,46 +3161,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: SKILL.md's scope table names `datasets download virus` as in-scope, and the command works correctly when run, but there is no 'Code patterns' entry for it (unlike genome/gene), no --include guidance, and no dataformat virus-genome field example.
 - Root cause: The Skill's worked examples focus on genome/gene; virus was likely added to the scope table without a matching code-pattern section.
 - Fix: Add a short 'Download virus assemblies' code pattern alongside the existing genome/gene patterns, including a dataformat tsv virus-genome --fields example verified against a live --help catalog.
-
-### `bio-alignment-msa-statistics` — average_conservation raises ZeroDivisionError when no column qualifies
-
-- Skill: 88, Production Ready · [mrsonord2240/bioSkills@7c5cb44](https://github.com/mrsonord2240/bioSkills/tree/7c5cb44b27b2edaabdf5129fdd541523f4b9ef27/alignment/msa-statistics) · [viewer](skills/bio-alignment-msa-statistics/mrsonord2240-bioSkills@7c5cb44/viewer.md)
-- Observed in inputs: 7
-- Problem: On an alignment whose columns are all below min_occupancy (fragments, sparse supermatrix) the SKILL.md function divides by zero; conservation_profile.py on the same file prints "nan% over 0 of 16 columns" with a numpy RuntimeWarning, so the two disagree.
-- Root cause: The occupancy rule added in the fix returns NaN for every column but the mean does not guard the empty case.
-- Fix: Return (float("nan"), 0) when `used` is empty and print an explicit "no column has >= min_occupancy residues" message in the SKILL.md block and the example.
-
-### `bio-alignment-msa-statistics` — NaN conservation default with no NaN-aware ranking guidance
-
-- Skill: 88, Production Ready · [mrsonord2240/bioSkills@7c5cb44](https://github.com/mrsonord2240/bioSkills/tree/7c5cb44b27b2edaabdf5129fdd541523f4b9ef27/alignment/msa-statistics) · [viewer](skills/bio-alignment-msa-statistics/mrsonord2240-bioSkills@7c5cb44/viewer.md)
-- Observed in inputs: 9, 1
-- Problem: Ranking column_conservation() output with sorted(key=-score), the obvious answer to the shipped prompt "Which columns are most conserved?", silently misorders when NaN is present: Pfam globin seed top-10 values 0.37-1.0 vs 0.63-1.0 for the NaN-free ranking; kinase seed 157 NaN columns.
-- Root cause: SKILL.md says NaN columns are "skipped by the averages" but gives no ranking snippet or warning for sort/max.
-- Fix: Add a two-line NaN-safe ranking (e.g. `[i for i in np.argsort(-np.nan_to_num(scores, nan=-1)) ...]` or filter NaN first) beside the Per-Column Conservation block and say NaN must be filtered before sort/max.
-
-### `bio-alignment-msa-statistics` — is_nucleotide() 0.9 threshold misclassifies IUPAC-rich DNA silently
-
-- Skill: 88, Production Ready · [mrsonord2240/bioSkills@7c5cb44](https://github.com/mrsonord2240/bioSkills/tree/7c5cb44b27b2edaabdf5129fdd541523f4b9ef27/alignment/msa-statistics) · [viewer](skills/bio-alignment-msa-statistics/mrsonord2240-bioSkills@7c5cb44/viewer.md)
-- Observed in inputs: 7
-- Problem: A DNA alignment with 12% R/Y/S/W/K/M codes is treated as protein (Robinson background, IC max 5.70 bits) and check_alphabet is silent because those letters are also amino acids; at 5% it is detected correctly.
-- Root cause: Auto-detection counts only A/C/G/T/U/N and the protein alphabet contains every IUPAC letter, so the warning cannot fire.
-- Fix: Count the full IUPAC nucleotide set in is_nucleotide(), or print the chosen alphabet with the letter composition and let the caller override; document the threshold in SKILL.md.
-
-### `bio-alignment-msa-statistics` — selftest.py leaves the gap/gap fix, is_nucleotide and JSD smoothing untested
-
-- Skill: 88, Production Ready · [mrsonord2240/bioSkills@7c5cb44](https://github.com/mrsonord2240/bioSkills/tree/7c5cb44b27b2edaabdf5129fdd541523f4b9ef27/alignment/msa-statistics) · [viewer](skills/bio-alignment-msa-statistics/mrsonord2240-bioSkills@7c5cb44/viewer.md)
-- Observed in inputs: 1, 7
-- Problem: Mutation testing: 16 of 20 breaks were caught; survivors were is_nucleotide always False, Capra-Singh gap penalty removed, lambda smoothing removed and gap_statistics.py. alignment_score and sum_of_pairs live only in SKILL.md, so the gap/gap = 0 convention has no shipped regression check.
-- Root cause: selftest.py imports only example modules and asserts JSD shape rather than values; inline SKILL.md functions are not importable.
-- Fix: Move alignment_score and sum_of_pairs into msa_utils.py (or an examples file), assert the hand values (-12, 78, all-gap column unchanged), assert one JSD column value, and assert is_nucleotide/pick_background on the shipped DNA example.
-
-### `bio-alignment-msa-statistics` — Minor: guess_format(), A2M route and the Kimura 0.85 band
-
-- Skill: 88, Production Ready · [mrsonord2240/bioSkills@7c5cb44](https://github.com/mrsonord2240/bioSkills/tree/7c5cb44b27b2edaabdf5129fdd541523f4b9ef27/alignment/msa-statistics) · [viewer](skills/bio-alignment-msa-statistics/mrsonord2240-bioSkills@7c5cb44/viewer.md)
-- Observed in inputs: 2, 5
-- Problem: examples/CLI treat every non-Stockholm extension as FASTA (Clustal/PHYLIP argv fail); SKILL.md mentions A2M with upper=False but hmmalign A2M is ragged and cannot be loaded by AlignIO; kimura returns inf for 0.85 <= p < 0.854 (92 of 2628 seed pairs) where the formula is finite.
-- Root cause: Format guessing is two-way and the 0.85 cut-off is a rounded pole.
-- Fix: Map .aln/.phy/.a2m via a small dict or accept a format argument in load_alignment CLI use, point the A2M sentence to alignment-io for loading, and state that inf means p >= 0.85 by convention.
 
 ### `bio-bam-statistics` — mosdepth --fast-mode caveat names deletions only
 
