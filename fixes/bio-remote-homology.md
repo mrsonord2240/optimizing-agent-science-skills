@@ -85,3 +85,22 @@ inside SKILL.md. Verified by grep that each command survives in its new home.
 | "Pfam domain annotation (canonical)" block (hmmpress, hmmscan --cut_ga, awk filter) | "HMMER 3" section block (hmmpress + `hmmscan --cut_ga --domtblout`), `examples/pfam_annotation.sh` (awk columns) and the toy script |
 | "DIAMOND ultra-sensitive on a metagenome" block | "DIAMOND" section (makedb + blastp block; `--ultra-sensitive` in table and default-choice line) |
 | Common-errors rows: PSI-BLAST implausible hits, MMseqs2 all unrelated, DIAMOND misses BLAST hits, Foldseek structurally unrelated | the four matching Failure-modes sections (unchanged); the table keeps its two unique rows (HHblits prefilter, jackhmmer ConvergenceError) |
+
+---
+
+## 2026-09-22 (final-pass Phase 1)
+
+Continued from `482fd24` on `fix/database-access-remote-homology`. Full runnable-block walk used the
+cached P17612 / 300-sequence Swiss-Prot public fixture and the 1ATP Foldseek fixture. Phase-1
+checkpoint: `F:\OpenScience\audits\_final_pass\bio-remote-homology\CHECKPOINT.md`.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| Iterative HMMER block passes `--chkhmm iter.hmm` but then glob-selects `iter-*.hmm`; HMMER actually writes `iter.hmm-<round>.hmm`, so the documented `hmmsearch` cannot receive a checkpoint | P1 | Changed the checkpoint prefix to `iter`, matching the existing `iter-*.hmm` selector | ran — HMMER 3.4 wrote `iter-2.hmm` for P17612 vs cached Swiss-Prot; the exact downstream `hmmsearch` recovered Q197B6, E=8.6e-62 | The old spelling was a real shell/glob mismatch, not an early-convergence edge case |
+| Sequence-only `foldseek_search.sh` treats the ProstT5 cache as a directory, but `foldseek databases` writes a file-prefix database | P2 | Changed cache guard from `prostt5/` to `prostt5.dbtype` | ran + syntax — all shipped shells pass `bash -n`; structurally equivalent cached `afdb_sp.dbtype` guard skipped download and 1ATP self-search returned probability/TM-scores/lDDT 1.000 | ProstT5 weights were not downloaded; see Left unfixed |
+
+### Left unfixed / checkpointed
+
+- Full `pfam_annotation.sh` against current Pfam-A: needs approval for the ~1.7 GB compressed Pfam-A download. The same `hmmscan --cut_ga` command and bundled toy script ran and returned Pkinase E=1.4e-79 / score 253.2.
+- Default Foldseek AlphaFoldDB Swiss-Prot and sequence-only ProstT5: each requires multi-GB artifacts. The structural script ran end-to-end against a cached 1ATP Foldseek DB, but Sam is away and no >1 GB download was started.
+- Exact HHblits/HHsearch against UniRef30/PDB70: needs tens-of-GB profile databases. `hhsearch` itself ran against a one-entry local profile DB and returned the expected self-hit (Prob=100.00, E=3.3e-215); production DB execution remains gated by those artifacts.
