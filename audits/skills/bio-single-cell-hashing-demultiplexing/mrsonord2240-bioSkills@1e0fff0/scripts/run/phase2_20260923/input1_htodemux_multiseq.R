@@ -1,0 +1,26 @@
+.libPaths(c('F:/OpenScience/audit-envs/single-cell-transcriptomics-analyst/R-lib', .libPaths()))
+suppressPackageStartupMessages(library(Seurat))
+suppressPackageStartupMessages(library(Matrix))
+set.seed(2026092301)
+
+n <- 800L; tags <- paste0('HTO_', LETTERS[1:4]); ids <- sprintf('cell_%04d', seq_len(n))
+truth <- sample(c(rep('singlet', 680), rep('doublet', 80), rep('negative', 40)))
+sample_id <- sample(tags, n, replace=TRUE)
+hto <- matrix(rpois(4*n, 4), nrow=4, dimnames=list(tags, ids))
+for(i in seq_len(n)) {
+  if(truth[i] == 'singlet') hto[sample_id[i],i] <- hto[sample_id[i],i] + rpois(1,180)
+  if(truth[i] == 'doublet') hto[sample(tags,2),i] <- hto[sample(tags,2),i] + rpois(2,150)
+}
+gex <- Matrix(matrix(rpois(300*n,2), nrow=300, dimnames=list(paste0('G',1:300),ids)), sparse=TRUE)
+obj <- CreateSeuratObject(gex); obj[['HTO']] <- CreateAssay5Object(counts=hto[,colnames(obj)])
+obj <- NormalizeData(obj, assay='HTO', normalization.method='CLR', margin=2)
+ht <- HTODemux(obj, assay='HTO', positive.quantile=.99)
+ms <- MULTIseqDemux(obj, assay='HTO', autoThresh=TRUE)
+map <- c(Singlet='singlet',Doublet='doublet',Negative='negative')
+pred <- unname(map[as.character(ht$HTO_classification.global)])
+both <- pred=='singlet' & truth=='singlet'
+cat('HTODEMUX_COUNTS\n'); print(table(ht$HTO_classification.global))
+cat(sprintf('HTODEMUX_CLASS_ACCURACY=%.3f\n',mean(pred==truth)))
+cat(sprintf('HTODEMUX_SINGLET_ID_ACCURACY=%.3f\n',mean(as.character(ht$hash.ID[both])==gsub('_','-',sample_id[both]))))
+cat('MULTISEQ_COUNTS\n'); print(table(ms$MULTI_ID))
+cat(sprintf('MULTISEQ_CALLS_PRESENT=%s\n',all(!is.na(ms$MULTI_ID))))

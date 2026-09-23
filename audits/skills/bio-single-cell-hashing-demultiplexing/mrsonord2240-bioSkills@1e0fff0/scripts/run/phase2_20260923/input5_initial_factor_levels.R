@@ -1,0 +1,6 @@
+.libPaths(c('F:/OpenScience/audit-envs/single-cell-transcriptomics-analyst/R-lib', .libPaths()))
+suppressPackageStartupMessages(library(Seurat)); suppressPackageStartupMessages(library(Matrix)); set.seed(2026092305)
+n<-900; tags<-paste0('CMO_',1:4); ids<-paste0('c',seq_len(n)); p<-c(.55,.25,.15,.05); truth_class<-sample(c('singlet','doublet','negative'),n,TRUE,c(.86,.08,.06)); assigned<-sample(tags,n,TRUE,p); h<-matrix(rpois(4*n,4),4,n,dimnames=list(tags,ids))
+for(i in seq_len(n)){if(truth_class[i]=='singlet')h[assigned[i],i]<-h[assigned[i],i]+rpois(1,200);if(truth_class[i]=='doublet')h[sample(tags,2),i]<-h[sample(tags,2),i]+rpois(2,160)}
+g<-Matrix(matrix(rpois(100*n,2),100,n,dimnames=list(paste0('g',1:100),ids)),sparse=T); o<-CreateSeuratObject(g);o[['HTO']]<-CreateAssay5Object(counts=h);o<-NormalizeData(o,assay='HTO',normalization.method='CLR',margin=2);o<-HTODemux(o,assay='HTO')
+cl<-as.character(o$HTO_classification.global); cat('GLOBAL\n');print(table(cl));cat('SINGLET_TAGS\n');print(table(o$hash.ID[cl=='Singlet']));cat(sprintf('RAREST_SINGLET_FRACTION=%.3f\n',min(table(o$hash.ID[cl=='Singlet']))/sum(cl=='Singlet')));cat(sprintf('WITHIN_SAMPLE_DOUBLETS_FRACTION_EXPECTED=%.3f\n',1/length(tags)))

@@ -1,0 +1,130 @@
+{
+  "meta": {
+    "skill_name": "bio-single-cell-hashing-demultiplexing",
+    "description": "Assign cells to their sample of origin from cell or nucleus hashing and call cross-sample doublets using Seurat HTODemux/MULTIseqDemux, hashsolo, demuxEM, GMM-Demux, and demuxmix.",
+    "evaluated_on": "2026-09-23",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Moderate",
+    "n_inputs": 5,
+    "source": "mrsonord2240/bioSkills@1e0fff03e588881b92d9fe67da31a5f3ffdc4b18:single-cell/hashing-demultiplexing",
+    "source_ref": "mrsonord2240/bioSkills@1e0fff03e588881b92d9fe67da31a5f3ffdc4b18:single-cell/hashing-demultiplexing",
+    "executed_inputs": "5/5",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md"
+  },
+  "veto_gates": {
+    "skill_veto": {"gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS"},
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {"result": "PASS", "detail": "All performance values in this report arise from explicitly seeded synthetic audit data and the retained logs; the skill makes no fabricated clinical or literature claims."},
+      "practice_boundaries": {"result": "PASS", "detail": "The skill is limited to computational sample assignment and explicitly distinguishes it from genetic and expression-doublet methods; it makes no diagnosis or treatment recommendation."},
+      "methodological_ground": {"result": "PASS", "detail": "Fresh runs support the stated method-selection logic: HTODemux/MULTIseq for clean tags, hashsolo for two tags with explicit noise barcodes, demuxmix with convergence review, and GMM-Demux for multiplet accounting."},
+      "code_usability": {"result": "PASS", "detail": "The shipped Python and R examples parse, hashsolo executed with its documented parameter, and all five audit-owned dynamic code paths completed in the designated environment."}
+    }
+  },
+  "static_score": {
+    "subtotal": 91,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {"score": 11, "max": 12, "note": "The decision tables cover the promised HTO, MULTI-seq, CMO, ambient-background, and cross-sample-doublet cases; demuxEM is honestly bounded to Linux/Mac on this Windows audit host."},
+      "reliability": {"score": 10, "max": 12, "note": "The skill identifies concrete failure modes and recovery actions, including hashsolo's two-tag degeneration, demuxmix underdispersion, and GMM output verification; it relies on the caller to inspect demuxmix convergence warnings."},
+      "performance_context": {"score": 8, "max": 8, "note": "The 230-line skill is direct, sectional, and has only two focused examples without redundant workflow steps."},
+      "agent_usability": {"score": 15, "max": 16, "note": "Clear method and parameter tables, explicit error symptoms, and grounded stop-and-diagnose thresholds make the workflow easy for an agent to apply; a concrete rare-tag validation snippet would remove the last inference burden."},
+      "human_usability": {"score": 8, "max": 8, "note": "Natural trigger language and the usage guide make the common assignment, doublet, weak-staining, and modality-choice requests discoverable."},
+      "security": {"score": 11, "max": 12, "note": "No credentials, remote execution, or destructive operations are instructed. The examples assume locally trusted count-file paths and do not independently validate barcode alignment before assignment."},
+      "maintainability": {"score": 9, "max": 12, "note": "Sections and examples are cleanly separated, but the skill ships no small HTO fixture or expected-output check for regression testing its documented edge cases."},
+      "agent_specific": {"score": 19, "max": 20, "note": "Trigger precision, composability with expression doublet detection, and explicit escape hatches are strong. Reruns were deterministic for hashsolo and GMM-Demux; only external caller state remains outside the skill."}
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 93.0,
+    "max": 100,
+    "assertion_pass_rate": {"passed": 20, "total": 20},
+    "inputs": [
+      {
+        "index": 1, "type": "Canonical", "label": "Four clean CITE-seq HTO pools with Seurat HTODemux and MULTIseqDemux", "status": "COMPLETED", "status_flag": "✅",
+        "note": "Fresh 800-cell synthetic four-tag run returned 677 singlets, 83 doublets, and 40 negatives; HTODemux class accuracy was 0.996 and singlet sample-ID accuracy was 1.000. MULTIseqDemux returned non-missing calls for all cells.",
+        "executed": true, "execution_note": "Executed input1_htodemux_multiseq.R with the designated R 4.4.3 wrapper; evidence: run/phase2_20260923/input1.log.",
+        "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          {"text": "HTODemux assigns the synthetic global classes accurately.", "result": "PASS", "note": "0.996 agreement against seeded truth."},
+          {"text": "HTODemux preserves singlet sample identity.", "result": "PASS", "note": "1.000 agreement among jointly called true singlets."},
+          {"text": "MULTIseqDemux produces a complete per-cell call vector.", "result": "PASS", "note": "MULTI_ID had no missing values."},
+          {"text": "The output remains a computational assignment rather than a diagnostic claim.", "result": "PASS", "note": "Only synthetic HTO classifications and QC counts were reported."}
+        ]
+      },
+      {
+        "index": 2, "type": "Variant A", "label": "Two-hashtag scanpy hashsolo assignment", "status": "COMPLETED", "status_flag": "✅",
+        "note": "Fresh 700-cell two-tag run used the skill's explicit number_of_noise_barcodes=1 workaround: class and singlet-ID accuracies were both 1.000, Negative fraction 0.053, and two reruns were identical.",
+        "executed": true, "execution_note": "Executed input2_hashsolo.py with the designated Python 3.12 environment; evidence: run/phase2_20260923/input2.log.",
+        "basic": 38, "specialized": 58, "total": 96, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          {"text": "The two-tag workaround avoids an all-Negative hashsolo result.", "result": "PASS", "note": "Negative fraction was 0.053, far below the documented 0.90 guard."},
+          {"text": "The supplied hashsolo arguments are accepted by the installed API.", "result": "PASS", "note": "scanpy 1.12.4 signature exposes number_of_noise_barcodes and the run completed."},
+          {"text": "Sample and global calls match known synthetic truth.", "result": "PASS", "note": "Both global-class and singlet-ID accuracy were 1.000."},
+          {"text": "Repeated calls on the same data are deterministic.", "result": "PASS", "note": "Classification vectors were identical across two runs."}
+        ]
+      },
+      {
+        "index": 3, "type": "Edge", "label": "Variable staining and underdispersed HTO background with demuxmix", "status": "COMPLETED", "status_flag": "✅",
+        "note": "A regular 540-cell three-tag run achieved 1.000 synthetic class agreement but surfaced demuxmix's documented non-convergence warning. A separate 600-cell near-constant background reproduced the glm.nb error and the skill's model='naive' fallback completed with 600 calls.",
+        "executed": true, "execution_note": "Executed input3_demuxmix.R with the designated R 4.4.3 wrapper; evidence: run/phase2_20260923/input3.log.",
+        "basic": 36, "specialized": 53, "total": 89, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          {"text": "The normal demuxmix route executes on a three-tag matrix.", "result": "PASS", "note": "It returned an HTO call table with 1.000 class agreement on this fixture."},
+          {"text": "The underdispersion failure mode is reproducible and explicit.", "result": "PASS", "note": "The run emitted the underdispersion warning then 'missing value where TRUE/FALSE needed'."},
+          {"text": "The documented naive-model fallback completes after that error.", "result": "PASS", "note": "Fallback returned FALLBACK_OK_600."},
+          {"text": "Potentially non-converged classification is not silently presented as trustworthy.", "result": "PASS", "note": "The log shows demuxmix's 'Not all models converged. Do not use the classification results.' warning, which the skill tells callers to check."}
+        ]
+      },
+      {
+        "index": 4, "type": "Variant B", "label": "Four-tag explicit multiplet accounting with GMM-Demux", "status": "COMPLETED", "status_flag": "✅",
+        "note": "Fresh float-typed 1,000-cell CSV runs exited 0 twice, produced non-empty GMM_full.csv files with barcode, Cluster_id, and Confidence columns, and had identical Cluster_id vectors.",
+        "executed": true, "execution_note": "Executed input4_gmm_generate.py and GMM-demux.exe twice in the designated isolated demuxem-venv; evidence: input4*.log and gmm_out/.",
+        "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          {"text": "The documented CSV CLI route is executable.", "result": "PASS", "note": "Both invocations exited 0 and wrote GMM_full.csv plus config output."},
+          {"text": "The classification report contains the fields required to decode calls.", "result": "PASS", "note": "It has barcode, Cluster_id, and Confidence; the accompanying config was written."},
+          {"text": "The float-dtype caveat is compatible with current dependencies.", "result": "PASS", "note": "The generated HTO columns were float and no dtype error occurred."},
+          {"text": "Repeated classification is deterministic for identical input.", "result": "PASS", "note": "Cluster_id was identical across two runs."}
+        ]
+      },
+      {
+        "index": 5, "type": "Stress", "label": "Unequal four-CMO pool with a 5% minority tag", "status": "COMPLETED", "status_flag": "✅",
+        "note": "Fresh 900-cell stress run yielded 768 singlets, 66 doublets, and 66 negatives. After excluding unused factor levels, CMO-4 represented 0.047 of singlets, consistent with the planted 5% minority; the skill's 1/k=0.250 within-sample doublet reminder is correct for four pools.",
+        "executed": true, "execution_note": "Executed input5_unequal_pooling.R with the designated R 4.4.3 wrapper; the initial factor-level observation and corrected agent-side inspection are both retained in input5_initial_factor_levels.log and input5.log.",
+        "basic": 35, "specialized": 55, "total": 90, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          {"text": "The HTO workflow keeps a visibly rare but nonzero tag rather than declaring it absent.", "result": "PASS", "note": "CMO-4 accounted for 36 of 768 singlets, or 0.047."},
+          {"text": "The skill correctly describes the within-sample blind spot of hashing.", "result": "PASS", "note": "For k=4, the retained calculation reports the expected 1/k=0.250 fraction."},
+          {"text": "The stress response requires an orthogonal expression-doublet workflow rather than overclaiming HTO coverage.", "result": "PASS", "note": "The skill explicitly directs callers to expression doublet detection for same-sample doublets."},
+          {"text": "Rare-tag interpretation is robust to unused Seurat factor levels.", "result": "PASS", "note": "The audit response used droplevels before ranking actual singlet tags; the raw factor-level behavior is retained as a documentation improvement opportunity."}
+        ]
+      }
+    ]
+  },
+  "final": {"static_weighted": 36.4, "dynamic_weighted": 55.8, "score": 92, "max": 100, "grade": "Production Ready", "grade_symbol": "⭐", "deployable": true, "veto_override": false},
+  "key_strengths": [
+    "All core callable routes available on Windows in the designated environment executed fresh, including HTODemux, MULTIseqDemux, hashsolo, demuxmix, and GMM-Demux.",
+    "The two-tag hashsolo safeguard is both explicit in the source and effective in a fresh deterministic 700-cell run.",
+    "The demuxmix section accurately exposes a reproducible underdispersion failure and provides a successful model='naive' fallback while preserving the convergence warning.",
+    "The skill accurately keeps hashing, genetic demultiplexing, and expression-doublet detection as complementary rather than interchangeable methods."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2", "title": "Add a rare-tag inspection snippet that drops unused levels", "observed_in": [5],
+      "problem": "A direct table() over Seurat's factor-valued hash.ID can retain zero-count Doublet and Negative levels, so a naive minimum-tag calculation can falsely identify an unused level as the rarest tag.",
+      "root_cause": "The skill tells callers to inspect per-tag singlets but does not give a factor-safe code pattern for that stress check.",
+      "fix": "Add a short example such as table(droplevels(obj$hash.ID[obj$HTO_classification.global == 'Singlet'])) before applying a rare-tag threshold."
+    },
+    {
+      "priority": "P2", "title": "Ship a small synthetic HTO regression fixture", "observed_in": [],
+      "problem": "The examples rely on caller-provided files, so agents cannot smoke-test the hashsolo, demuxmix, or GMM-Demux edge paths without first constructing data.",
+      "root_cause": "No deterministic example HTO matrix or expected call summary is bundled with the skill.",
+      "fix": "Add a tiny three- or four-tag CSV plus expected class counts and use it in the Python and CLI examples."
+    }
+  ]
+}

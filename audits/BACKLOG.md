@@ -3586,22 +3586,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The advice lives only in the error table, not in the patterns agents copy.
 - Fix: Add random_state / scvi.settings.seed to the code blocks and name max_epochs explicitly in the scVI snippet rather than relying on the internal heuristic.
 
-### `bio-single-cell-hashing-demultiplexing` — GMM-Demux's SSD-mtx writer does not 'always' fail as SKILL.md states
-
-- Skill: 90, Production Ready · [mrsonord2240/bioSkills@0de5e44](https://github.com/mrsonord2240/bioSkills/tree/0de5e44090dd0428293282bc6feff9e1389817f6/single-cell/hashing-demultiplexing) · [viewer](skills/bio-single-cell-hashing-demultiplexing/mrsonord2240-bioSkills@0de5e44/viewer.md)
-- Observed in inputs: 3, 5
-- Problem: SKILL.md says the SSD-mtx writer step 'always attempts to write a same-sample-droplet mtx file after classification and that step throws ValueError... even on an otherwise-correct run.' On a fresh 1000-cell 4-tag run, GMM-Demux exited 0 and wrote SSD_mtx/ without error.
-- Root cause: The fixer's own test run happened to trigger the failure and generalized it as universal; it appears to be data- or environment-dependent rather than deterministic across all inputs.
-- Fix: Soften 'always attempts... and that step throws' to something like 'can throw... on some inputs/environments'; keep the underlying advice (judge success by GMM_full.csv, not exit code) unchanged, since it is safe regardless of whether the mtx step fails.
-
-### `bio-single-cell-hashing-demultiplexing` — No bundled example dataset for smoke-testing the fixed patterns
-
-- Skill: 90, Production Ready · [mrsonord2240/bioSkills@0de5e44](https://github.com/mrsonord2240/bioSkills/tree/0de5e44090dd0428293282bc6feff9e1389817f6/single-cell/hashing-demultiplexing) · [viewer](skills/bio-single-cell-hashing-demultiplexing/mrsonord2240-bioSkills@0de5e44/viewer.md)
-- Observed in inputs: —
-- Problem: The Skill still ships no small synthetic HTO dataset alongside examples/, so verifying the hashsolo/demuxmix/GMM-Demux patterns requires generating data from scratch each time (as this audit and the original audit both did independently).
-- Root cause: examples/ contains only code, no fixture data.
-- Fix: Add a small synthetic 2-3 tag HTO CSV under examples/data/ so the hashsolo and GMM-Demux patterns are runnable as-is without the agent first writing a data generator.
-
 ### `bio-vcf-basics` — Wrong bcftools query -H tip in usage guide
 
 - Skill: 90, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/variant-calling/vcf-basics) · [viewer](skills/bio-vcf-basics/GPTomics-bioSkills@d91ed3d/viewer.md)
@@ -3913,6 +3897,22 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: A labeled reference run can contain overlapping ECFP4 values, and a naive cutoff derivation excluded its listed true hop while returning zero candidates.
 - Root cause: The Skill correctly requires task-specific calibration but does not show how to detect non-separability or report that no single cutoff is justified.
 - Fix: Add a short calibration example or decision rule: inspect class overlap, report retrieval/enrichment or a threshold trade-off, and stop rather than emit a misleading universal cutoff when the labels are not separable.
+
+### `bio-single-cell-hashing-demultiplexing` — Add a rare-tag inspection snippet that drops unused levels
+
+- Skill: 92, Production Ready · [mrsonord2240/bioSkills@1e0fff0](https://github.com/mrsonord2240/bioSkills/tree/1e0fff03e588881b92d9fe67da31a5f3ffdc4b18/single-cell/hashing-demultiplexing) · [viewer](skills/bio-single-cell-hashing-demultiplexing/mrsonord2240-bioSkills@1e0fff0/viewer.md)
+- Observed in inputs: 5
+- Problem: A direct table() over Seurat's factor-valued hash.ID can retain zero-count Doublet and Negative levels, so a naive minimum-tag calculation can falsely identify an unused level as the rarest tag.
+- Root cause: The skill tells callers to inspect per-tag singlets but does not give a factor-safe code pattern for that stress check.
+- Fix: Add a short example such as table(droplevels(obj$hash.ID[obj$HTO_classification.global == 'Singlet'])) before applying a rare-tag threshold.
+
+### `bio-single-cell-hashing-demultiplexing` — Ship a small synthetic HTO regression fixture
+
+- Skill: 92, Production Ready · [mrsonord2240/bioSkills@1e0fff0](https://github.com/mrsonord2240/bioSkills/tree/1e0fff03e588881b92d9fe67da31a5f3ffdc4b18/single-cell/hashing-demultiplexing) · [viewer](skills/bio-single-cell-hashing-demultiplexing/mrsonord2240-bioSkills@1e0fff0/viewer.md)
+- Observed in inputs: —
+- Problem: The examples rely on caller-provided files, so agents cannot smoke-test the hashsolo, demuxmix, or GMM-Demux edge paths without first constructing data.
+- Root cause: No deterministic example HTO matrix or expected call summary is bundled with the skill.
+- Fix: Add a tiny three- or four-tag CSV plus expected class counts and use it in the Python and CLI examples.
 
 ### `bio-single-cell-trajectory-inference` — CellRank code fence is not self-contained -- guard is a comment, not built in
 
