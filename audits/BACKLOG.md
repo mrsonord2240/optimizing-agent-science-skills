@@ -1344,7 +1344,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (373)
+## P2 (372)
 
 ### `bio-data-visualization-lollipop-protein-maps` — HGVSp edge cases and recurrence semantics undocumented
 
@@ -3898,30 +3898,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: No deterministic example HTO matrix or expected call summary is bundled with the skill.
 - Fix: Add a tiny three- or four-tag CSV plus expected class counts and use it in the Python and CLI examples.
 
-### `bio-single-cell-trajectory-inference` — CellRank code fence is not self-contained -- guard is a comment, not built in
-
-- Skill: 92, Production Ready · [mrsonord2240/bioSkills@e8cf78a](https://github.com/mrsonord2240/bioSkills/tree/e8cf78a7ddb739b108b4a8789e042230aa09911c/single-cell/trajectory-inference) · [viewer](skills/bio-single-cell-trajectory-inference/mrsonord2240-bioSkills@e8cf78a/viewer.md)
-- Observed in inputs: 6
-- Problem: The CellRank code block's Windows multiprocessing-guard requirement is documented in a comment above the fence ('Run this block inside if __name__ == "__main__":') but the fence itself is not wrapped, so a literal copy-paste into a standalone .py file still crashes with the original RuntimeError until the agent manually applies the guard.
-- Root cause: A markdown code fence meant to be pasted inline into a larger script cannot itself contain the enclosing if __name__ guard without restructuring the whole example as a standalone script.
-- Fix: Either ship the CellRank example as a complete standalone script (like examples/scvelo_velocity.py) with the guard built in, or add one line making the requirement impossible to miss, e.g. a one-line minimal scaffold showing `if __name__ == "__main__": <indented block>`.
-
-### `bio-single-cell-trajectory-inference` — CellRank's VelocityKernel path with deterministic-mode velocity is not caveated
-
-- Skill: 92, Production Ready · [mrsonord2240/bioSkills@e8cf78a](https://github.com/mrsonord2240/bioSkills/tree/e8cf78a7ddb739b108b4a8789e042230aa09911c/single-cell/trajectory-inference) · [viewer](skills/bio-single-cell-trajectory-inference/mrsonord2240-bioSkills@e8cf78a/viewer.md)
-- Observed in inputs: 9
-- Problem: This re-audit's new Input B found that feeding the fix's own recommended mode='deterministic' velocity into CellRank's VelocityKernel gives much weaker fate-probability entropy separation (0.36 vs 0.32) than the PseudotimeKernel route documented and tested elsewhere in the Skill (1.79 vs 0.82).
-- Root cause: Deterministic mode is the Skill's own 'least recommended... quick first pass' option; its weaker per-cell velocity estimates propagate into weaker CellRank fate discrimination when used as a VelocityKernel input, but this specific combination is not called out.
-- Fix: Add a short note near the CellRank section or the RNA Velocity compatibility note: when only mode='deterministic' velocity is available, prefer PseudotimeKernel (or another non-velocity-derived direction source) over VelocityKernel for fate mapping, or explicitly flag that VelocityKernel fate probabilities inherit deterministic mode's weaker discrimination.
-
-### `bio-single-cell-trajectory-inference` — monocle3_trajectory.R ships as an example but remains untested on this platform
-
-- Skill: 92, Production Ready · [mrsonord2240/bioSkills@e8cf78a](https://github.com/mrsonord2240/bioSkills/tree/e8cf78a7ddb739b108b4a8789e042230aa09911c/single-cell/trajectory-inference) · [viewer](skills/bio-single-cell-trajectory-inference/mrsonord2240-bioSkills@e8cf78a/viewer.md)
-- Observed in inputs: —
-- Problem: Unchanged from the original audit: Monocle3/SeuratWrappers do not install on Windows in this environment (confirmed by TOOLS.md), so examples/monocle3_trajectory.R has never been executed by any audit.
-- Root cause: The Skill correctly frames Monocle3 as a documented alternative rather than the primary path (now that primary_tool is PAGA), but the shipped example itself carries no compatibility note of its own.
-- Fix: Add a one-line note at the top of examples/monocle3_trajectory.R matching the Installation section's Windows caveat, so an agent reading the example file alone (without SKILL.md context) is not misled.
-
 ### `bio-metabolomics-pathway-mapping` — Stop after failed mummichog validation
 
 - Skill: 92.3, Production Ready · [mrsonord2240/bioSkills@bc75020](https://github.com/mrsonord2240/bioSkills/tree/bc7502038043b387617e236ee116d251c4bd5b50/metabolomics/pathway-mapping) · [viewer](skills/bio-metabolomics-pathway-mapping/mrsonord2240-bioSkills@bc75020/viewer.md)
@@ -4177,6 +4153,22 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The Recovering .raw block calls length(altExpNames(sce_hvg)) while its comment says this diagnoses zellkonverter raw=TRUE. sce_hvg is schard's default output, so its zero result cannot establish the zellkonverter result.
 - Root cause: The check was added beside the schard fallback without retaining a variable for the zellkonverter object.
 - Fix: Assign readH5AD(..., raw=TRUE) to sce_zk and use length(altExpNames(sce_zk)); keep schard use.raw=TRUE as the recovery route.
+
+### `bio-single-cell-trajectory-inference` — Move neighbor construction out of scVelo moments
+
+- Skill: 94, Production Ready · [mrsonord2240/bioSkills@4ce42c1](https://github.com/mrsonord2240/bioSkills/tree/4ce42c1553b0f2ae3e4c068a8d5f7e1566b5c2d1/single-cell/trajectory-inference) · [viewer](skills/bio-single-cell-trajectory-inference/mrsonord2240-bioSkills@4ce42c1/viewer.md)
+- Observed in inputs: 4
+- Problem: The documented scv.pp.moments call still computes neighbors and emits a deprecation warning that this behavior will be removed in scVelo 0.4.0.
+- Root cause: The current example preserves a scVelo 0.3-compatible convenience path rather than making Scanpy neighbor construction explicit.
+- Fix: Before scv.pp.moments, add the equivalent explicit scanpy neighbors step and use moments only for moments; rerun the deterministic pancreas regression after updating it.
+
+### `bio-single-cell-trajectory-inference` — Split installation instructions by platform
+
+- Skill: 94, Production Ready · [mrsonord2240/bioSkills@4ce42c1](https://github.com/mrsonord2240/bioSkills/tree/4ce42c1553b0f2ae3e4c068a8d5f7e1566b5c2d1/single-cell/trajectory-inference) · [viewer](skills/bio-single-cell-trajectory-inference/mrsonord2240-bioSkills@4ce42c1/viewer.md)
+- Observed in inputs: —
+- Problem: The generic R install fence still presents monocle3 and SeuratWrappers commands before the immediately following Windows caveat says they cannot install there.
+- Root cause: Cross-platform installation guidance is ordered as a single generic block rather than selected by operating system.
+- Fix: Label the GitHub R commands as non-Windows and give Windows users a separate PAGA, DPT, Slingshot, and tradeSeq installation path first.
 
 ### `bio-causal-genomics-fine-mapping` — PAINTOR remains unexecuted
 

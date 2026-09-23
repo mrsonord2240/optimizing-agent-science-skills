@@ -1,0 +1,154 @@
+{
+  "meta": {
+    "skill_name": "bio-single-cell-trajectory-inference",
+    "description": "Infers developmental trajectories, pseudotime, RNA velocity, and directed fate probabilities from single-cell data using topology-first PAGA, DPT, Palantir, scVelo, Slingshot, tradeSeq, and CellRank 2.",
+    "evaluated_on": "2026-09-23",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "mrsonord2240/bioSkills@4ce42c1553b0f2ae3e4c068a8d5f7e1566b5c2d1:single-cell/trajectory-inference",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md"
+  },
+  "veto_gates": {
+    "skill_veto": { "gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS" },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "No output fabricated measurements, clinical findings, or citations; observed values came from executed real-data runs." },
+      "practice_boundaries": { "result": "PASS", "detail": "The executed boundary response preserves that pseudotime is not elapsed time and fate calls are predictions rather than measurements." },
+      "methodological_ground": { "result": "PASS", "detail": "The Skill requires topology and a biologically anchored root before ordering, represents bifurcation uncertainty as probabilities, and warns against velocity over-interpretation." },
+      "code_usability": { "result": "PASS", "detail": "All six computational inputs executed to checked assertions in the designated environment; the shipped CellRank guard and deterministic scVelo fallback both ran on Windows." }
+    }
+  },
+  "static_score": {
+    "subtotal": 95,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 12, "max": 12, "note": "Topology selection, rooted pseudotime, fate uncertainty, velocity, and R/Python workflows are all covered with runnable primary routes." },
+      "reliability": { "score": 11, "max": 12, "note": "Specific fallbacks and known version failures are documented; a platform-aware installation split would make the Windows path even harder to misuse." },
+      "performance_context": { "score": 8, "max": 8, "note": "The topology-first decision table avoids unnecessary analyses and the 228-line instruction file stays focused." },
+      "agent_usability": { "score": 15, "max": 16, "note": "Clear goals, decision table, common errors, and checked script entry point guide an agent; one deprecated scVelo neighbor call remains." },
+      "human_usability": { "score": 8, "max": 8, "note": "Natural trigger language, explicit caveats, and related-skill links make the workflow discoverable and safe to redirect." },
+      "security": { "score": 12, "max": 12, "note": "No secrets, shell interpolation, destructive operations, or sensitive-data exposure were found." },
+      "maintainability": { "score": 11, "max": 12, "note": "Runnable CellRank logic is isolated in a parameterized script and Python sources parse; future scVelo API migration should be localized." },
+      "agent_specific": { "score": 18, "max": 20, "note": "Trigger scope and escape hatches are strong; platform-specific install instructions could be selected before presenting a failing command." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 93.9,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 28, "total": 28 },
+    "inputs": [
+      {
+        "index": 1, "type": "Canonical", "label": "PAGA topology and marker-rooted DPT on Paul15", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Executed phase2_input1_paga_dpt.py on 2,730 real Paul15 cells after retaining the documented sc.pl.paga call required for init_pos='paga'; MEP DPT 0.0332 versus mature mean 0.3790.",
+        "note": "Topology, PAGA-initialized UMAP, and root-anchored DPT completed.", "basic": 37, "specialized": 56, "total": 93, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "PAGA executes before DPT.", "result": "PASS", "note": "Leiden, PAGA, PAGA plot, UMAP, diffusion map, and DPT all completed." },
+          { "text": "The root is anchored to a biological progenitor label.", "result": "PASS", "note": "Root was selected from real 7MEP cells rather than UMAP position." },
+          { "text": "MEP precedes mature populations in DPT.", "result": "PASS", "note": "0.0332 is lower than 0.3790." },
+          { "text": "The result is checked rather than inferred from exit status.", "result": "PASS", "note": "Cluster-level pseudotime values were asserted." }
+        ]
+      },
+      {
+        "index": 2, "type": "Variant A", "label": "Palantir fate uncertainty on branching progenitors", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Executed phase2_input2_palantir.py on real Paul15 data: three terminal states, MEP entropy 0.6995, mature entropy 0.0599.",
+        "note": "Palantir diffusion, multiscale space, and fate probabilities completed.", "basic": 37, "specialized": 57, "total": 94, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "The Palantir API executes with installed packages.", "result": "PASS", "note": "Diffusion maps, multiscale space, and run_palantir completed." },
+          { "text": "Terminal states are represented as probabilities rather than hard branch labels.", "result": "PASS", "note": "branch_probs produced three terminal-state columns." },
+          { "text": "Progenitor entropy exceeds mature entropy.", "result": "PASS", "note": "0.6995 exceeds 0.0599." },
+          { "text": "Root selection is explicit.", "result": "PASS", "note": "The early cell was an observed 7MEP cell." }
+        ]
+      },
+      {
+        "index": 3, "type": "Edge", "label": "Discrete PBMC types must not be forced into a trajectory", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Executed phase2_input3_pbmc_boundary.py on real 10x PBMC 1k: 15 clusters, 0 isolated at 0.03 and 3 at 0.5, median nonzero PAGA connectivity 0.2574.",
+        "note": "This intentionally shows why a single PAGA threshold is not a continuum decision.", "basic": 36, "specialized": 54, "total": 90, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "PAGA executes on mature PBMC types.", "result": "PASS", "note": "Full PBMC preprocessing and PAGA completed." },
+          { "text": "A single threshold is not treated as a biological classifier.", "result": "PASS", "note": "The two thresholds give materially different isolation counts." },
+          { "text": "The Skill directs marker corroboration instead of forced ordering.", "result": "PASS", "note": "Its PAGA caveat explicitly requires connectivity distribution and marker identity." },
+          { "text": "No unsupported pseudotime is generated for this boundary case.", "result": "PASS", "note": "The executed workflow stops at topology evidence." }
+        ]
+      },
+      {
+        "index": 4, "type": "Variant B", "label": "Deterministic RNA velocity on pancreatic endocrinogenesis", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Executed phase2_input4_scvelo.py, the documented deterministic core, on 3,696 real pancreas cells: mean confidence 0.7126 and Ductal was the earliest mean velocity-pseudotime cluster at 0.1301.",
+        "note": "The tested workaround avoids the documented scvelo 0.3.4 plus numpy/pandas incompatibilities.", "basic": 38, "specialized": 58, "total": 96, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "The documented deterministic scVelo workflow runs end to end.", "result": "PASS", "note": "Moments, velocity, graph, confidence, and velocity pseudotime completed." },
+          { "text": "The run avoids the incompatible stochastic and dynamical modes.", "result": "PASS", "note": "mode='deterministic' was explicit." },
+          { "text": "The observed ordering is biologically coherent.", "result": "PASS", "note": "Ductal is the earliest mean cluster." },
+          { "text": "Output quality is checked numerically.", "result": "PASS", "note": "Mean confidence and cluster pseudotime were printed and asserted." }
+        ]
+      },
+      {
+        "index": 5, "type": "Stress", "label": "Slingshot plus raw-count tradeSeq", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Executed phase2_input5_slingshot_tradeseq.R through the required rs.sh wrapper: five lineages, MEP pseudotime 1.1925 near the lineage start, scaled matrix minimum -8.5197, scaled fitGAM rejected it, and raw-count associationTest returned 150 rows.",
+        "note": "The run directly tests the repaired raw-counts caveat rather than documentation alone.", "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Slingshot recovers a branched lineage structure.", "result": "PASS", "note": "Five lineages were detected." },
+          { "text": "The MEP root is near the selected lineage origin.", "result": "PASS", "note": "The bounded near-start test passed." },
+          { "text": "Scaled values are rejected for fitGAM.", "result": "PASS", "note": "fitGAM returned the documented non-negative count error." },
+          { "text": "Raw counts support downstream tradeSeq.", "result": "PASS", "note": "associationTest completed for all 150 retained genes." }
+        ]
+      },
+      {
+        "index": 6, "type": "Scope Boundary", "label": "Guarded CellRank 2 fate mapping", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Executed phase2_input6_cellrank.py under the isolated cellrank-venv with the source script's Windows guard: 10 macrostates, MEP entropy 1.7858, mature entropy 0.8189, with transition, GPCCA, fate probability, and lineage-driver steps completed.",
+        "note": "The initial unguarded audit harness failure was retained separately; the guarded shipped path completed as designed.", "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "The shipped CellRank script includes a Windows entry-point guard.", "result": "PASS", "note": "The source guard was asserted before execution." },
+          { "text": "The PseudotimeKernel plus ConnectivityKernel workflow runs.", "result": "PASS", "note": "Transition matrices and GPCCA completed." },
+          { "text": "Fate uncertainty declines after commitment.", "result": "PASS", "note": "MEP entropy 1.7858 exceeds mature entropy 0.8189." },
+          { "text": "The required outputs are checked after execution.", "result": "PASS", "note": "Macrostates and entropy values were printed and evaluated." }
+        ]
+      },
+      {
+        "index": 7, "type": "Adversarial", "label": "Request to turn pseudotime into diagnosis or elapsed time", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Executed the source-grounded boundary check in phase2_input7_scope_boundary.py; all four required limits were present, including non-identifiability, non-clock pseudotime, prediction-not-measurement fate language, and mature-tissue velocity rejection.",
+        "note": "The appropriate output is a refusal to claim diagnosis, real duration, or measured fate, followed by a request for orthogonal validation.", "basic": 37, "specialized": 57, "total": 94, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "The Skill rejects elapsed-time interpretation of pseudotime.", "result": "PASS", "note": "The governing principle states pseudotime is geometry, not a clock." },
+          { "text": "The Skill does not overclaim a unique dynamic from one snapshot.", "result": "PASS", "note": "The non-identifiability limitation is explicit." },
+          { "text": "Fate is framed as a prediction rather than a measurement.", "result": "PASS", "note": "The required boundary clause is present." },
+          { "text": "Invalid mature-tissue velocity is rejected.", "result": "PASS", "note": "The common-errors guidance says not to interpret those arrows." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 38.0,
+    "dynamic_weighted": 56.3,
+    "score": 94,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "The topology-first governing principle prevents the common error of imposing pseudotime on discrete populations.",
+    "All primary computational routes ran on real data with checked biological or numerical assertions.",
+    "The documented deterministic scVelo fallback and guarded CellRank script work in the designated Windows environment.",
+    "The raw-count requirement for tradeSeq was verified by both its scaled-matrix failure and a successful raw-count fit."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2", "title": "Move neighbor construction out of scVelo moments", "observed_in": [4],
+      "problem": "The documented scv.pp.moments call still computes neighbors and emits a deprecation warning that this behavior will be removed in scVelo 0.4.0.",
+      "root_cause": "The current example preserves a scVelo 0.3-compatible convenience path rather than making Scanpy neighbor construction explicit.",
+      "fix": "Before scv.pp.moments, add the equivalent explicit scanpy neighbors step and use moments only for moments; rerun the deterministic pancreas regression after updating it."
+    },
+    {
+      "priority": "P2", "title": "Split installation instructions by platform", "observed_in": [],
+      "problem": "The generic R install fence still presents monocle3 and SeuratWrappers commands before the immediately following Windows caveat says they cannot install there.",
+      "root_cause": "Cross-platform installation guidance is ordered as a single generic block rather than selected by operating system.",
+      "fix": "Label the GitHub R commands as non-Windows and give Windows users a separate PAGA, DPT, Slingshot, and tradeSeq installation path first."
+    }
+  ]
+}
