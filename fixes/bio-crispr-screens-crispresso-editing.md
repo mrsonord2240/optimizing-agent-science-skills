@@ -89,3 +89,18 @@ command to re-run in `F:\OpenScience\audits\_final_pass\bio-crispr-screens-crisp
 Flag names/output rows for PE mode were cross-checked against `CRISPResso2/CRISPRessoCORE.py`
 source (`pinellolab/CRISPResso2@master`) and match what SKILL.md documents -- a docs/source check,
 not a live run.
+
+## 2026-09-23: Environment corrective Phase 1 (no source change)
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| Docker API was healthy but all new containers stalled at `created`, blocking `docker cp`, `docker start`, and fresh CRISPResso output | P1 environment | No Skill change. Added an audit-owned recovery probe and preserved its logs; did not restart Docker because an unrelated `gbrain-litellm-proxy` container was running. | ran | `hello-world:latest` independently remained `created` for 90 seconds. The probe stopped only its own client process and removed only `audit_crispresso_recovery_hello`; `docker ps -a` then contained no audit probe. Docker Desktop 4.86.0 / Engine 29.7.2 still answered `version`, `info`, and `ps`. |
+
+### Left unresolved
+
+The shared Docker container-start path remains unavailable. A Docker Desktop restart is required to
+recover it, but would interrupt the unrelated `gbrain-litellm-proxy` (`restart=unless-stopped`) and
+is prohibited by this corrective pass. Therefore `run_dynamic.ps1` was not rerun and
+`validation.json` was not produced. Source remains exactly
+`205c8574b66f30fb04cb2fdbd0464f6d37a70920`; no source commit or push is needed. Recovery evidence:
+`F:\OpenScience\audits\bio-crispr-screens-crispresso-editing\run\recovery_*`.
