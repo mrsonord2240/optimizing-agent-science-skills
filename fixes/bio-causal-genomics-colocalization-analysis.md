@@ -92,3 +92,16 @@ Worktree `F:\OpenScience\wt\causal-genomics-colocalization-analysis`, branch
 **Left blocked, not fixed:** `references/moloc.md`'s snippet — `install.lock` in the shared `mendelian-randomization-analyst` env is currently held by another session; moloc's GitHub install was not attempted rather than force past a held lock. `references/ecaviar-clpp.md` and `references/pwcoco.md` CLI recipes — both need compiled C++ binaries this env's own tooling pass already time-boxed out (2026-09-17); PWCoCo also needs an individual-level bfile (a candidate one is already cached for a sibling Skill). Neither is a new finding; both pre-date this pass. SMR + HEIDI and HyPrColoc were not re-run this phase — both already have real, documented end-to-end verification from the 2026-09-18 / 2026-09-21 passes above and neither is gated by the held lock.
 
 Nothing needs Sam yet; see CHECKPOINT.md for what each blocked item needs before Phase 2.
+
+---
+
+# bio-causal-genomics-colocalization-analysis — corrective final-pass Phase 1 (2026-09-22)
+
+Worktree `F:\OpenScience\wt\causal-genomics-colocalization-analysis`, branch
+`fix/causal-genomics-colocalization-analysis`, commit `6c994a8`.
+
+| finding | priority | change | verified | notes |
+|---|---|---|---|---|
+| Research Veto M3: `scripts/coloc_susie.R` checked `estimate_s_rss` only for GWAS, so an eQTL LD mismatch with lambda=1.0 continued to a PP.H4=1 output | P0 | Added a separate eQTL z-score/LD lambda check, using the existing `--eqtl-n` and `--lambda-max`, before either `runsusie()` call; updated the coloc.susie reference to state both traits are checked | ran | Self-contained `scripts/test_coloc_susie_eqtl_ld_guard.R` builds an independent eQTL genotype panel against an AR(1) GWAS LD matrix, observes lambda=1.000000, and asserts the explicit eQTL stop plus absence of a summary file. Its Bash runner exits 0 only after the R assertions emit PASS. Current matched-LD Input 9 still produced rs90 x rs90 with PP.H4=1.0. Both changed R files parsed, `bash -n` passed, and `git diff --check` passed. |
+
+Left unfixed: the pre-existing moloc, eCAVIAR, and PWCoCo execution blockers remain unchanged and are documented in the checkpoint; this corrective pass found no other new blocker. Source commits: `6c994a8` (guard/test) and `dd57ffa` (executable test runner). No Phase 2 report was written.
