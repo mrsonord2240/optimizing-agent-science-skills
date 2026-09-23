@@ -1288,7 +1288,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (386)
+## P2 (385)
 
 ### `bio-data-visualization-lollipop-protein-maps` — HGVSp edge cases and recurrence semantics undocumented
 
@@ -3474,22 +3474,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: This P2 was explicitly scoped out of the current fix dispatch (fix log: 'not in this dispatch's scope... left for a future pass').
 - Fix: Add a concrete before/after example (e.g. cyclosporine A, already named in usage-guide.md but never coded) showing embedding failure or degraded diversity under default settings versus success under useMacrocycleTorsions=True.
 
-### `bio-metabolomics-targeted-analysis` — Matrix factor, recovery, and carryover still lack runnable code
-
-- Skill: 90, Production Ready · [mrsonord2240/bioSkills@9cf654d](https://github.com/mrsonord2240/bioSkills/tree/9cf654de316d9ad9ab699c4f9d545cfcd7eabd6b/metabolomics/targeted-analysis) · [viewer](skills/bio-metabolomics-targeted-analysis/mrsonord2240-bioSkills@9cf654d/viewer.md)
-- Observed in inputs: 4, 5
-- Problem: The pre-fix P1 covered accuracy/precision/matrix-factor/carryover collectively; this fix added runnable code only for precision (correctly prioritized -- it was the one with a real silent-failure risk). Matrix factor and carryover are still threshold-table rows with a prose formula, not a code block.
-- Root cause: The fix targeted the one formula an agent could get quantitatively wrong (nested variance components); matrix factor and carryover are simple ratio/percentage arithmetic an agent is unlikely to derive incorrectly, so they were left as documentation.
-- Fix: If time allows in a future pass, add a short code block for IS-normalized matrix factor and carryover-as-%-of-LLOQ, matching the style of the new Precision subsection, for full parity with the calibration/IS-normalization/ion-ratio sections.
-
-### `bio-metabolomics-targeted-analysis` — Description remains jargon-dense for non-expert trigger phrasing
-
-- Skill: 90, Production Ready · [mrsonord2240/bioSkills@9cf654d](https://github.com/mrsonord2240/bioSkills/tree/9cf654de316d9ad9ab699c4f9d545cfcd7eabd6b/metabolomics/targeted-analysis) · [viewer](skills/bio-metabolomics-targeted-analysis/mrsonord2240-bioSkills@9cf654d/viewer.md)
-- Observed in inputs: —
-- Problem: The frontmatter description relies on MRM/SRM/ion-ratio/%RE vocabulary; a user phrasing a request without this vocabulary may under-trigger relative to sibling skills.
-- Root cause: Description is written for an expert audience; this is an explicit, logged trade-off (fixes/bio-metabolomics-targeted-analysis.md), not an oversight -- the description already disambiguates against 3 sibling skills.
-- Fix: Optionally add one plain-language trigger phrase (e.g. 'give me a concentration in units for a known compound') alongside the technical terms; not required for deployment.
-
 ### `bio-molecular-standardization` — No policy for replicate measurements that disagree
 
 - Skill: 90, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/molecular-standardization) · [viewer](skills/bio-molecular-standardization/GPTomics-bioSkills@d91ed3d/viewer.md)
@@ -4185,6 +4169,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The documented pbmarkdup command was verified only with a deterministic synthetic unaligned HiFi-style BAM. Its behavior on a real HiFi amplicon BAM or FASTQ remains unobserved.
 - Root cause: The audit environment has no small public HiFi amplicon dataset and the checkpoint records no suitable source.
 - Fix: When a public HiFi amplicon BAM or FASTQ under 50 MB is available, run the documented command and assert flag or removal behavior against independently inspected duplicate families.
+
+### `bio-metabolomics-targeted-analysis` — Investigate the bundled ggplot2 example's post-output nonzero exit in the target R runtime
+
+- Skill: 94, Production Ready · [mrsonord2240/bioSkills@a23f43a](https://github.com/mrsonord2240/bioSkills/tree/a23f43a7558a4ed755dea34196feaebc5affcfc1/metabolomics/targeted-analysis) · [viewer](skills/bio-metabolomics-targeted-analysis/mrsonord2240-bioSkills@a23f43a/viewer.md)
+- Observed in inputs: 1
+- Problem: examples/targeted_quantification.R printed its complete expected calibration and identity-confirmation output on two fresh runs but returned status 2816 after output materialization. A base-R control through the same wrapper returned 0.
+- Root cause: The evidence localizes the issue to the ggplot2 example or its runtime teardown rather than the base-R wrapper, but does not yet identify a reproducible source-code defect.
+- Fix: Reproduce in a clean R 4.4.3 plus ggplot2 target environment, retain the valid-output assertion, and fix or document the specific graphics-device or package-teardown cause if the nonzero exit persists.
 
 ### `bio-microbiome-amplicon-processing` — Add a QIIME2 Deblur no-surviving-reads preflight
 

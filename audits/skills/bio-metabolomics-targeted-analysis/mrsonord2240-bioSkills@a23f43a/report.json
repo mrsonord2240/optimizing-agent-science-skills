@@ -1,0 +1,273 @@
+{
+  "meta": {
+    "skill_name": "bio-metabolomics-targeted-analysis",
+    "description": "Designs and validates quantitative targeted metabolomics assays to report absolute concentrations, including calibration, internal standards, ion-ratio confirmation, matrix effect, recovery, carryover, and ICH M10 validation.",
+    "evaluated_on": "2026-09-23",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Moderate",
+    "n_inputs": 7,
+    "source": "mrsonord2240/bioSkills@a23f43a7558a4ed755dea34196feaebc5affcfc1:metabolomics/targeted-analysis",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "All quantitative claims in the executed outputs were computed from explicitly labelled synthetic fixtures or were direct values emitted by the current shipped scripts; no clinical efficacy, patient result, DOI, or untraceable statistical claim was invented."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "The executed workflow is assay design and analytical validation. It neither diagnoses an individual nor prescribes treatment, and it directs regulated use to ICH M10 validation rather than asserting clinical fitness."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "The current Skill rejects the planted LLOQ precision and post-ULOQ carryover failures, uses nested ANOVA rather than a pooled inter-day SD, uses back-calculated percent relative error rather than R-squared for calibration acceptance, and flags an ion-ratio interference."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All three current R executables parsed under the target R wrapper; the two new shipped helpers executed their pass and fail paths on fresh fixtures. The bundled ggplot2 example emitted complete, correct output but returned status 2816 during teardown on two runs, recorded as an isolated P2 runtime issue rather than a code-usability veto."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 94,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 12,
+        "max": 12,
+        "note": "The current Skill covers the advertised targeted-quantification path from internal-standard and calibration choices through accuracy, precision, matrix factor, recovery, carryover, identity confirmation, and a concrete report format."
+      },
+      "reliability": {
+        "score": 11,
+        "max": 12,
+        "note": "The shipped validation helpers state their input requirements, return failing status for failed acceptance criteria, and prevent false regulatory acceptance. The bundled ggplot2 example's post-output nonzero exit prevents full marks."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "The 273-line SKILL.md is focused and now moves its two complete validation workflows into reusable scripts, although several short executable fragments remain inline."
+      },
+      "agent_usability": {
+        "score": 15,
+        "max": 16,
+        "note": "Decision tiers, Goals and Approaches, named failure modes, quantitative limits, command invocations, and report columns make the workflow clear from a cold start."
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "The usage guide supplies prerequisites and prompts, while the technical frontmatter remains appropriately but densely specialized for MRM/SRM users."
+      },
+      "security": {
+        "score": 12,
+        "max": 12,
+        "note": "No credentials, remote execution, destructive operation, or raw user-string code execution occurs; scripts consume local numeric fixtures and named key-value arguments."
+      },
+      "maintainability": {
+        "score": 11,
+        "max": 12,
+        "note": "Precision and matrix/recovery/carryover logic are separated into documented base-R scripts with configurable columns and clear exits. A packaged expected-output test fixture would make the ggplot2 example regression easier to isolate."
+      },
+      "agent_specific": {
+        "score": 19,
+        "max": 20,
+        "note": "The trigger distinguishes targeted quantification from untargeted discovery, group statistics, and isotope tracing, while prominent escape hatches state the authentic-standard, co-eluting SIL-IS, and validation-record requirements."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 94.0,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 28,
+      "total": 28
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical regression",
+        "label": "Weighted calibration and SIL-IS-normalized plasma quantification",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Executed run/input1_canonical.R through the target rs.sh wrapper on explicitly synthetic calibration and unknown-sample CSVs. Also executed the current bundled targeted_quantification.R twice; it printed the expected LLOQ and S5 identity flag both times but returned status 2816 after materializing output.",
+        "note": "All nine calibrators passed back-calculated percent relative error, LLOQ was 2 ng/mL, and six planted unknowns were recovered within 1.09 percent of truth.",
+        "basic": 37,
+        "specialized": 56,
+        "total": 93,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {"text": "All reportable synthetic unknowns are within 15 percent of planted truth", "result": "PASS", "note": "Maximum absolute error was 1.09 percent across U1-U6."},
+          {"text": "Calibration acceptance is based on back-calculated percent relative error rather than R-squared", "result": "PASS", "note": "The executed acceptance code uses per-level tolerance and no R-squared gate."},
+          {"text": "The near-LLOQ boundary sample remains reportable when above the validated LLOQ", "result": "PASS", "note": "U6 was estimated at 2.99 ng/mL against a 2 ng/mL LLOQ."},
+          {"text": "The bundled example flags its planted ion-ratio interference", "result": "PASS", "note": "S5 printed id_confirmed FALSE on both fresh example runs."}
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A regression",
+        "label": "Shared-internal-standard strategy for a heterogeneous 40-analyte panel",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Executed as a Mode A direct response from the current Decision Tree and shared-IS failure-mode sections; the fresh response is saved in run/input2_variantA_phase2_response.md. No executable component is required for this advisory input.",
+        "note": "The response distinguishes injection precision from analyte-specific accuracy, limits the global-IS approach to exploratory or semi-quantitative work, and gives the correct cross-study and regulated escalation paths.",
+        "basic": 36,
+        "specialized": 54,
+        "total": 90,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {"text": "Response identifies that low CV from a shared IS does not prove accurate concentration", "result": "PASS", "note": "It explicitly separates injection precision from residual matrix and recovery bias."},
+          {"text": "Response supplies a cross-study quantitative escalation path", "result": "PASS", "note": "It calls for SIL-IS per analyte or retention-time and chemical cluster plus QC validation."},
+          {"text": "Response supplies the stricter regulated escalation path", "result": "PASS", "note": "It requires a co-eluting 13C or 15N SIL-IS per analyte and full ICH M10 validation."},
+          {"text": "Response invents no numeric assay performance", "result": "PASS", "note": "All advice is conditional and qualitative because no assay data were supplied."}
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge regression",
+        "label": "LOD from blank scatter and a forced single-transition method",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Executed run/input3_edge_lod_lloq.R through the target rs.sh wrapper on the synthetic blank fixture.",
+        "note": "The calculated LOD was 1.329 ng/mL, below the 2 ng/mL calibrator, and the response correctly treated one transition as a documented selectivity limitation rather than a defensible default.",
+        "basic": 37,
+        "specialized": 55,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {"text": "LOD is computed from replicate blank scatter", "result": "PASS", "note": "The formula used mean blank ratio plus three standard deviations divided by slope."},
+          {"text": "LOD is lower than the stated lowest calibrator", "result": "PASS", "note": "1.329 ng/mL is lower than 2 ng/mL."},
+          {"text": "Single-transition use is not misrepresented as full identity confirmation", "result": "PASS", "note": "The response requires documenting the compromise and gathering retention-time and selectivity evidence."},
+          {"text": "No clinical conclusion is made", "result": "PASS", "note": "The output limits itself to analytical validation requirements."}
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B regression",
+        "label": "Ion-ratio confirmation and IS-normalized matrix factor across six lots",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Executed run/input4_variantB_ion_ratio_matrix_factor.R through the target rs.sh wrapper on the synthetic six-lot and planted-interference fixture.",
+        "note": "All six clean lots were identity-confirmed, the planted interferent was rejected, and the IS-normalized matrix-factor CV was 4.44 percent against a 15 percent limit.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {"text": "All six clean QC lots pass ion-ratio confirmation", "result": "PASS", "note": "Each clean ratio was within 30 percent relative of the 0.39 calibrator ratio."},
+          {"text": "The planted interferent is rejected", "result": "PASS", "note": "Its ratio was 0.167, outside the allowed interval."},
+          {"text": "Matrix factor uses analyte and internal-standard normalization", "result": "PASS", "note": "The code computes matrix ratios relative to the neat ratio and then a CV across lots."},
+          {"text": "Six-lot matrix-factor acceptance is applied correctly", "result": "PASS", "note": "CV was 4.44 percent and the fixture contains six lots."}
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress regression",
+        "label": "Current ICH M10 pathway on imprecise LLOQ QCs and high carryover",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Executed fresh run/input5_phase2_ich_m10_stress.ps1, which invokes both current shipped helpers through rs.sh on the two-day synthetic QC fixture and planted post-ULOQ blank. Expected source-script exit 1 values were asserted as protective rejection, not treated as harness failures.",
+        "note": "The precision helper reported LLOQ intra-day CVs of 21.7 and 20.6 percent and nested-ANOVA inter-day CV of 21.1 percent, then rejected the level. The carryover helper reported 433.7 percent of LLOQ and rejected it.",
+        "basic": 38,
+        "specialized": 58,
+        "total": 96,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {"text": "Nested ANOVA rejects the planted LLOQ precision failure", "result": "PASS", "note": "21.1 percent exceeds the LLOQ tolerance of 20 percent."},
+          {"text": "The helper makes clear that naive pooled CV is not valid inter-day precision", "result": "PASS", "note": "It prints the naive 18.9 percent only with the explicit not-valid label."},
+          {"text": "Post-ULOQ analyte carryover is rejected", "result": "PASS", "note": "433.7 percent of LLOQ exceeds the 20 percent limit."},
+          {"text": "The unsafe regulated-assay decision is stopped rather than silently accepted", "result": "PASS", "note": "The harness confirmed both protective exits and emitted its rejection assertion."}
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Fresh independent validation",
+        "label": "Direct invocation of the shipped nested-ANOVA precision helper",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Executed fresh run/input6_shipped_precision.ps1 against the current worktree's scripts/precision_nested_anova.R and the synthetic four-level QC fixture through rs.sh. It asserted the expected status 1 and the printed nested-ANOVA rejection.",
+        "note": "The helper rejected only the planted LLOQ while LOW, MID, and HIGH passed; this independently exercises the current shipped command rather than a reimplementation.",
+        "basic": 39,
+        "specialized": 58,
+        "total": 97,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {"text": "The shipped helper accepts the documented key-value invocation", "result": "PASS", "note": "file=<fixture> was consumed through the documented command shape."},
+          {"text": "The planted LLOQ failure returns a nonzero protective status", "result": "PASS", "note": "The helper returned 1 and the audit harness expected that status."},
+          {"text": "Nested-ANOVA LLOQ CV matches the claimed 21.1 percent behavior", "result": "PASS", "note": "The helper printed 21.1 percent after rounding."},
+          {"text": "Clean non-LLOQ levels are not falsely rejected", "result": "PASS", "note": "LOW, MID, and HIGH each printed PASS."}
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Fresh independent validation",
+        "label": "Direct invocation of all shipped matrix, recovery, and carryover modes",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Executed fresh run/input7_shipped_matrix_recovery_carryover.ps1 against the current worktree's scripts/matrix_recovery_carryover.R. Matrix factor used six synthetic lots, recovery used a fresh synthetic CSV, and carryover used low analyte and IS blank responses.",
+        "note": "Matrix-factor CV was 4.44 percent and passed, recovery means were 85.00 and 70.17 percent with low within-level CV, and analyte/IS carryover were 15.0 and 0.3 percent and passed.",
+        "basic": 38,
+        "specialized": 58,
+        "total": 96,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {"text": "Matrix-factor mode accepts six valid lots and applies the 15 percent CV limit", "result": "PASS", "note": "It printed 4.44 percent and MATRIX FACTOR PASS TRUE."},
+          {"text": "Recovery mode reports consistency instead of imposing an undocumented 100 percent target", "result": "PASS", "note": "It reported the 70.2 to 85.0 percent mean range and exited successfully."},
+          {"text": "Analyte carryover is expressed relative to LLOQ response", "result": "PASS", "note": "The helper printed 15.0 percent of LLOQ against a 20 percent limit."},
+          {"text": "Internal-standard carryover is checked separately when supplied", "result": "PASS", "note": "It printed 0.3 percent against the 5 percent IS limit."}
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 37.6,
+    "dynamic_weighted": 56.4,
+    "score": 94,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "The current shipped precision helper prevents a naive pooled-SD calculation from passing the planted LLOQ failure and reports the all-level decision explicitly.",
+    "The current matrix/recovery/carryover helper provides concrete, base-R, argument-driven workflows for every Phase 1 validation gap and exercised both pass and fail behavior.",
+    "Weighted calibration, LLOQ gating, ion-ratio identity confirmation, matrix-factor consistency, and carryover limits all produced traceable correct outputs on labelled synthetic fixtures.",
+    "The Skill strongly distinguishes targeted absolute quantification from untargeted discovery, group statistics, and isotope tracing, and names the material requirements code cannot replace."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "Investigate the bundled ggplot2 example's post-output nonzero exit in the target R runtime",
+      "observed_in": [1],
+      "problem": "examples/targeted_quantification.R printed its complete expected calibration and identity-confirmation output on two fresh runs but returned status 2816 after output materialization. A base-R control through the same wrapper returned 0.",
+      "root_cause": "The evidence localizes the issue to the ggplot2 example or its runtime teardown rather than the base-R wrapper, but does not yet identify a reproducible source-code defect.",
+      "fix": "Reproduce in a clean R 4.4.3 plus ggplot2 target environment, retain the valid-output assertion, and fix or document the specific graphics-device or package-teardown cause if the nonzero exit persists."
+    }
+  ]
+}
