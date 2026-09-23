@@ -22,7 +22,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The example passes cluster_rows=<OLO dendrogram> together with row_split=gene_info$pathway, a combination ComplexHeatmap rejects; the script was never run.
 - Fix: Drop row_split or use a numeric row_split (works with the dendrogram), or apply OLO within each pathway group; supply a runnable data preamble and state the constraint in SKILL.md next to the OLO block.
 
-## P1 (156)
+## P1 (155)
 
 ### `bio-data-visualization-lollipop-protein-maps` — Shipped example never completes and paints wrong colours
 
@@ -832,22 +832,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: Self-contradiction: the Skill's own Governing Principle says a state outside the reference is forced to the nearest label 'often with high apparent confidence', which is precisely why artifact clusters are confident. Low confidence instead tracks fine-granularity ambiguity between similar reference labels.
 - Fix: Invert the entry point. Screen every cluster on the QC covariates the same code block already computes - pct_counts_mt, n_genes_by_counts, doublet rate, batch purity - and use low annotation confidence only as a secondary signal for 'not in reference'. In this run the QC columns separated the artifacts perfectly (21-22% mito against a 2.5% baseline; doublet rates 0.44 and 0.22 against 0.02).
 
-### `bio-single-cell-cell-communication` — CellPhoneDB determinism fix is verified only at threads=1, but SKILL.md documents threads=4
-
-- Skill: 87, Production Ready · [mrsonord2240/bioSkills@6d96d9c](https://github.com/mrsonord2240/bioSkills/tree/6d96d9c0c90124466fdecd0694b0bfd1dc177b07/single-cell/cell-communication) · [viewer](skills/bio-single-cell-cell-communication/mrsonord2240-bioSkills@6d96d9c/viewer.md)
-- Observed in inputs: 2
-- Problem: SKILL.md's shipped 'Specificity Test' code block uses threads=4 with debug_seed=1337. Two fresh, independent re-audit runs at those exact parameters differed on 5,150/120,375 p-values and flipped 82/120,375 significance flags. The Permutation Rationale table's claim ('set it explicitly for reproducible reporting') is not accurate for the code block directly above it. A threads=1 run with the same seed is fully bit-identical (0/120,375 differ) -- this is what the fix log and commit message actually verified, per their own stated iterations=100, threads=1 parameters.
-- Root cause: cellphonedb's multiprocessing.Pool-based permutation workers do not deterministically replay the RNG stream across worker counts even with debug_seed fixed; the fixer's verification used a thread count the shipped code does not use.
-- Fix: Either change the documented call to threads=1 for reproducible reporting (accept ~3-5x slower runtime on datasets this size), or add an explicit caveat to the Permutation Rationale table: 'debug_seed is bit-reproducible at threads=1; at threads>1, marginal (near p=0.05) calls may still flip run-to-run.'
-
-### `bio-single-cell-cell-communication` — Condition Comparison section has no baseline sampling-noise warning
-
-- Skill: 87, Production Ready · [mrsonord2240/bioSkills@6d96d9c](https://github.com/mrsonord2240/bioSkills/tree/6d96d9c0c90124466fdecd0694b0bfd1dc177b07/single-cell/cell-communication) · [viewer](skills/bio-single-cell-cell-communication/mrsonord2240-bioSkills@6d96d9c/viewer.md)
-- Observed in inputs: 5
-- Problem: A re-auditor-constructed null-case split (stratified random, no true biological difference, different seed than the fixer's) still produced a 27.6% gained/lost fraction of the robust-pair union from sampling noise and halved per-condition cell counts alone. SKILL.md gives no guidance that a comparable fraction of any real two-condition comparison's gained/lost pairs may be noise, and recommends no stability check.
-- Root cause: The new section was validated by confirming it runs and produces plausible counts, not by checking its behavior under a known-null comparison.
-- Fix: Add a caveat recommending a repeat-split or bootstrap stability check (e.g., re-run the split N times and report each pair's gained/lost frequency) before treating a single split's gained/lost set as a finding, mirroring the rigor of the existing Resource-Sensitivity Check.
-
 ### `bio-workflows-proteomics-pipeline` — The fixed treat() fold-change floor silently zeroes the intermediate level of a dose series
 
 - Skill: 87.7, Production Ready · [mrsonord2240/bioSkills@45a0c5a](https://github.com/mrsonord2240/bioSkills/tree/45a0c5a65b7346d47a7b72b6d0a6eb60ea590317/workflows/proteomics-pipeline) · [viewer](skills/bio-workflows-proteomics-pipeline/mrsonord2240-bioSkills@45a0c5a/viewer.md)
@@ -1239,6 +1223,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: Now that the P0 crash is fixed and the graphite route actually runs, it computes an opposite-sign perturbation (Activated vs Inhibited) from direct spia() for 30 of 99 pathways scored by both, including one of the Skill's own two ground-truth planted pathways (hsa04110/Cell cycle: graphite says Inhibited, direct spia() and the planted direction both say Activated). SKILL.md presents the graphite route as simply an interchangeable 'modern route' with no caveat that it can reach a different scientific conclusion.
 - Root cause: This divergence was undiscoverable before this fix round because the graphite route never completed a single successful run pre-fix (Research Veto M4 FAIL); the fixer's own verification (fixes/bio-pathway-kegg-pathways.md) checked that runSPIA returned real rows but did not cross-check its direction calls against the direct spia() route.
 - Fix: Add a caveat to the SPIA section (and the Common Errors / Per-Method Failure Modes tables) stating that graphite's harmonized topology can disagree with SPIA's native KEGG-bundled topology on perturbation direction for a meaningful fraction of pathways, and recommend treating the two routes as complementary evidence rather than interchangeable, or explicitly stating which one to prefer as the default and why.
+
+### `bio-single-cell-cell-communication` — Live CellChat and NicheNet evidence remains unavailable in the designated Windows environment
+
+- Skill: 94, Production Ready · [mrsonord2240/bioSkills@49c6f69](https://github.com/mrsonord2240/bioSkills/tree/49c6f6943243f8faebc9848429c877be240d10d6/single-cell/cell-communication) · [viewer](skills/bio-single-cell-cell-communication/mrsonord2240-bioSkills@49c6f69/viewer.md)
+- Observed in inputs: 8
+- Problem: Current R code parsed but cannot run because CellChat and nichenetr are unavailable GitHub-only packages in this environment.
+- Root cause: Environment coverage, not a demonstrated source-code failure.
+- Fix: When a supported isolated R environment exists, execute current CellChat and NicheNet branches on public annotated data and retain material output.
 
 ### `bio-causal-genomics-fine-mapping` — Windows R process exits 139 after RSS output
 
@@ -2898,14 +2890,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The dependency on a clustering is implicit in the argument name.
 - Fix: Pass over_clustering='leiden' explicitly in the snippet and note that the upstream clustering must be seeded for the annotation to be reproducible.
 
-### `bio-single-cell-cell-communication` — usage-guide.md's Related Skills list still duplicates SKILL.md verbatim
-
-- Skill: 87, Production Ready · [mrsonord2240/bioSkills@6d96d9c](https://github.com/mrsonord2240/bioSkills/tree/6d96d9c0c90124466fdecd0694b0bfd1dc177b07/single-cell/cell-communication) · [viewer](skills/bio-single-cell-cell-communication/mrsonord2240-bioSkills@6d96d9c/viewer.md)
-- Observed in inputs: —
-- Problem: Both files list an identical 8-line Related Skills block. The fix's mandatory redundancy pass removed the Prerequisites duplication and two fully-duplicative sections but did not catch this one.
-- Root cause: The redundancy pass diffed the two flagged sections, not the full file.
-- Fix: Keep the list in SKILL.md only (the agent-loaded file) and replace usage-guide.md's copy with a one-line pointer: 'See SKILL.md Related Skills.'
-
 ### `bio-single-cell-multimodal-integration` — Prerequisites section doesn't flag scglue's lack of a Windows build
 
 - Skill: 87, Production Ready · [mrsonord2240/bioSkills@47aa056](https://github.com/mrsonord2240/bioSkills/tree/47aa05674fae7d22d25875ae99bc28cbc5781fc5/single-cell/multimodal-integration) · [viewer](skills/bio-single-cell-multimodal-integration/mrsonord2240-bioSkills@47aa056/viewer.md)
@@ -4433,6 +4417,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The deleted usage-guide.md Tips bullet 'WikiPathways has fewer total pathways than KEGG; best used as a complement' has no surviving statement anywhere in SKILL.md or usage-guide.md -- the closest remaining content (the WikiPathways-vs-KEGG/Reactome table's Species row) compares organism counts, not pathway counts.
 - Root cause: The fix log's deletion table classified this bullet as 'no unique content' alongside several bullets that genuinely were duplicates, but this specific quantitative comparison was not actually restated elsewhere.
 - Fix: Either restore a one-line version of the claim (with a source, since the original was unsourced) in the WikiPathways vs KEGG/Reactome section, or drop it deliberately and note the removal in the fix log rather than folding it into the true-duplicate bucket.
+
+### `bio-single-cell-cell-communication` — Condition-stability CLI should preflight its two-condition contract
+
+- Skill: 94, Production Ready · [mrsonord2240/bioSkills@49c6f69](https://github.com/mrsonord2240/bioSkills/tree/49c6f6943243f8faebc9848429c877be240d10d6/single-cell/cell-communication) · [viewer](skills/bio-single-cell-cell-communication/mrsonord2240-bioSkills@49c6f69/viewer.md)
+- Observed in inputs: 4
+- Problem: It documents a two-level condition column but does not explicitly reject missing columns, empty requested labels, or an unhandled third level before fitting.
+- Root cause: Input-contract checks are implicit in downstream indexing.
+- Fix: Add clear preflight validation before expensive LIANA fits.
 
 ### `bio-single-cell-data-io` — Correct the zellkonverter raw diagnostic variable
 

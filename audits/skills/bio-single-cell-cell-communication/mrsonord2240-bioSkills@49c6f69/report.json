@@ -1,0 +1,181 @@
+{
+  "meta": {
+    "skill_name": "bio-single-cell-cell-communication",
+    "description": "Infers ligand-receptor cell-cell communication from scRNA-seq with consensus LIANA, CellPhoneDB, CellChat, and NicheNet workflows.",
+    "evaluated_on": "2026-09-23",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 8,
+    "source": "mrsonord2240/bioSkills@49c6f6943243f8faebc9848429c877be240d10d6:single-cell/cell-communication",
+    "audit_type": "final pass phase 2",
+    "prior_audit": "F:/OpenScience/audits/_pre-fix-20260923/bio-single-cell-cell-communication/",
+    "checkpoint": "F:/OpenScience/audits/_final_pass/bio-single-cell-cell-communication/CHECKPOINT.md",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md"
+  },
+  "veto_gates": {
+    "skill_veto": {"gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS"},
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {"result": "PASS", "detail": "Fresh real-PBMC outputs contain no fabricated biology, citations, statistics, or clinical claims."},
+      "practice_boundaries": {"result": "PASS", "detail": "The Skill retains the co-expression-proxy boundary and makes no diagnostic or prescriptive claims."},
+      "methodological_ground": {"result": "PASS", "detail": "A fresh known-null run using the required ten within-cell-type permutations correctly classified the apparent condition result as not evidence."},
+      "code_usability": {"result": "PASS", "detail": "Exact-tip LIANA, CellPhoneDB, resource-sensitivity, and condition-stability paths ran. R-only branches parse but are environment-blocked."}
+    }
+  },
+  "static_score": {
+    "subtotal": 96,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {"score": 12, "max": 12, "note": "Complete consensus, specificity, resource, condition, pathway, ligand-activity, and spatial-boundary coverage."},
+      "reliability": {"score": 11, "max": 12, "note": "Seeded scripts, Windows guard, and material assertions are strong; condition inputs could be validated before expensive fitting."},
+      "performance_context": {"score": 8, "max": 8, "note": "References and runnable scripts provide progressive disclosure and state null-fit cost."},
+      "agent_usability": {"score": 16, "max": 16, "note": "Decision table, thresholds, caveats, and routing are precise."},
+      "human_usability": {"score": 8, "max": 8, "note": "Lean usage guide preserves actionable prompts."},
+      "security": {"score": 12, "max": 12, "note": "No credentials, unsafe execution, destructive operations, or patient-level claims."},
+      "maintainability": {"score": 11, "max": 12, "note": "Method references and scripts are cleanly separated; R branch live coverage is still unavailable."},
+      "agent_specific": {"score": 18, "max": 20, "note": "Seeded current scripts are idempotent; CellPhoneDB threads>1 limitation is explicitly bounded."}
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 93.0,
+    "max": 100,
+    "assertion_pass_rate": {"passed": 33, "total": 34},
+    "inputs": [
+      {
+        "index": 1, "type": "Canonical", "label": "Consensus LIANA rank aggregation on real annotated PBMC 1k v3",
+        "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Fresh 1,000-permutation execution from run/phase2_20260923/01_canonical_liana.py; CSV outputs parsed and asserted.",
+        "note": "31,812 total pairs; 1,122 robust pairs; both required ranks and coherent immune candidates recovered.",
+        "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          {"text": "Current consensus block completed on real annotated data", "result": "PASS", "note": "Fresh run wrote outputs."},
+          {"text": "Both magnitude and specificity ranks are present", "result": "PASS", "note": "Columns asserted."},
+          {"text": "Robust output is non-empty and interpretable", "result": "PASS", "note": "1,122 robust pairs including S100A9-ITGB2 and B2M-KLRD1."},
+          {"text": "Calls remain hypotheses rather than proof", "result": "PASS", "note": "Governing Principle preserved."}
+        ]
+      },
+      {
+        "index": 2, "type": "Variant A", "label": "Exact shipped CellPhoneDB statistical script, dual seeded run",
+        "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Invoked exact scripts/cellphonedb_statistical.py twice at --iterations 1000 --threads 1 --seed 1337; 03_cellphonedb_source_dual_run.py parsed and compared full matrices.",
+        "note": "Both calls exited 0, wrote all tables, and yielded bit-identical 535x238 p-value matrices with zero significance flips.",
+        "basic": 38, "specialized": 58, "total": 96, "assertions_passed": 5, "assertions_total": 5,
+        "assertions": [
+          {"text": "Exact source CLI runs on Windows without multiprocessing crash", "result": "PASS", "note": "Two guarded runs exited 0."},
+          {"text": "Expected result tables materialize", "result": "PASS", "note": "Six tables per run."},
+          {"text": "Complete p-value matrix shape is stable", "result": "PASS", "note": "535x238 both runs."},
+          {"text": "Seeded threads=1 output is reproducible", "result": "PASS", "note": "Whole-matrix equality and zero p<0.05 flips."},
+          {"text": "Human complex-aware configuration is retained", "result": "PASS", "note": "Exact source CLI used."}
+        ]
+      },
+      {
+        "index": 3, "type": "Edge", "label": "Single cell-type group supplied to LIANA",
+        "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Fresh real-PBMC execution in 02_single_group_edge.py.",
+        "note": "Current text matched actual ValueError: no comparison cells remain for log2FC.",
+        "basic": 37, "specialized": 57, "total": 94, "assertions_passed": 3, "assertions_total": 3,
+        "assertions": [
+          {"text": "One-group request stops rather than emits deceptive output", "result": "PASS", "note": "Expected ValueError."},
+          {"text": "Documented explanation matches actual error", "result": "PASS", "note": "Log2FC/comparison cause matched."},
+          {"text": "Failure is actionable", "result": "PASS", "note": "Error identifies groupby/sample-key cause."}
+        ]
+      },
+      {
+        "index": 4, "type": "Stress", "label": "Known-null two-condition comparison with within-cell-type calibration",
+        "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Created a fresh stratified known-null condition column, then invoked exact condition_stability.py at documented defaults n-null=10 and n-perms=1000.",
+        "note": "Completed with 297 gained/lost rows, 196 noise-prone rows, and correctly reported 297 within the 222-356 null range: not evidence.",
+        "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 5, "assertions_total": 5,
+        "assertions": [
+          {"text": "Current CLI executes at documented default null depth", "result": "PASS", "note": "Ten-null run exited 0."},
+          {"text": "Null labels are permuted within cell type", "result": "PASS", "note": "Source grouping confirmed."},
+          {"text": "Per-pair null frequency and noise-prone status are saved", "result": "PASS", "note": "TSV parsed."},
+          {"text": "Known-null difference is not claimed as biological evidence", "result": "PASS", "note": "Source printed null-range caution."},
+          {"text": "Comparison uses robust sets rather than raw counts", "result": "PASS", "note": "Gained/lost robust sets computed."}
+        ]
+      },
+      {
+        "index": 5, "type": "Variant B", "label": "Resource sensitivity across consensus, CellPhoneDB, and CellChatDB",
+        "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Fresh SKILL.md block execution in 05_resource_sensitivity.py with all frames parsed.",
+        "note": "31,812, 6,708, and 7,609 pairs respectively; 930 significant pairs survived all three resources.",
+        "basic": 37, "specialized": 57, "total": 94, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          {"text": "All named resources execute", "result": "PASS", "note": "Three non-empty frames."},
+          {"text": "Current p-value field is used", "result": "PASS", "note": "cellphone_pvals present and filtered."},
+          {"text": "Shared candidates can be identified", "result": "PASS", "note": "930 three-way intersection."},
+          {"text": "Database disagreement is visible", "result": "PASS", "note": "Per-resource counts retained."}
+        ]
+      },
+      {
+        "index": 6, "type": "Scope boundary", "label": "Visium spots offered to non-spatial CCC",
+        "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Fresh direct-mode execution recorded in run/phase2_20260923/06_spatial_scope_response.md; no CLI is appropriate for this reasoning boundary.",
+        "note": "Current Skill requires deconvolution, gives spatial alternatives, and rejects claims of physical binding.",
+        "basic": 37, "specialized": 56, "total": 93, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          {"text": "Mixed-cell spots are not treated as single cells", "result": "PASS", "note": "Deconvolution stated."},
+          {"text": "Real spatial methods are named", "result": "PASS", "note": "Squidpy, COMMOT, CellChat spatial, LIANA+ bivariate."},
+          {"text": "Spatial co-expression is not called binding", "result": "PASS", "note": "Proxy caveat retained."},
+          {"text": "Spatial sensitivity is addressed", "result": "PASS", "note": "COMMOT radius sensitivity stated."}
+        ]
+      },
+      {
+        "index": 7, "type": "Adversarial", "label": "Mouse CellPhoneDB request",
+        "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Fresh li.rs.select_resource('mouseconsensus') execution in 06_mouse_resource.py plus current source routing check.",
+        "note": "mouseconsensus returned 3,989 ligand/receptor rows; human-only CellPhoneDB warning remains proactive.",
+        "basic": 37, "specialized": 57, "total": 94, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          {"text": "Human-only limitation is proactive", "result": "PASS", "note": "Decision/common-error text present."},
+          {"text": "A real mouse alternative exists", "result": "PASS", "note": "Non-empty resource executed."},
+          {"text": "Ortholog risk is disclosed", "result": "PASS", "note": "Source warns."},
+          {"text": "Near-empty mouse output is not misrepresented", "result": "PASS", "note": "Source routes first."}
+        ]
+      },
+      {
+        "index": 8, "type": "Dependency-gated variant", "label": "CellChat pathway and NicheNet ligand-activity R branches",
+        "status": "PARTIAL", "status_flag": "⚠️", "executed": false,
+        "execution_note": "Fresh R parse check through designated rs.sh passed for current CellChat/NicheNet references and CellChat example. requireNamespace returned CellChat=false and nichenetr=false; GitHub-only packages are unavailable in this Windows environment, so no workflow result was invented.",
+        "note": "Syntactically valid current R code; live evidence remains an environment limitation rather than a demonstrated Python-core source failure.",
+        "basic": 33, "specialized": 50, "total": 83, "assertions_passed": 4, "assertions_total": 5,
+        "assertions": [
+          {"text": "CellChat reference parses", "result": "PASS", "note": "Fresh parse passed."},
+          {"text": "NicheNet reference parses", "result": "PASS", "note": "Fresh parse passed."},
+          {"text": "CellChat example parses", "result": "PASS", "note": "Fresh parse(file=...) passed."},
+          {"text": "Unavailable dependencies are detected explicitly", "result": "PASS", "note": "Both requireNamespace checks false."},
+          {"text": "Complete R workflow ran in assigned environment", "result": "FAIL", "note": "Blocked by unavailable GitHub-only packages."}
+        ]
+      }
+    ]
+  },
+  "final": {"static_weighted": 38.4, "dynamic_weighted": 55.8, "score": 94, "max": 100, "grade": "Production Ready", "grade_symbol": "⭐", "deployable": true, "veto_override": false},
+  "key_strengths": [
+    "Exact shipped CellPhoneDB wrapper passed two fresh bit-identical whole-matrix runs at documented threads=1.",
+    "Current condition-stability workflow passed an adversarial known-null test at its real default of ten null permutations.",
+    "Consensus, resource sensitivity, single-group rejection, and mouse routing all received fresh material-output checks.",
+    "Reference splitting and runnable scripts materially improve auditability."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "Live CellChat and NicheNet evidence remains unavailable in the designated Windows environment",
+      "observed_in": [8],
+      "problem": "Current R code parsed but cannot run because CellChat and nichenetr are unavailable GitHub-only packages in this environment.",
+      "root_cause": "Environment coverage, not a demonstrated source-code failure.",
+      "fix": "When a supported isolated R environment exists, execute current CellChat and NicheNet branches on public annotated data and retain material output."
+    },
+    {
+      "priority": "P2",
+      "title": "Condition-stability CLI should preflight its two-condition contract",
+      "observed_in": [4],
+      "problem": "It documents a two-level condition column but does not explicitly reject missing columns, empty requested labels, or an unhandled third level before fitting.",
+      "root_cause": "Input-contract checks are implicit in downstream indexing.",
+      "fix": "Add clear preflight validation before expensive LIANA fits."
+    }
+  ]
+}
