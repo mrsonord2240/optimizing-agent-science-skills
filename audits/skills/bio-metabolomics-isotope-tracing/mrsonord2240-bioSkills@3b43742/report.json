@@ -1,0 +1,451 @@
+{
+  "meta": {
+    "skill_name": "bio-metabolomics-isotope-tracing",
+    "description": "Stable-isotope-resolved metabolomics with 13C/15N/2H tracers, correction, MID/enrichment, and steady-state versus INST-MFA decisions.",
+    "evaluated_on": "2026-09-23",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 9,
+    "source": "mrsonord2240/bioSkills@3b437423563329fb137fa6fae8adb9563196fa13:metabolomics/isotope-tracing",
+    "reaudit_of": "F:/OpenScience/audits/_pre-fix-20260923/bio-metabolomics-isotope-tracing (score 93, Production Ready)",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "All numeric results were computed from synthetic arrays or AccuCor bundled reference data; no external scientific result was invented."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "All outputs remain bench metabolomics analysis and make no diagnostic, prescribing, or treatment conclusion."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "The audit verifies correction before interpretation, derivative sensitivity, pool-versus-flux separation, positional-tracer routing, and the four-timepoint classical-MFA guard."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "Six saved executable audit paths plus a copied shipped example ran successfully with isocor 2.2.4 and accucor 0.3.1.9000."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 98,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 12,
+        "max": 12,
+        "note": "All promised correction, tracer-choice, MID, and steady-state/MFA paths are covered."
+      },
+      "reliability": {
+        "score": 12,
+        "max": 12,
+        "note": "Live normal, malformed, derivative, and short-series checks produced actionable behavior."
+      },
+      "performance_context": {
+        "score": 8,
+        "max": 8,
+        "note": "Concise Skill, usage guide, and example avoid redundant workflow loops."
+      },
+      "agent_usability": {
+        "score": 16,
+        "max": 16,
+        "note": "Current snippets supply explicit status strings and preventive guidance."
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Natural trigger language and decision tree are strong; dependency errors remain plain ValueErrors."
+      },
+      "security": {
+        "score": 12,
+        "max": 12,
+        "note": "No credentials, raw-code execution, destructive action, or sensitive retention path is present."
+      },
+      "maintainability": {
+        "score": 11,
+        "max": 12,
+        "note": "Skill, guide, and example separate concerns; one shipped fixture limits breadth."
+      },
+      "agent_specific": {
+        "score": 20,
+        "max": 20,
+        "note": "Trigger boundaries, deterministic operations, and explicit handoffs are clear."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 93.1,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 36,
+      "total": 36
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "13C glutamine IsoCor correction (prior regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. Executed saved Python script with synthetic M+0..M+5 input; normalized MID and bounded enrichment.",
+        "executed": true,
+        "execution_note": "Executed saved Python script with synthetic M+0..M+5 input; normalized MID and bounded enrichment.",
+        "basic": 37,
+        "specialized": 55,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Corrected MID is normalized",
+            "result": "PASS",
+            "note": "Verified by the saved output and/or the current SKILL.md as stated in the execution note."
+          },
+          {
+            "text": "Output addresses the requested isotope-tracing decision",
+            "result": "PASS",
+            "note": "Verified by the saved output and/or the current SKILL.md as stated in the execution note."
+          },
+          {
+            "text": "Output makes no unsupported flux or clinical claim",
+            "result": "PASS",
+            "note": "Verified by the saved output and/or the current SKILL.md as stated in the execution note."
+          },
+          {
+            "text": "Output follows the current SKILL.md guardrail",
+            "result": "PASS",
+            "note": "Verified by the saved output and/or the current SKILL.md as stated in the execution note."
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "AccuCor shipped-reference correction (prior regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. Executed saved R script through rs.sh; G6P max difference 2.775558e-17, output isolated, extdata unchanged.",
+        "executed": true,
+        "execution_note": "Executed saved R script through rs.sh; G6P max difference 2.775558e-17, output isolated, extdata unchanged.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Reference-ground-truth comparison passes",
+            "result": "PASS",
+            "note": "Verified by the saved output and/or the current SKILL.md as stated in the execution note."
+          },
+          {
+            "text": "output_base keeps generated output inside the audit run",
+            "result": "PASS",
+            "note": "Verified by the saved output and/or the current SKILL.md as stated in the execution note."
+          },
+          {
+            "text": "Package reference data is unchanged",
+            "result": "PASS",
+            "note": "Verified by the saved output and/or the current SKILL.md as stated in the execution note."
+          },
+          {
+            "text": "Documented high-resolution call completes",
+            "result": "PASS",
+            "note": "Verified by the saved output and/or the current SKILL.md as stated in the execution note."
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Steady-state status and wrong-length cluster (prior regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. Executed saved Python script; decelerating series is still labeling and live IsoCor error names lengths 3 and 7.",
+        "executed": true,
+        "execution_note": "Executed saved Python script; decelerating series is still labeling and live IsoCor error names lengths 3 and 7.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Steady-state result does not overclaim plateau",
+            "result": "PASS",
+            "note": "Verified by the saved output and/or the current SKILL.md as stated in the execution note."
+          },
+          {
+            "text": "Latest three deltas control plateau",
+            "result": "PASS",
+            "note": "Verified by the saved output and/or the current SKILL.md as stated in the execution note."
+          },
+          {
+            "text": "Wrong-length vector is rejected clearly",
+            "result": "PASS",
+            "note": "Verified by the saved output and/or the current SKILL.md as stated in the execution note."
+          },
+          {
+            "text": "Output routes transient labeling away from classical MFA",
+            "result": "PASS",
+            "note": "Verified by the saved output and/or the current SKILL.md as stated in the execution note."
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "PPP versus glycolysis tracer choice (prior regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: false. Mode A reasoning recorded in saved Markdown; no executable tool applies.",
+        "executed": false,
+        "execution_note": "Mode A reasoning recorded in saved Markdown; no executable tool applies.",
+        "basic": 37,
+        "specialized": 54,
+        "total": 91,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Uses the documented positional tracer",
+            "result": "PASS",
+            "note": "Verified by the saved output and/or the current SKILL.md as stated in the execution note."
+          },
+          {
+            "text": "Uses the documented M+1/M+2 readout",
+            "result": "PASS",
+            "note": "Verified by the saved output and/or the current SKILL.md as stated in the execution note."
+          },
+          {
+            "text": "Requires correction before interpretation",
+            "result": "PASS",
+            "note": "Verified by the saved output and/or the current SKILL.md as stated in the execution note."
+          },
+          {
+            "text": "Stays in bench research scope",
+            "result": "PASS",
+            "note": "Verified by the saved output and/or the current SKILL.md as stated in the execution note."
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "TBDMS derivative and high-resolution error (prior regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. Executed saved Python script; derivative omission changes MID by 0.079513 and documented error text matches.",
+        "executed": true,
+        "execution_note": "Executed saved Python script; derivative omission changes MID by 0.079513 and documented error text matches.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Derivative formula materially affects correction",
+            "result": "PASS",
+            "note": "Verified by the saved output and/or the current SKILL.md as stated in the execution note."
+          },
+          {
+            "text": "Derivative-aware MID is normalized",
+            "result": "PASS",
+            "note": "Verified by the saved output and/or the current SKILL.md as stated in the execution note."
+          },
+          {
+            "text": "Documented factory error matches live error",
+            "result": "PASS",
+            "note": "Verified by the saved output and/or the current SKILL.md as stated in the execution note."
+          },
+          {
+            "text": "Output makes no unsupported flux claim",
+            "result": "PASS",
+            "note": "Verified by the saved output and/or the current SKILL.md as stated in the execution note."
+          }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Pool-versus-flux and quench guidance (prior regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: false. Mode A reasoning recorded in saved Markdown; no executable tool applies.",
+        "executed": false,
+        "execution_note": "Mode A reasoning recorded in saved Markdown; no executable tool applies.",
+        "basic": 36,
+        "specialized": 54,
+        "total": 90,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Distinguishes pool concentration from labeling",
+            "result": "PASS",
+            "note": "Verified by the saved output and/or the current SKILL.md as stated in the execution note."
+          },
+          {
+            "text": "Gives documented cold-quench range",
+            "result": "PASS",
+            "note": "Verified by the saved output and/or the current SKILL.md as stated in the execution note."
+          },
+          {
+            "text": "Does not fabricate a quantitative study result",
+            "result": "PASS",
+            "note": "Verified by the saved output and/or the current SKILL.md as stated in the execution note."
+          },
+          {
+            "text": "Stays in bench research scope",
+            "result": "PASS",
+            "note": "Verified by the saved output and/or the current SKILL.md as stated in the execution note."
+          }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Plateau, near-flat, and short-series statuses (prior regression)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. Executed saved Python script; current branches return still labeling, plateau, and insufficient timepoints.",
+        "executed": true,
+        "execution_note": "Executed saved Python script; current branches return still labeling, plateau, and insufficient timepoints.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Near-flat series is not plateau",
+            "result": "PASS",
+            "note": "Verified by the saved output and/or the current SKILL.md as stated in the execution note."
+          },
+          {
+            "text": "Flat three-interval series is plateau",
+            "result": "PASS",
+            "note": "Verified by the saved output and/or the current SKILL.md as stated in the execution note."
+          },
+          {
+            "text": "Short series is insufficient, not failed plateau",
+            "result": "PASS",
+            "note": "Verified by the saved output and/or the current SKILL.md as stated in the execution note."
+          },
+          {
+            "text": "Control flow matches current SKILL.md",
+            "result": "PASS",
+            "note": "Verified by the saved output and/or the current SKILL.md as stated in the execution note."
+          }
+        ]
+      },
+      {
+        "index": 8,
+        "type": "Adversarial",
+        "label": "Fresh 15N glutamine correction",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: true. Executed saved Python script; 15N MID has three states, sums to one, and has bounded enrichment.",
+        "executed": true,
+        "execution_note": "Executed saved Python script; 15N MID has three states, sums to one, and has bounded enrichment.",
+        "basic": 37,
+        "specialized": 56,
+        "total": 93,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "15N factory path runs",
+            "result": "PASS",
+            "note": "Verified by the saved output and/or the current SKILL.md as stated in the execution note."
+          },
+          {
+            "text": "Expected three-state 15N MID is returned",
+            "result": "PASS",
+            "note": "Verified by the saved output and/or the current SKILL.md as stated in the execution note."
+          },
+          {
+            "text": "MID is normalized",
+            "result": "PASS",
+            "note": "Verified by the saved output and/or the current SKILL.md as stated in the execution note."
+          },
+          {
+            "text": "Enrichment is bounded",
+            "result": "PASS",
+            "note": "Verified by the saved output and/or the current SKILL.md as stated in the execution note."
+          }
+        ]
+      },
+      {
+        "index": 9,
+        "type": "Scope Boundary",
+        "label": "Fresh no-tracer, no-time-course handoff",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "executed: false. Mode A reasoning recorded in saved Markdown; no executable tool applies.",
+        "executed": false,
+        "execution_note": "Mode A reasoning recorded in saved Markdown; no executable tool applies.",
+        "basic": 37,
+        "specialized": 56,
+        "total": 93,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Pool-only flux claim is refused",
+            "result": "PASS",
+            "note": "Verified by the saved output and/or the current SKILL.md as stated in the execution note."
+          },
+          {
+            "text": "Pool quantification routes to targeted-analysis",
+            "result": "PASS",
+            "note": "Verified by the saved output and/or the current SKILL.md as stated in the execution note."
+          },
+          {
+            "text": "Classical MFA prerequisites are supplied",
+            "result": "PASS",
+            "note": "Verified by the saved output and/or the current SKILL.md as stated in the execution note."
+          },
+          {
+            "text": "Transient labeling routes to INST-MFA",
+            "result": "PASS",
+            "note": "Verified by the saved output and/or the current SKILL.md as stated in the execution note."
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 39.2,
+    "dynamic_weighted": 55.9,
+    "score": 95,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "All seven substantive prior inputs were rerun, and the short-time-course case now returns an explicit insufficient-timepoints status.",
+    "Live IsoCor evidence covers 13C low-resolution, 15N, derivative formula sensitivity, malformed clusters, and the documented factory-selection error.",
+    "AccuCor output-base isolation matched its bundled reference while the documented high-resolution call also completed.",
+    "The Skill correctly separates pool concentration from flux and routes transient labeling to INST-MFA."
+  ],
+  "recommendations": []
+}

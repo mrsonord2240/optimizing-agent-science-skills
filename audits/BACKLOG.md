@@ -1280,7 +1280,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (418)
+## P2 (417)
 
 ### `bio-data-visualization-lollipop-protein-maps` — HGVSp edge cases and recurrence semantics undocumented
 
@@ -4369,14 +4369,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The Skill names TRIPOD+AI as the 2024+ target and lists what it demands (data-splitting and leakage controls, calibration, fairness/subgroup performance, uncertainty) but gives no template, checklist or output structure for the report it asks the agent to produce.
 - Root cause: Reporting is treated as a citation rather than as a deliverable.
 - Fix: Add a short output skeleton -- the fields a validation report must carry (split design and unit of independence, leakage controls applied, discrimination with an interval, calibration slope and intercept, net benefit at pre-specified thresholds, subgroup performance) -- so the agent produces something checkable.
-
-### `bio-metabolomics-isotope-tracing` — Fixed plateau check gives no guidance for <4-timepoint experiments
-
-- Skill: 93, Production Ready · [mrsonord2240/bioSkills@bb99daf](https://github.com/mrsonord2240/bioSkills/tree/bb99dafd612928583fb281f70790b5c801108c47/metabolomics/isotope-tracing) · [viewer](skills/bio-metabolomics-isotope-tracing/mrsonord2240-bioSkills@bb99daf/viewer.md)
-- Observed in inputs: 7
-- Problem: len(deltas) >= 3 (i.e. at least 4 timepoints) is required before the fixed rule can ever return True; SKILL.md never states this minimum in prose, so an agent following the snippet literally reports a 2-3-timepoint series as 'not at steady state' rather than 'insufficient timepoints to assess.'
-- Root cause: The P1 fix corrected the false-positive case (last-pair-only) but did not add a caveat for the now-more-conservative rule's own minimum-data requirement.
-- Fix: Add one sentence near the fixed snippet: 'requires at least 4 timepoints (3 consecutive deltas); with fewer, report insufficient timepoints to assess steady state rather than not yet at steady state.'
 
 ### `bio-microbiome-taxonomy-assignment` — SKILL.md's implied claim that multithread=FALSE gives assignTaxonomy() full bitwise identity at every rank is not quite accurate
 
