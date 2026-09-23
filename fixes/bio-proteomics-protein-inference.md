@@ -105,3 +105,24 @@ Added: "Reference Files" index, pointers in four decision-tree rows, the Percola
 Kept as a script, not deleted for `examples/protein_groups.py`: the sketch's wrong-prefix guard (raises when no accession carries the prefix) differs from the example's (raises only when `is_decoy` marks none), so it is not a duplicate. SKILL.md Common Errors row now names `scripts/picked_group_fdr.py`.
 
 **Stayed inline:** the Percolator / Philosopher CLI block (`references/percolator-philosopher-cli.md`). The Percolator leg is under 15 lines, and the Philosopher leg cannot produce output on this machine (Philosopher 5.1.0 reads 0 PSMs from any pepXML, see pass 5), so no script could be run to a real result.
+
+## Final pass Phase 1 — 2026-09-22
+
+Worktree `F:\OpenScience\wt\proteomics-protein-inference`, branch `fix/proteomics-protein-inference`,
+tip `2e41419be0f5d52378d18ce545c162a611006a93`. Runtime: pyOpenMS 3.5.0, Percolator 3.09.0,
+Philosopher 5.1.0. No source edit was warranted: every runnable block and shipped script was executable
+as documented, and the one known unable-to-produce route trips its explicit output guard.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| Previously unverified whole-Skill runnable-block sweep | P1 | No Skill change; added final-pass execution evidence and checkpoint | ran: Basic+greedy 556 passing groups, EPIFANY 749 posteriors in [0,1], picked-group script 586 groups and rejects `REV__`, Percolator 458 groups, example 2 target groups; every shipped Python script compiled | Audit fixture and PXD070049 Comet artifacts preserved outside the worktree |
+| Percolator/Philosopher CLI block after structure move | P1 | No Skill change; ran the Percolator leg and the staged-name Philosopher guard exactly | ran: Percolator `prot.target.tsv` 458 q<=0.01; Philosopher processes 6,135 results but writes zero `peptideprophet_result`, so `grep` guard exits 1; `bash -n` clean | This confirms the Skill refuses the known silent-empty result rather than accepting exit 0 |
+| CLI flags after structure move | P2 | No Skill change | help: Percolator `--picked-protein`; Philosopher `--maxppmdiff`, `--psm`, `--pepxml`, `--protxml`, `--picked`, `--razor` | No missing or renamed option found |
+
+## Left unfixed (final pass Phase 1)
+
+- **Positive Philosopher / ProteinProphet output path:** blocked by Philosopher 5.1.0's local pepXML
+  ingestion failure (it reports `read in no data` for this Comet input and the earlier OpenMS-reserialised
+  input). It needs a functioning compatible Philosopher/TPP environment or compatible pepXML fixture.
+  The Skill's current guard is tested and correct; a separate TPP-install retry is explicitly excluded by
+  Sam's 2026-09-15 decision.
