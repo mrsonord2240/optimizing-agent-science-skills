@@ -30,7 +30,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The two-trait diagnostic was implemented for z_gwas but never repeated for eQTL z-scores.
 - Fix: Compute z_eqtl and lam_eqtl with the supplied LD and eQTL N immediately after the GWAS check. Stop when either lambda exceeds --lambda-max, and add a shipped regression test proving the eQTL-only mismatch fails before runsusie or coloc.susie.
 
-## P1 (157)
+## P1 (156)
 
 ### `bio-data-visualization-lollipop-protein-maps` — Shipped example never completes and paints wrong colours
 
@@ -904,14 +904,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The cautionary note was added to SKILL.md's prose without updating the actual shipped example it refers to.
 - Fix: Remove the [1:200] slice from examples/phewas_drug_target_mr.R (loop over the full outcomes_filt$id) or replace it with a clearly-marked, commented-out debug line so the copy-pasteable example matches the documented best practice.
 
-### `bio-crispr-screens-bagel-essentiality` — Reference-set failure modes are documented but not defended by any runtime guard
-
-- Skill: 88, Production Ready · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/crispr-screens/bagel-essentiality) · [viewer](skills/bio-crispr-screens-bagel-essentiality/mrsonord2240-bioSkills@6847328/viewer.md)
-- Observed in inputs: 3
-- Problem: Species mismatch still raises a raw, uncaught Python traceback and the -e/-n swap still writes a fully silent all-NaN bayes_factor.txt with exit 0 -- both symptoms are now accurately described in the Skill's Common Errors table, but a user who does not consult the table in advance gets no runtime signal beyond the documentation.
-- Root cause: The fix addressed documentation accuracy, not the underlying BAGEL.py CLI wrapper -- no pre-flight check validates -e/-n gene-list overlap with the input's GENE column, and no post-run check flags an all-NaN BF column before declaring success.
-- Fix: Add a lightweight pre-flight or post-run sanity check to the Skill's example code: verify at least some overlap between -e/-n reference genes and the count file's GENE column before running, and assert the BF column is not >95% NaN after bf completes, printing an explicit warning naming the likely cause (argument swap or species mismatch) rather than relying on the user reading Common Errors.
-
 ### `bio-crispr-screens-mageck-analysis` — 'RRA does not support pairing' is factually incorrect
 
 - Skill: 88, Limited Release · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/crispr-screens/mageck-analysis) · [viewer](skills/bio-crispr-screens-mageck-analysis/mrsonord2240-bioSkills@6847328/viewer.md)
@@ -1288,7 +1280,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The local Philosopher/TPP-derived pepXML ingestion path is incompatible with the available Comet and OpenMS-reserialised fixtures; this is not a silent Skill failure because the guard stops it.
 - Fix: Before a workflow depends on this optional route, run the documented commands against a compatible pepXML fixture or functioning Philosopher/TPP environment and assert nonempty peptideprophet_result, prot.xml, and protein.tsv. Do not retry the prohibited standalone TPP installer.
 
-## P2 (468)
+## P2 (467)
 
 ### `bio-data-visualization-lollipop-protein-maps` — HGVSp edge cases and recurrence semantics undocumented
 
@@ -3322,22 +3314,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: Examples are written as illustrative code patterns rather than self-contained, runnable smoke tests.
 - Fix: Bundle a small synthetic dataset (as this audit built) alongside each example so an agent can run it directly to verify the pattern before substituting real data.
 
-### `bio-crispr-screens-bagel-essentiality` — No explicit practice-boundary disclaimer despite repeated 'clinical-grade' language
-
-- Skill: 88, Production Ready · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/crispr-screens/bagel-essentiality) · [viewer](skills/bio-crispr-screens-bagel-essentiality/mrsonord2240-bioSkills@6847328/viewer.md)
-- Observed in inputs: 7
-- Problem: SKILL.md and usage-guide.md use 'clinical-grade essentiality calls' / 'clinical-grade' four times (thresholds table, Reproducibility section, Decision Cheat Sheet) with no accompanying caveat that BAGEL2 output from a research screen does not itself constitute a validated clinical assay or support an individual patient treatment decision.
-- Root cause: The phrase was adopted as a stringency label (BF>12 vs BF>6) without considering that an agent following only the Skill's literal text has no textual guardrail against extrapolating it into a real treatment recommendation.
-- Fix: Add a one-line caveat next to each 'clinical-grade' mention (or a single Practice Boundaries note near the top of SKILL.md) stating that BF thresholds describe statistical stringency within a research screen, not a validated diagnostic or treatment-decision threshold for an individual patient.
-
-### `bio-crispr-screens-bagel-essentiality` — 'Bootstrap CI is wide' Failure Mode symptom did not reproduce under a real thin-coverage test
-
-- Skill: 88, Production Ready · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/crispr-screens/bagel-essentiality) · [viewer](skills/bio-crispr-screens-bagel-essentiality/mrsonord2240-bioSkills@6847328/viewer.md)
-- Observed in inputs: 6
-- Problem: A synthetic 3-sgRNA/gene library (below the Skill's own 4-6/gene recommendation) produced implausibly extreme BF magnitudes under thin coverage, but none of 200 genes showed the literal documented symptom (STD column larger than BF, CI spanning zero) at -NB 1000 -- the entry may overstate how reliably that specific symptom appears versus a more general 'extreme, less trustworthy point estimates' pattern.
-- Root cause: The Failure Mode entry was written from the general statistical expectation (small-sample CI widening) rather than checked against a concrete low-coverage run.
-- Fix: Either verify the CI-spans-zero symptom against a low-coverage run with realistic (not exaggerated) effect sizes and adjust the wording accordingly, or broaden the documented symptom to also mention implausibly large BF magnitude as an equally valid red flag for thin per-gene coverage.
-
 ### `bio-crispr-screens-mageck-analysis` — FluteRRA's remaining 'undefined columns selected' error is a real, still-open upstream gap
 
 - Skill: 88, Limited Release · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/crispr-screens/mageck-analysis) · [viewer](skills/bio-crispr-screens-mageck-analysis/mrsonord2240-bioSkills@6847328/viewer.md)
@@ -4361,6 +4337,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The 'Mediational E-Value for Sensitivity' Working Code Pattern ends with `evalues.RR(acme_rr, lo=acme_lower_rr, hi=NULL)`. On installed EValue 4.1.4, `args(evalues.RR)` shows the `hi` parameter defaults to `NA`, not `NULL`; passing `hi=NULL` crashes with `Error in if (est < true & !is.na(hi)) { : argument is of length zero`. An agent following this pattern verbatim would hit an unexplained crash on a routine sensitivity-analysis step.
 - Root cause: The code block was written assuming `hi=NULL` is an inert 'no upper bound' sentinel, matching the convention in some other R packages, but EValue's own default sentinel for 'no value' is `NA`, not `NULL`; this line was never executed by either the pre-fix or the 88 re-audit (both evaluated Input 7's E-value discussion as a Mode A direct response, not by running this specific code block), so the defect survived two prior audit rounds untouched by the redundancy pass that introduced the formula text around it.
 - Fix: Change the code block's final line to omit `hi` entirely (`evalues.RR(acme_rr, lo=acme_lower_rr)`) or pass `hi=NA` explicitly; both run cleanly and return the same point/lower E-values verified in this round's Input 12.
+
+### `bio-crispr-screens-bagel-essentiality` — Calibrate thin-library magnitude as a range
+
+- Skill: 91, Production Ready · [mrsonord2240/bioSkills@a43fb07](https://github.com/mrsonord2240/bioSkills/tree/a43fb0726ecb90a9ca8ea660404cd98ba2989c18/crispr-screens/bagel-essentiality) · [viewer](skills/bio-crispr-screens-bagel-essentiality/mrsonord2240-bioSkills@a43fb07/viewer.md)
+- Observed in inputs: 6
+- Problem: The synthetic 3-sgRNA/gene regression confirmed extreme BF inflation but observed 1,847.853 rather than the stated approximately 2,400.
+- Root cause: The prose presents one implementation- and input-dependent observed magnitude too literally.
+- Fix: Replace the literal approximately 2,400 comparison with a checked range or the more robust statement that the synthetic thin library was about 14x the real control-excluded maximum in this run; retain the actionable coverage guidance.
 
 ### `bio-crispr-screens-batch-correction` — Within-batch-constant filter over-excludes guides that were never actually at risk
 
