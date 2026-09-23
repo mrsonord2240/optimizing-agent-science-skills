@@ -62,3 +62,11 @@ Env: WSL `science` distro, micromamba env `cnv-audit`, numbat 1.5.2. `SKILL.md` 
 
 - **No clinical-practice-boundary disclaimer (P2).** Judged not a correction: it is new prose, and the brief limits fixers to corrections. The re-audit's input 7 showed the agent refusing safely without it, so no defect was demonstrated by a run.
 - **No patient-privacy note (P2).** Same reason, and no run exposed a failure; no peer-Skill convention to copy was named in the report.
+
+---
+
+## Corrective validation (2026-09-23)
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| Provisional Phase 1 delta changed copyKAT's human `genome` selector from `hg20` to `hg19` in the example and parameter table | P1 | Rejected and reverted the two uncommitted edits; retained the committed `hg20` text | docs: official copyKAT v1.2.5 `R/copykat.R` defaults to `genome="hg20"`, has branches only for `hg20` and `mm10`, and calls `annotateGenes.hg20()` for the former; generated `man/copykat.Rd` independently specifies `hg20 or mm10` | `hg19` has no branch, so `anno.mat` would be undefined before its first use. No source commit or push: after the narrow revert the worktree matches `fa1bbada93ada3e111be9f85eb0aa62be0ffdbac`. |
