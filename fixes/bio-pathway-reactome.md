@@ -44,6 +44,10 @@ No disagreements found between the two files' copies before deletion.
 
 ## 2026-09-21 (P2 batch)
 
+## 2026-09-23 corrective
+
+- Windows R 4.4 ReactomePA 1.50.0 exits 2816 after even a bare `library(ReactomePA)` and default `gsePathway` fans out 22 workers. A private Linux micromamba R 4.4/Bioconductor stack loads ReactomePA 1.50.0 and exits 0. Commit `e66cde9` makes the shipped GSEA example explicit and bounded with `BiocParallel::SerialParam()`; the exact route completed naturally there without child workers.
+
 Worktree `F:\OpenScience\wt\pathway-analysis-reactome-pathways`, branch `fix/pathway-analysis-reactome-pathways`
 from staging `main` @ `431aa55`. Commit `e94ae76`. Fixer: Claude Sonnet 5. R 4.4.3 via
 `crispr-screen-analyst.sh`; ReactomePA 1.50.0, reactome.db 1.89.0. Nothing installed.
