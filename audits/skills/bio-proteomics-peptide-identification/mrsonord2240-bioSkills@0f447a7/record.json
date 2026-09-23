@@ -1,9 +1,9 @@
 {
   "skill_id": "bio-proteomics-peptide-identification",
-  "version": "mrsonord2240-bioSkills@1110c24",
+  "version": "mrsonord2240-bioSkills@0f447a7",
   "source": {
     "repository": "mrsonord2240/bioSkills",
-    "commit": "1110c241c27760ad0127bd803e8832d54651e31c",
+    "commit": "0f447a7a628052aac81acecb85c3d52d442a974a",
     "path": "proteomics/peptide-identification",
     "author": "GPTomics",
     "author_url": "https://github.com/GPTomics",
@@ -13,7 +13,7 @@
       "repository": "GPTomics/bioSkills",
       "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
     },
-    "url": "https://github.com/mrsonord2240/bioSkills/tree/1110c241c27760ad0127bd803e8832d54651e31c/proteomics/peptide-identification"
+    "url": "https://github.com/mrsonord2240/bioSkills/tree/0f447a7a628052aac81acecb85c3d52d442a974a/proteomics/peptide-identification"
   },
   "audit": {
     "method": {
@@ -26,16 +26,16 @@
       "url": "https://github.com/aipoch/medical-research-skills/tree/f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26/skill-auditor"
     },
     "evaluator_version": "skill-auditor@1.0",
-    "audited_on": "2026-09-15",
+    "audited_on": "2026-09-22",
     "performed_by": "Claude (Anthropic) auditor agents",
     "commissioned_by": "Samuel Nord",
     "test_data": "synthetic"
   },
-  "supersedes": "GPTomics-bioSkills@d91ed3d",
+  "supersedes": "mrsonord2240-bioSkills@1110c24",
   "files": {
     "report": "report.json",
     "viewer": "viewer.md",
     "fixes": "fixes.md",
-    "scripts": 25
+    "scripts": 14
   }
 }

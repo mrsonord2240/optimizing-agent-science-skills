@@ -1280,7 +1280,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The local Philosopher/TPP-derived pepXML ingestion path is incompatible with the available Comet and OpenMS-reserialised fixtures; this is not a silent Skill failure because the guard stops it.
 - Fix: Before a workflow depends on this optional route, run the documented commands against a compatible pepXML fixture or functioning Philosopher/TPP environment and assert nonempty peptideprophet_result, prot.xml, and protein.tsv. Do not retry the prohibited standalone TPP installer.
 
-## P2 (458)
+## P2 (452)
 
 ### `bio-data-visualization-lollipop-protein-maps` — HGVSp edge cases and recurrence semantics undocumented
 
@@ -4017,54 +4017,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: SKILL.md's 'Whole-genome or default universe' failure mode describes the symptom as 'a confident table where tissue-restricted / lowly-expressed-gene terms dominate'. On a null (no-biology) 150-gene list, omitting universe= produced exactly one additional term (p.adjust 0.033), not a dominated table -- reproduced this pass and in the pre-fix audit.
 - Root cause: The failure mode's magnitude was written from the general mechanism rather than from a run against data of this scale.
 - Fix: Soften the symptom description to note that the effect scales with list size and background mismatch severity -- sometimes one spurious term, sometimes many -- rather than always implying a dominated table.
-
-### `bio-proteomics-peptide-identification` — dda_search.sh hides Percolator's error from the operator
-
-- Skill: 90, Production Ready · [mrsonord2240/bioSkills@1110c24](https://github.com/mrsonord2240/bioSkills/tree/1110c241c27760ad0127bd803e8832d54651e31c/proteomics/peptide-identification) · [viewer](skills/bio-proteomics-peptide-identification/mrsonord2240-bioSkills@1110c24/viewer.md)
-- Observed in inputs: Input 10
-- Problem: With a decoy-tag mismatch, Percolator correctly exits 1 with 'Error: no decoy PSMs were provided', but the script redirects its stderr to $OUT/percolator.log and dies under set -e, so the console shows the search completing and then nothing - no counts, no message.
-- Root cause: The 2> redirect was added to keep Percolator's long banner off the console, and no trap or tee was added with it.
-- Fix: Replace the redirect with `2> >(tee "$OUT/percolator.log" >&2)` or add a `trap 'tail -3 "$OUT/percolator.log" >&2' ERR`, and add a pre-flight check that the pin's Label column contains both 1 and -1 before calling Percolator.
-
-### `bio-proteomics-peptide-identification` — No shipped route for the multi-run pooling the Skill advises
-
-- Skill: 90, Production Ready · [mrsonord2240/bioSkills@1110c24](https://github.com/mrsonord2240/bioSkills/tree/1110c241c27760ad0127bd803e8832d54651e31c/proteomics/peptide-identification) · [viewer](skills/bio-proteomics-peptide-identification/mrsonord2240-bioSkills@1110c24/viewer.md)
-- Observed in inputs: Input 9
-- Problem: The Skill states, correctly and with numbers this audit reproduced, that Percolator needs pooled runs to beat an engine's own score, but dda_search.sh accepts one MZML and the sample Sage JSON shows one mzml path.
-- Root cause: The script was written around the single-run comparison used to generate the engine-comparison paragraph.
-- Fix: Let MZML hold several space-separated paths, pass them all to `sage` and loop the Comet call, and note that Comet's pins must be concatenated (header once) before Percolator.
-
-### `bio-proteomics-peptide-identification` — Zero-decoy stop loses the q-floor hint on tiny lists
-
-- Skill: 90, Production Ready · [mrsonord2240/bioSkills@1110c24](https://github.com/mrsonord2240/bioSkills/tree/1110c241c27760ad0127bd803e8832d54651e31c/proteomics/peptide-identification) · [viewer](skills/bio-proteomics-peptide-identification/mrsonord2240-bioSkills@1110c24/viewer.md)
-- Observed in inputs: Input 3
-- Problem: A genuinely decoy-free 33-PSM pulldown export now raises ValueError. The pre-fix behaviour returned a q floor of 0.0303, which told the operator directly that 1% is unreachable at this list size - the exact point the Skill's own Decision Tree makes.
-- Root cause: The guard added in pass 2 treats 'no decoys' as unconditionally an error rather than distinguishing a prefix mismatch from an already-filtered table.
-- Fix: Keep the raise, but put the attainable floor in the message: `raise ValueError(f'no decoy PSMs recognised in {len(psms)} rows: check the decoy prefix, or the table was already decoy-filtered (with no decoys the smallest reachable q is 1/{len(psms)} = {1/len(psms):.3f})')`.
-
-### `bio-proteomics-peptide-identification` — mokapot and MS2Rescore promised but not routed
-
-- Skill: 90, Production Ready · [mrsonord2240/bioSkills@1110c24](https://github.com/mrsonord2240/bioSkills/tree/1110c241c27760ad0127bd803e8832d54651e31c/proteomics/peptide-identification) · [viewer](skills/bio-proteomics-peptide-identification/mrsonord2240-bioSkills@1110c24/viewer.md)
-- Observed in inputs: Static evaluation
-- Problem: The frontmatter description and the tool taxonomy both advertise rescoring via mokapot and MS2Rescore, but only Percolator has a command line. mokapot 0.10.0 is installed and takes the same Sage pin.
-- Root cause: Pass 4 deliberately scoped rescoring to one tool to avoid adding surface.
-- Fix: Add a two-line mokapot invocation next to the Percolator block (`mokapot --dest_dir ... results.sage.pin`) and state that it consumes the identical pin, or drop MS2Rescore from the description so the description matches what ships.
-
-### `bio-proteomics-peptide-identification` — examples/fdr_filtering.py ships but is unreferenced
-
-- Skill: 90, Production Ready · [mrsonord2240/bioSkills@1110c24](https://github.com/mrsonord2240/bioSkills/tree/1110c241c27760ad0127bd803e8832d54651e31c/proteomics/peptide-identification) · [viewer](skills/bio-proteomics-peptide-identification/mrsonord2240-bioSkills@1110c24/viewer.md)
-- Observed in inputs: Static evaluation (gate 8 direction check)
-- Problem: SKILL.md and usage-guide.md now point at examples/dda_search.sh and examples/separate_search_fdr.py only. fdr_filtering.py still ships, still runs, and is the Skill's only worked PEP-vs-q demonstration, but nothing links to it.
-- Root cause: Pass 4 added two example references and did not re-check the existing one.
-- Fix: Cite `examples/fdr_filtering.py` from the PEP vs q-value insight, the same way the other two examples are cited from their sections.
-
-### `bio-proteomics-peptide-identification` — 366-line SKILL.md with no progressive disclosure
-
-- Skill: 90, Production Ready · [mrsonord2240/bioSkills@1110c24](https://github.com/mrsonord2240/bioSkills/tree/1110c241c27760ad0127bd803e8832d54651e31c/proteomics/peptide-identification) · [viewer](skills/bio-proteomics-peptide-identification/mrsonord2240-bioSkills@1110c24/viewer.md)
-- Observed in inputs: Static evaluation
-- Problem: An agent that only needs the table snippet loads the full CLI route, the decoy-database section and a 19-entry reference list.
-- Root cause: Pass 4 added roughly 120 lines of new sections without splitting the file.
-- Fix: Move the three command-line sections and the reference list into `references/cli_route.md` and `references/citations.md`, leaving the insights, estimators and Common Errors in SKILL.md.
 
 ### `bio-similarity-searching` — MCS failure mode describes a timeout that does not occur
 
