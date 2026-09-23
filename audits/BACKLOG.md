@@ -22,7 +22,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The example passes cluster_rows=<OLO dendrogram> together with row_split=gene_info$pathway, a combination ComplexHeatmap rejects; the script was never run.
 - Fix: Drop row_split or use a numeric row_split (works with the dendrogram), or apply OLO within each pathway group; supply a runnable data preamble and state the constraint in SKILL.md next to the OLO block.
 
-## P1 (158)
+## P1 (160)
 
 ### `bio-data-visualization-lollipop-protein-maps` — Shipped example never completes and paints wrong colours
 
@@ -1136,6 +1136,22 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The final-pass correction changed SKILL.md and examples/gi_scoring.py but did not update the abbreviated usage-guide workflow.
 - Fix: Revise the GI prompt and workflow step to state that raw z classification is only for small hand-curated sets; for genome-scale screens require two-sided z p-values and BH-FDR before calling hits.
 
+### `bio-crispr-screens-screen-qc` — Direct CLIs bypass the documented count validation
+
+- Skill: 92, Production Ready · [mrsonord2240/bioSkills@ea262e3](https://github.com/mrsonord2240/bioSkills/tree/ea262e30ef772128ccaf058698f972bb98f17e27/crispr-screens/screen-qc) · [viewer](skills/bio-crispr-screens-screen-qc/mrsonord2240-bioSkills@ea262e3/viewer.md)
+- Observed in inputs: 1, 4, 9
+- Problem: SKILL.md says to reject a default 0..n-1 index before any metric, and examples/screen_qc.py does so; directly advertised scripts/library_representation.py instead accepted a default integer index and emitted metrics (supplemental_direct_cli_validation.log).
+- Root cause: Validation was implemented only in the example rather than shared by the direct script entry points.
+- Fix: Extract the documented count-table validation into a shared helper and call it from every count-table CLI before any calculation; add a direct-CLI regression for default indexes, Gene absence, non-numeric values, negatives, duplicates, and all-zero samples.
+
+### `bio-crispr-screens-screen-qc` — Usage guide reverses the copy-number direction rule
+
+- Skill: 92, Production Ready · [mrsonord2240/bioSkills@ea262e3](https://github.com/mrsonord2240/bioSkills/tree/ea262e30ef772128ccaf058698f972bb98f17e27/crispr-screens/screen-qc) · [viewer](skills/bio-crispr-screens-screen-qc/mrsonord2240-bioSkills@ea262e3/viewer.md)
+- Observed in inputs: 3
+- Problem: usage-guide.md tells users to flag CN bias at abs(rho) > 0.1, whereas SKILL.md, copy-number-bias.md, and cn_bias.py correctly require rho < -0.1 plus p < 0.01. A positive correlation could therefore be falsely called a CN artifact.
+- Root cause: A stale guide summary retained an earlier absolute-value formulation after the two-rule diagnostic was corrected.
+- Fix: Replace the usage-guide statement with the directional broad-artifact rule and the focal amplified-vs-diploid gap rule, or point the guide to the canonical SKILL.md copy-number section without restating thresholds.
+
 ### `bio-metabolomics-metabolite-annotation` — Emit Level 2a in CLI single-hit branch
 
 - Skill: 92, Limited Release · [mrsonord2240/bioSkills@52cdec6](https://github.com/mrsonord2240/bioSkills/tree/52cdec64082fb7a3bc2d84e9d7cf5c05a5fdf9f1/metabolomics/metabolite-annotation) · [viewer](skills/bio-metabolomics-metabolite-annotation/mrsonord2240-bioSkills@52cdec6/viewer.md)
@@ -1288,7 +1304,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (382)
+## P2 (381)
 
 ### `bio-data-visualization-lollipop-protein-maps` — HGVSp edge cases and recurrence semantics undocumented
 
@@ -3794,6 +3810,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The command assumes an external library-file convention without documenting the required schema in the Skill.
 - Fix: Add a one-line CSV header/example immediately before mageck count: sgRNA,sequence,gene, and state that all three fields are required by MAGeCK's --list-seq parser.
 
+### `bio-crispr-screens-screen-qc` — Stage threshold values remain duplicated in the example
+
+- Skill: 92, Production Ready · [mrsonord2240/bioSkills@ea262e3](https://github.com/mrsonord2240/bioSkills/tree/ea262e30ef772128ccaf058698f972bb98f17e27/crispr-screens/screen-qc) · [viewer](skills/bio-crispr-screens-screen-qc/mrsonord2240-bioSkills@ea262e3/viewer.md)
+- Observed in inputs: 8
+- Problem: STAGE_THRESHOLDS in examples/screen_qc.py is a manual copy of values stated in SKILL.md and scripts/library_representation.py; the comments help but cannot prevent future drift.
+- Root cause: The standalone example intentionally avoids importing the script helper but has no consistency check.
+- Fix: Retain the standalone configuration but add a lightweight regression that compares the two threshold sources, or keep a single generated threshold artifact used by both.
+
 ### `bio-differential-expression-deseq2-basics` — 'All-zero in a group' is not a padj=NA cause
 
 - Skill: 92, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/differential-expression/deseq2-basics) · [viewer](skills/bio-differential-expression-deseq2-basics/GPTomics-bioSkills@d91ed3d/viewer.md)
@@ -4113,22 +4137,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The shipped CAUSE demo intentionally uses 50,000 variants and emits a package warning that fewer than 100,000 nuisance variants may be unstable.
 - Root cause: The lightweight synthetic demonstration is smaller than CAUSE's nuisance-estimation recommendation.
 - Fix: Add one sentence beside the demo that its 50,000-variant size is pedagogic and real analyses should follow the package's larger-nuisance-variant guidance.
-
-### `bio-crispr-screens-screen-qc` — Documented sgRNA-identifier-column requirement is not enforced by validate_counts()
-
-- Skill: 94, Production Ready · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/crispr-screens/screen-qc) · [viewer](skills/bio-crispr-screens-screen-qc/mrsonord2240-bioSkills@6847328/viewer.md)
-- Observed in inputs: 9
-- Problem: SKILL.md's Input Validation table lists 'an sgRNA identifier column (index)' as a required check, but validate_counts() only checks the Gene column, dtypes, negative values and duplicate index values -- a table indexed by a bare default RangeIndex (no real sgRNA IDs) is silently accepted.
-- Root cause: The duplicate-ID check (counts.index.duplicated()) was written assuming the index already holds sgRNA identifiers; nothing separately confirms the index is meaningful rather than a pandas default.
-- Fix: Add a check that the index is non-default (e.g. not equal to pd.RangeIndex(len(counts))) or that it matches an expected sgRNA-ID pattern, and raise the same kind of named ValueError as the other four checks.
-
-### `bio-crispr-screens-screen-qc` — Shipped example's threshold dict is a hand-copied duplicate of stage_specific_thresholds(), not a linked import
-
-- Skill: 94, Production Ready · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/crispr-screens/screen-qc) · [viewer](skills/bio-crispr-screens-screen-qc/mrsonord2240-bioSkills@6847328/viewer.md)
-- Observed in inputs: 8
-- Problem: examples/screen_qc.py's STAGE_THRESHOLDS now matches SKILL.md's stage_specific_thresholds() and says so in a comment, but nothing enforces that they stay in sync -- this is exactly how the pre-fix disagreement originally happened.
-- Root cause: The example is a standalone copy-paste script rather than importing SKILL.md's function, by design (so a researcher can run it without the rest of the Skill installed).
-- Fix: Add a one-line comment pointing to the exact SKILL.md section ("QC Stage Hierarchy" / "Library Representation Metrics") so a future editor updating one table is prompted to update the other, or add a small consistency test in a CI-style check if one exists for this repo.
 
 ### `bio-duplicate-handling` — Validate pbmarkdup on real HiFi amplicon data
 

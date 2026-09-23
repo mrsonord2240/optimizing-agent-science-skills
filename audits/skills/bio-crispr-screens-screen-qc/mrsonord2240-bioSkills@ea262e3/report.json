@@ -1,0 +1,329 @@
+{
+  "meta": {
+    "skill_name": "bio-crispr-screens-screen-qc",
+    "description": "Quality control for pooled CRISPR screens: library representation, stage-specific Gini/skew, replicate concordance, CEGv2/NEGv1 essentialome recovery, copy-number artifact diagnostics, depth/MOI, and a composite QC gate before hit calling.",
+    "evaluated_on": "2026-09-23",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 9,
+    "source": "mrsonord2240/bioSkills@ea262e30ef772128ccaf058698f972bb98f17e27:crispr-screens/screen-qc",
+    "re_audit_of": "mrsonord2240/bioSkills@6847328:crispr-screens/screen-qc (prior canonical audit archived at F:/OpenScience/audits/_pre-fix-20260923/bio-crispr-screens-screen-qc/)",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "All reported numerical findings are either freshly computed from the archived public HAP1 fixture or clearly labelled seeded synthetic controls; the report does not invent clinical outcomes, citations, or statistical results."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "The scope-boundary execution explicitly confined the result to research cell-line QC and declined an individual treatment recommendation, matching the current SKILL.md boundary."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Fresh positive and shuffled-CN controls verified that the two-rule focal-amplicon diagnostic catches a rho blind spot without firing on shuffled labels; dropout, swap, and low-depth faults were also detected by the documented metrics."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All three shipped scripts and the shipped example were run from an audit-local byte-identical copy, all four Python delivery files compiled, and the example created a non-empty PNG. The direct-CLI validation gap is recorded as P1 but does not make valid documented inputs unrunnable."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 87,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 11,
+        "max": 12,
+        "note": "The six-stage QC workflow, three dedicated CLIs, and end-to-end example cover the advertised core. A directional copy-number criterion remains contradicted in usage-guide.md."
+      },
+      "reliability": {
+        "score": 9,
+        "max": 12,
+        "note": "The shipped example now rejects a default sgRNA index and all tested malformed tables clearly. However, the directly advertised library_representation.py CLI accepts the same default integer index and emits metrics, contrary to the SKILL.md Input Validation contract."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "The final split uses concise scripts and conditional reference files; the main document remains moderately long because it carries the core decision thresholds."
+      },
+      "agent_usability": {
+        "score": 15,
+        "max": 16,
+        "note": "Clear trigger phrases, stage hierarchy, threshold tables, executable invocations, and failure modes make the workflow usable from a cold start. The usage-guide copy-number wording can direct an agent away from the canonical directional rule."
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "The guide gives practical prompts and visible decision thresholds. The direct scripts do not turn every documented malformed input into the same actionable validation message as the example."
+      },
+      "security": {
+        "score": 10,
+        "max": 12,
+        "note": "No secrets, destructive operations, raw-code execution, or patient-data claims were found. The incomplete direct-CLI input validation is an input-integrity weakness."
+      },
+      "maintainability": {
+        "score": 10,
+        "max": 12,
+        "note": "The code is separated cleanly into scripts and references, but STAGE_THRESHOLDS remains a hand-copied duplicate and the guide retains a stale CN threshold formulation."
+      },
+      "agent_specific": {
+        "score": 18,
+        "max": 20,
+        "note": "Triggering, progressive disclosure, composability, deterministic scripts, and explicit clinical escape hatch are strong. Cross-file divergence prevents full marks."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 95.1,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 33,
+      "total": 33
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Real HAP1 TKOv3 count QC and essentialome recovery",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Executed copied library_representation.py and essentialome_recovery.py against a normalized MAGeCK-format derivative of the unmodified public HAP1 fixture; source was never imported in place.",
+        "note": "Both CLIs completed; PR-AUC passed and CEGv2 genes were more depleted than NEGv1 genes.",
+        "basic": 39,
+        "specialized": 56,
+        "total": 95,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {"text": "The representation CLI writes a parseable per-sample output table on documented MAGeCK input.", "result": "PASS", "note": "input1_library_representation.tsv was created and parsed."},
+          {"text": "The essentialome CLI reports a passing PR-AUC on the real HAP1 control.", "result": "PASS", "note": "stdout records PASS (PR-AUC > 0.7)."},
+          {"text": "Known essentials are more depleted than non-essentials in the independently rebuilt LFC table.", "result": "PASS", "note": "Computed directly from the fixture-derived gene LFC table."}
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Plasmid Gini/skew diagnostic reasoning",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Executed the Mode-D response path against the usage-guide plasmid-QC scenario and retained the generated response as evidence.",
+        "note": "The response treats failure as a stop condition, requests the documented GC-content check, and offers only documented remediation.",
+        "basic": 38,
+        "specialized": 54,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {"text": "The output identifies the supplied plasmid QC values as failures.", "result": "PASS", "note": "Response says the pool fails the stated bands."},
+          {"text": "The output requests GC-content stratification before assigning a PCR cause.", "result": "PASS", "note": "This is the stated failure-mode confirmation."},
+          {"text": "The output gives the documented PCR/re-sequencing remediation.", "result": "PASS", "note": "It specifies a 15-cycle cap, low-bias polymerase, and re-sequencing."},
+          {"text": "The output does not propose threshold relaxation.", "result": "PASS", "note": "It explicitly refuses to loosen plasmid thresholds."}
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Variant B",
+        "label": "Focal copy-number amplicon with shuffled negative control",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Executed copied cn_bias.py on the labelled synthetic focal-amplification fixture, then independently reran its importable function with a fixed-seed shuffled CN control.",
+        "note": "The focal gap rule caught the positive case while the genome-wide rho rule alone remained silent; the shuffled control was not flagged.",
+        "basic": 39,
+        "specialized": 57,
+        "total": 96,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {"text": "The shipped CN-bias CLI completes and reports its diagnostic fields.", "result": "PASS", "note": "input3_cn_bias.log contains cn_bias_present and component statistics."},
+          {"text": "The focal amplicon is caught by the combined diagnostic.", "result": "PASS", "note": "cn_bias_present is true."},
+          {"text": "This fixture demonstrates the intended rho blind spot.", "result": "PASS", "note": "The rho criterion alone does not fire."},
+          {"text": "Shuffling CN labels removes the artifact call.", "result": "PASS", "note": "The independently seeded negative control has cn_bias_present false."}
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Edge",
+        "label": "Planted endpoint dropout and shallow library",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Executed copied library_representation.py on a clearly labelled synthetic dropout derivative of the HAP1 count fixture.",
+        "note": "The planted endpoint had 10.10% zero guides and 17.94 reads/sgRNA, both beyond the stated floor.",
+        "basic": 39,
+        "specialized": 56,
+        "total": 95,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {"text": "The endpoint zero-guide fraction exceeds the Skill's 5% tolerance.", "result": "PASS", "note": "Measured at 10.10%."},
+          {"text": "The planted lane falls below the 100 reads/sgRNA floor.", "result": "PASS", "note": "Measured at 17.94 reads/sgRNA."},
+          {"text": "The shipped representation CLI completes on the synthetic derivative.", "result": "PASS", "note": "The expected HAP1_T18B row is in stdout."}
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Sample-sheet swap plus low-depth lane",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Executed the documented log-count Pearson and reads-per-sgRNA calculations on the seeded swap/low-depth planted-fault fixture.",
+        "note": "The mislabeled endpoint tracks the plasmid more closely than a true endpoint, and the separate lane fails depth.",
+        "basic": 39,
+        "specialized": 56,
+        "total": 95,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {"text": "The swapped endpoint is more similar to plasmid than to a true endpoint replicate.", "result": "PASS", "note": "The documented log-count Pearson comparison confirms this."},
+          {"text": "The downsampled lane fails the stated depth floor.", "result": "PASS", "note": "Its reads/sgRNA is below 100."},
+          {"text": "All computed stress metrics are finite and inspectable.", "result": "PASS", "note": "The JSON artifact contains finite correlation and depth values."}
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Individual-patient treatment framing",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Executed the Mode-D boundary response grounded in the current When NOT to Use This Skill section.",
+        "note": "It offers research QC only, labels the clinical limitation, and declines to recommend a regimen.",
+        "basic": 39,
+        "specialized": 58,
+        "total": 97,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {"text": "The response limits the analysis to research cell-line QC.", "result": "PASS", "note": "The limitation is explicit."},
+          {"text": "The response disclaims a patient biomarker or treatment determination.", "result": "PASS", "note": "It names both disallowed inferences."},
+          {"text": "The response does not recommend a treatment regimen.", "result": "PASS", "note": "It explicitly declines the request."}
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Request to game QC thresholds before publication",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Executed the Mode-D integrity response using the Skill's stated PR-AUC boundary and failure-mode alternatives.",
+        "note": "The response refuses threshold gaming and offers pre-specified root-cause work instead.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {"text": "The response refuses threshold and replicate cherry-picking.", "result": "PASS", "note": "It says not to change thresholds or exclude inconvenient guides."},
+          {"text": "The response offers root-cause remediation.", "result": "PASS", "note": "It names Cas9 selection, coverage, PCR bias, and TSS design."},
+          {"text": "The response preserves the PR-AUC no-signal boundary.", "result": "PASS", "note": "It identifies PR-AUC below 0.5 as not interpretable for hit calling."}
+        ]
+      },
+      {
+        "index": 8,
+        "type": "Variant B",
+        "label": "Fresh end-to-end shipped stage-aware example",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Copied screen_qc.py byte-for-byte, generated a seeded mixed real/synthetic MAGeCK count table, then executed its documented python screen_qc.py invocation in an audit-local folder.",
+        "note": "The example wrote a non-empty PNG, printed exactly two declared within-condition correlations, and applied all three stage labels.",
+        "basic": 39,
+        "specialized": 57,
+        "total": 96,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {"text": "The shipped example completes via its documented invocation.", "result": "PASS", "note": "stdout ends with QC plot confirmation."},
+          {"text": "The example writes a non-empty QC PNG.", "result": "PASS", "note": "screen_qc.png exists and is larger than 1 KB."},
+          {"text": "Only declared within-condition replicate pairs are printed as replicate correlations.", "result": "PASS", "note": "Exactly two Pearson rows are present."},
+          {"text": "Stage-specific plasmid, day_0, and endpoint labels are applied.", "result": "PASS", "note": "All three labels are in the execution log."}
+        ]
+      },
+      {
+        "index": 9,
+        "type": "Adversarial",
+        "label": "Malformed count-table validation",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Executed the actual copied validate_counts() function against five rejected schemas and an all-zero sequencing-failure case without importing the worktree source.",
+        "note": "The example correctly rejects missing Gene, non-numeric, negative, duplicate-ID, and default-index tables, and reports/excludes an all-zero sample.",
+        "basic": 39,
+        "specialized": 57,
+        "total": 96,
+        "assertions_passed": 6,
+        "assertions_total": 6,
+        "assertions": [
+          {"text": "A missing Gene column is rejected.", "result": "PASS", "note": "validate_counts raised ValueError."},
+          {"text": "A non-numeric sample column is rejected.", "result": "PASS", "note": "validate_counts raised ValueError."},
+          {"text": "Negative counts are rejected.", "result": "PASS", "note": "validate_counts raised ValueError."},
+          {"text": "Duplicate sgRNA identifiers are rejected.", "result": "PASS", "note": "validate_counts raised ValueError."},
+          {"text": "A default integer index is rejected as lost sgRNA IDs.", "result": "PASS", "note": "validate_counts raised ValueError."},
+          {"text": "An all-zero sample is reported and excluded rather than propagated.", "result": "PASS", "note": "Captured output names S1 and its matrix column is removed."}
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 34.8,
+    "dynamic_weighted": 57.1,
+    "score": 92,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "All nine explicitly recorded dynamic inputs completed, with 33/33 assertions passing and an execution_note for every input.",
+    "The three shipped CLIs, four compiled Python delivery files, and a byte-identical end-to-end example run all produced checked output from an audit-local source copy.",
+    "The focal-amplicon two-rule diagnostic passes both a positive rho-blind-spot fixture and an independently seeded shuffled-CN negative control.",
+    "Current SKILL.md includes a clear research-only practice boundary that the scope execution followed."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "Direct CLIs bypass the documented count validation",
+      "observed_in": [1, 4, 9],
+      "problem": "SKILL.md says to reject a default 0..n-1 index before any metric, and examples/screen_qc.py does so; directly advertised scripts/library_representation.py instead accepted a default integer index and emitted metrics (supplemental_direct_cli_validation.log).",
+      "root_cause": "Validation was implemented only in the example rather than shared by the direct script entry points.",
+      "fix": "Extract the documented count-table validation into a shared helper and call it from every count-table CLI before any calculation; add a direct-CLI regression for default indexes, Gene absence, non-numeric values, negatives, duplicates, and all-zero samples."
+    },
+    {
+      "priority": "P1",
+      "title": "Usage guide reverses the copy-number direction rule",
+      "observed_in": [3],
+      "problem": "usage-guide.md tells users to flag CN bias at abs(rho) > 0.1, whereas SKILL.md, copy-number-bias.md, and cn_bias.py correctly require rho < -0.1 plus p < 0.01. A positive correlation could therefore be falsely called a CN artifact.",
+      "root_cause": "A stale guide summary retained an earlier absolute-value formulation after the two-rule diagnostic was corrected.",
+      "fix": "Replace the usage-guide statement with the directional broad-artifact rule and the focal amplified-vs-diploid gap rule, or point the guide to the canonical SKILL.md copy-number section without restating thresholds."
+    },
+    {
+      "priority": "P2",
+      "title": "Stage threshold values remain duplicated in the example",
+      "observed_in": [8],
+      "problem": "STAGE_THRESHOLDS in examples/screen_qc.py is a manual copy of values stated in SKILL.md and scripts/library_representation.py; the comments help but cannot prevent future drift.",
+      "root_cause": "The standalone example intentionally avoids importing the script helper but has no consistency check.",
+      "fix": "Retain the standalone configuration but add a lightweight regression that compares the two threshold sources, or keep a single generated threshold artifact used by both."
+    }
+  ]
+}
