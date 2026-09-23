@@ -120,3 +120,17 @@ Environment: `single-cell-transcriptomics-analyst`; no installs and no shared-en
 
 - The Windows `r.sh` -> R runtime returns post-output exit status `2816` for both completed chromVAR runs. It needs runtime-level diagnosis before a later audit may call the documented command process-clean.
 - The prior `fragtk` / `ATACqc()` and Linux-only ArchR/SnapATAC2 constraints remain unchanged.
+
+---
+
+## 2026-09-23 — Phase 1 continuation: process-clean isolated chromVAR runtime
+
+Worktree: `F:\OpenScience\wt\single-cell-scatac-analysis`; branch
+`fix/single-cell-scatac-analysis`; corrective source commit
+`e14c7b581acaa271a9bf643febcb5ff0dd40d966`.
+
+| finding | priority | change | verified | notes |
+|---|---|---|---|---|
+| The exact native Windows wrapper materialized chromVAR output but returned `2816` | P0 code-usability veto | Diagnosed with minimal probes: no-package R exits zero, while `library(Signac)` exits `-1073741819` at direct native-R teardown. Removed the audit-machine-specific library overlay and replaced the misleading native-wrapper instruction with a supported isolated WSL/Linux-R route. | Installed private `/home/sci/scatac-private-20260923` without modifying the shared Windows environment; full Signac/chromVAR stack loaded and exited zero. The exact source script ran twice through that private `Rscript` with saved `set -e` evidence, producing identical RDS/CSV outputs (746 motifs, 270 cells, 3 adjusted-significant motifs). | Native Windows Signac teardown remains unsuitable; the documented WSL route avoids claiming materialized output is a clean run. |
+
+The prior `fragtk` / `ATACqc()` and Linux-only ArchR/SnapATAC2 constraints remain unchanged. No scoring, publish, merge, or GBrain project write occurred.
