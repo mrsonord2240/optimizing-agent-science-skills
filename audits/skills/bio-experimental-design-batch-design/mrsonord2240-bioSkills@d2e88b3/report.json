@@ -1,0 +1,282 @@
+{
+  "meta": {
+    "skill_name": "bio-experimental-design-batch-design",
+    "description": "Designs genomics experiments so technical nuisance variation is balanced against biological variables, using constrained designit assignment, hidden-batch detection with SVA, and explicit routing for downstream correction.",
+    "evaluated_on": "2026-09-23",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Protocol Design",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 9,
+    "source": "mrsonord2240/bioSkills@d2e88b38777dd154d642d15cefe7e2ad1ccb2a0f:experimental-design/batch-design",
+    "audit_type": "final-pass Phase 2 re-audit: seven regression inputs plus two new validation inputs",
+    "pre_fix_report": "F:/OpenScience/audits/_pre-fix-20260923/bio-experimental-design-batch-design/",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "FAIL",
+      "stability": "FAIL",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "All numeric results are from labelled synthetic audit inputs and their saved execution logs; no citation, clinical result, or statistic was invented."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "The Skill provides experimental-design and analysis-boundary guidance only; it makes no individual diagnostic, treatment, or prescribing conclusion."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Fresh runs confirmed the central methodological boundaries: a confounded ComBat covariate is rejected, an estimable condition-plus-batch model fits partial imbalance, and the balance checker warns or stops rather than silently accepting a bad layout."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All four shipped R files parse. Each substantive workflow produced and checked its expected layout or analytical result. The non-zero package-session teardown is a designated-environment stability defect recorded under T1, not a syntax, dependency-resolution, or algorithmic failure in the shipped code."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 94,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 12, "max": 12, "note": "The exact tip covers constrained assignment, bridge-channel layouts, balance verification, SVA missing-value handling, correction boundaries, and reproducibility metadata." },
+      "reliability": { "score": 10, "max": 12, "note": "Shared validation clearly rejects missing columns, over-capacity layouts, confounding, and invalid channel coordinates; an operational-exit failure in the designated R environment prevents full marks." },
+      "performance_context": { "score": 7, "max": 8, "note": "The scripts are focused and seeded, but their documented full 10,000-iteration optimization can take minutes and emits an environment-level non-zero termination." },
+      "agent_usability": { "score": 16, "max": 16, "note": "Commands, required columns, balancing variables, hard stops, soft warnings, and downstream ownership are explicit." },
+      "human_usability": { "score": 8, "max": 8, "note": "Natural triggers and a short usage guide cover assignment, confounding, hidden batches, and method choice." },
+      "security": { "score": 11, "max": 12, "note": "No credentials, destructive operations, or raw-code execution are present; command arguments are ordinary local file and scalar parameters." },
+      "maintainability": { "score": 12, "max": 12, "note": "Runnable concerns are separated into assign_batches.R, bridge_layout.R, and one shared check_balance.R; all copied source files parsed successfully." },
+      "agent_specific": { "score": 18, "max": 20, "note": "The Skill has precise triggers, routing, seeds, and escape hatches. Its full execution still depends on repairing the supplied R environment." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 88.1,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 35, "total": 36 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical regression",
+        "label": "Assign 24 samples to three batches while balancing condition and sex.",
+        "status": "PARTIAL",
+        "status_flag": "⚠️",
+        "note": "The exact copied command wrote a 24-row layout with condition and sex both 4/4/4 across batches, then R exited by segmentation fault after completion.",
+        "executed": true,
+        "execution_note": "Executed run/in1_assign_canonical.sh under crispr-screen-analyst; checked layout24.csv and run/in1_assign_canonical.out.",
+        "basic": 32,
+        "specialized": 49,
+        "total": 81,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The documented assignment command produced a layout CSV.", "result": "PASS", "note": "layout24.csv exists with 24 assigned rows." },
+          { "text": "Condition is balanced across all three batches.", "result": "PASS", "note": "case and ctrl are each 4/4/4." },
+          { "text": "Sex is checked as an additional balanced covariate.", "result": "PASS", "note": "F and M are each 4/4/4." },
+          { "text": "The successful result is not silently accepted without a validation table.", "result": "PASS", "note": "check_balance printed both tables." }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Bridge-layout regression",
+        "label": "Assign 60 samples across four TMT 16plexes while reserving channel 16 for a bridge sample.",
+        "status": "PARTIAL",
+        "status_flag": "⚠️",
+        "note": "The copied bridge command reserved channel 16 and wrote the layout; condition was 7/7/8/8 and the checker correctly warned that site spread was 2. R then segfaulted after output completion.",
+        "executed": true,
+        "execution_note": "Executed run/in2_bridge_canonical.sh; checked layout60.csv and run/in2_bridge_canonical.out.",
+        "basic": 31,
+        "specialized": 49,
+        "total": 80,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The requested bridge channel remains unassigned to biology.", "result": "PASS", "note": "Channel 16 is absent from layout60.csv." },
+          { "text": "No plex exceeds its 15 non-reserved biological positions.", "result": "PASS", "note": "Each plex has 15 biological rows." },
+          { "text": "Condition is represented in every plex.", "result": "PASS", "note": "case 7/7/8/8 and ctrl 8/8/7/7." },
+          { "text": "Avoidable site imbalance is surfaced rather than hidden.", "result": "PASS", "note": "The shared checker warned of a largest-minus-smallest spread of 2." }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "SVA missing-value regression",
+        "label": "Estimate hidden batches from an intensity matrix that contains missing values.",
+        "status": "PARTIAL",
+        "status_flag": "⚠️",
+        "note": "The copied shipped example reported 282/24000 missing cells, restricted to 766 complete rows, estimated one surrogate variable, and reduced the visualization-only ComBat PC1-batch correlation from 0.48 to 0.01 before R segfaulted on teardown.",
+        "executed": true,
+        "execution_note": "Executed run/in3_sva_na.sh, which calls run/test_sva_missing.R and the copied examples/batch_design.R; checked run/in3_sva_na.out.",
+        "basic": 34,
+        "specialized": 50,
+        "total": 84,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Missing values are reported before SVA is called.", "result": "PASS", "note": "The output reports 282/24000 non-finite cells." },
+          { "text": "Only complete observations enter the Option A SVA estimate.", "result": "PASS", "note": "766/1000 complete rows were retained." },
+          { "text": "A hidden factor is estimated on the complete matrix.", "result": "PASS", "note": "The example estimated one surrogate variable." },
+          { "text": "Batch-cleaned data are framed as visualization-only.", "result": "PASS", "note": "The shipped output explicitly labels the PC comparison as plots only." }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Verifier regression",
+        "label": "Check balanced, avoidably unbalanced, and fully confounded layouts before sequencing.",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The shared verifier accepted a balanced condition/sex layout, emitted the expected soft warning for a spread of 3, and rejected a condition-by-batch confound.",
+        "executed": true,
+        "execution_note": "Executed run/in4_balance_cases.sh calling run/check_balance_cases.R; checked run/in4_balance_cases.out.",
+        "basic": 38,
+        "specialized": 58,
+        "total": 96,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Balanced layouts are accepted.", "result": "PASS", "note": "Condition and sex tables are all 4/4/4." },
+          { "text": "The soft imbalance warning fires above a spread of one.", "result": "PASS", "note": "Spread 3 emitted EXPECTED_WARNING." },
+          { "text": "Fully confounded layouts halt.", "result": "PASS", "note": "The test captured the documented confounded-layout error." },
+          { "text": "All requested covariates are checked.", "result": "PASS", "note": "Both condition and sex were supplied to check_balance." }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Correction-boundary regression",
+        "label": "Test whether ComBat can rescue a perfectly confounded design and whether partial imbalance remains estimable with batch in the model.",
+        "status": "PARTIAL",
+        "status_flag": "⚠️",
+        "note": "On labelled synthetic matrices, ComBat rejected a covariate perfectly aliased with batch and limma fit condition plus batch without NA coefficients for partial imbalance; R then segfaulted on teardown.",
+        "executed": true,
+        "execution_note": "Executed run/in5_combat_claims.sh calling run/test_combat_design_claims.R; checked run/in5_combat_claims.out.",
+        "basic": 34,
+        "specialized": 50,
+        "total": 84,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "A biological covariate perfectly confounded with batch is rejected by ComBat.", "result": "PASS", "note": "The synthetic call raised a confounding error." },
+          { "text": "Partial imbalance is estimable when batch is retained in the model.", "result": "PASS", "note": "lmFit produced no NA coefficients." },
+          { "text": "The test does not claim that correction rescues a non-identifiable design.", "result": "PASS", "note": "It explicitly tests and confirms rejection." },
+          { "text": "The data are identified as synthetic.", "result": "PASS", "note": "The test script is a seeded synthetic regression check." }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "New determinism input",
+        "label": "Repeat the same 24-sample assignment with the same seed and compare output bytes.",
+        "status": "PARTIAL",
+        "status_flag": "⚠️",
+        "note": "The repeated 10,000-iteration run wrote layout24_repeat.csv and it was byte-identical to layout24.csv, but again ended in the reproducible R teardown segmentation fault.",
+        "executed": true,
+        "execution_note": "Executed run/in6_determinism.sh; independently compared SHA-256 values of layout24.csv and layout24_repeat.csv after the script returned non-zero.",
+        "basic": 34,
+        "specialized": 50,
+        "total": 84,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The repeated documented command produced a second layout.", "result": "PASS", "note": "layout24_repeat.csv exists." },
+          { "text": "The same seed produces identical layout bytes.", "result": "PASS", "note": "The two CSV SHA-256 hashes are equal." },
+          { "text": "The repeated layout retains condition and sex balance.", "result": "PASS", "note": "The output tables are again 4/4/4." },
+          { "text": "The process exits successfully after a valid result.", "result": "FAIL", "note": "R ended with a segmentation fault after writing the result." }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "New validation boundary",
+        "label": "Request balancing on a missing covariate column.",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The command rejected missing_sex.csv with the explicit required-column message; the harness correctly treated that rejection as success.",
+        "executed": true,
+        "execution_note": "Executed run/in7_missing_covariate.sh; checked run/in7_missing_covariate.out.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "A missing requested covariate is rejected.", "result": "PASS", "note": "The command halted before optimization." },
+          { "text": "The error identifies the required input contract.", "result": "PASS", "note": "It names id and every requested feature variable." },
+          { "text": "No misleading layout is emitted.", "result": "PASS", "note": "should_not_exist.csv was not written." },
+          { "text": "The harness records the expected rejection correctly.", "result": "PASS", "note": "The wrapper returned PASS after the rejection." }
+        ]
+      },
+      {
+        "index": 8,
+        "type": "Capacity boundary",
+        "label": "Try to place 60 samples into only 24 batch positions.",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The assignment command stopped before optimization with the exact more-samples-than-slots message; no output layout was created.",
+        "executed": true,
+        "execution_note": "Executed run/in8_over_capacity.sh; checked run/in8_over_capacity.out.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Over-capacity inputs are rejected before optimization.", "result": "PASS", "note": "The documented capacity guard fired." },
+          { "text": "The failure identifies the capacity problem.", "result": "PASS", "note": "It states more samples than n_batch x n_position slots." },
+          { "text": "No partial layout is emitted.", "result": "PASS", "note": "should_not_exist.csv is absent." },
+          { "text": "The harness treats expected validation rejection as a passing outcome.", "result": "PASS", "note": "The wrapper returned PASS." }
+        ]
+      },
+      {
+        "index": 9,
+        "type": "Bridge-coordinate boundary",
+        "label": "Reserve channel 17 in a 16-channel plex.",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "designit rejected the out-of-range channel coordinate before an invalid bridge layout could be written; the wrapper correctly passed the expected rejection.",
+        "executed": true,
+        "execution_note": "Executed run/in9_invalid_reserved_channel.sh; checked run/in9_invalid_reserved_channel.out.",
+        "basic": 37,
+        "specialized": 57,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Out-of-range reserved channels are rejected.", "result": "PASS", "note": "designit reported a value outside the channel dimension range." },
+          { "text": "The failure occurs before a layout can be emitted.", "result": "PASS", "note": "invalid_reserved.csv is absent." },
+          { "text": "The error is actionable for a caller.", "result": "PASS", "note": "It identifies the channel dimension as invalid." },
+          { "text": "The expected validation rejection is captured as a successful test.", "result": "PASS", "note": "The wrapper printed PASS." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 37.6,
+    "dynamic_weighted": 52.9,
+    "score": 91,
+    "max": 100,
+    "grade": "Reject",
+    "grade_symbol": "❌",
+    "deployable": false,
+    "veto_override": true
+  },
+  "key_strengths": [
+    "The exact branch tip now has reusable, parsed scripts for constrained assignment, bridge layouts, and shared balance checking.",
+    "Every design boundary tested is explicit: missing covariates, capacity overflow, confounding, and invalid bridge coordinates are stopped instead of silently repaired.",
+    "The SVA example reports and handles missing values before calling SVA, and the correction tests respect the non-identifiability of perfect confounding.",
+    "The same seeded assignment produced byte-identical layout output across two full optimizer runs."
+  ],
+  "recommendations": [
+    {
+      "priority": "P0",
+      "title": "The designated crispr-screen-analyst R environment segfaults after designit or sva workflows complete",
+      "observed_in": [1, 2, 3, 5, 6],
+      "problem": "Five substantive valid workflows wrote correct, checked artifacts but exited non-zero with a segmentation fault. A fresh minimal probe that only loads designit reproduced the same teardown failure, while a parser-only probe for all shipped R files exited normally.",
+      "root_cause": "The failure is reproducible in the dispatched environment after package loading and is outside the source worktree; it is not explained by syntax, an absent package, or an invalid input.",
+      "fix": "Repair or replace the R/designit runtime in F:/OpenScience/audit-envs/crispr-screen-analyst under the environment tooling policy, prove a clean library(designit) session exits 0, then rerun this Phase 2 audit. No source-only edit can make a successfully completed R process return 0 in this environment."
+    }
+  ]
+}
