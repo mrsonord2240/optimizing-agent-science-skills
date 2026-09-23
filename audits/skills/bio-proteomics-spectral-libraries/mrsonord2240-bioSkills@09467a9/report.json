@@ -1,0 +1,138 @@
+{
+  "meta": {
+    "skill_name": "bio-proteomics-spectral-libraries",
+    "description": "Builds and manages calibrated DIA spectral libraries through predicted, experimental, chromatogram, and format-conversion workflows, with RT/CCS calibration, NCE selection, decoys, QC, and full-key merge guidance.",
+    "evaluated_on": "2026-09-23",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "mrsonord2240/bioSkills@09467a99deaa8ac30799074803a8b87af6d60858:proteomics/spectral-libraries",
+    "audit_kind": "final-pass-phase-2",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md",
+    "checkpoint": "F:/OpenScience/audits/_final_pass/bio-proteomics-spectral-libraries/CHECKPOINT.md",
+    "pre_fix_report": "F:/OpenScience/audits/_pre-fix-20260923/bio-proteomics-spectral-libraries/"
+  },
+  "veto_gates": {
+    "skill_veto": {"gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS"},
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {"result": "PASS", "detail": "All synthetic calibration and similarity data were explicitly labelled; no citations, clinical claims, or invented empirical findings were presented."},
+      "practice_boundaries": {"result": "PASS", "detail": "The Skill is limited to library construction and routes search, PTM design, and quantification to their owning Skills; it makes no individual diagnostic or treatment claim."},
+      "methodological_ground": {"result": "PASS", "detail": "Fresh runs enforced RT calibration, compared NCE candidates, retained the full transition key, and generated an OpenSWATH decoy null."},
+      "code_usability": {"result": "PASS", "detail": "All three shipped Python executables and the in-memory example were executed on the pinned source; live/local/OpenMS outputs were asserted."}
+    }
+  },
+  "static_score": {
+    "subtotal": 96,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {"score": 12, "max": 12, "note": "The Skill covers the promised predicted, empirical, calibration, conversion, QC, and merge routes with explicit ownership boundaries."},
+      "reliability": {"score": 11, "max": 12, "note": "Major invalid-data and calibration failures have explicit guards; the live Koina route lacks bounded retry/backoff guidance for intermittent service latency."},
+      "performance_context": {"score": 8, "max": 8, "note": "The 203-line SKILL.md delegates detailed method material to three targeted references and scripts."},
+      "agent_usability": {"score": 16, "max": 16, "note": "Decision tree, required thresholds, failure modes, commands, and output checks are precise and internally consistent."},
+      "human_usability": {"score": 8, "max": 8, "note": "Natural trigger phrases and a concise usage guide make the workflow discoverable while preserving strict scientific input checks."},
+      "security": {"score": 12, "max": 12, "note": "No credentials, unsafe shell interpolation, destructive operation, or sensitive-data retention pattern was found."},
+      "maintainability": {"score": 12, "max": 12, "note": "Long workflows are isolated in references and parameterized scripts; the shipped example exposes deterministic, checkable functions."},
+      "agent_specific": {"score": 17, "max": 20, "note": "Trigger and routing boundaries are strong, with progressive disclosure and escape hatches; external-service retry policy is not yet explicit."}
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 93.9,
+    "max": 100,
+    "assertion_pass_rate": {"passed": 28, "total": 28},
+    "inputs": [
+      {
+        "index": 1, "type": "Canonical", "label": "Live Koina Prosit library and iRT calibration", "status": "COMPLETED", "status_flag": "✅",
+        "executed": true, "execution_note": "Executed live against Koina with koinapy in the shared audit environment; synthetic observed RT was labelled and the regression was asserted.",
+        "note": "63 fragment rows for three precursors; annotation was returned and synthetic iRT-to-RT calibration achieved R2=1.000.", "basic": 38, "specialized": 58, "total": 96, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          {"text": "Koina returns more than one labelled fragment per requested precursor", "result": "PASS", "note": "63 rows and an annotation column were returned for three precursors."},
+          {"text": "Predicted iRT is calibrated before use", "result": "PASS", "note": "The explicitly synthetic observed RT calibration had R2=1.000."},
+          {"text": "The documented Koina constructor and input columns execute", "result": "PASS", "note": "Prosit_2019_intensity and Prosit_2019_irt accepted the documented DataFrames."},
+          {"text": "Synthetic values are not represented as empirical measurements", "result": "PASS", "note": "The run script and viewer label observed RT as synthetic."}
+        ]
+      },
+      {
+        "index": 2, "type": "Variant A", "label": "Local MS2PIP and calibrated DeepLC", "status": "COMPLETED", "status_flag": "✅",
+        "executed": true, "execution_note": "Executed in the isolated ms2pip-deeplc environment using eleven calibration anchors, two held-out targets, and local HCD2019 prediction.",
+        "note": "DeepLC module API returned RT 15.2130 and 26.6976; MS2PIP returned a ProcessingResult with two intensities.", "basic": 37, "specialized": 56, "total": 93, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          {"text": "The documented DeepLC module-level calibrated API runs", "result": "PASS", "note": "predict_and_calibrate completed on two held-out peptidoforms."},
+          {"text": "The obsolete DeepLC class is not required", "result": "PASS", "note": "The installed deeplc module lacks DeepLC and the documented replacement succeeded."},
+          {"text": "Local MS2PIP returns fragment-intensity predictions", "result": "PASS", "note": "HCD2019 returned a ProcessingResult containing two predicted intensities."},
+          {"text": "All local routes use installed public tools", "result": "PASS", "note": "No gated service or undisclosed credential was used."}
+        ]
+      },
+      {
+        "index": 3, "type": "Edge", "label": "NCE scan and Koina peptide preflight", "status": "COMPLETED", "status_flag": "✅",
+        "executed": true, "execution_note": "Executed live against Koina for NCE 25, 30, and 35 after rejecting three malformed or out-of-range sequences locally.",
+        "note": "Preflight rejected X-containing, six-residue, and 31-residue inputs; the labelled synthetic-reference scan selected NCE 25.", "basic": 37, "specialized": 55, "total": 92, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          {"text": "Nonstandard and out-of-range peptide inputs are rejected before network submission", "result": "PASS", "note": "All three invalid sequences failed valid_prosit_peptide."},
+          {"text": "Several NCE candidates are evaluated rather than a hardcoded value used", "result": "PASS", "note": "NCE 25, 30, and 35 each invoked the live predictor."},
+          {"text": "NCE selection uses a quantitative similarity score", "result": "PASS", "note": "Aligned annotated fragments produced correlations of 0.998029, 0.992134, and 0.989149."},
+          {"text": "The comparison reference is not misrepresented as experimental data", "result": "PASS", "note": "The script explicitly declares its fragment reference synthetic."}
+        ]
+      },
+      {
+        "index": 4, "type": "Variant B", "label": "OpenSWATH conversion and deterministic decoys", "status": "COMPLETED", "status_flag": "✅",
+        "executed": true, "execution_note": "Executed the pinned build_openswath_tsv.py, OpenMS 3.5.0 TargetedFileConverter, and three fresh pseudo-reverse decoy generations.",
+        "note": "Four precursors yielded 16 transitions, four TraML targets, four decoys, and one shared SHA256 across three pseudo-reverse runs.", "basic": 38, "specialized": 58, "total": 96, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          {"text": "The TSV contains real fragment m/z, Annotation, and unique precursor grouping", "result": "PASS", "note": "All 16 rows had y-ion annotations and four distinct transition_group_id values."},
+          {"text": "TargetedFileConverter preserves all four precursors", "result": "PASS", "note": "The TraML contained four Peptide target groups."},
+          {"text": "OpenSWATH decoys are created at one-for-one target coverage", "result": "PASS", "note": "OpenMS reported four target and four decoy peptides."},
+          {"text": "The recommended pseudo-reverse method is byte reproducible", "result": "PASS", "note": "Three fresh outputs shared SHA256 3911dafeafdf1b377686fbde1922a144b25c16a778e18cfb74fb9e882dc2a2ee."}
+        ]
+      },
+      {
+        "index": 5, "type": "Stress", "label": "Full-key merge, QC, and nonlinear LOWESS", "status": "COMPLETED", "status_flag": "✅",
+        "executed": true, "execution_note": "Executed the pinned in-memory build_library.py functions on a separate synthetic merge fixture and a deliberately nonlinear calibration fixture.",
+        "note": "Three precursors retained both charge states; LOWESS residual SS 0.211230 versus linear 110.903687.", "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          {"text": "Full transition-key merging retains distinct precursor charges", "result": "PASS", "note": "AAA charge 2 and 3 remained in a three-precursor merged library."},
+          {"text": "QC emits precursor, protein, and transition density counts", "result": "PASS", "note": "library_stats returned all three measures."},
+          {"text": "A nonlinear gradient is quantitatively compared with LOWESS", "result": "PASS", "note": "LOWESS residual SS was more than tenfold lower than linear residual SS."},
+          {"text": "Example results are reproducible", "result": "PASS", "note": "The pinned example uses fixed NumPy random seeds and reran successfully."}
+        ]
+      },
+      {
+        "index": 6, "type": "Scope Boundary", "label": "Spectronaut conversion and bad-iRT rejection", "status": "COMPLETED", "status_flag": "✅",
+        "executed": true, "execution_note": "Executed the pinned spectronaut_to_diann.py on a valid two-row table and a separate iRT=5000 rejection fixture.",
+        "note": "Valid input produced two DIA-NN-named rows; out-of-range iRT exited 1 with the documented error and wrote no output file.", "basic": 36, "specialized": 55, "total": 91, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          {"text": "Valid Spectronaut columns map to DIA-NN names", "result": "PASS", "note": "The output has LibraryIntensity, ProductMz, and FragmentSeriesNumber."},
+          {"text": "iRT is preserved rather than silently recalculated", "result": "PASS", "note": "The valid -24.92 and 12.39 values were accepted unchanged."},
+          {"text": "Non-iRT retention-time data is rejected", "result": "PASS", "note": "iRT=5000 exited 1 with RT not in iRT units."},
+          {"text": "Rejected input does not yield a partial output", "result": "PASS", "note": "must_not_write.tsv was absent after the failure."}
+        ]
+      },
+      {
+        "index": 7, "type": "Adversarial", "label": "Low-R2 calibration guard", "status": "COMPLETED", "status_flag": "✅",
+        "executed": true, "execution_note": "Executed the exact documented linear-calibration guard with a valid linear fixture and an intentionally incoherent low-R2 fixture.",
+        "note": "The valid fixture predicts RT 6.0 at iRT 10; the bad fixture stopped at R2=0.041 and instructed LOWESS.", "basic": 37, "specialized": 57, "total": 94, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          {"text": "A high-quality calibration maps iRT to RT", "result": "PASS", "note": "The accepted linear fixture predicted 6.0 at iRT 10."},
+          {"text": "A low-quality calibration is stopped before extraction", "result": "PASS", "note": "R2=0.041 raised ValueError rather than returning a map."},
+          {"text": "The error provides a corrective next step", "result": "PASS", "note": "The message explicitly says to use LOWESS."},
+          {"text": "Calibration threshold matches the documented value", "result": "PASS", "note": "The run used R2_MIN=0.95."}
+        ]
+      }
+    ]
+  },
+  "final": {"static_weighted": 38.4, "dynamic_weighted": 56.3, "score": 95, "max": 100, "grade": "Production Ready", "grade_symbol": "⭐", "deployable": true, "veto_override": false},
+  "key_strengths": [
+    "Every core route has a runnable, asserted result on the pinned source: live Koina, local DeepLC and MS2PIP, OpenMS conversion and decoys, merge/QC, and Spectronaut conversion.",
+    "The fixed OpenSWATH guidance accurately requires Annotation, real theoretical fragment m/z, and a unique transition_group_id, preventing both zero-decoy and silent-merge failures.",
+    "RT calibration and NCE guidance prevents two high-impact silent failure modes and is supported by quantitative guards.",
+    "The concise SKILL.md now uses focused references and executable scripts without losing decision-tree or safety boundaries."
+  ],
+  "recommendations": [
+    {"priority": "P2", "title": "Add bounded Koina retry and timeout guidance", "observed_in": [3], "problem": "The live three-NCE scan completed, but individual Koina requests took about 61 seconds during this fresh run and the reference only re-raises server exceptions.", "root_cause": "The Koina workflow validates peptides but has no explicit bounded retry, delay, or fallback instruction for transient service latency.", "fix": "Add a short retry policy around Koina prediction: catch InferenceServerException, retry a bounded number of times with backoff, then stop with the model, server, and failed batch recorded."},
+    {"priority": "P2", "title": "Use an explicit runtime check for iRT bounds", "observed_in": [6], "problem": "spectronaut_to_diann.py uses assert for the iRT-unit guard; Python optimization mode disables asserts.", "root_cause": "The runtime validation was implemented as a development assertion rather than an unconditional ValueError.", "fix": "Replace the assert with an if-not-between check that raises ValueError with the same message, preserving the tested failure behavior under python -O."}
+  ]
+}

@@ -30,7 +30,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The examples contain the required imports but the corresponding inline blocks were changed independently.
 - Fix: Add library(dplyr) to the inline Milo library block and import tensorflow as tf to the inline scCODA block. Execute both inline paths, not only examples, on the saved synthetic fixture before re-audit.
 
-## P1 (155)
+## P1 (154)
 
 ### `bio-data-visualization-lollipop-protein-maps` — Shipped example never completes and paints wrong colours
 
@@ -1183,14 +1183,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The archived real DIA-NN report.parquet lacks Predicted.RT, FWHM, and Quantity.Quality. diann_level1.py crashes with a raw KeyError that lists only two missing columns, although the skill describes these as report-carried metrics.
 - Root cause: The helper accesses columns before validating the report schema or explaining which acquisition/export route supplies them.
 - Fix: Add an explicit required-column preflight listing Run, RT, Predicted.RT, FWHM, Quantity.Quality, and Global.Q.Value. When unavailable, raise a clear ValueError that labels Level-1 RT/FWHM QC unavailable for that export and routes the user to the vendor/run-metrics export instead of implying the standard report contains the fields.
-
-### `bio-proteomics-spectral-libraries` — OpenSWATH TSV schema guidance omits transition_group_id
-
-- Skill: 93, Production Ready · [mrsonord2240/bioSkills@3f601a1](https://github.com/mrsonord2240/bioSkills/tree/3f601a1a50af8c52724edd5393938e2bda44cd79/proteomics/spectral-libraries) · [viewer](skills/bio-proteomics-spectral-libraries/mrsonord2240-bioSkills@3f601a1/viewer.md)
-- Observed in inputs: 4
-- Problem: A transition list lacking a transition_group_id column (or equivalent unique per-precursor identifier) can have TargetedFileConverter silently merge two distinct peptides that share a PrecursorCharge into a single peptide group -- corrupting target/decoy peptide counts with no error, worse than the now-documented 0-decoy threshold failure because it produces no error at all.
-- Root cause: The fix's new 'OpenSwathDecoyGenerator's real input requirements' section documents the Annotation column and real fragment m/z as the requirements, but the reference OpenSWATH TSV example (and the fixer's own verification data) already included transition_group_id without calling it out as a requirement.
-- Fix: Add transition_group_id (unique per PeptideSequence+PrecursorCharge) to the documented required-fields list in 'Convert Library Formats' and the runnable pyteomics snippet, alongside Annotation and real fragment m/z.
 
 ### `bio-causal-genomics-effector-gene-prioritization` — DEPICT remains a documented unexecuted branch
 
@@ -4138,22 +4130,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: One compact illustrative simulation is not a calibration benchmark.
 - Fix: Optionally label this printed FDR as an illustrative realization; retain larger planted-truth regressions for calibration evidence.
 
-### `bio-proteomics-spectral-libraries` — -method reverse's determinism claim is slightly overstated
-
-- Skill: 93, Production Ready · [mrsonord2240/bioSkills@3f601a1](https://github.com/mrsonord2240/bioSkills/tree/3f601a1a50af8c52724edd5393938e2bda44cd79/proteomics/spectral-libraries) · [viewer](skills/bio-proteomics-spectral-libraries/mrsonord2240-bioSkills@3f601a1/viewer.md)
-- Observed in inputs: 4
-- Problem: SKILL.md states both -method reverse and -method pseudo-reverse are deterministic ('confirmed byte-identical across repeated runs'). Independent re-testing found pseudo-reverse fully byte-identical across 5 runs, but reverse differed in 1 of 5 runs by a last-ULP floating-point value in a non-scored isolation-window metadata field (not the decoy peptide sequence or fragment content).
-- Root cause: The fix's own verification diffed only 2 runs of each method, which was not enough to catch an intermittent (1-in-5) floating-point discrepancy.
-- Fix: Soften the reverse claim (note it is deterministic for decoy peptide/fragment content but has been observed to vary in a metadata-only field) and recommend pseudo-reverse as the primary example when exact reproducibility matters, keeping reverse as a secondary option.
-
-### `bio-proteomics-spectral-libraries` — No input-validation guidance before submitting peptides to Koina
-
-- Skill: 93, Production Ready · [mrsonord2240/bioSkills@3f601a1](https://github.com/mrsonord2240/bioSkills/tree/3f601a1a50af8c52724edd5393938e2bda44cd79/proteomics/spectral-libraries) · [viewer](skills/bio-proteomics-spectral-libraries/mrsonord2240-bioSkills@3f601a1/viewer.md)
-- Observed in inputs: 3
-- Problem: Submitting a peptide with a non-standard residue or an unusually long sequence to Koina still raises an uncaught InferenceServerException rather than a Skill-anticipated, user-facing message. Unchanged from the prior audit; not addressed by this fix.
-- Root cause: The Skill does not mention validating peptide sequences (standard 20-AA alphabet, reasonable length) before calling an external prediction service.
-- Fix: Add a one-line tip recommending a basic peptide-sequence sanity check (alphabet, length) before submission, with a pointer to catch and report InferenceServerException clearly.
-
 ### `bio-virtual-screening` — Insertion-code failure mode documented too narrowly
 
 - Skill: 93, Production Ready · [mrsonord2240/bioSkills@0ce62bd](https://github.com/mrsonord2240/bioSkills/tree/0ce62bdfbb3cce49c45142c9aa0692ea7e3fe270/chemoinformatics/virtual-screening) · [viewer](skills/bio-virtual-screening/mrsonord2240-bioSkills@0ce62bd/viewer.md)
@@ -4353,6 +4329,22 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: pose_qc_batch.py prints a column named rank, but it is a cumulative count of PB-valid records within each source, not a docking score or original pose ordinal.
 - Root cause: The internal selection implementation exposes an intermediate column without describing its semantics in the CLI output.
 - Fix: Rename the displayed column to valid_ordinal or omit it from the CLI table; keep the documented first-PB-valid selection behavior unchanged.
+
+### `bio-proteomics-spectral-libraries` — Add bounded Koina retry and timeout guidance
+
+- Skill: 95, Production Ready · [mrsonord2240/bioSkills@09467a9](https://github.com/mrsonord2240/bioSkills/tree/09467a99deaa8ac30799074803a8b87af6d60858/proteomics/spectral-libraries) · [viewer](skills/bio-proteomics-spectral-libraries/mrsonord2240-bioSkills@09467a9/viewer.md)
+- Observed in inputs: 3
+- Problem: The live three-NCE scan completed, but individual Koina requests took about 61 seconds during this fresh run and the reference only re-raises server exceptions.
+- Root cause: The Koina workflow validates peptides but has no explicit bounded retry, delay, or fallback instruction for transient service latency.
+- Fix: Add a short retry policy around Koina prediction: catch InferenceServerException, retry a bounded number of times with backoff, then stop with the model, server, and failed batch recorded.
+
+### `bio-proteomics-spectral-libraries` — Use an explicit runtime check for iRT bounds
+
+- Skill: 95, Production Ready · [mrsonord2240/bioSkills@09467a9](https://github.com/mrsonord2240/bioSkills/tree/09467a99deaa8ac30799074803a8b87af6d60858/proteomics/spectral-libraries) · [viewer](skills/bio-proteomics-spectral-libraries/mrsonord2240-bioSkills@09467a9/viewer.md)
+- Observed in inputs: 6
+- Problem: spectronaut_to_diann.py uses assert for the iRT-unit guard; Python optimization mode disables asserts.
+- Root cause: The runtime validation was implemented as a development assertion rather than an unconditional ValueError.
+- Fix: Replace the assert with an if-not-between check that raises ValueError with the same message, preserving the tested failure behavior under python -O.
 
 ### `bio-alignment-filtering` — Make zero-width BED handling explicit at script runtime
 
