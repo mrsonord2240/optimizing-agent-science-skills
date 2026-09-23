@@ -34,3 +34,25 @@ The guide keeps overview, prompts, related Skills, and now points at SKILL.md. N
 - **sccomp block has never been executed** (P2): sccomp 1.10.0 (the Bioconductor 3.20 build for R 4.4.3) needs `instantiate` and a CmdStan install (`cmdstanr` from r-universe, `install_cmdstan()` downloads and compiles CmdStan). That is a multi-hundred-MB toolchain build into the shared env, not a plain package install, and the brief bars shared-R-library installs and background waits. Fix pass could only check it against upstream docs and add the drift note.
 - **How many cells per sample Milo needs** (P1 recommendation said "roughly thousands"): no data at larger cell counts exists in the audit set, and a simulation would be new content. The Skill states the measured failure point only.
 - **CD4:CD8 composition-masquerades-as-DE claim** (audit input 5, not scored as a defect): audit could not demonstrate it on the synthetic data (CD4/CD8 profiles too similar); left as stated, no correction is possible without new data.
+
+## Corrective Phase 1 — rejected Phase 2 M4 repair (2026-09-23)
+
+Worktree `F:\OpenScience\wt\single-cell-differential-abundance`, branch
+`fix/single-cell-differential-abundance`, starting tip
+`9f696015114bfcdd053a5a7b4425db5014b40761`. Runtime:
+`single-cell-transcriptomics-analyst` (R 4.4.3 with miloR 2.2.0; scCODA 0.1.9
+in `tools\sccoda-venv`). Nothing installed. This corrective Phase 1 scope is
+only the P0 source-fidelity veto; no Phase 2 report/viewer, promotion, merge,
+or deletion was performed.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| Inline Milo block calls `distinct()` without declaring its package | P0 | Added `library(dplyr)` beside the existing `miloR` and `SingleCellExperiment` imports in `SKILL.md` | ran | `F:\OpenScience\audits\_final_pass\bio-single-cell-differential-abundance\run\fix_p0_20260923\milo_inline_full_path.R` executed the full displayed Milo path on the eight-donor fixture: 8 designs, 306 neighborhoods, `PASS_MILO_INLINE_FULL_PATH`. R parse passed. |
+| Inline scCODA block calls `tf.random.set_seed()` without binding `tf` | P0 | Added `import tensorflow as tf` beside the existing pandas/scCODA imports in `SKILL.md` | ran | `...\run\fix_p0_20260923\sccoda_inline_full_path.py` executed the full displayed block with its default 20,000-draw HMC: 76.871 s, 73.9% acceptance, 8 samples, reference 2, credible NK effect, `PASS_SCCODA_INLINE_FULL_PATH`. Python compilation passed. |
+| Repaired blocks could still hide another undeclared direct dependency | P0 verification | Added no source dependency; executed both full source-faithful paths and ran `verify_repaired_blocks.py` | ran | The closure check passed (`Milo=dplyr::distinct`, `scCODA=tensorflow::tf`); neither full block raised an additional missing-import/name error. |
+
+## Left unfixed in this corrective scope
+
+- **sccomp executable proof (P1)** remains open: it needs the complete
+  CmdStan/sccomp route described above, which this Phase 1-only corrective
+  dispatch explicitly excludes. No claim was broadened or narrowed here.
