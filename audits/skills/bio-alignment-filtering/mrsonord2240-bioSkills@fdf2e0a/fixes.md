@@ -51,3 +51,71 @@ Every SKILL.md fenced bash block (19) was run from a clean copy of the skill fol
 | SKILL.md pysam "Basic Filtering" (subset of `passes_filter`) | SKILL.md "Filter with Function" |
 | SKILL.md "Common Filter Combinations" table (Clean reads, Variant calling, Coverage analysis, Count unique) | "Standard Quality Filter", the assay table (which gained the Coverage analysis row) and the Quick Reference table |
 | SKILL.md inline flag-sum comments (3332, 3328, 1804, 2304) | single "Flag breakdowns" list (now also 1280, 2308) |
+
+---
+
+# 2026-09-21 (P2 pass, split, scripts)
+
+Skill `alignment-files/alignment-filtering`, branch `fix/alignment-files-alignment-filtering` (worktree `F:\OpenScience\wt\alignment-files-alignment-filtering`, from staging `431aa55`). Commits: `9d18a79` fix, `bdff911` split, `016d741` scripts.
+Evidence: `F:\OpenScience\audits\bio-alignment-filtering\eval_report_bio-alignment-filtering_result.json` (5 P2). Tools: samtools 1.24, pysam 0.24.1, minimap2 2.31 (WSL `science`, env `alignment-files`). Scratch `F:\OpenScience\wt\afilt2-scratch` (deleted).
+
+## Findings
+
+| finding | priority | change | verified | notes |
+|---|---|---|---|---|
+| `-n` (`--exclude-no-read-group`) is 1.23, not 1.24 | P2 | "Samtools 1.23 adds `-n`"; 1.24 `--help` spells `--exclude-no-read_group`, hyphenated form also works | ran: `-r SRR702039` 4438 = `-n -r` 4438 = `--exclude-no-read-group -r` 4438 on 1000G BAM; `--help` | 1.23 date from the audit's NEWS check (n11) |
+| Somatic-row rationale contradicted by a real Mutect2 run | P2 | Row reworded: `-F 1280 -q 1` is a light pre-filter, Mutect2 applies MAPQ>=20, not-secondary, not-duplicate, non-chimeric-original itself; one line under the table says caller rationale is from documentation and only Mutect2/HaplotypeCaller filters were run | audit's Mutect2 run (120/5642 removed by `MappingQualityReadFilter`) and default-filter lists (`run/out/n10_*`), read, not re-run | GATK not re-run: the audit's output is the evidence |
+| pysam BED recipe not equal to `-L` on zero-width/space rows | P2 | `line.split()` (space-delimited rows); equivalence claim scoped to rows with start < end. Audit's suggested `max(end, start+1)` was tried and **rejected**: 5 of 80 fuzz BEDs still differed, because `-L` reads a zero-width row as "reads with start < s < end" (strictly spanning), not one base; `fetch` cannot express that | ran: 80 random BEDs (28 space-delimited, rows start < end, with track/comment/blank lines) x 2 BAMs, recipe extracted from SKILL.md: 0 differ from `samtools view -L`; separate check: zero-width `-L` count == model `start < s < end` on 60 random positions, 0 differ | zero-width rows: text says drop or widen |
+| Three filter pitfalls missing | P2 | New "Filter Pitfalls" (3 bullets, one 3-line block): orphaned mates and a `-N` keep-pairs recipe; no `-f 2` for SV callers; signed `tlen` | ran on 1000G BAM: `-F 3332 -q 30` leaves 89 single-record names; `fixmate` leaves 89 (audit's suggestion does not remove them: not used); `-N` recipe leaves 0 (9348 records); mapped 9563 vs `-f 2` 9454 (109 lost); `-e 'tlen>=100 && tlen<=500'` 4677, both-sign expression 9346 = pysam `abs()` count 9346; `abs()` in `-e` fails ("Couldn't process filter expression", audit's `abs(tlen)` advice is wrong); block extracted from SKILL.md and run | audit counted 53 orphans (mate mapped only); the text uses 89 (all single-record names) |
+| minimap2 row silent about short-read MAPQ ceilings | P2 | Row split: long-read presets `-q 60`; `-x sr` drop-ambiguous `-q 1`, high-confidence `-q 30`, with the measured 58.5% | ran: minimap2 2.31 `-ax sr` on the real human PE reads: 5570 primary, `-q 1` 5570, `-q 30` 5514, `-q 60` 3261 (58.5%); unique MAPQ 48-59 | `-q 30` chosen from the measured distribution (99% kept); no ambiguous reads on this slice, so its "drops ambiguous" side is not exercised |
+
+## Left unfixed
+
+None of the 5 P2s. Not run, stated in the text: caller rationale for Strelka2, DeepVariant, clair3, Sniffles, cuteSV, Manta, GRIDSS, Delly, SvABA (callers not installed; the text now says so); pbmm2 MAPQ row (long-read only, was already stated).
+
+## Redundancy pass
+
+`usage-guide.md` was already reduced on 2026-09-20 (overview, prompts, pointer, two tips); nothing duplicated remains, skipped.
+
+## Split (`bdff911`): SKILL.md 444 -> 279 lines
+
+| Moved (verbatim) | New home |
+|---|---|
+| `## Subsample Reads (Deterministic, Pair-Consistent)` | `references/subsampling.md` |
+| `## Expression Filtering`, `## Filter by Read Group` | `references/expressions-and-read-groups.md` |
+| `## pysam Python Alternative` (all four subsections) | `references/pysam.md` |
+
+Checked: no non-blank line lost (only the two pointer-edited lines differ), fences even, python blocks `ast.parse`, bash blocks `bash -n`. "Reference Files" index and two pointer lines added to SKILL.md (no decision tree in this Skill).
+
+## Scripts (`016d741`)
+
+| Old location | New |
+|---|---|
+| `references/pysam.md` "Filter from BED File" recipe (27 lines) | `scripts/filter_by_bed.py` (args bam, bed, out) |
+| `references/pysam.md` "Subsample (Pair-Consistent)" recipe (16 lines) | `scripts/subsample_pysam.py` (args bam, out, fraction, seed) |
+| `references/subsampling.md` coverage-matching + tumor-normal snippets (17 lines) | `scripts/match_read_count.sh` (`--target N` / `--like other.bam`) |
+| `references/pysam.md` "Filter with Function" `passes_filter` block (16 lines) | deleted: duplicates `examples/filter_bam.py`; text points at `filter_bam.py -q 30 -d -p` |
+
+Run as invoked: `filter_by_bed.py` md5-identical to `samtools view -L` (2608 records; track/comment/space/unknown-contig rows); `filter_bam.py -q 30 -d -p` md5-identical to `-F 3332 -q 30` (1000G BAM); `subsample_pysam.py` 947/9601 at 0.1, same seed byte-identical, 0 partial templates, seeds 42 and 7 share 49 of ~480 templates (10%, independent); `match_read_count.sh --target 3000` 2849 primary reads, `--target 20000` and `--like` a larger BAM copy unchanged.
+
+---
+
+# 2026-09-21/22 (final pass, phase 1)
+
+Branch `fix/alignment-files-alignment-filtering` (worktree `F:\OpenScience\wt\alignment-files-alignment-filtering`). Commit: `<see git log>`. Scratch `F:\OpenScience\wt\afinal-scratch` (deleted).
+
+## Findings
+
+| finding | priority | change | verified | notes |
+|---|---|---|---|---|
+| pbmm2 MAPQ row stated "not run" (no PacBio data in the env) | P2 | Row now states a checked result | ran: synthetic reference with a planted 3 kb exact repeat (from `human/genome.fasta`), 9 PacBio-HiFi-like reads (0.2% substitution), `pbmm2 26.2.99 --preset CCS` -- 5/5 unique-region reads MAPQ 60, 4/4 repeat-region reads MAPQ 0 | pbmm2 was already installed (TOOLS.md); the blocker was the dataset, resolved with a synthetic substitute per FINAL_PASS_BRIEF |
+
+## Left unfixed
+
+None outstanding. Caller rationale for Strelka2, DeepVariant, clair3, Sniffles, cuteSV, Manta, GRIDSS, Delly, SvABA in the assay-aware table stays documentation-only by design: the table's runnable content is the samtools filter recipe (verified), the text already discloses which caller filters were and were not run, and the Skill's `primary_tool` is samtools/pysam, not these callers. Not a blocked item -- judged resolved by the existing disclosure.
+
+## Re-verification (no prior finding, consolidation)
+
+Every bash block in `SKILL.md` and the three `references/*.md` files, plus `examples/filter_bam.py` and all three `scripts/`, re-run end-to-end in one pass on a fresh copy of the skill folder against real data (`human/test.paired_end.sorted.bam`, chr22; 1000G BAM), including the pysam.md inline "Filter by Region" block (previously only `ast.parse`d post-split). All match the counts/equivalences already on record; no regression from the split or scripts move. `py_compile`/`bash -n` clean on all scripts.
+
+Checkpoint: `F:\OpenScience\audits\_final_pass\bio-alignment-filtering\CHECKPOINT.md`.

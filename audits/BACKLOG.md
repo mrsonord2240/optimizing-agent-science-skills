@@ -1280,7 +1280,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The local Philosopher/TPP-derived pepXML ingestion path is incompatible with the available Comet and OpenMS-reserialised fixtures; this is not a silent Skill failure because the guard stops it.
 - Fix: Before a workflow depends on this optional route, run the documented commands against a compatible pepXML fixture or functioning Philosopher/TPP environment and assert nonempty peptideprophet_result, prot.xml, and protein.tsv. Do not retry the prohibited standalone TPP installer.
 
-## P2 (451)
+## P2 (447)
 
 ### `bio-data-visualization-lollipop-protein-maps` — HGVSp edge cases and recurrence semantics undocumented
 
@@ -2801,46 +2801,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: 391 -> 478 lines, three large taxonomy tables and a 23-entry reference list, all loaded on every invocation, with no references/ split.
 - Root cause: The TMT route necessarily grew the file and splitting is a restructure.
 - Fix: Move the Tool Taxonomy, the Per-Method Failure Modes and the reference list into references/ and leave the decision tree, the input contract and the code blocks in SKILL.md.
-
-### `bio-alignment-filtering` — -n (--exclude-no-read-group) arrived in 1.23, not 1.24
-
-- Skill: 87, Production Ready · [mrsonord2240/bioSkills@fdf2e0a](https://github.com/mrsonord2240/bioSkills/tree/fdf2e0a288f37dd697b40adf06cfcdc6341cc654/alignment-files/alignment-filtering) · [viewer](skills/bio-alignment-filtering/mrsonord2240-bioSkills@fdf2e0a/viewer.md)
-- Observed in inputs: 6
-- Problem: "Samtools 1.24 adds -n (--exclude-no-read-group)" is wrong: samtools NEWS.md lists the option under Release 1.23 (16 Dec 2025). The fix log recorded it as 1.24 without the release heading.
-- Root cause: Version claim taken from a NEWS entry without checking which release section it sits under.
-- Fix: Write "Samtools 1.23 adds -n (--exclude-no-read-group)". The 1.24 --help spells the long option --exclude-no-read_group; the hyphenated form in the text also works on 1.24 (checked).
-
-### `bio-alignment-filtering` — Somatic-row rationale contradicted by a real Mutect2 run
-
-- Skill: 87, Production Ready · [mrsonord2240/bioSkills@fdf2e0a](https://github.com/mrsonord2240/bioSkills/tree/fdf2e0a288f37dd697b40adf06cfcdc6341cc654/alignment-files/alignment-filtering) · [viewer](skills/bio-alignment-filtering/mrsonord2240-bioSkills@fdf2e0a/viewer.md)
-- Observed in inputs: 9
-- Problem: "Somatic callers handle low MAPQ" is not what a real Mutect2 run does: 120 of 5642 reads (MAPQ 10 and 0) were removed by its MappingQualityReadFilter (default minimum 20), and by default it also drops chimeric-original alignments. The assay table does not say that no caller row was run.
-- Root cause: Caller behaviour written from memory; only aligner/flag behaviour was tested.
-- Fix: Reword the somatic row: -F 1280 -q 1 is only a light pre-filter because Mutect2 applies MAPQ>=20, not-secondary, not-duplicate and non-chimeric filters itself. Add one line that the caller-specific rationale comes from caller documentation and was not run for Strelka2, DeepVariant, clair3, Sniffles, cuteSV, Manta, GRIDSS, Delly, SvABA.
-
-### `bio-alignment-filtering` — pysam BED recipe differs from -L on zero-width/space rows
-
-- Skill: 87, Production Ready · [mrsonord2240/bioSkills@fdf2e0a](https://github.com/mrsonord2240/bioSkills/tree/fdf2e0a288f37dd697b40adf06cfcdc6341cc654/alignment-files/alignment-filtering) · [viewer](skills/bio-alignment-filtering/mrsonord2240-bioSkills@fdf2e0a/viewer.md)
-- Observed in inputs: 3
-- Problem: The text says the recipe gives "the same records as samtools view -L". 13 of 81 fuzz BEDs differ, each with a start==end row (samtools returns the reads covering base s; fetch(c, s, s) returns nothing), and a space-delimited BED raises IndexError at parts[2].
-- Root cause: The fix was validated on one zero-width row placed where no reads exist, and on tab-delimited BED only.
-- Fix: Say "tab-delimited BED with start < end", or make the recipe match: parts = line.split(); end = max(int(parts[2]), int(parts[1]) + 1).
-
-### `bio-alignment-filtering` — Three known filter pitfalls still missing from the text
-
-- Skill: 87, Production Ready · [mrsonord2240/bioSkills@fdf2e0a](https://github.com/mrsonord2240/bioSkills/tree/fdf2e0a288f37dd697b40adf06cfcdc6341cc654/alignment-files/alignment-filtering) · [viewer](skills/bio-alignment-filtering/mrsonord2240-bioSkills@fdf2e0a/viewer.md)
-- Observed in inputs: 6, 7
-- Problem: (1) Read-level filters leave orphaned mates (53 single-record templates after -F 3332 -q 30 on the 1000G BAM); (2) -f 2 would also discard the discordant pairs an SV caller needs, but the SV rows only say "-F 1024 only"; (3) tlen is signed, so "-e tlen>=100 && tlen<=500" keeps 2109 of the 4225 intended records.
-- Root cause: The fix log lists them as "needs a new section, not a correction".
-- Fix: Add a short "Pitfalls" section: samtools fixmate after read-level filtering when pairing matters; do not add -f 2 for SV callers; use abs(tlen)-style symmetric tests in -e.
-
-### `bio-alignment-filtering` — minimap2 row silent about short-read MAPQ ceilings
-
-- Skill: 87, Production Ready · [mrsonord2240/bioSkills@fdf2e0a](https://github.com/mrsonord2240/bioSkills/tree/fdf2e0a288f37dd697b40adf06cfcdc6341cc654/alignment-files/alignment-filtering) · [viewer](skills/bio-alignment-filtering/mrsonord2240-bioSkills@fdf2e0a/viewer.md)
-- Observed in inputs: 8
-- Problem: The minimap2 row says "(DNA, long-read)" and -q 60. With -ax sr on real Illumina reads -q 60 kept only 58.5% of uniquely mapped reads (unique MAPQ mostly 48-59); on synthetic reads 96%.
-- Root cause: The row was checked only for long reads.
-- Fix: State that -q 60 is for long-read presets; for -x sr use -q 1 for "drop ambiguous" and a lower high-confidence value (measured MAPQ 48-59 for unique real reads).
 
 ### `bio-alignment-io` — Alphabet inference mislabels IUPAC/X-heavy and mixed T/U data
 
@@ -4849,6 +4809,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: org.Mm.eg.db and org.At.tair.db remain absent from the crispr-screen-analyst shared env, so a supported (mouse) and unsupported (arabidopsis) organism both fail at the identical missing-package step; the claimed 'exactly 7 organisms' ceiling can't be separated from 'these 2 packages happen to be missing' by execution.
 - Root cause: The shared audit env has no non-human OrgDb packages installed; this predates and is unrelated to this fix, and was explicitly left out of the dispatched findings.
 - Fix: In a future tooling pass, install org.Mm.eg.db under the shared env's install-lock discipline, then re-run with a real mouse gene list so the 7-organism ceiling is confirmed by a live enrichPathway(organism='mouse') result rather than by argument acceptance alone.
+
+### `bio-alignment-filtering` — Make zero-width BED handling explicit at script runtime
+
+- Skill: 96, Production Ready · [mrsonord2240/bioSkills@6c71f04](https://github.com/mrsonord2240/bioSkills/tree/6c71f04151377fe0d412ece85d9dc52cdccdf747/alignment-files/alignment-filtering) · [viewer](skills/bio-alignment-filtering/mrsonord2240-bioSkills@6c71f04/viewer.md)
+- Observed in inputs: 10
+- Problem: filter_by_bed.py silently returns no reads for a zero-width row while samtools -L returned 539 on this fixture. The reference accurately discloses the difference, but a direct script user gets no warning.
+- Root cause: The script delegates zero-width intervals to fetch(start, end), whose empty half-open range cannot express samtools behavior.
+- Fix: Reject start >= end with a concise error, or emit a warning identifying rows that must be dropped or widened before continuing.
 
 ### `bio-metabolomics-statistical-analysis` — Pareto-vs-UV VIP robustness sub-check not independently reconfirmed post-fix
 
