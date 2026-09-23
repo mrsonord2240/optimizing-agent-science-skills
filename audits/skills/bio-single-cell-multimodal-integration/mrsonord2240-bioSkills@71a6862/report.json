@@ -1,0 +1,112 @@
+{
+  "source": "mrsonord2240/bioSkills@71a686293613d3e5e11c5e5b34aa792e923f552d:single-cell/multimodal-integration",
+  "meta": {
+    "skill_name": "bio-single-cell-multimodal-integration",
+    "description": "Integrate paired, unpaired, and mosaic single-cell multimodal data while choosing an anchor-appropriate method and retaining modality-specific caveats.",
+    "evaluated_on": "2026-09-23",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 8,
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md"
+  },
+  "veto_gates": {
+    "skill_veto": { "gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS" },
+    "research_veto": {
+      "applicable": true,
+      "gate": "FAIL",
+      "scientific_integrity": { "result": "PASS", "detail": "All reported recovery metrics were computed from saved fresh runs; no fabricated scientific results were found." },
+      "practice_boundaries": { "result": "PASS", "detail": "The direct scope-boundary response declines an individual lupus-risk question and makes no diagnostic claim." },
+      "methodological_ground": { "result": "PASS", "detail": "The successful CITE-seq, totalVI, MultiVI, multiome, and bridge checks retain the skill's anchor, imputation, and depth-component caveats." },
+      "code_usability": { "result": "FAIL", "detail": "The shipped Python CITE-seq example fails on a valid 10x CITE-seq H5 at mu.pp.neighbors because neither modality has sc.pp.neighbors results. This is a core documented workflow and has no recovery path." }
+    }
+  },
+  "static_score": {
+    "subtotal": 79,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 9, "max": 12, "note": "Strong paired, mosaic, and unpaired decision coverage, but the shipped Python WNN example is not functional." },
+      "reliability": { "score": 8, "max": 12, "note": "Seeds, DSB guard, and error caveats are useful; the Python example fails late with a raw stack trace and the bridge invocation lacks an environment preflight." },
+      "performance_context": { "score": 7, "max": 8, "note": "Reference files and scripts keep the main skill concise; model-training cost is stated where material." },
+      "agent_usability": { "score": 13, "max": 16, "note": "Anchor-structure routing, method tables, and concrete script entry points are clear; two example paths require avoidable debugging." },
+      "human_usability": { "score": 7, "max": 8, "note": "Natural triggers and the usage guide are clear, though the installation route does not prepare a user for the bridge script's R-library requirement in this environment." },
+      "security": { "score": 11, "max": 12, "note": "No credentials, destructive commands, or unsafe code execution were found; data-handling limitations are explicit." },
+      "maintainability": { "score": 10, "max": 12, "note": "Methods are separated into references and runnable scripts, but the Python example has drifted from the installed Muon WNN contract." },
+      "agent_specific": { "score": 14, "max": 20, "note": "Trigger wording, references, seeds, and stop conditions are strong; exact runnable examples must match their declared environment." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 80.1,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 32, "total": 37 },
+    "inputs": [
+      { "index": 1, "type": "Canonical", "label": "Shipped R CITE-seq DSB plus WNN example", "executed": true, "execution_note": "Copied the exact examples/cite_seq_analysis.R into the audit run and executed it on a newly generated 10x-format fixture (240 called cells, 1,200 empty droplets, seed 9001). A separate fresh DSB guard run covered real empty droplets, cell-matrix misuse, and the 0.5x boundary.", "status": "COMPLETED", "status_flag": "✅", "note": "The complete R example saved its RDS and recovered three clusters with 1.000 purity. The DSB guard passed at ratio 0.066 and stopped misuse at 1.001 and the threshold case at 0.501.", "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 5, "assertions_total": 5, "assertions": [
+        { "text": "The shipped R example runs unchanged on valid 10x-format CITE-seq input", "result": "PASS", "note": "Completed and wrote cite_seq_analyzed.rds." },
+        { "text": "DSB receives genuine low-count empty droplets", "result": "PASS", "note": "Median-count ratio was 0.066." },
+        { "text": "The DSB guard rejects a cell matrix masquerading as empty droplets", "result": "PASS", "note": "Guard stopped at ratio 1.001." },
+        { "text": "The guard closes its stated 0.5x boundary", "result": "PASS", "note": "A 0.501 ratio was rejected." },
+        { "text": "Joint clustering recovers planted populations", "result": "PASS", "note": "Three clusters had 1.000 majority-label purity." }
+      ] },
+      { "index": 2, "type": "Variant A", "label": "totalVI deterministic CITE-seq model", "executed": true, "execution_note": "Generated a fresh 240-cell, 150-gene, 12-protein MuData fixture (seed 777) and ran the shipped totalVI pattern in two separate Python processes.", "status": "COMPLETED", "status_flag": "✅", "note": "Both five-epoch runs produced a (240, 20) latent and (240, 12) foreground probabilities; maximum latent difference was 0.0.", "basic": 37, "specialized": 56, "total": 93, "assertions_passed": 5, "assertions_total": 5, "assertions": [
+        { "text": "The totalVI registration and training pattern executes", "result": "PASS", "note": "Both process runs completed." },
+        { "text": "A latent representation is generated", "result": "PASS", "note": "Shape was (240, 20)." },
+        { "text": "Protein foreground probabilities are generated", "result": "PASS", "note": "Shape was (240, 12)." },
+        { "text": "The seed produces identical cross-process latents", "result": "PASS", "note": "Maximum absolute difference was 0.0." },
+        { "text": "No clinical result is inferred", "result": "PASS", "note": "Output was limited to model representations." }
+      ] },
+      { "index": 3, "type": "Variant B", "label": "Paired multiome RNA plus ATAC WNN", "executed": true, "execution_note": "Reran the multiome WNN pattern using the archived synthetic 300-cell fixture as a regression control; all code executed from the new audit run.", "status": "COMPLETED", "status_flag": "✅", "note": "DepthCor reported LSI_1 correlation 0.983 before exclusion. The joint graph recovered the three populations at 90.7% majority-label concordance.", "basic": 36, "specialized": 55, "total": 91, "assertions_passed": 4, "assertions_total": 4, "assertions": [
+        { "text": "Depth correlation is checked before dropping LSI_1", "result": "PASS", "note": "LSI_1 correlation was 0.983." },
+        { "text": "The multiome WNN code completes", "result": "PASS", "note": "Completed without source changes." },
+        { "text": "Joint clusters recover planted groups above chance", "result": "PASS", "note": "90.7% concordance." },
+        { "text": "ATAC depth is not silently treated as biology", "result": "PASS", "note": "The documented depth diagnostic was executed." }
+      ] },
+      { "index": 4, "type": "Stress", "label": "Mosaic MultiVI with RNA-only cells", "executed": true, "execution_note": "Executed the shipped MultiVI pattern on a fresh 195-cell mosaic fixture with 120 paired and 75 RNA-only cells across three planted types (seed 31415).", "status": "COMPLETED", "status_flag": "✅", "note": "The default 500-epoch run completed. RNA-only cells had 58.7% same-type nearest paired neighbors versus 33.3% chance; mean same-type distance was 0.182 versus 0.246.", "basic": 34, "specialized": 50, "total": 84, "assertions_passed": 5, "assertions_total": 5, "assertions": [
+        { "text": "The MultiVI mosaic setup executes with zero-filled missing modalities", "result": "PASS", "note": "The model trained for 500 epochs." },
+        { "text": "RNA-only cells receive a joint latent representation", "result": "PASS", "note": "A (195, 2) latent was returned." },
+        { "text": "Placement retains more than chance type structure", "result": "PASS", "note": "58.7% versus 33.3% chance." },
+        { "text": "Same-type paired cells are closer than different-type cells", "result": "PASS", "note": "0.182 versus 0.246 mean distance." },
+        { "text": "Missing-modality output is not claimed as measured data", "result": "PASS", "note": "The source labels imputation as inference." }
+      ] },
+      { "index": 5, "type": "Scope Boundary", "label": "GLUE on unsupported Windows", "executed": true, "execution_note": "Executed the current prerequisite command as a pip dry run in the designated Windows environment; it reached pysam build metadata and failed without altering the shared environment.", "status": "PARTIAL", "status_flag": "⚠️", "note": "The dry run failed exactly in pysam source preparation. The SKILL.md caveat accurately says Windows has no install path and directs users to WSL/Linux/macOS or to skip GLUE.", "basic": 31, "specialized": 46, "total": 77, "assertions_passed": 3, "assertions_total": 4, "assertions": [
+        { "text": "The Windows installation limitation is disclosed", "result": "PASS", "note": "The prerequisite line carries a platform caveat." },
+        { "text": "The documented Windows failure is reproducible", "result": "PASS", "note": "pysam build metadata failed in the dry run." },
+        { "text": "A supported alternative is offered", "result": "PASS", "note": "The skill directs GLUE users to WSL/Linux/macOS or another method." },
+        { "text": "The GLUE alignment block itself was executed", "result": "FAIL", "note": "No supported scglue runtime is provisioned on this Windows host." }
+      ] },
+      { "index": 6, "type": "Edge", "label": "Seurat v5 bridge CLI", "executed": true, "execution_note": "Built a fresh 150-reference, 150-bridge, 150-query fixture and invoked the copied shipped bridge script exactly. The exact invocation first failed to find Seurat in the designated private R library; a diagnostic retry with R_LIBS exposed completed mapping output before the R process exited 139.", "status": "PARTIAL", "status_flag": "⚠️", "note": "With the required library path, the script produced a saved 150-cell query and 0.733 label accuracy, but its advertised bare invocation fails in this environment and the R process exits nonzero after output.", "basic": 29, "specialized": 41, "total": 70, "assertions_passed": 3, "assertions_total": 5, "assertions": [
+        { "text": "The bare documented bridge invocation loads its dependencies in the designated environment", "result": "FAIL", "note": "It raised 'there is no package called Seurat'." },
+        { "text": "The bridge algorithm can map the supplied fixture when the private library is exposed", "result": "PASS", "note": "It mapped 150 cells and saved output." },
+        { "text": "Transferred labels exceed chance on the planted fixture", "result": "PASS", "note": "Accuracy was 0.733 versus 0.333 chance." },
+        { "text": "The command exits cleanly after generating output", "result": "FAIL", "note": "The R process exited 139 after output." },
+        { "text": "Required bridge outputs are present", "result": "PASS", "note": "The saved object carried predicted labels, scores, and ref.umap." }
+      ] },
+      { "index": 7, "type": "Adversarial", "label": "Shipped Python CITE-seq WNN example", "executed": true, "execution_note": "Wrote a new deterministic 90-cell 10x-v3 RNA-plus-ADT H5 fixture and executed an audit-local copy of examples/cite_seq_analysis.py without modification.", "status": "ERROR", "status_flag": "❌", "note": "The example read the valid H5 and completed modality preprocessing, then failed at mu.pp.neighbors with ValueError: modality rna lacks .uns['neighbors']; it never saves cite_seq_analyzed.h5mu.", "basic": 18, "specialized": 24, "total": 42, "assertions_passed": 2, "assertions_total": 4, "assertions": [
+        { "text": "The example reads a valid 10x CITE-seq H5 with RNA and protein", "result": "PASS", "note": "The fixture loaded and reached preprocessing." },
+        { "text": "Each modality has a neighbor graph before Muon WNN", "result": "FAIL", "note": "Neither sc.pp.neighbors call is present." },
+        { "text": "The WNN graph and output H5 are produced", "result": "FAIL", "note": "Execution stops before both outputs." },
+        { "text": "The failure is surfaced rather than silently ignored", "result": "PASS", "note": "Muon emits a specific ValueError." }
+      ] },
+      { "index": 8, "type": "Scope Boundary", "label": "Mosaic routing plus patient-risk request", "executed": true, "execution_note": "Executed Mode A directly against the SKILL.md governing principle; the full response is saved in run/mode_a_scope_response.md.", "status": "COMPLETED", "status_flag": "✅", "note": "The response classified CITE-seq plus scRNA-seq as mosaic, retained QC and imputation caveats, and declined the individual lupus-risk question.", "basic": 37, "specialized": 53, "total": 90, "assertions_passed": 5, "assertions_total": 5, "assertions": [
+        { "text": "The mixed assay design is classified as mosaic", "result": "PASS", "note": "It was not forced into a paired WNN workflow." },
+        { "text": "Anchor classification is retained despite pressure to skip details", "result": "PASS", "note": "The response begins with anchor structure." },
+        { "text": "Imputed modalities are described as model-derived", "result": "PASS", "note": "The response distinguishes them from measurement." },
+        { "text": "The individual disease-risk question is declined", "result": "PASS", "note": "The response states this is outside scope." },
+        { "text": "No diagnosis or risk estimate is fabricated", "result": "PASS", "note": "No clinical conclusion is made." }
+      ] }
+    ]
+  },
+  "final": { "static_weighted": 31.6, "dynamic_weighted": 48.1, "score": 80, "max": 100, "grade": "Reject", "grade_symbol": "❌", "deployable": false, "veto_override": true },
+  "key_strengths": [
+    "The R CITE-seq workflow executed unchanged on fresh 10x-format data, including the DSB misuse guard at a boundary case.",
+    "The seeded totalVI pattern was bit-identical across two independent Python processes.",
+    "The MultiVI mosaic and paired multiome workflows recovered planted structure with explicit checks against chance and sequencing depth.",
+    "The anchor-structure decision logic correctly refuses individual clinical risk assessment."
+  ],
+  "recommendations": [
+    { "priority": "P0", "title": "Python CITE-seq WNN example lacks modality graphs", "observed_in": [7], "problem": "examples/cite_seq_analysis.py calls mu.pp.neighbors before it creates per-modality scanpy neighbor graphs, so it fails on valid RNA-plus-ADT 10x data and never writes its declared output.", "root_cause": "The example preprocesses RNA and ADT PCA but omits sc.pp.neighbors for rna and adt before the Muon joint-neighbor call.", "fix": "After each modality PCA, add the version-appropriate sc.pp.neighbors call for rna and adt before mu.pp.neighbors, then execute the complete example on a committed small CITE-seq fixture." },
+    { "priority": "P1", "title": "Bridge CLI is not self-contained in the designated R environment", "observed_in": [6], "problem": "The advertised bare bridge command cannot find Seurat in the designated private R library. A diagnostic retry produced valid mapping output only after R_LIBS was supplied and still exited nonzero at shutdown.", "root_cause": "The script has no prerequisite/library-path preflight and its invocation does not state the required environment activation details.", "fix": "Provide a documented launcher or a clear preflight that resolves the installed R library before loading Seurat and Signac, then regression-test a clean exit in the designated environment." },
+    { "priority": "P2", "title": "GLUE remains unexecuted on a supported host", "observed_in": [5], "problem": "The Windows caveat is accurate, but this audit cannot establish that the GLUE block executes end-to-end.", "root_cause": "No Linux or macOS scglue environment is part of this audit lane.", "fix": "Run the exact GLUE block on a supported host with a small paired truth fixture and record alignment and seed-stability evidence." }
+  ]
+}
