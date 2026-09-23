@@ -3978,13 +3978,13 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The full model exceeds the available audit disk budget; this is a resource constraint, not a light-model correctness failure.
 - Fix: Retain the present light-model default and disk-size warning. Before advertising a full-model result, run the same parse-and-signal verification after an explicitly approved >=624 GB download.
 
-### `bio-entrez-fetch` — Close the CDS-only EFetch handle explicitly
+### `bio-entrez-fetch` — Close the documented cds_proteins EFetch handle explicitly
 
 - Skill: 95, Production Ready · [mrsonord2240/bioSkills@0681f5b](https://github.com/mrsonord2240/bioSkills/tree/0681f5b171b43eade5c4d81f0285dd9a5dbadb20/database-access/entrez-fetch) · [viewer](skills/bio-entrez-fetch/mrsonord2240-bioSkills@0681f5b/viewer.md)
 - Observed in inputs: 1
-- Problem: cds_proteins() materializes all FASTA records but does not close its EFetch handle explicitly, which can accumulate open connections in a caller loop.
-- Root cause: The compact inline helper returns list(SeqIO.parse(...)) without a finally block or context manager.
-- Fix: Read the records, close the handle, then return the list, or use a context-managed handle in the helper.
+- Problem: The SKILL.md helper materializes all FASTA records but does not explicitly close its EFetch handle.
+- Root cause: The inline convenience example returns list(SeqIO.parse(h, 'fasta')) directly.
+- Fix: Read the records, close the handle, then return the list, or use a context-managed handle.
 
 ### `bio-metabolomics-lipidomics` — Wrap malformed Goslin input errors
 
