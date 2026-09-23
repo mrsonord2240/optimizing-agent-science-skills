@@ -138,3 +138,22 @@ hand-built assertions — all correct.
 - **Genotype-QC checklist (P2)**: unchanged from above, still new content out of a fixer's scope.
 
 Nothing needs Sam beyond the PAINTOR retry note above.
+
+---
+
+# bio-causal-genomics-fine-mapping — corrective Phase 1, 2026-09-23
+
+Worktree `F:\OpenScience\wt\causal-genomics-fine-mapping`, branch
+`fix/causal-genomics-fine-mapping`, source commit
+`dfc77a6351c0f8af8ae6f4e1e5b38b281f4ae474`. This is a focused repair of the fresh audit's P0/M3
+research-veto finding; no Phase 2 work was performed.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| Shipped `examples/susie_rss_finemap.R` got `estimate_s_rss lambda = 0.8314` from hand-made Z bumps unrelated to its supplied LD, then continued to report and write credible sets | P0 | Simulate the default demo as `z ~ N(R %*% true_z, R)` using the PSD-stabilized analysis LD; add `SUSIE_RSS_DEMO_LD_MISMATCH=1` only as a regression counterfactual; `stop()` before kriging, fitting, credible-set extraction, or writes when lambda > 0.10 | ran | Via `mendelian-randomization-analyst/r.sh` with susieR 0.14.2: matched run lambda `0.0000`, two purity-1.0 credible sets, both TSVs written. Intentional mismatch lambda `1.0000`, explicit stop, neither TSV exists. |
+
+## Findings fixed: 1/1
+
+No further audit recommendations were changed: this corrective dispatch was limited to the P0/M3 RSS
+guard. The source branch was pushed to the staging fork remote `mine`; the legacy upstream `origin` push
+was correctly rejected because that repository is archived and read-only.
