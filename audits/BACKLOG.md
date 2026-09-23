@@ -1272,7 +1272,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (481)
+## P2 (479)
 
 ### `bio-data-visualization-lollipop-protein-maps` — HGVSp edge cases and recurrence semantics undocumented
 
@@ -4722,30 +4722,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The Common Errors table documents input-shape pitfalls but not automatic data-transformation steps performed inside the call.
 - Fix: Add one line to the Mummichog/PSEA section noting that duplicate m/z-matched features are automatically merged before enrichment, so reported feature counts may differ from the input row count.
 
-### `bio-metabolomics-xcms-preprocessing` — MatchedFilterParam (low-res/quadrupole path) has no worked code example or parameter guidance
-
-- Skill: 92, Production Ready · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/metabolomics/xcms-preprocessing) · [viewer](skills/bio-metabolomics-xcms-preprocessing/mrsonord2240-bioSkills@6847328/viewer.md)
-- Observed in inputs: 8
-- Problem: The Decision Tree and Tips name MatchedFilterParam as the correct tool for low-res/quadrupole/profile-only data, but no code block or fwhm/steps/snthresh guidance exists anywhere in SKILL.md or usage-guide.md, unlike CentWaveParam's full worked section and Quantitative Thresholds row.
-- Root cause: The Skill was authored primarily around the CentWave/high-res path; the low-res alternative was named for completeness but never given the same worked-example treatment.
-- Fix: Add a short MatchedFilterParam code block to the Peak Detection section (or a new subsection) with typical binSize/fwhm/steps/snthresh starting points by instrument class, mirroring the CentWave section's structure.
-
-### `bio-metabolomics-xcms-preprocessing` — AutoTuner/IPO (new-instrument path) is a single unelaborated Decision Tree cell
-
-- Skill: 92, Production Ready · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/metabolomics/xcms-preprocessing) · [viewer](skills/bio-metabolomics-xcms-preprocessing/mrsonord2240-bioSkills@6847328/viewer.md)
-- Observed in inputs: 9
-- Problem: This is the only Decision Tree row with zero elaboration anywhere else in the Skill -- no version note, code block, or parameter pointer, unlike every other named tool.
-- Root cause: The row was added to complete the Decision Tree's coverage but was never expanded into its own worked section like the other rows.
-- Fix: Add a short paragraph (or explicitly mark out-of-scope with a pointer to AutoTuner's own documentation) describing the recommended entry call and, critically, the mandatory EIC-FWHM verification step already named in the Decision Tree's rationale column.
-
-### `bio-metabolomics-xcms-preprocessing` — New small-cohort minFraction guidance doesn't disambiguate 'n=2 per group' from 'n=2 total, 1 per group'
-
-- Skill: 92, Production Ready · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/metabolomics/xcms-preprocessing) · [viewer](skills/bio-metabolomics-xcms-preprocessing/mrsonord2240-bioSkills@6847328/viewer.md)
-- Observed in inputs: 3
-- Problem: Real execution on a genuine 1-case/1-control (n=2 total) cohort found minFraction=1.0 and 0.5 produce IDENTICAL results (1714 features), because minFraction operates per sample-group and a single-sample group cannot express the 'present in only one of two' distinction the new prose illustrates -- that distinction only holds for 2 replicates of the SAME condition.
-- Root cause: The new Correspondence-section sentence was written with a same-group-replicate example in mind and doesn't flag that a mixed-group case/control pair behaves differently.
-- Fix: Add one clause distinguishing '2 replicates of one condition' (minFraction meaningfully varies 0.5 vs 1.0) from '1 sample per condition, no true replicates' (minFraction in (0,1] is equivalent; there is no within-group fraction to tune).
-
 ### `bio-microbiome-amplicon-processing` — No ITS fixture exists to verify the ITS analysis path end-to-end
 
 - Skill: 92, Production Ready · [mrsonord2240/bioSkills@d99180a](https://github.com/mrsonord2240/bioSkills/tree/d99180a5685df2b0c7e076077e2aa326020fc9c7/microbiome/amplicon-processing) · [viewer](skills/bio-microbiome-amplicon-processing/mrsonord2240-bioSkills@d99180a/viewer.md)
@@ -5041,6 +5017,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: Unlike the matchms section (full runnable synthetic example in examples/annotate_features.py) and SIRIUS's complete bash chain, the new MetFrag section supplies only the params.txt key/value template and the candidates.csv column schema -- an agent must still originate real peak masses and a real candidate structure list from outside knowledge to actually run it, as this audit did.
 - Root cause: The fix prioritized closing the 'zero executable guidance' P1 gap with a runnable template; a fully worked data sample was out of scope for that fix.
 - Fix: Ship a small worked candidates.csv + peaklist.txt (e.g. the citrate/isocitrate/glucose triple this Skill's own prose already describes) alongside examples/annotate_features.py so an agent can run the MetFrag path with zero external chemistry lookup, mirroring the matchms example's self-containedness.
+
+### `bio-metabolomics-xcms-preprocessing` — Make the example's parallel backend explicit
+
+- Skill: 95, Production Ready · [mrsonord2240/bioSkills@1c13209](https://github.com/mrsonord2240/bioSkills/tree/1c132093c089633f987f70238923d4c3b299a7f1/metabolomics/xcms-preprocessing) · [viewer](skills/bio-metabolomics-xcms-preprocessing/mrsonord2240-bioSkills@1c13209/viewer.md)
+- Observed in inputs: —
+- Problem: The shipped example relies on xcms's default BiocParallel backend. On this constrained Windows audit host it spawned a large worker pool, making resource use harder to predict.
+- Root cause: The example has no explicit backend choice or user-facing parallelism note.
+- Fix: Add a short optional BiocParallel note or parameterized backend choice to the example, with a serial option for constrained Windows hosts. Preserve the existing analysis defaults.
 
 ### `bio-microbiome-diversity-analysis` — NMDS and RPCA remain named but not backed by worked code
 

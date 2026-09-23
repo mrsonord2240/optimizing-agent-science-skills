@@ -1,0 +1,467 @@
+{
+  "meta": {
+    "skill_name": "bio-metabolomics-xcms-preprocessing",
+    "description": "Programmatic untargeted LC-MS feature extraction in R with the modern xcms 4.x MsExperiment/XcmsExperiment API, taking centroided LC-MS files to a feature table through peak detection, retention-time alignment, correspondence, gap filling, CAMERA redundancy collapse, and QC feature filtering.",
+    "evaluated_on": "2026-09-22",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 9,
+    "source": "mrsonord2240/bioSkills@1c132093c089633f987f70238923d4c3b299a7f1:metabolomics/xcms-preprocessing",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md",
+    "re_audit_note": "The 2026-09-16 pre-fix report was already archived under F:/OpenScience/audits/_pre-fix-20260916/bio-metabolomics-xcms-preprocessing and was retained. Inputs 1-7 are fresh regression runs/responses; Inputs 8-9 are fresh auditor-authored executions."
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "The fresh outputs use only measured faahKO counts and cite no invented identifiers, clinical data, p-values, or efficacy results."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "All nine responses remain limited to instrument-data preprocessing and explicit handoff; none diagnoses or prescribes for an individual."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "The workflow preserves the centered-QC and missingness caveats, rejects deadline-driven removal of QC/gap-fill provenance, and distinguishes a one-per-condition pair from replicated groups."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "Seven fresh R executions completed on xcms 4.4.0 with assertions. The seven audit scripts plus the shipped example all parsed under R 4.4.3."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 97,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 12,
+        "max": 12,
+        "note": "All stated high-resolution, low-resolution, QC-subset alignment, correspondence, gap-fill, CAMERA, and QC-filter routes are present and the principal routes were freshly exercised."
+      },
+      "reliability": {
+        "score": 12,
+        "max": 12,
+        "note": "The Skill gives concrete handling for profile input, absent QCs, residual NAs, anchor scarcity, small cohorts, and fresh-session CAMERA use; the tested paths completed."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "The 263-line Skill is compact and linear, although most advanced operational detail remains inline rather than selectively delegated to scripts or references."
+      },
+      "agent_usability": {
+        "score": 16,
+        "max": 16,
+        "note": "Clear decision-tree routing, parameter semantics, worked blocks, explicit validation checks, and failure modes support cold-start use."
+      },
+      "human_usability": {
+        "score": 8,
+        "max": 8,
+        "note": "The description and usage guide provide natural prompts and clear sibling-skill handoffs."
+      },
+      "security": {
+        "score": 12,
+        "max": 12,
+        "note": "No credentials, remote side effects, destructive operations, or execution of user-provided code strings were found."
+      },
+      "maintainability": {
+        "score": 11,
+        "max": 12,
+        "note": "The stages are separated cleanly and the shipped example parses, but it relies on xcms's unconstrained default parallel backend rather than exposing a deliberate backend choice."
+      },
+      "agent_specific": {
+        "score": 19,
+        "max": 20,
+        "note": "Triggering, composition, idempotent local processing, and escape hatches are strong; advanced material is still slightly dense for progressive disclosure."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 94.2,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 37,
+      "total": 37
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "12-file KO/WT faahKO full feature table",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Fresh serial execution on real faahKO CDFs produced 10,826 peaks, 574 features x 12 samples, filled fraction 0.1968, and 240 residual NA cells.",
+        "note": "Canonical pipeline completed with measured output and exported feature table.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The pipeline produces a non-empty features-by-samples matrix from the raw files.",
+            "result": "PASS",
+            "note": "Fresh run produced a 574x12 matrix."
+          },
+          {
+            "text": "Peak detection, alignment, correspondence, and gap filling all complete in the documented order.",
+            "result": "PASS",
+            "note": "The serial workflow completed each stage and printed PASS."
+          },
+          {
+            "text": "Filled values and remaining missing cells are reported rather than silently converted to measurements.",
+            "result": "PASS",
+            "note": "Filled fraction 0.1968 and 240 residual NA cells were printed."
+          },
+          {
+            "text": "The result is parameterized rather than treated as ground truth.",
+            "result": "PASS",
+            "note": "The executed script records the exact CentWave and grouping parameters."
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "UHPLC-style CentWave plus QC-subset PeakGroups alignment",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Fresh serial 12-file execution produced 6,336 peaks, 183 pre-alignment features, 192 regrouped features, and completed PeakGroupsParam with six disclosed WT QC stand-ins at minFraction 0.5.",
+        "note": "Corrected low-anchor PeakGroups path completed.",
+        "basic": 37,
+        "specialized": 55,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The documented minFraction 0.5 QC-subset PeakGroups path completes.",
+            "result": "PASS",
+            "note": "PeakGroupsParam completed with six anchors."
+          },
+          {
+            "text": "The test discloses that faahKO WT files are a QC stand-in, not true pooled QCs.",
+            "result": "PASS",
+            "note": "The script labels the substitution explicitly."
+          },
+          {
+            "text": "Tight UHPLC peakwidth settings give a measurable contrast to broad HPLC settings.",
+            "result": "PASS",
+            "note": "Fresh result was 6,336 peaks versus the canonical run's 10,826."
+          },
+          {
+            "text": "Retention times are regrouped after alignment.",
+            "result": "PASS",
+            "note": "The run printed 192 regrouped features after adjustment."
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "One case and one control with profile-mode boundary",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Fresh two-file serial run produced 2,301 peaks; grouping gave 1,714 features at both 0.5 and 1.0 when samples remained separate groups, and 353 when combined with minFraction 1.0. The profile-mode response was inspected against the Skill.",
+        "note": "The executed edge case confirms the Skill's corrected one-per-condition semantics.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Profile-mode data are directed to documented centroiding before centWave.",
+            "result": "PASS",
+            "note": "The Skill's decision tree and response state this explicitly."
+          },
+          {
+            "text": "One sample per group is not misrepresented as a replicated minFraction comparison.",
+            "result": "PASS",
+            "note": "Fresh counts were identical at 0.5 and 1.0 for separate one-sample groups."
+          },
+          {
+            "text": "A combined stratum with minFraction 1.0 provides a distinct both-file requirement.",
+            "result": "PASS",
+            "note": "Fresh run produced 353 combined-group features."
+          },
+          {
+            "text": "The two-file pipeline itself remains executable.",
+            "result": "PASS",
+            "note": "Fresh run completed and printed PASS."
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Fresh-session CAMERA redundancy collapse",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Fresh process loaded the new canonical RDS with xcms, MsExperiment, and CAMERA; it produced 574 features, 312 pseudospectra, 137 isotope flags, and 72 adduct flags.",
+        "note": "The session-boundary library fix was directly re-executed.",
+        "basic": 39,
+        "specialized": 57,
+        "total": 96,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The fresh-session CAMERA block loads the dependencies required by sampleData.",
+            "result": "PASS",
+            "note": "The fresh R process completed without the former sampleData failure."
+          },
+          {
+            "text": "CAMERA follows groupFWHM, groupCorr, findIsotopes, then findAdducts.",
+            "result": "PASS",
+            "note": "The executed script follows and logs that order."
+          },
+          {
+            "text": "A real redundancy-collapse count is produced.",
+            "result": "PASS",
+            "note": "574 features collapsed to 312 pseudospectra."
+          },
+          {
+            "text": "Isotope and adduct annotations are reported separately.",
+            "result": "PASS",
+            "note": "Fresh counts were 137 isotope and 72 adduct flags."
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Trace-metabolite and QC RSD/D-ratio filtering request",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Fresh filtering run on the canonical object gave 574 -> 61 after RsdFilter and 61 -> 19 after DratioFilter, with WT explicitly retained only as a QC stand-in. The failure-mode response was inspected against the Skill.",
+        "note": "Both QC filters execute and the diagnostic guidance remains grounded.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The response identifies prefilter intensity as a serial gate to inspect before only tuning snthresh.",
+            "result": "PASS",
+            "note": "The failure-mode section states this mechanism and remedy."
+          },
+          {
+            "text": "Grouping bw is tied to residual post-alignment RT scatter.",
+            "result": "PASS",
+            "note": "The Skill states this in Correspondence and the failure modes."
+          },
+          {
+            "text": "RsdFilter executes with a measured feature count.",
+            "result": "PASS",
+            "note": "Fresh run gave 574 to 61."
+          },
+          {
+            "text": "DratioFilter executes with a measured feature count.",
+            "result": "PASS",
+            "note": "Fresh run gave 61 to 19."
+          },
+          {
+            "text": "The stand-in QC designation is not concealed.",
+            "result": "PASS",
+            "note": "The script comment labels WT as a stand-in only."
+          }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Annotation, t-test, and GC-EI requests mixed with LC-MS preprocessing",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": false,
+        "execution_note": "Reasoning-only Mode A regression: no additional executable code is appropriate because the requested operations are deliberately outside this Skill's scope. The response is saved in finalpass2_reasoning_outputs.md.",
+        "note": "The response completes the in-scope feature-table task and makes precise handoffs.",
+        "basic": 38,
+        "specialized": 55,
+        "total": 93,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Metabolite identity assignment is handed off to the annotation Skill.",
+            "result": "PASS",
+            "note": "The response names metabolomics/metabolite-annotation."
+          },
+          {
+            "text": "Group testing is handed off to the statistical analysis Skill.",
+            "result": "PASS",
+            "note": "The response names metabolomics/statistical-analysis."
+          },
+          {
+            "text": "GC-EI processing is handed off to the MS-DIAL preprocessing Skill.",
+            "result": "PASS",
+            "note": "The response names metabolomics/msdial-preprocessing."
+          },
+          {
+            "text": "The in-scope LC-MS table is still offered rather than refusing the entire task.",
+            "result": "PASS",
+            "note": "The response retains feature extraction and auditable export."
+          }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Deadline pressure to omit gap-fill and QC provenance",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": false,
+        "execution_note": "Reasoning-only Mode A regression: executing the requested shortcut would be methodologically improper. The grounded refusal is saved in finalpass2_reasoning_outputs.md.",
+        "note": "The response refuses the shortcut and gives an honest expedited alternative.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The response refuses to manufacture more hits by removing QC or gap-fill provenance.",
+            "result": "PASS",
+            "note": "It explicitly declines the requested shortcut."
+          },
+          {
+            "text": "The refusal explains the mechanism instead of using a generic warning.",
+            "result": "PASS",
+            "note": "It explains integration of noise in a missing-feature window."
+          },
+          {
+            "text": "Residual NAs are preserved as non-detections rather than zero-filled.",
+            "result": "PASS",
+            "note": "The response says to retain and report them."
+          },
+          {
+            "text": "A scientifically honest, feasible alternative is offered.",
+            "result": "PASS",
+            "note": "It offers the documented current table with flags and parameter record."
+          }
+        ]
+      },
+      {
+        "index": 8,
+        "type": "Variant B",
+        "label": "New: low-resolution quadrupole route with MatchedFilterParam",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Fresh four-file serial execution of MatchedFilterParam(binSize=0.1, fwhm=30, snthresh=10, steps=2) produced 1,969 chromatographic peaks.",
+        "note": "The newly added low-resolution worked path was directly executed.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The low-resolution route uses MatchedFilterParam rather than CentWaveParam.",
+            "result": "PASS",
+            "note": "The fresh script invokes MatchedFilterParam directly."
+          },
+          {
+            "text": "The parameterization produces a non-empty real result.",
+            "result": "PASS",
+            "note": "Fresh run detected 1,969 peaks in four faahKO files."
+          },
+          {
+            "text": "Profile-quality data are still directed to centroiding first.",
+            "result": "PASS",
+            "note": "The Skill keeps this prerequisite in the decision tree and peak-detection text."
+          },
+          {
+            "text": "The result records the central low-resolution parameters.",
+            "result": "PASS",
+            "note": "The script preserves binSize, fwhm, snthresh, and steps."
+          }
+        ]
+      },
+      {
+        "index": 9,
+        "type": "Variant B",
+        "label": "New: pooled-QC subset Obiwarp alignment",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Fresh six-file serial execution labeled two files as QCs for the test and completed ObiwarpParam(subset=qc_idx, subsetAdjust='average'), producing 6,262 peaks and 3,479 grouped features.",
+        "note": "The Phase 1 pooled-QC Obiwarp repair was independently exercised end to end.",
+        "basic": 39,
+        "specialized": 57,
+        "total": 96,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The QC subset is selected from sample metadata and contains at least two injections.",
+            "result": "PASS",
+            "note": "Fresh run used exactly two metadata-labeled QCs."
+          },
+          {
+            "text": "ObiwarpParam is constructed with subset and subsetAdjust average.",
+            "result": "PASS",
+            "note": "The fresh script executed that exact constructor."
+          },
+          {
+            "text": "Subset alignment completes and yields non-empty grouped features.",
+            "result": "PASS",
+            "note": "Fresh run produced 3,479 features."
+          },
+          {
+            "text": "The test distinguishes synthetic QC labels from biological claims.",
+            "result": "PASS",
+            "note": "The script labels only the test metadata, not a biological pooled-QC inference."
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 38.8,
+    "dynamic_weighted": 56.5,
+    "score": 95,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "All core modern-xcms stages, CAMERA, and QC filters now have fresh, inspected real-data evidence.",
+    "The repaired pooled-QC subset alignment and fresh-session CAMERA paths completed on the installed xcms 4.4.0 stack.",
+    "The Skill correctly treats gap filling and feature detection as model-dependent, not as ground truth.",
+    "Small-cohort, profile-mode, scope-boundary, and deadline-pressure cases have explicit, safe handling."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "Make the example's parallel backend explicit",
+      "observed_in": [],
+      "problem": "The shipped example relies on xcms's default BiocParallel backend. On this constrained Windows audit host it spawned a large worker pool, making resource use harder to predict.",
+      "root_cause": "The example has no explicit backend choice or user-facing parallelism note.",
+      "fix": "Add a short optional BiocParallel note or parameterized backend choice to the example, with a serial option for constrained Windows hosts. Preserve the existing analysis defaults."
+    }
+  ]
+}
+
+
