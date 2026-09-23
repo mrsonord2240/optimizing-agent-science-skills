@@ -1288,7 +1288,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (416)
+## P2 (415)
 
 ### `bio-data-visualization-lollipop-protein-maps` — HGVSp edge cases and recurrence semantics undocumented
 
@@ -4538,22 +4538,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The example has no explicit backend choice or user-facing parallelism note.
 - Fix: Add a short optional BiocParallel note or parameterized backend choice to the example, with a serial option for constrained Windows hosts. Preserve the existing analysis defaults.
 
-### `bio-microbiome-diversity-analysis` — NMDS and RPCA remain named but not backed by worked code
-
-- Skill: 95, Production Ready · [mrsonord2240/bioSkills@7536f5f](https://github.com/mrsonord2240/bioSkills/tree/7536f5f114733ef0961f746614435789cf1f68d9/microbiome/diversity-analysis) · [viewer](skills/bio-microbiome-diversity-analysis/mrsonord2240-bioSkills@7536f5f/viewer.md)
-- Observed in inputs: 2
-- Problem: Still open from the original audit: PCoA is thorough, but NMDS is never mentioned and RPCA/DEICODE is only a one-line CLI reference with no worked example.
-- Root cause: Progressive disclosure stops one level short for these two secondary methods; the backing tools for RPCA are deliberately not installed in the shared audit env (would downgrade pinned scipy/scikit-bio).
-- Fix: Add a short NMDS snippet (vegan::metaMDS) alongside the PCoA one; add a worked RPCA example once DEICODE/gemelli can be installed without a version conflict, or explicitly route to qiime2-workflow for the full command.
-
-### `bio-microbiome-diversity-analysis` — Sampling-depth plateau choice still has no numeric heuristic
-
-- Skill: 95, Production Ready · [mrsonord2240/bioSkills@7536f5f](https://github.com/mrsonord2240/bioSkills/tree/7536f5f114733ef0961f746614435789cf1f68d9/microbiome/diversity-analysis) · [viewer](skills/bio-microbiome-diversity-analysis/mrsonord2240-bioSkills@7536f5f/viewer.md)
-- Observed in inputs: 2
-- Problem: SKILL.md's guidance to pick the depth 'where the alpha-rarefaction curve plateaus' has no numeric substitute for an agent that cannot visually read a plot; this audit's Input 2 still has to improvise a percentile heuristic.
-- Root cause: The plateau-detection method as written assumes a human visually inspecting a QIIME2 .qzv plot.
-- Fix: Add a numeric plateau-detection approach (e.g., the depth at which incremental richness gain per additional read falls below a stated threshold) as an agent-usable alternative to visual inspection.
-
 ### `bio-pathway-reactome` — 7-organism ceiling claim still not independently verifiable in this shared env
 
 - Skill: 95, Production Ready · [mrsonord2240/bioSkills@02448f6](https://github.com/mrsonord2240/bioSkills/tree/02448f6c40e18dc2dabe39f1bbbc6bbf35ce04ff/pathway-analysis/reactome-pathways) · [viewer](skills/bio-pathway-reactome/mrsonord2240-bioSkills@02448f6/viewer.md)
@@ -4593,6 +4577,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The compound-level BH-collapsed hit list included 1 compound with no planted true signal, versus 0 false compound hits in the pre-fix audit's synthetic run.
 - Root cause: Expected sampling variation at n=25/group with 90 compounds and per-compound Bonferroni-within-block p-value collapsing; not a methodological error.
 - Fix: No SKILL.md change needed; note in usage-guide.md that the compound-level correction still has a small non-zero false-discovery rate by construction (it is BH, not a zero-FDR guarantee) so users should not read '0 false hits' as a promise.
+
+### `bio-microbiome-diversity-analysis` — Make GlobalPatterns depth choice use the helper
+
+- Skill: 97, Production Ready · [mrsonord2240/bioSkills@69c0d36](https://github.com/mrsonord2240/bioSkills/tree/69c0d367c211d04226456107fde34f4c1dbee672/microbiome/diversity-analysis) · [viewer](skills/bio-microbiome-diversity-analysis/mrsonord2240-bioSkills@69c0d36/viewer.md)
+- Observed in inputs: 2, 11
+- Problem: The shipped GlobalPatterns example selects a tenth-percentile depth although the main Skill now supplies a numeric plateau helper.
+- Root cause: The example predates pick_sampling_depth.R.
+- Fix: Invoke the helper on exported counts, or label the quantile choice explicitly as a toy-example placeholder rather than a production rule.
 
 ### `bio-pathway-gsea` — GSVA's kcdf parameter choice remains undocumented
 

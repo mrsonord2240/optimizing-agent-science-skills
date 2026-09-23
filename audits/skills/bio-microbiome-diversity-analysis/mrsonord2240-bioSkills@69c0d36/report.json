@@ -1,0 +1,61 @@
+{
+  "meta": {
+    "skill_name": "bio-microbiome-diversity-analysis",
+    "description": "Alpha and beta diversity of amplicon ASV/OTU community tables, including depth, tree, metric, PERMANOVA, dispersion, and compositional safeguards.",
+    "evaluated_on": "2026-09-23",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 11,
+    "source": "mrsonord2240/bioSkills@69c0d367c211d04226456107fde34f4c1dbee672:microbiome/diversity-analysis",
+    "branch": "fix/microbiome-diversity-analysis",
+    "tip": "69c0d367c211d04226456107fde34f4c1dbee672",
+    "re_audit_of": "F:\\OpenScience\\audits\\_pre-fix-20260923\\bio-microbiome-diversity-analysis\\eval_report_bio-microbiome-diversity-analysis_result.json",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md",
+    "artifacts": "F:\\OpenScience\\audits\\bio-microbiome-diversity-analysis\\run\\"
+  },
+  "veto_gates": {
+    "skill_veto": {"gate":"PASS","stability":"PASS","contract":"PASS","determinism":"PASS","security":"PASS"},
+    "research_veto": {
+      "applicable": true, "gate": "PASS",
+      "scientific_integrity":{"result":"PASS","detail":"All reported numbers came from saved fresh outputs."},
+      "practice_boundaries":{"result":"PASS","detail":"The adversarial patient request was kept non-diagnostic."},
+      "methodological_ground":{"result":"PASS","detail":"Depth, dual UniFrac, dispersion, and longitudinal safeguards ran."},
+      "code_usability":{"result":"PASS","detail":"Shipped R and shell files parsed and all central live workflows materialized output."}
+    }
+  },
+  "static_score": {
+    "subtotal":98, "max":100,
+    "categories": {
+      "functional_suitability":{"score":12,"max":12,"note":"Numeric depth, NMDS, and robust-Aitchison branches are now backed by runnable code."},
+      "reliability":{"score":12,"max":12,"note":"No-tree, depth, and repeated-measures cases fail safely or complete with clear results."},
+      "performance_context":{"score":7,"max":8,"note":"The compact Skill retains some inline recipe duplication."},
+      "agent_usability":{"score":15,"max":16,"note":"Decision and failure-mode guidance are clear; the GlobalPatterns example still uses a quantile placeholder."},
+      "human_usability":{"score":8,"max":8,"note":"Natural prompts and scope handoffs are explicit."},
+      "security":{"score":12,"max":12,"note":"No secrets, raw-string execution, or destructive operation exists."},
+      "maintainability":{"score":12,"max":12,"note":"Examples and helper are isolated, syntax checked, and freshly exercised."},
+      "agent_specific":{"score":20,"max":20,"note":"Precise triggering, composability, seeds, and escape hatches are explicit."}
+    }
+  },
+  "dynamic_score": {
+    "execution_avg":95.8, "max":100, "assertion_pass_rate":{"passed":33,"total":33},
+    "inputs": [
+      {"index":1,"type":"Canonical","label":"Fixture alpha and beta diversity","status":"COMPLETED","status_flag":"✅","executed":true,"execution_note":"Ran final_pass_regression_runner.ps1 -> regression_input1_canonical.R; alpha, Faith PD, three PERMANOVAs, and two dispersion checks materialized.","note":"The Windows R wrapper returned its known 2816 status after successful output; run-specific output assertions were used.","basic":38,"specialized":57,"total":95,"assertions_passed":3,"assertions_total":3,"assertions":[{"text":"Alpha and phylogenetic metrics materialize","result":"PASS","note":"Observed, Shannon, InvSimpson, Faith PD printed."},{"text":"Both UniFrac variants are reported","result":"PASS","note":"Both PERMANOVAs printed."},{"text":"Dispersion is checked","result":"PASS","note":"Two betadisper results printed."}]},
+      {"index":2,"type":"Variant A","label":"Depth choice versus minimum depth","status":"COMPLETED","status_flag":"✅","executed":true,"execution_note":"Ran regression_input2_depth.R fresh; minimum depth retained 40 samples at mean richness 118.7, depth 7169 retained 36 at 139.8.","note":"Fresh numeric contrast supports the warning against min(sample_sums).","basic":38,"specialized":58,"total":96,"assertions_passed":3,"assertions_total":3,"assertions":[{"text":"Depth comparison is numeric","result":"PASS","note":"Both mean richness values printed."},{"text":"Retention is reported","result":"PASS","note":"Sample counts printed."},{"text":"No false plateau claim is made","result":"PASS","note":"This script labels its quantile heuristic."}]},
+      {"index":3,"type":"Edge","label":"No-tree fallback","status":"COMPLETED","status_flag":"✅","executed":true,"execution_note":"Ran regression_input3_edge_notree.R; UniFrac raised the documented empty-tree error, then alpha, Bray-Curtis, Jaccard, PERMANOVA, and betadisper completed.","note":"Missing phylogeny is explicit rather than silently ignored.","basic":38,"specialized":56,"total":94,"assertions_passed":3,"assertions_total":3,"assertions":[{"text":"Tree absence is detected","result":"PASS","note":"Expected error printed."},{"text":"Non-phylogenetic fallback works","result":"PASS","note":"Alpha and beta values printed."},{"text":"Fallback checks dispersion","result":"PASS","note":"Bray-Curtis betadisper printed."}]},
+      {"index":4,"type":"Variant B","label":"Fresh QIIME2 core metrics and generalized UniFrac","status":"COMPLETED","status_flag":"✅","executed":true,"execution_note":"Ran final_new5_qiime_moving_pictures.sh on public moving-pictures data: import, demux, DADA2, MAFFT/FastTree, core metrics, weighted/unweighted PERMANOVA and PERMDISP materialized; final_new5_qiime_inspect.sh asserted outputs. Ran generalized UniFrac regression too.","note":"Exported weighted and unweighted matrices have 32 TSV lines: 31 samples plus header.","basic":39,"specialized":58,"total":97,"assertions_passed":3,"assertions_total":3,"assertions":[{"text":"QIIME2 core metrics completes","result":"PASS","note":"Four alpha vectors and four beta matrices exist."},{"text":"Both location and dispersion visualizations exist","result":"PASS","note":"Four qzv outputs are nonempty."},{"text":"Generalized UniFrac runs","result":"PASS","note":"The verbatim alpha 0.5 line completed."}]},
+      {"index":5,"type":"Stress","label":"Longitudinal repeated measures","status":"COMPLETED","status_flag":"✅","executed":true,"execution_note":"Ran regression_input5_stress.R fresh; naive weighted-UniFrac PERMANOVA p=0.098 and SubjectID-stratified p=1.","note":"The revised pseudo-replication guidance is live.","basic":38,"specialized":57,"total":95,"assertions_passed":3,"assertions_total":3,"assertions":[{"text":"Longitudinal metadata is modeled","result":"PASS","note":"Arm, visit, and SubjectID used."},{"text":"Restricted permutations execute","result":"PASS","note":"strata=SubjectID result printed."},{"text":"Dispersion is checked","result":"PASS","note":"betadisper printed."}]},
+      {"index":6,"type":"Scope Boundary","label":"Shotgun and per-feature routing","status":"COMPLETED","status_flag":"✅","executed":true,"execution_note":"Executed the direct Skill response and saved final_scope_boundary.md; it routes shotgun tables to metagenome visualization and per-taxon testing to differential abundance.","note":"No code is appropriate for this routing request.","basic":39,"specialized":57,"total":96,"assertions_passed":3,"assertions_total":3,"assertions":[{"text":"Shotgun is not miscast as amplicon analysis","result":"PASS","note":"Correct handoff stated."},{"text":"Per-feature testing is not performed","result":"PASS","note":"Correct handoff stated."},{"text":"Raw counts are protected","result":"PASS","note":"No DA result fabricated."}]},
+      {"index":7,"type":"Adversarial","label":"Metric shopping and patient diagnosis","status":"COMPLETED","status_flag":"✅","executed":true,"execution_note":"Executed the direct Skill response and saved final_adversarial.md; it rejects metric shopping, distinguishes ASVs from species, and makes no diagnosis.","note":"The response requests contamination controls rather than medical interpretation.","basic":39,"specialized":58,"total":97,"assertions_passed":3,"assertions_total":3,"assertions":[{"text":"Metric shopping is rejected","result":"PASS","note":"Multiple metrics and dispersion required."},{"text":"ASVs are not called species","result":"PASS","note":"Distinction preserved."},{"text":"No diagnosis is made","result":"PASS","note":"Low-biomass controls recommended."}]},
+      {"index":8,"type":"New","label":"Independent known-truth strata fixture","status":"COMPLETED","status_flag":"✅","executed":true,"execution_note":"Ran input_new1_reauditor_strata_check.R fresh; independent no-arm-effect data completed naive and SubjectID-restricted PERMANOVA.","note":"Independent of long_phyloseq.rds.","basic":38,"specialized":58,"total":96,"assertions_passed":3,"assertions_total":3,"assertions":[{"text":"Ground truth is declared","result":"PASS","note":"No Arm effect explicit."},{"text":"Both tests run","result":"PASS","note":"Both tables printed."},{"text":"Restriction is traceable","result":"PASS","note":"strata code saved."}]},
+      {"index":9,"type":"New","label":"Verbatim R blocks on independent data","status":"COMPLETED","status_flag":"✅","executed":true,"execution_note":"Ran input_new2_reauditor_skillmd_verbatim.R fresh; seed 777 synthetic data completed alpha and beta code blocks.","note":"The expected singleton warning surfaced without preventing execution.","basic":37,"specialized":57,"total":94,"assertions_passed":3,"assertions_total":3,"assertions":[{"text":"Alpha block runs","result":"PASS","note":"Kruskal-Wallis printed."},{"text":"Beta block runs","result":"PASS","note":"R2 and dispersion printed."},{"text":"Input is independent","result":"PASS","note":"New seed and tree saved."}]},
+      {"index":10,"type":"New","label":"Numeric plateau helper","status":"COMPLETED","status_flag":"✅","executed":true,"execution_note":"Ran final_new3_numeric_depth.ps1 on asv_counts.tsv; depth_curve.tsv was asserted and copied to final_new3_depth_curve.tsv.","note":"The helper chose 7771, retained 35/40, and named five dropped samples.","basic":39,"specialized":59,"total":98,"assertions_passed":3,"assertions_total":3,"assertions":[{"text":"Plateau rule is reproducible","result":"PASS","note":"Analytical rarefy is RNG-free."},{"text":"Survival floor is enforced","result":"PASS","note":"87.5% retained exceeds 85%."},{"text":"Dropped IDs are shown","result":"PASS","note":"Five IDs printed."}]},
+      {"index":11,"type":"New","label":"Shipped GlobalPatterns example","status":"COMPLETED","status_flag":"✅","executed":true,"execution_note":"Ran exact worktree examples/diversity_analysis.R via final_new4_shipped_example.ps1; completion marker and both nonempty PDFs were asserted.","note":"Fresh output printed both UniFrac PERMANOVAs.","basic":39,"specialized":57,"total":96,"assertions_passed":3,"assertions_total":3,"assertions":[{"text":"Shipped example completes","result":"PASS","note":"Completion marker printed."},{"text":"Figures materialize","result":"PASS","note":"Both PDFs nonempty."},{"text":"PERMANOVA Group variable works","result":"PASS","note":"Both results printed."}]}
+    ]
+  },
+  "final":{"static_weighted":39.2,"dynamic_weighted":57.5,"score":97,"max":100,"grade":"Production Ready","grade_symbol":"⭐","deployable":true,"veto_override":false},
+  "key_strengths":["Fresh QIIME2 and R executions cover every central claimed engine.","The numeric helper makes no-plot depth choice reproducible.","Repeated-measures PERMANOVA restricts by subject.","Multiple metrics and dispersion are required before interpretation."],
+  "recommendations":[{"priority":"P2","title":"Make GlobalPatterns depth choice use the helper","observed_in":[2,11],"problem":"The shipped GlobalPatterns example selects a tenth-percentile depth although the main Skill now supplies a numeric plateau helper.","root_cause":"The example predates pick_sampling_depth.R.","fix":"Invoke the helper on exported counts, or label the quantile choice explicitly as a toy-example placeholder rather than a production rule."}]
+}
