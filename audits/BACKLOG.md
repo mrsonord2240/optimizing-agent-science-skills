@@ -1272,7 +1272,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (479)
+## P2 (474)
 
 ### `bio-data-visualization-lollipop-protein-maps` — HGVSp edge cases and recurrence semantics undocumented
 
@@ -2881,54 +2881,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: MAF, A2M/A3M, Stockholm and pyhmmer streaming sections sit in the main file, so every load pays for all of them.
 - Root cause: No progressive disclosure split.
 - Fix: Move MAF coordinates, A2M/A3M conventions and streaming into references/ files and link them from the Format Coverage Map.
-
-### `bio-alignment-msa-parsing` — select_columns / normalize_alignment is quadratic in length
-
-- Skill: 87, Production Ready · [mrsonord2240/bioSkills@53861ae](https://github.com/mrsonord2240/bioSkills/tree/53861ae5dcb3ba770ab1dc6d8cf1582925b49004/alignment/msa-parsing) · [viewer](skills/bio-alignment-msa-parsing/mrsonord2240-bioSkills@53861ae/viewer.md)
-- Observed in inputs: —
-- Problem: select_columns does "".join(str(record.seq)[i] for i in keep), materialising the whole string for every kept column, and every helper calls it: 10 x 100,000 columns takes 7.2 s per normalisation (9.0 s for gaps_per_column) against 1.95 s for the pre-fix count; 1 M columns would take about 12 min per call.
-- Root cause: The fix normalises by rebuilding the alignment column by column instead of once per record.
-- Fix: Take text = str(record.seq) once per record and slice/translate it (for the full-width case use text.upper().replace(".", "-")); keep select_columns for real column subsets.
-
-### `bio-alignment-msa-parsing` — remove_duplicates does not normalise (doc says every helper does)
-
-- Skill: 87, Production Ready · [mrsonord2240/bioSkills@53861ae](https://github.com/mrsonord2240/bioSkills/tree/53861ae5dcb3ba770ab1dc6d8cf1582925b49004/alignment/msa-parsing) · [viewer](skills/bio-alignment-msa-parsing/mrsonord2240-bioSkills@53861ae/viewer.md)
-- Observed in inputs: 7
-- Problem: remove_duplicates compares raw strings: AC-GT, AC.GT and ac-gt are kept as three distinct rows, contradicting the "Every helper below normalises its input internally" sentence.
-- Root cause: The fix added normalisation to the column helpers but not to the row-comparison helper.
-- Fix: Compare str(r.seq) of normalize_alignment(alignment) rows in remove_duplicates (keep the original records), or narrow the sentence.
-
-### `bio-alignment-msa-parsing` — a2m_a3m_io.py fails on real HMMER A2M output
-
-- Skill: 87, Production Ready · [mrsonord2240/bioSkills@53861ae](https://github.com/mrsonord2240/bioSkills/tree/53861ae5dcb3ba770ab1dc6d8cf1582925b49004/alignment/msa-parsing) · [viewer](skills/bio-alignment-msa-parsing/mrsonord2240-bioSkills@53861ae/viewer.md)
-- Observed in inputs: 8
-- Problem: `hmmalign --outformat a2m` (HMMER 3.4) writes unpadded rows (149-161 characters, no "." characters), so AlignIO.read(..., "fasta") raises "Sequences must all be the same length"; the docstring and SKILL.md/alignment-io describe A2M as padded.
-- Root cause: The example was written for padded (HH-suite style) A2M and only tested on the hand-made example.a2m.
-- Fix: Read with SeqIO.parse (match_only_columns already accepts a list of records: 117 columns per row = profile LENG) or pad through pyhmmer MSAFile(format="a2m"), and say that HMMER writes A2M unpadded.
-
-### `bio-alignment-msa-parsing` — All-zero weights return an all-placeholder consensus silently
-
-- Skill: 87, Production Ready · [mrsonord2240/bioSkills@53861ae](https://github.com/mrsonord2240/bioSkills/tree/53861ae5dcb3ba770ab1dc6d8cf1582925b49004/alignment/msa-parsing) · [viewer](skills/bio-alignment-msa-parsing/mrsonord2240-bioSkills@53861ae/viewer.md)
-- Observed in inputs: 3
-- Problem: consensus_sequence(weights=[0,0,0,0]) returns XXXXXX with only a RuntimeWarning (0/0); find_conserved_positions would return nothing.
-- Root cause: No check on weights.sum().
-- Fix: Raise ValueError("weights must sum to a positive value") next to the length check in both weighted helpers.
-
-### `bio-alignment-msa-parsing` — SKILL.md over 500 lines; description omits weights, Neff, MI-APC, MUSCLE5
-
-- Skill: 87, Production Ready · [mrsonord2240/bioSkills@53861ae](https://github.com/mrsonord2240/bioSkills/tree/53861ae5dcb3ba770ab1dc6d8cf1582925b49004/alignment/msa-parsing) · [viewer](skills/bio-alignment-msa-parsing/mrsonord2240-bioSkills@53861ae/viewer.md)
-- Observed in inputs: —
-- Problem: SKILL.md is 504 lines / 28.7 KB with the function bodies repeated in examples/, and the frontmatter description (unchanged) does not mention weighting, Neff, MI-APC or the MUSCLE5 column-confidence route that the body now covers.
-- Root cause: Fix added content without moving code out of SKILL.md or refreshing the trigger text.
-- Fix: Point to examples/ for the longer functions (keep a signature and a one-line use), and add "sequence weights, Neff, MI-APC coevolution, MUSCLE5 column confidence" to the description.
-
-### `bio-alignment-msa-parsing` — Small documentation inaccuracies
-
-- Skill: 87, Production Ready · [mrsonord2240/bioSkills@53861ae](https://github.com/mrsonord2240/bioSkills/tree/53861ae5dcb3ba770ab1dc6d8cf1582925b49004/alignment/msa-parsing) · [viewer](skills/bio-alignment-msa-parsing/mrsonord2240-bioSkills@53861ae/viewer.md)
-- Observed in inputs: 2, 5, 6
-- Problem: (a) SKILL.md sends the reader to structure-navigation for the "authoritative _pdbx_poly_seq_scheme mapping": that string is not in the Skill (it covers SEQRES/PPBuilder/auth vs label numbering). (b) "stderr ends best <name>": the line is second to last, a URL follows; muscle5_column_confidence.py with no argument dies with a bare IndexError and no usage line. (c) Biopython 1.88 writes only recognised Stockholm tags: Pfam GC seq_cons and GR pAS are dropped even from an uncleaned alignment, which the "GC ... survive read/write" sentence does not say. (d) The Cocco 2018 attribution for "APC underperforms raw MI below 100 columns" was not verified by me; on the seed both raw MI (top-30 contact precision 0.13) and MI-APC (0.00) sit near the 0.09 baseline.
-- Root cause: Prose written from memory of related Skills and one tool run.
-- Fix: Name the section that exists in structure-navigation, reword (b), add the recognised-tags caveat to the annotation paragraph, and cite or soften (d).
 
 ### `bio-biomart-queries` — Ensembl Genomes 'swap the host' claim does not work for a real dataset
 
@@ -4833,6 +4785,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: Both bundled examples start from a synthetic or cached featureValues()-shaped table; neither exercises real mzML -> xcms -> Stage 2 as part of one script.
 - Root cause: Deliberately deferred by the fixer (fix log 'Left unfixed') to xcms-preprocessing's own bundled-example scope, since it needs real instrument files.
 - Fix: A future third example chaining real (or cached) xcms output through all 5 stages would give full-pipeline regression coverage, but is reasonably out of scope for this fix round.
+
+### `bio-alignment-msa-parsing` — Keep MI and Neff use bounded to moderate widths
+
+- Skill: 93, Production Ready · [mrsonord2240/bioSkills@fea02de](https://github.com/mrsonord2240/bioSkills/tree/fea02def7356018ce7ada1c536e56397e195468f/alignment/msa-parsing) · [viewer](skills/bio-alignment-msa-parsing/mrsonord2240-bioSkills@fea02de/viewer.md)
+- Observed in inputs: 5, 9
+- Problem: The pure-Python pairwise loops are correct in this audit but scale quadratically with alignment width.
+- Root cause: The examples prioritize transparent implementations over vectorized or compiled kernels.
+- Fix: Retain the existing few-hundred-column guidance and direct wider/deeper production contact prediction to plmDCA or EVcouplings as the Skill already recommends.
 
 ### `bio-blast-searches` — No guidance that permissive/short-peptide searches can spike an order of magnitude beyond documented latency
 

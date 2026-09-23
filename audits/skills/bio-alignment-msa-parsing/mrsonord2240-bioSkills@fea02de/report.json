@@ -1,0 +1,591 @@
+{
+  "meta": {
+    "skill_name": "bio-alignment-msa-parsing",
+    "description": "Parse and analyze multiple sequence alignments using Biopython, including conservation, gaps, annotations, weighting, Neff, MI-APC and MUSCLE5 confidence.",
+    "evaluated_on": "2026-09-22",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 11,
+    "source": "mrsonord2240/bioSkills@fea02def7356018ce7ada1c536e56397e195468f:alignment/msa-parsing",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "All checked numerical claims came from real data, seeded synthetic truth, or direct independent calculations."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "The Skill analyzes sequence alignments only and makes no individual diagnostic or treatment claim."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "It guards APC by length and Neff/L, labels shallow rankings as noise, and names estimator dependence."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All eleven example modules py_compile; ten executable entrypoints and the fresh Python/WSL workflows ran successfully."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 91,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 12,
+        "max": 12,
+        "note": "Covers parsing, normalization, annotations, filtering, mapping, weights, Neff, MI-APC, and confidence masking with shipped runnable counterparts."
+      },
+      "reliability": {
+        "score": 11,
+        "max": 12,
+        "note": "Normalizes dot/lowercase input, rejects empty filters and invalid weights, and documents format/version limits; malformed external files still rely on Biopython errors."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "References and scripts keep SKILL.md concise; the documented pure-Python Neff/MI loops intentionally target only moderate widths."
+      },
+      "agent_usability": {
+        "score": 15,
+        "max": 16,
+        "note": "Clear request-to-reference routing, 0-based convention, runnable paths, and common-error recovery are present."
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Usage prompts and clear CLI patterns are supplied; users still need to choose biologically suitable thresholds."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "No credentials, network side effects, or destructive commands; file paths and regular expressions are passed to trusted Biopython/Python APIs."
+      },
+      "maintainability": {
+        "score": 12,
+        "max": 12,
+        "note": "Shared logic is factored into examples/msa_utils.py; references route specialized material and examples supply smoke inputs."
+      },
+      "agent_specific": {
+        "score": 16,
+        "max": 20,
+        "note": "Description is specific and the Skill has progressive disclosure and scope handoffs; it could name input-format ambiguity more prominently in the trigger text."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 94.5,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 55,
+      "total": 55
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "PF00042 parsing, conservation, gaps, and row filtering",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Real 73x141 Pfam seed: 1,943 gaps; 17F/77H fully conserved; 44 rows kept.",
+        "basic": 37,
+        "specialized": 57,
+        "total": 94,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The documented workflow completed and produced a parseable result",
+            "result": "PASS",
+            "note": "Real 73x141 Pfam seed: 1,943 gaps; 17F/77H fully conserved; 44 rows kept."
+          },
+          {
+            "text": "The result equals an independent or closed-form expected value",
+            "result": "PASS",
+            "note": "Verified in saved run output."
+          },
+          {
+            "text": "The stated edge-condition behavior is explicit and correct",
+            "result": "PASS",
+            "note": "Verified in saved run output."
+          },
+          {
+            "text": "The workflow stayed within alignment-analysis scope without unsafe operations",
+            "result": "PASS",
+            "note": "Verified in saved run output."
+          },
+          {
+            "text": "The output can be rerun from the saved Phase-2 script",
+            "result": "PASS",
+            "note": "Verified in saved run output."
+          }
+        ],
+        "executed": true,
+        "execution_note": "Fresh Phase-2 execution; script and asserted output are under run/."
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Normalized duplicate removal and annotation-preserving selection",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Synthetic dot/case gaps collapse to one row; copied record metadata is retained.",
+        "basic": 37,
+        "specialized": 57,
+        "total": 94,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The documented workflow completed and produced a parseable result",
+            "result": "PASS",
+            "note": "Synthetic dot/case gaps collapse to one row; copied record metadata is retained."
+          },
+          {
+            "text": "The result equals an independent or closed-form expected value",
+            "result": "PASS",
+            "note": "Verified in saved run output."
+          },
+          {
+            "text": "The stated edge-condition behavior is explicit and correct",
+            "result": "PASS",
+            "note": "Verified in saved run output."
+          },
+          {
+            "text": "The workflow stayed within alignment-analysis scope without unsafe operations",
+            "result": "PASS",
+            "note": "Verified in saved run output."
+          },
+          {
+            "text": "The output can be rerun from the saved Phase-2 script",
+            "result": "PASS",
+            "note": "Verified in saved run output."
+          }
+        ],
+        "executed": true,
+        "execution_note": "Fresh Phase-2 execution; script and asserted output are under run/."
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "All-gap alignment and all-zero sequence weights",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Both documented ValueErrors occur; an all-gap consensus column is '-'.",
+        "basic": 37,
+        "specialized": 57,
+        "total": 94,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The documented workflow completed and produced a parseable result",
+            "result": "PASS",
+            "note": "Both documented ValueErrors occur; an all-gap consensus column is '-'."
+          },
+          {
+            "text": "The result equals an independent or closed-form expected value",
+            "result": "PASS",
+            "note": "Verified in saved run output."
+          },
+          {
+            "text": "The stated edge-condition behavior is explicit and correct",
+            "result": "PASS",
+            "note": "Verified in saved run output."
+          },
+          {
+            "text": "The workflow stayed within alignment-analysis scope without unsafe operations",
+            "result": "PASS",
+            "note": "Verified in saved run output."
+          },
+          {
+            "text": "The output can be rerun from the saved Phase-2 script",
+            "result": "PASS",
+            "note": "Verified in saved run output."
+          }
+        ],
+        "executed": true,
+        "execution_note": "Fresh Phase-2 execution; script and asserted output are under run/."
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Coordinate mapping on real Pfam seed",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Residue-to-column mapping round-trips four positions and dot gaps map to -1.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The documented workflow completed and produced a parseable result",
+            "result": "PASS",
+            "note": "Residue-to-column mapping round-trips four positions and dot gaps map to -1."
+          },
+          {
+            "text": "The result equals an independent or closed-form expected value",
+            "result": "PASS",
+            "note": "Verified in saved run output."
+          },
+          {
+            "text": "The stated edge-condition behavior is explicit and correct",
+            "result": "PASS",
+            "note": "Verified in saved run output."
+          },
+          {
+            "text": "The workflow stayed within alignment-analysis scope without unsafe operations",
+            "result": "PASS",
+            "note": "Verified in saved run output."
+          },
+          {
+            "text": "The output can be rerun from the saved Phase-2 script",
+            "result": "PASS",
+            "note": "Verified in saved run output."
+          }
+        ],
+        "executed": true,
+        "execution_note": "Fresh Phase-2 execution; script and asserted output are under run/."
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Henikoff weighting, Neff, and guarded raw MI on Pfam",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Weights sum to one; Neff is 66.08; the guard warns and returns symmetric raw MI.",
+        "basic": 37,
+        "specialized": 56,
+        "total": 93,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The documented workflow completed and produced a parseable result",
+            "result": "PASS",
+            "note": "Weights sum to one; Neff is 66.08; the guard warns and returns symmetric raw MI."
+          },
+          {
+            "text": "The result equals an independent or closed-form expected value",
+            "result": "PASS",
+            "note": "Verified in saved run output."
+          },
+          {
+            "text": "The stated edge-condition behavior is explicit and correct",
+            "result": "PASS",
+            "note": "Verified in saved run output."
+          },
+          {
+            "text": "The workflow stayed within alignment-analysis scope without unsafe operations",
+            "result": "PASS",
+            "note": "Verified in saved run output."
+          },
+          {
+            "text": "The output can be rerun from the saved Phase-2 script",
+            "result": "PASS",
+            "note": "Verified in saved run output."
+          }
+        ],
+        "executed": true,
+        "execution_note": "Fresh Phase-2 execution; script and asserted output are under run/."
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "A2M match-column extraction and MUSCLE5 column confidence",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Shipped A2M parser and fresh MUSCLE 5.3 ensemble both produced parsed, nonempty outputs.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The documented workflow completed and produced a parseable result",
+            "result": "PASS",
+            "note": "Shipped A2M parser and fresh MUSCLE 5.3 ensemble both produced parsed, nonempty outputs."
+          },
+          {
+            "text": "The result equals an independent or closed-form expected value",
+            "result": "PASS",
+            "note": "Verified in saved run output."
+          },
+          {
+            "text": "The stated edge-condition behavior is explicit and correct",
+            "result": "PASS",
+            "note": "Verified in saved run output."
+          },
+          {
+            "text": "The workflow stayed within alignment-analysis scope without unsafe operations",
+            "result": "PASS",
+            "note": "Verified in saved run output."
+          },
+          {
+            "text": "The output can be rerun from the saved Phase-2 script",
+            "result": "PASS",
+            "note": "Verified in saved run output."
+          }
+        ],
+        "executed": true,
+        "execution_note": "Fresh Phase-2 execution; script and asserted output are under run/."
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Soft-masked DNA and empty-filter rejection",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Lowercase DNA normalizes correctly and an all-removed filter raises a clear error.",
+        "basic": 37,
+        "specialized": 57,
+        "total": 94,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The documented workflow completed and produced a parseable result",
+            "result": "PASS",
+            "note": "Lowercase DNA normalizes correctly and an all-removed filter raises a clear error."
+          },
+          {
+            "text": "The result equals an independent or closed-form expected value",
+            "result": "PASS",
+            "note": "Verified in saved run output."
+          },
+          {
+            "text": "The stated edge-condition behavior is explicit and correct",
+            "result": "PASS",
+            "note": "Verified in saved run output."
+          },
+          {
+            "text": "The workflow stayed within alignment-analysis scope without unsafe operations",
+            "result": "PASS",
+            "note": "Verified in saved run output."
+          },
+          {
+            "text": "The output can be rerun from the saved Phase-2 script",
+            "result": "PASS",
+            "note": "Verified in saved run output."
+          }
+        ],
+        "executed": true,
+        "execution_note": "Fresh Phase-2 execution; script and asserted output are under run/."
+      },
+      {
+        "index": 8,
+        "type": "Variant B",
+        "label": "Real HMMER 3.4 unpadded A2M",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Fresh hmmalign output has rows 149-161 but exactly 117 match columns per row.",
+        "basic": 38,
+        "specialized": 58,
+        "total": 96,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The documented workflow completed and produced a parseable result",
+            "result": "PASS",
+            "note": "Fresh hmmalign output has rows 149-161 but exactly 117 match columns per row."
+          },
+          {
+            "text": "The result equals an independent or closed-form expected value",
+            "result": "PASS",
+            "note": "Verified in saved run output."
+          },
+          {
+            "text": "The stated edge-condition behavior is explicit and correct",
+            "result": "PASS",
+            "note": "Verified in saved run output."
+          },
+          {
+            "text": "The workflow stayed within alignment-analysis scope without unsafe operations",
+            "result": "PASS",
+            "note": "Verified in saved run output."
+          },
+          {
+            "text": "The output can be rerun from the saved Phase-2 script",
+            "result": "PASS",
+            "note": "Verified in saved run output."
+          }
+        ],
+        "executed": true,
+        "execution_note": "Fresh Phase-2 execution; script and asserted output are under run/."
+      },
+      {
+        "index": 9,
+        "type": "Stress",
+        "label": "Deep synthetic MSA with planted coupling",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "The guard passes and the planted (10,60) pair ranks first at 1.903 bits.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The documented workflow completed and produced a parseable result",
+            "result": "PASS",
+            "note": "The guard passes and the planted (10,60) pair ranks first at 1.903 bits."
+          },
+          {
+            "text": "The result equals an independent or closed-form expected value",
+            "result": "PASS",
+            "note": "Verified in saved run output."
+          },
+          {
+            "text": "The stated edge-condition behavior is explicit and correct",
+            "result": "PASS",
+            "note": "Verified in saved run output."
+          },
+          {
+            "text": "The workflow stayed within alignment-analysis scope without unsafe operations",
+            "result": "PASS",
+            "note": "Verified in saved run output."
+          },
+          {
+            "text": "The output can be rerun from the saved Phase-2 script",
+            "result": "PASS",
+            "note": "Verified in saved run output."
+          }
+        ],
+        "executed": true,
+        "execution_note": "Fresh Phase-2 execution; script and asserted output are under run/."
+      },
+      {
+        "index": 10,
+        "type": "Edge",
+        "label": "NEW: unpadded A3M-like insert states",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Both uneven rows reduce to the same match-only sequence.",
+        "basic": 37,
+        "specialized": 57,
+        "total": 94,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The documented workflow completed and produced a parseable result",
+            "result": "PASS",
+            "note": "Both uneven rows reduce to the same match-only sequence."
+          },
+          {
+            "text": "The result equals an independent or closed-form expected value",
+            "result": "PASS",
+            "note": "Verified in saved run output."
+          },
+          {
+            "text": "The stated edge-condition behavior is explicit and correct",
+            "result": "PASS",
+            "note": "Verified in saved run output."
+          },
+          {
+            "text": "The workflow stayed within alignment-analysis scope without unsafe operations",
+            "result": "PASS",
+            "note": "Verified in saved run output."
+          },
+          {
+            "text": "The output can be rerun from the saved Phase-2 script",
+            "result": "PASS",
+            "note": "Verified in saved run output."
+          }
+        ],
+        "executed": true,
+        "execution_note": "Fresh Phase-2 execution; script and asserted output are under run/."
+      },
+      {
+        "index": 11,
+        "type": "Variant A",
+        "label": "NEW: weighted consensus and conservation",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Sequence weights change consensus as documented and conserve only positions meeting weighted 0.9.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The documented workflow completed and produced a parseable result",
+            "result": "PASS",
+            "note": "Sequence weights change consensus as documented and conserve only positions meeting weighted 0.9."
+          },
+          {
+            "text": "The result equals an independent or closed-form expected value",
+            "result": "PASS",
+            "note": "Verified in saved run output."
+          },
+          {
+            "text": "The stated edge-condition behavior is explicit and correct",
+            "result": "PASS",
+            "note": "Verified in saved run output."
+          },
+          {
+            "text": "The workflow stayed within alignment-analysis scope without unsafe operations",
+            "result": "PASS",
+            "note": "Verified in saved run output."
+          },
+          {
+            "text": "The output can be rerun from the saved Phase-2 script",
+            "result": "PASS",
+            "note": "Verified in saved run output."
+          }
+        ],
+        "executed": true,
+        "execution_note": "Fresh Phase-2 execution; script and asserted output are under run/."
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 36.4,
+    "dynamic_weighted": 56.7,
+    "score": 93,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "\u2b50",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Fresh real-data checks reproduced Pfam normalization, conservation, Neff, and HMMER A2M behavior from the dispatched source copy.",
+    "The HMMER unpadded-A2M and MUSCLE5 ensemble paths execute as documented and are guarded by parseable output assertions.",
+    "Synthetic tests cover all-gap, zero-weight, case/dot-gap, weighted-consensus, and planted-coupling boundaries.",
+    "The source is modular, with runnable examples, a row-filter CLI, and reference files for domain-specific branches."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "Keep MI and Neff use bounded to moderate widths",
+      "observed_in": [
+        5,
+        9
+      ],
+      "problem": "The pure-Python pairwise loops are correct in this audit but scale quadratically with alignment width.",
+      "root_cause": "The examples prioritize transparent implementations over vectorized or compiled kernels.",
+      "fix": "Retain the existing few-hundred-column guidance and direct wider/deeper production contact prediction to plmDCA or EVcouplings as the Skill already recommends."
+    }
+  ]
+}
