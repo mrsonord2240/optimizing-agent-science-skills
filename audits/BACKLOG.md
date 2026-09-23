@@ -22,7 +22,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The example passes cluster_rows=<OLO dendrogram> together with row_split=gene_info$pathway, a combination ComplexHeatmap rejects; the script was never run.
 - Fix: Drop row_split or use a numeric row_split (works with the dendrogram), or apply OLO within each pathway group; supply a runnable data preamble and state the constraint in SKILL.md next to the OLO block.
 
-## P1 (155)
+## P1 (154)
 
 ### `bio-data-visualization-lollipop-protein-maps` — Shipped example never completes and paints wrong colours
 
@@ -1104,14 +1104,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: SKILL.md's Common Errors table documents the Key=Value mistake as a generic symptom ('filter keeps 0/all features') rather than warning that the console gives zero error signal when it happens, so a researcher has no way to know their run silently used defaults instead of their intended parameters.
 - Fix: Add an explicit Common Errors / Reliability row: 'A malformed or misspelled param-file key (e.g. Key=Value instead of Key: Value, or a typo'd key name) is silently ignored by the console -- exit code 0, no warning, defaults used instead. Always spot-check a run by deliberately varying one known parameter (e.g. Minimum peak height) and confirming the feature count actually changes, rather than trusting a clean exit code alone.'
 
-### `bio-single-cell-cnv-inference` — Numbat df_allele docs still miss 1 of 11 required columns ('gene')
-
-- Skill: 91, Production Ready · [mrsonord2240/bioSkills@6f65c08](https://github.com/mrsonord2240/bioSkills/tree/6f65c0811b87e9c149f5de17a00ce1a42ff84cc8/single-cell/cnv-inference) · [viewer](skills/bio-single-cell-cnv-inference/mrsonord2240-bioSkills@6f65c08/viewer.md)
-- Observed in inputs: 4
-- Problem: The fix updated df_allele's documented columns from 7 to 10 (adding cM, REF, ALT), but numbat 1.5.2's real numbat:::check_allele_df() requires an 11th column, 'gene', which is still undocumented in both SKILL.md prose and the parameter reference table. A df_allele built to the exact current spec is still rejected by real validation before any computation runs.
-- Root cause: The fix's verification appears to have checked that cM/REF/ALT (the previously reported error) were fixed, without re-running check_allele_df() against the fully-updated 10-column frame to confirm no further columns were required.
-- Fix: Add 'gene' to both the df_allele column list and the parameter reference table row, with a one-line note on where it comes from (gene the SNP falls within, from the same annotation used by pileup_and_phase.R). Verify by calling numbat:::check_allele_df() directly on the final 11-column frame.
-
 ### `bio-crispr-screens-base-editing-analysis` — Validate allele-string coordinate bounds before classification
 
 - Skill: 92, Production Ready · [mrsonord2240/bioSkills@dd1d90a](https://github.com/mrsonord2240/bioSkills/tree/dd1d90a9ae607f068d5ffda2e761e869f07decce/crispr-screens/base-editing-analysis) · [viewer](skills/bio-crispr-screens-base-editing-analysis/mrsonord2240-bioSkills@dd1d90a/viewer.md)
@@ -1264,7 +1256,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (404)
+## P2 (402)
 
 ### `bio-data-visualization-lollipop-protein-maps` — HGVSp edge cases and recurrence semantics undocumented
 
@@ -3873,22 +3865,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: DRAGEN and Cell Ranger could not be directly executed in this environment.
 - Root cause: They require licensed hardware/software or account registration outside the public audit environment.
 - Fix: Retain the current not-verified labels; when a licensed instance or real Cell Ranger BAM becomes available, replace them with versioned observed distributions.
-
-### `bio-single-cell-cnv-inference` — No explicit clinical-practice-boundary disclaimer
-
-- Skill: 91, Production Ready · [mrsonord2240/bioSkills@6f65c08](https://github.com/mrsonord2240/bioSkills/tree/6f65c0811b87e9c149f5de17a00ce1a42ff84cc8/single-cell/cnv-inference) · [viewer](skills/bio-single-cell-cnv-inference/mrsonord2240-bioSkills@6f65c08/viewer.md)
-- Observed in inputs: 7
-- Problem: Nothing in SKILL.md explicitly instructs the agent to avoid staging/treatment conclusions from CNV calls; the safe refusal observed in testing relies on general judgment plus the skill's hypothesis-language framing, not an explicit instruction.
-- Root cause: Deliberately left unfixed this pass (fix log: 'out of this pass's correction scope; content addition, not a defect fix').
-- Fix: Add a short 'not for diagnosis or treatment' note near the Governing Principle, alongside the existing hypothesis-language cautions.
-
-### `bio-single-cell-cnv-inference` — No mention of patient-privacy handling for real tumor samples
-
-- Skill: 91, Production Ready · [mrsonord2240/bioSkills@6f65c08](https://github.com/mrsonord2240/bioSkills/tree/6f65c0811b87e9c149f5de17a00ce1a42ff84cc8/single-cell/cnv-inference) · [viewer](skills/bio-single-cell-cnv-inference/mrsonord2240-bioSkills@6f65c08/viewer.md)
-- Observed in inputs: —
-- Problem: Real tumor scRNA-seq is patient-derived clinical data; the skill gives no guidance on de-identification or data handling.
-- Root cause: Deliberately left unfixed this pass, same reason as above.
-- Fix: Add a one-line pointer to organizational data-handling policy, consistent with peer clinical-adjacent skills.
 
 ### `bio-single-cell-scatac-analysis` — NucleosomeSignal(), TSSEnrichment(), and StringToGRanges() are deprecated in the installed Signac release
 

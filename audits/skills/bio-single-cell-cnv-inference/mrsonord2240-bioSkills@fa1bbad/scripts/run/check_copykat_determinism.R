@@ -1,0 +1,5 @@
+p1 <- read.csv("/mnt/openscience/audits/bio-single-cell-cnv-inference/run/copykat_out_input2/copykat_prediction.csv")
+p2 <- read.csv("/mnt/openscience/audits/bio-single-cell-cnv-inference/run/copykat_out_input2_rerun/copykat_prediction.csv")
+m <- merge(p1, p2, by = "cell.names")
+cat("cells identical prediction:", sum(m$copykat.pred.x == m$copykat.pred.y), "/", nrow(m), "\n")
+print(table(m$copykat.pred.x, m$copykat.pred.y))
