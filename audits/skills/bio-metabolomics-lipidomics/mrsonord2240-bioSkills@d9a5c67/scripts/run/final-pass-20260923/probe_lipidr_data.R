@@ -1,0 +1,6 @@
+suppressMessages(library(lipidr))
+datadir <- system.file('extdata', package='lipidr')
+cat(datadir, '\n')
+print(list.files(datadir, 'A1_data.csv|F1_data.csv|F2_data.csv|clin.csv', full.names=TRUE))
+raw <- read.csv(file.path(datadir, 'A1_data.csv'), check.names=FALSE)
+print(names(raw)); print(head(raw[,1:4])); cat('rows=',nrow(raw),'\n')

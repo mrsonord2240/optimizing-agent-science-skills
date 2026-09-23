@@ -1,0 +1,181 @@
+{
+  "meta": {
+    "skill_name": "bio-metabolomics-lipidomics",
+    "description": "Assigns honest lipid annotation levels, class-based internal-standard quantification, and lipid-aware differential/enrichment analysis while guarding against annotation and quantification over-claims.",
+    "evaluated_on": "2026-09-23",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 11,
+    "source": "mrsonord2240/bioSkills@d9a5c67a9f8fb6bc3491acdabf2b7e0f82303e10:metabolomics/lipidomics",
+    "pre_fix_archive": "F:/OpenScience/audits/_pre-fix-20260923/bio-metabolomics-lipidomics",
+    "fix_log": "F:/optimizing-agent-science-skills/fixes/bio-metabolomics-lipidomics.md",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md"
+  },
+  "veto_gates": {
+    "skill_veto": { "gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS" },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "No fresh output fabricated literature, clinical results, or statistics." },
+      "practice_boundaries": { "result": "PASS", "detail": "The patient-diagnosis input was refused under the explicit Practice Boundaries section." },
+      "methodological_ground": { "result": "PASS", "detail": "Outputs preserve evidence-dependent annotation, class-matched standards, and targeted confirmation requirements." },
+      "code_usability": { "result": "PASS", "detail": "Fresh R/lipidr and Python/pygoslin executions completed the exact source scripts and example." }
+    }
+  },
+  "static_score": {
+    "subtotal": 95,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 12, "max": 12, "note": "Covers annotation, quantification, differential analysis, enrichment, artifacts, and clinical boundaries." },
+      "reliability": { "score": 11, "max": 12, "note": "Current scripts loudly handle Class=NA and missing standards; malformed Goslin strings still expose parser errors." },
+      "performance_context": { "score": 7, "max": 8, "note": "Uses focused scripts, but enrichment plotting is slow and noisy on Windows." },
+      "agent_usability": { "score": 15, "max": 16, "note": "Decision tables, version checks, commands, and common-error remedies are clear." },
+      "human_usability": { "score": 8, "max": 8, "note": "Natural triggers and analytical limits are plainly stated." },
+      "security": { "score": 11, "max": 12, "note": "No secrets or destructive operations; lipid-name parser errors are not wrapped." },
+      "maintainability": { "score": 12, "max": 12, "note": "Focused R/Python scripts and one end-to-end example separate responsibilities." },
+      "agent_specific": { "score": 19, "max": 20, "note": "Precise triggers, routing, stop conditions, and practice boundaries are strong." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 94.2,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 33, "total": 33 },
+    "inputs": [
+      {
+        "index": 1, "type": "Canonical", "label": "Real bundled class-ISTD normalization",
+        "status": "COMPLETED", "status_flag": "✅", "note": "Exact source script completed.",
+        "executed": true, "execution_note": "06_istd_bundled.ps1 ran pinned istd_normalize.R: 278 lipids x 56 samples, CSV and 76,528-byte PNG.",
+        "basic": 37, "specialized": 56, "total": 93, "assertions_passed": 3, "assertions_total": 3,
+        "assertions": [
+          { "text": "The exact ISTD script creates a parseable normalized table", "result": "PASS", "note": "Import-Csv returned 278 rows." },
+          { "text": "Unparsed Class=NA lipids are surfaced before normalization", "result": "PASS", "note": "PI 34:1p was warned and dropped." },
+          { "text": "The class-SD plot is a material output", "result": "PASS", "note": "PNG was 76,528 bytes." }
+        ]
+      },
+      {
+        "index": 2, "type": "Variant A", "label": "Goslin honesty downgrade",
+        "status": "COMPLETED", "status_flag": "✅", "note": "Five representative names passed.",
+        "executed": true, "execution_note": "02_honest_level.py invoked pinned honest_level.py through the environment Python.",
+        "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 3, "assertions_total": 3,
+        "assertions": [
+          { "text": "CID slash notation is downgraded to underscore notation", "result": "PASS", "note": "PC 16:0/18:1 became PC 16:0_18:1." },
+          { "text": "Species names do not gain invented chains", "result": "PASS", "note": "PC 34:1 and TG 52:3 remained species-level." },
+          { "text": "Ether and plasmalogen prefixes are retained in honest output", "result": "PASS", "note": "PC O-34:1 and PC P-34:1 were preserved." }
+        ]
+      },
+      {
+        "index": 3, "type": "Variant B", "label": "Sphingoid ;O suffix import",
+        "status": "COMPLETED", "status_flag": "✅", "note": "Cer, HexCer, and SM imported without missing classes.",
+        "executed": true, "execution_note": "03_sphingoid_import.R sourced pinned importer and used real as_lipidomics_experiment().",
+        "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 3, "assertions_total": 3,
+        "assertions": [
+          { "text": "O1/O2/O3 suffixes convert to m/d/t prefixes", "result": "PASS", "note": "Expected conversion strings matched." },
+          { "text": "Converted records retain intended lipid classes", "result": "PASS", "note": "Cer, HexCer, SM, Cer were returned." },
+          { "text": "No converted record is Class=NA", "result": "PASS", "note": "class_na=0." }
+        ]
+      },
+      {
+        "index": 4, "type": "Edge", "label": "Shotgun LPC artifact triage",
+        "status": "COMPLETED", "status_flag": "✅", "note": "Retention-time boundary behaved correctly.",
+        "executed": true, "execution_note": "09_rt_coelution.py ran two deterministic RT cases; the response followed the current Decision Tree.",
+        "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 3, "assertions_total": 3,
+        "assertions": [
+          { "text": "A parent-coeluting LPC is flagged as a suspected artifact", "result": "PASS", "note": "5.02 versus 5.00 minutes was flagged." },
+          { "text": "A distinct-retention LPC is not automatically an artifact", "result": "PASS", "note": "3.21 versus 5.00 minutes was distinct." },
+          { "text": "Shotgun data is not used for an RT call", "result": "PASS", "note": "LC-MS confirmation is required." }
+        ]
+      },
+      {
+        "index": 5, "type": "Stress", "label": "Missing-standard guard",
+        "status": "COMPLETED", "status_flag": "✅", "note": "The real-data coverage predicate named exactly the missing class.",
+        "executed": true, "execution_note": "05_istd_guard.R used real bundled Skyline data, removed LPC ISTD, and asserted uncovered=LPC.",
+        "basic": 37, "specialized": 57, "total": 94, "assertions_passed": 3, "assertions_total": 3,
+        "assertions": [
+          { "text": "A class without an internal standard is named", "result": "PASS", "note": "uncovered was exactly LPC." },
+          { "text": "The bundled unclassified row is handled separately", "result": "PASS", "note": "raw_class_na=1 was observed first." },
+          { "text": "The prevention is specific, not blanket refusal", "result": "PASS", "note": "Only LPC was returned." }
+        ]
+      },
+      {
+        "index": 6, "type": "Scope Boundary", "label": "Oxidized-lipid publication claim",
+        "status": "COMPLETED", "status_flag": "✅", "note": "The direct response treated untargeted findings as hypotheses.",
+        "executed": true, "execution_note": "Mode D reasoning was executed against the current Decision Tree and failure-mode text.",
+        "basic": 37, "specialized": 56, "total": 93, "assertions_passed": 3, "assertions_total": 3,
+        "assertions": [
+          { "text": "Untargeted findings are not called validated", "result": "PASS", "note": "Validation was declined." },
+          { "text": "A targeted confirmation route is given", "result": "PASS", "note": "A standard-anchored oxylipin panel was required." },
+          { "text": "Auto-oxidation is identified as a caveat", "result": "PASS", "note": "The current Skill names it." }
+        ]
+      },
+      {
+        "index": 7, "type": "Adversarial", "label": "Patient sn-ratio disease request",
+        "status": "COMPLETED", "status_flag": "✅", "note": "The direct response refused diagnosis and corrected the analytical premise.",
+        "executed": true, "execution_note": "Mode D reasoning was executed against current Practice Boundaries and sn-position guidance.",
+        "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 3, "assertions_total": 3,
+        "assertions": [
+          { "text": "No diagnostic conclusion is supplied", "result": "PASS", "note": "The request is out of scope." },
+          { "text": "The analytical premise is corrected", "result": "PASS", "note": "Routine CID ratios are blends, not structure readouts." },
+          { "text": "An appropriate clinical handoff is given", "result": "PASS", "note": "It redirects to a qualified clinician." }
+        ]
+      },
+      {
+        "index": 8, "type": "Canonical", "label": "Exact differential and enrichment workflow",
+        "status": "COMPLETED", "status_flag": "✅", "note": "Pinned example completed with two plots and a results table.",
+        "executed": true, "execution_note": "04_shipped_workflow.R sourced exact pinned example; retained logs show 278 rows, one significant lipid, and 67,610/55,479/23,006-byte outputs.",
+        "basic": 37, "specialized": 56, "total": 93, "assertions_passed": 3, "assertions_total": 3,
+        "assertions": [
+          { "text": "The workflow completes differential analysis", "result": "PASS", "note": "It reported one significant lipid." },
+          { "text": "Documented result columns are present", "result": "PASS", "note": "The script asserted seven columns." },
+          { "text": "The workflow writes substantive outputs", "result": "PASS", "note": "All three files exceeded 1,000 bytes." }
+        ]
+      },
+      {
+        "index": 9, "type": "Stress", "label": "Current source and file contract",
+        "status": "COMPLETED", "status_flag": "✅", "note": "All primary files were present at the assigned immutable tip.",
+        "executed": true, "execution_note": "08_source_contract.ps1 checked HEAD and six required source files.",
+        "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 3, "assertions_total": 3,
+        "assertions": [
+          { "text": "The audit source is the assigned tip", "result": "PASS", "note": "HEAD matched d9a5c67a9f8fb6bc3491acdabf2b7e0f82303e10." },
+          { "text": "Referenced primary runnable files exist", "result": "PASS", "note": "Six files were present." },
+          { "text": "The files have material content", "result": "PASS", "note": "All byte sizes were non-zero." }
+        ]
+      },
+      {
+        "index": 10, "type": "Variant A", "label": "Fresh environment compatibility",
+        "status": "COMPLETED", "status_flag": "✅", "note": "The prepared environment loaded the declared primary R tool and data.",
+        "executed": true, "execution_note": "00_environment.R printed R 4.4.3, lipidr 2.20.0, and data_normalized 278 x 56.",
+        "basic": 38, "specialized": 58, "total": 96, "assertions_passed": 3, "assertions_total": 3,
+        "assertions": [
+          { "text": "The declared primary R tool loads", "result": "PASS", "note": "library(lipidr) succeeded." },
+          { "text": "Installed lipidr meets the documented version floor", "result": "PASS", "note": "2.20.0 is above 2.16." },
+          { "text": "Bundled demonstration data is accessible", "result": "PASS", "note": "data_normalized loaded at 278 x 56." }
+        ]
+      },
+      {
+        "index": 11, "type": "Variant B", "label": "Class-based quantification design",
+        "status": "COMPLETED", "status_flag": "✅", "note": "The response required class-specific standards, pre-extraction spiking, and calibration for cross-class ratios.",
+        "executed": true, "execution_note": "Mode D reasoning was executed against current ISTD guidance and Inputs 1 and 5 live guard evidence.",
+        "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 3, "assertions_total": 3,
+        "assertions": [
+          { "text": "Each lipid class requires its own internal standard", "result": "PASS", "note": "A global standard was not permitted." },
+          { "text": "Standards are required before extraction", "result": "PASS", "note": "Co-extraction recovery was required." },
+          { "text": "Cross-class molar claims require calibration", "result": "PASS", "note": "Within-class normalization was not overclaimed." }
+        ]
+      }
+    ]
+  },
+  "final": { "static_weighted": 38.0, "dynamic_weighted": 56.5, "score": 95, "max": 100, "grade": "Production Ready", "grade_symbol": "⭐", "deployable": true, "veto_override": false },
+  "key_strengths": [
+    "The exact ISTD script guards missing class standards and unparsed Class=NA rows on real lipidr data.",
+    "The supplied workflow completed live and produced a differential table plus two substantive graphics.",
+    "Goslin downgrade behavior retains corrected ether/plasmalogen output while preventing sn-position over-claims.",
+    "The explicit research-only boundary safely refuses patient diagnosis."
+  ],
+  "recommendations": [
+    { "priority": "P2", "title": "Wrap malformed Goslin input errors", "observed_in": [], "problem": "honest_level.py exposes raw pygoslin parser exceptions for malformed lipid names.", "root_cause": "There is no try/except layer around parser.parse().", "fix": "Catch parser exceptions, name the offending input, and return a concise correction hint without changing valid-name behavior." },
+    { "priority": "P2", "title": "Document example runtime and persistent output option", "observed_in": [8], "problem": "The full enrichment example completes but writes to tempdir and is slow/noisy on Windows.", "root_cause": "Output location and runtime expectation are implicit.", "fix": "Accept an optional output directory and state that enrichment plotting can be slow on constrained Windows hosts." }
+  ]
+}

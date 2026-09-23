@@ -4162,22 +4162,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: powsimR is GitHub-only with a compile-required dependency and was judged not worth installing given the pseudobulk substitute answers the same question.
 - Fix: No action required for deployment; if powsimR is ever pinned and installed in a future audit environment, verify its estimateParam/simulateDE signatures against the version drift already flagged in Version Compatibility.
 
-### `bio-metabolomics-lipidomics` — istd-coverage guard is table()-based and silently misses Class=NA rows entirely
-
-- Skill: 92, Production Ready · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/metabolomics/lipidomics) · [viewer](skills/bio-metabolomics-lipidomics/mrsonord2240-bioSkills@6847328/viewer.md)
-- Observed in inputs: 1, 8
-- Problem: The guard (table(rowData(d)$Class, rowData(d)$istd)) correctly catches every UNCOVERED CLASS, but R's table() drops NA values by default, so a lipid that failed to parse into any Class at all never appears as a row and is invisible to the check -- it reaches normalize_istd() completely unflagged. Reproduced on lipidr's own real bundled data (1/279 rows, rowname "82").
-- Root cause: The guard's coverage check operates on table(Class, istd), which silently excludes NA-valued groups; the fix closed the per-class gap but not the per-row (unclassified-lipid) gap in the same mechanism.
-- Fix: Add an explicit pre-check before the table(): if (any(is.na(rowData(d)$Class))) stop()/warn() naming the unclassified rownames, or filter them out with a clear message before the coverage table is built.
-
-### `bio-metabolomics-lipidomics` — lipidr's importer still cannot natively parse the ';O2' notation without the manual conversion step
-
-- Skill: 92, Production Ready · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/metabolomics/lipidomics) · [viewer](skills/bio-metabolomics-lipidomics/mrsonord2240-bioSkills@6847328/viewer.md)
-- Observed in inputs: 9
-- Problem: The fix adds a working, verified conversion snippet, but it is a manual pre-processing step the agent must remember to apply every time; there is no guard that detects an un-converted ';O#' name and reminds the agent before import silently drops it.
-- Root cause: The fix addresses the documented failure mode with a conversion function but does not add a detection guard analogous to the istd-coverage check.
-- Fix: Optional hardening: after as_lipidomics_experiment()/read_skyline(), check for Class=NA rows whose Molecule string still contains the literal ';O' pattern, and suggest running to_lipidr_sphingoid() before re-importing.
-
 ### `bio-metabolomics-normalization-qc` — Permutation-test guardrail still trips at its nominal false-positive rate on clean data
 
 - Skill: 92, Production Ready · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/metabolomics/normalization-qc) · [viewer](skills/bio-metabolomics-normalization-qc/mrsonord2240-bioSkills@6847328/viewer.md)
@@ -4513,6 +4497,22 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: usage-guide.md says the optional reference-efficacy section is in SKILL.md, but it now resides in references/efficacy-prior-and-diagnostics.md.
 - Root cause: The 2026-09-21 reference-file split left one old section-location phrase in the usage guide.
 - Fix: Point that Prerequisites sentence directly to references/efficacy-prior-and-diagnostics.md, or say it is indexed by SKILL.md's Reference Files section.
+
+### `bio-metabolomics-lipidomics` — Wrap malformed Goslin input errors
+
+- Skill: 95, Production Ready · [mrsonord2240/bioSkills@d9a5c67](https://github.com/mrsonord2240/bioSkills/tree/d9a5c67a9f8fb6bc3491acdabf2b7e0f82303e10/metabolomics/lipidomics) · [viewer](skills/bio-metabolomics-lipidomics/mrsonord2240-bioSkills@d9a5c67/viewer.md)
+- Observed in inputs: —
+- Problem: honest_level.py exposes raw pygoslin parser exceptions for malformed lipid names.
+- Root cause: There is no try/except layer around parser.parse().
+- Fix: Catch parser exceptions, name the offending input, and return a concise correction hint without changing valid-name behavior.
+
+### `bio-metabolomics-lipidomics` — Document example runtime and persistent output option
+
+- Skill: 95, Production Ready · [mrsonord2240/bioSkills@d9a5c67](https://github.com/mrsonord2240/bioSkills/tree/d9a5c67a9f8fb6bc3491acdabf2b7e0f82303e10/metabolomics/lipidomics) · [viewer](skills/bio-metabolomics-lipidomics/mrsonord2240-bioSkills@d9a5c67/viewer.md)
+- Observed in inputs: 8
+- Problem: The full enrichment example completes but writes to tempdir and is slow/noisy on Windows.
+- Root cause: Output location and runtime expectation are implicit.
+- Fix: Accept an optional output directory and state that enrichment plotting can be slow on constrained Windows hosts.
 
 ### `bio-metabolomics-metabolite-annotation` — Inline code comment misplaces where the precursor_mz AssertionError actually fires
 
