@@ -1,9 +1,9 @@
 {
   "skill_id": "bio-crispr-screens-batch-correction",
-  "version": "mrsonord2240-bioSkills@6847328",
+  "version": "mrsonord2240-bioSkills@f04f3c5",
   "source": {
     "repository": "mrsonord2240/bioSkills",
-    "commit": "684732876d2781df75d90ba35c3e9949ff4f28b2",
+    "commit": "f04f3c5168224974c7879822c33f364c5e4fd034",
     "path": "crispr-screens/batch-correction",
     "author": "GPTomics",
     "author_url": "https://github.com/GPTomics",
@@ -13,7 +13,7 @@
       "repository": "GPTomics/bioSkills",
       "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
     },
-    "url": "https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/crispr-screens/batch-correction"
+    "url": "https://github.com/mrsonord2240/bioSkills/tree/f04f3c5168224974c7879822c33f364c5e4fd034/crispr-screens/batch-correction"
   },
   "audit": {
     "method": {
@@ -26,16 +26,16 @@
       "url": "https://github.com/aipoch/medical-research-skills/tree/f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26/skill-auditor"
     },
     "evaluator_version": "skill-auditor@1.0",
-    "audited_on": "2026-09-16",
+    "audited_on": "2026-09-23",
     "performed_by": "Claude (Anthropic) auditor agents",
     "commissioned_by": "Samuel Nord",
     "test_data": "synthetic"
   },
-  "supersedes": "GPTomics-bioSkills@d91ed3d",
+  "supersedes": "mrsonord2240-bioSkills@6847328",
   "files": {
     "report": "report.json",
     "viewer": "viewer.md",
     "fixes": "fixes.md",
-    "scripts": 10
+    "scripts": 19
   }
 }

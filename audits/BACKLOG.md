@@ -1272,7 +1272,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (437)
+## P2 (434)
 
 ### `bio-data-visualization-lollipop-protein-maps` — HGVSp edge cases and recurrence semantics undocumented
 
@@ -4050,38 +4050,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The prose presents one implementation- and input-dependent observed magnitude too literally.
 - Fix: Replace the literal approximately 2,400 comparison with a checked range or the more robust statement that the synthetic thin library was about 14x the real control-excluded maximum in this run; retain the actionable coverage guidance.
 
-### `bio-crispr-screens-batch-correction` — Within-batch-constant filter over-excludes guides that were never actually at risk
-
-- Skill: 91, Production Ready · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/crispr-screens/batch-correction) · [viewer](skills/bio-crispr-screens-batch-correction/mrsonord2240-bioSkills@6847328/viewer.md)
-- Observed in inputs: 1, 5
-- Problem: combat_correct()'s per-batch std>0 filter flags a guide if it is constant within ANY single batch, but the actual NaN-causing condition (confirmed by reading pycombat's source and testing both conditions separately) requires zero POOLED variance across ALL batches combined. Guides that are constant in one batch but ordinarily noisy in another are safe to correct, yet are dropped anyway -- 294/71,090 on real HAP1 data (Input 1, including 14 CEGv2 essential-gene guides) and 6/6 in a controlled comparison (Input 5 Part 4).
-- Root cause: The filter checks each batch's variance independently (an easy, cheap per-batch check) rather than the pooled-across-all-batches variance that pycombat's compute_prior() actually divides by.
-- Fix: Replace the per-batch std>0 check with a pooled-residual check (e.g. regress out batch+mod via the same design matrix pycombat uses internally, or a simpler proxy: flag a guide only if ALL of its batches are individually constant, not just one), so guides with real information in at least one noisy batch are still corrected.
-
-### `bio-crispr-screens-batch-correction` — Dropped/uncorrected guides are reported only as a count, not returned to the caller
-
-- Skill: 91, Production Ready · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/crispr-screens/batch-correction) · [viewer](skills/bio-crispr-screens-batch-correction/mrsonord2240-bioSkills@6847328/viewer.md)
-- Observed in inputs: 1, 5
-- Problem: combat_correct() prints '<N> features are constant within a batch' but returns a single DataFrame with no column or accompanying mask indicating which specific rows were left uncorrected, so a downstream pipeline cannot selectively re-examine, re-normalize, or exclude them from hit-calling without re-deriving the same per-batch std check itself.
-- Root cause: The `usable` boolean mask computed inside the function is local and discarded after use; only its count is surfaced via print().
-- Fix: Return a tuple (or attach a boolean Series as a `.attrs['uncorrected_features']`) so the caller can identify and act on the dropped guides directly, e.g. flag them in the final hit-calling report rather than silently including them alongside genuinely-corrected values.
-
-### `bio-crispr-screens-batch-correction` — The 'all-NaN' failure mode is framed as reliable; it is floating-point fragile
-
-- Skill: 91, Production Ready · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/crispr-screens/batch-correction) · [viewer](skills/bio-crispr-screens-batch-correction/mrsonord2240-bioSkills@6847328/viewer.md)
-- Observed in inputs: 5
-- Problem: combat_correct()'s docstring and the SKILL.md prose describe the danger as producing NaNs 'with no exception and exit code 0.' Testing the identical zero-pooled-variance construction against a dataset with a realistic per-batch baseline shift instead of a uniform one showed it can instead silently collapse the affected genes to a wrong-but-finite constant value -- no NaN at all -- depending on floating-point round-off in the underlying linear-algebra solve.
-- Root cause: The fix log's own measurement ('6/2,000 -> all-NaN') was taken under one specific data shape; the failure's exact numerical manifestation was not characterized as data-shape-dependent.
-- Fix: Reframe the docstring/prose to say the pre-fit filter, not the post-hoc NaN check, is what reliably prevents this class of failure (both the NaN and the degenerate-constant manifestations) -- so a future editor doesn't remove the filter under the assumption the NaN check alone is sufficient.
-
-### `bio-crispr-screens-batch-correction` — Full-genome-scale MAGeCK MLE runtime still undisclosed (carryover, unaddressed)
-
-- Skill: 91, Production Ready · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/crispr-screens/batch-correction) · [viewer](skills/bio-crispr-screens-batch-correction/mrsonord2240-bioSkills@6847328/viewer.md)
-- Observed in inputs: 4
-- Problem: mageck mle's default variance modeling at genome scale (18,056 genes) is a multi-hour job by design (confirmed independently in this environment's TOOLS.md), but SKILL.md and usage-guide.md still say nothing about this, even after this round's --permutation-round fix touched the same command.
-- Root cause: The P2 fix this round focused on the permutation-round/reproducibility caveat and did not also address runtime disclosure, which was noted as an assertion FAIL pre-fix but never entered the formal recommendations list.
-- Fix: Add one sentence near the mageck mle example: 'At genome scale (~18,000 genes), variance-model permutation is a multi-hour job; use a gene subset or reduce --permutation-round for a fast sanity check before a full run.'
-
 ### `bio-crispr-screens-crispresso-editing` — CRISPRessoWGS remains unexecuted across two audit passes
 
 - Skill: 91, Production Ready · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/crispr-screens/crispresso-editing) · [viewer](skills/bio-crispr-screens-crispresso-editing/mrsonord2240-bioSkills@6847328/viewer.md)
@@ -4665,6 +4633,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The deleted usage-guide.md Tips bullet 'WikiPathways has fewer total pathways than KEGG; best used as a complement' has no surviving statement anywhere in SKILL.md or usage-guide.md -- the closest remaining content (the WikiPathways-vs-KEGG/Reactome table's Species row) compares organism counts, not pathway counts.
 - Root cause: The fix log's deletion table classified this bullet as 'no unique content' alongside several bullets that genuinely were duplicates, but this specific quantitative comparison was not actually restated elsewhere.
 - Fix: Either restore a one-line version of the claim (with a source, since the original was unsourced) in the WikiPathways vs KEGG/Reactome section, or drop it deliberately and note the removal in the fix log rather than folding it into the true-duplicate bucket.
+
+### `bio-crispr-screens-batch-correction` — State JACKS compatibility or remove version implication
+
+- Skill: 95, Production Ready · [mrsonord2240/bioSkills@f04f3c5](https://github.com/mrsonord2240/bioSkills/tree/f04f3c5168224974c7879822c33f364c5e4fd034/crispr-screens/batch-correction) · [viewer](skills/bio-crispr-screens-batch-correction/mrsonord2240-bioSkills@f04f3c5/viewer.md)
+- Observed in inputs: —
+- Problem: JACKS is named as an alternative but Version Compatibility does not state which JACKS release/API was considered.
+- Root cause: The compatibility section concentrates on tools directly executed by the primary path.
+- Fix: Add a brief JACKS version/API compatibility note, or label it as a cross-reference to the dedicated JACKS Skill rather than a tested in-skill dependency.
 
 ### `bio-metabolomics-metabolite-annotation` — Inline code comment misplaces where the precursor_mz AssertionError actually fires
 
