@@ -22,7 +22,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The example passes cluster_rows=<OLO dendrogram> together with row_split=gene_info$pathway, a combination ComplexHeatmap rejects; the script was never run.
 - Fix: Drop row_split or use a numeric row_split (works with the dendrogram), or apply OLO within each pathway group; supply a runnable data preamble and state the constraint in SKILL.md next to the OLO block.
 
-## P1 (156)
+## P1 (155)
 
 ### `bio-data-visualization-lollipop-protein-maps` — Shipped example never completes and paints wrong colours
 
@@ -631,14 +631,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: SKILL.md says fastafile switches BAQ on 'under either stepper (`'all'`, the default, or `'samtools'`)' and the table row for `-f` says 'either stepper'. pysam 0.24.1's default stepper is 'samtools'; with an explicit stepper='all' (or 'nofilter') fastafile applies NO BAQ (538/538 BAQ positions on the own single-end BAM, 49/49 on real SE data; identical qualities with and without fastafile), and 'all' also skips overlap removal and the orphan filter (281 human-BAM positions differ from `-B`), so the `-x`/`-A` 'default matches' rows only hold for the default stepper. Round 1's wording (stepper='samtools' + fastafile) was correct; the fix log's 'either stepper' verification called the no-argument call 'all'.
 - Root cause: The round-2 harness passed no stepper argument for its 'all' rows, so both rows exercised the default 'samtools' stepper.
 - Fix: Rewrite the paragraph and table row: 'pysam's default stepper is `samtools`. With it, `fastafile=` switches BAQ on and `ignore_overlaps` / `ignore_orphans` / `min_base_quality` apply; with `stepper='all'` or `'nofilter'` neither BAQ nor overlap/orphan handling is applied, so do not pass them when matching mpileup.' Drop 'either stepper' and '`'all'`, the default'.
-
-### `bio-reference-operations` — Reheader recipe fails on full hg38 headers (map emits "na")
-
-- Skill: 85, Production Ready · [mrsonord2240/bioSkills@0d22089](https://github.com/mrsonord2240/bioSkills/tree/0d22089b40e9195801f3980b64fcbb24ed4e278f/alignment-files/reference-operations) · [viewer](skills/bio-reference-operations/mrsonord2240-bioSkills@0d22089/viewer.md)
-- Observed in inputs: 3
-- Problem: The UCSC->RefSeq map line keeps 4 contigs whose RefSeq column is "na" (chr11_KI270721v1_random, chr22_KI270734v1_random, chrUn_KI270752v1, chr10_KI270825v1_alt). On a hs38DH/UCSC header (1000G BAM) reheader stops with "Duplicate entry na in sam header" and leaves a 0-byte renamed.bam.
-- Root cause: The recipe was verified only on a single-contig BAM.
-- Fix: Change the awk filter to $10!="na" && $7!="na" (tested: rc 0, 451 of 3,366 contigs renamed, records identical) and write reheader output to a temp name, mv on success.
 
 ### `bio-single-cell-doublet-detection` — The Python per-sample loop silently discards its own results
 
@@ -1272,7 +1264,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (433)
+## P2 (430)
 
 ### `bio-data-visualization-lollipop-protein-maps` — HGVSp edge cases and recurrence semantics undocumented
 
@@ -2233,38 +2225,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The single file grew from 14.8 KB to 24.6 KB (479 lines); the ~150 lines of pysam helpers are loaded on every invocation, and only one of them ships as a runnable example.
 - Root cause: The dedup moved usage-guide code into SKILL.md instead of into examples/.
 - Fix: Move allele_counts / find_variants / pileup_text into examples/ (with a small self-test) and keep the table and one-line usage in SKILL.md.
-
-### `bio-reference-operations` — -T is described as filling low-coverage columns
-
-- Skill: 85, Production Ready · [mrsonord2240/bioSkills@0d22089](https://github.com/mrsonord2240/bioSkills/tree/0d22089b40e9195801f3980b64fcbb24ed4e278f/alignment-files/reference-operations) · [viewer](skills/bio-reference-operations/mrsonord2240-bioSkills@0d22089/viewer.md)
-- Observed in inputs: 6, 8
-- Problem: -T fills only zero-coverage columns with the reference base (in FASTA case). Columns below -d or ambiguous stay N.
-- Root cause: Wording "consensus unavailable (low coverage; ...)" was written without testing a depth-below--d column.
-- Fix: Say "columns with no reads (depth 0)"; add "columns below -d and ambiguous columns stay N".
-
-### `bio-reference-operations` — Description omits contig renaming, extraction, CRAM references
-
-- Skill: 85, Production Ready · [mrsonord2240/bioSkills@0d22089](https://github.com/mrsonord2240/bioSkills/tree/0d22089b40e9195801f3980b64fcbb24ed4e278f/alignment-files/reference-operations) · [viewer](skills/bio-reference-operations/mrsonord2240-bioSkills@0d22089/viewer.md)
-- Observed in inputs: 3, 7
-- Problem: The frontmatter still names consensus / indexing / dictionaries only, while the body and the usage-guide prompts now answer "my BAM says chr22, reference says 22" and "which GRCh38 is this?".
-- Root cause: Description left untouched during the fix.
-- Fix: Add "rename/match contig names (chr22 vs 22, GRCh38 flavours), extract regions, CRAM reference resolution" to the description.
-
-### `bio-reference-operations` — bgzip requirement and test data are undocumented
-
-- Skill: 85, Production Ready · [mrsonord2240/bioSkills@0d22089](https://github.com/mrsonord2240/bioSkills/tree/0d22089b40e9195801f3980b64fcbb24ed4e278f/alignment-files/reference-operations) · [viewer](skills/bio-reference-operations/mrsonord2240-bioSkills@0d22089/viewer.md)
-- Observed in inputs: 1
-- Problem: The script usage line and SKILL accept ".gz", but plain-gzip FASTA (as downloaded from Ensembl/NCBI) fails in faidx ("please use bgzip") and the Skill never says so. There is still no shipped sample data or expected output.
-- Root cause: .gz support was tested with bgzip only; test data was declined in the fix.
-- Fix: Add one line: "gunzip -c x.fa.gz \| bgzip > x.fa.gz2" (or gzip -> bgzip) and a 3-line toy FASTA + expected .dict in examples/.
-
-### `bio-reference-operations` — Small stated-but-imprecise details
-
-- Skill: 85, Production Ready · [mrsonord2240/bioSkills@0d22089](https://github.com/mrsonord2240/bioSkills/tree/0d22089b40e9195801f3980b64fcbb24ed4e278f/alignment-files/reference-operations) · [viewer](skills/bio-reference-operations/mrsonord2240-bioSkills@0d22089/viewer.md)
-- Observed in inputs: 1, 3, 4, 6
-- Problem: Picard 3.5.0 does accept genome.fasta.dict (only GATK ignores it); the chr22 "1 vs 2 differences" needs -d 3; the dict example shows UR:file:reference.fa but samtools writes an absolute file:/// URL; the UCSC->Ensembl sed one-liner rewrites non-primary contigs too (chr1_KI..._alt -> 1_KI..._alt); the multi-region skip message prints chr2:5001-3007; compare_to_ref reports reference N/IUPAC positions as differences and build_consensus writes N at deleted columns and ignores insertions without saying so.
-- Root cause: Prose written from one tool or one run.
-- Fix: One clause each: name GATK for the ignored-dict sentence, add -d 3 to the chr22 sentence, show an absolute UR, restrict the sed to a chr1-22/X/Y/M pattern, print the unclipped end in the skip message, note the N/IUPAC and indel behaviour of the pedagogical functions.
 
 ### `bio-sam-bam-basics` — CRAM round trip is not lossless: =/X become M, NM/MD get added
 
@@ -3865,6 +3825,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: SKILL.md's 'Whole-genome or default universe' failure mode describes the symptom as 'a confident table where tissue-restricted / lowly-expressed-gene terms dominate'. On a null (no-biology) 150-gene list, omitting universe= produced exactly one additional term (p.adjust 0.033), not a dominated table -- reproduced this pass and in the pre-fix audit.
 - Root cause: The failure mode's magnitude was written from the general mechanism rather than from a run against data of this scale.
 - Fix: Soften the symptom description to note that the effect scales with list size and background mismatch severity -- sometimes one spurious term, sometimes many -- rather than always implying a dominated table.
+
+### `bio-reference-operations` — Reject wholly out-of-range consensus windows
+
+- Skill: 90, Production Ready · [mrsonord2240/bioSkills@0f829d1](https://github.com/mrsonord2240/bioSkills/tree/0f829d1619132fc9033b2437205d51ecb74df5d3/alignment-files/reference-operations) · [viewer](skills/bio-reference-operations/mrsonord2240-bioSkills@0f829d1/viewer.md)
+- Observed in inputs: 9
+- Problem: pysam_consensus.py consensus chr1 121 130 exits 0 and prints nine Ns even though the requested range is beyond a 120-base contig.
+- Root cause: The CLI delegates range handling to pileup and does not compare START/END to the BAM header length before building its N-initialized output.
+- Fix: Before calling build_consensus, validate 0 <= START < END <= BAM reference length; exit nonzero with an actionable coordinate message. Preserve legitimate in-range uncovered columns as Ns.
 
 ### `bio-similarity-searching` — MCS failure mode describes a timeout that does not occur
 

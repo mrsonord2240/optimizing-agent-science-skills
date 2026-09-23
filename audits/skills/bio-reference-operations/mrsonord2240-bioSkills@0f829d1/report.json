@@ -1,0 +1,69 @@
+{
+  "meta": {
+    "skill_name": "bio-reference-operations",
+    "description": "Generate consensus sequences and manage reference files using samtools.",
+    "source": "mrsonord2240/bioSkills@0f829d1619132fc9033b2437205d51ecb74df5d3:alignment-files/reference-operations",
+    "evaluated_on": "2026-09-23",
+    "evaluator_version": "skill-auditor@1.0",
+    "audit_kind": "final pass Phase 2 re-audit",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md",
+    "category": "Data Analysis",
+    "execution_mode": "B",
+    "complexity": "Complex",
+    "n_inputs": 10,
+    "n_inputs_note": "Eight prior workflow classes were rerun as regressions and two fresh boundary cases were added, as required by the final-pass dispatch."
+  },
+  "veto_gates": {
+    "skill_veto": { "gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS" },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "No fabricated scientific claims or citations were produced; all assertions use local synthetic data or the named public chr22 fixture." },
+      "practice_boundaries": { "result": "PASS", "detail": "The Skill is a reference-file utility and makes no clinical or diagnostic claims." },
+      "methodological_ground": { "result": "PASS", "detail": "The majority-vote implementation is explicitly pedagogical; tested consensus and reference-coordinate behavior matches the stated scope." },
+      "code_usability": { "result": "PASS", "detail": "Copied current scripts executed in the documented WSL alignment-files environment; all runtime assertions in final_reference_operations.sh passed." }
+    }
+  },
+  "static_score": {
+    "subtotal": 89,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 11, "max": 12, "note": "Index, dictionary, extraction, consensus, and header-renaming routes are supplied and tested; the consensus CLI does not reject a wholly out-of-range window." },
+      "reliability": { "score": 10, "max": 12, "note": "Scripts use strict shell handling and atomic final rename output, but the Python CLI returns an all-N sequence for an impossible window rather than a diagnostic error." },
+      "performance_context": { "score": 7, "max": 8, "note": "The short SKILL routes detail to three focused references and two reusable scripts; reference operations necessarily retain several command examples." },
+      "agent_usability": { "score": 15, "max": 16, "note": "Coordinate conventions, intended use, version context, and script invocation are clear; one boundary behavior is implicit rather than guarded." },
+      "human_usability": { "score": 7, "max": 8, "note": "Natural requests for indexing, dictionaries, consensus, and contig renaming are covered with actionable commands and error clues." },
+      "security": { "score": 11, "max": 12, "note": "No credentials are used and shipped shell paths are quoted; a hostile filename was processed without shell evaluation. Map-file contents remain trusted local inputs." },
+      "maintainability": { "score": 10, "max": 12, "note": "Runnable logic is separated into named scripts and the references explain their limits; no shipped automated fixture suite accompanies the Skill." },
+      "agent_specific": { "score": 18, "max": 20, "note": "The trigger is precise, references are progressively disclosed, related Skills are named, and pedagogical versus production paths are distinguished." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 91.4,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 29, "total": 30 },
+    "inputs": [
+      { "index": 1, "type": "Canonical", "label": "Prepare a GATK-ready reference", "status": "COMPLETED", "status_flag": "✅", "note": "prepare_reference.sh created faidx, derived toy.dict, and chrom.sizes; samtools dict output matched.", "executed": true, "execution_note": "final_reference_operations.sh INPUT 1, WSL alignment-files.", "basic": 37, "specialized": 55, "total": 92, "assertions_passed": 3, "assertions_total": 3, "assertions": [{"text":"Derived dictionary and chrom.sizes are created","result":"PASS","note":"All three nonempty files exist."},{"text":"Dictionary content matches samtools dict","result":"PASS","note":"diff returned zero."},{"text":"Two-contig sizes are retained","result":"PASS","note":"chrom.sizes has two rows."}] },
+      { "index": 2, "type": "Variant A", "label": "Extract, reverse-complement, and fail safely on a missing contig", "status": "COMPLETED", "status_flag": "✅", "note": "faidx preserved inclusive coordinates and marked reverse-complement output; missing chr404 exited 1.", "executed": true, "execution_note": "final_reference_operations.sh INPUT 2, WSL alignment-files.", "basic": 36, "specialized": 55, "total": 91, "assertions_passed": 3, "assertions_total": 3, "assertions": [{"text":"1-based inclusive extraction has the requested length","result":"PASS","note":"chr1:2-10 emitted 9 bases."},{"text":"Reverse-complement output is labelled","result":"PASS","note":"Header ends /rc."},{"text":"Missing contig is a nonzero failure","result":"PASS","note":"samtools faidx returned 1."}] },
+      { "index": 3, "type": "Edge", "label": "Rename chr contigs to numeric names", "status": "COMPLETED", "status_flag": "✅", "note": "rename_contigs.sh retained 14 records and passed its reference name/length check.", "executed": true, "execution_note": "final_reference_operations.sh INPUT 3, WSL alignment-files.", "basic": 37, "specialized": 56, "total": 93, "assertions_passed": 3, "assertions_total": 3, "assertions": [{"text":"Renamed BAM retains all records","result":"PASS","note":"samtools view -c returned 14."},{"text":"Header uses the mapped numeric contig","result":"PASS","note":"SN:1 LN:120 present."},{"text":"Reference check succeeds","result":"PASS","note":"Script printed OK."}] },
+      { "index": 4, "type": "Variant B", "label": "Build a padded simple consensus", "status": "COMPLETED", "status_flag": "✅", "note": "samtools simple consensus with -a returned the reference-length record and N-covered gaps.", "executed": true, "execution_note": "final_reference_operations.sh INPUT 4, WSL alignment-files.", "basic": 37, "specialized": 56, "total": 93, "assertions_passed": 3, "assertions_total": 3, "assertions": [{"text":"Padded output has reference length","result":"PASS","note":"120 bases emitted."},{"text":"Uncovered/low-depth bases remain visible as N","result":"PASS","note":"N occurs in output."},{"text":"Documented consensus command executes","result":"PASS","note":"samtools 1.24 completed."}] },
+      { "index": 5, "type": "Stress", "label": "Compare pedagogical pysam consensus on toy and real chr22", "status": "COMPLETED", "status_flag": "✅", "note": "The copied CLI returned the full 2,666-base real window and exactly the documented chr22 3266 T>C difference.", "executed": true, "execution_note": "final_reference_operations.sh INPUT 5, WSL alignment-files; public-data/human real BAM and FASTA were used.", "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 3, "assertions_total": 3, "assertions": [{"text":"Toy consensus length is the requested window","result":"PASS","note":"120 bases."},{"text":"Comparison positions are 1-based","result":"PASS","note":"Toy planted difference is position 10."},{"text":"Real chr22 regression reproduces","result":"PASS","note":"2666 bases and 3266 T C."}] },
+      { "index": 6, "type": "Variant A", "label": "Validate dictionary M5 and pysam FASTA metadata", "status": "COMPLETED", "status_flag": "✅", "note": "Independent uppercase-sequence md5 values matched every @SQ M5 and pysam returned the expected contigs and lengths.", "executed": true, "execution_note": "final_reference_operations.sh INPUT 6, WSL alignment-files.", "basic": 36, "specialized": 55, "total": 91, "assertions_passed": 3, "assertions_total": 3, "assertions": [{"text":"pysam exposes both references","result":"PASS","note":"chr1 and chr2 returned."},{"text":"pysam length is correct","result":"PASS","note":"chr1 length 120."},{"text":"@SQ M5 is independently verified","result":"PASS","note":"hashlib md5 checks passed."}] },
+      { "index": 7, "type": "Edge", "label": "Differentiate plain gzip and bgzip reference input", "status": "COMPLETED", "status_flag": "✅", "note": "The script rejects plain gzip with a bgzip clue and accepts a bgzip-compressed FASTA.", "executed": true, "execution_note": "final_reference_operations.sh INPUT 7, WSL alignment-files.", "basic": 36, "specialized": 55, "total": 91, "assertions_passed": 3, "assertions_total": 3, "assertions": [{"text":"Plain gzip is rejected","result":"PASS","note":"Exit code 1."},{"text":"Failure tells the user about bgzip","result":"PASS","note":"Log contains bgzip."},{"text":"bgzip reference receives a dictionary","result":"PASS","note":"bgzip.dict is nonempty."}] },
+      { "index": 8, "type": "Scope Boundary", "label": "Missing contig-map file during rename", "status": "COMPLETED", "status_flag": "✅", "note": "The rename script exits for an absent map and leaves no misleading final BAM.", "executed": true, "execution_note": "final_reference_operations.sh INPUT 8, WSL alignment-files.", "basic": 36, "specialized": 54, "total": 90, "assertions_passed": 3, "assertions_total": 3, "assertions": [{"text":"Missing map fails nonzero","result":"PASS","note":"Exit code 2."},{"text":"No final BAM is left","result":"PASS","note":"broken.bam absent."},{"text":"Failure is observable","result":"PASS","note":"Shell logged missing file."}] },
+      { "index": 9, "type": "Adversarial", "label": "Fresh: wholly out-of-range pysam consensus window", "status": "COMPLETED", "status_flag": "✅", "note": "The CLI completed and emitted nine Ns; this is deterministic but insufficiently diagnostic, recorded as P2.", "executed": true, "execution_note": "final_reference_operations.sh INPUT 9, WSL alignment-files.", "basic": 34, "specialized": 51, "total": 85, "assertions_passed": 2, "assertions_total": 3, "assertions": [{"text":"Boundary behavior is deterministic","result":"PASS","note":"Exit 0 and nine Ns."},{"text":"Returned sequence length equals requested window","result":"PASS","note":"9 bases."},{"text":"CLI rejects a window wholly outside the contig","result":"FAIL","note":"It silently returns all Ns rather than reporting invalid coordinates."}] },
+      { "index": 10, "type": "Adversarial", "label": "Fresh: hostile filename passed to preparation script", "status": "COMPLETED", "status_flag": "✅", "note": "Quoted shell handling treated semicolon and command-substitution characters as filename text.", "executed": true, "execution_note": "final_reference_operations.sh INPUT 10, WSL alignment-files.", "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 3, "assertions_total": 3, "assertions": [{"text":"Hostile name does not execute a command","result":"PASS","note":"SHOULD_NOT_EXIST absent."},{"text":"Preparation still succeeds","result":"PASS","note":"Script completed."},{"text":"Derived dict is created beside hostile filename","result":"PASS","note":"odd;$(touch SHOULD_NOT_EXIST).dict exists."}] }
+    ]
+  },
+  "final": { "static_weighted": 35.6, "dynamic_weighted": 54.8, "score": 90, "max": 100, "grade": "Production Ready", "grade_symbol": "⭐", "deployable": true, "veto_override": false },
+  "key_strengths": [
+    "Pinned scripts run in the documented WSL environment and keep reference-name changes separate from re-alignment.",
+    "The preparation script derives GATK-compatible dictionary names, surfaces bgzip constraints, and uses quoted paths.",
+    "The Python consensus tool preserves requested coordinate width; its real chr22 comparison reproduces the documented result.",
+    "Focused reference files keep the SKILL concise while retaining consensus-mode and contig-naming detail."
+  ],
+  "recommendations": [
+    { "priority": "P2", "title": "Reject wholly out-of-range consensus windows", "observed_in": [9], "problem": "pysam_consensus.py consensus chr1 121 130 exits 0 and prints nine Ns even though the requested range is beyond a 120-base contig.", "root_cause": "The CLI delegates range handling to pileup and does not compare START/END to the BAM header length before building its N-initialized output.", "fix": "Before calling build_consensus, validate 0 <= START < END <= BAM reference length; exit nonzero with an actionable coordinate message. Preserve legitimate in-range uncovered columns as Ns." }
+  ]
+}
