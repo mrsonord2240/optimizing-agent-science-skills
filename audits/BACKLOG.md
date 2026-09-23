@@ -1264,7 +1264,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (407)
+## P2 (408)
 
 ### `bio-data-visualization-lollipop-protein-maps` — HGVSp edge cases and recurrence semantics undocumented
 
@@ -4002,13 +4002,21 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: CLI argument parsing validates paths but not table schema.
 - Fix: Add a small required-column check in each script that lists missing columns and states the expected schema before pandas indexing.
 
-### `bio-crispr-screens-in-vivo-screens` — Ethics-requirement surfacing relies on agent judgment, not a forced trigger
+### `bio-crispr-screens-in-vivo-screens` — Validate equal gene universes before meta-analysis
 
-- Skill: 92, Production Ready · [mrsonord2240/bioSkills@f649395](https://github.com/mrsonord2240/bioSkills/tree/f649395595e260d92fee5ec77add80fd422293ba/crispr-screens/in-vivo-screens) · [viewer](skills/bio-crispr-screens-in-vivo-screens/mrsonord2240-bioSkills@f649395/viewer.md)
-- Observed in inputs: 5
-- Problem: The new Ethical & Regulatory Requirements section is a standing, prominent note but is not explicitly tied to the points in the Skill where new animal work is recommended (e.g., 'arrayed validation of top hits', 'increase animals per condition'). Passing Input 5 required the agent to connect the two on its own rather than being prompted to.
-- Root cause: The fix added a standing compliance section but did not cross-reference it from the specific workflow steps (Validation Checklist, arrayed-validation guidance) that recommend new live-animal procedures.
-- Fix: Add a one-line pointer back to the Ethical & Regulatory Requirements section at the points in usage-guide.md's 'What the Agent Will Do' and Validation Checklist where new animal cohorts or procedures are recommended, so the reminder is structurally guaranteed rather than judgment-dependent.
+- Skill: 92, Production Ready · [mrsonord2240/bioSkills@afcf1e6](https://github.com/mrsonord2240/bioSkills/tree/afcf1e65250223117c255217b1974abc625f5741/crispr-screens/in-vivo-screens) · [viewer](skills/bio-crispr-screens-in-vivo-screens/mrsonord2240-bioSkills@afcf1e6/viewer.md)
+- Observed in inputs: 7
+- Problem: The shipped per-animal script silently combines a gene present in only five of six animal files and reports n_animals=5.0, giving that gene a different Stouffer denominator from the rest of the screen.
+- Root cause: The loader skips missing rows and groupby aggregation has no preflight check for equal id sets across the loaded gene_summary files.
+- Fix: Before concatenation, compare every input file's id set with the first file and raise a clear error that names missing and extra genes. Alternatively emit a separately labeled incomplete-gene table and exclude it from hit calling.
+
+### `bio-crispr-screens-in-vivo-screens` — Show MAGeCK count library columns
+
+- Skill: 92, Production Ready · [mrsonord2240/bioSkills@afcf1e6](https://github.com/mrsonord2240/bioSkills/tree/afcf1e65250223117c255217b1974abc625f5741/crispr-screens/in-vivo-screens) · [viewer](skills/bio-crispr-screens-in-vivo-screens/mrsonord2240-bioSkills@afcf1e6/viewer.md)
+- Observed in inputs: 4
+- Problem: The count command names library.csv but does not show that MAGeCK 0.5.9.5 requires three fields: sgRNA id, sequence, and gene. A two-column id/sequence CSV fails before FASTQ processing.
+- Root cause: The command assumes an external library-file convention without documenting the required schema in the Skill.
+- Fix: Add a one-line CSV header/example immediately before mageck count: sgRNA,sequence,gene, and state that all three fields are required by MAGeCK's --list-seq parser.
 
 ### `bio-differential-expression-deseq2-basics` — 'All-zero in a group' is not a padj=NA cause
 
