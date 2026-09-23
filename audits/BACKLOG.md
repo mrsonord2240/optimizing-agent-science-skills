@@ -1272,7 +1272,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (434)
+## P2 (433)
 
 ### `bio-data-visualization-lollipop-protein-maps` — HGVSp edge cases and recurrence semantics undocumented
 
@@ -4361,14 +4361,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: SKILL.md's decontam section still does not name and reject the specific shortcut of replacing decontam with a flat abundance-percentage filter, unchanged from the original audit.
 - Root cause: Out of scope for this fix pass, which targeted the truncLen ceiling defect only.
 - Fix: Add one sentence to the decontam section naming this shortcut and explaining why control-based statistical testing (decontam) is not interchangeable with an arbitrary abundance cutoff.
-
-### `bio-protac-degraders` — DC50/Dmax fit underestimates when a hook's onset is not well-separated from DC50
-
-- Skill: 92, Production Ready · [mrsonord2240/bioSkills@bfcde6d](https://github.com/mrsonord2240/bioSkills/tree/bfcde6d6e676730230728e37142eca8054ac06aa/chemoinformatics/protac-degraders) · [viewer](skills/bio-protac-degraders/mrsonord2240-bioSkills@bfcde6d/viewer.md)
-- Observed in inputs: 9
-- Problem: cooperativity_dc50.py's ascending-arm-only fit strategy assumes the hook effect declines sharply after a clear plateau. When the hook onset is gradual and its concentration is not far above DC50 (ratio ~20 with a shallow hook_hill, vs. the shipped demo's ratio of 125), the truncated ascending-arm data never reaches the true plateau, and Dmax is underestimated by >12 percentage points (reproduced noise-free, so it is a structural bias, not sampling noise). No warning is surfaced when this happens -- the output looks identical in confidence to the well-separated cases.
-- Root cause: detect_hook()/fit_dc50() were designed and verified against a single well-separated demo curve (hook_k/dc50 ~125); the ascending-arm truncation heuristic has no check for whether the retained pre-peak data actually reaches a plateau.
-- Fix: Add a diagnostic in fit_dc50() (e.g., compare the retained arm's maximum observed value against the fitted dmax_fit, or require a minimum number of near-plateau points before the peak) and surface a caveat in the output -- 'ascending-arm data may not reach the true plateau; treat Dmax as a lower bound' -- when that check fails.
 
 ### `bio-remote-homology` — Add standalone PSI-BLAST and HHsearch examples
 
