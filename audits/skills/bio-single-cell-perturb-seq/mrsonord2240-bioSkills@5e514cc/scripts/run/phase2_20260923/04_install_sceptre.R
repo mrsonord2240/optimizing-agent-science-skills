@@ -1,0 +1,5 @@
+dir.create('F:/OpenScience/audits/bio-single-cell-perturb-seq/run/phase2_20260923/R-private-lib', recursive=TRUE, showWarnings=FALSE)
+.libPaths(c('F:/OpenScience/audits/bio-single-cell-perturb-seq/run/phase2_20260923/R-private-lib', 'F:/OpenScience/audit-envs/single-cell-transcriptomics-analyst/R-lib', .libPaths()))
+remotes::install_github('Katsevich-Lab/sceptre', lib=.libPaths()[1], dependencies=FALSE, upgrade='never', quiet=TRUE)
+library(sceptre)
+cat('PASS installed sceptre ', as.character(packageVersion('sceptre')), '\n', sep='')
