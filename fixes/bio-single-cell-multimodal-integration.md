@@ -89,3 +89,20 @@ Left inline (under 15 lines or not runnable here): Multiome WNN R block, MOFA+ (
 ## Left unfixed
 
 - GLUE's `random_seed=0` default and the block itself remain unexecuted: scglue has no Windows install (pybedtools -> pysam), and the WSL `science` distro was not built for this Skill. Needs a Linux env with scglue to measure GLUE drift.
+
+# 2026-09-23: rejected-final-pass corrective P0/P1
+
+Worktree `F:\OpenScience\wt\single-cell-multimodal-integration`, branch
+`fix/single-cell-multimodal-integration`, starting tip `71a686293613d3e5e11c5e5b34aa792e923f552d`.
+Runtime: `single-cell-transcriptomics-analyst` (Muon 0.1.9, Scanpy 1.12.4, Seurat 5.5.0,
+Signac 1.17.1). Rejection evidence: the 2026-09-23 final-pass report, M4/P0 and bridge P1.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| Shipped Python CITE-seq example calls Muon WNN without modality-local graphs and retains stale modalities after QC slicing | P0 | Rebound the sliced MuData modalities, ran `sc.pp.neighbors` after each modality PCA, and capped joint candidate counts to the number of cells before `mu.pp.neighbors` | ran in an isolated audit-owned 90-cell valid 10x RNA+ADT H5 fixture; `py_compile` passed and both modality graphs were constructed, closing the original `Did not find .uns['neighbors']` failure path | The source-faithful Muon WNN kernel is expensive on this Windows host; retain the fresh run logs under `audits/.../run/p1_corrective`. |
+| Bridge CLI cannot resolve Seurat/Signac from the designated private R library | P1 | Added a `BIO_SKILLS_R_LIB` preflight before package loading and documented Bash/Linux/macOS and PowerShell invocation forms | ran: audit-owned probe loaded Seurat 5.5.0 from `R-lib` through the designated launcher | The runtime still exits with encoded 2816/139 after a standalone `library(Seurat); gc()` probe, so that exit is not safely fixable in this source script. |
+
+## Left unfixed
+
+- The designated Windows R runtime's 139 shutdown failure remains after Seurat loads successfully in a standalone probe. It needs runtime/DLL repair or a supported R host; source code must not convert a crash after output into success.
+- GLUE remains unexecuted: it needs a Linux/macOS scglue environment with a supported pysam build.
