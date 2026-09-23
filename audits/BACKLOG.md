@@ -1320,7 +1320,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (349)
+## P2 (347)
 
 ### `bio-data-visualization-lollipop-protein-maps` — HGVSp edge cases and recurrence semantics undocumented
 
@@ -3425,22 +3425,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: `bcftools view -s <order>` adds INFO/AC and INFO/AN header lines, so `concat --naive` then refuses with 'incompatible headers' (also with -I). Plain concat after the reorder works.
 - Root cause: The fix was checked against plain concat, not --naive.
 - Fix: Say: reorder with view -s, then use plain `bcftools concat` (or re-create every file with the same view -s so headers match) before --naive.
-
-### `bio-entrez-link` — No input validation for dbfrom/id namespace mismatches
-
-- Skill: 90.5, Production Ready · [mrsonord2240/bioSkills@0e30889](https://github.com/mrsonord2240/bioSkills/tree/0e30889d31d1c50e9aeb07cdb24a63864278100e/database-access/entrez-link) · [viewer](skills/bio-entrez-link/mrsonord2240-bioSkills@0e30889/viewer.md)
-- Observed in inputs: 9
-- Problem: A namespace mismatch (e.g. passing a nucleotide UID's numeric value with dbfrom='pubmed') silently returns an empty LinkSetDb, indistinguishable from a correctly-linked zero-result case. Confirmed live in this re-audit; this predates the fix pass and was not in its scope.
-- Root cause: The Skill never validates that an input ID plausibly belongs to the stated dbfrom namespace before calling ELink.
-- Fix: Add a lightweight sanity check or explicit caveat in SKILL.md's Failure Modes section recommending the agent double-check dbfrom against the ID's known source before calling ELink, especially when chaining UIDs across multiple database steps.
-
-### `bio-entrez-link` — The P0 acheck fix has no committed regression test
-
-- Skill: 90.5, Production Ready · [mrsonord2240/bioSkills@0e30889](https://github.com/mrsonord2240/bioSkills/tree/0e30889d31d1c50e9aeb07cdb24a63864278100e/database-access/entrez-link) · [viewer](skills/bio-entrez-link/mrsonord2240-bioSkills@0e30889/viewer.md)
-- Observed in inputs: 4, 8
-- Problem: The original P0 recommendation explicitly suggested 'a one-line regression test asserting the corrected key against a live acheck call.' No test file was added; the fix is correct and this re-audit verified it live across 5 db pairs, but nothing in the repository itself would catch a future NCBI/Biopython schema drift reintroducing the same class of bug.
-- Root cause: The fix pass corrected the code but did not add a lightweight smoke-test script alongside the examples.
-- Fix: Add a small script (or a assert-based snippet in discover_links.py's own __main__ guard) that fails loudly if a LinkInfo entry lacks 'LinkName', so a future NCBI response-schema change is caught immediately rather than silently.
 
 ### `bio-crispr-screens-bagel-essentiality` — Calibrate thin-library magnitude as a range
 

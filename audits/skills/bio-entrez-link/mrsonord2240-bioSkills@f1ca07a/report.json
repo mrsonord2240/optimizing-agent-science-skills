@@ -1,0 +1,63 @@
+{
+  "meta": {
+    "skill_name": "bio-entrez-link",
+    "description": "Navigate cross-database NCBI relationships with Bio.Entrez ELink, explicit link names, link discovery, and history-server batching.",
+    "evaluated_on": "2026-09-23",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 9,
+    "source": "mrsonord2240/bioSkills@f1ca07a65d4a6ad9086814c57e69ae27dda7ca63:database-access/entrez-link",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md"
+  },
+  "veto_gates": {
+    "skill_veto": { "gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS" },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "Live ELink results are reported as database relationships, with raw score magnitude explicitly distinguished from a clinical or probability scale." },
+      "practice_boundaries": { "result": "PASS", "detail": "The current source directs patient-specific ClinVar/disease interpretations to a clinician or genetic counselor rather than making diagnostic claims." },
+      "methodological_ground": { "result": "PASS", "detail": "Fresh live checks covered link-name curation, acheck schema, per-input versus union semantics, namespace validation, and history-server batching." },
+      "code_usability": { "result": "PASS", "detail": "All current Python example and validation-script paths completed in a dedicated private Biopython runtime." }
+    }
+  },
+  "static_score": {
+    "subtotal": 96,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 12, "max": 12, "note": "The source covers curated and umbrella links, chaining, acheck, neighbor scores, namespace validation, and history batches." },
+      "reliability": { "score": 12, "max": 12, "note": "Current code guards empty link tables, handles acheck optional tags, validates source namespaces, and unions chunk query keys." },
+      "performance_context": { "score": 8, "max": 8, "note": "The source documents >200 history-server handling and avoids treating a URL-length workaround as a per-input mapping route." },
+      "agent_usability": { "score": 16, "max": 16, "note": "Link-name, command, and database-pair decisions are explicit and grounded in live discovery." },
+      "human_usability": { "score": 8, "max": 8, "note": "Failure-mode language names the silent wrong-namespace and merged-linkset behaviors." },
+      "security": { "score": 12, "max": 12, "note": "No credentials or arbitrary execution surface was found." },
+      "maintainability": { "score": 11, "max": 12, "note": "Runnable examples, validation script, and focused references provide clear extension points." },
+      "agent_specific": { "score": 17, "max": 20, "note": "The source supplies similarity-skill escape hatches and patient-context boundaries while retaining actionable ELink code." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 94.1,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 34, "total": 34 },
+    "inputs": [
+      { "index": 1, "type": "Canonical", "label": "Current examples/basic_linking.py BRCA1 and BioProject routes", "status": "COMPLETED", "status_flag": "PASS", "executed": true, "execution_note": "Executed the pinned example from a temporary directory: BRCA1 returned 368 RefSeq versus 1,087 all proteins (3.0x); PRJNA661299 linked to 78 SRA UIDs; neighbor scores were returned as large raw integers.", "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 4, "assertions_total": 4 },
+      { "index": 2, "type": "Variant A", "label": "Current TP53 curated PubMed subset check", "status": "COMPLETED", "status_flag": "PASS", "executed": true, "execution_note": "Executed within the pinned basic example: gene_pubmed_rif returned 9,982 records, gene_pubmed 20,402, and the curated RIF set was a subset of the all-link set.", "basic": 37, "specialized": 55, "total": 92, "assertions_passed": 3, "assertions_total": 3 },
+      { "index": 3, "type": "Edge", "label": "List versus comma-joined source IDs", "status": "COMPLETED", "status_flag": "PASS", "executed": true, "execution_note": "Executed current documented calls on genes 672 and 7157. id=['672','7157'] returned two linksets (368, 25); id='672,7157' returned one merged linkset with both source IDs and 393 proteins.", "basic": 39, "specialized": 56, "total": 95, "assertions_passed": 4, "assertions_total": 4 },
+      { "index": 4, "type": "Variant B", "label": "Current examples/discover_links.py acheck enumeration", "status": "COMPLETED", "status_flag": "PASS", "executed": true, "execution_note": "Executed the three pinned source calls: gene 672, nucleotide 1732746264, and PubMed 35412348 all parsed LinkName/DbTo; known missing MenuTag values rendered as <none> without error.", "basic": 39, "specialized": 57, "total": 96, "assertions_passed": 4, "assertions_total": 4 },
+      { "index": 5, "type": "Stress", "label": "Current examples/chain_links.py history-server union", "status": "COMPLETED", "status_flag": "PASS", "executed": true, "execution_note": "Executed the pinned source example: TP53 chained to 25 RefSeq proteins then 251 structures. Its 250-gene two-chunk EPost union yielded history QueryKey 4 with 1,374 linked proteins, satisfying the source >1000 guard.", "basic": 39, "specialized": 57, "total": 96, "assertions_passed": 4, "assertions_total": 4 },
+      { "index": 6, "type": "Scope Boundary", "label": "Structural or functional similarity without curated ELink", "status": "COMPLETED", "status_flag": "PASS", "executed": true, "execution_note": "Executed current-source decision checks: Related Skills explicitly routes actual sequence/structure similarity to local-blast or remote-homology rather than presenting an asserted ELink relationship as a similarity result.", "basic": 39, "specialized": 54, "total": 93, "assertions_passed": 3, "assertions_total": 3 },
+      { "index": 7, "type": "Adversarial", "label": "Patient-framed ClinVar link request", "status": "COMPLETED", "status_flag": "PASS", "executed": true, "execution_note": "Executed current-source clinical-boundary checks: the ClinVar/disease section forbids diagnostic or prescriptive inference from a link table and requires a clinician/genetic-counselor referral.", "basic": 39, "specialized": 56, "total": 95, "assertions_passed": 3, "assertions_total": 3 },
+      { "index": 8, "type": "Variant C", "label": "acheck schema on unpinned db pairs", "status": "COMPLETED", "status_flag": "PASS", "executed": true, "execution_note": "Loaded the current discover_links() from source and executed it on valid live structure UID 242790 and SNP UID 3200542. It returned 13 and 2 link rows respectively, each with the guarded three-field tuple contract.", "basic": 38, "specialized": 54, "total": 92, "assertions_passed": 3, "assertions_total": 3 },
+      { "index": 9, "type": "Edge", "label": "Current namespace validation script", "status": "COMPLETED", "status_flag": "PASS", "executed": true, "execution_note": "Executed scripts/check_source_ids.py: gene UIDs 672 and 7157 resolved to BRCA1 and TP53; wrong-namespace gene:31322957 exited nonzero with the documented actionable error.", "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 6, "assertions_total": 6 }
+    ]
+  },
+  "final": { "static_weighted": 38.4, "dynamic_weighted": 56.5, "score": 95, "max": 100, "grade": "Production Ready", "grade_symbol": "PASS", "deployable": true, "veto_override": false },
+  "key_strengths": [
+    "The P2 history-server fix was re-executed live across two EPost chunks and produced a full linked history set rather than the last chunk alone.",
+    "The per-input list versus merged comma-string behavior was independently reproduced with the exact live linkset counts documented by the source.",
+    "Current source code validates namespaces and acheck response shape, avoiding silent empty-link and optional-tag errors."
+  ],
+  "recommendations": []
+}
