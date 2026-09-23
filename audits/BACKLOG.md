@@ -3482,22 +3482,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: Likely a ggplot2-version mismatch between what Maaslin2 1.20.0's plotting code expects and the env's installed ggplot2 4.0.3 (TOOLS.md records this version); not exercised by the original or this re-audit's other runs because sink()/capture.output() suppressed it or plot_heatmap=FALSE/plot_scatter=FALSE were passed.
 - Fix: Either note in SKILL.md's MaAsLin2 section that plot_heatmap=FALSE, plot_scatter=FALSE can be passed to skip plotting entirely (the numeric results are unaffected), or fix the env's ggplot2 pin in a future tooling pass.
 
-### `bio-causal-genomics-mendelian-randomization` — CAUSE still crashes inside its own ELPD model comparison against the installed loo version
-
-- Skill: 90, Production Ready · [mrsonord2240/bioSkills@dfecae6](https://github.com/mrsonord2240/bioSkills/tree/dfecae6db0054269a6e0510d49ae3395fab93070/causal-genomics/mendelian-randomization) · [viewer](skills/bio-causal-genomics-mendelian-randomization/mrsonord2240-bioSkills@dfecae6/viewer.md)
-- Observed in inputs: 8
-- Problem: Following SKILL.md's documented CAUSE workflow with 147 sig SNPs (above the stated >=100 floor) still crashes inside cause():::in_sample_elpd_loo() with 'non-numeric argument to binary operator' -- identical to the prior re-audit's finding, confirmed unchanged by round 2.
-- Root cause: cause 1.2.0.335's in_sample_elpd_loo() calls loo_compare() and indexes its return value assuming a shape the installed loo 2.10.1 no longer produces -- a package-version incompatibility, not a coding error in any file this Skill ships (its CAUSE section is prose plus a pointer to causal-genomics/pleiotropy-detection, not inline code).
-- Fix: Add a version-pinning note to SKILL.md's CAUSE section (e.g. 'verified against cause X.Y + loo Z.W; if cause() crashes inside in_sample_elpd_loo, check for a loo_compare() return-shape mismatch') so an agent hitting this doesn't mistake it for its own error. Carried forward unfixed from the prior audit; explicitly out of scope per the round-2 fix log.
-
-### `bio-causal-genomics-mendelian-randomization` — qhet_mvmr's fallback stays imprecise (though correctly signed) through most of the condF 1-10 range, and SKILL.md doesn't say so
-
-- Skill: 90, Production Ready · [mrsonord2240/bioSkills@dfecae6](https://github.com/mrsonord2240/bioSkills/tree/dfecae6db0054269a6e0510d49ae3395fab93070/causal-genomics/mendelian-randomization) · [viewer](skills/bio-causal-genomics-mendelian-randomization/mrsonord2240-bioSkills@dfecae6/viewer.md)
-- Observed in inputs: 10
-- Problem: At conditional F ~2.2 (above the round-2 guard's condF<1 floor), qhet_mvmr's point estimates were correctly signed but wide and imprecise (Exposure1 0.44 [0.118, 0.875] vs true 0.30; Exposure2 -0.26 [-0.665, 0.159] vs true -0.10) -- the guard correctly does not fire here, but an agent reading only the guard's condF<1 threshold could over-trust the point estimate anywhere above it.
-- Root cause: The round-2 fix documents a floor below which qhet_mvmr becomes unreliable (sign flips), but does not caveat that between that floor and the IVW-safe condF>10 threshold, the fallback is directionally usable but not yet precise.
-- Fix: Extend the round-2 caveat paragraph to note that condF in roughly the 1-5 range still yields wide confidence intervals even when correctly signed, and that the point estimate should be reported with its CI, not as a precise correction, until condF approaches 10.
-
 ### `bio-conformer-generation` — filter_by_energy() / filter_energy_window() crash ungracefully on an empty conformer list
 
 - Skill: 90, Limited Release · [mrsonord2240/bioSkills@c4e2ccd](https://github.com/mrsonord2240/bioSkills/tree/c4e2ccd0129527b6e04a691e4f79e14e38a64030/chemoinformatics/conformer-generation) · [viewer](skills/bio-conformer-generation/mrsonord2240-bioSkills@c4e2ccd/viewer.md)
@@ -4057,6 +4041,22 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The Common Errors table now correctly lists the exact NCBI error text for every defect found across both audit rounds, but no example script demonstrates catching and handling any of the six documented Failure Modes in code.
 - Root cause: The Skill is instructional (Mode D); it was authored to describe failure modes in prose rather than to ship a reusable error-handling wrapper.
 - Fix: Optional: add one small try/except example around a qblast() call that catches ValueError and looks up the message against the Common Errors table -- not blocking, since the prose guidance is already accurate and complete enough for an agent to act on.
+
+### `bio-causal-genomics-mendelian-randomization` — Emit an explicit F below 10 CLI warning
+
+- Skill: 93, Production Ready · [mrsonord2240/bioSkills@c9ece58](https://github.com/mrsonord2240/bioSkills/tree/c9ece583aa342593b6e2411191636de7f33a1d31/causal-genomics/mendelian-randomization) · [viewer](skills/bio-causal-genomics-mendelian-randomization/mrsonord2240-bioSkills@c9ece58/viewer.md)
+- Observed in inputs: 14
+- Problem: The MVMR CLI prints conditional F=8.76/8.53 but finishes without a machine-readable weak-instrument warning.
+- Root cause: The script has a hard stop below one and documentation for ten, but no runtime branch for the interval between them.
+- Fix: After computing condF, emit a clear warning or structured status for any 1 <= F < 10 while preserving the current hard stop below one.
+
+### `bio-causal-genomics-mendelian-randomization` — Make SIMEX reproducibility the default
+
+- Skill: 93, Production Ready · [mrsonord2240/bioSkills@c9ece58](https://github.com/mrsonord2240/bioSkills/tree/c9ece583aa342593b6e2411191636de7f33a1d31/causal-genomics/mendelian-randomization) · [viewer](skills/bio-causal-genomics-mendelian-randomization/mrsonord2240-bioSkills@c9ece58/viewer.md)
+- Observed in inputs: 15
+- Problem: simex_egger.R accepts a seed but leaves it unset by default, so repeated correction results can vary.
+- Root cause: The optional seed is exposed but not given a reproducible default or omission warning.
+- Fix: Set a documented default seed or print a reproducibility warning whenever --seed is omitted.
 
 ### `bio-experimental-design-randomization-blocking` — usage-guide.md lost its standalone human-skimmable process/tips summary
 

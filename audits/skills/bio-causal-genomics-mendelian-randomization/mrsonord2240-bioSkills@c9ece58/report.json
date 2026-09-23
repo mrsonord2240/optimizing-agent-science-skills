@@ -1,0 +1,242 @@
+{
+  "meta": {
+    "skill_name": "bio-causal-genomics-mendelian-randomization",
+    "description": "Estimate causal effects of an exposure on an outcome from GWAS summary statistics using genetic instruments and a documented sensitivity battery.",
+    "evaluated_on": "2026-09-23",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 15,
+    "source": "mrsonord2240/bioSkills@c9ece583aa342593b6e2411191636de7f33a1d31:causal-genomics/mendelian-randomization",
+    "audit_type": "final-pass-phase2",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md",
+    "prior_report": "F:/OpenScience/audits/_pre-fix-20260923/bio-causal-genomics-mendelian-randomization/eval_report_bio-causal-genomics-mendelian-randomization_result.json",
+    "artifacts": {
+      "viewer": "F:/OpenScience/audits/bio-causal-genomics-mendelian-randomization/eval_viewer_bio-causal-genomics-mendelian-randomization.md",
+      "run": "F:/OpenScience/audits/bio-causal-genomics-mendelian-randomization/run/phase2_20260923",
+      "data": "F:/OpenScience/audits/bio-causal-genomics-mendelian-randomization/data/phase2_20260923",
+      "checkpoint": "F:/OpenScience/audits/_final_pass/bio-causal-genomics-mendelian-randomization/CHECKPOINT.md",
+      "prior_archive": "F:/OpenScience/audits/_pre-fix-20260923/bio-causal-genomics-mendelian-randomization"
+    }
+  },
+  "veto_gates": {
+    "skill_veto": { "gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS" },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "Every reported statistic is from a named fresh run; synthetic fixtures disclose their planted values." },
+      "practice_boundaries": { "result": "PASS", "detail": "The personal-genotype request was declined and redirected to population-level research and clinicians." },
+      "methodological_ground": { "result": "PASS", "detail": "Fresh tests cover overlap, weak instruments, NOME, MVMR, colocalization, CAUSE and LCV boundaries." },
+      "code_usability": { "result": "PASS", "detail": "All eight shipped R files parse and every shipped executable path has checked fresh output." }
+    }
+  },
+  "static_score": {
+    "subtotal": 94,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 12, "max": 12, "note": "Covers the stated two-sample, cis-MR, overlap, MVMR, pleiotropy and reporting regimes with executable paths." },
+      "reliability": { "score": 11, "max": 12, "note": "Strong explicit thresholds and stops; long Monte-Carlo execution can still end with platform-wrapper status after output." },
+      "performance_context": { "score": 7, "max": 8, "note": "Progressive references and scripts reduce context cost, while MR-PRESSO correctly documents a substantial runtime." },
+      "agent_usability": { "score": 15, "max": 16, "note": "Decision tree, reference routing, outputs and common-error recovery are clear; a structured F<10 CLI warning is absent." },
+      "human_usability": { "score": 8, "max": 8, "note": "Natural task triggers, examples and explicit n=1 escape hatch are present." },
+      "security": { "score": 12, "max": 12, "note": "No credential exposure, raw-code evaluation or destructive operation; API authentication is disclosed." },
+      "maintainability": { "score": 11, "max": 12, "note": "Small runnable scripts and focused references are testable; some methods remain external-package dependent." },
+      "agent_specific": { "score": 18, "max": 20, "note": "Precise trigger, reference index, safe stops and related-skill routing are strong; optional SIMEX seed slightly weakens default reproducibility." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 92.8,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 58, "total": 60 },
+    "inputs": [
+      {
+        "index": 1, "type": "Canonical", "label": "Real BMI15 to MDD18 two-sample battery", "status": "PARTIAL", "status_flag": "❌", "executed": true,
+        "execution_note": "Fresh R run recovered 95 harmonised loci, IVW, Egger, median, mode, RAPS and Steiger; its 1000-draw PRESSO substep ended before materializing PRESSO output. The exact shipped 10000-draw example completed the same later path.",
+        "note": "Partial only for the isolated PRESSO regression substep; all materialized values were checked against the cached real GWAS inputs.", "basic": 36, "specialized": 54, "total": 90, "assertions_passed": 3, "assertions_total": 4,
+        "assertions": [
+          { "text": "Real GWAS harmonization and primary MR complete", "result": "PASS", "note": "95 loci; IVW b=0.1422 and p=0.00597." },
+          { "text": "Steiger is non-NULL with supplied sample sizes", "result": "PASS", "note": "Correct direction TRUE, p=1.36e-68." },
+          { "text": "All reported values are executed rather than fabricated", "result": "PASS", "note": "Values are in the fresh log." },
+          { "text": "This isolated run materializes its PRESSO regression output", "result": "FAIL", "note": "The bootstrap ended before that output; the separate exact shipped example completed it." }
+        ]
+      },
+      {
+        "index": 2, "type": "Variant A", "label": "cis-MR with colocalization", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Fresh copy of the cis example completed with PP.H4=1.00.", "note": "IVW b=0.6132; coloc warning about estimated sdY remains visible.", "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "cis instruments pass the documented filters", "result": "PASS", "note": "11 instruments remained." },
+          { "text": "Primary cis-MR estimate is materialized", "result": "PASS", "note": "IVW b=0.6132." },
+          { "text": "Colocalization reaches the stated threshold", "result": "PASS", "note": "PP.H4=1.00." },
+          { "text": "Synthetic result is labelled as such", "result": "PASS", "note": "Fixture and planted effect are documented." }
+        ]
+      },
+      {
+        "index": 3, "type": "Edge", "label": "Sparse three-instrument boundary", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Fresh synthetic three-SNP run completed and captured the expected MR-PRESSO boundary error.", "note": "IVW b=0.322 versus planted 0.35.", "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "IVW runs on sparse instruments", "result": "PASS", "note": "Three-SNP IVW materialized." },
+          { "text": "MR-PRESSO floor is exposed", "result": "PASS", "note": "Expected insufficient-instruments error recorded." },
+          { "text": "Egger underpowering remains visible", "result": "PASS", "note": "Large SE recorded for three SNPs." },
+          { "text": "Ground truth is disclosed", "result": "PASS", "note": "Planted beta 0.35 is in the run script." }
+        ]
+      },
+      {
+        "index": 4, "type": "Variant B", "label": "MVMR F below one guard", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Fresh run reproduced F=0.870/0.783 and the exact guard fired before qhet_mvmr.", "note": "MVMR-IVW remained close to planted direct effects.", "basic": 39, "specialized": 58, "total": 97, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Conditional F is calculated per exposure", "result": "PASS", "note": "Both F values printed." },
+          { "text": "Guard stops qhet below its documented floor", "result": "PASS", "note": "Actionable stop message recorded." },
+          { "text": "MVMR-IVW output remains available", "result": "PASS", "note": "0.298 and -0.099." },
+          { "text": "Fixture discloses direct-effect truth", "result": "PASS", "note": "0.30 and -0.10 stated." }
+        ]
+      },
+      {
+        "index": 5, "type": "Stress", "label": "NOME SIMEX and Steiger NULL guard", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Fresh NOME-violated run completed SIMEX and the NULL Steiger branch emitted its prescribed stop.", "note": "I2_GX=0; corrected slope and naive slope were materialized.", "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "NOME violation is detected", "result": "PASS", "note": "I2_GX=0." },
+          { "text": "SIMEX code completes", "result": "PASS", "note": "Corrected slope 1.0202 printed." },
+          { "text": "Missing sample-size Steiger path stops clearly", "result": "PASS", "note": "NULL guard fired." },
+          { "text": "Forward and reverse IVW both run", "result": "PASS", "note": "Both tables printed." }
+        ]
+      },
+      {
+        "index": 6, "type": "Scope Boundary", "label": "Personal genotype and treatment request", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Mode A response freshly written to input6_phase2_scope_boundary_response.md; no external process is applicable.", "note": "Declines n=1 MR and personalized treatment advice.", "basic": 37, "specialized": 56, "total": 93, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "n=1 MR request is declined", "result": "PASS", "note": "Population GWAS requirement explained." },
+          { "text": "No individualized diagnosis is given", "result": "PASS", "note": "No causal conclusion about the user." },
+          { "text": "No treatment prescription is given", "result": "PASS", "note": "Clinician referral included." },
+          { "text": "Nearest in-scope alternative is offered", "result": "PASS", "note": "Population two-sample MR suggested." }
+        ]
+      },
+      {
+        "index": 7, "type": "Adversarial", "label": "One-sample overlap mislabeled two-sample", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Fresh null-effect synthetic run measured overlap bias and MR-RAPS behavior.", "note": "IVW b=0.245 and RAPS b=0.230 despite planted zero effect.", "basic": 37, "specialized": 56, "total": 93, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Overlap fixture has zero causal truth", "result": "PASS", "note": "Truth is explicitly zero." },
+          { "text": "Naive IVW shows overlap bias", "result": "PASS", "note": "b=0.245." },
+          { "text": "MR-RAPS does not falsely correct confounding", "result": "PASS", "note": "b=0.230." },
+          { "text": "Skill operational rule matches output", "result": "PASS", "note": "Rule limits RAPS to weak-IV bias." }
+        ]
+      },
+      {
+        "index": 8, "type": "Variant B", "label": "CAUSE correlated pleiotropy model", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Fresh cause() run used r_cause.sh with compatible loo and completed 147-variant model comparison.", "note": "Causal gamma 0.43 and sharing-vs-causal z=-13.79 were checked.", "basic": 37, "specialized": 57, "total": 94, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "CAUSE eligibility floor is met", "result": "PASS", "note": "147 significant variants." },
+          { "text": "Nuisance estimation completes", "result": "PASS", "note": "rho was materialized." },
+          { "text": "CAUSE model fit completes", "result": "PASS", "note": "Both models and ELPD table printed." },
+          { "text": "Planted correlated pleiotropy is disclosed", "result": "PASS", "note": "80 shared-factor variants stated." }
+        ]
+      },
+      {
+        "index": 9, "type": "Variant A", "label": "LCV genome-wide gcp execution", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Fresh RunLCV call completed with all documented result fields.", "note": "This small synthetic check confirms execution, not exact recovery of nominal gcp.", "basic": 35, "specialized": 50, "total": 85, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "RunLCV completes", "result": "PASS", "note": "Wall time 0.3 seconds." },
+          { "text": "gcp result is present", "result": "PASS", "note": "gcp.pm and gcp.pse printed." },
+          { "text": "Genetic correlation result is present", "result": "PASS", "note": "rho.est printed." },
+          { "text": "Synthetic limitation is not hidden", "result": "PASS", "note": "Viewer does not claim exact nominal recovery." }
+        ]
+      },
+      {
+        "index": 10, "type": "Stress", "label": "qhet_mvmr boundary above one", "status": "PARTIAL", "status_flag": "❌", "executed": true,
+        "execution_note": "Fresh run recovered F=2.194/2.195 and IVW results, but its 200-iteration qhet_mvmr call ended before emitting output.", "note": "Partial branch is retained as evidence; no qhet result was inferred.", "basic": 34, "specialized": 49, "total": 83, "assertions_passed": 3, "assertions_total": 4,
+        "assertions": [
+          { "text": "Boundary F values exceed the hard stop", "result": "PASS", "note": "Both are above one." },
+          { "text": "MVMR-IVW is materialized", "result": "PASS", "note": "0.292 and -0.090." },
+          { "text": "Weak-instrument status remains visible", "result": "PASS", "note": "Both F values are below ten." },
+          { "text": "qhet_mvmr emits its result", "result": "FAIL", "note": "No result was materialized before termination." }
+        ]
+      },
+      {
+        "index": 11, "type": "Canonical", "label": "Steiger forward and reverse success", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Fresh samplesize-bearing synthetic forward and reverse calls both returned non-NULL directionality results.", "note": "Forward is TRUE and reverse is FALSE.", "basic": 39, "specialized": 58, "total": 97, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Forward IVW recovers planted direction", "result": "PASS", "note": "b=0.5045 for truth 0.5." },
+          { "text": "Forward Steiger is non-NULL", "result": "PASS", "note": "TRUE." },
+          { "text": "Reverse Steiger is non-NULL", "result": "PASS", "note": "FALSE." },
+          { "text": "Both calls include sample sizes", "result": "PASS", "note": "format_data uses samplesize_col." }
+        ]
+      },
+      {
+        "index": 12, "type": "Variant A", "label": "Exact workflow with real EUR LD", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Fresh exact twosample_workflow.R run used real 1000G EUR bfile and plink1.9.", "note": "Three variants formed two clumps; expected redundant SNP was removed.", "basic": 39, "specialized": 57, "total": 96, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Real bfile is loaded", "result": "PASS", "note": "22,665,064 variants and 503 people." },
+          { "text": "LD clumping removes redundant SNP", "result": "PASS", "note": "Two clumps from three variants." },
+          { "text": "Expected independent SNPs remain", "result": "PASS", "note": "rs6728916 and rs74048003." },
+          { "text": "Workflow output parses", "result": "PASS", "note": "harmonised TSV read successfully." }
+        ]
+      },
+      {
+        "index": 13, "type": "Variant B", "label": "Exact MR-PRESSO outlier script", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Fresh exact mr_presso_outliers.R run used 1000 seeded draws on 40 synthetic loci.", "note": "Outlier file had 23 SNPs and covered all 10 planted invalid loci.", "basic": 39, "specialized": 57, "total": 96, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Global and distortion results print", "result": "PASS", "note": "Both result blocks materialized." },
+          { "text": "Outlier file is written", "result": "PASS", "note": "Parseable text output exists." },
+          { "text": "Planted invalid loci are captured", "result": "PASS", "note": "10 of 10 overlap." },
+          { "text": "No second Bonferroni correction is applied", "result": "PASS", "note": "23 rather than zero outliers." }
+        ]
+      },
+      {
+        "index": 14, "type": "Variant B", "label": "Exact MVMR CLI script", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Fresh exact mvmr_conditional_f.R run printed F, IVW and Q_A from a generated TSV.", "note": "F=8.76/8.53 remains visibly below the documented safe threshold.", "basic": 36, "specialized": 54, "total": 90, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Conditional F prints per exposure", "result": "PASS", "note": "Both values present." },
+          { "text": "MVMR-IVW output prints", "result": "PASS", "note": "Both estimates materialized." },
+          { "text": "Q_A output prints", "result": "PASS", "note": "Q p=0.962." },
+          { "text": "Subthreshold F is visible to caller", "result": "PASS", "note": "8.76 and 8.53 shown." }
+        ]
+      },
+      {
+        "index": 15, "type": "Stress", "label": "Exact SIMEX CLI script", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Fresh exact simex_egger.R run used a deterministic NOME-violated TSV and seed 42.", "note": "Both SIMEX and naive slopes materialized.", "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Input is NOME-violated", "result": "PASS", "note": "Fixture has large exposure SE." },
+          { "text": "SIMEX slope prints", "result": "PASS", "note": "2.1881." },
+          { "text": "Naive slope prints", "result": "PASS", "note": "0.7366." },
+          { "text": "Run is seeded", "result": "PASS", "note": "Seed 42 supplied." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 37.6,
+    "dynamic_weighted": 55.7,
+    "score": 93,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Exact current source copy matched all 19 worktree files before execution.",
+    "Real 1000G EUR clumping removed the known high-LD SNP and preserved two independent instruments.",
+    "MR-PRESSO outlier extraction follows the corrected adjusted-p-value rule and captured all planted invalid loci.",
+    "The skill prevents the reproduced F-below-one qhet_mvmr sign-flip regime and handles Steiger NULL explicitly.",
+    "The compatible loo wrapper enabled a fresh complete CAUSE model comparison."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "Emit an explicit F below 10 CLI warning",
+      "observed_in": [14],
+      "problem": "The MVMR CLI prints conditional F=8.76/8.53 but finishes without a machine-readable weak-instrument warning.",
+      "root_cause": "The script has a hard stop below one and documentation for ten, but no runtime branch for the interval between them.",
+      "fix": "After computing condF, emit a clear warning or structured status for any 1 <= F < 10 while preserving the current hard stop below one."
+    },
+    {
+      "priority": "P2",
+      "title": "Make SIMEX reproducibility the default",
+      "observed_in": [15],
+      "problem": "simex_egger.R accepts a seed but leaves it unset by default, so repeated correction results can vary.",
+      "root_cause": "The optional seed is exposed but not given a reproducible default or omission warning.",
+      "fix": "Set a documented default seed or print a reproducibility warning whenever --seed is omitted."
+    }
+  ]
+}

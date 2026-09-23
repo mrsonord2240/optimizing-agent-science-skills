@@ -71,3 +71,130 @@ the sibling `pleiotropy-detection` Skill, not runnable code here. Per the re-aud
 does not affect the veto or the grade.
 
 Left unfixed: none of the two dispatched findings. Nothing needs Sam.
+
+---
+
+# Round 3 (2026-09-21) -- comparison defect + open P2s + split
+
+Worktree `F:\OpenScience\wt\causal-genomics-mendelian-randomization`, branch
+`fix/causal-genomics-mendelian-randomization`. Commits: `4bcf657` (fixes), `10e2381` (split). Fixer: Claude Sonnet 5.
+Evidence: `F:\OpenScience\comparisons\mr-execution\COMPARISON.md` and its `run\` scripts; the re-audit's two open P2s.
+Runtime: R 4.4.3 via `r.sh`, TwoSampleMR 0.7.9, MRPRESSO 1.0; nothing installed. Verification script: scratchpad `v/verify_presso.R`
+(comparison's harmonisation on `data_A`, `data_B`, NbDistribution 3000, seed 42).
+
+| finding | priority | change | verified | notes |
+|---|---|---|---|---|
+| SKILL.md MR-PRESSO outlier rule `Pvalue < 0.05 / nrow(dat)` double-corrects (MRPRESSO's outlier P is already x n) | P1 (silent under-detection) | Rule now `adjusted P <= SignifThreshold`; string P (`"<3e-04"`) parsed; NULL `Outlier Test` guarded; rows returned by `dat_p[rownames(ot)[...], 'SNP']`; `mr_presso` run on `dat[dat$mr_keep, ]` | ran | Old rule flagged 0 on A and B. New rule: A 11 flagged, 9 planted (of 29 in set); B 8 flagged, 8 planted (of 30). Both identical (`setequal`) to MR-PRESSO's own `Distortion Test$Outliers Indices`; source lines checked with `deparse(mr_presso)` (`refOutlier <- which(OutlierTest$Pvalue <= SignifThreshold)`) |
+| `examples/two_sample_mr.R` STROBE summary line still `signif()` on the string PRESSO p (the 2026-09-17 P0 guard missed this second call) | P1 (crash on pleiotropic data) | Uses `presso_p_fmt`; added outlier-SNP extraction with the same rule and the `mr_keep` filter | ran (whole example end to end, NbDistribution 1000) + parsed | Found while fixing the rule; the crash path fires only when the bootstrap p is exactly 0 |
+| Reconciliation row "IVW sig, WM sig, mode null -> trust IVW + median" endorses the false positive on the null-effect data | P2 | Row conditioned on non-significant Cochran Q and PRESSO global; new row for "IVW, WM and RAPS sig, Egger and mode null, Q and PRESSO global sig -> do not report a causal effect", with the comparison's planted-null numbers | ran (comparison `out_ours_B.txt`, my rerun of PRESSO on B: outlier-corrected IVW 0.070, p 1.5e-4) | |
+| `NbDistribution = 10000` cost undocumented; the "Outlier test unstable" warning had no guidance | P2 | Floor `NbDistribution > nrow(dat)/SignifThreshold` and the 40-minute/shared-CPU cost stated; run in background, 3000-5000 to explore; Common Errors rows updated (new row for the double-correction symptom) | ran (warning text read from MRPRESSO source; comparison `out_theirs_A.txt` shows it at 1000 draws) | My own 3000-draw runs took >20 min each on a loaded machine |
+| Re-audit P2: qhet_mvmr imprecise between conditional F 1 and 10 | P2 | CI caveat added to the existing guard paragraph with the audit's numbers | docs (audit run `input10`) | |
+| Re-audit P2: CAUSE crashes against loo 2.10.1 | P2 | Version note in the CAUSE section | docs (audit Input 8; cause 1.2.0.335 x loo 2.10.1) | Note only; a package mismatch, no Skill file to fix |
+| SKILL.md > 300 lines | structure | Split into `references/`: mr-presso, mvmr-conditional-f, mrlap-overlap-correction, simex-egger-nome, bidirectional-steiger, cis-mr-and-binary-outcomes, bibliography; "Reference Files" index + pointers on 7 decision-tree rows | ran (line diff, 7 R fences `parse()`) | 470 -> 331 lines. No non-blank line lost; 7 table rows only gained a pointer. Still over 300 because what every request needs (taxonomy, decision tree, failure modes, thresholds, standard workflow, common errors, install) stays |
+
+No usage-guide.md change: it restates none of the edited text.
+
+## Left unfixed
+
+- **`cause()` crash under `loo` 2.10.1** (re-audit P2, comparison did not touch it): the fault is inside the installed `cause` package against a newer `loo`; fixing it means installing or pinning a different `loo`/`cause` in the shared env, which the brief forbids. Documented as a version note only.
+- **qhet_mvmr precision (P2)** documented, not "fixed": it is a property of the estimator.
+- **SKILL.md still 331 lines** (> 300): the remaining sections are the ones every request needs; moving them would remove what the brief says must stay.
+- **`I^2_GX` = 0.996 reading / other comparison remarks** (theirs-side gaps, protocol scaffolding Theirs has and ours lacks: tiers, claim-boundary language): out of the Skill's scope (broader coverage the brief excludes).
+- **Comparison note: IVW/WM/RAPS biased +0.04 to +0.10 on data A with 30% invalid IVs**: a property of the estimators on the planted data, not a Skill defect; the corrected reconciliation row and the Egger/mode guidance already cover it.
+- **`examples/` synthetic data use random `A1`/`A2` (can be identical) and no LD clumping**: not hit in any run and not in the audit or comparison findings; judged not a correction.
+
+---
+
+# 2026-09-21 (structure)
+
+Worktree `F:\OpenScience\wt\causal-genomics-mendelian-randomization`, branch `fix/causal-genomics-mendelian-randomization`, on top of `10e2381`. Commits: `189f3b4` (split), `9fde5b0` (scripts). Fixer: Claude Sonnet 5. No behaviour or claim changed; the MR-PRESSO outlier rule (adjusted P <= SignifThreshold, string P parsed, NULL guarded, `mr_keep` filter) is unchanged.
+
+## Split: SKILL.md 331 -> 302 lines (extends the existing 7 files; 9 now)
+
+| Moved from SKILL.md | To | Left in SKILL.md |
+|---|---|---|
+| Cohort Gotchas + Anticipated Reviewer Pushback (18 lines) | `references/cohorts-and-reviewer-pushback.md` (new) | heading + 1-line pointer |
+| Tool Installation Notes (install block and mr.raps/plink note) | `references/tool-installation.md` (new) | heading + 1-line pointer |
+| Winner's curse Mechanism + Fix | appended to `references/mrlap-overlap-correction.md` (its Read-when line updated) | heading, Trigger, Symptom, 1-line pointer |
+
+Two new rows in the Reference Files index. Check: line set of the old SKILL.md against new SKILL.md plus references: only the edited index row differs. R fences `parse()` OK.
+
+## Scripts: SKILL.md 302 -> 260 lines
+
+| Old location | Script | How run |
+|---|---|---|
+| SKILL.md "TwoSampleMR Standard Workflow" R block (48 lines) | `scripts/twosample_workflow.R` (args `--exposure --outcome --outdir --bfile --plink --no-clump`; writes primary/heterogeneity/pleiotropy/leaveoneout/steiger/harmonised TSVs) | `r.sh` on `F:\OpenScience\comparisons\mr-execution\data_A` and `data_B` (the data the round-3 fix used) with `--no-clump`: 97/95 instruments, IVW/Egger/median/mode and `directionality_test()` all returned; numbers match round 3 (B: IVW p 2e-6, Egger p 0.72, mode p 0.82; A: IVW 0.397, planted 0.3). Missing `--bfile` without `--no-clump` stops with a clear error (checked) |
+| `references/mr-presso.md` R block (27 lines) | `scripts/mr_presso_outliers.R` (`--dat --nb --seed --signif --out`) | `r.sh`, `--nb 1000 --seed 42`, on a 40-SNP subset of data_B's harmonised output (14 planted invalid): outliers = MRPRESSO's own `Outliers Indices` (6 SNPs, `setequal`), all 6 planted. Full 95 SNPs at 3000-10000 draws exceeds 20-40 min on this loaded machine, so the subset was used; the rule is the round-3 one, unchanged |
+| `references/mvmr-conditional-f.md` R block (22 lines) | `scripts/mvmr_conditional_f.R` (`--dat --exposures --gencov`) | `r.sh` on the audit's Input 4 generator (seed 21): conditional F 0.87/0.78, guard stops with the message (checked); an independent-instrument case gave conditional F 22.6/25.7, MVMR-IVW 0.342/-0.119 (planted 0.30/-0.10), Q_A p 0.66 |
+| `references/simex-egger-nome.md` R block (20 lines) | `scripts/simex_egger.R` (`--dat --B --seed`) | `r.sh` on the audit's Input 5 generator (seed 33, I^2_GX < 0.9): runs without the `se.outcome` crash; SIMEX slope 1.007 vs naive 0.339 (the audit's own run gave 1.020 at true slope 0.40, so the SIMEX extrapolation instability at I^2_GX ~ 0 is pre-existing, not new); on data_B harmonised: 0.1004 vs naive 0.0995 |
+
+The load-bearing code comments (outlier-rule reasoning, simex weights workaround, NbDistribution cost) are kept in the script headers and as prose in the reference files. The three scripts that read data take the harmonised TSV from `twosample_workflow.R`.
+
+Differences from the inline blocks, all mechanical: hard-coded file names and constants became arguments; `--no-clump` added because plink and a 1KG reference do not exist on this machine (default still clumps); MVMR generalised from `x1,x2` to a list of exposures (default unchanged); `--seed` on SIMEX optional.
+
+## Stayed inline
+
+- `references/bidirectional-steiger.md` block (13 lines) and `references/mrlap-overlap-correction.md` block (13 lines): under the 15-line threshold; MRlap also needs LDSC reference files that do not exist here.
+- `references/tool-installation.md` install block: install commands, not analysis code.
+- `examples/*.R` untouched; no block duplicated an example (the examples simulate their own data, the workflow reads user files).
+
+## Left unfixed / not run
+
+- **LD clumping path** (`ld_clump()` with plink + 1KG bfile) of `twosample_workflow.R`: no plink, `genetics.binaRies` or reference panel on this machine and the brief forbids installing; the code is verbatim from the inline block and only guarded by the `--bfile` check.
+- **SKILL.md is now 260 lines**, under 300; nothing further to split.
+
+---
+
+# Final pass, Phase 1 (2026-09-21)
+
+Worktree `F:\OpenScience\wt\causal-genomics-mendelian-randomization`, branch
+`fix/causal-genomics-mendelian-randomization`, on top of `9fde5b0`. Same agent as fixer and (in Phase 2)
+auditor, per `FINAL_PASS_BRIEF.md`. Env: `mendelian-randomization-analyst`. No commits this phase
+(doc-only changes; see below) -- `TOOLS.md` and this fix log are outside the fork and not committed to
+the Skill.
+
+## LD-clumping checkpoint item -- closed for real
+
+The prior round's premise ("no plink or 1KG reference on this machine") was stale: a real 1000G Phase 3
+EUR PLINK bfile (`tools/magma/g1000_eur/`, 503 individuals, 22.7M SNPs) was already staged in this same
+env for a sibling Skill, and this env's own scope note says it covers the whole `causal-genomics`
+folder. The only missing piece was a plink **1.9** binary -- `ieugwasr::ld_clump_local()` (what
+`scripts/twosample_workflow.R` calls) is hardcoded to plink1.9's `--clump` syntax and output filename;
+the `plink2` binary already in this env does not work as a substitute (different report format, different
+output file).
+
+| finding | priority | change | verified | notes |
+|---|---|---|---|---|
+| LD-clumping path never executed; `--no-clump` was the only tested route | P1 (checkpoint item, named in dispatch) | No code change needed -- `scripts/twosample_workflow.R`'s `--bfile`/`--plink` path was already correct. Installed `genetics.binaRies` (GitHub, small, public, install-lock protocol) so `get_plink_binary()` resolves to a real plink1.9 binary | ran | End-to-end run of the real script against the real 1000G EUR bfile: 3-SNP synthetic instrument set (1 index SNP, 1 SNP independently confirmed at r2=0.960 with it via a direct `plink --r2` call, 1 independent-locus SNP on chr2) -> clumping correctly dropped the r2=0.960 SNP and kept the other two (`instruments after F/clump: 2`; `harmonised.tsv` confirms). First real run of this code path in this Skill's history |
+| `references/tool-installation.md` recommended plink2 + a generic 1KG download for local clumping | P2 (docs, found while closing the above) | Replaced with the verified `genetics.binaRies` route and an explanation of why plink2 does not work here | ran (same evidence as above) | |
+
+Full detail in `F:\OpenScience\audit-envs\mendelian-randomization-analyst\TOOLS.md` under "Added
+2026-09-21 by the `mendelian-randomization` final-pass fixer".
+
+## Other runnable blocks walked this phase
+
+| Block | Previously verified? | Result |
+|---|---|---|
+| `examples/twosamplemr_analysis.R` | No -- absent from every prior round of this log | Ran end to end, unmodified: IVW b=0.282 p=1.1e-11, Steiger correct direction p=9.3e-109 |
+| `examples/mr_visualization.R` | No -- absent from every prior round of this log | Ran end to end, unmodified: all 4 plots (scatter/forest/leave-one-out/funnel) written as real PDFs |
+| `examples/two_sample_mr.R` (MR-PRESSO battery, NbDistribution=10000) | Yes, Round 3 (2026-09-21), unchanged since | Not re-run this phase (10000-draw bootstrap is a 20-40 min cost per the fix log's own note); no code change since its last verified run |
+| `examples/cis_mr_drug_target.R` | Yes, Round 1 (2026-09-17), unchanged since | Not re-run this phase; no code change since its last verified run |
+| `scripts/mr_presso_outliers.R`, `mvmr_conditional_f.R`, `simex_egger.R`, `twosample_workflow.R` (`--no-clump` path) | Yes, 2026-09-21 (structure pass), unchanged since | Not re-run this phase; `--bfile` path newly verified above |
+| `references/bidirectional-steiger.md`, `mrlap-overlap-correction.md` (non-MRlap parts), `cis-mr-and-binary-outcomes.md` inline fragments | Illustrative fragments depending on external state (per FIX_BRIEF, not standalone scripts) | Parse-checked; function names (`format_data`, `steiger_filtering`, `directionality_test`) confirmed exported by the installed TwoSampleMR 0.7.9 |
+
+## Still blocked (needs a decision)
+
+- **MRlap** (`references/mrlap-overlap-correction.md`): `remotes::install_github('n-mounier/MRlap')` did
+  not finish within a 180-second window under this session's shared-machine load (no error, just did not
+  complete). Not retried further -- this is a secondary target, not the dispatch's named item, and a full
+  `MRlap()` run separately needs an LDSC reference (`eur_w_ld_chr`-style per-chromosome LD scores + a
+  HapMap3 SNP list) that Round 3 already documented as absent here. Needs: either a longer install window
+  on a quieter machine, or building a synthetic single-chromosome LD reference (this env's
+  `genetic-correlation` auditor already built one for a sibling Skill -- untested for MRlap's own format
+  expectations). Everything else about the Skill is otherwise ready.
+- **CAUSE crashing against `loo` 2.10.1** (carried from Round 2/3): unchanged, still a version mismatch in
+  the shared env, not a Skill file defect.
+- **qhet_mvmr imprecision between conditional F 1-10** (carried from Round 2): unchanged, a property of
+  the estimator, already documented with a caveat.
+
+Nothing else needs Sam.
