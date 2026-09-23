@@ -1,0 +1,150 @@
+{
+  "meta": {
+    "skill_name": "bio-differential-expression-deseq2-basics",
+    "description": "Performs DESeq2 differential expression for bulk RNA-seq and donor-level single-cell pseudobulk counts, including Wald and LRT testing, LFC shrinkage, filtering, transformations, and paired, batch, and interaction designs.",
+    "evaluated_on": "2026-09-23",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "mrsonord2240/bioSkills@6900ca0bc072c2cf19c33971043bca0bcb6dafa7:differential-expression/deseq2-basics",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md"
+  },
+  "veto_gates": {
+    "skill_veto": { "gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS" },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "Every quantitative claim below was emitted by the saved deterministic synthetic runs or a shipped example; no fabricated research result was used." },
+      "practice_boundaries": { "result": "PASS", "detail": "The Skill analyzes aggregate count matrices and does not diagnose, prescribe, or make clinical claims about an individual." },
+      "methodological_ground": { "result": "PASS", "detail": "Fresh checks supported explicit contrasts, donor-level pseudobulk, LRT-only omnibus inference, and lfcThreshold instead of a post-hoc shrunken-LFC FDR claim." },
+      "code_usability": { "result": "PASS", "detail": "All seven corrective inputs and all three shipped R examples exited 0 under isolated WSL micromamba environment deseq2-repair-20260923." }
+    }
+  },
+  "static_score": {
+    "subtotal": 93,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 12, "max": 12, "note": "The current description explicitly includes bulk and donor-level pseudobulk DE, and the decision tree covers the advertised contrasts, designs, transforms, filtering, and imports." },
+      "reliability": { "score": 11, "max": 12, "note": "Failure modes and remedies are specific; all examined R routes now exit cleanly in the isolated runtime, though examples remain illustrative rather than fixture-tested." },
+      "performance_context": { "score": 8, "max": 8, "note": "The concise SKILL.md delegates advanced topics to eleven clearly selected reference files." },
+      "agent_usability": { "score": 15, "max": 16, "note": "The decision tree, named-coefficient warnings, and new reporting checklist give an agent clear execution and handoff guidance." },
+      "human_usability": { "score": 8, "max": 8, "note": "Natural trigger language now includes single-cell pseudobulk as well as bulk RNA-seq." },
+      "security": { "score": 10, "max": 12, "note": "No credentials, destructive commands, or raw-code execution were found; count and metadata alignment is documented but not wrapped in a reusable validator." },
+      "maintainability": { "score": 11, "max": 12, "note": "References are separated by method, all eleven referenced files exist, and all three shipped R examples parse and run." },
+      "agent_specific": { "score": 18, "max": 20, "note": "Progressive disclosure, trigger precision, and scientific stop conditions are strong; the examples could expose machine-checkable expected outputs." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 95.4,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 21, "total": 21 },
+    "inputs": [
+      {
+        "index": 1, "type": "Canonical", "label": "Explicit-contrast donor pseudobulk workflow", "status": "COMPLETED", "status_flag": "✅",
+        "note": "Thirty-three calls were recovered from deterministic planted counts; explicit coefficient and res=res shrinkage behavior were inspected.",
+        "executed": true, "execution_note": "corrective_phase2_suite.R input 1 via micromamba run -n deseq2-repair-20260923 Rscript; process exit 0.",
+        "basic": 38, "specialized": 58, "total": 96, "assertions_passed": 3, "assertions_total": 3,
+        "assertions": [
+          { "text": "The reference level and tested coefficient are explicit", "result": "PASS", "note": "condition_treated_vs_control was present in resultsNames." },
+          { "text": "apeglm preserves Wald p-values when results are supplied", "result": "PASS", "note": "pvalue columns were identical after lfcShrink(res=res)." },
+          { "text": "apeglm preserves the selected adjusted p-values when results are supplied", "result": "PASS", "note": "padj columns were identical after lfcShrink(res=res)." }
+        ]
+      },
+      {
+        "index": 2, "type": "Variant A", "label": "Batch-adjusted and paired DE", "status": "COMPLETED", "status_flag": "✅",
+        "note": "Named condition results were invariant to formula order, and the paired donor model exposed the documented condition coefficient.",
+        "executed": true, "execution_note": "corrective_phase2_suite.R input 2 via micromamba run -n deseq2-repair-20260923 Rscript; process exit 0.",
+        "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 3, "assertions_total": 3,
+        "assertions": [
+          { "text": "A batch-adjusted named contrast can be extracted", "result": "PASS", "note": "The batch plus condition model returned condition_treated_vs_control." },
+          { "text": "Formula order does not change a named condition contrast", "result": "PASS", "note": "The two named LFC vectors were identical." },
+          { "text": "The paired model puts donor before condition", "result": "PASS", "note": "The donor plus condition fit returned the intended named coefficient." }
+        ]
+      },
+      {
+        "index": 3, "type": "Edge", "label": "padj=NA causes and tximport input", "status": "COMPLETED", "status_flag": "✅",
+        "note": "A group-zero gene remained testable, an all-zero gene had NA padj, IHW returned a table, and the tximport offset constructor succeeded.",
+        "executed": true, "execution_note": "corrective_phase2_suite.R input 3 via micromamba run -n deseq2-repair-20260923 Rscript; process exit 0.",
+        "basic": 38, "specialized": 58, "total": 96, "assertions_passed": 3, "assertions_total": 3,
+        "assertions": [
+          { "text": "A gene zero in one group is not misclassified as all-zero", "result": "PASS", "note": "ZERO_IN_CONTROL had a non-NA adjusted p-value." },
+          { "text": "A gene zero across every sample has NA adjusted p-value", "result": "PASS", "note": "ALL_ZERO had NA padj." },
+          { "text": "The documented IHW and tximport branches are runnable", "result": "PASS", "note": "IHW returned DESeqResults and DESeqDataSetFromTximport constructed a DESeqDataSet." }
+        ]
+      },
+      {
+        "index": 4, "type": "Variant B", "label": "Interaction and shrinkage workarounds", "status": "COMPLETED", "status_flag": "✅",
+        "note": "The expected apeglm contrast error occurred, ashr accepted the contrast, and the combined-factor route agreed with the summed contrast.",
+        "executed": true, "execution_note": "corrective_phase2_suite.R input 4 via micromamba run -n deseq2-repair-20260923 Rscript; process exit 0.",
+        "basic": 38, "specialized": 58, "total": 96, "assertions_passed": 3, "assertions_total": 3,
+        "assertions": [
+          { "text": "apeglm rejects an arbitrary interaction list contrast", "result": "PASS", "note": "The documented try-error was observed." },
+          { "text": "ashr accepts the same interaction contrast", "result": "PASS", "note": "ashr returned a DESeqResults object." },
+          { "text": "The combined-factor workaround agrees with the summed contrast", "result": "PASS", "note": "Complete-observation LFC correlation exceeded 0.999." }
+        ]
+      },
+      {
+        "index": 5, "type": "Stress", "label": "Four-level omnibus LRT", "status": "COMPLETED", "status_flag": "✅",
+        "note": "The LRT returned adjusted p-values and its LFC column exactly matched the final named Wald coefficient, not an omnibus effect size.",
+        "executed": true, "execution_note": "corrective_phase2_suite.R input 5 via micromamba run -n deseq2-repair-20260923 Rscript; process exit 0.",
+        "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 3, "assertions_total": 3,
+        "assertions": [
+          { "text": "The omnibus question uses an LRT", "result": "PASS", "note": "DESeq(test='LRT', reduced=~1) ran successfully." },
+          { "text": "The LRT LFC is identified as a last-coefficient value", "result": "PASS", "note": "It exactly equaled the last named Wald LFC." },
+          { "text": "The LRT provides testable adjusted p-values", "result": "PASS", "note": "Non-NA adjusted p-values were produced." }
+        ]
+      },
+      {
+        "index": 6, "type": "Scope Boundary", "label": "Cells are not biological replicates", "status": "COMPLETED", "status_flag": "✅",
+        "note": "Eighty synthetic cells were correctly aggregated to eight donor columns before DESeq2 fitting; the null pseudobulk comparison made zero calls.",
+        "executed": true, "execution_note": "corrective_phase2_suite.R input 6 via micromamba run -n deseq2-repair-20260923 Rscript; process exit 0.",
+        "basic": 37, "specialized": 57, "total": 94, "assertions_passed": 3, "assertions_total": 3,
+        "assertions": [
+          { "text": "Pseudobulk has one column per biological donor", "result": "PASS", "note": "Eight unique donors produced eight aggregate columns." },
+          { "text": "The aggregate analysis uses the named condition coefficient", "result": "PASS", "note": "condition_treated_vs_control was present in resultsNames." },
+          { "text": "The constructed null pseudobulk comparison does not imply a cell-level inference", "result": "PASS", "note": "It yielded zero adjusted-significant calls and the Skill directs aggregation before fitting." }
+        ]
+      },
+      {
+        "index": 7, "type": "Adversarial", "label": "Bare results and post-hoc LFC FDR claim", "status": "COMPLETED", "status_flag": "✅",
+        "note": "Bare results selected batch rather than the intended condition in a multifactor design; lfcThreshold produced the valid threshold-testing result.",
+        "executed": true, "execution_note": "corrective_phase2_suite.R input 7 via micromamba run -n deseq2-repair-20260923 Rscript; process exit 0.",
+        "basic": 38, "specialized": 58, "total": 96, "assertions_passed": 3, "assertions_total": 3,
+        "assertions": [
+          { "text": "Bare results differs from a named condition result in a multifactor design", "result": "PASS", "note": "The bare coefficient was batch_B_vs_A." },
+          { "text": "The Skill supplies a valid threshold-testing alternative", "result": "PASS", "note": "results(lfcThreshold=1) returned DESeqResults." },
+          { "text": "The result distinguishes a threshold test from a post-hoc shrunken-LFC filter", "result": "PASS", "note": "The executed output reported the threshold route separately." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 37.2,
+    "dynamic_weighted": 57.2,
+    "score": 94,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "The branch-tip description now directly triggers for donor-level single-cell pseudobulk as well as bulk RNA-seq.",
+    "The new What to Report section specifies contrast, reference level, alpha, filters, sample counts, NA causes, and effect-size source.",
+    "All corrective data-analysis paths and all three shipped R examples completed with clean exit code 0 in the isolated WSL environment.",
+    "Live regressions confirmed the high-impact contrast, LRT, pseudobulk, filtering, and LFC-threshold safeguards."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "Add machine-checkable example expectations",
+      "observed_in": [],
+      "problem": "The three shipped examples are runnable and completed cleanly, but they do not include asserted expected counts or result-shape checks for future drift detection.",
+      "root_cause": "The examples are intended as teaching scripts rather than regression fixtures.",
+      "fix": "When the Skill next changes, add lightweight deterministic assertions or a separate fixture-backed smoke script; no source change is required for this pass."
+    }
+  ]
+}
