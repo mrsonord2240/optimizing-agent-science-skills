@@ -1,0 +1,128 @@
+{
+  "meta": {
+    "skill_name": "bio-microbiome-functional-prediction",
+    "evaluated_on": "2026-09-23",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "mrsonord2240/bioSkills@ea6cfef4d791daeed8aab68e9a4519952b7bb1b1:microbiome/functional-prediction",
+    "reaudit": true,
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md",
+    "prior_audit_preserved_at": "F:/OpenScience/audits/_pre-fix-20260923/bio-microbiome-functional-prediction/"
+  },
+  "veto_gates": {
+    "skill_veto": { "gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS" },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "Fresh PICRUSt2, NSTI, and compositional-analysis outputs are retained under this audit; predicted potential is explicitly separated from measured function." },
+      "practice_boundaries": { "result": "PASS", "detail": "The Skill makes no individual diagnostic or treatment claim." },
+      "methodological_ground": { "result": "PASS", "detail": "It requires NSTI reporting, warns against activity and circularity claims, and requires cross-tool CoDA consensus with normalized IDs." },
+      "code_usability": { "result": "PASS", "detail": "PICRUSt2 2.6.3 completed the documented command on a real 770-ASV input; the shipped NSTI reporter also ran verbatim on its fresh output." }
+    }
+  },
+  "static_score": {
+    "subtotal": 93,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 12, "max": 12, "note": "The central pipeline, mandatory NSTI QC, misuse boundaries, and appropriate handoffs are complete and current." },
+      "reliability": { "score": 10, "max": 12, "note": "Concrete format, reference-coverage, hard-alignment, and sparse-feature recovery guidance is strong; no bundled automated fixture harness guards future regressions." },
+      "performance_context": { "score": 8, "max": 8, "note": "The BIOM-comment trap warning prevents costly discarded computation and the commands expose process count." },
+      "agent_usability": { "score": 15, "max": 16, "note": "The decision tree, explicit output files, quality report, and common-error table prevent common agent mistakes." },
+      "human_usability": { "score": 7, "max": 8, "note": "Clear scope and remediation are provided; the long technical reference requires careful reading." },
+      "security": { "score": 12, "max": 12, "note": "No secrets, shell interpolation of user strings, or unsafe execution pattern is shipped." },
+      "maintainability": { "score": 11, "max": 12, "note": "NSTI logic is now a maintained script with CLI arguments; the example retains a deliberate inline whole-workflow copy." },
+      "agent_specific": { "score": 18, "max": 20, "note": "Trigger scope is precise, handoffs are explicit, and it has strong escape hatches for out-of-reference communities and measured-function needs." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 92.1,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 28, "total": 28 },
+    "inputs": [
+      {
+        "index": 1, "type": "Canonical", "label": "Real 16S ASVs to PICRUSt2 functional potential", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Fresh PICRUSt2 2.6.3 run on 770 real moving-pictures-derived ASVs, using the exact documented -p, mp, and max_nsti flags; new output had 503 pathways.", "note": "KO, EC, pathway, and combined NSTI files all existed and parsed.", "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "The documented command completes with PICRUSt2 2.6.3.", "result": "PASS", "note": "Fresh exact-version command exited 0." },
+          { "text": "KO, EC, and MetaCyc outputs exist and are nonempty.", "result": "PASS", "note": "All asserted gzipped tables existed; pathway table contained 503 rows." },
+          { "text": "The documented maximum-parsimony and NSTI settings are accepted.", "result": "PASS", "note": "-p 4, --hsp_method mp, and --max_nsti 2 ran on the exact-version CLI." },
+          { "text": "Output is framed as predicted potential rather than measured activity.", "result": "PASS", "note": "The Skill's lead scope and executed guard check state this explicitly." }
+        ]
+      },
+      {
+        "index": 2, "type": "Variant A", "label": "QIIME2 artifact routing", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Executed direct-mode route assertions against the checked source; q2-picrust2 is intentionally handed to qiime2-workflow rather than an invented local command.", "note": "The guidance correctly routes FeatureTable/rep-seqs users to the q2-picrust2 workflow.", "basic": 35, "specialized": 51, "total": 86, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "QIIME2 users are routed to q2-picrust2 rather than given a fabricated command.", "result": "PASS", "note": "q2-picrust2 route was present in the executed source check." },
+          { "text": "The route distinguishes QIIME2 artifacts from CLI FASTA/BIOM input.", "result": "PASS", "note": "Decision tree makes the artifact boundary explicit." },
+          { "text": "The route retains the predicted-potential scope.", "result": "PASS", "note": "The same-engine framing does not claim measured function." },
+          { "text": "The source does not claim q2-picrust2 was exercised locally.", "result": "PASS", "note": "It explicitly hands off to qiime2-workflow." }
+        ]
+      },
+      {
+        "index": 3, "type": "Edge", "label": "Out-of-reference synthetic ASVs", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Fresh exact-version PICRUSt2 run on 11 synthetic ASVs stopped at the min_align gate after 20 minutes of reference placement; no NSTI table was created.", "note": "Observed hard abort exactly matches the Skill's separated hard-failure error row.", "basic": 37, "specialized": 55, "total": 92, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Poorly aligned ASVs stop before function prediction.", "result": "PASS", "note": "PICRUSt2 reported all 11 sequences aligned poorly at min_align 0.8." },
+          { "text": "The error is not misreported as post-hoc NSTI filtering.", "result": "PASS", "note": "No combined NSTI file existed after the hard placement abort." },
+          { "text": "The Skill documents this distinct hard-abort symptom.", "result": "PASS", "note": "Common Errors separates it from near-empty NSTI-gated output." },
+          { "text": "The response avoids fabricating quality statistics for failed placement.", "result": "PASS", "note": "The documented remediation is reference-aware routing, not invented NSTI values." }
+        ]
+      },
+      {
+        "index": 4, "type": "Variant B", "label": "Mandatory NSTI quality report", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Ran shipped scripts/nsti_report.py verbatim on the fresh central output at max NSTI 2.0 and 0.5.", "note": "It reported 0.077 mean, 0.001 median, 3/751 ASVs and 0.0% reads dropped at 2.0.", "basic": 39, "specialized": 56, "total": 95, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "The shipped reporter finds the combined 2.6.3 NSTI file.", "result": "PASS", "note": "combined_marker_predicted_and_nsti.tsv.gz existed and loaded." },
+          { "text": "It reports both ASV and read fractions dropped.", "result": "PASS", "note": "3/751 ASVs and 0.0% reads at 2.0 were printed." },
+          { "text": "It produces a valid alternate-threshold sensitivity report.", "result": "PASS", "note": "At 0.5 it printed 13/751 ASVs and 0.1% reads." },
+          { "text": "No error is silently swallowed.", "result": "PASS", "note": "Both calls exited 0 with printed summaries." }
+        ]
+      },
+      {
+        "index": 5, "type": "Stress", "label": "Predicted pathways to multi-tool CoDA DA", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Fresh R execution on the new 503-pathway output: ALDEx2 275 hits, MaAsLin2 421 hits, raw intersection 2, normalized intersection 242; LinDA prev.filter=0.1 fit 469 rows after filtering 34.", "note": "The R wrapper returned nonzero after materialized successful outputs; parsed result files and final R output independently confirm execution.", "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "At least two compositional tools execute on the predicted table.", "result": "PASS", "note": "Fresh ALDEx2 and MaAsLin2 analyses completed." },
+          { "text": "Feature-name normalization materially corrects the consensus calculation.", "result": "PASS", "note": "Raw overlap 2 became 242 after make.names normalization." },
+          { "text": "LinDA sparse-feature protection is operational.", "result": "PASS", "note": "prev.filter=0.1 filtered 34 sparse pathways and fit 469." },
+          { "text": "The result remains hypothesis-generating under the circularity warning.", "result": "PASS", "note": "Executed source guard check found the deterministic-taxonomy warning." }
+        ]
+      },
+      {
+        "index": 6, "type": "Scope Boundary", "label": "Marine sediment nitrification", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Executed direct-mode source guard assertions for the marine/sediment route and measured-shotgun handoff.", "note": "The scenario correctly selects FAPROTAX for broad biogeochemistry rather than overclaiming PICRUSt2 precision.", "basic": 37, "specialized": 55, "total": 92, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Marine or sediment biogeochemistry is routed to FAPROTAX.", "result": "PASS", "note": "The exact decision-tree route was asserted." },
+          { "text": "The reason is sparse-reference/high-NSTI risk.", "result": "PASS", "note": "Reference-coverage warning is explicit." },
+          { "text": "FAPROTAX is not misrepresented as gene-content prediction.", "result": "PASS", "note": "Tool taxonomy separates lookup from PICRUSt2 gene-content interpolation." },
+          { "text": "Measured function has a shotgun handoff.", "result": "PASS", "note": "MEASURED shotgun function route was asserted." }
+        ]
+      },
+      {
+        "index": 7, "type": "Adversarial", "label": "Activity-claim rewrite request", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Executed direct-mode source guard assertions for potential-not-activity, circularity, and measured-function escalation.", "note": "The Skill corrects an activity claim to predicted capacity and denies independent corroboration from the same ASV table.", "basic": 37, "specialized": 55, "total": 92, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Activity language is corrected to potential or capacity.", "result": "PASS", "note": "The exact 'Potential, never activity' guard was asserted." },
+          { "text": "It explains why the inferred quantity is not measured gene content.", "result": "PASS", "note": "The Skill states the reference-genome interpolation chain." },
+          { "text": "It flags taxonomy/function circularity.", "result": "PASS", "note": "The deterministic-ASV-table warning was asserted." },
+          { "text": "It directs activity conclusions to an appropriate measurement layer.", "result": "PASS", "note": "Measured shotgun and transcription routes are stated." }
+        ]
+      }
+    ]
+  },
+  "final": { "static_weighted": 37.2, "dynamic_weighted": 55.3, "score": 93, "max": 100, "grade": "Production Ready", "grade_symbol": "⭐", "deployable": true, "veto_override": false },
+  "key_strengths": [
+    "The central documented PICRUSt2 2.6.3 command was freshly run end to end on real ASVs, producing parsed KO, EC, MetaCyc, and NSTI outputs.",
+    "The shipped NSTI reporter completed verbatim on the fresh 2.6.3 combined filename and quantified both ASV and read loss.",
+    "The P2 LinDA prevalence instruction was freshly verified on the new pathway table alongside the documented cross-tool feature-name normalization.",
+    "Boundary and reasoning checks preserve scientifically correct scope: predicted potential is neither measured function nor activity, and functional DA is not independent taxonomy corroboration."
+  ],
+  "recommendations": [
+    { "priority": "P2", "title": "State expected full-run time more prominently", "observed_in": [1, 3], "problem": "Fresh real runs required roughly 35 minutes of reference placement/interpolation before producing outputs, while the Skill only says expensive work can take minutes.", "root_cause": "The performance caveat describes the BIOM-format waste but does not give a realistic planning expectation for a standard real-ASV run.", "fix": "Add a brief runtime-planning note beside the main command, stating that a real several-hundred-ASV run can take tens of minutes and should be budgeted before launch." }
+  ]
+}

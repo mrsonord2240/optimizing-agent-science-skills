@@ -3514,14 +3514,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: Description is written for an expert audience; this is an explicit, logged trade-off (fixes/bio-metabolomics-targeted-analysis.md), not an oversight -- the description already disambiguates against 3 sibling skills.
 - Fix: Optionally add one plain-language trigger phrase (e.g. 'give me a concentration in units for a known compound') alongside the technical terms; not required for deployment.
 
-### `bio-microbiome-functional-prediction` — LinDA crashes outright on predicted-pathway tables with near-zero-count features under default (no) prevalence filtering
-
-- Skill: 90, Production Ready · [mrsonord2240/bioSkills@47a62df](https://github.com/mrsonord2240/bioSkills/tree/47a62df7dad7982fbe62dd35613ee094d17acf41/microbiome/functional-prediction) · [viewer](skills/bio-microbiome-functional-prediction/mrsonord2240-bioSkills@47a62df/viewer.md)
-- Observed in inputs: 5
-- Problem: Discovered independently while adding LinDA as a third CoDA tool for a new comparison (gut vs left palm): MicrobiomeStat::linda() throws 'contrasts can be applied only to factors with 2 or more levels' and aborts the ENTIRE run (not just the offending feature) when prev.filter = 0.0 (no prevalence filtering, the natural default since SKILL.md's DA guidance says nothing about pre-filtering) and at least one of the 503 predicted pathways has fewer than 2 nonzero values across the compared groups. Root-caused with a minimal repro (run/06_linda_crash_diagnostic.R): prev.filter = 0.1 fixes it completely (469/503 features fit cleanly).
-- Root cause: SKILL.md names LinDA as one of four CoDA tools an agent might pick for the '>=2 CoDA tools, report intersection' guidance, but gives no caveat about prevalence-filtering near-zero predicted pathways before running it -- unlike the ALDEx2 features-as-rows warning, which IS present.
-- Fix: Add a one-line caveat next to the CoDA-tools guidance: filter near-zero-prevalence pathways (e.g. prev.filter/min_prevalence >= 0.1) before running LinDA on a predicted pathway table, since an unfiltered near-zero feature can abort the entire run rather than failing gracefully per-feature. This is out of this skill's own shipped code (no LinDA example lives here) -- also worth flagging for the differential-abundance skill, which owns LinDA's actual example code and may have the same gap.
-
 ### `bio-molecular-standardization` — No policy for replicate measurements that disagree
 
 - Skill: 90, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/molecular-standardization) · [viewer](skills/bio-molecular-standardization/GPTomics-bioSkills@d91ed3d/viewer.md)
@@ -4097,6 +4089,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The Skill names TRIPOD+AI as the 2024+ target and lists what it demands (data-splitting and leakage controls, calibration, fairness/subgroup performance, uncertainty) but gives no template, checklist or output structure for the report it asks the agent to produce.
 - Root cause: Reporting is treated as a citation rather than as a deliverable.
 - Fix: Add a short output skeleton -- the fields a validation report must carry (split design and unit of independence, leakage controls applied, discrimination with an interval, calibration slope and intercept, net benefit at pre-specified thresholds, subgroup performance) -- so the agent produces something checkable.
+
+### `bio-microbiome-functional-prediction` — State expected full-run time more prominently
+
+- Skill: 93, Production Ready · [mrsonord2240/bioSkills@ea6cfef](https://github.com/mrsonord2240/bioSkills/tree/ea6cfef4d791daeed8aab68e9a4519952b7bb1b1/microbiome/functional-prediction) · [viewer](skills/bio-microbiome-functional-prediction/mrsonord2240-bioSkills@ea6cfef/viewer.md)
+- Observed in inputs: 1, 3
+- Problem: Fresh real runs required roughly 35 minutes of reference placement/interpolation before producing outputs, while the Skill only says expensive work can take minutes.
+- Root cause: The performance caveat describes the BIOM-format waste but does not give a realistic planning expectation for a standard real-ASV run.
+- Fix: Add a brief runtime-planning note beside the main command, stating that a real several-hundred-ASV run can take tens of minutes and should be budgeted before launch.
 
 ### `bio-microbiome-taxonomy-assignment` — SKILL.md's implied claim that multithread=FALSE gives assignTaxonomy() full bitwise identity at every rank is not quite accurate
 
