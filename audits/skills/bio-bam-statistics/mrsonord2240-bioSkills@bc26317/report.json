@@ -1,0 +1,402 @@
+{
+  "meta": {
+    "skill_name": "bio-bam-statistics",
+    "description": "Generate alignment statistics using samtools flagstat, stats, depth, coverage, and mosdepth. Use when assessing alignment quality, calculating coverage, or generating QC reports.",
+    "source": "mrsonord2240/bioSkills@bc263173612a0d88214a3c2292d4a9c67f6feb04:alignment-files/bam-statistics",
+    "evaluated_on": "2026-09-23",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "audit_type": "final-pass Phase 2 re-audit; prior report archived at F:/OpenScience/audits/_pre-fix-20260922/bio-bam-statistics",
+    "regression_inputs": "Inputs 1-6 replay the prior canonical, denominator, edge, cap/overlap, stress and scope classes with saved t0-t6 scripts; Input 7 replays the prior error boundary with a fresh independent matrix.",
+    "new_inputs": "Fresh deletion-depth assertions and fresh exact-source/fence plus adversarial qc_report matrices.",
+    "executed": "7/7 inputs executed; 28/28 assertions passed.",
+    "tools": "WSL science / alignment-files: samtools 1.24, bcftools 1.24, pysam 0.24.1, mosdepth 0.3.14, Picard 3.5.0, MultiQC 1.35.",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated quantitative result: unavailable FREEMIX and somalier outputs remain explicitly unavailable."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "The Skill reports alignment QC and does not diagnose individuals or prescribe treatment."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Depth denominators, overlap conventions, CIGAR operations and assay specificity are disclosed and verified on representative fixtures."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "The shipped qc_report.py ran on all fresh boundary cases; all 28 runnable fenced blocks parse."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 90,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 11,
+        "max": 12,
+        "note": "Covers the promised counts, depth, coverage, QC reporting and report-generation workflows; whole-genome identity metrics require data not bundled here."
+      },
+      "reliability": {
+        "score": 11,
+        "max": 12,
+        "note": "Real, synthetic, missing-file, unaligned and CRAM paths have explicit handling; external whole-genome hand-offs remain deliberately unavailable on the fixture set."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "The main file is concise with references split out; broad BAM operations correctly warn about scale and memory."
+      },
+      "agent_usability": {
+        "score": 15,
+        "max": 16,
+        "note": "Commands, expected semantics and common traps are concrete; an agent still needs to select assay-specific thresholds externally."
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Natural trigger phrases, summary commands and error messages are clear; advanced identity workflows need a more explicit data-acquisition hand-off."
+      },
+      "security": {
+        "score": 10,
+        "max": 12,
+        "note": "No credentials, destructive commands or secret handling appear; shell examples assume trusted file paths supplied by the caller."
+      },
+      "maintainability": {
+        "score": 11,
+        "max": 12,
+        "note": "Depth, pysam and QC caveats are modular reference files with one shipped executable example; assay values remain a documentation maintenance liability."
+      },
+      "agent_specific": {
+        "score": 18,
+        "max": 20,
+        "note": "Description is precise, progressive disclosure is now effective, outputs are reproducible, and limitations are explicit; no machine-readable workflow contract is provided."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 92.9,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 28,
+      "total": 28
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Human PE BAM and 1000G BAM: flagstat, idxstats, stats, coverage and batch summary",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Regression t1_canonical.sh: human and 1000G summaries agree with flagstat/hand-count helpers; chr22-only mitochondrial and sex recipes correctly stop with explicit messages.",
+        "executed": true,
+        "execution_note": "Executed in WSL science with the alignment-files environment; checked output values, files, or controlled error text are retained under run/out or printed by the saved Phase-2 script.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Flagstat-derived counts agree with the saved record-flag helper.",
+            "result": "PASS",
+            "note": "Canonical output includes the expected human and 1000G primary/mapped/proper-pair values."
+          },
+          {
+            "text": "idxstats missing-contig recipes reject absent chrM and chrX/chrY.",
+            "result": "PASS",
+            "note": "Both cases exited 1 with a message instead of printing a false zero."
+          },
+          {
+            "text": "The batch summary labels total records and primary fields distinctly.",
+            "result": "PASS",
+            "note": "The 1000G row reports 9601 records, 9595 primary, 9557 primary mapped, and 101 primary duplicates."
+          },
+          {
+            "text": "Output stays within alignment-QC scope.",
+            "result": "PASS",
+            "note": "Only BAM/CRAM statistical interpretation and tool outputs were produced."
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Coverage denominators on planted read-less contigs and target regions",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Regression t2_planted.sh: region_depth_stats, samtools depth -aa, coverage, and synthetic truth agree across covered and read-less contigs.",
+        "executed": true,
+        "execution_note": "Executed in WSL science with the alignment-files environment; checked output values, files, or controlled error text are retained under run/out or printed by the saved Phase-2 script.",
+        "basic": 37,
+        "specialized": 57,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Region helper equals independent block-based truth.",
+            "result": "PASS",
+            "note": "t2 reports REGION_TRUTH_MISMATCHES 0 over the tested regions."
+          },
+          {
+            "text": "Depth -aa retains BED bases on a read-less contig.",
+            "result": "PASS",
+            "note": "3110 rows versus 2810 with -a alone; chrC contributes 300 rows only with -aa."
+          },
+          {
+            "text": "Coverage region mean is correct.",
+            "result": "PASS",
+            "note": "chrA:1001-2000 reports mean depth 30, the planted truth."
+          },
+          {
+            "text": "Empty and boundary behavior is explicit.",
+            "result": "PASS",
+            "note": "The documented zero-denominator and missing-contig paths report errors rather than invent a value."
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Flag categories, empty data, QC-fail data, and insert-size boundaries",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Regression t3_edge.sh: Count Reads and qc_report.py agree with flagstat and planted records; CIGAR soft-clip checks also pass under awk and mawk.",
+        "executed": true,
+        "execution_note": "Executed in WSL science with the alignment-files environment; checked output values, files, or controlled error text are retained under run/out or printed by the saved Phase-2 script.",
+        "basic": 37,
+        "specialized": 57,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "QC report and Count Reads match flagstat on planted categories.",
+            "result": "PASS",
+            "note": "The saved checker reports zero mismatches for the exercised edge inputs."
+          },
+          {
+            "text": "Unaligned and all-QC-fail inputs avoid tracebacks and divide-by-zero.",
+            "result": "PASS",
+            "note": "The documented messages and zero-report paths were observed."
+          },
+          {
+            "text": "Soft-clip output equals an independent CIGAR walk.",
+            "result": "PASS",
+            "note": "t6 records SOFTCLIP_MISMATCHES 0 across real and synthetic inputs."
+          },
+          {
+            "text": "Insert-size behavior is bounded and disclosed.",
+            "result": "PASS",
+            "note": "The report uses MAX_INSERT and caveat text rather than presenting an unbounded value."
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Depth caps, mate overlap, and a fresh 20-base deletion test",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Regression t4_depth_cap.sh reproduces caps and ARTIC depth truth. Fresh phase2_fresh_deletion.sh independently asserts the clause added in Phase 1.",
+        "executed": true,
+        "execution_note": "Executed in WSL science with the alignment-files environment; checked output values, files, or controlled error text are retained under run/out or printed by the saved Phase-2 script.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Depth-cap defaults reproduce on the 9500x synthetic stack.",
+            "result": "PASS",
+            "note": "The helper reports mean 1000.0 and max 9500 with the documented raised-cap behavior."
+          },
+          {
+            "text": "ARTIC depth recipe equals independent block-based truth.",
+            "result": "PASS",
+            "note": "Both report mean 68.8373x and matching threshold/breadth values."
+          },
+          {
+            "text": "New bcftools deletion claim is exact.",
+            "result": "PASS",
+            "note": "Across del:541-560, samtools mpileup depth is 20 at 20 sites while bcftools INFO/DP and FORMAT/DP are zero at all 20 sites."
+          },
+          {
+            "text": "Overlap and CIGAR caveats are methodologically explicit.",
+            "result": "PASS",
+            "note": "The skill distinguishes mate overlap conventions and internal CIGAR behavior by tool."
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Fifteen-sample table, plot-bamstats, MultiQC and CRAM/statistics paths",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Regression t5_batch_plots.sh: all 15 batch rows pass hand-count validation; plot-bamstats creates 11 PNGs and MultiQC writes a 2.27 MB report.",
+        "executed": true,
+        "execution_note": "Executed in WSL science with the alignment-files environment; checked output values, files, or controlled error text are retained under run/out or printed by the saved Phase-2 script.",
+        "basic": 37,
+        "specialized": 55,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "All batch rows equal hand-count truth.",
+            "result": "PASS",
+            "note": "t5 records BATCH_FAILS 0 for 15 real and synthetic BAMs."
+          },
+          {
+            "text": "Report-generation tools produce usable artifacts.",
+            "result": "PASS",
+            "note": "11 plot PNGs and multiqc_out/multiqc_report.html were created; the report was 2,272,085 bytes."
+          },
+          {
+            "text": "CRAM reference requirement is exercised rather than assumed.",
+            "result": "PASS",
+            "note": "samtools stats succeeds with --reference and emits controlled reference-loading diagnostics without it."
+          },
+          {
+            "text": "Command outputs were inspected, not accepted solely on exit status.",
+            "result": "PASS",
+            "note": "Counts, report files, and MultiQC module text were all asserted."
+          }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Picard targeted-QC and identity/contamination hand-offs",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Regression t6_scope.sh: Picard succeeds; VerifyBamID2 and somalier correctly demonstrate the documented dataset limitation rather than fabricating FREEMIX or identity results.",
+        "executed": true,
+        "execution_note": "Executed in WSL science with the alignment-files environment; checked output values, files, or controlled error text are retained under run/out or printed by the saved Phase-2 script.",
+        "basic": 35,
+        "specialized": 52,
+        "total": 87,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Picard target metrics run and are plausible.",
+            "result": "PASS",
+            "note": "BedToIntervalList and CollectHsMetrics produced PCT_OFF_BAIT 0 and MEAN_TARGET_COVERAGE 131.05814."
+          },
+          {
+            "text": "Unavailable end-to-end identity analyses are not represented as completed.",
+            "result": "PASS",
+            "note": "VerifyBamID2 reported no reads in panel regions and somalier failed on absent chr1, matching the documented limitation."
+          },
+          {
+            "text": "Assay thresholds are explicitly labelled orientation-only.",
+            "result": "PASS",
+            "note": "The table says it is unsourced and not checked on this machine, avoiding false runtime validation."
+          },
+          {
+            "text": "No diagnosis or treatment recommendation is made.",
+            "result": "PASS",
+            "note": "The skill limits itself to QC metrics and hand-offs."
+          }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Fresh qc_report.py error-boundary matrix plus exact-source/fence verification",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Fresh phase2_fresh_adversarial.py passes real BAM, uBAM, all-QC-fail, missing file, CRAM without reference, and CRAM with reference. phase2_fresh_source_check.py verifies the copied exact source and 31 fences.",
+        "executed": true,
+        "execution_note": "Executed in WSL science with the alignment-files environment; checked output values, files, or controlled error text are retained under run/out or printed by the saved Phase-2 script.",
+        "basic": 37,
+        "specialized": 56,
+        "total": 93,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The shipped report handles six adversarial/compatibility cases without a traceback.",
+            "result": "PASS",
+            "note": "All six phase2_fresh_adversarial.py assertions pass with expected rc and message or count."
+          },
+          {
+            "text": "CRAM missing-reference and provided-reference paths are distinguishable.",
+            "result": "PASS",
+            "note": "No-reference returns rc 1 with a hint; supplied-reference returns rc 0 and primary 5,642."
+          },
+          {
+            "text": "The evaluated source is the dispatched source.",
+            "result": "PASS",
+            "note": "phase2_fresh_source_check.py byte-compares SKILL.md to the staged worktree."
+          },
+          {
+            "text": "All bundled runnable fences parse.",
+            "result": "PASS",
+            "note": "31 total fences are present; 28 bash/python fences pass bash -n or ast.parse; linked references and qc_report.py exist."
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 36.0,
+    "dynamic_weighted": 55.7,
+    "score": 92,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "\u2b50",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Current source is byte-matched to the dispatched staging tip and all linked files are present.",
+    "Coverage denominators, depth caps, mate overlap and deletion semantics have independent checked-value evidence.",
+    "The shipped qc_report.py is deterministic across ten canonical runs and handles real BAM, uBAM, QC-fail, missing-file and CRAM boundaries without traceback.",
+    "Unverified assay and identity material is disclosed as such instead of being presented as observed output."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "Cite assay thresholds and FREEMIX cut-offs",
+      "observed_in": [
+        6
+      ],
+      "problem": "The threshold table and FREEMIX expectations are intentionally hedged but not sourced to assay-specific literature or facility specifications.",
+      "root_cause": "No verified citations or representative whole-genome data are bundled with this Skill.",
+      "fix": "Add per-assay citations or facility-QC references, and retain the orientation-only warning until those sources are reviewed."
+    },
+    {
+      "priority": "P2",
+      "title": "Add a reproducible whole-genome identity fixture",
+      "observed_in": [
+        6
+      ],
+      "problem": "VerifyBamID2 does not produce FREEMIX on the slice and somalier cannot extract without a full GRCh38 FASTA.",
+      "root_cause": "The environment contains only small slices rather than a matched WGS/WES BAM and complete reference.",
+      "fix": "Provide a small lawful whole-genome/exome fixture with its matching GRCh38 reference or a documented remote accession and expected non-sensitive digest."
+    }
+  ]
+}

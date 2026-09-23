@@ -1272,7 +1272,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (443)
+## P2 (441)
 
 ### `bio-data-visualization-lollipop-protein-maps` — HGVSp edge cases and recurrence semantics undocumented
 
@@ -3074,38 +3074,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The Skill's worked examples focus on genome/gene; virus was likely added to the scope table without a matching code-pattern section.
 - Fix: Add a short 'Download virus assemblies' code pattern alongside the existing genome/gene patterns, including a dataformat tsv virus-genome --fields example verified against a live --help catalog.
 
-### `bio-bam-statistics` — mosdepth --fast-mode caveat names deletions only
-
-- Skill: 88, Production Ready · [mrsonord2240/bioSkills@c8b1af2](https://github.com/mrsonord2240/bioSkills/tree/c8b1af2148fd4b8e6c667f4feb080cee03cd3551/alignment-files/bam-statistics) · [viewer](skills/bio-bam-statistics/mrsonord2240-bioSkills@c8b1af2/viewer.md)
-- Observed in inputs: 4
-- Problem: SKILL.md says --fast-mode "also counts deletion (D) bases as covered". It also counts spliced N bases: on the real RNA BAM mosdepth reports 17.67x by default and 49.40x with --fast-mode (depth -aa 23.67x, mates counted twice); on own_del the fast-mode sum 9600 = mates twice + D + N. samtools mpileup depth also includes D and N (own_del -Q 0: 9600 vs depth 5200), which the overlap table does not say.
-- Root cause: The round-2 note was written from an amplicon (deletion) BAM only.
-- Fix: Say --fast-mode ignores internal CIGAR operations (D and N count as covered) and add one clause to the overlap table that mpileup counts D and N.
-
-### `bio-bam-statistics` — MAX_INSERT is described as the samtools stats default, but stats clamps
-
-- Skill: 88, Production Ready · [mrsonord2240/bioSkills@c8b1af2](https://github.com/mrsonord2240/bioSkills/tree/c8b1af2148fd4b8e6c667f4feb080cee03cd3551/alignment-files/bam-statistics) · [viewer](skills/bio-bam-statistics/mrsonord2240-bioSkills@c8b1af2/viewer.md)
-- Observed in inputs: 3
-- Problem: qc_report.py and the Insert Size Caveats bullet say longer templates are dropped, attributed to samtools stats -i 8000. samtools stats counts them at the cap: own_insert mean 3555.5 (stats) vs 2286 (qc_report), predicted 3555.5 for clamping and confirmed with -i 7000 and -i 400.
-- Root cause: The cap value was matched to stats -i, its behaviour above the cap was not compared.
-- Fix: Reword to "drops templates >= 8000 (samtools stats -i 8000 instead counts them at 8000, so the two means differ on long-insert libraries)".
-
-### `bio-bam-statistics` — Wrong-reference CRAM reports "truncated file"
-
-- Skill: 88, Production Ready · [mrsonord2240/bioSkills@c8b1af2](https://github.com/mrsonord2240/bioSkills/tree/c8b1af2148fd4b8e6c667f4feb080cee03cd3551/alignment-files/bam-statistics) · [viewer](skills/bio-bam-statistics/mrsonord2240-bioSkills@c8b1af2/viewer.md)
-- Observed in inputs: 7
-- Problem: qc_report.py on a CRAM decoded against a FASTA with the right names but other bases exits 1 but prints "cannot read ...: truncated file"; only htslib stderr lines above it say MD5 mismatch. The CRAM hint is shown only when no reference was passed. pileup calls on CRAM also emit a "multiple_iterators not implemented for CRAM" UserWarning.
-- Root cause: The handler prints str(e) and adds a hint only for the missing-reference case.
-- Fix: When a reference was given and the read fails, append "check that reference.fa is the FASTA the CRAM was written against (see the htslib MD5 message above)".
-
-### `bio-bam-statistics` — Assay-threshold table and FREEMIX/somalier values unsourced
-
-- Skill: 88, Production Ready · [mrsonord2240/bioSkills@c8b1af2](https://github.com/mrsonord2240/bioSkills/tree/c8b1af2148fd4b8e6c667f4feb080cee03cd3551/alignment-files/bam-statistics) · [viewer](skills/bio-bam-statistics/mrsonord2240-bioSkills@c8b1af2/viewer.md)
-- Observed in inputs: 6
-- Problem: The mapping/duplicate/proper-pair/MAPQ/Mt table and the FREEMIX 1% / 5% cut-offs are hedged as literature ranges but no source is given and no run here could check them; VerifyBamID2 end to end stops at "Insufficient Available markers" on a synthetic slice and somalier needs a whole-GRCh38 FASTA.
-- Root cause: No whole-genome data and no citations are available to the fixer or to me.
-- Fix: Cite the source of each row (or a single reference per assay) or move the table to a clearly marked "orientation only" note; keep the existing "not run end to end" label until a real WGS BAM run is added.
-
 ### `bio-causal-genomics-genomic-sem` — Second-order p-factor identification rule not stated
 
 - Skill: 88, Production Ready · [mrsonord2240/bioSkills@c602f2a](https://github.com/mrsonord2240/bioSkills/tree/c602f2a0fe25fff9502210b062d195aa0a69b214/causal-genomics/genomic-sem) · [viewer](skills/bio-causal-genomics-genomic-sem/mrsonord2240-bioSkills@c602f2a/viewer.md)
@@ -4265,6 +4233,22 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: SKILL.md still has no dedicated 'when not to use this' section; unaddressed across two fix passes (correctly out of scope both times -- substantial new content, not a cheap fix).
 - Root cause: The skill is written as a dense reference/method doc rather than an agent-facing decision procedure with explicit stop conditions.
 - Fix: Add a short 'Escape Hatches' subsection pointing to single-cell/multimodal-integration when scRNA-equivalent resolution is requested, and to a human/statistician for a motif-to-TF causal claim.
+
+### `bio-bam-statistics` — Cite assay thresholds and FREEMIX cut-offs
+
+- Skill: 92, Production Ready · [mrsonord2240/bioSkills@bc26317](https://github.com/mrsonord2240/bioSkills/tree/bc263173612a0d88214a3c2292d4a9c67f6feb04/alignment-files/bam-statistics) · [viewer](skills/bio-bam-statistics/mrsonord2240-bioSkills@bc26317/viewer.md)
+- Observed in inputs: 6
+- Problem: The threshold table and FREEMIX expectations are intentionally hedged but not sourced to assay-specific literature or facility specifications.
+- Root cause: No verified citations or representative whole-genome data are bundled with this Skill.
+- Fix: Add per-assay citations or facility-QC references, and retain the orientation-only warning until those sources are reviewed.
+
+### `bio-bam-statistics` — Add a reproducible whole-genome identity fixture
+
+- Skill: 92, Production Ready · [mrsonord2240/bioSkills@bc26317](https://github.com/mrsonord2240/bioSkills/tree/bc263173612a0d88214a3c2292d4a9c67f6feb04/alignment-files/bam-statistics) · [viewer](skills/bio-bam-statistics/mrsonord2240-bioSkills@bc26317/viewer.md)
+- Observed in inputs: 6
+- Problem: VerifyBamID2 does not produce FREEMIX on the slice and somalier cannot extract without a full GRCh38 FASTA.
+- Root cause: The environment contains only small slices rather than a matched WGS/WES BAM and complete reference.
+- Fix: Provide a small lawful whole-genome/exome fixture with its matching GRCh38 reference or a documented remote accession and expected non-sensitive digest.
 
 ### `bio-covalent-design` — State the alpha-helper single-site limit
 
