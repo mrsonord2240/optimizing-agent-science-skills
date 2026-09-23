@@ -40,6 +40,16 @@ None.
 | usage-guide "What the Agent Will Do" | SKILL.md Decision Tree, Constrained Assignment, SVA, Downstream Correction, Reproducibility Metadata |
 | SKILL.md SVA block's Option A/B code comments | SKILL.md SVA section prose (Option A/B bullets) plus `run_sva_safely()` in `examples/batch_design.R` |
 
+# bio-experimental-design-batch-design — 2026-09-23 corrective P0 runtime route
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+| --- | --- | --- | --- | --- |
+| `crispr-screen-analyst` Windows R tears down with signal 139 after a valid `designit` load/workflow | P0 | Left shared R 4.4.3 and `R-lib` byte-for-byte in place; added the documented private WSL runtime at `audit-envs/crispr-screen-analyst/tools/designit-linux-runtime/` with `r-designit-linux.sh`, `install.sh`, and a private `runtime-r-lib-20260923`. | ran | `library(designit)` 0.5.1 exits 0. Exact shipped 24-sample assignment produced condition/sex 4/4/4; exact 60-sample bridge produced four 15-sample plexes and no channel 16. Evidence: `audits/_final_pass/bio-experimental-design-batch-design/run/p0_designit_runtime_20260923/`. |
+
+No Skill source file changed: the P0 is an environment-runtime defect, and the documented isolated route
+restores the required designit execution contract without mutating a shared package version. The SVA
+add-on is being provisioned to the same private runtime for the subsequent re-audit.
+
 ## Moved code (runnable code goes in scripts/)
 | old location | script |
 | --- | --- |

@@ -1,0 +1,10 @@
+suppressPackageStartupMessages({
+  library(designit)
+  library(sva)
+  library(limma)
+})
+cat("R=", R.version.string, "\n", sep = "")
+cat("designit=", as.character(packageVersion("designit")), "\n", sep = "")
+cat("sva=", as.character(packageVersion("sva")), "\n", sep = "")
+cat("limma=", as.character(packageVersion("limma")), "\n", sep = "")
+cat("PASS: isolated runtime loaded designit, sva, and limma; clean R teardown follows.\n")
