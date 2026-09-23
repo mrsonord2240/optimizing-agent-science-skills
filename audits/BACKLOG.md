@@ -38,7 +38,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The demo z-score bumps are not generated consistently with its LD matrix, and the warning path does not stop or mark all downstream results exploratory.
 - Fix: Generate z from the same LD matrix, for example z ~ N(R %*% true_z, R), and add a hard stop before credible-set extraction when lambda exceeds 0.10. Retain a separate intentional-mismatch example only if it refuses to report results.
 
-## P1 (155)
+## P1 (156)
 
 ### `bio-data-visualization-lollipop-protein-maps` — Shipped example never completes and paints wrong colours
 
@@ -599,6 +599,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: SKILL.md says set.seed() alone does not fix AE fits and `BPPARAM = SerialParam(RNGseed = 1)` does (0 differ). Measured on FRASER 2.6.1 (AE q=5 fitted twice, 20010 p-values): SerialParam(RNGseed=1) alone leaves 9815 differing (9962 at 5 iterations); set.seed(1) alone 9279; only set.seed(1) together with SerialParam(RNGseed=1) gives 0. The example says 'AE needs set.seed() to be reproducible', which is also incomplete.
 - Root cause: The fixer's measuring script set both seeds in the same call, so the '0 differ' result was attributed to RNGseed alone; the 'set.seed only' number was from that same combined call.
 - Fix: State: for reproducible AE fits call `set.seed(1)` and pass `BPPARAM = SerialParam(RNGseed = 1)` together (0 of 20010 differ; either alone 9-10k differ); make the example comment say the same. PCA stays the default.
+
+### `bio-crispr-screens-crispresso-editing` — Restore Docker execution and rerun core modes
+
+- Skill: 84, Limited Release · [mrsonord2240/bioSkills@205c857](https://github.com/mrsonord2240/bioSkills/tree/205c8574b66f30fb04cb2fdbd0464f6d37a70920/crispr-screens/crispresso-editing) · [viewer](skills/bio-crispr-screens-crispresso-editing/mrsonord2240-bioSkills@205c857/viewer.md)
+- Observed in inputs: 1, 2, 3, 4, 5, 7, 8, 10, 11
+- Problem: The Docker daemon answered version requests but newly created CRISPResso containers never reached start; docker cp and a 45-second CRISPResso --version probe timed out. Fresh core CLI outputs therefore could not be checked.
+- Root cause: Shared Docker Desktop container-start path is unavailable in this audit session, not a defect in the Skill bytes.
+- Fix: Restore the Docker container-start path without disrupting unrelated containers, then rerun run/run_dynamic.ps1 and require the generated validation.json to pass before changing deployable to true.
 
 ### `bio-single-cell-splicing` — scQuint block fails on real self-consistent STARsolo output
 
@@ -1280,7 +1288,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (415)
+## P2 (414)
 
 ### `bio-data-visualization-lollipop-protein-maps` — HGVSp edge cases and recurrence semantics undocumented
 
@@ -1897,6 +1905,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The Skill routes PHI-sensitive work to OpenCRAVAT but does not say that sending participant variants to a public API needs consent and approvals.
 - Root cause: Governance mentioned only as a tool choice.
 - Fix: Add a one-line consent/approvals note beside the batch workflow.
+
+### `bio-crispr-screens-crispresso-editing` — Cite interpretation thresholds more precisely
+
+- Skill: 84, Limited Release · [mrsonord2240/bioSkills@205c857](https://github.com/mrsonord2240/bioSkills/tree/205c8574b66f30fb04cb2fdbd0464f6d37a70920/crispr-screens/crispresso-editing) · [viewer](skills/bio-crispr-screens-crispresso-editing/mrsonord2240-bioSkills@205c857/viewer.md)
+- Observed in inputs: —
+- Problem: Several numerical editing and bystander thresholds are labelled field convention or application-dependent without per-threshold source links.
+- Root cause: Threshold table summarizes practice guidance more compactly than its evidence base.
+- Fix: Add direct citations or clearly mark each threshold as project-specific QC guidance in the quantitative-thresholds table.
 
 ### `bio-isoform-switching` — Manual DTU block fails on non-syntactic sample IDs
 
@@ -3921,22 +3937,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The synthetic 3-sgRNA/gene regression confirmed extreme BF inflation but observed 1,847.853 rather than the stated approximately 2,400.
 - Root cause: The prose presents one implementation- and input-dependent observed magnitude too literally.
 - Fix: Replace the literal approximately 2,400 comparison with a checked range or the more robust statement that the synthetic thin library was about 14x the real control-excluded maximum in this run; retain the actionable coverage guidance.
-
-### `bio-crispr-screens-crispresso-editing` — CRISPRessoWGS remains unexecuted across two audit passes
-
-- Skill: 91, Production Ready · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/crispr-screens/crispresso-editing) · [viewer](skills/bio-crispr-screens-crispresso-editing/mrsonord2240-bioSkills@6847328/viewer.md)
-- Observed in inputs: 6
-- Problem: No live run of CRISPRessoWGS exists in either the pre-fix or this re-audit; only --help flag verification.
-- Root cause: No small-genome reference FASTA is cached alongside the audit's small-genome BAM, and building one is out of scope for a time-boxed audit pass.
-- Fix: Cache a minimal reference FASTA (matching the existing Both.Cas9.fastq.smallGenome.bam's chr9/chr11 slices) alongside the other test fixtures so a future audit can execute CRISPRessoWGS for real rather than checking flags only.
-
-### `bio-crispr-screens-crispresso-editing` — Single bundled Python code sample has no accompanying automated test
-
-- Skill: 91, Production Ready · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/crispr-screens/crispresso-editing) · [viewer](skills/bio-crispr-screens-crispresso-editing/mrsonord2240-bioSkills@6847328/viewer.md)
-- Observed in inputs: 6
-- Problem: parse_crispresso() only gets verified when an auditor manually re-runs it by hand; nothing in the Skill package would catch a future regression on its own.
-- Root cause: The Skill ships documentation and CLI examples but no test harness.
-- Fix: Consider adding a minimal pytest-style smoke test (or at least a runnable __main__ block, as this audit's own run/input6_parse_output/test_parse_crispresso.py demonstrates) that future contributors can run before shipping a change to the parser.
 
 ### `bio-crispr-screens-library-design` — find_sgrna_candidates silently drops lowercase sequence input
 
