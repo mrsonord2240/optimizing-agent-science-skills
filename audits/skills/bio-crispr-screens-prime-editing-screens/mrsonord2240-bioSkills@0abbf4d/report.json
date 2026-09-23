@@ -1,0 +1,430 @@
+{
+  "meta": {
+    "skill_name": "bio-crispr-screens-prime-editing-screens",
+    "description": "Designs and analyzes pooled prime-editor screens: pegRNA design with PRIDICT/PRIDICT2, PE chemistry selection, PRIME/MOSAIC workflows, CRISPResso2 quantification, ePRIDICT chromatin context, and base-editor cross-validation.",
+    "evaluated_on": "2026-09-23",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 9,
+    "source": "mrsonord2240/bioSkills@0abbf4d40d0df260ca60b346a9d6dc307b80fa5d:crispr-screens/prime-editing-screens",
+    "source_ref": "mrsonord2240/bioSkills@0abbf4d40d0df260ca60b346a9d6dc307b80fa5d:crispr-screens/prime-editing-screens",
+    "branch": "fix/crispr-screens-prime-editing-screens",
+    "checkpoint": "F:\\OpenScience\\audits\\_final_pass\\bio-crispr-screens-prime-editing-screens\\CHECKPOINT.md",
+    "pre_fix_archive": "F:\\OpenScience\\audits\\_pre-fix-20260923\\bio-crispr-screens-prime-editing-screens",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md",
+    "worktree_git_status": "clean (git status --porcelain=v1 was empty before audit); pre-existing ignored __pycache__ files were not executed or modified"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "Fresh runs matched the named tool behavior; PRIDICT/PRIDICT2, ePRIDICT, and PRIME citation metadata were cross-checked against the publisher or PubMed record."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "The Skill handles research design and screen analysis, not individual diagnosis or treatment; it advises empirical pilots rather than clinical conclusions."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "The runs preserved tool-specific constraints: PRIDICT2 output columns and --cores cap, PE RTT-then-PBS order, ePRIDICT K562 specificity, and PE/BE sign plus FDR concordance."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All three shipped Python files parsed, and every shipped executable was run against fresh or planted data. The Docker CRISPResso2 command and WSL ePRIDICT command completed with checked outputs."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 94,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 12,
+        "max": 12,
+        "note": "All central claims were exercised: PRIDICT2 single and batch, candidate generation, filtering, concordance, CRISPResso2 PE mode, and ePRIDICT light model."
+      },
+      "reliability": {
+        "score": 11,
+        "max": 12,
+        "note": "The failure modes accurately cover the reproduced second-run guard and empty-summary handling. One point is reserved for the intentionally unrun full ePRIDICT model."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "Progressive references keep SKILL.md compact and disclose ePRIDICT light/full download sizes; the full model remains a large optional resource."
+      },
+      "agent_usability": {
+        "score": 15,
+        "max": 16,
+        "note": "Decision tree, command blocks, exact real output columns, and recovery messages are actionable. The full-model path cannot be live-tested in a normal audit footprint."
+      },
+      "human_usability": {
+        "score": 8,
+        "max": 8,
+        "note": "Usage guide now points to SKILL.md for operational detail and clearly distinguishes PE, BE, and Cas9 decisions."
+      },
+      "security": {
+        "score": 12,
+        "max": 12,
+        "note": "Static inspection found no raw eval/exec, credentials, or unbounded user-command interpolation in shipped Python."
+      },
+      "maintainability": {
+        "score": 11,
+        "max": 12,
+        "note": "Runnable helpers are separate, parse cleanly, and their expected columns are checked. The example intentionally retains a documented simulation placeholder rather than calling PRIDICT2 itself."
+      },
+      "agent_specific": {
+        "score": 18,
+        "max": 20,
+        "note": "Strong trigger precision, references, failure recovery, and handoffs. Full-model resource planning remains an explicit escape hatch rather than a fully executable low-footprint path."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 95.0,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 28,
+      "total": 28
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "PRIDICT2 five-fold single-mode pegRNA scoring",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Fresh upstream-README single-mode input; 5-fold run written under run/phase2/input1_single.",
+        "executed": true,
+        "execution_note": "Fresh upstream-README single-mode input; 5-fold run written under run/phase2/input1_single.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "Single-mode invocation produces a non-empty per-pegRNA CSV",
+            "result": "PASS",
+            "note": "765 rows"
+          },
+          {
+            "text": "Real PRIDICT2 score columns are present and non-NaN",
+            "result": "PASS",
+            "note": "['PRIDICT2_0_editing_Score_deep_K562', 'PRIDICT2_0_editing_Score_deep_HEK']"
+          },
+          {
+            "text": "The documented five-fold option completes",
+            "result": "PASS",
+            "note": "mode banner observed"
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Fresh two-edit PRIDICT2 batch recipe at the documented core cap",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Fresh two-edit batch run from an initially empty audit directory; exact --cores 3 and --summarize K562 recipe executed.",
+        "executed": true,
+        "execution_note": "Fresh two-edit batch run from an initially empty audit directory; exact --cores 3 and --summarize K562 recipe executed.",
+        "basic": 39,
+        "specialized": 57,
+        "total": 96,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Literal documented input/ and fresh predictions/ batch recipe completes",
+            "result": "PASS",
+            "note": "completion banner observed"
+          },
+          {
+            "text": "Summary contains real prediction rows",
+            "result": "PASS",
+            "note": "6 rows"
+          },
+          {
+            "text": "Documented real output columns are present",
+            "result": "PASS",
+            "note": "missing=[]"
+          },
+          {
+            "text": "K562 scores are numeric and non-NaN",
+            "result": "PASS",
+            "note": "all rows populated"
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Second --summarize run into a nonempty output directory",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Regression of the documented no-CSV-in-output-dir precondition; deliberately expected failure was observed.",
+        "executed": true,
+        "execution_note": "Regression of the documented no-CSV-in-output-dir precondition; deliberately expected failure was observed.",
+        "basic": 37,
+        "specialized": 57,
+        "total": 94,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "A second --summarize into an occupied CSV directory fails",
+            "result": "PASS",
+            "note": "rc=1"
+          },
+          {
+            "text": "Failure gives the documented remediation signal",
+            "result": "PASS",
+            "note": "Output directory is not empty"
+          },
+          {
+            "text": "The first-run summary remains parseable",
+            "result": "PASS",
+            "note": "(6, 52)"
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Shipped pegRNA example with constructible and no-PAM variants",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Copied shipped example ran on a new two-variant fixture, including a no-PAM edge case.",
+        "executed": true,
+        "execution_note": "Copied shipped example ran on a new two-variant fixture, including a no-PAM edge case.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "A constructible variant yields a filtered library entry",
+            "result": "PASS",
+            "note": "rows=2"
+          },
+          {
+            "text": "No-PAM variants are skipped rather than crashing the batch",
+            "result": "PASS",
+            "note": "No PE-designable PAM/PBS/RTT window for 1 variant(s): ['no_pam'] -- excluded before PRIDICT2 scoring, not a script error."
+          },
+          {
+            "text": "Every emitted extension is RTT then PBS",
+            "result": "PASS",
+            "note": "rowwise equality"
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Shipped summary filter on real and literal-empty summaries",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Copied shipped filtering script checked against fresh real PRIDICT2 summary and a literal empty-summary sentinel.",
+        "executed": true,
+        "execution_note": "Copied shipped filtering script checked against fresh real PRIDICT2 summary and a literal empty-summary sentinel.",
+        "basic": 38,
+        "specialized": 58,
+        "total": 96,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "Filter script retains top one per sequence on a real summary",
+            "result": "PASS",
+            "note": "rows=2"
+          },
+          {
+            "text": "Output has the two input sequence names",
+            "result": "PASS",
+            "note": [
+              "deletion1",
+              "insertion1"
+            ]
+          },
+          {
+            "text": "A literal empty PRIDICT2 summary exits nonzero with guidance",
+            "result": "PASS",
+            "note": "clear guard observed"
+          }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Adversarial",
+        "label": "Shipped PE/BE concordance against planted truth",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Copied shipped cross-validation script executed on a newly planted four-shared-variant fixture.",
+        "executed": true,
+        "execution_note": "Copied shipped cross-validation script executed on a newly planted four-shared-variant fixture.",
+        "basic": 38,
+        "specialized": 58,
+        "total": 96,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "Only shared variants are inner-joined",
+            "result": "PASS",
+            "note": "rows=4"
+          },
+          {
+            "text": "Exactly the two planted same-sign FDR-passing variants are high confidence",
+            "result": "PASS",
+            "note": [
+              "v1",
+              "v4"
+            ]
+          },
+          {
+            "text": "Discordant sign and failed FDR are excluded",
+            "result": "PASS",
+            "note": "v2/v3 false"
+          }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Scope Boundary",
+        "label": "ePRIDICT light model at the documented K562 locus",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "executed": true,
+        "execution_note": "run_epridict_phase2.sh, launched in the mandated WSL login shell, ran ePRIDICT single at chr3:44843504. It returned score 42.53 and K562 percentile 62.02%, and wrote the documented chr3_44843504.csv output.",
+        "note": "Real light-model ePRIDICT score and percentile obtained from the documented command.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "The documented single-locus command completes in the provisioned ePRIDICT environment",
+            "result": "PASS",
+            "note": "Exited 0 in WSL science/epridict."
+          },
+          {
+            "text": "The output contains a numeric light-model score and genomewide K562 percentile",
+            "result": "PASS",
+            "note": "42.53 and 62.02%, respectively."
+          },
+          {
+            "text": "The result is presented as K562-specific chromatin context rather than a cross-cell-line guarantee",
+            "result": "PASS",
+            "note": "Reference file states this boundary explicitly."
+          }
+        ]
+      },
+      {
+        "index": 8,
+        "type": "Stress",
+        "label": "All six ePRIDICT light-model bigWig inputs",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "executed": true,
+        "execution_note": "run_epridict_phase2.sh opened every light-model bigWig with pyBigWig at chr3:44843504 and counted non-null signal values. Each of the six tracks yielded 200/200 non-null values.",
+        "note": "Fresh integrity check of the data dependencies behind the light model.",
+        "basic": 37,
+        "specialized": 57,
+        "total": 94,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "All six light-model ENCODE bigWigs parse",
+            "result": "PASS",
+            "note": "ENCFF139KZL, 601JGK, 834SEY, 954LGE, 959YJV, and 972GVB opened successfully."
+          },
+          {
+            "text": "Every parsed bigWig has signal at the documented test locus",
+            "result": "PASS",
+            "note": "Each had 200/200 non-null values."
+          },
+          {
+            "text": "The check detects a data artifact rather than trusting a downloader exit code",
+            "result": "PASS",
+            "note": "It opens each file and asserts observed signal."
+          }
+        ]
+      },
+      {
+        "index": 9,
+        "type": "Variant B",
+        "label": "CRISPResso2 PE quantification with planted reference and edited reads",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "executed": true,
+        "execution_note": "run_crispresso_phase2.ps1 built a 500-read synthetic FASTQ (240 prime-edited, 260 reference) and ran the copied SKILL.md command through pinellolab/crispresso2:latest. The nested report path existed and contained three amplicon rows with 240 reads assigned to Prime-edited.",
+        "note": "The complete documented PE mode command ran; fixture is synthetic and intentionally below production depth.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "The documented nested CRISPResso2 output path exists",
+            "result": "PASS",
+            "note": "CRISPResso_on_sample_id/CRISPResso_quantification_of_editing_frequency.txt was produced."
+          },
+          {
+            "text": "The correct RTT-then-PBS extension creates a Prime-edited amplicon row",
+            "result": "PASS",
+            "note": "The report has Reference, Prime-edited, and Scaffold-incorporated rows."
+          },
+          {
+            "text": "All 240 planted edited reads are assigned to Prime-edited",
+            "result": "PASS",
+            "note": "Prime-edited Reads_aligned = 240 of 500 input reads."
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 37.6,
+    "dynamic_weighted": 57.0,
+    "score": 95,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "\u2b50",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "All runnable pathways were re-executed from an audit copy at the requested source commit, including the two newly added ePRIDICT and CRISPResso2 capabilities.",
+    "The fixed PRIDICT2 batch recipe now has positive evidence for a clean run and negative evidence for its guarded second-run failure mode.",
+    "CRISPResso2 correctly assigned all 240 planted edited reads to the Prime-edited row at the documented nested output path.",
+    "ePRIDICT light-model execution and the underlying six bigWig data dependencies were independently validated in WSL."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "Keep full ePRIDICT model explicitly optional",
+      "observed_in": [],
+      "problem": "The reference documents --use_full_model but the 455-track, approximately 624 GB model was not downloaded or executed in this audit.",
+      "root_cause": "The full model exceeds the available audit disk budget; this is a resource constraint, not a light-model correctness failure.",
+      "fix": "Retain the present light-model default and disk-size warning. Before advertising a full-model result, run the same parse-and-signal verification after an explicitly approved >=624 GB download."
+    }
+  ]
+}

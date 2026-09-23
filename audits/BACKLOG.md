@@ -2938,14 +2938,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The guard's echo message hardcodes the fastq_ftp field name instead of naming whichever of FTP_COL/MD5_COL was actually found empty.
 - Fix: Build the message from which variable is actually empty, e.g. name the missing field(s) explicitly: '[ -z "${FTP_COL}" ] && echo fastq_ftp missing'; '[ -z "${MD5_COL}" ] && echo fastq_md5 missing', combined into one accession-attributed message.
 
-### `bio-crispr-screens-prime-editing-screens` — The empty-summary-file Common Errors row names only one of at least three causes
-
-- Skill: 87.2, Production Ready · [mrsonord2240/bioSkills@4b3a86b](https://github.com/mrsonord2240/bioSkills/tree/4b3a86bc204d6eedbd0c24d7b2619f57ced0bbbd/crispr-screens/prime-editing-screens) · [viewer](skills/bio-crispr-screens-prime-editing-screens/mrsonord2240-bioSkills@4b3a86b/viewer.md)
-- Observed in inputs: 3, 5, 7
-- Problem: SKILL.md's Common Errors row 'PRIDICT2 batch: summary file is ""' attributes the symptom solely to a wrong CSV header (sequence vs editseq). This pass found two further, unrelated inputs that produce the byte-identical '""' summary file with exit code 0 and no error: (1) a correctly-headed CSV with zero data rows, and (2) a correctly-headed, non-empty CSV whose only variant has no PE-designable PAM anywhere in the CLI's search window (a realistic case: a variant list that includes some non-PE-installable edits).
-- Root cause: The row was written and verified against the specific defect the 2026-09-16 fix pass found (a wrong column name); the underlying summarize_top_scoring() function silently writes an empty DataFrame to CSV whenever os.listdir(out_dir) finds zero matching per-sequence files, regardless of why there are zero -- and this generalization was not tested for when the row was written.
-- Fix: Broaden the row (or add a sibling row) to state that ANY batch run producing zero successful pegRNA designs -- wrong header, an empty input CSV, or every variant lacking a usable PAM -- yields the same empty '""'-only summary file with exit code 0, and that this is a graceful no-op, not a hang or crash; direct the reader to check the per-sequence prediction CSVs (or stdout's 'No PAM' / '0 sequences' messages) for the real cause.
-
 ### `bio-ncbi-datasets-cli` — Virus download workflow has no worked code pattern
 
 - Skill: 87.8, Production Ready · [mrsonord2240/bioSkills@bac15cc](https://github.com/mrsonord2240/bioSkills/tree/bac15ccbda059dfec158576ae61cf7249a673cdb/database-access/ncbi-datasets-cli) · [viewer](skills/bio-ncbi-datasets-cli/mrsonord2240-bioSkills@bac15cc/viewer.md)
@@ -4281,6 +4273,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: usage-guide.md says the optional reference-efficacy section is in SKILL.md, but it now resides in references/efficacy-prior-and-diagnostics.md.
 - Root cause: The 2026-09-21 reference-file split left one old section-location phrase in the usage guide.
 - Fix: Point that Prerequisites sentence directly to references/efficacy-prior-and-diagnostics.md, or say it is indexed by SKILL.md's Reference Files section.
+
+### `bio-crispr-screens-prime-editing-screens` — Keep full ePRIDICT model explicitly optional
+
+- Skill: 95, Production Ready · [mrsonord2240/bioSkills@0abbf4d](https://github.com/mrsonord2240/bioSkills/tree/0abbf4d40d0df260ca60b346a9d6dc307b80fa5d/crispr-screens/prime-editing-screens) · [viewer](skills/bio-crispr-screens-prime-editing-screens/mrsonord2240-bioSkills@0abbf4d/viewer.md)
+- Observed in inputs: —
+- Problem: The reference documents --use_full_model but the 455-track, approximately 624 GB model was not downloaded or executed in this audit.
+- Root cause: The full model exceeds the available audit disk budget; this is a resource constraint, not a light-model correctness failure.
+- Fix: Retain the present light-model default and disk-size warning. Before advertising a full-model result, run the same parse-and-signal verification after an explicitly approved >=624 GB download.
 
 ### `bio-metabolomics-lipidomics` — Wrap malformed Goslin input errors
 
