@@ -1264,7 +1264,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (392)
+## P2 (390)
 
 ### `bio-data-visualization-lollipop-protein-maps` — HGVSp edge cases and recurrence semantics undocumented
 
@@ -4353,22 +4353,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: filter_by_bed.py silently returns no reads for a zero-width row while samtools -L returned 539 on this fixture. The reference accurately discloses the difference, but a direct script user gets no warning.
 - Root cause: The script delegates zero-width intervals to fetch(start, end), whose empty half-open range cannot express samtools behavior.
 - Fix: Reject start >= end with a concise error, or emit a warning identifying rows that must be dropped or widened before continuing.
-
-### `bio-metabolomics-statistical-analysis` — Pareto-vs-UV VIP robustness sub-check not independently reconfirmed post-fix
-
-- Skill: 96, Production Ready · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/metabolomics/statistical-analysis) · [viewer](skills/bio-metabolomics-statistical-analysis/mrsonord2240-bioSkills@6847328/viewer.md)
-- Observed in inputs: 3
-- Problem: The bundled example's third fit (unit-variance scaling, needed for the Pareto-vs-UV VIP overlap comparison) did not finish inside this audit's session time budget; only the real-label and null-label Pareto fits were reconfirmed.
-- Root cause: permI=1000 (the Skill's own recommended default) makes each full discriminant fit with double CV noticeably slow; this was not a defect found in the fit itself, just an unfinished re-check.
-- Fix: A future audit or CI run should let examples/metabolomics_stats.R run to completion (or reduce permI for a smoke test) to reconfirm the Pareto-vs-UV VIP overlap number alongside the reliability sweep.
-
-### `bio-metabolomics-statistical-analysis` — Correlated-feature FDR collapse produced 1 false independent-signal compound this run
-
-- Skill: 96, Production Ready · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/metabolomics/statistical-analysis) · [viewer](skills/bio-metabolomics-statistical-analysis/mrsonord2240-bioSkills@6847328/viewer.md)
-- Observed in inputs: 5
-- Problem: The compound-level BH-collapsed hit list included 1 compound with no planted true signal, versus 0 false compound hits in the pre-fix audit's synthetic run.
-- Root cause: Expected sampling variation at n=25/group with 90 compounds and per-compound Bonferroni-within-block p-value collapsing; not a methodological error.
-- Fix: No SKILL.md change needed; note in usage-guide.md that the compound-level correction still has a small non-zero false-discovery rate by construction (it is BH, not a zero-FDR guarantee) so users should not read '0 false hits' as a promise.
 
 ### `bio-microbiome-diversity-analysis` — Make GlobalPatterns depth choice use the helper
 
