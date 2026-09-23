@@ -28,8 +28,10 @@ decided this on 2026-09-22; see "After" below).
   "GPTomics", dated 2026-09-23, and points at another Skill's worktree (`wt\entrez-fetch\...`).
 - There are duplicate or near-duplicate ids (`bio-entrez-fetch` twice; `pathway-wikipathways` next to
   `pathway-analysis-wikipathways`; `pathway-reactome` next to `pathway-analysis-reactome-pathways`).
-- Several `audits\` folders show modification times later than the time of the check. Rule out clock
-  skew before relying on mtimes.
+- Cause (Sam, 2026-09-22): another model worked this tracker and did not follow the brief. Some of its
+  work may be usable. **Treat its `p2-done` marks and off-template checkpoints as not done until the
+  files prove otherwise.** Its commits on the fix branches count only if the Skill's diff and fix log
+  show a real fix.
 
 Write a script (save it under `tools\`) that builds `F:\OpenScience\wt\_phase2_manifest.json`, one row per
 **unique** frontmatter `name`:
