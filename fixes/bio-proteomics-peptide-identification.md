@@ -147,3 +147,13 @@ Each script run exactly as the reference invokes it: 381 PSMs written / 311 at q
 
 - None of the six findings. Two caveats: mokapot cannot run unpatched on this env's pandas 3 / numpy 2 (documented, not fixable without changing versions); MS2Rescore was removed rather than routed (not installed).
 - Noticed, not a finding: MSFragger, MaxQuant, MetaMorpheus, X!Tandem and pFind appear in the taxonomy and decision tree without commands. MSFragger's jars are licence-gated here; the others are named for choice guidance only.
+
+## 2026-09-22 — final pass Phase 1 (fixer/auditor, branch `fix/proteomics-peptide-identification`)
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+| --- | --- | --- | --- | --- |
+| Revisit list: MSFragger, MaxQuant, MetaMorpheus, X!Tandem and pFind were named with no runnable route; mokapot and R readers were likewise advertised but not executable in this environment | P1 | Removed all unsupported tool/reader claims, prompts, decoy rows and unneeded citations; retained only Comet, Sage, MS-GF+, Percolator and pyOpenMS; routes open-search/PTM and quantification requests to their owning Skills | ran: all remaining Python scripts, both full DDA engine routes and the MS-GF+ block; `rg` confirms no removed tool claim remains | MSFragger/MaxQuant are gated; mokapot 0.10.0 is incompatible with this shared pandas 3/numpy 2 stack. Deleting claims is the FIX_BRIEF-prescribed resolution, so no blocked tool remains. |
+| `dda_search.sh` passed POSIX paths embedded in Sage JSON and Comet parameter text to native Windows binaries | P1 | Under Git Bash, convert only the embedded/configured paths and native executable inputs with `cygpath -m`; keep POSIX paths for shell file operations | ran public PXD070049: Sage -> Percolator 1,398 PSMs / 1,367 peptides; Comet -> Percolator 1,144 / 1,138, both q <= 0.01; `bash -n` clean | Before the fix Sage wrote under `F:\\f\\...` and Comet could not open `/f/.../target_decoy.fasta`. |
+| Every runnable block must be walked in Phase 1 | P1 | Saved reproducible verification scripts in `audits/_final_pass/.../run/`; no further Skill code change | ran: fdr demo 481 q-value PSMs / 289 PEP PSMs; separate-search pi0 0.611 -> 2,888 at true FDP 0.0104; table FDR 2,632; pyOpenMS 381 -> 311; DecoyDatabase 31,437 -> 62,874; MS-GF+ -> 6,806 TSV rows | `py_compile` for every Python file and `bash -n` for the shell example also pass. |
+
+Unfixed: none. No install was needed and no item needs Sam's decision.
