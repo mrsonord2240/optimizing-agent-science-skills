@@ -1,0 +1,149 @@
+{
+  "meta": {
+    "skill_name": "bio-experimental-design-randomization-blocking",
+    "description": "Structures biological experiments around experimental units, randomization, blocking, factorial designs, split plots, nested designs, and matching analysis models.",
+    "evaluated_on": "2026-09-23",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Protocol Design",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "mrsonord2240/bioSkills@431aa55d2dc56d3da947f1c820077a6578691e37:experimental-design/randomization-blocking",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md"
+  },
+  "veto_gates": {
+    "skill_veto": { "gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS" },
+    "research_veto": {
+      "applicable": true,
+      "gate": "FAIL",
+      "scientific_integrity": { "result": "PASS", "detail": "All numbers in the audit were produced from labelled synthetic data or a byte-identical shipped example." },
+      "practice_boundaries": { "result": "PASS", "detail": "The Skill stays within research-design advice and makes no individual diagnosis or treatment recommendation." },
+      "methodological_ground": { "result": "PASS", "detail": "The tested outputs correctly prevent pseudoreplication and use the whole-plot error stratum for split plots." },
+      "code_usability": { "result": "FAIL", "detail": "The exact designit constrained-allocation block fails on designit 0.5.1, within the declared 0.5+ support range: some sample columns match BatchContainer dimension names." }
+    }
+  },
+  "static_score": {
+    "subtotal": 90,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 10, "max": 12, "note": "Experimental-unit, blocking, factorial, and split-plot guidance is strong, but the advertised constrained designit workflow fails." },
+      "reliability": { "score": 9, "max": 12, "note": "Seeded examples and caveats are sound, but the version-compatibility guidance does not protect a current supported designit invocation." },
+      "performance_context": { "score": 8, "max": 8, "note": "The primary Skill is compact and the usage guide remains separated from agent-facing detail." },
+      "agent_usability": { "score": 15, "max": 16, "note": "Decision tables, goals, and models are clear; there is no verified recovery path for the constrained allocator." },
+      "human_usability": { "score": 7, "max": 8, "note": "Explanations are clear, though usage-guide.md is less useful as a standalone quick reference." },
+      "security": { "score": 12, "max": 12, "note": "No secrets, destructive operations, raw-string execution, or injection surface were found." },
+      "maintainability": { "score": 9, "max": 12, "note": "The source has a version note, but its only designit block was not retained as a passing implementation for the claimed support range." },
+      "agent_specific": { "score": 20, "max": 20, "note": "Trigger conditions, scope handoffs, and scenario-based routing are precise and composable." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 84.1,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 25, "total": 27 },
+    "inputs": [
+      {
+        "index": 1, "type": "Canonical", "label": "Cell observations nested in donors", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Executed run/in1_experimental_unit_aggregation.R in the isolated R runtime; 400 cells were aggregated to eight donor-level units.",
+        "note": "EU aggregation completed with four donors per condition.", "basic": 37, "specialized": 55, "total": 92, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Observations are aggregated to experimental units", "result": "PASS", "note": "Eight EU rows were produced from 400 cells." },
+          { "text": "The inferred n is the donor count", "result": "PASS", "note": "The output reports four donors in each condition." },
+          { "text": "The documented aggregation code executes", "result": "PASS", "note": "dplyr aggregation completed normally." },
+          { "text": "The output stays within research-design scope", "result": "PASS", "note": "No individual medical conclusion was made." }
+        ]
+      },
+      {
+        "index": 2, "type": "Variant A", "label": "Constrained block randomization", "status": "ERROR", "status_flag": "❌", "executed": true,
+        "execution_note": "Executed manual restricted randomization in run/in2_restricted_randomization.R and the literal designit path in run/in10_designit_inline.R; the latter exited 1 on designit 0.5.1.",
+        "note": "Manual balance passed, but the advertised constrained designit code errors before a layout is made.", "basic": 18, "specialized": 27, "total": 45, "assertions_passed": 2, "assertions_total": 4,
+        "assertions": [
+          { "text": "Manual block-restricted allocation is balanced", "result": "PASS", "note": "Every day has four control and four treatment samples." },
+          { "text": "Run order is a valid permutation", "result": "PASS", "note": "The executed assertion passed." },
+          { "text": "The shipped designit block completes on its declared version range", "result": "FAIL", "note": "designit 0.5.1 rejects the colliding sample and dimension column name." },
+          { "text": "The constrained optimizer has a demonstrated finite route", "result": "FAIL", "note": "A non-source audit probe entered optimization but did not complete within 60 seconds." }
+        ]
+      },
+      {
+        "index": 3, "type": "Edge", "label": "RCBD with real day variation", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Executed run/in3_rcbd_blocking.R on a six-block synthetic dataset.",
+        "note": "The blocked model reduced treatment standard error from 0.3917 to 0.1268.", "basic": 36, "specialized": 54, "total": 90, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "A block term is included in the analysis", "result": "PASS", "note": "The model is y ~ treatment + blocks." },
+          { "text": "Blocking improves precision when nuisance variation is real", "result": "PASS", "note": "Blocked standard error is lower." },
+          { "text": "The planted treatment effect is recovered", "result": "PASS", "note": "Blocked p-value is 0.000009." },
+          { "text": "The interpretation does not infer blocking value from noise alone", "result": "PASS", "note": "The test used known simulated day variation." }
+        ]
+      },
+      {
+        "index": 4, "type": "Variant B", "label": "Whole-plot medium effect", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Executed in4, the byte-identical shipped example in8, and the independent 400-replicate whole-plot simulation in9.",
+        "note": "The flat model was anti-conservative while the mixed model remained near nominal Type-I error.", "basic": 37, "specialized": 54, "total": 91, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "The design maps a per-run factor to a whole-plot model", "result": "PASS", "note": "The required random intercept for run is explicit." },
+          { "text": "The shipped example executes end to end", "result": "PASS", "note": "Balance assertions and simulation completed." },
+          { "text": "A flat model is anti-conservative for the whole-plot factor", "result": "PASS", "note": "Rates were 0.355 shipped and 0.360 independent." },
+          { "text": "The mixed model stays near nominal Type-I error", "result": "PASS", "note": "Independent rate was 0.055." }
+        ]
+      },
+      {
+        "index": 5, "type": "Stress", "label": "Blocked factorial and Latin square", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Executed run/in5_factorial_blocked.R and run/in11_latin_square.R.",
+        "note": "The interaction is recovered and the Latin square is balanced in each row and column.", "basic": 36, "specialized": 55, "total": 91, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "The factorial model includes block and interaction terms", "result": "PASS", "note": "litter + genotype * drug was fitted." },
+          { "text": "The interaction is interpreted through simple effects", "result": "PASS", "note": "KO and WT drug effects differ." },
+          { "text": "The Latin square is orthogonal across both nuisance axes", "result": "PASS", "note": "Each row and column contains all four treatments." },
+          { "text": "The output avoids unconditional main-effect interpretation", "result": "PASS", "note": "The interaction drives the interpretation." }
+        ]
+      },
+      {
+        "index": 6, "type": "Scope Boundary", "label": "Sequencing-batch allocation", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Executed run/in6_scope_boundary_checks.ps1 against the pinned SKILL.md.",
+        "note": "The Decision Tree explicitly directs sample-to-batch allocation to batch-design.", "basic": 38, "specialized": 50, "total": 88, "assertions_passed": 3, "assertions_total": 3,
+        "assertions": [
+          { "text": "The batch-assignment boundary is explicit", "result": "PASS", "note": "The sequencing-batch row is present." },
+          { "text": "The correct sibling Skill is identified", "result": "PASS", "note": "experimental-design/batch-design is named." },
+          { "text": "No unsupported allocation algorithm is substituted", "result": "PASS", "note": "The Skill hands off rather than improvising." }
+        ]
+      },
+      {
+        "index": 7, "type": "Adversarial", "label": "Cell-level pseudoreplication request", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Executed run/in7_adversarial_boundary_checks.ps1 against the pinned SKILL.md.",
+        "note": "The source refuses the invalid cell-level n and offers EU-level or hierarchical analysis.", "basic": 38, "specialized": 54, "total": 92, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "The source identifies the correct experimental unit", "result": "PASS", "note": "It states that many cells from three mice remain n=3." },
+          { "text": "The source names pseudoreplication", "result": "PASS", "note": "The failure mode and mechanism are explicit." },
+          { "text": "A valid alternative is offered", "result": "PASS", "note": "Aggregation or a nested random effect is recommended." },
+          { "text": "The p-hacking request is not validated", "result": "PASS", "note": "No invalid cell-level inference is endorsed." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 36.0,
+    "dynamic_weighted": 50.5,
+    "score": 87,
+    "max": 100,
+    "grade": "Reject",
+    "grade_symbol": "❌",
+    "deployable": false,
+    "veto_override": true
+  },
+  "key_strengths": [
+    "The experimental-unit explanation and pseudoreplication refusal are direct and scientifically correct.",
+    "The shipped split-plot example runs and its whole-plot Type-I error warning was independently generalized.",
+    "Decision-tree scope handoffs prevent the Skill from pretending to solve sequencing-batch allocation.",
+    "Seeded manual randomization, blocked factorial, and Latin-square patterns produced checked outputs."
+  ],
+  "recommendations": [
+    {
+      "priority": "P0",
+      "title": "Repair the designit constrained-allocation block",
+      "observed_in": [2],
+      "problem": "The exact SKILL.md block errors on designit 0.5.1 because the samples and BatchContainer share the column name block, so it never produces a constrained layout.",
+      "root_cause": "The example was not maintained as an end-to-end tested implementation for its declared designit 0.5+ support range and has no bounded optimizer configuration.",
+      "fix": "Rebuild the block from the installed designit 0.5.1 vignette with non-colliding sample and container fields and explicit bounded optimization controls. Execute the literal documented block to a checked layout before a fresh re-audit."
+    }
+  ]
+}

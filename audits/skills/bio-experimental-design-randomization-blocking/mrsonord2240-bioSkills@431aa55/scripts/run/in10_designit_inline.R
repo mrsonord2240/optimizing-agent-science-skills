@@ -1,0 +1,10 @@
+# Exact executable block from SKILL.md (with its preceding `units` object), intentionally not repaired.
+set.seed(20260528)
+units <- data.frame(id = sprintf("S%02d", 1:24), block = rep(c("day1", "day2", "day3"), each = 8))
+units$treatment <- ave(units$id, units$block, FUN = function(ids) sample(rep(c("ctrl", "treat"), length.out = length(ids))))
+units$run_order <- sample(nrow(units))
+library(designit)
+bc <- BatchContainer$new(dimensions = list(block = 3, position = 8))
+bc <- assign_in_order(bc, samples = units)
+bc <- optimize_design(bc, scoring = osat_score_generator(batch_vars = "block", feature_vars = c("treatment")))
+print(bc)
