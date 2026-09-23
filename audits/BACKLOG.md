@@ -4482,14 +4482,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: Out of scope for this fix pass, which targeted the truncLen ceiling defect only.
 - Fix: Add one sentence to the decontam section naming this shortcut and explaining why control-based statistical testing (decontam) is not interchangeable with an arbitrary abundance cutoff.
 
-### `bio-pose-validation` — `mol` config table row still claims 'stereo' is included, contradicting the fix's own new caveat
-
-- Skill: 92, Production Ready · [mrsonord2240/bioSkills@cae7409](https://github.com/mrsonord2240/bioSkills/tree/cae740920eb752a820afd1efb953e28916bf41e5/chemoinformatics/pose-validation) · [viewer](skills/bio-pose-validation/mrsonord2240-bioSkills@cae7409/viewer.md)
-- Observed in inputs: 6
-- Problem: The fix correctly rewrote the `dock` row and added a caveat stating chirality/double-bond-stereo checks 'only run when mol_true is supplied (config="redock")'. It left the `mol` row untouched: 'Intra-ligand only (sanity, bonds, angles, rings, stereo, energy)'. Verified against installed PoseBusters 0.6.5: `PoseBusters(config='mol').bust()` returns 12 columns, none of them tetrahedral_chirality or double_bond_stereochemistry -- the same reference-dependent checks the fix pass already established require mol_true. An agent skimming the config table (rather than the caveat prose three lines above it) would conclude mol-only conformer QC catches stereo inversions; it does not.
-- Root cause: The fix pass's diff (verified via `git diff` on the staging commit) touched only the `dock` row and the caveat sentence; the `mol` row was not cross-checked against the same verification.
-- Fix: Change the `mol` row's parenthetical from '(sanity, bonds, angles, rings, stereo, energy)' to '(sanity, bonds, angles, rings, double-bond geometry, energy)' or explicitly note '-- stereo/chirality excluded, same as dock; requires mol_true'.
-
 ### `bio-protac-degraders` — DC50/Dmax fit underestimates when a hook's onset is not well-separated from DC50
 
 - Skill: 92, Production Ready · [mrsonord2240/bioSkills@bfcde6d](https://github.com/mrsonord2240/bioSkills/tree/bfcde6d6e676730230728e37142eca8054ac06aa/chemoinformatics/protac-degraders) · [viewer](skills/bio-protac-degraders/mrsonord2240-bioSkills@bfcde6d/viewer.md)
@@ -4801,6 +4793,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: org.Mm.eg.db and org.At.tair.db remain absent from the crispr-screen-analyst shared env, so a supported (mouse) and unsupported (arabidopsis) organism both fail at the identical missing-package step; the claimed 'exactly 7 organisms' ceiling can't be separated from 'these 2 packages happen to be missing' by execution.
 - Root cause: The shared audit env has no non-human OrgDb packages installed; this predates and is unrelated to this fix, and was explicitly left out of the dispatched findings.
 - Fix: In a future tooling pass, install org.Mm.eg.db under the shared env's install-lock discipline, then re-run with a real mouse gene list so the 7-organism ceiling is confirmed by a live enrichPathway(organism='mouse') result rather than by argument acceptance alone.
+
+### `bio-pose-validation` — Clarify batch rank output semantics
+
+- Skill: 95, Production Ready · [mrsonord2240/bioSkills@e4fa0a7](https://github.com/mrsonord2240/bioSkills/tree/e4fa0a78b55a107b91337a3307faebf34a70644d/chemoinformatics/pose-validation) · [viewer](skills/bio-pose-validation/mrsonord2240-bioSkills@e4fa0a7/viewer.md)
+- Observed in inputs: 5, 8
+- Problem: pose_qc_batch.py prints a column named rank, but it is a cumulative count of PB-valid records within each source, not a docking score or original pose ordinal.
+- Root cause: The internal selection implementation exposes an intermediate column without describing its semantics in the CLI output.
+- Fix: Rename the displayed column to valid_ordinal or omit it from the CLI table; keep the documented first-PB-valid selection behavior unchanged.
 
 ### `bio-alignment-filtering` — Make zero-width BED handling explicit at script runtime
 

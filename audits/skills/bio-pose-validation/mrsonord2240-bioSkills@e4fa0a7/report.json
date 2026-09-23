@@ -1,0 +1,67 @@
+{
+  "meta": {
+    "skill_name": "bio-pose-validation",
+    "description": "Validates docked or generated protein-ligand poses with PoseBusters physical-validity tests, relative MMFF strain, supplementary planarity diagnostics, and batch QC before downstream SAR analysis.",
+    "evaluated_on": "2026-09-23",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 9,
+    "source": "mrsonord2240/bioSkills@e4fa0a78b55a107b91337a3307faebf34a70644d:chemoinformatics/pose-validation",
+    "re_audit_of": "F:\\OpenScience\\audits\\_pre-fix-20260922\\bio-pose-validation",
+    "fix_log": "F:\\optimizing-agent-science-skills\\fixes\\bio-pose-validation.md",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {"result": "PASS", "detail": "All tested numeric and configuration claims came from live PoseBusters 0.6.5/RDKit 2026.03.6 execution; no clinical or efficacy claims were generated."},
+      "practice_boundaries": {"result": "PASS", "detail": "The Skill performs computational pose QC and consistently frames results as checks for inspection, not diagnostic or therapeutic conclusions."},
+      "methodological_ground": {"result": "PASS", "detail": "The Skill distinguishes a supplementary SVD planarity diagnostic from PoseBusters' authoritative check, treats strain as a relative diagnostic rather than a free energy, and avoids a universal strain cutoff."},
+      "code_usability": {"result": "PASS", "detail": "All three shipped Python entry points and the inline redock pattern executed from an audit-owned exact-tip snapshot; 30/30 audited assertions passed."}
+    }
+  },
+  "static_score": {
+    "subtotal": 94,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {"score": 12, "max": 12, "note": "Covers dock, redock, ligand-only, strain, planarity, and per-file batch QC with correct reference-dependent configuration guidance."},
+      "reliability": {"score": 10, "max": 12, "note": "Run paths return structured notes for unscorable strain input and use deterministic boolean aggregation; CLI argument validation and a clearer batch-selection diagnostic would improve recovery."},
+      "performance_context": {"score": 8, "max": 8, "note": "The normal workflow relies on focused RDKit/PoseBusters calculations and exposes a conformer-count control for the only expensive path."},
+      "agent_usability": {"score": 15, "max": 16, "note": "Trigger, config table, commands, error table, and direct script destinations are precise; the overloaded batch output label is a minor agent-reading ambiguity."},
+      "human_usability": {"score": 8, "max": 8, "note": "Workflow-oriented sections, concise usage guide, and warnings against absolute rejection make the Skill directly navigable."},
+      "security": {"score": 11, "max": 12, "note": "No credential, network, destructive-operation, or raw-command-execution pattern was found; arbitrary supplied file paths are normal local scientific inputs."},
+      "maintainability": {"score": 11, "max": 12, "note": "Runnable logic is now in named scripts with purpose/input/usage headers and an asserted fixture smoke test; there is no dedicated automated test suite for CLI argument errors."},
+      "agent_specific": {"score": 19, "max": 20, "note": "Frontmatter trigger is specific, version compatibility is explicit, and optional posecheck has a working PoseBusters path; batch rank naming remains the only small escape-hatch clarity gap."}
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 95.2,
+    "max": 100,
+    "assertion_pass_rate": {"passed": 30, "total": 30},
+    "inputs": [
+      {"index": 1, "type": "Canonical", "label": "Dock QC for real Vina benzamidine pose", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "PoseBusters dock run on mode1_fixed.sdf and 3PTB receptor completed with 22 boolean checks and PB-valid true.", "note": "Live PoseBusters result, not a simulated table.", "basic": 39, "specialized": 58, "total": 97, "assertions_passed": 3, "assertions_total": 3, "assertions": [{"text": "Dock configuration executes on the supplied SDF/PDB pair", "result": "PASS", "note": "Completed without missing dependency or API error."}, {"text": "The documented boolean aggregation sees 22 checks", "result": "PASS", "note": "22 boolean columns returned."}, {"text": "The real control pose is PB-valid", "result": "PASS", "note": "All 22 checks were true."}]},
+      {"index": 2, "type": "Variant A", "label": "Relative MMFF strain and bundled fixture smoke", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Ran examples/validate_poses.py __main__ and ligand_strain_mmff on the audit Vina pose.", "note": "Fixture smoke printed its OK line; audit pose strain was 4.162648 kcal/mol with note ok.", "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 3, "assertions_total": 3, "assertions": [{"text": "Bundled example smoke test passes", "result": "PASS", "note": "Printed the asserted PB-valid fixture success message."}, {"text": "Strain function returns a scored row", "result": "PASS", "note": "note=ok and pose_idx=0."}, {"text": "Reported strain matches regression evidence", "result": "PASS", "note": "4.162648 kcal/mol within 0.001."}]},
+      {"index": 3, "type": "Edge", "label": "Clash, stretched-bond, puckered-ring, and control poses", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Live dock/mol checks ran on four distinct audit fixtures.", "note": "Expected physical failures were differentiated rather than collapsed into an exit code.", "basic": 39, "specialized": 57, "total": 96, "assertions_passed": 4, "assertions_total": 4, "assertions": [{"text": "Protein clash is rejected", "result": "PASS", "note": "minimum_distance_to_protein and volume_overlap_with_protein failed."}, {"text": "Stretched bond is rejected", "result": "PASS", "note": "bond_lengths and bond_angles failed."}, {"text": "Puckered regression pose remains valid under the authoritative check", "result": "PASS", "note": "PB-valid true."}, {"text": "Unperturbed control remains valid", "result": "PASS", "note": "PB-valid true."}]},
+      {"index": 4, "type": "Variant B", "label": "Redock RMSD and PB-valid reconciliation", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Ran PoseBusters redock with a real benzamidine reference and receptor.", "note": "The reference-dependent stereochemistry checks and RMSD status were read from the returned frame.", "basic": 39, "specialized": 57, "total": 96, "assertions_passed": 3, "assertions_total": 3, "assertions": [{"text": "Redock configuration completes with mol_true", "result": "PASS", "note": "Live DataFrame returned."}, {"text": "Reference pose meets RMSD and PB-valid criteria", "result": "PASS", "note": "rmsd_<=_2A=true and PB-valid=true."}, {"text": "Reference-dependent stereo checks pass for the control", "result": "PASS", "note": "Both returned true."}]},
+      {"index": 5, "type": "Stress", "label": "Nine-file CLI batch replay", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Ran the shipped pose_qc_batch.py CLI and callable implementation on eight Vina modes plus one clash file.", "note": "CLI printed 8 / 9 files have a PB-valid pose.", "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 3, "assertions_total": 3, "assertions": [{"text": "Documented batch CLI executes", "result": "PASS", "note": "Completed with the documented receptor-plus-SDF argument form."}, {"text": "All eight valid Vina modes are retained", "result": "PASS", "note": "Eight source files in returned shortlist."}, {"text": "Clash file is excluded", "result": "PASS", "note": "Not present in shortlist."}]},
+      {"index": 6, "type": "Edge", "label": "Chirality inversion and config boundary", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Ran redock, dock, and mol configurations on the R/S phenylethanol fixture pair.", "note": "Replays the former table inconsistency against the current corrected row.", "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 4, "assertions_total": 4, "assertions": [{"text": "Redock detects the inverted stereocenter", "result": "PASS", "note": "tetrahedral_chirality=false."}, {"text": "Dock omits the reference chirality check", "result": "PASS", "note": "No tetrahedral_chirality column."}, {"text": "Mol omits the reference chirality and stereo checks", "result": "PASS", "note": "No tetrahedral_chirality or double_bond_stereochemistry column."}, {"text": "Current mol table wording matches execution", "result": "PASS", "note": "It explicitly excludes stereo/chirality without mol_true."}]},
+      {"index": 7, "type": "Variant B", "label": "Aromatic-planarity regression series", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Executed shipped aromatic_planarity.py for puck_0.6/1.0/1.5/2.0 SDFs and cross-checked each with PoseBusters mol.", "note": "The script is used as a supplementary diagnostic, as documented.", "basic": 39, "specialized": 57, "total": 96, "assertions_passed": 4, "assertions_total": 4, "assertions": [{"text": "Documented planarity CLI executes for all series inputs", "result": "PASS", "note": "Four completed CLI subprocesses."}, {"text": "0.6 displacement produces the documented 0.2888 A diagnostic", "result": "PASS", "note": "Observed 0.2888 A and PoseBusters pass."}, {"text": "1.0 displacement produces the documented 0.4524 A diagnostic", "result": "PASS", "note": "Observed 0.4524 A and PoseBusters fail."}, {"text": "Later series members remain PoseBusters failures", "result": "PASS", "note": "1.5 and 2.0 both failed flatness."}]},
+      {"index": 8, "type": "Stress", "label": "Fresh multi-pose first-valid selection", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Created an audit-owned three-record SDF: invalid clash followed by two valid poses; invoked the shipped batch function.", "note": "This fresh case verifies selection order, not only one-pose-per-file behavior.", "basic": 39, "specialized": 57, "total": 96, "assertions_passed": 3, "assertions_total": 3, "assertions": [{"text": "Fresh SDF contains invalid then two valid records", "result": "PASS", "note": "Raw flags were [false, true, true]."}, {"text": "Batch function returns one result for the file", "result": "PASS", "note": "One shortlisted row returned."}, {"text": "Returned row is the first valid record", "result": "PASS", "note": "Returned record index was 1."}]},
+      {"index": 9, "type": "Adversarial", "label": "Fresh malformed-SDF strain boundary", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Created an audit-owned malformed SDF and passed it to the shipped ligand_strain_mmff function.", "note": "RDKit emitted a parse diagnostic; the Skill function returned a structured row instead of crashing.", "basic": 37, "specialized": 54, "total": 91, "assertions_passed": 3, "assertions_total": 3, "assertions": [{"text": "Malformed input is represented in output", "result": "PASS", "note": "Returned one row for pose index 0."}, {"text": "Failure is labelled parse_fail", "result": "PASS", "note": "note=parse_fail."}, {"text": "No numeric strain is invented on parse failure", "result": "PASS", "note": "strain_kcal is null."}]}
+    ]
+  },
+  "final": {"static_weighted": 37.6, "dynamic_weighted": 57.1, "score": 95, "max": 100, "grade": "Production Ready", "grade_symbol": "⭐", "deployable": true, "veto_override": false},
+  "key_strengths": ["All seven Phase-1 input classes were rerun against the exact assigned commit and two fresh boundary cases passed.", "The source now has direct script destinations for the former inline runnable blocks, and each shipped entry point ran from an exact-tip audit snapshot.", "Live execution confirms correct handling of reference-dependent stereochemistry, planarity diagnostic limits, physical failures, and malformed strain input."],
+  "recommendations": [{"priority": "P2", "title": "Clarify batch rank output semantics", "observed_in": [5, 8], "problem": "pose_qc_batch.py prints a column named rank, but it is a cumulative count of PB-valid records within each source, not a docking score or original pose ordinal.", "root_cause": "The internal selection implementation exposes an intermediate column without describing its semantics in the CLI output.", "fix": "Rename the displayed column to valid_ordinal or omit it from the CLI table; keep the documented first-PB-valid selection behavior unchanged."}]
+}
