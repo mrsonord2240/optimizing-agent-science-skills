@@ -22,7 +22,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The example passes cluster_rows=<OLO dendrogram> together with row_split=gene_info$pathway, a combination ComplexHeatmap rejects; the script was never run.
 - Fix: Drop row_split or use a numeric row_split (works with the dendrogram), or apply OLO within each pathway group; supply a runnable data preamble and state the constraint in SKILL.md next to the OLO block.
 
-## P1 (155)
+## P1 (156)
 
 ### `bio-data-visualization-lollipop-protein-maps` — Shipped example never completes and paints wrong colours
 
@@ -1232,6 +1232,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The fix's new 'OpenSwathDecoyGenerator's real input requirements' section documents the Annotation column and real fragment m/z as the requirements, but the reference OpenSWATH TSV example (and the fixer's own verification data) already included transition_group_id without calling it out as a requirement.
 - Fix: Add transition_group_id (unique per PeptideSequence+PrecursorCharge) to the documented required-fields list in 'Convert Library Formats' and the runnable pyteomics snippet, alongside Annotation and real fragment m/z.
 
+### `bio-causal-genomics-effector-gene-prioritization` — DEPICT remains a documented unexecuted branch
+
+- Skill: 94, Production Ready · [mrsonord2240/bioSkills@08b73bc](https://github.com/mrsonord2240/bioSkills/tree/08b73bcd2fbccf8b3b667d3805881c98d3b4e6b5/causal-genomics/effector-gene-prioritization) · [viewer](skills/bio-causal-genomics-effector-gene-prioritization/mrsonord2240-bioSkills@08b73bc/viewer.md)
+- Observed in inputs: 8
+- Problem: DEPICT is named in the skill but has not been exercised because its legacy Java/Python workflow needs a 2.3-4.3 GB data bundle and JVM setup.
+- Root cause: The final-pass checkpoint deliberately deferred the large, lower-priority legacy dependency pending a product decision.
+- Fix: Either approve a dedicated DEPICT environment and data download for a future pass, or make its documentation explicitly citation-only like INQUISIT so users do not infer local executability.
+
 ### `bio-pathway-kegg-pathways` — graphite route disagrees with direct spia() on perturbation direction for 30% of pathways, undocumented
 
 - Skill: 94, Production Ready · [mrsonord2240/bioSkills@424a053](https://github.com/mrsonord2240/bioSkills/tree/424a0533ba4b67063c884886c727b1f3ecab6342/pathway-analysis/kegg-pathways) · [viewer](skills/bio-pathway-kegg-pathways/mrsonord2240-bioSkills@424a053/viewer.md)
@@ -1264,7 +1272,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (430)
+## P2 (428)
 
 ### `bio-data-visualization-lollipop-protein-maps` — HGVSp edge cases and recurrence semantics undocumented
 
@@ -3978,30 +3986,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The Skill (like its siblings in this folder) ships no test suite -- verification is audit-driven, not CI-driven.
 - Fix: Add a small pytest module (or a documented manual-check script) that mocks a bytes-typed handle body containing '<ERROR>' and a Count=0 ESearch response, asserting both code paths recover/no-op without raising.
 
-### `bio-causal-genomics-effector-gene-prioritization` — magma_genebased.sh's Bonferroni line depends on `bc`, absent from standard Windows Git-Bash
-
-- Skill: 91, Production Ready · [mrsonord2240/bioSkills@f4755df](https://github.com/mrsonord2240/bioSkills/tree/f4755df08871073a2bfbcc4370863fe72026e5d5/causal-genomics/effector-gene-prioritization) · [viewer](skills/bio-causal-genomics-effector-gene-prioritization/mrsonord2240-bioSkills@f4755df/viewer.md)
-- Observed in inputs: 2
-- Problem: The script's Bonferroni-threshold print (`echo "... $(echo "0.05 / ${N_GENES}" \| bc -l)"`) silently produces a blank value instead of a number when `bc` is not installed, which is the default state of a standard Windows Git-for-Windows bash install. The script still reports overall success.
-- Root cause: The Windows-specific fixes in this same script (filename rename, gene-count guard) were tested and verified, but this pre-existing, unrelated line was not re-exercised end-to-end on a standard Windows Git-Bash install as part of the same fix pass.
-- Fix: Replace `bc -l` with a portable computation (e.g. `awk 'BEGIN{printf "%.6g", 0.05/'"$N_GENES"'}'` or a one-line Python/PowerShell call), or detect `bc`'s absence and fall back with a clear message instead of a silent blank.
-
-### `bio-causal-genomics-effector-gene-prioritization` — magma_genebased.sh's printed gene count is off by one (counts the .genes.out header row)
-
-- Skill: 91, Production Ready · [mrsonord2240/bioSkills@f4755df](https://github.com/mrsonord2240/bioSkills/tree/f4755df08871073a2bfbcc4370863fe72026e5d5/causal-genomics/effector-gene-prioritization) · [viewer](skills/bio-causal-genomics-effector-gene-prioritization/mrsonord2240-bioSkills@f4755df/viewer.md)
-- Observed in inputs: 2
-- Problem: `N_GENES=$(wc -l < "$GENES_OUT")` counts every line of `.genes.out`, including its header row, so a 3-gene run prints 'across 4 genes' instead of 3. Purely cosmetic (not used elsewhere in the script) but wrong.
-- Root cause: wc -l was applied directly to a file with a header row without subtracting 1.
-- Fix: Use `tail -n +2 "$GENES_OUT" \| wc -l` (or the same `grep -vc '^#'` pattern already used elsewhere in the script for `.genes.raw`, adapted for the header-row case) for the gene count feeding the Bonferroni print.
-
-### `bio-causal-genomics-effector-gene-prioritization` — 6 of 10 named V2G tools remain prose-only with no runnable example
-
-- Skill: 91, Production Ready · [mrsonord2240/bioSkills@f4755df](https://github.com/mrsonord2240/bioSkills/tree/f4755df08871073a2bfbcc4370863fe72026e5d5/causal-genomics/effector-gene-prioritization) · [viewer](skills/bio-causal-genomics-effector-gene-prioritization/mrsonord2240-bioSkills@f4755df/viewer.md)
-- Observed in inputs: —
-- Problem: FUMA, cS2G, DEPICT, INQUISIT, and FLAMES still have no runnable code path anywhere in the Skill (ABC/ENCODE-rE2G is prose-only here but reasonably cross-referenced to atac-seq/enhancer-gene-linking's own examples).
-- Root cause: The fix pass scoped its two new examples (PoPS, Open Targets L2G) to the two highest-priority second-line tools rather than the full remaining list; FUMA is web-only and DEPICT/INQUISIT/FLAMES are lower-priority legacy or narrow-domain methods.
-- Fix: If further hardening is prioritized, add a minimal runnable cS2G lookup example (a static Zenodo-hosted table read) since it requires no install, before FUMA/DEPICT/INQUISIT/FLAMES which are lower-value (web-only or narrow-domain).
-
 ### `bio-causal-genomics-mediation-analysis` — SKILL.md's own Mediational E-Value code example crashes as written
 
 - Skill: 91, Production Ready · [mrsonord2240/bioSkills@6e5f414](https://github.com/mrsonord2240/bioSkills/tree/6e5f41487089c69a9978cede7d7614b1da81f110/causal-genomics/mediation-analysis) · [viewer](skills/bio-causal-genomics-mediation-analysis/mrsonord2240-bioSkills@6e5f414/viewer.md)
@@ -4545,6 +4529,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The formula identities/(identities+mismatches) is PID2 exactly, but references/percent-identity.md calls it only 'similar to PID2'.
 - Root cause: The prose retains cautious wording after the formula was made explicit.
 - Fix: Replace 'similar to PID2' with 'PID2 (aligned residue pairs excluding gaps)' and retain the pointer to PID1-4.
+
+### `bio-causal-genomics-effector-gene-prioritization` — Make unavailable tissue workflow executable or explicit
+
+- Skill: 94, Production Ready · [mrsonord2240/bioSkills@08b73bc](https://github.com/mrsonord2240/bioSkills/tree/08b73bcd2fbccf8b3b667d3805881c98d3b4e6b5/causal-genomics/effector-gene-prioritization) · [viewer](skills/bio-causal-genomics-effector-gene-prioritization/mrsonord2240-bioSkills@08b73bc/viewer.md)
+- Observed in inputs: 8
+- Problem: The tissue-unknown branch correctly calls for LDSC-SEG and S-MultiXcan but those tools were unavailable in this environment, so it could only be scored by inspection.
+- Root cause: Those components are owned by adjacent skills and are not provisioned by the folder environment.
+- Fix: Add a minimal cross-skill executable handoff or label this row planning-only until the adjacent tool environments are available.
 
 ### `bio-crispr-screens-screen-qc` — Documented sgRNA-identifier-column requirement is not enforced by validate_counts()
 
