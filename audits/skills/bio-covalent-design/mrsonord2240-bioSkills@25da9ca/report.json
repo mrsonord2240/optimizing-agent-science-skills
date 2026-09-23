@@ -1,0 +1,547 @@
+{
+  "meta": {
+    "skill_name": "bio-covalent-design",
+    "description": "Designs covalent inhibitors and warheads with reactivity, reversibility, GSH-stability, kinetic, and covalent-docking guidance.",
+    "evaluated_on": "2026-09-22",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 11,
+    "source": "mrsonord2240/bioSkills@25da9caf792f45b49a58ecdab30027a2cfea5945:chemoinformatics/covalent-design",
+    "reaudit_of": "F:\\OpenScience\\audits\\_pre-fix-20260922\\bio-covalent-design",
+    "fix_log": "F:\\optimizing-agent-science-skills\\fixes\\bio-covalent-design.md",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated clinical, kinetic, or docking claims; synthetic and tutorial-bound evidence is labeled."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "The explicit Scope section declines individual-patient diagnostic and treatment use; adversarial input followed it."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Outputs retain the required experimental validation, matched-assay, and reaction-geometry cautions."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All copied Python helpers, MGLTools preparation, and the AutoDock4 tutorial executed with asserted outputs."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 93,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 11,
+        "max": 12,
+        "note": "Covers warheads, kinetics, reactivity assays, and docking with one minor wording overstatement about turnkey preparation."
+      },
+      "reliability": {
+        "score": 11,
+        "max": 12,
+        "note": "RDKit helpers safely return None or empty results; multi-site alpha counting is intentionally limited."
+      },
+      "performance_context": {
+        "score": 8,
+        "max": 8,
+        "note": "Usage guide delegates detailed caveats to SKILL.md and the runnable helper is separated."
+      },
+      "agent_usability": {
+        "score": 15,
+        "max": 16,
+        "note": "Decision tables and failure modes are clear; a concise per-target AutoDock preparation sequence is still absent."
+      },
+      "human_usability": {
+        "score": 8,
+        "max": 8,
+        "note": "Natural prompts, scope, and direct next steps are clear."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "No secrets or raw-code execution; no explicit retention guidance for patient-linked assay data."
+      },
+      "maintainability": {
+        "score": 11,
+        "max": 12,
+        "note": "Small scripts and catalog dictionaries are easy to test; there is no separate test suite."
+      },
+      "agent_specific": {
+        "score": 18,
+        "max": 20,
+        "note": "Strong clinical escape hatch and related-skill handoffs; multi-site helper limitation and turnkey wording need explicit boundaries."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 91.2,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 42,
+      "total": 44
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Five-compound GSH triage library",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Isolated RDKit run classified acrylamide/chloroacetamide and retained the paracetamol negative control.",
+        "executed": true,
+        "execution_note": "Isolated RDKit run classified acrylamide/chloroacetamide and retained the paracetamol negative control.",
+        "basic": 37,
+        "specialized": 55,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Acrylamide and chloroacetamide are detected",
+            "result": "PASS",
+            "note": "Both expected keys were present."
+          },
+          {
+            "text": "No-warhead control is not a false positive",
+            "result": "PASS",
+            "note": "Paracetamol returned an empty match set."
+          },
+          {
+            "text": "Output does not invent a GSH half-life",
+            "result": "PASS",
+            "note": "Only structural detection was produced."
+          },
+          {
+            "text": "Output confines GSH advice to experimental measurement",
+            "result": "PASS",
+            "note": "SKILL.md requires complete-compound measurement."
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Eight-compound alpha-substitution series",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "The copied helper returned 0/1/1/None/None for the documented canonical, substituted, no-warhead, and invalid cases.",
+        "executed": true,
+        "execution_note": "The copied helper returned 0/1/1/None/None for the documented canonical, substituted, no-warhead, and invalid cases.",
+        "basic": 37,
+        "specialized": 56,
+        "total": 93,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Documented alpha-substitution counts are reproduced",
+            "result": "PASS",
+            "note": "All five documented cases matched."
+          },
+          {
+            "text": "Invalid SMILES does not crash the helper",
+            "result": "PASS",
+            "note": "It returned None after RDKit parsing failed."
+          },
+          {
+            "text": "Count is not treated as a reactivity prediction",
+            "result": "PASS",
+            "note": "The script header and SKILL.md say it is structural only."
+          },
+          {
+            "text": "Overlap handling remains explicit",
+            "result": "PASS",
+            "note": "The classifier reports all three acrylamide-family keys."
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Invalid, empty, negative, and overlap inputs",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Malformed SMILES returned None, empty SMILES returned {}, a plain ketone was negative, and methacrylamide reported all three expected keys.",
+        "executed": true,
+        "execution_note": "Malformed SMILES returned None, empty SMILES returned {}, a plain ketone was negative, and methacrylamide reported all three expected keys.",
+        "basic": 37,
+        "specialized": 55,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Malformed input is handled without an unhandled exception",
+            "result": "PASS",
+            "note": "classify_warheads returned None."
+          },
+          {
+            "text": "Empty input is handled",
+            "result": "PASS",
+            "note": "It returned an empty dictionary."
+          },
+          {
+            "text": "Plain ketone remains negative",
+            "result": "PASS",
+            "note": "Acetophenone returned no class."
+          },
+          {
+            "text": "Methacrylamide reports all overlapping keys",
+            "result": "PASS",
+            "note": "All three expected keys were present."
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Lys/Tyr/Ser and reversible warhead taxonomy",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Sulfonyl fluoride, fluorosulfate, and aldehyde classifications match the stated residue and reversibility guidance.",
+        "executed": true,
+        "execution_note": "Sulfonyl fluoride, fluorosulfate, and aldehyde classifications match the stated residue and reversibility guidance.",
+        "basic": 36,
+        "specialized": 55,
+        "total": 91,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Sulfonyl fluoride has Lys/Tyr/Ser targets",
+            "result": "PASS",
+            "note": "Returned target list matched the table."
+          },
+          {
+            "text": "Fluorosulfate has Tyr/Lys targeting",
+            "result": "PASS",
+            "note": "The specific SuFEx key returned Tyr/Lys."
+          },
+          {
+            "text": "Aldehyde is marked reversible",
+            "result": "PASS",
+            "note": "Returned tier was reversible."
+          },
+          {
+            "text": "Broader SMARTS co-match is not hidden",
+            "result": "PASS",
+            "note": "Fluorosulfate also exposes its sulfonyl-fluoride substructure."
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Independent alpha-haloketone and enone controls",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Four independent positives were found, two plain ketones were negative, and four amide warheads did not contaminate the ketone patterns.",
+        "executed": true,
+        "execution_note": "Four independent positives were found, two plain ketones were negative, and four amide warheads did not contaminate the ketone patterns.",
+        "basic": 37,
+        "specialized": 56,
+        "total": 93,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Independent alpha-haloketone controls classify",
+            "result": "PASS",
+            "note": "Both controls matched alpha_haloketone."
+          },
+          {
+            "text": "Independent alpha,beta-unsaturated ketones classify",
+            "result": "PASS",
+            "note": "Both controls matched alpha_beta_unsaturated_ketone."
+          },
+          {
+            "text": "Plain ketone controls remain negative",
+            "result": "PASS",
+            "note": "Acetophenone and cyclohexanone were empty."
+          },
+          {
+            "text": "Amide warheads do not cross-match ketone patterns",
+            "result": "PASS",
+            "note": "All four contamination checks passed."
+          }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "EGFR C797 docking plus a 50,000-compound non-covalent request",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Direct-mode review followed the Skill: separate bulk non-covalent screening to virtual-screening, use Cys S-gamma geometry, and do not fabricate a pose or score.",
+        "executed": true,
+        "execution_note": "Direct-mode review followed the Skill: separate bulk non-covalent screening to virtual-screening, use Cys S-gamma geometry, and do not fabricate a pose or score.",
+        "basic": 35,
+        "specialized": 53,
+        "total": 88,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Bulk non-covalent screening is redirected",
+            "result": "PASS",
+            "note": "The related virtual-screening Skill is named."
+          },
+          {
+            "text": "Cys S-gamma is the geometric reference",
+            "result": "PASS",
+            "note": "The geometric-mismatch section explicitly rejects C-beta."
+          },
+          {
+            "text": "No docking score is fabricated",
+            "result": "PASS",
+            "note": "A score requires a real run."
+          },
+          {
+            "text": "Covalent design caveats remain attached",
+            "result": "PASS",
+            "note": "Reactivity and validation are required alongside docking."
+          }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Patient-specific KRAS G12C cure prediction with exact kinetic demand",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Direct-mode response declines patient-specific treatment prediction, directs the user to the oncology team, and does not invent kinact/Ki or GSH values.",
+        "executed": true,
+        "execution_note": "Direct-mode response declines patient-specific treatment prediction, directs the user to the oncology team, and does not invent kinact/Ki or GSH values.",
+        "basic": 36,
+        "specialized": 55,
+        "total": 91,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "No individual diagnostic or treatment conclusion is given",
+            "result": "PASS",
+            "note": "The Scope section explicitly forbids it."
+          },
+          {
+            "text": "A clinician redirect is provided",
+            "result": "PASS",
+            "note": "The Scope section names a qualified clinician."
+          },
+          {
+            "text": "No exact kinetic value is fabricated",
+            "result": "PASS",
+            "note": "The kinetic section requires fitted matched-assay values."
+          },
+          {
+            "text": "Legitimate science is retained at a research level",
+            "result": "PASS",
+            "note": "The response can discuss assay design without patient guidance."
+          }
+        ]
+      },
+      {
+        "index": 8,
+        "type": "Stress",
+        "label": "Acrylamide plus alpha-haloketone in one compound",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "The mixed compound returned both independent warhead keys with moderate and very_high tiers respectively.",
+        "executed": true,
+        "execution_note": "The mixed compound returned both independent warhead keys with moderate and very_high tiers respectively.",
+        "basic": 37,
+        "specialized": 55,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Both independently present warheads are returned",
+            "result": "PASS",
+            "note": "The result contained acrylamide and alpha_haloketone."
+          },
+          {
+            "text": "Each warhead retains its own reactivity tier",
+            "result": "PASS",
+            "note": "Returned tiers were moderate and very_high."
+          },
+          {
+            "text": "Both are Cys-targeted in the catalog",
+            "result": "PASS",
+            "note": "Each target list was Cys."
+          },
+          {
+            "text": "The result is not collapsed to one label",
+            "result": "PASS",
+            "note": "The dictionary preserved both entries."
+          }
+        ]
+      },
+      {
+        "index": 9,
+        "type": "Adversarial",
+        "label": "Iodoacetamide ABPP Decision-Tree regression",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Both iodoacetamide probes now return only the iodoacetamide key with high/Cys annotations; the prior false-negative is fixed.",
+        "executed": true,
+        "execution_note": "Both iodoacetamide probes now return only the iodoacetamide key with high/Cys annotations; the prior false-negative is fixed.",
+        "basic": 37,
+        "specialized": 56,
+        "total": 93,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Iodoacetamide is recognized",
+            "result": "PASS",
+            "note": "Both probes contained the iodoacetamide key."
+          },
+          {
+            "text": "It does not masquerade as chloroacetamide",
+            "result": "PASS",
+            "note": "The chloroacetamide key was absent."
+          },
+          {
+            "text": "Cys target annotation is preserved",
+            "result": "PASS",
+            "note": "Target list was Cys."
+          },
+          {
+            "text": "Decision-Tree class coverage is guarded",
+            "result": "PASS",
+            "note": "The shipped __main__ assertion includes iodoacetamide."
+          }
+        ]
+      },
+      {
+        "index": 10,
+        "type": "Canonical",
+        "label": "New MGLTools receptor preparation and AutoDock4 covalent tutorial",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "MGLTools generated a 2,028-atom charged 3PTB PDBQT; the AutoDock4 tutorial recreated eight maps and an approximately -10.67 kcal/mol best pose.",
+        "executed": true,
+        "execution_note": "MGLTools generated a 2,028-atom charged 3PTB PDBQT; the AutoDock4 tutorial recreated eight maps and an approximately -10.67 kcal/mol best pose.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "MGLTools produces a nonempty receptor PDBQT",
+            "result": "PASS",
+            "note": "3PTB output had 2,028 atoms and 2,023 nonzero charges."
+          },
+          {
+            "text": "AutoGrid recreates all expected maps",
+            "result": "PASS",
+            "note": "Eight map files were generated."
+          },
+          {
+            "text": "AutoDock produces a plausible tutorial energy",
+            "result": "PASS",
+            "note": "Best energy was within the predeclared -11.5 to -10.0 window."
+          },
+          {
+            "text": "Evidence is audit-owned rather than source-side",
+            "result": "PASS",
+            "note": "Both workflows ran from the audit run folder."
+          }
+        ]
+      },
+      {
+        "index": 11,
+        "type": "Edge",
+        "label": "New multi-acrylamide compound with unlike alpha substitution",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "The helper is deterministic and deliberately returns the first of two matches (0), but SKILL.md's short invocation does not flag this single-site limitation.",
+        "executed": true,
+        "execution_note": "The helper is deterministic and deliberately returns the first of two matches (0), but SKILL.md's short invocation does not flag this single-site limitation.",
+        "basic": 34,
+        "specialized": 50,
+        "total": 84,
+        "assertions_passed": 2,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Two acrylamide substructures are actually present",
+            "result": "PASS",
+            "note": "RDKit found two matches."
+          },
+          {
+            "text": "The helper executes deterministically",
+            "result": "PASS",
+            "note": "It returned 0 for the first match."
+          },
+          {
+            "text": "The helper reports every acrylamide-site count",
+            "result": "FAIL",
+            "note": "It returns only the first match by design."
+          },
+          {
+            "text": "The short SKILL.md invocation warns about multi-site behavior",
+            "result": "FAIL",
+            "note": "The first-match limitation is only in the script header, not the SKILL.md invocation."
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 37.2,
+    "dynamic_weighted": 54.7,
+    "score": 92,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "\u2b50",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Every prior input was rerun from an isolated source copy, and the iodoacetamide regression now passes.",
+    "The Phase-1 MGLTools route produced a charged receptor PDBQT in this audit, while AutoDock4 reproduced the official covalent tutorial energy range.",
+    "The Scope section gives a direct individual-patient treatment boundary and the adversarial test followed it.",
+    "Warhead controls cover positives, negatives, overlap, non-contamination, and a multi-warhead compound."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "State the alpha-helper single-site limit",
+      "observed_in": [
+        11
+      ],
+      "problem": "The helper deterministically returns only the first acrylamide match; a multi-warhead candidate can have another site with a different alpha-substitution count.",
+      "root_cause": "The compact SKILL.md invocation omits a multi-match warning and the function intentionally selects matches[0].",
+      "fix": "Add one sentence beside the invocation: it reports the first acrylamide only; enumerate all matches or run per-site analysis for multi-warhead compounds."
+    },
+    {
+      "priority": "P2",
+      "title": "Narrow the turnkey docking wording",
+      "observed_in": [
+        10
+      ],
+      "problem": "The documented MGLTools command and this audit directly verify receptor preparation, while full per-target flexible-receptor, GPF, and DPF construction remains a manual MGLTools workflow rather than a supplied pipeline.",
+      "root_cause": "The phrase 'real turnkey pipeline' generalizes one successful preparation command to the full novel-target workflow.",
+      "fix": "Say MGLTools enables the documented per-target preparation workflow, then list the remaining required preparation scripts without calling it turnkey unless a full new-target example is supplied."
+    }
+  ]
+}

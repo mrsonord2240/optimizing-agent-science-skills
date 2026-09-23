@@ -4018,22 +4018,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: This P2 was explicitly scoped out of the current fix dispatch (fix log: 'not in this dispatch's scope... left for a future pass').
 - Fix: Add a concrete before/after example (e.g. cyclosporine A, already named in usage-guide.md but never coded) showing embedding failure or degraded diversity under default settings versus success under useMacrocycleTorsions=True.
 
-### `bio-covalent-design` — Covalent docking section remains documentation-only, no runnable local workflow
-
-- Skill: 90, Production Ready · [mrsonord2240/bioSkills@f768d37](https://github.com/mrsonord2240/bioSkills/tree/f768d37b1d60ce4995d6aa5ce935b3f4b50cc154/chemoinformatics/covalent-design) · [viewer](skills/bio-covalent-design/mrsonord2240-bioSkills@f768d37/viewer.md)
-- Observed in inputs: 6
-- Problem: All 7 listed covalent-docking tools (DOCKovalent, GOLD, AD4 covalent, CovDock, MOE, HCovDock, ICM-Pro) remain commercial, web-service-only, or unimplemented; the one code example (add_acrylamide) is a deliberate NotImplementedError stub.
-- Root cause: No open-source, Windows-runnable covalent-docking backend exists to ship (independently confirmed in this environment's TOOLS.md).
-- Fix: Left unfixed by design per the fixer's own log and the pre-fix audit's own recommendation; this re-audit concurs the disclosure is honest, not overclaimed. Does not block landing.
-
-### `bio-covalent-design` — Iodoacetamide, named in SKILL.md's own Decision Tree table, is not in the warhead catalog
-
-- Skill: 90, Production Ready · [mrsonord2240/bioSkills@f768d37](https://github.com/mrsonord2240/bioSkills/tree/f768d37b1d60ce4995d6aa5ce935b3f4b50cc154/chemoinformatics/covalent-design) · [viewer](skills/bio-covalent-design/mrsonord2240-bioSkills@f768d37/viewer.md)
-- Observed in inputs: 9
-- Problem: SKILL.md's 'Decision Tree by Scenario' table names 'Iodoacetamide / chloroacetamide' as the ABPP warhead class, but classify_warheads() returns {} for an iodoacetamide-class SMILES -- a silent false negative for a Skill-documented class, narrower in scope than the pre-fix P1 (this is one named example in a secondary table, not the primary Warhead Chemistry table) but the same failure mode.
-- Root cause: WARHEAD_SMARTS only catalogues Cl/Br leaving groups for the haloacetamide family ([CH2][Cl], [CH2][Br]); no iodo variant exists despite the pattern being trivially extensible.
-- Fix: Add an 'iodoacetamide' key ([CX3](=[OX1])([NX3])[CH2][I]) or generalize the existing patterns to [F,Cl,Br,I], and extend the regression assertion to cover Decision-Tree-named classes, not only the main Warhead Chemistry table rows.
-
 ### `bio-crispr-screens-drugz-chemogenomic` — Escape Hatches for a crashed run or low replicate concordance remain thin
 
 - Skill: 90, Production Ready · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/crispr-screens/drugz-chemogenomic) · [viewer](skills/bio-crispr-screens-drugz-chemogenomic/mrsonord2240-bioSkills@6847328/viewer.md)
@@ -4497,6 +4481,22 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: SKILL.md still has no dedicated 'when not to use this' section; unaddressed across two fix passes (correctly out of scope both times -- substantial new content, not a cheap fix).
 - Root cause: The skill is written as a dense reference/method doc rather than an agent-facing decision procedure with explicit stop conditions.
 - Fix: Add a short 'Escape Hatches' subsection pointing to single-cell/multimodal-integration when scRNA-equivalent resolution is requested, and to a human/statistician for a motif-to-TF causal claim.
+
+### `bio-covalent-design` — State the alpha-helper single-site limit
+
+- Skill: 92, Production Ready · [mrsonord2240/bioSkills@25da9ca](https://github.com/mrsonord2240/bioSkills/tree/25da9caf792f45b49a58ecdab30027a2cfea5945/chemoinformatics/covalent-design) · [viewer](skills/bio-covalent-design/mrsonord2240-bioSkills@25da9ca/viewer.md)
+- Observed in inputs: 11
+- Problem: The helper deterministically returns only the first acrylamide match; a multi-warhead candidate can have another site with a different alpha-substitution count.
+- Root cause: The compact SKILL.md invocation omits a multi-match warning and the function intentionally selects matches[0].
+- Fix: Add one sentence beside the invocation: it reports the first acrylamide only; enumerate all matches or run per-site analysis for multi-warhead compounds.
+
+### `bio-covalent-design` — Narrow the turnkey docking wording
+
+- Skill: 92, Production Ready · [mrsonord2240/bioSkills@25da9ca](https://github.com/mrsonord2240/bioSkills/tree/25da9caf792f45b49a58ecdab30027a2cfea5945/chemoinformatics/covalent-design) · [viewer](skills/bio-covalent-design/mrsonord2240-bioSkills@25da9ca/viewer.md)
+- Observed in inputs: 10
+- Problem: The documented MGLTools command and this audit directly verify receptor preparation, while full per-target flexible-receptor, GPF, and DPF construction remains a manual MGLTools workflow rather than a supplied pipeline.
+- Root cause: The phrase 'real turnkey pipeline' generalizes one successful preparation command to the full novel-target workflow.
+- Fix: Say MGLTools enables the documented per-target preparation workflow, then list the remaining required preparation scripts without calling it turnkey unless a full new-target example is supplied.
 
 ### `bio-crispr-screens-base-editing-analysis` — find_be_spacers() has no editor-name validation, unlike the schema-checked functions
 
