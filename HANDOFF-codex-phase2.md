@@ -29,9 +29,11 @@ decided this on 2026-09-22; see "After" below).
 - There are duplicate or near-duplicate ids (`bio-entrez-fetch` twice; `pathway-wikipathways` next to
   `pathway-analysis-wikipathways`; `pathway-reactome` next to `pathway-analysis-reactome-pathways`).
 - Cause (Sam, 2026-09-22): another model worked this tracker and did not follow the brief. Some of its
-  work may be usable. **Treat its `p2-done` marks and off-template checkpoints as not done until the
-  files prove otherwise.** Its commits on the fix branches count only if the Skill's diff and fix log
-  show a real fix.
+  work was not true to form but was not a regression either. **Keep all of it: revert nothing, reset
+  nothing.** Its commits stay on the branches. Its `p2-done` marks are wrong only because no Phase 2
+  report exists. An off-template checkpoint with real content (fixes made, items still blocked) gets
+  rewritten into the template; only a checkpoint with no Phase 1 substance means `redo-p1`, and that
+  re-run continues from the branch tip.
 
 Write a script (save it under `tools\`) that builds `F:\OpenScience\wt\_phase2_manifest.json`, one row per
 **unique** frontmatter `name`:
@@ -41,9 +43,9 @@ Write a script (save it under `tools\`) that builds `F:\OpenScience\wt\_phase2_m
 | `skill_id`, `worktree`, `branch`, `folder_path` | match `SKILL.md` frontmatter `name` inside each `wt\<short>` worktree (`git worktree list` in staging) |
 | `tip_commit`, `phase1_commits` | commits on the branch after 2026-09-21 that touch the Skill |
 | `env` | the `F:\OpenScience\audit-envs\<env>` whose `TOOLS.md` covers the folder |
-| `checkpoint` | `ok` (template, correct Skill, correct worktree) / `bad` / `missing` |
+| `checkpoint` | `ok` (template, correct Skill, correct worktree) / `reformat` (real Phase 1 content, wrong shape) / `empty` / `missing` |
 | `phase2_report` | true only if a report with `auditor_independent: false` audits `tip_commit` |
-| `status` | `ready` (checkpoint ok, Phase 1 commits exist), `redo-p1`, `p2-done` |
+| `status` | `ready` (checkpoint `ok` or `reformat`), `redo-p1` (`empty`/`missing`), `p2-done` |
 
 Then rewrite `_final_pass.json` from the manifest, keeping the old file as `_final_pass.pre-20260922.json`.
 **Skills in `redo-p1` get Phase 1 re-run** (fresh agent, `FINAL_PASS_BRIEF.md` Phase 1) before their Phase 2.
