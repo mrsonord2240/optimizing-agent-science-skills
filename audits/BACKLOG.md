@@ -3626,22 +3626,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: This P2 was explicitly scoped out of the current fix dispatch (fix log: 'not in this dispatch's scope... left for a future pass').
 - Fix: Add a concrete before/after example (e.g. cyclosporine A, already named in usage-guide.md but never coded) showing embedding failure or degraded diversity under default settings versus success under useMacrocycleTorsions=True.
 
-### `bio-crispr-screens-hit-calling` — usage-guide.md's Prerequisites section has a confusing duplicated drugZ install line
-
-- Skill: 90, Production Ready · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/crispr-screens/hit-calling) · [viewer](skills/bio-crispr-screens-hit-calling/mrsonord2240-bioSkills@6847328/viewer.md)
-- Observed in inputs: —
-- Problem: The comment '# drugZ via PyPI or GitHub' is followed by 'git clone .../drugz', then '# or', then the identical 'git clone .../drugz' line again -- no actual PyPI install command is shown despite the comment claiming one exists, and the two git-clone lines are byte-identical.
-- Root cause: Copy-paste leftover in the Prerequisites code block, not touched by this fix pass (pre-existing, unrelated to the four P1s that were fixed).
-- Fix: Either remove the false 'via PyPI' claim (drugZ is not on PyPI, per the block's own other comments) or replace the duplicate second git-clone line with the actual `pip install drugz` command if one now exists upstream.
-
-### `bio-crispr-screens-hit-calling` — No references/ split for the dense 7-method comparison tables (carried over from the pre-fix audit)
-
-- Skill: 90, Production Ready · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/crispr-screens/hit-calling) · [viewer](skills/bio-crispr-screens-hit-calling/mrsonord2240-bioSkills@6847328/viewer.md)
-- Observed in inputs: —
-- Problem: SKILL.md grew from 279 to 368 lines in this fix pass (new Spearman-correction section, comparability check, unified thresholds note) with no references/ subfolder, making an already-dense single file denser.
-- Root cause: No references/ subfolder exists for this Skill; the fix log explicitly left this unaddressed as a P2, judging the reorg risk not worth it for a Skill 7 points from its floor at the time.
-- Fix: Now that the Skill clears the floor, revisit splitting the Statistical Models Compared / Algorithmic Taxonomy tables into references/method-catalog.md, keeping SKILL.md focused on the decision tree, reconciliation, and the newer sign/comparability guidance.
-
 ### `bio-metabolomics-targeted-analysis` — Matrix factor, recovery, and carryover still lack runnable code
 
 - Skill: 90, Production Ready · [mrsonord2240/bioSkills@9cf654d](https://github.com/mrsonord2240/bioSkills/tree/9cf654de316d9ad9ab699c4f9d545cfcd7eabd6b/metabolomics/targeted-analysis) · [viewer](skills/bio-metabolomics-targeted-analysis/mrsonord2240-bioSkills@9cf654d/viewer.md)
@@ -4025,6 +4009,22 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The stated approximately 4% N=20 and 0.5% N=30 miss rates did not reproduce in a fresh 1,000-replicate run of the stated two-hit, GI=-2.5, null-SD=0.4 model; both were 0/2000 in this run.
 - Root cause: The narrative gives precise rates without shipping the generating simulation or enough parameter detail to reproduce its variance model.
 - Fix: Either ship the exact simulation and seed used for the percentages or replace the precise N=20/N=30 rates with a qualitative caution while retaining the conservative N>=50 recommendation.
+
+### `bio-crispr-screens-hit-calling` — Rename the five-method consensus heading
+
+- Skill: 92, Production Ready · [mrsonord2240/bioSkills@51cfb20](https://github.com/mrsonord2240/bioSkills/tree/51cfb2078674ff6e8cb4412b9ae229f173a0b19d/crispr-screens/hit-calling) · [viewer](skills/bio-crispr-screens-hit-calling/mrsonord2240-bioSkills@51cfb20/viewer.md)
+- Observed in inputs: —
+- Problem: The section titled 'Run All Five on the Same Data' invokes a three-method MAGeCK+BAGEL2+drugZ script and discusses two-to-three-method consensus.
+- Root cause: An older broad-consensus heading survived after the runnable scope was made explicit.
+- Fix: Rename the heading to 'Run two or three methods on the same data' or add the two omitted methods with equivalent runnable integration.
+
+### `bio-crispr-screens-hit-calling` — Validate required input columns before indexing
+
+- Skill: 92, Production Ready · [mrsonord2240/bioSkills@51cfb20](https://github.com/mrsonord2240/bioSkills/tree/51cfb2078674ff6e8cb4412b9ae229f173a0b19d/crispr-screens/hit-calling) · [viewer](skills/bio-crispr-screens-hit-calling/mrsonord2240-bioSkills@51cfb20/viewer.md)
+- Observed in inputs: —
+- Problem: The shipped pandas scripts index required columns directly, so a malformed input produces a raw KeyError rather than a named input-contract error.
+- Root cause: CLI argument parsing validates paths but not table schema.
+- Fix: Add a small required-column check in each script that lists missing columns and states the expected schema before pandas indexing.
 
 ### `bio-crispr-screens-in-vivo-screens` — Ethics-requirement surfacing relies on agent judgment, not a forced trigger
 
