@@ -22,7 +22,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The example passes cluster_rows=<OLO dendrogram> together with row_split=gene_info$pathway, a combination ComplexHeatmap rejects; the script was never run.
 - Fix: Drop row_split or use a numeric row_split (works with the dendrogram), or apply OLO within each pathway group; supply a runnable data preamble and state the constraint in SKILL.md next to the OLO block.
 
-## P1 (158)
+## P1 (159)
 
 ### `bio-data-visualization-lollipop-protein-maps` — Shipped example never completes and paints wrong colours
 
@@ -800,14 +800,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: query_raw() inherits pybiomart's GET-based transport unchanged; nothing in the fix's new helper switches to POST or chunks large ID lists client-side.
 - Fix: Either build the query_raw() request as an HTTP POST (BioMart's martservice endpoint accepts POST for the same XML payload) or chunk ID lists above a safe size (empirically ~500-1000 IDs) into multiple queries joined client-side, and correct the '5,000'/'8,000 IDs' claims in SKILL.md and usage-guide.md to state the real, tested limit.
 
-### `bio-causal-genomics-transcriptome-wide-association` — pyfocus pandas<2.2 pin+patch is insufficient to reach real FOCUS PIP output
-
-- Skill: 87, Production Ready · [mrsonord2240/bioSkills@4a67b94](https://github.com/mrsonord2240/bioSkills/tree/4a67b94a22f798e17ad9d4ebe4c0c58276ce9efb/causal-genomics/transcriptome-wide-association) · [viewer](skills/bio-causal-genomics-transcriptome-wide-association/mrsonord2240-bioSkills@4a67b94/viewer.md)
-- Observed in inputs: 3
-- Problem: Once a real pyfocus-schema FOCUS weight DB is used (rather than the wrong-schema DB that masked this during the fix's own verification), `focus finemap` reaches the 'Calculating PIPs' step and crashes with `TypeError: DataFrame.pivot() takes 1 positional argument but 4 were given`, and after that is worked around, with `AttributeError: 'DataFrame' object has no attribute 'append'` -- both inside pyfocus's own finemap.py, not the Skill's authored content.
-- Root cause: pyfocus/finemap.py:1012 calls `attr_tmp.pivot("model_id", "attr_name", "value")` (positional args, removed by pandas>=2.0) and finemap.py:188 calls `df.append(null_dict, ignore_index=True)` (removed by pandas>=2.0). The pandas<2.2 pin only prevents the earlier delim_whitespace/np.warnings crashes; it does not avoid these because pandas<2.0 pins were never applied, and pyfocus's own code was never updated for pandas>=2.0's stricter API.
-- Fix: Document two further one-line patches in SKILL.md's Tool Install Notes: `attr_tmp.pivot(index="model_id", columns="attr_name", values="value")` at finemap.py:1012, and replace `df.append(null_dict, ignore_index=True)` with `pd.concat([df, pd.DataFrame([null_dict])], ignore_index=True)` at finemap.py:188. Both were confirmed this session: with both patches, focus finemap produces correct real PIP output (pips_pop1=1.0 for a true gene, ~3.4e-08 for the null-model row).
-
 ### `bio-single-cell-cell-annotation` — The triage screens on the one signal artifacts do not trip
 
 - Skill: 87, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/cell-annotation) · [viewer](skills/bio-single-cell-cell-annotation/GPTomics-bioSkills@d91ed3d/viewer.md)
@@ -1039,6 +1031,22 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: SKILL.md's MaAsLin2 code block (unchanged by this fix pass) shows random_effects = c('SubjectID') as the canonical pattern for longitudinal/repeated designs. Run verbatim against the fixture used throughout the rest of the Skill's examples (40 samples, 40 unique SubjectID -- one sample per subject), every per-feature lme4 fit fails with 'number of levels of each grouping factor must be < number of observations', caught internally with only a per-feature WARNING, and the written result table ends up with zero rows for the Group coefficient -- a silently empty, useless result reached without any top-level R error.
 - Root cause: A random effect grouping variable with as many levels as observations is degenerate (no within-group replication to estimate a variance component from) -- the identical mismatch class that produced the original LinDA P1 (formula '~ Group + Age + (1 \| SubjectID)' against a cross-sectional fixture), but MaAsLin2's block sits in the very next section and was not touched by this fix pass because it was not part of the original audit's tested inputs.
 - Fix: Either change the MaAsLin2 code block's demo formula to drop random_effects (matching how the LinDA block was fixed, since this SKILL.md's canonical demo fixture is cross-sectional) and add a comment showing random_effects=c('SubjectID') as the pattern for a true repeated-measures fixture, or add a Common Errors row for the exact 'number of levels of each grouping factor' message with the same explanation already given for LinDA.
+
+### `bio-causal-genomics-transcriptome-wide-association` — Add MetaXcan calibration inputs to examples
+
+- Skill: 90, Production Ready · [mrsonord2240/bioSkills@3e246f1](https://github.com/mrsonord2240/bioSkills/tree/3e246f19f63e39dbb646ae874ed353b70f17ce94/causal-genomics/transcriptome-wide-association) · [viewer](skills/bio-causal-genomics-transcriptome-wide-association/mrsonord2240-bioSkills@3e246f1/viewer.md)
+- Observed in inputs: 1, 4
+- Problem: The exact documented SPrediXcan calls completed but MetaXcan warned that gwas_N and gwas_h2 were missing, leaving p-values and Z-scores uncalibrated for inflation.
+- Root cause: The prerequisite mentions N, but the runnable S-PrediXcan and S-MultiXcan examples do not pass the calibration arguments or a documented alternative calibration workflow.
+- Fix: Add a mandatory preflight that obtains trait-appropriate GWAS N and h2, then include the accepted MetaXcan calibration flags in the runnable example; if h2 is unavailable, stop or label the output explicitly uncalibrated and prohibit thresholding it.
+
+### `bio-causal-genomics-transcriptome-wide-association` — Handle Windows R wrapper exit 139 in triangulation
+
+- Skill: 90, Production Ready · [mrsonord2240/bioSkills@3e246f1](https://github.com/mrsonord2240/bioSkills/tree/3e246f19f63e39dbb646ae874ed353b70f17ce94/causal-genomics/transcriptome-wide-association) · [viewer](skills/bio-causal-genomics-transcriptome-wide-association/mrsonord2240-bioSkills@3e246f1/viewer.md)
+- Observed in inputs: 5
+- Problem: The local MR/coloc script wrote and parsed valid outputs, then the R wrapper exited 139, preventing clean automation despite materialized evidence.
+- Root cause: The shared Windows R runtime intermittently terminates after output materialization.
+- Fix: Document the verified-output fallback and add a post-run parse check with explicit nonzero-exit handling; prefer a stable R runtime for unattended pipelines.
 
 ### `bio-molecular-standardization` — ChEMBL route can return an unstripped organic salt, undocumented
 
@@ -1288,7 +1296,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (381)
+## P2 (379)
 
 ### `bio-data-visualization-lollipop-protein-maps` — HGVSp edge cases and recurrence semantics undocumented
 
@@ -2714,30 +2722,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: Examples are kept standalone-runnable by design, which requires the helper to be copied rather than imported from a shared module.
 - Fix: No action required under current policy; if the helper changes again, verify all 3 copies are updated in the same commit (as this fix did correctly).
 
-### `bio-causal-genomics-transcriptome-wide-association` — `focus import ... fusion` (the Skill's own documented custom-DB route) has an undocumented mygene+rpy2 dependency, and rpy2 needs R built as a shared library
-
-- Skill: 87, Production Ready · [mrsonord2240/bioSkills@4a67b94](https://github.com/mrsonord2240/bioSkills/tree/4a67b94a22f798e17ad9d4ebe4c0c58276ce9efb/causal-genomics/transcriptome-wide-association) · [viewer](skills/bio-causal-genomics-transcriptome-wide-association/mrsonord2240-bioSkills@4a67b94/viewer.md)
-- Observed in inputs: 3
-- Problem: Following SKILL.md's own documented `focus import custom_panel.pos fusion --tissue ... --output ...` command fails silently (0 genes imported, no error surfaced to the user) unless `mygene` and `rpy2` are separately installed; even then, rpy2 requires R compiled as a shared library (`R was not built as a library`), which the standard R distribution referenced elsewhere in this Skill's own tooling is not.
-- Root cause: pyfocus's import submodule imports mygene/rpy2 lazily and only logs an ERROR-level message rather than raising, so a user following the documented command gets an apparently-successful but empty database with no indication why.
-- Fix: Document the mygene+rpy2 (and R-as-shared-library) requirement in Tool Install Notes, or document the workaround used this session: build the DB directly via pyfocus's own SQLAlchemy schema (`pyfocus.models.db.load_db`/`build_model`) for a custom panel, bypassing `focus import`'s gene-symbol-lookup step entirely.
-
-### `bio-causal-genomics-transcriptome-wide-association` — SKILL.md is a single 464-line file with no references/ split
-
-- Skill: 87, Production Ready · [mrsonord2240/bioSkills@4a67b94](https://github.com/mrsonord2240/bioSkills/tree/4a67b94a22f798e17ad9d4ebe4c0c58276ce9efb/causal-genomics/transcriptome-wide-association) · [viewer](skills/bio-causal-genomics-transcriptome-wide-association/mrsonord2240-bioSkills@4a67b94/viewer.md)
-- Observed in inputs: —
-- Problem: Despite a Complex rating (12-tool taxonomy, heavy branching decision tree), everything remains front-loaded into one file, penalizing performance_context and agent_specific/progressive_disclosure. Unchanged from the pre-fix audit; deliberately out of scope for this fix pass.
-- Root cause: No references/ subdirectory exists to move per-tool CLI detail, HLA/QC caveats, or the Common Errors table out of the main file.
-- Fix: Split into references/ (e.g., hla-and-qc-caveats.md, per-tool-cli-examples.md, common-errors.md) with SKILL.md as a thin router.
-
-### `bio-causal-genomics-transcriptome-wide-association` — FUSION (the declared primary_tool) has no standalone example script
-
-- Skill: 87, Production Ready · [mrsonord2240/bioSkills@4a67b94](https://github.com/mrsonord2240/bioSkills/tree/4a67b94a22f798e17ad9d4ebe4c0c58276ce9efb/causal-genomics/transcriptome-wide-association) · [viewer](skills/bio-causal-genomics-transcriptome-wide-association/mrsonord2240-bioSkills@4a67b94/viewer.md)
-- Observed in inputs: —
-- Problem: examples/ only ships s_predixcan_pipeline.sh and focus_finemap.sh; FUSION.assoc_test.R usage lives only as an inline bash fence in SKILL.md, and no fixture data is shipped for any of the 12 tools. Unchanged from the pre-fix audit; deliberately out of scope for this fix pass.
-- Root cause: Example coverage was built out for S-PrediXcan and FOCUS but not extended to FUSION despite FUSION being the frontmatter primary_tool.
-- Fix: Add examples/fusion_assoc_test.sh mirroring the other two scripts, plus a tiny synthetic fixture set.
-
 ### `bio-experimental-design-batch-design` — Bridge-channel block doesn't inherit the soft imbalance warning
 
 - Skill: 87, Production Ready · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/experimental-design/batch-design) · [viewer](skills/bio-experimental-design-batch-design/mrsonord2240-bioSkills@6847328/viewer.md)
@@ -3401,6 +3385,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: A default Maaslin2() call (plot_heatmap/plot_scatter left at their defaults) that finds real significant associations crashes partway through plotting with '<ggplot2::labels> object is invalid: every label must be named', after already having written all_results.tsv/significant_results.tsv to disk.
 - Root cause: Likely a ggplot2-version mismatch between what Maaslin2 1.20.0's plotting code expects and the env's installed ggplot2 4.0.3 (TOOLS.md records this version); not exercised by the original or this re-audit's other runs because sink()/capture.output() suppressed it or plot_heatmap=FALSE/plot_scatter=FALSE were passed.
 - Fix: Either note in SKILL.md's MaAsLin2 section that plot_heatmap=FALSE, plot_scatter=FALSE can be passed to skip plotting entirely (the numeric results are unaffected), or fix the env's ggplot2 pin in a future tooling pass.
+
+### `bio-causal-genomics-transcriptome-wide-association` — Make optional-method execution boundaries clearer
+
+- Skill: 90, Production Ready · [mrsonord2240/bioSkills@3e246f1](https://github.com/mrsonord2240/bioSkills/tree/3e246f19f63e39dbb646ae874ed353b70f17ce94/causal-genomics/transcriptome-wide-association) · [viewer](skills/bio-causal-genomics-transcriptome-wide-association/mrsonord2240-bioSkills@3e246f1/viewer.md)
+- Observed in inputs: —
+- Problem: Several named specialist methods remain taxonomy/escalation guidance rather than locally executable workflows with fixtures.
+- Root cause: The Skill intentionally focuses runnable coverage on FUSION, MetaXcan, and FOCUS.
+- Fix: For each retained optional method, either add a minimal verified invocation or label it explicitly as a handoff/reference-only route.
 
 ### `bio-conformer-generation` — filter_by_energy() / filter_energy_window() crash ungracefully on an empty conformer list
 

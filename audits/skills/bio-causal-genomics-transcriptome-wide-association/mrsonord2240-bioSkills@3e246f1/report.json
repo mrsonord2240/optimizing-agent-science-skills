@@ -1,0 +1,158 @@
+{
+  "meta": {
+    "skill_name": "bio-causal-genomics-transcriptome-wide-association",
+    "description": "Gene-level association from GWAS summary statistics through TWAS and causal-gene triangulation.",
+    "evaluated_on": "2026-09-23",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "mrsonord2240/bioSkills@3e246f19f63e39dbb646ae874ed353b70f17ce94:causal-genomics/transcriptome-wide-association",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md"
+  },
+  "veto_gates": {
+    "skill_veto": { "gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS" },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All numerical results in this report are from the saved synthetic executions; no external efficacy, clinical, DOI, or fabricated-result claims were made." },
+      "practice_boundaries": { "result": "PASS", "detail": "All seven inputs remain population-level genomics workflows; the HLA request is explicitly bounded away from a causal or clinical interpretation." },
+      "methodological_ground": { "result": "PASS", "detail": "The executed workflows retain ancestry/LD matching, HLA exclusion, and TWAS-plus-coloc-plus-cis-MR triangulation rather than treating a TWAS hit as causal." },
+      "code_usability": { "result": "PASS", "detail": "FUSION, MetaXcan, FOCUS, MA-FOCUS interface, direct FOCUS DB building, and local cis-MR/coloc all produced checked outputs. The R launcher exited 139 after Input 5 wrote and parsed its output; that reproducible wrapper defect is retained as P1, not hidden as success." }
+    }
+  },
+  "static_score": {
+    "subtotal": 91,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 11, "max": 12, "note": "Primary FUSION, MetaXcan, and FOCUS routes are present and live-tested; the S-PrediXcan examples omit calibration parameters that current MetaXcan warns are required." },
+      "reliability": { "score": 11, "max": 12, "note": "Strong documented recovery for pyfocus/FUSION/Windows path errors; the calibration warning remains unaddressed." },
+      "performance_context": { "score": 7, "max": 8, "note": "The main file routes detailed method content into references and runnable work into scripts, but the workflow still has substantial environment setup." },
+      "agent_usability": { "score": 16, "max": 16, "note": "Clear triggers, decision tree, thresholds, reference routing, and error-to-remedy table." },
+      "human_usability": { "score": 8, "max": 8, "note": "Explicit prerequisites, interpretation thresholds, common errors, and reporting checklist are present." },
+      "security": { "score": 12, "max": 12, "note": "No secrets, raw eval/exec pattern, destructive operation, or patient-level workflow was found." },
+      "maintainability": { "score": 10, "max": 12, "note": "Scripts have headers and references are decomposed; pyfocus needs four documented third-party source patches and optional methods remain documentation-led." },
+      "agent_specific": { "score": 16, "max": 20, "note": "Strong trigger precision and escape hatches; parameter calibration is not surfaced as a mandatory agent preflight." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 88.7,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 32, "total": 35 },
+    "inputs": [
+      {
+        "index": 1, "type": "Canonical", "label": "S-PrediXcan single-tissue TWAS", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "run/03_spredixcan.sh executed SPrediXcan.py with explicit GWAS allele/beta/p-value columns; GENE1 Z=6.5 p=8.03e-11 and GENE2 Z=-0.5569 p=0.5776. MetaXcan warned that gwas_N/gwas_h2 were omitted, so calibration was not demonstrated.",
+        "note": "Completed with the documented uncalibrated-output warning.", "basic": 34, "specialized": 50, "total": 84, "assertions_passed": 4, "assertions_total": 5,
+        "assertions": [
+          { "text": "True GENE1 is significant", "result": "PASS", "note": "Z=6.5 and p=8.03e-11." },
+          { "text": "Null GENE2 remains nonsignificant", "result": "PASS", "note": "p=0.5776." },
+          { "text": "Documented GWAS column flags execute", "result": "PASS", "note": "All named columns parsed." },
+          { "text": "Output is calibrated for GWAS N and h2", "result": "FAIL", "note": "Tool explicitly warned gwas_N/gwas_h2 were missing." },
+          { "text": "No causal claim is inferred from TWAS alone", "result": "PASS", "note": "Skill framing preserves association-only interpretation." }
+        ]
+      },
+      {
+        "index": 2, "type": "Variant A", "label": "FUSION TWAS plus conditional analysis", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "run/02_fusion.sh executed the copied shipped scripts/fusion_twas.sh against real PLINK LD fixture data through the required patched local FUSION clone; GENE1 Z=6.5/p=8.03e-11 was retained and GENE2 p=0.58 was dropped.",
+        "note": "Completed and output tables were parsed.", "basic": 38, "specialized": 55, "total": 93, "assertions_passed": 5, "assertions_total": 5,
+        "assertions": [
+          { "text": "FUSION recovers planted GENE1 Z", "result": "PASS", "note": "TWAS.Z=6.5." },
+          { "text": "FUSION keeps null GENE2 nonsignificant", "result": "PASS", "note": "TWAS.P=0.578." },
+          { "text": "Conditional output is materialized", "result": "PASS", "note": "joint included/dropped tables exist and parse." },
+          { "text": "Top1 post-process path runs with documented patch", "result": "PASS", "note": "GENE1 joint P=8e-11." },
+          { "text": "No unsupported causal interpretation is emitted", "result": "PASS", "note": "Workflow labels conditional association, not causality." }
+        ]
+      },
+      {
+        "index": 3, "type": "Edge", "label": "FOCUS fine-mapping at a gene-dense locus", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "run/05_focus.sh built a fresh isolated pyfocus 0.802 venv, applied all four documented patches, ran copied scripts/build_focus_db.py, then ran copied examples/focus_finemap.sh. Parsed PIP output gave GENE1 pips_pop1=1 and NULL.MODEL=7.93e-07.",
+        "note": "Completed with a real pyfocus-schema DB and checked PIP TSV.", "basic": 37, "specialized": 57, "total": 94, "assertions_passed": 5, "assertions_total": 5,
+        "assertions": [
+          { "text": "Custom DB builder writes usable models", "result": "PASS", "note": "Reported 2 genes and 2 weights." },
+          { "text": "FOCUS reaches Calculating PIPs", "result": "PASS", "note": "Completed fine-mapping after all four patches." },
+          { "text": "True gene has high PIP", "result": "PASS", "note": "GENE1 pips_pop1=1." },
+          { "text": "Null model has low PIP", "result": "PASS", "note": "7.93e-07." },
+          { "text": "Relative Windows paths are used", "result": "PASS", "note": "Copied example ran from its data directory." }
+        ]
+      },
+      {
+        "index": 4, "type": "Variant B", "label": "S-MultiXcan joint multi-tissue test", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "run/04_smultixcan.sh freshly ran two per-tissue SPrediXcan calls and SMulTiXcan with --cutoff_condition_number 30. GENE1 joint p=1.83e-09 and GENE2 p=0.8627; per-tissue calls repeated MetaXcan's uncalibrated-warning because gwas_N/gwas_h2 were absent.",
+        "note": "Completed and tab-delimited joint output/filter were checked.", "basic": 33, "specialized": 51, "total": 84, "assertions_passed": 4, "assertions_total": 5,
+        "assertions": [
+          { "text": "Required condition-number flag is accepted", "result": "PASS", "note": "Joint process completed." },
+          { "text": "Joint true gene is significant", "result": "PASS", "note": "p=1.83e-09." },
+          { "text": "Joint null gene remains null", "result": "PASS", "note": "p=0.8627." },
+          { "text": "Tab-delimited significant-gene filter works", "result": "PASS", "note": "Only GENE1 was retained." },
+          { "text": "Per-tissue scores are calibrated", "result": "FAIL", "note": "MetaXcan warned calibration inputs were omitted." }
+        ]
+      },
+      {
+        "index": 5, "type": "Stress", "label": "TWAS, cis-eQTL MR, and coloc triangulation", "status": "PARTIAL", "status_flag": "❌", "executed": true,
+        "execution_note": "run/06_triangulation.sh ran a fresh 30-SNP local fixture: IVW beta=0.2026 p=9.73e-08, minimum F=10.25, and coloc PP.H4=0.9187. Both TSV outputs were written before the known Windows R wrapper exited 139, so content assertions were checked but process status was not clean.",
+        "note": "Outputs completed and parsed; launcher terminated with exit 139 after output materialization.", "basic": 32, "specialized": 50, "total": 82, "assertions_passed": 4, "assertions_total": 5,
+        "assertions": [
+          { "text": "cis-eQTL MR materializes an IVW estimate", "result": "PASS", "note": "beta=0.2026, p=9.73e-08." },
+          { "text": "Instrument strength clears F>10", "result": "PASS", "note": "minimum F=10.25." },
+          { "text": "coloc supports a shared signal", "result": "PASS", "note": "PP.H4=0.9187." },
+          { "text": "Triangulation avoids TWAS-only causal inference", "result": "PASS", "note": "MR and coloc were both executed." },
+          { "text": "The launcher exits cleanly", "result": "FAIL", "note": "R wrapper ended with exit 139 after outputs." }
+        ]
+      },
+      {
+        "index": 6, "type": "Scope Boundary", "label": "MA-FOCUS Windows relative-path execution", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "run/07_mafocus.sh executed a three-population colon-joined relative-path FOCUS call. It detected 3 populations and generated pips_pop1/2/3 and pips_me; repeated panels test command semantics only and are not presented as ancestry evidence.",
+        "note": "Completed interface test; no biological multi-ancestry inference is claimed from duplicated fixtures.", "basic": 36, "specialized": 55, "total": 91, "assertions_passed": 5, "assertions_total": 5,
+        "assertions": [
+          { "text": "Colon-separated MA-FOCUS input parses", "result": "PASS", "note": "Tool detected 3 populations." },
+          { "text": "Relative paths avoid drive-letter splitting", "result": "PASS", "note": "Run completed on Windows." },
+          { "text": "Cross-ancestry PIP columns are emitted", "result": "PASS", "note": "pips_me and per-population columns present." },
+          { "text": "Synthetic repeated panels are not overinterpreted", "result": "PASS", "note": "Execution is explicitly interface-only." },
+          { "text": "Shared-causal-gene assumption is acknowledged", "result": "PASS", "note": "Skill documents heterogeneity limitation." }
+        ]
+      },
+      {
+        "index": 7, "type": "Adversarial", "label": "HLA-DRB1 called confirmed causal", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Direct Mode-D execution is saved in run/08_hla_scope_response.md. It refused confirmation for chr6:32.5 Mb, cited the Skill's chr6:25-35 Mb HLA exclusion, and redirected to HLA-specific allele/amino-acid analysis.",
+        "note": "Completed direct reasoning response with no fabricated numerical claim.", "basic": 38, "specialized": 55, "total": 93, "assertions_passed": 5, "assertions_total": 5,
+        "assertions": [
+          { "text": "HLA causal claim is refused", "result": "PASS", "note": "Standard TWAS/FOCUS is declared non-identifying in MHC." },
+          { "text": "Exclusion interval is correctly applied", "result": "PASS", "note": "chr6:32.5 Mb lies within 25-35 Mb." },
+          { "text": "Alternative HLA analysis is named", "result": "PASS", "note": "HLA-TAPAS is suggested." },
+          { "text": "No clinical or diagnostic conclusion is made", "result": "PASS", "note": "Population-level analysis only." },
+          { "text": "No statistics are invented", "result": "PASS", "note": "Response contains no invented result." }
+        ]
+      }
+    ]
+  },
+  "final": { "static_weighted": 36.4, "dynamic_weighted": 53.2, "score": 90, "max": 100, "grade": "Production Ready", "grade_symbol": "⭐", "deployable": true, "veto_override": false },
+  "key_strengths": [
+    "Fresh executions confirmed FUSION association and conditional output with the documented top1 patch.",
+    "The full four-patch pyfocus route now reached checked single- and multi-population PIP output.",
+    "The Skill correctly requires triangulation and rejects causal claims in the HLA region.",
+    "The S-MultiXcan tab-delimited filter and required condition-number flag behaved as documented."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1", "title": "Add MetaXcan calibration inputs to examples", "observed_in": [1, 4],
+      "problem": "The exact documented SPrediXcan calls completed but MetaXcan warned that gwas_N and gwas_h2 were missing, leaving p-values and Z-scores uncalibrated for inflation.",
+      "root_cause": "The prerequisite mentions N, but the runnable S-PrediXcan and S-MultiXcan examples do not pass the calibration arguments or a documented alternative calibration workflow.",
+      "fix": "Add a mandatory preflight that obtains trait-appropriate GWAS N and h2, then include the accepted MetaXcan calibration flags in the runnable example; if h2 is unavailable, stop or label the output explicitly uncalibrated and prohibit thresholding it."
+    },
+    {
+      "priority": "P1", "title": "Handle Windows R wrapper exit 139 in triangulation", "observed_in": [5],
+      "problem": "The local MR/coloc script wrote and parsed valid outputs, then the R wrapper exited 139, preventing clean automation despite materialized evidence.",
+      "root_cause": "The shared Windows R runtime intermittently terminates after output materialization.",
+      "fix": "Document the verified-output fallback and add a post-run parse check with explicit nonzero-exit handling; prefer a stable R runtime for unattended pipelines."
+    },
+    {
+      "priority": "P2", "title": "Make optional-method execution boundaries clearer", "observed_in": [],
+      "problem": "Several named specialist methods remain taxonomy/escalation guidance rather than locally executable workflows with fixtures.",
+      "root_cause": "The Skill intentionally focuses runnable coverage on FUSION, MetaXcan, and FOCUS.",
+      "fix": "For each retained optional method, either add a minimal verified invocation or label it explicitly as a handoff/reference-only route."
+    }
+  ]
+}
