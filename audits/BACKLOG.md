@@ -22,7 +22,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The example passes cluster_rows=<OLO dendrogram> together with row_split=gene_info$pathway, a combination ComplexHeatmap rejects; the script was never run.
 - Fix: Drop row_split or use a numeric row_split (works with the dendrogram), or apply OLO within each pathway group; supply a runnable data preamble and state the constraint in SKILL.md next to the OLO block.
 
-## P1 (154)
+## P1 (155)
 
 ### `bio-data-visualization-lollipop-protein-maps` — Shipped example never completes and paints wrong colours
 
@@ -1096,6 +1096,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: Seurat's anchor-based integration ships its work to future workers, and the 500 MiB default globals limit is exceeded at very ordinary dataset sizes; the Skill's snippet omits the options() line every Seurat v5 integration tutorial carries.
 - Fix: Add options(future.globals.maxSize = 4 * 1024^3) immediately above the IntegrateLayers call - verified here to make RPCAIntegration run in 20 s at ARI 1.000 - and add the error string to Common Errors.
 
+### `bio-crispr-screens-library-design` — Reject invalid spacer sequences before oligo construction
+
+- Skill: 91, Production Ready · [mrsonord2240/bioSkills@f7185c8](https://github.com/mrsonord2240/bioSkills/tree/f7185c846de4c345fb2588fad1a43cebcd955b25/crispr-screens/library-design) · [viewer](skills/bio-crispr-screens-library-design/mrsonord2240-bioSkills@f7185c8/viewer.md)
+- Observed in inputs: 6
+- Problem: scripts/build_oligo.py accepts a non-ACGT, wrong-length spacer and emits it in a synthesis oligo. This can create an invalid order without warning.
+- Root cause: The helper uppercases and length-budgets the final oligo but never validates spacer alphabet or required 20-nt length.
+- Fix: Before constructing the oligo, require a 20-character A/C/G/T spacer and raise a concise ValueError otherwise; add a CLI test for hyphenated and wrong-length input.
+
 ### `bio-metabolomics-msdial-preprocessing` — Malformed param-file syntax (Key=Value) fails silently, not loudly
 
 - Skill: 91, Limited Release · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/metabolomics/msdial-preprocessing) · [viewer](skills/bio-metabolomics-msdial-preprocessing/mrsonord2240-bioSkills@6847328/viewer.md)
@@ -1256,7 +1264,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (402)
+## P2 (400)
 
 ### `bio-data-visualization-lollipop-protein-maps` — HGVSp edge cases and recurrence semantics undocumented
 
@@ -3778,29 +3786,13 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The prose presents one implementation- and input-dependent observed magnitude too literally.
 - Fix: Replace the literal approximately 2,400 comparison with a checked range or the more robust statement that the synthetic thin library was about 14x the real control-excluded maximum in this run; retain the actionable coverage guidance.
 
-### `bio-crispr-screens-library-design` — find_sgrna_candidates silently drops lowercase sequence input
+### `bio-crispr-screens-library-design` — Add CRISPOR index preflight and output schema
 
-- Skill: 91, Production Ready · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/crispr-screens/library-design) · [viewer](skills/bio-crispr-screens-library-design/mrsonord2240-bioSkills@6847328/viewer.md)
-- Observed in inputs: 4
-- Problem: A lowercase CDS input returns 0 candidates with no warning, because the PAM/spacer regex is case-sensitive (only matches uppercase ACGT). A researcher pasting a lowercase FASTA CDS gets an empty, unexplained result instead of an error or automatic normalization.
-- Root cause: find_sgrna_candidates never normalizes input case before regex matching.
-- Fix: Add cds_sequence = cds_sequence.upper() at the top of find_sgrna_candidates, or raise an explicit error/warning when a sequence contains no uppercase ACGT characters.
-
-### `bio-crispr-screens-library-design` — Recommended Azimuth alternative (CRISPick/crisprScore) remains unverified in this environment
-
-- Skill: 91, Production Ready · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/crispr-screens/library-design) · [viewer](skills/bio-crispr-screens-library-design/mrsonord2240-bioSkills@6847328/viewer.md)
-- Observed in inputs: 7
-- Problem: SKILL.md correctly and honestly flags that neither Broad CRISPick nor R crisprScore::getAzimuthScores() was installed or smoke-tested here, but a user following the Skill's own recommended replacement still cannot confirm it works without testing it themselves.
-- Root cause: Installing/testing crisprScore was explicitly out of scope for this fix pass (per the fix log) and belongs to a tooling pass.
-- Fix: In a future tooling pass, install R crisprScore and smoke-test getAzimuthScores() against a real gene, then update SKILL.md's Version Compatibility section from 'verify the call signature' to a confirmed working example.
-
-### `bio-crispr-screens-library-design` — SKILL.md remains a single large file with weak progressive disclosure
-
-- Skill: 91, Production Ready · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/crispr-screens/library-design) · [viewer](skills/bio-crispr-screens-library-design/mrsonord2240-bioSkills@6847328/viewer.md)
+- Skill: 91, Production Ready · [mrsonord2240/bioSkills@f7185c8](https://github.com/mrsonord2240/bioSkills/tree/f7185c846de4c345fb2588fad1a43cebcd955b25/crispr-screens/library-design) · [viewer](skills/bio-crispr-screens-library-design/mrsonord2240-bioSkills@f7185c8/viewer.md)
 - Observed in inputs: —
-- Problem: SKILL.md is still one ~342-line file (grew slightly from ~305 pre-fix) with no references/ split, and usage-guide.md still substantially duplicates SKILL.md's own tables and examples rather than adding orthogonal depth.
-- Root cause: Pre-existing structural issue from the pre-fix audit; out of scope for this fix round, which targeted the two ticketed P1s.
-- Fix: Split the Genome-Wide Library Selection table, Failure Modes section, and References into a references/ subdirectory, leaving SKILL.md focused on the core design workflow.
+- Problem: Real CFD/MIT scoring is documented but cannot run in this environment without a multi-GB genome index, and the promised custom-library deliverable has no machine-readable column contract.
+- Root cause: The Skill names the external route and deliverables but lacks preflight/format checks for them.
+- Fix: Add a short preflight that names the required genome index and gives a clear blocked message, plus a minimal required-column schema for library table and oligo order.
 
 ### `bio-metabolomics-msdial-preprocessing` — Targeted MRM/PRM/SRM quantification is never routed to metabolomics/targeted-analysis
 

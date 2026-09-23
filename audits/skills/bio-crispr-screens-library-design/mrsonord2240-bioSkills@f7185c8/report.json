@@ -1,0 +1,345 @@
+{
+  "meta": {
+    "skill_name": "bio-crispr-screens-library-design",
+    "description": "Designs pooled sgRNA libraries for CRISPR knockout, interference, activation, Cas12a multiplex, base-editor, and prime-editor screens, including guide selection, controls, oligo layout, and cloned-pool QC.",
+    "evaluated_on": "2026-09-23",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Protocol Design",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 10,
+    "source": "mrsonord2240/bioSkills@f7185c846de4c345fb2588fad1a43cebcd955b25:crispr-screens/library-design",
+    "reaudit_of": "F:\\OpenScience\\audits\\_pre-fix-20260923\\bio-crispr-screens-library-design (2026-09-16 report, final score 91)",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "All synthetic fixtures are labeled synthetic. The only real sequence was freshly fetched from NCBI NM_000546.6; no efficacy, off-target, clinical, or bibliographic result was fabricated."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "All outputs concern research-library design and plasmid-pool QC. No individual diagnosis, treatment recommendation, or medical triage was produced."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "The runs preserve required inputs, distinguish the composition heuristic from Rule Set 2, enforce guide spacing, retain CRISPRa shortfalls, and distinguish pool QC from biological hit calling."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All shipped Python files compiled; the shipped example and both shipped CLIs ran fresh. crisprScore loaded with the documented function signature and its known basilisk/VC9 backend failure was reproduced exactly rather than hidden."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 90,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 11,
+        "max": 12,
+        "note": "The decision tree, guide selection, CRISPRi/a windows, controls, synthesis layout, and QC are covered. Real CRISPOR CFD/MIT execution remains scale-gated because the environment intentionally has no multi-GB genome index."
+      },
+      "reliability": {
+        "score": 10,
+        "max": 12,
+        "note": "The Skill handles missing design inputs, quota shortfalls, lowercase CDS, and oligo-budget overflow. build_oligo.py still silently accepts a non-ACGT, wrong-length spacer and emits an invalid oligo."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "The 186-line SKILL.md routes advanced material into four references and two runnable helpers. The synthetic example intentionally runs a complete 20-gene demo but remains lightweight and deterministic."
+      },
+      "agent_usability": {
+        "score": 15,
+        "max": 16,
+        "note": "Required inputs, chemistry selection, thresholds, caveats, scripts, and reference routing are clear. A structured machine-readable deliverable contract for a complete custom-library order is not specified."
+      },
+      "human_usability": {
+        "score": 8,
+        "max": 8,
+        "note": "The trigger description uses researcher language, documents both off-the-shelf and custom paths, and explicitly tells the agent to stop when required inputs are absent."
+      },
+      "security": {
+        "score": 10,
+        "max": 12,
+        "note": "No secrets, raw-shell interpolation, destructive operations, or sensitive-data retention appear. The invalid-spacer acceptance in build_oligo.py is an input-validation weakness with a direct invalid-synthesis consequence."
+      },
+      "maintainability": {
+        "score": 11,
+        "max": 12,
+        "note": "The split references and small scripts are well-scoped, and the shipped example is deterministic and testable. Ranking functions are intentionally duplicated in the example rather than imported from a reusable module, which creates a small future drift surface."
+      },
+      "agent_specific": {
+        "score": 18,
+        "max": 20,
+        "note": "Trigger precision, reference routing, repeatability, and the missing-input escape hatch are strong. A CRISPOR-index preflight and a schema for the promised library table/oligo order would improve composability and execution feedback."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 90.8,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 39,
+      "total": 40
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Focused Cas9 KO library from the shipped example",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Ran copied pinned examples/design_library.py twice in the audit venv and independently parsed its CSV.",
+        "note": "Both runs exited 0 and were byte-identical: 142 rows, 20 genes at four targeting guides each, no null/short spacers, and the demo control fraction was caveated.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {"text":"Shipped example runs unmodified twice without error", "result":"PASS", "note":"Both return codes were 0."},
+          {"text":"Identical reruns are byte-identical", "result":"PASS", "note":"All three output CSV hashes matched."},
+          {"text":"Example supplies four targeting guides for every listed gene", "result":"PASS", "note":"20 genes each had four guides in the parsed CSV."},
+          {"text":"Every emitted spacer is non-null and 20 nt", "result":"PASS", "note":"142/142 rows passed."},
+          {"text":"Demo control fraction is explicitly caveated", "result":"PASS", "note":"stdout says demo-scale only and points to the real ~1 percent NTC target."}
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Dolcetto CRISPRi lncRNA design",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Ran copied scripts/tss_windows.py and created an audit-only synthetic TSS-relative design table.",
+        "note": "The CLI returned 999950-1000300 for a plus-strand TSS of 1000000; five synthetic genes each held six guides in the documented window.",
+        "basic": 37,
+        "specialized": 55,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {"text":"CRISPRi CLI prints the documented plus-strand Dolcetto search window", "result":"PASS", "note":"Output was 999950 tab 1000300."},
+          {"text":"Every synthetic lncRNA has the requested six guides", "result":"PASS", "note":"Each of five genes had six rows."},
+          {"text":"All designed guides fall within -50/+300", "result":"PASS", "note":"Observed relative positions were 30-80."},
+          {"text":"Output reports guides in the +25/+75 optimum band", "result":"PASS", "note":"25/30 synthetic rows were in that band."}
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Variant B",
+        "label": "Calabrese CRISPRa shortfall and strand orientation",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Ran copied scripts/tss_windows.py on both strands and checked an audit-only Calabrese table.",
+        "note": "The CLI produced 999850-999925 (+) and 1000075-1000150 (-). Four intentionally sparse targets reported 1-3 of six possible guides rather than padded values.",
+        "basic": 36,
+        "specialized": 54,
+        "total": 90,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {"text":"CRISPRa CLI returns documented strand-aware Calabrese windows", "result":"PASS", "note":"Both expected coordinate pairs matched exactly."},
+          {"text":"Every synthetic CRISPRa guide is in the Calabrese window", "result":"PASS", "note":"Relative range was -150 to -76."},
+          {"text":"Narrow-window quota shortfalls are retained, not padded", "result":"PASS", "note":"All four target counts remained below six and were explicit."},
+          {"text":"Shipped helper warns of a narrow-window shortfall", "result":"PASS", "note":"The crispra_window docstring contains the caveat."}
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Edge",
+        "label": "Sequence-case and malformed-input boundary",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Called find_sgrna_candidates from the copied shipped example on uppercase, lowercase, and malformed synthetic CDS strings.",
+        "note": "Lowercase normalization yielded the same 104 candidates as uppercase. A malformed string did not crash and emitted only valid 20-nt ACGT spacers.",
+        "basic": 37,
+        "specialized": 55,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {"text":"Lowercase CDS normalizes to the uppercase candidate set", "result":"PASS", "note":"Both paths returned 104 equal rows."},
+          {"text":"Non-ACGT characters do not crash candidate discovery", "result":"PASS", "note":"Malformed input returned 95 candidates without exception."},
+          {"text":"Malformed input never emits a non-ACGT or non-20-nt spacer", "result":"PASS", "note":"All emitted spacers were inspected."},
+          {"text":"Composition filters enforce GC and poly-T rules", "result":"PASS", "note":"All 104 uppercase candidates met 30-70 percent GC and lacked TTTT."}
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Live TP53 candidate selection and spacing regression",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Fetched NM_000546.6 fresh via public NCBI E-utilities and ran copied guide-selection functions.",
+        "note": "The 1182-nt CDS produced 104 filtered candidates. Naive top-12 ranking had a 1-nt minimum gap; the independence filter filled 12 with a 5-nt minimum gap.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {"text":"Live NCBI request returned a substantial TP53 CDS", "result":"PASS", "note":"Length was 1182 nt."},
+          {"text":"Unfiltered ranking exposes overlapping-guide risk on real sequence", "result":"PASS", "note":"Naive minimum pairwise gap was 1 nt."},
+          {"text":"Independence filter fills 12 guides with >=5-nt spacing", "result":"PASS", "note":"Selected count 12; minimum gap 5 nt."},
+          {"text":"Selected real-sequence spacers remain 20 nt", "result":"PASS", "note":"All selected spacers passed."}
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Edge",
+        "label": "Oligo synthesis layout and invalid spacer boundary",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Ran copied scripts/build_oligo.py for both documented subpools, a 200-nt overflow, and an invalid spacer.",
+        "note": "Correct subpool-1 and subpool-2 oligos were 71 and 73 nt, and overflow raised the documented error. A non-ACGT, wrong-length spacer was incorrectly accepted and embedded in an output oligo.",
+        "basic": 32,
+        "specialized": 50,
+        "total": 82,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {"text":"Subpool-1 oligo is uppercased, correctly prefixed, and 71 nt", "result":"PASS", "note":"Exact output was parsed."},
+          {"text":"Subpool-2 oligo uses its distinct primer and expected length", "result":"PASS", "note":"Exact 73-nt output was parsed."},
+          {"text":"Over-budget oligo input fails with the documented error", "result":"PASS", "note":"231-nt oligo raised ValueError with the 200-nt message."},
+          {"text":"Invalid non-ACGT spacer is rejected before oligo construction", "result":"FAIL", "note":"The CLI exited 0 and emitted an oligo containing ACGT-NOT-A-SPACER."}
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "enAsCas12a paralog array and singleton controls",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Ran a fresh audit-only TTTV-PAM synthetic scan following the copied Skill's Cas12a orientation and control rules.",
+        "note": "Two 23-nt guides per paralog yielded a 2+2 four-guide array; both singleton controls plus double-NTC were retained.",
+        "basic": 37,
+        "specialized": 54,
+        "total": 91,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {"text":"Finder identifies two TTTV-PAM-adjacent 23-nt spacers per paralog", "result":"PASS", "note":"Two candidates were found for each synthetic paralog."},
+          {"text":"Four-guide array has the documented 2+2 paralog split", "result":"PASS", "note":"Array had two A and two B guides."},
+          {"text":"Required singleton and double-NTC controls are retained", "result":"PASS", "note":"All three control conditions were explicit."},
+          {"text":"Skill warns that Cas12a orientation differs from Cas9", "result":"PASS", "note":"The Common Errors text says PAM is 5-prime of spacer."}
+        ]
+      },
+      {
+        "index": 8,
+        "type": "Scope Boundary",
+        "label": "Under-specified library request must stop for inputs",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Executed Mode-D direct reasoning against the copied Skill's explicit required-input gate; no library was fabricated.",
+        "note": "The response asked for gene list, genome assembly, chemistry, and exon/TSS source and made no silent Cas9 default.",
+        "basic": 37,
+        "specialized": 55,
+        "total": 92,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {"text":"Skill contains an explicit stop-and-confirm instruction", "result":"PASS", "note":"Required-input paragraph was found."},
+          {"text":"Direct-mode response asks for missing required inputs", "result":"PASS", "note":"All four prerequisite categories were named."},
+          {"text":"Response does not silently default to Cas9 KO", "result":"PASS", "note":"No chemistry was assumed."}
+        ]
+      },
+      {
+        "index": 9,
+        "type": "Variant B",
+        "label": "crisprScore real-Rule-Set-2 runtime boundary",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Ran saved input9_crisprscore.R through the env's r.sh wrapper and captured the expected backend failure.",
+        "note": "crisprScore 1.10.0 loaded and getAzimuthScores had formals sequences,fork. The actual scoring backend failed exactly as documented because basilisk could not solve Python 2.7's missing vc 9 dependency.",
+        "basic": 35,
+        "specialized": 53,
+        "total": 88,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {"text":"Probe propagates the unavailable backend instead of falsely succeeding", "result":"PASS", "note":"Nonzero process return contained expected_runtime_error."},
+          {"text":"Installed package and exported function signature match the Skill", "result":"PASS", "note":"Version 1.10.0 and formals sequences,fork were printed."},
+          {"text":"Rule Set 2 backend failure is reproduced and precisely attributed", "result":"PASS", "note":"Output includes LibMambaUnsatisfiableError and missing vc 9."},
+          {"text":"Skill documents both limitation and CRISPick alternative", "result":"PASS", "note":"Version Compatibility text contains both."}
+        ]
+      },
+      {
+        "index": 10,
+        "type": "Stress",
+        "label": "Plasmid-pool skew diagnostic",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Calculated audit-only synthetic count metrics and followed the copied failure-mode guidance.",
+        "note": "The intentionally skewed pool exceeded both the <0.1 Gini and <5 skew targets. The response retained PCR bias and synthesis dropout as competing causes and did not call biological hits.",
+        "basic": 37,
+        "specialized": 55,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {"text":"Synthetic pool truly violates documented QC thresholds", "result":"PASS", "note":"Gini and top/bottom-decile skew both exceeded their limits."},
+          {"text":"Diagnostic preserves competing documented causes", "result":"PASS", "note":"It names PCR bias and synthesis dropout without over-claiming one."},
+          {"text":"Remediation is grounded in shipped failure-mode guidance", "result":"PASS", "note":"It uses the cap-15-cycles and replacement-guide recommendations."},
+          {"text":"Response keeps pool QC distinct from biological hit calling", "result":"PASS", "note":"It explicitly rejects interpreting the artifact as a hit."}
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 36.0,
+    "dynamic_weighted": 54.5,
+    "score": 91,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Every runnable shipped component compiled and executed fresh from a byte-identical audit copy; the 20-gene example was reproducible byte-for-byte across reruns.",
+    "Guide independence is genuinely enforced on a fresh live TP53 CDS: the filter replaces a 1-nt naive overlap with a full 12-guide set spaced at least 5 nt apart.",
+    "The final-pass crisprScore claim is accurate and evidence-backed: package interface works, while the unavailable Python-2 VC9 backend is named honestly and CRISPick remains the usable real Rule Set 2 route.",
+    "The Skill handles scientifically important boundaries well: required-input stop, CRISPRa shortfalls, Cas12a PAM orientation and singleton controls, and non-biological plasmid-pool QC diagnosis."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "Reject invalid spacer sequences before oligo construction",
+      "observed_in": [6],
+      "problem": "scripts/build_oligo.py accepts a non-ACGT, wrong-length spacer and emits it in a synthesis oligo. This can create an invalid order without warning.",
+      "root_cause": "The helper uppercases and length-budgets the final oligo but never validates spacer alphabet or required 20-nt length.",
+      "fix": "Before constructing the oligo, require a 20-character A/C/G/T spacer and raise a concise ValueError otherwise; add a CLI test for hyphenated and wrong-length input."
+    },
+    {
+      "priority": "P2",
+      "title": "Add CRISPOR index preflight and output schema",
+      "observed_in": [],
+      "problem": "Real CFD/MIT scoring is documented but cannot run in this environment without a multi-GB genome index, and the promised custom-library deliverable has no machine-readable column contract.",
+      "root_cause": "The Skill names the external route and deliverables but lacks preflight/format checks for them.",
+      "fix": "Add a short preflight that names the required genome index and gives a clear blocked message, plus a minimal required-column schema for library table and oligo order."
+    }
+  ]
+}
