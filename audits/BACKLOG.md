@@ -1280,7 +1280,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (391)
+## P2 (390)
 
 ### `bio-data-visualization-lollipop-protein-maps` — HGVSp edge cases and recurrence semantics undocumented
 
@@ -3306,30 +3306,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: No references/ subfolder is used at all; every table lives directly in SKILL.md.
 - Fix: Move the Algorithmic Taxonomy, Per-Method Failure Modes, and Reconciliation Across Methods tables into references/methods.md, keeping SKILL.md to the Decision Tree and the single Cross-Trait LDSC Standard Workflow.
 
-### `bio-causal-genomics-pleiotropy-detection` — SIMEX correction is not flagged as capable of moving further from ground truth than the naive estimate
-
-- Skill: 89, Production Ready · [mrsonord2240/bioSkills@39e7eec](https://github.com/mrsonord2240/bioSkills/tree/39e7eec22fac8904d4b9ca340adfb0eebc98e590/causal-genomics/pleiotropy-detection) · [viewer](skills/bio-causal-genomics-pleiotropy-detection/mrsonord2240-bioSkills@39e7eec/viewer.md)
-- Observed in inputs: 5
-- Problem: In this audit's stress-input run, the SIMEX-corrected Egger slope (0.8536) landed further from the planted ground truth (0.3) than the naive, uncorrected Egger slope (0.6658). SKILL.md presents SIMEX as unconditionally 'the rescue' for I^2_GX between 0.6 and 0.9 without noting it can, in finite samples, overshoot.
-- Root cause: SIMEX corrects a known measurement-error bias mechanism but its extrapolation step is itself noisy in small samples; the Skill's framing implies monotonic improvement.
-- Fix: Add a one-line caveat to the MR-Egger NOME violation section: SIMEX corrects a known bias direction but is not guaranteed to reduce error in every finite sample; report both naive and SIMEX-corrected slopes with CIs rather than presenting the corrected value as strictly superior.
-
-### `bio-causal-genomics-pleiotropy-detection` — Reproducibility guidance (set.seed) covers only mr_presso(), not the rest of the battery
-
-- Skill: 89, Production Ready · [mrsonord2240/bioSkills@39e7eec](https://github.com/mrsonord2240/bioSkills/tree/39e7eec22fac8904d4b9ca340adfb0eebc98e590/causal-genomics/pleiotropy-detection) · [viewer](skills/bio-causal-genomics-pleiotropy-detection/mrsonord2240-bioSkills@39e7eec/viewer.md)
-- Observed in inputs: 1
-- Problem: The P2 fix added set.seed(42) immediately before SKILL.md's inline mr_presso() call, but mr()'s weighted-median and weighted-mode methods also use an internal bootstrap for their SEs with no exposed seed parameter and no seed set in SKILL.md's Standard Sensitivity Battery block; two runs of Input 1 in this audit produced slightly different median/mode SEs (0.0604/0.0777 vs 0.0620/0.0849) for identical point estimates.
-- Root cause: The reproducibility fix targeted the one Monte-Carlo method (PRESSO) the pre-fix audit's P2 named, not every stochastic step in the battery.
-- Fix: Move the set.seed(42) call in the Standard Sensitivity Battery code block to before the entire method battery (ahead of the mr() call), not just before mr_presso(), and note that TwoSampleMR's bootstrap SEs for median/mode are also seed-sensitive.
-
-### `bio-causal-genomics-pleiotropy-detection` — Reference-table volume still lives entirely in SKILL.md, no references/ folder
-
-- Skill: 89, Production Ready · [mrsonord2240/bioSkills@39e7eec](https://github.com/mrsonord2240/bioSkills/tree/39e7eec22fac8904d4b9ca340adfb0eebc98e590/causal-genomics/pleiotropy-detection) · [viewer](skills/bio-causal-genomics-pleiotropy-detection/mrsonord2240-bioSkills@39e7eec/viewer.md)
-- Observed in inputs: —
-- Problem: The pre-fix P2 recommendation asked for shared tabular content (LCV interpretation table, algorithmic taxonomy, quantitative thresholds) to move into a references/ file both SKILL.md and usage-guide.md could point to. The redundancy pass instead consolidated everything into SKILL.md itself (452->473 lines), which fixed the duplication problem but left SKILL.md as a single large file with no references/ split.
-- Root cause: The fix pass's scope was stated as 'remove redundancy' (delete duplicate content), which is a different, narrower fix than 'extract shared content to a references/ file' -- the former was completed, the latter was not attempted.
-- Fix: As a follow-up (not blocking): extract the Algorithmic Taxonomy, Quantitative Thresholds, and LCV gcp interpretation tables into references/pleiotropy-methods.md, leaving SKILL.md with pointers, to bring SKILL.md back toward the 500-line progressive-disclosure guideline with more margin.
-
 ### `bio-crispr-screens-perturb-seq-analysis` — State executable limits for optional methods
 
 - Skill: 89, Limited Release · [mrsonord2240/bioSkills@6ca8a47](https://github.com/mrsonord2240/bioSkills/tree/6ca8a47d4a9743fbf9a090ddbc5609b1b6b6a504/crispr-screens/perturb-seq-analysis) · [viewer](skills/bio-crispr-screens-perturb-seq-analysis/mrsonord2240-bioSkills@6ca8a47/viewer.md)
@@ -4193,6 +4169,22 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: This runtime reports exit 139 after valid GenomicSEM output materializes, which can mislead automation that trusts exit codes alone.
 - Root cause: Observed in the local Windows R runtime rather than in skill logic.
 - Fix: Keep content assertions in automation and document the host-runtime caveat in environment tooling, not as a scientific-method claim.
+
+### `bio-causal-genomics-pleiotropy-detection` — Seed the standalone SIMEX example
+
+- Skill: 94, Production Ready · [mrsonord2240/bioSkills@5c1c030](https://github.com/mrsonord2240/bioSkills/tree/5c1c030c4152f90b8a1457853c927e8568a710fd/causal-genomics/pleiotropy-detection) · [viewer](skills/bio-causal-genomics-pleiotropy-detection/mrsonord2240-bioSkills@5c1c030/viewer.md)
+- Observed in inputs: 5
+- Problem: The standalone SIMEX script uses B=1000 stochastic refits without setting a seed.
+- Root cause: The seed guidance is explicit for the sensitivity battery but not repeated in the separate SIMEX example.
+- Fix: Add a documented set.seed call before simex(), or accept a seed parameter and print it in the report.
+
+### `bio-causal-genomics-pleiotropy-detection` — Label the CAUSE demo nuisance warning
+
+- Skill: 94, Production Ready · [mrsonord2240/bioSkills@5c1c030](https://github.com/mrsonord2240/bioSkills/tree/5c1c030c4152f90b8a1457853c927e8568a710fd/causal-genomics/pleiotropy-detection) · [viewer](skills/bio-causal-genomics-pleiotropy-detection/mrsonord2240-bioSkills@5c1c030/viewer.md)
+- Observed in inputs: 11
+- Problem: The shipped CAUSE demo intentionally uses 50,000 variants and emits a package warning that fewer than 100,000 nuisance variants may be unstable.
+- Root cause: The lightweight synthetic demonstration is smaller than CAUSE's nuisance-estimation recommendation.
+- Fix: Add one sentence beside the demo that its 50,000-variant size is pedagogic and real analyses should follow the package's larger-nuisance-variant guidance.
 
 ### `bio-crispr-screens-screen-qc` — Documented sgRNA-identifier-column requirement is not enforced by validate_counts()
 
