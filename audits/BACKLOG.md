@@ -3810,14 +3810,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The Skill (like its siblings in this folder) ships no test suite -- verification is audit-driven, not CI-driven.
 - Fix: Add a small pytest module (or a documented manual-check script) that mocks a bytes-typed handle body containing '<ERROR>' and a Count=0 ESearch response, asserting both code paths recover/no-op without raising.
 
-### `bio-causal-genomics-mediation-analysis` — SKILL.md's own Mediational E-Value code example crashes as written
-
-- Skill: 91, Production Ready · [mrsonord2240/bioSkills@6e5f414](https://github.com/mrsonord2240/bioSkills/tree/6e5f41487089c69a9978cede7d7614b1da81f110/causal-genomics/mediation-analysis) · [viewer](skills/bio-causal-genomics-mediation-analysis/mrsonord2240-bioSkills@6e5f414/viewer.md)
-- Observed in inputs: 12
-- Problem: The 'Mediational E-Value for Sensitivity' Working Code Pattern ends with `evalues.RR(acme_rr, lo=acme_lower_rr, hi=NULL)`. On installed EValue 4.1.4, `args(evalues.RR)` shows the `hi` parameter defaults to `NA`, not `NULL`; passing `hi=NULL` crashes with `Error in if (est < true & !is.na(hi)) { : argument is of length zero`. An agent following this pattern verbatim would hit an unexplained crash on a routine sensitivity-analysis step.
-- Root cause: The code block was written assuming `hi=NULL` is an inert 'no upper bound' sentinel, matching the convention in some other R packages, but EValue's own default sentinel for 'no value' is `NA`, not `NULL`; this line was never executed by either the pre-fix or the 88 re-audit (both evaluated Input 7's E-value discussion as a Mode A direct response, not by running this specific code block), so the defect survived two prior audit rounds untouched by the redundancy pass that introduced the formula text around it.
-- Fix: Change the code block's final line to omit `hi` entirely (`evalues.RR(acme_rr, lo=acme_lower_rr)`) or pass `hi=NA` explicitly; both run cleanly and return the same point/lower E-values verified in this round's Input 12.
-
 ### `bio-crispr-screens-bagel-essentiality` — Calibrate thin-library magnitude as a range
 
 - Skill: 91, Production Ready · [mrsonord2240/bioSkills@a43fb07](https://github.com/mrsonord2240/bioSkills/tree/a43fb0726ecb90a9ca8ea660404cd98ba2989c18/crispr-screens/bagel-essentiality) · [viewer](skills/bio-crispr-screens-bagel-essentiality/mrsonord2240-bioSkills@a43fb07/viewer.md)
@@ -3961,6 +3953,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: VerifyBamID2 does not produce FREEMIX on the slice and somalier cannot extract without a full GRCh38 FASTA.
 - Root cause: The environment contains only small slices rather than a matched WGS/WES BAM and complete reference.
 - Fix: Provide a small lawful whole-genome/exome fixture with its matching GRCh38 reference or a documented remote accession and expected non-sensitive digest.
+
+### `bio-causal-genomics-mediation-analysis` — Repair shared R package exit-139 behavior
+
+- Skill: 92, Production Ready · [mrsonord2240/bioSkills@e46d106](https://github.com/mrsonord2240/bioSkills/tree/e46d106e931f1db5ed963fa29af3f8a22402915d/causal-genomics/mediation-analysis) · [viewer](skills/bio-causal-genomics-mediation-analysis/mrsonord2240-bioSkills@e46d106/viewer.md)
+- Observed in inputs: 13, 14
+- Problem: mediation, TwoSampleMR, and HIMA can finish valid computations and then exit 139 in the supplied R runtime, even for a one-line library load.
+- Root cause: The failure is reproduced without Skill code, so it belongs to the shared runtime or compiled package stack rather than this Skill.
+- Fix: Audit-environment owner should repair or rebuild the affected R package/runtime stack and repeat the smoke tests. No change to this Skill is indicated by the evidence.
 
 ### `bio-covalent-design` — State the alpha-helper single-site limit
 
