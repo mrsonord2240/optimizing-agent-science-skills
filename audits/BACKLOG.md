@@ -4290,13 +4290,13 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The executable examples focus on comparative iterative search, Pfam, and Foldseek.
 - Fix: When production databases are available, add small parameterized scripts or explicit runnable mini-fixtures for saved-PSSM reuse and HHsearch output inspection.
 
-### `bio-shape-similarity` — obabel --gen3D can warn 'NaN in calculated coordinates' on some fused-ring scaffolds while still producing usable output
+### `bio-shape-similarity` — Add calibration feasibility check
 
-- Skill: 92, Production Ready · [mrsonord2240/bioSkills@cb11853](https://github.com/mrsonord2240/bioSkills/tree/cb118537c46641fd5820681ffd41fd451b97005a/chemoinformatics/shape-similarity) · [viewer](skills/bio-shape-similarity/mrsonord2240-bioSkills@cb11853/viewer.md)
-- Observed in inputs: 6
-- Problem: Building a mol2 for a naphthalene-containing SMILES via the SKILL.md's own obabel --gen3D command printed an Open Babel warning about NaN coordinates during 3D building, even though the final mol2 had valid non-zero coordinates and ShaEP scored it sensibly (not the silent all-zero-coordinate trap the audit env's TOOLS.md separately documents and works around).
-- Root cause: Open Babel's force-field builder can emit an internal NaN warning mid-build on some conformers before recovering; SKILL.md's obabel step doesn't tell the reader to sanity-check the printed mol2 block when this specific warning appears.
-- Fix: Add one line to the ShaEP subsection: if obabel prints a coordinate-related warning during --gen3D, inspect the output mol2's @<TRIPOS>ATOM block for non-zero, non-repeating coordinates before trusting the downstream ShaEP score.
+- Skill: 92, Production Ready · [mrsonord2240/bioSkills@2f8cee5](https://github.com/mrsonord2240/bioSkills/tree/2f8cee570c21b48f08e0b15b1662c6d363bbf09b/chemoinformatics/shape-similarity) · [viewer](skills/bio-shape-similarity/mrsonord2240-bioSkills@2f8cee5/viewer.md)
+- Observed in inputs: 2
+- Problem: A labeled reference run can contain overlapping ECFP4 values, and a naive cutoff derivation excluded its listed true hop while returning zero candidates.
+- Root cause: The Skill correctly requires task-specific calibration but does not show how to detect non-separability or report that no single cutoff is justified.
+- Fix: Add a short calibration example or decision rule: inspect class overlap, report retrieval/enrichment or a threshold trade-off, and stop rather than emit a misleading universal cutoff when the labels are not separable.
 
 ### `bio-single-cell-data-io` — scale.data workaround shows extraction but not how to persist it alongside the h5ad
 

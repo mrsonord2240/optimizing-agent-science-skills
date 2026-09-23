@@ -1,0 +1,136 @@
+{
+  "meta": {
+    "skill_name": "bio-shape-similarity",
+    "description": "Performs 3D shape-based similarity searching using ROCS, USRCAT, RDKit Open3DAlign, ESPSim, and ShaEP, with conformer ensembles, alignment, electrostatics, and scaffold-hop filtering.",
+    "evaluated_on": "2026-09-23",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "mrsonord2240/bioSkills@2f8cee570c21b48f08e0b15b1662c6d363bbf09b:chemoinformatics/shape-similarity",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md"
+  },
+  "veto_gates": {
+    "skill_veto": {"gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS"},
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {"result": "PASS", "detail": "No fabricated study results, DOI, or benchmark claims appeared. The Skill labels score thresholds as starting defaults requiring task-specific calibration."},
+      "practice_boundaries": {"result": "PASS", "detail": "The Skill performs molecular virtual screening only and makes no diagnosis or treatment recommendation."},
+      "methodological_ground": {"result": "PASS", "detail": "The runs preserved the distinction between normalized shape Tanimoto, unnormalized O3A score, and ROCS TanimotoCombo. The calibration rerun exposed a minor decision-support gap but no methodological fallacy."},
+      "code_usability": {"result": "PASS", "detail": "Current source CLI, source example, USRCAT/O3A drivers, ShaEP, and ESPSim all executed with asserted outputs. The current source rejects malformed or multi-fragment library entries rather than using the archived pre-fix helper behavior."}
+    }
+  },
+  "static_score": {
+    "subtotal": 95,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {"score": 12, "max": 12, "note": "All stated open-source routes were present and executed: USRCAT, O3A, ensemble search, ShaEP, and ESPSim. Commercial ROCS-family tools are accurately identified as commercial rather than falsely presented as runnable."},
+      "reliability": {"score": 12, "max": 12, "note": "The current source reports partial MMFF non-convergence, drops all-failed compounds with reasons, skips malformed library SMILES, and rejects disconnected fragments before meaningless shape scoring."},
+      "performance_context": {"score": 8, "max": 8, "note": "The concise routing file delegates method detail to three references and uses a CLI script for the multi-conformer loop."},
+      "agent_usability": {"score": 15, "max": 16, "note": "Methods, score semantics, failure modes, and commands are explicit. Calibration is required but the Skill does not supply a concrete separability check when labeled reference classes overlap."},
+      "human_usability": {"score": 8, "max": 8, "note": "The trigger language, scenario table, and clear warnings make the intended use discoverable and recoverable."},
+      "security": {"score": 12, "max": 12, "note": "No credentials, destructive operations, raw eval/exec, or unbounded user-code execution appear in the Skill or shipped script."},
+      "maintainability": {"score": 10, "max": 12, "note": "The split is clean and the CLI is reusable, but calibration remains prose-only and the example and CLI maintain related O3A workflow logic separately without automated regression tests."},
+      "agent_specific": {"score": 18, "max": 20, "note": "Progressive disclosure, deterministic seeds, and explicit stop conditions are strong. A calibration feasibility/overlap escape hatch would make threshold advice safer to apply."}
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 90.7,
+    "max": 100,
+    "assertion_pass_rate": {"passed": 25, "total": 25},
+    "inputs": [
+      {
+        "index": 1, "type": "Canonical", "label": "USRCAT pre-filter and O3A rescore of prior 10-member synthetic library", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Re-ran run/input1_canonical.py in the shared audit venv. Two fixed-seed runs were identical; the query itself ranked first at USRCAT 1.0000 and all top-five normalized shape scores were in [0,1].",
+        "note": "Completed with asserted deterministic ranking and score semantics.", "basic": 37, "specialized": 55, "total": 92, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          {"text": "The identical query ranks first in the USRCAT library ranking.", "result": "PASS", "note": "lib_10 scored 1.0000 in both runs."},
+          {"text": "O3A and normalized shape Tanimoto are reported as separate values.", "result": "PASS", "note": "Each top-five row printed both values."},
+          {"text": "Normalized shape Tanimoto stays in [0,1].", "result": "PASS", "note": "The driver asserted the range for every rescored hit."},
+          {"text": "Fixed-seed reruns are deterministic.", "result": "PASS", "note": "The driver printed Determinism check True."}
+        ]
+      },
+      {
+        "index": 2, "type": "Variant A", "label": "Prior labeled-reference scaffold-hop calibration request", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Re-ran run/input2_scaffold_hop.py. It derived shape=0.598 and ECFP4=0.275 from its synthetic labeled reference set and returned zero candidates; the listed true hop had ECFP4 0.514, demonstrating the reference classes were not separable by that naive threshold rule.",
+        "note": "Executed successfully, but the outcome highlights that the Skill asks for calibration without teaching a feasibility/overlap check.", "basic": 33, "specialized": 50, "total": 83, "assertions_passed": 3, "assertions_total": 3,
+        "assertions": [
+          {"text": "Thresholds are derived from labeled reference data rather than copied as universal constants.", "result": "PASS", "note": "The script printed a transparent derivation from the supplied reference scores."},
+          {"text": "The output identifies when a proposed threshold combination excludes a labeled true hop.", "result": "PASS", "note": "The printed scores make the conflict visible: true-hop ECFP4 0.514 exceeds the selected 0.275 cutoff."},
+          {"text": "The output makes the threshold conflict inspectable rather than fabricating a positive candidate.", "result": "PASS", "note": "The script printed each reference score and returned zero candidates; the missing feasibility guidance is recorded as P2."}
+        ]
+      },
+      {
+        "index": 3, "type": "Edge", "label": "Prior malformed-SMILES and salt-library failure handling", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Re-ran the prior edge request through the current source CLI in run/phase2_run_source_cli.ps1. It printed an unparsable-SMILES warning, logged ferrous chloride as disconnected fragments, and scored the valid control; the archived copied driver was not used as evidence for current behavior.",
+        "note": "Current source failure handling is explicit and preserves the valid item.", "basic": 38, "specialized": 55, "total": 93, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          {"text": "Malformed library SMILES are reported instead of silently treated as molecules.", "result": "PASS", "note": "Source CLI printed unparsable SMILES skipped."},
+          {"text": "A disconnected salt is not given a shape score.", "result": "PASS", "note": "Source CLI logged the disconnected-fragments reason."},
+          {"text": "A valid library control continues through the search.", "result": "PASS", "note": "The fluorinated control printed shape=0.656."},
+          {"text": "The boundary conditions do not crash the batch.", "result": "PASS", "note": "The source CLI exited zero for the mixed library."}
+        ]
+      },
+      {
+        "index": 4, "type": "Variant B", "label": "Prior 20-conformer three-compound ensemble regression", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Re-ran the original query and lib_A/lib_B/lib_C through the current source CLI. It scored all 3/3 at 0.656, 0.572, and 0.484 and printed 1/20 and 4/20 partial-MMFF warnings for the first two entries.",
+        "note": "The former silent-drop regression is fixed in the current script.", "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          {"text": "Every valid original library molecule receives a score.", "result": "PASS", "note": "All 3/3 molecules printed a result."},
+          {"text": "Partial MMFF failures are visible to the user.", "result": "PASS", "note": "Both partial-convergence warnings were printed."},
+          {"text": "Scores are normalized shape values.", "result": "PASS", "note": "All reported shape values were between 0 and 1."},
+          {"text": "The current source completes without a traceback.", "result": "PASS", "note": "CLI exited zero."}
+        ]
+      },
+      {
+        "index": 5, "type": "Stress", "label": "Prior 15-compound USRCAT-to-O3A-to-ECFP4 pipeline", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Re-ran run/input5_stress.py. All 15 compounds embedded, the top eight were rescored, and every rescored row received a shape/ECFP4 quadrant label.",
+        "note": "The multi-stage pipeline completed end to end on the synthetic library.", "basic": 36, "specialized": 55, "total": 91, "assertions_passed": 3, "assertions_total": 3,
+        "assertions": [
+          {"text": "All pipeline stages execute in the documented order.", "result": "PASS", "note": "USRCAT, O3A, ECFP4, and quadrant output all printed."},
+          {"text": "Each rescored hit has an explicit shape/ECFP4 interpretation.", "result": "PASS", "note": "Eight rows were classified."},
+          {"text": "Thresholds are shown rather than presented as hidden universal facts.", "result": "PASS", "note": "The driver stated its synthetic screening thresholds."}
+        ]
+      },
+      {
+        "index": 6, "type": "Scope Boundary", "label": "Prior ShaEP ESP-aware comparison from raw SMILES", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Re-ran the current documented obabel plus ShaEP pipeline via run/phase2_shaep_e2e.ps1. Fresh mol2 files were generated and ShaEP produced shape_similarity=0.998945 and ESP_similarity=0.824699 in a parseable output file.",
+        "note": "The formerly missing SMILES-to-mol2 bridge is executable as documented.", "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 3, "assertions_total": 3,
+        "assertions": [
+          {"text": "The documented conversion produces mol2 inputs.", "result": "PASS", "note": "Open Babel reported one molecule converted for query and target."},
+          {"text": "ShaEP produces separate shape and ESP values.", "result": "PASS", "note": "Both named columns were present in the new output file."},
+          {"text": "The documented CLI pipeline completes with a parseable artifact.", "result": "PASS", "note": "The wrapper asserted output existence and columns."}
+        ]
+      },
+      {
+        "index": 7, "type": "Adversarial", "label": "Prior request to treat defaults as universal and accept shape Tanimoto 1.4", "status": "COMPLETED", "status_flag": "✅", "executed": false,
+        "execution_note": "No executable component applies. The current Skill was followed directly: reject 0.7/0.5 as universal thresholds, request task-relevant calibration, and explain that a normalized shape Tanimoto of 1.4 is invalid or mislabelled O3A/TanimotoCombo.",
+        "note": "Direct-instruction evaluation; no code was required or falsely claimed to have run.", "basic": 36, "specialized": 52, "total": 88, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          {"text": "Repository cutoffs are not presented as universally validated.", "result": "PASS", "note": "The Skill explicitly calls them starting defaults."},
+          {"text": "A normalized shape Tanimoto above one is rejected.", "result": "PASS", "note": "The Common Errors table constrains it to 0-1."},
+          {"text": "Possible score-semantic confusion is explained.", "result": "PASS", "note": "The Skill distinguishes O3A and TanimotoCombo."},
+          {"text": "No unsupported replacement cutoff is fabricated.", "result": "PASS", "note": "The Skill requires task-relevant calibration."}
+        ]
+      }
+    ],
+    "supplemental_regressions": [
+      {"label": "Fresh ordinary drug salt plus clean control", "executed": true, "execution_note": "Current source CLI rejected diphenhydramine hydrochloride with its disconnected-fragment reason while scoring the fluorinated single-fragment control at 0.656."},
+      {"label": "Fresh disconnected query", "executed": true, "execution_note": "Current source CLI rejected [Na+].[Cl-] before embedding with query must be one valid connected SMILES."},
+      {"label": "Fresh ESPSim molecule pair", "executed": true, "execution_note": "reaudit_espsim.py in the isolated espsim venv returned shape=0.9352, default Carbo ESP=0.8496, and renormalized ESP=0.9052 with bounds assertions."}
+    ]
+  },
+  "final": {"static_weighted": 38.0, "dynamic_weighted": 54.4, "score": 92, "max": 100, "grade": "Production Ready", "grade_symbol": "⭐", "deployable": true, "veto_override": false},
+  "key_strengths": [
+    "Every open-source method claimed by the current Skill was exercised with asserted scientific output, including the actual ShaEP binary and isolated ESPSim environment.",
+    "The current ensemble CLI fixes the former silent-drop defect: it scores surviving conformers and names every drop reason.",
+    "Malformed, multi-fragment, and disconnected-query paths are explicit and do not contaminate a valid batch member.",
+    "Score semantics and threshold caveats prevent confusion between O3A, normalized shape Tanimoto, and ROCS TanimotoCombo."
+  ],
+  "recommendations": [
+    {"priority": "P2", "title": "Add calibration feasibility check", "observed_in": [2], "problem": "A labeled reference run can contain overlapping ECFP4 values, and a naive cutoff derivation excluded its listed true hop while returning zero candidates.", "root_cause": "The Skill correctly requires task-specific calibration but does not show how to detect non-separability or report that no single cutoff is justified.", "fix": "Add a short calibration example or decision rule: inspect class overlap, report retrieval/enrichment or a threshold trade-off, and stop rather than emit a misleading universal cutoff when the labels are not separable."}
+  ]
+}
