@@ -79,3 +79,72 @@ Disagreement between copies: usage-guide named `PDB100` and bioconda `tmalign`; 
 - ChimeraX and the pLM aligners were never executed (removed).
 - Examples still hard-code placeholder file names (`reference.pdb`, `query.pdb`, `/path/to/afdb`); not a listed
   finding, left as is.
+
+## 2026-09-21 - fix/alignment-structural-alignment (worktree `F:\OpenScience\wt\alignment-structural-alignment`, from staging main 431aa55)
+
+Second pass, Sam's Production Ready batch: audit `eval_report_bio-alignment-structural_result.json` (4 P2, audited at
+upstream d91ed3d). Commits `e33c5f3` (fix), `5388004` (split), `17418eb` (scripts/). Env `alignment`: WSL Foldseek
+10.941cd33, Foldmason 4.dd3c235, TM-align 20240303, US-align 20241108, Biopython 1.88 (Windows venv for the
+Superimposer runs, WSL env python for the rest). The audit's `data\` folder is gone, so runs use
+`audit-envs\alignment\public-data\structures` (real PDB entries: 1MBN, 1A6M, 1A3N, 1ATP, 1HCK, ...).
+
+### Findings
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+| --- | --- | --- | --- | --- |
+| Inline Superimposer block has no name check; MSE/modified residues undocumented | P2 | inline block deleted (duplicated `examples/biopython_superimposer.py`, see scripts/ below); SKILL points at the example and states both refusals, and that HETATM MSE/modified residues are skipped by `id[0]==' '` (missing, not mis-paired); example docstring says the same, `__main__` reads paths from argv. Before that deletion the inline block got the residue-name check and was run | ran: inline block 1MBN/1A6M 0.483 A over 151 pairs, 1MBN/1A3N asserted (116/141 names differ), 1ATP/1HCK asserted (no shared key); example gives the same, refuses 1MBN/1A3N | did not accept `H_MSE` (audit's optional suggestion): would pair MSE to MET by key and the name check would then flag every one; the 1-4% figure is the audit's, not re-measured |
+| Foldseek-Multimer 10-100x pairwise, >99% and PDB100/AFDB-Multimer claims unverified | P2 | table row, section intro and decision guide reworded: scale-only citation (3-4 orders of magnitude at database scale), no gain expected for one pair, the audit's measured 1.7x-5.8x on 62 small oligomers, prefilter reported 22 of 62 targets; PDB100/AFDB-Multimer dropped, target is a folder or a `createdb` of PDB entries, placeholder `afdb_multimer_or_pdb_dir` -> `complexes_dir/`; usage-guide prompt no longer names AFDB-Multimer | help: `foldseek databases` (10.941cd33) lists Alphafold/*, ESMAtlas30, PDB, CATH50, BFMD, BFVD, ProstT5 and no multimer or PDB100 entry | the 1.7x/5.8x timings are the audit's (one run), labelled as such; I did not re-time them |
+| Foldmason unseeded variance figures set-specific | P2 | "74% shared / 88% homologous" replaced by "depends on the set: from under 1% to about 40% of aligned pairs differing" | ran: 3 unseeded `--refine-iters 100` runs on 12 real structures, pair-set overlap 0.80-0.88 of the union (12-20% differ), consistent with the range | range endpoints are the audit's (0.6% / 44%); my 12-structure set falls inside |
+| Housekeeping: description "Predict"; Hamamsy 2024 reference; example placeholder names; foldseek_search prints parameter table; no references/ split | P2 | description now "Score and superpose"; Hamamsy reference deleted (its pLM section is gone); all four examples take paths from argv; `foldseek_search.py` passes `-v 1`; split done (below) | ran: `foldseek_search.py` on a 12-entry DB, type 2 (5 rows shown, no parameter table) and type 1 (15 confident of 17 rows); `tm_align_pairwise.py 1A3N 1MBN` TM 0.836/0.900, RMSD 1.56, 141 aligned; `foldmason_msa.py` on 3 files -> 3 rows x 153 cols, 153/153 columns scored; `foldseek -v 1` output byte-identical to default (`cmp`); all `py_compile` | |
+
+### Split (own commit `5388004`)
+
+SKILL.md 332 -> 286 lines (270 after the scripts/ commit). Verbatim moves; every non-blank old line is found in
+SKILL.md + references/ except the 3 decision-tree rows that gained a pointer; fences balanced; moved bash fences
+pass `bash -n`, the Foldmason python fence parses.
+
+| moved | to |
+| --- | --- |
+| "Foldseek-Multimer for Database-Scale Complex Search" body (mode table, commands, `_report` columns, decision guide, reporting convention) | `references/foldseek-multimer.md` (SKILL keeps a 3-line summary) |
+| "Local DALI with DaliLite v5" paragraph, `import.pl`/`dali.pl` block, result-file trap, checked Z-scores | `references/dalilite.md` (SKILL keeps one pointer sentence) |
+| "Foldmason easy-msa" (command, seeding paragraph, per-column LDDT JSON snippet, `-1` note) | `references/foldmason.md` (SKILL keeps the command, the seed rule, the `scores` key) |
+
+### scripts/ (own commit `17418eb`)
+
+| old location | disposition |
+| --- | --- |
+| SKILL.md Bio.PDB.Superimposer inline block (21 lines) | duplicates `examples/biopython_superimposer.py`: deleted, SKILL points at the example (invocation + `superpose_ca` import). Ran as invoked: 1MBN/1A6M 0.483 A over 151 pairs; 1MBN/1A3N refuses |
+| every other block (TMalign/USalign/TMscore/foldseek/foldmason/pymol commands, DaliLite 5-liner, Foldmason 5-line JSON reader) | 1-6 line commands or short fragments: left inline. No `scripts/` directory created |
+
+### Redundancy
+
+Already done 2026-09-20 (usage-guide is overview, prompts, related Skills). This pass added no repeated fact: the
+Multimer speed evidence lives once in `references/foldseek-multimer.md`, the table row only cites the scale.
+
+### Left unfixed
+
+- Foldseek-Multimer ">99% chain-pairing match" is removed, not verified: I could not source it, so it is gone rather than kept.
+- The audit's optional `H_MSE` acceptance in the Superimposer (see finding 1).
+- Foldseek's "Removing temporary files" line still prints under `-v 1` (one line); no flag found to silence it.
+
+## 2026-09-21 - final pass phase 1 (worktree `F:\OpenScience\wt\alignment-structural-alignment`, branch `fix/alignment-structural-alignment`, tip `17418eb`)
+
+No open findings from either pass above needed further work: the Xu & Zhang p-value gap and the
+T-Coffee Expresso/3D-Coffee deletion are already resolved by honest documentation / claim removal (not
+half-repairs), and the Foldseek-Multimer/DALI literature claims are attributed citations, not
+unverified measurements. Checked `fixes/README.md`'s Revisit list: no row names this Skill.
+
+Instead of new fixes, walked every runnable block end to end on a clean 12-structure real-PDB set
+(`public-data/structures`) plus 2 complexes: `TMalign`/`USalign` pairwise and multimer, `TMscore -seq`,
+`foldseek easy-search` (type 1 and 2), `easy-cluster`, `createdb --mask-bfactor-threshold`,
+`easy-multimersearch`/`easy-multimercluster`, DaliLite `import.pl`/`dali.pl`, `foldmason easy-msa`
+(`--report-mode 2`), MUSTANG, PyMOL `super`, and all four `examples/*.py` scripts as SKILL.md invokes
+them. Every result matched the values already documented in SKILL.md/references or TOOLS.md
+(e.g. US-align 1IRD/1A3N 0.9769/0.4943 RMSD 0.94 Lali 286; DaliLite Z 20.3; Superimposer 0.483 A/151
+pairs and its ValueError refusal on 1MBN/1A3N). Confirmed with `-v 0` that Foldseek's
+"Removing temporary files" line cannot be silenced (cosmetic, stderr only). No file in the Skill
+changed; branch tip unchanged at `17418eb`. Full detail: `F:\OpenScience\audits\_final_pass\bio-alignment-structural\CHECKPOINT.md`.
+
+### Still blocked
+
+None.

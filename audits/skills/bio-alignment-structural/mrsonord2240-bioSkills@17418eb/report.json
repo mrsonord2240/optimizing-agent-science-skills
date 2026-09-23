@@ -1,0 +1,64 @@
+{
+  "meta": {
+    "skill_name": "bio-alignment-structural",
+    "description": "Align, search, score, and superpose protein structures with Foldseek, TM-align, US-align, DaliLite, Foldmason, Biopython, MUSTANG, and PyMOL.",
+    "evaluated_on": "2026-09-23",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 11,
+    "source": "mrsonord2240/bioSkills@17418ebd37abd18d522f23899fae008fd118b79a:alignment/structural-alignment",
+    "audit_type": "final pass Phase 2",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md",
+    "prior_report_archive": "F:/OpenScience/audits/_pre-fix-20260923/bio-alignment-structural",
+    "execution_note": "All commands were run from run/phase2_replay.sh against a SHA-256-matched copied source snapshot. Every input was executed and asserted; no source file was edited."
+  },
+  "veto_gates": {
+    "skill_veto": {"gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS"},
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {"result": "PASS", "detail": "Outputs report measured tool values and distinguish structural similarity from homology."},
+      "practice_boundaries": {"result": "PASS", "detail": "No patient-specific diagnosis, treatment, or clinical prescription was produced."},
+      "methodological_ground": {"result": "PASS", "detail": "Whole-chain calls use the smaller TM-score and short chains are refused or guarded."},
+      "code_usability": {"result": "PASS", "detail": "All four shipped Python examples compiled and their exercised paths ran in the documented environments."}
+    }
+  },
+  "static_score": {
+    "subtotal": 91,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {"score": 12, "max": 12, "note": "Covers pairwise, multimer, search, structural MSA, quality scoring, and inspection with runnable routes."},
+      "reliability": {"score": 11, "max": 12, "note": "Documents no-row TM-align behavior, Foldseek filters, seed control, and correspondence refusal; arbitrary external-tool failures remain tool messages."},
+      "performance_context": {"score": 7, "max": 8, "note": "The 270-line main Skill delegates detailed DaliLite, Foldmason, and multimer material to focused references."},
+      "agent_usability": {"score": 15, "max": 16, "note": "Goal-based decision tree, commands, examples, metric caveats, and common-error recovery are precise."},
+      "human_usability": {"score": 7, "max": 8, "note": "Natural structural-alignment triggers are clear; users still need local structure paths and tool installation."},
+      "security": {"score": 11, "max": 12, "note": "Examples use argv lists and no credentials or shell evaluation; supplied paths are not independently constrained."},
+      "maintainability": {"score": 10, "max": 12, "note": "Four small examples and three references separate concerns, but a shipped test fixture suite is absent."},
+      "agent_specific": {"score": 18, "max": 20, "note": "Trigger, progressive disclosure, determinism controls, related-skill handoffs, and stop conditions are explicit."}
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 92.7,
+    "max": 100,
+    "assertion_pass_rate": {"passed": 33, "total": 33},
+    "inputs": [
+      {"index": 1, "type": "Canonical", "label": "Pairwise globin superposition", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Shipped TM-align example plus TM-align and US-align tabular regressions ran.", "note": "1MBN/1A3N produced matching TM scores and a superposed PDB.", "basic": 37, "specialized": 57, "total": 94, "assertions_passed": 3, "assertions_total": 3, "assertions": [{"text": "The shipped parser returns both TM normalizations and RMSD.", "result": "PASS", "note": "It printed 0.900/0.836 and 1.56 A."}, {"text": "Independent TM-align and US-align agree to displayed precision.", "result": "PASS", "note": "Both reported 0.8356/0.9000, 1.56 A, 141 residues."}, {"text": "The requested superposition artifact exists.", "result": "PASS", "note": "superposed.pdb is nonempty."}]},
+      {"index": 2, "type": "Variant A", "label": "Foldseek local structural search", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Shipped search example ran on six real PDB targets with alignment types 2 and 1.", "note": "Both modes parsed results and applied their distinct documented confidence filters.", "basic": 37, "specialized": 56, "total": 93, "assertions_passed": 3, "assertions_total": 3, "assertions": [{"text": "Type 2 returns confident structural hits with the combined filter.", "result": "PASS", "note": "Seven of eight rows met alnTM and E-value criteria."}, {"text": "Type 1 uses alnTM rather than E-value for confidence.", "result": "PASS", "note": "Output explicitly labels alnTM-only criterion and found seven hits."}, {"text": "Parsed results are written and nonempty.", "result": "PASS", "note": "result.m8 contains eight real-chain rows."}]},
+      {"index": 3, "type": "Edge", "label": "Known correspondence and offset refusal", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Biopython example ran on co-numbered myoglobins and the offset-numbered control.", "note": "Correct pairing succeeded while the hazardous correspondence was refused.", "basic": 37, "specialized": 56, "total": 93, "assertions_passed": 3, "assertions_total": 3, "assertions": [{"text": "Co-numbered structures superpose reproducibly.", "result": "PASS", "note": "1MBN/1A6M gave 0.483 A over 151 CA pairs."}, {"text": "Offset numbering is not silently accepted.", "result": "PASS", "note": "1MBN/1A3N raises the documented 116/141 name-mismatch ValueError."}, {"text": "The transformed structure is written.", "result": "PASS", "note": "mobile_superposed.pdb is nonempty."}]},
+      {"index": 4, "type": "Variant B", "label": "Seeded Foldmason structural MSA", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Shipped Foldmason example ran on three real structures with seed 42 and report mode 2.", "note": "It produced chain rows, MSA files, tree, and parsable LDDT JSON.", "basic": 36, "specialized": 56, "total": 92, "assertions_passed": 3, "assertions_total": 3, "assertions": [{"text": "Seeded MSA outputs exist.", "result": "PASS", "note": "AA and 3Di FASTA files and guide tree were created."}, {"text": "Scores are parsed as one value per column.", "result": "PASS", "note": "The example reported 153 scored columns of 294."}, {"text": "The execution records the reproducibility seed.", "result": "PASS", "note": "Foldmason log records seed 42."}]},
+      {"index": 5, "type": "Stress", "label": "Dimer-to-tetramer multimer search", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "US-align multimer and Foldseek-Multimer ran on real hemoglobin assemblies.", "note": "Whole-complex containment scores and a complex-level report were produced.", "basic": 37, "specialized": 56, "total": 93, "assertions_passed": 3, "assertions_total": 3, "assertions": [{"text": "US-align reports both whole-complex normalizations.", "result": "PASS", "note": "1IRD/1A3N reported 0.9769 and 0.4943, RMSD 0.94."}, {"text": "Foldseek-Multimer writes the required report file.", "result": "PASS", "note": "mm_report is nonempty."}, {"text": "Multimer execution uses the documented mode flags.", "result": "PASS", "note": "US-align used -mm 1 -ter 0."}]},
+      {"index": 6, "type": "Scope Boundary", "label": "TMscore model-quality metrics", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "TMscore -seq ran on related myoglobin structures.", "note": "Sequence-paired model-quality metrics were emitted rather than inferred from RMSD alone.", "basic": 36, "specialized": 56, "total": 92, "assertions_passed": 3, "assertions_total": 3, "assertions": [{"text": "TMscore emits GDT-TS.", "result": "PASS", "note": "Log includes GDT-TS-score 0.9917."}, {"text": "TMscore emits TM-score and RMSD.", "result": "PASS", "note": "Log reports 0.9893 and 0.483 A."}, {"text": "The documented sequence pairing flag was used.", "result": "PASS", "note": "Command used -seq."}]},
+      {"index": 7, "type": "Adversarial", "label": "One-residue no-row behavior", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "A synthetic one-residue PDB was passed through the shipped parser against real 1MBN.", "note": "The wrapper turned TM-align's exit-0/no-row case into an explicit RuntimeError.", "basic": 36, "specialized": 55, "total": 91, "assertions_passed": 3, "assertions_total": 3, "assertions": [{"text": "Degenerate input does not return a fabricated alignment.", "result": "PASS", "note": "The process exits nonzero at the wrapper level."}, {"text": "The error names the missing alignment condition.", "result": "PASS", "note": "RuntimeError says produced no alignment."}, {"text": "The underlying tool diagnosis is preserved.", "result": "PASS", "note": "Message includes Sequence is too short <3!."}]},
+      {"index": 8, "type": "Variant B", "label": "Kinase remote-homology confirmation", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "TM-align and DaliLite were run on real PKA/CDK2 structures.", "note": "Both methods support a same-fold interpretation with distinct metrics.", "basic": 37, "specialized": 57, "total": 94, "assertions_passed": 3, "assertions_total": 3, "assertions": [{"text": "TM-align finds substantial kinase structural similarity.", "result": "PASS", "note": "It reported 0.6805/0.7659 and 2.85 A over 254 residues."}, {"text": "DaliLite creates a result file in the documented location.", "result": "PASS", "note": "1atpE.txt exists."}, {"text": "DaliLite recovers the documented high Z-score band.", "result": "PASS", "note": "The result contains Z 24.x."}]},
+      {"index": 9, "type": "Edge", "label": "pLDDT-masked Foldseek database", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Foldseek createdb with the documented B-factor threshold ran on real 1MBN.", "note": "A valid masked database and index were produced.", "basic": 36, "specialized": 56, "total": 92, "assertions_passed": 3, "assertions_total": 3, "assertions": [{"text": "Masked database metadata exists.", "result": "PASS", "note": "masked.dbtype is nonempty."}, {"text": "Masked database index exists.", "result": "PASS", "note": "masked.index is nonempty."}, {"text": "The documented threshold was executed.", "result": "PASS", "note": "Log records --mask-bfactor-threshold 70.0."}]},
+      {"index": 10, "type": "Variant A", "label": "Fresh MUSTANG structural MSA", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Fresh Phase 2 probe: MUSTANG ran on three real myoglobins.", "note": "The documented FASTA output contains exactly three sequence records.", "basic": 37, "specialized": 56, "total": 93, "assertions_passed": 3, "assertions_total": 3, "assertions": [{"text": "MUSTANG completes its structural alignment.", "result": "PASS", "note": "Log reports All Done."}, {"text": "The documented FASTA output exists.", "result": "PASS", "note": "mustang.afasta is nonempty."}, {"text": "One record is produced per input structure.", "result": "PASS", "note": "FASTA has three headers."}]},
+      {"index": 11, "type": "Stress", "label": "Fresh headless PyMOL inspection", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Fresh Phase 2 probe: documented headless PyMOL super command ran on 1A6M/1MBN.", "note": "It rendered an image and reported the cycle-fitted RMSD.", "basic": 37, "specialized": 56, "total": 93, "assertions_passed": 3, "assertions_total": 3, "assertions": [{"text": "PyMOL reports a structural RMSD.", "result": "PASS", "note": "It reported 0.409 A over 934 atoms."}, {"text": "Headless rendering produces the requested image.", "result": "PASS", "note": "super.png is nonempty."}, {"text": "The run is noninteractive.", "result": "PASS", "note": "pymol -cq -d completed without a GUI."}]}
+    ]
+  },
+  "final": {"static_weighted": 36.4, "dynamic_weighted": 55.6, "score": 92, "max": 100, "grade": "Production Ready", "grade_symbol": "⭐", "deployable": true, "veto_override": false},
+  "key_strengths": ["All 11 final-pass regression and fresh inputs executed with 33/33 assertions passing.", "TM-align, US-align, DaliLite, Foldseek, Foldmason, TMscore, MUSTANG, PyMOL, and Biopython routes have real-output evidence.", "The source has explicit determinism, short-chain, correspondence, and no-row error safeguards.", "The source snapshot exactly matches the dispatched branch tip and the source worktree stayed clean."],
+  "recommendations": []
+}

@@ -1272,7 +1272,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (441)
+## P2 (437)
 
 ### `bio-data-visualization-lollipop-protein-maps` — HGVSp edge cases and recurrence semantics undocumented
 
@@ -2097,38 +2097,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The 476-line SKILL.md loads BAli-Phy, OMM_MACSE, HyPhy, vcMSA and T-Coffee detail for every request.
 - Root cause: No progressive-disclosure layer.
 - Fix: Keep the decision tables and MAFFT/MUSCLE/PAL2NAL core in SKILL.md; move per-tool detail to references/*.md loaded on demand.
-
-### `bio-alignment-structural` — Inline Superimposer block and MSE handling are less safe than the example
-
-- Skill: 85, Production Ready · [mrsonord2240/bioSkills@b611de1](https://github.com/mrsonord2240/bioSkills/tree/b611de1c303cb454f76e2e10ae39cba0db3e3c06/alignment/structural-alignment) · [viewer](skills/bio-alignment-structural/mrsonord2240-bioSkills@b611de1/viewer.md)
-- Observed in inputs: 3, 9
-- Problem: The SKILL.md inline block pairs by residue number with no name check (1MBN vs 1A3N prints 7.539 A over 141 pairs, exit 0), and both it and the example drop HETATM MSE/modified residues (1-4% of residues in six real entries) without mention.
-- Root cause: The refusals were added to examples/biopython_superimposer.py but not to the shorter block in SKILL.md; id[0]==' ' was chosen to exclude ions.
-- Fix: Add the residue-name check to the inline block (or say 'use examples/biopython_superimposer.py') and one sentence that modified residues such as MSE are excluded; optionally accept id[0]=='H_MSE'.
-
-### `bio-alignment-structural` — Foldseek-Multimer speed and database-name claims are unverified
-
-- Skill: 85, Production Ready · [mrsonord2240/bioSkills@b611de1](https://github.com/mrsonord2240/bioSkills/tree/b611de1c303cb454f76e2e10ae39cba0db3e3c06/alignment/structural-alignment) · [viewer](skills/bio-alignment-structural/mrsonord2240-bioSkills@b611de1/viewer.md)
-- Observed in inputs: 5
-- Problem: The 10-100x pairwise and >99% chain-pairing figures were left unchecked; on 62 small oligomers Foldseek-Multimer was 1.7x (directory, incl. createdb) to 5.8x (prebuilt DB) faster than US-align, and foldseek databases lists no AFDB-Multimer or PDB100 database that the text and a usage-guide prompt name.
-- Root cause: Literature numbers copied without a source location; the bioRxiv abstract supports only 3-4 orders of magnitude at database scale.
-- Fix: Cite the figure to the paper as a scale claim (thousands of complexes and up), drop the pairwise 10-100x and PDB100-Multimer, and name a target that exists (PDB or a folder of complexes).
-
-### `bio-alignment-structural` — The unseeded Foldmason variance figures are set-specific
-
-- Skill: 85, Production Ready · [mrsonord2240/bioSkills@b611de1](https://github.com/mrsonord2240/bioSkills/tree/b611de1c303cb454f76e2e10ae39cba0db3e3c06/alignment/structural-alignment) · [viewer](skills/bio-alignment-structural/mrsonord2240-bioSkills@b611de1/viewer.md)
-- Observed in inputs: 4
-- Problem: '74% of aligned pairs shared; homologous pairs 88%' came from a 5-structure set; re-measured 56%/87% there but 99.4% on the 11-structure globin/kinase set.
-- Root cause: One measurement quoted as a general fact.
-- Fix: Say 'unseeded refinement changes the MSA (as little as 0.6% to as much as 44% of aligned pairs in our runs)' or drop the numbers; the seed advice stays.
-
-### `bio-alignment-structural` — Housekeeping left from the fix
-
-- Skill: 85, Production Ready · [mrsonord2240/bioSkills@b611de1](https://github.com/mrsonord2240/bioSkills/tree/b611de1c303cb454f76e2e10ae39cba0db3e3c06/alignment/structural-alignment) · [viewer](skills/bio-alignment-structural/mrsonord2240-bioSkills@b611de1/viewer.md)
-- Observed in inputs: 2, 8
-- Problem: Description still says 'Predict' (no prediction path); the Hamamsy 2024 (TM-Vec) reference outlives the deleted pLM section; example __main__ blocks keep placeholder names; foldseek_search dumps Foldseek's parameter table on every call; SKILL.md is one 330-line file with no references/ split.
-- Root cause: Deletions and rewrites did not sweep the description, reference list and examples.
-- Fix: Reword the description ('Score and superpose...'), drop the Hamamsy reference, add -v 1 to the Foldseek calls and read paths from argv in the examples.
 
 ### `bio-alignment-validation` — Crosscheck misses a swap when both BAMs share RG ID/PU
 
