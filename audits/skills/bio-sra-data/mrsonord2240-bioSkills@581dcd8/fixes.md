@@ -67,3 +67,49 @@ runnable file beside an inline block). `download_single.sh` and `prefetch_large.
 touched -- neither does ENA column lookup, so the finding doesn't apply to them.
 
 Commit: `086e443` on `fix/db-sra2`.
+
+
+## 2026-09-21 -- P2 batch (fix/database-access-sra-data, from staging 431aa55)
+
+Audit: `eval_report_bio-sra-data_result.json`, 1 P2. Env: `database-access` (pysradb 2.5.1, curl, bash; the audit's fake-curl fixtures copied to scratchpad). Commits: `cc3e896` fix, `07df97a` + `1ef54e5` redundancy, `6b6bbb0` scripts.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+| --- | --- | --- | --- | --- |
+| ENA guard prints "fastq_ftp not found" even when `fastq_md5` is the missing column | P2 | Message built from whichever of `FTP_COL`/`MD5_COL` is empty (both named when both are); dbGaP hint reworded to "a missing fastq_ftp may indicate controlled-access". Applied to the SKILL.md inline block and `examples/download_batch.sh` | ran: fixtures CONTROLLEDTEST1 (ftp absent -> "fastq_ftp"), CONTROLLEDTEST2 (md5 absent -> "fastq_md5"), EMPTYRESP1 (-> "fastq_ftp, fastq_md5"), each exit 1 with zero files; live ERR10419835 md5 OK on both mates; mixed batch [CONTROLLEDTEST2, ERR10419835, CONTROLLEDTEST1] -> OK 1/3, both bad accessions in failed.txt | the inline block was later replaced by a pointer to the example (see scripts table) |
+
+Redundancy pass: `usage-guide.md` already held only overview/prompts/related Skills (its one stale section name, "Failure modes", was repointed to "Common errors"). Inside SKILL.md, a disagreement was resolved: the trap paragraph says ~3x scratch plus ~3x output; the failure mode said "4-5x compressed size". Kept the trap paragraph's figures.
+
+### Deleted passage -> new home
+
+| deleted | new home |
+| --- | --- |
+| Code pattern "prefetch + fasterq-dump" (25 lines) | `examples/download_single.sh` (pointer line) |
+| Code pattern "Cloud (STRIDES) via AWS" and "10x single-cell with technical reads" | `examples/prefetch_large.sh` (4th arg `yes` = `--include-technical`); pointer section "Cloud (STRIDES) and 10x single-cell" |
+| Code pattern "Single SRR via ENA mirror" (44 lines) | `examples/download_batch.sh` with a one-line accessions file (pointer + failed.txt caveat) |
+| Code pattern "Batch via pysradb metadata" (30 lines) | `scripts/pysradb_resolve.py` |
+| Failure mode prefetch --max-size silent skip | "prefetch and the --max-size trap" section + Common errors row (now carries the fix) |
+| Failure mode scratch exhaustion | uncompressed-scratch trap paragraph (now also names `fastq-dump --gzip` and the "out of disk space" symptom) + Common errors row |
+| Failure mode 10x technical reads missing | "Single-cell / 10x quirks" (now names the R2-only / CellRanger symptom) + Common errors row |
+| Failure mode SRA-direct slowness | Common errors row (business-hours detail, run off-peak) |
+| Failure mode Aspera deprecation | decision matrix row + new Common errors row |
+| Failure mode cloud egress | Required Setup sentence + Common errors row |
+| Failure mode vdb-config not persisted | Common errors row (persist `user-settings.mkfg`, or `--temp`/`-O`) |
+| Required Setup `aws s3 ls` block | Cloud (STRIDES) access section |
+| "Ignore SKILL.md's own older claim that this column doesn't exist" | deleted (stale self-reference; the total_size fact stays) |
+
+### Runnable code moved to scripts/
+
+| old location | new |
+| --- | --- |
+| SKILL.md "Batch via pysradb metadata" | `scripts/pysradb_resolve.py` (functions verbatim, plus a CLI entry). Ran: `GSE110009` -> 74 SRRs, `ERR10419835` -> 1; `batch_resolve(['ERR10419835','NOTREAL1'])` -> 1-row frame with `total_size` |
+| SKILL.md ENA single-run block | not a script: duplicated `examples/download_batch.sh`, so deleted and pointed there. Ran the exact pointer command on live ERR10419835: OK 1/1, both md5 OK |
+
+SKILL.md 426 -> 249 lines; under 300, so no `references/` split.
+
+### Left unfixed
+
+None; all 1 P2 fixed.
+
+### Noticed, not changed
+
+- `examples/download_batch.sh` exits 0 even when accessions fail (only `failed.txt` and the summary say so). Caveat now stated in SKILL.md; the script's behaviour is unchanged.

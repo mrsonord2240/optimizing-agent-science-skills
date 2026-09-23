@@ -1,0 +1,211 @@
+{
+  "source": "mrsonord2240/bioSkills@1ef54e50ff0b2afbd4405b666e79793667dba5c0:database-access/sra-data",
+  "meta": {
+    "skill_name": "bio-sra-data",
+    "evaluated_on": "2026-09-23",
+    "evaluator_version": "skill-auditor@2.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md",
+    "environment": "audit-owned micromamba env /home/sci/sra-audit-20260923; sra-tools 3.4.1, EDirect 26.0, pysradb 2.5.1, Biopython 1.88; audit-owned HOME/cache under F:/OpenScience/audits/bio-sra-data/private_runtime"
+  },
+  "provenance": {
+    "source_clean_start": true,
+    "source_clean_end": true,
+    "source_mutated": false,
+    "source_head_verified": "1ef54e50ff0b2afbd4405b666e79793667dba5c0",
+    "prior_canonical_report_archived_to": "F:/OpenScience/audits/_pre-fix-20260923/bio-sra-data",
+    "execution_artifacts": "F:/OpenScience/audits/bio-sra-data/run/phase2_20260923"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "FAIL",
+      "stability": "FAIL",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS",
+      "detail": "Three of the seven documented dynamic routes fail in the pinned private runtime: direct SRA conversion exits 3, the STRIDES fallback exits 3, and find_sra_runs.py exits 1 before returning runs. This is a reproducible core-route failure rate above the stability threshold."
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "FAIL",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No fabricated citations, quantitative claims, or biological conclusions were introduced; the executed outputs are operational data-transfer and accession-resolution results."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "The skill makes no diagnostic or treatment recommendation; its controlled-access route stops before attempting unauthorized retrieval."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "The ENA MD5 path completed against live ERR10419835 and the controlled-access guard correctly stopped a malformed/missing-field response without producing files."
+      },
+      "code_usability": {
+        "result": "FAIL",
+        "detail": "examples/find_sra_runs.py crashes under its pinned compatible Biopython 1.88 because Entrez.efetch(...).read() is bytes and the script calls split('\\n') on it. The documented direct SRA route also cannot complete its promised FASTQ conversion for ERR10419835 with SRA Tools 3.4.1: prefetch uses normalized format, then the required reference NC_000913.2 cannot be resolved and fasterq-dump exits 3."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 65,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 7, "max": 12, "note": "The ENA batch path and pysradb resolver work, but two advertised primary routes and one example script are not usable as shipped." },
+      "reliability": { "score": 5, "max": 12, "note": "Good MD5 verification and controlled-access handling are offset by reproducible current-toolchain failures and an unhandled bytes/text API mismatch." },
+      "performance_context": { "score": 6, "max": 8, "note": "The documentation identifies scratch and max-size constraints, but the failing direct route spends time downloading data before it cannot complete conversion." },
+      "agent_usability": { "score": 9, "max": 16, "note": "Route-selection guidance is useful, but an agent following the advertised commands reaches opaque toolkit and Python exceptions rather than a supported fallback." },
+      "human_usability": { "score": 6, "max": 8, "note": "Readable documentation and the ENA happy path help, but the exact EDirect example uses an unsupported option and the core failure messages do not lead to a successful documented remedy." },
+      "security": { "score": 10, "max": 12, "note": "No secrets or arbitrary code execution found; controlled-access content is recognized and does not attempt bypass." },
+      "maintainability": { "score": 8, "max": 12, "note": "Scripts are small and syntactically valid, but duplicated shell routes leave current toolkit behavior unpinned and the Python return type is not normalized." },
+      "agent_specific": { "score": 14, "max": 20, "note": "Strong scope boundaries and alternatives, but the active defaults do not reliably route an agent to a completing path." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 54.3,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 17, "total": 28 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Live ENA batch download of ERR10419835 using shipped examples/download_batch.sh",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Executed against the live ENA API and FTP mirror in the private runtime. Both paired FASTQ files were downloaded and both MD5 checks passed; evidence: outputs/input1_ena_live.stdout.txt and outputs/ena_live/.",
+        "basic": 38,
+        "specialized": 54,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4
+      },
+      {
+        "index": 2,
+        "type": "Canonical",
+        "label": "Documented direct SRA Toolkit route using shipped examples/download_single.sh for ERR10419835",
+        "status": "FAILED",
+        "status_flag": "❌",
+        "executed": true,
+        "execution_note": "Executed unmodified in the private SRA Tools 3.4.1 runtime. prefetch downloaded the accession but its normalized-format dependency NC_000913.2 could not be resolved; vdb-validate/fasterq-dump did not yield FASTQs and the script exited 3. Evidence: outputs/input2_sra_toolkit.stdout.txt, stderr.txt, and empty outputs/toolkit_fastq/.",
+        "basic": 12,
+        "specialized": 8,
+        "total": 20,
+        "assertions_passed": 1,
+        "assertions_total": 4
+      },
+      {
+        "index": 3,
+        "type": "Canonical",
+        "label": "Accession expansion using shipped scripts/pysradb_resolve.py GSE110009",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Executed in the private Python 3.12/pysradb 2.5.1 environment. It resolved GSE110009 to 74 SRRs; evidence: outputs/input3_pysradb.stdout.txt and stderr.txt.",
+        "basic": 38,
+        "specialized": 54,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4
+      },
+      {
+        "index": 4,
+        "type": "Variant",
+        "label": "Run discovery using shipped examples/find_sra_runs.py",
+        "status": "FAILED",
+        "status_flag": "❌",
+        "executed": true,
+        "execution_note": "Executed against ESearch/SRA runinfo in the private Biopython 1.88 runtime. It received runinfo then crashed at text.strip().split('\\n') with TypeError: a bytes-like object is required, not 'str'; evidence: outputs/input4_find_runs.stderr.txt.",
+        "basic": 10,
+        "specialized": 10,
+        "total": 20,
+        "assertions_passed": 1,
+        "assertions_total": 4
+      },
+      {
+        "index": 5,
+        "type": "Boundary",
+        "label": "Controlled-access/missing-field guard in shipped examples/download_batch.sh",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "A static ENA-shaped response with missing fastq_ftp/fastq_md5 was supplied only for CONTROLLEDTEST1 through an audit-local curl wrapper; the source script emitted its controlled-access guidance, returned nonzero for that accession, wrote no FASTQs, and recorded failed.txt. A first harness invocation was invalid and excluded; the standalone recheck is the accepted evidence: outputs/input5_controlled_guard_recheck.stdout.txt and outputs/controlled_guard/.",
+        "basic": 36,
+        "specialized": 52,
+        "total": 88,
+        "assertions_passed": 4,
+        "assertions_total": 4
+      },
+      {
+        "index": 6,
+        "type": "Fallback",
+        "label": "Documented STRIDES/AWS fallback using shipped examples/prefetch_large.sh ERR10419835",
+        "status": "FAILED",
+        "status_flag": "❌",
+        "executed": true,
+        "execution_note": "Executed in the private runtime without AWS CLI, so the script took its documented NCBI prefetch fallback. It hit the same unresolved normalized-format dependency and exited 3 without FASTQ output; evidence: outputs/input6_strides_fallback.stdout.txt and stderr.txt.",
+        "basic": 16,
+        "specialized": 14,
+        "total": 30,
+        "assertions_passed": 1,
+        "assertions_total": 4
+      },
+      {
+        "index": 7,
+        "type": "Documentation probe",
+        "label": "Exact EDirect conversion command documented in SKILL.md",
+        "status": "FAILED",
+        "status_flag": "❌",
+        "executed": true,
+        "execution_note": "The exact documented command efetch -db sra -id 8 -rettype runinfo failed immediately with 'Unrecognized option -rettype'; evidence: outputs/input7_edirect.stderr.txt. Audit control with -format runinfo returned runinfo (outputs/input7_edirect_corrected_flag.stdout.txt), confirming the documentation syntax rather than installation was the defect.",
+        "basic": 10,
+        "specialized": 10,
+        "total": 20,
+        "assertions_passed": 2,
+        "assertions_total": 4
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 26.0,
+    "dynamic_weighted": 32.6,
+    "score": 59,
+    "max": 100,
+    "grade": "Reject",
+    "grade_symbol": "⛔",
+    "deployable": false,
+    "veto_override": true,
+    "decision": "Reject: both stability and research code-usability vetoes fail."
+  },
+  "key_strengths": [
+    "The ENA live-download route completed with MD5 verification for both ERR10419835 mates.",
+    "pysradb accession expansion completed in a pinned private environment.",
+    "The shipped controlled-access guard safely avoided false success and wrote no files for the missing-field fixture."
+  ],
+  "recommendations": [
+    {
+      "priority": "P0",
+      "title": "Repair find_sra_runs.py bytes/text handling and execute it against a live runinfo record",
+      "problem": "The script assumes Entrez handle.read() returns str, but Biopython 1.88 returns bytes in this route.",
+      "root_cause": "The example assumes Entrez.efetch(...).read() always returns text and does not normalize the bytes response observed with the pinned Biopython runtime.",
+      "fix": "Decode bytes before stripping/splitting, preserve CSV parsing, then pin and document the validated Biopython version with a live regression command."
+    },
+    {
+      "priority": "P0",
+      "title": "Make the documented direct SRA conversion route complete on its pinned SRA Tools version",
+      "problem": "ERR10419835 downloads but cannot be converted because the default normalized-format/reference behavior cannot resolve NC_000913.2; the script exits before FASTQ output.",
+      "root_cause": "The direct and STRIDES-fallback recipes rely on normalized SRA format without ensuring that required reference sequences are resolvable or routing that condition to the verified ENA path.",
+      "fix": "Document and implement a tested SRA Tools configuration/command sequence that completes prefetch, vdb-validate, and fasterq-dump for a public accession in a clean cache, or route this condition explicitly to the verified ENA path."
+    },
+    {
+      "priority": "P1",
+      "title": "Correct the EDirect runinfo example",
+      "problem": "efetch does not accept -rettype; the shipped command is unusable.",
+      "root_cause": "The example used an option from a different command interface instead of the current EDirect efetch -format runinfo syntax and was not executed before publication.",
+      "fix": "Replace it with the verified -format runinfo form and add a small output/exit-status check."
+    }
+  ]
+}
