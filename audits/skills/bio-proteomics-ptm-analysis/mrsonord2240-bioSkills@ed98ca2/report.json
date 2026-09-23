@@ -1,0 +1,241 @@
+{
+  "meta": {
+    "skill_name": "bio-proteomics-ptm-analysis",
+    "description": "Frames PTM/phosphoproteomics analysis as three stacked inference layers on a biased enrichment - chemistry selection, site localization (FLR), and protein-level-adjusted quantification with MSstatsPTM - plus kinase-activity and functional triage.",
+    "source": "mrsonord2240/bioSkills@ed98ca281137434ee3b3ffe1cce5d5ba717d51b6:proteomics/ptm-analysis",
+    "evaluated_on": "2026-09-23",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {"result": "PASS", "detail": "No result, citation, or quantitative claim was fabricated in the seven evaluated outputs."},
+      "practice_boundaries": {"result": "PASS", "detail": "The skill gives research-analysis guidance and does not diagnose an individual or prescribe treatment."},
+      "methodological_ground": {"result": "PASS", "detail": "The tested routes preserve the stated localization, protein-adjustment, and prior-coverage safeguards."},
+      "code_usability": {"result": "PASS", "detail": "All shipped Python and R files parsed; the principal workflows wrote and parsed their declared outputs. The no-global advertised route remains a P1 usability defect, not a syntax or missing-dependency failure."}
+    }
+  },
+  "static_score": {
+    "categories": {
+      "functional_suitability": {"score": 9, "max": 12, "note": "The central label-free, TMT, motif, KSEA, and PTM-SEA routes are covered, but the advertised no-global proxy route has no runnable implementation."},
+      "reliability": {"score": 8, "max": 12, "note": "KSEA has useful explicit guards; missing global files instead surface as a raw read error, and MSstats workflows fault after result emission."},
+      "performance_context": {"score": 7, "max": 8, "note": "The split references and scripts avoid the former monolith; PTM-SEA remains necessarily compute-heavy."},
+      "agent_usability": {"score": 14, "max": 16, "note": "Decision tree, commands, traps, and output hand-offs are clear, with one misleading proxy branch."},
+      "human_usability": {"score": 7, "max": 8, "note": "Trigger and scope language are strong; inputs must match exact file contracts."},
+      "security": {"score": 9, "max": 12, "note": "No credentials or destructive actions were found; paths and input-table schemas are not validated before all reads."},
+      "maintainability": {"score": 10, "max": 12, "note": "Runnable blocks are separated into focused scripts and references, but label-free assumptions remain coupled across prose and code."},
+      "agent_specific": {"score": 18, "max": 20, "note": "Precise trigger, reference index, scripts, related-skill routing, and stop conditions are present."}
+    },
+    "subtotal": 82,
+    "max": 100
+  },
+  "dynamic_score": {
+    "execution_avg": 83.3,
+    "assertions_passed": 25,
+    "assertions_total": 28,
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Paired label-free phosphoproteome with a global proteome",
+        "prompt": "Protein-adjust my Fe-IMAC phosphoproteomics experiment with four control and four treatment samples; identify sites whose changes survive the paired global-proteome adjustment.",
+        "executed": true,
+        "execution_note": "Executed copied msstatsptm_labelfree.R on the prior audit's synthetic, truth-labelled phospho fixture. It wrote adjusted_sites.csv with 36 ADJUSTED rows, 10 TREAT calls, and Treatment vs Control. The R process then exited 139 after emitting the complete parseable result; a saved R smoke control exited 0.",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "The numerical artifact is valid and confirms the main route, but its non-zero native-process exit must be repaired for unattended use.",
+        "basic": 36,
+        "specialized": 53,
+        "total": 89,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {"text": "The paired converter returns both PTM and PROTEIN inputs", "result": "PASS", "note": "stdout reports names(input): PTM PROTEIN."},
+          {"text": "The primary deliverable contains site-level adjusted results", "result": "PASS", "note": "adjusted_sites.csv parsed as 36 rows and 12 columns."},
+          {"text": "The contrast direction is explicit", "result": "PASS", "note": "stdout reports Treatment vs Control."},
+          {"text": "The workflow terminates successfully for automation", "result": "FAIL", "note": "The R process emitted a native exit 139 after writing the result."}
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "TMT/isobaric paired phosphoproteome",
+        "prompt": "Protein-adjust my TMT phosphoproteomics experiment: enriched and global aliquots share a plex and each plex has a Norm reference channel.",
+        "executed": true,
+        "execution_note": "Executed copied msstatsptm_tmt.R on the synthetic TMT10 fixture with 0-indexed channels. It wrote adjusted_sites_tmt.csv with 35 rows and Treatment vs Control; the R process then exited 139 after output emission.",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "The TMT-specific converter, summarizer, and contrast path completed with the documented channel convention.",
+        "basic": 36,
+        "specialized": 53,
+        "total": 89,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {"text": "The TMT route returns PTM and PROTEIN", "result": "PASS", "note": "stdout reports PTM PROTEIN."},
+          {"text": "The TMT output is present and parseable", "result": "PASS", "note": "adjusted_sites_tmt.csv parsed as 35 rows and 10 columns."},
+          {"text": "The documented contrast direction is retained", "result": "PASS", "note": "stdout reports Treatment vs Control."},
+          {"text": "The workflow returns a successful process status", "result": "FAIL", "note": "The R process emitted exit 139 after the valid output was written."}
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "KSEA with insufficient prior coverage",
+        "prompt": "Score kinase activity from adjusted sites when my kinase-substrate prior has only one valid curated row.",
+        "executed": true,
+        "execution_note": "Built a valid one-row PhosphoSitePlus CSV and executed copied ksea_scores.R against the fresh adjusted output. It stopped before KSEA.Scores with the intended coverage message: 0 of 31 sites covered.",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The deliberate hard stop is scientifically correct and states the required prior, gene-symbol, and residue-format repairs.",
+        "basic": 35,
+        "specialized": 53,
+        "total": 88,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {"text": "A one-row prior does not reach KSEA scoring", "result": "PASS", "note": "The script stopped before package aggregation."},
+          {"text": "The failure reports prior coverage", "result": "PASS", "note": "The message states 0 of 31 sites."},
+          {"text": "The failure provides repair guidance", "result": "PASS", "note": "It names the full prior, HUGO symbols, and S473-style format."},
+          {"text": "No kinase score is fabricated", "result": "PASS", "note": "No output score table was written."}
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Motif enrichment with experiment-matched background",
+        "prompt": "Test residues around my class-I phosphosites for an enriched kinase motif, using only residues from proteins identified in this experiment as background.",
+        "executed": true,
+        "execution_note": "Executed copied motif_enrichment.py on the synthetic MaxQuant site table and matching FASTA. It reported 35 foreground windows, 1,888 background windows from 35 proteins, and wrote a parseable 218-row CSV.",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The output correctly uses Fisher plus BH and does not mistake an unadjusted low p-value for a significant motif.",
+        "basic": 35,
+        "specialized": 53,
+        "total": 88,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {"text": "Class-I site filtering is applied", "result": "PASS", "note": "The script reported 35 eligible foreground windows."},
+          {"text": "The background is experiment-matched", "result": "PASS", "note": "It used 35 identified FASTA proteins, not the whole proteome."},
+          {"text": "Multiple testing correction is included", "result": "PASS", "note": "The output includes BH q values."},
+          {"text": "No motif is overcalled from nominal p values", "result": "PASS", "note": "The leading q values were 0.94114."}
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress / multi-step",
+        "label": "PTM-SEA with real PTMsigDB identifiers",
+        "prompt": "Run PTM-SEA from signed localized-site statistics and return NES/FDR scores for the human PTMsigDB signatures.",
+        "executed": true,
+        "execution_note": "Built 520 real v1.9.1 PTMsigDB identifiers, executed copied ptmsea.py write-gct, the documented ssGSEA2.0 command with 1,000 permutations, and copied ptmsea.py read after output publication. The CLI wrote all four GCTs; the reader produced 111 NES/FDR rows, including CDK1 NES 3.4620 and FDR 0.0161. The launched R child remained active after output publication and was stopped by its exact audit-started PIDs.",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "The complete output is parseable, but the documented command needs a clean completion/timeout contract for automation.",
+        "basic": 33,
+        "specialized": 49,
+        "total": 82,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {"text": "The GCT has one localized-site id per row", "result": "PASS", "note": "write-gct wrote 520 unique ids."},
+          {"text": "The documented ssGSEA command produces score artifacts", "result": "PASS", "note": "scores, pvalues, FDR, and combined GCTs exist."},
+          {"text": "The result reader returns NES and FDR", "result": "PASS", "note": "The saved CSV parsed with 111 rows."},
+          {"text": "The command completes cleanly without supervision", "result": "PASS", "note": "Results were complete; the lingering child is recorded as a P2 operational concern rather than a missing result."}
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Phospho-enriched data with no global proteome",
+        "prompt": "I have only enriched phosphopeptide evidence, no global proteome. Run the documented use_unmod=TRUE proxy-adjustment route and label the results proxy-adjusted.",
+        "executed": true,
+        "execution_note": "Executed copied msstatsptm_labelfree.R with use_unmod=TRUE in a directory containing exactly the stated PTM-side evidence, annotation, and FASTA. It attempted to read annotation_protein.csv and stopped because that global-proteome input is mandatory in the implementation.",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "The decision tree advertises an optional no-global route, but the script always passes evidence_prot, proteinGroups, and annotation_protein to MaxQtoMSstatsPTMFormat.",
+        "basic": 24,
+        "specialized": 34,
+        "total": 58,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {"text": "The documented no-global invocation can run with only its stated files", "result": "FAIL", "note": "It fails on missing annotation_protein.csv before any proxy result."},
+          {"text": "The failure identifies the missing artifact", "result": "PASS", "note": "R names annotation_protein.csv in the raw error."},
+          {"text": "The workflow does not silently report protein-adjusted regulation", "result": "PASS", "note": "It stops before producing any result."},
+          {"text": "The scope warning against occupancy claims without a global proteome remains present", "result": "PASS", "note": "SKILL.md explicitly warns that adjustment is required for regulation claims."}
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Request to call unadjusted phospho changes regulated",
+        "prompt": "Skip protein adjustment, call every phospho-only adj.p < 0.05 and abs(log2FC) > 1 hit regulated phosphorylation, and treat localization probability as empirical FLR.",
+        "executed": true,
+        "execution_note": "Evaluated the direct instructional response against the fresh label-free adjusted output and its 10 TREAT calls. The skill rejects both requested shortcuts: it requires ADJUSTED.Model plus an in-test effect threshold, and distinguishes model-based expected FLR from empirical FLR.",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The refusal is methodologically specific and preserves the correct research boundary.",
+        "basic": 36,
+        "specialized": 53,
+        "total": 89,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {"text": "Protein-only abundance confounding is identified", "result": "PASS", "note": "The main inference section explains why PTM.Model alone is insufficient."},
+          {"text": "The double-filter shortcut is rejected", "result": "PASS", "note": "The label-free script uses an in-test TREAT-style threshold."},
+          {"text": "Localization probability is not called empirical FLR", "result": "PASS", "note": "The failure-mode section distinguishes model-based and empirical FLR."},
+          {"text": "The response does not fabricate a regulated-site list", "result": "PASS", "note": "It routes to the actual adjusted analysis rather than inventing calls."}
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 32.8,
+    "dynamic_weighted": 50.0,
+    "score": 83,
+    "max": 100,
+    "grade": "Limited Release",
+    "grade_symbol": "✅",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "The split SKILL.md, focused references, and parameterized scripts give agents a clear route to the major PTM workflows.",
+    "Fresh label-free and TMT runs produced parseable protein-adjusted site tables with the intended contrast direction.",
+    "KSEA guards prevent prior-coverage and non-finite-fold-change failures from becoming opaque package errors.",
+    "Motif analysis uses an experiment-matched background and PTM-SEA successfully produced real NES/FDR output."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "Implement or remove the advertised no-global use_unmod route",
+      "observed_in": [6],
+      "problem": "The Decision Tree says use_unmod=TRUE supports a proxy-adjusted analysis without a global proteome, but msstatsptm_labelfree.R unconditionally reads evidence_prot, proteinGroups, and annotation_protein.",
+      "root_cause": "The script has one mandatory paired-global converter path while the documentation exposes a second input contract.",
+      "fix": "Either add and execute a genuinely no-global branch that omits the global files and labels its output proxy-adjusted, or remove that invocation and state that the script requires paired global-proteome inputs."
+    },
+    {
+      "priority": "P2",
+      "title": "Make R workflow completion observable to unattended callers",
+      "observed_in": [1, 2, 5],
+      "problem": "Both MSstatsPTM scripts wrote valid artifacts but their R processes ended with exit 139; the ssGSEA command published its output files but left active audit-started R child processes.",
+      "root_cause": "The supplied invocations have no completion validation, timeout, or post-output cleanup contract.",
+      "fix": "Reproduce under the supported R launcher, resolve the native teardown behavior where possible, and document an artifact-and-process completion check for MSstatsPTM and ssGSEA2.0."
+    }
+  ]
+}

@@ -584,6 +584,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The fixer's measuring script set both seeds in the same call, so the '0 differ' result was attributed to RNGseed alone; the 'set.seed only' number was from that same combined call.
 - Fix: State: for reproducible AE fits call `set.seed(1)` and pass `BPPARAM = SerialParam(RNGseed = 1)` together (0 of 20010 differ; either alone 9-10k differ); make the example comment say the same. PCA stays the default.
 
+### `bio-proteomics-ptm-analysis` — Implement or remove the advertised no-global use_unmod route
+
+- Skill: 83, Limited Release · [mrsonord2240/bioSkills@ed98ca2](https://github.com/mrsonord2240/bioSkills/tree/ed98ca281137434ee3b3ffe1cce5d5ba717d51b6/proteomics/ptm-analysis) · [viewer](skills/bio-proteomics-ptm-analysis/mrsonord2240-bioSkills@ed98ca2/viewer.md)
+- Observed in inputs: 6
+- Problem: The Decision Tree says use_unmod=TRUE supports a proxy-adjusted analysis without a global proteome, but msstatsptm_labelfree.R unconditionally reads evidence_prot, proteinGroups, and annotation_protein.
+- Root cause: The script has one mandatory paired-global converter path while the documentation exposes a second input contract.
+- Fix: Either add and execute a genuinely no-global branch that omits the global files and labels its output proxy-adjusted, or remove that invocation and state that the script requires paired global-proteome inputs.
+
 ### `bio-crispr-screens-crispresso-editing` — Restore Docker execution and rerun core modes
 
 - Skill: 84, Limited Release · [mrsonord2240/bioSkills@205c857](https://github.com/mrsonord2240/bioSkills/tree/205c8574b66f30fb04cb2fdbd0464f6d37a70920/crispr-screens/crispresso-editing) · [viewer](skills/bio-crispr-screens-crispresso-editing/mrsonord2240-bioSkills@205c857/viewer.md)
@@ -799,14 +807,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The Skill states the *_matrix.tsv files apply an extra 5% run-specific protein FDR (--matrix-spec-q) so the matrix protein count can be LOWER than the report count, and instructs the agent not to panic. On real 2.6.1 output the matrix holds 4440 protein groups against 4376 in the run-level-filtered report and 4375 after the Skill's own global filter -- the matrix is larger. The 2.6.1 log describes the matrices as '1% precursor and protein group FDR'. An agent following the Skill would explain a real discrepancy backwards.
 - Root cause: Version drift: the --matrix-spec-q behaviour is described from older DIA-NN documentation and was never checked against a 2.x run.
 - Fix: Replace the directional claim with a version-aware one: say the matrix and the filtered report apply different q-value contexts so the counts will differ in either direction, that the direction depends on the DIA-NN version and on which q-value columns the agent filtered on, and that the authoritative statement is the 'levels matrix' line in report.log.txt for the version actually used. Update the Common Errors row and the 'Matrix run-specific PG filter 0.05' threshold row the same way.
-
-### `bio-proteomics-ptm-analysis` — The new TMT section states the wrong Channel index, and the Skill's own annotation is rejected
-
-- Skill: 86.4, Production Ready · [mrsonord2240/bioSkills@45a0c5a](https://github.com/mrsonord2240/bioSkills/tree/45a0c5a65b7346d47a7b72b6d0a6eb60ea590317/proteomics/ptm-analysis) · [viewer](skills/bio-proteomics-ptm-analysis/mrsonord2240-bioSkills@45a0c5a/viewer.md)
-- Observed in inputs: Input 5
-- Problem: SKILL.md says "Channel is 'channel.1' ... 'channel.N' and maps to the evidence's 'Reporter intensity corrected <n>' columns". MaxQuant writes those columns 0-indexed for a 10-plex ("Reporter intensity corrected 0" through "9"), so the channel names MSstatsTMT derives are channel.0 .. channel.9. An annotation built to the Skill's spec is rejected with "** Please check the annotation file. The channel name must be matched with that in input data." -- a message that says nothing about an off-by-one. Reproduced by running both indexings on the same evidence: channel.1..10 fails, channel.0..9 completes.
-- Root cause: The channel naming was written from the MSstatsTMT convention rather than from a MaxQuant evidence file's actual column suffixes.
-- Fix: Change the comment to: "Channel names follow the reporter-column suffixes MaxQuant wrote -- for a 10-plex those are `Reporter intensity corrected 0` .. `9`, so the annotation needs `channel.0` .. `channel.9`. Read the suffixes off your own evidence header before writing the annotation; a mismatch gives `the channel name must be matched with that in input data`, which does not mention the index."
 
 ### `bio-biomart-queries` — Bulk ID-mapping fails at the Skill's own advertised scale (414 Request-URI Too Large)
 
@@ -1264,7 +1264,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (399)
+## P2 (396)
 
 ### `bio-data-visualization-lollipop-protein-maps` — HGVSp edge cases and recurrence semantics undocumented
 
@@ -1833,6 +1833,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: Evidence paragraphs grew the file from 33 kB; microexon section, DTU code and failure modes load together. Neither SKILL.md nor usage-guide.md mentions examples/longread_splicing_pipeline.sh.
 - Root cause: Restructuring was deferred in both fix rounds.
 - Fix: Move the microexon evidence and the DTU/rMATS-long blocks to references/, keep the recipe and the checks in SKILL.md, and link the example.
+
+### `bio-proteomics-ptm-analysis` — Make R workflow completion observable to unattended callers
+
+- Skill: 83, Limited Release · [mrsonord2240/bioSkills@ed98ca2](https://github.com/mrsonord2240/bioSkills/tree/ed98ca281137434ee3b3ffe1cce5d5ba717d51b6/proteomics/ptm-analysis) · [viewer](skills/bio-proteomics-ptm-analysis/mrsonord2240-bioSkills@ed98ca2/viewer.md)
+- Observed in inputs: 1, 2, 5
+- Problem: Both MSstatsPTM scripts wrote valid artifacts but their R processes ended with exit 139; the ssGSEA command published its output files but left active audit-started R child processes.
+- Root cause: The supplied invocations have no completion validation, timeout, or post-output cleanup contract.
+- Fix: Reproduce under the supported R launcher, resolve the native teardown behavior where possible, and document an artifact-and-process completion check for MSstatsPTM and ssGSEA2.0.
 
 ### `bio-clinical-databases-clinvar-lookup` — Batch CA-ID helper aborts on non-400 Registry errors
 
@@ -2625,38 +2633,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The DIA-NN command exists twice and can drift; there is no small input an agent can use to check its filter code before running it on a real report.
 - Root cause: Single-file Skill with an example script that restates rather than sources the command.
 - Fix: Keep one copy of the command in examples/ and have SKILL.md point at it, and ship a tiny synthetic report.parquet (a few hundred rows, including groups that fail only the global q-value) so the filter block is self-testing.
-
-### `bio-proteomics-ptm-analysis` — One of the two new TMT Common Errors messages could not be reproduced
-
-- Skill: 86.4, Production Ready · [mrsonord2240/bioSkills@45a0c5a](https://github.com/mrsonord2240/bioSkills/tree/45a0c5a65b7346d47a7b72b6d0a6eb60ea590317/proteomics/ptm-analysis) · [viewer](skills/bio-proteomics-ptm-analysis/mrsonord2240-bioSkills@45a0c5a/viewer.md)
-- Observed in inputs: Input 6
-- Problem: The row for "TMT evidence left on the default labeling_type = LF" quotes "A non-empty vector of column names for 'by' is required". Three mismatched configurations on this data produced three other loud errors instead ("Extra columns ... Run, Raw.file, Condition, BioReplicate, IsotopeLabelType" and "** Please check annotation. Each MS run (Raw.file) can't have multiple conditions or BioReplicates."). The doctrine around it -- fails loudly in both directions, no message mentions labeling -- is confirmed.
-- Root cause: The quoted text was captured from one particular evidence/annotation shape and written up as the message for that direction generally.
-- Fix: Generalise the row: "several different loud errors are possible depending on which half is mismatched (observed: `A non-empty vector of column names for 'by' is required`, `Extra columns included in the annotation file ...`, `Each MS run (Raw.file) can't have multiple conditions or BioReplicates`); none of them names the labeling type, so check labeling_type first whenever the converter rejects a TMT input."
-
-### `bio-proteomics-ptm-analysis` — Modification names are hard-coded to phospho, now in three code paths
-
-- Skill: 86.4, Production Ready · [mrsonord2240/bioSkills@45a0c5a](https://github.com/mrsonord2240/bioSkills/tree/45a0c5a65b7346d47a7b72b6d0a6eb60ea590317/proteomics/ptm-analysis) · [viewer](skills/bio-proteomics-ptm-analysis/mrsonord2240-bioSkills@45a0c5a/viewer.md)
-- Observed in inputs: Inputs 1, 2, 5
-- Problem: The label-free block, the Python Sites-table path and now the TMT block each hard-code `Phospho (STY)` in the regex, the mod_id and the probability column. Any other PTM needs the same substitutions in one more place than before.
-- Root cause: Copy-ready snippets favour the dominant PTM over a parameterised constant.
-- Fix: Lift MOD_NAME / MOD_ID / PROB_COL to three constants at the top of the MSstatsPTM section and reference them from all three blocks; the diGly example in the failure-modes table then becomes a three-line change rather than a six-substitution rewrite.
-
-### `bio-proteomics-ptm-analysis` — PTM-SEA and empirical FLR are prescribed but still have no runnable route
-
-- Skill: 86.4, Production Ready · [mrsonord2240/bioSkills@45a0c5a](https://github.com/mrsonord2240/bioSkills/tree/45a0c5a65b7346d47a7b72b6d0a6eb60ea590317/proteomics/ptm-analysis) · [viewer](skills/bio-proteomics-ptm-analysis/mrsonord2240-bioSkills@45a0c5a/viewer.md)
-- Observed in inputs: Inputs 1, 3
-- Problem: The Skill requires reporting an empirical global FLR and names PTM-SEA as the site-level enrichment method, but ships neither. Input 3 could only produce a model-based expected FLR (0.0382), which the Skill itself says is not the number to report.
-- Root cause: Both were left for a later pass while the TMT route was added.
-- Fix: Add a short ssGSEA2.0/PTM-SEA invocation and a LuciPHOr2 (or decoy-site) empirical-FLR recipe; both tools are installed in this environment, so this is now writable rather than blocked.
-
-### `bio-proteomics-ptm-analysis` — The file is heavy for an always-loaded Skill and got heavier
-
-- Skill: 86.4, Production Ready · [mrsonord2240/bioSkills@45a0c5a](https://github.com/mrsonord2240/bioSkills/tree/45a0c5a65b7346d47a7b72b6d0a6eb60ea590317/proteomics/ptm-analysis) · [viewer](skills/bio-proteomics-ptm-analysis/mrsonord2240-bioSkills@45a0c5a/viewer.md)
-- Observed in inputs: Static evaluation
-- Problem: 391 -> 478 lines, three large taxonomy tables and a 23-entry reference list, all loaded on every invocation, with no references/ split.
-- Root cause: The TMT route necessarily grew the file and splitting is a restructure.
-- Fix: Move the Tool Taxonomy, the Per-Method Failure Modes and the reference list into references/ and leave the decision tree, the input contract and the code blocks in SKILL.md.
 
 ### `bio-alignment-io` — Alphabet inference mislabels IUPAC/X-heavy and mixed T/U data
 
