@@ -1,0 +1,562 @@
+{
+  "meta": {
+    "skill_name": "bio-proteomics-differential-abundance",
+    "evaluated_on": "2026-09-23",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 13,
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md",
+    "environment": "mass-spec-proteomics-analyst; fresh runs used R 4.4.3/Bioc 3.20 via r.sh and Python 3.12. Synthetic planted-truth fixtures were re-executed.",
+    "source": "mrsonord2240/bioSkills@31deeb9912f6e318ed11069f05a55be98577ff5e:proteomics/differential-abundance"
+  },
+  "source": "mrsonord2240/bioSkills@31deeb9912f6e318ed11069f05a55be98577ff5e:proteomics/differential-abundance",
+  "artifacts": {
+    "report": "eval_report_bio-proteomics-differential-abundance_result.json",
+    "viewer": "eval_viewer_bio-proteomics-differential-abundance.md",
+    "evidence": "run/phase2_20260923/",
+    "checkpoint": "F:/OpenScience/audits/_final_pass/bio-proteomics-differential-abundance/CHECKPOINT.md",
+    "prior_audit": "F:/OpenScience/audits/_pre-fix-20260923/bio-proteomics-differential-abundance/"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "All numbers are from fresh synthetic planted-truth output."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "n=1 and individual diagnosis/treatment are explicitly excluded and freshly checked."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Fresh runs verified moderation, blocked-design filtering, explicit untestables, and centring guards."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All paths parsed and emitted checked output; direct-R exit 139 after output is a recorded P1 runtime issue."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 93,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 12,
+        "max": 12,
+        "note": "All advertised routes have executable paths."
+      },
+      "reliability": {
+        "score": 9,
+        "max": 12,
+        "note": "Validation is strong; direct R teardown exits 139 after valid output."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "Scripts and conditional feature reference provide progressive disclosure."
+      },
+      "agent_usability": {
+        "score": 16,
+        "max": 16,
+        "note": "Decision tree, commands, and errors are precise."
+      },
+      "human_usability": {
+        "score": 8,
+        "max": 8,
+        "note": "Natural triggers and scope routing are clear."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "No secrets or destructive operations; file paths are local-tool inputs."
+      },
+      "maintainability": {
+        "score": 11,
+        "max": 12,
+        "note": "Modular scripts are testable; runtime teardown complicates CLI use."
+      },
+      "agent_specific": {
+        "score": 19,
+        "max": 20,
+        "note": "Focused trigger, layered material, seeded demo, and escape hatches."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 92.4,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 37,
+      "total": 39
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "4v4 label-free limma with batch",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "limma_de.R: 1334 tested, 97 calls, 3 FP (3.09%), 223 valid-value and 3 non-estimable drops.",
+        "executed": true,
+        "execution_note": "limma_de.R: 1334 tested, 97 calls, 3 FP (3.09%), 223 valid-value and 3 non-estimable drops.",
+        "basic": 37,
+        "specialized": 56,
+        "total": 93,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "The requested workflow produced a checked result or refusal.",
+            "result": "PASS",
+            "note": "Fresh output was inspected."
+          },
+          {
+            "text": "Missingness or scope boundaries are retained explicitly.",
+            "result": "PASS",
+            "note": "The route preserves untestable/undetected status or stops safely."
+          },
+          {
+            "text": "No unsupported clinical or fabricated claim is made.",
+            "result": "PASS",
+            "note": "Scope and planted-truth limits were respected."
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "DEqMS moderation and minimum fold change",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "treat: 83 calls/0 FP; DEqMS: 97 calls/3 FP (3.09%); count-adjusted fields present.",
+        "executed": true,
+        "execution_note": "treat: 83 calls/0 FP; DEqMS: 97 calls/3 FP (3.09%); count-adjusted fields present.",
+        "basic": 37,
+        "specialized": 56,
+        "total": 93,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "The requested workflow produced a checked result or refusal.",
+            "result": "PASS",
+            "note": "Fresh output was inspected."
+          },
+          {
+            "text": "Missingness or scope boundaries are retained explicitly.",
+            "result": "PASS",
+            "note": "The route preserves untestable/undetected status or stops safely."
+          },
+          {
+            "text": "No unsupported clinical or fabricated claim is made.",
+            "result": "PASS",
+            "note": "Scope and planted-truth limits were respected."
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "MNAR/on-off proteins with proDA",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "proDA: 1560 tested, 38 calls; 140 on/off proteins and none called.",
+        "executed": true,
+        "execution_note": "proDA: 1560 tested, 38 calls; 140 on/off proteins and none called.",
+        "basic": 36,
+        "specialized": 56,
+        "total": 92,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "The requested workflow produced a checked result or refusal.",
+            "result": "PASS",
+            "note": "Fresh output was inspected."
+          },
+          {
+            "text": "Missingness or scope boundaries are retained explicitly.",
+            "result": "PASS",
+            "note": "The route preserves untestable/undetected status or stops safely."
+          },
+          {
+            "text": "No unsupported clinical or fabricated claim is made.",
+            "result": "PASS",
+            "note": "Scope and planted-truth limits were respected."
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Python Welch+BH with untestables",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "1337 tested and 223 separately returned untestables; no-testable guard raised ValueError.",
+        "executed": true,
+        "execution_note": "1337 tested and 223 separately returned untestables; no-testable guard raised ValueError.",
+        "basic": 37,
+        "specialized": 55,
+        "total": 92,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "The requested workflow produced a checked result or refusal.",
+            "result": "PASS",
+            "note": "Fresh output was inspected."
+          },
+          {
+            "text": "Missingness or scope boundaries are retained explicitly.",
+            "result": "PASS",
+            "note": "The route preserves untestable/undetected status or stops safely."
+          },
+          {
+            "text": "No unsupported clinical or fabricated claim is made.",
+            "result": "PASS",
+            "note": "Scope and planted-truth limits were respected."
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "ashr fold-change shrinkage",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "1334 finite posterior means returned from the moderated fit.",
+        "executed": true,
+        "execution_note": "1334 finite posterior means returned from the moderated fit.",
+        "basic": 37,
+        "specialized": 55,
+        "total": 92,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "The requested workflow produced a checked result or refusal.",
+            "result": "PASS",
+            "note": "Fresh output was inspected."
+          },
+          {
+            "text": "Missingness or scope boundaries are retained explicitly.",
+            "result": "PASS",
+            "note": "The route preserves untestable/undetected status or stops safely."
+          },
+          {
+            "text": "No unsupported clinical or fabricated claim is made.",
+            "result": "PASS",
+            "note": "Scope and planted-truth limits were respected."
+          }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "n=1 individual clinical comparison",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Fresh scan verified explicit exclusions for n=1 comparison and individual diagnosis/treatment.",
+        "executed": true,
+        "execution_note": "Fresh scan verified explicit exclusions for n=1 comparison and individual diagnosis/treatment.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "The requested workflow produced a checked result or refusal.",
+            "result": "PASS",
+            "note": "Fresh output was inspected."
+          },
+          {
+            "text": "Missingness or scope boundaries are retained explicitly.",
+            "result": "PASS",
+            "note": "The route preserves untestable/undetected status or stops safely."
+          },
+          {
+            "text": "No unsupported clinical or fabricated claim is made.",
+            "result": "PASS",
+            "note": "Scope and planted-truth limits were respected."
+          }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "SKILL and usage-guide consistency",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Superseded claims absent; both examples and feature reference are linked.",
+        "executed": true,
+        "execution_note": "Superseded claims absent; both examples and feature reference are linked.",
+        "basic": 39,
+        "specialized": 57,
+        "total": 96,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "The requested workflow produced a checked result or refusal.",
+            "result": "PASS",
+            "note": "Fresh output was inspected."
+          },
+          {
+            "text": "Missingness or scope boundaries are retained explicitly.",
+            "result": "PASS",
+            "note": "The route preserves untestable/undetected status or stops safely."
+          },
+          {
+            "text": "No unsupported clinical or fabricated claim is made.",
+            "result": "PASS",
+            "note": "Scope and planted-truth limits were respected."
+          }
+        ]
+      },
+      {
+        "index": 8,
+        "type": "Edge",
+        "label": "Six-donor paired blocking design",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "795 tested after 121 non-estimable drops; 63 calls, 3 FP (4.76%).",
+        "executed": true,
+        "execution_note": "795 tested after 121 non-estimable drops; 63 calls, 3 FP (4.76%).",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "The requested workflow produced a checked result or refusal.",
+            "result": "PASS",
+            "note": "Fresh output was inspected."
+          },
+          {
+            "text": "Missingness or scope boundaries are retained explicitly.",
+            "result": "PASS",
+            "note": "The route preserves untestable/undetected status or stops safely."
+          },
+          {
+            "text": "No unsupported clinical or fabricated claim is made.",
+            "result": "PASS",
+            "note": "Scope and planted-truth limits were respected."
+          }
+        ]
+      },
+      {
+        "index": 9,
+        "type": "Variant B",
+        "label": "Direct MSstats and msqrob2 scripts",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "Outputs parsed (290 MSstats tested; 286 msqrob2 tested, 80 calls), then direct R processes exited 139.",
+        "executed": true,
+        "execution_note": "Outputs parsed (290 MSstats tested; 286 msqrob2 tested, 80 calls), then direct R processes exited 139.",
+        "basic": 34,
+        "specialized": 52,
+        "total": 86,
+        "assertions_passed": 2,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "The requested workflow produced a checked result or refusal.",
+            "result": "PASS",
+            "note": "Fresh output was inspected."
+          },
+          {
+            "text": "Missingness or scope boundaries are retained explicitly.",
+            "result": "PASS",
+            "note": "The route preserves untestable/undetected status or stops safely."
+          },
+          {
+            "text": "Direct shipped R invocation exits successfully after its artifact.",
+            "result": "FAIL",
+            "note": "Exit 139 occurred after valid output was written."
+          }
+        ]
+      },
+      {
+        "index": 10,
+        "type": "Stress",
+        "label": "Centring checks on peptide normalization",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Residual-SD ratio 0.752 warned; -0.200 logFC input correctly stopped.",
+        "executed": true,
+        "execution_note": "Residual-SD ratio 0.752 warned; -0.200 logFC input correctly stopped.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "The requested workflow produced a checked result or refusal.",
+            "result": "PASS",
+            "note": "Fresh output was inspected."
+          },
+          {
+            "text": "Missingness or scope boundaries are retained explicitly.",
+            "result": "PASS",
+            "note": "The route preserves untestable/undetected status or stops safely."
+          },
+          {
+            "text": "No unsupported clinical or fabricated claim is made.",
+            "result": "PASS",
+            "note": "Scope and planted-truth limits were respected."
+          }
+        ]
+      },
+      {
+        "index": 11,
+        "type": "Adversarial",
+        "label": "Three-arm msqrob2 ridge rule",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "ridge=TRUE accepted on the current three-group synthetic design.",
+        "executed": true,
+        "execution_note": "ridge=TRUE accepted on the current three-group synthetic design.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "The requested workflow produced a checked result or refusal.",
+            "result": "PASS",
+            "note": "Fresh output was inspected."
+          },
+          {
+            "text": "Missingness or scope boundaries are retained explicitly.",
+            "result": "PASS",
+            "note": "The route preserves untestable/undetected status or stops safely."
+          },
+          {
+            "text": "No unsupported clinical or fabricated claim is made.",
+            "result": "PASS",
+            "note": "Scope and planted-truth limits were respected."
+          }
+        ]
+      },
+      {
+        "index": 12,
+        "type": "Canonical",
+        "label": "Deterministic self-contained msqrob2 example",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "Two seeded runs were byte-identical (300 tested, 43 calls), then both direct R processes exited 139.",
+        "executed": true,
+        "execution_note": "Two seeded runs were byte-identical (300 tested, 43 calls), then both direct R processes exited 139.",
+        "basic": 34,
+        "specialized": 52,
+        "total": 86,
+        "assertions_passed": 2,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "The requested workflow produced a checked result or refusal.",
+            "result": "PASS",
+            "note": "Fresh output was inspected."
+          },
+          {
+            "text": "Missingness or scope boundaries are retained explicitly.",
+            "result": "PASS",
+            "note": "The route preserves untestable/undetected status or stops safely."
+          },
+          {
+            "text": "Direct shipped R invocation exits successfully after its artifact.",
+            "result": "FAIL",
+            "note": "Exit 139 occurred after valid output was written."
+          }
+        ]
+      },
+      {
+        "index": 13,
+        "type": "Variant A",
+        "label": "Fresh 12v12 Python planted-truth analysis",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "826 tested, 74 returned untestables, 39 calls, and 0 planted false positives.",
+        "executed": true,
+        "execution_note": "826 tested, 74 returned untestables, 39 calls, and 0 planted false positives.",
+        "basic": 37,
+        "specialized": 55,
+        "total": 92,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "The requested workflow produced a checked result or refusal.",
+            "result": "PASS",
+            "note": "Fresh output was inspected."
+          },
+          {
+            "text": "Missingness or scope boundaries are retained explicitly.",
+            "result": "PASS",
+            "note": "The route preserves untestable/undetected status or stops safely."
+          },
+          {
+            "text": "No unsupported clinical or fabricated claim is made.",
+            "result": "PASS",
+            "note": "Scope and planted-truth limits were respected."
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 37.2,
+    "dynamic_weighted": 55.4,
+    "score": 93,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "limma filters and paired estimability control achieved 3.09% and 4.76% realized FDR.",
+    "Feature-level routes separate tested from undetected outputs and centring checks catch both symptoms.",
+    "The three-arm ridge rule and Python untestable handling passed fresh adversarial checks."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "Direct R processes exit 139 after valid output",
+      "observed_in": [
+        9,
+        12
+      ],
+      "problem": "Five fresh direct r.sh invocations wrote complete parseable output then returned exit 139.",
+      "root_cause": "The failure appears during shared-R native teardown, after computation/output, rather than before a source-level result.",
+      "fix": "Reproduce in a clean user-target R 4.4.3/Bioc 3.20 stack and identify the unloading dependency. Until resolved, validate expected output files after R exits and never conceal the nonzero status."
+    },
+    {
+      "priority": "P2",
+      "title": "Self-contained msqrob2 demo realizes 7% FDR once",
+      "observed_in": [
+        12
+      ],
+      "problem": "The fixed seed prints 43 calls with 3 planted false positives (7.0%) at nominal 5%; it does not claim calibration but can be overread.",
+      "root_cause": "One compact illustrative simulation is not a calibration benchmark.",
+      "fix": "Optionally label this printed FDR as an illustrative realization; retain larger planted-truth regressions for calibration evidence."
+    }
+  ]
+}

@@ -1048,14 +1048,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: A property of conditional Shapley in general has been attributed to the tree_path_dependent implementation specifically, where the tree structure prevents it.
 - Fix: Restate the taxonomy row and the failure mode: under tree_path_dependent the credit split among correlated features that the model DOES use shifts toward the conditionally implied ones, which is why within-module ordering is not a finding. Reserve the 'nonzero credit to an entirely unused feature' statement for conditional estimators that sample from p(x_dropped \| x_S) without reference to the fitted structure, and align the prose with what examples/shap_omics_classifier.py already prints.
 
-### `bio-proteomics-differential-abundance` — The centring section's stated mechanism is refuted
-
-- Skill: 89, Production Ready · [mrsonord2240/bioSkills@1110c24](https://github.com/mrsonord2240/bioSkills/tree/1110c241c27760ad0127bd803e8832d54651e31c/proteomics/differential-abundance) · [viewer](skills/bio-proteomics-differential-abundance/mrsonord2240-bioSkills@1110c24/viewer.md)
-- Observed in inputs: Input 10
-- Problem: The Skill says a global between-condition offset of 0.1-0.2 log2 'becomes significant for hundreds of proteins at once' because feature-level standard errors are small. Injecting a uniform -0.20 log2 offset into every treatment run gives 0 false positives, with the null-protein median SE unchanged at 0.2057. Real per-run median normalization at the same -0.199 median offset gives 31 false positives, because it ALSO halves that SE to 0.1159 by removing genuine within-condition run-to-run loading variation. Neither ingredient alone is enough - offset-only gives 0 FP, SE-shrinkage-only (centring each run on its own condition's median) gives 1 of 81. 'Hundreds' is also an overstatement of 31.
-- Root cause: The root-cause analysis varied one family of normalizations, in which the offset and the variance shrinkage move together, and attributed the whole effect to the variable that was easiest to measure.
-- Fix: Rewrite the Approach paragraph: per-run median normalization of a peptide table does two things at once - it transfers a detection-composition difference into a between-condition offset, AND it removes real run-to-run loading variance, shrinking the residual the test divides by. The offset is the detectable symptom of both. Keep the guard exactly as it is (it fired correctly on every configuration tested) and add a second cheap check beside it: compare the residual SD before and after normalization, and treat a large drop as the same warning. Drop 'hundreds of proteins at once' for the measured figure.
-
 ### `bio-single-cell-clustering` — The Skill's only operational stop rule never stops
 
 - Skill: 89, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/clustering) · [viewer](skills/bio-single-cell-clustering/GPTomics-bioSkills@d91ed3d/viewer.md)
@@ -1168,6 +1160,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The failure-mode section names a detection-only invocation but omits segmasker's output format and file handoff.
 - Fix: Replace the command with segmasker -infmt fasta -in query.fa -outfmt fasta > query.masked.fa, then explicitly use query.masked.fa for profile construction. State that the lowercase output is soft masking.
 
+### `bio-proteomics-differential-abundance` — Direct R processes exit 139 after valid output
+
+- Skill: 93, Production Ready · [mrsonord2240/bioSkills@31deeb9](https://github.com/mrsonord2240/bioSkills/tree/31deeb9912f6e318ed11069f05a55be98577ff5e/proteomics/differential-abundance) · [viewer](skills/bio-proteomics-differential-abundance/mrsonord2240-bioSkills@31deeb9/viewer.md)
+- Observed in inputs: 9, 12
+- Problem: Five fresh direct r.sh invocations wrote complete parseable output then returned exit 139.
+- Root cause: The failure appears during shared-R native teardown, after computation/output, rather than before a source-level result.
+- Fix: Reproduce in a clean user-target R 4.4.3/Bioc 3.20 stack and identify the unloading dependency. Until resolved, validate expected output files after R exits and never conceal the nonzero status.
+
 ### `bio-proteomics-spectral-libraries` — OpenSWATH TSV schema guidance omits transition_group_id
 
 - Skill: 93, Production Ready · [mrsonord2240/bioSkills@3f601a1](https://github.com/mrsonord2240/bioSkills/tree/3f601a1a50af8c52724edd5393938e2bda44cd79/proteomics/spectral-libraries) · [viewer](skills/bio-proteomics-spectral-libraries/mrsonord2240-bioSkills@3f601a1/viewer.md)
@@ -1256,7 +1256,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (412)
+## P2 (409)
 
 ### `bio-data-visualization-lollipop-protein-maps` — HGVSp edge cases and recurrence semantics undocumented
 
@@ -3490,38 +3490,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The table predates the fixes.
 - Fix: Add both rows with their fixes (--bt; fit step 1 on QC'd common variants).
 
-### `bio-proteomics-differential-abundance` — The MSstats block ships the normalization the Skill blames
-
-- Skill: 89, Production Ready · [mrsonord2240/bioSkills@1110c24](https://github.com/mrsonord2240/bioSkills/tree/1110c241c27760ad0127bd803e8832d54651e31c/proteomics/differential-abundance) · [viewer](skills/bio-proteomics-differential-abundance/mrsonord2240-bioSkills@1110c24/viewer.md)
-- Observed in inputs: Input 9
-- Problem: The MSstats workflow hardcodes normalization = 'equalizeMedians' and therefore produces a table with a -0.184 offset and a 20.8% realized FDR. The centring guard two paragraphs later then stops the reader. One section of the Skill warns about exactly what another section does.
-- Root cause: The MSstats block was written from the vendor's default call; the centring section was added afterwards without revisiting it.
-- Fix: Add a comment on the normalization argument of dataProcess pointing at the centring check, and offer normalization = FALSE with protein-level centring afterwards as the alternative the centring section actually recommends. Show the measured consequence (-0.184, 20.8%) inline so the choice is visible at the point of the call.
-
-### `bio-proteomics-differential-abundance` — The 0.05 centring threshold has no stated basis
-
-- Skill: 89, Production Ready · [mrsonord2240/bioSkills@1110c24](https://github.com/mrsonord2240/bioSkills/tree/1110c241c27760ad0127bd803e8832d54651e31c/proteomics/differential-abundance) · [viewer](skills/bio-proteomics-differential-abundance/mrsonord2240-bioSkills@1110c24/viewer.md)
-- Observed in inputs: Input 10
-- Problem: The guard stops at \|median log2FC\| > 0.05. On this data an injected uniform offset of -0.20 is harmless (0 FP) yet would be stopped, and a within-condition centring that halves the SE is harmful in principle yet passes at -0.016. The threshold is calibrated on one 4v4 set and on a symptom whose relation to the harm is not what the prose says.
-- Root cause: The constant was read off the four normalizations tried during the fix pass.
-- Fix: State that 0.05 is an empirical trip-wire from one 4v4 label-free set, not a distributional bound; make it a named constant at the top of the block; and say explicitly that passing the check does not certify the normalization, only that this particular symptom is absent.
-
-### `bio-proteomics-differential-abundance` — Two of the three examples are unreferenced
-
-- Skill: 89, Production Ready · [mrsonord2240/bioSkills@1110c24](https://github.com/mrsonord2240/bioSkills/tree/1110c241c27760ad0127bd803e8832d54651e31c/proteomics/differential-abundance) · [viewer](skills/bio-proteomics-differential-abundance/mrsonord2240-bioSkills@1110c24/viewer.md)
-- Observed in inputs: Static evaluation
-- Problem: SKILL.md and usage-guide.md point at examples/msqrob2_peptide_level.R only. examples/limma_analysis.R and examples/differential_abundance.py both ship and both exit 0, but nothing links to them.
-- Root cause: Pass 4 added a reference for the new example and did not revisit the existing two.
-- Fix: Cite examples/limma_analysis.R from the limma workflow and examples/differential_abundance.py from the Python workflow, as the msqrob2 example is cited from its own section.
-
-### `bio-proteomics-differential-abundance` — 398 lines in one file with no progressive disclosure
-
-- Skill: 89, Production Ready · [mrsonord2240/bioSkills@1110c24](https://github.com/mrsonord2240/bioSkills/tree/1110c241c27760ad0127bd803e8832d54651e31c/proteomics/differential-abundance) · [viewer](skills/bio-proteomics-differential-abundance/mrsonord2240-bioSkills@1110c24/viewer.md)
-- Observed in inputs: Static evaluation
-- Problem: Ten code blocks in a single file; an agent that needs only the limma route loads the msqrob2, MSstats, proDA and Python sections as well.
-- Root cause: Pass 4 added roughly 110 lines of new sections without splitting the file.
-- Fix: Move the feature-level material (msqrob2, msqrobAggregate, MSstats, the centring check) into references/feature_level.md, leaving the insights, the protein-summary workflows and the Common Errors table in SKILL.md.
-
 ### `bio-single-cell-clustering` — Seurat Leiden dependency is named wrongly
 
 - Skill: 89, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/clustering) · [viewer](skills/bio-single-cell-clustering/GPTomics-bioSkills@d91ed3d/viewer.md)
@@ -4281,6 +4249,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The documented incompatibility (enrichplot 1.26.6/ggtree/ggplot2 4.0.3) may be fixed in a future enrichplot or ggtree release, at which point the Skill's 'do not retry' guidance and emapplot-only recommendation for compareClusterResult would become stale.
 - Root cause: The fix correctly documents a point-in-time incompatibility but has no built-in trigger to revisit it as dependency versions move forward.
 - Fix: Add a one-line note to Version Compatibility: 're-test treeplot on a compareClusterResult after any enrichplot/ggtree upgrade; this may be fixed upstream'.
+
+### `bio-proteomics-differential-abundance` — Self-contained msqrob2 demo realizes 7% FDR once
+
+- Skill: 93, Production Ready · [mrsonord2240/bioSkills@31deeb9](https://github.com/mrsonord2240/bioSkills/tree/31deeb9912f6e318ed11069f05a55be98577ff5e/proteomics/differential-abundance) · [viewer](skills/bio-proteomics-differential-abundance/mrsonord2240-bioSkills@31deeb9/viewer.md)
+- Observed in inputs: 12
+- Problem: The fixed seed prints 43 calls with 3 planted false positives (7.0%) at nominal 5%; it does not claim calibration but can be overread.
+- Root cause: One compact illustrative simulation is not a calibration benchmark.
+- Fix: Optionally label this printed FDR as an illustrative realization; retain larger planted-truth regressions for calibration evidence.
 
 ### `bio-proteomics-spectral-libraries` — -method reverse's determinism claim is slightly overstated
 
