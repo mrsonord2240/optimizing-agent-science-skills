@@ -22,7 +22,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The example passes cluster_rows=<OLO dendrogram> together with row_split=gene_info$pathway, a combination ComplexHeatmap rejects; the script was never run.
 - Fix: Drop row_split or use a numeric row_split (works with the dendrogram), or apply OLO within each pathway group; supply a runnable data preamble and state the constraint in SKILL.md next to the OLO block.
 
-## P1 (159)
+## P1 (158)
 
 ### `bio-data-visualization-lollipop-protein-maps` — Shipped example never completes and paints wrong colours
 
@@ -840,22 +840,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: `datasets rehydrate`'s local-state check appears to be presence-only (does a file exist at the expected relative path), not a size or checksum comparison against the values it itself records in dataset_catalog.json.uncompressedLengthBytes.
 - Fix: Add a step to bulk_dehydrated.sh (and a note in SKILL.md's Checksum verification section) that independently verifies file size against dataset_catalog.json's uncompressedLengthBytes (or re-downloads into a clean directory) after the aria2c leg, rather than trusting `datasets rehydrate`'s 'already rehydrated' report as a correctness signal. Downgrade the 'Rehydrate workflows also verify' claim to state this limitation explicitly.
 
-### `bio-causal-genomics-proteome-mr-drug-target` — mr_ivw namespace collision between TwoSampleMR and MendelianRandomization
-
-- Skill: 88, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/causal-genomics/proteome-mr-drug-target) · [viewer](skills/bio-causal-genomics-proteome-mr-drug-target/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 5
-- Problem: When coloc, MendelianRandomization, and TwoSampleMR are all loaded (a natural combination for the correlated cis-IVW + coloc.susie workflow this skill documents), TwoSampleMR::mr_ivw silently shadows MendelianRandomization::mr_ivw on the search path if TwoSampleMR loads last. The documented call mr_ivw(mr_obj, model='default', correl=TRUE) then throws 'unused arguments' with no hint of the real cause.
-- Root cause: SKILL.md's 'Cis-IVW with Correlated Instruments' and 'Robust/Penalized cis-IVW' code blocks never use explicit MendelianRandomization:: namespacing, and no Common-Errors row warns about this cross-package name collision.
-- Fix: Add explicit MendelianRandomization::mr_ivw() calls in both code blocks, and add a row to the Common Errors table: "mr_ivw() throws 'unused arguments' \| TwoSampleMR::mr_ivw masks MendelianRandomization::mr_ivw when both are loaded \| call MendelianRandomization::mr_ivw() explicitly."
-
-### `bio-causal-genomics-proteome-mr-drug-target` — Shipped phewas example contains the exact debug shortcut its own SKILL.md text disclaims
-
-- Skill: 88, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/causal-genomics/proteome-mr-drug-target) · [viewer](skills/bio-causal-genomics-proteome-mr-drug-target/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 4
-- Problem: examples/phewas_drug_target_mr.R runs lapply(outcomes_filt$id[1:200], scan_one_outcome) as its literal example code, while SKILL.md's prose a few lines below calls this same [1:200] pattern 'a debug shortcut, not a defensible pheWAS protocol.'
-- Root cause: The cautionary note was added to SKILL.md's prose without updating the actual shipped example it refers to.
-- Fix: Remove the [1:200] slice from examples/phewas_drug_target_mr.R (loop over the full outcomes_filt$id) or replace it with a clearly-marked, commented-out debug line so the copy-pasteable example matches the documented best practice.
-
 ### `bio-crispr-screens-mageck-analysis` — 'RRA does not support pairing' is factually incorrect
 
 - Skill: 88, Limited Release · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/crispr-screens/mageck-analysis) · [viewer](skills/bio-crispr-screens-mageck-analysis/mrsonord2240-bioSkills@6847328/viewer.md)
@@ -1176,6 +1160,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: It filters R NA values but not literal text NA in the KEGG column.
 - Fix: Exclude both is.na(kegg_ids) and trimws(kegg_ids) == 'NA' before writing and counting mappings.
 
+### `bio-causal-genomics-proteome-mr-drug-target` — Handle pheWAS scans with zero usable results
+
+- Skill: 93, Production Ready · [mrsonord2240/bioSkills@b1df50d](https://github.com/mrsonord2240/bioSkills/tree/b1df50d420e9a6bb2cd43f46adf2a0d94ff37288/causal-genomics/proteome-mr-drug-target) · [viewer](skills/bio-causal-genomics-proteome-mr-drug-target/mrsonord2240-bioSkills@b1df50d/viewer.md)
+- Observed in inputs: 11
+- Problem: scripts/phewas_curated_endpoints.R errors with object 'pval' not found and writes no output when every endpoint returns NULL or fewer than two usable SNPs.
+- Root cause: The script assumes do.call(rbind, Filter(Negate(is.null), results)) produces at least one row before accessing pval and creating corrections.
+- Fix: After filtering results, explicitly test for zero rows; write a header-only TSV or return a structured no-usable-outcomes status with counts and actionable retry guidance. Also wrap per-endpoint extraction errors so one transient API failure does not abort a full scan.
+
 ### `bio-metabolomics-normalization-qc` — Make the QCRSC all-NA guard per-batch
 
 - Skill: 93, Production Ready · [mrsonord2240/bioSkills@980965f](https://github.com/mrsonord2240/bioSkills/tree/980965fb613fd6c6dbbabe8d51c2b54eae3d8f34/metabolomics/normalization-qc) · [viewer](skills/bio-metabolomics-normalization-qc/mrsonord2240-bioSkills@980965f/viewer.md)
@@ -1296,7 +1288,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (384)
+## P2 (382)
 
 ### `bio-data-visualization-lollipop-protein-maps` — HGVSp edge cases and recurrence semantics undocumented
 
@@ -2938,30 +2930,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The Skill's worked examples focus on genome/gene; virus was likely added to the scope table without a matching code-pattern section.
 - Fix: Add a short 'Download virus assemblies' code pattern alongside the existing genome/gene patterns, including a dataformat tsv virus-genome --fields example verified against a live --help catalog.
 
-### `bio-causal-genomics-proteome-mr-drug-target` — No concrete path to a local LD reference panel
-
-- Skill: 88, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/causal-genomics/proteome-mr-drug-target) · [viewer](skills/bio-causal-genomics-proteome-mr-drug-target/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 1, 5
-- Problem: The correlated cis-IVW and clumping workflow hard-depends on genetics.binaRies (GitHub-only install) plus a 1kg_EUR/EUR bfile that the skill never shows how to obtain or build; with OpenGWAS gated, an agent has no documented fallback for real in-window LD.
-- Root cause: The skill assumes either live OpenGWAS access or a pre-existing local 1000G reference, neither of which is guaranteed.
-- Fix: Add a concrete recipe (e.g. plink2 --make-bed from public 1000G phase 3 VCFs restricted to the EUR superpopulation) so an agent without OpenGWAS access can still build a real reference panel.
-
-### `bio-causal-genomics-proteome-mr-drug-target` — SKILL.md carries the full methodological corpus inline with no references/ split
-
-- Skill: 88, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/causal-genomics/proteome-mr-drug-target) · [viewer](skills/bio-causal-genomics-proteome-mr-drug-target/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: —
-- Problem: At ~450 lines with dense decision-tree, threshold, and reconciliation tables, SKILL.md exceeds the progressive-disclosure ideal of a concise top-level file with depth deferred to references/.
-- Root cause: No references/ subfolder exists; usage-guide.md only separates quick-start prompts, not the methodological tables.
-- Fix: Move the Data Source Taxonomy, Cis-MR Methodological Taxonomy, Quantitative Thresholds, and Reconciliation tables into a references/ subfolder, leaving SKILL.md as a shorter router into them.
-
-### `bio-causal-genomics-proteome-mr-drug-target` — Example scripts are not runnable out-of-the-box
-
-- Skill: 88, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/causal-genomics/proteome-mr-drug-target) · [viewer](skills/bio-causal-genomics-proteome-mr-drug-target/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 1, 2, 3, 4, 5, 6
-- Problem: Both shipped examples hardcode local file paths (data/ukbppp_pcsk9_full_window.tsv, 1kg_EUR/EUR) with no bundled or synthetic data, so neither can be executed without the user's own real data or an auditor-built substitute.
-- Root cause: Examples are written as illustrative code patterns rather than self-contained, runnable smoke tests.
-- Fix: Bundle a small synthetic dataset (as this audit built) alongside each example so an agent can run it directly to verify the pattern before substituting real data.
-
 ### `bio-crispr-screens-mageck-analysis` — FluteRRA's remaining 'undefined columns selected' error is a real, still-open upstream gap
 
 - Skill: 88, Limited Release · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/crispr-screens/mageck-analysis) · [viewer](skills/bio-crispr-screens-mageck-analysis/mrsonord2240-bioSkills@6847328/viewer.md)
@@ -4009,6 +3977,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: simex_egger.R accepts a seed but leaves it unset by default, so repeated correction results can vary.
 - Root cause: The optional seed is exposed but not given a reproducible default or omission warning.
 - Fix: Set a documented default seed or print a reproducibility warning whenever --seed is omitted.
+
+### `bio-causal-genomics-proteome-mr-drug-target` — Record production prerequisites before live runs
+
+- Skill: 93, Production Ready · [mrsonord2240/bioSkills@b1df50d](https://github.com/mrsonord2240/bioSkills/tree/b1df50d420e9a6bb2cd43f46adf2a0d94ff37288/causal-genomics/proteome-mr-drug-target) · [viewer](skills/bio-causal-genomics-proteome-mr-drug-target/mrsonord2240-bioSkills@b1df50d/viewer.md)
+- Observed in inputs: 4, 10
+- Problem: Live OpenGWAS execution remains JWT-gated, and local VEP with the GRCh38 cache was not installed in this audit environment.
+- Root cause: These are external authenticated or multi-GB runtime prerequisites rather than source-code failures.
+- Fix: At invocation, preflight for an OpenGWAS token and VEP/cache availability, then emit a concise blocked status before starting a long scan; retain the documented local-LD fallback.
 
 ### `bio-experimental-design-randomization-blocking` — usage-guide.md lost its standalone human-skimmable process/tips summary
 

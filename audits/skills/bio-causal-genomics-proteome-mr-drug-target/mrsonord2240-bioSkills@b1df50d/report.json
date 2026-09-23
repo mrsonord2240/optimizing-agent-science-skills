@@ -1,0 +1,152 @@
+{
+  "meta": {
+    "skill_name": "bio-causal-genomics-proteome-mr-drug-target",
+    "description": "Runs cis-pQTL Mendelian randomization for drug-target validation with colocalization, platform replication, PAV sensitivity, and phenome-wide adverse-effect scans.",
+    "evaluated_on": "2026-09-23",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 11,
+    "source": "mrsonord2240/bioSkills@b1df50d420e9a6bb2cd43f46adf2a0d94ff37288:causal-genomics/proteome-mr-drug-target",
+    "audit_type": "final-pass-phase2",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md",
+    "prior_report": "F:/OpenScience/audits/_pre-fix-20260923/bio-causal-genomics-proteome-mr-drug-target/eval_report_bio-causal-genomics-proteome-mr-drug-target_result.json",
+    "artifacts": {
+      "viewer": "F:/OpenScience/audits/bio-causal-genomics-proteome-mr-drug-target/eval_viewer_bio-causal-genomics-proteome-mr-drug-target.md",
+      "run": "F:/OpenScience/audits/bio-causal-genomics-proteome-mr-drug-target/run",
+      "data": "F:/OpenScience/audits/bio-causal-genomics-proteome-mr-drug-target/data",
+      "checkpoint": "F:/OpenScience/audits/_final_pass/bio-causal-genomics-proteome-mr-drug-target/CHECKPOINT.md",
+      "prior_archive": "F:/OpenScience/audits/_pre-fix-20260923/bio-causal-genomics-proteome-mr-drug-target"
+    }
+  },
+  "veto_gates": {
+    "skill_veto": { "gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS" },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All numerical tests are explicitly labelled synthetic with planted ground truth, or are local deterministic API-shaped stubs; no unverified clinical or literature statistics were invented." },
+      "practice_boundaries": { "result": "PASS", "detail": "All outputs concern population-level drug-target research. The adversarial request is refused as insufficient evidence; no individual diagnosis, prescription, or treatment recommendation is generated." },
+      "methodological_ground": { "result": "PASS", "detail": "The audit verifies the cis-only refusal with a 3.6-fold distortion from a trans instrument, the PP.H4 and PAV/cross-platform ladders, and the repaired Steiger sample-size contract." },
+      "code_usability": { "result": "PASS", "detail": "The current shipped cis example and curated-endpoint script executed end to end in an isolated copy. Input 11 exposes a localized empty-result guard defect, but valid analyses are runnable and the failure is explicit rather than silent." }
+    }
+  },
+  "static_score": {
+    "subtotal": 92,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 11, "max": 12, "note": "Covers cis-MR, correlated instruments, coloc, PAV, platform reconciliation, target nomination and pheWAS; the curated pheWAS script lacks a defined zero-usable-outcome result." },
+      "reliability": { "score": 10, "max": 12, "note": "Strong failure-mode routing, explicit package/version checks, and a repaired Steiger prerequisite; the shipped pheWAS loop stops with object 'pval' not found when no endpoint yields data." },
+      "performance_context": { "score": 7, "max": 8, "note": "The 186-line router uses targeted references and scripts; its advanced branches appropriately require substantial external data." },
+      "agent_usability": { "score": 15, "max": 16, "note": "Decision tree, threshold ladder, exact columns, Common Errors, and named namespace/sign-alignment handling make the primary workflow highly actionable." },
+      "human_usability": { "score": 7, "max": 8, "note": "Clear natural researcher triggers and explicit claim ladder; expert terminology and local-data prerequisites remain necessarily demanding." },
+      "security": { "score": 12, "max": 12, "note": "No secrets, destructive operations, or raw-code execution of user strings; aggregate summary statistics are the documented input model." },
+      "maintainability": { "score": 11, "max": 12, "note": "Reference files isolate advanced methods and the pheWAS logic is parameterized; an explicit no-result branch would improve testability and recovery." },
+      "agent_specific": { "score": 19, "max": 20, "note": "Precise triggering, progressive disclosure, stop conditions, and composable tabular outputs are strong; authentication and multi-GB external resources remain external escape hatches." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 93.9,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 48, "total": 49 },
+    "inputs": [
+      { "index": 1, "type": "Canonical", "label": "PCSK9 cis-MR, coloc, PAV sensitivity, correlated IVW", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Fresh synthetic planted-truth R run completed all assertions; the Windows R wrapper returned 2816 only after PASS output was materialized.", "note": "IVW 0.4296 versus planted 0.45; PP.H4 0.9999999; 24 to 23 instruments after PAV exclusion.", "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 4, "assertions_total": 4, "assertions": [
+        { "text": "Cis-IVW recovers the planted protein-to-disease effect", "result": "PASS", "note": "0.4296 is within 0.10 of 0.45." },
+        { "text": "PAV sensitivity is run and reported", "result": "PASS", "note": "One PAV was removed and the direction remained concordant." },
+        { "text": "Colocalization clears the publication PP.H4 threshold", "result": "PASS", "note": "PP.H4=0.9999999 exceeds 0.8." },
+        { "text": "Correlated-IVW uses the repaired namespaced API", "result": "PASS", "note": "MendelianRandomization::mr_ivw completed with the supplied matrix." }
+      ] },
+      { "index": 2, "type": "Variant A", "label": "IL6R Olink-SomaScan replication with PAV artifact", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Fresh synthetic cross-platform run produced materialized outputs before the known post-output Windows R exit.", "note": "Pre-PAV magnitude ratio 2.19 failed the <2x bar; SomaScan converged from -0.2380 to -0.4950 after dropping its planted PAV.", "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 5, "assertions_total": 5, "assertions": [
+        { "text": "Cross-platform direction is checked", "result": "PASS", "note": "Both estimates are negative." },
+        { "text": "Magnitude agreement is checked, not assumed", "result": "PASS", "note": "2.19 ratio is explicitly identified as failing the rule." },
+        { "text": "PAV artifact is isolated", "result": "PASS", "note": "The planted missense variant is removed in the sensitivity analysis." },
+        { "text": "Platform-specific coloc ambiguity is retained", "result": "PASS", "note": "SomaScan PP.H3 dominates rather than being overclaimed." },
+        { "text": "PAV exclusion restores interpretable agreement", "result": "PASS", "note": "The resulting ratio is approximately 1.05." }
+      ] },
+      { "index": 3, "type": "Edge", "label": "Small ANGPTL4 cis window and sentinel comparison", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Fresh R run completed and printed both full-IVW and sentinel Wald estimates before the known post-output wrapper exit.", "note": "Five instruments survived; Wald 0.5334 versus IVW 0.5750 and PP.H4 0.6026 remain below the suggestive bar.", "basic": 37, "specialized": 55, "total": 92, "assertions_passed": 4, "assertions_total": 4, "assertions": [
+        { "text": "Single-sentinel logic is available", "result": "PASS", "note": "The script produces a Wald ratio for the lead SNP." },
+        { "text": "Small-window coloc is still evaluated", "result": "PASS", "note": "A 15-SNP coloc result is printed." },
+        { "text": "Sub-threshold PP.H4 is not promoted", "result": "PASS", "note": "0.6026 is below 0.7." },
+        { "text": "Sentinel and IVW disagreement is quantified", "result": "PASS", "note": "The 0.928 ratio is printed with the failure-mode interpretation." }
+      ] },
+      { "index": 4, "type": "Variant B", "label": "Full 50-outcome on-target pheWAS substitute", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Fresh 50-outcome local R scan completed; OpenGWAS live calls were not used because the catalogue requires a JWT.", "note": "All 50 outcomes were tested; only the planted T2D-like effect passed Bonferroni (p_bonf=1.09e-32).", "basic": 39, "specialized": 57, "total": 96, "assertions_passed": 5, "assertions_total": 5, "assertions": [
+        { "text": "A full outcome set is scanned", "result": "PASS", "note": "50 of 50 outcomes, with no debug slice." },
+        { "text": "Bonferroni correction uses the tested count", "result": "PASS", "note": "Threshold is 0.05/50." },
+        { "text": "The planted adverse effect is recovered", "result": "PASS", "note": "Recovered beta=0.1777 versus 0.18." },
+        { "text": "Borderline effects are not overclaimed", "result": "PASS", "note": "The 0.06 planted effect has p_bonf=0.276." },
+        { "text": "FDR accompanies strict correction", "result": "PASS", "note": "BH column is materialized." }
+      ] },
+      { "index": 5, "type": "Stress", "label": "Allelic heterogeneity and coloc.susie", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Fresh individual-level synthetic R run completed SuSiE, coloc.susie, Wald ratios and correlated robust IVW.", "note": "Two credible sets per trait; matching pairs PP.H4=1.0; standard and robust correlated IVW both 0.4987 for planted 0.5.", "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 5, "assertions_total": 5, "assertions": [
+        { "text": "Independent signals are resolved", "result": "PASS", "note": "Two credible sets were recovered for each trait." },
+        { "text": "Matched signals colocalize", "result": "PASS", "note": "Matching PP.H4 values are 1.0." },
+        { "text": "Crossed signals do not falsely colocalize", "result": "PASS", "note": "Crossed pairs are H3-dominant." },
+        { "text": "Per-signal effects recover the target effect", "result": "PASS", "note": "Wald estimates 0.4191 and 0.5886 bracket 0.5." },
+        { "text": "Robust correlated IVW is executable", "result": "PASS", "note": "Both standard and robust estimates are 0.4987." }
+      ] },
+      { "index": 6, "type": "Scope Boundary", "label": "Trans-pQTL inclusion request", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Fresh planted-pleiotropy R comparison completed and printed cis-only and contaminated estimates.", "note": "Cis-only IVW=0.4089 for truth 0.4; adding trans SNP gives 1.4657 and Q p=4.03e-44.", "basic": 39, "specialized": 57, "total": 96, "assertions_passed": 4, "assertions_total": 4, "assertions": [
+        { "text": "Trans instruments are refused as primary evidence", "result": "PASS", "note": "Matches the Decision Tree rule." },
+        { "text": "The harm from ignoring the rule is quantified", "result": "PASS", "note": "Effect inflates about 3.6-fold." },
+        { "text": "Heterogeneity is surfaced", "result": "PASS", "note": "Cochran Q p=4.03e-44." },
+        { "text": "The alternative response remains scientifically bounded", "result": "PASS", "note": "Only confirmatory use is offered." }
+      ] },
+      { "index": 7, "type": "Adversarial", "label": "Overclaim from nominal p=0.03", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Fresh grounding script completed with the Skill's stated thresholds.", "note": "p=0.03 is 1753.8x looser than Olink and 2944.2x looser than SomaScan proteome-wide bars.", "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 4, "assertions_total": 4, "assertions": [
+        { "text": "The nominal claim is refused", "result": "PASS", "note": "The evidence is below even the exploratory ladder rung." },
+        { "text": "The refusal is quantitative", "result": "PASS", "note": "Both relevant Bonferroni gaps are calculated." },
+        { "text": "Missing triangulation legs are named", "result": "PASS", "note": "Coloc, replication, PAV, neighbour and L2G are enumerated." },
+        { "text": "No clinical efficacy is fabricated", "result": "PASS", "note": "The output limits itself to evidence requirements." }
+      ] },
+      { "index": 8, "type": "Variant A", "label": "Steiger sample-size regression", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Fresh literal execution of failure-modes.md lines 42-48 completed with explicit sample sizes.", "note": "Four rows survive; all Steiger directions are TRUE; directionality p=1.29e-57.", "basic": 39, "specialized": 59, "total": 98, "assertions_passed": 4, "assertions_total": 4, "assertions": [
+        { "text": "The repaired block no longer crashes", "result": "PASS", "note": "steiger_filtering returned four rows." },
+        { "text": "Sample sizes yield r-squared fields", "result": "PASS", "note": "Both rsq.exposure and rsq.outcome are present." },
+        { "text": "Forward direction is recoverable", "result": "PASS", "note": "All four steiger_dir values are TRUE." },
+        { "text": "The directionality result is materialized", "result": "PASS", "note": "correct_causal_direction is TRUE." }
+      ] },
+      { "index": 9, "type": "Canonical", "label": "Current shipped cis_pqtl_mr.R with local LD", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "The unmodified current example was sourced from an isolated copy after supplying synthetic data and a disposable local PLINK bfile; all output assertions printed before the known wrapper exit.", "note": "Real PLINK 1.9 clumped 24 SNPs, computed the matrix, namespaced IVW ran, and PP.H4=0.9999999.", "basic": 39, "specialized": 58, "total": 97, "assertions_passed": 5, "assertions_total": 5, "assertions": [
+        { "text": "The shipped example completes unmodified", "result": "PASS", "note": "source(examples/cis_pqtl_mr.R) returned to the harness." },
+        { "text": "Local clumping is real rather than stubbed", "result": "PASS", "note": "PLINK loaded 14,389 variants and formed 24 clumps." },
+        { "text": "LD-matrix IVW completes", "result": "PASS", "note": "Namespaced correlated IVW printed estimate 0.431." },
+        { "text": "Coloc decision is produced", "result": "PASS", "note": "PP.H4=0.9999999." },
+        { "text": "Primary decision is internally consistent", "result": "PASS", "note": "triangulation_passed is TRUE." }
+      ] },
+      { "index": 10, "type": "Variant B", "label": "Current shipped curated-endpoint pheWAS script", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "The unmodified script was sourced with deterministic API-shaped local stubs because live OpenGWAS needs JWT; it scanned all 12 endpoints and wrote its TSV.", "note": "12/12 outcomes returned results; one planted effect has p_bonf=6.63e-43.", "basic": 39, "specialized": 58, "total": 97, "assertions_passed": 5, "assertions_total": 5, "assertions": [
+        { "text": "Every curated endpoint is scanned", "result": "PASS", "note": "12 calls and 12 result rows." },
+        { "text": "The output TSV is written and parseable", "result": "PASS", "note": "phewas.tsv reloaded as 12 rows." },
+        { "text": "Bonferroni columns are present", "result": "PASS", "note": "p_bonf is in the materialized TSV." },
+        { "text": "The planted effect is detected", "result": "PASS", "note": "Minimum adjusted p=6.63e-43." },
+        { "text": "No endpoint slice is applied", "result": "PASS", "note": "The script loop receives the complete endpoint set." }
+      ] },
+      { "index": 11, "type": "Edge", "label": "PheWAS with no usable endpoint data", "status": "PARTIAL", "status_flag": "❌", "executed": true, "execution_note": "Fresh exact-source edge run was captured under tryCatch; the script errors with object 'pval' not found and writes no TSV when every endpoint returns NULL.", "note": "This exposes a recoverable P1 reliability defect in the otherwise runnable curated-endpoint script.", "basic": 31, "specialized": 47, "total": 78, "assertions_passed": 3, "assertions_total": 4, "assertions": [
+        { "text": "The edge path is executed and observed", "result": "PASS", "note": "The exact source path was run with a no-overlap endpoint." },
+        { "text": "No-result scans produce a clear empty output", "result": "FAIL", "note": "The source errors with object 'pval' not found and writes no TSV." },
+        { "text": "The failure does not fabricate a target hit", "result": "PASS", "note": "No result row or claim is emitted." },
+        { "text": "The failure is localized for remediation", "result": "PASS", "note": "It occurs after Filter(Negate(is.null), results) returns no rows." }
+      ] }
+    ]
+  },
+  "final": { "static_weighted": 36.8, "dynamic_weighted": 56.3, "score": 93, "max": 100, "grade": "Production Ready", "grade_symbol": "⭐", "deployable": true, "veto_override": false },
+  "key_strengths": [
+    "The now-namespaced correlated-IVW workflow and local-LD fallback execute in the current shipped example, not merely in an isolated snippet.",
+    "The triangulation ladder blocks an unsupported nominal-p claim and the cis-only boundary prevents a measured 3.6-fold trans-instrument distortion.",
+    "Platform/PAV reconciliation and multi-signal coloc.susie both recover their planted ground truth in fresh runs.",
+    "The repaired Steiger block succeeds only after explicit sample sizes, exactly as the Skill now instructs."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "Handle pheWAS scans with zero usable results",
+      "observed_in": [11],
+      "problem": "scripts/phewas_curated_endpoints.R errors with object 'pval' not found and writes no output when every endpoint returns NULL or fewer than two usable SNPs.",
+      "root_cause": "The script assumes do.call(rbind, Filter(Negate(is.null), results)) produces at least one row before accessing pval and creating corrections.",
+      "fix": "After filtering results, explicitly test for zero rows; write a header-only TSV or return a structured no-usable-outcomes status with counts and actionable retry guidance. Also wrap per-endpoint extraction errors so one transient API failure does not abort a full scan."
+    },
+    {
+      "priority": "P2",
+      "title": "Record production prerequisites before live runs",
+      "observed_in": [4, 10],
+      "problem": "Live OpenGWAS execution remains JWT-gated, and local VEP with the GRCh38 cache was not installed in this audit environment.",
+      "root_cause": "These are external authenticated or multi-GB runtime prerequisites rather than source-code failures.",
+      "fix": "At invocation, preflight for an OpenGWAS token and VEP/cache availability, then emit a concise blocked status before starting a long scan; retain the documented local-LD fallback."
+    }
+  ]
+}
