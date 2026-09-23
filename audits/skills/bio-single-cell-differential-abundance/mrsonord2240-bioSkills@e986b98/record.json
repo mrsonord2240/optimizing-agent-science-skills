@@ -1,0 +1,41 @@
+{
+  "skill_id": "bio-single-cell-differential-abundance",
+  "version": "mrsonord2240-bioSkills@e986b98",
+  "source": {
+    "repository": "mrsonord2240/bioSkills",
+    "commit": "e986b98c85b38b4ad31ee9289f5aa39f6bec212b",
+    "path": "single-cell/differential-abundance",
+    "author": "GPTomics",
+    "author_url": "https://github.com/GPTomics",
+    "license": "MIT",
+    "modified_by": "Samuel Nord",
+    "fork_of": {
+      "repository": "GPTomics/bioSkills",
+      "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    "url": "https://github.com/mrsonord2240/bioSkills/tree/e986b98c85b38b4ad31ee9289f5aa39f6bec212b/single-cell/differential-abundance"
+  },
+  "audit": {
+    "method": {
+      "name": "skill-auditor",
+      "author": "AIPOCH",
+      "repository": "aipoch/medical-research-skills",
+      "commit": "f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26",
+      "path": "skill-auditor",
+      "license": "MIT",
+      "url": "https://github.com/aipoch/medical-research-skills/tree/f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26/skill-auditor"
+    },
+    "evaluator_version": "skill-auditor@1.0",
+    "audited_on": "2026-09-23",
+    "performed_by": "Claude (Anthropic) auditor agents",
+    "commissioned_by": "Samuel Nord",
+    "test_data": "synthetic"
+  },
+  "supersedes": "mrsonord2240-bioSkills@9f69601",
+  "files": {
+    "report": "report.json",
+    "viewer": "viewer.md",
+    "fixes": "fixes.md",
+    "scripts": 17
+  }
+}

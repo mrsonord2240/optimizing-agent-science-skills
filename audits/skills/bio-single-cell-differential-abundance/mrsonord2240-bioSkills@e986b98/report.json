@@ -1,0 +1,59 @@
+{
+  "meta": {
+    "skill_name": "bio-single-cell-differential-abundance",
+    "description": "Test whether cell-type proportions or composition changed between conditions in single-cell data using Milo, scCODA, sccomp, and propeller.",
+    "evaluated_on": "2026-09-23",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "mrsonord2240/bioSkills@e986b98c85b38b4ad31ee9289f5aa39f6bec212b:single-cell/differential-abundance",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md"
+  },
+  "veto_gates": {
+    "skill_veto": {"gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS"},
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {"result": "PASS", "detail": "All reported values are from fresh saved logs; the constructed mixing result remains qualified as inconclusive."},
+      "practice_boundaries": {"result": "PASS", "detail": "The Skill and fresh inputs compare donor groups and make no individual diagnostic, triage, or treatment claim."},
+      "methodological_ground": {"result": "PASS", "detail": "Fresh outputs retain donor-level replication, simplex-aware composition testing, n=1 refusal, and Milo power/adjustment cautions."},
+      "code_usability": {"result": "PASS", "detail": "Fresh exact inline Milo and scCODA paths completed with repaired library(dplyr) and import tensorflow as tf declarations."}
+    }
+  },
+  "static_score": {
+    "subtotal": 86,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {"score": 10, "max": 12, "note": "Core Milo, scCODA, and propeller workflows are fresh-runnable; sccomp remains unexecuted and version-drift qualified."},
+      "reliability": {"score": 10, "max": 12, "note": "Replicate, reference, seed, power, and common-error guidance is strong; a tested sccomp/CmdStan recovery path is absent."},
+      "performance_context": {"score": 7, "max": 8, "note": "The focused 195-line Skill avoids duplicated guide procedure, although several implementation details remain inline."},
+      "agent_usability": {"score": 14, "max": 16, "note": "Method selection and preventive cautions are clear and direct blocks now execute; sccomp adaptation still requires version inspection."},
+      "human_usability": {"score": 7, "max": 8, "note": "Natural triggers and recovery rows are clear; CmdStan is not an immediately runnable route."},
+      "security": {"score": 10, "max": 12, "note": "No credentials, destructive operations, or raw-code execution are present; metadata/confounding checks remain instructional."},
+      "maintainability": {"score": 10, "max": 12, "note": "Examples and inline blocks agree on repaired dependencies; untested sccomp API drift is one remaining seam."},
+      "agent_specific": {"score": 18, "max": 20, "note": "Triggers, seeds, stop conditions, and related-skill seams are strong; no runnable sccomp escape hatch exists here."}
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 92.1,
+    "max": 100,
+    "assertion_pass_rate": {"passed": 28, "total": 28},
+    "inputs": [
+      {"index": 1, "type": "Canonical", "label": "Eight-donor propeller composition test", "status": "COMPLETED", "status_flag": "✅", "note": "Fresh propeller recovered the planted NK-only expansion at FDR 9.25e-05; logit remained the current default.", "executed": true, "execution_note": "Executed run/2026-09-23-final-reaudit/input1_propeller_regression.R with speckle 1.6.0; checked input1_propeller_regression.log.", "basic": 37, "specialized": 56, "total": 93, "assertions_passed": 4, "assertions_total": 4, "assertions": [{"text": "A simplex-aware abundance method is used", "result": "PASS", "note": "propeller ran on donor-level counts."}, {"text": "The planted NK-only change is recovered", "result": "PASS", "note": "NK was the sole FDR below 0.05 call."}, {"text": "The current default transform is represented correctly", "result": "PASS", "note": "The run printed logit transformation for the default call."}, {"text": "The compositional constraint is made visible", "result": "PASS", "note": "NK versus mean-other proportion correlation was -1.000."}]},
+      {"index": 2, "type": "Variant A", "label": "Eight-donor Milo neighborhood regression", "status": "COMPLETED", "status_flag": "✅", "note": "Fresh Milo made 284 neighborhoods, returned no SpatialFDR call for NK, and reproduced adjusted-only caution and k/prop sensitivity.", "executed": true, "execution_note": "Executed run/2026-09-23-final-reaudit/input2_milo_regression.R; checked input2_milo_regression.log. R returned Windows code 2816 after checked DONE output.", "basic": 36, "specialized": 52, "total": 88, "assertions_passed": 4, "assertions_total": 4, "assertions": [{"text": "Milo produces SpatialFDR output", "result": "PASS", "note": "284 annotated neighborhoods and SpatialFDR were produced."}, {"text": "The documented power limitation is reproduced", "result": "PASS", "note": "No NK neighborhood passed SpatialFDR below 0.1."}, {"text": "The adjusted-only monocyte signal is qualified", "result": "PASS", "note": "The checked output supports the unconfirmed caution."}, {"text": "The repaired inline Milo dependencies execute", "result": "PASS", "note": "The separate source-faithful full-path run completed."}]},
+      {"index": 3, "type": "Variant B", "label": "Seeded scCODA reference-model regression", "status": "COMPLETED", "status_flag": "✅", "note": "The fresh 1,000-draw seeded fit selected reference 2 and recovered only NK with inclusion probability 1.0.", "executed": true, "execution_note": "Executed run/2026-09-23-final-reaudit/input3_sccoda_reference_regression.py in tools/sccoda-venv; checked input3_sccoda_reference_regression.log.", "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 4, "assertions_total": 4, "assertions": [{"text": "The count table has required covariates", "result": "PASS", "note": "dat.from_pandas accepted all eight samples."}, {"text": "The seeded HMC model samples", "result": "PASS", "note": "1,000 draws completed at 80.1% acceptance."}, {"text": "The planted NK change is recovered", "result": "PASS", "note": "NK alone had inclusion probability 1.0."}, {"text": "The automatic reference is recorded", "result": "PASS", "note": "The output recorded reference index 2."}]},
+      {"index": 4, "type": "Edge", "label": "One donor per condition", "status": "COMPLETED", "status_flag": "✅", "note": "propeller refused n=1; n=2 through n=4 each recovered NK alone with improving FDR.", "executed": true, "execution_note": "Executed run/2026-09-23-final-reaudit/input4_n1_regression.R; checked input4_n1_regression.log. R returned Windows code 2816 after checked DONE output.", "basic": 37, "specialized": 55, "total": 92, "assertions_passed": 4, "assertions_total": 4, "assertions": [{"text": "The n=1 design is treated as unidentifiable", "result": "PASS", "note": "No abundance claim was emitted."}, {"text": "The tool failure is surfaced", "result": "PASS", "note": "The expected finite-residual error was logged."}, {"text": "Replication is tested after refusal", "result": "PASS", "note": "n=2, n=3, and n=4 runs completed."}, {"text": "Only planted NK is called after replication", "result": "PASS", "note": "Each replicated analysis called NK only."}]},
+      {"index": 5, "type": "Stress", "label": "Joint DE and DA interpretation", "status": "COMPLETED", "status_flag": "✅", "note": "The paired test recovered 15 precise monocyte DE calls and kept the CD4/CD8 mixing demonstration inconclusive.", "executed": true, "execution_note": "Executed run/2026-09-23-final-reaudit/input5_de_da_regression.R; checked input5_de_da_regression.log. R returned Windows code 2816 after checked DONE2 output.", "basic": 35, "specialized": 53, "total": 88, "assertions_passed": 4, "assertions_total": 4, "assertions": [{"text": "DE and DA are run together", "result": "PASS", "note": "edgeR pseudobulk and propeller both executed."}, {"text": "Injected monocyte DE is precise", "result": "PASS", "note": "15 calls had precision 1.0."}, {"text": "No unsupported mixing conclusion is made", "result": "PASS", "note": "The constructed mixing result was stated inconclusive."}, {"text": "Coarse-label limitation is disclosed", "result": "PASS", "note": "Coarse propeller called NK only."}]},
+      {"index": 6, "type": "Scope Boundary", "label": "Exact repaired Milo inline path", "status": "COMPLETED", "status_flag": "✅", "note": "The exact displayed Milo block completed design, neighborhood test, annotation, and SpatialFDR output with dplyr declared.", "executed": true, "execution_note": "Executed run/2026-09-23-final-reaudit/input6_milo_inline_full_path.R; checked PASS_MILO_INLINE_FULL_PATH. R returned Windows code 2816 after checked completion output.", "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 4, "assertions_total": 4, "assertions": [{"text": "The inline block declares dplyr", "result": "PASS", "note": "library(dplyr) precedes distinct()."}, {"text": "The exact design construction executes", "result": "PASS", "note": "Eight distinct donor rows were created."}, {"text": "The exact Milo path reaches test output", "result": "PASS", "note": "306 neighborhoods and SpatialFDR were produced."}, {"text": "No undeclared-name repair is needed", "result": "PASS", "note": "The source-faithful block completed as printed."}]},
+      {"index": 7, "type": "Adversarial", "label": "Exact repaired scCODA inline path", "status": "COMPLETED", "status_flag": "✅", "note": "The exact displayed scCODA block ran default 20,000-draw HMC, selected reference 2, and recovered a credible NK effect.", "executed": true, "execution_note": "Executed run/2026-09-23-final-reaudit/input7_sccoda_inline_full_path.py in tools/sccoda-venv; checked PASS_SCCODA_INLINE_FULL_PATH after 87.848 seconds at 73.9% acceptance.", "basic": 39, "specialized": 57, "total": 96, "assertions_passed": 4, "assertions_total": 4, "assertions": [{"text": "The inline block imports TensorFlow as tf", "result": "PASS", "note": "import tensorflow as tf precedes tf.random.set_seed."}, {"text": "The inline seed command executes", "result": "PASS", "note": "The model constructed and sampled without NameError."}, {"text": "The inline model reaches default HMC sampling", "result": "PASS", "note": "20,000 draws completed."}, {"text": "A checkable credible result is produced", "result": "PASS", "note": "NK alone had a nonzero final parameter and credible effect."}]}
+    ]
+  },
+  "final": {"static_weighted": 34.4, "dynamic_weighted": 55.3, "score": 90, "max": 100, "grade": "Production Ready", "grade_symbol": "⭐", "deployable": true, "veto_override": false},
+  "key_strengths": ["Fresh propeller and scCODA runs recovered the planted NK-only composition shift with simplex-aware interpretation.", "The repaired Milo inline block now completes source-faithfully and retains useful null and adjusted-model cautions.", "The repaired scCODA inline block completed the documented default HMC path and recovered a credible NK effect.", "Fresh n=1 and joint DE/DA tests retained cautious refusal and interpretation behavior."],
+  "recommendations": [
+    {"priority": "P1", "title": "Make sccomp verification executable", "observed_in": [], "problem": "sccomp remains advertised but has no tested complete CmdStan/sccomp route in the designated environment.", "root_cause": "The install note names CmdStan without a version-pinned executed path, and the block has documented API drift.", "fix": "Add and execute a complete version-pinned CmdStan/sccomp route, or narrow the sccomp execution claim until it is tested."}
+  ]
+}
