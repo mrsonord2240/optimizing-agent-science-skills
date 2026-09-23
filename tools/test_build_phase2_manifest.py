@@ -42,10 +42,55 @@ class Phase2ManifestTests(unittest.TestCase):
             self.assertEqual(state, "ok")
             self.assertEqual(details["worktree_reference"], "matched")
             state, _ = MANIFEST.validate_checkpoint(checkpoint, "bio-example", Path("other-one"))
-            self.assertEqual(state, "bad")
+            self.assertEqual(state, "reformat")
             checkpoint.write_text(checkpoint.read_text(encoding="utf-8") + "\n## Result\n- extra\n", encoding="utf-8")
             state, _ = MANIFEST.validate_checkpoint(checkpoint, "bio-example", Path("right-one"))
             self.assertEqual(state, "ok")
+
+    def test_checkpoint_requires_a_matching_worktree_reference(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            checkpoint = Path(temporary) / "CHECKPOINT.md"
+            checkpoint.write_text(
+                "# bio-example — final pass checkpoint\n\n## Fixed this phase\n- fixed\n\n"
+                "## Still blocked (needs a decision)\n- none\n\n## Ran, not previously verified\n- ran\n",
+                encoding="utf-8",
+            )
+            state, details = MANIFEST.validate_checkpoint(checkpoint, "bio-example", Path("right-one"))
+            self.assertEqual(state, "reformat")
+            self.assertIn("does not explicitly name", details["reasons"][0])
+
+    def test_checkpoint_with_real_phase1_work_but_wrong_shape_is_reformat(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            checkpoint = Path(temporary) / "CHECKPOINT.md"
+            checkpoint.write_text(
+                "# Phase 1 notes for bio-example\n\nWorktree `F:\\OpenScience\\wt\\wrong-one`\n"
+                "| finding | priority | change | verified |\n|---|---|---|---|\n| broken flag | P1 | fixed it | ran |\n",
+                encoding="utf-8",
+            )
+            state, details = MANIFEST.validate_checkpoint(checkpoint, "bio-example", Path("right-one"))
+            self.assertEqual(state, "reformat")
+            self.assertIn("finding/change evidence table", details["substance_signals"])
+
+    def test_checkpoint_without_phase1_substance_is_empty(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            checkpoint = Path(temporary) / "CHECKPOINT.md"
+            checkpoint.write_text("# Phase 1 Audit\n\nDependencies: package A, package B.\n", encoding="utf-8")
+            state, details = MANIFEST.validate_checkpoint(checkpoint, "bio-example", Path("right-one"))
+            self.assertEqual(state, "empty")
+            self.assertEqual(details["substance_signals"], [])
+
+    def test_substance_for_another_skill_is_empty(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            checkpoint = Path(temporary) / "CHECKPOINT.md"
+            checkpoint.write_text(
+                "# Phase 1 notes for bio-other\n\n"
+                "| finding | priority | change | verified |\n|---|---|---|---|\n"
+                "| broken flag | P1 | fixed it | ran |\n",
+                encoding="utf-8",
+            )
+            state, details = MANIFEST.validate_checkpoint(checkpoint, "bio-example", Path("right-one"))
+            self.assertEqual(state, "empty")
+            self.assertEqual(details["skill_reference"], "missing")
 
     def test_since_is_start_of_recovery_day_not_current_clock_time(self) -> None:
         self.assertEqual(MANIFEST.SINCE, "2026-09-21T00:00:00-07:00")

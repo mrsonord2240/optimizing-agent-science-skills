@@ -22,11 +22,9 @@ import json
 import re
 import shutil
 import subprocess
-import sys
 import tempfile
 from collections import defaultdict
 from dataclasses import dataclass
-from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -173,10 +171,54 @@ def identity_skill_dirs(worktree: Worktree) -> dict[Path, str]:
     return result
 
 
+def phase1_substance(text: str) -> tuple[bool, list[str]]:
+    """Conservatively distinguish a real Phase-1 handoff from an audit-shaped stub.
+
+    Reformat is deliberately reserved for evidence that someone did final-pass work:
+    a concrete fix/change record, a blocked-item handoff, or a stated walk of the
+    runnable blocks paired with execution evidence.  Generic audit summaries and
+    dependency inventories alone do not satisfy it.
+    """
+    lower = text.lower()
+    signals: list[str] = []
+    if re.search(r"\|\s*finding\s*\|.*\|\s*(?:priority|change|verified)", lower):
+        signals.append("finding/change evidence table")
+    if re.search(r"\b(?:fixed this phase|findings fixed|fixes applied|changes? (?:made|applied)|commit(?:ted)? this phase)\b", lower):
+        signals.append("explicit Phase-1 change record")
+    if re.search(r"\b(?:still blocked|left unfixed|needs a decision)\b", lower) and re.search(
+        r"\b(?:final pass|phase ?1)\b", lower
+    ):
+        signals.append("Phase-1 blocked-item handoff")
+    walked = bool(re.search(r"\b(?:walked|re-?ran|ran) every runnable block\b", lower))
+    execution = bool(re.search(r"\b(?:verified|executed|assert(?:ion|ed)?|output|result)\b", lower))
+    if walked and execution:
+        signals.append("runnable-block walk with execution evidence")
+    # Some authentic Phase-1 records predate the final template and use headings
+    # such as "Validation Results", "What Was Done", or "Conclusion". Require
+    # substantial checkpoint-sized content plus multiple concrete activity lines;
+    # a short dependency-only audit remains empty.
+    outcome_lines = [
+        line
+        for line in lower.splitlines()
+        if re.search(
+            r"\b(?:fixed|blocked|install(?:ed|ation| attempt)?|validat(?:ed|ion)?|verif(?:ied|y)?|"
+            r"ran|run|executed|test(?:ed|ing)?|review(?:ed)?|confirm(?:ed)?|attempt|result|"
+            r"assert(?:ion)?|commit|output|pass(?:ed)?|fail(?:ed)?|changed|copied|created|need(?:s|ed)?)\b",
+            line,
+        )
+    ]
+    phase_context = bool(re.search(r"\b(?:phase ?1|final pass|checkpoint)\b", lower))
+    if len(text.strip()) >= 800 and phase_context and len(outcome_lines) >= 2:
+        signals.append(f"substantial concrete outcome record ({len(outcome_lines)} matching lines)")
+    return bool(signals), signals
+
+
 def validate_checkpoint(checkpoint: Path, skill_id: str, worktree: Path) -> tuple[str, dict[str, Any]]:
     if not checkpoint.is_file():
         return "missing", {"reason": "CHECKPOINT.md does not exist"}
     text = checkpoint.read_text(encoding="utf-8", errors="replace")
+    if not text.strip():
+        return "empty", {"path": str(checkpoint), "reasons": ["CHECKPOINT.md is empty"], "substance_signals": []}
     expected_title = f"# {skill_id} — final pass checkpoint"
     required_sections = [
         "## Fixed this phase",
@@ -197,21 +239,36 @@ def validate_checkpoint(checkpoint: Path, skill_id: str, worktree: Path) -> tupl
     elif offsets != sorted(offsets):
         reasons.append("required sections are not in template order")
 
-    # The published template does not require a worktree line.  When one is supplied,
-    # however, it must name this worktree rather than another Skill's worktree.
+    # A checkpoint is dispatchable only when it positively names this live worktree.
     mentioned = re.findall(r"(?:[A-Za-z]:)?[\\/][^\r\n`]*?[\\/]wt[\\/]([^\\/\s`]+)", text, re.IGNORECASE)
     expected_leaf = worktree.name.lower()
     wrong_worktrees = sorted({entry for entry in mentioned if entry.lower() != expected_leaf})
-    if mentioned and expected_leaf not in {entry.lower() for entry in mentioned}:
+    if not mentioned:
+        reasons.append("checkpoint does not explicitly name its worktree")
+    elif expected_leaf not in {entry.lower() for entry in mentioned}:
         reasons.append("checkpoint names another worktree: " + ", ".join(wrong_worktrees))
-    details = {
+    substantive, signals = phase1_substance(text)
+    skill_reference = skill_id.lower() in text.lower()
+    if substantive and not skill_reference:
+        substantive = False
+    details: dict[str, Any] = {
         "path": str(checkpoint),
         "worktree_reference": "matched" if expected_leaf in {entry.lower() for entry in mentioned} else (
             "not-stated" if not mentioned else "mismatched"
         ),
+        "skill_reference": "matched" if skill_reference else "missing",
         "reasons": reasons,
+        "substance_signals": signals,
     }
-    return ("ok" if not reasons else "bad"), details
+    if not reasons and substantive:
+        return "ok", details
+    if substantive:
+        details["reasons"] = reasons + ["real Phase-1 substance requires checkpoint reformat"]
+        return "reformat", details
+    if not skill_reference:
+        reasons.append("checkpoint does not name the target Skill")
+    details["reasons"] = reasons + ["no conservative Phase-1 substance signal"]
+    return "empty", details
 
 
 ENV_PREFERENCE_BY_TOP = {
@@ -390,7 +447,7 @@ def build_manifest(args: argparse.Namespace) -> tuple[list[dict[str, Any]], str]
         reports = phase2_reports(args.audits_root, skill_id, worktree.tip_commit, folder_path)
         phase2_report = bool(reports)
         status = "p2-done" if phase2_report else (
-            "ready" if checkpoint == "ok" and phase1_commits else "redo-p1"
+            "ready" if checkpoint in {"ok", "reformat"} else "redo-p1"
         )
         by_skill[skill_id].append(
             {
