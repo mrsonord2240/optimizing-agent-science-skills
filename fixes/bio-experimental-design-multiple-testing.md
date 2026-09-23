@@ -56,3 +56,15 @@ Worktree `F:\OpenScience\wt\experimental-design-multiple-testing`, branch `fix/e
 - **How run** (audit's `data\de_pvalues_reaudit.csv`, m=18,000, exactly as SKILL.md invokes it): `source()` path returned IHW on attempt 1, 1018 discoveries vs BH 1006, realized FDP 0.040 (asserted < 0.1, padj in [0,1], length = m); CLI path gave the same 1018; forced failure (mismatched covariate length) returned the BH fallback with padj identical to `p.adjust(p, 'BH')` and attempts = 2. A separate full-length run had all 3 children fail (one hung, 130 s CPU, and I killed it by PID; the others exited without output) and fell back to BH, 1006, exit 0.
 - **Stayed inline:** BH/q-value block (commented fragment illustrating a point, not a runnable pipeline), FCR block (10 lines), Python `multipletests` (2 lines). `examples/multiple_testing_correction.R` keeps its own inline IHW child-process retry; examples stay as they are.
 - **Noticed, not changed (behaviour):** `ihw_safe()` has no timeout. On this loaded machine one IHW child hung rather than crashed (130 s CPU on m=18,000, where the normal run is seconds), and the wrapper would wait indefinitely. A per-child timeout is a behaviour change, so it was left.
+
+---
+
+## 2026-09-23 corrective Phase 1
+
+Worktree `F:\OpenScience\wt\experimental-design-multiple-testing`, branch `fix/experimental-design-multiple-testing`. Env `crispr-screen-analyst\r.sh` (R 4.4.3, IHW 1.34.0, qvalue 2.38.0). Rejected tip: `ed2c5e1`.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| Shipped `examples/multiple_testing_correction.R` printed q-value and IHW output, then exited 139 in every Phase 2 run | P0 / M4 | Replaced its duplicate IHW retry implementation with the tested `scripts/ihw_safe.R` interface. Initial direct delegation still exited 139, so added `scripts/qvalue_safe.R`: qvalue runs in an isolated worker, writes `pi0` and discoveries before teardown, and the parent only falls back to BH if no usable worker output exists. The example no longer loads qvalue in the outer process. | ran | Focused isolation found `requireNamespace('qvalue')` alone exits nonzero during teardown in this Windows R environment, whereas `qvalue_safe()` alone and followed by `ihw_safe()` exit 0. Parsed the changed R files via the designated wrapper. The exact full-example audit runner exited 0 once; its three-run repetition harness recorded `run=1/2/3 exit=0`, each with pi0 0.912, 98 q-value discoveries, and 85 IHW versus 93 BH discoveries. No shared environment versions or locks changed. |
+
+Left unfixed: the pre-existing P2 `locfdr` taxonomy-only mention remains outside this P0 corrective pass; it does not affect the repaired shipped-example exit path.

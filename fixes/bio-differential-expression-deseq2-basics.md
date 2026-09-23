@@ -30,6 +30,13 @@ Disagreement logged: usage-guide "use vst over rlog for >100 samples" vs SKILL.m
 
 ## Left unfixed
 
-- **Description is bulk-worded; add pseudobulk trigger (P2).** Judged not a correction: the description is incomplete, not wrong, and the brief limits `description` edits to wrong claims. Needs Sam if he wants trigger tuning.
-- **No "what to report" guidance (P2).** New content (a feedback/reporting block), which the brief excludes as broader coverage.
 - **IHW segfaults at default `nbins` in this env (audit note).** Local build issue in the audit env, not a Skill defect; not written into the Skill.
+
+## 2026-09-23 (corrective Phase 1 after M4/P0 rejection)
+
+Worktree `F:\OpenScience\wt\differential-expression-deseq2-basics`, branch `fix/differential-expression-deseq2-basics`.
+
+| finding | priority | change | verified | notes |
+| --- | --- | --- | --- | --- |
+| Shared Windows R runtime exits 139 after every DESeq2 route, including `library(DESeq2)` | P0 | Created isolated WSL micromamba env `deseq2-repair-20260923` (R 4.4.3, DESeq2 1.46.0, apeglm 1.28.0); no shared runtime or shared package version was changed | `wsl.exe -d science -u sci -- bash -lc 'bash /mnt/openscience/audit-scratch/deseq2-runtime-check/wsl_run_isolated_checks.sh'`: minimal `library(DESeq2)` and unchanged shipped `examples/basic_workflow.R` both exited 0; workflow asserted 1,000 rows and non-NA adjusted p-values, reporting 58 significant genes | The failed F-mounted scratch prefix was removed after verification; the verified env lives under the WSL user's micromamba env root. |
+| Source did not match the existing checkpoint/rejection recommendations for pseudobulk discovery and reporting | P1/P2 | Added an explicit pseudobulk trigger to frontmatter and a compact What to Report section | source review; covered workflow exits cleanly in the isolated env | Keeps scope to DESeq2 result reporting; no method expansion. |
