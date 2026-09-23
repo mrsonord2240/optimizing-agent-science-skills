@@ -1136,14 +1136,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The single-hit print statement omits the label while tied and no-hit branches include their Level 3 and Level 5 labels.
 - Fix: Change the single-hit print statement in scripts/match_library.py to include '-> Level 2a' and add a shipped assertion or CLI fixture checking that text; retain score and matched-peak count.
 
-### `bio-metabolomics-pathway-mapping` — Reference-library downloads are an undisclosed network dependency
-
-- Skill: 92, Production Ready · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/metabolomics/pathway-mapping) · [viewer](skills/bio-metabolomics-pathway-mapping/mrsonord2240-bioSkills@6847328/viewer.md)
-- Observed in inputs: 7
-- Problem: SetKEGG.PathLib(), CrossReferencing(), and Setup.KEGGReferenceMetabolome() all route through MetaboAnalystR's internal .get.my.lib(), which silently downloads generic pathway/compound reference libraries from https://www.metaboanalyst.ca/resources/libs/ whenever the local cache is missing or older than 30 days. This is not disclosed anywhere in SKILL.md/usage-guide.md, unlike the two fixed P0s and unlike FELLA's/KEGGREST's comparable live-network caveats, which ARE disclosed.
-- Root cause: The Version Compatibility disclosure block added in the last fix pass covered only the two functions the fixer was explicitly told about (CalculateOraScore/CalculateQeaScore); it was not extended to the library-loading functions that also reach out to a remote server.
-- Fix: Add one sentence to Version Compatibility or Prerequisites noting that SetKEGG.PathLib/CrossReferencing/Setup.KEGGReferenceMetabolome download generic (non-user) reference libraries from metaboanalyst.ca on first use or after a 30-day cache expiry, mirroring the existing FELLA/KEGGREST live-dependency disclosure.
-
 ### `bio-remote-homology` — Make the low-complexity mitigation produce masked FASTA
 
 - Skill: 92, Production Ready · [mrsonord2240/bioSkills@7153e87](https://github.com/mrsonord2240/bioSkills/tree/7153e877bfec221df95ba1f5758f4012e788b7aa/database-access/remote-homology) · [viewer](skills/bio-remote-homology/mrsonord2240-bioSkills@7153e87/viewer.md)
@@ -1151,6 +1143,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The documented segmasker command prints only interval coordinates, so it does not create the masked query that the next profile-building command must consume.
 - Root cause: The failure-mode section names a detection-only invocation but omits segmasker's output format and file handoff.
 - Fix: Replace the command with segmasker -infmt fasta -in query.fa -outfmt fasta > query.masked.fa, then explicitly use query.masked.fa for profile construction. State that the lowercase output is soft masking.
+
+### `bio-metabolomics-pathway-mapping` — Filter literal NA values before reporting or writing KEGG mappings
+
+- Skill: 92.3, Production Ready · [mrsonord2240/bioSkills@bc75020](https://github.com/mrsonord2240/bioSkills/tree/bc7502038043b387617e236ee116d251c4bd5b50/metabolomics/pathway-mapping) · [viewer](skills/bio-metabolomics-pathway-mapping/mrsonord2240-bioSkills@bc75020/viewer.md)
+- Observed in inputs: 6
+- Problem: map_compounds.R retains the string NA for an unmapped compound, writes it to kegg_ids.txt, and reports it as mapped, making coverage misleading.
+- Root cause: It filters R NA values but not literal text NA in the KEGG column.
+- Fix: Exclude both is.na(kegg_ids) and trimws(kegg_ids) == 'NA' before writing and counting mappings.
 
 ### `bio-metabolomics-normalization-qc` — Make the QCRSC all-NA guard per-batch
 
@@ -1264,7 +1264,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (400)
+## P2 (399)
 
 ### `bio-data-visualization-lollipop-protein-maps` — HGVSp edge cases and recurrence semantics undocumented
 
@@ -4010,22 +4010,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: powsimR is GitHub-only with a compile-required dependency and was judged not worth installing given the pseudobulk substitute answers the same question.
 - Fix: No action required for deployment; if powsimR is ever pinned and installed in a future audit environment, verify its estimateParam/simulateDE signatures against the version drift already flagged in Version Compatibility.
 
-### `bio-metabolomics-pathway-mapping` — Primary ORA code block is a signposted dead end before the working fix
-
-- Skill: 92, Production Ready · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/metabolomics/pathway-mapping) · [viewer](skills/bio-metabolomics-pathway-mapping/mrsonord2240-bioSkills@6847328/viewer.md)
-- Observed in inputs: 1
-- Problem: A user who runs only the first ('official') ORA code block in SKILL.md, including the documented Setup.KEGGReferenceMetabolome() addition, still ends at a clean but unresolved failure; the actually-working Local-Only ORA function appears later in the same section and requires reading past the failure to find it.
-- Root cause: The fix correctly added a working local alternative but kept the known-broken official path as the code block's primary example, with the alternative subordinated below it.
-- Fix: Consider swapping the order: lead with Local-Only ORA as the default background-corrected path, and present the official MetaboAnalystR API path as the (currently broken) alternative for users who accept the xialab.ca data-sharing tradeoff.
-
-### `bio-metabolomics-pathway-mapping` — Mummichog's automatic duplicate-merging QC step is undocumented in prose
-
-- Skill: 92, Production Ready · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/metabolomics/pathway-mapping) · [viewer](skills/bio-metabolomics-pathway-mapping/mrsonord2240-bioSkills@6847328/viewer.md)
-- Observed in inputs: 2
-- Problem: Read.PeakListData/SanityCheckMummichogData silently merge duplicate m/z-matched features (observed: 'A total of 11/111/11/11 of duplicates were merged' across four merge passes on the 1500-feature input) with no mention of this behavior in SKILL.md or usage-guide.md.
-- Root cause: The Common Errors table documents input-shape pitfalls but not automatic data-transformation steps performed inside the call.
-- Fix: Add one line to the Mummichog/PSEA section noting that duplicate m/z-matched features are automatically merged before enrichment, so reported feature counts may differ from the input row count.
-
 ### `bio-remote-homology` — Add standalone PSI-BLAST and HHsearch examples
 
 - Skill: 92, Production Ready · [mrsonord2240/bioSkills@7153e87](https://github.com/mrsonord2240/bioSkills/tree/7153e877bfec221df95ba1f5758f4012e788b7aa/database-access/remote-homology) · [viewer](skills/bio-remote-homology/mrsonord2240-bioSkills@7153e87/viewer.md)
@@ -4089,6 +4073,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: Both bundled examples start from a synthetic or cached featureValues()-shaped table; neither exercises real mzML -> xcms -> Stage 2 as part of one script.
 - Root cause: Deliberately deferred by the fixer (fix log 'Left unfixed') to xcms-preprocessing's own bundled-example scope, since it needs real instrument files.
 - Fix: A future third example chaining real (or cached) xcms output through all 5 stages would give full-pipeline regression coverage, but is reasonably out of scope for this fix round.
+
+### `bio-metabolomics-pathway-mapping` — Stop after failed mummichog validation
+
+- Skill: 92.3, Production Ready · [mrsonord2240/bioSkills@bc75020](https://github.com/mrsonord2240/bioSkills/tree/bc7502038043b387617e236ee116d251c4bd5b50/metabolomics/pathway-mapping) · [viewer](skills/bio-metabolomics-pathway-mapping/mrsonord2240-bioSkills@bc75020/viewer.md)
+- Observed in inputs: 3
+- Problem: After the useful too-few-features error, the script calls SetPeakEnrichMethod on numeric 0 and emits a second raw R error.
+- Root cause: No return-value guard follows SanityCheckMummichogData.
+- Fix: Test whether mSet is numeric after validation; print current.msg and quit nonzero before later calls.
 
 ### `bio-alignment-msa-parsing` — Keep MI and Neff use bounded to moderate widths
 

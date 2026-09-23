@@ -1,0 +1,18 @@
+# Fresh Phase 2 assertions over artifacts created by final_pass_execute.ps1.
+args <- commandArgs(trailingOnly = TRUE)
+if (length(args) != 1L) stop("usage: final_pass_assertions.R <run-dir>")
+run_dir <- args[[1]]
+read_ids <- function(name) trimws(readLines(file.path(run_dir, name), warn = FALSE))
+ids1 <- read_ids("final_pass_input1_kegg_ids.txt")
+ids8 <- read_ids("final_pass_input8_kegg_ids.txt")
+ora1 <- read.csv(file.path(run_dir, "final_pass_input1_local_ora.csv"), check.names = FALSE)
+ora8 <- read.csv(file.path(run_dir, "final_pass_input8_local_ora_rerun.csv"), check.names = FALSE)
+mum_a <- read.csv(file.path(run_dir, "final_pass_input2_mummichog_a.csv"), check.names = FALSE)
+mum_b <- read.csv(file.path(run_dir, "final_pass_input2_mummichog_b.csv"), check.names = FALSE)
+fella <- read.csv(file.path(run_dir, "final_pass_input4_fella.csv"), check.names = FALSE)
+stopifnot(length(ids1) == 12L, length(ids8) == 11L, any(ids8 == "NA"))
+stopifnot(any(ora1$pathway == "hsa00020"), any(ora8$pathway == "hsa00020"))
+stopifnot(isTRUE(all.equal(mum_a, mum_b, check.attributes = FALSE)))
+stopifnot(nrow(mum_a) > 0L, nrow(fella) > 0L)
+stopifnot(!file.exists(file.path(run_dir, "final_pass_input3_bad.csv")))
+cat(sprintf("PASS canonical map=12/12; observed literal-NA mapping defect on 10/11-known+1-unknown input; TCA returned in both ORA runs; deterministic PSEA rows=%d; FELLA rows=%d; API failure emitted no CSV.\n", nrow(mum_a), nrow(fella)))
