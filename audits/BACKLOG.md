@@ -1272,7 +1272,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (447)
+## P2 (443)
 
 ### `bio-data-visualization-lollipop-protein-maps` — HGVSp edge cases and recurrence semantics undocumented
 
@@ -2513,46 +2513,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: Version Compatibility pins 'admet-ai 1.3+', while the taxonomy table itself warns that 'v2 package predictions differ from the v1 paper/server'. The installed release is 2.0.1, so the pin admits precisely the version the Skill says will disagree.
 - Root cause: The pin was written as a lower bound before the v1/v2 divergence note was added, and the two were never reconciled.
 - Fix: State the tested major version explicitly and repeat the divergence warning in Version Compatibility, not only in the taxonomy table.
-
-### `bio-alignment-pairwise` — SKILL.md is 449 lines / 28 KB with no references/ split
-
-- Skill: 86, Production Ready · [mrsonord2240/bioSkills@9c811ae](https://github.com/mrsonord2240/bioSkills/tree/9c811aed171970a7188fa0a62396373dfd9a428d/alignment/pairwise-alignment) · [viewer](skills/bio-alignment-pairwise/mrsonord2240-bioSkills@9c811ae/viewer.md)
-- Observed in inputs: —
-- Problem: The guide grew from 402 to 449 lines; the gap-convention table, library table, significance theory and BLAST flags all load up front.
-- Root cause: All depth lives in one file and the fix added content to it.
-- Fix: Move Statistical Significance, Pairwise Library Selection and When Alignment Is NOT Appropriate into references/ files loaded on demand; keep the aligner recipes and gap-convention table in SKILL.md.
-
-### `bio-alignment-pairwise` — Routed-to tools are named without command lines
-
-- Skill: 86, Production Ready · [mrsonord2240/bioSkills@9c811ae](https://github.com/mrsonord2240/bioSkills/tree/9c811aed171970a7188fa0a62396373dfd9a428d/alignment/pairwise-alignment) · [viewer](skills/bio-alignment-pairwise/mrsonord2240-bioSkills@9c811ae/viewer.md)
-- Observed in inputs: 4, 6
-- Problem: PAL2NAL, MMseqs2 (easy-search / --num-iterations), EMBOSS needle/water and HHsearch are named but no flags or invocations are shown, and the DNA dinucleotide shuffle points at ushuffle with no code (ushuffle failed to build via pip on Windows and in WSL here).
-- Root cause: The guide documents the Python path in depth and treats the CLI/R paths as one-line pointers.
-- Fix: Add a short CLI block: `needle -gapopen 11 -gapextend 1 ...`, `water ...`, `mmseqs easy-search ...`, `pal2nal.pl prot.aln nuc.fa -output fasta`, with a note that pal2nal exits 0 with empty output on inconsistent input; say how to install ushuffle or give a short dinucleotide-shuffle function.
-
-### `bio-alignment-pairwise` — Strand bullet quotes a sequence-specific number
-
-- Skill: 86, Production Ready · [mrsonord2240/bioSkills@9c811ae](https://github.com/mrsonord2240/bioSkills/tree/9c811aed171970a7188fa0a62396373dfd9a428d/alignment/pairwise-alignment) · [viewer](skills/bio-alignment-pairwise/mrsonord2240-bioSkills@9c811ae/viewer.md)
-- Observed in inputs: 3
-- Problem: 'a 30-nt exact match scored 60, reverse complement 0' reproduces the 60 but not the 0: over 50 random 30-mers the local score of the reverse complement had median 17.5 and max 29.
-- Root cause: A single example sequence was generalised.
-- Fix: Say 'the reverse complement scores far lower (typically under half)'; keep the score-both-strands recipe, which was verified.
-
-### `bio-alignment-pairwise` — 'edlib returns edit distance only' is misleading
-
-- Skill: 86, Production Ready · [mrsonord2240/bioSkills@9c811ae](https://github.com/mrsonord2240/bioSkills/tree/9c811aed171970a7188fa0a62396373dfd9a428d/alignment/pairwise-alignment) · [viewer](skills/bio-alignment-pairwise/mrsonord2240-bioSkills@9c811ae/viewer.md)
-- Observed in inputs: 5
-- Problem: edlib.align(..., task='path') returns a CIGAR and alignment (verified); its scoring is unit-cost edit distance, which is what the sentence means.
-- Root cause: Wording conflates the scoring model with the output.
-- Fix: Reword to 'unit-cost edit distance scoring only (no matrix, no affine gaps); task="path" returns the alignment'.
-
-### `bio-alignment-pairwise` — Description omits common trigger phrases
-
-- Skill: 86, Production Ready · [mrsonord2240/bioSkills@9c811ae](https://github.com/mrsonord2240/bioSkills/tree/9c811aed171970a7188fa0a62396373dfd9a428d/alignment/pairwise-alignment) · [viewer](skills/bio-alignment-pairwise/mrsonord2240-bioSkills@9c811ae/viewer.md)
-- Observed in inputs: —
-- Problem: The description says 'pairwise sequence alignment' but not Needleman-Wunsch, Smith-Waterman, semiglobal, percent identity, needle/water, or 'reverse complement'.
-- Root cause: Description was not touched by the fix.
-- Fix: Add those terms to the frontmatter description.
 
 ### `bio-alignment-sorting` — Picard '-n output is rejected' is too broad
 
@@ -4697,6 +4657,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: Converting a charged ligand's docked PDBQT pose to SDF for PoseBusters still fails RDKit sanitization (3/12 checks pass in a ligand-only run), exactly as the fix's new 'Handoff caveat' describes. The underlying cross-skill integration gap between virtual-screening's PDBQT output and pose-validation's expected input is still open.
 - Root cause: PDBQT does not encode formal bond order; no clean programmatic reconstruction exists for charged/aromatic-adjacent groups, as the fixer's own log states.
 - Fix: No action required this round -- documentation is now accurate. Tracking only: a real fix would need pose-validation (or virtual-screening) to accept the original RDKit Mol object alongside the PDBQT rather than reconstructing bonds from the pose, as the new caveat already recommends as a workaround.
+
+### `bio-alignment-pairwise` — Name the shown percent-identity formula PID2 exactly
+
+- Skill: 94, Production Ready · [mrsonord2240/bioSkills@d45a647](https://github.com/mrsonord2240/bioSkills/tree/d45a6478bc0f0450f101b6c394415998d7151899/alignment/pairwise-alignment) · [viewer](skills/bio-alignment-pairwise/mrsonord2240-bioSkills@d45a647/viewer.md)
+- Observed in inputs: 7
+- Problem: The formula identities/(identities+mismatches) is PID2 exactly, but references/percent-identity.md calls it only 'similar to PID2'.
+- Root cause: The prose retains cautious wording after the formula was made explicit.
+- Fix: Replace 'similar to PID2' with 'PID2 (aligned residue pairs excluding gaps)' and retain the pointer to PID1-4.
 
 ### `bio-crispr-screens-screen-qc` — Documented sgRNA-identifier-column requirement is not enforced by validate_counts()
 

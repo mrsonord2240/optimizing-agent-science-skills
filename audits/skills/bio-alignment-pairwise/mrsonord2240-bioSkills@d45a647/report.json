@@ -1,0 +1,560 @@
+{
+  "meta": {
+    "skill_name": "bio-alignment-pairwise",
+    "description": "Perform pairwise sequence alignment using Biopython Bio.Align.PairwiseAligner for global, local, semiglobal, identity, strand and reproducibility workflows.",
+    "evaluated_on": "2026-09-23",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 11,
+    "source": "mrsonord2240/bioSkills@d45a6478bc0f0450f101b6c394415998d7151899:alignment/pairwise-alignment",
+    "reaudit_of": "F:\\OpenScience\\audits\\_phase1-20260922\\bio-alignment-pairwise (86, Production Ready)",
+    "fix_log": "F:\\optimizing-agent-science-skills\\fixes\\bio-alignment-pairwise.md (read; not evidence)",
+    "executed_inputs": "11/11",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md",
+    "environment": "alignment audit environment: Windows Biopython 1.88/parasail/edlib; WSL alignment Biopython 1.88, EMBOSS, BLAST+, MAFFT, PAL2NAL, MMseqs2, pywfa and mappy; WSL bio HH-suite 3.3.0; R pwalign 1.2.0.",
+    "execution_note": "Nine substantive Phase-1 inputs were rerun against the exact d45a647 source copy; inputs 10 and 11 are fresh all-fence and HHsearch tests. All reported evidence has a saved script and checked output."
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "Real public sequences, seeded synthetic perturbations, independent implementations and cross-tool checks support every scored numeric conclusion."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Sequence-comparison methods only; no individual diagnostic or treatment guidance."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Gap conventions, null-based significance, codon-aware handling, database-scale escape hatches and strand logic passed fresh checks."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "16/16 current Python fences and all five shipped examples executed from an audit copy; current CLI blocks ran on real data."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 93,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 12,
+        "max": 12,
+        "note": "All promised global, local, semiglobal, identity, strand, export, significance, library-routing and CLI paths executed."
+      },
+      "reliability": {
+        "score": 11,
+        "max": 12,
+        "note": "Explicit alphabet, empty-sequence, strand, internal-stop and PAL2NAL-empty-output traps are practical and reproduced."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "SKILL.md is 299 lines and depth is routed to six focused references; the one index is concise."
+      },
+      "agent_usability": {
+        "score": 15,
+        "max": 16,
+        "note": "Goals, runnable patterns, configuration conventions, and observed failure modes are clear; some snippets intentionally rely on prior variables."
+      },
+      "human_usability": {
+        "score": 8,
+        "max": 8,
+        "note": "Frontmatter covers natural Needleman-Wunsch, Smith-Waterman, semiglobal, PID, strand, EMBOSS and BLAST requests."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "No credentials, dynamic execution, network calls, or destructive operations in shipped source; user FASTA paths remain caller-controlled."
+      },
+      "maintainability": {
+        "score": 11,
+        "max": 12,
+        "note": "Reference split, source examples and deterministic checks make updates localized; no formal automated test runner ships."
+      },
+      "agent_specific": {
+        "score": 18,
+        "max": 20,
+        "note": "Specific triggers, progressive disclosure, idempotent local computation and explicit handoffs to MMseqs2/HMMER/structure search are strong."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 93.9,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 47,
+      "total": 48
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "HBA/HBB global protein alignment and gap conventions",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Executed on real UniProt HBA/HBB using Biopython, independent Gotoh, parasail, EMBOSS, BLAST+, and pwalign; see input1*.py/.sh/.R logs.",
+        "executed": true,
+        "execution_note": "Executed on real UniProt HBA/HBB using Biopython, independent Gotoh, parasail, EMBOSS, BLAST+, and pwalign; see input1*.py/.sh/.R logs.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Global BLOSUM62 -11/-1 equals independent Gotoh, parasail and needle",
+            "result": "PASS",
+            "note": "286.0 in all four"
+          },
+          {
+            "text": "EMBOSS-default -10/-0.5 score is reproduced",
+            "result": "PASS",
+            "note": "292.5"
+          },
+          {
+            "text": "BLASTP 11/1 maps to Biopython local -12/-1",
+            "result": "PASS",
+            "note": "raw 285 and identical HSP"
+          },
+          {
+            "text": "pwalign uses the documented BLAST convention",
+            "result": "PASS",
+            "note": "global 10/1=286; local 11/1=285"
+          },
+          {
+            "text": "Counts and explicit default-gap warning reproduce",
+            "result": "PASS",
+            "note": "65/75/9; 55/37 versus 9/5"
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Mutated HBB local DNA placement and strand recovery",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Executed on seeded synthetic flanks plus a real HBB fragment; see input2_local_dna.py log.",
+        "executed": true,
+        "execution_note": "Executed on seeded synthetic flanks plus a real HBB fragment; see input2_local_dna.py log.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Local score equals independent Gotoh and planted-score arithmetic",
+            "result": "PASS",
+            "note": "268.0"
+          },
+          {
+            "text": "Coordinates and counts recover the planted segment",
+            "result": "PASS",
+            "note": "600..750; 142 identities, 5 mismatches, 3 gaps"
+          },
+          {
+            "text": "Parasail cross-check agrees",
+            "result": "PASS",
+            "note": "267 at 10/1"
+          },
+          {
+            "text": "Reverse-complement selection recovers the correct orientation",
+            "result": "PASS",
+            "note": "268.0 versus 34.5"
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Semiglobal placement and invalid-input handling",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Executed with synthetic fragment/reference and real mammal CDS; see input3_edge_semiglobal.py log.",
+        "executed": true,
+        "execution_note": "Executed with synthetic fragment/reference and real mammal CDS; see input3_edge_semiglobal.py log.",
+        "basic": 37,
+        "specialized": 56,
+        "total": 93,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Both semiglobal recipes return score 40 and span 300..320",
+            "result": "PASS",
+            "note": "Deprecation warnings promoted to errors"
+          },
+          {
+            "text": "Argument-order warning is real",
+            "result": "PASS",
+            "note": "swapped order scores -279"
+          },
+          {
+            "text": "Documented invalid and accepted alphabets reproduce",
+            "result": "PASS",
+            "note": "lowercase/newline/J/U/empty reject; X/B/Z/SeqRecord accept"
+          },
+          {
+            "text": "Internal-stop check isolates rabbit HBB2",
+            "result": "PASS",
+            "note": "NM_001314043.1 only"
+          },
+          {
+            "text": "Strand distribution matches the final wording",
+            "result": "PASS",
+            "note": "300-pair median about 18; max 29"
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Empirical significance and dinucleotide shuffle",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Executed deterministic protein and DNA significance paths from the current copied example; see input4_significance.py log.",
+        "executed": true,
+        "execution_note": "Executed deterministic protein and DNA significance paths from the current copied example; see input4_significance.py log.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Seeded protein null is deterministic",
+            "result": "PASS",
+            "note": "three real pairs match on repeat"
+          },
+          {
+            "text": "Related and unrelated pairs separate by empirical p-value",
+            "result": "PASS",
+            "note": "0.001 versus 0.2478"
+          },
+          {
+            "text": "Karlin-Altschul check is consistent with BLAST",
+            "result": "PASS",
+            "note": "115.5 bits; fitted lambda 0.262"
+          },
+          {
+            "text": "Current pure-Python dinucleotide shuffle is available",
+            "result": "PASS",
+            "note": "current examples/empirical_pvalue.py copied before run"
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Accelerated-library agreement and saturation",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Executed 4 kb/20 kb and 1,000-pair seeded synthetic cases; see input5_libs.py and finalpass2_allblocks_wsl.py logs.",
+        "executed": true,
+        "execution_note": "Executed 4 kb/20 kb and 1,000-pair seeded synthetic cases; see input5_libs.py and finalpass2_allblocks_wsl.py logs.",
+        "basic": 37,
+        "specialized": 56,
+        "total": 93,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "parasail and edlib agree with independent scoring",
+            "result": "PASS",
+            "note": "1,000/1,000 comparisons"
+          },
+          {
+            "text": "Fixed-width parasail saturation is detected",
+            "result": "PASS",
+            "note": "0 plus saturated=True versus 35644"
+          },
+          {
+            "text": "Measured speed claims are plausible on this host",
+            "result": "PASS",
+            "note": "parasail 1.9-3.9x at 300 nt; edlib 714x at 20 kb"
+          },
+          {
+            "text": "Linux-only pywfa and mappy snippets execute",
+            "result": "PASS",
+            "note": "scores/locus cross-check in all-block harness"
+          }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Codon alignment, PAL2NAL trap, and database search",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Executed real HBB CDS, MAFFT/PAL2NAL in WSL, and MMseqs2 against eight real globins; see input6*.py/.sh logs.",
+        "executed": true,
+        "execution_note": "Executed real HBB CDS, MAFFT/PAL2NAL in WSL, and MMseqs2 against eight real globins; see input6*.py/.sh logs.",
+        "basic": 37,
+        "specialized": 55,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Human/cow routing and protein-first codon alignment are frame-consistent",
+            "result": "PASS",
+            "note": "441 codon columns"
+          },
+          {
+            "text": "Documented PAL2NAL empty-output trap reproduces on the MAFFT rabbit route",
+            "result": "PASS",
+            "note": "exit 0, zero bytes, inconsistency error"
+          },
+          {
+            "text": "Clean control yields two PAL2NAL records",
+            "result": "PASS",
+            "note": "human/cow control"
+          },
+          {
+            "text": "Database-scale escape hatch executes",
+            "result": "PASS",
+            "note": "MMseqs2 finds HBA/HBB at 115 bits, E 3.096E-34"
+          }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "PID definitions, deprecated APIs, exports, and examples",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Executed pairwise2/max_alignments/PID/IUPAC/export checks plus all five copied examples; see input7_adversarial.py, input7_R_biostrings.R, and run_examples.py logs.",
+        "executed": true,
+        "execution_note": "Executed pairwise2/max_alignments/PID/IUPAC/export checks plus all five copied examples; see input7_adversarial.py, input7_R_biostrings.R, and run_examples.py logs.",
+        "basic": 37,
+        "specialized": 54,
+        "total": 91,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "pairwise2 deprecation and islice guidance are accurate",
+            "result": "PASS",
+            "note": "warning, AttributeError, OverflowError, and islice reproduce"
+          },
+          {
+            "text": "PID1-4 agree with EMBOSS and pwalign",
+            "result": "PASS",
+            "note": "43.6/46.4/45.8/45.0"
+          },
+          {
+            "text": "Reference wording distinguishes the exact PID2 formula",
+            "result": "FAIL",
+            "note": "the shown formula is exactly PID2, not merely 'similar to PID2'"
+          },
+          {
+            "text": "NUC.4.4, algorithm names, output formatting and exports reproduce",
+            "result": "PASS",
+            "note": "all checks pass"
+          },
+          {
+            "text": "All shipped examples run from the copied current source",
+            "result": "PASS",
+            "note": "five scripts complete without source bytecode writes"
+          }
+        ]
+      },
+      {
+        "index": 8,
+        "type": "Variant B",
+        "label": "Fresh kinase-pair convention check",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Fresh real PKA/CDK2 pair not used in the HBA/HBB canonical input; see input8_kinase_conv.py, input8_ground_truth.sh, and input8_R_pwalign.R logs.",
+        "executed": true,
+        "execution_note": "Fresh real PKA/CDK2 pair not used in the HBA/HBB canonical input; see input8_kinase_conv.py, input8_ground_truth.sh, and input8_R_pwalign.R logs.",
+        "basic": 39,
+        "specialized": 56,
+        "total": 95,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Global scores equal independent Gotoh and needle",
+            "result": "PASS",
+            "note": "124, 186.5, and 110 as configured"
+          },
+          {
+            "text": "BLAST mapping holds on a second protein family",
+            "result": "PASS",
+            "note": "local -12/-1=222 and identical HSP"
+          },
+          {
+            "text": "pwalign mapping holds on this pair",
+            "result": "PASS",
+            "note": "124/222/228"
+          },
+          {
+            "text": "Identity/significance advice fits a distant true homolog",
+            "result": "PASS",
+            "note": "29.1% PID2 and 90.1 bits"
+          }
+        ]
+      },
+      {
+        "index": 9,
+        "type": "Edge",
+        "label": "Fresh mammal-CDS DNA alignment and unknown strand",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Fresh real six-mammal HBB CDS exercise; see input9_real_dna.py log.",
+        "executed": true,
+        "execution_note": "Fresh real six-mammal HBB CDS exercise; see input9_real_dna.py log.",
+        "basic": 39,
+        "specialized": 56,
+        "total": 95,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "NUC.4.4 global scores equal EMBOSS needle across five orthologs",
+            "result": "PASS",
+            "note": "all five agree"
+          },
+          {
+            "text": "Independent Gotoh agrees on human/cow",
+            "result": "PASS",
+            "note": "1666.5"
+          },
+          {
+            "text": "DNA-versus-protein routing threshold holds",
+            "result": "PASS",
+            "note": "minimum nucleotide PID1 85.2%"
+          },
+          {
+            "text": "Unknown-strand recipe recovers locus and score",
+            "result": "PASS",
+            "note": "183.0 and human span 126..246"
+          }
+        ]
+      },
+      {
+        "index": 10,
+        "type": "Stress",
+        "label": "Fresh full-document code-fence execution",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Freshly extracted and executed all 16 Python fences from current SKILL.md plus all six reference files in WSL; see finalpass2_allblocks.py log.",
+        "executed": true,
+        "execution_note": "Freshly extracted and executed all 16 Python fences from current SKILL.md plus all six reference files in WSL; see finalpass2_allblocks.py log.",
+        "basic": 39,
+        "specialized": 57,
+        "total": 96,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Every current fenced Python block executes",
+            "result": "PASS",
+            "note": "16/16 with DeprecationWarning as error"
+          },
+          {
+            "text": "Semiglobal documented values are asserted",
+            "result": "PASS",
+            "note": "both return 40.0 and span 300..320"
+          },
+          {
+            "text": "parasail, edlib, pywfa and mappy comments are independently asserted",
+            "result": "PASS",
+            "note": "all four pass"
+          },
+          {
+            "text": "Export and substitution-count fences execute",
+            "result": "PASS",
+            "note": "FASTA/Clustal/PSL/SAM nonempty"
+          },
+          {
+            "text": "No source file was imported in place",
+            "result": "PASS",
+            "note": "audit copy used; source SHA-256 recorded"
+          }
+        ]
+      },
+      {
+        "index": 11,
+        "type": "Variant A",
+        "label": "Fresh documented HHsearch command",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Fresh toy HH-suite profile database built from eight public globins, then current documented hhsearch command executed; see finalpass2_hhsearch.sh log.",
+        "executed": true,
+        "execution_note": "Fresh toy HH-suite profile database built from eight public globins, then current documented hhsearch command executed; see finalpass2_hhsearch.sh log.",
+        "basic": 39,
+        "specialized": 57,
+        "total": 96,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Documented hhsearch flags execute against a real constructed database",
+            "result": "PASS",
+            "note": "query.a3m, -d toydb, -o query.hhr"
+          },
+          {
+            "text": "Result contains all eight ranked globin profiles",
+            "result": "PASS",
+            "note": "eight summary rows"
+          },
+          {
+            "text": "HBA query self-hit is strongly ranked",
+            "result": "PASS",
+            "note": "100.0 probability; E 1.8E-93"
+          },
+          {
+            "text": "Phylogenetic ordering is sensible",
+            "result": "PASS",
+            "note": "alpha, beta, then myoglobin profiles"
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 37.2,
+    "dynamic_weighted": 56.3,
+    "score": 94,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "The gap-convention table was confirmed on two real protein families by independent Gotoh, EMBOSS, BLAST+ and pwalign.",
+    "The final reference split keeps SKILL.md concise while every current Python fence still executes.",
+    "The current pure-Python dinucleotide shuffle, PAL2NAL empty-output trap and HHsearch database command were exercised rather than assumed.",
+    "Clear boundaries route unsuitable pairwise work to MMseqs2, HMMER or structural search."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "Name the shown percent-identity formula PID2 exactly",
+      "observed_in": [
+        7
+      ],
+      "problem": "The formula identities/(identities+mismatches) is PID2 exactly, but references/percent-identity.md calls it only 'similar to PID2'.",
+      "root_cause": "The prose retains cautious wording after the formula was made explicit.",
+      "fix": "Replace 'similar to PID2' with 'PID2 (aligned residue pairs excluding gaps)' and retain the pointer to PID1-4."
+    }
+  ]
+}
