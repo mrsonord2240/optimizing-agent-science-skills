@@ -4122,14 +4122,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The fix added a standing compliance section but did not cross-reference it from the specific workflow steps (Validation Checklist, arrayed-validation guidance) that recommend new live-animal procedures.
 - Fix: Add a one-line pointer back to the Ethical & Regulatory Requirements section at the points in usage-guide.md's 'What the Agent Will Do' and Validation Checklist where new animal cohorts or procedures are recommended, so the reminder is structurally guaranteed rather than judgment-dependent.
 
-### `bio-crispr-screens-jacks-analysis` — usage-guide.md's documented output filenames don't match real JACKS output
-
-- Skill: 92, Production Ready · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/crispr-screens/jacks-analysis) · [viewer](skills/bio-crispr-screens-jacks-analysis/mrsonord2240-bioSkills@6847328/viewer.md)
-- Observed in inputs: 7
-- Problem: 'What the Agent Will Do' step 12 lists gene_results.txt, sgrna_efficacy.txt, library_redesign_candidates.txt, comparison_with_mageck.txt as outputs, but no code anywhere in the Skill produces files with these names -- the real JACKS outputs (confirmed by every execution in this audit) are <outprefix>_gene_JACKS_results.txt, _gene_std_JACKS_results.txt, _grna_JACKS_results.txt, optionally _gene_pval_JACKS_results.txt, and a .pickle file.
-- Root cause: Appears to be a leftover generic/aspirational output summary written before the Skill's real JACKS-derived filename conventions were pinned down elsewhere; not in scope for the round-2 fix pass, which targeted verified code and factual-claim defects rather than this workflow-summary line.
-- Fix: Replace step 12's filename list with the Skill's own real output filenames, or explicitly label library_redesign_candidates.txt and comparison_with_mageck.txt as agent-authored downstream summaries rather than direct JACKS outputs.
-
 ### `bio-differential-expression-deseq2-basics` — 'All-zero in a group' is not a padj=NA cause
 
 - Skill: 92, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/differential-expression/deseq2-basics) · [viewer](skills/bio-differential-expression-deseq2-basics/GPTomics-bioSkills@d91ed3d/viewer.md)
@@ -4537,6 +4529,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: JACKS is named as an alternative but Version Compatibility does not state which JACKS release/API was considered.
 - Root cause: The compatibility section concentrates on tools directly executed by the primary path.
 - Fix: Add a brief JACKS version/API compatibility note, or label it as a cross-reference to the dedicated JACKS Skill rather than a tested in-skill dependency.
+
+### `bio-crispr-screens-jacks-analysis` — Correct the stale efficacy-prior cross-reference
+
+- Skill: 95, Production Ready · [mrsonord2240/bioSkills@d1b1b16](https://github.com/mrsonord2240/bioSkills/tree/d1b1b166dcd771e115e8564fb7969260e791c39f/crispr-screens/jacks-analysis) · [viewer](skills/bio-crispr-screens-jacks-analysis/mrsonord2240-bioSkills@d1b1b16/viewer.md)
+- Observed in inputs: —
+- Problem: usage-guide.md says the optional reference-efficacy section is in SKILL.md, but it now resides in references/efficacy-prior-and-diagnostics.md.
+- Root cause: The 2026-09-21 reference-file split left one old section-location phrase in the usage guide.
+- Fix: Point that Prerequisites sentence directly to references/efficacy-prior-and-diagnostics.md, or say it is indexed by SKILL.md's Reference Files section.
 
 ### `bio-metabolomics-metabolite-annotation` — Inline code comment misplaces where the precursor_mz AssertionError actually fires
 
