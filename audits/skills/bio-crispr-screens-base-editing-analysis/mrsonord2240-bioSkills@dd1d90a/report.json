@@ -1,0 +1,143 @@
+{
+  "meta": {
+    "skill_name": "bio-crispr-screens-base-editing-analysis",
+    "description": "Analyzes base-editing screens for variant function, including library design, base-editor choice, editing-window interpretation, CRISPResso2 post-processing, bystander attribution, and variant-level scoring.",
+    "evaluated_on": "2026-09-22",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "mrsonord2240/bioSkills@dd1d90a9ae607f068d5ffda2e761e869f07decce:crispr-screens/base-editing-analysis",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md",
+    "checkpoint": "F:/OpenScience/audits/_final_pass/bio-crispr-screens-base-editing-analysis/CHECKPOINT.md",
+    "prior_report_archived_to": "F:/OpenScience/audits/_pre-fix-2026-09-22/bio-crispr-screens-base-editing-analysis"
+  },
+  "veto_gates": {
+    "skill_veto": { "gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS" },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "No fabricated quantitative result, DOI, patient claim, or unsupported efficacy claim was produced or found in the tested paths." },
+      "practice_boundaries": { "result": "PASS", "detail": "The Skill is confined to research screen design and analysis; it makes no individual diagnostic or treatment recommendation." },
+      "methodological_ground": { "result": "PASS", "detail": "Real CRISPResso2 and MAGeCK outputs reproduced their planted or independently calculated results; reverse-strand coordinate attribution and ABE8e window handling were re-derived outside the subject functions." },
+      "code_usability": { "result": "PASS", "detail": "All five committed Python scripts parsed; the four callable functions and BE-Hive CLI executed successfully on their supported inputs. One invalid-position validation gap is a P1 robustness finding, not a failure of supported analysis inputs." }
+    }
+  },
+  "static_score": {
+    "subtotal": 89,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 11, "max": 12, "note": "It covers the declared design, efficiency, attribution, and aggregation workflow with runnable scripts; deconvolution lacks a documented position-range rejection." },
+      "reliability": { "score": 10, "max": 12, "note": "The repaired empty-result, editor-name, and schema paths now fail clearly, but deconvolute_bystander accepts zero and out-of-range coordinates silently." },
+      "performance_context": { "score": 8, "max": 8, "note": "The concise SKILL.md routes detailed material to focused references and scripts without redundant loading." },
+      "agent_usability": { "score": 14, "max": 16, "note": "Workflow routing, version notes, caveats, and concrete invocations are strong; the coordinate validation omission weakens error prevention." },
+      "human_usability": { "score": 7, "max": 8, "note": "Natural-language examples and decision tables are clear, while malformed allele positions have no recovery guidance." },
+      "security": { "score": 11, "max": 12, "note": "No credentials, destructive behavior, or raw-code execution were found; file and coordinate arguments are not comprehensively validated." },
+      "maintainability": { "score": 10, "max": 12, "note": "References and standalone scripts cleanly separate responsibilities and were byte-matched for audit; several data-column and position contracts remain implicit in code." },
+      "agent_specific": { "score": 18, "max": 20, "note": "Trigger language, progressive disclosure, related-skill seams, and stop conditions are precise; a position-range escape hatch is missing." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 93.7,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 27, "total": 28 },
+    "inputs": [
+      {
+        "index": 1, "type": "Canonical", "label": "CBE library design and reverse-strand attribution", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "note": "Replayed prior Inputs 1, 2, and 9 from byte-matched current scripts: seeded CBE gave 15 candidates and two independently confirmed target hits; engineered reverse candidate returned target_positions=[5]; ABE8e gave two independently checked zero-bystander target candidates.", "execution_note": "run/phase2_regression.py -> R1, R2, R9; output asserted and captured.",
+        "basic": 38, "specialized": 58, "total": 96, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Current subject copies are byte-identical to the requested source scripts", "result": "PASS", "note": "SHA-256 equality was asserted before imports." },
+          { "text": "Reported reverse-strand target positions map to the forward target codon", "result": "PASS", "note": "Both seeded hits and the engineered opposite-bug-direction case passed independent coordinate checks." },
+          { "text": "ABE8e uses the documented 4-8 window and identifies zero-bystander target hits", "result": "PASS", "note": "Two candidates were independently re-scanned for editable A positions." },
+          { "text": "No protein-consequence label is falsely claimed from the spacer function", "result": "PASS", "note": "Current reference correctly limits the output to nucleotide positions and routes consequence annotation to VEP." }
+        ]
+      },
+      {
+        "index": 2, "type": "Variant A", "label": "CRISPResso2 editing-efficiency filter", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "note": "Prior Input 3 re-ran against real CRISPResso2 2.3.4 synthetic-CBE output: target position 5 was 0.5 and bystander position 7 was 0.3.", "execution_note": "run/phase2_regression.py -> R3; output asserted and captured.",
+        "basic": 38, "specialized": 59, "total": 97, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "The filter parses the real transposed CRISPResso2 table without a Position column", "result": "PASS", "note": "Real table loaded and positional selection completed." },
+          { "text": "Target and bystander editing fractions equal planted truth", "result": "PASS", "note": "0.5 and 0.30000000000000004 were asserted." },
+          { "text": "The filter preserves a clear 0-1 fraction convention", "result": "PASS", "note": "Returned values matched the documented fraction convention." },
+          { "text": "Unexpected base and out-of-range quantification-window position are rejected", "result": "PASS", "note": "Both ValueError paths replayed in R7." }
+        ]
+      },
+      {
+        "index": 3, "type": "Variant B", "label": "Allele-pattern bystander deconvolution", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "note": "Prior Input 4 re-ran on the real CRISPResso2 allele zip and recovered 40/30/20/10 unmodified, target-only, target-plus-bystander, and bystander-only percentages.", "execution_note": "run/phase2_regression.py -> R4; output asserted and captured.",
+        "basic": 37, "specialized": 57, "total": 94, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "The real Alleles_frequency_table.zip schema is accepted", "result": "PASS", "note": "Required sequences and %Reads columns parsed." },
+          { "text": "The four expected allele partitions sum to 100 percent", "result": "PASS", "note": "Exact 40/10/30/20 mapping was asserted." },
+          { "text": "The function uses the real %Reads field rather than obsolete Reference_pct", "result": "PASS", "note": "Successful real-file aggregation proves the current field selection." },
+          { "text": "Missing required allele columns are rejected clearly", "result": "PASS", "note": "Malformed zip raised ValueError in R7." }
+        ]
+      },
+      {
+        "index": 4, "type": "Stress", "label": "MAGeCK sgRNA-to-variant aggregation", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "note": "Prior Input 5 re-ran on the real 71,090-row MAGeCK summary. The target-only V1 mean matched an independent mean of its three real LFC values: 5.101166666666667.", "execution_note": "run/phase2_regression.py -> R5; output asserted and captured.",
+        "basic": 38, "specialized": 58, "total": 96, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "The current merge uses real lowercase MAGeCK sgrna identifiers", "result": "PASS", "note": "The real summary merged without KeyError." },
+          { "text": "Target-only scores exclude bystander-containing annotations", "result": "PASS", "note": "V1 count was 3 and mixed output had the other three rows." },
+          { "text": "Variant mean LFC is independently reproducible", "result": "PASS", "note": "Function and hand mean matched to 1e-9." },
+          { "text": "Missing merge-key input is rejected", "result": "PASS", "note": "Malformed summary raised ValueError in R7." }
+        ]
+      },
+      {
+        "index": 5, "type": "Scope Boundary", "label": "BE-Hive 50nt prediction workflow", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "note": "Prior Input 6 re-ran the current CLI in its isolated BE-Hive environment. It returned total predicted probability 0.979505911313023 and C4/C6 outcome columns.", "execution_note": "run/input6_behive_predict.ps1; output asserted and captured.",
+        "basic": 36, "specialized": 57, "total": 93, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "The documented 19 plus 20 plus 3 plus 8 substrate convention runs end to end", "result": "PASS", "note": "CLI completed in the configured BE-Hive environment." },
+          { "text": "The prediction is nontrivial and bounded as a probability", "result": "PASS", "note": "Total was greater than 0.9 and no more than 1.0." },
+          { "text": "Target and bystander output columns are present", "result": "PASS", "note": "C4 and C6 appeared in the returned table." },
+          { "text": "The tool does not present a clinical conclusion", "result": "PASS", "note": "Output is limited to editing outcomes." }
+        ]
+      },
+      {
+        "index": 6, "type": "Adversarial", "label": "Malformed-schema and coordinate-boundary handling", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "note": "Prior Input 7 now passes for filter, allele-schema, aggregation, empty candidate, lowercase, and unknown-editor checks. New Input 13 found that deconvolution silently accepts target_pos=0 and target_pos=167: the latter marks 100 percent of reads edited instead of rejecting an invalid coordinate.", "execution_note": "run/phase2_regression.py -> R7 and run/input13_deconvolution_position_boundary.py; output captured.",
+        "basic": 32, "specialized": 51, "total": 83, "assertions_passed": 3, "assertions_total": 4,
+        "assertions": [
+          { "text": "Malformed CRISPResso2 and MAGeCK schemas fail with a specific ValueError", "result": "PASS", "note": "All replayed malformed cases were rejected." },
+          { "text": "Empty candidate and lowercase CDS paths return a usable result", "result": "PASS", "note": "Empty frame has all six columns and lowercase count matches uppercase." },
+          { "text": "Unknown editor names are rejected clearly", "result": "PASS", "note": "Current function raised ValueError." },
+          { "text": "Allele target and bystander positions outside the aligned string are rejected", "result": "FAIL", "note": "target_pos=0 was accepted; target_pos=167 silently classified 100 percent of reads as edited." }
+        ]
+      },
+      {
+        "index": 7, "type": "Variant B", "label": "Direct CLI and corrected CRISPRessoBatch flag", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "note": "New Input 10 exercised find_be_spacers.py as a CLI and parsed its TSV. New Input 11 verified CRISPRessoBatch 2.3.4 advertises and accepts --base_editor_output, proceeding to the expected missing-file error rather than the former ambiguous-flag failure. The retained shell example also passed bash -n.", "execution_note": "run/input10_find_be_spacers_cli.py, run/input11_crispresso_batch_flag.ps1, and run/input12_examples_syntax.ps1; outputs asserted and captured.",
+        "basic": 38, "specialized": 59, "total": 97, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "The committed library-design CLI serializes a correct reverse-strand target row", "result": "PASS", "note": "TSV row had target_positions [5] and no bystanders." },
+          { "text": "CRISPRessoBatch 2.3.4 documents the corrected base-editor flag", "result": "PASS", "note": "--help contains --base_editor_output." },
+          { "text": "The corrected batch command passes argument parsing", "result": "PASS", "note": "It reached the expected missing batch-file error, not ambiguous option." },
+          { "text": "The retained CRISPResso example shell file is syntactically valid", "result": "PASS", "note": "bash -n completed successfully." }
+        ]
+      }
+    ]
+  },
+  "final": { "static_weighted": 35.6, "dynamic_weighted": 56.2, "score": 92, "max": 100, "grade": "Production Ready", "grade_symbol": "⭐", "deployable": true, "veto_override": false },
+  "key_strengths": [
+    "All prior live regressions passed from byte-matched current scripts, including real CRISPResso2 2.3.4 and MAGeCK data with independently asserted ground truth.",
+    "The reverse-strand coordinate repair, empty-result behavior, lowercase normalization, and editor validation are confirmed on current code.",
+    "The BE-Hive worked example and corrected CRISPRessoBatch flag were directly executed in their real runtimes.",
+    "Reference decomposition keeps the primary Skill concise while preserving direct routes to code and analysis context."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "Validate allele-string coordinate bounds before classification",
+      "observed_in": [6],
+      "problem": "deconvolute_bystander accepts target_pos=0 and an out-of-range position. On the real 166-base allele table, target_pos=167 silently marked 100 percent of reads as edited instead of reporting an invalid coordinate.",
+      "root_cause": "The script indexes pandas string accessors directly without checking that every target and bystander position is an integer in the shared aligned-sequence range.",
+      "fix": "Before assigning edit flags, reject positions below 1 or above the aligned sequence length with ValueError that names the invalid value and valid range. Validate target_pos and every bystander_pos, and reject missing or unequal-length aligned/reference strings explicitly."
+    }
+  ]
+}

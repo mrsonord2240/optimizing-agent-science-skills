@@ -1232,13 +1232,13 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: Likely an environment or binary interaction rather than source-script logic, but a nonzero process status makes unattended use unreliable.
 - Fix: Reproduce with a minimal coloc script outside the audit harness, identify the R or native-package layer, and either repair the environment or document a supported runtime whose successful outputs also exit zero.
 
-### `bio-crispr-screens-base-editing-analysis` — find_be_spacers() crashes with a bare, unrelated KeyError when it finds zero candidate spacers
+### `bio-crispr-screens-base-editing-analysis` — Validate allele-string coordinate bounds before classification
 
-- Skill: 92, Production Ready · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/crispr-screens/base-editing-analysis) · [viewer](skills/bio-crispr-screens-base-editing-analysis/mrsonord2240-bioSkills@6847328/viewer.md)
-- Observed in inputs: 7
-- Problem: When no PAM-adjacent window contains the target base on either strand (a short CDS, an unlucky sequence for a narrow-window editor, or a lowercase-masked input against the case-sensitive [ACGT]GG PAM regex), `candidates` stays empty and `pd.DataFrame(candidates).sort_values('n_bystanders')` raises `KeyError: 'n_bystanders'` -- a confusing error unrelated to the actual problem (no candidates found), with no guidance for the agent.
-- Root cause: pd.DataFrame([]) has no columns at all, so .sort_values() on a column name that would only exist if candidates were non-empty fails. This is the same class of defect (missing schema/edge-case guard) that the fix pass addressed in the other 3 functions, but find_be_spacers() was not covered.
-- Fix: Guard the return: `if not candidates: return pd.DataFrame(columns=['spacer','strand','spacer_start','target_positions','bystander_positions','n_bystanders'])` before the .sort_values() call, so callers get a well-formed empty result (or raise a clear ValueError like 'no candidate spacers found for target_aa=... with editor=...') instead of an internal pandas KeyError.
+- Skill: 92, Production Ready · [mrsonord2240/bioSkills@dd1d90a](https://github.com/mrsonord2240/bioSkills/tree/dd1d90a9ae607f068d5ffda2e761e869f07decce/crispr-screens/base-editing-analysis) · [viewer](skills/bio-crispr-screens-base-editing-analysis/mrsonord2240-bioSkills@dd1d90a/viewer.md)
+- Observed in inputs: 6
+- Problem: deconvolute_bystander accepts target_pos=0 and an out-of-range position. On the real 166-base allele table, target_pos=167 silently marked 100 percent of reads as edited instead of reporting an invalid coordinate.
+- Root cause: The script indexes pandas string accessors directly without checking that every target and bystander position is an integer in the shared aligned-sequence range.
+- Fix: Before assigning edit flags, reject positions below 1 or above the aligned sequence length with ValueError that names the invalid value and valid range. Validate target_pos and every bystander_pos, and reject missing or unequal-length aligned/reference strings explicitly.
 
 ### `bio-metabolomics-pathway-mapping` — Reference-library downloads are an undisclosed network dependency
 
@@ -1280,7 +1280,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The local Philosopher/TPP-derived pepXML ingestion path is incompatible with the available Comet and OpenMS-reserialised fixtures; this is not a silent Skill failure because the guard stops it.
 - Fix: Before a workflow depends on this optional route, run the documented commands against a compatible pepXML fixture or functioning Philosopher/TPP environment and assert nonempty peptideprophet_result, prot.xml, and protein.tsv. Do not retry the prohibited standalone TPP installer.
 
-## P2 (452)
+## P2 (451)
 
 ### `bio-data-visualization-lollipop-protein-maps` — HGVSp edge cases and recurrence semantics undocumented
 
@@ -4369,14 +4369,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The documented MGLTools command and this audit directly verify receptor preparation, while full per-target flexible-receptor, GPF, and DPF construction remains a manual MGLTools workflow rather than a supplied pipeline.
 - Root cause: The phrase 'real turnkey pipeline' generalizes one successful preparation command to the full novel-target workflow.
 - Fix: Say MGLTools enables the documented per-target preparation workflow, then list the remaining required preparation scripts without calling it turnkey unless a full new-target example is supplied.
-
-### `bio-crispr-screens-base-editing-analysis` — find_be_spacers() has no editor-name validation, unlike the schema-checked functions
-
-- Skill: 92, Production Ready · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/crispr-screens/base-editing-analysis) · [viewer](skills/bio-crispr-screens-base-editing-analysis/mrsonord2240-bioSkills@6847328/viewer.md)
-- Observed in inputs: 7
-- Problem: Calling find_be_spacers() with an invalid `editor` string raises a bare `KeyError: 'NOT_A_REAL_EDITOR'` from the window_by_editor dict lookup, rather than a clear message listing the valid editor names.
-- Root cause: window_by_editor[editor] is indexed directly with no existence check, the same pattern the fix pass replaced with explicit ValueErrors in the other 3 functions.
-- Fix: Add `if editor not in window_by_editor: raise ValueError(f"editor={editor!r} not recognized; valid editors: {sorted(window_by_editor)}")` at the top of the function, consistent with the validation style already added elsewhere in this Skill.
 
 ### `bio-crispr-screens-combinatorial-screens` — No minimum-N guidance for the z-score GI cutoff (open; re-auditor disagrees this is out of fixer scope)
 
