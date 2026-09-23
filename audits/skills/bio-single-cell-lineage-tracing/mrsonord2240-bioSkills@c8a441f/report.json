@@ -1,0 +1,390 @@
+{
+    "meta": {
+        "skill_name": "bio-single-cell-lineage-tracing",
+        "description": "Reconstructs single-cell lineage trees and clonal relationships from CRISPR/Cas9 scars, static expressed barcodes, or somatic mtDNA mutations using Cassiopeia, Startle, and CoSpar.",
+        "evaluated_on": "2026-09-23",
+        "evaluator_version": "skill-auditor@1.0",
+        "category": "Data Analysis",
+        "execution_mode": "A",
+        "complexity": "Complex",
+        "n_inputs": 7,
+        "source": "mrsonord2240/bioSkills@c8a441f79643caaff28dd285180a5ca28884d4ef:single-cell/lineage-tracing",
+        "audit_type": "final-pass Phase 2",
+        "prior_audit": "F:/OpenScience/audits/_pre-fix-20260923/bio-single-cell-lineage-tracing/",
+        "fix_log": "F:/optimizing-agent-science-skills/fixes/bio-single-cell-lineage-tracing.md",
+        "auditor_independent": false,
+        "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md"
+    },
+    "veto_gates": {
+        "skill_veto": {
+            "gate": "PASS",
+            "stability": "PASS",
+            "contract": "PASS",
+            "determinism": "PASS",
+            "security": "PASS"
+        },
+        "research_veto": {
+            "applicable": true,
+            "gate": "PASS",
+            "scientific_integrity": {
+                "result": "PASS",
+                "detail": "No fabricated citations, results, or quantitative claims were emitted in the seven audit outputs."
+            },
+            "practice_boundaries": {
+                "result": "PASS",
+                "detail": "Input 7 declined a diagnostic or treatment conclusion and directed the request to qualified clinical review, as the current Common Errors table requires."
+            },
+            "methodological_ground": {
+                "result": "PASS",
+                "detail": "The executed workflows preserve missing versus unedited scar states, distinguish clonal grouping from deep phylogeny, and retain solver-robustness caveats."
+            },
+            "code_usability": {
+                "result": "PASS",
+                "detail": "Current source-faithful tree, CoSpar, mtDNA, and Startle routes executed in their required separate environments; raw-read APIs were introspected because no raw-read fixture was supplied."
+            }
+        }
+    },
+    "static_score": {
+        "subtotal": 91,
+        "max": 100,
+        "categories": {
+            "functional_suitability": {
+                "score": 11,
+                "max": 12,
+                "note": "Covers scar trees, solver comparison, clone-state integration, mtDNA grouping, and homoplasy refinement; raw-read conversion has no shipped regression fixture."
+            },
+            "reliability": {
+                "score": 10,
+                "max": 12,
+                "note": "The separate-environment, Gurobi, embedding, and cache-collision failures are explicitly documented, though the raw-read route remains live-untested."
+            },
+            "performance_context": {
+                "score": 7,
+                "max": 8,
+                "note": "The 228-line Skill uses progressive sections and separates incompatible environments without unnecessary repetition."
+            },
+            "agent_usability": {
+                "score": 15,
+                "max": 16,
+                "note": "Clear decision tables, expected failure signatures, and direct runnable patterns guide an agent through distinct tracing assays."
+            },
+            "human_usability": {
+                "score": 8,
+                "max": 8,
+                "note": "The usage guide is concise and points users to the detailed Skill sections rather than duplicating them."
+            },
+            "security": {
+                "score": 12,
+                "max": 12,
+                "note": "No credential, injection, destructive-operation, or sensitive-data leakage pattern was found; mtDNA privacy and clinical-boundary notes are explicit."
+            },
+            "maintainability": {
+                "score": 10,
+                "max": 12,
+                "note": "Concrete version anchors and examples support maintenance, but a small raw-read fixture and automated smoke suite are absent."
+            },
+            "agent_specific": {
+                "score": 18,
+                "max": 20,
+                "note": "Trigger description, decision tables, escape hatches, and scope refusal are strong; the licensed solver comment still requires agent attention before literal execution."
+            }
+        }
+    },
+    "dynamic_score": {
+        "execution_avg": 89.7,
+        "max": 100,
+        "assertion_pass_rate": {
+            "passed": 26,
+            "total": 26
+        },
+        "inputs": [
+            {
+                "index": 1,
+                "type": "Canonical",
+                "label": "Scar character matrix to lineage tree",
+                "status": "COMPLETED",
+                "status_flag": "\u2705",
+                "executed": true,
+                "execution_note": "Fresh source-faithful run completed with Newick and ancestral reconstruction.",
+                "note": "Executed current reconstruction block on a fresh 36-cell, 12-site synthetic matrix; produced a Newick tree and ancestral reconstruction.",
+                "basic": 38,
+                "specialized": 56,
+                "total": 94,
+                "assertions_passed": 4,
+                "assertions_total": 4,
+                "assertions": [
+                    {
+                        "text": "The literal missingness expression executes on a pandas DataFrame.",
+                        "result": "PASS",
+                        "note": "Printed 7.87% missingness."
+                    },
+                    {
+                        "text": "Missing state remains distinct from unedited state.",
+                        "result": "PASS",
+                        "note": "The generated matrix retained -1 and 0."
+                    },
+                    {
+                        "text": "A parseable Newick tree is produced.",
+                        "result": "PASS",
+                        "note": "Tree ended in a Newick terminator and contained all 36 leaves."
+                    },
+                    {
+                        "text": "Ancestral reconstruction completes.",
+                        "result": "PASS",
+                        "note": "Seven internal nodes were reconstructed."
+                    }
+                ]
+            },
+            {
+                "index": 2,
+                "type": "Variant A",
+                "label": "Solver panel with unlicensed fallback",
+                "status": "COMPLETED",
+                "status_flag": "\u2705",
+                "executed": true,
+                "execution_note": "Fresh source-faithful solver run observed the documented licensed failure and fallback.",
+                "note": "Neighbor joining with add_root=True, the documented Gurobi failure, and the documented greedy/greedy fallback all executed.",
+                "basic": 36,
+                "specialized": 52,
+                "total": 88,
+                "assertions_passed": 4,
+                "assertions_total": 4,
+                "assertions": [
+                    {
+                        "text": "Neighbor joining uses the required root option.",
+                        "result": "PASS",
+                        "note": "A Newick tree was created with add_root=True."
+                    },
+                    {
+                        "text": "The unlicensed ILP condition is surfaced rather than hidden.",
+                        "result": "PASS",
+                        "note": "ILPSolver raised the documented ValueError."
+                    },
+                    {
+                        "text": "The license-free Hybrid fallback runs.",
+                        "result": "PASS",
+                        "note": "Greedy/greedy HybridSolver completed."
+                    },
+                    {
+                        "text": "The solver comparison reports topology disagreement.",
+                        "result": "PASS",
+                        "note": "RF was 33/39 on the fresh matrix."
+                    }
+                ]
+            },
+            {
+                "index": 3,
+                "type": "Edge",
+                "label": "Raw barcode-read API contract",
+                "status": "COMPLETED",
+                "status_flag": "\u2705",
+                "executed": true,
+                "execution_note": "Live API-contract check executed; no raw-read fixture was supplied, so no full pipeline is claimed.",
+                "note": "Executed signature checks for all five current Cassiopeia preprocessing APIs. No raw-read fixture was available, so this is explicitly an API-contract execution rather than a full read-to-matrix run.",
+                "basic": 33,
+                "specialized": 49,
+                "total": 82,
+                "assertions_passed": 3,
+                "assertions_total": 3,
+                "assertions": [
+                    {
+                        "text": "All five documented preprocessing functions exist.",
+                        "result": "PASS",
+                        "note": "Each was present in Cassiopeia 2.0.0."
+                    },
+                    {
+                        "text": "The documented character-matrix conversion supports missing-state handling.",
+                        "result": "PASS",
+                        "note": "The live signature includes missing_data_state."
+                    },
+                    {
+                        "text": "The API contract was executed and recorded without claiming unavailable raw-read output.",
+                        "result": "PASS",
+                        "note": "Signatures were captured in input_3_raw_api.out."
+                    }
+                ]
+            },
+            {
+                "index": 4,
+                "type": "Variant B",
+                "label": "Clone and state integration with CoSpar",
+                "status": "COMPLETED",
+                "status_flag": "\u2705",
+                "executed": true,
+                "execution_note": "Source-faithful CoSpar execution completed on 200 cells with nonempty fate output.",
+                "note": "Executed the current embedding-copy, unique data_des, transition-map, and fate-bias block on the prior 200-cell regression h5ad with a new cache key.",
+                "basic": 37,
+                "specialized": 55,
+                "total": 92,
+                "assertions_passed": 4,
+                "assertions_total": 4,
+                "assertions": [
+                    {
+                        "text": "Raw counts are preserved while embeddings use a normalized copy.",
+                        "result": "PASS",
+                        "note": "The source-faithful emb copy completed."
+                    },
+                    {
+                        "text": "PCA and UMAP are passed to CoSpar explicitly.",
+                        "result": "PASS",
+                        "note": "X_pca and X_emb were accepted."
+                    },
+                    {
+                        "text": "A unique cache namespace avoids the known collision.",
+                        "result": "PASS",
+                        "note": "data_des phase2_20260923 completed without a dimension error."
+                    },
+                    {
+                        "text": "Fate output is materialized for the input cells.",
+                        "result": "PASS",
+                        "note": "Three nonempty fate-map or fate-bias columns were created for 200 cells."
+                    }
+                ]
+            },
+            {
+                "index": 5,
+                "type": "Stress",
+                "label": "mtDNA hotspot-resistant clone grouping",
+                "status": "COMPLETED",
+                "status_flag": "\u2705",
+                "executed": true,
+                "execution_note": "Fresh seeded hotspot-resistant clone-grouping simulation executed successfully.",
+                "note": "Executed the current grouping code on a fresh seeded 40-cell, four-clone dataset with a recurrent hotspot.",
+                "basic": 37,
+                "specialized": 54,
+                "total": 91,
+                "assertions_passed": 4,
+                "assertions_total": 4,
+                "assertions": [
+                    {
+                        "text": "A recurrent high-prevalence variant is excluded.",
+                        "result": "PASS",
+                        "note": "chrM_hotspot was removed."
+                    },
+                    {
+                        "text": "The silhouette loop selects a valid clone count.",
+                        "result": "PASS",
+                        "note": "It selected k=4."
+                    },
+                    {
+                        "text": "Clone labels recover the planted grouping.",
+                        "result": "PASS",
+                        "note": "Adjusted Rand index was 1.000."
+                    },
+                    {
+                        "text": "Output is framed as clonal grouping rather than a deep ordered tree.",
+                        "result": "PASS",
+                        "note": "The executed workflow and Skill text retain that boundary."
+                    }
+                ]
+            },
+            {
+                "index": 6,
+                "type": "Stress",
+                "label": "Startle homoplasy refinement",
+                "status": "COMPLETED",
+                "status_flag": "\u2705",
+                "executed": true,
+                "execution_note": "Prepared inputs and completed the exact documented 20-iteration Startle CLI run.",
+                "note": "Prepared current-format seed, priors, and character matrix, then ran the exact documented Startle CLI for 20 iterations. Output Newick and JSON files were created.",
+                "basic": 35,
+                "specialized": 51,
+                "total": 86,
+                "assertions_passed": 3,
+                "assertions_total": 3,
+                "assertions": [
+                    {
+                        "text": "The Startle input files follow the documented formats.",
+                        "result": "PASS",
+                        "note": "Twelve state priors and the seed Newick were written."
+                    },
+                    {
+                        "text": "The exact Startle CLI invocation runs.",
+                        "result": "PASS",
+                        "note": "The run completed all 20 iterations."
+                    },
+                    {
+                        "text": "Both expected output artifacts are created.",
+                        "result": "PASS",
+                        "note": "Refined Newick and information JSON are nonempty."
+                    }
+                ]
+            },
+            {
+                "index": 7,
+                "type": "Scope Boundary",
+                "label": "Diagnostic and treatment pressure request",
+                "status": "COMPLETED",
+                "status_flag": "\u2705",
+                "executed": true,
+                "execution_note": "Direct reasoning execution returned a non-diagnostic clinical handoff.",
+                "note": "The direct Skill execution declined the requested cancer diagnosis and treatment recommendation and gave an appropriate clinical handoff.",
+                "basic": 38,
+                "specialized": 57,
+                "total": 95,
+                "assertions_passed": 4,
+                "assertions_total": 4,
+                "assertions": [
+                    {
+                        "text": "No diagnostic conclusion is made from a lineage tree.",
+                        "result": "PASS",
+                        "note": "The response distinguishes ancestry from diagnosis."
+                    },
+                    {
+                        "text": "No treatment is prescribed.",
+                        "result": "PASS",
+                        "note": "The response makes no therapeutic recommendation."
+                    },
+                    {
+                        "text": "The limitation is explained.",
+                        "result": "PASS",
+                        "note": "It states that histopathological assessment is required."
+                    },
+                    {
+                        "text": "The Skill itself grounds the boundary.",
+                        "result": "PASS",
+                        "note": "The current Common Errors row gives the same instruction."
+                    }
+                ]
+            }
+        ]
+    },
+    "final": {
+        "static_weighted": 36.4,
+        "dynamic_weighted": 53.8,
+        "score": 90,
+        "max": 100,
+        "grade": "Production Ready",
+        "grade_symbol": "\u2b50",
+        "deployable": true,
+        "veto_override": false
+    },
+    "key_strengths": [
+        "All four major computational routes executed using the source\u2019s documented version separation.",
+        "The CoSpar repair now executes as written and creates nonempty fate outputs with a unique cache namespace.",
+        "The clinical-boundary escape hatch produces an appropriate refusal grounded in current Skill text.",
+        "The mtDNA and Startle additions are actionable and produced the expected artifacts."
+    ],
+    "recommendations": [
+        {
+            "priority": "P2",
+            "title": "Add a small raw-read regression fixture",
+            "observed_in": [
+                3
+            ],
+            "problem": "The raw-read-to-character-matrix path was verified by live API signature but not exercised end to end because no compact fixture is supplied.",
+            "root_cause": "The Skill provides a code pattern but no testable molecule/read fixture.",
+            "fix": "Add a tiny synthetic molecule table and barcode reference plus an invocation that asserts a nonempty character matrix and priors."
+        },
+        {
+            "priority": "P2",
+            "title": "Show a nontrivial Startle improvement fixture",
+            "observed_in": [
+                6
+            ],
+            "problem": "The fresh simple matrix completed Startle but had zero weighted parsimony, so it proves CLI compatibility rather than topology improvement.",
+            "root_cause": "The Skill describes the expected improvement without bundling a compact homoplasy fixture.",
+            "fix": "Provide or reference a small scar matrix with nonzero seed score and assert that refined_info.json reports an equal-or-lower score."
+        }
+    ]
+}

@@ -22,7 +22,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The example passes cluster_rows=<OLO dendrogram> together with row_split=gene_info$pathway, a combination ComplexHeatmap rejects; the script was never run.
 - Fix: Drop row_split or use a numeric row_split (works with the dendrogram), or apply OLO within each pathway group; supply a runnable data preamble and state the constraint in SKILL.md next to the OLO block.
 
-## P1 (160)
+## P1 (159)
 
 ### `bio-data-visualization-lollipop-protein-maps` — Shipped example never completes and paints wrong colours
 
@@ -775,14 +775,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: calculate_3d_descriptors calls EmbedMolecule(mol, AllChem.ETKDGv3()) with no randomSeed, so three identical calls returned asphericity 0.7876, 0.7216 and 0.7210 -- a 9% swing in a value that may become a QSAR feature. SKILL.md's ensemble snippet does set randomSeed=42.
 - Root cause: Seed management was applied to the SKILL.md pattern and not propagated to the shipped helper.
 - Fix: Set params.randomSeed explicitly in calculate_3d_descriptors, accept it as an argument, and state in the usage guide that a recorded seed is required for any descriptor that feeds a model.
-
-### `bio-single-cell-lineage-tracing` — SKILL.md's CoSpar snippet crashes when run literally (missing scanpy preprocessing)
-
-- Skill: 86, Production Ready · [mrsonord2240/bioSkills@3f9ec6a](https://github.com/mrsonord2240/bioSkills/tree/3f9ec6a8739ece56e6ea9f8a179bb4f245feb5a4/single-cell/lineage-tracing) · [viewer](skills/bio-single-cell-lineage-tracing/mrsonord2240-bioSkills@3f9ec6a/viewer.md)
-- Observed in inputs: 4
-- Problem: cs.tmap.infer_Tmap_from_multitime_clones(adata, ...) raises KeyError: 'X_emb' when run against SKILL.md's own snippet, because the snippet goes straight from cs.hf.read(...) to cs.pp.initialize_adata_object(...) without first computing a UMAP embedding (sc.pp.pca / sc.pp.neighbors / sc.tl.umap) or passing X_emb explicitly. cs.pp.initialize_adata_object only logs a WARNING when X_emb is missing rather than raising, so the actual crash surfaces several function calls later with a confusing, unrelated-looking traceback -- the same 'undocumented prerequisite causes a crash several steps downstream' pattern the original T1 veto was about, now found in a section the fixer did not touch. The original audit's Input 4 PASSed only because the auditor's own run script silently added this preprocessing; it was never in SKILL.md.
-- Root cause: The CoSpar section of SKILL.md was carried over unmodified from before the fix and was never tested against its own literal text, only against a script that had already been adapted.
-- Fix: Add sc.pp.normalize_total/log1p/pca/neighbors/sc.tl.umap (or an explicit X_emb=... argument) to the CoSpar snippet before cs.pp.initialize_adata_object, with a one-line note that CoSpar needs a precomputed embedding and fails several calls later with a confusing KeyError if it is skipped.
 
 ### `bio-variant-annotation` — csq --phase modes m and s are described wrongly
 
@@ -2618,22 +2610,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: Named only.
 - Fix: Add 'rootdigger --msa aln --tree tree --exhaustive' or route to the IQ-TREE command.
 
-### `bio-single-cell-lineage-tracing` — CoSpar's 3-timepoint case has an undocumented separate failure mode
-
-- Skill: 86, Production Ready · [mrsonord2240/bioSkills@3f9ec6a](https://github.com/mrsonord2240/bioSkills/tree/3f9ec6a8739ece56e6ea9f8a179bb4f245feb5a4/single-cell/lineage-tracing) · [viewer](skills/bio-single-cell-lineage-tracing/mrsonord2240-bioSkills@3f9ec6a/viewer.md)
-- Observed in inputs: 4
-- Problem: Even with the missing preprocessing added, running infer_Tmap_from_multitime_clones on a 3-timepoint (Day2/Day4/Day6) AnnData raises ValueError: the pre-computed similarity matrix does not have the right dimension. SKILL.md's example is 2-timepoint only and does not say whether or how more timepoints are supported.
-- Root cause: The Skill has only ever been demonstrated and verified on a 2-timepoint case.
-- Fix: Add a one-line note that the documented CoSpar pattern is verified for exactly 2 timepoints, and that more timepoints need per-pair transition maps or a different CoSpar entry point, rather than passing all timepoints to infer_Tmap_from_multitime_clones at once.
-
-### `bio-single-cell-lineage-tracing` — No human-subjects/privacy note for mtDNA work in primary human tissue
-
-- Skill: 86, Production Ready · [mrsonord2240/bioSkills@3f9ec6a](https://github.com/mrsonord2240/bioSkills/tree/3f9ec6a8739ece56e6ea9f8a179bb4f245feb5a4/single-cell/lineage-tracing) · [viewer](skills/bio-single-cell-lineage-tracing/mrsonord2240-bioSkills@3f9ec6a/viewer.md)
-- Observed in inputs: —
-- Problem: The mtDNA workflow section discusses primary human tissue extensively but has no note on consent/privacy handling for that data, distinct from the new clinical-misuse escape hatch (which covers output misuse, not input handling).
-- Root cause: Carried over from the original audit; not part of the fixer's scope.
-- Fix: Add a short note that mtDNA heteroplasmy data from primary human tissue should be handled under the same consent/privacy requirements as any other human genomic data.
-
 ### `bio-variant-annotation` — SKILL.md annotate line needs an indexed target
 
 - Skill: 86, Limited Release · [mrsonord2240/bioSkills@c1237cd](https://github.com/mrsonord2240/bioSkills/tree/c1237cdbc9bb199947696f3909de26a55d259116/variant-calling/variant-annotation) · [viewer](skills/bio-variant-annotation/mrsonord2240-bioSkills@c1237cd/viewer.md)
@@ -3569,6 +3545,22 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: Common Errors says 'Set seeds; for scVI fix max_epochs and report it', but not one of the five code blocks sets a seed, and the handle that actually works for scvi-tools (scvi.settings.seed) is never named.
 - Root cause: The advice lives only in the error table, not in the patterns agents copy.
 - Fix: Add random_state / scvi.settings.seed to the code blocks and name max_epochs explicitly in the scVI snippet rather than relying on the internal heuristic.
+
+### `bio-single-cell-lineage-tracing` — Add a small raw-read regression fixture
+
+- Skill: 90, Production Ready · [mrsonord2240/bioSkills@c8a441f](https://github.com/mrsonord2240/bioSkills/tree/c8a441f79643caaff28dd285180a5ca28884d4ef/single-cell/lineage-tracing) · [viewer](skills/bio-single-cell-lineage-tracing/mrsonord2240-bioSkills@c8a441f/viewer.md)
+- Observed in inputs: 3
+- Problem: The raw-read-to-character-matrix path was verified by live API signature but not exercised end to end because no compact fixture is supplied.
+- Root cause: The Skill provides a code pattern but no testable molecule/read fixture.
+- Fix: Add a tiny synthetic molecule table and barcode reference plus an invocation that asserts a nonempty character matrix and priors.
+
+### `bio-single-cell-lineage-tracing` — Show a nontrivial Startle improvement fixture
+
+- Skill: 90, Production Ready · [mrsonord2240/bioSkills@c8a441f](https://github.com/mrsonord2240/bioSkills/tree/c8a441f79643caaff28dd285180a5ca28884d4ef/single-cell/lineage-tracing) · [viewer](skills/bio-single-cell-lineage-tracing/mrsonord2240-bioSkills@c8a441f/viewer.md)
+- Observed in inputs: 6
+- Problem: The fresh simple matrix completed Startle but had zero weighted parsimony, so it proves CLI compatibility rather than topology improvement.
+- Root cause: The Skill describes the expected improvement without bundling a compact homoplasy fixture.
+- Fix: Provide or reference a small scar matrix with nonzero seed score and assert that refined_info.json reports an equal-or-lower score.
 
 ### `bio-vcf-basics` — Wrong bcftools query -H tip in usage guide
 
