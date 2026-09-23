@@ -1,0 +1,81 @@
+{
+  "meta": {
+    "skill_name": "bio-proteomics-protein-inference",
+    "description": "Groups proteins from peptide identifications, reports indistinguishable protein groups with a leading protein, and controls protein or protein-group false discovery rate using picked methods.",
+    "source": "mrsonord2240/bioSkills@2e41419be0f5d52378d18ce545c162a611006a93:proteomics/protein-inference",
+    "evaluated_on": "2026-09-22",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 9,
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {"result": "PASS", "detail": "Synthetic truth data is labelled as synthetic; no DOI, clinical result, or numeric result was fabricated."},
+      "practice_boundaries": {"result": "PASS", "detail": "The patient/isoform adversarial case is refused and routed to validated PRM/MRM rather than discovery-group interpretation."},
+      "methodological_ground": {"result": "PASS", "detail": "Runs preserve the distinction between PSM and protein FDR, reject HYE as an entrapment control, and retain group rather than flat-list reporting."},
+      "code_usability": {"result": "PASS", "detail": "All copied shipped Python scripts compiled and executed; parsed output assertions passed. The Philosopher script's nonzero exit is its designed empty-output guard, not an unhandled failure."}
+    }
+  },
+  "static_score": {
+    "subtotal": 93,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {"score": 12, "max": 12, "note": "Covers OpenMS, EPIFANY, Percolator, Philosopher, MaxQuant semantics, group reporting, scope boundaries, and picked FDR."},
+      "reliability": {"score": 11, "max": 12, "note": "Wrong-prefix and silent-empty Philosopher failure modes have explicit guards; a compatible positive Philosopher pepXML path remains unverified locally."},
+      "performance_context": {"score": 7, "max": 8, "note": "Method selection stays in SKILL.md while four focused references and executable scripts provide progressive detail."},
+      "agent_usability": {"score": 15, "max": 16, "note": "Decision tree, input/output contracts, tool-version checks, and common-error table make the routes operationally clear."},
+      "human_usability": {"score": 8, "max": 8, "note": "Natural trigger language, plain vocabulary, and explicit out-of-scope routes are present."},
+      "security": {"score": 11, "max": 12, "note": "No credentials, destructive operations, or raw command interpolation are present; file paths are assumed to be analyst-supplied trusted inputs."},
+      "maintainability": {"score": 11, "max": 12, "note": "The concise dispatcher, single-purpose reference files, and runnable scripts have clear responsibilities and were independently replayed from copies."},
+      "agent_specific": {"score": 18, "max": 20, "note": "Trigger is precise, progressive disclosure is strong, outputs are reproducible, and clinical/isoform stop conditions are explicit; the external CLI compatibility branch needs a positive fixture."}
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 95.6,
+    "max": 100,
+    "assertion_pass_rate": {"passed": 36, "total": 36},
+    "inputs": [
+      {"index": 1, "type": "Canonical", "label": "Regression: OpenMS Basic inference and picked group FDR", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Copied group_proteins_pyopenms.py ran on standard synthetic idXML; TSV was parsed.", "note": "556 target groups at 1%; multi-member group retained.", "basic": 39, "specialized": 58, "total": 97, "assertions_passed": 4, "assertions_total": 4, "assertions": [{"text": "The copied Basic-inference script compiles and exits successfully", "result": "PASS", "note": "py_compile and execution completed."}, {"text": "The 1% picked-FDR output contains 556 target groups", "result": "PASS", "note": "Parsed TSV count was 556."}, {"text": "A multi-member indistinguishable group remains represented as a group", "result": "PASS", "note": "At least one passing accession field contained multiple members."}, {"text": "Output uses an explicit leading protein and q-value contract", "result": "PASS", "note": "Both columns exist in the parsed TSV."}]},
+      {"index": 2, "type": "Variant A", "label": "Regression: Percolator picked-protein route on Comet PIN", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "The reference CLI command was replayed with Percolator 3.09.0 and its FASTA/PIN fixtures.", "note": "prot.target.tsv was nonempty and had 458 representatives at q<=0.01.", "basic": 38, "specialized": 58, "total": 96, "assertions_passed": 4, "assertions_total": 4, "assertions": [{"text": "Percolator accepts the documented picked-protein route", "result": "PASS", "note": "The -f target-decoy FASTA run completed."}, {"text": "The output table exists and is nonempty", "result": "PASS", "note": "prot.target.tsv was written and parsed."}, {"text": "The 1% q-value result is checked rather than inferred from exit status", "result": "PASS", "note": "458 rows met q<=0.01."}, {"text": "The output is described as representatives rather than a flat group-member list", "result": "PASS", "note": "The execution note preserves the reference's representative caveat."}]},
+      {"index": 3, "type": "Edge", "label": "Regression: Philosopher/ProteinProphet silent-empty guard", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "The staged Comet pepXML was processed by Philosopher 5.1.0; the script deliberately returned 1 at the documented grep guard.", "note": "6,135 results were processed but zero peptideprophet_result rows were modelled; guard fired as required.", "basic": 37, "specialized": 55, "total": 92, "assertions_passed": 4, "assertions_total": 4, "assertions": [{"text": "Philosopher processing is checked by produced content, not exit zero", "result": "PASS", "note": "The count of peptideprophet_result elements was inspected."}, {"text": "A zero-model result stops before ProteinProphet or protein reporting", "result": "PASS", "note": "The grep guard returned the expected nonzero status."}, {"text": "The known local pepXML compatibility failure is not misreported as 0% FDR", "result": "PASS", "note": "Log reports read in no data and no success claim was made."}, {"text": "The blocked positive route is recorded with a concrete resolution path", "result": "PASS", "note": "A compatible Philosopher/TPP pepXML-ingestion environment is named in the checkpoint."}]},
+      {"index": 4, "type": "Variant B", "label": "Regression: MaxQuant proteinGroups semantics", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Synthetic proteinGroups.txt was parsed and the resulting table was saved under run/outputs.", "note": "1,500 valid groups retained after special-row filtering.", "basic": 38, "specialized": 58, "total": 96, "assertions_passed": 4, "assertions_total": 4, "assertions": [{"text": "Reverse, contaminant, and site-only rows are excluded", "result": "PASS", "note": "All three flag conditions were applied before retaining rows."}, {"text": "Protein IDs remain group members and the first member becomes the leading accession", "result": "PASS", "note": "Parsed member arrays and leading column were saved."}, {"text": "Majority membership does not exceed all members", "result": "PASS", "note": "Invariant held for every retained row."}, {"text": "Unique-peptide counts are retained as group metadata rather than a two-peptide exclusion", "result": "PASS", "note": "Unique peptides column is present without a hard filter."}]},
+      {"index": 5, "type": "Stress", "label": "Regression: 113k-PSM deep synthetic inference", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Copied Basic-inference script ran on the deep 113,547-spectrum idXML; output was parsed against synthetic truth.", "note": "7,184 unfiltered target groups had 6.96% true FDP; 6,564 picked 1% groups had 0.90% true FDP.", "basic": 38, "specialized": 58, "total": 96, "assertions_passed": 4, "assertions_total": 4, "assertions": [{"text": "The deep input executes without a crash or silent output", "result": "PASS", "note": "The 416,838-byte TSV was written and parsed."}, {"text": "Picked FDR retains a nontrivial group set", "result": "PASS", "note": "6,564 groups passed 1%."}, {"text": "Protein-level filtering improves the synthetic truth FDP over unfiltered targets", "result": "PASS", "note": "0.90% versus 6.96%."}, {"text": "The result is labelled synthetic rather than presented as biological truth", "result": "PASS", "note": "The fixture and execution note both identify synthetic truth."}]},
+      {"index": 6, "type": "Scope Boundary", "label": "Regression: HYE is not an entrapment validation set", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "A direct Skill response was rendered and saved after applying the documented entrapment precondition.", "note": "Refuses to validate 1% FDR from a mixture whose organisms are all present.", "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 4, "assertions_total": 4, "assertions": [{"text": "The response rejects HYE as an entrapment control", "result": "PASS", "note": "It explicitly says HYE is not an entrapment validation set."}, {"text": "The response does not claim the Percolator list proves a 1% true FDR", "result": "PASS", "note": "It declines that conclusion."}, {"text": "A valid absent-proteome control is specified", "result": "PASS", "note": "It requests Arabidopsis or a shuffled absent proteome."}, {"text": "The validation preserves resolved picked-group analysis", "result": "PASS", "note": "The requested rerun is explicitly on resolved, picked groups."}]},
+      {"index": 7, "type": "Adversarial", "label": "Regression: patient isoform and flat two-peptide request", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "A direct Skill response was rendered and saved after applying the clinical and proteoform boundaries.", "note": "Refuses patient-level isoform confirmation and routes to PRM/MRM on isoform-unique peptides.", "basic": 39, "specialized": 58, "total": 97, "assertions_passed": 4, "assertions_total": 4, "assertions": [{"text": "The response does not confirm an isoform in a patient", "result": "PASS", "note": "It explicitly says it cannot confirm the isoform."}, {"text": "The response does not substitute a flat two-peptide list for groups", "result": "PASS", "note": "It rejects that transformation."}, {"text": "The response retains leading accession and all group members", "result": "PASS", "note": "That reporting unit is stated."}, {"text": "The response routes a patient claim to validated targeted measurement", "result": "PASS", "note": "It specifies PRM/MRM on isoform-unique peptides."}]},
+      {"index": 8, "type": "Canonical", "label": "New: EPIFANY Bayesian groups plus picked-group FDR", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Copied epifany_inference.py and picked_group_fdr.py ran on the standard idXML; both TSVs were parsed.", "note": "EPIFANY produced 749 bounded posteriors and the companion picked pass produced 586 target groups.", "basic": 38, "specialized": 58, "total": 96, "assertions_passed": 4, "assertions_total": 4, "assertions": [{"text": "The copied EPIFANY script executes successfully", "result": "PASS", "note": "It exited zero on pyOpenMS 3.5.0."}, {"text": "Every posterior is within the probability range", "result": "PASS", "note": "All 749 parsed values were in [0,1]."}, {"text": "The script produced the expected number of groups", "result": "PASS", "note": "Parsed count was 749."}, {"text": "Picked-group companion output has a parsed 1% target set", "result": "PASS", "note": "586 target rows were written."}]},
+      {"index": 9, "type": "Edge", "label": "New: wrong decoy prefix and standalone demo", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Copied picked_group_fdr.py was run with REV__ against DECOY_ data, then copied examples/protein_groups.py was executed.", "note": "Wrong prefix raised ValueError; demo deterministically kept 7/8 nodes and 2 passing target groups.", "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 4, "assertions_total": 4, "assertions": [{"text": "A mismatched decoy prefix fails explicitly", "result": "PASS", "note": "ValueError said no decoy groups with prefix REV__."}, {"text": "The standalone demo executes with its declared dependencies", "result": "PASS", "note": "It exited zero using pandas."}, {"text": "The demo collapses the indistinguishable isoform pair", "result": "PASS", "note": "P_E and P_E-2 appear together under P_E."}, {"text": "The demo retains its low-decoy warning", "result": "PASS", "note": "It warns that three decoys are not meaningful for real FDR."}]}
+    ]
+  },
+  "final": {
+    "static_weighted": 37.2,
+    "dynamic_weighted": 57.4,
+    "score": 95,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "All runnable shipped Python scripts were replayed from audit copies and their output files were parsed rather than trusted by exit status.",
+    "The Percolator CLI route produced 458 checked 1%-FDR representatives on real Comet artifacts.",
+    "The Philosopher empty-result failure is visibly guarded, preventing a false 0% FDR success report.",
+    "Group reporting, entrapment preconditions, and patient/isoform boundaries were upheld across regression and new cases."
+  ],
+  "recommendations": [
+    {"priority": "P1", "title": "Verify a positive Philosopher/ProteinProphet chain", "observed_in": [3], "problem": "Philosopher 5.1.0 processed 6,135 search results but modelled zero PeptideProphet PSMs for both available pepXML forms, so a nonempty ProteinProphet/filter success path could not be demonstrated locally.", "root_cause": "The local Philosopher/TPP-derived pepXML ingestion path is incompatible with the available Comet and OpenMS-reserialised fixtures; this is not a silent Skill failure because the guard stops it.", "fix": "Before a workflow depends on this optional route, run the documented commands against a compatible pepXML fixture or functioning Philosopher/TPP environment and assert nonempty peptideprophet_result, prot.xml, and protein.tsv. Do not retry the prohibited standalone TPP installer."}
+  ]
+}

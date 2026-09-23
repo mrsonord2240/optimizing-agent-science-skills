@@ -26,7 +26,7 @@
     "commissioned_by": "Samuel Nord",
     "test_data": "synthetic"
   },
-  "supersedes": null,
+  "supersedes": "mrsonord2240-bioSkills@45a0c5a",
   "files": {
     "report": "report.json",
     "viewer": "viewer.md",

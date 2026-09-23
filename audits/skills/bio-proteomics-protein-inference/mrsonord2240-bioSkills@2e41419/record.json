@@ -1,9 +1,9 @@
 {
   "skill_id": "bio-proteomics-protein-inference",
-  "version": "mrsonord2240-bioSkills@45a0c5a",
+  "version": "mrsonord2240-bioSkills@2e41419",
   "source": {
     "repository": "mrsonord2240/bioSkills",
-    "commit": "45a0c5a65b7346d47a7b72b6d0a6eb60ea590317",
+    "commit": "2e41419be0f5d52378d18ce545c162a611006a93",
     "path": "proteomics/protein-inference",
     "author": "GPTomics",
     "author_url": "https://github.com/GPTomics",
@@ -13,7 +13,7 @@
       "repository": "GPTomics/bioSkills",
       "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
     },
-    "url": "https://github.com/mrsonord2240/bioSkills/tree/45a0c5a65b7346d47a7b72b6d0a6eb60ea590317/proteomics/protein-inference"
+    "url": "https://github.com/mrsonord2240/bioSkills/tree/2e41419be0f5d52378d18ce545c162a611006a93/proteomics/protein-inference"
   },
   "audit": {
     "method": {
@@ -26,16 +26,16 @@
       "url": "https://github.com/aipoch/medical-research-skills/tree/f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26/skill-auditor"
     },
     "evaluator_version": "skill-auditor@1.0",
-    "audited_on": "2026-09-15",
+    "audited_on": "2026-09-22",
     "performed_by": "Claude (Anthropic) auditor agents",
     "commissioned_by": "Samuel Nord",
     "test_data": "synthetic"
   },
-  "supersedes": null,
+  "supersedes": "GPTomics-bioSkills@d91ed3d",
   "files": {
     "report": "report.json",
     "viewer": "viewer.md",
     "fixes": "fixes.md",
-    "scripts": 41
+    "scripts": 37
   }
 }

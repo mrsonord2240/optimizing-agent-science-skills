@@ -1064,14 +1064,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: Time-boxed behind the P0/P1 tool-route fix; acknowledged unfixed in the fix log.
 - Fix: Split per-method sections (LDSC, LDAK, HESS, HDL, Popcorn, BOLT/GCTA) into references/*.md; keep SKILL.md as an index plus the Decision Tree by Scenario.
 
-### `bio-proteomics-protein-inference` — The newly recommended Percolator route emits a flat protein list, and SKILL.md does not say so
-
-- Skill: 88.8, Production Ready · [mrsonord2240/bioSkills@45a0c5a](https://github.com/mrsonord2240/bioSkills/tree/45a0c5a65b7346d47a7b72b6d0a6eb60ea590317/proteomics/protein-inference) · [viewer](skills/bio-proteomics-protein-inference/mrsonord2240-bioSkills@45a0c5a/viewer.md)
-- Observed in inputs: Inputs 2, 6
-- Problem: The Skill's central thesis is that a protein GROUP, not a flat list, is the only honest reporting unit. The new decision-tree row and CLI block send a Percolator user to `-f/--picked-protein` and document the output columns, but prot.target.tsv carries 2,339 rows with 2,339 distinct ProteinGroupIds and 0 rows listing more than one accession: Percolator eliminates fragment and duplicate proteins rather than listing them as group members. A reader following the Skill gets exactly the flat list the Skill warns against, and is told it is "one row per group representative, already picked" without being told the partners vanished.
-- Root cause: The block was written from the run's stdout and column header rather than from the content of the rows, so the elimination-vs-listing distinction was never checked.
-- Fix: Add one line under the Percolator OUTPUT CHECK: "each row is a single representative -- the indistinguishable partners are ELIMINATED, not listed; pass --protein-report-duplicates (and --protein-report-fragments) if you need the full group membership, and never report prot.target.tsv as a group list without them."
-
 ### `bio-causal-genomics-fine-mapping` — coloc.susie example crashes on SKILL.md's own documented code (missing SNP-name precondition)
 
 - Skill: 89, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/causal-genomics/fine-mapping) · [viewer](skills/bio-causal-genomics-fine-mapping/GPTomics-bioSkills@d91ed3d/viewer.md)
@@ -1264,6 +1256,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: This divergence was undiscoverable before this fix round because the graphite route never completed a single successful run pre-fix (Research Veto M4 FAIL); the fixer's own verification (fixes/bio-pathway-kegg-pathways.md) checked that runSPIA returned real rows but did not cross-check its direction calls against the direct spia() route.
 - Fix: Add a caveat to the SPIA section (and the Common Errors / Per-Method Failure Modes tables) stating that graphite's harmonized topology can disagree with SPIA's native KEGG-bundled topology on perturbation direction for a meaningful fraction of pathways, and recommend treating the two routes as complementary evidence rather than interchangeable, or explicitly stating which one to prefer as the default and why.
 
+### `bio-proteomics-protein-inference` — Verify a positive Philosopher/ProteinProphet chain
+
+- Skill: 95, Production Ready · [mrsonord2240/bioSkills@2e41419](https://github.com/mrsonord2240/bioSkills/tree/2e41419be0f5d52378d18ce545c162a611006a93/proteomics/protein-inference) · [viewer](skills/bio-proteomics-protein-inference/mrsonord2240-bioSkills@2e41419/viewer.md)
+- Observed in inputs: 3
+- Problem: Philosopher 5.1.0 processed 6,135 search results but modelled zero PeptideProphet PSMs for both available pepXML forms, so a nonempty ProteinProphet/filter success path could not be demonstrated locally.
+- Root cause: The local Philosopher/TPP-derived pepXML ingestion path is incompatible with the available Comet and OpenMS-reserialised fixtures; this is not a silent Skill failure because the guard stops it.
+- Fix: Before a workflow depends on this optional route, run the documented commands against a compatible pepXML fixture or functioning Philosopher/TPP environment and assert nonempty peptideprophet_result, prot.xml, and protein.tsv. Do not retry the prohibited standalone TPP installer.
+
 ### `bio-causal-genomics-colocalization-analysis` — Revised PP.H3-inflation trigger condition is not yet empirically calibrated
 
 - Skill: 96, Production Ready · [mrsonord2240/bioSkills@9da81ea](https://github.com/mrsonord2240/bioSkills/tree/9da81ea758e0b0d631f72199a4679211dc89f5d4/causal-genomics/colocalization-analysis) · [viewer](skills/bio-causal-genomics-colocalization-analysis/mrsonord2240-bioSkills@9da81ea/viewer.md)
@@ -1272,7 +1272,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (473)
+## P2 (470)
 
 ### `bio-data-visualization-lollipop-protein-maps` — HGVSp edge cases and recurrence semantics undocumented
 
@@ -3697,30 +3697,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: These five named tools are still scored by inspection only, unchanged from the pre-fix audit; none has been executed against real or synthetic data in either round, even though this round proved LDAK (previously also assumed unexecutable) runs fine in the same WSL seat.
 - Root cause: Time/scope-boxed in both audit rounds; HDL/HESS need R/Python installs and reference panels not yet set up for this candidate.
 - Fix: A future audit or tooling pass should install and smoke-test at least HDL (pure R, no GPU needed) and HESS (Python) the same way this round did for LDAK, since both are named headline capabilities of the Skill's own frontmatter description.
-
-### `bio-proteomics-protein-inference` — The entrapment-validation advice omits the condition that makes it valid
-
-- Skill: 88.8, Production Ready · [mrsonord2240/bioSkills@45a0c5a](https://github.com/mrsonord2240/bioSkills/tree/45a0c5a65b7346d47a7b72b6d0a6eb60ea590317/proteomics/protein-inference) · [viewer](skills/bio-proteomics-protein-inference/mrsonord2240-bioSkills@45a0c5a/viewer.md)
-- Observed in inputs: Input 6
-- Problem: The Naive-FDR Fix line says "validate with a two-species or entrapment search". On the commonest benchmark design -- a HYE human/yeast/E. coli mix, which is what the real data here is -- all species present are genuinely in the sample, so none of them can act as an entrapment set. Executed on the 458-protein list: 312 HUMAN, 131 YEAST, 10 ECOLI and 5 cRAP contaminants, with no absent proteome anywhere to count false hits against.
-- Root cause: A one-clause shorthand for a method whose whole validity rests on an unstated precondition.
-- Fix: Condition it: "entrapment validation needs a proteome that is ABSENT from the sample (e.g. append Arabidopsis or a shuffled second proteome to the search database); a multi-species benchmark such as HYE does not provide one, because every species in it is truly present."
-
-### `bio-proteomics-protein-inference` — The decoy prefix is hard-coded in three places in the shipped code
-
-- Skill: 88.8, Production Ready · [mrsonord2240/bioSkills@45a0c5a](https://github.com/mrsonord2240/bioSkills/tree/45a0c5a65b7346d47a7b72b6d0a6eb60ea590317/proteomics/protein-inference) · [viewer](skills/bio-proteomics-protein-inference/mrsonord2240-bioSkills@45a0c5a/viewer.md)
-- Observed in inputs: Inputs 1, 2, 4
-- Problem: DECOY_ appears as a literal inside the pyOpenMS default block (twice) and again in the Percolator command line, while the Skill correctly teaches that the prefix is tool-specific. The failure is now well-documented (IndexError / ValueError, both reproduced) but still has to happen before the reader notices.
-- Root cause: Copy-ready snippets favour literals over a named constant.
-- Fix: Lift the prefix to a single `DECOY_PREFIX = 'DECOY_' # OpenMS/Comet; rev_ Philosopher; REV__ MaxQuant` at the top of the block and reference it, as examples/protein_groups.py already does.
-
-### `bio-proteomics-protein-inference` — The pyOpenMS route still has no stated output schema
-
-- Skill: 88.8, Production Ready · [mrsonord2240/bioSkills@45a0c5a](https://github.com/mrsonord2240/bioSkills/tree/45a0c5a65b7346d47a7b72b6d0a6eb60ea590317/proteomics/protein-inference) · [viewer](skills/bio-proteomics-protein-inference/mrsonord2240-bioSkills@45a0c5a/viewer.md)
-- Observed in inputs: Inputs 1, 5
-- Problem: The CLI routes now specify their output columns and a row-count assertion, but the recommended Python path leaves the caller to infer the report shape from a print loop. An agent chaining this into quantification has no named contract to bind to.
-- Root cause: The fix addressed the CLI gap and left the asymmetry.
-- Fix: State the group record once -- leading_protein, accessions, n_peptides, n_unique_peptides, is_decoy, qvalue -- which is exactly what examples/protein_groups.py already returns, and point the default block at it.
 
 ### `bio-causal-genomics-fine-mapping` — SKILL.md carries all technical depth inline rather than in a references/ folder
 
