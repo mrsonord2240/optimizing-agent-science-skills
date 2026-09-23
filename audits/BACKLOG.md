@@ -30,7 +30,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The examples contain the required imports but the corresponding inline blocks were changed independently.
 - Fix: Add library(dplyr) to the inline Milo library block and import tensorflow as tf to the inline scCODA block. Execute both inline paths, not only examples, on the saved synthetic fixture before re-audit.
 
-## P1 (154)
+## P1 (156)
 
 ### `bio-data-visualization-lollipop-protein-maps` — Shipped example never completes and paints wrong colours
 
@@ -1016,6 +1016,22 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: examples/ was only partially built out relative to the scope claimed in the Algorithmic Taxonomy table.
 - Fix: Add at minimum examples/hdl_rg.R and examples/popcorn_transancestry.sh mirroring the structure of the existing two files (argument parsing, inline operational-rule comments).
 
+### `bio-crispr-screens-perturb-seq-analysis` — Stabilize SCEPTRE runtime exit
+
+- Skill: 89, Limited Release · [mrsonord2240/bioSkills@6ca8a47](https://github.com/mrsonord2240/bioSkills/tree/6ca8a47d4a9743fbf9a090ddbc5609b1b6b6a504/crispr-screens/perturb-seq-analysis) · [viewer](skills/bio-crispr-screens-perturb-seq-analysis/mrsonord2240-bioSkills@6ca8a47/viewer.md)
+- Observed in inputs: 4, 11
+- Problem: Both shipped SCEPTRE paths write valid result tables but then exit 139 after computation.
+- Root cause: The R/sceptre native runtime tears down unreliably in this audited environment; the script has no containment or known-good execution route.
+- Fix: Reproduce and isolate the native crash with the pinned R/sceptre stack, then document a known-good environment or wrapper that exits 0; re-run both shipped branches.
+
+### `bio-crispr-screens-perturb-seq-analysis` — Bound the full Pertpy example
+
+- Skill: 89, Limited Release · [mrsonord2240/bioSkills@6ca8a47](https://github.com/mrsonord2240/bioSkills/tree/6ca8a47d4a9743fbf9a090ddbc5609b1b6b6a504/crispr-screens/perturb-seq-analysis) · [viewer](skills/bio-crispr-screens-perturb-seq-analysis/mrsonord2240-bioSkills@6ca8a47/viewer.md)
+- Observed in inputs: 1
+- Problem: The copied real Papalexi example passed 22 GB RSS without producing its promised TSV and had to be stopped.
+- Root cause: It loads and processes the full dataset in one unbounded process.
+- Fix: Provide a parameterized subset/smoke mode and memory estimate, or refactor the full example to a bounded workflow before claiming it as a generally runnable example.
+
 ### `bio-entrez-fetch` — sra_runinfo()'s CSV parsing silently fabricates rows from a malformed/error response
 
 - Skill: 89, Production Ready · [mrsonord2240/bioSkills@3a095e5](https://github.com/mrsonord2240/bioSkills/tree/3a095e59ce2df1dc0a820f3f11c7e6b472afce45/database-access/entrez-fetch) · [viewer](skills/bio-entrez-fetch/mrsonord2240-bioSkills@3a095e5/viewer.md)
@@ -1264,7 +1280,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (390)
+## P2 (391)
 
 ### `bio-data-visualization-lollipop-protein-maps` — HGVSp edge cases and recurrence semantics undocumented
 
@@ -3313,6 +3329,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The pre-fix P2 recommendation asked for shared tabular content (LCV interpretation table, algorithmic taxonomy, quantitative thresholds) to move into a references/ file both SKILL.md and usage-guide.md could point to. The redundancy pass instead consolidated everything into SKILL.md itself (452->473 lines), which fixed the duplication problem but left SKILL.md as a single large file with no references/ split.
 - Root cause: The fix pass's scope was stated as 'remove redundancy' (delete duplicate content), which is a different, narrower fix than 'extract shared content to a references/ file' -- the former was completed, the latter was not attempted.
 - Fix: As a follow-up (not blocking): extract the Algorithmic Taxonomy, Quantitative Thresholds, and LCV gcp interpretation tables into references/pleiotropy-methods.md, leaving SKILL.md with pointers, to bring SKILL.md back toward the 500-line progressive-disclosure guideline with more margin.
+
+### `bio-crispr-screens-perturb-seq-analysis` — State executable limits for optional methods
+
+- Skill: 89, Limited Release · [mrsonord2240/bioSkills@6ca8a47](https://github.com/mrsonord2240/bioSkills/tree/6ca8a47d4a9743fbf9a090ddbc5609b1b6b6a504/crispr-screens/perturb-seq-analysis) · [viewer](skills/bio-crispr-screens-perturb-seq-analysis/mrsonord2240-bioSkills@6ca8a47/viewer.md)
+- Observed in inputs: —
+- Problem: FR-Perturb is not installable in this Python-3.12 environment and Seurat is absent.
+- Root cause: The references name alternatives without a verified local execution route.
+- Fix: Add a supported environment recipe or an explicit unavailable-here note with a tested fallback.
 
 ### `bio-entrez-fetch` — No fenced code block in SKILL.md imports `time`, though two of them call time.sleep()
 
