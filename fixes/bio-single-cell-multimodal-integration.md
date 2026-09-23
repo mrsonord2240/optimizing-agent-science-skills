@@ -106,3 +106,17 @@ Signac 1.17.1). Rejection evidence: the 2026-09-23 final-pass report, M4/P0 and 
 
 - The designated Windows R runtime's 139 shutdown failure remains after Seurat loads successfully in a standalone probe. It needs runtime/DLL repair or a supported R host; source code must not convert a crash after output into success.
 - GLUE remains unexecuted: it needs a Linux/macOS scglue environment with a supported pysam build.
+
+# 2026-09-23: private-runtime M4 corrective continuation
+
+Worktree `F:\OpenScience\wt\single-cell-multimodal-integration`, branch
+`fix/single-cell-multimodal-integration`, starting tip
+`187625ad0a1a89640fcb91cae6b727d63dc8fac1`.
+
+| finding | priority | change | verified | notes |
+|---|---|---|---|---|
+| Python CITE-seq example passed Muon WNN metadata to Scanpy's AnnData-only UMAP and failed with `TypeError: unhashable type: 'dict'` | P0/M4 | Replaced `sc.tl.umap(mdata, neighbors_key='wnn')` with `mu.tl.umap(mdata, neighbors_key='wnn', random_state=0)`; disabled plot autoshow; documented the MuData-versus-AnnData UMAP contract in `SKILL.md` | exact source file ran to natural zero exit in a private WSL stack (Muon 0.1.9, Scanpy 1.12.4, MuData 0.4.1, leidenalg 0.11.0) on the valid 90-cell 10x RNA+ADT H5; readback confirmed `cite_seq_analyzed.h5mu`, 1,738 WNN graph nonzeros, `X_umap` shape `(90,2)`, three clusters, and PDF | private stack at `/home/sci/multimodal-private-20260923/packages`; shared Windows environments were not changed |
+
+The native Windows Seurat shutdown issue and lack of a supported GLUE host remain
+separate non-veto follow-ups. No Phase 2 score/report or GBrain project record
+was written in this corrective pass.
