@@ -1,0 +1,209 @@
+{
+  "meta": {
+    "skill_name": "bio-proteomics-proteomics-qc",
+    "description": "Quality control for bottom-up proteomics across instrument, identification, and experiment levels, including raw-first loading checks, contamination, matrix reproducibility, batch/PCA, TMT balance, and DIA-NN Level-1 metrics.",
+    "source": "mrsonord2240/bioSkills@1f8616e8d39c2f14c16a01a4330bd0d94762b762:proteomics/proteomics-qc",
+    "evaluated_on": "2026-09-23",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 10,
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "All numerical findings were generated from the archived synthetic controls, the archived DIA-NN report, or explicitly labelled derived fixtures; none were presented as clinical or experimental findings."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "The runs provide QC diagnostics and stop conditions, not patient-specific diagnosis, treatment, or sample exclusion without approval."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Fresh tests confirmed raw-before-normalization, linear-scale CV, log2 correlation, no-replicate status handling, and the fully-confounded batch stop condition."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All shipped Python files compiled. The four scripts, seeded example, and the inline TMT block executed; the DIA-NN CLI correctly runs on a conformant fixture but lacks a friendly preflight for a real report missing three required columns."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 93,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 11, "max": 12, "note": "The three-level QC workflow, decisions, thresholds, reporting template, and all advertised helper scripts are present; the DIA-NN Level-1 route is not compatible with the archived real report without required-column validation." },
+      "reliability": { "score": 10, "max": 12, "note": "Explicit statuses, stop conditions, deterministic full-SVD PCA, and warnings cover key degenerate designs, but diann_level1 exposes a raw KeyError rather than naming missing columns and an alternative route." },
+      "performance_context": { "score": 8, "max": 8, "note": "The concise SKILL.md delegates detailed matrix, PCA, DIA-NN, and reporting material to references and uses small deterministic helpers." },
+      "agent_usability": { "score": 15, "max": 16, "note": "Clear raw-first sequence, decision tree, output columns, threshold rationale, common errors, and escalation conditions make the workflow usable from a cold start." },
+      "human_usability": { "score": 8, "max": 8, "note": "The usage guide has concrete requests and the QC report template records flags, approvals, and sensitivity checks without duplicating the operational instructions." },
+      "security": { "score": 11, "max": 12, "note": "No secrets, destructive operations, or user-code execution are present; file/schema preflight is incomplete for the DIA-NN CLI." },
+      "maintainability": { "score": 12, "max": 12, "note": "Four single-purpose scripts, their headers/CLIs, reference routing, reproducible example, and status-bearing data frames cleanly separate concerns." },
+      "agent_specific": { "score": 18, "max": 20, "note": "Trigger language and scope boundaries are precise; progressive disclosure and status columns support composition, with the DIA-NN input contract remaining a minor escape-hatch gap." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 93.1,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 39, "total": 40 },
+    "inputs": [
+      {
+        "index": 1, "type": "Canonical regression", "label": "Raw-first MaxQuant matrix QC before normalization", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Freshly executed raw_qc.py, matrix_metrics.py, pca_batch.py, and the copied branch helpers on the archived synthetic MaxQuant data. Results are in run/phase2_final_20260923/phase2_dynamic.out and the three CLI logs.",
+        "note": "1,500 contaminant-filtered rows yielded 12 measured replicate pairs, Control/Treatment median CVs 24.27%/23.57%, and three tested batch-PC rows.", "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Raw-first loading, correlation, CV, missingness, completeness, and PCA all execute", "result": "PASS", "note": "All six workflow outputs were nonempty." },
+          { "text": "Replicate correlation uses measurable status-bearing rows", "result": "PASS", "note": "12 rows, all status=measured." },
+          { "text": "Linear-scale CV output is present by condition", "result": "PASS", "note": "Control 24.27% and Treatment 23.57%." },
+          { "text": "Balanced batch association is evaluated rather than assumed", "result": "PASS", "note": "PC1-PC3 test statuses were tested." }
+        ]
+      },
+      {
+        "index": 2, "type": "Canonical tool regression", "label": "PTXQC createReport with and without Pandoc", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Fresh R 4.4.3/PTXQC 1.1.5 runs used saved ptxqc_no_pandoc.R and ptxqc_with_pandoc.R through the approved r.sh wrapper. Outputs and logs are retained in the phase2 run folder.",
+        "note": "Without Pandoc, PTXQC produced PDF, mzQC, YAML, and an 8x13 heatmap but no HTML. With RSTUDIO_PANDOC set, it additionally produced a 1,367.4 kB HTML report.", "basic": 37, "specialized": 56, "total": 93, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "The exact documented createReport(txt_folder=...) call completes", "result": "PASS", "note": "Both runs exited successfully and emitted reports." },
+          { "text": "Pandoc is not required for the PDF/mzQC/YAML leg", "result": "PASS", "note": "All three artifacts existed with pandoc_available=FALSE." },
+          { "text": "Pandoc enables the HTML leg", "result": "PASS", "note": "HTML existed only with RSTUDIO_PANDOC configured." },
+          { "text": "PTXQC QC scores are inspectable", "result": "PASS", "note": "The generated heatmap table parsed as 8x13." }
+        ]
+      },
+      {
+        "index": 3, "type": "Real-data compatibility", "label": "DIA-NN Level-1 report QC", "status": "PARTIAL", "status_flag": "⚠️", "executed": true,
+        "execution_note": "The shipped diann_level1.py was run directly on the archived real report.parquet and on a separately labelled conformant fixture made from that report. Both CLI logs and the fixture are retained in the phase2 run folder.",
+        "note": "The archived real report has Run, RT, and Global.Q.Value but lacks Predicted.RT, FWHM, and Quantity.Quality; the direct CLI therefore raises KeyError ['Predicted.RT', 'FWHM']. The same shipped code returned eight no-flag rows on the conformant fixture.", "basic": 31, "specialized": 46, "total": 77, "assertions_passed": 3, "assertions_total": 4,
+        "assertions": [
+          { "text": "The actual report schema is checked by a fresh direct execution", "result": "PASS", "note": "The CLI failed reproducibly at the missing-column access." },
+          { "text": "The documented helper computes per-run R2, FWHM, and flag on a conformant report", "result": "PASS", "note": "Eight runs returned R2=1.0 and no flags from the labelled fixture." },
+          { "text": "The real DIA-NN failure is clear and actionable to a user", "result": "FAIL", "note": "Raw KeyError lists only Predicted.RT and FWHM; it does not preflight all required columns or name an alternative input route." },
+          { "text": "No derived fixture result is presented as a real QC conclusion", "result": "PASS", "note": "Fixture data and results are explicitly labelled synthetic/conformant." }
+        ]
+      },
+      {
+        "index": 4, "type": "Regression failure control", "label": "Failed loading visible in raw Intensity but hidden in MaxLFQ", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Fresh raw_sample_qc and strip_contaminant_rows calls used data/proteinGroups_failed.txt in phase2_dynamic.py.",
+        "note": "T4 alone was flagged on raw Intensity; no sample was flagged on normalized LFQ. Contaminant/decoy stripping reduced rows from 1,560 to 1,500.", "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Raw loading failure is detected", "result": "PASS", "note": "raw flags=['T4']." },
+          { "text": "Normalized LFQ does not substitute for the raw check", "result": "PASS", "note": "LFQ flags=[] as expected after evidence-erasing normalization." },
+          { "text": "Contaminant/decoy rows are removed before matrix QC", "result": "PASS", "note": "60 rows were removed." },
+          { "text": "Contaminant fraction remains quantitative", "result": "PASS", "note": "Per-sample range was 4.16-13.65%." }
+        ]
+      },
+      {
+        "index": 5, "type": "TMT regression", "label": "Within-plex raw reporter channel balance", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "The exact inline tmt_channel_balance block was executed against both archived plex matrices and a planted 0.30x channel failure in phase2_dynamic.py.",
+        "note": "No baseline channel was investigated across 20 rows; the planted A/127C channel had fold 0.281 and was flagged.", "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Balance is assessed within, not across, plexes", "result": "PASS", "note": "The function retains a plex field and compares to each plex median." },
+          { "text": "Clean archived plexes are not spuriously flagged", "result": "PASS", "note": "0 of 20 baseline channel rows investigated." },
+          { "text": "A planted low channel is detected", "result": "PASS", "note": "A/127C at fold 0.281 was investigate=true." },
+          { "text": "The calculation handles zero reporters as missing", "result": "PASS", "note": "The exact block uses replace(0, NaN)." }
+        ]
+      },
+      {
+        "index": 6, "type": "Stress boundary", "label": "Fully confounded batch and condition", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Fresh pca_batch_check execution and a batch-by-condition crosstab were generated in phase2_dynamic.py on the archived synthetic matrix.",
+        "note": "The crosstab was exactly day1=4 Control/day2=4 Treatment. PCA can describe the separation; the Skill correctly directs the analyst to report non-identifiability and stop rather than correct/test.", "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "The stress design is actually fully confounded", "result": "PASS", "note": "Each batch contained one condition only." },
+          { "text": "PCA can report association without claiming correction is valid", "result": "PASS", "note": "Three PC tests executed." },
+          { "text": "The Skill names the non-identifiability stop condition", "result": "PASS", "note": "Its PCA reference says do not correct and do not test." },
+          { "text": "No batch-corrected result is advanced as a valid differential test", "result": "PASS", "note": "The audited workflow stopped at QC interpretation." }
+        ]
+      },
+      {
+        "index": 7, "type": "Regression edge", "label": "Suspected C2/T3 sample swap", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Fresh cross_group_correlation execution used a new C2/T3 column swap in phase2_dynamic.py.",
+        "note": "Only C2 and T3 received possible_swap=true; the workflow correctly treats that as a sample-sheet confirmation candidate rather than automatic exclusion.", "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "The planted swapped samples are found", "result": "PASS", "note": "possible_swap samples=['C2', 'T3']." },
+          { "text": "Unswapped samples are not falsely flagged", "result": "PASS", "note": "No other sample was flagged." },
+          { "text": "The check uses a centred cross-group comparison", "result": "PASS", "note": "The shipped helper centers proteins and selects high-variance rows." },
+          { "text": "The output avoids unauthorized exclusion", "result": "PASS", "note": "The reference requires sample-sheet confirmation." }
+        ]
+      },
+      {
+        "index": 8, "type": "Reproducibility adversarial", "label": "Repeated identical PCA input", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "pca_batch_check was freshly called twice on the same filtered matrix; the seeded example was also run twice by execute_phase2.ps1.",
+        "note": "The two helper outputs were frame-for-frame and variance-ratio identical; example_run_1.out and example_run_2.out were identical.", "basic": 39, "specialized": 57, "total": 96, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Repeated helper results are identical", "result": "PASS", "note": "coords, explained variance, and tests all matched." },
+          { "text": "The example is deterministic", "result": "PASS", "note": "execute_phase2.ps1 recorded example_stdout_identical=true." },
+          { "text": "The fixed PCA uses an exact low-cost solver", "result": "PASS", "note": "PCA is configured with svd_solver='full' and random_state=0." },
+          { "text": "Results remain inspectable", "result": "PASS", "note": "Per-PC status and p values are returned as a DataFrame." }
+        ]
+      },
+      {
+        "index": 9, "type": "New partial-degeneracy edge", "label": "Two controls plus two singleton groups", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "A fresh 2/1/1 design was constructed from archived matrix columns and exercised raw_sample_qc, replicate_correlation, median_cv_linear, and pca_batch_check in phase2_dynamic.py.",
+        "note": "Correlation and CV returned measured Control rows plus two status=not_measurable_n1 rows; all PCA rows were not_testable and singleton loading rules used fallback_all_samples.", "basic": 39, "specialized": 58, "total": 97, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Measurable control replicates are retained", "result": "PASS", "note": "Control produced one measured correlation and CV row." },
+          { "text": "Singleton correlation/CV limits are machine-readable", "result": "PASS", "note": "Two not_measurable_n1 statuses appear in each returned result." },
+          { "text": "PCA does not mistake 2/1/1 for a valid ANOVA", "result": "PASS", "note": "All returned PC tests are not_testable." },
+          { "text": "Loading-rule fallback is explicit", "result": "PASS", "note": "Both singleton samples have loading_rule=fallback_all_samples." }
+        ]
+      },
+      {
+        "index": 10, "type": "New scope/design boundary", "label": "All-singleton three-condition design", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "A fresh three-sample, three-group design was run through all relevant helpers in phase2_dynamic.py.",
+        "note": "Replicate correlation and linear CV both raised explicit not-measurable errors, all loading rules fell back to ALL, and PCA returned only not_testable rows.", "basic": 39, "specialized": 57, "total": 96, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "No-replicate correlation fails loudly", "result": "PASS", "note": "replicate_correlation raised a group-size error." },
+          { "text": "No-replicate CV fails loudly", "result": "PASS", "note": "median_cv_linear raised a not-measurable error." },
+          { "text": "The loading fallback is not silently within-group", "result": "PASS", "note": "Every row says fallback_all_samples." },
+          { "text": "PCA outputs a machine-readable design limitation", "result": "PASS", "note": "Both returned PC test rows were not_testable." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 37.2,
+    "dynamic_weighted": 55.9,
+    "score": 93,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "The raw-first rule demonstrably catches a T4 loading failure that normalized MaxLFQ hides.",
+    "Phase 1's status-bearing outputs correctly preserve partial and total no-replicate design limits for callers.",
+    "The sample-swap, deterministic PCA, TMT balance, and fully-confounded batch safeguards all reproduced in fresh runs.",
+    "PTXQC behavior with and without Pandoc exactly matches the documented decision-tree and common-error guidance."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "Preflight the DIA-NN Level-1 column contract",
+      "observed_in": [3],
+      "problem": "The archived real DIA-NN report.parquet lacks Predicted.RT, FWHM, and Quantity.Quality. diann_level1.py crashes with a raw KeyError that lists only two missing columns, although the skill describes these as report-carried metrics.",
+      "root_cause": "The helper accesses columns before validating the report schema or explaining which acquisition/export route supplies them.",
+      "fix": "Add an explicit required-column preflight listing Run, RT, Predicted.RT, FWHM, Quantity.Quality, and Global.Q.Value. When unavailable, raise a clear ValueError that labels Level-1 RT/FWHM QC unavailable for that export and routes the user to the vendor/run-metrics export instead of implying the standard report contains the fields."
+    }
+  ],
+  "artifacts": [
+    "F:/OpenScience/audits/bio-proteomics-proteomics-qc/run/phase2_final_20260923/execute_phase2.ps1",
+    "F:/OpenScience/audits/bio-proteomics-proteomics-qc/run/phase2_final_20260923/phase2_dynamic.py",
+    "F:/OpenScience/audits/bio-proteomics-proteomics-qc/run/phase2_final_20260923/phase2_dynamic.out",
+    "F:/OpenScience/audits/bio-proteomics-proteomics-qc/run/phase2_final_20260923/ptxqc_no_pandoc.out",
+    "F:/OpenScience/audits/bio-proteomics-proteomics-qc/run/phase2_final_20260923/ptxqc_with_pandoc.out",
+    "F:/OpenScience/audits/_pre-fix-20260923/bio-proteomics-proteomics-qc/"
+  ]
+}

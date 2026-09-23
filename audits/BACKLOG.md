@@ -992,14 +992,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The None guard exists only in the shipped example's has_substructure and was never propagated into the SKILL.md patterns the agent actually copies.
 - Fix: Add a compile_smarts(s) helper to SKILL.md that raises ValueError on None and on a zero-atom query, and route every snippet through it.
 
-### `bio-proteomics-proteomics-qc` — The new degenerate-design caveats are print() only and never reach the returned objects
-
-- Skill: 88.1, Production Ready · [mrsonord2240/bioSkills@45a0c5a](https://github.com/mrsonord2240/bioSkills/tree/45a0c5a65b7346d47a7b72b6d0a6eb60ea590317/proteomics/proteomics-qc) · [viewer](skills/bio-proteomics-proteomics-qc/mrsonord2240-bioSkills@45a0c5a/viewer.md)
-- Observed in inputs: Inputs 2, 8
-- Problem: When some but not all groups are singletons, median_cv_linear returns a frame with a bare NaN in median_cv_pct for those groups and replicate_correlation simply omits them, while the explanation goes to stdout. An agent (the intended caller of this Skill) that consumes the return value sees NaN and absence with no machine-readable signal that the group was unmeasurable -- which is the exact misreading the fix set out to prevent, moved one layer down.
-- Root cause: The all-singleton case was fixed with a raise (which the caller cannot miss) and the partial case with a print (which it can).
-- Fix: Return the status in the data: add a `status` column to median_cv_linear ('measured' / 'not_measurable_n1') and an `unchecked_groups` entry (or a second returned frame) to replicate_correlation, and have pca_batch_check return the per-PC test status alongside coords rather than only printing it.
-
 ### `bio-causal-genomics-genetic-correlation` — No explicit population-vs-individual clinical scope statement
 
 - Skill: 89, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/causal-genomics/genetic-correlation) · [viewer](skills/bio-causal-genomics-genetic-correlation/GPTomics-bioSkills@d91ed3d/viewer.md)
@@ -1176,6 +1168,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The failure appears during shared-R native teardown, after computation/output, rather than before a source-level result.
 - Fix: Reproduce in a clean user-target R 4.4.3/Bioc 3.20 stack and identify the unloading dependency. Until resolved, validate expected output files after R exits and never conceal the nonzero status.
 
+### `bio-proteomics-proteomics-qc` — Preflight the DIA-NN Level-1 column contract
+
+- Skill: 93, Production Ready · [mrsonord2240/bioSkills@1f8616e](https://github.com/mrsonord2240/bioSkills/tree/1f8616e8d39c2f14c16a01a4330bd0d94762b762/proteomics/proteomics-qc) · [viewer](skills/bio-proteomics-proteomics-qc/mrsonord2240-bioSkills@1f8616e/viewer.md)
+- Observed in inputs: 3
+- Problem: The archived real DIA-NN report.parquet lacks Predicted.RT, FWHM, and Quantity.Quality. diann_level1.py crashes with a raw KeyError that lists only two missing columns, although the skill describes these as report-carried metrics.
+- Root cause: The helper accesses columns before validating the report schema or explaining which acquisition/export route supplies them.
+- Fix: Add an explicit required-column preflight listing Run, RT, Predicted.RT, FWHM, Quantity.Quality, and Global.Q.Value. When unavailable, raise a clear ValueError that labels Level-1 RT/FWHM QC unavailable for that export and routes the user to the vendor/run-metrics export instead of implying the standard report contains the fields.
+
 ### `bio-proteomics-spectral-libraries` — OpenSWATH TSV schema guidance omits transition_group_id
 
 - Skill: 93, Production Ready · [mrsonord2240/bioSkills@3f601a1](https://github.com/mrsonord2240/bioSkills/tree/3f601a1a50af8c52724edd5393938e2bda44cd79/proteomics/spectral-libraries) · [viewer](skills/bio-proteomics-spectral-libraries/mrsonord2240-bioSkills@3f601a1/viewer.md)
@@ -1264,7 +1264,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (408)
+## P2 (404)
 
 ### `bio-data-visualization-lollipop-protein-maps` — HGVSp edge cases and recurrence semantics undocumented
 
@@ -3329,38 +3329,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: peddy fails on non-human or small targets; somalier needs a build-matched sites file.
 - Root cause: Tool requirements not stated (left unfixed in this round).
 - Fix: Note the bundled human site panels, the chrX requirement and `somalier find-sites` for custom targets.
-
-### `bio-proteomics-proteomics-qc` — Levels 1-2 and DIA matrix construction are still prose only
-
-- Skill: 88.1, Production Ready · [mrsonord2240/bioSkills@45a0c5a](https://github.com/mrsonord2240/bioSkills/tree/45a0c5a65b7346d47a7b72b6d0a6eb60ea590317/proteomics/proteomics-qc) · [viewer](skills/bio-proteomics-proteomics-qc/mrsonord2240-bioSkills@45a0c5a/viewer.md)
-- Observed in inputs: Input 2
-- Problem: The description advertises instrument-level QC, and the Levels table names RT/iRT fit and FWHM, but no function and no threshold is offered for either. On the real DIA-NN report those metrics were sitting in columns the Skill already tells the reader to load (RT, Predicted.RT, FWHM, Quantity.Quality) and the auditor had to compute r = 0.9996 and median FWHM 0.050 min by hand.
-- Root cause: The python blocks cover Levels 2-3 only; Level 1 was left as taxonomy.
-- Fix: Add one short block: correlate RT against Predicted.RT per run, report median FWHM and median Quantity.Quality per run, and give the thresholds you would act on (e.g. RT/iRT r < 0.99, FWHM drift > 1.5x across runs).
-
-### `bio-proteomics-proteomics-qc` — Sample-swap detection is named in the decision tree but has no code
-
-- Skill: 88.1, Production Ready · [mrsonord2240/bioSkills@45a0c5a](https://github.com/mrsonord2240/bioSkills/tree/45a0c5a65b7346d47a7b72b6d0a6eb60ea590317/proteomics/proteomics-qc) · [viewer](skills/bio-proteomics-proteomics-qc/mrsonord2240-bioSkills@45a0c5a/viewer.md)
-- Observed in inputs: Input 6
-- Problem: The row "Replicate correlation low for one sample -> Check if it correlates better with a DIFFERENT group" is the correct diagnostic and it is what identified the planted C2/T3 swap, but replicate_correlation computes within-group pairs only. The auditor had to write the mean-centred own-vs-other comparison; the within-group table alone shows nothing (all pairs 0.93-0.96).
-- Root cause: The insight was captured in the decision tree and never turned into a function.
-- Fix: Extend replicate_correlation (or add cross_group_correlation) to report, per sample, mean centred r against its own group and against every other group, and flag any sample whose best match is not its own label.
-
-### `bio-proteomics-proteomics-qc` — No QC report or exclusion-decision template
-
-- Skill: 88.1, Production Ready · [mrsonord2240/bioSkills@45a0c5a](https://github.com/mrsonord2240/bioSkills/tree/45a0c5a65b7346d47a7b72b6d0a6eb60ea590317/proteomics/proteomics-qc) · [viewer](skills/bio-proteomics-proteomics-qc/mrsonord2240-bioSkills@45a0c5a/viewer.md)
-- Observed in inputs: Inputs 1, 4, 6
-- Problem: The Skill instructs the reader to document and justify every exclusion and to run a sensitivity check, but ships no structure for either, so each run produces a different ad-hoc write-up and the TMT investigate band exists only inside the code.
-- Root cause: Reporting was left to the caller.
-- Fix: Add a short template: per sample, the metric that failed, its value and threshold, the decision, and the with/without sensitivity result -- then point the TMT and loading rules at it.
-
-### `bio-proteomics-proteomics-qc` — examples/qc_analysis.py still states no expected output
-
-- Skill: 88.1, Production Ready · [mrsonord2240/bioSkills@45a0c5a](https://github.com/mrsonord2240/bioSkills/tree/45a0c5a65b7346d47a7b72b6d0a6eb60ea590317/proteomics/proteomics-qc) · [viewer](skills/bio-proteomics-proteomics-qc/mrsonord2240-bioSkills@45a0c5a/viewer.md)
-- Observed in inputs: Input 1
-- Problem: The example is now seeded and therefore reproducible, but nothing in the file says what it should print, so it cannot serve as its own regression test the way protein-inference's example does.
-- Root cause: The fix seeded the PCA without adding the expected-output docstring.
-- Fix: Add the "Expected output:" block at the top of the file, now that the seeding makes the numbers stable.
 
 ### `bio-causal-genomics-genetic-correlation` — Two different rg-magnitude thresholds are not cross-referenced
 
