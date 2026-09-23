@@ -22,7 +22,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The example passes cluster_rows=<OLO dendrogram> together with row_split=gene_info$pathway, a combination ComplexHeatmap rejects; the script was never run.
 - Fix: Drop row_split or use a numeric row_split (works with the dendrogram), or apply OLO within each pathway group; supply a runnable data preamble and state the constraint in SKILL.md next to the OLO block.
 
-## P1 (154)
+## P1 (155)
 
 ### `bio-data-visualization-lollipop-protein-maps` — Shipped example never completes and paints wrong colours
 
@@ -1160,6 +1160,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The failure-mode section names a detection-only invocation but omits segmasker's output format and file handoff.
 - Fix: Replace the command with segmasker -infmt fasta -in query.fa -outfmt fasta > query.masked.fa, then explicitly use query.masked.fa for profile construction. State that the lowercase output is soft masking.
 
+### `bio-metabolomics-normalization-qc` — Make the QCRSC all-NA guard per-batch
+
+- Skill: 93, Production Ready · [mrsonord2240/bioSkills@980965f](https://github.com/mrsonord2240/bioSkills/tree/980965fb613fd6c6dbbabe8d51c2b54eae3d8f34/metabolomics/normalization-qc) · [viewer](skills/bio-metabolomics-normalization-qc/mrsonord2240-bioSkills@980965f/viewer.md)
+- Observed in inputs: 12
+- Problem: The displayed guard checks whether any feature has data anywhere in the result. In a multi-batch run, a valid batch makes it pass even when a sparse-QC batch is entirely NA.
+- Root cause: The implementation aggregates row completeness across every sample although the prose says to check immediately per batch.
+- Fix: Schedule a follow-up fix: replace the global assertion with a per-batch check, for example loop over unique(batch_id) and stop if all corrected values in any batch are NA; test a mixed valid/sparse-QC batch. This is nonblocking because the governing rubric makes only vetoes and open P0s deployment blockers.
+
 ### `bio-proteomics-differential-abundance` — Direct R processes exit 139 after valid output
 
 - Skill: 93, Production Ready · [mrsonord2240/bioSkills@31deeb9](https://github.com/mrsonord2240/bioSkills/tree/31deeb9912f6e318ed11069f05a55be98577ff5e/proteomics/differential-abundance) · [viewer](skills/bio-proteomics-differential-abundance/mrsonord2240-bioSkills@31deeb9/viewer.md)
@@ -1256,7 +1264,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (409)
+## P2 (407)
 
 ### `bio-data-visualization-lollipop-protein-maps` — HGVSp edge cases and recurrence semantics undocumented
 
@@ -4057,22 +4065,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The shipped pseudobulk substitute is methodologically sound and independently confirmed, but powsimR itself -- still named as an optional alternative -- has never been run or verified in any audit of this Skill.
 - Root cause: powsimR is GitHub-only with a compile-required dependency and was judged not worth installing given the pseudobulk substitute answers the same question.
 - Fix: No action required for deployment; if powsimR is ever pinned and installed in a future audit environment, verify its estimateParam/simulateDE signatures against the version drift already flagged in Version Compatibility.
-
-### `bio-metabolomics-normalization-qc` — Permutation-test guardrail still trips at its nominal false-positive rate on clean data
-
-- Skill: 92, Production Ready · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/metabolomics/normalization-qc) · [viewer](skills/bio-metabolomics-normalization-qc/mrsonord2240-bioSkills@6847328/viewer.md)
-- Observed in inputs: 2
-- Problem: Replacing the fixed \|r\|>0.3 cutoff with a 999-permutation test (the P2 fix) is a genuine calibration improvement, but on this audit's exact clean-case draw the permutation test still reports p=0.022 (TRIPPED) despite the true dilution-group correlation being 0 -- expected behavior for a properly calibrated test at its ~5% nominal rate, but a user seeing one 'TRIPPED' verdict may not realize that.
-- Root cause: usage-guide.md recommends the permutation test but doesn't caveat that any single well-calibrated test will still false-positive at its nominal rate; no guidance on replication or multiple-draw interpretation.
-- Fix: Add one line to the guardrail Tips: a single TRIPPED verdict from the permutation test can still occur by chance at ~5% under a true null -- corroborate with the dilution-factor correlation (should be high) before concluding normalization is eating the effect.
-
-### `bio-metabolomics-normalization-qc` — Non-positive raw intensities upstream of QRILC aren't mentioned in Common Errors
-
-- Skill: 92, Production Ready · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/metabolomics/normalization-qc) · [viewer](skills/bio-metabolomics-normalization-qc/mrsonord2240-bioSkills@6847328/viewer.md)
-- Observed in inputs: 8
-- Problem: If any upstream step (e.g. an imperfect drift-correction division) leaves a non-positive value in a feature fed to log2()/impute.QRILC, the fixed pattern fails loudly ('NA/NaN/Inf in y') rather than silently -- a safe failure mode, but undocumented, so an agent seeing this error has no signpost in SKILL.md pointing at the actual cause.
-- Root cause: SKILL.md assumes raw MS intensities are always positive (physically true for a peak table) and doesn't anticipate corrupted input from an earlier buggy step in an agent-composed pipeline.
-- Fix: Add a Common Errors row: 'NA/NaN/Inf in y from impute.QRILC -> a feature has a non-positive value before the log2() call, usually from a division-by-near-zero in an earlier drift-correction step; check min(feature_matrix, na.rm=TRUE) > 0 before imputing.'
 
 ### `bio-metabolomics-pathway-mapping` — Primary ORA code block is a signposted dead end before the working fix
 
