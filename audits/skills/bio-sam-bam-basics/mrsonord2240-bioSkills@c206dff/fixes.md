@@ -56,3 +56,69 @@ Disagreements between the two files: usage-guide "6-row" CIGAR/FLAG tables were 
 - DRAGEN MAPQ scale, Cell Ranger / STARsolo tags (CB/UB), featureCounts NH behaviour: not verifiable here (as in the audit); text left as is except the two deleted claims above.
 - `samtools view -M` on unindexed BAM not documented (needs an index; not tested).
 - Picard behaviour on `=`/`X` CIGARs: claim removed, not tested.
+
+## 2026-09-21 (fixer: Sonnet 5; branch `fix/alignment-files-sam-bam-basics`, worktree `F:\OpenScience\wt\alignment-files-sam-bam-basics`, from staging main 431aa55)
+
+Re-audit 85, Production Ready, 4 P2s. Commits: `d5e2910` (fixes), `9d0fe15` (split).
+Checked on samtools 1.24, pysam 0.24.1, minimap2 2.31, bwa 0.7.19, pbmm2 26.2.99 (WSL `science`, env `alignment-files`).
+Scratch: `F:\OpenScience\scratch\sambam2\` (t1-t5.sh).
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+| --- | --- | --- | --- | --- |
+| CRAM round trip "keeps every field and tag but not the tag order" is false | P2 | Sentence moved out of "Pipe Conversion" into its own "CRAM round trip is not byte-lossless" section: `=`/`X` become `M`, NM/MD regenerated when the reference is available, tags reordered, unmapped MAPQ becomes 0; use BAM when exact CIGAR ops or tag set matter | ran: minimap2 `--eqx` BAM (200 reads) -> CRAM -> BAM: `=`/`X` ops in 197 reads -> 0, MD:Z on 0 -> 197 reads, cols 1-5 and 7-11 identical; hand SAM unmapped read MAPQ 10 -> 0 | |
+| Unverified table rows stated as fact (DRAGEN, Cell Ranger/STARsolo, featureCounts/RSEM, pbmm2) | P2 | "(not verified here)" on DRAGEN, Cell Ranger/STARsolo, NH (featureCounts/Salmon), HI (RSEM), CB, UB; pbmm2 verified instead and row annotated "checked: minimap2 2.31, pbmm2 26.2.99" | ran: pbmm2 `--preset HIFI` on 20 simulated unique 6 kb reads: all MAPQ 60 | DRAGEN, Cell Ranger, STARsolo, featureCounts, RSEM not installed / need real input; marked, not removed (statements are plausible tool behaviour) |
+| `view_bam.py` raw ValueError on non-numeric limit | P2 | `int(sys.argv[2])` inside a try; message + usage to stderr, exit 1 | ran: `abc` -> message, rc 1; numeric and default limits unchanged; `py_compile` ok | |
+| `convert_formats.sh` leaves output when samtools fails | P2 | Validation (extension, CRAM reference) runs first; EXIT trap deletes OUTPUT on non-zero exit, installed only just before samtools runs | ran: CRAM input with unreachable reference: old script rc 1 and left `f2.bam` (500 B), new rc 1 and no file; validation exits keep a pre-existing file; SAM/BAM/CRAM conversions still 5644 records; `bash -n` ok | Trap scoped after validation on purpose: a naive trap deleted a pre-existing unrelated file on a usage error |
+| `[E::cram_index_load]` lines on unindexed CRAM | P2 | One sentence in the pysam section: harmless when the run succeeds | ran: `view_bam.py` on unindexed CRAM -> 4 such lines, rc 0, counts correct | |
+| pysam `wc` mode row said "needs `reference_filename=`" | P2 | "give `reference_filename=`; without it pysam warns and writes an embedded-reference CRAM" | ran: no `reference_filename` -> `embed_ref=2` warnings, CRAM quickchecks, 5644 records, no M5 in header | |
+| @PG example IDs `bwa-mem`, `samtools.1..3` | P2 | `bwa`, `samtools`, `samtools.1`, `samtools.2` with matching PP | ran: bwa mem \| sort \| fixmate \| sort \| markdup -> IDs bwa, samtools, samtools.1, .2, .3 | |
+| `-M` needs an index not stated | P2 | "(needs an index, like any region query)" | ran: unindexed BAM -> rc 1 `Could not retrieve index file` | |
+| MAPQ distribution command printed distinct values | P2 | `sort -n \| uniq -c \| head -20` | ran: counts per value on the human BAM (5637 at 60) | |
+
+Redundancy pass: already done on 2026-09-20 (usage-guide 210 -> 53 lines, one copy of each fact). Skipped.
+
+Split: SKILL.md 435 -> 276 lines. Verbatim moves; "Reference Files" index added, pointers from the pysam bullet, Format Conversion Approach (CRAM) and after the Secondary vs Supplementary table (MAPQ). Non-blank line multiset before == SKILL.md + 4 references except the 2 lines that gained a pointer. 23 python/bash fences parse (ast / `bash -n`).
+
+| moved section | now lives in |
+| --- | --- |
+| MAPQ Is Not Portable Across Aligners | `references/mapq-by-aligner.md` (19 lines) |
+| Context-Specific Tags, Provenance: @PG Chain | `references/tags-and-provenance.md` (42 lines) |
+| CRAM Reference Resolution (Critical) | `references/cram-reference.md` (24 lines) |
+| pysam Python Alternative | `references/pysam.md` (82 lines) |
+
+usage-guide.md Overview now names the `references/` files as well as SKILL.md.
+
+### Left unfixed
+- DRAGEN `--mapq-max`, Cell Ranger/STARsolo MAPQ 255 and CB/UB, featureCounts/RSEM tag consumption: cannot be run here (DRAGEN and Cell Ranger absent and licence/real-input gated; STARsolo/featureCounts/RSEM need a whitelist/annotation dataset that does not exist in `public-data`). Marked "(not verified here)" as the audit suggested.
+- pysam's "truncated file" wording for a missing CRAM reference (audit static note, not a recommendation): it is pysam's own message, and `view_bam.py` already appends the reference hint; not changed.
+
+### Scripts move (2026-09-21, commit below the split; SKILL.md 276 -> 265 lines)
+
+| old location | script path | verified |
+| --- | --- | --- |
+| SKILL.md "Multiple Regions" `fetch_regions()` (17 lines) | `scripts/fetch_regions.py` (verbatim function + BED CLI + `read_bed`; SKILL.md keeps CLI and import invocation) | ran on human BAM: 2 BED sets -> 5426 and 802 reads, identical (cols 1-11) to `samtools view -M -L`; naive multi-region view 7356; import path 5426; wrong contig / no args rc 1 |
+
+Not moved: `examples/view_bam.py` and `convert_formats.sh` already are the scripts (SKILL.md and pysam.md point to them); every other block is under 15 lines (pysam open/iterate/convert fragments, CRAM cache recipe 8 lines, conversion one-liners) and stays inline.
+
+## 2026-09-21 final pass, Phase 1 (fixer+auditor: Sonnet 5; branch `fix/alignment-files-sam-bam-basics`, worktree `F:\OpenScience\wt\alignment-files-sam-bam-basics`, from branch tip `3580586`)
+
+Resolved every item on the 2026-09-21 "Left unfixed" list that was resolvable with a public, unauthenticated
+install (per `FINAL_PASS_BRIEF.md`'s wider install permission). New side env `af-subread` (subread 2.0.6,
+RSEM 1.2.28, bowtie2 2.5.4) added to `F:\OpenScience\audit-envs\alignment-files\TOOLS.md` under the
+install-lock protocol; no existing env or package touched. Scratch: `F:\OpenScience\scratch\sambam3\`.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+| --- | --- | --- | --- | --- |
+| `mapq-by-aligner.md` "Cell Ranger / STARsolo inherits STAR, 255" not verified | P2 | Row now says STARsolo checked, Cell Ranger not run | ran: STAR 2.7.11b, synthetic duplicated-contig genome + 80 synthetic 10x-style reads (40 unique, 40 forced to 2 loci): STARsolo MAPQ 255 (unique) / 3 (2-locus), matching plain STAR's scale | Cell Ranger not run: 10x Genomics gates the download behind account registration |
+| `tags-and-provenance.md` CB:Z / UB:Z "not verified here" | P2 | Rows now say STARsolo checked, Cell Ranger not run | ran: same STARsolo job, `--soloType CB_UMI_Simple` + 3-entry whitelist -> `CB:Z` matches the whitelist entry, `UB:Z` present on every aligned read | |
+| `tags-and-provenance.md` NH:i "Required by featureCounts ... (not verified here)" | P2 | Row now cites the exact featureCounts behaviour | ran: subread 2.0.6 `featureCounts` on the STARsolo BAM (40 NH:i:1, 40 NH:i:2 reads): default excludes all NH>1 records (`Unassigned_MultiMapping: 80`); `-M` includes all 120; `-M --fraction` weights 0.5/0.5 per locus | Salmon left "(not verified here)", out of scope for this pass |
+| `tags-and-provenance.md` HI:i "Required by RSEM (not verified here)" was wrong, not just unverified | P1 | Row corrected: RSEM does not read an HI tag; it groups a read's alignments by consecutive same-QNAME lines | checked: RSEM 1.2.28 `rsem-calculate-expression --help` and `convert-sam-for-rsem --help`, neither mentions HI | caught only because this pass installed RSEM to check; a real defect, not a mere gap |
+| Full re-run of every runnable block post-split/post-scripts-move | - | no changes needed | ran: all SKILL.md inline commands, `examples/view_bam.py` (5 modes incl. bad-limit/missing-file), `examples/convert_formats.sh` (5 cases), `scripts/fetch_regions.py` (CLI + import) on the current worktree layout; all match prior recorded outputs | confirms the 2026-09-21 split/move did not break any invocation |
+
+### Left unfixed (checkpoint: needs Sam)
+- DRAGEN MAPQ row: Illumina-licensed hardware/software, no public install path. Needs a DRAGEN
+  licence/instance or a real DRAGEN BAM to inspect.
+- Cell Ranger itself (STARsolo now verified as its stand-in for MAPQ/CB/UB behaviour): 10x Genomics
+  gates the download behind account registration. Needs that registration or a real Cell Ranger BAM.
+
+Full detail: `F:\OpenScience\audits\_final_pass\bio-sam-bam-basics\CHECKPOINT.md`.

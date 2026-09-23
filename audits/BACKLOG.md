@@ -1280,7 +1280,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (417)
+## P2 (415)
 
 ### `bio-data-visualization-lollipop-protein-maps` — HGVSp edge cases and recurrence semantics undocumented
 
@@ -2241,38 +2241,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The single file grew from 14.8 KB to 24.6 KB (479 lines); the ~150 lines of pysam helpers are loaded on every invocation, and only one of them ships as a runnable example.
 - Root cause: The dedup moved usage-guide code into SKILL.md instead of into examples/.
 - Fix: Move allele_counts / find_variants / pileup_text into examples/ (with a small self-test) and keep the table and one-line usage in SKILL.md.
-
-### `bio-sam-bam-basics` — CRAM round trip is not lossless: =/X become M, NM/MD get added
-
-- Skill: 85, Production Ready · [mrsonord2240/bioSkills@35712f5](https://github.com/mrsonord2240/bioSkills/tree/35712f5f1c1177aec6e6f1fab165b8c49a832aab/alignment-files/sam-bam-basics) · [viewer](skills/bio-sam-bam-basics/mrsonord2240-bioSkills@35712f5/viewer.md)
-- Observed in inputs: 7, 8
-- Problem: SKILL.md says a CRAM round trip "keeps every field and tag but not the tag order". On a hand SAM the =/X CIGAR of one read became 9M, and on real minimap2 --eqx output 5000 of 5000 reads lost their =/X ops; on a minimap2 BAM without MD, decoding with the reference added MD:Z to all 5000 reads (unmapped-read MAPQ also becomes 0).
-- Root cause: The sentence was verified only on the nf-core BAM, whose CIGARs use M and whose reads already carry NM/MD.
-- Fix: Replace with: a CRAM round trip preserves reads and quality but rewrites =/X to M, regenerates NM/MD when the reference is available and reorders tags; use BAM if the exact CIGAR ops matter.
-
-### `bio-sam-bam-basics` — Unverifiable table rows presented as fact
-
-- Skill: 85, Production Ready · [mrsonord2240/bioSkills@35712f5](https://github.com/mrsonord2240/bioSkills/tree/35712f5f1c1177aec6e6f1fab165b8c49a832aab/alignment-files/sam-bam-basics) · [viewer](skills/bio-sam-bam-basics/mrsonord2240-bioSkills@35712f5/viewer.md)
-- Observed in inputs: 5
-- Problem: DRAGEN "--mapq-max (default 60)", Cell Ranger/STARsolo "inherits STAR / 255" and CB/UB, featureCounts/RSEM as consumers of NH/HI, and the pbmm2 row are stated without any marker, although the fix log says none could be run.
-- Root cause: Rows were kept from the upstream text; the fixer deleted only the claims it could disprove.
-- Fix: Append "(not verified here)" to those rows, or cite the vendor documentation for each, or drop the DRAGEN flag name.
-
-### `bio-sam-bam-basics` — Residual robustness gaps in the shipped examples
-
-- Skill: 85, Production Ready · [mrsonord2240/bioSkills@35712f5](https://github.com/mrsonord2240/bioSkills/tree/35712f5f1c1177aec6e6f1fab165b8c49a832aab/alignment-files/sam-bam-basics) · [viewer](skills/bio-sam-bam-basics/mrsonord2240-bioSkills@35712f5/viewer.md)
-- Observed in inputs: 7
-- Problem: view_bam.py with a non-numeric limit dies with a raw ValueError traceback (the int() sits outside the try); on an unindexed CRAM pysam prints several [E::cram_index_load] lines on stderr although the run succeeds; convert_formats.sh leaves a header-only output file behind when samtools fails after opening it (rc 1, file present).
-- Root cause: Argument parsing and cleanup were not covered by the rewrite.
-- Fix: Move int(sys.argv[2]) into the try and print a usage error; delete OUTPUT in an EXIT trap when the run fails; mention that the cram_index_load lines are harmless.
-
-### `bio-sam-bam-basics` — Small text inaccuracies and gaps
-
-- Skill: 85, Production Ready · [mrsonord2240/bioSkills@35712f5](https://github.com/mrsonord2240/bioSkills/tree/35712f5f1c1177aec6e6f1fab165b8c49a832aab/alignment-files/sam-bam-basics) · [viewer](skills/bio-sam-bam-basics/mrsonord2240-bioSkills@35712f5/viewer.md)
-- Observed in inputs: 1, 5, 6, 8
-- Problem: Mode table says pysam "wc" needs reference_filename= but it writes an embedded-reference CRAM with warnings when omitted; the @PG example uses IDs bwa-mem and samtools.1 where real files have bwa and samtools; the multi-region section does not say -M needs an index; the "mapping quality distribution" command prints distinct values, not counts.
-- Root cause: Illustrative examples were not aligned with tool output.
-- Fix: Reword the wc row ("should be given"), use real @PG IDs, add "(needs an index)" to the -M line, and add `\| uniq -c` to the MAPQ command.
 
 ### `bio-single-cell-doublet-detection` — The lineage co-expression heuristic needs an ambient caveat where it is stated
 
@@ -4041,6 +4009,22 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: Chem.MolFromSmiles('') returns a zero-atom Mol rather than None, so an empty cell in an input file passes every None check in the Skill and flows downstream as a real record.
 - Root cause: The Skill's parse guards test for None only, which is the documented failure signal but not the only one.
 - Fix: Add a line to parse_smiles_safe and the Common Errors table: treat a molecule with GetNumAtoms() == 0 as a parse failure, because an empty or whitespace input does not return None.
+
+### `bio-sam-bam-basics` — Validate BED rows before indexing fields
+
+- Skill: 91, Production Ready · [mrsonord2240/bioSkills@cb48eb1](https://github.com/mrsonord2240/bioSkills/tree/cb48eb16bf63f75098c865da4e8f7bf3191af733/alignment-files/sam-bam-basics) · [viewer](skills/bio-sam-bam-basics/mrsonord2240-bioSkills@cb48eb1/viewer.md)
+- Observed in inputs: 10
+- Problem: A two-column BED causes scripts/fetch_regions.py to expose a Python IndexError traceback.
+- Root cause: read_bed assumes three tab-separated fields before validating the row length.
+- Fix: Validate exactly three fields and integer nonnegative start/end values in read_bed; report the line number and a concise BED-format error before exit 1.
+
+### `bio-sam-bam-basics` — Keep external MAPQ claims evidence-labelled
+
+- Skill: 91, Production Ready · [mrsonord2240/bioSkills@cb48eb1](https://github.com/mrsonord2240/bioSkills/tree/cb48eb16bf63f75098c865da4e8f7bf3191af733/alignment-files/sam-bam-basics) · [viewer](skills/bio-sam-bam-basics/mrsonord2240-bioSkills@cb48eb1/viewer.md)
+- Observed in inputs: 5
+- Problem: DRAGEN and Cell Ranger could not be directly executed in this environment.
+- Root cause: They require licensed hardware/software or account registration outside the public audit environment.
+- Fix: Retain the current not-verified labels; when a licensed instance or real Cell Ranger BAM becomes available, replace them with versioned observed distributions.
 
 ### `bio-single-cell-cnv-inference` — No explicit clinical-practice-boundary disclaimer
 
