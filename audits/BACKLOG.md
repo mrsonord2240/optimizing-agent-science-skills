@@ -22,7 +22,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The example passes cluster_rows=<OLO dendrogram> together with row_split=gene_info$pathway, a combination ComplexHeatmap rejects; the script was never run.
 - Fix: Drop row_split or use a numeric row_split (works with the dendrogram), or apply OLO within each pathway group; supply a runnable data preamble and state the constraint in SKILL.md next to the OLO block.
 
-## P1 (154)
+## P1 (153)
 
 ### `bio-data-visualization-lollipop-protein-maps` — Shipped example never completes and paints wrong colours
 
@@ -1000,30 +1000,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The all-singleton case was fixed with a raise (which the caller cannot miss) and the partial case with a print (which it can).
 - Fix: Return the status in the data: add a `status` column to median_cv_linear ('measured' / 'not_measurable_n1') and an `unchecked_groups` entry (or a second returned frame) to replicate_correlation, and have pca_batch_check return the per-PC test status alongside coords rather than only printing it.
 
-### `bio-causal-genomics-heritability-partitioning` — examples/*.sh break under WSL bash on a default Windows git checkout (CRLF)
-
-- Skill: 88.2, Production Ready · [mrsonord2240/bioSkills@c602f2a](https://github.com/mrsonord2240/bioSkills/tree/c602f2a0fe25fff9502210b062d195aa0a69b214/causal-genomics/heritability-partitioning) · [viewer](skills/bio-causal-genomics-heritability-partitioning/mrsonord2240-bioSkills@c602f2a/viewer.md)
-- Observed in inputs: 9
-- Problem: The fork's git-committed bytes for examples/smoke_test_ldsc.sh are LF (confirmed via 'git show'), but the on-disk checkout on this Windows machine is CRLF (core.autocrlf=true, no .gitattributes in the fork). Running the script exactly as its own header instructs -- 'LDSC_DIR=./ldsc bash smoke_test_ldsc.sh' under WSL -- fails immediately with "$'\r': command not found" then "set: pipefail: invalid option name", exit code 2.
-- Root cause: No .gitattributes forces LF for shell scripts; Git for Windows' commonly-recommended core.autocrlf=true setting silently rewrites LF to CRLF on checkout, and every examples/*.sh in this Skill (and likely the rest of the fork) inherits the same risk.
-- Fix: Add a .gitattributes with '*.sh text eol=lf' so every Windows checkout keeps LF regardless of the user's global autocrlf setting. This is the Skill's own 'confirm your install works before pointing LDSC at real data' step, so breaking silently here is high-cost for a first-time Windows+WSL user.
-
-### `bio-causal-genomics-heritability-partitioning` — SKILL.md still has no h2-out-of-bounds sanity check
-
-- Skill: 88.2, Production Ready · [mrsonord2240/bioSkills@c602f2a](https://github.com/mrsonord2240/bioSkills/tree/c602f2a0fe25fff9502210b062d195aa0a69b214/causal-genomics/heritability-partitioning) · [viewer](skills/bio-causal-genomics-heritability-partitioning/mrsonord2240-bioSkills@c602f2a/viewer.md)
-- Observed in inputs: 4
-- Problem: The liability-scale input again produces Total Liability scale h2: 1.4326 (0.1009) -- an impossible (>1) value. SKILL.md's Quantitative Thresholds table has no rule that would catch an agent reporting this at face value; this gap was identified pre-fix and remains unaddressed.
-- Root cause: Quantitative Thresholds table covers mean chi-square, SE, and intercept/ratio bins only, with no h2-in-[0,1] plausibility rule.
-- Fix: Add a one-line rule to Quantitative Thresholds: h2 outside [0,1] on either scale is definitionally invalid; report it as a data/fixture artifact or model misspecification, never as a face-value estimate.
-
-### `bio-causal-genomics-heritability-partitioning` — references/ progressive-disclosure split still not done
-
-- Skill: 88.2, Production Ready · [mrsonord2240/bioSkills@c602f2a](https://github.com/mrsonord2240/bioSkills/tree/c602f2a0fe25fff9502210b062d195aa0a69b214/causal-genomics/heritability-partitioning) · [viewer](skills/bio-causal-genomics-heritability-partitioning/mrsonord2240-bioSkills@c602f2a/viewer.md)
-- Observed in inputs: —
-- Problem: SKILL.md is now ~493 lines (grew from 452 after the redundancy pass folded the moved-in Computational Footprint and finer intercept tables back in), still covering all 10 methods in one file with no references/*.md split.
-- Root cause: Time-boxed behind the P0/P1 tool-route fix; acknowledged unfixed in the fix log.
-- Fix: Split per-method sections (LDSC, LDAK, HESS, HDL, Popcorn, BOLT/GCTA) into references/*.md; keep SKILL.md as an index plus the Decision Tree by Scenario.
-
 ### `bio-causal-genomics-genetic-correlation` — No explicit population-vs-individual clinical scope statement
 
 - Skill: 89, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/causal-genomics/genetic-correlation) · [viewer](skills/bio-causal-genomics-genetic-correlation/GPTomics-bioSkills@d91ed3d/viewer.md)
@@ -1231,6 +1207,22 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The shared Windows R wrapper reported exit 139 after the source example had already materialized every expected output or expected stop message.
 - Root cause: This appears to be runtime-wrapper instability rather than a source-level result defect, but a shell caller cannot regard the process status as success.
 - Fix: Stabilize or replace the Windows R wrapper, then re-run the three RSS checks and require exit 0 in addition to their content assertions.
+
+### `bio-causal-genomics-heritability-partitioning` — Execute HDL with real reference panel
+
+- Skill: 95, Production Ready · [mrsonord2240/bioSkills@05d2d10](https://github.com/mrsonord2240/bioSkills/tree/05d2d10f902ceb158ab2a9402dc36214ca44b9a1/causal-genomics/heritability-partitioning) · [viewer](skills/bio-causal-genomics-heritability-partitioning/mrsonord2240-bioSkills@05d2d10/viewer.md)
+- Observed in inputs: 3
+- Problem: HDL remains unexecuted because its public reference is roughly 5 GB.
+- Root cause: Reference panel is absent.
+- Fix: On a storage-capable host, obtain the documented panel and assert HDL.rg on non-overlapping GWAS.
+
+### `bio-causal-genomics-heritability-partitioning` — Verify BOLT-REML on compatible host
+
+- Skill: 95, Production Ready · [mrsonord2240/bioSkills@05d2d10](https://github.com/mrsonord2240/bioSkills/tree/05d2d10f902ceb158ab2a9402dc36214ca44b9a1/causal-genomics/heritability-partitioning) · [viewer](skills/bio-causal-genomics-heritability-partitioning/mrsonord2240-bioSkills@05d2d10/viewer.md)
+- Observed in inputs: —
+- Problem: BOLT 2.5 still segfaults on this WSL host even for help.
+- Root cause: Host binary compatibility unresolved.
+- Fix: Run binary or source build on compatible Linux and record a real REML assertion.
 
 ### `bio-proteomics-protein-inference` — Verify a positive Philosopher/ProteinProphet chain
 
@@ -3354,14 +3346,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The fix seeded the PCA without adding the expected-output docstring.
 - Fix: Add the "Expected output:" block at the top of the file, now that the seeding makes the numbers stable.
 
-### `bio-causal-genomics-heritability-partitioning` — HDL, HESS, BOLT-REML, GCTA, Popcorn remain untested across both audit rounds
-
-- Skill: 88.2, Production Ready · [mrsonord2240/bioSkills@c602f2a](https://github.com/mrsonord2240/bioSkills/tree/c602f2a0fe25fff9502210b062d195aa0a69b214/causal-genomics/heritability-partitioning) · [viewer](skills/bio-causal-genomics-heritability-partitioning/mrsonord2240-bioSkills@c602f2a/viewer.md)
-- Observed in inputs: 2, 3
-- Problem: These five named tools are still scored by inspection only, unchanged from the pre-fix audit; none has been executed against real or synthetic data in either round, even though this round proved LDAK (previously also assumed unexecutable) runs fine in the same WSL seat.
-- Root cause: Time/scope-boxed in both audit rounds; HDL/HESS need R/Python installs and reference panels not yet set up for this candidate.
-- Fix: A future audit or tooling pass should install and smoke-test at least HDL (pure R, no GPU needed) and HESS (Python) the same way this round did for LDAK, since both are named headline capabilities of the Skill's own frontmatter description.
-
 ### `bio-causal-genomics-genetic-correlation` — Two different rg-magnitude thresholds are not cross-referenced
 
 - Skill: 89, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/causal-genomics/genetic-correlation) · [viewer](skills/bio-causal-genomics-genetic-correlation/GPTomics-bioSkills@d91ed3d/viewer.md)
@@ -4433,6 +4417,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: Individual-level and CLI paths do not provide a concise pre-fine-mapping call-rate, HWE, MAF, and sample/QC hand-off.
 - Root cause: The prior fix scope excluded new threshold content.
 - Fix: Add a sourced, short QC checklist or explicitly delegate it to the upstream GWAS/QC Skill before running genotype-derived LD workflows.
+
+### `bio-causal-genomics-heritability-partitioning` — Exercise HESS genome-wide aggregation
+
+- Skill: 95, Production Ready · [mrsonord2240/bioSkills@05d2d10](https://github.com/mrsonord2240/bioSkills/tree/05d2d10f902ceb158ab2a9402dc36214ca44b9a1/causal-genomics/heritability-partitioning) · [viewer](skills/bio-causal-genomics-heritability-partitioning/mrsonord2240-bioSkills@05d2d10/viewer.md)
+- Observed in inputs: —
+- Problem: HESS step 2 requires 22 chromosome outputs and is not executed here.
+- Root cause: Available fixture is single-chromosome.
+- Fix: Run all chromosome jobs with a matched reference and validate aggregate h2.
 
 ### `bio-crispr-screens-batch-correction` — State JACKS compatibility or remove version implication
 
