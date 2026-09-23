@@ -1272,7 +1272,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The fix's own re-verification tested the well-powered end of the claim (proving r2 alone is insufficient) but did not test the newly-added 'limited power' condition itself, so that clause is unverified and, on this evidence, does not reliably produce the claimed symptom.
 - Fix: Run a calibration sweep over eQTL N (e.g. 200, 400, 700, 1000, 5000) at fixed r2~0.5 and comparable effect sizes to find the actual regime (if any) where PP.H3 dominates rather than PP.H1, and replace 'comparable effect sizes / limited power' with the empirically-identified band, or reframe the mechanism qualitatively instead of naming a specific power condition that does not hold up.
 
-## P2 (474)
+## P2 (473)
 
 ### `bio-data-visualization-lollipop-protein-maps` — HGVSp edge cases and recurrence semantics undocumented
 
@@ -3345,14 +3345,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The new paragraph after Required Setup correctly explains that terms are URL-encoded (verified true in this audit), but gives no code example for the length/count sanity-check it recommends before large batch loops.
 - Root cause: The finding was addressed with documentation only, matching its P2 priority from the fix log.
 - Fix: Add a 3-line helper function (e.g. warn if len(term) > N or term.count(' OR ') > M) alongside the existing EPost-chunking pointer.
-
-### `bio-pharmacophore-modeling` — Diagnostic explains but does not resolve the diverse-actives false-negative
-
-- Skill: 88, Production Ready · [mrsonord2240/bioSkills@66f9c91](https://github.com/mrsonord2240/bioSkills/tree/66f9c917d8954cf128a856fd4c1e5c2644b321a6/chemoinformatics/pharmacophore-modeling) · [viewer](skills/bio-pharmacophore-modeling/mrsonord2240-bioSkills@66f9c91/viewer.md)
-- Observed in inputs: 2, 5
-- Problem: feature_family_prefilter still rejects genuine same-class actives (e.g. ritonavir) when the query set is small and structurally diverse; the fix adds a clear diagnostic but the underlying strict-intersection matching is unchanged.
-- Root cause: No per-feature relaxation or scaffold-clustering fallback in shared_feature_types_prefilter, as already noted in SKILL.md's own 'Ligand-based -- diverse actives confound' failure-mode row.
-- Fix: Optional follow-up (not required for this fix pass): have feature_family_prefilter accept a min_shared_fraction parameter so a molecule missing only 1-2 non-essential features can still pass, with the strict-intersection behavior remaining the default.
 
 ### `bio-phylo-modern-tree-inference` — Remove the false IQ-TREE flag-form warnings
 

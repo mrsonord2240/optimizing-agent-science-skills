@@ -1,0 +1,108 @@
+{
+  "meta": {
+    "skill_name": "bio-pharmacophore-modeling",
+    "description": "Builds and applies 3D pharmacophore models using RDKit Pharm3D, receptor interaction analysis, and pharmacophore search workflows.",
+    "evaluated_on": "2026-09-22",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md",
+    "source": "mrsonord2240/bioSkills@c83fb1c4c8c3c40079e8cf653c3ed266fa7b1d8c:chemoinformatics/pharmacophore-modeling",
+    "re_audit_of": "mrsonord2240/bioSkills@66f9c91:chemoinformatics/pharmacophore-modeling",
+    "pre_fix_report_archived_at": "F:/OpenScience/audits/_pre-fix-20260922/bio-pharmacophore-modeling/",
+    "fix_log": "F:/optimizing-agent-science-skills/fixes/bio-pharmacophore-modeling.md",
+    "checkpoint": "F:/OpenScience/audits/_final_pass/bio-pharmacophore-modeling/CHECKPOINT.md"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {"result": "PASS", "detail": "All execution claims are backed by captured RDKit 2026.03.6 and PLIP 3.0.1 runs on real PDB structures or valid real-drug SMILES; no invented results, statistics, or citations were used."},
+      "practice_boundaries": {"result": "PASS", "detail": "The seven outputs perform molecular-modeling workflows and contain no individual diagnosis, treatment prescription, or medical conclusion."},
+      "methodological_ground": {"result": "PASS", "detail": "The skill distinguishes application of a supplied pharmacophore from consensus derivation, warns that its coordinates are placeholders, treats the relaxed feature prefilter as coarse, and requires a distance-constrained follow-up."},
+      "code_usability": {"result": "PASS", "detail": "Every runnable SKILL.md block and examples/pharmacophore.py route was executed from saved scripts; all assertions passed and all required imports resolved in the declared environments."}
+    }
+  },
+  "static_score": {
+    "subtotal": 90,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {"score": 12, "max": 12, "note": "Covers ligand-based application, interaction-derived receptor analysis, pharmacophore search boundaries, validation, and explicit adjacent-skill handoffs."},
+      "reliability": {"score": 11, "max": 12, "note": "Documented PLIP workaround, failure modes, fixed seeds, and the strict/relaxed feature-family diagnostic cover the observed routes; a bounds-infeasible EmbedPharmacophore error still relies on user inspection rather than a reusable handler."},
+      "performance_context": {"score": 7, "max": 8, "note": "The 299-line SKILL.md is direct and the short usage guide points to the authoritative sections, though several external routes require separate tool documentation."},
+      "agent_usability": {"score": 15, "max": 16, "note": "Decision tree, feature taxonomy, worked code, validation criteria, and concrete failure modes make cold-start execution clear; search-engine conversion remains intentionally tool-specific."},
+      "human_usability": {"score": 7, "max": 8, "note": "Natural trigger cases and concise prerequisites are present; exact hosted-service query setup must be checked against the deployed interface."},
+      "security": {"score": 11, "max": 12, "note": "No secrets, raw shell execution, or destructive operations are present. Molecule and structure files are accepted as scientific inputs without an explicit untrusted-file policy."},
+      "maintainability": {"score": 10, "max": 12, "note": "The example is self-contained and its changed return contract has one verified caller; apo2ph4, Pharmit, and PharmacoForge stay documentation-directed external seams."},
+      "agent_specific": {"score": 17, "max": 20, "note": "Trigger description is precise, fixed-seed examples are repeatable, and stop/hand-off conditions are documented; the broad description necessarily spans tools not bundled in the skill."}
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 92.7,
+    "max": 100,
+    "assertion_pass_rate": {"passed": 29, "total": 29},
+    "inputs": [
+      {"index": 1, "type": "Canonical", "label": "Regression: receptor-based pharmacophore interactions on real HIV-1 protease co-crystal PDB 1HSG", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Saved run/01_plip_1hsg.py executed under PLIP 3.0.1; run/01_plip_1hsg.py.out.txt records the documented workaround and 6/15/2/4 counts.", "note": "PLIP 3.0.1 completed under the SKILL.md-documented inchikey workaround and reproduced the prior 6/15/2/4 interaction counts.", "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 4, "assertions_total": 4, "assertions": [
+        {"text": "The documented PLIP workaround completes without raising on real PDB 1HSG", "result": "PASS", "note": "analyze() returned normally."},
+        {"text": "Hydrogen-bond, hydrophobic, salt-bridge, and water-bridge counts reproduce the prior regression", "result": "PASS", "note": "Counts were 6, 15, 2, and 4."},
+        {"text": "Interaction records are derived from real atomic coordinates rather than fabricated", "result": "PASS", "note": "Input is the archived real 1HSG PDB fixture."},
+        {"text": "The workflow stays within molecular-modeling rather than medical practice", "result": "PASS", "note": "Only typed ligand-protein contacts were reported."}
+      ]},
+      {"index": 2, "type": "Variant A", "label": "Regression plus new case: strict and relaxed family prefilter on real HIV protease inhibitors and unrelated drugs", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Saved run/02_relaxation.py ran with RDKit 2026.03.6; its captured output records strict=[], relaxed ritonavir/aspirin/acetaminophen, and the typed rejections.", "note": "Strict 1.0 produced no hits; 0.6 admitted ritonavir, aspirin, and acetaminophen while caffeine and metformin remained rejected, exactly exposing the documented coarse-filter limitation.", "basic": 37, "specialized": 55, "total": 92, "assertions_passed": 5, "assertions_total": 5, "assertions": [
+        {"text": "Default strict behavior is unchanged", "result": "PASS", "note": "Strict hit list was empty."},
+        {"text": "Relaxation admits the real same-class ritonavir query as documented", "result": "PASS", "note": "Ritonavir was present at min_shared_fraction=0.6."},
+        {"text": "Caffeine and metformin remain rejected at 0.6", "result": "PASS", "note": "Both remained absent from relaxed hits."},
+        {"text": "Every rejected molecule receives a specific missing-feature diagnostic", "result": "PASS", "note": "Captured output lists feature tuples for every rejection."},
+        {"text": "Output treats the relaxed filter as coarse rather than a validated 3D match", "result": "PASS", "note": "The report records aspirin and acetaminophen co-hits and the skill requires distance matching next."}
+      ]},
+      {"index": 3, "type": "Edge", "label": "Regression: SKILL.md ligand-based EmbedPharmacophore block run verbatim", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Saved run/03_embed_block.py executed the SKILL.md block under RDKit 2026.03.6; captured output is CAN_MATCH True, EMBEDDINGS 10, N_FAILED 0.", "note": "The illustrative supplied pharmacophore matched phenethylamine and produced 10 embeddings with zero failures.", "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 4, "assertions_total": 4, "assertions": [
+        {"text": "The documented imports and RDKit API signatures resolve", "result": "PASS", "note": "RDKit 2026.03.6 ran the unmodified block."},
+        {"text": "A valid feature match is found", "result": "PASS", "note": "can_match=True."},
+        {"text": "Embedding produces non-empty valid output without failed embeddings", "result": "PASS", "note": "10 embeddings and n_failed=0."},
+        {"text": "The output does not claim the block derives a consensus pharmacophore", "result": "PASS", "note": "The skill explicitly labels it application of an already supplied model."}
+      ]},
+      {"index": 4, "type": "Variant B", "label": "Regression: shipped pharmacophore.py demo executed twice in independent processes", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Archived exact demo source run/04_pharmacophore_demo_source.py ran twice; run/04_demo_run1.out.txt and run/04_demo_run2.out.txt have identical SHA-256 recorded in run/04_demo_determinism_assertion.txt.", "note": "Both full stdout files were byte-identical (SHA-256 recorded in run/04_demo_determinism_assertion.txt) and returned the documented one-member hit list.", "basic": 39, "specialized": 56, "total": 95, "assertions_passed": 4, "assertions_total": 4, "assertions": [
+        {"text": "The shipped __main__ demo completes without error", "result": "PASS", "note": "Both processes exited 0."},
+        {"text": "The documented chlorinated amide hit is returned", "result": "PASS", "note": "Each captured stdout contains the expected one-member list."},
+        {"text": "Rejected molecules receive feature diagnostics", "result": "PASS", "note": "Hexane and pyridine diagnostics were printed."},
+        {"text": "Repeated independent execution is deterministic", "result": "PASS", "note": "Full stdout SHA-256 values matched."}
+      ]},
+      {"index": 5, "type": "Stress", "label": "Regression: ten-drug diverse-library feature-family prefilter", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Saved run/05_stress.py ran against ten real-drug SMILES; run/05_stress.py.out.txt records N_LIBRARY 10, N_HITS 6, and four diagnostics.", "note": "All ten valid real-drug SMILES were processed; six coarse hits and four typed diagnostics matched the prior stress result.", "basic": 36, "specialized": 54, "total": 90, "assertions_passed": 4, "assertions_total": 4, "assertions": [
+        {"text": "All ten library molecules are processed without truncation or crash", "result": "PASS", "note": "N_LIBRARY=10."},
+        {"text": "The prior six-hit regression result is reproduced", "result": "PASS", "note": "N_HITS=6."},
+        {"text": "Every rejection identifies missing RDKit feature types", "result": "PASS", "note": "Four diagnostics were captured."},
+        {"text": "The result is presented as a prefilter rather than an activity prediction", "result": "PASS", "note": "Script and SKILL.md use the coarse-prefilter framing."}
+      ]},
+      {"index": 6, "type": "Scope Boundary", "label": "Regression: second real receptor structure PDB 3PTB with documented PLIP workaround", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Saved run/06_plip_3ptb.py executed under PLIP 3.0.1; run/06_plip_3ptb.py.out.txt records nine hbond/hydroph_interaction/metal_complex records.", "note": "PLIP completed on trypsin-benzamidine and returned nine typed interaction records across hbond, hydroph_interaction, and metal_complex.", "basic": 37, "specialized": 56, "total": 93, "assertions_passed": 4, "assertions_total": 4, "assertions": [
+        {"text": "The documented workaround generalizes beyond PDB 1HSG", "result": "PASS", "note": "3PTB analyze() completed normally."},
+        {"text": "Real typed interaction records are returned", "result": "PASS", "note": "Nine records were found."},
+        {"text": "All expected observed interaction classes are retained", "result": "PASS", "note": "hbond, hydroph_interaction, and metal_complex were present."},
+        {"text": "No molecular generation claim is made from a pharmacophore", "result": "PASS", "note": "Output remains interaction analysis only."}
+      ]},
+      {"index": 7, "type": "Adversarial", "label": "Regression plus new boundary: false-premise correction, placeholder warning, and enrichment edge handling", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Saved run/07_enrichment.py and run/08_documentation_checks.py executed; captured outputs show inf plus the expected ValueError and all three documentation boundary assertions.", "note": "Static checks confirmed both prior reasoning boundaries. New enrichment execution returned infinity with no inactive matches and raises the documented ValueError for an empty active set.", "basic": 36, "specialized": 55, "total": 91, "assertions_passed": 4, "assertions_total": 4, "assertions": [
+        {"text": "Placeholder coordinates are warned about before their definition", "result": "PASS", "note": "Warning precedes query_features in SKILL.md."},
+        {"text": "The skill rejects the false premise that EmbedPharmacophore derives a consensus automatically", "result": "PASS", "note": "Explicit correction is present in the ligand-based approach."},
+        {"text": "The skill distinguishes pharmacophore generation from molecule generation", "result": "PASS", "note": "PharmacoForge scope statement says it does not directly generate molecules."},
+        {"text": "Quality-validation code handles zero inactive matches and rejects an empty class", "result": "PASS", "note": "Returned inf and raised the stated ValueError."}
+      ]}
+    ]
+  },
+  "final": {"static_weighted": 36.0, "dynamic_weighted": 55.6, "score": 92, "max": 100, "grade": "Production Ready", "grade_symbol": "⭐", "deployable": true, "veto_override": false},
+  "key_strengths": [
+    "Every runnable route in the skill and its shipped example has current, saved execution evidence on the declared branch tip.",
+    "The PLIP Windows/Open-Babel workaround reproduced real interaction records on two different experimental structures.",
+    "Fixed seeds make the shipped example's complete stdout deterministic across independent processes.",
+    "The skill correctly distinguishes illustrative pharmacophore application from consensus derivation and molecule generation."
+  ],
+  "recommendations": []
+}
