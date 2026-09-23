@@ -1,0 +1,25 @@
+library(dada2)
+audit_root <- 'F:/OpenScience/audits/bio-microbiome-amplicon-processing'
+env_root <- 'F:/OpenScience/audit-envs/microbiome-metagenomics-analyst'
+work <- file.path(audit_root, 'work', 'final_pass_20260923')
+raw <- file.path(env_root, 'datagen', 'amplicon', 'raw_reads')
+trim <- file.path(work, 'trimmed')
+samples <- paste0('S0', 1:5)
+run_case <- function(in_dir, out_dir) {
+  dir.create(out_dir, recursive=TRUE, showWarnings=FALSE)
+  fF <- file.path(in_dir, paste0(samples, '_S1_L001_R1_001.fastq.gz'))
+  fR <- file.path(in_dir, paste0(samples, '_S1_L001_R2_001.fastq.gz'))
+  filtF <- file.path(out_dir, paste0(samples, '_F.fastq.gz'))
+  filtR <- file.path(out_dir, paste0(samples, '_R.fastq.gz'))
+  out <- filterAndTrim(fF, filtF, fR, filtR, truncLen=c(220,200), maxEE=c(2,2), truncQ=2, maxN=0, compress=TRUE, multithread=TRUE)
+  errF <- learnErrors(filtF, multithread=TRUE); errR <- learnErrors(filtR, multithread=TRUE)
+  dF <- dada(filtF, err=errF, multithread=TRUE); dR <- dada(filtR, err=errR, multithread=TRUE)
+  mer <- mergePairs(dF, filtF, dR, filtR)
+  tab <- makeSequenceTable(mer)
+  nochim <- removeBimeraDenovo(tab, method='consensus', multithread=TRUE)
+  c(before=sum(tab), after=sum(nochim), retained=100*sum(nochim)/sum(tab))
+}
+trimmed <- run_case(trim, file.path(work, 'primers_test', 'trimmed'))
+raw_case <- run_case(raw, file.path(work, 'primers_test', 'raw'))
+stopifnot(trimmed['retained'] > raw_case['retained'] + 20)
+cat(sprintf('PRIMER_ORDER_PASS trimmed_retained=%.1f raw_retained=%.1f delta=%.1f\n', trimmed['retained'], raw_case['retained'], trimmed['retained']-raw_case['retained']))

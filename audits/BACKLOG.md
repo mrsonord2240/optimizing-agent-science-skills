@@ -1280,7 +1280,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (420)
+## P2 (418)
 
 ### `bio-data-visualization-lollipop-protein-maps` — HGVSp edge cases and recurrence semantics undocumented
 
@@ -4226,30 +4226,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The Common Errors table documents input-shape pitfalls but not automatic data-transformation steps performed inside the call.
 - Fix: Add one line to the Mummichog/PSEA section noting that duplicate m/z-matched features are automatically merged before enrichment, so reported feature counts may differ from the input row count.
 
-### `bio-microbiome-amplicon-processing` — No ITS fixture exists to verify the ITS analysis path end-to-end
-
-- Skill: 92, Production Ready · [mrsonord2240/bioSkills@d99180a](https://github.com/mrsonord2240/bioSkills/tree/d99180a5685df2b0c7e076077e2aa326020fc9c7/microbiome/amplicon-processing) · [viewer](skills/bio-microbiome-amplicon-processing/mrsonord2240-bioSkills@d99180a/viewer.md)
-- Observed in inputs: 4
-- Problem: The ITS pipeline (itsxpress + truncLen=0) still ships no example data, so only CLI flag syntax can be verified, not a full run.
-- Root cause: examples/ only contains a 16S-paired-end-oriented script and a primer-trimming script; no ITS equivalent. Correctly left unfixed - building a synthetic fixture ITSxpress's HMM step would meaningfully exercise needs real conserved SSU/5.8S/LSU flanking sequence, not arbitrary synthetic reads.
-- Fix: If a real ITS reference sequence becomes available, add a minimal ITS fixture and a matching example script; otherwise leave documented-but-untested as is.
-
-### `bio-microbiome-amplicon-processing` — removeBimeraDenovo's low-abundance recall limit remains undocumented
-
-- Skill: 92, Production Ready · [mrsonord2240/bioSkills@d99180a](https://github.com/mrsonord2240/bioSkills/tree/d99180a5685df2b0c7e076077e2aa326020fc9c7/microbiome/amplicon-processing) · [viewer](skills/bio-microbiome-amplicon-processing/mrsonord2240-bioSkills@d99180a/viewer.md)
-- Observed in inputs: 1
-- Problem: One of two synthetic chimeras seeded in the fixture (a low-abundance chimera) is still not caught by removeBimeraDenovo(method='consensus'), unchanged from the original audit; this fix pass did not target chimera removal.
-- Root cause: Documented statistical limitation of consensus bimera detection at low abundance, not a Skill authoring defect.
-- Fix: Add one sentence to the chimera-removal section noting that removeBimeraDenovo can miss low-abundance chimeras, and that method='pooled' or manual inspection of borderline-abundance ASVs is a useful supplementary check.
-
-### `bio-microbiome-amplicon-processing` — Adversarial abundance-filter-instead-of-decontam shortcut is not pre-empted by name
-
-- Skill: 92, Production Ready · [mrsonord2240/bioSkills@d99180a](https://github.com/mrsonord2240/bioSkills/tree/d99180a5685df2b0c7e076077e2aa326020fc9c7/microbiome/amplicon-processing) · [viewer](skills/bio-microbiome-amplicon-processing/mrsonord2240-bioSkills@d99180a/viewer.md)
-- Observed in inputs: 7
-- Problem: SKILL.md's decontam section still does not name and reject the specific shortcut of replacing decontam with a flat abundance-percentage filter, unchanged from the original audit.
-- Root cause: Out of scope for this fix pass, which targeted the truncLen ceiling defect only.
-- Fix: Add one sentence to the decontam section naming this shortcut and explaining why control-based statistical testing (decontam) is not interchangeable with an arbitrary abundance cutoff.
-
 ### `bio-remote-homology` — Add standalone PSI-BLAST and HHsearch examples
 
 - Skill: 92, Production Ready · [mrsonord2240/bioSkills@7153e87](https://github.com/mrsonord2240/bioSkills/tree/7153e877bfec221df95ba1f5758f4012e788b7aa/database-access/remote-homology) · [viewer](skills/bio-remote-homology/mrsonord2240-bioSkills@7153e87/viewer.md)
@@ -4497,6 +4473,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The documented pbmarkdup command was verified only with a deterministic synthetic unaligned HiFi-style BAM. Its behavior on a real HiFi amplicon BAM or FASTQ remains unobserved.
 - Root cause: The audit environment has no small public HiFi amplicon dataset and the checkpoint records no suitable source.
 - Fix: When a public HiFi amplicon BAM or FASTQ under 50 MB is available, run the documented command and assert flag or removal behavior against independently inspected duplicate families.
+
+### `bio-microbiome-amplicon-processing` — Add a QIIME2 Deblur no-surviving-reads preflight
+
+- Skill: 94, Production Ready · [mrsonord2240/bioSkills@0e9a568](https://github.com/mrsonord2240/bioSkills/tree/0e9a568381ac039886853ff13f167acce8e92229/microbiome/amplicon-processing) · [viewer](skills/bio-microbiome-amplicon-processing/mrsonord2240-bioSkills@0e9a568/viewer.md)
+- Observed in inputs: 11
+- Problem: Two real/imported artifacts reached q2-deblur but produced no output and its error did not tell the user that no sequences survived the tool's processing.
+- Root cause: The QIIME2 equivalent is a terse command without a read-length or post-filter survival diagnostic.
+- Fix: Before denoise-16S, direct users to inspect demux read lengths and verify a suitable trim length; after failure, inspect whether zero reads survive rather than treating the q2-deblur exception as a generic installation error.
 
 ### `bio-pathway-kegg-pathways` — Shipped SPIA example defaults to nB=2000, no smaller value suggested for quick iteration
 
