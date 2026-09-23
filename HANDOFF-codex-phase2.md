@@ -96,7 +96,12 @@ force-push the shelf** (the marketplace pins its SHAs).
 
 Once every Skill has landed: retire staging. Archive `mrsonord2240/bioSkills-Improved` on GitHub, prune
 `F:\OpenScience\wt`, and move editing onto the shelf (the plan is in `CLAUDE.md` → Consolidation). Ask Sam
-first. About 12 GB of scratch folders in `F:\OpenScience` are also waiting on his word.
+first.
+
+**Splicing scratch goes after lane C (Sam, 2026-09-22).** Once every alternative-splicing Skill has landed,
+delete `F:\OpenScience\as-*-scratch`, `fixwork`, `scratch-lr2` and `scratch-iso2` (about 11 GB: hg38 and
+GENCODE subsets, STAR indexes, splice-model weights, run output), and remove the two `Scratch:` pointers in
+`audit-envs\alternative-splicing\TOOLS.md`. Until then lane C agents may reuse them.
 
 ## Final report to Sam
 
