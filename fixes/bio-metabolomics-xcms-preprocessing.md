@@ -69,6 +69,14 @@ Both files keep a Related Skills list (guide's, per the brief, and SKILL.md's); 
 
 SKILL.md 236 -> 255 lines: under the 300-line threshold, no split. `scripts/`: the largest fenced block is 12 lines (Peak Detection); none is at the ~15-line threshold, so nothing moved. All 8 fenced R blocks parse (`parse()`). `examples/xcms_workflow.R` untouched; re-run as a regression check, it completes (4 files, 4667 peaks, 2931 features, filled fraction 0.496).
 
-### Noticed, not changed
+## 2026-09-22: Phase 1 final pass
 
-- Retention-Time Alignment says to align to a pooled QC, but the `ObiwarpParam` example shows no `centerSample`; left as a possible follow-up (not in the audit's findings).
+Worktree `F:\OpenScience\wt\metabolomics-xcms-preprocessing`, branch `fix/metabolomics-xcms-preprocessing` (tip before this pass: `bb934d8`). Runtime: R 4.4.3 / Bioconductor 3.20 via `F:\OpenScience\audit-envs\untargeted-metabolomics-analyst\rs.sh`; xcms 4.4.0, MsExperiment 1.8.0, CAMERA 1.62.0. Data: real faahKO CDFs and the saved 12-file audit result. Nothing installed.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| Retention-Time Alignment instructed pooled-QC alignment but the `ObiwarpParam` block did not pass QC indices; the commented `PeakGroupsParam` alternative also used undefined `pdp_anchor` | P2 | The obiwarp block now builds `qc_idx`, uses `ObiwarpParam(..., subset = qc_idx, subsetAdjust = 'average')` when >=2 QCs are present, and clearly falls back to full-cohort alignment otherwise. The peakGroups alternative now defines `pdp_anchor`. | ran + docs | Installed xcms 4.4.0 vignette documents subset-based alignment for both parameter classes. Full serial execution against real faahKO passed: 10,826 obiwarp-adjusted peaks, `PeakGroupsParam(minFraction = 0.5)` QC subset OK, then 497 features, 137 residual NAs, CAMERA 497-row peaklist, and QC filters 497 -> 79 -> 32. All 8 fenced R blocks parse. |
+
+### Left unfixed
+
+None. All prior recommendations and the final-pass revisit item are resolved; no install, authentication, licence, data, or decision blocker remains.
