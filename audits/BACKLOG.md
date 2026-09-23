@@ -30,7 +30,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The examples contain the required imports but the corresponding inline blocks were changed independently.
 - Fix: Add library(dplyr) to the inline Milo library block and import tensorflow as tf to the inline scCODA block. Execute both inline paths, not only examples, on the saved synthetic fixture before re-audit.
 
-## P1 (157)
+## P1 (159)
 
 ### `bio-data-visualization-lollipop-protein-maps` — Shipped example never completes and paints wrong colours
 
@@ -1056,6 +1056,22 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: A property of conditional Shapley in general has been attributed to the tree_path_dependent implementation specifically, where the tree structure prevents it.
 - Fix: Restate the taxonomy row and the failure mode: under tree_path_dependent the credit split among correlated features that the model DOES use shifts toward the conditionally implied ones, which is why within-module ordering is not a finding. Reserve the 'nonzero credit to an entirely unused feature' statement for conditional estimators that sample from p(x_dropped \| x_S) without reference to the fitted structure, and align the prose with what examples/shap_omics_classifier.py already prints.
 
+### `bio-microbiome-taxonomy-assignment` — QIIME2 filter-seqs uses obsolete option names
+
+- Skill: 89, Production Ready · [mrsonord2240/bioSkills@60fd788](https://github.com/mrsonord2240/bioSkills/tree/60fd788ddba9db5cdfdd157003ee4274e5c47349/microbiome/taxonomy-assignment) · [viewer](skills/bio-microbiome-taxonomy-assignment/mrsonord2240-bioSkills@60fd788/viewer.md)
+- Observed in inputs: 6
+- Problem: The documented QIIME2 command uses --i-data and --o-filtered-data, which current QIIME2 rejected.
+- Root cause: The example was written for an older q2-taxa interface.
+- Fix: Replace those names with --i-sequences and --o-filtered-sequences, then rerun the fixture.
+
+### `bio-microbiome-taxonomy-assignment` — DADA2 wrong-reference guard accepts false labels
+
+- Skill: 89, Production Ready · [mrsonord2240/bioSkills@60fd788](https://github.com/mrsonord2240/bioSkills/tree/60fd788ddba9db5cdfdd157003ee4274e5c47349/microbiome/taxonomy-assignment) · [viewer](skills/bio-microbiome-taxonomy-assignment/mrsonord2240-bioSkills@60fd788/viewer.md)
+- Observed in inputs: 9
+- Problem: The documented all-NA genus sentinel passed a deliberately incompatible one-sequence reference and reported 770/770 genus calls.
+- Root cause: A nonzero assigned fraction is not evidence that a DADA2 reference matches marker or primer region.
+- Fix: Replace the all-NA-only sentinel with a validation check against an expected-region/reference manifest and flag implausible 100 percent single-lineage assignments. Keep the current non-degeneracy check only as a secondary diagnostic.
+
 ### `bio-single-cell-clustering` — The Skill's only operational stop rule never stops
 
 - Skill: 89, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/clustering) · [viewer](skills/bio-single-cell-clustering/GPTomics-bioSkills@d91ed3d/viewer.md)
@@ -1288,7 +1304,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (385)
+## P2 (384)
 
 ### `bio-data-visualization-lollipop-protein-maps` — HGVSp edge cases and recurrence semantics undocumented
 
@@ -3362,6 +3378,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: Both effects are real but their magnitude depends on the model and the feature correlation structure, and the Skill quantifies neither.
 - Fix: Soften both to what is reliably true and testable -- the tail of the ranking is unstable while the head often is not -- and tell the reader to measure it: rerun with two backgrounds or two seeds and report the rank overlap alongside the ranking.
 
+### `bio-microbiome-taxonomy-assignment` — DADA2 example exits with a post-output segmentation fault
+
+- Skill: 89, Production Ready · [mrsonord2240/bioSkills@60fd788](https://github.com/mrsonord2240/bioSkills/tree/60fd788ddba9db5cdfdd157003ee4274e5c47349/microbiome/taxonomy-assignment) · [viewer](skills/bio-microbiome-taxonomy-assignment/mrsonord2240-bioSkills@60fd788/viewer.md)
+- Observed in inputs: 2, 9
+- Problem: Both shipped-example invocations saved complete outputs then exited through a segmentation fault in this R runtime.
+- Root cause: Likely an R/DADA2 runtime teardown interaction; the source output was complete but the process status was nonzero.
+- Fix: Reproduce in a clean R session, report the exact DADA2/R build, and document or eliminate the crash before relying on shell exit status in automation.
+
 ### `bio-population-genetics-rare-variant-association` — SAIGE bgen command omits --chrom or --LOCO=FALSE
 
 - Skill: 89, Production Ready · [mrsonord2240/bioSkills@c1237cd](https://github.com/mrsonord2240/bioSkills/tree/c1237cdbc9bb199947696f3909de26a55d259116/population-genetics/rare-variant-association) · [viewer](skills/bio-population-genetics-rare-variant-association/mrsonord2240-bioSkills@c1237cd/viewer.md)
@@ -4057,22 +4081,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: Fresh real runs required roughly 35 minutes of reference placement/interpolation before producing outputs, while the Skill only says expensive work can take minutes.
 - Root cause: The performance caveat describes the BIOM-format waste but does not give a realistic planning expectation for a standard real-ASV run.
 - Fix: Add a brief runtime-planning note beside the main command, stating that a real several-hundred-ASV run can take tens of minutes and should be budgeted before launch.
-
-### `bio-microbiome-taxonomy-assignment` — SKILL.md's implied claim that multithread=FALSE gives assignTaxonomy() full bitwise identity at every rank is not quite accurate
-
-- Skill: 93, Production Ready · [mrsonord2240/bioSkills@7552317](https://github.com/mrsonord2240/bioSkills/tree/7552317238d4f383ac1fab825949294bfa667c96/microbiome/taxonomy-assignment) · [viewer](skills/bio-microbiome-taxonomy-assignment/mrsonord2240-bioSkills@7552317/viewer.md)
-- Observed in inputs: 11
-- Problem: Two independent seeded, single-threaded assignTaxonomy() runs on a fresh reference are not identical() -- 2/770 cells differ at the Kingdom and Order ranks (genus is unaffected, 0/770 differ). The DECIPHER section's assign_silva.R comment and the fix log both imply single-threading is a full fix for the small multithreaded residual the first fix pass disclosed; this re-audit shows it narrows but does not eliminate it.
-- Root cause: The residual is very likely a floating-point tie-breaking or accumulation-order effect inside DADA2's C implementation of the bootstrap classifier, present (at a smaller magnitude) regardless of thread count -- the first fixer diagnosed the multithreaded case but did not test whether multithread=FALSE alone was sufficient before recommending it as a workaround.
-- Fix: Soften the SKILL.md comment to state the reproducibility guarantee is at the genus rank (which is what the Skill's own scope statement -- 'genus at best' -- already cares about), rather than implying multithread=FALSE gives bitwise identity at every rank including Kingdom/Phylum/Class/Order/Family. No code change needed; a one-line wording correction.
-
-### `bio-microbiome-taxonomy-assignment` — No self-check anywhere in the Skill catches non-degenerate-output or run-to-run-reproducibility failures
-
-- Skill: 93, Production Ready · [mrsonord2240/bioSkills@7552317](https://github.com/mrsonord2240/bioSkills/tree/7552317238d4f383ac1fab825949294bfa667c96/microbiome/taxonomy-assignment) · [viewer](skills/bio-microbiome-taxonomy-assignment/mrsonord2240-bioSkills@7552317/viewer.md)
-- Observed in inputs: 4, 8
-- Problem: Three real defects across four audit passes (assignTaxonomy non-determinism, DECIPHER all-NA flattening, IdTaxa/LearnTaxa non-determinism) all shipped silently -- no example script or SKILL.md guidance includes a lightweight check (e.g. 'rerun and diff', or 'assert >0 non-NA calls') that would have caught any of them before a user did. Carried forward unchanged from the prior re-audit; this fix pass did not address it (reasonably, since it was P2 not P0).
-- Root cause: Examples are written to demonstrate the happy path only; none include a verification step.
-- Fix: Add a short 'sanity-check your output' pattern to both the DADA2 and DECIPHER sections: rerun the classification once and diff, or assert a non-trivial fraction of non-NA genus calls, before trusting the result for downstream analysis.
 
 ### `bio-pathway-enrichment-visualization` — treeplot-on-compareClusterResult crash is a live upstream bug worth periodic re-checking
 
