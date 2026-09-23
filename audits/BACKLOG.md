@@ -22,7 +22,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The example passes cluster_rows=<OLO dendrogram> together with row_split=gene_info$pathway, a combination ComplexHeatmap rejects; the script was never run.
 - Fix: Drop row_split or use a numeric row_split (works with the dendrogram), or apply OLO within each pathway group; supply a runnable data preamble and state the constraint in SKILL.md next to the OLO block.
 
-## P1 (159)
+## P1 (161)
 
 ### `bio-data-visualization-lollipop-protein-maps` — Shipped example never completes and paints wrong colours
 
@@ -1112,6 +1112,22 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: SKILL.md's Common Errors table documents the Key=Value mistake as a generic symptom ('filter keeps 0/all features') rather than warning that the console gives zero error signal when it happens, so a researcher has no way to know their run silently used defaults instead of their intended parameters.
 - Fix: Add an explicit Common Errors / Reliability row: 'A malformed or misspelled param-file key (e.g. Key=Value instead of Key: Value, or a typo'd key name) is silently ignored by the console -- exit code 0, no warning, defaults used instead. Always spot-check a run by deliberately varying one known parameter (e.g. Minimum peak height) and confirming the feature count actually changes, rather than trusting a clean exit code alone.'
 
+### `bio-workflows-metabolomics-pipeline` — Materialize and verify the Stage 1 mode lock
+
+- Skill: 91, Production Ready · [mrsonord2240/bioSkills@ac3fdd2](https://github.com/mrsonord2240/bioSkills/tree/ac3fdd24777613868e4328191dc274ed4c5ac162/workflows/metabolomics-pipeline) · [viewer](skills/bio-workflows-metabolomics-pipeline/mrsonord2240-bioSkills@ac3fdd2/viewer.md)
+- Observed in inputs: 10
+- Problem: The current Stage 1 script accepts ionization_mode but ends after featureDefinitions(xdata); it does not add defs$mode despite claiming that it carries the mode downstream.
+- Root cause: The intended defs$mode assignment described in the fix log and script comments was omitted from the executable script.
+- Fix: Immediately after featureDefinitions(xdata), set defs$mode <- ionization_mode and assert it is present and non-missing before returning Stage 1 outputs. Add this assertion to the bundled hand-off verification.
+
+### `bio-workflows-metabolomics-pipeline` — Bound Stage 1 parallel execution on Windows
+
+- Skill: 91, Production Ready · [mrsonord2240/bioSkills@ac3fdd2](https://github.com/mrsonord2240/bioSkills/tree/ac3fdd24777613868e4328191dc274ed4c5ac162/workflows/metabolomics-pipeline) · [viewer](skills/bio-workflows-metabolomics-pipeline/mrsonord2240-bioSkills@ac3fdd2/viewer.md)
+- Observed in inputs: 10
+- Problem: With the default backend, the real six-CDF run launched 22 Windows RSOCK workers and made no useful output during the audit window; serial registration completed successfully.
+- Root cause: The shipped Stage 1 script leaves BiocParallel backend selection implicit.
+- Fix: Accept an explicit BPPARAM or register a documented bounded backend before xcms calls, with SerialParam as the safe Windows fallback. Preserve user override for larger hosts.
+
 ### `bio-crispr-screens-base-editing-analysis` — Validate allele-string coordinate bounds before classification
 
 - Skill: 92, Production Ready · [mrsonord2240/bioSkills@dd1d90a](https://github.com/mrsonord2240/bioSkills/tree/dd1d90a9ae607f068d5ffda2e761e869f07decce/crispr-screens/base-editing-analysis) · [viewer](skills/bio-crispr-screens-base-editing-analysis/mrsonord2240-bioSkills@dd1d90a/viewer.md)
@@ -1296,7 +1312,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (379)
+## P2 (376)
 
 ### `bio-data-visualization-lollipop-protein-maps` — HGVSp edge cases and recurrence semantics undocumented
 
@@ -3897,30 +3913,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: Unchanged from the original audit: Monocle3/SeuratWrappers do not install on Windows in this environment (confirmed by TOOLS.md), so examples/monocle3_trajectory.R has never been executed by any audit.
 - Root cause: The Skill correctly frames Monocle3 as a documented alternative rather than the primary path (now that primary_tool is PAGA), but the shipped example itself carries no compatibility note of its own.
 - Fix: Add a one-line note at the top of examples/monocle3_trajectory.R matching the Installation section's Windows caveat, so an agent reading the example file alone (without SKILL.md context) is not misled.
-
-### `bio-workflows-metabolomics-pipeline` — MS-DIAL alternate entry point still has zero glue code
-
-- Skill: 92, Production Ready · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/workflows/metabolomics-pipeline) · [viewer](skills/bio-workflows-metabolomics-pipeline/mrsonord2240-bioSkills@6847328/viewer.md)
-- Observed in inputs: 5
-- Problem: The orchestrator still claims 'import the alignment-result table and enter the pipeline at Stage 2' with no code demonstrating the hand-off, unchanged from the pre-fix audit.
-- Root cause: msdial-preprocessing was not part of this round's fix batch, so this pointer was left as prose.
-- Fix: Add a short code snippet showing msdial-preprocessing's Alignment ID/Area export feeding directly into filter_peaks_by_fraction, mirroring the level of detail Stage 1's xcms entry point now has.
-
-### `bio-workflows-metabolomics-pipeline` — impute.QRILC has no explicit seed, so exact imputed values are not run-to-run reproducible
-
-- Skill: 92, Production Ready · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/workflows/metabolomics-pipeline) · [viewer](skills/bio-workflows-metabolomics-pipeline/mrsonord2240-bioSkills@6847328/viewer.md)
-- Observed in inputs: 2
-- Problem: Re-running Stage 2's Input 2 code on the identical real MTBLS79 data produced a different minimum imputed value (17.155 here vs 11.77 in the fixer's own verification run) -- same non-negative, NA-free outcome and identical downstream model-fit statistics (pR2Y=pQ2=0.001), but the imputed values themselves vary.
-- Root cause: imputeLCMD's impute.QRILC draws from a fitted distribution and is not seeded by the Stage 2 code block, unlike PerformPSEA elsewhere in the same pipeline which does call set.seed(123).
-- Fix: Add set.seed() immediately before the impute.QRILC call in Stage 2, matching the explicit seeding convention already used for PerformPSEA.
-
-### `bio-workflows-metabolomics-pipeline` — No bundled example runs a real Stage 1 xcms extraction into the rest of the pipeline
-
-- Skill: 92, Production Ready · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/workflows/metabolomics-pipeline) · [viewer](skills/bio-workflows-metabolomics-pipeline/mrsonord2240-bioSkills@6847328/viewer.md)
-- Observed in inputs: 3, 8
-- Problem: Both bundled examples start from a synthetic or cached featureValues()-shaped table; neither exercises real mzML -> xcms -> Stage 2 as part of one script.
-- Root cause: Deliberately deferred by the fixer (fix log 'Left unfixed') to xcms-preprocessing's own bundled-example scope, since it needs real instrument files.
-- Fix: A future third example chaining real (or cached) xcms output through all 5 stages would give full-pipeline regression coverage, but is reasonably out of scope for this fix round.
 
 ### `bio-metabolomics-pathway-mapping` — Stop after failed mummichog validation
 
