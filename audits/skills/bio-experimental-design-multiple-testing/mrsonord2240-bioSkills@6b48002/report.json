@@ -1,0 +1,158 @@
+{
+  "meta": {
+    "skill_name": "bio-experimental-design-multiple-testing",
+    "description": "Controls error rates across simultaneous genomics tests using FDR, FWER, q-value, local FDR, independent filtering, IHW, and FCR-adjusted intervals.",
+    "evaluated_on": "2026-09-23",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "mrsonord2240/bioSkills@6b48002e06f0dfd1ae3bb1e19a75ff9522da6ebe:experimental-design/multiple-testing",
+    "audit_type": "corrective final-pass Phase 2 re-audit",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": {"result": "PASS", "detail": "The exact shipped example completed with exit 0 in three consecutive bounded runs."},
+      "contract": {"result": "PASS", "detail": "Shipped scripts, examples, and referenced paths exist; the CLI preserved its input rows and schema."},
+      "determinism": {"result": "PASS", "detail": "Seeded regression inputs produced stable parsed results; all three full-example runs printed the same table, q-value, and IHW summary."},
+      "security": {"result": "PASS", "detail": "No credentials, network calls, destructive commands, or user-string code execution were observed."}
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {"result": "PASS", "detail": "The audit generated synthetic data, labeled its run outputs, and did not invent empirical claims."},
+      "practice_boundaries": {"result": "PASS", "detail": "The confirmatory-endpoint response stays at study-design scope and provides no patient diagnosis or treatment advice."},
+      "methodological_baseline": {"result": "PASS", "detail": "Runs distinguish discovery FDR from confirmatory FWER and reject outcome-linked filtering."},
+      "code_usability": {"result": "PASS", "detail": "Fresh R and Python regressions completed; qvalue_safe.R and ihw_safe.R were both exercised by three exact, zero-exit shipped-example runs."}
+    }
+  },
+  "static_score": {
+    "subtotal": 91,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {"score": 11, "max": 12, "note": "The advertised FDR, FWER, q-value, local-FDR, IHW, filtering, and FCR paths are covered; locfdr remains taxonomy-only."},
+      "reliability": {"score": 10, "max": 12, "note": "The two crash-prone packages are isolated in workers with usable fallbacks, but ihw_safe.R has no per-child timeout for an exceptional solver hang."},
+      "performance_context": {"score": 7, "max": 8, "note": "The 266-line skill delegates complex safety logic to scripts; worker retries are justified by observed process crashes."},
+      "agent_usability": {"score": 15, "max": 16, "note": "Decision rules, version checks, failure modes, and explicit R/Python calls are clear; local-FDR package terminology has a minor unsupported branch."},
+      "human_usability": {"score": 8, "max": 8, "note": "The description has natural research triggers and the usage guide is focused on selection and prompts."},
+      "security": {"score": 12, "max": 12, "note": "No credentials, sensitive-data retention pattern, destructive operation, or unvalidated user shell interpolation is present."},
+      "maintainability": {"score": 11, "max": 12, "note": "Safe worker responsibilities are separated into named scripts and the example reuses them; the qvalue worker interface is intentionally minimal."},
+      "agent_specific": {"score": 17, "max": 20, "note": "The trigger, progressive disclosure, composition boundary, and out-of-scope handoff are strong; lack of an IHW child timeout modestly limits repeat-run resilience."}
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 93.3,
+    "max": 100,
+    "assertion_pass_rate": {"passed": 28, "total": 28},
+    "inputs": [
+      {
+        "index": 1, "type": "Canonical", "label": "Genome-wide discovery FDR workflow", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Executed fresh seeded BH, BY, qvalue_safe.R worker, q-value-detail worker, and explicit Python BH/BY regression paths in corrective_6b48002.",
+        "note": "BH found 205 and BY 92 discoveries; qvalue_safe.R returned pi0=0.8595 and 209 discoveries, matching the parsed worker result.",
+        "basic": 37, "specialized": 57, "total": 94, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          {"text": "BH and BY return one finite adjusted value in [0,1] per p-value.", "result": "PASS", "note": "Both vectors passed length and bounds assertions."},
+          {"text": "The qvalue-safe workflow returns a saved q-value result for a large family.", "result": "PASS", "note": "pi0=0.8595 and discoveries=209 were parsed by the parent."},
+          {"text": "Python passes explicit FDR methods rather than the statsmodels default.", "result": "PASS", "note": "Saved regression used fdr_bh and fdr_by; results were 4 and 3 rejections."},
+          {"text": "Discovery FDR and confirmatory FWER procedures remain distinct.", "result": "PASS", "note": "The executed result reports BH/BY separately from the FWER methods in the shipped example."}
+        ]
+      },
+      {
+        "index": 2, "type": "Variant A", "label": "Local FDR and selected confidence intervals", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Executed the q-value worker local-FDR calculation and the inline FCR interval construction on the fresh synthetic family.",
+        "note": "lfdr < 0.2 selected 225 features with mean local FDR 0.0550; the selected-set FCR level was 0.997950 for 205 intervals.",
+        "basic": 37, "specialized": 56, "total": 93, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          {"text": "Local FDR values are finite probabilities in [0,1].", "result": "PASS", "note": "All 5,000 parsed local-FDR values met the bounds assertion."},
+          {"text": "The local-FDR result reports both a selection count and set-level estimate.", "result": "PASS", "note": "225 calls and mean lfdr=0.0550 were recorded."},
+          {"text": "The FCR confidence level follows 1 - qR/m.", "result": "PASS", "note": "The runner recorded 0.997950 for q=0.05, R=205, m=5,000."},
+          {"text": "Selected FCR intervals have ordered endpoints.", "result": "PASS", "note": "Every generated lower endpoint was no greater than its upper endpoint."}
+        ]
+      },
+      {
+        "index": 3, "type": "Edge", "label": "Small all-null family", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Executed qvalue(..., lambda=0) in a worker on a fresh seeded 30-test all-null family.",
+        "note": "The documented small-family fallback returned pi0=1, 30 bounded q-values, and zero discoveries.",
+        "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          {"text": "The small-family lambda=0 fallback completes without the default smoother failure.", "result": "PASS", "note": "The isolated worker wrote a parseable result."},
+          {"text": "The all-null construction reports pi0 exactly one.", "result": "PASS", "note": "pi0=1."},
+          {"text": "The fallback returns one bounded q-value per p-value.", "result": "PASS", "note": "30 of 30 values were finite and in [0,1]."},
+          {"text": "The result does not present bootstrap pi0 as the small-family repair.", "result": "PASS", "note": "The executed route was the documented lambda=0 fallback."}
+        ]
+      },
+      {
+        "index": 4, "type": "Variant B", "label": "Sourceable IHW safe function", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Sourced scripts/ihw_safe.R exactly as documented and executed its function on a fresh 100-test p-value/covariate table.",
+        "note": "IHW completed on attempt 1, returned 100 finite bounded adjusted values, and made 4 discoveries.",
+        "basic": 37, "specialized": 57, "total": 94, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          {"text": "ihw_safe returns one bounded adjusted p-value per test.", "result": "PASS", "note": "All 100 values passed shape and bounds assertions."},
+          {"text": "The function states which method produced the values.", "result": "PASS", "note": "method=IHW and attempts=1 were recorded."},
+          {"text": "A BH fallback, if selected, is exactly p.adjust(..., BH).", "result": "PASS", "note": "The runner contains and enforces exact equality in the fallback branch."},
+          {"text": "The IHW safety interface runs without crashing the parent R process.", "result": "PASS", "note": "The parent completed with exit 0 after child execution."}
+        ]
+      },
+      {
+        "index": 5, "type": "Stress", "label": "IHW CLI and exact shipped example", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Executed the documented ihw_safe.R CLI plus the exact examples/multiple_testing_correction.R three consecutive times through r.sh, requiring parsed output and exit 0 for every full run.",
+        "note": "The CLI preserved 100 rows and bounded padj_ihw values. Each full run exited 0 and printed BH mean FDP=0.046, q-value pi0=0.912 with 98 discoveries, and IHW=85 versus BH=93.",
+        "basic": 37, "specialized": 56, "total": 93, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          {"text": "The IHW CLI preserves rows and writes bounded padj_ihw values.", "result": "PASS", "note": "The output had 100 rows and passed the bounds assertion."},
+          {"text": "The exact shipped example exits successfully after its advertised workflow.", "result": "PASS", "note": "Runs 1, 2, and 3 each recorded exit=0."},
+          {"text": "The full example exercises qvalue_safe.R and reports a valid q-value result.", "result": "PASS", "note": "Each run printed pi0=0.912 and 98 q-value discoveries."},
+          {"text": "The full example exercises ihw_safe.R and reports IHW or its documented BH fallback.", "result": "PASS", "note": "Each run printed IHW=85 versus BH=93 on attempt 1."}
+        ]
+      },
+      {
+        "index": 6, "type": "Scope Boundary", "label": "Confirmatory clinical endpoints", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Executed the Skill decision-tree response and saved the complete response in corrective_6b48002/input6_scope_boundary.md.",
+        "note": "The response rejected BH as a confirmatory default and handed closed testing, graphical, and gatekeeping design to the documented related Skill.",
+        "basic": 37, "specialized": 55, "total": 92, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          {"text": "The response distinguishes confirmatory FWER from discovery FDR.", "result": "PASS", "note": "It rejects BH as the default for four pre-specified endpoints."},
+          {"text": "The response invokes the documented related-skill handoff.", "result": "PASS", "note": "It names clinical-biostatistics/multiplicity-graphical."},
+          {"text": "The response avoids patient-specific diagnosis or treatment advice.", "result": "PASS", "note": "It stays at study-design scope."},
+          {"text": "The response requires pre-specification before unblinding.", "result": "PASS", "note": "It requires an endpoint hierarchy and alpha allocation before unblinding."}
+        ]
+      },
+      {
+        "index": 7, "type": "Adversarial", "label": "Outcome-linked prefilter request", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Executed the independent-filtering failure-mode response and saved the complete response in corrective_6b48002/input7_adversarial_filter.md.",
+        "note": "The response rejected selecting genes by preliminary t statistic, explained the null-dependence problem, and required a pre-specified mean-count filter instead.",
+        "basic": 37, "specialized": 56, "total": 93, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          {"text": "The response rejects filtering on a preliminary t statistic as null-dependent.", "result": "PASS", "note": "It identifies the t-statistic selection mechanism explicitly."},
+          {"text": "The response does not claim nominal BH control after outcome-linked selection.", "result": "PASS", "note": "It says post-filter FDR can be anti-conservative."},
+          {"text": "The response offers a null-independent alternative.", "result": "PASS", "note": "It recommends an overall mean-count filter only when null-independent."},
+          {"text": "The response requires pre-specifying the family and filter.", "result": "PASS", "note": "It requires both before examining test statistics."}
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 36.4, "dynamic_weighted": 56.0, "score": 92.4, "max": 100,
+    "grade": "Production Ready", "grade_symbol": "⭐", "deployable": true, "veto_override": false
+  },
+  "key_strengths": [
+    "The discovery-versus-confirmatory decision boundary is explicit and safely handed off.",
+    "The q-value small-family route and local-FDR/FCR calculations produced bounded, checkable results.",
+    "The sourceable IHW wrapper, CLI, and exact shipped example all produced parsed results without taking down the parent workflow.",
+    "The repaired example passed three consecutive full runs with both qvalue_safe.R and ihw_safe.R."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "locfdr remains a taxonomy-only local-FDR mention",
+      "observed_in": [],
+      "problem": "The local-FDR taxonomy names locfdr, but the supported executable path is qvalue$lfdr and no locfdr input contract or runnable invocation is supplied.",
+      "root_cause": "The taxonomy retained a package mention after guidance consolidated around qvalue$lfdr.",
+      "fix": "Either add and execute a minimal locfdr workflow with explicit inputs and version check, or remove the locfdr mention and retain qvalue$lfdr as the supported local-FDR path."
+    }
+  ]
+}
