@@ -128,3 +128,17 @@ Added to the guide: one AP-MS example prompt.
 | `references/affinity_enrichment.md` scorer | `scripts/apms_score.py` | CLI + import; ran on `apms_lfq.csv`: 17 called |
 | `references/tmt_isobaric.md` SL + IRS block | deleted, points at `examples/lfq_normalization.py` | duplicated the example |
 | `references/tmt_isobaric.md` TMT reporter R block, `silac_log2_ratio`, median centering | kept inline | short code; rest is CoA guidance |
+
+---
+
+# Final pass Phase 1 — 2026-09-23
+
+Worktree `F:\OpenScience\wt\proteomics-quantification`, branch `fix/proteomics-quantification`, commit `fb1efc10a979717f1fc66a48a6a8b12e95aa6401`. Runtime: Python 3.12 shared venv (numpy 2.5.3, pandas 3.0.5); R 4.4.3 via `r.sh` (MSstats 4.14.2, iq 2.0.1, MSnbase 2.32.0).
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| `silac_labeling_efficiency` reads incorporation falsely low when a heavy-only pilot includes Pro-containing peptides affected by Arg->Pro conversion (Revisit list) | P1 | When `Sequence` is available, calculate incorporation only on Pro-free signal peptides; report `n_signal_peptides`, `pro_containing_excluded`, and `sequence_column_used`; update the SILAC reference and exercise the public example through the helper | ran: seeded 1,000-peptide pilot at 0.93 incorporation / 0.10 conversion returned 0.9300 after excluding 759 Pro-containing peptides; unsafe all-peptide fallback read 0.9186; CLI JSON, all-Pro guard, `py_compile`, and every example assertion passed | Sequence-free inputs retain the old all-peptide calculation but explicitly report `sequence_column_used: false`, so they are not silently treated as conversion-safe |
+
+## Left unfixed / checkpoint blocker
+
+- **P1 verification limitation — TMT reporter R block:** `MSnbase::quantify` -> `purityCorrect` produced and asserted a 24 x 10 reporter matrix with 0 negative values on `tmt10_synthetic.mzML`, but the R process exits 11 after output. A separate `library(MSnbase)` probe also exits 11 and warns that `mzR` was built against Rcpp 1.0.13 while Rcpp 1.1.1 is installed. A private binary `mzR` kept the mismatch; a private source rebuild failed at `boost/regex/v4/regex.hpp` missing. The shared R library was not changed. Resolving this needs a compatible mzR/Rcpp build for the audit R 4.4.3 environment (or an approved environment rebuild); all source-side TMT assertions otherwise pass.
