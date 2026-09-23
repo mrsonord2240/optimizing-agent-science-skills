@@ -30,7 +30,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The audit R library has incompatible compiled components; Phase 1 identified mzR built against Rcpp 1.0.13 while Rcpp 1.1.1 is installed, and a private mzR source build lacks boost/regex/v4/regex.hpp.
 - Fix: Provision an isolated R 4.4.3 library with mutually compatible Rcpp, mzR, MSnbase, MSstats, and Arrow binaries or complete the approved source-build prerequisites. Re-run Inputs 1, 4, 8, and 9 and require clean exit 0 before deployment.
 
-## P1 (157)
+## P1 (156)
 
 ### `bio-data-visualization-lollipop-protein-maps` — Shipped example never completes and paints wrong colours
 
@@ -872,22 +872,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: `datasets rehydrate`'s local-state check appears to be presence-only (does a file exist at the expected relative path), not a size or checksum comparison against the values it itself records in dataset_catalog.json.uncompressedLengthBytes.
 - Fix: Add a step to bulk_dehydrated.sh (and a note in SKILL.md's Checksum verification section) that independently verifies file size against dataset_catalog.json's uncompressedLengthBytes (or re-downloads into a clean directory) after the aria2c leg, rather than trusting `datasets rehydrate`'s 'already rehydrated' report as a correctness signal. Downgrade the 'Rehydrate workflows also verify' claim to state this limitation explicitly.
 
-### `bio-causal-genomics-genomic-sem` — commonfactorGWAS() Q_SNP does not discriminate under DWLS on two independent synthetic panels
-
-- Skill: 88, Production Ready · [mrsonord2240/bioSkills@c602f2a](https://github.com/mrsonord2240/bioSkills/tree/c602f2a0fe25fff9502210b062d195aa0a69b214/causal-genomics/genomic-sem) · [viewer](skills/bio-causal-genomics-genomic-sem/mrsonord2240-bioSkills@c602f2a/viewer.md)
-- Observed in inputs: 2, 8
-- Problem: Under estimation='DWLS' (the Skill's own documented default), commonfactorGWAS()'s Q_pval failed to distinguish the 5 planted heterogeneous SNPs from the 5 planted factor SNPs on both a flat-SE synthetic panel (Input 2, matching the fix log's own finding) and a realistic MAF/N-driven-SE panel built specifically to test whether SE-flatness was the cause (Input 8). ML correctly discriminated on both identical inputs.
-- Root cause: Not fully confirmed. Both panels bypass ldsc() and supply no per-SNP N column, so the true per-SNP sampling-covariance structure a real ldsc()+sumstats() pipeline would carry is absent -- exactly the scenario SKILL.md's own 'Sample overlap mis-specified' section already warns against ('Never construct S manually from rg estimates' / always use ldsc() output). Whether this is a DWLS-specific statistical weakness or purely an artifact of bypassing ldsc() is not yet settled.
-- Fix: Add a note under 'Common-Factor GWAS with Q_SNP' recommending a cross-check with estimation='ML' specifically for the Q_SNP classification step until this is verified against a real ldsc()-derived V with per-SNP N; flag DWLS Q_pval results as provisional when V/N come from anything other than a genuine ldsc() call.
-
-### `bio-causal-genomics-genomic-sem` — commonfactor() and usermodel() name the same standardized-loading quantity differently
-
-- Skill: 88, Production Ready · [mrsonord2240/bioSkills@c602f2a](https://github.com/mrsonord2240/bioSkills/tree/c602f2a0fe25fff9502210b062d195aa0a69b214/causal-genomics/genomic-sem) · [viewer](skills/bio-causal-genomics-genomic-sem/mrsonord2240-bioSkills@c602f2a/viewer.md)
-- Observed in inputs: 4
-- Problem: commonfactor() returns the standardized loading in a column named 'Standardized_Est'; usermodel() returns the identical conceptual quantity in a column named 'STD_Genotype'. Neither SKILL.md nor usage-guide.md documents this difference; this audit's own extraction script crashed on first attempt because of it.
-- Root cause: The two GenomicSEM functions were implemented with independently-named output columns; SKILL.md's workflow snippets print raw result objects rather than extracting specific named columns, so the inconsistency was never surfaced in the Skill's own examples.
-- Fix: Add a one-line note in the Standard Workflow or Common Errors section: "commonfactor() names its standardized-loading column 'Standardized_Est'; usermodel() and commonfactorGWAS()-family functions may use 'STD_Genotype' instead -- check names(result$results) before extracting by column name."
-
 ### `bio-causal-genomics-proteome-mr-drug-target` — mr_ivw namespace collision between TwoSampleMR and MendelianRandomization
 
 - Skill: 88, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/causal-genomics/proteome-mr-drug-target) · [viewer](skills/bio-causal-genomics-proteome-mr-drug-target/GPTomics-bioSkills@d91ed3d/viewer.md)
@@ -1248,6 +1232,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The final-pass checkpoint deliberately deferred the large, lower-priority legacy dependency pending a product decision.
 - Fix: Either approve a dedicated DEPICT environment and data download for a future pass, or make its documentation explicitly citation-only like INQUISIT so users do not infer local executability.
 
+### `bio-causal-genomics-genomic-sem` — Exercise real LDSC and stratified branches
+
+- Skill: 94, Production Ready · [mrsonord2240/bioSkills@5475243](https://github.com/mrsonord2240/bioSkills/tree/547524301ce5ee3cedf6cae70d5204e9c0d013f2/causal-genomics/genomic-sem) · [viewer](skills/bio-causal-genomics-genomic-sem/mrsonord2240-bioSkills@5475243/viewer.md)
+- Observed in inputs: —
+- Problem: ldsc(), sumstats(), s_ldsc() and enrich() have not been executed end to end in this environment.
+- Root cause: The required aligned >=3-trait inputs, eur_w_ld_chr, 1000G MAF reference and baselineLD_v2.2 are absent.
+- Fix: When those public references are provisioned, run the bundled example and stratified path with an independently checked positive-control dataset.
+
 ### `bio-pathway-kegg-pathways` — graphite route disagrees with direct spia() on perturbation direction for 30% of pathways, undocumented
 
 - Skill: 94, Production Ready · [mrsonord2240/bioSkills@424a053](https://github.com/mrsonord2240/bioSkills/tree/424a0533ba4b67063c884886c727b1f3ecab6342/pathway-analysis/kegg-pathways) · [viewer](skills/bio-pathway-kegg-pathways/mrsonord2240-bioSkills@424a053/viewer.md)
@@ -1288,7 +1280,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (415)
+## P2 (414)
 
 ### `bio-data-visualization-lollipop-protein-maps` — HGVSp edge cases and recurrence semantics undocumented
 
@@ -3002,22 +2994,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The Skill's worked examples focus on genome/gene; virus was likely added to the scope table without a matching code-pattern section.
 - Fix: Add a short 'Download virus assemblies' code pattern alongside the existing genome/gene patterns, including a dataformat tsv virus-genome --fields example verified against a live --help catalog.
 
-### `bio-causal-genomics-genomic-sem` — Second-order p-factor identification rule not stated
-
-- Skill: 88, Production Ready · [mrsonord2240/bioSkills@c602f2a](https://github.com/mrsonord2240/bioSkills/tree/c602f2a0fe25fff9502210b062d195aa0a69b214/causal-genomics/genomic-sem) · [viewer](skills/bio-causal-genomics-genomic-sem/mrsonord2240-bioSkills@c602f2a/viewer.md)
-- Observed in inputs: 9
-- Problem: SKILL.md's '>=3 indicators to identify a factor' rule (stated for first-order common-factor/usermodel fits) is not stated as applying to the second-order p-factor itself. This audit confirmed a 2-first-order-factor p reproduces the same under-identification symptom ('information matrix could not be inverted') as the documented 2-trait first-order case.
-- Root cause: The Higher-Order/Bifactor/p-Factor section's template happens to use 3 first-order factors (INT/EXT/THT) without stating why that count matters at the second order too.
-- Fix: Add one sentence to the Higher-Order/Bifactor/p-Factor Models section: the second-order p-factor itself needs >=3 first-order factors to identify, by the same rule already stated for first-order models.
-
-### `bio-causal-genomics-genomic-sem` — SKILL.md line count and reference-table placement push against progressive-disclosure guidance
-
-- Skill: 88, Production Ready · [mrsonord2240/bioSkills@c602f2a](https://github.com/mrsonord2240/bioSkills/tree/c602f2a0fe25fff9502210b062d195aa0a69b214/causal-genomics/genomic-sem) · [viewer](skills/bio-causal-genomics-genomic-sem/mrsonord2240-bioSkills@c602f2a/viewer.md)
-- Observed in inputs: —
-- Problem: SKILL.md is now 506 lines (up from 481 pre-fix), mixing decision-tree tables, failure-mode tables, and full code examples in one file with no references/ subfolder.
-- Root cause: All content, including the new Version Compatibility/Scope Boundary sections, was authored directly into SKILL.md rather than split by depth-of-need.
-- Fix: Move the failure-mode and reconciliation tables into a references/ file, keeping SKILL.md to the decision tree and the minimal end-to-end workflow. Carried over from the pre-fix audit; the fixer explicitly declined this as out-of-scope-for-a-minimal-diff.
-
 ### `bio-causal-genomics-proteome-mr-drug-target` — No concrete path to a local LD reference panel
 
 - Skill: 88, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/causal-genomics/proteome-mr-drug-target) · [viewer](skills/bio-causal-genomics-proteome-mr-drug-target/GPTomics-bioSkills@d91ed3d/viewer.md)
@@ -4401,6 +4377,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The tissue-unknown branch correctly calls for LDSC-SEG and S-MultiXcan but those tools were unavailable in this environment, so it could only be scored by inspection.
 - Root cause: Those components are owned by adjacent skills and are not provisioned by the folder environment.
 - Fix: Add a minimal cross-skill executable handoff or label this row planning-only until the adjacent tool environments are available.
+
+### `bio-causal-genomics-genomic-sem` — Document Windows post-output R exit 139 operationally
+
+- Skill: 94, Production Ready · [mrsonord2240/bioSkills@5475243](https://github.com/mrsonord2240/bioSkills/tree/547524301ce5ee3cedf6cae70d5204e9c0d013f2/causal-genomics/genomic-sem) · [viewer](skills/bio-causal-genomics-genomic-sem/mrsonord2240-bioSkills@5475243/viewer.md)
+- Observed in inputs: 1, 2, 3, 4, 5, 7, 8, 9, 10
+- Problem: This runtime reports exit 139 after valid GenomicSEM output materializes, which can mislead automation that trusts exit codes alone.
+- Root cause: Observed in the local Windows R runtime rather than in skill logic.
+- Fix: Keep content assertions in automation and document the host-runtime caveat in environment tooling, not as a scientific-method claim.
 
 ### `bio-crispr-screens-screen-qc` — Documented sgRNA-identifier-column requirement is not enforced by validate_counts()
 

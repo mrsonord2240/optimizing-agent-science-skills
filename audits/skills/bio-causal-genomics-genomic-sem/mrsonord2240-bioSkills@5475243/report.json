@@ -1,0 +1,68 @@
+{
+  "meta": {
+    "skill_name": "bio-causal-genomics-genomic-sem",
+    "description": "Population-level GenomicSEM workflow for LDSC-derived genetic covariance, factor models, multivariate GWAS, and Q_SNP interpretation.",
+    "evaluated_on": "2026-09-23",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 11,
+    "source": "mrsonord2240/bioSkills@547524301ce5ee3cedf6cae70d5204e9c0d013f2:causal-genomics/genomic-sem",
+    "branch": "fix/causal-genomics-genomic-sem",
+    "worktree": "F:\\OpenScience\\wt\\causal-genomics-genomic-sem",
+    "re_audit_of": "2026-09-17 report archived at F:\\OpenScience\\audits\\_pre-fix-20260923\\bio-causal-genomics-genomic-sem",
+    "runtime": "GenomicSEM 0.0.5 + lavaan 0.6.19 through r_gsem.sh; shared r.sh library uses lavaan 0.7.2",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md"
+  },
+  "veto_gates": {
+    "skill_veto": {"gate":"PASS","stability":"PASS","contract":"PASS","determinism":"PASS","security":"PASS"},
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {"result":"PASS","detail":"All numerical checks use explicitly synthetic planted-truth fixtures; no clinical or literature facts were invented."},
+      "practice_boundaries": {"result":"PASS","detail":"The shipped Scope Boundary was directly applied to the individual diagnostic request in Input 6."},
+      "methodological_ground": {"result":"PASS","detail":"The workflow rejects two-trait under-identification, retains the LDSC S+V requirement, and labels DWLS Q_SNP provisional pending ML cross-check."},
+      "code_usability": {"result":"PASS","detail":"Nine regression paths and two fresh paths materialized asserted output; all seven R fences, both R files, and the Bash example syntax-checked."}
+    }
+  },
+  "static_score": {
+    "subtotal": 97,
+    "max": 100,
+    "categories": {
+      "functional_suitability":{"score":12,"max":12,"note":"Covers the declared CFA, usermodel, commonfactorGWAS, userGWAS, MTAG and stratified routes with explicit selection guidance."},
+      "reliability":{"score":11,"max":12,"note":"Version pin, failure-mode references and hard identification stops are strong; real LDSC-reference branches remain unexecuted here."},
+      "performance_context":{"score":8,"max":8,"note":"283-line entrypoint and indexed references provide effective progressive disclosure."},
+      "agent_usability":{"score":16,"max":16,"note":"Decision tree, named result columns, errors and exact helper invocation are actionable."},
+      "human_usability":{"score":7,"max":8,"note":"Technical by necessity; the usage guide and reference index make recovery discoverable."},
+      "security":{"score":12,"max":12,"note":"No credentials, raw eval/exec, destructive commands or individual-data workflow found."},
+      "maintainability":{"score":12,"max":12,"note":"Runnable Q_SNP logic is extracted to a documented script and every referenced file exists."},
+      "agent_specific":{"score":19,"max":20,"note":"Precise trigger, scope escape hatch, composable sibling links and reference routing; external reference-data setup is necessarily substantial."}
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 92.6,
+    "max": 100,
+    "assertion_pass_rate":{"passed":33,"total":33},
+    "inputs":[
+      {"index":1,"type":"Canonical","label":"Regression common-factor CFA, four planted traits","status":"COMPLETED","status_flag":"✅","executed":true,"execution_note":"r_gsem.sh materialized DWLS and ML fits; Windows R then exited 139 after output. Both recovered 0.75/0.65/0.70/0.55 exactly.","note":"CFI=1 and max loading error=0.","basic":38,"specialized":56,"total":94,"assertions_passed":3,"assertions_total":3,"assertions":[{"text":"DWLS fits","result":"PASS","note":"Fit materialized."},{"text":"ML fits","result":"PASS","note":"Fit materialized."},{"text":"Loadings recover planted truth","result":"PASS","note":"max error 0."}]},
+      {"index":2,"type":"Variant A","label":"Regression commonfactorGWAS Q_SNP panel","status":"COMPLETED","status_flag":"✅","executed":true,"execution_note":"Both estimators materialized results before the known post-output exit 139.","note":"DWLS Q_pval remained non-discriminating as the Skill warns; ML separated all five heterogeneous SNPs.","basic":37,"specialized":55,"total":92,"assertions_passed":3,"assertions_total":3,"assertions":[{"text":"DWLS result table exists","result":"PASS","note":"20 rows printed."},{"text":"ML cross-check separates planted heterogeneity","result":"PASS","note":"all five Q_pval<1e-4."},{"text":"DWLS result is treated as provisional","result":"PASS","note":"Matches explicit shipped caveat."}]},
+      {"index":3,"type":"Edge","label":"Regression Heywood diagnosis","status":"COMPLETED","status_flag":"✅","executed":true,"execution_note":"Both fits materialized before exit 139.","note":"BMI loading ~1.06 and two Heywood flags recover the planted near-collinearity.","basic":36,"specialized":54,"total":90,"assertions_passed":3,"assertions_total":3,"assertions":[{"text":"Both estimators run","result":"PASS","note":"DWLS and ML printed fits."},{"text":"Heywood signal detected","result":"PASS","note":"two flags."},{"text":"Fit diagnostic is reported","result":"PASS","note":"CFI and SRMR printed."}]},
+      {"index":4,"type":"Variant B","label":"Regression two-factor usermodel","status":"COMPLETED","status_flag":"✅","executed":true,"execution_note":"Both fits materialized before exit 139.","note":"Six loadings and rF=0.4000 were exactly recovered.","basic":38,"specialized":56,"total":94,"assertions_passed":3,"assertions_total":3,"assertions":[{"text":"DWLS usermodel runs","result":"PASS","note":"fit printed."},{"text":"ML usermodel runs","result":"PASS","note":"fit printed."},{"text":"Parameters recover truth","result":"PASS","note":"exact."}]},
+      {"index":5,"type":"Stress","label":"Regression userGWAS custom direct path","status":"COMPLETED","status_flag":"✅","executed":true,"execution_note":"DWLS output materialized before exit 139; expected ML singularity was caught and printed.","note":"rs3 direct effect=0.1000 and other direct effects <0.02.","basic":37,"specialized":55,"total":92,"assertions_passed":3,"assertions_total":3,"assertions":[{"text":"DWLS userGWAS runs","result":"PASS","note":"six SNP rows."},{"text":"Planted direct path recovers","result":"PASS","note":"rs3=0.1000."},{"text":"Output column semantics are correct","result":"PASS","note":"chisq fields, not Q_pval."}]},
+      {"index":6,"type":"Scope Boundary","label":"Regression individual PGS diagnostic request","status":"COMPLETED","status_flag":"✅","executed":true,"execution_note":"Direct Mode-A execution of the shipped Scope Boundary; no external program is applicable.","note":"Declines individual prediction and redirects to population-level inference and a clinician/genetic counselor.","basic":38,"specialized":56,"total":94,"assertions_passed":3,"assertions_total":3,"assertions":[{"text":"No diagnosis given","result":"PASS","note":"Explicit decline."},{"text":"Population scope stated","result":"PASS","note":"Aggregate GWAS framing."},{"text":"Safe redirect present","result":"PASS","note":"Qualified professional named."}]},
+      {"index":7,"type":"Adversarial","label":"Regression forced two-trait factor","status":"COMPLETED","status_flag":"✅","executed":true,"execution_note":"Both estimators returned the documented under-identification error before the post-output exit 139.","note":"df=-1 error supplies both valid remedies.","basic":38,"specialized":56,"total":94,"assertions_passed":3,"assertions_total":3,"assertions":[{"text":"Invalid model is rejected","result":"PASS","note":"No numeric result."},{"text":"Reason is specific","result":"PASS","note":"df=-1."},{"text":"Recovery is supplied","result":"PASS","note":"constraint or third trait."}]},
+      {"index":8,"type":"Variant B","label":"Regression MAF/N-driven Q_SNP panel","status":"COMPLETED","status_flag":"✅","executed":true,"execution_note":"Both estimator outputs materialized before exit 139.","note":"Realistic SE did not repair DWLS Q_SNP; ML again discriminated, supporting the documented cross-check.","basic":37,"specialized":55,"total":92,"assertions_passed":3,"assertions_total":3,"assertions":[{"text":"MAF/N SE varies","result":"PASS","note":"0.00637-0.01069."},{"text":"ML separates classes","result":"PASS","note":"five heterogeneous SNPs."},{"text":"Caveat is represented","result":"PASS","note":"No overclaim about DWLS."}]},
+      {"index":9,"type":"Stress","label":"Regression higher-order p-factor","status":"COMPLETED","status_flag":"✅","executed":true,"execution_note":"Two-factor preliminary model exposed non-identification warnings; 3-factor DWLS and ML fits materialized before exit 139.","note":"3-factor p-model succeeds with CFI=1; preliminary model shows singular information matrix.","basic":35,"specialized":53,"total":88,"assertions_passed":3,"assertions_total":3,"assertions":[{"text":"Two-factor p warning observed","result":"PASS","note":"NaN SE/information matrix warning."},{"text":"Three-factor p model runs","result":"PASS","note":"both estimators."},{"text":"Identification boundary is not hidden","result":"PASS","note":"warning retained."}]},
+      {"index":10,"type":"Fresh","label":"Extracted commonfactor_gwas_qsnp.R helper","status":"COMPLETED","status_flag":"✅","executed":true,"execution_note":"Fixture preparation and assertion scripts exited 0; helper materialized a TSV then Windows R exited 139.","note":"20-row TSV parsed with all required columns, finite DWLS/ML Q values, unique SNPs and four factor_only calls.","basic":39,"specialized":56,"total":95,"assertions_passed":3,"assertions_total":3,"assertions":[{"text":"CLI helper writes TSV","result":"PASS","note":"20 rows."},{"text":"Required columns exist","result":"PASS","note":"six checked."},{"text":"Output parses and is finite","result":"PASS","note":"assertion script exit 0."}]},
+      {"index":11,"type":"Fresh","label":"Bundled lavaan version-guard branches","status":"COMPLETED","status_flag":"✅","executed":true,"execution_note":"Both R wrapper checks exited 0.","note":"Pinned 0.6.19 produced zero warnings; shared 0.7.2 produced one expected warning.","basic":38,"specialized":56,"total":94,"assertions_passed":3,"assertions_total":3,"assertions":[{"text":"Pinned runtime is silent","result":"PASS","note":"0 warnings."},{"text":"Unsupported runtime warns","result":"PASS","note":"1 warning."},{"text":"Shipped R and Bash code parses","result":"PASS","note":"7 fences, 2 R files, 1 Bash file."}]}
+    ]
+  },
+  "final":{"static_weighted":38.8,"dynamic_weighted":55.6,"score":94,"max":100,"grade":"Production Ready","grade_symbol":"⭐","deployable":true,"veto_override":false},
+  "key_strengths":["Pinned dependency combination repairs all core GenomicSEM entry points.","The extracted Q_SNP helper is directly runnable and validates its output shape.","Scope and identification safeguards are explicit and executed."],
+  "recommendations":[
+    {"priority":"P1","title":"Exercise real LDSC and stratified branches","observed_in":[],"problem":"ldsc(), sumstats(), s_ldsc() and enrich() have not been executed end to end in this environment.","root_cause":"The required aligned >=3-trait inputs, eur_w_ld_chr, 1000G MAF reference and baselineLD_v2.2 are absent.","fix":"When those public references are provisioned, run the bundled example and stratified path with an independently checked positive-control dataset."},
+    {"priority":"P2","title":"Document Windows post-output R exit 139 operationally","observed_in":[1,2,3,4,5,7,8,9,10],"problem":"This runtime reports exit 139 after valid GenomicSEM output materializes, which can mislead automation that trusts exit codes alone.","root_cause":"Observed in the local Windows R runtime rather than in skill logic.","fix":"Keep content assertions in automation and document the host-runtime caveat in environment tooling, not as a scientific-method claim."}
+  ]
+}
