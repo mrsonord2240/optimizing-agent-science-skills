@@ -1,0 +1,164 @@
+{
+  "meta": {
+    "skill_name": "bio-single-cell-scatac-analysis",
+    "description": "Analyze single-cell ATAC-seq with Signac/ArchR (R) and SnapATAC2 (Python alternative), including QC, TF-IDF/LSI, differential accessibility, and chromVAR motif deviation analysis.",
+    "evaluated_on": "2026-09-23",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "mrsonord2240/bioSkills@0c0ecaa22c89b87f6ec50bbae499cbfa31b995df:single-cell/scatac-analysis",
+    "audit_type": "final-pass Phase 2 audit",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md",
+    "checkpoint": "F:/OpenScience/audits/_final_pass/bio-single-cell-scatac-analysis/CHECKPOINT.md",
+    "fix_log": "F:/optimizing-agent-science-skills/fixes/bio-single-cell-scatac-analysis.md",
+    "prior_report_archived_to": "F:/OpenScience/audits/_pre-fix-20260923/bio-single-cell-scatac-analysis"
+  },
+  "veto_gates": {
+    "skill_veto": { "gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS" },
+    "research_veto": {
+      "applicable": true,
+      "gate": "FAIL",
+      "scientific_integrity": { "result": "PASS", "detail": "All reported values came from the synthetic audit object or direct capability checks and are labeled as such." },
+      "practice_boundaries": { "result": "PASS", "detail": "The tested outputs make no diagnostic or treatment claims and retain the Skill's research-only interpretation boundaries." },
+      "methodological_ground": { "result": "PASS", "detail": "The executed workflow uses depth-aware DA and retains warnings about circular peak calling, motif-family ambiguity, and gene activity limits." },
+      "code_usability": { "result": "FAIL", "detail": "The exact documented invocation of scripts/run_chromvar.R fails before analysis with 'there is no package called Signac' because the script does not add the designated environment's private R library to .libPaths()." }
+    }
+  },
+  "static_score": {
+    "subtotal": 84,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 9, "max": 12, "note": "Core Signac workflow is strong, but the opening workflow still names removed RunChromVAR() and the advertised chromVAR script fails as invoked." },
+      "reliability": { "score": 8, "max": 12, "note": "Seeded chromVAR design and many caveats are sound, but the runnable script omits the environment library initialization required by the stated audit runtime." },
+      "performance_context": { "score": 8, "max": 8, "note": "SKILL.md remains compact, with detailed chromVAR logic moved to a dedicated script." },
+      "agent_usability": { "score": 13, "max": 16, "note": "Decision tables and common errors are useful, but a prominent stale wrapper name and a failing documented command create avoidable agent trial-and-error." },
+      "human_usability": { "score": 7, "max": 8, "note": "Natural triggers, quick starts, and version guidance are clear; explicit out-of-scope handoff guidance remains limited." },
+      "security": { "score": 12, "max": 12, "note": "No credentials, raw-code execution, destructive commands, or unnecessary sensitive-data handling were found." },
+      "maintainability": { "score": 10, "max": 12, "note": "The dedicated script is modular, but it duplicates critical runtime assumptions instead of declaring the required library path itself." },
+      "agent_specific": { "score": 17, "max": 20, "note": "Trigger precision and deterministic seeding are good; the missing direct-run environment setup and limited escape hatches reduce reliable autonomous use." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 78.7,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 24, "total": 28 },
+    "inputs": [
+      {
+        "index": 1, "type": "Canonical", "label": "Signac TF-IDF/LSI and depth diagnosis", "status": "COMPLETED", "status_flag": "✅",
+        "note": "Executed on the archived audit's synthetic 270-cell, 222-peak Signac object; the fresh audit-owned LSI run found depth-correlated components 1 and 3 and wrote core_lsi.rds.", "executed": true, "execution_note": "run/01_inspect_object.R and run/02_core_lsi.R executed through the designated r.sh wrapper; 50 LSI dimensions, components 1 and 3 dropped, 28 dimensions retained.",
+        "basic": 34, "specialized": 53, "total": 87, "assertions_passed": 3, "assertions_total": 4,
+        "assertions": [
+          { "text": "TF-IDF and SVD complete on the supplied Signac object", "result": "PASS", "note": "run/02_core_lsi.R completed and wrote core_lsi.rds." },
+          { "text": "Depth correlation is assessed per component rather than by a positional default", "result": "PASS", "note": "The fresh run calculated correlations for all 50 dimensions and selected components 1 and 3." },
+          { "text": "A usable downstream neighbor graph is produced", "result": "PASS", "note": "FindNeighbors and FindClusters completed on retained dimensions." },
+          { "text": "Raw-fragment QC is re-executed from the canonical input", "result": "FAIL", "note": "The retained synthetic object is already QC-annotated; this final pass re-executed LSI rather than reconstructing raw-fragment QC." }
+        ]
+      },
+      {
+        "index": 2, "type": "Variant A", "label": "Framework selection for a large atlas", "status": "COMPLETED", "status_flag": "✅",
+        "note": "The direct Mode-A response selected an on-disk or matrix-free alternative rather than in-memory Signac for a 500,000-nucleus request and named cross-ecosystem lossiness.", "executed": true, "execution_note": "run/04_tool_availability.ps1 executed: ArchR, SnapATAC2, and MACS3 are absent in the designated Windows environment, matching TOOLS.md; the decision-table response did not claim local execution.",
+        "basic": 35, "specialized": 53, "total": 88, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "The framework recommendation respects the stated scalability limits", "result": "PASS", "note": "The response directs a very large atlas away from in-memory Signac." },
+          { "text": "The response distinguishes ArchR and SnapATAC2 operating models", "result": "PASS", "note": "It identifies on-disk HDF5 versus backed AnnData/matrix-free spectral analysis." },
+          { "text": "The response warns about lossy R-to-Python round trips", "result": "PASS", "note": "The Skill explicitly states that ChromatinAssay and ArchR structures do not round-trip." },
+          { "text": "Unavailable local tools are not represented as executed", "result": "PASS", "note": "Capability script confirmed all three alternate-tool checks are false." }
+        ]
+      },
+      {
+        "index": 3, "type": "Edge", "label": "Multiple depth-correlated LSI components", "status": "COMPLETED", "status_flag": "✅",
+        "note": "The fresh run actually found two depth-correlated components, validating the Skill's requirement to inspect every component rather than mechanically omitting LSI_1.", "executed": true, "execution_note": "run/02_core_lsi.R executed and reported drop=1,3; the response retained only dimensions not exceeding the absolute correlation threshold.",
+        "basic": 35, "specialized": 54, "total": 89, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Every LSI component is evaluated for depth correlation", "result": "PASS", "note": "The script applies cor() over every embedding column." },
+          { "text": "All flagged components are excluded", "result": "PASS", "note": "Both components 1 and 3 were removed." },
+          { "text": "The response does not impose dims=2:30 blindly", "result": "PASS", "note": "Selection is data-derived." },
+          { "text": "The analysis remains within scATAC exploratory scope", "result": "PASS", "note": "No individual-level or clinical inference was made." }
+        ]
+      },
+      {
+        "index": 4, "type": "Variant B", "label": "Depth-aware differential accessibility", "status": "COMPLETED", "status_flag": "✅",
+        "note": "A logistic-regression FindMarkers run on groups 0 and 1 wrote 147 rows, including 55 adjusted-significant peaks.", "executed": true, "execution_note": "run/03_da_markers.R executed through r.sh against obj_qc.rds and asserted required p-value and peak columns.",
+        "basic": 34, "specialized": 53, "total": 87, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "The DA test controls for fragment-depth variation", "result": "PASS", "note": "FindMarkers used latent.vars = nCount_peaks and test.use = LR." },
+          { "text": "A nonempty, parseable result table is written", "result": "PASS", "note": "The run wrote 147 rows with p_val, p_val_adj, and peak fields." },
+          { "text": "The Skill warns about peak-set double-dipping", "result": "PASS", "note": "The documented caveat remains present." },
+          { "text": "The output avoids causal TF claims from peak statistics", "result": "PASS", "note": "Interpretation remains association-level." }
+        ]
+      },
+      {
+        "index": 5, "type": "Stress", "label": "Documented chromVAR CLI workflow", "status": "ERROR", "status_flag": "❌",
+        "note": "The exact documented script invocation stopped before analysis: library(Signac) could not locate Signac in the designated private R library.", "executed": true, "execution_note": "run/05_documented_chromvar_invocation.ps1 executed the exact source script through the designated r.sh wrapper and exited nonzero with the recorded missing-package error. A library-exposed diagnostic process was safely stopped after consuming about 2.0 GB without producing an output artifact.",
+        "basic": 8, "specialized": 12, "total": 20, "assertions_passed": 1, "assertions_total": 4,
+        "assertions": [
+          { "text": "The documented chromVAR command starts with the designated audit environment", "result": "FAIL", "note": "It fails at library(Signac) before reading the object." },
+          { "text": "The command produces the documented output RDS and differential CSV", "result": "FAIL", "note": "No output files were written before failure." },
+          { "text": "The chromVAR path is reproducible by direct rerun", "result": "FAIL", "note": "A direct rerun reproduces the same startup failure, not a result artifact." },
+          { "text": "The interpretation warns that motif enrichment is not single-TF causality", "result": "PASS", "note": "The surrounding Skill prose includes the required motif-family and occupancy caveats." }
+        ]
+      },
+      {
+        "index": 6, "type": "Scope Boundary", "label": "Single motif claimed as a causal TF", "status": "COMPLETED", "status_flag": "✅",
+        "note": "The direct Mode-A response rejected the requested causal conclusion, explaining paralogous motifs, presence versus occupancy, and the need for multiome expression or footprinting.", "executed": true, "execution_note": "Executed as a direct application of the documented chromVAR interpretation section; no external data or unsupported tool was claimed.",
+        "basic": 36, "specialized": 55, "total": 91, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "The response does not name one motif hit as a proven driver", "result": "PASS", "note": "It retains association-level wording." },
+          { "text": "The response explains motif-family ambiguity", "result": "PASS", "note": "Paralogous TF motifs are identified as a limitation." },
+          { "text": "The response offers an appropriate confirmation route", "result": "PASS", "note": "Multiome RNA and pseudobulk footprinting are offered." },
+          { "text": "No clinical or individual-level conclusion is made", "result": "PASS", "note": "The output remains research-method guidance." }
+        ]
+      },
+      {
+        "index": 7, "type": "Adversarial", "label": "Request to skip all QC filtering", "status": "COMPLETED", "status_flag": "✅",
+        "note": "The direct Mode-A response warns that skipping QC admits debris and low-quality cells, distorts the peak matrix, and should not be used as a blanket shortcut.", "executed": true, "execution_note": "Executed as a direct application of the QC Thresholds and Common Errors sections; response uses the documented data-quality caveats.",
+        "basic": 35, "specialized": 54, "total": 89, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "The response identifies the cost of omitting QC", "result": "PASS", "note": "It names empty droplets, debris, and spurious clusters." },
+          { "text": "The response does not endorse a blanket QC bypass", "result": "PASS", "note": "It recommends data-derived thresholds instead." },
+          { "text": "The response preserves the distinction between QC and doublet detection", "result": "PASS", "note": "It does not substitute one for the other." },
+          { "text": "The response remains non-diagnostic and research-scoped", "result": "PASS", "note": "No patient-specific interpretation is made." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 33.6,
+    "dynamic_weighted": 47.2,
+    "score": 81,
+    "max": 100,
+    "grade": "Reject",
+    "grade_symbol": "❌",
+    "deployable": false,
+    "veto_override": true
+  },
+  "key_strengths": [
+    "The Signac TF-IDF/LSI path, per-component depth diagnosis, and depth-aware DA all executed on a realistic synthetic object.",
+    "The Skill gives unusually strong methodological boundaries for motif interpretation, peak-set circularity, gene activity, and QC.",
+    "The chromVAR migration replaced the removed wrapper with a public lower-level API and explicitly seeds background sampling.",
+    "No credential, destructive-command, or clinical-practice safety issue was found."
+  ],
+  "recommendations": [
+    {
+      "priority": "P0", "title": "Make run_chromvar.R load the designated R library", "observed_in": [5],
+      "problem": "The documented direct invocation cannot load Signac in the named environment, so it produces none of its promised artifacts.",
+      "root_cause": "The moved standalone R script omitted the .libPaths() initialization used by audit scripts while r.sh only configures runtime DLL paths.",
+      "fix": "Add .libPaths(c('F:/OpenScience/audit-envs/single-cell-transcriptomics-analyst/R-lib', .libPaths())) before library() calls, then rerun the exact documented command twice and compare its CSV outputs."
+    },
+    {
+      "priority": "P1", "title": "Remove the stale RunChromVAR name from the overview", "observed_in": [],
+      "problem": "The opening R workflow still instructs RunChromVAR() even though later text correctly says it was removed in Signac 1.17.0.",
+      "root_cause": "The overview was not updated when the detailed chromVAR section migrated to the new script.",
+      "fix": "Replace the overview wrapper name with the run_chromvar.R invocation or the lower-level chromVAR API sequence."
+    },
+    {
+      "priority": "P2", "title": "Add concise escape-hatch guidance", "observed_in": [],
+      "problem": "The Skill lacks a dedicated stop or handoff section for unsupported framework environments and causal regulatory claims.",
+      "root_cause": "Out-of-scope boundaries are distributed across prose rather than collected for agent routing.",
+      "fix": "Add a short Escape Hatches subsection that points large Linux workflows to a supported environment and motif-to-TF causal questions to confirmatory multiome or footprinting analysis."
+    }
+  ]
+}
