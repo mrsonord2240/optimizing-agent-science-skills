@@ -74,3 +74,6 @@ Commit the record, the regenerated index and any fix log together. An audit only
   it writes manifests to `F:\OpenScience\marketplace-submissions\`, refuses ids already in the
   marketplace, and fails unless the marketplace's own `intake:skill` accepts every one. **Never rewrite
   shelf history:** a force-push breaks the pinned SHAs.
+- `config/marketplace_submission_holds.json` is a machine-readable maintainer-decision hold. A held ID
+  remains eligible for shelf promotion but is never marketplace-ready, written as a manifest, or passed
+  to `intake:skill`—including via `marketplace_manifests.py --skill`.

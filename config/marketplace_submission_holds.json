@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "purpose": "Explicit, maintainer-decision holds for Skill IDs that must not be submitted to or tested against the Open Science marketplace.",
+  "holds": [
+    {
+      "id": "bio-causal-genomics-mediation-analysis",
+      "reason": "This ID collides with an existing marketplace skill. Hold pending maintainer decision.",
+      "scope": [
+        "marketplace_submission",
+        "marketplace_intake"
+      ],
+      "until": "marketplace maintainers decide how duplicate IDs are handled"
+    },
+    {
+      "id": "bio-causal-genomics-pleiotropy-detection",
+      "reason": "This ID collides with an existing marketplace skill. Hold pending maintainer decision.",
+      "scope": [
+        "marketplace_submission",
+        "marketplace_intake"
+      ],
+      "until": "marketplace maintainers decide how duplicate IDs are handled"
+    }
+  ]
+}

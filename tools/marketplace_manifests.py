@@ -11,6 +11,9 @@ pins each to the shelf commit that last touched `skills/<id>/`, and refuses to w
     (their rules: registered ids are unique and disjoint from the original members; no renaming to
     dodge the check)
 
+`config/marketplace_submission_holds.json` is an explicit maintainer-decision hold. Its entries are
+never written or passed to `intake:skill`, even when an operator names one with `--skill`.
+
 Usage:
   marketplace_manifests.py [--out DIR] [--version 1.0.0] [--skill ID ...]
                            [--intake PATH-TO-MARKETPLACE-CLONE]
@@ -29,11 +32,34 @@ import urllib.request
 SHELF = "F:/optimized-scientific-skills"
 SHELF_URL = "https://github.com/mrsonord2240/optimized-scientific-skills"
 MARKETPLACE_JSON = "https://statics.aipoch.com/open-science/skill-marketplace/v1/marketplace.json"
+MARKETPLACE_HOLDS = os.path.normpath(os.path.join(
+    os.path.dirname(__file__), "..", "config", "marketplace_submission_holds.json"))
 
 # The marketplace has five fixed categories. Everything in bioSkills is computational analysis except
 # the study-design folder. A maintainer may recategorise on review.
 DEFAULT_CATEGORY = "Data Analysis"
 FOLDER_CATEGORY = {"experimental-design": "Protocol Design"}
+
+
+def load_marketplace_holds(path=MARKETPLACE_HOLDS):
+    """Read deliberate marketplace submission holds, failing closed on a malformed config."""
+    with open(path, encoding="utf-8") as fh:
+        document = json.load(fh)
+    if document.get("schema_version") != 1 or not isinstance(document.get("holds"), list):
+        raise SystemExit(f"{path}: expected schema_version 1 and a holds array")
+    holds = {}
+    required_scope = {"marketplace_submission", "marketplace_intake"}
+    for hold in document["holds"]:
+        if not isinstance(hold, dict):
+            raise SystemExit(f"{path}: every hold must be an object")
+        sid, reason, scope = hold.get("id"), hold.get("reason"), hold.get("scope")
+        if (not isinstance(sid, str) or not sid or not isinstance(reason, str) or not reason
+                or not isinstance(scope, list) or not required_scope.issubset(scope)):
+            raise SystemExit(f"{path}: holds need id, reason, and both marketplace scopes")
+        if sid in holds:
+            raise SystemExit(f"{path}: duplicate hold for {sid}")
+        holds[sid] = hold
+    return holds
 
 
 def git(*args):
@@ -56,9 +82,18 @@ def main():
     args = ap.parse_args()
 
     prov = json.load(open(os.path.join(SHELF, "PROVENANCE.json"), encoding="utf-8"))
+    marketplace_holds = load_marketplace_holds()
     rows = [r for r in prov["skills"] if r.get("marketplace_ready")]
+    refused = []
     if args.skill:
-        rows = [r for r in prov["skills"] if r["id"] in args.skill]
+        for sid in args.skill:
+            hold = marketplace_holds.get(sid)
+            if hold:
+                refused.append((sid, "submission hold: " + hold["reason"]))
+        rows = [r for r in prov["skills"]
+                if r["id"] in args.skill and r["id"] not in marketplace_holds]
+    else:
+        rows = [r for r in rows if r["id"] not in marketplace_holds]
     live = marketplace_ids()
     stripped = {i[4:] if i.startswith("bio-") else i for i in live}
 
@@ -66,7 +101,7 @@ def main():
         raise SystemExit("the shelf has uncommitted changes under skills/; commit and push them first")
     on_main = set(git("rev-list", "origin/main").splitlines())
 
-    written, refused = [], []
+    written = []
     for r in rows:
         sid = r["id"]
         commit = git("log", "-1", "--format=%H", "--", f"skills/{sid}")

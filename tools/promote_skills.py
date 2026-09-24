@@ -26,6 +26,8 @@ UPSTREAM_COMMIT = "d91ed3d563019e649dc854c56ccd62551359488a"
 FORK_COMMIT = "431aa55d2dc56d3da947f1c820077a6578691e37"
 AUDITS = "F:/OpenScience/audits"
 OUT = "F:/optimized-scientific-skills"
+MARKETPLACE_HOLDS = os.path.normpath(os.path.join(
+    os.path.dirname(__file__), "..", "config", "marketplace_submission_holds.json"))
 
 # The two lines added to every SKILL.md across the corpus: `license: MIT` (558aea5) and
 # `author: GPTomics` (2026-09-21, the marketplace keeps a frontmatter author as the attribution claim).
@@ -38,6 +40,37 @@ OUT_OF_SCOPE = {
     "clawhub-installer": "upstream's own corpus installer, not a science Skill; declares "
                          "os: darwin/linux only and exists to install the other Skills",
 }
+
+
+def load_marketplace_holds(path=MARKETPLACE_HOLDS):
+    """Read deliberate marketplace submission holds, failing closed on a malformed config."""
+    with open(path, encoding="utf-8") as fh:
+        document = json.load(fh)
+    if document.get("schema_version") != 1 or not isinstance(document.get("holds"), list):
+        raise SystemExit(f"{path}: expected schema_version 1 and a holds array")
+    holds = {}
+    required_scope = {"marketplace_submission", "marketplace_intake"}
+    for hold in document["holds"]:
+        if not isinstance(hold, dict):
+            raise SystemExit(f"{path}: every hold must be an object")
+        sid, reason, scope = hold.get("id"), hold.get("reason"), hold.get("scope")
+        if (not isinstance(sid, str) or not sid or not isinstance(reason, str) or not reason
+                or not isinstance(scope, list) or not required_scope.issubset(scope)):
+            raise SystemExit(f"{path}: holds need id, reason, and both marketplace scopes")
+        if sid in holds:
+            raise SystemExit(f"{path}: duplicate hold for {sid}")
+        holds[sid] = hold
+    return holds
+
+
+def set_marketplace_status(row, hold):
+    """Apply the marketplace gate without changing the Skill's audit or shelf eligibility."""
+    row["marketplace_ready"] = (row["grade"] == "Production Ready" and row["fix_pass"] == "done"
+                                and row["reaudit"] == "not needed" and hold is None)
+    if hold:
+        # A submission hold does not question audit deployability or shelf promotion. It only
+        # prevents this record from becoming a marketplace candidate or entering intake:skill.
+        row["marketplace_hold"] = hold
 
 
 def git(args, cwd=FORK):
@@ -178,6 +211,11 @@ def main():
         acquire_promote_lock()
     idx = skill_index()
     rep = audits()
+    marketplace_holds = load_marketplace_holds()
+    unknown_holds = sorted(set(marketplace_holds) - set(idx))
+    if unknown_holds:
+        raise SystemExit("marketplace hold(s) do not name Skills in the pinned source tree: "
+                         + ", ".join(unknown_holds))
     fixlogs = {f[:-3] for f in os.listdir(os.path.join(REC, "fixes")) if f.endswith(".md")}
 
     # Records whose own commit never landed on the path to FORK_COMMIT: skip them entirely this run
@@ -220,8 +258,7 @@ def main():
         # Cleared to submit to the marketplace: at the Production Ready target (process/COMMON.md, Thresholds),
         # a fix pass done, and no changes since the last audit. Versions there are immutable and each
         # is reviewed, so a Skill that is still moving, or short of the target, is not ready.
-        row["marketplace_ready"] = (row["grade"] == "Production Ready" and row["fix_pass"] == "done"
-                                    and row["reaudit"] == "not needed")
+        set_marketplace_status(row, marketplace_holds.get(row["id"]))
 
     finished.sort(key=lambda r: r["id"])
     excluded.sort(key=lambda r: r["id"])
@@ -239,6 +276,9 @@ def main():
     print(f"   re-audit needed            {len(stale)}")
     ready = [r for r in finished if r["marketplace_ready"]]
     print(f"   marketplace ready          {len(ready)}")
+    held = [r for r in finished if r.get("marketplace_hold")]
+    if held:
+        print("   marketplace held           " + ", ".join(r["id"] for r in held))
     print(f"remaining : {len(remaining)}")
 
     if not apply:
@@ -358,4 +398,5 @@ def main():
     print(f"\nwrote {OUT}")
 
 
-main()
+if __name__ == "__main__":
+    main()
