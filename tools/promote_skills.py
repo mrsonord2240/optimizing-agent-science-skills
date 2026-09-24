@@ -23,7 +23,7 @@ import time
 REC = "F:/optimizing-agent-science-skills"
 FORK = "F:/OpenScience/external/mrsonord2240__bioSkills"
 UPSTREAM_COMMIT = "d91ed3d563019e649dc854c56ccd62551359488a"
-FORK_COMMIT = "d4f4651b3cdca08afced50fa7f3c9ab36e43edd7"
+FORK_COMMIT = "5bfde8a9411f445ef9dad51fa4aea7dc1bf27ef8"
 AUDITS = "F:/OpenScience/audits"
 OUT = "F:/optimized-scientific-skills"
 MARKETPLACE_HOLDS = os.path.normpath(os.path.join(
