@@ -1,0 +1,41 @@
+{
+  "skill_id": "bio-crispr-screens-copy-number-correction",
+  "version": "mrsonord2240-bioSkills@dded722",
+  "source": {
+    "repository": "mrsonord2240/bioSkills",
+    "commit": "dded722b0c3490d36f4fec2fe633eb113a05317c",
+    "path": "crispr-screens/copy-number-correction",
+    "author": "GPTomics",
+    "author_url": "https://github.com/GPTomics",
+    "license": "MIT",
+    "modified_by": "Samuel Nord",
+    "fork_of": {
+      "repository": "GPTomics/bioSkills",
+      "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    "url": "https://github.com/mrsonord2240/bioSkills/tree/dded722b0c3490d36f4fec2fe633eb113a05317c/crispr-screens/copy-number-correction"
+  },
+  "audit": {
+    "method": {
+      "name": "skill-auditor",
+      "author": "AIPOCH",
+      "repository": "aipoch/medical-research-skills",
+      "commit": "f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26",
+      "path": "skill-auditor",
+      "license": "MIT",
+      "url": "https://github.com/aipoch/medical-research-skills/tree/f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26/skill-auditor"
+    },
+    "evaluator_version": "skill-auditor@1.0",
+    "audited_on": "2026-09-24",
+    "performed_by": "Claude (Anthropic) auditor agents",
+    "commissioned_by": "Samuel Nord",
+    "test_data": "synthetic"
+  },
+  "supersedes": "mrsonord2240-bioSkills@9d31109",
+  "files": {
+    "report": "report.json",
+    "viewer": "viewer.md",
+    "fixes": "fixes.md",
+    "scripts": 12
+  }
+}

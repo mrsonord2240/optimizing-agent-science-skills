@@ -738,7 +738,7 @@ None open.
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (223)
+## P2 (220)
 
 ### `bio-data-visualization-statistical-annotation` — Test-name and label details differ from the tools
 
@@ -971,30 +971,6 @@ None open.
 - Problem: The eleven usage-guide tips and the Quick Start prompts restate SKILL.md failure modes almost word for word (~880 words), and all of it loads with a 325-line SKILL.md.
 - Root cause: No split between method and quick start.
 - Fix: Keep the tips once (SKILL.md) and make usage-guide.md a short prompt list, or move failure modes to references/.
-
-### `bio-crispr-screens-copy-number-correction` — negative_control_sgrnas empty-dict case raises an undocumented ValueError
-
-- Skill: 82, Limited Release · [mrsonord2240/bioSkills@9d31109](https://github.com/mrsonord2240/bioSkills/tree/9d31109159d4d490ec375d4ae88c9b77570f3840/crispr-screens/copy-number-correction) · [viewer](skills/bio-crispr-screens-copy-number-correction/mrsonord2240-bioSkills@9d31109/viewer.md)
-- Observed in inputs: 6
-- Problem: Passing negative_control_sgrnas as an explicit empty dict ({'screen': []}) rather than omitting the argument raises ValueError('set of negative_control_sgrnas is empty') -- a different message from the one the Common Errors table documents for the omitted-argument case.
-- Root cause: The round-3 fix documented only the omitted-argument path, which was this audit's and the fix log's main test case; the empty-list path was mentioned only as an aside in the fix log and never added to SKILL.md itself.
-- Fix: Add a second Common Errors row: 'ValueError: set of negative_control_sgrnas is empty' at Chronos(...) construction \| negative_control_sgrnas supplied but its list is empty \| Populate it with real non-targeting/non-essential sgRNAs, not an empty list.
-
-### `bio-crispr-screens-copy-number-correction` — Reconciliation cause 5's 'pooling masks it' claim did not reproduce on real per-line-vs-pooled data
-
-- Skill: 82, Limited Release · [mrsonord2240/bioSkills@9d31109](https://github.com/mrsonord2240/bioSkills/tree/9d31109159d4d490ec375d4ae88c9b77570f3840/crispr-screens/copy-number-correction) · [viewer](skills/bio-crispr-screens-copy-number-correction/mrsonord2240-bioSkills@9d31109/viewer.md)
-- Observed in inputs: 5
-- Problem: SKILL.md's new cause 5 justifies re-running detect_cn_bias per cell line by claiming pooling can mask a real per-line problem. A real construction from the round-2 fix pass's own 3-line panel found pooled and per-line gave the same qualitative read (both bias_present=True, near-identical gap) -- the specific masking scenario was not demonstrated.
-- Root cause: The cause-5 text was added as prose reasoning during the fix pass and was never itself run against real numbers before this audit.
-- Fix: Soften the claim to what is actually demonstrated: alternate_CN's fitted average can leave real residual signal at strong amplicons (confirmed), and re-checking per line is good practice regardless of whether pooling happens to mask it in a given panel -- drop the implication that pooling reliably hides the problem.
-
-### `bio-crispr-screens-copy-number-correction` — Chronos training has no documented seed/determinism guidance
-
-- Skill: 82, Limited Release · [mrsonord2240/bioSkills@9d31109](https://github.com/mrsonord2240/bioSkills/tree/9d31109159d4d490ec375d4ae88c9b77570f3840/crispr-screens/copy-number-correction) · [viewer](skills/bio-crispr-screens-copy-number-correction/mrsonord2240-bioSkills@9d31109/viewer.md)
-- Observed in inputs: 2, 3
-- Problem: None of the three real Chronos training runs across this audit's inputs set or discussed a random seed, and SKILL.md gives no guidance on reproducibility between training runs.
-- Root cause: Carried over from both prior audits' static notes (Idempotency, Agent-Specific); unrelated to and untouched by this fix pass.
-- Fix: Add a one-line note to the Chronos code block: set a seed (or document that Chronos training is stochastic and gene-effect estimates should be treated as approximate across runs) so agents don't present a single run's numbers as exactly reproducible.
 
 ### `bio-outlier-splicing-detection` — FRASER block stops at its last line when no sample has a call
 

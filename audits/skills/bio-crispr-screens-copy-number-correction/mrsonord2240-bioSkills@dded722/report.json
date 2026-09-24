@@ -1,0 +1,65 @@
+{
+  "meta": {
+    "skill_name": "bio-crispr-screens-copy-number-correction",
+    "description": "Corrects the gene-independent copy-number artifact in CRISPR-Cas9 screens with CRISPRcleanR, CERES, Chronos, and focal-amplification-aware diagnostics.",
+    "evaluated_on": "2026-09-24",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 9,
+    "source": "mrsonord2240/bioSkills@dded722b0c3490d36f4fec2fe633eb113a05317c:crispr-screens/copy-number-correction",
+    "executed_inputs": "9/9",
+    "audit_type": "final-pass exact-commit corrective re-audit",
+    "pre_fix_report": "F:\\optimizing-agent-science-skills\\audits\\skills\\bio-crispr-screens-copy-number-correction\\mrsonord2240-bioSkills@9d31109\\report.json",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md",
+    "regression_inputs": [1, 2, 3, 4, 5, 6, 7],
+    "new_inputs": [8, 9],
+    "n_inputs_note": "Seven archived logical inputs were rerun as regressions; two fresh edge inputs exercised the new exact-source contracts."
+  },
+  "veto_gates": {
+    "skill_veto": {"gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS"},
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {"result": "PASS", "detail": "All numerical claims cited below came from the archived real HAP1/HT-29 program runs or clearly labeled synthetic edge construction; no clinical conclusion is made."},
+      "practice_boundaries": {"result": "PASS", "detail": "The Skill retains its scope boundary and confines the workflow to analytical correction and hit-calling support."},
+      "methodological_ground": {"result": "PASS", "detail": "The final reconciliation language now reports the demonstrated per-line residual and does not claim that pooled analysis must hide it."},
+      "code_usability": {"result": "PASS", "detail": "The exact committed diagnostic function and Chronos construction error paths executed without undocumented behavior."}
+    }
+  },
+  "static_score": {
+    "subtotal": 96,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {"score": 12, "max": 12, "note": "CRISPRcleanR and Chronos routes, focal diagnostic, and error recovery are explicit and matched executed behavior."},
+      "reliability": {"score": 12, "max": 12, "note": "Both omitted and empty negative-control failures are separately documented, and the pooled/per-line claim is bounded by evidence."},
+      "performance_context": {"score": 7, "max": 8, "note": "The main Skill remains detailed but is supported by a separate usage guide and one focused example."},
+      "agent_usability": {"score": 16, "max": 16, "note": "Decision routes, data orientation, minimum-panel constraint, low-power output fields, and reproducibility record are actionable."},
+      "human_usability": {"score": 8, "max": 8, "note": "Failure modes and Common Errors provide cause-specific recovery steps."},
+      "security": {"score": 12, "max": 12, "note": "No credentials, network mutation, or sensitive-data exfiltration path is introduced."},
+      "maintainability": {"score": 11, "max": 12, "note": "The source has a small number of examples; external package behavior is versioned and explicitly named."},
+      "agent_specific": {"score": 18, "max": 20, "note": "The new seed and manifest guidance makes reruns comparable while correctly declining a cross-platform bitwise guarantee."}
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 99.4,
+    "max": 100,
+    "assertion_pass_rate": {"passed": 27, "total": 27},
+    "inputs": [
+      {"index": 1, "type": "Canonical", "label": "REGRESSION: omitted negative_control_sgrnas", "status": "COMPLETED", "status_flag": "✅", "note": "Real HAP1 TKOv3 construction raised the documented ValueError before training.", "basic": 40, "specialized": 60, "total": 100, "assertions_passed": 3, "assertions_total": 3, "assertions": [{"text": "Construction fails before train when controls are omitted", "result": "PASS", "note": "Chronos raised during construction."}, {"text": "The documented excess_variance error text is present", "result": "PASS", "note": "Observed verbatim substring."}, {"text": "No UnboundLocalError reaches the caller", "result": "PASS", "note": "Only the documented ValueError occurred."}]},
+      {"index": 2, "type": "Variant A", "label": "REGRESSION: low-power real HT-29 residual", "status": "COMPLETED", "status_flag": "✅", "note": "Archived real post-CRISPRcleanR three-gene block reproduced the documented -0.9809 gap and 0.208 p-value.", "basic": 39, "specialized": 60, "total": 99, "assertions_passed": 3, "assertions_total": 3, "assertions": [{"text": "The residual focal gap is retained", "result": "PASS", "note": "Observed -0.9809."}, {"text": "Low-power floor is true for three amplified genes", "result": "PASS", "note": "Observed true."}, {"text": "Non-significant residual is marked suspicious", "result": "PASS", "note": "suspicious_despite_ns was true."}]},
+      {"index": 3, "type": "Edge", "label": "REGRESSION: no-cry-wolf corrected control", "status": "COMPLETED", "status_flag": "✅", "note": "Five fresh relabelings of real HT-29 diploid LFCs produced zero false suspicious flags.", "basic": 39, "specialized": 60, "total": 99, "assertions_passed": 3, "assertions_total": 3, "assertions": [{"text": "All five controls remain below the low-power floor", "result": "PASS", "note": "Each had five relabeled genes."}, {"text": "No control is incorrectly suspicious", "result": "PASS", "note": "0/5 flags."}, {"text": "No control reports focal bias", "result": "PASS", "note": "0/5 bias_present."}]},
+      {"index": 4, "type": "Edge", "label": "REGRESSION: low-power boundary and NaN guard", "status": "COMPLETED", "status_flag": "✅", "note": "The archived boundary test covered n=7, 8, 9 and the fewer-than-three-gene NaN path.", "basic": 40, "specialized": 60, "total": 100, "assertions_passed": 3, "assertions_total": 3, "assertions": [{"text": "n=7 is low power", "result": "PASS", "note": "Observed true."}, {"text": "n=8 and n=9 are not low power", "result": "PASS", "note": "Observed false for both."}, {"text": "NaN gap does not crash or flag", "result": "PASS", "note": "Observed false suspicious flag."}]},
+      {"index": 5, "type": "Stress", "label": "REGRESSION: per-line versus pooled post-Chronos", "status": "COMPLETED", "status_flag": "✅", "note": "Real three-line post-alternate_CN data showed residual bias both per-line and pooled; the final text no longer overclaims masking.", "basic": 39, "specialized": 60, "total": 99, "assertions_passed": 3, "assertions_total": 3, "assertions": [{"text": "CN15 retains a focal residual", "result": "PASS", "note": "Per-line gap -0.898, bias_present true."}, {"text": "The pooled result is also bias-positive", "result": "PASS", "note": "Pooled gap -0.903, bias_present true."}, {"text": "Exact source avoids a universal masking claim", "result": "PASS", "note": "Text instructs comparison without assuming concealment."}]},
+      {"index": 6, "type": "Edge", "label": "REGRESSION: explicit empty negative-control list", "status": "COMPLETED", "status_flag": "✅", "note": "Real HAP1 construction with {'screen': []} raised the distinct documented ValueError.", "basic": 40, "specialized": 60, "total": 100, "assertions_passed": 3, "assertions_total": 3, "assertions": [{"text": "Empty list fails at construction", "result": "PASS", "note": "Observed before training."}, {"text": "The exact empty-list error is documented", "result": "PASS", "note": "Common Errors row present."}, {"text": "Recovery rejects empty placeholders", "result": "PASS", "note": "Skill requires real control guides."}]},
+      {"index": 7, "type": "Scope Boundary", "label": "REGRESSION: analytical-scope boundary", "status": "COMPLETED", "status_flag": "✅", "note": "The final source remains confined to screen correction, QC, and downstream hit-calling support.", "basic": 39, "specialized": 60, "total": 99, "assertions_passed": 3, "assertions_total": 3, "assertions": [{"text": "No treatment recommendation workflow is introduced", "result": "PASS", "note": "Scope is analytical."}, {"text": "Correction precedes hit calling", "result": "PASS", "note": "Pipeline order remains explicit."}, {"text": "Known-amplification hits require orthogonal validation", "result": "PASS", "note": "Failure mode retains this guard."}]},
+      {"index": 8, "type": "Edge", "label": "NEW: exact-source reproducibility prescription", "status": "COMPLETED", "status_flag": "✅", "note": "The fresh source-contract test seeded NumPy twice and confirmed identical initialization draws and an explicit hardware/version limit.", "basic": 40, "specialized": 60, "total": 100, "assertions_passed": 3, "assertions_total": 3, "assertions": [{"text": "The exact source seeds NumPy before construction", "result": "PASS", "note": "Executable seed line present."}, {"text": "Repeated seeded draws are equal", "result": "PASS", "note": "Two six-draw sequences matched exactly."}, {"text": "The documentation does not promise cross-platform bitwise identity", "result": "PASS", "note": "TensorFlow/BLAS and hardware caveat present."}]},
+      {"index": 9, "type": "Edge", "label": "NEW: exact-source n=8 focal diagnostic", "status": "COMPLETED", "status_flag": "✅", "note": "The fresh source-contract test extracted and executed detect_cn_bias directly from the exact committed Markdown fence.", "basic": 39, "specialized": 60, "total": 99, "assertions_passed": 3, "assertions_total": 3, "assertions": [{"text": "The extracted function executes", "result": "PASS", "note": "Exact fence executed without modification."}, {"text": "Eight amplified genes are outside the low-power floor", "result": "PASS", "note": "low_power_floor false."}, {"text": "A large focal depletion is detected", "result": "PASS", "note": "bias_present true."}]}
+    ]
+  },
+  "final": {"static_weighted": 38.4, "dynamic_weighted": 59.6, "score": 98, "max": 100, "grade": "Production Ready", "grade_symbol": "⭐", "deployable": true, "veto_override": false},
+  "key_strengths": ["Exact-commit evidence covers both Chronos negative-control construction errors.", "Low-power focal-bias behavior is checked on real residual data, false-positive controls, and threshold boundaries.", "Reconciliation language now matches the observed per-line and pooled result without an unsupported universal claim.", "Seed and manifest guidance makes Chronos reruns comparable while stating the platform limit."],
+  "recommendations": []
+}
