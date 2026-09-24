@@ -1,0 +1,58 @@
+{
+  "meta": {
+    "skill_name": "bio-similarity-searching",
+    "description": "Performs molecular similarity searching using task-aware fingerprint similarity, clustering, activity-cliff diagnosis, and large-library nearest-neighbor methods.",
+    "source": "mrsonord2240/bioSkills@87bcd4677e0402e821a95f06f06d8400733606ae:chemoinformatics/similarity-searching",
+    "evaluated_on": "2026-09-24",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 9,
+    "executed_inputs": "9/9"
+  },
+  "veto_gates": {
+    "skill_veto": { "gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS" },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "The prior causal claims were corrected and all threshold guidance remains explicitly calibration-dependent." },
+      "practice_boundaries": { "result": "PASS", "detail": "The skill ranks and compares compounds only; it makes no individual diagnostic or treatment claim." },
+      "methodological_ground": { "result": "PASS", "detail": "The re-audit verifies chirality-aware fingerprints, SMARTS confirmation, canceled-MCS interpretation, and percentile calibration." },
+      "code_usability": { "result": "PASS", "detail": "The bundled example compiled and ran in the audit RDKit environment; exact-commit focused and MHFP6 executions passed." }
+    }
+  },
+  "static_score": {
+    "subtotal": 96,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 12, "max": 12, "note": "All documented search, clustering, Tversky, MCS, activity-cliff, and LSH workflows have usable instructions and an executable path." },
+      "reliability": { "score": 11, "max": 12, "note": "Invalid query SMILES raises clearly and the revised failure modes distinguish meaningful outcomes; some utility snippets still rely on caller-side input screening." },
+      "performance_context": { "score": 8, "max": 8, "note": "The skill uses bulk comparisons, states Butina's quadratic cost, and recommends sampling pair scores for large libraries." },
+      "agent_usability": { "score": 15, "max": 16, "note": "Choice tables, focused snippets, and corrected failure guidance make the workflows actionable; several advanced choices still require chemistry judgment." },
+      "human_usability": { "score": 8, "max": 8, "note": "Natural trigger language and explicit caveats make the intended use and limitations discoverable." },
+      "security": { "score": 11, "max": 12, "note": "No credentials, network access, eval, or destructive action; query validation is demonstrated and library validation remains caller-owned in some snippets." },
+      "maintainability": { "score": 11, "max": 12, "note": "Independent functions and the bundled runnable example make changes testable; instructions remain concentrated in one substantial SKILL.md." },
+      "agent_specific": { "score": 20, "max": 20, "note": "The description is precise, the skill composes with standardization and substructure search, and it now supplies practical escape hatches for false cliffs and trivial MCS results." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 96.2,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 36, "total": 36 },
+    "inputs": [
+      { "index": 1, "type": "Canonical", "label": "Rank analogs around a library query", "status": "COMPLETED", "status_flag": "✅", "note": "Exact-commit bundled example returned 18 ranked hits with the query at 1.000.", "basic": 39, "specialized": 57, "total": 96, "assertions_passed": 4, "assertions_total": 4, "assertions": [{ "text": "Search returns a ranked hit list", "result": "PASS", "note": "18 hits returned." }, { "text": "Query self-match is recovered", "result": "PASS", "note": "Top score was 1.000." }, { "text": "Search uses a deterministic fingerprint route", "result": "PASS", "note": "Bundled Morgan generator executed." }, { "text": "No activity-preservation claim is implied", "result": "PASS", "note": "Skill retains its activity-cliff caveat." }] },
+      { "index": 2, "type": "Variant A", "label": "Butina centroid guarantee", "status": "COMPLETED", "status_flag": "✅", "note": "200 compounds formed 128 clusters; no member-to-centroid violation at the documented 0.4 cutoff.", "basic": 39, "specialized": 57, "total": 96, "assertions_passed": 4, "assertions_total": 4, "assertions": [{ "text": "Butina clustering executes", "result": "PASS", "note": "128 clusters returned." }, { "text": "Centroid-neighbor cutoff statement holds", "result": "PASS", "note": "0 violations." }, { "text": "Quadratic distance route is explicit", "result": "PASS", "note": "Upper triangle was constructed." }, { "text": "Non-centroid pair caveat remains documented", "result": "PASS", "note": "Skill states it directly." }] },
+      { "index": 3, "type": "Variant B", "label": "Tversky ranking plus SMARTS confirmation", "status": "COMPLETED", "status_flag": "✅", "note": "Query-to-library versus reverse Tversky differed by 0.152 on average; SMARTS confirmation filtered the candidate set.", "basic": 39, "specialized": 58, "total": 97, "assertions_passed": 4, "assertions_total": 4, "assertions": [{ "text": "Tversky asymmetry is observable", "result": "PASS", "note": "Mean directional difference was 0.152." }, { "text": "Containment is confirmed with SMARTS", "result": "PASS", "note": "Only HasSubstructMatch results are retained." }, { "text": "The skill does not call Tversky proof of containment", "result": "PASS", "note": "It labels it feature-overlap ranking." }, { "text": "Invalid SMARTS is rejected in the example", "result": "PASS", "note": "Example raises ValueError." }] },
+      { "index": 4, "type": "Edge", "label": "Stereoisomer activity-cliff guard", "status": "COMPLETED", "status_flag": "✅", "note": "An enantiomer pair was 1.000 achiral and 0.714 chirality-aware, matching the corrected explanation.", "basic": 39, "specialized": 58, "total": 97, "assertions_passed": 4, "assertions_total": 4, "assertions": [{ "text": "Achiral Morgan can conflate stereoisomers", "result": "PASS", "note": "Observed 1.000." }, { "text": "Chirality-aware Morgan separates the pair", "result": "PASS", "note": "Observed 0.714." }, { "text": "Exact identity is not delegated to fingerprint similarity", "result": "PASS", "note": "InChIKey and standardized identifiers are prescribed." }, { "text": "Salt handling is addressed", "result": "PASS", "note": "Skill directs upstream standardization and salt stripping." }] },
+      { "index": 5, "type": "Stress", "label": "MCS cancellation versus trivial overlap", "status": "COMPLETED", "status_flag": "✅", "note": "Five divergent molecules returned a two-atom MCS with canceled=False.", "basic": 39, "specialized": 57, "total": 96, "assertions_passed": 4, "assertions_total": 4, "assertions": [{ "text": "MCS execution completes", "result": "PASS", "note": "rdFMCS returned a result." }, { "text": "Cancellation state is observable", "result": "PASS", "note": "canceled=False was returned." }, { "text": "Tiny uncanceled MCS is not misdiagnosed as timeout", "result": "PASS", "note": "Pre-clustering is prescribed." }, { "text": "Timeout escalation is conditional", "result": "PASS", "note": "Only advised after canceled=True." }] },
+      { "index": 6, "type": "Scope Boundary", "label": "Cross-fingerprint threshold calibration", "status": "COMPLETED", "status_flag": "✅", "note": "On 500 hERG compounds, p99.5 was 0.731 and retained 0.0050 of pairs.", "basic": 39, "specialized": 57, "total": 96, "assertions_passed": 4, "assertions_total": 4, "assertions": [{ "text": "Pairwise distribution is computable", "result": "PASS", "note": "124,750 scores evaluated." }, { "text": "Percentile realizes the requested retention rate", "result": "PASS", "note": "0.50% retained." }, { "text": "Calibration is fingerprint-specific", "result": "PASS", "note": "Skill requires per-family distributions." }, { "text": "Large-library memory guard is supplied", "result": "PASS", "note": "Skill recommends sampled pairs." }] },
+      { "index": 7, "type": "Adversarial", "label": "Invalid query and MHFP6 LSH", "status": "COMPLETED", "status_flag": "✅", "note": "Invalid SMILES raised ValueError; focused 100-compound MHFP6 run returned 10 neighbors with recall@10 10/10.", "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 4, "assertions_total": 4, "assertions": [{ "text": "Invalid query reports an actionable error", "result": "PASS", "note": "ValueError: Invalid query SMILES." }, { "text": "MHFP6 LSH index builds", "result": "PASS", "note": "Focused route completed in numpy-1.x venv." }, { "text": "LSH returns requested neighbor count", "result": "PASS", "note": "10 neighbors returned." }, { "text": "Approximate retrieval is benchmarked", "result": "PASS", "note": "Recall@10 was 10/10." }] },
+      { "index": 8, "type": "Edge", "label": "Identity check after a 1.0 fingerprint score", "status": "COMPLETED", "status_flag": "✅", "note": "The enantiomer pair had distinct InChIKeys despite the achiral 1.0 score.", "basic": 39, "specialized": 58, "total": 97, "assertions_passed": 4, "assertions_total": 4, "assertions": [{ "text": "Distinct stereoisomers have distinct identifiers", "result": "PASS", "note": "InChIKeys differed." }, { "text": "Chirality-aware repair is documented", "result": "PASS", "note": "includeChirality=True is first-line." }, { "text": "Hash collisions are retained only as secondary cause", "result": "PASS", "note": "Skill distinguishes both mechanisms." }, { "text": "Sparse fingerprints are not misrepresented as identity proof", "result": "PASS", "note": "Skill limits their diagnostic role." }] },
+      { "index": 9, "type": "Stress", "label": "All prior findings present in exact source", "status": "COMPLETED", "status_flag": "✅", "note": "Exact source contained all four required correction phrases; no original P1/P2 remained open.", "basic": 39, "specialized": 57, "total": 96, "assertions_passed": 4, "assertions_total": 4, "assertions": [{ "text": "Tversky SMARTS confirmation is present", "result": "PASS", "note": "Required phrase found." }, { "text": "MCS canceled-state branch is present", "result": "PASS", "note": "Required phrase found." }, { "text": "Chirality-aware identity guidance is present", "result": "PASS", "note": "Required phrase found." }, { "text": "Percentile calibration guidance is present", "result": "PASS", "note": "Required phrase found." }] }
+    ]
+  },
+  "final": { "static_weighted": 38.4, "dynamic_weighted": 57.7, "score": 96, "max": 100, "grade": "Production Ready", "grade_symbol": "⭐", "deployable": true, "veto_override": false },
+  "key_strengths": ["All four prior P1/P2 findings have exact-source, executable regression coverage.", "Chirality-aware similarity and identifier-based identity checks are now clearly separated.", "MCS guidance now branches correctly on canceled state.", "Threshold guidance now gives an operational per-library calibration procedure."],
+  "recommendations": []
+}

@@ -318,5 +318,8 @@
     "Small-k, Egger, sparse-subgroup, and MR-outlier guards are executable rather than prose-only.",
     "The self-contained reference runs end-to-end through forest, funnel, Cox, and MR outputs with warnings promoted to errors."
   ],
+  "environment_notes": [
+    "The shared Windows R 4.4 audit runtime writes every expected artifact and reaches HARNESS PASS, then exits 139 during process teardown. An isolated library(survminer) probe reproduces the same post-success shutdown fault; metafor and survival probes exit 0. This is recorded as an audit-environment package/finalizer defect, not an open Skill finding."
+  ],
   "recommendations": []
 }

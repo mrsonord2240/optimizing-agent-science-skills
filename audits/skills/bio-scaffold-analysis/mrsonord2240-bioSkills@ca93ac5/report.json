@@ -1,0 +1,82 @@
+{
+  "meta": {
+    "skill_name": "bio-scaffold-analysis",
+    "source": "mrsonord2240/bioSkills@ca93ac599c17ee0c898c2a443777a60ebcd96177:chemoinformatics/scaffold-analysis",
+    "evaluated_on": "2026-09-24",
+    "evaluator_version": "skill-auditor@1.0 exact-commit focused re-audit"
+  },
+  "skill": {
+    "name": "bio-scaffold-analysis",
+    "path": "F:\\OpenScience\\worktrees\\bio-scaffold-analysis-fixpass\\chemoinformatics\\scaffold-analysis",
+    "source_commit": "ca93ac599c17ee0c898c2a443777a60ebcd96177",
+    "base_commit": "80118b2aa7a282506e2661ce9c8bc8a810d0a1fb",
+    "audited_on": "2026-09-24",
+    "mode": "exact-commit focused re-audit"
+  },
+  "pre_fix_evidence": {
+    "report": "re-audit-20260924/pre-fix/eval_report_bio-scaffold-analysis_result.json",
+    "viewer": "re-audit-20260924/pre-fix/eval_viewer_bio-scaffold-analysis.md",
+    "score": 88,
+    "assertions": "24/30"
+  },
+  "structural_veto": {
+    "stability": "PASS",
+    "contract": "PASS",
+    "determinism": "PASS",
+    "security": "PASS"
+  },
+  "final": {
+    "static_weighted": 38.0,
+    "dynamic_weighted": 55.3,
+    "score": 93,
+    "max": 100,
+    "grade": "Production Ready",
+    "deployable": true,
+    "open_p0": 0,
+    "open_p1": 0,
+    "open_p2": 0
+  },
+  "recommendations": [],
+  "re_audit": {
+    "execution_average": 92.1,
+    "assertion_pass_rate": { "passed": 30, "total": 30 },
+    "final": {
+      "static_weighted": 38.0,
+      "dynamic_weighted": 55.3,
+      "score": 93,
+      "max": 100,
+      "grade": "Production Ready",
+      "deployable": true
+    },
+    "assertion_basis": "The 24 previously passing assertions are unchanged by commit ca93ac5. The six prior failures were re-executed against that exact clean commit and now pass. Focused executable evidence is in re-audit-20260924/run-focused/.",
+    "focused_validations": [
+      {
+        "name": "balanced scaffold split",
+        "evidence": "re-audit-20260924/run-focused/scaffold_validation.out",
+        "result": "PASS: 1,500 audited compounds; 80/20, 70/30, and 90/10 all reached their requested train sizes; scaffold overlap 0; test singleton fractions 0.407, 0.407, and 0.400; same-seed rerun identical."
+      },
+      {
+        "name": "canonical worked example",
+        "evidence": "re-audit-20260924/run-focused/scaffold_validation.out",
+        "result": "PASS: Bemis-Murcko O=C(NCC1CCCC1)c1ccccc1 and generic CC(CCC1CCCC1)C1CCCCC1 match the exact strings published in SKILL.md."
+      },
+      {
+        "name": "property-aware MMPA",
+        "evidence": "re-audit-20260924/run-focused/loadprops.out; re-audit-20260924/run-focused/transform.out; re-audit-20260924/run-focused/mmpdb_validation.out",
+        "result": "PASS: mmpdb 3.1.4 loaded 1,064 pIC50 records, recalculated 45,317 rule statistics, and transform returned 135 TSV rows with pIC50_count, pIC50_avg, pIC50_std, pIC50_paired_t, and pIC50_p_value."
+      },
+      {
+        "name": "generic-framework scale expectation",
+        "evidence": "SKILL.md at source_commit",
+        "result": "PASS: the taxonomy now gives the measured reference scale (857 Bemis-Murcko scaffolds to 583 generic frameworks; 1.47-fold collapse; largest generic framework spans four Bemis-Murcko scaffolds) and states that this is library-dependent."
+      }
+    ],
+    "resolved_findings": [
+      "P1 MMPA recipe: loadprops, property-file format, actual property-prefixed output columns, explicit sorting, and no confidence column are now documented and executable.",
+      "P1 split pathology: balanced group allocation, deterministic diagnostics, and a singleton-only-test assertion are shipped in both the SKILL.md snippet and bundled example.",
+      "P2 example strings: canonical RDKit 2026.03.6 output is now published.",
+      "P2 generic framework magnitude: an explicitly non-universal measured reference figure is now published."
+    ],
+    "remaining_findings": []
+  }
+}

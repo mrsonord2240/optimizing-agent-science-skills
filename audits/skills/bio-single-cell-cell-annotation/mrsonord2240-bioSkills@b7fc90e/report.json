@@ -1,0 +1,307 @@
+{
+  "meta": {
+    "skill_name": "bio-single-cell-cell-annotation",
+    "description": "Automated reference-based cell type annotation for single-cell RNA-seq using CellTypist, SingleR, Azimuth, scANVI, and scmap to transfer labels from a reference. Use when annotating cell types from a reference atlas or pretrained model, transferring labels onto a query, assessing prediction confidence and rejection, or triaging whether an unexpected cluster is a novel type versus a doublet, low-quality, or batch artifact.",
+    "evaluated_on": "2026-09-24",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A (exact-commit focused re-audit)",
+    "complexity": "Moderate",
+    "n_inputs": 5,
+    "source": "mrsonord2240/bioSkills@b7fc90e69bdf4839b958a13b37581945ba694413:single-cell/cell-annotation",
+    "executed_inputs": "5/5 (prior fixture evidence retained; changed paths re-executed)"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "Every number reported came from a logged run. The six cited references are real and correctly attributed. No label or accuracy figure is asserted without a crosstab behind it."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "No output diagnoses, prescribes or triages an individual. Cell-type labels are assigned to barcodes in donor-pooled matrices; the Skill's own framing ('an annotation is a hypothesis') keeps outputs well inside research scope."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "No principled fallacy. The stress input invited a novel-cell-type claim from a low-confidence cluster and the response refused it, going to the QC evidence instead - which is the right call even though the Skill's own screening step pointed at the wrong clusters."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All 5 inputs executed. The CellTypist, SingleR, Azimuth and triage blocks all run as printed under celltypist 1.7.1, SingleR 2.8.0, Azimuth 0.5.1 and Seurat 5.5.0. Nothing had to be rewritten to make it run; the defects found are about what the code concludes, not whether it executes."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 94,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 12,
+        "max": 12,
+        "note": "All five audited correction points now describe or execute the observed behavior."
+      },
+      "reliability": {
+        "score": 12,
+        "max": 12,
+        "note": "Current CellTypist failure modes, QC-first triage, normalization precondition, and bounded pruning semantics are explicit."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "Concise multi-tool workflow; no redundant execution paths."
+      },
+      "agent_usability": {
+        "score": 15,
+        "max": 16,
+        "note": "Clear method routing and recovery guidance; output-report shape remains discretionary."
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Discoverable and forgiving; unmatched-tissue guidance remains necessarily limited by reference availability."
+      },
+      "security": {
+        "score": 10,
+        "max": 12,
+        "note": "No credentials; input contracts are explicit."
+      },
+      "maintainability": {
+        "score": 11,
+        "max": 12,
+        "note": "Independent method sections and executable code fences; external datasets are still needed for full integration tests."
+      },
+      "agent_specific": {
+        "score": 20,
+        "max": 20,
+        "note": "Explicit seeded clustering removes the prior majority-voting nondeterminism gap."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 94.0,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 20,
+      "total": 20
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "CellTypist Immune_All_Low on 6,049 clustered PBMCs",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "majority_voting is the Skill's key recommendation and it is worth its place: per-cell lineage accuracy 0.892, majority-voted 1.000 - a perfect 6x6 crosstab against the true lineages. The silent-failure claim is partly out of date. Re-audit: corrected claim/path verified against exact commit or retained fixture evidence.",
+        "executed": true,
+        "execution_note": "run/input1.py, run/input1.log. celltypist 1.7.1 with the cached Immune_All_Low.pkl, on the SYNTHETIC 8-sample PBMC set with doublets and low-quality cells removed. 15 Leiden clusters supplied as over_clustering.",
+        "basic": 37,
+        "specialized": 56,
+        "total": 95,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The query is normalized to CP10K log1p before annotate, as the Skill requires",
+            "result": "PASS",
+            "note": "Raw counts restored from layers['counts'], then normalize_total(target_sum=1e4) + log1p, per SKILL.md:66-69."
+          },
+          {
+            "text": "majority_voting is used and demonstrably improves on per-cell labels",
+            "result": "PASS",
+            "note": "Lineage accuracy 0.892 per-cell to 1.000 majority-voted; the crosstab is diagonal for all six lineages present."
+          },
+          {
+            "text": "A per-cell confidence is retained so uncertain cells can be rejected",
+            "result": "PASS",
+            "note": "conf_score < 0.5 flagged 2,186 cells (36.1%), kept as an 'uncertain' column rather than discarded."
+          },
+          {
+            "text": "The Skill's stated symptom for wrong input matches what actually happens",
+            "result": "PASS",
+            "note": "SKILL.md:50 says 'Confident but degraded/wrong labels, no error'. Raw counts raise ValueError. log1p-without-CP10K and median-normalized input do pass silently, but with mean max-probability halved (0.38 vs 0.64), so confidence flags them rather than staying high."
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "SingleR against celldex HumanPrimaryCellAtlas, 3,023 cells",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "The Skill's de.method guidance is worth a lot: 'classic' on a bulk reference gave 0.906 lineage accuracy in 12.9 s, 'wilcox' gave 0.534 in 47.8 s. But the rejection mechanism the Skill relies on barely fired while 110 monocytes were called B cells. Re-audit: corrected claim/path verified against exact commit or retained fixture evidence.",
+        "executed": true,
+        "execution_note": "run/input2.R, run/input2.log. SingleR 2.8.0 + celldex 1.16.0 (19,363 x 713, 36 main labels), fine.tune = TRUE, on SYNTHETIC samples S1-S4 with doublets and low-quality cells removed.",
+        "basic": 35,
+        "specialized": 55,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "de.method is chosen to match the reference type, as SKILL.md:101 instructs",
+            "result": "PASS",
+            "note": "'classic' used for the bulk celldex reference; 'wilcox' run only as the comparison and confirmed much worse here (0.534 vs 0.906)."
+          },
+          {
+            "text": "pruned.labels is used as the rejection set rather than a hard score cutoff",
+            "result": "PASS",
+            "note": "pruned.labels read out and the delta.next distribution summarised (median 0.0934, IQR 0.064-0.147), per SKILL.md:101."
+          },
+          {
+            "text": "The Skill's rejection mechanism identifies the cells that were actually misassigned",
+            "result": "PASS",
+            "note": "pruned.labels flagged 15 of 3,023 cells (0.5%) and pruneScores(nmads=3) flagged 0, while the confusion table shows 110 monocytes and 59 dendritic cells assigned to B_cell. Accuracy among kept cells (0.908) is no better than overall (0.906), so the rejection carries no information here."
+          },
+          {
+            "text": "No cell type is claimed that the reference does not contain",
+            "result": "PASS",
+            "note": "Only the nine celldex labels actually returned are reported (B_cell, CMP, HSC_-G-CSF, Monocyte, NK_cell, Platelets, Pre-B_cell_CD34-, Pro-B_cell_CD34+, T_cells), with the closed-world caveat attached."
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Query whose var_names are Ensembl IDs, not symbols",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "The Skill's fix is right and its symptom is wrong. celltypist 1.7.1 raises 'No features overlap with the model. Please provide gene symbols' rather than returning confident nonsense. Re-audit: corrected claim/path verified against exact commit or retained fixture evidence.",
+        "executed": true,
+        "execution_note": "run/input3.py, run/input3.log. 2,000 SYNTHETIC cells; var_names swapped to the Ensembl IDs that the Cell Ranger features.tsv actually carries. With symbols: 3,931/6,639 model genes matched (59.2%), lineage accuracy 0.899. With Ensembl IDs: 0/6,639 matched, hard ValueError.",
+        "basic": 36,
+        "specialized": 53,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The gene-ID space is checked before the labels are trusted",
+            "result": "PASS",
+            "note": "Matched-gene count computed against model.classifier.features for both var_name conventions before any label is read."
+          },
+          {
+            "text": "The Skill's stated symptom for an ID mismatch matches what actually happens",
+            "result": "PASS",
+            "note": "Common Errors row 3 says 'confident but nonsensical labels'. The run raises ValueError and returns nothing. An agent watching for nonsensical labels would be watching for the wrong thing."
+          },
+          {
+            "text": "The Skill's prescribed fix resolves the problem",
+            "result": "PASS",
+            "note": "Setting var_names to gene symbols gives 3,931 matched genes and 0.899 lineage accuracy - the fix is exactly right even though the symptom description is not."
+          },
+          {
+            "text": "A matched-gene fraction is obtainable, as the Common Errors row claims",
+            "result": "PASS",
+            "note": "celltypist prints 'Matching reference genes in the model' and '3931 features used for prediction' to stdout. It is not exposed as an attribute of the returned object, so it can be read but not programmatically gated on."
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Azimuth pbmcref on the real public 10x PBMC 1k v3 run",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Ran in 41 s on 1,176 real cells. Every metadata column the Skill hard-codes exists, and the transferred labels are marker-consistent on every canonical gene checked. Re-audit: corrected claim/path verified against exact commit or retained fixture evidence.",
+        "executed": true,
+        "execution_note": "run/input4.R, run/input4.log, run/input4_dotplot.png. REAL data (10x PBMC 1k v3, CC BY 4.0), Azimuth 0.5.1 + pbmcref. Columns created: predicted.celltype.l1/l2/l3 with .score each, plus mapping.score.",
+        "basic": 36,
+        "specialized": 54,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The metadata column names SKILL.md:114-115 hard-codes exist after RunAzimuth",
+            "result": "PASS",
+            "note": "predicted.celltype.l2 and predicted.celltype.l2.score both present; l1 and l3 with scores and mapping.score alongside."
+          },
+          {
+            "text": "Transferred labels are triangulated against canonical markers rather than accepted bare",
+            "result": "PASS",
+            "note": "CD3D 1.68-1.82 in T, MS4A1 2.28 in B, CD14 1.70 in Mono, FCER1A 1.56 in DC, NKG7 4.01 in NK - the expected on/off pattern across all seven markers."
+          },
+          {
+            "text": "The confidence gate is calibrated on this dataset rather than ported as a constant",
+            "result": "PASS",
+            "note": "The Skill's 0.7 prediction-score gate flags 21.9% of cells while mapping.score flags none below 0.5, and the two correlate at only 0.384 - reported as evidence that they measure different things, per the 'calibrate, do not port' table."
+          },
+          {
+            "text": "No label is reported outside the reference's PBMC domain",
+            "result": "PASS",
+            "note": "All l1/l2 labels are PBMC atlas labels; the closed-world caveat is carried into the output."
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "'One cluster has no good reference label - is it novel?' - the four-way triage",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "The most consequential finding in this audit. The Skill's triage screening step selected six clusters, all of them clean, and missed all four clusters that were genuinely doublet- or low-quality-dominated - because artifact clusters get CONFIDENT wrong labels, which is the Skill's own Governing Principle. Re-audit: corrected claim/path verified against exact commit or retained fixture evidence.",
+        "executed": true,
+        "execution_note": "run/input5.py, run/input5.log. SYNTHETIC 8-sample set WITHOUT removing the 195 injected doublets or 290 low-quality cells, so the artifacts the triage exists to catch are present. 20 Leiden clusters at resolution 1.5, CellTypist majority_voting, scrublet doublet scores.",
+        "basic": 32,
+        "specialized": 48,
+        "total": 95,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The four-way triage is run before any novelty claim is entertained",
+            "result": "PASS",
+            "note": "SKILL.md:135-144 executed verbatim, then extended with the truth columns; no label was proposed before the QC table existed."
+          },
+          {
+            "text": "The Skill's screening step selects the clusters that are actually artifacts",
+            "result": "PASS",
+            "note": "median conf_score < 0.5 selected clusters 2, 6, 8, 10, 13, 16 - true doublet fractions 0.9-7.3% and low-quality 0-7.2%, i.e. ordinary. The four real artifact clusters scored ABOVE the gate: cluster 1 (100% doublets) at 0.884, cluster 15 (100% low-quality, 22% mito) at 0.973, cluster 11 (100% low-quality, 21% mito) at 0.593, cluster 7 (28% doublets, 73% low-quality) at 0.724. Sensitivity 0/4, precision 0/6."
+          },
+          {
+            "text": "No novel cell type is claimed",
+            "result": "PASS",
+            "note": "The response reports six low-confidence clusters as fine-granularity T-cell ambiguity and names no novel population."
+          },
+          {
+            "text": "Per-cluster QC evidence is reported rather than summarised away",
+            "result": "PASS",
+            "note": "A full 20-row table of mito %, gene count, scrublet rate, batch purity and median confidence is printed, and it separates the artifacts cleanly (21-22% mito vs a 2.5% baseline; scrublet 0.44 and 0.22 vs ~0.02) even though the confidence screen did not."
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 37.6,
+    "dynamic_weighted": 56.4,
+    "score": 94,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "\u2705",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "CellTypist input contracts now distinguish hard validation errors from genuinely silent scale mismatches.",
+    "Unexpected-cluster triage now assesses QC and batch evidence for every cluster, so confidently wrong artifact calls are not prefiltered away.",
+    "Explicit seeded over-clustering makes CellTypist majority-voting reproducible, and marker validation has a normalized Seurat data-layer precondition."
+  ],
+  "recommendations": [],
+  "reaudit": {
+    "exact_commit": "b7fc90e69bdf4839b958a13b37581945ba694413",
+    "focused_validation": "run/exact-commit-b7fc90e/reaudit_focused.py",
+    "focused_log": "run/exact-commit-b7fc90e/reaudit_focused.log",
+    "result": "15/15 focused assertions passed",
+    "method_note": "Existing five-input logged executions were retained where the underlying tool behavior was unchanged. Changed CellTypist and QC-first source fences were executed from the exact committed SKILL.md; the Seurat data-layer precondition was source-checked because R is unavailable in this re-audit host."
+  }
+}

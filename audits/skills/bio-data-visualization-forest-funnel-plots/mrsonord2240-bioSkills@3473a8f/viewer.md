@@ -18,6 +18,7 @@
 - Exact-source contract: 13/13 PASS.
 - R exact execution: full shipped workflow PASS with `options(warn = 2)`.
 - Visual inspection: BCG forest footer is rendered and all study whiskers are visible; funnel is rendered.
+- Environment note: the shared Windows R 4.4 runtime reaches `HARNESS PASS` and writes every expected artifact, then exits 139 during teardown. An isolated `library(survminer)` probe reproduces that post-success shutdown fault while `metafor` and `survival` exit 0; this is an audit-environment package/finalizer defect, not an open Skill finding.
 
 ## Scores
 

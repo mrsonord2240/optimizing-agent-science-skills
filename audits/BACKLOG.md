@@ -8,7 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (119)
+## P1 (113)
 
 ### `bio-data-visualization-statistical-annotation` — stat_compare_means(comparisons, p.adjust.method='holm') draws unadjusted p; the argument does not exist
 
@@ -498,14 +498,6 @@ None open.
 - Root cause: query_raw() inherits pybiomart's GET-based transport unchanged; nothing in the fix's new helper switches to POST or chunks large ID lists client-side.
 - Fix: Either build the query_raw() request as an HTTP POST (BioMart's martservice endpoint accepts POST for the same XML payload) or chunk ID lists above a safe size (empirically ~500-1000 IDs) into multiple queries joined client-side, and correct the '5,000'/'8,000 IDs' claims in SKILL.md and usage-guide.md to state the real, tested limit.
 
-### `bio-single-cell-cell-annotation` — The triage screens on the one signal artifacts do not trip
-
-- Skill: 87, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/cell-annotation) · [viewer](skills/bio-single-cell-cell-annotation/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 5
-- Problem: SKILL.md:138-139 screens for suspect clusters with median conf_score < 0.5. On a dataset containing labelled doublet and low-quality clusters, that screen selected six ordinary clusters and none of the four artifact clusters, which scored 0.59 to 0.97.
-- Root cause: Self-contradiction: the Skill's own Governing Principle says a state outside the reference is forced to the nearest label 'often with high apparent confidence', which is precisely why artifact clusters are confident. Low confidence instead tracks fine-granularity ambiguity between similar reference labels.
-- Fix: Invert the entry point. Screen every cluster on the QC covariates the same code block already computes - pct_counts_mt, n_genes_by_counts, doublet rate, batch purity - and use low annotation confidence only as a secondary signal for 'not in reference'. In this run the QC columns separated the artifacts perfectly (21-22% mito against a 2.5% baseline; doublet rates 0.44 and 0.22 against 0.02).
-
 ### `bio-crispr-screens-mageck-analysis` — 'RRA does not support pairing' is factually incorrect
 
 - Skill: 88, Limited Release · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/crispr-screens/mageck-analysis) · [viewer](skills/bio-crispr-screens-mageck-analysis/mrsonord2240-bioSkills@6847328/viewer.md)
@@ -561,22 +553,6 @@ None open.
 - Problem: Conformal intervals fitted on a scaffold-split model undercovered at every level tested: 0.851 against a 0.90 target, 0.916 against 0.95, 0.706 against 0.80. The Skill states the exchangeability assumption in the AD table and recommends the scaffold split two pages earlier, but never connects them, so a reader following both instructions gets silent undercoverage.
 - Root cause: The two sections were written independently; the interaction between split design and conformal validity is never addressed.
 - Fix: Add a sentence to the conformal section: under a scaffold or time split the calibration and test sets are not exchangeable, so marginal coverage is not guaranteed -- report empirical coverage on the held-out set alongside the nominal level, and consider a Mondrian or group-conditional conformal variant.
-
-### `bio-scaffold-analysis` — The MMPA command sequence omits loadprops and cannot produce its documented output
-
-- Skill: 88, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/scaffold-analysis) · [viewer](skills/bio-scaffold-analysis/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 5
-- Problem: The three-line recipe is fragment, index, then `mmpdb transform --property pIC50`. Run as written it fails with "--property 'pIC50' is not present in the database", because activity data is never loaded. The section's stated output -- 'ranked transformations with delta(pIC50), N pairs, confidence' -- is also wrong: the real output is an unranked 20-column TSV in SMILES order with no confidence field.
-- Root cause: The recipe was written from the mmpdb command list without running the property-dependent step end to end.
-- Fix: Insert `mmpdb loadprops -p props.csv data.mmpdb` between index and transform, show the two-column tab-separated property file format, and correct the output description to name the columns that actually appear (count, avg, std, paired_t, p_value) and to say the caller must sort.
-
-### `bio-scaffold-analysis` — The shipped scaffold split always yields an all-singleton test set
-
-- Skill: 88, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/scaffold-analysis) · [viewer](skills/bio-scaffold-analysis/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 2
-- Problem: Because scaffold groups are sorted largest-first and assigned to train until the target size is reached, every multi-member scaffold lands in train. At 0.8, 0.7 and 0.9 train fractions the test set was 100% singleton-scaffold compounds. The Skill names this exact failure mode and prescribes a stratified scaffold split, but ships no implementation of one.
-- Root cause: Size-descending greedy assignment optimises only for hitting the target train size, with nothing spreading large scaffolds across splits.
-- Fix: Either interleave assignment (walk the size-sorted groups and send every k-th large group to test) or ship the StratifiedGroupKFold variant the Skill already recommends, and add an assertion in the function that reports the fraction of test compounds sitting on singleton scaffolds so the user sees the problem.
 
 ### `bio-single-cell-markers-annotation` — The Python pseudobulk snippet sums normalized values, against the Skill's own rule
 
@@ -698,22 +674,6 @@ None open.
 - Root cause: The shared Windows R runtime intermittently terminates after output materialization.
 - Fix: Document the verified-output fallback and add a post-run parse check with explicit nonzero-exit handling; prefer a stable R runtime for unattended pipelines.
 
-### `bio-molecular-standardization` — ChEMBL route can return an unstripped organic salt, undocumented
-
-- Skill: 90, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/molecular-standardization) · [viewer](skills/bio-molecular-standardization/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 2, 4
-- Problem: get_parent_mol returned both fragments for sodium acetate, sodium benzoate, sodium formate, sodium citrate, potassium acetate and choline chloride, because every fragment is itself on ChEMBL's salt list. The Skill presents the ChEMBL route as the default and documents only the fully-inorganic case.
-- Root cause: The 'ChEMBL pipeline -- inorganic salt fails' failure mode assumes the survivor has no carbon, so its prescribed mitigation (pre-filter to >=1 carbon atom) passes every organic salt shown above.
-- Fix: Add a failure mode for the all-fragments-are-salts case and change the mitigation to a fragment-count check on the parent (`len(Chem.GetMolFrags(parent)) > 1` -> flag for review or fall back to LargestFragmentChooser(preferOrganic=True)), not a carbon-count check.
-
-### `bio-molecular-standardization` — Shipped code discards failures silently, contradicting the usage guide
-
-- Skill: 90, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/molecular-standardization) · [viewer](skills/bio-molecular-standardization/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 1
-- Problem: usage-guide.md step 7 promises a report of parse failures, exclusion flags and fragments stripped, but prepare_qsar_data in both SKILL.md and examples/standardize_library.py drops every failure with a bare `continue` and keeps no counts, so a library can lose rows with no trace.
-- Root cause: The reporting contract lives only in the usage guide; the reference implementation was written as a filter rather than as an audited transform.
-- Fix: Give prepare_qsar_data a status tally (parse_failure / excluded_by_chembl / standardize_error / inorganic / ok), return it alongside the DataFrame, and print it in the __main__ demo so the documented report is what the code actually produces.
-
 ### `bio-pathway-kegg-pathways` — Forward n_boot into graphite runSPIA
 
 - Skill: 90, Production Ready · [mrsonord2240/bioSkills@2befc0b](https://github.com/mrsonord2240/bioSkills/tree/2befc0bb138ea3b0a035402c78af1c62b8955522/pathway-analysis/kegg-pathways) · [viewer](skills/bio-pathway-kegg-pathways/mrsonord2240-bioSkills@2befc0b/viewer.md)
@@ -721,14 +681,6 @@ None open.
 - Problem: The shipped topology example offers n_boot as its sole performance/reproducibility control but only sends it to direct spia(). The graphite route silently runs 2,000 bootstraps, contradicting the interactive 200-500 guidance and the claimed nB=100 whole-script runtime.
 - Root cause: runSPIA forwards its dots to SPIA::spia, but the example omits nB=n_boot in that call.
 - Fix: Change the graphite call to runSPIA(de = de_vec_gr, all = universe_gr, 'kegg_hsa_spia', nB = n_boot), then re-run the topology regression at a reduced documented value and update the reference timing.
-
-### `bio-similarity-searching` — The 'Tanimoto = 1.0' failure mode has the wrong cause and a fix that does not work
-
-- Skill: 90, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/similarity-searching) · [viewer](skills/bio-similarity-searching/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 4, 7
-- Problem: 141 pairs in a 3,224-compound library reach folded-ECFP4 Tanimoto 1.0 with different structures. The Skill attributes this to hash collisions and prescribes an unhashed sparse fingerprint to disambiguate. Every inspected pair is an enantiomer or diastereomer whose unhashed sparse fingerprints are also identical, because the default Morgan generator sets includeChirality=False. The same misattribution appears in the Common Errors row for activity-cliff false positives, where four of five observed cliffs are stereochemistry artifacts and the fifth is an unstripped salt.
-- Root cause: Fingerprint collisions and stereochemistry-blindness produce the same symptom, and the Skill diagnosed the rarer cause.
-- Fix: Rewrite the failure mode around chirality: state that RDKit's Morgan generators default to includeChirality=False, give GetMorganGenerator(..., includeChirality=True) as the first fix and InChIKey as the identity check, and keep hash collisions as a secondary cause. Add the same note to the activity-cliff false-positive row, together with a reminder to strip salts upstream.
 
 ### `bio-single-cell-batch-integration` — The Seurat v5 snippet aborts on its own default method
 
@@ -962,7 +914,7 @@ None open.
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (307)
+## P2 (295)
 
 ### `bio-data-visualization-statistical-annotation` — Test-name and label details differ from the tools
 
@@ -2204,38 +2156,6 @@ None open.
 - Root cause: Conceptual section only.
 - Fix: Add the regression of HPD width on posterior mean from out.txt.
 
-### `bio-single-cell-cell-annotation` — Two 'wrong input' symptoms are stale for current tool versions
-
-- Skill: 87, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/cell-annotation) · [viewer](skills/bio-single-cell-cell-annotation/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 1, 3
-- Problem: The normalization table says wrong CellTypist input produces 'confident but degraded/wrong labels, no error'; Common Errors row 3 says an Ensembl-ID query produces 'confident but nonsensical labels'. Under celltypist 1.7.1 both raise hard ValueErrors instead.
-- Root cause: The symptoms were written against an older CellTypist that did not validate its input; the requirements themselves are still right.
-- Fix: Update both symptom cells to name the actual error strings ('Invalid expression matrix in .X, expect log1p normalized expression to 10000 counts per cell' and 'No features overlap with the model. Please provide gene symbols'), and keep a line for the case that IS still silent - log1p without CP10K, or scanpy's median-normalized default, where accuracy degrades and mean max-probability roughly halves.
-
-### `bio-single-cell-cell-annotation` — SingleR's rejection set is presented as a safety net it is not
-
-- Skill: 87, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/cell-annotation) · [viewer](skills/bio-single-cell-cell-annotation/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 2
-- Problem: The Skill treats pruned.labels and pruneScores(nmads=3) as the rejection mechanism. On a query where 169 of 3,023 cells were confidently misassigned across lineage boundaries, pruning flagged 15 cells and pruneScores flagged 0, and accuracy among retained cells was no better than overall.
-- Root cause: Delta-based pruning detects cells whose best and second-best scores are close, not cells whose reference simply lacks their type - a different failure from the one the Skill is guarding against.
-- Fix: Say what pruning does and does not catch, and pair it with the marker-triangulation step the Skill already describes: a DotPlot of canonical markers by SingleR label would have shown the monocyte-to-B_cell assignments immediately.
-
-### `bio-single-cell-cell-annotation` — The marker-validation snippet assumes a normalized object it is not given
-
-- Skill: 87, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/cell-annotation) · [viewer](skills/bio-single-cell-cell-annotation/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 4
-- Problem: SKILL.md:155-158 runs DotPlot straight after the annotation block. On the object RunAzimuth returns, the RNA data layer is empty, and Seurat falls back with 'data layer is not found and counts layer is used' - so the validation plot is built from raw counts.
-- Root cause: The validation section was written as if the object had already been through NormalizeData, which the Azimuth path does not guarantee.
-- Fix: Add NormalizeData(seurat_obj) (or a note that DotPlot needs the data layer) immediately above the DotPlot call.
-
-### `bio-single-cell-cell-annotation` — majority_voting's over-clustering is neither created nor seeded
-
-- Skill: 87, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/cell-annotation) · [viewer](skills/bio-single-cell-cell-annotation/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 1, 5
-- Problem: The CellTypist snippet passes majority_voting=True but never says where the over-clustering comes from. Left to itself CellTypist runs its own Leiden; given an unseeded upstream clustering, the smoothed labels differ between runs of the same script.
-- Root cause: The dependency on a clustering is implicit in the argument name.
-- Fix: Pass over_clustering='leiden' explicitly in the snippet and note that the upstream clustering must be seeded for the annotation to be reproducible.
-
 ### `bio-crispr-screens-mageck-analysis` — FluteRRA's remaining 'undefined columns selected' error is a real, still-open upstream gap
 
 - Skill: 88, Limited Release · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/crispr-screens/mageck-analysis) · [viewer](skills/bio-crispr-screens-mageck-analysis/mrsonord2240-bioSkills@6847328/viewer.md)
@@ -2323,22 +2243,6 @@ None open.
 - Problem: The symptom is given as 'Confident predictions but actual values different'. On the 50 most novel chemotypes, MAE was 0.667 against 0.659 for the 50 closest analogues -- a ratio of 1.01 -- while R2 fell from 0.621 to 0.015.
 - Root cause: The symptom is described in terms of absolute error, but out-of-domain subsets often also have compressed label ranges, so the damage appears in explained variance instead.
 - Fix: Restate the symptom as loss of explained variance and rank ordering on the out-of-domain subset, and tell the reader to report R2 or Spearman stratified by the AD diagnostic rather than MAE alone.
-
-### `bio-scaffold-analysis` — Worked example quotes non-canonical SMILES for code output
-
-- Skill: 88, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/scaffold-analysis) · [viewer](skills/bio-scaffold-analysis/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 4
-- Problem: The scaffold example states the Bemis-Murcko output as c1ccc(C(=O)NCC2CCCC2)cc1 and the generic as C1CCC(C(C)CCC2CCCC2)CC1. Both are chemically correct but neither is what MolToSmiles emits (O=C(NCC1CCCC1)c1ccccc1 and CC(CCC1CCCC1)C1CCCCC1), so an agent comparing strings sees a mismatch.
-- Root cause: The example was written by hand rather than pasted from a run.
-- Fix: Replace both strings with the canonical output of the current RDKit and note that the example was produced with a stated version.
-
-### `bio-scaffold-analysis` — No expectation given for how much the generic framework collapses a library
-
-- Skill: 88, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/scaffold-analysis) · [viewer](skills/bio-scaffold-analysis/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 6
-- Problem: The Skill correctly says generic frameworks are for topology comparison only, but gives no sense of scale. Measured on 1,500 real compounds: 857 Bemis-Murcko scaffolds become 583 generic frameworks, and the largest framework merges 4 distinct chemotypes into 59 compounds.
-- Root cause: The representation table describes what each view loses without quantifying the consequence.
-- Fix: Add a one-line worked figure to the taxonomy table showing the scaffold-count ratio on a representative library, so a reader can judge whether the abstraction is acceptable for their purpose.
 
 ### `bio-single-cell-markers-annotation` — No Common Errors row for a non-integer pseudobulk matrix
 
@@ -2644,30 +2548,6 @@ None open.
 - Root cause: This P2 was explicitly scoped out of the current fix dispatch (fix log: 'not in this dispatch's scope... left for a future pass').
 - Fix: Add a concrete before/after example (e.g. cyclosporine A, already named in usage-guide.md but never coded) showing embedding failure or degraded diversity under default settings versus success under useMacrocycleTorsions=True.
 
-### `bio-molecular-standardization` — No policy for replicate measurements that disagree
-
-- Skill: 90, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/molecular-standardization) · [viewer](skills/bio-molecular-standardization/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 1
-- Problem: Mean-aggregating pChEMBL across replicates is prescribed without any tolerance check. On the real hERG set, 47 of 379 replicated compounds (12.4%) spanned more than 1 log unit, up to 3.69.
-- Root cause: The ML-preparation section treats replicate count as a confidence signal but never converts it into a decision rule.
-- Fix: Add a spread column (std or max-min) and a documented threshold in the ML-preparation section, with guidance to drop or flag compounds above it, and note that ChEMBL exports mix binding and functional assay formats.
-
-### `bio-molecular-standardization` — Isotope handling is a single library-wide boolean
-
-- Skill: 90, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/molecular-standardization) · [viewer](skills/bio-molecular-standardization/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 5
-- Problem: keep_isotopes applies to every molecule, so a library mixing labelled tracers with ordinary compounds cannot be standardized in one pass under the documented policy.
-- Root cause: Stage 7 of the pipeline table treats isotope normalization as a global setting, although its own note says to preserve labels when scientifically meaningful.
-- Fix: Show the per-record form in the pipeline: accept a predicate or a per-row flag column, and add a line to the Tips section on recording which compounds retained labels.
-
-### `bio-molecular-standardization` — User column names are used without a presence check
-
-- Skill: 90, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/molecular-standardization) · [viewer](skills/bio-molecular-standardization/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: —
-- Problem: prepare_qsar_data indexes row[smiles_col] and row[activity_col] directly, so a mistyped or absent column surfaces as a raw pandas KeyError rather than an actionable message.
-- Root cause: The function was written for a fixed in-house schema and then parameterised without validating the parameters.
-- Fix: Validate that both columns exist in df.columns at function entry and raise a named error listing the available columns.
-
 ### `bio-reference-operations` — Reject wholly out-of-range consensus windows
 
 - Skill: 90, Production Ready · [mrsonord2240/bioSkills@0f829d1](https://github.com/mrsonord2240/bioSkills/tree/0f829d1619132fc9033b2437205d51ecb74df5d3/alignment-files/reference-operations) · [viewer](skills/bio-reference-operations/mrsonord2240-bioSkills@0f829d1/viewer.md)
@@ -2675,30 +2555,6 @@ None open.
 - Problem: pysam_consensus.py consensus chr1 121 130 exits 0 and prints nine Ns even though the requested range is beyond a 120-base contig.
 - Root cause: The CLI delegates range handling to pileup and does not compare START/END to the BAM header length before building its N-initialized output.
 - Fix: Before calling build_consensus, validate 0 <= START < END <= BAM reference length; exit nonzero with an actionable coordinate message. Preserve legitimate in-range uncovered columns as Ns.
-
-### `bio-similarity-searching` — MCS failure mode describes a timeout that does not occur
-
-- Skill: 90, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/similarity-searching) · [viewer](skills/bio-similarity-searching/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 5
-- Problem: The Skill's MCS failure mode says the algorithm 'tries every atom-mapping permutation within timeout' and prescribes raising the timeout. On 40 deliberately divergent molecules rdFMCS returned a 2-atom MCS in under 0.1 s with canceled=False at both a 5 s and a 60 s timeout, so raising the timeout changes nothing.
-- Root cause: The symptom 'returns small partial MCS' has two causes -- cancellation and genuine convergence on a trivial common fragment -- and the Skill only covers the first.
-- Fix: Split the symptom: instruct the reader to check result.canceled first, and state that a small MCS with canceled=False means the input set genuinely has little in common, for which the fix is pre-clustering rather than a longer timeout.
-
-### `bio-similarity-searching` — No precision expectation for Tversky substructure-like search
-
-- Skill: 90, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/similarity-searching) · [viewer](skills/bio-similarity-searching/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 3
-- Problem: With alpha=1, beta=0 against a 2-aminobenzimidazole query, 8 compounds scored above 0.7 and only one actually contains the fragment. The Skill offers 'substructure-like' and 'parameter choice subjective' but no indication that the hit list needs a SMARTS confirmation step.
-- Root cause: The section explains the coefficient's asymmetry without characterising its precision as a substructure proxy.
-- Fix: Add one line telling the reader to confirm Tversky hits with an actual substructure match from chemoinformatics/substructure-search, and note that the coefficient ranks feature overlap rather than containment.
-
-### `bio-similarity-searching` — Per-fingerprint thresholds are not iso-selective and the Skill does not say how to set them
-
-- Skill: 90, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/similarity-searching) · [viewer](skills/bio-similarity-searching/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 6
-- Problem: The quoted starting points (ECFP4 0.7, FCFP4 0.6, AtomPair 0.55, MACCS 0.85) retain between 0.094% and 0.603% of all pairs on the same library -- a 6.4x spread. The Skill correctly says they are not universal equivalents, but gives no procedure for choosing one.
-- Root cause: The table lists heuristics without the calibration step that would make them comparable.
-- Fix: Add a two-line recipe: compute the all-pairs similarity distribution on the actual library and pick the threshold at a chosen percentile (for example p99.5), so thresholds across fingerprints select comparable fractions rather than comparable numbers.
 
 ### `bio-single-cell-batch-integration` — Two of the five listed Seurat methods need an unnamed package
 

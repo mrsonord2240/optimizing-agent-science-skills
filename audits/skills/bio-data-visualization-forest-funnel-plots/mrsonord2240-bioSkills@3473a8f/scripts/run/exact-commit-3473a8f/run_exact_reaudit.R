@@ -41,9 +41,12 @@ stopifnot(k3$k == 3, identical(k3$test, "knha"), !grepl("I\\^2", small_footer), 
 cat("SMALL-K PASS: ", small_footer, "; Egger withheld because k < 10\n", sep = "")
 
 # The shipped example runs through synthetic Cox and bundled lipid/CHD MR without warnings.
-old_wd <- getwd(); on.exit(setwd(old_wd), add = TRUE); setwd(out)
+old_wd <- getwd(); setwd(out)
 sys.source(file.path(source_root, "examples", "forest_phd.R"), envir = new.env(parent = globalenv()))
 expected <- file.path(out, "plots", c("forest.pdf", "funnel.pdf", "cox_subgroup_forest.pdf",
                                        "cox_adjusted_covariates.pdf", "mr_method_forest.pdf"))
 stopifnot(all(file.exists(expected)), all(file.info(expected)$size > 1000))
 cat("EXAMPLE PASS: ", paste(basename(expected), collapse = ", "), "\n", sep = "")
+setwd(old_wd)
+cat("HARNESS PASS\n")
+quit(save = "no", status = 0, runLast = FALSE)

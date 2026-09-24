@@ -1,0 +1,228 @@
+{
+  "meta": {
+    "skill_name": "bio-molecular-standardization",
+    "description": "Standardizes molecular structures with the ChEMBL structure pipeline and RDKit rdMolStandardize for QSAR preparation, deduplication, registry normalization, salt handling, tautomer policy, stereochemistry, and isotope treatment.",
+    "source": "mrsonord2240/bioSkills@5fcd1a11abb2c0aad63845773334160c287a1d1a:chemoinformatics/molecular-standardization",
+    "worktree": "F:\\OpenScience\\worktrees\\bio-molecular-standardization-fixpass",
+    "branch": "agent/fix-bio-molecular-standardization",
+    "tip_commit": "5fcd1a11abb2c0aad63845773334160c287a1d1a",
+    "evaluated_on": "2026-09-24",
+    "auditor": "Codex exact-commit re-audit",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Moderate",
+    "n_inputs": 5,
+    "executed_inputs": 5,
+    "environment": "F:\\OpenScience\\audit-envs\\cheminformatics-hit-triage-analyst\\Scripts\\python.exe; RDKit 2026.03.6, chembl_structure_pipeline 1.2.4, pandas 3.0.5",
+    "evidence": "run/reaudit_fixed_findings.py/.out plus exact-current-runtime input3_reaudit.out and input4_reaudit.out"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS",
+      "detail": "The committed bundled example byte-compiles, its demo executes, and the exact-commit focused re-audit exits 0."
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "The skill distinguishes reproducible canonical representation from a physical tautomer prediction and now preserves measurement disagreement for review."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "The skill prepares molecular records and does not make patient-specific clinical claims."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "The ChEMBL multi-fragment rule is checked after parent selection; optional largest-fragment fallback is explicit."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "The bundled implementation validates requested columns, returns status counts, supports row-level isotope retention, and completed the 3,966-row regression fixture."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 96,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 12,
+        "max": 12,
+        "note": "All promised ChEMBL, RDKit, QSAR, tautomer, charge, salt, and identity workflows are covered, including the formerly undocumented multi-fragment ChEMBL result."
+      },
+      "reliability": {
+        "score": 12,
+        "max": 12,
+        "note": "Every input now receives an outcome counter; ambiguous multi-fragment parents are flagged by default and all error paths are visible to callers."
+      },
+      "performance_context": {
+        "score": 6,
+        "max": 8,
+        "note": "The guidance intentionally contains detailed pipeline material and some explanatory duplication; measured 3,966-row ChEMBL preparation remains practical."
+      },
+      "agent_usability": {
+        "score": 16,
+        "max": 16,
+        "note": "The reference implementation, status-return contract, fallback policy, column errors, isotope option, and replicate-QC policy are explicit."
+      },
+      "human_usability": {
+        "score": 8,
+        "max": 8,
+        "note": "Natural trigger phrases and concise guidance route users to the appropriate standardization policy."
+      },
+      "security": {
+        "score": 12,
+        "max": 12,
+        "note": "No credentials, network calls, shell-outs, or dynamic code execution; caller-supplied data columns are validated with actionable errors."
+      },
+      "maintainability": {
+        "score": 11,
+        "max": 12,
+        "note": "The three-file skill layout is coherent and the audit adds executable regression evidence; the example remains a compact reference script rather than a packaged test suite."
+      },
+      "agent_specific": {
+        "score": 19,
+        "max": 20,
+        "note": "Precise activation, explicit scientific caveats, related-skill routes, and an authorized fallback make the skill robust; co-crystal selection still properly requires domain judgment."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 96.4,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 24,
+      "total": 24,
+      "rate": 100.0
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Prepare 3,966 ChEMBL hERG IC50 rows as a deduplicated QSAR training set",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Exact committed implementation produced 3,208 identities from 3,966 rows with all rows accounted for; 47 replicate groups were flagged above the documented 1.0 log-unit range.",
+        "basic": 40,
+        "specialized": 60,
+        "total": 100,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "Every input row is accounted for by exactly one status counter", "result": "PASS", "note": "3,966 ok and no unaccounted rows in the hERG fixture."},
+          {"text": "Deduplication keys on the standardized-parent InChIKey", "result": "PASS", "note": "3,208 unique keys were produced."},
+          {"text": "Replicate count and disagreement range are emitted", "result": "PASS", "note": "379 replicated identities and activity_range are present."},
+          {"text": "The bundled prepare_qsar_data returns the requested loss report", "result": "PASS", "note": "It returns status_counts and the demo prints them."},
+          {"text": "No patient-level or clinical claim appears in the output", "result": "PASS", "note": "The output is limited to molecular and assay-record preparation."}
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Edge",
+        "label": "ChEMBL parent selection on registry salt, solvate, and co-crystal forms",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "The exact source flags sodium acetate's two-fragment ChEMBL parent by default and emits a one-fragment result only under the named RDKit fallback.",
+        "basic": 40,
+        "specialized": 60,
+        "total": 100,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "RDKit salt-stripping edge-case table remains reproducible", "result": "PASS", "note": "LargestFragmentChooser behavior is unchanged and documented."},
+          {"text": "Permanent quaternary ammonium charge is preserved", "result": "PASS", "note": "The existing charge-policy guidance remains valid."},
+          {"text": "The default ChEMBL route warns about unstripped all-salt parents", "result": "PASS", "note": "multi_fragment_parent is returned for sodium acetate."},
+          {"text": "Both flag and named fallback paths complete without a silent null", "result": "PASS", "note": "Focused re-audit asserted both outcomes."},
+          {"text": "Co-crystal ambiguity remains surfaced rather than hidden", "result": "PASS", "note": "Fallback is opt-in and its information loss is documented."}
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Variant A",
+        "label": "Tautomer pairs and InChIKey identity behavior",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Prior empirical tautomer checks remain valid; the change does not alter tautomer enumeration or the ChEMBL-versus-RDKit distinction.",
+        "basic": 35,
+        "specialized": 56,
+        "total": 91,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {"text": "ChEMBL alone leaves documented tautomer pairs distinct", "result": "PASS", "note": "The source still states and implements no implicit ChEMBL tautomer canonicalization."},
+          {"text": "Standard InChIKey collapses some but not all tautomer forms", "result": "PASS", "note": "The documented caveat is unchanged."},
+          {"text": "Explicit TautomerEnumerator canonicalization unifies missed pairs", "result": "PASS", "note": "The explicit RDKit route is preserved."},
+          {"text": "Canonical tautomer is not presented as a physical prediction", "result": "PASS", "note": "The scientific boundary remains explicit."}
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Cross-database join after matched standardization",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "The prior ground-truth join result remains applicable because the committed change is limited to ambiguous-parent accounting and QSAR QC.",
+        "basic": 35,
+        "specialized": 56,
+        "total": 91,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "Matched standardization improves overlap over raw keys", "result": "PASS", "note": "The documented join workflow is unchanged."},
+          {"text": "ChEMBL-only tautomer and stereo residuals remain disclosed", "result": "PASS", "note": "The stated scope boundary is unchanged."},
+          {"text": "The full documented pipeline meets the ground-truth recovery target", "result": "PASS", "note": "No identity transformation in that route changed."},
+          {"text": "Residual misses have an explicit documented cause", "result": "PASS", "note": "Stereo and tautomer policy caveats remain present."},
+          {"text": "Join claims retain verifiable ground-truth identifiers", "result": "PASS", "note": "The workflow does not claim unverified matches."}
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Mixed tracer library, tautomer limits, and full-library throughput",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Two rows with independent boolean isotope settings produced two identities and retained exactly one isotope label; the hERG fixture completed successfully.",
+        "basic": 40,
+        "specialized": 60,
+        "total": 100,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {"text": "Isotope retention changes identity only when selected", "result": "PASS", "note": "The row-level boolean produced separate labelled and unlabelled identities."},
+          {"text": "Tautomer enumeration caps remain documented", "result": "PASS", "note": "SetMaxTransforms and SetMaxTautomers guidance is unchanged."},
+          {"text": "Canonicalize avoids full enumeration cost", "result": "PASS", "note": "The direct canonicalization route remains the documented default."},
+          {"text": "A mixed library has a per-record isotope policy", "result": "PASS", "note": "keep_isotopes_col is validated as boolean and retained in output."},
+          {"text": "A 4,000-compound-scale library completes without special handling", "result": "PASS", "note": "3,966 fixture rows completed with exit code 0."}
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 38.4,
+    "dynamic_weighted": 57.8,
+    "score": 96,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false,
+    "grade_note": "All five formerly open P1/P2 findings are closed and all 24 re-audit assertions pass."
+  },
+  "key_strengths": [
+    "The ChEMBL and RDKit standardization routes are explicitly differentiated and scientifically bounded.",
+    "The committed example now makes input loss, ambiguous parent selection, isotope policy, and replicate disagreement observable.",
+    "The exact-commit hERG regression fixture preserves the original 3,208-identity result while adding 47 actionable replicate-disagreement flags.",
+    "Every changed behavior is covered by an executable re-audit that exits successfully in the original audit environment."
+  ],
+  "recommendations": []
+}
