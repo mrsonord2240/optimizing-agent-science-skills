@@ -1,0 +1,58 @@
+TwoSampleMR version 0.7.9 
+
+ [>] New authentication requirements: https://mrcieu.github.io/ieugwasr/articles/guide.html#authentication.
+ [>] Major upgrades to our servers completed to improve service and stability.
+ [>] We need your help to shape our emerging roadmap!
+     Please take 2 minutes to give us feedback -
+     https://forms.office.com/e/eSr7EFAfCG
+--- Univariable MR (Total Effect E -> Y) ---
+  Total beta: 0.463  SE: 0.0507  p: < 2.22e-16 
+  95% CI: [ 0.3636 , 0.5624 ]
+
+
+Conditional F-statistics for instrument strength
+
+            exposure1 exposure2
+F-statistic  11.19587  8.241182
+Warning message:
+In strength_mvmr(mvmr_dat, gencov = 0) :
+  Covariance between effect of genetic variants on each exposure not specified. Fixing covariance at 0.
+--- Conditional F-statistics (require > 10 per exposure) ---
+            exposure1 exposure2
+F-statistic  11.19587  8.241182
+Q-Statistic for instrument validity:
+18.14061 on 77 DF , p-value: 1
+Warning message:
+In pleiotropy_mvmr(mvmr_dat, gencov = 0) :
+  Covariance between effect of genetic variants on each exposure not specified. Fixing covariance at 0.
+
+--- MVMR Q-statistic for instrument heterogeneity ---
+$Qstat
+[1] 18.14061
+
+$Qpval
+[1] 1
+
+
+Multivariable MR
+
+           Estimate Std. Error  t value     Pr(>|t|)
+exposure1 0.1689364 0.01175605 14.37017 1.271831e-23
+exposure2 0.8251207 0.01826423 45.17688 1.084967e-57
+
+Residual standard error: 0.983 on 78 degrees of freedom
+
+
+
+--- MVMR (Direct Effects) ---
+           Estimate Std. Error  t value     Pr(>|t|)
+exposure1 0.1689364 0.01175605 14.37017 1.271831e-23
+exposure2 0.8251207 0.01826423 45.17688 1.084967e-57
+
+--- Indirect Effect (Total - Direct) ---
+  Indirect: 0.2941  SE: 0.052 
+  95% CI: [ 0.1921 , 0.3961 ]
+  Proportion mediated: 0.635 
+
+WARNING: conditional F < 10 detected. Weak-instrument bias possible.
+         Consider Q-statistic-adjusted methods (qhet_mvmr).

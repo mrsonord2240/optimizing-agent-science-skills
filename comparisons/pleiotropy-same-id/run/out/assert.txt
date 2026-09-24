@@ -1,0 +1,17 @@
+planted outliers (C): 7 19 28 36 47 55 
+
+##### theirs 
+A_balanced     IVW 0.310 Egger 0.249 (int 0.0052 p=0.504) WM 0.305 WMode 0.322 Qp 7.5e-11 | PRESSO global <5e-04 raw 0.310 corr 0.3062899 | errs: raps_block
+B_directional  IVW 0.534 Egger 0.344 (int 0.0164 p=0.013) WM 0.474 WMode 0.422 Qp 8.5e-06 | PRESSO global 5e-04 raw 0.534 corr NA | errs: raps_block
+C_outliers     IVW 0.318 Egger 0.339 (int -0.0018 p=0.838) WM 0.289 WMode 0.232 Qp 8.4e-18 | PRESSO global <5e-04 raw 0.318 corr 0.3101847 | errs: raps_block
+   verbatim `which(Pvalue<0.05)` -> 19 28 36 47 55 
+   numeric parse (<x -> x, p<0.05) -> 19 28 36 47 55 
+   numeric hits in planted: 5 of 6  false hits: 0 
+D_chp          IVW 0.485 Egger 0.528 (int -0.0038 p=0.472) WM 0.429 WMode 0.378 Qp 0.15 | PRESSO global 0.3905 raw 0.485 corr NA | errs: raps_block
+
+##### ours 
+A_balanced     IVW 0.310 Egger 0.249 (int 0.0052 p=0.504) WM 0.305 WMode 0.322 Qp 7.5e-11 | PRESSO global <5e-04 raw 0.310 corr 0.3062899 n_out(verbatim) 2 | errs: 
+B_directional  IVW 0.534 Egger 0.344 (int 0.0164 p=0.013) WM 0.474 WMode 0.422 Qp 8.5e-06 | PRESSO global 5e-04 raw 0.534 corr NA n_out(verbatim) 0 | errs: 
+C_outliers     IVW 0.318 Egger 0.339 (int -0.0018 p=0.838) WM 0.289 WMode 0.232 Qp 8.4e-18 | PRESSO global <5e-04 raw 0.318 corr 0.3101847 n_out(verbatim) 5 | errs: 
+   verbatim which(outlier_p<0.05) -> 19 28 36 47 55 
+D_chp          IVW 0.485 Egger 0.528 (int -0.0038 p=0.472) WM 0.429 WMode 0.378 Qp 0.15 | PRESSO global 0.412 raw 0.485 corr NA n_out(verbatim) 0 | errs: 

@@ -1,0 +1,17 @@
+# Q2 on OUR side: GSEA(TERM2GENE) accepts any user table -> Reactome (msigdbr) and the immune cell-type table.
+suppressMessages({library(clusterProfiler); library(msigdbr); library(GSVA)})
+D <- "F:/OpenScience/comparisons/gsva-vs-gsea/data/"; O <- "F:/OpenScience/comparisons/gsva-vs-gsea/out/"
+gl <- readRDS(paste0(O,"ours_ranked_t.rds"))
+reac <- msigdbr(species="Homo sapiens", collection="C2", subcollection="CP:REACTOME")
+set.seed(123)
+g1 <- GSEA(gl, TERM2GENE=unique(reac[,c("gs_name","gene_symbol")]), exponent=1, minGSSize=10, maxGSSize=500, eps=0, pvalueCutoff=1, seed=TRUE, verbose=FALSE)
+write.csv(as.data.frame(g1)[,c("ID","setSize","NES","pvalue","p.adjust")], paste0(O,"ours_q2_reactome_gsea.csv"), row.names=FALSE)
+ic <- read.csv("F:/OpenScience/comparisons/_theirs/ssgsea-immune-infiltration-analysis/tests/data/immune_gene_sets.csv", check.names=FALSE); names(ic) <- sub("^\ufeff","",names(ic))
+t2g <- unique(data.frame(gs_name=ic$cell_type, gene_symbol=toupper(ic$gene)))
+set.seed(123)
+g2 <- GSEA(gl, TERM2GENE=t2g, exponent=1, minGSSize=10, maxGSSize=500, eps=0, pvalueCutoff=1, seed=TRUE, verbose=FALSE)
+write.csv(as.data.frame(g2)[,c("ID","setSize","NES","pvalue","p.adjust")], paste0(O,"ours_q2_immunecell_gsea.csv"), row.names=FALSE)
+E <- as.matrix(read.csv(paste0(D,"expr.csv"), row.names=1, check.names=FALSE))
+sc <- gsva(ssgseaParam(E, lapply(split(t2g$gene_symbol, t2g$gs_name), unique), minSize=10, maxSize=500))
+write.csv(sc, paste0(O,"ours_q2_immunecell_ssgsea_scores.csv"))
+cat("ok", nrow(as.data.frame(g1)), nrow(as.data.frame(g2)), dim(sc), "\n")

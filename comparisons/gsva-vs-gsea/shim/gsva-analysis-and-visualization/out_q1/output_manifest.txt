@@ -1,0 +1,30 @@
+Output Files
+============
+
+Run Mode: full
+Generated At: 2026-09-21 13:39:36
+
+- out_q1/table/GSVA_diff.csv
+  Description: Pathway-level differential results
+  Content: Columns include geneset, logFC, P.Value, adj.P.Val, t, and B.
+
+- out_q1/table/GSVA_enrichment_results.csv
+  Description: Full GSVA score matrix
+  Content: Rows are pathways and columns are samples.
+
+- out_q1/table/GSVA_enrichment_results_topN.csv
+  Description: Top-pathway GSVA score matrix
+  Content: Subset of pathways selected by top_n and fdr_threshold.
+
+- out_q1/data/GSVA_list.rda
+  Description: Serialized gsva_result object
+  Content: Saved object used for visualization-only mode.
+
+- out_q1/session_info.txt
+  Description: R session and package version record
+  Content: sessionInfo() output captured at the end of analysis mode.
+
+- out_q1/plot/GSVA_heatmap.pdf
+  Description: GSVA heatmap PDF
+  Content: Heatmap comparing pathway scores between the selected sample groups.
+

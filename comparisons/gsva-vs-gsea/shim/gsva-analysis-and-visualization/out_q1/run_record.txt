@@ -1,0 +1,54 @@
+Run Record
+==========
+
+Input Parameters
+----------------
+- mode: full
+- input_file: F:/OpenScience/comparisons/gsva-vs-gsea/data/expr.csv
+- group_file: F:/OpenScience/comparisons/gsva-vs-gsea/data/group.csv
+- case_group: Case
+- control_group: Control
+- species: Homo sapiens
+- category: C2
+- subcategory: CP:KEGG_LEGACY
+- method: gsva
+- kcdf: Gaussian
+- fdr_threshold: 0.05
+- top_n: 20
+- seed: 1
+- output_dir: out_q1
+
+Input Summary
+-------------
+- genes: 8288
+- samples: 24
+- case_samples: 12
+- control_samples: 12
+
+Runtime And Resource Notes
+--------------------------
+- start_time: 2026-09-21 13:39:26
+- end_time: 2026-09-21 13:39:36
+- elapsed_seconds: 10.005
+- user_cpu_seconds: 10.520
+- system_cpu_seconds: 1.730
+- timeout_seconds: 0
+- gc_snapshot:
+             used  (Mb) gc trigger  (Mb) max used  (Mb)
+  Ncells  9479339 506.3   16836392 899.2 12412298 662.9
+  Vcells 28183511 215.1   48063546 366.7 47678588 363.8
+
+Output Summary
+--------------
+- out_q1/table/GSVA_diff.csv
+  Description: Pathway-level differential results
+- out_q1/table/GSVA_enrichment_results.csv
+  Description: Full GSVA score matrix
+- out_q1/table/GSVA_enrichment_results_topN.csv
+  Description: Top-pathway GSVA score matrix
+- out_q1/data/GSVA_list.rda
+  Description: Serialized gsva_result object
+- out_q1/session_info.txt
+  Description: R session and package version record
+- out_q1/plot/GSVA_heatmap.pdf
+  Description: GSVA heatmap PDF

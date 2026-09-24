@@ -1,0 +1,3 @@
+[ERROR] 2026-09-21 13:51:38 | cannot coerce type 'closure' to vector of type 'character'
+[ERROR] 2026-09-21 13:51:50 | cannot coerce type 'closure' to vector of type 'character'
+[ERROR] 2026-09-21 13:52:03 | SKILL_INVALID_PARAMETER: GSVA failed: Calling gsva(expr=., gset.idx.list=., method=., ...) is defunct; use a method-specific parameter object (see '?gsva').

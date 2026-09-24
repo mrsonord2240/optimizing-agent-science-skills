@@ -1,0 +1,52 @@
+mediation 4.5.1 
+Running nonparametric bootstrap
+
+  (mediate boot bca sims=5000: 110.4s)
+ACME 0.1061 CI 0.0877 0.1266 
+ADE 0.0771 
+Total 0.1811 
+PM 0.586 
+truth (prob scale): 0.1058363 0.1042527 0.07059379 0.1748465 
+--- as-written sensitivity on the logit/boot object ---
+  [ERROR] medsens as written : medsens is only valid for the probit link 
+  (medsens as written: 0.0s)
+--- OUR Common Errors fix: probit outcome refit ---
+Running nonparametric bootstrap
+
+  (mediate probit: 26.1s)
+probit ACME 0.1051 CI 0.0873 0.125 
+  [warning] medsens probit : Recycling array of length 1 in vector-array arithmetic is deprecated.
+  Use c() or as.vector() instead. 
+  [warning] medsens probit : Recycling array of length 1 in vector-array arithmetic is deprecated.
+  Use c() or as.vector() instead. 
+  (medsens probit: 25.8s)
+
+Mediation Sensitivity Analysis: Average Mediation Effect
+
+Sensitivity Region: ACME for Control Group
+
+      Rho ACME(control) 95% CI Lower 95% CI Upper R^2_M*R^2_Y* R^2_M~R^2_Y~
+[1,] 0.30        0.0053      -0.0046       0.0142       0.0900       0.0521
+[2,] 0.35       -0.0083      -0.0187       0.0007       0.1225       0.0709
+
+Rho at which ACME for Control Group = 0: 0.3
+R^2_M*R^2_Y* at which ACME for Control Group = 0: 0.09
+R^2_M~R^2_Y~ at which ACME for Control Group = 0: 0.0521 
+
+
+Sensitivity Region: ACME for Treatment Group
+
+      Rho ACME(treated) 95% CI Lower 95% CI Upper R^2_M*R^2_Y* R^2_M~R^2_Y~
+[1,] 0.30        0.0053      -0.0046       0.0146       0.0900       0.0521
+[2,] 0.35       -0.0083      -0.0186       0.0007       0.1225       0.0709
+
+Rho at which ACME for Treatment Group = 0: 0.3
+R^2_M*R^2_Y* at which ACME for Treatment Group = 0: 0.09
+R^2_M~R^2_Y~ at which ACME for Treatment Group = 0: 0.0521 
+
+Running nonparametric bootstrap
+
+  (continuous mediate: 20.0s)
+continuous: ACME 0.3141 CI 0.2667 0.3679 ADE 0.199 PM 0.612 | truth ACME 0.30 ADE 0.20 PM 0.60
+ASSERT pass: binary ACME CI covers 0.105
+ASSERT pass: continuous ACME CI covers 0.30

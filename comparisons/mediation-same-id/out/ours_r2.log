@@ -1,0 +1,33 @@
+Running nonparametric bootstrap
+
+  (mediate boot bca sims=5000: 97.2s)
+ACME 0.1032 CI 0.0723 0.1357 p 0 | ADE 0.0228 | Total 0.126 | PM 0.819 
+TRUTH: ACME 0, ADE 0.2, total 0.2; planted rho 0.237 
+--- medsens exactly as OUR SKILL.md (rho.by=0.05, effect.type indirect, sims=1000) ---
+  (medsens as written: 2.3s)
+
+Mediation Sensitivity Analysis for Average Causal Mediation Effect
+
+Sensitivity Region
+
+      Rho    ACME 95% CI Lower 95% CI Upper R^2_M*R^2_Y* R^2_M~R^2_Y~
+[1,] 0.15  0.0172      -0.0116       0.0460       0.0225       0.0182
+[2,] 0.20 -0.0125      -0.0413       0.0162       0.0400       0.0323
+
+Rho at which ACME = 0: 0.2
+R^2_M*R^2_Y* at which ACME = 0: 0.04
+R^2_M~R^2_Y~ at which ACME = 0: 0.0323 
+
+rho_crit: 0.2 
+--- OUR mediational E-value snippet as written ---
+  [ERROR] evalues.RR : argument is of length zero 
+  (evalues.RR: 0.0s)
+--- OUR E-value for continuous outcome: evalues.OLS on standardized ACME (their text: "use evalues.OLS with the standardized indirect effect") ---
+  (evalues.OLS: 0.0s)
+            point    lower    upper
+RR       1.087158 1.059638 1.115393
+E-values 1.394980 1.311024       NA
+OUR thresholds: rho_crit >0.3 robust; 0.1-0.3 moderately sensitive; <0.1 highly sensitive. rho_crit = 0.2 
+OUR high-stakes rule: needs (1) sig ACME (2) rho_crit>0.2 OR E>1.5 (3) consistent MR-mediation, else "exploratory".
+ASSERT pass: naive ACME CI excludes truth 0
+ASSERT pass: rho_crit within 0.08 of planted rho

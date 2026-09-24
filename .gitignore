@@ -33,3 +33,7 @@ Thumbs.db
 # Datasets and outputs dropped in the repo root by audit runs (hundreds of MB; refetch, never commit)
 /data/
 /pertpy_de_results.tsv
+
+# Comparisons: upstream Skills' bundled test data (recoverable from their repos) and R binaries
+comparisons/**/tests/data/
+comparisons/**/*.rds

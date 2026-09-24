@@ -1,0 +1,23 @@
+# THEIRS request 1: does expression mediate genotype -> disease? Follows THEIR SKILL.md prose:
+# "Basic Mediation" (boot=TRUE, sims=1000) + "Interpreting Results" + "Assumptions and Diagnostics" (medsens as written).
+source('F:/OpenScience/comparisons/mediation-same-id/run/common.R')
+suppressMessages(library(mediation)); cat('mediation', as.character(packageVersion('mediation')), '\n')
+dat <- read.csv(file.path(D, 'A_planted.csv'))
+set.seed(1)
+mediator_model <- lm(expression ~ genotype + age + sex + pc1 + pc2, data = dat)
+outcome_model <- glm(disease ~ genotype + expression + age + sex + pc1 + pc2, data = dat, family = binomial)
+med_result <- try_run('mediate boot sims=1000', mediate(mediator_model, outcome_model, treat = 'genotype', mediator = 'expression', boot = TRUE, sims = 1000))
+cat('--- as-written interpretation block ---\n')
+cat('ACME', round(med_result$d0, 4), 'CI', round(med_result$d0.ci, 4), '\nADE', round(med_result$z0, 4), '\nTotal', round(med_result$tau.coef, 4), '\nPM', round(med_result$n0, 3), '\n')
+cat('truth (prob scale, MC from true params):', unlist(truth$A$prob_scale), '\n')
+cat('--- as-written sensitivity (medsens rho.by=0.1, effect.type=indirect, sims=1000) on the logit/boot object ---\n')
+sens <- try_run('medsens as written', medsens(med_result, rho.by = 0.1, effect.type = 'indirect', sims = 1000))
+if (!is.null(sens)) print(summary(sens))
+# continuous-outcome check against the planted ACME = 0.5*0.6 = 0.30
+om <- lm(y_cont ~ genotype + expression + age + sex + pc1 + pc2, data = dat)
+r2 <- try_run('continuous mediate', mediate(mediator_model, om, treat = 'genotype', mediator = 'expression', boot = TRUE, sims = 1000))
+cat('continuous: ACME', round(r2$d0, 4), 'CI', round(r2$d0.ci, 4), 'ADE', round(r2$z0, 4), 'PM', round(r2$n0, 3), '| truth ACME 0.30 ADE 0.20 PM 0.60\n')
+sink(file.path(O, 'theirs_r1.rds.txt')); print(list(acme=med_result$d0, ci=med_result$d0.ci)); sink()
+stopifnot(!is.null(med_result), med_result$d0.ci[1] < 0.105, med_result$d0.ci[2] > 0.105)
+cat('ASSERT pass: binary ACME CI covers truth 0.105\n')
+stopifnot(r2$d0.ci[1] < 0.30, r2$d0.ci[2] > 0.30); cat('ASSERT pass: continuous ACME CI covers 0.30\n')

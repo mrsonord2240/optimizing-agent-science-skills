@@ -1,0 +1,7 @@
+as written in our SKILL.md: evalues.RR(rr, lo=lo, hi=NULL)
+[1] "argument is of length zero"
+with hi=NA:
+            point    lower upper
+RR       1.109000 1.075000    NA
+E-values 1.456679 1.358945    NA
+Dataset A (no confounding, true ACME 0.30): rho_crit = 0.45 

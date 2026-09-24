@@ -1,0 +1,22 @@
+Running nonparametric bootstrap
+
+  [ERROR] as written : object 'med_formula' not found 
+  (as written: 0.1s)
+--- adapt: embed the formula object in the model call (bootstrap refits evaluate the call in mediate frame, not the function frame) ---
+Running nonparametric bootstrap
+
+Running nonparametric bootstrap
+
+Running nonparametric bootstrap
+
+Running nonparametric bootstrap
+
+  gene        acme acme_p acme_fdr prop_mediated
+1   M1 0.086354185  0.000    0.000    0.42882738
+2   M2 0.094297136  0.000    0.000    0.46404004
+3   M3 0.002323516  0.806    0.806    0.01161263
+4   M4 0.003375854  0.622    0.806    0.01692915
+significant at BH<0.05: M1 M2 
+ASSERT pass: M1,M2 detected
+decoys flagged:  
+ASSERT pass: decoys M3,M4 not flagged

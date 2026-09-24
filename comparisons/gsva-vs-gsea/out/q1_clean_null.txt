@@ -1,0 +1,9 @@
+   2.62e-90             7          20
+gsva-skill vs immune-pathway: n= 186  max|dlogFC|= 0  max|dP|= 0 
+clean-null KEGG sets (no planted overlap, not correlated-null): 67 
+gsva_skill             clean-null sets called FDR<0.05: 0 of 67
+immune_pathway         clean-null sets called FDR<0.05: 0 of 67
+ssgsea_skill_wilcox    clean-null sets called FDR<0.05: 0 of 67
+ours_GSEA_limma_t      clean-null sets called FDR<0.05: 9 of 67
+ours_CAMERA_NA         clean-null sets called FDR<0.05: 0 of 67
+ours_CAMERA_default    clean-null sets called FDR<0.05: 8 of 67

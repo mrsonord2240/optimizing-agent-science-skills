@@ -1,0 +1,14 @@
+HIMA 2.3.4 
+--- as written ---
+  [ERROR] hima as written : argument "formula" is missing, with no default 
+  (hima as written: 0.0s)
+--- adapted: their code has Y.family/M.family + BH.FDR (HIMA 2.2 names); 2.3.4 classic engine is hima_classic(X,M,Y,COV.XM,Y.type,M.type,penalty) ---
+  (hima_classic adapted: 2.9s)
+[1] "data.frame"
+  Index alpha_hat  beta_hat       IDE     rimp         pmax
+1    M1 0.4121095 0.7512053 0.3095789 47.59883 3.856408e-14
+2    M2 0.3909547 0.8717452 0.3408128 52.40117 3.577470e-17
+adapted recovered: M1 M2 
+truth: M1,M2 true; M3,M4 decoys
+ASSERT pass: adapted run recovers M1 and M2
+decoys flagged:  

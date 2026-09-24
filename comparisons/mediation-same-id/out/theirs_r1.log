@@ -1,0 +1,19 @@
+mediation 4.5.1 
+Running nonparametric bootstrap
+
+  (mediate boot sims=1000: 21.8s)
+--- as-written interpretation block ---
+ACME 0.1053 CI 0.0869 0.1258 
+ADE 0.0766 
+Total 0.1792 
+PM 0.588 
+truth (prob scale, MC from true params): 0.1058363 0.1042527 0.07059379 0.1748465 
+--- as-written sensitivity (medsens rho.by=0.1, effect.type=indirect, sims=1000) on the logit/boot object ---
+  [ERROR] medsens as written : medsens is only valid for the probit link 
+  (medsens as written: 0.0s)
+Running nonparametric bootstrap
+
+  (continuous mediate: 17.7s)
+continuous: ACME 0.3141 CI 0.266 0.3702 ADE 0.199 PM 0.612 | truth ACME 0.30 ADE 0.20 PM 0.60
+ASSERT pass: binary ACME CI covers truth 0.105
+ASSERT pass: continuous ACME CI covers 0.30

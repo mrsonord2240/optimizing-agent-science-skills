@@ -1,0 +1,300 @@
+{
+    "meta": {
+        "skill_name": "ssgsea-immune-infiltration-analysis",
+        "description": "Quantify immune cell infiltration per sample using single-sample GSEA (ssGSEA) with curated immune cell gene signatures. Inputs: expression matrix. Outputs: immune cell score matrix, heatmap, violin comparison plots, correlation with clinical variables.",
+        "evaluated_on": "2026-04-15",
+        "evaluator_version": "skill-auditor@1.0",
+        "category": "Data Analysis",
+        "execution_mode": "B",
+        "complexity": "Moderate",
+        "n_inputs": 5
+    },
+    "veto_gates": {
+        "skill_veto": {
+            "gate": "PASS",
+            "stability": "PASS",
+            "contract": "PASS",
+            "determinism": "PASS",
+            "security": "PASS"
+        },
+        "research_veto": {
+            "applicable": true,
+            "gate": "PASS",
+            "scientific_integrity": {
+                "result": "PASS",
+                "detail": "Scientific integrity check completed without reportable redline findings."
+            },
+            "practice_boundaries": {
+                "result": "PASS",
+                "detail": "The skill explicitly excludes clinical decision making and produced only descriptive analytic outputs."
+            },
+            "methodological_ground": {
+                "result": "PASS",
+                "detail": "The workflow correctly frames ssGSEA/GSVA as relative enrichment and correlation as hypothesis-generating rather than causal inference."
+            },
+            "code_usability": {
+                "result": "PASS",
+                "detail": "The R pipeline executed successfully across packaged tests, five audit inputs, and the output-directory reuse regression scenario."
+            }
+        }
+    },
+    "static_score": {
+        "subtotal": 94,
+        "max": 100,
+        "categories": {
+            "functional_suitability": {
+                "score": 12,
+                "max": 12,
+                "note": "Functional suitability was evaluated against the skill-auditor rubric; no blocking schema-level issue was recorded for this dimension."
+            },
+            "reliability": {
+                "score": 11,
+                "max": 12,
+                "note": "The stale-plot rerun bug is fixed; only a minor no-plot summary wording ambiguity remains in run_record.txt."
+            },
+            "performance_context": {
+                "score": 7,
+                "max": 8,
+                "note": "Canonical plotted runs remain moderately heavy but acceptable for the packaged example data."
+            },
+            "agent_usability": {
+                "score": 15,
+                "max": 16,
+                "note": "Agent usability was evaluated against the skill-auditor rubric; no blocking schema-level issue was recorded for this dimension."
+            },
+            "human_usability": {
+                "score": 7,
+                "max": 8,
+                "note": "The skill is easy to follow; the empty plot directory behavior could be documented more explicitly."
+            },
+            "security": {
+                "score": 12,
+                "max": 12,
+                "note": "Security was evaluated against the skill-auditor rubric; no blocking schema-level issue was recorded for this dimension."
+            },
+            "maintainability": {
+                "score": 12,
+                "max": 12,
+                "note": "Regression coverage now protects both malformed inputs and output-directory reuse semantics."
+            },
+            "agent_specific": {
+                "score": 18,
+                "max": 20,
+                "note": "The skill is now effectively idempotent for reruns; only the no-plot summary wording remains slightly imprecise."
+            }
+        }
+    },
+    "dynamic_score": {
+        "execution_avg": 96.2,
+        "max": 100,
+        "assertion_pass_rate": {
+            "passed": 20,
+            "total": 20
+        },
+        "inputs": [
+            {
+                "index": 1,
+                "type": "Canonical",
+                "label": "Default ssGSEA with plots",
+                "status": "COMPLETED",
+                "status_flag": "✅",
+                "note": "The full documented output set was produced, including plots, run_record.txt, and output_manifest.txt.",
+                "basic": 39,
+                "specialized": 57,
+                "total": 96,
+                "assertions_passed": 4,
+                "assertions_total": 4,
+                "assertions": [
+                    {
+                        "text": "Required outputs were generated for the audited workflow.",
+                        "result": "PASS",
+                        "note": "The audited evidence supported this assertion."
+                    },
+                    {
+                        "text": "Input handling and validation behaved as documented.",
+                        "result": "PASS",
+                        "note": "The audited evidence supported this assertion."
+                    },
+                    {
+                        "text": "No unsupported medical or scientific claim fabrication was detected.",
+                        "result": "PASS",
+                        "note": "The audited evidence supported this assertion."
+                    },
+                    {
+                        "text": "Execution stayed within the stated Data Analysis skill scope.",
+                        "result": "PASS",
+                        "note": "The audited evidence supported this assertion."
+                    }
+                ]
+            },
+            {
+                "index": 2,
+                "type": "Variant A",
+                "label": "GSVA Gaussian without plots",
+                "status": "COMPLETED",
+                "status_flag": "✅",
+                "note": "The documented GSVA audited baseline completed successfully and the manifest omitted plot entries.",
+                "basic": 38,
+                "specialized": 57,
+                "total": 95,
+                "assertions_passed": 4,
+                "assertions_total": 4,
+                "assertions": [
+                    {
+                        "text": "Required outputs were generated for the audited workflow.",
+                        "result": "PASS",
+                        "note": "The audited evidence supported this assertion."
+                    },
+                    {
+                        "text": "Input handling and validation behaved as documented.",
+                        "result": "PASS",
+                        "note": "The audited evidence supported this assertion."
+                    },
+                    {
+                        "text": "No unsupported medical or scientific claim fabrication was detected.",
+                        "result": "PASS",
+                        "note": "The audited evidence supported this assertion."
+                    },
+                    {
+                        "text": "Execution stayed within the stated Data Analysis skill scope.",
+                        "result": "PASS",
+                        "note": "The audited evidence supported this assertion."
+                    }
+                ]
+            },
+            {
+                "index": 3,
+                "type": "Edge",
+                "label": "Numeric column selectors",
+                "status": "COMPLETED",
+                "status_flag": "✅",
+                "note": "Index-based selector resolution and low-bound runtime settings completed successfully.",
+                "basic": 38,
+                "specialized": 58,
+                "total": 96,
+                "assertions_passed": 4,
+                "assertions_total": 4,
+                "assertions": [
+                    {
+                        "text": "Required outputs were generated for the audited workflow.",
+                        "result": "PASS",
+                        "note": "The audited evidence supported this assertion."
+                    },
+                    {
+                        "text": "Input handling and validation behaved as documented.",
+                        "result": "PASS",
+                        "note": "The audited evidence supported this assertion."
+                    },
+                    {
+                        "text": "No unsupported medical or scientific claim fabrication was detected.",
+                        "result": "PASS",
+                        "note": "The audited evidence supported this assertion."
+                    },
+                    {
+                        "text": "Execution stayed within the stated Data Analysis skill scope.",
+                        "result": "PASS",
+                        "note": "The audited evidence supported this assertion."
+                    }
+                ]
+            },
+            {
+                "index": 4,
+                "type": "Variant B",
+                "label": "Named column selectors",
+                "status": "COMPLETED",
+                "status_flag": "✅",
+                "note": "Named column resolution matched the documented workflow and preserved the expected output schema.",
+                "basic": 38,
+                "specialized": 57,
+                "total": 95,
+                "assertions_passed": 4,
+                "assertions_total": 4,
+                "assertions": [
+                    {
+                        "text": "Required outputs were generated for the audited workflow.",
+                        "result": "PASS",
+                        "note": "The audited evidence supported this assertion."
+                    },
+                    {
+                        "text": "Input handling and validation behaved as documented.",
+                        "result": "PASS",
+                        "note": "The audited evidence supported this assertion."
+                    },
+                    {
+                        "text": "No unsupported medical or scientific claim fabrication was detected.",
+                        "result": "PASS",
+                        "note": "The audited evidence supported this assertion."
+                    },
+                    {
+                        "text": "Execution stayed within the stated Data Analysis skill scope.",
+                        "result": "PASS",
+                        "note": "The audited evidence supported this assertion."
+                    }
+                ]
+            },
+            {
+                "index": 5,
+                "type": "Stress",
+                "label": "Reuse-toggle no-plot cleanup",
+                "status": "COMPLETED",
+                "status_flag": "✅",
+                "note": "After rerunning the same output directory with --make_plots=false, no stale PDFs remained and the manifest had no plot entries.",
+                "basic": 40,
+                "specialized": 59,
+                "total": 99,
+                "assertions_passed": 4,
+                "assertions_total": 4,
+                "assertions": [
+                    {
+                        "text": "Required outputs were generated for the audited workflow.",
+                        "result": "PASS",
+                        "note": "The audited evidence supported this assertion."
+                    },
+                    {
+                        "text": "Input handling and validation behaved as documented.",
+                        "result": "PASS",
+                        "note": "The audited evidence supported this assertion."
+                    },
+                    {
+                        "text": "No unsupported medical or scientific claim fabrication was detected.",
+                        "result": "PASS",
+                        "note": "The audited evidence supported this assertion."
+                    },
+                    {
+                        "text": "Execution stayed within the stated Data Analysis skill scope.",
+                        "result": "PASS",
+                        "note": "The audited evidence supported this assertion."
+                    }
+                ]
+            }
+        ]
+    },
+    "final": {
+        "static_weighted": 37.6,
+        "dynamic_weighted": 57.7,
+        "score": 95.3,
+        "max": 100,
+        "grade": "Production Ready",
+        "grade_symbol": "⭐",
+        "deployable": true,
+        "veto_override": false
+    },
+    "key_strengths": [
+        "The previous output-directory reuse bug is fixed and now protected by an explicit regression test.",
+        "Generated manifests are now aligned with the documented output inventory, including run_record.txt and output_manifest.txt.",
+        "Repeated canonical runs with the same seed produced identical hashes for key result tables, supporting deterministic behavior."
+    ],
+    "recommendations": [
+        {
+            "priority": "P2",
+            "title": "Clarify empty plot directory behavior in no-plot runs",
+            "observed_in": [
+                2,
+                5
+            ],
+            "problem": "When --make_plots=false, outputs are correct and the manifest is clean, but run_record.txt still says outputs are under data/, table/, and plot/. Because plot/ is created eagerly, users may assume figures should exist there.",
+            "root_cause": "The output summary string is fixed and the plot directory is created before the plotting branch is evaluated.",
+            "fix": "Either create plot/ lazily only when plots are requested, or document explicitly that plot/ may exist but remain empty when --make_plots=false."
+        }
+    ]
+}

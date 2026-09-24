@@ -1,0 +1,18 @@
+    OUTLIERtest = FALSE, DISTORTIONtest = FALSE, SignifThreshold = 0.05, 
+    if (SignifThreshold > 1) 
+        GlobalTest <- list(RSSobs = RSSobs[[1]], Pvalue = sum(RSSexp[1, 
+    else GlobalTest <- list(RSSobs = RSSobs[[1]], Pvalue = sum(RSSexp > 
+    if (GlobalTest$Pvalue < SignifThreshold & OUTLIERtest) {
+                pval <- cbind.data.frame(RSSobs = Dif^2, Pvalue = pval)
+        OutlierTest$Pvalue <- apply(cbind(OutlierTest$Pvalue * 
+        refOutlier <- which(OutlierTest$Pvalue <= SignifThreshold)
+                  `Distortion Coefficient` = 100 * BiasObs, Pvalue = sum(abs(BiasExp) > 
+                  `Distortion Coefficient` = NA, Pvalue = NA)
+                `Distortion Coefficient` = NA, Pvalue = NA)
+    GlobalTest$Pvalue <- ifelse(GlobalTest$Pvalue == 0, paste0("<", 
+        1/NbDistribution), GlobalTest$Pvalue)
+        OutlierTest$Pvalue <- replace(OutlierTest$Pvalue, OutlierTest$Pvalue == 
+            BiasTest$Pvalue <- ifelse(BiasTest$Pvalue == 0, paste0("<", 
+                1/NbDistribution), BiasTest$Pvalue)
+        if (nrow(data)/NbDistribution > SignifThreshold) 
+                SignifThreshold, " for the outlier test is not achievable with only ", 

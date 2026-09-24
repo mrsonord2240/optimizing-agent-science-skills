@@ -1,0 +1,95 @@
+TwoSampleMR version 0.7.9 
+
+ [>] New authentication requirements: https://mrcieu.github.io/ieugwasr/articles/guide.html#authentication.
+ [>] Major upgrades to our servers completed to improve service and stability.
+ [>] We need your help to shape our emerging roadmap!
+     Please take 2 minutes to give us feedback -
+     https://forms.office.com/e/eSr7EFAfCG
+
+Attaching package: 'MendelianRandomization'
+
+The following objects are masked from 'package:TwoSampleMR':
+
+    mr_ivw, mr_median
+
+=== Instrument strength ===
+Mean F-statistic: 66.8 
+Weak (F < 10): 2 / 60 
+
+=== Core MR methods ===
+Analysing 'exposure' on 'outcome'
+                     method nsnp         b         se          pval
+1 Inverse variance weighted   60 0.4847017 0.02071827 4.817196e-121
+2                  MR Egger   60 0.5281676 0.06351620  1.816597e-11
+3           Weighted median   60 0.4293296 0.03214659  1.102101e-40
+4             Weighted mode   60 0.3784488 0.06418106  1.918839e-07
+
+=== Heterogeneity (Cochran Q) ===
+                     method        Q Q_df    Q_pval
+1                  MR Egger 69.86349   58 0.1367119
+2 Inverse variance weighted 70.49536   59 0.1452836
+
+=== Egger intercept (directional UHP) ===
+Intercept: -0.00376 
+SE: 0.00519 
+P-value: 0.47181 
+
+I^2_GX (NOME): 0.863 
+NOME partial; consider SIMEX correction
+
+=== Steiger directionality ===
+r.exposure and/or r.outcome not present.
+Calculating approximate SNP-exposure and/or SNP-outcome correlations, assuming all are quantitative traits. Please pre-calculate r.exposure and/or r.outcome using get_r_from_lor() for any binary traits
+Correct direction: TRUE 
+Steiger p-value: < 2.22e-16 
+Per-SNP pass: 60 / 60 
+
+=== MR-PRESSO ===
+Warning message:
+In mr_presso(BetaOutcome = "by", BetaExposure = "bx", SdOutcome = "byse",  :
+  No outlier were identified, therefore the results for the outlier-corrected MR are set to NA
+Global p: 0.399 
+Outliers detected: 0 / 60 
+Distortion p: 
+Raw IVW: 0.4847 
+Corrected IVW: NA 
+
+=== Contamination mixture ===
+Estimate: 0.4986 
+95% CI: 0.4586 to 0.5486 
+
+=== MR-RAPS ===
+Warning message:
+In mr.raps.overdispersed.robust(b_exp, b_out, se_exp, se_out, loss.function,  :
+  The estimated overdispersion parameter is very small. Consider using the simple model without overdispersion.
+Estimate: 0.4831 
+SE: 0.0222 
+P-value: < 2.22e-16 
+
+=== Leave-one-out (IVW) ===
+LOO range: 0.475 to 0.491 
+
+=== STROBE-MR reporting summary ===
+                 Method Estimate     SE             P
+1                   IVW   0.4847 0.0207 4.817196e-121
+2              MR-Egger   0.5282 0.0635  1.816597e-11
+3       Weighted median   0.4293 0.0321  1.102101e-40
+4         Weighted mode   0.3784 0.0642  1.918839e-07
+5 MR-PRESSO (corrected)       NA     NA            NA
+6 Contamination mixture   0.4986 0.0230            NA
+7               MR-RAPS   0.4831 0.0222 7.242714e-105
+
+Diagnostics:
+  Mean F-statistic: 66.8 (>=10 strong)
+  I^2_GX (NOME): 0.863 (>=0.9 Egger reliable)
+  Egger intercept p: 0.47181 
+  Cochran Q p (IVW): 0.14528 
+  PRESSO global p: 0.399 
+  PRESSO outliers: 0 
+  Steiger correct direction: TRUE 
+
+=== Interpretation rule ===
+All methods agree on direction: NA 
+If LDSC rg(exposure, outcome) >= 0.3 OR biology suggests shared factor:
+  Additionally run CAUSE or LHC-MR (see cause_analysis.R)
+  UHP-method agreement alone is INSUFFICIENT under CHP

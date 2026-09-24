@@ -1,0 +1,10 @@
+data-derived numbers in response body: []
+IVW                      named: True
+weighted median          named: True
+Egger                    named: True
+MR-PRESSO                named: True
+leave-one-out            named: True
+Steiger                  named: True
+directional pleiotropy   named: True
+F-statistic              named: True
+executed_estimate_present: False

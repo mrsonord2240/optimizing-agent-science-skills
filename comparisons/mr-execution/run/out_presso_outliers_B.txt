@@ -1,0 +1,6 @@
+No phenotype name specified, defaulting to 'exposure'.
+No phenotype name specified, defaulting to 'outcome'.
+Harmonising exposure (VapPHP) and outcome (H5WzxG)
+planted invalid in set: 30
+SKILL.md rule (p < 0.05/n): flagged 0, true pos 0
+PRESSO own rule (p <= 0.05): flagged 8, true pos 8

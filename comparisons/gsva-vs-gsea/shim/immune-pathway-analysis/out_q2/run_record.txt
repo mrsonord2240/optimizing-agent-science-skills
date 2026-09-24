@@ -1,0 +1,72 @@
+Run Record
+==========
+
+Input Parameters
+----------------
+- mode: full
+- input_file: F:/OpenScience/comparisons/gsva-vs-gsea/data/expr.csv
+- group_file: F:/OpenScience/comparisons/gsva-vs-gsea/data/group.csv
+- geneset_file: F:/OpenScience/comparisons/_theirs/immune-pathway-analysis/tests/data/immune_genesets.csv
+- geneset_column: gs_name
+- gene_column: gene_symbol
+- focus_genesets: N/A
+- case_group: Case
+- control_group: Control
+- method: gsva
+- kcdf: Gaussian
+- fdr_threshold: 0.05
+- top_n: 20
+- seed: 1
+- output_dir: F:/OpenScience/comparisons/gsva-vs-gsea/shim/immune-pathway-analysis/out_q2
+
+Input Summary
+-------------
+- genes: 8288
+- samples: 24
+- case_samples: 12
+- control_samples: 12
+- genesets_retained: 41
+- matched_genes: 2259
+
+Runtime And Resource Notes
+--------------------------
+- start_time: 2026-09-21 13:43:30
+- end_time: 2026-09-21 13:43:31
+- elapsed_seconds: 1.076
+- user_cpu_seconds: 1.780
+- system_cpu_seconds: 0.940
+- timeout_seconds: 0
+- gc_snapshot:
+             used  (Mb) gc trigger  (Mb) max used  (Mb)
+  Ncells  9107002 486.4   16733181 893.7 12908954 689.5
+  Vcells 16059593 122.6   26252954 200.3 21775496 166.2
+
+Recorded Result Summary
+-----------------------
+- significant_pathways_fdr_le_0.05: 10
+- reported_top_pathways: 10
+- method: gsva
+
+Output Summary
+--------------
+- F:/OpenScience/comparisons/gsva-vs-gsea/shim/immune-pathway-analysis/out_q2/table/immune_pathway_diff.csv
+  Description: Pathway-level differential results
+  Content: Columns include geneset, logFC, P.Value, adj.P.Val, t, and B.
+- F:/OpenScience/comparisons/gsva-vs-gsea/shim/immune-pathway-analysis/out_q2/table/immune_pathway_scores.csv
+  Description: Full immune pathway score matrix
+  Content: Rows are pathways and columns are samples.
+- F:/OpenScience/comparisons/gsva-vs-gsea/shim/immune-pathway-analysis/out_q2/table/immune_pathway_scores_top.csv
+  Description: Top-pathway score matrix
+  Content: Subset of pathways selected by top_n and fdr_threshold.
+- F:/OpenScience/comparisons/gsva-vs-gsea/shim/immune-pathway-analysis/out_q2/table/immune_gene_set_summary.csv
+  Description: Immune gene-set summary table
+  Content: One row per retained pathway with unique gene counts.
+- F:/OpenScience/comparisons/gsva-vs-gsea/shim/immune-pathway-analysis/out_q2/data/immune_pathway_result.rds
+  Description: Serialized analysis result object
+  Content: Saved object used for visualization-only mode.
+- F:/OpenScience/comparisons/gsva-vs-gsea/shim/immune-pathway-analysis/out_q2/plot/immune_pathway_heatmap.pdf
+  Description: Immune pathway heatmap PDF
+  Content: Heatmap comparing pathway scores between the selected sample groups.
+- F:/OpenScience/comparisons/gsva-vs-gsea/shim/immune-pathway-analysis/out_q2/session_info.txt
+  Description: R session and package version record
+  Content: sessionInfo() output captured at the end of the run.

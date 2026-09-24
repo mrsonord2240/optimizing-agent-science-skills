@@ -1,0 +1,12 @@
+suppressMessages({library(EValue); library(mediation)})
+cat('as written in our SKILL.md: evalues.RR(rr, lo=lo, hi=NULL)\n')
+r <- tryCatch(evalues.RR(1.109, lo = 1.075, hi = NULL), error = function(e) conditionMessage(e)); print(r)
+cat('with hi=NA:\n'); print(evalues.RR(1.109, lo = 1.075, hi = NA))
+# contrast: unconfounded dataset A (true ACME 0.30): what rho_crit does medsens give?
+source('F:/OpenScience/comparisons/mediation-same-id/run/common.R')
+dat <- read.csv(file.path(D, 'A_planted.csv')); set.seed(1)
+mm <- lm(expression ~ genotype + age + sex + pc1 + pc2, data = dat)
+om <- lm(y_cont ~ genotype + expression + age + sex + pc1 + pc2, data = dat)
+r0 <- mediate(mm, om, treat = 'genotype', mediator = 'expression', boot = FALSE, sims = 1000)
+s <- medsens(r0, rho.by = 0.05, effect.type = 'indirect', sims = 1000)
+cat('Dataset A (no confounding, true ACME 0.30): rho_crit =', s$err.cr.d, '\n')

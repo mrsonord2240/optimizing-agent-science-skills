@@ -1,0 +1,25 @@
+Analysing 'exposure' on 'outcome'
+r.exposure and/or r.outcome not present.
+Calculating approximate SNP-exposure and/or SNP-outcome correlations, assuming all are quantitative traits. Please pre-calculate r.exposure and/or r.outcome using get_r_from_lor() for any binary traits
+                     method nsnp         b         se         pval
+1 Inverse variance weighted   60 0.3176197 0.03521655 1.897321e-19
+2                  MR Egger   60 0.3386754 0.10841136 2.784356e-03
+3           Weighted median   60 0.2892743 0.03265391 8.088437e-19
+4             Weighted mode   60 0.2320496 0.05709821 1.445713e-04
+                     method        Q Q_df       Q_pval
+1                  MR Egger 203.5311   58 4.677964e-18
+2 Inverse variance weighted 203.6794   59 8.396812e-18
+Egger intercept: -0.001821433 SE 0.008860968 p 0.8378568 
+I2_GX 0.862774 NOME pass FALSE 
+  id.exposure id.outcome exposure outcome snp_r2.exposure snp_r2.outcome
+1    exposure    outcome        X       Y      0.00801517   0.0009689419
+  correct_causal_direction  steiger_pval
+1                     TRUE 6.701582e-189
+PRESSO global p <5e-04  n_outliers 5  distortion p 0.746 
+ chr [1:60] "1" "1" "1" "1" "1" "1" "0.09" "1" "1" "1" "1" "1" "1" "1" "1" ...
+       Exposure       MR Analysis Causal Estimate         Sd    T-stat
+1 beta.exposure               Raw       0.3176197 0.03521655  9.019047
+2 beta.exposure Outlier-corrected       0.3101847 0.02333279 13.293936
+       P-value
+1 1.061873e-12
+2 1.148622e-18

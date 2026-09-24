@@ -1,0 +1,20 @@
+No phenotype name specified, defaulting to 'exposure'.
+No phenotype name specified, defaulting to 'outcome'.
+Harmonising exposure (Rv5CG9) and outcome (J6G4cm)
+Analysing 'Rv5CG9' on 'J6G4cm'
+                     method nsnp          b         se         pval
+1 Inverse variance weighted   95 0.09953923 0.02108874 2.358229e-06
+2           Weighted median   95 0.05283188 0.01872686 4.784702e-03
+3                  MR Egger   95 0.02416756 0.06660922 7.175581e-01
+  covers_truth
+1        FALSE
+2        FALSE
+3         TRUE
+r.exposure and/or r.outcome not present.
+Calculating approximate SNP-exposure and/or SNP-outcome correlations, assuming all are quantitative traits. Please pre-calculate r.exposure and/or r.outcome using get_r_from_lor() for any binary traits
+Warning message:
+In mr_presso(BetaOutcome = "beta.outcome", BetaExposure = "beta.exposure",  :
+  Outlier test unstable. The significance threshold of 0.05 for the outlier test is not achievable with only 1000 to compute the null distribution. The current precision is <0.095. Increase NbDistribution.
+Q p=1.49e-47 | Egger intercept p=0.236 | PRESSO global p=<0.001 | LOO sign-stable=TRUE | Steiger correct=TRUE
+Their tier assignment: DOWNGRADED (trigger fired) 
+Direction-only concordance (IVW, WM, Egger same sign): TRUE 

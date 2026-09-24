@@ -1,0 +1,7 @@
+"side","n_sets","n_sig","cellcycle_dir","cellcycle_fdr","oxphos_dir","oxphos_fdr","corr_null_sig","corr_null_n"
+"gsva_skill",186,42,1,2.69e-21,-1,3.73e-21,1,20
+"immune_pathway",186,42,1,2.69e-21,-1,3.73e-21,1,20
+"ssgsea_skill_wilcox",186,46,1,1.38e-05,-1,1.38e-05,1,20
+"ours_GSEA_limma_t",186,68,1,1.87e-72,-1,7.89e-99,9,20
+"ours_CAMERA_NA",186,41,1,3.13e-17,-1,1.83e-17,0,20
+"ours_CAMERA_default",186,53,1,2.1e-106,-1,2.62e-90,7,20

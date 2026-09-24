@@ -1,0 +1,42 @@
+No phenotype name specified, defaulting to 'exposure'.
+sig SNPs: 95  mean F: 225.6  F<10: 0 
+No phenotype name specified, defaulting to 'outcome'.
+Harmonising exposure (UaT2bH) and outcome (7iL1AS)
+harmonised SNPs: 95  mr_keep: 95 
+Analysing 'UaT2bH' on '7iL1AS'
+                     method nsnp            b         se         pval
+1 Inverse variance weighted   95  0.099539231 0.02108874 2.358229e-06
+2                  MR Egger   95  0.024167564 0.06660922 7.175581e-01
+3           Weighted median   95  0.052831882 0.01908843 5.644571e-03
+4             Weighted mode   95 -0.006316417 0.02821633 8.233545e-01
+           lo         hi covers_truth
+1  0.05820531 0.14087315        FALSE
+2 -0.10638650 0.15472163         TRUE
+3  0.01541857 0.09024520        FALSE
+4 -0.06162043 0.04898759         TRUE
+                     method        Q Q_df       Q_pval
+1                  MR Egger 441.3287   93 9.957418e-47
+2 Inverse variance weighted 448.0784   94 1.494650e-47
+Egger intercept: 0.00421 se 0.00353 p 0.236 
+I2_GX: 0.996 
+MR-RAPS: b 0.0894 se 0.022 p 4.93e-05 
+PRESSO global p: <0.000333333333333333 
+       Exposure       MR Analysis Causal Estimate         Sd   T-stat
+1 beta.exposure               Raw      0.09953923 0.02108874 4.720019
+2 beta.exposure Outlier-corrected      0.07005556 0.01762463 3.974867
+       P-value
+1 8.206851e-06
+2 1.461062e-04
+PRESSO outliers (Bonferroni): 0 
+$<NA>
+NULL
+
+$Pvalue
+[1] 0.028
+
+Outlier detection vs planted-invalid: flagged=0, true positives=0, planted invalid in set=30
+r.exposure and/or r.outcome not present.
+Calculating approximate SNP-exposure and/or SNP-outcome correlations, assuming all are quantitative traits. Please pre-calculate r.exposure and/or r.outcome using get_r_from_lor() for any binary traits
+  snp_r2.exposure snp_r2.outcome correct_causal_direction steiger_pval
+1       0.1067778    0.005542343                     TRUE            0
+LOO IVW range: 0.0943 0.104 

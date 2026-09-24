@@ -1,0 +1,30 @@
+Loading required package: MASS
+Loading required package: Matrix
+Loading required package: mvtnorm
+Loading required package: sandwich
+mediation: Causal Mediation Analysis
+Version: 4.5.1
+
+Mediator model (genotype -> expression):
+  Genotype coefficient: 0.4892 
+  P-value: < 2.22e-16 
+
+Outcome model (expression -> disease):
+  Expression coefficient: 0.2295 
+  Direct genotype coefficient: -0.0235 
+
+Running nonparametric bootstrap
+
+Mediation Results:
+  ACME (indirect): 0.0261  [ 7e-04 , 0.0517 ]
+  ADE (direct): -0.0054  [ -0.0746 , 0.0609 ]
+  Total: 0.0206 
+  Proportion mediated: 1.268 
+  ACME p-value: 0.04 
+
+--- Testing mediation for multiple genes ---
+Running nonparametric bootstrap
+
+Error in eval(mf, parent.frame()) : object 'med_form' not found
+Calls: rbind ... eval.parent -> eval -> eval -> lm -> eval -> eval -> <Anonymous>
+Execution halted

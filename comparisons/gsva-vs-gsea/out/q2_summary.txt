@@ -1,0 +1,7 @@
+ssgsea skill (own 28-cell table, Wilcoxon) n_sets=  28 n_sig=  1 | Activated_CD8_T_cell: dir=+1 FDR=2.07e-05 rank=1
+immune-pathway (own 41 Reactome immune)    n_sets=  41 n_sig= 10 | REACTOME_INTERFERON_GAMMA_SIGNALING: dir=+1 FDR=8.78e-23 rank=1
+gsva skill (MSigDB C2 Reactome, 1839)      n_sets=1815 n_sig=195 | REACTOME_INTERFERON_GAMMA_SIGNALING: dir=+1 FDR=1.98e-18 rank=1
+ours GSEA t-rank, Reactome (msigdbr)       n_sets=1316 n_sig=219 | REACTOME_INTERFERON_GAMMA_SIGNALING: dir=+1 FDR=5.46e-65 rank=1
+ours GSEA t-rank, immune cell table        n_sets=  28 n_sig=  1 | Activated CD8 T cell: dir=+1 FDR=3.25e-12 rank=1
+ssgsea skill: other cell types called FDR<0.05:  
+ours immune-cell GSEA: other cell types FDR<0.05:  

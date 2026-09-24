@@ -1,0 +1,60 @@
+Global test p-value: 0.001 
+
+Outlier test results (str of Pvalue col):
+ chr [1:60] "1" "1" "1" "1" "1" "1" "1" "0.93" "1" "1" "1" "1" "1" "1" "1" ...
+Outlier SNPs: 0 
+Distortion test p-value: NA 
+Raw IVW estimate: 0.5335976 
+Corrected IVW estimate: NA 
+Warning message:
+In mr_presso(BetaOutcome = "by", BetaExposure = "bx", SdOutcome = "byse",  :
+  No outlier were identified, therefore the results for the outlier-corrected MR are set to NA
+Egger intercept: 0.01641  SE: 0.00639  p: 0.012778 
+Egger causal estimate: 0.3439  SE: 0.0782  p: 4.706e-05 
+I-squared: 0.863 
+Warning: I-squared < 0.9
+Instruments passing Steiger filter: 53 of 60 
+Analysing 'exposure' on 'outcome'
+                     method nsnp         b         se          pval
+1                  MR Egger   53 0.4655528 0.08231143  7.057459e-07
+2           Weighted median   53 0.4731766 0.03276981  2.923533e-47
+3 Inverse variance weighted   53 0.5100079 0.02370367 1.103128e-102
+4               Simple mode   53 0.4311855 0.07297939  2.686246e-07
+5             Weighted mode   53 0.4289372 0.05425656  1.794545e-10
+r.exposure and/or r.outcome not present.
+Calculating approximate SNP-exposure and/or SNP-outcome correlations, assuming all are quantitative traits. Please pre-calculate r.exposure and/or r.outcome using get_r_from_lor() for any binary traits
+Correct causal direction: TRUE  Steiger p: < 2.22e-16 
+Analysing 'exposure' on 'outcome'
+                                method         b         se         pval
+1 Robust adjusted profile score (RAPS) 0.5300426 0.02826183 1.771554e-78
+
+Attaching package: 'MendelianRandomization'
+
+The following objects are masked from 'package:TwoSampleMR':
+
+    mr_ivw, mr_median
+
+ERROR in raps_block : argument "b_out" is missing, with no default 
+Analysing 'exposure' on 'outcome'
+Analysing 'exposure' on 'outcome'
+Analysing 'exposure' on 'outcome'
+Analysing 'exposure' on 'outcome'
+=== MR Sensitivity Analysis Summary ===
+                     method         b         se         pval
+1 Inverse variance weighted 0.5335976 0.02678450 2.629240e-88
+2                  MR Egger 0.3438528 0.07815550 4.706049e-05
+3           Weighted median 0.4742930 0.03274881 1.557314e-47
+4             Weighted mode 0.4218046 0.04776266 2.185061e-12
+  Q p-value (IVW): 8.470702e-06 
+  Egger intercept: 0.01641401  P: 0.01277754 
+  MR-PRESSO global p: 5e-04 
+--- Interpretation (verbatim text) ---
+Consistent estimates across methods: Evidence strengthened
+Significant Egger intercept: Directional pleiotropy present
+Significant MR-PRESSO global: Horizontal pleiotropy detected
+Significant heterogeneity: Instruments may be invalid
+Warning message:
+In mr_presso(BetaOutcome = "by", BetaExposure = "bx", SdOutcome = "byse",  :
+  No outlier were identified, therefore the results for the outlier-corrected MR are set to NA
+
+ERRORS: raps_block 

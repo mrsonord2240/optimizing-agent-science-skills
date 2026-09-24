@@ -1,0 +1,51 @@
+HIMA 2.3.4 
+Note: The selected conditions do not support de-biased Lasso penalty. 
+Switching to 'MCP' ...
+Running logistic HIMA with MCP penalty...
+Data scaling is completed.
+Step 1: Sure Independent Screening ...     (1:37:41 PM)
+    Screening M using the association between X (independent variable) and M (dependent variable): Adjusting for covariate(s): age, sex
+Running Sure Independent Screening (M ~ X + COV.XM, family: gaussian) with 8 cores in parallel...   (1:37:41 PM)
+    Top 60 mediators are selected: M1, M2, M3, M37, M78, M77, M31, M35, M93, M23, M83, M87, M52, M20, M51, M56, M12, M76, M69, M42, M67, M71, M43, M72, M13, M58, M27, M34, M65, M88, M10, M85, M79, M22, M24, M39, M9, M36, M81, M46, M84, M33, M16, M91, M32, M63, M66, M50, M45, M98, M5, M92, M95, M70, M96, M48, M82, M41, M44, M75
+Step 2: Penalized estimate (MCP) ...     (1:38:06 PM)
+    Adjusting for covariate(s): age, sex
+    Tuning parameter lambda selected: 0.0358674190343672
+    Non-zero MCP beta estimate(s) of mediator(s) found: M1,M2
+    Using alpha estimated in Step 1 ...   (1:38:06 PM)
+Step 3: Joint significance test ...     (1:38:06 PM)
+Done!     (1:38:07 PM)
+  (hima as written: 25.9s)
+[1] "hima"
+$ID
+[1] "M2" "M1"
+
+$alpha
+[1] 0.3909547 0.4121095
+
+$beta
+[1] 0.8717452 0.7512053
+
+$`alpha*beta`
+[1] 0.3408128 0.3095789
+
+$rimp
+[1] 52.40117 47.59883
+
+$`p-value`
+[1] 3.577470e-17 3.856408e-14
+
+attr(,"row.names")
+[1] 1 2
+attr(,"class")
+[1] "hima"
+attr(,"variable.labels")
+[1] "ID: Mediator ID"                                                                                      
+[2] "alpha: Effect of exposure on mediator"                                                                
+[3] "beta: Effect of mediator on outcome"                                                                  
+[4] "alpha*beta: Mediation (indirect) effect"                                                              
+[5] "rimp: Relative importance of the mediator \n  out of all significant mediators"                       
+[6] "p-value: Joint raw p-value of significant mediator \n  selected based on Bonferroni-adjusted p < 0.05"
+nrow(result) is TRUE (NULL as their text says)
+recovered: M2 M1 
+decoys flagged:  
+ASSERT pass: recovers M1 and M2

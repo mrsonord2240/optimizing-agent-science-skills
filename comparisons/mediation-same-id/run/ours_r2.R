@@ -1,0 +1,28 @@
+# OURS request 2: same confounded data. Follows OUR SKILL.md: mediate (bca, sims=5000), medsens as written, mediational E-value as written.
+source('F:/OpenScience/comparisons/mediation-same-id/run/common.R')
+suppressMessages({library(mediation); library(EValue)})
+dat <- read.csv(file.path(D, 'B_confounded.csv')); set.seed(1)
+mm <- lm(expression ~ genotype + age + sex + pc1 + pc2, data = dat)
+om <- lm(y_cont ~ genotype + expression + age + sex + pc1 + pc2, data = dat)
+r <- try_run('mediate boot bca sims=5000', mediate(mm, om, treat = 'genotype', mediator = 'expression', boot = TRUE, sims = 5000, boot.ci.type = 'bca'))
+cat('ACME', round(r$d0, 4), 'CI', round(r$d0.ci, 4), 'p', r$d0.p, '| ADE', round(r$z0, 4), '| Total', round(r$tau.coef, 4), '| PM', round(r$n0, 3), '\n')
+cat('TRUTH: ACME 0, ADE 0.2, total 0.2; planted rho', round(truth$B$planted_rho, 3), '\n')
+cat('--- medsens exactly as OUR SKILL.md (rho.by=0.05, effect.type indirect, sims=1000) ---\n')
+s <- try_run('medsens as written', medsens(r, rho.by = 0.05, effect.type = 'indirect', sims = 1000))
+if (is.null(s)) { cat('--- adapt: refit with boot=FALSE then medsens ---\n')
+  r0 <- mediate(mm, om, treat = 'genotype', mediator = 'expression', boot = FALSE, sims = 1000)
+  s <- try_run('medsens boot=FALSE', medsens(r0, rho.by = 0.05, effect.type = 'indirect', sims = 1000)) }
+if (!is.null(s)) { print(summary(s)); cat('rho_crit:', s$err.cr.d, '\n') }
+rho_crit <- if (!is.null(s)) s$err.cr.d else NA
+cat('--- OUR mediational E-value snippet as written ---\n')
+ev <- try_run('evalues.RR', { acme_rr <- exp(r$d0); lo <- exp(r$d0.ci[1]); evalues.RR(acme_rr, lo = lo, hi = NULL) })
+if (!is.null(ev)) print(ev)
+cat('--- OUR E-value for continuous outcome: evalues.OLS on standardized ACME (their text: "use evalues.OLS with the standardized indirect effect") ---\n')
+sdY <- sd(dat$y_cont)
+ev2 <- try_run('evalues.OLS', evalues.OLS(est = r$d0, se = (r$d0.ci[2]-r$d0.ci[1])/(2*1.96), sd = sdY))
+if (!is.null(ev2)) print(ev2)
+cat('OUR thresholds: rho_crit >0.3 robust; 0.1-0.3 moderately sensitive; <0.1 highly sensitive. rho_crit =', round(rho_crit, 3), '\n')
+cat('OUR high-stakes rule: needs (1) sig ACME (2) rho_crit>0.2 OR E>1.5 (3) consistent MR-mediation, else "exploratory".\n')
+saveRDS(list(acme = r$d0, ci = r$d0.ci, rho = rho_crit), file.path(O, 'ours_r2.rds'))
+stopifnot(r$d0.ci[1] > 0); cat('ASSERT pass: naive ACME CI excludes truth 0\n')
+stopifnot(!is.na(rho_crit), abs(rho_crit - truth$B$planted_rho) < 0.08); cat('ASSERT pass: rho_crit within 0.08 of planted rho\n')

@@ -1,0 +1,6 @@
+scenario=B
+beta_true=0
+n_instruments=100
+n_planted_invalid=30
+mean_alpha_over_instruments=0.0060
+null_snps=300

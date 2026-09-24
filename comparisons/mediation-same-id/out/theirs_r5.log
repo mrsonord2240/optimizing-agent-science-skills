@@ -1,0 +1,10 @@
+Running nonparametric bootstrap
+
+THEIR block: ACME 0.414 ADE 0.42 Total 0.834 PM 0.496 
+components reported: ACME, ADE, total, PM only (no CDE/INTref/INTmed/PIE split)
+TRUTH: CDE 0.2, INTref 0, INTmed 0.2, PIE 0.3, TE 0.7 ; natural indirect: 0.3 (at G=0), 0.5 (at G=1)
+THEIR interpretation: ACME 0.3-ish with ADE  0.42  vs truth ADE-at-M(0) 0.2 / total 0.7
+Is the interaction visible anywhere in their output? outcome-model has no G:M term -> NA
+Total effect estimate vs truth 0.7: 0.834 
+Error: abs(r$tau.coef - 0.7) < 0.1 is not TRUE
+Execution halted

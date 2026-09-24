@@ -1,0 +1,22 @@
+Running nonparametric bootstrap
+
+  [ERROR] as written : object 'med_form' not found 
+  (as written: 0.1s)
+--- adapt: embed the formula object in the model call (same fix as theirs_r4.R) ---
+Running nonparametric bootstrap
+
+Running nonparametric bootstrap
+
+Running nonparametric bootstrap
+
+Running nonparametric bootstrap
+
+  gene        acme acme_p        ade prop_mediated  acme_fdr
+1   M1 0.084990809  0.000 0.10298854    0.42788487 0.0000000
+2   M2 0.093872964  0.000 0.09790599    0.46344073 0.0000000
+3   M3 0.002322877  0.748 0.19713858    0.01161152 0.7480000
+4   M4 0.003401640  0.560 0.19671731    0.01692803 0.7466667
+significant at BH<0.05: M1 M2 
+ASSERT pass: M1,M2 detected
+decoys flagged:  
+ASSERT pass: decoys M3,M4 not flagged

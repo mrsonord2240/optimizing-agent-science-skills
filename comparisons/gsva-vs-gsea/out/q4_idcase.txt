@@ -1,0 +1,9 @@
+[ERROR] 2026-09-21 13:50:40 | ✖ No identifiers in the gene sets could be matched to the identifiers in
+  the expression data.
+[INFO] 2026-09-21 13:50:53 | Building immune gene sets from the local table.
+[ERROR] 2026-09-21 13:50:53 | SKILL_EMPTY_DATA: No immune gene sets remained after matching to the expression matrix.
+[INFO] 2026-09-21 13:51:04 | Reading immune gene sets.
+[INFO] 2026-09-21 13:51:10 | Analysis completed successfully.
+immune_cell_correlation_matrix.csv
+immune_cell_correlation_pvalue.csv
+ssgsea_group_compare.csv

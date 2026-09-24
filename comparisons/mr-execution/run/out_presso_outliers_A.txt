@@ -1,0 +1,6 @@
+No phenotype name specified, defaulting to 'exposure'.
+No phenotype name specified, defaulting to 'outcome'.
+Harmonising exposure (7YeEcV) and outcome (cEGVha)
+planted invalid in set: 29
+SKILL.md rule (p < 0.05/n): flagged 0, true pos 0
+PRESSO own rule (p <= 0.05): flagged 11, true pos 9

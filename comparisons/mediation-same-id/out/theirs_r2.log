@@ -1,0 +1,24 @@
+Running nonparametric bootstrap
+
+  (mediate boot sims=1000: 21.1s)
+ACME 0.1032 CI 0.0741 0.1389 p 0 | ADE 0.0228 | Total 0.126 | PM 0.819 
+TRUTH: ACME 0, ADE 0.2, total 0.2; planted rho 0.237 
+THEIR interpretation rules: CI excludes 0 -> "Evidence for mediation":  TRUE ; PM>0.2 "Meaningful mediation":  TRUE 
+--- medsens exactly as their SKILL.md (rho.by=0.1, effect.type indirect, sims=1000) ---
+  (medsens as written: 3.5s)
+
+Mediation Sensitivity Analysis for Average Causal Mediation Effect
+
+Sensitivity Region
+
+     Rho    ACME 95% CI Lower 95% CI Upper R^2_M*R^2_Y* R^2_M~R^2_Y~
+[1,] 0.2 -0.0125      -0.0413       0.0162         0.04       0.0323
+
+Rho at which ACME = 0: 0.2
+R^2_M*R^2_Y* at which ACME = 0: 0.04
+R^2_M~R^2_Y~ at which ACME = 0: 0.0323 
+
+rho at which ACME=0 (s$rho.by grid): 0.2 
+THEIR threshold text: |rho|>0.3 reasonably robust. rho_crit = 0.2 -> not labelled robust 
+ASSERT pass: naive ACME CI excludes truth 0 (i.e. the bootstrap CI alone is wrong)
+ASSERT pass: rho_crit within 0.08 of planted rho

@@ -1,0 +1,7 @@
+#!/bin/bash
+# Q3 (ranked DE table only, no matrix): try the three Open Science skills with the ranked table as the only input.
+R=F:/OpenScience/audit-envs/mass-spec-proteomics-analyst/r.sh; D=F:/OpenScience/comparisons/gsva-vs-gsea/data; S=F:/OpenScience/comparisons/gsva-vs-gsea/shim
+bash $R -e 'suppressMessages(library(limma)); E<-as.matrix(read.csv("F:/OpenScience/comparisons/gsva-vs-gsea/data/expr.csv",row.names=1,check.names=FALSE)); g<-read.csv("F:/OpenScience/comparisons/gsva-vs-gsea/data/group.csv"); grp<-factor(g$group,levels=c("Control","Case")); tt<-topTable(eBayes(lmFit(E,model.matrix(~grp))),coef=2,n=Inf); write.csv(data.frame(gene=rownames(tt),t=tt$t),"F:/OpenScience/comparisons/gsva-vs-gsea/data/ranked_de.csv",row.names=FALSE,quote=FALSE)'
+cd $S/gsva-analysis-and-visualization && bash $R scripts/main.R --mode analyze --input_file $D/ranked_de.csv --group_file $D/group.csv --case_group Case --control_group Control --category C2 --subcategory CP:KEGG_LEGACY --output_dir out_q3 2>&1 | tail -2
+cd $S/immune-pathway-analysis && bash $R scripts/main.R --mode analyze --input_file $D/ranked_de.csv --group_file $D/group.csv --geneset_file $D/kegg_table.csv --case_group Case --control_group Control --output_dir out_q3 2>&1 | tail -2
+cd $S/ssgsea-immune-infiltration-analysis && bash $R scripts/main.R --input_file $D/ranked_de.csv --group_file $D/group.csv --gene_set $D/kegg_as_celltype.csv --case_group Case --control_group Control --output_dir out_q3 2>&1 | tail -2

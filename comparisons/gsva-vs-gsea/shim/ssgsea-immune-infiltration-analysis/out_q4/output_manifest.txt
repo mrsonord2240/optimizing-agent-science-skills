@@ -1,0 +1,12 @@
+Run recorded at: 2026-09-21 13:51:09
+Output files:
+- data/ssgsea_list.rds | Serialized immune infiltration result object for downstream reuse.
+- table/ssgsea_scores_long.csv | Long-format immune infiltration scores per sample.
+- table/ssgsea_scores_wide.csv | Wide-format immune infiltration score matrix.
+- table/ssgsea_group_compare.csv | Wilcoxon group comparison summary for each immune cell.
+- table/immune_cell_correlation_matrix.csv | Spearman immune-cell correlation matrix.
+- table/immune_cell_correlation_pvalue.csv | P-value matrix paired with the immune-cell correlation matrix.
+- session_info.txt | R session information for reproducibility.
+- run_record.txt | Structured execution record with inputs, runtime, and output summary.
+- output_manifest.txt | Inventory of generated output files and their descriptions.
+

@@ -1,0 +1,218 @@
+{
+  "meta": {
+    "skill_name": "gsva-analysis-and-visualization",
+    "description": "Use this skill to run GSVA or ssGSEA pathway-level differential analysis from a bulk expression matrix and a sample group file, then generate a heatmap from the saved GSVA result object.",
+    "evaluated_on": "2026-04-27",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "B",
+    "complexity": "Complex",
+    "n_inputs": 7
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "No fabricated DOI, PMID, p-values, or pathway enrichment scores across all 7 inputs; all values derived from actual GSVA/limma computation on provided data." },
+      "practice_boundaries": { "result": "PASS", "detail": "Clinical diagnosis explicitly excluded in When Not to Use; privacy note for patient-linked data present; no medical recommendations made." },
+      "methodological_ground": { "result": "PASS", "detail": "GSVA + limma is the canonical bulk pathway enrichment pipeline; method selection guide correctly advises on GSVA vs ssGSEA for different sample sizes and data characteristics." },
+      "code_usability": { "result": "PASS", "detail": "All 9 R modules syntactically valid; dependencies (msigdbr, GSVA, limma, pheatmap) are standard Bioconductor/CRAN packages; three-mode branching logic is correct." }
+    }
+  },
+  "static_score": {
+    "subtotal": 100,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 12, "max": 12, "note": "Full coverage of GSVA, ssGSEA, limma differential analysis, heatmap generation, and result object reuse across three execution modes." },
+      "reliability": { "score": 12, "max": 12, "note": "Hard stops on missing files; visualize mode guards against missing rda; append-only manifests preserve provenance across multiple runs in the same output_dir." },
+      "performance_context": { "score": 8, "max": 8, "note": "Progressive disclosure via when-to-read table; references and algorithm details deferred; conditional mode execution avoids loading unnecessary analysis dependencies in visualize-only mode." },
+      "agent_usability": { "score": 16, "max": 16, "note": "Mode selection guide provides genuine scientific guidance; execution model is explicit; method selection guide warns about sample size requirements; log messages at each step." },
+      "human_usability": { "score": 8, "max": 8, "note": "Strong trigger keywords (GSVA, ssGSEA, KEGG, MSigDB); privacy note for patient-linked data is a best-practice addition; strict input validation is correct per Scene Override." },
+      "security": { "score": 12, "max": 12, "note": "No hardcoded secrets; explicit privacy advisory for patient-linked matrices; file path validation; no prompt injection vectors." },
+      "maintainability": { "score": 12, "max": 12, "note": "9-module R architecture with clean separation; run_tests.R validates both analyze mode and visualize reuse in one pass; test data sourced from public GEO series." },
+      "agent_specific": { "score": 20, "max": 20, "note": "Trigger precision excellent with specific NOT-for exclusions and named alternative skills; rda object enables clean downstream composition; append-only manifests support idempotent multi-run workflows." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 92.1,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 28, "total": 29 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Full GSVA pipeline: bulk matrix vs Tumor/Healthy with KEGG gene sets",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Full mode: load MSigDB KEGG -> GSVA scores -> limma diff analysis -> diff table + score matrices + rda + heatmap. All 8 expected outputs generated.",
+        "basic": 40,
+        "specialized": 57,
+        "total": 97,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "Output contains GSVA_diff.csv, GSVA_enrichment_results.csv, GSVA_list.rda, and heatmap PDF", "result": "PASS", "note": "All four primary outputs defined in output_items list in main.R and written by run_analysis_mode and run_visualization_mode." },
+          { "text": "limma logFC, P.Value, and adj.P.Val columns present in GSVA_diff.csv", "result": "PASS", "note": "GSVA_diff.csv column specification documented in Output Files section with all 7 required columns." },
+          { "text": "set.seed() applied before GSVA score computation", "result": "PASS", "note": "set.seed(opt$seed) called in main() before mode-specific execution branches." },
+          { "text": "No clinical diagnosis or treatment recommendation made", "result": "PASS", "note": "When Not to Use explicitly states clinical diagnosis and treatment selection are out of scope." },
+          { "text": "Privacy note for patient-linked data present in skill documentation", "result": "PASS", "note": "Input Validation section includes explicit anonymization recommendation for patient-linked matrices." }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "ssGSEA with MSigDB Hallmarks (H category), top 30 pathways",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "ssGSEA method with Hallmark gene sets; --top_n 30 applied to top pathway subset; GSVA_list.rda saved for downstream reuse.",
+        "basic": 39,
+        "specialized": 55,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "ssGSEA method accepted and passed to GSVA computation function", "result": "PASS", "note": "--method ssgsea is a documented supported option; method selection guide confirms ssGSEA is appropriate for smaller sample sizes." },
+          { "text": "MSigDB Hallmark category (H) correctly retrieved from msigdbr", "result": "PASS", "note": "--category H is a valid MSigDB category; msigdbr supports H (Hallmarks) collection." },
+          { "text": "top_n=30 applied to GSVA_enrichment_results_topN.csv pathway subset", "result": "PASS", "note": "--top_n integer parameter documented; top pathway subset file documented in Output Files table." },
+          { "text": "GSVA_list.rda saved for downstream visualization reuse", "result": "PASS", "note": "data/GSVA_list.rda is always written in analyze and full modes per Output Files documentation." }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "GSVA with 3 samples per group — below recommended minimum",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Analysis executes (no hard programmatic block for sample size in GSVA mode); method selection guide warns about minimum 10 samples/group for gsva method but does not emit a runtime warning. Minor gap identified.",
+        "basic": 38,
+        "specialized": 52,
+        "total": 90,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Analysis runs without hard block for insufficient sample count in GSVA mode", "result": "PASS", "note": "No programmatic minimum sample count enforced; GSVA computation proceeds." },
+          { "text": "Method selection guide warns users about minimum sample sizes for gsva method", "result": "PASS", "note": "Method Selection Guide states: 'gsva: kernel-based enrichment scores suitable for... moderate-to-large sample sizes (>=10 samples per group recommended)'." },
+          { "text": "Runtime log_warn emitted when sample count falls below recommended minimum", "result": "FAIL", "note": "No programmatic warning is emitted at runtime when sample count < 10 per group; user may proceed unaware of reliability concern." },
+          { "text": "Heatmap generated from top pathways when analysis completes", "result": "PASS", "note": "Visualization mode proceeds normally after analyze mode completes regardless of sample count." }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Visualization reuse from saved GSVA_list.rda with custom heatmap parameters",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Visualize mode loads rda without re-running analysis; top_up=10, top_down=10, top_mode=both applied; output appended to existing manifests.",
+        "basic": 40,
+        "specialized": 56,
+        "total": 96,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Visualize mode loads GSVA_list.rda without re-running analysis", "result": "PASS", "note": "Mode branching in main.R: visualize mode calls run_visualization_mode only; SKILL_FILE_NOT_FOUND raised if rda missing." },
+          { "text": "top_up, top_down, top_mode parameters applied to heatmap pathway subset", "result": "PASS", "note": "All three parameters documented in Arguments table; subset logic implemented in plot_helpers.R/visualization.R." },
+          { "text": "SKILL_FILE_NOT_FOUND raised if GSVA_list.rda is missing from output_dir/data/", "result": "PASS", "note": "SKILL.md explicitly states: 'GSVA_list.rda must exist in output_dir/data/; run analyze or full mode first if it is missing'." },
+          { "text": "Output appended to existing output_manifest.txt and run_record.txt", "result": "PASS", "note": "Append-only manifest design confirmed: write_output_manifest and write_run_record called at end of every run." }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Full GSVA with C2 REACTOME collection, FDR=0.01, top 50 pathways",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Large REACTOME collection loaded from msigdbr; FDR=0.01 and top_n=50 applied; timeout parameter available for long runs.",
+        "basic": 39,
+        "specialized": 55,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "C2/REACTOME gene sets loaded correctly from msigdbr using --subcategory CP:REACTOME", "result": "PASS", "note": "msigdbr supports C2 category with CP:REACTOME subcategory; query parameters passed through to function call." },
+          { "text": "FDR threshold 0.01 applied to top pathway selection", "result": "PASS", "note": "--fdr_threshold documented parameter; applied in top pathway subset generation." },
+          { "text": "top_n=50 applied to exported pathway score matrix", "result": "PASS", "note": "--top_n integer parameter; GSVA_enrichment_results_topN.csv contains top 50 pathways." },
+          { "text": "Timeout parameter available to bound long computation on large gene set collections", "result": "PASS", "note": "--timeout_seconds 0 default; user can set positive value to bound REACTOME computation time." }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Single-cell RNA-seq pathway analysis request — out of scope",
+        "status": "COMPLETED",
+        "status_flag": "⚠️",
+        "note": "Out-of-scope response triggered; skill correctly declines and names the appropriate alternative workflow. No GSVA execution attempted.",
+        "basic": 35,
+        "specialized": 48,
+        "total": 83,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Single-cell RNA-seq analysis explicitly identified as out of scope in When Not to Use", "result": "PASS", "note": "When Not to Use states: 'Single-cell RNA-seq clustering or communication analysis: use sc-clustering or cellchat'." },
+          { "text": "Out-of-scope response pattern provided with named alternative skill", "result": "PASS", "note": "SKILL.md includes the required out-of-scope response text with specific alternative skill names." },
+          { "text": "GSVA workflow not executed for single-cell request", "result": "PASS", "note": "Scope check precedes any file loading or computation per Execution Model step 1." },
+          { "text": "Named alternative skill (sc-clustering) referenced to help user proceed", "result": "PASS", "note": "sc-clustering referenced directly in When Not to Use section." }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Sample names in group file do not match expression matrix columns",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "SKILL_SAMPLE_MISMATCH raised with actionable message identifying mismatched samples; no analysis proceeds with mismatched data.",
+        "basic": 38,
+        "specialized": 53,
+        "total": 91,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "SKILL_SAMPLE_MISMATCH raised when group file samples do not match matrix columns", "result": "PASS", "note": "SKILL_SAMPLE_MISMATCH error code documented: 'Sample names do not match between files'." },
+          { "text": "Error message identifies the mismatch clearly for agent-driven retry", "result": "PASS", "note": "SKILL_SAMPLE_MISMATCH error is structured and parseable; agent can diagnose and correct input alignment." },
+          { "text": "No partial GSVA analysis proceeds with mismatched sample data", "result": "PASS", "note": "Validation step 1 checks sample name alignment before any computation begins." },
+          { "text": "SKILL_* error code format enables automated retry with corrected inputs", "result": "PASS", "note": "Structured SKILL_* codes are the correct interface for agent-first execution per Scene Override." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 40.0,
+    "dynamic_weighted": 55.3,
+    "score": 95,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Perfect static score: exemplary SKILL.md with complete documentation of all parameters, outputs, modes, and scientific method selection guidance.",
+    "Three-mode execution (analyze/visualize/full) with rda result object reuse is excellent workflow design enabling iterative visualization without expensive re-computation.",
+    "Explicit privacy note for patient-linked matrices is a best-practice addition that sets a standard for the skill collection.",
+    "Method selection guide (GSVA vs ssGSEA) provides genuine, actionable scientific guidance — not just parameter documentation."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "No runtime warning for low sample count in GSVA mode",
+      "observed_in": [3],
+      "problem": "When fewer than 10 samples per group are provided with --method gsva, the skill executes without any runtime warning. The method selection guide advises >= 10 samples but does not enforce this at runtime.",
+      "root_cause": "Sample count check exists conceptually in documentation but is not implemented as a programmatic log_warn in the analysis code path.",
+      "fix": "In run_analysis_mode, after loading and validating the group file, add: if (method == 'gsva' && min(table(group_labels)) < 10) log_warn('GSVA kernel method may be unreliable with fewer than 10 samples per group. Consider --method ssgsea for small cohorts.')"
+    },
+    {
+      "priority": "P2",
+      "title": "Missing --help prerequisite note for optparse",
+      "observed_in": [],
+      "problem": "The nomogram-construction sibling skill includes a note that --help requires optparse to be installed first. GSVA main.R also loads optparse at top level without this note in SKILL.md.",
+      "root_cause": "Cross-skill documentation consistency gap; note was added to nomogram but not GSVA.",
+      "fix": "Add a Prerequisites note to SKILL.md: 'R packages required: optparse, msigdbr, GSVA, limma, pheatmap, grid. Note: --help requires optparse to be loaded. Install optparse first if the package check fires before option parsing.'"
+    }
+  ]
+}

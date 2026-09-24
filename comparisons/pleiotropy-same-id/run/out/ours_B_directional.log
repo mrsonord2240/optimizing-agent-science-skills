@@ -1,0 +1,28 @@
+Analysing 'exposure' on 'outcome'
+r.exposure and/or r.outcome not present.
+Calculating approximate SNP-exposure and/or SNP-outcome correlations, assuming all are quantitative traits. Please pre-calculate r.exposure and/or r.outcome using get_r_from_lor() for any binary traits
+                     method nsnp         b         se         pval
+1 Inverse variance weighted   60 0.5335976 0.02678450 2.629240e-88
+2                  MR Egger   60 0.3438528 0.07815550 4.706049e-05
+3           Weighted median   60 0.4742930 0.03315521 2.029628e-46
+4             Weighted mode   60 0.4218046 0.04905777 5.370884e-12
+                     method        Q Q_df       Q_pval
+1                  MR Egger 105.7792   58 1.291735e-04
+2 Inverse variance weighted 117.8204   59 8.470702e-06
+Egger intercept: 0.01641401 SE 0.006388015 p 0.01277754 
+I2_GX 0.862774 NOME pass FALSE 
+  id.exposure id.outcome exposure outcome snp_r2.exposure snp_r2.outcome
+1    exposure    outcome        X       Y      0.00801517     0.00182066
+  correct_causal_direction  steiger_pval
+1                     TRUE 1.734781e-122
+PRESSO global p 5e-04  n_outliers 0  distortion p NA 
+ chr [1:60] "1" "1" "1" "1" "1" "1" "1" "0.72" "1" "1" "1" "1" "1" "1" "1" ...
+       Exposure       MR Analysis Causal Estimate        Sd   T-stat
+1 beta.exposure               Raw       0.5335976 0.0267845 19.92188
+2 beta.exposure Outlier-corrected              NA        NA       NA
+       P-value
+1 7.042429e-28
+2           NA
+Warning message:
+In mr_presso(BetaOutcome = "beta.outcome", BetaExposure = "beta.exposure",  :
+  No outlier were identified, therefore the results for the outlier-corrected MR are set to NA

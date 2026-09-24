@@ -1,0 +1,54 @@
+Global test p-value: <5e-04 
+
+Outlier test results (str of Pvalue col):
+ chr [1:60] "1" "0.33" "1" "1" "<0.03" "1" "0.9" "1" "1" "1" "1" "0.06" "1" ...
+Outlier SNPs: 2 
+Distortion test p-value: 0.8945 
+Raw IVW estimate: 0.3095812 
+Corrected IVW estimate: 0.3062899 
+Egger intercept: 0.00521  SE: 0.00775  p: 0.50417 
+Egger causal estimate: 0.2493  SE: 0.0949  p: 0.010973 
+I-squared: 0.863 
+Warning: I-squared < 0.9
+Instruments passing Steiger filter: 58 of 60 
+Analysing 'exposure' on 'outcome'
+                     method nsnp         b         se         pval
+1                  MR Egger   58 0.2989983 0.09382729 2.354283e-03
+2           Weighted median   58 0.3009776 0.03166507 1.999784e-21
+3 Inverse variance weighted   58 0.3015307 0.02991704 6.849206e-24
+4               Simple mode   58 0.4198568 0.07651835 9.787676e-07
+5             Weighted mode   58 0.3242082 0.05334534 1.073320e-07
+r.exposure and/or r.outcome not present.
+Calculating approximate SNP-exposure and/or SNP-outcome correlations, assuming all are quantitative traits. Please pre-calculate r.exposure and/or r.outcome using get_r_from_lor() for any binary traits
+Correct causal direction: TRUE  Steiger p: < 2.22e-16 
+Analysing 'exposure' on 'outcome'
+                                method         b         se         pval
+1 Robust adjusted profile score (RAPS) 0.3136829 0.03194957 9.413526e-23
+
+Attaching package: 'MendelianRandomization'
+
+The following objects are masked from 'package:TwoSampleMR':
+
+    mr_ivw, mr_median
+
+ERROR in raps_block : argument "b_out" is missing, with no default 
+Analysing 'exposure' on 'outcome'
+Analysing 'exposure' on 'outcome'
+Analysing 'exposure' on 'outcome'
+Analysing 'exposure' on 'outcome'
+=== MR Sensitivity Analysis Summary ===
+                     method         b         se         pval
+1 Inverse variance weighted 0.3095812 0.03092762 1.379448e-23
+2                  MR Egger 0.2493305 0.09487413 1.097255e-02
+3           Weighted median 0.3046407 0.03200065 1.734676e-21
+4             Weighted mode 0.3222425 0.05515993 2.362002e-07
+  Q p-value (IVW): 7.533151e-11 
+  Egger intercept: 0.005212025  P: 0.5041706 
+  MR-PRESSO global p: <5e-04 
+--- Interpretation (verbatim text) ---
+Consistent estimates across methods: Evidence strengthened
+Significant Egger intercept: Directional pleiotropy present
+Significant MR-PRESSO global: Horizontal pleiotropy detected
+Significant heterogeneity: Instruments may be invalid
+
+ERRORS: raps_block 

@@ -1,0 +1,66 @@
+Loading required package: MASS
+Loading required package: Matrix
+Loading required package: mvtnorm
+Loading required package: sandwich
+mediation: Causal Mediation Analysis
+Version: 4.5.1
+
+Running nonparametric bootstrap
+
+Mediation result:
+  ACME: 0.0043 
+  ACME p-value: 0.756 
+  Proportion mediated: 0.055 
+
+Warning messages:
+1: In rho^2 * (1 - r.sq.m) * (1 - r.sq.y) :
+  Recycling array of length 1 in vector-array arithmetic is deprecated.
+  Use c() or as.vector() instead.
+2: In err.cr.d^2 * (1 - r.sq.m) * (1 - r.sq.y) :
+  Recycling array of length 1 in vector-array arithmetic is deprecated.
+  Use c() or as.vector() instead.
+Sensitivity analysis:
+
+Mediation Sensitivity Analysis: Average Mediation Effect
+
+Sensitivity Region: ACME for Control Group
+
+       Rho ACME(control) 95% CI Lower 95% CI Upper R^2_M*R^2_Y* R^2_M~R^2_Y~
+[1,] -0.05        0.0148      -0.0068       0.0374       0.0025       0.0020
+[2,]  0.00        0.0037      -0.0189       0.0251       0.0000       0.0000
+[3,]  0.05       -0.0072      -0.0297       0.0137       0.0025       0.0020
+[4,]  0.10       -0.0181      -0.0411       0.0026       0.0100       0.0081
+
+Rho at which ACME for Control Group = 0: 0
+R^2_M*R^2_Y* at which ACME for Control Group = 0: 0
+R^2_M~R^2_Y~ at which ACME for Control Group = 0: 0 
+
+
+Sensitivity Region: ACME for Treatment Group
+
+       Rho ACME(treated) 95% CI Lower 95% CI Upper R^2_M*R^2_Y* R^2_M~R^2_Y~
+[1,] -0.05        0.0156      -0.0073       0.0383       0.0025       0.0020
+[2,]  0.00        0.0039      -0.0209       0.0272       0.0000       0.0000
+[3,]  0.05       -0.0080      -0.0325       0.0144       0.0025       0.0020
+[4,]  0.10       -0.0200      -0.0456       0.0027       0.0100       0.0081
+
+Rho at which ACME for Treatment Group = 0: 0
+R^2_M*R^2_Y* at which ACME for Treatment Group = 0: 0
+R^2_M~R^2_Y~ at which ACME for Treatment Group = 0: 0 
+
+null device 
+          1 
+Warning message:
+In (1 - x$r.square.y) * seq(0, 1 - x$rho.by, 0.01) :
+  Recycling array of length 1 in array-vector arithmetic is deprecated.
+  Use c() or as.vector() instead.
+null device 
+          1 
+
+Plots saved: sensitivity_plot.pdf, sensitivity_rsq.pdf
+
+Interpretation guide:
+  - The x-axis shows hypothetical correlation (rho) between residuals
+  - At rho = 0, no unmeasured confounding (standard mediation estimate)
+  - The rho where ACME crosses 0 is the critical sensitivity parameter
+  - Larger |critical rho| = more robust to confounding

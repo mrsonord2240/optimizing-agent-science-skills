@@ -1,0 +1,6 @@
+[INFO] 2026-09-21 13:49:43 | Loading expression matrix.
+[ERROR] 2026-09-21 13:49:43 | SKILL_EMPTY_DATA: Expression matrix must contain at least 2 genes and 2 samples.
+[INFO] 2026-09-21 13:49:55 | Loading expression matrix.
+[ERROR] 2026-09-21 13:49:55 | SKILL_EMPTY_DATA: Expression matrix must contain at least 2 genes and 2 samples.
+[INFO] 2026-09-21 13:50:06 | Reading immune gene sets.
+[ERROR] 2026-09-21 13:50:06 | SKILL_SAMPLE_MISMATCH: No overlapping samples were found between the expression matrix and the group file.

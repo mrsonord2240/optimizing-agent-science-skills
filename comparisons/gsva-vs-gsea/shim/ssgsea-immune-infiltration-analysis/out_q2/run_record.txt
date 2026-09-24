@@ -1,0 +1,8 @@
+Run recorded at: 2026-09-21 13:43:18
+Input parameters: {"input_file":"F:/OpenScience/comparisons/gsva-vs-gsea/data/expr.csv","group_file":"F:/OpenScience/comparisons/gsva-vs-gsea/data/group.csv","output_dir":"out_q2","seed":1,"timeout_seconds":0,"method":"ssgsea","kcdf":"Gaussian","min_sz":2,"max_sz":10000,"parallel_sz":2,"tau":0.25,"mx_diff":true,"gene_id_case":"upper","gene_set":"F:/OpenScience/comparisons/_theirs/ssgsea-immune-infiltration-analysis/tests/data/immune_gene_sets.csv","case_group":"Case","control_group":"Control","make_plots":true,"verbose":true,"help":false}
+Input summary: 8288 genes, 24 samples, 28 immune gene sets kept.
+Runtime seconds: 3.865
+CPU summary: Requested parallel_sz=2; actual_parallel_sz=2.
+GC note: GC used cells: Ncells=525.5, Vcells=135.1.
+Output summary: 28 score rows, 24 samples, plots=enabled. Structured outputs under data/, table/, and plot/.
+

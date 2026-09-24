@@ -1,0 +1,318 @@
+{
+    "meta": {
+        "skill_name": "immune-pathway-analysis",
+        "description": "Analyze immune-related pathway activity and immune cell-type enrichment scores from bulk RNA-seq expression data. Inputs: expression matrix, immune gene sets or pathway database. Outputs: pathway activity table, immune score comparison plots.",
+        "evaluated_on": "2026-04-20",
+        "evaluator_version": "skill-auditor@1.0",
+        "category": "Data Analysis",
+        "execution_mode": "D",
+        "complexity": "Moderate",
+        "n_inputs": 5
+    },
+    "veto_gates": {
+        "skill_veto": {
+            "gate": "PASS",
+            "stability": "PASS",
+            "contract": "PASS",
+            "determinism": "PASS",
+            "security": "PASS"
+        },
+        "research_veto": {
+            "applicable": true,
+            "gate": "PASS",
+            "scientific_integrity": {
+                "result": "PASS",
+                "detail": "Scientific integrity check completed without reportable redline findings."
+            },
+            "practice_boundaries": {
+                "result": "PASS",
+                "detail": "Practice boundaries check completed without reportable redline findings."
+            },
+            "methodological_ground": {
+                "result": "PASS",
+                "detail": "Methodological ground check completed without reportable redline findings."
+            },
+            "code_usability": {
+                "result": "PASS",
+                "detail": "Code usability check completed without reportable redline findings."
+            }
+        }
+    },
+    "static_score": {
+        "subtotal": 98,
+        "max": 100,
+        "categories": {
+            "functional_suitability": {
+                "score": 12,
+                "max": 12,
+                "note": "Functional suitability was evaluated against the skill-auditor rubric; no blocking schema-level issue was recorded for this dimension."
+            },
+            "reliability": {
+                "score": 11,
+                "max": 12,
+                "note": "Append-only provenance improves recovery, but reruns still overwrite core output artifacts in place."
+            },
+            "performance_context": {
+                "score": 8,
+                "max": 8,
+                "note": "Performance and context was evaluated against the skill-auditor rubric; no blocking schema-level issue was recorded for this dimension."
+            },
+            "agent_usability": {
+                "score": 16,
+                "max": 16,
+                "note": "Completion format now tells the agent exactly how to summarize results after execution."
+            },
+            "human_usability": {
+                "score": 8,
+                "max": 8,
+                "note": "Fixture notes now explain the smoke-test data and the minimal gene-set helper more clearly."
+            },
+            "security": {
+                "score": 12,
+                "max": 12,
+                "note": "Security was evaluated against the skill-auditor rubric; no blocking schema-level issue was recorded for this dimension."
+            },
+            "maintainability": {
+                "score": 12,
+                "max": 12,
+                "note": "Maintainability was evaluated against the skill-auditor rubric; no blocking schema-level issue was recorded for this dimension."
+            },
+            "agent_specific": {
+                "score": 19,
+                "max": 20,
+                "note": "Escape hatches and progressive disclosure are strong; reruns still append timestamped provenance by design."
+            }
+        }
+    },
+    "dynamic_score": {
+        "execution_avg": 91.4,
+        "max": 100,
+        "assertion_pass_rate": {
+            "passed": 23,
+            "total": 23
+        },
+        "inputs": [
+            {
+                "index": 1,
+                "type": "Canonical",
+                "label": "Full GSVA baseline",
+                "status": "COMPLETED",
+                "status_flag": "✅",
+                "note": "Fallback to |t| ranking because no pathways met FDR <= 0.05 on the bundled demo data.",
+                "basic": 38,
+                "specialized": 55,
+                "total": 93,
+                "assertions_passed": 5,
+                "assertions_total": 5,
+                "assertions": [
+                    {
+                        "text": "Required outputs were generated for the audited workflow.",
+                        "result": "PASS",
+                        "note": "The audited evidence supported this assertion."
+                    },
+                    {
+                        "text": "Input handling and validation behaved as documented.",
+                        "result": "PASS",
+                        "note": "The audited evidence supported this assertion."
+                    },
+                    {
+                        "text": "No unsupported medical or scientific claim fabrication was detected.",
+                        "result": "PASS",
+                        "note": "The audited evidence supported this assertion."
+                    },
+                    {
+                        "text": "Execution stayed within the stated Data Analysis skill scope.",
+                        "result": "PASS",
+                        "note": "The audited evidence supported this assertion."
+                    },
+                    {
+                        "text": "Result artifacts and scoring evidence were sufficient for audit review.",
+                        "result": "PASS",
+                        "note": "The audited evidence supported this assertion."
+                    }
+                ]
+            },
+            {
+                "index": 2,
+                "type": "Variant A",
+                "label": "Full ssGSEA baseline",
+                "status": "COMPLETED",
+                "status_flag": "✅",
+                "note": "Method switch to ssGSEA succeeded and produced a complete output bundle.",
+                "basic": 37,
+                "specialized": 54,
+                "total": 91,
+                "assertions_passed": 5,
+                "assertions_total": 5,
+                "assertions": [
+                    {
+                        "text": "Required outputs were generated for the audited workflow.",
+                        "result": "PASS",
+                        "note": "The audited evidence supported this assertion."
+                    },
+                    {
+                        "text": "Input handling and validation behaved as documented.",
+                        "result": "PASS",
+                        "note": "The audited evidence supported this assertion."
+                    },
+                    {
+                        "text": "No unsupported medical or scientific claim fabrication was detected.",
+                        "result": "PASS",
+                        "note": "The audited evidence supported this assertion."
+                    },
+                    {
+                        "text": "Execution stayed within the stated Data Analysis skill scope.",
+                        "result": "PASS",
+                        "note": "The audited evidence supported this assertion."
+                    },
+                    {
+                        "text": "Result artifacts and scoring evidence were sufficient for audit review.",
+                        "result": "PASS",
+                        "note": "The audited evidence supported this assertion."
+                    }
+                ]
+            },
+            {
+                "index": 3,
+                "type": "Edge",
+                "label": "Visualize-only reuse",
+                "status": "COMPLETED",
+                "status_flag": "✅",
+                "note": "Reused saved RDS state and appended a second provenance section without rerunning analysis.",
+                "basic": 36,
+                "specialized": 54,
+                "total": 90,
+                "assertions_passed": 4,
+                "assertions_total": 4,
+                "assertions": [
+                    {
+                        "text": "Required outputs were generated for the audited workflow.",
+                        "result": "PASS",
+                        "note": "The audited evidence supported this assertion."
+                    },
+                    {
+                        "text": "Input handling and validation behaved as documented.",
+                        "result": "PASS",
+                        "note": "The audited evidence supported this assertion."
+                    },
+                    {
+                        "text": "No unsupported medical or scientific claim fabrication was detected.",
+                        "result": "PASS",
+                        "note": "The audited evidence supported this assertion."
+                    },
+                    {
+                        "text": "Execution stayed within the stated Data Analysis skill scope.",
+                        "result": "PASS",
+                        "note": "The audited evidence supported this assertion."
+                    }
+                ]
+            },
+            {
+                "index": 4,
+                "type": "Variant B",
+                "label": "Analyze-only export",
+                "status": "COMPLETED",
+                "status_flag": "✅",
+                "note": "Analyze mode correctly produced tables and RDS output without requiring a plot.",
+                "basic": 36,
+                "specialized": 53,
+                "total": 89,
+                "assertions_passed": 4,
+                "assertions_total": 4,
+                "assertions": [
+                    {
+                        "text": "Required outputs were generated for the audited workflow.",
+                        "result": "PASS",
+                        "note": "The audited evidence supported this assertion."
+                    },
+                    {
+                        "text": "Input handling and validation behaved as documented.",
+                        "result": "PASS",
+                        "note": "The audited evidence supported this assertion."
+                    },
+                    {
+                        "text": "No unsupported medical or scientific claim fabrication was detected.",
+                        "result": "PASS",
+                        "note": "The audited evidence supported this assertion."
+                    },
+                    {
+                        "text": "Execution stayed within the stated Data Analysis skill scope.",
+                        "result": "PASS",
+                        "note": "The audited evidence supported this assertion."
+                    }
+                ]
+            },
+            {
+                "index": 5,
+                "type": "Stress",
+                "label": "Full custom heatmap run",
+                "status": "COMPLETED",
+                "status_flag": "✅",
+                "note": "Accepted multiple non-default plotting parameters and produced the custom heatmap PDF successfully.",
+                "basic": 38,
+                "specialized": 56,
+                "total": 94,
+                "assertions_passed": 5,
+                "assertions_total": 5,
+                "assertions": [
+                    {
+                        "text": "Required outputs were generated for the audited workflow.",
+                        "result": "PASS",
+                        "note": "The audited evidence supported this assertion."
+                    },
+                    {
+                        "text": "Input handling and validation behaved as documented.",
+                        "result": "PASS",
+                        "note": "The audited evidence supported this assertion."
+                    },
+                    {
+                        "text": "No unsupported medical or scientific claim fabrication was detected.",
+                        "result": "PASS",
+                        "note": "The audited evidence supported this assertion."
+                    },
+                    {
+                        "text": "Execution stayed within the stated Data Analysis skill scope.",
+                        "result": "PASS",
+                        "note": "The audited evidence supported this assertion."
+                    },
+                    {
+                        "text": "Result artifacts and scoring evidence were sufficient for audit review.",
+                        "result": "PASS",
+                        "note": "The audited evidence supported this assertion."
+                    }
+                ]
+            }
+        ]
+    },
+    "final": {
+        "static_weighted": 39.2,
+        "dynamic_weighted": 54.8,
+        "score": 94,
+        "max": 100,
+        "grade": "Production Ready",
+        "grade_symbol": "⭐",
+        "deployable": true,
+        "veto_override": false
+    },
+    "key_strengths": [
+        "Scope boundaries are explicit and reduce misuse across deconvolution, gene-level differential expression, and single-cell requests.",
+        "The CLI surface is well validated, including safe output path handling and precise parameter checks.",
+        "Provenance is strong: session info, output manifests, and run records are generated consistently.",
+        "The skill now explains smoke-test expectations and completion reporting more clearly to both agents and users."
+    ],
+    "recommendations": [
+        {
+            "priority": "P2",
+            "title": "Add an optional positive-control showcase dataset",
+            "observed_in": [
+                1,
+                2,
+                4,
+                5
+            ],
+            "problem": "The bundled demo data is excellent for smoke testing but still does not demonstrate a clearly significant pathway at the default FDR <= 0.05.",
+            "root_cause": "The bundled fixture is optimized for deterministic execution coverage rather than strong biological separation.",
+            "fix": "Add an optional second demo dataset with stronger pathway contrast if you want a more compelling showcase run in docs or screenshots."
+        }
+    ]
+}

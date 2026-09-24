@@ -1,0 +1,34 @@
+Output Files
+============
+
+Run Mode: full
+Generated At: 2026-09-21 13:39:51
+
+- F:/OpenScience/comparisons/gsva-vs-gsea/shim/immune-pathway-analysis/out_q1/table/immune_pathway_diff.csv
+  Description: Pathway-level differential results
+  Content: Columns include geneset, logFC, P.Value, adj.P.Val, t, and B.
+
+- F:/OpenScience/comparisons/gsva-vs-gsea/shim/immune-pathway-analysis/out_q1/table/immune_pathway_scores.csv
+  Description: Full immune pathway score matrix
+  Content: Rows are pathways and columns are samples.
+
+- F:/OpenScience/comparisons/gsva-vs-gsea/shim/immune-pathway-analysis/out_q1/table/immune_pathway_scores_top.csv
+  Description: Top-pathway score matrix
+  Content: Subset of pathways selected by top_n and fdr_threshold.
+
+- F:/OpenScience/comparisons/gsva-vs-gsea/shim/immune-pathway-analysis/out_q1/table/immune_gene_set_summary.csv
+  Description: Immune gene-set summary table
+  Content: One row per retained pathway with unique gene counts.
+
+- F:/OpenScience/comparisons/gsva-vs-gsea/shim/immune-pathway-analysis/out_q1/data/immune_pathway_result.rds
+  Description: Serialized analysis result object
+  Content: Saved object used for visualization-only mode.
+
+- F:/OpenScience/comparisons/gsva-vs-gsea/shim/immune-pathway-analysis/out_q1/plot/immune_pathway_heatmap.pdf
+  Description: Immune pathway heatmap PDF
+  Content: Heatmap comparing pathway scores between the selected sample groups.
+
+- F:/OpenScience/comparisons/gsva-vs-gsea/shim/immune-pathway-analysis/out_q1/session_info.txt
+  Description: R session and package version record
+  Content: sessionInfo() output captured at the end of the run.
+

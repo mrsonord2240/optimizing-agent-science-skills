@@ -1,0 +1,53 @@
+$A
+$A$acme_cont
+[1] 0.3
+
+$A$ade_cont
+[1] 0.2
+
+$A$total_cont
+[1] 0.5
+
+$A$prop_med_cont
+[1] 0.6
+
+$A$prob_scale
+$A$prob_scale$acme0
+[1] 0.1058363
+
+$A$prob_scale$acme1
+[1] 0.1042527
+
+$A$prob_scale$ade0
+[1] 0.07059379
+
+$A$prob_scale$tot
+[1] 0.1748465
+
+
+
+$B
+$B$acme
+[1] 0
+
+$B$ade
+[1] 0.2
+
+$B$total
+[1] 0.2
+
+$B$planted_rho
+[1] 0.2370227
+
+
+$C
+$C$true_mediators
+[1] "M1" "M2"
+
+$C$decoys
+[1] "M3" "M4"
+
+$C$prevalence
+[1] 0.3925
+
+

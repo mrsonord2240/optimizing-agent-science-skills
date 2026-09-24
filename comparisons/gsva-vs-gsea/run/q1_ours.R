@@ -1,0 +1,31 @@
+# Q1 on OUR side (bio-pathway-gsea): follow the SKILL.md decision tree.
+#  - contrast on all genes -> limma t -> preranked GSEA(TERM2GENE) (exponent=1, eps=0, seed) ; CAMERA inter.gene.cor=NA
+#  - per-sample scores -> gsva(gsvaParam()) / gsva(ssgseaParam())  (skill: "no contrast test")
+suppressMessages({library(limma); library(clusterProfiler); library(msigdbr); library(GSVA)})
+D <- "F:/OpenScience/comparisons/gsva-vs-gsea/data/"; O <- "F:/OpenScience/comparisons/gsva-vs-gsea/out/"
+E <- as.matrix(read.csv(paste0(D,"expr.csv"), row.names=1, check.names=FALSE)); g <- read.csv(paste0(D,"group.csv"))
+grp <- factor(g$group[match(colnames(E), g$sample)], levels=c("Control","Case"))
+kegg <- msigdbr(species="Homo sapiens", collection="C2", subcollection="CP:KEGG_LEGACY")
+t2g <- unique(kegg[, c("gs_name","gene_symbol")])
+design <- model.matrix(~grp); fit <- eBayes(lmFit(E, design)); tt <- topTable(fit, coef=2, n=Inf, sort.by="none")
+# --- ranked vector: named, deduped, sorted decreasing, signed variance-calibrated (limma t)
+gl <- tt$t; names(gl) <- rownames(tt); gl <- gl[!is.na(gl) & !duplicated(names(gl))]; gl <- sort(gl, decreasing=TRUE)
+set.seed(123)
+t0 <- Sys.time()
+gs <- GSEA(geneList=gl, TERM2GENE=t2g, exponent=1, minGSSize=10, maxGSSize=500, eps=0, pvalueCutoff=1, seed=TRUE, verbose=FALSE)
+cat("GSEA seconds:", round(as.numeric(Sys.time()-t0, units="secs"),1), "\n")
+r <- as.data.frame(gs)[, c("ID","setSize","enrichmentScore","NES","pvalue","p.adjust","core_enrichment")]
+write.csv(r, paste0(O,"ours_q1_gsea_t.csv"), row.names=FALSE)
+# --- CAMERA with correlation estimated (skill's recommended correlation-honest test)
+idx <- lapply(split(t2g$gene_symbol, t2g$gs_name), function(x) which(rownames(E) %in% x))
+idx <- idx[lengths(idx) >= 10 & lengths(idx) <= 500]
+cam <- camera(E, idx, design, contrast=2, inter.gene.cor=NA)
+cam$ID <- rownames(cam); write.csv(cam, paste0(O,"ours_q1_camera_NA.csv"), row.names=FALSE)
+cam0 <- camera(E, idx, design, contrast=2)   # default preset inter.gene.cor=0.01 (skill: gives no protection)
+cam0$ID <- rownames(cam0); write.csv(cam0, paste0(O,"ours_q1_camera_default.csv"), row.names=FALSE)
+# --- per-sample scores exactly as the skill's snippet (GSVA 2.x parameter objects)
+gsets <- lapply(split(t2g$gene_symbol, t2g$gs_name), unique)
+sc_g <- gsva(gsvaParam(E, gsets, minSize=10, maxSize=500)); sc_s <- gsva(ssgseaParam(E, gsets, minSize=10, maxSize=500))
+write.csv(sc_g, paste0(O,"ours_q1_gsva_scores.csv")); write.csv(sc_s, paste0(O,"ours_q1_ssgsea_scores.csv"))
+cat("gsva score matrix dims:", dim(sc_g), " ssgsea:", dim(sc_s), "\n")
+saveRDS(gl, paste0(O,"ours_ranked_t.rds"))
