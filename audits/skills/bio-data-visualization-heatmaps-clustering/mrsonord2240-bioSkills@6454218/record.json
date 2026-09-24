@@ -1,9 +1,9 @@
 {
   "skill_id": "bio-data-visualization-heatmaps-clustering",
-  "version": "mrsonord2240-bioSkills@019953e",
+  "version": "mrsonord2240-bioSkills@6454218",
   "source": {
     "repository": "mrsonord2240/bioSkills",
-    "commit": "019953e9ca90f6f6f69e3f5a9cd19a5c1b9dc6be",
+    "commit": "6454218cec8127aa7880df1b346afd108bc8e3a0",
     "path": "data-visualization/heatmaps-clustering",
     "author": "GPTomics",
     "author_url": "https://github.com/GPTomics",
@@ -13,7 +13,7 @@
       "repository": "GPTomics/bioSkills",
       "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
     },
-    "url": "https://github.com/mrsonord2240/bioSkills/tree/019953e9ca90f6f6f69e3f5a9cd19a5c1b9dc6be/data-visualization/heatmaps-clustering"
+    "url": "https://github.com/mrsonord2240/bioSkills/tree/6454218cec8127aa7880df1b346afd108bc8e3a0/data-visualization/heatmaps-clustering"
   },
   "audit": {
     "method": {
@@ -26,16 +26,16 @@
       "url": "https://github.com/aipoch/medical-research-skills/tree/f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26/skill-auditor"
     },
     "evaluator_version": "skill-auditor@1.0",
-    "audited_on": "2026-09-20",
+    "audited_on": "2026-09-24",
     "performed_by": "Claude (Anthropic) auditor agents",
     "commissioned_by": "Samuel Nord",
     "test_data": "synthetic"
   },
-  "supersedes": null,
+  "supersedes": "mrsonord2240-bioSkills@019953e",
   "files": {
     "report": "report.json",
     "viewer": "viewer.md",
     "fixes": "fixes.md",
-    "scripts": 39
+    "scripts": 11
   }
 }

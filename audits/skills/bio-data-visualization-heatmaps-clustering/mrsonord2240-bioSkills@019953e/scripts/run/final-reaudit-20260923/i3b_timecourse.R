@@ -1,0 +1,25 @@
+# INPUT 3b (edge): ordered time-course columns. Skill: cluster_columns=FALSE; use column_split to group while preserving order. SYNTHETIC planted temporal patterns.
+suppressPackageStartupMessages({library(ComplexHeatmap);library(circlize)})
+set.seed(9)
+tp <- c("0h","1h","2h","4h","8h","12h","24h","48h"); ns <- length(tp)
+ng <- 60
+pat <- rbind(early = c(0,2,3,2,1,0,0,0), late = c(0,0,0,0,1,2,3,4), down = c(0,-1,-2,-3,-3,-3,-3,-3))
+cl <- rep(c("early","late","down"), each = 20)
+mat <- pat[cl, ] + matrix(rnorm(ng*ns, 0, 0.4), ng); colnames(mat) <- tp; rownames(mat) <- paste0("g", 1:ng)
+z <- t(scale(t(mat))); b <- quantile(abs(z), .99); cf <- colorRamp2(c(-b,0,b), c("#0072B2","white","#D55E00"))
+hA <- Heatmap(z, name="z", col=cf, cluster_columns = TRUE, clustering_method_columns="ward.D2", clustering_method_rows="ward.D2", row_split = 3)
+hB <- Heatmap(z, name="z", col=cf, cluster_columns = FALSE, clustering_method_rows="ward.D2", row_split = 3)
+pdf(NULL); dA <- draw(hA); dB <- draw(hB); dev.off()
+cat("cluster_columns=TRUE order  :", tp[column_order(dA)], "\n")
+cat("cluster_columns=FALSE order :", tp[column_order(dB)], "\n")
+cat("time axis preserved with FALSE:", identical(column_order(dB), 1:ns), "; scrambled with TRUE:", !identical(column_order(dA), 1:ns), "\n")
+# column_split preserving order
+grpc <- factor(rep(c("early","mid","late"), c(3,3,2)), levels = c("early","mid","late"))
+hC <- Heatmap(z, name="z", col=cf, cluster_columns = FALSE, column_split = grpc, row_split = 3, clustering_method_rows="ward.D2")
+pdf(NULL); dC <- draw(hC); dev.off(); cat("column_split + cluster_columns=FALSE order:", unlist(lapply(column_order(dC), function(i) tp[i])), "\n")
+# does column_split with default cluster_columns=TRUE keep order? (Skill: 'use column_split ... to group while preserving order')
+hD <- Heatmap(z, name="z", col=cf, column_split = grpc, row_split = 3, clustering_method_rows="ward.D2")
+pdf(NULL); dD <- draw(hD); dev.off(); cat("column_split + cluster_columns=TRUE (default) order:", unlist(lapply(column_order(dD), function(i) tp[i])), "\n")
+png("i3b_timecourse.png", 700, 600, res=100); draw(hC); dev.off()
+# planted recovery: row clusters
+ro <- row_order(dC); print(sapply(ro, function(i) table(factor(cl[i], levels=c("early","late","down")))))
