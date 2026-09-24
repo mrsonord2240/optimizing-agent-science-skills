@@ -1,0 +1,57 @@
+{
+  "meta": {
+    "skill_name": "bio-pathway-wikipathways",
+    "description": "Tests gene lists and ranked vectors against live or dated WikiPathways collections with clusterProfiler and rWikiPathways.",
+    "evaluated_on": "2026-09-23",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md",
+    "source": "mrsonord2240/bioSkills@cc9a798929c5e73205d5148f5bc6abb37967b518:pathway-analysis/wikipathways"
+  },
+  "veto_gates": {
+    "skill_veto": { "gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS" },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All figures are fresh synthetic/live WikiPathways output, with archive release date and public-source behavior stated; no biomedical result was invented." },
+      "practice_boundaries": { "result": "PASS", "detail": "The Skill performs pathway enrichment on de-identified gene lists and makes no individual diagnostic or treatment claim." },
+      "methodological_ground": { "result": "PASS", "detail": "ORA, ranked GSEA, explicit universes, Entrez matching, live-data drift, dated GMT pinning, and non-human organism validation were each independently exercised." },
+      "code_usability": { "result": "PASS", "detail": "The corrected rWikiPathways standalone accessor, the new non-human API smoke regression, both shipped examples, and every other fresh input completed with exit 0." }
+    }
+  },
+  "static_score": {
+    "subtotal": 95,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 12, "max": 12, "note": "ORA, GSEA, dated pinning, direct API inspection, and non-human organism coverage each have an applicable, runnable route." },
+      "reliability": { "score": 12, "max": 12, "note": "Explicit ID, universe, archive-retention, and community-curation safeguards now use the correct standalone API namespace." },
+      "performance_context": { "score": 7, "max": 8, "note": "Workflow is bounded and linear; dated monthly archive retries make live-data recovery clear." },
+      "agent_usability": { "score": 16, "max": 16, "note": "Decision tree, workflow, error prevention, and direct API instructions are explicit and were validated in the declared import context." },
+      "human_usability": { "score": 7, "max": 8, "note": "Readable scenario guidance and concise usage guide mitigate necessarily technical pathway content." },
+      "security": { "score": 12, "max": 12, "note": "No credentials, destructive actions, or untrusted-code execution are documented; public archive/API traffic is identified." },
+      "maintainability": { "score": 12, "max": 12, "note": "The pinned procedure and focused API regression are shipped separately, while the SKILL names the exact supported namespace." },
+      "agent_specific": { "score": 17, "max": 20, "note": "Trigger, scope, and escape-hatch language are precise; advanced live-database context remains inherently dense." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 96.0,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 21, "total": 21 },
+    "inputs": [
+      { "index": 1, "type": "Canonical API", "label": "Human WikiPathways discovery and WP554 retrieval", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Fresh agent-private wikipathways-phase2 runtime; exit 0.", "note": "listOrganisms returned 41 organisms, listPathways returned 1,131 human pathways, and WP554 returned 17 Entrez identifiers.", "basic": 38, "specialized": 58, "total": 96, "assertions_passed": 3, "assertions_total": 3, "assertions": [ { "text": "Supported organisms can be enumerated", "result": "PASS", "note": "41 organisms returned." }, { "text": "Human pathways can be listed", "result": "PASS", "note": "1,131 rows returned." }, { "text": "A pathway's metadata and Entrez cross-references can be retrieved", "result": "PASS", "note": "WP554 metadata and 17 L-system identifiers returned." } ] },
+      { "index": 2, "type": "Reproducible ORA", "label": "Shipped dated-GMT pinning script", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Fresh agent-private wikipathways-phase2 runtime; shipped script exited 0.", "note": "The script chose release 20260710, wrote its CSV, and recovered WP554 among six terms.", "basic": 38, "specialized": 58, "total": 96, "assertions_passed": 3, "assertions_total": 3, "assertions": [ { "text": "Newest-first dated archive retry succeeds", "result": "PASS", "note": "20260710 downloaded and was printed for methods reporting." }, { "text": "Compound GMT terms are converted to usable TERM2GENE/TERM2NAME", "result": "PASS", "note": "The resulting enrichResult CSV has pathway IDs and descriptions." }, { "text": "Pinned ORA recovers the planted pathway", "result": "PASS", "note": "WP554 was recovered with adjusted p=4.013e-29." } ] },
+      { "index": 3, "type": "Variant A", "label": "Live ORA and ranked GSEA", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Fresh agent-private wikipathways-phase2 runtime; exit 0.", "note": "Explicit-universe ORA produced six terms including WP554; seeded gseWP produced 30 terms.", "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 3, "assertions_total": 3, "assertions": [ { "text": "Entrez ORA with an explicit tested universe executes", "result": "PASS", "note": "Six terms, including WP554, returned." }, { "text": "Named decreasing GSEA executes", "result": "PASS", "note": "30 terms returned." }, { "text": "Live numerical caveats remain visible", "result": "PASS", "note": "fgsea emitted explicit tie and precision warnings." } ] },
+      { "index": 4, "type": "Method Boundary", "label": "Default versus matched ORA universe", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Fresh agent-private wikipathways-phase2 runtime; exit 0.", "note": "The same WP554 query used 17/420 under the matched universe versus 17/9031 by default, changing adjusted p from 4.013e-29 to 2.716e-51.", "basic": 38, "specialized": 58, "total": 96, "assertions_passed": 3, "assertions_total": 3, "assertions": [ { "text": "Matched and default-universe calls both execute", "result": "PASS", "note": "Both returned WP554." }, { "text": "Background ratio changes materially", "result": "PASS", "note": "420 mapped tested genes versus 9,031 default genes." }, { "text": "The result demonstrates the documented default-background inflation", "result": "PASS", "note": "Default p.adjust is substantially smaller." } ] },
+      { "index": 5, "type": "API Compatibility", "label": "Standalone organism lookup and non-human ORA smoke", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Fresh agent-private wikipathways-phase2 runtime; corrected standalone source regression exited 0.", "note": "rWikiPathways::listOrganisms returned 41 organisms including Danio rerio; the shipped smoke test listed 55 Danio pathways and returned two non-human ORA terms. No stale accessor calls remain in SKILL.md or the exploration example.", "basic": 39, "specialized": 58, "total": 97, "assertions_passed": 3, "assertions_total": 3, "assertions": [ { "text": "The explicit rWikiPathways namespace resolves standalone", "result": "PASS", "note": "41 organisms returned and Danio rerio was present." }, { "text": "Every corrected source reference avoids the invalid accessor", "result": "PASS", "note": "Focused scan returned stale_accessor=FALSE." }, { "text": "A non-human enrichment route executes", "result": "PASS", "note": "The source smoke regression returned two Danio rerio ORA terms." } ] },
+      { "index": 6, "type": "Shipped Example", "label": "wikipathways_ora.R end to end", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Fresh agent-private wikipathways-phase2 runtime; byte-for-byte shipped example exited 0.", "note": "The example read fresh synthetic input, performed ORA/GSEA, drew its temporary PDF, and wrote its result without errors.", "basic": 38, "specialized": 58, "total": 96, "assertions_passed": 3, "assertions_total": 3, "assertions": [ { "text": "The shipped ORA example runs unmodified", "result": "PASS", "note": "Exit 0." }, { "text": "ORA output is readable and contains the planted pathway", "result": "PASS", "note": "WP554 is top in the captured table." }, { "text": "The advertised GSEA and plotting branches complete", "result": "PASS", "note": "GSEA output and temporary PDF device closure were captured." } ] },
+      { "index": 7, "type": "Shipped Example", "label": "wikipathways_explore.R end to end", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "Fresh agent-private wikipathways-phase2 runtime; byte-for-byte shipped example exited 0.", "note": "The corrected example uses the explicit standalone rWikiPathways API, lists/queryes live data, pins 20260710, and recovers WP554.", "basic": 38, "specialized": 58, "total": 96, "assertions_passed": 3, "assertions_total": 3, "assertions": [ { "text": "The shipped exploration example runs unmodified", "result": "PASS", "note": "Exit 0." }, { "text": "Live inspection and dated archive branches execute", "result": "PASS", "note": "API output and 20260710 archive download were captured." }, { "text": "Self-contained pinned enrichment recovers WP554", "result": "PASS", "note": "WP554 is top in the returned enrichment table." } ] }
+    ]
+  },
+  "final": { "static_weighted": 38.0, "dynamic_weighted": 57.6, "score": 96, "max": 100, "grade": "Production Ready", "grade_symbol": "⭐", "deployable": true, "veto_override": false },
+  "key_strengths": [ "Every advertised live and pinned enrichment route was re-executed in an agent-private runtime at the fixed exact tip.", "The source now uses the explicitly namespaced rWikiPathways API and ships a focused standalone non-human regression.", "The Skill directly demonstrates the major default-universe inflation hazard and records a reproducible monthly archive release." ],
+  "recommendations": []
+}

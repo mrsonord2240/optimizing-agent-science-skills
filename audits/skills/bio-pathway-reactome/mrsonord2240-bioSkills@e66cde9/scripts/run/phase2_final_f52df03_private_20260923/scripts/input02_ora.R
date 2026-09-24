@@ -1,0 +1,10 @@
+root <- Sys.getenv('REACTOME_AUDIT_ROOT'); private <- Sys.getenv('REACTOME_AUDIT_PRIVATE_LIB')
+.libPaths(c(private, .libPaths()))
+library(ReactomePA); library(clusterProfiler); library(org.Hs.eg.db)
+sig <- c('CDK1','CCNB1','CCNB2','CDC20','BUB1','MAD2L1','PLK1','AURKA','AURKB','CDC25C','CCNA2','CDK2','E2F1','MCM2','MCM3','MCM4','MCM5','MCM6','MCM7','ORC1')
+set.seed(42); all <- keys(org.Hs.eg.db,keytype='SYMBOL'); measured <- unique(c(sig,sample(setdiff(all,sig),2980)))
+s <- bitr(sig,'SYMBOL','ENTREZID',org.Hs.eg.db)$ENTREZID; u <- bitr(measured,'SYMBOL','ENTREZID',org.Hs.eg.db)$ENTREZID
+ora <- enrichPathway(s,organism='human',universe=u,pvalueCutoff=.05,qvalueCutoff=.2,minGSSize=10,maxGSSize=500,readable=TRUE)
+d <- as.data.frame(ora); stopifnot(nrow(d)>0, all(c('FoldEnrichment','p.adjust','Count') %in% names(d)), grepl('/',d$BgRatio[1],fixed=TRUE))
+write.csv(d,file.path(root,'outputs','input02_ora.csv'),row.names=FALSE)
+cat('ASSERT ora_rows=',nrow(d),' top=',d$ID[1],'\n',sep='')

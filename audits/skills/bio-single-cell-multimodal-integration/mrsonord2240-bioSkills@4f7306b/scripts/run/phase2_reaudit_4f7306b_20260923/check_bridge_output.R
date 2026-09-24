@@ -1,0 +1,6 @@
+args <- commandArgs(trailingOnly = TRUE)
+obj <- readRDS(args[[1]])
+required <- c("predicted.celltype", "predicted.celltype.score")
+stopifnot(all(required %in% colnames(obj[[]])), "ref.umap" %in% names(obj@reductions), ncol(obj) == 150L)
+stopifnot(all(is.finite(obj$predicted.celltype.score)))
+cat(sprintf("bridge_private_wsl_clean_exit cells=%d mean_score=%.4f\n", ncol(obj), mean(obj$predicted.celltype.score)))

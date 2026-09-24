@@ -1,0 +1,199 @@
+{
+  "source": "mrsonord2240/bioSkills@7342f0782d258eba329460f76a8c7dea35abc7cb:database-access/sra-data",
+  "meta": {
+    "skill_name": "bio-sra-data",
+    "evaluated_on": "2026-09-24",
+    "evaluator_version": "skill-auditor@2.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md",
+    "environment": "audit-owned micromamba env /home/sci/sra-audit-20260923; SRA Tools 3.4.1, EDirect 26.0, pysradb 2.5.1, Biopython 1.88; isolated HOME/cache under F:/OpenScience/audits/bio-sra-data/private_runtime"
+  },
+  "provenance": {
+    "source_clean_start": true,
+    "source_clean_end": true,
+    "source_head_verified": "7342f0782d258eba329460f76a8c7dea35abc7cb",
+    "source_changes_committed": "7342f07 harden sra download staging safety",
+    "prior_canonical_report_archived_to": "F:/OpenScience/audits/_pre-fix-20260924-safety/bio-sra-data",
+    "execution_artifacts": "F:/OpenScience/audits/bio-sra-data/run/phase2_20260923/safety_final_tip",
+    "final_vector_manifest": "F:/OpenScience/audits/bio-sra-data/run/phase2_20260923/safety_final_tip/commands/final_vector_manifest.md"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS",
+      "detail": "All seven documented vectors completed in the private pinned runtime. The safety regression suite rejected traversal, separator-bearing, and option-like IDs before tools or cleanup, and retained existing/dangling-symlink destinations."
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "No unsupported biological conclusion, fabricated citation, or fabricated quantitative result." },
+      "practice_boundaries": { "result": "PASS", "detail": "Controlled/missing-field responses publish no FASTQ and return a non-successful direct-script result." },
+      "methodological_ground": { "result": "PASS", "detail": "Live ENA retrieval produced both ERR10419835 mates with matching MD5 values; Toolkit/STRIDES errors route only to that verified public-data path." },
+      "code_usability": { "result": "PASS", "detail": "Live run discovery, corrected EDirect syntax, direct Toolkit fallback, and STRIDES fallback completed. New adversarial tests demonstrate strict accession validation, owned-stage cleanup, and no-clobber behavior." }
+    }
+  },
+  "static_score": {
+    "subtotal": 90,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 11, "max": 12, "note": "All advertised operational routes now reach a successful or safe explicit outcome." },
+      "reliability": { "score": 12, "max": 12, "note": "Toolkit/STRIDES work and fallback stages are owned under out_dir and cleaned on exit; fallback publication uses no-clobber hard links and refuses existing files or dangling symlinks. The standalone batch script retains its documented per-accession failed.txt behavior." },
+      "performance_context": { "score": 6, "max": 8, "note": "Fallback can repeat metadata/download work after a failed Toolkit route." },
+      "agent_usability": { "score": 14, "max": 16, "note": "Errors identify route and safety condition, and invalid run IDs fail before network or cleanup actions." },
+      "human_usability": { "score": 7, "max": 8, "note": "Corrected EDirect syntax and documented safety/fallback behavior make common paths directly usable." },
+      "security": { "score": 12, "max": 12, "note": "Strict run-accession validation precedes path construction and destructive cleanup; cleanup accepts only marked owned stages inside out_dir; no-clobber publication handles dangling symlinks." },
+      "maintainability": { "score": 11, "max": 12, "note": "Shared safety and fallback helpers align direct, STRIDES, and batch behavior; runinfo parsing uses CSV rather than comma splitting." },
+      "agent_specific": { "score": 17, "max": 20, "note": "Clear route selection, bounded cleanup, and controlled-access escape hatch are operationally explicit." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 91.3,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 27, "total": 28 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Live ENA batch download via shipped examples/download_batch.sh for ERR10419835",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Live ENA API and FTP mirror; both paired FASTQs and MD5 checks completed. Evidence: outputs/input1_ena_live.stdout.txt and outputs/ena_live/.",
+        "basic": 38, "specialized": 54, "total": 92, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Both paired mates download", "result": "PASS", "note": "Live output names both mate files." },
+          { "text": "Both mates pass MD5", "result": "PASS", "note": "Live output prints md5 OK twice." },
+          { "text": "Batch summary reports success", "result": "PASS", "note": "OK: 1/1 and Failed: 0." },
+          { "text": "Expected gzip files exist", "result": "PASS", "note": "outputs/ena_live contains both mates." }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Canonical",
+        "label": "Documented direct Toolkit route via shipped examples/download_single.sh ERR10419835",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "SRA Tools reproduced its unresolved normalized-reference dependency; owned Toolkit stages were cleaned and the shared ENA fallback published two MD5-verified FASTQs. Evidence: outputs/input2_sra_toolkit.stdout.txt and outputs/toolkit_fastq/.",
+        "basic": 37, "specialized": 53, "total": 90, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Toolkit dependency error is detected", "result": "PASS", "note": "Run records unresolved normalized reference." },
+          { "text": "Toolkit stages are owned and cleaned", "result": "PASS", "note": "Only final gzip files appear in output; no hidden owned stage remains." },
+          { "text": "ENA fallback verifies both mates", "result": "PASS", "note": "Output reports both downloads and md5 OK." },
+          { "text": "User-visible route exits successfully", "result": "PASS", "note": "Recorded exit status is 0." }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Canonical",
+        "label": "Accession expansion via shipped scripts/pysradb_resolve.py GSE110009",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Private Python 3.12/pysradb 2.5.1 resolved GSE110009 to 74 SRRs. Evidence: outputs/input3_pysradb.stdout.txt and stderr.txt.",
+        "basic": 38, "specialized": 54, "total": 92, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "GSE is accepted", "result": "PASS", "note": "Resolver accepted GSE110009." },
+          { "text": "Run count is reported", "result": "PASS", "note": "stderr reports 74 SRRs." },
+          { "text": "Run accessions are emitted", "result": "PASS", "note": "stdout contains SRR output." },
+          { "text": "Pinned route exits cleanly", "result": "PASS", "note": "Recorded exit status is 0." }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant",
+        "label": "Run discovery via shipped examples/find_sra_runs.py",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Live ESearch/runinfo parsing under Biopython 1.88 returned 5 BioProject runs, 506 RNA-Seq runs, and 74 GSE110009 runs. Evidence: outputs/input4_find_runs.stdout.txt.",
+        "basic": 38, "specialized": 54, "total": 92, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "BioProject parsing succeeds", "result": "PASS", "note": "5 SRR runs reported." },
+          { "text": "Live ESearch loop succeeds", "result": "PASS", "note": "506 RNA-Seq runs reported." },
+          { "text": "GSE pysradb branch succeeds", "result": "PASS", "note": "74 GSE runs reported." },
+          { "text": "No bytes/text exception occurs", "result": "PASS", "note": "Recorded exit status is 0." }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Boundary",
+        "label": "Controlled/missing-field guard in shipped examples/download_batch.sh",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Audit-local valid run-shaped fixture ERR99999999 omitted public FASTQ values. The batch script recorded it in failed.txt and published no FASTQ. Evidence: outputs/input5_controlled_guard.stdout.txt and outputs/controlled_guard/.",
+        "basic": 37, "specialized": 54, "total": 91, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Missing public fields are detected", "result": "PASS", "note": "Output reports no FASTQ URLs." },
+          { "text": "The accession is recorded as failed", "result": "PASS", "note": "failed.txt and summary report one failure." },
+          { "text": "No FASTQ is published", "result": "PASS", "note": "Controlled output directory has no FASTQ." },
+          { "text": "Batch behavior remains explicit", "result": "PASS", "note": "The per-accession failure is visible in failed.txt." }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Fallback",
+        "label": "Documented STRIDES route via shipped examples/prefetch_large.sh ERR10419835",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "AWS CLI was absent, so prefetch was tried in an owned stage. Its unresolved dependency was safely routed to ENA, which produced two MD5-verified FASTQs. Evidence: outputs/input6_strides_fallback.stdout.txt and outputs/strides_fastq/.",
+        "basic": 37, "specialized": 53, "total": 90, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "AWS-unavailable branch is explicit", "result": "PASS", "note": "Run records AWS object/CLI condition." },
+          { "text": "Toolkit failure stays staged", "result": "PASS", "note": "No partial Toolkit output is published." },
+          { "text": "ENA fallback verifies both mates", "result": "PASS", "note": "Output reports md5 OK for both mates." },
+          { "text": "Route completes successfully", "result": "PASS", "note": "Exit status is 0 and final gzip files exist." }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Documentation probe",
+        "label": "Exact EDirect runinfo command documented in SKILL.md",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Reran exactly `efetch -db sra -id 8 -format runinfo` in private EDirect 26.0; usable runinfo returned with exit 0. Evidence: commands/rerun_input7_edirect_format_runinfo.sh and outputs/input7_edirect_format_runinfo.{command,stdout,stderr,exit}.txt.",
+        "basic": 38, "specialized": 54, "total": 92, "assertions_passed": 3, "assertions_total": 4,
+        "assertions": [
+          { "text": "Documented -format option is accepted", "result": "PASS", "note": "Exact command exits 0." },
+          { "text": "Runinfo is returned", "result": "PASS", "note": "stdout begins with CSV header and SRR rows." },
+          { "text": "Output is usable for conversion", "result": "PASS", "note": "Run and metadata columns are present." },
+          { "text": "Transport completes without warning", "result": "FAIL", "note": "stderr records curl (56) OpenSSL unexpected EOF after usable output; this is the one non-passing assertion." }
+        ]
+      }
+    ],
+    "supplemental_controls": [
+      { "executed": true, "execution_note": "Direct Toolkit fallback with valid run-shaped ERR99999999 and a missing-field ENA fixture exited nonzero and created no FASTQ; evidence: outputs/input8_controlled_fallback.stderr.txt." },
+      { "executed": true, "execution_note": "Shipped tests/test_sra_safety.sh rejected .., ERR/123, and --max-size before tool invocation; retained an existing file and a dangling symlink; and confirmed owned ENA-stage cleanup." }
+    ]
+  },
+  "final": {
+    "static_weighted": 36.0,
+    "dynamic_weighted": 54.8,
+    "score": 91,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false,
+    "decision": "Production Ready: all vetoes pass; dynamic totals are 639/7 = 91.3 and assertion evidence is 27/28."
+  },
+  "key_strengths": [
+    "Strict SRA run-accession validation prevents traversal and option-like input before tool calls, stage construction, or cleanup.",
+    "The prior bytes/text crash, GSE metadata route, and invalid EDirect option remain fixed and live-tested.",
+    "Toolkit and STRIDES work occurs only in marked owned stages; public fallback publishes MD5-verified ENA files with no-clobber hard-link publication.",
+    "Adversarial tests retain existing outputs and dangling symlinks, and controlled-style data cannot bypass the public-data boundary."
+  ],
+  "recommendations": [
+    { "priority": "P2", "title": "Consider a Toolkit normalized-reference preflight", "problem": "The Toolkit still attempts work before detecting ERR10419835's unresolved reference dependency.", "root_cause": "The installed SRA Toolkit cannot resolve this public run's normalized-reference dependency before attempting its retrieval path; the private runtime instead reaches the verified ENA fallback safely.", "fix": "If a stable toolkit-level preflight becomes available, detect this state sooner while retaining the validated staged ENA fallback." }
+  ]
+}

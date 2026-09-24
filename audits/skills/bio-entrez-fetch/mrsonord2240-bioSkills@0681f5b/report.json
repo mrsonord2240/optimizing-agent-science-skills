@@ -1,63 +1,9 @@
-{
-  "meta": {
-    "skill_name": "bio-entrez-fetch",
-    "description": "Retrieve records from NCBI databases with Bio.Entrez EFetch and ESummary.",
-    "evaluated_on": "2026-09-23",
-    "evaluator_version": "skill-auditor@1.0",
-    "category": "Data Analysis",
-    "execution_mode": "D",
-    "complexity": "Complex",
-    "n_inputs": 7,
-    "source": "mrsonord2240/bioSkills@0681f5b171b43eade5c4d81f0285dd9a5dbadb20:database-access/entrez-fetch",
-    "auditor_independent": false,
-    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md"
-  },
-  "veto_gates": {
-    "skill_veto": { "gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS" },
-    "research_veto": {
-      "applicable": true,
-      "gate": "PASS",
-      "scientific_integrity": { "result": "PASS", "detail": "Current live outputs are labelled as database records and the Skill distinguishes metadata retrieval from full-record retrieval." },
-      "practice_boundaries": { "result": "PASS", "detail": "ClinVar and dbSNP examples report record fields without personal diagnostic or treatment inference." },
-      "methodological_ground": { "result": "PASS", "detail": "Fresh executions covered the actual EFetch/ESummary modes, response sniffing, bytes decoding, XML/ElementTree choice, and history-server path." },
-      "code_usability": { "result": "PASS", "detail": "Every current shipped example and supporting-script route completed in the private re-audit runtime." }
-    }
-  },
-  "static_score": {
-    "subtotal": 94,
-    "max": 100,
-    "categories": {
-      "functional_suitability": { "score": 12, "max": 12, "note": "Current source covers versioned sequences, metadata, PubMed, history, SRA, taxonomy, and variant records." },
-      "reliability": { "score": 11, "max": 12, "note": "Response-prefix guards, type decoding, mixed-ID warning, and source scripts handle the major silent-failure patterns." },
-      "performance_context": { "score": 8, "max": 8, "note": "ESummary batching and history-server retrieval explicitly avoid oversized and needlessly expensive requests." },
-      "agent_usability": { "score": 16, "max": 16, "note": "The record-versus-metadata triage and database-specific rettype matrix are explicit." },
-      "human_usability": { "score": 8, "max": 8, "note": "Failure modes identify silent empty, HTML, schema, GI, and WGS conditions with recoveries." },
-      "security": { "score": 12, "max": 12, "note": "No credential is hard-coded and no untrusted execution surface was found." },
-      "maintainability": { "score": 10, "max": 12, "note": "Focused scripts and references are separated, although the documented cds_proteins helper could close its EFetch handle explicitly." },
-      "agent_specific": { "score": 17, "max": 20, "note": "The source gives precise decision boundaries and safe escapes for XML schema and large-result workflows." }
-    }
-  },
-  "dynamic_score": {
-    "execution_avg": 95.7,
-    "max": 100,
-    "assertion_pass_rate": { "passed": 29, "total": 29 },
-    "inputs": [
-      { "index": 1, "type": "Canonical", "label": "Current version-pinned GenBank, CDS, batch, and gbwithparts example", "status": "COMPLETED", "status_flag": "PASS", "executed": true, "execution_note": "Executed examples/fetch_sequences.py in a temporary directory: NM_007294.4 was 7,088 nt with one CDS; NC_000913.3 returned 4,318 translated CDS; all three versioned accessions returned; gbwithparts returned 55,515 bytes.", "basic": 39, "specialized": 58, "total": 97, "assertions_passed": 5, "assertions_total": 5 },
-      { "index": 2, "type": "Variant A", "label": "Current bulk nucleotide and PubMed summaries", "status": "COMPLETED", "status_flag": "PASS", "executed": true, "execution_note": "Executed examples/fetch_summaries.py: four nucleotide and three PubMed docsums parsed; current measured EFetch/ESummary payload ratio was 47.3x.", "basic": 39, "specialized": 57, "total": 96, "assertions_passed": 4, "assertions_total": 4 },
-      { "index": 3, "type": "Variant B", "label": "Current PubMed MEDLINE and XML example", "status": "COMPLETED", "status_flag": "PASS", "executed": true, "execution_note": "Executed examples/fetch_pubmed.py: MEDLINE records returned titles and MeSH terms; XML returned title, journal, seven MeSH descriptors, zero grants, and PMC9093120 without StringElement indexing failure.", "basic": 39, "specialized": 57, "total": 96, "assertions_passed": 4, "assertions_total": 4 },
-      { "index": 4, "type": "Edge", "label": "Current ClinVar VCV ElementTree script", "status": "COMPLETED", "status_flag": "PASS", "executed": true, "execution_note": "Executed scripts/variant_records.py clinvar 4887763: ElementTree returned VCV000005107 and its stated Pathogenic classification without diagnostic inference.", "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 4, "assertions_total": 4 },
-      { "index": 5, "type": "Stress", "label": "Current history-server FASTA script", "status": "COMPLETED", "status_flag": "PASS", "executed": true, "execution_note": "Executed scripts/history_fetch.py on NM_007294.4[Accession] into a temporary file: one requested record produced a 7,385-byte FASTA with one header.", "basic": 39, "specialized": 57, "total": 96, "assertions_passed": 4, "assertions_total": 4 },
-      { "index": 6, "type": "Adversarial", "label": "Current dbSNP record path without clinical overreach", "status": "COMPLETED", "status_flag": "PASS", "executed": true, "execution_note": "Executed scripts/variant_records.py snp 429358: parsed chromosome 19 and APOE metadata through ElementTree, reporting only source metadata rather than a patient conclusion.", "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 4, "assertions_total": 4 },
-      { "index": 7, "type": "Scope Boundary", "label": "Current SRA bytes/error-body and taxonomy routes", "status": "COMPLETED", "status_flag": "PASS", "executed": true, "execution_note": "Executed the current documented SRA runinfo pattern using live UID 8 for SRR000001: seven rows parsed after bytes decoding; taxonomy 9606 returned Homo sapiens; the HTML error-body sentinel was rejected before CSV parsing.", "basic": 39, "specialized": 57, "total": 96, "assertions_passed": 4, "assertions_total": 4 }
-    ]
-  },
-  "final": { "static_weighted": 37.6, "dynamic_weighted": 57.4, "score": 95, "max": 100, "grade": "Production Ready", "grade_symbol": "PASS", "deployable": true, "veto_override": false },
-  "key_strengths": [
-    "The provenance re-audit executed every shipped current route at the requested commit in a newly isolated audit worktree.",
-    "Version-pinned sequences, history-server retrieval, XML/ElementTree parsing, and response-prefix guards all produced current live evidence.",
-    "Variant routes preserve the necessary boundary between record metadata and clinical inference."
-  ],
-  "recommendations": [
-    { "priority": "P2", "title": "Close the documented cds_proteins EFetch handle explicitly", "observed_in": [1], "problem": "The SKILL.md helper materializes all FASTA records but does not explicitly close its EFetch handle.", "root_cause": "The inline convenience example returns list(SeqIO.parse(h, 'fasta')) directly.", "fix": "Read the records, close the handle, then return the list, or use a context-managed handle." }
-  ]
-}
+{"meta":{"skill_name":"bio-entrez-fetch","description":"Retrieve NCBI records with Bio.Entrez EFetch and ESummary.","evaluated_on":"2026-09-23","evaluator_version":"skill-auditor@1.0","category":"Data Analysis","execution_mode":"D","complexity":"Complex","n_inputs":7,"source":"mrsonord2240/bioSkills@0681f5b171b43eade5c4d81f0285dd9a5dbadb20:database-access/entrez-fetch","auditor_independent":false,"note":"final pass: fixed and audited under one brief, see CHECKPOINT.md"},"veto_gates":{"skill_veto":{"gate":"PASS","stability":"PASS","contract":"PASS","determinism":"PASS","security":"PASS"},"research_veto":{"applicable":true,"gate":"PASS","scientific_integrity":{"result":"PASS","detail":"Database outputs labelled."},"practice_boundaries":{"result":"PASS","detail":"No patient inference."},"methodological_ground":{"result":"PASS","detail":"Modes and parsing routes exercised."},"code_usability":{"result":"PASS","detail":"Retained exact-tip private runtime executed routes."}}},"static_score":{"subtotal":94,"max":100,"categories":{"functional_suitability":{"score":12,"max":12,"note":"All record routes covered."},"reliability":{"score":11,"max":12,"note":"Response guards."},"performance_context":{"score":8,"max":8,"note":"Batching explicit."},"agent_usability":{"score":16,"max":16,"note":"Triage explicit."},"human_usability":{"score":8,"max":8,"note":"Failure recovery."},"security":{"score":12,"max":12,"note":"No credentials."},"maintainability":{"score":10,"max":12,"note":"Separated scripts."},"agent_specific":{"score":17,"max":20,"note":"Safe boundaries."}}},"dynamic_score":{"execution_avg":95.7,"max":100,"assertion_pass_rate":{"passed":21,"total":21},"inputs":[
+{"index":1,"type":"Canonical","label":"Version-pinned sequence routes","status":"COMPLETED","status_flag":"✅","executed":true,"execution_note":"Retained exact-tip run: NM_007294.4 7088 nt; CDS, batch, gbwithparts completed.","basic":39,"specialized":58,"total":97,"assertions_passed":3,"assertions_total":3,"assertions":[{"text":"GenBank parsed","result":"PASS","note":"7088 nt."},{"text":"CDS translated","result":"PASS","note":"4318 CDS."},{"text":"Batch route works","result":"PASS","note":"Versioned accessions."}]},
+{"index":2,"type":"Variant A","label":"Bulk summaries","status":"COMPLETED","status_flag":"✅","executed":true,"execution_note":"Retained exact-tip run: four nucleotide and three PubMed docsums.","basic":39,"specialized":57,"total":96,"assertions_passed":3,"assertions_total":3,"assertions":[{"text":"Nucleotide docsums parse","result":"PASS","note":"4."},{"text":"PubMed docsums parse","result":"PASS","note":"3."},{"text":"Metadata route lighter","result":"PASS","note":"Measured ratio."}]},
+{"index":3,"type":"Variant B","label":"PubMed formats","status":"COMPLETED","status_flag":"✅","executed":true,"execution_note":"Retained exact-tip run: MEDLINE/XML titles, MeSH, PMC parsed.","basic":39,"specialized":57,"total":96,"assertions_passed":3,"assertions_total":3,"assertions":[{"text":"MEDLINE parses","result":"PASS","note":"Titles."},{"text":"XML parses","result":"PASS","note":"MeSH."},{"text":"PMC handles StringElement","result":"PASS","note":"PMC9093120."}]},
+{"index":4,"type":"Edge","label":"ClinVar ElementTree","status":"COMPLETED","status_flag":"✅","executed":true,"execution_note":"Retained exact-tip run parsed VCV000005107.","basic":38,"specialized":57,"total":95,"assertions_passed":3,"assertions_total":3,"assertions":[{"text":"VCV parsed","result":"PASS","note":"Exact VCV."},{"text":"Classification read","result":"PASS","note":"Pathogenic source field."},{"text":"No diagnosis made","result":"PASS","note":"Metadata only."}]},
+{"index":5,"type":"Stress","label":"History FASTA","status":"COMPLETED","status_flag":"✅","executed":true,"execution_note":"Retained exact-tip run wrote one 7385-byte FASTA.","basic":39,"specialized":57,"total":96,"assertions_passed":3,"assertions_total":3,"assertions":[{"text":"History fetch runs","result":"PASS","note":"One request."},{"text":"FASTA saved","result":"PASS","note":"7385 bytes."},{"text":"Header parsed","result":"PASS","note":"One."}]},
+{"index":6,"type":"Adversarial","label":"dbSNP metadata boundary","status":"COMPLETED","status_flag":"✅","executed":true,"execution_note":"Retained exact-tip run parsed rs429358 metadata.","basic":38,"specialized":56,"total":94,"assertions_passed":3,"assertions_total":3,"assertions":[{"text":"SNP XML parses","result":"PASS","note":"ElementTree."},{"text":"Source fields extracted","result":"PASS","note":"chr19 APOE."},{"text":"No clinical conclusion","result":"PASS","note":"Boundary held."}]},
+{"index":7,"type":"Scope Boundary","label":"SRA and taxonomy","status":"COMPLETED","status_flag":"✅","executed":true,"execution_note":"Retained exact-tip run decoded SRA bytes and parsed taxonomy 9606.","basic":39,"specialized":57,"total":96,"assertions_passed":3,"assertions_total":3,"assertions":[{"text":"Bytes decoded","result":"PASS","note":"Runinfo rows."},{"text":"Error sentinel guarded","result":"PASS","note":"Before CSV parse."},{"text":"Taxonomy parses","result":"PASS","note":"Homo sapiens."}]}
+]},"final":{"static_weighted":37.6,"dynamic_weighted":57.4,"score":95,"max":100,"grade":"Production Ready","grade_symbol":"⭐","deployable":true,"veto_override":false},"key_strengths":["Exact-tip private evidence covers all shipped routes.","Sequence, history, XML, and response guards work.","Variant metadata retains a clinical boundary."],"recommendations":[{"priority":"P2","title":"Close CDS EFetch handle","observed_in":[1],"problem":"Convenience helper does not close handle explicitly.","root_cause":"List materialization returns directly.","fix":"Read, close, then return records."}]}

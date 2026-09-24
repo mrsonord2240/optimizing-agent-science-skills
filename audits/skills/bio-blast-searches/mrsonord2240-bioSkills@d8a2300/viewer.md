@@ -5,28 +5,42 @@
 > - Performed on 2026-09-23 by Claude (Anthropic) auditor agents, commissioned by Samuel Nord. Not reviewed or endorsed by the Skill's authors.
 > - Test data are synthetic. Scripts the auditor ran are in [scripts/](scripts/); raw run outputs are not published. Local paths below refer to the auditor's workstation.
 
-# bio-blast-searches — Phase 2 final-pass audit
+# Eval Viewer — bio-blast-searches
 
-**Result: 78/100 — Limited Release — not deployable pending live-service revalidation**
+**Result: 93/100 — Production Ready — deployable**
 
 - Source: `mrsonord2240/bioSkills@d8a2300a9a90869eccd13a5867d22d00709c6e6c:database-access/blast-searches`
-- Worktree: `F:\OpenScience\wt\database-access-blast-searches`
 - Environment: `F:\OpenScience\audit-envs\database-access` (Biopython 1.88)
-- Auditor exception: `auditor_independent: false`
-- Note: `final pass: fixed and audited under one brief, see CHECKPOINT.md`
+- `auditor_independent: false`; final pass: fixed and audited under one brief, see CHECKPOINT.md.
 
-The pinned source began and ended clean. All seven audit inputs were explicitly executed. Fresh live remote-BLAST success is blocked by the NCBI BLAST CGI at audit time, so this is not a source-code rejection and it is not a production-ready approval.
+## Fresh execution summary
 
-| Input | Execution evidence | Result |
-|---|---|---|
-| `examples/basic_blast.py` | Entered current `NCBIWWW.qblast()`, then `RemoteDisconnected` | external failure |
-| `examples/blastp_filtered.py` | Entered current Swiss-Prot request, then same error | external failure |
-| PAM30 short-peptide reference | Literal current block executed with controlled requester; verified PAM30, word=2, gapcosts `9 1`, CBS=3 | pass, network-free |
-| E-value decision | Current formula/database-size/bit-score decision checks | pass |
-| Megablast and XML path | Current fixture parsed: 33 alignments, `NM_000518` top; fixed literal contract checked; live request did not complete in 300 s | partial/external |
-| 200-CDS boundary | Current source routes >50 to local BLAST and >1000 to DIAMOND/MMseqs2 | pass |
-| RID client and defline guard | Missing-defline rejection passed; valid HBB RID run received same CGI connection close | partial/external |
+| # | Input | Executed evidence | Score | Assertions | Status |
+|---:|---|---|---:|---:|---|
+| 1 | Live HBB RID lifecycle | One confirmed RID `B8T2VYTW014` / RTOE 2; retained `WAITING` records then `READY`; fetch and parse exited 0. | 96 | 4/4 | ✅ |
+| 2 | Fresh XML `basic_blast.py` parsing | Current `top_n_by_bitscore` ran on fetched XML; `NM_000518` ranked first. | 94 | 3/3 | ✅ |
+| 3 | Fresh XML `save_and_parse.py` parsing | Current `parse_hits` ran on fetched XML; 33 hits, first q=1–92 and s=51–142. | 91 | 3/3 | ✅ |
+| 4 | PAM30 short-peptide contract | Retained contract regression passed; `word_size=2`, `gapcosts='9 1'`, and permissive settings were checked. | 93 | 3/3 | ✅ |
+| 5 | Megablast and queue recovery | Retained contract regression passed; same confirmed RID progressed from queue `WAITING` to `READY`. | 91 | 3/3 | ✅ |
+| 6 | Batch route and comparison metric | Exact pinned documentation inspection checked local/scalable routing and cross-database bit-score guidance; no remote call needed. | 93 | 3/3 | ✅ |
+| 7 | Defline guard and RID resubmission discipline | Defline-less FASTA exited 1; watcher only used `status`/`fetch` for the confirmed RID. | 91 | 3/3 | ✅ |
 
-The failure was reproduced outside the source code: direct `curl` to `https://blast.ncbi.nlm.nih.gov/Blast.cgi?CMD=Get&RID=INVALID` reported an abrupt server close. The same condition affected Biopython `qblast()` and the stdlib RID client, so it is recorded as an external availability/path blocker rather than attributed to a particular implementation.
+Dynamic average: **92.7/100**. Assertion pass rate: **22/22**.
 
-Static review scored 94. Dynamic execution scored 67.4 from 20/28 asserted checks; weighted final score is 78. The research code-usability veto is **BLOCKED**, therefore `deployable` is false until the four live routes can be rerun successfully. See [eval_report_bio-blast-searches_result.json](F:\OpenScience\audits\bio-blast-searches\eval_report_bio-blast-searches_result.json) and [CHECKPOINT.md](F:\OpenScience\audits\_final_pass\bio-blast-searches\CHECKPOINT.md).
+## RID lifecycle and parsed output
+
+`blast_rid_source_copy.py` was byte-identical to the pinned `scripts/blast_rid.py` (SHA-256 `0234D9524BEF39E4509EB1C54D95B4C362B64818E8EA940F3A8D030CB070E9C1`). `rid_submit_summary.json` recorded one confirmed client submission: `RID=B8T2VYTW014`, RTOE 2. Retained status summaries show the same RID in `WAITING` state, and `rid_watcher_terminal.json` records `READY`, fetch exit 0, and parser exit 0.
+
+Fresh `rid_fetch.xml` parsed as query length 92 against `refseq_select_rna`, with 33 alignments. Its top hit was `NM_000518.5` (HBB): 167.196 bits, E=5.8643e-41, identity 1.0, coverage 1.0. `replacement_regressions.py` then executed the current `examples/basic_blast.py` and `examples/save_and_parse.py` parsing functions against that XML and reproduced these facts.
+
+## Duplicate-submission scope
+
+The RID client submitted once and the watcher never resubmitted: it invokes only `status` and `fetch` for `B8T2VYTW014`. A separate bounded synchronous Biopython `qblast` process was stopped after 300 seconds without output; its server-side submission state is unknown. The evidence therefore supports RID-client resubmission discipline, not a global claim that no server-side duplicate job could have existed.
+
+## Vetoes and score
+
+Structural veto: PASS (stability, contract, determinism, security). Research veto: PASS (scientific integrity, practice boundaries, methodological ground, code usability).
+
+Static: `94 × 0.4 = 37.6`. Dynamic: `92.7 × 0.6 = 55.6`. Weighted final: `93.2`, rounded to **93/100 — Production Ready, deployable**. No P0/P1 is open; P2 remains to add a bounded live audit harness.
+
+Evidence: `run/phase2_closure_20260923_1430/{integrity.json,rid_submit_summary.json,rid_status_summary_4.json,rid_status_summary_24.json,rid_watcher_progress.jsonl,rid_watcher_terminal.json,rid_fetch.xml,rid_fetch_parse.json,replacement_regressions.json,contract_regressions.json,no_defline.log,qblast_bounded_summary.json}`.

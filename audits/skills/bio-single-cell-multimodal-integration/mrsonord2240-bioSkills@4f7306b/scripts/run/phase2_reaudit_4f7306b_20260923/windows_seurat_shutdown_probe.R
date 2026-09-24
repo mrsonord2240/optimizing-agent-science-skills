@@ -1,0 +1,5 @@
+.libPaths(c('F:/OpenScience/audit-envs/single-cell-transcriptomics-analyst/R-lib', .libPaths()))
+suppressPackageStartupMessages(library(Seurat))
+cat(sprintf('native_probe_loaded_seurat=%s\n', as.character(packageVersion('Seurat'))))
+gc()
+cat('native_probe_reached_end\n')

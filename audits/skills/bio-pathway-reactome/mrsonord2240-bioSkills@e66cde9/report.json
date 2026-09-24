@@ -1,0 +1,216 @@
+{
+  "meta": {
+    "skill_name": "bio-pathway-reactome",
+    "description": "Tests a gene list or ranked gene vector against Reactome pathways with ReactomePA local annotations and documents ReactomeGSA as the comparative-service route.",
+    "evaluated_on": "2026-09-23",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 6,
+    "source": "mrsonord2240/bioSkills@e66cde984eb21bf2a9767ea6616c96aafeba3c04:pathway-analysis/reactome-pathways",
+    "audit_kind": "final-pass re-audit after private Linux runtime corrective; only retained e66 evidence is scored",
+    "inputs_note": "Each scored input used the retained agent-private WSL micromamba run directory and PID-recording runner. input07 is an unscored corroborating unsupported-organism control, excluded to avoid duplicating input06.",
+    "executed_k_of_n": "6/6 scored; input07 is an unscored corroborating control",
+    "env": "private WSL science micromamba env reactome-phase1-private; R 4.4.3, ReactomePA 1.50.0, clusterProfiler 4.14.0, org.Hs.eg.db 3.20.0; all scored runners natural exit 0",
+    "provenance": "F:/OpenScience/audits/bio-pathway-reactome/run/phase2_e66cde9_linux_20260923",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "Only retained e66 Linux evidence is scored; the older Windows exit-2816 evidence is described solely as the operational caveat."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "The source frames enrichment as hypothesis-generating, non-diagnostic research analysis."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Exact copied ORA and bounded-GSEA examples produced retained non-empty CSV outputs, with the planted GSEA pathway ranked first."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All six scored private-Linux runners exited 0; the shipped GSEA source explicitly registers SerialParam to prevent implicit worker fan-out."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 89,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 11, "max": 12, "note": "ORA and GSEA source paths retained." },
+      "reliability": { "score": 10, "max": 12, "note": "Bounded GSEA backend and retained clean exits." },
+      "performance_context": { "score": 7, "max": 8, "note": "Focused workflow and bounded backend." },
+      "agent_usability": { "score": 15, "max": 16, "note": "Explicit identifiers, routes, and failure semantics." },
+      "human_usability": { "score": 8, "max": 8, "note": "Clear hierarchy and practice-boundary guidance." },
+      "security": { "score": 12, "max": 12, "note": "No credentials, destructive actions, or unsupported clinical claims." },
+      "maintainability": { "score": 8, "max": 12, "note": "The private Linux runtime remains an operational dependency." },
+      "agent_specific": { "score": 18, "max": 20, "note": "Scope and error boundaries are explicit." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 89.2,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 10, "total": 10 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Baseline",
+        "label": "ReactomePA private Linux load",
+        "executed": true,
+        "execution_note": "scripts/probe.R; logs/input01.log; logs/input01.log.stdout.",
+        "status": "COMPLETED",
+        "status_flag": "PASS",
+        "note": "ReactomePA 1.50.0 printed and the runner exited 0.",
+        "basic": 35,
+        "specialized": 55,
+        "total": 90,
+        "assertions_passed": 1,
+        "assertions_total": 1,
+        "assertions": [
+          { "text": "ReactomePA loads and runner exits 0", "result": "PASS", "evidence": "logs/input01.log; logs/input01.log.stdout" }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Canonical",
+        "label": "Exact copied ORA source",
+        "executed": true,
+        "execution_note": "scripts/run_ora.R sources source_copy/examples/reactome_ora.R; logs/input02.log; outputs/ora.csv.",
+        "status": "COMPLETED",
+        "status_flag": "PASS",
+        "note": "20 rows persisted and the exact route exited 0.",
+        "basic": 36,
+        "specialized": 54,
+        "total": 90,
+        "assertions_passed": 2,
+        "assertions_total": 2,
+        "assertions": [
+          { "text": "ORA returns 20 rows", "result": "PASS", "evidence": "logs/input02.log.stdout; outputs/ora.csv" },
+          { "text": "Exact route exits 0", "result": "PASS", "evidence": "logs/input02.log" }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Canonical",
+        "label": "Exact copied bounded GSEA source",
+        "executed": true,
+        "execution_note": "scripts/run_gsea.R sources source_copy/examples/reactome_gsea.R; logs/input03.log; outputs/gsea.csv.",
+        "status": "COMPLETED",
+        "status_flag": "PASS",
+        "note": "54 rows persisted, planted R-HSA-877300 ranked first, and the bounded route exited 0.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "GSEA returns 54 rows", "result": "PASS", "evidence": "logs/input03.log.stdout; outputs/gsea.csv" },
+          { "text": "Planted pathway ranks first", "result": "PASS", "evidence": "logs/input03.log.stdout" },
+          { "text": "Bounded route exits 0", "result": "PASS", "evidence": "logs/input03.log" }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Edge",
+        "label": "SYMBOL guard and browser URL format",
+        "executed": true,
+        "execution_note": "scripts/input04_edges.R; logs/input04.log; logs/input04.log.stdout.",
+        "status": "COMPLETED",
+        "status_flag": "PASS",
+        "note": "SYMBOL input returned NULL and the local/browser route URL format asserted; runner exited 0.",
+        "basic": 34,
+        "specialized": 51,
+        "total": 85,
+        "assertions_passed": 2,
+        "assertions_total": 2,
+        "assertions": [
+          { "text": "SYMBOL input returns NULL", "result": "PASS", "evidence": "logs/input04.log.stdout" },
+          { "text": "Browser URL format is valid", "result": "PASS", "evidence": "logs/input04.log.stdout" }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Variant",
+        "label": "Measured-universe result semantics",
+        "executed": true,
+        "execution_note": "scripts/input05_measured_universe.R; logs/input05.log; outputs/input05_measured_universe.csv.",
+        "status": "COMPLETED",
+        "status_flag": "PASS",
+        "note": "Measured-universe denominator was 193 versus 11146 for the implicit default; runner exited 0.",
+        "basic": 35,
+        "specialized": 55,
+        "total": 90,
+        "assertions_passed": 1,
+        "assertions_total": 1,
+        "assertions": [
+          { "text": "Measured denominator 193 differs from default 11146", "result": "PASS", "evidence": "logs/input05.log.stdout; outputs/input05_measured_universe.csv" }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Unsupported organism produces no result",
+        "executed": true,
+        "execution_note": "scripts/input06_organism.R; logs/input06.log; logs/input06.log.stdout.",
+        "status": "COMPLETED",
+        "status_flag": "PASS",
+        "note": "Unsupported ecoli route returned an error/null rather than fabricating a pathway result; runner exited 0.",
+        "basic": 34,
+        "specialized": 51,
+        "total": 85,
+        "assertions_passed": 1,
+        "assertions_total": 1,
+        "assertions": [
+          { "text": "Unsupported organism does not fabricate a pathway result", "result": "PASS", "evidence": "logs/input06.log.stdout" }
+        ]
+      }
+    ],
+    "unscored_controls": [
+      {
+        "label": "Invalid-organism corroboration",
+        "executed": true,
+        "execution_note": "scripts/input07_invalid_organism.R; logs/input07.log; outputs/input07_invalid_organism.txt.",
+        "status": "COMPLETED",
+        "status_flag": "PASS",
+        "note": "A direct error-capture corroboration of input06; excluded from the scored set to avoid duplicate unsupported-organism coverage."
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 35.6,
+    "dynamic_weighted": 53.5,
+    "score": 89,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Six retained private-Linux executions exited 0.",
+    "Exact ORA and bounded GSEA source routes retained non-empty CSV outputs.",
+    "The measured-universe and unsupported-organism boundaries have retained direct evidence."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "Document Linux runtime route",
+      "problem": "Windows ReactomePA teardown remains unsuitable.",
+      "root_cause": "ReactomePA 1.50.0 under Windows R 4.4 exited 2816 after bare load, while the matching private Linux R 4.4 stack exited 0.",
+      "fix": "Keep the private Linux route documented for audited execution."
+    }
+  ]
+}

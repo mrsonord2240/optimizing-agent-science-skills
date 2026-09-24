@@ -1,0 +1,6 @@
+library(ReactomePA); library(clusterProfiler); library(org.Hs.eg.db)
+x <- enrichPathway(c('CDK1','CCNB1'), organism='human')
+stopifnot(is.null(x)); cat('ASSERT symbol_NULL\n')
+cat('ASSERT browser_url_format=',grepl('^https://reactome.org/PathwayBrowser/#/R-HSA-', 'https://reactome.org/PathwayBrowser/#/R-HSA-69278'),'\n',sep='')
+bad <- tryCatch({enrichPathway(c('1','2'),organism='ecoli');FALSE},error=function(e) TRUE)
+stopifnot(bad); cat('ASSERT invalid_organism_rejected\n')

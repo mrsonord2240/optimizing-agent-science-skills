@@ -1,0 +1,7 @@
+root <- Sys.getenv('REACTOME_AUDIT_ROOT'); private <- Sys.getenv('REACTOME_AUDIT_PRIVATE_LIB')
+.libPaths(c(private, .libPaths()))
+setwd(file.path(root,'outputs'))
+source(file.path(root,'source_copy','examples','reactome_gsea.R'), echo=FALSE)
+stopifnot(nrow(results_df)>0, planted_id %in% results_df$ID, results_df$ID[1] == planted_id)
+write.csv(results_df,file.path(root,'outputs','input03_gsea.csv'),row.names=FALSE)
+cat('ASSERT source_gsea_rows=',nrow(results_df),' planted_rank1\n',sep='')
