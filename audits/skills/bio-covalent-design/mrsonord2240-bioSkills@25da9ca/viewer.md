@@ -189,3 +189,4 @@ Static: 93 × 0.4 = 37.2. Dynamic: 91.2 × 0.6 = 54.7.
 **Final score: 92/100 — ⭐ Production Ready. Deployable: true. Veto override: false.**
 
 Open P0/P1: none. P2: state the single-site alpha-helper limit and narrow the unsupported turnkey wording.
+auditor_independent: false

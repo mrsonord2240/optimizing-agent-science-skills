@@ -7,8 +7,8 @@
 
 # Eval Viewer — bio-crispr-screens-hit-calling
 
-Generated: 2026-09-23  
-Source: `mrsonord2240/bioSkills@51cfb2078674ff6e8cb4412b9ae229f173a0b19d:crispr-screens/hit-calling`  
+Generated: 2026-09-23
+Source: `mrsonord2240/bioSkills@51cfb2078674ff6e8cb4412b9ae229f173a0b19d:crispr-screens/hit-calling`
 Mode: D (agent orchestration plus executable data analysis) · Category: Data Analysis · Complexity: Complex
 
 This is the Phase 2 final-pass audit. The auditor exception is deliberate: `auditor_independent: false`; `final pass: fixed and audited under one brief, see CHECKPOINT.md`. The prior 2026-09-16 report, viewer, data, and run material were preserved at `F:\OpenScience\audits\_pre-fix-20260923\bio-crispr-screens-hit-calling\` before this report replaced the active one.

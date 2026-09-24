@@ -7,8 +7,8 @@
 
 # Eval Viewer — bio-single-cell-differential-abundance
 
-Generated: 2026-09-23  
-Source: `mrsonord2240/bioSkills@e986b98c85b38b4ad31ee9289f5aa39f6bec212b:single-cell/differential-abundance`  
+Generated: 2026-09-23
+Source: `mrsonord2240/bioSkills@e986b98c85b38b4ad31ee9289f5aa39f6bec212b:single-cell/differential-abundance`
 Final-pass metadata: `auditor_independent: false` — `final pass: fixed and audited under one brief, see CHECKPOINT.md`
 
 ## Decision

@@ -7,9 +7,9 @@
 
 # Eval Viewer — bio-proteomics-ptm-analysis
 
-Generated: 2026-09-23  
-Source: `mrsonord2240/bioSkills@ed98ca281137434ee3b3ffe1cce5d5ba717d51b6:proteomics/ptm-analysis`  
-Category: Data Analysis · Mode D · Complex (7 inputs)  
+Generated: 2026-09-23
+Source: `mrsonord2240/bioSkills@ed98ca281137434ee3b3ffe1cce5d5ba717d51b6:proteomics/ptm-analysis`
+Category: Data Analysis · Mode D · Complex (7 inputs)
 Final-pass metadata: `auditor_independent: false`; `final pass: fixed and audited under one brief, see CHECKPOINT.md`
 
 ## Summary
@@ -24,8 +24,8 @@ Final-pass metadata: `auditor_independent: false`; `final pass: fixed and audite
 | 6 | No-global scope boundary | 24 | 34 | 58 | 3/4 | ❌ |
 | 7 | Adversarial shortcut request | 36 | 53 | 89 | 4/4 | ✅ |
 
-Execution average: **83.3 / 100** · Assertions: **25/28**  
-Static score: **82 / 100** · Final: **83 / 100 — Limited Release**  
+Execution average: **83.3 / 100** · Assertions: **25/28**
+Static score: **82 / 100** · Final: **83 / 100 — Limited Release**
 Deployable: **true** · Skill veto: **PASS** · Research veto: **PASS**
 
 Production Ready is not met: the execution average is below 85, and Input 6 exposes an open P1.

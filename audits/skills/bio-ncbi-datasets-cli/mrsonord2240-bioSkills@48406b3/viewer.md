@@ -7,7 +7,11 @@
 
 # bio-ncbi-datasets-cli — final-pass Phase 2 result
 
-**95/100 — Production Ready.** The source at `48406b3c04c59a8e0d2de0664c1d32f6cd8bc683` was clean at audit start and end. Seven explicit formal inputs completed in private audit runtime child processes, with all 16 assertions passing.
+## Canonical final summary
+
+**Final:** 95/100 — ⭐ Production Ready; deployable: true.
+
+**⭐ 95/100 — Production Ready.** The source at `mrsonord2240/bioSkills@48406b3c04c59a8e0d2de0664c1d32f6cd8bc683:database-access/ncbi-datasets-cli` was clean at audit start and end. Seven explicit formal inputs completed in private audit runtime child processes, with all 16 assertions passing.
 
 | Input | Accepted record | Result |
 |---|---|---|
@@ -22,3 +26,15 @@
 All accepted records state `executed: true`, an auditor-owned PID, and `intervention: none`. Early run labels `02`, `03`, `04`, and `07` are retained as non-evidence test-expectation corrections, not source failures; they were neither killed nor otherwise intervened upon.
 
 One P2 documentation correction remains: in this build a nonexistent assembly accession returns exit code zero and **zero JSON-lines**, rather than the literal `{ "total_count": 0 }` payload shown in the Common errors table. The more important operational safeguard—never accepting exit zero without a nonzero result count—is correct and reproduced.
+
+## Canonical final-pass metadata
+
+- Source: `mrsonord2240/bioSkills@48406b3c04c59a8e0d2de0664c1d32f6cd8bc683:database-access/ncbi-datasets-cli`
+- `auditor_independent:false`
+- Note: `final pass: fixed and audited under one brief, see CHECKPOINT.md`
+
+## Canonical final-pass metadata
+
+- Source: `mrsonord2240/bioSkills@48406b3c04c59a8e0d2de0664c1d32f6cd8bc683:database-access/ncbi-datasets-cli`
+- `auditor_independent: false`
+- Note: `final pass: fixed and audited under one brief, see CHECKPOINT.md`

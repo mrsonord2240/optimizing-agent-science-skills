@@ -7,6 +7,10 @@
 
 # Eval Viewer — bio-blast-searches
 
+## Canonical final summary
+
+**Final:** 93/100 — ⭐ Production Ready; deployable: true.
+
 **Result: 93/100 — Production Ready — deployable**
 
 - Source: `mrsonord2240/bioSkills@d8a2300a9a90869eccd13a5867d22d00709c6e6c:database-access/blast-searches`
@@ -44,3 +48,4 @@ Structural veto: PASS (stability, contract, determinism, security). Research vet
 Static: `94 × 0.4 = 37.6`. Dynamic: `92.7 × 0.6 = 55.6`. Weighted final: `93.2`, rounded to **93/100 — Production Ready, deployable**. No P0/P1 is open; P2 remains to add a bounded live audit harness.
 
 Evidence: `run/phase2_closure_20260923_1430/{integrity.json,rid_submit_summary.json,rid_status_summary_4.json,rid_status_summary_24.json,rid_watcher_progress.jsonl,rid_watcher_terminal.json,rid_fetch.xml,rid_fetch_parse.json,replacement_regressions.json,contract_regressions.json,no_defline.log,qblast_bounded_summary.json}`.
+auditor_independent: false

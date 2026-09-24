@@ -7,9 +7,15 @@
 
 # Eval Viewer — bio-pathway-wikipathways
 
+## Canonical final summary
+
+**Final:** 96/100 — ⭐ Production Ready; deployable: true.
+
 Generated: 2026-09-23
 
 Source: `mrsonord2240/bioSkills@cc9a798929c5e73205d5148f5bc6abb37967b518:pathway-analysis/wikipathways`
+
+Final-pass metadata: `auditor_independent: false`; `final pass: fixed and audited under one brief, see CHECKPOINT.md`.
 
 ## Verdict
 

@@ -47,3 +47,16 @@ Skill Veto: PASS. Research Veto: PASS. The former M4 failure was the old tip's p
 ## Remaining recommendation
 
 P2: `locfdr` is still taxonomy-only. Either supply and run a minimal supported workflow or remove that package mention. This does not block deployment.
+
+## Canonical final-pass metadata
+
+- Source: `mrsonord2240/bioSkills@6b48002e06f0dfd1ae3bb1e19a75ff9522da6ebe:experimental-design/multiple-testing`
+- `auditor_independent:false`
+- Note: `final pass: fixed and audited under one brief, see CHECKPOINT.md`
+
+## Canonical final-pass metadata
+
+- Source: `mrsonord2240/bioSkills@6b48002e06f0dfd1ae3bb1e19a75ff9522da6ebe:experimental-design/multiple-testing`
+- `auditor_independent: false`
+- Note: `final pass: fixed and audited under one brief, see CHECKPOINT.md`
+- Final: `92.4/100 — ⭐ Production Ready — deployable: true`

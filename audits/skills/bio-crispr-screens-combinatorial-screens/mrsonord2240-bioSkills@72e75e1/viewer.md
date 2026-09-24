@@ -7,6 +7,10 @@
 
 # Eval Viewer — bio-crispr-screens-combinatorial-screens
 
+Source: `mrsonord2240/bioSkills@72e75e17c8e64d89ddcf4af7587012a52cc5103a:crispr-screens/combinatorial-screens`
+Auditor independent: `false`
+Note: final pass: fixed and audited under one brief, see CHECKPOINT.md
+
 Generated: 2026-09-23
 
 Source: `mrsonord2240/bioSkills@72e75e17c8e64d89ddcf4af7587012a52cc5103a:crispr-screens/combinatorial-screens`

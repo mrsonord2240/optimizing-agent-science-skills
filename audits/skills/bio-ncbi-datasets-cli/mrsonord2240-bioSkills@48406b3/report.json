@@ -39,7 +39,7 @@
     }
   },
   "dynamic_score": {
-    "execution_avg": 96.0,
+    "execution_avg": 96.1,
     "max": 100,
     "assertion_pass_rate": {"passed": 16, "total": 16},
     "inputs": [
@@ -53,6 +53,6 @@
     ],
     "supplemental": {"parse": "run/00_parse.execution.json: source wrapper AST and layout checks passed.", "early_attempts": "run/02, 03, 04, and 07 are retained non-evidence test-expectation corrections. They received no process intervention; accepted evidence uses fresh corrected labels 08–11."}
   },
-  "final": {"static_weighted": 37.2, "dynamic_weighted": 57.6, "score": 95, "max": 100, "grade": "Production Ready", "grade_symbol": "✅", "deployable": true, "veto_override": false},
+  "final": {"static_weighted": 37.2, "dynamic_weighted": 57.7, "score": 95, "max": 100, "grade": "Production Ready", "grade_symbol": "⭐", "deployable": true, "veto_override": false},
   "key_strengths": ["The exact wrapper, current dataformat contract, and explicit multi-species ortholog syntax all ran successfully against live public NCBI data.", "The high-risk dehydrated conversion now demonstrably uses fetch.txt column 3 and catches the prior out=0 corruption mode.", "The Skill correctly requires record/file-count validation beyond a successful process exit and defines clear scope boundaries."],
   "recommendations": [{"priority": "P2", "title": "Correct the literal nonexistent-accession response example", "observed_in": [4], "problem": "The Common errors table says an invalid accession returns {\"total_count\": 0}; CLI 18.37.0 instead exited 0 with no JSON-lines for GCF_999999999.1.", "root_cause": "The safety rule was retained while the exact CLI response shape drifted.", "fix": "Say 'zero JSON-lines or a zero-count response, depending on subcommand/version' and keep the existing requirement to assert a nonzero record/file count."}, {"priority": "P2", "title": "Avoid presenting a fixed live ortholog row count as a durable contract", "observed_in": [3], "problem": "The reference says 272 Mammalia rows; the fresh live run returned 271 as source data changed.", "root_cause": "NCBI records and ortholog relationships are live data.", "fix": "Phrase this as 'hundreds of rows; count will vary' and retain syntax/structure checks."}]}

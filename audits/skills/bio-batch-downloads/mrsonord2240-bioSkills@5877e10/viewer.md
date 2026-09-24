@@ -7,6 +7,10 @@
 
 # bio-batch-downloads — Phase 2 structured re-audit
 
+## Canonical final summary
+
+**Final:** 92/100 — ⭐ Production Ready; deployable: true.
+
 **Result: 92/100 — Production Ready — deployable**
 
 - Source: `mrsonord2240/bioSkills@5877e10e931bd361863c8e1d1feb5a738c8bb0dc:database-access/batch-downloads`
@@ -18,3 +22,4 @@ The re-audit ran from an audit-owned `git archive` of the exact source tip. The 
 All nine required inputs have explicit executed evidence, scores, and three assertions in the machine-readable report. The previous artifacts remain preserved under `run/phase2_reaudit_20260923_1740/previous_incomplete_*`.
 
 Evidence: `run/phase2_reaudit_20260923_1740/{pytest.log,batch_by_ids.py.log,batch_fasta.py.log,robust_download.py.log,structured_results.json}`.
+auditor_independent: false

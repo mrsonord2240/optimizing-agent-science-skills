@@ -42,7 +42,7 @@
     }
   },
   "dynamic_score": {
-    "execution_avg": 94.0,
+    "execution_avg": 93.6,
     "max": 100,
     "assertion_pass_rate": {"passed": 21, "total": 21},
     "inputs": [
@@ -57,7 +57,7 @@
       {"index": 9, "type": "Scope Boundary", "label": "MAJIQ/VOILA licence boundary", "executed": true, "execution_note": "No licence-gated MAJIQ/VOILA binary was launched. The run explicitly records this as an unsupported unauthenticated route; no external download or environment mutation was attempted.", "status": "COMPLETED", "status_flag": "PASS", "note": "The documented boundary is accurate: the Skill does not present a licence-gated runtime as verified.", "basic": 36, "specialized": 55, "total": 91, "assertions_passed": 1, "assertions_total": 1, "assertions": [{"text": "Unlicensed route is not represented as executed", "result": "PASS", "note": "No MAJIQ/VOILA process was started."}]}
     ]
   },
-  "final": {"static_weighted": 36.0, "dynamic_weighted": 56.4, "score": 92, "max": 100, "grade": "Production Ready", "grade_symbol": "STAR", "deployable": true, "veto_override": false},
+  "final": {"static_weighted": 36.0, "dynamic_weighted": 56.2, "score": 92, "max": 100, "grade": "Production Ready", "grade_symbol": "STAR", "deployable": true, "veto_override": false},
   "key_strengths": ["Fresh PID-owned tests covered every non-licence-gated executable route from a copied source tree.", "Input guards prevent ggsashimi from silently accepting missing BAMs or unknown contigs.", "rMATS, leafcutter, Jutils and pyGenomeTracks all produced asserted output artifacts."],
   "recommendations": [{"priority": "P2", "title": "Provide reproducible fixtures", "problem": "The Skill itself has no small test fixture bundle.", "root_cause": "The runnable recipes assume user-provided BAM, event, annotation, and index inputs, while the small deterministic fixtures exist only in audit infrastructure.", "fix": "Add optional tiny fixtures and a smoke-test recipe so compatibility can be checked without audit infrastructure."}, {"priority": "P2", "title": "Clarify recipe state", "problem": "Some later examples presume files created by earlier blocks or a tool on PATH.", "root_cause": "Prerequisite artifacts and PATH dependencies are described at workflow level rather than repeated beside each independently runnable block.", "fix": "State dependencies adjacent to every runnable block."}]
 }

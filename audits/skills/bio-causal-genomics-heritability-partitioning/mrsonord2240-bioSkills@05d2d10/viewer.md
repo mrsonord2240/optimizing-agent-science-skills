@@ -7,8 +7,12 @@
 
 # Final-pass Phase 2 — bio-causal-genomics-heritability-partitioning
 
-Source: `mrsonord2240/bioSkills@05d2d10f902ceb158ab2a9402dc36214ca44b9a1:causal-genomics/heritability-partitioning`  
-Date: 2026-09-23 · **95/100, Production Ready, deployable**  
+## Canonical final summary
+
+**Final:** 95/100 — ⭐ Production Ready; deployable: true.
+
+Source: `mrsonord2240/bioSkills@05d2d10f902ceb158ab2a9402dc36214ca44b9a1:causal-genomics/heritability-partitioning`
+Date: 2026-09-23 · **95/100, Production Ready, deployable**
 This directed final pass sets `auditor_independent: false`: `final pass: fixed and audited under one brief, see CHECKPOINT.md`.
 
 The preceding live audit was preserved at `F:\OpenScience\audits\_pre-fix-20260923\bio-causal-genomics-heritability-partitioning\`; the existing 2026-09-17c archive remains untouched.
@@ -31,3 +35,4 @@ The preceding live audit was preserved at `F:\OpenScience\audits\_pre-fix-202609
 Artifacts are in `run/finalpass_20260923/`: `run_ldsc_ldak_smoke.sh`, `run_gcta_example.sh`, their logs, and all checked outputs. A preliminary HESS fixture harness stopped because the WSL default Python lacks pandas; it is retained as harness evidence and is not scored as a Skill defect.
 
 No P0 or veto. Remaining P1: HDL requires its real reference panel; BOLT-REML needs a compatible host. P2: HESS step 2 needs all 22 chromosome outputs.
+auditor_independent: false

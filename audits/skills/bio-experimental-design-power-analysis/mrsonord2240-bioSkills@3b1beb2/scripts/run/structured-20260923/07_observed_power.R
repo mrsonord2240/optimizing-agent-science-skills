@@ -1,0 +1,5 @@
+suppressPackageStartupMessages(library(pwr))
+p_values <- c(.65, .4, .19)
+observed <- vapply(p_values, function(p) pwr.t.test(d = qt(1 - p / 2, 38) * sqrt(2 / 20), n = 20, sig.level = .05, type = "two.sample")$power, numeric(1))
+stopifnot(all(diff(observed) > 0))
+cat(sprintf("observed=%s\nOBSERVED_POWER=PASS\n", paste(sprintf("%.6f", observed), collapse = ",")))

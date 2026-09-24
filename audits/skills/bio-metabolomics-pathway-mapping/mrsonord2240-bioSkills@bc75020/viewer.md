@@ -7,9 +7,13 @@
 
 # Eval Viewer — bio-metabolomics-pathway-mapping
 
+## Canonical final summary
+
+**Final:** 92.3/100 — ⭐ Production Ready; deployable: true.
+
 Generated: 2026-09-23
 
-Exact source: `mrsonord2240/bioSkills@bc7502038043b387617e236ee116d251c4bd5b50:metabolomics/pathway-mapping`  
+Exact source: `mrsonord2240/bioSkills@bc7502038043b387617e236ee116d251c4bd5b50:metabolomics/pathway-mapping`
 Mode: D (scripts plus interpretive guidance) · Category: Data Analysis · Complexity: Complex (7 inputs)
 
 The prior 2026-09-16 report was preserved at `F:\OpenScience\audits\_pre-fix-20260922\bio-metabolomics-pathway-mapping\` before this fresh Phase 2 report replaced the current record. This directed final pass sets `auditor_independent: false`; see `F:\OpenScience\audits\_final_pass\bio-metabolomics-pathway-mapping\CHECKPOINT.md`.
@@ -26,7 +30,7 @@ The prior 2026-09-16 report was preserved at `F:\OpenScience\audits\_pre-fix-202
 | 6 | Unknown-name mapping boundary | 34 | 52 | 86 | 4/5 | ⚠️ |
 | 7 | Disclosed remote API alternative | 35 | 53 | 88 | 4/4 | ⚠️ |
 
-Execution average: **91.1/100** · Assertions: **30/31 (96.8%)** · Layer 1 average: **36.6/40** · Layer 2 average: **54.6/60**  
+Execution average: **91.1/100** · Assertions: **30/31 (96.8%)** · Layer 1 average: **36.6/40** · Layer 2 average: **54.6/60**
 Static: **94/100** · Final: **92.3/100 — Production Ready — deployable** · Vetoes: **none**.
 
 ## What ran
@@ -72,3 +76,9 @@ The interpretive guidance preserves the necessary limits: annotation uncertainty
 
 1. **P1 — filter literal `NA` mappings.** In `scripts/map_compounds.R`, exclude both R `NA` and `trimws(kegg_ids) == 'NA'` before writing and counting; report the unknown name as unmapped.
 2. **P2 — stop after failed mummichog validation.** Test whether `SanityCheckMummichogData` returned numeric 0, print `current.msg`, and quit nonzero before `SetPeakEnrichMethod`.
+
+## Canonical final-pass metadata
+
+- Source: `mrsonord2240/bioSkills@bc7502038043b387617e236ee116d251c4bd5b50:metabolomics/pathway-mapping`
+- `auditor_independent:false`
+- Note: `final pass: fixed and audited under one brief, see CHECKPOINT.md`

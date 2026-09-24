@@ -7,6 +7,10 @@
 
 # Eval Viewer — bio-alignment-pairwise (final-pass Phase 2)
 
+Source: `mrsonord2240/bioSkills@d45a6478bc0f0450f101b6c394415998d7151899:alignment/pairwise-alignment`
+Auditor independent: `false`
+Note: final pass: fixed and audited under one brief, see CHECKPOINT.md
+
 Generated: 2026-09-23  |  Source: `mrsonord2240/bioSkills@d45a6478bc0f0450f101b6c394415998d7151899:alignment/pairwise-alignment`
 
 > Final-pass exception: `auditor_independent: false`; fixed and audited under one brief, see `F:\OpenScience\audits\_final_pass\bio-alignment-pairwise\CHECKPOINT.md`.

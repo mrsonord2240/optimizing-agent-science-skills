@@ -7,9 +7,11 @@
 
 # Eval Viewer — bio-pharmacophore-modeling (FINAL PASS PHASE 2)
 
-Generated: 2026-09-22  
-Source: `mrsonord2240/bioSkills@c83fb1c4c8c3c40079e8cf653c3ed266fa7b1d8c:chemoinformatics/pharmacophore-modeling`  
+Generated: 2026-09-22
+Source: `mrsonord2240/bioSkills@c83fb1c4c8c3c40079e8cf653c3ed266fa7b1d8c:chemoinformatics/pharmacophore-modeling`
 Status: final-pass exception — `auditor_independent: false`; see `F:\OpenScience\audits\_final_pass\bio-pharmacophore-modeling\CHECKPOINT.md`.
+
+Final-pass metadata: `auditor_independent: false`; `final pass: fixed and audited under one brief, see CHECKPOINT.md`.
 
 The prior Phase-1/re-audit record was preserved at `F:\OpenScience\audits\_pre-fix-20260922\bio-pharmacophore-modeling\`. This audit used fresh scripts under `run/`; no source file was modified.
 
@@ -42,6 +44,6 @@ All command output and assertion evidence are saved in `run/*.out.txt`; `run_all
 
 ## Gates and score
 
-Skill Veto: T1/T2/T3/T4 **PASS**. Research Veto: M1/M2/M3/M4 **PASS**.  
-Static: **90/100 × 0.4 = 36.0**. Dynamic: **92.7/100 × 0.6 = 55.6**.  
+Skill Veto: T1/T2/T3/T4 **PASS**. Research Veto: M1/M2/M3/M4 **PASS**.
+Static: **90/100 × 0.4 = 36.0**. Dynamic: **92.7/100 × 0.6 = 55.6**.
 Final: **92/100 — ⭐ Production Ready — deployable: true**. No P0, P1, or P2 recommendation remains.

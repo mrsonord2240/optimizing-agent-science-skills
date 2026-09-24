@@ -7,8 +7,8 @@
 
 # Eval Viewer — bio-crispr-screens-drugz-chemogenomic
 
-Generated: 2026-09-23  
-Source: `mrsonord2240/bioSkills@14e7c1ec9fb76fd5859c5b4ba5ec70128fb85aeb:crispr-screens/drugz-chemogenomic`  
+Generated: 2026-09-23
+Source: `mrsonord2240/bioSkills@14e7c1ec9fb76fd5859c5b4ba5ec70128fb85aeb:crispr-screens/drugz-chemogenomic`
 Final-pass metadata: `auditor_independent: false` — `final pass: fixed and audited under one brief, see CHECKPOINT.md`
 
 The prior 2026-09-16 report and viewer were preserved at `F:\OpenScience\audits\_pre-fix-20260923\bio-crispr-screens-drugz-chemogenomic\`. Fresh scripts, exact-source copy, command output, downloaded CEGv2, and result tables are in `run\phase2\`.
@@ -27,10 +27,10 @@ The prior 2026-09-16 report and viewer were preserved at `F:\OpenScience\audits\
 | 8 | Exact shipped example | 39 | 58 | 97 | 4/4 | yes | ✅ |
 | 9 | Argument-validation adversarial | 34 | 49 | 83 | 3/4 | yes | ✅ |
 
-**Execution average:** 94.6 / 100  
-**Assertion pass rate:** 35 / 36  
-**Static score:** 96 / 100  
-**Final:** 95 / 100 — ⭐ Production Ready — deployable: true  
+**Execution average:** 94.6 / 100
+**Assertion pass rate:** 35 / 36
+**Static score:** 96 / 100
+**Final:** 95 / 100 — ⭐ Production Ready — deployable: true
 **Vetoes:** Skill PASS; Research PASS.
 
 ## Fresh execution evidence

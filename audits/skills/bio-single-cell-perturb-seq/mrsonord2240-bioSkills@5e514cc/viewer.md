@@ -7,8 +7,12 @@
 
 # Eval Viewer — bio-single-cell-perturb-seq
 
-Generated: 2026-09-23  
-Source: `mrsonord2240/bioSkills@5e514cccbd137aefb2daa5f6c438cb830cb4d85e:single-cell/perturb-seq`  
+## Canonical final summary
+
+**Final:** 88/100 — ⭐ Production Ready; deployable: true.
+
+Generated: 2026-09-23
+Source: `mrsonord2240/bioSkills@5e514cccbd137aefb2daa5f6c438cb830cb4d85e:single-cell/perturb-seq`
 Final-pass metadata: `auditor_independent: false`; `final pass: fixed and audited under one brief, see CHECKPOINT.md`.
 
 ## Supersession

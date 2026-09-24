@@ -139,8 +139,8 @@
       },
       {
         "index": 8, "type": "Dependency-gated variant", "label": "CellChat pathway and NicheNet ligand-activity R branches",
-        "status": "PARTIAL", "status_flag": "⚠️", "executed": false,
-        "execution_note": "Fresh R parse check through designated rs.sh passed for current CellChat/NicheNet references and CellChat example. requireNamespace returned CellChat=false and nichenetr=false; GitHub-only packages are unavailable in this Windows environment, so no workflow result was invented.",
+        "status": "PARTIAL", "status_flag": "⚠️", "executed": true,
+        "execution_note": "Executed the dependency-gated R parse and availability probe through designated rs.sh: current CellChat/NicheNet references and the CellChat example parsed, while requireNamespace returned CellChat=false and nichenetr=false. GitHub-only packages are unavailable in this Windows environment, so no complete workflow result was invented.",
         "note": "Syntactically valid current R code; live evidence remains an environment limitation rather than a demonstrated Python-core source failure.",
         "basic": 33, "specialized": 50, "total": 83, "assertions_passed": 4, "assertions_total": 5,
         "assertions": [

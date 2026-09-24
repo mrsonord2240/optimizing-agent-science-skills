@@ -7,6 +7,14 @@
 
 # Eval Viewer — bio-crispr-screens-prime-editing-screens
 
+## Canonical final summary
+
+**Final:** 95/100 — ⭐ Production Ready; deployable: true.
+
+Source: `mrsonord2240/bioSkills@0abbf4d40d0df260ca60b346a9d6dc307b80fa5d:crispr-screens/prime-editing-screens`
+Auditor independent: `false`
+Note: final pass: fixed and audited under one brief, see CHECKPOINT.md
+
 Generated: 2026-09-23 | Source: `mrsonord2240/bioSkills@0abbf4d40d0df260ca60b346a9d6dc307b80fa5d:crispr-screens/prime-editing-screens`
 
 This is the required final-pass exception: `auditor_independent: false`; `final pass: fixed and audited under one brief, see CHECKPOINT.md`.

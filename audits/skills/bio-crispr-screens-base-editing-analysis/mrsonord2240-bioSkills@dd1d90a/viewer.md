@@ -7,6 +7,10 @@
 
 # Eval Viewer — bio-crispr-screens-base-editing-analysis
 
+Source: `mrsonord2240/bioSkills@dd1d90a9ae607f068d5ffda2e761e869f07decce:crispr-screens/base-editing-analysis`
+Auditor independent: `false`
+Note: final pass: fixed and audited under one brief, see CHECKPOINT.md
+
 Generated: 2026-09-22
 
 Source: `mrsonord2240/bioSkills@dd1d90a9ae607f068d5ffda2e761e869f07decce:crispr-screens/base-editing-analysis`

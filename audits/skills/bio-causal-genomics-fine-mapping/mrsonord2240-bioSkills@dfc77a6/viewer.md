@@ -7,8 +7,16 @@
 
 # Eval Viewer — bio-causal-genomics-fine-mapping
 
-Generated: 2026-09-23  
-Source: `mrsonord2240/bioSkills@dfc77a6351c0f8af8ae6f4e1e5b38b281f4ae474:causal-genomics/fine-mapping`  
+## Canonical final summary
+
+**Final:** 95/100 — ⭐ Production Ready; deployable: true.
+
+Source: `mrsonord2240/bioSkills@dfc77a6351c0f8af8ae6f4e1e5b38b281f4ae474:causal-genomics/fine-mapping`
+Auditor independent: `false`
+Note: final pass: fixed and audited under one brief, see CHECKPOINT.md
+
+Generated: 2026-09-23
+Source: `mrsonord2240/bioSkills@dfc77a6351c0f8af8ae6f4e1e5b38b281f4ae474:causal-genomics/fine-mapping`
 Audit context: corrective final-pass Phase 2; `auditor_independent: false` by direction.
 
 ## Verdict

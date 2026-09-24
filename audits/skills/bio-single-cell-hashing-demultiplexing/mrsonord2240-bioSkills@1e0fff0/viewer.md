@@ -7,9 +7,15 @@
 
 # Eval Viewer — bio-single-cell-hashing-demultiplexing
 
+## Canonical final summary
+
+**Final:** 92/100 — ⭐ Production Ready; deployable: true.
+
 Generated: 2026-09-23
 
 Final-pass Phase 2 audit of `mrsonord2240/bioSkills@1e0fff03e588881b92d9fe67da31a5f3ffdc4b18:single-cell/hashing-demultiplexing`. The source worktree was clean before and after the audit. All data used below are seeded synthetic HTO/GEX fixtures described in [data/README.md](data/README.md).
+
+Final-pass metadata: `auditor_independent: false`; `final pass: fixed and audited under one brief, see CHECKPOINT.md`.
 
 ## Summary
 

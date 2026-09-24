@@ -7,6 +7,14 @@
 
 # Eval Viewer — bio-crispr-screens-jacks-analysis
 
+## Canonical final summary
+
+**Final:** 95/100 — ⭐ Production Ready; deployable: true.
+
+Source: `mrsonord2240/bioSkills@d1b1b166dcd771e115e8564fb7969260e791c39f:crispr-screens/jacks-analysis`
+Auditor independent: `false`
+Note: final pass: fixed and audited under one brief, see CHECKPOINT.md
+
 Generated: 2026-09-23
 
 Source: `mrsonord2240/bioSkills@d1b1b166dcd771e115e8564fb7969260e791c39f:crispr-screens/jacks-analysis`

@@ -7,8 +7,8 @@
 
 # Eval Viewer — bio-workflows-proteomics-pipeline
 
-Generated: 2026-09-23  
-Source: `mrsonord2240/bioSkills@ef9b7eed11c0dcbea3820d6b97cf7fd8b7c702e4:workflows/proteomics-pipeline`  
+Generated: 2026-09-23
+Source: `mrsonord2240/bioSkills@ef9b7eed11c0dcbea3820d6b97cf7fd8b7c702e4:workflows/proteomics-pipeline`
 Final-pass metadata: `auditor_independent: false` — `final pass: fixed and audited under one brief, see CHECKPOINT.md`
 
 ## Summary
@@ -26,8 +26,8 @@ Final-pass metadata: `auditor_independent: false` — `final pass: fixed and aud
 | 9 | Empty-directory example | 37 | 57 | 94 | 4/4 | ✅ |
 | 10 | Missing TMT Norm channel | 36 | 53 | 89 | 4/4 | ✅ |
 
-Execution average: **93.2 / 100**. Assertion pass rate: **40/40**.  
-Static score: **92 / 100**. Final score: **93 / 100 — ⭐ Production Ready**.  
+Execution average: **93.2 / 100**. Assertion pass rate: **40/40**.
+Static score: **92 / 100**. Final score: **93 / 100 — ⭐ Production Ready**.
 Deployable: **true**. Structural and research vetoes: **PASS**.
 
 ## What Ran

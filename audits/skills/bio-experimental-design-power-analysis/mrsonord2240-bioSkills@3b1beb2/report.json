@@ -1,52 +1,78 @@
 {
   "meta": {
     "skill_name": "bio-experimental-design-power-analysis",
-    "source": "mrsonord2240/bioSkills@3b1beb228f540a2b0e5ee138bd8f6646997f4f4e:experimental-design/power-analysis",
-    "audit_type": "fresh corrective final-pass Phase 2 audit",
+    "description": "Design prospective power analyses for bulk and pseudobulk RNA-seq, proteomics, and other genomic assays, with realized-FDR gates and explicit clinical-trial handoff.",
     "evaluated_on": "2026-09-23",
     "evaluator_version": "skill-auditor@1.0",
+    "category": "Protocol Design",
     "execution_mode": "A",
+    "complexity": "Complex",
     "n_inputs": 7,
-    "executed_inputs": 7,
-    "auditor": "Codex",
+    "source": "mrsonord2240/bioSkills@3b1beb228f540a2b0e5ee138bd8f6646997f4f4e:experimental-design/power-analysis",
     "auditor_independent": false,
-    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md",
-    "freshness": "The preceding rejected audit was archived before this run. All conclusions use only run/ evidence at the pushed tip.",
-    "environment": "crispr-screen-analyst; RNASeqPower 1.46.0, PROPER 1.38.0, edgeR 4.4.2, pwr 1.3.0"
-  },
-  "process_isolation": {
-    "all_completed": true,
-    "all_exit_codes_zero": true,
-    "policy": "Each input was a separate auditor-owned process; every execution JSON records intervention:none and outside_process_intervention:none."
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md"
   },
   "veto_gates": {
-    "skill_veto": {"gate":"PASS","stability":"PASS","contract":"PASS","determinism":"PASS","security":"PASS"},
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
     "research_veto": {
       "applicable": true,
       "gate": "PASS",
-      "scientific_integrity": {"result":"PASS","detail":"Fresh outputs and pinned source support every result."},
-      "practice_boundaries": {"result":"PASS","detail":"Clinical endpoint work remains explicitly routed to clinical-biostatistics/power-and-sample-size."},
-      "methodological_ground": {"result":"PASS","detail":"The fresh shipped bulk run labels all candidates REJECT when Actual FDR is 0.3692738/0.1849111/0.1024990/0.0598908 at nominal 0.05. The pseudobulk run accepts FDR 0.000 and rejects FDR 0.133. The generic gate independently maps 0.04/0.06/NaN to ACCEPT/REJECT/REJECT; no rejected candidate is presented as usable power."},
-      "code_usability": {"result":"PASS","detail":"Source examples and all five R blocks parse; both shipped examples and all audit inputs exited 0 in the declared environment."}
+      "scientific_integrity": {"result": "PASS", "detail": "Fresh bulk output rejected realized FDR 0.3692738, 0.1849111, 0.1024990, and 0.0598908; no failed candidate is presented as usable."},
+      "practice_boundaries": {"result": "PASS", "detail": "Clinical-trial endpoints route to clinical-biostatistics/power-and-sample-size."},
+      "methodological_ground": {"result": "PASS", "detail": "The skill distinguishes marginal/per-gene power, gates FDR, uses donors for pseudobulk, and rejects observed power as a null-result explanation."},
+      "code_usability": {"result": "PASS", "detail": "Both shipped R examples completed in retained same-tip runs; the exact pseudobulk rerun recorded exit_code 0 and its post-source sentinel."}
     }
   },
-  "static_score": {"subtotal":95,"max":100,"categories":{"functional_suitability":12,"reliability":12,"performance_context":7,"agent_usability":15,"human_usability":8,"security":11,"maintainability":12,"agent_specific":18},"note":"The two prior actionable defects are repaired with executable gates. The simulation remains intentionally computationally substantive."},
+  "static_score": {
+    "subtotal": 95,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {"score": 12, "max": 12, "note": "Bulk, simulation/FDR, pseudobulk, ATAC/ChIP/methylation, proteomics, budget, observed-power and clinical boundary covered."},
+      "reliability": {"score": 12, "max": 12, "note": "Checked wrapper validates inputs; FDR gate rejects non-finite and above-target results."},
+      "performance_context": {"score": 7, "max": 8, "note": "Closed-form first, simulation when needed; realistic simulation is intentionally substantive."},
+      "agent_usability": {"score": 15, "max": 16, "note": "Decision tree, prompts, version checks and anti-patterns are clear; no machine-readable request contract."},
+      "human_usability": {"score": 8, "max": 8, "note": "Natural triggers, scenario routing, examples and escape hatch are discoverable."},
+      "security": {"score": 11, "max": 12, "note": "No secrets or arbitrary code execution; inputs are validated before rnapower."},
+      "maintainability": {"score": 12, "max": 12, "note": "Clear sections, compatibility guidance, and executable bulk/pseudobulk examples."},
+      "agent_specific": {"score": 18, "max": 20, "note": "Precise trigger and stop conditions; detailed material remains in one large SKILL.md."}
+    }
+  },
   "dynamic_score": {
-    "execution_avg":94.0,"max":100,"assertion_pass_rate":{"passed":34,"total":34},
-    "inputs":[
-      {"index":1,"type":"Canonical","label":"Bulk RNA-seq sizing plus realized-FDR gate","executed":true,"execution_note":"Fresh 01_guard_and_canonical.R PID 60800 and exact source 03_rnaseq_source.R PID 99288 both completed exit 0; no process intervention.","status":"COMPLETED","total":95,"assertions_passed":5,"assertions_total":5,"note":"Valid closed-form output is finite; the direct gate accepts 0.04 and rejects 0.06/NaN; the source run rejects each FDR-invalid PROPER candidate."},
-      {"index":2,"type":"Variant A","label":"Fixed budget depth versus replicates","executed":true,"execution_note":"Fresh 02_budget.R PID 250444 completed exit 0; no process intervention.","status":"COMPLETED","total":90,"assertions_passed":5,"assertions_total":5,"note":"n4=0.112480 and n8=0.118358 preserve the intended prospective comparison through checked_rnapower."},
-      {"index":3,"type":"Edge","label":"Hard target, preflight, and MDE solve","executed":true,"execution_note":"Fresh 09_edge_preflight.R PID 88940 completed exit 0; no process intervention.","status":"COMPLETED","total":95,"assertions_passed":5,"assertions_total":5,"note":"Required n=6441.455943 and MDE=1.775628 are finite; invalid effect 0, effect 1, and alpha 1.5 are rejected before RNASeqPower is called."},
-      {"index":4,"type":"Variant B","label":"scRNA-seq pseudobulk donor power","executed":true,"execution_note":"Fresh exact source 04_pseudobulk_source.R PID 80592 completed exit 0; no process intervention.","status":"COMPLETED","total":95,"assertions_passed":5,"assertions_total":5,"note":"FDR 0.000 is ACCEPT and FDR 0.133 is REJECT; the naive cell-level pseudoreplication warning remains visible."},
-      {"index":5,"type":"Stress","label":"Proteomics multiplicity and ATAC","executed":true,"execution_note":"Fresh 05_proteomics_atac.R PID 119092 completed exit 0; no process intervention.","status":"COMPLETED","total":93,"assertions_passed":5,"assertions_total":5,"note":"Raw n=11.942258, corrected n=42.449567, ATAC power=0.219796."},
-      {"index":6,"type":"Scope Boundary","label":"Regulated Phase II endpoint","executed":true,"execution_note":"Fresh 06_scope.py PID 60452 completed exit 0; no process intervention.","status":"COMPLETED","total":95,"assertions_passed":4,"assertions_total":4,"note":"Exact sibling handoff verified."},
-      {"index":7,"type":"Adversarial","label":"Observed-power request","executed":true,"execution_note":"Fresh 07_observed.R PID 201052 completed exit 0; no process intervention.","status":"COMPLETED","total":94,"assertions_passed":5,"assertions_total":5,"note":"Observed-power diagnostic remains prospective-design guidance, not a null-result explanation."}
-    ],
-    "additional_fresh_executions":[
-      {"label":"Environment and parse","executed":true,"execution_note":"00_env_parse.R PID 118428 completed exit 0."},
-      {"label":"PROPER determinism","executed":true,"execution_note":"08_determinism.R PID 146880 completed exit 0; repeated default-seed summaries were identical."}
+    "execution_avg": 93.9,
+    "max": 100,
+    "assertion_pass_rate": {"passed": 34, "total": 34},
+    "inputs": [
+      {"index": 1, "type": "Canonical", "label": "Bulk RNA-seq sizing plus realized-FDR gate", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "run/structured-20260923/01_bulk_guard.R completed with exit_code 0 in the audit-owned runtime.", "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 5, "assertions_total": 5, "assertions": [{"text": "Prospective closed-form power is finite.", "result": "PASS", "note": "valid_canonical_power=0.286598."}, {"text": "Out-of-range alpha is stopped before rnapower.", "result": "PASS", "note": "alpha=1.5 raised a checked-wrapper error."}, {"text": "Negative CV and null effect are stopped.", "result": "PASS", "note": "cv=-0.3 and effect=1 raised errors."}, {"text": "Below-target realized FDR is accepted.", "result": "PASS", "note": "0.04 at target 0.05 gave ACCEPT."}, {"text": "Above-target and non-finite FDR are rejected.", "result": "PASS", "note": "0.06 and NaN gave REJECT."}]},
+      {"index": 2, "type": "Variant A", "label": "Fixed budget depth versus replicates", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "run/structured-20260923/02_budget.R completed with exit_code 0 in the audit-owned runtime.", "basic": 36, "specialized": 54, "total": 90, "assertions_passed": 5, "assertions_total": 5, "assertions": [{"text": "Both designs use prospective checked_rnapower calls.", "result": "PASS", "note": "The replay evaluated both stated depth/n designs."}, {"text": "The 4-per-group calculation is finite.", "result": "PASS", "note": "n4=0.112480."}, {"text": "The 8-per-group calculation is finite.", "result": "PASS", "note": "n8=0.118358."}, {"text": "The replicate comparison has expected direction.", "result": "PASS", "note": "Executable assertion verified n8 > n4."}, {"text": "Depth is treated as per-feature input.", "result": "PASS", "note": "Source distinguishes depth from total library size."}]},
+      {"index": 3, "type": "Edge", "label": "Hard target, preflight, and MDE solve", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "run/structured-20260923/08_edge_preflight.R completed with exit_code 0 in the audit-owned runtime.", "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 5, "assertions_total": 5, "assertions": [{"text": "Demanding target yields a finite large sample requirement.", "result": "PASS", "note": "required_n=6441.455943 (>1000)."}, {"text": "Inverse MDE solve is finite.", "result": "PASS", "note": "mde=1.775628."}, {"text": "Zero effect is stopped.", "result": "PASS", "note": "effect=0 raised an error."}, {"text": "Unit fold effect is stopped.", "result": "PASS", "note": "effect=1 raised an error."}, {"text": "Invalid alpha is stopped.", "result": "PASS", "note": "alpha=1.5 raised an error."}]},
+      {"index": 4, "type": "Variant B", "label": "scRNA-seq pseudobulk donor power", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "run/closure-20260924/rerun_pseudobulk_exact.ps1 reran the exact source in an audit-owned process; pseudobulk_exact_source.execution.json recorded exit_code 0 and terminal_sentinel=true.", "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 5, "assertions_total": 5, "assertions": [{"text": "Exact pseudobulk example completes naturally.", "result": "PASS", "note": "Closure record has exit_code=0 and PSEUDOBULK_EXACT_SOURCE_RETURNED=PASS."}, {"text": "4-donor configuration is assessed.", "result": "PASS", "note": "Pseudobulk power=0.000, FDR=0.000."}, {"text": "Passing FDR is accepted.", "result": "PASS", "note": "4 donors: ACCEPT."}, {"text": "Above-target FDR is rejected.", "result": "PASS", "note": "12 donors: FDR=0.133, REJECT."}, {"text": "Cell pseudoreplication remains visibly unsafe.", "result": "PASS", "note": "Cell-level FDR=0.897/0.888 despite apparent power."}]},
+      {"index": 5, "type": "Stress", "label": "Proteomics multiplicity and ATAC", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "run/structured-20260923/05_proteomics_atac.R completed with exit_code 0 in the audit-owned runtime.", "basic": 37, "specialized": 56, "total": 93, "assertions_passed": 5, "assertions_total": 5, "assertions": [{"text": "Raw per-protein sample size is calculable.", "result": "PASS", "note": "raw=11.942258."}, {"text": "Proteome-wide correction increases n.", "result": "PASS", "note": "corrected=42.449567 > raw."}, {"text": "Correction is not omitted.", "result": "PASS", "note": "alpha=0.05/4000."}, {"text": "ATAC cross-check is a probability.", "result": "PASS", "note": "atac=0.219796; 0 < atac < 1."}, {"text": "ATAC uses guarded wrapper.", "result": "PASS", "note": "checked_rnapower(), not permissive rnapower()."}]},
+      {"index": 6, "type": "Scope Boundary", "label": "Regulated Phase II endpoint", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "run/structured-20260923/06_scope.py completed with exit_code 0 in the audit-owned runtime.", "basic": 39, "specialized": 56, "total": 95, "assertions_passed": 4, "assertions_total": 4, "assertions": [{"text": "Clinical trial is recognized as separate regime.", "result": "PASS", "note": "Decision tree has Clinical-trial endpoint route."}, {"text": "Regulated-trial sibling is named.", "result": "PASS", "note": "clinical-biostatistics/power-and-sample-size present."}, {"text": "Redirect is source-level executable.", "result": "PASS", "note": "06_scope.py printed SCOPE_HANDOFF=PASS."}, {"text": "Genomics models do not replace regulated endpoint guidance.", "result": "PASS", "note": "Route appears in scenario decision table."}]},
+      {"index": 7, "type": "Adversarial", "label": "Observed-power request", "status": "COMPLETED", "status_flag": "✅", "executed": true, "execution_note": "run/structured-20260923/07_observed_power.R completed with exit_code 0 in the audit-owned runtime.", "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 5, "assertions_total": 5, "assertions": [{"text": "Adversarial diagnostic is calculable.", "result": "PASS", "note": "0.073075, 0.131845, 0.255462."}, {"text": "Diagnostic changes monotonically with p-value.", "result": "PASS", "note": "all(diff(observed) > 0)."}, {"text": "Observed power is labeled unsuitable for null explanation.", "result": "PASS", "note": "Main guidance calls it an anti-pattern."}, {"text": "Bulk example does not calculate observed power as design output.", "result": "PASS", "note": "Source explicitly says deliberately NOT computed."}, {"text": "Prospective alternative is supplied.", "result": "PASS", "note": "Report CI/effect size and plan power before data."}]}
     ]
   },
-  "final": {"static_weighted":38.0,"dynamic_weighted":56.4,"score":94,"max":100,"grade":"Production Ready","grade_symbol":"✅","deployable":true,"veto_override":false},
-  "recommendations":[{"priority":"P2","title":"Pre-specify a nonzero Monte Carlo tolerance only when justified","problem":"The realized-FDR gate accepts a configurable Monte Carlo tolerance, but the workflow does not yet define when a nonzero value is scientifically justified.","root_cause":"The corrective gate added a flexible tolerance parameter without coupling it to a pre-specified simulation-error rule or minimum nsims.","fix":"Keep the default tolerance at zero. If a study uses a nonzero tolerance, state it before simulation and increase nsims until the accept/reject decision is stable."}]
+  "final": {
+    "static_weighted": 38.0,
+    "dynamic_weighted": 56.3,
+    "score": 94,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "The repaired realized-FDR gate rejects both above-target and non-finite candidates rather than reporting unusable power.",
+    "The exact pseudobulk source was rerun to natural exit in an audit-owned process, with both exit code and post-source sentinel retained.",
+    "The Skill distinguishes donor-level pseudobulk power from inflated cell-level pseudoreplication and redirects regulated clinical endpoints."
+  ],
+  "recommendations": [
+    {"priority": "P2", "title": "Pre-specify nonzero Monte Carlo tolerance only when justified", "observed_in": [], "problem": "The FDR gate permits tolerance but does not define a simulation-error rule for nonzero use.", "root_cause": "Monte Carlo precision is study-specific.", "fix": "Keep tolerance=0 by default; otherwise pre-specify it, increase nsims, and demonstrate stable accept/reject decisions."}
+  ]
 }

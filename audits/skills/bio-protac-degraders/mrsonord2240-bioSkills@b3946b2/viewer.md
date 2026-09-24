@@ -7,6 +7,10 @@
 
 # Eval Viewer — bio-protac-degraders
 
+## Canonical final summary
+
+**Final:** 95/100 — ⭐ Production Ready; deployable: true.
+
 Generated: 2026-09-23 (final-pass Phase 2)
 
 Source: `mrsonord2240/bioSkills@b3946b260ddf8aebed7ad920e494fd43b06d147f:chemoinformatics/protac-degraders` in `F:\OpenScience\wt\chemoinformatics-protac-degraders`. The previous `bfcde6d` report, viewer, scripts, and skill copy were preserved at `F:\OpenScience\audits\_phase1-20260923\bio-protac-degraders\` before this report replaced it. All runnable code was executed only from `phase2_skill_copy`, a byte-verified audit copy of the exact source tip.

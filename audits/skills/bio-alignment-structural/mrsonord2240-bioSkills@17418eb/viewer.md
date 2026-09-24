@@ -7,6 +7,14 @@
 
 # Eval Viewer — bio-alignment-structural
 
+## Canonical final summary
+
+**Final:** 92/100 — ⭐ Production Ready; deployable: true.
+
+Source: `mrsonord2240/bioSkills@17418ebd37abd18d522f23899fae008fd118b79a:alignment/structural-alignment`
+Auditor independent: `false`
+Note: final pass: fixed and audited under one brief, see CHECKPOINT.md
+
 Generated: 2026-09-23. Source: `mrsonord2240/bioSkills@17418ebd37abd18d522f23899fae008fd118b79a:alignment/structural-alignment`.
 
 This is the required final-pass exception: `auditor_independent: false`; see the Phase 1 [checkpoint](../_final_pass/bio-alignment-structural/CHECKPOINT.md). The prior report was preserved at `F:\OpenScience\audits\_pre-fix-20260923\bio-alignment-structural` before this report was written.

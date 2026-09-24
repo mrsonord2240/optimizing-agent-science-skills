@@ -7,8 +7,12 @@
 
 # Eval Viewer — bio-metabolomics-targeted-analysis
 
-Generated: 2026-09-23  
-Source: `mrsonord2240/bioSkills@a23f43a7558a4ed755dea34196feaebc5affcfc1:metabolomics/targeted-analysis`  
+## Canonical final summary
+
+**Final:** 94/100 — ⭐ Production Ready; deployable: true.
+
+Generated: 2026-09-23
+Source: `mrsonord2240/bioSkills@a23f43a7558a4ed755dea34196feaebc5affcfc1:metabolomics/targeted-analysis`
 Final-pass metadata: `auditor_independent: false` — `final pass: fixed and audited under one brief, see CHECKPOINT.md`
 
 The previous active audit has been preserved without modification at `F:\OpenScience\audits\_pre-fix-20260923\bio-metabolomics-targeted-analysis\`. This fresh Phase 2 audit uses the current branch tip only. All fixtures are synthetic.

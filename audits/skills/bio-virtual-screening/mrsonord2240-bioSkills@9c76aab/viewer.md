@@ -7,11 +7,17 @@
 
 # Eval Viewer — bio-virtual-screening
 
+## Canonical final summary
+
+**Final:** 95/100 — ✅ Production Ready; deployable: true.
+
 Generated: 2026-09-23 · rendered from `report.json` by `tools/render_viewer.py`.
 
 > This viewer is **generated from the audit report**, not written by the auditor. It restates the report's own recorded scores, notes and assertions and adds nothing to them. Where a hand-written viewer would argue from the runs, this one points at the scripts in [scripts/](scripts/) instead.
 
 Source: `mrsonord2240/bioSkills@9c76aab55da6a7304f99b214feea6a75b5aacd8e:chemoinformatics/virtual-screening`
+
+Final-pass metadata: `auditor_independent: false`; `final pass: fixed and audited under one brief, see CHECKPOINT.md`.
 Audit type: fresh final-pass Phase 2 audit
 Category: None · Execution mode: A · Complexity: Complex · N = 7 · Executed: 7/7
 
@@ -33,7 +39,7 @@ Virtual-screening workflow for receptor preparation, binding-site prediction, li
 
 **Execution Average: 96.0 / 100** · **Assertion Pass Rate: 15/15**
 
-**Static: 94/100** · Static weighted 37.6 + dynamic weighted 57.6 = **95/100** → ✅ Production Ready, deployable.
+**Static: 94/100** · Static weighted 37.6 + dynamic weighted 57.6 = **95/100** → ⭐ Production Ready, deployable.
 
 ---
 

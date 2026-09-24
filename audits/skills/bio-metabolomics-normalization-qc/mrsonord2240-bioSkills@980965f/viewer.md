@@ -7,8 +7,12 @@
 
 # Eval Viewer — bio-metabolomics-normalization-qc
 
-Generated: 2026-09-23  
-Source: `mrsonord2240/bioSkills@980965fb613fd6c6dbbabe8d51c2b54eae3d8f34:metabolomics/normalization-qc`  
+## Canonical final summary
+
+**Final:** 93/100 — ⭐ Production Ready; deployable: true.
+
+Generated: 2026-09-23
+Source: `mrsonord2240/bioSkills@980965fb613fd6c6dbbabe8d51c2b54eae3d8f34:metabolomics/normalization-qc`
 Final-pass note: `auditor_independent: false` — final pass: fixed and audited under one brief, see CHECKPOINT.md.
 
 ## Verdict
@@ -58,7 +62,7 @@ Final-pass note: `auditor_independent: false` — final pass: fixed and audited 
 | 11 | Stress | New shipped example: RSD 0.271 -> 0.235, 149 features, zero NAs, group p=0.613. | 95 | 5/5 |
 | 12 | Edge | Global QCRSC guard passed even though sparse batch B2 was entirely NA. | 71 | 3/4 |
 
-Assertion pass rate: **55/56 (98.2%)**.
+Assertion pass rate: **51/52 (98.1%)**.
 
 ## Detailed output checks
 

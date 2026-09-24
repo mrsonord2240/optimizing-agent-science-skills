@@ -7,9 +7,15 @@
 
 # Eval Viewer — bio-phylo-tree-visualization
 
+## Canonical final summary
+
+**Final:** 96/100 — ⭐ Production Ready; deployable: true.
+
 Generated: 2026-09-23
 
 Source: `mrsonord2240/bioSkills@1d9b6fcb44d3e728d78d653e437abfed59ecb55a:phylogenetics/tree-visualization`
+
+Final-pass metadata: `auditor_independent: false`; `final pass: fixed and audited under one brief, see CHECKPOINT.md`.
 
 ## Summary
 

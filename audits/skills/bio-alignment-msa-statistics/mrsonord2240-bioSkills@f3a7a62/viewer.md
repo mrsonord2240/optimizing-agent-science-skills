@@ -7,6 +7,14 @@
 
 # Eval Viewer — bio-alignment-msa-statistics
 
+## Canonical final summary
+
+**Final:** 97/100 — ⭐ Production Ready; deployable: true.
+
+Source: `mrsonord2240/bioSkills@f3a7a62091e42f6e98653b5b626de94c6f7bfff7:alignment/msa-statistics`
+Auditor independent: `false`
+Note: final pass: fixed and audited under one brief, see CHECKPOINT.md
+
 Generated: 2026-09-22
 
 Source: `mrsonord2240/bioSkills@f3a7a62091e42f6e98653b5b626de94c6f7bfff7:alignment/msa-statistics`
@@ -29,7 +37,7 @@ Final-pass exception: `auditor_independent: false`; fixed and audited under one 
 | 10 | New IUPAC-rich DNA | 39 | 59 | 98 | 5/5 | ✅ |
 | 11 | New format-map round trip | 39 | 59 | 98 | 5/5 | ✅ |
 
-Execution average: **97.0/100**. Assertion pass rate: **54/54**.
+Execution average: **97.5/100**. Assertion pass rate: **54/54**.
 
 ## What ran
 
@@ -53,6 +61,6 @@ INPUT 11 PASS: 4 extension-mapped formats, 8 shape/row assertions plus format-co
 
 Structural veto: PASS (stability, contract, determinism, security). Research veto: PASS (scientific integrity, practice boundaries, methodological ground, code usability).
 
-Static score: 96/100. Dynamic score: 97.0/100. Weighted final: `96 * 0.4 + 97.0 * 0.6 = 96.6`, rounded to **97/100**.
+Static score: 96/100. Dynamic score: 97.5/100. Weighted final: `96 * 0.4 + 97.5 * 0.6 = 96.9`, rounded to **97/100 — Production Ready, deployable**.
 
 No P0, P1, or P2 recommendation is open. The pre-fix audit was preserved at `F:\OpenScience\audits\_pre-fix-20260922\bio-alignment-msa-statistics`.

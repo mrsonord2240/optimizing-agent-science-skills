@@ -18,3 +18,9 @@ The runtime probe loaded designit 0.5.1, sva 3.58.0, and limma 3.66.0, then exit
 Evidence: `run\phase2-corrective-20260923\`. Final-pass metadata is intentionally `auditor_independent: false` with `final pass: fixed and audited under one brief, see CHECKPOINT.md`.
 
 Open P0/P1: none. P2: do not accept a bridge layout that still emits the documented covariate-imbalance warning; retry the optimizer first.
+
+## Canonical final-pass metadata
+
+- Source: `mrsonord2240/bioSkills@d2e88b38777dd154d642d15cefe7e2ad1ccb2a0f:experimental-design/batch-design`
+- `auditor_independent:false`
+- Note: `final pass: fixed and audited under one brief, see CHECKPOINT.md`

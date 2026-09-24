@@ -7,6 +7,14 @@
 
 # Eval Viewer — bio-pose-validation
 
+## Canonical final summary
+
+**Final:** 95/100 — ⭐ Production Ready; deployable: true.
+
+Source: `mrsonord2240/bioSkills@e4fa0a78b55a107b91337a3307faebf34a70644d:chemoinformatics/pose-validation`
+Auditor independent: `false`
+Note: final pass: fixed and audited under one brief, see CHECKPOINT.md
+
 Generated: 2026-09-23
 
 Source audited: `mrsonord2240/bioSkills@e4fa0a78b55a107b91337a3307faebf34a70644d:chemoinformatics/pose-validation`
@@ -31,7 +39,7 @@ The prior report and its data/run artifacts were preserved before this audit at 
 | 8 | Stress (fresh) | 39 | 57 | 96 | 3/3 | Yes | ✅ |
 | 9 | Adversarial (fresh) | 37 | 54 | 91 | 3/3 | Yes | ✅ |
 
-**Execution average:** 95.2 / 100  
+**Execution average:** 95.2 / 100
 **Assertions:** 30 / 30 PASS
 
 ## Execution evidence
@@ -170,3 +178,9 @@ Production floors pass: static >= 80, execution >= 85, Layer 1 average 38.4 >= 3
 ## Recommendation
 
 P2 — `pose_qc_batch.py` exposes `rank` as a cumulative count of PB-valid records within a file, rather than a docking score or original pose ordinal. Rename it `valid_ordinal` or omit it from the CLI display; this does not affect the verified first-PB-valid selection behavior.
+
+## Canonical final-pass metadata
+
+- Source: `mrsonord2240/bioSkills@e4fa0a78b55a107b91337a3307faebf34a70644d:chemoinformatics/pose-validation`
+- `auditor_independent: false`
+- Note: `final pass: fixed and audited under one brief, see CHECKPOINT.md`

@@ -7,8 +7,12 @@
 
 # Eval Viewer — bio-metabolomics-xcms-preprocessing
 
-Generated: 2026-09-22  
-Source: <code>mrsonord2240/bioSkills@1c132093c089633f987f70238923d4c3b299a7f1:metabolomics/xcms-preprocessing</code>  
+## Canonical final summary
+
+**Final:** 95/100 — ⭐ Production Ready; deployable: true.
+
+Generated: 2026-09-22
+Source: <code>mrsonord2240/bioSkills@1c132093c089633f987f70238923d4c3b299a7f1:metabolomics/xcms-preprocessing</code>
 Final-pass disclosure: <code>meta.auditor_independent: false</code>; see <code>F:\OpenScience\audits\_final_pass\bio-metabolomics-xcms-preprocessing\CHECKPOINT.md</code>.
 
 The pre-fix report was already archived at <code>F:\OpenScience\audits\_pre-fix-20260916\bio-metabolomics-xcms-preprocessing</code>. This fresh Phase 2 audit replaces the prior incomplete re-audit evidence.
@@ -151,4 +155,8 @@ Veto override: false
 
 Make the shipped example's BiocParallel backend explicit and provide a serial option for constrained Windows hosts. This is resource-predictability polish only. There are **no open P0 or P1 findings**.
 
+## Canonical final-pass metadata
 
+- Source: `mrsonord2240/bioSkills@1c132093c089633f987f70238923d4c3b299a7f1:metabolomics/xcms-preprocessing`
+- `auditor_independent:false`
+- Note: `final pass: fixed and audited under one brief, see CHECKPOINT.md`

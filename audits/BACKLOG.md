@@ -938,7 +938,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 ### `bio-crispr-screens-perturb-seq-analysis` — Stabilize SCEPTRE runtime exit
 
-- Skill: 89, Limited Release · [mrsonord2240/bioSkills@6ca8a47](https://github.com/mrsonord2240/bioSkills/tree/6ca8a47d4a9743fbf9a090ddbc5609b1b6b6a504/crispr-screens/perturb-seq-analysis) · [viewer](skills/bio-crispr-screens-perturb-seq-analysis/mrsonord2240-bioSkills@6ca8a47/viewer.md)
+- Skill: 89, Production Ready · [mrsonord2240/bioSkills@6ca8a47](https://github.com/mrsonord2240/bioSkills/tree/6ca8a47d4a9743fbf9a090ddbc5609b1b6b6a504/crispr-screens/perturb-seq-analysis) · [viewer](skills/bio-crispr-screens-perturb-seq-analysis/mrsonord2240-bioSkills@6ca8a47/viewer.md)
 - Observed in inputs: 4, 11
 - Problem: Both shipped SCEPTRE paths write valid result tables but then exit 139 after computation.
 - Root cause: The R/sceptre native runtime tears down unreliably in this audited environment; the script has no containment or known-good execution route.
@@ -946,7 +946,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 ### `bio-crispr-screens-perturb-seq-analysis` — Bound the full Pertpy example
 
-- Skill: 89, Limited Release · [mrsonord2240/bioSkills@6ca8a47](https://github.com/mrsonord2240/bioSkills/tree/6ca8a47d4a9743fbf9a090ddbc5609b1b6b6a504/crispr-screens/perturb-seq-analysis) · [viewer](skills/bio-crispr-screens-perturb-seq-analysis/mrsonord2240-bioSkills@6ca8a47/viewer.md)
+- Skill: 89, Production Ready · [mrsonord2240/bioSkills@6ca8a47](https://github.com/mrsonord2240/bioSkills/tree/6ca8a47d4a9743fbf9a090ddbc5609b1b6b6a504/crispr-screens/perturb-seq-analysis) · [viewer](skills/bio-crispr-screens-perturb-seq-analysis/mrsonord2240-bioSkills@6ca8a47/viewer.md)
 - Observed in inputs: 1
 - Problem: The copied real Papalexi example passed 22 GB RSS without producing its promised TSV and had to be stopped.
 - Root cause: It loads and processes the full dataset in one unbounded process.
@@ -1122,7 +1122,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 ### `bio-metabolomics-metabolite-annotation` — Emit Level 2a in CLI single-hit branch
 
-- Skill: 92, Limited Release · [mrsonord2240/bioSkills@52cdec6](https://github.com/mrsonord2240/bioSkills/tree/52cdec64082fb7a3bc2d84e9d7cf5c05a5fdf9f1/metabolomics/metabolite-annotation) · [viewer](skills/bio-metabolomics-metabolite-annotation/mrsonord2240-bioSkills@52cdec6/viewer.md)
+- Skill: 92, Production Ready · [mrsonord2240/bioSkills@52cdec6](https://github.com/mrsonord2240/bioSkills/tree/52cdec64082fb7a3bc2d84e9d7cf5c05a5fdf9f1/metabolomics/metabolite-annotation) · [viewer](skills/bio-metabolomics-metabolite-annotation/mrsonord2240-bioSkills@52cdec6/viewer.md)
 - Observed in inputs: 1, 6
 - Problem: scripts/match_library.py and SKILL.md promise a Level 2a call for a single passing library hit, but that branch prints only compound name, score, and matched-peak count. A CLI caller cannot reliably carry the mandated confidence level downstream.
 - Root cause: The single-hit print statement omits the label while tied and no-hit branches include their Level 3 and Level 5 labels.
@@ -1272,7 +1272,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (348)
+## P2 (349)
 
 ### `bio-data-visualization-lollipop-protein-maps` — HGVSp edge cases and recurrence semantics undocumented
 
@@ -3068,7 +3068,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 ### `bio-crispr-screens-perturb-seq-analysis` — State executable limits for optional methods
 
-- Skill: 89, Limited Release · [mrsonord2240/bioSkills@6ca8a47](https://github.com/mrsonord2240/bioSkills/tree/6ca8a47d4a9743fbf9a090ddbc5609b1b6b6a504/crispr-screens/perturb-seq-analysis) · [viewer](skills/bio-crispr-screens-perturb-seq-analysis/mrsonord2240-bioSkills@6ca8a47/viewer.md)
+- Skill: 89, Production Ready · [mrsonord2240/bioSkills@6ca8a47](https://github.com/mrsonord2240/bioSkills/tree/6ca8a47d4a9743fbf9a090ddbc5609b1b6b6a504/crispr-screens/perturb-seq-analysis) · [viewer](skills/bio-crispr-screens-perturb-seq-analysis/mrsonord2240-bioSkills@6ca8a47/viewer.md)
 - Observed in inputs: —
 - Problem: FR-Perturb is not installable in this Python-3.12 environment and Seurat is absent.
 - Root cause: The references name alternatives without a verified local execution route.
@@ -3370,6 +3370,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The fix was checked against plain concat, not --naive.
 - Fix: Say: reorder with view -s, then use plain `bcftools concat` (or re-create every file with the same view -s so headers match) before --naive.
 
+### `bio-geo-data` — Run GEOquery parity in dedicated R runtime
+
+- Skill: 90.9, Production Ready · [mrsonord2240/bioSkills@ae7abb8](https://github.com/mrsonord2240/bioSkills/tree/ae7abb81bc209cc856ab3ea55e4cd47eaf0e2364/database-access/geo-data) · [viewer](skills/bio-geo-data/mrsonord2240-bioSkills@ae7abb8/viewer.md)
+- Observed in inputs: 6, 11
+- Problem: Two R GEOquery vectors are unavailable in the retained private runtime.
+- Root cause: No Rscript executable; not a Python-source failure.
+- Fix: Provision an isolated R/Bioconductor GEOquery runtime for a later parity check without mutating shared database-lane environments.
+
 ### `bio-crispr-screens-bagel-essentiality` — Calibrate thin-library magnitude as a range
 
 - Skill: 91, Production Ready · [mrsonord2240/bioSkills@a43fb07](https://github.com/mrsonord2240/bioSkills/tree/a43fb0726ecb90a9ca8ea660404cd98ba2989c18/crispr-screens/bagel-essentiality) · [viewer](skills/bio-crispr-screens-bagel-essentiality/mrsonord2240-bioSkills@a43fb07/viewer.md)
@@ -3385,14 +3393,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: Real CFD/MIT scoring is documented but cannot run in this environment without a multi-GB genome index, and the promised custom-library deliverable has no machine-readable column contract.
 - Root cause: The Skill names the external route and deliverables but lacks preflight/format checks for them.
 - Fix: Add a short preflight that names the required genome index and gives a clear blocked message, plus a minimal required-column schema for library table and oligo order.
-
-### `bio-geo-data` — Re-run GEOquery parity in a dedicated R runtime
-
-- Skill: 91, Production Ready · [mrsonord2240/bioSkills@ae7abb8](https://github.com/mrsonord2240/bioSkills/tree/ae7abb81bc209cc856ab3ea55e4cd47eaf0e2364/database-access/geo-data) · [viewer](skills/bio-geo-data/mrsonord2240-bioSkills@ae7abb8/viewer.md)
-- Observed in inputs: 6, 11
-- Problem: The private audit runtime has no Rscript executable, so the optional GEOquery reference was not live-verified.
-- Root cause: Audit-runtime capability gap, not a Python source failure.
-- Fix: Provision a separate R/Bioconductor GEOquery runtime for a later parity check; do not mutate shared database-lane environments.
 
 ### `bio-metabolomics-msdial-preprocessing` — Targeted MRM/PRM/SRM quantification is never routed to metabolomics/targeted-analysis
 
@@ -3682,6 +3682,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The Skill assumes the documented error route is a reliable process-status contract without testing this image version.
 - Fix: Require checking the error text and absence of CRISPResso_quantification_of_editing_frequency.txt; do not promise a nonzero exit code.
 
+### `bio-experimental-design-randomization-blocking` — Revalidate optional Latin-square and auxiliary simulation routes
+
+- Skill: 93, Production Ready · [mrsonord2240/bioSkills@c19ca21](https://github.com/mrsonord2240/bioSkills/tree/c19ca21cc60b9007bd955ebe4b31ead3ccf687e4/experimental-design/randomization-blocking) · [viewer](skills/bio-experimental-design-randomization-blocking/mrsonord2240-bioSkills@c19ca21/viewer.md)
+- Observed in inputs: —
+- Problem: Those optional auxiliary routes were not replayed in this final eight-input audit.
+- Root cause: Only the selected seven core routes and exact designit primary-tool block have retained same-tip execution evidence.
+- Fix: Run retained same-tip checks for the Latin-square and simulation routes before making execution claims about them.
+
 ### `bio-local-blast` — New table claim: 'v4 has no per-sequence taxid at build time' is false
 
 - Skill: 93, Limited Release · [mrsonord2240/bioSkills@e3ae050](https://github.com/mrsonord2240/bioSkills/tree/e3ae050e9b0c4bef22129953132c11e80ded18e8/database-access/local-blast) · [viewer](skills/bio-local-blast/mrsonord2240-bioSkills@e3ae050/viewer.md)
@@ -3810,13 +3818,13 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The audit environment has no small public HiFi amplicon dataset and the checkpoint records no suitable source.
 - Fix: When a public HiFi amplicon BAM or FASTQ under 50 MB is available, run the documented command and assert flag or removal behavior against independently inspected duplicate families.
 
-### `bio-experimental-design-power-analysis` — Pre-specify a nonzero Monte Carlo tolerance only when justified
+### `bio-experimental-design-power-analysis` — Pre-specify nonzero Monte Carlo tolerance only when justified
 
 - Skill: 94, Production Ready · [mrsonord2240/bioSkills@3b1beb2](https://github.com/mrsonord2240/bioSkills/tree/3b1beb228f540a2b0e5ee138bd8f6646997f4f4e/experimental-design/power-analysis) · [viewer](skills/bio-experimental-design-power-analysis/mrsonord2240-bioSkills@3b1beb2/viewer.md)
 - Observed in inputs: —
-- Problem: The realized-FDR gate accepts a configurable Monte Carlo tolerance, but the workflow does not yet define when a nonzero value is scientifically justified.
-- Root cause: The corrective gate added a flexible tolerance parameter without coupling it to a pre-specified simulation-error rule or minimum nsims.
-- Fix: Keep the default tolerance at zero. If a study uses a nonzero tolerance, state it before simulation and increase nsims until the accept/reject decision is stable.
+- Problem: The FDR gate permits tolerance but does not define a simulation-error rule for nonzero use.
+- Root cause: Monte Carlo precision is study-specific.
+- Fix: Keep tolerance=0 by default; otherwise pre-specify it, increase nsims, and demonstrate stable accept/reject decisions.
 
 ### `bio-metabolomics-targeted-analysis` — Investigate the bundled ggplot2 example's post-output nonzero exit in the target R runtime
 
@@ -3889,14 +3897,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: HESS step 2 requires 22 chromosome outputs and is not executed here.
 - Root cause: Available fixture is single-chromosome.
 - Fix: Run all chromosome jobs with a matched reference and validate aggregate h2.
-
-### `bio-crispr-screens-batch-correction` — State JACKS compatibility or remove version implication
-
-- Skill: 95, Production Ready · [mrsonord2240/bioSkills@f04f3c5](https://github.com/mrsonord2240/bioSkills/tree/f04f3c5168224974c7879822c33f364c5e4fd034/crispr-screens/batch-correction) · [viewer](skills/bio-crispr-screens-batch-correction/mrsonord2240-bioSkills@f04f3c5/viewer.md)
-- Observed in inputs: —
-- Problem: JACKS is named as an alternative but Version Compatibility does not state which JACKS release/API was considered.
-- Root cause: The compatibility section concentrates on tools directly executed by the primary path.
-- Fix: Add a brief JACKS version/API compatibility note, or label it as a cross-reference to the dedicated JACKS Skill rather than a tested in-skill dependency.
 
 ### `bio-crispr-screens-drugz-chemogenomic` — Validate the dose-helper FDR range
 
@@ -4018,6 +4018,14 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The script delegates zero-width intervals to fetch(start, end), whose empty half-open range cannot express samtools behavior.
 - Fix: Reject start >= end with a concise error, or emit a warning identifying rows that must be dropped or widened before continuing.
 
+### `bio-crispr-screens-batch-correction` — State JACKS compatibility or remove version implication
+
+- Skill: 96, Production Ready · [mrsonord2240/bioSkills@f04f3c5](https://github.com/mrsonord2240/bioSkills/tree/f04f3c5168224974c7879822c33f364c5e4fd034/crispr-screens/batch-correction) · [viewer](skills/bio-crispr-screens-batch-correction/mrsonord2240-bioSkills@f04f3c5/viewer.md)
+- Observed in inputs: —
+- Problem: JACKS is named as an alternative but Version Compatibility does not state which JACKS release/API was considered.
+- Root cause: The compatibility section concentrates on tools directly executed by the primary path.
+- Fix: Add a brief JACKS version/API compatibility note, or label it as a cross-reference to the dedicated JACKS Skill rather than a tested in-skill dependency.
+
 ### `bio-pathway-enrichment-visualization` — Remove stale treeplot-crash wording from usage guide
 
 - Skill: 96, Production Ready · [mrsonord2240/bioSkills@9500048](https://github.com/mrsonord2240/bioSkills/tree/9500048793a19cae65ca89930733581eddcc1375/pathway-analysis/enrichment-visualization) · [viewer](skills/bio-pathway-enrichment-visualization/mrsonord2240-bioSkills@9500048/viewer.md)
@@ -4047,7 +4055,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Skill: 97, Production Ready · [mrsonord2240/bioSkills@d2e88b3](https://github.com/mrsonord2240/bioSkills/tree/d2e88b38777dd154d642d15cefe7e2ad1ccb2a0f/experimental-design/batch-design) · [viewer](skills/bio-experimental-design-batch-design/mrsonord2240-bioSkills@d2e88b3/viewer.md)
 - Observed in inputs: 2
 - Problem: The supplied synthetic bridge run has a site spread of two although all hard constraints pass.
-- Root cause: 
+- Root cause: The fixed-seed synthetic bridge assignment satisfies hard constraints but does not optimize site balance below the documented warning threshold.
 - Fix: Before a real placement is accepted, re-run the documented optimizer with a different seed or higher max_iter until every declared covariate has acceptable balance.
 
 ### `bio-microbiome-diversity-analysis` — Make GlobalPatterns depth choice use the helper

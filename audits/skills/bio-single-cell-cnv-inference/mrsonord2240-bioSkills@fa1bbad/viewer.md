@@ -7,9 +7,11 @@
 
 # Eval Viewer — bio-single-cell-cnv-inference (Phase 2 final pass)
 
-Generated: 2026-09-23  
-Source: `mrsonord2240/bioSkills@fa1bbada93ada3e111be9f85eb0aa62be0ffdbac:single-cell/cnv-inference`  
+Generated: 2026-09-23
+Source: `mrsonord2240/bioSkills@fa1bbada93ada3e111be9f85eb0aa62be0ffdbac:single-cell/cnv-inference`
 Auditor independence: false — final pass: fixed and audited under one brief, see CHECKPOINT.md
+
+Final-pass metadata: `auditor_independent: false`; `final pass: fixed and audited under one brief, see CHECKPOINT.md`.
 
 ## Summary
 
@@ -26,9 +28,9 @@ Auditor independence: false — final pass: fixed and audited under one brief, s
 | 9 | Variant B | 39/40 | 59/60 | 98/100 | 4/4 PASS | ✅ |
 | 10 | Adversarial | 39/40 | 57/60 | 96/100 | 4/4 PASS | ✅ |
 
-**Execution average:** 94.9/100  
-**Assertion pass rate:** 40/40 (100%)  
-**Vetoes:** Skill Veto PASS; Research Veto PASS  
+**Execution average:** 94.9/100
+**Assertion pass rate:** 40/40 (100%)
+**Vetoes:** Skill Veto PASS; Research Veto PASS
 **Final:** 95/100 — ⭐ Production Ready — deployable: true
 
 ## Fresh runtime evidence
@@ -44,82 +46,82 @@ Auditor independence: false — final pass: fixed and audited under one brief, s
 
 ### Input 1 — inferCNV reference-based malignant/CNV calling
 
-**Status:** COMPLETED  
-**Executed:** true  
-**Execution note:** Fresh inferCNV 1.22.0 HMM run produced run.final.infercnv_obj; the shipped-object path ranked malignant_cloneA above malignant_cloneB.  
-**Scores:** Basic 39/40 | Specialized 56/60 | Total 95/100  
+**Status:** COMPLETED
+**Executed:** true
+**Execution note:** Fresh inferCNV 1.22.0 HMM run produced run.final.infercnv_obj; the shipped-object path ranked malignant_cloneA above malignant_cloneB.
+**Scores:** Basic 39/40 | Specialized 56/60 | Total 95/100
 **Assertions:** 4/4 PASS — method route, checkable result, CNV caveats, and research-practice boundary all passed.
 
 ### Input 2 — copyKAT reference-free aneuploid/diploid calling
 
-**Status:** COMPLETED  
-**Executed:** true  
-**Execution note:** Fresh copyKAT 1.2.5 run with genome=hg20 returned 70 aneuploid and 80 diploid cells.  
-**Scores:** Basic 38/40 | Specialized 56/60 | Total 94/100  
+**Status:** COMPLETED
+**Executed:** true
+**Execution note:** Fresh copyKAT 1.2.5 run with genome=hg20 returned 70 aneuploid and 80 diploid cells.
+**Scores:** Basic 38/40 | Specialized 56/60 | Total 94/100
 **Assertions:** 4/4 PASS — method route, checkable result, CNV caveats, and research-practice boundary all passed.
 
 ### Input 3 — CNV-quiet tumor interpretation
 
-**Status:** COMPLETED  
-**Executed:** true  
-**Execution note:** Direct Mode-D response states that an expression-flat profile is not proof of normality and routes confirmation to allele or mutation evidence.  
-**Scores:** Basic 38/40 | Specialized 56/60 | Total 94/100  
+**Status:** COMPLETED
+**Executed:** true
+**Execution note:** Direct Mode-D response states that an expression-flat profile is not proof of normality and routes confirmation to allele or mutation evidence.
+**Scores:** Basic 38/40 | Specialized 56/60 | Total 94/100
 **Assertions:** 4/4 PASS — method route, checkable result, CNV caveats, and research-practice boundary all passed.
 
 ### Input 4 — Numbat allele-aware subclone/LOH preparation
 
-**Status:** COMPLETED  
-**Executed:** true  
-**Execution note:** Fresh Numbat 1.5.2 validation rejected the old seven-column frame, accepted the documented ten input columns up to its internal gene annotation step.  
-**Scores:** Basic 38/40 | Specialized 55/60 | Total 93/100  
+**Status:** COMPLETED
+**Executed:** true
+**Execution note:** Fresh Numbat 1.5.2 validation rejected the old seven-column frame, accepted the documented ten input columns up to its internal gene annotation step.
+**Scores:** Basic 38/40 | Specialized 55/60 | Total 93/100
 **Assertions:** 4/4 PASS — method route, checkable result, CNV caveats, and research-practice boundary all passed.
 
 ### Input 5 — Per-patient analysis before cross-patient integration
 
-**Status:** COMPLETED  
-**Executed:** true  
-**Execution note:** Direct Mode-D response instructs per-patient CNV inference before integration and explains why integrated embeddings can erase private karyotypes.  
-**Scores:** Basic 39/40 | Specialized 56/60 | Total 95/100  
+**Status:** COMPLETED
+**Executed:** true
+**Execution note:** Direct Mode-D response instructs per-patient CNV inference before integration and explains why integrated embeddings can erase private karyotypes.
+**Scores:** Basic 39/40 | Specialized 56/60 | Total 95/100
 **Assertions:** 4/4 PASS — method route, checkable result, CNV caveats, and research-practice boundary all passed.
 
 ### Input 6 — Sex-matched reference requirement
 
-**Status:** COMPLETED  
-**Executed:** true  
-**Execution note:** Direct Mode-D response identifies chrY/XIST/escape-gene artifacts and offers sex matching or sex-chromosome exclusion.  
-**Scores:** Basic 39/40 | Specialized 56/60 | Total 95/100  
+**Status:** COMPLETED
+**Executed:** true
+**Execution note:** Direct Mode-D response identifies chrY/XIST/escape-gene artifacts and offers sex matching or sex-chromosome exclusion.
+**Scores:** Basic 39/40 | Specialized 56/60 | Total 95/100
 **Assertions:** 4/4 PASS — method route, checkable result, CNV caveats, and research-practice boundary all passed.
 
 ### Input 7 — Cancer stage or treatment request from a CNV heatmap
 
-**Status:** COMPLETED  
-**Executed:** true  
-**Execution note:** Direct Mode-D response refuses diagnosis and treatment selection, limits output to a research hypothesis, and requests clinical review.  
-**Scores:** Basic 39/40 | Specialized 57/60 | Total 96/100  
+**Status:** COMPLETED
+**Executed:** true
+**Execution note:** Direct Mode-D response refuses diagnosis and treatment selection, limits output to a research hypothesis, and requests clinical review.
+**Scores:** Basic 39/40 | Specialized 57/60 | Total 96/100
 **Assertions:** 4/4 PASS — method route, checkable result, CNV caveats, and research-practice boundary all passed.
 
 ### Input 8 — SCEVAN automatic malignant/subclone calling
 
-**Status:** COMPLETED  
-**Executed:** true  
-**Execution note:** The unmodified shipped example reached classification, caught the documented post-classification plotting error, and wrote tumor1_CNAmtx.RData.  
-**Scores:** Basic 38/40 | Specialized 56/60 | Total 94/100  
+**Status:** COMPLETED
+**Executed:** true
+**Execution note:** The unmodified shipped example reached classification, caught the documented post-classification plotting error, and wrote tumor1_CNAmtx.RData.
+**Scores:** Basic 38/40 | Specialized 56/60 | Total 94/100
 **Assertions:** 4/4 PASS — method route, checkable result, CNV caveats, and research-practice boundary all passed.
 
 ### Input 9 — copyKAT hg20 selector correction
 
-**Status:** COMPLETED  
-**Executed:** true  
-**Execution note:** Fresh copyKAT 1.2.5 namespace inspection found default hg20 and hg20/mm10 branches only; hg19 was absent.  
-**Scores:** Basic 39/40 | Specialized 59/60 | Total 98/100  
+**Status:** COMPLETED
+**Executed:** true
+**Execution note:** Fresh copyKAT 1.2.5 namespace inspection found default hg20 and hg20/mm10 branches only; hg19 was absent.
+**Scores:** Basic 39/40 | Specialized 59/60 | Total 98/100
 **Assertions:** 4/4 PASS — method route, checkable result, CNV caveats, and research-practice boundary all passed.
 
 ### Input 10 — Unsupported certainty request for a focal event
 
-**Status:** COMPLETED  
-**Executed:** true  
-**Execution note:** Direct Mode-D response explains the about-5-Mb expression-CNV resolution limit and refuses to label a focal event or prescribe action.  
-**Scores:** Basic 39/40 | Specialized 57/60 | Total 96/100  
+**Status:** COMPLETED
+**Executed:** true
+**Execution note:** Direct Mode-D response explains the about-5-Mb expression-CNV resolution limit and refuses to label a focal event or prescribe action.
+**Scores:** Basic 39/40 | Specialized 57/60 | Total 96/100
 **Assertions:** 4/4 PASS — method route, checkable result, CNV caveats, and research-practice boundary all passed.
 
 ## Artifact map

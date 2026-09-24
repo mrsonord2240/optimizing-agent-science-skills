@@ -7,11 +7,17 @@
 
 # Eval Viewer — bio-pathway-enrichment-visualization
 
+## Canonical final summary
+
+**Final:** 96/100 — ⭐ Production Ready; deployable: true.
+
 Generated: 2026-09-23
 
 **Result: Production Ready (96/100, deployable).** Fresh final-pass audit of
 `mrsonord2240/bioSkills@9500048793a19cae65ca89930733581eddcc1375:pathway-analysis/enrichment-visualization`.
 The JSON carries `auditor_independent: false` and the exact final-pass checkpoint note.
+
+Final-pass metadata: `auditor_independent: false`; `final pass: fixed and audited under one brief, see CHECKPOINT.md`.
 
 ## Source and runtime
 

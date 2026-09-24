@@ -256,10 +256,7 @@
           {
             "text": "Output has the two input sequence names",
             "result": "PASS",
-            "note": [
-              "deletion1",
-              "insertion1"
-            ]
+            "note": "sequence names: deletion1, insertion1"
           },
           {
             "text": "A literal empty PRIDICT2 summary exits nonzero with guidance",
@@ -291,10 +288,7 @@
           {
             "text": "Exactly the two planted same-sign FDR-passing variants are high confidence",
             "result": "PASS",
-            "note": [
-              "v1",
-              "v4"
-            ]
+            "note": "high-confidence variants: v1, v4"
           },
           {
             "text": "Discordant sign and failed FDR are excluded",

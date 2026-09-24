@@ -7,6 +7,10 @@
 
 # bio-sra-data — Phase 2 final-pass audit
 
+## Canonical final summary
+
+**Final:** 91/100 — ⭐ Production Ready; deployable: true.
+
 **Decision: ⭐ Production Ready (91/100).** The exact source `mrsonord2240/bioSkills@7342f0782d258eba329460f76a8c7dea35abc7cb:database-access/sra-data` passes all vetoes and is deployable.
 
 | Audit metadata | Value |
@@ -64,3 +68,15 @@ The retained [final-vector manifest](run/phase2_20260923/safety_final_tip/comman
 | 90/100 | 91.3/100 | **91/100 — Production Ready** |
 
 The seven totals sum to 639, so the dynamic average is 91.3. Assertion evidence is 27/28: EDirect returned usable output with exit 0 but recorded a post-response `curl (56)` transport warning.
+
+## Canonical final-pass metadata
+
+- Source: `mrsonord2240/bioSkills@7342f0782d258eba329460f76a8c7dea35abc7cb:database-access/sra-data`
+- `auditor_independent:false`
+- Note: `final pass: fixed and audited under one brief, see CHECKPOINT.md`
+
+## Canonical final-pass metadata
+
+- Source: `mrsonord2240/bioSkills@7342f0782d258eba329460f76a8c7dea35abc7cb:database-access/sra-data`
+- `auditor_independent: false`
+- Note: `final pass: fixed and audited under one brief, see CHECKPOINT.md`

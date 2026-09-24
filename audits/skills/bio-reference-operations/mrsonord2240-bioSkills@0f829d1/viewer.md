@@ -7,9 +7,9 @@
 
 # Eval Viewer — bio-reference-operations
 
-Generated: 2026-09-23  
-Source: `mrsonord2240/bioSkills@0f829d1619132fc9033b2437205d51ecb74df5d3:alignment-files/reference-operations`  
-Audit mode: final-pass Phase 2; `auditor_independent: false` (see the final-pass checkpoint).
+Generated: 2026-09-23
+Source: `mrsonord2240/bioSkills@0f829d1619132fc9033b2437205d51ecb74df5d3:alignment-files/reference-operations`
+Final-pass metadata: `auditor_independent: false` — final pass: fixed and audited under one brief, see CHECKPOINT.md.
 
 ## Summary
 
@@ -26,7 +26,7 @@ Audit mode: final-pass Phase 2; `auditor_independent: false` (see the final-pass
 | 9 | Adversarial | Fresh: out-of-range window | 34 | 51 | 85 | 2/3 |
 | 10 | Adversarial | Fresh: hostile filename | 38 | 56 | 94 | 3/3 |
 
-Execution average: **91.4/100**. Assertion pass rate: **29/30**.  
+Execution average: **91.4/100**. Assertion pass rate: **29/30**.
 Structural veto: **PASS**. Research veto: **PASS**.
 
 ## What ran
@@ -60,4 +60,4 @@ Static score: **89/100**. The content is modular, runnable, and clear about peda
 
 Dynamic score: **91.4/100**. Every regression workflow class and both fresh cases executed. Input 9 lost points for silently accepting impossible coordinates; it does not trigger a safety or research veto.
 
-Final: `(89 × 0.4) + (91.4 × 0.6) = 90.4`, rounded to **90/100 — Production Ready**. Deployable: **true**.
+Final: `(89 × 0.4) + (91.4 × 0.6) = 90.4`, rounded to **90/100 — ⭐ Production Ready**. Deployable: **true**.

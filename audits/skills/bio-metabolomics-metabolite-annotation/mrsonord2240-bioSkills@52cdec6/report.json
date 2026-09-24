@@ -138,8 +138,8 @@
     "dynamic_weighted": 54.8,
     "score": 92,
     "max": 100,
-    "grade": "Limited Release",
-    "grade_symbol": "✅",
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
     "deployable": true,
     "veto_override": false
   },

@@ -7,6 +7,10 @@
 
 # Eval Viewer — bio-microbiome-amplicon-processing
 
+## Canonical final summary
+
+**Final:** 94/100 — ⭐ Production Ready; deployable: true.
+
 Generated: 2026-09-23. Final-pass Phase 2 audit of `mrsonord2240/bioSkills@0e9a568381ac039886853ff13f167acce8e92229:microbiome/amplicon-processing`.
 
 Prior report preserved at `F:\OpenScience\audits\_pre-fix-20260923\bio-microbiome-amplicon-processing\`. This final-pass report deliberately records `auditor_independent: false`: fixed and audited under one brief; see `CHECKPOINT.md`.
@@ -51,3 +55,9 @@ Structural veto: **PASS** (stability, contract, determinism, security). Research
 ## Recommendation
 
 - P2 — Add a QIIME2 Deblur preflight that checks read-length suitability and whether reads survive before users encounter q2-deblur's opaque empty-sequence error.
+
+## Canonical final-pass metadata
+
+- Source: `mrsonord2240/bioSkills@0e9a568381ac039886853ff13f167acce8e92229:microbiome/amplicon-processing`
+- `auditor_independent:false`
+- Note: `final pass: fixed and audited under one brief, see CHECKPOINT.md`

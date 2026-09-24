@@ -7,7 +7,11 @@
 
 # Eval Viewer — bio-duplicate-handling
 
-Generated: 2026-09-22  
+## Canonical final summary
+
+**Final:** 94/100 — ⭐ Production Ready; deployable: true.
+
+Generated: 2026-09-22
 Source: `mrsonord2240/bioSkills@2d29a1e3460345c6877ecf9f33c58a210ee5c727:alignment-files/duplicate-handling`
 
 Final-pass Phase 2 fresh audit. The previous report and its entire run directory were preserved at `F:\OpenScience\audits\_pre-fix-2026-09-22\bio-duplicate-handling\`. This report sets `meta.auditor_independent: false`: final pass fixed and audited under one brief; see `F:\OpenScience\audits\_final_pass\bio-duplicate-handling\CHECKPOINT.md`.
@@ -50,3 +54,9 @@ Regression coverage re-ran all prior-report use-case families: canonical standar
 ## Recommendation
 
 - P2 — Validate `pbmarkdup` on a small real public HiFi amplicon BAM or FASTQ. The deterministic synthetic run proves the documented flags and `--rmdup` behavior, but not real-library performance. This is the sole open item recorded in the final-pass checkpoint.
+
+## Canonical final-pass metadata
+
+- Source: `mrsonord2240/bioSkills@2d29a1e3460345c6877ecf9f33c58a210ee5c727:alignment-files/duplicate-handling`
+- `auditor_independent:false`
+- Note: `final pass: fixed and audited under one brief, see CHECKPOINT.md`

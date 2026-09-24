@@ -7,6 +7,10 @@
 
 # Eval Viewer — bio-proteomics-differential-abundance
 
+## Canonical final summary
+
+**Final:** 93/100 — ⭐ Production Ready; deployable: true.
+
 Generated: 2026-09-23
 Source: mrsonord2240/bioSkills@31deeb9912f6e318ed11069f05a55be98577ff5e:proteomics/differential-abundance
 
@@ -83,4 +87,3 @@ examples/differential_abundance.py. Synthetic planted-truth fixtures were rerun;
 P1: five direct R calls wrote valid, parseable output then exited 139 during shared-R teardown. This is not concealed; reproduce in a clean target R 4.4.3/Bioc 3.20 runtime before claiming stable CLI exit behavior.
 
 P2: the compact seeded msqrob2 demo's printed 7.0% realized FDR is an illustrative single realization, not a calibration guarantee.
-

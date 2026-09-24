@@ -7,6 +7,10 @@
 
 # Eval Viewer — bio-microbiome-taxonomy-assignment
 
+## Canonical final summary
+
+**Final:** 89/100 — ⭐ Production Ready; deployable: true.
+
 Generated: 2026-09-23. Source: `mrsonord2240/bioSkills@60fd788ddba9db5cdfdd157003ee4274e5c47349:microbiome/taxonomy-assignment`.
 
 ## Result
@@ -32,3 +36,9 @@ P1: the DADA2 example's claimed all-NA wrong-reference safeguard is not discrimi
 P2: both DADA2 example invocations wrote complete output and then ended with a segmentation fault in this R runtime. This needs a clean-session reproduction before automation treats its exit status as reliable.
 
 The dated prior audit remains preserved in `F:\OpenScience\audits\_pre-fix-20260919c\bio-microbiome-taxonomy-assignment`.
+
+## Canonical final-pass metadata
+
+- Source: `mrsonord2240/bioSkills@60fd788ddba9db5cdfdd157003ee4274e5c47349:microbiome/taxonomy-assignment`
+- `auditor_independent:false`
+- Note: `final pass: fixed and audited under one brief, see CHECKPOINT.md`

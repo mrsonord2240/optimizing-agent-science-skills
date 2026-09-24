@@ -7,9 +7,9 @@
 
 # Eval Viewer — bio-remote-homology
 
-Generated: 2026-09-22  
-Source: `mrsonord2240/bioSkills@7153e877bfec221df95ba1f5758f4012e788b7aa:database-access/remote-homology`  
-Audit mode: final-pass Phase 2; `auditor_independent: false`. The superseded intermediate re-audit was archived intact at `F:\OpenScience\audits\_pre-fix-20260922\bio-remote-homology`.
+Generated: 2026-09-22
+Source: `mrsonord2240/bioSkills@7153e877bfec221df95ba1f5758f4012e788b7aa:database-access/remote-homology`
+Final-pass metadata: `auditor_independent: false` — final pass: fixed and audited under one brief, see CHECKPOINT.md. The superseded intermediate re-audit was archived intact at `F:\OpenScience\audits\_pre-fix-20260922\bio-remote-homology`.
 
 ## Summary
 

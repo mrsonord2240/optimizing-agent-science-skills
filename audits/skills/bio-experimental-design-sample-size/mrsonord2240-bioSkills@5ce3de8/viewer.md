@@ -33,8 +33,8 @@ Source: `mrsonord2240/bioSkills@5ce3de8235a0bc77f51bd2aecc5ca599cfb6862e:experim
 | 6 | Scope Boundary | 37 | 56 | 93 | 4/4 | ✅ COMPLETED |
 | 7 | Adversarial | 38 | 57 | 95 | 4/4 | ✅ COMPLETED |
 
-**Execution average:** 93.1 / 100  
-**Assertions:** 28 / 28  
+**Execution average:** 93.1 / 100
+**Assertions:** 28 / 28
 **Research veto:** PASS (M1–M4)
 
 ## Executed code and outputs
@@ -128,3 +128,15 @@ OK proteomics unadjusted_n=11.94 adjusted_n=43.26
 - Final: **93 / 100 — ⭐ Production Ready**
 - Deployable: **true**
 - Recommendations: none (no open P0 or P1).
+
+## Canonical final-pass metadata
+
+- Source: `mrsonord2240/bioSkills@5ce3de8235a0bc77f51bd2aecc5ca599cfb6862e:experimental-design/sample-size`
+- `auditor_independent:false`
+- Note: `final pass: fixed and audited under one brief, see CHECKPOINT.md`
+
+## Canonical final-pass metadata
+
+- Source: `mrsonord2240/bioSkills@5ce3de8235a0bc77f51bd2aecc5ca599cfb6862e:experimental-design/sample-size`
+- `auditor_independent: false`
+- Note: `final pass: fixed and audited under one brief, see CHECKPOINT.md`

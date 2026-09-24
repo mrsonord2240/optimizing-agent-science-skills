@@ -7,8 +7,16 @@
 
 # Eval Viewer — bio-crispr-screens-bagel-essentiality
 
-Generated: 2026-09-22  
-Source: `mrsonord2240/bioSkills@a43fb0726ecb90a9ca8ea660404cd98ba2989c18:crispr-screens/bagel-essentiality`  
+## Canonical final summary
+
+**Final:** 91/100 — ⭐ Production Ready; deployable: true.
+
+Source: `mrsonord2240/bioSkills@a43fb0726ecb90a9ca8ea660404cd98ba2989c18:crispr-screens/bagel-essentiality`
+Auditor independent: `false`
+Note: final pass: fixed and audited under one brief, see CHECKPOINT.md
+
+Generated: 2026-09-22
+Source: `mrsonord2240/bioSkills@a43fb0726ecb90a9ca8ea660404cd98ba2989c18:crispr-screens/bagel-essentiality`
 Final-pass status: `auditor_independent: false` — fixed and audited under one brief; see `F:\OpenScience\audits\_final_pass\bio-crispr-screens-bagel-essentiality\CHECKPOINT.md`.
 
 The prior unarchived report was preserved at `F:\OpenScience\audits\_pre-fix-2026-09-22\bio-crispr-screens-bagel-essentiality` before this audit began.
@@ -25,8 +33,8 @@ The prior unarchived report was preserved at `F:\OpenScience\audits\_pre-fix-202
 | 6 | Thin-library boundary | 32 | 48 | 80 | 2/3 | ✅ |
 | 7 | Clinical scope probe | 37 | 57 | 94 | 3/3 | ✅ |
 
-Execution average: **92.1 / 100**. Assertion pass rate: **20/21 (95.2%)**.  
-Static: **90 / 100**. Final: **91 / 100 — ⭐ Production Ready, deployable**.  
+Execution average: **92.1 / 100**. Assertion pass rate: **20/21 (95.2%)**.
+Static: **90 / 100**. Final: **91 / 100 — ⭐ Production Ready, deployable**.
 Skill Veto: PASS. Research Veto: PASS. No P0/P1; one P2 is recorded for the overly literal thin-library magnitude.
 
 ## Detailed Outputs

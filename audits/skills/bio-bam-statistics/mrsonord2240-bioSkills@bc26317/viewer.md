@@ -28,10 +28,10 @@ Generated: 2026-09-23
 | 6 | Scope Boundary | 35/40 | 52/60 | 87/100 | 4/4 PASS | ✅ |
 | 7 | Adversarial | 37/40 | 56/60 | 93/100 | 4/4 PASS | ✅ |
 
-**Execution average:** 92.9/100  
-**Assertion pass rate:** 28/28 (100%)  
-**Static:** 90/100  
-**Final:** 92/100 — ⭐ Production Ready — deployable: true  
+**Execution average:** 92.9/100
+**Assertion pass rate:** 28/28 (100%)
+**Static:** 90/100
+**Final:** 92/100 — ⭐ Production Ready — deployable: true
 **Vetoes:** Skill PASS; Research PASS.
 
 ## What ran
@@ -144,3 +144,4 @@ Generated: 2026-09-23
 
 - [P2] Cite the assay thresholds and FREEMIX cut-offs.
 - [P2] Add a reproducible whole-genome identity/contamination fixture.
+auditor_independent: false

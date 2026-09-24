@@ -7,9 +7,15 @@
 
 # Eval Viewer — bio-single-cell-cell-communication (Final Pass, Phase 2)
 
+## Canonical final summary
+
+**Final:** 94/100 — ⭐ Production Ready; deployable: true.
+
 Generated: 2026-09-23
 
 Exact source: mrsonord2240/bioSkills@49c6f6943243f8faebc9848429c877be240d10d6:single-cell/cell-communication
+
+Final-pass metadata: `auditor_independent: false`; `final pass: fixed and audited under one brief, see CHECKPOINT.md`.
 
 Worktree: F:\OpenScience\wt\single-cell-cell-communication on fix/single-cell-cell-communication.
 
@@ -30,7 +36,7 @@ Prior audit preserved intact: F:\OpenScience\audits\_pre-fix-20260923\bio-single
 | 5 | Resource sensitivity | 37 | 57 | 94 | 4/4 | yes |
 | 6 | Spatial scope boundary | 37 | 56 | 93 | 4/4 | yes, direct mode |
 | 7 | Mouse resource boundary | 37 | 57 | 94 | 4/4 | yes |
-| 8 | CellChat/NicheNet R branches | 33 | 50 | 83 | 4/5 | no — dependencies absent |
+| 8 | CellChat/NicheNet R branches | 33 | 50 | 83 | 4/5 | yes — parse/availability probe; dependencies absent |
 
 Execution average: 93.0/100. Assertion rate: 33/34 (97.1%).
 

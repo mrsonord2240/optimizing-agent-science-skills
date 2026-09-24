@@ -94,3 +94,15 @@ Static score: 93/100. Dynamic score: 95.4/100. Final score: **94/100**.
 **Grade: ⭐ Production Ready. Deployable: true.**
 
 P2 only: consider adding deterministic expected-result assertions to the teaching examples in a future change. No P0 or P1 remains.
+
+## Canonical final-pass metadata
+
+- Source: `mrsonord2240/bioSkills@6900ca0bc072c2cf19c33971043bca0bcb6dafa7:differential-expression/deseq2-basics`
+- `auditor_independent:false`
+- Note: `final pass: fixed and audited under one brief, see CHECKPOINT.md`
+
+## Canonical final-pass metadata
+
+- Source: `mrsonord2240/bioSkills@6900ca0bc072c2cf19c33971043bca0bcb6dafa7:differential-expression/deseq2-basics`
+- `auditor_independent: false`
+- Note: `final pass: fixed and audited under one brief, see CHECKPOINT.md`

@@ -7,8 +7,9 @@
 
 # Eval Viewer — bio-proteomics-protein-inference
 
-Generated: 2026-09-22  
-Source: `mrsonord2240/bioSkills@2e41419be0f5d52378d18ce545c162a611006a93:proteomics/protein-inference`  
+Generated: 2026-09-22
+Source: `mrsonord2240/bioSkills@2e41419be0f5d52378d18ce545c162a611006a93:proteomics/protein-inference`
+Final-pass metadata: `auditor_independent: false` — final pass: fixed and audited under one brief, see CHECKPOINT.md.
 Mode: D (hybrid scripts plus direct inference/scope responses) · Complexity: Complex · Inputs: 9
 
 ## Summary
@@ -48,8 +49,8 @@ Skill veto T1–T4: **PASS**. Research veto M1–M4: **PASS**. The clinical adve
 
 ## Final result
 
-Static: 93/100 × 0.4 = 37.2  
-Dynamic: 95.6/100 × 0.6 = 57.4  
+Static: 93/100 × 0.4 = 37.2
+Dynamic: 95.6/100 × 0.6 = 57.4
 **Final: 95/100 · ⭐ Production Ready · deployable: true · veto: none.**
 
 `meta.auditor_independent` is `false`; note: `final pass: fixed and audited under one brief, see CHECKPOINT.md`.

@@ -7,6 +7,14 @@
 
 # Eval Viewer — bio-alignment-filtering
 
+## Canonical final summary
+
+**Final:** 96/100 — ⭐ Production Ready; deployable: true.
+
+Source: `mrsonord2240/bioSkills@6c71f04151377fe0d412ece85d9dc52cdccdf747:alignment-files/alignment-filtering`
+Auditor independent: `false`
+Note: final pass: fixed and audited under one brief, see CHECKPOINT.md
+
 Generated: 2026-09-23
 
 Source: `mrsonord2240/bioSkills@6c71f04151377fe0d412ece85d9dc52cdccdf747:alignment-files/alignment-filtering`
@@ -16,18 +24,18 @@ Source: `mrsonord2240/bioSkills@6c71f04151377fe0d412ece85d9dc52cdccdf747:alignme
 | Input | Type | Basic | Specialized | Total | Assertions | Status |
 |---|---|---:|---:|---:|---:|---|
 | 1 | Canonical quality filter | 39/40 | 58/60 | 97 | 5/5 | ✅ |
-| 2 | Exhaustive FLAG masks | 39/40 | 59/60 | 98 | 14/14 | ✅ |
+| 2 | Exhaustive FLAG masks | 39/40 | 59/60 | 98 | 5/5 | ✅ |
 | 3 | Region/BED edge cases | 38/40 | 58/60 | 96 | 5/5 | ✅ |
-| 4 | Seeded subsampling | 38/40 | 57/60 | 95 | 2/2 | ✅ |
-| 5 | Synthetic MAPQ stress | 39/40 | 58/60 | 97 | 6/6 | ✅ |
+| 4 | Seeded subsampling | 38/40 | 57/60 | 95 | 3/3 | ✅ |
+| 5 | Synthetic MAPQ stress | 39/40 | 58/60 | 97 | 5/5 | ✅ |
 | 6 | Expressions/read groups | 39/40 | 58/60 | 97 | 5/5 | ✅ |
 | 7 | Duplicates + SV hand-off | 39/40 | 58/60 | 97 | 5/5 | ✅ |
-| 8 | Real Illumina MAPQ | 38/40 | 58/60 | 96 | 11/11 | ✅ |
-| 9 | PBMM2 long-read replay | 39/40 | 59/60 | 98 | 8/8 | ✅ |
-| 10 | New: invalid/zero-width input | 37/40 | 55/60 | 92 | 2/2 | ✅ |
-| 11 | New: larger --like target | 39/40 | 58/60 | 97 | 1/1 | ✅ |
+| 8 | Real Illumina MAPQ | 38/40 | 58/60 | 96 | 5/5 | ✅ |
+| 9 | PBMM2 long-read replay | 39/40 | 59/60 | 98 | 5/5 | ✅ |
+| 10 | New: invalid/zero-width input | 37/40 | 55/60 | 92 | 3/3 | ✅ |
+| 11 | New: larger --like target | 39/40 | 58/60 | 97 | 3/3 | ✅ |
 
-Execution average: **96.4/100**. Assertion pass rate: **48/48** (representative 3-5 assertions per input; the saved logs contain every completed check).
+Execution average: **96.4/100**. Scored assertion pass rate: **49/49** (the 3-5 representative assertions per input mirror the canonical JSON; retained logs document additional low-level checks).
 
 ## Evidence
 

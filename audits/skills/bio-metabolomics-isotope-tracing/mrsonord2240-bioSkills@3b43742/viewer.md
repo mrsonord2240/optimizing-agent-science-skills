@@ -7,6 +7,10 @@
 
 # Eval Viewer — bio-metabolomics-isotope-tracing
 
+## Canonical final summary
+
+**Final:** 95/100 — ⭐ Production Ready; deployable: true.
+
 Generated: 2026-09-23
 
 Source: mrsonord2240/bioSkills@3b437423563329fb137fa6fae8adb9563196fa13:metabolomics/isotope-tracing
@@ -119,4 +123,3 @@ Each input has four scored PASS assertions in the JSON report: completion/correc
 - Scripts, copied shipped example, and checked outputs: F:\OpenScience\audits\bio-metabolomics-isotope-tracing\run\finalpass2
 - Archived prior audit: F:\OpenScience\audits\_pre-fix-20260923\bio-metabolomics-isotope-tracing
 - Recommendations: none. No P0 or P1 findings remain.
-

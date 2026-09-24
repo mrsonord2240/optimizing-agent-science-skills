@@ -7,11 +7,15 @@
 
 # Eval Viewer — bio-proteomics-peptide-identification
 
+## Canonical final summary
+
+**Final:** 95/100 — ⭐ Production Ready; deployable: true.
+
 Generated: 2026-09-22 · `skill-auditor@1.0` · final-pass Phase 2
 
 Source: `mrsonord2240/bioSkills@0f447a7a628052aac81acecb85c3d52d442a974a:proteomics/peptide-identification`
 
-This is the final-pass exception: `auditor_independent: false` because the Skill was fixed and audited under one brief; see [CHECKPOINT.md](../_final_pass/bio-proteomics-peptide-identification/CHECKPOINT.md). The prior record was preserved at `F:\OpenScience\audits\_pre-fix-20260922\bio-proteomics-peptide-identification` before this run began.
+Final-pass metadata: `auditor_independent: false` — final pass: fixed and audited under one brief, see CHECKPOINT.md. The prior record was preserved at `F:\OpenScience\audits\_pre-fix-20260922\bio-proteomics-peptide-identification` before this run began.
 
 **Result: 95/100 · ⭐ Production Ready · deployable · no veto · 12/12 inputs executed · 46/46 assertions passed.**
 

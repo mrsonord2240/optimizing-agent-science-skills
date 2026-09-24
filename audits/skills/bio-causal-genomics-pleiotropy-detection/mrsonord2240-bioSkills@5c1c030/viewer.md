@@ -7,8 +7,12 @@
 
 # Eval Viewer — bio-causal-genomics-pleiotropy-detection
 
-Generated: 2026-09-23  
-Exact source: `mrsonord2240/bioSkills@5c1c030c4152f90b8a1457853c927e8568a710fd:causal-genomics/pleiotropy-detection`  
+## Canonical final summary
+
+**Final:** 94/100 — ⭐ Production Ready; deployable: true.
+
+Generated: 2026-09-23
+Exact source: `mrsonord2240/bioSkills@5c1c030c4152f90b8a1457853c927e8568a710fd:causal-genomics/pleiotropy-detection`
 Final-pass metadata: `auditor_independent: false` — final pass: fixed and audited under one brief, see CHECKPOINT.md.
 
 ## Verdict
@@ -60,3 +64,4 @@ The UHP/CHP split, explicit thresholded decision flow, practice boundary, report
 - **P2:** label the CAUSE demo's expected warning that 50,000 nuisance variants is below its preferred 100,000-variant scale.
 
 No P0 or P1 findings are open.
+auditor_independent: false

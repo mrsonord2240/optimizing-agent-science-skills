@@ -7,6 +7,10 @@
 
 # Eval Viewer — bio-crispr-screens-crispresso-editing
 
+## Canonical final summary
+
+**Final:** 93/100 — ⭐ Production Ready; deployable: true.
+
 Generated: 2026-09-23
 
 Source: `mrsonord2240/bioSkills@205c8574b66f30fb04cb2fdbd0464f6d37a70920:crispr-screens/crispresso-editing`

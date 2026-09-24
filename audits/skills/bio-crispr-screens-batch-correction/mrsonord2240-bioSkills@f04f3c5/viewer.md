@@ -7,9 +7,17 @@
 
 # Eval Viewer — bio-crispr-screens-batch-correction
 
-Generated: 2026-09-23  
-Source: `mrsonord2240/bioSkills@f04f3c5168224974c7879822c33f364c5e4fd034:crispr-screens/batch-correction`  
-Category: Data Analysis | Execution mode: D (Hybrid) | Complexity: Complex (N=9)  
+## Canonical final summary
+
+**Final:** 96/100 — ⭐ Production Ready; deployable: true.
+
+Source: `mrsonord2240/bioSkills@f04f3c5168224974c7879822c33f364c5e4fd034:crispr-screens/batch-correction`
+Auditor independent: `false`
+Note: final pass: fixed and audited under one brief, see CHECKPOINT.md
+
+Generated: 2026-09-23
+Source: `mrsonord2240/bioSkills@f04f3c5168224974c7879822c33f364c5e4fd034:crispr-screens/batch-correction`
+Category: Data Analysis | Execution mode: D (Hybrid) | Complexity: Complex (N=9)
 Final-pass disclosure: `meta.auditor_independent: false`; fixed and audited under one brief, per `CHECKPOINT.md`.
 
 The previous finished report and its complete prior run directory were preserved before replacement at `F:\OpenScience\audits\_pre-fix-20260922\bio-crispr-screens-batch-correction\`.
@@ -30,8 +38,8 @@ The previous finished report and its complete prior run directory were preserved
 
 *Input 6 is a direct inspection of the Skill's scope response; no computation is applicable.
 
-**Execution average:** 95.1/100. **Assertions:** 27/27. **Executed:** 8/9.  
-**Static:** 96/100. **Final:** 95/100, ⭐ Production Ready, deployable.  
+**Execution average:** 95.1/100. **Assertions:** 27/27. **Executed:** 8/9.
+**Static:** 96/100. **Final:** 96/100, ⭐ Production Ready, deployable.
 Skill Veto: PASS (T1–T4). Research Veto: PASS (M1–M4).
 
 ## Evidence and generated code

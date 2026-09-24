@@ -7,6 +7,10 @@
 
 # Eval Viewer - bio-microbiome-diversity-analysis
 
+## Canonical final summary
+
+**Final:** 97/100 — ⭐ Production Ready; deployable: true.
+
 Generated: 2026-09-23
 
 Source: mrsonord2240/bioSkills@69c0d367c211d04226456107fde34f4c1dbee672:microbiome/diversity-analysis
@@ -62,3 +66,15 @@ Static: 98/100. Dynamic: 95.8/100. Assertions: 33/33.
 - Fresh QIIME artifacts: run/final_new5_qiime_moving_pictures_r2/
 - Preserved preceding audit: F:/OpenScience/audits/_pre-fix-20260923/bio-microbiome-diversity-analysis/
 - Original pre-fix audit: F:/OpenScience/audits/_pre-fix-20260919/bio-microbiome-diversity-analysis/
+
+## Canonical final-pass metadata
+
+- Source: `mrsonord2240/bioSkills@69c0d367c211d04226456107fde34f4c1dbee672:microbiome/diversity-analysis`
+- `auditor_independent:false`
+- Note: `final pass: fixed and audited under one brief, see CHECKPOINT.md`
+
+## Canonical final-pass metadata
+
+- Source: `mrsonord2240/bioSkills@69c0d367c211d04226456107fde34f4c1dbee672:microbiome/diversity-analysis`
+- `auditor_independent: false`
+- Note: `final pass: fixed and audited under one brief, see CHECKPOINT.md`

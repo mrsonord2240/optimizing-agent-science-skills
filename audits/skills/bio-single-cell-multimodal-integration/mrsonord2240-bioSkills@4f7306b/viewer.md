@@ -7,8 +7,14 @@
 
 # Eval Viewer — bio-single-cell-multimodal-integration
 
+## Canonical final summary
+
+**Final:** 91/100 — ⭐ Production Ready; deployable: true.
+
 Generated: 2026-09-23
 Source: `mrsonord2240/bioSkills@4f7306b54e8c445d251d352bb85e01ced4c7a3b4:single-cell/multimodal-integration`
+
+Final-pass metadata: `auditor_independent: false`; `final pass: fixed and audited under one brief, see CHECKPOINT.md`.
 Mode: D · Data Analysis · Complex · 10 inputs
 
 ## Result: ⭐ Production Ready — 91/100

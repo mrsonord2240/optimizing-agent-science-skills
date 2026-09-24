@@ -7,6 +7,10 @@
 
 # Eval Viewer — bio-single-cell-trajectory-inference
 
+## Canonical final summary
+
+**Final:** 94/100 — ⭐ Production Ready; deployable: true.
+
 Generated: 2026-09-23
 
 Source: `mrsonord2240/bioSkills@4ce42c1553b0f2ae3e4c068a8d5f7e1566b5c2d1:single-cell/trajectory-inference`

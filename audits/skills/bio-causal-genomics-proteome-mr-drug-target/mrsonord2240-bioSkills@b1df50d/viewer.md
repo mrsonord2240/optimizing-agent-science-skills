@@ -7,6 +7,10 @@
 
 # Eval Viewer — bio-causal-genomics-proteome-mr-drug-target
 
+## Canonical final summary
+
+**Final:** 93/100 — ⭐ Production Ready; deployable: true.
+
 Generated: 2026-09-23
 
 Source: `mrsonord2240/bioSkills@b1df50d420e9a6bb2cd43f46adf2a0d94ff37288:causal-genomics/proteome-mr-drug-target`
@@ -92,3 +96,4 @@ All harnesses, logs, source snapshot, and synthetic inputs are under `run/` and 
 Static: 92 / 100 × 0.4 = 36.8. Dynamic: 93.9 / 100 × 0.6 = 56.3. **Final: 93 / 100 — Production Ready; deployable: true; veto override: false.**
 
 Open P1: add the zero-usable-outcomes guard to the curated-endpoint script. Open P2: preflight and communicate the JWT/VEP runtime prerequisites. The checkpoint's live OpenGWAS, 1000G EUR download, and VEP-cache items remain environment prerequisites, not claims of live verification.
+auditor_independent: false

@@ -7,6 +7,14 @@
 
 # Eval Viewer — bio-alignment-msa-parsing
 
+## Canonical final summary
+
+**Final:** 93/100 — ⭐ Production Ready; deployable: true.
+
+Source: `mrsonord2240/bioSkills@fea02def7356018ce7ada1c536e56397e195468f:alignment/msa-parsing`
+Auditor independent: `false`
+Note: final pass: fixed and audited under one brief, see CHECKPOINT.md
+
 Generated: 2026-09-22
 
 Source: `mrsonord2240/bioSkills@fea02def7356018ce7ada1c536e56397e195468f:alignment/msa-parsing`
@@ -27,7 +35,7 @@ Source: `mrsonord2240/bioSkills@fea02def7356018ce7ada1c536e56397e195468f:alignme
 | 10 — NEW: unpadded A3M-like insert states | Edge | 37 | 57 | 94 | 5/5 | ✅ |
 | 11 — NEW: weighted consensus and conservation | Variant A | 38 | 57 | 95 | 5/5 | ✅ |
 
-**Execution average:** 94.5/100  
+**Execution average:** 94.5/100
 **Assertion pass rate:** 55/55
 
 ## Executed evidence
@@ -189,3 +197,9 @@ Skill Veto: PASS (T1–T4). Research Veto: PASS (M1–M4).
 Static: 91/100 × 40% = 36.4. Dynamic: 94.5/100 × 60% = 56.7. **Final: 93/100 — Production Ready; deployable.**
 
 The previously live Phase-1 report was preserved at `F:\OpenScience\audits\_phase1-20260922\bio-alignment-msa-parsing`. Its old inline-fence extraction harness was also replayed under `run/regression_phase1/`; that stale harness expects pre-split inline helpers and pre-fix wording, so it is preserved as diagnostic history and is not Phase-2 scoring evidence.
+
+## Canonical final-pass metadata
+
+- Source: `mrsonord2240/bioSkills@fea02def7356018ce7ada1c536e56397e195468f:alignment/msa-parsing`
+- `auditor_independent: false`
+- Note: `final pass: fixed and audited under one brief, see CHECKPOINT.md`

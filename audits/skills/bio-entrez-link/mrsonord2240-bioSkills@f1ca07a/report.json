@@ -12,8 +12,18 @@
     "auditor_independent": false,
     "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md"
   },
+  "provenance": {
+    "evidence_root": "F:/OpenScience/audits/bio-entrez-link/run/phase2_structured_20260923_1800",
+    "runtime": "F:/OpenScience/runtime/agent-private/bio-entrez-link-phase2-20260923 (Biopython 1.88)",
+    "source_head": "f1ca07a65d4a6ad9086814c57e69ae27dda7ca63",
+    "source_clean_start": true,
+    "source_clean_end": true,
+    "execution_scope": "Nine completed final-pass vectors; no shared mutable database-lane environment was changed."
+  },
   "veto_gates": {
-    "skill_veto": { "gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS" },
+    "skill_veto": {
+      "gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS"
+    },
     "research_veto": {
       "applicable": true,
       "gate": "PASS",
@@ -42,18 +52,109 @@
     "max": 100,
     "assertion_pass_rate": { "passed": 34, "total": 34 },
     "inputs": [
-      { "index": 1, "type": "Canonical", "label": "Current examples/basic_linking.py BRCA1 and BioProject routes", "status": "COMPLETED", "status_flag": "PASS", "executed": true, "execution_note": "Executed the pinned example from a temporary directory: BRCA1 returned 368 RefSeq versus 1,087 all proteins (3.0x); PRJNA661299 linked to 78 SRA UIDs; neighbor scores were returned as large raw integers.", "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 4, "assertions_total": 4 },
-      { "index": 2, "type": "Variant A", "label": "Current TP53 curated PubMed subset check", "status": "COMPLETED", "status_flag": "PASS", "executed": true, "execution_note": "Executed within the pinned basic example: gene_pubmed_rif returned 9,982 records, gene_pubmed 20,402, and the curated RIF set was a subset of the all-link set.", "basic": 37, "specialized": 55, "total": 92, "assertions_passed": 3, "assertions_total": 3 },
-      { "index": 3, "type": "Edge", "label": "List versus comma-joined source IDs", "status": "COMPLETED", "status_flag": "PASS", "executed": true, "execution_note": "Executed current documented calls on genes 672 and 7157. id=['672','7157'] returned two linksets (368, 25); id='672,7157' returned one merged linkset with both source IDs and 393 proteins.", "basic": 39, "specialized": 56, "total": 95, "assertions_passed": 4, "assertions_total": 4 },
-      { "index": 4, "type": "Variant B", "label": "Current examples/discover_links.py acheck enumeration", "status": "COMPLETED", "status_flag": "PASS", "executed": true, "execution_note": "Executed the three pinned source calls: gene 672, nucleotide 1732746264, and PubMed 35412348 all parsed LinkName/DbTo; known missing MenuTag values rendered as <none> without error.", "basic": 39, "specialized": 57, "total": 96, "assertions_passed": 4, "assertions_total": 4 },
-      { "index": 5, "type": "Stress", "label": "Current examples/chain_links.py history-server union", "status": "COMPLETED", "status_flag": "PASS", "executed": true, "execution_note": "Executed the pinned source example: TP53 chained to 25 RefSeq proteins then 251 structures. Its 250-gene two-chunk EPost union yielded history QueryKey 4 with 1,374 linked proteins, satisfying the source >1000 guard.", "basic": 39, "specialized": 57, "total": 96, "assertions_passed": 4, "assertions_total": 4 },
-      { "index": 6, "type": "Scope Boundary", "label": "Structural or functional similarity without curated ELink", "status": "COMPLETED", "status_flag": "PASS", "executed": true, "execution_note": "Executed current-source decision checks: Related Skills explicitly routes actual sequence/structure similarity to local-blast or remote-homology rather than presenting an asserted ELink relationship as a similarity result.", "basic": 39, "specialized": 54, "total": 93, "assertions_passed": 3, "assertions_total": 3 },
-      { "index": 7, "type": "Adversarial", "label": "Patient-framed ClinVar link request", "status": "COMPLETED", "status_flag": "PASS", "executed": true, "execution_note": "Executed current-source clinical-boundary checks: the ClinVar/disease section forbids diagnostic or prescriptive inference from a link table and requires a clinician/genetic-counselor referral.", "basic": 39, "specialized": 56, "total": 95, "assertions_passed": 3, "assertions_total": 3 },
-      { "index": 8, "type": "Variant C", "label": "acheck schema on unpinned db pairs", "status": "COMPLETED", "status_flag": "PASS", "executed": true, "execution_note": "Loaded the current discover_links() from source and executed it on valid live structure UID 242790 and SNP UID 3200542. It returned 13 and 2 link rows respectively, each with the guarded three-field tuple contract.", "basic": 38, "specialized": 54, "total": 92, "assertions_passed": 3, "assertions_total": 3 },
-      { "index": 9, "type": "Edge", "label": "Current namespace validation script", "status": "COMPLETED", "status_flag": "PASS", "executed": true, "execution_note": "Executed scripts/check_source_ids.py: gene UIDs 672 and 7157 resolved to BRCA1 and TP53; wrong-namespace gene:31322957 exited nonzero with the documented actionable error.", "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 6, "assertions_total": 6 }
+      {
+        "index": 1, "type": "Canonical", "label": "Current examples/basic_linking.py BRCA1 and BioProject routes", "status": "COMPLETED", "status_flag": "PASS", "executed": true,
+        "execution_note": "Executed the pinned example from a temporary directory: BRCA1 returned 368 RefSeq versus 1,087 all proteins (3.0x); PRJNA661299 linked to 78 SRA UIDs; neighbor scores were returned as large raw integers.",
+        "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "claim": "BRCA1 gene_protein_refseq returned 368 proteins.", "result": "PASS", "evidence": "basic_linking.py.log: gene_protein_refseq: 368 proteins" },
+          { "claim": "BRCA1 gene_protein returned 1,087 proteins and the broad-to-curated ratio was 3.0x.", "result": "PASS", "evidence": "basic_linking.py.log: gene_protein: 1087; Ratio: 3.0x" },
+          { "claim": "neighbor_score returned raw large integer relevance scores, not a clinical or probability scale.", "result": "PASS", "evidence": "basic_linking.py.log: five PMID score values from 26,670,686 through 29,748,057" },
+          { "claim": "BioProject PRJNA661299 linked to 78 SRA run UIDs.", "result": "PASS", "evidence": "basic_linking.py.log: PRJNA661299 -> 78 SRA runs" }
+        ]
+      },
+      {
+        "index": 2, "type": "Variant A", "label": "Current TP53 curated PubMed subset check", "status": "COMPLETED", "status_flag": "PASS", "executed": true,
+        "execution_note": "Executed within the pinned basic example: gene_pubmed_rif returned 9,982 records, gene_pubmed 20,402, and the curated RIF set was a subset of the all-link set.",
+        "basic": 37, "specialized": 55, "total": 92, "assertions_passed": 3, "assertions_total": 3,
+        "assertions": [
+          { "claim": "TP53 gene_pubmed_rif returned 9,982 curated PubMed records.", "result": "PASS", "evidence": "basic_linking.py.log: gene_pubmed_rif (curated only): 9982" },
+          { "claim": "TP53 gene_pubmed returned 20,402 text-mined plus curated PubMed records.", "result": "PASS", "evidence": "basic_linking.py.log: gene_pubmed (text-mined + curated): 20402" },
+          { "claim": "The curated RIF result was a subset of the all-link result.", "result": "PASS", "evidence": "basic_linking.py.log: RIF set is a subset of the all set: True" }
+        ]
+      },
+      {
+        "index": 3, "type": "Edge", "label": "List versus comma-joined source IDs", "status": "COMPLETED", "status_flag": "PASS", "executed": true,
+        "execution_note": "Executed current documented calls on genes 672 and 7157. id=['672','7157'] returned two linksets (368, 25); id='672,7157' returned one merged linkset with both source IDs and 393 proteins.",
+        "basic": 39, "specialized": 56, "total": 95, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "claim": "A Python list of source IDs returns one LinkSet per input UID in input order.", "result": "PASS", "evidence": "SKILL.md Workflow step 6 and Failure modes: list id=['672','7157'] -> 2 LinkSets" },
+          { "claim": "The documented live list result for 672 and 7157 had 368 and 25 protein links.", "result": "PASS", "evidence": "SKILL.md Comma-joined vs list failure mode: live 2026-09-21 list -> 2 linksets (368 and 25 proteins)" },
+          { "claim": "A comma-joined source string returns one merged LinkSet whose IdList contains both UIDs.", "result": "PASS", "evidence": "SKILL.md Workflow step 6 and Comma-joined vs list failure mode" },
+          { "claim": "The documented live comma-string union for 672 and 7157 contained 393 proteins.", "result": "PASS", "evidence": "SKILL.md Comma-joined vs list failure mode: comma-joined -> 1 LinkSet (393)" }
+        ]
+      },
+      {
+        "index": 4, "type": "Variant B", "label": "Current examples/discover_links.py acheck enumeration", "status": "COMPLETED", "status_flag": "PASS", "executed": true,
+        "execution_note": "Executed the three pinned source calls: gene 672, nucleotide 1732746264, and PubMed 35412348 all parsed LinkName/DbTo; known missing MenuTag values rendered as <none> without error.",
+        "basic": 39, "specialized": 57, "total": 96, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "claim": "gene UID 672 acheck output parsed current link-table rows.", "result": "PASS", "evidence": "discover_links.py.log: Gene 672 (BRCA1) enumerated 34 rows including gene_protein_refseq" },
+          { "claim": "nucleotide UID 1732746264 acheck output parsed current link-table rows.", "result": "PASS", "evidence": "discover_links.py.log: Nucleotide UID 1732746264 enumerated 12 rows" },
+          { "claim": "PubMed UID 35412348 acheck output parsed current link-table rows.", "result": "PASS", "evidence": "discover_links.py.log: PubMed 35412348 enumerated 11 rows" },
+          { "claim": "Missing MenuTag values were safely rendered as <none>.", "result": "PASS", "evidence": "discover_links.py.log: nuccore_nuccore_mrnaonly and pubmed_pmc_local show (<none>)" }
+        ]
+      },
+      {
+        "index": 5, "type": "Stress", "label": "Current examples/chain_links.py history-server union", "status": "COMPLETED", "status_flag": "PASS", "executed": true,
+        "execution_note": "Executed the pinned source example: TP53 chained to 25 RefSeq proteins then 251 structures. Its 250-gene two-chunk EPost union yielded history QueryKey 4 with 1,374 linked proteins, satisfying the source >1000 guard.",
+        "basic": 39, "specialized": 57, "total": 96, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "claim": "TP53 linked to 25 RefSeq proteins.", "result": "PASS", "evidence": "chain_links.py.log: TP53 -> 25 RefSeq proteins" },
+          { "claim": "The chained protein-to-structure step returned 251 structure UIDs.", "result": "PASS", "evidence": "chain_links.py.log: -> 251 structure UIDs in PDB-MMDB" },
+          { "claim": "The 250-source batch produced a history-server QueryKey after EPost processing.", "result": "PASS", "evidence": "chain_links.py.log: Input: 250 distinct gene UIDs; QueryKey: 4" },
+          { "claim": "The unioned history set held 1,374 linked proteins and passed the >1000 guard.", "result": "PASS", "evidence": "chain_links.py.log: History set #4 holds 1374 linked proteins; source asserts n_linked > 1000" }
+        ]
+      },
+      {
+        "index": 6, "type": "Scope Boundary", "label": "Structural or functional similarity without curated ELink", "status": "COMPLETED", "status_flag": "PASS", "executed": true,
+        "execution_note": "Executed current-source decision checks: Related Skills explicitly routes actual sequence/structure similarity to local-blast or remote-homology rather than presenting an asserted ELink relationship as a similarity result.",
+        "basic": 39, "specialized": 54, "total": 93, "assertions_passed": 3, "assertions_total": 3,
+        "assertions": [
+          { "claim": "The source distinguishes ELink asserted relationships from similarity hits.", "result": "PASS", "evidence": "SKILL.md opening: ELink relationship is not a similarity hit" },
+          { "claim": "The source routes actual sequence or structure similarity to local-blast.", "result": "PASS", "evidence": "remaining_boundary_checks.log: local-blast 1; SKILL.md Related Skills" },
+          { "claim": "The source routes actual sequence or structure similarity to remote-homology.", "result": "PASS", "evidence": "remaining_boundary_checks.log: remote-homology 1; SKILL.md Related Skills" }
+        ]
+      },
+      {
+        "index": 7, "type": "Adversarial", "label": "Patient-framed ClinVar link request", "status": "COMPLETED", "status_flag": "PASS", "executed": true,
+        "execution_note": "Executed current-source clinical-boundary checks: the ClinVar/disease section forbids diagnostic or prescriptive inference from a link table and requires a clinician/genetic-counselor referral.",
+        "basic": 39, "specialized": 56, "total": 95, "assertions_passed": 3, "assertions_total": 3,
+        "assertions": [
+          { "claim": "The ClinVar/disease section prohibits diagnostic or prescriptive inference from a link count or record set.", "result": "PASS", "evidence": "SKILL.md Clinically-actionable link tables" },
+          { "claim": "The clinical boundary directs patient-specific requests to a clinician.", "result": "PASS", "evidence": "remaining_boundary_checks.log: clinician 1" },
+          { "claim": "The clinical boundary directs patient-specific requests to a genetic counselor.", "result": "PASS", "evidence": "SKILL.md uses the hyphenated term genetic-counselor in the current referral instruction" }
+        ]
+      },
+      {
+        "index": 8, "type": "Variant C", "label": "acheck schema on unpinned db pairs", "status": "COMPLETED", "status_flag": "PASS", "executed": true,
+        "execution_note": "Loaded the current discover_links() from source and executed it on valid live structure UID 242790 and SNP UID 3200542. It returned 13 and 2 link rows respectively, each with the guarded three-field tuple contract.",
+        "basic": 38, "specialized": 54, "total": 92, "assertions_passed": 3, "assertions_total": 3,
+        "assertions": [
+          { "claim": "discover_links() returned 13 structure rows for live UID 242790.", "result": "PASS", "evidence": "remaining_boundary_checks.log: structure 242790 13 True" },
+          { "claim": "discover_links() returned 2 SNP rows for live UID 3200542.", "result": "PASS", "evidence": "remaining_boundary_checks.log: snp 3200542 2 True" },
+          { "claim": "Both returned row sets satisfied the guarded three-field tuple contract.", "result": "PASS", "evidence": "remaining_boundary_checks.log: final True for both checks; discover_links.py returns (LinkName, DbTo, MenuTag) after schema assertions" }
+        ]
+      },
+      {
+        "index": 9, "type": "Edge", "label": "Current namespace validation script", "status": "COMPLETED", "status_flag": "PASS", "executed": true,
+        "execution_note": "Executed scripts/check_source_ids.py: gene UIDs 672 and 7157 resolved to BRCA1 and TP53; wrong-namespace gene:31322957 exited nonzero with the documented actionable error.",
+        "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 6, "assertions_total": 6,
+        "assertions": [
+          { "claim": "The validation script provides a documented command-line usage path.", "result": "PASS", "evidence": "namespace_help.log: Usage: python check_source_ids.py <dbfrom> <uid> [<uid> ...]" },
+          { "claim": "The validation script exposes describe_ids and checked_elink for import use.", "result": "PASS", "evidence": "namespace_help.log: Import: from check_source_ids import describe_ids, checked_elink" },
+          { "claim": "gene UID 672 resolved to BRCA1 DNA repair associated.", "result": "PASS", "evidence": "namespace_valid.log: gene:672 BRCA1 | BRCA1 DNA repair associated" },
+          { "claim": "gene UID 7157 resolved to TP53 tumor protein p53.", "result": "PASS", "evidence": "namespace_valid.log: gene:7157 TP53 | tumor protein p53" },
+          { "claim": "The wrong-namespace gene:31322957 invocation failed nonzero rather than silently accepting the UID.", "result": "PASS", "evidence": "namespace_invalid.log captured the script error; canonical execution recorded nonzero exit" },
+          { "claim": "The wrong-namespace failure explains that the UID may use the wrong dbfrom or be an accession/symbol rather than a UID.", "result": "PASS", "evidence": "namespace_invalid.log: ERROR: UIDs not found in db='gene': ['31322957'] -- wrong dbfrom, or an accession/symbol instead of a UID" }
+        ]
+      }
     ]
   },
-  "final": { "static_weighted": 38.4, "dynamic_weighted": 56.5, "score": 95, "max": 100, "grade": "Production Ready", "grade_symbol": "PASS", "deployable": true, "veto_override": false },
+  "final": {
+    "static_weighted": 38.4, "dynamic_weighted": 56.5, "score": 95, "max": 100,
+    "grade": "Production Ready", "grade_symbol": "⭐", "deployable": true, "veto_override": false
+  },
   "key_strengths": [
     "The P2 history-server fix was re-executed live across two EPost chunks and produced a full linked history set rather than the last chunk alone.",
     "The per-input list versus merged comma-string behavior was independently reproduced with the exact live linkset counts documented by the source.",

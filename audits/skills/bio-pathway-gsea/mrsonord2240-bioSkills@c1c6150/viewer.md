@@ -7,9 +7,15 @@
 
 # Eval Viewer — bio-pathway-gsea
 
+## Canonical final summary
+
+**Final:** 93/100 — ⭐ Production Ready; deployable: true.
+
 Generated: 2026-09-23
 
 Source: `mrsonord2240/bioSkills@c1c6150cba5570abc754866e90d09ee536917b07:pathway-analysis/gsea`
+
+Final-pass metadata: `auditor_independent: false`; `final pass: fixed and audited under one brief, see CHECKPOINT.md`.
 
 ## Summary
 

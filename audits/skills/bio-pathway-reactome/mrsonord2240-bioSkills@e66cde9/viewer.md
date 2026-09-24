@@ -7,7 +7,13 @@
 
 # bio-pathway-reactome final-pass audit
 
-**89/100 ⭐ — Production Ready.** Exact source: `e66cde984eb21bf2a9767ea6616c96aafeba3c04`.
+## Canonical final summary
+
+**Final:** 89/100 — ⭐ Production Ready; deployable: true.
+
+**89/100 ⭐ — Production Ready.** Exact source: `mrsonord2240/bioSkills@e66cde984eb21bf2a9767ea6616c96aafeba3c04:pathway-analysis/reactome-pathways`.
+
+Final-pass metadata: `auditor_independent: false`; `final pass: fixed and audited under one brief, see CHECKPOINT.md`.
 
 This final report scores six retained private-Linux inputs under `run/phase2_e66cde9_linux_20260923/`: package load; exact ORA (20 rows, CSV); exact bounded GSEA (54 rows, planted pathway rank 1, CSV); SYMBOL/URL edge behavior; measured-universe result (193 measured versus 11146 default denominator); and unsupported-organism boundary. All six runners exited 0, with 10/10 retained assertions. `input07_invalid_organism.R` is retained as an unscored corroborating control to avoid duplicating the scored organism boundary.
 

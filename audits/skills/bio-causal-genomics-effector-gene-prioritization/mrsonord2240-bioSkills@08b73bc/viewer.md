@@ -7,8 +7,16 @@
 
 # Eval Viewer — bio-causal-genomics-effector-gene-prioritization
 
-Generated: 2026-09-23  
-Pinned source: `mrsonord2240/bioSkills@08b73bcd2fbccf8b3b667d3805881c98d3b4e6b5:causal-genomics/effector-gene-prioritization`  
+## Canonical final summary
+
+**Final:** 94/100 — ⭐ Production Ready; deployable: true.
+
+Source: `mrsonord2240/bioSkills@08b73bcd2fbccf8b3b667d3805881c98d3b4e6b5:causal-genomics/effector-gene-prioritization`
+Auditor independent: `false`
+Note: final pass: fixed and audited under one brief, see CHECKPOINT.md
+
+Generated: 2026-09-23
+Pinned source: `mrsonord2240/bioSkills@08b73bcd2fbccf8b3b667d3805881c98d3b4e6b5:causal-genomics/effector-gene-prioritization`
 Final-pass metadata: `auditor_independent: false` — final pass: fixed and audited under one brief, see `CHECKPOINT.md`.
 
 ## Outcome

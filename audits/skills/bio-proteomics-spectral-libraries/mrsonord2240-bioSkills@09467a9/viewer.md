@@ -14,7 +14,7 @@ Generated: 2026-09-23
 - Source audited: `mrsonord2240/bioSkills@09467a99deaa8ac30799074803a8b87af6d60858:proteomics/spectral-libraries`
 - Branch/worktree: `fix/proteomics-spectral-libraries`, `F:\OpenScience\wt\proteomics-spectral-libraries`
 - Source state: verified clean before and after the audit.
-- Audit type: Phase 2 final pass. `auditor_independent: false` because the final-pass brief requires the designated exception; see `F:\OpenScience\audits\_final_pass\bio-proteomics-spectral-libraries\CHECKPOINT.md`.
+- Audit type: Phase 2 final pass. `auditor_independent: false` — final pass: fixed and audited under one brief, see CHECKPOINT.md.
 - Prior audit preserved unchanged at `F:\OpenScience\audits\_pre-fix-20260923\bio-proteomics-spectral-libraries\` (SHA256 of the archived JSON matched the original before replacement).
 
 ## Summary table

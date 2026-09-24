@@ -7,8 +7,8 @@
 
 # Eval Viewer — bio-proteomics-proteomics-qc
 
-Generated: 2026-09-23  
-Source: `mrsonord2240/bioSkills@1f8616e8d39c2f14c16a01a4330bd0d94762b762:proteomics/proteomics-qc`  
+Generated: 2026-09-23
+Source: `mrsonord2240/bioSkills@1f8616e8d39c2f14c16a01a4330bd0d94762b762:proteomics/proteomics-qc`
 Final-pass metadata: `auditor_independent: false` — `final pass: fixed and audited under one brief, see CHECKPOINT.md`
 
 ## Decision
@@ -68,4 +68,3 @@ Key printed evidence:
 - Fresh scripts and logs: [`run/phase2_final_20260923`](run/phase2_final_20260923/)
 - Machine-readable report: [`eval_report_bio-proteomics-proteomics-qc_result.json`](eval_report_bio-proteomics-proteomics-qc_result.json)
 - Preserved September 15 audit: `F:/OpenScience/audits/_pre-fix-20260923/bio-proteomics-proteomics-qc/`
-

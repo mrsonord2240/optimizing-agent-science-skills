@@ -7,9 +7,15 @@
 
 # Eval Viewer — bio-pathway-kegg-pathways
 
+## Canonical final summary
+
+**Final:** 90/100 — ⭐ Production Ready; deployable: true.
+
 Generated: 2026-09-23
 
 Source: `mrsonord2240/bioSkills@2befc0bb138ea3b0a035402c78af1c62b8955522:pathway-analysis/kegg-pathways`
+
+Final-pass metadata: `auditor_independent: false`; `final pass: fixed and audited under one brief, see CHECKPOINT.md`.
 
 ## Summary
 

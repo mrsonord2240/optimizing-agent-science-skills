@@ -7,8 +7,8 @@
 
 # Eval Viewer — bio-crispr-screens-screen-qc
 
-Generated: 2026-09-23  
-Source: `mrsonord2240/bioSkills@ea262e30ef772128ccaf058698f972bb98f17e27:crispr-screens/screen-qc`  
+Generated: 2026-09-23
+Source: `mrsonord2240/bioSkills@ea262e30ef772128ccaf058698f972bb98f17e27:crispr-screens/screen-qc`
 Final-pass audit exception: `auditor_independent: false` — `final pass: fixed and audited under one brief, see CHECKPOINT.md`
 
 ## Summary
@@ -25,8 +25,8 @@ Final-pass audit exception: `auditor_independent: false` — `final pass: fixed 
 | 8 | Variant B | 39 | 57 | 96 | 4/4 | ✅ |
 | 9 | Adversarial | 39 | 57 | 96 | 6/6 | ✅ |
 
-Execution average: **95.1 / 100**. Assertion pass rate: **33/33**.  
-Layer averages: Basic **38.8/40**, specialized **56.3/60**.  
+Execution average: **95.1 / 100**. Assertion pass rate: **33/33**.
+Layer averages: Basic **38.8/40**, specialized **56.3/60**.
 Static: **87/100**. Final: **92/100 — ⭐ Production Ready; deployable true**. Both veto gates pass.
 
 Every command and generated response is retained under `run/`; the command orchestration is

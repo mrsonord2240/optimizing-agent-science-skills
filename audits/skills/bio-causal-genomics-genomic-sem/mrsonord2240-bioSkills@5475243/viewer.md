@@ -7,6 +7,14 @@
 
 # Eval Viewer — bio-causal-genomics-genomic-sem
 
+## Canonical final summary
+
+**Final:** 94/100 — ⭐ Production Ready; deployable: true.
+
+Source: `mrsonord2240/bioSkills@547524301ce5ee3cedf6cae70d5204e9c0d013f2:causal-genomics/genomic-sem`
+Auditor independent: `false`
+Note: final pass: fixed and audited under one brief, see CHECKPOINT.md
+
 Generated: 2026-09-23. Source: `mrsonord2240/bioSkills@547524301ce5ee3cedf6cae70d5204e9c0d013f2:causal-genomics/genomic-sem` on `fix/causal-genomics-genomic-sem`.
 
 This is the final-pass exception: `auditor_independent: false`; see `F:\OpenScience\audits\_final_pass\bio-causal-genomics-genomic-sem\CHECKPOINT.md`.

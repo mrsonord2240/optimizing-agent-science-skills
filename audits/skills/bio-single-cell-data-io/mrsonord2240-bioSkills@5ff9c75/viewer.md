@@ -7,11 +7,17 @@
 
 # Eval Viewer — bio-single-cell-data-io
 
-Generated: 2026-09-23  
-Phase: Final pass, Phase 2 only  
-Source audited: `mrsonord2240/bioSkills@5ff9c75dc947fa7c7292315ae64198769d067faf:single-cell/data-io`  
-Environment: `single-cell-transcriptomics-analyst`  
+## Canonical final summary
+
+**Final:** 94/100 — ⭐ Production Ready; deployable: true.
+
+Generated: 2026-09-23
+Phase: Final pass, Phase 2 only
+Source audited: `mrsonord2240/bioSkills@5ff9c75dc947fa7c7292315ae64198769d067faf:single-cell/data-io`
+Environment: `single-cell-transcriptomics-analyst`
 Auditor independent: **false** — final pass: fixed and audited under one brief, see CHECKPOINT.md.
+
+Final-pass metadata: `auditor_independent: false`; `final pass: fixed and audited under one brief, see CHECKPOINT.md`.
 
 ## Result
 

@@ -7,8 +7,8 @@
 
 # Eval Viewer — bio-causal-genomics-mediation-analysis
 
-Generated: 2026-09-23  
-Source: `mrsonord2240/bioSkills@e46d106e931f1db5ed963fa29af3f8a22402915d:causal-genomics/mediation-analysis`  
+Generated: 2026-09-23
+Source: `mrsonord2240/bioSkills@e46d106e931f1db5ed963fa29af3f8a22402915d:causal-genomics/mediation-analysis`
 Audit: final pass, Phase 2. `auditor_independent: false` — final pass: fixed and audited under one brief, see CHECKPOINT.md.
 
 The prior 2026-09-17 audit has been preserved at `F:/OpenScience/audits/_pre-fix-20260917c/bio-causal-genomics-mediation-analysis/`.
@@ -64,3 +64,4 @@ Every input passed three assertions: its requested method or boundary was addres
 ## Findings
 
 No Skill-source P0 or P1 is open. One P2 is external to the Skill: the supplied R stack exits 139 after minimal `mediation`, `TwoSampleMR`, or `HIMA` loads. Because the analytical values/files are correct and the probe fails without any Skill code, this is recorded for the environment owner rather than scored as a Skill code defect.
+auditor_independent: false

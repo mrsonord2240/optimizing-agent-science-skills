@@ -7,11 +7,16 @@
 
 # Eval Viewer — bio-sashimi-plots
 
+## Canonical final summary
+
+**Final:** 92/100 — ⭐ Production Ready; deployable: true.
+
 Generated: 2026-09-23 · rendered from `report.json` by `tools/render_viewer.py`.
 
 > This viewer is **generated from the audit report**, not written by the auditor. It restates the report's own recorded scores, notes and assertions and adds nothing to them. Where a hand-written viewer would argue from the runs, this one points at the scripts in [scripts/](scripts/) instead.
 
 Source: `mrsonord2240/bioSkills@0663f11fbc8026f2134cdcc27c57ad80996c8447:alternative-splicing/sashimi-plots`
+Final-pass metadata: `auditor_independent: false` — final pass: fixed and audited under one brief, see CHECKPOINT.md.
 Category: Data Analysis · Execution mode: D · Complexity: Complex · N = 9 · Executed: None
 
 ## What the Skill claims to do
@@ -34,7 +39,7 @@ Creates RNA-seq sashimi plots with ggsashimi, rmats2sashimiplot, leafviz, Jutils
 
 **Execution Average: 94.0 / 100** · **Assertion Pass Rate: 21/21**
 
-**Static: 90/100** · Static weighted 36.0 + dynamic weighted 56.4 = **92/100** → STAR Production Ready, deployable.
+**Static: 90/100** · Static weighted 36.0 + dynamic weighted 56.4 = **92/100** → ⭐ Production Ready, deployable.
 
 ---
 
@@ -185,12 +190,12 @@ Creates RNA-seq sashimi plots with ggsashimi, rmats2sashimiplot, leafviz, Jutils
 
 - Observed in inputs: —
 - Problem: The Skill itself has no small test fixture bundle.
-- Root cause: 
+- Root cause:
 - Fix: Add optional tiny fixtures and a smoke-test recipe so compatibility can be checked without audit infrastructure.
 
 ### P2 — Clarify recipe state
 
 - Observed in inputs: —
 - Problem: Some later examples presume files created by earlier blocks or a tool on PATH.
-- Root cause: 
+- Root cause:
 - Fix: State dependencies adjacent to every runnable block.

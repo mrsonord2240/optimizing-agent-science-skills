@@ -7,6 +7,10 @@
 
 # Eval Viewer — bio-crispr-screens-library-design
 
+Source: `mrsonord2240/bioSkills@f7185c846de4c345fb2588fad1a43cebcd955b25:crispr-screens/library-design`
+Auditor independent: `false`
+Note: final pass: fixed and audited under one brief, see CHECKPOINT.md
+
 Generated: 2026-09-23
 
 Source: `mrsonord2240/bioSkills@f7185c846de4c345fb2588fad1a43cebcd955b25:crispr-screens/library-design`

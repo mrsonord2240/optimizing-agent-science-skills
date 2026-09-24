@@ -7,11 +7,17 @@
 
 # Eval Viewer — bio-proteomics-quantification
 
+## Canonical final summary
+
+**Final:** 94/100 — ⭐ Production Ready; deployable: true.
+
 Generated: 2026-09-23 · corrective final-pass Phase 2
 
 Source: `mrsonord2240/bioSkills@fb1efc10a979717f1fc66a48a6a8b12e95aa6401:proteomics/quantification`
 
-**94/100 · ⭐ Production Ready · deployable.** All executable central routes completed with exit 0 in the approved private compatible R 4.4.3 prefix. This final-pass exception deliberately sets `auditor_independent: false`; see `_final_pass/bio-proteomics-quantification/CHECKPOINT.md`.
+Final-pass metadata: `auditor_independent: false` — final pass: fixed and audited under one brief, see CHECKPOINT.md.
+
+**94/100 · ⭐ Production Ready · deployable.** All executable central routes completed with exit 0 in the approved private compatible R 4.4.3 prefix.
 
 The superseded rejected report is preserved at `F:\OpenScience\audits\_pre-fix-20260923\bio-proteomics-quantification\`.
 

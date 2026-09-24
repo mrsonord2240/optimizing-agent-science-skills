@@ -7,8 +7,8 @@
 
 # Eval Viewer — bio-workflows-metabolomics-pipeline
 
-Generated: 2026-09-23  
-Source: `mrsonord2240/bioSkills@ac3fdd24777613868e4328191dc274ed4c5ac162:workflows/metabolomics-pipeline`  
+Generated: 2026-09-23
+Source: `mrsonord2240/bioSkills@ac3fdd24777613868e4328191dc274ed4c5ac162:workflows/metabolomics-pipeline`
 Final-pass metadata: `auditor_independent: false` — `final pass: fixed and audited under one brief, see CHECKPOINT.md`
 
 ## Summary
@@ -27,9 +27,9 @@ Final-pass metadata: `auditor_independent: false` — `final pass: fixed and aud
 | 10 | Canonical | 30 | 48 | 78 | 2/4 | ✅ |
 | 11 | Stress | 37 | 57 | 94 | 4/4 | ✅ |
 
-**Execution average:** 92.9 / 100  
-**Assertion pass rate:** 46 / 48  
-**Layer 1 average:** 36.8 / 40  
+**Execution average:** 92.9 / 100
+**Assertion pass rate:** 46 / 48
+**Layer 1 average:** 36.8 / 40
 **Layer 2 average:** 56.1 / 60
 
 ## Veto gates
@@ -125,6 +125,6 @@ The implicit default backend launched 22 RSOCK workers without useful output. Le
 
 ## Final score
 
-Static: 88 × 0.4 = 35.2  
-Dynamic: 92.9 × 0.6 = 55.7  
+Static: 88 × 0.4 = 35.2
+Dynamic: 92.9 × 0.6 = 55.7
 **Final: 91 / 100 — ⭐ Production Ready — deployable: true**

@@ -21,5 +21,5 @@ assert avg == r['dynamic_score']['execution_avg'] == 96.4
 assert r['final']['static_weighted'] == round(95 * .4, 1)
 assert r['final']['dynamic_weighted'] == round(96.4 * .6, 1)
 assert r['final']['score'] == 96 and r['final']['grade'] == 'Production Ready' and r['final']['deployable'] is True
-assert r['dynamic_score']['assertion_pass_rate'] == {'passed': 48, 'total': 48}
+assert r['dynamic_score']['assertion_pass_rate'] == {'passed': 49, 'total': 49}
 print('PASS report JSON schema-relevant fields, arithmetic, per-input assertions, source, and final-pass metadata')

@@ -7,15 +7,19 @@
 
 # Eval Viewer — bio-causal-genomics-colocalization-analysis
 
-Generated: 2026-09-22  
-Source: `mrsonord2240/bioSkills@dd57ffa39c21e80666c0ed1e8ece61a76cd8a76d:causal-genomics/colocalization-analysis`  
+Source: `mrsonord2240/bioSkills@dd57ffa39c21e80666c0ed1e8ece61a76cd8a76d:causal-genomics/colocalization-analysis`
+Auditor independent: `false` (`auditor_independent: false`)
+Note: final pass: fixed and audited under one brief, see CHECKPOINT.md
+
+Generated: 2026-09-22
+Source: `mrsonord2240/bioSkills@dd57ffa39c21e80666c0ed1e8ece61a76cd8a76d:causal-genomics/colocalization-analysis`
 Mode: D (Hybrid) | Category: Data Analysis | Complexity: Complex
 
 This is a directed final-pass re-audit. `meta.auditor_independent` is deliberately `false`: final pass, as directed; see `F:\OpenScience\audits\_final_pass\bio-causal-genomics-colocalization-analysis\CHECKPOINT.md`. The rejected `9266ded` report and complete evidence are preserved at [`_pre-fix-20260922/.../rejected-9266ded-artifacts`](F:/OpenScience/audits/_pre-fix-20260922/bio-causal-genomics-colocalization-analysis/rejected-9266ded-artifacts/).
 
 ## Result
 
-**PASS — 98/100, Production Ready, deployable: true.** All vetoes pass. The former M3/P0 is closed: `scripts/coloc_susie.R` independently checks eQTL z-scores against the supplied LD matrix before SuSiE/coloc, and rejects mismatches instead of emitting PP.H4.
+**⭐ Production Ready — 98/100, deployable: true.** All vetoes pass. The former M3/P0 is closed: `scripts/coloc_susie.R` independently checks eQTL z-scores against the supplied LD matrix before SuSiE/coloc, and rejects mismatches instead of emitting PP.H4.
 
 | Inputs | Assertions | Execution average | Static | Research veto |
 |---:|---:|---:|---:|---|

@@ -7,6 +7,10 @@
 
 # bio-entrez-fetch — Phase 2 provenance re-audit
 
+## Canonical final summary
+
+**Final:** 95/100 — ⭐ Production Ready; deployable: true.
+
 **Result: 95/100 — Production Ready — deployable**
 
 - Source: `mrsonord2240/bioSkills@0681f5b171b43eade5c4d81f0285dd9a5dbadb20:database-access/entrez-fetch`

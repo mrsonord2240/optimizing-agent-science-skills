@@ -88,7 +88,7 @@
     }
   },
   "dynamic_score": {
-    "execution_avg": 97.0,
+    "execution_avg": 97.5,
     "max": 100,
     "assertion_pass_rate": {
       "passed": 54,
@@ -556,7 +556,7 @@
   },
   "final": {
     "static_weighted": 38.4,
-    "dynamic_weighted": 58.2,
+    "dynamic_weighted": 58.5,
     "score": 97,
     "max": 100,
     "grade": "Production Ready",

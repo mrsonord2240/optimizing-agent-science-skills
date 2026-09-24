@@ -7,8 +7,13 @@
     "category": "Protocol Design",
     "execution_mode": "A",
     "complexity": "Complex",
-    "n_inputs": 7,
+    "n_inputs": 8,
     "source": "mrsonord2240/bioSkills@c19ca21cc60b9007bd955ebe4b31ead3ccf687e4:experimental-design/randomization-blocking",
+    "audit_kind": "same-tip final-pass re-audit using only retained private c19 replay evidence",
+    "inputs_note": "Source was exported directly from the immutable c19 Git tree into the private run directory and hash-manifested. Inputs 01-08 are scored, including the successful exact designit rerun; the failed output-path harness attempt is excluded setup evidence. Latin-square and auxiliary simulation claims are unrun and unscored.",
+    "executed_k_of_n": "8/8",
+    "env": "private WSL R runtime /home/sci/openscience-r-isolated-20260923; R 4.5.2; inputs 01-05 natural R exit 0 and inputs 06-07 PowerShell exit 0",
+    "provenance": "F:/OpenScience/audits/bio-experimental-design-randomization-blocking/run/phase2_c19ca21_private_20260923",
     "auditor_independent": false,
     "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md"
   },
@@ -17,46 +22,42 @@
     "research_veto": {
       "applicable": true,
       "gate": "PASS",
-      "scientific_integrity": { "result": "PASS", "detail": "All quantitative outputs are from labelled synthetic data or the shipped example." },
-      "practice_boundaries": { "result": "PASS", "detail": "The Skill stays within research-design advice and makes no individual diagnosis or treatment recommendation." },
-      "methodological_ground": { "result": "PASS", "detail": "The tested outputs prevent pseudoreplication and use the whole-plot error stratum." },
-      "code_usability": { "result": "PASS", "detail": "The literal repaired SKILL.md designit block completed on designit 0.5.1 with a checked 4/4 treatment balance in each of three processing days." }
+      "scientific_integrity": { "result": "PASS", "detail": "All quantitative values are from retained seeded synthetic replays; unsupported prior auxiliary claims are excluded." },
+      "practice_boundaries": { "result": "PASS", "detail": "The source provides research-design guidance, not diagnosis or treatment advice." },
+      "methodological_ground": { "result": "PASS", "detail": "Replays demonstrate donor-level aggregation, blocking, factorial interaction, and a nonzero whole-plot variance." },
+      "code_usability": { "result": "PASS", "detail": "All seven retained c19 replay inputs completed successfully in the private runtime." }
     }
   },
   "static_score": {
-    "subtotal": 98,
+    "subtotal": 95,
     "max": 100,
     "categories": {
-      "functional_suitability": { "score": 12, "max": 12, "note": "Experimental-unit, blocking, factorial, split-plot, and constrained-allocation paths are all runnable or explicitly bounded." },
-      "reliability": { "score": 11, "max": 12, "note": "Seeded examples, version guidance, bounded optimizer settings, and balance assertions provide a tested current-designit route." },
-      "performance_context": { "score": 8, "max": 8, "note": "The primary document remains compact and uses a separate usage guide." },
-      "agent_usability": { "score": 16, "max": 16, "note": "Decision tables, scope handoffs, concrete goals, and executable checks are clear." },
-      "human_usability": { "score": 7, "max": 8, "note": "Clear explanations; the short usage guide is less independently skimmable than the primary document." },
-      "security": { "score": 12, "max": 12, "note": "No secrets, destructive operations, or raw-string evaluation pattern." },
-      "maintainability": { "score": 12, "max": 12, "note": "The designit example now names non-colliding fields, has explicit finite controls, and asserts the promised layout." },
-      "agent_specific": { "score": 20, "max": 20, "note": "Trigger conditions, boundaries, and related-skill routing are precise." }
+      "functional_suitability": { "score": 12, "max": 12, "note": "Experimental-unit, blocking, factorial, split-plot, and boundary paths are explicit." },
+      "reliability": { "score": 10, "max": 12, "note": "Seeded examples and direct checks are retained; unrerun auxiliary claims are not credited." },
+      "performance_context": { "score": 8, "max": 8, "note": "Focused source with a separate usage guide." },
+      "agent_usability": { "score": 16, "max": 16, "note": "Decision tables, routes, and handoffs are explicit." },
+      "human_usability": { "score": 7, "max": 8, "note": "Primary explanations are clear." },
+      "security": { "score": 12, "max": 12, "note": "No secrets, destructive operations, or raw evaluation pattern." },
+      "maintainability": { "score": 10, "max": 12, "note": "Core examples ran; auxiliary package/API claims were not scored." },
+      "agent_specific": { "score": 20, "max": 20, "note": "Trigger conditions and scope boundaries are precise." }
     }
   },
   "dynamic_score": {
-    "execution_avg": 90.9,
+    "execution_avg": 91.1,
     "max": 100,
-    "assertion_pass_rate": { "passed": 27, "total": 27 },
+    "assertion_pass_rate": { "passed": 17, "total": 17 },
     "inputs": [
-      { "index": 1, "type": "Canonical", "label": "Cell observations nested in donors", "status": "COMPLETED", "status_flag": "PASS", "executed": true, "execution_note": "Executed run/in1_experimental_unit_aggregation.R in the isolated R runtime; 400 cells became eight donor-level units with n=4/4.", "note": "Experimental-unit aggregation is correct.", "basic": 37, "specialized": 55, "total": 92, "assertions_passed": 4, "assertions_total": 4 },
-      { "index": 2, "type": "Variant A", "label": "Constrained block randomization", "status": "COMPLETED", "status_flag": "PASS", "executed": true, "execution_note": "Executed run/in2_restricted_randomization.R and the literal repaired SKILL.md block on designit 0.5.1; the latter produced 4 control and 4 treatment samples in each of three processing days.", "note": "Manual balance, run-order permutation, literal current API execution, and finite optimizer route all passed.", "basic": 37, "specialized": 55, "total": 92, "assertions_passed": 4, "assertions_total": 4 },
-      { "index": 3, "type": "Edge", "label": "RCBD with real day variation", "status": "COMPLETED", "status_flag": "PASS", "executed": true, "execution_note": "Executed run/in3_rcbd_blocking.R; blocked SE=0.1268, unblocked SE=0.3917, blocked p=0.000009.", "note": "The block term recovers the planted effect and improves precision.", "basic": 36, "specialized": 54, "total": 90, "assertions_passed": 4, "assertions_total": 4 },
-      { "index": 4, "type": "Variant B", "label": "Whole-plot medium effect", "status": "COMPLETED", "status_flag": "PASS", "executed": true, "execution_note": "Executed in4, shipped-example in8, and independent 400-replicate in9: shipped flat/mixed=0.355/0.033; independent flat/mixed=0.360/0.055.", "note": "The flat model is anti-conservative and the mixed model remains near nominal Type-I error.", "basic": 37, "specialized": 54, "total": 91, "assertions_passed": 4, "assertions_total": 4 },
-      { "index": 5, "type": "Stress", "label": "Blocked factorial and Latin square", "status": "COMPLETED", "status_flag": "PASS", "executed": true, "execution_note": "Executed in5 and in11; interaction p=0.002207, KO/WT drug effects=2.135/1.210, and every Latin-square row/column contains all four treatments.", "note": "Blocked interaction interpretation and orthogonal Latin-square construction pass.", "basic": 36, "specialized": 55, "total": 91, "assertions_passed": 4, "assertions_total": 4 },
-      { "index": 6, "type": "Scope Boundary", "label": "Sequencing-batch allocation", "status": "COMPLETED", "status_flag": "PASS", "executed": true, "execution_note": "Executed run/in6_scope_boundary_checks.ps1 against the pinned SKILL.md.", "note": "The Skill explicitly hands batch allocation to experimental-design/batch-design.", "basic": 38, "specialized": 50, "total": 88, "assertions_passed": 3, "assertions_total": 3 },
-      { "index": 7, "type": "Adversarial", "label": "Cell-level pseudoreplication request", "status": "COMPLETED", "status_flag": "PASS", "executed": true, "execution_note": "Executed run/in7_adversarial_boundary_checks.ps1 against the pinned SKILL.md.", "note": "The source names pseudoreplication, retains n=3 mice, and provides EU-level or hierarchical alternatives.", "basic": 38, "specialized": 54, "total": 92, "assertions_passed": 4, "assertions_total": 4 }
+      { "index": 1, "type": "Canonical", "label": "Cell observations nested in donors", "executed": true, "execution_note": "logs/input01.log; logs/input01.stdout.", "status": "COMPLETED", "status_flag": "PASS", "note": "400 cells reduced to eight donor-level units with 4/4 allocation.", "basic": 37, "specialized": 55, "total": 92, "assertions_passed": 3, "assertions_total": 3, "assertions": [{"text":"400 cell observations","result":"PASS","evidence":"logs/input01.stdout"},{"text":"eight experimental units","result":"PASS","evidence":"logs/input01.stdout"},{"text":"four units per condition","result":"PASS","evidence":"logs/input01.stdout"}] },
+      { "index": 2, "type": "Variant", "label": "Constrained block randomization", "executed": true, "execution_note": "logs/input02.log; logs/input02.stdout.", "status": "COMPLETED", "status_flag": "PASS", "note": "Each of three days has a 4/4 allocation and a valid run-order permutation.", "basic": 37, "specialized": 55, "total": 92, "assertions_passed": 2, "assertions_total": 2, "assertions": [{"text":"each block has four control and four treatment units","result":"PASS","evidence":"logs/input02.stdout"},{"text":"run order is a permutation","result":"PASS","evidence":"logs/input02.stdout"}] },
+      { "index": 3, "type": "Edge", "label": "RCBD with day variation", "executed": true, "execution_note": "logs/input03.log; logs/input03.stdout.", "status": "COMPLETED", "status_flag": "PASS", "note": "Blocked SE 0.1268 is smaller than unblocked SE 0.3917; blocked p=0.000009.", "basic": 36, "specialized": 54, "total": 90, "assertions_passed": 2, "assertions_total": 2, "assertions": [{"text":"blocked SE improves precision","result":"PASS","evidence":"logs/input03.stdout"},{"text":"blocked treatment p is below 0.05","result":"PASS","evidence":"logs/input03.stdout"}] },
+      { "index": 4, "type": "Variant", "label": "Whole-plot medium effect", "executed": true, "execution_note": "logs/input04.log; logs/input04.stdout.", "status": "COMPLETED", "status_flag": "PASS", "note": "Mixed-model SE is finite and whole-plot run variance is positive (3.0000).", "basic": 37, "specialized": 54, "total": 91, "assertions_passed": 2, "assertions_total": 2, "assertions": [{"text":"mixed-model SE is finite","result":"PASS","evidence":"logs/input04.stdout"},{"text":"whole-plot variance is positive","result":"PASS","evidence":"logs/input04.stdout"}] },
+      { "index": 5, "type": "Stress", "label": "Blocked factorial interaction", "executed": true, "execution_note": "logs/input05.log; logs/input05.stdout.", "status": "COMPLETED", "status_flag": "PASS", "note": "Interaction p=0.002207 and KO drug effect 2.135 exceeds WT effect 1.210.", "basic": 36, "specialized": 55, "total": 91, "assertions_passed": 2, "assertions_total": 2, "assertions": [{"text":"interaction p is below 0.05","result":"PASS","evidence":"logs/input05.stdout"},{"text":"KO treatment effect exceeds WT effect","result":"PASS","evidence":"logs/input05.stdout"}] },
+      { "index": 6, "type": "Scope Boundary", "label": "Sequencing-batch allocation handoff", "executed": true, "execution_note": "scripts/input06_scope.ps1; logs/input06.log.", "status": "COMPLETED", "status_flag": "PASS", "note": "Pinned source routes batch allocation to experimental-design/batch-design.", "basic": 38, "specialized": 50, "total": 88, "assertions_passed": 1, "assertions_total": 1, "assertions": [{"text":"batch-design handoff exists","result":"PASS","evidence":"logs/input06.log"}] },
+      { "index": 7, "type": "Adversarial", "label": "Cell-level pseudoreplication request", "executed": true, "execution_note": "scripts/input07_adversarial.ps1; logs/input07.log.", "status": "COMPLETED", "status_flag": "PASS", "note": "Pinned source names n=3 mice and directs aggregation to the experimental unit.", "basic": 38, "specialized": 54, "total": 92, "assertions_passed": 1, "assertions_total": 1, "assertions": [{"text":"pseudoreplication refusal and EU alternative exist","result":"PASS","evidence":"logs/input07.log"}] },
+      { "index": 8, "type": "Primary Tool", "label": "Exact corrected designit processing-day allocation", "executed": true, "execution_note": "scripts/input08_exact_designit.R; logs/input08.log; logs/input08.log.stdout; outputs/input08_designit_layout.csv; source_manifest.txt. The earlier output-path harness failure is excluded setup evidence; this retained rerun exited 0.", "status": "COMPLETED", "status_flag": "PASS", "note": "Literal c19 block ran on designit 0.5.1 with 4/4 balance per processing day.", "basic": 38, "specialized": 55, "total": 93, "assertions_passed": 4, "assertions_total": 4, "assertions": [{"text":"designit 0.5.1 loads","result":"PASS","evidence":"logs/input08.log.stdout"},{"text":"processing-day balance is 4/4","result":"PASS","evidence":"logs/input08.log.stdout; outputs/input08_designit_layout.csv"},{"text":"layout has 24 rows","result":"PASS","evidence":"logs/input08.log.stdout; outputs/input08_designit_layout.csv"},{"text":"run order is a permutation","result":"PASS","evidence":"logs/input08.log.stdout"}] }
     ]
   },
-  "final": { "static_weighted": 39.2, "dynamic_weighted": 54.5, "score": 94, "max": 100, "grade": "Production Ready", "grade_symbol": "PASS", "deployable": true, "veto_override": false },
-  "key_strengths": [
-    "The literal designit constrained-allocation path now executes on designit 0.5.1 and verifies its balanced layout.",
-    "Experimental-unit and pseudoreplication guidance is direct and quantitatively checked.",
-    "The shipped and independent split-plot simulations demonstrate the correct whole-plot error structure.",
-    "Scope boundaries prevent unsupported sequencing-batch prescriptions."
-  ],
-  "recommendations": []
+  "final": { "static_weighted": 38, "dynamic_weighted": 54.7, "score": 93, "max": 100, "grade": "Production Ready", "grade_symbol": "⭐", "deployable": true, "veto_override": false },
+  "key_strengths": ["All eight selected c19 inputs replayed with retained natural exits.", "The exact corrected designit processing-day primary-tool block has direct version, balance, layout, and exit evidence.", "Experimental-unit, blocking, split-plot, factorial, and scope-boundary behavior has direct evidence."],
+  "recommendations": [{"priority":"P2","title":"Revalidate optional Latin-square and auxiliary simulation routes","problem":"Those optional auxiliary routes were not replayed in this final eight-input audit.","root_cause":"Only the selected seven core routes and exact designit primary-tool block have retained same-tip execution evidence.","fix":"Run retained same-tip checks for the Latin-square and simulation routes before making execution claims about them."}]
 }

@@ -7,8 +7,16 @@
 
 # Eval Viewer — bio-causal-genomics-mendelian-randomization
 
-Generated: 2026-09-23  
-Source: `mrsonord2240/bioSkills@c9ece583aa342593b6e2411191636de7f33a1d31:causal-genomics/mendelian-randomization`  
+## Canonical final summary
+
+**Final:** 93/100 — ⭐ Production Ready; deployable: true.
+
+Source: `mrsonord2240/bioSkills@c9ece583aa342593b6e2411191636de7f33a1d31:causal-genomics/mendelian-randomization`
+Auditor independent: `false`
+Note: final pass: fixed and audited under one brief, see CHECKPOINT.md
+
+Generated: 2026-09-23
+Source: `mrsonord2240/bioSkills@c9ece583aa342593b6e2411191636de7f33a1d31:causal-genomics/mendelian-randomization`
 Audit type: final-pass Phase 2; `auditor_independent: false` by the directed final-pass exception.
 
 ## Result

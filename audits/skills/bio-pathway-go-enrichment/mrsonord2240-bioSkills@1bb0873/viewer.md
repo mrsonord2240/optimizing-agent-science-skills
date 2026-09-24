@@ -7,8 +7,10 @@
 
 # Eval Viewer — bio-pathway-go-enrichment
 
-Generated: 2026-09-23  
-Source: `mrsonord2240/bioSkills@1bb08737d3b24d54f00f5d35aa096f9fd2e04b79:pathway-analysis/go-enrichment`  
+Generated: 2026-09-23
+Source: `mrsonord2240/bioSkills@1bb08737d3b24d54f00f5d35aa096f9fd2e04b79:pathway-analysis/go-enrichment`
+
+Final-pass metadata: `auditor_independent: false`; `final pass: fixed and audited under one brief, see CHECKPOINT.md`.
 Environment: isolated WSL R 4.4.3 / Bioconductor 3.20 (clusterProfiler 4.14.0, org.Hs.eg.db 3.20.0, goseq 1.58.0, GenomicFeatures 1.58.0, TxDb.Hsapiens.UCSC.hg38.knownGene 3.20.0). The shared Windows environment was not changed.
 
 ## Summary Table
@@ -23,7 +25,7 @@ Environment: isolated WSL R 4.4.3 / Bioconductor 3.20 (clusterProfiler 4.14.0, o
 | 6 | Adversarial | 39 | 57 | 96 | 4/4 PASS | ✅ |
 | 7 | Scope Boundary | 38 | 56 | 94 | 4/4 PASS | ✅ |
 
-**Execution Average: 94.9 / 100**  
+**Execution Average: 94.9 / 100**
 **Assertion Pass Rate: 28/28**
 
 ## Detailed Outputs
@@ -159,14 +161,14 @@ The PWF issued the non-fatal numerical message `initial point very close to some
 
 ## Gates and Static Review
 
-Structural veto: PASS (stability, contract, determinism, security).  
-Research veto: PASS (scientific integrity, practice boundaries, methodological ground, code usability).  
+Structural veto: PASS (stability, contract, determinism, security).
+Research veto: PASS (scientific integrity, practice boundaries, methodological ground, code usability).
 Static score: 91/100. The main issue is an internal reproducibility statement conflict: the global compatibility text names clusterProfiler 4.18.4+/org.Hs.eg.db 3.22+, but the usage guide and executable hg38 route pin Bioconductor 3.20 and this re-audit verified clusterProfiler 4.14.0/org.Hs.eg.db 3.20.0.
 
 ## Final
 
-Static weighted: 36.4  
-Dynamic weighted: 56.9  
+Static weighted: 36.4
+Dynamic weighted: 56.9
 **Final score: 93/100 — ⭐ Production Ready — deployable: true.**
 
 Recommendations are one P1 (reconcile the conflicting compatibility statements) and one P2 (move the expanded GOseq recipe into a parameterized script). The report metadata explicitly sets `auditor_independent: false` for this final-pass exception.

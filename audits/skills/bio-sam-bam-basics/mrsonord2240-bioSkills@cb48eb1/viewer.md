@@ -7,6 +7,14 @@
 
 # Eval Viewer — bio-sam-bam-basics
 
+## Canonical final summary
+
+**Final:** 91/100 — ⭐ Production Ready; deployable: true.
+
+Source: `mrsonord2240/bioSkills@cb48eb16bf63f75098c865da4e8f7bf3191af733:alignment-files/sam-bam-basics`
+Auditor independent: `false`
+Note: final pass: fixed and audited under one brief, see CHECKPOINT.md
+
 Generated: 2026-09-23
 
 **Source:** `mrsonord2240/bioSkills@cb48eb16bf63f75098c865da4e8f7bf3191af733:alignment-files/sam-bam-basics`
@@ -28,7 +36,7 @@ Generated: 2026-09-23
 | 9 | Variant B — Fresh: NH:i featureCounts multimapper handling | 38 | 57 | 95 | 4/4 | ✅ |
 | 10 | Adversarial — Fresh: unordered and malformed BED for fetch_regions | 34 | 50 | 84 | 3/4 | ✅ |
 
-**Execution Average:** 91.4/100  
+**Execution Average:** 91.4/100
 **Assertion Pass Rate:** 39/40
 
 ## Veto Gates
@@ -194,3 +202,9 @@ Generated: 2026-09-23
 
 - [P2] Validate malformed BED rows in `scripts/fetch_regions.py`; current behavior exposes raw `IndexError`.
 - [P2] Preserve explicit evidence labels for DRAGEN and Cell Ranger until a licensed instance or real BAM is available.
+
+## Canonical final-pass metadata
+
+- Source: `mrsonord2240/bioSkills@cb48eb16bf63f75098c865da4e8f7bf3191af733:alignment-files/sam-bam-basics`
+- `auditor_independent: false`
+- Note: `final pass: fixed and audited under one brief, see CHECKPOINT.md`

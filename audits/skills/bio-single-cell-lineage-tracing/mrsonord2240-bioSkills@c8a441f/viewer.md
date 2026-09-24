@@ -7,6 +7,10 @@
 
 # Eval Viewer — bio-single-cell-lineage-tracing
 
+## Canonical final summary
+
+**Final:** 90/100 — ⭐ Production Ready; deployable: true.
+
 Generated: 2026-09-23
 
 Source: `mrsonord2240/bioSkills@c8a441f79643caaff28dd285180a5ca28884d4ef:single-cell/lineage-tracing`

@@ -25,6 +25,12 @@ Final-pass metadata: `auditor_independent: false`; `final pass: fixed and audite
 | 10 Shipped examples | 98 | Python and all three `PERM_I=100` R fits completed |
 | 11 PCA CLI | 98 | S1/S2 found; NA path rejects with documented remedy |
 
-Execution average **97.1/100**; assertions **33/33**. Skill and research vetoes both PASS. Static **98/100**. Final **97/100 — Production Ready — deployable: true**. No open P0/P1/P2.
+Execution average **97.1/100**; assertions **33/33**. Skill and research vetoes both PASS. Static **98/100**. Final **⭐ 98/100 — Production Ready — deployable: true**. No open P0/P1/P2.
 
 Fresh scripts and logs are in `run/`; PCA fixtures/output are in `data/`. The prior active audit was preserved at `F:\OpenScience\audits\_pre-fix-20260923\bio-metabolomics-statistical-analysis`.
+
+## Canonical final-pass metadata
+
+- Source: `mrsonord2240/bioSkills@36eff6bf7899c44e3d589b10952e7fa2c14e31fc:metabolomics/statistical-analysis`
+- `auditor_independent:false`
+- Note: `final pass: fixed and audited under one brief, see CHECKPOINT.md`

@@ -45,6 +45,7 @@
   },
   "dynamic_score": {
     "execution_avg": 83.3,
+    "assertion_pass_rate": {"passed": 25, "total": 28},
     "assertions_passed": 25,
     "assertions_total": 28,
     "inputs": [

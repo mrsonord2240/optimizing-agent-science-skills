@@ -7,8 +7,12 @@
 
 # Eval Viewer — bio-causal-genomics-transcriptome-wide-association
 
-Generated: 2026-09-23  
-Source: `mrsonord2240/bioSkills@3e246f19f63e39dbb646ae874ed353b70f17ce94:causal-genomics/transcriptome-wide-association`  
+## Canonical final summary
+
+**Final:** 90/100 — ⭐ Production Ready; deployable: true.
+
+Generated: 2026-09-23
+Source: `mrsonord2240/bioSkills@3e246f19f63e39dbb646ae874ed353b70f17ce94:causal-genomics/transcriptome-wide-association`
 Final-pass metadata: `auditor_independent: false`; `final pass: fixed and audited under one brief, see CHECKPOINT.md`
 
 ## Gates and static review
@@ -46,3 +50,4 @@ Execution average: 88.7/100. Assertions: 32/35. The sole partial status is truth
 Static 91 × 0.4 = 36.4. Dynamic 88.7 × 0.6 = 53.2. Final score: **90/100 — Production Ready**. `deployable: true`; no veto and no open P0.
 
 Open P1: add calibrated MetaXcan commands; handle the R-wrapper exit-139 outcome. Open P2: label optional specialist methods as reference-only or add a verified minimal executable route.
+auditor_independent: false

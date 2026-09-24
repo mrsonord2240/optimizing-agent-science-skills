@@ -7,11 +7,17 @@
 
 # Eval Viewer — bio-single-cell-scatac-analysis
 
-Generated: 2026-09-23  
-Source: `mrsonord2240/bioSkills@e14c7b581acaa271a9bf643febcb5ff0dd40d966:single-cell/scatac-analysis`  
+## Canonical final summary
+
+**Final:** 96/100 — ✅ Production Ready; deployable: true.
+
+Generated: 2026-09-23
+Source: `mrsonord2240/bioSkills@e14c7b581acaa271a9bf643febcb5ff0dd40d966:single-cell/scatac-analysis`
+
+Final-pass metadata: `auditor_independent: false`; `final pass: fixed and audited under one brief, see CHECKPOINT.md`.
 Mode: A (direct Skill execution) · Category: Data Analysis · Complexity: Complex (7 inputs)
 
-## Result: ✅ Production Ready — 96/100
+## Result: ⭐ Production Ready — 96/100
 
 This is a fresh final-pass Phase 2 re-audit at the exact pushed tip above. All
 executable checks were run in the private isolated WSL runtime, not the known

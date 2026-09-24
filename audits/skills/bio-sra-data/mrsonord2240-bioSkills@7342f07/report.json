@@ -2,6 +2,7 @@
   "source": "mrsonord2240/bioSkills@7342f0782d258eba329460f76a8c7dea35abc7cb:database-access/sra-data",
   "meta": {
     "skill_name": "bio-sra-data",
+    "source": "mrsonord2240/bioSkills@7342f0782d258eba329460f76a8c7dea35abc7cb:database-access/sra-data",
     "evaluated_on": "2026-09-24",
     "evaluator_version": "skill-auditor@2.0",
     "category": "Data Analysis",

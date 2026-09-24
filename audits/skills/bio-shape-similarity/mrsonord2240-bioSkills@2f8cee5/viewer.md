@@ -7,11 +7,15 @@
 
 # Eval Viewer — bio-shape-similarity
 
+## Canonical final summary
+
+**Final:** 92/100 — ⭐ Production Ready; deployable: true.
+
 Generated: 2026-09-23
 
 Source: `mrsonord2240/bioSkills@2f8cee570c21b48f08e0b15b1662c6d363bbf09b:chemoinformatics/shape-similarity`
 
-Final-pass metadata: `auditor_independent: false` — fixed and audited under one final-pass brief; see [`CHECKPOINT.md`](../_final_pass/bio-shape-similarity/CHECKPOINT.md).
+Final-pass metadata: `auditor_independent: false` — final pass: fixed and audited under one brief, see CHECKPOINT.md.
 
 ## Summary
 

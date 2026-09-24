@@ -7,8 +7,12 @@
 
 # Eval Viewer — bio-crispr-screens-in-vivo-screens
 
-Generated: 2026-09-23  
-Source: `mrsonord2240/bioSkills@afcf1e65250223117c255217b1974abc625f5741:crispr-screens/in-vivo-screens`  
+## Canonical final summary
+
+**Final:** 92/100 — ⭐ Production Ready; deployable: true.
+
+Generated: 2026-09-23
+Source: `mrsonord2240/bioSkills@afcf1e65250223117c255217b1974abc625f5741:crispr-screens/in-vivo-screens`
 Category: Data Analysis | Execution mode: D (Hybrid) | Complexity: Complex (N=7)
 
 Final-pass declaration: `auditor_independent: false`; `note: final pass: fixed and audited under one brief, see CHECKPOINT.md`.
@@ -103,7 +107,7 @@ Result: the test executed and was safely contained, but the expected validation 
 
 Skill Veto: **PASS** (stability, contract, determinism, security). Research Veto: **PASS** (scientific integrity, practice boundaries, methodological ground, code usability).
 
-Static score: 94 / 100. Dynamic score: 91.0 / 100.  
+Static score: 94 / 100. Dynamic score: 91.0 / 100.
 Final: `94 × 0.4 + 91.0 × 0.6 = 92.2`, rounded to **92 / 100 — Production Ready — deployable: true**.
 
 ## Open recommendations
