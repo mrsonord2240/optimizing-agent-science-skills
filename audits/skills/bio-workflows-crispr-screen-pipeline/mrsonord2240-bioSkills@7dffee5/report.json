@@ -1,0 +1,203 @@
+{
+  "meta": {
+    "skill_name": "bio-workflows-crispr-screen-pipeline",
+    "description": "End-to-end pooled and single-cell CRISPR screen analysis from FASTQ to hit genes: library QC, guide counting, six-stage screen QC, method-matched hit calling across MAGeCK/BAGEL2/drugZ/JACKS/Chronos, copy-number and batch correction, and tier-based cross-method consensus, with branches to editing, single-cell, and in-vivo variants.",
+    "evaluated_on": "2026-09-24",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "mrsonord2240/bioSkills@7dffee58a50f7b4ef25d5922a1b95960f886a3f2:workflows/crispr-screen-pipeline",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All outputs are technical assay-analysis guidance and the checked references retain their original, attributable citations; no fabricated biological results were reported." },
+      "practice_boundaries": { "result": "PASS", "detail": "Every exercised branch concerns experimental screen design, quality control, or computational analysis rather than an individual diagnosis or treatment recommendation." },
+      "methodological_ground": { "result": "PASS", "detail": "The repaired MLE example explicitly uses ten permutation rounds and warns that default-round near-boundary FDR calls require stability checking; replicate correlation is restricted to within-condition pairs." },
+      "code_usability": { "result": "PASS", "detail": "The final-pass scripts executed current MAGeCK MLE, MAGeCK RRA, drugZ, JACKS flag, Chronos API, Python, and shell checks on the documented environment." }
+    }
+  },
+  "static_score": {
+    "subtotal": 93,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 12, "max": 12, "note": "All three open recommendations are corrected: MLE reliability, the replicate-Pearson threshold, and example discoverability." },
+      "reliability": { "score": 11, "max": 12, "note": "The MLE default-round recovery path is now explicit; the remaining unavoidable runtime cost of higher permutation counts is accurately disclosed." },
+      "performance_context": { "score": 7, "max": 8, "note": "The broad workflow remains compact for its scope, with a targeted pointer to detailed MLE guidance rather than duplicated prose." },
+      "agent_usability": { "score": 15, "max": 16, "note": "The numeric QC gate is internally consistent, the Step 0 clarification gate is explicit, and the branch-specific recovery rows are actionable." },
+      "human_usability": { "score": 7, "max": 8, "note": "The compact example is now discoverable and explicitly scoped, while the main workflow retains clear choice and recovery points." },
+      "security": { "score": 12, "max": 12, "note": "No credential exposure, destructive workflow instruction, or raw user-string execution path was found." },
+      "maintainability": { "score": 11, "max": 12, "note": "Threshold and example facts now have a clear canonical location; the workflow remains necessarily broad because it orchestrates several screen modalities." },
+      "agent_specific": { "score": 18, "max": 20, "note": "The counted-input to RRA handoff, seeded BAGEL2 consensus, MLE reliability caveat, and preflight escape hatch compose cleanly across the workflow." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 93.0,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 28, "total": 28 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Regression: real HAP1 pooled-screen QC, hit calling, and seeded tier consensus",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Re-ran current QC checks on the archived 71,090-guide HAP1 matrix; regenerated the matched RRA handoff and checked seeded BAGEL2/tier artifacts.",
+        "basic": 37,
+        "specialized": 57,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Within-condition replicate Pearson is calculated without baseline-to-endpoint pairs", "result": "PASS", "note": "Current regression reproduced 0.7886812496284182 for T18_A/B/C pairs." },
+          { "text": "The repaired Step 2 to Step 6a RRA handoff produces a real gene summary", "result": "PASS", "note": "Fresh MAGeCK 0.5.9.5 run produced 18,056 genes with EIF3A, POLR2L, PCNA, and GTPBP10 among top depleted hits." },
+          { "text": "Seeded BAGEL2 tier inputs remain deterministic", "result": "PASS", "note": "The archived seeded-pair regression reports zero BF greater-than-six flips across 18,053 genes." },
+          { "text": "Tier consensus has a concrete persisted output", "result": "PASS", "note": "tier_consensus_seeded.csv is parsed by the archived current-code regression." }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Regression: Step 2 labels composed literally into the Step 6a MAGeCK RRA branch",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Fresh isolated finalpass_step2_rra run used Veh_r1,Veh_r2 against Day0, as the repaired Skill documents.",
+        "basic": 37,
+        "specialized": 57,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Documented treatment labels exist in the Step 2 count table", "result": "PASS", "note": "MAGeCK accepted Veh_r1,Veh_r2 and Day0 without a label error." },
+          { "text": "MAGeCK RRA completes on the real 71,090-guide table", "result": "PASS", "note": "Run completed and wrote finalpass_step2_rra.gene_summary.txt." },
+          { "text": "The regenerated summary contains the expected HAP1 essentiality signal", "result": "PASS", "note": "Top low-rank genes include EIF3A, POLR2L, PCNA, and GTPBP10." },
+          { "text": "The two-timepoint and MLE branches remain semantically distinct", "result": "PASS", "note": "RRA uses the two-condition label handoff while the separate Step 6b command uses a design matrix." }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Regression: replicate-Pearson and copy-number QC threshold boundary checks",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Re-read all shipped threshold locations and ran a fresh supported-label grouping check.",
+        "basic": 37,
+        "specialized": 56,
+        "total": 93,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Step 3 states the same replicate-Pearson floor as frontmatter and the usage guide", "result": "PASS", "note": "All state >=0.8 as the floor, with >0.85 acceptable." },
+          { "text": "A value of 0.82 has one documented interpretation", "result": "PASS", "note": "It passes the stated floor but is below the acceptable band." },
+          { "text": "The copy-number gate remains identical across SKILL.md and usage-guide.md", "result": "PASS", "note": "Both retain abs(rho) <0.10 with <0.05 as the stricter target." },
+          { "text": "A fresh mixed label convention groups technical replicates correctly", "result": "PASS", "note": "Vehicle_rep1/2 and Drug_r1/2/3 grouped by condition while Day0 remained a singleton." }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Regression: JACKS CLI and Chronos API compatibility",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Executed installed JACKS help and Chronos constructor introspection in their documented environments.",
+        "basic": 36,
+        "specialized": 56,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "All seven documented JACKS flags are exposed", "result": "PASS", "note": "Installed run_JACKS.py help contains every documented flag." },
+          { "text": "Chronos constructor accepts sequence_map", "result": "PASS", "note": "Installed signature includes sequence_map." },
+          { "text": "Chronos constructor accepts guide_gene_map and readcounts", "result": "PASS", "note": "Both names appear in the inspected installed signature." },
+          { "text": "Post-hoc alternate_CN is available", "result": "PASS", "note": "Installed chronos module reports has_alternate_CN true." }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Regression: vehicle-anchored drugZ on a synthetic drug screen",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Fresh drugZ execution followed the documented Veh versus Drug command on the archived 200-gene synthetic screen.",
+        "basic": 36,
+        "specialized": 56,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The documented drugZ command completes", "result": "PASS", "note": "Current run wrote finalpass_drugz_output.txt." },
+          { "text": "Output contains one result per synthetic gene", "result": "PASS", "note": "Parsed output has 200 rows." },
+          { "text": "Output provides the documented synthetic-direction FDR column", "result": "PASS", "note": "fdr_synth is present with minimum value 0.00601." },
+          { "text": "The branch remains vehicle anchored rather than Day0 anchored", "result": "PASS", "note": "Fresh command used -c Veh and -x Drug exactly as the Skill prescribes." }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Fresh: real-data MAGeCK MLE near-boundary reliability check",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Fresh current-command run used ten permutation rounds on the archived 1,500-gene HAP1 subset and wrote parseable gene and sgRNA summaries.",
+        "basic": 37,
+        "specialized": 57,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The documented MLE command explicitly sets ten permutation rounds", "result": "PASS", "note": "SKILL.md and executed command both include --permutation-round 10." },
+          { "text": "Installed MAGeCK supports the chosen reliability setting", "result": "PASS", "note": "MAGeCK 0.5.9.5 help reports suggested value 10 and default 2." },
+          { "text": "The real-data MLE run completes and writes a gene summary", "result": "PASS", "note": "finalpass_mle_round10.gene_summary.txt contains 1,500 genes." },
+          { "text": "MLE output exposes FDR fields for the documented boundary guidance", "result": "PASS", "note": "Parsed summary includes condition fdr columns." }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Fresh: underspecified request and reference-example discoverability",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Verified the preflight response path and a fresh example-discovery path from the current source tree.",
+        "basic": 36,
+        "specialized": 56,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "An unspecified baseline or control class triggers the Step 0 clarification gate", "result": "PASS", "note": "Step 0 explicitly requires asking before analysis rather than inferring." },
+          { "text": "The usage guide exposes the same operational preflight requirement", "result": "PASS", "note": "Its numbered agent workflow repeats the gate." },
+          { "text": "The shipped example is discoverable from SKILL.md", "result": "PASS", "note": "Output Files links examples/crispr_pipeline.sh and the target exists." },
+          { "text": "The discovered shell reference is syntactically valid", "result": "PASS", "note": "bash -n passed in the WSL runtime." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 37.2,
+    "dynamic_weighted": 55.8,
+    "score": 93,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "The final-pass MLE command is exercised on real HAP1 data with the explicit ten-round reliability setting required for near-boundary FDR interpretation.",
+    "The Step 2 count labels compose into the Step 6a RRA command and regenerate a biologically coherent 18,056-gene summary.",
+    "Technical replicate correlation is calculated only within condition groups, and the numeric QC threshold now agrees across all shipped documentation.",
+    "The complete runnable MAGeCK reference is now discoverable from the main workflow without displacing the mandatory QC and design gates."
+  ],
+  "recommendations": []
+}

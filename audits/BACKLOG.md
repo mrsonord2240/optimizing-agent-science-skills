@@ -8,7 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (94)
+## P1 (93)
 
 ### `bio-data-visualization-statistical-annotation` — stat_compare_means(comparisons, p.adjust.method='holm') draws unadjusted p; the argument does not exist
 
@@ -377,14 +377,6 @@ None open.
 - Problem: RSeQC adds (index_end - index_st) from zero, so with -l 80 -u 100 -s 5 the "80%" point is 5% of the reads and "100%" is 25%. The mid library gives growth 263% and the saturated deep library flips from PLATEAU to STILL RISING (11.1%) with helper lo=80; lo=50 reaches only 157 of 180 known junctions at "100%". The default and l == s (e.g. -l 2 -u 100 -s 2) are correct.
 - Root cause: The refinement was written from the option names, never run, and the helper exposes lo/hi/step without a guard.
 - Fix: Replace the tip with "for a finer curve lower -s and keep -l equal to -s (-l 2 -u 100 -s 2)"; make junction_saturation() raise or warn when lo != step; add a test on the planted deep BAM.
-
-### `bio-workflows-crispr-screen-pipeline` — Step 6b's MAGeCK MLE example doesn't carry forward mageck-analysis's own fixed permutation-round caveat
-
-- Skill: 85, Limited Release · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/workflows/crispr-screen-pipeline) · [viewer](skills/bio-workflows-crispr-screen-pipeline/mrsonord2240-bioSkills@6847328/viewer.md)
-- Observed in inputs: 6
-- Problem: Step 6b's mageck mle command sets no --permutation-round, silently using MAGeCK's noisy default of 2. On a 1,500-gene real-data subsample this flips 4/1500 genes' FDR<0.05 status against --permutation-round 10; sibling mageck-analysis's own audit found the same defect flips 40% of hits at full genome scale and now documents '>=10 for any FDR call near 0.05', but this pipeline's Step 6b and Related Skills sections never surface that caveat.
-- Root cause: Step 6b's example was written before mageck-analysis's permutation-round finding existed, and this fix round's Related Skills cross-references were not revisited for it.
-- Fix: Add --permutation-round 10 (or an explicit caveat with a pointer to [[mageck-analysis]]'s permutation-round section) to Step 6b's mageck mle example, matching what bagel-essentiality's -s 42 seed and hit-calling's own cross-references already do for the BAGEL2 determinism fix in this same pipeline.
 
 ### `bio-proteomics-data-import` — No TMT route, and the no-LFQ error sends a TMT user to columns that do not exist
 
@@ -762,7 +754,7 @@ None open.
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (243)
+## P2 (241)
 
 ### `bio-data-visualization-statistical-annotation` — Test-name and label details differ from the tools
 
@@ -1459,22 +1451,6 @@ None open.
 - Problem: 401-line SKILL.md with no references/ split; PP3/BP4 codes remain in the SpliceAI paragraph though scoped as research use.
 - Root cause: Single-file layout.
 - Fix: Move STAR 2-pass and Picard details to references/; keep the cut-offs but drop the ACMG code names.
-
-### `bio-workflows-crispr-screen-pipeline` — Replicate Pearson threshold still drifts internally within SKILL.md itself
-
-- Skill: 85, Limited Release · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/workflows/crispr-screen-pipeline) · [viewer](skills/bio-workflows-crispr-screen-pipeline/mrsonord2240-bioSkills@6847328/viewer.md)
-- Observed in inputs: 1, 6
-- Problem: SKILL.md's frontmatter states 'Replicate Pearson on log-counts >=0.8 (MAGeCK-VISPR floor; >0.85 acceptable, >0.95 ideal)', matching usage-guide.md and the canonical sibling screen-qc, but Step 3's own 'Hard gates from [[screen-qc]]' line states flatly 'Replicate Pearson on log-counts >0.85' -- using the 'acceptable' band as if it were the fail floor. This is the same class of documentation-sync defect as the CN-bias threshold that was fixed this round, just not caught by that fix.
-- Root cause: The CN-threshold fix reconciled SKILL.md against usage-guide.md but did not audit SKILL.md's own two internal statements of the Replicate Pearson gate against each other or against screen-qc's canonical wording.
-- Fix: Make Step 3's 'Hard gates' line read '>=0.8 (MAGeCK-VISPR floor); >0.85 acceptable' verbatim, matching the frontmatter, usage-guide.md, and screen-qc.
-
-### `bio-workflows-crispr-screen-pipeline` — examples/crispr_pipeline.sh is not referenced from SKILL.md or usage-guide.md
-
-- Skill: 85, Limited Release · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/workflows/crispr-screen-pipeline) · [viewer](skills/bio-workflows-crispr-screen-pipeline/mrsonord2240-bioSkills@6847328/viewer.md)
-- Observed in inputs: —
-- Problem: The bundled examples/crispr_pipeline.sh (a complete, independently-runnable mageck count -> mageck test -> hit extraction script, verified to use only flags present in the installed MAGeCK 0.5.9.5) is never mentioned in either shipped document, so an agent following SKILL.md/usage-guide.md alone would not discover it.
-- Root cause: The examples/ file was added without a cross-reference from the main documents.
-- Fix: Add one line in SKILL.md's Output Files or Related Skills section pointing to examples/crispr_pipeline.sh as a ready-to-run reference script.
 
 ### `bio-proteomics-data-import` — The flag-column guard collapses to a scalar when all three flag columns are absent
 
