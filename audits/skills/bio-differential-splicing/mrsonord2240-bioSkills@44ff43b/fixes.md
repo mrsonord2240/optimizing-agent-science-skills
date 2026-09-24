@@ -56,3 +56,21 @@ Copies that disagreed: taxonomy said SUPPA2 classical n>=2 / empirical fails whe
 ## Environment change
 
 New WSL env `as-pairadise` and `tools\pairadise_fork_profile.R` under `F:\OpenScience\audit-envs\alternative-splicing\`; TOOLS.md updated (env row + trap 33). No existing env or version changed.
+
+## 2026-09-24 (final pass; branch `agent/finalpass-bio-differential-splicing-20260924` from staging main `a0f8d09`)
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+| --- | --- | --- | --- | --- |
+| Coverage filter uses per-group minima and drops true events | P2 | Replaced `min(IJC)+min(SJC)` with an every-replicate `IJC+SJC >= 10` predicate in `SKILL.md` and `examples/diff_splicing_rmats.sh`; updated the human prompt | ran | Edge data with inclusion/skipping minima in different replicates: the corrected predicate retains the fully covered event and rejects the genuinely shallow event. |
+| leafcutter batch = group sentence is wrong | P2 | Corrected it to exit-0/no-warning/non-informative p-values near 1 | prior run rechecked against audit evidence | The rank guard remains the required stop. |
+| MAJIQ HET "conservative at n=5-10" is not in the docs | P2 | Deleted the unsupported claim; retained the docs-based TNOM/Wilcoxon guidance | docs | MAJIQ remains clearly marked licence-gated and not executed. |
+| Shipped leafcutter example fails opaquely on zero introns | P2 | Added missing and empty counts-table guards with `-k True`, `-m`, and XS-tag remedies | R parse | `as-rleaf` parsed the changed example. |
+| Confounder guidance and PAIRADISE hang wording incomplete | P2 | Changed PC1 wording to every leading PC, named leafcutter-with-batch as first low-n adjusted route, and added timeout/output verification for PAIRADISE after 100% progress | prior run rechecked against audit evidence | The existing imbalanced 4v4 audit data supports the low-n leafcutter route. |
+
+**Fixed: 5 of 5 open final-pass recommendations.**
+
+**Final refinement from the fresh stress run:** the initial every-replicate total-coverage interpretation still retained only 20/28 strong n=6 events. It was replaced before audit with `IJC+SJC >= 10` in at least half of each group's replicates. The exact embedded code retained 21 significant n=6 calls versus 17 under the legacy independent-minima rule, while still rejecting the shallow edge case.
+
+## Findings not fixed / hedged
+
+- **MAJIQ V3 / VOILA execution:** license-gated academic download; no public package install exists in this environment. The Skill does not present its commands as run evidence. Needs Sam only if a licensed execution is desired.

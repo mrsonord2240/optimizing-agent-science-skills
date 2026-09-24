@@ -8,7 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (85)
+## P1 (84)
 
 ### `bio-data-visualization-statistical-annotation` — stat_compare_means(comparisons, p.adjust.method='holm') draws unadjusted p; the argument does not exist
 
@@ -442,14 +442,6 @@ None open.
 - Root cause: A nonzero assigned fraction is not evidence that a DADA2 reference matches marker or primer region.
 - Fix: Replace the all-NA-only sentinel with a validation check against an expected-region/reference manifest and flag implausible 100 percent single-lineage assignments. Keep the current non-degeneracy check only as a secondary diagnostic.
 
-### `bio-microbiome-differential-abundance` — MaAsLin2's own shown random_effects='SubjectID' code block silently returns zero usable rows on a cross-sectional fixture -- the same defect class already fixed for LinDA, left undocumented in the code block two sections above
-
-- Skill: 89.2, Limited Release · [mrsonord2240/bioSkills@aeee6e0](https://github.com/mrsonord2240/bioSkills/tree/aeee6e017ce77b3e04d41da860de76496d8b1e68/microbiome/differential-abundance) · [viewer](skills/bio-microbiome-differential-abundance/mrsonord2240-bioSkills@aeee6e0/viewer.md)
-- Observed in inputs: 8
-- Problem: SKILL.md's MaAsLin2 code block (unchanged by this fix pass) shows random_effects = c('SubjectID') as the canonical pattern for longitudinal/repeated designs. Run verbatim against the fixture used throughout the rest of the Skill's examples (40 samples, 40 unique SubjectID -- one sample per subject), every per-feature lme4 fit fails with 'number of levels of each grouping factor must be < number of observations', caught internally with only a per-feature WARNING, and the written result table ends up with zero rows for the Group coefficient -- a silently empty, useless result reached without any top-level R error.
-- Root cause: A random effect grouping variable with as many levels as observations is degenerate (no within-group replication to estimate a variance component from) -- the identical mismatch class that produced the original LinDA P1 (formula '~ Group + Age + (1 \| SubjectID)' against a cross-sectional fixture), but MaAsLin2's block sits in the very next section and was not touched by this fix pass because it was not part of the original audit's tested inputs.
-- Fix: Either change the MaAsLin2 code block's demo formula to drop random_effects (matching how the LinDA block was fixed, since this SKILL.md's canonical demo fixture is cross-sectional) and add a comment showing random_effects=c('SubjectID') as the pattern for a true repeated-measures fixture, or add a Common Errors row for the exact 'number of levels of each grouping factor' message with the same explanation already given for LinDA.
-
 ### `bio-causal-genomics-transcriptome-wide-association` — Add MetaXcan calibration inputs to examples
 
 - Skill: 90, Production Ready · [mrsonord2240/bioSkills@3e246f1](https://github.com/mrsonord2240/bioSkills/tree/3e246f19f63e39dbb646ae874ed353b70f17ce94/causal-genomics/transcriptome-wide-association) · [viewer](skills/bio-causal-genomics-transcriptome-wide-association/mrsonord2240-bioSkills@3e246f1/viewer.md)
@@ -690,7 +682,7 @@ None open.
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (201)
+## P2 (191)
 
 ### `bio-data-visualization-statistical-annotation` — Test-name and label details differ from the tools
 
@@ -1116,46 +1108,6 @@ None open.
 - Root cause: Recipes were verified in the fixer's envs; restructuring was declared out of scope.
 - Fix: Add a CPU-torch note and pin the GitHub commits; move ASO, branchpoint and HGVS material to references/.
 
-### `bio-differential-splicing` — leafcutter batch = group sentence is wrong
-
-- Skill: 85, Limited Release · [mrsonord2240/bioSkills@ec5b9cf](https://github.com/mrsonord2240/bioSkills/tree/ec5b9cf46e2b1c73a361724dab97168c464fcbac/alternative-splicing/differential-splicing) · [viewer](skills/bio-differential-splicing/mrsonord2240-bioSkills@ec5b9cf/viewer.md)
-- Observed in inputs: 7
-- Problem: SKILL.md says leafcutter_ds.R with batch = group "exits 0 and returns significant clusters, with no warning". Run with both label and 0/1 encodings: exit 0, no warning, 86 clusters tested, every p ~ 1, 0 significant.
-- Root cause: The claim came from the first audit's wording and was not re-run when the section was rewritten.
-- Fix: Say it exits 0 without a warning and returns non-informative p ~ 1 for every cluster; keep the rank check as the guard.
-
-### `bio-differential-splicing` — Coverage filter uses per-group minima and drops true events
-
-- Skill: 85, Limited Release · [mrsonord2240/bioSkills@ec5b9cf](https://github.com/mrsonord2240/bioSkills/tree/ec5b9cf46e2b1c73a361724dab97168c464fcbac/alternative-splicing/differential-splicing) · [viewer](skills/bio-differential-splicing/mrsonord2240-bioSkills@ec5b9cf/viewer.md)
-- Observed in inputs: 5
-- Problem: min_inc and min_skip are minima over all replicates of both groups, added together; on sim2 it kept 20-22 of 28 strong events (26-28 without it), and loses more as n grows. usage-guide prompts ask for >= 10 reads per replicate.
-- Root cause: The sum of two separate minima is not a per-replicate total, and the minimum over more replicates only falls.
-- Fix: Filter on the per-replicate total (IJC + SJC >= 10 in every replicate, or in at least half) and state the recall cost; update the shipped example the same way.
-
-### `bio-differential-splicing` — MAJIQ HET "conservative at n=5-10" is not in the docs
-
-- Skill: 85, Limited Release · [mrsonord2240/bioSkills@ec5b9cf](https://github.com/mrsonord2240/bioSkills/tree/ec5b9cf46e2b1c73a361724dab97168c464fcbac/alternative-splicing/differential-splicing) · [viewer](skills/bio-differential-splicing/mrsonord2240-bioSkills@ec5b9cf/viewer.md)
-- Observed in inputs: 6
-- Problem: The MAJIQ section is labelled as taken from the 3.0.11.dev7 docs, but the docs recommend TNOM for n<5 and Wilcoxon for n>5 and never call HET conservative.
-- Root cause: A benchmark impression was left in a section that claims documentation as its source.
-- Fix: Attribute it to the MAJIQ-HET paper or delete it; keep the docs-based n<5 / n>5 statistic advice.
-
-### `bio-differential-splicing` — Shipped leafcutter example fails opaquely on zero introns
-
-- Skill: 85, Limited Release · [mrsonord2240/bioSkills@ec5b9cf](https://github.com/mrsonord2240/bioSkills/tree/ec5b9cf46e2b1c73a361724dab97168c464fcbac/alternative-splicing/differential-splicing) · [viewer](skills/bio-differential-splicing/mrsonord2240-bioSkills@ec5b9cf/viewer.md)
-- Observed in inputs: 2
-- Problem: With contigs outside chr1..22,X,Y (or -m too high) clustering yields an empty counts table and the example dies inside leafcutter with a colnames<- error.
-- Root cause: No check after the clustering step, unlike the rMATS example.
-- Fix: After Step 2 count rows in leafcutter_perind_numers.counts.gz and stop with the -k True / -m hint when there are none.
-
-### `bio-differential-splicing` — Confounder guidance: PCA wording and the better route at small n
-
-- Skill: 85, Limited Release · [mrsonord2240/bioSkills@ec5b9cf](https://github.com/mrsonord2240/bioSkills/tree/ec5b9cf46e2b1c73a361724dab97168c464fcbac/alternative-splicing/differential-splicing) · [viewer](skills/bio-differential-splicing/mrsonord2240-bioSkills@ec5b9cf/viewer.md)
-- Observed in inputs: 7
-- Problem: "If PC1 separates by batch" would not flag the simulated design (PC1 tracks group, r 0.97; batch is on PC2). The per-event regression found 4/30 true events at 4v4, while leafcutter with a batch column kept 18/30 with 0 batch-driven calls. PAIRADISE default PSOCK also hangs after reaching 100% (2 of 3 runs), not only at a few percent.
-- Root cause: Advice written from a 3v3 case and one hang pattern.
-- Fix: Say "check every leading PC against batch", name leafcutter with a batch column as the first choice at n<=4, and add a timeout note to the PAIRADISE paragraph.
-
 ### `bio-pileup-generation` — allele_counts counts read-base N as an allele; find_variants drops it
 
 - Skill: 85, Production Ready · [mrsonord2240/bioSkills@5fc1304](https://github.com/mrsonord2240/bioSkills/tree/5fc1304c09be282792e56a613274508db5bfaead/alignment-files/pileup-generation) · [viewer](skills/bio-pileup-generation/mrsonord2240-bioSkills@5fc1304/viewer.md)
@@ -1572,30 +1524,6 @@ None open.
 - Root cause: ReactomePA 1.50.0 under Windows R 4.4 exited 2816 after bare load, while the matching private Linux R 4.4 stack exited 0.
 - Fix: Keep the private Linux route documented for audited execution.
 
-### `bio-population-genetics-rare-variant-association` — SAIGE bgen command omits --chrom or --LOCO=FALSE
-
-- Skill: 89, Production Ready · [mrsonord2240/bioSkills@c1237cd](https://github.com/mrsonord2240/bioSkills/tree/c1237cdbc9bb199947696f3909de26a55d259116/population-genetics/rare-variant-association) · [viewer](skills/bio-population-genetics-rare-variant-association/mrsonord2240-bioSkills@c1237cd/viewer.md)
-- Observed in inputs: 4
-- Problem: The printed step2_SPAtests.R bgen command now parses but stops: 'chrom needs to be specified in order to apply Leave-one-chromosome-out on gene- or region-based tests'.
-- Root cause: LOCO is on by default in SAIGE 1.3.1 and the set-test command gives no chromosome.
-- Fix: Add `--chrom <chr>` (one run per chromosome with a LOCO null) or `--LOCO=FALSE`, and state which applies.
-
-### `bio-population-genetics-rare-variant-association` — SSD route does not warn about sample order
-
-- Skill: 89, Production Ready · [mrsonord2240/bioSkills@c1237cd](https://github.com/mrsonord2240/bioSkills/tree/c1237cdbc9bb199947696f3909de26a55d259116/population-genetics/rare-variant-association) · [viewer](skills/bio-population-genetics-rare-variant-association/mrsonord2240-bioSkills@c1237cd/viewer.md)
-- Observed in inputs: 6
-- Problem: SKAT_Null_Model data are matched to SSD genotypes by position; the Skill never says the covariate table must follow the .fam order.
-- Root cause: Sample alignment is implicit in the SKAT API.
-- Fix: Add a one-line check, e.g. `stopifnot(identical(fam$V2, covar_df$IID))`, before fitting the null model.
-
-### `bio-population-genetics-rare-variant-association` — Common Errors misses step-1 trait-type and variance traps
-
-- Skill: 89, Production Ready · [mrsonord2240/bioSkills@c1237cd](https://github.com/mrsonord2240/bioSkills/tree/c1237cdbc9bb199947696f3909de26a55d259116/population-genetics/rare-variant-association) · [viewer](skills/bio-population-genetics-rare-variant-association/mrsonord2240-bioSkills@c1237cd/viewer.md)
-- Observed in inputs: 1
-- Problem: The regenie errors 'very few unique values' (no --bt) and 'low variance' (rare SNPs in step 1) are explained only in code comments.
-- Root cause: The table predates the fixes.
-- Fix: Add both rows with their fixes (--bt; fit step 1 on QC'd common variants).
-
 ### `bio-variant-normalization` — csq --phase m and s described wrongly
 
 - Skill: 89, Production Ready · [mrsonord2240/bioSkills@c1237cd](https://github.com/mrsonord2240/bioSkills/tree/c1237cdbc9bb199947696f3909de26a55d259116/variant-calling/variant-normalization) · [viewer](skills/bio-variant-normalization/mrsonord2240-bioSkills@c1237cd/viewer.md)
@@ -1611,22 +1539,6 @@ None open.
 - Problem: On a REF mismatch the last pipe step aborts after creating a 0-record non-BGZF file; the next 'bcftools index' fails with 'not BGZF compressed', hiding the real cause.
 - Root cause: The workflow blocks omit the REF pre-check the example now has.
 - Fix: Add `set -o pipefail` and a `bcftools norm -f ref.fa -c w` pre-check (or the example's MISMATCH count) before the pipeline.
-
-### `bio-microbiome-differential-abundance` — Shared WSL lefse env is broken for both LDA and SVM ranking, independently reproduced -- needs a tooling-pass fix, not a SKILL.md change
-
-- Skill: 89.2, Limited Release · [mrsonord2240/bioSkills@aeee6e0](https://github.com/mrsonord2240/bioSkills/tree/aeee6e017ce77b3e04d41da860de76496d8b1e68/microbiome/differential-abundance) · [viewer](skills/bio-microbiome-differential-abundance/mrsonord2240-bioSkills@aeee6e0/viewer.md)
-- Observed in inputs: 9
-- Problem: run_lefse.py crashes on any input (confirmed on a fresh, independently-built input file, not reusing the fixer's) with a None return from its internal rpy2/R interop step, in both the default LDA ranking and the -r svm alternative.
-- Root cause: R in the shared lefse env is 4.5.3, not the R 3.2/3.3 TOOLS.md describes rpy2 as needing -- a version mismatch between the 'modern noarch build' of LEfSe 1.1.1 actually installed and the R version it was built to interoperate with via rpy2.
-- Fix: A future tooling pass on microbiome-metagenomics-analyst should rebuild the lefse env pinned to an R version rpy2 actually resolves against, then re-verify run_lefse.py end to end before any Skill's LEfSe example is scored as execution-verified.
-
-### `bio-microbiome-differential-abundance` — Maaslin2() crashes on plot generation with a ggplot2 API-version error when there are real significant results to plot
-
-- Skill: 89.2, Limited Release · [mrsonord2240/bioSkills@aeee6e0](https://github.com/mrsonord2240/bioSkills/tree/aeee6e017ce77b3e04d41da860de76496d8b1e68/microbiome/differential-abundance) · [viewer](skills/bio-microbiome-differential-abundance/mrsonord2240-bioSkills@aeee6e0/viewer.md)
-- Observed in inputs: 8
-- Problem: A default Maaslin2() call (plot_heatmap/plot_scatter left at their defaults) that finds real significant associations crashes partway through plotting with '<ggplot2::labels> object is invalid: every label must be named', after already having written all_results.tsv/significant_results.tsv to disk.
-- Root cause: Likely a ggplot2-version mismatch between what Maaslin2 1.20.0's plotting code expects and the env's installed ggplot2 4.0.3 (TOOLS.md records this version); not exercised by the original or this re-audit's other runs because sink()/capture.output() suppressed it or plot_heatmap=FALSE/plot_scatter=FALSE were passed.
-- Fix: Either note in SKILL.md's MaAsLin2 section that plot_heatmap=FALSE, plot_scatter=FALSE can be passed to skip plotting entirely (the numeric results are unaffected), or fix the env's ggplot2 pin in a future tooling pass.
 
 ### `bio-causal-genomics-transcriptome-wide-association` — Make optional-method execution boundaries clearer
 

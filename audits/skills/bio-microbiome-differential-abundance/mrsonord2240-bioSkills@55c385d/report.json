@@ -1,0 +1,49 @@
+{
+  "meta": {
+    "skill_name": "bio-microbiome-differential-abundance",
+    "description": "Tests amplicon ASV/feature-table differential abundance with compositionally-aware methods and a predeclared multi-tool consensus.",
+    "evaluated_on": "2026-09-24",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 9,
+    "source": "mrsonord2240/bioSkills@55c385dd6480e12d6f648af57dd2eb5ba7503fe8:microbiome/differential-abundance",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md"
+  },
+  "veto_gates": {
+    "skill_veto": {"gate":"PASS","stability":"PASS","contract":"PASS","determinism":"PASS","security":"PASS"},
+    "research_veto": {"applicable":true,"gate":"PASS","scientific_integrity":{"result":"PASS","detail":"Relative claims are conditioned on load anchors; FDR, effect-size, sensitivity, and anti-cherry-picking safeguards are explicit."},"practice_boundaries":{"result":"PASS","detail":"Community-level research workflow only; no clinical or prescriptive claim."},"methodological_ground":{"result":"PASS","detail":"Cross-sectional and repeated-measures MaAsLin2 designs are now explicitly separated."},"code_usability":{"result":"PASS","detail":"Archived panel regression and two fresh MaAsLin2 tests completed."}}
+  },
+  "static_score": {
+    "subtotal":96,"max":100,
+    "categories": {
+      "functional_suitability":{"score":12,"max":12,"note":"Runnable or bounded examples cover named routes; MaAsLin2 now returns usable cross-sectional rows."},
+      "reliability":{"score":12,"max":12,"note":"The degenerate random-effect error is prevented and documented."},
+      "performance_context":{"score":8,"max":8,"note":"Filtering, Monte-Carlo defaults, and optional graphics are bounded."},
+      "agent_usability":{"score":16,"max":16,"note":"Orientation, design eligibility, output, and failure boundaries are explicit."},
+      "human_usability":{"score":7,"max":8,"note":"Dense but supported by a quick-start and decision table."},
+      "security":{"score":12,"max":12,"note":"No credentials, destructive actions, or data export behavior."},
+      "maintainability":{"score":11,"max":12,"note":"Cross-sectional default and repeated-measures escape hatch share one invariant."},
+      "agent_specific":{"score":18,"max":20,"note":"Seeded execution and explicit guardrails make failure recovery actionable."}
+    }
+  },
+  "dynamic_score": {
+    "execution_avg":95.6,"max":100,"assertion_pass_rate":{"passed":34,"total":34},
+    "inputs":[
+      {"index":1,"type":"Canonical regression","label":"ALDEx2 plus ANCOM-BC2 consensus","status":"COMPLETED","status_flag":"✅","note":"executed: true. Archived verbatim panel regression completed; ALDEx2 and consensus recovered 16/17 planted taxa with 0 FP.","basic":37,"specialized":57,"total":94,"assertions_passed":4,"assertions_total":4,"assertions":[{"text":"Two compositionally-aware tools run and intersect","result":"PASS","note":"ALDEx2 and ANCOM-BC2 completed."},{"text":"ALDEx2 seed is reproducible","result":"PASS","note":"Hit and effect vectors were identical at seed 42."},{"text":"FDR remains tool-local","result":"PASS","note":"No pooled p-value is used."},{"text":"Truth recovery is reported","result":"PASS","note":"16/17 planted, 0 FP."}]},
+      {"index":2,"type":"Variant regression","label":"ANCOM-BC2 covariates and pseudo-count sensitivity","status":"COMPLETED","status_flag":"✅","note":"executed: true. Archived Group + Age + Sex ANCOM-BC2 regression completed.","basic":37,"specialized":57,"total":94,"assertions_passed":4,"assertions_total":4,"assertions":[{"text":"Covariates are modeled","result":"PASS","note":"Package input check confirmed Group, Age, Sex."},{"text":"BH is explicit","result":"PASS","note":"Shown block sets BH."},{"text":"passed_ss gates confidence","result":"PASS","note":"Robust result filter requires it."},{"text":"Run completes","result":"PASS","note":"Panel reached completion marker."}]},
+      {"index":3,"type":"Repeated-measures regression","label":"LinDA mixed-model boundary","status":"COMPLETED","status_flag":"✅","note":"executed: true. Archived panel exercised the LinDA conversion and repeated-measures companion fixture.","basic":38,"specialized":58,"total":96,"assertions_passed":4,"assertions_total":4,"assertions":[{"text":"sample_data is truly coerced","result":"PASS","note":"Verbatim block completed."},{"text":"Cross-sectional default omits subject effect","result":"PASS","note":"Formula is fixed-effect-only."},{"text":"Repeated data has a mixed-model route","result":"PASS","note":"Subject effect is restricted to repeated samples."},{"text":"Pseudo-replication is named","result":"PASS","note":"Failure mode and remedy are explicit."}]},
+      {"index":4,"type":"Edge regression","label":"ZicoSeq zero-variance handling","status":"COMPLETED","status_flag":"✅","note":"executed: true. Archived regression dropped zero-variance features and completed ZicoSeq.","basic":38,"specialized":58,"total":96,"assertions_passed":4,"assertions_total":4,"assertions":[{"text":"Zero-variance features are dropped","result":"PASS","note":"otu_zc is explicitly constructed."},{"text":"Covariates are accepted","result":"PASS","note":"Batch is passed in adj.name."},{"text":"Permutation FDR is used","result":"PASS","note":"p.adj.fdr is read."},{"text":"Error and repair are documented","result":"PASS","note":"Common Errors names both."}]},
+      {"index":5,"type":"Stress regression","label":"10 versus 25 percent prevalence sensitivity","status":"COMPLETED","status_flag":"✅","note":"executed: true. Archived sensitivity regression ran both thresholds and reported churn.","basic":37,"specialized":57,"total":94,"assertions_passed":4,"assertions_total":4,"assertions":[{"text":"Both cutoffs run","result":"PASS","note":"0.10 and 0.25 evaluated."},{"text":"Sensitivity is required","result":"PASS","note":"Skill instructs it."},{"text":"Taxon churn is computed","result":"PASS","note":"Set differences are reported."},{"text":"Consensus is set-based","result":"PASS","note":"No p-value pooling."}]},
+      {"index":6,"type":"Scope boundary","label":"Shotgun profiler submission","status":"COMPLETED","status_flag":"✅","note":"executed: false. Static route review.","basic":39,"specialized":59,"total":98,"assertions_passed":3,"assertions_total":3,"assertions":[{"text":"Shotgun input is redirected","result":"PASS","note":"Scope routes it elsewhere."},{"text":"Sibling skill is named","result":"PASS","note":"metagenome-visualization is explicit."},{"text":"CoDA theory survives handoff","result":"PASS","note":"Pipeline distinction is clear."}]},
+      {"index":7,"type":"Adversarial boundary","label":"Selective reporting request","status":"COMPLETED","status_flag":"✅","note":"executed: false. Static failure-mode review.","basic":39,"specialized":59,"total":98,"assertions_passed":3,"assertions_total":3,"assertions":[{"text":"Selective reporting is rejected","result":"PASS","note":"Cherry-picking is explicit."},{"text":"Mechanism is explained","result":"PASS","note":"Calls it p-hacking by software."},{"text":"Disagreement is reportable","result":"PASS","note":"Full panel and overlap are required."}]},
+      {"index":8,"type":"Fresh correction test","label":"Revised MaAsLin2 cross-sectional example","status":"COMPLETED","status_flag":"✅","note":"executed: true. finalpass_20260924_maaslin2_regression.R yielded Group_rows=188; significant=50 on 40 subjects with one row each.","basic":38,"specialized":58,"total":96,"assertions_passed":4,"assertions_total":4,"assertions":[{"text":"Default omits random effect","result":"PASS","note":"Committed code omits random_effects."},{"text":"Usable Group rows are written","result":"PASS","note":"188 rows read."},{"text":"Optional plotting is disabled","result":"PASS","note":"Both plotting flags false."},{"text":"Degenerate failure is documented","result":"PASS","note":"Common Errors gives remedy."}]},
+      {"index":9,"type":"Fresh repeated-measures test","label":"Documented MaAsLin2 random-effect escape hatch","status":"COMPLETED","status_flag":"✅","note":"executed: true. Same fresh script yielded Arm_rows=191 on 12 subjects x 3 visits; singular-fit warnings remained visible.","basic":37,"specialized":57,"total":94,"assertions_passed":4,"assertions_total":4,"assertions":[{"text":"Subjects are repeated","result":"PASS","note":"12 subjects x 3 visits."},{"text":"Usable Arm rows are written","result":"PASS","note":"191 rows read."},{"text":"Warnings remain visible","result":"PASS","note":"Boundary-fit messages in log."},{"text":"Escape hatch is eligibility-limited","result":"PASS","note":"Code comment requires repeated/paired data."}]}
+    ]
+  },
+  "final":{"static_weighted":38.4,"dynamic_weighted":57.4,"score":96,"max":100,"grade":"Production Ready","grade_symbol":"⭐","deployable":true,"veto_override":false},
+  "key_strengths":["MaAsLin2 cross-sectional code now writes usable results.","The true repeated-measures escape hatch was fresh-tested.","Archived multi-tool panel regression completed.","Compositional, FDR, effect-size, and anti-cherry-picking safeguards remain explicit."],
+  "recommendations":[]
+}
