@@ -1,0 +1,56 @@
+{
+  "meta": {
+    "skill_name": "bio-single-cell-batch-integration",
+    "description": "Integrate multiple scRNA-seq samples or batches with Harmony, scVI/scANVI, Seurat (CCA/RPCA), fastMNN, Scanorama, or BBKNN.",
+    "evaluated_on": "2026-09-24",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "executed_inputs": "7/7 targeted regressions",
+    "source": "mrsonord2240/bioSkills@8edc49ca40e7eab8a24c1d9555a176ae894e16ac:single-cell/batch-integration",
+    "audit_scope": "Exact-commit remediation re-audit of every P1/P2 from the 2026-09-16 audit."
+  },
+  "veto_gates": {
+    "skill_veto": {"gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS"},
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {"result": "PASS", "detail": "The revised text distinguishes observed tuning behavior from a universal guarantee and keeps paired biological/batch evaluation mandatory."},
+      "practice_boundaries": {"result": "PASS", "detail": "Research workflow only; no individual diagnosis, prescription, or triage."},
+      "methodological_ground": {"result": "PASS", "detail": "The metadata confounding stop check now precedes cluster-based effect sizing."},
+      "code_usability": {"result": "PASS", "detail": "The exact committed Harmony, scVI/scANVI, and Seurat RPCA scripts ran on synthetic audit fixtures and emitted their declared outputs."}
+    }
+  },
+  "static_score": {
+    "subtotal": 98,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {"score": 12, "max": 12, "note": "The Seurat RPCA command now includes its tested memory setting and wrapper methods are accurately bounded."},
+      "reliability": {"score": 12, "max": 12, "note": "Both observed runtime failures now have actionable recovery guidance."},
+      "performance_context": {"score": 7, "max": 8, "note": "The source remains compact; method-specific details load only through routed references."},
+      "agent_usability": {"score": 16, "max": 16, "note": "Runnable commands expose inputs, output paths, seeds, and epochs."},
+      "human_usability": {"score": 8, "max": 8, "note": "Confounded designs now have an explicit metadata-first stop rule."},
+      "security": {"score": 12, "max": 12, "note": "Scripts validate batch/label keys and do not require credentials or network access."},
+      "maintainability": {"score": 11, "max": 12, "note": "Canonical scripts and references replace copied blocks; no dedicated fixture ships with the skill."},
+      "agent_specific": {"score": 20, "max": 20, "note": "Copied execution paths pin stochastic controls and explicit training duration."}
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 96.0,
+    "max": 100,
+    "assertion_pass_rate": {"passed": 7, "total": 7},
+    "inputs": [
+      {"index": 1, "type": "Regression", "label": "Seeded Harmony source script", "status": "COMPLETED", "executed": true, "execution_note": "scripts/harmony_integration.py ran on a 400-cell stratified synthetic fixture and wrote re_audit_harmony.h5ad containing X_pca and X_pca_harmony.", "basic": 38, "specialized": 58, "total": 96, "assertions_passed": 1, "assertions_total": 1, "assertions": [{"text": "The documented exact command emits an integrated Harmony artifact with an uncorrected baseline.", "result": "PASS", "note": "Output artifact exists; Harmony converged in six iterations."}]},
+      {"index": 2, "type": "Regression", "label": "Seeded scVI/scANVI source script", "status": "COMPLETED", "executed": true, "execution_note": "scripts/scvi_scanvi_integration.py ran on the 6,524-cell synthetic input with a reproducible partial-label column; both trainers stopped at max_epochs=2 and wrote re_audit_scvi.h5ad.", "basic": 38, "specialized": 58, "total": 96, "assertions_passed": 1, "assertions_total": 1, "assertions": [{"text": "The copied scVI path sets scvi.settings.seed and an explicit epoch cap.", "result": "PASS", "note": "Runtime log reports Seed set to 0 and both trainers stopped at max_epochs=2."}]},
+      {"index": 3, "type": "Regression", "label": "Seurat v5 RPCA source script", "status": "COMPLETED", "executed": true, "execution_note": "scripts/seurat_v5_integration.R ran through the audit R wrapper on a 400-cell synthetic Seurat object and wrote re_audit_seurat.rds.", "basic": 38, "specialized": 58, "total": 96, "assertions_passed": 1, "assertions_total": 1, "assertions": [{"text": "RPCA has the documented future.globals.maxSize recovery before IntegrateLayers.", "result": "PASS", "note": "Source script completed and output RDS is 5,079,417 bytes."}]},
+      {"index": 4, "type": "Regression", "label": "Optional SeuratWrappers method boundary", "status": "COMPLETED", "executed": true, "execution_note": "The exact Seurat source script was invoked with FastMNNIntegration in an environment without SeuratWrappers.", "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 1, "assertions_total": 1, "assertions": [{"text": "An unavailable wrapper method fails with an actionable dependency message.", "result": "PASS", "note": "Error named SeuratWrappers rather than reporting an unresolved bare symbol."}]},
+      {"index": 5, "type": "Regression", "label": "Confounded-design metadata guard", "status": "COMPLETED", "executed": true, "execution_note": "run/re_audit_policy_checks.py checked the exact committed SKILL.md.", "basic": 38, "specialized": 58, "total": 96, "assertions_passed": 1, "assertions_total": 1, "assertions": [{"text": "Condition-by-batch is the first explicit stop check.", "result": "PASS", "note": "The text stops when a condition occurs in only one batch and demotes cluster cross-tabs to effect sizing."}]},
+      {"index": 6, "type": "Regression", "label": "Scanorama and theta corrections", "status": "COMPLETED", "executed": true, "execution_note": "run/re_audit_policy_checks.py checked the exact committed SKILL.md against the prior synthetic Scanorama/theta run evidence.", "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 1, "assertions_total": 1, "assertions": [{"text": "The two observed preconditions are stated without claiming that theta is an off switch.", "result": "PASS", "note": "Stable batch sorting, 0.5-5 starting scale, and theta=0 caveat are present."}]},
+      {"index": 7, "type": "Regression", "label": "Shipped-path structural check", "status": "COMPLETED", "executed": true, "execution_note": "Python scripts py_compile; Seurat script parsed; every SKILL.md reference target exists at commit 8edc49c.", "basic": 38, "specialized": 58, "total": 96, "assertions_passed": 1, "assertions_total": 1, "assertions": [{"text": "All routed scripts and reference files are present and syntactically valid.", "result": "PASS", "note": "No missing shipped asset or parse failure."}]}
+    ]
+  },
+  "recommendations": [],
+  "final": {"score": 97, "grade": "Production Ready", "deployable": true, "veto_override": false, "summary": "All six prior P1/P2 findings are fixed and each remediation assertion passed on the exact committed source."}
+}

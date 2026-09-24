@@ -1,0 +1,89 @@
+{
+  "meta": {
+    "skill_name": "bio-substructure-search",
+    "source": "mrsonord2240/bioSkills@94971d4a4427eb5c682cd860eee91e8d9e41adc7:chemoinformatics/substructure-search",
+    "evaluated_on": "2026-09-24",
+    "evaluator_version": "skill-auditor@1.0 exact-commit focused re-audit"
+  },
+  "skill": {
+    "name": "bio-substructure-search",
+    "path": "F:\\OpenScience\\worktrees\\bio-substructure-search-fixpass\\chemoinformatics\\substructure-search",
+    "source_commit": "94971d4a4427eb5c682cd860eee91e8d9e41adc7",
+    "base_commit": "4d483d0451fcd60cb3ab62dfa4cd047ec59b3615",
+    "audited_on": "2026-09-24",
+    "mode": "exact-commit focused re-audit"
+  },
+  "pre_fix_evidence": {
+    "report": "re-audit-20260924/pre-fix/eval_report_bio-substructure-search_result.json",
+    "viewer": "re-audit-20260924/pre-fix/eval_viewer_bio-substructure-search.md",
+    "score": 88,
+    "assertions": "24/30"
+  },
+  "structural_veto": {
+    "stability": "PASS",
+    "contract": "PASS",
+    "determinism": "PASS",
+    "security": "PASS",
+    "research_veto": "PASS"
+  },
+  "final": {
+    "static_weighted": 38.4,
+    "dynamic_weighted": 55.6,
+    "score": 94,
+    "max": 100,
+    "grade": "Production Ready",
+    "deployable": true,
+    "open_p0": 0,
+    "open_p1": 0,
+    "open_p2": 0
+  },
+  "recommendations": [],
+  "re_audit": {
+    "execution_average": 92.7,
+    "assertion_pass_rate": { "passed": 30, "total": 30 },
+    "final": {
+      "static_weighted": 38.4,
+      "dynamic_weighted": 55.6,
+      "score": 94,
+      "max": 100,
+      "grade": "Production Ready",
+      "deployable": true
+    },
+    "assertion_basis": "The 24 earlier passing assertions cover unchanged behavior. The six prior failures were re-executed against the exact clean commit and now pass; focused evidence is in re-audit-20260924/run-focused/.",
+    "focused_validations": [
+      {
+        "name": "ester SMARTS",
+        "evidence": "re-audit-20260924/run-focused/focused_validation.out",
+        "result": "PASS: [CX3](=[OX1])[OX2][#6] matched both isopropyl acetate and phenyl acetate."
+      },
+      {
+        "name": "user SMARTS validation",
+        "evidence": "re-audit-20260924/run-focused/focused_validation.out",
+        "result": "PASS: empty, malformed, and unsupported SMARTS raise ValueError; filter_library cannot silently empty an include result."
+      },
+      {
+        "name": "invalid input accounting",
+        "evidence": "re-audit-20260924/run-focused/focused_validation.out",
+        "result": "PASS: pains_filter returns zero-based invalid input positions ([1] for the tested malformed molecule) rather than silently discarding it."
+      },
+      {
+        "name": "reactive-alert semantics",
+        "evidence": "re-audit-20260924/run-focused/focused_validation.out",
+        "result": "PASS: precompiled Michael-acceptor query flags an enone and the covalent-design exemption suppresses the flag."
+      },
+      {
+        "name": "calibrated guidance",
+        "evidence": "re-audit-20260924/run-focused/focused_validation.out",
+        "result": "PASS: RDKit-specific curcumin limitation, measured recursive-SMARTS scale, BRENK reference attrition, and reactive flag-not-delete caveat are present."
+      }
+    ],
+    "resolved_findings": [
+      "P1 ester pattern is corrected and shared by SKILL.md and the executable example, with alkyl- and aryl-ester regressions.",
+      "P1 compile_smarts validates empty and malformed user SMARTS and is used by all user-query snippets and the example.",
+      "P2 PAINS wording now names RDKit-covered rhodanine/catechol classes and notes its lack of a curcumin-specific pattern.",
+      "P2 recursive-SMARTS performance wording now reports measured 1.6x and 3.7x reference costs instead of a false universal 10x-100x band.",
+      "P2 BRENK and custom reactive filters now provide collection-specific attrition and flag-not-delete interpretation guidance; reactive SMARTS compile once per configuration."
+    ],
+    "remaining_findings": []
+  }
+}

@@ -8,7 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (102)
+## P1 (96)
 
 ### `bio-data-visualization-statistical-annotation` — stat_compare_means(comparisons, p.adjust.method='holm') draws unadjusted p; the argument does not exist
 
@@ -362,14 +362,6 @@ None open.
 - Root cause: The checker tests residual primers against the same BED that was used to clip, so it cannot see a wrong BED; the example asserts only TOTAL CLIPPED > 0.
 - Fix: In the example compute NOT CLIPPED / TOTAL READS from clip.stats and fail (or warn loudly) above a stated threshold (control 0.14 %, shifted BED 2.5 %, wrong scheme 90 %+); remove 'BED from another scheme' from the checker's row and point it at the NOT CLIPPED share.
 
-### `bio-alignment-multiple` — Fix MUSCLE5 ensemble commands (-super5 has no .efa)
-
-- Skill: 85, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/alignment/multiple-alignment) · [viewer](skills/bio-alignment-multiple/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 4
-- Problem: Every ensemble example and the Quick Reference use 'muscle -super5 ... -stratified/-diversified/-replicates', which MUSCLE 5.3 rejects with 'not supported'; the Skill also states -super5 can output an .efa ensemble.
-- Root cause: Ensemble options belong to the -align (PPP) command; -super5 only accepts -perm/-perturb for single replicates.
-- Fix: Use 'muscle -align in.fa -stratified -output ens.efa' (and -diversified); for >1000 sequences say to run -super5 with several -perm/-perturb values and combine with -fa2efa. Correct the MUSCLE5 table's Output column.
-
 ### `bio-pileup-generation` — Round 2 introduced a false statement: BAQ 'under either stepper'; 'all' is the default
 
 - Skill: 85, Production Ready · [mrsonord2240/bioSkills@5fc1304](https://github.com/mrsonord2240/bioSkills/tree/5fc1304c09be282792e56a613274508db5bfaead/alignment-files/pileup-generation) · [viewer](skills/bio-pileup-generation/mrsonord2240-bioSkills@5fc1304/viewer.md)
@@ -498,38 +490,6 @@ None open.
 - Root cause: The JAX extra is intentionally absent from the shared environment.
 - Fix: Create a compatible isolated pertpy[jax] environment without changing the shared one, then rerun primary mixture assignment on the same fixture.
 
-### `bio-substructure-search` — Ester SMARTS silently misses every -O-CH< ester
-
-- Skill: 88, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/substructure-search) · [viewer](skills/bio-substructure-search/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: —
-- Problem: The Common SMARTS Patterns table gives ester as [CX3](=O)[OX2][!H]. In SMARTS, [!H] means 'not exactly one attached hydrogen', not 'not a hydrogen atom', so the pattern returns False for isopropyl acetate and any other ester whose O-substituted carbon carries one H. The shipped example uses [CX3](=O)[OX2][C] instead, which catches isopropyl but misses aryl esters such as aspirin.
-- Root cause: [!H] was written as if H were an element primitive; the two files were never cross-checked because the example asserts nothing.
-- Fix: Change the table entry to [CX3](=[OX1])[OX2][#6] (and make the example match), then add a regression case for CC(=O)OC(C)C and CC(=O)Oc1ccccc1 to the example's __main__.
-
-### `bio-substructure-search` — Invalid or empty SMARTS is not guarded in any SKILL.md snippet
-
-- Skill: 88, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/substructure-search) · [viewer](skills/bio-substructure-search/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 7
-- Problem: filter_library, pains_filter and the basic-match snippet pass the result of MolFromSmarts straight into HasSubstructMatch. An invalid pattern produces a four-line Boost C++ signature dump; an empty string produces a valid 0-atom query that matches nothing, so an include filter returns an empty library with no error at all.
-- Root cause: The None guard exists only in the shipped example's has_substructure and was never propagated into the SKILL.md patterns the agent actually copies.
-- Fix: Add a compile_smarts(s) helper to SKILL.md that raises ValueError on None and on a zero-atom query, and route every snippet through it.
-
-### `bio-causal-genomics-genetic-correlation` — No explicit population-vs-individual clinical scope statement
-
-- Skill: 89, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/causal-genomics/genetic-correlation) · [viewer](skills/bio-causal-genomics-genetic-correlation/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 6
-- Problem: SKILL.md never states that rg is a population-level statistic inapplicable to individual patients; the correct refusal observed in Input 6 relied on the model's general safety training, not on any instruction in the Skill.
-- Root cause: The Skill's extensive 'do NOT' guidance is entirely methodology-focused (intercept misreading, HDL overlap, method switching); it has zero escape-hatch language about individual-vs-population use.
-- Fix: Add a short Scope note near the top of SKILL.md: 'rg is computed from cohort-level GWAS summary statistics; it characterizes shared genetic architecture across a population and must never be used to inform diagnosis, prognosis, or treatment for an individual.'
-
-### `bio-causal-genomics-genetic-correlation` — Most documented methods have no runnable example file
-
-- Skill: 89, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/causal-genomics/genetic-correlation) · [viewer](skills/bio-causal-genomics-genetic-correlation/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 4
-- Problem: Only 2 of 9 named methods (LDSC, LAVA) have a standalone example script in examples/; HDL, rho-HESS, Popcorn, GREML-bivariate, GenomicSEM, and LCV exist only as inline SKILL.md code blocks the agent must extract and adapt by hand.
-- Root cause: examples/ was only partially built out relative to the scope claimed in the Algorithmic Taxonomy table.
-- Fix: Add at minimum examples/hdl_rg.R and examples/popcorn_transancestry.sh mirroring the structure of the existing two files (argument parsing, inline operational-rule comments).
-
 ### `bio-crispr-screens-perturb-seq-analysis` — Stabilize SCEPTRE runtime exit
 
 - Skill: 89, Production Ready · [mrsonord2240/bioSkills@6ca8a47](https://github.com/mrsonord2240/bioSkills/tree/6ca8a47d4a9743fbf9a090ddbc5609b1b6b6a504/crispr-screens/perturb-seq-analysis) · [viewer](skills/bio-crispr-screens-perturb-seq-analysis/mrsonord2240-bioSkills@6ca8a47/viewer.md)
@@ -593,14 +553,6 @@ None open.
 - Problem: The shipped topology example offers n_boot as its sole performance/reproducibility control but only sends it to direct spia(). The graphite route silently runs 2,000 bootstraps, contradicting the interactive 200-500 guidance and the claimed nB=100 whole-script runtime.
 - Root cause: runSPIA forwards its dots to SPIA::spia, but the example omits nB=n_boot in that call.
 - Fix: Change the graphite call to runSPIA(de = de_vec_gr, all = universe_gr, 'kegg_hsa_spia', nB = n_boot), then re-run the topology regression at a reduced documented value and update the reference timing.
-
-### `bio-single-cell-batch-integration` — The Seurat v5 snippet aborts on its own default method
-
-- Skill: 90, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/batch-integration) · [viewer](skills/bio-single-cell-batch-integration/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 4
-- Problem: SKILL.md:135 prints IntegrateLayers(..., method = RPCAIntegration). On a 6,048-cell, two-batch object it aborts: 'The total size of the 10 globals exported for future expression (FUN()) is 781.60 MiB. This exceeds the maximum allowed size 500.00 MiB per plan() argument maxSizeOfObjects'. CCAIntegration and HarmonyIntegration through the same code ran fine.
-- Root cause: Seurat's anchor-based integration ships its work to future workers, and the 500 MiB default globals limit is exceeded at very ordinary dataset sizes; the Skill's snippet omits the options() line every Seurat v5 integration tutorial carries.
-- Fix: Add options(future.globals.maxSize = 4 * 1024^3) immediately above the IntegrateLayers call - verified here to make RPCAIntegration run in 20 s at ARI 1.000 - and add the error string to Common Errors.
 
 ### `bio-single-cell-differential-abundance` — Make sccomp verification executable
 
@@ -826,7 +778,7 @@ None open.
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (276)
+## P2 (259)
 
 ### `bio-data-visualization-statistical-annotation` — Test-name and label details differ from the tools
 
@@ -1196,30 +1148,6 @@ None open.
 - Root cause: Restructuring was deferred in both fix rounds.
 - Fix: Move the microexon evidence and the DTU/rMATS-long blocks to references/, keep the recipe and the checks in SKILL.md, and link the example.
 
-### `bio-clinical-databases-clinvar-lookup` — Batch CA-ID helper aborts on non-400 Registry errors
-
-- Skill: 84, Limited Release · [mrsonord2240/bioSkills@c1237cd](https://github.com/mrsonord2240/bioSkills/tree/c1237cdbc9bb199947696f3909de26a55d259116/clinical-databases/clinvar-lookup) · [viewer](skills/bio-clinical-databases-clinvar-lookup/mrsonord2240-bioSkills@c1237cd/viewer.md)
-- Observed in inputs: 6
-- Problem: An unknown RefSeq accession returns HTTP 500 'Unknown reference'; car_record raises a generic HTTPError and batch_resolve_to_car_then_clinvar returns nothing for the whole list.
-- Root cause: Only HTTP 400 is caught and the response body is discarded on other errors.
-- Fix: Catch requests.HTTPError per input in the batch loop and record the Registry 'message' (e.g. 'Unknown reference: NC_000013.14') in the row's error column.
-
-### `bio-clinical-databases-clinvar-lookup` — No privacy or API-key guidance for bulk queries
-
-- Skill: 84, Limited Release · [mrsonord2240/bioSkills@c1237cd](https://github.com/mrsonord2240/bioSkills/tree/c1237cdbc9bb199947696f3909de26a55d259116/clinical-databases/clinvar-lookup) · [viewer](skills/bio-clinical-databases-clinvar-lookup/mrsonord2240-bioSkills@c1237cd/viewer.md)
-- Observed in inputs: —
-- Problem: Variant lists from patients or participants are sent to NCBI and ClinGen without a governance note, and higher NCBI rate limits need an API key the Skill does not mention.
-- Root cause: Written as a public-data query recipe.
-- Fix: Add a consent/approvals note for participant-derived variants and the `api_key` parameter for E-utilities.
-
-### `bio-clinical-databases-clinvar-lookup` — SKILL.md is long for single lookups
-
-- Skill: 84, Limited Release · [mrsonord2240/bioSkills@c1237cd](https://github.com/mrsonord2240/bioSkills/tree/c1237cdbc9bb199947696f3909de26a55d259116/clinical-databases/clinvar-lookup) · [viewer](skills/bio-clinical-databases-clinvar-lookup/mrsonord2240-bioSkills@c1237cd/viewer.md)
-- Observed in inputs: —
-- Problem: 345 lines load reviewer pushback and reconciliation tables for a one-variant query.
-- Root cause: All material kept in SKILL.md.
-- Fix: Move pushback, reconciliation and tripartite schema tables to the usage guide.
-
 ### `bio-clinical-databases-myvariant-queries` — State that myvariant _id HGVS-g is GRCh37
 
 - Skill: 84, Limited Release · [mrsonord2240/bioSkills@c1237cd](https://github.com/mrsonord2240/bioSkills/tree/c1237cdbc9bb199947696f3909de26a55d259116/clinical-databases/myvariant-queries) · [viewer](skills/bio-clinical-databases-myvariant-queries/mrsonord2240-bioSkills@c1237cd/viewer.md)
@@ -1427,30 +1355,6 @@ None open.
 - Problem: for f in *.bam in a directory with no BAMs runs samtools on the literal '*.bam'; a stale CSI built with -m 12 is rebuilt at the default; a truncated but fresh index (or a BAM restored with an old mtime) passes as fresh.
 - Root cause: mtime-only freshness test and no nullglob.
 - Fix: Add 'shopt -s nullglob' to the loop, a one-line note that freshness is by mtime only (verify with samtools idxstats vs samtools view -c after restores), and pass -m through when a CSI was rebuilt.
-
-### `bio-alignment-multiple` — Correct the 'mafft --auto' strategy table
-
-- Skill: 85, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/alignment/multiple-alignment) · [viewer](skills/bio-alignment-multiple/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 5
-- Problem: MAFFT 7.526 uses L-INS-i only for <100 sequences (and <3000 columns); 100-199 sequences of a 1.5 kb gene get FFT-NS-i. The 2,000-50,000 and >50,000 rows also do not match the script (FFT-NS-2 up to 20,000; PartTree only above 200,000).
-- Root cause: Table written from memory rather than from the mafft script's auto block.
-- Fix: Replace the table with the thresholds in the mafft script (nseq<100 & len<3000 -> L-INS-i; len<1000 & nseq<200 -> local, maxiterate 2; nseq<500 -> FFT-NS-i; <20000 -> FFT-NS-2; ...) and keep the advice to specify the mode explicitly.
-
-### `bio-alignment-multiple` — Add homology/strand pre-flight and note _R_ renaming
-
-- Skill: 85, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/alignment/multiple-alignment) · [viewer](skills/bio-alignment-multiple/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 1, 3
-- Problem: The gap-outlier checklist missed a non-homologous contig (gap fraction 0.18 vs 0.12-0.16) and fired on a correct indel-rich alignment; --adjustdirection silently renames sequences with _R_.
-- Root cause: Validation relies on gap heuristics; homology is only mentioned in prose.
-- Fix: Add a runnable homology/orientation screen (BLAST or local score vs shuffled) before alignment, describe the >50%-gapped-columns rule as a prompt to inspect, not a verdict, and tell the agent to strip _R_ prefixes before downstream joins.
-
-### `bio-alignment-multiple` — Move tool deep-dives to references/
-
-- Skill: 85, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/alignment/multiple-alignment) · [viewer](skills/bio-alignment-multiple/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: —
-- Problem: The 476-line SKILL.md loads BAli-Phy, OMM_MACSE, HyPhy, vcMSA and T-Coffee detail for every request.
-- Root cause: No progressive-disclosure layer.
-- Fix: Keep the decision tables and MAFFT/MUSCLE/PAL2NAL core in SKILL.md; move per-tool detail to references/*.md loaded on demand.
 
 ### `bio-alignment-validation` — Crosscheck misses a swap when both BAMs share RG ID/PU
 
@@ -2100,38 +2004,6 @@ None open.
 - Root cause: Parallel cleanup is fragile on this Windows runtime.
 - Fix: Document and verify a serial or controlled-worker option if reproducible.
 
-### `bio-substructure-search` — Curcumin is named as a PAINS_A target but RDKit's catalog has no curcumin pattern
-
-- Skill: 88, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/substructure-search) · [viewer](skills/bio-substructure-search/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 6
-- Problem: The PAINS false-positive failure mode says PAINS_A patterns target 'rhodanines, curcumins, polyhydroxylated polyphenols'. Curcumin is clean against all 480 PAINS entries in RDKit 2026.03.6; only BRENK flags it. A scan of all catalog descriptions found no entry containing 'cur'.
-- Root cause: The sentence describes the Baell & Holloway paper's scope rather than the RDKit FilterCatalog implementation the Skill tells the reader to use.
-- Fix: Replace 'curcumins' with a scaffold the RDKit catalog does cover (rhodanines fire as ene_rhod_A(235); catechols as catechol_A(92)) and add a line noting that RDKit's PAINS implementation does not reproduce every alert class in the original paper.
-
-### `bio-substructure-search` — Recursive-SMARTS slowdown is overstated by an order of magnitude
-
-- Skill: 88, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/substructure-search) · [viewer](skills/bio-substructure-search/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 3
-- Problem: The performance failure mode states a 10x-100x slowdown. Measured over 2,000 molecules: 1.6x for a one-level recursive amine pattern and 3.7x for a deeply nested one.
-- Root cause: The figure appears to be carried from an older toolkit or an unusually pathological pattern and was never re-measured.
-- Fix: State a measured range with the pattern and library size it was measured on, or drop the numeric claim and keep the prefilter-then-retest fix, which does work (identical matches at half the cost).
-
-### `bio-substructure-search` — BRENK attrition on lead-like libraries is not anticipated
-
-- Skill: 88, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/substructure-search) · [viewer](skills/bio-substructure-search/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 2
-- Problem: The prescribed HTS library-prep combination removed 39.4% of a lead-like ChEMBL set, of which BRENK alone accounted for 288 of 315 compounds. The catalog table frames BRENK as 'useful for fragment / virtual library' and offers no expectation of how much it removes from a drug-like collection.
-- Root cause: The when-to-apply table recommends catalog combinations without characterising their cost on different library types.
-- Fix: Add an expected-attrition column or a short note giving typical flag rates per catalog on fragment, lead-like and drug-like collections, and advise reviewing BRENK hits by category rather than deleting them wholesale.
-
-### `bio-substructure-search` — Reactive-filter section lacks the false-positive caveat the PAINS section has
-
-- Skill: 88, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/substructure-search) · [viewer](skills/bio-substructure-search/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 4
-- Problem: REACTIVE_SMARTS flagged curcumin and would flag any enone under Michael_acceptor, and flags penicillin G under beta_lactam. The PAINS section carries an explicit false-positive warning; this section carries none, so a user is more likely to treat these flags as deletions.
-- Root cause: The custom-filter section was written as a utility rather than as a judgement call, unlike the catalog sections around it.
-- Fix: Add two or three lines mirroring the PAINS caveat: name the classes each pattern over-calls (enones, beta-lactam antibiotics, aliphatic aldehydes) and repeat the flag-not-delete rule. Also hoist the MolFromSmarts calls out of reactive_filter's per-molecule loop.
-
 ### `bio-variant-calling-filtering-best-practices` — Tumor-column block has no guard for a missing header
 
 - Skill: 88, Production Ready · [mrsonord2240/bioSkills@c1237cd](https://github.com/mrsonord2240/bioSkills/tree/c1237cdbc9bb199947696f3909de26a55d259116/variant-calling/filtering-best-practices) · [viewer](skills/bio-variant-calling-filtering-best-practices/mrsonord2240-bioSkills@c1237cd/viewer.md)
@@ -2179,22 +2051,6 @@ None open.
 - Problem: peddy fails on non-human or small targets; somalier needs a build-matched sites file.
 - Root cause: Tool requirements not stated (left unfixed in this round).
 - Fix: Note the bundled human site panels, the chrX requirement and `somalier find-sites` for custom targets.
-
-### `bio-causal-genomics-genetic-correlation` — Two different rg-magnitude thresholds are not cross-referenced
-
-- Skill: 89, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/causal-genomics/genetic-correlation) · [viewer](skills/bio-causal-genomics-genetic-correlation/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 5
-- Problem: examples/ldsc_crosstrait_rg.sh hardcodes a 0.5 threshold to trigger 'run LAVA local rg', while SKILL.md's prose states \|rg\|>0.3 requires CHP-aware MR sensitivity; a reader who only skims the executable example could miss the stricter 0.3 MR rule.
-- Root cause: The two thresholds live in different files, addressing different downstream actions, with no inline cross-reference between them.
-- Fix: Add a one-line comment in ldsc_crosstrait_rg.sh's Step 7 noting the separate, stricter 0.3 MR-sensitivity threshold documented in SKILL.md.
-
-### `bio-causal-genomics-genetic-correlation` — SKILL.md is a 487-line monolith with no references/ split
-
-- Skill: 89, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/causal-genomics/genetic-correlation) · [viewer](skills/bio-causal-genomics-genetic-correlation/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: —
-- Problem: All taxonomy, decision-tree, failure-mode, and threshold content for all 9 methods loads into context on every trigger, even for a single-method request, penalizing Progressive Disclosure.
-- Root cause: No references/ subfolder is used at all; every table lives directly in SKILL.md.
-- Fix: Move the Algorithmic Taxonomy, Per-Method Failure Modes, and Reconciliation Across Methods tables into references/methods.md, keeping SKILL.md to the Decision Tree and the single Cross-Trait LDSC Standard Workflow.
 
 ### `bio-crispr-screens-perturb-seq-analysis` — State executable limits for optional methods
 
@@ -2315,46 +2171,6 @@ None open.
 - Problem: pysam_consensus.py consensus chr1 121 130 exits 0 and prints nine Ns even though the requested range is beyond a 120-base contig.
 - Root cause: The CLI delegates range handling to pileup and does not compare START/END to the BAM header length before building its N-initialized output.
 - Fix: Before calling build_consensus, validate 0 <= START < END <= BAM reference length; exit nonzero with an actionable coordinate message. Preserve legitimate in-range uncovered columns as Ns.
-
-### `bio-single-cell-batch-integration` — Two of the five listed Seurat methods need an unnamed package
-
-- Skill: 90, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/batch-integration) · [viewer](skills/bio-single-cell-batch-integration/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 4
-- Problem: SKILL.md:143 lists CCAIntegration, RPCAIntegration, HarmonyIntegration, FastMNNIntegration and scVIIntegration as bare symbols to pass. Only the first three resolve in Seurat 5.5.0; FastMNNIntegration and scVIIntegration live in SeuratWrappers, which is not mentioned anywhere in the Skill.
-- Root cause: The list was written from Seurat's documentation, which groups them together without flagging the package boundary.
-- Fix: Mark the last two as requiring SeuratWrappers (and scVIIntegration additionally requiring a working reticulate scvi-tools), so an agent that reaches for fastMNN in R knows what to install.
-
-### `bio-single-cell-batch-integration` — The theta warning has no magnitude
-
-- Skill: 90, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/batch-integration) · [viewer](skills/bio-single-cell-batch-integration/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 1
-- Problem: The strength-parameter table says larger theta over-corrects. Sweeping theta 0.5 / 2.0 / 8.0 changed batch ASW and cell-type ASW by less than 1e-4; only theta = 50 produced a visibly different correction, and theta = 0 still corrected substantially.
-- Root cause: The table gives a direction with no scale, so an agent cannot tell whether raising theta from 2 to 8 is a meaningful intervention.
-- Fix: State the useful range (roughly 0.5-5, default around 2) and say that the batch effect size dominates theta below that - and that theta = 0 does not disable correction.
-
-### `bio-single-cell-batch-integration` — Scanorama's sorted-batch precondition is unstated
-
-- Skill: 90, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/batch-integration) · [viewer](skills/bio-single-cell-batch-integration/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 3
-- Problem: sce.pp.scanorama_integrate raises 'Detected non-contiguous batches' on a normally ordered object. The Skill recommends Scanorama for partial cell-type overlap but gives no code and no precondition.
-- Root cause: Scanorama is table-only in the Skill, so its input contract was never written down.
-- Fix: Add one line to the method table or Common Errors: Scanorama requires the object sorted by batch key before integrate/correct.
-
-### `bio-single-cell-batch-integration` — The confounded-design diagnostic is necessary but not sufficient
-
-- Skill: 90, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/batch-integration) · [viewer](skills/bio-single-cell-batch-integration/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 6
-- Problem: The prescribed check is 'cluster the uncorrected data and cross-tabulate clusters x batch x condition'. On a design that is confounded by construction, that check returned 0 of 8 pure clusters and ARI 0.003 against capture day, i.e. it read as safe.
-- Root cause: The diagnostic detects a large batch effect, not a confounded design; a confound with a modest batch effect is invisible to it.
-- Fix: Lead the section with the metadata test - cross-tabulate condition against batch and stop if any condition sits entirely in one batch - and keep the cluster crosstab as the follow-up that sizes the effect. (Caveat: the simulated day effect used here is a uniform per-gene rescale that normalization removes, so this run shows the diagnostic is insufficient, not that it is generally blind.)
-
-### `bio-single-cell-batch-integration` — Seeds are prescribed in the error table and set in no code block
-
-- Skill: 90, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/batch-integration) · [viewer](skills/bio-single-cell-batch-integration/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 1, 2
-- Problem: Common Errors says 'Set seeds; for scVI fix max_epochs and report it', but not one of the five code blocks sets a seed, and the handle that actually works for scvi-tools (scvi.settings.seed) is never named.
-- Root cause: The advice lives only in the error table, not in the patterns agents copy.
-- Fix: Add random_state / scvi.settings.seed to the code blocks and name max_epochs explicitly in the scVI snippet rather than relying on the internal heuristic.
 
 ### `bio-single-cell-lineage-tracing` — Add a small raw-read regression fixture
 

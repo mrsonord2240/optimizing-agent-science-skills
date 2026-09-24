@@ -22,7 +22,7 @@ import time
 REC = "F:/optimizing-agent-science-skills"
 FORK = "F:/OpenScience/external/mrsonord2240__bioSkills"
 UPSTREAM_COMMIT = "d91ed3d563019e649dc854c56ccd62551359488a"
-FORK_COMMIT = "5c3408442c41a3f5c634a8c0be38984817d93fde"
+FORK_COMMIT = "7bf6ff4b1b6d0b94c5a4e63988c6e2b34e347f2c"
 AUDITS = "F:/OpenScience/audits"
 OUT = "F:/optimized-scientific-skills"
 SHELF_SIZE = 157

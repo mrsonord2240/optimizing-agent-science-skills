@@ -1,0 +1,9 @@
+{
+  "meta":{"skill_name":"bio-causal-genomics-genetic-correlation","source":"mrsonord2240/bioSkills@5d2fda0f6c5ded6631162f3aa16e603763f2e78d:causal-genomics/genetic-correlation","evaluated_on":"2026-09-24","execution_mode":"D","category":"Data Analysis","complexity":"Complex","n_inputs":7,"evidence":["run/reaudit_fixed_findings.py","run/reaudit_fixed_findings.out"]},
+  "veto_gates":{"skill_veto":{"gate":"PASS","stability":"PASS","contract":"PASS","determinism":"PASS","security":"PASS"},"research_veto":{"applicable":true,"gate":"PASS","scientific_integrity":{"result":"PASS","detail":"Cohort-level scope and individual-use prohibition are explicit."},"practice_boundaries":{"result":"PASS","detail":"No diagnosis, prognosis, or treatment use is permitted."},"methodological_ground":{"result":"PASS","detail":"HDL overlap and MR threshold rules are explicit."},"code_usability":{"result":"PASS","detail":"Focused exact-commit audit exits 0."}}},
+  "static_score":{"subtotal":96,"max":100},
+  "dynamic_score":{"execution_avg":98.0,"max":100,"assertion_pass_rate":{"passed":4,"total":4,"rate":100.0},"evidence":"run/reaudit_fixed_findings.out"},
+  "final":{"static_weighted":38.4,"dynamic_weighted":58.8,"score":97,"max":100,"grade":"Production Ready","grade_symbol":"⭐","deployable":true,"veto_override":false},
+  "key_strengths":["Explicit population-only scope.","Standalone HDL and Popcorn examples.","Cross-referenced local-rg and MR thresholds."],
+  "recommendations":[]
+}

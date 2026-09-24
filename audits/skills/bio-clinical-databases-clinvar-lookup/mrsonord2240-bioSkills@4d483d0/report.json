@@ -1,0 +1,97 @@
+{
+  "meta": {
+    "skill_name": "bio-clinical-databases-clinvar-lookup",
+    "source": "mrsonord2240/bioSkills@4d483d0451fcd60cb3ab62dfa4cd047ec59b3615:clinical-databases/clinvar-lookup",
+    "evaluated_on": "2026-09-24",
+    "mode": "exact-current re-audit",
+    "source_changed_in_this_pass": false,
+    "commit_created_in_this_pass": false,
+    "prior_audit": {
+      "source": "mrsonord2240/bioSkills@c1237cdbc9bb199947696f3909de26a55d259116:clinical-databases/clinvar-lookup",
+      "score": 84,
+      "grade": "Limited Release",
+      "assertions": "25/27",
+      "archived_report": "re-audit-20260924/pre-current/eval_report_bio-clinical-databases-clinvar-lookup_result.json"
+    }
+  },
+  "exact_byte_comparison": {
+    "result": "PASS",
+    "commits_present": [
+      "fc575c5 fix(bio-clinical-databases-clinvar-lookup): preserve batch registry error messages",
+      "905893a fix(bio-clinical-databases-clinvar-lookup): add consent and API-key guidance",
+      "f26acc9 fix(bio-clinical-databases-clinvar-lookup): move advanced reconciliation content to usage guide"
+    ],
+    "finding": "All three prior P2 remedies are present in the exact current source. No stale or new P0/P1/P2 source defect was found."
+  },
+  "veto_gates": {
+    "skill": "PASS",
+    "research": "PASS",
+    "security": "PASS",
+    "scope_boundary": "PASS"
+  },
+  "static_score": {
+    "subtotal": 89,
+    "max": 100,
+    "categories": {
+      "functional_suitability": "11/12 — public Allele Registry GET, ClinVar summary and paged E-utilities paths remain executable.",
+      "reliability": "11/12 — per-row HTTP errors now preserve Registry message and do not abort a batch.",
+      "performance_context": "7/8 — advanced reconciliation material is progressively disclosed in usage-guide.md.",
+      "agent_usability": "14/16 — explicit identifier, conflict and failure-mode guidance.",
+      "human_usability": "7/8 — clear routing and scope boundary.",
+      "security": "11/12 — participant-derived data governance and API-key handling guidance added; public services still require appropriate local governance.",
+      "maintainability": "10/12 — focused example is resilient; no dedicated automated test suite.",
+      "agent_specific": "18/20 — clinical-use boundary and escalation are explicit."
+    }
+  },
+  "dynamic_score": {
+    "execution_average": 88.0,
+    "max": 100,
+    "assertion_reconciliation": {
+      "passed": 27,
+      "total": 27,
+      "basis": "25 prior passing assertions retained against byte-compared unchanged behavior; the two formerly failing batch assertions were re-executed at the exact current SHA."
+    },
+    "focused_executable_validation": [
+      {
+        "name": "ClinVar summary and ClinGen CA resolution",
+        "result": "PASS",
+        "evidence": "Variation 17661 -> VCV000017661, Pathogenic, reviewed by expert panel; NC_000017.11:g.43106487A>C -> CA001182."
+      },
+      {
+        "name": "Batch non-400 Registry error",
+        "result": "PASS",
+        "evidence": "Three input rows returned; invalid NC_000013.14 row retained error 'Unknown reference: NC_000013.14' while valid row retained CA001182."
+      },
+      {
+        "name": "Conflict and VCF contracts",
+        "result": "PASS",
+        "evidence": "Likely_pathogenic(2)|Likely_benign(1) classified severe; command includes INFO/ONCDN,INFO/SCIDN."
+      },
+      {
+        "name": "Gene-search pagination",
+        "result": "PASS",
+        "evidence": "Live BRCA1 pathogenic search returned count=4725, ids=4725, all unique; max_ids=1200 returned documented whole final page of 1500."
+      },
+      {
+        "name": "Governance and progressive disclosure",
+        "result": "PASS",
+        "evidence": "Source assertions found consent/IRB guidance, NCBI_API_KEY guidance, and relocation of advanced tables to usage-guide.md."
+      },
+      {
+        "name": "Syntax and integrity",
+        "result": "PASS_WITH_LEGACY_WARNING",
+        "evidence": "py_compile and git diff --check passed. quick_validate reports only pre-existing unsupported legacy frontmatter keys: author, primary_tool, tool_type."
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 35.6,
+    "dynamic_weighted": 52.8,
+    "score": 88,
+    "max": 100,
+    "grade": "Production Ready",
+    "deployable": true,
+    "veto_override": false
+  },
+  "remaining_findings": []
+}
