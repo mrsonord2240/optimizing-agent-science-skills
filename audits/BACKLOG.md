@@ -8,7 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (91)
+## P1 (90)
 
 ### `bio-data-visualization-statistical-annotation` — stat_compare_means(comparisons, p.adjust.method='holm') draws unadjusted p; the argument does not exist
 
@@ -353,14 +353,6 @@ None open.
 - Problem: CFTR c.3849+10kbC>T (c.3717+12191C>T), listed in the Skill as a disease example, scores SpliceAI 0.16 at -D 50, 500 and 2000; only Pangolin (+0.33) and the discordance label flag it, CI-SpliceAI gives 0.01, MMSplice returns no row.
 - Root cause: The Failure Mode text reads as if -D 500 is the fix; the measured GLA case is favourable, this one is not.
 - Fix: Add the CFTR measurement next to the GLA one and say that a deep-intronic candidate at 0.10-0.20 with a Pangolin gain is a "discordant, needs RNA" case, not a rescue by -D.
-
-### `bio-alignment-amplicon-clipping` — Wrong primer BED passes the example; claim attributed to checker
-
-- Skill: 85, Limited Release · [mrsonord2240/bioSkills@76805aa](https://github.com/mrsonord2240/bioSkills/tree/76805aaab9347c8022c25df34c533cc3abd0b898/alignment-files/alignment-amplicon-clipping) · [viewer](skills/bio-alignment-amplicon-clipping/mrsonord2240-bioSkills@76805aa/viewer.md)
-- Observed in inputs: 7
-- Problem: A v5 BED shifted +9 bp and a v3.0.0 BED with --strand alone both exit 0 (4692 of 4916 reads NOT CLIPPED in the latter); the v3.0.0 BED with the default mode fails only because one read's 3' end hit a primer. The example header says a run that prints the final line succeeded, and SKILL Common Errors lists 'BED from another primer-scheme version' under the checker's exit 1.
-- Root cause: The checker tests residual primers against the same BED that was used to clip, so it cannot see a wrong BED; the example asserts only TOTAL CLIPPED > 0.
-- Fix: In the example compute NOT CLIPPED / TOTAL READS from clip.stats and fail (or warn loudly) above a stated threshold (control 0.14 %, shifted BED 2.5 %, wrong scheme 90 %+); remove 'BED from another scheme' from the checker's row and point it at the NOT CLIPPED share.
 
 ### `bio-pileup-generation` — Round 2 introduced a false statement: BAQ 'under either stepper'; 'all' is the default
 
@@ -738,7 +730,7 @@ None open.
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (220)
+## P2 (215)
 
 ### `bio-data-visualization-statistical-annotation` — Test-name and label details differ from the tools
 
@@ -1203,46 +1195,6 @@ None open.
 - Problem: torch via pip pulls the CUDA wheel by default, SpliceTransformer needs a Drive download and pyensembl indexing that I could not repeat from scratch; SKILL.md is still 443 lines with no references/ layer.
 - Root cause: Recipes were verified in the fixer's envs; restructuring was declared out of scope.
 - Fix: Add a CPU-torch note and pin the GitHub commits; move ASO, branchpoint and HGVS material to references/.
-
-### `bio-alignment-amplicon-clipping` — Refuted BAQ/MD claim survives in the example comment
-
-- Skill: 85, Limited Release · [mrsonord2240/bioSkills@76805aa](https://github.com/mrsonord2240/bioSkills/tree/76805aaab9347c8022c25df34c533cc3abd0b898/alignment-files/alignment-amplicon-clipping) · [viewer](skills/bio-alignment-amplicon-clipping/mrsonord2240-bioSkills@76805aa/viewer.md)
-- Observed in inputs: 4
-- Problem: examples/ampliconclip_workflow.sh line 62 says bcftools mpileup BAQ depends on MD/NM; bcftools output is byte-identical with and without MD (32,150 records, with and without -B) and SKILL.md says so.
-- Root cause: The fix removed the claim from SKILL.md and usage-guide.md but not from the script comment.
-- Fix: Change the comment to 'IGV mismatch coloring and NM/MD-based filters read them'.
-
-### `bio-alignment-amplicon-clipping` — Example rejects legitimate BEDs with the wrong message
-
-- Skill: 85, Limited Release · [mrsonord2240/bioSkills@76805aa](https://github.com/mrsonord2240/bioSkills/tree/76805aaab9347c8022c25df34c533cc3abd0b898/alignment-files/alignment-amplicon-clipping) · [viewer](skills/bio-alignment-amplicon-clipping/mrsonord2240-bioSkills@76805aa/viewer.md)
-- Observed in inputs: 3
-- Problem: samtools accepts a BED with track/browser header lines and space-delimited columns; the example exits 1 with '--strand needs the strand in BED column 6 ... 5-column BED is rejected' (track line) or 'no contig shared ... (whole lines listed)' (spaces). A 5-column BED with CLIP_OPTS=--both-ends fails only after clipping, as 'primer bases remain'.
-- Root cause: The BED checks use awk -F'\t' with !/^#/ and count every non-comment line, and the checker's BED loader also needs 6 columns without saying so up front.
-- Fix: Skip lines starting with track/browser and split on any whitespace in the awk checks (or state 'tab-delimited, no header lines' in the example header); make the checker's BED error say it is a BED problem.
-
-### `bio-alignment-amplicon-clipping` — check_primer_residual.py exit codes contradict its docstring
-
-- Skill: 85, Limited Release · [mrsonord2240/bioSkills@76805aa](https://github.com/mrsonord2240/bioSkills/tree/76805aaab9347c8022c25df34c533cc3abd0b898/alignment-files/alignment-amplicon-clipping) · [viewer](skills/bio-alignment-amplicon-clipping/mrsonord2240-bioSkills@76805aa/viewer.md)
-- Observed in inputs: 7
-- Problem: The docstring says exit 2 on bad input, but a 5-column BED (sys.exit(message)), a missing BED (traceback) and a missing BAM all exit 1, the same code as 'residual found', so the example reports 'primer bases remain'. When pysam is not importable the example skips the check with only a stderr note and exits 0.
-- Root cause: sys.exit(str) and uncaught FileNotFoundError give status 1; the skip path is not treated as a failed check.
-- Fix: Catch bad-input errors and return 2 (print to stderr); in the example treat rc 2 as 'check could not run' and fail (or require pysam explicitly).
-
-### `bio-alignment-amplicon-clipping` — Failed example runs leave an output BAM; sparse samples get a misleading stop
-
-- Skill: 85, Limited Release · [mrsonord2240/bioSkills@76805aa](https://github.com/mrsonord2240/bioSkills/tree/76805aaab9347c8022c25df34c533cc3abd0b898/alignment-files/alignment-amplicon-clipping) · [viewer](skills/bio-alignment-amplicon-clipping/mrsonord2240-bioSkills@76805aa/viewer.md)
-- Observed in inputs: 5
-- Problem: After the MD assertion or the residual check fails, $OUT (bam and .bai) already exists and looks finished; a legitimate sparse or negative-control sample with no read on a primer exits 'BED coordinates do not match the reads'.
-- Root cause: calmd writes straight to $OUT and the checks run after; the TOTAL CLIPPED > 0 assert cannot tell a wrong BED from a low-yield sample.
-- Fix: Write to $WORK/final.bam and mv to $OUT after the checks pass; word the stop as 'ampliconclip clipped nothing (wrong BED, or no reads on primers)'.
-
-### `bio-alignment-amplicon-clipping` — Two small claim inaccuracies (iVar index, --tolerance)
-
-- Skill: 85, Limited Release · [mrsonord2240/bioSkills@76805aa](https://github.com/mrsonord2240/bioSkills/tree/76805aaab9347c8022c25df34c533cc3abd0b898/alignment-files/alignment-amplicon-clipping) · [viewer](skills/bio-alignment-amplicon-clipping/mrsonord2240-bioSkills@76805aa/viewer.md)
-- Observed in inputs: 1, 3
-- Problem: iVar 1.4.4 trimmed an unindexed sorted BAM (4909 reads) although SKILL says it needs an indexed BAM; --tolerance N is described as the distance a read end may sit from a primer edge, but reads starting inside the primer always clip and N only extends the match N bases upstream of the primer start.
-- Root cause: Statements copied from tool documentation without a run.
-- Fix: Say 'iVar expects sorted input (index optional on 1.4.4)' and 'a read start up to N bases before the primer start still matches; starts inside the primer always match'.
 
 ### `bio-differential-splicing` — leafcutter batch = group sentence is wrong
 

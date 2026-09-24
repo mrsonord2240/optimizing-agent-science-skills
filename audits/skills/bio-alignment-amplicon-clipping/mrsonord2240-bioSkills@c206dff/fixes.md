@@ -35,3 +35,15 @@ Tools checked on: samtools 1.24, pysam 0.24.1, iVar 1.4.4, bcftools 1.24 (WSL en
 ## Findings left unfixed
 
 None of the audit's recommendations. Not exercised: BAMClipper (deleted, not installed); PacBio HiFi 16S (only mentioned generically; ONT measured); `--tolerance` effect (no difference on the ARTIC data, stated as flag semantics only).
+
+## 2026-09-24 (final pass, branch `root/fix-bio-alignment-amplicon-clipping`)
+
+Completed the outstanding final-pass remediation and audited the exact resulting source commit `c48efba95387158281f21abe97ecb48b8407ac44` (following the hardening commit `968e76c3a46383a495cbee10f2b65f25cca60a56`).
+
+| finding | priority | change | verified |
+| --- | --- | --- | --- |
+| Wrong or sparse primer schemes could look successful | P1 | Workflow now derives `NOT CLIPPED / TOTAL READS`, enforces `MAX_NOT_CLIPPED_PCT` (default 1%), and keeps output inside the temporary directory until every check passes | ARTIC v3, v5 shifted +9 bp, and v3 strand-only each fail at 90.419%, 2.482%, and 95.443%; matching v5 succeeds (7/4916 not clipped) |
+| BED/header parsing, residual-check contract, and late failures were ambiguous | P2 | Normalizes whitespace, UCSC headers, and CRLF; makes pysam mandatory; checker returns 2 for bad input; final BAM is atomically published only after validation | Space, track/browser, comment, blank, and CRLF BEDs pass; malformed 5-column BED returns actionable error/exit 2; failed cases leave no final BAM |
+| Minor stale claims | P2 | Corrected BAQ/MD script wording and iVar/tolerance guidance | Re-ran command/pointer checks and MD-vs-no-MD bcftools comparisons |
+
+Final audit: **95/100, Production Ready, deployable**, 7/7 inputs executed, 28/28 assertions passed, all structural and research vetoes pass, no open P0/P1/P2 recommendations. Inputs 1–5 re-ran archived logical regressions; inputs 6–7 were fresh synthetic HiFi and wrong-scheme/checker cases. Evidence: `F:\OpenScience\audits\bio-alignment-amplicon-clipping\eval_report_bio-alignment-amplicon-clipping_result.json` and its viewer. `auditor_independent: false`; final-pass note is present.
