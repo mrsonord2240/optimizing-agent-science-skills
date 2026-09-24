@@ -8,6 +8,7 @@ Commits:
 
 - `a6550a1a7aca3cfa156d65780278acb017e54d94` — `fix(single-cell/preprocessing): repair QC and ambient audit findings`
 - `c3ca7ea1aa3aacf4efebc322b9b01dee31fe3917` — `fix(single-cell/preprocessing): align packaged QC examples`
+- `713361b0f496c5658fa225b596fbd7989ddefa40` — `docs(single-cell/preprocessing): restore install guidance`
 
 ## Resolved findings
 
@@ -37,14 +38,14 @@ Commits:
 | Preserve raw counts | `usage-guide.md` Tips | Consolidated into Canonical Pipeline Order and HVG guidance |
 | Avoid reflexive regression | `usage-guide.md` Tips | Consolidated into Scaling and Covariate Regression |
 | Dissociation caveat | `usage-guide.md` Tips | Consolidated into mitochondrial/confound guidance |
-| Prerequisites section | `usage-guide.md` | Version compatibility and installation context already live in `SKILL.md` |
+| Prerequisites section | `usage-guide.md` | Install commands moved into the authoritative `SKILL.md` Installation section |
 | Repeated workflow section | `usage-guide.md` | Canonical Pipeline Order already lives in `SKILL.md` |
 
 ## Verification and re-audit
 
 - Exact evidence directory: `F:\OpenScience\audits\bio-single-cell-preprocessing\run\final-corrective-20260924`
 - Seven archived inputs rerun as regressions; two fresh packaged-example inputs added
-- Exact source: `mrsonord2240/bioSkills@c3ca7ea1aa3aacf4efebc322b9b01dee31fe3917:single-cell/preprocessing`
+- Exact source: `mrsonord2240/bioSkills@713361b0f496c5658fa225b596fbd7989ddefa40:single-cell/preprocessing`
 - Pre-fix evidence retained: `F:\OpenScience\audits\_pre-fix-20260924\bio-single-cell-preprocessing`
 
 Re-audit result: **93/100, Production Ready, deployable**; **36/36 assertions

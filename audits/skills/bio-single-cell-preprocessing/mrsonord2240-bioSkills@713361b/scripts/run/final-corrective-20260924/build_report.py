@@ -22,7 +22,7 @@ def require(path, *markers):
 head = subprocess.check_output(
     ["git", "rev-parse", "HEAD"], cwd=SOURCE, text=True
 ).strip()
-assert head == "c3ca7ea1aa3aacf4efebc322b9b01dee31fe3917"
+assert head == "713361b0f496c5658fa225b596fbd7989ddefa40"
 
 require(RUN / "input1-rerun.log", "VERBATIM_SKILL_BLOCK_OK = True", "HVGs: 2000")
 require(RUN / "input2-rerun.log", "mean |error| = 0.0515", "counts removed: 1 %", "DONE")
@@ -30,7 +30,7 @@ require(RUN / "input3-rerun.log", "survivors=84/120")
 require(RUN / "input4-rerun.log", "SCTransform: ", "scran size factors:", "DONE")
 require(RUN / "input5-rerun.log", "precision=0.510", "reciprocal condition number", "DONE")
 require(RUN / "input7-rerun.log", "ratio 0.662", "DONE")
-require(RUN / "sources.log", "PASS: 10/10 exact-source assertions")
+require(RUN / "sources.log", "PASS: 11/11 exact-source assertions")
 require(
     RUN / "qc.log",
     "PASS: nuclei MAD guard stopped",
@@ -55,7 +55,7 @@ report["meta"].update(
         "n_inputs": 9,
         "source": (
             "mrsonord2240/bioSkills@"
-            "c3ca7ea1aa3aacf4efebc322b9b01dee31fe3917:single-cell/preprocessing"
+            "713361b0f496c5658fa225b596fbd7989ddefa40:single-cell/preprocessing"
         ),
         "executed_inputs": "8/9",
         "regression_inputs": [1, 2, 3, 4, 5, 6, 7],

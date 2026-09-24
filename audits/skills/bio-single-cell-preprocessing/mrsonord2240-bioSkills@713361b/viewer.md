@@ -1,5 +1,5 @@
 > **Audit record for `bio-single-cell-preprocessing`**
-> - Skill authored by [GPTomics](https://github.com/GPTomics); audited version [mrsonord2240/bioSkills@c3ca7ea](https://github.com/mrsonord2240/bioSkills/tree/c3ca7ea1aa3aacf4efebc322b9b01dee31fe3917/single-cell/preprocessing) (MIT).
+> - Skill authored by [GPTomics](https://github.com/GPTomics); audited version [mrsonord2240/bioSkills@713361b](https://github.com/mrsonord2240/bioSkills/tree/713361b0f496c5658fa225b596fbd7989ddefa40/single-cell/preprocessing) (MIT).
 > - Modified by Samuel Nord from [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a); every change is listed in [fixes.md](fixes.md).
 > - Audit method: [skill-auditor](https://github.com/aipoch/medical-research-skills/tree/f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26/skill-auditor) by AIPOCH (MIT), skill-auditor@1.0.
 > - Performed on 2026-09-24 by Claude (Anthropic) auditor agents, commissioned by Samuel Nord. Not reviewed or endorsed by the Skill's authors.
@@ -11,7 +11,7 @@ Generated: 2026-09-24 · rendered from `report.json` by `tools/render_viewer.py`
 
 > This viewer is **generated from the audit report**, not written by the auditor. It restates the report's own recorded scores, notes and assertions and adds nothing to them. Where a hand-written viewer would argue from the runs, this one points at the scripts in [scripts/](scripts/) instead.
 
-Source: `mrsonord2240/bioSkills@c3ca7ea1aa3aacf4efebc322b9b01dee31fe3917:single-cell/preprocessing`
+Source: `mrsonord2240/bioSkills@713361b0f496c5658fa225b596fbd7989ddefa40:single-cell/preprocessing`
 Audit type: final-pass exact-commit corrective re-audit
 Category: Data Analysis · Execution mode: A · Complexity: Complex · N = 9 · Executed: 8/9
 
