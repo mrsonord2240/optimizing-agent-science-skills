@@ -54,3 +54,20 @@ From `usage-guide.md` (now overview, prompts, "what the agent will do" only; eve
 | Prompts added: "skip ones that already have a fresh index", "index my CRAM ... reference ref.fa" | new, point at `ensure_index` and CRAM sections |
 
 The usage-guide and SKILL.md disagreed on the unsorted-BAM message (`file is not coordinate sorted` vs `file is not sorted`); both wrong, replaced by the message printed by samtools 1.24.
+
+## 2026-09-24 (final pass: Codex, branch `fix/bio-alignment-indexing-final`, base `cf49634b`)
+
+Final-pass source commit: `1c12d65aa177cc782a8e69e51130afb9caed5250`. Checked on samtools/htslib 1.24, pysam 0.24.1 and Python 3.12 in WSL `science` env `alignment-files`. The prior 2026-09-20 re-audit and its raw runs were archived at `F:\OpenScience\audits\_pre-fix-20260924\bio-alignment-indexing` before this audit.
+
+| Finding | Priority | Change | Verified (ran / help / docs) | Notes |
+| --- | --- | --- | --- | --- |
+| `fetch_regions.py` mishandles coordinate 0, reversed coordinates and comma-bearing contig names | P2 | Preserve commas in contigs, strip commas only in coordinates, map start `0` to Python offset `0`, validate reversed intervals and catch `ValueError` from `fetch()` | Ran copied example on the real human BAM: `chr22:0-4000` returns 5550; `ctg,1` parser fixtures pass; `chr22:5000-4000` exits with one `Bad region` line and no traceback | Matches samtools-style zero boundary while retaining 1-based inclusive user coordinates elsewhere |
+| Bash helper can remove a sibling BAM/CRAM alternate-name index | P2 | Candidate paths are format-specific: BAM uses CSI/BAI only, CRAM uses CRAI only | Ran standard and alternate sibling fixtures; re-indexing either format retained the other's index | Python helper already had format-specific candidates; Bash now agrees |
+| Stale custom CSI rebuilt with default bin size | P2 | Read CSI `min_shift` after BGZF decompression and pass `-c -m` on rebuild | Ran stale `-m 12` CSI fixture; rebuilt CSI remained `min_shift=12` and returned the expected count | The prior raw check exposed that CSI is BGZF-compressed; direct `od` was corrected before commit |
+| Empty batch loop invokes literal `*.bam` | P2 | Document and enable `shopt -s nullglob` before the loop | Ran empty-directory fixture: exit 0, no command attempted | Fresh BAI/CSI and unsorted-BAM batch checks also pass |
+| Genome/table and BAM position statements are too broad | P2 | Pine/fir guidance now checks the longest scaffold, axolotl chromosome arms use CSI, and the text distinguishes a long header from an unwriteable read position | Ran synthetic 830-Mbp, 2.0-Gbp and 3-Gbp-header fixtures; all 18 large-genome checks pass | A CSI can index low-position reads under a 3-Gbp header; positions beyond `2^31-1` still fail to write |
+| `REF_PATH` is presented as though it could be a FASTA directory | P2 | State the M5/MD5 cache convention and recommend `-T ref.fa` as the direct route | Archived CRAM run: plain FASTA directory returns 0 records, M5-named cache returns 2 | No new dependency: `bgzip` is supplied by installed htslib |
+
+## Findings left unfixed
+
+None. All six open P2 recommendations from the canonical 2026-09-20 report were corrected and re-executed.
