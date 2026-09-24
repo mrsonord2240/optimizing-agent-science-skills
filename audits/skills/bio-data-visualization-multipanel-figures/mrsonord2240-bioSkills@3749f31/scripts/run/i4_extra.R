@@ -1,0 +1,6 @@
+.libPaths(c("F:/OpenScience/audits/bio-data-visualization-multipanel-figures/lib-pw113", .libPaths()))
+suppressPackageStartupMessages(library(patchwork))
+cat("patchwork", as.character(packageVersion("patchwork")), "\n")
+cat("plot_layout formals in 1.1.3:", paste(names(formals(plot_layout)), collapse = ", "), "\n")
+r <- try(plot_layout(axes = "collect"), silent = TRUE)
+cat("plot_layout(axes='collect') in 1.1.3 ->", if (inherits(r, "try-error")) paste("ERROR:", conditionMessage(attr(r, "condition"))) else "accepted", "\n")
