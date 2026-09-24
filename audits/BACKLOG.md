@@ -610,7 +610,7 @@ None open.
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (149)
+## P2 (143)
 
 ### `bio-data-visualization-statistical-annotation` — Test-name and label details differ from the tools
 
@@ -892,30 +892,6 @@ None open.
 - Root cause: Runtime taken from the first table of results.
 - Fix: Say 'about 90 minutes to the first results.tsv on 10 cores, longer for the whole target'.
 
-### `bio-alignment-trimming` — Caution on trimAl sequence-overlap thresholds
-
-- Skill: 83, Limited Release · [mrsonord2240/bioSkills@966f838](https://github.com/mrsonord2240/bioSkills/tree/966f838b0ba32918310bd223a34f71d78f190560/alignment/alignment-trimming) · [viewer](skills/bio-alignment-trimming/mrsonord2240-bioSkills@966f838/viewer.md)
-- Observed in inputs: 9
-- Problem: -resoverlap 0.8 -seqoverlap 75 dropped two full-length sequences along with the fragments, silently.
-- Root cause: The flags are listed without guidance on thresholds or on checking removed sequences.
-- Fix: Say the thresholds are dataset-dependent, list removed sequence names (diff headers) and relax -seqoverlap when full-length sequences are lost.
-
-### `bio-alignment-trimming` — Remove the remaining mixed messages
-
-- Skill: 83, Limited Release · [mrsonord2240/bioSkills@966f838](https://github.com/mrsonord2240/bioSkills/tree/966f838b0ba32918310bd223a34f71d78f190560/alignment/alignment-trimming) · [viewer](skills/bio-alignment-trimming/mrsonord2240-bioSkills@966f838/viewer.md)
-- Observed in inputs: —
-- Problem: BMGE is described with BLOSUM62 context (BLOSUM30 on 2.0), and trimAl -automated1 is offered for publication-grade trimming while the reproducibility note says not to use it for audit-grade work.
-- Root cause: Older sentences were not reconciled with the fixed sections.
-- Fix: Say 'substitution-matrix entropy (BLOSUM62 in 1.12, BLOSUM30 in 2.0)' and name an explicit trimAl mode in the first-line sentence.
-
-### `bio-alignment-trimming` — Move tool-specific detail to references/
-
-- Skill: 83, Limited Release · [mrsonord2240/bioSkills@966f838](https://github.com/mrsonord2240/bioSkills/tree/966f838b0ba32918310bd223a34f71d78f190560/alignment/alignment-trimming) · [viewer](skills/bio-alignment-trimming/mrsonord2240-bioSkills@966f838/viewer.md)
-- Observed in inputs: —
-- Problem: 330-line SKILL.md loads TCS, MACSE, PhyIN, Gblocks and HMMcleaner detail for every trimming request.
-- Root cause: Monolithic layout.
-- Fix: Keep the decision rules in SKILL.md and move per-tool command blocks to references/.
-
 ### `bio-clinical-databases-myvariant-queries` — State that myvariant _id HGVS-g is GRCh37
 
 - Skill: 84, Limited Release · [mrsonord2240/bioSkills@c1237cd](https://github.com/mrsonord2240/bioSkills/tree/c1237cdbc9bb199947696f3909de26a55d259116/clinical-databases/myvariant-queries) · [viewer](skills/bio-clinical-databases-myvariant-queries/mrsonord2240-bioSkills@c1237cd/viewer.md)
@@ -1035,30 +1011,6 @@ None open.
 - Problem: Both are recommended with names only.
 - Root cause: Scope written around MrBayes.
 - Fix: Add a minimal command or route explicitly.
-
-### `bio-phylo-distance-calculations` — Give alpha-estimation and gap-stripping code
-
-- Skill: 87, Production Ready · [mrsonord2240/bioSkills@966f838](https://github.com/mrsonord2240/bioSkills/tree/966f838b0ba32918310bd223a34f71d78f190560/phylogenetics/distance-calculations) · [viewer](skills/bio-phylo-distance-calculations/mrsonord2240-bioSkills@966f838/viewer.md)
-- Observed in inputs: 2, 8, 9
-- Problem: The Skill tells the agent to estimate alpha and strip gap columns but gives neither snippet; its own block hard-codes alpha 0.5.
-- Root cause: Instructions added as prose.
-- Fix: Add phangorn optim.pml(optGamma=TRUE) for alpha and a one-line gap-column filter before DistanceCalculator.
-
-### `bio-phylo-distance-calculations` — Align the Trap paragraph with the optional Xia test
-
-- Skill: 87, Production Ready · [mrsonord2240/bioSkills@966f838](https://github.com/mrsonord2240/bioSkills/tree/966f838b0ba32918310bd223a34f71d78f190560/phylogenetics/distance-calculations) · [viewer](skills/bio-phylo-distance-calculations/mrsonord2240-bioSkills@966f838/viewer.md)
-- Observed in inputs: —
-- Problem: The Trap paragraph still uses Xia Iss >= Iss.c as the criterion.
-- Root cause: Not updated with the pre-flight section.
-- Fix: Refer to the ape proxy first, Xia in DAMBE as optional.
-
-### `bio-phylo-distance-calculations` — Make the examples test real data
-
-- Skill: 87, Production Ready · [mrsonord2240/bioSkills@966f838](https://github.com/mrsonord2240/bioSkills/tree/966f838b0ba32918310bd223a34f71d78f190560/phylogenetics/distance-calculations) · [viewer](skills/bio-phylo-distance-calculations/mrsonord2240-bioSkills@966f838/viewer.md)
-- Observed in inputs: —
-- Problem: Examples use 5-16 bp toys and include an off-topic patristic-distance script.
-- Root cause: Illustrative examples.
-- Fix: Ship a small simulated alignment with a true tree; move pairwise_tree_distances.py to tree-manipulation.
 
 ### `bio-phylo-divergence-dating` — Ship root-to-tip and date-randomization code
 

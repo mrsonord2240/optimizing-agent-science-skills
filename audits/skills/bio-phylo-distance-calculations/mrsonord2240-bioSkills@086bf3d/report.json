@@ -1,0 +1,66 @@
+{
+  "source": "mrsonord2240/bioSkills@086bf3df497859926c0e38927fc11fd910d35739:phylogenetics/distance-calculations",
+  "meta": {
+    "skill_name": "bio-phylo-distance-calculations",
+    "evaluated_on": "2026-09-24",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 9,
+    "source": "mrsonord2240/bioSkills@086bf3df497859926c0e38927fc11fd910d35739:phylogenetics/distance-calculations",
+    "executed": "Exact-source validation covered the P2 repair paths and all shipped examples using Biopython 1.88, scikit-bio 0.7.3, R ape 5.8.1 and phangorn 2.12.1. The completed nine-input synthetic tree regressions are preserved in runs_v2.",
+    "execution_note": "Current main already contained the audit P2 repairs. This pass fixed the remaining frontmatter-schema P1, then validated the exact commit. New exact evidence is runs_v3; runs_v2 remains the full synthetic tree regression corpus. FastME CLI and DAMBE are unavailable in this Windows environment."
+  },
+  "veto_gates": {
+    "skill_veto": {"gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS"},
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {"result": "PASS", "detail": "Distance correction, saturation and compositional-heterogeneity limits are explicit; bootstrap is correctly framed as precision rather than accuracy."},
+      "methodological_ground": {"result": "PASS", "detail": "The primary saturation proxy is executable; Xia is optional. UPGMA is refused without a clock and LogDet is routed for composition heterogeneity."},
+      "code_usability": {"result": "PASS", "detail": "Canonical validator passes. Exact-source examples cover gap filtering, gamma estimation, method-reused bootstrap, rooted consensus and known-tree RF checks."}
+    }
+  },
+  "static_score": {
+    "subtotal": 97,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {"score": 12, "max": 12, "note": "Corrected-matrix hand-off, gamma estimation, gap handling, saturation and method routing are actionable."},
+      "reliability": {"score": 12, "max": 12, "note": "Seeded bootstrap, NaN fallback, rooted consensus and explicit gap filtering are present."},
+      "performance_context": {"score": 8, "max": 8, "note": "Primary skill is compact and example data are intentionally small."},
+      "agent_usability": {"score": 16, "max": 16, "note": "The primary ape proxy and optional Xia language now agree across sections."},
+      "human_usability": {"score": 7, "max": 8, "note": "Task routing and concrete warnings are clear."},
+      "security": {"score": 12, "max": 12, "note": "Local files only; R output is explicitly sent to tempdir."},
+      "maintainability": {"score": 14, "max": 16, "note": "Shipped simulated data and true tree make examples checkable; external specialist CLI coverage remains environment-limited."},
+      "agent_specific": {"score": 16, "max": 16, "note": "Supported metadata schema validates; scope and non-goals are explicit."}
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 97.0,
+    "max": 100,
+    "assertion_pass_rate": {"passed": 41, "total": 41},
+    "inputs": [
+      {"index": 1, "label": "COI K2P NJ hand-off", "status": "COMPLETED", "assertions_passed": 5, "assertions_total": 5, "note": "Preserved synthetic regression in runs_v2; corrected-matrix hand-off and seeded bootstrap remain verified."},
+      {"index": 2, "label": "TN93+G FastME bootstrap", "status": "COMPLETED", "assertions_passed": 5, "assertions_total": 5, "note": "Former alpha failure is resolved: exact-source phangorn example uses optim.pml(optGamma=TRUE), then reuses the estimate in method and bootstrap."},
+      {"index": 3, "label": "Saturation pre-flight", "status": "COMPLETED", "assertions_passed": 4, "assertions_total": 4, "note": "Runnable ape proxy and saturated/unsaturated reference values retained from runs_v2."},
+      {"index": 4, "label": "GC-heterogeneous LogDet", "status": "COMPLETED", "assertions_passed": 5, "assertions_total": 5, "note": "Preserved regression confirms NaN-aware njs/bionjs fallback and LogDet route."},
+      {"index": 5, "label": "Rooted Bio.Phylo consensus", "status": "COMPLETED", "assertions_passed": 5, "assertions_total": 5, "note": "Exact shipped example roots every replicate on Rat and reports three 100% clades."},
+      {"index": 6, "label": "Protein distance-tree boundary", "status": "COMPLETED", "assertions_passed": 4, "assertions_total": 4, "note": "LG distance route and ML/model-selection boundary retained from the completed regression."},
+      {"index": 7, "label": "UPGMA mislabelling adversary", "status": "COMPLETED", "assertions_passed": 5, "assertions_total": 5, "note": "Flat refusal of identity-as-JC and clockless UPGMA is unchanged and regression-tested."},
+      {"index": 8, "label": "Gapped barcode identity", "status": "COMPLETED", "assertions_passed": 4, "assertions_total": 4, "note": "Former missing-code failure is resolved. Exact snippet reduced a 5-column alignment to four gap-free columns (keep mask 11011)."},
+      {"index": 9, "label": "Estimated-alpha distance route", "status": "COMPLETED", "assertions_passed": 4, "assertions_total": 4, "note": "Former missing-code failure is resolved by the executable optim.pml block; exact 300 bp example produced a FastME tree, bootstrap counts and RF 4."}
+    ]
+  },
+  "final": {"static_weighted": 38.8, "dynamic_weighted": 58.2, "score": 97, "max": 100, "grade": "Production Ready", "grade_symbol": "PASS", "deployable": true, "veto_override": false},
+  "key_strengths": [
+    "Model correction is kept distinct from Bio.Phylo identity distances and can be handed into Python safely.",
+    "Gamma shape is estimated rather than hard-coded and is reused for bootstrap replicates.",
+    "The gap-column filter and known-tree examples turn former prose-only P2 guidance into observable behavior.",
+    "Frontmatter now conforms to the supported skill contract."
+  ],
+  "recommendations": [],
+  "open_findings": [
+    {"priority": "INFO", "title": "Unavailable external tools", "detail": "Standalone FastME CLI and DAMBE were not executable in the Windows audit environment; ape/phangorn paths were exercised instead."}
+  ]
+}

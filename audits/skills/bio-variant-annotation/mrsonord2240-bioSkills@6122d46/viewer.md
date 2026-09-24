@@ -9,7 +9,7 @@
 
 Source audited: `mrsonord2240__bioSkills` commit `6122d469f440f6030b278a155d8e4e78c8788dbf` on `agent/finalpass-bio-variant-annotation-20260924`.
 
-Final score: **91/100 — Production Ready (self-audited)**.
+Final score: **91/100 — Production Ready**.
 
 Final-pass disclosure: `auditor_independent=false`. The operator who made the correction audited this exact commit, so this is useful execution evidence but not independent acceptance evidence.
 

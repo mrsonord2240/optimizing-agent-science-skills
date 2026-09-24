@@ -6,6 +6,7 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 
 import {
+  gradeForScore,
   loadAudits,
   renderBacklog,
   renderIndex,
@@ -53,7 +54,11 @@ async function writeVersion(directory, skillId, version, options) {
   await writeFile(
     path.join(base, "report.json"),
     JSON.stringify({
-      final: { score: options.score, grade: "Beta Only", deployable: false },
+      final: {
+        score: options.score,
+        grade: options.grade ?? "Beta Only",
+        deployable: options.deployable ?? false,
+      },
       recommendations: options.recommendations,
     }),
   );
@@ -96,4 +101,20 @@ test("a Skill with two unsuperseded versions is rejected", async () => {
     });
   }
   await assert.rejects(loadAudits(directory), /expected one latest version/);
+});
+
+test("AIPOCH release grades follow the score thresholds", async () => {
+  assert.equal(gradeForScore(85), "Production Ready");
+  assert.equal(gradeForScore(84), "Limited Release");
+  assert.equal(gradeForScore(60), "Beta Only");
+  assert.equal(gradeForScore(59), "Reject");
+
+  const directory = await mkdtemp(path.join(os.tmpdir(), "audits-"));
+  await writeVersion(directory, "skill-c", "current", {
+    score: 93,
+    grade: "Production Ready (self-audited)",
+    deployable: true,
+    recommendations: [],
+  });
+  await assert.rejects(loadAudits(directory), /requires grade Production Ready/);
 });

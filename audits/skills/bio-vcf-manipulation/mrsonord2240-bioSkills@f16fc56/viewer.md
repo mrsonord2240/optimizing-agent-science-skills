@@ -9,7 +9,7 @@
 
 Evaluated 2026-09-24 against `mrsonord2240/bioSkills@f16fc56a854565e26d87a67d3de2df91e986b056:variant-calling/vcf-manipulation`.
 
-Final score: **93/100 — Production Ready (self-audited)**.
+Final score: **93/100 — Production Ready**.
 
 Final-pass disclosure: `auditor_independent=false`. The operator who made the correction audited this exact commit, so this is execution evidence, not independent acceptance evidence. Note: `final pass: fixed and audited under one brief, see CHECKPOINT.md`.
 

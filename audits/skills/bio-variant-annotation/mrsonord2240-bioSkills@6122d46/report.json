@@ -89,7 +89,7 @@
   "score": {
     "value": 91,
     "max": 100,
-    "grade": "Production Ready (self-audited)",
+    "grade": "Production Ready",
     "rationale": "All discovered P0/P1/P2 items are closed and the changed helper passed one archived canonical path, two other archived regressions, and four fresh success/failure probes. The score is capped below an independent acceptance score because VEP/SnpEff/ANNOVAR were not rerun and this final pass is a self-audit."
   },
   "recommendations": [],

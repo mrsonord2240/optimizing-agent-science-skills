@@ -59,7 +59,7 @@
     "static": 93,
     "dynamic": 94,
     "final": 93,
-    "grade": "Production Ready (self-audited)",
+    "grade": "Production Ready",
     "deployable": true,
     "score_rationale": "The score reflects complete synthetic regression plus targeted fresh execution, clear boundaries, and the P2 correction. It is not independent acceptance evidence and does not claim production-scale or non-synthetic coverage."
   },
@@ -67,7 +67,7 @@
   "final": {
     "score": 93,
     "max": 100,
-    "grade": "Production Ready (self-audited)",
+    "grade": "Production Ready",
     "deployable": true,
     "veto_override": false
   }

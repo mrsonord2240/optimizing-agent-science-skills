@@ -34,6 +34,17 @@ MARKETPLACE_HOLDS = os.path.normpath(os.path.join(
 # Neither counts as a change to what an audit ran on.
 DECLARATIONS = {"+license: MIT", "+author: GPTomics"}
 
+
+def grade_for_score(score):
+    """Return the canonical AIPOCH MedSkillAudit release disposition."""
+    if score >= 85:
+        return "Production Ready"
+    if score >= 75:
+        return "Limited Release"
+    if score >= 60:
+        return "Beta Only"
+    return "Reject"
+
 # Present in the source tree but not candidates for refinement. Recorded in REMAINING.json with the
 # reason rather than silently filtered, so the remaining count always reconciles with the tree.
 OUT_OF_SCOPE = {
@@ -294,6 +305,12 @@ def main():
         if sid not in idx:
             continue
         fin = r["final"]
+        if fin["deployable"]:
+            expected_grade = grade_for_score(fin["score"])
+            if fin["grade"] != expected_grade:
+                raise SystemExit(
+                    f"{sid}: score {fin['score']} requires AIPOCH grade {expected_grade!r}, "
+                    f"found {fin['grade']!r}")
         p0 = [x for x in r.get("recommendations", []) if str(x.get("priority", "")).upper() == "P0"]
         row = {
             "id": sid,

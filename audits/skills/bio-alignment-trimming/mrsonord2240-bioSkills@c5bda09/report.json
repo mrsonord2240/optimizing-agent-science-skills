@@ -1,0 +1,67 @@
+{
+  "source": "mrsonord2240/bioSkills@c5bda09627a2d9f0bfc2222bfcef06249772f0a2:alignment/alignment-trimming",
+  "meta": {
+    "skill_name": "bio-alignment-trimming",
+    "evaluated_on": "2026-09-24",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 10,
+    "source": "mrsonord2240/bioSkills@c5bda09627a2d9f0bfc2222bfcef06249772f0a2:alignment/alignment-trimming",
+    "executed": "9/9 focused instruction-validation inputs; ClipKIT 2.14.0, trimAl 1.4.1, BMGE 1.12 and 2.0, MACSE 2.07, PAML 4.10.10 and PhyIN 1.0. Full IQ-TREE sensitivity evidence is retained in runs_v2; exact-SHA execution is runs_v8 plus overlap_validation.",
+    "execution_note": "Exact-commit re-audit after the current-main P2 fixes and one frontmatter schema repair. runs_v8 replays trimmer, parser, safeguard and shipped-example commands with tree bootstraps intentionally skipped; runs_v2 retains the completed synthetic tree regressions. Synthetic inputs are under data/."
+  },
+  "veto_gates": {
+    "skill_veto": {"gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS"},
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {"result": "PASS", "detail": "The skill keeps an untrimmed sensitivity route, refuses support-driven over-trimming, and directs branch-site users away from generic column trimming."},
+      "methodological_ground": {"result": "PASS", "detail": "The sequence-overlap section makes thresholds dataset-dependent, requires a header diff, and gives a relaxation action when full-length records are lost."},
+      "code_usability": {"result": "PASS", "detail": "The supported frontmatter validator passes. Executed commands covered ClipKIT, trimAl, both BMGE versions and their mismatch guard, MACSE, PAML cleanup, PhyIN, and all shipped examples."}
+    }
+  },
+  "static_score": {
+    "subtotal": 96,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {"score": 12, "max": 12, "note": "Goal routing, explicit modes and BMGE version-specific syntax are consistent."},
+      "reliability": {"score": 12, "max": 12, "note": "Output guards, column maps, overlap header diff and threshold-relaxation guidance are present."},
+      "performance_context": {"score": 8, "max": 8, "note": "Specialist workflows are progressively disclosed in references/."},
+      "agent_usability": {"score": 15, "max": 16, "note": "Decision rules and the scoped 20%/40% interpretation are clear; downstream tree comparison still requires external tooling."},
+      "human_usability": {"score": 7, "max": 8, "note": "Task-oriented usage guide and concrete warnings are clear."},
+      "security": {"score": 12, "max": 12, "note": "Local inputs and list-form subprocess examples; no credential or destructive operation."},
+      "maintainability": {"score": 14, "max": 16, "note": "Version branches and examples are testable; unavailable specialist tools remain reference-only in this Windows environment."},
+      "agent_specific": {"score": 16, "max": 16, "note": "Supported frontmatter schema validates and references keep the primary path compact."}
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 96.0,
+    "max": 100,
+    "assertion_pass_rate": {"passed": 30, "total": 30},
+    "inputs": [
+      {"index": 1, "label": "Protein single-gene ClipKIT", "status": "COMPLETED", "assertions_passed": 3, "assertions_total": 3, "note": "smart-gap retained 339/413 (82.1%); the shipped log parser returned (339, 339, True)."},
+      {"index": 2, "label": "DNA supermatrix and BMGE version branches", "status": "COMPLETED", "assertions_passed": 4, "assertions_total": 4, "note": "ClipKIT -of phylip succeeded; BMGE 1.12 and 2.0 wrote output; 1.12 flags on 2.0 correctly produced no alignment and triggered the guard."},
+      {"index": 3, "label": "Unbalanced outgroup regression", "status": "COMPLETED", "assertions_passed": 2, "assertions_total": 2, "note": "Both documented ClipKIT modes ran; current command-level regression reproduces their different retention behavior. Completed tree evidence remains in runs_v2."},
+      {"index": 4, "label": "HMM-preparation trimAl maps", "status": "COMPLETED", "assertions_passed": 3, "assertions_total": 3, "note": "gappyout, automated1 and explicit modes ran; each column map parsed and residue-verified (218, 161 and 250 columns)."},
+      {"index": 5, "label": "Deep-supermatrix routes", "status": "COMPLETED", "assertions_passed": 2, "assertions_total": 2, "note": "ClipKIT modes, trimAl modes and both BMGE AA commands completed."},
+      {"index": 6, "label": "Codon selection boundary", "status": "COMPLETED", "assertions_passed": 4, "assertions_total": 4, "note": "Header-safe cleanup and MACSE export left zero ! characters; both PAML runs wrote lnL and omega despite this build's documented exit 1."},
+      {"index": 7, "label": "Support-driven over-trimming boundary", "status": "COMPLETED", "assertions_passed": 2, "assertions_total": 2, "note": "All documented trimming modes ran; the skill's refusal and sensitivity-tree policy was inspected. Completed tree regression remains in runs_v2."},
+      {"index": 8, "label": "PhyIN second pass", "status": "COMPLETED", "assertions_passed": 3, "assertions_total": 3, "note": "DNA second pass deleted 20/816 sites after ClipKIT; protein input deleted 0/413, confirming the need for the DNA/RNA warning."},
+      {"index": 9, "label": "Fragmentary-contig overlap filtering", "status": "COMPLETED", "assertions_passed": 4, "assertions_total": 4, "note": "At seqoverlap 75, header diff found P04/P10 fragments plus P12/P14 full-length records; relaxing to 50 retained P12/P14 and removed only P04/P10, exercising the repaired workflow."},
+      {"index": 10, "label": "Shipped examples and skill contract", "status": "COMPLETED", "assertions_passed": 3, "assertions_total": 3, "note": "quick_validate.py passes; all four examples py_compile; ClipKIT and BMGE examples run on 1.12 and 2.0, while deliberate mismatch fails loudly."}
+    ]
+  },
+  "final": {"static_weighted": 38.4, "dynamic_weighted": 57.6, "score": 96, "max": 100, "grade": "Production Ready", "grade_symbol": "PASS", "deployable": true, "veto_override": false},
+  "key_strengths": [
+    "The former P2 overlap issue now has a reproducible inspect-and-relax workflow.",
+    "BMGE 1.12 and 2.0 commands, matrix descriptions and output guard agree.",
+    "The compact primary skill keeps specialist detail in references while preserving direct selection-analysis routing.",
+    "Supported-schema frontmatter passes the canonical validator."
+  ],
+  "recommendations": [],
+  "open_findings": [
+    {"priority": "INFO", "title": "Specialist tools not live-executed on Windows", "detail": "T-Coffee, HMMcleaner, Divvier, Gblocks and hmmbuild remain reference-checked only; this is an environment limitation, not a source defect."}
+  ]
+}
