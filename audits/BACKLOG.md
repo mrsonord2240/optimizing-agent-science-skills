@@ -8,7 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (96)
+## P1 (94)
 
 ### `bio-data-visualization-statistical-annotation` — stat_compare_means(comparisons, p.adjust.method='holm') draws unadjusted p; the argument does not exist
 
@@ -369,22 +369,6 @@ None open.
 - Problem: SKILL.md says fastafile switches BAQ on 'under either stepper (`'all'`, the default, or `'samtools'`)' and the table row for `-f` says 'either stepper'. pysam 0.24.1's default stepper is 'samtools'; with an explicit stepper='all' (or 'nofilter') fastafile applies NO BAQ (538/538 BAQ positions on the own single-end BAM, 49/49 on real SE data; identical qualities with and without fastafile), and 'all' also skips overlap removal and the orphan filter (281 human-BAM positions differ from `-B`), so the `-x`/`-A` 'default matches' rows only hold for the default stepper. Round 1's wording (stepper='samtools' + fastafile) was correct; the fix log's 'either stepper' verification called the no-argument call 'all'.
 - Root cause: The round-2 harness passed no stepper argument for its 'all' rows, so both rows exercised the default 'samtools' stepper.
 - Fix: Rewrite the paragraph and table row: 'pysam's default stepper is `samtools`. With it, `fastafile=` switches BAQ on and `ignore_overlaps` / `ignore_orphans` / `min_base_quality` apply; with `stepper='all'` or `'nofilter'` neither BAQ nor overlap/orphan handling is applied, so do not pass them when matching mpileup.' Drop 'either stepper' and '`'all'`, the default'.
-
-### `bio-single-cell-preprocessing` — SoupX snippet errors on the input the Skill names
-
-- Skill: 85, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/preprocessing) · [viewer](skills/bio-single-cell-preprocessing/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 2
-- Problem: SKILL.md:123-128 gives load10X -> autoEstCont -> adjustCounts as the SoupX pattern. On standard Cell Ranger raw+filtered output it aborts with 'Clustering information must be supplied, run setClusters first', because load10X imports clusters only when an analysis/clustering directory is present.
-- Root cause: The snippet was written against a Cell Ranger run that included the secondary-analysis directory, and the precondition was never stated.
-- Fix: Add setClusters between load10X and autoEstCont in the snippet, with a one-line note that a Cell Ranger delivery without analysis/clustering needs clusters supplied from a quick Seurat or scran pass, and add the error string to Common Errors.
-
-### `bio-single-cell-preprocessing` — The prescribed mito rule deletes the population the Skill says it protects
-
-- Skill: 85, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/preprocessing) · [viewer](skills/bio-single-cell-preprocessing/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 7
-- Problem: The QC code hardcodes pct_counts_mt > 8 as an unconditional hard cap. On a tissue with a constitutively high-mito population it removed 374/374 of that population and 819 cells overall, versus 663 for the flat 5% cutoff the Skill criticises for exactly this failure.
-- Root cause: The tissue-dependence of the cap is stated in prose (SKILL.md:102) and in an example comment, but the code block that agents copy has no branch on tissue and no way to disable the cap.
-- Fix: Replace the literal 8 with a named variable set from a short tissue table (nuclei ~1, PBMC 8, cardiac/hepatic/muscle 25-40, 'unknown' = MAD only), and state that the hard cap must be raised or removed whenever the tissue has a known high-mito parenchyma.
 
 ### `bio-splicing-qc` — The documented "-l/-u/-s for a finer 80-100% range" tip gives wrong curves
 
@@ -778,7 +762,7 @@ None open.
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (259)
+## P2 (255)
 
 ### `bio-data-visualization-statistical-annotation` — Test-name and label details differ from the tools
 
@@ -1491,38 +1475,6 @@ None open.
 - Problem: The single file grew from 14.8 KB to 24.6 KB (479 lines); the ~150 lines of pysam helpers are loaded on every invocation, and only one of them ships as a runnable example.
 - Root cause: The dedup moved usage-guide code into SKILL.md instead of into examples/.
 - Fix: Move allele_counts / find_variants / pileup_text into examples/ (with a small self-test) and keep the table and one-line usage in SKILL.md.
-
-### `bio-single-cell-preprocessing` — batch_key HVG advice has an undocumented precondition
-
-- Skill: 85, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/preprocessing) · [viewer](skills/bio-single-cell-preprocessing/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 5
-- Problem: SKILL.md:176 says to set batch_key to compute HVGs per batch. With flavor='seurat_v3' on a design where one batch is shallow, this raised ValueError: reciprocal condition number 2.07e-15 from the loess fit and produced nothing.
-- Root cause: seurat_v3's per-batch loess is singular when a batch carries too many near-zero genes; the Skill treats batch_key as a free option.
-- Fix: Note that batch_key with seurat_v3 requires gene filtering inside each batch first (filter_genes min_cells applied per batch fixed it here) and add the error string to Common Errors.
-
-### `bio-single-cell-preprocessing` — Re-normalization error row states the wrong symptom
-
-- Skill: 85, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/preprocessing) · [viewer](skills/bio-single-cell-preprocessing/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 7
-- Problem: Common Errors says re-running normalization gives 'Values inflated ~2x'. Measured on scanpy 1.12.4 the total fell to 0.662x of the single-pass value, and scanpy emitted its own 'adata.X seems to be already log-transformed' warning.
-- Root cause: The row describes a pre-log1p size-factor double-application, not the normalize_total + log1p pair the Skill actually prescribes.
-- Fix: Change the symptom to 'values shrink and distributions compress; scanpy warns that X looks already log-transformed' and keep the fix (restore from layers['counts']).
-
-### `bio-single-cell-preprocessing` — QC over-removes low-complexity cell types with no warning
-
-- Skill: 85, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/preprocessing) · [viewer](skills/bio-single-cell-preprocessing/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 1, 5
-- Problem: The 5-MAD rule on pct_counts_in_top_20_genes deleted 28.8% of megakaryocytes, a genuinely low-complexity type, while catching 100% of the true low-quality cells. The Skill warns about cell-type deletion only in the mito context.
-- Root cause: pct_counts_in_top_20_genes is presented as a pure quality metric ('high value flags low-complexity / dying cells') without the same 'this is a biology metric' caveat the Skill gives pct_counts_mt.
-- Fix: Add a caveat to the QC threshold table that platelets/megakaryocytes, erythrocytes and other transcriptionally simple types are constitutively high on this metric, and tell the agent to report per-cluster removal rates before subsetting.
-
-### `bio-single-cell-preprocessing` — MAD-collapse fallback is unquantified
-
-- Skill: 85, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/single-cell/preprocessing) · [viewer](skills/bio-single-cell-preprocessing/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 3
-- Problem: The Common Errors row tells the agent to assert 'n_obs > 0 and a sane survival fraction'. n_obs > 0 never fires, and no number is given for the survival fraction, so the 30% loss in input 3 passed the guard.
-- Root cause: The guard names the right check but leaves the threshold to the caller.
-- Fix: Give the guard a number - e.g. stop and fall back to fixed cutoffs when MAD of any log1p QC metric is 0, or when survival is below 80% of the input barcodes - and say to report the MAD value itself.
 
 ### `bio-splicing-qc` — RSeQC summary wording and a missing drill-down for a high novel rate
 
