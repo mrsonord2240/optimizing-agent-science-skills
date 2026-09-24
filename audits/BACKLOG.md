@@ -610,7 +610,7 @@ None open.
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (168)
+## P2 (149)
 
 ### `bio-data-visualization-statistical-annotation` — Test-name and label details differ from the tools
 
@@ -916,46 +916,6 @@ None open.
 - Root cause: Monolithic layout.
 - Fix: Keep the decision rules in SKILL.md and move per-tool command blocks to references/.
 
-### `bio-long-read-splicing` — uLTRA offered as an equivalent microexon route
-
-- Skill: 83, Limited Release · [mrsonord2240/bioSkills@887eaed](https://github.com/mrsonord2240/bioSkills/tree/887eaeddf09532feee6caaf5f325d0c9b3ce7101/alternative-splicing/long-read-splicing) · [viewer](skills/bio-long-read-splicing/mrsonord2240-bioSkills@887eaed/viewer.md)
-- Observed in inputs: 7
-- Problem: Decision tree and 'Other routes' present uLTRA next to --junc-bed, backed by 150/150 on one 10-nt exon. On 14 microexon genes uLTRA lost 3-nt exons and the 4+12 tandem pair (0%), recovered 53-80% of 5-11 nt exons on ONT and dRNA (mean inclusion 76.6% ONT, 78.6% dRNA, 91.4% HiFi) against 99.6% for the recipe.
-- Root cause: A single-sequence measurement generalised into a peer recommendation.
-- Fix: State the per-size range measured (or say uLTRA is weaker below ~12 nt and on ONT/dRNA) and drop 'or uLTRA' from the decision-tree row.
-
-### `bio-long-read-splicing` — flair diffSplice --test hides a failed event type
-
-- Skill: 83, Limited Release · [mrsonord2240/bioSkills@887eaed](https://github.com/mrsonord2240/bioSkills/tree/887eaeddf09532feee6caaf5f325d0c9b3ce7101/alternative-splicing/long-read-splicing) · [viewer](skills/bio-long-read-splicing/mrsonord2240-bioSkills@887eaed/viewer.md)
-- Observed in inputs: 1
-- Problem: On real 6-sample data alt5 has events but none survive DRIMSeq's filter: R prints '!No genes left after filtering!' with a traceback, FLAIR exits 0 and writes no drimseq_alt5 file. The text only says empty event types are skipped.
-- Root cause: Only the empty-matrix case was documented.
-- Fix: Add one sentence: an event type can also fail with '!No genes left after filtering!' (rc stays 0); check that drimseq_<event>_*.tsv exists for every event type you need.
-
-### `bio-long-read-splicing` — Microexon numbers depend on read error rate, which is not stated
-
-- Skill: 83, Limited Release · [mrsonord2240/bioSkills@887eaed](https://github.com/mrsonord2240/bioSkills/tree/887eaeddf09532feee6caaf5f325d0c9b3ce7101/alternative-splicing/long-read-splicing) · [viewer](skills/bio-long-read-splicing/mrsonord2240-bioSkills@887eaed/viewer.md)
-- Observed in inputs: 7
-- Problem: Bonus 16 gives 99.1% / 99.2% for direct RNA at ~4% error but 93.2% / 94.9% at 7.2% error (4/12 genes < 90%, including a 27-nt exon); the table gives one figure per platform. Also on real LRGASP cDNA bonus 16 changes the chain of 5.8% of reads (109/1883, all to fully annotated chains, flair correct inconsistent 195 -> 214), whereas the text says 'changed nothing outside microexons' (true only for its planted set).
-- Root cause: Table measured on one error profile; the 'nothing outside microexons' sentence is scoped in parentheses but easy to over-read.
-- Fix: Name the simulated error rates next to the table and say that on real reads the bonus also extends some reads by an annotated intron.
-
-### `bio-long-read-splicing` — Lima/isoseq status and adapter file name not verifiable
-
-- Skill: 83, Limited Release · [mrsonord2240/bioSkills@887eaed](https://github.com/mrsonord2240/bioSkills/tree/887eaeddf09532feee6caaf5f325d0c9b3ce7101/alternative-splicing/long-read-splicing) · [viewer](skills/bio-long-read-splicing/mrsonord2240-bioSkills@887eaed/viewer.md)
-- Observed in inputs: 8
-- Problem: The text says lima did not finish on the toy BAM and that lima/isoseq are help-only; with a zm tag on the toy BAM skera -> lima --isoseq -> isoseq refine all ran (132 -> 132 -> 132). 'mas16_primers.fasta' cannot be confirmed from skera.how/adapters.
-- Root cause: The stall came from the toy BAM (S-read names movie/?/ccs/... without zm), not from lima; the file name was not checked.
-- Fix: Say the toy BAM needed a zm tag, that skera -> lima -> refine ran on a synthetic array, and quote the file name only after fetching it.
-
-### `bio-long-read-splicing` — SKILL.md 38.8 kB / 580 lines, no references/; example not referenced
-
-- Skill: 83, Limited Release · [mrsonord2240/bioSkills@887eaed](https://github.com/mrsonord2240/bioSkills/tree/887eaeddf09532feee6caaf5f325d0c9b3ce7101/alternative-splicing/long-read-splicing) · [viewer](skills/bio-long-read-splicing/mrsonord2240-bioSkills@887eaed/viewer.md)
-- Observed in inputs: —
-- Problem: Evidence paragraphs grew the file from 33 kB; microexon section, DTU code and failure modes load together. Neither SKILL.md nor usage-guide.md mentions examples/longread_splicing_pipeline.sh.
-- Root cause: Restructuring was deferred in both fix rounds.
-- Fix: Move the microexon evidence and the DTU/rMATS-long blocks to references/, keep the recipe and the checks in SKILL.md, and link the example.
-
 ### `bio-clinical-databases-myvariant-queries` — State that myvariant _id HGVS-g is GRCh37
 
 - Skill: 84, Limited Release · [mrsonord2240/bioSkills@c1237cd](https://github.com/mrsonord2240/bioSkills/tree/c1237cdbc9bb199947696f3909de26a55d259116/clinical-databases/myvariant-queries) · [viewer](skills/bio-clinical-databases-myvariant-queries/mrsonord2240-bioSkills@c1237cd/viewer.md)
@@ -1051,22 +1011,6 @@ None open.
 - Problem: Both are recommended with no PAUP* block or BPP control file.
 - Root cause: Method table without worked commands.
 - Fix: Add a minimal PAUP* svdq block and a BPP A00/A10 control-file skeleton, or route explicitly.
-
-### `bio-phylo-tree-manipulation` — Check ingroup monophyly in the outgroup snippet
-
-- Skill: 86, Production Ready · [mrsonord2240/bioSkills@966f838](https://github.com/mrsonord2240/bioSkills/tree/966f838b0ba32918310bd223a34f71d78f190560/phylogenetics/tree-manipulation) · [viewer](skills/bio-phylo-tree-manipulation/mrsonord2240-bioSkills@966f838/viewer.md)
-- Observed in inputs: 8
-- Problem: The code tests only outgroup monophyly, so an LBA sister pair used as outgroups passes and is rooted on.
-- Root cause: The Approach's ingroup check was not coded.
-- Fix: After rooting, assert tree.is_monophyletic(ingroup) and print the warning otherwise.
-
-### `bio-phylo-tree-manipulation` — Give RootDigger flags or drop it
-
-- Skill: 86, Production Ready · [mrsonord2240/bioSkills@966f838](https://github.com/mrsonord2240/bioSkills/tree/966f838b0ba32918310bd223a34f71d78f190560/phylogenetics/tree-manipulation) · [viewer](skills/bio-phylo-tree-manipulation/mrsonord2240-bioSkills@966f838/viewer.md)
-- Observed in inputs: —
-- Problem: RootDigger is recommended without a command.
-- Root cause: Named only.
-- Fix: Add 'rootdigger --msa aln --tree tree --exhaustive' or route to the IQ-TREE command.
 
 ### `bio-phylo-bayesian-inference` — Make the example refuse a single .p file
 
@@ -1196,54 +1140,6 @@ None open.
 - Root cause: Parallel cleanup is fragile on this Windows runtime.
 - Fix: Document and verify a serial or controlled-worker option if reproducible.
 
-### `bio-variant-calling-filtering-best-practices` — Tumor-column block has no guard for a missing header
-
-- Skill: 88, Production Ready · [mrsonord2240/bioSkills@c1237cd](https://github.com/mrsonord2240/bioSkills/tree/c1237cdbc9bb199947696f3909de26a55d259116/variant-calling/filtering-best-practices) · [viewer](skills/bio-variant-calling-filtering-best-practices/mrsonord2240-bioSkills@c1237cd/viewer.md)
-- Observed in inputs: 8
-- Problem: With no ##tumor_sample header TUMOR is empty, T becomes -1 and bcftools segfaults (exit 139 on both 1.21 and 1.24) instead of stopping with a message.
-- Root cause: The block assumes the ##tumor_sample header exists.
-- Fix: Add `[ -n "$TUMOR" ] && [ "$T" -ge 0 ] \|\| { echo 'tumor sample not found; pass it explicitly'; exit 1; }` before the filter.
-
-### `bio-variant-calling-filtering-best-practices` — Usage-guide allele-balance recipe deletes hom-alt sites
-
-- Skill: 88, Production Ready · [mrsonord2240/bioSkills@c1237cd](https://github.com/mrsonord2240/bioSkills/tree/c1237cdbc9bb199947696f3909de26a55d259116/variant-calling/filtering-best-practices) · [viewer](skills/bio-variant-calling-filtering-best-practices/mrsonord2240-bioSkills@c1237cd/viewer.md)
-- Observed in inputs: 9
-- Problem: `bcftools filter -i 'GT="het" & AB...'` is a site include, so every site with no het genotype is removed: 24 of 25 true hom-alt-only sites and 31 true SNPs were lost.
-- Root cause: A per-genotype check was written as a site-level include, contradicting the Skill's own hom-alt rule.
-- Fix: Apply it at genotype level: `bcftools filter -S . -e 'GT="het" & (FMT/AD[:1]/(FMT/AD[:0]+FMT/AD[:1])<=0.2 \| FMT/AD[:1]/(FMT/AD[:0]+FMT/AD[:1])>=0.8)'` (kept 22/25 hom-alt sites here).
-
-### `bio-variant-calling-filtering-best-practices` — cyvcf2 block is still only a partial filter
-
-- Skill: 88, Production Ready · [mrsonord2240/bioSkills@c1237cd](https://github.com/mrsonord2240/bioSkills/tree/c1237cdbc9bb199947696f3909de26a55d259116/variant-calling/filtering-best-practices) · [viewer](skills/bio-variant-calling-filtering-best-practices/mrsonord2240-bioSkills@c1237cd/viewer.md)
-- Observed in inputs: 2
-- Problem: The block is now labelled minimal, but an agent asked for a Python equivalent still has to write the QD/SOR/RankSum terms itself (26/60 artifacts kept vs 4/60).
-- Root cause: The Python counterpart was never extended to the full expression.
-- Fix: Add the QD, SOR and None-guarded RankSum checks so the block matches the bcftools expression.
-
-### `bio-vcf-statistics` — Het allele-balance one-liner ignores 1\|0 genotypes
-
-- Skill: 88, Production Ready · [mrsonord2240/bioSkills@c1237cd](https://github.com/mrsonord2240/bioSkills/tree/c1237cdbc9bb199947696f3909de26a55d259116/variant-calling/vcf-statistics) · [viewer](skills/bio-vcf-statistics/mrsonord2240-bioSkills@c1237cd/viewer.md)
-- Observed in inputs: 6
-- Problem: The awk test matches 0/1 and 0\|1 only, so on a phased VCF every 1\|0 het is dropped (per-sample n halved, means shifted).
-- Root cause: Phased genotype orientations were not enumerated.
-- Fix: Match `$2 ~ /^(0[\/\|]1\|1\\|0)$/` (or normalise with `gsub(/\\|/,"/")` and accept 0/1 and 1/0).
-
-### `bio-vcf-statistics` — Quick PASS count treats FILTER '.' as not passing
-
-- Skill: 88, Production Ready · [mrsonord2240/bioSkills@c1237cd](https://github.com/mrsonord2240/bioSkills/tree/c1237cdbc9bb199947696f3909de26a55d259116/variant-calling/vcf-statistics) · [viewer](skills/bio-vcf-statistics/mrsonord2240-bioSkills@c1237cd/viewer.md)
-- Observed in inputs: 7
-- Problem: `bcftools view -f PASS` counts 0 on an unfiltered callset (FILTER '.'), while examples/vcf_stats.py counts those records as PASS (361).
-- Root cause: The two idioms differ on missing FILTER and the Skill does not say so.
-- Fix: Use `bcftools view -f .,PASS` for 'not failed', or state that '.' means unfiltered and is excluded by `-f PASS`.
-
-### `bio-vcf-statistics` — State the site-panel needs of peddy and somalier
-
-- Skill: 88, Production Ready · [mrsonord2240/bioSkills@c1237cd](https://github.com/mrsonord2240/bioSkills/tree/c1237cdbc9bb199947696f3909de26a55d259116/variant-calling/vcf-statistics) · [viewer](skills/bio-vcf-statistics/mrsonord2240-bioSkills@c1237cd/viewer.md)
-- Observed in inputs: 2
-- Problem: peddy fails on non-human or small targets; somalier needs a build-matched sites file.
-- Root cause: Tool requirements not stated (left unfixed in this round).
-- Fix: Note the bundled human site panels, the chrX requirement and `somalier find-sites` for custom targets.
-
 ### `bio-crispr-screens-perturb-seq-analysis` — State executable limits for optional methods
 
 - Skill: 89, Production Ready · [mrsonord2240/bioSkills@6ca8a47](https://github.com/mrsonord2240/bioSkills/tree/6ca8a47d4a9743fbf9a090ddbc5609b1b6b6a504/crispr-screens/perturb-seq-analysis) · [viewer](skills/bio-crispr-screens-perturb-seq-analysis/mrsonord2240-bioSkills@6ca8a47/viewer.md)
@@ -1267,22 +1163,6 @@ None open.
 - Problem: Windows ReactomePA teardown remains unsuitable.
 - Root cause: ReactomePA 1.50.0 under Windows R 4.4 exited 2816 after bare load, while the matching private Linux R 4.4 stack exited 0.
 - Fix: Keep the private Linux route documented for audited execution.
-
-### `bio-variant-normalization` — csq --phase m and s described wrongly
-
-- Skill: 89, Production Ready · [mrsonord2240/bioSkills@c1237cd](https://github.com/mrsonord2240/bioSkills/tree/c1237cdbc9bb199947696f3909de26a55d259116/variant-calling/variant-normalization) · [viewer](skills/bio-variant-normalization/mrsonord2240-bioSkills@c1237cd/viewer.md)
-- Observed in inputs: 5
-- Problem: The caveat says -p m merges only where phase is known and -p s treats unphased hets as separate haplotypes; bcftools 1.21/1.24 help: m merges all GTs into a single haplotype, s skips unphased hets (no consequence emitted in the run).
-- Root cause: Mode semantics were paraphrased, not copied from 'bcftools csq' help.
-- Fix: Replace with the help text (a = GTs as is, 0/1 -> 0\|1; m = merge all GTs; r = require phase; s = skip unphased hets) and recommend -p a for phased input.
-
-### `bio-variant-normalization` — Database-annotation block leaves an empty file on REF error
-
-- Skill: 89, Production Ready · [mrsonord2240/bioSkills@c1237cd](https://github.com/mrsonord2240/bioSkills/tree/c1237cdbc9bb199947696f3909de26a55d259116/variant-calling/variant-normalization) · [viewer](skills/bio-variant-normalization/mrsonord2240-bioSkills@c1237cd/viewer.md)
-- Observed in inputs: 2, 6
-- Problem: On a REF mismatch the last pipe step aborts after creating a 0-record non-BGZF file; the next 'bcftools index' fails with 'not BGZF compressed', hiding the real cause.
-- Root cause: The workflow blocks omit the REF pre-check the example now has.
-- Fix: Add `set -o pipefail` and a `bcftools norm -f ref.fa -c w` pre-check (or the example's MISMATCH count) before the pipeline.
 
 ### `bio-causal-genomics-transcriptome-wide-association` — Make optional-method execution boundaries clearer
 
@@ -1315,38 +1195,6 @@ None open.
 - Problem: The fresh simple matrix completed Startle but had zero weighted parsimony, so it proves CLI compatibility rather than topology improvement.
 - Root cause: The Skill describes the expected improvement without bundling a compact homoplasy fixture.
 - Fix: Provide or reference a small scar matrix with nonzero seed score and assert that refined_info.json reports an equal-or-lower score.
-
-### `bio-vcf-basics` — Wrong bcftools query -H tip in usage guide
-
-- Skill: 90, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/variant-calling/vcf-basics) · [viewer](skills/bio-vcf-basics/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 1
-- Problem: usage-guide.md says '-H with bcftools query skips the header line'; for query -H prints a header.
-- Root cause: view -H (skip header) and query -H (print header) were conflated.
-- Fix: Change the tip to 'bcftools view -H skips the header; bcftools query -H adds a column header'.
-
-### `bio-vcf-basics` — Update the bgzip error string
-
-- Skill: 90, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/variant-calling/vcf-basics) · [viewer](skills/bio-vcf-basics/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 5
-- Problem: Common Errors quotes 'no BGZF EOF marker'; current bcftools reports 'not compressed with bgzip' or 'not BGZF compressed, cannot index'.
-- Root cause: Error text from an older htslib.
-- Fix: List the current messages alongside the old one.
-
-### `bio-vcf-basics` — Add a gVCF variant-site extraction recipe
-
-- Skill: 90, Production Ready · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/variant-calling/vcf-basics) · [viewer](skills/bio-vcf-basics/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 4
-- Problem: The gVCF section explains the model but gives no command to list candidate sites; ALT="<NON_REF>" expressions also match multi-ALT records.
-- Root cause: Section is conceptual only.
-- Fix: Add 'bcftools view -i "N_ALT>1" sample.g.vcf' and note that string tests on ALT match any allele.
-
-### `bio-vcf-manipulation` — Sample-reorder advice does not make --naive work
-
-- Skill: 90, Production Ready · [mrsonord2240/bioSkills@c1237cd](https://github.com/mrsonord2240/bioSkills/tree/c1237cdbc9bb199947696f3909de26a55d259116/variant-calling/vcf-manipulation) · [viewer](skills/bio-vcf-manipulation/mrsonord2240-bioSkills@c1237cd/viewer.md)
-- Observed in inputs: 2
-- Problem: `bcftools view -s <order>` adds INFO/AC and INFO/AN header lines, so `concat --naive` then refuses with 'incompatible headers' (also with -I). Plain concat after the reorder works.
-- Root cause: The fix was checked against plain concat, not --naive.
-- Fix: Say: reorder with view -s, then use plain `bcftools concat` (or re-create every file with the same view -s so headers match) before --naive.
 
 ### `bio-geo-data` — Run GEOquery parity in dedicated R runtime
 

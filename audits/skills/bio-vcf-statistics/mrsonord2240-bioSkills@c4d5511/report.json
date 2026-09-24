@@ -1,0 +1,95 @@
+{
+  "meta": {
+    "skill_name": "bio-vcf-statistics",
+    "evaluated_on": "2026-09-24",
+    "source": "mrsonord2240/bioSkills@c4d5511fe2830349a9d65609495018ed862ead58:variant-calling/vcf-statistics",
+    "auditor_independent": false,
+    "execution_mode": "A (exact-commit focused re-audit)",
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md"
+  },
+  "scope": {
+    "changed_paths": [
+      "variant-calling/vcf-statistics/SKILL.md",
+      "variant-calling/vcf-statistics/usage-guide.md"
+    ],
+    "change": "The biallelic het allele-balance command now accepts reversed unphased 1/0 genotypes as well as 0/1, 0|1, and 1|0, and explicitly excludes multiallelic genotypes from this quick two-AD-value calculation."
+  },
+  "veto_gates": {
+    "skill_veto": {"gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS"},
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": "PASS: the quick check is labelled a contamination signal, not a contamination estimator; dedicated VerifyBamID2/CHARR confirmation remains required.",
+      "methodological_ground": "PASS: genotype filtering precedes cohort metrics, HWE is excess-het-only, and ancestry/control constraints are explicit."
+    }
+  },
+  "static_score": {
+    "subtotal": 94,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {"score": 12, "max": 12, "note": "All biallelic GT orientation forms are now accounted for and the multiallelic boundary is explicit."},
+      "reliability": {"score": 12, "max": 12, "note": "FILTER '.' versus PASS semantics and plot-vcfstats LaTeX behavior are both documented."},
+      "performance_context": {"score": 7, "max": 8, "note": "The focused workflow streams VCF records and delegates scale operations to bcftools/vcftools/somalier."},
+      "agent_usability": {"score": 15, "max": 16, "note": "The decision table, ordering constraints, and cross-skill hand-offs are directly actionable."},
+      "human_usability": {"score": 8, "max": 8, "note": "Prompts, quick reference, decision table, and failure remedies are coherent."},
+      "security": {"score": 12, "max": 12, "note": "Commands operate on local declared files and do not expose credentials."},
+      "maintainability": {"score": 10, "max": 12, "note": "Runnable example and explicit version guidance; tool availability remains an environment responsibility."},
+      "agent_specific": {"score": 18, "max": 20, "note": "The Skill clearly routes filtering, normalization, and contamination-estimation work to the appropriate follow-up Skills/tools."}
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 94,
+    "max": 100,
+    "assertion_pass_rate": {"passed": 15, "total": 15},
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Synthetic cohort statistics and FILTER semantics",
+        "status": "COMPLETED",
+        "executed": true,
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 12,
+        "assertions_total": 12,
+        "evidence": "run/exact-commit-c4d5511/reaudit_focused.log: eight PSC rows, Ti/Tv 1.43, strict PASS 0, not-failed 361, and six planted ExcessHet artifacts."
+      },
+      {
+        "index": 2,
+        "type": "Edge",
+        "label": "Orientation-mixed biallelic allele balance",
+        "status": "COMPLETED",
+        "executed": true,
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "evidence": "The test rewrote alternating 0/1 calls to 1/0 without changing AD; all 747 biallelic hets were retained and 372 were reversed unphased calls."
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 37.6,
+    "dynamic_weighted": 56.4,
+    "score": 94,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "All biallelic heterozygote orientation forms are correctly counted by the AD quick check.",
+    "The Skill distinguishes strict PASS from not-failed records and states the peddy/somalier panel limits.",
+    "The exact focused run verifies actual bcftools output against planted cohort truth."
+  ],
+  "recommendations": [],
+  "evidence": {
+    "focused_validation": "run/exact-commit-c4d5511/reaudit_focused.sh",
+    "focused_log": "run/exact-commit-c4d5511/reaudit_focused.log",
+    "environment": "WSL bio environment, bcftools 1.22; synthetic data at data/cohort.vcf.",
+    "source_identity": "Windows Git verified the isolated worktree HEAD and clean status immediately before executing the focused script; WSL Git cannot resolve this Windows worktree's .git pointer."
+  }
+}

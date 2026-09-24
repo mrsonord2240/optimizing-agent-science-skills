@@ -75,3 +75,9 @@ Re-audit of round 1: 80, Limited Release. Tools this round: minimap2 2.31, samto
 - lima and isoseq refine/cluster2: help-only (lima stalled on the toy BAM); no real Kinnex data.
 - Bambu multicore on Linux; uLTRA/deSALT on real data.
 - Microexon window is measured on simulated reads plus two real read sets; real microexon loci with a known skipped isoform were not available, so the SKILL tells the user to run the two-way check.
+
+## 2026-09-24 final pass (branch `agent/final-pass-bio-long-read-splicing-20260924`)
+
+Source commit `1d219c0a0bc1a422f6bc26a12f1dc2e08466ea61` closes the remaining documentation findings without changing analysis commands: the decision tree no longer offers uLTRA as an equivalent microexon rescue; the microexon section scopes direct-RNA numbers to simulated error rate and reports the real-read side effect; FLAIR now requires per-event DRIMSeq outputs rather than trusting its zero exit status; and the Kinnex route requires a verified kit adapter file and records the synthetic `zm`-tag result accurately. A focused `references/microexons.md` holds validation detail and both SKILL.md and the usage guide link the shipped example.
+
+Final exact-commit audit completed 2026-09-24: **91/100, Production Ready, no open P0/P1/P2**. Fresh static checks validated source structure, links, and all five repaired claims at the exact SHA. The WSL tool environments remain installed (`as-lr`, `as-lr-drim`, `as-sqanti`, `as-pb`); the old `asenv` helper was absent but is replaceable by direct environment executables. Generated fixture/output directories from the earlier independent 8-input execution had been retention-cleaned, so the final report distinguishes retained execution logs from newly rerun static evidence rather than representing it as a full fresh run.

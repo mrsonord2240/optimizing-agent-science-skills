@@ -1,0 +1,74 @@
+{
+  "meta": {
+    "skill_name": "bio-vcf-manipulation",
+    "evaluated_on": "2026-09-24",
+    "source": "mrsonord2240/bioSkills@f16fc56a854565e26d87a67d3de2df91e986b056:variant-calling/vcf-manipulation",
+    "source_repo": "F:\\OpenScience\\external\\mrsonord2240__bioSkills",
+    "source_branch": "agent/finalpass-bio-vcf-manipulation-20260924",
+    "source_commit": "f16fc56a854565e26d87a67d3de2df91e986b056",
+    "source_path": "variant-calling/vcf-manipulation/SKILL.md",
+    "audit_type": "final-pass re-audit of the exact fixed commit",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md",
+    "environment": "WSL bcftools 1.24 / htslib 1.24; synthetic archived fixtures",
+    "executed": true,
+    "n_inputs": 9,
+    "executed_inputs": "9/9",
+    "archived_inputs": ["p_in1", "p_in2", "p_in3", "p_in4", "p_in5", "in6", "in7"],
+    "fresh_inputs": ["final_20260924_fresh_naive_reorder", "final_20260924_fresh_contig_records"]
+  },
+  "veto_gates": {
+    "skill_veto": "PASS",
+    "research_veto": "PASS",
+    "security": "PASS",
+    "scope": "PASS"
+  },
+  "findings": [
+    {
+      "id": "P0",
+      "status": "none found",
+      "evidence": "All archived and fresh inputs completed; no unsafe or scope-violating behavior was observed."
+    },
+    {
+      "id": "P1",
+      "status": "fixed and reverified",
+      "finding": "reheader -f changes contig header lines but not record CHROM values; annotate --rename-chrs must be used before merging mismatched contig names.",
+      "evidence": "fresh contig-records: header-only records remained 1,2; annotate merge produced 361 sites x 8 samples with a tuple hash equal to the joint truth."
+    },
+    {
+      "id": "P2",
+      "status": "fixed",
+      "finding": "The naive-concat recovery now distinguishes a one-file reorder (use plain concat) from a naive path (apply view -s with the same order to every input).",
+      "evidence": "fresh naive-reorder: both plain concat after a one-file reorder and --naive after normalizing every input produced 361 records and the joint-truth tuple hash."
+    }
+  ],
+  "dynamic_results": {
+    "archived": {
+      "passed": 7,
+      "total": 7,
+      "summary": "Validated missing-vs-hom-ref merge behavior, concat/overlap handling, normalized isec, subset tag recomputation, contig/sample harmonization and sorting, SV scope routing, and duplicate sample-name handling."
+    },
+    "fresh": {
+      "passed": 2,
+      "total": 2,
+      "summary": "Validated the two supported naive-concat recoveries and header-only versus record-level contig repair."
+    },
+    "known_runtime_note": "The archived sort case emitted a Windows-mounted-filesystem chmod warning for bcftools temporary storage but still sorted and indexed all 361 records; it is not a skill instruction failure."
+  },
+  "scores": {
+    "static": 93,
+    "dynamic": 94,
+    "final": 93,
+    "grade": "Production Ready (self-audited)",
+    "deployable": true,
+    "score_rationale": "The score reflects complete synthetic regression plus targeted fresh execution, clear boundaries, and the P2 correction. It is not independent acceptance evidence and does not claim production-scale or non-synthetic coverage."
+  },
+  "recommendations": [],
+  "final": {
+    "score": 93,
+    "max": 100,
+    "grade": "Production Ready (self-audited)",
+    "deployable": true,
+    "veto_override": false
+  }
+}

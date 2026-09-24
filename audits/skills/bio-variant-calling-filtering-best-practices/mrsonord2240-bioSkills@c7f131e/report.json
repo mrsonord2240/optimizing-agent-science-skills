@@ -1,0 +1,74 @@
+{
+  "meta": {
+    "skill_name": "bio-variant-calling-filtering-best-practices",
+    "evaluated_on": "2026-09-24",
+    "evaluator_version": "skill-auditor@1.0-final-pass",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 11,
+    "executed": 11,
+    "source": "mrsonord2240/bioSkills@c7f131e61134fb550457f761e76bd07dc0a840a8:variant-calling/filtering-best-practices",
+    "source_branch": "agent/bio-variant-calling-filtering-best-practices-finalpass",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md",
+    "prior_canonical_artifacts": "F:/OpenScience/audits/bio-variant-calling-filtering-best-practices/runs/pre-final-20260924/",
+    "execution_note": "Archived prompts 1-9 were replayed in runs/fp1 through runs/fp9 with bcftools 1.24 and GATK 4.6.1.0 where applicable. Fresh inputs 10-11 are runs/fp10 and runs/fp11. fp10 executes the exact-current missing-tumor-header guard. fp11 executes the exact-current documented cyvcf2 predicate body against an audit VCF-shaped stub because cyvcf2 is absent from both currently available runtimes; it is a logic execution, not a cyvcf2 integration claim. The source worktree was clean at c7f131e after the audit.",
+    "re_audit": {
+      "prior_source": "mrsonord2240/bioSkills@c1237cdbc9bb199947696f3909de26a55d259116",
+      "prior_score": 88,
+      "fixed_findings": [
+        "Missing tumor header now stops before an invalid bcftools index can crash.",
+        "Allele balance is genotype-level and preserves hom-alt-only sites.",
+        "The cyvcf2 predicate contains QD, SOR, and rank-sum checks.",
+        "Zero-valued DP or MQ no longer masquerades as a missing annotation."
+      ]
+    }
+  },
+  "veto_gates": {
+    "skill_veto": {"gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS"},
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {"result": "PASS", "detail": "Synthetic planted-truth fixtures are labelled as synthetic; no clinical interpretation is made."},
+      "practice_boundaries": {"result": "PASS", "detail": "Callset filtering and QC only."},
+      "methodological_ground": {"result": "PASS", "detail": "Hard filters, VQSR small-panel failure mode, genotype no-calls, somatic column selection, and allele balance were exercised."},
+      "code_usability": {"result": "PASS", "detail": "The shipped shell example and documented CLI paths ran. cyvcf2 package integration was unavailable in the current runtime; its exact predicate body was executed with a documented stub."}
+    }
+  },
+  "static_score": {
+    "subtotal": 93,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {"score": 12, "max": 12, "note": "Separate SNP/indel, site/genotype, somatic, and caller-native paths are explicit."},
+      "reliability": {"score": 11, "max": 12, "note": "Missing annotations pass only where intended; zero DP/MQ now fail; the somatic header guard is tested."},
+      "performance_context": {"score": 7, "max": 8, "note": "Method choice is bounded by cohort and platform context."},
+      "agent_usability": {"score": 15, "max": 16, "note": "Decision table and explicit handoffs constrain tool choice."},
+      "human_usability": {"score": 8, "max": 8, "note": "Recipes state their scope and ordering."},
+      "security": {"score": 12, "max": 12, "note": "No credentials or unsafe dynamic execution."},
+      "maintainability": {"score": 10, "max": 12, "note": "Examples are readable, but the cyvcf2 helper remains inline documentation rather than a tested shipped script."},
+      "agent_specific": {"score": 18, "max": 20, "note": "Explicit unsupported-case routing avoids silent misuse."}
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 90.3,
+    "max": 100,
+    "assertion_pass_rate": {"passed": 44, "total": 44},
+    "inputs": [
+      {"index": 1, "type": "archived regression", "status": "COMPLETED", "total": 92, "assertions_passed": 4, "assertions_total": 4, "evidence": "runs/fp1/execution.log; shipped example exit 0; 285/285 planted true sites retained."},
+      {"index": 2, "type": "archived regression", "status": "COMPLETED", "total": 89, "assertions_passed": 4, "assertions_total": 4, "evidence": "runs/fp2/execution.log; guarded bcftools preserves 25/25 hom-alt."},
+      {"index": 3, "type": "archived regression", "status": "COMPLETED", "total": 91, "assertions_passed": 4, "assertions_total": 4, "evidence": "runs/fp3/execution.log; VQSR small-panel route retains 57/60 artifacts versus 4/60 under hard filters."},
+      {"index": 4, "type": "archived regression", "status": "COMPLETED", "total": 89, "assertions_passed": 4, "assertions_total": 4, "evidence": "runs/fp4/execution.log; 23 bad genotypes nulled and all 299 sites retained."},
+      {"index": 5, "type": "archived regression", "status": "COMPLETED", "total": 89, "assertions_passed": 4, "assertions_total": 4, "evidence": "runs/fp5/execution.log; end-to-end filtering and QC completed."},
+      {"index": 6, "type": "archived regression", "status": "COMPLETED", "total": 88, "assertions_passed": 4, "assertions_total": 4, "evidence": "runs/fp6/execution.log; DeepVariant route correctly avoids GATK annotations."},
+      {"index": 7, "type": "archived regression", "status": "COMPLETED", "total": 87, "assertions_passed": 4, "assertions_total": 4, "evidence": "runs/fp7/execution.log; tumor sample resolves to index 1."},
+      {"index": 8, "type": "archived regression", "status": "COMPLETED", "total": 92, "assertions_passed": 4, "assertions_total": 4, "evidence": "runs/fp8/execution.log replays the three-layout prompt; current missing-header behavior is superseded and verified at fp10."},
+      {"index": 9, "type": "archived regression", "status": "COMPLETED", "total": 90, "assertions_passed": 4, "assertions_total": 4, "evidence": "runs/fp9/execution.log; the current genotype-level alternative preserves 22/25 hom-alt true sites."},
+      {"index": 10, "type": "fresh boundary", "status": "COMPLETED", "total": 94, "assertions_passed": 4, "assertions_total": 4, "evidence": "runs/fp10/execution.log; exact-current guard emits the actionable error and exits 1 before bcftools filtering."},
+      {"index": 11, "type": "fresh boundary", "status": "COMPLETED", "total": 92, "assertions_passed": 4, "assertions_total": 4, "evidence": "runs/fp11/execution.log; exact-current predicate rejects DP=0 and MQ=0 while retaining missing and rank-sum-missing records."}
+    ]
+  },
+  "final": {"static_weighted": 37.2, "dynamic_weighted": 54.2, "score": 91, "max": 100, "grade": "Production Ready", "grade_symbol": "⭐", "deployable": true, "veto_override": false},
+  "key_strengths": ["The shipped hard-filter example completed and matched the GATK survivor set on planted truth.", "The small-panel VQSR warning was reproduced rather than merely asserted.", "Current somatic and genotype-level boundary code prevents the two previously documented data-loss/crash cases.", "Current cyvcf2 predicate logic distinguishes absent annotations from zero-valued failed annotations."],
+  "recommendations": []
+}

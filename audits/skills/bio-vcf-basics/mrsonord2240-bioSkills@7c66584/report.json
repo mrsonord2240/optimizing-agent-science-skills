@@ -1,0 +1,88 @@
+{
+  "meta": {
+    "skill_name": "bio-vcf-basics",
+    "description": "View, query, and interpret VCF/BCF variant files with bcftools and cyvcf2.",
+    "evaluated_on": "2026-09-24",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Moderate",
+    "n_inputs": 7,
+    "source": "mrsonord2240/bioSkills@7c665843f733a0833f21fe95a7c7199376159059:variant-calling/vcf-basics",
+    "audit_type": "final-pass correction and self-audit at the exact source commit",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md",
+    "execution_note": "Exact commit 7c665843f733a0833f21fe95a7c7199376159059. Archived synthetic inputs 1--5 were rerun from the prior canonical audit, plus two fresh cases. Environment: bcftools 1.24 and cyvcf2 0.34.0 in WSL science. The archived conversion/index write was executed in a temporary Linux directory to avoid Windows mount latency."
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "The PL/GL transform, conditional GQ definition, header recommendations, and BCF requirements were checked against the current hts-specs VCF specification; no patient inference is made."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "All inputs are synthetic and operations are local read, query, convert, or filtered-write examples."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Archived checks cover site/genotype levels, missingness, gVCF blocks, indexing, and filtered writing; fresh checks cover QUAL=0 and caller-emitted PL/GQ fields."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "The shipped viewer ran from the exact commit and was compiled with py_compile."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 92,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {"score": 12, "max": 12, "note": "View, query, field interpretation, gVCF triage, conversion, and Python access are covered."},
+      "reliability": {"score": 12, "max": 12, "note": "Corrected QUAL=0 display, caller-dependent GQ wording, VCF/BCF header requirements, and current plain-gzip diagnostic."},
+      "performance_context": {"score": 6, "max": 8, "note": "The 350-plus-line core guide is thorough but exceeds the 300-line target and remains dense."},
+      "agent_usability": {"score": 16, "max": 16, "note": "The level-and-Number principle and explicit traps prevent common silent interpretation errors."},
+      "human_usability": {"score": 8, "max": 8, "note": "Usage prompts and focused command examples are clear."},
+      "security": {"score": 12, "max": 12, "note": "No secrets, network calls, destructive source operations, or patient-specific guidance."},
+      "maintainability": {"score": 9, "max": 12, "note": "The small executable example is useful, but synthetic regression cases are audit artifacts rather than shipped tests."},
+      "agent_specific": {"score": 17, "max": 20, "note": "Routes to normalization and joint calling are strong; broad compatibility claims are now qualified."}
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 97,
+    "max": 100,
+    "assertion_pass_rate": {"passed": 28, "total": 28},
+    "inputs": [
+      {"index": 1, "type": "Archived canonical", "status": "COMPLETED", "total": 97, "assertions_passed": 4, "assertions_total": 4, "executed": true, "note": "Header/sample/table query, SNP=8, indel=3, total=11, query -H header behavior, and exact shipped viewer execution passed."},
+      {"index": 2, "type": "Archived variant", "status": "COMPLETED", "total": 96, "assertions_passed": 4, "assertions_total": 4, "executed": true, "note": "AD-derived heterozygote allele balance, QUAL-vs-GQ distinction, low-GQ S7 carriers, and missing exclusion passed."},
+      {"index": 3, "type": "Archived edge", "status": "COMPLETED", "total": 97, "assertions_passed": 4, "assertions_total": 4, "executed": true, "note": "SYN_S6 missingness 76/361, missing-versus-hom-ref AF bias, PL/GQ validation on this caller, and independent missingness handling passed."},
+      {"index": 4, "type": "Archived gVCF", "status": "COMPLETED", "total": 97, "assertions_passed": 4, "assertions_total": 4, "executed": true, "note": "Reference blocks, END spans, one N_ALT>1 candidate site, low-GQ block triage, and joint-genotyping boundary passed."},
+      {"index": 5, "type": "Archived stress", "status": "COMPLETED", "total": 97, "assertions_passed": 4, "assertions_total": 4, "executed": true, "note": "BCF and tabix conversion, 32-record region agreement, observed plain-gzip error diagnosis, and 350/361 QUAL>30 Writer result passed."},
+      {"index": 6, "type": "Fresh edge", "status": "COMPLETED", "total": 98, "assertions_passed": 4, "assertions_total": 4, "executed": true, "note": "Fresh VCF proves the shipped viewer prints QUAL=0.0 and preserves missing QUAL as dot; source py_compile passed."},
+      {"index": 7, "type": "Fresh semantics", "status": "COMPLETED", "total": 97, "assertions_passed": 4, "assertions_total": 4, "executed": true, "note": "Fresh caller fields parsed GT, GQ, PL, and GL; relative GL-to-PL scaling was demonstrated and an emitted GQ=99 was preserved rather than reconstructed from PL."}
+    ]
+  },
+  "final": {
+    "static_weighted": 36.8,
+    "dynamic_weighted": 58.2,
+    "score": 95,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false,
+    "open_p0": 0,
+    "open_p1": 0,
+    "open_p2": 0
+  },
+  "recommendations": []
+}

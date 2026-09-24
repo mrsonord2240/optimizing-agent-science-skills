@@ -1,0 +1,46 @@
+{
+  "meta": {
+    "skill_name": "bio-variant-normalization",
+    "evaluated_on": "2026-09-24",
+    "evaluator_version": "skill-auditor@1.0 final-pass exact-commit",
+    "execution_mode": "A (combined fixer/auditor final pass)",
+    "source": "mrsonord2240/bioSkills@356581080738dee60b613812b35fd4b99d217527:variant-calling/variant-normalization",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md",
+    "independence_note": "Final-pass exception: auditor_independent=false; one agent fixed and exact-commit audited under one brief.",
+    "raw_evidence": "F:/OpenScience/audits/bio-variant-normalization/runs/finalpass_20260924/exact_commit_audit.log",
+    "executed": "5 archived logical inputs plus 2 fresh inputs; all assertions passed",
+    "environment": "WSL bcftools 1.24; vt was unavailable, so archived input 4 re-created the documented atomized representation with bcftools and records that limitation."
+  },
+  "veto_gates": {
+    "skill_veto": {"gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS"},
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {"result": "PASS", "detail": "The corrected homopolymer example represents one biological deletion at multiple valid positions; phase-mode text is constrained to installed-tool behavior."},
+      "practice_boundaries": {"result": "PASS", "detail": "The skill addresses representation and matching, and does not make a clinical interpretation from a database match."},
+      "methodological_ground": {"result": "PASS", "detail": "Split-before-atomize, reference preflight, idempotence, and un-atomized consequence handling were executed on synthetic fixtures."},
+      "code_usability": {"result": "PASS", "detail": "All runnable source routes exercised in the exact-commit harness completed successfully."}
+    }
+  },
+  "dynamic_score": {
+    "assertion_pass_rate": {"passed": 17, "total": 17},
+    "inputs": [
+      {"index": 1, "type": "Archived regression", "result": "PASS", "note": "Known REF mismatch surfaced; atomized normalized files had zero ALT=* records and callerA was idempotent."},
+      {"index": 2, "type": "Archived regression", "result": "PASS", "note": "Right-shifted chr1:506 AA>A normalized to the canonical chr1:500 GA>G key."},
+      {"index": 3, "type": "Archived regression", "result": "PASS", "note": "-m-both and -m-any agreed while splitting; declared per-ALT fields were subset."},
+      {"index": 4, "type": "Archived logical regression", "result": "PASS WITH TOOL LIMITATION", "note": "vt was unavailable; the documented bcftools atomized equivalent and the re-standardized unatomized cohort had identical site sets."},
+      {"index": 5, "type": "Archived regression", "result": "PASS", "note": "-p a emitted the unphased MNP consequence; -p s omitted that merged consequence, while isolated-site output remained version-sensitive as documented."},
+      {"index": 6, "type": "Fresh", "result": "PASS", "note": "Mixed SNP/indel input confirmed split equivalence and -m+both separation."},
+      {"index": 7, "type": "Fresh", "result": "PASS", "note": "The usage-guide preflight detected a known REF mismatch before any destination output was created."}
+    ]
+  },
+  "findings_closed": [
+    {"priority": "P1", "title": "Companion guide's full routes omitted atomization and mismatch preflight", "resolution": "Fixed and executed."},
+    {"priority": "P2", "title": "Companion guide misdescribed -m-both while splitting", "resolution": "Fixed and executed."},
+    {"priority": "P1", "title": "Primary repeat illustration used inequivalent deletions", "resolution": "Replaced with a valid homopolymer representation example."},
+    {"priority": "P2", "title": "-p s claimed no consequence is emitted globally", "resolution": "Restricted to documented skip behavior and requires inspection of emitted BCSQ on the installed version."}
+  ],
+  "recommendations": [],
+  "final": {"score": 95, "max": 100, "grade": "Production Ready", "deployable": true, "veto_override": false, "open_p0_p1_p2": 0}
+}

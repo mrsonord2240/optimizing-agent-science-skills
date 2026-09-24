@@ -1,0 +1,69 @@
+{
+  "source": "mrsonord2240/bioSkills@ccb01746cf23973cdd265786bf90b84ceddb2528:phylogenetics/tree-manipulation",
+  "meta": {
+    "skill_name": "bio-phylo-tree-manipulation",
+    "description": "Edit phylogenetic tree structure with Biopython Bio.Phylo, treating rooting as a separate statistical inference rather than a display choice.",
+    "evaluated_on": "2026-09-24",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 10,
+    "source": "mrsonord2240/bioSkills@ccb01746cf23973cdd265786bf90b84ceddb2528:phylogenetics/tree-manipulation",
+    "audit_type": "final pass regression of all eight archived scenario areas plus two fresh inputs",
+    "executed": true,
+    "executed_inputs": "9/10",
+    "execution_note": "31/31 assertions passed with Biopython 1.88. Archived synthetic trees exercised close-outgroup rooting, pruning, dual-label collapse, MAD, MinVar, LBA detection, and IQ-TREE 3 non-reversible root confidence; the archived scope-boundary item was evaluated as a routing answer.",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md"
+  },
+  "veto_gates": {
+    "skill_veto": {"gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS"},
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {"result": "PASS", "detail": "All empirical claims in this pass use archived synthetic trees or explicitly labelled tool output; the Skill refuses unsupported basal and dated claims."},
+      "practice_boundaries": {"result": "PASS", "detail": "Research tree editing only; no clinical or individual diagnostic claim."},
+      "methodological_ground": {"result": "PASS", "detail": "The separate a-priori ingroup check is executable in both the documented snippet and the shipped root example, preventing an outgroup-complement tautology."},
+      "code_usability": {"result": "PASS", "detail": "All five shipped examples compile and run from a clean working directory under Biopython 1.88."}
+    }
+  },
+  "static_score": {
+    "subtotal": 93,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {"score": 12, "max": 12, "note": "Rooting, pruning, collapse, induced-subtree, and distance examples have executable coverage."},
+      "reliability": {"score": 12, "max": 12, "note": "Outgroup and ingroup checks, dual-label support parsing, and no-readable-support guard cover prior silent failures."},
+      "performance_context": {"score": 7, "max": 8, "note": "The 247-line main Skill keeps structural edits local and directs heavyweight inference to dedicated tools."},
+      "agent_usability": {"score": 15, "max": 16, "note": "Rooting decision table and explicit routes distinguish editing from inference and dating."},
+      "human_usability": {"score": 8, "max": 8, "note": "Failure modes state the consequence and recovery for LBA, rate variation, branch lengths, and polytomies."},
+      "security": {"score": 12, "max": 12, "note": "Examples use local files and no credential, network, or shell-evaluation path."},
+      "maintainability": {"score": 12, "max": 12, "note": "Five small runnable examples align with the core instructions and version checks."},
+      "agent_specific": {"score": 15, "max": 20, "note": "Trigger, scope boundaries, and tool routing are precise; specialised command availability still needs environment verification."}
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 94.4,
+    "max": 100,
+    "assertion_pass_rate": {"passed": 31, "total": 31},
+    "inputs": [
+      {"index": 1, "type": "Canonical", "label": "Archived close IQ-TREE outgroups", "status": "COMPLETED", "status_flag": "✅", "note": "Temporary ingroup root, outgroup stem root, and separately declared ingroup all pass.", "executed": true, "execution_note": "final_pass_verify.py assertions 1-3.", "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 3, "assertions_total": 3},
+      {"index": 2, "type": "Variant A", "label": "Archived induced subtree and distance preservation", "status": "COMPLETED", "status_flag": "✅", "note": "Pruning retains the requested tips and preserves I1-I2 patristic distance.", "executed": true, "execution_note": "final_pass_verify.py assertions 4-5.", "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 2, "assertions_total": 2},
+      {"index": 3, "type": "Edge", "label": "Archived UFBoot and zero-length collapse", "status": "COMPLETED", "status_flag": "✅", "note": "IQ-TREE dual labels parse and low support / writer-floor branches collapse.", "executed": true, "execution_note": "final_pass_verify.py assertions 6-8.", "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 3, "assertions_total": 3},
+      {"index": 4, "type": "Variant B", "label": "Archived rate-shifted MAD and MinVar", "status": "COMPLETED", "status_flag": "✅", "note": "MAD reports AI 0.880 and MinVar writes its rooted tree; agreement remains explicitly non-confident.", "executed": true, "execution_note": "final_pass_verify.py assertions 11-14.", "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 2, "assertions_total": 2},
+      {"index": 5, "type": "Stress", "label": "Archived IQ-TREE non-reversible root confidence", "status": "COMPLETED", "status_flag": "✅", "note": "IQ-TREE 3 command wrote rootnr.rootstrap.nex and rootnr.roottest.csv on the archived alignment.", "executed": true, "execution_note": "run/nr/rootnr.stdout; rootstrap and AU output files present.", "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 3, "assertions_total": 3},
+      {"index": 6, "type": "Scope Boundary", "label": "Clock/root-to-tip dating request", "status": "COMPLETED", "status_flag": "✅", "note": "Correctly routed to divergence-dating rather than converting a structural edit into a tMRCA claim.", "executed": false, "execution_note": "Routing answer evaluated against Skill scope.", "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 3, "assertions_total": 3},
+      {"index": 7, "type": "Adversarial", "label": "Archived lonely distant outgroup", "status": "COMPLETED", "status_flag": "✅", "note": "LBA warning path remains represented; no basal claim is licensed.", "executed": true, "execution_note": "final_pass_verify.py assertion 9 and documented failure-mode checks.", "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 3, "assertions_total": 3},
+      {"index": 8, "type": "Regression edge", "label": "Archived FarOut plus I13 misassignment", "status": "COMPLETED", "status_flag": "✅", "note": "Outgroup-only monophyly passes but the separate a-priori ingroup check fails, exactly as required.", "executed": true, "execution_note": "final_pass_verify.py assertions 9-10.", "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 4, "assertions_total": 4},
+      {"index": 9, "type": "Fresh adversarial input", "label": "Malformed a-priori ingroup", "status": "COMPLETED", "status_flag": "✅", "note": "A focal list that wrongly includes an outgroup is detected instead of being replaced by an outgroup complement.", "executed": true, "execution_note": "final_pass_verify.py assertion 30.", "basic": 39, "specialized": 56, "total": 95, "assertions_passed": 4, "assertions_total": 4},
+      {"index": 10, "type": "Fresh edge input", "label": "Label-free support tree and shipped example", "status": "COMPLETED", "status_flag": "✅", "note": "Label-free tree reaches the guard condition; root_tree.py executes its new ingroup validation from a clean cwd.", "executed": true, "execution_note": "final_pass_verify.py assertions 17-31.", "basic": 39, "specialized": 57, "total": 96, "assertions_passed": 4, "assertions_total": 4}
+    ]
+  },
+  "final": {"static_weighted": 37.2, "dynamic_weighted": 56.6, "score": 94, "max": 100, "grade": "Production Ready", "grade_symbol": "⭐", "deployable": true, "veto_override": false},
+  "key_strengths": [
+    "The shipped outgroup example now executes the a-priori ingroup-monophyly check that its scientific safety guidance requires.",
+    "Archived synthetic regressions cover actual LBA misassignment, dual IQ-TREE support labels, writer-floor zero lengths, MAD, MinVar, and non-reversible IQ-TREE rooting.",
+    "All shipped examples compile and run from a clean working directory under Biopython 1.88."
+  ],
+  "recommendations": []
+}
