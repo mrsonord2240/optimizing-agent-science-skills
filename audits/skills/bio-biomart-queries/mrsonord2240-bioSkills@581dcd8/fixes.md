@@ -34,6 +34,21 @@ data) in one helper, since the raw body is available to check before parsing. Ch
 | `examples/bulk_id_mapping.py` adds `entrezgene_id` (6th attribute), breaking live with "Too many attributes selected for External References" even after the filter fix | P2 | Dropped `entrezgene_id` from the example's attribute list to match SKILL.md's own 5-attribute inline pattern | ran (part of the same bulk_id_mapping.py run above): no "too many attributes" error, 5 attributes returned cleanly | |
 | (found during verification, not in the audit) `examples/bulk_id_mapping.py`'s groupby-collapse step crashes with `TypeError: sequence item 2: expected str instance, float found` | not in report; fixed as a shipped-example defect per FIX_BRIEF | `filter(None, x)` does not drop `NaN` (NaN is truthy in Python), so the join over RefSeq/UniProt columns hit a float; replaced with an explicit `pd.notna()` filter | ran: same bulk_id_mapping.py end-to-end run above, "Collapse to one row per gene" section now completes and prints correctly for all 5 genes | only surfaced now that the P0 filter fix lets the script reach this line; the auditor's run never got this far |
 
+## Final pass — 2026-09-24
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| Large ID lists fail with HTTP 414 because `ds.get()` serializes XML into a GET URL | P1 | Moved the helper to `scripts/biomart_query.py`; start large ID lists in 500-value batches and halve only a batch that receives 414 | ran: 1,001 real release-110 Ensembl IDs completed live after adaptive splitting; deterministic fixture made 3 bounded requests | `www.ensembl.org` was serving an HTML outage page, so the documented release-110 archive was used for live validation |
+| Empty list, outage HTML, and other malformed responses had one generic error path | P2 | Added local `BioMartInputError`, retryable `BioMartOutageError`, and `BioMartResponseError`; empty filters now fail before sending a request | ran: escaping, canned outage, valid TSV, and empty-list fixtures in `finalpass_rerun_archived_inputs.py` | agents can now retry only an outage error |
+| Ensembl Genomes host-swap example was unverified and failed for a real Plants dataset | P2 | Removed the one-line `plants.ensembl.org` recipe and caveated that endpoint/schema configuration is instance-specific | ran: current-source scope regression asserts the unsupported recipe is absent | no new Ensembl Genomes workflow was added |
+| `query_raw()` was duplicated in SKILL.md and two examples | P2 | Centralized the helper under `scripts/`; both Python examples import it | ran: all changed Python files py_compile; archived current-source regressions passed | standalone examples now require the adjacent Skill `scripts/` directory |
+
+### Evidence limitation (not an open source recommendation)
+
+| item | classification | evidence | refresh condition |
+|---|---|---|
+| R biomaRt live round-trip for `gene_biotype` | external verification limitation | biomaRt 2.62.1 could load but `useEnsembl(version=110)`, current `useEnsembl()`, and direct archive `useMart()` all failed mirror/archive connection discovery in this environment; Python reached the same release-110 archive and schema checks confirm the source attribute | a reachable biomaRt-compatible Ensembl mirror; rerun `run/input_r_gene_biotype.R` through `audit-envs/database-access/r.sh` |
+
 **Redundancy pass (usage-guide.md):** deleted "What the Agent Will Do" (8 numbered points) and "Tips"
 (8 bullets) in full — every point restated something already in SKILL.md (decision matrix, discovery
 pattern, failure modes: row-multiplication, HGNC renames, version pinning, SNP-vs-gene mart, REST vs

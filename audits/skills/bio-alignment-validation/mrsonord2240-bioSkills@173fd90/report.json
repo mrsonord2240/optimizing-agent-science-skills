@@ -1,0 +1,154 @@
+{
+  "meta": {
+    "skill_name": "bio-alignment-validation",
+    "description": "Validate BAM integrity, reference-dictionary identity, alignment quality, contamination, and sample swaps with insert size, pairing, GC bias, strand balance, and post-alignment metrics. Use before variant calling or quantification.",
+    "evaluated_on": "2026-09-24",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "mrsonord2240/bioSkills@173fd9097151633f9d7658826e094440f902e495:alignment-files/alignment-validation",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All numeric claims cited in this report came from captured runs; no clinical outcomes or identifiers were fabricated." },
+      "practice_boundaries": { "result": "PASS", "detail": "The Skill supplies research-data QC and explicitly leaves clinical interpretation to downstream research workflows." },
+      "methodological_ground": { "result": "PASS", "detail": "The Skill distinguishes generic DNA defaults from assay-specific expectations and documents the limits of slice-based contamination checks." },
+      "code_usability": { "result": "PASS", "detail": "Both shipped validators parsed and ran across archived and fresh fixtures with documented 0/1/2 exit contracts." }
+    }
+  },
+  "static_score": {
+    "subtotal": 96,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 12, "max": 12, "note": "Covers integrity, dictionary identity, QC, contamination, sample swap, and assay-aware interpretation with runnable primary workflows." },
+      "reliability": { "score": 12, "max": 12, "note": "Both validators have explicit success, QC-fail, and unreadable-input exit contracts, including missing @SQ and unresolved CRAM handling." },
+      "performance_context": { "score": 8, "max": 8, "note": "The Python validator uses aggregate counters and an exact frequency median; a 5.642M-record run used 27,292 KB maximum RSS." },
+      "agent_usability": { "score": 15, "max": 16, "note": "Decision-oriented sections, commands, thresholds, exits, and cross-skill boundaries are clear; the comprehensive reference remains necessarily long." },
+      "human_usability": { "score": 8, "max": 8, "note": "The concise guide defers commands and thresholds to SKILL.md while retaining useful prompts and a quick-start path." },
+      "security": { "score": 12, "max": 12, "note": "No credential, external-write, or unbounded destructive operation is instructed; inputs remain explicit local files." },
+      "maintainability": { "score": 11, "max": 12, "note": "The two maintained examples share documented bands and contracts; detailed assay commands intentionally remain in their canonical related Skills." },
+      "agent_specific": { "score": 18, "max": 20, "note": "Frontmatter now names integrity, dictionary, contamination, and swap triggers; the description and decision surface are specific without overpromising a real FREEMIX result." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 94.3,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 28, "total": 28 },
+    "inputs": [
+      {
+        "index": 1, "type": "Canonical", "label": "Primary paired-end BAM validation",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Both validators completed on the public human paired-end BAM; reported 99.96% mapping, expected insert statistics, and PASS verdicts.",
+        "basic": 38, "specialized": 58, "total": 96, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Both shipped validators complete the canonical paired-end BAM workflow.", "result": "PASS", "note": "Archived regression output contains a contract-valid result for each validator." },
+          { "text": "The mapping rate is computed over primary records including unplaced unmapped reads.", "result": "PASS", "note": "The full-run output reports 5,640,000 mapped of 5,642,000 primary records in the stress confirmation." },
+          { "text": "The output gives an actionable verdict rather than only raw counts.", "result": "PASS", "note": "Both outputs end with the Quality Summary and a 0/1/2 contract." },
+          { "text": "The workflow remains within research QC scope.", "result": "PASS", "note": "It reports alignment quality only and does not diagnose an individual." }
+        ]
+      },
+      {
+        "index": 2, "type": "Variant A", "label": "Archived defect-fixture regression set",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Every one of the 58 archived BAM fixtures was rerun through both validators: 116 runs, valid 0/1/2 contract statuses, and no Python traceback.",
+        "basic": 37, "specialized": 57, "total": 94, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "All archived BAM fixtures are exercised by both validators.", "result": "PASS", "note": "archived-validator-regression.summary records 58 BAMs and 116 validator runs." },
+          { "text": "Each validator returns a documented contract status on every archived fixture.", "result": "PASS", "note": "No status outside 0, 1, or 2 was recorded." },
+          { "text": "Malformed inputs do not emit a Python traceback.", "result": "PASS", "note": "The regression harness explicitly checks stderr for Traceback and recorded none." },
+          { "text": "The regression set includes integrity, mapping, pairing, strand, and fingerprint fixtures.", "result": "PASS", "note": "The archived data tree contains planted defects, ladder cases, dictionary cases, and fingerprint inputs." }
+        ]
+      },
+      {
+        "index": 3, "type": "Edge", "label": "Fresh tiny, no-SQ, and unreadable-CRAM inputs",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Fresh synthetic fixtures produced Python/shell exit pairs of 0/0 for 50 reads, 2/2 for no @SQ, and 2/2 for an unresolved CRAM.",
+        "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "A tiny valid BAM is not given a pairing or strand grade.", "result": "PASS", "note": "Both outputs say too few primary reads to grade pairing or strand balance." },
+          { "text": "A BAM without @SQ is rejected consistently.", "result": "PASS", "note": "Both validators return exit 2 on the fresh no-SQ fixture." },
+          { "text": "An unresolved CRAM is classified as unreadable rather than as a low-MAPQ QC failure.", "result": "PASS", "note": "Both validators return exit 2; shell stderr names REF_PATH or -T as the remedy." },
+          { "text": "Sampling behavior is disclosed to the user.", "result": "PASS", "note": "The Python validator prints the -n head-of-file bias warning." }
+        ]
+      },
+      {
+        "index": 4, "type": "Adversarial", "label": "Same-RG fingerprint collision",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Synthetic mismatched BAMs sharing a read-group collision were compared by file and returned UNEXPECTED_MISMATCH with exit 1.",
+        "basic": 38, "specialized": 58, "total": 96, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "The documented CrosscheckFingerprints command groups by file.", "result": "PASS", "note": "The command contains CROSSCHECK_BY=FILE." },
+          { "text": "A same-RG/PU collision cannot collapse two input BAMs into one comparison group.", "result": "PASS", "note": "The output metric header reports CROSSCHECK_BY=FILE and separate file group values." },
+          { "text": "A mismatched same-SM pair produces a failing result.", "result": "PASS", "note": "crosscheck_by_file_rc=1 and the output contains UNEXPECTED_MISMATCH." },
+          { "text": "The workflow states a safe alternative for input metadata.", "result": "PASS", "note": "The Skill also instructs users to assign distinct RG IDs and PUs." }
+        ]
+      },
+      {
+        "index": 5, "type": "Variant B", "label": "Picard chart and table contracts",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "Picard 3.5.0 wrote InsertSize and GC table outputs without charts, and wrote an InsertSize PDF when Rscript was available.",
+        "basic": 37, "specialized": 57, "total": 94, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Insert-size metrics can be generated without the chart option.", "result": "PASS", "note": "insert-no-chart.txt exists and contains MEDIAN_INSERT_SIZE." },
+          { "text": "GC-bias metrics can be generated without the chart option.", "result": "PASS", "note": "Both GC detail and summary tables exist and include NORMALIZED_COVERAGE." },
+          { "text": "A chart run succeeds when Rscript is available.", "result": "PASS", "note": "insert_chart_rc=0 and insert-with-chart.pdf was asserted non-empty." },
+          { "text": "The Skill documents the optional R prerequisite precisely.", "result": "PASS", "note": "Version Compatibility and both Picard sections distinguish chart generation from table generation." }
+        ]
+      },
+      {
+        "index": 6, "type": "Stress", "label": "5.642M-record full-file validation",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "A BAM assembled from 1,000 public BAM copies completed in 22.61 seconds at 27,292 KB maximum RSS with expected 99.96% mapping and 123/126/32 insert statistics.",
+        "basic": 37, "specialized": 56, "total": 93, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "The validator completes a multi-million-record full-file input.", "result": "PASS", "note": "The 5,642,000-primary-record run completed successfully." },
+          { "text": "The large-run mapping calculation is correct.", "result": "PASS", "note": "The output reports 5,640,000 mapped and 2,000 unmapped primary records." },
+          { "text": "The aggregate implementation avoids per-read MAPQ memory growth.", "result": "PASS", "note": "Maximum RSS was 27,292 KB while processing 5.642M primary records." },
+          { "text": "Insert summary statistics remain correct after the aggregation change.", "result": "PASS", "note": "Median 123, mean 126, and standard deviation 32 match the established public-fixture values." }
+        ]
+      },
+      {
+        "index": 7, "type": "Scope Boundary", "label": "Documentation and static contract review",
+        "status": "COMPLETED", "status_flag": "✅",
+        "note": "The source changes were syntax-checked, source diff checked, and reviewed against the final-pass recommendation list.",
+        "basic": 37, "specialized": 55, "total": 92, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "The Python example parses after the aggregate-counter change.", "result": "PASS", "note": "py_compile completed successfully." },
+          { "text": "The shell example parses after the decoded-pass change.", "result": "PASS", "note": "bash -n completed successfully." },
+          { "text": "The guide uses the same strand quantity as the validator and Skill.", "result": "PASS", "note": "Its prompts and workflow now name forward fraction F/(F+R)." },
+          { "text": "All nine prior open P2 recommendations have a corresponding source correction and evidence.", "result": "PASS", "note": "The final checkpoint and unique fix log enumerate each correction and its verification." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 38.4,
+    "dynamic_weighted": 56.6,
+    "score": 95,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "The two validators now agree on normal, tiny, missing-SQ, malformed, and unresolved-CRAM contracts.",
+    "The Skill explicitly separates integrity, dictionary identity, QC metrics, and fingerprinting rather than treating one tool as universal validation.",
+    "All archived fixtures and targeted fresh inputs have retained, runnable evidence.",
+    "The whole-file implementation now has measured bounded memory behavior at multi-million-record scale."
+  ],
+  "recommendations": []
+}

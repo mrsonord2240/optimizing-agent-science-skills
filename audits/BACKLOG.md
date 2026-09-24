@@ -8,7 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (93)
+## P1 (91)
 
 ### `bio-data-visualization-statistical-annotation` — stat_compare_means(comparisons, p.adjust.method='holm') draws unadjusted p; the argument does not exist
 
@@ -386,14 +386,6 @@ None open.
 - Root cause: The block and its new error message were written for the label-free case only, while the taxonomy advertises TMT.
 - Fix: Add a decision-tree row 'MaxQuant TMT / isobaric labelling -> read Reporter intensity corrected <n> columns; corrected channels apply MaxQuant's isotope-impurity correction, uncorrected do not; reporter-ion quant computation itself is quantification', and change the ValueError to name the columns the table actually has, e.g. 'No LFQ intensity columns. Found Reporter intensity corrected columns -> this is an isobaric (TMT/iTRAQ) run; see the TMT row. Otherwise use Intensity and normalize explicitly.'
 
-### `bio-alignment-sorting` — Dagger footnote false for two rows; CMCR row incomplete
-
-- Skill: 86, Limited Release · [mrsonord2240/bioSkills@cd9e0d2](https://github.com/mrsonord2240/bioSkills/tree/cd9e0d284852ed0c6989fedd401e74d00b863a51/alignment-files/alignment-sorting) · [viewer](skills/bio-alignment-sorting/mrsonord2240-bioSkills@cd9e0d2/viewer.md)
-- Observed in inputs: 5
-- Problem: The footnote says the daggered tools were not installed, but fgbio and GATK are installed here. fgbio 4.1.1 CallMolecularConsensusReads rejects coordinate-sorted and sort -t MI input ('not sorted correctly. Please sort with fgbio SortBam -s TemplateCoordinate') although the row says 'grouped by MI tag'. Mutect2 needs coordinate and index (verified).
-- Root cause: The fixer hedged rows by tool family without checking which tools were actually present.
-- Fix: Remove the dagger from Mutect2 (verified: coordinate-sorted and indexed) and change the CMCR row to 'template-coordinate order, as written by GroupReadsByUmi'. Keep the dagger only on featureCounts, Salmon, RSEM, Sniffles, cuteSV, Manta, Delly, which are genuinely unverified.
-
 ### `bio-variant-annotation` — csq --phase modes m and s are described wrongly
 
 - Skill: 86, Limited Release · [mrsonord2240/bioSkills@c1237cd](https://github.com/mrsonord2240/bioSkills/tree/c1237cdbc9bb199947696f3909de26a55d259116/variant-calling/variant-annotation) · [viewer](skills/bio-variant-annotation/mrsonord2240-bioSkills@c1237cd/viewer.md)
@@ -417,14 +409,6 @@ None open.
 - Problem: The Skill states the *_matrix.tsv files apply an extra 5% run-specific protein FDR (--matrix-spec-q) so the matrix protein count can be LOWER than the report count, and instructs the agent not to panic. On real 2.6.1 output the matrix holds 4440 protein groups against 4376 in the run-level-filtered report and 4375 after the Skill's own global filter -- the matrix is larger. The 2.6.1 log describes the matrices as '1% precursor and protein group FDR'. An agent following the Skill would explain a real discrepancy backwards.
 - Root cause: Version drift: the --matrix-spec-q behaviour is described from older DIA-NN documentation and was never checked against a 2.x run.
 - Fix: Replace the directional claim with a version-aware one: say the matrix and the filtered report apply different q-value contexts so the counts will differ in either direction, that the direction depends on the DIA-NN version and on which q-value columns the agent filtered on, and that the authoritative statement is the 'levels matrix' line in report.log.txt for the version actually used. Update the Common Errors row and the 'Matrix run-specific PG filter 0.05' threshold row the same way.
-
-### `bio-biomart-queries` — Bulk ID-mapping fails at the Skill's own advertised scale (414 Request-URI Too Large)
-
-- Skill: 87, Limited Release · [mrsonord2240/bioSkills@eb9a071](https://github.com/mrsonord2240/bioSkills/tree/eb9a071e28dec6fef79e277bd94aa8d41afd5695/database-access/biomart-queries) · [viewer](skills/bio-biomart-queries/mrsonord2240-bioSkills@eb9a071/viewer.md)
-- Observed in inputs: 7
-- Problem: query_raw() calls ds.get(), which is pybiomart's ServerBase.get() -- a plain HTTP GET with the entire XML query embedded in the URL. At 2066 real Ensembl gene IDs (~33KB filter value alone), Ensembl rejects the request with 414 Request-URI Too Large. SKILL.md's own Goal text advertises '5,000 Ensembl Gene IDs' and usage-guide.md's Quick Start example says '8,000 Ensembl Gene IDs' -- both would fail the same way, worse.
-- Root cause: query_raw() inherits pybiomart's GET-based transport unchanged; nothing in the fix's new helper switches to POST or chunks large ID lists client-side.
-- Fix: Either build the query_raw() request as an HTTP POST (BioMart's martservice endpoint accepts POST for the same XML payload) or chunk ID lists above a safe size (empirically ~500-1000 IDs) into multiple queries joined client-side, and correct the '5,000'/'8,000 IDs' claims in SKILL.md and usage-guide.md to state the real, tested limit.
 
 ### `bio-crispr-screens-mageck-analysis` — 'RRA does not support pairing' is factually incorrect
 
@@ -754,7 +738,7 @@ None open.
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (241)
+## P2 (223)
 
 ### `bio-data-visualization-statistical-annotation` — Test-name and label details differ from the tools
 
@@ -1284,78 +1268,6 @@ None open.
 - Root cause: Statements copied from tool documentation without a run.
 - Fix: Say 'iVar expects sorted input (index optional on 1.4.4)' and 'a read start up to N bases before the primer start still matches; starts inside the primer always match'.
 
-### `bio-alignment-validation` — Crosscheck misses a swap when both BAMs share RG ID/PU
-
-- Skill: 85, Limited Release · [mrsonord2240/bioSkills@f9307f4](https://github.com/mrsonord2240/bioSkills/tree/f9307f4029f87c79892a5d2832dee4b903038056/alignment-files/alignment-validation) · [viewer](skills/bio-alignment-validation/mrsonord2240-bioSkills@f9307f4/viewer.md)
-- Observed in inputs: 6
-- Problem: With the Skill's CrosscheckFingerprints command, two BAMs that both carry read group ID:1 PU:1 collapse into one group: RESULT EXPECTED_MATCH, LOD 7.7, exit 0, also with EXPECT_ALL_GROUPS_TO_MATCH=true, although the genotypes differ at every planted site.
-- Root cause: Picard groups by read group by default and the added tumor/normal block does not say the two BAMs need distinct read-group IDs / PUs.
-- Fix: Add CROSSCHECK_BY=FILE (or give each BAM a unique RG ID and PU) to the tumor/normal command and one sentence on the collapse; measured: CROSSCHECK_BY=FILE LOD -64.4, rc 1 under EXPECT_ALL_GROUPS_TO_MATCH=true.
-
-### `bio-alignment-validation` — Picard chart commands need R; Skill never says so
-
-- Skill: 85, Limited Release · [mrsonord2240/bioSkills@f9307f4](https://github.com/mrsonord2240/bioSkills/tree/f9307f4029f87c79892a5d2832dee4b903038056/alignment-files/alignment-validation) · [viewer](skills/bio-alignment-validation/mrsonord2240-bioSkills@f9307f4/viewer.md)
-- Observed in inputs: 1, 6
-- Problem: CollectInsertSizeMetrics H= and CollectGcBiasMetrics CHART= exit 1 and leave no metrics file when Rscript is missing ('R is not installed on this machine...'). SKILL.md lists no R prerequisite.
-- Root cause: Version Compatibility names samtools, picard, pysam, matplotlib, numpy only.
-- Fix: Add R to the install line, or say the chart options need Rscript and that omitting H= / CHART= still writes the metrics (measured: CollectInsertSizeMetrics without H= wrote its metrics file).
-
-### `bio-alignment-validation` — validate_alignment.sh prints FAIL, rc 1 on unreadable CRAM
-
-- Skill: 85, Limited Release · [mrsonord2240/bioSkills@f9307f4](https://github.com/mrsonord2240/bioSkills/tree/f9307f4029f87c79892a5d2832dee4b903038056/alignment-files/alignment-validation) · [viewer](skills/bio-alignment-validation/mrsonord2240-bioSkills@f9307f4/viewer.md)
-- Observed in inputs: 4
-- Problem: On a CRAM whose reference cannot be resolved the mean-MAPQ pipeline fails silently: 'Mean MAPQ: ' is blank and the verdict is 'FAIL: Mean MAPQ' with exit 1 (should be 2). The python validator returns rc 2.
-- Root cause: samtools view -c never decodes bases, so the quickcheck and count preconditions pass; the later `samtools view \| awk` errors are not checked.
-- Fix: Decode once up front (samtools view -c on the CRAM with the reference, or check the exit status of the MAPQ pipeline) and exit 2; or state that CRAM needs REF_PATH / -T.
-
-### `bio-alignment-validation` — 'R= enables the NM/MD checks' overstates Picard
-
-- Skill: 85, Limited Release · [mrsonord2240/bioSkills@f9307f4](https://github.com/mrsonord2240/bioSkills/tree/f9307f4029f87c79892a5d2832dee4b903038056/alignment-files/alignment-validation) · [viewer](skills/bio-alignment-validation/mrsonord2240-bioSkills@f9307f4/viewer.md)
-- Observed in inputs: 8
-- Problem: With R=, ValidateSamFile reported INVALID_TAG_NM 40 for the inflated NM tags but 'No errors found' for 40 shifted MD tags that samtools calmd shows are wrong.
-- Root cause: The comment on the ValidateSamFile line was written for NM only.
-- Fix: Write '(R= enables the NM check)' and point to samtools calmd for MD.
-
-### `bio-alignment-validation` — usage-guide still says forward/reverse ratio
-
-- Skill: 85, Limited Release · [mrsonord2240/bioSkills@f9307f4](https://github.com/mrsonord2240/bioSkills/tree/f9307f4029f87c79892a5d2832dee4b903038056/alignment-files/alignment-validation) · [viewer](skills/bio-alignment-validation/mrsonord2240-bioSkills@f9307f4/viewer.md)
-- Observed in inputs: —
-- Problem: Three example prompts and step 4 of 'What the Agent Will Do' still ask for the forward/reverse ratio; SKILL.md says the 0.48-0.52 quantity is the forward fraction and warns against F/R.
-- Root cause: The strand section was corrected in SKILL.md and the scripts but the guide's wording was not.
-- Fix: Replace 'forward/reverse strand ratio' by 'forward fraction F/(F+R)' in the guide.
-
-### `bio-alignment-validation` — Picard noise note is incomplete
-
-- Skill: 85, Limited Release · [mrsonord2240/bioSkills@f9307f4](https://github.com/mrsonord2240/bioSkills/tree/f9307f4029f87c79892a5d2832dee4b903038056/alignment-files/alignment-validation) · [viewer](skills/bio-alignment-validation/mrsonord2240-bioSkills@f9307f4/viewer.md)
-- Observed in inputs: 2
-- Problem: The valid nanopore BAM draws HEADER_RECORD_MISSING_REQUIRED_TAG 3, INVALID_TAG_NM 22 and MISSING_PLATFORM_VALUE 3 from Picard; the note lists only MATE_NOT_FOUND, MISSING_TAG_NM and RECORD_OUT_OF_ORDER.
-- Root cause: The note was drawn from short-read data.
-- Fix: Add one clause: long-read BAMs also draw header (@RG PL / required tag) and NM-convention errors.
-
-### `bio-alignment-validation` — Validators grade tiny inputs and disagree on edge files
-
-- Skill: 85, Limited Release · [mrsonord2240/bioSkills@f9307f4](https://github.com/mrsonord2240/bioSkills/tree/f9307f4029f87c79892a5d2832dee4b903038056/alignment-files/alignment-validation) · [viewer](skills/bio-alignment-validation/mrsonord2240-bioSkills@f9307f4/viewer.md)
-- Observed in inputs: 4, 9
-- Problem: One- and two-read BAMs print 'FAIL: Strand balance' rc 1 with no small-sample note; -n output has no bias warning; python rc 1 vs shell rc 2 on an unaligned BAM without @SQ.
-- Root cause: No minimum-n guard and no shared precondition between the two implementations.
-- Fix: Print 'too few reads to grade strand/pairing (n<...)' instead of a grade below a threshold n, print the -n bias warning in the output, and make both scripts treat a no-@SQ BAM the same way.
-
-### `bio-alignment-validation` — Cost of the whole-file default
-
-- Skill: 85, Limited Release · [mrsonord2240/bioSkills@f9307f4](https://github.com/mrsonord2240/bioSkills/tree/f9307f4029f87c79892a5d2832dee4b903038056/alignment-files/alignment-validation) · [viewer](skills/bio-alignment-validation/mrsonord2240-bioSkills@f9307f4/viewer.md)
-- Observed in inputs: 5
-- Problem: The python validator keeps every mapped read's MAPQ in a list (149 MB at 5.6M reads, ~1.9 GB extrapolated to 100M) and the shell validator makes ~10 passes (124 s at 5.6M reads).
-- Root cause: Metrics computed from full lists rather than counters; one samtools call per metric.
-- Fix: Use counters for MAPQ and insert size, and take shell counts from one `samtools flagstat` / `stats` pass.
-
-### `bio-alignment-validation` — Description omits integrity and contamination triggers
-
-- Skill: 85, Limited Release · [mrsonord2240/bioSkills@f9307f4](https://github.com/mrsonord2240/bioSkills/tree/f9307f4029f87c79892a5d2832dee4b903038056/alignment-files/alignment-validation) · [viewer](skills/bio-alignment-validation/mrsonord2240-bioSkills@f9307f4/viewer.md)
-- Observed in inputs: —
-- Problem: The frontmatter description names metrics only; the body also covers file integrity, dictionary identity, contamination and sample swap.
-- Root cause: Description not updated when those sections were added.
-- Fix: Add 'BAM integrity, reference dictionary match, contamination / sample swap' to the description.
-
 ### `bio-differential-splicing` — leafcutter batch = group sentence is wrong
 
 - Skill: 85, Limited Release · [mrsonord2240/bioSkills@ec5b9cf](https://github.com/mrsonord2240/bioSkills/tree/ec5b9cf46e2b1c73a361724dab97168c464fcbac/alternative-splicing/differential-splicing) · [viewer](skills/bio-differential-splicing/mrsonord2240-bioSkills@ec5b9cf/viewer.md)
@@ -1484,46 +1396,6 @@ None open.
 - Root cause: The blocks are written as minimal transformations.
 - Fix: Add one print per block summarising rows read, rows removed by each criterion, and final matrix shape, and say in the Approach text that this line belongs in the methods record.
 
-### `bio-alignment-sorting` — Picard '-n output is rejected' is too broad
-
-- Skill: 86, Limited Release · [mrsonord2240/bioSkills@cd9e0d2](https://github.com/mrsonord2240/bioSkills/tree/cd9e0d284852ed0c6989fedd401e74d00b863a51/alignment-files/alignment-sorting) · [viewer](skills/bio-alignment-sorting/mrsonord2240-bioSkills@cd9e0d2/viewer.md)
-- Observed in inputs: 2
-- Problem: With zero-padded names where natural and ASCII order coincide, Picard MarkDuplicates accepted -n output (rc 0). With numeric-suffix names (all three real BAMs) it is rejected.
-- Root cause: The claim was tested only on names whose two orders differ.
-- Fix: Say 'rejected whenever natural and ASCII order differ (most real names); use -N to be safe'.
-
-### `bio-alignment-sorting` — is_coordinate_sorted fails opaquely on uBAM and CRAM
-
-- Skill: 86, Limited Release · [mrsonord2240/bioSkills@cd9e0d2](https://github.com/mrsonord2240/bioSkills/tree/cd9e0d284852ed0c6989fedd401e74d00b863a51/alignment-files/alignment-sorting) · [viewer](skills/bio-alignment-sorting/mrsonord2240-bioSkills@cd9e0d2/viewer.md)
-- Observed in inputs: 6
-- Problem: Unaligned BAM raises ValueError (no @SQ); CRAM without a resolvable reference raises OSError 'truncated file'.
-- Root cause: The function opens with pysam.AlignmentFile(path, 'rb') and no check_sq or reference options.
-- Fix: Add check_sq=False (an unaligned BAM is not coordinate sorted) and a one-line note that CRAM needs REF_PATH or reference_filename.
-
-### `bio-alignment-sorting` — Failed pipeline run leaves a truncated BAM in place
-
-- Skill: 86, Limited Release · [mrsonord2240/bioSkills@cd9e0d2](https://github.com/mrsonord2240/bioSkills/tree/cd9e0d284852ed0c6989fedd401e74d00b863a51/alignment-files/alignment-sorting) · [viewer](skills/bio-alignment-sorting/mrsonord2240-bioSkills@cd9e0d2/viewer.md)
-- Observed in inputs: 5, 7
-- Problem: After a read-count mismatch or aligner crash sort_pipeline.sh exits non-zero but the partial, valid-looking BAM stays at OUTPUT; THREADS is not validated and SE-with-threads needs an empty R2 argument.
-- Root cause: No cleanup on failure; positional-argument design.
-- Fix: rm -f "$OUTPUT" before exiting on the count error (or a trap on failure), and validate THREADS as an integer.
-
-### `bio-alignment-sorting` — Small flag and performance wording gaps
-
-- Skill: 86, Limited Release · [mrsonord2240/bioSkills@cd9e0d2](https://github.com/mrsonord2240/bioSkills/tree/cd9e0d284852ed0c6989fedd401e74d00b863a51/alignment-files/alignment-sorting) · [viewer](skills/bio-alignment-sorting/mrsonord2240-bioSkills@cd9e0d2/viewer.md)
-- Observed in inputs: 5
-- Problem: -T with an existing directory is used as a directory (samtools.PID.tmp.NNNN.bam inside it), contrary to 'not a directory'; -@ N gave 2/6/7/11 threads for N = 0/2/4/8, not N+1; collate and -l 0 timings reverse on a network mount (collate ~4x slower on 9p); HTSeq 2820/5599 is quoted without its GTF and BAM.
-- Root cause: Statements come from help text and one machine.
-- Fix: Soften each to the observed behaviour and name the conditions (local disk, one-gene GTF over the DNA test BAM).
-
-### `bio-alignment-sorting` — Description omits merge, collate and record verification
-
-- Skill: 86, Limited Release · [mrsonord2240/bioSkills@cd9e0d2](https://github.com/mrsonord2240/bioSkills/tree/cd9e0d284852ed0c6989fedd401e74d00b863a51/alignment-files/alignment-sorting) · [viewer](skills/bio-alignment-sorting/mrsonord2240-bioSkills@cd9e0d2/viewer.md)
-- Observed in inputs: —
-- Problem: Frontmatter description mentions only sorting for indexing, variant calling or paired-end analysis, though the Skill covers merge, collate and order verification.
-- Root cause: Description not updated when sections were added.
-- Fix: Add 'merge, collate and verify sort order' to the description.
-
 ### `bio-clinical-databases-dbsnp-queries` — Batch table drops annotations for merged rsIDs
 
 - Skill: 86, Production Ready · [mrsonord2240/bioSkills@c1237cd](https://github.com/mrsonord2240/bioSkills/tree/c1237cdbc9bb199947696f3909de26a55d259116/clinical-databases/dbsnp-queries) · [viewer](skills/bio-clinical-databases-dbsnp-queries/mrsonord2240-bioSkills@c1237cd/viewer.md)
@@ -1651,38 +1523,6 @@ None open.
 - Problem: The DIA-NN command exists twice and can drift; there is no small input an agent can use to check its filter code before running it on a real report.
 - Root cause: Single-file Skill with an example script that restates rather than sources the command.
 - Fix: Keep one copy of the command in examples/ and have SKILL.md point at it, and ship a tiny synthetic report.parquet (a few hundred rows, including groups that fail only the global q-value) so the filter block is self-testing.
-
-### `bio-biomart-queries` — Ensembl Genomes 'swap the host' claim does not work for a real dataset
-
-- Skill: 87, Limited Release · [mrsonord2240/bioSkills@eb9a071](https://github.com/mrsonord2240/bioSkills/tree/eb9a071e28dec6fef79e277bd94aa8d41afd5695/database-access/biomart-queries) · [viewer](skills/bio-biomart-queries/mrsonord2240-bioSkills@eb9a071/viewer.md)
-- Observed in inputs: 6
-- Problem: SKILL.md's tool listing (promoted into the main document by this fix, moved from usage-guide.md's Tips) claims 'Non-vertebrate species: swap the host for the Ensembl Genomes BioMart, e.g. Server(host='http://plants.ensembl.org')'. Querying the real athaliana_eg_gene dataset this way fails with 'Dataset NOT FOUND', via both query_raw() and pybiomart's own built-in ds.query() -- so it is not a query_raw()-specific bug, but the claim itself is unverified and inaccurate as a one-line instruction.
-- Root cause: The claim was carried over/relocated from usage-guide.md's Tips without being run against a real Ensembl Genomes dataset before being given more prominence in SKILL.md's main tool listing.
-- Fix: Either verify a working end-to-end Ensembl Genomes example (may need a different martservice path/virtual schema handling than the main Ensembl host) before shipping it as a one-line claim, or caveat it clearly as unverified / requiring additional configuration.
-
-### `bio-biomart-queries` — query_raw()'s error guard can't distinguish a genuine live outage from a degenerate query
-
-- Skill: 87, Limited Release · [mrsonord2240/bioSkills@eb9a071](https://github.com/mrsonord2240/bioSkills/tree/eb9a071e28dec6fef79e277bd94aa8d41afd5695/database-access/biomart-queries) · [viewer](skills/bio-biomart-queries/mrsonord2240-bioSkills@eb9a071/viewer.md)
-- Observed in inputs: 7
-- Problem: An empty ID-list filter and an all-unknown-ID filter both surfaced the same generic 'non-TSV response' RuntimeError that the guard also raises for a genuine service outage. An agent catching this exception has no reliable way to tell 'retry me later' from 'this query itself was malformed, don't retry.'
-- Root cause: query_raw() uses one exception type and message for every non-TSV/empty-body case, regardless of cause.
-- Fix: Raise a distinct exception (or include a machine-checkable flag/code) for a genuinely empty response versus an HTML outage page, and document pre-flight validation (e.g. reject an empty filter list before sending the request) so agents get a clear, immediate error instead of a round trip to the server.
-
-### `bio-biomart-queries` — R-side gene_biotype fix remains unverified live (5 total attempts across fixer + re-audit)
-
-- Skill: 87, Limited Release · [mrsonord2240/bioSkills@eb9a071](https://github.com/mrsonord2240/bioSkills/tree/eb9a071e28dec6fef79e277bd94aa8d41afd5695/database-access/biomart-queries) · [viewer](skills/bio-biomart-queries/mrsonord2240-bioSkills@eb9a071/viewer.md)
-- Observed in inputs: —
-- Problem: Neither the fixer (3 attempts) nor this re-audit (2 further attempts, one of which got further than before -- a live connection succeeded via useMart() directly against the archive host, but the subsequent getBM() call itself then failed with 'HTTP 405 Method Not Allowed') could complete a live R biomaRt round trip this session to confirm gene_biotype works identically in R.
-- Root cause: Live Ensembl BioMart mirror-selection and archive-host behavior remains intermittently unreachable/inconsistent for R's biomaRt client specifically, independent of this fix's code.
-- Fix: No code change indicated -- re-run block_7/coordinate_table.sh's R pattern when Ensembl's R-reachable mirrors stabilize, to close out the one item still verified only by schema-equivalence rather than a live run.
-
-### `bio-biomart-queries` — query_raw() is duplicated verbatim in 3 files
-
-- Skill: 87, Limited Release · [mrsonord2240/bioSkills@eb9a071](https://github.com/mrsonord2240/bioSkills/tree/eb9a071e28dec6fef79e277bd94aa8d41afd5695/database-access/biomart-queries) · [viewer](skills/bio-biomart-queries/mrsonord2240-bioSkills@eb9a071/viewer.md)
-- Observed in inputs: —
-- Problem: The same ~30-line query_raw() helper is byte-identical in SKILL.md and both examples/*.py (confirmed via diff, no drift yet). This is explicitly allowed for shipped examples under the redundancy policy, but it is still 3 places to update correctly if the helper needs a future fix (e.g. the POST/chunking fix above).
-- Root cause: Examples are kept standalone-runnable by design, which requires the helper to be copied rather than imported from a shared module.
-- Fix: No action required under current policy; if the helper changes again, verify all 3 copies are updated in the same commit (as this fix did correctly).
 
 ### `bio-phylo-bayesian-inference` — Make the example refuse a single .p file
 

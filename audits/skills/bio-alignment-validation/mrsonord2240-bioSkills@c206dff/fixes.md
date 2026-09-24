@@ -61,3 +61,19 @@ Disagreements between copies resolved in favour of what the audit runs support: 
 - **Cause of Picard's `RECORD_OUT_OF_ORDER` on samtools name-sorted BAMs** not investigated to the source; the Skill says "likely".
 - `CollectMultipleMetrics` / `CollectHsMetrics` / `CollectWgsMetrics` / `mosdepth` remain named without a local block (pointer to bio-bam-statistics); no run added because the audit did not flag them and they would add coverage the Skill never had.
 - Python validator default changed (100000-read head sample -> whole file). Documented in the script header and SKILL.md; `-n` keeps the old behaviour.
+
+## Final pass — 2026-09-24 (source `173fd9097151633f9d7658826e094440f902e495`; follows the functional fix `d980c313fe0562659544278fb5d1432c1a3d6d94`)
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| CrosscheckFingerprints misses a mismatch when BAMs share RG ID/PU | P2 | Added `CROSSCHECK_BY=FILE`, a distinct-RG/PU alternative, and same-SM guidance to the tumor/normal command | ran: synthetic same-RG/PU `A_sameSM_as_B` versus `B` returned `UNEXPECTED_MISMATCH`, exit 1, with `CROSSCHECK_BY=FILE` | Prevents Picard's default read-group collapse from masking a swap |
+| Picard chart options require R | P2 | Version Compatibility and both chart blocks now state that `H=` / `CHART=` invoke `Rscript`; no-chart table output is documented | ran: Picard 3.5.0 wrote InsertSize and GC tables without charts and wrote the InsertSize PDF with `Rscript` available | Chart capability remains optional rather than an undocumented runtime dependency |
+| Shell validator reports an unreadable CRAM as a QC fail | P2 | Replaced separate count pipelines with one decoded primary-record pass and error 2 on decode failure | ran: real CRAM with `REF_PATH=/nonexistent_ref_dir` returns 2 from Python and shell; shell reports the reference remedy | The decoded pass also removes repeated `samtools view -c` count scans |
+| Picard R= wording, long-read noise, guide strand term, and description were incomplete | P2 | R= now names NM only and points MD checks to `samtools calmd`; documented long-read header/NM noise; converted guide prompts to F/(F+R); expanded trigger description | ran/docs: Picard command outputs, prior planted NM/MD fixtures, and guide/source review | No duplicated agent-facing command content was added to the guide |
+| Tiny samples and `-n` could overstate validator confidence | P2 | Both validators suppress pairing/strand grades below 100 primary reads, require `@SQ`, and Python prints the sample-bias warning | ran: fresh 50-read BAM returns 0 with the too-few-reads note; fresh no-`@SQ` BAM returns 2 from both implementations | Mapping rate remains available on tiny valid BAMs |
+| Whole-file Python validation retained one MAPQ and insert element per read | P2 | Replaced lists with MAPQ counters and an insert-size frequency table with exact weighted median | ran: 5,642,000 primary records completed in 22.61 s, maximum RSS 27,292 KB, with 99.96% mapping and expected 123/126/32 insert statistics | The shell also derives validator counters in one decoded pass |
+| Touched SKILL.md remained above the 300-line final-pass limit | P2 | Moved insert-size and GC-bias methods to indexed `references/library-metrics.md` | ran: main SKILL.md 288 lines; five reference fences found and its Python snippet compiled; Picard table/chart contract rerun | The decision table points agents to the reference when those metrics are needed |
+
+### Still blocked / limitations
+
+- **Real FREEMIX and real-genome fingerprint measurements**: needs a whole-genome or exome BAM with sufficient panel coverage. The current public slice is deliberately too small; the Skill documents that limitation and makes no unverified result claim. This is a data-availability limitation, not an open source defect.

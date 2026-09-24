@@ -1,0 +1,153 @@
+{
+  "source": "mrsonord2240/bioSkills@e4722ccd1616cc79568c1674be726d950d9297d5:database-access/biomart-queries",
+  "meta": {
+    "skill_name": "bio-biomart-queries",
+    "source": "mrsonord2240/bioSkills@e4722ccd1616cc79568c1674be726d950d9297d5:database-access/biomart-queries",
+    "description": "Bulk-query Ensembl BioMart for cross-database ID mapping, coordinates, and ortholog tables.",
+    "evaluated_on": "2026-09-24",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 8,
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md",
+    "evidence_limitation": "R biomaRt 2.62.1 could not reach any tested Ensembl mirror or archive in this environment; the source is schema-correct and Python completed the corresponding live BioMart checks."
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "Live outputs were constrained to Ensembl reference data and no biological claims were invented." },
+      "practice_boundaries": { "result": "PASS", "detail": "The Skill performs reference-database retrieval and makes no diagnostic or treatment claims." },
+      "methodological_ground": { "result": "PASS", "detail": "The rerun verified correct ID-filter, attribute/filter, ortholog, and long-format GO semantics." },
+      "code_usability": { "result": "PASS", "detail": "All current-source archived scenarios and two fresh batching scenarios ran; the only incomplete check is the external R mirror connection." }
+    }
+  },
+  "static_score": {
+    "subtotal": 96,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 12, "max": 12, "note": "All stated Ensembl gene-mart workflows are runnable; unsupported Ensembl Genomes advice was removed." },
+      "reliability": { "score": 12, "max": 12, "note": "The helper validates empty input, classifies outage HTML, and adaptively handles HTTP 414 batches." },
+      "performance_context": { "score": 8, "max": 8, "note": "The reusable helper is separated from concise examples and is bounded for large ID lists." },
+      "agent_usability": { "score": 15, "max": 16, "note": "Failure modes and typed errors give clear recovery paths; R live availability remains an external caveat." },
+      "human_usability": { "score": 8, "max": 8, "note": "Trigger language and examples are clear and aligned with common BioMart tasks." },
+      "security": { "score": 12, "max": 12, "note": "Public read-only service use, XML escaping, and local validation create no credential or destructive-operation risk." },
+      "maintainability": { "score": 9, "max": 12, "note": "The helper is centralized in scripts; examples deliberately import the adjacent module instead of maintaining copies." },
+      "agent_specific": { "score": 20, "max": 20, "note": "The decision matrix, stable error surface, read-only idempotency, and related-skill escape hatches are strong." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 94.8,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 25, "total": 25 },
+    "inputs": [
+      {
+        "index": 1, "type": "Canonical", "label": "Bulk ID mapping", "status": "COMPLETED", "status_flag": "✅",
+        "note": "Release-110 BioMart returned 49 rows for BRCA2, TP53, PTEN, EGFR, and MYC.", "basic": 38, "specialized": 57, "total": 95, "executed": true,
+        "execution_note": "Current-source archived regression Input 1 passed live.", "assertions_passed": 3, "assertions_total": 3,
+        "assertions": [
+          { "text": "The ID-list workaround executes", "result": "PASS", "note": "Returned a non-empty table." },
+          { "text": "Known symbols are present", "result": "PASS", "note": "All five requested gene symbols were returned." },
+          { "text": "Cross-reference data is live", "result": "PASS", "note": "Results came from the release-110 archive." }
+        ]
+      },
+      {
+        "index": 2, "type": "Variant A", "label": "chr17 coordinate table", "status": "COMPLETED", "status_flag": "✅",
+        "note": "Returned 1,186 protein-coding chr17 rows with Gene type.", "basic": 38, "specialized": 56, "total": 94, "executed": true,
+        "execution_note": "Current-source archived regression Input 2 passed live.", "assertions_passed": 3, "assertions_total": 3,
+        "assertions": [
+          { "text": "The coordinate query executes", "result": "PASS", "note": "A non-empty table was returned." },
+          { "text": "gene_biotype is used as an attribute", "result": "PASS", "note": "The output contained Gene type." },
+          { "text": "biotype remains a filter", "result": "PASS", "note": "The protein-coding constraint succeeded." }
+        ]
+      },
+      {
+        "index": 3, "type": "Edge", "label": "Discovery semantics", "status": "COMPLETED", "status_flag": "✅",
+        "note": "The pybiomart nested ID-list gap and documented attribute/filter distinction were confirmed.", "basic": 38, "specialized": 56, "total": 94, "executed": true,
+        "execution_note": "Current-source archived regression Input 3 passed live.", "assertions_passed": 3, "assertions_total": 3,
+        "assertions": [
+          { "text": "Discovery executes", "result": "PASS", "note": "Dataset metadata loaded." },
+          { "text": "ID-list filters remain absent from pybiomart discovery", "result": "PASS", "note": "ensembl_gene_id was absent from ds.filters." },
+          { "text": "The documented schema distinction is correct", "result": "PASS", "note": "gene_biotype was an attribute and biotype a filter." }
+        ]
+      },
+      {
+        "index": 4, "type": "Variant B", "label": "Ortholog wide table", "status": "COMPLETED", "status_flag": "✅",
+        "note": "Returned 3,773 chr17 rows and found one-to-one mouse and zebrafish pairs.", "basic": 38, "specialized": 57, "total": 95, "executed": true,
+        "execution_note": "Current-source archived regression Input 4 passed live.", "assertions_passed": 3, "assertions_total": 3,
+        "assertions": [
+          { "text": "Ortholog query executes", "result": "PASS", "note": "A non-empty table was returned." },
+          { "text": "Display-name resolution works", "result": "PASS", "note": "Mouse and zebrafish type columns were found." },
+          { "text": "One-to-one rows exist", "result": "PASS", "note": "The expected joint filter had matches." }
+        ]
+      },
+      {
+        "index": 5, "type": "Stress", "label": "GO annotation and renamed symbol", "status": "COMPLETED", "status_flag": "✅",
+        "note": "Returned 510 GO rows; TP53 was found and obsolete MARCH1 was absent.", "basic": 38, "specialized": 56, "total": 94, "executed": true,
+        "execution_note": "Current-source archived regression Input 5 passed live.", "assertions_passed": 3, "assertions_total": 3,
+        "assertions": [
+          { "text": "GO query executes", "result": "PASS", "note": "A non-empty long-format table was returned." },
+          { "text": "Known symbols are found", "result": "PASS", "note": "TP53 was present." },
+          { "text": "Rename boundary is surfaced", "result": "PASS", "note": "MARCH1 was not silently substituted." }
+        ]
+      },
+      {
+        "index": 6, "type": "Scope Boundary and Adversarial", "label": "Ensembl Genomes boundary and response classification", "status": "COMPLETED", "status_flag": "✅",
+        "note": "The unsupported Plants recipe is absent; escaping, valid TSV, outage HTML, and empty-list cases have distinct expected behavior.", "basic": 38, "specialized": 57, "total": 95, "executed": true,
+        "execution_note": "Current-source archived regressions Inputs 6 and 7 passed.", "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "The obsolete Plants recipe is absent", "result": "PASS", "note": "No plants.ensembl.org Server example remains." },
+          { "text": "Special characters remain XML-safe", "result": "PASS", "note": "ElementTree-generated request parsed safely." },
+          { "text": "Outage HTML is retryable", "result": "PASS", "note": "It raised BioMartOutageError." },
+          { "text": "Empty filters fail locally", "result": "PASS", "note": "They raised BioMartInputError before a request." }
+        ]
+      },
+      {
+        "index": 7, "type": "Fresh Deterministic", "label": "1,001-ID bounded batching fixture", "status": "COMPLETED", "status_flag": "✅",
+        "note": "A 1,001-ID fixture issued three bounded initial requests and concatenated results.", "basic": 39, "specialized": 57, "total": 96, "executed": true,
+        "execution_note": "Fresh Input 7 passed offline.", "assertions_passed": 3, "assertions_total": 3,
+        "assertions": [
+          { "text": "Large input is split", "result": "PASS", "note": "Three requests were captured." },
+          { "text": "All partial tables are combined", "result": "PASS", "note": "Three rows were concatenated." },
+          { "text": "No network is needed for the batching invariant", "result": "PASS", "note": "The fixture supplied deterministic responses." }
+        ]
+      },
+      {
+        "index": 8, "type": "Fresh Live", "label": "1,001 real-ID adaptive batching", "status": "COMPLETED", "status_flag": "✅",
+        "note": "A 1,001-ID live query completed with 1,001 returned rows after server-specific 414 splitting.", "basic": 38, "specialized": 57, "total": 95, "executed": true,
+        "execution_note": "Fresh Input 8 passed against the release-110 archive.", "assertions_passed": 3, "assertions_total": 3,
+        "assertions": [
+          { "text": "A thousand-scale ID list completes", "result": "PASS", "note": "The query returned 1,001 rows." },
+          { "text": "414 handling is adaptive", "result": "PASS", "note": "Only failed large batches were halved." },
+          { "text": "Output remains tabular", "result": "PASS", "note": "Gene stable ID was present in the result." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 38.4,
+    "dynamic_weighted": 56.9,
+    "score": 95,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "The ID-list workaround now handles both pybiomart validation and server URL limits.",
+    "Archived functional scenarios and fresh thousand-scale batching tests passed against current source.",
+    "Typed local, outage, and malformed-response errors make recovery decisions explicit.",
+    "The unsupported Ensembl Genomes shortcut was removed instead of left as a misleading promise."
+  ],
+  "recommendations": []
+}

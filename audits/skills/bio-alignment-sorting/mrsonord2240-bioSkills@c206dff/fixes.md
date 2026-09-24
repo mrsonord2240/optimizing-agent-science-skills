@@ -42,3 +42,20 @@ Checked on: samtools 1.24, pysam 0.24.1, Picard 3.5.0 (side env `af-picard3`), b
 Disagreements between the two copies: usage-guide's name-sort/markdup workflow (`sort -n | fixmate | sort | markdup`) and SKILL's collate pipeline both ran (100 dup reads); kept the collate pipeline. usage-guide's "total memory = threads x memory-per-thread" contradicted the audit; SKILL now says (`-@`+1) x `-m`.
 
 `.py` changed: none. `.sh` changed: `examples/sort_pipeline.sh` (`bash -n` ok, file mode still executable).
+
+## 2026-09-24 - final pass `agent/final-pass-bio-alignment-sorting-20260924`
+
+Checked on: samtools 1.24, pysam 0.24.1, bwa 0.7.19, GATK 4.6.2.0, fgbio 4.1.1 in WSL `science` / `alignment-files`.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+| --- | --- | --- | --- | --- |
+| Dagger footnote falsely covered Mutect2 and CMCR; CMCR requirement incomplete | P1 | Removed those daggers; table now requires coordinate plus index for Mutect2 and template-coordinate GroupReadsByUmi output for CMCR | ran: archived input 5f; Mutect2 completed only coordinate+indexed, CMCR accepted GroupReadsByUmi and rejected coordinate/MI-tag order | Corrects existing deployed claims rather than adding tools |
+| Picard `-n` rejection stated too broadly | P2 | Qualified it to names where natural and ASCII order differ; keep `-N` as portable rule | ran: archived input 2 accepted fixed-width coincident order and rejected real/numeric divergent order | |
+| Pysam helper raised on uBAM and obscured CRAM reference failure | P2 | Added `check_sq=False`, no-@SQ false result, and optional `reference_filename` | ran: fresh `finalpass_in08_source_order_checks.sh` | |
+| Pipeline left partial output, accepted bad threads, and made SE threads awkward | P2 | Added positive-integer validation, numeric fourth-argument SE threads, temporary output, count/index before atomic publish | ran: fresh `finalpass_in09_source_pipeline_checks.sh` | Existing output digest stayed unchanged across two failures |
+| Performance and flag claims were too host-specific | P2 | Qualified `-@`, `-m`, `-T`, collate, compression, and HTSeq text; moved performance/errors to reference | ran: archived input 5c/5d/5e; source split checked at 299 lines | Input-5 timing formatter has its own arithmetic bug, but samtools checks completed |
+| Trigger omitted actual merge/collate/verification scope | P2 | Expanded frontmatter description | inspected in committed SKILL.md | |
+
+## Findings left unfixed
+
+- None. The remaining dagger rows are explicitly unverified because their tools are absent from the shared environment; this is stated in the table rather than an unresolved correction.

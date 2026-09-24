@@ -1,0 +1,142 @@
+{
+  "meta": {
+    "skill_name": "bio-alignment-sorting",
+    "description": "Sort, merge, collate, and verify alignment-file order with samtools and pysam. Use when preparing BAM files for indexing, variant calling, or paired-end analysis.",
+    "source": "mrsonord2240/bioSkills@2e9e45b14f0a4aa092765f484a020fe3af39e712:alignment-files/alignment-sorting",
+    "evaluated_on": "2026-09-24",
+    "evaluator_version": "skill-auditor@1.0",
+    "audit_kind": "final pass re-audit",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md",
+    "category": "Data Analysis",
+    "execution_mode": "B",
+    "complexity": "Moderate",
+    "n_inputs": 7,
+    "executed": "7/7 archived input groups rerun; two fresh source-tip inputs executed"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All runtime claims cited in this audit were checked from the saved logs; measurements are explicitly local-storage observations rather than universal promises." },
+      "practice_boundaries": { "result": "PASS", "detail": "This is a file-format utility and makes no clinical, diagnostic, or treatment recommendation." },
+      "methodological_ground": { "result": "PASS", "detail": "The revised table requires coordinate-plus-index input for Mutect2 and template-coordinate order for CallMolecularConsensusReads; both behaviors were executed." },
+      "code_usability": { "result": "PASS", "detail": "The source-tip Python helper and shell pipeline were executed under samtools 1.24, pysam 0.24.1, bwa 0.7.19, GATK 4.6.2.0, and fgbio 4.1.1." }
+    }
+  },
+  "static_score": {
+    "subtotal": 94,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 12, "max": 12, "note": "Coordinate, name, tag, template-coordinate sorting, collate, merge, verification, and the fail-loud alignment pipeline are present and checked." },
+      "reliability": { "score": 11, "max": 12, "note": "The example now validates threads and publishes only after count and index checks; an aligner may still report data-specific FASTQ parsing errors directly." },
+      "performance_context": { "score": 8, "max": 8, "note": "Performance claims name their local-storage conditions and the detailed compression guidance is progressively disclosed in a reference." },
+      "agent_usability": { "score": 15, "max": 16, "note": "Sort-order choices, verification, and failure remedies are explicit; advanced downstream tools marked dagger remain intentionally unverified locally." },
+      "human_usability": { "score": 8, "max": 8, "note": "The description now exposes merge, collate, and order-verification triggers in natural user language." },
+      "security": { "score": 11, "max": 12, "note": "No credentials or raw-code execution are present; file paths are quoted and the example rejects invalid thread counts." },
+      "maintainability": { "score": 11, "max": 12, "note": "The 299-line SKILL.md has a focused performance reference, an executable example, and deterministic checks." },
+      "agent_specific": { "score": 18, "max": 20, "note": "The trigger is precise, detailed material is referenced, reruns are safe, and error conditions are actionable." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 96.1,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 28, "total": 28 },
+    "inputs": [
+      {
+        "index": 1, "type": "Canonical", "label": "Coordinate-sort, index, and CRAM conversion of shuffled real BAMs", "status": "COMPLETED", "status_flag": "✅",
+        "note": "Archived input 1 rerun: real 5,644-record BAM, 9,601-record 1000G BAM, and 15,788-record UMI BAM sort, preserve record multisets, and index; CRAM conversion and CSI creation succeed.", "basic": 38, "specialized": 58, "total": 96, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Coordinate sort preserves the input record multiset", "result": "PASS", "note": "The archived digest checks matched the original BAMs." },
+          { "text": "Sorted BAMs pass independent coordinate-order checks", "result": "PASS", "note": "pysam walk reported True for all three real sorted outputs." },
+          { "text": "Coordinate outputs are indexable", "result": "PASS", "note": "BAM BAI and CRAM CRAI creation succeeded." },
+          { "text": "Documented sort flags preserve records", "result": "PASS", "note": "-@, -m, -T, -l, and -O variants matched the default record stream." }
+        ]
+      },
+      {
+        "index": 2, "type": "Variant A", "label": "Natural versus ASCII queryname order and duplicate marking", "status": "COMPLETED", "status_flag": "✅",
+        "note": "Archived input 2 rerun: -n and -N match natural and ASCII orders respectively; Picard accepts -N and rejects -n when the orders differ, while fixed-width names demonstrate the documented exception.", "basic": 38, "specialized": 58, "total": 96, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "-n and -N produce distinct documented orders when names differ numerically", "result": "PASS", "note": "read2 precedes read10 for -n and read10 precedes read2 for -N." },
+          { "text": "-N matches Picard queryname order", "result": "PASS", "note": "The query-name streams compared equal." },
+          { "text": "The qualified Picard rule matches runtime behavior", "result": "PASS", "note": "Differing orders were rejected and coincident fixed-width orders were accepted." },
+          { "text": "Name grouping supports the documented duplicate and FASTQ workflows", "result": "PASS", "note": "Both sort modes and collate yielded 100 duplicate reads and paired FASTQ names." }
+        ]
+      },
+      {
+        "index": 3, "type": "Edge", "label": "Tag, template-coordinate, malformed, and mislabeled alignments", "status": "COMPLETED", "status_flag": "✅",
+        "note": "Archived input 3 rerun: tag and template-coordinate order behavior, index failures, corruption handling, memory floor, and deterministic threaded output all match the skill.", "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Tag and template-coordinate outputs have the documented headers", "result": "PASS", "note": "Both header checks passed." },
+          { "text": "Non-coordinate outputs are not falsely presented as indexable", "result": "PASS", "note": "samtools index refused them with the documented errors." },
+          { "text": "Record-level checking catches a lying SO header", "result": "PASS", "note": "The helper returned False and ensure_coordinate_sorted repaired the file." },
+          { "text": "Thread settings preserve the record stream", "result": "PASS", "note": "-@ 0, 4, and 8 streams matched." }
+        ]
+      },
+      {
+        "index": 4, "type": "Variant B", "label": "Merge lanes, read groups, and name-sorted inputs", "status": "COMPLETED", "status_flag": "✅",
+        "note": "Archived input 4 rerun: merge detects no order itself, preserves valid coordinate input, documents RG collision risk, and -n/-N merges yield their corresponding order.", "basic": 38, "specialized": 58, "total": 96, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Merged valid inputs preserve record counts", "result": "PASS", "note": "5,644 plus 500 records yielded 6,144 records." },
+          { "text": "Mismatched order is detected by the documented verification process", "result": "PASS", "note": "Merge exited zero but the independent order walk returned False." },
+          { "text": "RG collision warning is reproducible", "result": "PASS", "note": "-c collapsed distinct same-ID groups until IDs were made unique." },
+          { "text": "Name-sort merge flags provide correct order", "result": "PASS", "note": "-n and -N outputs passed natural and ASCII checks respectively." }
+        ]
+      },
+      {
+        "index": 5, "type": "Stress", "label": "Downstream matrix, storage conditions, and performance flags", "status": "COMPLETED", "status_flag": "✅",
+        "note": "All archived input-5 scripts reran. The downstream matrix, local versus network storage comparison, compression, existing-directory -T behavior, and fgbio/Mutect2 checks support the revised wording.", "basic": 37, "specialized": 57, "total": 94, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Existing-directory -T behavior is documented correctly", "result": "PASS", "note": "Temporary samtools files appeared inside the supplied directory and were cleaned up." },
+          { "text": "Performance text is conditioned on storage", "result": "PASS", "note": "Collate was fast on local ext4 and much slower with a network-mounted temporary prefix." },
+          { "text": "CMCR requires template-coordinate grouping", "result": "PASS", "note": "Coordinate and MI-tag sorts failed while GroupReadsByUmi template-coordinate output succeeded." },
+          { "text": "Mutect2 requires coordinate sorting and an index", "result": "PASS", "note": "Only coordinate-sorted indexed input completed." }
+        ]
+      },
+      {
+        "index": 6, "type": "Scope Boundary", "label": "Fresh source-tip uBAM and CRAM order verification", "status": "COMPLETED", "status_flag": "✅",
+        "note": "Fresh input 8 extracted the committed source-tip helper. It returned True for a sorted BAM and CRAM with explicit reference, and False for shuffled BAM and a no-@SQ uBAM.", "basic": 39, "specialized": 59, "total": 98, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "uBAM returns False instead of raising", "result": "PASS", "note": "The no-@SQ uBAM returned False." },
+          { "text": "CRAM accepts an explicit reference", "result": "PASS", "note": "The real CRAM returned True with reference_filename." },
+          { "text": "Shuffled BAM is rejected", "result": "PASS", "note": "The helper returned False." },
+          { "text": "Clarified -T and -@ claims execute", "result": "PASS", "note": "An existing -T directory cleaned up and threaded streams matched." }
+        ]
+      },
+      {
+        "index": 7, "type": "Adversarial", "label": "Fresh source-tip pipeline failure and publication behavior", "status": "COMPLETED", "status_flag": "✅",
+        "note": "Fresh input 9 executed the committed pipeline with real FASTQs. Single-end threads work; invalid threads and unequal mates fail without replacing a valid output or leaving a partial temporary BAM.", "basic": 39, "specialized": 59, "total": 98, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Single-end invocation accepts a numeric thread argument", "result": "PASS", "note": "The four-argument single-end run completed and indexed." },
+          { "text": "Invalid thread values fail before output publication", "result": "PASS", "note": "abc was rejected and the valid output digest remained unchanged." },
+          { "text": "Unequal mate inputs do not overwrite a valid output", "result": "PASS", "note": "The primary-record check failed and the original digest remained unchanged." },
+          { "text": "Failure leaves no partial destination file", "result": "PASS", "note": "No keep.bam.partial process file remained." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 37.6,
+    "dynamic_weighted": 57.7,
+    "score": 95,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "The source-tip example validates arguments and publishes atomically after count and index checks.",
+    "The sort-order helper now distinguishes a no-@SQ uBAM from a coordinate-sorted BAM and supports explicit CRAM references.",
+    "Downstream order requirements for Picard, Mutect2, and fgbio are backed by executed checks.",
+    "Performance guidance names storage and data dependence instead of presenting one machine result as universal."
+  ],
+  "recommendations": []
+}
