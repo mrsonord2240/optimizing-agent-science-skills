@@ -1,0 +1,232 @@
+{
+  "meta": {
+    "skill_name": "bio-data-visualization-distribution-plots",
+    "description": "Plot per-group distributions of continuous data using boxplots, violins, beeswarms, quasirandom jitter, and ggdist raincloud plots with sample-size honesty (Weissgerber 2015), KDE-bandwidth awareness, and N-aware encoding choices.",
+    "evaluated_on": "2026-09-23",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Moderate",
+    "n_inputs": 7,
+    "source": "mrsonord2240/bioSkills@25b3d2162f76de9b1d0b5d98533bf76f7c970b05:data-visualization/distribution-plots",
+    "audit_type": "final-pass re-audit of the exact fixed commit",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md",
+    "executed": true,
+    "execution_note": "Executed 7/7 exact-commit inputs with the data-visualization wrappers: R 4.4.3 / ggplot2 4.0.3 / ggdist 3.3.3 / introdataviz 0.0.0.9003, and Python 3.12 / seaborn 0.13.2 / matplotlib 3.11.2 / ptitprince 0.3.1. All inspected PNG/PDF outputs were nonempty. The process-local wrappers were sufficient; no cleanup profile was needed."
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "The corrected nrd/nrd0 relation, bounded-data trim advice, N ranges, and cited visualization claims agree with the executed checks; no unsupported clinical claim is made."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "This is a research visualization Skill and does not diagnose, prescribe, or triage individuals."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "The decision table preserves raw observations at small N, treats KDE as bandwidth-sensitive, and now rejects incomplete or low-N split-violin cells instead of giving a misleading density."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "The shipped R and Python tests, standalone R example, current R blocks, split guards, and PDF export all executed on the documented current stack."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 93,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 12, "max": 12, "note": "The decision table, current ggdist raincloud, N annotations, current Python routes, and guarded split-violin workflow cover the stated task and ran." },
+      "reliability": { "score": 11, "max": 12, "note": "Panel-wide SJ-to-nrd0 fallback, finite-value filtering, ordered two-level validation, and per-cell eligibility prevent the formerly silent failure modes; an empty eligible set is returned safely." },
+      "performance_context": { "score": 7, "max": 8, "note": "The 194-line operational Skill is concise, with executable end-to-end material in the shipped example and a lean usage guide." },
+      "agent_usability": { "score": 14, "max": 16, "note": "Version compatibility, a single N decision table, explicit failure remedies, deterministic jitter, and local-N labels provide actionable guidance; users must still choose a suitable encoding for their question." },
+      "human_usability": { "score": 8, "max": 8, "note": "The trigger, prerequisites, prompt examples, colors, and N-aware choices are clear and scoped to distribution visualization." },
+      "security": { "score": 12, "max": 12, "note": "No network, credential, shell, or destructive-data route is introduced; example output is a caller-local PDF." },
+      "maintainability": { "score": 11, "max": 12, "note": "The standalone deterministic example and focused R/Python tests are shipped beside the instructions; reusable guards use explicit column arguments." },
+      "agent_specific": { "score": 18, "max": 20, "note": "The description is specific, APIs and versions are named, archived gghalves is explicitly excluded, and the documented ptitprince compatibility limit is surfaced." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 93.1,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 28, "total": 28 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Current R box, guarded violin, quasirandom, and ggdist raincloud",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The exact shipped R test and fresh current-stack blocks passed; the generated PNG was nonempty (27,301 B).",
+        "basic": 37,
+        "specialized": 57,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The shipped focused R test completes against the exact copied example", "result": "PASS", "note": "It printed its PASS line on ggplot2 4.0.3." },
+          { "text": "Current inline box+jitter draws every raw observation", "result": "PASS", "note": "ggplot_build returned 80 point rows for 80 input observations." },
+          { "text": "The guarded violin and quasirandom examples build nonempty layers", "result": "PASS", "note": "Both layer checks were nonempty; quasirandom returned 80 rows." },
+          { "text": "The current R render is a usable file", "result": "PASS", "note": "reaudit_i1_current_r.png was 27,301 B." }
+        ],
+        "executed": true,
+        "execution_note": "run/exact-source/test_distribution_plots.R and run/reaudit_i1_r_current.R via data-visualization r.sh."
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Current Python RainCloud and seaborn boxenplot",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The exact shipped Python smoke test and fresh calls passed; both PNGs were nonempty and the palette-only seaborn warning was absent.",
+        "basic": 36,
+        "specialized": 55,
+        "total": 91,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The shipped Python test produces a RainCloud and a boxenplot", "result": "PASS", "note": "It reported 21,552 B and 12,210 B PNGs." },
+          { "text": "The documented current Python RainCloud call renders", "result": "PASS", "note": "Fresh RainCloud PNG was 21,711 B." },
+          { "text": "The hue-based seaborn boxenplot renders without the palette-only warning", "result": "PASS", "note": "Fresh boxen PNG was 12,210 B and no such warning was recorded." },
+          { "text": "The ptitprince compatibility caveat reflects current behavior", "result": "PASS", "note": "The expected Matplotlib orientation deprecation warning was observed and is documented as a recheck limit." }
+        ],
+        "executed": true,
+        "execution_note": "run/reaudit_i2_python_current.py via data-visualization py.sh."
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Tied/all-zero fallback and missing or low-N split cells",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "A tied/all-zero panel fell back to nrd0 and rendered. Invalid condition typing was rejected; incomplete and low-N clusters were removed before a stable three-cluster split plot rendered.",
+        "basic": 37,
+        "specialized": 57,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "All-zero and tied strata choose the nrd0 fallback", "result": "PASS", "note": "safe_violin_bw returned nrd0." },
+          { "text": "The fallback panel still renders rather than becoming blank", "result": "PASS", "note": "The violin layer was nonempty and the tied PNG was 25,496 B." },
+          { "text": "The split guard rejects an unordered condition and removes invalid clusters", "result": "PASS", "note": "Unordered input errored; only three complete 40-by-40 clusters remained." },
+          { "text": "Complete-grid split sides are stable", "result": "PASS", "note": "Ordered interaction groups were Control/Treatment within each cluster; visual inspection confirmed fixed left/right halves." }
+        ],
+        "executed": true,
+        "execution_note": "run/reaudit_i3_split_edges.R via r.sh; inspected reaudit_i3_split.png."
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Prior real ALL microarray split-violin input",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The former real-data input used probe 38319_at. No stage had both B and T N >=30, so the current contract correctly omitted all split cells instead of rendering unstable or side-swapped half violins.",
+        "basic": 35,
+        "specialized": 55,
+        "total": 90,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The previous real ALL data route loads and selects its B-vs-T probe", "result": "PASS", "note": "ALL loaded and selected 38319_at." },
+          { "text": "The real stage-by-lineage counts are measured before plotting", "result": "PASS", "note": "Counts were 19/1, 36/15, 23/10, and 12/2 for populated stages." },
+          { "text": "The current split guard excludes each ineligible real-data cell", "result": "PASS", "note": "No cluster had both conditions at N >=30 and guarded rows equaled zero." },
+          { "text": "Ineligible real data is not converted into a misleading split violin", "result": "PASS", "note": "The helper returned a valid empty frame rather than relying on geom parity." }
+        ],
+        "executed": true,
+        "execution_note": "run/reaudit_i4_real_all.R via r.sh; real Bioconductor ALL data."
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Standalone exact shipped R example and PDF export",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The copied exact source example ran without a prelude and wrote a usable Nature-column PDF.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "The shipped example runs without externally prepared data frames", "result": "PASS", "note": "It completed directly from the copied exact source." },
+          { "text": "The example writes its declared raincloud.pdf", "result": "PASS", "note": "raincloud.pdf was created in the caller working directory." },
+          { "text": "The exported PDF is nonempty", "result": "PASS", "note": "The PDF was 27,314 B." },
+          { "text": "The exported PDF uses an embedded font marker and no Type3 font", "result": "PASS", "note": "Byte inspection found a font marker and no /Type3 token." }
+        ],
+        "executed": true,
+        "execution_note": "run/exact-source/raincloud_phd.R via r.sh and run/reaudit_i4_example_pdf.py via py.sh."
+      },
+      {
+        "index": 6,
+        "type": "Adversarial",
+        "label": "Bandwidth ratio, bounded-data trim, and N guidance",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The corrected nrd/nrd0 ratio, trim behavior, and unified N thresholds were directly checked.",
+        "basic": 37,
+        "specialized": 57,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "nrd has a larger bandwidth than nrd0", "result": "PASS", "note": "The observed ratio was 1.177777777778, equal to 1.06/0.9." },
+          { "text": "trim=TRUE does not extend a bounded violin beyond observed values", "result": "PASS", "note": "Drawn y range matched the observed minimum and maximum bounds." },
+          { "text": "The full N decision sequence is stated once in the Skill", "result": "PASS", "note": "All five bins 3-10 through >1000 were found." },
+          { "text": "Small-N and split-cell rules agree with the table", "result": "PASS", "note": "The checked strings require raw points below 30 and both split conditions at N >=30." }
+        ],
+        "executed": true,
+        "execution_note": "run/reaudit_i5_nrd_trim.R via r.sh."
+      },
+      {
+        "index": 7,
+        "type": "Scope Boundary",
+        "label": "Shipped-file and current compatibility contract",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Every linked example/test exists, and source inspection confirmed the current ggdist, seeded R, and hue-based Python contracts.",
+        "basic": 37,
+        "specialized": 57,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Every referenced shipped example and focused test exists", "result": "PASS", "note": "The R example and both R/Python tests were present." },
+          { "text": "The R raincloud path uses current ggdist rather than required gghalves", "result": "PASS", "note": "The source names stat_halfeye and explicitly excludes gghalves as a required dependency." },
+          { "text": "The current R route records deterministic jitter", "result": "PASS", "note": "The documented jitter uses the fixed 20260923 seed." },
+          { "text": "The current Python seaborn route avoids the deprecated palette-only form", "result": "PASS", "note": "The source documents hue=group and legend=False." }
+        ],
+        "executed": true,
+        "execution_note": "run/reaudit_i6_source_contract.py via py.sh."
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 37.2,
+    "dynamic_weighted": 55.9,
+    "score": 93.1,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "The exact current-stack R workflow replaces archived gghalves with ggdist and produced a standalone embedded-font PDF.",
+    "Tied and constant strata now select a panel-wide nrd0 fallback instead of silently blanking an SJ violin panel.",
+    "Ordered two-level validation and per-cell N filtering eliminate the missing-cell split-violin side swap seen in the archived audit.",
+    "The R and Python routes, deterministic examples, source tests, and current compatibility limits are explicit and executable."
+  ],
+  "recommendations": []
+}
