@@ -1,0 +1,6 @@
+cat("before-cli\n")
+library(cli)
+cat("after-cli\n")
+detach("package:cli", unload = TRUE, character.only = TRUE)
+cat("after-detach\n")
+q(save = "no", status = 0, runLast = FALSE)

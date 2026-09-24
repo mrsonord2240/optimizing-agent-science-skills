@@ -22,7 +22,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The example passes cluster_rows=<OLO dendrogram> together with row_split=gene_info$pathway, a combination ComplexHeatmap rejects; the script was never run.
 - Fix: Drop row_split or use a numeric row_split (works with the dendrogram), or apply OLO within each pathway group; supply a runnable data preamble and state the constraint in SKILL.md next to the OLO block.
 
-## P1 (156)
+## P1 (155)
 
 ### `bio-data-visualization-lollipop-protein-maps` — Shipped example never completes and paints wrong colours
 
@@ -583,14 +583,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: SKILL.md says set.seed() alone does not fix AE fits and `BPPARAM = SerialParam(RNGseed = 1)` does (0 differ). Measured on FRASER 2.6.1 (AE q=5 fitted twice, 20010 p-values): SerialParam(RNGseed=1) alone leaves 9815 differing (9962 at 5 iterations); set.seed(1) alone 9279; only set.seed(1) together with SerialParam(RNGseed=1) gives 0. The example says 'AE needs set.seed() to be reproducible', which is also incomplete.
 - Root cause: The fixer's measuring script set both seeds in the same call, so the '0 differ' result was attributed to RNGseed alone; the 'set.seed only' number was from that same combined call.
 - Fix: State: for reproducible AE fits call `set.seed(1)` and pass `BPPARAM = SerialParam(RNGseed = 1)` together (0 of 20010 differ; either alone 9-10k differ); make the example comment say the same. PCA stays the default.
-
-### `bio-proteomics-ptm-analysis` — Implement or remove the advertised no-global use_unmod route
-
-- Skill: 83, Limited Release · [mrsonord2240/bioSkills@ed98ca2](https://github.com/mrsonord2240/bioSkills/tree/ed98ca281137434ee3b3ffe1cce5d5ba717d51b6/proteomics/ptm-analysis) · [viewer](skills/bio-proteomics-ptm-analysis/mrsonord2240-bioSkills@ed98ca2/viewer.md)
-- Observed in inputs: 6
-- Problem: The Decision Tree says use_unmod=TRUE supports a proxy-adjusted analysis without a global proteome, but msstatsptm_labelfree.R unconditionally reads evidence_prot, proteinGroups, and annotation_protein.
-- Root cause: The script has one mandatory paired-global converter path while the documentation exposes a second input contract.
-- Fix: Either add and execute a genuinely no-global branch that omits the global files and labels its output proxy-adjusted, or remove that invocation and state that the script requires paired global-proteome inputs.
 
 ### `bio-single-cell-splicing` — scQuint block fails on real self-consistent STARsolo output
 
@@ -1272,7 +1264,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (349)
+## P2 (348)
 
 ### `bio-data-visualization-lollipop-protein-maps` — HGVSp edge cases and recurrence semantics undocumented
 
@@ -1841,14 +1833,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: Evidence paragraphs grew the file from 33 kB; microexon section, DTU code and failure modes load together. Neither SKILL.md nor usage-guide.md mentions examples/longread_splicing_pipeline.sh.
 - Root cause: Restructuring was deferred in both fix rounds.
 - Fix: Move the microexon evidence and the DTU/rMATS-long blocks to references/, keep the recipe and the checks in SKILL.md, and link the example.
-
-### `bio-proteomics-ptm-analysis` — Make R workflow completion observable to unattended callers
-
-- Skill: 83, Limited Release · [mrsonord2240/bioSkills@ed98ca2](https://github.com/mrsonord2240/bioSkills/tree/ed98ca281137434ee3b3ffe1cce5d5ba717d51b6/proteomics/ptm-analysis) · [viewer](skills/bio-proteomics-ptm-analysis/mrsonord2240-bioSkills@ed98ca2/viewer.md)
-- Observed in inputs: 1, 2, 5
-- Problem: Both MSstatsPTM scripts wrote valid artifacts but their R processes ended with exit 139; the ssGSEA command published its output files but left active audit-started R child processes.
-- Root cause: The supplied invocations have no completion validation, timeout, or post-output cleanup contract.
-- Fix: Reproduce under the supported R launcher, resolve the native teardown behavior where possible, and document an artifact-and-process completion check for MSstatsPTM and ssGSEA2.0.
 
 ### `bio-clinical-databases-clinvar-lookup` — Batch CA-ID helper aborts on non-400 Registry errors
 

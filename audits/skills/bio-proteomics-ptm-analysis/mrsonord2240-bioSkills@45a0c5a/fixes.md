@@ -127,3 +127,18 @@ Edits beyond the moves (all wording, no behaviour): `use_unmod <- TRUE` in the D
 **Stayed inline:** the Ascore illustration (10 lines, an intuition sketch, not a runnable step); the `ssgsea-cli.R` call (5 lines, an invocation of an external tool); one-line invocations. `bash -n` on the invocation fences fails only on `<placeholder>` arguments, by design.
 
 **Left unfixed (carried, unchanged):** modification names hard-coded to phospho in three code paths (a rewrite of blocks that work); PTM-SEA tested on the planted PTMsigDB input only (no mouse/rat database, v2.0.0 or multi-sample input, as noted in the pass-6 addendum).
+
+## Final Phase 2 corrective (2026-09-23)
+
+Source commit `0dcaeb6bfdafc308d0c5a9f39720df96d1969cd9`, branch
+`fix/proteomics-ptm-analysis`, worktree
+`F:\OpenScience\wt\proteomics-ptm-corrective`.
+
+| finding | priority | change | verification |
+|---|---|---|---|
+| Advertised no-global mode still required global-proteome files | P1 | Added a validated `use_unmod=TRUE` proxy route with explicit proxy-only labels, coverage guards, three artifacts, an internal manifest, and a checked outer completion marker | Guarded literal CLI run completed with no global files; three proxy site rows; unguarded teardown control produced byte-identical staged results but no publication |
+| Valid results could be emitted before a nonzero/lingering R completion | P2 | Added owned-process checked runners with timeout, receipts, clean-exit validation, and no-clobber publication; added a narrow process-local Windows `cli` cleanup profile | Paired label-free, TMT, proxy, and PTM-SEA checked runs completed with the expected publication behavior |
+| TMT output omitted threshold-aware test columns | P2 | Added TREAT-style `pvalue_lfc`, BH `adj.pvalue_lfc`, and a declared 12-column output contract | TMT run produced 35 rows in the full schema; exact-commit contract passed |
+| Checked publication lacked focused regressions | P2 | Added Python process/publication tests and R route contracts | Clean exact checkout passed 25/25 Python tests and all three R contracts |
+
+No P0 or P1 findings remain. The final audit is 92/100, ⭐ Production Ready.
