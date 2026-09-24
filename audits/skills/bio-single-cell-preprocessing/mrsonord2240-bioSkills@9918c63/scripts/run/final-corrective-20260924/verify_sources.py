@@ -17,7 +17,7 @@ head = subprocess.check_output(
 ).strip()
 
 checks = {
-    "source commit is 713361b": head == "713361b0f496c5658fa225b596fbd7989ddefa40",
+    "source commit is 9918c63": head == "9918c631d94f81dd418cf71d5c40be59f4850677",
     "Scanpy example has MAD-collapse guard": "MAD collapsed" in scanpy,
     "Scanpy example has survival guard": "survival_fraction < 0.80" in scanpy,
     "Scanpy example has no flat 8 percent filter": "pct_counts_mt'] > 8" not in scanpy,

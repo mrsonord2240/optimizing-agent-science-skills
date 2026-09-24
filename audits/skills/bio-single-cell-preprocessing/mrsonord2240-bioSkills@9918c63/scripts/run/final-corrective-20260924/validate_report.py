@@ -16,7 +16,7 @@ viewer = (AUDIT / "eval_viewer_bio-single-cell-preprocessing.md").read_text(
 
 source = (
     "mrsonord2240/bioSkills@"
-    "713361b0f496c5658fa225b596fbd7989ddefa40:single-cell/preprocessing"
+    "9918c631d94f81dd418cf71d5c40be59f4850677:single-cell/preprocessing"
 )
 assert report["meta"]["source"] == source
 assert report["meta"]["n_inputs"] == 9
@@ -50,4 +50,4 @@ assert report["recommendations"] == []
 assert source in viewer
 assert "**93/100**" in viewer
 assert "**Assertion Pass Rate: 36/36**" in viewer
-print("PASS: 713361b report and viewer invariants")
+print("PASS: 9918c63 report and viewer invariants")

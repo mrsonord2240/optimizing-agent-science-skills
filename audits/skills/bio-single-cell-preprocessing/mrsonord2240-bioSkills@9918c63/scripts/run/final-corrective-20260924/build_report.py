@@ -22,7 +22,7 @@ def require(path, *markers):
 head = subprocess.check_output(
     ["git", "rev-parse", "HEAD"], cwd=SOURCE, text=True
 ).strip()
-assert head == "713361b0f496c5658fa225b596fbd7989ddefa40"
+assert head == "9918c631d94f81dd418cf71d5c40be59f4850677"
 
 require(RUN / "input1-rerun.log", "VERBATIM_SKILL_BLOCK_OK = True", "HVGs: 2000")
 require(RUN / "input2-rerun.log", "mean |error| = 0.0515", "counts removed: 1 %", "DONE")
@@ -55,7 +55,7 @@ report["meta"].update(
         "n_inputs": 9,
         "source": (
             "mrsonord2240/bioSkills@"
-            "713361b0f496c5658fa225b596fbd7989ddefa40:single-cell/preprocessing"
+            "9918c631d94f81dd418cf71d5c40be59f4850677:single-cell/preprocessing"
         ),
         "executed_inputs": "8/9",
         "regression_inputs": [1, 2, 3, 4, 5, 6, 7],

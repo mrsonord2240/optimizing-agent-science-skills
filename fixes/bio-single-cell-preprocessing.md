@@ -8,7 +8,7 @@ Commits:
 
 - `a6550a1a7aca3cfa156d65780278acb017e54d94` — `fix(single-cell/preprocessing): repair QC and ambient audit findings`
 - `c3ca7ea1aa3aacf4efebc322b9b01dee31fe3917` — `fix(single-cell/preprocessing): align packaged QC examples`
-- `713361b0f496c5658fa225b596fbd7989ddefa40` — `docs(single-cell/preprocessing): restore install guidance`
+- `9918c631d94f81dd418cf71d5c40be59f4850677` — `docs(single-cell/preprocessing): restore install guidance`
 
 ## Resolved findings
 
@@ -45,7 +45,7 @@ Commits:
 
 - Exact evidence directory: `F:\OpenScience\audits\bio-single-cell-preprocessing\run\final-corrective-20260924`
 - Seven archived inputs rerun as regressions; two fresh packaged-example inputs added
-- Exact source: `mrsonord2240/bioSkills@713361b0f496c5658fa225b596fbd7989ddefa40:single-cell/preprocessing`
+- Exact source: `mrsonord2240/bioSkills@9918c631d94f81dd418cf71d5c40be59f4850677:single-cell/preprocessing`
 - Pre-fix evidence retained: `F:\OpenScience\audits\_pre-fix-20260924\bio-single-cell-preprocessing`
 
 Re-audit result: **93/100, Production Ready, deployable**; **36/36 assertions
