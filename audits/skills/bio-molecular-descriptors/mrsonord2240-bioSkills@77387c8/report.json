@@ -1,0 +1,110 @@
+{
+  "meta": {
+    "skill_name": "bio-molecular-descriptors",
+    "description": "Calculates molecular fingerprints and physicochemical descriptors with explicit choice tables, bit versus count semantics, MAP4 installation boundaries, and partial-charge model selection.",
+    "source": "mrsonord2240/bioSkills@77387c83238ced7d8e6bae147002918c0dd11116:chemoinformatics/molecular-descriptors",
+    "evaluated_on": "2026-09-24", "evaluator_version": "skill-auditor@1.0", "category": "Data Analysis", "execution_mode": "A", "complexity": "Complex", "n_inputs": 7, "executed_inputs": "7/7"
+  },
+  "veto_gates": {
+    "skill_veto": { "gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS" },
+    "research_veto": {
+      "applicable": true, "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "The repaired QED and Gasteiger boundaries match reproduced behavior." },
+      "practice_boundaries": { "result": "PASS", "detail": "Triage and charge methods are explicitly domain limited." },
+      "methodological_ground": { "result": "PASS", "detail": "The repaired 3D protocol completed on flexible drug-like molecules." },
+      "code_usability": { "result": "PASS", "detail": "The bundled example and audit checks ran with RDKit 2026.03.6." }
+    }
+  },
+  "static_score": {
+    "subtotal": 91, "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 11, "max": 12, "note": "2D, 3D, rule-set, and charge coverage has explicit selection guidance." },
+      "reliability": { "score": 11, "max": 12, "note": "Seeds, convergence policy, and element guards address the prior defects." },
+      "performance_context": { "score": 8, "max": 8, "note": "Baseline representations are bounded and library-scale validated." },
+      "agent_usability": { "score": 15, "max": 16, "note": "Choice tables and boundaries make execution decisions explicit." },
+      "human_usability": { "score": 8, "max": 8, "note": "Defaults, caveats, and recovery actions are direct." },
+      "security": { "score": 12, "max": 12, "note": "No unsafe execution or credential behavior exists." },
+      "maintainability": { "score": 11, "max": 12, "note": "The bundled helper and documentation use one 3D policy." },
+      "agent_specific": { "score": 15, "max": 20, "note": "The description and dependency boundaries are discriminating." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 94.4, "max": 100, "assertion_pass_rate": { "passed": 31, "total": 31 },
+    "inputs": [
+      {
+        "index": 1, "type": "Canonical", "label": "Physicochemical panel and rule sets over 1,000 real compounds", "status": "COMPLETED", "status_flag": "✅", "note": "Nine descriptor calls completed with no NaN or inf.", "basic": 38, "specialized": 54, "total": 92, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "All nine documented descriptor calls resolve", "result": "PASS", "note": "Panel shape was 1000 by 9." },
+          { "text": "Rule-set thresholds remain applicable", "result": "PASS", "note": "The unchanged threshold panel completed." },
+          { "text": "The real-data panel has no NaN or inf", "result": "PASS", "note": "All values were finite." },
+          { "text": "Rule sets are framed as risk indicators", "result": "PASS", "note": "The documented framing is retained." }
+        ]
+      },
+      {
+        "index": 2, "type": "Variant A", "label": "Fingerprint taxonomy and dependency compatibility", "status": "COMPLETED", "status_flag": "✅", "note": "Supported RDKit APIs construct; MAP4 is an explicit boundary.", "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 5, "assertions_total": 5,
+        "assertions": [
+          { "text": "All directly supported fingerprint APIs construct", "result": "PASS", "note": "Six RDKit generators construct." },
+          { "text": "MACCS semantics are stated correctly", "result": "PASS", "note": "167-bit guidance is retained." },
+          { "text": "Bit and count forms retain distinct semantics", "result": "PASS", "note": "The original API paths remain valid." },
+          { "text": "FCFP uses feature invariants and differs from ECFP", "result": "PASS", "note": "Exact-commit check confirmed different fingerprints." },
+          { "text": "MAP4 and MHFP6 compatibility is executable or bounded", "result": "PASS", "note": "MAP4 is not claimed pip-installable; MHFP6 pins NumPy 1.x." }
+        ]
+      },
+      {
+        "index": 3, "type": "Edge", "label": "ECFP radius convention and measured bit collisions", "status": "COMPLETED", "status_flag": "✅", "note": "Collision loss decreased monotonically from 512 to 8192 bits.", "basic": 38, "specialized": 55, "total": 93, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "The ECFP diameter to RDKit radius conversion is correct", "result": "PASS", "note": "The documented radii remain valid." },
+          { "text": "Folding loss decreases as fingerprint size increases", "result": "PASS", "note": "Loss was 5.38 to 0.44 percent." },
+          { "text": "No universal collision-rate claim is made", "result": "PASS", "note": "Dataset measurement is still required." },
+          { "text": "The 2048-bit baseline remains defensible", "result": "PASS", "note": "Measured loss was 1.89 percent." }
+        ]
+      },
+      {
+        "index": 4, "type": "Variant B", "label": "3D shape descriptors for flexible drug-like molecules", "status": "COMPLETED", "status_flag": "✅", "note": "Atenolol and verapamil both converged 20 of 20 conformers.", "basic": 39, "specialized": 57, "total": 96, "assertions_passed": 5, "assertions_total": 5,
+        "assertions": [
+          { "text": "The ensemble path returns descriptors for flexible drug-like molecules", "result": "PASS", "note": "Both repaired test molecules completed." },
+          { "text": "The MMFF parameter guard remains effective", "result": "PASS", "note": "The guard is retained before optimization." },
+          { "text": "The ensemble exposes descriptor variation", "result": "PASS", "note": "Standard deviations were reported." },
+          { "text": "The bundled 3D helper is reproducible", "result": "PASS", "note": "Three fixed-seed runs were identical." },
+          { "text": "Partial convergence has a usable aggregation policy", "result": "PASS", "note": "Only non-converged conformers are excluded." }
+        ]
+      },
+      {
+        "index": 5, "type": "Stress", "label": "Full-library ML featurization", "status": "COMPLETED", "status_flag": "✅", "note": "All 3224 compounds were featurized.", "basic": 38, "specialized": 55, "total": 93, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Full-library featurization completes", "result": "PASS", "note": "The matrix was 3224 by 2048." },
+          { "text": "The 2048-bit representation is not mostly empty", "result": "PASS", "note": "Only eight bits were never set." },
+          { "text": "Physchem values remain finite at library scale", "result": "PASS", "note": "The panel check had no NaN or inf." },
+          { "text": "Throughput is adequate for baseline ML", "result": "PASS", "note": "The run completed at 6952 molecules per second." }
+        ]
+      },
+      {
+        "index": 6, "type": "Scope Boundary", "label": "QED triage across fragments and natural products", "status": "COMPLETED", "status_flag": "✅", "note": "The caveat states both observed failure directions.", "basic": 39, "specialized": 57, "total": 96, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "QED computes for the representative probes", "result": "PASS", "note": "The audit probe calls completed." },
+          { "text": "Natural-product and peptide under-ranking is documented", "result": "PASS", "note": "The caveat names both regimes." },
+          { "text": "Fragment over-ranking is documented", "result": "PASS", "note": "Indole 0.544 and imatinib 0.389 were reproduced." },
+          { "text": "QED is not presented as a universal gate", "result": "PASS", "note": "The usage guide requires calibration." }
+        ]
+      },
+      {
+        "index": 7, "type": "Adversarial", "label": "Partial-charge and descriptor-model traps", "status": "COMPLETED", "status_flag": "✅", "note": "Aspirin balances and iron is rejected.", "basic": 39, "specialized": 57, "total": 96, "assertions_passed": 5, "assertions_total": 5,
+        "assertions": [
+          { "text": "Gasteiger charges are calculated through RDKit", "result": "PASS", "note": "The helper returned 21 explicit-atom charges." },
+          { "text": "Reported charges balance to the formal charge", "result": "PASS", "note": "The explicit-H sum was -0.000000." },
+          { "text": "Charge-method compatibility warning is retained", "result": "PASS", "note": "The force-field boundary remains explicit." },
+          { "text": "MolWt versus ExactMolWt guidance remains correct", "result": "PASS", "note": "The documented distinction remains applicable." },
+          { "text": "Unsupported metal inputs are flagged before use", "result": "PASS", "note": "The iron test raised a ValueError naming Fe." }
+        ]
+      }
+    ]
+  },
+  "final": { "static_weighted": 36.4, "dynamic_weighted": 56.6, "score": 93, "max": 100, "grade": "Production Ready", "grade_symbol": "⭐", "deployable": true, "veto_override": false },
+  "key_strengths": [
+    "The repaired 3D path works reproducibly for flexible drug-like molecules.",
+    "Unavailable or incompatible third-party packages are explicit reproducibility boundaries.",
+    "The Gasteiger section makes hydrogen convention and element scope executable.",
+    "The real-data 2D baseline remains fast and finite over 3224 ChEMBL hERG compounds."
+  ],
+  "recommendations": []
+}

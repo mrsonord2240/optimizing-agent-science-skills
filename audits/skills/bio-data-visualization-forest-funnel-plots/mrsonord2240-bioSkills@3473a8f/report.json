@@ -1,0 +1,322 @@
+{
+  "meta": {
+    "skill_name": "bio-data-visualization-forest-funnel-plots",
+    "description": "Exact-commit re-audit after forest/funnel reliability and workflow corrections.",
+    "evaluated_on": "2026-09-24",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Moderate",
+    "n_inputs": 5,
+    "source": "mrsonord2240/bioSkills@3473a8f48eccab6c73436a627c3e8568f3736eef:data-visualization/forest-funnel-plots",
+    "audit_type": "exact-commit re-audit",
+    "executed": true,
+    "execution_note": "Structural wrapper PASS; 13/13 exact-source contract checks PASS; R 4.4.3 data-visualization wrapper executed the full shipped example with warnings promoted to errors. Real BCG and bundled LDL-C/CHD data, plus labelled synthetic Cox and small-k cases, were used. BCG forest and funnel PNGs were inspected."
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "Examples distinguish real bundled data from labelled synthetic demonstrations and make no fabricated claims."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "The guidance is analytical and explicitly avoids treatment, publication-bias, effect-modification, and causal overclaims."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "REML/log ratios, HKSJ and small-k restraint, k>=10 Egger guard, sensitivity-only trim-and-fill, formal interaction testing, and MR triangulation are methodologically grounded."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "The full shipped R example completed and produced all five expected visual artifacts with warnings treated as errors."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 93,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 11,
+        "max": 12,
+        "note": "All previously promised workflows now have an executable or explicitly scoped pattern; optional layouts remain clearly optional."
+      },
+      "reliability": {
+        "score": 11,
+        "max": 12,
+        "note": "Executable small-k, Egger, sparse-strata, scalar-reference, and interval-bound safeguards replace prose-only advice."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "Focused 184-line entry point and compact usage guide; optional layouts are intentionally short."
+      },
+      "agent_usability": {
+        "score": 15,
+        "max": 16,
+        "note": "Decision table distinguishes six easily conflated workflows and failures have actionable stops."
+      },
+      "human_usability": {
+        "score": 7,
+        "max": 8,
+        "note": "Usage prompts and a fully runnable reference make the intended inputs explicit."
+      },
+      "security": {
+        "score": 12,
+        "max": 12,
+        "note": "No credentials, network calls, shell execution, or user-string evaluation."
+      },
+      "maintainability": {
+        "score": 11,
+        "max": 12,
+        "note": "One self-contained deterministic R reference and exact-commit evidence cover all primary workflows."
+      },
+      "agent_specific": {
+        "score": 19,
+        "max": 20,
+        "note": "Specific trigger boundary, progressive workflow choice, deterministic example, and clear escape hatches."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 96.6,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 25,
+      "total": 25
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "REML BCG forest with log-ratio axis and prediction interval",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "basic": 39,
+        "specialized": 59,
+        "executed": true,
+        "execution_note": "run/exact-commit-3473a8f/run_exact_reaudit.R; real metafor::dat.bcg; rendered PNG inspected.",
+        "assertions": [
+          {
+            "text": "Pooled BCG REML estimate equals the independently established audit value",
+            "result": "PASS",
+            "note": "OR 0.4746 [0.3296, 0.6835], tau2 0.337772, I2 92.07%, Q 163.165."
+          },
+          {
+            "text": "Footer carries tau-squared, I-squared, and Q p-value",
+            "result": "PASS",
+            "note": "Rendered footer reads RE model (tau^2 = 0.338; I^2 = 92.1%; Q p = <2e-16)."
+          },
+          {
+            "text": "Every study, pooled, and prediction interval lies inside the plotting range",
+            "result": "PASS",
+            "note": "Limits are derived from study CIs, pooled CI, prediction interval, and ticks; inspected PNG has no clipped-interval arrows."
+          },
+          {
+            "text": "Ratio axis is log-scaled with OR ticks and reference line 1",
+            "result": "PASS",
+            "note": "Ticks 0.25, 0.5, 1, 2, 4 and dotted reference are rendered."
+          },
+          {
+            "text": "Forest render completes without R warnings",
+            "result": "PASS",
+            "note": "Harness uses options(warn = 2) and completed."
+          }
+        ],
+        "total": 98,
+        "assertions_passed": 5,
+        "assertions_total": 5
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Funnel, contour funnel, Egger, and trim-and-fill safeguards",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "basic": 39,
+        "specialized": 58,
+        "executed": true,
+        "execution_note": "Exact harness rendered real BCG funnel; shipped example rendered contour funnel and sensitivity result.",
+        "assertions": [
+          {
+            "text": "Funnel reference is a scalar pooled estimate",
+            "result": "PASS",
+            "note": "Source uses as.numeric(coef(res)[1]); warning-as-error harness passed."
+          },
+          {
+            "text": "Egger is only offered at k >= 10",
+            "result": "PASS",
+            "note": "Source contract and k=3 execution confirm the explicit withholding branch."
+          },
+          {
+            "text": "Contour funnel is runnable",
+            "result": "PASS",
+            "note": "Shipped example wrote plots/funnel.pdf successfully."
+          },
+          {
+            "text": "Trim-and-fill is labelled sensitivity-only",
+            "result": "PASS",
+            "note": "Source prints original and sensitivity OR together and documents hypothetical imputations."
+          },
+          {
+            "text": "No R array-recycling warning occurs",
+            "result": "PASS",
+            "note": "options(warn = 2) exact harness completed."
+          }
+        ],
+        "total": 97,
+        "assertions_passed": 5,
+        "assertions_total": 5
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Three-study small-k meta-analysis",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "basic": 38,
+        "specialized": 58,
+        "executed": true,
+        "execution_note": "Exact harness fits the synthetic k=3 model with metafor 4.8.0.",
+        "assertions": [
+          {
+            "text": "Small-k model uses HKSJ",
+            "result": "PASS",
+            "note": "Exact harness confirms test == knha."
+          },
+          {
+            "text": "Small-k footer withholds I-squared",
+            "result": "PASS",
+            "note": "Footer is RE model (k = 3; HKSJ CI; heterogeneity metrics withheld)."
+          },
+          {
+            "text": "Egger is withheld below ten studies",
+            "result": "PASS",
+            "note": "Exact harness confirms k=3 branch is not eligible for Egger."
+          },
+          {
+            "text": "Pooling fewer than three studies is rejected",
+            "result": "PASS",
+            "note": "Exact-source contract locates the nrow(studies) < 3 stop guard."
+          },
+          {
+            "text": "HKSJ claim is appropriately qualified",
+            "result": "PASS",
+            "note": "Source says k <= 3 remains highly imprecise and is not decisive."
+          }
+        ],
+        "total": 96,
+        "assertions_passed": 5,
+        "assertions_total": 5
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Cox covariate forest and treatment-by-subgroup forest",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "basic": 38,
+        "specialized": 58,
+        "executed": true,
+        "execution_note": "Shipped exact example generated both synthetic-Cox PDFs with a seeded data set.",
+        "assertions": [
+          {
+            "text": "ggforest is accurately labelled as adjusted covariate display",
+            "result": "PASS",
+            "note": "Source heading and figure title say adjusted covariate HRs."
+          },
+          {
+            "text": "Subgroup path estimates stratum treatment HRs and tests interaction",
+            "result": "PASS",
+            "note": "Source fits treatment * subgroup and records LRT p."
+          },
+          {
+            "text": "Sparse strata are stopped before estimation",
+            "result": "PASS",
+            "note": "Counts <20 and events <5 guards are present."
+          },
+          {
+            "text": "The supplied example is self-contained",
+            "result": "PASS",
+            "note": "clinical_df is constructed in the example; all Cox PDFs were written."
+          },
+          {
+            "text": "Subgroup plot and covariate plot are separate artifacts",
+            "result": "PASS",
+            "note": "cox_subgroup_forest.pdf and cox_adjusted_covariates.pdf both exist and exceed 1 KB."
+          }
+        ],
+        "total": 96,
+        "assertions_passed": 5,
+        "assertions_total": 5
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "MR method comparison with outlier-safe layout",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "basic": 38,
+        "specialized": 58,
+        "executed": true,
+        "execution_note": "Shipped exact example used bundled LDL-C/CHD instruments and wrote mr_method_forest.pdf.",
+        "assertions": [
+          {
+            "text": "MR forest suppresses SNP rows for method comparison",
+            "result": "PASS",
+            "note": "Source and example use snp_estimates = FALSE."
+          },
+          {
+            "text": "Multiple MR methods are run",
+            "result": "PASS",
+            "note": "IVW, weighted median, mode, and Egger are passed to mr_forest."
+          },
+          {
+            "text": "MR-Egger intercept is reported",
+            "result": "PASS",
+            "note": "Exact run reports intercept -0.0115; p = 0.451."
+          },
+          {
+            "text": "Input constructor is not shadowed",
+            "result": "PASS",
+            "note": "Example stores result in mr_dat rather than mr_input."
+          },
+          {
+            "text": "MR method figure is produced",
+            "result": "PASS",
+            "note": "plots/mr_method_forest.pdf exists and exceeds 1 KB."
+          }
+        ],
+        "total": 96,
+        "assertions_passed": 5,
+        "assertions_total": 5
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 37.2,
+    "dynamic_weighted": 58.0,
+    "score": 95,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Rendered BCG forest carries a scalar heterogeneity footer and no longer clips study confidence intervals.",
+    "Small-k, Egger, sparse-subgroup, and MR-outlier guards are executable rather than prose-only.",
+    "The self-contained reference runs end-to-end through forest, funnel, Cox, and MR outputs with warnings promoted to errors."
+  ],
+  "recommendations": []
+}

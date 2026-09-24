@@ -1,0 +1,66 @@
+{
+  "meta": {
+    "skill_name": "bio-molecular-io",
+    "source": "mrsonord2240/bioSkills@2f3d8d3c43ef34e5ff55af1b04a9abf263c5c631:chemoinformatics/molecular-io",
+    "commit": "2f3d8d3c43ef34e5ff55af1b04a9abf263c5c631",
+    "evaluated_on": "2026-09-24",
+    "environment": "cheminformatics-hit-triage-analyst: Python 3.12.13, RDKit 2026.03.6, openbabel-wheel 3.1.1.23",
+    "script": "F:/OpenScience/audits/bio-molecular-io/re_audit.py",
+    "evidence": "F:/OpenScience/audits/bio-molecular-io/re_audit.out"
+  },
+  "veto_gates": {
+    "skill_veto": "PASS",
+    "research_veto": "PASS",
+    "security": "PASS",
+    "determinism": "PASS"
+  },
+  "static_score": {
+    "subtotal": 98,
+    "max": 100,
+    "categories": {
+      "functional_suitability": "12/12",
+      "reliability": "12/12",
+      "performance_context": "8/8",
+      "agent_usability": "16/16",
+      "human_usability": "8/8",
+      "security": "12/12",
+      "maintainability": "11/12",
+      "agent_specific": "19/20"
+    },
+    "remaining_deductions": [
+      "P3: The source skill does not bundle an automated regression runner; the exact-commit runner is maintained with audit evidence.",
+      "P3: A vendor-specific MOL2 source that cannot be converted or parsed still requires a corrected source file or human escalation."
+    ]
+  },
+  "dynamic_score": {
+    "execution": "7 molecular I/O regression areas executed",
+    "assertions": { "passed": 28, "total": 28, "rate_percent": 100.0 },
+    "results": {
+      "documentation_claims": "5/5 pass",
+      "empty_grammar_and_sanitization_boundaries": "10/10 pass",
+      "3224_compound_herg_sdf_round_trip": "4/4 pass",
+      "oversized_sdf_v3000_behavior": "2/2 pass",
+      "open_babel_conversion_and_rdkit_inchi": "4/4 pass",
+      "pdb_bond_order_and_inchi_tautomer_boundaries": "3/3 pass"
+    }
+  },
+  "findings": {
+    "P0": [],
+    "P1": [],
+    "P2_resolved": [
+      "Registry InChI is now generated through RDKit after Open Babel conversion; the skill labels Open Babel InChI support as build-dependent and requires a format probe.",
+      "The SDF guidance now reflects current RDKit automatic V3000 emission and focuses compatibility checks on downstream readers.",
+      "Grammar failures are separated from chemistry failures recoverable through sanitize=False and SanitizeMol(catchErrors=True).",
+      "Blank and whitespace SMILES are rejected before parsing, and zero-atom molecules are rejected at parse and file boundaries."
+    ]
+  },
+  "final": {
+    "static_weighted": 39.2,
+    "dynamic_weighted": 60.0,
+    "score": 99,
+    "max": 100,
+    "grade": "Production Ready",
+    "deployable": true,
+    "assertion_floor_met": true
+  }
+}

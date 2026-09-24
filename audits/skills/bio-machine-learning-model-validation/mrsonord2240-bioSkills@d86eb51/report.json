@@ -1,0 +1,62 @@
+{
+  "meta": {
+    "skill_name": "bio-machine-learning-model-validation",
+    "source": "mrsonord2240/bioSkills@d86eb5194220abbd15e2f8f110390da88a31e5aa:machine-learning/model-validation",
+    "evaluated_on": "2026-09-24",
+    "audit_type": "exact-commit fix-pass re-audit",
+    "environment": "F:/OpenScience/audit-envs/cheminformatics-hit-triage-analyst; scikit-learn 1.9.1"
+  },
+  "veto_gates": {
+    "skill_veto": "PASS",
+    "research_veto": "PASS",
+    "detail": "No safety, determinism, contract, or scientific-integrity regression observed."
+  },
+  "static_score": {
+    "score": 96,
+    "max": 100,
+    "changes_verified": [
+      "Leakage taxonomy labels its impact column explicitly as non-ranking and distinguishes scalar transforms from high-impact fitted transforms and selection.",
+      "Nested-versus-flat CV optimism is conditional on search size/correlation, signal, and sample size, with report fields specified.",
+      "SMOTE guidance states the severe-imbalance regime, removes the unconditional no-AUC-gain claim, and requires original-prevalence evaluation/recalibration.",
+      "A TRIPOD+AI-oriented validation-report skeleton specifies split, leakage, discrimination, calibration, utility, subgroup, and provenance fields."
+    ],
+    "remaining_deductions": [
+      "Examples still assume well-formed X, y, and groups rather than performing runtime input validation.",
+      "The broad SKILL.md remains a single document rather than splitting conditional detail into references."
+    ]
+  },
+  "dynamic_score": {
+    "score": 95.4,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 31, "total": 31 },
+    "harness": "run/inputs_all.py",
+    "harness_output": "run/inputs_all_d86eb51_serial.out",
+    "fix_pass_script": "run/fix_pass_validation.py",
+    "fix_pass_output": "run/fix_pass_validation_d86eb51.out",
+    "results": [
+      "Nested CV versus flat CV: 0.753 +/- 0.030 versus 0.762; the skill now explains why this +0.009 gap is data- and search-dependent.",
+      "Pure-noise leakage: selection outside folds 0.904 AUC versus 0.547 inside a Pipeline; taxonomy now prevents its frequency ordering being read as an impact ordering.",
+      "Structured CV: 419 scaffold spans under plain folds versus 0 under StratifiedGroupKFold.",
+      "Calibration API: sklearn 1.9.1 rejects cv='prefit'; FrozenEstimator and temperature calibration are available.",
+      "Utility: quantile reliability bins gave mean absolute gap 0.0596 versus 0.1036 for uniform bins; decision-curve calculations remained coherent.",
+      "Resampling: at 24.7% prevalence SMOTE changed AUC 0.783 to 0.810, Brier 0.1480 to 0.1421, and mean risk 0.247 to 0.275; the new text correctly avoids a universal direction claim while preserving the original-prevalence calibration requirement.",
+      "LOO/AUC remains degenerate; repeated 5x10 CV ran with 0.667 +/- 0.125. A pooled-versus-fold-average difference of 0.002 does not contradict the skill's narrower non-equivalence warning."
+    ]
+  },
+  "final": {
+    "static_weighted": 38.4,
+    "dynamic_weighted": 57.2,
+    "score": 96,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "✅",
+    "deployable": true,
+    "open_p0": 0,
+    "open_p1": 0,
+    "open_p2": 0
+  },
+  "remaining_recommendations": [
+    "Add explicit input-shape/class-count/group-integrity preflight checks if this guidance becomes a reusable executable validator.",
+    "Consider a small references/report-template artifact only if report generation becomes a recurring workflow; the inline skeleton resolves the audited missing deliverable."
+  ]
+}

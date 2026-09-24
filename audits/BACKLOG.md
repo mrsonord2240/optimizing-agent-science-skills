@@ -8,7 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (130)
+## P1 (119)
 
 ### `bio-data-visualization-statistical-annotation` — stat_compare_means(comparisons, p.adjust.method='holm') draws unadjusted p; the argument does not exist
 
@@ -298,46 +298,6 @@ None open.
 - Root cause: bbox tight resizes the figure; so.Plot uses its own theme and size.
 - Fix: For exact size use constrained_layout without bbox tight (or set savefig.pad_inches=0 and state the tolerance); for so.Plot add .layout(size=(w,h)) and .theme(mpl.rcParams) then re-check the size.
 
-### `bio-data-visualization-forest-funnel-plots` — mlab bquote(paste()) prints 'paste', hiding I2/tau2/Q
-
-- Skill: 76, Limited Release · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/forest-funnel-plots) · [viewer](skills/bio-data-visualization-forest-funnel-plots/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: 1
-- Problem: In both the SKILL.md forest block and examples/forest_phd.R the pooled-row label renders as the word 'paste' because bquote() returns a call, not an expression; the heterogeneity footer the Skill calls mandatory never appears.
-- Root cause: mlab needs an expression or character; the snippet was never rendered and checked.
-- Fix: Wrap in as.expression(bquote(...)) (verified: prints 'RE Model (Q = 163.16, df = 12; I2 = 92.1%)') or use sprintf() to a character mlab; then add a rendered-output check.
-
-### `bio-data-visualization-forest-funnel-plots` — ggforest is not a subgroup forest and no interaction code is given
-
-- Skill: 76, Limited Release · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/forest-funnel-plots) · [viewer](skills/bio-data-visualization-forest-funnel-plots/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: 4
-- Problem: The decision tree and usage guide route 'Cox subgroup forest with interaction p-values' to ggforest, which draws covariate HRs from one additive coxph model and has no interaction argument; per-subgroup treatment HRs and the interaction LRT (p 0.893 here) had to be built by hand.
-- Root cause: ggforest was conflated with a stratified subgroup display; only prose mentions the interaction term.
-- Fix: Rename that section 'multivariable Cox forest', and add a subgroup block: fit treatment*subgroup, extract stratum HRs with CIs, plot with metafor forest or forestplot, annotate the anova() interaction p. Warn that sparse strata (ECOG3 N=1) must be collapsed.
-
-### `bio-data-visualization-forest-funnel-plots` — Shipped example halts at step 8 and never runs step 9
-
-- Skill: 76, Limited Release · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/forest-funnel-plots) · [viewer](skills/bio-data-visualization-forest-funnel-plots/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: 4, 5
-- Problem: forest_phd.R stops with object 'clinical_df' not found; step 9 uses undefined bx/bxse/by/byse. Only steps 1-7 are runnable, so the example cannot serve as a test.
-- Root cause: Placeholder data objects are used without definitions or a synthetic fallback.
-- Fix: Define small inline data for steps 8-9 (e.g. survival::lung and MendelianRandomization::ldlc/chdlodds) so the whole script runs, and print the expected values.
-
-### `bio-data-visualization-forest-funnel-plots` — Small-k rules live only in prose; HKSJ overstated at k=3
-
-- Skill: 76, Limited Release · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/forest-funnel-plots) · [viewer](skills/bio-data-visualization-forest-funnel-plots/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: 3
-- Problem: The code blocks print I2 at k=3 and run regtest() at k=3 (p=0.028) with no guard, despite the k<5 and k>=10 rules; the text says HKSJ is 'well-calibrated even at k=3' while the k=3 CI here spans OR 0.24-3.36.
-- Root cause: Guards are stated as advice, not encoded; the calibration claim goes beyond IntHout 2014.
-- Fix: Wrap I2 and regtest in if (res$k >= 5) / if (res$k >= 10) with a message otherwise, and soften the HKSJ sentence to 'better calibrated than z-based CIs, still very wide at k<=3'.
-
-### `bio-data-visualization-forest-funnel-plots` — MR forest unreadable with outlier SNP; p-value annotation unsupported
-
-- Skill: 76, Limited Release · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/forest-funnel-plots) · [viewer](skills/bio-data-visualization-forest-funnel-plots/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: 5
-- Problem: mr_forest with default SNP rows lets one SNP (CI to 380) set the axis so the four method estimates overlap; the usage guide promises per-method p-value annotation that mr_forest cannot draw.
-- Root cause: No guidance on snp_estimates=FALSE or axis control, and the annotation claim was not tested.
-- Fix: Show mr_forest(..., snp_estimates = FALSE) for the method comparison, note the outlier effect, and either add a ggplot annotation snippet for p-values or delete the promise.
-
 ### `bio-data-visualization-volcano-and-ma-plots` — Threshold line drawn on the wrong axis quantity
 
 - Skill: 76, Beta Only · [mrsonord2240/bioSkills@019953e](https://github.com/mrsonord2240/bioSkills/tree/019953e9ca90f6f6f69e3f5a9cd19a5c1b9dc6be/data-visualization/volcano-and-ma-plots) · [viewer](skills/bio-data-visualization-volcano-and-ma-plots/mrsonord2240-bioSkills@019953e/viewer.md)
@@ -498,22 +458,6 @@ None open.
 - Root cause: The block and its new error message were written for the label-free case only, while the taxonomy advertises TMT.
 - Fix: Add a decision-tree row 'MaxQuant TMT / isobaric labelling -> read Reporter intensity corrected <n> columns; corrected channels apply MaxQuant's isotope-impurity correction, uncorrected do not; reporter-ion quant computation itself is quantification', and change the ValueError to name the columns the table actually has, e.g. 'No LFQ intensity columns. Found Reporter intensity corrected columns -> this is an isobaric (TMT/iTRAQ) run; see the TMT row. Otherwise use Intensity and normalize explicitly.'
 
-### `bio-admet-prediction` — No executable ADMET prediction route ships with the Skill
-
-- Skill: 86, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/admet-prediction) · [viewer](skills/bio-admet-prediction/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 1, 2
-- Problem: The description names ADMETlab 3.0, ADMET-AI, DeepChem MolNet and chemprop. ADMETlab is the declared primary_tool and has no request code at all; ADMET-AI and DeepChem appear only as taxonomy rows with no code; chemprop is a commented CLI block. Everything the Skill can actually run is rule-based physchem and RDKit alert catalogs, so the canonical triage produces no ADMET prediction.
-- Root cause: The deliberate and defensible decision not to hard-code a web API route was not paired with an offline fallback, leaving the Skill with no working model path.
-- Fix: Add a short executable ADMET-AI section: admet_ai ships its model weights and DrugBank reference set in the package and runs fully offline (verified here: 105 endpoints including hERG, the five CYPs, DILI, AMES, Caco-2 and BBB). Ten lines would give the Skill a working prediction route without touching a network service.
-
-### `bio-admet-prediction` — The prescribed out-of-distribution mitigation is unavailable in the runnable route
-
-- Skill: 86, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/admet-prediction) · [viewer](skills/bio-admet-prediction/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 4, 7
-- Problem: The OOD and hERG failure modes both prescribe 'check the uncertainty band' and 'if kNN distance to training set > P95, treat as low-confidence'. The only route that can be executed emits neither: zero of 105 output columns carry uncertainty or applicability-domain information, and sodium chloride came back with BBB_Martins 0.967 and AMES 0.905.
-- Root cause: The applicability-domain guidance is written against the hosted service's evidential uncertainty and was never re-grounded in what an offline user can compute.
-- Fix: Add a toolkit-independent AD gate the reader can always run: max Tanimoto similarity to a reference set plus a heavy-atom/element sanity filter that rejects inorganics and metals before prediction, with the worked numbers from this audit as the motivating example.
-
 ### `bio-alignment-sorting` — Dagger footnote false for two rows; CMCR row incomplete
 
 - Skill: 86, Limited Release · [mrsonord2240/bioSkills@cd9e0d2](https://github.com/mrsonord2240/bioSkills/tree/cd9e0d284852ed0c6989fedd401e74d00b863a51/alignment-files/alignment-sorting) · [viewer](skills/bio-alignment-sorting/mrsonord2240-bioSkills@cd9e0d2/viewer.md)
@@ -521,30 +465,6 @@ None open.
 - Problem: The footnote says the daggered tools were not installed, but fgbio and GATK are installed here. fgbio 4.1.1 CallMolecularConsensusReads rejects coordinate-sorted and sort -t MI input ('not sorted correctly. Please sort with fgbio SortBam -s TemplateCoordinate') although the row says 'grouped by MI tag'. Mutect2 needs coordinate and index (verified).
 - Root cause: The fixer hedged rows by tool family without checking which tools were actually present.
 - Fix: Remove the dagger from Mutect2 (verified: coordinate-sorted and indexed) and change the CMCR row to 'template-coordinate order, as written by GroupReadsByUmi'. Keep the dagger only on featureCounts, Salmon, RSEM, Sniffles, cuteSV, Manta, Delly, which are genuinely unverified.
-
-### `bio-molecular-descriptors` — 3D convergence guard rejects valid ensembles for ordinary flexible drugs
-
-- Skill: 86, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/molecular-descriptors) · [viewer](skills/bio-molecular-descriptors/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 4
-- Problem: Both documented 3D paths raise RuntimeError when any conformer returns MMFF status 1. Status 1 means 'more iterations required', not failure. 19 of 20 conformers for atenolol and 20 of 20 for verapamil hit it, so the snippet discards a usable ensemble for any flexible drug-like molecule. Only the four-carbon example in the Skill succeeds.
-- Root cause: The guard treats MMFFOptimizeMoleculeConfs' two-valued status as pass/fail rather than converged/needs-more-iterations.
-- Fix: Pass maxIters=2000 (or higher) and treat status 1 as a warning: count non-converged conformers, re-optimize or drop only those, and raise only when every conformer fails. Update both SKILL.md and examples/calculate_descriptors.py, and add atenolol to the example's __main__ so the path is exercised.
-
-### `bio-molecular-descriptors` — Version Compatibility pins map4, which has no obtainable distribution
-
-- Skill: 86, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/molecular-descriptors) · [viewer](skills/bio-molecular-descriptors/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 2
-- Problem: The header states the examples were tested with 'map4 1.1+' and the references cite https://pypi.org/project/map4/, but pip reports no version of map4 exists on PyPI and the import fails. MAP4 also appears as a first-class row in the fingerprint taxonomy table.
-- Root cause: The pin was written from the paper and the project README rather than from an actual install.
-- Fix: Remove map4 from Version Compatibility, mark the MAP4 taxonomy row as 'GitHub source install, conda-only tmap dependency, no Windows build', and point the stereochemistry-aware route at mapchiral, which does install and works.
-
-### `bio-molecular-descriptors` — The example's 3D helper is unseeded and non-reproducible
-
-- Skill: 86, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/molecular-descriptors) · [viewer](skills/bio-molecular-descriptors/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 4
-- Problem: calculate_3d_descriptors calls EmbedMolecule(mol, AllChem.ETKDGv3()) with no randomSeed, so three identical calls returned asphericity 0.7876, 0.7216 and 0.7210 -- a 9% swing in a value that may become a QSAR feature. SKILL.md's ensemble snippet does set randomSeed=42.
-- Root cause: Seed management was applied to the SKILL.md pattern and not propagated to the shipped helper.
-- Fix: Set params.randomSeed explicitly in calculate_3d_descriptors, accept it as an argument, and state in the usage guide that a recorded seed is required for any descriptor that feeds a model.
 
 ### `bio-variant-annotation` — csq --phase modes m and s are described wrongly
 
@@ -729,14 +649,6 @@ None open.
 - Problem: The copied real Papalexi example passed 22 GB RSS without producing its promised TSV and had to be stopped.
 - Root cause: It loads and processes the full dataset in one unbounded process.
 - Fix: Provide a parameterized subset/smoke mode and memory estimate, or refactor the full example to a bounded workflow before claiming it as a generally runnable example.
-
-### `bio-machine-learning-prediction-explanation` — The conditional-SHAP 'credit to an unused feature' claim does not reproduce
-
-- Skill: 89, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/prediction-explanation) · [viewer](skills/bio-machine-learning-prediction-explanation/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 2
-- Problem: The Skill states three times -- in the method taxonomy, in the core section and in a failure mode -- that tree_path_dependent SHAP can give nonzero attribution to a feature the model never uses, with the symptom 'a gene the model never splits on ranks high'. On a depth-1 tree that splits only on A, its twin B (r = 0.9995) received exactly 0.0000 under tree_path_dependent as well as under interventional. Path-dependent TreeSHAP walks the fitted tree's own paths, so a feature absent from every split contributes nothing by construction. The Skill's own example script asserts only the weaker, correct claim: the A-versus-B credit split differs by mode.
-- Root cause: A property of conditional Shapley in general has been attributed to the tree_path_dependent implementation specifically, where the tree structure prevents it.
-- Fix: Restate the taxonomy row and the failure mode: under tree_path_dependent the credit split among correlated features that the model DOES use shifts toward the conditionally implied ones, which is why within-module ordering is not a finding. Reserve the 'nonzero credit to an entirely unused feature' statement for conditional estimators that sample from p(x_dropped \| x_S) without reference to the fitted structure, and align the prose with what examples/shap_omics_classifier.py already prints.
 
 ### `bio-microbiome-taxonomy-assignment` — QIIME2 filter-seqs uses obsolete option names
 
@@ -1050,7 +962,7 @@ None open.
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (327)
+## P2 (307)
 
 ### `bio-data-visualization-statistical-annotation` — Test-name and label details differ from the tools
 
@@ -1235,38 +1147,6 @@ None open.
 - Problem: The Skill does not say to leave R/ggplot users, interactive figures or genome tracks to other Skills.
 - Root cause: Escape hatches only in Related Skills.
 - Fix: Add three lines of scope limits.
-
-### `bio-data-visualization-forest-funnel-plots` — refline = res$b triggers array-recycling warnings
-
-- Skill: 76, Limited Release · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/forest-funnel-plots) · [viewer](skills/bio-data-visualization-forest-funnel-plots/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: 2
-- Problem: res$b is a 1x1 matrix; funnel() emits four deprecation warnings under R 4.4.
-- Root cause: Matrix passed where a scalar is expected.
-- Fix: Use refline = res$b[1] or coef(res).
-
-### `bio-data-visualization-forest-funnel-plots` — at= ticks clip most CIs on the BCG forest
-
-- Skill: 76, Limited Release · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/forest-funnel-plots) · [viewer](skills/bio-data-visualization-forest-funnel-plots/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: 1
-- Problem: at = log(c(0.25..4)) also sets the plotting range, so 7 of 13 CIs and the PI are cut with arrows.
-- Root cause: Tick set chosen without regard to data range.
-- Fix: Say that at also sets alim, or add alim/xlim so all intervals are shown.
-
-### `bio-data-visualization-forest-funnel-plots` — Frontmatter promises tools with no code; netmeta described as Bayesian
-
-- Skill: 76, Limited Release · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/forest-funnel-plots) · [viewer](skills/bio-data-visualization-forest-funnel-plots/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: —
-- Problem: forestplot (with boxsize), ggforestplot, netmeta and metafor::cumul are named but no snippet exists; netmeta is frequentist yet the table says 'Bayesian or frequentist'.
-- Root cause: Description broader than the body.
-- Fix: Add one short block per promised tool or trim the description; correct the netmeta row.
-
-### `bio-data-visualization-forest-funnel-plots` — usage-guide.md repeats SKILL.md tips; example data contradicts its own lesson
-
-- Skill: 76, Limited Release · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/forest-funnel-plots) · [viewer](skills/bio-data-visualization-forest-funnel-plots/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: 2
-- Problem: The Tips list is a near-copy of SKILL.md text; the example's synthetic data give I2 = 0% (so the prediction interval is invisible) and a significant Egger p = 0.0039, unremarked.
-- Root cause: Data were not designed to show the lessons.
-- Fix: Remove the duplicate Tips, and choose example data with visible heterogeneity and a stated Egger outcome.
 
 ### `bio-data-visualization-volcano-and-ma-plots` — EnhancedVolcano 'selectLab filtered by thresholds' does not reproduce
 
@@ -2004,30 +1884,6 @@ None open.
 - Root cause: The blocks are written as minimal transformations.
 - Fix: Add one print per block summarising rows read, rows removed by each criterion, and final matrix shape, and say in the Approach text that this line belongs in the methods record.
 
-### `bio-admet-prediction` — chemprop reproducibility advice names a flag that does not exist
-
-- Skill: 86, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/admet-prediction) · [viewer](skills/bio-admet-prediction/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 3
-- Problem: The Common Errors table fixes 'Predictions inconsistent across runs' with `--seed 42`. chemprop 2.3.1 rejects it: 'unrecognized arguments: --seed 42'. The real flags are --data-seed and --pytorch-seed.
-- Root cause: The flag is carried over from chemprop 1.x, which the Skill elsewhere correctly flags as a breaking API change.
-- Fix: Replace with `--data-seed 42 --pytorch-seed 42` and note that the two control different sources of randomness. The identical error appears in chemoinformatics/qsar-modeling and should be fixed in both.
-
-### `bio-admet-prediction` — load_admetlab_results enforces no column contract
-
-- Skill: 86, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/admet-prediction) · [viewer](skills/bio-admet-prediction/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 2
-- Problem: The loader checks only that the file is non-empty. A two-column CSV with a single unrelated field passed unchallenged, and a missing file produces an unhandled FileNotFoundError. The Skill's instruction to 'preserve the uncertainty columns and task identifier' therefore has nothing enforcing it.
-- Root cause: The function was written as a thin wrapper around read_csv for a route whose output shape the Skill declines to specify.
-- Fix: Have the loader take a required-columns argument (defaulting to a smiles column plus at least one uncertainty column), raise a named error listing what was missing, and catch FileNotFoundError with a message pointing at the API step that should have produced the file.
-
-### `bio-admet-prediction` — ADMET-AI version pin is two major versions behind the Skill's own warning
-
-- Skill: 86, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/admet-prediction) · [viewer](skills/bio-admet-prediction/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: —
-- Problem: Version Compatibility pins 'admet-ai 1.3+', while the taxonomy table itself warns that 'v2 package predictions differ from the v1 paper/server'. The installed release is 2.0.1, so the pin admits precisely the version the Skill says will disagree.
-- Root cause: The pin was written as a lower bound before the v1/v2 divergence note was added, and the two were never reconciled.
-- Fix: State the tested major version explicitly and repeat the divergence warning in Version Compatibility, not only in the taxonomy table.
-
 ### `bio-alignment-sorting` — Picard '-n output is rejected' is too broad
 
 - Skill: 86, Limited Release · [mrsonord2240/bioSkills@cd9e0d2](https://github.com/mrsonord2240/bioSkills/tree/cd9e0d284852ed0c6989fedd401e74d00b863a51/alignment-files/alignment-sorting) · [viewer](skills/bio-alignment-sorting/mrsonord2240-bioSkills@cd9e0d2/viewer.md)
@@ -2115,30 +1971,6 @@ None open.
 - Problem: 430 lines load SV/CNV/mtDNA catalogs and pushback tables for one-variant queries.
 - Root cause: All material kept in SKILL.md.
 - Fix: Move catalogs and pushback tables to the usage guide.
-
-### `bio-molecular-descriptors` — Gasteiger snippet prints charges that do not sum to the formal charge
-
-- Skill: 86, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/molecular-descriptors) · [viewer](skills/bio-molecular-descriptors/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 7
-- Problem: The documented loop iterates the molecule's atoms and prints _GasteigerCharge. For neutral aspirin those sum to -0.6555, because implicit-hydrogen charge is carried separately and the molecule has not had hydrogens added.
-- Root cause: The snippet demonstrates the API call without stating the hydrogen convention it depends on.
-- Fix: Call Chem.AddHs before ComputeGasteigerCharges in the snippet, or read _GasteigerHCharge alongside it, and add a line stating that heavy-atom charges alone will not balance.
-
-### `bio-molecular-descriptors` — No warning that Gasteiger silently echoes formal charge for unparameterised elements
-
-- Skill: 86, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/molecular-descriptors) · [viewer](skills/bio-molecular-descriptors/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 7
-- Problem: ComputeGasteigerCharges on [Fe+2] returned exactly 2.0 with no exception and no nan, so a metal-containing compound passes through a charge-aware pipeline carrying a meaningless number.
-- Root cause: The partial-charge table covers cost and accuracy but not element coverage.
-- Fix: Add an element-coverage column or note to the charge table, and show a guard that flags atoms outside the Gasteiger parameter set before the charges are used downstream.
-
-### `bio-molecular-descriptors` — QED caveat states the wrong failure direction for fragments
-
-- Skill: 86, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/molecular-descriptors) · [viewer](skills/bio-molecular-descriptors/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 6
-- Problem: The Skill warns QED can under-rank fragment-like molecules. Measured the opposite: indole 0.544 and phenol 0.515 clear a 0.5 gate while imatinib, a marketed drug, scores 0.389.
-- Root cause: The caveat generalises the natural-product case, where under-ranking is real (paclitaxel 0.130), to fragments, where the desirability functions are permissive instead.
-- Fix: Split the caveat: QED under-ranks large natural-product and peptide chemistry and over-ranks small fragments, with these numbers as worked examples, and repeat that it must not be the sole gate in either regime.
 
 ### `bio-phylo-species-trees` — Add a leaf-name consistency check before ASTRAL
 
@@ -2676,22 +2508,6 @@ None open.
 - Root cause: The references name alternatives without a verified local execution route.
 - Fix: Add a supported environment recipe or an explicit unavailable-here note with a tested fallback.
 
-### `bio-machine-learning-prediction-explanation` — The aggregation snippet requires a module map the Skill never tells you how to build
-
-- Skill: 89, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/prediction-explanation) · [viewer](skills/bio-machine-learning-prediction-explanation/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 1
-- Problem: The prescribed workflow ends with aggregating \|SHAP\| over co-expression modules, but the snippet takes `clusters` as 'a precomputed gene->module map'. The choice of correlation metric and cut threshold determines which module ranks first -- at \|r\| >= 0.3 the top module here contained none of the top five individually ranked features.
-- Root cause: Module construction is treated as an input to the method rather than as part of it, although it changes the result.
-- Fix: Add three lines showing one defensible construction (absolute-correlation distance, average linkage, a stated cut) and say plainly that the threshold is a reported analysis choice, since the module ranking moves with it.
-
-### `bio-machine-learning-prediction-explanation` — Two instability claims are stated more strongly than they behave
-
-- Skill: 89, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/prediction-explanation) · [viewer](skills/bio-machine-learning-prediction-explanation/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 4, 5
-- Problem: The background section says a different background 'yields different important genes'; three quite different backgrounds shared 8 to 9 of the top 10 here. The LIME section says different seeds 'flip the top features'; the mean pairwise top-10 overlap was 8.5/10 and the top two features were identical across all five seeds.
-- Root cause: Both effects are real but their magnitude depends on the model and the feature correlation structure, and the Skill quantifies neither.
-- Fix: Soften both to what is reliably true and testable -- the tail of the ranking is unstable while the head often is not -- and tell the reader to measure it: rerun with two backgrounds or two seeds and report the rank overlap alongside the ranking.
-
 ### `bio-microbiome-taxonomy-assignment` — DADA2 example exits with a post-output segmentation fault
 
 - Skill: 89, Production Ready · [mrsonord2240/bioSkills@60fd788](https://github.com/mrsonord2240/bioSkills/tree/60fd788ddba9db5cdfdd157003ee4274e5c47349/microbiome/taxonomy-assignment) · [viewer](skills/bio-microbiome-taxonomy-assignment/mrsonord2240-bioSkills@60fd788/viewer.md)
@@ -3012,38 +2828,6 @@ None open.
 - Root cause: No real DIA/ABF test data exists in this candidate's audit environment (per TOOLS.md), so neither the fixer nor this audit could close the loop on this specific claim.
 - Fix: Add a one-sentence caveat next to the CSV acquisition_type instructions noting it is sourced from the official tutorial and CLI-mechanism-verified, but not yet confirmed against a real DIA/SWATH run's MS2Dec output; revisit once ABF/DIA test data is available.
 
-### `bio-molecular-io` — Open Babel snippet writes InChI, which the pinned build does not support
-
-- Skill: 91, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/molecular-io) · [viewer](skills/bio-molecular-io/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 3
-- Problem: The pybel snippet ends with `inchi = mol.write('inchi')`. Under openbabel-wheel 3.1.1.23 -- inside the Skill's own 'Open Babel 3.1.1+' pin -- this raises ValueError: 'inchi is not a recognised Open Babel format', and `obabel -L formats` confirms neither inchi nor inchikey is compiled into the build. The Skill discusses InChI at length elsewhere, so a reader is likely to take this line at face value.
-- Root cause: InChI support in Open Babel is a compile-time option and the snippet assumes it is always present; the Skill's own instruction to check `obabel -L formats` was never applied to its own example.
-- Fix: Drop the InChI line from the pybel snippet and point InChI generation at RDKit (rdkit.Chem.inchi.MolToInchi, verified working here), with a one-line note that Open Babel InChI support is build-dependent and should be checked with `obabel -L formats`.
-
-### `bio-molecular-io` — The SDF V2000 999-atom failure mode no longer fires
-
-- Skill: 91, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/molecular-io) · [viewer](skills/bio-molecular-io/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 2
-- Problem: The failure mode predicts a truncated atom block and a cryptic parse failure for molecules above 999 atoms. RDKit 2026.03.6's SDWriter emitted V3000 automatically for a 1,200-atom molecule and it read back intact, so SetForceV3000(True) was a no-op in the case it exists to fix.
-- Root cause: The symptom was written against an older RDKit that did not auto-upgrade the format.
-- Fix: Restate the entry: current RDKit auto-selects V3000 above the V2000 limit, so the real risk is downstream software that cannot read V3000, and SetForceV3000 remains useful for forcing the format deliberately rather than for avoiding truncation.
-
-### `bio-molecular-io` — The sanitize=False diagnostic does not apply to two of the three causes it is offered for
-
-- Skill: 91, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/molecular-io) · [viewer](skills/bio-molecular-io/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 7
-- Problem: The Common Errors row pairs 'Invalid SMILES, bad parentheses, ring not closed' with the fix 'try sanitize=False, inspect'. Grammar-level errors return None under sanitize=False as well, so the fix only helps the chemistry cases (valence, kekulization).
-- Root cause: Two different classes of parse failure -- grammar and chemistry -- are grouped under one row with one fix.
-- Fix: Split the row: grammar errors return None regardless and need the input corrected; chemistry errors are recoverable with sanitize=False followed by SanitizeMol(catchErrors=True), which names the failing step.
-
-### `bio-molecular-io` — An empty SMILES silently yields a valid molecule
-
-- Skill: 91, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/chemoinformatics/molecular-io) · [viewer](skills/bio-molecular-io/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 7
-- Problem: Chem.MolFromSmiles('') returns a zero-atom Mol rather than None, so an empty cell in an input file passes every None check in the Skill and flows downstream as a real record.
-- Root cause: The Skill's parse guards test for None only, which is the documented failure signal but not the only one.
-- Fix: Add a line to parse_smiles_safe and the Common Errors table: treat a molecule with GetNumAtoms() == 0 as a parse failure, because an empty or whitespace input does not return None.
-
 ### `bio-sam-bam-basics` — Validate BED rows before indexing fields
 
 - Skill: 91, Production Ready · [mrsonord2240/bioSkills@cb48eb1](https://github.com/mrsonord2240/bioSkills/tree/cb48eb16bf63f75098c865da4e8f7bf3191af733/alignment-files/sam-bam-basics) · [viewer](skills/bio-sam-bam-basics/mrsonord2240-bioSkills@cb48eb1/viewer.md)
@@ -3299,38 +3083,6 @@ None open.
 - Problem: The rewritten 'Database format: v5 vs v4' table and the Failure-modes 'v4 has no per-sequence taxid support at all' line claim a v4-format DB cannot carry -taxid_map assignments. Building a v4 DB with -taxid_map succeeds silently at exit 0, and blastdbcmd/blastp both correctly retrieve the per-sequence taxid.
 - Root cause: The fix conflated two separate v4 limitations: v4 genuinely cannot run -taxids/-taxidlist filtering (confirmed: hard error 'Taxonomy filtering is not supported in v4 BLAST dbs' once taxdb.tar.gz is present), but it DOES store and return per-sequence taxids assigned via -taxid_map at build time.
 - Fix: Split the table row: change 'Per-sequence taxid at build time (-taxid_map): v4 No' to 'Yes (stored, but not filterable)'. Keep 'v4: No' for the '-taxids/-taxidlist support' row (accurate). Add a note that a v4 DB with taxdb.tar.gz present fails LOUDLY (exit 2) rather than silently -- a third, currently undocumented failure mode distinct from the v5-without-taxdb silent no-op.
-
-### `bio-machine-learning-model-validation` — The leakage taxonomy's ordering implies a severity ranking it does not have
-
-- Skill: 93, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/model-validation) · [viewer](skills/bio-machine-learning-model-validation/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 2
-- Problem: Preprocessing leakage heads the table as 'most common, most missed', and feature-selection leakage follows as a 'severe special case'. Measured on identical zero-signal data, selection leakage manufactured 0.357 AUC while scaler leakage cost -0.004 -- that is, nothing at all.
-- Root cause: The table is ordered by frequency while readers will take the first row as the biggest risk.
-- Fix: Add a severity column with indicative magnitudes (selection leakage can produce near-perfect CV from pure noise; scaler leakage is usually small for a single global transform but large for quantile normalisation, ComBat and kNN imputation), so the reader triages by impact rather than by position.
-
-### `bio-machine-learning-model-validation` — The SMOTE warning gives no prevalence regime
-
-- Skill: 93, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/model-validation) · [viewer](skills/bio-machine-learning-model-validation/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 6
-- Problem: The failure mode says oversampling inflates minority-class probabilities with no AUC gain and produces badly miscalibrated risks. At 10% prevalence in the Skill's own example that is exactly what happens; at 24.7% prevalence on real data, AUC rose from 0.783 to 0.810 and Brier improved from 0.1480 to 0.1421.
-- Root cause: The claim is stated unconditionally although its magnitude depends strongly on how severe the imbalance is.
-- Fix: Qualify the entry with the regime it was established in (van den Goorbergh studied severe imbalance) and state that the probability shift scales with the resampling ratio, so mild imbalance may show little effect -- while keeping the recommendation, since even here mean predicted risk drifted above prevalence.
-
-### `bio-machine-learning-model-validation` — No guidance on when nested-versus-flat optimism is large
-
-- Skill: 93, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/model-validation) · [viewer](skills/bio-machine-learning-model-validation/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: 1
-- Problem: Flat CV with tuning is called a known reviewer red flag, but the measured optimism was +0.009 AUC on a 9-point grid over a real dataset. A reader cannot tell from the Skill whether to expect 0.01 or 0.2.
-- Root cause: The bias is described qualitatively although it depends on grid size, signal strength and sample size -- all of which the Skill discusses elsewhere.
-- Fix: Add one line tying the size of the optimism to the number of configurations tried and the sample size, and recommend reporting both numbers when they are close so a reviewer can see the gap rather than infer it.
-
-### `bio-machine-learning-model-validation` — TRIPOD+AI reporting is required but never specified
-
-- Skill: 93, Limited Release · [GPTomics/bioSkills@d91ed3d](https://github.com/GPTomics/bioSkills/tree/d91ed3d563019e649dc854c56ccd62551359488a/machine-learning/model-validation) · [viewer](skills/bio-machine-learning-model-validation/GPTomics-bioSkills@d91ed3d/viewer.md)
-- Observed in inputs: —
-- Problem: The Skill names TRIPOD+AI as the 2024+ target and lists what it demands (data-splitting and leakage controls, calibration, fairness/subgroup performance, uncertainty) but gives no template, checklist or output structure for the report it asks the agent to produce.
-- Root cause: Reporting is treated as a citation rather than as a deliverable.
-- Fix: Add a short output skeleton -- the fields a validation report must carry (split design and unit of independence, leakage controls applied, discrimination with an interval, calibration slope and intercept, net benefit at pre-specified thresholds, subgroup performance) -- so the agent produces something checkable.
 
 ### `bio-microbiome-functional-prediction` — State expected full-run time more prominently
 
