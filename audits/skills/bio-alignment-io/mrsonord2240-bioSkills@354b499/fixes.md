@@ -66,3 +66,19 @@ Redundancy: nothing added twice; the MrBayes and datatype notes live once in the
 
 - SKILL.md is one file (459 -> 472 lines) with no `references/` layer (re-audit P2): moving MAF, A2M/A3M and Pfam streaming out is restructuring beyond the dedup rule.
 - Round-1 "left unfixed" RAxML-NG `*` and PhyML 100-character claims are now resolved (above).
+
+# Final pass (2026-09-24)
+
+Branch `agent/bio-alignment-io-final-pass` (worktree `F:\OpenScience\worktrees\bio-alignment-io-final-pass`), commit `6b9fa869af695c9dcd745c6bca830d6aebe58f68`, from staging main `cf49634b`. Final-pass report: 94, Production Ready, deployable, 31/31 assertions; it is explicitly marked `auditor_independent: false` because this pass fixed and audited under one brief.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+| --- | --- | --- | --- | --- |
+| IUPAC/X-heavy nucleotide data inferred as protein; mixed T/U produced unreadable NEXUS | P2 | `convert_formats.py` now recognizes `ACGTUNRYKMSWBDHVX` as nucleotide, rejects mixed T/U, writes in a temporary directory, and re-reads NEXUS before publish | ran: DNA, RNA, protein, IUPAC/X input and mixed-T/U negative case in `run/final_pass_verify.py` | resolves re-audit alphabet inference recommendation |
+| RNA override on DNA (or DNA on RNA) created partial output | P2 | Any override must equal the inferred molecule type before any output write | ran: RNA-on-DNA exits with a direct contradiction message and no outputs | resolves re-audit override recommendation |
+| MrBayes example did not surface unsafe pipe ids | P2 | Converter warns for ids outside `[A-Za-z0-9_]`; existing SKILL recipe remains the one canonical remediation | ran: copied pipe-id example prints warning and emits readable NEXUS | resolves re-audit MrBayes recommendation without silently renaming ids |
+| Clustal truncation and tree-tool sanitizer were incomplete | P2 | Document Clustal's 30-character no-collision-check behavior; point all relevant tree-tool cells to `[^A-Za-z0-9_]` sanitation | ran: 30-character collision reproduced and documented; text check confirms the full regex | resolves both re-audit identifier recommendations |
+| Main file had no progressive disclosure | P2 | Moved MAF coordinates, A2M/A3M conventions, and Stockholm streaming to three `references/` files linked from the coverage map and a reference index | ran: all links resolve; main `SKILL.md` is 435 lines | resolves re-audit reference-layer recommendation |
+
+## Left unfixed
+
+- None in the final-pass scope. Earlier historical entries above are superseded where this final-pass table says resolved.

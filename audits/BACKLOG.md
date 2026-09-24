@@ -762,7 +762,7 @@ None open.
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (255)
+## P2 (249)
 
 ### `bio-data-visualization-statistical-annotation` — Test-name and label details differ from the tools
 
@@ -1723,54 +1723,6 @@ None open.
 - Problem: The DIA-NN command exists twice and can drift; there is no small input an agent can use to check its filter code before running it on a real report.
 - Root cause: Single-file Skill with an example script that restates rather than sources the command.
 - Fix: Keep one copy of the command in examples/ and have SKILL.md point at it, and ship a tiny synthetic report.parquet (a few hundred rows, including groups that fail only the global q-value) so the filter block is self-testing.
-
-### `bio-alignment-io` — Alphabet inference mislabels IUPAC/X-heavy and mixed T/U data
-
-- Skill: 87, Limited Release · [mrsonord2240/bioSkills@00ddbb3](https://github.com/mrsonord2240/bioSkills/tree/00ddbb34e81668b221fb96daa59530e7432495fa/alignment/alignment-io) · [viewer](skills/bio-alignment-io/mrsonord2240-bioSkills@00ddbb3/viewer.md)
-- Observed in inputs: 8
-- Problem: convert_formats.py counts only ACGTUN, so a nucleotide alignment with more than 10% R/Y/K/M/S/W or X is written as datatype=protein with exit 0, and a mixed T+U alignment is written as datatype=dna into a NEXUS that AlignIO cannot re-read.
-- Root cause: The 90% ACGTUN threshold ignores the other IUPAC nucleotide letters and the post-write assert only greps the datatype line.
-- Fix: Count ACGTUNRYKMSWBDHV as nucleotide, exit with a message when both T and U occur, and re-read output.nex before printing the check line.
-
-### `bio-alignment-io` — RNA/DNA override mismatch ends in a traceback and a 0-byte NEXUS
-
-- Skill: 87, Limited Release · [mrsonord2240/bioSkills@00ddbb3](https://github.com/mrsonord2240/bioSkills/tree/00ddbb34e81668b221fb96daa59530e7432495fa/alignment/alignment-io) · [viewer](skills/bio-alignment-io/mrsonord2240-bioSkills@00ddbb3/viewer.md)
-- Observed in inputs: 1
-- Problem: Overriding RNA on a T-containing alignment (or DNA on a U-containing one) is not caught by the example's guard; Biopython raises after output.fasta and output.phy are written and leaves output.nex empty.
-- Root cause: The mismatch guard compares only protein against nucleotide.
-- Fix: Reject an override whose alphabet contradicts the inferred DNA or RNA before writing anything.
-
-### `bio-alignment-io` — Clustal 30-character id truncation is not documented
-
-- Skill: 87, Limited Release · [mrsonord2240/bioSkills@00ddbb3](https://github.com/mrsonord2240/bioSkills/tree/00ddbb34e81668b221fb96daa59530e7432495fa/alignment/alignment-io) · [viewer](skills/bio-alignment-io/mrsonord2240-bioSkills@00ddbb3/viewer.md)
-- Observed in inputs: 5
-- Problem: The Clustal writer silently cuts ids to 30 characters and returns two ids that differ only after character 30 as identical, unlike PHYLIP which raises; the SKILL documents only PHYLIP name limits while all shipped examples use Clustal.
-- Root cause: Format-specific notes cover PHYLIP truncation only.
-- Fix: Add one sentence to the Format Coverage Map or Format-Specific Notes: Clustal writer truncates ids to 30 characters with no collision check; check id uniqueness after a Clustal round trip.
-
-### `bio-alignment-io` — MrBayes explanation and example miss unquoted pipe ids
-
-- Skill: 87, Limited Release · [mrsonord2240/bioSkills@00ddbb3](https://github.com/mrsonord2240/bioSkills/tree/00ddbb34e81668b221fb96daa59530e7432495fa/alignment/alignment-io) · [viewer](skills/bio-alignment-io/mrsonord2240-bioSkills@00ddbb3/viewer.md)
-- Observed in inputs: 5
-- Problem: The shipped example writes NEXUS with ids such as sp\|P02185\|MYG_PHYMC and lcl\|NM_000518.5 unquoted and MrBayes 3.2.7 rejects them (Unrecognized character '\|'), which is not the quoted-id failure the SKILL describes; the recipe fixes both.
-- Root cause: The SKILL attributes the MrBayes failure to Biopython quoting only, and convert_formats.py does not apply the recipe.
-- Fix: State that MrBayes needs ids of [A-Za-z0-9_] only (quoted or not) and either apply the recipe in convert_formats.py or print a warning when ids contain other characters.
-
-### `bio-alignment-io` — Sanitiser regex [():,] leaves square brackets
-
-- Skill: 87, Limited Release · [mrsonord2240/bioSkills@00ddbb3](https://github.com/mrsonord2240/bioSkills/tree/00ddbb34e81668b221fb96daa59530e7432495fa/alignment/alignment-io) · [viewer](skills/bio-alignment-io/mrsonord2240-bioSkills@00ddbb3/viewer.md)
-- Observed in inputs: 7
-- Problem: A name containing [ is rejected by RAxML-NG 2.0.3 and makes PhyML 3.3.20260528 exit 139 after the initial tree, but the PHYLIP dialect table tells the agent to sanitise with [():,].
-- Root cause: The table's fix regex lists the characters found in earlier probes only.
-- Fix: Point the table's fix cells at the recipe regex [^A-Za-z0-9_] used for MrBayes.
-
-### `bio-alignment-io` — SKILL.md is one 472-line file with no references/ layer
-
-- Skill: 87, Limited Release · [mrsonord2240/bioSkills@00ddbb3](https://github.com/mrsonord2240/bioSkills/tree/00ddbb34e81668b221fb96daa59530e7432495fa/alignment/alignment-io) · [viewer](skills/bio-alignment-io/mrsonord2240-bioSkills@00ddbb3/viewer.md)
-- Observed in inputs: —
-- Problem: MAF, A2M/A3M, Stockholm and pyhmmer streaming sections sit in the main file, so every load pays for all of them.
-- Root cause: No progressive disclosure split.
-- Fix: Move MAF coordinates, A2M/A3M conventions and streaming into references/ files and link them from the Format Coverage Map.
 
 ### `bio-biomart-queries` — Ensembl Genomes 'swap the host' claim does not work for a real dataset
 

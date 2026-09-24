@@ -1,0 +1,445 @@
+{
+  "meta": {
+    "skill_name": "bio-alignment-io",
+    "description": "Read, write, and convert multiple sequence alignment files using Biopython Bio.AlignIO. Supports Clustal, PHYLIP, Stockholm, FASTA, Nexus, and other alignment formats for phylogenetics and conservation analysis.",
+    "evaluated_on": "2026-09-24",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 10,
+    "source": "mrsonord2240/bioSkills@6b9fa869af695c9dcd745c6bca830d6aebe58f68:alignment/alignment-io",
+    "audit_type": "final pass regression of all eight archived scenario areas plus two fresh inputs",
+    "executed": true,
+    "execution_note": "31/31 assertions passed under F:/OpenScience/audit-envs/alignment/Scripts/python.exe (Biopython 1.88).",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "All conversion claims in the final-pass scope were checked against generated alignment files."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "The Skill processes research alignment files and makes no clinical or individual diagnostic claim."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "DNA/RNA/protein labels, MAF coordinates, and downstream identifier cautions are tied to executable checks."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All shipped examples and the modified conversion script ran from copied source with Biopython 1.88."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 93,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 12,
+        "max": 12,
+        "note": "All shipped examples and all documented conversion paths exercised in this final pass."
+      },
+      "reliability": {
+        "score": 12,
+        "max": 12,
+        "note": "Invalid alphabet and override cases fail before new output files are published."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "Streaming guidance is separated for large databases; no full Pfam-A.full run was needed for this I/O Skill."
+      },
+      "agent_usability": {
+        "score": 15,
+        "max": 16,
+        "note": "Main workflow is concise with explicit reference routing for specialized formats."
+      },
+      "human_usability": {
+        "score": 8,
+        "max": 8,
+        "note": "Format choices, output checks, and failure recovery are explicit."
+      },
+      "security": {
+        "score": 12,
+        "max": 12,
+        "note": "Local file processing only; no credential, network, or shell-evaluation path introduced."
+      },
+      "maintainability": {
+        "score": 12,
+        "max": 12,
+        "note": "Reference files isolate MAF, A2M/A3M, and streaming detail without removing route guidance."
+      },
+      "agent_specific": {
+        "score": 15,
+        "max": 20,
+        "note": "Description and decision points directly route reading, writing, conversion, and advanced-format requests."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 94.7,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 31,
+      "total": 31
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Copied shipped examples",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Executed against commit 6b9fa86; all assertions passed.",
+        "executed": true,
+        "execution_note": "Executed by run/final_pass_verify.py with copied examples or synthetic test alignments.",
+        "basic": 37,
+        "specialized": 57,
+        "total": 94,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "read_alignment runs from any cwd",
+            "result": "PASS",
+            "note": "Observed in final_pass_verify.py output."
+          },
+          {
+            "text": "slice_alignment writes its bounded slice",
+            "result": "PASS",
+            "note": "Observed in final_pass_verify.py output."
+          },
+          {
+            "text": "batch_convert creates converted output",
+            "result": "PASS",
+            "note": "Observed in final_pass_verify.py output."
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "NEXUS conversion across alphabets",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Executed against commit 6b9fa86; all assertions passed.",
+        "executed": true,
+        "execution_note": "Executed by run/final_pass_verify.py with copied examples or synthetic test alignments.",
+        "basic": 38,
+        "specialized": 58,
+        "total": 96,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "DNA NEXUS round-trips",
+            "result": "PASS",
+            "note": "Observed in final_pass_verify.py output."
+          },
+          {
+            "text": "RNA NEXUS round-trips",
+            "result": "PASS",
+            "note": "Observed in final_pass_verify.py output."
+          },
+          {
+            "text": "protein NEXUS round-trips",
+            "result": "PASS",
+            "note": "Observed in final_pass_verify.py output."
+          },
+          {
+            "text": "protein sequences survive the NEXUS re-read",
+            "result": "PASS",
+            "note": "Observed in final_pass_verify.py output."
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Clustal identifier collision",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Executed against commit 6b9fa86; all assertions passed.",
+        "executed": true,
+        "execution_note": "Executed by run/final_pass_verify.py with copied examples or synthetic test alignments.",
+        "basic": 37,
+        "specialized": 57,
+        "total": 94,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "Biopython truncates ids at 30 characters",
+            "result": "PASS",
+            "note": "Observed in final_pass_verify.py output."
+          },
+          {
+            "text": "a collision is observable after re-read",
+            "result": "PASS",
+            "note": "Observed in final_pass_verify.py output."
+          },
+          {
+            "text": "the Skill instructs a uniqueness check",
+            "result": "PASS",
+            "note": "Observed in final_pass_verify.py output."
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "MAF minus-strand coordinates",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Executed against commit 6b9fa86; all assertions passed.",
+        "executed": true,
+        "execution_note": "Executed by run/final_pass_verify.py with copied examples or synthetic test alignments.",
+        "basic": 37,
+        "specialized": 57,
+        "total": 94,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "the documented formula returns the known plus-strand coordinate",
+            "result": "PASS",
+            "note": "Observed in final_pass_verify.py output."
+          },
+          {
+            "text": "the reference identifies integer strand annotations",
+            "result": "PASS",
+            "note": "Observed in final_pass_verify.py output."
+          },
+          {
+            "text": "the reference states the complete conversion",
+            "result": "PASS",
+            "note": "Observed in final_pass_verify.py output."
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "MrBayes-safe NEXUS identifiers",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Executed against commit 6b9fa86; all assertions passed.",
+        "executed": true,
+        "execution_note": "Executed by run/final_pass_verify.py with copied examples or synthetic test alignments.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "unsafe ids emit an actionable warning",
+            "result": "PASS",
+            "note": "Observed in final_pass_verify.py output."
+          },
+          {
+            "text": "the emitted NEXUS remains readable",
+            "result": "PASS",
+            "note": "Observed in final_pass_verify.py output."
+          },
+          {
+            "text": "the full safe-id recipe is retained",
+            "result": "PASS",
+            "note": "Observed in final_pass_verify.py output."
+          }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Progressive-disclosure references",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Executed against commit 6b9fa86; all assertions passed.",
+        "executed": true,
+        "execution_note": "Executed by run/final_pass_verify.py with copied examples or synthetic test alignments.",
+        "basic": 37,
+        "specialized": 56,
+        "total": 93,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "all three links resolve",
+            "result": "PASS",
+            "note": "Observed in final_pass_verify.py output."
+          },
+          {
+            "text": "the reference index is present",
+            "result": "PASS",
+            "note": "Observed in final_pass_verify.py output."
+          },
+          {
+            "text": "the main Skill is below 450 lines",
+            "result": "PASS",
+            "note": "Observed in final_pass_verify.py output."
+          }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Ragged A2M rows",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Executed against commit 6b9fa86; all assertions passed.",
+        "executed": true,
+        "execution_note": "Executed by run/final_pass_verify.py with copied examples or synthetic test alignments.",
+        "basic": 37,
+        "specialized": 57,
+        "total": 94,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "SeqIO retains both ragged rows",
+            "result": "PASS",
+            "note": "Observed in final_pass_verify.py output."
+          },
+          {
+            "text": "the match-column extraction is correct",
+            "result": "PASS",
+            "note": "Observed in final_pass_verify.py output."
+          },
+          {
+            "text": "the A3M first-record pitfall remains documented",
+            "result": "PASS",
+            "note": "Observed in final_pass_verify.py output."
+          }
+        ]
+      },
+      {
+        "index": 8,
+        "type": "Regression edge",
+        "label": "IUPAC and X-masked DNA",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Executed against commit 6b9fa86; all assertions passed.",
+        "executed": true,
+        "execution_note": "Executed by run/final_pass_verify.py with copied examples or synthetic test alignments.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "IUPAC/X data infers DNA",
+            "result": "PASS",
+            "note": "Observed in final_pass_verify.py output."
+          },
+          {
+            "text": "the explicit IUPAC alphabet is present",
+            "result": "PASS",
+            "note": "Observed in final_pass_verify.py output."
+          },
+          {
+            "text": "X-masked nucleotides are accepted",
+            "result": "PASS",
+            "note": "Observed in final_pass_verify.py output."
+          }
+        ]
+      },
+      {
+        "index": 9,
+        "type": "Fresh invalid input",
+        "label": "Contradictory RNA override",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Executed against commit 6b9fa86; all assertions passed.",
+        "executed": true,
+        "execution_note": "Executed by run/final_pass_verify.py with copied examples or synthetic test alignments.",
+        "basic": 38,
+        "specialized": 58,
+        "total": 96,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "the command fails",
+            "result": "PASS",
+            "note": "Observed in final_pass_verify.py output."
+          },
+          {
+            "text": "the diagnostic names the contradiction",
+            "result": "PASS",
+            "note": "Observed in final_pass_verify.py output."
+          },
+          {
+            "text": "no outputs replace the preserved input",
+            "result": "PASS",
+            "note": "Observed in final_pass_verify.py output."
+          }
+        ]
+      },
+      {
+        "index": 10,
+        "type": "Fresh invalid input",
+        "label": "Mixed T/U alignment",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "Executed against commit 6b9fa86; all assertions passed.",
+        "executed": true,
+        "execution_note": "Executed by run/final_pass_verify.py with copied examples or synthetic test alignments.",
+        "basic": 38,
+        "specialized": 58,
+        "total": 96,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "the command fails",
+            "result": "PASS",
+            "note": "Observed in final_pass_verify.py output."
+          },
+          {
+            "text": "the diagnostic explains recovery",
+            "result": "PASS",
+            "note": "Observed in final_pass_verify.py output."
+          },
+          {
+            "text": "the command exits without a traceback",
+            "result": "PASS",
+            "note": "Observed in final_pass_verify.py output."
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 37.2,
+    "dynamic_weighted": 56.8,
+    "score": 94,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "\u2b50",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "All six canonical open P2 findings were corrected and covered by final-pass assertions.",
+    "NEXUS conversion validates the inferred alphabet before output and re-reads NEXUS before publishing files.",
+    "The 435-line main Skill routes format-specific complexity into three focused reference files.",
+    "Every archived scenario area and two new negative cases executed successfully from copied source."
+  ],
+  "recommendations": []
+}
