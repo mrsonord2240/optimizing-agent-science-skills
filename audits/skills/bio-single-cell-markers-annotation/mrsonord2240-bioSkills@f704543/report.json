@@ -1,0 +1,79 @@
+{
+  "meta": {
+    "skill_name": "bio-single-cell-markers-annotation",
+    "source": "mrsonord2240/bioSkills@f704543b45168b0df1a09670e5f584e173c06d97:single-cell/markers-annotation",
+    "evaluated_on": "2026-09-24",
+    "evaluator_version": "skill-auditor@1.0 exact-commit focused re-audit"
+  },
+  "skill": {
+    "name": "bio-single-cell-markers-annotation",
+    "path": "F:\\OpenScience\\worktrees\\bio-single-cell-markers-annotation-fixpass\\single-cell\\markers-annotation",
+    "source_commit": "f704543b45168b0df1a09670e5f584e173c06d97",
+    "base_commit": "12be3fc12a733fbbb8479bc8aa6abc1248950803",
+    "audited_on": "2026-09-24",
+    "mode": "exact-commit focused re-audit"
+  },
+  "pre_fix_evidence": {
+    "report": "re-audit-20260924/pre-fix/eval_report_bio-single-cell-markers-annotation_result.json",
+    "viewer": "re-audit-20260924/pre-fix/eval_viewer_bio-single-cell-markers-annotation.md",
+    "score": 88,
+    "assertions": "19/20"
+  },
+  "structural_veto": {
+    "stability": "PASS",
+    "contract": "PASS",
+    "determinism": "PASS",
+    "security": "PASS",
+    "research_veto": "PASS"
+  },
+  "final": {
+    "static_weighted": 37.6,
+    "dynamic_weighted": 56.0,
+    "score": 94,
+    "max": 100,
+    "grade": "Production Ready",
+    "deployable": true,
+    "open_p0": 0,
+    "open_p1": 0,
+    "open_p2": 0
+  },
+  "recommendations": [],
+  "re_audit": {
+    "execution_average": 93.4,
+    "assertion_pass_rate": { "passed": 20, "total": 20 },
+    "final": {
+      "static_weighted": 37.6,
+      "dynamic_weighted": 56.0,
+      "score": 94,
+      "max": 100,
+      "grade": "Production Ready",
+      "deployable": true
+    },
+    "assertion_basis": "The 19 prior passing assertions concern unchanged behavior and are carried forward. The one prior failing pseudobulk assertion plus all four P2 remediation contracts were checked at the exact clean source commit. Focused evidence is in re-audit-20260924/run-focused/.",
+    "focused_validations": [
+      {
+        "name": "raw-count pseudobulk",
+        "evidence": "re-audit-20260924/run-focused/focused_validation.out",
+        "result": "PASS: exact SKILL.md block aggregated the counts layer by sample to [[5,1],[1,6]]; values were integral."
+      },
+      {
+        "name": "missing raw-count recovery",
+        "evidence": "re-audit-20260924/run-focused/focused_validation.out",
+        "result": "PASS: the exact block raises a named ValueError before normalized .X can be aggregated."
+      },
+      {
+        "name": "P2 documentation contracts",
+        "evidence": "re-audit-20260924/run-focused/focused_validation.out",
+        "result": "PASS: explicit nbin=25 replaces the unverifiable default; the CD8/NK lineage gate, reporting block, and non-integer pseudobulk Common Errors row are present."
+      }
+    ],
+    "resolved_findings": [
+      "P1 Python pseudobulk now explicitly aggregates layer='counts', checks for the layer, and verifies integer-valued output.",
+      "P2 recovery guidance now covers non-integer pseudobulk and absent raw counts in both the main skill and usage guide.",
+      "P2 PBMC panel now requires a CD3D/CD3E lineage gate before distinguishing CD8 T from NK cytotoxic markers.",
+      "P2 unverified Seurat 24-bin claim was removed; both ecosystems now receive explicit 25-bin/50-control settings for comparisons.",
+      "P2 reporting guidance now states the ranking method/version/thresholds, effect and fraction fields, lineage gates, and descriptive p-value caveat."
+    ],
+    "remaining_findings": []
+  }
+}

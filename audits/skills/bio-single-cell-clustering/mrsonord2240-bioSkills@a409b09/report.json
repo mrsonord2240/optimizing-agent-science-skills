@@ -1,0 +1,56 @@
+{
+  "meta": {
+    "skill_name": "bio-single-cell-clustering",
+    "description": "Dimensionality reduction and graph-based single-cell RNA-seq clustering with Scanpy and Seurat, including non-circular validation of candidate partitions.",
+    "source": "mrsonord2240/bioSkills@a409b098b3602b13d7c40610f1c6bc09057258ac:single-cell/clustering",
+    "evaluated_on": "2026-09-24",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Moderate",
+    "n_inputs": 7,
+    "executed_inputs": "7/7"
+  },
+  "veto_gates": {
+    "skill_veto": { "gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS" },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "The revised skill explicitly rejects circular marker-based validation and avoids unsupported biological population claims." },
+      "practice_boundaries": { "result": "PASS", "detail": "The skill analyzes research data only and makes no clinical diagnostic or treatment recommendation." },
+      "methodological_ground": { "result": "PASS", "detail": "Validation now separates covariate confounding, resampling stability, formal split testing, and independent replication." },
+      "code_usability": { "result": "PASS", "detail": "The exact-commit helper and all Python blocks compiled; its focused execution validated output and missing-key behavior. The optional scSHC package is absent and the skill fails clearly rather than substituting invalid marker p-values." }
+    }
+  },
+  "static_score": {
+    "subtotal": 94,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 12, "max": 12, "note": "The main clustering, sweep, Seurat, subclustering, reproducibility, validation, and reporting paths are documented with a bundled validation helper." },
+      "reliability": { "score": 11, "max": 12, "note": "The helper validates labels, PCA, and resolution; formal testing correctly stops when its optional package is unavailable." },
+      "performance_context": { "score": 7, "max": 8, "note": "The 250-line entrypoint has necessary code paths and the bootstrap cost is explicit, but validation detail remains concentrated in SKILL.md." },
+      "agent_usability": { "score": 16, "max": 16, "note": "Choice rules, runnable checks, concrete output requirements, and explicit non-circular stop conditions are directly actionable." },
+      "human_usability": { "score": 8, "max": 8, "note": "Natural clustering prompts and clear distinctions between hypotheses and population claims make the scope discoverable." },
+      "security": { "score": 10, "max": 12, "note": "No credentials, network, eval, or destructive action; donor-data-specific governance remains outside this narrow clustering skill." },
+      "maintainability": { "score": 11, "max": 12, "note": "The independent helper has parameter and input guards, while Python and R workflow guidance remains easy to update." },
+      "agent_specific": { "score": 19, "max": 20, "note": "The skill is composable with preprocessing, integration, annotation, and formal testing, and now gives a real stop/hypothesis escape hatch." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 96.0,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 28, "total": 28 },
+    "inputs": [
+      { "index": 1, "type": "Canonical", "label": "Defensible Scanpy clustering sweep", "status": "COMPLETED", "status_flag": "✅", "note": "Exact source retains pinned igraph Leiden and the revised PC decision rule.", "basic": 39, "specialized": 57, "total": 96, "assertions_passed": 4, "assertions_total": 4, "assertions": [{ "text": "Leiden backend and iterations are pinned", "result": "PASS", "note": "Pinned igraph route present." }, { "text": "n_pcs treats elbow as a floor", "result": "PASS", "note": "max(elbow, about 30) is explicit." }, { "text": "Resolution is swept", "result": "PASS", "note": "Sweep block remains executable." }, { "text": "Output requirements are explicit", "result": "PASS", "note": "What-to-report block is present." }] },
+      { "index": 2, "type": "Variant A", "label": "Seurat 5 Leiden route", "status": "COMPLETED", "status_flag": "✅", "note": "Seurat 5.5.0 exposes leiden_method; the local R environment lacks leidenbase and the corrected source gives the installation and igraph routes.", "basic": 39, "specialized": 57, "total": 96, "assertions_passed": 4, "assertions_total": 4, "assertions": [{ "text": "Seurat 5 dependency is named correctly", "result": "PASS", "note": "leidenbase documented." }, { "text": "Alternative backend is available", "result": "PASS", "note": "leiden_method='igraph' documented." }, { "text": "Version boundary is acknowledged", "result": "PASS", "note": "Older reticulate route retained conditionally." }, { "text": "Louvain default is not misrepresented", "result": "PASS", "note": "algorithm=1 remains documented." }] },
+      { "index": 3, "type": "Edge", "label": "Batch-driven split of one population", "status": "COMPLETED", "status_flag": "✅", "note": "The new operational gate reports ARI against batch/sample/QC and bootstrap Jaccard instead of deciding from marker overlap.", "basic": 39, "specialized": 58, "total": 97, "assertions_passed": 4, "assertions_total": 4, "assertions": [{ "text": "Covariate alignment is measurable", "result": "PASS", "note": "ARI output is implemented." }, { "text": "Bootstrap stability is measurable", "result": "PASS", "note": "Per-cluster Jaccard returned." }, { "text": "Markers do not decide the split", "result": "PASS", "note": "Explicitly prohibited." }, { "text": "Technical alignment yields a stop/hypothesis outcome", "result": "PASS", "note": "Subclustering stop rule states this." }] },
+      { "index": 4, "type": "Variant B", "label": "Homogeneous-subset subclustering", "status": "COMPLETED", "status_flag": "✅", "note": "Subclustering retains local HVG/PCA guidance and now requires non-circular validation before a population claim.", "basic": 39, "specialized": 57, "total": 96, "assertions_passed": 4, "assertions_total": 4, "assertions": [{ "text": "Subset PCA is recomputed", "result": "PASS", "note": "Workflow remains present." }, { "text": "Marker distinctness is not a stop rule", "result": "PASS", "note": "Explicit correction present." }, { "text": "Independent replication is required for a claim", "result": "PASS", "note": "Explicit requirement present." }, { "text": "Unvalidated split remains a hypothesis", "result": "PASS", "note": "Stated in reporting rule." }] },
+      { "index": 5, "type": "Stress", "label": "High-resolution marker p-value claim", "status": "COMPLETED", "status_flag": "✅", "note": "The exact source preserves the double-dipping warning and makes marker p-values ranking-only in sweep reports.", "basic": 39, "specialized": 57, "total": 96, "assertions_passed": 4, "assertions_total": 4, "assertions": [{ "text": "Post-clustering p-values are rejected as inference", "result": "PASS", "note": "Double-dipping section retained." }, { "text": "Markers may still rank candidates", "result": "PASS", "note": "Reporting section says ranking only." }, { "text": "Formal split testing is named", "result": "PASS", "note": "scSHC and CHOIR present." }, { "text": "UMAP remains display-only", "result": "PASS", "note": "Visualization boundary retained." }] },
+      { "index": 6, "type": "Adversarial", "label": "Helper input guards and stability aggregation", "status": "COMPLETED", "status_flag": "✅", "note": "Focused exact-commit helper execution printed ARI=1.000, two Jaccard values of 1.000, and raised KeyError for missing labels.", "basic": 39, "specialized": 58, "total": 97, "assertions_passed": 4, "assertions_total": 4, "assertions": [{ "text": "Helper imports and runs", "result": "PASS", "note": "Exact source executed." }, { "text": "Covariate ARI prints", "result": "PASS", "note": "ARI(candidate, batch)=1.000." }, { "text": "Jaccard aggregation returns per-cluster results", "result": "PASS", "note": "Two clusters returned." }, { "text": "Missing labels fail clearly", "result": "PASS", "note": "KeyError asserted." }] },
+      { "index": 7, "type": "Scope Boundary", "label": "Formal-test availability boundary", "status": "COMPLETED", "status_flag": "✅", "note": "Four Python blocks compiled; source has an scSHC package guard and direct documented call rather than falling back to invalid marker inference.", "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 4, "assertions_total": 4, "assertions": [{ "text": "Python snippets compile", "result": "PASS", "note": "Four blocks compiled." }, { "text": "scSHC absence fails clearly", "result": "PASS", "note": "requireNamespace guard is explicit." }, { "text": "Formal test call is supplied", "result": "PASS", "note": "scSHC::scSHC(expr_hvg) present." }, { "text": "No invalid fallback is recommended", "result": "PASS", "note": "Marker p-values remain ranking-only." }] }
+    ]
+  },
+  "final": { "static_weighted": 37.6, "dynamic_weighted": 57.6, "score": 95, "max": 100, "grade": "Production Ready", "grade_symbol": "⭐", "deployable": true, "veto_override": false },
+  "key_strengths": ["The prior circular marker-overlap stop rule is replaced by runnable covariate and stability checks.", "Seurat 5 Leiden backend guidance now matches the installed API boundary.", "The PC elbow ambiguity is resolved with a stability-first rule.", "Sweep reports now require the measurements needed for a reviewable decision."],
+  "recommendations": []
+}

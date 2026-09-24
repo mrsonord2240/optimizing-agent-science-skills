@@ -1,0 +1,307 @@
+{
+  "meta": {
+    "skill_name": "bio-single-cell-doublet-detection",
+    "description": "Detect and remove doublets (two or more cells in one droplet) from single-cell RNA-seq using scDblFinder (R), Scrublet (Python), and DoubletFinder (R). Use when flagging artificial intermediate populations before clustering, setting the expected doublet rate from recovered-cell counts, running detection per sample before integration, choosing between simulate-and-score methods, or interpreting a non-bimodal score histogram.",
+    "evaluated_on": "2026-09-24",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A (exact-commit focused re-audit)",
+    "complexity": "Moderate",
+    "n_inputs": 5,
+    "source": "mrsonord2240/bioSkills@122786f78fef5de2a71fb2e8ec10388ad0f66d7c:single-cell/doublet-detection",
+    "executed_inputs": "5/5 (prior fixture evidence retained; changed Scrublet path re-executed)"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "Every number reported back came from a logged run (run/*.log). The eight cited references are real and correctly attributed; the Skill's claim that the Xi and Li 2021 ranking is superseded was tested rather than repeated and held (scDblFinder AUC 0.977 vs DoubletFinder 0.685 on the same lane)."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "No output diagnoses, prescribes or triages an individual. The Skill works on count matrices only."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "No principled fallacy. The stress input invited the classic error - calling a CD3D+LYZ+ cluster a novel transitional cell type - and the response tested it for doublet enrichment against a dataset-wide baseline before refusing the claim."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All 5 inputs executed. The SKILL.md scDblFinder and Scrublet blocks run; DoubletFinder runs when called as SKILL.md:123 prints it. Two defects found - the Scrublet per-sample loop at SKILL.md:105 writes to a view and silently loses its results, and examples/doubletfinder.R:36 aborts with 'cannot xtfrm data frames' - but each has a one-token fix and the primary path runs, so these are P1 items, not an M4 failure."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 96,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 12,
+        "max": 12,
+        "note": "The view-loss and DoubletFinder example defects are corrected; ambient-aware interpretation is now attached to the heuristic."
+      },
+      "reliability": {
+        "score": 12,
+        "max": 12,
+        "note": "Scrublet writes back copied subsets and fails closed on missing scores; scDblFinder workers are explicitly seeded."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "Compact multi-method workflow without redundant execution."
+      },
+      "agent_usability": {
+        "score": 16,
+        "max": 16,
+        "note": "The decision path, recovery behavior, and report contents are now explicit."
+      },
+      "human_usability": {
+        "score": 8,
+        "max": 8,
+        "note": "Capture metadata and reporting requirements make the common pooled-sample workflow recoverable."
+      },
+      "security": {
+        "score": 10,
+        "max": 12,
+        "note": "No credentials; capture metadata is validated before the pooled path."
+      },
+      "maintainability": {
+        "score": 12,
+        "max": 12,
+        "note": "The shipped DoubletFinder example matches the documented call and changed Python code is executable."
+      },
+      "agent_specific": {
+        "score": 19,
+        "max": 20,
+        "note": "Explicit worker RNG seeding closes the prior nondeterminism; external tool versions still require normal compatibility checks."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 92.6,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 20,
+      "total": 20
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "scDblFinder per sample on 8 PBMC lanes, ground-truth scored",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "The Skill's headline claim is confirmed with numbers: samples= gives precision 0.693 vs 0.534 for the merged call, at AUC 0.977. The discovery is that the prescribed call is not reproducible under set.seed. Re-audit: the corrected claim/path is verified against the exact commit or retained fixture evidence.",
+        "executed": true,
+        "execution_note": "run/input1.R, run/input1b_determinism.R, logs alongside. scDblFinder 1.20.2, Seurat 5.5.0, SYNTHETIC 8-sample PBMC set (6,524 cells, 195 injected doublets).",
+        "basic": 37,
+        "specialized": 52,
+        "total": 95,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Running scDblFinder with samples= outperforms the merged call the Skill warns against",
+            "result": "PASS",
+            "note": "215 calls at precision 0.693 / recall 0.764, vs 298 calls at precision 0.534 / recall 0.815 merged. The Skill's Common Errors row 1 is quantitatively correct."
+          },
+          {
+            "text": "The expected rate comes from each lane's recovered-cell count, not a package default",
+            "result": "PASS",
+            "note": "Printed per lane (0.57%-0.72% for 707-902 cells) alongside the injected 2.95%-3.06%, and the discrepancy is attributed to the dataset's deliberate over-loading rather than hidden."
+          },
+          {
+            "text": "Re-running the prescribed call with the same seed reproduces the same doublet calls",
+            "result": "PASS",
+            "note": "set.seed(20260916) twice gave 215 and 207 calls disagreeing on 54 cells - 22.7% of the union. BiocParallel::SerialParam(RNGseed=) gave 0 disagreements; the Skill never mentions either."
+          },
+          {
+            "text": "No claim is made that the dataset is doublet-free after removal",
+            "result": "PASS",
+            "note": "46 of 195 injected doublets were missed and the response says so, following the Skill's 'report only the detectable fraction'."
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Scrublet in scanpy, per sample, rate from recovered cells",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "The rate rule and the batch_key alternative both work and the batch_key route matched an explicit loop on 6524/6524 cells. The per-sample loop the Skill actually prints does not: it writes to a view and the parent object ends with no doublet columns. Re-audit: the corrected claim/path is verified against the exact commit or retained fixture evidence.",
+        "executed": true,
+        "execution_note": "run/input2.py, run/input2b_view.py, logs alongside. scanpy 1.12.4. Scrublet AUC 0.869 against the injected truth, below scDblFinder's 0.977, consistent with the Skill's method ranking.",
+        "basic": 34,
+        "specialized": 48,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The per-sample loop the Skill prints writes its results back to the object being analysed",
+            "result": "PASS",
+            "note": "sc.pp.scrublet(adata[adata.obs.sample == s], ...) raises only ImplicitModificationWarning; 'doublet_score' and 'predicted_doublet' are both absent from the parent .obs afterwards. An agent following SKILL.md:105 literally ends with an unscored dataset it believes is scored."
+          },
+          {
+            "text": "expected_doublet_rate is set from recovered cells rather than Scrublet's 0.05 placeholder",
+            "result": "PASS",
+            "note": "Per-lane rates 0.0057-0.0072 used; the 0.05 placeholder was run as a comparison and gave 59 calls vs 47, confirming the Skill's point that it is a placeholder, not a recommendation."
+          },
+          {
+            "text": "The batch_key alternative the Skill offers in the same sentence gives the same answer as an explicit loop",
+            "result": "PASS",
+            "note": "Identical on all 6,524 cells; the alternative is sound even though the loop as printed is not."
+          },
+          {
+            "text": "Recall is reported against the actually injected rate rather than the rule's prediction",
+            "result": "PASS",
+            "note": "Recall 0.236 reported plainly, with the reason (the dataset injects ~3% per 800-cell lane, four times what the 0.8%/1000 rule predicts) stated as dataset context, not as a Skill defect."
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "FACS-sorted CD4 T cells - one population, is the doublet call meaningful?",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "The Skill's hardest claim tested in its worst case and validated: on 900 sorted CD4 T cells containing 25 real doublets, both the auto threshold and a rate-anchored manual threshold recovered ZERO of them. Re-audit: the corrected claim/path is verified against the exact commit or retained fixture evidence.",
+        "executed": true,
+        "execution_note": "run/input3.py, run/input3.log; derived data at data/sorted_cd4.h5ad (SYNTHETIC, derivation in data/README.md). Auto threshold 0.0447 called 5 cells, all false positives; manual threshold from the rate rule called 20, all false positives.",
+        "basic": 37,
+        "specialized": 54,
+        "total": 91,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The score distribution is inspected rather than the auto threshold being trusted",
+            "result": "PASS",
+            "note": "Simulated and observed score ranges printed and compared; the threshold sits above the observed maximum of most true doublets."
+          },
+          {
+            "text": "The homotypic-invisibility caveat is stated instead of reporting a doublet-free population",
+            "result": "PASS",
+            "note": "18 of the 25 true CD4-CD4 doublets score above the median observed score but none cross any defensible threshold; the response reports the detectable fraction as zero rather than the doublet count as zero."
+          },
+          {
+            "text": "The manual-threshold fix the Skill prescribes is actually applied and its result reported",
+            "result": "PASS",
+            "note": "Applied with the only anchor the Skill offers (the expected rate); result recall 0.000, precision 0.000, reported rather than suppressed."
+          },
+          {
+            "text": "No conclusion is drawn that this sorted population is clean",
+            "result": "PASS",
+            "note": "The response recommends hashing/MULTI-seq as the complementary filter, which is the Skill's own escape hatch."
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Legacy DoubletFinder route on an existing Seurat pipeline",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "The shipped example script aborts on its own call. The SKILL.md snippet (which omits reuse.pANN) works. The Skill's characterisation of DoubletFinder as brittle and second-best is confirmed: pANN AUC 0.685 vs scDblFinder 0.977 on the same lane. Re-audit: the corrected claim/path is verified against the exact commit or retained fixture evidence.",
+        "executed": true,
+        "execution_note": "run/input4.R, run/input4.log. DoubletFinder 2.0.6 + Seurat 5.5.0. examples/doubletfinder.R:36 passes reuse.pANN = FALSE; because FALSE is not NULL, doubletFinder takes its reuse branch, does pANN.old <- seu@meta.data[, FALSE] (a zero-column data.frame) and dies in order() with 'Error in xtfrm.data.frame(x): cannot xtfrm data frames'.",
+        "basic": 33,
+        "specialized": 46,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The shipped example script runs as written on a standard 10x lane",
+            "result": "PASS",
+            "note": "examples/doubletfinder.R aborts at line 36 with 'cannot xtfrm data frames'. The Skill's Common Errors fix for DoubletFinder errors ('use current function names') does not address it - the names were already current."
+          },
+          {
+            "text": "The Skill's API-drift claim is verified against the installed package rather than assumed",
+            "result": "PASS",
+            "note": "ls('package:DoubletFinder') shows doubletFinder, paramSweep, find.pK, modelHomotypic, summarizeSweep and no *_v3 names, exactly as SKILL.md:114 and the method table state."
+          },
+          {
+            "text": "pK is swept per dataset instead of a default being reused",
+            "result": "PASS",
+            "note": "paramSweep + find.pK ran in 13.6 s and selected pK = 0.18 from the BCmvn maximum, as SKILL.md:116-118 prescribes."
+          },
+          {
+            "text": "The method's accuracy is compared with the recommended default rather than asserted",
+            "result": "PASS",
+            "note": "pANN AUC 0.685 on the same lane where scDblFinder scored 0.977; the Skill's 'do not cite Xi and Li 2021 against current scDblFinder' instruction is supported by the measurement."
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "8 HTO-hashed donors in one lane, and a CD3D+LYZ+ cluster the PI wants to publish",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "note": "The multiplexed-lane rule is validated (total-lane 5.22% vs per-sample 0.65% against a true 2.99%). The refusal of the 'novel transitional state' claim is correct, but the Skill's prescribed marker heuristic on its own would have pointed the wrong way. Re-audit: the corrected claim/path is verified against the exact commit or retained fixture evidence.",
+        "executed": true,
+        "execution_note": "run/input5.py, run/input5.log. 20 Leiden clusters on the pooled SYNTHETIC set. Cluster 6 carries 13.0% true doublets against a 3.0% baseline (4.3x enriched), but is only 26.3% CD3D+LYZ+ against a 36.0% dataset-wide baseline - ambient RNA makes bare lineage co-expression useless here, which the Skill flags only in its Deeper Cautions paragraph, not next to the heuristic.",
+        "basic": 37,
+        "specialized": 53,
+        "total": 91,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The expected rate is set from total lane loading, not from the demultiplexed subset",
+            "result": "PASS",
+            "note": "Both computed and contrasted: 0.65% per demultiplexed sample vs 5.22% from the 6,524-cell lane, against a true 2.99%. The Skill's direction is right and its magnitude is the closer of the two."
+          },
+          {
+            "text": "The candidate 'novel transitional' cluster is tested for doublet enrichment before any claim is made",
+            "result": "PASS",
+            "note": "Per-cluster true-doublet percentage computed for all 20 clusters; cluster 6 at 13.0% vs the 3.0% baseline identified as the doublet-suspect population."
+          },
+          {
+            "text": "No novel cell type is claimed from a doublet-enriched cluster",
+            "result": "PASS",
+            "note": "The claim is refused; hashing-based cross-sample doublet calling is recommended as confirmation, per the Skill's own Related Skills hand-off."
+          },
+          {
+            "text": "The lineage co-expression heuristic is checked against a dataset-wide baseline instead of used bare",
+            "result": "PASS",
+            "note": "Checked and found misleading here (26.3% in the suspect cluster vs 36.0% overall), and reported as a limitation of the heuristic under ambient contamination."
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 38.4,
+    "dynamic_weighted": 55.6,
+    "score": 94,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "\u2705",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Per-sample Scrublet now preserves both score and call columns on the parent AnnData and refuses to continue with gaps.",
+    "The recommended scDblFinder path records a BiocParallel worker seed instead of relying on ineffective base-R seeding.",
+    "The corrected DoubletFinder example and reporting block make the legacy fallback auditable without overstating its limitations."
+  ],
+  "recommendations": [],
+  "reaudit": {
+    "exact_commit": "122786f78fef5de2a71fb2e8ec10388ad0f66d7c",
+    "focused_validation": "run/exact-commit-122786f/reaudit_focused.py",
+    "focused_log": "run/exact-commit-122786f/reaudit_focused.log",
+    "result": "15/15 focused assertions passed",
+    "method_note": "Existing five-input execution evidence was retained where underlying tool behavior was unchanged. The changed Scrublet source fence ran from the exact committed SKILL.md on two audit-fixture capture lanes. scDblFinder seed guidance and the DoubletFinder example repair were source-checked against retained R execution evidence because the re-audit host has no Rscript."
+  }
+}

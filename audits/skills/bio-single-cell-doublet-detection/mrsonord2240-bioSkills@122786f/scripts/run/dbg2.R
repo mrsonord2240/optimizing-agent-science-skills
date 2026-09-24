@@ -1,0 +1,5 @@
+.libPaths(c('F:/OpenScience/audit-envs/single-cell-transcriptomics-analyst/R-lib', .libPaths()))
+suppressPackageStartupMessages({library(Seurat); library(DoubletFinder)})
+txt <- deparse(body(DoubletFinder::doubletFinder))
+i <- grep('pANN', txt)
+cat(paste0(i, ': ', txt[i], collapse='\n'), '\n')
