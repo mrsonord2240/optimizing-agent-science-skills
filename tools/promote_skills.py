@@ -22,7 +22,7 @@ import time
 REC = "F:/optimizing-agent-science-skills"
 FORK = "F:/OpenScience/external/mrsonord2240__bioSkills"
 UPSTREAM_COMMIT = "d91ed3d563019e649dc854c56ccd62551359488a"
-FORK_COMMIT = "7bf6ff4b1b6d0b94c5a4e63988c6e2b34e347f2c"
+FORK_COMMIT = "cf49634bbedaea7d5f5c0fda81526343d40e3e62"
 AUDITS = "F:/OpenScience/audits"
 OUT = "F:/optimized-scientific-skills"
 SHELF_SIZE = 157
@@ -42,7 +42,7 @@ OUT_OF_SCOPE = {
 }
 
 
-def load_shelf_scope(out_dir=OUT):
+def load_shelf_rows(out_dir=OUT):
     """The published shelf is an update-in-place scope, not an expanding audit queue.
 
     Sam fixed this pass at the 157 Skills already published on 2026-09-24.  Audit records for
@@ -61,7 +61,11 @@ def load_shelf_scope(out_dir=OUT):
         raise SystemExit(
             f"{path}: expected exactly {SHELF_SIZE} unique published Skills, "
             f"found {len(ids)} unique ids across {len(rows)} rows")
-    return ids
+    return rows
+
+
+def load_shelf_scope(out_dir=OUT):
+    return {row["id"] for row in load_shelf_rows(out_dir)}
 
 
 def load_marketplace_holds(path=MARKETPLACE_HOLDS):
@@ -199,6 +203,36 @@ def unmerged_records(rep, idx):
     return bad
 
 
+def shelf_bytes_match_pinned_source(row, out_dir=OUT):
+    """Prove a carried shelf entry already contains the bytes at FORK_COMMIT.
+
+    An unmerged audit record must not replace the last published score, but a fixed-size shelf also
+    must not drop that Skill. Carrying the existing row is safe only when its current files are
+    byte-identical to the path at the pinned staging commit.
+    """
+    prefix = row["upstream_path"] + "/"
+    source_paths = sorted(path for path in staging_tree() if path.startswith(prefix))
+    skill_dir = os.path.join(out_dir, "skills", row["id"])
+    if not source_paths or not os.path.isdir(skill_dir):
+        return False
+    shelf_paths = sorted(
+        os.path.relpath(os.path.join(root, name), skill_dir).replace(os.sep, "/")
+        for root, _, files in os.walk(skill_dir)
+        for name in files
+    )
+    relative_source_paths = [path[len(prefix):] for path in source_paths]
+    if shelf_paths != relative_source_paths:
+        return False
+    for source_path, relative in zip(source_paths, relative_source_paths):
+        expected = subprocess.run(
+            ["git", "show", f"{FORK_COMMIT}:{source_path}"], cwd=FORK, capture_output=True
+        ).stdout
+        with open(os.path.join(skill_dir, *relative.split("/")), "rb") as fh:
+            if fh.read() != expected:
+                return False
+    return True
+
+
 def acquire_promote_lock(out_dir=OUT, timeout=600, poll=2):
     """Atomic mkdir lock so two concurrent `--apply` runs never race the same rmtree/rebuild of
     `skills/`. Several agents hit this collision by hand on 2026-09-19 (crash mid-rmtree, or one
@@ -231,7 +265,8 @@ def main():
     if apply:
         acquire_promote_lock()
     idx = skill_index()
-    shelf_scope = load_shelf_scope()
+    existing_shelf_rows = {row["id"]: row for row in load_shelf_rows()}
+    shelf_scope = set(existing_shelf_rows)
     unknown_shelf_ids = sorted(shelf_scope - set(idx))
     if unknown_shelf_ids:
         raise SystemExit("published shelf Skill(s) missing from the pinned source tree: "
@@ -280,6 +315,19 @@ def main():
                 finished.append(row)
         else:
             excluded.append(row)
+
+    carried_unmerged = []
+    for sid in sorted(set(unmerged) & shelf_scope):
+        row = dict(existing_shelf_rows[sid])
+        if not shelf_bytes_match_pinned_source(row):
+            raise SystemExit(
+                f"{sid}: cannot carry the existing shelf entry because its files differ from "
+                f"{FORK_COMMIT[:8]}:{row['upstream_path']}"
+            )
+        finished.append(row)
+        carried_unmerged.append(sid)
+    if carried_unmerged:
+        print("carried   : " + ", ".join(carried_unmerged))
 
     for row in finished:
         kind, files = classify(row["upstream_path"])
