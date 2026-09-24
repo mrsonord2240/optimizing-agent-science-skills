@@ -1,0 +1,63 @@
+{
+  "meta": {
+    "skill_name": "bio-single-cell-splicing",
+    "evaluated_on": "2026-09-24",
+    "evaluator_version": "final-pass@1.0",
+    "source": "mrsonord2240/bioSkills@31a33c13b6b6dd92395c7d399245534317ae1f39:alternative-splicing/single-cell-splicing",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md",
+    "exact_commit_note": "This report evaluates exactly commit 31a33c13b6b6dd92395c7d399245534317ae1f39 on source main. The executed workflow evidence was produced on its skill-content parent 540d2a2750cd58be3d3402d9a6d02f71d5b0d3a1; 31a33c1 only converts the description to colon-safe YAML without changing its meaning or workflow content.",
+    "prior_report": "2026-09-20 re-audit, score 84; its P1 and all P2 recommendations were corrected in this commit."
+  },
+  "veto_gates": {
+    "skill_veto": "PASS",
+    "research_veto": "PASS",
+    "notes": "Chemistry gate, APA/splicing separation, anti-imputation boundary, and replicate-aware pseudobulk boundary are retained."
+  },
+  "checks": [
+    {
+      "input": "Archived MARVEL demo / 39c_marvel_RI_readlen.R",
+      "kind": "archived",
+      "result": "PASS",
+      "evidence": "The exact corrected invocation completed on the MARVEL package demo: 10 RI rows across 26 cells."
+    },
+    {
+      "input": "Fresh documentation contract",
+      "kind": "fresh",
+      "result": "PASS",
+      "evidence": "Seven references resolve; MARVEL includes thread=2/read.length=100; scQuint includes chr-prefix contract and adata.n_vars guard; unsupported 10X figures are absent."
+    },
+    {
+      "input": "Fresh synthetic pseudobulk fixture",
+      "kind": "fresh",
+      "result": "PASS",
+      "evidence": "The exact helper produced 3 x 6 pseudobulks, conserved 630 of 630 reads, and rejected RangeIndex metadata."
+    },
+    {
+      "input": "Archived scQuint compatible and incompatible contig fixtures",
+      "kind": "archived",
+      "result": "PASS",
+      "evidence": "Compatible bounded fixture completed with 4 groups/8 introns; incompatible real pairing annotated zero introns and triggered the documented guard."
+    },
+    {
+      "input": "Live BRIE2 help and SpliZ configuration contract",
+      "kind": "fresh",
+      "result": "PASS",
+      "evidence": "All documented BRIE2 flags and SpliZ configuration keys are present."
+    }
+  ],
+  "resolved": [
+    "P1: scQuint now states its chr-prefixed-junction/unprefixed-GTF compatibility contract, checks annotation success, and reports the observed sparse-group ValueError.",
+    "P2: MARVEL RI has an explicit thread=2 and read.length=100 invocation.",
+    "P2: operational tool workflows moved from the 561-line root guide into seven progressive references; root guide is 130 lines.",
+    "P2: unsupported 10X figures were dropped; install guidance and Psix performance trade-offs are explicitly hedged."
+  ],
+  "recommendations": [],
+  "final": {
+    "score": 94,
+    "max": 100,
+    "grade": "Production Ready",
+    "deployable": true,
+    "honest_limit": "SpliZ remains unexecuted because Nextflow is unavailable; the source labels it as unrun and directs users to verify the live pipeline configuration."
+  }
+}

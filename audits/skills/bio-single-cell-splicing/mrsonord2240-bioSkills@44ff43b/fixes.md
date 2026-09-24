@@ -58,3 +58,13 @@ Every changed snippet was extracted from `SKILL.md` and run as written (only fil
 - scQuint was verified on a synthetic STARsolo SJ directory only.
 - FLAMES, scNanoGPS, uLTRA, deSALT remain named in decision tables as long-read alternatives with no code: long-read scope, delegated to `long-read-splicing`.
 - The install commands are quoted from upstream READMEs and the tooling agent's working env; not re-run as `pip install`.
+
+## 2026-09-24 final pass (fixer and final auditor: Codex; not independent)
+
+Source commit: `540d2a2750cd58be3d3402d9a6d02f71d5b0d3a1` on `codex/final-single-cell-splicing`, worktree `F:\OpenScience\wt\final-single-cell-splicing`.
+
+Post-merge validation found that the description's unquoted colon made the frontmatter invalid YAML. Source commit `31a33c13b6b6dd92395c7d399245534317ae1f39` preserves the description as a folded scalar; the final report now pins that exact source commit.
+
+Resolved the re-audit's remaining P1/P2 items: scQuint now states its tested `chr`-prefixed-junction / unprefixed-Ensembl-GTF compatibility contract, guards zero annotation with `adata.n_vars`, and reports its real sparse-group `ValueError`; MARVEL RI now supplies `thread=2` and `read.length=100`; the 561-line root guide became a 130-line decision layer with seven tool references; unsupported 10X figures were removed; installation and Psix-performance statements are explicitly hedged. `usage-guide.md` now directs readers to the references.
+
+Final evidence was extended after the initial report: the exact MARVEL RI call completed on the package demo (10 rows x 26 cells); scQuint completed on a compatible bounded fixture (4 groups, 8 introns) and its incompatible real-contig fixture fired the clear zero-annotation guard; the exact shuffled 3-junction x 12-cell pseudobulk helper conserved 630/630 reads and rejected `RangeIndex`; live BRIE2 help and SpliZ config keys matched the text. Final-pass score: 94/100, Production Ready. SpliZ remains explicitly unrun because Nextflow is unavailable. Raw report/viewer: `F:\OpenScience\audits\bio-single-cell-splicing` (`auditor_independent=false`, exact-commit note included).

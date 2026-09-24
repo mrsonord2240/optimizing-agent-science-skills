@@ -1,0 +1,103 @@
+{
+  "meta": {
+    "skill_name": "bio-variant-annotation",
+    "evaluated_on": "2026-09-24",
+    "source": "mrsonord2240/bioSkills@6122d469f440f6030b278a155d8e4e78c8788dbf:variant-calling/variant-annotation",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md"
+  },
+  "skill_name": "bio-variant-annotation",
+  "source": "mrsonord2240/bioSkills@6122d469f440f6030b278a155d8e4e78c8788dbf:variant-calling/variant-annotation",
+  "source_details": {
+    "repository": "F:/OpenScience/external/mrsonord2240__bioSkills",
+    "worktree": "F:/OpenScience/worktrees/bio-variant-annotation-finalpass",
+    "branch": "agent/finalpass-bio-variant-annotation-20260924",
+    "commit": "6122d469f440f6030b278a155d8e4e78c8788dbf",
+    "paths": [
+      "variant-calling/variant-annotation/SKILL.md",
+      "variant-calling/variant-annotation/usage-guide.md",
+      "variant-calling/variant-annotation/examples/annotate_vcf.sh"
+    ]
+  },
+  "evaluated_on": "2026-09-24",
+  "auditor_independent": false,
+  "auditor_note": "auditor_independent=false: the final-pass operator made the correction and audited the same exact commit. This is a self-audit, not independent acceptance evidence.",
+  "environment": {
+    "bcftools": "1.24 (F:/OpenScience/audit-envs/variant-annotation-curation-analyst/msys)",
+    "shell": "Git Bash",
+    "data": "synthetic fixtures already archived in F:/OpenScience/audits/bio-variant-annotation/data"
+  },
+  "findings": [
+    {
+      "id": "P2-finalpass-1",
+      "status": "fixed",
+      "priority": "P2",
+      "title": "The shipped example silently emitted a blank rsID percentage when bc was unavailable, and did not reject bad optional gnomAD inputs.",
+      "fix": "Use awk for the percentage; require indexed target/source VCFs; reject a nonexistent GNOMAD_VCF and zero shared contig names before annotate.",
+      "verified_by": [
+        "runs/finalpass_fresh_valid/out.txt",
+        "runs/finalpass_fresh_unindexed/out.txt",
+        "runs/finalpass_fresh_badenv/out.txt",
+        "runs/finalpass_fresh_mismatch/out.txt"
+      ]
+    }
+  ],
+  "open_p0_p1_p2": [],
+  "tests": [
+    {
+      "kind": "archived regression",
+      "name": "canonical csq -> dbSNP -> indexed gnomAD annotation block",
+      "result": "pass",
+      "evidence": "runs/finalpass_archived_canonical/out.txt: 12 split records, 8 rsIDs, 7 FAF values, rc=0"
+    },
+    {
+      "kind": "archived regression",
+      "name": "rare-variant recipe preserves cohort AF and retains absent gnomAD variants",
+      "result": "pass",
+      "evidence": "runs/p_in3/finalpass_out.txt: annotate=0; csq pipeline=0 0; cohort AF remains 0.5"
+    },
+    {
+      "kind": "archived regression",
+      "name": "csq phase-mode edge case",
+      "result": "pass",
+      "evidence": "runs/in9/finalpass_out.txt: -p a, -p s and -p m outputs match the corrected a/m/s description"
+    },
+    {
+      "kind": "fresh",
+      "name": "valid helper run without bc installed",
+      "result": "pass",
+      "evidence": "runs/finalpass_fresh_valid/out.txt: 11 variants, 7 rsIDs, 63.6%, rc=0"
+    },
+    {
+      "kind": "fresh",
+      "name": "chr1 versus 1 contig mismatch",
+      "result": "pass",
+      "evidence": "runs/finalpass_fresh_mismatch/out.txt: explicit no-shared-contigs error, rc=1"
+    },
+    {
+      "kind": "fresh",
+      "name": "missing index and invalid GNOMAD_VCF guards",
+      "result": "pass",
+      "evidence": "runs/finalpass_fresh_unindexed/out.txt and runs/finalpass_fresh_badenv/out.txt: explicit errors, rc=1"
+    }
+  ],
+  "limitations": [
+    "The current final-pass execution did not rerun VEP with a production cache, SnpEff, or ANNOVAR because their required databases/registration were not available in the audit environment.",
+    "The archived cyvcf2 parser fixture could not be rerun: the current dedicated Windows environment lacks cyvcf2 and the agents WSL runtime lacks python. This does not cover changed code; the parser file was unchanged by this commit.",
+    "This report is not independent acceptance evidence."
+  ],
+  "score": {
+    "value": 91,
+    "max": 100,
+    "grade": "Production Ready (self-audited)",
+    "rationale": "All discovered P0/P1/P2 items are closed and the changed helper passed one archived canonical path, two other archived regressions, and four fresh success/failure probes. The score is capped below an independent acceptance score because VEP/SnpEff/ANNOVAR were not rerun and this final pass is a self-audit."
+  },
+  "recommendations": [],
+  "final": {
+    "score": 91,
+    "max": 100,
+    "grade": "Production Ready",
+    "deployable": true,
+    "veto_override": false
+  }
+}

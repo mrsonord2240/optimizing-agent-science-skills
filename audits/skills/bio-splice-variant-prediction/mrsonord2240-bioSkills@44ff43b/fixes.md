@@ -84,3 +84,14 @@ usage-guide.md (each fact now once, in SKILL.md):
 - MMSplice: the audit's GRCh37 multi-transcript rows and GLA c.639+919G>A (row present on GRCh37 Ensembl, absent on GRCh38 GENCODE basic) differ by annotation; documented as "no row" behaviour, not investigated further.
 - BPHunter/LaBranchoR/BPP/SVM-BPfinder/TrASPr could not be run (see table).
 - Claims taken from TOOLS.md and not re-tested here: MMSplice `setuptools<81`/cyvcf2 numpy note; SpliceAI needing `setuptools<81` (the `pkg_resources` import is visible in the audit log).
+
+## 2026-09-24 final pass (fixer and final auditor: Codex; not independent)
+
+2026-09-24, source commit `4b731c929804830dee9ea5862ce8d1ec340f7f78`:
+
+- Filter `*` and symbolic ALT alleles before invoking SpliceAI, retaining supported alleles from the same record and returning excluded alleles as `not_scored`.
+- Emit `top_score_gene` and `annotated_genes` so a maximum score is not mistaken for clinical-transcript selection.
+- Bound long allele displays in warnings and document the limits of extended-window rescue, predictor concordance, BPHunter availability, and CPU/Git provenance.
+
+Evidence: canonical audit report and viewer in `F:\OpenScience\audits\bio-splice-variant-prediction\`; raw execution logs are in `run\final_pass_20260924`.
+

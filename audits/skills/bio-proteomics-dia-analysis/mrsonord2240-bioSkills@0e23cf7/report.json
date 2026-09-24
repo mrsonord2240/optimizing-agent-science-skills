@@ -1,0 +1,117 @@
+{
+  "meta": {
+    "skill_name": "bio-proteomics-dia-analysis",
+    "evaluated_on": "2026-09-24",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Moderate",
+    "n_inputs": 9,
+    "source": "mrsonord2240/bioSkills@0e23cf7a1fc896bc332d5729ee93ae2b8d5dc291:proteomics/dia-analysis",
+    "audit_type": "final pass re-audit",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md",
+    "environment": "DIA-NN 2.6.1 archived public outputs; ProteoWizard msconvert 3.0.26253; EasyPQP 0.1.59; pandas 3.0.5; numpy 2.5.3.",
+    "execution_note": "Seven archived logical inputs and two fresh inputs were checked by scripts retained in run/finalpass_20260924. The public raw DIA search itself was not rerun because its prior complete execution is multi-hour; its real 2.6.1 report/log were re-filtered with the exact committed source block. The fresh two-stage command check uses a contract stub, not a claim that a new DIA-NN search was completed."
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "detail": "Exact source filter ran deterministically on synthetic 8-run, synthetic 600-run, and public 2.6.1 reports; example validates its two DIA-NN stages and spaced input names."
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "The final source now states the DIA-NN 2.x separate prediction/search requirement and does not assert a universal matrix-row direction."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "Canonical filter, two-stage shell contract, staggered demultiplex command, and EasyPQP library contract were executed or checked against installed tools."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 94,
+    "max": 100,
+    "note": "All prior P1/P2 findings are corrected: two-stage prediction, version-aware matrix interpretation, third-party TSV fragment fields, expanded outputs, de-duplicated runnable command, and a small synthetic Parquet fixture."
+  },
+  "dynamic_score": {
+    "execution_avg": 90,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 25,
+      "total": 25
+    },
+    "note": "Score is deliberately below a fresh end-to-end raw-search maximum because the public raw search was not repeated in this final pass."
+  },
+  "inputs": [
+    {
+      "id": 1,
+      "type": "archived canonical",
+      "result": "PASS",
+      "evidence": "01_verify_exact_source.out.txt: synthetic 8-run report -> 887x8, LOWCONF=0, no -Inf."
+    },
+    {
+      "id": 2,
+      "type": "archived variant",
+      "result": "PASS",
+      "evidence": "01_verify_exact_source.out.txt: public DIA-NN 2.6.1 filter -> 4375x3; pg_matrix 4440, demonstrating no fixed count direction."
+    },
+    {
+      "id": 3,
+      "type": "archived edge",
+      "result": "PASS",
+      "evidence": "02_rerun_archived_tools.out.txt: msconvert staggered demultiplex exit 0."
+    },
+    {
+      "id": 4,
+      "type": "archived library-build variant",
+      "result": "PASS",
+      "evidence": "02_rerun_archived_tools.out.txt: EasyPQP 0.1.59 library help and documented fragment-field gate."
+    },
+    {
+      "id": 5,
+      "type": "archived stress",
+      "result": "PASS",
+      "evidence": "01_verify_exact_source.out.txt: seeded synthetic 600-run report -> 2000x600, FALSE=0, no -Inf."
+    },
+    {
+      "id": 6,
+      "type": "archived public predicted-library output",
+      "result": "PASS",
+      "evidence": "01_verify_exact_source.out.txt: exact committed filter re-ran on real 2.6.1 report/log."
+    },
+    {
+      "id": 7,
+      "type": "archived public library-based output",
+      "result": "PASS",
+      "evidence": "02_rerun_archived_tools.out.txt: global filter matrix 771x3."
+    },
+    {
+      "id": 8,
+      "type": "fresh fixture",
+      "result": "PASS",
+      "evidence": "01_verify_exact_source.out.txt: shipped synthetic Parquet fixture excludes global-only low-confidence group and maps zero to NaN."
+    },
+    {
+      "id": 9,
+      "type": "fresh command contract",
+      "result": "PASS",
+      "evidence": "01_verify_exact_source.out.txt: stub observed prediction with no raw --f arguments and stage-two library search preserving a spaced filename."
+    }
+  ],
+  "findings": {
+    "p0": [],
+    "p1": [],
+    "p2": []
+  },
+  "final": {
+    "score": 92,
+    "max": 100,
+    "grade": "Production Ready",
+    "deployable": true,
+    "rationale": "All prior P0/P1/P2 corrections pass. The score retains an execution discount for not re-running the expensive public raw search in this final pass."
+  }
+}

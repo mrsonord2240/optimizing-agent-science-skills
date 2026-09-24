@@ -1,0 +1,59 @@
+{
+  "meta": {
+    "skill_name": "bio-splice-variant-prediction",
+    "evaluated_on": "2026-09-24",
+    "source": "mrsonord2240/bioSkills@4b731c929804830dee9ea5862ce8d1ec340f7f78:alternative-splicing/splice-variant-prediction",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md"
+  },
+  "skill_name": "bio-splice-variant-prediction",
+  "audit_date": "2026-09-24",
+  "audit_type": "final-pass correction audit",
+  "source": "mrsonord2240/bioSkills@4b731c929804830dee9ea5862ce8d1ec340f7f78:alternative-splicing/splice-variant-prediction",
+  "auditor_independent": false,
+  "independence_note": "auditor_independent=false: this final pass was performed by the same agent that made the fixes.",
+  "score": 90,
+  "grade": "Production Ready",
+  "vetoes": {"skill": "PASS", "research": "PASS"},
+  "open_findings": {"p0": 0, "p1": 0, "p2": 0},
+  "executed_evidence": [
+    {
+      "input": "Archived real-output parser and concordance fixtures",
+      "result": "PASS: 6/6 tests",
+      "evidence": "run/final_pass_20260924/archived_parser_regression.log"
+    },
+    {
+      "input": "Fresh GRCh37 mixed VCF with supported alleles plus <DEL>",
+      "result": "PASS: real SpliceAI classifier retained supported records and emitted symbolic_DEL as not_scored",
+      "evidence": "run/final_pass_20260924/real_spliceai_symbolic.log and run/final_pass_20260924/ex_symbolic/"
+    },
+    {
+      "input": "Fresh all-symbolic long-REF VCF",
+      "result": "PASS: safe input is header-only and human warning key is bounded",
+      "evidence": "run/final_pass_20260924/fresh_all_symbolic_long_ref.log"
+    },
+    {
+      "input": "Archived GRCh38 auditor panel, rerun through real SpliceAI classifier",
+      "result": "PASS: output exposes top_score_gene and annotated_genes; OTC includes RP5-972B16.2,OTC and GLA overlap remains visible",
+      "evidence": "run/final_pass_20260924/real_spliceai_gene_columns.log and run/final_pass_20260924/ex_gene/panel_classified.tsv"
+    }
+  ],
+  "fixed_findings": [
+    "Unsupported star and symbolic ALT alleles no longer abort a mixed SpliceAI classifier batch; they remain visible as not_scored.",
+    "Overlapping SpliceAI annotations are reported as top_score_gene and annotated_genes, preventing a highest-score annotation from being misrepresented as the selected clinical transcript.",
+    "The CFTR extended-window counterexample, concordant false-positive limitation, CPU torch guidance, long-key warning bound, and BPHunter availability limitation are explicit."
+  ],
+  "residual_limitations": [
+    "Branchpoint tools with unavailable or unverified installs are not presented as runnable workflows.",
+    "SpliceTransformer and CI-SpliceAI remain optional heavyweight tools; their external weights and installation provenance must be recorded per analysis."
+  ],
+  "score_rationale": "Production Ready reflects the corrected executable primary workflow and executed real SpliceAI regression. The score is not higher because optional external predictors remain environment-heavy and this audit is non-independent.",
+  "recommendations": [],
+  "final": {
+    "score": 90,
+    "max": 100,
+    "grade": "Production Ready",
+    "deployable": true,
+    "veto_override": false
+  }
+}

@@ -1,0 +1,76 @@
+{
+  "meta": {
+    "skill_name": "bio-splicing-qc",
+    "evaluated_on": "2026-09-24",
+    "audit_kind": "final corrective re-audit",
+    "source": "mrsonord2240/bioSkills@4dd002b3ef77b6019b9cd59ff7309af20b0972a2:alternative-splicing/splicing-qc",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md",
+    "independence_note": "The same agent implemented the final corrective changes and performed this audit. Results are regression evidence, not an independent approval.",
+    "execution_environment": "WSL science; as-core (RSeQC 5.0.5, pysam, samtools), as-maxent (maxentpy 0.0.2). No packages were installed or changed.",
+    "data_note": "Archived planted data are under run/data/synthetic and remain labelled synthetic. The RSeQC table used by the fresh CLI check was generated from the archived novel-rich BAM during this audit."
+  },
+  "veto_gates": {
+    "skill_veto": {"gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS"},
+    "research_veto": {"applicable": true, "gate": "PASS", "code_usability": "PASS", "practice_boundaries": "PASS"}
+  },
+  "executed_inputs": [
+    {
+      "kind": "archived input 1",
+      "result": "PASS",
+      "evidence": "Current report command: clean 93.4% read-known / 34.6% junction-known, Healthy; novel-rich 22.3% / 13.0%, Suspect. Coverage verdicts include 12,410 and 12,014 anchored fragments."
+    },
+    {
+      "kind": "archived input 2",
+      "result": "PASS",
+      "evidence": "Current saturation helper: deep 0.0% known-curve growth, PLATEAU; mid 4.0%, STILL RISING; shallow 17.6%, STILL RISING."
+    },
+    {
+      "kind": "archived input 3",
+      "result": "PASS",
+      "evidence": "infer_experiment on planted dUTP library returned 1.0000 for 1+-,1-+,2++,2--."
+    },
+    {
+      "kind": "archived input 4",
+      "result": "PASS",
+      "evidence": "Current junction CLI on the archived hand-truth edge BAM: 13 junctions, 12 anchored, 62 total and 55 anchored reads."
+    },
+    {
+      "kind": "archived input 6",
+      "result": "PASS",
+      "evidence": "Current MaxEnt CLI: donors [10.86, 2.68], acceptor [11.58]."
+    },
+    {
+      "kind": "archived input 7",
+      "result": "PASS",
+      "evidence": "Primary mapped count 36,756; rRNA-overlap count 8,170; 22.2%, matching the documented planted result."
+    },
+    {
+      "kind": "fresh input 1",
+      "result": "PASS",
+      "evidence": "New novel-qc CLI accepted a real RSeQC 5.0.5 header (intron_st(0-based), intron_end(1-based)) and reported annotated 242 / median 12 fragments; complete_novel 540 / median 5; partial_novel 1,075 / median 6."
+    },
+    {
+      "kind": "fresh input 2",
+      "result": "PASS",
+      "evidence": "Expanded self-contained regression passed in as-core and as-maxent. It verifies the annotation-class join, including the real RSeQC coordinate headers, as well as prior CIGAR, mate, no-splice, RSeQC, saturation, and MaxEnt cases."
+    }
+  ],
+  "fixes": [
+    {"priority": "P2", "result": "FIXED", "detail": "RSeQC stdout now distinguishes read-weighted Splicing Events from distinct-junction Splicing Junctions; the documented table is explicitly read-weighted."},
+    {"priority": "P2", "result": "FIXED", "detail": "A runnable novel-qc diagnostic joins junction_annotation output to unique, fragment-level support and minimum anchors without dropping zero-support rows."},
+    {"priority": "P2", "result": "FIXED", "detail": "5-to-3 bias is a screen requiring gene-body and depth confirmation; helper coverage verdicts print the supporting fragment and junction counts."},
+    {"priority": "P2", "result": "FIXED", "detail": "MaxEnt throughput and sampling sensitivity are stated; references now include precise DOI/Table pointers; residual clinical classification codes were removed from the research QC workflow."}
+  ],
+  "recommendations": [],
+  "final": {
+    "score": 90,
+    "max": 100,
+    "grade": "Production Ready",
+    "deployable": true,
+    "open_p0": 0,
+    "open_p1": 0,
+    "open_p2": 0,
+    "score_note": "90 reflects strong archived regression coverage plus two fresh cases on the exact source commit. It is intentionally not an independent sign-off; the auditor also made the fixes."
+  }
+}

@@ -1,0 +1,8 @@
+pdf("/mnt/openscience/audits/bio-splicing-qc/run/work/final_20260924/novel.splice_events.pdf")
+events=c(54.3116364241718,23.339437323123022,22.348926252705176)
+pie(events,col=c(2,3,4),init.angle=30,angle=c(60,120,150),density=c(70,70,70),main="splicing events",labels=c("partial_novel 54%","complete_novel 23%","known 22%"))
+dev.off()
+pdf("/mnt/openscience/audits/bio-splicing-qc/run/work/final_20260924/novel.splice_junction.pdf")
+junction=c(57.889068389876144,29.079159935379643,13.031771674744212)
+pie(junction,col=c(2,3,4),init.angle=30,angle=c(60,120,150),density=c(70,70,70),main="splicing junctions",labels=c("partial_novel 58%","complete_novel 29%","known 13%"))
+dev.off()

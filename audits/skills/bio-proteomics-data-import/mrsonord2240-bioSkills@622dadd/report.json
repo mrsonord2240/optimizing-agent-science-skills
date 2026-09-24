@@ -1,0 +1,76 @@
+{
+  "meta": {
+    "skill_name": "bio-proteomics-data-import",
+    "description": "Imports and cleans MaxQuant, DIA-NN, and mzML data while preserving quantitative and missingness contracts.",
+    "evaluated_on": "2026-09-24",
+    "evaluator_version": "final-pass-exact-source@1",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Moderate",
+    "n_inputs": 10,
+    "source": "mrsonord2240/bioSkills@622daddbf14af58b9a83bdae2d586133ba35b2a6:proteomics/data-import",
+    "audit_type": "directed final pass: exact-source archived regressions, fresh edge checks, and every packaged example",
+    "executed": true,
+    "execution_note": "exact_source_checks.json records six archived executions and four fresh checks against the source commit, including a generated mzXML reader check. The QFeatures example was verified in a bounded clean R process with a process-local teardown guard and receipt.",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md"
+  },
+  "veto_gates": {
+    "skill_veto": {"gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS"},
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {"result": "PASS", "detail": "The final pass adds no unsupported biological-performance claim and preserves the prior evidence-based FDR, zero, and missingness guidance."},
+      "practice_boundaries": {"result": "PASS", "detail": "The Skill remains a technical import and diagnostic guide, not a clinical or statistical-decision workflow."},
+      "methodological_ground": {"result": "PASS", "detail": "Corrected TMT reporter channels, not the single group-total Intensity value, now form the documented import matrix; the associated computation boundary remains explicit."},
+      "code_usability": {"result": "PASS", "detail": "All exact-source Python blocks and all four packaged examples completed. QFeatures completed 1500 x 8 with no -Inf and a clean guarded process exit."}
+    }
+  },
+  "static_score": {
+    "subtotal": 94,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {"score": 12, "max": 12, "note": "Label-free, TMT, DIA-NN, mzML, and QFeatures routes now have explicit, correct decision boundaries."},
+      "reliability": {"score": 12, "max": 12, "note": "All-flags-absent input fails clearly; all supported input routes protect zero and confidence contracts."},
+      "performance_context": {"score": 7, "max": 8, "note": "All added operations are linear imports or small read-only examples."},
+      "agent_usability": {"score": 15, "max": 16, "note": "Quant-family selection, errors, row accounting, and routing now agree."},
+      "human_usability": {"score": 8, "max": 8, "note": "TMT and QFeatures pitfalls have direct recoveries and runnable entry points."},
+      "security": {"score": 11, "max": 12, "note": "All Skill paths read user data without mutating it."},
+      "maintainability": {"score": 12, "max": 12, "note": "Every documented import format now has a packaged executable example."},
+      "agent_specific": {"score": 17, "max": 20, "note": "The quantification, inference, and differential-abundance stop conditions remain explicit."}
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 95.0,
+    "max": 100,
+    "assertion_pass_rate": {"passed": 29, "total": 29},
+    "inputs": [
+      {"index": 1, "type": "Archived", "label": "MaxQuant LFQ exact block", "status": "COMPLETED", "executed": true, "total": 95, "assertions_passed": 4, "assertions_total": 4, "note": "1445 x 10, no bookkeeping survivor, infinity, or all-missing group."},
+      {"index": 2, "type": "Archived", "label": "DIA-NN exact block", "status": "COMPLETED", "executed": true, "total": 95, "assertions_passed": 3, "assertions_total": 3, "note": "887 x 8, zero LOWCONF groups, no infinity."},
+      {"index": 3, "type": "Archived", "label": "mzML exact block", "status": "COMPLETED", "executed": true, "total": 94, "assertions_passed": 3, "assertions_total": 3, "note": "Mixed DDA/DIA/AIF fixture completed and named unknown offsets."},
+      {"index": 4, "type": "Fresh", "label": "TMT corrected reporter import", "status": "COMPLETED", "executed": true, "total": 95, "assertions_passed": 4, "assertions_total": 4, "note": "Ten corrected channels gave a 390 x 12 finite-or-missing log2 matrix."},
+      {"index": 5, "type": "Fresh", "label": "Flagless wrong-table error", "status": "COMPLETED", "executed": true, "total": 95, "assertions_passed": 3, "assertions_total": 3, "note": "Specific bookkeeping-columns ValueError replaced KeyError: True."},
+      {"index": 6, "type": "Packaged example", "label": "load_maxquant.py", "status": "COMPLETED", "executed": true, "total": 95, "assertions_passed": 2, "assertions_total": 2, "note": "Self-contained fixture completed with the stated row accounting."},
+      {"index": 7, "type": "Packaged example", "label": "load_diann.py", "status": "COMPLETED", "executed": true, "total": 96, "assertions_passed": 2, "assertions_total": 2, "note": "Archived report completed at 887 x 8 with no -inf."},
+      {"index": 8, "type": "Packaged example", "label": "inspect_mzml.py", "status": "COMPLETED", "executed": true, "total": 95, "assertions_passed": 2, "assertions_total": 2, "note": "Reported 4 MS1, 16 MS2, one all-ion scan, and one unknown window."},
+      {"index": 9, "type": "Packaged example", "label": "load_maxquant_qfeatures.R", "status": "COMPLETED", "executed": true, "total": 95, "assertions_passed": 3, "assertions_total": 3, "note": "Bounded process-local guarded run exited 0; 1500 x 8 and no -Inf; guard receipt retained."},
+      {"index": 10, "type": "Fresh", "label": "Generated mzXML reader", "status": "COMPLETED", "executed": true, "total": 95, "assertions_passed": 3, "assertions_total": 3, "note": "A generated mzXML copy of the mixed fixture reported the same 4 MS1, 16 MS2, one all-ion scan, and one unknown window."}
+    ]
+  },
+  "final": {
+    "static_weighted": 37.6,
+    "dynamic_weighted": 57.0,
+    "score": 95,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Both documented raw formats now have matching exact-source readers and executable coverage.",
+    "The TMT matrix and wrong-table failure corrections close the prior P1/P2 findings.",
+    "The QFeatures route has a bounded clean exit with a retained process-local guard receipt."
+  ],
+  "recommendations": []
+}
