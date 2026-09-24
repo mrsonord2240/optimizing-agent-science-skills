@@ -14,47 +14,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: The example passes cluster_rows=<OLO dendrogram> together with row_split=gene_info$pathway, a combination ComplexHeatmap rejects; the script was never run.
 - Fix: Drop row_split or use a numeric row_split (works with the dendrogram), or apply OLO within each pathway group; supply a runnable data preamble and state the constraint in SKILL.md next to the OLO block.
 
-## P1 (151)
-
-### `bio-data-visualization-lollipop-protein-maps` — Shipped example never completes and paints wrong colours
-
-- Skill: 65, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/lollipop-protein-maps) · [viewer](skills/bio-data-visualization-lollipop-protein-maps/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: 3, 4, 5
-- Problem: examples/lollipop_phd.R halts at proteinID='P04637' (V1), at GRanges() on classes outside the palette (V2; unparsable p.Arg175His / p.* positions fail next), and at hgvspChange2protein (V3); where it draws, class_col[<factor>] gives all 55 lollipops the wrong colour and every stem is captioned with its class name.
-- Root cause: The example was written from the API in memory and never executed against a real MAF.
-- Fix: Use class_col[as.character(class)], drop or warn on unparsable HGVSp rows, extend the palette to Translation_Start_Site/Nonstop_Mutation, name lollipops by residue, remove proteinID or pass an NP_ id, and replace the g3viz section with readMAF() -> g3Lollipop() -> saveWidget().
-
-### `bio-data-visualization-lollipop-protein-maps` — Statements about maftools behaviour are false for 2.22.0
-
-- Skill: 65, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/lollipop-protein-maps) · [viewer](skills/bio-data-visualization-lollipop-protein-maps/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: 1, 2, 3
-- Problem: printCount=TRUE only prints a console table (no counts on the plot); lollipopPlot returns a data.table (base graphics), not a ggplot2 object; point size is constant (height encodes count); domains come from a bundled CDD table (db_xref), not a live Pfam query; the default isoform is the longest RefSeq, not the canonical UniProt one; proteinID takes NP_ ids.
-- Root cause: API and defaults described from assumption rather than from the installed package.
-- Fix: Rewrite these lines to match maftools 2.22 (or annotate counts yourself with text()), state the domain source and the transcript actually used, and show a working isoform call such as refSeqID='NM_000546'.
-
-### `bio-data-visualization-lollipop-protein-maps` — Wrong domain coordinates and a wrong Ensembl transcript id
-
-- Skill: 65, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/lollipop-protein-maps) · [viewer](skills/bio-data-visualization-lollipop-protein-maps/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: 3, 4
-- Problem: TP53 domains coded as 102-291 / 323-352 / 363-392 (SKILL.md) and 1-41 / 102-291 / 323-355 / 363-392 (example) contradict both their own comments and UniProt (TAD 1-44, DNA binding 102-292, oligomerization 325-356, basic 368-387); ENST00000288602 is BRAF-201, not TP53's canonical transcript (ENST00000269305).
-- Root cause: Coordinates typed by hand with IRanges width arithmetic and no lookup.
-- Fix: Pull features from the UniProt JSON (start/end are inclusive; use IRanges(start, end)) or quote the verified values, and correct the transcript id and the invented 'R175H plotted at R177H' example.
-
-### `bio-data-visualization-lollipop-protein-maps` — g3viz section calls a function that does not exist
-
-- Skill: 65, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/lollipop-protein-maps) · [viewer](skills/bio-data-visualization-lollipop-protein-maps/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: 5
-- Problem: hgvspChange2protein is not exported by g3viz 1.2.0, and output.filename='TP53_lollipop.html' writes no HTML (it names the download button file).
-- Root cause: g3viz API invented; a package archived on CRAN 2026-02-21 is also not installable with install.packages().
-- Fix: Show mut <- readMAF(file, protein.change.col='HGVSp_Short'); w <- g3Lollipop(mut, gene.symbol='TP53', protein.change.col='HGVSp_Short', ...); htmlwidgets::saveWidget(w, 'TP53.html'), and note the CRAN-archive install.
-
-### `bio-data-visualization-lollipop-protein-maps` — AACol='HGVSp_Short' hard-coded; wrong failure description
-
-- Skill: 65, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/lollipop-protein-maps) · [viewer](skills/bio-data-visualization-lollipop-protein-maps/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: 2
-- Problem: maftools' own TCGA-LAML MAF has Protein_Change, so every call as written stops (lollipopPlot: 'Column HGVSp_Short not found.'; lollipopPlot2: "object 'AAChange' not found"), whereas the Skill says maftools 'falls back inconsistently' and reports 'No mutations to plot'.
-- Root cause: Failure modes documented from expectation.
-- Fix: Leave AACol unset (maftools auto-detects HGVSp_Short, Protein_Change, AAChange and says which it used) or document the real messages and how to read them.
+## P1 (142)
 
 ### `bio-data-visualization-distribution-plots` — The headline R raincloud depends on gghalves, archived and broken on ggplot2 4.x
 
@@ -87,38 +47,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: df, df_small, df_med, df_large and df_paired are never created (df falls through to stats::df); with data, the small-N panel labels every group n=80 above 15 points because n_per_group is computed on df; count(group) also counts NA rows.
 - Root cause: Example written as a fragment and N derived once from an unrelated frame.
 - Fix: Build the five frames at the top (or read a shipped CSV), compute N per plot from the plotted frame with sum(!is.na(value)), and add a runnable data file.
-
-### `bio-data-visualization-upset-plots` — Python upsetplot route does not run as shipped
-
-- Skill: 70.4, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/upset-plots) · [viewer](skills/bio-data-visualization-upset-plots/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: 3
-- Problem: Every Python snippet uses show_counts=True: with numpy 2.5.3 it raises TypeError at savefig (upsetplot 0.9.0 passes a 1-element array to Axes.text), and a plain pip install brings pandas 3, where UpSet fails with 'Invalid RGBA argument: nan'. examples/upset_python.py also calls data.to_frame() on the DataFrame that from_contents returns, so its metadata plot cannot run on any version. A Python-only user gets no figure.
-- Root cause: Version stamp says only 'upsetplot 0.9+'; the snippets were not run against a current stack.
-- Fix: State the working stack (pandas < 3 for upsetplot 0.9.0) and drop show_counts=True or show a labelling workaround; fix the example: build the attribute frame from from_contents' DataFrame (df['log2FC'] = ...), do not call to_frame(); run the example in CI.
-
-### `bio-data-visualization-upset-plots` — Query highlighting breaks; the Skill blames the wrong cause
-
-- Skill: 70.4, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/upset-plots) · [viewer](skills/bio-data-visualization-upset-plots/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: 2
-- Problem: Block 3 as written raises a render error on the Skill's own data (the second query targets an empty exclusive intersection), and two queries on non-adjacent existing bars draw a highlight rectangle 6.3 bar-widths wide over neighbouring bars, on ggplot2 4.0.3 and 3.5.2. The Skill attributes ComplexUpset trouble to ggplot2 4.0 (issue #213) and advises pinning ggplot2, which does not fix this. Block 4 as written fails because log2FC/significant are not in df.
-- Root cause: Queries were not rendered with two targets; the 4-set example has no intersection larger than 1 and no empty query target.
-- Fix: Use targets that exist, test with two non-adjacent bars, document the width behaviour (or a working alternative such as separate single-query plots or a colour column in base_annotations), remove or correct the ggplot2 4.0 claim, and add the missing columns to block 4's df.
-
-### `bio-data-visualization-upset-plots` — Silent data-loss patterns are not warned about
-
-- Skill: 70.4, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/upset-plots) · [viewer](skills/bio-data-visualization-upset-plots/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: 1, 4, 5
-- Problem: UpSetR nsets = 4 on a longer list keeps the 4 largest sets and draws merged, wrong bars (A-only 17 vs 12); empty sets vanish from both R plots without a message; NA and '' IDs are counted as shared elements (3 shared instead of 1).
-- Root cause: The Skill's blocks hardcode nsets and never validate set sizes, emptiness or identifiers before plotting.
-- Fix: Add a pre-plot checklist: nsets = length(sets); stop on empty sets; drop NA/'' and normalise IDs; print set sizes and the union size and compare with the sum of drawn bars.
-
-### `bio-data-visualization-upset-plots` — Several stated behaviours are false or unreproduced
-
-- Skill: 70.4, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/upset-plots) · [viewer](skills/bio-data-visualization-upset-plots/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: 2, 3, 4, 5
-- Problem: (a) 'duplicates in fromList inflate counts' and the reconciliation row on duplicate handling: not reproduced in UpSetR or ComplexUpset (upsetplot raises instead). (b) 'ComplexUpset CRAN active through 2025-07': 1.3.3 of 2021-12-11 is the current release. (c) 'ggplot2 4.0 broke upset()': upset() builds on 4.0.3. (d) mode='intersect' as a way to exclude 1-set bars: it makes them the full set size. (e) degree sort shown with 'descending' puts 3-set groups first. (f) style_subsets(present=) is called a specific intersection but highlights supersets. (g) intersection_plot_elements is called a cap on intersections but is a height. (h) 2^10 = 1023 columns: 137 drawn on real data.
-- Root cause: Claims were written from documentation and memory, not checked against an installed stack.
-- Fix: Correct or delete each statement using the measured behaviour (exclude 1-set with min_degree=2 or an intersections list; sort_intersections='ascending' for degree; add absent= to style_subsets; use max_subset_rank for a cap).
 
 ### `bio-data-visualization-multipanel-figures` — plot_annotation(theme=plot.tag) is silently ignored
 
@@ -1224,31 +1152,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (346)
-
-### `bio-data-visualization-lollipop-protein-maps` — HGVSp edge cases and recurrence semantics undocumented
-
-- Skill: 65, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/lollipop-protein-maps) · [viewer](skills/bio-data-visualization-lollipop-protein-maps/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: 1, 3
-- Problem: Counts are mutation rows, not samples (a duplicated call row makes R175H 46 vs 45 samples); different amino-acid changes at one residue draw as separate stems so KRAS G12 shows 30 and 25 rather than 55; p.M1?, silent and empty HGVSp rows are dropped without a note; 3-letter HGVSp is not merged; mutations beyond a shorter isoform are clipped silently.
-- Root cause: The Skill treats 'count' as unambiguous.
-- Fix: Add a short table of these behaviours and recommend deduplicating on sample + change and stating whether height means rows, samples or per-change counts.
-
-### `bio-data-visualization-lollipop-protein-maps` — pyLollipop does not exist; ProteinPaint not runnable
-
-- Skill: 65, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/lollipop-protein-maps) · [viewer](skills/bio-data-visualization-lollipop-protein-maps/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: 5
-- Problem: 'pyLollipop (limited maintenance)' has no PyPI distribution; 'ProteinPaint via API' has no example; Bio.PDB is cited for domain coordinates but never used.
-- Root cause: Tool list padded from memory.
-- Fix: Remove pyLollipop and Bio.PDB or give a verified Python alternative; give a real ProteinPaint or cBioPortal URL pattern if kept.
-
-### `bio-data-visualization-lollipop-protein-maps` — Redundant usage guide and cosmetic defects
-
-- Skill: 65, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/lollipop-protein-maps) · [viewer](skills/bio-data-visualization-lollipop-protein-maps/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: 2
-- Problem: usage-guide.md repeats SKILL.md tips and prompts; default label overlap ('R248QR273C', domain names over each other) and random per-call domain colours are not mentioned.
-- Root cause: Duplicated prose; no visual check of the outputs.
-- Fix: Fold the guide into SKILL.md, and mention repel = TRUE and domainAlpha/label-size arguments for crowded genes.
+## P2 (340)
 
 ### `bio-data-visualization-distribution-plots` — Wrong bandwidth sentence: nrd (Scott) is 1.178x nrd0, so it oversmooths more
 
@@ -1297,30 +1201,6 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 - Problem: The Tips and What the Agent Will Do sections restate SKILL.md rules.
 - Root cause: Two files carry the same guidance.
 - Fix: Reduce usage-guide.md to prompts and prerequisites.
-
-### `bio-data-visualization-upset-plots` — The canonical toy example cannot show anything
-
-- Skill: 70.4, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/upset-plots) · [viewer](skills/bio-data-visualization-upset-plots/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: 1
-- Problem: In the Skill's 4-set example every gene has a unique membership, so all eight bars are 1: sorting, counts, queries and attribute panels cannot be told apart from noise. The example's n_intersections=20 and its second query target an empty intersection.
-- Root cause: Hand-made toy sets without planted overlaps.
-- Fix: Replace with planted overlaps of different sizes including a subset set (the planted 8-set table in data/ is a drop-in known-answer test) and state the expected bar heights in the Skill.
-
-### `bio-data-visualization-upset-plots` — Package masking, stray axes, labels and export claims
-
-- Skill: 70.4, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/upset-plots) · [viewer](skills/bio-data-visualization-upset-plots/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: 3, 4, 5
-- Problem: ComplexUpset and UpSetR both export upset(); attaching ComplexUpset second breaks the UpSetR block with 'unused arguments' (matters for the 'migrate UpSetR to ComplexUpset' prompt). The shipped first Python plot calls plt.subplots then plot(fig=fig), leaving an empty axes drawn over the figure. ComplexUpset leaves the x label 'group'. Usage-guide step 8 (cairo_pdf / Type-42) is implemented nowhere: matplotlib's default pdf.fonttype is 3 and the R example uses pdf().
-- Root cause: Untested integration details.
-- Fix: Use ComplexUpset::upset / UpSetR::upset in the migration text, replace plt.subplots by plt.figure, set xlab, and add rcParams['pdf.fonttype'] = 42 and cairo_pdf to the export snippets.
-
-### `bio-data-visualization-upset-plots` — SKILL.md and usage-guide.md duplicate the same tips
-
-- Skill: 70.4, Beta Only · [mrsonord2240/bioSkills@64b3b15](https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/upset-plots) · [viewer](skills/bio-data-visualization-upset-plots/mrsonord2240-bioSkills@64b3b15/viewer.md)
-- Observed in inputs: —
-- Problem: The usage-guide Tips section and Quick Start restate the SKILL.md failure modes almost verbatim (ggplot2 4.0 note, cap at 20-25, unique(), degree vs cardinality, upset_query), so both load for one task.
-- Root cause: No split between method and quick-start content.
-- Fix: Keep the tips once in SKILL.md and reduce usage-guide.md to prompts, or move failure modes to a references/ file.
 
 ### `bio-data-visualization-multipanel-figures` — Inconsistent label/text sizes and column widths
 

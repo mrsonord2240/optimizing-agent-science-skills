@@ -1,9 +1,9 @@
 {
   "skill_id": "bio-data-visualization-lollipop-protein-maps",
-  "version": "mrsonord2240-bioSkills@64b3b15",
+  "version": "mrsonord2240-bioSkills@4f5e4c0",
   "source": {
     "repository": "mrsonord2240/bioSkills",
-    "commit": "64b3b150c9b989c102f7ee69e0bb07c16842d894",
+    "commit": "4f5e4c0e54f612acdab50562e7a5cb07abb0b6bc",
     "path": "data-visualization/lollipop-protein-maps",
     "author": "GPTomics",
     "author_url": "https://github.com/GPTomics",
@@ -13,7 +13,7 @@
       "repository": "GPTomics/bioSkills",
       "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
     },
-    "url": "https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/lollipop-protein-maps"
+    "url": "https://github.com/mrsonord2240/bioSkills/tree/4f5e4c0e54f612acdab50562e7a5cb07abb0b6bc/data-visualization/lollipop-protein-maps"
   },
   "audit": {
     "method": {
@@ -26,16 +26,16 @@
       "url": "https://github.com/aipoch/medical-research-skills/tree/f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26/skill-auditor"
     },
     "evaluator_version": "skill-auditor@1.0",
-    "audited_on": "2026-09-20",
+    "audited_on": "2026-09-24",
     "performed_by": "Claude (Anthropic) auditor agents",
     "commissioned_by": "Samuel Nord",
     "test_data": "synthetic"
   },
-  "supersedes": null,
+  "supersedes": "mrsonord2240-bioSkills@64b3b15",
   "files": {
     "report": "report.json",
     "viewer": "viewer.md",
     "fixes": "fixes.md",
-    "scripts": 25
+    "scripts": 13
   }
 }

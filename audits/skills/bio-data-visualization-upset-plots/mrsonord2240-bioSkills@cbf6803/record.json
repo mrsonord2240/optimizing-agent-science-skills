@@ -1,10 +1,10 @@
 {
-  "skill_id": "bio-data-visualization-lollipop-protein-maps",
-  "version": "mrsonord2240-bioSkills@64b3b15",
+  "skill_id": "bio-data-visualization-upset-plots",
+  "version": "mrsonord2240-bioSkills@cbf6803",
   "source": {
     "repository": "mrsonord2240/bioSkills",
-    "commit": "64b3b150c9b989c102f7ee69e0bb07c16842d894",
-    "path": "data-visualization/lollipop-protein-maps",
+    "commit": "cbf68034488c0a367703d34eb22b2931d0283fee",
+    "path": "data-visualization/upset-plots",
     "author": "GPTomics",
     "author_url": "https://github.com/GPTomics",
     "license": "MIT",
@@ -13,7 +13,7 @@
       "repository": "GPTomics/bioSkills",
       "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
     },
-    "url": "https://github.com/mrsonord2240/bioSkills/tree/64b3b150c9b989c102f7ee69e0bb07c16842d894/data-visualization/lollipop-protein-maps"
+    "url": "https://github.com/mrsonord2240/bioSkills/tree/cbf68034488c0a367703d34eb22b2931d0283fee/data-visualization/upset-plots"
   },
   "audit": {
     "method": {
@@ -26,16 +26,16 @@
       "url": "https://github.com/aipoch/medical-research-skills/tree/f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26/skill-auditor"
     },
     "evaluator_version": "skill-auditor@1.0",
-    "audited_on": "2026-09-20",
+    "audited_on": "2026-09-24",
     "performed_by": "Claude (Anthropic) auditor agents",
     "commissioned_by": "Samuel Nord",
     "test_data": "synthetic"
   },
-  "supersedes": null,
+  "supersedes": "mrsonord2240-bioSkills@64b3b15",
   "files": {
     "report": "report.json",
     "viewer": "viewer.md",
     "fixes": "fixes.md",
-    "scripts": 25
+    "scripts": 9
   }
 }

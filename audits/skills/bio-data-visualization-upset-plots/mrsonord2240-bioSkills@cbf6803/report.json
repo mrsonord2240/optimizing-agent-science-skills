@@ -1,0 +1,106 @@
+{
+  "meta": {
+    "skill_name": "bio-data-visualization-upset-plots",
+    "description": "Build UpSet plots for intersections among gene, peak, variant, or feature sets using ComplexUpset, UpSetR, or upsetplot, with explicit sorting, input hygiene, query, and export guidance.",
+    "evaluated_on": "2026-09-24",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Moderate",
+    "n_inputs": 5,
+    "source": "mrsonord2240/bioSkills@cbf68034488c0a367703d34eb22b2931d0283fee:data-visualization/upset-plots",
+    "audit_type": "focused final-pass re-audit at the exact follow-up commit",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md",
+    "executed": true,
+    "execution_note": "The exact follow-up commit changes only the max_subset_rank wording in SKILL.md. Focused verification reran the pandas-2 Python guard: a no-tie rank-3 case rendered 3 bars, while a tied rank-3 boundary retained 6 bars, exactly matching the new caveat and pre-filter guidance. The unchanged runtime paths retain the 5/5 execution evidence from parent corrective commit 722b632f950c2e5ab9405781d4f2fd236281c5b3 (R 4.4.3, ComplexUpset 1.3.3, UpSetR 1.4.0, ggplot2 4.0.3; Python 3.12, upsetplot 0.9.0, pandas 2.3.3, numpy 2.5.3, matplotlib 3.11)."
+  },
+  "veto_gates": {
+    "skill_veto": { "gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS" },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "The exact-commit routes preserve independently calculated exclusive membership counts and accurately distinguish exclusive intersections from inclusive mode." },
+      "practice_boundaries": { "result": "PASS", "detail": "This is a visualization workflow and does not diagnose, prescribe, or triage individuals." },
+      "methodological_ground": { "result": "PASS", "detail": "Planted and Hallmark inputs confirmed input hygiene, exclusive-count interpretation, sorting, set preservation, and real-data scale claims." },
+      "code_usability": { "result": "PASS", "detail": "The canonical R route, direct shipped R example, exact pandas-2 Python example, Python guards, and Hallmark stress route all completed with populated files and assertions." }
+    }
+  },
+  "static_score": {
+    "subtotal": 91,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 11, "max": 12, "note": "All three documented routes have runnable, scope-appropriate paths with correct input hygiene, sorting, queries, attributes, exports, and explicit rank-tie behavior." },
+      "reliability": { "score": 11, "max": 12, "note": "Preflight reports removed bad identifiers and stops on an empty named set; Python makes its pandas-2 constraint explicit. The external upsetplot package emits future warnings under pandas 2 but completes." },
+      "performance_context": { "score": 7, "max": 8, "note": "The concise SKILL.md routes users to a modern default and limits static figures to readable intersection counts." },
+      "agent_usability": { "score": 15, "max": 16, "note": "The decision guidance separates ComplexUpset, legacy UpSetR, and Python behavior, with explicit common-error corrections and concrete commands." },
+      "human_usability": { "score": 8, "max": 8, "note": "The usage guide is short, has dependency commands and representative prompts, and points implementation detail back to SKILL.md." },
+      "security": { "score": 11, "max": 12, "note": "No credentials, network calls, shell interpolation, or destructive operations appear. Examples deliberately write named plot files in the current directory." },
+      "maintainability": { "score": 10, "max": 12, "note": "Shipped deterministic R and Python examples have clear version assumptions and named products; library deprecation warnings come from external packages rather than the source instructions." },
+      "agent_specific": { "score": 18, "max": 20, "note": "Trigger scope, progressive fallback guidance, deterministic examples, escape hatches, and the Python rank-tie caveat are clear." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 93.6,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 23, "total": 23 },
+    "inputs": [
+      {
+        "index": 1, "type": "Canonical", "label": "R planted overlap with query and attributes", "status": "COMPLETED", "status_flag": "✅", "note": "Fresh R vector produced five populated Cairo PDFs for cardinality, degree, one query, attributes, and legacy UpSetR.", "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 5, "assertions_total": 5,
+        "assertions": [
+          { "text": "Identifier preflight trims duplicates and rejects an empty named set", "result": "PASS", "note": "Known dirty and empty inputs behaved as documented." },
+          { "text": "Exclusive planted intersection counts equal independent truth", "result": "PASS", "note": "Observed descending counts were 6,5,4,4,3,2,2 and sum to the union." },
+          { "text": "Cardinality and degree routes render successfully", "result": "PASS", "note": "Both ComplexUpset PDFs exceeded 2 KB." },
+          { "text": "A nonempty single query and supplied metadata attributes render", "result": "PASS", "note": "Query and attribute PDFs were populated." },
+          { "text": "Legacy UpSetR preserves all named sets", "result": "PASS", "note": "The vector uses nsets=length(sets) and wrote a populated PDF." }
+        ]
+      },
+      {
+        "index": 2, "type": "Variant A", "label": "Exact shipped R example", "status": "COMPLETED", "status_flag": "✅", "note": "The exact committed example, invoked directly as documented, wrote all three named Cairo PDFs after its duplicate warnings.", "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "The exact R example executes as a script", "result": "PASS", "note": "Direct r.sh execution completed." },
+          { "text": "All three documented PDFs are produced", "result": "PASS", "note": "upset_basic, upset_customized, and upset_queries exist." },
+          { "text": "Each R PDF is populated", "result": "PASS", "note": "Sizes were 29,452, 28,599, and 30,054 bytes." },
+          { "text": "Simulated duplicate IDs are reported before plotting", "result": "PASS", "note": "Warnings reported per-set duplicate removals and the final union." }
+        ]
+      },
+      {
+        "index": 3, "type": "Variant B", "label": "Exact shipped pandas-2 Python example", "status": "COMPLETED", "status_flag": "✅", "note": "The exact Python example completed in the documented pandas-2 environment and created three PNG/PDF pairs including its metadata boxplot; the follow-up guard rechecked both tied and untied rank boundaries.", "basic": 36, "specialized": 55, "total": 91, "assertions_passed": 5, "assertions_total": 5,
+        "assertions": [
+          { "text": "The version guard admits the documented pandas-2 environment", "result": "PASS", "note": "pandas 2.3.3 met the source guard." },
+          { "text": "All six documented Python output files are created", "result": "PASS", "note": "Three PNG/PDF figure pairs exceeded 2 KB." },
+          { "text": "The metadata boxplot route runs", "result": "PASS", "note": "upset_with_boxplot PNG and PDF were produced." },
+          { "text": "The rendered Python plot has no stray axes", "result": "PASS", "note": "The exact rendered PNG was inspected and contains a coherent UpSet layout plus boxplots." },
+          { "text": "Rank-limit guidance distinguishes tied from untied boundaries", "result": "PASS", "note": "The rerun rendered three bars without a tie and retained six bars at a tied rank-3 cutoff; the exact commit documents both behavior and exact-count pre-filtering." }
+        ]
+      },
+      {
+        "index": 4, "type": "Edge", "label": "Python input and presentation guards", "status": "COMPLETED", "status_flag": "✅", "note": "Independent pandas-2 vector used unequal planted counts and tested duplicate rejection, rank behavior, labels, exact styling, and PDF embedding.", "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 5, "assertions_total": 5,
+        "assertions": [
+          { "text": "from_contents rejects duplicate identifiers", "result": "PASS", "note": "The planted duplicate input raised ValueError." },
+          { "text": "A no-tie max_subset_rank limits the ranked bars", "result": "PASS", "note": "Three unequal leading bars were rendered for rank 3." },
+          { "text": "Manual intersection count labels are present", "result": "PASS", "note": "At least three annotation texts were attached to the bar axis." },
+          { "text": "present plus absent targets exact membership", "result": "PASS", "note": "The AB-only bar received the requested orange style." },
+          { "text": "Python PDF uses a non-Type3 embedded font", "result": "PASS", "note": "PDF bytes contain Type42 or CIDFontType2 and no Type3 marker." }
+        ]
+      },
+      {
+        "index": 5, "type": "Stress", "label": "Ten real Hallmark gene sets", "status": "COMPLETED", "status_flag": "✅", "note": "The real membership table rendered a populated top-20 ComplexUpset PDF from 10 sets, 1,211 genes, and 137 nonempty exclusive combinations.", "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "All ten named Hallmark sets are nonempty", "result": "PASS", "note": "The audit fixture has ten nonempty sets." },
+          { "text": "The input has fewer nonempty combinations than the theoretical 1023", "result": "PASS", "note": "Independent count was 137 nonempty exclusive combinations." },
+          { "text": "The top-20 route renders a populated export", "result": "PASS", "note": "hallmark_top20.pdf exceeded 2 KB." },
+          { "text": "The stress run remains within visualization scope", "result": "PASS", "note": "It reports membership intersections only and makes no clinical or causal claim." }
+        ]
+      }
+    ]
+  },
+  "final": { "static_weighted": 36.4, "dynamic_weighted": 56.2, "score": 93, "max": 100, "grade": "Production Ready", "grade_symbol": "⭐", "deployable": true, "veto_override": false },
+  "key_strengths": [
+    "Exact R and Python shipped examples execute in the documented compatible environments and emit named populated files.",
+    "Input hygiene makes duplicate, blank, missing, and empty-set behavior explicit instead of silently distorting intersections.",
+    "ComplexUpset, UpSetR, and upsetplot behavior is described with tested sorting, query, compatibility, and exact-style constraints.",
+    "The real Hallmark stress vector confirms that theoretical combinations and observed nonempty intersections are not conflated."
+  ],
+  "recommendations": []
+}
