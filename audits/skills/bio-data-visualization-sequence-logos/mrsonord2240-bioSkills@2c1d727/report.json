@@ -1,0 +1,62 @@
+{
+  "meta": {
+    "skill_name": "bio-data-visualization-sequence-logos",
+    "description": "Build sequence logos from aligned DNA, RNA, or protein motifs using ggseqlogo (R), Logomaker (Python), or WebLogo with explicit bits vs probability encoding, correctly computed non-uniform-background relative entropy, custom alphabets, and multi-logo stacking.",
+    "evaluated_on": "2026-09-23",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 9,
+    "executed_inputs": "9/9 exact-commit vectors",
+    "source": "mrsonord2240/bioSkills@2c1d7271a6bfec6c2eebf9b50914e9a3b74f60f3:data-visualization/sequence-logos",
+    "audit_type": "final-pass backlog remediation",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md",
+    "execution_note": "Exact evidence is run/exact-commit-20260923-200710. The known Windows R/ggseqlogo CLI teardown crash occurs after even a minimal library load; R tests use only a process-local R_PROFILE_USER cleanup guard, with cli_unloaded=TRUE receipts. The guard is neither global configuration nor a skill requirement."
+  },
+  "veto_gates": {
+    "skill_veto": {"gate":"PASS","stability":"PASS","contract":"PASS","determinism":"PASS","security":"PASS"},
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {"result":"PASS","detail":"The claimed non-uniform-background route now computes relative entropy instead of passing an ignored parameter. The 72% GC Streptomyces composition is presented as illustrative, not independently sourced."},
+      "practice_boundaries": {"result":"PASS","detail":"Motif visualization only; no diagnostic or prescriptive claim."},
+      "methodological_ground": {"result":"PASS","detail":"Uniform bits, background relative entropy, signed log-odds, and non-equivalent low-N tool defaults are explicitly separated."},
+      "code_usability": {"result":"PASS","detail":"The exact checkout helper, complete example, Logomaker snippet, and WebLogo DNA/RNA commands completed with the recorded outputs."}
+    }
+  },
+  "static_score": {
+    "subtotal": 93,
+    "max": 100,
+    "categories": {
+      "functional_suitability":{"score":12,"max":12,"note":"All three routes distinguish uniform bits from non-uniform-background relative entropy."},
+      "reliability":{"score":11,"max":12,"note":"Alphabet/background validation and low-N/RNA/dependency limits are explicit."},
+      "performance_context":{"score":7,"max":8,"note":"Reusable helper and small bundled fixtures make the central workflow reproducible."},
+      "agent_usability":{"score":15,"max":16,"note":"Tool choice, current API signatures, and labels agree with the calculation."},
+      "human_usability":{"score":8,"max":8,"note":"Direct prompts, decision table, and concise boundaries are clear."},
+      "security":{"score":11,"max":12,"note":"No credentials, network operation, or destructive cleanup; outputs are local PDFs."},
+      "maintainability":{"score":11,"max":12,"note":"The calculation is separately testable and shipped fixture data remove undefined inputs."},
+      "agent_specific":{"score":18,"max":20,"note":"Precise trigger and hand-offs; external package APIs still require version inspection."}
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 94.9,
+    "max": 100,
+    "assertion_pass_rate":{"passed":37,"total":37},
+    "inputs": [
+      {"index":1,"type":"Canonical regression","label":"Uniform-background ggseqlogo bits route and matrix orientation","status":"COMPLETED","status_flag":"✅","note":"Exact source preserves letters-as-rows/positions-as-columns and no longer claims a nonexistent background argument.","basic":37,"specialized":56,"total":93,"assertions_passed":3,"assertions_total":3,"assertions":[{"text":"PWM orientation is stated correctly","result":"PASS","note":"Transposed positions-by-letters input rejects with the expected row-name error."},{"text":"Uniform route remains method='bits'","result":"PASS","note":"Exact n=5 sequence route rendered 1.567191488 bits; matrix route rendered 2.000000000 bits."},{"text":"No functional bg_freq call remains","result":"PASS","note":"Exact-source search."}],"executed":true,"execution_note":"run/exact-commit-20260923-200710/uniform_small_n_exact.R; guarded exit 0 with cli_unloaded=TRUE receipt."},
+      {"index":2,"type":"Canonical regression","label":"Custom relative-entropy ggseqlogo route","status":"COMPLETED","status_flag":"✅","note":"Exact helper checks passed, including numerical calibration, malformed backgrounds, and the rendered custom-stack height.","basic":38,"specialized":58,"total":96,"assertions_passed":7,"assertions_total":7,"assertions":[{"text":"Human-background pure C totals -log2(.21)","result":"PASS","note":"2.251538767 bits."},{"text":"Background-matched column totals zero","result":"PASS","note":"No NaN or invented height."},{"text":"Mixed letters use p_i D_KL","result":"PASS","note":"Exact helper comparison."},{"text":"Uniform background equivalence holds","result":"PASS","note":"Exact helper comparison."},{"text":"GC calibration and scale invariance hold","result":"PASS","note":"Pure G 1.643856190; pure A 2.473931188."},{"text":"Missing, duplicate, and extra symbols reject","result":"PASS","note":"Expected errors."},{"text":"ggseqlogo stack reaches calculated custom height","result":"PASS","note":"ggplot build comparison."}],"executed":true,"execution_note":"run/exact-commit-20260923-200710/examples/test_relative_entropy_logo.R; exit 0 with process-local guard."},
+      {"index":3,"type":"Variant A regression","label":"Logomaker information and signed-weight snippets","status":"COMPLETED","status_flag":"✅","note":"Exact current-code checks passed under Logomaker 0.8.7 and produced both PNGs.","basic":38,"specialized":58,"total":96,"assertions_passed":5,"assertions_total":5,"assertions":[{"text":"Information matrix matches relative entropy","result":"PASS","note":"Exact checker assertion."},{"text":"Pseudocount is explicitly zero","result":"PASS","note":"Exact checker assertion."},{"text":"Logo binds to supplied axes","result":"PASS","note":"Exact checker assertion."},{"text":"Signed weight route is valid","result":"PASS","note":"Exact checker assertion."},{"text":"Information and weight PNGs render","result":"PASS","note":"Both files present."}],"executed":true,"execution_note":"run/exact-commit-20260923-200710/logomaker_exact.py; exit 0."},
+      {"index":4,"type":"Variant B regression","label":"WebLogo DNA and RNA commands","status":"COMPLETED","status_flag":"✅","note":"Exact commands passed under WebLogo 3.7.12; both declared artifacts are non-empty.","basic":38,"specialized":58,"total":96,"assertions_passed":3,"assertions_total":3,"assertions":[{"text":"DNA command writes PDF","result":"PASS","note":"weblogo_dna.pdf, 5,535 B."},{"text":"RNA command selects RNA mode and writes PNG","result":"PASS","note":"weblogo_rna.png, 3,624 B."},{"text":"Windows Ghostscript boundary remains disclosed","result":"PASS","note":"Exact-source inspection."}],"executed":true,"execution_note":"run/exact-commit-20260923-200710/weblogo_exact.sh; exit 0."},
+      {"index":5,"type":"Edge regression","label":"Tool-specific small-N behavior","status":"COMPLETED","status_flag":"✅","note":"The exact source now distinguishes ggseqlogo sequence/matrix behavior, Logomaker pseudocounts, and WebLogo priors rather than calling them one correction.","basic":36,"specialized":55,"total":91,"assertions_passed":4,"assertions_total":4,"assertions":[{"text":"ggseqlogo sequence and matrix paths are distinguished","result":"PASS","note":"Exact n=5 heights were 1.567191488 for sequences and 2.000000000 for a counts matrix."},{"text":"Logomaker default is identified as pseudocount, not Schneider","result":"PASS","note":"Exact n=5 default was 0.553383332 bits versus 2.000000000 with pseudocount=0."},{"text":"WebLogo prior/weight is disclosed","result":"PASS","note":"Exact n=5 default and --weight 0 logodata outputs differed."},{"text":"N<5 is exploratory rather than authoritative","result":"PASS","note":"Exact-source failure-mode guidance."}],"executed":true,"execution_note":"run/exact-commit-20260923-200710/uniform_small_n_exact.R, logomaker_exact.py, and weblogo_exact.sh; all exact-commit checks exit 0."},
+      {"index":6,"type":"Edge regression","label":"Alphabet and malformed-input boundaries","status":"COMPLETED","status_flag":"✅","note":"Exact helper validation rejects incompatible symbols/backgrounds; exact WebLogo evidence covers the RNA route.","basic":37,"specialized":56,"total":93,"assertions_passed":4,"assertions_total":4,"assertions":[{"text":"Unknown sequence symbols reject","result":"PASS","note":"Helper validation."},{"text":"Missing/duplicate/extra background names reject","result":"PASS","note":"Helper test."},{"text":"RNA WebLogo path renders","result":"PASS","note":"Input 4 exact PNG."},{"text":"Matrix orientation is explicit for both R and Python","result":"PASS","note":"Exact-source inspection."}],"executed":true,"execution_note":"Helper checks in input 2 plus exact WebLogo RNA execution in input 4."},
+      {"index":7,"type":"Adversarial regression","label":"Non-uniform-background bias direction","status":"COMPLETED","status_flag":"✅","note":"The exact helper calibration and corrected prose agree: uniform bits understate rare true-background letters and overstate common ones.","basic":38,"specialized":58,"total":96,"assertions_passed":3,"assertions_total":3,"assertions":[{"text":"Human C=.21 is taller than 2 uniform bits","result":"PASS","note":"2.251538767 bits."},{"text":"Human A=.29 is lower than 2 uniform bits","result":"PASS","note":"Documented 1.786 bits."},{"text":"Streptomyces composition is illustrative, not independently sourced","result":"PASS","note":"Exact-source wording."}],"executed":true,"execution_note":"Exact helper calibration plus exact-source inspection."},
+      {"index":8,"type":"New end-to-end input","label":"Self-contained shipped-example execution","status":"COMPLETED","status_flag":"✅","note":"The formerly incomplete example ran from a clean exact checkout using bundled fixtures and produced exactly its four stated PDFs.","basic":39,"specialized":58,"total":97,"assertions_passed":5,"assertions_total":5,"assertions":[{"text":"All required FASTA fixtures are bundled","result":"PASS","note":"DNA, three multi-logo, and protein inputs."},{"text":"N labels are derived from loaded data","result":"PASS","note":"Exact-source inspection."},{"text":"Four declared PDFs are non-empty","result":"PASS","note":"32,818 / 38,993 / 24,722 / 24,749 B."},{"text":"No Rplots.pdf is emitted","result":"PASS","note":"Artifact check False."},{"text":"Custom and uniform panels are truthfully distinguished","result":"PASS","note":"Exact-source inspection plus successful render."}],"executed":true,"execution_note":"run/exact-commit-20260923-200710/examples/seqlogo_phd.R; exit 0 with process-local guard."},
+      {"index":9,"type":"New environment boundary","label":"Windows ggseqlogo CLI teardown containment","status":"COMPLETED","status_flag":"✅","note":"The process-local guard yields clean helper and example exits and receipts prove the cli package was unloaded; no global profile was changed.","basic":38,"specialized":58,"total":96,"assertions_passed":3,"assertions_total":3,"assertions":[{"text":"Helper test exits zero under the process-local profile","result":"PASS","note":"helper_exit=0; cli_unloaded=TRUE."},{"text":"Example exits zero under the process-local profile","result":"PASS","note":"example_exit=0; cli_unloaded=TRUE."},{"text":"Guard is not a shipped/global skill requirement","result":"PASS","note":"Exact checkpoint and source inspection."}],"executed":true,"execution_note":"run/exact-commit-20260923-200710 exit-codes.txt and guard receipts."}
+    ]
+  },
+  "final":{"static_weighted":37.2,"dynamic_weighted":56.9,"score":94,"max":100,"grade":"Production Ready","grade_symbol":"⭐","deployable":true,"veto_override":false},
+  "key_strengths":["The silent ggseqlogo background-correction defect is replaced by an executable and numerically tested relative-entropy route.","The exact checkout's self-contained example emitted all declared PDFs without a stray device output.","Exact current-code Logomaker and WebLogo regressions cover the corrected API and RNA paths."],
+  "recommendations":[]
+}
