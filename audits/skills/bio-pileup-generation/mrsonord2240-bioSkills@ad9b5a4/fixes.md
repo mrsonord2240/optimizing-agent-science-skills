@@ -73,3 +73,23 @@ Tools: samtools 1.24, bcftools 1.24, pysam 0.24.1 (WSL `science`, env `alignment
 Redundancy (this pass): pysam table `--ff` row no longer repeats the four default flags (says 1796 = the same four); `-d` row and the Maximum Depth comment point to each other and to the options table instead of repeating the `max_depth=0` fact and both default numbers; example header says pysam has no BAQ only without a fastafile. Nothing deleted from the agent's reach.
 
 Unfixed: none of the 6 re-audit findings is open. Not done: `stepper='nofilter'` and `pileup_read.indel` remain as described in round 1.
+
+## 2026-09-24 (final pass: Codex)
+
+Final-pass source commit: `3eac20f00989e1b287984d13e92c59e7ff5c86a2`, branch
+`agent/finalpass-bio-pileup-generation-20260924`, based on staging
+`2812e22`. The final audit is same-agent by design (`auditor_independent:
+false`), reports 95/100 Production Ready, and cites that exact commit.
+
+| Finding | Priority | Change | Verified |
+| --- | --- | --- | --- |
+| `allele_counts` included read-base `N` while `find_variants` excluded it | P2 | Moved shared functions to `examples/pileup_helpers.py`; `allele_counts` now skips read-base `N`, so `allele_frequency` and `find_variants` use compatible non-N denominators. `examples/allele_counts.py` imports the shared function. | Fresh planted site: `{'G': 17}`, no `N`; frequencies sum to 1.0. Archived planted-SNV and CLI routes still pass. |
+| `pileup_text` crashed on a deletion after the read's final base with `-Q 0` | P2 | Render the samtools Q0 deletion quality (`!`) when no next query quality exists. | Fresh `14M3D` fixture: 3,187 rows exactly equal `samtools mpileup --ff 0 -Q 0 -B`, with no `IndexError`. |
+| Padded (`P`) CIGARs were silently rendered differently from samtools | P2 | The helper states its ordinary-aligner-CIGAR scope and raises a named `ValueError` for padding instead of emitting incorrect pileup text. | Fresh padded-CIGAR fixture gets an actionable padding error. |
+| Large inline helpers inflated `SKILL.md` | P2 | Moved reusable helpers into one importable module and added `examples/self_test.py`, which builds an isolated temporary FASTA/BAM and tests counts, frequencies, SNVs, and text rows. | Main guide reduced to 361 lines; shipped self-test and CLI execute successfully. |
+
+Regression evidence: every archived input reran from an audit-owned copy of
+the exact source: inputs 1--7 passed 28/28, 28/28, 41/41, 21/21, 28/28, 56/56,
+and 28/28 checks. Fresh final-pass checks also passed 14/14. Toolchain: WSL
+`science` `alignment-files` environment, samtools/htslib 1.24, bcftools 1.24,
+pysam 0.24.1, Python 3.12.14.

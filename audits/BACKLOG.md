@@ -8,7 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (84)
+## P1 (83)
 
 ### `bio-data-visualization-statistical-annotation` — stat_compare_means(comparisons, p.adjust.method='holm') draws unadjusted p; the argument does not exist
 
@@ -354,14 +354,6 @@ None open.
 - Root cause: The Failure Mode text reads as if -D 500 is the fix; the measured GLA case is favourable, this one is not.
 - Fix: Add the CFTR measurement next to the GLA one and say that a deep-intronic candidate at 0.10-0.20 with a Pangolin gain is a "discordant, needs RNA" case, not a rescue by -D.
 
-### `bio-pileup-generation` — Round 2 introduced a false statement: BAQ 'under either stepper'; 'all' is the default
-
-- Skill: 85, Production Ready · [mrsonord2240/bioSkills@5fc1304](https://github.com/mrsonord2240/bioSkills/tree/5fc1304c09be282792e56a613274508db5bfaead/alignment-files/pileup-generation) · [viewer](skills/bio-pileup-generation/mrsonord2240-bioSkills@5fc1304/viewer.md)
-- Observed in inputs: 7
-- Problem: SKILL.md says fastafile switches BAQ on 'under either stepper (`'all'`, the default, or `'samtools'`)' and the table row for `-f` says 'either stepper'. pysam 0.24.1's default stepper is 'samtools'; with an explicit stepper='all' (or 'nofilter') fastafile applies NO BAQ (538/538 BAQ positions on the own single-end BAM, 49/49 on real SE data; identical qualities with and without fastafile), and 'all' also skips overlap removal and the orphan filter (281 human-BAM positions differ from `-B`), so the `-x`/`-A` 'default matches' rows only hold for the default stepper. Round 1's wording (stepper='samtools' + fastafile) was correct; the fix log's 'either stepper' verification called the no-argument call 'all'.
-- Root cause: The round-2 harness passed no stepper argument for its 'all' rows, so both rows exercised the default 'samtools' stepper.
-- Fix: Rewrite the paragraph and table row: 'pysam's default stepper is `samtools`. With it, `fastafile=` switches BAQ on and `ignore_overlaps` / `ignore_orphans` / `min_base_quality` apply; with `stepper='all'` or `'nofilter'` neither BAQ nor overlap/orphan handling is applied, so do not pass them when matching mpileup.' Drop 'either stepper' and '`'all'`, the default'.
-
 ### `bio-splicing-qc` — The documented "-l/-u/-s for a finer 80-100% range" tip gives wrong curves
 
 - Skill: 85, Production Ready · [mrsonord2240/bioSkills@9a5cf9b](https://github.com/mrsonord2240/bioSkills/tree/9a5cf9bd40c5aa1c6b7f8a3b1fc227ccd96fa547/alternative-splicing/splicing-qc) · [viewer](skills/bio-splicing-qc/mrsonord2240-bioSkills@9a5cf9b/viewer.md)
@@ -682,7 +674,7 @@ None open.
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (191)
+## P2 (188)
 
 ### `bio-data-visualization-statistical-annotation` — Test-name and label details differ from the tools
 
@@ -1107,30 +1099,6 @@ None open.
 - Problem: torch via pip pulls the CUDA wheel by default, SpliceTransformer needs a Drive download and pyensembl indexing that I could not repeat from scratch; SKILL.md is still 443 lines with no references/ layer.
 - Root cause: Recipes were verified in the fixer's envs; restructuring was declared out of scope.
 - Fix: Add a CPU-torch note and pin the GitHub commits; move ASO, branchpoint and HGVS material to references/.
-
-### `bio-pileup-generation` — allele_counts counts read-base N as an allele; find_variants drops it
-
-- Skill: 85, Production Ready · [mrsonord2240/bioSkills@5fc1304](https://github.com/mrsonord2240/bioSkills/tree/5fc1304c09be282792e56a613274508db5bfaead/alignment-files/pileup-generation) · [viewer](skills/bio-pileup-generation/mrsonord2240-bioSkills@5fc1304/viewer.md)
-- Observed in inputs: 8
-- Problem: At a site with 3 read-base N in 20 reads, allele_counts returns {'G': 17, 'N': 3} and allele_frequency divides by 20, while find_variants (round 2) drops N from alleles and depth; the docstrings do not say so.
-- Root cause: The N fix was applied to find_variants only.
-- Fix: Skip base 'N' in allele_counts as well (or state 'N is counted as its own allele' in its docstring) so the two helpers agree.
-
-### `bio-pileup-generation` — pileup_text scope: P-op CIGARs differ and a CIGAR ending in D crashes under -Q 0
-
-- Skill: 85, Production Ready · [mrsonord2240/bioSkills@5fc1304](https://github.com/mrsonord2240/bioSkills/tree/5fc1304c09be282792e56a613274508db5bfaead/alignment-files/pileup-generation) · [viewer](skills/bio-pileup-generation/mrsonord2240-bioSkills@5fc1304/viewer.md)
-- Observed in inputs: 6
-- Problem: Templates with a P (padding) op differ from samtools in 148-462 rows (samtools prints '+3*AC'); a read whose CIGAR ends in a deletion makes pileup_text raise IndexError when run with min_base_quality=0 / flag_filter=0.
-- Root cause: indel_text ignores op 6, and query_position_or_next is out of range after a trailing D.
-- Fix: One docstring sentence: 'aligner-legal CIGARs only (no P ops, no trailing D)', or guard the quality lookup.
-
-### `bio-pileup-generation` — SKILL.md is 24.6 KB with all helper code inline
-
-- Skill: 85, Production Ready · [mrsonord2240/bioSkills@5fc1304](https://github.com/mrsonord2240/bioSkills/tree/5fc1304c09be282792e56a613274508db5bfaead/alignment-files/pileup-generation) · [viewer](skills/bio-pileup-generation/mrsonord2240-bioSkills@5fc1304/viewer.md)
-- Observed in inputs: —
-- Problem: The single file grew from 14.8 KB to 24.6 KB (479 lines); the ~150 lines of pysam helpers are loaded on every invocation, and only one of them ships as a runnable example.
-- Root cause: The dedup moved usage-guide code into SKILL.md instead of into examples/.
-- Fix: Move allele_counts / find_variants / pileup_text into examples/ (with a small self-test) and keep the table and one-line usage in SKILL.md.
 
 ### `bio-splicing-qc` — RSeQC summary wording and a missing drill-down for a high novel rate
 

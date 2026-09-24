@@ -1,0 +1,55 @@
+{
+  "meta": {
+    "skill_name": "bio-pileup-generation",
+    "description": "Generate pileup data for variant calling using samtools mpileup and pysam. Use when preparing data for variant calling, analyzing per-position read data, or calculating allele frequencies.",
+    "evaluated_on": "2026-09-24",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Moderate",
+    "n_inputs": 9,
+    "source": "mrsonord2240/bioSkills@3eac20f00989e1b287984d13e92c59e7ff5c86a2:alignment-files/pileup-generation",
+    "mode": "final pass",
+    "audit_type": "final pass: fixed and audited under one brief, see CHECKPOINT.md",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md",
+    "executed": "9/9",
+    "executed_inputs": "9/9",
+    "environment": "WSL science env alignment-files: samtools/htslib 1.24, bcftools 1.24, pysam 0.24.1, Python 3.12.14",
+    "regression_evidence": "All seven archived inputs were rerun against an audit-owned exact-source copy (28+28+41+21+28+56+28 assertions). Two fresh exact-source inputs checked read-N consistency, trailing-deletion parity, padded-CIGAR refusal, and the shipped self-test."
+  },
+  "veto_gates": {
+    "skill_veto": {"gate":"PASS","stability":"PASS","contract":"PASS","determinism":"PASS","security":"PASS"},
+    "research_veto": {"applicable":true,"gate":"PASS","scientific_integrity":{"result":"PASS","detail":"Claims are grounded in labelled synthetic fixtures, real alignment slices, and observed tool behavior."},"practice_boundaries":{"result":"PASS","detail":"No clinical inference; production callers are named for out-of-scope cases."},"methodological_ground":{"result":"PASS","detail":"BAQ, flags, depth caps, read-N handling, and text-pileup parity were re-executed."},"code_usability":{"result":"PASS","detail":"The CLI and deterministic self-test run; helpers match samtools on archived and fresh fixtures."}}
+  },
+  "static_score": {
+    "subtotal":94,"max":100,
+    "categories": {
+      "functional_suitability":{"score":12,"max":12,"note":"Text pileup, pysam helpers, and modern bcftools calling routes are complete and tested."},
+      "reliability":{"score":12,"max":12,"note":"Read-N denominators agree, trailing deletions cannot crash the renderer, and padded CIGARs fail clearly."},
+      "performance_context":{"score":7,"max":8,"note":"The main guide is now 361 lines and reusable code lives in importable examples."},
+      "agent_usability":{"score":15,"max":16,"note":"Version checks, option mappings, recipes, and error boundaries are explicit."},
+      "human_usability":{"score":8,"max":8,"note":"Natural prompts remain and point to focused helpers."},
+      "security":{"score":12,"max":12,"note":"No credentials, network mutation, or unsafe path handling is introduced."},
+      "maintainability":{"score":10,"max":12,"note":"Helpers are shipped once and covered by a deterministic temporary-fixture self-test."},
+      "agent_specific":{"score":18,"max":20,"note":"Tool choice, deprecations, scope limits, and stop conditions are clear."}
+    }
+  },
+  "dynamic_score": {
+    "execution_avg":96.0,"max":100,"assertion_pass_rate":{"passed":27,"total":27},
+    "inputs": [
+      {"index":1,"type":"Canonical regression","label":"Archived real human text pileup, defaults, output format, and pysam table","status":"COMPLETED","status_flag":"✅","note":"t01_regress_real_mpileup.py: 28/28 checks pass.","basic":38,"specialized":58,"total":96,"assertions_passed":3,"assertions_total":3,"assertions":[{"text":"Text output and depth semantics match real alignment data","result":"PASS","note":"1,157 rows independently decoded."},{"text":"Default and BAQ parameter mappings reproduce","result":"PASS","note":"Pysam/samtools depths match position by position."},{"text":"Documented option defaults and error strings reproduce","result":"PASS","note":"samtools and bcftools checks pass."}],"executed":true,"execution_note":"Exact-source audit copy in WSL alignment-files."},
+      {"index":2,"type":"Variant regression","label":"Archived planted SNVs, read access, helper functions, and shipped CLI","status":"COMPLETED","status_flag":"✅","note":"t02_regress_pysam_helpers.py: 28/28 checks pass.","basic":38,"specialized":59,"total":97,"assertions_passed":3,"assertions_total":3,"assertions":[{"text":"Allele helpers and SNV finder recover planted truth","result":"PASS","note":"30/10 count and 10/40 SNV recovered."},{"text":"pileup_text equals samtools on synthetic events","result":"PASS","note":"Default and filtered paths pass."},{"text":"Shipped counter handles real, splice, and hostile inputs","result":"PASS","note":"Clean errors and expected counts."}],"executed":true,"execution_note":"Exact-source audit copy in WSL alignment-files."},
+      {"index":3,"type":"Edge regression","label":"Archived defaults, flags, BAQ, depth-cap, and hostile-input checks","status":"COMPLETED","status_flag":"✅","note":"t03_regress_edge_defaults.py: 41/41 checks pass.","basic":38,"specialized":58,"total":96,"assertions_passed":3,"assertions_total":3,"assertions":[{"text":"Depth and flag defaults match tools","result":"PASS","note":"8000 cap and default filters verified."},{"text":"BAQ behavior is reproduced","result":"PASS","note":"Deletion visibility changes as documented."},{"text":"CLI errors are concise","result":"PASS","note":"Hostile input matrix passed."}],"executed":true,"execution_note":"Exact-source audit copy in WSL alignment-files."},
+      {"index":4,"type":"Pipeline regression","label":"Archived bcftools germline, BCF, joint, and parallel-by-contig flows","status":"COMPLETED","status_flag":"✅","note":"t04_regress_bcftools.py: 21/21 checks pass.","basic":38,"specialized":58,"total":96,"assertions_passed":3,"assertions_total":3,"assertions":[{"text":"Documented bcftools routes execute","result":"PASS","note":"Planted variants and BCF intermediate verified."},{"text":"Parallel merge preserves header order","result":"PASS","note":"Failure and ordered merge cases pass."},{"text":"Wrong text-to-call pipe fails as documented","result":"PASS","note":"Correct nonzero behavior observed."}],"executed":true,"execution_note":"Exact-source audit copy in WSL alignment-files."},
+      {"index":5,"type":"Real-data regression","label":"Archived library-specific flags and real BAM helper matrix","status":"COMPLETED","status_flag":"✅","note":"t05_regress_library_real.py: 28/28 checks pass.","basic":38,"specialized":58,"total":96,"assertions_passed":3,"assertions_total":3,"assertions":[{"text":"Library cheat-sheet rows run","result":"PASS","note":"ARTIC, RNA-seq, and 1000G paths covered."},{"text":"Default stepper guidance agrees with behavior","result":"PASS","note":"BAQ and overlap semantics observed."},{"text":"Multi-BAM layout remains correct","result":"PASS","note":"Twelve-column output verified."}],"executed":true,"execution_note":"Exact-source audit copy in WSL alignment-files."},
+      {"index":6,"type":"CIGAR regression","label":"Archived planted and randomized differential matrix","status":"COMPLETED","status_flag":"✅","note":"t06_new_planted_and_fuzz.py: 56/56 checks pass.","basic":38,"specialized":59,"total":97,"assertions_passed":3,"assertions_total":3,"assertions":[{"text":"Ordinary indel and splice rendering matches samtools","result":"PASS","note":"Planted and fuzz data passed."},{"text":"SNV-only helper boundaries hold","result":"PASS","note":"Reference skips and indels handled correctly."},{"text":"Depth semantics remain documented","result":"PASS","note":"n versus pileups assertion passed."}],"executed":true,"execution_note":"Exact-source audit copy in WSL alignment-files."},
+      {"index":7,"type":"Real-data matrix regression","label":"Archived real and synthetic pysam/samtools parameter matrix","status":"COMPLETED","status_flag":"✅","note":"t07_new_real_matrix.py: 28/28 checks pass.","basic":38,"specialized":59,"total":97,"assertions_passed":3,"assertions_total":3,"assertions":[{"text":"Parameter mappings agree across datasets","result":"PASS","note":"Matrix has no mismatches."},{"text":"pileup_text remains row-for-row compatible","result":"PASS","note":"Real and synthetic rows pass."},{"text":"Guide remains non-duplicative and complete","result":"PASS","note":"Prompt and token checks pass."}],"executed":true,"execution_note":"Exact-source audit copy in WSL alignment-files."},
+      {"index":8,"type":"Fresh defect regression","label":"Read-N policy consistency and trailing-deletion parity","status":"COMPLETED","status_flag":"✅","note":"final_pass_verify.py: read-N and trailing-deletion checks pass.","basic":39,"specialized":60,"total":99,"assertions_passed":3,"assertions_total":3,"assertions":[{"text":"allele_counts excludes read-base N","result":"PASS","note":"17 G and no N at the fresh fixture site."},{"text":"Allele frequencies use the same denominator","result":"PASS","note":"Frequencies sum to one after N exclusion."},{"text":"Trailing deletion exactly matches samtools","result":"PASS","note":"3,187 rows, no IndexError."}],"executed":true,"execution_note":"Exact committed source executed in WSL alignment-files."},
+      {"index":9,"type":"Fresh packaged-example boundary","label":"Padded-CIGAR scope and deterministic shipped self-test","status":"COMPLETED","status_flag":"✅","note":"final_pass_verify.py: padded-CIGAR and self-test checks pass.","basic":39,"specialized":60,"total":99,"assertions_passed":3,"assertions_total":3,"assertions":[{"text":"Padded CIGAR fails with an actionable message","result":"PASS","note":"No silent incorrect rendering."},{"text":"The shipped temporary-fixture self-test passes","result":"PASS","note":"All helpers exercised."},{"text":"The command-line counter uses the shared helper","result":"PASS","note":"Planted 30/10 CLI output verified."}],"executed":true,"execution_note":"Exact committed source executed in WSL alignment-files."}
+    ]
+  },
+  "final":{"static_weighted":37.6,"dynamic_weighted":57.6,"score":95,"max":100,"grade":"Production Ready","grade_symbol":"⭐","deployable":true,"veto_override":false},
+  "key_strengths":["All seven archived audit inputs reran successfully against the exact-source audit copy.","Reusable helpers are shipped as importable, deterministic examples rather than duplicated inline code.","Read-N counts and frequencies agree with find_variants, and the trailing-deletion crash is eliminated.","Padded CIGARs are rejected explicitly rather than silently rendered incorrectly."],
+  "recommendations":[]
+}
