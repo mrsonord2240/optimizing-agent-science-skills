@@ -1,8 +1,7 @@
 """Assemble the optimized-scientific-skills repository.
 
-Contents, per Sam 2026-09-17:
-  - every Skill whose latest audit is deployable with no open P0, whatever its score, with
-    `fix_pass: needed` marking those not yet through a fix pass
+Contents, per Sam 2026-09-24:
+  - the fixed 157-Skill published shelf, refreshed in place as its Skills finish their final passes
   - a list of what remains, limited for now to the rest of GPTomics/bioSkills
 
 Layout is flat, `skills/<skill-id>/`, so the directory name equals the frontmatter `name` and equals
@@ -26,6 +25,7 @@ UPSTREAM_COMMIT = "d91ed3d563019e649dc854c56ccd62551359488a"
 FORK_COMMIT = "5bfde8a9411f445ef9dad51fa4aea7dc1bf27ef8"
 AUDITS = "F:/OpenScience/audits"
 OUT = "F:/optimized-scientific-skills"
+SHELF_SIZE = 157
 MARKETPLACE_HOLDS = os.path.normpath(os.path.join(
     os.path.dirname(__file__), "..", "config", "marketplace_submission_holds.json"))
 
@@ -40,6 +40,28 @@ OUT_OF_SCOPE = {
     "clawhub-installer": "upstream's own corpus installer, not a science Skill; declares "
                          "os: darwin/linux only and exists to install the other Skills",
 }
+
+
+def load_shelf_scope(out_dir=OUT):
+    """The published shelf is an update-in-place scope, not an expanding audit queue.
+
+    Sam fixed this pass at the 157 Skills already published on 2026-09-24.  Audit records for
+    other Skills remain useful backlog evidence, but they must not silently expand this repository.
+    Read the current published provenance before rebuilding and fail closed if its membership is
+    missing or no longer exactly the agreed scope.
+    """
+    path = os.path.join(out_dir, "PROVENANCE.json")
+    try:
+        with open(path, encoding="utf-8") as fh:
+            rows = json.load(fh)["skills"]
+        ids = {row["id"] for row in rows}
+    except (OSError, KeyError, TypeError, json.JSONDecodeError) as exc:
+        raise SystemExit(f"cannot load fixed shelf scope from {path}: {exc}") from exc
+    if len(ids) != SHELF_SIZE or len(rows) != SHELF_SIZE:
+        raise SystemExit(
+            f"{path}: expected exactly {SHELF_SIZE} unique published Skills, "
+            f"found {len(ids)} unique ids across {len(rows)} rows")
+    return ids
 
 
 def load_marketplace_holds(path=MARKETPLACE_HOLDS):
@@ -203,13 +225,17 @@ def acquire_promote_lock(out_dir=OUT, timeout=600, poll=2):
 
 
 def main():
-    # Every Skill whose latest audit is deployable with no open P0 is promoted, whatever its score
-    # (Sam, 2026-09-17). Skills that have not yet been through a fix pass are promoted too, and are
-    # flagged `fix_pass: needed` in PROVENANCE.json and listed in REMAINING.md.
+    # Refresh only the fixed 157-Skill shelf (Sam, 2026-09-24). Deployable audit records outside
+    # that membership stay in the backlog instead of silently expanding the published repository.
     apply = "--apply" in sys.argv
     if apply:
         acquire_promote_lock()
     idx = skill_index()
+    shelf_scope = load_shelf_scope()
+    unknown_shelf_ids = sorted(shelf_scope - set(idx))
+    if unknown_shelf_ids:
+        raise SystemExit("published shelf Skill(s) missing from the pinned source tree: "
+                         + ", ".join(unknown_shelf_ids))
     rep = audits()
     marketplace_holds = load_marketplace_holds()
     unknown_holds = sorted(set(marketplace_holds) - set(idx))
@@ -249,7 +275,11 @@ def main():
         # still promoted, but flagged so the score is never read as describing these bytes.
         row["reaudit"] = ("needed" if audited_bytes_differ(
             r.get("source") or r.get("meta", {}).get("source"), idx[sid]) else "not needed")
-        (finished if fin["deployable"] and not p0 else excluded).append(row)
+        if fin["deployable"] and not p0:
+            if sid in shelf_scope:
+                finished.append(row)
+        else:
+            excluded.append(row)
 
     for row in finished:
         kind, files = classify(row["upstream_path"])
@@ -284,6 +314,11 @@ def main():
     if not apply:
         print("\nDRY RUN — pass --apply to write the repository")
         return
+
+    if len(finished) != SHELF_SIZE:
+        raise SystemExit(
+            f"refusing to rewrite the fixed shelf: expected {SHELF_SIZE} publishable Skills, "
+            f"found {len(finished)}")
 
     os.makedirs(OUT, exist_ok=True)
     sk = os.path.join(OUT, "skills")
