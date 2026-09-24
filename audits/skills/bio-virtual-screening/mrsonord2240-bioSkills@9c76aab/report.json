@@ -1,6 +1,7 @@
 {
   "meta": {
     "skill_name": "bio-virtual-screening",
+    "category": "Data Analysis",
     "description": "Virtual-screening workflow for receptor preparation, binding-site prediction, ligand preparation, docking, pose review, and screening triage.",
     "source": "mrsonord2240/bioSkills@9c76aab55da6a7304f99b214feea6a75b5aacd8e:chemoinformatics/virtual-screening",
     "evaluated_on": "2026-09-23",

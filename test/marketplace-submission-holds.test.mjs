@@ -85,3 +85,33 @@ print(json.dumps({"intake_ran": any("INTAKE REJECTED" in result for result in ou
   assert.match(result.outputs[1], /bio-causal-genomics-mediation-analysis/);
   assert.match(result.outputs[1], /bio-causal-genomics-pleiotropy-detection/);
 });
+
+test("manifest category comes from Skill frontmatter and is fail-closed", () => {
+  const output = execFileSync("python", ["-c", String.raw`
+import importlib.util
+import json
+import tempfile
+from pathlib import Path
+
+root = Path(r"${root}")
+spec = importlib.util.spec_from_file_location("marketplace_manifests", root / "tools" / "marketplace_manifests.py")
+module = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(module)
+with tempfile.TemporaryDirectory() as tmp:
+    shelf = Path(tmp)
+    skill = shelf / "skills" / "example"
+    skill.mkdir(parents=True)
+    path = skill / "SKILL.md"
+    path.write_text("---\nname: example\ncategory: Evidence Insight\n---\n", encoding="utf-8")
+    assert module.skill_category("example", shelf) == "Evidence Insight"
+    path.write_text("---\nname: example\ncategory: Made Up\n---\n", encoding="utf-8")
+    try:
+        module.skill_category("example", shelf)
+    except SystemExit as exc:
+        assert "invalid marketplace category" in str(exc)
+    else:
+        raise AssertionError("invalid category was accepted")
+print(json.dumps({"ok": True}))
+`], { encoding: "utf8" });
+  assert.deepEqual(JSON.parse(output), { ok: true });
+});

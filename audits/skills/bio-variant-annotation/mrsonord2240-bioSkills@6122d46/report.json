@@ -1,6 +1,7 @@
 {
   "meta": {
     "skill_name": "bio-variant-annotation",
+    "category": "Data Analysis",
     "evaluated_on": "2026-09-24",
     "source": "mrsonord2240/bioSkills@6122d469f440f6030b278a155d8e4e78c8788dbf:variant-calling/variant-annotation",
     "auditor_independent": false,

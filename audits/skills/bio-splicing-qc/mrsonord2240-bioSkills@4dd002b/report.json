@@ -1,6 +1,7 @@
 {
   "meta": {
     "skill_name": "bio-splicing-qc",
+    "category": "Data Analysis",
     "evaluated_on": "2026-09-24",
     "audit_kind": "final corrective re-audit",
     "source": "mrsonord2240/bioSkills@4dd002b3ef77b6019b9cd59ff7309af20b0972a2:alternative-splicing/splicing-qc",

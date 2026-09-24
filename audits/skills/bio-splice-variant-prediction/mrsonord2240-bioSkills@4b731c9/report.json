@@ -1,6 +1,7 @@
 {
   "meta": {
     "skill_name": "bio-splice-variant-prediction",
+    "category": "Data Analysis",
     "evaluated_on": "2026-09-24",
     "source": "mrsonord2240/bioSkills@4b731c929804830dee9ea5862ce8d1ec340f7f78:alternative-splicing/splice-variant-prediction",
     "auditor_independent": false,

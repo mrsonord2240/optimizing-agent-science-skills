@@ -35,10 +35,38 @@ MARKETPLACE_JSON = "https://statics.aipoch.com/open-science/skill-marketplace/v1
 MARKETPLACE_HOLDS = os.path.normpath(os.path.join(
     os.path.dirname(__file__), "..", "config", "marketplace_submission_holds.json"))
 
-# The marketplace has five fixed categories. Everything in bioSkills is computational analysis except
-# the study-design folder. A maintainer may recategorise on review.
-DEFAULT_CATEGORY = "Data Analysis"
-FOLDER_CATEGORY = {"experimental-design": "Protocol Design"}
+# The marketplace has five fixed categories. Classification is audit evidence, so manifest
+# generation reads the declaration promoted with the Skill and never guesses from its folder.
+VALID_CATEGORIES = {
+    "Evidence Insight",
+    "Protocol Design",
+    "Data Analysis",
+    "Academic Writing",
+    "Other",
+}
+
+
+def skill_category(skill_id, shelf=None):
+    shelf = shelf or SHELF
+    path = os.path.join(shelf, "skills", skill_id, "SKILL.md")
+    try:
+        with open(path, encoding="utf-8") as fh:
+            text = fh.read()
+    except OSError as exc:
+        raise SystemExit(f"{path}: cannot read Skill frontmatter: {exc}") from exc
+    if not text.startswith("---"):
+        raise SystemExit(f"{path}: missing YAML frontmatter")
+    end = text.find("\n---", 3)
+    if end < 0:
+        raise SystemExit(f"{path}: unterminated YAML frontmatter")
+    matches = [line.split(":", 1)[1].strip().strip("\"'")
+               for line in text[3:end].splitlines() if line.startswith("category:")]
+    if len(matches) != 1:
+        raise SystemExit(f"{path}: expected exactly one category frontmatter field")
+    category = matches[0]
+    if category not in VALID_CATEGORIES:
+        raise SystemExit(f"{path}: invalid marketplace category {category!r}")
+    return category
 
 
 def load_marketplace_holds(path=MARKETPLACE_HOLDS):
@@ -104,6 +132,11 @@ def main():
     written = []
     for r in rows:
         sid = r["id"]
+        category = skill_category(sid)
+        if r.get("category") != category:
+            raise SystemExit(
+                f"{sid}: PROVENANCE category {r.get('category')!r} does not match "
+                f"SKILL.md category {category!r}")
         commit = git("log", "-1", "--format=%H", "--", f"skills/{sid}")
         alias = sid[4:] if sid.startswith("bio-") else sid
         if sid in live or alias in stripped:
@@ -120,7 +153,7 @@ def main():
             "schema_version": 1,
             "id": sid,
             "version": args.version,
-            "category": FOLDER_CATEGORY.get(r["upstream_path"].split("/")[0], DEFAULT_CATEGORY),
+            "category": category,
             "source": {"repository": SHELF_URL, "commit": commit, "path": f"skills/{sid}"},
             "license_files": ["LICENSE"],
         }

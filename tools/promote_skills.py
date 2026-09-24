@@ -22,17 +22,30 @@ import time
 REC = "F:/optimizing-agent-science-skills"
 FORK = "F:/OpenScience/external/mrsonord2240__bioSkills"
 UPSTREAM_COMMIT = "d91ed3d563019e649dc854c56ccd62551359488a"
-FORK_COMMIT = "9d9d66773e8d25145c2580c58423acc6cb238be4"
+FORK_COMMIT = "7963580251c856f48511aa64c438dd798decb0ae"
 AUDITS = "F:/OpenScience/audits"
 OUT = "F:/optimized-scientific-skills"
 SHELF_SIZE = 157
 MARKETPLACE_HOLDS = os.path.normpath(os.path.join(
     os.path.dirname(__file__), "..", "config", "marketplace_submission_holds.json"))
 
-# The two lines added to every SKILL.md across the corpus: `license: MIT` (558aea5) and
-# `author: GPTomics` (2026-09-21, the marketplace keeps a frontmatter author as the attribution claim).
-# Neither counts as a change to what an audit ran on.
+# Metadata declarations added corpus-wide after the scientific audits. They do not change the
+# instructions or executable payload the audit evaluated. Category is accepted only from the five
+# values defined by AIPOCH MedSkillAudit, and is separately required to match the audit report.
 DECLARATIONS = {"+license: MIT", "+author: GPTomics"}
+VALID_CATEGORIES = {
+    "Evidence Insight",
+    "Protocol Design",
+    "Data Analysis",
+    "Academic Writing",
+    "Other",
+}
+
+
+def is_declaration_change(line):
+    if line in DECLARATIONS:
+        return True
+    return line.startswith("+category: ") and line[len("+category: "):] in VALID_CATEGORIES
 
 
 def grade_for_score(score):
@@ -166,7 +179,7 @@ def classify(path):
     changed = [l for l in out.splitlines()
                if l[:1] in "+-" and not l.startswith(("+++", "---"))]
     files = sorted({l.split("/")[-1] for l in out.splitlines() if l.startswith("+++ b/")})
-    if all(l in DECLARATIONS for l in changed):
+    if all(is_declaration_change(l) for l in changed):
         return "declarations-only", files
     return "modified", files
 
@@ -175,14 +188,27 @@ def audited_bytes_differ(source, path):
     """True when the bytes at FORK_COMMIT are not the bytes the audit ran on.
 
     A Skill fixed after its audit but not yet re-audited must not be promoted on the old score. The
-    declaration lines in DECLARATIONS, added corpus-wide, are the only tolerated difference.
+    declaration lines accepted by `is_declaration_change`, added corpus-wide, are the only
+    tolerated difference.
     """
     m = re.match(r"^[\w.-]+/[\w.-]+@([0-9a-f]{7,40}):", source or "")
     if not m:
         return True
     out = git(["diff", "-U0", m.group(1), FORK_COMMIT, "--", path]).stdout or ""
     changed = [l for l in out.splitlines() if l[:1] in "+-" and not l.startswith(("+++", "---"))]
-    return any(l not in DECLARATIONS for l in changed)
+    return any(not is_declaration_change(l) for l in changed)
+
+
+def source_category(path):
+    """Read the canonical category declaration from a Skill at the pinned source commit."""
+    head = git(["show", f"{FORK_COMMIT}:{path}/SKILL.md"]).stdout or ""
+    matches = re.findall(r"^category:\s*(.+)$", head, re.M)
+    if len(matches) != 1:
+        raise SystemExit(f"{path}/SKILL.md: expected exactly one category frontmatter field")
+    category = matches[0].strip().strip("\"'")
+    if category not in VALID_CATEGORIES:
+        raise SystemExit(f"{path}/SKILL.md: invalid category {category!r}")
+    return category
 
 
 def audit_source_commit(source):
@@ -305,6 +331,16 @@ def main():
         if sid not in idx:
             continue
         fin = r["final"]
+        category = None
+        if sid in shelf_scope:
+            category = r.get("meta", {}).get("category")
+            if category not in VALID_CATEGORIES:
+                raise SystemExit(f"{sid}: audit report has missing or invalid category {category!r}")
+            declared_category = source_category(idx[sid])
+            if declared_category != category:
+                raise SystemExit(
+                    f"{sid}: source category {declared_category!r} does not match audit category "
+                    f"{category!r}")
         if fin["deployable"]:
             expected_grade = grade_for_score(fin["score"])
             if fin["grade"] != expected_grade:
@@ -323,6 +359,8 @@ def main():
             "fix_log": f"fixes/{sid}.md" if sid in fixlogs else None,
             "fix_pass": "done" if sid in fixlogs else "needed",
         }
+        if category is not None:
+            row["category"] = category
         # Changed since its audit (e.g. the 2026-09-16 P2 backlog round, fixed without a re-audit):
         # still promoted, but flagged so the score is never read as describing these bytes.
         row["reaudit"] = ("needed" if audited_bytes_differ(

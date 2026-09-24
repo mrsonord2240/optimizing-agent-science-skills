@@ -1,6 +1,7 @@
 {
   "meta": {
     "skill_name": "bio-scaffold-analysis",
+    "category": "Data Analysis",
     "source": "mrsonord2240/bioSkills@ca93ac599c17ee0c898c2a443777a60ebcd96177:chemoinformatics/scaffold-analysis",
     "evaluated_on": "2026-09-24",
     "evaluator_version": "skill-auditor@1.0 exact-commit focused re-audit"

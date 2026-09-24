@@ -1,6 +1,7 @@
 {
   "meta": {
     "skill_name": "bio-single-cell-splicing",
+    "category": "Data Analysis",
     "evaluated_on": "2026-09-24",
     "evaluator_version": "final-pass@1.0",
     "source": "mrsonord2240/bioSkills@31a33c13b6b6dd92395c7d399245534317ae1f39:alternative-splicing/single-cell-splicing",

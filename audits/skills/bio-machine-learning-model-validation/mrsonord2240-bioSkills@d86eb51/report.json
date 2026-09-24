@@ -1,6 +1,7 @@
 {
   "meta": {
     "skill_name": "bio-machine-learning-model-validation",
+    "category": "Data Analysis",
     "source": "mrsonord2240/bioSkills@d86eb5194220abbd15e2f8f110390da88a31e5aa:machine-learning/model-validation",
     "evaluated_on": "2026-09-24",
     "audit_type": "exact-commit fix-pass re-audit",

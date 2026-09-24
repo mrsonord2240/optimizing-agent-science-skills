@@ -1,6 +1,7 @@
 {
   "meta": {
     "skill_name": "bio-variant-normalization",
+    "category": "Data Analysis",
     "evaluated_on": "2026-09-24",
     "evaluator_version": "skill-auditor@1.0 final-pass exact-commit",
     "execution_mode": "A (combined fixer/auditor final pass)",

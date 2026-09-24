@@ -1,6 +1,7 @@
 {
   "meta": {
     "skill_name": "bio-molecular-io",
+    "category": "Data Analysis",
     "source": "mrsonord2240/bioSkills@2f3d8d3c43ef34e5ff55af1b04a9abf263c5c631:chemoinformatics/molecular-io",
     "commit": "2f3d8d3c43ef34e5ff55af1b04a9abf263c5c631",
     "evaluated_on": "2026-09-24",

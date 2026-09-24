@@ -1,6 +1,7 @@
 {
   "meta": {
     "skill_name": "bio-clinical-databases-clinvar-lookup",
+    "category": "Data Analysis",
     "source": "mrsonord2240/bioSkills@4d483d0451fcd60cb3ab62dfa4cd047ec59b3615:clinical-databases/clinvar-lookup",
     "evaluated_on": "2026-09-24",
     "mode": "exact-current re-audit",

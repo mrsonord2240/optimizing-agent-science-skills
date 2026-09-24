@@ -1,6 +1,7 @@
 {
   "meta": {
     "skill_name": "bio-vcf-manipulation",
+    "category": "Data Analysis",
     "evaluated_on": "2026-09-24",
     "source": "mrsonord2240/bioSkills@f16fc56a854565e26d87a67d3de2df91e986b056:variant-calling/vcf-manipulation",
     "source_repo": "F:\\OpenScience\\external\\mrsonord2240__bioSkills",

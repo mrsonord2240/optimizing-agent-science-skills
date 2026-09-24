@@ -1,6 +1,7 @@
 {
   "meta": {
     "skill_name": "bio-substructure-search",
+    "category": "Data Analysis",
     "source": "mrsonord2240/bioSkills@94971d4a4427eb5c682cd860eee91e8d9e41adc7:chemoinformatics/substructure-search",
     "evaluated_on": "2026-09-24",
     "evaluator_version": "skill-auditor@1.0 exact-commit focused re-audit"

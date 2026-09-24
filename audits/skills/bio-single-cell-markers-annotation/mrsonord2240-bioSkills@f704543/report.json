@@ -1,6 +1,7 @@
 {
   "meta": {
     "skill_name": "bio-single-cell-markers-annotation",
+    "category": "Data Analysis",
     "source": "mrsonord2240/bioSkills@f704543b45168b0df1a09670e5f584e173c06d97:single-cell/markers-annotation",
     "evaluated_on": "2026-09-24",
     "evaluator_version": "skill-auditor@1.0 exact-commit focused re-audit"

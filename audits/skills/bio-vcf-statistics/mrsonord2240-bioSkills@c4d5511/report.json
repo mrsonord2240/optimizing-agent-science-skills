@@ -1,6 +1,7 @@
 {
   "meta": {
     "skill_name": "bio-vcf-statistics",
+    "category": "Data Analysis",
     "evaluated_on": "2026-09-24",
     "source": "mrsonord2240/bioSkills@c4d5511fe2830349a9d65609495018ed862ead58:variant-calling/vcf-statistics",
     "auditor_independent": false,
