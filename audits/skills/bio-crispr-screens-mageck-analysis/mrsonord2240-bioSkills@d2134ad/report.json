@@ -1,0 +1,424 @@
+{
+  "source": "mrsonord2240/bioSkills@d2134ad0c94f2e442d6c21f81f51b00db4ca15e1:crispr-screens/mageck-analysis",
+  "meta": {
+    "skill_name": "bio-crispr-screens-mageck-analysis",
+    "description": "MAGeCK pooled-CRISPR screen analysis with RRA/MLE selection, normalization, paired testing, and downstream visualization.",
+    "evaluated_on": "2026-09-24",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 9,
+    "executed_inputs": 9,
+    "source": "mrsonord2240/bioSkills@d2134ad0c94f2e442d6c21f81f51b00db4ca15e1:crispr-screens/mageck-analysis",
+    "audit_type": "final pass",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No invented results; all reported run outcomes come from final-pass outputs."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "Guidance remains limited to pooled-screen analysis, not patient treatment."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Paired RRA, multifactor MLE, and permutation uncertainty are now accurately delimited."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All runnable core CLI routes exercised in the final-pass harness completed."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 94,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 12,
+        "max": 12,
+        "note": "Decision table and worked examples align with the audited CLI."
+      },
+      "reliability": {
+        "score": 11,
+        "max": 12,
+        "note": "Documents default-round uncertainty, baseline/intercept distinction, and external package recovery."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "Keeps progressive disclosure through usage guide and examples."
+      },
+      "agent_usability": {
+        "score": 16,
+        "max": 16,
+        "note": "Explicit decision routes and error recoveries prevent the audited mistakes."
+      },
+      "human_usability": {
+        "score": 8,
+        "max": 8,
+        "note": "Commands and interpretation thresholds are readable and scoped."
+      },
+      "security": {
+        "score": 12,
+        "max": 12,
+        "note": "No credentials or unsafe input interpolation."
+      },
+      "maintainability": {
+        "score": 12,
+        "max": 12,
+        "note": "Version and package-compatibility boundaries are explicit."
+      },
+      "agent_specific": {
+        "score": 16,
+        "max": 20,
+        "note": "Precise trigger, real-data anti-fabrication rule, and sibling handoffs."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 94.8,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 32,
+      "total": 32
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical regression",
+        "label": "Real HAP1 TKOv3 RRA, output-column and volcano checks",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "executed": true,
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "i1_rra exits cleanly",
+            "result": "PASS",
+            "note": "reused completed current-pass output i1_rra.gene_summary.txt"
+          },
+          {
+            "text": "input 1 RRA has high essential/nonessential separation",
+            "result": "PASS",
+            "note": "PR-style rank AUC=0.993"
+          },
+          {
+            "text": "input 1 volcano example includes pandas import",
+            "result": "PASS",
+            "note": "SKILL.md visualization block"
+          },
+          {
+            "text": "input 1 gene-summary columns exist",
+            "result": "PASS",
+            "note": "RRA gene_summary columns"
+          }
+        ],
+        "note": "Fresh final-pass execution; see _final_pass/bio-crispr-screens-mageck-analysis/run/verification.json."
+      },
+      {
+        "index": 2,
+        "type": "Time-course regression",
+        "label": "Two independent round-10 MLE executions",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "executed": true,
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "i2_pr10a exits cleanly",
+            "result": "PASS",
+            "note": "reused completed current-pass output i2_pr10a.gene_summary.txt"
+          },
+          {
+            "text": "i2_pr10b exits cleanly",
+            "result": "PASS",
+            "note": "reused completed current-pass output i2_pr10b.gene_summary.txt"
+          },
+          {
+            "text": "input 2 documented round 10 recovers planted time-course hits",
+            "result": "PASS",
+            "note": "found=20/20"
+          },
+          {
+            "text": "input 2 documented round 10 recovers planted time-course hits",
+            "result": "PASS",
+            "note": "found=20/20"
+          },
+          {
+            "text": "input 2 beta signs reproducible at round 10",
+            "result": "PASS",
+            "note": "two fresh permutation-round-10 runs"
+          }
+        ],
+        "note": "Fresh final-pass execution; see _final_pass/bio-crispr-screens-mageck-analysis/run/verification.json."
+      },
+      {
+        "index": 3,
+        "type": "Heavy-selection regression",
+        "label": "Median versus control-sgRNA normalization",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "executed": true,
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "i3_median exits cleanly",
+            "result": "PASS",
+            "note": "reused completed current-pass output i3_median.gene_summary.txt"
+          },
+          {
+            "text": "i3_control exits cleanly",
+            "result": "PASS",
+            "note": "reused completed current-pass output i3_control.gene_summary.txt"
+          },
+          {
+            "text": "input 3 control normalization restores masked enriched hits",
+            "result": "PASS",
+            "note": "median=0, control=43, total=43"
+          }
+        ],
+        "note": "Fresh final-pass execution; see _final_pass/bio-crispr-screens-mageck-analysis/run/verification.json."
+      },
+      {
+        "index": 4,
+        "type": "Drug-screen regression",
+        "label": "Vehicle control and sgRNA-efficiency MLE",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "executed": true,
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "i4_rra exits cleanly",
+            "result": "PASS",
+            "note": "reused completed current-pass output i4_rra.gene_summary.txt"
+          },
+          {
+            "text": "i4_eff exits cleanly",
+            "result": "PASS",
+            "note": "reused completed current-pass output i4_eff.gene_summary.txt"
+          },
+          {
+            "text": "i4_noeff exits cleanly",
+            "result": "PASS",
+            "note": "reused completed current-pass output i4_noeff.gene_summary.txt"
+          },
+          {
+            "text": "input 4 MLE efficiency flags produce a valid weighted analysis",
+            "result": "PASS",
+            "note": "planted hits=20"
+          },
+          {
+            "text": "input 4 efficiency changes a nontrivial beta estimate",
+            "result": "PASS",
+            "note": "weighted=-0.788"
+          }
+        ],
+        "note": "Fresh final-pass execution; see _final_pass/bio-crispr-screens-mageck-analysis/run/verification.json."
+      },
+      {
+        "index": 5,
+        "type": "Multi-line/batch regression",
+        "label": "Explicit batch-aware and no-batch MLE designs",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "executed": true,
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "i5_batch exits cleanly",
+            "result": "PASS",
+            "note": "reused completed current-pass output i5_batch.gene_summary.txt"
+          },
+          {
+            "text": "i5_nobatch exits cleanly",
+            "result": "PASS",
+            "note": "reused completed current-pass output i5_nobatch.gene_summary.txt"
+          },
+          {
+            "text": "input 5 batch-aware design runs with explicit covariates",
+            "result": "PASS",
+            "note": "15 planted hits present"
+          },
+          {
+            "text": "input 5 MLE outputs beta and wald-fdr columns",
+            "result": "PASS",
+            "note": "batch-aware MLE result"
+          },
+          {
+            "text": "input 5 alternate covariate design also runs",
+            "result": "PASS",
+            "note": "rows=60"
+          }
+        ],
+        "note": "Fresh final-pass execution; see _final_pass/bio-crispr-screens-mageck-analysis/run/verification.json."
+      },
+      {
+        "index": 6,
+        "type": "Scope-boundary regression",
+        "label": "Windows VISPR fallback",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "executed": true,
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 1,
+        "assertions_total": 1,
+        "assertions": [
+          {
+            "text": "input 6 platform fallback is documented",
+            "result": "PASS",
+            "note": "mageck_vispr import exit=1"
+          }
+        ],
+        "note": "Fresh final-pass execution; see _final_pass/bio-crispr-screens-mageck-analysis/run/verification.json."
+      },
+      {
+        "index": 7,
+        "type": "Adversarial regression",
+        "label": "No fabrication without observed count data",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "executed": true,
+        "basic": 38,
+        "specialized": 58,
+        "total": 96,
+        "assertions_passed": 1,
+        "assertions_total": 1,
+        "assertions": [
+          {
+            "text": "input 7 anti-fabrication instruction is explicit",
+            "result": "PASS",
+            "note": "SKILL.md direct instruction"
+          }
+        ],
+        "note": "Fresh final-pass execution; see _final_pass/bio-crispr-screens-mageck-analysis/run/verification.json."
+      },
+      {
+        "index": 8,
+        "type": "Fresh permutation edge",
+        "label": "New deterministic HAP1 subset, rounds 2 and 5",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "executed": true,
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "i8_pr2 exits cleanly",
+            "result": "PASS",
+            "note": "exit=0; log=i8_pr2.stdout.txt"
+          },
+          {
+            "text": "i8_pr5 exits cleanly",
+            "result": "PASS",
+            "note": "exit=0; log=i8_pr5.stdout.txt"
+          },
+          {
+            "text": "input 8 fresh subset preserves wald-fdr column",
+            "result": "PASS",
+            "note": "fresh 350-gene subset at rounds 2 and 5"
+          },
+          {
+            "text": "input 8 guidance labels run-specific flip count as illustrative",
+            "result": "PASS",
+            "note": "no generalized effect-size claim"
+          }
+        ],
+        "note": "Fresh final-pass execution; see _final_pass/bio-crispr-screens-mageck-analysis/run/verification.json."
+      },
+      {
+        "index": 9,
+        "type": "Fresh paired-design edge",
+        "label": "New matched-pair fixture using mageck test --paired",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "executed": true,
+        "basic": 38,
+        "specialized": 58,
+        "total": 96,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "i9_paired_rra exits cleanly",
+            "result": "PASS",
+            "note": "exit=0; log=i9_paired_rra.stdout.txt"
+          },
+          {
+            "text": "input 9 paired RRA recovers the planted paired hits",
+            "result": "PASS",
+            "note": "6/6 planted paired hits"
+          },
+          {
+            "text": "input 9 no longer claims RRA lacks pairing",
+            "result": "PASS",
+            "note": "decision table and paired command guidance"
+          },
+          {
+            "text": "input 9 FluteMLE uses emitted condition names",
+            "result": "PASS",
+            "note": "baseline intercept is not passed to FluteMLE"
+          }
+        ],
+        "note": "Fresh final-pass execution; see _final_pass/bio-crispr-screens-mageck-analysis/run/verification.json."
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 37.6,
+    "dynamic_weighted": 56.9,
+    "score": 94,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "\u2b50",
+    "deployable": true,
+    "veto_override": false,
+    "note": "All 32 final-pass assertions passed; the release claim is supported by fresh execution across every archived scenario class plus two new edge fixtures."
+  },
+  "key_strengths": [
+    "All seven archived scenario classes were freshly rerun, including real HAP1 RRA and batch-aware MLE.",
+    "Two new edge fixtures validate the repaired boundaries: paired two-condition RRA and screen-dependent permutation sensitivity.",
+    "The final documentation removes the false RRA-pairing claim, uses emitted MLE condition names in FluteMLE, and warns that default permutation calls can vary on identical reruns."
+  ],
+  "recommendations": []
+}

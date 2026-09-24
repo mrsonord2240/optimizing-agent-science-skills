@@ -1,0 +1,64 @@
+{
+  "meta": {
+    "skill_name": "bio-entrez-search",
+    "description": "Search NCBI databases through Biopython Bio.Entrez, with field-qualified ESearch, EInfo, ESpell, history-server, and disclosed cross-database-count guidance.",
+    "evaluated_on": "2026-09-24",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Evidence Insight",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 11,
+    "source": "mrsonord2240/bioSkills@5442c26cef8f0f9eeca84dd1eccfe00eb63d4d07:database-access/entrez-search",
+    "audit_type": "final pass: all nine archived logical inputs plus two fresh source-derived inputs",
+    "executed": true,
+    "execution_note": "38/38 assertions passed with Python 3.14 and Biopython 1.88; NCBI-dependent inputs were run live on 2026-09-24.",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md"
+  },
+  "veto_gates": {
+    "skill_veto": {"gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS"},
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {"result": "PASS", "detail": "Counts, translations, field lists, database-list coverage, and taxonomy behavior were observed from live NCBI responses; the report does not present them as durable biological conclusions."},
+      "practice_boundaries": {"result": "PASS", "detail": "The Skill supports database searching and makes no individual diagnostic, treatment, or other clinical claim."},
+      "methodological_ground": {"result": "PASS", "detail": "The final pass corrects the exact-node taxonomy syntax to :noexp and directs users to QueryTranslation and EInfo rather than relying on assumed field behavior."},
+      "code_usability": {"result": "PASS", "detail": "Source-derived examples and extracted fenced blocks executed under Biopython 1.88; no missing dependency or fabricated error-body behavior was observed."}
+    }
+  },
+  "static_score": {
+    "subtotal": 96,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {"score": 12, "max": 12, "note": "ESearch, EInfo, ESpell, history-server, and cross-database workflows are documented and exercised."},
+      "reliability": {"score": 12, "max": 12, "note": "Current Biopython DbInfo shape, EGQuery absence, error-body handling, and exact-node taxonomy behavior are covered by tests."},
+      "performance_context": {"score": 7, "max": 8, "note": "Rate limits, retmax, history-server retrieval, and the cost of widening to all databases are explicit; a full 38-database widening run took 27.8 seconds."},
+      "agent_usability": {"score": 15, "max": 16, "note": "The 289-line entrypoint routes database-specific fields and recovery details to one focused reference."},
+      "human_usability": {"score": 8, "max": 8, "note": "Decision table, examples, limits, and recovery routes are clear and linked."},
+      "security": {"score": 12, "max": 12, "note": "Keys are environment-sourced; terms are URL parameters; the preflight helper is explicitly framed as an operational, not security, guard."},
+      "maintainability": {"score": 12, "max": 12, "note": "Query and failure detail is isolated in a linked reference, and the new local preflight example is executable without network access."},
+      "agent_specific": {"score": 18, "max": 20, "note": "The trigger, decision table, source examples, and reference routing distinguish search, field discovery, and large-result workflows."}
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 94.8,
+    "max": 100,
+    "assertion_pass_rate": {"passed": 38, "total": 38},
+    "inputs": [
+      {"index": 1, "type": "Canonical regression", "label": "PubMed field-qualified search", "status": "COMPLETED", "status_flag": "PASS", "executed": true, "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 4, "assertions_total": 4, "note": "Source-extracted search_ncbi returned a nonempty translated 2024 query and at most 20 live PMIDs."},
+      {"index": 2, "type": "Variant regression", "label": "EInfo DbInfo list shape", "status": "COMPLETED", "status_flag": "PASS", "executed": true, "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 4, "assertions_total": 4, "note": "Source-extracted list_fields worked for taxonomy and assembly; live structure and biosample responses were list-of-one DbInfo objects."},
+      {"index": 3, "type": "Large-result regression", "label": "History-server queue", "status": "COMPLETED", "status_flag": "PASS", "executed": true, "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 3, "assertions_total": 3, "note": "A human RefSeq protein query returned 197,927 records with nonempty WebEnv and QueryKey."},
+      {"index": 4, "type": "Edge regression", "label": "MARCH1 ambiguity", "status": "COMPLETED", "status_flag": "PASS", "executed": true, "basic": 37, "specialized": 55, "total": 92, "assertions_passed": 3, "assertions_total": 3, "note": "The unqualified query returned 703 records while the field-qualified MARCHF1 query returned one."},
+      {"index": 5, "type": "Stress regression", "label": "History chaining and spell check", "status": "COMPLETED", "status_flag": "PASS", "executed": true, "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 2, "assertions_total": 2, "note": "A same-WebEnv intersection was bounded by both parent counts and ESpell corrected colen carsinoma."},
+      {"index": 6, "type": "Scope regression", "label": "EGQuery fallback", "status": "COMPLETED", "status_flag": "PASS", "executed": true, "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 3, "assertions_total": 3, "note": "Shipped global_query.py exposed the expected EGQuery AttributeError, counted ten curated databases, and found Gene ID 5728 for human PTEN."},
+      {"index": 7, "type": "Adversarial regression", "label": "Error-body parsing", "status": "COMPLETED", "status_flag": "PASS", "executed": true, "basic": 39, "specialized": 57, "total": 96, "assertions_passed": 3, "assertions_total": 3, "note": "Both synthetic XML error bodies raised RuntimeError and a real control response remained parseable."},
+      {"index": 8, "type": "Coverage regression", "label": "Widen to live database list", "status": "COMPLETED", "status_flag": "PASS", "executed": true, "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 5, "assertions_total": 5, "note": "EInfo listed 38 databases; all ten curated names were valid and the widening pattern completed 38/38 with zero errors."},
+      {"index": 9, "type": "Safety regression", "label": "Term URL encoding", "status": "COMPLETED", "status_flag": "PASS", "executed": true, "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 5, "assertions_total": 5, "note": "Biopython source had no shell/eval path, uses URL encoding, escaped metacharacters, and accepted a live adversarial-looking term without execution."},
+      {"index": 10, "type": "Fresh local contract", "label": "Query preflight", "status": "COMPLETED", "status_flag": "PASS", "executed": true, "basic": 39, "specialized": 57, "total": 96, "assertions_passed": 4, "assertions_total": 4, "note": "The shipped helper preserved a normal field-qualified term and rejected empty, overlong, and OR-heavy terms."},
+      {"index": 11, "type": "Fresh live regression", "label": "Exact-node taxonomy syntax", "status": "COMPLETED", "status_flag": "PASS", "executed": true, "basic": 39, "specialized": 58, "total": 97, "assertions_passed": 2, "assertions_total": 2, "note": "Live nucleotide counts confirmed :exp preserves Mammalia expansion while :noexp narrows it from 92,281,225 to 113 records."}
+    ]
+  },
+  "final": {"static_weighted": 38.4, "dynamic_weighted": 56.9, "score": 95, "max": 100, "grade": "Production Ready", "grade_symbol": "Production Ready", "deployable": true, "veto_override": false},
+  "key_strengths": ["All nine archived scenario areas and two fresh inputs passed from the committed source.", "The entrypoint is 289 lines and routes query-design and failure-recovery detail to a focused reference.", "The new preflight helper is runnable, source-tested, and correctly scoped as an operational guard.", "Live verification corrected the previously inverted taxonomy exact-node guidance."],
+  "recommendations": []
+}

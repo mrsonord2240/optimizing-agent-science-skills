@@ -1,5 +1,19 @@
 # bio-local-blast fix log
 
+2026-09-24. Final-pass correction for `database-access/local-blast`, branch
+`agent/final-pass-bio-local-blast-20260924`, commit
+`95cc27bafcad6395ddac4c678b3224d951ff86f6`, based on staging `main`
+`9bcf426`. The prior re-audit correctly found that the first taxonomy fix had
+introduced a P2 documentation error. This pass is directed rather than
+independent (`auditor_independent: false`).
+
+| finding | priority | change | verified | notes |
+| --- | --- | --- | --- | --- |
+| v4 was incorrectly described as unable to store per-sequence taxids | P2 | Corrected the v4/v5 table and all matching prose: v4 can retain `-taxid`/`-taxid_map` assignments and report `staxids`, but only v5 supports `-taxids`/`-taxidlist` filtering. Updated the shipped `run_blast.sh` comment too. | ran | Built a v4 protein DB with `-taxid_map`; `blastp` returned `9606` and `7227` in `staxids`. |
+| v4 filtering behavior was conflated with the v5-without-taxonomy-data no-op | P2 | Split the failure mode and common-errors rows. The v5 missing-`taxdb.tar.gz` case remains an exit-0, unfiltered result; the v4 case now directs rebuild-as-v5 and names its loud nonzero error. | ran | With `taxdb.bti`, `taxdb.btd`, and `taxonomy4blast.sqlite3` present, a v4 `-taxidlist` query exited 2 with `Taxonomy filtering is not supported in v4 BLAST dbs` and wrote no result rows. |
+
+Regression evidence: reran archived Inputs 1-8 with BLAST+ 2.17.0+ (custom v5 DB/search, dc-megablast, v5 taxonomy no-op then recovery, short primers, RBH extraction, clinical scope boundary, thread/hitlist behavior, and v4 taxid-map behavior); Input 9's stale runner referenced a deleted worktree, so its shipped-means-present checks were rerun directly against this worktree. The bundled `blast_wrapper.py` also passed against real BLAST+ output. Two fresh current-source checks covered the v4 hard-error path with all taxonomy data installed and the corrected docs/examples/link surface.
+
 2026-09-17. Fixer for `database-access/local-blast`, branch `fix/db-blast` off staging `main` at
 `581dcd89a7450785c2451a0543ee822049fbf934`. Audit: `F:\OpenScience\audits\bio-local-blast\`
 (87/100, Limited Release, deployable, one open P0). BLAST+ version invoked throughout: 2.17.0+

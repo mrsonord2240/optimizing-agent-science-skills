@@ -1,0 +1,15 @@
+# Probe for 10B: why does the manual block fail with non-syntactic sample IDs? Shows the column names at each step (uses the Skill's own lines).
+setwd("F:/OpenScience/audits/bio-isoform-switching/run/work/w10")
+suppressPackageStartupMessages({ library(tximport); library(DRIMSeq) })
+meta <- read.delim("sample_metadata.tsv", stringsAsFactors = FALSE)
+files <- setNames(file.path("salmon_quant", meta$sample_id, "quant.sf"), meta$sample_id)
+tx <- read.delim(files[1])$Name; tx2gene <- data.frame(tx = tx, gene = sub("_[ABC]$", "", tx))
+txi <- tximport(files, type = 'salmon', txOut = TRUE, countsFromAbundance = 'no'); cts <- txi$counts
+cat("colnames(cts):", colnames(cts), "\n")
+txdf <- data.frame(gene_id = tx2gene$gene[match(rownames(cts), tx2gene$tx)], feature_id = rownames(cts), cts, check.names = FALSE)
+cat("txdf cols:", colnames(txdf), "\n")
+samples <- data.frame(sample_id = colnames(cts), condition = factor(meta$condition[match(colnames(cts), meta$sample_id)]))
+d <- dmDSdata(counts = txdf, samples = samples)
+cat("DRIMSeq::counts(d) cols:", colnames(DRIMSeq::counts(d)), "\n")
+cat("DRIMSeq::samples(d)$sample_id:", DRIMSeq::samples(d)$sample_id, "\n")
+cat("A) is 'cnt[, samples$sample_id]' valid? ", tryCatch({ x <- DRIMSeq::counts(d)[, samples$sample_id]; "yes" }, error = function(e) conditionMessage(e)), "\n")

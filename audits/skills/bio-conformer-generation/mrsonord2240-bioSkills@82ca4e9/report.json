@@ -1,0 +1,169 @@
+{
+  "meta": {
+    "skill_name": "bio-conformer-generation",
+    "description": "Generates 3D conformer ensembles using RDKit ETKDGv3, checked MMFF94s/UFF optimization, macrocycle-aware settings, and an optional CREST plus GFN2-xTB escalation path. Use for 3D ligand preparation, docking inputs, conformer-sensitive descriptors, and macrocycle ensemble diagnostics.",
+    "evaluated_on": "2026-09-24",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "A",
+    "complexity": "Complex",
+    "n_inputs": 11,
+    "source": "mrsonord2240/bioSkills@82ca4e996c8149725569183a338cdd28f44f8268:chemoinformatics/conformer-generation",
+    "audit_type": "final-pass",
+    "supersedes": "mrsonord2240/bioSkills@c4e2ccd0129527b6e04a691e4f79e14e38a64030:chemoinformatics/conformer-generation (score 90, Limited Release)",
+    "fix_log": "F:/optimizing-agent-science-skills/fixes/bio-conformer-generation.md",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md"
+  },
+  "veto_gates": {
+    "skill_veto": { "gate": "PASS", "stability": "PASS", "contract": "PASS", "determinism": "PASS", "security": "PASS" },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "All reported geometric and energy values were produced by RDKit or xTB during this audit. The macrocycle comparison now limits its conclusion to molecule-specific evidence and does not claim universal superiority." },
+      "practice_boundaries": { "result": "PASS", "detail": "This is a computational molecular-geometry workflow with no diagnostic, prescriptive, or patient-facing use." },
+      "methodological_ground": { "result": "PASS", "detail": "The Skill requires downstream convergence and chemistry-appropriate validation rather than treating isolated force-field minima or one macrocycle setting as definitive." },
+      "code_usability": { "result": "PASS", "detail": "Every Python fence compiled; nine archived logical workflows and two fresh packaged-example/edge workflows executed against the exact source commit (11/11)." }
+    }
+  },
+  "static_score": {
+    "subtotal": 97,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 12, "max": 12, "note": "The documented ETKDGv3, MMFF94s/UFF, macrocycle, CREST boundary, and Boltzmann workflows are present and were exercised on realistic molecules." },
+      "reliability": { "score": 12, "max": 12, "note": "All public entry points now reject zero-atom SMILES explicitly; empty and mismatched helper inputs have deterministic, documented behavior." },
+      "performance_context": { "score": 7, "max": 8, "note": "The Skill identifies scalable starting heuristics and bounded filtering, though high conformer counts remain molecule- and hardware-dependent by design." },
+      "agent_usability": { "score": 15, "max": 16, "note": "Decision rules, error modes, platform caveat, and the mapping to packaged example names are explicit; the broad method taxonomy still requires a selection judgment." },
+      "human_usability": { "score": 8, "max": 8, "note": "The trigger description, scenario table, usage guide, and error table give a researcher clear entry points and recovery actions." },
+      "security": { "score": 12, "max": 12, "note": "SMILES and numeric inputs are validated, subprocess invocation uses an argument list rather than a shell, and no credentials or sensitive data are handled." },
+      "maintainability": { "score": 12, "max": 12, "note": "The runnable packaged examples now have consistent contracts, and the macrocycle diagnostic is isolated in its own documented script." },
+      "agent_specific": { "score": 19, "max": 20, "note": "The Skill is precisely triggered and has explicit hand-offs and platform escape hatches. It remains a substantial but still under-500-line technical Skill." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 93.9,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 44, "total": 44 },
+    "inputs": [
+      {
+        "index": 1, "type": "Canonical", "label": "Aspirin ETKDGv3 plus MMFF94s ensemble regression", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Embedded and optimized 20/20 requested aspirin conformers from the exact inline code.", "note": "20 conformers converged; energies were 18.9098 to 20.8331 kcal/mol.", "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "The requested 20 conformers are embedded.", "result": "PASS", "note": "EmbedMultipleConfs returned 20 IDs." },
+          { "text": "Each conformer has a converged MMFF94s optimization and real energy.", "result": "PASS", "note": "20/20 optimization records converged with finite calculated energies." },
+          { "text": "The result is deterministic for the documented seed.", "result": "PASS", "note": "The fixed-seed regression values match the archived run." },
+          { "text": "No global-minimum claim is inferred from the sampled ensemble.", "result": "PASS", "note": "The workflow reports sampled local-minimum energies only." }
+        ]
+      },
+      {
+        "index": 2, "type": "Variant A", "label": "Ibuprofen single docking conformer and SDF regression", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Generated one seeded conformer, optimized it, wrote SDF, and round-tripped it.", "note": "The SDF contains non-planar coordinates and an MMFF94s energy of 25.2875 kcal/mol.", "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "A single conformer is embedded and optimized for the documented docking-start use case.", "result": "PASS", "note": "One conformer and one MMFF94s result were returned." },
+          { "text": "The written SDF is parseable and genuinely three-dimensional.", "result": "PASS", "note": "Round-trip SDF had a coordinate Z range greater than 0.1 angstrom." },
+          { "text": "The reported energy is computed rather than a placeholder.", "result": "PASS", "note": "Energy came from RDKit force-field CalcEnergy." },
+          { "text": "The workflow stays within ligand-preparation scope.", "result": "PASS", "note": "No docking score or binding claim was made." }
+        ]
+      },
+      {
+        "index": 3, "type": "Edge", "label": "Phenylboronic acid MMFF gap and UFF fallback regression", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Ran the exact inline optimization workflow on boron-containing phenylboronic acid.", "note": "10/10 conformers embedded and used UFF; energies were 11.4524 to 11.4747 kcal/mol.", "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "MMFF94s unavailability triggers the documented UFF fallback.", "result": "PASS", "note": "All result records named UFF." },
+          { "text": "The fallback produces one finite energy per conformer.", "result": "PASS", "note": "10 UFF energy records were produced." },
+          { "text": "The fallback is explicit rather than a silent no-op.", "result": "PASS", "note": "Force-field selection is recorded in each output row." },
+          { "text": "Unsupported chemistry has an actionable terminal error path.", "result": "PASS", "note": "The inline code raises if neither MMFF94s nor UFF has parameters." }
+        ]
+      },
+      {
+        "index": 4, "type": "Variant B", "label": "Fourteen-membered macrocycle ETKDGv3 regression", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Ran macrocycle_conformers on a verified 14-membered ring with a bounded 10-conformer fixture under current RDKit.", "note": "10/10 embedded with finite MMFF94s energies; current ETKDGv3 default reports useMacrocycleTorsions=True.", "basic": 37, "specialized": 55, "total": 92, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "The fixture is a macrocycle under the Skill's stated threshold.", "result": "PASS", "note": "RDKit ring analysis returned one 14-atom ring." },
+          { "text": "The macrocycle-aware embedding path returns the requested conformers.", "result": "PASS", "note": "10/10 conformers embedded." },
+          { "text": "The documented current RDKit default is verified rather than assumed.", "result": "PASS", "note": "ETKDGv3().useMacrocycleTorsions was True in RDKit 2026.03.6." },
+          { "text": "The Skill does not claim a universal macrocycle benefit from this setting.", "result": "PASS", "note": "The revised text requires molecule-specific comparison and downstream validation." }
+        ]
+      },
+      {
+        "index": 5, "type": "Stress", "label": "Flexible imatinib full pipeline regression", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Ran embed, optimize, RMSD prune, energy filter, and Boltzmann averaging using the documented 5 times rotatable bonds plus 10 heuristic.", "note": "7 rotatable bonds yielded 45 requested and embedded conformers; 43 survived pruning and 38 the energy window.", "basic": 39, "specialized": 57, "total": 96, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "The documented conformer-count heuristic is computed correctly.", "result": "PASS", "note": "7 rotatable bonds gave max(10, 5*7+10) = 45." },
+          { "text": "The full workflow completes with finite intermediate and final outputs.", "result": "PASS", "note": "All five stages completed and Boltzmann asphericity was 0.43156." },
+          { "text": "RMSD and energy filtering preserve a nonempty ensemble.", "result": "PASS", "note": "43 then 38 conformers remained." },
+          { "text": "Boltzmann averaging is used as an exploratory surrogate, not a validated population claim.", "result": "PASS", "note": "The Skill states the required thermodynamic caveat." }
+        ]
+      },
+      {
+        "index": 6, "type": "Scope Boundary", "label": "Native-Windows CREST boundary and xTB fallback regression", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Executed crest_workflow without CREST and then the documented standalone xTB fallback.", "note": "CREST gave expected WinError 2; xTB returned 0 and wrote parseable xtbopt.xyz.", "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "The native-Windows CREST caveat predicts the observed failure mode.", "result": "PASS", "note": "crest_workflow raised FileNotFoundError / WinError 2." },
+          { "text": "The documented standalone xTB fallback actually executes.", "result": "PASS", "note": "xTB --opt returned 0 and wrote xtbopt.xyz." },
+          { "text": "The fallback output is a real geometry artifact.", "result": "PASS", "note": "xtbopt.xyz exists in the audit run directory." },
+          { "text": "The platform limitation is an explicit boundary, not a silent degradation.", "result": "PASS", "note": "SKILL.md tells native-Windows users to use WSL or the documented fallback." }
+        ]
+      },
+      {
+        "index": 7, "type": "Adversarial", "label": "Malformed and empty SMILES plus deterministic seed regression", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Tested two syntactically malformed strings and empty string, then compared two identical seeded caffeine runs and a changed seed.", "note": "All three invalid inputs raised the same explicit ValueError; same-seed output matched and a different seed changed the result.", "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Syntactically malformed SMILES fail with an actionable error.", "result": "PASS", "note": "Both malformed strings raised Invalid SMILES ValueError." },
+          { "text": "Empty SMILES fails through the same public validation contract.", "result": "PASS", "note": "The zero-atom guard raised Invalid SMILES: ''." },
+          { "text": "Fixed seeds reproduce the sampled result.", "result": "PASS", "note": "Two seed-7 sorted energy lists were identical." },
+          { "text": "Changing the seed changes the sampled ensemble as expected.", "result": "PASS", "note": "Seed 99 gave a different sorted energy list." }
+        ]
+      },
+      {
+        "index": 8, "type": "Adversarial", "label": "Metal and disconnected-fragment coverage boundary regression", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Embedded an Fe-containing disconnected fixture and passed it through parameter selection.", "note": "5 conformers embedded and the installed RDKit reported usable MMFF94s parameters; the Skill remains explicit that this does not validate coordination chemistry.", "basic": 37, "specialized": 54, "total": 91, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "A metal-containing disconnected input does not cause an unhandled crash.", "result": "PASS", "note": "The workflow embedded and optimized five conformers." },
+          { "text": "The force-field branch reports its actual selection.", "result": "PASS", "note": "All returned records identified MMFF94s." },
+          { "text": "The Skill avoids treating generic force fields as coordination validation.", "result": "PASS", "note": "UFF and MMFF caveats explicitly exclude metal-coordination validation." },
+          { "text": "No unsupported no-force-field claim is invented from this fixture.", "result": "PASS", "note": "The report records the observed MMFF94s result rather than asserting a missing-parameter path." }
+        ]
+      },
+      {
+        "index": 9, "type": "Edge", "label": "Empty helper, mismatch, and identical-energy regression", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Ran empty and mismatched filter inputs plus empty, non-finite, and identical Boltzmann energy vectors.", "note": "Empty energy filtering returns []; mismatches and invalid energy vectors raise clear errors; identical energies produce uniform normalized weights.", "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "Empty aligned energy-filter input is handled gracefully.", "result": "PASS", "note": "filter_by_energy(None, [], []) returned []." },
+          { "text": "Mismatched conformer and energy arrays are rejected explicitly.", "result": "PASS", "note": "The error names the equal-length contract." },
+          { "text": "Empty and non-finite Boltzmann inputs are rejected explicitly.", "result": "PASS", "note": "Both cases raised ValueError." },
+          { "text": "Identical finite energies yield valid normalized uniform weights.", "result": "PASS", "note": "Three weights were one-third and summed to one." }
+        ]
+      },
+      {
+        "index": 10, "type": "Edge", "label": "Fresh packaged gen_conformers example contract", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Imported and ran examples/gen_conformers.py from the exact source commit.", "note": "The packaged ensemble example returned three records, macrocycle function returned (mol, ids), and empty SMILES raised the expected ValueError.", "basic": 38, "specialized": 57, "total": 95, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "The packaged ensemble example executes on a valid molecule.", "result": "PASS", "note": "Ethanol produced three optimized rows." },
+          { "text": "The packaged macrocycle function returns both molecule and conformer IDs.", "result": "PASS", "note": "It returned three IDs and a molecule with three conformers." },
+          { "text": "The packaged example rejects empty SMILES consistently.", "result": "PASS", "note": "It raised Invalid SMILES: ''." },
+          { "text": "The packaged and inline workflow contracts are aligned.", "result": "PASS", "note": "Both now use explicit ValueErrors and return conformer identifiers." }
+        ]
+      },
+      {
+        "index": 11, "type": "Edge", "label": "Fresh packaged macrocycle comparison and argument validation", "status": "COMPLETED", "status_flag": "✅", "executed": true,
+        "execution_note": "Ran compare_macrocycle_embedding.py on a lactam and tested invalid --n-conf 0.", "note": "Both default and explicit opt-out embedded and MMFF-scored 5/5 conformers; invalid count failed clearly.", "basic": 38, "specialized": 56, "total": 94, "assertions_passed": 4, "assertions_total": 4,
+        "assertions": [
+          { "text": "The packaged comparison script is directly executable.", "result": "PASS", "note": "It emitted parseable JSON." },
+          { "text": "Both compared macrocycle settings produce traceable counts and energy ranges.", "result": "PASS", "note": "Each path embedded and scored five conformers." },
+          { "text": "The comparison result is scoped to the tested molecule.", "result": "PASS", "note": "Script and SKILL.md label it a diagnostic rather than a benchmark." },
+          { "text": "Invalid requested conformer count is rejected clearly.", "result": "PASS", "note": "--n-conf 0 exited nonzero with an at-least-one message." }
+        ]
+      }
+    ]
+  },
+  "final": { "static_weighted": 38.8, "dynamic_weighted": 56.3, "score": 95, "max": 100, "grade": "Production Ready", "grade_symbol": "⭐", "deployable": true, "veto_override": false },
+  "key_strengths": [
+    "The exact source commit passed all nine archived logical workflows, including a 45-conformer flexible-drug pipeline and real UFF fallback.",
+    "Empty and malformed molecule inputs, empty helper inputs, mismatched data, and non-finite Boltzmann energies now have explicit, actionable handling.",
+    "The Windows CREST limitation is accurately bounded and its documented native xTB fallback executed to a real optimized geometry artifact.",
+    "The macrocycle discussion now reflects current RDKit defaults and offers a runnable molecule-specific comparison without overstating its result.",
+    "Fresh packaged-example checks confirm the shipped Python contracts match the inline workflow."
+  ],
+  "recommendations": []
+}

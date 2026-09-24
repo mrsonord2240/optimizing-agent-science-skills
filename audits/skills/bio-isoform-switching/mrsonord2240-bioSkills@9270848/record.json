@@ -1,0 +1,41 @@
+{
+  "skill_id": "bio-isoform-switching",
+  "version": "mrsonord2240-bioSkills@9270848",
+  "source": {
+    "repository": "mrsonord2240/bioSkills",
+    "commit": "92708486d538d7f1c19d00f6117f149dfc2687b6",
+    "path": "alternative-splicing/isoform-switching",
+    "author": "GPTomics",
+    "author_url": "https://github.com/GPTomics",
+    "license": "MIT",
+    "modified_by": "Samuel Nord",
+    "fork_of": {
+      "repository": "GPTomics/bioSkills",
+      "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
+    },
+    "url": "https://github.com/mrsonord2240/bioSkills/tree/92708486d538d7f1c19d00f6117f149dfc2687b6/alternative-splicing/isoform-switching"
+  },
+  "audit": {
+    "method": {
+      "name": "skill-auditor",
+      "author": "AIPOCH",
+      "repository": "aipoch/medical-research-skills",
+      "commit": "f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26",
+      "path": "skill-auditor",
+      "license": "MIT",
+      "url": "https://github.com/aipoch/medical-research-skills/tree/f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26/skill-auditor"
+    },
+    "evaluator_version": "skill-auditor@1.0",
+    "audited_on": "2026-09-24",
+    "performed_by": "Claude (Anthropic) auditor agents",
+    "commissioned_by": "Samuel Nord",
+    "test_data": "synthetic"
+  },
+  "supersedes": "mrsonord2240-bioSkills@48e3cbc",
+  "files": {
+    "report": "report.json",
+    "viewer": "viewer.md",
+    "fixes": "fixes.md",
+    "scripts": 59
+  }
+}

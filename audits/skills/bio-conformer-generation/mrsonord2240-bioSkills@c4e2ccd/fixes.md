@@ -26,3 +26,14 @@ combined into one file) plus `examples/gen_conformers.py` (unchanged) — all pa
 `F:\OpenScience\audit-envs\cheminformatics-hit-triage-analyst\Scripts\python.exe` (RDKit 2026.03.6).
 The Windows/CREST claim was checked against the audit env's own `TOOLS.md` tooling record rather than
 re-run, since CREST cannot execute on this machine by definition of the defect being fixed.
+
+## 2026-09-24 — final pass (`82ca4e9`)
+
+| finding | priority | change | verified | notes |
+|---|---|---|---|---|
+| Empty-string SMILES bypassed all `mol is None` guards | P2 | Added `mol.GetNumAtoms() == 0` checks to inline `gen_conformers`, `macrocycle_conformers`, and `crest_workflow`, plus the packaged ensemble example | ran | Empty string and two syntactically malformed strings now each raise `ValueError("Invalid SMILES: ...")` under RDKit 2026.03.6. |
+| Empty or mismatched energy arrays produced a raw error or silent `zip` truncation | P2 | Made `filter_by_energy` return `[]` for an empty, aligned input and reject length mismatch; added finite-energy, positive-temperature, and length guards to Boltzmann helpers | ran | Empty filtering returns `[]`; mismatch and invalid energy cases give actionable `ValueError`; equal energies retain normalized uniform weights. |
+| Macrocycle-torsion benefit was claimed without a worked comparison | P2 | Replaced the universal claim with RDKit's current default behavior and added `examples/compare_macrocycle_embedding.py` | ran | The packaged lactam comparison executed default and explicit opt-out paths (5/5 embedded and MMFF-scored each); its output is explicitly molecule-specific, not a general benchmark. |
+| Packaged example had divergent invalid-input handling and returned only a molecule from `macrocycle_conformers` | P2 | Aligned error and return contracts with the inline Skill workflow | ran | Fresh packaged-example run returned `(mol, ids)` with 3 macrocycle conformers and rejected empty SMILES clearly. |
+
+No findings remain open. The full final audit reran the nine archived logical inputs and two fresh packaged-example/edge inputs (11/11 passed) from source commit `82ca4e996c8149725569183a338cdd28f44f8268`.

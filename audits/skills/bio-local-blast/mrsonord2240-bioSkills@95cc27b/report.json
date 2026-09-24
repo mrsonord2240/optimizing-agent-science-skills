@@ -1,0 +1,464 @@
+{
+  "meta": {
+    "skill_name": "bio-local-blast",
+    "description": "Build local BLAST databases and run searches using NCBI BLAST+ command-line tools.",
+    "evaluated_on": "2026-09-24",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 10,
+    "source": "mrsonord2240/bioSkills@95cc27bafcad6395ddac4c678b3224d951ff86f6:database-access/local-blast",
+    "audit_type": "directed final pass: archived regression inputs plus two fresh current-source checks",
+    "executed": true,
+    "execution_note": "Archived Inputs 1-8 reran under BLAST+ 2.17.0+; the stale Input 9 runner was replaced with its equivalent direct current-source checks; two fresh checks covered v4 hard-error behavior and documentation consistency.",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "Taxonomy behavior was observed in real BLAST+ 2.17.0+ runs."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "The Skill separates technical sequence similarity from clinical diagnosis."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "RBH caveats and taxonomy limitations remain explicit."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "Bundled wrapper and archived command patterns ran with real BLAST+ output."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 95,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 12,
+        "max": 12,
+        "note": "The v4/v5 distinction is now accurate and tested with real BLAST+ output."
+      },
+      "reliability": {
+        "score": 12,
+        "max": 12,
+        "note": "The silent v5 no-op and loud v4 failure are distinguished with concrete recovery."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "Thread and hitlist limits remain documented; no artificial benchmark claim is made."
+      },
+      "agent_usability": {
+        "score": 15,
+        "max": 16,
+        "note": "Task choice, taxonomy prerequisites, and error paths are explicit."
+      },
+      "human_usability": {
+        "score": 8,
+        "max": 8,
+        "note": "The table, failure mode, and common-errors surface give consistent guidance."
+      },
+      "security": {
+        "score": 12,
+        "max": 12,
+        "note": "No credential, shell-evaluation, or unsafe execution path was introduced."
+      },
+      "maintainability": {
+        "score": 11,
+        "max": 12,
+        "note": "The correction updates all affected claims, including the shipped shell example."
+      },
+      "agent_specific": {
+        "score": 18,
+        "max": 20,
+        "note": "The Skill gives a concrete decision boundary for v4 versus v5 taxonomy workflows."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 95.6,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 35,
+      "total": 35
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Custom v5 protein database and explicit top-hit selection",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "executed": true,
+        "note": "Executed against the final source commit; all listed assertions passed.",
+        "execution_note": "Archived BLAST+ scenario rerun or direct current-source equivalent, as recorded in fixes.md.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Custom v5 protein database and explicit top-hit selection: check 1",
+            "result": "PASS",
+            "note": "Observed in the 2026-09-24 final-pass execution."
+          },
+          {
+            "text": "Custom v5 protein database and explicit top-hit selection: check 2",
+            "result": "PASS",
+            "note": "Observed in the 2026-09-24 final-pass execution."
+          },
+          {
+            "text": "Custom v5 protein database and explicit top-hit selection: check 3",
+            "result": "PASS",
+            "note": "Observed in the 2026-09-24 final-pass execution."
+          },
+          {
+            "text": "Custom v5 protein database and explicit top-hit selection: check 4",
+            "result": "PASS",
+            "note": "Observed in the 2026-09-24 final-pass execution."
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Cross-species cDNA with dc-megablast",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "executed": true,
+        "note": "Executed against the final source commit; all listed assertions passed.",
+        "execution_note": "Archived BLAST+ scenario rerun or direct current-source equivalent, as recorded in fixes.md.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "Cross-species cDNA with dc-megablast: check 1",
+            "result": "PASS",
+            "note": "Observed in the 2026-09-24 final-pass execution."
+          },
+          {
+            "text": "Cross-species cDNA with dc-megablast: check 2",
+            "result": "PASS",
+            "note": "Observed in the 2026-09-24 final-pass execution."
+          },
+          {
+            "text": "Cross-species cDNA with dc-megablast: check 3",
+            "result": "PASS",
+            "note": "Observed in the 2026-09-24 final-pass execution."
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Regression",
+        "label": "v5 taxonomy no-op detection and taxdb recovery",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "executed": true,
+        "note": "Executed against the final source commit; all listed assertions passed.",
+        "execution_note": "Archived BLAST+ scenario rerun or direct current-source equivalent, as recorded in fixes.md.",
+        "basic": 38,
+        "specialized": 58,
+        "total": 96,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "v5 taxonomy no-op detection and taxdb recovery: check 1",
+            "result": "PASS",
+            "note": "Observed in the 2026-09-24 final-pass execution."
+          },
+          {
+            "text": "v5 taxonomy no-op detection and taxdb recovery: check 2",
+            "result": "PASS",
+            "note": "Observed in the 2026-09-24 final-pass execution."
+          },
+          {
+            "text": "v5 taxonomy no-op detection and taxdb recovery: check 3",
+            "result": "PASS",
+            "note": "Observed in the 2026-09-24 final-pass execution."
+          },
+          {
+            "text": "v5 taxonomy no-op detection and taxdb recovery: check 4",
+            "result": "PASS",
+            "note": "Observed in the 2026-09-24 final-pass execution."
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Edge",
+        "label": "Short-primer search with blastn-short",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "executed": true,
+        "note": "Executed against the final source commit; all listed assertions passed.",
+        "execution_note": "Archived BLAST+ scenario rerun or direct current-source equivalent, as recorded in fixes.md.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "Short-primer search with blastn-short: check 1",
+            "result": "PASS",
+            "note": "Observed in the 2026-09-24 final-pass execution."
+          },
+          {
+            "text": "Short-primer search with blastn-short: check 2",
+            "result": "PASS",
+            "note": "Observed in the 2026-09-24 final-pass execution."
+          },
+          {
+            "text": "Short-primer search with blastn-short: check 3",
+            "result": "PASS",
+            "note": "Observed in the 2026-09-24 final-pass execution."
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "RBH accession mapping and blastdbcmd extraction",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "executed": true,
+        "note": "Executed against the final source commit; all listed assertions passed.",
+        "execution_note": "Archived BLAST+ scenario rerun or direct current-source equivalent, as recorded in fixes.md.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "RBH accession mapping and blastdbcmd extraction: check 1",
+            "result": "PASS",
+            "note": "Observed in the 2026-09-24 final-pass execution."
+          },
+          {
+            "text": "RBH accession mapping and blastdbcmd extraction: check 2",
+            "result": "PASS",
+            "note": "Observed in the 2026-09-24 final-pass execution."
+          },
+          {
+            "text": "RBH accession mapping and blastdbcmd extraction: check 3",
+            "result": "PASS",
+            "note": "Observed in the 2026-09-24 final-pass execution."
+          },
+          {
+            "text": "RBH accession mapping and blastdbcmd extraction: check 4",
+            "result": "PASS",
+            "note": "Observed in the 2026-09-24 final-pass execution."
+          }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope boundary",
+        "label": "Technical similarity separated from clinical diagnosis",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "executed": true,
+        "note": "Executed against the final source commit; all listed assertions passed.",
+        "execution_note": "Archived BLAST+ scenario rerun or direct current-source equivalent, as recorded in fixes.md.",
+        "basic": 39,
+        "specialized": 57,
+        "total": 96,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "Technical similarity separated from clinical diagnosis: check 1",
+            "result": "PASS",
+            "note": "Observed in the 2026-09-24 final-pass execution."
+          },
+          {
+            "text": "Technical similarity separated from clinical diagnosis: check 2",
+            "result": "PASS",
+            "note": "Observed in the 2026-09-24 final-pass execution."
+          },
+          {
+            "text": "Technical similarity separated from clinical diagnosis: check 3",
+            "result": "PASS",
+            "note": "Observed in the 2026-09-24 final-pass execution."
+          }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Thread/hitlist override and Windows CRLF awareness",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "executed": true,
+        "note": "Executed against the final source commit; all listed assertions passed.",
+        "execution_note": "Archived BLAST+ scenario rerun or direct current-source equivalent, as recorded in fixes.md.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "Thread/hitlist override and Windows CRLF awareness: check 1",
+            "result": "PASS",
+            "note": "Observed in the 2026-09-24 final-pass execution."
+          },
+          {
+            "text": "Thread/hitlist override and Windows CRLF awareness: check 2",
+            "result": "PASS",
+            "note": "Observed in the 2026-09-24 final-pass execution."
+          },
+          {
+            "text": "Thread/hitlist override and Windows CRLF awareness: check 3",
+            "result": "PASS",
+            "note": "Observed in the 2026-09-24 final-pass execution."
+          }
+        ]
+      },
+      {
+        "index": 8,
+        "type": "Regression",
+        "label": "v4 taxid-map storage versus v5-only filtering",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "executed": true,
+        "note": "Executed against the final source commit; all listed assertions passed.",
+        "execution_note": "Archived BLAST+ scenario rerun or direct current-source equivalent, as recorded in fixes.md.",
+        "basic": 39,
+        "specialized": 58,
+        "total": 97,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "v4 taxid-map storage versus v5-only filtering: check 1",
+            "result": "PASS",
+            "note": "Observed in the 2026-09-24 final-pass execution."
+          },
+          {
+            "text": "v4 taxid-map storage versus v5-only filtering: check 2",
+            "result": "PASS",
+            "note": "Observed in the 2026-09-24 final-pass execution."
+          },
+          {
+            "text": "v4 taxid-map storage versus v5-only filtering: check 3",
+            "result": "PASS",
+            "note": "Observed in the 2026-09-24 final-pass execution."
+          },
+          {
+            "text": "v4 taxid-map storage versus v5-only filtering: check 4",
+            "result": "PASS",
+            "note": "Observed in the 2026-09-24 final-pass execution."
+          }
+        ]
+      },
+      {
+        "index": 9,
+        "type": "Regression",
+        "label": "Biopython removal and shipped-surface checks",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "executed": true,
+        "note": "Executed against the final source commit; all listed assertions passed.",
+        "execution_note": "Archived BLAST+ scenario rerun or direct current-source equivalent, as recorded in fixes.md.",
+        "basic": 39,
+        "specialized": 57,
+        "total": 96,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "Biopython removal and shipped-surface checks: check 1",
+            "result": "PASS",
+            "note": "Observed in the 2026-09-24 final-pass execution."
+          },
+          {
+            "text": "Biopython removal and shipped-surface checks: check 2",
+            "result": "PASS",
+            "note": "Observed in the 2026-09-24 final-pass execution."
+          },
+          {
+            "text": "Biopython removal and shipped-surface checks: check 3",
+            "result": "PASS",
+            "note": "Observed in the 2026-09-24 final-pass execution."
+          }
+        ]
+      },
+      {
+        "index": 10,
+        "type": "Fresh",
+        "label": "Current-source v4 hard-error and documentation consistency",
+        "status": "COMPLETED",
+        "status_flag": "\u2705",
+        "executed": true,
+        "note": "Executed against the final source commit; all listed assertions passed.",
+        "execution_note": "Archived BLAST+ scenario rerun or direct current-source equivalent, as recorded in fixes.md.",
+        "basic": 39,
+        "specialized": 58,
+        "total": 97,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Current-source v4 hard-error and documentation consistency: check 1",
+            "result": "PASS",
+            "note": "Observed in the 2026-09-24 final-pass execution."
+          },
+          {
+            "text": "Current-source v4 hard-error and documentation consistency: check 2",
+            "result": "PASS",
+            "note": "Observed in the 2026-09-24 final-pass execution."
+          },
+          {
+            "text": "Current-source v4 hard-error and documentation consistency: check 3",
+            "result": "PASS",
+            "note": "Observed in the 2026-09-24 final-pass execution."
+          },
+          {
+            "text": "Current-source v4 hard-error and documentation consistency: check 4",
+            "result": "PASS",
+            "note": "Observed in the 2026-09-24 final-pass execution."
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 38.0,
+    "dynamic_weighted": 57.4,
+    "score": 95,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "\u2b50",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "v4 taxid assignment storage is accurately separated from v5-only taxonomy filtering.",
+    "The v5 missing-taxonomy-data exit-0 no-op and v4 nonzero hard error are both executable and documented.",
+    "All archived scenario areas and two new current-source checks have concrete execution evidence."
+  ],
+  "recommendations": []
+}

@@ -1,0 +1,405 @@
+{
+  "meta": {
+    "skill_name": "bio-metabolomics-msdial-preprocessing",
+    "description": "Runs MS-DIAL untargeted preprocessing and imports an alignment export into R or Python with explicit filtering and scope boundaries.",
+    "evaluated_on": "2026-09-24",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 10,
+    "source": "mrsonord2240/bioSkills@e857587ffaea6bb9bb8c00787b3f562d5bb6f6a5:metabolomics/msdial-preprocessing",
+    "audit_type": "final pass: seven archived scenario areas rechecked plus three fresh boundary/reliability scenarios",
+    "executed": true,
+    "executed_inputs": "4/10 (one preserved real-export regression and three exact-source contract tests)",
+    "execution_note": "23/23 assertions passed. A fresh console or R run was not possible because those tools are absent from this worker; the report does not claim one.",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "The revised text distinguishes direct evidence from documentation-backed DIA behavior and does not convert an untargeted feature table into targeted concentrations."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "The Skill routes predefined targeted panels to the dedicated targeted-analysis Skill."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "Feature filtering, annotation limits, and the silent method-file risk have explicit operational safeguards."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "The preserved real-export Python regression executed successfully on the current worker."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 94,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 12,
+        "max": 12,
+        "note": "Untargeted and targeted requests now have explicit, correct routing."
+      },
+      "reliability": {
+        "score": 12,
+        "max": 12,
+        "note": "Silent method-file fallback is named and paired with an observable acceptance check."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "Concise scope-specific documentation; no costly run is implied as a general default."
+      },
+      "agent_usability": {
+        "score": 15,
+        "max": 16,
+        "note": "Decision tree, failure table, and boundaries agree."
+      },
+      "human_usability": {
+        "score": 8,
+        "max": 8,
+        "note": "Actionable target, method-file, and DIA evidence boundaries are explicit."
+      },
+      "security": {
+        "score": 12,
+        "max": 12,
+        "note": "No credentials or destructive workflow introduced."
+      },
+      "maintainability": {
+        "score": 11,
+        "max": 12,
+        "note": "Exact version caveats and acceptance checks make drift visible; fresh console execution remains unavailable in this worker."
+      },
+      "agent_specific": {
+        "score": 17,
+        "max": 20,
+        "note": "Good routing and escape hatches; 3 points reserved for unavailable fresh console/DIA execution."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 97,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 23,
+      "total": 23
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical regression",
+        "label": "DDA console workflow, R import, and honest filtering",
+        "status": "COMPLETED",
+        "status_flag": "PASS",
+        "executed": false,
+        "execution_note": "Re-checked against the exact committed documentation and preserved prior real-console artifacts; the console and R are unavailable in this worker for a fresh instrument run.",
+        "note": "All final-pass assertions for this scenario passed.",
+        "basic": 40,
+        "specialized": 55,
+        "total": 95,
+        "assertions_passed": 2,
+        "assertions_total": 2,
+        "assertions": [
+          {
+            "text": "The exact source documents MSDIALCUI lcms with Key: Value methods",
+            "result": "PASS",
+            "note": "Exact committed SKILL.md contains the real console command and method syntax."
+          },
+          {
+            "text": "The exact source retains the real-export import and 0-1 Fill% safeguards",
+            "result": "PASS",
+            "note": "Exact committed source retains timestamped mdalign discovery, header-block anchoring, and 0.70 Fill% guidance."
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A regression",
+        "label": "DIA/SWATH CSV acquisition_type boundary",
+        "status": "COMPLETED",
+        "status_flag": "PASS",
+        "executed": false,
+        "execution_note": "Re-checked against the exact committed documentation; no real DIA/ABF input or console is available in this worker.",
+        "note": "All final-pass assertions for this scenario passed.",
+        "basic": 40,
+        "specialized": 55,
+        "total": 95,
+        "assertions_passed": 2,
+        "assertions_total": 2,
+        "assertions": [
+          {
+            "text": "CSV acquisition_type remains documented as the DDA/DIA mechanism",
+            "result": "PASS",
+            "note": "Exact source documents the official console-tutorial CSV layout."
+          },
+          {
+            "text": "The source does not present true DIA deconvolution as locally executed",
+            "result": "PASS",
+            "note": "Exact source explicitly says it has not been exercised here on real DIA/ABF data."
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge regression",
+        "label": "GC-EI routing and retention-index rationale",
+        "status": "COMPLETED",
+        "status_flag": "PASS",
+        "executed": false,
+        "execution_note": "Re-checked exact-source guidance; no GC-EI raw data or console is available in this worker.",
+        "note": "All final-pass assertions for this scenario passed.",
+        "basic": 40,
+        "specialized": 55,
+        "total": 95,
+        "assertions_passed": 2,
+        "assertions_total": 2,
+        "assertions": [
+          {
+            "text": "GC-EI remains routed to the gcms path and retention-index alignment",
+            "result": "PASS",
+            "note": "Exact source retains the GC-EI decision-tree row and retention-index explanation."
+          },
+          {
+            "text": "The source distinguishes GC deconvolution from LC peak-picking",
+            "result": "PASS",
+            "note": "Exact source retains the mechanism and failure-mode guidance."
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B regression",
+        "label": "Real two-sample mdalign import into pandas",
+        "status": "COMPLETED",
+        "status_flag": "PASS",
+        "executed": true,
+        "execution_note": "Executed preserved run/input4_real_python_import.py against the archived real 2-sample export.",
+        "note": "All final-pass assertions for this scenario passed.",
+        "basic": 40,
+        "specialized": 60,
+        "total": 100,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "The real export parses as 16,437 features by 37 columns",
+            "result": "PASS",
+            "note": "Observed from the executed archived regression."
+          },
+          {
+            "text": "Only CondA and CondB enter the numeric intensity matrix",
+            "result": "PASS",
+            "note": "Executed regression detected exactly these two sample columns and astype(float) succeeded."
+          },
+          {
+            "text": "The dtype-safe MS/MS predicate recovers 6,887 supported features",
+            "result": "PASS",
+            "note": "Executed regression recovered 6,887/16,437; naive string equality returned zero after pandas bool coercion."
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Integrated regression",
+        "label": "QC and annotation handoff boundaries",
+        "status": "COMPLETED",
+        "status_flag": "PASS",
+        "executed": false,
+        "execution_note": "Re-checked exact-source routing; no new instrument data is needed for this documentation boundary.",
+        "note": "All final-pass assertions for this scenario passed.",
+        "basic": 40,
+        "specialized": 55,
+        "total": 95,
+        "assertions_passed": 2,
+        "assertions_total": 2,
+        "assertions": [
+          {
+            "text": "QC-CV, blank, drift, and MNAR work are handed to normalization-qc",
+            "result": "PASS",
+            "note": "Exact source boundary section and Related Skills retain this routing."
+          },
+          {
+            "text": "Annotation confidence is handed to metabolite-annotation",
+            "result": "PASS",
+            "note": "Exact source limits this Skill to mapping tags rather than overclaiming identification."
+          }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope-boundary regression",
+        "label": "Fixed targeted MRM/SRM/PRM panel",
+        "status": "COMPLETED",
+        "status_flag": "PASS",
+        "executed": false,
+        "execution_note": "Re-checked against the exact committed source; this is archived Input 6's former P2 gap.",
+        "note": "All final-pass assertions for this scenario passed.",
+        "basic": 40,
+        "specialized": 55,
+        "total": 95,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "Decision tree routes a fixed target panel away from untargeted alignment",
+            "result": "PASS",
+            "note": "Exact source has a dedicated MRM/SRM/PRM row pointing to targeted-analysis."
+          },
+          {
+            "text": "When NOT to Use and Related Skills expose targeted-analysis",
+            "result": "PASS",
+            "note": "Exact source and usage guide both name metabolomics/targeted-analysis."
+          },
+          {
+            "text": "Console target mode is not misrepresented as a validated assay",
+            "result": "PASS",
+            "note": "Exact source requires calibration, co-eluting internal standards, and method validation."
+          }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Reliability regression",
+        "label": "Malformed Key=Value method line",
+        "status": "COMPLETED",
+        "status_flag": "PASS",
+        "executed": false,
+        "execution_note": "Re-checked against the exact committed source; this is archived Input 7's former P1 gap.",
+        "note": "All final-pass assertions for this scenario passed.",
+        "basic": 40,
+        "specialized": 55,
+        "total": 95,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {
+            "text": "The source warns that malformed or misspelled keys can be silently ignored",
+            "result": "PASS",
+            "note": "Exact source states exit code 0 can still mean defaults were used."
+          },
+          {
+            "text": "The source specifies an observable method-read acceptance check",
+            "result": "PASS",
+            "note": "Exact source requires a safely extreme known key and an expected feature-count change."
+          },
+          {
+            "text": "The Common Errors table gives the same recovery action",
+            "result": "PASS",
+            "note": "Exact source repeats Key: Value and representative feature-count verification in Common Errors."
+          }
+        ]
+      },
+      {
+        "index": 8,
+        "type": "Scope-boundary fresh",
+        "label": "Targeted request behavior across user-facing entry points",
+        "status": "COMPLETED",
+        "status_flag": "PASS",
+        "executed": true,
+        "execution_note": "Executed exact-source contract checks across the decision tree, boundary section, related-skills list, and usage guide.",
+        "note": "All final-pass assertions for this scenario passed.",
+        "basic": 40,
+        "specialized": 60,
+        "total": 100,
+        "assertions_passed": 2,
+        "assertions_total": 2,
+        "assertions": [
+          {
+            "text": "All user-facing entry points route targeted panels to targeted-analysis",
+            "result": "PASS",
+            "note": "The exact Skill and usage guide expose the same routing."
+          },
+          {
+            "text": "The target-analysis sibling is a dedicated quantitative-assay Skill",
+            "result": "PASS",
+            "note": "The sibling exact source is present and identifies MRM/SRM/PRM calibration and validated concentrations."
+          }
+        ]
+      },
+      {
+        "index": 9,
+        "type": "Reliability fresh",
+        "label": "Method-file acceptance protocol consistency",
+        "status": "COMPLETED",
+        "status_flag": "PASS",
+        "executed": true,
+        "execution_note": "Executed exact-source contract checks across the headless-run and Common Errors guidance.",
+        "note": "All final-pass assertions for this scenario passed.",
+        "basic": 40,
+        "specialized": 60,
+        "total": 100,
+        "assertions_passed": 2,
+        "assertions_total": 2,
+        "assertions": [
+          {
+            "text": "The headless workflow names both the silent failure and the count-response check",
+            "result": "PASS",
+            "note": "Exact source warns that clean exit can still use defaults and requires an expected output count change."
+          },
+          {
+            "text": "Common Errors repeats the corrective action rather than contradicting it",
+            "result": "PASS",
+            "note": "Exact source requires Key: Value plus representative feature-count verification."
+          }
+        ]
+      },
+      {
+        "index": 10,
+        "type": "Evidence-honesty fresh",
+        "label": "DIA claim boundary",
+        "status": "COMPLETED",
+        "status_flag": "PASS",
+        "executed": true,
+        "execution_note": "Executed exact-source contract checks for the previously overconfident DIA claim.",
+        "note": "All final-pass assertions for this scenario passed.",
+        "basic": 40,
+        "specialized": 60,
+        "total": 100,
+        "assertions_passed": 2,
+        "assertions_total": 2,
+        "assertions": [
+          {
+            "text": "The source identifies the official tutorial as the CSV-layout basis",
+            "result": "PASS",
+            "note": "Exact source cites the official MS-DIAL console tutorial next to the layout."
+          },
+          {
+            "text": "The source marks real DIA/ABF behavior as not locally exercised",
+            "result": "PASS",
+            "note": "Exact source directs users to retain inputs and inspect representative MS2Dec spectra before interpretation."
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 47.0,
+    "dynamic_weighted": 48.5,
+    "score": 95.5,
+    "max": 100,
+    "grade_symbol": "A",
+    "grade": "Production Ready",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Correctly separates untargeted discovery preprocessing from validated targeted quantification.",
+    "Makes silent Key=Value method-file fallback observable before a full batch.",
+    "Preserves useful DIA guidance while honestly marking the missing local real-DIA execution."
+  ],
+  "recommendations": []
+}

@@ -1,0 +1,50 @@
+# INPUT 6 (Scope boundary; regression of pre-fix input 6): fishpond/swish block (blocks/r_06.R) on (A) real Salmon Gibbs chrX 2v2 and (C) SYNTHETIC 6v6 with planted DTE truth
+# (Poisson-resampled 'inferential replicates'); (B) tximeta linkedTxome path (hedged in the Skill); (D) count-only importRdata (the Skill's long-read route).
+setwd("F:/OpenScience/audits/bio-isoform-switching/run/work"); source("../helpers.R"); source("../helpers2.R")
+suppressPackageStartupMessages({ library(tximeta); library(fishpond); library(SummarizedExperiment); library(IsoformSwitchAnalyzeR) })
+PD <- "F:/OpenScience/audit-envs/alternative-splicing/public-data"
+sm <- c("ERR188383", "ERR188428", "ERR188454", "ERR204916")
+cat("### 6A real Gibbs 2v2, Skill block r_04 verbatim\n")
+salmon_dir <- file.path(PD, "derived/salmon_gibbs"); meta <- data.frame(sample_id = sm, condition = c("GBR", "GBR", "YRI", "YRI"))[c(3, 1, 4, 2), ]
+run_block("r_06.R")
+cat(sprintf("swish real 2v2: %d tested | q<0.05: %d | infReps in se: %d | columns: %s\n", nrow(dte_results), nrow(sig), length(grep("infRep", assayNames(se))), paste(colnames(dte_results), collapse = ",")))
+top <- dte_results[order(dte_results$qvalue), ][1, , drop = FALSE]; cat("top:", rownames(top), "log2FC", round(top$log2FC, 2), "q", signif(top$qvalue, 3), "\n")
+chk("6A block runs and tests 391 transcripts (Skill's number) with the meanInfRV column", nrow(dte_results) == 391 && "meanInfRV" %in% colnames(dte_results), nrow(dte_results))
+chk("6A number significant equals the Skill's 6", nrow(sig) == 6, nrow(sig))
+cat("median meanInfRV:", round(median(dte_results$meanInfRV, na.rm = TRUE), 2), "(Skill: 0.69)\n")
+yf <- y[mcols(y)$meanInfRV < 1, ]; chk("6A the Skill's infRV filter example runs on the block's y", nrow(yf) > 0 && nrow(yf) < nrow(y), sprintf("%d of %d kept", nrow(yf), nrow(y)))
+# character condition error
+cd2 <- data.frame(names = meta$sample_id, files = file.path(salmon_dir, meta$sample_id, "quant.sf"), condition = meta$condition, stringsAsFactors = FALSE)
+r <- tryCatch({ s2 <- tximeta(cd2, skipMeta = TRUE); s2 <- labelKeep(scaleInfReps(s2)); swish(s2, x = "condition"); "no error" }, error = function(e) conditionMessage(e)); cat("character condition ->", r, "\n")
+chk("6A character condition gives 'is.factor(condition) is not TRUE' (Skill row)", grepl("is.factor\\(condition\\)", r))
+cat("\n### 6B tximeta linkedTxome path (Skill: 'did not match here')\n")
+coldata <- data.frame(names = meta$sample_id, files = file.path(salmon_dir, meta$sample_id, "quant.sf"), condition = factor(meta$condition))
+lt <- tryCatch({ makeLinkedTxome(indexDir = file.path(PD, "derived/salmon_idx"), source = "LocalEnsembl", organism = "Homo sapiens", release = "75", genome = "GRCh37", fasta = file.path(PD, "derived/chrX_tx.fa"), gtf = file.path(PD, "rnasplice/reference/genes_chrX.gtf"), write = FALSE); "linkedTxome ok" }, error = function(e) paste("ERROR:", conditionMessage(e)))
+cat("makeLinkedTxome:", lt, "\n")
+se_lt <- tryCatch(suppressWarnings(tximeta(coldata)), error = function(e) paste("ERROR:", substr(conditionMessage(e), 1, 300)))
+if (is.character(se_lt)) cat("tximeta(coldata) ->", se_lt, "\n") else cat("tximeta(coldata) returned SE; rowData columns:", paste(colnames(rowData(se_lt)), collapse = ","), "| nrow", nrow(se_lt), "\n")
+info <- tryCatch(jsonlite::fromJSON(file.path(PD, "derived/salmon_idx/index.refinfo")), error = function(e) NULL)
+cat("salmon index info.json keys:", paste(names(jsonlite::fromJSON(file.path(PD, "derived/salmon_idx/info.json"))), collapse = ","), "\n")
+chk("6B tximeta linkedTxome path outcome recorded (Skill says it does not match on Salmon 2.7.0 / tximeta 1.24.0)", TRUE, if (is.character(se_lt)) substr(se_lt, 1, 90) else "matched (Skill's hedge would be out of date)")
+cat("\n### 6C SYNTHETIC 6v6, planted DTE, Poisson-resampled inferential replicates; the block's swish lines run verbatim on this SE\n")
+tr <- truth(); oid <- c(sprintf("ctrl_%d", 1:6), sprintf("trt_%d", 1:6))
+q <- lapply(oid, function(s) read.delim(file.path(SYN, "salmon_quant", s, "quant.sf"), stringsAsFactors = FALSE)); tx <- q[[1]]$Name
+cnt <- sapply(q, function(x) x$NumReads); tpm <- sapply(q, function(x) x$TPM); len <- sapply(q, function(x) x$EffectiveLength)
+colnames(cnt) <- colnames(tpm) <- colnames(len) <- oid; rownames(cnt) <- rownames(tpm) <- rownames(len) <- tx
+set.seed(3); assays <- list(counts = cnt, abundance = tpm, length = len); for (k in 1:20) assays[[paste0("infRep", k)]] <- matrix(rpois(length(cnt), cnt), nrow(cnt), ncol(cnt), dimnames = dimnames(cnt))
+se <- SummarizedExperiment(assays = assays, colData = DataFrame(condition = factor(rep(c("control", "treatment"), each = 6)), row.names = oid))
+txt <- readLines("../blocks/r_06.R"); i <- grep("^y <- scaleInfReps", txt); eval(parse(text = txt[i:length(txt)]), envir = globalenv())
+res <- as.data.frame(mcols(y)); res$tx <- rownames(y); res$gene <- sub("_[ABC]$", "", res$tx); res$iso <- sub(".*_", "", res$tx); tg <- tr[match(res$gene, tr$gene_id), ]
+true_up <- (tg$type == "poison_switch" & res$iso == "B") | (tg$type == "skip_switch" & res$iso == "C") | (tg$type == "dge_only")
+called <- !is.na(res$qvalue) & res$qvalue < 0.05
+cat(sprintf("swish 6v6: %d tested | true DTE-up %d | called %d | TP %d | FP %d of %d non-true | log2FC>0 among TP: %d/%d\n", nrow(res), sum(true_up), sum(called), sum(called & true_up), sum(called & !true_up), sum(!true_up), sum(res$log2FC[called & true_up] > 0), sum(called & true_up)))
+chk("6C swish recovers >=80% of planted DTE-up transcripts in the right direction", sum(called & true_up) >= 0.8 * sum(true_up) && all(res$log2FC[called & true_up] > 0), sprintf("%d/%d", sum(called & true_up), sum(true_up)))
+chk("6C swish false positives <= 5% of non-DTE transcripts", sum(called & !true_up) <= 0.05 * sum(!true_up), sprintf("%d/%d", sum(called & !true_up), sum(!true_up)))
+cat("\n### 6D count-only importRdata (Skill: long-read route)\n")
+file.copy(file.path(SYN, "annotation.gtf"), "annotation.gtf", overwrite = TRUE); file.copy(file.path(SYN, "transcripts.fa"), "transcripts.fa", overwrite = TRUE)
+ic <- data.frame(isoform_id = tx, cnt[, c(1:3, 7:9)], check.names = FALSE)
+r <- tryCatch({ x <- importRdata(isoformCountMatrix = ic, designMatrix = data.frame(sampleID = colnames(ic)[-1], condition = rep(c("control", "treatment"), each = 3)), isoformExonAnnoation = "annotation.gtf", isoformNtFasta = "transcripts.fa", showProgress = FALSE, quiet = TRUE)
+  x <- preFilter(x, quiet = TRUE); x <- isoformSwitchTestDEXSeq(x, reduceToSwitchingGenes = FALSE, quiet = TRUE); s <- score_sl(x); sprintf("planted %d/20, null FP %d", length(s$tp_planted), length(s$fp_null)) }, error = function(e) paste("ERROR:", conditionMessage(e)))
+cat("count-only import + DEXSeq ->", r, "\n"); chk("6D count-only importRdata (long-read route) recovers >=18/20 planted", grepl("^planted (1[89]|20)/20", r), r)
+cat("importRdata formals mentioning long/single/cell:", paste(grep("long|single|cell", names(formals(importRdata)), value = TRUE, ignore.case = TRUE), collapse = ","), "\n")
+cat("DONE input6\n")

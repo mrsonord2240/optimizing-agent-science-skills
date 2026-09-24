@@ -8,7 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (90)
+## P1 (85)
 
 ### `bio-data-visualization-statistical-annotation` — stat_compare_means(comparisons, p.adjust.method='holm') draws unadjusted p; the argument does not exist
 
@@ -402,38 +402,6 @@ None open.
 - Root cause: Version drift: the --matrix-spec-q behaviour is described from older DIA-NN documentation and was never checked against a 2.x run.
 - Fix: Replace the directional claim with a version-aware one: say the matrix and the filtered report apply different q-value contexts so the counts will differ in either direction, that the direction depends on the DIA-NN version and on which q-value columns the agent filtered on, and that the authoritative statement is the 'levels matrix' line in report.log.txt for the version actually used. Update the Common Errors row and the 'Matrix run-specific PG filter 0.05' threshold row the same way.
 
-### `bio-crispr-screens-mageck-analysis` — 'RRA does not support pairing' is factually incorrect
-
-- Skill: 88, Limited Release · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/crispr-screens/mageck-analysis) · [viewer](skills/bio-crispr-screens-mageck-analysis/mrsonord2240-bioSkills@6847328/viewer.md)
-- Observed in inputs: 9
-- Problem: The RRA vs MLE decision tree states 'RRA does not support pairing' and routes all paired-sample designs to mageck mle, but mageck test --paired is a real, documented, working flag (verified: 10/10 hit recovery, 0 false positives on a synthetic paired dataset, cleaner than the MLE per-donor-covariate alternative the Skill implies instead).
-- Root cause: The decision tree row was written without checking mageck test --help against the installed tool version.
-- Fix: Correct the decision-tree row to note mageck test --paired as the simpler option for pure two-condition paired designs, reserving MLE-with-covariates for cases needing additional factors beyond pairing (e.g. cell-line + pairing together).
-
-### `bio-crispr-screens-mageck-analysis` — FluteMLE's documented worked example is unrunnable (sibling bug to the already-fixed FluteRRA one)
-
-- Skill: 88, Limited Release · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/crispr-screens/mageck-analysis) · [viewer](skills/bio-crispr-screens-mageck-analysis/mrsonord2240-bioSkills@6847328/viewer.md)
-- Observed in inputs: 9
-- Problem: SKILL.md's FluteMLE(gene_summary=..., treatname='day21', ctrlname='baseline', ...) example fails on every real MLE output with 'Sample name doesn't match !!!' because MAGeCK MLE never emits a 'baseline' condition column -- baseline is the implicit intercept/reference, not an output beta column. Confirmed by rerunning with two real condition names (ctrlname='day7'), which proceeds past this specific check.
-- Root cause: The fix addressed FluteRRA's directory-creation and proj= gaps but did not test FluteMLE, its sibling function in the same 'MAGeCKFlute Integration (R)' section, against real MLE output.
-- Fix: Change the documented ctrlname from 'baseline' to one of the actual condition columns being compared (e.g. an earlier timepoint or an explicit 'day0' condition included in the design matrix), and add a note that ctrlname/treatname must both be real emitted condition names, never the design matrix's baseline/intercept column.
-
-### `bio-crispr-screens-mageck-analysis` — mageck mle gives non-reproducible hit calls between identical reruns at the default --permutation-round, not just across different designs
-
-- Skill: 88, Limited Release · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/crispr-screens/mageck-analysis) · [viewer](skills/bio-crispr-screens-mageck-analysis/mrsonord2240-bioSkills@6847328/viewer.md)
-- Observed in inputs: 2, 5
-- Problem: Two back-to-back runs of the exact same mageck mle command on the exact same data, at the tool's own default --permutation-round 2, produced different FDR<0.05 gene calls (Input 2: 7/10 vs 10/10 planted hits recovered). MAGeCK 0.5.9.5's mle has no --seed flag to fix this at the tool level.
-- Root cause: SKILL.md's Permutation-Round Sensitivity note and Failure Modes section frame the instability as design/covariate-set-sensitive, but the underlying cause (unseeded Monte Carlo permutation) also makes the exact same command nondeterministic on rerun -- a stronger and more surprising claim that isn't stated.
-- Fix: Add a sentence to the Permutation-Round Sensitivity note: at the default round count, rerunning the identical mageck mle command can itself flip individual gene FDR<0.05 calls (no --seed option exists in this MAGeCK version); always raise --permutation-round for any result that will be reported, not just when comparing across designs.
-
-### `bio-crispr-screens-mageck-analysis` — Permutation-Round Sensitivity note states a single-subset measurement as if it generalizes
-
-- Skill: 88, Limited Release · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/crispr-screens/mageck-analysis) · [viewer](skills/bio-crispr-screens-mageck-analysis/mrsonord2240-bioSkills@6847328/viewer.md)
-- Observed in inputs: 8
-- Problem: SKILL.md quotes '48 -> 67 genes, 19 flips (40%)' between --permutation-round 2 and 5 as the expected effect size. An independent 1500-gene subset (different random seed) reproduced the qualitative direction (wald-fdr stable, permutation fdr round-sensitive) but at a much smaller magnitude: 66 -> 62 -> 61 genes, only 3 flips (~5%) between the same two round counts.
-- Root cause: The fix log's own quantification was run on one specific 1500-gene subset and stated in SKILL.md without a caveat that the magnitude is subset-dependent.
-- Fix: Rephrase the specific numbers as a worked example rather than a general statistic, e.g. 'in one 1500-gene test this moved the hit count by up to 40%; the exact magnitude varies by gene subset and screen -- the actionable rule is qualitative: don't trust a near-threshold permutation fdr call at the default round count, regardless of size.'
-
 ### `bio-single-cell-perturb-seq` — Verify the primary optax mixture backend
 
 - Skill: 88, Production Ready · [mrsonord2240/bioSkills@5e514cc](https://github.com/mrsonord2240/bioSkills/tree/5e514cccbd137aefb2daa5f6c438cb830cb4d85e/single-cell/perturb-seq) · [viewer](skills/bio-single-cell-perturb-seq/mrsonord2240-bioSkills@5e514cc/viewer.md)
@@ -521,14 +489,6 @@ None open.
 - Problem: scripts/build_oligo.py accepts a non-ACGT, wrong-length spacer and emits it in a synthesis oligo. This can create an invalid order without warning.
 - Root cause: The helper uppercases and length-budgets the final oligo but never validates spacer alphabet or required 20-nt length.
 - Fix: Before constructing the oligo, require a 20-character A/C/G/T spacer and raise a concise ValueError otherwise; add a CLI test for hyphenated and wrong-length input.
-
-### `bio-metabolomics-msdial-preprocessing` — Malformed param-file syntax (Key=Value) fails silently, not loudly
-
-- Skill: 91, Limited Release · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/metabolomics/msdial-preprocessing) · [viewer](skills/bio-metabolomics-msdial-preprocessing/mrsonord2240-bioSkills@6847328/viewer.md)
-- Observed in inputs: 7
-- Problem: A param-file line using the old MS-DIAL 4 style 'Key=Value' instead of the documented 'Key: Value' is not rejected by the real console -- it is silently dropped and the console falls back to its built-in default for that key, exits 0, and prints no warning. Verified with a controlled comparison: an extreme 'Minimum peak height: 500000' correctly cut 11605 features down to 13, but the identical value written as 'Minimum peak height=500000' produced 11605 features -- byte-identical to not setting it at all.
-- Root cause: SKILL.md's Common Errors table documents the Key=Value mistake as a generic symptom ('filter keeps 0/all features') rather than warning that the console gives zero error signal when it happens, so a researcher has no way to know their run silently used defaults instead of their intended parameters.
-- Fix: Add an explicit Common Errors / Reliability row: 'A malformed or misspelled param-file key (e.g. Key=Value instead of Key: Value, or a typo'd key name) is silently ignored by the console -- exit code 0, no warning, defaults used instead. Always spot-check a run by deliberately varying one known parameter (e.g. Minimum peak height) and confirming the feature count actually changes, rather than trusting a clean exit code alone.'
 
 ### `bio-workflows-metabolomics-pipeline` — Materialize and verify the Stage 1 mode lock
 
@@ -730,7 +690,7 @@ None open.
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (215)
+## P2 (201)
 
 ### `bio-data-visualization-statistical-annotation` — Test-name and label details differ from the tools
 
@@ -1099,46 +1059,6 @@ None open.
 - Problem: The Skill routes PHI-sensitive work to OpenCRAVAT but does not say that sending participant variants to a public API needs consent and approvals.
 - Root cause: Governance mentioned only as a tool choice.
 - Fix: Add a one-line consent/approvals note beside the batch workflow.
-
-### `bio-isoform-switching` — Manual DTU block fails on non-syntactic sample IDs
-
-- Skill: 84, Limited Release · [mrsonord2240/bioSkills@48e3cbc](https://github.com/mrsonord2240/bioSkills/tree/48e3cbc5c3b116ae021618313014e046b688618d/alternative-splicing/isoform-switching) · [viewer](skills/bio-isoform-switching/mrsonord2240-bioSkills@48e3cbc/viewer.md)
-- Observed in inputs: 10
-- Problem: With sample dirs such as 1-ctrl or trt.1-b the manual block stops with 'undefined columns selected': DRIMSeq make.names()-es the count columns (X1.ctrl) and replaces samples(d)$sample_id by 1..n. The workflow block and the example handle the same IDs.
-- Root cause: The block indexes DRIMSeq::counts(d) by the original IDs.
-- Fix: Add a line before dmDSdata: meta$sample_id <- make.names(meta$sample_id); names(files) <- meta$sample_id (verified: block then runs, planted 20/20), or note the requirement next to the block.
-
-### `bio-isoform-switching` — ISAR version statements stale or wrong
-
-- Skill: 84, Limited Release · [mrsonord2240/bioSkills@48e3cbc](https://github.com/mrsonord2240/bioSkills/tree/48e3cbc5c3b116ae021618313014e046b688618d/alternative-splicing/isoform-switching) · [viewer](skills/bio-isoform-switching/mrsonord2240-bioSkills@48e3cbc/viewer.md)
-- Observed in inputs: 7
-- Problem: The Skill says 2.6.0 'does not choose the test for you' and that no newer release was available to check. isoformSwitchAnalysisPart1() in 2.6.0 (and 2.10.0/2.12.0) does choose (any condition > 5 replicates -> satuRn, else DEXSeq; traced run), only the two test wrappers merely warn. 2.8.0/2.10.0/2.12.0 (Bioc 3.21-3.23) exist and 2.12.0 renames analyzeNetSurfP2 to analyzeNetSurfP3.
-- Root cause: Only the test wrappers and the installed Bioc 3.20 release were inspected.
-- Fix: Say the one-call wrapper isoformSwitchAnalysisPart1 applies the same >5 rule, the wrappers only warn, the rule is unchanged through 2.12.0, and that on Bioc >= 3.23 the NetSurfP importer is analyzeNetSurfP3.
-
-### `bio-isoform-switching` — Surrogate-variable step makes n=2 results seed-dependent
-
-- Skill: 84, Limited Release · [mrsonord2240/bioSkills@48e3cbc](https://github.com/mrsonord2240/bioSkills/tree/48e3cbc5c3b116ae021618313014e046b688618d/alternative-splicing/isoform-switching) · [viewer](skills/bio-isoform-switching/mrsonord2240-bioSkills@48e3cbc/viewer.md)
-- Observed in inputs: 3
-- Problem: importRdata(detectUnwantedEffects = TRUE) runs sva, which is random: on the real chrX mixed split the workflow block called 11 genes for seeds 1-4 and 6 but 0 for seed 5 (sv1 added), and the shipped example printed 0 on that split while the Null-check table lists 11. The Skill notes sv1 appeared once but not that it is random or that it flips the answer. True split (20) and 3v3 data (22, 0) were stable across seeds.
-- Root cause: No set.seed() in the workflow block or example; the Null-check text treats one draw as the result.
-- Fix: Put set.seed(1) at the top of the workflow block and the example, and say a small-n list can change with the seed when sva adds a surrogate variable (check colnames(aSwitchList$designMatrix)).
-
-### `bio-isoform-switching` — SKILL.md is 550 lines in one file
-
-- Skill: 84, Limited Release · [mrsonord2240/bioSkills@48e3cbc](https://github.com/mrsonord2240/bioSkills/tree/48e3cbc5c3b116ae021618313014e046b688618d/alternative-splicing/isoform-switching) · [viewer](skills/bio-isoform-switching/mrsonord2240-bioSkills@48e3cbc/viewer.md)
-- Observed in inputs: —
-- Problem: About 11k tokens load at once (was 491 lines); the count-route table, Null check with its block, the consequence details and Common Errors are all in the main file.
-- Root cause: No references/ layer; round 2 added content instead of moving it.
-- Fix: Move Count route + Null check and the Common Errors table into references/ with a one-line pointer each in SKILL.md.
-
-### `bio-isoform-switching` — Licence-gated annotators still unrun
-
-- Skill: 84, Limited Release · [mrsonord2240/bioSkills@48e3cbc](https://github.com/mrsonord2240/bioSkills/tree/48e3cbc5c3b116ae021618313014e046b688618d/alternative-splicing/isoform-switching) · [viewer](skills/bio-isoform-switching/mrsonord2240-bioSkills@48e3cbc/viewer.md)
-- Observed in inputs: 4
-- Problem: signal_peptide_identified, IDR_identified/IDR_type and isoform_topology were not exercised (SignalP, IUPred2A, NetSurfP, DeepTMHMM); the Skill labels them 'not run' or 'read from source'.
-- Root cause: Licence or cloud gating.
-- Fix: Keep the flags; add a smoke test when a licence is available.
 
 ### `bio-single-cell-splicing` — MARVEL RI cannot be computed with the text given
 
@@ -1524,30 +1444,6 @@ None open.
 - Root cause: Conceptual section only.
 - Fix: Add the regression of HPD width on posterior mean from out.txt.
 
-### `bio-crispr-screens-mageck-analysis` — FluteRRA's remaining 'undefined columns selected' error is a real, still-open upstream gap
-
-- Skill: 88, Limited Release · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/crispr-screens/mageck-analysis) · [viewer](skills/bio-crispr-screens-mageck-analysis/mrsonord2240-bioSkills@6847328/viewer.md)
-- Observed in inputs: 1
-- Problem: After the directory-creation fix, FluteRRA still fails downstream against MAGeCKFlute 1.99.2001 (the unreleased GitHub-HEAD build in TOOLS.md) with 'undefined columns selected'. This is already honestly documented in SKILL.md's Common Errors table as a known compatibility gap, which is the correct interim fix, but the underlying MAGeCKFlute-side bug remains unresolved.
-- Root cause: MAGeCKFlute's own plotting code has a column-handling incompatibility with this build; not something SKILL.md's text can fix directly.
-- Fix: No action needed from this Skill beyond what's already documented; track the upstream MAGeCKFlute issue and update the Version Compatibility note if a newer stable release resolves it.
-
-### `bio-entrez-search` — No progressive disclosure despite SKILL.md growing longer across two fix passes
-
-- Skill: 88, Limited Release · [mrsonord2240/bioSkills@1b1dd1d](https://github.com/mrsonord2240/bioSkills/tree/1b1dd1d7c11113e788ae408f2a8c62405b7ead71/database-access/entrez-search) · [viewer](skills/bio-entrez-search/mrsonord2240-bioSkills@1b1dd1d/viewer.md)
-- Observed in inputs: —
-- Problem: SKILL.md is now 339 lines (up from ~300 pre-fix), still a single flat file with all failure-mode and field tables inline. Both fix passes declined the references/ split as out of scope for FIX_BRIEF.md's restructuring limit.
-- Root cause: Restructuring beyond the redundancy rule was explicitly out of scope for both fix passes; a reasonable call given the mandate, but the underlying static-score gap remains.
-- Fix: In a future pass with restructuring scope, split the field-qualified-pattern tables and Failure Modes/Common Errors tables into a references/ file.
-
-### `bio-entrez-search` — Term-validation guidance is prose-only, no runnable helper
-
-- Skill: 88, Limited Release · [mrsonord2240/bioSkills@1b1dd1d](https://github.com/mrsonord2240/bioSkills/tree/1b1dd1d7c11113e788ae408f2a8c62405b7ead71/database-access/entrez-search) · [viewer](skills/bio-entrez-search/mrsonord2240-bioSkills@1b1dd1d/viewer.md)
-- Observed in inputs: 9
-- Problem: The new paragraph after Required Setup correctly explains that terms are URL-encoded (verified true in this audit), but gives no code example for the length/count sanity-check it recommends before large batch loops.
-- Root cause: The finding was addressed with documentation only, matching its P2 priority from the fix log.
-- Fix: Add a 3-line helper function (e.g. warn if len(term) > N or term.count(' OR ') > M) alongside the existing EPost-chunking pointer.
-
 ### `bio-phylo-modern-tree-inference` — Remove the false IQ-TREE flag-form warnings
 
 - Skill: 88, Production Ready · [mrsonord2240/bioSkills@966f838](https://github.com/mrsonord2240/bioSkills/tree/966f838b0ba32918310bd223a34f71d78f190560/phylogenetics/modern-tree-inference) · [viewer](skills/bio-phylo-modern-tree-inference/mrsonord2240-bioSkills@966f838/viewer.md)
@@ -1740,30 +1636,6 @@ None open.
 - Root cause: The Skill intentionally focuses runnable coverage on FUSION, MetaXcan, and FOCUS.
 - Fix: For each retained optional method, either add a minimal verified invocation or label it explicitly as a handoff/reference-only route.
 
-### `bio-conformer-generation` — filter_by_energy() / filter_energy_window() crash ungracefully on an empty conformer list
-
-- Skill: 90, Limited Release · [mrsonord2240/bioSkills@c4e2ccd](https://github.com/mrsonord2240/bioSkills/tree/c4e2ccd0129527b6e04a691e4f79e14e38a64030/chemoinformatics/conformer-generation) · [viewer](skills/bio-conformer-generation/mrsonord2240-bioSkills@c4e2ccd/viewer.md)
-- Observed in inputs: 9
-- Problem: Both the SKILL.md gen_conformers() pipeline's filter_by_energy() and examples/gen_conformers.py's filter_energy_window() call min(energies) unguarded. If RMSD pruning ever removes every conformer, the next pipeline step raises a raw 'ValueError: min() iterable argument is empty' with no context, unlike the clear guarded errors the rest of the Skill now uses consistently.
-- Root cause: The energy-window filter was not included in the same guard-consistency pass that fixed gen_conformers()'s missing mol-is-None check.
-- Fix: Add an explicit check at the top of both functions: 'if not conf_ids: return []' (or raise a clear ValueError naming the empty-pruning cause), matching the empty-input handling already present in filter_energy_window()'s own conf_data check in examples/gen_conformers.py.
-
-### `bio-conformer-generation` — gen_conformers()'s mol-is-None guard does not catch empty-string SMILES
-
-- Skill: 90, Limited Release · [mrsonord2240/bioSkills@c4e2ccd](https://github.com/mrsonord2240/bioSkills/tree/c4e2ccd0129527b6e04a691e4f79e14e38a64030/chemoinformatics/conformer-generation) · [viewer](skills/bio-conformer-generation/mrsonord2240-bioSkills@c4e2ccd/viewer.md)
-- Observed in inputs: 7
-- Problem: Chem.MolFromSmiles('') returns a valid Mol object with 0 atoms (not None) in the installed RDKit build, so the new 'if mol is None' guard does not fire for this input; RDKit's own EmbedMultipleConfs eventually raises 'ValueError: molecule has no atoms' instead of the guard's intended 'Invalid SMILES' message.
-- Root cause: The guard checks only for None; it does not also check GetNumAtoms() == 0, which is a second way RDKit signals an unusable SMILES.
-- Fix: Extend the guard to 'if mol is None or mol.GetNumAtoms() == 0: raise ValueError(...)' in gen_conformers(), macrocycle_conformers(), and crest_workflow() for consistency.
-
-### `bio-conformer-generation` — Macrocycle-aware embedding's claimed benefit still has no worked before/after example
-
-- Skill: 90, Limited Release · [mrsonord2240/bioSkills@c4e2ccd](https://github.com/mrsonord2240/bioSkills/tree/c4e2ccd0129527b6e04a691e4f79e14e38a64030/chemoinformatics/conformer-generation) · [viewer](skills/bio-conformer-generation/mrsonord2240-bioSkills@c4e2ccd/viewer.md)
-- Observed in inputs: 4
-- Problem: Unchanged from the pre-fix audit: a genuine >=12-atom carbocycle test still shows default ETKDGv3 settings succeeding equally (50/50) alongside useMacrocycleTorsions=True, so the documented under-sampling claim remains undemonstrated by any example in the Skill.
-- Root cause: This P2 was explicitly scoped out of the current fix dispatch (fix log: 'not in this dispatch's scope... left for a future pass').
-- Fix: Add a concrete before/after example (e.g. cyclosporine A, already named in usage-guide.md but never coded) showing embedding failure or degraded diversity under default settings versus success under useMacrocycleTorsions=True.
-
 ### `bio-reference-operations` — Reject wholly out-of-range consensus windows
 
 - Skill: 90, Production Ready · [mrsonord2240/bioSkills@0f829d1](https://github.com/mrsonord2240/bioSkills/tree/0f829d1619132fc9033b2437205d51ecb74df5d3/alignment-files/reference-operations) · [viewer](skills/bio-reference-operations/mrsonord2240-bioSkills@0f829d1/viewer.md)
@@ -1843,22 +1715,6 @@ None open.
 - Problem: Real CFD/MIT scoring is documented but cannot run in this environment without a multi-GB genome index, and the promised custom-library deliverable has no machine-readable column contract.
 - Root cause: The Skill names the external route and deliverables but lacks preflight/format checks for them.
 - Fix: Add a short preflight that names the required genome index and gives a clear blocked message, plus a minimal required-column schema for library table and oligo order.
-
-### `bio-metabolomics-msdial-preprocessing` — Targeted MRM/PRM/SRM quantification is never routed to metabolomics/targeted-analysis
-
-- Skill: 91, Limited Release · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/metabolomics/msdial-preprocessing) · [viewer](skills/bio-metabolomics-msdial-preprocessing/mrsonord2240-bioSkills@6847328/viewer.md)
-- Observed in inputs: 6
-- Problem: The repository has a sibling metabolomics/targeted-analysis Skill, and the real installed console exposes its own -t/--target flag for single-compound target-mode processing, but neither is mentioned anywhere in msdial-preprocessing's SKILL.md or usage-guide.md, including the otherwise-thorough 'When NOT to Use This Skill' section.
-- Root cause: The 'When NOT to Use' section was written to cover the 4 sibling Skills known at the time; it was not revisited when -t/target-mode support or the targeted-analysis Skill entered scope.
-- Fix: Add one line to 'When NOT to Use This Skill' and 'Related Skills': 'Fixed panel of known targets / MRM-PRM-SRM quantification -> metabolomics/targeted-analysis (MSDIALCUI.exe also exposes a -t/--target flag for single-compound target mode; this Skill's untargeted alignment is for discovery, not a predefined target list).'
-
-### `bio-metabolomics-msdial-preprocessing` — The per-file acquisition_type CSV mechanism is documented but never empirically confirmed against real DIA data
-
-- Skill: 91, Limited Release · [mrsonord2240/bioSkills@6847328](https://github.com/mrsonord2240/bioSkills/tree/684732876d2781df75d90ba35c3e9949ff4f28b2/metabolomics/msdial-preprocessing) · [viewer](skills/bio-metabolomics-msdial-preprocessing/mrsonord2240-bioSkills@6847328/viewer.md)
-- Observed in inputs: 2
-- Problem: Both this audit and the fix log ran the CSV -i mechanism to completion, but with DDA-only data in both cases (no real ABF/DIA file was available in this environment); the SKILL.md text presents the mechanism as settled fact, sourced only to the official tutorial page, without flagging that true DIA/SWATH deconvolution behavior has never actually been observed running through it.
-- Root cause: No real DIA/ABF test data exists in this candidate's audit environment (per TOOLS.md), so neither the fixer nor this audit could close the loop on this specific claim.
-- Fix: Add a one-sentence caveat next to the CSV acquisition_type instructions noting it is sourced from the official tutorial and CLI-mechanism-verified, but not yet confirmed against a real DIA/SWATH run's MS2Dec output; revisit once ABF/DIA test data is available.
 
 ### `bio-sam-bam-basics` — Validate BED rows before indexing fields
 
@@ -2107,14 +1963,6 @@ None open.
 - Problem: Those optional auxiliary routes were not replayed in this final eight-input audit.
 - Root cause: Only the selected seven core routes and exact designit primary-tool block have retained same-tip execution evidence.
 - Fix: Run retained same-tip checks for the Latin-square and simulation routes before making execution claims about them.
-
-### `bio-local-blast` — New table claim: 'v4 has no per-sequence taxid at build time' is false
-
-- Skill: 93, Limited Release · [mrsonord2240/bioSkills@e3ae050](https://github.com/mrsonord2240/bioSkills/tree/e3ae050e9b0c4bef22129953132c11e80ded18e8/database-access/local-blast) · [viewer](skills/bio-local-blast/mrsonord2240-bioSkills@e3ae050/viewer.md)
-- Observed in inputs: 8
-- Problem: The rewritten 'Database format: v5 vs v4' table and the Failure-modes 'v4 has no per-sequence taxid support at all' line claim a v4-format DB cannot carry -taxid_map assignments. Building a v4 DB with -taxid_map succeeds silently at exit 0, and blastdbcmd/blastp both correctly retrieve the per-sequence taxid.
-- Root cause: The fix conflated two separate v4 limitations: v4 genuinely cannot run -taxids/-taxidlist filtering (confirmed: hard error 'Taxonomy filtering is not supported in v4 BLAST dbs' once taxdb.tar.gz is present), but it DOES store and return per-sequence taxids assigned via -taxid_map at build time.
-- Fix: Split the table row: change 'Per-sequence taxid at build time (-taxid_map): v4 No' to 'Yes (stored, but not filterable)'. Keep 'v4: No' for the '-taxids/-taxidlist support' row (accurate). Add a note that a v4 DB with taxdb.tar.gz present fails LOUDLY (exit 2) rather than silently -- a third, currently undocumented failure mode distinct from the v5-without-taxdb silent no-op.
 
 ### `bio-microbiome-functional-prediction` — State expected full-run time more prominently
 

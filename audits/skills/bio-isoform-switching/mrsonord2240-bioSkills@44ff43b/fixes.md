@@ -90,3 +90,11 @@ Re-audit of round 1: 82, Limited Release, deployable, one open P1 (36/39 asserti
 
 - Writing scripts through a Bash heredoc de-escapes `\1`/`\n`; two scratch scripts silently produced empty transcript IDs until rewritten. Not a Skill issue.
 - `rnasplice\reference\tximport.tx2gene.tsv` has only 98 rows (use `salmon\genes_chrX.tx2gene.tsv`); a manual run with it tests 6 genes without an error.
+
+## 2026-09-24 final pass (branch `agent/finalpass-bio-isoform-switching-20260924`, commit `92708486d538d7f1c19d00f6117f149dfc2687b6`)
+
+- Corrected the false claim that `isoformSwitchAnalysisPart1()` does not choose a test: the installed 2.6.0 one-call wrapper selects DEXSeq at <=5 replicates per condition and satuRn above; direct wrappers warn only. Bound later-version wording to source-read 2.8.0/2.10.0/2.12.0 and recorded the 2.12 NetSurfP3 rename.
+- Added `set.seed(1)` immediately before `importRdata()` in the workflow and packaged R example. `detectUnwantedEffects = TRUE` can invoke stochastic `sva`; the Skill now tells users to record the seed and treat small-n surrogate-variable runs as exploratory.
+- Repaired the manual DRIMSeq/DEXSeq/stageR route for names such as `1-ctrl` and `trt.1-b` by applying the same `make.names(..., unique=TRUE)` mapping to metadata and the named `files` vector before `tximport`.
+- Evidence: packaged demo 14/14 planted switches and 8/8 planted NMD genes; fresh 3v5 odd-ID fixture through the shipped real-data example 20/20 planted and 0 others with PDF output; exact manual route 20/20 planted and 593 stageR rows; installed API, source contract (6/6), and R parser checks passed. Final exact-commit report: 94/100, Production Ready, 21/21 assertions, 6/6 executed; `auditor_independent=false`.
+- Environment note: the Windows R wrapper emitted locale warnings and returned status 11 after successful package runs, including checks with completed `stopifnot` assertions and no R error. Recorded outputs, rather than that wrapper exit status, are the execution evidence.

@@ -1,0 +1,246 @@
+{
+  "meta": {
+    "skill_name": "bio-isoform-switching",
+    "description": "Analyzes differential transcript usage (DTU) and isoform switches with functional consequence prediction, distinguishing DTU from DGE and DTE and providing IsoformSwitchAnalyzeR, manual DRIMSeq/DEXSeq/stageR, and swish routes.",
+    "source": "mrsonord2240/bioSkills@92708486d538d7f1c19d00f6117f149dfc2687b6:alternative-splicing/isoform-switching",
+    "evaluated_on": "2026-09-24",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 6,
+    "executed_inputs": "6/6",
+    "audit_type": "final-pass exact-commit corrective re-audit",
+    "pre_fix_report": "F:\\OpenScience\\audits\\bio-isoform-switching\\eval_report_bio-isoform-switching_result.json (pre-final-pass state archived in records)",
+    "auditor_independent": false,
+    "note": "final pass: fixed and audited under one brief, see CHECKPOINT.md",
+    "regression_inputs": [1, 2, 3],
+    "new_inputs": [4, 5, 6],
+    "n_inputs_note": "Three archived logical routes were rerun (packaged demo, non-syntactic-ID manual DTU, and installed API behavior); three fresh exact-source checks cover the real-data example, the documented contract, and R parsing."
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "All new numeric outcomes are from saved or freshly generated local planted-truth fixtures; version claims are bounded to installed 2.6.0 or explicitly source-read 2.8.0-2.12.0."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "The Skill remains research-analysis guidance and says NMD and switch predictions are probabilistic rather than diagnostic conclusions."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "The repaired manual route was exercised on 3v5 non-syntactic sample names, while the workflow continues to require label-permutation scrutiny for small studies."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "The packaged example and the exact manual normalization both completed on planted data, produced expected outputs, and recovered all planted switches."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 94,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 12,
+        "max": 12,
+        "note": "Covers DTU framing, a runnable IsoformSwitchAnalyzeR workflow, a manual confirmation route, consequences, and uncertainty-aware DTE."
+      },
+      "reliability": {
+        "score": 12,
+        "max": 12,
+        "note": "Name-keyed metadata, fixed seeding, explicit small-n limits, and manual ID normalization address the observed failure modes."
+      },
+      "performance_context": {
+        "score": 6,
+        "max": 8,
+        "note": "The single SKILL.md remains long, but its content is navigable and no split was needed solely to meet the 300-line target."
+      },
+      "agent_usability": {
+        "score": 15,
+        "max": 16,
+        "note": "Direct route choices, stops, version boundaries, and a runnable packaged example give agents concrete recovery paths."
+      },
+      "human_usability": {
+        "score": 8,
+        "max": 8,
+        "note": "Decision tables and explicit caveats distinguish exploratory small-n output from trusted conclusions."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "No credentials or shell evaluation path; external licensed annotators are visibly optional and unrun."
+      },
+      "maintainability": {
+        "score": 12,
+        "max": 12,
+        "note": "The runnable example, converter, version-qualified wording, and exact seed make the main routes maintainable."
+      },
+      "agent_specific": {
+        "score": 18,
+        "max": 20,
+        "note": "Accurate triggers, named input contracts, progressive workflow, and clear stop conditions; licensed external annotators remain environment-dependent."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 94.5,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 21,
+      "total": 21
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Regression Canonical",
+        "label": "Packaged synthetic demo",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Exact committed example ran with its built-in 3v3 synthetic Salmon fixture; it printed DEMO OK and wrote a >5 kB PDF.",
+        "note": "14/14 planted switching genes and 8/8 planted poison-exon NMD genes were recovered; no non-planted genes were called.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {"text": "The packaged script parses and starts without user data", "result": "PASS", "note": "Demo constructed its temporary Salmon, GTF, FASTA, and metadata inputs."},
+          {"text": "The planted switching genes are recovered", "result": "PASS", "note": "14/14 reported by the script self-check."},
+          {"text": "The planted NMD consequence is recovered", "result": "PASS", "note": "8/8 planted poison genes reported by the script self-check."},
+          {"text": "A plot is produced", "result": "PASS", "note": "The demo wrote switchPlot_TOY002.pdf and passed its file-size assertion."}
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Regression Edge",
+        "label": "Manual DRIMSeq/DEXSeq/stageR on non-syntactic sample IDs",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "The exact new ID-normalization lines were exercised with a fresh seeded 3v5 planted fixture whose directories include 1-ctrl and trt.1-b.",
+        "note": "Manual DEXSeq called 20 genes, recovered all 20 planted genes, and stageR returned 593 rows.",
+        "basic": 38,
+        "specialized": 58,
+        "total": 96,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {"text": "Non-syntactic IDs remain aligned through tximport and DRIMSeq", "result": "PASS", "note": "make.names() was applied to both metadata and named quant paths before tximport."},
+          {"text": "The manual DEXSeq model completes", "result": "PASS", "note": "No R error; per-gene q-values were produced."},
+          {"text": "Planted switches are recovered", "result": "PASS", "note": "20/20 planted genes at q < 0.05."},
+          {"text": "stageR confirmation is reachable", "result": "PASS", "note": "getAdjustedPValues returned 593 rows."}
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Regression Adversarial",
+        "label": "Installed IsoformSwitchAnalyzeR wrapper behavior",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "Installed IsoformSwitchAnalyzeR 2.6.0 function bodies were inspected by R in the alternative-splicing environment.",
+        "note": "Part1 references both direct test wrappers and replicate logic; the installed namespace exports analyzeNetSurfP2.",
+        "basic": 37,
+        "specialized": 56,
+        "total": 93,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          {"text": "The installed version is identified", "result": "PASS", "note": "IsoformSwitchAnalyzeR 2.6.0."},
+          {"text": "Part1 contains both selection branches", "result": "PASS", "note": "Function body contains isoformSwitchTestDEXSeq and isoformSwitchTestSatuRn."},
+          {"text": "The current NetSurfP importer claim is bounded", "result": "PASS", "note": "analyzeNetSurfP2 exists in the installed 2.6.0 namespace; later-version wording is labelled source-read."}
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Fresh Variant",
+        "label": "Committed real-data example on fresh odd-ID 3v5 planted fixture",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "The committed script was run in real-data mode with the fresh 3v5 fixture and its deliberately shuffled 1-ctrl/trt.N-b metadata.",
+        "note": "The output CSV contained 20 called genes: all 20 planted switches and no others; a 7,441-byte PDF was written.",
+        "basic": 38,
+        "specialized": 58,
+        "total": 96,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {"text": "The example joins unusual sample names by metadata key", "result": "PASS", "note": "All eight 1-ctrl/trt.N-b names were printed in the intended conditions."},
+          {"text": "The direct DEXSeq route completes", "result": "PASS", "note": "39 switching isoforms in 20 genes were reported."},
+          {"text": "Fresh planted-truth recovery is exact", "result": "PASS", "note": "20/20 planted genes and 0 other genes in significant_switches.csv."},
+          {"text": "Functional output is generated", "result": "PASS", "note": "ORFs, consequences, CSV, RDS, sequences, and a 7,441-byte switchPlot PDF were written."}
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Fresh Contract",
+        "label": "Exact-source documentation contract",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "A source-text checker ran against the committed worktree after the source commit.",
+        "note": "All six contract checks passed.",
+        "basic": 37,
+        "specialized": 56,
+        "total": 93,
+        "assertions_passed": 6,
+        "assertions_total": 6,
+        "assertions": [
+          {"text": "Stale auto-selection and unavailable-release claims are absent", "result": "PASS", "note": "Both retired phrases were absent."},
+          {"text": "Part1 selection is documented", "result": "PASS", "note": "The <=5/>5 Part1 behavior is stated."},
+          {"text": "NetSurfP version boundary is documented", "result": "PASS", "note": "The 2.12 analyzeNetSurfP3 boundary is named."},
+          {"text": "Workflow seed precedes importRdata", "result": "PASS", "note": "set.seed(1) precedes the workflow import."},
+          {"text": "Example seed precedes importRdata", "result": "PASS", "note": "set.seed(1) precedes the shipped-example import."},
+          {"text": "Manual ID normalization is present", "result": "PASS", "note": "Both metadata and files receive the same make.names() mapping."}
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Fresh Syntax",
+        "label": "R parser check for committed packaged example",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "executed": true,
+        "execution_note": "R 4.4.3 parsed the exact committed example in the alternative-splicing environment.",
+        "note": "R_PARSE_OK was emitted.",
+        "basic": 37,
+        "specialized": 57,
+        "total": 94,
+        "assertions_passed": 1,
+        "assertions_total": 1,
+        "assertions": [
+          {"text": "The shipped R example is syntactically valid", "result": "PASS", "note": "parse(file=...) completed and emitted R_PARSE_OK."}
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 37.6,
+    "dynamic_weighted": 56.7,
+    "score": 94,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Exact-source evidence covers the shipped demo, the shipped real-data route, manual DTU, package behavior, documentation contract, and parsing.",
+    "The repaired manual pipeline now handles non-syntactic sample names without a workaround.",
+    "Small-n stochastic behavior and version boundaries are explicit instead of silently implied."
+  ],
+  "recommendations": []
+}
