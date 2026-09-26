@@ -1,0 +1,436 @@
+{
+  "meta": {
+    "skill_name": "bio-single-cell-cell-annotation",
+    "description": "Automated reference-based cell type annotation for single-cell RNA-seq using CellTypist, SingleR, Azimuth, scANVI, and scmap to transfer labels from a reference. Use when annotating cell types from a reference atlas or pretrained model, transferring labels onto a query, assessing prediction confidence and rejection, or triaging whether an unexpected cluster is a novel type versus a doublet, low-quality, or batch artifact.",
+    "evaluated_on": "2026-09-25",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "mrsonord2240/optimized-scientific-skills@2dee47f80dac6f3ba5c78b53ea9ec132a87cf5db:skills/bio-single-cell-cell-annotation",
+    "auditor_independent": true,
+    "performed_by": "Codex independent auditor agent"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "All reported cell counts, accuracies, confidence values, and model-agreement rates were computed by saved scripts against the logged synthetic or public PBMC inputs; no scientific values were invented."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "The outputs annotate research matrices and explicitly treat labels as hypotheses; none diagnoses, prescribes, or triages an individual."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "The executions respected method-specific normalization, reference domains, uncertainty, pruning limits, marker triangulation, and QC-first novelty triage without substituting confidence for biological validity."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "Five Python workflows exited 0 and produced checked outputs. Both Windows R workflows completed their scientific assertions and wrote artifacts but returned exit 2816 during process teardown, so they are conservatively marked PARTIAL rather than clean successes; no syntax error, infinite loop, or missing core dependency occurred."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 91,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 11,
+        "max": 12,
+        "note": "CellTypist, SingleR, Azimuth, rejection, and novelty triage are substantive; scANVI and scmap are correctly routed but lack comparable runnable examples."
+      },
+      "reliability": {
+        "score": 10,
+        "max": 12,
+        "note": "The shipped CellTypist CLI rejects missing counts, Leiden, UMAP, and uncached models with actionable errors; R snippets rely more heavily on package-level failures and this host did not yield a clean R process exit."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "The workflow is concise and method-routed, with detail split between SKILL.md, a usage guide, and examples; the canonical CellTypist block duplicates part of the executable example."
+      },
+      "agent_usability": {
+        "score": 14,
+        "max": 16,
+        "note": "Method selection, normalization, confidence, and artifact triage are clear. The inline CellTypist block still includes explicit model download while the shipped CLI enforces offline cached-path execution."
+      },
+      "human_usability": {
+        "score": 8,
+        "max": 8,
+        "note": "Natural trigger examples and explicit recovery messages make the skill discoverable and forgiving without silently correcting biologically meaningful identifiers."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "No credentials, raw-code execution, destructive operations, or hidden acquisition were observed in the shipped CLI; general privacy and retention guidance for human expression matrices is not explicit."
+      },
+      "maintainability": {
+        "score": 11,
+        "max": 12,
+        "note": "Responsibilities are separated across documentation and two examples, and the Python CLI is directly testable; full multi-method integration still depends on external reference packages and models."
+      },
+      "agent_specific": {
+        "score": 19,
+        "max": 20,
+        "note": "Triggering, seeded execution, composability, idempotency, and stop conditions are strong; the two CellTypist acquisition contracts create minor avoidable ambiguity."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 90.7,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 33,
+      "total": 35
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Exact shipped CellTypist CLI on synthetic PBMCs",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The exact source example exited 0 on 6,049 cells, restored CP10K/log1p totals to exactly 10,000, preserved 15 seeded clusters, improved coarse lineage accuracy from 0.891 to 1.000 with majority voting, and wrote every configured artifact.",
+        "executed": true,
+        "execution_note": "run/input1_prepare.py, exact source examples/celltypist_annotation.py, run/input1_validate.py, and run/input1.log; supporting deterministic replay in run/verify_seed_repeat.log.",
+        "basic": 39,
+        "specialized": 58,
+        "total": 97,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The shipped CLI restores raw counts and produces CP10K log1p input before annotation",
+            "result": "PASS",
+            "note": "Back-transformed per-cell totals ranged from 10000.00 to 10000.00."
+          },
+          {
+            "text": "The intentionally seeded Leiden over-clustering is preserved and used for majority voting",
+            "result": "PASS",
+            "note": "All 15 prepared clusters were preserved; a separate two-run replay produced identical majority labels and confidence values for 1,000 cells."
+          },
+          {
+            "text": "Majority voting improves or preserves ground-truth lineage accuracy",
+            "result": "PASS",
+            "note": "Coarse lineage accuracy increased from 0.891 per cell to 1.000 after majority voting."
+          },
+          {
+            "text": "Per-cell confidence and low-confidence membership are retained",
+            "result": "PASS",
+            "note": "The output retained annotation_confidence and marked 2,186 of 6,049 cells below the configured high-confidence rule."
+          },
+          {
+            "text": "All caller-specified output destinations are created and parse",
+            "result": "PASS",
+            "note": "Annotated H5AD, PNG, and counts CSV were present, non-empty, and internally consistent."
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "SingleR HPCA annotation with method and pruning checks",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "Both the original and Seurat-free Windows routes completed their scientific checks (0.906 and 0.908 lineage accuracy) and saved predictions, but each returned exit 2816 after output. WSL execution was not completed because the isolated dependency environment exceeded the 1 GB install limit.",
+        "executed": false,
+        "execution_note": "run/input2.log and run/input2_clean.log preserve both nonzero Windows exits. run/input2_wsl_probe.log and run/input2_wsl_install_interrupted.log document the unavailable WSL packages and stopped 1,965,733,894-byte partial environment.",
+        "basic": 32,
+        "specialized": 47,
+        "total": 79,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "SingleR receives a log-normalized assay",
+            "result": "PASS",
+            "note": "Both routes asserted that logcounts was present before SingleR."
+          },
+          {
+            "text": "The differential-expression method is matched to the bulk reference",
+            "result": "PASS",
+            "note": "classic achieved 0.906 lineage accuracy versus 0.530 for wilcox on the same bulk HPCA reference."
+          },
+          {
+            "text": "Pruned labels and delta behavior are reported without treating pruning as a general correctness guarantee",
+            "result": "PASS",
+            "note": "The run recorded 15 of 3,022 cells pruned, kept accuracy 0.908, and the delta distribution."
+          },
+          {
+            "text": "The scientific output is reproducible through a second implementation path",
+            "result": "PASS",
+            "note": "The sparse-matrix, Seurat-free route independently produced 0.908 accuracy and 14 of 3,023 cells pruned."
+          },
+          {
+            "text": "At least one complete SingleR route exits cleanly",
+            "result": "FAIL",
+            "note": "Both Windows routes returned 2816 after their success assertions; the WSL route was not executed."
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "CellTypist gene-symbol versus Ensembl-ID boundary",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The explicit local model used 3,931 of 6,639 model genes with symbols and returned 32 labels; the Ensembl-ID query matched zero genes and raised the documented no-feature-overlap ValueError.",
+        "executed": true,
+        "execution_note": "run/input3.py and run/input3.log, exit 0.",
+        "basic": 37,
+        "specialized": 55,
+        "total": 92,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "A valid gene-symbol query annotates successfully",
+            "result": "PASS",
+            "note": "The symbols route matched 3,931 model features and returned 32 distinct labels."
+          },
+          {
+            "text": "An Ensembl-ID query with no overlap is rejected rather than silently labeled",
+            "result": "PASS",
+            "note": "CellTypist raised ValueError: No features overlap with the model."
+          },
+          {
+            "text": "Matched-feature evidence is quantified before labels are trusted",
+            "result": "PASS",
+            "note": "The log records 3,931/6,639 matched features for symbols and 0/6,639 for Ensembl IDs."
+          },
+          {
+            "text": "The model is loaded from an explicit local path",
+            "result": "PASS",
+            "note": "Model.load received the resolved cached Immune_All_Low.pkl path."
+          },
+          {
+            "text": "No unsupported biological conclusion is produced for the invalid query",
+            "result": "PASS",
+            "note": "The zero-overlap route stopped before producing any label."
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Azimuth mapping of real public 10x PBMC data",
+        "status": "PARTIAL",
+        "status_flag": "❌",
+        "note": "Azimuth mapped 1,176 real cells, produced all required label and score columns, recorded 21.9% below the illustrative 0.7 score, and rendered normalized marker validation, but the Windows R process returned exit 2816 after output.",
+        "executed": false,
+        "execution_note": "run/input4.R, run/input4.log, and data/input4_dotplot.png preserve the completed analysis and nonzero process exit.",
+        "basic": 32,
+        "specialized": 48,
+        "total": 80,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "RunAzimuth creates the documented hierarchical labels and score columns",
+            "result": "PASS",
+            "note": "predicted.celltype.l1, predicted.celltype.l2, predicted.celltype.l2.score, and mapping.score were all present."
+          },
+          {
+            "text": "The query is a real PBMC dataset inside the selected reference domain",
+            "result": "PASS",
+            "note": "The run used 1,176 cells from the public 10x PBMC 1k v3 dataset with pbmcref."
+          },
+          {
+            "text": "Prediction confidence is reported as a dataset-specific distribution",
+            "result": "PASS",
+            "note": "The run reported 257/1,176 below 0.7 and a median mapping score of 0.982 rather than presenting the cutoff as universal."
+          },
+          {
+            "text": "Marker triangulation uses a normalized RNA data layer",
+            "result": "PASS",
+            "note": "NormalizeData preceded DotPlot and all seven requested lineage markers rendered."
+          },
+          {
+            "text": "The Azimuth process exits cleanly after writing outputs",
+            "result": "FAIL",
+            "note": "The Windows R process returned 2816 after the validation marker and artifact were written."
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "QC-first novelty triage with planted artifacts",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "All 20 clusters entered QC before confidence interpretation; the four planted doublet/low-quality artifact clusters were all detected by QC evidence, including confidently mislabeled artifacts, and no novel type was claimed.",
+        "executed": true,
+        "execution_note": "run/input5.py, run/input5.log, and data/input5_cluster_qc.csv, exit 0.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Every cluster enters QC before annotation confidence is interpreted",
+            "result": "PASS",
+            "note": "The QC table contained all 20 Leiden clusters."
+          },
+          {
+            "text": "Planted doublet and low-quality artifact clusters are detected by QC evidence",
+            "result": "PASS",
+            "note": "All four ground-truth artifact clusters were QC-flagged, giving artifact-cluster recall 1.000."
+          },
+          {
+            "text": "High annotation confidence does not suppress artifact review",
+            "result": "PASS",
+            "note": "Low-quality clusters with median confidence 0.973 and 0.593 and a doublet cluster at 0.820 remained in the QC table."
+          },
+          {
+            "text": "Batch purity, mitochondrial fraction, gene count, and doublet evidence are retained",
+            "result": "PASS",
+            "note": "All four evidence dimensions plus median confidence were written per cluster."
+          },
+          {
+            "text": "No novel cell type is claimed from confidence alone",
+            "result": "PASS",
+            "note": "The logged novelty-claim flag is false."
+          }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Air-gapped CellTypist execution and missing-model boundary",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "With CellTypist pointed at an isolated empty cache and all acquisition helpers/network requests blocked, the shipped CLI completed from an explicit model path, wrote custom destinations, and rejected a missing bare model without any network call.",
+        "executed": true,
+        "execution_note": "run/input6.py and run/input6.log, exit 0; isolated models path recorded under data/input6_empty_cache/data/models.",
+        "basic": 39,
+        "specialized": 58,
+        "total": 97,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "An explicit local model path works when the default model cache is empty",
+            "result": "PASS",
+            "note": "The run completed using the external cached model while models_path pointed inside the isolated empty audit cache."
+          },
+          {
+            "text": "Execution does not invoke model-index helpers or network requests",
+            "result": "PASS",
+            "note": "requests, urllib, download_models, and get_all_models were blocked and the recorded acquisition-call count remained zero."
+          },
+          {
+            "text": "A missing uncached model fails with an actionable local error",
+            "result": "PASS",
+            "note": "The CLI raised FileNotFoundError instructing the caller to download separately or pass an existing file."
+          },
+          {
+            "text": "Input, annotated H5AD, figure, and counts destinations are configurable",
+            "result": "PASS",
+            "note": "All three custom output paths were created and non-empty."
+          },
+          {
+            "text": "No model file is populated into the isolated cache as a side effect",
+            "result": "PASS",
+            "note": "The isolated cache contained no pkl file after both the success and missing-model cases."
+          }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Competing CellTypist reference granularities",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "On 800 real PBMCs, Immune_All_Low and Immune_All_High agreed on exact labels for only 1.9% but on coarse lineage for 100%; 89 low-confidence or coarse-disagreement cells were flagged for review and neither model was treated as ground truth.",
+        "executed": true,
+        "execution_note": "run/input7.py, run/input7.log, and data/input7_model_comparison.csv, exit 0.",
+        "basic": 38,
+        "specialized": 57,
+        "total": 95,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "Both plausible immune models run on the same seeded real PBMC query",
+            "result": "PASS",
+            "note": "Both explicit local models annotated the same 800 cells and 14 seeded clusters."
+          },
+          {
+            "text": "Different label granularities are reconciled hierarchically before disagreement is interpreted",
+            "result": "PASS",
+            "note": "Exact agreement was 0.019 while coarse lineage agreement was 1.000."
+          },
+          {
+            "text": "Low-confidence or biologically meaningful disagreements are explicitly flagged",
+            "result": "PASS",
+            "note": "The output flagged 89 cells for manual review."
+          },
+          {
+            "text": "Confidence is reported separately for both models",
+            "result": "PASS",
+            "note": "Mean confidence was 0.868 for Immune_All_Low and 0.966 for Immune_All_High."
+          },
+          {
+            "text": "Neither automated reference is presented as ground truth",
+            "result": "PASS",
+            "note": "The logged ground-truth flag is false and the output retains both model labels for review."
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 36.4,
+    "dynamic_weighted": 54.4,
+    "score": 91,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "The shipped CellTypist CLI enforces raw-count, seeded-cluster, UMAP, and local-model preconditions with actionable failures.",
+    "CP10K/log1p restoration and explicit over-clustering produced deterministic, ground-truth-consistent majority labels.",
+    "QC-first novelty triage correctly retained and detected confidently mislabeled doublet and low-quality clusters.",
+    "The skill treats reference labels as hypotheses and supports calibrated uncertainty, hierarchy reconciliation, and marker triangulation."
+  ],
+  "recommendations": [
+    {
+      "priority": "P1",
+      "title": "Establish a clean-exit Linux smoke for R routes",
+      "observed_in": [2, 4],
+      "problem": "SingleR and Azimuth completed their scientific checks and wrote valid outputs, but both Windows R processes returned exit 2816 after output. No Linux confirmation was completed because the isolated WSL dependency environment exceeded the 1 GB installation limit.",
+      "root_cause": "The current audit environment lacks a lightweight, pre-provisioned Linux R stack for the skill's reference-transfer routes, while the native Windows R runtime has a deterministic teardown failure.",
+      "fix": "Provide a tested lockfile or compact container/environment for SingleR, celldex, and Azimuth, then require exit 0 plus artifact assertions in the release smoke. Keep the Windows result marked partial until that independent route passes."
+    },
+    {
+      "priority": "P2",
+      "title": "Align inline and CLI CellTypist model acquisition",
+      "observed_in": [],
+      "problem": "The canonical SKILL.md block explicitly calls download_models and then passes a bare name, while the shipped CLI separates acquisition from execution and resolves only existing local files.",
+      "root_cause": "The executable example was hardened for offline use without making the inline documentation follow the same contract.",
+      "fix": "Change the inline block to resolve an existing explicit or cached model path, and present downloading as a separate optional provisioning step."
+    },
+    {
+      "priority": "P2",
+      "title": "Add runnable scANVI and scmap examples",
+      "observed_in": [],
+      "problem": "The description and routing tables promise scANVI/scArches and scmap, but only CellTypist, SingleR, and Azimuth have runnable workflows.",
+      "root_cause": "The broad method-selection scope exceeds the executable examples shipped with the skill.",
+      "fix": "Add one minimal seeded scANVI transfer example and one scmap rejection example, each with explicit input contracts, uncertainty output, and a small smoke fixture."
+    }
+  ]
+}

@@ -42,6 +42,13 @@ REPOSITORIES = {
         "modified_by": "Samuel Nord",
         "fork_of": UPSTREAM_BIOSKILLS,
     },
+    "mrsonord2240/optimized-scientific-skills": {
+        "author": "GPTomics",
+        "author_url": "https://github.com/GPTomics",
+        "license": "MIT",
+        "modified_by": "Samuel Nord",
+        "fork_of": UPSTREAM_BIOSKILLS,
+    },
 }
 AUDIT_METHOD = {
     "name": "skill-auditor",
@@ -57,7 +64,13 @@ COMMISSIONED_BY = "Samuel Nord"
 RUN_DIR_RE = re.compile(r"^(run|rerun|pass)\w*$")
 FORK_CLONE = os.environ.get("OASS_FORK_CLONE", "F:/OpenScience/external/mrsonord2240__bioSkills")
 UPSTREAM_CLONE = os.environ.get("OASS_UPSTREAM_CLONE", "F:/OpenScience/external/GPTomics__bioSkills")
-CLONES = {"GPTomics/bioSkills": UPSTREAM_CLONE, "mrsonord2240/bioSkills": FORK_CLONE}
+OPTIMIZED_CLONE = os.environ.get("OASS_OPTIMIZED_CLONE", "F:/optimized-scientific-skills")
+CLONES = {
+    "GPTomics/bioSkills": UPSTREAM_CLONE,
+    "mrsonord2240/bioSkills": FORK_CLONE,
+    "mrsonord2240/optimized-scientific-skills": OPTIMIZED_CLONE,
+}
+ALWAYS_MODIFIED_REPOSITORIES = {"mrsonord2240/optimized-scientific-skills"}
 SCRIPT_EXTENSIONS = {".py", ".R", ".r", ".sh", ".ctl"}
 MAX_SCRIPT_BYTES = 100_000
 
@@ -119,11 +132,18 @@ def fork_modifies(source):
     clone is unavailable, leaving the caller to fall back on the fix log.
     """
     base = source.get("fork_of")
-    if not base or not os.path.isdir(os.path.join(FORK_CLONE, ".git")):
+    if source["repository"] in ALWAYS_MODIFIED_REPOSITORIES:
+        # The published shelf was created with independent history and normalized
+        # `skills/<id>` paths, so its commit cannot be diffed against the upstream
+        # repository's original path. Every shelf record is intentionally treated
+        # as a modified derivative and retains its upstream attribution below.
+        return True
+    clone = CLONES.get(source["repository"])
+    if not base or not clone or not os.path.isdir(os.path.join(clone, ".git")):
         return None
     result = subprocess.run(
         ["git", "diff", "--quiet", base["commit"], source["commit"], "--", source["path"]],
-        cwd=FORK_CLONE, capture_output=True)
+        cwd=clone, capture_output=True)
     if result.returncode == 0:
         return False
     if result.returncode == 1:
@@ -178,6 +198,7 @@ def collect_scripts(folder, subdirectories, modified_before=None, modified_after
 
 
 def header(skill_id, source, report):
+    performed_by = report.get("meta", {}).get("performed_by", PERFORMED_BY)
     lines = [
         f"> **Audit record for `{skill_id}`**",
         f"> - Skill authored by [{source['author']}]({source['author_url']}); audited version "
@@ -199,7 +220,7 @@ def header(skill_id, source, report):
     lines += [
         f"> - Audit method: [{AUDIT_METHOD['name']}]({AUDIT_METHOD['url']}) by {AUDIT_METHOD['author']} "
         f"({AUDIT_METHOD['license']}), {report.get('meta', {}).get('evaluator_version', 'skill-auditor')}.",
-        f"> - Performed on {report.get('meta', {}).get('evaluated_on')} by {PERFORMED_BY}, commissioned by "
+        f"> - Performed on {report.get('meta', {}).get('evaluated_on')} by {performed_by}, commissioned by "
         f"{COMMISSIONED_BY}. Not reviewed or endorsed by the Skill's authors.",
         "> - Test data are synthetic. Scripts the auditor ran are in [scripts/](scripts/); raw run outputs are not published. "
         "Local paths below refer to the auditor's workstation.",
@@ -212,6 +233,7 @@ def publish_version(repo, skill_id, folder, report_name, script_dirs, supersedes
                     script_window=(None, None)):
     report_path = os.path.join(folder, report_name)
     report = read_json(report_path)
+    performed_by = report.get("meta", {}).get("performed_by", PERFORMED_BY)
     source = parse_source(report, report_path)
     fixes_present = bool(fixes_path and os.path.isfile(fixes_path))
     source, name = resolve_identity(source, fixes_present)
@@ -230,6 +252,15 @@ def publish_version(repo, skill_id, folder, report_name, script_dirs, supersedes
     # rebuilding the record purely from what is on F: today silently deletes the first audit's work.
     # Keep anything already published that this run cannot re-derive.
     published_before = {}
+    existing_record = None
+    existing_fixes = None
+    existing_record_path = os.path.join(target, "record.json")
+    existing_fixes_path = os.path.join(target, "fixes.md")
+    if os.path.isfile(existing_record_path):
+        existing_record = read_json(existing_record_path)
+    if os.path.isfile(existing_fixes_path):
+        with open(existing_fixes_path, "rb") as f:
+            existing_fixes = f.read()
     previous_scripts = os.path.join(target, "scripts")
     if os.path.isdir(previous_scripts):
         for dirpath, _, filenames in os.walk(previous_scripts):
@@ -247,7 +278,10 @@ def publish_version(repo, skill_id, folder, report_name, script_dirs, supersedes
         viewer = f.read().replace("\r\n", "\n")
     write_text(os.path.join(target, "viewer.md"), header(skill_id, source, report) + "\n" + viewer)
     shutil.copyfile(report_path, os.path.join(target, "report.json"))
-    if fixes_present:
+    if existing_fixes is not None:
+        with open(os.path.join(target, "fixes.md"), "wb") as f:
+            f.write(existing_fixes)
+    elif fixes_present:
         with open(fixes_path, encoding="utf-8") as f:
             write_text(os.path.join(target, "fixes.md"), f.read().replace("\r\n", "\n"))
 
@@ -268,22 +302,31 @@ def publish_version(repo, skill_id, folder, report_name, script_dirs, supersedes
             f.write(blob)
         carried += 1
 
+    audit_record = {
+        "method": AUDIT_METHOD,
+        "evaluator_version": report.get("meta", {}).get("evaluator_version"),
+        "audited_on": report.get("meta", {}).get("evaluated_on"),
+        "performed_by": performed_by,
+        "commissioned_by": COMMISSIONED_BY,
+        "test_data": "synthetic",
+    }
+    if "auditor_independent" in report.get("meta", {}):
+        audit_record["auditor_independent"] = report["meta"]["auditor_independent"]
     record = {
         "skill_id": skill_id,
         "version": name,
         "source": source,
-        "audit": {
-            "method": AUDIT_METHOD,
-            "evaluator_version": report.get("meta", {}).get("evaluator_version"),
-            "audited_on": report.get("meta", {}).get("evaluated_on"),
-            "performed_by": PERFORMED_BY,
-            "commissioned_by": COMMISSIONED_BY,
-            "test_data": "synthetic",
-        },
+        "audit": audit_record,
         "supersedes": supersedes,
         "files": {"report": "report.json", "viewer": "viewer.md", "fixes": "fixes.md" if fixes_present else None,
                   "scripts": len(scripts) + carried},
     }
+    if existing_record is not None:
+        # Republishing an already-recorded version may recover scripts, but it
+        # must not rewrite that historical version's provenance or chain edge.
+        record["source"] = existing_record.get("source", record["source"])
+        record["audit"] = existing_record.get("audit", record["audit"])
+        record["supersedes"] = existing_record.get("supersedes")
     write_text(os.path.join(target, "record.json"), json.dumps(record, indent=2) + "\n")
     return name, len(scripts) + carried
 

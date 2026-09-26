@@ -1,0 +1,379 @@
+{
+  "meta": {
+    "skill_name": "bio-vcf-statistics",
+    "description": "Compute and interpret VCF quality-control metrics including Ti/Tv, het/hom, missingness, HWE, contamination signals, and sample relatedness with bcftools, VCFtools, identity tools, and cyvcf2.",
+    "evaluated_on": "2026-09-25",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "mrsonord2240/optimized-scientific-skills@2dee47f80dac6f3ba5c78b53ea9ec132a87cf5db:skills/bio-vcf-statistics",
+    "auditor_independent": true,
+    "performed_by": "Codex independent auditor agent"
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "All reported numerical values were generated from retained synthetic fixtures and cross-checked against command outputs; no literature identifiers, clinical results, or statistics were invented."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "The outputs remained callset and cohort quality-control analyses and made no patient-specific diagnosis or treatment recommendation."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "The Skill correctly requires matched-cohort interpretation, genotype filtering before cohort metrics, ancestry-aware comparisons, controls-only excess-heterozygosity assessment, and identity reconciliation before downstream analysis."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "The shipped cyvcf2 example and every exercised bcftools and VCFtools workflow ran successfully. Two edge-output presentation gaps remain, but neither makes the code unrunnable or corrupts the corrected multiallelic Ti/Tv and QUAL calculations."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 92,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 10,
+        "max": 12,
+        "note": "The broad QC workflow is scientifically complete, but the example labels PASS-or-dot records as PASS and omits substitution counts when the transversion denominator is zero."
+      },
+      "reliability": {
+        "score": 10,
+        "max": 12,
+        "note": "Empty files, missing QUAL, multiallelic SNPs, prior cohort data, and all broader CLI workflows complete deterministically; two valid edge cases produce incomplete or ambiguous presentation rather than a crash."
+      },
+      "performance_context": {
+        "score": 8,
+        "max": 8,
+        "note": "The Skill layers concise operational guidance over a separate usage guide and streams VCF records through mature command-line tools."
+      },
+      "agent_usability": {
+        "score": 15,
+        "max": 16,
+        "note": "Decision tables, ordering constraints, command patterns, and common-error remedies are directly actionable; one example label is inconsistent with the documented FILTER distinction."
+      },
+      "human_usability": {
+        "score": 8,
+        "max": 8,
+        "note": "Natural trigger language, example prompts, a quick reference, and explicit contextual interpretation make the Skill easy to discover and use."
+      },
+      "security": {
+        "score": 11,
+        "max": 12,
+        "note": "No credentials, destructive commands, or dynamic code execution are present; the example delegates malformed-path and malformed-VCF validation to cyvcf2."
+      },
+      "maintainability": {
+        "score": 11,
+        "max": 12,
+        "note": "The documentation and short example are modular and independently testable, although the summary-printing branch couples count visibility to a nonzero denominator."
+      },
+      "agent_specific": {
+        "score": 19,
+        "max": 20,
+        "note": "Trigger scope, progressive disclosure, idempotent read-only workflows, and handoffs to filtering and normalization Skills are strong; the custom script output contract could be more explicit."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 90.3,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 26,
+      "total": 28
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Prior synthetic cohort statistics regression",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Executed on the prior eight-sample, 361-record cohort: eight PSC rows, Ti/Tv 1.43, strict PASS 0, not-failed 361, and the copied example processed all records.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The prior cohort produces one per-sample statistics row for each of eight samples.",
+            "result": "PASS",
+            "note": "bcftools stats -s emitted exactly eight PSC rows."
+          },
+          {
+            "text": "The prior cohort Ti/Tv regression value remains 1.43.",
+            "result": "PASS",
+            "note": "The TSTV section reported 1.43."
+          },
+          {
+            "text": "Strict PASS and PASS-or-unfiltered counts match the known all-dot-filter fixture.",
+            "result": "PASS",
+            "note": "Strict PASS returned 0 while -f .,PASS returned all 361 records."
+          },
+          {
+            "text": "The shipped cyvcf2 example consumes the complete prior cohort without error.",
+            "result": "PASS",
+            "note": "The byte-identical copied script reported 361 total variants."
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "Prior reversed-heterozygote allele-balance regression",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The orientation-mixed stream contained 747 biallelic heterozygotes, including 372 reversed unphased 1/0 calls; the documented matcher retained all 747.",
+        "basic": 39,
+        "specialized": 56,
+        "total": 95,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "The regression fixture contains the full expected set of 747 biallelic heterozygotes.",
+            "result": "PASS",
+            "note": "An independent bcftools GT query counted 747 accepted orientation forms."
+          },
+          {
+            "text": "The fixture includes a substantial reversed unphased 1/0 subset.",
+            "result": "PASS",
+            "note": "The generated stream contained 372 1/0 genotypes."
+          },
+          {
+            "text": "The documented matcher retains every valid phased and unphased biallelic orientation.",
+            "result": "PASS",
+            "note": "Observed accepted count was 747 of 747."
+          },
+          {
+            "text": "The Skill explicitly limits the quick AD calculation to biallelic heterozygotes.",
+            "result": "PASS",
+            "note": "SKILL.md directs multiallelic AD to an explicit parser."
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Variant B",
+        "label": "Multiallelic Ti/Tv, QUAL zero, and FILTER semantics",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The corrected script matched bcftools at two transitions and two transversions and retained QUAL=0 in a mean of 20.0; its PASS label nevertheless combined two strict-PASS and one unfiltered-dot record.",
+        "basic": 35,
+        "specialized": 53,
+        "total": 88,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Every alternate allele in both multiallelic SNP records contributes to Ti/Tv.",
+            "result": "PASS",
+            "note": "The script and bcftools independently reported two transitions and two transversions."
+          },
+          {
+            "text": "A valid QUAL value of zero contributes to the mean quality.",
+            "result": "PASS",
+            "note": "The script reported 20.0 for observed qualities 0, 20, and 40; dropping zero would have produced 30.0."
+          },
+          {
+            "text": "The custom summary distinguishes strict PASS records from unfiltered-dot records.",
+            "result": "FAIL",
+            "note": "It printed PASS variants: 3, while bcftools found two strict-PASS records and three PASS-or-dot records."
+          },
+          {
+            "text": "Filtered records remain separate from not-failed records.",
+            "result": "PASS",
+            "note": "One LowQual record was reported as filtered, and bcftools confirmed the 2/3 strict-versus-not-failed split."
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Edge",
+        "label": "Empty VCF and zero-transversion Ti/Tv denominator",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The empty VCF completed cleanly and the transition-only VCF retained QUAL=0, but the print branch suppressed both substitution counts when transversions equaled zero.",
+        "basic": 32,
+        "specialized": 46,
+        "total": 78,
+        "assertions_passed": 3,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "An empty valid VCF completes and reports zero records.",
+            "result": "PASS",
+            "note": "The script exited normally and reported Total variants: 0."
+          },
+          {
+            "text": "An empty VCF does not fabricate a mean quality.",
+            "result": "PASS",
+            "note": "No Mean QUAL line was emitted because there were no observed values."
+          },
+          {
+            "text": "QUAL zero remains in the transition-only mean.",
+            "result": "PASS",
+            "note": "The two observed qualities 0 and 10 produced Mean QUAL: 5.0."
+          },
+          {
+            "text": "A zero-transversion callset still reports the observed transition and transversion counts.",
+            "result": "FAIL",
+            "note": "Neither Transitions: 2 nor Transversions: 0 was printed because the entire block is guarded by transversions > 0."
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Cohort missingness and exact-HWE workflow",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "VCFtools 0.1.17 produced eight sample rows, 361 site rows, and 361 exact-HWE rows; an independent standard-library parser matched every missingness count.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Per-sample missingness includes all eight cohort samples.",
+            "result": "PASS",
+            "note": "The .imiss file contained eight data rows."
+          },
+          {
+            "text": "Per-site missingness includes all 361 cohort sites.",
+            "result": "PASS",
+            "note": "The .lmiss file contained 361 data rows."
+          },
+          {
+            "text": "VCFtools missingness values agree with an independent raw-VCF parser.",
+            "result": "PASS",
+            "note": "All sample genotype counts and per-site missing-allele counts matched exactly."
+          },
+          {
+            "text": "The exact-HWE workflow produces a result for each cohort site.",
+            "result": "PASS",
+            "note": "The .hwe file contained 361 data rows."
+          }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Two-caller comparison and regional stratification",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "bcftools compared nonempty caller fixtures with three comparison-set IDs and partitioned the full 361-record cohort into 172 chr1 easy-region and 189 chr2 difficult-region records.",
+        "basic": 37,
+        "specialized": 54,
+        "total": 91,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "Both caller fixtures contain variants and can be compared.",
+            "result": "PASS",
+            "note": "Caller A had 11 records and caller B had 9 records before comparison."
+          },
+          {
+            "text": "The two-file statistics report contains separate A, B, and intersection set identifiers.",
+            "result": "PASS",
+            "note": "The report contained exactly three ID records."
+          },
+          {
+            "text": "The two region strata jointly cover the entire cohort fixture.",
+            "result": "PASS",
+            "note": "172 easy-region plus 189 difficult-region records equals all 361 records."
+          },
+          {
+            "text": "Neither regional stratum is empty.",
+            "result": "PASS",
+            "note": "Both chr1 and chr2 had retained records and complete statistics sections."
+          }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Identity and relatedness matrix completeness",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "bcftools gtcheck compared all 28 unordered pairs over 361 sites, and VCFtools relatedness2 emitted the complete 8-by-8 matrix with all sample IDs.",
+        "basic": 37,
+        "specialized": 55,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          {
+            "text": "gtcheck emits every unordered pair for eight cohort samples.",
+            "result": "PASS",
+            "note": "The output contained 28 DCv2 rows, equal to 8 choose 2."
+          },
+          {
+            "text": "gtcheck evaluates the full set of 361 cohort sites.",
+            "result": "PASS",
+            "note": "The INFO summary reported sites-compared as 361."
+          },
+          {
+            "text": "KING-robust relatedness emits the complete ordered matrix including diagonals.",
+            "result": "PASS",
+            "note": "The relatedness2 file contained 64 data rows, equal to 8 by 8."
+          },
+          {
+            "text": "Every declared sample is represented in the relatedness matrix.",
+            "result": "PASS",
+            "note": "The matrix contained eight distinct sample IDs."
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 36.8,
+    "dynamic_weighted": 54.2,
+    "score": 91,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "The corrected cyvcf2 example counts every alternate SNP allele and preserves valid QUAL zero values, with independent bcftools agreement.",
+    "The Skill gives methodologically sound, context-dependent guidance for Ti/Tv, missingness, HWE, contamination signals, and ancestry-aware cohort interpretation.",
+    "The documented biallelic allele-balance matcher retains phased and unphased 0/1 and 1/0 orientations while explicitly routing multiallelic AD to a real parser.",
+    "The broader bcftools and VCFtools workflows executed successfully for cohort statistics, exact HWE, callset comparison, stratification, identity checking, and relatedness."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "Separate strict PASS from unfiltered records",
+      "observed_in": [3],
+      "problem": "The example increments pass whenever cyvcf2 exposes FILTER as null, which includes both strict PASS and the unfiltered dot state, then prints the combined count as PASS variants.",
+      "root_cause": "The output contract uses one counter for two VCF FILTER states even though the Skill documentation correctly distinguishes them.",
+      "fix": "Report strict PASS and unfiltered-dot records as separate counters, or rename the current count to Not-failed variants (PASS or dot) and add a strict-PASS counter using an API-safe distinction. Add a three-record PASS/dot/LowQual regression."
+    },
+    {
+      "priority": "P2",
+      "title": "Report Ti/Tv components when denominator is zero",
+      "observed_in": [4],
+      "problem": "When a valid callset has transitions but zero transversions, the example suppresses both component counts because the entire print block is guarded by transversions greater than zero.",
+      "root_cause": "Presentation of the counts is coupled to whether the ratio has a nonzero denominator.",
+      "fix": "Always print transition and transversion counts. Print Ti/Tv as infinite or undefined with an explicit zero-denominator note when transversions are zero, and add transition-only and empty-VCF regressions."
+    }
+  ]
+}

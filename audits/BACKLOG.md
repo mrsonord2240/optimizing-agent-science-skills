@@ -8,7 +8,7 @@ Open recommendations from the latest audit of each Skill, most severe first and 
 
 None open.
 
-## P1 (75)
+## P1 (76)
 
 ### `bio-data-visualization-statistical-annotation` — stat_compare_means(comparisons, p.adjust.method='holm') draws unadjusted p; the argument does not exist
 
@@ -410,6 +410,14 @@ None open.
 - Root cause: The helper uppercases and length-budgets the final oligo but never validates spacer alphabet or required 20-nt length.
 - Fix: Before constructing the oligo, require a 20-character A/C/G/T spacer and raise a concise ValueError otherwise; add a CLI test for hyphenated and wrong-length input.
 
+### `bio-single-cell-cell-annotation` — Establish a clean-exit Linux smoke for R routes
+
+- Skill: 91, Production Ready · [mrsonord2240/optimized-scientific-skills@2dee47f](https://github.com/mrsonord2240/optimized-scientific-skills/tree/2dee47f80dac6f3ba5c78b53ea9ec132a87cf5db/skills/bio-single-cell-cell-annotation) · [viewer](skills/bio-single-cell-cell-annotation/mrsonord2240-optimized-scientific-skills@2dee47f/viewer.md)
+- Observed in inputs: 2, 4
+- Problem: SingleR and Azimuth completed their scientific checks and wrote valid outputs, but both Windows R processes returned exit 2816 after output. No Linux confirmation was completed because the isolated WSL dependency environment exceeded the 1 GB installation limit.
+- Root cause: The current audit environment lacks a lightweight, pre-provisioned Linux R stack for the skill's reference-transfer routes, while the native Windows R runtime has a deterministic teardown failure.
+- Fix: Provide a tested lockfile or compact container/environment for SingleR, celldex, and Azimuth, then require exit 0 plus artifact assertions in the release smoke. Keep the Windows result marked partial until that independent route passes.
+
 ### `bio-workflows-metabolomics-pipeline` — Materialize and verify the Stage 1 mode lock
 
 - Skill: 91, Production Ready · [mrsonord2240/bioSkills@ac3fdd2](https://github.com/mrsonord2240/bioSkills/tree/ac3fdd24777613868e4328191dc274ed4c5ac162/workflows/metabolomics-pipeline) · [viewer](skills/bio-workflows-metabolomics-pipeline/mrsonord2240-bioSkills@ac3fdd2/viewer.md)
@@ -610,7 +618,7 @@ None open.
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (143)
+## P2 (148)
 
 ### `bio-data-visualization-statistical-annotation` — Test-name and label details differ from the tools
 
@@ -1188,6 +1196,22 @@ None open.
 - Root cause: They require licensed hardware/software or account registration outside the public audit environment.
 - Fix: Retain the current not-verified labels; when a licensed instance or real Cell Ranger BAM becomes available, replace them with versioned observed distributions.
 
+### `bio-single-cell-cell-annotation` — Align inline and CLI CellTypist model acquisition
+
+- Skill: 91, Production Ready · [mrsonord2240/optimized-scientific-skills@2dee47f](https://github.com/mrsonord2240/optimized-scientific-skills/tree/2dee47f80dac6f3ba5c78b53ea9ec132a87cf5db/skills/bio-single-cell-cell-annotation) · [viewer](skills/bio-single-cell-cell-annotation/mrsonord2240-optimized-scientific-skills@2dee47f/viewer.md)
+- Observed in inputs: —
+- Problem: The canonical SKILL.md block explicitly calls download_models and then passes a bare name, while the shipped CLI separates acquisition from execution and resolves only existing local files.
+- Root cause: The executable example was hardened for offline use without making the inline documentation follow the same contract.
+- Fix: Change the inline block to resolve an existing explicit or cached model path, and present downloading as a separate optional provisioning step.
+
+### `bio-single-cell-cell-annotation` — Add runnable scANVI and scmap examples
+
+- Skill: 91, Production Ready · [mrsonord2240/optimized-scientific-skills@2dee47f](https://github.com/mrsonord2240/optimized-scientific-skills/tree/2dee47f80dac6f3ba5c78b53ea9ec132a87cf5db/skills/bio-single-cell-cell-annotation) · [viewer](skills/bio-single-cell-cell-annotation/mrsonord2240-optimized-scientific-skills@2dee47f/viewer.md)
+- Observed in inputs: —
+- Problem: The description and routing tables promise scANVI/scArches and scmap, but only CellTypist, SingleR, and Azimuth have runnable workflows.
+- Root cause: The broad method-selection scope exceeds the executable examples shipped with the skill.
+- Fix: Add one minimal seeded scANVI transfer example and one scmap rejection example, each with explicit input contracts, uncertainty output, and a small smoke fixture.
+
 ### `bio-single-cell-multimodal-integration` — Keep the private WSL R route available
 
 - Skill: 91, Production Ready · [mrsonord2240/bioSkills@4f7306b](https://github.com/mrsonord2240/bioSkills/tree/4f7306b54e8c445d251d352bb85e01ced4c7a3b4/single-cell/multimodal-integration) · [viewer](skills/bio-single-cell-multimodal-integration/mrsonord2240-bioSkills@4f7306b/viewer.md)
@@ -1211,6 +1235,22 @@ None open.
 - Problem: The Toolkit still attempts work before detecting ERR10419835's unresolved reference dependency.
 - Root cause: The installed SRA Toolkit cannot resolve this public run's normalized-reference dependency before attempting its retrieval path; the private runtime instead reaches the verified ENA fallback safely.
 - Fix: If a stable toolkit-level preflight becomes available, detect this state sooner while retaining the validated staged ENA fallback.
+
+### `bio-vcf-statistics` — Separate strict PASS from unfiltered records
+
+- Skill: 91, Production Ready · [mrsonord2240/optimized-scientific-skills@2dee47f](https://github.com/mrsonord2240/optimized-scientific-skills/tree/2dee47f80dac6f3ba5c78b53ea9ec132a87cf5db/skills/bio-vcf-statistics) · [viewer](skills/bio-vcf-statistics/mrsonord2240-optimized-scientific-skills@2dee47f/viewer.md)
+- Observed in inputs: 3
+- Problem: The example increments pass whenever cyvcf2 exposes FILTER as null, which includes both strict PASS and the unfiltered dot state, then prints the combined count as PASS variants.
+- Root cause: The output contract uses one counter for two VCF FILTER states even though the Skill documentation correctly distinguishes them.
+- Fix: Report strict PASS and unfiltered-dot records as separate counters, or rename the current count to Not-failed variants (PASS or dot) and add a strict-PASS counter using an API-safe distinction. Add a three-record PASS/dot/LowQual regression.
+
+### `bio-vcf-statistics` — Report Ti/Tv components when denominator is zero
+
+- Skill: 91, Production Ready · [mrsonord2240/optimized-scientific-skills@2dee47f](https://github.com/mrsonord2240/optimized-scientific-skills/tree/2dee47f80dac6f3ba5c78b53ea9ec132a87cf5db/skills/bio-vcf-statistics) · [viewer](skills/bio-vcf-statistics/mrsonord2240-optimized-scientific-skills@2dee47f/viewer.md)
+- Observed in inputs: 4
+- Problem: When a valid callset has transitions but zero transversions, the example suppresses both component counts because the entire print block is guarded by transversions greater than zero.
+- Root cause: Presentation of the counts is coupled to whether the ratio has a nonzero denominator.
+- Fix: Always print transition and transversion counts. Print Ti/Tv as infinite or undefined with an explicit zero-denominator note when transversions are zero, and add transition-only and empty-VCF regressions.
 
 ### `bio-bam-statistics` — Cite assay thresholds and FREEMIX cut-offs
 
@@ -1667,6 +1707,14 @@ None open.
 - Problem: pose_qc_batch.py prints a column named rank, but it is a cumulative count of PB-valid records within each source, not a docking score or original pose ordinal.
 - Root cause: The internal selection implementation exposes an intermediate column without describing its semantics in the CLI output.
 - Fix: Rename the displayed column to valid_ordinal or omit it from the CLI table; keep the documented first-PB-valid selection behavior unchanged.
+
+### `bio-proteomics-data-import` — Align QFeatures valid-row filtering with Python
+
+- Skill: 95, Production Ready · [mrsonord2240/optimized-scientific-skills@2dee47f](https://github.com/mrsonord2240/optimized-scientific-skills/tree/2dee47f80dac6f3ba5c78b53ea9ec132a87cf5db/skills/bio-proteomics-data-import) · [viewer](skills/bio-proteomics-data-import/mrsonord2240-optimized-scientific-skills@2dee47f/viewer.md)
+- Observed in inputs: 4
+- Problem: After zeroIsNA and logTransform, the bundled QFeatures example retains 55 protein groups with no quantified value, returning 1500 rows where the Python route returns 1445.
+- Root cause: The R workflow stops after transformation and does not apply the documented valid-value rule used by the Python LFQ workflow.
+- Fix: After creating log2LFQ, subset that assay to rows with at least one non-missing sample and report pre-bookkeeping, post-bookkeeping, and quantified row counts. Add an assertion that no delivered row is all missing.
 
 ### `bio-proteomics-spectral-libraries` — Add bounded Koina retry and timeout guidance
 

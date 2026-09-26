@@ -1,0 +1,423 @@
+{
+  "meta": {
+    "skill_name": "bio-proteomics-data-import",
+    "description": "Loads mass-spectrometry data into Python/R and strips search-engine bookkeeping before values are trusted; supports MaxQuant proteinGroups, DIA-NN reports, and mzML/mzXML while enforcing quantification and missingness contracts.",
+    "evaluated_on": "2026-09-25",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "mrsonord2240/optimized-scientific-skills@2dee47f80dac6f3ba5c78b53ea9ec132a87cf5db:skills/bio-proteomics-data-import",
+    "audit_type": "independent scientific re-audit of immutable source",
+    "auditor_independent": true,
+    "performed_by": "Codex independent auditor agent",
+    "executed": true,
+    "execution_note": "All seven input cases were executed. The exact bundled QFeatures example exited 0 in WSL; the auxiliary native Windows reproduction printed correct output and then failed during teardown with exit 139 as the Skill warns."
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": {
+        "result": "PASS",
+        "detail": "No output fabricated identifiers, performance figures, sample sizes, or statistical results; every reported value came from a retained execution log."
+      },
+      "practice_boundaries": {
+        "result": "PASS",
+        "detail": "The Skill and all outputs remained within technical proteomics import and missingness diagnosis, with no individual diagnosis, prescription, or clinical triage."
+      },
+      "methodological_ground": {
+        "result": "PASS",
+        "detail": "The executed routes enforced MaxQuant bookkeeping removal, zero-to-missing conversion, DIA-NN run and global protein-group FDR, corrected TMT reporter selection, and abundance-dependent missingness diagnosis."
+      },
+      "code_usability": {
+        "result": "PASS",
+        "detail": "All Python workflows and the exact bundled QFeatures example ran in supported environments. The known native Windows teardown crash is explicitly classified as failure and has a verified WSL route with exit 0."
+      }
+    }
+  },
+  "static_score": {
+    "subtotal": 94,
+    "max": 100,
+    "categories": {
+      "functional_suitability": {
+        "score": 11,
+        "max": 12,
+        "note": "The advertised MaxQuant, DIA-NN, mzML/mzXML, TMT, and R routes are present and correct; the QFeatures route does not remove 55 all-missing protein groups as the Python LFQ route does."
+      },
+      "reliability": {
+        "score": 12,
+        "max": 12,
+        "note": "Format, column-family, precursor, global-FDR, zero, and wrong-table failures are handled explicitly with repeatable outcomes."
+      },
+      "performance_context": {
+        "score": 7,
+        "max": 8,
+        "note": "The workflow is linear and efficient, although the 317-line SKILL.md duplicates some runnable-example detail inline."
+      },
+      "agent_usability": {
+        "score": 14,
+        "max": 16,
+        "note": "Scenario routing and failure prevention are strong; feedback and row-accounting are slightly inconsistent between Python and QFeatures."
+      },
+      "human_usability": {
+        "score": 8,
+        "max": 8,
+        "note": "Natural trigger phrases, a usage guide, explicit prerequisites, and actionable failures make the Skill discoverable and recoverable."
+      },
+      "security": {
+        "score": 12,
+        "max": 12,
+        "note": "All demonstrated operations are local and read-only on input data, with no credentials, code-string execution, or destructive operations."
+      },
+      "maintainability": {
+        "score": 11,
+        "max": 12,
+        "note": "Four packaged examples provide deterministic verification; inline and packaged copies of the same workflows create a small drift risk."
+      },
+      "agent_specific": {
+        "score": 19,
+        "max": 20,
+        "note": "Triggering, scope boundaries, related-skill routing, idempotency, and stop conditions are precise; progressive disclosure could move more detail out of SKILL.md."
+      }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 95.1,
+    "max": 100,
+    "assertion_pass_rate": {
+      "passed": 34,
+      "total": 35
+    },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "MaxQuant LFQ cleaning",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "1560 rows became 1500 targets and 1445 quantified groups across eight samples, with no bookkeeping survivor, infinity, or all-missing group.",
+        "executed": true,
+        "execution_note": "run/input1_maxquant_lfq.py exited 0; stdout is retained in run/input1_maxquant_lfq.stdout.log.",
+        "basic": 39,
+        "specialized": 58,
+        "total": 97,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The import removes MaxQuant decoy, contaminant, and site-only bookkeeping rows.",
+            "result": "PASS",
+            "note": "The row count fell from 1560 to 1500 and no REV__/CON__ identifier survived."
+          },
+          {
+            "text": "The result contains the expected eight LFQ samples and 1445 quantified protein groups.",
+            "result": "PASS",
+            "note": "The asserted result was 1445 protein groups by eight sample columns."
+          },
+          {
+            "text": "Zeros become missing values before log2 and no infinite value remains.",
+            "result": "PASS",
+            "note": "The execution asserted zero infinite values."
+          },
+          {
+            "text": "Protein groups without any quantified LFQ value are removed.",
+            "result": "PASS",
+            "note": "The execution asserted zero all-missing groups after filtering."
+          },
+          {
+            "text": "The workflow remains read-only and does not alter the supplied proteinGroups file.",
+            "result": "PASS",
+            "note": "The script used read_csv and in-memory copies only."
+          }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "DIA-NN global FDR and zero handling",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The exact bundled loader produced an 887 by 8 matrix with no experiment-wide low-confidence group and no infinity.",
+        "executed": true,
+        "execution_note": "run/input2_diann.py loaded the copied exact bundled module and exited 0; stdout is retained in run/input2_diann.stdout.log.",
+        "basic": 39,
+        "specialized": 58,
+        "total": 97,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The bundled loader accepts the prior DIA-NN parquet fixture.",
+            "result": "PASS",
+            "note": "It read all 23020 report rows and exited 0."
+          },
+          {
+            "text": "The cross-run matrix enforces experiment-wide protein-group FDR.",
+            "result": "PASS",
+            "note": "No group with Global.PG.Q.Value above 0.01 survived."
+          },
+          {
+            "text": "The matrix has the expected 887 protein groups and eight runs.",
+            "result": "PASS",
+            "note": "Both dimensions were asserted in the execution."
+          },
+          {
+            "text": "PG.MaxLFQ zeros do not become negative infinity after log2.",
+            "result": "PASS",
+            "note": "The execution asserted zero infinite values."
+          },
+          {
+            "text": "The workflow is read-only and stops before normalization or statistical testing.",
+            "result": "PASS",
+            "note": "Only read, filter, pivot, missing conversion, and log2 operations were performed."
+          }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Mixed mzML with all-ion and unknown-window scans",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The exact bundled inspector completed the 20-spectrum fixture and reported four MS1, sixteen MS2, one precursor-less MS2, and one unknown isolation window.",
+        "executed": true,
+        "execution_note": "run/input3_mzml.py loaded the copied exact bundled module and exited 0; stdout is retained in run/input3_mzml.stdout.log.",
+        "basic": 39,
+        "specialized": 57,
+        "total": 96,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The reader selects and executes the mzML route successfully.",
+            "result": "PASS",
+            "note": "The bundled inspector exited 0 on the synthetic_mixed.mzML fixture."
+          },
+          {
+            "text": "The input contains and reports four MS1 and sixteen MS2 spectra.",
+            "result": "PASS",
+            "note": "Both counts matched the retained synthetic truth."
+          },
+          {
+            "text": "A precursor-less all-ion MS2 scan is counted without an index error.",
+            "result": "PASS",
+            "note": "ms2_without_precursor equaled one and the process completed."
+          },
+          {
+            "text": "Missing isolation offsets are reported as unknown rather than as a zero-width window.",
+            "result": "PASS",
+            "note": "offsets_unknown equaled one."
+          },
+          {
+            "text": "The inspector is read-only and does not attempt conversion or modify the spectrum file.",
+            "result": "PASS",
+            "note": "The execution only loaded and counted spectra."
+          }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Column choice and clean QFeatures route",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "LFQ removed the T4 loading offset and the exact QFeatures example exited 0 in WSL, but an independent check found 55 all-missing protein groups retained in the R assay.",
+        "executed": true,
+        "execution_note": "run/input4_column_choice.py and run/input4_qfeatures_wsl.sh exited 0. The auxiliary Windows route printed correct output and then exited 139 during native teardown, matching the documented limitation.",
+        "basic": 36,
+        "specialized": 53,
+        "total": 89,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "LFQ intensity is empirically the appropriate between-sample column on the weak-loading fixture.",
+            "result": "PASS",
+            "note": "T4 residual was 0.014 log2 in LFQ versus -1.331 in raw Intensity."
+          },
+          {
+            "text": "iBAQ is correctly limited to a within-sample molar proxy.",
+            "result": "PASS",
+            "note": "Its T4 residual matched raw Intensity and within-protein log2(iBAQ/Intensity) variation was zero."
+          },
+          {
+            "text": "The exact bundled QFeatures example completes through a clean supported route without infinity.",
+            "result": "PASS",
+            "note": "WSL R 4.5.2, QFeatures 1.20.0, and cli 3.6.6 exited 0 with a 1500 by 8 assay and no -Inf."
+          },
+          {
+            "text": "The QFeatures route removes protein groups with no quantified value, matching the Python LFQ route.",
+            "result": "FAIL",
+            "note": "Independent R assertions found 55 rows with no non-missing value; the Python route removes them and returns 1445 rows."
+          },
+          {
+            "text": "The workflow makes no destructive change and treats the nonzero native Windows exit as failure.",
+            "result": "PASS",
+            "note": "Inputs were read-only; the Windows exit 139 is retained as failed auxiliary evidence, not counted as success."
+          }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Combined DDA and DIA missingness diagnosis",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The corrected routes produced 1445 DDA and 887 DIA groups, 864 overlapping; DIA had less missingness but both abundance-missingness correlations were negative.",
+        "executed": true,
+        "execution_note": "run/input5_combined_missingness.py exited 0; stdout is retained in run/input5_combined_missingness.stdout.log.",
+        "basic": 38,
+        "specialized": 56,
+        "total": 94,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The combined workflow applies the corrected MaxQuant and DIA-NN import contracts before diagnosis.",
+            "result": "PASS",
+            "note": "The matrices contained 1445 DDA and 887 globally filtered DIA protein groups."
+          },
+          {
+            "text": "DDA missingness is identified as abundance-dependent.",
+            "result": "PASS",
+            "note": "The abundance-missingness correlation was -0.619."
+          },
+          {
+            "text": "DIA has less missingness but is not mislabeled as MCAR.",
+            "result": "PASS",
+            "note": "DIA missingness was 8.3% versus 14.533% for DDA, with correlation -0.495."
+          },
+          {
+            "text": "The workflow reports a biologically plausible overlap and routes imputation downstream.",
+            "result": "PASS",
+            "note": "It reported 864 overlapping groups and recommended a left-censored or censoring-aware downstream method."
+          },
+          {
+            "text": "No imputation, differential testing, or mutation of supplied data occurs in the import workflow.",
+            "result": "PASS",
+            "note": "Only read, filter, transform, diagnose, and report steps were executed."
+          }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "Corrected MaxQuant TMT reporter import",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "A fresh deterministic TMT10 fixture yielded 389 quantified target groups by ten corrected reporter channels, with no group-total Intensity substitution or infinity.",
+        "executed": true,
+        "execution_note": "run/generate_new_inputs.py created the synthetic fixture and run/input6_tmt.py exited 0; logs are retained.",
+        "basic": 39,
+        "specialized": 58,
+        "total": 97,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "The TMT route selects exactly the ten corrected reporter channels.",
+            "result": "PASS",
+            "note": "reporter_channels equaled ten."
+          },
+          {
+            "text": "The single group-total Intensity field is not substituted for a channel matrix.",
+            "result": "PASS",
+            "note": "single_group_total_intensity_used was false."
+          },
+          {
+            "text": "Bookkeeping and all-zero groups are removed before delivery.",
+            "result": "PASS",
+            "note": "Ten bookkeeping rows and one all-zero target were excluded, leaving 389 quantified groups."
+          },
+          {
+            "text": "Zero reporter values become missing values without producing infinity.",
+            "result": "PASS",
+            "note": "The result had one missing value and zero infinite values."
+          },
+          {
+            "text": "Reporter correction and normalization remain outside import and no input file is modified.",
+            "result": "PASS",
+            "note": "The route selected already-corrected values and performed only in-memory transformation."
+          }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Flagless wrong-table rejection",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "A protein-looking table with LFQ columns but no MaxQuant bookkeeping fields was rejected with a specific ValueError and remained unchanged.",
+        "executed": true,
+        "execution_note": "run/generate_new_inputs.py created the two-row fixture and run/input7_wrong_table.py exited 0 after asserting the rejection.",
+        "basic": 39,
+        "specialized": 57,
+        "total": 96,
+        "assertions_passed": 5,
+        "assertions_total": 5,
+        "assertions": [
+          {
+            "text": "A table lacking every MaxQuant bookkeeping column is not silently accepted.",
+            "result": "PASS",
+            "note": "The route raised ValueError before quantification."
+          },
+          {
+            "text": "The error identifies the missing bookkeeping-column contract.",
+            "result": "PASS",
+            "note": "The message names Reverse, Potential contaminant, and Only identified by site."
+          },
+          {
+            "text": "The strict rejection is deterministic and preserves the input.",
+            "result": "PASS",
+            "note": "The asserted two-row input remained unchanged."
+          },
+          {
+            "text": "The workflow does not infer absent flags or fabricate a clean matrix.",
+            "result": "PASS",
+            "note": "No matrix was returned after the validation error."
+          },
+          {
+            "text": "The failure path performs no destructive operation or sensitive-data exposure.",
+            "result": "PASS",
+            "note": "The fixture was read locally and only an error summary was emitted."
+          }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 37.6,
+    "dynamic_weighted": 57.1,
+    "score": 95,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "Every original regression case now completes with the intended FDR, zero, precursor, and missingness contracts.",
+    "The exact packaged QFeatures route has a clean, repeatable WSL execution with explicit R, QFeatures, and cli versions.",
+    "Fresh TMT and wrong-table cases demonstrate correct scope routing and defensive validation.",
+    "The Skill explicitly treats the reproducible native Windows teardown crash as failure and gives a verified supported alternative."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "Align QFeatures valid-row filtering with Python",
+      "observed_in": [4],
+      "problem": "After zeroIsNA and logTransform, the bundled QFeatures example retains 55 protein groups with no quantified value, returning 1500 rows where the Python route returns 1445.",
+      "root_cause": "The R workflow stops after transformation and does not apply the documented valid-value rule used by the Python LFQ workflow.",
+      "fix": "After creating log2LFQ, subset that assay to rows with at least one non-missing sample and report pre-bookkeeping, post-bookkeeping, and quantified row counts. Add an assertion that no delivered row is all missing."
+    }
+  ]
+}
