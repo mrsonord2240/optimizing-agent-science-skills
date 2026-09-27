@@ -18,23 +18,25 @@ and the re-auditor are different agents**, except in the final pass. The Special
 
 ## Where things are
 
+Consolidated 2026-09-27: the staging fork (`bioSkills-Improved`) is archived — its worktrees are gone
+and every fix it ever held is already on the shelf's `main`. Fixes now branch from the shelf directly;
+there is no separate worktree-per-fix location any more.
+
 | Path | What | You write there |
 | --- | --- | --- |
-| `F:\OpenScience\external\GPTomics__bioSkills` | upstream `GPTomics/bioSkills@d91ed3d` (MIT); diff against it for the original | never |
-| `F:\OpenScience\external\mrsonord2240__bioSkills` | staging (`bioSkills-Improved`); every fix lands on its `main` | never directly |
-| `F:\OpenScience\wt\<short>` | one worktree per fix, branch `fix/<short>` | only the one your dispatch names |
+| `F:\optimizing-agent-science-skills\external\GPTomics__bioSkills` | upstream `GPTomics/bioSkills@d91ed3d` (MIT); diff against it for the original | never |
 | `F:\OpenScience\audits\<skill-id>\` | raw audit runs, reports, viewers | only your own |
 | `F:\OpenScience\audit-envs\<env>\` | per-folder env and its `TOOLS.md` | installs, under the lock below |
-| `F:\OpenScience\skills\skill-auditor\` | the audit method | never |
+| `F:\optimizing-agent-science-skills\skill-auditor.zip` | the audit method | never |
 | `F:\optimizing-agent-science-skills` | records: `process/`, `fixes/<skill-id>.md`, `audits/` (generated) | only your fix log |
-| `F:\optimized-scientific-skills\skills\` | the published shelf | never |
+| `F:\optimized-scientific-skills\skills\` | the published shelf; branch from it for a fix, then commit there | never directly to `main` |
 
 - **Skill ID is the SKILL.md frontmatter `name`, not the folder name.** Every report, audit folder and
   `--skill` argument depends on it.
-- **Nothing under `F:\OpenScience\external\` may change**, including what your interpreter writes:
-  importing a Skill's `examples/` module leaves a `__pycache__`, and `.pyc` is gitignored, so `git status`
-  reads clean while byte-identity is broken. Check the filesystem (`find <clone> -name __pycache__`), and
-  run Skill code from a copy in your own folder, never imported in place.
+- **Nothing under `external\` may change**, including what your interpreter writes: importing a Skill's
+  `examples/` module leaves a `__pycache__`, and `.pyc` is gitignored, so `git status` reads clean while
+  byte-identity is broken. Check the filesystem (`find <clone> -name __pycache__`), and run Skill code
+  from a copy in your own folder, never imported in place.
 
 ## Thresholds
 

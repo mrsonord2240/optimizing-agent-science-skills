@@ -10,6 +10,10 @@ audits/*/*/data/*
 
 # Downloaded public datasets, runtimes and installed binaries
 public-data/
+
+# Upstream reference clones (kept for `git -C <path> show HEAD:...` diffing; heavy, reproducible
+# from their own GitHub history, and each is its own git repo — never nested into ours)
+/external/
 *.raw
 *.mzML
 *.mzXML

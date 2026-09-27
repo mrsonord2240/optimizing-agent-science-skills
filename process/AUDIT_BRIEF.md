@@ -27,7 +27,7 @@ holding a finished `eval_report_*_result.json` is a complete audit.
 
 ## Audit
 
-A first audit reads the Skill from `F:\OpenScience\external\GPTomics__bioSkills\<folder>\<skill>\`
+A first audit reads the Skill from `F:\optimizing-agent-science-skills\external\GPTomics__bioSkills\<folder>\<skill>\`
 (`SKILL.md`, usually `usage-guide.md` and `examples/`).
 
 - **Inputs:** N by the complexity rule, each a realistic request a researcher would send with this Skill

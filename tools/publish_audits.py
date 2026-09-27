@@ -63,7 +63,7 @@ PERFORMED_BY = "Claude (Anthropic) auditor agents"
 COMMISSIONED_BY = "Samuel Nord"
 RUN_DIR_RE = re.compile(r"^(run|rerun|pass)\w*$")
 FORK_CLONE = os.environ.get("OASS_FORK_CLONE", "F:/OpenScience/external/mrsonord2240__bioSkills")
-UPSTREAM_CLONE = os.environ.get("OASS_UPSTREAM_CLONE", "F:/OpenScience/external/GPTomics__bioSkills")
+UPSTREAM_CLONE = os.environ.get("OASS_UPSTREAM_CLONE", "F:/optimizing-agent-science-skills/external/GPTomics__bioSkills")
 OPTIMIZED_CLONE = os.environ.get("OASS_OPTIMIZED_CLONE", "F:/optimized-scientific-skills")
 CLONES = {
     "GPTomics/bioSkills": UPSTREAM_CLONE,

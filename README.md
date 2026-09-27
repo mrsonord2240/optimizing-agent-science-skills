@@ -38,9 +38,10 @@ fork is the maintained line rather than a staging area.
 
 Raw run outputs, generated test data, downloaded public datasets, Python virtual environments and
 installed binaries. They are large and reproducible: each audit record names the dataset accession or
-the generator script that produced its input. Fixed Skill trees live in the fork
-([bioSkills-Improved](https://github.com/mrsonord2240/bioSkills-Improved)) and on the published shelf
+the generator script that produced its input. Fixed Skill trees live on the published shelf
 ([optimized-scientific-skills](https://github.com/mrsonord2240/optimized-scientific-skills)), not here.
+The staging fork ([bioSkills-Improved](https://github.com/mrsonord2240/bioSkills-Improved)) is archived
+as of 2026-09-27; every fix it held had already landed on the shelf.
 
 ## Credit and licences
 
