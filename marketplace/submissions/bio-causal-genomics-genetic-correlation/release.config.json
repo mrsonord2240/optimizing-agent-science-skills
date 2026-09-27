@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "id": "bio-causal-genomics-genetic-correlation",
+  "version": "1.0.0",
+  "category": "Data Analysis",
+  "source": {
+    "repository": "https://github.com/mrsonord2240/optimized-scientific-skills",
+    "commit": "af8e65e6c659fd5aaf14477de13e7ff881a896e9",
+    "path": "skills/bio-causal-genomics-genetic-correlation"
+  },
+  "license_files": [
+    "LICENSE"
+  ]
+}
