@@ -1,0 +1,47 @@
+# bio-variant-annotation — fixes (2026-09-15)
+
+Branch `fix/variant`. Runtime: bcftools 1.24 (MSYS2, candidate venv, plugins via BCFTOOLS_PLUGINS); audit data `audits/bio-variant-annotation/data`.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| Piped `annotate -a <vcf>` recipes fail | P1 | Basic, Clinical and Rare recipes and `annotate_vcf.sh` write indexed `-Oz` intermediates | ran on normalized callerA: all three recipes exit 0; example gnomAD branch exit 0 with `gnomAD_AF` populated | `bc` is missing in the Windows shell only (percentage line), not a Skill defect |
+| `bcftools csq` lacks `--phase` | P1 | `-p a` in SKILL.md and usage guide; `-p a/m/s` semantics incl. merged haplotype consequences | ran: default exits on unphased het; `-p a` exit 0 | |
+| Rare recipe clobbers cohort `INFO/AF` | P1 | Annotate into `INFO/gnomAD_FAF:=INFO/fafmax_faf95_max`, filter on the new tag (also `gnomAD_AF` in basic recipe/example) | ran on callerA + `fill-tags AF`: old recipe kept 500,1026,2000 (lost absent ClinVar P/LP 1101,1231); new kept 500,1026,1073,1101,1231,1420,1466,2000 | |
+| `--pick` default outdated; pick_order drops MANE Plus Clinical | P2 | VEP 110+ default order stated; `mane_plus_clinical` added to both `--pick_order` lines | docs: VEP 114.2 `Config.pm` as checked in the audit | VEP not re-run |
+| SIFT/PolyPhen/CADD calibration overstated | P2 | Qualified to developer thresholds; calibrated PP3 intervals cited | docs: Pejaver 2022 Table 2 values as quoted in audit Input 4 | |
+
+Left unfixed: none.
+
+## Backlog pass — 2026-09-15
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| csq --phase modes m and s described wrongly | P1 | Replaced paraphrase with verbatim `bcftools csq` help semantics (a/m/r/R/s) in SKILL.md and usage-guide.md; recommend -p a for unphased short-read data | ran: `bcftools csq --help` 1.24; reproduced audit in9 case (chr1:1420/1466 phased in trans) on synthetic data, -p a/-p m/-p s on bcftools 1.24 matched corrected text | |
+| SKILL.md annotate line needs an indexed target | P2 | Inserted `bcftools index -f rsid.vcf.gz` before the gnomAD annotate line | ran on synthetic data: reproduced `could not load index` (exit 127) without the fix, exit 0 with it, bcftools 1.24 | |
+| No warning at the annotate step for contig-name mismatch | P2 | Added inline pre-check comment (`bcftools index -s` comparison) next to the annotate commands | ran `bcftools index -s` on both target and source synthetic files to confirm output format; Common Errors row kept as-is | |
+
+Left unfixed: none (3/3 fixed).
+
+## Final pass — 2026-09-24
+
+Source: `mrsonord2240__bioSkills` commit `6122d469f440f6030b278a155d8e4e78c8788dbf` on `agent/finalpass-bio-variant-annotation-20260924`. Final-pass disclosure: `auditor_independent=false`; the fixer audited the same exact commit.
+
+| finding | priority | change | verified (ran / help / docs) | notes |
+|---|---|---|---|---|
+| Shipped helper used undeclared `bc` for its percentage and could make bad optional gnomAD input look like success | P2 | Replaced `bc` with zero-safe `awk`; require indexed target/source VCFs; reject a nonexistent `GNOMAD_VCF` and no shared input/gnomAD contigs; stated the preflight in the usage guide | bcftools 1.24: archived canonical and rare/phase regressions plus fresh valid, unindexed, invalid-path, and chr1-vs-1 cases. Valid run reports 7/11 rsIDs (63.6%); invalid cases fail explicitly. | Raw report/viewer: `F:\OpenScience\audits\bio-variant-annotation\`. |
+
+Left unfixed: none. Score: 91/100 Production Ready (self-audited; not independent acceptance evidence).
+
+## Marketplace pilot duplication cleanup — 2026-09-27
+
+Not from an audit finding: repo convention (FIX_BRIEF "state each fact once") flagged during
+marketplace-pilot review. `usage-guide.md`'s Overview paragraph restated SKILL.md's "annotation is
+not deterministic" governing-principle theory. Replaced with a short pointer to `SKILL.md` plus a
+one-line summary of what the guide actually covers uniquely (`bcftools annotate`/`csq` mechanics --
+BED/TAB annotation, `--set-id`, chromosome renaming, database downloads -- all already legitimately
+delegated to this file by SKILL.md's own "See usage-guide.md for..." line). Net effect is a
+restructure, not a shrink (461 -> 465 lines); the rest of the file was already correctly scoped. No
+command semantics changed.
+
+Left unfixed: none. **Needs re-audit** -- bytes changed since the 2026-09-24 final pass (91/100,
+Production Ready).

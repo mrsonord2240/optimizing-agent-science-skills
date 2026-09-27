@@ -27,9 +27,9 @@ Category: Data Analysis · Mode D · Complexity: Complex · N=7
 | 6 | Scope Boundary | 37 | 54 | 91 | 4/4 | ✅ |
 | 7 | Adversarial | 37 | 55 | 92 | 4/4 | ✅ |
 
-**Execution Average: 90.3 / 100**
-**Layer 1 Average: 36.6 / 40**
-**Layer 2 Average: 53.7 / 60**
+**Execution Average: 90.3 / 100**  
+**Layer 1 Average: 36.6 / 40**  
+**Layer 2 Average: 53.7 / 60**  
 **Assertion Pass Rate: 26/28 (92.9%)**
 
 The complete saved harness is `run/run_all.sh`; its final log is `outputs/reaudit_attempt4.log`. It used bcftools 1.24 from the documented alignment-files environment, VCFtools 0.1.17 from the existing `atac-jvm` environment after a read-only path search, and system WSL Python with cyvcf2 0.31.4. No environment was installed into or changed.
@@ -163,10 +163,10 @@ The complete saved harness is `run/run_all.sh`; its final log is `outputs/reaudi
 
 ## Final Result
 
-Static score: **92/100**
-Dynamic score: **90.3/100**
-Final score: **91/100 — ⭐ Production Ready**
-Deployable: **true**
+Static score: **92/100**  
+Dynamic score: **90.3/100**  
+Final score: **91/100 — ⭐ Production Ready**  
+Deployable: **true**  
 Veto override: **false**
 
 ## Open Recommendations

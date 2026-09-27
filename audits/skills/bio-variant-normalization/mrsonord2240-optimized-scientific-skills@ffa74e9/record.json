@@ -1,10 +1,10 @@
 {
   "skill_id": "bio-variant-normalization",
-  "version": "mrsonord2240-bioSkills@3565810",
+  "version": "mrsonord2240-optimized-scientific-skills@ffa74e9",
   "source": {
-    "repository": "mrsonord2240/bioSkills",
-    "commit": "356581080738dee60b613812b35fd4b99d217527",
-    "path": "variant-calling/variant-normalization",
+    "repository": "mrsonord2240/optimized-scientific-skills",
+    "commit": "ffa74e915d92da714bfd40ce2f0aa1fbb1e2cde4",
+    "path": "skills/bio-variant-normalization",
     "author": "GPTomics",
     "author_url": "https://github.com/GPTomics",
     "license": "MIT",
@@ -13,7 +13,7 @@
       "repository": "GPTomics/bioSkills",
       "commit": "d91ed3d563019e649dc854c56ccd62551359488a"
     },
-    "url": "https://github.com/mrsonord2240/bioSkills/tree/356581080738dee60b613812b35fd4b99d217527/variant-calling/variant-normalization"
+    "url": "https://github.com/mrsonord2240/optimized-scientific-skills/tree/ffa74e915d92da714bfd40ce2f0aa1fbb1e2cde4/skills/bio-variant-normalization"
   },
   "audit": {
     "method": {
@@ -25,17 +25,18 @@
       "license": "MIT",
       "url": "https://github.com/aipoch/medical-research-skills/tree/f5ef65b9bea79b6dd9553f52f95b0d08f7d64d26/skill-auditor"
     },
-    "evaluator_version": "skill-auditor@1.0 final-pass exact-commit",
-    "audited_on": "2026-09-24",
+    "evaluator_version": "skill-auditor@1.0",
+    "audited_on": "2026-09-27",
     "performed_by": "Claude (Anthropic) auditor agents",
     "commissioned_by": "Samuel Nord",
-    "test_data": "synthetic"
+    "test_data": "synthetic",
+    "auditor_independent": true
   },
-  "supersedes": "mrsonord2240-bioSkills@c1237cd",
+  "supersedes": "mrsonord2240-bioSkills@3565810",
   "files": {
     "report": "report.json",
     "viewer": "viewer.md",
     "fixes": "fixes.md",
-    "scripts": 20
+    "scripts": 0
   }
 }

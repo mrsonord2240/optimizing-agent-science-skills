@@ -1,0 +1,213 @@
+{
+  "meta": {
+    "skill_name": "bio-variant-normalization",
+    "description": "Left-align and trim indels to parsimonious canonical form, decompose MNPs (atomize), and split multiallelic variants with bcftools norm. Use when comparing variants across callers or cohorts, preparing a VCF for database annotation or ClinVar/dbSNP matching, merging VCFs, reconciling vt-vs-bcftools representation discordance, or resolving the VCF-left-align vs HGVS-3'-rule clash.",
+    "evaluated_on": "2026-09-27",
+    "evaluator_version": "skill-auditor@1.0",
+    "category": "Data Analysis",
+    "execution_mode": "D",
+    "complexity": "Complex",
+    "n_inputs": 7,
+    "source": "mrsonord2240/optimized-scientific-skills@ffa74e915d92da714bfd40ce2f0aa1fbb1e2cde4:skills/bio-variant-normalization",
+    "auditor_independent": true,
+    "re_audit_of": "F:/OpenScience/audits/_pre-fix-20260927/bio-variant-normalization/eval_report_bio-variant-normalization_result.json (2026-09-24 final pass, 95/100, auditor_independent=false)",
+    "environment": "bcftools 1.24 via WSL science/bio; cyvcf2 0.34.0 installed 2026-09-27 into a dedicated venv (audit-envs/bio-variant-normalization/venv, --system-site-packages) since the shared bio env only had numpy; vt still not installed (checked again, unchanged from prior audit)."
+  },
+  "veto_gates": {
+    "skill_veto": {
+      "gate": "PASS",
+      "stability": "PASS",
+      "contract": "PASS",
+      "determinism": "PASS",
+      "security": "PASS"
+    },
+    "research_veto": {
+      "applicable": true,
+      "gate": "PASS",
+      "scientific_integrity": { "result": "PASS", "detail": "No fabricated DOI/PMID/trial results anywhere in SKILL.md or usage-guide.md; the one citation (Tan/Abecasis/Kang 2015) is a real, correctly described paper. All worked examples (chr1:506 AA>A -> chr1:500 GA>G, the 11L>11F consequence, the split/atomize record counts) were independently reproduced with bcftools 1.24 in this audit and matched." },
+      "practice_boundaries": { "result": "PASS", "detail": "Scope stays at variant representation and matching; no diagnostic or prescriptive clinical conclusion is made anywhere, and clinical interpretation is explicitly deferred to variant-calling/clinical-interpretation." },
+      "methodological_ground": { "result": "PASS", "detail": "No substituted-causation or mismatched-model fallacies found. The adversarial input (7) confirmed the skill does not silently endorse blind use of `-c s`: SKILL.md's caution ('REF mismatches often indicate a genome build mismatch, and silently fixing REF may mask a liftover error') sits directly next to the command and matches the observed silent-rewrite-with-exit-0 behavior." },
+      "code_usability": { "result": "PASS", "detail": "All CLI/pipeline commands and both example scripts (normalize_vcf.sh, check_normalization.py) ran to completion without syntax errors or missing dependencies across all 7 inputs. One non-blocking robustness gap found in check_normalization.py (unhandled IndexError on missing argv) — code still runs correctly for its documented usage, so this is a P2 quality note, not an M4 failure." }
+    }
+  },
+  "static_score": {
+    "subtotal": 99,
+    "max": 100,
+    "categories": {
+      "functional_suitability": { "score": 12, "max": 12, "note": "Covers left-align, split/join, atomize, dedup, REF-fixing, caller comparison, DB-annotation prep, GWAS prep, and the cyvcf2 pre-check, matching every use case in the frontmatter description; all verified correct against bcftools 1.24." },
+      "reliability": { "score": 12, "max": 12, "note": "REF-mismatch preflight with pipefail rationale, a Common Errors table covering 8 distinct failure modes, and an empirically-verified idempotent normalization path. Category-3 override applied: hard-stop-on-mismatch is scored as correct defensive design, not a fault-tolerance defect." },
+      "performance_context": { "score": 8, "max": 8, "note": "Post-fix layering is now clean: SKILL.md holds mechanics, usage-guide.md (61 lines) is onboarding-only and points back to SKILL.md/examples/, and the cyvcf2 script lives in its own file instead of inline. This directly fixes what would have been a low score pre-fix (397-line usage-guide.md re-stating SKILL.md)." },
+      "agent_usability": { "score": 16, "max": 16, "note": "Order-of-operations is explained with the failure mode it prevents (spurious ALT=* if atomized before split); Quick Reference and Common Errors tables give unambiguous feedback contracts." },
+      "human_usability": { "score": 8, "max": 8, "note": "Description and usage-guide Example Prompts use natural researcher phrasing ('extra private variants', 'showing as absent'). Category-3 override applied to Forgiveness: strict REF-mismatch rejection is a data-integrity guarantee, not a usability defect, and the error message identifies the exact problem." },
+      "security": { "score": 11, "max": 12, "note": "No credentials, no destructive operations, no injection vectors. Docked 1 point: examples/check_normalization.py does not validate argv before indexing it (confirmed: running it with no arguments raises a bare IndexError traceback instead of a usage message), unlike examples/normalize_vcf.sh which does check $#." },
+      "maintainability": { "score": 12, "max": 12, "note": "Clean separation of concerns after the fix: decision logic (SKILL.md), onboarding (usage-guide.md), runnable code (examples/). Extracting the cyvcf2 block into its own file removed the only real coupling between prose and code that existed pre-fix." },
+      "agent_specific": { "score": 20, "max": 20, "note": "Trigger description is specific (ClinVar/dbSNP matching, vt-vs-bcftools discordance, HGVS clash) without being narrow; SKILL.md is 408 lines with real supporting files actually used; Related Skills list gives clean composability; idempotence and escape-hatch guidance (when normalization is safe to skip, when NOT to use -c s blindly) are both explicit and were verified to hold in execution." }
+    }
+  },
+  "dynamic_score": {
+    "execution_avg": 97.7,
+    "max": 100,
+    "assertion_pass_rate": { "passed": 27, "total": 28 },
+    "inputs": [
+      {
+        "index": 1,
+        "type": "Canonical",
+        "label": "Normalize callerA.vcf.gz and callerB.vcf.gz so I can compare them directly",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Full split->atomize->left-align pipeline run on both callers; REF mismatch on callerB caught by the preflight; zero spurious ALT=* records; renormalizing callerA's output was a no-op (idempotent).",
+        "basic": 40,
+        "specialized": 60,
+        "total": 100,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "REF mismatch on callerB is detected before the normalized output is trusted", "result": "PASS", "note": "bcftools norm -c w flagged 'does not match' before the main pipeline ran." },
+          { "text": "Split-before-atomize order produces zero spurious ALT=* records", "result": "PASS", "note": "bcftools view -i 'ALT=\"*\"' returned no rows on either normalized output." },
+          { "text": "Normalized output is idempotent (re-normalizing changes nothing)", "result": "PASS", "note": "diff between norm.tsv and renorm.tsv was empty." },
+          { "text": "Command sequence matches SKILL.md's Recommended Normalization Pipeline exactly", "result": "PASS", "note": "Used bcftools norm -m- | --atomize | -f ref.fa verbatim, as documented." }
+        ]
+      },
+      {
+        "index": 2,
+        "type": "Variant A",
+        "label": "A pathogenic ClinVar variant shows as absent -- check whether my indels are left-aligned",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Right-shifted homopolymer deletion chr1:506 AA>A correctly reached the canonical chr1:500 GA>G key via the documented pipeline.",
+        "basic": 40,
+        "specialized": 59,
+        "total": 99,
+        "assertions_passed": 3,
+        "assertions_total": 3,
+        "assertions": [
+          { "text": "chr1:506 AA>A normalizes to the canonical chr1:500 GA>G", "result": "PASS", "note": "bcftools query output was exactly '500 GA>G'." },
+          { "text": "Guidance directs the full pipeline (not left-align alone) for database matching", "result": "PASS", "note": "SKILL.md's 'Why Left-Alignment Matters' and 'Recommended Normalization Pipeline' sections both apply here." },
+          { "text": "No fabricated ClinVar/dbSNP identifiers are introduced", "result": "PASS", "note": "Only the synthetic coordinate/allele key is reported; no external ID is invented." }
+        ]
+      },
+      {
+        "index": 3,
+        "type": "Edge",
+        "label": "Split a multiallelic VCF while keeping AD and PL correct per allele",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "-m-any and -m-both produced identical split output; the correctly-declared Number=A field (XAF) was subset per-ALT as documented.",
+        "basic": 40,
+        "specialized": 60,
+        "total": 100,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "-m-both and -m-any produce identical output while splitting", "result": "PASS", "note": "diff between split-any.vcf and split-both.vcf (header stripped) was empty." },
+          { "text": "Number=A declared field (XAF) is correctly subset per-ALT, not carried whole", "result": "PASS", "note": "Each split record kept only its own XAF value (0.10 or 0.20)." },
+          { "text": "Skill flags the Number=. mis-declaration trap for custom fields", "result": "PASS", "note": "SKILL.md's Field Reapportionment section names this exact failure mode explicitly." },
+          { "text": "Output stays within normalization scope (no allele-frequency computation attempted)", "result": "PASS", "note": "No scope creep into downstream AF calculation." }
+        ]
+      },
+      {
+        "index": 4,
+        "type": "Variant B",
+        "label": "Two cohorts normalized with different tools show extra private variants -- reconcile representation",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "vt is not installed in this environment (confirmed again); used the documented bcftools atomization-equivalent per AUDIT_BRIEF's not-executed allowance. Atomized and re-standardized cohorts reached identical site sets.",
+        "basic": 39,
+        "specialized": 58,
+        "total": 97,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "vt's unavailability is disclosed rather than silently assumed", "result": "PASS", "note": "command -v vt reconfirmed absent; logged plainly in the run output." },
+          { "text": "Atomized bcftools output and re-standardized (unatomize-then-reatomize) cohort reach identical site sets", "result": "PASS", "note": "bcftools isec shared-site count equaled the full atomized record count." },
+          { "text": "Skill explicitly warns that mixing vt and bcftools atomization manufactures spurious cohort-private variants", "result": "PASS", "note": "Stated directly in the Tool Discordance section." },
+          { "text": "Skill recommends standardizing on one tool + exact flag set rather than an ad hoc per-file choice", "result": "PASS", "note": "Explicit 'Decision' line in the Tool Discordance section." }
+        ]
+      },
+      {
+        "index": 5,
+        "type": "Stress",
+        "label": "Annotate consequences for unphased calls with bcftools csq without hitting the phase error",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "-p a correctly annotated the unphased MNP (11L>11F at chr1:1041); -p s correctly omitted that merged consequence at the same site, matching the documented, version-checked behavior.",
+        "basic": 40,
+        "specialized": 59,
+        "total": 99,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "-p a annotates the unphased MNP consequence (11L>11F) as documented", "result": "PASS", "note": "grep matched BCSQ=...11L>11F in csq-a.vcf." },
+          { "text": "-p s omits that merged consequence at the same site, matching documented skip behavior", "result": "PASS", "note": "No BCSQ field at chr1:1041 in csq-s.vcf." },
+          { "text": "Skill instructs running csq on the un-atomized VCF for correct codon-aware consequence calling", "result": "PASS", "note": "Explicit instruction in the Atomize section: 'run bcftools csq on the un-atomized VCF'." },
+          { "text": "No unphased-genotype crash occurs because --phase is set per guidance", "result": "PASS", "note": "Both csq runs exited 0; the default -p r crash is avoided by the documented -p a/-p s flags." }
+        ]
+      },
+      {
+        "index": 6,
+        "type": "Scope Boundary",
+        "label": "How many variants in my VCF need normalization before I run bcftools norm? (exercises the newly-extracted examples/check_normalization.py)",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "Script ran correctly and its output was byte-identical to the pre-trim inline SKILL.md block on the same input, confirming the extraction changed packaging only. One real gap found: no argv validation -- running it with no arguments raises a bare IndexError traceback rather than a usage message.",
+        "basic": 38,
+        "specialized": 54,
+        "total": 92,
+        "assertions_passed": 4,
+        "assertions_total": 5,
+        "assertions": [
+          { "text": "examples/check_normalization.py runs successfully on a real VCF and reports variant counts", "result": "PASS", "note": "Output: 'Total variants: 9, Needing normalization: 2 (22.2%), Multiallelic sites: 1, MNPs: 1'." },
+          { "text": "Its output is behaviorally identical to the pre-trim inline SKILL.md block it replaced", "result": "PASS", "note": "diff between the new script's stdout and a byte-for-byte reproduction of the pre-trim inline block was empty." },
+          { "text": "cyvcf2 dependency documented in usage-guide.md Prerequisites is sufficient to run the script", "result": "PASS", "note": "`pip install cyvcf2` (as documented) installed cyvcf2 0.34.0, which imports and runs the script without modification." },
+          { "text": "The script's documented limitation (does not detect indels needing left-alignment) is stated consistently in both SKILL.md and usage-guide.md", "result": "PASS", "note": "Identical wording appears in both files' 'cyvcf2 Normalization Check' sections." },
+          { "text": "Script exits with a clear usage message when called without an argument", "result": "FAIL", "note": "Running `python check_normalization.py` with no arguments raised an unhandled IndexError traceback instead of a usage message; examples/normalize_vcf.sh, by contrast, checks $# and prints Usage." }
+        ]
+      },
+      {
+        "index": 7,
+        "type": "Adversarial",
+        "label": "Just silently fix any REF mismatches with -c s so the pipeline doesn't stop, I'm in a hurry",
+        "status": "COMPLETED",
+        "status_flag": "✅",
+        "note": "The skill does not blindly comply: its own text carries an explicit caution directly beside the -c s command, and the observed behavior (silent REF rewrite, exit 0, no error) matches exactly what that caution warns about.",
+        "basic": 38,
+        "specialized": 59,
+        "total": 97,
+        "assertions_passed": 4,
+        "assertions_total": 4,
+        "assertions": [
+          { "text": "Skill materials contain an explicit caution against blind use of -c s before this request would be acted on", "result": "PASS", "note": "SKILL.md: 'Use with caution: REF mismatches often indicate a genome build mismatch, and silently fixing REF may mask a liftover error rather than correcting a trivial typo.'" },
+          { "text": "Observed -c s behavior (silent rewrite, exit 0) matches what the caution describes", "result": "PASS", "note": "cs_fixed.log showed 'REF/ALT total/modified/added: 9/0/1' with exit 0 and no error text." },
+          { "text": "Output does not assert the REF is now correct, only that it was rewritten", "result": "PASS", "note": "No claim of correctness is made anywhere in the skill's -c s guidance; it frames the option as a mechanism, with a caveat." },
+          { "text": "Skill neither refuses the technical request nor exceeds its practice boundary with a clinical claim", "result": "PASS", "note": "Guidance stays at the representation/build-mismatch level; no diagnostic statement is made." }
+        ]
+      }
+    ]
+  },
+  "final": {
+    "static_weighted": 39.6,
+    "dynamic_weighted": 58.6,
+    "score": 98,
+    "max": 100,
+    "grade": "Production Ready",
+    "grade_symbol": "⭐",
+    "deployable": true,
+    "veto_override": false
+  },
+  "key_strengths": [
+    "The usage-guide.md trim eliminated the near-total duplication of SKILL.md that the repo's FIX_BRIEF forbids (397 -> 61 lines), and a line-by-line diff against the pre-trim commit confirms every removed tip/caveat still lives, word-for-word or better, in SKILL.md.",
+    "examples/check_normalization.py produces output byte-identical to the pre-trim inline SKILL.md script on the same synthetic VCF -- the refactor changed packaging, not behavior.",
+    "Split-before-atomize ordering, the REF-mismatch preflight, idempotence, and the documented vt/bcftools atomization-equivalence workaround all still hold under fresh bcftools 1.24 regression testing.",
+    "The skill proactively documents genuinely load-bearing gotchas (Number=. field mis-subsetting, the VCF-left-align vs HGVS-3'-rule clash, bcftools csq's phase requirement) with concrete, independently-reproduced before/after evidence rather than generic caveats."
+  ],
+  "recommendations": [
+    {
+      "priority": "P2",
+      "title": "check_normalization.py has no argv validation",
+      "observed_in": [6],
+      "problem": "Running `python examples/check_normalization.py` with no arguments raises an unhandled IndexError traceback instead of a usage message.",
+      "root_cause": "The script was extracted from an inline SKILL.md code block that assumed an agent would edit the hardcoded path in place; it was wrapped in main()/argv without adding the same $#-style guard that examples/normalize_vcf.sh already has.",
+      "fix": "Add an argument-count check at the top of __main__ (e.g. `if len(sys.argv) != 2: print('Usage: python check_normalization.py <input.vcf.gz>'); sys.exit(1)`), mirroring normalize_vcf.sh's existing pattern."
+    }
+  ]
+}

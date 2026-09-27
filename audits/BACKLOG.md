@@ -618,7 +618,7 @@ None open.
 - Root cause: GitHub package and C++ binary prerequisites were intentionally time-boxed out.
 - Fix: Use isolated environments for planted moloc, eCAVIAR, and conditional PWCoCo executions.
 
-## P2 (148)
+## P2 (150)
 
 ### `bio-data-visualization-statistical-annotation` — Test-name and label details differ from the tools
 
@@ -1236,21 +1236,29 @@ None open.
 - Root cause: The installed SRA Toolkit cannot resolve this public run's normalized-reference dependency before attempting its retrieval path; the private runtime instead reaches the verified ENA fallback safely.
 - Fix: If a stable toolkit-level preflight becomes available, detect this state sooner while retaining the validated staged ENA fallback.
 
-### `bio-vcf-statistics` — Separate strict PASS from unfiltered records
+### `bio-vcf-statistics` — Separate strict PASS from unfiltered records in the example
 
-- Skill: 91, Production Ready · [mrsonord2240/optimized-scientific-skills@2dee47f](https://github.com/mrsonord2240/optimized-scientific-skills/tree/2dee47f80dac6f3ba5c78b53ea9ec132a87cf5db/skills/bio-vcf-statistics) · [viewer](skills/bio-vcf-statistics/mrsonord2240-optimized-scientific-skills@2dee47f/viewer.md)
+- Skill: 91, Production Ready · [mrsonord2240/optimized-scientific-skills@ffa74e9](https://github.com/mrsonord2240/optimized-scientific-skills/tree/ffa74e915d92da714bfd40ce2f0aa1fbb1e2cde4/skills/bio-vcf-statistics) · [viewer](skills/bio-vcf-statistics/mrsonord2240-optimized-scientific-skills@ffa74e9/viewer.md)
 - Observed in inputs: 3
-- Problem: The example increments pass whenever cyvcf2 exposes FILTER as null, which includes both strict PASS and the unfiltered dot state, then prints the combined count as PASS variants.
-- Root cause: The output contract uses one counter for two VCF FILTER states even though the Skill documentation correctly distinguishes them.
-- Fix: Report strict PASS and unfiltered-dot records as separate counters, or rename the current count to Not-failed variants (PASS or dot) and add a strict-PASS counter using an API-safe distinction. Add a three-record PASS/dot/LowQual regression.
+- Problem: examples/vcf_stats.py increments 'pass' whenever cyvcf2 exposes FILTER as None, which includes both strict PASS and the unfiltered dot state, then prints the combined count as 'PASS variants'.
+- Root cause: The output contract uses one counter for two VCF FILTER states even though SKILL.md itself correctly distinguishes them (Quick counts section).
+- Fix: Report strict PASS and unfiltered-dot records as separate counters, or rename the current count to 'Not-failed variants (PASS or dot)' and add a real strict-PASS counter using variant.FILTER == None and a separate raw-FILTER check. Unchanged from the 2026-09-25 finding; still open.
 
-### `bio-vcf-statistics` — Report Ti/Tv components when denominator is zero
+### `bio-vcf-statistics` — Report Ti/Tv components when the transversion denominator is zero
 
-- Skill: 91, Production Ready · [mrsonord2240/optimized-scientific-skills@2dee47f](https://github.com/mrsonord2240/optimized-scientific-skills/tree/2dee47f80dac6f3ba5c78b53ea9ec132a87cf5db/skills/bio-vcf-statistics) · [viewer](skills/bio-vcf-statistics/mrsonord2240-optimized-scientific-skills@2dee47f/viewer.md)
+- Skill: 91, Production Ready · [mrsonord2240/optimized-scientific-skills@ffa74e9](https://github.com/mrsonord2240/optimized-scientific-skills/tree/ffa74e915d92da714bfd40ce2f0aa1fbb1e2cde4/skills/bio-vcf-statistics) · [viewer](skills/bio-vcf-statistics/mrsonord2240-optimized-scientific-skills@ffa74e9/viewer.md)
 - Observed in inputs: 4
-- Problem: When a valid callset has transitions but zero transversions, the example suppresses both component counts because the entire print block is guarded by transversions greater than zero.
+- Problem: When a valid callset has transitions but zero transversions, examples/vcf_stats.py suppresses both component counts because the entire print block is guarded by transversions > 0.
 - Root cause: Presentation of the counts is coupled to whether the ratio has a nonzero denominator.
-- Fix: Always print transition and transversion counts. Print Ti/Tv as infinite or undefined with an explicit zero-denominator note when transversions are zero, and add transition-only and empty-VCF regressions.
+- Fix: Always print transition and transversion counts; print Ti/Tv as undefined/infinite with an explicit zero-denominator note when transversions are zero. Unchanged from the 2026-09-25 finding; still open.
+
+### `bio-vcf-statistics` — Document that the AF-spectrum snippet only bins the first ALT's frequency
+
+- Skill: 91, Production Ready · [mrsonord2240/optimized-scientific-skills@ffa74e9](https://github.com/mrsonord2240/optimized-scientific-skills/tree/ffa74e915d92da714bfd40ce2f0aa1fbb1e2cde4/skills/bio-vcf-statistics) · [viewer](skills/bio-vcf-statistics/mrsonord2240-optimized-scientific-skills@ffa74e9/viewer.md)
+- Observed in inputs: 8
+- Problem: usage-guide.md's allele-frequency spectrum snippet takes af[0] for any multiallelic record's AF tuple with no comment; a multiallelic site's second and later alternate alleles are silently dropped from the spectrum.
+- Root cause: The snippet was written for the common biallelic case and never annotated for the multiallelic branch it already contains (isinstance(af, tuple)).
+- Fix: Add a one-line comment above the isinstance check noting that only the first ALT's AF is binned for multiallelic sites, mirroring the multiallelic caveat already present in SKILL.md's het allele-balance one-liner.
 
 ### `bio-bam-statistics` — Cite assay thresholds and FREEMIX cut-offs
 
@@ -1803,3 +1811,11 @@ None open.
 - Problem: The shipped GlobalPatterns example selects a tenth-percentile depth although the main Skill now supplies a numeric plateau helper.
 - Root cause: The example predates pick_sampling_depth.R.
 - Fix: Invoke the helper on exported counts, or label the quantile choice explicitly as a toy-example placeholder rather than a production rule.
+
+### `bio-variant-normalization` — check_normalization.py has no argv validation
+
+- Skill: 98, Production Ready · [mrsonord2240/optimized-scientific-skills@ffa74e9](https://github.com/mrsonord2240/optimized-scientific-skills/tree/ffa74e915d92da714bfd40ce2f0aa1fbb1e2cde4/skills/bio-variant-normalization) · [viewer](skills/bio-variant-normalization/mrsonord2240-optimized-scientific-skills@ffa74e9/viewer.md)
+- Observed in inputs: 6
+- Problem: Running `python examples/check_normalization.py` with no arguments raises an unhandled IndexError traceback instead of a usage message.
+- Root cause: The script was extracted from an inline SKILL.md code block that assumed an agent would edit the hardcoded path in place; it was wrapped in main()/argv without adding the same $#-style guard that examples/normalize_vcf.sh already has.
+- Fix: Add an argument-count check at the top of __main__ (e.g. `if len(sys.argv) != 2: print('Usage: python check_normalization.py <input.vcf.gz>'); sys.exit(1)`), mirroring normalize_vcf.sh's existing pattern.
