@@ -118,3 +118,16 @@ genes; SKILL.md:12's version floors checked against the env (pertpy 1.3.0, scanp
 only on Anaconda's `defaults`/`anaconda` channel, and `spams` has no py3.12 wheel and needs
 `numpy.distutils`. Seurat is not installed in the env's R library, so `Seurat::MixscapeLDA` /
 `?Seurat::PrepLDA` (SKILL.md:18,28) were confirmed from published docs, not by loading the package.
+
+## 2026-09-24 (exact-commit re-audit)
+
+Source commit `c16962282f077cac34857236c80e7d47935cacef` from worktree
+`F:\OpenScience\worktrees\bio-crispr-screens-perturb-seq-analysis-reaudit`.
+
+| finding | priority | change | verified | notes |
+| --- | --- | --- | --- | --- |
+| SCEPTRE creates a result then exits 139 in the pinned R runtime | P1 | Added `scripts/run_sceptre_safe.py`; it isolates the R worker, validates a nonempty TSV with numeric p-values in `[0,1]`, and persists worker status/result acceptance in `<out>.run.json` | ran file-input branch through the pinned `r.sh`: 3 rows validated, wrapper exit 0, manifest records native worker `2816`; an `echo` worker with no TSV was rejected with exit 1 | The native teardown warning remains visible in the manifest; valid output is not silently assumed. |
+| Default real Papalexi example exceeded 22 GB before output | P1 | `examples/run_pertpy.py` now defaults to 600 cells, 2,000 genes, and two perturbations; `--full` is explicit and warns of tens-of-GiB memory needs | ran `--help` against exact source; it completes before heavy imports and exposes all bounds | A partial dataset download produced an untracked 467 MiB temporary file during validation; it was removed and never committed. |
+| FR-Perturb/Seurat availability did not route to a tested fallback | P2 | Added `references/optional-methods.md`: isolated Python-3.8 FR-Perturb recipe, Seurat availability check, and supplied Pertpy/Mixscape/multiome fallbacks | docs and source routing checked | Optional methods are no longer implied to be runnable in the default environment. |
+
+Left unfixed: none at P0/P1/P2. Canonical re-audit: 93/100, Production Ready, assertion reconciliation 43/43.

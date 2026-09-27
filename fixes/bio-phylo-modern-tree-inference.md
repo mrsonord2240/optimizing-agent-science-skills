@@ -22,3 +22,12 @@ Worktree `F:\OpenScience\external\bioSkills-wt-p1`, branch `fix/backlog-p1`. Run
 | No small-data / duplicate-sequence pre-flight guidance (item 12) | P2 | New "Pre-flight: Small or Low-Signal Alignments" section (after Branch Support, before Concordance Factors): check `.iqtree`'s "Number of parsimony informative sites" before trusting a node; IQ-TREE2 keeps identical sequences by default (logs a NOTE, does not drop them); collapse/flag branches <=1e-6 (IQ-TREE's branch-length floor) before reading support on the adjacent node | ran `iqtree2.exe` (v2.4.0) on audit's own `runs_v2/in3/isolates6.fa` (6 primate seqs/250bp, `Homo_sapiens` duplicated as `Homo_sapiens_isolate2`) with `-m MFP -B 1000 -bnni --alrt 1000 -T 1 --seed 12345`, exit 0, independent rerun in scratchpad: `.iqtree` "Number of parsimony informative sites: 33" (of 250); `.log` "NOTE: Homo_sapiens_isolate2 is identical to Homo_sapiens but kept for subsequent analysis"; `.treefile` both duplicate tips at `0.0000010000` (1e-6 floor), uniting branch at 86.7/100 SH-aLRT/UFBoot; confirmed `ape::di2multi(phy, tol=...)` exists in shared R-lib (ape 5.8.1) for the collapsing recommendation | matches audit's own Input 3 note verbatim ("33 parsimony-informative sites; duplicate kept at 1e-6 branches; trivial 86.7/100 split flagged"); commit `0875dee` |
 
 Unfixed: none in this slice. bio-phylo-modern-tree-inference backlog items 10-12 now 3/3 done.
+
+## Phase 2 re-audit — 2026-09-24
+
+| finding | priority | change | exact-commit verification | result |
+|---|---|---|---|---|
+| PMSF command implied a second topology search despite `-ft` | P2 | Added `--seed 12345` to both PMSF steps and stated that `-ft guide.treefile` fixes the topology for profile fitting rather than launching another topology search | Commit `2ea86269004a0121ba08a1e934dfaef75bbe9ad1`; copied source and examples had matching SHA-256 bytes; exact skill-contract checks and shell syntax checks passed; live C10 fallback with the required `-B 1000` wrote `guide.treefile`, `pmsf.treefile`, and `LG+SSF` site-frequency output | closed |
+| Combined gCF/sCF command | P1 (prior) | No source change required: current source still uses the split `--gcf` and `--scfl` calls | Exact two-call run on synthetic 40-locus data wrote both `concord_g.cf.stat` and `concord_s.cf.stat` under IQ-TREE 2.4.0 | closed |
+
+No open P0, P1, or P2 findings after the Phase 2 re-audit.

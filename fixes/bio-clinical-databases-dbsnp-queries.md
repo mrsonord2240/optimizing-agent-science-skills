@@ -12,6 +12,18 @@ Branch `fix/variant`. Verified live on 2026-09-15 against NCBI Variation Service
 
 Left unfixed: none.
 
+## Re-audit — 2026-09-24
+
+Audited the clean staging commit `669dc64c934764a83d5b4d50c4ce11936f276d91` from an isolated worktree. The exact-commit runner asserted the SHA and clean worktree before each input, copied the committed example into the audit folder, and extracted runnable Python blocks directly from `SKILL.md`.
+
+| prior finding | priority | exact-commit evidence | result |
+|---|---|---|---|
+| Batch table drops annotations for merged rsIDs | P2 | Live manifest run: `rs630496` resolved to `429358` and retained the canonical myvariant ID, gnomAD v2 AFs, and ClinVar significance | closed |
+| Duplicate input rsIDs double per-allele values | P2 | Live manifest run: duplicate `rs429358` emitted one row and each per-allele value once; offline canonical-query regression passed | closed |
+| Inconsistent not-found contract | P2 | Live absent-ID run and offline regression: extracted `SKILL.md` and example both returned `status=not_found`, `final_rsid`, and `chain` | closed |
+
+Added `examples/test_dbsnp_lookup_contracts.py` to preserve those three contracts without network access, and documented the shared terminal-status and batch canonicalization invariants in the skill/example docstrings. The test script passed 2/2; the exact-commit re-audit completed 7/7 inputs, 28/28 assertions, score 93/100, Production Ready. No open P0, P1, or P2 findings.
+
 ## Backlog pass — 2026-09-15
 
 | finding | priority | change | verified (ran / help / docs) | notes |
