@@ -32,3 +32,17 @@ Source commit `356581080738dee60b613812b35fd4b99d217527` on isolated branch `age
 | `csq -p s` claimed no consequence is emitted globally | P2 | Limited wording to documented skip behavior and tells users to inspect emitted BCSQ on the installed version | archived input 5, bcftools 1.24 | unphased MNP consequence omitted; isolated-site output is version-sensitive |
 
 Final exact-commit audit: `F:\OpenScience\audits\bio-variant-normalization\runs\finalpass_20260924\exact_commit_audit.log` — 5 archived logical inputs plus 2 fresh inputs, 17/17 assertions passed. `vt` was unavailable; the input-4 logical reconciliation used the documented bcftools atomization equivalent and is labeled accordingly in the evidence. Final report: 95/100, Production Ready, no open P0/P1/P2; `auditor_independent=false` because the fixer performed this exact-commit audit under one brief. No merge, push, publish, or promotion was performed.
+
+## Marketplace pilot duplication cleanup — 2026-09-27
+
+Not from an audit finding: repo convention (FIX_BRIEF "state each fact once") flagged during
+marketplace-pilot review. `usage-guide.md` restated nearly all of `SKILL.md`'s normalization
+pipeline, tool-discordance, and troubleshooting content verbatim; trimmed 397 -> 61 lines to
+overview/prerequisites/quick-start/example-prompts/what-agent-will-do/tips/related-skills, with a
+pointer to `SKILL.md` and `examples/`. Also moved the inline cyvcf2 normalization-check script out
+of `SKILL.md` (was lines 364-399) into a new `examples/check_normalization.py`, replacing it with a
+1-line pointer (`SKILL.md` 438 -> 408 lines). No command semantics changed; the extracted script is
+byte-identical logic to the moved block, only wrapped in a `main()`/CLI arg.
+
+Left unfixed: none. **Needs re-audit** -- bytes changed since the 2026-09-24 final-pass audit
+(95/100, Production Ready).

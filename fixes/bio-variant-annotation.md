@@ -31,3 +31,17 @@ Source: `mrsonord2240__bioSkills` commit `6122d469f440f6030b278a155d8e4e78c8788d
 | Shipped helper used undeclared `bc` for its percentage and could make bad optional gnomAD input look like success | P2 | Replaced `bc` with zero-safe `awk`; require indexed target/source VCFs; reject a nonexistent `GNOMAD_VCF` and no shared input/gnomAD contigs; stated the preflight in the usage guide | bcftools 1.24: archived canonical and rare/phase regressions plus fresh valid, unindexed, invalid-path, and chr1-vs-1 cases. Valid run reports 7/11 rsIDs (63.6%); invalid cases fail explicitly. | Raw report/viewer: `F:\OpenScience\audits\bio-variant-annotation\`. |
 
 Left unfixed: none. Score: 91/100 Production Ready (self-audited; not independent acceptance evidence).
+
+## Marketplace pilot duplication cleanup — 2026-09-27
+
+Not from an audit finding: repo convention (FIX_BRIEF "state each fact once") flagged during
+marketplace-pilot review. `usage-guide.md`'s Overview paragraph restated SKILL.md's "annotation is
+not deterministic" governing-principle theory. Replaced with a short pointer to `SKILL.md` plus a
+one-line summary of what the guide actually covers uniquely (`bcftools annotate`/`csq` mechanics --
+BED/TAB annotation, `--set-id`, chromosome renaming, database downloads -- all already legitimately
+delegated to this file by SKILL.md's own "See usage-guide.md for..." line). Net effect is a
+restructure, not a shrink (461 -> 465 lines); the rest of the file was already correctly scoped. No
+command semantics changed.
+
+Left unfixed: none. **Needs re-audit** -- bytes changed since the 2026-09-24 final pass (91/100,
+Production Ready).

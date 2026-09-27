@@ -44,3 +44,16 @@ Exact source: `mrsonord2240/optimized-scientific-skills@2dee47f80dac6f3ba5c78b53
   26/28 assertions passed, with no veto, P0, or P1.
 - Open P2s: distinguish strict PASS from unfiltered dot records in the example's label, and always
   print transition/transversion component counts when the transversion denominator is zero.
+
+## Marketplace pilot duplication cleanup — 2026-09-27
+
+Not from an audit finding: repo convention (FIX_BRIEF "state each fact once") flagged during
+marketplace-pilot review. `usage-guide.md` restated SKILL.md's QC-metric interpretation and command
+blocks (Ti/Tv, het/hom, novel/known, missingness, HWE, contamination signatures, identity QC)
+almost verbatim. Trimmed 267 -> 106 lines, keeping only overview/prerequisites/quick-start/the two
+Python snippets SKILL.md explicitly delegates to it (per-sample genotype distribution,
+allele-frequency spectrum, both unchanged)/what-agent-will-do/tips/related-skills. No command
+semantics changed.
+
+Left unfixed: none. **Needs re-audit** -- bytes changed since the 2026-09-25 marketplace pilot
+re-audit (91/100, Production Ready).
